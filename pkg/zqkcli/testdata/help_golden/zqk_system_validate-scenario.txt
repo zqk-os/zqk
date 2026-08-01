@@ -1,0 +1,23 @@
+Execute a sequence of programmatic validation steps defined in a scenario file.
+
+This command uses the scenario executor to run command, regex, and file existence checks
+to natively verify that policies, architectural mandates, and tests are satisfied.
+
+  Run a specific scenario
+  zqk system validate-scenario --file scenarios/observability_check.yaml
+
+Usage:
+  zqk system validate-scenario [flags]
+
+Flags:
+      --columns string          Override column widths for table output (format: field:width)
+      --file string             Path to the scenario YAML file
+  -f, --format string           Output format (table, json, jsonl, yaml, csv, json-rpc, stream, agent-prompt, semantic-link) (default "table")
+      --ignore-scheduler-down   Ignore scheduler down warning/lockdown
+  -o, --output string           Write output to file
+  -q, --quiet                   Suppress non-essential output
+      --timeout duration        Timeout for command execution (0 = auto-calculate)
+  -v, --verbose                 Verbose output
+
+Global Flags:
+      --allow-degraded   Allow scheduler-dependent commands to run when scheduler daemon is not running

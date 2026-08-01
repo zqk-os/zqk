@@ -1,0 +1,268 @@
+package paths
+
+import (
+	"io/fs"
+
+	"github.com/lanceman/zqk/pkg/brand"
+)
+
+// Project data directory constants.
+// These are the default layout; the canonical source for "where are docs/zqk/cache" is brand settings
+// (zqk-settings.yaml paths.aliases) and the path alias cache built from it. Use paths.ResolvePathFromCacheOrConstant
+// or paths.ResolvePath(projectRoot, "prefix:<alias>") when building paths so moving folders only requires editing the settings file.
+//
+// Usage when cache may be built (prefer so settings can override):
+//   paths.ResolvePathFromCacheOrConstant(projectRoot, "cache", filepath.Join(paths.ProjectDataDir, paths.CacheDir))
+// Fallback when no project root or cache (e.g. init): filepath.Join(projectRoot, paths.ProjectDataDir, paths.CacheDir, ...)
+
+var (
+	// ProjectDataDir is the base directory name for project data
+	// This is where all project-specific data, configuration, and state is stored
+	ProjectDataDir = "." + brand.NamespacePrefix()
+
+	// Metrics directory constants (under project data, not source tree)
+	MetricsProfilesDir = ProjectDataDir + "/metrics/profiles"
+
+	// Seed questions directory (under project data); see initialization-seed-questions-v1.0.md
+	SeedQuestionsDir = ProjectDataDir + "/seed/questions"
+)
+
+const (
+	configYAMLFileName = "config.yaml"
+
+	// GitWorktreeMetadataEntry is the file or directory name Git places at the root of a work tree.
+	// Tests and teardown use it to avoid stripping or scrubbing a real checkout.
+	GitWorktreeMetadataEntry = ".git"
+
+	// Common subdirectories under ProjectDataDir
+	CacheDir              = "cache"
+	LogsDir               = "logs"
+	ConfigDir             = "config"
+	MCPDir                = "mcp"
+	MetricsDir            = "metrics"
+	StateDir              = "state"
+	StreamCurrentSubdir   = "stream_current" // Runtime deltas for stream-backed kinds (no CAS hash); see HIGH_VOLUME_STORAGE_DEPRECATION.md
+	CallbackDir           = "callback-logs"
+	MigrationSnapshotsDir = "migration-snapshots"
+	WalDir                = "wal"
+
+	// Logs subdirs: reports (object-count-report, etc.) live under logs/reports/
+	LogsReportsSubdir = "reports"
+	// LogsDriftSubdir holds convergence rollup/drift tooling output (default CVS_ORCH_ROLLUP_OUT directory segment).
+	// Full path: ProjectDataDir/LogsDir/LogsDriftSubdir — teams may override output via CVS_ORCH_ROLLUP_OUT on orchestrate jobs.
+	LogsDriftSubdir = "drift"
+	// Reports index and dashboard snapshot (object-count-report): durable index and latest snapshot for aggregation and dashboards.
+	ReportsIndexFile              = "reports_index.json"
+	LatestObjectCountSnapshotFile = "latest_object_count_snapshot.json"
+	// Metrics subdirs: object_volume time series (from object-count-report) live under metrics/object_volume/
+	MetricsObjectVolumeSubdir = "object_volume"
+	// Metrics subdirs: stream_volume time series (from high-volume stream kinds like audit_event) live under metrics/stream_volume/
+	MetricsStreamVolumeSubdir = "stream_volume"
+	// MetricsFilesystemSnapshotSubdir: full-tree file/byte counts by bucket (from object-count-report --include-filesystem-snapshot).
+	MetricsFilesystemSnapshotSubdir = "filesystem_snapshot"
+
+	// Common file names
+	ProjectConfigFile = configYAMLFileName
+	FeatureFlagsFile  = "feature_flags.json"
+	// CLIHookProfileFile stores built-in CLI hook bindings (enable/disable, optional tray entry). See pkg/clihooks.
+	CLIHookProfileFile = "cli_hook_profile.json"
+	// AgentChatChannelConfigFile is lite-file policy for the agent chat channel pilot (steward rules, enable/disable).
+	// See pkg/datacell, DATA_CELL_RUNTIME_ORGANISM.md.
+	AgentChatChannelConfigFile = "agent_chat_channel.json"
+	// AgentChatChannelEventsFile is append-only JSONL for chat-channel events (same directory contract as Cursor hook logs).
+	AgentChatChannelEventsFile = "agent_chat_channel.jsonl"
+	// CursorHooksLogsSubdir holds Cursor hook and chat-channel JSONL logs under .zqk/logs/.
+	CursorHooksLogsSubdir = "cursor-hooks"
+	// DataCellLogsSubdir holds data-cell stewardship JSONL under ProjectDataDir/LogsDir (steward enqueue queue; see pkg/datacell).
+	DataCellLogsSubdir = "datacell"
+	// StewardEnqueueJSONLFile is the append-only steward enqueue queue drained by data_cell_envelope_tick.
+	StewardEnqueueJSONLFile = "steward_enqueue.jsonl"
+	// DataCellRuntimeManifestFile is optional JSON declaring protocol_version for the datacell runtime layout. See pkg/datacell, DATA_CELL_RUNTIME_ORGANISM.md.
+	DataCellRuntimeManifestFile = "datacell_runtime.json"
+	// TrayYAMLFile is the optional tray manifest under ProjectDataDir (merged with embedded defaults). See pkg/tray, pkg/datacell.
+	TrayYAMLFile        = "tray.yaml"
+	ValidationCacheFile = "validation_cache.json"
+	ObjectIDCacheFile   = "object-id-cache.json"
+	CommandMetricsFile  = "command_metrics.json"
+	// ContextEventsJSONLFile is append-only JSONL for cross-cutting context / criteria / matrix signals (pkg/contextevents).
+	ContextEventsJSONLFile  = "context_events.jsonl"
+	SamplerConfigFile       = "sampler_config.yaml"
+	MCPConfigFile           = configYAMLFileName // Under MCPDir
+	BlockingCheckConfigFile = "blocking_check_config.yaml"
+	// HighVolumeKindsConfigFile is the canonical list of stream-backed kinds.
+	// Located under ProcessInternalConfigsDir. Drives streamStorageEnabledKinds in pkg/storage.
+	HighVolumeKindsConfigFile = "high_volume_kinds.yaml"
+	KindMappingsConfigFile    = "kind_mappings_config.yaml"
+	IdPrefixesConfigFile      = "id_prefixes_config.yaml"
+	PathsConfigFile           = "paths_config.yaml"
+	NamespacesConfigFile      = "namespaces_config.yaml"
+	ScannerConfigFile         = "scanner_config.yaml"
+	CommandTimeoutsConfigFile = "command_timeouts.yaml" // Under ConfigDir or repo config/
+	// ScanTestsPackageTimeoutsConfigFile is the config for minimum job/test timeouts per package (scheduler scan-tests).
+	// Under ConfigDir or repo config/. Load order: .zqk/config/ (override) then config/ (default).
+	ScanTestsPackageTimeoutsConfigFile = "scan_tests_package_timeouts.yaml"
+	MCPLogsDir                         = "logs" // Under MCPDir
+	MCPTraceLogPrefix                  = "mcp-trace-"
+	LogEventsPrefix                    = "log-events-"
+	ComponentsLogDir                   = "components" // Under LogsDir
+
+	// AuditStreamsDir: legacy name; audit_event streams now live under StreamsDir ( .zqk/streams/audit_event/ ). Kept for migration or external reference.
+	AuditStreamsDir = "audit_streams"
+	// StreamsDir: generic stream storage root for high-volume kinds (e.g. change_journal_entry) under .zqk/streams/
+	StreamsDir = "streams"
+	// TestBundlesDir is the subdirectory under ProjectDataDir where test bundles are saved/loaded (definitions)
+	TestBundlesDir = "test-bundles"
+
+	// Scheduler-related constants
+	SchedulerDir = "scheduler"
+	// SchedulerConfigFile is the scheduler configuration file name
+	SchedulerConfigFile = configYAMLFileName
+	// SchedulerPIDFile is the scheduler PID file name
+	SchedulerPIDFile = "scheduler.pid"
+	// SchedulerKeepAliveFile is the scheduler keep-alive file name
+	SchedulerKeepAliveFile = "scheduler.keepalive"
+	// SchedulerDaemonUnhealthyFile is written by external health-check when daemon is down or keep-alive stale.
+	// Monitoring can watch for this file; health-check removes it when daemon is healthy.
+	SchedulerDaemonUnhealthyFile = "daemon-unhealthy.json"
+	// SchedulerNoAutoRestartFile is created by "zqk scheduler stop" so ensure-scheduler-running.sh (cron) does not restart the daemon until the user runs "zqk scheduler start" again.
+	SchedulerNoAutoRestartFile = "no-auto-restart"
+	// SchedulerTriggersDir is the subdirectory for trigger queue files
+	SchedulerTriggersDir = "triggers"
+	// SchedulerTriggersQueueFile is the trigger queue file name
+	SchedulerTriggersQueueFile = "queue.json"
+	// SchedulerLocksDir is the subdirectory for lock files
+	SchedulerLocksDir = "locks"
+	// SchedulerLogsDir is the subdirectory for job execution logs (legacy name; see SchedulerJobLogsSubdir).
+	SchedulerLogsDir = "logs"
+	// SchedulerJobLogsSubdir is the subdirectory under ProjectDataDir/LogsDir for per-job logs.
+	// Full path: .zqk/logs/scheduler/<job-id>/<job-id>.log (colocated with other runtime logs under .zqk).
+	SchedulerJobLogsSubdir = "scheduler"
+	// SchedulerCVSSubdir is the convergence-session / CVS log namespace under scheduler logs.
+	// Full path: .zqk/logs/scheduler/cvs/ — CONV-wide JSONL (e.g. cvs_measurement_events.jsonl) and a nested test-bundles dir.
+	SchedulerCVSSubdir = "cvs"
+	// SchedulerTestBundlesSubdir is the subdir under SchedulerCVSSubdir for test-bundle job logs (shared folder).
+	// Full path: .zqk/logs/scheduler/cvs/test-bundles/; files: events.jsonl, health.jsonl, <job-id>.stdout, bundle-*.log.
+	SchedulerTestBundlesSubdir = "test-bundles"
+	// SchedulerChurnRunsSubdir is the subdir for legacy/high-churn one-off job logs (SCH-<unix>-<kind>-<id> pattern).
+	// One shared folder avoids hundreds of duplicate per-timestamp directories under .zqk/logs/scheduler/.
+	SchedulerChurnRunsSubdir = "churn-runs"
+
+	// Persistent project root (workspace-scoped): .zqk/current_root in the workspace (repo) root.
+	// Contains one line: absolute path or path relative to workspace. See PROJECT_ROOT_USE_AND_SCHEDULER_ALIGNMENT.md.
+	CurrentRootFile = "current_root"
+
+	// BrandSettingsFilename is the per-project settings file (e.g. zqk-settings.yaml).
+	// Defines project_root, staleness_check_dirs, aliases, cli.default_context. Required for scheduler and orientation.
+	// See .zqk/cli/specs/schemas/brand_settings.schema.json and PATH_ALIAS_RESOLUTION.md §6.
+	BrandSettingsFilename = "zqk-settings.yaml"
+	// TestSettingsFilename is the settings file used when ZQK_TEST_ROOT is set. Tests load this file
+	// instead of zqk-settings.yaml so project data is never touched. SetupTestEnvironment creates it.
+	TestSettingsFilename = "test-settings.yaml"
+	// ZqkTestSettingsFilename is an alternate test-root settings file (same schema as brand_settings).
+	// Loaded when TestSettingsFilename is absent so isolated zqk-ts + ZQK_TS_TEST_ROOT projects can ship one file.
+	ZqkTestSettingsFilename = "zqk-test-settings.yaml"
+
+	// Pre-commit: all state under .zqk/pre-commit/ (category files + single results.json for the hook)
+	PreCommitDir         = "pre-commit"
+	PreCommitResultsFile = "results.json" // aggregated file read by hook: .zqk/pre-commit/results.json
+
+	// DraftsDir is under ProjectDataDir: default output for `zqk new` (editable YAML before object create).
+	DraftsDir = "drafts"
+	// LastDraftPointerFile records the most recently written draft path for implicit `object create` / tooling.
+	LastDraftPointerFile = "last-draft.yaml"
+
+	// Process directory constants
+	ProcessDir                    = "docs/process"
+	ProcessInternalDir            = "docs/architecture/_internal"
+	ProcessInternalConfigsDir     = "docs/architecture/_internal/configs"
+	ProcessInternalAPISpecsDir    = "docs/architecture/api_specs"
+	ProcessInternalLifecyclesDir  = "docs/architecture/_internal/lifecycles"
+	ProcessInternalObjectSpecsDir = "docs/architecture/_internal/object_specs"
+	// ProcessInternalPipelineOutcomeKeysFile is the declarative registry for pkg/pipeline outcome map keys (codegen).
+	ProcessInternalPipelineOutcomeKeysFile = "docs/architecture/_internal/pipeline_outcome_keys.yaml"
+	ProcessInternalTraitsDir               = "docs/architecture/_internal/traits"
+	ProcessInternalProfileSpecsDir         = "docs/architecture/_internal/profile_specs"
+	ProcessArchitectureDir                 = "docs/architecture/architecture"
+	ProcessPoliciesDir                     = "docs/architecture/policies"
+	ProcessPlanningDir                     = "docs/architecture/planning"
+	ProcessAuditDir                        = "docs/architecture/audit"
+	ProcessAccountsDir                     = "docs/architecture/accounts"
+	ProcessAuthStrategiesDir               = "docs/architecture/auth_strategies"
+	ProcessBacklogDir                      = "docs/architecture/backlog"
+	ProcessKeystoreDir                     = "docs/architecture/keystore"
+	ProcessRolesDir                        = "docs/architecture/roles"
+	ProcessMissionsDir                     = "docs/architecture/missions"
+	ProcessVisionsDir                      = "docs/architecture/visions"
+	ProcessGoalsDir                        = "docs/architecture/goals"
+	ProcessWorkstreamsDir                  = "docs/architecture/workstreams"
+	ProcessPriorityPlansDir                = "docs/architecture/priority_plans"
+	ProcessAgentSkillsDir                  = "docs/architecture/agent_skills"
+
+	// Documentation directory constants
+	OnboardingDir = "docs/onboarding"
+
+	// CLI directory constants
+	CLIProfilesDir = "pkg/cli/profiles"
+
+	// CLI specs (under project data); used by bootstrap and command builders
+	CLISpecsDir = "cli/specs"
+	// System-health and quarantine (under project data)
+	SystemHealthDir = "system-health"
+	QuarantineDir   = "quarantine" // under SystemHealthDir
+	AutofixDir      = "autofix"
+	LockDir         = "lock"
+
+	// Standard source directory constants
+	DocsDir        = "docs"
+	DocsQualityDir = DocsDir + "/quality"
+	PkgDir         = "pkg"
+	// ConfigPackageDir is the root config package under PkgDir (import …/pkg/config).
+	ConfigPackageDir = "config"
+	// SpecbuilderDir is the specbuilder tree under PkgDir (import …/pkg/specbuilder/…).
+	SpecbuilderDir = "specbuilder"
+	// ObjectsPackageDir is the Go package directory under PkgDir (generated field_keys.go, kinds, etc.).
+	ObjectsPackageDir = "objects"
+	// FieldKeysGoFile is the generated ontology field-key constants source (under PkgDir/ObjectsPackageDir).
+	FieldKeysGoFile = "field_keys.go"
+	CmdDir          = "cmd"
+	InternalDir     = "internal"
+	ToolsDir        = "tools"
+	ScriptsDir      = "scripts"
+
+	// File extension constants
+	YAMLExtension        = ".yaml"
+	JSONExtension        = ".json"
+	MarkdownExtension    = ".md"
+	MarkdownAltExtension = ".markdown"
+
+	// Lock and temporary file suffixes (append to base path for atomic/locked writes)
+	LockFileSuffix = ".lock"
+	TmpFileSuffix  = ".tmp"
+
+	// Profile constants
+	ProfileExtendsNull = "null" // Value used to indicate no parent profile extension
+
+	// Namespace ID constants
+	// These define standard namespace identifiers used throughout the project
+	//
+	// NOTE: namespace IDs are configured dynamically for white-label support.
+
+	// Path reference scheme prefixes: path refs use these to distinguish resolution.
+	// Resolve via path alias cache at runtime before resolving any path on the local system.
+	//   prefix:<alias>  → project-relative path from cache (e.g. "prefix:docs" → "<project-root>/docs")
+	//   abs:<uri>       → absolute or file URI (e.g. "abs:file:///tmp/foo" or "abs:/local/abs/path")
+	//   web:<url>       → web URL (e.g. "web:https://example.com/resource")
+	PathSchemePrefix = "prefix:"
+	PathSchemeAbs    = "abs:"
+	PathSchemeWeb    = "web:"
+)
+
+// Default POSIX permissions for directories and files created under the project tree.
+// Use these instead of raw octal literals so linters and code search stay consistent.
+const (
+	DirPerm700  fs.FileMode = 0o700 // e.g. docs/architecture/keystore (credential material)
+	DirPerm750  fs.FileMode = 0o750 // e.g. scheduler health artifacts (owner + group r-x)
+	DirPerm755  fs.FileMode = 0o755
+	FilePerm600 fs.FileMode = 0o600
+	FilePerm644 fs.FileMode = 0o600
+)

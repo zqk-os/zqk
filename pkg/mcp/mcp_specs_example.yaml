@@ -1,0 +1,135 @@
+# Example MCP Spec - Onboarding Prompts
+# This demonstrates how to externalize MCP prompts, resources, and tools
+# Following the spec-driven builder pattern for consistency
+
+name: onboarding_prompts
+description: Standard onboarding and help prompts for MCP server
+version: "1.0"
+
+prompts:
+  - name: welcome
+    description: |
+      Welcome prompt that instructs the AI agent to introduce itself and get started.
+      Provides project context, current priority plans, and guidance on first steps.
+      Use this at the start of a session to understand the project state.
+
+  - name: getting_started
+    description: |
+      Comprehensive getting started guide for new users of the MCP server.
+      Explains available tools, permissions, system health checks, and common workflows.
+      Essential reading for understanding how to use the MCP server effectively.
+
+  - name: query_help
+    description: |
+      Help guide for querying and filtering objects.
+      Use this to learn how to use object_list, object_count, and filtering syntax.
+      Essential for finding and working with objects.
+
+  - name: create_object_guide
+    description: |
+      Guide and template for creating new objects.
+      Use this before creating objects to understand required fields, optional fields, and best practices.
+      Requires 'kind' argument to specify object type (e.g., backlog_item, goal, milestone).
+    arguments:
+      - name: kind
+        description: The object kind to create (e.g., backlog_item, goal, milestone)
+        required: true
+
+  - name: common_tasks
+    description: |
+      Examples of common tasks you can perform.
+      Provides step-by-step examples for listing objects, checking system health,
+      querying by status, and accessing documentation.
+      Use this to learn common workflows.
+
+  - name: object_lifecycle
+    description: |
+      Guide to understanding object lifecycles and state transitions.
+      Essential reading before updating object status to understand valid transitions
+      and lifecycle requirements.
+      Use this with resources/get for the full lifecycle guide.
+
+  - name: filter_syntax
+    description: |
+      Detailed guide to filter syntax for querying objects.
+      Explains how to use filters with object_list and object_count,
+      including equality, negation, and multiple filter combinations.
+      Essential for effective object queries.
+
+  - name: role_based_access
+    description: |
+      Guide to understanding role-based access and permissions in the MCP server.
+      Explains how tools are filtered by role, permissions, and server configuration.
+      Use this to understand why certain tools may not be available and how to check your access.
+
+  - name: execution_context
+    description: |
+      Current execution context including active priority plans, workflow policies,
+      and lifecycle requirements.
+      Use this to understand what work is currently prioritized and what workflow
+      requirements must be followed. Updated dynamically from project state.
+
+  - name: big_picture
+    description: |
+      Comprehensive project big picture including mission, vision, strategy, policies,
+      and current state.
+      Use this to understand the overall project goals, strategic direction, and current priorities.
+      Updated dynamically from project state.
+
+  - name: current_role
+    description: |
+      Shows your current role, permissions, and what operations you can perform.
+      Use this to understand your access level and what tools are available to you
+      based on your security context.
+
+# Example resources configuration
+resources:
+  - uri: file://docs/architecture/README.md
+    name: health_monitoring
+    description: Guide to system health monitoring, check violations, and proactive system maintenance
+    mime_type: text/markdown
+    category: documentation
+    priority: high
+    tags:
+      - health
+      - monitoring
+      - system
+
+# Example tool groups for organization
+tool_groups:
+  - name: object_operations
+    description: Tools for object CRUD operations
+    tools:
+      - object_list
+      - object_get
+      - object_create
+      - object_update
+    tags:
+      - objects
+      - crud
+
+  - name: system_operations
+    description: Tools for system health and status
+    tools:
+      - system_status
+      - system_check
+    tags:
+      - system
+      - health
+
+# Resource discovery configuration
+resource_discovery:
+  enabled: true
+  base_paths:
+    - docs/process
+    - docs/architecture
+  patterns:
+    - "**/*.md"
+    - "**/*.yaml"
+  exclusions:
+    - "**/_internal/**"
+    - "**/node_modules/**"
+  categories:
+    "docs/architecture/architecture/**": "architecture"
+    "docs/architecture/testing/**": "testing"
+    "docs/architecture/**": "process"

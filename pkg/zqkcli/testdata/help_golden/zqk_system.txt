@@ -1,0 +1,50 @@
+System operations for health checks, validation, and maintenance.
+
+This command group provides operations for system-level management:
+  Common operations: check (object health and compliance), align (strategic alignment)
+  Specialized operations: init, status, validate, sync
+
+  Common operations
+  zqk system check
+  Strategic alignment
+  zqk system align --gaps
+  Specialized operations
+  zqk system init
+  Show status
+  zqk system status
+  Validate objects
+  zqk system validate
+  Sync system
+  zqk system sync
+
+Usage:
+  zqk system [command]
+
+Available Commands:
+  check                 Check object health: registration, lifecycle, and policy compliance
+  cleanup-duplicates    Clean up duplicate traditional files that have hash-based equivalents
+  compact-journal       Compact change journal entries into dictionary-compressed artifacts
+  init                  Initialize a new ZQK project
+  metrics               View command execution metrics and statistics
+  recover-cas           Recover CAS objects with missing files
+  repair-cas-corruption Repair CAS filename/content hash mismatches (Tier-1 integrity blockers)
+  retention-tolerance   Run retention tolerance (archive and cleanup by age and max_count)
+  snapshot              Capture a sanitized telemetry snapshot for partner support
+  snapshot-expand       Expand a compressed snapshot file
+  snapshot-scenario     Capture system state snapshot for test scenario creation
+  snapshot-verify       Verify compressed snapshot data integrity against live objects
+  start-here            Start Here tutorial for new users and agents
+  state-commit          Commit the Knowledge Kernel state into a single compressed artifact
+  state-diff            Compare two system state snapshots or a snapshot against live state
+  state-restore         Restore the Knowledge Kernel state from a compressed artifact
+  status                Show system status and health summary
+  stream-gc             Run garbage collector to prune orphaned JSONL stream segment files
+  sync                  Sync objects between backends or environments
+  sync-cas-index        Sync CAS index from an existing hash-addressed file
+  validate              Validate object(s) against schema
+  validate-scenario     Execute a programmatic validation scenario
+
+Flags:
+      --allow-degraded   Allow scheduler-dependent commands to run when scheduler daemon is not running
+
+Use "zqk system [command] --help" for more information about a command.

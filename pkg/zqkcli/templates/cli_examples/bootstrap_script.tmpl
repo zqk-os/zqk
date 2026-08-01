@@ -1,0 +1,25 @@
+#!/bin/bash
+# Bootstrap script for initializing {kind} objects
+
+set -e
+
+PROJECT_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || pwd)
+
+# Create root {kind}
+cat > /tmp/root.yaml <<EOF
+{root_yaml}
+EOF
+
+{cli} object create {kind} --file /tmp/root.yaml
+
+# Create {count} child {kind} objects
+for i in {1..{count}}; do
+  cat > /tmp/{kind}-$i.yaml <<EOF
+{child_yaml_template}
+EOF
+  {cli} object create {kind} --file /tmp/{kind}-$i.yaml
+done
+
+# Verify creation
+{cli} object list {kind}
+

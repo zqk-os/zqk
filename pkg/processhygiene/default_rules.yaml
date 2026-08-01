@@ -1,0 +1,21 @@
+# Default declarative rules for object hygiene scans (embedded fallback).
+# Override: place docs/architecture/_internal/process_hygiene_rules.yaml in the project, or pass --rules-file.
+version: 1
+rules:
+  - id: fixture_title_prefix
+    description: "Isolated test helper titles (Fixture: prefix)"
+    match:
+      field: title
+      prefix: "Fixture:"
+
+  - id: test_snake_kind_number
+    description: "Mechanical Test <snake_kind> <n> titles from CRUD/scenario tests"
+    match:
+      field: title
+      regex: '^Test ([a-z0-9_]+) ([0-9]+)$'
+
+  - id: test_snake_kind_only
+    description: "Test <snake_kind> without index"
+    match:
+      field: title
+      regex: '^Test ([a-z0-9_]+)$'

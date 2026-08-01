@@ -1,0 +1,17 @@
+created_at: "2026-08-01T06:37:27Z"
+created_by: account:system
+file_path: /Users/lanceettl/ai-projects/zqk-public-candidate/docs/architecture/_internal/object_specs/decision.yaml
+id: OBJ-decision
+kind: object_spec
+namespace_id: zqk:kernel
+ontology: decision
+origin_project: zqk
+origin_system: zqk
+schema_version: 2.0.0
+source_type: internal
+status: implemented
+title: Decisions capture governance choices, linking goals, requirements, rules, and...
+updated_at: "2026-08-01T06:37:27Z"
+updated_by: account:system
+version_context: default
+visibility: public

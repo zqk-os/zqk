@@ -1,0 +1,79 @@
+package bldr_lifecycle_v1
+
+import (
+	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/lanceman/zqk/pkg/specbuilder/lifecycle_builders"
+)
+
+// SchedulerHealthMetricLifecycleBuilder builds the scheduler_health_metric lifecycle at version v1_0_0
+// File: bldr_lifecycle_v1/scheduler_health_metric_builder.go - version is encoded in package/directory name
+type SchedulerHealthMetricLifecycleBuilder struct {
+	*lifecycle_builders.BaseLifecycleBuilder
+}
+
+// NewSchedulerHealthMetricLifecycleBuilder creates a new builder for scheduler_health_metric lifecycle version v1_0_0
+func NewSchedulerHealthMetricLifecycleBuilder() *SchedulerHealthMetricLifecycleBuilder {
+	builder := &SchedulerHealthMetricLifecycleBuilder{
+		BaseLifecycleBuilder: lifecycle_builders.NewBaseLifecycleBuilder("scheduler_health_metric", "v1_0_0"),
+	}
+
+	// Configure the lifecycle
+	builder.
+		SetPercentComplete(objects.PercentCompleteConfig{
+			Method: "status_defaults",
+			DefaultByStatus: map[string]any{
+				"active":   100,
+				"archived": 100,
+				"error":    0,
+			},
+		})
+
+	// Add statuses and transitions
+	builder.addSchedulerHealthMetricLifecycleData()
+
+	return builder
+}
+
+// addSchedulerHealthMetricLifecycleData adds the scheduler_health_metric lifecycle statuses and transitions
+func (b *SchedulerHealthMetricLifecycleBuilder) addSchedulerHealthMetricLifecycleData() {
+
+	b.AddStatus(objects.Status{
+		Value:       "active",
+		Display:     "Active",
+		Origin:      true,
+		Description: "Metric is current and actively being updated",
+	})
+	b.AddStatus(objects.Status{
+		Value:       "archived",
+		Display:     "Archived",
+		Terminal:    true,
+		Archive:     true,
+		Description: "Metric is historical and no longer updated",
+	})
+	b.AddStatus(objects.Status{
+		Value:       "error",
+		Display:     "Error",
+		System:      true,
+		Description: "Metric encountered an error during creation or update",
+	})
+
+	b.AddTransition(objects.Transition{
+		From:        "active",
+		To:          "archived",
+		Description: "Archive metric after retention period",
+		Manual:      false,
+		Auto:        true,
+	})
+
+	b.AddTransition(objects.Transition{
+		From:        "*",
+		To:          "error",
+		Description: "Metric encountered a system error",
+		Manual:      false,
+		Auto:        true,
+	})
+}
+
+func init() {
+	lifecycle_builders.RegisterBuilder(NewSchedulerHealthMetricLifecycleBuilder())
+}

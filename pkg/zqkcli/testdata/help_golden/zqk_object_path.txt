@@ -1,0 +1,20 @@
+Find the shortest path between two objects via reference relationships.
+
+
+
+Traverses relationships following reference fields (*_ref, *_refs) to find
+
+a connection path between the two objects.
+
+  Find path from one backlog item to another
+  zqk object path ITEM-626 ITEM-641
+  Output as JSON
+  zqk object path ITEM-626 ITEM-641 --format json
+  Output as YAML
+  zqk object path ITEM-626 ITEM-641 --format yaml
+
+Usage:
+  zqk object path [flags]
+
+Global Flags:
+      --allow-degraded   Allow scheduler-dependent commands to run when scheduler daemon is not running

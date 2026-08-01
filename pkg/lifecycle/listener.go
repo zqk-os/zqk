@@ -1,0 +1,190 @@
+// Package lifecycle: listener reads the lifecycle event WAL, accumulates satisfied criteria,
+// and when all criteria for a transition rule are met, sends the transition to the updater channel.
+
+package lifecycle
+
+import (
+	"context"
+	"fmt"
+	"os"
+	"strconv"
+	"sync"
+	"time"
+
+	pkgctx "github.com/lanceman/zqk/pkg/context"
+	"github.com/lanceman/zqk/pkg/goroutinelabels"
+	"github.com/lanceman/zqk/pkg/logging"
+	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/lanceman/zqk/pkg/paths"
+)
+
+// TransitionRequest is a request to apply a status transition (kind, id, to_status).
+type TransitionRequest struct {
+	Kind     string
+	ID       string
+	ToStatus string
+}
+
+// Listener reads the lifecycle WAL, accumulates criteria, and enqueues transition requests.
+// Run one listener per project root (single goroutine). Bounded: no unbounded goroutines.
+type Listener struct {
+	projectRoot  string
+	wal          *LifecycleEventWAL
+	rules        []TransitionRule
+	transitionCh chan<- TransitionRequest
+	getStorage   StorageProviderForCriterion
+
+	// satisfied: set of (criterion_id, scope_key) that have been satisfied
+	satisfied      map[string]struct{}
+	fired          map[string]struct{} // rule key -> fired, so we don't double-fire
+	lastSeq        int64
+	mu             sync.Mutex
+	checkpointPath string
+}
+
+// NewListener creates a listener that reads from wal, evaluates rules, and sends transitions to transitionCh.
+func NewListener(projectRoot string, wal *LifecycleEventWAL, rules []TransitionRule, transitionCh chan<- TransitionRequest, getStorage StorageProviderForCriterion) *Listener {
+	return &Listener{
+		projectRoot:    projectRoot,
+		wal:            wal,
+		rules:          rules,
+		transitionCh:   transitionCh,
+		getStorage:     getStorage,
+		satisfied:      make(map[string]struct{}),
+		fired:          make(map[string]struct{}),
+		checkpointPath: wal.CheckpointPath(),
+	}
+}
+
+// Run runs the listener loop: load checkpoint, replay from WAL, process events, save checkpoint.
+// Blocks until ctx is cancelled. Single goroutine per listener (concurrency guideline).
+func (l *Listener) Run(ctx context.Context) error {
+	logger := logging.NewEventLogger(ctx)
+	if err := l.loadCheckpoint(); err != nil {
+		logging.FluentEvent(logger).Debug("Lifecycle listener: load checkpoint failed, starting from seq 0").
+			WithError(err).
+			Log()
+	}
+	for {
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		default:
+		}
+		lastSeq := l.lastSeq
+		var replayed int
+		err := l.wal.ReplayFrom(lastSeq, func(ev *LifecycleEvent) error {
+			select {
+			case <-ctx.Done():
+				return ctx.Err()
+			default:
+			}
+			if err := l.processEvent(ev); err != nil {
+				return err
+			}
+			if ev.Seq > l.lastSeq {
+				l.lastSeq = ev.Seq
+			}
+			replayed++
+			return nil
+		})
+		if err != nil {
+			logging.FluentEvent(logger).Debug("Lifecycle listener: replay failed").
+				WithError(err).
+				Log()
+			return err
+		}
+		if replayed > 0 {
+			_ = l.saveCheckpoint()
+		}
+		// Poll WAL periodically; avoid tight loop when idle
+		timer := time.NewTimer(2 * time.Second)
+		select {
+		case <-ctx.Done():
+			timer.Stop()
+			return ctx.Err()
+		case <-timer.C:
+			timer.Stop()
+		}
+	}
+}
+
+func (l *Listener) processEvent(ev *LifecycleEvent) error {
+	l.mu.Lock()
+	defer l.mu.Unlock()
+	switch ev.EventType {
+	case EventTypeCriterionSatisfied:
+		key := ev.CriterionID + ":" + ev.scopeKey()
+		l.satisfied[key] = struct{}{}
+		l.tryFireRulesLocked(ev.CriterionID, ev.scopeKey(), ev.Scope)
+	case EventTypeStatusTransition:
+		// When a criteria transitions to a status that meets the gate, check if the parent milestone/backlog item criteria are satisfied.
+		if ev.Kind == objects.KindCriteria && CriterionStatusMeetsMilestoneGateForMilestone(ev.ToStatus) {
+			goroutinelabels.NewGoroutine("lifecycle_propagation", "propagate criteria transition to parents").StartSimple(func() {
+				ctx := pkgctx.NewSystemContext()
+				TryEmitForMilestonesContainingCriterion(ctx, l.projectRoot, ev.ID, l.getStorage)
+				TryEmitForBacklogItemsContainingCriterion(ctx, l.projectRoot, ev.ID, l.getStorage)
+			})
+		}
+	}
+	return nil
+}
+
+func (l *Listener) tryFireRulesLocked(criterionID, scopeKey string, scope map[string]string) {
+	for _, rule := range l.rules {
+		if !rule.RuleMatch(criterionID, scopeKey, scope) {
+			continue
+		}
+		objID := rule.ObjectID(scope)
+		if objID == emptyValue {
+			continue
+		}
+		fireKey := rule.CriterionID + ":" + scopeKey + "->" + rule.Kind + ":" + objID
+		if _, already := l.fired[fireKey]; already {
+			continue
+		}
+		l.fired[fireKey] = struct{}{}
+		select {
+		case l.transitionCh <- TransitionRequest{Kind: rule.Kind, ID: objID, ToStatus: rule.ToStatus}:
+			// sent
+		default:
+			// channel full; don't block listener (drop or retry later - for now drop to avoid deadlock)
+		}
+	}
+}
+
+func (l *Listener) loadCheckpoint() error {
+	b, err := os.ReadFile(l.checkpointPath)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return nil
+		}
+		return err
+	}
+	seq, err := strconv.ParseInt(string(b), 10, 64)
+	if err != nil {
+		return err
+	}
+	l.mu.Lock()
+	l.lastSeq = seq
+	l.mu.Unlock()
+	return nil
+}
+
+func (l *Listener) saveCheckpoint() error {
+	l.mu.Lock()
+	seq := l.lastSeq
+	l.mu.Unlock()
+	return os.WriteFile(l.checkpointPath, []byte(fmt.Sprintf("%d", seq)), paths.FilePerm600)
+}
+
+// AppendCriterionSatisfied appends a CriterionSatisfied event to the WAL (e.g. from lifecycle hook or job).
+// Call from the same process that holds the WAL so Append is safe.
+func AppendCriterionSatisfied(wal *LifecycleEventWAL, criterionID string, scope map[string]string) error {
+	ev := &LifecycleEvent{
+		EventType:   EventTypeCriterionSatisfied,
+		CriterionID: criterionID,
+		Scope:       scope,
+	}
+	return wal.Append(ev)
+}

@@ -1,0 +1,27 @@
+Utility operations for system information and data management.
+
+This command group provides utility operations:
+  Common operations: version, migrate, validate-yaml, fix-hashes
+  Specialized operations: (future: export, import, etc.)
+
+  Show version
+  zqk utility version
+  Migrate data
+  zqk utility migrate --from file --to graph
+  Validate YAML
+  zqk utility validate-yaml file.yaml
+  Fix hashes
+  zqk utility fix-hashes --recursive docs/architecture/
+
+Usage:
+  zqk utility [command]
+
+Available Commands:
+  fix-hashes       Fix missing or mismatched integrity hashes
+  fix-registration Fix registration issues (ID format mismatches)
+  migrate          Migrate data between backends
+  scenario-builder Build test scenarios with configurable data
+  validate-yaml    Validate YAML file syntax
+  version          Show ZQK version information
+
+Use "zqk utility [command] --help" for more information about a command.

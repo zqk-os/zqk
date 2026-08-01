@@ -1,0 +1,20 @@
+# Default Tray entries (embedded). Override or extend with .zqk/tray.yaml in the project root.
+# JSON Schema: https://zqk.dev/schemas/tray_config.schema.json (file: .zqk/cli/specs/schemas/tray_config.schema.json)
+$schema: https://zqk.dev/schemas/tray_config.schema.json
+version: 1
+entries:
+  - name: scheduler-status
+    description: Show whether the scheduler daemon is running
+    argv: [scheduler, status]
+  - name: scheduler-activity
+    description: Recent scheduler activity
+    argv: [scheduler, activity]
+  - name: priority-in-progress
+    description: List in-progress priority plans (JSON)
+    argv: [object, list, priority_plan, --filter, status=in_progress, --format, json]
+  - name: active-convergence
+    description: List active convergence sessions (JSON)
+    argv: [object, list, convergence_session, --filter, status=active, --format, json]
+  - name: test-failures-health
+    description: Test bundle health timeline (meaningful after bundles have run)
+    argv: [scheduler, test-failures, health]

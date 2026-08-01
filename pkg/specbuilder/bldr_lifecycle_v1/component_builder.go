@@ -1,0 +1,135 @@
+package bldr_lifecycle_v1
+
+import (
+	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/lanceman/zqk/pkg/specbuilder/lifecycle_builders"
+)
+
+// ComponentLifecycleBuilder builds the component lifecycle at version v1_0_0
+// File: bldr_lifecycle_v1/component_builder.go - version is encoded in package/directory name
+type ComponentLifecycleBuilder struct {
+	*lifecycle_builders.BaseLifecycleBuilder
+}
+
+// NewComponentLifecycleBuilder creates a new builder for component lifecycle version v1_0_0
+func NewComponentLifecycleBuilder() *ComponentLifecycleBuilder {
+	builder := &ComponentLifecycleBuilder{
+		BaseLifecycleBuilder: lifecycle_builders.NewBaseLifecycleBuilder("component", "v1_0_0"),
+	}
+
+	// Configure the lifecycle
+	builder.
+		SetPercentComplete(objects.PercentCompleteConfig{
+			Method: "status_defaults",
+			DefaultByStatus: map[string]any{
+				"archived":  100,
+				"created":   0,
+				"error":     0,
+				"placed":    50,
+				"rendered":  100,
+				"validated": 25,
+			},
+		})
+
+	// Add statuses and transitions
+	builder.addComponentLifecycleData()
+
+	return builder
+}
+
+// addComponentLifecycleData adds the component lifecycle statuses and transitions
+func (b *ComponentLifecycleBuilder) addComponentLifecycleData() {
+
+	b.AddStatus(objects.Status{
+		Value:       "created",
+		Display:     "Created",
+		Origin:      true,
+		Description: "Component has been instantiated but not yet validated",
+	})
+	b.AddStatus(objects.Status{
+		Value:   "validated",
+		Display: "Validated",
+		Preconditions: []string{
+			"Component type is valid",
+			"Attributes pass validation",
+			"Constraint spec exists (if constrainable)",
+		},
+		Description: "Component passes validation checks (type, attributes, constraints)",
+	})
+	b.AddStatus(objects.Status{
+		Value:   "placed",
+		Display: "Placed",
+		Preconditions: []string{
+			"Component has valid position",
+			"No overlap violations (if applicable)",
+			"Spatial constraints satisfied",
+		},
+		Description: "Component positioned in layout with no overlap violations",
+	})
+	b.AddStatus(objects.Status{
+		Value:   "rendered",
+		Display: "Rendered",
+		Preconditions: []string{
+			"Component successfully written to SVG",
+			"SVG structure is valid",
+		},
+		Description: "Component successfully written to SVG output",
+	})
+	b.AddStatus(objects.Status{
+		Value:       "archived",
+		Display:     "Archived",
+		Terminal:    true,
+		Archive:     true,
+		Description: "Component is no longer active and has been archived",
+	})
+	b.AddStatus(objects.Status{
+		Value:       "error",
+		Display:     "Error",
+		System:      true,
+		Description: "Component encountered an error during validation, placement, or rendering",
+	})
+
+	b.AddTransition(objects.Transition{
+		From:        "created",
+		To:          "validated",
+		Description: "Component passes validation checks",
+		Manual:      true,
+		Auto:        false,
+	})
+
+	b.AddTransition(objects.Transition{
+		From:        "validated",
+		To:          "placed",
+		Description: "Component positioned in layout",
+		Manual:      true,
+		Auto:        false,
+	})
+
+	b.AddTransition(objects.Transition{
+		From:        "placed",
+		To:          "rendered",
+		Description: "Component successfully rendered to SVG",
+		Manual:      false,
+		Auto:        true,
+	})
+
+	b.AddTransition(objects.Transition{
+		From:        "*",
+		To:          "error",
+		Description: "Component encountered an error",
+		Manual:      false,
+		Auto:        true,
+	})
+
+	b.AddTransition(objects.Transition{
+		From:        "*",
+		To:          "archived",
+		Description: "Component is no longer needed and can be archived",
+		Manual:      true,
+		Auto:        false,
+	})
+}
+
+func init() {
+	lifecycle_builders.RegisterBuilder(NewComponentLifecycleBuilder())
+}

@@ -1,0 +1,18 @@
+# Enable graph backend
+export {cli_env_prefix}_GRAPH_ENABLED=true
+
+# Optional: Configure graph connection (defaults shown)
+export {cli_env_prefix}_GRAPH_HOST=localhost
+export {cli_env_prefix}_GRAPH_PORT=7687
+export {cli_env_prefix}_GRAPH_POOL_SIZE=10
+
+# Start MemGraph (if not already running)
+# Option 1: Using Docker
+docker run -d --name {cli}-memgraph -p 7687:7687 -p 7444:7444 memgraph/memgraph
+
+# Option 2: Using service management
+{cli} system service start memgraph
+
+# Verify graph backend is enabled
+{cli} system service status memgraph
+

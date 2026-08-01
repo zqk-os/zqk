@@ -1,0 +1,123 @@
+package object
+
+import (
+	"encoding/json"
+	"testing"
+
+	pkgctx "github.com/lanceman/zqk/pkg/context"
+	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/lanceman/zqk/pkg/storage"
+)
+
+func TestGetObjectView_MilestoneCompletionReport_ProjectsFields(t *testing.T) {
+	testEnv := SetupTestEnvironment(t)
+
+	fieldRegistry := objects.GetGlobalFieldRegistry()
+	if err := fieldRegistry.LoadFields(); err != nil {
+		t.Fatalf("failed to load field registry: %v", err)
+	}
+
+	criteriaFields, err := fieldRegistry.GetFieldsForKind("criteria")
+	if err != nil {
+		t.Fatalf("failed to get criteria fields: %v", err)
+	}
+	milestoneFields, err := fieldRegistry.GetFieldsForKind("milestone")
+	if err != nil {
+		t.Fatalf("failed to get milestone fields: %v", err)
+	}
+
+	fs, err := storage.NewFileObjectStorage(testEnv.GetTestRoot())
+	if err != nil {
+		t.Fatalf("open storage: %v", err)
+	}
+
+	ctx := pkgctx.NewSystemContext()
+	secCtx := pkgctx.NewSystemSecurityContext()
+	cliCtx := storage.WithCLIOperation(ctx)
+
+	crit1ID := "CRIT-011000"
+	crit2ID := "CRIT-011001"
+
+	crit1 := createTestObject("criteria", crit1ID, criteriaFields, 0)
+	crit1[objects.FieldKeyStatus] = objectStatusComplete
+	if err := fs.Create(cliCtx, secCtx, crit1); err != nil {
+		t.Fatalf("create crit1: %v", err)
+	}
+
+	crit2 := createTestObject("criteria", crit2ID, criteriaFields, 1)
+	crit2[objects.FieldKeyStatus] = objectStatusValidated
+	if err := fs.Create(cliCtx, secCtx, crit2); err != nil {
+		t.Fatalf("create crit2: %v", err)
+	}
+
+	flushCtx, cancelFlush := storage.DurabilityFlushContext()
+	defer cancelFlush()
+	if err := fs.EnsureCLIObjectMutationVisible(flushCtx, []string{"criteria"}); err != nil {
+		t.Fatalf("ensure criteria visible: %v", err)
+	}
+
+	milestoneID := "MIL-011000"
+	milestone := createTestObject("milestone", milestoneID, milestoneFields, 0)
+	milestone[objects.FieldKeyCriteriaRefs] = []string{crit1ID, crit2ID}
+
+	// Intentionally contradict text-based completion; view should be driven by durable criteria status.
+	milestone[objects.FieldKeyCompletionCriteria] = []string{
+		"[ ] backlog-item-example status is complete",
+		"[ ] backlog-item-example-2 status is complete",
+	}
+	if err := fs.Create(cliCtx, secCtx, milestone); err != nil {
+		t.Fatalf("create milestone: %v", err)
+	}
+	if err := fs.EnsureCLIObjectMutationVisible(flushCtx, []string{"milestone"}); err != nil {
+		t.Fatalf("ensure milestone visible: %v", err)
+	}
+
+	cmd := testEnv.CreateCLICommand(
+		"object",
+		"get",
+		milestoneID,
+		"--format",
+		"json",
+		"--view",
+		"milestone-completion-report",
+	)
+	out, err := cmd.CombinedOutput()
+	if err != nil {
+		t.Fatalf("object get failed: %v output=%s", err, string(out))
+	}
+
+	var got map[string]any
+	if err := json.Unmarshal(out, &got); err != nil {
+		t.Fatalf("unmarshal get output: %v; output=%s", err, string(out))
+	}
+
+	if got["milestone_complete_via_criteria_refs"] != true {
+		t.Fatalf("expected milestone_complete_via_criteria_refs=true; got=%v", got["milestone_complete_via_criteria_refs"])
+	}
+	if got["milestone_percent_complete_via_criteria_refs"] != float64(100) {
+		t.Fatalf("expected percent=100; got=%v", got["milestone_percent_complete_via_criteria_refs"])
+	}
+
+	if _, ok := got[objects.FieldKeyCompletionCriteria]; ok {
+		t.Fatalf("expected completion_criteria excluded from milestone-completion-report view")
+	}
+	if _, ok := got["reference_resolver_overlay_applied"]; ok {
+		t.Fatalf("expected resolver overlay metadata excluded from view projection")
+	}
+
+	resolved, ok := got["resolved_criteria_refs"].([]any)
+	if !ok {
+		t.Fatalf("expected resolved_criteria_refs as array; got=%T", got["resolved_criteria_refs"])
+	}
+	if len(resolved) != 2 {
+		t.Fatalf("expected resolved_criteria_refs length=2; got=%d", len(resolved))
+	}
+
+	firstCrit, _ := resolved[0].(map[string]any)
+	if firstCrit[objects.FieldKeyStatus] != objectStatusComplete && firstCrit[objects.FieldKeyStatus] != objectStatusValidated {
+		t.Fatalf("expected resolved criteria status complete/validated; got=%v", firstCrit[objects.FieldKeyStatus])
+	}
+	if firstCrit[objects.FieldKeyTitle] == emptyValue {
+		t.Fatalf("expected resolved criteria title non-empty")
+	}
+}

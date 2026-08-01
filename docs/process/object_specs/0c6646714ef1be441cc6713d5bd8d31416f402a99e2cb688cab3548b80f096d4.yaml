@@ -1,0 +1,17 @@
+created_at: "2026-08-01T06:38:28Z"
+created_by: account:system
+file_path: /Users/lanceettl/ai-projects/zqk-public-candidate/docs/architecture/_internal/object_specs/workstream_transition.yaml
+id: OBJ-workstream_transition
+kind: object_spec
+namespace_id: zqk:kernel
+ontology: workstream_transition
+origin_project: zqk
+origin_system: zqk
+schema_version: 2.0.0
+source_type: internal
+status: implemented
+title: Defines a transition from one workstream to another, including transition cri...
+updated_at: "2026-08-01T06:38:28Z"
+updated_by: account:system
+version_context: default
+visibility: public

@@ -1,0 +1,9 @@
+.zqk
+.git
+bin
+*.exe
+**/*_test.go
+**/testdata
+pkg/specbuilder/bldr_v2
+docs/process
+node_modules

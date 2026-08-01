@@ -1,0 +1,26 @@
+Update multiple objects from a YAML file.
+
+The file should contain a YAML array of update items:
+  - id: BLI-001
+    updates:
+      title: "Updated Title"
+      status: validated
+  - id: BLI-002
+    updates:
+      priority: high
+
+
+  Update multiple objects from file
+  zqk-object object bulk update --file updates.yaml
+  Dry-run to see what would be updated
+  zqk-object object bulk update --file updates.yaml --dry-run
+
+Usage:
+  zqk-object object bulk update [flags]
+
+Flags:
+      --dry-run       Show what would be done without actually doing it
+      --file string   Path to YAML file containing array of updates (required)
+      --force         Force mode: skip 'not found' errors (treat missing objects as success)
+      --keep-file     Keep the source file after update (default: temp files like tmp-*.yaml are removed automatically)
+      --relaxed       Relax integrity constraints during bulk update (allow references to objects that will be created later in batch operations). Note: Auto-detected for bulk operations, this flag is optional.

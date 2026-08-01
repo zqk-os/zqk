@@ -1,0 +1,16 @@
+package workflow
+
+import (
+	"github.com/lanceman/zqk/pkg/cli/bldr_cli_cmd_v1"
+	"github.com/spf13/cobra"
+)
+
+// NewWorkflowCmd creates the workflow command group.
+func NewWorkflowCmd() *cobra.Command {
+	cmd := bldr_cli_cmd_v1.NewWorkflowCommandBuilder()
+	cmd.AddCommand(NewNextCmd())
+	cmd.AddCommand(NewWhatsNextCmd())
+	cmd.AddCommand(NewAddCmd())
+	cmd.AddCommand(NewCoachCmd())
+	return cmd
+}

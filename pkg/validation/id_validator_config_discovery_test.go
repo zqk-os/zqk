@@ -1,0 +1,99 @@
+package validation
+
+import (
+	"os"
+	"path/filepath"
+	"testing"
+
+	"github.com/lanceman/zqk/pkg/datacell"
+	"github.com/lanceman/zqk/pkg/paths"
+)
+
+// TestConfigFileDiscovery tests if findIDPrefixesConfig can find the config file
+// from different working directories (simulating actual project usage)
+// NOTE: Cannot use t.Parallel() - this test changes working directory which conflicts with parallel execution
+func TestConfigFileDiscovery(t *testing.T) {
+	tmpDir := t.TempDir()
+	projectRoot := tmpDir
+
+	internalDir := datacell.CellCASPrimaryDir(projectRoot, "_internal")
+	if err := os.MkdirAll(internalDir, paths.DirPerm755); err != nil {
+		t.Fatalf(ConstMagicf379db0a, err)
+	}
+
+	// Create configs directory (config file should be in configs/ subdirectory)
+	configsDir := filepath.Join(internalDir, "configs")
+	if err := os.MkdirAll(configsDir, paths.DirPerm755); err != nil {
+		t.Fatalf(ConstMagic2967e378, err)
+	}
+
+	// Create a marker file (go.mod) so findPathByWalkingUp can identify project root
+	goModFile := filepath.Join(projectRoot, "go.mod")
+	if err := os.WriteFile(goModFile, []byte("module test\n"), paths.FilePerm644); err != nil {
+		t.Fatalf(ConstMagica76bb0bc, err)
+	}
+
+	// Config file should be in configs/ subdirectory per ProcessInternalConfigsDir
+	configFile := filepath.Join(configsDir, ConstMagic014a7ae7)
+	configContent := `version: "1.0.0"
+kind_to_prefixes:
+  decision:
+    - DEC-
+    - ADR-
+`
+	if err := os.WriteFile(configFile, []byte(configContent), paths.FilePerm644); err != nil {
+		t.Fatalf(ConstMagic8e96c016, err)
+	}
+
+	oldWd, err := os.Getwd()
+	if err != nil {
+		t.Fatalf(ConstMagic25cbf3ea, err)
+	}
+	defer os.Chdir(oldWd)
+
+	// Test 1: From project root
+	if err := os.Chdir(projectRoot); err != nil {
+		t.Fatalf(ConstMagic0b7b38b2, err)
+	}
+
+	ResetGlobalIDPrefixesConfig()
+	ResetGlobalPathsConfig()
+	foundPath := findIDPrefixesConfig()
+	t.Logf(ConstMagic7b4155cb, foundPath)
+	if foundPath == emptyValue {
+		t.Error(ConstMagic50785345)
+	}
+
+	// Test 2: From a subdirectory (simulating system check running from different location)
+	subDir := filepath.Join(projectRoot, "some", "sub", "directory")
+	if err := os.MkdirAll(subDir, paths.DirPerm755); err != nil {
+		t.Fatalf(ConstMagicbc403569, err)
+	}
+
+	if err := os.Chdir(subDir); err != nil {
+		t.Fatalf(ConstMagic0b7b38b2, err)
+	}
+
+	ResetGlobalIDPrefixesConfig()
+	ResetGlobalPathsConfig()
+	foundPath2 := findIDPrefixesConfig()
+	t.Logf(ConstMagic425ba67b, foundPath2)
+	if foundPath2 == emptyValue {
+		t.Error(ConstMagic8f630751)
+	}
+
+	// Test 3: Load config and verify it has both prefixes
+	ResetGlobalIDPrefixesConfig()
+	ResetGlobalPathsConfig()
+	config := GetGlobalIDPrefixesConfig()
+	if config == nil {
+		t.Fatal(ConstMagica6b206af)
+	}
+
+	prefixes := config.GetPrefixesForKind("decision")
+	t.Logf(ConstMagic3e6eb5b5, prefixes)
+
+	if len(prefixes) != 2 {
+		t.Errorf(ConstMagicfdb60e48, len(prefixes), prefixes)
+	}
+}

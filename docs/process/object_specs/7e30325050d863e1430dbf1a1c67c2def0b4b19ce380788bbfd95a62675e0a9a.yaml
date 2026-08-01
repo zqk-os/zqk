@@ -1,0 +1,17 @@
+created_at: "2026-08-01T06:37:59Z"
+created_by: account:system
+file_path: /Users/lanceettl/ai-projects/zqk-public-candidate/docs/architecture/_internal/object_specs/prompt_template.yaml
+id: OBJ-prompt_template
+kind: object_spec
+namespace_id: zqk:kernel
+ontology: prompt_template
+origin_project: zqk
+origin_system: zqk
+schema_version: 2.0.0
+source_type: internal
+status: implemented
+title: Prompt templates are structured, reusable prompts that guide agents or humans...
+updated_at: "2026-08-01T06:37:59Z"
+updated_by: account:system
+version_context: default
+visibility: public

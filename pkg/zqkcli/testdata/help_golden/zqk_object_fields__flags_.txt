@@ -1,0 +1,23 @@
+Without --list-kinds, use 'object <kind> fields' to list fields for a specific kind.
+With --list-kinds, output all object kinds (table, json, or yaml).
+
+Examples: zqk object backlog_item fields
+
+  List all kinds
+  zqk object fields --list-kinds
+  List kinds as JSON
+  zqk object fields --list-kinds --format json
+
+Usage:
+  zqk object fields [flags]
+
+Flags:
+      --filterable         Show only filterable fields
+      --format string      Output format: table, json, yaml (default "table")
+      --groupable          Show only groupable fields
+      --list-kinds         List all object kinds (instead of listing fields for a kind)
+      --sortable           Show only sortable fields
+      --specialized-only   Show only specialized fields (exclude common fields)
+
+Global Flags:
+      --allow-degraded   Allow scheduler-dependent commands to run when scheduler daemon is not running

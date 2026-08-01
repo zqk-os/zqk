@@ -1,0 +1,101 @@
+package bldr_lifecycle_v1
+
+import (
+	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/lanceman/zqk/pkg/specbuilder/lifecycle_builders"
+)
+
+// AuthStrategyLifecycleBuilder builds the auth_strategy lifecycle at version v1_0_0
+// File: bldr_lifecycle_v1/auth_strategy_builder.go - version is encoded in package/directory name
+type AuthStrategyLifecycleBuilder struct {
+	*lifecycle_builders.BaseLifecycleBuilder
+}
+
+// NewAuthStrategyLifecycleBuilder creates a new builder for auth_strategy lifecycle version v1_0_0
+func NewAuthStrategyLifecycleBuilder() *AuthStrategyLifecycleBuilder {
+	builder := &AuthStrategyLifecycleBuilder{
+		BaseLifecycleBuilder: lifecycle_builders.NewBaseLifecycleBuilder("auth_strategy", "v1_0_0"),
+	}
+
+	// Configure the lifecycle
+	builder.
+		SetPercentComplete(objects.PercentCompleteConfig{
+			Method: "status_defaults",
+			DefaultByStatus: map[string]any{
+				"active":   100,
+				"archived": 100,
+				"disabled": 0,
+				"error":    0,
+			},
+		})
+
+	// Add statuses and transitions
+	builder.addAuthStrategyLifecycleData()
+
+	return builder
+}
+
+// addAuthStrategyLifecycleData adds the auth_strategy lifecycle statuses and transitions
+func (b *AuthStrategyLifecycleBuilder) addAuthStrategyLifecycleData() {
+
+	b.AddStatus(objects.Status{
+		Value:       "active",
+		Display:     "Active",
+		Origin:      true,
+		Description: "Strategy is enabled and can be used for authentication",
+	})
+	b.AddStatus(objects.Status{
+		Value:       "disabled",
+		Display:     "Disabled",
+		Description: "Strategy is temporarily disabled and cannot be used",
+	})
+	b.AddStatus(objects.Status{
+		Value:       "archived",
+		Display:     "Archived",
+		Terminal:    true,
+		Archive:     true,
+		Description: "Strategy has been deprecated and is no longer used",
+	})
+	b.AddStatus(objects.Status{
+		Value:       "error",
+		Display:     "Error",
+		System:      true,
+		Description: "Strategy encountered an error during configuration or validation",
+	})
+
+	b.AddTransition(objects.Transition{
+		From:        "active",
+		To:          "disabled",
+		Description: "Disable the strategy (temporarily disable authentication)",
+		Manual:      true,
+		Auto:        false,
+	})
+
+	b.AddTransition(objects.Transition{
+		From:        "disabled",
+		To:          "active",
+		Description: "Re-enable a disabled strategy",
+		Manual:      true,
+		Auto:        false,
+	})
+
+	b.AddTransition(objects.Transition{
+		From:        "*",
+		To:          "archived",
+		Description: "Archive the strategy permanently (deprecate it)",
+		Manual:      true,
+		Auto:        false,
+	})
+
+	b.AddTransition(objects.Transition{
+		From:        "*",
+		To:          "error",
+		Description: "Strategy encountered a system error or validation failure",
+		Manual:      false,
+		Auto:        true,
+	})
+}
+
+func init() {
+	lifecycle_builders.RegisterBuilder(NewAuthStrategyLifecycleBuilder())
+}

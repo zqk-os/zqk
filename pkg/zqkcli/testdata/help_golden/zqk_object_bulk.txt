@@ -1,0 +1,31 @@
+Perform bulk operations on multiple objects at once.
+
+Bulk operations are atomic - either all operations succeed or all fail (transaction-based).
+For operations that can partially succeed (like bulk-get), errors are reported per-object.
+
+Available subcommands:
+  - create: Create multiple objects from a file
+  - update: Update multiple objects from a file
+  - get: Get multiple objects by ID
+  - delete: Delete multiple objects by ID
+
+  Create multiple objects
+  zqk object bulk create backlog_item --file items.yaml
+  Update multiple objects
+  zqk object bulk update --file updates.yaml
+  Get multiple objects
+  zqk object bulk get --ids ITEM-001,ITEM-002,ITEM-003
+
+Usage:
+  zqk object bulk [command]
+
+Available Commands:
+  create      Create multiple objects from a file
+  delete      Delete multiple objects by ID
+  get         Get multiple objects by ID
+  update      Bulk update objects (filter or file)
+
+Global Flags:
+      --allow-degraded   Allow scheduler-dependent commands to run when scheduler daemon is not running
+
+Use "zqk object bulk [command] --help" for more information about a command.

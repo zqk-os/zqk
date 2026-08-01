@@ -1,0 +1,68 @@
+package bldr_lifecycle_v1
+
+import (
+	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/lanceman/zqk/pkg/specbuilder/lifecycle_builders"
+)
+
+// GlossaryTermLifecycleBuilder builds the glossary_term lifecycle at version v1_0_0
+// File: bldr_lifecycle_v1/glossary_term_builder.go - version is encoded in package/directory name
+type GlossaryTermLifecycleBuilder struct {
+	*lifecycle_builders.BaseLifecycleBuilder
+}
+
+// NewGlossaryTermLifecycleBuilder creates a new builder for glossary_term lifecycle version v1_0_0
+func NewGlossaryTermLifecycleBuilder() *GlossaryTermLifecycleBuilder {
+	builder := &GlossaryTermLifecycleBuilder{
+		BaseLifecycleBuilder: lifecycle_builders.NewBaseLifecycleBuilder("glossary_term", "v1_0_0"),
+	}
+
+	// Add statuses and transitions
+	builder.addGlossaryTermLifecycleData()
+
+	return builder
+}
+
+// addGlossaryTermLifecycleData adds the glossary_term lifecycle statuses and transitions
+func (b *GlossaryTermLifecycleBuilder) addGlossaryTermLifecycleData() {
+
+	b.AddStatus(objects.Status{
+		Value:       "active",
+		Display:     "Active",
+		Origin:      true,
+		Description: "Term is active and available for use",
+	})
+	b.AddStatus(objects.Status{
+		Value:       "archived",
+		Display:     "Archived",
+		Terminal:    true,
+		Archive:     true,
+		Description: "Term has been deprecated and archived",
+	})
+	b.AddStatus(objects.Status{
+		Value:       "error",
+		Display:     "Error",
+		System:      true,
+		Description: "Term encountered an error",
+	})
+
+	b.AddTransition(objects.Transition{
+		From:        "active",
+		To:          "archived",
+		Description: "Term is deprecated",
+		Manual:      true,
+		Auto:        false,
+	})
+
+	b.AddTransition(objects.Transition{
+		From:        "*",
+		To:          "error",
+		Description: "System error occurred",
+		Manual:      false,
+		Auto:        true,
+	})
+}
+
+func init() {
+	lifecycle_builders.RegisterBuilder(NewGlossaryTermLifecycleBuilder())
+}

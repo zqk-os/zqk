@@ -1,0 +1,27 @@
+Navigate to the previous priority plan in the sequence.
+
+
+
+The sequence includes all active and in_progress priority plans, sorted by:
+
+1. in_progress plans first
+
+2. Then active plans by active_order (lower first)
+
+3. Then by plan_date (descending)
+
+  View backlog items for previous plan
+  zqk pplan prev
+  View in JSON format
+  zqk pplan prev --format json
+
+Usage:
+  zqk object pplan prev [flags]
+
+Flags:
+      --filter stringArray   Filter by field (format: field=value or field:value, can be used multiple times)
+      --sort-asc             Sort ascending (default: true) (default true)
+      --sort-by string       Field to sort by
+
+Global Flags:
+      --allow-degraded   Allow scheduler-dependent commands to run when scheduler daemon is not running

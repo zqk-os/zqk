@@ -1,1 +1,169 @@
-/target
+# Binaries
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test binary, built with `go test -c`
+*.test
+
+# Output of the go coverage tool
+*.out
+
+# Dependency directories
+vendor/
+
+# Go workspace file
+go.work
+
+# IDE
+.idea/
+# Track `.vscode/settings.json` for shared editor/extension defaults; keep other `.vscode/*` local.
+.vscode/*
+!.vscode/settings.json
+
+*.swp
+*.swo
+*~
+
+# zqk
+# Prevent nested .zqk directories from test data pollution (POL-CODE-006).
+# Go test CWD is the package directory; poorly isolated tests can create .zqk/ there.
+**/.zqk/logs/
+**/.zqk/scheduler/
+**/.zqk/streams/
+.zqk/**/*.lock
+.zqk/cache/
+.zqk/stream_summary/
+.zqk/scheduler/
+.zqk/state/
+.zqk/streams/
+.zqk/tmp/
+# Ephemeral scratch at .zqk root (CLI --file payloads, scans). Use .zqk/tmp/ instead.
+/.zqk/tmp-*
+/.zqk/tmp_*
+/.zqk/temp-*
+/.zqk/temp_*
+.zqk/drafts/
+.zqk/wal/
+# System-managed resources container (CAS indices, snapshots)
+.zqk/system-state/cas-indices/
+.zqk/system-state/snapshots/
+!.zqk/system-state/README.md  # Track README for documentation
+/zqk
+/zqk-mcp
+
+
+# Logs
+.zqk/logs/
+.zqk/logs/
+.zqk/**/logs/
+
+# OS
+.DS_Store
+._*
+Thumbs.db
+
+# Build artifacts
+bin/
+dist/
+build
+codebase-inventory
+/zqk
+/zqk_local
+
+# Temporary files
+*.tmp
+*.log
+lint*.txt
+/**/lint*.txt
+hash-mismatch.*.txt
+
+# Vetting matrix loop backups if written next to CSV (legacy); default backup dir is under .zqk/logs/
+docs/quality/*.bak-*
+
+# Test data
+test-data/
+test-scenarios/
+
+# Scenario builder generated files (bootstrapping artifacts)
+
+# Process data (will be managed by CLI)
+# Corporate initiative index builder temps (atomic write before rename)
+
+# Lock files (temporary, auto-cleaned by FileLockStrategy)
+
+# Audit events (high-volume, system-generated - not suitable for version control)
+
+# Change journal entries (high-volume, system-generated - not suitable for version control)
+
+# Metrics (high-volume, system-generated - includes scheduler_health_metric, file_lock_metric, command_metric, etc.)
+
+# Scheduler jobs (high-volume runtime artifacts; temporary until docs/process -> .zqk migration)
+
+# Local workspace metrics (command_metrics.json, object_volume/stream_volume chunks, baseline_metrics, etc.).
+# Populated by CLI and scheduler; use zqk system audit-report, object-count-report, scripts/collect_baseline*.sh — not versioned.
+.zqk/metrics/
+
+# Pre-commit hook state (results.json, category JSON, lint/policy/integrity outputs). Populated by pre-commit scripts and timer jobs.
+.zqk/pre-commit/
+
+.zqk/diagnostics/
+.zqk/scheduler/locks/
+
+# Compliance output snapshots (generated)
+.zqk/compliance-*.txt
+
+# Ad-hoc Go literal scan dumps at repo root (e.g. for p in cmd cmdv2 pkg internal; do git grep … > ${p}_results.txt).
+# Prefer: ./scripts/scan-hardcoded-go-literals.sh --out .zqk/logs/drift/go-literals-scan.txt
+# System health snapshots (generated)
+.zqk/system-health/
+
+# MCP session dumps (runtime artifacts)
+# Local .zqk used by cmd/zqk/internal (runtime)
+# Nested .zqk and docs under package dirs must not be used as project root; ignore if created by mistake
+
+# Transient zqk object update payload (CLI --file helper)
+tmp/cvs-update.yaml
+
+# Local zip snapshots of docs/reports (see docs/archive/README.md); regenerate on demand
+docs/archive/snapshots/*.zip
+
+# Kernel state instances (managed via state-commit snapshot)
+
+.zqk/config/ambient_context.json*
+.env
+/.sandbox/
+.zqk/inbox/
+.zqk/test-bundles/
+*.prof
+zqk_local
+dump_commands
+.zqk/cursors/
+artifacts/
+
+# Marketing & Public Sites
+
+# Personal & Sensitive Data
+
+# Temp / Scratch / Junk
+*.awk
+*.prof
+*.pprof
+*.jsonl
+lint_out*.txt
+*.patch
+/zqk
+
+# Public tour hygiene rules
+*.tmp-*
+*.tmp
+.zqk/*.log
+
+# Community: Studio junk / process-CAS patterns live in Studio police
+# (scripts/open-core/police-community-tree.sh), not this ignore file.
+
+.oc-sun-quarantine/
+.oc-sun-docker/
+

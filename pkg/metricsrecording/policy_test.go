@@ -1,0 +1,27 @@
+package metricsrecording
+
+import (
+	"os"
+	"testing"
+
+	"github.com/lanceman/zqk/pkg/zqkenv"
+)
+
+const testSkipReasonEnvOptIn = "ZQK_TEST_METRICS_RECORDING opts in whole suite"
+
+func TestEnabled_OptInRefCount(t *testing.T) {
+	if !testing.Testing() {
+		t.Skip("test binary only")
+	}
+	if os.Getenv(zqkenv.TestMetricsRecording()) == "1" || os.Getenv(zqkenv.TestMetricsRecording()) == "true" {
+		t.Skip(testSkipReasonEnvOptIn)
+	}
+	if Enabled() {
+		t.Fatal("expected default disabled in test binary without opt-in")
+	}
+	EnterAllowRecording()
+	defer LeaveAllowRecording()
+	if !Enabled() {
+		t.Fatal("expected enabled after EnterAllowRecording")
+	}
+}

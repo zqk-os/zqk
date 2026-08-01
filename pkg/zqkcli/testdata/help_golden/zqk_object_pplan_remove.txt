@@ -1,0 +1,12 @@
+Clears priority_plan_ref from the specified backlog item.
+
+  Remove backlog item from plan
+  zqk pplan remove PLAN-123456789012345678-abcdef120-bdc4dd36 ITEM-123456789012345678-abcdef120-de06babe
+  Alternative positional syntax
+  zqk pplan PLAN-123456789012345678-abcdef120-bdc4dd36 remove ITEM-123456789012345678-abcdef120-de06babe
+
+Usage:
+  zqk object pplan remove [flags]
+
+Global Flags:
+      --allow-degraded   Allow scheduler-dependent commands to run when scheduler daemon is not running

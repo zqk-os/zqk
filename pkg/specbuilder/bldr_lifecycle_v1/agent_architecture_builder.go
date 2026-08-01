@@ -1,0 +1,103 @@
+package bldr_lifecycle_v1
+
+import (
+	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/lanceman/zqk/pkg/specbuilder/lifecycle_builders"
+)
+
+// AgentArchitectureLifecycleBuilder builds the agent_architecture lifecycle at version v1_0_0
+// File: bldr_lifecycle_v1/agent_architecture_builder.go - version is encoded in package/directory name
+type AgentArchitectureLifecycleBuilder struct {
+	*lifecycle_builders.BaseLifecycleBuilder
+}
+
+// NewAgentArchitectureLifecycleBuilder creates a new builder for agent_architecture lifecycle version v1_0_0
+func NewAgentArchitectureLifecycleBuilder() *AgentArchitectureLifecycleBuilder {
+	builder := &AgentArchitectureLifecycleBuilder{
+		BaseLifecycleBuilder: lifecycle_builders.NewBaseLifecycleBuilder("agent_architecture", "v1_0_0"),
+	}
+
+	// Configure the lifecycle
+	builder.
+		SetPercentComplete(objects.PercentCompleteConfig{
+			Method: "status_defaults",
+			DefaultByStatus: map[string]any{
+				"active":         100,
+				"archived":       100,
+				"design":         0,
+				"error":          0,
+				"implementation": 50,
+			},
+		})
+
+	// Add statuses and transitions
+	builder.addAgentArchitectureLifecycleData()
+
+	return builder
+}
+
+// addAgentArchitectureLifecycleData adds the agent_architecture lifecycle statuses and transitions
+func (b *AgentArchitectureLifecycleBuilder) addAgentArchitectureLifecycleData() {
+
+	b.AddStatus(objects.Status{
+		Value:   "design",
+		Display: "Design",
+		Origin:  true,
+	})
+	b.AddStatus(objects.Status{
+		Value:   "implementation",
+		Display: "Implementation",
+	})
+	b.AddStatus(objects.Status{
+		Value:    "active",
+		Display:  "Active",
+		Terminal: true,
+	})
+	b.AddStatus(objects.Status{
+		Value:    "archived",
+		Display:  "Archived",
+		Terminal: true,
+		Archive:  true,
+	})
+	b.AddStatus(objects.Status{
+		Value:   "error",
+		Display: "Error",
+		System:  true,
+	})
+
+	b.AddTransition(objects.Transition{
+		From:        "design",
+		To:          "implementation",
+		Description: "Move from design to implementation",
+		Manual:      true,
+		Auto:        false,
+	})
+
+	b.AddTransition(objects.Transition{
+		From:        "implementation",
+		To:          "active",
+		Description: "Activate architecture",
+		Manual:      true,
+		Auto:        false,
+	})
+
+	b.AddTransition(objects.Transition{
+		From:        "active",
+		To:          "archived",
+		Description: "Archive architecture",
+		Manual:      true,
+		Auto:        false,
+	})
+
+	b.AddTransition(objects.Transition{
+		From:        "*",
+		To:          "error",
+		Description: "System error occurred",
+		Manual:      false,
+		Auto:        true,
+	})
+}
+
+func init() {
+	lifecycle_builders.RegisterBuilder(NewAgentArchitectureLifecycleBuilder())
+}

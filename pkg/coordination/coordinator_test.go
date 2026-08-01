@@ -1,0 +1,240 @@
+package coordination
+
+import (
+	"github.com/lanceman/zqk/pkg/datacell"
+
+	"os"
+	"testing"
+	"time"
+
+	pkgctx "github.com/lanceman/zqk/pkg/context"
+	"github.com/lanceman/zqk/pkg/metrics"
+	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/lanceman/zqk/pkg/paths"
+	"github.com/lanceman/zqk/pkg/storage"
+)
+
+func TestCoordinator_Emit(t *testing.T) {
+	t.Parallel()
+	coordinator := NewCoordinator(CoordinatorConfig{})
+
+	eventCtx := NewEventContext("test-op-1", "test_operation", "start").
+		WithEventData(&EventData{
+			LoggingFields: []LoggingField{
+				{Key: "event", Value: "test_start"},
+				{Key: "operation", Value: "test_operation"},
+			},
+			AuditMetadata: map[string]any{
+				objects.FieldKeyEventType: "test_start",
+				objects.FieldKeyOperation: "Test operation started",
+			},
+			MetricsData: map[string]any{
+				objects.FieldKeyOperation: "test_operation",
+			},
+		})
+
+	// Emit should not panic
+	err := coordinator.Emit(pkgctx.NewSystemContext(), eventCtx)
+	if err != nil {
+		t.Errorf("Emit() returned error: %v", err)
+	}
+}
+
+func TestCoordinator_Subscribe(t *testing.T) {
+	t.Parallel()
+	coordinator := NewCoordinator(CoordinatorConfig{})
+
+	subscriber := &testSubscriber{
+		id:         "test-sub-1",
+		eventTypes: []string{"operation.start"},
+		active:     true,
+	}
+
+	subscriberID := coordinator.Subscribe(subscriber)
+	if subscriberID != "test-sub-1" {
+		t.Errorf("Subscribe() returned wrong ID: got %s, want test-sub-1", subscriberID)
+	}
+
+	// Unsubscribe
+	coordinator.Unsubscribe(subscriberID)
+
+	// Subscribe again should work
+	subscriberID2 := coordinator.Subscribe(subscriber)
+	if subscriberID2 != "test-sub-1" {
+		t.Errorf("Subscribe() after unsubscribe returned wrong ID: got %s, want test-sub-1", subscriberID2)
+	}
+}
+
+func TestEventContext_WithMethods(t *testing.T) {
+	t.Parallel()
+	ec := NewEventContext("op-1", "test_op", "start")
+
+	ec = ec.WithDuration(5 * time.Second).
+		WithDependencies([]string{"dep-1", "dep-2"}).
+		WithTriggers([]string{"trigger-1"}).
+		WithCorrelationID("corr-123")
+
+	if ec.Duration != 5*time.Second {
+		t.Errorf("Duration not set correctly")
+	}
+	if len(ec.Dependencies) != 2 {
+		t.Errorf("Dependencies not set correctly")
+	}
+	if len(ec.Triggers) != 1 {
+		t.Errorf("Triggers not set correctly")
+	}
+	if ec.CorrelationID != "corr-123" {
+		t.Errorf("CorrelationID not set correctly")
+	}
+}
+
+func TestStorageAuditRouter_Emit(t *testing.T) {
+	t.Parallel()
+	if testing.Short() {
+		t.Skip("Skipping test in short mode - creates FileObjectStorage with background goroutines")
+	}
+	// Create a temporary directory for storage
+	tmpDir := t.TempDir()
+
+	ensureObjectSpecsForCoordTest(t, tmpDir)
+
+	// Use test storage so hash registries are not registered with global manager;
+	// otherwise a later test's cleanup can cancel them and cause "hash registry context cancelled".
+	fileStorage, err := storage.NewFileObjectStorageForTest(tmpDir)
+	if err != nil {
+		t.Fatalf("Failed to create file storage: %v", err)
+	}
+	t.Cleanup(func() {
+		if err := storage.RunProjectTestTeardown(storage.TempProjectTeardown(tmpDir, fileStorage)); err != nil {
+			t.Logf("project test teardown: %v", err)
+		}
+	})
+
+	router := NewStorageAuditRouter(tmpDir, fileStorage)
+
+	eventCtx := NewEventContext("test-op", "test_operation", "complete").
+		WithEventData(&EventData{
+			AuditMetadata: map[string]any{
+				objects.FieldKeyEventType:  "test_complete",
+				objects.FieldKeyOperation:  "Test operation completed",
+				objects.FieldKeySeverity:   "low",
+				objects.FieldKeyTargetKind: "test_object",
+			},
+		})
+
+	// Emit should not panic (best-effort, may fail if project structure is incomplete)
+	err = router.Emit(pkgctx.NewSystemContext(), eventCtx)
+	// Error is acceptable for best-effort audit events
+	_ = err
+}
+
+func TestMetricPipelineRouter_Emit(t *testing.T) {
+	t.Parallel()
+	if testing.Short() {
+		t.Skip("Skipping test in short mode - creates FileObjectStorage with background goroutines")
+	}
+	tmpDir := t.TempDir()
+
+	// Create minimal project structure (docs/process directory)
+	processDir := datacell.ProcessPrimaryDir(tmpDir)
+	if err := os.MkdirAll(processDir, paths.DirPerm755); err != nil {
+		t.Fatalf("Failed to create process directory: %v", err)
+	}
+
+	fileStorage, err := storage.NewFileObjectStorage(tmpDir)
+	if err != nil {
+		t.Fatalf("Failed to create file storage: %v", err)
+	}
+
+	pipeline := metrics.NewMetricPipeline(fileStorage)
+	router := NewMetricPipelineRouter(pipeline)
+
+	t.Cleanup(func() {
+		if err := storage.RunProjectTestTeardown(storage.TempProjectTeardown(tmpDir, fileStorage)); err != nil {
+			t.Logf("project test teardown: %v", err)
+		}
+	})
+	t.Cleanup(func() {
+		if pipeline != nil && pipeline.GetSamplerRegistry() != nil {
+			_ = pipeline.GetSamplerRegistry().StopAll() //nolint:errcheck // Test cleanup
+		}
+		buffer := storage.GetGlobalAuditEventBuffer()
+		if buffer != nil {
+			_ = buffer.Shutdown() //nolint:errcheck // Test cleanup
+		}
+	})
+
+	eventCtx := NewEventContext("test-op", "test_operation", "complete").
+		WithEventData(&EventData{
+			MetricsData: map[string]any{
+				objects.FieldKeyKind:            "test",
+				objects.FieldKeyOperation:       "test_operation",
+				objects.FieldKeyDurationSeconds: 1.5,
+			},
+		})
+
+	// Emit should not panic
+	err = router.Emit(pkgctx.NewSystemContext(), eventCtx)
+	// Error is acceptable for best-effort metrics
+	_ = err
+}
+
+func TestNewOperationalEvent(t *testing.T) {
+	t.Parallel()
+	eventCtx := NewEventContext("test-op", "test_operation", "complete").
+		WithDuration(5 * time.Second).
+		WithEventData(&EventData{
+			MetricsData: map[string]any{
+				"result": "success",
+			},
+		})
+
+	operationalEvent := NewOperationalEvent(eventCtx)
+
+	if operationalEvent.Type != "operation.complete" {
+		t.Errorf("OperationalEvent.Type = %s, want operation.complete", operationalEvent.Type)
+	}
+	if operationalEvent.OperationID != "test-op" {
+		t.Errorf("OperationalEvent.OperationID = %s, want test-op", operationalEvent.OperationID)
+	}
+	if operationalEvent.Duration != 5*time.Second {
+		t.Errorf("OperationalEvent.Duration not set correctly")
+	}
+}
+
+func TestNewOperationalEvent_DependencyRefStatus(t *testing.T) {
+	t.Parallel()
+	eventCtx := NewEventContext("target-1", "lifecycle_dependency_ref", "dependency_ref").
+		WithEventData(&EventData{
+			MetricsData: map[string]any{"project_root": "/proj", objects.FieldKeyTargetID: "target-1"},
+		})
+	operationalEvent := NewOperationalEvent(eventCtx)
+	if operationalEvent.Type != EventTypeLifecycleDependencyRef {
+		t.Errorf("OperationalEvent.Type = %s, want %s", operationalEvent.Type, EventTypeLifecycleDependencyRef)
+	}
+}
+
+// testSubscriber is a test implementation of OperationalEventSubscriber
+type testSubscriber struct {
+	id         string
+	eventTypes []string
+	active     bool
+	events     []*OperationalEvent
+}
+
+func (ts *testSubscriber) ID() string {
+	return ts.id
+}
+
+func (ts *testSubscriber) HandleEvent(event *OperationalEvent) error {
+	ts.events = append(ts.events, event)
+	return nil
+}
+
+func (ts *testSubscriber) EventTypes() []string {
+	return ts.eventTypes
+}
+
+func (ts *testSubscriber) IsActive() bool {
+	return ts.active
+}

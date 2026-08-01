@@ -1,0 +1,56 @@
+List objects of a specific kind with filtering, sorting, pagination, grouping,
+and optional field projection.
+
+
+
+Full objects are loaded from storage (including overlays), then projection keeps
+only the requested top-level keys,
+
+reducing serialized output size. Use --fields with top-level YAML keys (repeat
+flag or comma-separated values).
+
+--sort-by and --group-by columns are included in the projection automatically
+when those flags are set.
+
+
+
+If no kind is specified, shows available object kinds.
+
+  List all backlog items
+  zqk list backlog_item
+  List with filtering
+  zqk list backlog_item --filter status=exploring
+  List with sorting
+  zqk list backlog_item --sort-by title --sort-asc
+  List id and updated_at only (projection)
+  zqk list backlog_item --fields id,updated_at --sort-by updated_at
+  List with pagination
+  zqk list backlog_item --offset 0 --limit 10
+  List with grouping
+  zqk list backlog_item --group-by status
+  List with negation filter
+  zqk list backlog_item --filter 'status!="complete|archived"'
+  List with context-specific pagination (if configured)
+  zqk list backlog_item --context pagination
+  List with multiple filters
+  zqk list backlog_item --filter status=exploring --filter priority=high
+  Show available kinds
+  zqk list
+
+Usage:
+  zqk object list [flags]
+
+Aliases:
+  list, ls, find
+
+Flags:
+      --allow-degraded       Allow running when scheduler daemon is not running (results may be partial/stale)
+      --count                Only return the count of matching objects (no object details)
+      --fields stringArray   Keys to include per object (repeat or comma-separated); omit for full rows. Sort/group columns merge automatically.
+      --filter stringArray   Filter by field (format: field=value or field:value, can be used multiple times)
+      --group-by string      Field to group results by
+      --group-limit int      Maximum items per group when using --group-by (0 = no limit)
+      --limit int            Pagination limit
+      --offset int           Pagination offset
+      --sort-asc             Sort ascending (default: true) (default true)
+      --sort-by string       Field to sort by

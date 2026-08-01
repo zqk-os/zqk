@@ -1,0 +1,37 @@
+Get an object by its ID.
+
+
+
+The object kind is inferred from the ID format (e.g., ITEM-001 -> backlog_item).
+
+
+
+Full object is loaded and merged with overlays first; optional --fields then
+keeps only those
+
+top-level keys (same hybrid projection as object list).
+
+  Get a backlog item
+  zqk get ITEM-626
+  Get with JSON output
+  zqk get ITEM-626 --format json
+  Get with YAML output
+  zqk get ITEM-626 --format yaml
+  Milestone completion report slice
+  zqk get MIL-001 --view milestone-completion-report
+  JSON with selected keys only (projection)
+  zqk get PROMPT-001 --fields prompt_body --format json
+
+Usage:
+  zqk object get [flags]
+
+Aliases:
+  get, show, view
+
+Flags:
+      --fields stringArray      Top-level keys to include in output (repeat or comma-separated); same hybrid projection as list. Omit for full object after overlays. Put -h before --fields if you need help so '-h' is not parsed as a field name.
+      --link-hydration string   Reference overlay: lazy (one hop), default (balanced), or eager (deeper). Omit to use kind and --view defaults (pkg/objectget).
+      --view string             Optional view name to scope output fields (default: full object with reference-resolver overlay).
+
+Global Flags:
+      --allow-degraded   Allow scheduler-dependent commands to run when scheduler daemon is not running

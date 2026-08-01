@@ -1,0 +1,376 @@
+package cli
+
+import (
+	"fmt"
+	"go/format"
+	"os"
+	"path/filepath"
+	"strings"
+
+	"github.com/lanceman/zqk/pkg/errfmt"
+	"github.com/lanceman/zqk/pkg/objects"
+	yamlspec "github.com/lanceman/zqk/pkg/specbuilder/yaml"
+	"github.com/lanceman/zqk/pkg/utils/fileutil"
+	"gopkg.in/yaml.v3"
+)
+
+const (
+	defaultVersionPackage = "bldr_cli_cmd_v1"
+)
+
+func GenerateCommandBuilderFromYAML(yamlPath, outputDir string) error {
+	data, err := os.ReadFile(yamlPath)
+	if err != nil {
+		return errfmt.Newf("failed to read YAML file").Wrap(err)
+	}
+
+	var tempSpec map[string]any
+	if err := yaml.Unmarshal(data, &tempSpec); err != nil {
+		return errfmt.Newf("failed to parse YAML").Wrap(err)
+	}
+
+	if schemaRef, ok := tempSpec["$schema"].(string); ok && schemaRef != emptyValue {
+		validator := yamlspec.NewSchemaValidator(".zqk/cli/specs/schemas")
+		_ = validator.ValidateYAML(yamlPath, schemaRef)
+	}
+
+	_, isCRUD := tempSpec["operation_type"]
+
+	commandName := ResolveCommandBuilderName(tempSpec, yamlPath)
+	if commandName == "" {
+		return errfmt.Errorf("refusing to generate command builder with empty or numeric-CAS name from %s (use DNA under .zqk/cli/specs with name/use, or a non-numeric CSPEC id)", yamlPath)
+	}
+
+	versionDir := filepath.Join(outputDir, defaultVersionPackage)
+	_ = fileutil.EnsureDir(versionDir)
+
+	var code string
+	if isCRUD {
+		var crudSpec CRUDCommandSpec
+		_ = yaml.Unmarshal(data, &crudSpec)
+		code = generateCRUDCommandBuilderCode(&crudSpec, commandName, defaultVersionPackage)
+	} else {
+		var spec CommandSpec
+		_ = yaml.Unmarshal(data, &spec)
+		code = generateCommandBuilderCode(&spec, commandName, defaultVersionPackage)
+	}
+
+	formatted, err := format.Source([]byte(code))
+	if err != nil {
+		formatted = []byte(code)
+	}
+
+	outputFile := filepath.Join(versionDir, fmt.Sprintf("%s_command_builder.go", commandName))
+	return fileutil.WriteSecureFile(outputFile, formatted)
+}
+
+func generateCommandBuilderCode(spec *CommandSpec, commandName, packageName string) string {
+	var buf strings.Builder
+	typeName := toCamelCase(commandName) + "CommandBuilder"
+	constructorName := "New" + typeName
+
+	fmt.Fprintf(&buf, "package %s\n\n", packageName)
+	fmt.Fprintf(&buf, "import (\n\t\"github.com/spf13/cobra\"\n")
+	needsInternalCli := spec.CommonFlags || spec.RequiresStorage != nil || spec.RequiresSession != nil || spec.RequiresSchedulerCheck != nil
+	if needsInternalCli {
+		fmt.Fprintf(&buf, "\t\"github.com/lanceman/zqk/internal/cli\"\n")
+	}
+	fmt.Fprintf(&buf, "\tclipkg \"github.com/lanceman/zqk/pkg/cli\"\n)\n\n")
+
+	fmt.Fprintf(&buf, "// %s creates a new %s command\nfunc %s() *cobra.Command {\n", constructorName, commandName, constructorName)
+
+	name := spec.Name
+	if idx := strings.Index(name, " "); idx != -1 {
+		name = name[:idx]
+	}
+	if name == "" {
+		name = strings.ReplaceAll(commandName, "_", "-")
+	}
+	fmt.Fprintf(&buf, "\tbuilder := clipkg.NewCommandBuilder(%q)\n", name)
+
+	if spec.Short != "" {
+		fmt.Fprintf(&buf, "\tbuilder.WithShort(%q)\n", spec.Short)
+	}
+
+	var excludeFlags []string
+	if spec.Help != nil && len(spec.Help.ExcludeFlags) > 0 {
+		excludeFlags = spec.Help.ExcludeFlags
+	}
+
+	if spec.Help != nil || spec.Description != "" {
+		short := spec.Short
+		if spec.Help != nil && spec.Help.Short != "" {
+			short = spec.Help.Short
+		}
+		fmt.Fprintf(&buf, "\thelp := clipkg.DynamicHelpBuilder(%q)\n", short)
+
+		desc := spec.Description
+		if spec.Help != nil && len(spec.Help.Description) > 0 {
+			desc = strings.Join(spec.Help.Description, "\n")
+		}
+		if desc != "" {
+			lines := strings.Split(strings.TrimSpace(desc), "\n")
+			for _, l := range lines {
+				fmt.Fprintf(&buf, "\thelp.WithDescriptionLines(%q)\n", l)
+			}
+		}
+
+		if spec.Help != nil && len(spec.Help.Examples) > 0 {
+			for _, ex := range spec.Help.Examples {
+				fmt.Fprintf(&buf, "\thelp.AddExample(%q, %q)\n", ex.Comment, ex.Command)
+			}
+		}
+
+		if len(excludeFlags) > 0 {
+			for _, f := range excludeFlags {
+				fmt.Fprintf(&buf, "\thelp.ExcludeFlag(%q)\n", f)
+			}
+		}
+
+		fmt.Fprintf(&buf, "\tbuilder.WithHelpBuilder(help)\n")
+	}
+
+	if spec.Args != nil {
+		fmt.Fprintf(&buf, "\tbuilder.WithArgs(%s)\n", generateArgsCode(spec.Args))
+	}
+
+	for _, f := range spec.Flags {
+		fmt.Fprintf(&buf, "\tbuilder.%s\n", generateFlagCode(f))
+	}
+
+	if spec.CommonFlags {
+		if len(excludeFlags) > 0 {
+			fmt.Fprintf(&buf, "\tbuilder.WithCommonFlagsExcluding(cli.AddCommonFlagsExcluding, []string{")
+			for i, f := range excludeFlags {
+				if i > 0 {
+					fmt.Fprintf(&buf, ", ")
+				}
+				fmt.Fprintf(&buf, "%q", f)
+			}
+			fmt.Fprintf(&buf, "})\n")
+		} else {
+			fmt.Fprintf(&buf, "\tbuilder.WithCommonFlagsDefault(cli.AddCommonFlags)\n")
+		}
+	} else {
+		fmt.Fprintf(&buf, "\tbuilder.WithCommonFlags(false, nil)\n")
+	}
+
+	if spec.QueryFlags {
+		fmt.Fprintf(&buf, "\tbuilder.WithQueryFlags()\n")
+	}
+
+	fmt.Fprintf(&buf, "\tcmd := builder.Build()\n")
+
+	if spec.RequiresStorage != nil {
+		fmt.Fprintf(&buf, "\tcli.RequireStorage(cmd, %t)\n", *spec.RequiresStorage)
+	}
+	if spec.RequiresSession != nil {
+		fmt.Fprintf(&buf, "\tcli.RequireSession(cmd, %t)\n", *spec.RequiresSession)
+	}
+	if spec.RequiresSchedulerCheck != nil {
+		fmt.Fprintf(&buf, "\tcli.RequireSchedulerCheck(cmd, %t)\n", *spec.RequiresSchedulerCheck)
+	}
+
+	// Subcommands are intentionally NOT added here to avoid duplication
+	// when logic is added in Go implementation files. Subcommands should
+	// be added manually in the parent command's New...Cmd function.
+
+	fmt.Fprintf(&buf, "\treturn cmd\n}\n")
+	return buf.String()
+}
+
+func generateCRUDCommandBuilderCode(spec *CRUDCommandSpec, commandName, packageName string) string {
+	var buf strings.Builder
+	typeName := toCamelCase(commandName) + "CommandBuilder"
+	constructorName := "New" + typeName
+
+	fmt.Fprintf(&buf, "package %s\n\n", packageName)
+	fmt.Fprintf(&buf, "import (\n\t\"github.com/spf13/cobra\"\n")
+	needsInternalCli := spec.CommonFlags || spec.RequiresStorage != nil || spec.RequiresSession != nil || spec.RequiresSchedulerCheck != nil
+	if needsInternalCli {
+		fmt.Fprintf(&buf, "\t\"github.com/lanceman/zqk/internal/cli\"\n")
+	}
+	fmt.Fprintf(&buf, "\tclipkg \"github.com/lanceman/zqk/pkg/cli\"\n)\n\n")
+
+	fmt.Fprintf(&buf, "// %s creates a new %s command\nfunc %s() *cobra.Command {\n", constructorName, commandName, constructorName)
+	useName := spec.Name
+	if useName == "" {
+		useName = strings.ReplaceAll(commandName, "_", "-")
+	}
+	fmt.Fprintf(&buf, "\tbuilder := clipkg.NewCRUDCommandBuilder(%q, %q)\n", spec.OperationType, useName)
+
+	if spec.DataInput {
+		fmt.Fprintf(&buf, "\tbuilder.WithDataInputFlags()\n")
+	}
+	if spec.UpdateFlags {
+		fmt.Fprintf(&buf, "\tbuilder.WithUpdateFlags()\n")
+	}
+
+	if spec.QueryFlags {
+		fmt.Fprintf(&buf, "\tbuilder.WithQueryFlags()\n")
+	}
+
+	if spec.DryRun {
+		fmt.Fprintf(&buf, "\tbuilder.WithDryRunFlag()\n")
+	}
+
+	if spec.Cascade {
+		fmt.Fprintf(&buf, "\tbuilder.WithCascadeFlag()\n")
+	}
+
+	if spec.UnlinkReferences {
+		fmt.Fprintf(&buf, "\tbuilder.WithUnlinkReferencesFlag()\n")
+	}
+
+	if spec.CommonFlags {
+		fmt.Fprintf(&buf, "\tbuilder.WithCommonFlagsDefault(cli.AddCommonFlags)\n")
+	}
+
+	// Generate custom flags, skipping those that clash with built-in flags
+	generatedFlags := make(map[string]bool)
+	if spec.DataInput {
+		generatedFlags["file"] = true
+		generatedFlags["data"] = true
+	}
+	if spec.UpdateFlags {
+		generatedFlags["file"] = true
+		generatedFlags["data"] = true
+		generatedFlags[objects.FieldKeyField] = true
+		generatedFlags["auto-status"] = true
+	}
+	if spec.QueryFlags {
+		generatedFlags["filter"] = true
+		generatedFlags["sort-by"] = true
+		generatedFlags["sort-asc"] = true
+		generatedFlags["group-by"] = true
+		generatedFlags["group-limit"] = true
+		generatedFlags["limit"] = true
+		generatedFlags["offset"] = true
+		generatedFlags["count"] = true
+		generatedFlags["ids-only"] = true
+	}
+	if spec.DryRun {
+		generatedFlags["dry-run"] = true
+	}
+	if spec.Cascade {
+		generatedFlags["cascade"] = true
+	}
+	if spec.UnlinkReferences {
+		generatedFlags["unlink-references"] = true
+	}
+
+	for _, f := range spec.Flags {
+		if !generatedFlags[f.Name] {
+			fmt.Fprintf(&buf, "\tbuilder.%s\n", generateFlagCode(f))
+		}
+	}
+
+	if spec.Short != "" {
+		fmt.Fprintf(&buf, "\tbuilder.WithShort(%q)\n", spec.Short)
+	}
+
+	if spec.Help != nil || spec.Description != "" {
+		short := spec.Short
+		if spec.Help != nil && spec.Help.Short != "" {
+			short = spec.Help.Short
+		}
+		fmt.Fprintf(&buf, "\thelp := clipkg.DynamicHelpBuilder(%q)\n", short)
+
+		desc := spec.Description
+		if spec.Help != nil && len(spec.Help.Description) > 0 {
+			desc = strings.Join(spec.Help.Description, "\n")
+		}
+		if desc != "" {
+			lines := strings.Split(strings.TrimSpace(desc), "\n")
+			for _, l := range lines {
+				fmt.Fprintf(&buf, "\thelp.WithDescriptionLines(%q)\n", l)
+			}
+		}
+
+		if spec.Help != nil && len(spec.Help.Examples) > 0 {
+			for _, ex := range spec.Help.Examples {
+				fmt.Fprintf(&buf, "\thelp.AddExample(%q, %q)\n", ex.Comment, ex.Command)
+			}
+		}
+
+		var excludeFlags []string
+		if spec.Help != nil && len(spec.Help.ExcludeFlags) > 0 {
+			excludeFlags = spec.Help.ExcludeFlags
+		}
+		if len(excludeFlags) > 0 {
+			for _, f := range excludeFlags {
+				fmt.Fprintf(&buf, "\thelp.ExcludeFlag(%q)\n", f)
+			}
+		}
+
+		fmt.Fprintf(&buf, "\tbuilder.WithHelpBuilder(help)\n")
+	}
+
+	fmt.Fprintf(&buf, "\treturn builder.Build()\n}\n")
+	return buf.String()
+}
+
+func generateArgsCode(args *ArgsSpec) string {
+	switch args.Type {
+	case "exact":
+		count := 0
+		if args.Count != nil {
+			count = *args.Count
+		}
+		return fmt.Sprintf("cobra.ExactArgs(%d)", count)
+	case "minimum":
+		min := 0
+		if args.Min != nil {
+			min = *args.Min
+		}
+		return fmt.Sprintf("cobra.MinimumNArgs(%d)", min)
+	case "maximum":
+		max := 0
+		if args.Max != nil {
+			max = *args.Max
+		}
+		return fmt.Sprintf("cobra.MaximumNArgs(%d)", max)
+	default:
+		return "cobra.NoArgs"
+	}
+}
+
+func generateFlagCode(flag FlagSpec) string {
+	def := flag.Default
+
+	switch flag.Type {
+	case "bool":
+		if def == nil {
+			def = false
+		}
+		return fmt.Sprintf("AddBoolFlag(%q, %q, %v, %q)", flag.Name, flag.Shorthand, def, flag.Description)
+	case "int":
+		if def == nil {
+			def = 0
+		}
+		return fmt.Sprintf("AddIntFlag(%q, %q, %v, %q)", flag.Name, flag.Shorthand, def, flag.Description)
+	case "float", "float64":
+		if def == nil {
+			def = 0.0
+		}
+		return fmt.Sprintf("AddFloatFlag(%q, %q, %v, %q)", flag.Name, flag.Shorthand, def, flag.Description)
+	case "string_array", "stringSlice":
+		return fmt.Sprintf("AddStringArrayFlag(%q, %q, %q)", flag.Name, flag.Shorthand, flag.Description)
+	default:
+		if def == nil {
+			def = ""
+		}
+		return fmt.Sprintf("AddStringFlag(%q, %q, %q, %q)", flag.Name, flag.Shorthand, def, flag.Description)
+	}
+}
+
+func toCamelCase(s string) string {
+	s = strings.ReplaceAll(s, "-", "_")
+	parts := strings.Split(s, "_")
+	for i, p := range parts {
+		if len(p) > 0 {
+			parts[i] = strings.ToUpper(p[0:1]) + p[1:]
+		}
+	}
+	return strings.Join(parts, "")
+}

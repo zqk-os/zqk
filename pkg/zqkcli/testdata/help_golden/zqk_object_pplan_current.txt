@@ -1,0 +1,29 @@
+View backlog items for the current priority plan.
+
+
+
+The current priority plan is determined by:
+
+1. If there's an in_progress plan, that's the current
+
+2. Otherwise, the active plan with the lowest active_order
+
+3. If no active_order, the most recent active plan by plan_date
+
+  View backlog items for current plan
+  zqk pplan current
+  View with filters
+  zqk pplan current --filter status!=complete
+  View in JSON format
+  zqk pplan current --format json
+
+Usage:
+  zqk object pplan current [flags]
+
+Flags:
+      --filter stringArray   Filter by field (format: field=value or field:value, can be used multiple times)
+      --sort-asc             Sort ascending (default: true) (default true)
+      --sort-by string       Field to sort by
+
+Global Flags:
+      --allow-degraded   Allow scheduler-dependent commands to run when scheduler daemon is not running

@@ -1,0 +1,115 @@
+package bldr_lifecycle_v1
+
+import (
+	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/lanceman/zqk/pkg/specbuilder/lifecycle_builders"
+)
+
+// CodeQualityMetricLifecycleBuilder builds the code_quality_metric lifecycle at version v1_0_0
+// File: bldr_lifecycle_v1/code_quality_metric_builder.go - version is encoded in package/directory name
+type CodeQualityMetricLifecycleBuilder struct {
+	*lifecycle_builders.BaseLifecycleBuilder
+}
+
+// NewCodeQualityMetricLifecycleBuilder creates a new builder for code_quality_metric lifecycle version v1_0_0
+func NewCodeQualityMetricLifecycleBuilder() *CodeQualityMetricLifecycleBuilder {
+	builder := &CodeQualityMetricLifecycleBuilder{
+		BaseLifecycleBuilder: lifecycle_builders.NewBaseLifecycleBuilder("code_quality_metric", "v1_0_0"),
+	}
+
+	// Configure the lifecycle
+	builder.
+		SetPercentComplete(objects.PercentCompleteConfig{
+			Method: "status_defaults",
+			DefaultByStatus: map[string]any{
+				"analyzed":  50,
+				"archived":  100,
+				"collected": 0,
+				"error":     0,
+				"reported":  75,
+			},
+		})
+
+	// Add statuses and transitions
+	builder.addCodeQualityMetricLifecycleData()
+
+	return builder
+}
+
+// addCodeQualityMetricLifecycleData adds the code_quality_metric lifecycle statuses and transitions
+func (b *CodeQualityMetricLifecycleBuilder) addCodeQualityMetricLifecycleData() {
+
+	b.AddStatus(objects.Status{
+		Value:       "collected",
+		Display:     "Collected",
+		Origin:      true,
+		Description: "Code quality metric has been collected but not yet analyzed",
+	})
+	b.AddStatus(objects.Status{
+		Value:       "analyzed",
+		Display:     "Analyzed",
+		Description: "Code quality metric has been analyzed for trends and patterns",
+	})
+	b.AddStatus(objects.Status{
+		Value:       "reported",
+		Display:     "Reported",
+		Description: "Code quality metric has been included in quality reports",
+	})
+	b.AddStatus(objects.Status{
+		Value:       "archived",
+		Display:     "Archived",
+		Terminal:    true,
+		Archive:     true,
+		Description: "Code quality metric has been archived",
+	})
+	b.AddStatus(objects.Status{
+		Value:       "error",
+		Display:     "Error",
+		System:      true,
+		Description: "Code quality metric encountered an error during processing",
+	})
+
+	b.AddTransition(objects.Transition{
+		From:        "collected",
+		To:          "analyzed",
+		Description: "Analyze collected code quality metric",
+		Manual:      false,
+		Auto:        true,
+	})
+
+	b.AddTransition(objects.Transition{
+		From:        "analyzed",
+		To:          "reported",
+		Description: "Include metric in quality report",
+		Manual:      true,
+		Auto:        false,
+	})
+
+	b.AddTransition(objects.Transition{
+		From:        "reported",
+		To:          "archived",
+		Description: "Archive metric after reporting",
+		Manual:      false,
+		Auto:        true,
+	})
+
+	b.AddTransition(objects.Transition{
+		From:        "*",
+		To:          "archived",
+		Description: "Archive metric directly",
+		Manual:      true,
+		Auto:        false,
+	})
+
+	b.AddTransition(objects.Transition{
+		From:        "*",
+		To:          "error",
+		Description: "System error occurred",
+		Manual:      false,
+		Auto:        true,
+	})
+}
+
+func init() {
+	lifecycle_builders.RegisterBuilder(NewCodeQualityMetricLifecycleBuilder())
+}

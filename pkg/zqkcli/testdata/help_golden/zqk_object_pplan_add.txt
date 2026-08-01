@@ -1,0 +1,17 @@
+Associates a backlog item with a priority plan by updating the backlog item's
+priority_plan_ref.
+
+
+
+Note: Priority plan membership is child-owned on BLI.priority_plan_ref.
+
+  Add backlog item to plan
+  zqk pplan add PLAN-123456789012345678-abcdef120-bdc4dd36 ITEM-123456789012345678-abcdef120-de06babe
+  Alternative positional syntax
+  zqk pplan PLAN-123456789012345678-abcdef120-bdc4dd36 add ITEM-123456789012345678-abcdef120-de06babe
+
+Usage:
+  zqk object pplan add [flags]
+
+Global Flags:
+      --allow-degraded   Allow scheduler-dependent commands to run when scheduler daemon is not running

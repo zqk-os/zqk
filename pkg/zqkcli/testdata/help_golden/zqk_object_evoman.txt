@@ -1,0 +1,29 @@
+View and list evolution_management objects. Create/update/delete via object
+create/update/delete.
+
+
+
+Available subcommands:
+
+- show: Display an evolution management by ID or the first
+
+- list: List evolution_management objects with optional filters
+
+  Show first evolution management
+  zqk object evoman show
+  Show by ID
+  zqk object evoman show EVOL-001
+  List all evolution management
+  zqk object evoman list
+
+Usage:
+  zqk object evoman [command]
+
+Available Commands:
+  list        List evolution management objects
+  show        Show an evolution management by ID or the first
+
+Global Flags:
+      --allow-degraded   Allow scheduler-dependent commands to run when scheduler daemon is not running
+
+Use "zqk object evoman [command] --help" for more information about a command.

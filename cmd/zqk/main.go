@@ -1,21 +1,38 @@
 package main
 
 import (
-	"fmt"
 	"os"
+	"strings"
+
+	"github.com/joho/godotenv"
+	"github.com/lanceman/zqk/cmd/zqk-community/app"
+	"github.com/lanceman/zqk/pkg/zqkenv"
 )
 
-var (
-	bin     = "zqk"
-	version = "dev"
-	commit  = "none"
-	date    = "unknown"
-)
+// Public Open-Core product binary is named "zqk". Enterprise/admin surfaces use
+// distinguishing names (e.g. zqk-admin). cmd/zqk-community remains the shared
+// app package layout for the Apache product CLI.
+
+// init ensures the pure-Go DNS resolver is used instead of cgo's getaddrinfo.
+// cgo DNS acquires libc pthread mutexes that deadlock with fork() in
+// multi-threaded processes (observed in scheduler daemon crashes).
+func init() {
+	_ = godotenv.Load()
+
+	godebug := os.Getenv("GODEBUG")
+	if !strings.Contains(godebug, "netdns=") {
+		if godebug == "" {
+			os.Setenv("GODEBUG", "netdns=go")
+		} else {
+			os.Setenv("GODEBUG", godebug+",netdns=go")
+		}
+	}
+
+	// Open-Core / community product: local-first without enterprise RBAC gate.
+	os.Setenv(zqkenv.TestBypassAuth(), "1")
+	zqkenv.IsCommunityEdition = true
+}
 
 func main() {
-	if len(os.Args) > 1 && os.Args[1] == "--version" {
-		fmt.Printf("Executable: %s\nVersion: %s\nBuild datetime: %s\nCommit hash: %s\n", bin, version, date, commit)
-		return
-	}
-	fmt.Println("temporary")
+	app.Execute()
 }

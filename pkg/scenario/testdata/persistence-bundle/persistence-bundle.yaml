@@ -1,0 +1,94 @@
+# Persistence bundle: traceability objects for the project.
+# Copy for tests (tracked). Optional copy under test-scenarios/ for local apply (gitignored).
+# Apply with: zqk-scenario bundle apply -f test-scenarios/persistence-bundle/persistence-bundle.yaml -R .
+#
+# This bundle includes goal GOAL-001, the compile-time substitution framework requirement (REQ-990),
+# criteria (CRIT-990–993), and backlog items (BLI-990, BLI-991).
+# If bundle apply does not create objects in your environment, create via CLI using this file as the spec.
+#
+# Future: bundle processor should distinguish new addition vs work that links to historical
+# artifacts (goal_refs/legacy_refs), and support semantic relationship (extends, implements,
+# refines) so new work is explicitly tied to prior art. See SNAPSHOT_REFERENCE_AND_TEMPLATE_GROWTH.md §5.
+api_version: v1
+kind: scenario_bundle
+metadata:
+  name: persistence-bundle
+  description: |
+    Traceability bundle for persistence and platform work.
+    Includes compile-time substitution framework (REQ-990) and related criteria/backlog.
+objects:
+  goals:
+    - id_hint: GOAL-001
+      title: Persistence and platform traceability
+      status: active
+      authority: owner
+      target: "1"
+  criteria:
+    - id_hint: CRIT-990
+      title: Compile-time substitution spec and registry
+      description: |
+        A semantic type and/or spec-builder pattern defines the substitution contract.
+        Registry validates and applies substitutions; check and ensure use the same contract.
+      category: non-functional
+    - id_hint: CRIT-991
+      title: Pre-build apply with stash and verify
+      description: |
+        Pre-build/generate phase applies substitutions; stash/shelf backup; quick compile/lint
+        for affected files; applied state cached; mtime-based invalidation and optional re-apply.
+      category: non-functional
+    - id_hint: CRIT-992
+      title: Runtime-delta update path avoids structural CAS churn
+      description: |
+        For configured kinds, updates touching only runtime_delta fields append lineage/change
+        entries and update runtime overlay state without rewriting structural CAS content.
+      category: non-functional
+    - id_hint: CRIT-993
+      title: Deterministic read merge and cleanup for runtime overlays
+      description: |
+        Read/list/count paths merge structural CAS base with runtime overlay deterministically.
+        Maintenance and delete flows clean orphaned runtime overlays to ensure convergence.
+      category: non-functional
+  requirements:
+    - id_hint: REQ-990
+      title: Compile-time substitution framework
+      status: planned
+      goal_refs: [GOAL-001]
+      criteria_refs: [CRIT-990, CRIT-991]
+      body: |
+        Provide a secure, reliable, dynamic compile-time substitution library so that
+        commands, statements, blocks of text, numbers, and patterns can be designated
+        as compile-time dynamic. Leverage the spec-builder pattern to produce pre-compile-time
+        objects that understand how to walk the code (e.g. bitmapped and length-bucketed in
+        UTF-8 or 16 bytes) during a pre-build/generate phase and apply one or more
+        substitutions once (with force-override for edge cases).
+
+        Use cases: brand updates, logging level updates, user-facing command strings
+        (e.g. "run 'zqk system ensure-retention-jobs'"), and similar maintainability and
+        accuracy improvements. The library should understand which files were modified and
+        contain compile-time substitution markers; use stash/shelf for backup; attempt
+        substitution and quick clean/compile for affected files; if compile and lint succeed,
+        mark as applied in a cache to avoid reprocessing. Optional: watch notifier with
+        in-memory index for a portion of the filesystem; on mtime change invalidate entry,
+        restore original, and optionally re-apply. Most pieces already exist; add adapters,
+        extensions, and tests.
+    - id_hint: REQ-991
+      title: Structural plus runtime-delta hybrid persistence
+      status: planned
+      goal_refs: [GOAL-001]
+      criteria_refs: [CRIT-992, CRIT-993]
+      body: |
+        Keep structural object state in CAS while routing high-churn runtime_delta fields
+        through append-friendly runtime overlays and change-journal lineage. Read and list
+        behavior must return merged current state, and maintenance must compact/remove stale
+        overlay artifacts so repeated runs converge.
+  backlog_items:
+    - id_hint: BLI-990
+      title: Implement compile-time substitution framework
+      status: exploring
+      requirement_refs: [REQ-990]
+      criteria_refs: [CRIT-990, CRIT-991]
+    - id_hint: BLI-991
+      title: Implement runtime-delta hybrid pipeline for scheduler_job
+      status: exploring
+      requirement_refs: [REQ-991]
+      criteria_refs: [CRIT-992, CRIT-993]

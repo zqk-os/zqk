@@ -1,0 +1,104 @@
+package internal
+
+import (
+	"fmt"
+
+	"github.com/lanceman/zqk/internal/cli"
+	"github.com/lanceman/zqk/pkg/errfmt"
+	"github.com/lanceman/zqk/pkg/logging"
+	"github.com/lanceman/zqk/pkg/paths"
+	"github.com/spf13/cobra"
+)
+
+const emptyValue = ""
+
+// NewInternalCmd creates a new internal command with subcommands
+func NewInternalCmd() *cobra.Command {
+	internalCmdLong := fmt.Sprintf(`Manage internal and built-in objects with privileged access.
+
+This command provides admin-only access to:
+  - Built-in objects (e.g., COMP-TYPE-* component types) - normally immutable
+  - Internal objects (objects with visibility: internal)
+  - System objects in _internal directories
+
+Built-in objects are shareable/reusable but immutable unless accessed through
+this command with admin privileges.
+
+Command organization:
+  Common operations: list, get, create, update, delete, bulk (work for all internal object kinds)
+  Kind-based operations: <kind> fields (explore fields for a specific internal kind)
+  Specialized operations: (future: lifecycle management, spec management, etc.)
+
+Examples:
+  # Common operations
+  %s internal list component --built-in
+  %s internal get COMP-TYPE-001
+  %s internal create object_spec --file spec.yaml
+  %s internal update COMP-TYPE-001 --field title="Updated Title"
+  %s internal delete COMP-TYPE-001
+  %s internal object_spec fields
+  %s internal bulk create kind_synonym --file synonyms.yaml`, paths.CLICommandName, paths.CLICommandName, paths.CLICommandName, paths.CLICommandName, paths.CLICommandName, paths.CLICommandName, paths.CLICommandName)
+	internalCmd := &cobra.Command{
+		Use:               "internal",
+		Short:             "Manage internal and built-in objects (admin only)",
+		Long:              internalCmdLong,
+		PersistentPreRunE: runInternalPersistentPreRunE, // admin + kind_validate_prerun.go + scheduler_guard.go
+	}
+	internalCmd.PersistentFlags().Bool("allow-degraded", false, "Allow scheduler-dependent commands to run when scheduler daemon is not running")
+
+	// Common operations (work for all internal object kinds)
+	internalCmd.AddCommand(NewInternalListCmd())
+	internalCmd.AddCommand(NewInternalGetCmd())
+	internalCmd.AddCommand(NewInternalCreateCmd())
+	internalCmd.AddCommand(NewInternalUpdateCmd())
+	internalCmd.AddCommand(NewInternalDeleteCmd())
+	internalCmd.AddCommand(NewInternalCountCmd())
+	internalCmd.AddCommand(NewInternalBulkCmd())
+	internalCmd.AddCommand(NewInternalProcessCmd())
+	internalCmd.AddCommand(NewInternalRootFieldsCmd())
+
+	// Kind-based command group (allows "internal <kind> fields")
+	internalCmd.AddCommand(NewInternalKindCmd())
+	RegisterDynamicInternalKindCommands(internalCmd)
+
+	// Specialized operations (future)
+	// internalCmd.AddCommand(NewInternalLifecycleCmd())
+	// internalCmd.AddCommand(NewInternalSpecCmd())
+
+	return internalCmd
+}
+
+func runInternalPersistentPreRunE(cmd *cobra.Command, args []string) error {
+	if err := requireAdminRole(cmd, args); err != nil {
+		return err
+	}
+	if err := validateAnnotatedInternalKind(cmd, args); err != nil {
+		return err
+	}
+	return runInternalSchedulerGuard(cmd, args)
+}
+
+// requireAdminRole checks that the user has admin role
+func requireAdminRole(cmd *cobra.Command, _ []string) error {
+	logger := logging.GetLoggerFromContext(cmd.Context())
+
+	// Get context to check security
+	ctx := cli.GetContext(cmd)
+	if ctx == nil {
+		logging.FluentEvent(logger).Error("Failed to get CLI context", errfmt.Errorf("context is nil")).Log()
+		return errfmt.Errorf("failed to get context")
+	}
+
+	// For now, we'll use system security context which has admin role
+	// In the future, this should check the actual user's account and roles
+	// For CLI, we can allow it but log a warning if not system/admin
+	logging.FluentEvent(logger).Debug("Internal command requires admin privileges").
+		String("acc"+"ount", internalProfileSystem).
+		String("note", "CLI operations use system context").
+		Log()
+
+	return nil
+}
+
+// getAdminSecurityContext returns a security context with admin privileges
+//

@@ -1,0 +1,33 @@
+Priority plan operations for navigating and managing priority plans.
+
+This command group provides operations for working with priority plans:
+  - current: View backlog items for the current priority plan
+  - next: Navigate to the next priority plan
+  - prev: Navigate to the previous priority plan
+  - add: Associate a backlog item with a priority plan (child-owned)
+  - remove: Clear priority plan association from a backlog item
+
+  View backlog items for current priority plan
+  zqk pplan current
+  Add backlog item to priority plan
+  zqk pplan add PLAN-123 ITEM-456
+  Alternative positional syntax
+  zqk pplan PLAN-123 add ITEM-456
+  Remove backlog item from priority plan
+  zqk pplan remove PLAN-123 ITEM-456
+
+Usage:
+  zqk object pplan [flags]
+  zqk object pplan [command]
+
+Available Commands:
+  add         Add a backlog item to a priority plan
+  current     View backlog items for the current priority plan
+  next        Navigate to the next priority plan
+  prev        Navigate to the previous priority plan
+  remove      Remove a backlog item association from a priority plan
+
+Global Flags:
+      --allow-degraded   Allow scheduler-dependent commands to run when scheduler daemon is not running
+
+Use "zqk object pplan [command] --help" for more information about a command.

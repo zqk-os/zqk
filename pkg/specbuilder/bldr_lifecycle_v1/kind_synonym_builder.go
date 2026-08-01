@@ -1,0 +1,68 @@
+package bldr_lifecycle_v1
+
+import (
+	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/lanceman/zqk/pkg/specbuilder/lifecycle_builders"
+)
+
+// KindSynonymLifecycleBuilder builds the kind_synonym lifecycle at version v1_0_0
+// File: bldr_lifecycle_v1/kind_synonym_builder.go - version is encoded in package/directory name
+type KindSynonymLifecycleBuilder struct {
+	*lifecycle_builders.BaseLifecycleBuilder
+}
+
+// NewKindSynonymLifecycleBuilder creates a new builder for kind_synonym lifecycle version v1_0_0
+func NewKindSynonymLifecycleBuilder() *KindSynonymLifecycleBuilder {
+	builder := &KindSynonymLifecycleBuilder{
+		BaseLifecycleBuilder: lifecycle_builders.NewBaseLifecycleBuilder("kind_synonym", "v1_0_0"),
+	}
+
+	// Add statuses and transitions
+	builder.addKindSynonymLifecycleData()
+
+	return builder
+}
+
+// addKindSynonymLifecycleData adds the kind_synonym lifecycle statuses and transitions
+func (b *KindSynonymLifecycleBuilder) addKindSynonymLifecycleData() {
+
+	b.AddStatus(objects.Status{
+		Value:       "active",
+		Display:     "Active",
+		Origin:      true,
+		Description: "Synonym is active and available for use",
+	})
+	b.AddStatus(objects.Status{
+		Value:       "archived",
+		Display:     "Archived",
+		Terminal:    true,
+		Archive:     true,
+		Description: "Synonym has been deprecated and archived",
+	})
+	b.AddStatus(objects.Status{
+		Value:       "error",
+		Display:     "Error",
+		System:      true,
+		Description: "Synonym encountered an error",
+	})
+
+	b.AddTransition(objects.Transition{
+		From:        "active",
+		To:          "archived",
+		Description: "Synonym is deprecated by system",
+		Manual:      true,
+		Auto:        false,
+	})
+
+	b.AddTransition(objects.Transition{
+		From:        "*",
+		To:          "error",
+		Description: "Synonym encountered a system error",
+		Manual:      false,
+		Auto:        true,
+	})
+}
+
+func init() {
+	lifecycle_builders.RegisterBuilder(NewKindSynonymLifecycleBuilder())
+}

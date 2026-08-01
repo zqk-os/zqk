@@ -1,0 +1,33 @@
+Export objects matching filters to a file or stdout.
+
+Examples:
+  # Export all backlog_item to YAML file
+  zqk object export backlog_item --out items.yaml
+  # Export with filter and JSON format
+  zqk object export backlog_item --filter status=planned --format json --out items.json
+  # Write to stdout
+  zqk object export backlog_item --out -
+
+Usage:
+  zqk object export [kind] [flags]
+
+Flags:
+      --columns string          Override column widths for table output (format: field:width)
+      --count                   Only return the count of matching objects (no object details)
+      --fields stringArray      Keys to include per object (repeat or comma-separated); omit for full rows. Sort/group columns merge automatically. Put -h/--help before --fields so a value like '-h' is not parsed as a flag.
+      --filter stringArray      Filter by field (format: field=value or field:value, can be used multiple times)
+  -f, --format string           Output format (table, json, jsonl, yaml, csv, json-rpc, stream, agent-prompt, semantic-link) (default "table")
+      --group-by string         Field to group results by
+      --group-limit int         Maximum items per group when using --group-by (0 = no limit)
+      --ignore-scheduler-down   Ignore scheduler down warning/lockdown
+      --limit int               Pagination limit (0 = no limit)
+      --offset int              Pagination offset
+  -o, --output string           Write output to file
+  -q, --quiet                   Suppress non-essential output
+      --sort-asc                Sort ascending (default: true) (default true)
+      --sort-by string          Field to sort by
+      --timeout duration        Timeout for command execution (0 = auto-calculate)
+  -v, --verbose                 Verbose output
+
+Global Flags:
+      --allow-degraded   Allow scheduler-dependent commands to run when scheduler daemon is not running

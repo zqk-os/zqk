@@ -1,0 +1,17 @@
+created_at: "2026-08-01T06:38:13Z"
+created_by: account:system
+file_path: /Users/lanceettl/ai-projects/zqk-public-candidate/docs/architecture/_internal/object_specs/scheduler_health_metric.yaml
+id: OBJ-scheduler_health_metric
+kind: object_spec
+namespace_id: zqk:kernel
+ontology: scheduler_health_metric
+origin_project: zqk
+origin_system: zqk
+schema_version: 2.0.0
+source_type: internal
+status: implemented
+title: Scheduler health and recovery metrics. Tracks health check runs, missed job t...
+updated_at: "2026-08-01T06:38:13Z"
+updated_by: account:system
+version_context: default
+visibility: internal

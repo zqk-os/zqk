@@ -1,0 +1,37 @@
+name: "delete <id> [flags]"
+short: "Delete an object by ID"
+description: |
+  Delete an object by its ID.
+  
+  By default, deletion will fail if the object has dependents (objects that reference it).
+  Use --cascade to delete the object and all its dependents recursively.
+
+operation_type: "delete"
+
+args:
+  type: "exact"
+  count: 1
+
+help:
+  examples:
+    - comment: "Delete an object (fails if it has dependents)"
+      command: "%s delete BLI-626"
+    - comment: "Delete with cascade (deletes object and all dependents)"
+      command: "%s delete BLI-626 --cascade"
+    - comment: "Dry-run to see what would be deleted"
+      command: "%s delete BLI-626 --cascade --dry-run"
+  exclude_flags:
+    - "format"
+    - "output"
+    - "verbose"
+    - "quiet"
+    - "timeout"
+    - "columns"
+
+# Flags cascade and dry-run are added automatically via cascade: true and dry_run: true below
+# If you need custom flag definitions, add them to the flags: section above
+
+run_e: "runDelete"
+common_flags: true
+cascade: true      # Automatically adds --cascade flag
+dry_run: true      # Automatically adds --dry-run flag

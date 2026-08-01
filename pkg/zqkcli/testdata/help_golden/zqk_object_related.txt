@@ -1,0 +1,27 @@
+Find objects related to a given object via reference fields.
+
+
+
+Traverses relationships following reference fields (*_ref, *_refs) up to a
+specified depth.
+
+Supports filtering by relationship type.
+
+  Find all related objects (depth 1)
+  zqk object related ITEM-626
+  Find related objects up to depth 3
+  zqk object related ITEM-626 --depth 3
+  Find objects related via specific relationship type
+  zqk object related ITEM-626 --relationship priority_plan_ref
+  Output as JSON
+  zqk object related ITEM-626 --format json
+
+Usage:
+  zqk object related [flags]
+
+Flags:
+      --depth int             Maximum depth to traverse relationships (default: 1) (default 1)
+      --relationship string   Filter by specific relationship type (e.g., priority_plan_ref)
+
+Global Flags:
+      --allow-degraded   Allow scheduler-dependent commands to run when scheduler daemon is not running

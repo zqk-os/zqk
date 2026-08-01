@@ -1,0 +1,12 @@
+ZQK CLI
+
+Usage:
+  zqk [command]
+
+Available Commands:
+  internal    Manage internal and built-in objects (admin only)
+  object      Object operations (CRUD, query, and management)
+  system      System operations (health, validation, and maintenance)
+  version     Show ZQK version information
+
+Use "zqk [command] --help" for more information about a command.

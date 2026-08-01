@@ -1,0 +1,53 @@
+Object operations for managing all object kinds in the system.
+
+This command group provides operations that work across all object kinds:
+  Common operations: create, get, list, update, delete, count
+  Relationship traversal: related, path, neighbors
+  Specialized operations: bulk (batch operations)
+  Kind-based operations: <kind> fields (explore fields for a specific kind)
+
+Examples:
+  # Common operations (work for all object kinds)
+  zqk object create backlog_item --file item.yaml
+  zqk object list backlog_item --filter status=exploring
+  zqk object get ITEM-626
+  zqk object update ITEM-626 --field status=validated
+  zqk object delete ITEM-626
+  zqk object count backlog_item
+  zqk object backlog_item fields
+
+  # Specialized operations
+  zqk object bulk create backlog_item --file items.yaml
+  zqk object bulk update --file updates.yaml
+
+Usage:
+  zqk object [command]
+
+Available Commands:
+  <kind>      Operations for a specific object kind
+  count       Count objects by kind
+  create      Create a new object
+  delete      Delete an object by ID
+  demote      Demote one or more objects to a lower lifecycle status
+  evoman      Evolution management operations
+  export      Export objects to YAML or JSON
+  fields      List object kinds or explore fields (use object <kind> fields for a specific kind)
+  get         Get an object by ID
+  import      Import objects from YAML or JSON file
+  list        List objects of a specific kind
+  move        Move an object to a different directory/kind
+  neighbors   Find immediate neighbors of an object (depth=1)
+  path        Find a path between two objects via reference relationships
+  pplan       Priority plan operations (current, next, prev, add, remove)
+  promote     Promote one or more objects to the highest valid lifecycle status they satisfy
+  related     Find objects related to an object via reference fields
+  rename      Rename an object (change its ID)
+  splan       Strategic plan operations
+  template    Generate a blank template for creating an object
+  update      Update an existing object
+  wstrans     Workstream transition operations
+
+Flags:
+      --allow-degraded   Allow scheduler-dependent commands to run when scheduler daemon is not running
+
+Use "zqk object [command] --help" for more information about a command.

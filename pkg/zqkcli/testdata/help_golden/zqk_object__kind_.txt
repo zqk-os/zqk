@@ -1,0 +1,18 @@
+Operations for a specific object kind. Use 'fields' subcommand to explore available fields.
+
+Usage:
+  zqk object <kind> [flags]
+  zqk object <kind> [command]
+
+Available Commands:
+  create      Create a new object
+  delete      Delete an object by ID
+  fields      List available fields for this object kind
+  get         Get an object by ID
+  list        List objects of a specific kind
+  update      Update an existing object
+
+Global Flags:
+      --allow-degraded   Allow scheduler-dependent commands to run when scheduler daemon is not running
+
+Use "zqk object <kind> [command] --help" for more information about a command.

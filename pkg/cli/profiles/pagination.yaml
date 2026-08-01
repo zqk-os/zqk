@@ -1,0 +1,18 @@
+# Pagination CLI Profile Specification
+# Version: 1.0.0
+
+schema_version: "1.0.0"
+namespace_id: "zqk:kernel:cli"
+name: "pagination"
+extends: "base"
+description: |
+  Pagination context: sets max page size to 5 items per page.
+  Useful for testing pagination behavior or limiting result sets.
+
+spec:
+  format: "table"
+  verbose: false
+  quiet: false
+  storage:
+    max_page_size: 5
+    default_page_size: 5

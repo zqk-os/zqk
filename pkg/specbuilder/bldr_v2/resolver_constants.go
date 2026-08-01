@@ -1,0 +1,14 @@
+package bldr_v2
+
+// Field name constants for resolver objects
+// These constants are generated from fields defined in THIS spec (not inherited)
+// Inherited fields from base_object are defined in base_object_constants.go (same package)
+// All constants are in package bldr_v2, so you can access inherited fields via bldr_v2.FieldX
+const (
+	// FieldReferenceFormat is the field name for reference_format
+	FieldReferenceFormat = "reference_format"
+	// FieldScheme is the field name for scheme
+	FieldScheme = "scheme"
+	// FieldUserHint is the field name for user_hint
+	FieldUserHint = "user_hint"
+)

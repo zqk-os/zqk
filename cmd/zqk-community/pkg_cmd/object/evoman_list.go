@@ -1,0 +1,24 @@
+package object
+
+import (
+	"github.com/lanceman/zqk/internal/cli"
+	"github.com/lanceman/zqk/pkg/cli/bldr_cli_cmd_v1"
+	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/spf13/cobra"
+)
+
+// NewEvomanListCmd creates the evoman list subcommand (ITEM-808).
+// Generated spec: docs/process/command_specs/object/evoman/list_command.yaml; query flags from generated builder (query_flags: true).
+func NewEvomanListCmd() *cobra.Command {
+	cmd := bldr_cli_cmd_v1.NewObjectEvomanListCommandBuilder()
+	cli.BindAsyncProgress(cmd, runEvomanList)
+	return cmd
+}
+
+func runEvomanList(cmd *cobra.Command, _ []string) error {
+	return cli.WithProcessor(func(cmd *cobra.Command, _ []string, proc *cli.Processor) error {
+		var err error
+		_ = err
+		return runListSingleKind(cmd, proc, objects.KindEvolutionManagement)
+	})(cmd, nil)
+}

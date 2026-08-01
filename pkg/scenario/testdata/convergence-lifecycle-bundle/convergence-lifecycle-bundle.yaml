@@ -1,0 +1,106 @@
+# Convergence lifecycle scaffold — stamp full traceability + session shell from one file.
+# Copy to test-scenarios/ or apply from repo root with:
+#   zqk bundle apply -f pkg/scenario/testdata/convergence-lifecycle-bundle/convergence-lifecycle-bundle.yaml -R .
+# (or zqk-scenario bundle apply from cmdv2)
+#
+# Replace the *-CLF-* id_hints with your prefix (e.g. -ACME-) before applying to a shared project
+# to avoid ID collisions. Summary is written to .zqk/scenarios/<metadata.name>/scenario-summary.json.
+#
+# See: docs/architecture/CONVERGENCE_PHASE_ROUTER_AND_COORDINATOR_DESIGN.md
+api_version: v1
+kind: scenario_bundle
+metadata:
+  name: convergence-lifecycle-bundle
+  description: |
+    Traceability scaffold: goal, criteria (tombstones, router, coordinator, traceability),
+    requirement (phase router + coordinator design), doc_entry (design path), convergence_session (draft CVS),
+    optional backlog. Stamps structures without manual object-by-object CLI.
+objects:
+  goals:
+    - id_hint: GOAL-CLF-001
+      title: Convergence automation and iteration control
+      status: active
+      authority: owner
+      target: "1"
+  criteria:
+    - id_hint: CRIT-CLF-001
+      title: Tombstones and disparity defined in design
+      category: acceptance
+      validation_method: code_review
+      requirement_ref: REQ-CLF-001
+      description: |
+        Design doc names iteration tombstone (surface id, watermark, scope fingerprint);
+        disparity vs tombstone; mapping to convergence_session snapshots.
+    - id_hint: CRIT-CLF-002
+      title: Phase router instance configurability
+      category: functional
+      validation_method: code_review
+      requirement_ref: REQ-CLF-001
+      description: |
+        Design specifies per-session routing (flow_variant / routing profile) and extension points.
+    - id_hint: CRIT-CLF-003
+      title: Coordinator-backed evaluation pattern
+      category: non-functional
+      validation_method: code_review
+      requirement_ref: REQ-CLF-001
+      description: |
+        Design describes async coordinator usage, idempotency, evidence-first persistence.
+    - id_hint: CRIT-CLF-004
+      title: Traceability (doc_entry ↔ requirement ↔ criteria)
+      category: compliance
+      validation_method: manual_check
+      requirement_ref: REQ-CLF-001
+      description: |
+        doc_entry path and requirement_refs align; requirement lists all criteria_refs.
+  requirements:
+    - id_hint: REQ-CLF-001
+      title: Convergence phase router, tombstones, and coordinator-backed iteration control
+      status: planned
+      priority: p1
+      priority_plan_ref: PRI-219
+      goal_refs: [GOAL-CLF-001]
+      criteria_refs: [CRIT-CLF-001, CRIT-CLF-002, CRIT-CLF-003, CRIT-CLF-004]
+      body: |
+        Implement the convergence iteration control pattern: tombstones, configurable phase router,
+        optional coordinator-backed measurement, and decisive next_action generation aligned with
+        convergence_session (CVS-*) objects. Complements evaluation-surface / deviation-response semantics.
+
+        Design: docs/architecture/CONVERGENCE_PHASE_ROUTER_AND_COORDINATOR_DESIGN.md
+  doc_entries:
+    - id_hint: DOC-CLF-001
+      title: Convergence phase router and coordinator design
+      summary: "Architecture design for tombstones, phase router, coordinator pattern; links to REQ."
+      path: docs/architecture/CONVERGENCE_PHASE_ROUTER_AND_COORDINATOR_DESIGN.md
+      group: architecture
+      category: convergence
+      status: published
+      content_searchable: true
+      requirement_refs: [REQ-CLF-001]
+  convergence_sessions:
+    # Canonical CVS id (digits + lowercase hex) so scheduler convergence_session_tick env validation accepts bundle-applied sessions.
+    - id: CVS-EXAMPLE
+      id_hint: CVS-CLF-001
+      title: Convergence session scaffold (phase router + coordinator)
+      status: draft
+      current_phase: c1_scope
+      outcome_character: pending
+      delta_assessment: unknown
+      desired_end_state: Scoped test-bundle health green; session completion gates satisfied; optional autofix tier stable.
+      hypothesis: |
+        Instance-configurable routing plus coordinator-backed evaluation reduces manual next_action
+        drafting and keeps iteration evidence bounded.
+      iteration_process: |
+        Measure (scheduler convergence measure JSON) → triage → act → verify → update snapshots
+        and activity_log; repeat until exit or escalate.
+      next_action: |
+        Run zqk scheduler convergence measure --format json; update after_state_snapshot and
+        next_action from snapshot; confirm trigger queue and activity before closing.
+      flow_variant: test_bundle_health_v1
+      automation_hooks: evaluation_surface=test_bundle_health_jsonl; snapshot=scheduler_test_failures_convergence_v1
+      requirement_refs: [REQ-CLF-001]
+  backlog_items:
+    - id_hint: BLI-CLF-001
+      title: Implement convergence phase router and coordinator hooks
+      status: exploring
+      requirement_refs: [REQ-CLF-001]
+      criteria_refs: [CRIT-CLF-001, CRIT-CLF-002, CRIT-CLF-003]

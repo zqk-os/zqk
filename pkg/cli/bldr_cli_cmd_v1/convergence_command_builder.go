@@ -1,0 +1,50 @@
+package bldr_cli_cmd_v1
+
+import (
+	clipkg "github.com/lanceman/zqk/pkg/cli"
+	"github.com/spf13/cobra"
+)
+
+// NewConvergenceCommandBuilder creates a new convergence command
+func NewConvergenceCommandBuilder() *cobra.Command {
+	builder := clipkg.NewCommandBuilder("convergence")
+	builder.WithShort("Convergence measurement (test bundles, rollup, agent handoff)")
+	help := clipkg.DynamicHelpBuilder("Convergence measurement (test bundles, rollup, agent handoff)")
+	help.WithDescriptionLines("Test-bundle health timeline, rollup_status_core, coordinator overseer, and optional CVS/agent handoff.")
+	help.WithDescriptionLines("")
+	help.WithDescriptionLines("measure              — Read health.jsonl and compute delta_assessment, rollup, suggested CVS fields (distinct from")
+	help.WithDescriptionLines("                       CVS object fields like before_state_snapshot / after_state_snapshot — those are persisted state).")
+	help.WithDescriptionLines("overseer             — Coordinator/nested CVS rollup (tree walk + arbitrated parent line).")
+	help.WithDescriptionLines("nest-spawn           — Create child CVS under parent (related_object_refs; depth/cycle safe).")
+	help.WithDescriptionLines("nest-link            — Link existing child CVS under parent.")
+	help.WithDescriptionLines("nest-status          — BFS nest tree status for a parent CVS.")
+	help.WithDescriptionLines("promotion-readiness   — Optional promotion gate; delegates to scripts/check_convergence_promotion_readiness.sh (bash + jq).")
+	help.WithDescriptionLines("record-overseer-run   — Append overseer_run_v1 JSONL; delegates to scripts/record_convergence_overseer_run.sh.")
+	help.WithDescriptionLines("")
+	help.WithDescriptionLines("For agent markdown, use measure with --format agent-prompt. For JSON automation, use --format json.")
+	help.AddExample("Convergence measure for automation (JSON)", "%s scheduler convergence measure --format json")
+	help.AddExample("Convergence JSON without literal gate scripts (faster; full gates + matrix in cvs_outcome_rollup.py)", "%s scheduler convergence measure --format json --skip-rollup-gates")
+	help.AddExample("Convergence measure with suggested CVS fields for object update", "%s scheduler convergence measure --format json --session-id CONV-001")
+	help.AddExample("Convergence with phase router alignment (current CVS phase + flow variant)", "%s scheduler convergence measure --format json --session-id CONV-001 --current-phase c5_verify --flow-variant scheduler_fast")
+	help.AddExample("Object update payload only (pipe to file for zqk object update --file)", "%s scheduler convergence measure --format json --session-id CONV-001 | jq '.suggested_convergence_session_fields.object_update_body'")
+	help.AddExample("Agent prompt (markdown) for chat — same command as JSON, different --format", "%s scheduler convergence measure --format agent-prompt --session-id CONV-001")
+	help.AddExample("Agent prompt to file only (no CVS write; omit --persist-session when health watermark unchanged)", "%s scheduler convergence measure --format agent-prompt --session-id CONV-001 -o .zqk/logs/drift/cvs_agent_prompt_latest.md")
+	help.AddExample("Agent prompt copied to clipboard (macOS pbcopy)", "%s scheduler convergence measure --format agent-prompt --session-id CONV-001 --copy")
+	help.AddExample("Agent prompt then AppleScript: activate Cursor, ⌘Y, ⌘V, Return (macOS; Accessibility)", "%s scheduler convergence measure --format agent-prompt --session-id CONV-001 --paste-cursor")
+	help.AddExample("Persist CVS + log file + clipboard for chat (automated loop handoff; macOS)", "%s scheduler convergence measure --format agent-prompt --session-id CONV-001 --persist-session -o .zqk/logs/drift/cvs_agent_prompt_latest.md --copy")
+	help.AddExample("Coordinator overseer: rollup + nested CVS tree + arbitrated prompt line", "%s scheduler convergence overseer --coordinator-session-id CONV-001 --format json")
+	help.AddExample("Spawn nested child CVS under parent", "%s scheduler convergence nest-spawn --parent-session-id CONV-001 --title \"Child\" --hypothesis \"h\" --desired-end-state \"done\"")
+	help.AddExample("Nest status BFS tree", "%s scheduler convergence nest-status --parent-session-id CONV-001 --format json")
+	help.AddExample("Promotion readiness gate (session id arg or env; same exit codes as shell script)", "%s scheduler convergence promotion-readiness CONV-001")
+	help.AddExample("Record one overseer run JSONL line (coordinator id arg or COORDINATOR_SESSION_ID)", "%s scheduler convergence record-overseer-run CONV-001")
+	help.ExcludeFlag("format")
+	help.ExcludeFlag("output")
+	help.ExcludeFlag("verbose")
+	help.ExcludeFlag("quiet")
+	help.ExcludeFlag("timeout")
+	help.ExcludeFlag("columns")
+	builder.WithHelpBuilder(help)
+	builder.WithCommonFlags(false, nil)
+	cmd := builder.Build()
+	return cmd
+}

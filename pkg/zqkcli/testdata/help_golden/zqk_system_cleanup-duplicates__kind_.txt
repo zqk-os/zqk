@@ -1,0 +1,20 @@
+Scans hash-based files, extracts their object IDs, and removes traditional files (e.g., ITEM-*.yaml)
+that have the same object ID as a hash-based file.
+
+This is useful for cleaning up after CAS migration where traditional files
+weren't automatically removed.
+
+If a kind is provided, only processes that kind. Otherwise processes all kinds.
+
+Usage:
+  zqk system cleanup-duplicates [kind] [flags]
+
+Flags:
+      --delete-hash-duplicates   Delete duplicate hash-based files instead of quarantining them (use with care)
+      --dry-run                  Show what would be deleted without actually deleting
+      --hash-duplicates          Also handle duplicate hash-based files for the same object ID (quarantine by default)
+      --quarantine-dir string    Directory to move quarantined duplicate hash files into (default: .zqk/system-health/quarantine/hash-duplicates)
+      --verbose                  Show detailed output
+
+Global Flags:
+      --allow-degraded   Allow scheduler-dependent commands to run when scheduler daemon is not running

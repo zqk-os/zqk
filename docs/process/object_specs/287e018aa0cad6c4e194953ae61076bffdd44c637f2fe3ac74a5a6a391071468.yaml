@@ -1,0 +1,17 @@
+created_at: "2026-08-01T06:37:11Z"
+created_by: account:system
+file_path: /Users/lanceettl/ai-projects/zqk-public-candidate/docs/architecture/_internal/object_specs/capacity_advertisement.yaml
+id: OBJ-capacity_advertisement
+kind: object_spec
+namespace_id: zqk:kernel
+ontology: capacity_advertisement
+origin_project: zqk
+origin_system: zqk
+schema_version: 2.0.0
+source_type: internal
+status: implemented
+title: Represents a broadcast advertisement of available resources (compute, skill, ...
+updated_at: "2026-08-01T06:37:11Z"
+updated_by: account:system
+version_context: default
+visibility: public

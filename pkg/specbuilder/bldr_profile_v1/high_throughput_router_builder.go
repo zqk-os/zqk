@@ -1,0 +1,45 @@
+package bldr_profile_v1
+
+import (
+	"github.com/lanceman/zqk/pkg/config"
+	"github.com/lanceman/zqk/pkg/specbuilder/profile_builders"
+)
+
+// HighThroughputRouterBuilder builds the high_throughput_router profile at version v1_0_0
+// File: bldr_profile_v1/high_throughput_router_builder.go - version is encoded in package/directory name
+type HighThroughputRouterBuilder struct {
+	*profile_builders.BaseProfileBuilder
+}
+
+// NewHighThroughputRouterBuilder creates a new builder for high_throughput_router profile version v1_0_0
+func NewHighThroughputRouterBuilder() *HighThroughputRouterBuilder {
+	builder := &HighThroughputRouterBuilder{
+		BaseProfileBuilder: profile_builders.NewBaseProfileBuilder("high_throughput_router", "v1_0_0"),
+	}
+
+	// Configure the profile
+	builder.
+		SetSchemaVersion(SchemaVersionV1).
+		SetKind("profile").
+		SetType(config.ProfileTypeTransceiverRouter).
+		SetMetadata(config.ProfileMetadata{
+			Name:        "high_throughput_router",
+			Extends:     "base_router",
+			Description: "High throughput router profile for deployments with high message volume.\\nLarger worker pool and queue sizes to handle bursts.\\n",
+		}).
+		SetSpec(map[string]any{
+			"backoff_strategy":    "exponential",
+			"default_timeout_ms":  3000,
+			"enqueue_timeout_ms":  50,
+			"max_backoff_ms":      20000,
+			"max_workers":         25,
+			"metrics_interval_ms": 0,
+			"queue_size":          250,
+		})
+
+	return builder
+}
+
+func init() {
+	profile_builders.RegisterBuilder(NewHighThroughputRouterBuilder())
+}

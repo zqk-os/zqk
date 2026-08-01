@@ -1,0 +1,284 @@
+package scheduler
+
+import (
+	"context"
+	"errors"
+	"os"
+	"path/filepath"
+	"strconv"
+	"strings"
+	"time"
+
+	"github.com/lanceman/zqk/pkg/paths"
+
+	pkgctx "github.com/lanceman/zqk/pkg/context"
+	"github.com/lanceman/zqk/pkg/logging"
+	"github.com/lanceman/zqk/pkg/objects"
+	storagepkg "github.com/lanceman/zqk/pkg/storage"
+	"github.com/lanceman/zqk/pkg/when"
+)
+
+// Log events for scheduler_job_retention handler (POLICY-CODE-007 stable keys).
+const (
+	LogEventSchedulerJobRetentionJobStart                 = JobTypeSchedulerJobRetention + "_job_start"
+	LogEventSchedulerJobRetentionConfig                   = JobTypeSchedulerJobRetention + "_config"
+	LogEventSchedulerJobRetentionListFailed               = JobTypeSchedulerJobRetention + "_list_failed"
+	LogEventSchedulerJobRetentionBulkDeleteFailed         = JobTypeSchedulerJobRetention + "_bulk_delete_failed"
+	LogEventSchedulerJobRetentionRemoveLogDirFailed       = JobTypeSchedulerJobRetention + "_remove_log_dir_failed"
+	LogEventSchedulerJobRetentionRemoveOrphanLogDirFailed = JobTypeSchedulerJobRetention + "_remove_orphan_log_dir_failed"
+	LogEventSchedulerJobRetentionJobCompleted             = JobTypeSchedulerJobRetention + "_job_completed"
+	LogEventSchedulerJobRetentionCASFlushFailed           = JobTypeSchedulerJobRetention + "_cas_flush_failed"
+)
+
+// Default retention and batch limits for scheduler job cleanup.
+const (
+	defaultSchedulerJobRetentionDays       = 7
+	defaultSchedulerJobRetentionBatchSize  = 100
+	defaultSchedulerJobRetentionMaxBatches = 50
+)
+
+// SchedulerJobRetentionHandler archives and deletes old one_time scheduler jobs that have already run
+// (enabled=false), so the job store does not grow indefinitely. Reusable jobs (timer, manual, etc.)
+// are never touched.
+type SchedulerJobRetentionHandler struct {
+	storage     storagepkg.ObjectStorageProvider
+	projectRoot string
+	logger      logging.Logger
+	onProgress  ProgressFunc
+}
+
+// NewSchedulerJobRetentionHandler creates a new scheduler job retention handler.
+// NewSchedulerJobRetentionHandler creates a new scheduler job retention handler
+func NewSchedulerJobRetentionHandler(storage storagepkg.ObjectStorageProvider, projectRoot string) SchedulerJobRetentionHandlerInterface {
+	if projectRoot == emptyValue {
+		if fileStorage, ok := storage.(*storagepkg.FileObjectStorage); ok {
+			projectRoot = fileStorage.GetProjectRoot()
+		}
+	}
+	return &SchedulerJobRetentionHandler{
+		storage:     storage,
+		projectRoot: projectRoot,
+		logger:      logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem)),
+	}
+}
+
+// SetProgressFunc sets an optional callback for progress (e.g. CLI stderr).
+func (h *SchedulerJobRetentionHandler) SetProgressFunc(fn ProgressFunc) {
+	h.onProgress = fn
+}
+
+func (h *SchedulerJobRetentionHandler) emitProgress(msg string) {
+	if h.onProgress != nil {
+		h.onProgress(msg)
+	}
+}
+
+// getRetentionConfig returns retention days, batch size, and max batches from job env or defaults.
+func getSchedulerJobRetentionConfig(job *ScheduledJob) (retentionDays, batchSize, maxBatches int) {
+	retentionDays = defaultSchedulerJobRetentionDays
+	batchSize = defaultSchedulerJobRetentionBatchSize
+	maxBatches = defaultSchedulerJobRetentionMaxBatches
+	if scheduledJobEnvMissing(job) {
+		return retentionDays, batchSize, maxBatches
+	}
+	if s, ok := job.EnvironmentVariables[EnvKeyRetentionDays]; ok && s != emptyValue {
+		if n, err := strconv.Atoi(s); err == nil && n >= 0 {
+			retentionDays = n
+		}
+	}
+	if s, ok := job.EnvironmentVariables[EnvKeyBatchSize]; ok && s != emptyValue {
+		if n, err := strconv.Atoi(s); err == nil && n > 0 {
+			batchSize = n
+		}
+	}
+	if s, ok := job.EnvironmentVariables[EnvKeyMaxBatches]; ok && s != emptyValue {
+		if n, err := strconv.Atoi(s); err == nil && n > 0 {
+			maxBatches = n
+		}
+	}
+	return retentionDays, batchSize, maxBatches
+}
+
+// Execute runs scheduler job retention via the pipeline (INGEST → NORMALIZE → FINALIZE).
+func (h *SchedulerJobRetentionHandler) Execute(ctx context.Context, job *ScheduledJob) error {
+	return RunSchedulerJobRetentionViaPipeline(ctx, h, job)
+}
+
+// executeSchedulerJobRetentionCore lists one_time, enabled=false scheduler_job objects older than retention, then deletes them. Called from RunSchedulerJobRetentionViaPipeline NORMALIZE stage. Caller must set storagepkg.WithCLIOperation on ctx.
+func (h *SchedulerJobRetentionHandler) executeSchedulerJobRetentionCore(ctx context.Context, job *ScheduledJob) error {
+	h.emitProgress("Starting scheduler job retention (cleanup old one_time jobs)...")
+	SLog(h.logger).Info(LogEventSchedulerJobRetentionJobStart).
+		JobID(job.ID).
+		Log()
+
+	// Run CAS recovery for scheduler_job so stale index entries are removed before retention runs.
+	runCASRecoveryForKind(ctx, h.projectRoot, objects.KindSchedulerJob, h.logger, h.storage)
+
+	retentionDays, batchSize, maxBatches := getSchedulerJobRetentionConfig(job)
+	var cutoff time.Time
+	when.When(func() bool { return retentionDays <= 0 }).Then(func() {
+		cutoff = time.Time{} // zero: delete all matching regardless of age (one-off cleanup)
+	}).OrElse(func() {
+		cutoff = time.Now().UTC().Add(-time.Duration(retentionDays) * 24 * time.Hour)
+	}).Run()
+	cutoffStr := cutoff.Format(time.RFC3339)
+	if retentionDays <= 0 {
+		cutoffStr = "any (RETENTION_DAYS=0)"
+	}
+
+	SLog(h.logger).Info(LogEventSchedulerJobRetentionConfig).
+		JobID(job.ID).
+		Int("retention_days", retentionDays).
+		String("cutoff", cutoffStr).
+		BatchSize(batchSize).
+		MaxBatches(maxBatches).
+		Log()
+
+	secCtx := pkgctx.NewSystemSecurityContext()
+	storageCtx := &pkgctx.StorageContext{}
+
+	// List one_time jobs that are done (enabled=false or status=disabled). Two list passes to catch both.
+	var totalDeleted int
+	for batchNum := 0; batchNum < maxBatches; batchNum++ {
+		h.emitProgress("Listing and cleaning scheduler_job batch...")
+		objectsByID := make(map[string]map[string]any)
+		for _, listFilter := range []storagepkg.ListFilter{
+			{Kind: objects.KindSchedulerJob, Filters: map[string]any{objects.FieldKeyExecutionMode: ExecutionModeOneTime, objects.FieldKeyEnabled: false}, SortBy: objects.FieldKeyCreatedAt, SortAsc: true, Limit: batchSize},
+			{Kind: objects.KindSchedulerJob, Filters: map[string]any{objects.FieldKeyExecutionMode: ExecutionModeOneTime, objects.FieldKeyStatus: StatusDisabled}, SortBy: objects.FieldKeyCreatedAt, SortAsc: true, Limit: batchSize},
+		} {
+			result, err := h.storage.List(ctx, secCtx, storageCtx, listFilter)
+			if err != nil {
+				SLog(h.logger).Warn(LogEventSchedulerJobRetentionListFailed).
+					WithFields(jobLogFieldsByIDAndErr(job.ID, err)...).
+					Log()
+				continue
+			}
+			for _, obj := range result.Objects {
+				if id, ok := obj[objects.FieldKeyID].(string); ok && id != emptyValue && id != job.ID {
+					objectsByID[id] = obj
+				}
+			}
+		}
+		if len(objectsByID) == 0 {
+			break
+		}
+		var toDelete []string
+		for id, obj := range objectsByID {
+			if !IsSchedulerJobMarkedForDeletion(obj) {
+				continue
+			}
+			var t time.Time
+			if lastRun, ok := obj[objects.FieldKeyLastRunAt].(string); ok && lastRun != emptyValue {
+				if parsed, err := time.Parse(time.RFC3339, lastRun); err == nil {
+					t = parsed
+				}
+			}
+			if t.IsZero() {
+				if created, ok := obj[objects.FieldKeyCreatedAt].(string); ok && created != emptyValue {
+					if parsed, err := time.Parse(time.RFC3339, created); err == nil {
+						t = parsed
+					}
+				}
+			}
+			if retentionDays <= 0 {
+				toDelete = append(toDelete, id)
+			} else if !t.IsZero() && t.Before(cutoff) {
+				toDelete = append(toDelete, id)
+			}
+		}
+		if len(toDelete) == 0 {
+			break
+		}
+		var n int
+		if fileStorage, ok := h.storage.(*storagepkg.FileObjectStorage); ok {
+			optRes, delErr := fileStorage.BulkDeleteOptimized(ctx, secCtx, toDelete, false, 20)
+			if delErr != nil {
+				SLog(h.logger).Warn(LogEventSchedulerJobRetentionBulkDeleteFailed).
+					WithFields(jobLogFieldsByIDAndErr(job.ID, delErr)...).
+					Log()
+				break
+			}
+			n = optRes.SuccessCount
+		} else {
+			bulkRes, delErr := h.storage.BulkDelete(ctx, secCtx, toDelete, false)
+			if delErr != nil {
+				SLog(h.logger).Warn(LogEventSchedulerJobRetentionBulkDeleteFailed).
+					WithFields(jobLogFieldsByIDAndErr(job.ID, delErr)...).
+					Log()
+				break
+			}
+			n = bulkRes.SuccessCount
+		}
+		totalDeleted += n
+		storagepkg.InvalidateListCacheForKind(objects.KindSchedulerJob)
+
+		if h.projectRoot != emptyValue {
+			if queue := storagepkg.GetGlobalListingIndexWriteQueue(); queue != nil {
+				_ = queue.FlushKind(objects.KindSchedulerJob, 5*time.Second)
+			}
+		}
+
+		// Remove log directories for deleted job IDs so logs don't accumulate.
+		for _, id := range toDelete {
+			logDir := filepath.Join(h.projectRoot, paths.ProjectDataDir, "logs", "scheduler", id)
+			if err := os.RemoveAll(logDir); err != nil && !os.IsNotExist(err) {
+				SLog(h.logger).Warn(LogEventSchedulerJobRetentionRemoveLogDirFailed).
+					JobID(job.ID).
+					String("deleted_job_id", id).
+					WithError(err).
+					Log()
+			}
+		}
+		if n < len(toDelete) {
+			break
+		}
+	}
+
+	// Remove orphaned log dirs (job no longer exists).
+	if h.projectRoot != emptyValue {
+		logRoot := filepath.Join(h.projectRoot, paths.ProjectDataDir, "logs", "scheduler")
+		entries, err := os.ReadDir(logRoot)
+		if err == nil {
+			for _, e := range entries {
+				if !e.IsDir() {
+					continue
+				}
+				jobID := e.Name()
+				if jobID == emptyValue || jobID == job.ID {
+					continue
+				}
+				// Maintenance runner log dirs removed in V1.0 Hardening.
+				_, getErr := h.storage.Read(ctx, pkgctx.NewSystemSecurityContext(), jobID)
+				isNotFound := getErr != nil && (errors.Is(getErr, storagepkg.ErrObjectNotFound) || strings.Contains(getErr.Error(), "not found"))
+				if isNotFound {
+					orphanDir := filepath.Join(logRoot, jobID)
+					if rmErr := os.RemoveAll(orphanDir); rmErr != nil && !os.IsNotExist(rmErr) {
+						SLog(h.logger).Warn(LogEventSchedulerJobRetentionRemoveOrphanLogDirFailed).
+							JobID(job.ID).
+							String("orphan_dir", jobID).
+							WithError(rmErr).
+							Log()
+					}
+				}
+			}
+		}
+	}
+
+	if totalDeleted > 0 {
+		SLog(h.logger).Info(LogEventSchedulerJobRetentionJobCompleted).
+			JobID(job.ID).
+			Deleted(totalDeleted).
+			Log()
+		// Flush CAS index so deletes are persisted (same pattern as retention_tolerance).
+		if queue := storagepkg.GetGlobalListingIndexWriteQueue(); queue != nil {
+			if flushErr := queue.FlushKind(objects.KindSchedulerJob, 20*time.Second); flushErr != nil {
+				SLog(h.logger).Warn(LogEventSchedulerJobRetentionCASFlushFailed).
+					WithFields(jobLogFieldsByIDAndErr(job.ID, flushErr)...).
+					Log()
+			}
+		}
+	}
+
+	h.emitProgress("Scheduler job retention complete.")
+	return nil
+}
