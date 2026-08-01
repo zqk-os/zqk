@@ -72,12 +72,12 @@ download_stdout() {
 
 # --- System Detection ---
 detect_os() {
-    os="$(uname -s)"
+    os="$(uname -s | tr '[:upper:]' '[:lower:]')"
     case "$os" in
-        Linux)
+        linux)
             OS="linux"
             ;;
-        Darwin)
+        darwin)
             OS="darwin"
             ;;
         *)
@@ -90,10 +90,10 @@ detect_arch() {
     arch="$(uname -m)"
     case "$arch" in
         x86_64|amd64)
-            ARCH="x86_64"
+            ARCH="amd64"
             ;;
         aarch64|arm64)
-            ARCH="aarch64"
+            ARCH="arm64"
             ;;
         *)
             error "Unsupported architecture: $arch. ZQK binaries are compiled for x86_64 and aarch64 (ARM64)."
@@ -151,9 +151,13 @@ main() {
     detect_arch
     get_latest_version
 
-    TARBALL_NAME="${BINARY_NAME}-${VERSION}-${OS}-${ARCH}.tar.gz"
+    # Strip leading 'v' for the binary archive filename (e.g., v0.1.0-alpha.1 -> 0.1.0-alpha.1)
+    VERSION_NO_V="${VERSION#v}"
+
+    # Match GoReleaser output naming conventions
+    TARBALL_NAME="${BINARY_NAME}_${VERSION_NO_V}_${OS}_${ARCH}.tar.gz"
     DOWNLOAD_URL="${GITHUB_RELEASE_URL}/download/${VERSION}/${TARBALL_NAME}"
-    CHECKSUMS_URL="${GITHUB_RELEASE_URL}/download/${VERSION}/checksums.txt"
+    CHECKSUMS_URL="${GITHUB_RELEASE_URL}/download/${VERSION}/${BINARY_NAME}_${VERSION_NO_V}_checksums.txt"
 
     TMP_DIR="$(mktemp -d 2>/dev/null || mktemp -d -t 'zqk_install')"
     trap 'rm -rf "$TMP_DIR"' EXIT INT TERM
