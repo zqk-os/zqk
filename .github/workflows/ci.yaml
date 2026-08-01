@@ -6,30 +6,35 @@ on:
   pull_request:
     branches: [ "main" ]
 
-env:
-  CARGO_TERM_COLOR: always
-
 jobs:
-  check:
-    name: Rust CI (Format, Lint, Test)
+  build:
+    name: Build & Test (Go)
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Install Rust Toolchain
-        uses: dtolnay/rust-toolchain@stable
+      - name: Set up Go
+        uses: actions/setup-go@v5
         with:
-          components: rustfmt, clippy
-
-      - name: Set up Rust Cache
-        uses: Swatinem/rust-cache@v2
+          go-version: '1.26'
+          check-latest: true
+          cache: true
 
       - name: Check Formatting
-        run: cargo fmt --all -- --check
+        run: |
+          if [ -n "$(gofmt -l .)" ]; then
+            echo "The following files are not formatted properly:"
+            gofmt -l .
+            exit 1
+          fi
 
-      - name: Run Clippy Linter
-        run: cargo clippy --all-targets --all-features -- -D warnings
+      - name: Vet Code
+        run: go vet ./...
 
-      - name: Run Unit & Integration Tests
-        run: cargo test --all-targets --all-features
+      - name: Run Tests
+        run: go test -v ./...
+
+      - name: Build Binary
+        run: go build -v -o zqk ./cmd/zqk
