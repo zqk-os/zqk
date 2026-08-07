@@ -8,11 +8,11 @@ ZQK (Zen Quantum Kernel) is an open-core, distributed Knowledge Operating System
 
 ### ⚡ Core Architecture
 
-- **Distributed Knowledge Kernel:** Built on a cellular, spec-driven architecture where project artifacts, policies, and goals are managed as graph nodes[cite: 1].
-- **Dual-Storage & CAS:** Combines Git-native YAML with Content-Addressable Storage (CAS) for cryptographic integrity, synchronized to a high-throughput MemGraph/Neo4j backend[cite: 1].
-- **GraphRAG Engine:** Native multi-hop traversal, semantic proximity queries, and vector search for deep AI reasoning[cite: 1].
-- **MCP Server & RBAC:** Exposes system commands to AI agents via the Model Context Protocol standard under strict role-based access control[cite: 1].
-- **DAG Pipeline Executor:** Composable workflow engine with automatic rollback semantics, retry stages, and rate-limiting[cite: 1].
+- **Distributed Knowledge Kernel:** Built on a cellular, spec-driven architecture where project artifacts, policies, and goals are managed as graph nodes.
+- **Dual-Storage & CAS:** Combines Git-native YAML with Content-Addressable Storage (CAS) for cryptographic integrity, synchronized to a high-throughput MemGraph/Neo4j backend.
+- **GraphRAG Engine:** Native multi-hop traversal, semantic proximity queries, and vector search for deep AI reasoning.
+- **MCP Server & RBAC:** Exposes system commands to AI agents via the Model Context Protocol standard under strict role-based access control.
+- **DAG Pipeline Executor:** Composable workflow engine with automatic rollback semantics, retry stages, and rate-limiting.
 
 ---
 
