@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-344",
+  "created_at": "2026-09-04T21:34:30.772254Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-344",
+    "Tests": [
+      {
+        "Name": "TestKeystoreCreate_ValidKey",
+        "Package": "keystore",
+        "PackagePath": "cmd/zqk/keystore",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/keystore/keystore_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestKeystoreCreate_NonSystemUserCannotSetCredentialHash",
+        "Package": "keystore",
+        "PackagePath": "cmd/zqk/keystore",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/keystore/keystore_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestKeystoreCreate_AccountIDAutoSet",
+        "Package": "keystore",
+        "PackagePath": "cmd/zqk/keystore",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/keystore/keystore_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestKeystoreList_UserSeesOwnEntries",
+        "Package": "keystore",
+        "PackagePath": "cmd/zqk/keystore",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/keystore/keystore_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestKeystoreList_AdminSeesAllEntries",
+        "Package": "keystore",
+        "PackagePath": "cmd/zqk/keystore",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/keystore/keystore_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestKeystoreList_SystemSeesAllFields",
+        "Package": "keystore",
+        "PackagePath": "cmd/zqk/keystore",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/keystore/keystore_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestKeystoreRotate_ValidRotation",
+        "Package": "keystore",
+        "PackagePath": "cmd/zqk/keystore",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/keystore/keystore_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestKeystoreRotate_NonSystemUserCannotRotate",
+        "Package": "keystore",
+        "PackagePath": "cmd/zqk/keystore",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/keystore/keystore_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestKeystoreRotate_RevokeOldKey",
+        "Package": "keystore",
+        "PackagePath": "cmd/zqk/keystore",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/keystore/keystore_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestKeystoreRotate_OwnerCanRevoke",
+        "Package": "keystore",
+        "PackagePath": "cmd/zqk/keystore",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/keystore/keystore_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 300000000000,
+    "PackagePath": "cmd/zqk/keystore"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestKeystoreCreate_ValidKey",
+      "Package": "keystore",
+      "PackagePath": "cmd/zqk/keystore",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/keystore/keystore_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestKeystoreCreate_NonSystemUserCannotSetCredentialHash",
+      "Package": "keystore",
+      "PackagePath": "cmd/zqk/keystore",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/keystore/keystore_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestKeystoreCreate_AccountIDAutoSet",
+      "Package": "keystore",
+      "PackagePath": "cmd/zqk/keystore",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/keystore/keystore_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestKeystoreList_UserSeesOwnEntries",
+      "Package": "keystore",
+      "PackagePath": "cmd/zqk/keystore",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/keystore/keystore_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestKeystoreList_AdminSeesAllEntries",
+      "Package": "keystore",
+      "PackagePath": "cmd/zqk/keystore",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/keystore/keystore_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestKeystoreList_SystemSeesAllFields",
+      "Package": "keystore",
+      "PackagePath": "cmd/zqk/keystore",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/keystore/keystore_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestKeystoreRotate_ValidRotation",
+      "Package": "keystore",
+      "PackagePath": "cmd/zqk/keystore",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/keystore/keystore_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestKeystoreRotate_NonSystemUserCannotRotate",
+      "Package": "keystore",
+      "PackagePath": "cmd/zqk/keystore",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/keystore/keystore_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestKeystoreRotate_RevokeOldKey",
+      "Package": "keystore",
+      "PackagePath": "cmd/zqk/keystore",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/keystore/keystore_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestKeystoreRotate_OwnerCanRevoke",
+      "Package": "keystore",
+      "PackagePath": "cmd/zqk/keystore",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/keystore/keystore_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

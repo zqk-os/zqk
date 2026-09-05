@@ -1,0 +1,14 @@
+created_at: "2026-08-18T23:37:33Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1787096253163853000-0cda792e
+item_id: BLI-CEF-R2-SEC-HTTP-TIMEOUTS
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 2857702ca28e4b64fb5782140b43c1400e68fdeab30ab0062f4119523ca97d466e5f13c72adcfa41b92eacf21fa7f0a79b8a8e3a8d7c581e5c9afe0e69cb31dc
+schema_version: 2.0.0
+signature: 304502204e1ca7efed4cf1b8ae690bfa8a048f2157ea16fc2b72f91bd62b5d0847167f05022100fb339ae2a7ddacb36d8a9055e49c22a06d88ae0af94aba50c01ed612071ab733
+status: archived
+title: HTTP listeners set ReadHeaderTimeout/WriteTimeout
+updated_at: "2026-09-01T07:37:37Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-347",
+  "created_at": "2026-09-04T21:34:30.79027Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-347",
+    "Tests": [
+      {
+        "Name": "TestCompactOldSegments",
+        "Package": "telemetry",
+        "PackagePath": "pkg/telemetry",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/telemetry/compaction_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestTelemetryDaemon_Aggregate",
+        "Package": "telemetry",
+        "PackagePath": "pkg/telemetry",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/telemetry/daemon_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestTelemetryDaemon_RunBackgroundGC",
+        "Package": "telemetry",
+        "PackagePath": "pkg/telemetry",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/telemetry/daemon_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestDriftDetector_CheckDrift",
+        "Package": "telemetry",
+        "PackagePath": "pkg/telemetry",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/telemetry/drift_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestStreamCompaction",
+        "Package": "telemetry",
+        "PackagePath": "pkg/telemetry",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/telemetry/telemetry_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestGc",
+        "Package": "telemetry",
+        "PackagePath": "pkg/telemetry",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/telemetry/telemetry_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestCacheHitRatioObservability",
+        "Package": "telemetry",
+        "PackagePath": "pkg/telemetry",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/telemetry/telemetry_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestIPCLatencyObservability",
+        "Package": "telemetry",
+        "PackagePath": "pkg/telemetry",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/telemetry/telemetry_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAgentTokenTrackingObservability",
+        "Package": "telemetry",
+        "PackagePath": "pkg/telemetry",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/telemetry/telemetry_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestGhostDriftMTTRObservability",
+        "Package": "telemetry",
+        "PackagePath": "pkg/telemetry",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/telemetry/telemetry_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 300000000000,
+    "PackagePath": "pkg/telemetry"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestCompactOldSegments",
+      "Package": "telemetry",
+      "PackagePath": "pkg/telemetry",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/telemetry/compaction_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestTelemetryDaemon_Aggregate",
+      "Package": "telemetry",
+      "PackagePath": "pkg/telemetry",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/telemetry/daemon_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestTelemetryDaemon_RunBackgroundGC",
+      "Package": "telemetry",
+      "PackagePath": "pkg/telemetry",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/telemetry/daemon_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestDriftDetector_CheckDrift",
+      "Package": "telemetry",
+      "PackagePath": "pkg/telemetry",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/telemetry/drift_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestStreamCompaction",
+      "Package": "telemetry",
+      "PackagePath": "pkg/telemetry",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/telemetry/telemetry_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestGc",
+      "Package": "telemetry",
+      "PackagePath": "pkg/telemetry",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/telemetry/telemetry_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestCacheHitRatioObservability",
+      "Package": "telemetry",
+      "PackagePath": "pkg/telemetry",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/telemetry/telemetry_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestIPCLatencyObservability",
+      "Package": "telemetry",
+      "PackagePath": "pkg/telemetry",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/telemetry/telemetry_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestAgentTokenTrackingObservability",
+      "Package": "telemetry",
+      "PackagePath": "pkg/telemetry",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/telemetry/telemetry_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestGhostDriftMTTRObservability",
+      "Package": "telemetry",
+      "PackagePath": "pkg/telemetry",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/telemetry/telemetry_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

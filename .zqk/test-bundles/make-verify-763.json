@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-763",
+  "created_at": "2026-09-04T21:34:34.885162Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-763",
+    "Tests": [
+      {
+        "Name": "TestApplyIndependentVerifyYes",
+        "Package": "vds",
+        "PackagePath": "pkg/vds",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/vds/chunk_apply_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestPredPathExists",
+        "Package": "vds",
+        "PackagePath": "pkg/vds",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/vds/chunk_apply_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestEvaluate_passStructuralAndObjectExists",
+        "Package": "vds",
+        "PackagePath": "pkg/vds",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/vds/evaluate_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestEvaluate_failMissingEvidence",
+        "Package": "vds",
+        "PackagePath": "pkg/vds",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/vds/evaluate_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestEvaluate_schedulerTestsNeedJobAndLog",
+        "Package": "vds",
+        "PackagePath": "pkg/vds",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/vds/evaluate_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestLoadSpineFromRepo",
+        "Package": "vds",
+        "PackagePath": "pkg/vds",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/vds/evaluate_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestEvaluate_includesGlossaryFromPins",
+        "Package": "vds",
+        "PackagePath": "pkg/vds",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/vds/evaluate_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestInitChunksFile",
+        "Package": "vds",
+        "PackagePath": "pkg/vds",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/vds/evaluate_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestResolveGlossary_customizationPins",
+        "Package": "vds",
+        "PackagePath": "pkg/vds",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/vds/glossary_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestResolveGlossary_titleLookup",
+        "Package": "vds",
+        "PackagePath": "pkg/vds",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/vds/glossary_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 300000000000,
+    "PackagePath": "pkg/vds"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestApplyIndependentVerifyYes",
+      "Package": "vds",
+      "PackagePath": "pkg/vds",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/vds/chunk_apply_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestPredPathExists",
+      "Package": "vds",
+      "PackagePath": "pkg/vds",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/vds/chunk_apply_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestEvaluate_passStructuralAndObjectExists",
+      "Package": "vds",
+      "PackagePath": "pkg/vds",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/vds/evaluate_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestEvaluate_failMissingEvidence",
+      "Package": "vds",
+      "PackagePath": "pkg/vds",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/vds/evaluate_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestEvaluate_schedulerTestsNeedJobAndLog",
+      "Package": "vds",
+      "PackagePath": "pkg/vds",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/vds/evaluate_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestLoadSpineFromRepo",
+      "Package": "vds",
+      "PackagePath": "pkg/vds",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/vds/evaluate_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestEvaluate_includesGlossaryFromPins",
+      "Package": "vds",
+      "PackagePath": "pkg/vds",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/vds/evaluate_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestInitChunksFile",
+      "Package": "vds",
+      "PackagePath": "pkg/vds",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/vds/evaluate_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestResolveGlossary_customizationPins",
+      "Package": "vds",
+      "PackagePath": "pkg/vds",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/vds/glossary_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestResolveGlossary_titleLookup",
+      "Package": "vds",
+      "PackagePath": "pkg/vds",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/vds/glossary_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

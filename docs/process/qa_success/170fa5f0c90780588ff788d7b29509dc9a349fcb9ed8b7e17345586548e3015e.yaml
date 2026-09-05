@@ -1,0 +1,14 @@
+created_at: "2026-08-19T07:51:22Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1787125882184008000-70996897
+item_id: REDACTED
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 2857702ca28e4b64fb5782140b43c1400e68fdeab30ab0062f4119523ca97d466e5f13c72adcfa41b92eacf21fa7f0a79b8a8e3a8d7c581e5c9afe0e69cb31dc
+schema_version: 2.0.0
+signature: 304402201af0f05d5317d5ab615b88f381e23b3b30d5b934b8f0b2d587cc6f63d51ead8b022077f4b7eaa3c65e8bcb692ecec71939a0736870389c06d92ff5916d98b5443c44
+status: archived
+title: 'Acceptance: Bulletproof CAS / object-id-cache coherence'
+updated_at: "2026-09-01T07:12:45Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

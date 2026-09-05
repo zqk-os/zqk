@@ -1,0 +1,14 @@
+created_at: "2026-09-03T05:19:07Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1788412747379248000-09adc523
+item_id: CRIT-CEF-CRIT-VALIDATED-NOT-COMPLETE-001
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 86b8ab3d574c004a61020b73c23f52b9055049e90c3d755c8bbb383e059e384028fdd8cd69e13123b644e5f3f7eb65596e73e2d57d719ea3dafcb01b84ce8dfb
+schema_version: 2.0.0
+signature: 3044022067948be84cadb3100693476f22bebec68c22c9ed0e740163f65ff3ce094a14080220103adc3421451a878b2659860cf002b1903ff6d1a221f754da402627cacab02d
+status: success
+title: QA success for CRIT-CEF-CRIT-VALIDATED-NOT-COMPLETE-001
+updated_at: "2026-09-03T05:19:08Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

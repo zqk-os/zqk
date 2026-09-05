@@ -1,0 +1,60 @@
+
+--- run 2026-09-04T22:20:56Z ---
+=== RUN   TestDataCellDescriptorsFromSpecIndex_roundTrip
+=== PAUSE TestDataCellDescriptorsFromSpecIndex_roundTrip
+=== RUN   TestDataCellDescriptorsFromSpecIndex_invalidProfile
+=== PAUSE TestDataCellDescriptorsFromSpecIndex_invalidProfile
+=== RUN   TestDataCellDescriptorsFromSpecIndex_allProfilesParse
+=== PAUSE TestDataCellDescriptorsFromSpecIndex_allProfilesParse
+=== RUN   TestHighVolumeStreamSpecProfileMismatchesFromIndex
+=== PAUSE TestHighVolumeStreamSpecProfileMismatchesFromIndex
+=== RUN   TestHighVolumeStreamSpecProfileMismatchesFromIndex_edges
+=== PAUSE TestHighVolumeStreamSpecProfileMismatchesFromIndex_edges
+=== RUN   TestHighVolumeStreamSpecProfileMismatches_repo
+=== PAUSE TestHighVolumeStreamSpecProfileMismatches_repo
+=== RUN   TestStreamKindNamesFromHighVolumeConfig_repo
+=== PAUSE TestStreamKindNamesFromHighVolumeConfig_repo
+=== RUN   TestStreamKindNamesFromHighVolumeConfig_synthetic
+=== PAUSE TestStreamKindNamesFromHighVolumeConfig_synthetic
+=== RUN   TestStreamKindNamesFromHighVolumeConfig_missingFile
+=== PAUSE TestStreamKindNamesFromHighVolumeConfig_missingFile
+=== RUN   TestHighVolumeStreamStewardshipDrift_repo
+=== PAUSE TestHighVolumeStreamStewardshipDrift_repo
+=== CONT  TestDataCellDescriptorsFromSpecIndex_roundTrip
+--- PASS: TestDataCellDescriptorsFromSpecIndex_roundTrip (0.00s)
+=== CONT  TestHighVolumeStreamSpecProfileMismatchesFromIndex_edges
+=== RUN   TestHighVolumeStreamSpecProfileMismatchesFromIndex_edges/nil_index
+=== PAUSE TestHighVolumeStreamSpecProfileMismatchesFromIndex_edges/nil_index
+=== RUN   TestHighVolumeStreamSpecProfileMismatchesFromIndex_edges/nil_kinds
+=== PAUSE TestHighVolumeStreamSpecProfileMismatchesFromIndex_edges/nil_kinds
+=== RUN   TestHighVolumeStreamSpecProfileMismatchesFromIndex_edges/empty_kinds
+=== PAUSE TestHighVolumeStreamSpecProfileMismatchesFromIndex_edges/empty_kinds
+=== RUN   TestHighVolumeStreamSpecProfileMismatchesFromIndex_edges/aligned_stream_kind
+=== PAUSE TestHighVolumeStreamSpecProfileMismatchesFromIndex_edges/aligned_stream_kind
+=== CONT  TestHighVolumeStreamSpecProfileMismatches_repo
+=== CONT  TestHighVolumeStreamSpecProfileMismatchesFromIndex_edges/nil_index
+=== CONT  TestHighVolumeStreamSpecProfileMismatchesFromIndex
+--- PASS: TestHighVolumeStreamSpecProfileMismatchesFromIndex (0.00s)
+=== CONT  TestDataCellDescriptorsFromSpecIndex_allProfilesParse
+--- PASS: TestDataCellDescriptorsFromSpecIndex_allProfilesParse (0.00s)
+=== CONT  TestDataCellDescriptorsFromSpecIndex_invalidProfile
+--- PASS: TestDataCellDescriptorsFromSpecIndex_invalidProfile (0.00s)
+=== CONT  TestHighVolumeStreamSpecProfileMismatchesFromIndex_edges/aligned_stream_kind
+=== CONT  TestHighVolumeStreamSpecProfileMismatchesFromIndex_edges/empty_kinds
+=== CONT  TestHighVolumeStreamSpecProfileMismatchesFromIndex_edges/nil_kinds
+--- PASS: TestHighVolumeStreamSpecProfileMismatchesFromIndex_edges (0.00s)
+    --- PASS: TestHighVolumeStreamSpecProfileMismatchesFromIndex_edges/nil_index (0.00s)
+    --- PASS: TestHighVolumeStreamSpecProfileMismatchesFromIndex_edges/aligned_stream_kind (0.00s)
+    --- PASS: TestHighVolumeStreamSpecProfileMismatchesFromIndex_edges/empty_kinds (0.00s)
+    --- PASS: TestHighVolumeStreamSpecProfileMismatchesFromIndex_edges/nil_kinds (0.00s)
+=== CONT  TestStreamKindNamesFromHighVolumeConfig_missingFile
+--- PASS: TestStreamKindNamesFromHighVolumeConfig_missingFile (0.00s)
+=== CONT  TestHighVolumeStreamStewardshipDrift_repo
+--- PASS: TestHighVolumeStreamStewardshipDrift_repo (0.02s)
+=== CONT  TestStreamKindNamesFromHighVolumeConfig_synthetic
+--- PASS: TestStreamKindNamesFromHighVolumeConfig_synthetic (0.01s)
+=== CONT  TestStreamKindNamesFromHighVolumeConfig_repo
+--- PASS: TestStreamKindNamesFromHighVolumeConfig_repo (0.00s)
+--- PASS: TestHighVolumeStreamSpecProfileMismatches_repo (0.03s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/datacellregistry	0.313s

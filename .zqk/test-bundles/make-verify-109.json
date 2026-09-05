@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-109",
+  "created_at": "2026-09-04T21:34:28.437568Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-109",
+    "Tests": [
+      {
+        "Name": "TestBatchInternalUpdate_ConcurrentDeadlockDetection",
+        "Package": "internal",
+        "PackagePath": "pkg/zqkcli",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/zqkcli/batch_update_deadlock_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestBatchInternalUpdate_SequentialNoDeadlock",
+        "Package": "internal",
+        "PackagePath": "pkg/zqkcli",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/zqkcli/batch_update_deadlock_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestCRUDBaselineConsistency",
+        "Package": "internal",
+        "PackagePath": "pkg/zqkcli",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/zqkcli/crud_baseline_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestCRUDBaseline1k",
+        "Package": "internal",
+        "PackagePath": "pkg/zqkcli",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/zqkcli/crud_baseline_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestFileBackendLifecycleHooks",
+        "Package": "internal",
+        "PackagePath": "pkg/zqkcli",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/zqkcli/file_lifecycle_hooks_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestFileBackendAutoTransitionEvaluation",
+        "Package": "internal",
+        "PackagePath": "pkg/zqkcli",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/zqkcli/file_lifecycle_hooks_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestFileGraphBackendLifecycleParity",
+        "Package": "internal",
+        "PackagePath": "pkg/zqkcli",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/zqkcli/file_lifecycle_hooks_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestGraphFileBackendParity",
+        "Package": "internal",
+        "PackagePath": "pkg/zqkcli",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/zqkcli/graph_file_parity_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestGraphBackendIntegration",
+        "Package": "internal",
+        "PackagePath": "pkg/zqkcli",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/zqkcli/graph_integration_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestGraphBackendPerformance",
+        "Package": "internal",
+        "PackagePath": "pkg/zqkcli",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/zqkcli/graph_integration_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 300000000000,
+    "PackagePath": "pkg/zqkcli"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestBatchInternalUpdate_ConcurrentDeadlockDetection",
+      "Package": "internal",
+      "PackagePath": "pkg/zqkcli",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/zqkcli/batch_update_deadlock_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestBatchInternalUpdate_SequentialNoDeadlock",
+      "Package": "internal",
+      "PackagePath": "pkg/zqkcli",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/zqkcli/batch_update_deadlock_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestCRUDBaselineConsistency",
+      "Package": "internal",
+      "PackagePath": "pkg/zqkcli",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/zqkcli/crud_baseline_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestCRUDBaseline1k",
+      "Package": "internal",
+      "PackagePath": "pkg/zqkcli",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/zqkcli/crud_baseline_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestFileBackendLifecycleHooks",
+      "Package": "internal",
+      "PackagePath": "pkg/zqkcli",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/zqkcli/file_lifecycle_hooks_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestFileBackendAutoTransitionEvaluation",
+      "Package": "internal",
+      "PackagePath": "pkg/zqkcli",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/zqkcli/file_lifecycle_hooks_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestFileGraphBackendLifecycleParity",
+      "Package": "internal",
+      "PackagePath": "pkg/zqkcli",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/zqkcli/file_lifecycle_hooks_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestGraphFileBackendParity",
+      "Package": "internal",
+      "PackagePath": "pkg/zqkcli",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/zqkcli/graph_file_parity_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestGraphBackendIntegration",
+      "Package": "internal",
+      "PackagePath": "pkg/zqkcli",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/zqkcli/graph_integration_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestGraphBackendPerformance",
+      "Package": "internal",
+      "PackagePath": "pkg/zqkcli",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/zqkcli/graph_integration_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-649",
+  "created_at": "2026-09-04T21:34:33.8084Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-649",
+    "Tests": [
+      {
+        "Name": "TestWakePeer_E2EProof_LiveWakesCursorTPM",
+        "Package": "agentfeed",
+        "PackagePath": "pkg/agentfeed",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentfeed/deliver_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestInspectFeed_Doctor",
+        "Package": "agentfeed_test",
+        "PackagePath": "pkg/agentfeed",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentfeed/doctor_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestDispatchOrchestratePlan_skipsPeerInboxAndCooldown",
+        "Package": "agentfeed",
+        "PackagePath": "pkg/agentfeed",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentfeed/orchestrate_plan_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestDispatchOrchestratePlan_skipsRemint",
+        "Package": "agentfeed",
+        "PackagePath": "pkg/agentfeed",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentfeed/orchestrate_plan_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAuthorizePeerAck_deniesCrossSeatImpersonation",
+        "Package": "agentfeed",
+        "PackagePath": "pkg/agentfeed",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentfeed/peer_ack_auth_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestCorrespondence_impersonatedAckDoesNotClearOutbox",
+        "Package": "agentfeed",
+        "PackagePath": "pkg/agentfeed",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentfeed/peer_ack_auth_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestCompletePeerAckAwaits_requiresAddressedSeat",
+        "Package": "agentfeed",
+        "PackagePath": "pkg/agentfeed",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentfeed/peer_ack_auth_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestRefreshPeerSeatsFromLivePIDs_AssignsAndPersists",
+        "Package": "agentfeed",
+        "PackagePath": "pkg/agentfeed",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentfeed/peer_seats_refresh_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestRefreshPeerSeatsFromLivePIDs_DryRunNoWrite",
+        "Package": "agentfeed",
+        "PackagePath": "pkg/agentfeed",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentfeed/peer_seats_refresh_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestIsPIDAlive_Self",
+        "Package": "agentfeed",
+        "PackagePath": "pkg/agentfeed",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentfeed/peer_seats_refresh_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 300000000000,
+    "PackagePath": "pkg/agentfeed"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestWakePeer_E2EProof_LiveWakesCursorTPM",
+      "Package": "agentfeed",
+      "PackagePath": "pkg/agentfeed",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentfeed/deliver_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestInspectFeed_Doctor",
+      "Package": "agentfeed_test",
+      "PackagePath": "pkg/agentfeed",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentfeed/doctor_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestDispatchOrchestratePlan_skipsPeerInboxAndCooldown",
+      "Package": "agentfeed",
+      "PackagePath": "pkg/agentfeed",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentfeed/orchestrate_plan_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestDispatchOrchestratePlan_skipsRemint",
+      "Package": "agentfeed",
+      "PackagePath": "pkg/agentfeed",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentfeed/orchestrate_plan_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestAuthorizePeerAck_deniesCrossSeatImpersonation",
+      "Package": "agentfeed",
+      "PackagePath": "pkg/agentfeed",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentfeed/peer_ack_auth_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestCorrespondence_impersonatedAckDoesNotClearOutbox",
+      "Package": "agentfeed",
+      "PackagePath": "pkg/agentfeed",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentfeed/peer_ack_auth_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestCompletePeerAckAwaits_requiresAddressedSeat",
+      "Package": "agentfeed",
+      "PackagePath": "pkg/agentfeed",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentfeed/peer_ack_auth_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestRefreshPeerSeatsFromLivePIDs_AssignsAndPersists",
+      "Package": "agentfeed",
+      "PackagePath": "pkg/agentfeed",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentfeed/peer_seats_refresh_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestRefreshPeerSeatsFromLivePIDs_DryRunNoWrite",
+      "Package": "agentfeed",
+      "PackagePath": "pkg/agentfeed",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentfeed/peer_seats_refresh_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestIsPIDAlive_Self",
+      "Package": "agentfeed",
+      "PackagePath": "pkg/agentfeed",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentfeed/peer_seats_refresh_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

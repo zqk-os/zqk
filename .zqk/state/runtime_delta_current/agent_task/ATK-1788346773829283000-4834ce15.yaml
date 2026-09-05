@@ -1,0 +1,85 @@
+assignee_persona_ref: PER-ORCH-BETA
+created_at: "2026-09-02T10:59:33Z"
+created_by: ACC-1785920548450214012-68b850c0
+description: |
+    # Agent Task Envelope
+    zqk_task_envelope_v1
+
+    Static context lives in kernel objects. Do not treat this description as a copy of policy or skill bodies.
+    Resolve at execute: `zqk object get <id>`, `zqk agent prepare-context --task-id <ATK>`, or `zqk workflow whats-next`.
+
+    ## Dynamic
+    - Plan: CEF AA/AB structure — storage, packages, logging, tests, docs (PRI-CEF-REMEDIATE-STRUCTURE-001)
+    - Target: coder-agent (capability: )
+    - Persona: PER-ORCH-BETA
+    - Task: Drop gocyclo threshold to <=20 with named exclusions
+
+    ## Standing refs (do not duplicate bodies)
+    - `POL-ONBOARD-001` — `zqk object get POL-ONBOARD-001`
+    - `POL-ONBOARD-002` — `zqk object get POL-ONBOARD-002`
+    - `POL-AGENT-INSTRUCTION-RUBRIC-001` — `zqk object get POL-AGENT-INSTRUCTION-RUBRIC-001`
+    - `POL-WORKFLOW-VDS` — `zqk object get POL-WORKFLOW-VDS`
+    - `POL-CODE-CAS-COMMIT-001` — `zqk object get POL-CODE-CAS-COMMIT-001`
+    - `POL-CODE-1784753087498298000-bedce972` — `zqk object get POL-CODE-1784753087498298000-bedce972`
+
+    ## Bound policies
+    - `POL-ONBOARD-001`
+    - `POL-ONBOARD-002`
+    - `POL-AGENT-INSTRUCTION-RUBRIC-001`
+    - `POL-WORKFLOW-VDS`
+    - `POL-CODE-CAS-COMMIT-001`
+    - `POL-CODE-1784753087498298000-bedce972`
+    - `POL-AGENT-ADMIN-MEMBRANE-001`
+    - `POL-AGENT-TPM-GROOM-AHEAD-001`
+
+    ## Bound skills
+    - `ASK-1781037416510742000-284d1135` — `zqk object get ASK-1781037416510742000-284d1135`
+    - `ASK-1781037418374609000-68c51cbb` — `zqk object get ASK-1781037418374609000-68c51cbb`
+    - `ASK-1782259937447396000-fb005beb` — `zqk object get ASK-1782259937447396000-fb005beb`
+    - `ASK-1782593752920560000-99708cd6` — `zqk object get ASK-1782593752920560000-99708cd6`
+    - `ASK-1785886324283087000-34320add` — `zqk object get ASK-1785886324283087000-34320add`
+    - `ASK-1786081148616665000-c78bdd4d` — `zqk object get ASK-1786081148616665000-c78bdd4d`
+    - `ASK-DEFAULT-FEED-CORRESPONDENCE` — `zqk object get ASK-DEFAULT-FEED-CORRESPONDENCE`
+
+    ## Observer
+    Do not persist an AST census. At execute time call observer_search, then read_code the returned path.
+estimated_effort: 1d
+id: ATK-1788346773829283000-4834ce15
+kind: agent_task
+model_tier: tier_2_simple
+namespace_id: zqk:kernel
+outputs: []
+policy_refs:
+    - POL-ONBOARD-001
+    - POL-ONBOARD-002
+    - POL-AGENT-INSTRUCTION-RUBRIC-001
+    - POL-WORKFLOW-VDS
+    - POL-CODE-CAS-COMMIT-001
+    - POL-CODE-1784753087498298000-bedce972
+    - POL-AGENT-ADMIN-MEMBRANE-001
+    - POL-AGENT-TPM-GROOM-AHEAD-001
+priority_plan_ref: PRI-CEF-REMEDIATE-STRUCTURE-001
+related_object_refs:
+    - ASK-1781037416510742000-284d1135
+    - ASK-1781037418374609000-68c51cbb
+    - ASK-1782259937447396000-fb005beb
+    - ASK-1782593752920560000-99708cd6
+    - ASK-1785886324283087000-34320add
+    - ASK-1786081148616665000-c78bdd4d
+    - ASK-DEFAULT-FEED-CORRESPONDENCE
+schema_version: 2.0.0
+started_at: "2026-09-02T10:59:46Z"
+status: archived
+task_steps:
+    - description: Resolve the task envelope refs (`zqk object get`, `zqk agent prepare-context`) and execute the dynamic task. Do not copy policy or skill bodies onto the task object.
+      status: pending_implementation
+      title: Implementation Phase
+    - command: ./bin/zqk agent validate
+      description: Must pass targeted validation script.
+      status: pending
+      title: Validation Phase
+      verification_strategy: command_exit_code
+title: 'Execute Task: Drop gocyclo threshold to <=20 with named exclusions'
+updated_at: "2026-09-02T21:35:07Z"
+updated_by: ACC-1785920548450214006-2e52b3e7
+version_context: default

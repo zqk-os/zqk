@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-579",
+  "created_at": "2026-09-04T21:34:33.093318Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-579",
+    "Tests": [
+      {
+        "Name": "TestConvergenceEngine_evaluateStaleConvergenceSessions",
+        "Package": "scheduler",
+        "PackagePath": "pkg/scheduler",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/scheduler/convergence_engine_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestMaybeSpawnTerminalFollowupDraft_CreateIntegration",
+        "Package": "scheduler",
+        "PackagePath": "pkg/scheduler",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/scheduler/convergence_terminal_tick_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestReadTestBundleHealthTailLines_CanceledMidScan",
+        "Package": "scheduler",
+        "PackagePath": "pkg/scheduler",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/scheduler/convergence_testbundle_read_context_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestMaybeRunOrchestrateRollupAfterTick_WriteJobOutcome_success",
+        "Package": "scheduler",
+        "PackagePath": "pkg/scheduler",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/scheduler/convergence_tick_rollup_outcome_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestMaybeRunOrchestrateRollupAfterTick_WriteJobOutcome_failure",
+        "Package": "scheduler",
+        "PackagePath": "pkg/scheduler",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/scheduler/convergence_tick_rollup_outcome_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestScopeFingerprintSHA256FromFingerprintMap_Deterministic",
+        "Package": "scheduler",
+        "PackagePath": "pkg/scheduler",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/scheduler/convergence_tombstone_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestComputeTombstoneDisparity_NoBefore",
+        "Package": "scheduler",
+        "PackagePath": "pkg/scheduler",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/scheduler/convergence_tombstone_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestComputeTombstoneDisparity_Match",
+        "Package": "scheduler",
+        "PackagePath": "pkg/scheduler",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/scheduler/convergence_tombstone_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestComputeTombstoneDisparity_ScopeDrift",
+        "Package": "scheduler",
+        "PackagePath": "pkg/scheduler",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/scheduler/convergence_tombstone_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestShouldSkipConvergencePersistForDuplicateWatermark",
+        "Package": "scheduler",
+        "PackagePath": "pkg/scheduler",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/scheduler/convergence_watermark_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 300000000000,
+    "PackagePath": "pkg/scheduler"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestConvergenceEngine_evaluateStaleConvergenceSessions",
+      "Package": "scheduler",
+      "PackagePath": "pkg/scheduler",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/scheduler/convergence_engine_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestMaybeSpawnTerminalFollowupDraft_CreateIntegration",
+      "Package": "scheduler",
+      "PackagePath": "pkg/scheduler",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/scheduler/convergence_terminal_tick_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestReadTestBundleHealthTailLines_CanceledMidScan",
+      "Package": "scheduler",
+      "PackagePath": "pkg/scheduler",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/scheduler/convergence_testbundle_read_context_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestMaybeRunOrchestrateRollupAfterTick_WriteJobOutcome_success",
+      "Package": "scheduler",
+      "PackagePath": "pkg/scheduler",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/scheduler/convergence_tick_rollup_outcome_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestMaybeRunOrchestrateRollupAfterTick_WriteJobOutcome_failure",
+      "Package": "scheduler",
+      "PackagePath": "pkg/scheduler",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/scheduler/convergence_tick_rollup_outcome_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestScopeFingerprintSHA256FromFingerprintMap_Deterministic",
+      "Package": "scheduler",
+      "PackagePath": "pkg/scheduler",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/scheduler/convergence_tombstone_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestComputeTombstoneDisparity_NoBefore",
+      "Package": "scheduler",
+      "PackagePath": "pkg/scheduler",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/scheduler/convergence_tombstone_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestComputeTombstoneDisparity_Match",
+      "Package": "scheduler",
+      "PackagePath": "pkg/scheduler",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/scheduler/convergence_tombstone_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestComputeTombstoneDisparity_ScopeDrift",
+      "Package": "scheduler",
+      "PackagePath": "pkg/scheduler",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/scheduler/convergence_tombstone_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestShouldSkipConvergencePersistForDuplicateWatermark",
+      "Package": "scheduler",
+      "PackagePath": "pkg/scheduler",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/scheduler/convergence_watermark_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

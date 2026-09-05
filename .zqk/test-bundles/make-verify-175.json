@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-175",
+  "created_at": "2026-09-04T21:34:29.067616Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-175",
+    "Tests": [
+      {
+        "Name": "TestBuildPermissionCache_PrivilegeTagPerms",
+        "Package": "mcp",
+        "PackagePath": "pkg/mcp",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/permission_cache_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestBuildPermissionCache_InactiveUser",
+        "Package": "mcp",
+        "PackagePath": "pkg/mcp",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/permission_cache_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestRefreshUserPermissions",
+        "Package": "mcp",
+        "PackagePath": "pkg/mcp",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/permission_cache_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestClearCache",
+        "Package": "mcp",
+        "PackagePath": "pkg/mcp",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/permission_cache_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestPermissionCache_LifetimeCounters",
+        "Package": "mcp",
+        "PackagePath": "pkg/mcp",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/permission_cache_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestQuerySecurity_FilterRestrictedFields",
+        "Package": "mcp",
+        "PackagePath": "pkg/mcp",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/query_security_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestQuerySecurity_GroupByRestrictedFields",
+        "Package": "mcp",
+        "PackagePath": "pkg/mcp",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/query_security_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestQuerySecurity_SortByRestrictedFields",
+        "Package": "mcp",
+        "PackagePath": "pkg/mcp",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/query_security_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestQuerySecurity_ValidateFilterFields",
+        "Package": "mcp",
+        "PackagePath": "pkg/mcp",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/query_security_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestQuerySecurity_ValidateGroupByField",
+        "Package": "mcp",
+        "PackagePath": "pkg/mcp",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/query_security_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": true,
+    "EstimatedDuration": 300000000000,
+    "PackagePath": "pkg/mcp"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestBuildPermissionCache_PrivilegeTagPerms",
+      "Package": "mcp",
+      "PackagePath": "pkg/mcp",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/permission_cache_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestBuildPermissionCache_InactiveUser",
+      "Package": "mcp",
+      "PackagePath": "pkg/mcp",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/permission_cache_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestRefreshUserPermissions",
+      "Package": "mcp",
+      "PackagePath": "pkg/mcp",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/permission_cache_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestClearCache",
+      "Package": "mcp",
+      "PackagePath": "pkg/mcp",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/permission_cache_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestPermissionCache_LifetimeCounters",
+      "Package": "mcp",
+      "PackagePath": "pkg/mcp",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/permission_cache_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestQuerySecurity_FilterRestrictedFields",
+      "Package": "mcp",
+      "PackagePath": "pkg/mcp",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/query_security_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestQuerySecurity_GroupByRestrictedFields",
+      "Package": "mcp",
+      "PackagePath": "pkg/mcp",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/query_security_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestQuerySecurity_SortByRestrictedFields",
+      "Package": "mcp",
+      "PackagePath": "pkg/mcp",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/query_security_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestQuerySecurity_ValidateFilterFields",
+      "Package": "mcp",
+      "PackagePath": "pkg/mcp",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/query_security_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestQuerySecurity_ValidateGroupByField",
+      "Package": "mcp",
+      "PackagePath": "pkg/mcp",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/query_security_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

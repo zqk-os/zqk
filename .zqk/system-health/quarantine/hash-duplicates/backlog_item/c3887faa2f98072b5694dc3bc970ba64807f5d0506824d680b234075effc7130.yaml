@@ -1,0 +1,30 @@
+acceptance_considerations: Done when CRIT-OPENCORE-SUPPLY-SBOM-001 is validated via zqk workflow vds evaluate on BLI-OPENCORE-SUPPLY-SBOM-001. Not lingering launch; stay on the grooming column named in priority_plan_ref.
+created_at: "2026-08-31T20:26:49Z"
+created_by: ACC-1785920548450214012-68b850c0
+criteria_refs:
+    - CRIT-OPENCORE-SUPPLY-SBOM-001
+description: Publish-prep only. Payload check remains the P0 on this plan. No zqk-os push.
+estimated_effort: 2d
+id: BLI-OPENCORE-SUPPLY-SBOM-001
+kind: backlog_item
+milestone_refs:
+    - MIL-CEF-R2-M2-ARCH
+namespace_id: zqk:kernel
+persona_refs:
+    - PER-ORCH-ALPHA
+priority: high
+priority_plan_ref: PRI-OPENCORE-PUBLISH-001
+priority_tier: P1
+problem_statement: Publish-prep only. Payload check remains the P0 on this plan. No zqk-os push.
+requirement_refs:
+    - REQ-CEF-R2-SUP-SBOM
+    - REQ-CEF-R2-SUP-SECRET-SCAN
+    - REQ-CEF-SUP-001
+    - REQ-CEF-SUP-002
+schema_version: 2.0.0
+started_at: "2026-09-05T03:28:51Z"
+status: in_progress
+title: SBOM + secret-scan + supply disclosure path for a future public tree
+updated_at: "2026-09-05T03:28:51Z"
+updated_by: ACC-1785920548450214006-2e52b3e7
+version_context: default

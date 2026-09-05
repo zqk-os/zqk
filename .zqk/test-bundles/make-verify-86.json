@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-86",
+  "created_at": "2026-09-04T21:34:28.216693Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-86",
+    "Tests": [
+      {
+        "Name": "TestEnhancePCSWithCommits",
+        "Package": "metrics",
+        "PackagePath": "pkg/metrics",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/metrics/ai_metrics_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestEnhanceEDDWithCommits",
+        "Package": "metrics",
+        "PackagePath": "pkg/metrics",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/metrics/ai_metrics_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestGenerateDBSummary",
+        "Package": "metrics",
+        "PackagePath": "pkg/metrics",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/metrics/ai_metrics_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestBuildCacheValidationBaseMetricInstance",
+        "Package": "metrics",
+        "PackagePath": "pkg/metrics",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/metrics/cache_validation_base_metric_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestBuildGraphProviderMetricsBaseMetricInstance",
+        "Package": "metrics",
+        "PackagePath": "pkg/metrics",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/metrics/graph_provider_base_metric_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestProfileLoader_LoadProfile_NamespaceIDValidation",
+        "Package": "metrics",
+        "PackagePath": "pkg/metrics",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/metrics/loader_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestProfileLoader_LoadProfile_InheritanceWithNamespaceID",
+        "Package": "metrics",
+        "PackagePath": "pkg/metrics",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/metrics/loader_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestProfileLoader_LoadProfile_CircularInheritance",
+        "Package": "metrics",
+        "PackagePath": "pkg/metrics",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/metrics/loader_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestMetricPipeline_Sample_UsesSingleSharedSamplerManyKinds",
+        "Package": "metrics",
+        "PackagePath": "pkg/metrics",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/metrics/pipeline_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestSamplerRegistry_RegisterSampler_SystemMetrics_DistinctCapped",
+        "Package": "metrics",
+        "PackagePath": "pkg/metrics",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/metrics/sampler_registry_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": true,
+    "EstimatedDuration": 300000000000,
+    "PackagePath": "pkg/metrics"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestEnhancePCSWithCommits",
+      "Package": "metrics",
+      "PackagePath": "pkg/metrics",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/metrics/ai_metrics_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestEnhanceEDDWithCommits",
+      "Package": "metrics",
+      "PackagePath": "pkg/metrics",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/metrics/ai_metrics_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestGenerateDBSummary",
+      "Package": "metrics",
+      "PackagePath": "pkg/metrics",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/metrics/ai_metrics_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestBuildCacheValidationBaseMetricInstance",
+      "Package": "metrics",
+      "PackagePath": "pkg/metrics",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/metrics/cache_validation_base_metric_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestBuildGraphProviderMetricsBaseMetricInstance",
+      "Package": "metrics",
+      "PackagePath": "pkg/metrics",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/metrics/graph_provider_base_metric_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestProfileLoader_LoadProfile_NamespaceIDValidation",
+      "Package": "metrics",
+      "PackagePath": "pkg/metrics",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/metrics/loader_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestProfileLoader_LoadProfile_InheritanceWithNamespaceID",
+      "Package": "metrics",
+      "PackagePath": "pkg/metrics",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/metrics/loader_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestProfileLoader_LoadProfile_CircularInheritance",
+      "Package": "metrics",
+      "PackagePath": "pkg/metrics",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/metrics/loader_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestMetricPipeline_Sample_UsesSingleSharedSamplerManyKinds",
+      "Package": "metrics",
+      "PackagePath": "pkg/metrics",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/metrics/pipeline_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestSamplerRegistry_RegisterSampler_SystemMetrics_DistinctCapped",
+      "Package": "metrics",
+      "PackagePath": "pkg/metrics",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/metrics/sampler_registry_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

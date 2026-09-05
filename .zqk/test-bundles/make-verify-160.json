@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-160",
+  "created_at": "2026-09-04T21:34:28.915514Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-160",
+    "Tests": [
+      {
+        "Name": "TestRequestShutdown_multiClientDoesNotArmProcessShutdown",
+        "Package": "mcp",
+        "PackagePath": "pkg/mcp",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/serve_coordinator_read_error_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestShutdownOnConnectionFault_multiClientSkipsShutdown",
+        "Package": "mcp",
+        "PackagePath": "pkg/mcp",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/serve_coordinator_read_error_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestEndConnectionOnly_multiClientSkipsShutdown",
+        "Package": "mcp",
+        "PackagePath": "pkg/mcp",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/serve_coordinator_read_error_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestHandleClientDisconnect_multiClientPreservesTools",
+        "Package": "mcp",
+        "PackagePath": "pkg/mcp",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/serve_coordinator_read_error_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestHandleClientDisconnect_multiClientReleasesWriter",
+        "Package": "mcp",
+        "PackagePath": "pkg/mcp",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/serve_coordinator_read_error_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestHandleNotificationEvent",
+        "Package": "mcp",
+        "PackagePath": "pkg/mcp",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/server_handlers_events_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestServer_LifetimeCounters",
+        "Package": "mcp",
+        "PackagePath": "pkg/mcp",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/server_lifetime_counters_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestMessageQueueResilience",
+        "Package": "mcp",
+        "PackagePath": "pkg/mcp",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/server_resilience_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestShutdownResilience",
+        "Package": "mcp",
+        "PackagePath": "pkg/mcp",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/server_resilience_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestConcurrentOperations",
+        "Package": "mcp",
+        "PackagePath": "pkg/mcp",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/server_resilience_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 300000000000,
+    "PackagePath": "pkg/mcp"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestRequestShutdown_multiClientDoesNotArmProcessShutdown",
+      "Package": "mcp",
+      "PackagePath": "pkg/mcp",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/serve_coordinator_read_error_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestShutdownOnConnectionFault_multiClientSkipsShutdown",
+      "Package": "mcp",
+      "PackagePath": "pkg/mcp",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/serve_coordinator_read_error_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestEndConnectionOnly_multiClientSkipsShutdown",
+      "Package": "mcp",
+      "PackagePath": "pkg/mcp",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/serve_coordinator_read_error_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestHandleClientDisconnect_multiClientPreservesTools",
+      "Package": "mcp",
+      "PackagePath": "pkg/mcp",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/serve_coordinator_read_error_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestHandleClientDisconnect_multiClientReleasesWriter",
+      "Package": "mcp",
+      "PackagePath": "pkg/mcp",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/serve_coordinator_read_error_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestHandleNotificationEvent",
+      "Package": "mcp",
+      "PackagePath": "pkg/mcp",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/server_handlers_events_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestServer_LifetimeCounters",
+      "Package": "mcp",
+      "PackagePath": "pkg/mcp",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/server_lifetime_counters_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestMessageQueueResilience",
+      "Package": "mcp",
+      "PackagePath": "pkg/mcp",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/server_resilience_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestShutdownResilience",
+      "Package": "mcp",
+      "PackagePath": "pkg/mcp",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/server_resilience_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestConcurrentOperations",
+      "Package": "mcp",
+      "PackagePath": "pkg/mcp",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/server_resilience_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

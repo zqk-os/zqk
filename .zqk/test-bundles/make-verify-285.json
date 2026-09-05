@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-285",
+  "created_at": "2026-09-04T21:34:30.195578Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-285",
+    "Tests": [
+      {
+        "Name": "TestOperationalEnvelopeForKind_auditEventAugment",
+        "Package": "datacell",
+        "PackagePath": "pkg/datacell",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/datacell/operational_envelope_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestOperationalEnvelopeSummary_CompactSummary",
+        "Package": "datacell",
+        "PackagePath": "pkg/datacell",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/datacell/operational_envelope_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestOperationalEnvelopeForKind_changeJournalStreamAugment",
+        "Package": "datacell",
+        "PackagePath": "pkg/datacell",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/datacell/operational_envelope_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestOperationalEnvelopeForKind_auditAggregationMetric_extraCategories",
+        "Package": "datacell",
+        "PackagePath": "pkg/datacell",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/datacell/operational_envelope_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestOperationalEnvelopeForKind_baseMetricAndSchedulerHealthStreamAugments",
+        "Package": "datacell",
+        "PackagePath": "pkg/datacell",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/datacell/operational_envelope_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestOperationalEnvelopeForKind_schedulerJobAugments",
+        "Package": "datacell",
+        "PackagePath": "pkg/datacell",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/datacell/operational_envelope_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAllOperationalEnvelopeCompactSummaries_coversKnownProfiles",
+        "Package": "datacell",
+        "PackagePath": "pkg/datacell",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/datacell/operational_envelope_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestEnvelopeTickKindAugmentSummaries_nonEmpty",
+        "Package": "datacell",
+        "PackagePath": "pkg/datacell",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/datacell/operational_envelope_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestOperationalEnvelopeForKind_additionalStreamKindsAugmented",
+        "Package": "datacell",
+        "PackagePath": "pkg/datacell",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/datacell/operational_envelope_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestOperationalEnvelopeHasKindAugment",
+        "Package": "datacell",
+        "PackagePath": "pkg/datacell",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/datacell/operational_envelope_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": true,
+    "EstimatedDuration": 300000000000,
+    "PackagePath": "pkg/datacell"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestOperationalEnvelopeForKind_auditEventAugment",
+      "Package": "datacell",
+      "PackagePath": "pkg/datacell",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/datacell/operational_envelope_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestOperationalEnvelopeSummary_CompactSummary",
+      "Package": "datacell",
+      "PackagePath": "pkg/datacell",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/datacell/operational_envelope_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestOperationalEnvelopeForKind_changeJournalStreamAugment",
+      "Package": "datacell",
+      "PackagePath": "pkg/datacell",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/datacell/operational_envelope_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestOperationalEnvelopeForKind_auditAggregationMetric_extraCategories",
+      "Package": "datacell",
+      "PackagePath": "pkg/datacell",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/datacell/operational_envelope_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestOperationalEnvelopeForKind_baseMetricAndSchedulerHealthStreamAugments",
+      "Package": "datacell",
+      "PackagePath": "pkg/datacell",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/datacell/operational_envelope_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestOperationalEnvelopeForKind_schedulerJobAugments",
+      "Package": "datacell",
+      "PackagePath": "pkg/datacell",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/datacell/operational_envelope_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestAllOperationalEnvelopeCompactSummaries_coversKnownProfiles",
+      "Package": "datacell",
+      "PackagePath": "pkg/datacell",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/datacell/operational_envelope_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestEnvelopeTickKindAugmentSummaries_nonEmpty",
+      "Package": "datacell",
+      "PackagePath": "pkg/datacell",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/datacell/operational_envelope_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestOperationalEnvelopeForKind_additionalStreamKindsAugmented",
+      "Package": "datacell",
+      "PackagePath": "pkg/datacell",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/datacell/operational_envelope_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestOperationalEnvelopeHasKindAugment",
+      "Package": "datacell",
+      "PackagePath": "pkg/datacell",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/datacell/operational_envelope_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

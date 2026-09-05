@@ -1,0 +1,123 @@
+{
+  "name": "make-verify-612",
+  "created_at": "2026-09-04T21:34:33.408522Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-612",
+    "Tests": [
+      {
+        "Name": "TestChain_Run",
+        "Package": "when",
+        "PackagePath": "pkg/when",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/when/chain_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestChain_ConvenienceBuilders",
+        "Package": "when",
+        "PackagePath": "pkg/when",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/when/chain_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestChain_ExecuteFlowSignals",
+        "Package": "when",
+        "PackagePath": "pkg/when",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/when/chain_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestPredicates_StringAndNilHelpers",
+        "Package": "when",
+        "PackagePath": "pkg/when",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/when/predicates_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestPredicates_IsNilOrEmpty",
+        "Package": "when",
+        "PackagePath": "pkg/when",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/when/predicates_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestPredicates_RuneHelpers",
+        "Package": "when",
+        "PackagePath": "pkg/when",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/when/predicates_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 180000000000,
+    "PackagePath": "pkg/when"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestChain_Run",
+      "Package": "when",
+      "PackagePath": "pkg/when",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/when/chain_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestChain_ConvenienceBuilders",
+      "Package": "when",
+      "PackagePath": "pkg/when",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/when/chain_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestChain_ExecuteFlowSignals",
+      "Package": "when",
+      "PackagePath": "pkg/when",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/when/chain_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestPredicates_StringAndNilHelpers",
+      "Package": "when",
+      "PackagePath": "pkg/when",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/when/predicates_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestPredicates_IsNilOrEmpty",
+      "Package": "when",
+      "PackagePath": "pkg/when",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/when/predicates_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestPredicates_RuneHelpers",
+      "Package": "when",
+      "PackagePath": "pkg/when",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/when/predicates_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

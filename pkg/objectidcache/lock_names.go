@@ -1,0 +1,26 @@
+package objectidcache
+
+const (
+	LockNameCacheBuildClear                     = "cache_build_clear"
+	LockNameCacheBuildGetCountAfter             = "cache_build_get_count_after"
+	LockNameCacheBuildGetCountBefore            = "cache_build_get_count_before"
+	LockNameCacheBuildStoreEntries              = "cache_build_store_entries"
+	LockNameObjectIDCacheBuildGetCountBuilt     = "object_id_cache_build_get_count_built"
+	LockNameObjectIDCacheBuildGetCountLoaded    = "object_id_cache_build_get_count_loaded"
+	LockNameObjectIDCacheBuildVerify            = "object_id_cache_build_verify"
+	LockNameObjectIDCacheBulkInvalidate         = "object_id_cache_bulk_invalidate"
+	LockNameObjectIDCacheClearInMemory          = "object_id_cache_clear_in_memory"
+	LockNameObjectIDCacheCountKind              = "object_id_cache_count_kind"
+	LockNameObjectIDCacheEnsureReady            = "object_id_cache_ensure_ready"
+	LockNameObjectIDCacheGet                    = "object_id_cache_get"
+	LockNameObjectIDCacheGetMetadata            = "object_id_cache_get_metadata"
+	LockNameObjectIDCacheGetRunner              = "object_id_cache_get_runner"
+	LockNameObjectIDCacheInvalidate             = "object_id_cache_invalidate"
+	LockNameObjectIDCacheInvalidateKind         = "object_id_cache_invalidate_kind"
+	LockNameObjectIDCacheKindNamesForReverseRef = "object_id_cache_kind_names_for_reverse_ref"
+	LockNameObjectIDCacheLoad                   = "object_id_cache_load"
+	LockNameObjectIDCacheSavePrepare            = "object_id_cache_save_prepare"
+	LockNameObjectIDCacheSet                    = "object_id_cache_set"
+	LockNameObjectIDCacheTryLoadCount           = "object_id_cache_try_load_count"
+	LockNameObjectIDCacheValidateClean          = "object_id_cache_validate_clean"
+)

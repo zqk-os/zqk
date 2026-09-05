@@ -1,0 +1,49 @@
+
+--- run 2026-09-05T05:57:07Z ---
+=== RUN   TestReadIssues_MissingFile_ReturnsOkPayload
+--- PASS: TestReadIssues_MissingFile_ReturnsOkPayload (0.00s)
+=== RUN   TestReadIssues_ExistingFile_ReturnsPayload
+--- PASS: TestReadIssues_ExistingFile_ReturnsPayload (0.01s)
+=== RUN   TestReadIssues_MalformedFile_ReturnsError
+--- PASS: TestReadIssues_MalformedFile_ReturnsError (0.01s)
+=== RUN   TestReadIssues_EmptyProjectRoot_ReturnsNilNil
+--- PASS: TestReadIssues_EmptyProjectRoot_ReturnsNilNil (0.00s)
+=== RUN   TestScanAdmissionTimeoutsDisablesAndMarksFailed
+--- PASS: TestScanAdmissionTimeoutsDisablesAndMarksFailed (1.71s)
+=== RUN   TestScanAdmissionTimeoutsSkipsPendingDispatch
+--- PASS: TestScanAdmissionTimeoutsSkipsPendingDispatch (0.44s)
+=== RUN   TestJobLoader_HydrateJob
+=== RUN   TestJobLoader_HydrateJob/Valid_timer_job
+=== RUN   TestJobLoader_HydrateJob/Timer_job_without_schedule_expression
+=== RUN   TestJobLoader_HydrateJob/Job_with_default_category
+=== RUN   TestJobLoader_HydrateJob/One-time_job_already_executed
+=== RUN   TestJobLoader_HydrateJob/Run_wrapper_job_with_command
+=== RUN   TestJobLoader_HydrateJob/run_wrapper_job_receives_environment_variables_from_YAML_(same_treatment_as_other_job_types)
+=== RUN   TestJobLoader_HydrateJob/Job_with_log_level
+=== RUN   TestJobLoader_HydrateJob/Job_with_invalid_log_level_defaults_to_default
+=== RUN   TestJobLoader_HydrateJob/Job_with_priority_critical
+=== RUN   TestJobLoader_HydrateJob/Job_with_missing_priority_defaults_to_normal
+=== RUN   TestJobLoader_HydrateJob/audit_event_aggregation_job_receives_environment_variables_from_YAML
+=== RUN   TestJobLoader_HydrateJob/retention_tolerance_job_receives_environment_variables_from_YAML_(same_treatment_as_other_job_types)
+--- PASS: TestJobLoader_HydrateJob (0.44s)
+    --- PASS: TestJobLoader_HydrateJob/Valid_timer_job (0.00s)
+    --- PASS: TestJobLoader_HydrateJob/Timer_job_without_schedule_expression (0.00s)
+    --- PASS: TestJobLoader_HydrateJob/Job_with_default_category (0.00s)
+    --- PASS: TestJobLoader_HydrateJob/One-time_job_already_executed (0.00s)
+    --- PASS: TestJobLoader_HydrateJob/Run_wrapper_job_with_command (0.00s)
+    --- PASS: TestJobLoader_HydrateJob/run_wrapper_job_receives_environment_variables_from_YAML_(same_treatment_as_other_job_types) (0.00s)
+    --- PASS: TestJobLoader_HydrateJob/Job_with_log_level (0.00s)
+    --- PASS: TestJobLoader_HydrateJob/Job_with_invalid_log_level_defaults_to_default (0.00s)
+    --- PASS: TestJobLoader_HydrateJob/Job_with_priority_critical (0.00s)
+    --- PASS: TestJobLoader_HydrateJob/Job_with_missing_priority_defaults_to_normal (0.00s)
+    --- PASS: TestJobLoader_HydrateJob/audit_event_aggregation_job_receives_environment_variables_from_YAML (0.00s)
+    --- PASS: TestJobLoader_HydrateJob/retention_tolerance_job_receives_environment_variables_from_YAML_(same_treatment_as_other_job_types) (0.00s)
+=== RUN   TestJobLoader_LoadJobs_ExcludesMarkedForDeletion
+--- PASS: TestJobLoader_LoadJobs_ExcludesMarkedForDeletion (1.07s)
+=== RUN   TestJobLock_DuplicateExecutionPrevention
+    job_lock_integration_test.go:225: Test completed in 501.404042ms with 1 execution(s) (lock serialized 5 simultaneous triggers)
+--- PASS: TestJobLock_DuplicateExecutionPrevention (3.44s)
+=== RUN   TestJobLock_SequentialExecution
+--- PASS: TestJobLock_SequentialExecution (1.44s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/scheduler	9.312s

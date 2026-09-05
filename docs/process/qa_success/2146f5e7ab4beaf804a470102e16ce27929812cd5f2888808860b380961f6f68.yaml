@@ -1,0 +1,14 @@
+created_at: "2026-08-19T04:21:54Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1787113307666407000-8f80c74d
+item_id: REDACTED
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 2857702ca28e4b64fb5782140b43c1400e68fdeab30ab0062f4119523ca97d466e5f13c72adcfa41b92eacf21fa7f0a79b8a8e3a8d7c581e5c9afe0e69cb31dc
+schema_version: 2.0.0
+signature: 304502206e112ab530a140518bca055637861df50a3aa16a21d446b6646ad2c656ed5871022100d4320887db8820f4940c8ce43884e285791b39ade273dc6660d1a86ba14557b6
+status: archived
+title: A stale or unavailable reverse-reference index cannot authorize deletion.
+updated_at: "2026-09-01T07:40:44Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

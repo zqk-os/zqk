@@ -1,0 +1,159 @@
+{
+  "name": "make-verify-212",
+  "created_at": "2026-09-04T21:34:29.489378Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-212",
+    "Tests": [
+      {
+        "Name": "TestSlackAdapter_ParseEvent",
+        "Package": "bridge",
+        "PackagePath": "pkg/agentfeed/bridge",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentfeed/bridge/ingress_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestSlackAdapter_ParseSlash",
+        "Package": "bridge",
+        "PackagePath": "pkg/agentfeed/bridge",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentfeed/bridge/ingress_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestToSteerInput_mapsSteeringSchema",
+        "Package": "bridge",
+        "PackagePath": "pkg/agentfeed/bridge",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentfeed/bridge/ingress_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestGenericAdapter_andLookup",
+        "Package": "bridge",
+        "PackagePath": "pkg/agentfeed/bridge",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentfeed/bridge/ingress_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestTeamsAdapter_Parse",
+        "Package": "bridge",
+        "PackagePath": "pkg/agentfeed/bridge",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentfeed/bridge/ingress_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestTelegramAdapter_ParseUpdate",
+        "Package": "bridge",
+        "PackagePath": "pkg/agentfeed/bridge",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentfeed/bridge/ingress_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestSignalAdapter_ParseEnvelope",
+        "Package": "bridge",
+        "PackagePath": "pkg/agentfeed/bridge",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentfeed/bridge/ingress_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestToSteerInput_requiresText",
+        "Package": "bridge",
+        "PackagePath": "pkg/agentfeed/bridge",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentfeed/bridge/ingress_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": true,
+    "EstimatedDuration": 240000000000,
+    "PackagePath": "pkg/agentfeed/bridge"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestSlackAdapter_ParseEvent",
+      "Package": "bridge",
+      "PackagePath": "pkg/agentfeed/bridge",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentfeed/bridge/ingress_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestSlackAdapter_ParseSlash",
+      "Package": "bridge",
+      "PackagePath": "pkg/agentfeed/bridge",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentfeed/bridge/ingress_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestToSteerInput_mapsSteeringSchema",
+      "Package": "bridge",
+      "PackagePath": "pkg/agentfeed/bridge",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentfeed/bridge/ingress_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestGenericAdapter_andLookup",
+      "Package": "bridge",
+      "PackagePath": "pkg/agentfeed/bridge",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentfeed/bridge/ingress_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestTeamsAdapter_Parse",
+      "Package": "bridge",
+      "PackagePath": "pkg/agentfeed/bridge",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentfeed/bridge/ingress_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestTelegramAdapter_ParseUpdate",
+      "Package": "bridge",
+      "PackagePath": "pkg/agentfeed/bridge",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentfeed/bridge/ingress_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestSignalAdapter_ParseEnvelope",
+      "Package": "bridge",
+      "PackagePath": "pkg/agentfeed/bridge",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentfeed/bridge/ingress_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestToSteerInput_requiresText",
+      "Package": "bridge",
+      "PackagePath": "pkg/agentfeed/bridge",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentfeed/bridge/ingress_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

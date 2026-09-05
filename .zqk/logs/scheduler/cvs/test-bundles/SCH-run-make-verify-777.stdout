@@ -1,0 +1,98 @@
+
+--- run 2026-09-04T22:21:22Z ---
+=== RUN   TestValidSchemaVersion
+=== PAUSE TestValidSchemaVersion
+=== RUN   TestCanonicalizeCriteriaFieldKeys_TypeAlias
+=== PAUSE TestCanonicalizeCriteriaFieldKeys_TypeAlias
+=== RUN   TestCanonicalizeCriteriaFieldKeys_CriteriaTypeAlias
+=== PAUSE TestCanonicalizeCriteriaFieldKeys_CriteriaTypeAlias
+=== RUN   TestCanonicalizeCriteriaFieldKeys_KeepsExistingCategory
+=== PAUSE TestCanonicalizeCriteriaFieldKeys_KeepsExistingCategory
+=== RUN   TestCanonicalizeCriteriaFieldKeys_NoOpOnNil
+=== PAUSE TestCanonicalizeCriteriaFieldKeys_NoOpOnNil
+=== RUN   TestRejectCriteriaRequirementRelatedRefs
+=== PAUSE TestRejectCriteriaRequirementRelatedRefs
+=== RUN   TestDisplayLength_Regression_SpecValidation
+=== PAUSE TestDisplayLength_Regression_SpecValidation
+=== RUN   TestDisplayLength_Regression_GetDisplayLength
+=== PAUSE TestDisplayLength_Regression_GetDisplayLength
+=== RUN   TestGetDisplayLength
+=== PAUSE TestGetDisplayLength
+=== RUN   TestGetDisplayLengthFromFieldDef
+=== PAUSE TestGetDisplayLengthFromFieldDef
+=== CONT  TestValidSchemaVersion
+=== RUN   TestValidSchemaVersion/valid_2.0.0
+=== CONT  TestRejectCriteriaRequirementRelatedRefs
+=== RUN   TestValidSchemaVersion/valid_1.0.0
+--- PASS: TestRejectCriteriaRequirementRelatedRefs (0.00s)
+=== CONT  TestGetDisplayLengthFromFieldDef
+=== RUN   TestValidSchemaVersion/valid_10.20.30
+=== RUN   TestGetDisplayLengthFromFieldDef/nil_fieldDef_returns_default
+=== RUN   TestValidSchemaVersion/empty
+=== RUN   TestValidSchemaVersion/missing_patch
+=== RUN   TestGetDisplayLengthFromFieldDef/fieldDef_with_display_length_as_int
+=== RUN   TestValidSchemaVersion/non-semver
+=== RUN   TestGetDisplayLengthFromFieldDef/fieldDef_with_display_length_as_float64
+=== RUN   TestValidSchemaVersion/with_prefix
+=== RUN   TestGetDisplayLengthFromFieldDef/fieldDef_without_validation_section_returns_default
+--- PASS: TestValidSchemaVersion (0.00s)
+    --- PASS: TestValidSchemaVersion/valid_2.0.0 (0.00s)
+    --- PASS: TestValidSchemaVersion/valid_1.0.0 (0.00s)
+    --- PASS: TestValidSchemaVersion/valid_10.20.30 (0.00s)
+    --- PASS: TestValidSchemaVersion/empty (0.00s)
+    --- PASS: TestValidSchemaVersion/missing_patch (0.00s)
+    --- PASS: TestValidSchemaVersion/non-semver (0.00s)
+    --- PASS: TestValidSchemaVersion/with_prefix (0.00s)
+=== CONT  TestDisplayLength_Regression_GetDisplayLength
+=== RUN   TestDisplayLength_Regression_GetDisplayLength/spec_with_display_length_as_int
+=== RUN   TestGetDisplayLengthFromFieldDef/fieldDef_with_validation_but_no_display_length_returns_default
+=== RUN   TestDisplayLength_Regression_GetDisplayLength/spec_with_display_length_as_float64_(YAML_parsing)
+--- PASS: TestGetDisplayLengthFromFieldDef (0.00s)
+    --- PASS: TestGetDisplayLengthFromFieldDef/nil_fieldDef_returns_default (0.00s)
+    --- PASS: TestGetDisplayLengthFromFieldDef/fieldDef_with_display_length_as_int (0.00s)
+    --- PASS: TestGetDisplayLengthFromFieldDef/fieldDef_with_display_length_as_float64 (0.00s)
+    --- PASS: TestGetDisplayLengthFromFieldDef/fieldDef_without_validation_section_returns_default (0.00s)
+    --- PASS: TestGetDisplayLengthFromFieldDef/fieldDef_with_validation_but_no_display_length_returns_default (0.00s)
+=== CONT  TestGetDisplayLength
+=== RUN   TestDisplayLength_Regression_GetDisplayLength/spec_without_display_length_uses_default
+=== RUN   TestDisplayLength_Regression_GetDisplayLength/nil_spec_uses_default
+=== RUN   TestDisplayLength_Regression_GetDisplayLength/field_not_in_spec_uses_default
+--- PASS: TestDisplayLength_Regression_GetDisplayLength (0.00s)
+    --- PASS: TestDisplayLength_Regression_GetDisplayLength/spec_with_display_length_as_int (0.00s)
+    --- PASS: TestDisplayLength_Regression_GetDisplayLength/spec_with_display_length_as_float64_(YAML_parsing) (0.00s)
+    --- PASS: TestDisplayLength_Regression_GetDisplayLength/spec_without_display_length_uses_default (0.00s)
+    --- PASS: TestDisplayLength_Regression_GetDisplayLength/nil_spec_uses_default (0.00s)
+    --- PASS: TestDisplayLength_Regression_GetDisplayLength/field_not_in_spec_uses_default (0.00s)
+=== RUN   TestGetDisplayLength/nil_spec_returns_default
+=== RUN   TestGetDisplayLength/spec_with_nil_ResolvedFields_returns_default
+=== RUN   TestGetDisplayLength/field_not_found_returns_default
+=== RUN   TestGetDisplayLength/field_with_display_length_as_int
+=== RUN   TestGetDisplayLength/field_with_display_length_as_float64_(YAML_parsing)
+=== CONT  TestCanonicalizeCriteriaFieldKeys_KeepsExistingCategory
+=== RUN   TestGetDisplayLength/field_without_validation_section_returns_default
+--- PASS: TestCanonicalizeCriteriaFieldKeys_KeepsExistingCategory (0.00s)
+=== CONT  TestCanonicalizeCriteriaFieldKeys_NoOpOnNil
+--- PASS: TestCanonicalizeCriteriaFieldKeys_NoOpOnNil (0.00s)
+=== CONT  TestDisplayLength_Regression_SpecValidation
+=== RUN   TestGetDisplayLength/field_with_validation_but_no_display_length_returns_default
+--- PASS: TestGetDisplayLength (0.00s)
+    --- PASS: TestGetDisplayLength/nil_spec_returns_default (0.00s)
+    --- PASS: TestGetDisplayLength/spec_with_nil_ResolvedFields_returns_default (0.00s)
+    --- PASS: TestGetDisplayLength/field_not_found_returns_default (0.00s)
+    --- PASS: TestGetDisplayLength/field_with_display_length_as_int (0.00s)
+    --- PASS: TestGetDisplayLength/field_with_display_length_as_float64_(YAML_parsing) (0.00s)
+    --- PASS: TestGetDisplayLength/field_without_validation_section_returns_default (0.00s)
+    --- PASS: TestGetDisplayLength/field_with_validation_but_no_display_length_returns_default (0.00s)
+=== CONT  TestCanonicalizeCriteriaFieldKeys_CriteriaTypeAlias
+--- PASS: TestCanonicalizeCriteriaFieldKeys_CriteriaTypeAlias (0.00s)
+=== CONT  TestCanonicalizeCriteriaFieldKeys_TypeAlias
+--- PASS: TestCanonicalizeCriteriaFieldKeys_TypeAlias (0.00s)
+=== RUN   TestDisplayLength_Regression_SpecValidation/listable_field_with_valid_display_length_passes
+=== RUN   TestDisplayLength_Regression_SpecValidation/listable_field_without_display_length_fails
+=== RUN   TestDisplayLength_Regression_SpecValidation/non-listable_field_without_display_length_passes
+--- PASS: TestDisplayLength_Regression_SpecValidation (0.03s)
+    --- PASS: TestDisplayLength_Regression_SpecValidation/listable_field_with_valid_display_length_passes (0.03s)
+    --- PASS: TestDisplayLength_Regression_SpecValidation/listable_field_without_display_length_fails (0.00s)
+    --- PASS: TestDisplayLength_Regression_SpecValidation/non-listable_field_without_display_length_passes (0.00s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/objects	0.618s

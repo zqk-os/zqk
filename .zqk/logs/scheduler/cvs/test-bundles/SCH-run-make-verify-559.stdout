@@ -1,0 +1,44 @@
+
+--- run 2026-09-04T22:16:59Z ---
+=== RUN   TestLogEventOperationExecution_constantsDerivedFromJobType
+=== PAUSE TestLogEventOperationExecution_constantsDerivedFromJobType
+=== RUN   TestIntegrityCheckCommandArgs_noFastWithAutoFix
+=== PAUSE TestIntegrityCheckCommandArgs_noFastWithAutoFix
+=== RUN   TestLogEventIntegrityCheck_constantsDerivedFromJobType
+=== PAUSE TestLogEventIntegrityCheck_constantsDerivedFromJobType
+=== RUN   TestLogEventObjectValidation_constantsDerivedFromJobType
+=== PAUSE TestLogEventObjectValidation_constantsDerivedFromJobType
+=== RUN   TestLogEventSchedulerJobRetention_constantsDerivedFromJobType
+=== PAUSE TestLogEventSchedulerJobRetention_constantsDerivedFromJobType
+=== RUN   TestLogEventMetricsCollection_constantsDerivedFromJobType
+=== PAUSE TestLogEventMetricsCollection_constantsDerivedFromJobType
+=== RUN   TestLogEventContextRefresh_constantsDerivedFromJobType
+=== PAUSE TestLogEventContextRefresh_constantsDerivedFromJobType
+=== RUN   TestLogEventAutofixBatchCleanup_constantsDerivedFromJobType
+=== PAUSE TestLogEventAutofixBatchCleanup_constantsDerivedFromJobType
+=== RUN   TestLogEventCleanup_constantsDerivedFromJobType
+=== PAUSE TestLogEventCleanup_constantsDerivedFromJobType
+=== RUN   TestLogEventConvergenceSessionTick_constantsDerivedFromJobType
+=== PAUSE TestLogEventConvergenceSessionTick_constantsDerivedFromJobType
+=== CONT  TestLogEventOperationExecution_constantsDerivedFromJobType
+--- PASS: TestLogEventOperationExecution_constantsDerivedFromJobType (0.00s)
+=== CONT  TestLogEventConvergenceSessionTick_constantsDerivedFromJobType
+--- PASS: TestLogEventConvergenceSessionTick_constantsDerivedFromJobType (0.00s)
+=== CONT  TestLogEventSchedulerJobRetention_constantsDerivedFromJobType
+=== CONT  TestLogEventMetricsCollection_constantsDerivedFromJobType
+=== CONT  TestLogEventIntegrityCheck_constantsDerivedFromJobType
+=== CONT  TestIntegrityCheckCommandArgs_noFastWithAutoFix
+=== CONT  TestLogEventAutofixBatchCleanup_constantsDerivedFromJobType
+=== CONT  TestLogEventCleanup_constantsDerivedFromJobType
+=== CONT  TestLogEventContextRefresh_constantsDerivedFromJobType
+--- PASS: TestLogEventSchedulerJobRetention_constantsDerivedFromJobType (0.00s)
+--- PASS: TestLogEventMetricsCollection_constantsDerivedFromJobType (0.00s)
+--- PASS: TestLogEventIntegrityCheck_constantsDerivedFromJobType (0.00s)
+--- PASS: TestIntegrityCheckCommandArgs_noFastWithAutoFix (0.00s)
+=== CONT  TestLogEventObjectValidation_constantsDerivedFromJobType
+--- PASS: TestLogEventObjectValidation_constantsDerivedFromJobType (0.00s)
+--- PASS: TestLogEventAutofixBatchCleanup_constantsDerivedFromJobType (0.00s)
+--- PASS: TestLogEventCleanup_constantsDerivedFromJobType (0.00s)
+--- PASS: TestLogEventContextRefresh_constantsDerivedFromJobType (0.00s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/scheduler	0.723s

@@ -1,0 +1,44 @@
+
+--- run 2026-09-04T22:12:29Z ---
+=== RUN   TestArmCheckin_writesTimerDistinctFromDeadlineFile
+=== PAUSE TestArmCheckin_writesTimerDistinctFromDeadlineFile
+=== RUN   TestArmCheckin_zeroCadenceFallsBackToDefault
+=== PAUSE TestArmCheckin_zeroCadenceFallsBackToDefault
+=== RUN   TestRenewCheckin_extendsWindowAndClearsMisses
+=== PAUSE TestRenewCheckin_extendsWindowAndClearsMisses
+=== RUN   TestRenewCheckin_absentTimerIsNotAnError
+=== PAUSE TestRenewCheckin_absentTimerIsNotAnError
+=== RUN   TestRearm_backsOffAndCaps
+=== PAUSE TestRearm_backsOffAndCaps
+=== RUN   TestClearCheckin_removesTimerAndIsIdempotent
+=== PAUSE TestClearCheckin_removesTimerAndIsIdempotent
+=== RUN   TestExpired_unparseableDeadlineCountsAsExpired
+=== PAUSE TestExpired_unparseableDeadlineCountsAsExpired
+=== RUN   TestLoadCheckinFile_corruptJSONReportsError
+=== PAUSE TestLoadCheckinFile_corruptJSONReportsError
+=== RUN   TestCheckinTimer_wireShapeMatchesWatcher
+=== PAUSE TestCheckinTimer_wireShapeMatchesWatcher
+=== RUN   TestTryClaim_ContentionAndIdempotent
+=== PAUSE TestTryClaim_ContentionAndIdempotent
+=== CONT  TestArmCheckin_writesTimerDistinctFromDeadlineFile
+=== CONT  TestClearCheckin_removesTimerAndIsIdempotent
+--- PASS: TestClearCheckin_removesTimerAndIsIdempotent (0.03s)
+=== CONT  TestCheckinTimer_wireShapeMatchesWatcher
+--- PASS: TestCheckinTimer_wireShapeMatchesWatcher (0.00s)
+=== CONT  TestTryClaim_ContentionAndIdempotent
+--- PASS: TestTryClaim_ContentionAndIdempotent (0.00s)
+=== CONT  TestLoadCheckinFile_corruptJSONReportsError
+--- PASS: TestArmCheckin_writesTimerDistinctFromDeadlineFile (0.04s)
+=== CONT  TestRenewCheckin_absentTimerIsNotAnError
+--- PASS: TestRenewCheckin_absentTimerIsNotAnError (0.02s)
+=== CONT  TestRearm_backsOffAndCaps
+--- PASS: TestLoadCheckinFile_corruptJSONReportsError (0.04s)
+=== CONT  TestExpired_unparseableDeadlineCountsAsExpired
+--- PASS: TestExpired_unparseableDeadlineCountsAsExpired (0.00s)
+=== CONT  TestRenewCheckin_extendsWindowAndClearsMisses
+--- PASS: TestRearm_backsOffAndCaps (0.02s)
+=== CONT  TestArmCheckin_zeroCadenceFallsBackToDefault
+--- PASS: TestRenewCheckin_extendsWindowAndClearsMisses (0.02s)
+--- PASS: TestArmCheckin_zeroCadenceFallsBackToDefault (0.01s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/agentclaim	0.844s

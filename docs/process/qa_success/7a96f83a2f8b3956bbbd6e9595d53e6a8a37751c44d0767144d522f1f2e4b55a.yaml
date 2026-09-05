@@ -1,0 +1,14 @@
+created_at: "2026-09-03T09:29:14Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1788427754105396000-1207aca0
+item_id: BLI-CEF-POL007-FMT-001
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 86b8ab3d574c004a61020b73c23f52b9055049e90c3d755c8bbb383e059e384028fdd8cd69e13123b644e5f3f7eb65596e73e2d57d719ea3dafcb01b84ce8dfb
+schema_version: 2.0.0
+signature: 30460221009f9581370fea77e87bfc9ba31d7f6420b889a0de9a5748a85130576db8d1173f022100b40e6cd670d0d191aae8b1734d47cb77e4b5b6b0ea26e5bea25bf5e4298fb2a0
+status: success
+title: QA success for BLI-CEF-POL007-FMT-001
+updated_at: "2026-09-03T09:29:14Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

@@ -1,0 +1,68 @@
+
+--- run 2026-09-04T22:19:49Z ---
+=== RUN   TestOutputJSONL_Stdout
+=== PAUSE TestOutputJSONL_Stdout
+=== RUN   TestDispatchViolationsToInbox
+=== PAUSE TestDispatchViolationsToInbox
+=== RUN   TestOutputYAML
+=== PAUSE TestOutputYAML
+=== RUN   TestOutputYAML_FieldNames
+=== PAUSE TestOutputYAML_FieldNames
+=== RUN   TestPerformance_AsyncVsSync
+=== PAUSE TestPerformance_AsyncVsSync
+=== RUN   TestPerformance_FeatureFlagIntegration
+=== PAUSE TestPerformance_FeatureFlagIntegration
+=== RUN   TestHighVolumeKindsSuppressObjectIDCacheLag
+=== PAUSE TestHighVolumeKindsSuppressObjectIDCacheLag
+=== RUN   TestShouldSkipReferenceField_BranchRef
+=== PAUSE TestShouldSkipReferenceField_BranchRef
+=== RUN   TestParseReferenceID_domainOrganizational
+=== PAUSE TestParseReferenceID_domainOrganizational
+=== RUN   TestGetCacheKeyForReference_domainOrganizational
+=== PAUSE TestGetCacheKeyForReference_domainOrganizational
+=== CONT  TestOutputJSONL_Stdout
+=== CONT  TestPerformance_FeatureFlagIntegration
+    check_performance_test.go:177: Feature flag integration test - requires full system setup
+--- PASS: TestPerformance_FeatureFlagIntegration (0.00s)
+=== CONT  TestOutputYAML_FieldNames
+=== NAME  TestOutputJSONL_Stdout
+    check_output_test.go:256: ✓ Successfully wrote to stdout in JSONL format
+--- PASS: TestOutputJSONL_Stdout (0.00s)
+=== CONT  TestPerformance_AsyncVsSync
+=== RUN   TestPerformance_AsyncVsSync/Count_10
+--- PASS: TestOutputYAML_FieldNames (0.00s)
+=== CONT  TestParseReferenceID_domainOrganizational
+--- PASS: TestParseReferenceID_domainOrganizational (0.00s)
+=== CONT  TestGetCacheKeyForReference_domainOrganizational
+--- PASS: TestGetCacheKeyForReference_domainOrganizational (0.00s)
+=== CONT  TestShouldSkipReferenceField_BranchRef
+--- PASS: TestShouldSkipReferenceField_BranchRef (0.00s)
+=== CONT  TestOutputYAML
+=== RUN   TestOutputYAML/empty_results
+=== RUN   TestOutputYAML/single_result_with_issues
+=== RUN   TestOutputYAML/result_with_auto-fixed_items
+--- PASS: TestOutputYAML (0.02s)
+    --- PASS: TestOutputYAML/empty_results (0.00s)
+    --- PASS: TestOutputYAML/single_result_with_issues (0.00s)
+    --- PASS: TestOutputYAML/result_with_auto-fixed_items (0.01s)
+=== CONT  TestHighVolumeKindsSuppressObjectIDCacheLag
+--- PASS: TestHighVolumeKindsSuppressObjectIDCacheLag (0.00s)
+=== CONT  TestDispatchViolationsToInbox
+--- PASS: TestDispatchViolationsToInbox (0.04s)
+=== NAME  TestPerformance_AsyncVsSync/Count_10
+    check_performance_test.go:69: Objects: 10, Sync: 27.169084ms, Async: 101.345459ms, Speedup: 0.27x
+=== RUN   TestPerformance_AsyncVsSync/Count_50
+    check_performance_test.go:69: Objects: 50, Sync: 85.564375ms, Async: 701.627708ms, Speedup: 0.12x
+=== RUN   TestPerformance_AsyncVsSync/Count_100
+    check_performance_test.go:69: Objects: 100, Sync: 214.984459ms, Async: 630.153916ms, Speedup: 0.34x
+    check_performance_test.go:76: Warning: Async validation slower than expected for 100 objects
+=== RUN   TestPerformance_AsyncVsSync/Count_500
+    check_performance_test.go:69: Objects: 500, Sync: 719.908416ms, Async: 4.222230917s, Speedup: 0.17x
+    check_performance_test.go:76: Warning: Async validation slower than expected for 500 objects
+--- PASS: TestPerformance_AsyncVsSync (17.95s)
+    --- PASS: TestPerformance_AsyncVsSync/Count_10 (0.31s)
+    --- PASS: TestPerformance_AsyncVsSync/Count_50 (1.93s)
+    --- PASS: TestPerformance_AsyncVsSync/Count_100 (3.12s)
+    --- PASS: TestPerformance_AsyncVsSync/Count_500 (12.39s)
+PASS
+ok  	github.com/lanceman/zqk/cmd/zqk/system	18.744s

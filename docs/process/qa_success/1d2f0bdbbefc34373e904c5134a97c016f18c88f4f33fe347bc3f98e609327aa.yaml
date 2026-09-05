@@ -1,0 +1,14 @@
+created_at: "2026-08-19T07:31:38Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1787124688251434000-bbe6064d
+item_id: PRI-GROOM-LIFECYCLE-COHERENCE-001
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 2857702ca28e4b64fb5782140b43c1400e68fdeab30ab0062f4119523ca97d466e5f13c72adcfa41b92eacf21fa7f0a79b8a8e3a8d7c581e5c9afe0e69cb31dc
+schema_version: 2.0.0
+signature: 3045022038ad74a1f806c7561eb52a8c2206e5ace96ed41aa111b46c1cea72b4803488b6022100d56f944503dcfcb07ca00d14a7fa4a0b35b06317c904773a8116b8823e416779
+status: archived
+title: QA success QAS-1787124688251434000-bbe6064d
+updated_at: "2026-09-01T07:25:38Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

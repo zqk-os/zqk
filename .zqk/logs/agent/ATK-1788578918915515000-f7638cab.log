@@ -1,0 +1,2 @@
+Error: unauthorized: invalid API key (not an ACC-* id and no keystore match); see POL-AGENT-API-KEY-001
+2026-09-05T03:28:47Z [error] Command execution failed error=unauthorized: invalid API key (not an ACC-* id and no keystore match); see POL-AGENT-API-KEY-001

@@ -1,0 +1,88 @@
+
+--- run 2026-09-04T22:16:55Z ---
+=== RUN   TestFailureKindAndReason
+=== PAUSE TestFailureKindAndReason
+=== RUN   TestIsShellWithInlineScript
+=== PAUSE TestIsShellWithInlineScript
+=== RUN   TestIsShellScriptPath
+=== PAUSE TestIsShellScriptPath
+=== RUN   TestResolveScriptPath
+=== PAUSE TestResolveScriptPath
+=== RUN   TestValidateShellScriptSyntax
+=== PAUSE TestValidateShellScriptSyntax
+=== RUN   TestEnsureEnvHasSchedulerTools
+=== PAUSE TestEnsureEnvHasSchedulerTools
+=== RUN   TestEffectiveRunWrapperTimeoutSeconds
+=== PAUSE TestEffectiveRunWrapperTimeoutSeconds
+=== RUN   TestGetSchedulerJobRetentionConfig
+=== PAUSE TestGetSchedulerJobRetentionConfig
+=== RUN   TestLogEventCascadeUpdate_constantsDerivedFromJobType
+=== PAUSE TestLogEventCascadeUpdate_constantsDerivedFromJobType
+=== RUN   TestLogEventCacheInvalidation_constantsDerivedFromJobType
+=== PAUSE TestLogEventCacheInvalidation_constantsDerivedFromJobType
+=== CONT  TestFailureKindAndReason
+=== CONT  TestEnsureEnvHasSchedulerTools
+=== RUN   TestFailureKindAndReason/timeout
+=== RUN   TestFailureKindAndReason/exit_126_shell_exec
+=== RUN   TestFailureKindAndReason/exit_137_resource_exhausted
+=== RUN   TestFailureKindAndReason/oom_stderr_resource_exhausted
+=== RUN   TestFailureKindAndReason/exit_1_script_exit
+--- PASS: TestFailureKindAndReason (0.00s)
+    --- PASS: TestFailureKindAndReason/timeout (0.00s)
+    --- PASS: TestFailureKindAndReason/exit_126_shell_exec (0.00s)
+    --- PASS: TestFailureKindAndReason/exit_137_resource_exhausted (0.00s)
+    --- PASS: TestFailureKindAndReason/oom_stderr_resource_exhausted (0.00s)
+    --- PASS: TestFailureKindAndReason/exit_1_script_exit (0.00s)
+=== CONT  TestResolveScriptPath
+--- PASS: TestEnsureEnvHasSchedulerTools (0.00s)
+=== CONT  TestValidateShellScriptSyntax
+--- PASS: TestResolveScriptPath (0.00s)
+=== CONT  TestIsShellScriptPath
+=== RUN   TestIsShellScriptPath/./scripts/pre-commit-integrity.sh
+=== RUN   TestIsShellScriptPath//usr/local/foo.sh
+=== RUN   TestIsShellScriptPath/bar.BASH
+=== RUN   TestIsShellScriptPath/echo_hello
+=== RUN   TestIsShellScriptPath//bin/sh
+=== RUN   TestIsShellScriptPath/#00
+=== RUN   TestIsShellScriptPath/script_with_spaces.sh
+=== RUN   TestIsShellScriptPath/script.sh_
+--- PASS: TestIsShellScriptPath (0.00s)
+    --- PASS: TestIsShellScriptPath/./scripts/pre-commit-integrity.sh (0.00s)
+    --- PASS: TestIsShellScriptPath//usr/local/foo.sh (0.00s)
+    --- PASS: TestIsShellScriptPath/bar.BASH (0.00s)
+    --- PASS: TestIsShellScriptPath/echo_hello (0.00s)
+    --- PASS: TestIsShellScriptPath//bin/sh (0.00s)
+    --- PASS: TestIsShellScriptPath/#00 (0.00s)
+    --- PASS: TestIsShellScriptPath/script_with_spaces.sh (0.00s)
+    --- PASS: TestIsShellScriptPath/script.sh_ (0.00s)
+=== CONT  TestLogEventCascadeUpdate_constantsDerivedFromJobType
+--- PASS: TestLogEventCascadeUpdate_constantsDerivedFromJobType (0.00s)
+=== CONT  TestLogEventCacheInvalidation_constantsDerivedFromJobType
+--- PASS: TestLogEventCacheInvalidation_constantsDerivedFromJobType (0.00s)
+=== CONT  TestIsShellWithInlineScript
+=== RUN   TestIsShellWithInlineScript/bin_sh_with_same_path_in_args
+=== RUN   TestIsShellWithInlineScript/sh_with_bin_sh_in_args_(path_variation)
+=== RUN   TestIsShellWithInlineScript/bash_with_same_path
+=== RUN   TestIsShellWithInlineScript/too_few_args
+=== RUN   TestIsShellWithInlineScript/args_not_-c
+=== RUN   TestIsShellWithInlineScript/non-shell_command
+=== RUN   TestIsShellWithInlineScript/empty_args
+=== RUN   TestIsShellWithInlineScript/two-arg_form_(command=/bin/sh,_args=[-c,_script])
+=== RUN   TestIsShellWithInlineScript/two-arg_form_with_bash
+--- PASS: TestIsShellWithInlineScript (0.00s)
+    --- PASS: TestIsShellWithInlineScript/bin_sh_with_same_path_in_args (0.00s)
+    --- PASS: TestIsShellWithInlineScript/sh_with_bin_sh_in_args_(path_variation) (0.00s)
+    --- PASS: TestIsShellWithInlineScript/bash_with_same_path (0.00s)
+    --- PASS: TestIsShellWithInlineScript/too_few_args (0.00s)
+    --- PASS: TestIsShellWithInlineScript/args_not_-c (0.00s)
+    --- PASS: TestIsShellWithInlineScript/non-shell_command (0.00s)
+    --- PASS: TestIsShellWithInlineScript/empty_args (0.00s)
+    --- PASS: TestIsShellWithInlineScript/two-arg_form_(command=/bin/sh,_args=[-c,_script]) (0.00s)
+    --- PASS: TestIsShellWithInlineScript/two-arg_form_with_bash (0.00s)
+=== CONT  TestGetSchedulerJobRetentionConfig
+--- PASS: TestGetSchedulerJobRetentionConfig (0.00s)
+=== CONT  TestEffectiveRunWrapperTimeoutSeconds
+--- PASS: TestEffectiveRunWrapperTimeoutSeconds (0.00s)
+--- PASS: TestValidateShellScriptSyntax (0.08s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/scheduler	0.834s

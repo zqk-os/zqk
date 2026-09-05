@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-389",
+  "created_at": "2026-09-04T21:34:31.193403Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-389",
+    "Tests": [
+      {
+        "Name": "TestAgentStage",
+        "Package": "pipeline_test",
+        "PackagePath": "pkg/pipeline",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/pipeline/agent_stage_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAllocator_Allocate",
+        "Package": "pipeline",
+        "PackagePath": "pkg/pipeline",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/pipeline/context_budget_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAllocator_Cycle",
+        "Package": "pipeline",
+        "PackagePath": "pkg/pipeline",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/pipeline/context_budget_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestContextHydrationPlugin",
+        "Package": "pipeline",
+        "PackagePath": "pkg/pipeline",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/pipeline/context_hydration_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestDAGExecutor",
+        "Package": "pipeline",
+        "PackagePath": "pkg/pipeline",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/pipeline/dag_executor_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestDAGExecutorFailure",
+        "Package": "pipeline",
+        "PackagePath": "pkg/pipeline",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/pipeline/dag_executor_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestDAGExecutorParallelism",
+        "Package": "pipeline",
+        "PackagePath": "pkg/pipeline",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/pipeline/dag_executor_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestIdlePreventionMiddleware",
+        "Package": "pipeline",
+        "PackagePath": "pkg/pipeline",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/pipeline/idle_prevention_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestIdlePreventionMiddleware_MissingDeps",
+        "Package": "pipeline",
+        "PackagePath": "pkg/pipeline",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/pipeline/idle_prevention_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestNormalizeBucketLabels",
+        "Package": "pipeline",
+        "PackagePath": "pkg/pipeline",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/pipeline/metrics_resolve_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 300000000000,
+    "PackagePath": "pkg/pipeline"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestAgentStage",
+      "Package": "pipeline_test",
+      "PackagePath": "pkg/pipeline",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/pipeline/agent_stage_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestAllocator_Allocate",
+      "Package": "pipeline",
+      "PackagePath": "pkg/pipeline",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/pipeline/context_budget_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestAllocator_Cycle",
+      "Package": "pipeline",
+      "PackagePath": "pkg/pipeline",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/pipeline/context_budget_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestContextHydrationPlugin",
+      "Package": "pipeline",
+      "PackagePath": "pkg/pipeline",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/pipeline/context_hydration_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestDAGExecutor",
+      "Package": "pipeline",
+      "PackagePath": "pkg/pipeline",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/pipeline/dag_executor_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestDAGExecutorFailure",
+      "Package": "pipeline",
+      "PackagePath": "pkg/pipeline",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/pipeline/dag_executor_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestDAGExecutorParallelism",
+      "Package": "pipeline",
+      "PackagePath": "pkg/pipeline",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/pipeline/dag_executor_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestIdlePreventionMiddleware",
+      "Package": "pipeline",
+      "PackagePath": "pkg/pipeline",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/pipeline/idle_prevention_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestIdlePreventionMiddleware_MissingDeps",
+      "Package": "pipeline",
+      "PackagePath": "pkg/pipeline",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/pipeline/idle_prevention_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestNormalizeBucketLabels",
+      "Package": "pipeline",
+      "PackagePath": "pkg/pipeline",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/pipeline/metrics_resolve_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

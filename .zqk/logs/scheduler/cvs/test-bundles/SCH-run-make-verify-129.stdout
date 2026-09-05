@@ -1,0 +1,138 @@
+
+--- run 2026-09-04T21:39:30Z ---
+=== RUN   TestParseNamespace
+=== PAUSE TestParseNamespace
+=== RUN   TestIDValidator_ValidateID_WithNamespace
+=== PAUSE TestIDValidator_ValidateID_WithNamespace
+=== RUN   TestIDValidator_ValidateID_AccountSpecialHandling
+=== PAUSE TestIDValidator_ValidateID_AccountSpecialHandling
+=== RUN   TestIDValidator_ValidateID_ErrorPaths
+=== PAUSE TestIDValidator_ValidateID_ErrorPaths
+=== RUN   TestIDValidator_ValidateID_PrefixValidation
+=== PAUSE TestIDValidator_ValidateID_PrefixValidation
+=== RUN   TestIDValidator_InferKindFromID_WithNamespace
+=== PAUSE TestIDValidator_InferKindFromID_WithNamespace
+=== RUN   TestExtractPrefixesFromPattern
+=== PAUSE TestExtractPrefixesFromPattern
+=== CONT  TestParseNamespace
+=== CONT  TestIDValidator_ValidateID_PrefixValidation
+=== RUN   TestParseNamespace/legacy_format_-_no_namespace
+=== RUN   TestParseNamespace/short_format_-_goal
+=== RUN   TestParseNamespace/full_format_-_zqk_kernel_goal
+=== RUN   TestParseNamespace/full_format_-_domain_organizational
+=== RUN   TestParseNamespace/full_format_-_domain_with_subdomain
+=== RUN   TestParseNamespace/full_format_-_integration_jira
+=== RUN   TestParseNamespace/full_format_-_zqk_kernel_without_object_type
+=== RUN   TestParseNamespace/full_format_-_domain_without_object_type
+--- PASS: TestParseNamespace (0.00s)
+    --- PASS: TestParseNamespace/legacy_format_-_no_namespace (0.00s)
+    --- PASS: TestParseNamespace/short_format_-_goal (0.00s)
+    --- PASS: TestParseNamespace/full_format_-_zqk_kernel_goal (0.00s)
+    --- PASS: TestParseNamespace/full_format_-_domain_organizational (0.00s)
+    --- PASS: TestParseNamespace/full_format_-_domain_with_subdomain (0.00s)
+    --- PASS: TestParseNamespace/full_format_-_integration_jira (0.00s)
+    --- PASS: TestParseNamespace/full_format_-_zqk_kernel_without_object_type (0.00s)
+    --- PASS: TestParseNamespace/full_format_-_domain_without_object_type (0.00s)
+=== CONT  TestExtractPrefixesFromPattern
+=== RUN   TestExtractPrefixesFromPattern/simple_prefix_pattern
+=== RUN   TestExtractPrefixesFromPattern/alternation_pattern
+=== RUN   TestExtractPrefixesFromPattern/alternation_with_multiple_options
+=== RUN   TestExtractPrefixesFromPattern/generic_pattern
+=== RUN   TestExtractPrefixesFromPattern/pattern_without_prefix
+=== RUN   TestExtractPrefixesFromPattern/empty_pattern
+=== RUN   TestExtractPrefixesFromPattern/pattern_with_spaces_in_alternation
+=== RUN   TestExtractPrefixesFromPattern/long_prefix_with_underscore
+=== RUN   TestExtractPrefixesFromPattern/lowercase_prefix_(not_matched)
+--- PASS: TestExtractPrefixesFromPattern (0.00s)
+    --- PASS: TestExtractPrefixesFromPattern/simple_prefix_pattern (0.00s)
+    --- PASS: TestExtractPrefixesFromPattern/alternation_pattern (0.00s)
+    --- PASS: TestExtractPrefixesFromPattern/alternation_with_multiple_options (0.00s)
+    --- PASS: TestExtractPrefixesFromPattern/generic_pattern (0.00s)
+    --- PASS: TestExtractPrefixesFromPattern/pattern_without_prefix (0.00s)
+    --- PASS: TestExtractPrefixesFromPattern/empty_pattern (0.00s)
+    --- PASS: TestExtractPrefixesFromPattern/pattern_with_spaces_in_alternation (0.00s)
+    --- PASS: TestExtractPrefixesFromPattern/long_prefix_with_underscore (0.00s)
+    --- PASS: TestExtractPrefixesFromPattern/lowercase_prefix_(not_matched) (0.00s)
+=== CONT  TestIDValidator_InferKindFromID_WithNamespace
+=== RUN   TestIDValidator_InferKindFromID_WithNamespace/GOAL-123
+=== RUN   TestIDValidator_InferKindFromID_WithNamespace/BLI-001
+=== RUN   TestIDValidator_ValidateID_PrefixValidation/PRI-208_priority_plan
+=== RUN   TestIDValidator_InferKindFromID_WithNamespace/goal:GOAL-123
+=== RUN   TestIDValidator_InferKindFromID_WithNamespace/backlog_item:BLI-001
+=== RUN   TestIDValidator_InferKindFromID_WithNamespace/zqk:kernel:goal:GOAL-123
+=== RUN   TestIDValidator_ValidateID_PrefixValidation/PRIO-002_priority_plan
+=== RUN   TestIDValidator_InferKindFromID_WithNamespace/zqk:kernel:backlog_item:BLI-001
+=== RUN   TestIDValidator_ValidateID_PrefixValidation/REQ-016_requirement
+=== RUN   TestIDValidator_InferKindFromID_WithNamespace/domain:organizational:organization:ORG-001
+=== RUN   TestIDValidator_ValidateID_PrefixValidation/REQU-001_requirement
+=== RUN   TestIDValidator_InferKindFromID_WithNamespace/UNKNOWN-001
+=== RUN   TestIDValidator_ValidateID_PrefixValidation/INVALID-001_priority_plan
+=== CONT  TestIDValidator_ValidateID_AccountSpecialHandling
+--- PASS: TestIDValidator_InferKindFromID_WithNamespace (0.10s)
+    --- PASS: TestIDValidator_InferKindFromID_WithNamespace/GOAL-123 (0.00s)
+    --- PASS: TestIDValidator_InferKindFromID_WithNamespace/BLI-001 (0.00s)
+    --- PASS: TestIDValidator_InferKindFromID_WithNamespace/goal:GOAL-123 (0.00s)
+    --- PASS: TestIDValidator_InferKindFromID_WithNamespace/backlog_item:BLI-001 (0.00s)
+    --- PASS: TestIDValidator_InferKindFromID_WithNamespace/zqk:kernel:goal:GOAL-123 (0.00s)
+    --- PASS: TestIDValidator_InferKindFromID_WithNamespace/zqk:kernel:backlog_item:BLI-001 (0.00s)
+    --- PASS: TestIDValidator_InferKindFromID_WithNamespace/domain:organizational:organization:ORG-001 (0.00s)
+    --- PASS: TestIDValidator_InferKindFromID_WithNamespace/UNKNOWN-001 (0.00s)
+=== RUN   TestIDValidator_ValidateID_PrefixValidation/PRI-001_requirement
+--- PASS: TestIDValidator_ValidateID_PrefixValidation (0.10s)
+    --- PASS: TestIDValidator_ValidateID_PrefixValidation/PRI-208_priority_plan (0.00s)
+    --- PASS: TestIDValidator_ValidateID_PrefixValidation/PRIO-002_priority_plan (0.00s)
+    --- PASS: TestIDValidator_ValidateID_PrefixValidation/REQ-016_requirement (0.00s)
+    --- PASS: TestIDValidator_ValidateID_PrefixValidation/REQU-001_requirement (0.00s)
+    --- PASS: TestIDValidator_ValidateID_PrefixValidation/INVALID-001_priority_plan (0.00s)
+    --- PASS: TestIDValidator_ValidateID_PrefixValidation/PRI-001_requirement (0.00s)
+=== CONT  TestIDValidator_ValidateID_ErrorPaths
+=== RUN   TestIDValidator_ValidateID_AccountSpecialHandling/account:username
+=== RUN   TestIDValidator_ValidateID_AccountSpecialHandling/account:testuser
+=== RUN   TestIDValidator_ValidateID_AccountSpecialHandling/ACC-001
+=== RUN   TestIDValidator_ValidateID_AccountSpecialHandling/account:invalid-format
+--- PASS: TestIDValidator_ValidateID_AccountSpecialHandling (0.10s)
+    --- PASS: TestIDValidator_ValidateID_AccountSpecialHandling/account:username (0.00s)
+    --- PASS: TestIDValidator_ValidateID_AccountSpecialHandling/account:testuser (0.00s)
+    --- PASS: TestIDValidator_ValidateID_AccountSpecialHandling/ACC-001 (0.00s)
+    --- PASS: TestIDValidator_ValidateID_AccountSpecialHandling/account:invalid-format (0.00s)
+=== CONT  TestIDValidator_ValidateID_WithNamespace
+=== RUN   TestIDValidator_ValidateID_ErrorPaths/invalid:layer:goal:GOAL-123
+=== RUN   TestIDValidator_ValidateID_ErrorPaths/zqk:INVALID_FORMAT:goal:GOAL-123
+=== RUN   TestIDValidator_ValidateID_ErrorPaths/unknown:GOAL-123
+--- PASS: TestIDValidator_ValidateID_ErrorPaths (0.10s)
+    --- PASS: TestIDValidator_ValidateID_ErrorPaths/invalid:layer:goal:GOAL-123 (0.00s)
+    --- PASS: TestIDValidator_ValidateID_ErrorPaths/zqk:INVALID_FORMAT:goal:GOAL-123 (0.00s)
+    --- PASS: TestIDValidator_ValidateID_ErrorPaths/unknown:GOAL-123 (0.00s)
+=== RUN   TestIDValidator_ValidateID_WithNamespace/GOAL-123_goal
+=== RUN   TestIDValidator_ValidateID_WithNamespace/BLI-001_backlog_item
+=== RUN   TestIDValidator_ValidateID_WithNamespace/goal:GOAL-123_goal
+=== RUN   TestIDValidator_ValidateID_WithNamespace/backlog_item:BLI-001_backlog_item
+=== RUN   TestIDValidator_ValidateID_WithNamespace/zqk:kernel:goal:GOAL-123_goal
+=== RUN   TestIDValidator_ValidateID_WithNamespace/zqk:kernel:backlog_item:BLI-001_backlog_item
+=== RUN   TestIDValidator_ValidateID_WithNamespace/domain:organizational:organization:ORG-001_organization
+=== RUN   TestIDValidator_ValidateID_WithNamespace/invalid:namespace:goal:GOAL-123_goal
+=== RUN   TestIDValidator_ValidateID_WithNamespace/zqk:kernel:goal:GOAL-123_backlog_item
+=== RUN   TestIDValidator_ValidateID_WithNamespace/unknown:layer:goal:GOAL-123_goal
+=== RUN   TestIDValidator_ValidateID_WithNamespace/domain:financial:accounting:account:ACC-001_account
+=== RUN   TestIDValidator_ValidateID_WithNamespace/integration:jira:issue:PROJ-123_issue
+=== RUN   TestIDValidator_ValidateID_WithNamespace/zqk:kernel:goal:GOAL-123:extra_goal
+=== RUN   TestIDValidator_ValidateID_WithNamespace/zqk:INVALID_CHARS:goal:GOAL-123_goal
+=== RUN   TestIDValidator_ValidateID_WithNamespace/unknown:GOAL-123_goal
+--- PASS: TestIDValidator_ValidateID_WithNamespace (0.09s)
+    --- PASS: TestIDValidator_ValidateID_WithNamespace/GOAL-123_goal (0.00s)
+    --- PASS: TestIDValidator_ValidateID_WithNamespace/BLI-001_backlog_item (0.00s)
+    --- PASS: TestIDValidator_ValidateID_WithNamespace/goal:GOAL-123_goal (0.00s)
+    --- PASS: TestIDValidator_ValidateID_WithNamespace/backlog_item:BLI-001_backlog_item (0.00s)
+    --- PASS: TestIDValidator_ValidateID_WithNamespace/zqk:kernel:goal:GOAL-123_goal (0.00s)
+    --- PASS: TestIDValidator_ValidateID_WithNamespace/zqk:kernel:backlog_item:BLI-001_backlog_item (0.00s)
+    --- PASS: TestIDValidator_ValidateID_WithNamespace/domain:organizational:organization:ORG-001_organization (0.00s)
+    --- PASS: TestIDValidator_ValidateID_WithNamespace/invalid:namespace:goal:GOAL-123_goal (0.00s)
+    --- PASS: TestIDValidator_ValidateID_WithNamespace/zqk:kernel:goal:GOAL-123_backlog_item (0.00s)
+    --- PASS: TestIDValidator_ValidateID_WithNamespace/unknown:layer:goal:GOAL-123_goal (0.00s)
+    --- PASS: TestIDValidator_ValidateID_WithNamespace/domain:financial:accounting:account:ACC-001_account (0.00s)
+    --- PASS: TestIDValidator_ValidateID_WithNamespace/integration:jira:issue:PROJ-123_issue (0.00s)
+    --- PASS: TestIDValidator_ValidateID_WithNamespace/zqk:kernel:goal:GOAL-123:extra_goal (0.00s)
+    --- PASS: TestIDValidator_ValidateID_WithNamespace/zqk:INVALID_CHARS:goal:GOAL-123_goal (0.00s)
+    --- PASS: TestIDValidator_ValidateID_WithNamespace/unknown:GOAL-123_goal (0.00s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/validation	1.016s

@@ -1,0 +1,24 @@
+
+--- run 2026-09-04T22:23:17Z ---
+=== RUN   TestExtractPackagePathFromRunWrapperCommand
+--- PASS: TestExtractPackagePathFromRunWrapperCommand (0.00s)
+=== RUN   TestPackageConcurrencyLimiter_AcquireRelease
+--- PASS: TestPackageConcurrencyLimiter_AcquireRelease (0.10s)
+=== RUN   TestPackageConcurrencyLimiter_Snapshot
+--- PASS: TestPackageConcurrencyLimiter_Snapshot (0.00s)
+=== RUN   TestPackageConcurrencyLimiter_ShouldLimit
+--- PASS: TestPackageConcurrencyLimiter_ShouldLimit (0.00s)
+=== RUN   TestPackageConcurrencyLimiter_MergeLimitsZeroRemoves
+--- PASS: TestPackageConcurrencyLimiter_MergeLimitsZeroRemoves (0.00s)
+=== RUN   TestPackageConcurrencyLimiter_MergeLimitsIncreases
+--- PASS: TestPackageConcurrencyLimiter_MergeLimitsIncreases (0.00s)
+=== RUN   TestPackageConcurrencyLimiter_TrimDotSlashPrefix
+--- PASS: TestPackageConcurrencyLimiter_TrimDotSlashPrefix (0.00s)
+=== RUN   TestPackageConcurrencyLimiter_EmptyPackagePath
+--- PASS: TestPackageConcurrencyLimiter_EmptyPackagePath (0.00s)
+=== RUN   TestPackageConcurrencyLimiter_MergeLimitsNilNoOp
+--- PASS: TestPackageConcurrencyLimiter_MergeLimitsNilNoOp (0.00s)
+=== RUN   TestTPMRateLimiter_Wait
+--- PASS: TestTPMRateLimiter_Wait (1.00s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/circuitbreaker	1.313s

@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-65",
+  "created_at": "2026-09-04T21:34:28.028672Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-65",
+    "Tests": [
+      {
+        "Name": "TestSnapshotOperationQueue_GetDataFromPendingWrite",
+        "Package": "storage",
+        "PackagePath": "pkg/storage",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/snapshot_operation_queue_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestSnapshotOperationQueue_Replay",
+        "Package": "storage",
+        "PackagePath": "pkg/storage",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/snapshot_operation_queue_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestSnapshotOperationQueue_Overflow",
+        "Package": "storage",
+        "PackagePath": "pkg/storage",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/snapshot_operation_queue_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestSnapshotOperationQueue_ConcurrentEnqueue",
+        "Package": "storage",
+        "PackagePath": "pkg/storage",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/snapshot_operation_queue_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestSnapshotOperationQueue_Clear",
+        "Package": "storage",
+        "PackagePath": "pkg/storage",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/snapshot_operation_queue_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestProxyStorage_BeginEndSnapshot",
+        "Package": "storage",
+        "PackagePath": "pkg/storage",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/snapshot_proxy_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestProxyStorage_CreateDuringSnapshot",
+        "Package": "storage",
+        "PackagePath": "pkg/storage",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/snapshot_proxy_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestProxyStorage_ReadAfterWriteConsistency",
+        "Package": "storage",
+        "PackagePath": "pkg/storage",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/snapshot_proxy_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestProxyStorage_UpdateDuringSnapshot",
+        "Package": "storage",
+        "PackagePath": "pkg/storage",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/snapshot_proxy_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestProxyStorage_DeleteDuringSnapshot",
+        "Package": "storage",
+        "PackagePath": "pkg/storage",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/snapshot_proxy_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 900000000000,
+    "PackagePath": "pkg/storage"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestSnapshotOperationQueue_GetDataFromPendingWrite",
+      "Package": "storage",
+      "PackagePath": "pkg/storage",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/snapshot_operation_queue_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestSnapshotOperationQueue_Replay",
+      "Package": "storage",
+      "PackagePath": "pkg/storage",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/snapshot_operation_queue_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestSnapshotOperationQueue_Overflow",
+      "Package": "storage",
+      "PackagePath": "pkg/storage",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/snapshot_operation_queue_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestSnapshotOperationQueue_ConcurrentEnqueue",
+      "Package": "storage",
+      "PackagePath": "pkg/storage",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/snapshot_operation_queue_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestSnapshotOperationQueue_Clear",
+      "Package": "storage",
+      "PackagePath": "pkg/storage",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/snapshot_operation_queue_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestProxyStorage_BeginEndSnapshot",
+      "Package": "storage",
+      "PackagePath": "pkg/storage",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/snapshot_proxy_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestProxyStorage_CreateDuringSnapshot",
+      "Package": "storage",
+      "PackagePath": "pkg/storage",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/snapshot_proxy_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestProxyStorage_ReadAfterWriteConsistency",
+      "Package": "storage",
+      "PackagePath": "pkg/storage",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/snapshot_proxy_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestProxyStorage_UpdateDuringSnapshot",
+      "Package": "storage",
+      "PackagePath": "pkg/storage",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/snapshot_proxy_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestProxyStorage_DeleteDuringSnapshot",
+      "Package": "storage",
+      "PackagePath": "pkg/storage",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/snapshot_proxy_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    }
+  }
+}

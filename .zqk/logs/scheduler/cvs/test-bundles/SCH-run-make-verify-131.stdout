@@ -1,0 +1,52 @@
+
+--- run 2026-09-04T21:39:37Z ---
+=== RUN   TestValidationMetrics_UpdateQueueSize
+=== PAUSE TestValidationMetrics_UpdateQueueSize
+=== RUN   TestValidationMetrics_RecordTierIssue
+=== PAUSE TestValidationMetrics_RecordTierIssue
+=== RUN   TestValidationMetrics_Finalize
+=== PAUSE TestValidationMetrics_Finalize
+=== RUN   TestValidationMetrics_Save
+=== PAUSE TestValidationMetrics_Save
+=== RUN   TestValidationMetrics_String
+=== PAUSE TestValidationMetrics_String
+=== RUN   TestValidationMetrics_StringThroughputWithoutFinalize
+=== PAUSE TestValidationMetrics_StringThroughputWithoutFinalize
+=== RUN   TestValidationMetrics_StringOmitsZeroHitCache
+=== PAUSE TestValidationMetrics_StringOmitsZeroHitCache
+=== RUN   TestValidationMetrics_StringIncludesCacheWhenHits
+=== PAUSE TestValidationMetrics_StringIncludesCacheWhenHits
+=== RUN   TestValidationMetrics_CacheHitRate
+=== PAUSE TestValidationMetrics_CacheHitRate
+=== RUN   TestLoadNamespaceFromObject
+=== PAUSE TestLoadNamespaceFromObject
+=== CONT  TestValidationMetrics_UpdateQueueSize
+=== CONT  TestValidationMetrics_StringThroughputWithoutFinalize
+--- PASS: TestValidationMetrics_UpdateQueueSize (0.00s)
+=== CONT  TestValidationMetrics_Save
+--- PASS: TestValidationMetrics_StringThroughputWithoutFinalize (0.00s)
+=== CONT  TestValidationMetrics_String
+--- PASS: TestValidationMetrics_String (0.00s)
+=== CONT  TestValidationMetrics_CacheHitRate
+--- PASS: TestValidationMetrics_CacheHitRate (0.00s)
+=== CONT  TestLoadNamespaceFromObject
+=== RUN   TestLoadNamespaceFromObject/kernel_namespace
+=== RUN   TestLoadNamespaceFromObject/domain_namespace_with_integration
+=== RUN   TestLoadNamespaceFromObject/namespace_with_isolation
+=== RUN   TestLoadNamespaceFromObject/missing_namespace_id
+--- PASS: TestLoadNamespaceFromObject (0.00s)
+    --- PASS: TestLoadNamespaceFromObject/kernel_namespace (0.00s)
+    --- PASS: TestLoadNamespaceFromObject/domain_namespace_with_integration (0.00s)
+    --- PASS: TestLoadNamespaceFromObject/namespace_with_isolation (0.00s)
+    --- PASS: TestLoadNamespaceFromObject/missing_namespace_id (0.00s)
+=== CONT  TestValidationMetrics_StringIncludesCacheWhenHits
+--- PASS: TestValidationMetrics_StringIncludesCacheWhenHits (0.00s)
+=== CONT  TestValidationMetrics_StringOmitsZeroHitCache
+--- PASS: TestValidationMetrics_StringOmitsZeroHitCache (0.00s)
+=== CONT  TestValidationMetrics_Finalize
+--- PASS: TestValidationMetrics_Save (0.01s)
+=== CONT  TestValidationMetrics_RecordTierIssue
+--- PASS: TestValidationMetrics_RecordTierIssue (0.00s)
+--- PASS: TestValidationMetrics_Finalize (0.01s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/validation	0.652s

@@ -1,0 +1,123 @@
+{
+  "name": "make-verify-213",
+  "created_at": "2026-09-04T21:34:29.495902Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-213",
+    "Tests": [
+      {
+        "Name": "TestShape_KindAndNamespace",
+        "Package": "events_test",
+        "PackagePath": "pkg/events",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/events/cascading_overlay_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestPolicyInspector_MatchesKindAndStatus",
+        "Package": "events_test",
+        "PackagePath": "pkg/events",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/events/cascading_overlay_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestCascadingSuspension",
+        "Package": "events_test",
+        "PackagePath": "pkg/events",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/events/cascading_overlay_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestRouter_Unsubscribe",
+        "Package": "events_test",
+        "PackagePath": "pkg/events",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/events/cascading_overlay_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestRouter_BitmaskSubscription",
+        "Package": "events_test",
+        "PackagePath": "pkg/events",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/events/router_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestRouter_PolicyInspectorCascade",
+        "Package": "events_test",
+        "PackagePath": "pkg/events",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/events/router_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 180000000000,
+    "PackagePath": "pkg/events"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestShape_KindAndNamespace",
+      "Package": "events_test",
+      "PackagePath": "pkg/events",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/events/cascading_overlay_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestPolicyInspector_MatchesKindAndStatus",
+      "Package": "events_test",
+      "PackagePath": "pkg/events",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/events/cascading_overlay_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestCascadingSuspension",
+      "Package": "events_test",
+      "PackagePath": "pkg/events",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/events/cascading_overlay_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestRouter_Unsubscribe",
+      "Package": "events_test",
+      "PackagePath": "pkg/events",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/events/cascading_overlay_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestRouter_BitmaskSubscription",
+      "Package": "events_test",
+      "PackagePath": "pkg/events",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/events/router_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestRouter_PolicyInspectorCascade",
+      "Package": "events_test",
+      "PackagePath": "pkg/events",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/events/router_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

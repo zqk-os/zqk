@@ -1,0 +1,18 @@
+package bldr_cli_cmd_v1
+
+import (
+	clipkg "github.com/lanceman/zqk/pkg/cli"
+	"github.com/spf13/cobra"
+)
+
+// NewAgentExecuteCommandBuilder creates a new agent_execute command
+func NewAgentExecuteCommandBuilder() *cobra.Command {
+	builder := clipkg.NewCommandBuilder("execute")
+	builder.WithShort("Execute an agent task")
+	help := clipkg.DynamicHelpBuilder("Execute an agent task")
+	help.WithDescriptionLines("Execute an agent task by ID")
+	builder.WithHelpBuilder(help)
+	builder.WithCommonFlags(false, nil)
+	cmd := builder.Build()
+	return cmd
+}

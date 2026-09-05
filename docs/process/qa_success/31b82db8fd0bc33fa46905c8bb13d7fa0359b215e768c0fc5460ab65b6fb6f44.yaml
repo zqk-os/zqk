@@ -1,0 +1,14 @@
+created_at: "2026-08-20T01:37:50Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1787189868807090000-14bf4817
+item_id: BLI-CEF-R8-P0-OBS-REAL-001
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 2857702ca28e4b64fb5782140b43c1400e68fdeab30ab0062f4119523ca97d466e5f13c72adcfa41b92eacf21fa7f0a79b8a8e3a8d7c581e5c9afe0e69cb31dc
+schema_version: 2.0.0
+signature: 3046022100ab92a9b91e59163e47b73ea5d5affd9e1f90cbb92d2dcc21994e2fce98d561330221008a10e98f67cf6ed976a9baf1a8fe4b2d862077a9d428d9681945e64ccc068a76
+status: archived
+title: 'R8 P0 observability: healthchk exit-0 lie, raw prints, no OTel (real K/L ids)'
+updated_at: "2026-09-01T07:33:31Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

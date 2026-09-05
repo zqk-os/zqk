@@ -1,0 +1,14 @@
+created_at: "2026-08-19T00:28:49Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1787099328847925000-055a4e6f
+item_id: CRIT-CEF-R2-CON-RACE-EXPAND-A
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 2857702ca28e4b64fb5782140b43c1400e68fdeab30ab0062f4119523ca97d466e5f13c72adcfa41b92eacf21fa7f0a79b8a8e3a8d7c581e5c9afe0e69cb31dc
+schema_version: 2.0.0
+signature: 3045022100fdfa4e64580f102c6d526719db98e6585db453978f0c738bfb1b07519b1cc1120220013dd6ff59f48818ad72d24216ce15107219f7789d64e27e2fa6ee9524a2cbd3
+status: archived
+title: 'Accept: Expand CI -race to pkg/concurrency and circuitbreaker'
+updated_at: "2026-09-01T07:07:33Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

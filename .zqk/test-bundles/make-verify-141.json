@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-141",
+  "created_at": "2026-09-04T21:34:28.721555Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-141",
+    "Tests": [
+      {
+        "Name": "TestValidationStateCache_Save_ErrorPaths",
+        "Package": "validation",
+        "PackagePath": "pkg/validation",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/validation/state_cache_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestValidationStateCache_Save_Concurrent",
+        "Package": "validation",
+        "PackagePath": "pkg/validation",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/validation/state_cache_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestValidationStateCache_CodeChangeInvalidation",
+        "Package": "validation",
+        "PackagePath": "pkg/validation",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/validation/state_cache_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestShouldCacheValidationState",
+        "Package": "validation",
+        "PackagePath": "pkg/validation",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/validation/state_cache_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestValidationStateCache_LoadPrunesExcludedKinds",
+        "Package": "validation",
+        "PackagePath": "pkg/validation",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/validation/state_cache_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestValidateType_NumberAcceptsIntsAndFloats",
+        "Package": "validation",
+        "PackagePath": "pkg/validation",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/validation/type_validator_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestDefaultValidationTierConfig",
+        "Package": "validation",
+        "PackagePath": "pkg/validation",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/validation/validation_tier_config_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestIsBlockingTier",
+        "Package": "validation",
+        "PackagePath": "pkg/validation",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/validation/validation_tier_config_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestGetBlockingErrors",
+        "Package": "validation",
+        "PackagePath": "pkg/validation",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/validation/validation_tier_config_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestLoadValidationTierConfig",
+        "Package": "validation",
+        "PackagePath": "pkg/validation",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/validation/validation_tier_config_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": true,
+    "EstimatedDuration": 300000000000,
+    "PackagePath": "pkg/validation"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestValidationStateCache_Save_ErrorPaths",
+      "Package": "validation",
+      "PackagePath": "pkg/validation",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/validation/state_cache_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestValidationStateCache_Save_Concurrent",
+      "Package": "validation",
+      "PackagePath": "pkg/validation",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/validation/state_cache_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestValidationStateCache_CodeChangeInvalidation",
+      "Package": "validation",
+      "PackagePath": "pkg/validation",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/validation/state_cache_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestShouldCacheValidationState",
+      "Package": "validation",
+      "PackagePath": "pkg/validation",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/validation/state_cache_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestValidationStateCache_LoadPrunesExcludedKinds",
+      "Package": "validation",
+      "PackagePath": "pkg/validation",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/validation/state_cache_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestValidateType_NumberAcceptsIntsAndFloats",
+      "Package": "validation",
+      "PackagePath": "pkg/validation",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/validation/type_validator_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestDefaultValidationTierConfig",
+      "Package": "validation",
+      "PackagePath": "pkg/validation",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/validation/validation_tier_config_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestIsBlockingTier",
+      "Package": "validation",
+      "PackagePath": "pkg/validation",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/validation/validation_tier_config_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestGetBlockingErrors",
+      "Package": "validation",
+      "PackagePath": "pkg/validation",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/validation/validation_tier_config_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestLoadValidationTierConfig",
+      "Package": "validation",
+      "PackagePath": "pkg/validation",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/validation/validation_tier_config_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

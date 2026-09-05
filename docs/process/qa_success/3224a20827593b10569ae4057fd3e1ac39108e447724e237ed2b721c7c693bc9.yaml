@@ -1,0 +1,14 @@
+created_at: "2026-08-19T17:51:48Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1787161904370921000-31b92e1d
+item_id: CRIT-CEF-R3-LOGGING-OBS-001
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 2857702ca28e4b64fb5782140b43c1400e68fdeab30ab0062f4119523ca97d466e5f13c72adcfa41b92eacf21fa7f0a79b8a8e3a8d7c581e5c9afe0e69cb31dc
+schema_version: 2.0.0
+signature: 3045022070e67616fd3083288b2cd2fd25d4d5469291865b9425b60cc4fdee86db61c306022100f31728df12f908bf1b58269b3e00f5d408227a0fe81dc3cc58ea6c843fd014cb
+status: archived
+title: Structured logging observability compliance
+updated_at: "2026-09-01T07:10:38Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

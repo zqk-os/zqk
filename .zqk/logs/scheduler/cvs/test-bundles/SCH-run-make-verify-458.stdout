@@ -1,0 +1,50 @@
+
+--- run 2026-09-04T22:13:32Z ---
+=== RUN   TestGenerateCommandBuilderFromYAML
+=== PAUSE TestGenerateCommandBuilderFromYAML
+=== RUN   TestCriticalCommandBuilders_NonEmptyUse
+=== PAUSE TestCriticalCommandBuilders_NonEmptyUse
+=== RUN   TestIsNumericCASCommandStem
+=== PAUSE TestIsNumericCASCommandStem
+=== RUN   TestResolveCommandBuilderName_PrefersUseOverNumericCSPEC
+=== PAUSE TestResolveCommandBuilderName_PrefersUseOverNumericCSPEC
+=== RUN   TestResolveCommandBuilderName_NestedDNAUsesPathStem
+=== PAUSE TestResolveCommandBuilderName_NestedDNAUsesPathStem
+=== RUN   TestIsProcessCommandSpecCAS
+=== PAUSE TestIsProcessCommandSpecCAS
+=== RUN   TestCommandBuilder_Basic
+=== PAUSE TestCommandBuilder_Basic
+=== RUN   TestCommandBuilder_WithHelpBuilder
+=== PAUSE TestCommandBuilder_WithHelpBuilder
+=== RUN   TestCommandBuilder_WithFlags
+=== PAUSE TestCommandBuilder_WithFlags
+=== RUN   TestCommandBuilder_WithRequiredFlags
+=== PAUSE TestCommandBuilder_WithRequiredFlags
+=== CONT  TestGenerateCommandBuilderFromYAML
+=== CONT  TestIsProcessCommandSpecCAS
+--- PASS: TestIsProcessCommandSpecCAS (0.00s)
+=== CONT  TestCommandBuilder_WithHelpBuilder
+--- PASS: TestCommandBuilder_WithHelpBuilder (0.00s)
+=== CONT  TestCommandBuilder_WithFlags
+--- PASS: TestCommandBuilder_WithFlags (0.00s)
+=== CONT  TestCommandBuilder_WithRequiredFlags
+--- PASS: TestCommandBuilder_WithRequiredFlags (0.00s)
+=== CONT  TestResolveCommandBuilderName_PrefersUseOverNumericCSPEC
+--- PASS: TestResolveCommandBuilderName_PrefersUseOverNumericCSPEC (0.00s)
+=== CONT  TestResolveCommandBuilderName_NestedDNAUsesPathStem
+--- PASS: TestResolveCommandBuilderName_NestedDNAUsesPathStem (0.00s)
+=== CONT  TestIsNumericCASCommandStem
+--- PASS: TestIsNumericCASCommandStem (0.00s)
+=== CONT  TestCriticalCommandBuilders_NonEmptyUse
+=== RUN   TestGenerateCommandBuilderFromYAML/get_command_spec
+--- PASS: TestCriticalCommandBuilders_NonEmptyUse (0.00s)
+=== CONT  TestCommandBuilder_Basic
+--- PASS: TestCommandBuilder_Basic (0.00s)
+=== RUN   TestGenerateCommandBuilderFromYAML/delete_command_spec_(CRUD)
+=== RUN   TestGenerateCommandBuilderFromYAML/empty_name_falls_back_to_command_file_stem
+--- PASS: TestGenerateCommandBuilderFromYAML (0.03s)
+    --- PASS: TestGenerateCommandBuilderFromYAML/get_command_spec (0.01s)
+    --- PASS: TestGenerateCommandBuilderFromYAML/delete_command_spec_(CRUD) (0.01s)
+    --- PASS: TestGenerateCommandBuilderFromYAML/empty_name_falls_back_to_command_file_stem (0.01s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/cli	0.580s

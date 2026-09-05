@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-39",
+  "created_at": "2026-09-04T21:34:27.793507Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-39",
+    "Tests": [
+      {
+        "Name": "TestKeystoreEntry_DeleteOwnership",
+        "Package": "storage",
+        "PackagePath": "pkg/storage",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/keystore_access_control_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestKeystoreEntry_CreateRestrictions",
+        "Package": "storage",
+        "PackagePath": "pkg/storage",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/keystore_access_control_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestKeystoreEntry_FilePermissions",
+        "Package": "storage",
+        "PackagePath": "pkg/storage",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/keystore_access_control_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestKeystoreEntry_ApplyAccessControl",
+        "Package": "storage",
+        "PackagePath": "pkg/storage",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/keystore_access_control_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestValidateKindDirectoryName",
+        "Package": "storage",
+        "PackagePath": "pkg/storage",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/kind_directory_guard_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestLazyGraphStorage",
+        "Package": "storage",
+        "PackagePath": "pkg/storage",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/lazy_graph_storage_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestLazyGraphStorage_NotAvailable",
+        "Package": "storage",
+        "PackagePath": "pkg/storage",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/lazy_graph_storage_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestGetListCache_MCPShortTTL",
+        "Package": "storage",
+        "PackagePath": "pkg/storage",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/list_cache_mcp_ttl_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestListCache_LifetimeCounters",
+        "Package": "storage",
+        "PackagePath": "pkg/storage",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/list_cache_stats_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestListCache_GetMiss",
+        "Package": "storage",
+        "PackagePath": "pkg/storage",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/list_cache_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 900000000000,
+    "PackagePath": "pkg/storage"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestKeystoreEntry_DeleteOwnership",
+      "Package": "storage",
+      "PackagePath": "pkg/storage",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/keystore_access_control_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestKeystoreEntry_CreateRestrictions",
+      "Package": "storage",
+      "PackagePath": "pkg/storage",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/keystore_access_control_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestKeystoreEntry_FilePermissions",
+      "Package": "storage",
+      "PackagePath": "pkg/storage",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/keystore_access_control_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestKeystoreEntry_ApplyAccessControl",
+      "Package": "storage",
+      "PackagePath": "pkg/storage",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/keystore_access_control_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestValidateKindDirectoryName",
+      "Package": "storage",
+      "PackagePath": "pkg/storage",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/kind_directory_guard_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestLazyGraphStorage",
+      "Package": "storage",
+      "PackagePath": "pkg/storage",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/lazy_graph_storage_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestLazyGraphStorage_NotAvailable",
+      "Package": "storage",
+      "PackagePath": "pkg/storage",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/lazy_graph_storage_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestGetListCache_MCPShortTTL",
+      "Package": "storage",
+      "PackagePath": "pkg/storage",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/list_cache_mcp_ttl_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestListCache_LifetimeCounters",
+      "Package": "storage",
+      "PackagePath": "pkg/storage",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/list_cache_stats_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestListCache_GetMiss",
+      "Package": "storage",
+      "PackagePath": "pkg/storage",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/list_cache_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    }
+  }
+}

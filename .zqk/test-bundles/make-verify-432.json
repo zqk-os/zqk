@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-432",
+  "created_at": "2026-09-04T21:34:31.604171Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-432",
+    "Tests": [
+      {
+        "Name": "TestEventLogger_LogSpecLoad",
+        "Package": "logging",
+        "PackagePath": "pkg/logging",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/logging/event_logger_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestEventLogger_LogSpecValidation",
+        "Package": "logging",
+        "PackagePath": "pkg/logging",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/logging/event_logger_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestEventLogger_LogCheckResult",
+        "Package": "logging",
+        "PackagePath": "pkg/logging",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/logging/event_logger_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestEventLogger_LogObjectCheck",
+        "Package": "logging",
+        "PackagePath": "pkg/logging",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/logging/event_logger_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestEventLogger_LogFileOperation",
+        "Package": "logging",
+        "PackagePath": "pkg/logging",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/logging/event_logger_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestEventLogger_LogHashOperation",
+        "Package": "logging",
+        "PackagePath": "pkg/logging",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/logging/event_logger_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestEventLogger_WithObjectRef",
+        "Package": "logging",
+        "PackagePath": "pkg/logging",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/logging/event_logger_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestNewEventLogger",
+        "Package": "logging",
+        "PackagePath": "pkg/logging",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/logging/event_logger_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestFluentWarnChainsFields",
+        "Package": "logging",
+        "PackagePath": "pkg/logging",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/logging/fluent_builder_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestFluentCommonFieldHelpers",
+        "Package": "logging",
+        "PackagePath": "pkg/logging",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/logging/fluent_builder_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": true,
+    "EstimatedDuration": 300000000000,
+    "PackagePath": "pkg/logging"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestEventLogger_LogSpecLoad",
+      "Package": "logging",
+      "PackagePath": "pkg/logging",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/logging/event_logger_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestEventLogger_LogSpecValidation",
+      "Package": "logging",
+      "PackagePath": "pkg/logging",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/logging/event_logger_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestEventLogger_LogCheckResult",
+      "Package": "logging",
+      "PackagePath": "pkg/logging",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/logging/event_logger_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestEventLogger_LogObjectCheck",
+      "Package": "logging",
+      "PackagePath": "pkg/logging",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/logging/event_logger_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestEventLogger_LogFileOperation",
+      "Package": "logging",
+      "PackagePath": "pkg/logging",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/logging/event_logger_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestEventLogger_LogHashOperation",
+      "Package": "logging",
+      "PackagePath": "pkg/logging",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/logging/event_logger_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestEventLogger_WithObjectRef",
+      "Package": "logging",
+      "PackagePath": "pkg/logging",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/logging/event_logger_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestNewEventLogger",
+      "Package": "logging",
+      "PackagePath": "pkg/logging",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/logging/event_logger_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestFluentWarnChainsFields",
+      "Package": "logging",
+      "PackagePath": "pkg/logging",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/logging/fluent_builder_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestFluentCommonFieldHelpers",
+      "Package": "logging",
+      "PackagePath": "pkg/logging",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/logging/fluent_builder_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

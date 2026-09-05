@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-144",
+  "created_at": "2026-09-04T21:34:28.746343Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-144",
+    "Tests": [
+      {
+        "Name": "TestHasBlockingReferenceIssues",
+        "Package": "validation",
+        "PackagePath": "pkg/validation",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/validation/async_validator_cache_reference_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAsyncValidator_Stop_NoDeadlock",
+        "Package": "validation",
+        "PackagePath": "pkg/validation",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/validation/async_validator_deadlock_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAsyncValidator_ProgressChannel_NoDeadlock",
+        "Package": "validation",
+        "PackagePath": "pkg/validation",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/validation/async_validator_deadlock_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAsyncValidator_ConcurrentOperations_NoDeadlock",
+        "Package": "validation",
+        "PackagePath": "pkg/validation",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/validation/async_validator_deadlock_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAsyncValidator_Stop_WithActiveWorkers_NoDeadlock",
+        "Package": "validation",
+        "PackagePath": "pkg/validation",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/validation/async_validator_deadlock_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAsyncValidator_MultipleStopCalls_NoDeadlock",
+        "Package": "validation",
+        "PackagePath": "pkg/validation",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/validation/async_validator_deadlock_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAsyncValidator_ProgressChannelClose_NoDeadlock",
+        "Package": "validation",
+        "PackagePath": "pkg/validation",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/validation/async_validator_deadlock_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestReadValidationInput_StreamLocation",
+        "Package": "validation",
+        "PackagePath": "pkg/validation",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/validation/async_validator_worker_stream_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestReadLiveCASBlobFromIndex",
+        "Package": "validation",
+        "PackagePath": "pkg/validation",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/validation/cas_live_index_read_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestConstantsInternalMessages_NonEmpty",
+        "Package": "validation",
+        "PackagePath": "pkg/validation",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/validation/constants_internal_messages_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 300000000000,
+    "PackagePath": "pkg/validation"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestHasBlockingReferenceIssues",
+      "Package": "validation",
+      "PackagePath": "pkg/validation",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/validation/async_validator_cache_reference_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestAsyncValidator_Stop_NoDeadlock",
+      "Package": "validation",
+      "PackagePath": "pkg/validation",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/validation/async_validator_deadlock_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestAsyncValidator_ProgressChannel_NoDeadlock",
+      "Package": "validation",
+      "PackagePath": "pkg/validation",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/validation/async_validator_deadlock_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestAsyncValidator_ConcurrentOperations_NoDeadlock",
+      "Package": "validation",
+      "PackagePath": "pkg/validation",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/validation/async_validator_deadlock_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestAsyncValidator_Stop_WithActiveWorkers_NoDeadlock",
+      "Package": "validation",
+      "PackagePath": "pkg/validation",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/validation/async_validator_deadlock_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestAsyncValidator_MultipleStopCalls_NoDeadlock",
+      "Package": "validation",
+      "PackagePath": "pkg/validation",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/validation/async_validator_deadlock_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestAsyncValidator_ProgressChannelClose_NoDeadlock",
+      "Package": "validation",
+      "PackagePath": "pkg/validation",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/validation/async_validator_deadlock_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestReadValidationInput_StreamLocation",
+      "Package": "validation",
+      "PackagePath": "pkg/validation",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/validation/async_validator_worker_stream_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestReadLiveCASBlobFromIndex",
+      "Package": "validation",
+      "PackagePath": "pkg/validation",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/validation/cas_live_index_read_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestConstantsInternalMessages_NonEmpty",
+      "Package": "validation",
+      "PackagePath": "pkg/validation",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/validation/constants_internal_messages_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

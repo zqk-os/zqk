@@ -1,0 +1,14 @@
+created_at: "2026-08-20T04:44:47Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1787201085826459000-2a6e50a3
+item_id: CRIT-CEF-R8L-ARCH-01
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 2857702ca28e4b64fb5782140b43c1400e68fdeab30ab0062f4119523ca97d466e5f13c72adcfa41b92eacf21fa7f0a79b8a8e3a8d7c581e5c9afe0e69cb31dc
+schema_version: 2.0.0
+signature: 30460221008a8ac6396632ca7e31952d32827751117de8ba5c8053efb55f7e3d3ac22f3a6d02210081e29419dcbaae4445b8f73f47b4b48236165aaedcf39de7d1558ff7d9eb24eb
+status: archived
+title: 'AGENT_L F-ARCH-01: Zero pkg imports from cmd layer'
+updated_at: "2026-09-01T07:21:36Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

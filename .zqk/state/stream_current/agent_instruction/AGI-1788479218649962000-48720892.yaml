@@ -1,0 +1,14 @@
+created_at: "2026-09-03T23:46:58Z"
+created_by: ACC-1785920548450214006-2e52b3e7
+id: AGI-1788479218649962000-48720892
+instruction: DEPRECATED for mega waves. Use PIP-CEF-DIAMOND-REMEASURE-001 + AGI-1788480855200082000-e5fe493d (stage executor). Mint one ATK per stage per seat; max ~2 interactions; description embeds stage.config steps + success_gate.
+kind: agent_instruction
+namespace_id: zqk:kernel
+persona_id: orch-primary
+plan_id: PRI-CEF-R27-ENVELOPE-001
+schema_version: 2.0.0
+status: approved
+title: CEF wave executor — mintable ATK recipe (per seat × wave)
+updated_at: "2026-09-04T00:18:30Z"
+updated_by: ACC-1785920548450214006-2e52b3e7
+version_context: default

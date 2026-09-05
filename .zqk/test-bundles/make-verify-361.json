@@ -1,0 +1,141 @@
+{
+  "name": "make-verify-361",
+  "created_at": "2026-09-04T21:34:30.941605Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-361",
+    "Tests": [
+      {
+        "Name": "TestFlagCollisions",
+        "Package": "app",
+        "PackagePath": "cmd/zqk-community/app",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk-community/app/flag_collision_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestCommandFlagPermutations",
+        "Package": "app",
+        "PackagePath": "cmd/zqk-community/app",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk-community/app/flag_permutation_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestJoinCommand_Registration",
+        "Package": "app",
+        "PackagePath": "cmd/zqk-community/app",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk-community/app/join_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestObjectCreateDeleteFlow_UpdatesValidationCache",
+        "Package": "app_test",
+        "PackagePath": "cmd/zqk-community/app",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk-community/app/root_object_flow_integration_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestSystemCheckAutoFix_E2E",
+        "Package": "app_test",
+        "PackagePath": "cmd/zqk-community/app",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk-community/app/root_object_flow_integration_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestValidationTriggerBatch_FlushOnSize",
+        "Package": "app",
+        "PackagePath": "cmd/zqk-community/app",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk-community/app/validation_trigger_batch_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestValidationTriggerBatch_NoTriggerWhenEmptyProjectRoot",
+        "Package": "app",
+        "PackagePath": "cmd/zqk-community/app",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk-community/app/validation_trigger_batch_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 210000000000,
+    "PackagePath": "cmd/zqk-community/app"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestFlagCollisions",
+      "Package": "app",
+      "PackagePath": "cmd/zqk-community/app",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk-community/app/flag_collision_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestCommandFlagPermutations",
+      "Package": "app",
+      "PackagePath": "cmd/zqk-community/app",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk-community/app/flag_permutation_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestJoinCommand_Registration",
+      "Package": "app",
+      "PackagePath": "cmd/zqk-community/app",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk-community/app/join_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestObjectCreateDeleteFlow_UpdatesValidationCache",
+      "Package": "app_test",
+      "PackagePath": "cmd/zqk-community/app",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk-community/app/root_object_flow_integration_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestSystemCheckAutoFix_E2E",
+      "Package": "app_test",
+      "PackagePath": "cmd/zqk-community/app",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk-community/app/root_object_flow_integration_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestValidationTriggerBatch_FlushOnSize",
+      "Package": "app",
+      "PackagePath": "cmd/zqk-community/app",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk-community/app/validation_trigger_batch_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestValidationTriggerBatch_NoTriggerWhenEmptyProjectRoot",
+      "Package": "app",
+      "PackagePath": "cmd/zqk-community/app",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk-community/app/validation_trigger_batch_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

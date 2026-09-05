@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-313",
+  "created_at": "2026-09-04T21:34:30.495891Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-313",
+    "Tests": [
+      {
+        "Name": "TestDispatcher_Start",
+        "Package": "swarm_test",
+        "PackagePath": "pkg/swarm",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/swarm/dispatcher_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestDispatcher_QueueClosed",
+        "Package": "swarm_test",
+        "PackagePath": "pkg/swarm",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/swarm/dispatcher_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestEngine_resolvedSessionID_contextThenEnv",
+        "Package": "swarm",
+        "PackagePath": "pkg/swarm",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/swarm/engine_identity_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestEngine_Run",
+        "Package": "swarm",
+        "PackagePath": "pkg/swarm",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/swarm/engine_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestEngine_RequiredToolCallRejectsNarrativeOnlyCompletion",
+        "Package": "swarm",
+        "PackagePath": "pkg/swarm",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/swarm/engine_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestEngine_RequiredToolCallAllowsCompletionAfterExecution",
+        "Package": "swarm",
+        "PackagePath": "pkg/swarm",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/swarm/engine_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestEngine_RequiredMutationToolRejectsStatusOnlyEvidence",
+        "Package": "swarm",
+        "PackagePath": "pkg/swarm",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/swarm/engine_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestEngine_RequiredMutationToolSecondNudgeAllowsWrite",
+        "Package": "swarm",
+        "PackagePath": "pkg/swarm",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/swarm/engine_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestEngine_RequiredMutationToolAllowsWriteFileEvidence",
+        "Package": "swarm",
+        "PackagePath": "pkg/swarm",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/swarm/engine_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestEngine_CompletionVerifierReplaysFeedbackThenAccepts",
+        "Package": "swarm",
+        "PackagePath": "pkg/swarm",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/swarm/engine_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 300000000000,
+    "PackagePath": "pkg/swarm"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestDispatcher_Start",
+      "Package": "swarm_test",
+      "PackagePath": "pkg/swarm",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/swarm/dispatcher_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestDispatcher_QueueClosed",
+      "Package": "swarm_test",
+      "PackagePath": "pkg/swarm",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/swarm/dispatcher_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestEngine_resolvedSessionID_contextThenEnv",
+      "Package": "swarm",
+      "PackagePath": "pkg/swarm",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/swarm/engine_identity_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestEngine_Run",
+      "Package": "swarm",
+      "PackagePath": "pkg/swarm",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/swarm/engine_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestEngine_RequiredToolCallRejectsNarrativeOnlyCompletion",
+      "Package": "swarm",
+      "PackagePath": "pkg/swarm",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/swarm/engine_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestEngine_RequiredToolCallAllowsCompletionAfterExecution",
+      "Package": "swarm",
+      "PackagePath": "pkg/swarm",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/swarm/engine_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestEngine_RequiredMutationToolRejectsStatusOnlyEvidence",
+      "Package": "swarm",
+      "PackagePath": "pkg/swarm",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/swarm/engine_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestEngine_RequiredMutationToolSecondNudgeAllowsWrite",
+      "Package": "swarm",
+      "PackagePath": "pkg/swarm",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/swarm/engine_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestEngine_RequiredMutationToolAllowsWriteFileEvidence",
+      "Package": "swarm",
+      "PackagePath": "pkg/swarm",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/swarm/engine_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestEngine_CompletionVerifierReplaysFeedbackThenAccepts",
+      "Package": "swarm",
+      "PackagePath": "pkg/swarm",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/swarm/engine_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

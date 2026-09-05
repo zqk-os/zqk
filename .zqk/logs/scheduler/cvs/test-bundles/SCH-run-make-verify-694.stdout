@@ -1,0 +1,130 @@
+
+--- run 2026-09-04T22:19:39Z ---
+=== RUN   TestCheckOutputFormats
+=== PAUSE TestCheckOutputFormats
+=== RUN   TestCheckTieredIssueReporting
+=== PAUSE TestCheckTieredIssueReporting
+=== RUN   TestCheckAutoFix
+=== PAUSE TestCheckAutoFix
+=== RUN   TestCheckAutoFix_HashMismatchRequiresForce
+=== PAUSE TestCheckAutoFix_HashMismatchRequiresForce
+=== RUN   TestCheckCommandScenarios
+=== PAUSE TestCheckCommandScenarios
+=== RUN   TestCheckAuditEventCreation
+=== PAUSE TestCheckAuditEventCreation
+=== RUN   TestReproduceAutoFixableIssue
+=== PAUSE TestReproduceAutoFixableIssue
+=== RUN   TestIdentifyNonDeterminableScenarios
+=== PAUSE TestIdentifyNonDeterminableScenarios
+=== RUN   TestGenerateFixCommand
+=== PAUSE TestGenerateFixCommand
+=== RUN   TestBuildQueryHint
+=== PAUSE TestBuildQueryHint
+=== CONT  TestCheckOutputFormats
+=== RUN   TestCheckOutputFormats/JSON_output
+=== CONT  TestCheckAuditEventCreation
+=== RUN   TestCheckOutputFormats/YAML_output
+--- PASS: TestCheckOutputFormats (0.03s)
+    --- PASS: TestCheckOutputFormats/JSON_output (0.02s)
+    --- PASS: TestCheckOutputFormats/YAML_output (0.01s)
+=== CONT  TestCheckAutoFix_HashMismatchRequiresForce
+--- PASS: TestCheckAuditEventCreation (0.33s)
+=== CONT  TestCheckCommandScenarios
+=== NAME  TestCheckAutoFix_HashMismatchRequiresForce
+    check_impl_test.go:783: Hash mismatch fix with --force did not apply (storage/CAS path may require full env)
+--- SKIP: TestCheckAutoFix_HashMismatchRequiresForce (0.38s)
+=== CONT  TestGenerateFixCommand
+=== RUN   TestGenerateFixCommand/milestone_refs_precondition_with_context
+=== RUN   TestGenerateFixCommand/milestone_refs_precondition_minimal_context
+=== RUN   TestGenerateFixCommand/priority_plan_ref_precondition
+=== RUN   TestGenerateFixCommand/workstream_refs_precondition
+=== RUN   TestGenerateFixCommand/goal_refs_precondition
+=== RUN   TestGenerateFixCommand/required_field_violation
+=== RUN   TestGenerateFixCommand/non-lifecycle_error_returns_empty
+=== RUN   TestGenerateFixCommand/empty_objID_returns_empty
+=== RUN   TestGenerateFixCommand/tags_as_string_array
+=== RUN   TestGenerateFixCommand/tags_as_interface_array
+=== RUN   TestGenerateFixCommand/full_context_all_fields
+--- PASS: TestGenerateFixCommand (0.00s)
+    --- PASS: TestGenerateFixCommand/milestone_refs_precondition_with_context (0.00s)
+    --- PASS: TestGenerateFixCommand/milestone_refs_precondition_minimal_context (0.00s)
+    --- PASS: TestGenerateFixCommand/priority_plan_ref_precondition (0.00s)
+    --- PASS: TestGenerateFixCommand/workstream_refs_precondition (0.00s)
+    --- PASS: TestGenerateFixCommand/goal_refs_precondition (0.00s)
+    --- PASS: TestGenerateFixCommand/required_field_violation (0.00s)
+    --- PASS: TestGenerateFixCommand/non-lifecycle_error_returns_empty (0.00s)
+    --- PASS: TestGenerateFixCommand/empty_objID_returns_empty (0.00s)
+    --- PASS: TestGenerateFixCommand/tags_as_string_array (0.00s)
+    --- PASS: TestGenerateFixCommand/tags_as_interface_array (0.00s)
+    --- PASS: TestGenerateFixCommand/full_context_all_fields (0.00s)
+=== CONT  TestBuildQueryHint
+=== RUN   TestBuildQueryHint/all_fields_present
+=== RUN   TestBuildQueryHint/priority_plan_uses_active_status
+=== RUN   TestBuildQueryHint/only_category
+=== RUN   TestBuildQueryHint/only_tags
+=== RUN   TestBuildQueryHint/only_status
+=== RUN   TestBuildQueryHint/only_title
+=== RUN   TestBuildQueryHint/empty_context
+=== RUN   TestBuildQueryHint/multiple_tags
+=== RUN   TestBuildQueryHint/category_and_status
+--- PASS: TestBuildQueryHint (0.00s)
+    --- PASS: TestBuildQueryHint/all_fields_present (0.00s)
+    --- PASS: TestBuildQueryHint/priority_plan_uses_active_status (0.00s)
+    --- PASS: TestBuildQueryHint/only_category (0.00s)
+    --- PASS: TestBuildQueryHint/only_tags (0.00s)
+    --- PASS: TestBuildQueryHint/only_status (0.00s)
+    --- PASS: TestBuildQueryHint/only_title (0.00s)
+    --- PASS: TestBuildQueryHint/empty_context (0.00s)
+    --- PASS: TestBuildQueryHint/multiple_tags (0.00s)
+    --- PASS: TestBuildQueryHint/category_and_status (0.00s)
+=== CONT  TestIdentifyNonDeterminableScenarios
+=== RUN   TestIdentifyNonDeterminableScenarios/empty_objID
+    check_instance_validation_helpers_reproduce_test.go:207: Scenario: empty_objID
+    check_instance_validation_helpers_reproduce_test.go:208: Condition: objID == ""
+    check_instance_validation_helpers_reproduce_test.go:209: Early Exit: true
+    check_instance_validation_helpers_reproduce_test.go:210: Description: Cannot generate command without object ID - fast path return
+=== RUN   TestIdentifyNonDeterminableScenarios/wrong_rule_type
+    check_instance_validation_helpers_reproduce_test.go:207: Scenario: wrong_rule_type
+    check_instance_validation_helpers_reproduce_test.go:208: Condition: rule != "lifecycle"
+    check_instance_validation_helpers_reproduce_test.go:209: Early Exit: false
+    check_instance_validation_helpers_reproduce_test.go:210: Description: Rule must be 'lifecycle' for lifecycle violations - skipped in lifecycle block
+=== RUN   TestIdentifyNonDeterminableScenarios/missing_precondition_marker
+    check_instance_validation_helpers_reproduce_test.go:207: Scenario: missing_precondition_marker
+    check_instance_validation_helpers_reproduce_test.go:208: Condition: !strings.Contains(message, "Precondition not met")
+    check_instance_validation_helpers_reproduce_test.go:209: Early Exit: false
+    check_instance_validation_helpers_reproduce_test.go:210: Description: Message must contain 'Precondition not met' marker - skipped in lifecycle block
+=== RUN   TestIdentifyNonDeterminableScenarios/unknown_precondition_pattern
+    check_instance_validation_helpers_reproduce_test.go:207: Scenario: unknown_precondition_pattern
+    check_instance_validation_helpers_reproduce_test.go:208: Condition: Pattern not matched by any known precondition
+    check_instance_validation_helpers_reproduce_test.go:209: Early Exit: false
+    check_instance_validation_helpers_reproduce_test.go:210: Description: Unknown precondition patterns cannot be auto-fixed - returns empty string
+--- PASS: TestIdentifyNonDeterminableScenarios (0.00s)
+    --- PASS: TestIdentifyNonDeterminableScenarios/empty_objID (0.00s)
+    --- PASS: TestIdentifyNonDeterminableScenarios/wrong_rule_type (0.00s)
+    --- PASS: TestIdentifyNonDeterminableScenarios/missing_precondition_marker (0.00s)
+    --- PASS: TestIdentifyNonDeterminableScenarios/unknown_precondition_pattern (0.00s)
+=== CONT  TestCheckAutoFix
+=== RUN   TestCheckCommandScenarios/Kind-based_check
+--- PASS: TestCheckAutoFix (0.26s)
+=== CONT  TestCheckTieredIssueReporting
+--- PASS: TestCheckTieredIssueReporting (0.01s)
+=== CONT  TestReproduceAutoFixableIssue
+=== RUN   TestReproduceAutoFixableIssue/lifecycle_priority_plan_ref_violation_-_PRODUCTION_SCENARIO
+=== RUN   TestReproduceAutoFixableIssue/lifecycle_milestone_refs_violation_-_PRODUCTION_SCENARIO
+=== RUN   TestReproduceAutoFixableIssue/empty_objID_-_non-determinable
+=== RUN   TestReproduceAutoFixableIssue/wrong_rule_type_-_generates_generic_required_field_command
+=== RUN   TestReproduceAutoFixableIssue/missing_precondition_marker_-_non-determinable
+=== RUN   TestReproduceAutoFixableIssue/unknown_precondition_pattern_-_non-determinable
+--- PASS: TestReproduceAutoFixableIssue (0.00s)
+    --- PASS: TestReproduceAutoFixableIssue/lifecycle_priority_plan_ref_violation_-_PRODUCTION_SCENARIO (0.00s)
+    --- PASS: TestReproduceAutoFixableIssue/lifecycle_milestone_refs_violation_-_PRODUCTION_SCENARIO (0.00s)
+    --- PASS: TestReproduceAutoFixableIssue/empty_objID_-_non-determinable (0.00s)
+    --- PASS: TestReproduceAutoFixableIssue/wrong_rule_type_-_generates_generic_required_field_command (0.00s)
+    --- PASS: TestReproduceAutoFixableIssue/missing_precondition_marker_-_non-determinable (0.00s)
+    --- PASS: TestReproduceAutoFixableIssue/unknown_precondition_pattern_-_non-determinable (0.00s)
+=== RUN   TestCheckCommandScenarios/Single_object_check
+--- PASS: TestCheckCommandScenarios (0.52s)
+    --- PASS: TestCheckCommandScenarios/Kind-based_check (0.33s)
+    --- PASS: TestCheckCommandScenarios/Single_object_check (0.00s)
+PASS
+ok  	github.com/lanceman/zqk/cmd/zqk/system	1.703s

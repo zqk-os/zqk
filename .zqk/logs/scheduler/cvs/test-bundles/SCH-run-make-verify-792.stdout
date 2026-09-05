@@ -1,0 +1,70 @@
+
+--- run 2026-09-04T22:22:12Z ---
+=== RUN   TestSpecLoader_MissingParent
+=== PAUSE TestSpecLoader_MissingParent
+=== RUN   TestNormalizeSpecsDirIfProjectRoot
+=== PAUSE TestNormalizeSpecsDirIfProjectRoot
+=== RUN   TestNewSpecLoader_projectRootUsesFileSpecStorage
+=== PAUSE TestNewSpecLoader_projectRootUsesFileSpecStorage
+=== RUN   TestSpecLoader_ValidateDependencyGraph
+=== PAUSE TestSpecLoader_ValidateDependencyGraph
+=== RUN   TestSpecLoader_GetLoadOrder
+=== PAUSE TestSpecLoader_GetLoadOrder
+=== RUN   TestNewFileSpecStorageProvider_ReadSpecBytes
+=== PAUSE TestNewFileSpecStorageProvider_ReadSpecBytes
+=== RUN   TestFileSpecStorageProvider_ReadOutsideRootRejected
+=== PAUSE TestFileSpecStorageProvider_ReadOutsideRootRejected
+=== RUN   TestFileSpecStorageProvider_ContextCancelled
+=== PAUSE TestFileSpecStorageProvider_ContextCancelled
+=== RUN   TestSpecValidator_DisplayLength_ListableFields
+=== PAUSE TestSpecValidator_DisplayLength_ListableFields
+=== RUN   TestSpecValidator_FieldChecklistCompleteness
+=== PAUSE TestSpecValidator_FieldChecklistCompleteness
+=== CONT  TestSpecLoader_MissingParent
+=== CONT  TestNewFileSpecStorageProvider_ReadSpecBytes
+--- PASS: TestSpecLoader_MissingParent (0.00s)
+=== CONT  TestSpecLoader_ValidateDependencyGraph
+--- PASS: TestNewFileSpecStorageProvider_ReadSpecBytes (0.01s)
+=== CONT  TestSpecLoader_GetLoadOrder
+--- PASS: TestSpecLoader_ValidateDependencyGraph (0.04s)
+=== CONT  TestNewSpecLoader_projectRootUsesFileSpecStorage
+--- PASS: TestNewSpecLoader_projectRootUsesFileSpecStorage (0.01s)
+=== CONT  TestNormalizeSpecsDirIfProjectRoot
+--- PASS: TestNormalizeSpecsDirIfProjectRoot (0.01s)
+=== CONT  TestSpecValidator_DisplayLength_ListableFields
+=== RUN   TestSpecValidator_DisplayLength_ListableFields/listable_field_with_display_length_passes
+=== RUN   TestSpecValidator_DisplayLength_ListableFields/listable_field_without_display_length_fails
+=== RUN   TestSpecValidator_DisplayLength_ListableFields/listable_field_with_invalid_display_length_type_fails
+=== RUN   TestSpecValidator_DisplayLength_ListableFields/listable_field_with_zero_display_length_fails
+=== RUN   TestSpecValidator_DisplayLength_ListableFields/listable_field_with_negative_display_length_fails
+=== RUN   TestSpecValidator_DisplayLength_ListableFields/non-listable_field_without_display_length_passes
+=== RUN   TestSpecValidator_DisplayLength_ListableFields/filterable_field_with_display_length_passes
+=== RUN   TestSpecValidator_DisplayLength_ListableFields/filterable_field_without_display_length_fails
+=== RUN   TestSpecValidator_DisplayLength_ListableFields/sortable_field_with_display_length_passes
+=== RUN   TestSpecValidator_DisplayLength_ListableFields/sortable_field_without_display_length_fails
+=== RUN   TestSpecValidator_DisplayLength_ListableFields/field_with_multiple_display_traits_(listable_and_filterable)_with_display_length_passes
+=== RUN   TestSpecValidator_DisplayLength_ListableFields/listable_field_with_float64_display_length_passes
+--- PASS: TestSpecValidator_DisplayLength_ListableFields (0.09s)
+    --- PASS: TestSpecValidator_DisplayLength_ListableFields/listable_field_with_display_length_passes (0.01s)
+    --- PASS: TestSpecValidator_DisplayLength_ListableFields/listable_field_without_display_length_fails (0.01s)
+    --- PASS: TestSpecValidator_DisplayLength_ListableFields/listable_field_with_invalid_display_length_type_fails (0.01s)
+    --- PASS: TestSpecValidator_DisplayLength_ListableFields/listable_field_with_zero_display_length_fails (0.01s)
+    --- PASS: TestSpecValidator_DisplayLength_ListableFields/listable_field_with_negative_display_length_fails (0.01s)
+    --- PASS: TestSpecValidator_DisplayLength_ListableFields/non-listable_field_without_display_length_passes (0.01s)
+    --- PASS: TestSpecValidator_DisplayLength_ListableFields/filterable_field_with_display_length_passes (0.01s)
+    --- PASS: TestSpecValidator_DisplayLength_ListableFields/filterable_field_without_display_length_fails (0.01s)
+    --- PASS: TestSpecValidator_DisplayLength_ListableFields/sortable_field_with_display_length_passes (0.01s)
+    --- PASS: TestSpecValidator_DisplayLength_ListableFields/sortable_field_without_display_length_fails (0.01s)
+    --- PASS: TestSpecValidator_DisplayLength_ListableFields/field_with_multiple_display_traits_(listable_and_filterable)_with_display_length_passes (0.01s)
+    --- PASS: TestSpecValidator_DisplayLength_ListableFields/listable_field_with_float64_display_length_passes (0.01s)
+=== CONT  TestSpecValidator_FieldChecklistCompleteness
+=== RUN   TestSpecValidator_FieldChecklistCompleteness/account_spec_validation_finds_missing_items
+--- PASS: TestSpecValidator_FieldChecklistCompleteness (0.01s)
+    --- PASS: TestSpecValidator_FieldChecklistCompleteness/account_spec_validation_finds_missing_items (0.01s)
+=== CONT  TestFileSpecStorageProvider_ContextCancelled
+--- PASS: TestFileSpecStorageProvider_ContextCancelled (0.00s)
+=== CONT  TestFileSpecStorageProvider_ReadOutsideRootRejected
+--- PASS: TestFileSpecStorageProvider_ReadOutsideRootRejected (0.00s)
+--- PASS: TestSpecLoader_GetLoadOrder (0.16s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/objects	0.752s

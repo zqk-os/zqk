@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-25",
+  "created_at": "2026-09-04T21:34:27.682707Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-25",
+    "Tests": [
+      {
+        "Name": "TestWriteReadCompressedSnapshot",
+        "Package": "storage",
+        "PackagePath": "pkg/storage",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/compressed_snapshot_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestCompressedSnapshot_NestedObjects",
+        "Package": "storage",
+        "PackagePath": "pkg/storage",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/compressed_snapshot_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestContentAddressableStorage_ComprehensiveOperations",
+        "Package": "storage",
+        "PackagePath": "pkg/storage",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/content_addressable_storage_comprehensive_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestContentAddressableStorage_Create_ReadImmediate",
+        "Package": "storage",
+        "PackagePath": "pkg/storage",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/content_addressable_storage_consistency_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestContentAddressableStorage_GetFilePathForID",
+        "Package": "storage",
+        "PackagePath": "pkg/storage",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/content_addressable_storage_integration_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestContentAddressableStorage_ListIDs",
+        "Package": "storage",
+        "PackagePath": "pkg/storage",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/content_addressable_storage_integration_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestContentAddressableStorage_GetAllMappings",
+        "Package": "storage",
+        "PackagePath": "pkg/storage",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/content_addressable_storage_integration_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestContentAddressableStorage_Read_ReadDirTimeout",
+        "Package": "storage",
+        "PackagePath": "pkg/storage",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/content_addressable_storage_readdir_timeout_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestContentAddressableStorage_Simple",
+        "Package": "storage",
+        "PackagePath": "pkg/storage",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/content_addressable_storage_simple_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestIDIndex_OldestIDs",
+        "Package": "storage",
+        "PackagePath": "pkg/storage",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/content_addressable_storage_simple_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 900000000000,
+    "PackagePath": "pkg/storage"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestWriteReadCompressedSnapshot",
+      "Package": "storage",
+      "PackagePath": "pkg/storage",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/compressed_snapshot_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestCompressedSnapshot_NestedObjects",
+      "Package": "storage",
+      "PackagePath": "pkg/storage",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/compressed_snapshot_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestContentAddressableStorage_ComprehensiveOperations",
+      "Package": "storage",
+      "PackagePath": "pkg/storage",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/content_addressable_storage_comprehensive_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestContentAddressableStorage_Create_ReadImmediate",
+      "Package": "storage",
+      "PackagePath": "pkg/storage",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/content_addressable_storage_consistency_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestContentAddressableStorage_GetFilePathForID",
+      "Package": "storage",
+      "PackagePath": "pkg/storage",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/content_addressable_storage_integration_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestContentAddressableStorage_ListIDs",
+      "Package": "storage",
+      "PackagePath": "pkg/storage",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/content_addressable_storage_integration_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestContentAddressableStorage_GetAllMappings",
+      "Package": "storage",
+      "PackagePath": "pkg/storage",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/content_addressable_storage_integration_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestContentAddressableStorage_Read_ReadDirTimeout",
+      "Package": "storage",
+      "PackagePath": "pkg/storage",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/content_addressable_storage_readdir_timeout_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestContentAddressableStorage_Simple",
+      "Package": "storage",
+      "PackagePath": "pkg/storage",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/content_addressable_storage_simple_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestIDIndex_OldestIDs",
+      "Package": "storage",
+      "PackagePath": "pkg/storage",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/content_addressable_storage_simple_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    }
+  }
+}

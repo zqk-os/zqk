@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-317",
+  "created_at": "2026-09-04T21:34:30.527721Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-317",
+    "Tests": [
+      {
+        "Name": "TestInMemoryTaskQueue_DequeueEmpty",
+        "Package": "swarm_test",
+        "PackagePath": "pkg/swarm",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/swarm/task_queue_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestInMemoryTaskQueue_Close",
+        "Package": "swarm_test",
+        "PackagePath": "pkg/swarm",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/swarm/task_queue_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestInMemoryTaskQueue_EnqueueClosed",
+        "Package": "swarm_test",
+        "PackagePath": "pkg/swarm",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/swarm/task_queue_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestInMemoryTaskQueue_DoubleClose",
+        "Package": "swarm_test",
+        "PackagePath": "pkg/swarm",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/swarm/task_queue_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestInMemoryTaskQueue_ConcurrencyStress",
+        "Package": "swarm_test",
+        "PackagePath": "pkg/swarm",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/swarm/task_queue_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestTokenTracker_EstimateTokens",
+        "Package": "swarm",
+        "PackagePath": "pkg/swarm",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/swarm/token_tracker_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestTokenTracker_CompactHistory",
+        "Package": "swarm",
+        "PackagePath": "pkg/swarm",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/swarm/token_tracker_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestTokenTracker_FitUserPrompt",
+        "Package": "swarm",
+        "PackagePath": "pkg/swarm",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/swarm/token_tracker_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestTokenTracker_FitUserPrompt_TooSmall",
+        "Package": "swarm",
+        "PackagePath": "pkg/swarm",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/swarm/token_tracker_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestEngine_toolChoiceRequiredAfterMarkdownRecovery",
+        "Package": "swarm",
+        "PackagePath": "pkg/swarm",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/swarm/tool_choice_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 300000000000,
+    "PackagePath": "pkg/swarm"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestInMemoryTaskQueue_DequeueEmpty",
+      "Package": "swarm_test",
+      "PackagePath": "pkg/swarm",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/swarm/task_queue_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestInMemoryTaskQueue_Close",
+      "Package": "swarm_test",
+      "PackagePath": "pkg/swarm",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/swarm/task_queue_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestInMemoryTaskQueue_EnqueueClosed",
+      "Package": "swarm_test",
+      "PackagePath": "pkg/swarm",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/swarm/task_queue_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestInMemoryTaskQueue_DoubleClose",
+      "Package": "swarm_test",
+      "PackagePath": "pkg/swarm",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/swarm/task_queue_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestInMemoryTaskQueue_ConcurrencyStress",
+      "Package": "swarm_test",
+      "PackagePath": "pkg/swarm",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/swarm/task_queue_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestTokenTracker_EstimateTokens",
+      "Package": "swarm",
+      "PackagePath": "pkg/swarm",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/swarm/token_tracker_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestTokenTracker_CompactHistory",
+      "Package": "swarm",
+      "PackagePath": "pkg/swarm",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/swarm/token_tracker_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestTokenTracker_FitUserPrompt",
+      "Package": "swarm",
+      "PackagePath": "pkg/swarm",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/swarm/token_tracker_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestTokenTracker_FitUserPrompt_TooSmall",
+      "Package": "swarm",
+      "PackagePath": "pkg/swarm",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/swarm/token_tracker_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestEngine_toolChoiceRequiredAfterMarkdownRecovery",
+      "Package": "swarm",
+      "PackagePath": "pkg/swarm",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/swarm/tool_choice_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

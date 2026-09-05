@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-195",
+  "created_at": "2026-09-04T21:34:29.304966Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-195",
+    "Tests": [
+      {
+        "Name": "TestCAS_CascadeDelete_NoDependents",
+        "Package": "cas_test",
+        "PackagePath": "pkg/storage/cas",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/cas/cas_cascade_delete_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestCAS_CheckCommandOutput",
+        "Package": "cas_test",
+        "PackagePath": "pkg/storage/cas",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/cas/cas_check_output_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestCAS_CheckCommandDistinguishesCAS",
+        "Package": "cas_test",
+        "PackagePath": "pkg/storage/cas",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/cas/cas_check_output_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestCAS_CLI_Operations",
+        "Package": "cas_test",
+        "PackagePath": "pkg/storage/cas",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/cas/cas_cli_operations_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestCAS_ComponentLevel_Update",
+        "Package": "cas_test",
+        "PackagePath": "pkg/storage/cas",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/cas/cas_cli_operations_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestCAS_ComponentLevel_Delete",
+        "Package": "cas_test",
+        "PackagePath": "pkg/storage/cas",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/cas/cas_cli_operations_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestCAS_ComponentLevel_Move",
+        "Package": "cas_test",
+        "PackagePath": "pkg/storage/cas",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/cas/cas_cli_operations_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestCAS_MixedCASAndNonCAS",
+        "Package": "cas_test",
+        "PackagePath": "pkg/storage/cas",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/cas/cas_comprehensive_validation_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestCAS_ListIncludesBothCASAndIDBased",
+        "Package": "cas_test",
+        "PackagePath": "pkg/storage/cas",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/cas/cas_comprehensive_validation_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestRepairCASHFilenameMismatch_NoOpWhenFilenameMatchesContent",
+        "Package": "cas_test",
+        "PackagePath": "pkg/storage/cas",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/cas/cas_corruption_repair_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 900000000000,
+    "PackagePath": "pkg/storage/cas"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestCAS_CascadeDelete_NoDependents",
+      "Package": "cas_test",
+      "PackagePath": "pkg/storage/cas",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/cas/cas_cascade_delete_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestCAS_CheckCommandOutput",
+      "Package": "cas_test",
+      "PackagePath": "pkg/storage/cas",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/cas/cas_check_output_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestCAS_CheckCommandDistinguishesCAS",
+      "Package": "cas_test",
+      "PackagePath": "pkg/storage/cas",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/cas/cas_check_output_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestCAS_CLI_Operations",
+      "Package": "cas_test",
+      "PackagePath": "pkg/storage/cas",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/cas/cas_cli_operations_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestCAS_ComponentLevel_Update",
+      "Package": "cas_test",
+      "PackagePath": "pkg/storage/cas",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/cas/cas_cli_operations_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestCAS_ComponentLevel_Delete",
+      "Package": "cas_test",
+      "PackagePath": "pkg/storage/cas",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/cas/cas_cli_operations_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestCAS_ComponentLevel_Move",
+      "Package": "cas_test",
+      "PackagePath": "pkg/storage/cas",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/cas/cas_cli_operations_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestCAS_MixedCASAndNonCAS",
+      "Package": "cas_test",
+      "PackagePath": "pkg/storage/cas",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/cas/cas_comprehensive_validation_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestCAS_ListIncludesBothCASAndIDBased",
+      "Package": "cas_test",
+      "PackagePath": "pkg/storage/cas",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/cas/cas_comprehensive_validation_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestRepairCASHFilenameMismatch_NoOpWhenFilenameMatchesContent",
+      "Package": "cas_test",
+      "PackagePath": "pkg/storage/cas",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/cas/cas_corruption_repair_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    }
+  }
+}

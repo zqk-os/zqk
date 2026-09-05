@@ -1,0 +1,14 @@
+created_at: "2026-08-19T02:27:02Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1787106422348971000-d02b6fde
+item_id: PRI-KERNEL-COHERENCE-RESIDUAL-REHOME-001
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 2857702ca28e4b64fb5782140b43c1400e68fdeab30ab0062f4119523ca97d466e5f13c72adcfa41b92eacf21fa7f0a79b8a8e3a8d7c581e5c9afe0e69cb31dc
+schema_version: 2.0.0
+signature: 3046022100c2433b77d74fde8c2e9bbaed356c5e13276d2059b960ffa04e29a2af37e03549022100ee0bcb3dd013d346187d5de174e57b5c8b8ff9898940c24947a50d21a6448621
+status: archived
+title: Kernel coherence residual — rehomed from stuck prioritizing CAP74
+updated_at: "2026-09-01T07:48:46Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

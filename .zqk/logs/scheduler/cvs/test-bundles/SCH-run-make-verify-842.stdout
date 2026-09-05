@@ -1,0 +1,24 @@
+
+--- run 2026-09-04T22:22:36Z ---
+=== RUN   TestTransportEnforcer_StandardRisk
+=== PAUSE TestTransportEnforcer_StandardRisk
+=== RUN   TestTransportEnforcer_HighRiskBlocked
+=== PAUSE TestTransportEnforcer_HighRiskBlocked
+=== RUN   TestTransportEnforcer_NilEnvelope
+=== PAUSE TestTransportEnforcer_NilEnvelope
+=== RUN   TestFastPathEvaluator
+=== PAUSE TestFastPathEvaluator
+=== RUN   TestSkillSigningEvaluator_UnsignedBlocked
+=== PAUSE TestSkillSigningEvaluator_UnsignedBlocked
+=== CONT  TestTransportEnforcer_StandardRisk
+--- PASS: TestTransportEnforcer_StandardRisk (0.00s)
+=== CONT  TestSkillSigningEvaluator_UnsignedBlocked
+--- PASS: TestSkillSigningEvaluator_UnsignedBlocked (0.00s)
+=== CONT  TestFastPathEvaluator
+--- PASS: TestFastPathEvaluator (0.00s)
+=== CONT  TestTransportEnforcer_NilEnvelope
+--- PASS: TestTransportEnforcer_NilEnvelope (0.00s)
+=== CONT  TestTransportEnforcer_HighRiskBlocked
+--- PASS: TestTransportEnforcer_HighRiskBlocked (0.00s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/tde	0.330s

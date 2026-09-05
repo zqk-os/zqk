@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-483",
+  "created_at": "2026-09-04T21:34:32.158364Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-483",
+    "Tests": [
+      {
+        "Name": "TestMustRecreateTestBundleJob",
+        "Package": "testjobgen",
+        "PackagePath": "pkg/testjobgen",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/testjobgen/bundle_jobs_recreate_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestJobGenerator_BuildTestArgs_SchedulerPackageUsesParallel1",
+        "Package": "testjobgen",
+        "PackagePath": "pkg/testjobgen",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/testjobgen/bundle_jobs_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestJobGenerator_BuildTestArgs",
+        "Package": "testjobgen",
+        "PackagePath": "pkg/testjobgen",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/testjobgen/bundle_jobs_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestJobGenerator_GenerateJobs",
+        "Package": "testjobgen",
+        "PackagePath": "pkg/testjobgen",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/testjobgen/bundle_jobs_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestJobGenerator_GenerateJobs_RecreatesTerminalArchivedJob",
+        "Package": "testjobgen",
+        "PackagePath": "pkg/testjobgen",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/testjobgen/bundle_jobs_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestJobGenerator_GenerateJobs_BundleWithCriteriaRefs_SetsPriorityHigh",
+        "Package": "testjobgen",
+        "PackagePath": "pkg/testjobgen",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/testjobgen/bundle_jobs_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestJobGenerator_GenerateJobs_updatesBundleCommandFingerprintOnReschedule",
+        "Package": "testjobgen",
+        "PackagePath": "pkg/testjobgen",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/testjobgen/bundle_jobs_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestScanAndSchedule",
+        "Package": "testjobgen",
+        "PackagePath": "pkg/testjobgen",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/testjobgen/bundle_jobs_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestContaminationGuardPath",
+        "Package": "testjobgen",
+        "PackagePath": "pkg/testjobgen",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/testjobgen/contamination_guard_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestBuildTestArgsWrapsWithContaminationGuard",
+        "Package": "testjobgen",
+        "PackagePath": "pkg/testjobgen",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/testjobgen/contamination_guard_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 300000000000,
+    "PackagePath": "pkg/testjobgen"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestMustRecreateTestBundleJob",
+      "Package": "testjobgen",
+      "PackagePath": "pkg/testjobgen",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/testjobgen/bundle_jobs_recreate_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestJobGenerator_BuildTestArgs_SchedulerPackageUsesParallel1",
+      "Package": "testjobgen",
+      "PackagePath": "pkg/testjobgen",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/testjobgen/bundle_jobs_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestJobGenerator_BuildTestArgs",
+      "Package": "testjobgen",
+      "PackagePath": "pkg/testjobgen",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/testjobgen/bundle_jobs_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestJobGenerator_GenerateJobs",
+      "Package": "testjobgen",
+      "PackagePath": "pkg/testjobgen",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/testjobgen/bundle_jobs_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestJobGenerator_GenerateJobs_RecreatesTerminalArchivedJob",
+      "Package": "testjobgen",
+      "PackagePath": "pkg/testjobgen",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/testjobgen/bundle_jobs_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestJobGenerator_GenerateJobs_BundleWithCriteriaRefs_SetsPriorityHigh",
+      "Package": "testjobgen",
+      "PackagePath": "pkg/testjobgen",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/testjobgen/bundle_jobs_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestJobGenerator_GenerateJobs_updatesBundleCommandFingerprintOnReschedule",
+      "Package": "testjobgen",
+      "PackagePath": "pkg/testjobgen",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/testjobgen/bundle_jobs_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestScanAndSchedule",
+      "Package": "testjobgen",
+      "PackagePath": "pkg/testjobgen",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/testjobgen/bundle_jobs_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestContaminationGuardPath",
+      "Package": "testjobgen",
+      "PackagePath": "pkg/testjobgen",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/testjobgen/contamination_guard_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestBuildTestArgsWrapsWithContaminationGuard",
+      "Package": "testjobgen",
+      "PackagePath": "pkg/testjobgen",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/testjobgen/contamination_guard_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

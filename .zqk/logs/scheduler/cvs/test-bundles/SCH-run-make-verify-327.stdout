@@ -1,0 +1,44 @@
+
+--- run 2026-09-04T22:11:38Z ---
+=== RUN   TestScenarioLoader_MissingFile
+=== PAUSE TestScenarioLoader_MissingFile
+=== RUN   TestScenarioLoader_EmptyFile
+=== PAUSE TestScenarioLoader_EmptyFile
+=== RUN   TestScenarioLoader_MissingImportFile
+=== PAUSE TestScenarioLoader_MissingImportFile
+=== RUN   TestScenarioLoader_CircularImport
+=== PAUSE TestScenarioLoader_CircularImport
+=== RUN   TestScenarioLoader_NestedImports
+=== PAUSE TestScenarioLoader_NestedImports
+=== RUN   TestScenarioLoader_EmptyScenario
+=== PAUSE TestScenarioLoader_EmptyScenario
+=== RUN   TestScenarioLoader_DuplicateImports
+=== PAUSE TestScenarioLoader_DuplicateImports
+=== RUN   TestExecutor_RegexMatching
+=== PAUSE TestExecutor_RegexMatching
+=== RUN   TestExecutor_RegexMatching_Fail
+=== PAUSE TestExecutor_RegexMatching_Fail
+=== RUN   TestExecutor_ErrorValidation
+=== PAUSE TestExecutor_ErrorValidation
+=== CONT  TestScenarioLoader_MissingFile
+=== CONT  TestScenarioLoader_EmptyScenario
+--- PASS: TestScenarioLoader_MissingFile (0.00s)
+=== CONT  TestExecutor_RegexMatching_Fail
+--- PASS: TestExecutor_RegexMatching_Fail (0.00s)
+=== CONT  TestExecutor_ErrorValidation
+--- PASS: TestExecutor_ErrorValidation (0.00s)
+=== CONT  TestExecutor_RegexMatching
+--- PASS: TestExecutor_RegexMatching (0.00s)
+=== CONT  TestScenarioLoader_DuplicateImports
+--- PASS: TestScenarioLoader_EmptyScenario (0.01s)
+=== CONT  TestScenarioLoader_CircularImport
+--- PASS: TestScenarioLoader_DuplicateImports (0.01s)
+=== CONT  TestScenarioLoader_NestedImports
+--- PASS: TestScenarioLoader_CircularImport (0.01s)
+=== CONT  TestScenarioLoader_MissingImportFile
+--- PASS: TestScenarioLoader_MissingImportFile (0.01s)
+=== CONT  TestScenarioLoader_EmptyFile
+--- PASS: TestScenarioLoader_NestedImports (0.01s)
+--- PASS: TestScenarioLoader_EmptyFile (0.00s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/mcp/testing	0.689s

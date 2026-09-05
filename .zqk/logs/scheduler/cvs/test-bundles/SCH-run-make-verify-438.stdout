@@ -1,0 +1,24 @@
+
+--- run 2026-09-04T22:13:17Z ---
+=== RUN   TestValidateReferences
+=== PAUSE TestValidateReferences
+=== RUN   TestValidateRequiredFields
+=== PAUSE TestValidateRequiredFields
+=== RUN   TestDetectOrphans
+=== PAUSE TestDetectOrphans
+=== RUN   TestValidateEdgeTypes
+=== PAUSE TestValidateEdgeTypes
+=== RUN   TestCheckDuplicateIDs
+=== PAUSE TestCheckDuplicateIDs
+=== CONT  TestValidateReferences
+--- PASS: TestValidateReferences (0.00s)
+=== CONT  TestDetectOrphans
+--- PASS: TestDetectOrphans (0.00s)
+=== CONT  TestValidateRequiredFields
+--- PASS: TestValidateRequiredFields (0.00s)
+=== CONT  TestCheckDuplicateIDs
+=== CONT  TestValidateEdgeTypes
+--- PASS: TestCheckDuplicateIDs (0.00s)
+--- PASS: TestValidateEdgeTypes (0.00s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/migration/validator	0.313s

@@ -1,0 +1,14 @@
+created_at: "2026-08-19T06:58:34Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1787122711197502000-9d7e2590
+item_id: REDACTED
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 2857702ca28e4b64fb5782140b43c1400e68fdeab30ab0062f4119523ca97d466e5f13c72adcfa41b92eacf21fa7f0a79b8a8e3a8d7c581e5c9afe0e69cb31dc
+schema_version: 2.0.0
+signature: 304402203ac1b9b65f89bd1dba1aa1afe75287c4da7597cb76b9927b58275fd129f63e3502200c3ae5c1e0b655866b9f997e2eac0efbf856b9f486218ace7c1cae1cc9b04e2f
+status: archived
+title: Ambient orchestration authz/policy guardrails enforceable
+updated_at: "2026-09-01T07:19:49Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

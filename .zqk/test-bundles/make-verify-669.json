@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-669",
+  "created_at": "2026-09-04T21:34:33.993101Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-669",
+    "Tests": [
+      {
+        "Name": "TestIntegrityCheck_FileMovedAndContentModified",
+        "Package": "system",
+        "PackagePath": "cmd/zqk/system",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/system/integrity_check_file_movement_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestIntegrityCheck_FileMovedViaCLI",
+        "Package": "system",
+        "PackagePath": "cmd/zqk/system",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/system/integrity_check_file_movement_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestIntegrityCheck_MultipleFilesMoved",
+        "Package": "system",
+        "PackagePath": "cmd/zqk/system",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/system/integrity_check_file_movement_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestIntegrityCheck_ForceFixPersistence",
+        "Package": "system",
+        "PackagePath": "cmd/zqk/system",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/system/integrity_check_force_persistence_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestIntegrityCheck_ForceFixFailureDetection",
+        "Package": "system",
+        "PackagePath": "cmd/zqk/system",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/system/integrity_check_force_persistence_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestIntegrityCheck_FileAgeEscalation",
+        "Package": "system",
+        "PackagePath": "cmd/zqk/system",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/system/integrity_check_patterns_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestIntegrityCheck_ModificationPatterns",
+        "Package": "system",
+        "PackagePath": "cmd/zqk/system",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/system/integrity_check_patterns_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestIntegrityCheck_RecoveryOrder",
+        "Package": "system",
+        "PackagePath": "cmd/zqk/system",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/system/integrity_check_patterns_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestIntegrityCheck_ConcurrentModifications",
+        "Package": "system",
+        "PackagePath": "cmd/zqk/system",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/system/integrity_check_scenarios_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestIntegrityCheck_ErrorScenarios",
+        "Package": "system",
+        "PackagePath": "cmd/zqk/system",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/system/integrity_check_scenarios_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 300000000000,
+    "PackagePath": "cmd/zqk/system"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestIntegrityCheck_FileMovedAndContentModified",
+      "Package": "system",
+      "PackagePath": "cmd/zqk/system",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/system/integrity_check_file_movement_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestIntegrityCheck_FileMovedViaCLI",
+      "Package": "system",
+      "PackagePath": "cmd/zqk/system",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/system/integrity_check_file_movement_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestIntegrityCheck_MultipleFilesMoved",
+      "Package": "system",
+      "PackagePath": "cmd/zqk/system",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/system/integrity_check_file_movement_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestIntegrityCheck_ForceFixPersistence",
+      "Package": "system",
+      "PackagePath": "cmd/zqk/system",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/system/integrity_check_force_persistence_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestIntegrityCheck_ForceFixFailureDetection",
+      "Package": "system",
+      "PackagePath": "cmd/zqk/system",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/system/integrity_check_force_persistence_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestIntegrityCheck_FileAgeEscalation",
+      "Package": "system",
+      "PackagePath": "cmd/zqk/system",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/system/integrity_check_patterns_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestIntegrityCheck_ModificationPatterns",
+      "Package": "system",
+      "PackagePath": "cmd/zqk/system",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/system/integrity_check_patterns_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestIntegrityCheck_RecoveryOrder",
+      "Package": "system",
+      "PackagePath": "cmd/zqk/system",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/system/integrity_check_patterns_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestIntegrityCheck_ConcurrentModifications",
+      "Package": "system",
+      "PackagePath": "cmd/zqk/system",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/system/integrity_check_scenarios_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestIntegrityCheck_ErrorScenarios",
+      "Package": "system",
+      "PackagePath": "cmd/zqk/system",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/system/integrity_check_scenarios_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

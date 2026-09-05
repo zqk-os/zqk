@@ -1,0 +1,28 @@
+
+--- run 2026-09-04T21:41:14Z ---
+=== RUN   TestFormatBlockingErrors
+=== PAUSE TestFormatBlockingErrors
+=== RUN   TestDefaultValidationTimeoutConfig
+=== PAUSE TestDefaultValidationTimeoutConfig
+=== RUN   TestLoadValidationTimeoutConfig_FromFile
+=== PAUSE TestLoadValidationTimeoutConfig_FromFile
+=== RUN   TestLoadValidationTimeoutConfig_EmptyOverridesDoNotMergeLegacy
+=== PAUSE TestLoadValidationTimeoutConfig_EmptyOverridesDoNotMergeLegacy
+=== RUN   TestValidationTimeoutForKind_UsesConfig
+=== PAUSE TestValidationTimeoutForKind_UsesConfig
+=== RUN   TestValidationTimeoutConfig_StuckTimeout
+=== PAUSE TestValidationTimeoutConfig_StuckTimeout
+=== CONT  TestFormatBlockingErrors
+=== CONT  TestLoadValidationTimeoutConfig_EmptyOverridesDoNotMergeLegacy
+--- PASS: TestFormatBlockingErrors (0.00s)
+=== CONT  TestValidationTimeoutConfig_StuckTimeout
+--- PASS: TestValidationTimeoutConfig_StuckTimeout (0.00s)
+=== CONT  TestValidationTimeoutForKind_UsesConfig
+--- PASS: TestValidationTimeoutForKind_UsesConfig (0.00s)
+=== CONT  TestLoadValidationTimeoutConfig_FromFile
+--- PASS: TestLoadValidationTimeoutConfig_FromFile (0.01s)
+=== CONT  TestDefaultValidationTimeoutConfig
+--- PASS: TestDefaultValidationTimeoutConfig (0.00s)
+--- PASS: TestLoadValidationTimeoutConfig_EmptyOverridesDoNotMergeLegacy (0.01s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/validation	0.638s

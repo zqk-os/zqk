@@ -1,0 +1,21 @@
+created_at: "2026-09-04T23:07:30Z"
+created_by: ACC-1785920548450214006-2e52b3e7
+description: |
+    Grooming column for remesure after PRI-CEF-R28-REMEDIATE-001 lands residuals.
+    Parent CVS-CEF-UNTIL-45-001. Do not stuff sealed R28 — remesure lives here until R28 ship-exit.
+    Envelope floor 4.0; target 4.5; moonshot 5.0. Path-honest dual-seat (QWEN1/QWEN2).
+id: PRI-CEF-R29-REMEASURE-001
+kind: priority_plan
+namespace_id: zqk:kernel
+persona_refs:
+    - PER-ORCH-ALPHA
+    - PER-ORCH-BETA
+schema_version: 2.0.0
+shaped: true
+status: grooming
+title: CEF R29 — dual-seat remesure after R28 remediation (envelope floor 4)
+updated_at: "2026-09-05T00:45:10Z"
+updated_by: ACC-1785920548450214006-2e52b3e7
+version_context: default
+workstream_refs:
+    - WS-CEF-ARCHITECTURE

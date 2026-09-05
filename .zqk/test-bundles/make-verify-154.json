@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-154",
+  "created_at": "2026-09-04T21:34:28.846574Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-154",
+    "Tests": [
+      {
+        "Name": "TestMCPServerStdioGetCurrentBacklogItem",
+        "Package": "mcp",
+        "PackagePath": "pkg/mcp",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/mcp_server_stdio_integration_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestConfiguredMCPServerStdio",
+        "Package": "mcp",
+        "PackagePath": "pkg/mcp",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/mcp_server_stdio_integration_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestConfiguredMCPServerStdioDiagnostics",
+        "Package": "mcp",
+        "PackagePath": "pkg/mcp",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/mcp_server_stdio_integration_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestConfiguredMCPServerStdioObjectList",
+        "Package": "mcp",
+        "PackagePath": "pkg/mcp",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/mcp_server_stdio_integration_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestConfiguredMCPServerStdioObjectListCache",
+        "Package": "mcp",
+        "PackagePath": "pkg/mcp",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/mcp_server_stdio_integration_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestConfiguredMCPServerStdioPrompts",
+        "Package": "mcp",
+        "PackagePath": "pkg/mcp",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/mcp_server_stdio_integration_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestConfiguredMCPServerStdioResourcesAndTools",
+        "Package": "mcp",
+        "PackagePath": "pkg/mcp",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/mcp_server_stdio_integration_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestMCPServerStdioHelpPrompt",
+        "Package": "mcp",
+        "PackagePath": "pkg/mcp",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/mcp_server_stdio_integration_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestMCPServerStdioWelcomePrompt",
+        "Package": "mcp",
+        "PackagePath": "pkg/mcp",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/mcp_server_stdio_integration_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestConfiguredMCPServerStdioUsefulAsClient",
+        "Package": "mcp",
+        "PackagePath": "pkg/mcp",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/mcp_server_stdio_integration_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 300000000000,
+    "PackagePath": "pkg/mcp"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestMCPServerStdioGetCurrentBacklogItem",
+      "Package": "mcp",
+      "PackagePath": "pkg/mcp",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/mcp_server_stdio_integration_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestConfiguredMCPServerStdio",
+      "Package": "mcp",
+      "PackagePath": "pkg/mcp",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/mcp_server_stdio_integration_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestConfiguredMCPServerStdioDiagnostics",
+      "Package": "mcp",
+      "PackagePath": "pkg/mcp",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/mcp_server_stdio_integration_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestConfiguredMCPServerStdioObjectList",
+      "Package": "mcp",
+      "PackagePath": "pkg/mcp",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/mcp_server_stdio_integration_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestConfiguredMCPServerStdioObjectListCache",
+      "Package": "mcp",
+      "PackagePath": "pkg/mcp",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/mcp_server_stdio_integration_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestConfiguredMCPServerStdioPrompts",
+      "Package": "mcp",
+      "PackagePath": "pkg/mcp",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/mcp_server_stdio_integration_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestConfiguredMCPServerStdioResourcesAndTools",
+      "Package": "mcp",
+      "PackagePath": "pkg/mcp",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/mcp_server_stdio_integration_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestMCPServerStdioHelpPrompt",
+      "Package": "mcp",
+      "PackagePath": "pkg/mcp",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/mcp_server_stdio_integration_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestMCPServerStdioWelcomePrompt",
+      "Package": "mcp",
+      "PackagePath": "pkg/mcp",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/mcp_server_stdio_integration_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestConfiguredMCPServerStdioUsefulAsClient",
+      "Package": "mcp",
+      "PackagePath": "pkg/mcp",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/mcp_server_stdio_integration_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

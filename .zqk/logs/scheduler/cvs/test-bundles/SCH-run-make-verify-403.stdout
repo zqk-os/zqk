@@ -1,0 +1,55 @@
+
+--- run 2026-09-04T22:12:32Z ---
+=== RUN   TestCollectFilesByKind
+=== PAUSE TestCollectFilesByKind
+=== RUN   TestCollectInternalFiles
+=== PAUSE TestCollectInternalFiles
+=== RUN   TestFixHashesWithKindFlag
+=== PAUSE TestFixHashesWithKindFlag
+=== RUN   TestGetPrefixFromID
+=== PAUSE TestGetPrefixFromID
+=== RUN   TestEnsurePrefixForKind
+=== PAUSE TestEnsurePrefixForKind
+=== RUN   TestHandleLoadDataFile_EmitsEvents
+=== PAUSE TestHandleLoadDataFile_EmitsEvents
+=== RUN   TestHandleLoadDataFile_EmitsErrorOnFileNotFound
+=== PAUSE TestHandleLoadDataFile_EmitsErrorOnFileNotFound
+=== RUN   TestBuildFromDataFile_EmitsEvents
+=== PAUSE TestBuildFromDataFile_EmitsEvents
+=== RUN   TestHandleLoadDataFile_ParsesYAMLArray
+=== PAUSE TestHandleLoadDataFile_ParsesYAMLArray
+=== RUN   TestHandleLoadDataFile_YAMLListFormat
+=== PAUSE TestHandleLoadDataFile_YAMLListFormat
+=== CONT  TestCollectFilesByKind
+=== CONT  TestHandleLoadDataFile_EmitsEvents
+--- PASS: TestCollectFilesByKind (0.05s)
+=== CONT  TestGetPrefixFromID
+=== RUN   TestGetPrefixFromID/ADR-001
+=== RUN   TestGetPrefixFromID/BLI-123
+=== RUN   TestGetPrefixFromID/AUD-456
+=== RUN   TestGetPrefixFromID/NO-DASH
+=== RUN   TestGetPrefixFromID/#00
+--- PASS: TestGetPrefixFromID (0.00s)
+    --- PASS: TestGetPrefixFromID/ADR-001 (0.00s)
+    --- PASS: TestGetPrefixFromID/BLI-123 (0.00s)
+    --- PASS: TestGetPrefixFromID/AUD-456 (0.00s)
+    --- PASS: TestGetPrefixFromID/NO-DASH (0.00s)
+    --- PASS: TestGetPrefixFromID/#00 (0.00s)
+=== CONT  TestEnsurePrefixForKind
+--- PASS: TestEnsurePrefixForKind (0.00s)
+=== CONT  TestHandleLoadDataFile_ParsesYAMLArray
+--- PASS: TestHandleLoadDataFile_ParsesYAMLArray (0.32s)
+=== CONT  TestHandleLoadDataFile_YAMLListFormat
+--- PASS: TestHandleLoadDataFile_EmitsEvents (0.38s)
+=== CONT  TestBuildFromDataFile_EmitsEvents
+--- PASS: TestHandleLoadDataFile_YAMLListFormat (0.31s)
+=== CONT  TestHandleLoadDataFile_EmitsErrorOnFileNotFound
+--- PASS: TestHandleLoadDataFile_EmitsErrorOnFileNotFound (0.29s)
+=== CONT  TestFixHashesWithKindFlag
+    fix_hashes_test.go:112: Requires full CLI context - integration test needed
+--- SKIP: TestFixHashesWithKindFlag (0.00s)
+=== CONT  TestCollectInternalFiles
+--- PASS: TestCollectInternalFiles (0.00s)
+--- PASS: TestBuildFromDataFile_EmitsEvents (1.36s)
+PASS
+ok  	github.com/lanceman/zqk/cmd/zqk/utility	2.506s

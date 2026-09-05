@@ -1,0 +1,78 @@
+
+--- run 2026-09-04T22:22:05Z ---
+=== RUN   TestSpecIndex_storageProfileWireCoverage
+=== PAUSE TestSpecIndex_storageProfileWireCoverage
+=== RUN   TestBuildSpecIndexFromSpecsDirStrict_rejectsInvalidStorageProfile
+=== PAUSE TestBuildSpecIndexFromSpecsDirStrict_rejectsInvalidStorageProfile
+=== RUN   TestSpecLoader_FileMtimeDetection
+=== PAUSE TestSpecLoader_FileMtimeDetection
+=== RUN   TestSpecLoader_InvalidateSpec
+=== PAUSE TestSpecLoader_InvalidateSpec
+=== RUN   TestSpecLoader_InvalidateSpecByFile
+=== PAUSE TestSpecLoader_InvalidateSpecByFile
+=== RUN   TestSpecLoader_SpecCacheRevision
+=== PAUSE TestSpecLoader_SpecCacheRevision
+=== RUN   TestSpecLoader_ConcurrentAccess
+=== PAUSE TestSpecLoader_ConcurrentAccess
+=== RUN   TestSpecLoader_DoubleCheckedLocking
+=== PAUSE TestSpecLoader_DoubleCheckedLocking
+=== RUN   TestSpecLoader_ResolveInheritance
+=== PAUSE TestSpecLoader_ResolveInheritance
+=== RUN   TestSpecLoader_FieldInheritance
+=== PAUSE TestSpecLoader_FieldInheritance
+=== CONT  TestSpecIndex_storageProfileWireCoverage
+=== CONT  TestSpecLoader_SpecCacheRevision
+--- PASS: TestSpecLoader_SpecCacheRevision (0.00s)
+=== CONT  TestSpecLoader_ResolveInheritance
+=== RUN   TestSpecLoader_ResolveInheritance/account_extends_base_object
+=== RUN   TestSpecLoader_ResolveInheritance/base_object_extends_auditable
+=== RUN   TestSpecLoader_ResolveInheritance/auditable_has_no_parent
+=== RUN   TestSpecLoader_ResolveInheritance/extensible_object_extends_base_object
+=== RUN   TestSpecLoader_ResolveInheritance/work_interval_extends_base_object
+=== RUN   TestSpecLoader_ResolveInheritance/work_unit_extends_work_interval
+=== RUN   TestSpecLoader_ResolveInheritance/occupancy_extends_work_interval
+=== RUN   TestSpecLoader_ResolveInheritance/remaining_open_extends_work_interval
+=== RUN   TestSpecLoader_ResolveInheritance/agent_task_extends_work_unit
+=== RUN   TestSpecLoader_ResolveInheritance/backlog_item_extends_work_unit
+=== RUN   TestSpecLoader_ResolveInheritance/roadmap_extends_work_interval
+--- PASS: TestSpecLoader_ResolveInheritance (0.05s)
+    --- PASS: TestSpecLoader_ResolveInheritance/account_extends_base_object (0.00s)
+    --- PASS: TestSpecLoader_ResolveInheritance/base_object_extends_auditable (0.00s)
+    --- PASS: TestSpecLoader_ResolveInheritance/auditable_has_no_parent (0.00s)
+    --- PASS: TestSpecLoader_ResolveInheritance/extensible_object_extends_base_object (0.00s)
+    --- PASS: TestSpecLoader_ResolveInheritance/work_interval_extends_base_object (0.00s)
+    --- PASS: TestSpecLoader_ResolveInheritance/work_unit_extends_work_interval (0.00s)
+    --- PASS: TestSpecLoader_ResolveInheritance/occupancy_extends_work_interval (0.00s)
+    --- PASS: TestSpecLoader_ResolveInheritance/remaining_open_extends_work_interval (0.00s)
+    --- PASS: TestSpecLoader_ResolveInheritance/agent_task_extends_work_unit (0.01s)
+    --- PASS: TestSpecLoader_ResolveInheritance/backlog_item_extends_work_unit (0.01s)
+    --- PASS: TestSpecLoader_ResolveInheritance/roadmap_extends_work_interval (0.00s)
+=== CONT  TestSpecLoader_FieldInheritance
+--- PASS: TestSpecLoader_FieldInheritance (0.00s)
+=== CONT  TestSpecLoader_InvalidateSpec
+--- PASS: TestSpecLoader_InvalidateSpec (0.03s)
+=== CONT  TestSpecLoader_InvalidateSpecByFile
+--- PASS: TestSpecLoader_InvalidateSpecByFile (0.02s)
+=== CONT  TestSpecLoader_DoubleCheckedLocking
+    spec_loader_cache_test.go:370: Expected all specs to be same pointer (double-checked locking), got different pointer at iteration 2
+    spec_loader_cache_test.go:370: Expected all specs to be same pointer (double-checked locking), got different pointer at iteration 3
+    spec_loader_cache_test.go:370: Expected all specs to be same pointer (double-checked locking), got different pointer at iteration 4
+    spec_loader_cache_test.go:370: Expected all specs to be same pointer (double-checked locking), got different pointer at iteration 5
+    spec_loader_cache_test.go:370: Expected all specs to be same pointer (double-checked locking), got different pointer at iteration 6
+    spec_loader_cache_test.go:370: Expected all specs to be same pointer (double-checked locking), got different pointer at iteration 7
+    spec_loader_cache_test.go:370: Expected all specs to be same pointer (double-checked locking), got different pointer at iteration 8
+    spec_loader_cache_test.go:370: Expected all specs to be same pointer (double-checked locking), got different pointer at iteration 9
+    spec_loader_cache_test.go:370: Expected all specs to be same pointer (double-checked locking), got different pointer at iteration 10
+--- FAIL: TestSpecLoader_DoubleCheckedLocking (0.01s)
+=== CONT  TestSpecLoader_FileMtimeDetection
+--- PASS: TestSpecLoader_FileMtimeDetection (0.01s)
+=== CONT  TestSpecLoader_ConcurrentAccess
+--- PASS: TestSpecLoader_ConcurrentAccess (0.02s)
+=== CONT  TestBuildSpecIndexFromSpecsDirStrict_rejectsInvalidStorageProfile
+--- PASS: TestBuildSpecIndexFromSpecsDirStrict_rejectsInvalidStorageProfile (0.01s)
+=== NAME  TestSpecIndex_storageProfileWireCoverage
+    spec_index_storage_profile_coverage_test.go:50: note: no object_spec uses storage_profile light_file yet — profile reserved (runtime organism / low-ceremony kinds)
+--- PASS: TestSpecIndex_storageProfileWireCoverage (0.47s)
+FAIL
+FAIL	github.com/lanceman/zqk/pkg/objects	1.001s
+FAIL

@@ -1,0 +1,2 @@
+=== test Parallel + ZQK_TEST_ROOT guard (in-scope test files) ===
+check_test_parallel_zqk: ok (no scoped Parallel + ZQK_TEST_ROOT setenv / os.Chdir)

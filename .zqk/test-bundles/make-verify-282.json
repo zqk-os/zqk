@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-282",
+  "created_at": "2026-09-04T21:34:30.172316Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-282",
+    "Tests": [
+      {
+        "Name": "TestStewardMaintenanceCoordinator_Enqueue",
+        "Package": "datacell",
+        "PackagePath": "pkg/datacell",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/datacell/enqueue_maintenance_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestStewardMaintenanceCoordinator_nilSafe",
+        "Package": "datacell",
+        "PackagePath": "pkg/datacell",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/datacell/enqueue_maintenance_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestTruncateStewardEnqueueDetail",
+        "Package": "datacell",
+        "PackagePath": "pkg/datacell",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/datacell/enqueue_maintenance_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAllOperationalEnvelopeDiscoveryTokens_nonEmpty",
+        "Package": "datacell",
+        "PackagePath": "pkg/datacell",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/datacell/envelope_token_jobs_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestResolvedSchedulerJobTypesFromDiscoveryTokens_sortedUnique",
+        "Package": "datacell",
+        "PackagePath": "pkg/datacell",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/datacell/envelope_token_jobs_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestEnvelopeDiscoveryTokensMappedOrDocumentationOnly",
+        "Package": "datacell",
+        "PackagePath": "pkg/datacell",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/datacell/envelope_token_jobs_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestResolvedEnvelopeTokenJobEdges_coversBindings",
+        "Package": "datacell",
+        "PackagePath": "pkg/datacell",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/datacell/envelope_token_jobs_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestResolvedSchedulerJobTypesFromTokenEdgesWithPolicy_denyToken",
+        "Package": "datacell",
+        "PackagePath": "pkg/datacell",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/datacell/envelope_token_jobs_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestResolvedSchedulerJobTypesFromTokenEdgesWithPolicy_allowRestrictive",
+        "Package": "datacell",
+        "PackagePath": "pkg/datacell",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/datacell/envelope_token_jobs_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestResolvedSchedulerJobTypesFromTokenEdgesWithPolicy_allowEmptySuppressesAll",
+        "Package": "datacell",
+        "PackagePath": "pkg/datacell",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/datacell/envelope_token_jobs_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": true,
+    "EstimatedDuration": 300000000000,
+    "PackagePath": "pkg/datacell"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestStewardMaintenanceCoordinator_Enqueue",
+      "Package": "datacell",
+      "PackagePath": "pkg/datacell",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/datacell/enqueue_maintenance_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestStewardMaintenanceCoordinator_nilSafe",
+      "Package": "datacell",
+      "PackagePath": "pkg/datacell",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/datacell/enqueue_maintenance_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestTruncateStewardEnqueueDetail",
+      "Package": "datacell",
+      "PackagePath": "pkg/datacell",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/datacell/enqueue_maintenance_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestAllOperationalEnvelopeDiscoveryTokens_nonEmpty",
+      "Package": "datacell",
+      "PackagePath": "pkg/datacell",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/datacell/envelope_token_jobs_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestResolvedSchedulerJobTypesFromDiscoveryTokens_sortedUnique",
+      "Package": "datacell",
+      "PackagePath": "pkg/datacell",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/datacell/envelope_token_jobs_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestEnvelopeDiscoveryTokensMappedOrDocumentationOnly",
+      "Package": "datacell",
+      "PackagePath": "pkg/datacell",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/datacell/envelope_token_jobs_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestResolvedEnvelopeTokenJobEdges_coversBindings",
+      "Package": "datacell",
+      "PackagePath": "pkg/datacell",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/datacell/envelope_token_jobs_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestResolvedSchedulerJobTypesFromTokenEdgesWithPolicy_denyToken",
+      "Package": "datacell",
+      "PackagePath": "pkg/datacell",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/datacell/envelope_token_jobs_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestResolvedSchedulerJobTypesFromTokenEdgesWithPolicy_allowRestrictive",
+      "Package": "datacell",
+      "PackagePath": "pkg/datacell",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/datacell/envelope_token_jobs_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestResolvedSchedulerJobTypesFromTokenEdgesWithPolicy_allowEmptySuppressesAll",
+      "Package": "datacell",
+      "PackagePath": "pkg/datacell",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/datacell/envelope_token_jobs_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

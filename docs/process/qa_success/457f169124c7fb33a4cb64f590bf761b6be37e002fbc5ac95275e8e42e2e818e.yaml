@@ -1,0 +1,14 @@
+created_at: "2026-08-19T01:05:28Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1787101516850655000-a96da3ab
+item_id: CRIT-CEF-R2-OBS-FMT-PRINTF-A
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 2857702ca28e4b64fb5782140b43c1400e68fdeab30ab0062f4119523ca97d466e5f13c72adcfa41b92eacf21fa7f0a79b8a8e3a8d7c581e5c9afe0e69cb31dc
+schema_version: 2.0.0
+signature: 30440220714b15ab74f67af2010bb27282f6dac129e42131c13b5dc240bca800cb8b180d022049d1248060426e96058f4681e45661c482e220e275db9ef9d42482764e6eef5d
+status: archived
+title: 'Accept: Replace fmt.Printf in object daemon with structured logging'
+updated_at: "2026-09-01T07:33:10Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-174",
+  "created_at": "2026-09-04T21:34:29.059347Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-174",
+    "Tests": [
+      {
+        "Name": "TestClientEventContext_LifetimeCounters",
+        "Package": "mcp",
+        "PackagePath": "pkg/mcp",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/message_processor_context_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestNewSpecAccessControlFromObjectsLoader",
+        "Package": "mcp",
+        "PackagePath": "pkg/mcp",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/objects_spec_loader_adapter_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestExtractPrivilegeTags",
+        "Package": "mcp",
+        "PackagePath": "pkg/mcp",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/permission_cache_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestExtractAccessPermissions",
+        "Package": "mcp",
+        "PackagePath": "pkg/mcp",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/permission_cache_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestHasObjectAccessFast",
+        "Package": "mcp",
+        "PackagePath": "pkg/mcp",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/permission_cache_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestHasObjectAccessFast_WildcardAccess",
+        "Package": "mcp",
+        "PackagePath": "pkg/mcp",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/permission_cache_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestHasObjectAccessFast_CacheHit",
+        "Package": "mcp",
+        "PackagePath": "pkg/mcp",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/permission_cache_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestUserActivationDeactivation",
+        "Package": "mcp",
+        "PackagePath": "pkg/mcp",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/permission_cache_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestInvalidateObjectAccess",
+        "Package": "mcp",
+        "PackagePath": "pkg/mcp",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/permission_cache_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestInvalidateUserCache",
+        "Package": "mcp",
+        "PackagePath": "pkg/mcp",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/permission_cache_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": true,
+    "EstimatedDuration": 300000000000,
+    "PackagePath": "pkg/mcp"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestClientEventContext_LifetimeCounters",
+      "Package": "mcp",
+      "PackagePath": "pkg/mcp",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/message_processor_context_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestNewSpecAccessControlFromObjectsLoader",
+      "Package": "mcp",
+      "PackagePath": "pkg/mcp",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/objects_spec_loader_adapter_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestExtractPrivilegeTags",
+      "Package": "mcp",
+      "PackagePath": "pkg/mcp",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/permission_cache_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestExtractAccessPermissions",
+      "Package": "mcp",
+      "PackagePath": "pkg/mcp",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/permission_cache_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestHasObjectAccessFast",
+      "Package": "mcp",
+      "PackagePath": "pkg/mcp",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/permission_cache_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestHasObjectAccessFast_WildcardAccess",
+      "Package": "mcp",
+      "PackagePath": "pkg/mcp",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/permission_cache_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestHasObjectAccessFast_CacheHit",
+      "Package": "mcp",
+      "PackagePath": "pkg/mcp",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/permission_cache_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestUserActivationDeactivation",
+      "Package": "mcp",
+      "PackagePath": "pkg/mcp",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/permission_cache_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestInvalidateObjectAccess",
+      "Package": "mcp",
+      "PackagePath": "pkg/mcp",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/permission_cache_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestInvalidateUserCache",
+      "Package": "mcp",
+      "PackagePath": "pkg/mcp",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/permission_cache_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

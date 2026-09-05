@@ -1,0 +1,27 @@
+assignee_persona_ref: PER-ORCH-BETA
+backlog_item_ref: BLI-CEF-R27-DUAL-SEAT-REMEASURE-001
+branch_ref: integration/pri-cef-r27-envelope-001
+created_at: "2026-09-03T23:42:07Z"
+created_by: ACC-1785920548450214006-2e52b3e7
+description: |-
+    SOLO CEF Wave 0 for AGENT_AD (antigravity-2).
+    HARD REQUIREMENT: This is a Codebase Evaluation Framework (CEF) v0.1.0 wave ATK, not a checklist.
+    Follow docs/quality/cef-runs/2026-09-03-KICKOFF-AGENT_AD.md + CONSTITUTION/DIAMOND_SCALE/OPERATOR/WAVE_PLAN/DIAGRAM_CONTRACT/HANDOFF_SCHEMA + per-lens rubrics/prompts (specialist THEN adversarial).
+    output_home=docs/quality/cef-runs/2026-09-03-AGENT_AD freeze SHA=c5f525fcc4163142e7978da9dd80e2fb09759718.
+    REQUIRED package pieces as they apply to this wave must land under output_home only. Findings must validate against schemas/finding.schema.json; scorecard only at Wave 4 against schemas/scorecard.schema.json.
+    Score ONLY diamond axes RDB MNT TST REL OBS RCV SEC ROB — never invent axes, never GPA, never docs/reports/dual-seat.
+    Do NOT mint process/backlog objects. Do NOT modify application source. Do NOT read AGENT_AC package until Wave 4 complete.
+    Evidence E0-E3; accepted findings E3 (or E2 with waive in run_log.md). Append commands/skips/waives to run_log.md every wave.
+    Wave 0 lenses: L-PREFLIGHT. REQUIRED now: run_scope.yaml (exact kickoff freeze), preflight.json, tooling_gaps.md (start), run_log.md, draft diagrams/**.
+    Gate: languages detected; include/exclude frozen; tools listed. Ack + notify TPM; do not start Wave 1 until TPM steers the Wave 1 ATK.
+id: ATK-1788478927976935000-1bddad6e
+kind: agent_task
+namespace_id: zqk:kernel
+priority_plan_ref: PRI-CEF-R27-ENVELOPE-001
+schema_version: 2.0.0
+started_at: "2026-09-03T23:42:13Z"
+status: archived
+title: CEF R27 AGENT_AD Wave 0 L-PREFLIGHT
+updated_at: "2026-09-04T03:57:05Z"
+updated_by: ACC-1785920548450214006-2e52b3e7
+version_context: default

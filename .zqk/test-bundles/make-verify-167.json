@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-167",
+  "created_at": "2026-09-04T21:34:28.983755Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-167",
+    "Tests": [
+      {
+        "Name": "TestPrivilegeFiltering_AdminRole",
+        "Package": "mcp",
+        "PackagePath": "pkg/mcp",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/cli_bridge_privilege_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestPrivilegeFiltering_RoleRequirements",
+        "Package": "mcp",
+        "PackagePath": "pkg/mcp",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/cli_bridge_privilege_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestPrivilegeFiltering_WildcardPermissions",
+        "Package": "mcp",
+        "PackagePath": "pkg/mcp",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/cli_bridge_privilege_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestPrivilegeFiltering_NoPermissions",
+        "Package": "mcp",
+        "PackagePath": "pkg/mcp",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/cli_bridge_privilege_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestMCPToolRegistration_PrivilegeFiltering",
+        "Package": "mcp",
+        "PackagePath": "pkg/mcp",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/cli_bridge_privilege_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestMCPToolRegistration_AdminSeesAll",
+        "Package": "mcp",
+        "PackagePath": "pkg/mcp",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/cli_bridge_privilege_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestDiscoverCLICommands",
+        "Package": "mcp",
+        "PackagePath": "pkg/mcp",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/cli_bridge_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestFilterCommandsByPermissions",
+        "Package": "mcp",
+        "PackagePath": "pkg/mcp",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/cli_bridge_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestConvertCommandToMCPTool",
+        "Package": "mcp",
+        "PackagePath": "pkg/mcp",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/cli_bridge_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestInitializeSecurityContextFromMCP",
+        "Package": "mcp",
+        "PackagePath": "pkg/mcp",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/cli_bridge_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": true,
+    "EstimatedDuration": 300000000000,
+    "PackagePath": "pkg/mcp"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestPrivilegeFiltering_AdminRole",
+      "Package": "mcp",
+      "PackagePath": "pkg/mcp",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/cli_bridge_privilege_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestPrivilegeFiltering_RoleRequirements",
+      "Package": "mcp",
+      "PackagePath": "pkg/mcp",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/cli_bridge_privilege_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestPrivilegeFiltering_WildcardPermissions",
+      "Package": "mcp",
+      "PackagePath": "pkg/mcp",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/cli_bridge_privilege_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestPrivilegeFiltering_NoPermissions",
+      "Package": "mcp",
+      "PackagePath": "pkg/mcp",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/cli_bridge_privilege_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestMCPToolRegistration_PrivilegeFiltering",
+      "Package": "mcp",
+      "PackagePath": "pkg/mcp",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/cli_bridge_privilege_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestMCPToolRegistration_AdminSeesAll",
+      "Package": "mcp",
+      "PackagePath": "pkg/mcp",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/cli_bridge_privilege_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestDiscoverCLICommands",
+      "Package": "mcp",
+      "PackagePath": "pkg/mcp",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/cli_bridge_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestFilterCommandsByPermissions",
+      "Package": "mcp",
+      "PackagePath": "pkg/mcp",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/cli_bridge_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestConvertCommandToMCPTool",
+      "Package": "mcp",
+      "PackagePath": "pkg/mcp",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/cli_bridge_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestInitializeSecurityContextFromMCP",
+      "Package": "mcp",
+      "PackagePath": "pkg/mcp",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/cli_bridge_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

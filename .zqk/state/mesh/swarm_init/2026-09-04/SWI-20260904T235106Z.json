@@ -1,0 +1,28 @@
+{
+  "schema": "zqk_swarm_init_run_v1",
+  "run_id": "SWI-20260904T235106Z",
+  "pipeline_id": "PIP-SWARM-INIT-MMORCH-001",
+  "dry_run": false,
+  "started_at": "2026-09-04T23:51:06Z",
+  "finished_at": "2026-09-04T23:51:12Z",
+  "ok": false,
+  "path": "/Users/lanceettl/zqk-restore-clone/.zqk/state/mesh/swarm_init/2026-09-04/SWI-20260904T235106Z.json",
+  "stages": [
+    {
+      "id": "control_plane",
+      "executor": "control_plane",
+      "status": "fail",
+      "evidence": {
+        "contract_paths_ok": true,
+        "dry_run": false,
+        "feed_health": "healthy",
+        "forbid_refresh_seats": true,
+        "mcp_ensure": "ok",
+        "mcp_subscribers": 1,
+        "mcp_tcp": "127.0.0.1:8443",
+        "night_duty_enabled": true
+      },
+      "error": "SCH-cap-night-duty is enabled; swarm-init will not turn it on and refuses to continue"
+    }
+  ]
+}

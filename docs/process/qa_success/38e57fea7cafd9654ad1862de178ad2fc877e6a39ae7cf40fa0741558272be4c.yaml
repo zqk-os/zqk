@@ -1,0 +1,14 @@
+created_at: "2026-08-19T10:23:42Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1787135016116882000-c07083b5
+item_id: CRIT-COMMUNITY-INSTALL-SH-001
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 2857702ca28e4b64fb5782140b43c1400e68fdeab30ab0062f4119523ca97d466e5f13c72adcfa41b92eacf21fa7f0a79b8a8e3a8d7c581e5c9afe0e69cb31dc
+schema_version: 2.0.0
+signature: 304402200679d5e4efd641ec791968c542828f819072b9994e36c1e66efe1c0a246b630d02200dc2850671764311a8f7cce6b743ccf2e61171fd72a6d61da86ad7bfab43caca
+status: archived
+title: curl | sh installation script multi-arch validation passes
+updated_at: "2026-09-01T07:18:51Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

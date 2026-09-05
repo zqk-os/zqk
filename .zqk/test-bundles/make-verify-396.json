@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-396",
+  "created_at": "2026-09-04T21:34:31.245746Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-396",
+    "Tests": [
+      {
+        "Name": "TestArmCheckin_writesTimerDistinctFromDeadlineFile",
+        "Package": "agentclaim",
+        "PackagePath": "pkg/agentclaim",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentclaim/checkin_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestArmCheckin_zeroCadenceFallsBackToDefault",
+        "Package": "agentclaim",
+        "PackagePath": "pkg/agentclaim",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentclaim/checkin_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestRenewCheckin_extendsWindowAndClearsMisses",
+        "Package": "agentclaim",
+        "PackagePath": "pkg/agentclaim",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentclaim/checkin_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestRenewCheckin_absentTimerIsNotAnError",
+        "Package": "agentclaim",
+        "PackagePath": "pkg/agentclaim",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentclaim/checkin_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestRearm_backsOffAndCaps",
+        "Package": "agentclaim",
+        "PackagePath": "pkg/agentclaim",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentclaim/checkin_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestClearCheckin_removesTimerAndIsIdempotent",
+        "Package": "agentclaim",
+        "PackagePath": "pkg/agentclaim",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentclaim/checkin_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestExpired_unparseableDeadlineCountsAsExpired",
+        "Package": "agentclaim",
+        "PackagePath": "pkg/agentclaim",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentclaim/checkin_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestLoadCheckinFile_corruptJSONReportsError",
+        "Package": "agentclaim",
+        "PackagePath": "pkg/agentclaim",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentclaim/checkin_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestCheckinTimer_wireShapeMatchesWatcher",
+        "Package": "agentclaim",
+        "PackagePath": "pkg/agentclaim",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentclaim/checkin_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestTryClaim_ContentionAndIdempotent",
+        "Package": "agentclaim",
+        "PackagePath": "pkg/agentclaim",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentclaim/claim_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": true,
+    "EstimatedDuration": 300000000000,
+    "PackagePath": "pkg/agentclaim"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestArmCheckin_writesTimerDistinctFromDeadlineFile",
+      "Package": "agentclaim",
+      "PackagePath": "pkg/agentclaim",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentclaim/checkin_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestArmCheckin_zeroCadenceFallsBackToDefault",
+      "Package": "agentclaim",
+      "PackagePath": "pkg/agentclaim",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentclaim/checkin_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestRenewCheckin_extendsWindowAndClearsMisses",
+      "Package": "agentclaim",
+      "PackagePath": "pkg/agentclaim",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentclaim/checkin_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestRenewCheckin_absentTimerIsNotAnError",
+      "Package": "agentclaim",
+      "PackagePath": "pkg/agentclaim",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentclaim/checkin_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestRearm_backsOffAndCaps",
+      "Package": "agentclaim",
+      "PackagePath": "pkg/agentclaim",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentclaim/checkin_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestClearCheckin_removesTimerAndIsIdempotent",
+      "Package": "agentclaim",
+      "PackagePath": "pkg/agentclaim",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentclaim/checkin_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestExpired_unparseableDeadlineCountsAsExpired",
+      "Package": "agentclaim",
+      "PackagePath": "pkg/agentclaim",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentclaim/checkin_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestLoadCheckinFile_corruptJSONReportsError",
+      "Package": "agentclaim",
+      "PackagePath": "pkg/agentclaim",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentclaim/checkin_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestCheckinTimer_wireShapeMatchesWatcher",
+      "Package": "agentclaim",
+      "PackagePath": "pkg/agentclaim",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentclaim/checkin_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestTryClaim_ContentionAndIdempotent",
+      "Package": "agentclaim",
+      "PackagePath": "pkg/agentclaim",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentclaim/claim_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

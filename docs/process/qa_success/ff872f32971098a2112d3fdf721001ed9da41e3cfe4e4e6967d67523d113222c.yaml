@@ -1,0 +1,14 @@
+created_at: "2026-09-03T05:19:34Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1788412774487081000-fcabfed2
+item_id: CRIT-CEF-NO-HARDCODED-SLEEP-001
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 86b8ab3d574c004a61020b73c23f52b9055049e90c3d755c8bbb383e059e384028fdd8cd69e13123b644e5f3f7eb65596e73e2d57d719ea3dafcb01b84ce8dfb
+schema_version: 2.0.0
+signature: 304402201e2079942ff1d520342db682a54591471f48fac8b2e12c98c2f392338c714d3c022023bbb334b597b36f7619a26ccad4331c8731ce0ac2e08b316eda6ebbf23ef7fd
+status: success
+title: QA success for CRIT-CEF-NO-HARDCODED-SLEEP-001
+updated_at: "2026-09-03T05:19:34Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

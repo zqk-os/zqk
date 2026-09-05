@@ -1,0 +1,69 @@
+{
+  "name": "make-verify-757",
+  "created_at": "2026-09-04T21:34:34.83047Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-757",
+    "Tests": [
+      {
+        "Name": "TestOutputEquivalence",
+        "Package": "adapters",
+        "PackagePath": "pkg/specbuilder/adapters",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/specbuilder/adapters/output_equivalence_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAdapterIntegration",
+        "Package": "adapters",
+        "PackagePath": "pkg/specbuilder/adapters",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/specbuilder/adapters/output_equivalence_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAdapterValidation",
+        "Package": "adapters",
+        "PackagePath": "pkg/specbuilder/adapters",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/specbuilder/adapters/output_equivalence_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": true,
+    "EstimatedDuration": 90000000000,
+    "PackagePath": "pkg/specbuilder/adapters"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestOutputEquivalence",
+      "Package": "adapters",
+      "PackagePath": "pkg/specbuilder/adapters",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/specbuilder/adapters/output_equivalence_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestAdapterIntegration",
+      "Package": "adapters",
+      "PackagePath": "pkg/specbuilder/adapters",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/specbuilder/adapters/output_equivalence_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestAdapterValidation",
+      "Package": "adapters",
+      "PackagePath": "pkg/specbuilder/adapters",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/specbuilder/adapters/output_equivalence_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

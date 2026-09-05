@@ -1,0 +1,70 @@
+
+--- run 2026-09-04T22:19:44Z ---
+=== RUN   TestConvertValidationResultsToIssues
+=== PAUSE TestConvertValidationResultsToIssues
+=== RUN   TestExtractFileStorage_UnwrapsBatchingRouting
+=== PAUSE TestExtractFileStorage_UnwrapsBatchingRouting
+=== RUN   TestCheckIntegrity_ReusesCASUnderBatchedProvider
+=== PAUSE TestCheckIntegrity_ReusesCASUnderBatchedProvider
+=== RUN   TestObjectIDCache_EntriesForID
+=== PAUSE TestObjectIDCache_EntriesForID
+=== RUN   TestReportSystemCheckCallback_CompleteUsesWallDuration
+=== PAUSE TestReportSystemCheckCallback_CompleteUsesWallDuration
+=== RUN   TestReportSystemCheckCallback_ErrorSkipsComplete
+=== PAUSE TestReportSystemCheckCallback_ErrorSkipsComplete
+=== RUN   TestReportSystemCheckCallback_NilCallback
+=== PAUSE TestReportSystemCheckCallback_NilCallback
+=== RUN   TestPreliminaryCASIssue
+=== PAUSE TestPreliminaryCASIssue
+=== RUN   TestOutputJSONL
+=== PAUSE TestOutputJSONL
+=== RUN   TestOutputJSONL_WithBufferInfo
+=== PAUSE TestOutputJSONL_WithBufferInfo
+=== CONT  TestConvertValidationResultsToIssues
+=== CONT  TestReportSystemCheckCallback_ErrorSkipsComplete
+=== RUN   TestConvertValidationResultsToIssues/lifecycle_error_generates_fix_command
+--- PASS: TestReportSystemCheckCallback_ErrorSkipsComplete (0.00s)
+=== CONT  TestObjectIDCache_EntriesForID
+--- PASS: TestObjectIDCache_EntriesForID (0.00s)
+=== CONT  TestReportSystemCheckCallback_CompleteUsesWallDuration
+--- PASS: TestReportSystemCheckCallback_CompleteUsesWallDuration (0.00s)
+=== CONT  TestCheckIntegrity_ReusesCASUnderBatchedProvider
+=== RUN   TestConvertValidationResultsToIssues/required_field_error_generates_fix_command
+=== RUN   TestConvertValidationResultsToIssues/warning_generates_fix_command_but_not_auto-fixable
+=== RUN   TestConvertValidationResultsToIssues/multiple_errors_generate_multiple_fix_commands
+=== RUN   TestConvertValidationResultsToIssues/validation_error_returns_single_issue
+=== RUN   TestConvertValidationResultsToIssues/pattern_error_is_marked_auto-fixable
+=== RUN   TestConvertValidationResultsToIssues/datatype_error_from_production_-_health_check_duration_ms
+=== RUN   TestConvertValidationResultsToIssues/required_field_error_from_production_-_minCount
+=== RUN   TestConvertValidationResultsToIssues/pattern_error_from_production_-_id_pattern
+=== RUN   TestConvertValidationResultsToIssues/enum_error_from_production_-_job_type
+=== RUN   TestConvertValidationResultsToIssues/datatype_error_from_production_-_last_activity_time.Time
+--- PASS: TestConvertValidationResultsToIssues (0.00s)
+    --- PASS: TestConvertValidationResultsToIssues/lifecycle_error_generates_fix_command (0.00s)
+    --- PASS: TestConvertValidationResultsToIssues/required_field_error_generates_fix_command (0.00s)
+    --- PASS: TestConvertValidationResultsToIssues/warning_generates_fix_command_but_not_auto-fixable (0.00s)
+    --- PASS: TestConvertValidationResultsToIssues/multiple_errors_generate_multiple_fix_commands (0.00s)
+    --- PASS: TestConvertValidationResultsToIssues/validation_error_returns_single_issue (0.00s)
+    --- PASS: TestConvertValidationResultsToIssues/pattern_error_is_marked_auto-fixable (0.00s)
+    --- PASS: TestConvertValidationResultsToIssues/datatype_error_from_production_-_health_check_duration_ms (0.00s)
+    --- PASS: TestConvertValidationResultsToIssues/required_field_error_from_production_-_minCount (0.00s)
+    --- PASS: TestConvertValidationResultsToIssues/pattern_error_from_production_-_id_pattern (0.00s)
+    --- PASS: TestConvertValidationResultsToIssues/enum_error_from_production_-_job_type (0.00s)
+    --- PASS: TestConvertValidationResultsToIssues/datatype_error_from_production_-_last_activity_time.Time (0.00s)
+=== CONT  TestOutputJSONL
+    check_output_test.go:139: ✓ Successfully wrote 2 valid JSONL lines
+--- PASS: TestOutputJSONL (0.04s)
+=== CONT  TestOutputJSONL_WithBufferInfo
+    check_output_test.go:207: ✓ Successfully wrote result + buffer info in JSONL format
+--- PASS: TestOutputJSONL_WithBufferInfo (0.01s)
+=== CONT  TestExtractFileStorage_UnwrapsBatchingRouting
+--- PASS: TestExtractFileStorage_UnwrapsBatchingRouting (0.26s)
+=== CONT  TestPreliminaryCASIssue
+--- PASS: TestPreliminaryCASIssue (0.00s)
+=== CONT  TestReportSystemCheckCallback_NilCallback
+--- PASS: TestReportSystemCheckCallback_NilCallback (0.00s)
+=== NAME  TestCheckIntegrity_ReusesCASUnderBatchedProvider
+    check_integrity_cas_reuse_test.go:141: concurrent integrity n=48 elapsed=1.69975ms
+--- PASS: TestCheckIntegrity_ReusesCASUnderBatchedProvider (0.95s)
+PASS
+ok  	github.com/lanceman/zqk/cmd/zqk/system	1.746s

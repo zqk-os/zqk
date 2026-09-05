@@ -1,0 +1,87 @@
+{
+  "name": "make-verify-338",
+  "created_at": "2026-09-04T21:34:30.715006Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-338",
+    "Tests": [
+      {
+        "Name": "TestAgentStatusCmd",
+        "Package": "agent_test",
+        "PackagePath": "cmd/zqk/agent",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/agent/status_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestBuildContextBundle",
+        "Package": "agent",
+        "PackagePath": "cmd/zqk/agent",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/agent/sync_loop_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestSyncLoop_MaxVerificationAttempts",
+        "Package": "agent",
+        "PackagePath": "cmd/zqk/agent",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/agent/sync_loop_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestWorktreeBuildCheck_Hook",
+        "Package": "agent",
+        "PackagePath": "cmd/zqk/agent",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/agent/worktree_gate_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 120000000000,
+    "PackagePath": "cmd/zqk/agent"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestAgentStatusCmd",
+      "Package": "agent_test",
+      "PackagePath": "cmd/zqk/agent",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/agent/status_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestBuildContextBundle",
+      "Package": "agent",
+      "PackagePath": "cmd/zqk/agent",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/agent/sync_loop_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestSyncLoop_MaxVerificationAttempts",
+      "Package": "agent",
+      "PackagePath": "cmd/zqk/agent",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/agent/sync_loop_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestWorktreeBuildCheck_Hook",
+      "Package": "agent",
+      "PackagePath": "cmd/zqk/agent",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/agent/worktree_gate_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

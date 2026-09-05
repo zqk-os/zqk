@@ -1,0 +1,114 @@
+name: "CLI Spec Builder End-to-End Test"
+description: |
+  Tests building a CLI from the ground up using the spec builder pattern:
+  1. Create command specs from scratch
+  2. Generate command builders using codegen
+  3. Build graph structure with relationships
+  4. Test semantic traversal with aliases
+  5. Validate with live data
+
+setup:
+  - name: "Create command specs"
+    description: "Create get and delete command specs from scratch"
+    tool: "test_create_specs"
+    args:
+      specs_dir: ".zqk/cli/specs"
+      commands:
+        - name: "get <id>"
+          type: "command"
+          short: "Get an object by ID"
+          aliases: ["fetch", "retrieve"]
+          synonyms: ["object"]
+        - name: "delete <id> [flags]"
+          type: "crud_command"
+          operation_type: "delete"
+          cascade: true
+          dry_run: true
+          aliases: ["remove", "del"]
+          synonyms: ["object"]
+
+  - name: "Generate command builders"
+    description: "Run codegen to generate command builder Go files"
+    tool: "test_generate_builders"
+    args:
+      specs_dir: ".zqk/cli/specs"
+      output_dir: "pkg/cli/command_builders"
+    expected:
+      success: true
+      has_field:
+        generated_files: null
+
+tests:
+  - name: "Validate generated specs"
+    description: "Verify command specs are valid and can be loaded"
+    tool: "test_validate_specs"
+    args:
+      specs_dir: ".zqk/cli/specs"
+    expected:
+      success: true
+      has_fields: ["spec_count", "valid_specs"]
+
+  - name: "Build command spec graph"
+    description: "Build graph structure from command specs"
+    tool: "test_build_graph"
+    args:
+      specs_dir: ".zqk/cli/specs"
+    expected:
+      success: true
+      has_fields: ["nodes", "edges"]
+      equals:
+        node_count: 2
+        edge_count: 7  # 3 for get (object_kind, alias, synonym) + 4 for delete (object_kind, operation, alias, synonym)
+
+  - name: "Test semantic traversal"
+    description: "Test alias resolution and semantic queries"
+    tool: "test_semantic_traversal"
+    args:
+      query: "commands for tasks"
+      expected_resolution: "backlog_item"
+    expected:
+      success: true
+      has_field:
+        resolved_kinds: null
+
+  - name: "Test alias registry"
+    description: "Verify alias registry resolves correctly"
+    tool: "test_alias_registry"
+    args:
+      aliases:
+        - "tasks"
+        - "add"
+        - "remove"
+    expected:
+      success: true
+      has_fields: ["resolved_aliases"]
+
+  - name: "Test graph storage"
+    description: "Store command specs in graph backend"
+    tool: "test_store_in_graph"
+    args:
+      specs_dir: ".zqk/cli/specs"
+    expected:
+      success: true
+      has_field:
+        stored_nodes: null
+
+  - name: "Test command execution (if live data available)"
+    description: "Execute generated commands with live test data"
+    tool: "test_command_execution"
+    args:
+      command: "get"
+      test_id: "BLI-TEST-001"
+      scenario_dir: "test-scenarios/cli-spec-test"
+    skip: true  # Skip by default, enable with ZQK_ENABLE_CLI_SCENARIO_TESTS
+    expected:
+      success: true
+      has_field:
+        result: null
+
+cleanup:
+  - name: "Cleanup test artifacts"
+    description: "Remove generated test files"
+    tool: "test_cleanup"
+    args:
+      test_root: null  # Will be set by test environment

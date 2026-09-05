@@ -1,0 +1,14 @@
+created_at: "2026-08-19T07:47:33Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1787125652590206000-c2c96949
+item_id: REDACTED
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 2857702ca28e4b64fb5782140b43c1400e68fdeab30ab0062f4119523ca97d466e5f13c72adcfa41b92eacf21fa7f0a79b8a8e3a8d7c581e5c9afe0e69cb31dc
+schema_version: 2.0.0
+signature: 3045022100a4e2f580f6c13300bf0fa88a8c234606bb452fd7000abcb1bb04cf9a9b92b079022041640dd3a370a02736bec16ead236bf8285dfa723b6b799db45eb483c8deaf6c
+status: archived
+title: 'Acceptance: Ready child draft PRI sprint hygiene'
+updated_at: "2026-09-01T07:36:57Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

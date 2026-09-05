@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-38",
+  "created_at": "2026-09-04T21:34:27.79133Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-38",
+    "Tests": [
+      {
+        "Name": "TestIOQueue_ShutdownCoordination",
+        "Package": "storage",
+        "PackagePath": "pkg/storage",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/io_queue_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestIOQueueStateChangeEventCallback_Invoked",
+        "Package": "storage",
+        "PackagePath": "pkg/storage",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/io_queue_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestIOQueue_NoStorageProvider",
+        "Package": "storage",
+        "PackagePath": "pkg/storage",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/io_queue_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestIOQueue_InvalidStorageType",
+        "Package": "storage",
+        "PackagePath": "pkg/storage",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/io_queue_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestKeystoreEntry_SystemAccess",
+        "Package": "storage",
+        "PackagePath": "pkg/storage",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/keystore_access_control_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestKeystoreEntry_AdminAccess",
+        "Package": "storage",
+        "PackagePath": "pkg/storage",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/keystore_access_control_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestKeystoreEntry_UserOwnAccess",
+        "Package": "storage",
+        "PackagePath": "pkg/storage",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/keystore_access_control_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestKeystoreEntry_UserOtherAccess",
+        "Package": "storage",
+        "PackagePath": "pkg/storage",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/keystore_access_control_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestKeystoreEntry_ListAccessControl",
+        "Package": "storage",
+        "PackagePath": "pkg/storage",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/keystore_access_control_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestKeystoreEntry_UpdateOwnership",
+        "Package": "storage",
+        "PackagePath": "pkg/storage",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/keystore_access_control_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 900000000000,
+    "PackagePath": "pkg/storage"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestIOQueue_ShutdownCoordination",
+      "Package": "storage",
+      "PackagePath": "pkg/storage",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/io_queue_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestIOQueueStateChangeEventCallback_Invoked",
+      "Package": "storage",
+      "PackagePath": "pkg/storage",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/io_queue_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestIOQueue_NoStorageProvider",
+      "Package": "storage",
+      "PackagePath": "pkg/storage",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/io_queue_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestIOQueue_InvalidStorageType",
+      "Package": "storage",
+      "PackagePath": "pkg/storage",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/io_queue_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestKeystoreEntry_SystemAccess",
+      "Package": "storage",
+      "PackagePath": "pkg/storage",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/keystore_access_control_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestKeystoreEntry_AdminAccess",
+      "Package": "storage",
+      "PackagePath": "pkg/storage",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/keystore_access_control_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestKeystoreEntry_UserOwnAccess",
+      "Package": "storage",
+      "PackagePath": "pkg/storage",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/keystore_access_control_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestKeystoreEntry_UserOtherAccess",
+      "Package": "storage",
+      "PackagePath": "pkg/storage",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/keystore_access_control_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestKeystoreEntry_ListAccessControl",
+      "Package": "storage",
+      "PackagePath": "pkg/storage",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/keystore_access_control_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestKeystoreEntry_UpdateOwnership",
+      "Package": "storage",
+      "PackagePath": "pkg/storage",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/keystore_access_control_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    }
+  }
+}

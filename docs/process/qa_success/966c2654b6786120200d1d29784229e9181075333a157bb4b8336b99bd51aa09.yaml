@@ -1,0 +1,14 @@
+created_at: "2026-08-20T04:54:47Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1787201686038520000-796263a1
+item_id: CRIT-CEF-R8K-L-CODE-QUALITY-001
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 2857702ca28e4b64fb5782140b43c1400e68fdeab30ab0062f4119523ca97d466e5f13c72adcfa41b92eacf21fa7f0a79b8a8e3a8d7c581e5c9afe0e69cb31dc
+schema_version: 2.0.0
+signature: 3045022100dd713b9ed898a667b73b3d8065eee7b3705174f1e7c82602a80500a449be140602205cfc4cc4feaadc7a4f01107d980c79c9634dfae37031b15f52f1c5b33b0d583c
+status: archived
+title: Resolved CRIT-CEF-R8K-L-CODE-QUALITY-001
+updated_at: "2026-09-01T07:21:40Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

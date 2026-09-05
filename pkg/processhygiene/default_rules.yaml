@@ -1,0 +1,63 @@
+# Default declarative rules for object hygiene scans (embedded fallback).
+# Override: place docs/process/_internal/process_hygiene_rules.yaml in the project, or pass --rules-file.
+version: 1
+rules:
+  - id: fixture_title_prefix
+    description: "Isolated test helper titles (Fixture: prefix)"
+    match:
+      field: title
+      prefix: "Fixture:"
+
+  - id: test_snake_kind_number
+    description: "Mechanical Test <snake_kind> <n> titles from CRUD/scenario tests"
+    match:
+      field: title
+      regex: '^Test ([a-z0-9_]+) ([0-9]+)$'
+
+  - id: test_snake_kind_only
+    description: "Test <snake_kind> without index"
+    match:
+      field: title
+      regex: '^Test ([a-z0-9_]+)$'
+
+  # Reject prototype/test account IDs used as owner_ref in production objects.
+  # DEC-CAS-MEMBRANE-FAIL-CLOSED-001: ACC-TEST, ACC-001, ACC-901, FAKE-OWNER-.*, etc.
+  - id: prototype_owner_ref
+    description: "Prototype/test account ID in owner_ref — must use real production agent account"
+    match:
+      field: owner_ref
+      prefix: "ACC-"
+
+  # Kernel CAS must not host classic test fixture object IDs (stewardship incident 2026-08-12).
+  # TRACK: BLI-CAS-HAND-DUP-CHECK-001
+  - id: fixture_object_id_acc_test
+    description: "Fixture account id ACC-TEST must not live in kernel CAS"
+    match:
+      field: id
+      equals: "ACC-TEST"
+
+  - id: fixture_object_id_bli_999
+    description: "Fixture backlog id BLI-999 must not live in kernel CAS"
+    match:
+      field: id
+      equals: "BLI-999"
+
+  - id: fixture_object_id_goal_999
+    description: "Fixture goal id GOAL-999 must not live in kernel CAS"
+    match:
+      field: id
+      equals: "GOAL-999"
+
+  # Scenario-builder / timing-test pollution (2026-08-12): ACC-* with title "Test User".
+  # TRACK: BLI-CAS-HAND-DUP-CHECK-001
+  - id: fixture_title_test_user
+    description: "Fixture account title Test User must not live in kernel CAS"
+    match:
+      field: title
+      equals: "Test User"
+
+  - id: fixture_username_test_user
+    description: "Fixture account username test-user must not live in kernel CAS"
+    match:
+      field: username
+      equals: "test-user"

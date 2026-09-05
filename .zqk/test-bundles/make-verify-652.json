@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-652",
+  "created_at": "2026-09-04T21:34:33.828176Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-652",
+    "Tests": [
+      {
+        "Name": "TestExpectsPeerAck",
+        "Package": "agentfeed",
+        "PackagePath": "pkg/agentfeed",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentfeed/correspondence_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestInferRoleHints_exactSeatIDOnly",
+        "Package": "agentfeed",
+        "PackagePath": "pkg/agentfeed",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentfeed/correspondence_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestCorrespondence_NoIdleOnEmptyInbox",
+        "Package": "agentfeed",
+        "PackagePath": "pkg/agentfeed",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentfeed/correspondence_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestVendorPathPolicy_FindLeak",
+        "Package": "agentfeed_test",
+        "PackagePath": "pkg/agentfeed",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentfeed/doctor_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestEnforceDirectedHourglass_broadcastOK",
+        "Package": "agentfeed",
+        "PackagePath": "pkg/agentfeed",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentfeed/hourglass_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestEnforceDirectedHourglass_directedRequiresAwait",
+        "Package": "agentfeed",
+        "PackagePath": "pkg/agentfeed",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentfeed/hourglass_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestEnforceDirectedHourglass_directedWithAwaitOK",
+        "Package": "agentfeed",
+        "PackagePath": "pkg/agentfeed",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentfeed/hourglass_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestNamedATKID",
+        "Package": "agentfeed",
+        "PackagePath": "pkg/agentfeed",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentfeed/named_atk_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestWorkerSeatForPersona",
+        "Package": "agentfeed",
+        "PackagePath": "pkg/agentfeed",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentfeed/orchestrate_plan_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestIsCoordinatorDutySeat",
+        "Package": "agentfeed",
+        "PackagePath": "pkg/agentfeed",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentfeed/orchestrate_plan_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": true,
+    "EstimatedDuration": 300000000000,
+    "PackagePath": "pkg/agentfeed"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestExpectsPeerAck",
+      "Package": "agentfeed",
+      "PackagePath": "pkg/agentfeed",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentfeed/correspondence_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestInferRoleHints_exactSeatIDOnly",
+      "Package": "agentfeed",
+      "PackagePath": "pkg/agentfeed",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentfeed/correspondence_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestCorrespondence_NoIdleOnEmptyInbox",
+      "Package": "agentfeed",
+      "PackagePath": "pkg/agentfeed",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentfeed/correspondence_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestVendorPathPolicy_FindLeak",
+      "Package": "agentfeed_test",
+      "PackagePath": "pkg/agentfeed",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentfeed/doctor_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestEnforceDirectedHourglass_broadcastOK",
+      "Package": "agentfeed",
+      "PackagePath": "pkg/agentfeed",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentfeed/hourglass_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestEnforceDirectedHourglass_directedRequiresAwait",
+      "Package": "agentfeed",
+      "PackagePath": "pkg/agentfeed",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentfeed/hourglass_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestEnforceDirectedHourglass_directedWithAwaitOK",
+      "Package": "agentfeed",
+      "PackagePath": "pkg/agentfeed",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentfeed/hourglass_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestNamedATKID",
+      "Package": "agentfeed",
+      "PackagePath": "pkg/agentfeed",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentfeed/named_atk_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestWorkerSeatForPersona",
+      "Package": "agentfeed",
+      "PackagePath": "pkg/agentfeed",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentfeed/orchestrate_plan_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestIsCoordinatorDutySeat",
+      "Package": "agentfeed",
+      "PackagePath": "pkg/agentfeed",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentfeed/orchestrate_plan_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

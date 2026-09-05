@@ -1,0 +1,14 @@
+created_at: "2026-08-18T23:37:08Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1787096228659518000-d2ff4765
+item_id: BLI-CEF-R2-ARCH-GOD-SCHEDULER
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 2857702ca28e4b64fb5782140b43c1400e68fdeab30ab0062f4119523ca97d466e5f13c72adcfa41b92eacf21fa7f0a79b8a8e3a8d7c581e5c9afe0e69cb31dc
+schema_version: 2.0.0
+signature: 304502210084b27d16a3b048a47d6ede309dd8b2557fbde148cb3f98e49a7a19010237f457022054da6ce793e761c26118c0d9b0c4593e6dafda5a1862b21f69685b13b1d98b2f
+status: archived
+title: Split scheduler god file handlers_cap_orchestrator (>2k LOC)
+updated_at: "2026-09-01T07:27:45Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

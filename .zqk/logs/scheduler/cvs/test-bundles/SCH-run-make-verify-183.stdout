@@ -1,0 +1,72 @@
+
+--- run 2026-09-04T21:46:08Z ---
+=== RUN   TestUnixPermission_String
+=== PAUSE TestUnixPermission_String
+=== RUN   TestUnixPermission_CheckPermission
+=== PAUSE TestUnixPermission_CheckPermission
+=== RUN   TestFieldPermission_HasFieldAccess
+=== PAUSE TestFieldPermission_HasFieldAccess
+=== RUN   TestParseFieldPermission
+=== PAUSE TestParseFieldPermission
+=== CONT  TestUnixPermission_String
+=== RUN   TestUnixPermission_String/full_access
+=== CONT  TestFieldPermission_HasFieldAccess
+=== RUN   TestFieldPermission_HasFieldAccess/kind-level_read,_no_requirements,_rwx
+=== RUN   TestFieldPermission_HasFieldAccess/no_kind-level_read,_no_requirements,_rwx
+=== RUN   TestUnixPermission_String/read_only
+=== RUN   TestFieldPermission_HasFieldAccess/kind-level_read,_requires_confidential,_has_access
+=== RUN   TestFieldPermission_HasFieldAccess/kind-level_read,_requires_confidential,_no_access
+=== RUN   TestFieldPermission_HasFieldAccess/kind-level_read,_requires_admin_role,_has_role
+=== RUN   TestFieldPermission_HasFieldAccess/kind-level_read,_requires_admin_role,_no_role
+=== RUN   TestFieldPermission_HasFieldAccess/r-x_permission,_write_operation
+=== RUN   TestUnixPermission_String/read_and_execute
+=== RUN   TestFieldPermission_HasFieldAccess/r-x_permission,_read_operation
+--- PASS: TestFieldPermission_HasFieldAccess (0.00s)
+    --- PASS: TestFieldPermission_HasFieldAccess/kind-level_read,_no_requirements,_rwx (0.00s)
+    --- PASS: TestFieldPermission_HasFieldAccess/no_kind-level_read,_no_requirements,_rwx (0.00s)
+    --- PASS: TestFieldPermission_HasFieldAccess/kind-level_read,_requires_confidential,_has_access (0.00s)
+    --- PASS: TestFieldPermission_HasFieldAccess/kind-level_read,_requires_confidential,_no_access (0.00s)
+    --- PASS: TestFieldPermission_HasFieldAccess/kind-level_read,_requires_admin_role,_has_role (0.00s)
+    --- PASS: TestFieldPermission_HasFieldAccess/kind-level_read,_requires_admin_role,_no_role (0.00s)
+    --- PASS: TestFieldPermission_HasFieldAccess/r-x_permission,_write_operation (0.00s)
+    --- PASS: TestFieldPermission_HasFieldAccess/r-x_permission,_read_operation (0.00s)
+=== CONT  TestUnixPermission_CheckPermission
+=== RUN   TestUnixPermission_CheckPermission/read_on_rwx
+=== RUN   TestUnixPermission_String/no_access
+=== RUN   TestUnixPermission_CheckPermission/write_on_rwx
+--- PASS: TestUnixPermission_String (0.00s)
+    --- PASS: TestUnixPermission_String/full_access (0.00s)
+    --- PASS: TestUnixPermission_String/read_only (0.00s)
+    --- PASS: TestUnixPermission_String/read_and_execute (0.00s)
+    --- PASS: TestUnixPermission_String/no_access (0.00s)
+=== RUN   TestUnixPermission_CheckPermission/execute_on_rwx
+=== RUN   TestUnixPermission_CheckPermission/write_on_r-x
+=== RUN   TestUnixPermission_CheckPermission/read_on_r-x
+=== RUN   TestUnixPermission_CheckPermission/read_on_r--
+=== CONT  TestParseFieldPermission
+=== RUN   TestUnixPermission_CheckPermission/write_on_r--
+=== RUN   TestParseFieldPermission/explicit_permissions_rwx
+--- PASS: TestUnixPermission_CheckPermission (0.00s)
+    --- PASS: TestUnixPermission_CheckPermission/read_on_rwx (0.00s)
+    --- PASS: TestUnixPermission_CheckPermission/write_on_rwx (0.00s)
+    --- PASS: TestUnixPermission_CheckPermission/execute_on_rwx (0.00s)
+    --- PASS: TestUnixPermission_CheckPermission/write_on_r-x (0.00s)
+    --- PASS: TestUnixPermission_CheckPermission/read_on_r-x (0.00s)
+    --- PASS: TestUnixPermission_CheckPermission/read_on_r-- (0.00s)
+    --- PASS: TestUnixPermission_CheckPermission/write_on_r-- (0.00s)
+=== RUN   TestParseFieldPermission/explicit_permissions_r-x
+=== RUN   TestParseFieldPermission/sensitive_field_from_checklist
+=== RUN   TestParseFieldPermission/non-sensitive_is_not_confidential
+=== RUN   TestParseFieldPermission/priority_plan_active_order_stays_writable_without_confidential
+=== RUN   TestParseFieldPermission/requires_from_access_metadata
+=== RUN   TestParseFieldPermission/combined_permissions_and_requires
+--- PASS: TestParseFieldPermission (0.00s)
+    --- PASS: TestParseFieldPermission/explicit_permissions_rwx (0.00s)
+    --- PASS: TestParseFieldPermission/explicit_permissions_r-x (0.00s)
+    --- PASS: TestParseFieldPermission/sensitive_field_from_checklist (0.00s)
+    --- PASS: TestParseFieldPermission/non-sensitive_is_not_confidential (0.00s)
+    --- PASS: TestParseFieldPermission/priority_plan_active_order_stays_writable_without_confidential (0.00s)
+    --- PASS: TestParseFieldPermission/requires_from_access_metadata (0.00s)
+    --- PASS: TestParseFieldPermission/combined_permissions_and_requires (0.00s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/mcp	0.696s

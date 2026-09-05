@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-727",
+  "created_at": "2026-09-04T21:34:34.576284Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-727",
+    "Tests": [
+      {
+        "Name": "TestBlobCache_PutPeekGetCopy",
+        "Package": "filecas",
+        "PackagePath": "pkg/storage/filecas",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/filecas/blob_cache_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestBlobCache_CapEvictsOldestPut",
+        "Package": "filecas",
+        "PackagePath": "pkg/storage/filecas",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/filecas/blob_cache_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestBlobCache_GetSavesFromEviction",
+        "Package": "filecas",
+        "PackagePath": "pkg/storage/filecas",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/filecas/blob_cache_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestBlobCache_PeekDoesNotRefresh",
+        "Package": "filecas",
+        "PackagePath": "pkg/storage/filecas",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/filecas/blob_cache_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestBlobCache_EvictAndClear",
+        "Package": "filecas",
+        "PackagePath": "pkg/storage/filecas",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/filecas/blob_cache_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestBlobCache_EvictMiddleThenCapDropsTrueLRU",
+        "Package": "filecas",
+        "PackagePath": "pkg/storage/filecas",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/filecas/blob_cache_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestBlobCache_PutOverwriteDoesNotGrow",
+        "Package": "filecas",
+        "PackagePath": "pkg/storage/filecas",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/filecas/blob_cache_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestCASBlobCache_RejectsNonHash",
+        "Package": "filecas",
+        "PackagePath": "pkg/storage/filecas",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/filecas/blob_cache_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestCASBlobCache_RoundTrip",
+        "Package": "filecas",
+        "PackagePath": "pkg/storage/filecas",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/filecas/blob_cache_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestUpdate_IndexWaitTimeout_SweepsSupersededBlob",
+        "Package": "filecas",
+        "PackagePath": "pkg/storage/filecas",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/filecas/cas_index_timeout_sweep_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 900000000000,
+    "PackagePath": "pkg/storage/filecas"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestBlobCache_PutPeekGetCopy",
+      "Package": "filecas",
+      "PackagePath": "pkg/storage/filecas",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/filecas/blob_cache_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestBlobCache_CapEvictsOldestPut",
+      "Package": "filecas",
+      "PackagePath": "pkg/storage/filecas",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/filecas/blob_cache_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestBlobCache_GetSavesFromEviction",
+      "Package": "filecas",
+      "PackagePath": "pkg/storage/filecas",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/filecas/blob_cache_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestBlobCache_PeekDoesNotRefresh",
+      "Package": "filecas",
+      "PackagePath": "pkg/storage/filecas",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/filecas/blob_cache_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestBlobCache_EvictAndClear",
+      "Package": "filecas",
+      "PackagePath": "pkg/storage/filecas",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/filecas/blob_cache_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestBlobCache_EvictMiddleThenCapDropsTrueLRU",
+      "Package": "filecas",
+      "PackagePath": "pkg/storage/filecas",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/filecas/blob_cache_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestBlobCache_PutOverwriteDoesNotGrow",
+      "Package": "filecas",
+      "PackagePath": "pkg/storage/filecas",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/filecas/blob_cache_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestCASBlobCache_RejectsNonHash",
+      "Package": "filecas",
+      "PackagePath": "pkg/storage/filecas",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/filecas/blob_cache_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestCASBlobCache_RoundTrip",
+      "Package": "filecas",
+      "PackagePath": "pkg/storage/filecas",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/filecas/blob_cache_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestUpdate_IndexWaitTimeout_SweepsSupersededBlob",
+      "Package": "filecas",
+      "PackagePath": "pkg/storage/filecas",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/filecas/cas_index_timeout_sweep_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    }
+  }
+}

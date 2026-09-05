@@ -1,0 +1,105 @@
+{
+  "name": "make-verify-765",
+  "created_at": "2026-09-04T21:34:34.907383Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-765",
+    "Tests": [
+      {
+        "Name": "TestLookupProvider_missingFormatOrOut",
+        "Package": "vds",
+        "PackagePath": "pkg/vds",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/vds/providers_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestEnabledProviders_skipsDisabled",
+        "Package": "vds",
+        "PackagePath": "pkg/vds",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/vds/providers_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestResolveVendorProviders_fromCustomization",
+        "Package": "vds",
+        "PackagePath": "pkg/vds",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/vds/providers_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestResolveVendorProviders_defaultsWhenEmpty",
+        "Package": "vds",
+        "PackagePath": "pkg/vds",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/vds/providers_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestLoadCustomization_parsesVendorProviders",
+        "Package": "vds",
+        "PackagePath": "pkg/vds",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/vds/providers_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 150000000000,
+    "PackagePath": "pkg/vds"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestLookupProvider_missingFormatOrOut",
+      "Package": "vds",
+      "PackagePath": "pkg/vds",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/vds/providers_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestEnabledProviders_skipsDisabled",
+      "Package": "vds",
+      "PackagePath": "pkg/vds",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/vds/providers_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestResolveVendorProviders_fromCustomization",
+      "Package": "vds",
+      "PackagePath": "pkg/vds",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/vds/providers_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestResolveVendorProviders_defaultsWhenEmpty",
+      "Package": "vds",
+      "PackagePath": "pkg/vds",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/vds/providers_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestLoadCustomization_parsesVendorProviders",
+      "Package": "vds",
+      "PackagePath": "pkg/vds",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/vds/providers_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

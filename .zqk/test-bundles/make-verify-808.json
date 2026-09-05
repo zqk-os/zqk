@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-808",
+  "created_at": "2026-09-04T21:34:35.333283Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-808",
+    "Tests": [
+      {
+        "Name": "TestMemGraphConnection_ExecuteBatch",
+        "Package": "memgraph",
+        "PackagePath": "pkg/graph/memgraph",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/graph/memgraph/connection_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestMemGraphConnection_CloseInternal",
+        "Package": "memgraph",
+        "PackagePath": "pkg/graph/memgraph",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/graph/memgraph/connection_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestMemGraphConnectionPool_Starvation",
+        "Package": "memgraph",
+        "PackagePath": "pkg/graph/memgraph",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/graph/memgraph/pool_stress_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestMemGraphConnectionPool_Timeout",
+        "Package": "memgraph",
+        "PackagePath": "pkg/graph/memgraph",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/graph/memgraph/pool_stress_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestMemGraphConnectionPool_ConcurrentAccess",
+        "Package": "memgraph",
+        "PackagePath": "pkg/graph/memgraph",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/graph/memgraph/pool_stress_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestMemGraphConnectionPool_ConnectionLeak",
+        "Package": "memgraph",
+        "PackagePath": "pkg/graph/memgraph",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/graph/memgraph/pool_stress_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestMemGraphConnectionPool_HangingConnection",
+        "Package": "memgraph",
+        "PackagePath": "pkg/graph/memgraph",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/graph/memgraph/pool_stress_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestMemGraphConnectionPool_ReturnConnectionWithOpenTransaction",
+        "Package": "memgraph",
+        "PackagePath": "pkg/graph/memgraph",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/graph/memgraph/pool_stress_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestNewMemGraphConnectionPool",
+        "Package": "memgraph",
+        "PackagePath": "pkg/graph/memgraph",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/graph/memgraph/pool_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestNewMemGraphConnectionPool_DefaultSize",
+        "Package": "memgraph",
+        "PackagePath": "pkg/graph/memgraph",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/graph/memgraph/pool_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": true,
+    "EstimatedDuration": 300000000000,
+    "PackagePath": "pkg/graph/memgraph"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestMemGraphConnection_ExecuteBatch",
+      "Package": "memgraph",
+      "PackagePath": "pkg/graph/memgraph",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/graph/memgraph/connection_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestMemGraphConnection_CloseInternal",
+      "Package": "memgraph",
+      "PackagePath": "pkg/graph/memgraph",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/graph/memgraph/connection_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestMemGraphConnectionPool_Starvation",
+      "Package": "memgraph",
+      "PackagePath": "pkg/graph/memgraph",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/graph/memgraph/pool_stress_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestMemGraphConnectionPool_Timeout",
+      "Package": "memgraph",
+      "PackagePath": "pkg/graph/memgraph",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/graph/memgraph/pool_stress_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestMemGraphConnectionPool_ConcurrentAccess",
+      "Package": "memgraph",
+      "PackagePath": "pkg/graph/memgraph",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/graph/memgraph/pool_stress_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestMemGraphConnectionPool_ConnectionLeak",
+      "Package": "memgraph",
+      "PackagePath": "pkg/graph/memgraph",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/graph/memgraph/pool_stress_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestMemGraphConnectionPool_HangingConnection",
+      "Package": "memgraph",
+      "PackagePath": "pkg/graph/memgraph",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/graph/memgraph/pool_stress_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestMemGraphConnectionPool_ReturnConnectionWithOpenTransaction",
+      "Package": "memgraph",
+      "PackagePath": "pkg/graph/memgraph",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/graph/memgraph/pool_stress_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestNewMemGraphConnectionPool",
+      "Package": "memgraph",
+      "PackagePath": "pkg/graph/memgraph",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/graph/memgraph/pool_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestNewMemGraphConnectionPool_DefaultSize",
+      "Package": "memgraph",
+      "PackagePath": "pkg/graph/memgraph",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/graph/memgraph/pool_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

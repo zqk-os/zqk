@@ -1,0 +1,14 @@
+created_at: "2026-09-03T05:19:40Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1788412780401740000-728fbf83
+item_id: CRIT-CEF-PIP-STAGE-DNA-001
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 86b8ab3d574c004a61020b73c23f52b9055049e90c3d755c8bbb383e059e384028fdd8cd69e13123b644e5f3f7eb65596e73e2d57d719ea3dafcb01b84ce8dfb
+schema_version: 2.0.0
+signature: 30440220499e6ce2d08da91eb5e206d757a1aa5e85e0f7a48a528f70fe7e3671591435300220018c9077d38a82955dbaadf3ba1d4aa85ff11575485401d37bd8cb23f3b888e5
+status: success
+title: QA success for CRIT-CEF-PIP-STAGE-DNA-001
+updated_at: "2026-09-03T05:19:40Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

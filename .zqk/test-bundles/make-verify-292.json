@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-292",
+  "created_at": "2026-09-04T21:34:30.261617Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-292",
+    "Tests": [
+      {
+        "Name": "TestAmbientIngestService",
+        "Package": "mesh",
+        "PackagePath": "pkg/mesh",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mesh/ambient_ingest_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestInMemoryRegistry",
+        "Package": "mesh_test",
+        "PackagePath": "pkg/mesh",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mesh/identity_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestInMemoryMesh",
+        "Package": "mesh_test",
+        "PackagePath": "pkg/mesh",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mesh/mesh_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestInMemoryMesh_ToolPods",
+        "Package": "mesh_test",
+        "PackagePath": "pkg/mesh",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mesh/mesh_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAnalyzeVideoFrames",
+        "Package": "mesh",
+        "PackagePath": "pkg/mesh",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mesh/multimodal_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestMultimodalPromptAndHook",
+        "Package": "mesh",
+        "PackagePath": "pkg/mesh",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mesh/multimodal_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestNightDutyEvalScriptGuard",
+        "Package": "mesh_test",
+        "PackagePath": "pkg/mesh",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mesh/night_duty_eval_guard_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestNightDutyLatchHygieneGuard",
+        "Package": "mesh_test",
+        "PackagePath": "pkg/mesh",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mesh/night_duty_eval_guard_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestStateSync_Integration",
+        "Package": "mesh_test",
+        "PackagePath": "pkg/mesh",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mesh/state_sync_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestDispatchFFmpegJob_Success",
+        "Package": "mesh",
+        "PackagePath": "pkg/mesh",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mesh/toolpod_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 300000000000,
+    "PackagePath": "pkg/mesh"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestAmbientIngestService",
+      "Package": "mesh",
+      "PackagePath": "pkg/mesh",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mesh/ambient_ingest_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestInMemoryRegistry",
+      "Package": "mesh_test",
+      "PackagePath": "pkg/mesh",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mesh/identity_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestInMemoryMesh",
+      "Package": "mesh_test",
+      "PackagePath": "pkg/mesh",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mesh/mesh_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestInMemoryMesh_ToolPods",
+      "Package": "mesh_test",
+      "PackagePath": "pkg/mesh",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mesh/mesh_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestAnalyzeVideoFrames",
+      "Package": "mesh",
+      "PackagePath": "pkg/mesh",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mesh/multimodal_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestMultimodalPromptAndHook",
+      "Package": "mesh",
+      "PackagePath": "pkg/mesh",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mesh/multimodal_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestNightDutyEvalScriptGuard",
+      "Package": "mesh_test",
+      "PackagePath": "pkg/mesh",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mesh/night_duty_eval_guard_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestNightDutyLatchHygieneGuard",
+      "Package": "mesh_test",
+      "PackagePath": "pkg/mesh",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mesh/night_duty_eval_guard_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestStateSync_Integration",
+      "Package": "mesh_test",
+      "PackagePath": "pkg/mesh",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mesh/state_sync_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestDispatchFFmpegJob_Success",
+      "Package": "mesh",
+      "PackagePath": "pkg/mesh",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mesh/toolpod_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

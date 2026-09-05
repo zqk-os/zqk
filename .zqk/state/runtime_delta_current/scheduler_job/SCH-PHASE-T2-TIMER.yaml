@@ -1,0 +1,20 @@
+category: maintenance
+created_at: "2026-08-11T12:27:02Z"
+created_by: ACC-1785920548450214012-68b850c0
+enabled: true
+execution_mode: reusable
+id: SCH-PHASE-T2-TIMER
+job_type: audit_event_aggregation
+kind: scheduler_job
+max_runtime_seconds: 60
+namespace_id: zqk:kernel
+origin_project: zqk
+origin_system: zqk
+schedule_expression: 0 0 1 1 *
+schema_version: 2.0.0
+status: active
+title: Phase test timer
+trigger_type: timer
+updated_at: "2026-08-11T12:27:02Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-73",
+  "created_at": "2026-09-04T21:34:28.095966Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-73",
+    "Tests": [
+      {
+        "Name": "TestStorageSynonymLoader_GraphStorage_Deduplication",
+        "Package": "storage",
+        "PackagePath": "pkg/storage",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/synonym_loader_graph_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestStorageSynonymLoader_GraphStorage_EmptyResult",
+        "Package": "storage",
+        "PackagePath": "pkg/storage",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/synonym_loader_graph_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestStorageSynonymLoader_LoadFromFiles",
+        "Package": "storage_test",
+        "PackagePath": "pkg/storage",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/synonym_loader_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestStorageSynonymLoader_EmptyStorage",
+        "Package": "storage_test",
+        "PackagePath": "pkg/storage",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/synonym_loader_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestStorageSynonymLoader_WithRealProjectData",
+        "Package": "storage_test",
+        "PackagePath": "pkg/storage",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/synonym_loader_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestWriteSystemObjectAndRegisterHash_Integrity",
+        "Package": "storage",
+        "PackagePath": "pkg/storage",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/system_object_hash_integrity_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestWriteSystemObjectAndRegisterHash_ConcurrentWrites",
+        "Package": "storage",
+        "PackagePath": "pkg/storage",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/system_object_hash_integrity_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestWriteSystemObjectAndRegisterHash_FileSystemDelay",
+        "Package": "storage",
+        "PackagePath": "pkg/storage",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/system_object_hash_integrity_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestWriteSystemObjectAndRegisterHash_LineEndings",
+        "Package": "storage",
+        "PackagePath": "pkg/storage",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/system_object_hash_integrity_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestSchedulerAuditEvent_HashIntegrity",
+        "Package": "storage",
+        "PackagePath": "pkg/storage",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/system_object_hash_integrity_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 900000000000,
+    "PackagePath": "pkg/storage"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestStorageSynonymLoader_GraphStorage_Deduplication",
+      "Package": "storage",
+      "PackagePath": "pkg/storage",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/synonym_loader_graph_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestStorageSynonymLoader_GraphStorage_EmptyResult",
+      "Package": "storage",
+      "PackagePath": "pkg/storage",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/synonym_loader_graph_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestStorageSynonymLoader_LoadFromFiles",
+      "Package": "storage_test",
+      "PackagePath": "pkg/storage",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/synonym_loader_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestStorageSynonymLoader_EmptyStorage",
+      "Package": "storage_test",
+      "PackagePath": "pkg/storage",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/synonym_loader_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestStorageSynonymLoader_WithRealProjectData",
+      "Package": "storage_test",
+      "PackagePath": "pkg/storage",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/synonym_loader_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestWriteSystemObjectAndRegisterHash_Integrity",
+      "Package": "storage",
+      "PackagePath": "pkg/storage",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/system_object_hash_integrity_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestWriteSystemObjectAndRegisterHash_ConcurrentWrites",
+      "Package": "storage",
+      "PackagePath": "pkg/storage",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/system_object_hash_integrity_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestWriteSystemObjectAndRegisterHash_FileSystemDelay",
+      "Package": "storage",
+      "PackagePath": "pkg/storage",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/system_object_hash_integrity_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestWriteSystemObjectAndRegisterHash_LineEndings",
+      "Package": "storage",
+      "PackagePath": "pkg/storage",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/system_object_hash_integrity_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestSchedulerAuditEvent_HashIntegrity",
+      "Package": "storage",
+      "PackagePath": "pkg/storage",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/system_object_hash_integrity_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    }
+  }
+}

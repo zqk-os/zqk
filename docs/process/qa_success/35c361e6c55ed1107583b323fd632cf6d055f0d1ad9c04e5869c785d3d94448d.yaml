@@ -1,0 +1,18 @@
+created_at: "2026-09-03T00:09:02Z"
+created_by: ACC-1785920548450214006-2e52b3e7
+criteria_ref: CRIT-CEF-GENERATED-LINT-EXCLUDE-001
+description: Passed VDS chunk vds-generated-lint-exclude
+id: QAS-CEF-GENERATED-EXCLUDE-BLI
+item_id: BLI-CEF-GENERATED-EXCLUDE-001
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 86b8ab3d574c004a61020b73c23f52b9055049e90c3d755c8bbb383e059e384028fdd8cd69e13123b644e5f3f7eb65596e73e2d57d719ea3dafcb01b84ce8dfb
+related_object_refs:
+    - BLI-CEF-GENERATED-EXCLUDE-001
+schema_version: 2.0.0
+signature: 304402204fc796bfac4b3ab3c100ac598c83a2ab9025fae3e7e7c1bb88808d5d2e38f7fe02206c5e05b663e2503e2a6c86253aa23f34f3988fdbdd46f1119140979c4d455785
+status: success
+title: QA Success for Generated Exclude BLI
+updated_at: "2026-09-03T05:32:40Z"
+updated_by: ACC-1785920548450214006-2e52b3e7
+version_context: default

@@ -1,0 +1,14 @@
+created_at: "2026-08-19T10:35:32Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1787135726319793000-d62c0d1d
+item_id: PRI-GIT-EVIDENCE-STEWARD-001
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 2857702ca28e4b64fb5782140b43c1400e68fdeab30ab0062f4119523ca97d466e5f13c72adcfa41b92eacf21fa7f0a79b8a8e3a8d7c581e5c9afe0e69cb31dc
+schema_version: 2.0.0
+signature: 30450220424774c8e3f16f6e10540d1b33bf365dd9e937258fa4cbb109acb73c66748240022100dfc7f22b16f71de375dcc4bbfa4f9a2045d9b2f9f0b08c54e4c3284afa3ab1fb
+status: archived
+title: Git Evidence Steward — Automated Provenance & Verification Hardening
+updated_at: "2026-09-01T07:15:56Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

@@ -1,0 +1,44 @@
+
+--- run 2026-09-04T22:22:05Z ---
+=== RUN   TestApplyCompleteTransitionDefaults_TechnicalDebtResolved
+=== PAUSE TestApplyCompleteTransitionDefaults_TechnicalDebtResolved
+=== RUN   TestApplyCompleteTransitionDefaults_ArchiveIsNotWorkDone
+=== PAUSE TestApplyCompleteTransitionDefaults_ArchiveIsNotWorkDone
+=== RUN   TestApplyCompleteTransitionDefaults_CompletableWithoutEffort
+=== PAUSE TestApplyCompleteTransitionDefaults_CompletableWithoutEffort
+=== RUN   TestApplyCompleteTransitionDefaults_AgentTaskImplemented
+=== PAUSE TestApplyCompleteTransitionDefaults_AgentTaskImplemented
+=== RUN   TestApplyCompleteTransitionDefaults_DoesNotOverwriteClocks
+=== PAUSE TestApplyCompleteTransitionDefaults_DoesNotOverwriteClocks
+=== RUN   TestCompletedAtBackfillStamp
+=== PAUSE TestCompletedAtBackfillStamp
+=== RUN   TestIsObjectNotFound
+=== PAUSE TestIsObjectNotFound
+=== RUN   TestIsExpectedObjectGetMiss
+=== PAUSE TestIsExpectedObjectGetMiss
+=== RUN   TestLogObjectReadFailure_nilLogger
+=== PAUSE TestLogObjectReadFailure_nilLogger
+=== RUN   TestCacheManager_LifetimeCounters
+=== PAUSE TestCacheManager_LifetimeCounters
+=== CONT  TestApplyCompleteTransitionDefaults_TechnicalDebtResolved
+=== CONT  TestCompletedAtBackfillStamp
+--- PASS: TestApplyCompleteTransitionDefaults_TechnicalDebtResolved (0.04s)
+=== CONT  TestLogObjectReadFailure_nilLogger
+--- PASS: TestLogObjectReadFailure_nilLogger (0.00s)
+=== CONT  TestCacheManager_LifetimeCounters
+--- PASS: TestCacheManager_LifetimeCounters (0.00s)
+=== CONT  TestIsExpectedObjectGetMiss
+--- PASS: TestIsExpectedObjectGetMiss (0.00s)
+=== CONT  TestApplyCompleteTransitionDefaults_AgentTaskImplemented
+--- PASS: TestApplyCompleteTransitionDefaults_AgentTaskImplemented (0.01s)
+=== CONT  TestApplyCompleteTransitionDefaults_DoesNotOverwriteClocks
+--- PASS: TestApplyCompleteTransitionDefaults_DoesNotOverwriteClocks (0.00s)
+=== CONT  TestApplyCompleteTransitionDefaults_CompletableWithoutEffort
+--- PASS: TestCompletedAtBackfillStamp (0.05s)
+=== CONT  TestApplyCompleteTransitionDefaults_ArchiveIsNotWorkDone
+--- PASS: TestApplyCompleteTransitionDefaults_ArchiveIsNotWorkDone (0.00s)
+=== CONT  TestIsObjectNotFound
+--- PASS: TestIsObjectNotFound (0.00s)
+--- PASS: TestApplyCompleteTransitionDefaults_CompletableWithoutEffort (0.01s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/storage	0.667s

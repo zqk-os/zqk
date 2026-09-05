@@ -1,0 +1,72 @@
+
+--- run 2026-09-04T21:41:27Z ---
+=== RUN   TestClientEventContext_LifetimeCounters
+=== PAUSE TestClientEventContext_LifetimeCounters
+=== RUN   TestNewSpecAccessControlFromObjectsLoader
+=== PAUSE TestNewSpecAccessControlFromObjectsLoader
+=== RUN   TestExtractPrivilegeTags
+=== PAUSE TestExtractPrivilegeTags
+=== RUN   TestExtractAccessPermissions
+=== PAUSE TestExtractAccessPermissions
+=== RUN   TestHasObjectAccessFast
+=== PAUSE TestHasObjectAccessFast
+=== RUN   TestHasObjectAccessFast_WildcardAccess
+=== PAUSE TestHasObjectAccessFast_WildcardAccess
+=== RUN   TestHasObjectAccessFast_CacheHit
+=== PAUSE TestHasObjectAccessFast_CacheHit
+=== RUN   TestUserActivationDeactivation
+=== PAUSE TestUserActivationDeactivation
+=== RUN   TestInvalidateObjectAccess
+=== PAUSE TestInvalidateObjectAccess
+=== RUN   TestInvalidateUserCache
+=== PAUSE TestInvalidateUserCache
+=== CONT  TestClientEventContext_LifetimeCounters
+=== CONT  TestHasObjectAccessFast_WildcardAccess
+--- PASS: TestHasObjectAccessFast_WildcardAccess (0.00s)
+=== CONT  TestInvalidateObjectAccess
+--- PASS: TestClientEventContext_LifetimeCounters (0.00s)
+=== CONT  TestInvalidateUserCache
+=== CONT  TestUserActivationDeactivation
+--- PASS: TestUserActivationDeactivation (0.00s)
+=== CONT  TestExtractAccessPermissions
+=== RUN   TestExtractAccessPermissions/no_access_permissions
+=== CONT  TestHasObjectAccessFast_CacheHit
+=== CONT  TestHasObjectAccessFast
+=== RUN   TestHasObjectAccessFast/no_tags_-_should_allow
+--- PASS: TestInvalidateUserCache (0.00s)
+--- PASS: TestInvalidateObjectAccess (0.00s)
+--- PASS: TestHasObjectAccessFast_CacheHit (0.00s)
+=== RUN   TestExtractAccessPermissions/access_permissions
+=== RUN   TestHasObjectAccessFast/matching_access_tag
+=== RUN   TestExtractAccessPermissions/wildcard_access
+=== RUN   TestHasObjectAccessFast/non-matching_access_tag
+=== RUN   TestHasObjectAccessFast/multiple_tags_-_one_matches
+=== RUN   TestHasObjectAccessFast/no_object_ID_-_should_check_spec
+--- PASS: TestHasObjectAccessFast (0.00s)
+    --- PASS: TestHasObjectAccessFast/no_tags_-_should_allow (0.00s)
+    --- PASS: TestHasObjectAccessFast/matching_access_tag (0.00s)
+    --- PASS: TestHasObjectAccessFast/non-matching_access_tag (0.00s)
+    --- PASS: TestHasObjectAccessFast/multiple_tags_-_one_matches (0.00s)
+    --- PASS: TestHasObjectAccessFast/no_object_ID_-_should_check_spec (0.00s)
+=== CONT  TestNewSpecAccessControlFromObjectsLoader
+=== RUN   TestExtractAccessPermissions/mixed_permissions
+--- PASS: TestExtractAccessPermissions (0.00s)
+    --- PASS: TestExtractAccessPermissions/no_access_permissions (0.00s)
+    --- PASS: TestExtractAccessPermissions/access_permissions (0.00s)
+    --- PASS: TestExtractAccessPermissions/wildcard_access (0.00s)
+    --- PASS: TestExtractAccessPermissions/mixed_permissions (0.00s)
+=== CONT  TestExtractPrivilegeTags
+=== RUN   TestExtractPrivilegeTags/no_tags
+=== RUN   TestExtractPrivilegeTags/access_tags
+=== RUN   TestExtractPrivilegeTags/privilege_tags
+--- PASS: TestNewSpecAccessControlFromObjectsLoader (0.00s)
+=== RUN   TestExtractPrivilegeTags/mixed_tags
+=== RUN   TestExtractPrivilegeTags/non-string_tags_ignored
+--- PASS: TestExtractPrivilegeTags (0.00s)
+    --- PASS: TestExtractPrivilegeTags/no_tags (0.00s)
+    --- PASS: TestExtractPrivilegeTags/access_tags (0.00s)
+    --- PASS: TestExtractPrivilegeTags/privilege_tags (0.00s)
+    --- PASS: TestExtractPrivilegeTags/mixed_tags (0.00s)
+    --- PASS: TestExtractPrivilegeTags/non-string_tags_ignored (0.00s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/mcp	0.648s

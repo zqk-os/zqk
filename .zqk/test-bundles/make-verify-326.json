@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-326",
+  "created_at": "2026-09-04T21:34:30.614895Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-326",
+    "Tests": [
+      {
+        "Name": "TestConvenienceFunctions",
+        "Package": "testing",
+        "PackagePath": "pkg/mcp/testing",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/testing/scenario_builder_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestScenarioBuilder_Integration",
+        "Package": "testing",
+        "PackagePath": "pkg/mcp/testing",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/testing/scenario_builder_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestScenarioWriter_WriteToFile",
+        "Package": "testing",
+        "PackagePath": "pkg/mcp/testing",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/testing/scenario_builder_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestScenarioWriter_WriteToString",
+        "Package": "testing",
+        "PackagePath": "pkg/mcp/testing",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/testing/scenario_builder_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestScenarioGenerator_GenerateFromSpecs",
+        "Package": "testing",
+        "PackagePath": "pkg/mcp/testing",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/testing/scenario_generator_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestScenarioGenerator_GenerateFromFile",
+        "Package": "testing",
+        "PackagePath": "pkg/mcp/testing",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/testing/scenario_generator_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestScenarioGenerator_BuildScenarioFromSpec",
+        "Package": "testing",
+        "PackagePath": "pkg/mcp/testing",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/testing/scenario_generator_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestScenarioGenerator_GenerateFilename",
+        "Package": "testing",
+        "PackagePath": "pkg/mcp/testing",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/testing/scenario_generator_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestGenerateScenariosFromSpecFile",
+        "Package": "testing",
+        "PackagePath": "pkg/mcp/testing",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/testing/scenario_generator_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestScenarioLoader_InvalidYAML",
+        "Package": "testing",
+        "PackagePath": "pkg/mcp/testing",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/testing/scenario_loader_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": true,
+    "EstimatedDuration": 300000000000,
+    "PackagePath": "pkg/mcp/testing"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestConvenienceFunctions",
+      "Package": "testing",
+      "PackagePath": "pkg/mcp/testing",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/testing/scenario_builder_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestScenarioBuilder_Integration",
+      "Package": "testing",
+      "PackagePath": "pkg/mcp/testing",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/testing/scenario_builder_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestScenarioWriter_WriteToFile",
+      "Package": "testing",
+      "PackagePath": "pkg/mcp/testing",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/testing/scenario_builder_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestScenarioWriter_WriteToString",
+      "Package": "testing",
+      "PackagePath": "pkg/mcp/testing",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/testing/scenario_builder_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestScenarioGenerator_GenerateFromSpecs",
+      "Package": "testing",
+      "PackagePath": "pkg/mcp/testing",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/testing/scenario_generator_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestScenarioGenerator_GenerateFromFile",
+      "Package": "testing",
+      "PackagePath": "pkg/mcp/testing",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/testing/scenario_generator_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestScenarioGenerator_BuildScenarioFromSpec",
+      "Package": "testing",
+      "PackagePath": "pkg/mcp/testing",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/testing/scenario_generator_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestScenarioGenerator_GenerateFilename",
+      "Package": "testing",
+      "PackagePath": "pkg/mcp/testing",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/testing/scenario_generator_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestGenerateScenariosFromSpecFile",
+      "Package": "testing",
+      "PackagePath": "pkg/mcp/testing",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/testing/scenario_generator_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestScenarioLoader_InvalidYAML",
+      "Package": "testing",
+      "PackagePath": "pkg/mcp/testing",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/testing/scenario_loader_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

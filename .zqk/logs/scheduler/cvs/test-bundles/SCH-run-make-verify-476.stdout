@@ -1,0 +1,44 @@
+
+--- run 2026-09-04T22:13:40Z ---
+=== RUN   TestRankNextPlanLabels_ShapedAnnotation
+=== PAUSE TestRankNextPlanLabels_ShapedAnnotation
+=== RUN   TestClassifyShell
+=== PAUSE TestClassifyShell
+=== RUN   TestEvaluate_DefaultCatalog
+=== PAUSE TestEvaluate_DefaultCatalog
+=== RUN   TestEvaluate_PersonaFilter
+=== PAUSE TestEvaluate_PersonaFilter
+=== RUN   TestEvaluate_UnknownEvent
+=== PAUSE TestEvaluate_UnknownEvent
+=== RUN   TestSkipCASOverlay
+=== PAUSE TestSkipCASOverlay
+=== RUN   TestDriveFromPolicyBody_ResponseSection
+=== PAUSE TestDriveFromPolicyBody_ResponseSection
+=== RUN   TestDriveFromPolicyBody_StopsAtParentField
+=== PAUSE TestDriveFromPolicyBody_StopsAtParentField
+=== RUN   TestDriveFromPolicyBody_FirstProse
+=== PAUSE TestDriveFromPolicyBody_FirstProse
+=== RUN   TestOverlayFromPolicy
+=== PAUSE TestOverlayFromPolicy
+=== CONT  TestRankNextPlanLabels_ShapedAnnotation
+--- PASS: TestRankNextPlanLabels_ShapedAnnotation (0.00s)
+=== CONT  TestOverlayFromPolicy
+=== CONT  TestSkipCASOverlay
+--- PASS: TestOverlayFromPolicy (0.00s)
+=== CONT  TestEvaluate_UnknownEvent
+=== CONT  TestEvaluate_PersonaFilter
+=== CONT  TestDriveFromPolicyBody_StopsAtParentField
+--- PASS: TestSkipCASOverlay (0.00s)
+--- PASS: TestEvaluate_UnknownEvent (0.00s)
+--- PASS: TestEvaluate_PersonaFilter (0.00s)
+--- PASS: TestDriveFromPolicyBody_StopsAtParentField (0.00s)
+=== CONT  TestDriveFromPolicyBody_FirstProse
+--- PASS: TestDriveFromPolicyBody_FirstProse (0.00s)
+=== CONT  TestEvaluate_DefaultCatalog
+--- PASS: TestEvaluate_DefaultCatalog (0.00s)
+=== CONT  TestClassifyShell
+=== CONT  TestDriveFromPolicyBody_ResponseSection
+--- PASS: TestClassifyShell (0.00s)
+--- PASS: TestDriveFromPolicyBody_ResponseSection (0.00s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/interactionpolicy	0.380s

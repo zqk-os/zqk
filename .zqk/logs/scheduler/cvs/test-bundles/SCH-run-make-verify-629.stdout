@@ -1,0 +1,24 @@
+
+--- run 2026-09-04T22:18:45Z ---
+=== RUN   TestTallyEventsEmptyTypeFallback
+=== PAUSE TestTallyEventsEmptyTypeFallback
+=== RUN   TestTallyEventsNil
+=== PAUSE TestTallyEventsNil
+=== RUN   TestMetricUpdateFields
+=== PAUSE TestMetricUpdateFields
+=== RUN   TestWindowsOverlap
+=== PAUSE TestWindowsOverlap
+=== RUN   TestFirstOverlappingID
+=== PAUSE TestFirstOverlappingID
+=== CONT  TestTallyEventsEmptyTypeFallback
+=== CONT  TestWindowsOverlap
+--- PASS: TestTallyEventsEmptyTypeFallback (0.00s)
+=== CONT  TestFirstOverlappingID
+=== CONT  TestTallyEventsNil
+--- PASS: TestWindowsOverlap (0.00s)
+--- PASS: TestFirstOverlappingID (0.00s)
+--- PASS: TestTallyEventsNil (0.00s)
+=== CONT  TestMetricUpdateFields
+--- PASS: TestMetricUpdateFields (0.00s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/storage/audit	0.508s

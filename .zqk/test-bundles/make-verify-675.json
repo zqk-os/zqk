@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-675",
+  "created_at": "2026-09-04T21:34:34.057913Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-675",
+    "Tests": [
+      {
+        "Name": "TestResolveRequiredFieldDefault_SkipsDocumentationProse",
+        "Package": "system",
+        "PackagePath": "cmd/zqk/system",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/system/spec_auto_fixer_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAttemptFixes_RequiredStatus_LifecycleOrigin",
+        "Package": "system",
+        "PackagePath": "cmd/zqk/system",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/system/spec_auto_fixer_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAttemptFixes_RefWireTypeNormalization",
+        "Package": "system",
+        "PackagePath": "cmd/zqk/system",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/system/spec_auto_fixer_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAttemptFixes_RequiredAccountId_SystemAccountFallback",
+        "Package": "system",
+        "PackagePath": "cmd/zqk/system",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/system/spec_auto_fixer_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAttemptFixes_InternalMetricKind_SafeDefaults",
+        "Package": "system",
+        "PackagePath": "cmd/zqk/system",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/system/spec_auto_fixer_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAttemptFixes_TypeCoercion",
+        "Package": "system",
+        "PackagePath": "cmd/zqk/system",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/system/spec_auto_fixer_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAttemptFixes_EventTypeCountsObjectCoercion",
+        "Package": "system",
+        "PackagePath": "cmd/zqk/system",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/system/spec_auto_fixer_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAttemptFixes_EventTypeCountsObjectCoercion_EscapedJSONString",
+        "Package": "system",
+        "PackagePath": "cmd/zqk/system",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/system/spec_auto_fixer_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAttemptFixes_EventTypeCountsObjectCoercion_NullPlaceholder",
+        "Package": "system",
+        "PackagePath": "cmd/zqk/system",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/system/spec_auto_fixer_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAttemptFixes_EventTypeCountsObjectCoercion_AngleNilPlaceholder",
+        "Package": "system",
+        "PackagePath": "cmd/zqk/system",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/system/spec_auto_fixer_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 300000000000,
+    "PackagePath": "cmd/zqk/system"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestResolveRequiredFieldDefault_SkipsDocumentationProse",
+      "Package": "system",
+      "PackagePath": "cmd/zqk/system",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/system/spec_auto_fixer_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestAttemptFixes_RequiredStatus_LifecycleOrigin",
+      "Package": "system",
+      "PackagePath": "cmd/zqk/system",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/system/spec_auto_fixer_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestAttemptFixes_RefWireTypeNormalization",
+      "Package": "system",
+      "PackagePath": "cmd/zqk/system",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/system/spec_auto_fixer_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestAttemptFixes_RequiredAccountId_SystemAccountFallback",
+      "Package": "system",
+      "PackagePath": "cmd/zqk/system",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/system/spec_auto_fixer_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestAttemptFixes_InternalMetricKind_SafeDefaults",
+      "Package": "system",
+      "PackagePath": "cmd/zqk/system",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/system/spec_auto_fixer_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestAttemptFixes_TypeCoercion",
+      "Package": "system",
+      "PackagePath": "cmd/zqk/system",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/system/spec_auto_fixer_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestAttemptFixes_EventTypeCountsObjectCoercion",
+      "Package": "system",
+      "PackagePath": "cmd/zqk/system",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/system/spec_auto_fixer_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestAttemptFixes_EventTypeCountsObjectCoercion_EscapedJSONString",
+      "Package": "system",
+      "PackagePath": "cmd/zqk/system",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/system/spec_auto_fixer_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestAttemptFixes_EventTypeCountsObjectCoercion_NullPlaceholder",
+      "Package": "system",
+      "PackagePath": "cmd/zqk/system",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/system/spec_auto_fixer_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestAttemptFixes_EventTypeCountsObjectCoercion_AngleNilPlaceholder",
+      "Package": "system",
+      "PackagePath": "cmd/zqk/system",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/system/spec_auto_fixer_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

@@ -1,0 +1,37 @@
+acceptance_considerations: Acceptance recorded as linked criteria; no narrative captured at migration time.
+actual_effort: 4h
+commit_refs:
+    - c271cb442f8f
+created_at: "2026-08-05T04:52:22Z"
+created_by: ACC-1785920548450214012-68b850c0
+criteria_refs:
+    - CRIT-1785939724997912000-5dd7c1a2
+    - CRIT-1785939725857339000-b688642f
+    - CRIT-1785939726814840000-965bf1c0
+    - CRIT-1785939727672422000-afe555e4
+    - CRIT-1786697464558147000-baefcd4f
+description: 'Progress 2026-08-05: LiveStreamIDSet list/count gate (#1369); SCH-retention-tolerance max_runtime=7200; dedicated SCH-retention-tolerance-agent-instruction (KINDS=agent_instruction hourly). Catch-up count=500. Remaining: prove dedicated job succeeds + stewardship + CAP steady-state. Catch-up: zqk system retention-tolerance --kind agent_instruction --batch-size 5000 --max-batches -1.'
+estimated_effort: 6h
+goal_refs:
+    - GOAL-1785885763755750000-6efcb274
+id: BLI-1785905541906569000-074e24d7
+kind: backlog_item
+milestone_refs:
+    - MIL-1785886016336815000-ad6784be
+namespace_id: zqk:kernel
+next_action: 'Merged #1386; CAP coverage soft-gap follow-up in flight'
+owner_ref: ACC-1785920548450214012-68b850c0
+persona_refs:
+    - PER-1781486429759398000-a79939a1
+priority: high
+priority_plan_ref: PRI-GROOM-KERNEL-RELIABILITY-RESIDUAL-001
+priority_tier: P0
+problem_statement: 'Progress 2026-08-05: LiveStreamIDSet list/count gate (#1369); SCH-retention-tolerance max_runtime=7200; dedicated SCH-retention-tolerance-agent-instruction (KINDS=agent_instruction hourly). Catch-up count=500. Remaining: prove dedicated job succeeds + stewardship + CAP steady-state. Catch-up: zqk system retention-tolerance --kind agent_instruction --batch-size 5000 --max-batches -1.'
+related_object_refs:
+    - REQ-1785905520527169000-4fb88f5d
+schema_version: 2.0.0
+status: complete
+title: 'MMORCH P0: agent_instruction count >> retention max_count — fix stream steward/retention'
+updated_at: "2026-08-19T04:53:15Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

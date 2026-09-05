@@ -1,0 +1,3290 @@
+{
+  "meta": {
+    "namespace_isolation_active": true,
+    "namespace_scope": "zqk:kernel",
+    "namespace_scope_mode": "default_kernel",
+    "returned_count": 500,
+    "total_count": 1059
+  },
+  "objects": [
+    {
+      "id": "BLI-1001",
+      "status": "archived",
+      "title": "Implement Multi-Agent Swarm Orchestration CLI via Codegen"
+    },
+    {
+      "id": "BLI-1002",
+      "status": "archived",
+      "title": "Integrate Dynamic Media Composition Engine via pkg/pipeline"
+    },
+    {
+      "id": "BLI-1003",
+      "status": "archived",
+      "title": "Implement Tool Pod Mesh Serverless FFmpeg Processor"
+    },
+    {
+      "id": "BLI-1004",
+      "status": "archived",
+      "title": "Design Prompt Structures and API Hooks for Multimodal LLMs"
+    },
+    {
+      "id": "BLI-1005",
+      "status": "archived",
+      "title": "Implement Sentinel Quality Control Pipeline"
+    },
+    {
+      "id": "BLI-1782225517120330000-40b1bcd3",
+      "priority": "low",
+      "status": "archived",
+      "title": "Nonsensical Distraction 1"
+    },
+    {
+      "id": "BLI-1782225519196625000-2e24165b",
+      "priority": "low",
+      "status": "archived",
+      "title": "Nonsensical Distraction 2"
+    },
+    {
+      "id": "BLI-1782225521166187000-dc0f452e",
+      "priority": "low",
+      "status": "archived",
+      "title": "Nonsensical Distraction 3"
+    },
+    {
+      "id": "BLI-1782225534944328000-523f3875",
+      "priority": "low",
+      "status": "archived",
+      "title": "Nonsensical Distraction 4"
+    },
+    {
+      "id": "BLI-1782225537037883000-b840ae46",
+      "priority": "low",
+      "status": "archived",
+      "title": "Nonsensical Distraction 5"
+    },
+    {
+      "id": "BLI-1782225538972819000-80572e98",
+      "priority": "low",
+      "status": "archived",
+      "title": "Nonsensical Distraction 6"
+    },
+    {
+      "id": "BLI-1782225541072744000-369dc141",
+      "priority": "low",
+      "status": "archived",
+      "title": "Nonsensical Distraction 7"
+    },
+    {
+      "id": "BLI-1782225543200101000-91c511b2",
+      "priority": "low",
+      "status": "archived",
+      "title": "Nonsensical Distraction 8"
+    },
+    {
+      "id": "BLI-1782225545115574000-d7810653",
+      "priority": "low",
+      "status": "archived",
+      "title": "Nonsensical Distraction 9"
+    },
+    {
+      "id": "BLI-1782225547017836000-2d6d96c1",
+      "priority": "low",
+      "status": "archived",
+      "title": "Nonsensical Distraction 10"
+    },
+    {
+      "id": "BLI-1782225549334479000-e9375522",
+      "priority": "low",
+      "status": "archived",
+      "title": "Nonsensical Distraction 11"
+    },
+    {
+      "id": "BLI-1782225551312765000-1a3f1725",
+      "priority": "low",
+      "status": "archived",
+      "title": "Nonsensical Distraction 12"
+    },
+    {
+      "id": "BLI-1782225553261879000-336392f2",
+      "priority": "low",
+      "status": "archived",
+      "title": "Nonsensical Distraction 13"
+    },
+    {
+      "id": "BLI-1782225555428707000-2d4efe59",
+      "priority": "low",
+      "status": "archived",
+      "title": "Nonsensical Distraction 14"
+    },
+    {
+      "id": "BLI-1782225557366637000-8931cf0b",
+      "priority": "low",
+      "status": "archived",
+      "title": "Nonsensical Distraction 15"
+    },
+    {
+      "id": "BLI-1782225559307429000-2d119b8c",
+      "priority": "low",
+      "status": "archived",
+      "title": "Nonsensical Distraction 16"
+    },
+    {
+      "id": "BLI-1782225561449145000-e7ab8366",
+      "priority": "low",
+      "status": "archived",
+      "title": "Nonsensical Distraction 17"
+    },
+    {
+      "id": "BLI-1782225563382111000-850d0a75",
+      "priority": "low",
+      "status": "archived",
+      "title": "Nonsensical Distraction 18"
+    },
+    {
+      "id": "BLI-1782225565555519000-50db53d2",
+      "priority": "low",
+      "status": "archived",
+      "title": "Nonsensical Distraction 19"
+    },
+    {
+      "id": "BLI-1782225567486750000-7f8c82f6",
+      "priority": "low",
+      "status": "archived",
+      "title": "Nonsensical Distraction 20"
+    },
+    {
+      "id": "BLI-1782225569400743000-5c41f544",
+      "priority": "low",
+      "status": "archived",
+      "title": "Nonsensical Distraction 21"
+    },
+    {
+      "id": "BLI-1782225571594120000-095f059f",
+      "priority": "low",
+      "status": "archived",
+      "title": "Nonsensical Distraction 22"
+    },
+    {
+      "id": "BLI-1782225573551994000-61abf944",
+      "priority": "low",
+      "status": "archived",
+      "title": "Nonsensical Distraction 23"
+    },
+    {
+      "id": "BLI-1782225575497822000-adcae740",
+      "priority": "low",
+      "status": "archived",
+      "title": "Nonsensical Distraction 24"
+    },
+    {
+      "id": "BLI-1782225577623572000-14a33f6c",
+      "priority": "low",
+      "status": "archived",
+      "title": "Nonsensical Distraction 25"
+    },
+    {
+      "id": "BLI-1782225579558557000-f3440699",
+      "priority": "low",
+      "status": "archived",
+      "title": "Nonsensical Distraction 26"
+    },
+    {
+      "id": "BLI-1782225581576649000-d99e1d7a",
+      "priority": "low",
+      "status": "archived",
+      "title": "Nonsensical Distraction 27"
+    },
+    {
+      "id": "BLI-1782225584016293000-7ac979e9",
+      "priority": "low",
+      "status": "archived",
+      "title": "Nonsensical Distraction 28"
+    },
+    {
+      "id": "BLI-1782225585952550000-30efcc2e",
+      "priority": "low",
+      "status": "archived",
+      "title": "Nonsensical Distraction 29"
+    },
+    {
+      "id": "BLI-1782225587895236000-82245792",
+      "priority": "low",
+      "status": "archived",
+      "title": "Nonsensical Distraction 30"
+    },
+    {
+      "id": "BLI-1782225590042508000-615eebbb",
+      "priority": "low",
+      "status": "archived",
+      "title": "Nonsensical Distraction 31"
+    },
+    {
+      "id": "BLI-1782225592045846000-730576e9",
+      "priority": "low",
+      "status": "archived",
+      "title": "Nonsensical Distraction 32"
+    },
+    {
+      "id": "BLI-1782225593988986000-f9670765",
+      "priority": "low",
+      "status": "archived",
+      "title": "Nonsensical Distraction 33"
+    },
+    {
+      "id": "BLI-1782225596157717000-d0db8044",
+      "priority": "low",
+      "status": "archived",
+      "title": "Nonsensical Distraction 34"
+    },
+    {
+      "id": "BLI-1782225598081655000-110122f9",
+      "priority": "low",
+      "status": "archived",
+      "title": "Nonsensical Distraction 35"
+    },
+    {
+      "id": "BLI-1782225600049609000-a39591e6",
+      "priority": "low",
+      "status": "archived",
+      "title": "Nonsensical Distraction 36"
+    },
+    {
+      "id": "BLI-1782225602184075000-08d0a8d4",
+      "priority": "low",
+      "status": "archived",
+      "title": "Nonsensical Distraction 37"
+    },
+    {
+      "id": "BLI-1782225604194735000-04fc4b92",
+      "priority": "low",
+      "status": "archived",
+      "title": "Nonsensical Distraction 38"
+    },
+    {
+      "id": "BLI-1782225606123222000-a707262d",
+      "priority": "low",
+      "status": "archived",
+      "title": "Nonsensical Distraction 39"
+    },
+    {
+      "id": "BLI-1782225608183115000-b41d8ac6",
+      "priority": "low",
+      "status": "archived",
+      "title": "Nonsensical Distraction 40"
+    },
+    {
+      "id": "BLI-1782225610121563000-23571c08",
+      "priority": "low",
+      "status": "archived",
+      "title": "Nonsensical Distraction 41"
+    },
+    {
+      "id": "BLI-1782225612162781000-1f797eef",
+      "priority": "low",
+      "status": "archived",
+      "title": "Nonsensical Distraction 42"
+    },
+    {
+      "id": "BLI-1782225614325464000-46026b7d",
+      "priority": "low",
+      "status": "archived",
+      "title": "Nonsensical Distraction 43"
+    },
+    {
+      "id": "BLI-1782225616180052000-7086b501",
+      "priority": "low",
+      "status": "archived",
+      "title": "Nonsensical Distraction 44"
+    },
+    {
+      "id": "BLI-1782225618069253000-fab960b9",
+      "priority": "low",
+      "status": "archived",
+      "title": "Nonsensical Distraction 45"
+    },
+    {
+      "id": "BLI-1782225620341692000-afdf8ede",
+      "priority": "low",
+      "status": "archived",
+      "title": "Nonsensical Distraction 46"
+    },
+    {
+      "id": "BLI-1782225622280142000-3aa64fb0",
+      "priority": "low",
+      "status": "archived",
+      "title": "Nonsensical Distraction 47"
+    },
+    {
+      "id": "BLI-1782225624184650000-43f35e8f",
+      "priority": "low",
+      "status": "archived",
+      "title": "Nonsensical Distraction 48"
+    },
+    {
+      "id": "BLI-1782225626993794000-0626ce87",
+      "priority": "low",
+      "status": "archived",
+      "title": "Nonsensical Distraction 49"
+    },
+    {
+      "id": "BLI-1782225629700968000-f80b422d",
+      "priority": "low",
+      "status": "archived",
+      "title": "Nonsensical Distraction 50"
+    },
+    {
+      "id": "BLI-1782225632053503000-3541fc51",
+      "priority": "low",
+      "status": "archived",
+      "title": "Nonsensical Distraction 51"
+    },
+    {
+      "id": "BLI-1782225634339577000-b296b475",
+      "priority": "low",
+      "status": "archived",
+      "title": "Nonsensical Distraction 52"
+    },
+    {
+      "id": "BLI-1782225636247620000-198c3aa7",
+      "priority": "low",
+      "status": "archived",
+      "title": "Nonsensical Distraction 53"
+    },
+    {
+      "id": "BLI-1782225638589117000-61677e25",
+      "priority": "low",
+      "status": "archived",
+      "title": "Nonsensical Distraction 54"
+    },
+    {
+      "id": "BLI-1782225640632730000-06730a61",
+      "priority": "low",
+      "status": "archived",
+      "title": "Nonsensical Distraction 55"
+    },
+    {
+      "id": "BLI-1782225642701202000-8e7594a9",
+      "priority": "low",
+      "status": "archived",
+      "title": "Nonsensical Distraction 56"
+    },
+    {
+      "id": "BLI-1782225646008948000-a7d89ebf",
+      "priority": "low",
+      "status": "archived",
+      "title": "Nonsensical Distraction 57"
+    },
+    {
+      "id": "BLI-1782225648041210000-56b5e031",
+      "priority": "low",
+      "status": "archived",
+      "title": "Nonsensical Distraction 58"
+    },
+    {
+      "id": "BLI-1782225650165651000-15b9ad08",
+      "priority": "low",
+      "status": "archived",
+      "title": "Nonsensical Distraction 59"
+    },
+    {
+      "id": "BLI-1782225652216956000-207b7422",
+      "priority": "low",
+      "status": "archived",
+      "title": "Nonsensical Distraction 60"
+    },
+    {
+      "id": "BLI-1782225654172190000-e7150fed",
+      "priority": "low",
+      "status": "archived",
+      "title": "Nonsensical Distraction 61"
+    },
+    {
+      "id": "BLI-1782225656282398000-6e403d79",
+      "priority": "low",
+      "status": "archived",
+      "title": "Nonsensical Distraction 62"
+    },
+    {
+      "id": "BLI-1782225658258018000-63110b6a",
+      "priority": "low",
+      "status": "archived",
+      "title": "Nonsensical Distraction 63"
+    },
+    {
+      "id": "BLI-1782225660356023000-28fe7317",
+      "priority": "low",
+      "status": "archived",
+      "title": "Nonsensical Distraction 64"
+    },
+    {
+      "id": "BLI-1782225662684025000-73b04575",
+      "priority": "low",
+      "status": "archived",
+      "title": "Nonsensical Distraction 65"
+    },
+    {
+      "id": "BLI-1782225664622490000-bb3427c0",
+      "priority": "low",
+      "status": "archived",
+      "title": "Nonsensical Distraction 66"
+    },
+    {
+      "id": "BLI-1782225666523871000-633424a0",
+      "priority": "low",
+      "status": "archived",
+      "title": "Nonsensical Distraction 67"
+    },
+    {
+      "id": "BLI-1782225668871271000-075f72a2",
+      "priority": "low",
+      "status": "archived",
+      "title": "Nonsensical Distraction 68"
+    },
+    {
+      "id": "BLI-1782225670858572000-265a4f3b",
+      "priority": "low",
+      "status": "archived",
+      "title": "Nonsensical Distraction 69"
+    },
+    {
+      "id": "BLI-1782225672816840000-2efa14ac",
+      "priority": "low",
+      "status": "archived",
+      "title": "Nonsensical Distraction 70"
+    },
+    {
+      "id": "BLI-1782225674972075000-04370db9",
+      "priority": "low",
+      "status": "archived",
+      "title": "Nonsensical Distraction 71"
+    },
+    {
+      "id": "BLI-1782225676980888000-a85ea1a9",
+      "priority": "low",
+      "status": "archived",
+      "title": "Nonsensical Distraction 72"
+    },
+    {
+      "id": "BLI-1782225678929549000-3514c564",
+      "priority": "low",
+      "status": "archived",
+      "title": "Nonsensical Distraction 73"
+    },
+    {
+      "id": "BLI-1782225681113049000-fa2207bb",
+      "priority": "low",
+      "status": "archived",
+      "title": "Nonsensical Distraction 74"
+    },
+    {
+      "id": "BLI-1782225683040808000-903bdada",
+      "priority": "low",
+      "status": "archived",
+      "title": "Nonsensical Distraction 75"
+    },
+    {
+      "id": "BLI-1782225684973091000-656a1502",
+      "priority": "low",
+      "status": "archived",
+      "title": "Nonsensical Distraction 76"
+    },
+    {
+      "id": "BLI-1782225687077924000-46e04760",
+      "priority": "low",
+      "status": "archived",
+      "title": "Nonsensical Distraction 77"
+    },
+    {
+      "id": "BLI-1782225689143232000-cf1988fd",
+      "priority": "low",
+      "status": "archived",
+      "title": "Nonsensical Distraction 78"
+    },
+    {
+      "id": "BLI-1782225691128942000-5631803a",
+      "priority": "low",
+      "status": "archived",
+      "title": "Nonsensical Distraction 79"
+    },
+    {
+      "id": "BLI-1782225693351081000-9581ffa4",
+      "priority": "low",
+      "status": "archived",
+      "title": "Nonsensical Distraction 80"
+    },
+    {
+      "id": "BLI-1782225695284213000-b44b081d",
+      "priority": "low",
+      "status": "archived",
+      "title": "Nonsensical Distraction 81"
+    },
+    {
+      "id": "BLI-1782225697269194000-7ec7991f",
+      "priority": "low",
+      "status": "archived",
+      "title": "Nonsensical Distraction 82"
+    },
+    {
+      "id": "BLI-1782225699403622000-c5603f11",
+      "priority": "low",
+      "status": "archived",
+      "title": "Nonsensical Distraction 83"
+    },
+    {
+      "id": "BLI-1782225701413654000-b177c1b9",
+      "priority": "low",
+      "status": "archived",
+      "title": "Nonsensical Distraction 84"
+    },
+    {
+      "id": "BLI-1782225703572753000-7bfab85b",
+      "priority": "low",
+      "status": "archived",
+      "title": "Nonsensical Distraction 85"
+    },
+    {
+      "id": "BLI-1782225705505760000-68f5ba16",
+      "priority": "low",
+      "status": "archived",
+      "title": "Nonsensical Distraction 86"
+    },
+    {
+      "id": "BLI-1782225707453997000-5d08c7e4",
+      "priority": "low",
+      "status": "archived",
+      "title": "Nonsensical Distraction 87"
+    },
+    {
+      "id": "BLI-1782225709533007000-eabe3643",
+      "priority": "low",
+      "status": "archived",
+      "title": "Nonsensical Distraction 88"
+    },
+    {
+      "id": "BLI-1782225711500312000-a568a4cf",
+      "priority": "low",
+      "status": "archived",
+      "title": "Nonsensical Distraction 89"
+    },
+    {
+      "id": "BLI-1782225713498671000-ac8fc94e",
+      "priority": "low",
+      "status": "archived",
+      "title": "Nonsensical Distraction 90"
+    },
+    {
+      "id": "BLI-1782225715607213000-bd0ac5aa",
+      "priority": "low",
+      "status": "archived",
+      "title": "Nonsensical Distraction 91"
+    },
+    {
+      "id": "BLI-1782225717541068000-51dd0ab7",
+      "priority": "low",
+      "status": "archived",
+      "title": "Nonsensical Distraction 92"
+    },
+    {
+      "id": "BLI-1782225719485078000-d0b586d7",
+      "priority": "low",
+      "status": "archived",
+      "title": "Nonsensical Distraction 93"
+    },
+    {
+      "id": "BLI-1782225722591629000-08fd2d26",
+      "priority": "low",
+      "status": "archived",
+      "title": "Nonsensical Distraction 95"
+    },
+    {
+      "id": "BLI-1782225724532065000-0a515a0d",
+      "priority": "low",
+      "status": "archived",
+      "title": "Nonsensical Distraction 96"
+    },
+    {
+      "id": "BLI-1782225726626020000-d74a5151",
+      "priority": "low",
+      "status": "archived",
+      "title": "Nonsensical Distraction 97"
+    },
+    {
+      "id": "BLI-1782225728612383000-9cb7237c",
+      "priority": "low",
+      "status": "archived",
+      "title": "Nonsensical Distraction 98"
+    },
+    {
+      "id": "BLI-1782225730592502000-1e66df6f",
+      "priority": "low",
+      "status": "archived",
+      "title": "Nonsensical Distraction 99"
+    },
+    {
+      "id": "BLI-1782225732767205000-bc1d3256",
+      "priority": "low",
+      "status": "archived",
+      "title": "Nonsensical Distraction 100"
+    },
+    {
+      "id": "BLI-1782231573594750000-80b5064c",
+      "priority": "high",
+      "status": "archived",
+      "title": "MCP Server: Dynamic Persona Context Hydration"
+    },
+    {
+      "id": "BLI-1782234496173170000-6b19d16f",
+      "priority": "high",
+      "status": "archived",
+      "title": "ZQK Quick Bundle Command for TPM Persona"
+    },
+    {
+      "id": "BLI-1782235667036640000-b98bb34c",
+      "priority": "high",
+      "status": "archived",
+      "title": "Retroactive Chain of Integrity Compliance Sweep"
+    },
+    {
+      "id": "BLI-1782236015055711000-c3aabc09",
+      "priority": "high",
+      "status": "archived",
+      "title": "Enforce Hierarchical Chain of Integrity Validation"
+    },
+    {
+      "id": "BLI-1782244916226048000-b426512b",
+      "priority": "low",
+      "status": "archived",
+      "title": "Refactor CLI Commands via AST to use WithProcessor"
+    },
+    {
+      "id": "BLI-1782270570512246000-ab204a81",
+      "priority": "medium",
+      "status": "archived",
+      "title": "Migrate raw fmt.Print calls to structured logging framework"
+    },
+    {
+      "id": "BLI-1782322872854023000-a7b26a6d",
+      "priority": "medium",
+      "status": "archived",
+      "title": "Pipeline-Enforced Worktree Locks"
+    },
+    {
+      "id": "BLI-1782322903619851000-80cd03a9",
+      "priority": "low",
+      "status": "archived",
+      "title": "Quarantine Ref Garbage Collection"
+    },
+    {
+      "id": "BLI-1782323761357087000-d4135463",
+      "priority": "low",
+      "status": "archived",
+      "title": "Sandbox and Clean-up Enhancements"
+    },
+    {
+      "id": "BLI-1782325374637730000-a50a4d51",
+      "priority": "medium",
+      "status": "archived",
+      "title": "Enforce Persona-Based RBAC Gating for Swarm Workers"
+    },
+    {
+      "id": "BLI-1782332133353820000-6d99a4b7",
+      "priority": "high",
+      "status": "archived",
+      "title": "Native LLM Engine Foundation"
+    },
+    {
+      "id": "BLI-1782332133353840000-9cce8730",
+      "priority": "high",
+      "status": "archived",
+      "title": "Native MCP Execution Client"
+    },
+    {
+      "id": "BLI-1782332133353846000-1bce9b2b",
+      "priority": "medium",
+      "status": "archived",
+      "title": "Scheduler Daemon Swarm Integration"
+    },
+    {
+      "id": "BLI-1782332133353850000-208e283a",
+      "priority": "medium",
+      "priority_plan_ref": "PRI-GROOM-KERNEL-RELIABILITY-RESIDUAL-001",
+      "status": "archived",
+      "title": "Enforce RBAC for Native Swarm Workers"
+    },
+    {
+      "id": "BLI-1782343371833517000-a60dab1a",
+      "priority": "medium",
+      "status": "archived",
+      "title": "Design Diagnostic Probe Spec for Agentic Efficiency"
+    },
+    {
+      "id": "BLI-1782355432022941000-14bbe7e5",
+      "priority": "medium",
+      "status": "archived",
+      "title": "Native Swarm Engine Run Loop"
+    },
+    {
+      "id": "BLI-1782356338791655000-75242080",
+      "priority": "medium",
+      "status": "archived",
+      "title": "Harden Integration Test Teardown"
+    },
+    {
+      "id": "BLI-1782358562824147000-618f24d8",
+      "priority": "medium",
+      "priority_plan_ref": "PRI-GROOM-KERNEL-RELIABILITY-RESIDUAL-001",
+      "status": "archived",
+      "title": "Task-Specific Scheduler Process Identifiers"
+    },
+    {
+      "id": "BLI-1782604662257399000-499951ca",
+      "priority": "medium",
+      "status": "archived",
+      "title": "Implement Graph-State Sync Loop"
+    },
+    {
+      "id": "BLI-1782677462783265000-8c9f726b",
+      "priority": "medium",
+      "status": "archived",
+      "title": "Refactor System-Wide Limiter/Circuit-Breaker Patterns"
+    },
+    {
+      "id": "BLI-1782677464493428000-7f49f27e",
+      "priority": "high",
+      "priority_plan_ref": "PRI-GROOM-KERNEL-RELIABILITY-RESIDUAL-001",
+      "status": "archived",
+      "title": "Port Legacy Bash/Python Scripts to Native Go"
+    },
+    {
+      "id": "BLI-1782685953808212000-20a19851",
+      "priority": "high",
+      "status": "archived",
+      "title": "Implement Event Stream Router for Cascading Overlays"
+    },
+    {
+      "id": "BLI-1782724390853604000-75c6b2c0",
+      "priority": "medium",
+      "status": "archived",
+      "title": "Design Qwen LLM prompt templates for native swarm orchestrator"
+    },
+    {
+      "id": "BLI-1782724392251638000-72163849",
+      "priority": "medium",
+      "status": "archived",
+      "title": "Implement task queuing and dispatch mechanism for LLM swarm"
+    },
+    {
+      "id": "BLI-1782724393648223000-b2a31909",
+      "priority": "medium",
+      "status": "archived",
+      "title": "Develop self-governing audit policies for LLM actions"
+    },
+    {
+      "id": "BLI-1782724395043109000-12180317",
+      "priority": "medium",
+      "status": "archived",
+      "title": "Build feedback loop for failed agent task resolution"
+    },
+    {
+      "id": "BLI-1782724396430633000-d47274bc",
+      "priority": "medium",
+      "status": "archived",
+      "title": "Create dashboard for monitoring swarm autonomy metrics"
+    },
+    {
+      "id": "BLI-1782790226686816000-d76381e0",
+      "priority": "medium",
+      "status": "archived",
+      "title": "Refactor builder-based factories to use errgroup for concurrent generation"
+    },
+    {
+      "id": "BLI-1782792338077872000-6eaac740",
+      "priority": "medium",
+      "status": "archived",
+      "title": "Sanitize MCP trace logs and remove POL-DEBUG-001 debug statements"
+    },
+    {
+      "id": "BLI-1782795334968443000-de6f1f1f",
+      "priority": "medium",
+      "status": "archived",
+      "title": "Implement WebSocket telemetry server for Autonomy Dashboard"
+    },
+    {
+      "id": "BLI-1782795746055728000-47455dc0",
+      "priority": "medium",
+      "status": "archived",
+      "title": "Implement Auto-Transitioning Validation Gates for Strategic Objects"
+    },
+    {
+      "id": "BLI-1782963050463520000-ff2d611d",
+      "priority": "medium",
+      "status": "archived",
+      "title": "Real-time bundle progress matrix with agent next event emission"
+    },
+    {
+      "id": "BLI-1783099961080769000-8fd196ea",
+      "priority": "medium",
+      "status": "archived",
+      "title": "Implement Kernel Steward: local LLM perpetual monitoring agent for CAP orchestration"
+    },
+    {
+      "id": "BLI-1783230769049735000-750cf486",
+      "priority": "medium",
+      "status": "archived",
+      "title": "Updated offline"
+    },
+    {
+      "id": "BLI-1783549174908134000-2feabfc0",
+      "priority": "high",
+      "status": "archived",
+      "title": "Resolve Technical Debt Batch 1"
+    },
+    {
+      "id": "BLI-1783549254802565000-227c1816",
+      "priority": "high",
+      "status": "archived",
+      "title": "Resolve Technical Debt Batch 2"
+    },
+    {
+      "id": "BLI-1783549333527191000-71f079c7",
+      "priority": "high",
+      "status": "archived",
+      "title": "Resolve Technical Debt Batch 3"
+    },
+    {
+      "id": "BLI-1783549413360277000-c8a7e28a",
+      "priority": "high",
+      "status": "archived",
+      "title": "Resolve Technical Debt Batch 4"
+    },
+    {
+      "id": "BLI-1783552013061717000-5e27bef0",
+      "priority": "high",
+      "status": "archived",
+      "title": "Resolve Technical Debt Batch 1"
+    },
+    {
+      "id": "BLI-1783552248775036000-247d64b4",
+      "priority": "high",
+      "status": "archived",
+      "title": "Resolve Technical Debt Batch 4"
+    },
+    {
+      "id": "BLI-1783552734871080000-31539b5e",
+      "priority": "high",
+      "status": "archived",
+      "title": "Resolve Technical Debt Batch 1"
+    },
+    {
+      "id": "BLI-1783552891203944000-414c79d1",
+      "priority": "high",
+      "status": "archived",
+      "title": "Resolve Technical Debt Batch 3"
+    },
+    {
+      "id": "BLI-1783552969464949000-75d52682",
+      "priority": "high",
+      "status": "archived",
+      "title": "Resolve Technical Debt Batch 4"
+    },
+    {
+      "id": "BLI-1783553032529133000-7199fcc9",
+      "priority": "high",
+      "status": "archived",
+      "title": "Resolve Technical Debt Batch 1"
+    },
+    {
+      "id": "BLI-1783553138738498000-8e4a05d5",
+      "priority": "high",
+      "status": "archived",
+      "title": "Resolve Technical Debt Batch 1"
+    },
+    {
+      "id": "BLI-1783553174082111000-e41da346",
+      "priority": "high",
+      "status": "archived",
+      "title": "Resolve Technical Debt Batch 1"
+    },
+    {
+      "id": "BLI-1783553197028179000-8a799bfb",
+      "priority": "high",
+      "status": "archived",
+      "title": "Resolve Technical Debt Batch 3"
+    },
+    {
+      "id": "BLI-1783553289778466000-0cdecfdc",
+      "priority": "high",
+      "status": "archived",
+      "title": "Resolve Technical Debt Batch 4"
+    },
+    {
+      "id": "BLI-1783631888120135000-843bc301",
+      "priority": "high",
+      "status": "archived",
+      "title": "Implement Local LLM Timeout \u0026 Retry Fallback"
+    },
+    {
+      "id": "BLI-1783631892661332000-b2cd615e",
+      "priority": "high",
+      "status": "archived",
+      "title": "Implement Token Budget Tracker for Swarm Steps"
+    },
+    {
+      "id": "BLI-1783631896775129000-de3fef87",
+      "priority": "high",
+      "status": "archived",
+      "title": "Add Loop Guard \u0026 Max Verification Loop Limits"
+    },
+    {
+      "id": "BLI-1783736564792714000-0a6099c7",
+      "priority": "low",
+      "status": "archived",
+      "title": "Dummy Backlog Item"
+    },
+    {
+      "id": "BLI-1783749852101692000-e3218711",
+      "priority": "high",
+      "priority_plan_ref": "PRI-1786121461227090000-f8c05f3c",
+      "status": "archived",
+      "title": "Verify Requirement REQ-DATASTREAM-001"
+    },
+    {
+      "id": "BLI-1783796263496783000-dd863823",
+      "priority": "high",
+      "status": "archived",
+      "title": "Fix SCH-010 cascade deletion edge cases"
+    },
+    {
+      "id": "BLI-1783796363723663000-27f4631b",
+      "priority": "high",
+      "requirement_refs": [
+        "REQ-037"
+      ],
+      "status": "archived",
+      "title": "Audit and refactor error handling in storage provider interfaces"
+    },
+    {
+      "id": "BLI-1783796365498753000-2d832f96",
+      "priority": "high",
+      "requirement_refs": [
+        "REQ-037"
+      ],
+      "status": "archived",
+      "title": "Enforce TDD compliance across all new pkg/ objects"
+    },
+    {
+      "id": "BLI-1783815941748134000-7b0b718f",
+      "priority": "high",
+      "status": "archived",
+      "title": "Implement Cache Hit Ratios"
+    },
+    {
+      "id": "BLI-1783815952886841000-5688b668",
+      "priority": "high",
+      "status": "archived",
+      "title": "Implement IPC Latency Histograms"
+    },
+    {
+      "id": "BLI-1783815954745306000-d094ea8a",
+      "priority": "high",
+      "status": "archived",
+      "title": "Implement Agent Token Tracking"
+    },
+    {
+      "id": "BLI-1783815956424322000-c8546c87",
+      "priority": "high",
+      "status": "archived",
+      "title": "Implement Ghost Drift MTTR metrics"
+    },
+    {
+      "id": "BLI-1783822804230348000-3c62b03b",
+      "priority": "high",
+      "status": "archived",
+      "title": "Initialize MemGraph Integration Package"
+    },
+    {
+      "id": "BLI-1783822950016030000-81da5812",
+      "priority": "high",
+      "status": "archived",
+      "title": "Implement Embedded TSDB Telemetry Interface"
+    },
+    {
+      "id": "BLI-1783823063515186000-a4f272c6",
+      "priority": "medium",
+      "requirement_refs": [
+        "REQ-037"
+      ],
+      "status": "archived",
+      "title": "Implement Two-Way CSNAP to MemGraph Migrator"
+    },
+    {
+      "id": "BLI-1783843207677713000-bee72de5",
+      "priority": "high",
+      "status": "archived",
+      "title": "Implement graph-based task leasing"
+    },
+    {
+      "id": "BLI-1784589875074718000-d6811882",
+      "priority": "medium",
+      "requirement_refs": [
+        "REQ-037"
+      ],
+      "status": "archived",
+      "title": "Ship distributable binary with GoReleaser and install script"
+    },
+    {
+      "id": "BLI-1784668811911891000-588867c7",
+      "priority": "medium",
+      "requirement_refs": [
+        "REQ-037"
+      ],
+      "status": "archived",
+      "title": "Build Executive Partner Portal in zqkos-website"
+    },
+    {
+      "id": "BLI-1784698858486076000-8e4d6b09",
+      "priority": "medium",
+      "requirement_refs": [
+        "REQ-037"
+      ],
+      "status": "archived",
+      "title": "Implement Idle Prevention Stage in Pipeline"
+    },
+    {
+      "id": "BLI-1784752266744224000-ee980da2",
+      "priority": "high",
+      "priority_plan_ref": "PRI-GROOM-CI-TEST-001",
+      "requirement_refs": [
+        "REQ-STABLE-IDENTITY-STORAGE"
+      ],
+      "status": "archived",
+      "title": "Fix Graph Ontology Mismatches in pkg/storage Tests"
+    },
+    {
+      "id": "BLI-1784752288702011000-ed8777b9",
+      "priority": "high",
+      "priority_plan_ref": "PRI-GROOM-CI-TEST-001",
+      "requirement_refs": [
+        "REQ-1785784859577332000-344f1e9a"
+      ],
+      "status": "archived",
+      "title": "Fix Governance Validation Failures in Tests"
+    },
+    {
+      "id": "BLI-1784788094705633000-10323987",
+      "priority": "medium",
+      "requirement_refs": [
+        "REQ-037"
+      ],
+      "status": "archived",
+      "title": "Define Pipeline Schemas"
+    },
+    {
+      "id": "BLI-1784788096046653000-fef8c764",
+      "priority": "medium",
+      "requirement_refs": [
+        "REQ-037"
+      ],
+      "status": "archived",
+      "title": "Implement pkg/pipeline state machine"
+    },
+    {
+      "id": "BLI-1784788097344620000-f82a92ad",
+      "priority": "medium",
+      "requirement_refs": [
+        "REQ-037"
+      ],
+      "status": "archived",
+      "title": "Develop Pipeline Plugin Interface"
+    },
+    {
+      "id": "BLI-1784802110163487000-88336a63",
+      "priority": "high",
+      "requirement_refs": [
+        "REQ-155"
+      ],
+      "status": "archived",
+      "title": "Implement ShockwaveRouter Go Structs"
+    },
+    {
+      "id": "BLI-1784802111479522000-a842e1a4",
+      "priority": "high",
+      "status": "archived",
+      "title": "Implement Shockwave Protocol Dispatcher"
+    },
+    {
+      "id": "BLI-1784802197553701000-b3d9484b",
+      "priority": "high",
+      "priority_plan_ref": "PRI-GROOM-COMMS-MESH-001",
+      "requirement_refs": [
+        "REQ-1785008242763254000-e28dc4a1"
+      ],
+      "status": "archived",
+      "title": "Implement Shockwave Protocol Dispatcher"
+    },
+    {
+      "id": "BLI-1784808341902234000-c0524c47",
+      "priority": "high",
+      "requirement_refs": [
+        "REQ-155"
+      ],
+      "status": "archived",
+      "title": "Upgrade Interactive Instantiation Wizard"
+    },
+    {
+      "id": "BLI-1784811472141858000-1d730854",
+      "priority": "high",
+      "requirement_refs": [
+        "REQ-155"
+      ],
+      "status": "archived",
+      "title": "Centralized Request/Response Transport Handlers"
+    },
+    {
+      "id": "BLI-1784812237515848000-d62ae7b7",
+      "priority": "high",
+      "requirement_refs": [
+        "REQ-155"
+      ],
+      "status": "archived",
+      "title": "Cryptographic Stamp Auto-Merge Protocol"
+    },
+    {
+      "id": "BLI-1784826730317262000-70c3210a",
+      "priority": "medium",
+      "priority_plan_ref": "PRI-GROOM-KERNEL-RELIABILITY-RESIDUAL-001",
+      "status": "archived",
+      "title": "Implement Demote Command"
+    },
+    {
+      "id": "BLI-1784832046560540000-a95d8707",
+      "priority": "high",
+      "requirement_refs": [
+        "REQ-155"
+      ],
+      "status": "archived",
+      "title": "Auto-Heal CAS Index Lag Silently"
+    },
+    {
+      "id": "BLI-1784832522776244000-c693d913",
+      "priority": "high",
+      "requirement_refs": [
+        "REQ-155"
+      ],
+      "status": "archived",
+      "title": "Implement Scope Creep Protection Validation Hook"
+    },
+    {
+      "id": "BLI-1784866267564829000-aa79af58",
+      "priority": "medium",
+      "priority_plan_ref": "PRI-GROOM-KERNEL-RELIABILITY-RESIDUAL-001",
+      "requirement_refs": [
+        "REQ-1785885781250041000-d05108de"
+      ],
+      "status": "archived",
+      "title": "Implement Native Idle Agent \u0026 Process Cleanup"
+    },
+    {
+      "id": "BLI-1784871485890812000-058f7d31",
+      "priority": "high",
+      "status": "archived",
+      "title": "Groom Batch 1"
+    },
+    {
+      "id": "BLI-1784872799166181000-bd174d69",
+      "status": "archived",
+      "title": "Groom Batch 2"
+    },
+    {
+      "id": "BLI-1784872810517747000-8e4aed70",
+      "status": "archived",
+      "title": "Groom Batch 3"
+    },
+    {
+      "id": "BLI-1784872820330606000-3fc61d93",
+      "status": "archived",
+      "title": "Groom Batch 4"
+    },
+    {
+      "id": "BLI-1784872832270358000-40d56cc4",
+      "status": "archived",
+      "title": "Groom Batch 5"
+    },
+    {
+      "id": "BLI-1784872841559481000-035ed23d",
+      "status": "archived",
+      "title": "Groom Batch 6"
+    },
+    {
+      "id": "BLI-1784872850550494000-68655bf7",
+      "status": "archived",
+      "title": "Groom Batch 7"
+    },
+    {
+      "id": "BLI-1784872859415378000-0cce06fb",
+      "status": "archived",
+      "title": "Groom Batch 8"
+    },
+    {
+      "id": "BLI-1784872867999205000-646c4cfb",
+      "status": "archived",
+      "title": "Groom Batch 9"
+    },
+    {
+      "id": "BLI-1784872877325541000-43fee186",
+      "status": "archived",
+      "title": "Groom Batch 10"
+    },
+    {
+      "id": "BLI-1784872886264753000-089b3024",
+      "status": "archived",
+      "title": "Groom Batch 11"
+    },
+    {
+      "id": "BLI-1784872895252075000-b0484eb0",
+      "status": "archived",
+      "title": "Groom Batch 12"
+    },
+    {
+      "id": "BLI-1784872903941476000-856f45c0",
+      "status": "archived",
+      "title": "Groom Batch 13"
+    },
+    {
+      "id": "BLI-1784872913371649000-a9b48ff5",
+      "status": "archived",
+      "title": "Groom Batch 14"
+    },
+    {
+      "id": "BLI-1784872922381979000-e74466f9",
+      "status": "archived",
+      "title": "Groom Batch 15"
+    },
+    {
+      "id": "BLI-1784872932068224000-bc9dc594",
+      "status": "archived",
+      "title": "Groom Batch 16"
+    },
+    {
+      "id": "BLI-1784872941269326000-4a42cd33",
+      "status": "archived",
+      "title": "Groom Batch 17"
+    },
+    {
+      "id": "BLI-1784872950404349000-faaa52a8",
+      "status": "archived",
+      "title": "Groom Batch 18"
+    },
+    {
+      "id": "BLI-1784872959276400000-8768ca4d",
+      "status": "archived",
+      "title": "Groom Batch 19"
+    },
+    {
+      "id": "BLI-1784872968191580000-b2079fff",
+      "status": "archived",
+      "title": "Groom Batch 20"
+    },
+    {
+      "id": "BLI-1784872977483344000-7c61b02b",
+      "status": "archived",
+      "title": "Groom Batch 21"
+    },
+    {
+      "id": "BLI-1784872986766286000-25b485f9",
+      "status": "archived",
+      "title": "Groom Batch 22"
+    },
+    {
+      "id": "BLI-1784872995769234000-e43ab4f0",
+      "status": "archived",
+      "title": "Groom Batch 23"
+    },
+    {
+      "id": "BLI-1784873005107441000-eebd01c6",
+      "status": "archived",
+      "title": "Groom Batch 24"
+    },
+    {
+      "id": "BLI-1784873013733302000-1a4a1ac5",
+      "status": "archived",
+      "title": "Groom Batch 25"
+    },
+    {
+      "id": "BLI-1784873022862124000-2728a979",
+      "status": "archived",
+      "title": "Groom Batch 26"
+    },
+    {
+      "id": "BLI-1784873501340813000-9b3123f9",
+      "status": "archived",
+      "title": "Execute Grooming Protocol: Right-Size and Estimate"
+    },
+    {
+      "id": "BLI-1784873527853018000-a9f79141",
+      "priority": "high",
+      "priority_plan_ref": "PRI-GROOM-KERNEL-RELIABILITY-RESIDUAL-001",
+      "status": "archived",
+      "title": "Execute Grooming Protocol: Right-Size and Estimate"
+    },
+    {
+      "id": "BLI-1784908470214647000-a6e7d600",
+      "priority": "high",
+      "status": "archived",
+      "title": "Implementation Batch 1"
+    },
+    {
+      "id": "BLI-1784908471751419000-9858242f",
+      "priority": "high",
+      "status": "archived",
+      "title": "Implementation Batch 2"
+    },
+    {
+      "id": "BLI-1784908473025989000-19953d29",
+      "priority": "high",
+      "status": "archived",
+      "title": "Implementation Batch 3"
+    },
+    {
+      "id": "BLI-1784908474524737000-e20024ea",
+      "priority": "high",
+      "status": "archived",
+      "title": "Implementation Batch 4"
+    },
+    {
+      "id": "BLI-1784908475810609000-19a59aa2",
+      "priority": "high",
+      "status": "archived",
+      "title": "Implementation Batch 5"
+    },
+    {
+      "id": "BLI-1784908477279279000-73d5fbdd",
+      "priority": "high",
+      "status": "archived",
+      "title": "Implementation Batch 6"
+    },
+    {
+      "id": "BLI-1784908478668730000-b76bdec5",
+      "priority": "high",
+      "status": "archived",
+      "title": "Implementation Batch 7"
+    },
+    {
+      "id": "BLI-1784908479877766000-9d8347e8",
+      "priority": "high",
+      "status": "archived",
+      "title": "Implementation Batch 8"
+    },
+    {
+      "id": "BLI-1784908481513343000-f555312b",
+      "priority": "high",
+      "status": "archived",
+      "title": "Implementation Batch 9"
+    },
+    {
+      "id": "BLI-1784908482345075000-a0849ec7",
+      "priority": "high",
+      "status": "archived",
+      "title": "Implementation Batch 10"
+    },
+    {
+      "id": "BLI-1784908483264175000-3f08d723",
+      "priority": "high",
+      "status": "archived",
+      "title": "Implementation Batch 11"
+    },
+    {
+      "id": "BLI-1784908484674227000-c1b7dae7",
+      "priority": "high",
+      "status": "archived",
+      "title": "Implementation Batch 12"
+    },
+    {
+      "id": "BLI-1784908485827107000-9d71928e",
+      "priority": "high",
+      "status": "archived",
+      "title": "Implementation Batch 13"
+    },
+    {
+      "id": "BLI-1784908486696551000-91e9d8ec",
+      "priority": "high",
+      "status": "archived",
+      "title": "Implementation Batch 14"
+    },
+    {
+      "id": "BLI-1784908488061832000-91d4a56c",
+      "priority": "high",
+      "status": "archived",
+      "title": "Implementation Batch 15"
+    },
+    {
+      "id": "BLI-1784908489183200000-12e7e124",
+      "priority": "high",
+      "status": "archived",
+      "title": "Implementation Batch 16"
+    },
+    {
+      "id": "BLI-1784908490044656000-56579bd0",
+      "priority": "high",
+      "status": "archived",
+      "title": "Implementation Batch 17"
+    },
+    {
+      "id": "BLI-1784908491619023000-8ac6c870",
+      "priority": "high",
+      "status": "archived",
+      "title": "Implementation Batch 18"
+    },
+    {
+      "id": "BLI-1784908493075844000-9286ac7c",
+      "priority": "high",
+      "status": "archived",
+      "title": "Implementation Batch 19"
+    },
+    {
+      "id": "BLI-1784908493995828000-f9796d3c",
+      "priority": "high",
+      "status": "archived",
+      "title": "Implementation Batch 20"
+    },
+    {
+      "id": "BLI-1784908495416827000-ba98af69",
+      "priority": "high",
+      "status": "archived",
+      "title": "Implementation Batch 21"
+    },
+    {
+      "id": "BLI-1784908496655290000-af909004",
+      "priority": "high",
+      "status": "archived",
+      "title": "Implementation Batch 22"
+    },
+    {
+      "id": "BLI-1784908497935798000-463d422d",
+      "priority": "high",
+      "status": "archived",
+      "title": "Implementation Batch 23"
+    },
+    {
+      "id": "BLI-1784908499075016000-d3dfc9d8",
+      "priority": "high",
+      "status": "archived",
+      "title": "Implementation Batch 24"
+    },
+    {
+      "id": "BLI-1784908501271436000-2e0765a1",
+      "priority": "high",
+      "status": "archived",
+      "title": "Implementation Batch 25"
+    },
+    {
+      "id": "BLI-1784908502474158000-e76fd221",
+      "priority": "high",
+      "status": "archived",
+      "title": "Implementation Batch 26"
+    },
+    {
+      "id": "BLI-1784908503846021000-74ed785c",
+      "priority": "high",
+      "status": "archived",
+      "title": "Implementation Batch 27"
+    },
+    {
+      "id": "BLI-1784908504773880000-f0247038",
+      "priority": "high",
+      "status": "archived",
+      "title": "Implementation Batch 28"
+    },
+    {
+      "id": "BLI-1784908506954573000-e0c56294",
+      "priority": "high",
+      "status": "archived",
+      "title": "Implementation Batch 29"
+    },
+    {
+      "id": "BLI-1784908508379241000-59316ed7",
+      "priority": "high",
+      "status": "archived",
+      "title": "Implementation Batch 30"
+    },
+    {
+      "id": "BLI-1784908512971005000-8ccbdd9f",
+      "priority": "high",
+      "status": "archived",
+      "title": "Implementation Batch 31"
+    },
+    {
+      "id": "BLI-1784908514403631000-bf7dcd59",
+      "priority": "high",
+      "status": "archived",
+      "title": "Implementation Batch 32"
+    },
+    {
+      "id": "BLI-1784908515618956000-4ed29420",
+      "priority": "high",
+      "status": "archived",
+      "title": "Implementation Batch 33"
+    },
+    {
+      "id": "BLI-1784908516912473000-26513507",
+      "priority": "high",
+      "status": "archived",
+      "title": "Implementation Batch 34"
+    },
+    {
+      "id": "BLI-1784908518293777000-8c67a68a",
+      "priority": "high",
+      "status": "archived",
+      "title": "Implementation Batch 35"
+    },
+    {
+      "id": "BLI-1784908520171245000-8b8fc119",
+      "priority": "high",
+      "status": "archived",
+      "title": "Implementation Batch 36"
+    },
+    {
+      "id": "BLI-1784908521127121000-79928e58",
+      "priority": "high",
+      "status": "archived",
+      "title": "Implementation Batch 37"
+    },
+    {
+      "id": "BLI-1784908522595785000-aa5cfa5f",
+      "priority": "high",
+      "status": "archived",
+      "title": "Implementation Batch 38"
+    },
+    {
+      "id": "BLI-1784908523974221000-1d4963f4",
+      "priority": "high",
+      "status": "archived",
+      "title": "Implementation Batch 39"
+    },
+    {
+      "id": "BLI-1784908524852208000-fd3fe5c8",
+      "priority": "medium",
+      "status": "archived",
+      "title": "Implementation Batch 40"
+    },
+    {
+      "id": "BLI-1784908525810361000-811187bc",
+      "priority": "high",
+      "status": "archived",
+      "title": "Implementation Batch 41"
+    },
+    {
+      "id": "BLI-1784908527145436000-7ce69d82",
+      "priority": "high",
+      "status": "archived",
+      "title": "Implementation Batch 42"
+    },
+    {
+      "id": "BLI-1784908528067315000-019ca165",
+      "priority": "high",
+      "status": "archived",
+      "title": "Implementation Batch 43"
+    },
+    {
+      "id": "BLI-1784908529371218000-d9de1aa2",
+      "priority": "high",
+      "status": "archived",
+      "title": "Implementation Batch 44"
+    },
+    {
+      "id": "BLI-1784908530793996000-9f854ea0",
+      "priority": "high",
+      "status": "archived",
+      "title": "Implementation Batch 45"
+    },
+    {
+      "id": "BLI-1784908531912994000-4993bb25",
+      "priority": "high",
+      "status": "archived",
+      "title": "Implementation Batch 46"
+    },
+    {
+      "id": "BLI-1784908532916894000-ee9ee695",
+      "priority": "high",
+      "status": "archived",
+      "title": "Implementation Batch 47"
+    },
+    {
+      "id": "BLI-1784908534204160000-9848e249",
+      "priority": "high",
+      "status": "archived",
+      "title": "Implementation Batch 48"
+    },
+    {
+      "id": "BLI-1784908535365167000-5341ec60",
+      "priority": "high",
+      "status": "archived",
+      "title": "Implementation Batch 49"
+    },
+    {
+      "id": "BLI-1784908536746167000-147e3665",
+      "priority": "high",
+      "status": "archived",
+      "title": "Implementation Batch 50"
+    },
+    {
+      "id": "BLI-1784908538564091000-6ab0d28a",
+      "priority": "high",
+      "status": "archived",
+      "title": "Implementation Batch 51"
+    },
+    {
+      "id": "BLI-1784908540099939000-a5f11414",
+      "priority": "high",
+      "status": "archived",
+      "title": "Implementation Batch 52"
+    },
+    {
+      "id": "BLI-1784908541177864000-16766a1b",
+      "priority": "high",
+      "status": "archived",
+      "title": "Implementation Batch 53"
+    },
+    {
+      "id": "BLI-1784908542171154000-75bfe61f",
+      "priority": "high",
+      "status": "archived",
+      "title": "Implementation Batch 54"
+    },
+    {
+      "id": "BLI-1784908543271506000-80401ac7",
+      "priority": "high",
+      "status": "archived",
+      "title": "Implementation Batch 55"
+    },
+    {
+      "id": "BLI-1784908544172232000-05d918d8",
+      "priority": "high",
+      "status": "archived",
+      "title": "Implementation Batch 56"
+    },
+    {
+      "id": "BLI-1784908545300675000-d7997151",
+      "priority": "high",
+      "status": "archived",
+      "title": "Implementation Batch 57"
+    },
+    {
+      "id": "BLI-1784908546969333000-feb7a844",
+      "priority": "high",
+      "status": "archived",
+      "title": "Implementation Batch 58"
+    },
+    {
+      "id": "BLI-1784908548039177000-82a98c30",
+      "priority": "high",
+      "status": "archived",
+      "title": "Implementation Batch 59"
+    },
+    {
+      "id": "BLI-1784908549149784000-bc70318d",
+      "priority": "high",
+      "status": "archived",
+      "title": "Implementation Batch 60"
+    },
+    {
+      "id": "BLI-1784908550445703000-824190cf",
+      "priority": "high",
+      "status": "archived",
+      "title": "Implementation Batch 61"
+    },
+    {
+      "id": "BLI-1784908551671081000-ba064b17",
+      "priority": "high",
+      "status": "archived",
+      "title": "Implementation Batch 62"
+    },
+    {
+      "id": "BLI-1784908552896491000-bf4baaf3",
+      "priority": "high",
+      "status": "archived",
+      "title": "Implementation Batch 63"
+    },
+    {
+      "id": "BLI-1784908554032926000-d6cf9b2d",
+      "priority": "high",
+      "status": "archived",
+      "title": "Implementation Batch 64"
+    },
+    {
+      "id": "BLI-1784908555171388000-4ba9eebc",
+      "priority": "high",
+      "status": "archived",
+      "title": "Implementation Batch 65"
+    },
+    {
+      "id": "BLI-1784908556559763000-944414e9",
+      "priority": "high",
+      "status": "archived",
+      "title": "Implementation Batch 66"
+    },
+    {
+      "id": "BLI-1784908557844726000-cb0b5fb4",
+      "priority": "high",
+      "status": "archived",
+      "title": "Implementation Batch 67"
+    },
+    {
+      "id": "BLI-1784908559056636000-8687b998",
+      "priority": "high",
+      "status": "archived",
+      "title": "Implementation Batch 68"
+    },
+    {
+      "id": "BLI-1784908560375770000-b55bcb04",
+      "priority": "high",
+      "status": "archived",
+      "title": "Implementation Batch 69"
+    },
+    {
+      "id": "BLI-1784908561463707000-a72405b2",
+      "priority": "high",
+      "status": "archived",
+      "title": "Implementation Batch 70"
+    },
+    {
+      "id": "BLI-1784908562673545000-b44c9562",
+      "priority": "high",
+      "status": "archived",
+      "title": "Implementation Batch 71"
+    },
+    {
+      "id": "BLI-1784908563631055000-f6734bf9",
+      "priority": "high",
+      "status": "archived",
+      "title": "Implementation Batch 72"
+    },
+    {
+      "id": "BLI-1784908564719540000-bb2e51f8",
+      "priority": "high",
+      "status": "archived",
+      "title": "Implementation Batch 73"
+    },
+    {
+      "id": "BLI-1784908565867540000-cc0c7af5",
+      "priority": "high",
+      "status": "archived",
+      "title": "Implementation Batch 74"
+    },
+    {
+      "id": "BLI-1784908567085075000-8687436a",
+      "priority": "high",
+      "status": "archived",
+      "title": "Implementation Batch 75"
+    },
+    {
+      "id": "BLI-1784908568326926000-efd0c480",
+      "priority": "high",
+      "status": "archived",
+      "title": "Implementation Batch 76"
+    },
+    {
+      "id": "BLI-1784908569553515000-9a98f7e2",
+      "priority": "high",
+      "status": "archived",
+      "title": "Implementation Batch 77"
+    },
+    {
+      "id": "BLI-1784908570668082000-e55f47a4",
+      "priority": "high",
+      "status": "archived",
+      "title": "Implementation Batch 78"
+    },
+    {
+      "id": "BLI-1784912212676363000-d06e0ad0",
+      "priority": "high",
+      "priority_plan_ref": "PRI-GROOM-CLI-DNA-001",
+      "requirement_refs": [
+        "REQ-1785905117601841000-468539c3"
+      ],
+      "status": "archived",
+      "title": "Implement Persona-Aware Context Filtering at CLI Layer"
+    },
+    {
+      "id": "BLI-1784969288097655000-19677269",
+      "status": "archived",
+      "title": "Seed default policy pack on system init"
+    },
+    {
+      "id": "BLI-1784969955962654000-dc689643",
+      "status": "archived",
+      "title": "MCP resources/list returns JSON null; Cursor drops connection"
+    },
+    {
+      "id": "BLI-1784969957319071000-4d579774",
+      "status": "archived",
+      "title": "MCP tool adapter parse_error when CLI emits table under --context mcp"
+    },
+    {
+      "id": "BLI-1784969959530358000-3a6309a7",
+      "status": "archived",
+      "title": "--discover wizard does not create mission/vision/goal objects"
+    },
+    {
+      "id": "BLI-1784969960804062000-f80b0214",
+      "status": "archived",
+      "title": "Fresh init: foundational kinds fail list with unknown object kind (CAS)"
+    },
+    {
+      "id": "BLI-1784969963152536000-1e30e0a0",
+      "status": "archived",
+      "title": "MCP/CLI without ZQK_PROJECT_ROOT resolves to HOME and fails account schema"
+    },
+    {
+      "id": "BLI-1784969964356060000-cd6e1d58",
+      "status": "archived",
+      "title": "ZQK_MCP_KEYSTORE_KEY_ID breaks human client auth (keystore path incomplete)"
+    },
+    {
+      "id": "BLI-1784969965645206000-68f55ba4",
+      "status": "archived",
+      "title": "Community bootstrap ships internal/dev command_specs — scrub before community cut"
+    },
+    {
+      "id": "BLI-1784972361726196000-d3dcb9e0",
+      "status": "archived",
+      "title": "Remediate policy violations from PR #970 greenfield-init-unblock"
+    },
+    {
+      "id": "BLI-1784972841790270000-7809e0b2",
+      "status": "archived",
+      "title": "Remediate policy violations from PR #970"
+    },
+    {
+      "id": "BLI-1784977033630573000-c1f4e176",
+      "priority": "medium",
+      "priority_plan_ref": "PRI-GROOM-KERNEL-RELIABILITY-RESIDUAL-001",
+      "status": "archived",
+      "title": "Async agent comms: callbacks and wake notifications (no per-agent poll loops)"
+    },
+    {
+      "id": "BLI-1784977490835635000-2c2ce383",
+      "priority": "medium",
+      "priority_plan_ref": "PRI-GROOM-KERNEL-RELIABILITY-RESIDUAL-001",
+      "requirement_refs": [
+        "REQ-COMMS-RELIABLE-001"
+      ],
+      "status": "archived",
+      "title": "Chat Router / Switchboard for Agent Wake Notifications"
+    },
+    {
+      "id": "BLI-1785008246322458000-f520ca46",
+      "priority": "high",
+      "priority_plan_ref": "PRI-GROOM-KERNEL-RELIABILITY-RESIDUAL-001",
+      "requirement_refs": [
+        "REQ-1785008237068876000-edec9b51"
+      ],
+      "status": "archived",
+      "title": "Add author_session_id to audit events from MCP tool handlers"
+    },
+    {
+      "id": "BLI-1785008248438506000-22976ac6",
+      "priority": "medium",
+      "priority_plan_ref": "PRI-GROOM-KERNEL-RELIABILITY-RESIDUAL-001",
+      "requirement_refs": [
+        "REQ-1785008237068876000-edec9b51"
+      ],
+      "status": "archived",
+      "title": "Remove kernel_watcher.go and wire CascadeOnObjectChange to agent notification"
+    },
+    {
+      "id": "BLI-1785008249540023000-e465a9cc",
+      "priority": "medium",
+      "requirement_refs": [
+        "REQ-1785008237068876000-edec9b51"
+      ],
+      "status": "archived",
+      "title": "Add MCP subscription tool for kind-based notification filtering"
+    },
+    {
+      "id": "BLI-1785008251439668000-01f85bf9",
+      "priority": "medium",
+      "requirement_refs": [
+        "REQ-1785008237068876000-edec9b51"
+      ],
+      "status": "archived",
+      "title": "Fix kernel_watcher.go fsnotify integration in MCP server lifecycle"
+    },
+    {
+      "id": "BLI-1785021456679560000-58c8e486",
+      "priority": "high",
+      "status": "archived",
+      "title": "Architectural Split: Core vs Proprietary Tiers"
+    },
+    {
+      "id": "BLI-1785022054003495000-addd04c7",
+      "status": "archived",
+      "title": "Clean up repo for public tour"
+    },
+    {
+      "id": "BLI-1785054811736292000-8dfa531a",
+      "priority": "medium",
+      "priority_plan_ref": "PRI-GROOM-KERNEL-RELIABILITY-RESIDUAL-001",
+      "requirement_refs": [
+        "REQ-1786742913550328000-2ee7f979"
+      ],
+      "status": "archived",
+      "title": "Groomed Orphaned Requirements Batch 1"
+    },
+    {
+      "id": "BLI-1785078973930137000-3717a1a2",
+      "status": "archived",
+      "title": "Implement priority plan active order assignment"
+    },
+    {
+      "id": "BLI-1785097679203874000-efe9817b",
+      "priority": "medium",
+      "priority_plan_ref": "PRI-GROOM-KERNEL-RELIABILITY-RESIDUAL-001",
+      "status": "archived",
+      "title": "Enhance Agent Orchestration, MCP Server, and Developer Experience"
+    },
+    {
+      "id": "BLI-1785097679869003000-dfe4410f",
+      "status": "archived",
+      "title": "Platform Integrity, Architecture Evolution, and Core Capability Expansion"
+    },
+    {
+      "id": "BLI-1785097680711134000-3bb1c172",
+      "priority": "medium",
+      "priority_plan_ref": "PRI-GROOM-KERNEL-RELIABILITY-RESIDUAL-001",
+      "status": "archived",
+      "title": "Groomed Batch AD"
+    },
+    {
+      "id": "BLI-1785097683110557000-9b2e85ef",
+      "status": "archived",
+      "title": "Kernel Infrastructure Enhancements: Spec Storage, Coordination, and Bucketing"
+    },
+    {
+      "id": "BLI-1785097687432058000-9f873c67",
+      "status": "archived",
+      "title": "ZQK Kernel Core Enhancements \u0026 Mesh Stabilization"
+    },
+    {
+      "id": "BLI-1785097688694504000-7d7ac5ef",
+      "status": "archived",
+      "title": "ZQK Kernel Core Capabilities Maturation"
+    },
+    {
+      "id": "BLI-1785097692772902000-3018dcde",
+      "priority": "medium",
+      "priority_plan_ref": "PRI-GROOM-KERNEL-RELIABILITY-RESIDUAL-001",
+      "status": "archived",
+      "title": "System Robustness and Feature Enhancements Batch AB"
+    },
+    {
+      "id": "BLI-1785097694875516000-b019f0fd",
+      "priority": "medium",
+      "priority_plan_ref": "PRI-GROOM-KERNEL-RELIABILITY-RESIDUAL-001",
+      "status": "archived",
+      "title": "Legacy Requirements Grooming: Batch AF"
+    },
+    {
+      "id": "BLI-1785105619125906000-8a74e7ef",
+      "status": "archived",
+      "title": "Add pedantic checklist rule"
+    },
+    {
+      "id": "BLI-1785124764304463000-80965f0f",
+      "priority": "high",
+      "requirement_refs": [
+        "REQ-1785124743423294000-63639a45"
+      ],
+      "status": "archived",
+      "title": "Implement MCP Proxy Daemon Architecture"
+    },
+    {
+      "id": "BLI-1785125244138015000-d9c6802c",
+      "priority": "high",
+      "requirement_refs": [
+        "REQ-1785124743423294000-63639a45"
+      ],
+      "status": "archived",
+      "title": "MCP Stdio Proxy Frame Forwarder \u0026 Reconnect Loop"
+    },
+    {
+      "id": "BLI-1785125245486395000-22e5a3f4",
+      "priority": "high",
+      "priority_plan_ref": "PRI-GROOM-KERNEL-RELIABILITY-RESIDUAL-001",
+      "requirement_refs": [
+        "REQ-1785124743423294000-63639a45"
+      ],
+      "status": "archived",
+      "title": "JSON-RPC Health Heartbeat \u0026 Daemon Handshake Protocol"
+    },
+    {
+      "id": "BLI-1785125246865272000-bb77ea7b",
+      "priority": "high",
+      "priority_plan_ref": "PRI-GROOM-KERNEL-RELIABILITY-RESIDUAL-001",
+      "requirement_refs": [
+        "REQ-1785124743423294000-63639a45"
+      ],
+      "status": "archived",
+      "title": "Unit \u0026 Integration Test Suite for Stdio Proxy Daemon"
+    },
+    {
+      "id": "BLI-1785125248105750000-fcb55cd1",
+      "priority": "high",
+      "requirement_refs": [
+        "REQ-1785124743423294000-63639a45"
+      ],
+      "status": "archived",
+      "title": "CLI Command Entrypoint zqk mcp proxy \u0026 Config Wire-up"
+    },
+    {
+      "id": "BLI-1785126258864631000-15fa1254",
+      "priority": "medium",
+      "status": "archived",
+      "title": "Traceability in Ambient Orchestration"
+    },
+    {
+      "id": "BLI-1785126259961840000-bb250b22",
+      "priority": "critical",
+      "status": "archived",
+      "title": "Governance and Security Guardrails"
+    },
+    {
+      "id": "BLI-1785126260953784000-f4cd1146",
+      "priority": "high",
+      "status": "archived",
+      "title": "Hive Mind Memory Scalability"
+    },
+    {
+      "id": "BLI-1785126261917923000-928a077d",
+      "priority": "high",
+      "status": "archived",
+      "title": "Capability Synthesis Pipeline Policies"
+    },
+    {
+      "id": "BLI-1785126262862048000-c2944f95",
+      "priority": "high",
+      "status": "archived",
+      "title": "Test-Driven Milestones for Strategic Plan"
+    },
+    {
+      "id": "BLI-1785132518478796000-b323c3b2",
+      "status": "archived",
+      "title": "Document MCP Proxy"
+    },
+    {
+      "id": "BLI-1785133212317325000-cffac0d7",
+      "status": "archived",
+      "title": "Fix MCP Command Specs"
+    },
+    {
+      "id": "BLI-1785134171699249000-069433e1",
+      "status": "archived",
+      "title": "Implement Event-Sourcing Layer for Ambient Events"
+    },
+    {
+      "id": "BLI-1785134173180136000-650238cd",
+      "status": "archived",
+      "title": "Define Memory Node Compression and Bucketing Policies"
+    },
+    {
+      "id": "BLI-1785134174394340000-5e6bb53e",
+      "status": "archived",
+      "title": "Enforce Capability Synthesis Policy and Pipeline"
+    },
+    {
+      "id": "BLI-1785142024168005000-c2ae7b2f",
+      "status": "archived",
+      "title": "Autonomy Inbox Auto-Merge Daemon"
+    },
+    {
+      "id": "BLI-1785142025473789000-dd3b4aa4",
+      "status": "archived",
+      "title": "TDE Envelope Transport Enforcer"
+    },
+    {
+      "id": "BLI-1785179651464953000-783a3391",
+      "status": "archived",
+      "title": "CAP agent_task create must use proposed not pending/active"
+    },
+    {
+      "id": "BLI-1785182171861079000-c128ec99",
+      "priority": "high",
+      "status": "archived",
+      "title": "Implement Graph Storage Batch Insertion Policy"
+    },
+    {
+      "id": "BLI-1785182173383656000-7973b315",
+      "priority": "high",
+      "status": "archived",
+      "title": "Refactor TDE Envelope MCP Permissions"
+    },
+    {
+      "id": "BLI-1785182174531371000-3f17f076",
+      "priority": "medium",
+      "status": "archived",
+      "title": "Optimize CAS Orphan Cleanup Concurrency"
+    },
+    {
+      "id": "BLI-1785195158915505000-140e3f35",
+      "priority": "high",
+      "status": "archived",
+      "title": "Implement Community Edition Onboarding Flow"
+    },
+    {
+      "id": "BLI-1785195170569428000-f36ec183",
+      "priority": "high",
+      "status": "archived",
+      "title": "Sovereign OS Packaging \u0026 Distribution"
+    },
+    {
+      "id": "BLI-1785202049069498000-84fe5a7e",
+      "status": "archived",
+      "title": "Guard CLI command codegen against empty Use stubs"
+    },
+    {
+      "id": "BLI-1785202050585016000-0592410a",
+      "status": "archived",
+      "title": "Refresh CAP review result contract and clear stale Jun-17 gate file"
+    },
+    {
+      "id": "BLI-1785202051940571000-53e2c4d2",
+      "status": "archived",
+      "title": "Starve-proof grooming: stop Groom Batch ATK floods"
+    },
+    {
+      "id": "BLI-1785202053326416000-84013ba2",
+      "status": "archived",
+      "title": "Wire CAP TPM assignment wakes through notify-only wake-agy path (paste retired)"
+    },
+    {
+      "id": "BLI-1785202054326787000-3f235578",
+      "status": "archived",
+      "title": "whats-next backlog counts must include active priority_plan BLIs"
+    },
+    {
+      "id": "BLI-1785202056042142000-971a27fb",
+      "status": "archived",
+      "title": "Graph batch insertion: metrics + failure surfacing for swarm writes"
+    },
+    {
+      "id": "BLI-1785202057037234000-fc8bb4b5",
+      "status": "archived",
+      "title": "Community start-here brand parity (zqk vs zqk-community)"
+    },
+    {
+      "id": "BLI-1785202058446007000-a6b212c5",
+      "status": "archived",
+      "title": "Envelope tick dispatch: regression matrix for MODE/EXPAND/deny tokens"
+    },
+    {
+      "id": "BLI-1785204475372301000-529a5800",
+      "status": "archived",
+      "title": "Refactor Priority Plan lifecycle \u0026 add status cache for scope lock / auto-transitions"
+    },
+    {
+      "id": "BLI-1785207837440507000-abcf28d7",
+      "status": "archived",
+      "title": "Route plan-error alerts to host/project primary orchestrator (not wake-agy hardcode)"
+    },
+    {
+      "id": "BLI-1785208097189244000-5c8fae88",
+      "status": "archived",
+      "title": "Remediate recurring system-check maladaptations (orphan CAS, qa_success error, agent account refs)"
+    },
+    {
+      "id": "BLI-1785218141113426000-8785e267",
+      "status": "archived",
+      "title": "CEO Strategic Review — Post-Q3 commercial roadmap"
+    },
+    {
+      "id": "BLI-1785218143450288000-e7db89b8",
+      "status": "archived",
+      "title": "Architecture Capability Recommendations — Post-Q3"
+    },
+    {
+      "id": "BLI-1785218147758989000-e62e5d06",
+      "status": "archived",
+      "title": "Hater Critique — Post-Q3 Strategic Claims"
+    },
+    {
+      "id": "BLI-1785219074185289000-0a9a9124",
+      "status": "archived",
+      "title": "Zero-config Community onboarding + MCP start-here parity"
+    },
+    {
+      "id": "BLI-1785219076370799000-1a20ca3e",
+      "status": "archived",
+      "title": "CAP review gate freshness + flaky test quarantine"
+    },
+    {
+      "id": "BLI-1785219077646504000-8b375021",
+      "status": "archived",
+      "title": "Eliminate TDE override debt + fast-path performance gate"
+    },
+    {
+      "id": "BLI-1785219078559687000-dbc7d57f",
+      "status": "archived",
+      "title": "Cryptographic skill signing + TDE transport policy hardening"
+    },
+    {
+      "id": "BLI-1785219219003656000-e3178ed2",
+      "status": "archived",
+      "title": "Wire ambient PR verification into Autonomy Inbox / whats-next"
+    },
+    {
+      "id": "BLI-1785221506752716000-8271a4e8",
+      "priority": "high",
+      "priority_plan_ref": "PRI-GROOM-OPENCORE-001",
+      "status": "archived",
+      "title": "Zero-config Community onboarding + MCP start-here parity"
+    },
+    {
+      "id": "BLI-1785221508114110000-da93ba3f",
+      "priority": "high",
+      "priority_plan_ref": "PRI-GROOM-METRICS-AMBIENT-001",
+      "status": "archived",
+      "title": "Wire ambient PR verification into Autonomy Inbox / whats-next"
+    },
+    {
+      "id": "BLI-1785221509470151000-b97a0e0d",
+      "priority": "high",
+      "priority_plan_ref": "PRI-GROOM-CI-TEST-001",
+      "status": "archived",
+      "title": "CAP review gate freshness + flaky test quarantine"
+    },
+    {
+      "id": "BLI-1785222326627416000-2ea92b56",
+      "priority": "high",
+      "priority_plan_ref": "PRI-GROOM-KERNEL-OPS-001",
+      "status": "archived",
+      "title": "Eliminate TDE override debt + fast-path performance gate"
+    },
+    {
+      "id": "BLI-1785257900472489000-551baff5",
+      "status": "archived",
+      "title": "Pending Human Intervention for Task ATK-1785222445867207000-5afd949f"
+    },
+    {
+      "id": "BLI-1785262553966881000-505bb192",
+      "status": "archived",
+      "title": "Close Ambient QA disparity (PRI-1785222352955168000-0fd35332 + twin BLIs)"
+    },
+    {
+      "id": "BLI-1785262554886376000-0d209ffb",
+      "status": "archived",
+      "title": "Close CAPH QA disparity (BLI-CAPH-001..004) + land wake contract if missing"
+    },
+    {
+      "id": "BLI-1785262621148387000-304ba988",
+      "status": "archived",
+      "title": "Fix MCP Command Specs"
+    },
+    {
+      "id": "BLI-1785262981014169000-a29bf8bd",
+      "status": "archived",
+      "title": "BLI-1785262981014169000-a29bf8bd: placeholder title replaced with real label"
+    },
+    {
+      "id": "BLI-1785263154706612000-17a394ce",
+      "status": "archived",
+      "title": "YC Demo: zqk init --help / first-run path probe (no hang, exit 0)"
+    },
+    {
+      "id": "BLI-1785263156265919000-5a4b8ff7",
+      "status": "archived",
+      "title": "YC Demo: Community MCP start-here one-liner works on fresh clone"
+    },
+    {
+      "id": "BLI-1785263632710235000-82309703",
+      "status": "archived",
+      "title": "Marketing Strategic Review — Post-Q3"
+    },
+    {
+      "id": "BLI-1785263634186271000-aba93cfb",
+      "status": "archived",
+      "title": "Quality Strategic Review — Post-Q3"
+    },
+    {
+      "id": "BLI-1785263635604867000-78b60745",
+      "status": "archived",
+      "title": "Security Strategic Review — Post-Q3"
+    },
+    {
+      "id": "BLI-1785263637014468000-ba2b9530",
+      "status": "archived",
+      "title": "Synthesis Strategic Review — Post-Q3"
+    },
+    {
+      "id": "BLI-1785264498152588000-aa80c013",
+      "priority": "critical",
+      "status": "archived",
+      "title": "Child BLI: migrate_cas *_test.go TRACE (follow-up to #1058)"
+    },
+    {
+      "id": "BLI-1785279944660686000-6042aaa4",
+      "priority": "medium",
+      "priority_plan_ref": "PRI-GROOM-CI-TEST-001",
+      "status": "archived",
+      "title": "Mega-gap concurrency gate: Go architect + AST expert via prompt-builder/personas"
+    },
+    {
+      "id": "BLI-1785281514861559000-de06babe",
+      "status": "archived",
+      "title": "CLI pplan \u003cplanID\u003e add \u003cbliID\u003e — child-owned priority_plan_ref"
+    },
+    {
+      "id": "BLI-1785281562154373000-e00d66e2",
+      "status": "archived",
+      "title": "CLI: pplan planID add bliID — child-owned priority_plan_ref (no bidirectional PRI refs)"
+    },
+    {
+      "id": "BLI-1785286818292156000-2df7afd2",
+      "status": "archived",
+      "title": "Backfill backlog_item.category on mega PRI-bdc4dd36 (findability / mesh readiness D9)"
+    },
+    {
+      "id": "BLI-1785288057156414000-ac7dce26",
+      "priority": "high",
+      "priority_plan_ref": "PRI-GROOM-LIFECYCLE-COHERENCE-001",
+      "status": "archived",
+      "title": "Recover mega PRI-bdc4dd36 BLIs stuck in status=error (D11 lifecycle trap)"
+    },
+    {
+      "id": "BLI-1785295565949550000-cbf4fadb",
+      "status": "archived",
+      "title": "\"Storage QueueShutdownEventCallback Lock-Free Refactor\""
+    },
+    {
+      "id": "BLI-1785295609366241000-302859ca",
+      "status": "archived",
+      "title": "\"Storage QueueShutdownEventCallback Lock-Free Refactor\""
+    },
+    {
+      "id": "BLI-1785299421806904000-6e2b2f09",
+      "priority": "medium",
+      "priority_plan_ref": "PRI-GROOM-LIFECYCLE-COHERENCE-001",
+      "status": "archived",
+      "title": "Mega PRI reorg: kernel-first shovel-ready + orchestrate-ready"
+    },
+    {
+      "id": "BLI-1785305932301454000-15849412",
+      "status": "archived",
+      "title": "Open-Core: Licensing delineation (Apache core vs commercial EE)"
+    },
+    {
+      "id": "BLI-1785305934422055000-58f288fc",
+      "status": "archived",
+      "title": "Open-Core: Time-to-first-agent (\u003c2 min install→init→run)"
+    },
+    {
+      "id": "BLI-1785305935929100000-52390fc9",
+      "status": "archived",
+      "title": "Open-Core: MCP as default tool interop (stdio + local HTTP)"
+    },
+    {
+      "id": "BLI-1785305938961759000-2c84f92c",
+      "status": "archived",
+      "title": "Open-Core: Capability deny-by-default + deterministic host FSM audit"
+    },
+    {
+      "id": "BLI-1785305940555369000-d63e7bdc",
+      "status": "archived",
+      "title": "Open-Core: Virtual context paging / cold episodic store story"
+    },
+    {
+      "id": "BLI-1785305941798937000-f52f72db",
+      "status": "archived",
+      "title": "Open-Core: Launch docs — architecture specs, 3 examples, benchmarks, Show HN"
+    },
+    {
+      "id": "BLI-1785313774435372000-3ac0d8c8",
+      "priority": "medium",
+      "priority_plan_ref": "PRI-GROOM-EVIDENCE-REOPEN-001",
+      "status": "archived",
+      "title": "Open-Core public release hygiene — studio vs public source inventory + gates"
+    },
+    {
+      "id": "BLI-1785320751043959000-8860a0a4",
+      "priority": "medium",
+      "priority_plan_ref": "PRI-GROOM-OPENCORE-001",
+      "requirement_refs": [
+        "REQ-OC-PROOF-HELLO-001"
+      ],
+      "status": "archived",
+      "title": "OC proof: implement hello kernel note"
+    },
+    {
+      "id": "BLI-1785320753089324000-49fc658e",
+      "priority": "medium",
+      "priority_plan_ref": "PRI-GROOM-OPENCORE-001",
+      "requirement_refs": [
+        "REQ-OC-PROOF-HELLO-001"
+      ],
+      "status": "archived",
+      "title": "OC proof: verify hello kernel note"
+    },
+    {
+      "id": "BLI-1785351629281373000-752ddc48",
+      "priority": "high",
+      "priority_plan_ref": "PRI-GROOM-KERNEL-OPS-001",
+      "status": "archived",
+      "title": "Persistence layer show-stopper perf (graph UNWIND + CAS index-miss scans)"
+    },
+    {
+      "id": "BLI-1785609242525860000-e9d17838",
+      "priority": "high",
+      "requirement_refs": [
+        "REQ-037"
+      ],
+      "status": "complete",
+      "title": "Managed I/O registry + disk stewardship (never fill disk)"
+    },
+    {
+      "id": "BLI-1785609249707882000-6914292e",
+      "priority": "high",
+      "requirement_refs": [
+        "REQ-037"
+      ],
+      "status": "complete",
+      "title": "I/O path registry: static paths + dynamic patterns for every managed instance"
+    },
+    {
+      "id": "BLI-1785609382360818000-3cade8c6",
+      "priority": "high",
+      "requirement_refs": [
+        "REQ-037"
+      ],
+      "status": "complete",
+      "title": "Managed-output steward: routine cleanup, retention classes, disk budgets"
+    },
+    {
+      "id": "BLI-1785637313042867000-cf345687",
+      "priority": "critical",
+      "status": "complete",
+      "title": "VDS evaluator — zqk workflow vds (fluent gate culture)"
+    },
+    {
+      "id": "BLI-1785641363663048000-550f93db",
+      "priority": "high",
+      "requirement_refs": [
+        "REQ-SYM-021"
+      ],
+      "status": "archived",
+      "title": "Cryptographic skill seal with version/date binding (load-time trust)"
+    },
+    {
+      "id": "BLI-1785641365487794000-2d69dc10",
+      "priority": "medium",
+      "requirement_refs": [
+        "REQ-SYM-021"
+      ],
+      "status": "complete",
+      "title": "System maintenance: periodic agent skill refresh + drift audit"
+    },
+    {
+      "id": "BLI-1785642900406738000-1bcc18d8",
+      "priority": "high",
+      "requirement_refs": [
+        "REQ-SYM-021"
+      ],
+      "status": "complete",
+      "title": "Keep kernel ASK twins synced with .zqk/skills + persona related_object_refs"
+    },
+    {
+      "id": "BLI-1785643367283240000-d4502eb9",
+      "priority": "medium",
+      "requirement_refs": [
+        "REQ-SYM-021"
+      ],
+      "status": "complete",
+      "title": "Peer swarm: feed ack + seat PID hygiene runbook"
+    },
+    {
+      "id": "BLI-1785643580218036000-30ecf93f",
+      "priority": "high",
+      "requirement_refs": [
+        "REQ-SYM-021"
+      ],
+      "status": "complete",
+      "title": "Wire pkg/skill seal into CLI + fail-closed skill load"
+    },
+    {
+      "id": "BLI-1785643626068720000-b1859e8c",
+      "priority": "medium",
+      "requirement_refs": [
+        "REQ-SYM-021"
+      ],
+      "status": "complete",
+      "title": "System maintenance: periodic agent skill refresh + drift audit"
+    },
+    {
+      "id": "BLI-1785643687770634000-3e439835",
+      "priority": "high",
+      "requirement_refs": [
+        "REQ-SYM-021"
+      ],
+      "status": "complete",
+      "title": "Keep kernel ASK twins synced with .zqk/skills + persona related_object_refs"
+    },
+    {
+      "id": "BLI-1785699942857215000-8f4280a2",
+      "priority": "high",
+      "requirement_refs": [
+        "REQ-1785699950223838000-536ca1bf"
+      ],
+      "status": "complete",
+      "title": "Local CI: commit on studio, checkout SHA elsewhere, scan-tests"
+    },
+    {
+      "id": "BLI-1785699944171403000-b1a163da",
+      "priority": "medium",
+      "requirement_refs": [
+        "REQ-1785699950223838000-536ca1bf"
+      ],
+      "status": "complete",
+      "title": "Local CI checkout worktree at committed SHA"
+    },
+    {
+      "id": "BLI-1785699945358997000-d8d12770",
+      "priority": "medium",
+      "requirement_refs": [
+        "REQ-1785699950223838000-536ca1bf"
+      ],
+      "status": "complete",
+      "title": "scan-tests split studio root vs source-root"
+    },
+    {
+      "id": "BLI-1785699946601766000-26fbe6a5",
+      "priority": "medium",
+      "requirement_refs": [
+        "REQ-1785699950223838000-536ca1bf"
+      ],
+      "status": "complete",
+      "title": "zqk ci run/checkout/status command surface"
+    },
+    {
+      "id": "BLI-1785699947844878000-ebecded7",
+      "priority": "medium",
+      "requirement_refs": [
+        "REQ-1785699950223838000-536ca1bf"
+      ],
+      "status": "complete",
+      "title": "Local CI optional archive drops + archive-git diffs"
+    },
+    {
+      "id": "BLI-1785699949009541000-0268198c",
+      "priority": "medium",
+      "requirement_refs": [
+        "REQ-1785699950223838000-536ca1bf"
+      ],
+      "status": "complete",
+      "title": "Document Local CI contract for remote CI translation"
+    },
+    {
+      "id": "BLI-1785723654802038000-b14064bc",
+      "priority": "high",
+      "priority_plan_ref": "PRI-CI-VERIFICATION-VALIDATION-001",
+      "requirement_refs": [
+        "REQ-1785699950223838000-536ca1bf"
+      ],
+      "status": "complete",
+      "title": "Local CI / test-bundle ops: sticky fingerprints, cache reload, AllKindsCRUD fixtures"
+    },
+    {
+      "id": "BLI-1785741758978987000-0e236acc",
+      "priority": "high",
+      "priority_plan_ref": "PRI-GROOM-LIFECYCLE-COHERENCE-001",
+      "status": "complete",
+      "title": "Remediate REQ/MIL linkage so planned requirements and not_started milestones can promote"
+    },
+    {
+      "id": "BLI-1785744934128386000-5439373d",
+      "priority": "high",
+      "priority_plan_ref": "PRI-GROOM-CAS-DRAFT-001",
+      "status": "complete",
+      "title": "Core-object archive: aggregate+compress with lineage (no silent hard-delete)"
+    },
+    {
+      "id": "BLI-1785784862092711000-26aae37b",
+      "priority": "high",
+      "requirement_refs": [
+        "REQ-1785784861144656000-2951034e"
+      ],
+      "status": "complete",
+      "title": "KMP-0: Objectify program + KERNEL_MUTATION_PIPELINE.md"
+    },
+    {
+      "id": "BLI-1785784863457357000-dda098ed",
+      "priority": "high",
+      "requirement_refs": [
+        "REQ-1785784861144656000-2951034e"
+      ],
+      "status": "complete",
+      "title": "KMP-1: Implement kernel.cas_object_* pkg/pipeline kinds + DECIDE policies"
+    },
+    {
+      "id": "BLI-1785784865905766000-dded0895",
+      "priority": "high",
+      "requirement_refs": [
+        "REQ-1785784861144656000-2951034e"
+      ],
+      "status": "complete",
+      "title": "KMP-3: Migrate check autofix, state-restore, retention onto pipeline kinds"
+    },
+    {
+      "id": "BLI-1785784867143912000-635942fb",
+      "priority": "high",
+      "requirement_refs": [
+        "REQ-1785784861144656000-2951034e"
+      ],
+      "status": "complete",
+      "title": "KMP-4: Retire ForceLifecycleOverride into DECIDE break_glass"
+    },
+    {
+      "id": "BLI-1785784868493840000-a8a0b4fc",
+      "priority": "high",
+      "requirement_refs": [
+        "REQ-1785784861144656000-2951034e"
+      ],
+      "status": "complete",
+      "title": "KMP-5: Heal dangling refs (restore-same-id or unlink) to zero critical"
+    },
+    {
+      "id": "BLI-1785786991961752000-a9d2f142",
+      "priority": "high",
+      "status": "complete",
+      "title": "KMP2-1: Init-time composition compiler → pipeline_definition"
+    },
+    {
+      "id": "BLI-1785786993294193000-ebe57e46",
+      "priority": "high",
+      "status": "archived",
+      "title": "KMP2-2: Pilot backlog_item × transition composed DECIDE"
+    },
+    {
+      "id": "BLI-1785786994591589000-2693f73f",
+      "priority": "high",
+      "status": "complete",
+      "title": "KMP2-3: Wire kernelcas Run* DECIDE to composed definitions"
+    },
+    {
+      "id": "BLI-1785786996110276000-11dde761",
+      "priority": "high",
+      "status": "complete",
+      "title": "KMP2-4: Migrate validation DSL + policy overlays into compiler inputs"
+    },
+    {
+      "id": "BLI-1785786997399161000-76ea6811",
+      "priority": "high",
+      "status": "complete",
+      "title": "KMP2-5: DELETE legacy pre-composition paths (no shims)"
+    },
+    {
+      "id": "BLI-1785786998830969000-3420af64",
+      "priority": "high",
+      "status": "complete",
+      "title": "KMP2-6: Expand critical kinds + kernel-integrity composition coverage"
+    },
+    {
+      "id": "BLI-1785801665361977000-178d12ca",
+      "priority": "high",
+      "priority_plan_ref": "PRI-GROOM-CAS-DRAFT-001",
+      "status": "complete",
+      "title": "Ready child for draft PRI sprint hygiene (leave-preliminary)"
+    },
+    {
+      "id": "BLI-1785801873589684000-3988d567",
+      "priority": "medium",
+      "status": "complete",
+      "title": "Ready child for restored PRI-SYM-005"
+    },
+    {
+      "id": "BLI-1785803632381849000-10415162",
+      "priority": "medium",
+      "priority_plan_ref": "PRI-GROOM-LIFECYCLE-COHERENCE-001",
+      "status": "archived",
+      "title": "Ready child for PRI-1785264202551036000-27c5bd5a (layer1→2)"
+    },
+    {
+      "id": "BLI-1785803649522917000-8b56c12f",
+      "priority": "medium",
+      "priority_plan_ref": "PRI-GROOM-LIFECYCLE-COHERENCE-001",
+      "status": "archived",
+      "title": "Ready child for PRI-1785320736668937000-ffe618f6 (layer1→2)"
+    },
+    {
+      "id": "BLI-1785803667090943000-cc384641",
+      "priority": "medium",
+      "requirement_refs": [
+        "REQ-037"
+      ],
+      "status": "complete",
+      "title": "Ready child for PRI-1785609407178143000-a801c159 (layer1→2)"
+    },
+    {
+      "id": "BLI-1785827957031623000-b08b9791",
+      "priority": "high",
+      "status": "complete",
+      "title": "CLI easy button: draft-plane sweeper (filterable or --all)"
+    },
+    {
+      "id": "BLI-1785827958281378000-c0366ecd",
+      "priority": "high",
+      "status": "complete",
+      "title": "CLI easy button: draft-plane promote (filterable or --all)"
+    },
+    {
+      "id": "BLI-1785839467352368000-bc625973",
+      "priority": "high",
+      "priority_plan_ref": "PRI-GROOM-EVIDENCE-REOPEN-001",
+      "status": "complete",
+      "title": "P0-1 Binary distribution (brew / curl|sh / GH Releases)"
+    },
+    {
+      "id": "BLI-1785839468275201000-ddb513d4",
+      "priority": "high",
+      "priority_plan_ref": "PRI-GROOM-EVIDENCE-REOPEN-001",
+      "status": "complete",
+      "title": "P0-2 zqk quickstart command"
+    },
+    {
+      "id": "BLI-1785839469182519000-b7ba60e7",
+      "priority": "high",
+      "priority_plan_ref": "PRI-GROOM-EVIDENCE-REOPEN-001",
+      "status": "complete",
+      "title": "P0-3 get_project_context MCP tool"
+    },
+    {
+      "id": "BLI-1785839470170393000-d1353460",
+      "priority": "high",
+      "priority_plan_ref": "PRI-GROOM-EVIDENCE-REOPEN-001",
+      "requirement_refs": [
+        "REQ-CEF-R2-DOC-JARGON",
+        "REQ-MCP-SPEC-CONFIG-001",
+        "REQ-CEF-R2-USA-COMMUNITY-FIRST"
+      ],
+      "status": "complete",
+      "title": "P0-4 MCP configuration guide (docs/QUICKSTART.md)"
+    },
+    {
+      "id": "BLI-1785839471232576000-8fd4956f",
+      "priority": "high",
+      "priority_plan_ref": "PRI-GROOM-EVIDENCE-REOPEN-001",
+      "status": "complete",
+      "title": "P0-5 README top-section rewrite (value prop + 5-min quickstart)"
+    },
+    {
+      "id": "BLI-1785886109507170000-f7f9b852",
+      "priority": "high",
+      "requirement_refs": [
+        "REQ-1785885781250041000-d05108de"
+      ],
+      "status": "complete",
+      "title": "MMORCH P0: Activate scheduler + ensure-retention-jobs for CAP"
+    },
+    {
+      "id": "BLI-1785886115759246000-7c5a488d",
+      "priority": "high",
+      "priority_plan_ref": "PRI-GROOM-KERNEL-RELIABILITY-RESIDUAL-001",
+      "requirement_refs": [
+        "REQ-1785885781250041000-d05108de"
+      ],
+      "status": "complete",
+      "title": "MMORCH P0: Standing CVS for MMORCH Operational Excellence"
+    },
+    {
+      "id": "BLI-1785886122044907000-3b4f5a93",
+      "priority": "high",
+      "requirement_refs": [
+        "REQ-1785885781250041000-d05108de"
+      ],
+      "status": "complete",
+      "title": "MMORCH P0: Create TPM CAP scheduler_job (30m cadence)"
+    },
+    {
+      "id": "BLI-1785886128312389000-6658262b",
+      "priority": "high",
+      "requirement_refs": [
+        "REQ-1785885782919744000-e6a2d175"
+      ],
+      "status": "complete",
+      "title": "MMORCH P0: Define and enforce CRI-SHOVEL-READY on dispatch"
+    },
+    {
+      "id": "BLI-1785886134649966000-7732876c",
+      "priority": "high",
+      "requirement_refs": [
+        "REQ-1785885789689154000-9d0c369d"
+      ],
+      "status": "complete",
+      "title": "MMORCH P1: WFL-MMORCH-OPERATIONAL-RUNBOOK to CAS active"
+    },
+    {
+      "id": "BLI-1785886141140237000-5982a06b",
+      "priority": "high",
+      "requirement_refs": [
+        "REQ-1785885784655713000-2b07e696",
+        "REQ-1785885782919744000-e6a2d175"
+      ],
+      "status": "complete",
+      "title": "MMORCH P1: ASK-SUBAGENT-LAUNCH-PROTOCOL agent skill"
+    },
+    {
+      "id": "BLI-1785886147647930000-39d480ce",
+      "priority": "high",
+      "requirement_refs": [
+        "REQ-1785885789689154000-9d0c369d",
+        "REQ-1785885782919744000-e6a2d175"
+      ],
+      "status": "complete",
+      "title": "MMORCH P1: ASK-MMORCH-DAILY-OPS agent skill"
+    },
+    {
+      "id": "BLI-1785886153940532000-c8f77257",
+      "priority": "high",
+      "requirement_refs": [
+        "REQ-1785885786383550000-cd8e26b6",
+        "REQ-1785885782919744000-e6a2d175"
+      ],
+      "status": "complete",
+      "title": "MMORCH P1: Probe specs for TPM heartbeat and agent idle"
+    },
+    {
+      "id": "BLI-1785886160479244000-c9f67956",
+      "priority": "high",
+      "requirement_refs": [
+        "REQ-1785885784655713000-2b07e696"
+      ],
+      "status": "complete",
+      "title": "MMORCH P2: zqk agent prepare-context CLI command"
+    },
+    {
+      "id": "BLI-1785886166768774000-c429c155",
+      "priority": "high",
+      "requirement_refs": [
+        "REQ-1785885786383550000-cd8e26b6"
+      ],
+      "status": "complete",
+      "title": "MMORCH P2: zqk swarm status CLI command"
+    },
+    {
+      "id": "BLI-1785886173393325000-d0690a02",
+      "priority": "high",
+      "requirement_refs": [
+        "REQ-1785885788031751000-a1e35fec"
+      ],
+      "status": "complete",
+      "title": "MMORCH P2: Extend agent_task with claimed_by/claimed_at"
+    },
+    {
+      "id": "BLI-1785886179550933000-d18e4779",
+      "priority": "high",
+      "priority_plan_ref": "PRI-GROOM-KERNEL-RELIABILITY-RESIDUAL-001",
+      "requirement_refs": [
+        "REQ-1785885788031751000-a1e35fec"
+      ],
+      "status": "complete",
+      "title": "MMORCH P2: Update WFL-TPM-AGY-MESH-001 for N:M topology"
+    },
+    {
+      "id": "BLI-1785886639456069000-8e575baf",
+      "priority": "high",
+      "status": "complete",
+      "title": "Retrofit legacy backlog items with string acceptance_criteria to use criteria_refs"
+    },
+    {
+      "id": "BLI-1785895580100186000-c5539372",
+      "priority": "high",
+      "priority_plan_ref": "PRI-GROOM-CAS-DRAFT-001",
+      "requirement_refs": [
+        "REQ-1785895564241296000-bf266adb"
+      ],
+      "status": "complete",
+      "title": "Bulletproof CAS / object-id-cache coherence"
+    },
+    {
+      "id": "BLI-1785899470673804000-a8ada88e",
+      "priority": "medium",
+      "status": "complete",
+      "title": "Re-align MMORCH CVS after timeout (auto PRI child)"
+    },
+    {
+      "id": "BLI-1785903708509306000-a6d8dc5b",
+      "priority": "high",
+      "requirement_refs": [
+        "REQ-1785903690847761000-a5449df3"
+      ],
+      "status": "complete",
+      "title": "MMORCH P0: Namespace demarcation on object list/count (visible scope + parity)"
+    },
+    {
+      "id": "BLI-1785903709847957000-8c7a991c",
+      "priority": "high",
+      "requirement_refs": [
+        "REQ-1785903690847761000-a5449df3"
+      ],
+      "status": "complete",
+      "title": "MMORCH P1: All-kinds object count must enumerate every listable kind"
+    },
+    {
+      "id": "BLI-1785904242062561000-ec024787",
+      "priority": "high",
+      "requirement_refs": [
+        "REQ-1785903690847761000-a5449df3"
+      ],
+      "status": "complete",
+      "title": "MMORCH P1: Enforce CRI-PERSONA-SKILL-BOUND for persona readiness"
+    },
+    {
+      "id": "BLI-1785905134201010000-07393484",
+      "priority": "high",
+      "requirement_refs": [
+        "REQ-1785905117601841000-468539c3"
+      ],
+      "status": "complete",
+      "title": "MMORCH P0: Migrate account:* ids to ACC-* and retire dual id pattern in spec"
+    },
+    {
+      "id": "BLI-1785905136581480000-1f317f44",
+      "priority": "high",
+      "requirement_refs": [
+        "REQ-1785905117601841000-468539c3"
+      ],
+      "status": "complete",
+      "title": "MMORCH P0: Enforce agent login as ACC account with role+persona binding"
+    },
+    {
+      "id": "BLI-1785905292370531000-b758a11c",
+      "priority": "high",
+      "requirement_refs": [
+        "REQ-1785905287974978000-85b10c21",
+        "REQ-1785905117601841000-468539c3"
+      ],
+      "status": "complete",
+      "title": "MMORCH P0: Issue unique ZQK_API_KEY per ACC account and inject at seating"
+    },
+    {
+      "id": "BLI-1785905540598640000-12d5118e",
+      "priority": "high",
+      "requirement_refs": [
+        "REQ-1785905520527169000-4fb88f5d",
+        "REQ-1785905117601841000-468539c3"
+      ],
+      "status": "complete",
+      "title": "MMORCH P0: Encode planner vs doer role matrix + RBAC deny cross-lane"
+    },
+    {
+      "id": "BLI-1785905541906569000-074e24d7",
+      "priority": "high",
+      "priority_plan_ref": "PRI-GROOM-KERNEL-RELIABILITY-RESIDUAL-001",
+      "status": "complete",
+      "title": "MMORCH P0: agent_instruction count \u003e\u003e retention max_count — fix stream steward/retention"
+    },
+    {
+      "id": "BLI-1785907446155489000-2d7f745b",
+      "priority": "high",
+      "status": "complete",
+      "title": "MMORCH before-launch: CLI kind aliases (splan/pplan/…) must resolve on object list/count"
+    },
+    {
+      "id": "BLI-1785908736395909000-25c4884e",
+      "priority": "high",
+      "requirement_refs": [
+        "REQ-1785908734512726000-0db5c98e"
+      ],
+      "status": "complete",
+      "title": "MMORCH before-launch P1: Partition object help — verbs vs shortcuts vs kinds"
+    },
+    {
+      "id": "BLI-1785908737683715000-dd37d570",
+      "priority": "high",
+      "priority_plan_ref": "PRI-GROOM-KERNEL-RELIABILITY-RESIDUAL-001",
+      "requirement_refs": [
+        "REQ-1785908734512726000-0db5c98e"
+      ],
+      "status": "complete",
+      "title": "MMORCH before-launch P1: Kind ontology triage — active vs adopt vs archive-candidate"
+    },
+    {
+      "id": "BLI-1785908739114727000-9a7cc2bd",
+      "priority": "high",
+      "requirement_refs": [
+        "REQ-1785908734512726000-0db5c98e",
+        "REQ-1785905520527169000-4fb88f5d"
+      ],
+      "status": "complete",
+      "title": "MMORCH before-launch P1: Persona/RBAC-scoped object discovery membrane"
+    },
+    {
+      "id": "BLI-1785909672838827000-9fca84f5",
+      "priority": "high",
+      "requirement_refs": [
+        "REQ-1785908734512726000-0db5c98e"
+      ],
+      "status": "complete",
+      "title": "MMORCH before-launch P1: Decouple link hydration — raw get + resolved sidecar/index"
+    },
+    {
+      "id": "BLI-1785918841712163000-f128dc79",
+      "priority": "high",
+      "status": "complete",
+      "title": "MMORCH: Spec/lifecycle change shockwave demotes ineligible shovel-ready objects"
+    },
+    {
+      "id": "BLI-1785925525621756000-0bc2c5ea",
+      "priority": "medium",
+      "priority_plan_ref": "PRI-SYM-003",
+      "requirement_refs": [
+        "REQ-SYM-001"
+      ],
+      "status": "complete",
+      "title": "Restore linkage for PRI-SYM-003 (Layer-1 missing-ref repair)"
+    },
+    {
+      "id": "BLI-1785930106857898000-94b9a5bc",
+      "priority": "high",
+      "priority_plan_ref": "PRI-GROOM-CLI-DNA-001",
+      "requirement_refs": [
+        "REQ-1785930125333916000-14c57300"
+      ],
+      "status": "complete",
+      "title": "Unify elevated object access under object --internal (license-gated)"
+    },
+    {
+      "id": "BLI-1786012814128369000-7373de76",
+      "priority": "high",
+      "priority_plan_ref": "PRI-GROOM-KERNEL-RELIABILITY-RESIDUAL-001",
+      "requirement_refs": [
+        "REQ-COMMS-RELIABLE-001",
+        "REQ-COMMS-SEAT-WORKER-001"
+      ],
+      "status": "complete",
+      "title": "COMMS reliable mesh gate: wake+ide_bridge+peer ack (proof of life ∧ work)"
+    },
+    {
+      "id": "BLI-1786012815231072000-d82ac6e9",
+      "priority": "high",
+      "priority_plan_ref": "PRI-GROOM-KERNEL-RELIABILITY-RESIDUAL-001",
+      "requirement_refs": [
+        "REQ-SYM-021"
+      ],
+      "status": "complete",
+      "title": "Swarm polish: zqk-ide-bridge productize (packs, install, AGY bridge later)"
+    },
+    {
+      "id": "BLI-1786084838709588000-49c11214",
+      "priority": "medium",
+      "priority_plan_ref": "PRI-1786084814786868000-df9be3b3",
+      "requirement_refs": [
+        "REQ-037"
+      ],
+      "status": "complete",
+      "title": "CAP: enforce no-idle after peer_wake_live=false (continue ATK)"
+    },
+    {
+      "id": "BLI-1786084840010427000-0c86ccfa",
+      "priority": "medium",
+      "priority_plan_ref": "PRI-1786084814786868000-df9be3b3",
+      "requirement_refs": [
+        "REQ-037"
+      ],
+      "status": "complete",
+      "title": "Collapse peer-open-core-01 alias into antigravity-1 correspondence identity"
+    },
+    {
+      "id": "BLI-1786084841516230000-904c485c",
+      "priority": "medium",
+      "priority_plan_ref": "PRI-1786084814786868000-df9be3b3",
+      "requirement_refs": [
+        "REQ-037"
+      ],
+      "status": "complete",
+      "title": "TPM roadmap buffer job: mint next PRI/BLI wave when open planned BLIs on active plans fall below threshold"
+    },
+    {
+      "id": "BLI-1786084842897497000-4f501aef",
+      "priority": "medium",
+      "priority_plan_ref": "PRI-1786084814786868000-df9be3b3",
+      "requirement_refs": [
+        "REQ-037"
+      ],
+      "status": "complete",
+      "title": "SYM-005 next shovel: CLI Stabilization P2 (slow commands)"
+    },
+    {
+      "id": "BLI-1786084844112764000-c32c6e2e",
+      "priority": "medium",
+      "priority_plan_ref": "PRI-1786084814786868000-df9be3b3",
+      "requirement_refs": [
+        "REQ-037"
+      ],
+      "status": "complete",
+      "title": "SYM-005 next shovel: Pipeline Plugin Interface tranche"
+    },
+    {
+      "id": "BLI-1786084845438321000-5da5b5f0",
+      "priority": "medium",
+      "priority_plan_ref": "PRI-1786084814786868000-df9be3b3",
+      "requirement_refs": [
+        "REQ-037"
+      ],
+      "status": "complete",
+      "title": "Mesh watchdog: ship 90s idle nudge defaults in repo + docs"
+    },
+    {
+      "id": "BLI-1786090098819989000-9471083a",
+      "priority": "high",
+      "priority_plan_ref": "PRI-GROOM-LIFECYCLE-COHERENCE-001",
+      "requirement_refs": [
+        "REQ-037"
+      ],
+      "status": "complete",
+      "title": "SUPERSEDED by BLI-1786090191934747000-a61e7e7a — vendor hardcode PR gate"
+    },
+    {
+      "id": "BLI-1786121543571877000-a13020e6",
+      "priority": "high",
+      "priority_plan_ref": "PRI-1786121461227090000-f8c05f3c",
+      "status": "complete",
+      "title": "L1+L7: Durable mesh overnight ops + vendor-strip allowlist"
+    },
+    {
+      "id": "BLI-1786121546094277000-30fb3a4c",
+      "priority": "medium",
+      "priority_plan_ref": "PRI-1786121461227090000-f8c05f3c",
+      "status": "complete",
+      "title": "L10: Night-duty registered as kernel CAP integrity (not parallel shell-only)"
+    },
+    {
+      "id": "BLI-1786121551081900000-d3d9a096",
+      "priority": "high",
+      "priority_plan_ref": "PRI-1786121461227090000-f8c05f3c",
+      "status": "complete",
+      "title": "L2: CAS create ACK fail-closed (index + get round-trip)"
+    },
+    {
+      "id": "BLI-1786121553043259000-e0f13ad7",
+      "priority": "high",
+      "priority_plan_ref": "PRI-1786121461227090000-f8c05f3c",
+      "status": "complete",
+      "title": "L3: Overnight planner seating OR doer-safe feed wake API"
+    },
+    {
+      "id": "BLI-1786121554562427000-fd5b12b0",
+      "priority": "high",
+      "priority_plan_ref": "PRI-1786121461227090000-f8c05f3c",
+      "status": "complete",
+      "title": "L4: CAP journal freshness probe + unstick SCH-cap-orchestrator"
+    },
+    {
+      "id": "BLI-1786121556161154000-6a4ed14f",
+      "priority": "high",
+      "priority_plan_ref": "PRI-1786121461227090000-f8c05f3c",
+      "status": "complete",
+      "title": "L5: Land hardened night-duty-eval as SSOT (list-first + wake fallback)"
+    },
+    {
+      "id": "BLI-1786121559664862000-4742df8e",
+      "priority": "high",
+      "priority_plan_ref": "PRI-1786121461227090000-f8c05f3c",
+      "status": "complete",
+      "title": "L6: Swarm heartbeat metrics (kill false executing)"
+    },
+    {
+      "id": "BLI-1786121561447104000-88f96427",
+      "priority": "high",
+      "priority_plan_ref": "PRI-1786121461227090000-f8c05f3c",
+      "status": "complete",
+      "title": "L8: Honor PR gates — fix Actions startup_failure; refuse merge without checks"
+    },
+    {
+      "id": "BLI-1786121565703984000-627fbbdd",
+      "priority": "medium",
+      "priority_plan_ref": "PRI-1786121461227090000-f8c05f3c",
+      "status": "complete",
+      "title": "L9: Drain stale peer-ack outbox; peer-ack timeout job health"
+    },
+    {
+      "id": "BLI-1786142398361424000-871ed207",
+      "priority": "high",
+      "priority_plan_ref": "PRI-GROOM-CAS-DRAFT-001",
+      "requirement_refs": [
+        "REQ-1785895564241296000-bf266adb"
+      ],
+      "status": "complete",
+      "title": "Storage delete guard must fail CLOSED on stale/missing reverse-reference index"
+    },
+    {
+      "id": "BLI-1786158060462103000-ba3112b0",
+      "priority": "high",
+      "priority_plan_ref": "PRI-GROOM-CAS-DRAFT-001",
+      "requirement_refs": [
+        "REQ-1785895564241296000-bf266adb"
+      ],
+      "status": "complete",
+      "title": "Draft bulk delete reports success but leaves draft YAML"
+    },
+    {
+      "id": "BLI-1786162072415759000-eb64a9d5",
+      "priority": "medium",
+      "priority_plan_ref": "PRI-GROOM-CI-TEST-001",
+      "requirement_refs": [
+        "REQ-1785895564241296000-bf266adb"
+      ],
+      "status": "complete",
+      "title": "Track QA disparity debt: missing verified test assets / traceability"
+    },
+    {
+      "id": "BLI-1786202792894137000-261b4c60",
+      "priority": "high",
+      "requirement_refs": [
+        "REQ-1785699950223838000-536ca1bf"
+      ],
+      "status": "complete",
+      "title": "E2E test for Local CI worktree checkout and scan"
+    },
+    {
+      "id": "BLI-1786234269135820000-4129651b",
+      "priority": "high",
+      "priority_plan_ref": "PRI-GROOM-METRICS-AMBIENT-001",
+      "status": "complete",
+      "title": "whats-next kernel ambience — TPM thought projector (system check + draft plane + COMMS seat)"
+    },
+    {
+      "id": "BLI-1786234750339950000-942f33c5",
+      "priority": "high",
+      "priority_plan_ref": "PRI-GROOM-CAS-DRAFT-001",
+      "status": "complete",
+      "title": "Dangling-ref unlink does not persist — autofix success vs CAS (new surface after KMP-5)"
+    },
+    {
+      "id": "BLI-1786234899269701000-6d2cbc03",
+      "priority": "high",
+      "priority_plan_ref": "PRI-GROOM-LIFECYCLE-COHERENCE-001",
+      "status": "complete",
+      "title": "False-complete priority_plans — status=complete while linked BLIs non-terminal"
+    },
+    {
+      "id": "BLI-1786235477458617000-fa406a21",
+      "priority": "high",
+      "priority_plan_ref": "PRI-GROOM-CLI-DNA-001",
+      "status": "complete",
+      "title": "N-seat CLI session collision — shared .zqk/state/session + auth login SystemAccountID electrocutes workers"
+    },
+    {
+      "id": "BLI-1786332003099023000-60d2373e",
+      "priority": "critical",
+      "requirement_refs": [
+        "REQ-1786331858536124000-45977c14"
+      ],
+      "status": "complete",
+      "title": "P0: Idempotent configure-restored-project.sh + Make targets"
+    },
+    {
+      "id": "BLI-1786353315012672000-55c06f15",
+      "priority": "high",
+      "status": "complete",
+      "title": "P0: Clean-clone verify configure-restored-project.sh --check twice"
+    }
+  ]
+}

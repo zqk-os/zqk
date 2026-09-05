@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-106",
+  "created_at": "2026-09-04T21:34:28.415432Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-106",
+    "Tests": [
+      {
+        "Name": "TestAggregate_NumericWithMissingField",
+        "Package": "crud_test",
+        "PackagePath": "pkg/storage/crud",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/crud/file_aggregate_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAggregate_PermissionDenied",
+        "Package": "crud_test",
+        "PackagePath": "pkg/storage/crud",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/crud/file_aggregate_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAggregate_PermissionAllowed_ExplicitReadKind",
+        "Package": "crud_test",
+        "PackagePath": "pkg/storage/crud",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/crud/file_aggregate_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestFileObjectStorage_Create_WithBlockedIOQueue",
+        "Package": "crud_test",
+        "PackagePath": "pkg/storage/crud",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/crud/file_create_timeout_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestFileObjectStorage_Create_HonestContextCancellationUnderContention",
+        "Package": "crud_test",
+        "PackagePath": "pkg/storage/crud",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/crud/file_create_timeout_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestCriteriaCascadeDeletionDirection",
+        "Package": "crud_test",
+        "PackagePath": "pkg/storage/crud",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/crud/file_criteria_cascade_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestFileObjectStorage_DispatchStatusGatewayDoesNotWalkParents",
+        "Package": "crud_test",
+        "PackagePath": "pkg/storage/crud",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/crud/file_gateway_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestFileObjectStorage_StatusReactiveListener_MilestoneRefs",
+        "Package": "crud_test",
+        "PackagePath": "pkg/storage/crud",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/crud/file_gateway_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestFileObjectStorage_StatusReactiveListener_CriteriaRefs",
+        "Package": "crud_test",
+        "PackagePath": "pkg/storage/crud",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/crud/file_gateway_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestVerifyEmbeddedChecksum",
+        "Package": "crud_test",
+        "PackagePath": "pkg/storage/crud",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/crud/file_helpers_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 900000000000,
+    "PackagePath": "pkg/storage/crud"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestAggregate_NumericWithMissingField",
+      "Package": "crud_test",
+      "PackagePath": "pkg/storage/crud",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/crud/file_aggregate_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestAggregate_PermissionDenied",
+      "Package": "crud_test",
+      "PackagePath": "pkg/storage/crud",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/crud/file_aggregate_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestAggregate_PermissionAllowed_ExplicitReadKind",
+      "Package": "crud_test",
+      "PackagePath": "pkg/storage/crud",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/crud/file_aggregate_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestFileObjectStorage_Create_WithBlockedIOQueue",
+      "Package": "crud_test",
+      "PackagePath": "pkg/storage/crud",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/crud/file_create_timeout_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestFileObjectStorage_Create_HonestContextCancellationUnderContention",
+      "Package": "crud_test",
+      "PackagePath": "pkg/storage/crud",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/crud/file_create_timeout_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestCriteriaCascadeDeletionDirection",
+      "Package": "crud_test",
+      "PackagePath": "pkg/storage/crud",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/crud/file_criteria_cascade_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestFileObjectStorage_DispatchStatusGatewayDoesNotWalkParents",
+      "Package": "crud_test",
+      "PackagePath": "pkg/storage/crud",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/crud/file_gateway_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestFileObjectStorage_StatusReactiveListener_MilestoneRefs",
+      "Package": "crud_test",
+      "PackagePath": "pkg/storage/crud",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/crud/file_gateway_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestFileObjectStorage_StatusReactiveListener_CriteriaRefs",
+      "Package": "crud_test",
+      "PackagePath": "pkg/storage/crud",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/crud/file_gateway_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestVerifyEmbeddedChecksum",
+      "Package": "crud_test",
+      "PackagePath": "pkg/storage/crud",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/crud/file_helpers_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    }
+  }
+}

@@ -1,0 +1,123 @@
+{
+  "name": "make-verify-464",
+  "created_at": "2026-09-04T21:34:31.93403Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-464",
+    "Tests": [
+      {
+        "Name": "TestParseColumnsFlag",
+        "Package": "cli",
+        "PackagePath": "pkg/cli",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/cli/table_formatter_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestGetColumnWidth",
+        "Package": "cli",
+        "PackagePath": "pkg/cli",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/cli/table_formatter_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestTruncateString",
+        "Package": "cli",
+        "PackagePath": "pkg/cli",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/cli/table_formatter_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestParseSchedulerStopWaitArgs",
+        "Package": "cli",
+        "PackagePath": "pkg/cli",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/cli/timeout_hook_scheduler_stop_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAdjustOuterTimeoutForSchedulerStopWait",
+        "Package": "cli",
+        "PackagePath": "pkg/cli",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/cli/timeout_hook_scheduler_stop_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestSchedulerStopWaitExemptFromChildCap",
+        "Package": "cli",
+        "PackagePath": "pkg/cli",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/cli/timeout_hook_scheduler_stop_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": true,
+    "EstimatedDuration": 180000000000,
+    "PackagePath": "pkg/cli"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestParseColumnsFlag",
+      "Package": "cli",
+      "PackagePath": "pkg/cli",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/cli/table_formatter_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestGetColumnWidth",
+      "Package": "cli",
+      "PackagePath": "pkg/cli",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/cli/table_formatter_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestTruncateString",
+      "Package": "cli",
+      "PackagePath": "pkg/cli",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/cli/table_formatter_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestParseSchedulerStopWaitArgs",
+      "Package": "cli",
+      "PackagePath": "pkg/cli",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/cli/timeout_hook_scheduler_stop_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestAdjustOuterTimeoutForSchedulerStopWait",
+      "Package": "cli",
+      "PackagePath": "pkg/cli",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/cli/timeout_hook_scheduler_stop_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestSchedulerStopWaitExemptFromChildCap",
+      "Package": "cli",
+      "PackagePath": "pkg/cli",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/cli/timeout_hook_scheduler_stop_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

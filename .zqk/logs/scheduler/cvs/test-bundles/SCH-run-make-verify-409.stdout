@@ -1,0 +1,424 @@
+
+--- run 2026-09-04T22:12:46Z ---
+=== RUN   TestObjectsKindAliasesMatchKindnames
+=== PAUSE TestObjectsKindAliasesMatchKindnames
+=== RUN   TestLoadKindNamesFromSpecsDir
+=== PAUSE TestLoadKindNamesFromSpecsDir
+=== RUN   TestLoadKindNamesFromSpecsDir_emptyDirErrors
+=== PAUSE TestLoadKindNamesFromSpecsDir_emptyDirErrors
+=== CONT  TestObjectsKindAliasesMatchKindnames
+=== RUN   TestObjectsKindAliasesMatchKindnames/account
+=== PAUSE TestObjectsKindAliasesMatchKindnames/account
+=== RUN   TestObjectsKindAliasesMatchKindnames/agent_architecture
+=== PAUSE TestObjectsKindAliasesMatchKindnames/agent_architecture
+=== RUN   TestObjectsKindAliasesMatchKindnames/agent_feed
+=== PAUSE TestObjectsKindAliasesMatchKindnames/agent_feed
+=== RUN   TestObjectsKindAliasesMatchKindnames/agent_onboarding_preparation
+=== CONT  TestLoadKindNamesFromSpecsDir_emptyDirErrors
+=== PAUSE TestObjectsKindAliasesMatchKindnames/agent_onboarding_preparation
+=== RUN   TestObjectsKindAliasesMatchKindnames/audit_aggregation_metric
+=== PAUSE TestObjectsKindAliasesMatchKindnames/audit_aggregation_metric
+=== RUN   TestObjectsKindAliasesMatchKindnames/audit_event
+=== PAUSE TestObjectsKindAliasesMatchKindnames/audit_event
+=== RUN   TestObjectsKindAliasesMatchKindnames/audit_event_aggregation
+=== PAUSE TestObjectsKindAliasesMatchKindnames/audit_event_aggregation
+=== RUN   TestObjectsKindAliasesMatchKindnames/auditable
+=== PAUSE TestObjectsKindAliasesMatchKindnames/auditable
+=== RUN   TestObjectsKindAliasesMatchKindnames/auth_strategy
+=== PAUSE TestObjectsKindAliasesMatchKindnames/auth_strategy
+=== RUN   TestObjectsKindAliasesMatchKindnames/auto_fix_rule
+=== PAUSE TestObjectsKindAliasesMatchKindnames/auto_fix_rule
+=== RUN   TestObjectsKindAliasesMatchKindnames/backlog_item
+=== PAUSE TestObjectsKindAliasesMatchKindnames/backlog_item
+=== RUN   TestObjectsKindAliasesMatchKindnames/base_metric
+=== PAUSE TestObjectsKindAliasesMatchKindnames/base_metric
+=== RUN   TestObjectsKindAliasesMatchKindnames/base_object
+=== PAUSE TestObjectsKindAliasesMatchKindnames/base_object
+=== RUN   TestObjectsKindAliasesMatchKindnames/base_sampler
+=== PAUSE TestObjectsKindAliasesMatchKindnames/base_sampler
+=== RUN   TestObjectsKindAliasesMatchKindnames/brand
+=== PAUSE TestObjectsKindAliasesMatchKindnames/brand
+=== RUN   TestObjectsKindAliasesMatchKindnames/bucketing_strategy
+=== PAUSE TestObjectsKindAliasesMatchKindnames/bucketing_strategy
+=== RUN   TestObjectsKindAliasesMatchKindnames/certificate
+=== PAUSE TestObjectsKindAliasesMatchKindnames/certificate
+=== RUN   TestObjectsKindAliasesMatchKindnames/change_journal_entry
+=== PAUSE TestObjectsKindAliasesMatchKindnames/change_journal_entry
+=== RUN   TestObjectsKindAliasesMatchKindnames/code_quality_metric
+=== PAUSE TestObjectsKindAliasesMatchKindnames/code_quality_metric
+=== RUN   TestObjectsKindAliasesMatchKindnames/code_reference
+=== PAUSE TestObjectsKindAliasesMatchKindnames/code_reference
+=== RUN   TestObjectsKindAliasesMatchKindnames/command_metric
+=== PAUSE TestObjectsKindAliasesMatchKindnames/command_metric
+=== RUN   TestObjectsKindAliasesMatchKindnames/component
+=== PAUSE TestObjectsKindAliasesMatchKindnames/component
+=== RUN   TestObjectsKindAliasesMatchKindnames/context_refresh_schedule
+=== PAUSE TestObjectsKindAliasesMatchKindnames/context_refresh_schedule
+=== RUN   TestObjectsKindAliasesMatchKindnames/convergence_session
+=== PAUSE TestObjectsKindAliasesMatchKindnames/convergence_session
+=== RUN   TestObjectsKindAliasesMatchKindnames/corporate_initiative
+=== PAUSE TestObjectsKindAliasesMatchKindnames/corporate_initiative
+=== RUN   TestObjectsKindAliasesMatchKindnames/criteria
+=== PAUSE TestObjectsKindAliasesMatchKindnames/criteria
+=== RUN   TestObjectsKindAliasesMatchKindnames/decision
+=== PAUSE TestObjectsKindAliasesMatchKindnames/decision
+=== RUN   TestObjectsKindAliasesMatchKindnames/department
+=== PAUSE TestObjectsKindAliasesMatchKindnames/department
+=== RUN   TestObjectsKindAliasesMatchKindnames/display
+=== PAUSE TestObjectsKindAliasesMatchKindnames/display
+=== RUN   TestObjectsKindAliasesMatchKindnames/division
+=== PAUSE TestObjectsKindAliasesMatchKindnames/division
+=== RUN   TestObjectsKindAliasesMatchKindnames/doc_entry
+=== PAUSE TestObjectsKindAliasesMatchKindnames/doc_entry
+=== RUN   TestObjectsKindAliasesMatchKindnames/domain_registry
+=== PAUSE TestObjectsKindAliasesMatchKindnames/domain_registry
+=== RUN   TestObjectsKindAliasesMatchKindnames/evolution_management
+=== PAUSE TestObjectsKindAliasesMatchKindnames/evolution_management
+=== RUN   TestObjectsKindAliasesMatchKindnames/extensible_object
+=== PAUSE TestObjectsKindAliasesMatchKindnames/extensible_object
+=== RUN   TestObjectsKindAliasesMatchKindnames/file_lock_metric
+=== PAUSE TestObjectsKindAliasesMatchKindnames/file_lock_metric
+=== RUN   TestObjectsKindAliasesMatchKindnames/goal
+=== PAUSE TestObjectsKindAliasesMatchKindnames/goal
+=== RUN   TestObjectsKindAliasesMatchKindnames/glossary_term
+=== PAUSE TestObjectsKindAliasesMatchKindnames/glossary_term
+=== RUN   TestObjectsKindAliasesMatchKindnames/glossary_term_relation
+=== PAUSE TestObjectsKindAliasesMatchKindnames/glossary_term_relation
+=== RUN   TestObjectsKindAliasesMatchKindnames/impact_analysis
+=== PAUSE TestObjectsKindAliasesMatchKindnames/impact_analysis
+=== RUN   TestObjectsKindAliasesMatchKindnames/import_tracking
+=== PAUSE TestObjectsKindAliasesMatchKindnames/import_tracking
+=== RUN   TestObjectsKindAliasesMatchKindnames/important_date
+=== PAUSE TestObjectsKindAliasesMatchKindnames/important_date
+=== RUN   TestObjectsKindAliasesMatchKindnames/improvement_report
+=== PAUSE TestObjectsKindAliasesMatchKindnames/improvement_report
+=== RUN   TestObjectsKindAliasesMatchKindnames/integrity_manifest
+=== PAUSE TestObjectsKindAliasesMatchKindnames/integrity_manifest
+=== RUN   TestObjectsKindAliasesMatchKindnames/keystore_entry
+=== PAUSE TestObjectsKindAliasesMatchKindnames/keystore_entry
+=== RUN   TestObjectsKindAliasesMatchKindnames/kind_mapping_metric
+=== PAUSE TestObjectsKindAliasesMatchKindnames/kind_mapping_metric
+=== RUN   TestObjectsKindAliasesMatchKindnames/kind_synonym
+=== PAUSE TestObjectsKindAliasesMatchKindnames/kind_synonym
+=== RUN   TestObjectsKindAliasesMatchKindnames/library
+=== PAUSE TestObjectsKindAliasesMatchKindnames/library
+=== RUN   TestObjectsKindAliasesMatchKindnames/lifecycle
+=== PAUSE TestObjectsKindAliasesMatchKindnames/lifecycle
+=== RUN   TestObjectsKindAliasesMatchKindnames/list_metric_sampler
+=== PAUSE TestObjectsKindAliasesMatchKindnames/list_metric_sampler
+=== RUN   TestObjectsKindAliasesMatchKindnames/mcp_built_in_tool
+=== PAUSE TestObjectsKindAliasesMatchKindnames/mcp_built_in_tool
+=== RUN   TestObjectsKindAliasesMatchKindnames/mcp_session
+=== PAUSE TestObjectsKindAliasesMatchKindnames/mcp_session
+=== RUN   TestObjectsKindAliasesMatchKindnames/mcp_spec
+=== PAUSE TestObjectsKindAliasesMatchKindnames/mcp_spec
+=== RUN   TestObjectsKindAliasesMatchKindnames/metadata_package
+=== PAUSE TestObjectsKindAliasesMatchKindnames/metadata_package
+=== RUN   TestObjectsKindAliasesMatchKindnames/milestone
+=== PAUSE TestObjectsKindAliasesMatchKindnames/milestone
+=== RUN   TestObjectsKindAliasesMatchKindnames/mission
+=== PAUSE TestObjectsKindAliasesMatchKindnames/mission
+=== RUN   TestObjectsKindAliasesMatchKindnames/namespace
+=== PAUSE TestObjectsKindAliasesMatchKindnames/namespace
+=== RUN   TestObjectsKindAliasesMatchKindnames/namespace_registry
+=== PAUSE TestObjectsKindAliasesMatchKindnames/namespace_registry
+=== RUN   TestObjectsKindAliasesMatchKindnames/object_spec
+=== PAUSE TestObjectsKindAliasesMatchKindnames/object_spec
+=== RUN   TestObjectsKindAliasesMatchKindnames/ordered_list_metric_sampler
+=== PAUSE TestObjectsKindAliasesMatchKindnames/ordered_list_metric_sampler
+=== RUN   TestObjectsKindAliasesMatchKindnames/organization
+=== PAUSE TestObjectsKindAliasesMatchKindnames/organization
+=== RUN   TestObjectsKindAliasesMatchKindnames/organizational_change
+=== PAUSE TestObjectsKindAliasesMatchKindnames/organizational_change
+=== RUN   TestObjectsKindAliasesMatchKindnames/partnership
+=== PAUSE TestObjectsKindAliasesMatchKindnames/partnership
+=== RUN   TestObjectsKindAliasesMatchKindnames/persona
+=== PAUSE TestObjectsKindAliasesMatchKindnames/persona
+=== RUN   TestObjectsKindAliasesMatchKindnames/policy
+=== PAUSE TestObjectsKindAliasesMatchKindnames/policy
+=== RUN   TestObjectsKindAliasesMatchKindnames/priority_plan
+=== PAUSE TestObjectsKindAliasesMatchKindnames/priority_plan
+=== RUN   TestObjectsKindAliasesMatchKindnames/prompt_template
+=== PAUSE TestObjectsKindAliasesMatchKindnames/prompt_template
+=== RUN   TestObjectsKindAliasesMatchKindnames/question
+=== PAUSE TestObjectsKindAliasesMatchKindnames/question
+=== RUN   TestObjectsKindAliasesMatchKindnames/release
+=== PAUSE TestObjectsKindAliasesMatchKindnames/release
+=== RUN   TestObjectsKindAliasesMatchKindnames/requirement
+=== PAUSE TestObjectsKindAliasesMatchKindnames/requirement
+=== RUN   TestObjectsKindAliasesMatchKindnames/resolver
+=== PAUSE TestObjectsKindAliasesMatchKindnames/resolver
+=== RUN   TestObjectsKindAliasesMatchKindnames/roadmap
+=== PAUSE TestObjectsKindAliasesMatchKindnames/roadmap
+=== RUN   TestObjectsKindAliasesMatchKindnames/risk_blocker
+=== PAUSE TestObjectsKindAliasesMatchKindnames/risk_blocker
+=== RUN   TestObjectsKindAliasesMatchKindnames/rollback_report
+=== PAUSE TestObjectsKindAliasesMatchKindnames/rollback_report
+=== RUN   TestObjectsKindAliasesMatchKindnames/role
+=== PAUSE TestObjectsKindAliasesMatchKindnames/role
+=== RUN   TestObjectsKindAliasesMatchKindnames/rule
+=== PAUSE TestObjectsKindAliasesMatchKindnames/rule
+=== RUN   TestObjectsKindAliasesMatchKindnames/sampler_profile
+=== PAUSE TestObjectsKindAliasesMatchKindnames/sampler_profile
+=== RUN   TestObjectsKindAliasesMatchKindnames/scalar_metric_sampler
+=== PAUSE TestObjectsKindAliasesMatchKindnames/scalar_metric_sampler
+=== RUN   TestObjectsKindAliasesMatchKindnames/scenario
+=== PAUSE TestObjectsKindAliasesMatchKindnames/scenario
+=== RUN   TestObjectsKindAliasesMatchKindnames/scheduler_handler_binding
+=== PAUSE TestObjectsKindAliasesMatchKindnames/scheduler_handler_binding
+=== RUN   TestObjectsKindAliasesMatchKindnames/scheduler_health_metric
+=== PAUSE TestObjectsKindAliasesMatchKindnames/scheduler_health_metric
+=== RUN   TestObjectsKindAliasesMatchKindnames/scheduler_job
+=== PAUSE TestObjectsKindAliasesMatchKindnames/scheduler_job
+=== RUN   TestObjectsKindAliasesMatchKindnames/stakeholder_profile
+=== PAUSE TestObjectsKindAliasesMatchKindnames/stakeholder_profile
+=== RUN   TestObjectsKindAliasesMatchKindnames/status_history_metric_sampler
+=== PAUSE TestObjectsKindAliasesMatchKindnames/status_history_metric_sampler
+=== RUN   TestObjectsKindAliasesMatchKindnames/strategic_context
+=== PAUSE TestObjectsKindAliasesMatchKindnames/strategic_context
+=== RUN   TestObjectsKindAliasesMatchKindnames/strategic_plan
+=== PAUSE TestObjectsKindAliasesMatchKindnames/strategic_plan
+=== RUN   TestObjectsKindAliasesMatchKindnames/team
+=== PAUSE TestObjectsKindAliasesMatchKindnames/team
+=== RUN   TestObjectsKindAliasesMatchKindnames/technical_debt
+=== PAUSE TestObjectsKindAliasesMatchKindnames/technical_debt
+=== RUN   TestObjectsKindAliasesMatchKindnames/template
+=== PAUSE TestObjectsKindAliasesMatchKindnames/template
+=== RUN   TestObjectsKindAliasesMatchKindnames/test_audit_aggregation_metric
+=== PAUSE TestObjectsKindAliasesMatchKindnames/test_audit_aggregation_metric
+=== RUN   TestObjectsKindAliasesMatchKindnames/test_case
+=== PAUSE TestObjectsKindAliasesMatchKindnames/test_case
+=== RUN   TestObjectsKindAliasesMatchKindnames/test_command_rule
+=== PAUSE TestObjectsKindAliasesMatchKindnames/test_command_rule
+=== RUN   TestObjectsKindAliasesMatchKindnames/verification_matrix
+=== PAUSE TestObjectsKindAliasesMatchKindnames/verification_matrix
+=== RUN   TestObjectsKindAliasesMatchKindnames/vocabulary_scheme
+=== PAUSE TestObjectsKindAliasesMatchKindnames/vocabulary_scheme
+=== RUN   TestObjectsKindAliasesMatchKindnames/vision
+=== PAUSE TestObjectsKindAliasesMatchKindnames/vision
+=== RUN   TestObjectsKindAliasesMatchKindnames/workflow
+=== PAUSE TestObjectsKindAliasesMatchKindnames/workflow
+=== RUN   TestObjectsKindAliasesMatchKindnames/workstream
+=== PAUSE TestObjectsKindAliasesMatchKindnames/workstream
+=== RUN   TestObjectsKindAliasesMatchKindnames/workstream_transition
+=== PAUSE TestObjectsKindAliasesMatchKindnames/workstream_transition
+=== RUN   TestObjectsKindAliasesMatchKindnames/occupancy
+=== PAUSE TestObjectsKindAliasesMatchKindnames/occupancy
+=== RUN   TestObjectsKindAliasesMatchKindnames/remaining_open
+=== PAUSE TestObjectsKindAliasesMatchKindnames/remaining_open
+=== RUN   TestObjectsKindAliasesMatchKindnames/work_interval
+=== PAUSE TestObjectsKindAliasesMatchKindnames/work_interval
+=== RUN   TestObjectsKindAliasesMatchKindnames/work_unit
+=== PAUSE TestObjectsKindAliasesMatchKindnames/work_unit
+=== RUN   TestObjectsKindAliasesMatchKindnames/zqk_session
+=== PAUSE TestObjectsKindAliasesMatchKindnames/zqk_session
+=== CONT  TestLoadKindNamesFromSpecsDir
+--- PASS: TestLoadKindNamesFromSpecsDir_emptyDirErrors (0.01s)
+=== CONT  TestObjectsKindAliasesMatchKindnames/account
+=== CONT  TestObjectsKindAliasesMatchKindnames/mcp_spec
+=== CONT  TestObjectsKindAliasesMatchKindnames/zqk_session
+=== CONT  TestObjectsKindAliasesMatchKindnames/work_unit
+=== CONT  TestObjectsKindAliasesMatchKindnames/work_interval
+=== CONT  TestObjectsKindAliasesMatchKindnames/remaining_open
+=== CONT  TestObjectsKindAliasesMatchKindnames/occupancy
+=== CONT  TestObjectsKindAliasesMatchKindnames/workstream_transition
+=== CONT  TestObjectsKindAliasesMatchKindnames/workstream
+=== CONT  TestObjectsKindAliasesMatchKindnames/workflow
+=== CONT  TestObjectsKindAliasesMatchKindnames/vision
+=== CONT  TestObjectsKindAliasesMatchKindnames/vocabulary_scheme
+=== CONT  TestObjectsKindAliasesMatchKindnames/verification_matrix
+=== CONT  TestObjectsKindAliasesMatchKindnames/test_command_rule
+=== CONT  TestObjectsKindAliasesMatchKindnames/test_case
+=== CONT  TestObjectsKindAliasesMatchKindnames/test_audit_aggregation_metric
+=== CONT  TestObjectsKindAliasesMatchKindnames/template
+=== CONT  TestObjectsKindAliasesMatchKindnames/technical_debt
+=== CONT  TestObjectsKindAliasesMatchKindnames/team
+=== CONT  TestObjectsKindAliasesMatchKindnames/strategic_plan
+=== CONT  TestObjectsKindAliasesMatchKindnames/strategic_context
+=== CONT  TestObjectsKindAliasesMatchKindnames/status_history_metric_sampler
+=== CONT  TestObjectsKindAliasesMatchKindnames/stakeholder_profile
+=== CONT  TestObjectsKindAliasesMatchKindnames/scheduler_job
+=== CONT  TestObjectsKindAliasesMatchKindnames/scheduler_health_metric
+=== CONT  TestObjectsKindAliasesMatchKindnames/scheduler_handler_binding
+=== CONT  TestObjectsKindAliasesMatchKindnames/scenario
+=== CONT  TestObjectsKindAliasesMatchKindnames/scalar_metric_sampler
+=== CONT  TestObjectsKindAliasesMatchKindnames/sampler_profile
+=== CONT  TestObjectsKindAliasesMatchKindnames/rule
+=== CONT  TestObjectsKindAliasesMatchKindnames/role
+=== CONT  TestObjectsKindAliasesMatchKindnames/rollback_report
+=== CONT  TestObjectsKindAliasesMatchKindnames/risk_blocker
+=== CONT  TestObjectsKindAliasesMatchKindnames/roadmap
+=== CONT  TestObjectsKindAliasesMatchKindnames/resolver
+=== CONT  TestObjectsKindAliasesMatchKindnames/requirement
+=== CONT  TestObjectsKindAliasesMatchKindnames/release
+=== CONT  TestObjectsKindAliasesMatchKindnames/question
+=== CONT  TestObjectsKindAliasesMatchKindnames/prompt_template
+=== CONT  TestObjectsKindAliasesMatchKindnames/priority_plan
+=== CONT  TestObjectsKindAliasesMatchKindnames/object_spec
+=== CONT  TestObjectsKindAliasesMatchKindnames/namespace_registry
+=== CONT  TestObjectsKindAliasesMatchKindnames/namespace
+=== CONT  TestObjectsKindAliasesMatchKindnames/mission
+=== CONT  TestObjectsKindAliasesMatchKindnames/milestone
+=== CONT  TestObjectsKindAliasesMatchKindnames/metadata_package
+=== CONT  TestObjectsKindAliasesMatchKindnames/partnership
+=== CONT  TestObjectsKindAliasesMatchKindnames/policy
+=== CONT  TestObjectsKindAliasesMatchKindnames/persona
+=== CONT  TestObjectsKindAliasesMatchKindnames/organizational_change
+=== CONT  TestObjectsKindAliasesMatchKindnames/decision
+=== CONT  TestObjectsKindAliasesMatchKindnames/mcp_session
+=== CONT  TestObjectsKindAliasesMatchKindnames/mcp_built_in_tool
+=== CONT  TestObjectsKindAliasesMatchKindnames/list_metric_sampler
+=== CONT  TestObjectsKindAliasesMatchKindnames/lifecycle
+=== CONT  TestObjectsKindAliasesMatchKindnames/library
+=== CONT  TestObjectsKindAliasesMatchKindnames/kind_synonym
+=== CONT  TestObjectsKindAliasesMatchKindnames/kind_mapping_metric
+=== CONT  TestObjectsKindAliasesMatchKindnames/keystore_entry
+=== CONT  TestObjectsKindAliasesMatchKindnames/integrity_manifest
+=== CONT  TestObjectsKindAliasesMatchKindnames/improvement_report
+=== CONT  TestObjectsKindAliasesMatchKindnames/important_date
+=== CONT  TestObjectsKindAliasesMatchKindnames/import_tracking
+=== CONT  TestObjectsKindAliasesMatchKindnames/impact_analysis
+=== CONT  TestObjectsKindAliasesMatchKindnames/glossary_term_relation
+=== CONT  TestObjectsKindAliasesMatchKindnames/glossary_term
+=== CONT  TestObjectsKindAliasesMatchKindnames/goal
+=== CONT  TestObjectsKindAliasesMatchKindnames/file_lock_metric
+=== CONT  TestObjectsKindAliasesMatchKindnames/extensible_object
+=== CONT  TestObjectsKindAliasesMatchKindnames/evolution_management
+=== CONT  TestObjectsKindAliasesMatchKindnames/domain_registry
+=== CONT  TestObjectsKindAliasesMatchKindnames/doc_entry
+=== CONT  TestObjectsKindAliasesMatchKindnames/division
+=== CONT  TestObjectsKindAliasesMatchKindnames/display
+=== CONT  TestObjectsKindAliasesMatchKindnames/department
+=== CONT  TestObjectsKindAliasesMatchKindnames/organization
+=== CONT  TestObjectsKindAliasesMatchKindnames/base_sampler
+=== CONT  TestObjectsKindAliasesMatchKindnames/criteria
+=== CONT  TestObjectsKindAliasesMatchKindnames/corporate_initiative
+=== CONT  TestObjectsKindAliasesMatchKindnames/convergence_session
+=== CONT  TestObjectsKindAliasesMatchKindnames/context_refresh_schedule
+=== CONT  TestObjectsKindAliasesMatchKindnames/component
+=== CONT  TestObjectsKindAliasesMatchKindnames/command_metric
+=== CONT  TestObjectsKindAliasesMatchKindnames/code_reference
+=== CONT  TestObjectsKindAliasesMatchKindnames/code_quality_metric
+=== CONT  TestObjectsKindAliasesMatchKindnames/change_journal_entry
+=== CONT  TestObjectsKindAliasesMatchKindnames/certificate
+=== CONT  TestObjectsKindAliasesMatchKindnames/bucketing_strategy
+=== CONT  TestObjectsKindAliasesMatchKindnames/brand
+=== CONT  TestObjectsKindAliasesMatchKindnames/auditable
+=== CONT  TestObjectsKindAliasesMatchKindnames/base_object
+=== CONT  TestObjectsKindAliasesMatchKindnames/base_metric
+=== CONT  TestObjectsKindAliasesMatchKindnames/backlog_item
+=== CONT  TestObjectsKindAliasesMatchKindnames/auto_fix_rule
+=== CONT  TestObjectsKindAliasesMatchKindnames/auth_strategy
+=== CONT  TestObjectsKindAliasesMatchKindnames/audit_aggregation_metric
+=== CONT  TestObjectsKindAliasesMatchKindnames/audit_event_aggregation
+=== CONT  TestObjectsKindAliasesMatchKindnames/audit_event
+=== CONT  TestObjectsKindAliasesMatchKindnames/agent_feed
+=== CONT  TestObjectsKindAliasesMatchKindnames/agent_onboarding_preparation
+=== CONT  TestObjectsKindAliasesMatchKindnames/agent_architecture
+=== CONT  TestObjectsKindAliasesMatchKindnames/ordered_list_metric_sampler
+--- PASS: TestObjectsKindAliasesMatchKindnames (0.00s)
+    --- PASS: TestObjectsKindAliasesMatchKindnames/account (0.00s)
+    --- PASS: TestObjectsKindAliasesMatchKindnames/mcp_spec (0.00s)
+    --- PASS: TestObjectsKindAliasesMatchKindnames/zqk_session (0.00s)
+    --- PASS: TestObjectsKindAliasesMatchKindnames/work_unit (0.00s)
+    --- PASS: TestObjectsKindAliasesMatchKindnames/work_interval (0.00s)
+    --- PASS: TestObjectsKindAliasesMatchKindnames/remaining_open (0.00s)
+    --- PASS: TestObjectsKindAliasesMatchKindnames/occupancy (0.00s)
+    --- PASS: TestObjectsKindAliasesMatchKindnames/workstream_transition (0.00s)
+    --- PASS: TestObjectsKindAliasesMatchKindnames/workstream (0.00s)
+    --- PASS: TestObjectsKindAliasesMatchKindnames/workflow (0.00s)
+    --- PASS: TestObjectsKindAliasesMatchKindnames/vision (0.00s)
+    --- PASS: TestObjectsKindAliasesMatchKindnames/vocabulary_scheme (0.00s)
+    --- PASS: TestObjectsKindAliasesMatchKindnames/verification_matrix (0.00s)
+    --- PASS: TestObjectsKindAliasesMatchKindnames/test_command_rule (0.00s)
+    --- PASS: TestObjectsKindAliasesMatchKindnames/test_case (0.00s)
+    --- PASS: TestObjectsKindAliasesMatchKindnames/test_audit_aggregation_metric (0.00s)
+    --- PASS: TestObjectsKindAliasesMatchKindnames/template (0.00s)
+    --- PASS: TestObjectsKindAliasesMatchKindnames/technical_debt (0.00s)
+    --- PASS: TestObjectsKindAliasesMatchKindnames/team (0.00s)
+    --- PASS: TestObjectsKindAliasesMatchKindnames/strategic_plan (0.00s)
+    --- PASS: TestObjectsKindAliasesMatchKindnames/strategic_context (0.00s)
+    --- PASS: TestObjectsKindAliasesMatchKindnames/status_history_metric_sampler (0.00s)
+    --- PASS: TestObjectsKindAliasesMatchKindnames/stakeholder_profile (0.00s)
+    --- PASS: TestObjectsKindAliasesMatchKindnames/scheduler_job (0.00s)
+    --- PASS: TestObjectsKindAliasesMatchKindnames/scheduler_health_metric (0.00s)
+    --- PASS: TestObjectsKindAliasesMatchKindnames/scheduler_handler_binding (0.00s)
+    --- PASS: TestObjectsKindAliasesMatchKindnames/scenario (0.00s)
+    --- PASS: TestObjectsKindAliasesMatchKindnames/scalar_metric_sampler (0.00s)
+    --- PASS: TestObjectsKindAliasesMatchKindnames/sampler_profile (0.00s)
+    --- PASS: TestObjectsKindAliasesMatchKindnames/rule (0.00s)
+    --- PASS: TestObjectsKindAliasesMatchKindnames/role (0.00s)
+    --- PASS: TestObjectsKindAliasesMatchKindnames/rollback_report (0.00s)
+    --- PASS: TestObjectsKindAliasesMatchKindnames/risk_blocker (0.00s)
+    --- PASS: TestObjectsKindAliasesMatchKindnames/roadmap (0.00s)
+    --- PASS: TestObjectsKindAliasesMatchKindnames/resolver (0.00s)
+    --- PASS: TestObjectsKindAliasesMatchKindnames/requirement (0.00s)
+    --- PASS: TestObjectsKindAliasesMatchKindnames/release (0.00s)
+    --- PASS: TestObjectsKindAliasesMatchKindnames/question (0.00s)
+    --- PASS: TestObjectsKindAliasesMatchKindnames/prompt_template (0.00s)
+    --- PASS: TestObjectsKindAliasesMatchKindnames/priority_plan (0.00s)
+    --- PASS: TestObjectsKindAliasesMatchKindnames/object_spec (0.00s)
+    --- PASS: TestObjectsKindAliasesMatchKindnames/namespace_registry (0.00s)
+    --- PASS: TestObjectsKindAliasesMatchKindnames/namespace (0.00s)
+    --- PASS: TestObjectsKindAliasesMatchKindnames/mission (0.00s)
+    --- PASS: TestObjectsKindAliasesMatchKindnames/milestone (0.00s)
+    --- PASS: TestObjectsKindAliasesMatchKindnames/metadata_package (0.00s)
+    --- PASS: TestObjectsKindAliasesMatchKindnames/partnership (0.00s)
+    --- PASS: TestObjectsKindAliasesMatchKindnames/policy (0.00s)
+    --- PASS: TestObjectsKindAliasesMatchKindnames/persona (0.00s)
+    --- PASS: TestObjectsKindAliasesMatchKindnames/organizational_change (0.00s)
+    --- PASS: TestObjectsKindAliasesMatchKindnames/decision (0.00s)
+    --- PASS: TestObjectsKindAliasesMatchKindnames/mcp_session (0.00s)
+    --- PASS: TestObjectsKindAliasesMatchKindnames/mcp_built_in_tool (0.00s)
+    --- PASS: TestObjectsKindAliasesMatchKindnames/list_metric_sampler (0.00s)
+    --- PASS: TestObjectsKindAliasesMatchKindnames/lifecycle (0.00s)
+    --- PASS: TestObjectsKindAliasesMatchKindnames/library (0.00s)
+    --- PASS: TestObjectsKindAliasesMatchKindnames/kind_synonym (0.00s)
+    --- PASS: TestObjectsKindAliasesMatchKindnames/kind_mapping_metric (0.00s)
+    --- PASS: TestObjectsKindAliasesMatchKindnames/keystore_entry (0.00s)
+    --- PASS: TestObjectsKindAliasesMatchKindnames/integrity_manifest (0.00s)
+    --- PASS: TestObjectsKindAliasesMatchKindnames/improvement_report (0.00s)
+    --- PASS: TestObjectsKindAliasesMatchKindnames/important_date (0.00s)
+    --- PASS: TestObjectsKindAliasesMatchKindnames/import_tracking (0.00s)
+    --- PASS: TestObjectsKindAliasesMatchKindnames/impact_analysis (0.00s)
+    --- PASS: TestObjectsKindAliasesMatchKindnames/glossary_term_relation (0.00s)
+    --- PASS: TestObjectsKindAliasesMatchKindnames/glossary_term (0.00s)
+    --- PASS: TestObjectsKindAliasesMatchKindnames/goal (0.00s)
+    --- PASS: TestObjectsKindAliasesMatchKindnames/file_lock_metric (0.00s)
+    --- PASS: TestObjectsKindAliasesMatchKindnames/extensible_object (0.00s)
+    --- PASS: TestObjectsKindAliasesMatchKindnames/evolution_management (0.00s)
+    --- PASS: TestObjectsKindAliasesMatchKindnames/domain_registry (0.00s)
+    --- PASS: TestObjectsKindAliasesMatchKindnames/doc_entry (0.00s)
+    --- PASS: TestObjectsKindAliasesMatchKindnames/division (0.00s)
+    --- PASS: TestObjectsKindAliasesMatchKindnames/display (0.00s)
+    --- PASS: TestObjectsKindAliasesMatchKindnames/department (0.00s)
+    --- PASS: TestObjectsKindAliasesMatchKindnames/organization (0.00s)
+    --- PASS: TestObjectsKindAliasesMatchKindnames/base_sampler (0.00s)
+    --- PASS: TestObjectsKindAliasesMatchKindnames/criteria (0.00s)
+    --- PASS: TestObjectsKindAliasesMatchKindnames/corporate_initiative (0.00s)
+    --- PASS: TestObjectsKindAliasesMatchKindnames/convergence_session (0.00s)
+    --- PASS: TestObjectsKindAliasesMatchKindnames/context_refresh_schedule (0.00s)
+    --- PASS: TestObjectsKindAliasesMatchKindnames/component (0.00s)
+    --- PASS: TestObjectsKindAliasesMatchKindnames/command_metric (0.00s)
+    --- PASS: TestObjectsKindAliasesMatchKindnames/code_reference (0.00s)
+    --- PASS: TestObjectsKindAliasesMatchKindnames/code_quality_metric (0.00s)
+    --- PASS: TestObjectsKindAliasesMatchKindnames/change_journal_entry (0.00s)
+    --- PASS: TestObjectsKindAliasesMatchKindnames/certificate (0.00s)
+    --- PASS: TestObjectsKindAliasesMatchKindnames/bucketing_strategy (0.00s)
+    --- PASS: TestObjectsKindAliasesMatchKindnames/brand (0.00s)
+    --- PASS: TestObjectsKindAliasesMatchKindnames/auditable (0.00s)
+    --- PASS: TestObjectsKindAliasesMatchKindnames/base_object (0.00s)
+    --- PASS: TestObjectsKindAliasesMatchKindnames/base_metric (0.00s)
+    --- PASS: TestObjectsKindAliasesMatchKindnames/backlog_item (0.00s)
+    --- PASS: TestObjectsKindAliasesMatchKindnames/auto_fix_rule (0.00s)
+    --- PASS: TestObjectsKindAliasesMatchKindnames/auth_strategy (0.00s)
+    --- PASS: TestObjectsKindAliasesMatchKindnames/audit_aggregation_metric (0.00s)
+    --- PASS: TestObjectsKindAliasesMatchKindnames/audit_event_aggregation (0.00s)
+    --- PASS: TestObjectsKindAliasesMatchKindnames/audit_event (0.00s)
+    --- PASS: TestObjectsKindAliasesMatchKindnames/agent_feed (0.00s)
+    --- PASS: TestObjectsKindAliasesMatchKindnames/agent_onboarding_preparation (0.00s)
+    --- PASS: TestObjectsKindAliasesMatchKindnames/agent_architecture (0.00s)
+    --- PASS: TestObjectsKindAliasesMatchKindnames/ordered_list_metric_sampler (0.00s)
+--- PASS: TestLoadKindNamesFromSpecsDir (0.01s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/kindnames	0.403s

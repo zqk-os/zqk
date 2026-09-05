@@ -1,0 +1,45 @@
+
+--- run 2026-09-04T22:12:56Z ---
+=== RUN   TestBuildFromDataFile_IsCalledWhenDataFileObjectsSet
+=== PAUSE TestBuildFromDataFile_IsCalledWhenDataFileObjectsSet
+=== RUN   TestBuildFromDataFile_EmptyDataFileObjects
+=== PAUSE TestBuildFromDataFile_EmptyDataFileObjects
+=== RUN   TestBuild_DataFileObjectsTakesPrecedence
+=== PAUSE TestBuild_DataFileObjectsTakesPrecedence
+=== RUN   TestHandleLoadDataFile_ActualYAMLFile
+=== PAUSE TestHandleLoadDataFile_ActualYAMLFile
+=== RUN   TestBuildDependencyGraphAndSort_BasicOrdering
+=== PAUSE TestBuildDependencyGraphAndSort_BasicOrdering
+=== RUN   TestBuildDependencyGraphAndSort_ForwardReferences
+=== PAUSE TestBuildDependencyGraphAndSort_ForwardReferences
+=== RUN   TestBuildDependencyGraphAndSort_ComplexChain
+=== PAUSE TestBuildDependencyGraphAndSort_ComplexChain
+=== RUN   TestBuildDependencyGraphAndSort_ObjectsWithoutIDs
+=== PAUSE TestBuildDependencyGraphAndSort_ObjectsWithoutIDs
+=== RUN   TestBuildDependencyGraphAndSort_AccountUsernameMapping
+=== PAUSE TestBuildDependencyGraphAndSort_AccountUsernameMapping
+=== RUN   TestBuildDependencyGraphAndSort_MultipleReferences
+=== PAUSE TestBuildDependencyGraphAndSort_MultipleReferences
+=== CONT  TestBuildFromDataFile_IsCalledWhenDataFileObjectsSet
+=== CONT  TestBuildDependencyGraphAndSort_MultipleReferences
+--- PASS: TestBuildDependencyGraphAndSort_MultipleReferences (0.26s)
+=== CONT  TestBuildDependencyGraphAndSort_ForwardReferences
+--- PASS: TestBuildDependencyGraphAndSort_ForwardReferences (0.22s)
+=== CONT  TestBuildDependencyGraphAndSort_AccountUsernameMapping
+--- PASS: TestBuildDependencyGraphAndSort_AccountUsernameMapping (0.19s)
+=== CONT  TestBuildDependencyGraphAndSort_ObjectsWithoutIDs
+--- PASS: TestBuildDependencyGraphAndSort_ObjectsWithoutIDs (0.17s)
+=== CONT  TestBuildDependencyGraphAndSort_ComplexChain
+--- PASS: TestBuildDependencyGraphAndSort_ComplexChain (0.17s)
+=== CONT  TestHandleLoadDataFile_ActualYAMLFile
+    scenario_builder_data_loader_test.go:461: scenario-data.yaml not found in any expected location, skipping test
+--- SKIP: TestHandleLoadDataFile_ActualYAMLFile (0.00s)
+=== CONT  TestBuildDependencyGraphAndSort_BasicOrdering
+--- PASS: TestBuildDependencyGraphAndSort_BasicOrdering (0.21s)
+=== CONT  TestBuild_DataFileObjectsTakesPrecedence
+--- PASS: TestBuild_DataFileObjectsTakesPrecedence (0.90s)
+=== CONT  TestBuildFromDataFile_EmptyDataFileObjects
+--- PASS: TestBuildFromDataFile_IsCalledWhenDataFileObjectsSet (2.12s)
+--- PASS: TestBuildFromDataFile_EmptyDataFileObjects (0.20s)
+PASS
+ok  	github.com/lanceman/zqk/cmd/zqk/utility	3.100s

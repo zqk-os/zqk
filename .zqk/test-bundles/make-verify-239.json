@@ -1,0 +1,33 @@
+{
+  "name": "make-verify-239",
+  "created_at": "2026-09-04T21:34:29.778336Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-239",
+    "Tests": [
+      {
+        "Name": "TestOntologyImport_Integration",
+        "Package": "ontology",
+        "PackagePath": "cmd/zqk/ontology",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/ontology/import_integration_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 30000000000,
+    "PackagePath": "cmd/zqk/ontology"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestOntologyImport_Integration",
+      "Package": "ontology",
+      "PackagePath": "cmd/zqk/ontology",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/ontology/import_integration_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

@@ -1,0 +1,40 @@
+
+--- run 2026-09-04T21:46:03Z ---
+=== RUN   TestRun_toleratesMissingFilesDuringWalk
+=== PAUSE TestRun_toleratesMissingFilesDuringWalk
+=== RUN   TestRun_streamBackedDirs_skipsDiskWalk
+=== PAUSE TestRun_streamBackedDirs_skipsDiskWalk
+=== RUN   TestRun_legacyStreamBacked_nestedSubdirs
+=== PAUSE TestRun_legacyStreamBacked_nestedSubdirs
+=== RUN   TestRun_legacyStreamBacked_emptyDir
+=== PAUSE TestRun_legacyStreamBacked_emptyDir
+=== RUN   TestRun_strayUnmappedProcessDir
+=== PAUSE TestRun_strayUnmappedProcessDir
+=== RUN   TestRunFilesystemProjectSnapshot_Buckets
+=== PAUSE TestRunFilesystemProjectSnapshot_Buckets
+=== RUN   TestRunFilesystemProjectSnapshot_SkipsVendor
+=== PAUSE TestRunFilesystemProjectSnapshot_SkipsVendor
+=== RUN   TestParseFilesystemSnapshotScope
+=== PAUSE TestParseFilesystemSnapshotScope
+=== RUN   TestRunFilesystemProjectSnapshot_ScopeZqk
+=== PAUSE TestRunFilesystemProjectSnapshot_ScopeZqk
+=== CONT  TestRun_toleratesMissingFilesDuringWalk
+=== CONT  TestRunFilesystemProjectSnapshot_Buckets
+--- PASS: TestRunFilesystemProjectSnapshot_Buckets (0.01s)
+=== CONT  TestRun_legacyStreamBacked_emptyDir
+--- PASS: TestRun_legacyStreamBacked_emptyDir (0.25s)
+=== CONT  TestRun_strayUnmappedProcessDir
+--- PASS: TestRun_toleratesMissingFilesDuringWalk (0.72s)
+=== CONT  TestParseFilesystemSnapshotScope
+--- PASS: TestParseFilesystemSnapshotScope (0.00s)
+=== CONT  TestRunFilesystemProjectSnapshot_ScopeZqk
+--- PASS: TestRunFilesystemProjectSnapshot_ScopeZqk (0.01s)
+=== CONT  TestRunFilesystemProjectSnapshot_SkipsVendor
+--- PASS: TestRunFilesystemProjectSnapshot_SkipsVendor (0.00s)
+=== CONT  TestRun_legacyStreamBacked_nestedSubdirs
+--- PASS: TestRun_strayUnmappedProcessDir (0.66s)
+=== CONT  TestRun_streamBackedDirs_skipsDiskWalk
+--- PASS: TestRun_legacyStreamBacked_nestedSubdirs (0.26s)
+--- PASS: TestRun_streamBackedDirs_skipsDiskWalk (0.22s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/operational	1.765s

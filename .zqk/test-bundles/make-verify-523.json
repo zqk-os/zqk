@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-523",
+  "created_at": "2026-09-04T21:34:32.557721Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-523",
+    "Tests": [
+      {
+        "Name": "TestGeneratePromptSection_refsNotBodies",
+        "Package": "agentprompt",
+        "PackagePath": "pkg/agentprompt",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentprompt/skills_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestSkillMatchesQuery_titleTokens",
+        "Package": "agentprompt",
+        "PackagePath": "pkg/agentprompt",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentprompt/skills_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestRelatedASKRefs",
+        "Package": "agentprompt",
+        "PackagePath": "pkg/agentprompt",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentprompt/skills_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestSyncASKTwins",
+        "Package": "agentprompt",
+        "PackagePath": "pkg/agentprompt",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentprompt/skills_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestLoadRelevantSkillsOpts_EmbedsBootASKs",
+        "Package": "agentprompt",
+        "PackagePath": "pkg/agentprompt",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentprompt/skills_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestLoadRelevantSkillsOpts_SealVerification",
+        "Package": "agentprompt",
+        "PackagePath": "pkg/agentprompt",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentprompt/skills_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestLoadRelevantSkillsOpts_MissingFileFailClosed",
+        "Package": "agentprompt",
+        "PackagePath": "pkg/agentprompt",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentprompt/skills_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestFormatTaskEnvelope_refsNotBodies",
+        "Package": "agentprompt",
+        "PackagePath": "pkg/agentprompt",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentprompt/task_envelope_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestBuildTaskEnvelope_policyAndSkillRefs",
+        "Package": "agentprompt",
+        "PackagePath": "pkg/agentprompt",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentprompt/task_envelope_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestBuildTaskPrompt_refsNotBodies",
+        "Package": "agentprompt",
+        "PackagePath": "pkg/agentprompt",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentprompt/task_envelope_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 300000000000,
+    "PackagePath": "pkg/agentprompt"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestGeneratePromptSection_refsNotBodies",
+      "Package": "agentprompt",
+      "PackagePath": "pkg/agentprompt",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentprompt/skills_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestSkillMatchesQuery_titleTokens",
+      "Package": "agentprompt",
+      "PackagePath": "pkg/agentprompt",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentprompt/skills_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestRelatedASKRefs",
+      "Package": "agentprompt",
+      "PackagePath": "pkg/agentprompt",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentprompt/skills_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestSyncASKTwins",
+      "Package": "agentprompt",
+      "PackagePath": "pkg/agentprompt",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentprompt/skills_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestLoadRelevantSkillsOpts_EmbedsBootASKs",
+      "Package": "agentprompt",
+      "PackagePath": "pkg/agentprompt",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentprompt/skills_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestLoadRelevantSkillsOpts_SealVerification",
+      "Package": "agentprompt",
+      "PackagePath": "pkg/agentprompt",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentprompt/skills_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestLoadRelevantSkillsOpts_MissingFileFailClosed",
+      "Package": "agentprompt",
+      "PackagePath": "pkg/agentprompt",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentprompt/skills_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestFormatTaskEnvelope_refsNotBodies",
+      "Package": "agentprompt",
+      "PackagePath": "pkg/agentprompt",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentprompt/task_envelope_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestBuildTaskEnvelope_policyAndSkillRefs",
+      "Package": "agentprompt",
+      "PackagePath": "pkg/agentprompt",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentprompt/task_envelope_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestBuildTaskPrompt_refsNotBodies",
+      "Package": "agentprompt",
+      "PackagePath": "pkg/agentprompt",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentprompt/task_envelope_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

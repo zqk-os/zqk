@@ -1,0 +1,36 @@
+
+--- run 2026-09-04T22:18:34Z ---
+=== RUN   TestClassifyChatModel
+=== PAUSE TestClassifyChatModel
+=== RUN   TestResilientClient_NoMockFallbackOnInvalidRequest
+=== PAUSE TestResilientClient_NoMockFallbackOnInvalidRequest
+=== RUN   TestIsNonRetryableLLMError
+=== PAUSE TestIsNonRetryableLLMError
+=== RUN   TestIsMockFallback
+=== PAUSE TestIsMockFallback
+=== RUN   TestOpenAIChatMessages_emptyContentIsString
+=== PAUSE TestOpenAIChatMessages_emptyContentIsString
+=== RUN   TestStructuredCompletion_nilClient
+=== PAUSE TestStructuredCompletion_nilClient
+=== RUN   TestStructuredCompletion_prefersWithOptions
+=== PAUSE TestStructuredCompletion_prefersWithOptions
+=== RUN   TestStructuredCompletion_plainClientFallback
+=== PAUSE TestStructuredCompletion_plainClientFallback
+=== CONT  TestClassifyChatModel
+--- PASS: TestClassifyChatModel (0.00s)
+=== CONT  TestStructuredCompletion_nilClient
+--- PASS: TestStructuredCompletion_nilClient (0.00s)
+=== CONT  TestOpenAIChatMessages_emptyContentIsString
+=== CONT  TestIsMockFallback
+--- PASS: TestIsMockFallback (0.00s)
+=== CONT  TestIsNonRetryableLLMError
+--- PASS: TestIsNonRetryableLLMError (0.00s)
+=== CONT  TestResilientClient_NoMockFallbackOnInvalidRequest
+--- PASS: TestResilientClient_NoMockFallbackOnInvalidRequest (0.00s)
+=== CONT  TestStructuredCompletion_prefersWithOptions
+--- PASS: TestStructuredCompletion_prefersWithOptions (0.00s)
+=== CONT  TestStructuredCompletion_plainClientFallback
+--- PASS: TestStructuredCompletion_plainClientFallback (0.00s)
+--- PASS: TestOpenAIChatMessages_emptyContentIsString (0.00s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/llm	0.643s

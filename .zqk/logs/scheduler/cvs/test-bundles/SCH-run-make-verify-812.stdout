@@ -1,0 +1,44 @@
+
+--- run 2026-09-04T22:22:15Z ---
+=== RUN   TestAgentWorktreeDir_defaultOutsideProject
+=== PAUSE TestAgentWorktreeDir_defaultOutsideProject
+=== RUN   TestAgentWorktreeDir_emptyTask
+=== PAUSE TestAgentWorktreeDir_emptyTask
+=== RUN   TestNamedFilePermissionsMatchTheirNames
+=== PAUSE TestNamedFilePermissionsMatchTheirNames
+=== RUN   TestDefaultPathAliases_IncludesOperationalRoots
+=== PAUSE TestDefaultPathAliases_IncludesOperationalRoots
+=== RUN   TestLayoutUnder_Err_nilWhenEmptyChain
+=== PAUSE TestLayoutUnder_Err_nilWhenEmptyChain
+=== RUN   TestLayoutUnder_Dir_createsTree
+=== PAUSE TestLayoutUnder_Dir_createsTree
+=== RUN   TestEnsureProcessAndObjectSpecsLayout
+=== PAUSE TestEnsureProcessAndObjectSpecsLayout
+=== RUN   TestLayoutUnder_Dir_stopsOnFirstError
+=== PAUSE TestLayoutUnder_Dir_stopsOnFirstError
+=== RUN   TestModuleRootFromPath_findsGoMod
+=== PAUSE TestModuleRootFromPath_findsGoMod
+=== RUN   TestObjectsFieldKeysGoPath
+=== PAUSE TestObjectsFieldKeysGoPath
+=== CONT  TestAgentWorktreeDir_defaultOutsideProject
+=== CONT  TestLayoutUnder_Dir_createsTree
+--- PASS: TestAgentWorktreeDir_defaultOutsideProject (0.01s)
+=== CONT  TestModuleRootFromPath_findsGoMod
+--- PASS: TestModuleRootFromPath_findsGoMod (0.01s)
+=== CONT  TestObjectsFieldKeysGoPath
+--- PASS: TestLayoutUnder_Dir_createsTree (0.02s)
+=== CONT  TestDefaultPathAliases_IncludesOperationalRoots
+--- PASS: TestDefaultPathAliases_IncludesOperationalRoots (0.00s)
+=== CONT  TestLayoutUnder_Err_nilWhenEmptyChain
+--- PASS: TestObjectsFieldKeysGoPath (0.00s)
+=== CONT  TestNamedFilePermissionsMatchTheirNames
+--- PASS: TestNamedFilePermissionsMatchTheirNames (0.00s)
+=== CONT  TestLayoutUnder_Dir_stopsOnFirstError
+--- PASS: TestLayoutUnder_Err_nilWhenEmptyChain (0.00s)
+=== CONT  TestAgentWorktreeDir_emptyTask
+--- PASS: TestLayoutUnder_Dir_stopsOnFirstError (0.01s)
+=== CONT  TestEnsureProcessAndObjectSpecsLayout
+--- PASS: TestAgentWorktreeDir_emptyTask (0.01s)
+--- PASS: TestEnsureProcessAndObjectSpecsLayout (0.01s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/paths	0.343s

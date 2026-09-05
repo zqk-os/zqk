@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-690",
+  "created_at": "2026-09-04T21:34:34.206374Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-690",
+    "Tests": [
+      {
+        "Name": "TestDetectOrphanedFiles_StaleIndexHashIsDriftNotBlockingOrphan",
+        "Package": "system",
+        "PackagePath": "cmd/zqk/system",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/system/cas_orphan_sole_survivor_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestDetectOrphanedFiles_EmptyIndexReindexesSoleCriteria",
+        "Package": "system",
+        "PackagePath": "cmd/zqk/system",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/system/cas_orphan_sole_survivor_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestCleanupHashDuplicates_RefusesMisgroupedNestedID",
+        "Package": "system",
+        "PackagePath": "cmd/zqk/system",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/system/cas_orphan_sole_survivor_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestDetectOrphanedFiles_NeverDeletesTraditionalFile",
+        "Package": "system",
+        "PackagePath": "cmd/zqk/system",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/system/cas_orphan_sole_survivor_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestConvertCheckResultToValidationState_DropsCacheCoherenceIssues",
+        "Package": "system",
+        "PackagePath": "cmd/zqk/system",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/system/check_cache_coherence_not_cached_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestShouldUseCachedState_RejectsCacheCoherenceIssues",
+        "Package": "system",
+        "PackagePath": "cmd/zqk/system",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/system/check_cache_coherence_not_cached_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestShouldUseCachedState_RejectsGhostRef",
+        "Package": "system",
+        "PackagePath": "cmd/zqk/system",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/system/check_cache_coherence_not_cached_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestCheckCacheOnly",
+        "Package": "system",
+        "PackagePath": "cmd/zqk/system",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/system/check_cache_only_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestCheckCommand_JSONLOutput_Quick",
+        "Package": "system",
+        "PackagePath": "cmd/zqk/system",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/system/check_cli_output_quick_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestCheckCommand_JSONLOutput",
+        "Package": "system",
+        "PackagePath": "cmd/zqk/system",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/system/check_cli_output_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": true,
+    "EstimatedDuration": 300000000000,
+    "PackagePath": "cmd/zqk/system"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestDetectOrphanedFiles_StaleIndexHashIsDriftNotBlockingOrphan",
+      "Package": "system",
+      "PackagePath": "cmd/zqk/system",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/system/cas_orphan_sole_survivor_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestDetectOrphanedFiles_EmptyIndexReindexesSoleCriteria",
+      "Package": "system",
+      "PackagePath": "cmd/zqk/system",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/system/cas_orphan_sole_survivor_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestCleanupHashDuplicates_RefusesMisgroupedNestedID",
+      "Package": "system",
+      "PackagePath": "cmd/zqk/system",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/system/cas_orphan_sole_survivor_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestDetectOrphanedFiles_NeverDeletesTraditionalFile",
+      "Package": "system",
+      "PackagePath": "cmd/zqk/system",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/system/cas_orphan_sole_survivor_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestConvertCheckResultToValidationState_DropsCacheCoherenceIssues",
+      "Package": "system",
+      "PackagePath": "cmd/zqk/system",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/system/check_cache_coherence_not_cached_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestShouldUseCachedState_RejectsCacheCoherenceIssues",
+      "Package": "system",
+      "PackagePath": "cmd/zqk/system",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/system/check_cache_coherence_not_cached_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestShouldUseCachedState_RejectsGhostRef",
+      "Package": "system",
+      "PackagePath": "cmd/zqk/system",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/system/check_cache_coherence_not_cached_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestCheckCacheOnly",
+      "Package": "system",
+      "PackagePath": "cmd/zqk/system",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/system/check_cache_only_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestCheckCommand_JSONLOutput_Quick",
+      "Package": "system",
+      "PackagePath": "cmd/zqk/system",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/system/check_cli_output_quick_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestCheckCommand_JSONLOutput",
+      "Package": "system",
+      "PackagePath": "cmd/zqk/system",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/system/check_cli_output_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

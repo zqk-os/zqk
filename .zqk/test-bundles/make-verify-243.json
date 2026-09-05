@@ -1,0 +1,105 @@
+{
+  "name": "make-verify-243",
+  "created_at": "2026-09-04T21:34:29.80844Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-243",
+    "Tests": [
+      {
+        "Name": "TestAggregate_StaleBlockingCategoryBlocks",
+        "Package": "precommit",
+        "PackagePath": "pkg/precommit",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/precommit/results_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAggregate_FreshPassDoesNotBlock",
+        "Package": "precommit",
+        "PackagePath": "pkg/precommit",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/precommit/results_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAggregate_StaleNonBlockingCategoryDoesNotBlock",
+        "Package": "precommit",
+        "PackagePath": "pkg/precommit",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/precommit/results_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAggregate_FailingCategoryStillBlocks",
+        "Package": "precommit",
+        "PackagePath": "pkg/precommit",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/precommit/results_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestCategoryResult_IsStaleOnUnusableTimestamp",
+        "Package": "precommit",
+        "PackagePath": "pkg/precommit",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/precommit/results_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": true,
+    "EstimatedDuration": 150000000000,
+    "PackagePath": "pkg/precommit"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestAggregate_StaleBlockingCategoryBlocks",
+      "Package": "precommit",
+      "PackagePath": "pkg/precommit",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/precommit/results_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestAggregate_FreshPassDoesNotBlock",
+      "Package": "precommit",
+      "PackagePath": "pkg/precommit",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/precommit/results_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestAggregate_StaleNonBlockingCategoryDoesNotBlock",
+      "Package": "precommit",
+      "PackagePath": "pkg/precommit",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/precommit/results_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestAggregate_FailingCategoryStillBlocks",
+      "Package": "precommit",
+      "PackagePath": "pkg/precommit",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/precommit/results_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestCategoryResult_IsStaleOnUnusableTimestamp",
+      "Package": "precommit",
+      "PackagePath": "pkg/precommit",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/precommit/results_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

@@ -1,0 +1,44 @@
+
+--- run 2026-09-04T21:40:30Z ---
+=== RUN   TestEvaluatePersonaSkillBound_Structural
+=== PAUSE TestEvaluatePersonaSkillBound_Structural
+=== RUN   TestEvaluatePersonaSkillBound_Resolve
+=== PAUSE TestEvaluatePersonaSkillBound_Resolve
+=== RUN   TestPriorityQueue_BasicOperations
+=== PAUSE TestPriorityQueue_BasicOperations
+=== RUN   TestPriorityQueue_SamePriorityOrdering
+=== PAUSE TestPriorityQueue_SamePriorityOrdering
+=== RUN   TestPriorityQueue_Peek
+=== PAUSE TestPriorityQueue_Peek
+=== RUN   TestPriorityQueue_GetByPriority
+=== PAUSE TestPriorityQueue_GetByPriority
+=== RUN   TestPriorityQueue_Clear
+=== PAUSE TestPriorityQueue_Clear
+=== RUN   TestRefStatusRules_statusesExistInReferencedLifecycle
+=== PAUSE TestRefStatusRules_statusesExistInReferencedLifecycle
+=== RUN   TestEvalRefStatus_isGenericOverAnyRule
+=== PAUSE TestEvalRefStatus_isGenericOverAnyRule
+=== RUN   TestShippedBacklogCompleteHopsBindCriteriaRow
+=== PAUSE TestShippedBacklogCompleteHopsBindCriteriaRow
+=== CONT  TestEvaluatePersonaSkillBound_Structural
+--- PASS: TestEvaluatePersonaSkillBound_Structural (0.00s)
+=== CONT  TestPriorityQueue_Peek
+=== CONT  TestPriorityQueue_GetByPriority
+--- PASS: TestPriorityQueue_Peek (0.00s)
+=== CONT  TestPriorityQueue_SamePriorityOrdering
+=== CONT  TestRefStatusRules_statusesExistInReferencedLifecycle
+--- PASS: TestPriorityQueue_GetByPriority (0.00s)
+--- PASS: TestPriorityQueue_SamePriorityOrdering (0.00s)
+=== CONT  TestPriorityQueue_BasicOperations
+--- PASS: TestPriorityQueue_BasicOperations (0.00s)
+=== CONT  TestEvaluatePersonaSkillBound_Resolve
+--- PASS: TestEvaluatePersonaSkillBound_Resolve (0.00s)
+=== CONT  TestPriorityQueue_Clear
+--- PASS: TestPriorityQueue_Clear (0.00s)
+=== CONT  TestShippedBacklogCompleteHopsBindCriteriaRow
+--- PASS: TestShippedBacklogCompleteHopsBindCriteriaRow (0.00s)
+=== CONT  TestEvalRefStatus_isGenericOverAnyRule
+--- PASS: TestEvalRefStatus_isGenericOverAnyRule (0.00s)
+--- PASS: TestRefStatusRules_statusesExistInReferencedLifecycle (0.01s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/validation	0.667s

@@ -1,0 +1,44 @@
+
+--- run 2026-09-04T22:20:36Z ---
+=== RUN   TestEnsureRetentionJobsCommandHasRunE
+=== PAUSE TestEnsureRetentionJobsCommandHasRunE
+=== RUN   TestEnsureRetentionJobsInProject_EmptyRoot
+=== PAUSE TestEnsureRetentionJobsInProject_EmptyRoot
+=== RUN   TestEnsureRetentionJobsResult_HasCachePrewarmAndAutofixFields
+=== PAUSE TestEnsureRetentionJobsResult_HasCachePrewarmAndAutofixFields
+=== RUN   TestParseTemplateScheduleAndEnv
+=== PAUSE TestParseTemplateScheduleAndEnv
+=== RUN   TestEnsureWorkItemBLI_doesNotCreate
+=== PAUSE TestEnsureWorkItemBLI_doesNotCreate
+=== RUN   TestIntegrityCheck_CASIndexOutOfSyncIsNotTampering
+=== PAUSE TestIntegrityCheck_CASIndexOutOfSyncIsNotTampering
+=== RUN   TestNotifyLiteFileAgentChatMaterialized_enqueueJSONL
+=== PAUSE TestNotifyLiteFileAgentChatMaterialized_enqueueJSONL
+=== RUN   TestMaterializeAgentChatChannelLiteFromObject
+=== PAUSE TestMaterializeAgentChatChannelLiteFromObject
+=== RUN   TestMaterializeAgentChatChannelLiteFromObject_wrongKind
+=== PAUSE TestMaterializeAgentChatChannelLiteFromObject_wrongKind
+=== RUN   TestNewMigrateCasCmd_FlagsAndHelp
+=== PAUSE TestNewMigrateCasCmd_FlagsAndHelp
+=== CONT  TestEnsureRetentionJobsCommandHasRunE
+=== CONT  TestIntegrityCheck_CASIndexOutOfSyncIsNotTampering
+--- PASS: TestEnsureRetentionJobsCommandHasRunE (0.00s)
+=== CONT  TestEnsureWorkItemBLI_doesNotCreate
+--- PASS: TestEnsureWorkItemBLI_doesNotCreate (0.00s)
+=== CONT  TestParseTemplateScheduleAndEnv
+--- PASS: TestParseTemplateScheduleAndEnv (0.00s)
+=== CONT  TestMaterializeAgentChatChannelLiteFromObject_wrongKind
+--- PASS: TestMaterializeAgentChatChannelLiteFromObject_wrongKind (0.00s)
+=== CONT  TestNewMigrateCasCmd_FlagsAndHelp
+--- PASS: TestNewMigrateCasCmd_FlagsAndHelp (0.00s)
+=== CONT  TestMaterializeAgentChatChannelLiteFromObject
+--- PASS: TestMaterializeAgentChatChannelLiteFromObject (0.00s)
+=== CONT  TestNotifyLiteFileAgentChatMaterialized_enqueueJSONL
+=== CONT  TestEnsureRetentionJobsResult_HasCachePrewarmAndAutofixFields
+--- PASS: TestEnsureRetentionJobsResult_HasCachePrewarmAndAutofixFields (0.00s)
+=== CONT  TestEnsureRetentionJobsInProject_EmptyRoot
+--- PASS: TestNotifyLiteFileAgentChatMaterialized_enqueueJSONL (0.01s)
+--- PASS: TestEnsureRetentionJobsInProject_EmptyRoot (0.00s)
+--- PASS: TestIntegrityCheck_CASIndexOutOfSyncIsNotTampering (0.02s)
+PASS
+ok  	github.com/lanceman/zqk/cmd/zqk/system	0.745s

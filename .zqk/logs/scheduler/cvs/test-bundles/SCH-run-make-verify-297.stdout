@@ -1,0 +1,50 @@
+
+--- run 2026-09-04T22:11:11Z ---
+=== RUN   TestSchedulerEventsMonitor_Run
+=== PAUSE TestSchedulerEventsMonitor_Run
+=== RUN   TestObjectVolumeMonitor_Run
+=== PAUSE TestObjectVolumeMonitor_Run
+=== RUN   TestStreamVolumeMonitor_Run
+=== PAUSE TestStreamVolumeMonitor_Run
+=== RUN   TestWalBacklogMonitor_Run
+=== PAUSE TestWalBacklogMonitor_Run
+=== RUN   TestAutonomyInboxMonitor_Run
+=== PAUSE TestAutonomyInboxMonitor_Run
+=== CONT  TestSchedulerEventsMonitor_Run
+=== CONT  TestWalBacklogMonitor_Run
+=== RUN   TestWalBacklogMonitor_Run/empty_project_root_returns_ok
+=== RUN   TestWalBacklogMonitor_Run/missing_wal_returns_ok
+=== RUN   TestSchedulerEventsMonitor_Run/no_summary_file_returns_degraded
+=== RUN   TestSchedulerEventsMonitor_Run/empty_jobs_returns_ok
+--- PASS: TestWalBacklogMonitor_Run (0.00s)
+    --- PASS: TestWalBacklogMonitor_Run/empty_project_root_returns_ok (0.00s)
+    --- PASS: TestWalBacklogMonitor_Run/missing_wal_returns_ok (0.00s)
+=== CONT  TestStreamVolumeMonitor_Run
+=== RUN   TestStreamVolumeMonitor_Run/empty_project_root_returns_ok
+=== RUN   TestStreamVolumeMonitor_Run/missing_metrics_dir_returns_ok
+--- PASS: TestStreamVolumeMonitor_Run (0.00s)
+    --- PASS: TestStreamVolumeMonitor_Run/empty_project_root_returns_ok (0.00s)
+    --- PASS: TestStreamVolumeMonitor_Run/missing_metrics_dir_returns_ok (0.00s)
+=== CONT  TestObjectVolumeMonitor_Run
+=== RUN   TestObjectVolumeMonitor_Run/empty_project_root_returns_ok
+=== RUN   TestObjectVolumeMonitor_Run/missing_metrics_dir_returns_ok
+--- PASS: TestObjectVolumeMonitor_Run (0.02s)
+    --- PASS: TestObjectVolumeMonitor_Run/empty_project_root_returns_ok (0.00s)
+    --- PASS: TestObjectVolumeMonitor_Run/missing_metrics_dir_returns_ok (0.02s)
+=== CONT  TestAutonomyInboxMonitor_Run
+=== RUN   TestAutonomyInboxMonitor_Run/empty_project_root_returns_ok
+=== RUN   TestAutonomyInboxMonitor_Run/empty_inbox_returns_ok_live
+=== RUN   TestAutonomyInboxMonitor_Run/inbox_with_items_returns_count
+=== RUN   TestSchedulerEventsMonitor_Run/slow_job_returns_degraded
+--- PASS: TestAutonomyInboxMonitor_Run (0.02s)
+    --- PASS: TestAutonomyInboxMonitor_Run/empty_project_root_returns_ok (0.00s)
+    --- PASS: TestAutonomyInboxMonitor_Run/empty_inbox_returns_ok_live (0.00s)
+    --- PASS: TestAutonomyInboxMonitor_Run/inbox_with_items_returns_count (0.02s)
+=== RUN   TestSchedulerEventsMonitor_Run/failed_job_returns_fail
+--- PASS: TestSchedulerEventsMonitor_Run (0.08s)
+    --- PASS: TestSchedulerEventsMonitor_Run/no_summary_file_returns_degraded (0.00s)
+    --- PASS: TestSchedulerEventsMonitor_Run/empty_jobs_returns_ok (0.04s)
+    --- PASS: TestSchedulerEventsMonitor_Run/slow_job_returns_degraded (0.02s)
+    --- PASS: TestSchedulerEventsMonitor_Run/failed_job_returns_fail (0.02s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/healthcheck/monitors	0.839s

@@ -1,0 +1,36 @@
+category: maintenance
+command: /bin/sh
+command_args:
+    - -c
+    - |-
+      set -e
+      ZQK="${ZQK_BIN:-zqk}"
+      # Scheduler runs with CWD = project root; resolve there
+      "$ZQK" system auto-fix-process-pending --sync-glossary --sync-glossary-apply --allow-degraded
+created_at: "2026-03-17T00:00:00Z"
+created_by: account:system
+description: |
+    Runs `zqk system auto-fix-process-pending` to process any AUTOFIX-*.json in .zqk/autofix/.
+    Ensures autofix files don't build up; triggered when batches are submitted and on a timer.
+enabled: true
+environment_variables:
+    AUTOFIX_GLOSSARY_MAX_CREATE: "1000"
+execution_mode: reusable
+id: SCH-autofix-process-pending
+job_type: run_wrapper
+kind: scheduler_job
+last_run_at: "2026-09-05T05:08:45Z"
+max_runtime_seconds: 3600
+namespace_id: zqk:kernel
+next_run_at: "2026-09-05T05:10:00Z"
+origin_project: zqk
+origin_system: zqk
+schedule_expression: 0 */10 * * * *
+schema_version: 2.0.0
+source_type: internal
+status: active
+title: Process pending autofix batches
+trigger_type: timer
+updated_at: "2026-09-05T05:08:47Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

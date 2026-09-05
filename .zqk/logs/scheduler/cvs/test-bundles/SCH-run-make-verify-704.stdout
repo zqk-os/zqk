@@ -1,0 +1,78 @@
+
+--- run 2026-09-04T22:21:09Z ---
+=== RUN   TestUpdateFieldFilter_IsFieldUpdatable
+=== PAUSE TestUpdateFieldFilter_IsFieldUpdatable
+=== RUN   TestNewSyncGitHooksCmd
+=== PAUSE TestNewSyncGitHooksCmd
+=== RUN   TestSyncGitHooksCommandFlags
+=== PAUSE TestSyncGitHooksCommandFlags
+=== RUN   TestInstallHookAndEnableRoundTripPreserveExecutableMode
+=== PAUSE TestInstallHookAndEnableRoundTripPreserveExecutableMode
+=== RUN   TestNewSyncCmd
+=== PAUSE TestNewSyncCmd
+=== RUN   TestSyncCommandFlags
+=== PAUSE TestSyncCommandFlags
+=== RUN   TestNewValidateCmd
+=== PAUSE TestNewValidateCmd
+=== RUN   TestValidateCommandFlags
+=== PAUSE TestValidateCommandFlags
+=== RUN   TestAllTasksAccountedFor
+=== PAUSE TestAllTasksAccountedFor
+=== RUN   TestEnqueueBookkeeping
+=== PAUSE TestEnqueueBookkeeping
+=== CONT  TestUpdateFieldFilter_IsFieldUpdatable
+=== CONT  TestSyncCommandFlags
+=== RUN   TestUpdateFieldFilter_IsFieldUpdatable/id_is_not_updatable
+=== RUN   TestUpdateFieldFilter_IsFieldUpdatable/kind_is_not_updatable
+=== RUN   TestUpdateFieldFilter_IsFieldUpdatable/created_at_is_not_updatable
+=== RUN   TestUpdateFieldFilter_IsFieldUpdatable/title_is_updatable
+=== RUN   TestUpdateFieldFilter_IsFieldUpdatable/status_is_updatable
+=== RUN   TestUpdateFieldFilter_IsFieldUpdatable/updated_at_is_updatable_(but_auto-managed)
+=== RUN   TestUpdateFieldFilter_IsFieldUpdatable/updated_by_is_updatable_(but_auto-managed)
+--- PASS: TestUpdateFieldFilter_IsFieldUpdatable (0.00s)
+    --- PASS: TestUpdateFieldFilter_IsFieldUpdatable/id_is_not_updatable (0.00s)
+    --- PASS: TestUpdateFieldFilter_IsFieldUpdatable/kind_is_not_updatable (0.00s)
+    --- PASS: TestUpdateFieldFilter_IsFieldUpdatable/created_at_is_not_updatable (0.00s)
+    --- PASS: TestUpdateFieldFilter_IsFieldUpdatable/title_is_updatable (0.00s)
+    --- PASS: TestUpdateFieldFilter_IsFieldUpdatable/status_is_updatable (0.00s)
+    --- PASS: TestUpdateFieldFilter_IsFieldUpdatable/updated_at_is_updatable_(but_auto-managed) (0.00s)
+    --- PASS: TestUpdateFieldFilter_IsFieldUpdatable/updated_by_is_updatable_(but_auto-managed) (0.00s)
+=== CONT  TestInstallHookAndEnableRoundTripPreserveExecutableMode
+--- PASS: TestSyncCommandFlags (0.00s)
+=== CONT  TestNewSyncCmd
+--- PASS: TestNewSyncCmd (0.00s)
+=== CONT  TestSyncGitHooksCommandFlags
+--- PASS: TestSyncGitHooksCommandFlags (0.00s)
+=== CONT  TestAllTasksAccountedFor
+=== RUN   TestAllTasksAccountedFor/zero_total_is_not_complete
+=== RUN   TestAllTasksAccountedFor/progress_equals_total
+=== RUN   TestAllTasksAccountedFor/progress_plus_cached_equals_total
+=== RUN   TestAllTasksAccountedFor/progress_plus_cached_exceeds_total
+=== RUN   TestAllTasksAccountedFor/progress_below_total_no_cache
+=== RUN   TestAllTasksAccountedFor/progress_plus_cached_below_total
+=== RUN   TestAllTasksAccountedFor/all_from_cache
+=== RUN   TestAllTasksAccountedFor/single_task_complete
+=== RUN   TestAllTasksAccountedFor/single_task_incomplete
+--- PASS: TestAllTasksAccountedFor (0.00s)
+    --- PASS: TestAllTasksAccountedFor/zero_total_is_not_complete (0.00s)
+    --- PASS: TestAllTasksAccountedFor/progress_equals_total (0.00s)
+    --- PASS: TestAllTasksAccountedFor/progress_plus_cached_equals_total (0.00s)
+    --- PASS: TestAllTasksAccountedFor/progress_plus_cached_exceeds_total (0.00s)
+    --- PASS: TestAllTasksAccountedFor/progress_below_total_no_cache (0.00s)
+    --- PASS: TestAllTasksAccountedFor/progress_plus_cached_below_total (0.00s)
+    --- PASS: TestAllTasksAccountedFor/all_from_cache (0.00s)
+    --- PASS: TestAllTasksAccountedFor/single_task_complete (0.00s)
+    --- PASS: TestAllTasksAccountedFor/single_task_incomplete (0.00s)
+=== CONT  TestEnqueueBookkeeping
+✅ Hook pre-commit disabled
+✅ Hook pre-commit enabled
+--- PASS: TestInstallHookAndEnableRoundTripPreserveExecutableMode (0.04s)
+=== CONT  TestNewSyncGitHooksCmd
+--- PASS: TestNewSyncGitHooksCmd (0.00s)
+=== CONT  TestValidateCommandFlags
+--- PASS: TestValidateCommandFlags (0.00s)
+=== CONT  TestNewValidateCmd
+--- PASS: TestNewValidateCmd (0.00s)
+--- PASS: TestEnqueueBookkeeping (0.10s)
+PASS
+ok  	github.com/lanceman/zqk/cmd/zqk/system	0.813s

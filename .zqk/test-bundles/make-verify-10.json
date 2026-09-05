@@ -1,0 +1,69 @@
+{
+  "name": "make-verify-10",
+  "created_at": "2026-09-04T21:34:27.551871Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-10",
+    "Tests": [
+      {
+        "Name": "TestStreamRegistrySnapshot_RefreshCoalescesWithinInterval",
+        "Package": "storage",
+        "PackagePath": "pkg/storage",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/stream_registry_refresh_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestBackfillWorkEnvelopeCompletedAt_NilStore",
+        "Package": "storage",
+        "PackagePath": "pkg/storage",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/work_envelope_backfill_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestEffortAwareKindNamesIncludesTimesheetKinds",
+        "Package": "storage",
+        "PackagePath": "pkg/storage",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/work_envelope_backfill_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": true,
+    "EstimatedDuration": 270000000000,
+    "PackagePath": "pkg/storage"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestStreamRegistrySnapshot_RefreshCoalescesWithinInterval",
+      "Package": "storage",
+      "PackagePath": "pkg/storage",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/stream_registry_refresh_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestBackfillWorkEnvelopeCompletedAt_NilStore",
+      "Package": "storage",
+      "PackagePath": "pkg/storage",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/work_envelope_backfill_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestEffortAwareKindNamesIncludesTimesheetKinds",
+      "Package": "storage",
+      "PackagePath": "pkg/storage",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/work_envelope_backfill_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    }
+  }
+}

@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-424",
+  "created_at": "2026-09-04T21:34:31.53999Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-424",
+    "Tests": [
+      {
+        "Name": "TestResolveCredentialPath_isolatedTestRootDoesNotUseHome",
+        "Package": "authcred",
+        "PackagePath": "pkg/authcred",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/authcred/credentials_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestResolveCredentialPath_liveTestRootFallsBackToHome",
+        "Package": "authcred",
+        "PackagePath": "pkg/authcred",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/authcred/credentials_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestResolveCredentialPath_prefersExistingTestRootFile",
+        "Package": "authcred",
+        "PackagePath": "pkg/authcred",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/authcred/credentials_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestClassifyLane",
+        "Package": "authcred",
+        "PackagePath": "pkg/authcred",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/authcred/identity_status_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestIsPlannerSeatRef_usesDirectory",
+        "Package": "authcred",
+        "PackagePath": "pkg/authcred",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/authcred/identity_status_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestWriteReadIdentityStatus",
+        "Package": "authcred",
+        "PackagePath": "pkg/authcred",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/authcred/identity_status_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestRoleMatches_IDAndRoleID",
+        "Package": "authcred",
+        "PackagePath": "pkg/authcred",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/authcred/planner_doer_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestExpandAssignedRoles_IncludesCanonicalFromDirectory",
+        "Package": "authcred",
+        "PackagePath": "pkg/authcred",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/authcred/planner_doer_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestValidateLanePermissions",
+        "Package": "authcred",
+        "PackagePath": "pkg/authcred",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/authcred/planner_doer_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestMayOrchestrateAndDeny",
+        "Package": "authcred",
+        "PackagePath": "pkg/authcred",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/authcred/planner_doer_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 300000000000,
+    "PackagePath": "pkg/authcred"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestResolveCredentialPath_isolatedTestRootDoesNotUseHome",
+      "Package": "authcred",
+      "PackagePath": "pkg/authcred",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/authcred/credentials_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestResolveCredentialPath_liveTestRootFallsBackToHome",
+      "Package": "authcred",
+      "PackagePath": "pkg/authcred",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/authcred/credentials_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestResolveCredentialPath_prefersExistingTestRootFile",
+      "Package": "authcred",
+      "PackagePath": "pkg/authcred",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/authcred/credentials_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestClassifyLane",
+      "Package": "authcred",
+      "PackagePath": "pkg/authcred",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/authcred/identity_status_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestIsPlannerSeatRef_usesDirectory",
+      "Package": "authcred",
+      "PackagePath": "pkg/authcred",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/authcred/identity_status_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestWriteReadIdentityStatus",
+      "Package": "authcred",
+      "PackagePath": "pkg/authcred",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/authcred/identity_status_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestRoleMatches_IDAndRoleID",
+      "Package": "authcred",
+      "PackagePath": "pkg/authcred",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/authcred/planner_doer_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestExpandAssignedRoles_IncludesCanonicalFromDirectory",
+      "Package": "authcred",
+      "PackagePath": "pkg/authcred",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/authcred/planner_doer_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestValidateLanePermissions",
+      "Package": "authcred",
+      "PackagePath": "pkg/authcred",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/authcred/planner_doer_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestMayOrchestrateAndDeny",
+      "Package": "authcred",
+      "PackagePath": "pkg/authcred",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/authcred/planner_doer_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

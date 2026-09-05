@@ -1,0 +1,44 @@
+
+--- run 2026-09-04T22:14:06Z ---
+=== RUN   TestConvergenceLifecycleBundle_StampTombstoneAndDisparity
+=== PAUSE TestConvergenceLifecycleBundle_StampTombstoneAndDisparity
+=== RUN   TestConvergenceLifecycleBundle_FinalizeDebriefAndDebriefNotes
+=== PAUSE TestConvergenceLifecycleBundle_FinalizeDebriefAndDebriefNotes
+=== RUN   TestConvergenceLifecycleBundle_SchedulerFastRoutingProfileViaFlag
+=== PAUSE TestConvergenceLifecycleBundle_SchedulerFastRoutingProfileViaFlag
+=== RUN   TestConvergenceLifecycleBundle_SkipSessionContextDoesNotReadCVS
+=== PAUSE TestConvergenceLifecycleBundle_SkipSessionContextDoesNotReadCVS
+=== RUN   TestConvergenceLifecycleBundle_RemediateToExitThreeIterations
+=== PAUSE TestConvergenceLifecycleBundle_RemediateToExitThreeIterations
+=== RUN   TestConvergenceSessionTickHandler_Execute_UpdatesSession
+=== PAUSE TestConvergenceSessionTickHandler_Execute_UpdatesSession
+=== RUN   TestConvergenceSessionTickHandler_SkipsDuplicateWatermark
+=== PAUSE TestConvergenceSessionTickHandler_SkipsDuplicateWatermark
+=== RUN   TestConvergenceSessionTickHandler_SkipsPersistWhenSessionTerminal
+=== PAUSE TestConvergenceSessionTickHandler_SkipsPersistWhenSessionTerminal
+=== RUN   TestConvergenceSessionTickHandler_SpawnsFollowupDraftWhenTerminalAndEnv
+=== PAUSE TestConvergenceSessionTickHandler_SpawnsFollowupDraftWhenTerminalAndEnv
+=== RUN   TestCreateOrderFromSpecIndex_NoIndexUsesDefaultOrder
+=== PAUSE TestCreateOrderFromSpecIndex_NoIndexUsesDefaultOrder
+=== CONT  TestConvergenceLifecycleBundle_StampTombstoneAndDisparity
+=== CONT  TestConvergenceSessionTickHandler_Execute_UpdatesSession
+--- PASS: TestConvergenceSessionTickHandler_Execute_UpdatesSession (2.01s)
+=== CONT  TestConvergenceLifecycleBundle_SkipSessionContextDoesNotReadCVS
+--- PASS: TestConvergenceLifecycleBundle_StampTombstoneAndDisparity (2.01s)
+=== CONT  TestConvergenceLifecycleBundle_RemediateToExitThreeIterations
+--- PASS: TestConvergenceLifecycleBundle_SkipSessionContextDoesNotReadCVS (1.71s)
+=== CONT  TestConvergenceSessionTickHandler_SpawnsFollowupDraftWhenTerminalAndEnv
+--- PASS: TestConvergenceLifecycleBundle_RemediateToExitThreeIterations (1.78s)
+=== CONT  TestCreateOrderFromSpecIndex_NoIndexUsesDefaultOrder
+--- PASS: TestCreateOrderFromSpecIndex_NoIndexUsesDefaultOrder (0.00s)
+=== CONT  TestConvergenceLifecycleBundle_SchedulerFastRoutingProfileViaFlag
+--- PASS: TestConvergenceLifecycleBundle_SchedulerFastRoutingProfileViaFlag (1.48s)
+=== CONT  TestConvergenceSessionTickHandler_SkipsPersistWhenSessionTerminal
+--- PASS: TestConvergenceSessionTickHandler_SpawnsFollowupDraftWhenTerminalAndEnv (1.61s)
+=== CONT  TestConvergenceLifecycleBundle_FinalizeDebriefAndDebriefNotes
+--- PASS: TestConvergenceLifecycleBundle_FinalizeDebriefAndDebriefNotes (1.53s)
+=== CONT  TestConvergenceSessionTickHandler_SkipsDuplicateWatermark
+--- PASS: TestConvergenceSessionTickHandler_SkipsPersistWhenSessionTerminal (1.60s)
+--- PASS: TestConvergenceSessionTickHandler_SkipsDuplicateWatermark (1.50s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/scenario	9.003s

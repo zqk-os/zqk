@@ -1,0 +1,23 @@
+cell_type: neuron
+context: TPM-assembled stratplan cell (neuron) for MIS-CEF-PRELAUNCH-001. Planning only. Do not mint onto in_progress/complete columns. Next unlocked CEF column is CI/supply gates, not open-core public-release intake.
+created_at: "2026-08-19T03:22:07Z"
+created_by: ACC-1785920548450214012-68b850c0
+focus_area: strategic
+id: TCFG-1787109727112428000-5cfa6cb3
+kind: team_configuration
+namespace_id: zqk:kernel
+persona_allocations:
+    - PER-1781253460184332032-da6d73c2
+    - PER-1781253460190786048-39fe99e7
+    - PER-1781486391201872000-779baf38
+    - PER-1781248465963724000-290ecdb4
+    - PER-1781248465963671000-281a3996
+    - PER-HATER
+    - PER-MARKETING
+    - PER-1781253460190606080-f6ad5d4a
+schema_version: 2.0.0
+status: approved
+title: Strategic Planning Meeting Team
+updated_at: "2026-08-19T03:22:25Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

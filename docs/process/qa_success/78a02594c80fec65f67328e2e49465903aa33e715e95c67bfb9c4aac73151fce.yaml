@@ -1,0 +1,14 @@
+created_at: "2026-08-19T22:29:20Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1787178559010712000-b984c9c7
+item_id: BLI-KERNEL-PACK-DEFAULT-TRIM-001
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 2857702ca28e4b64fb5782140b43c1400e68fdeab30ab0062f4119523ca97d466e5f13c72adcfa41b92eacf21fa7f0a79b8a8e3a8d7c581e5c9afe0e69cb31dc
+schema_version: 2.0.0
+signature: 3045022100f69d3ce6f1268d3fca2a5ca454e1e91c8625ba94ddfe0254134b1ee3b1696dec02200d035447d8d5d8987ccaa26ed58ce54797e20eaad9e5452e0b658eb4f7b1a3ef
+status: archived
+title: Default Binary Trim of Studio Workflows and Plugins
+updated_at: "2026-09-01T07:48:20Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

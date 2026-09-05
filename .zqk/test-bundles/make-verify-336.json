@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-336",
+  "created_at": "2026-09-04T21:34:30.689485Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-336",
+    "Tests": [
+      {
+        "Name": "TestAgentNext_FailClosedOnWorktreeExists",
+        "Package": "agent_test",
+        "PackagePath": "cmd/zqk/agent",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/agent/next_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAgentNext_FailClosedOnNotMerged",
+        "Package": "agent_test",
+        "PackagePath": "cmd/zqk/agent",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/agent/next_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAgentNext_FailClosedOnMissingPriorityPlanRef",
+        "Package": "agent_test",
+        "PackagePath": "cmd/zqk/agent",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/agent/next_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAgentNext_FailClosedOnNotMerged_Lowercase",
+        "Package": "agent_test",
+        "PackagePath": "cmd/zqk/agent",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/agent/next_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestOrchestrate_Integration_Adversarial",
+        "Package": "agent_test",
+        "PackagePath": "cmd/zqk/agent",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/agent/orchestrate_integration_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestOrchestrate_ComputeDelegation",
+        "Package": "agent_test",
+        "PackagePath": "cmd/zqk/agent",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/agent/orchestrate_integration_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestOrchestrate_StrategicPlan",
+        "Package": "agent_test",
+        "PackagePath": "cmd/zqk/agent",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/agent/orchestrate_integration_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestHasPersonaMatch_UnassignedSoftMatch",
+        "Package": "agent",
+        "PackagePath": "cmd/zqk/agent",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/agent/orchestrate_persona_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestEnsureOrchestrationWorktreeReusesExisting",
+        "Package": "agent",
+        "PackagePath": "cmd/zqk/agent",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/agent/orchestrate_reuse_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestEnsureOrchestrationWorktree_resetsLeftoverDirt",
+        "Package": "agent",
+        "PackagePath": "cmd/zqk/agent",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/agent/orchestrate_reuse_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 300000000000,
+    "PackagePath": "cmd/zqk/agent"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestAgentNext_FailClosedOnWorktreeExists",
+      "Package": "agent_test",
+      "PackagePath": "cmd/zqk/agent",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/agent/next_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestAgentNext_FailClosedOnNotMerged",
+      "Package": "agent_test",
+      "PackagePath": "cmd/zqk/agent",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/agent/next_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestAgentNext_FailClosedOnMissingPriorityPlanRef",
+      "Package": "agent_test",
+      "PackagePath": "cmd/zqk/agent",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/agent/next_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestAgentNext_FailClosedOnNotMerged_Lowercase",
+      "Package": "agent_test",
+      "PackagePath": "cmd/zqk/agent",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/agent/next_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestOrchestrate_Integration_Adversarial",
+      "Package": "agent_test",
+      "PackagePath": "cmd/zqk/agent",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/agent/orchestrate_integration_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestOrchestrate_ComputeDelegation",
+      "Package": "agent_test",
+      "PackagePath": "cmd/zqk/agent",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/agent/orchestrate_integration_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestOrchestrate_StrategicPlan",
+      "Package": "agent_test",
+      "PackagePath": "cmd/zqk/agent",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/agent/orchestrate_integration_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestHasPersonaMatch_UnassignedSoftMatch",
+      "Package": "agent",
+      "PackagePath": "cmd/zqk/agent",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/agent/orchestrate_persona_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestEnsureOrchestrationWorktreeReusesExisting",
+      "Package": "agent",
+      "PackagePath": "cmd/zqk/agent",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/agent/orchestrate_reuse_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestEnsureOrchestrationWorktree_resetsLeftoverDirt",
+      "Package": "agent",
+      "PackagePath": "cmd/zqk/agent",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/agent/orchestrate_reuse_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

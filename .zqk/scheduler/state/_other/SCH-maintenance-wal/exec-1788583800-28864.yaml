@@ -1,0 +1,7 @@
+job_id: SCH-maintenance-wal
+execution_id: exec-1788583800-28864
+state: completed
+process_id: 28864
+started_at: 2026-09-05T04:50:00.413449Z
+completed_at: 2026-09-05T04:50:00.464276Z
+policy_decision: execute

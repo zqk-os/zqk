@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-426",
+  "created_at": "2026-09-04T21:34:31.563214Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-426",
+    "Tests": [
+      {
+        "Name": "TestResolveDiscoveryLane",
+        "Package": "authcred",
+        "PackagePath": "pkg/authcred",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/authcred/discovery_membrane_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestFilterKindsForDiscovery",
+        "Package": "authcred",
+        "PackagePath": "pkg/authcred",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/authcred/discovery_membrane_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestPrototypeRejection_KnownHashesComprehensive",
+        "Package": "authcred",
+        "PackagePath": "pkg/authcred",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/authcred/prototype_rejection_comprehensive_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestPrototypeRejection_ErrorFormatDeterministic",
+        "Package": "authcred",
+        "PackagePath": "pkg/authcred",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/authcred/prototype_rejection_comprehensive_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestPrototypeRejection_EmptyAndWhitespace",
+        "Package": "authcred",
+        "PackagePath": "pkg/authcred",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/authcred/prototype_rejection_comprehensive_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestPrototypeRejection_CaseInsensitiveACC",
+        "Package": "authcred",
+        "PackagePath": "pkg/authcred",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/authcred/prototype_rejection_comprehensive_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestPrototypeRejection_BoundaryCases",
+        "Package": "authcred",
+        "PackagePath": "pkg/authcred",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/authcred/prototype_rejection_comprehensive_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestIsPrototypeAccount_KnownHashes",
+        "Package": "authcred_test",
+        "PackagePath": "pkg/authcred",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/authcred/prototype_rejection_integration_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestIsPrototypeAccount_SuffixDetection",
+        "Package": "authcred_test",
+        "PackagePath": "pkg/authcred",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/authcred/prototype_rejection_integration_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestIsPrototypeAccount_EmptyEdgeCases",
+        "Package": "authcred_test",
+        "PackagePath": "pkg/authcred",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/authcred/prototype_rejection_integration_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": true,
+    "EstimatedDuration": 300000000000,
+    "PackagePath": "pkg/authcred"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestResolveDiscoveryLane",
+      "Package": "authcred",
+      "PackagePath": "pkg/authcred",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/authcred/discovery_membrane_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestFilterKindsForDiscovery",
+      "Package": "authcred",
+      "PackagePath": "pkg/authcred",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/authcred/discovery_membrane_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestPrototypeRejection_KnownHashesComprehensive",
+      "Package": "authcred",
+      "PackagePath": "pkg/authcred",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/authcred/prototype_rejection_comprehensive_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestPrototypeRejection_ErrorFormatDeterministic",
+      "Package": "authcred",
+      "PackagePath": "pkg/authcred",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/authcred/prototype_rejection_comprehensive_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestPrototypeRejection_EmptyAndWhitespace",
+      "Package": "authcred",
+      "PackagePath": "pkg/authcred",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/authcred/prototype_rejection_comprehensive_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestPrototypeRejection_CaseInsensitiveACC",
+      "Package": "authcred",
+      "PackagePath": "pkg/authcred",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/authcred/prototype_rejection_comprehensive_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestPrototypeRejection_BoundaryCases",
+      "Package": "authcred",
+      "PackagePath": "pkg/authcred",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/authcred/prototype_rejection_comprehensive_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestIsPrototypeAccount_KnownHashes",
+      "Package": "authcred_test",
+      "PackagePath": "pkg/authcred",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/authcred/prototype_rejection_integration_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestIsPrototypeAccount_SuffixDetection",
+      "Package": "authcred_test",
+      "PackagePath": "pkg/authcred",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/authcred/prototype_rejection_integration_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestIsPrototypeAccount_EmptyEdgeCases",
+      "Package": "authcred_test",
+      "PackagePath": "pkg/authcred",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/authcred/prototype_rejection_integration_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

@@ -1,0 +1,2 @@
+{"category":"auto_fix","event_type":"started","job_id":"SCH-AUTOFIX-1788564331132346000","job_type":"run_wrapper","timestamp":"2026-09-04T23:26:36Z","title":"Auto-fix batch: 10 issues","trigger_type":"manual"}
+{"category":"auto_fix","duration":"33.631510791s","error":"command failed after 2 attempts: exit status 1","event_type":"failed","job_id":"SCH-AUTOFIX-1788564331132346000","job_type":"run_wrapper","timestamp":"2026-09-04T23:27:10Z","title":"Auto-fix batch: 10 issues","trigger_type":"manual"}

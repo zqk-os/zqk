@@ -1,0 +1,44 @@
+
+--- run 2026-09-04T22:18:21Z ---
+=== RUN   TestClassifyDispatch
+=== PAUSE TestClassifyDispatch
+=== RUN   TestCacheableEventIDAndPersistLog
+=== PAUSE TestCacheableEventIDAndPersistLog
+=== RUN   TestFlushActor
+=== PAUSE TestFlushActor
+=== RUN   TestPrepareFlush
+=== PAUSE TestPrepareFlush
+=== RUN   TestPrepareFlushNil
+=== PAUSE TestPrepareFlushNil
+=== RUN   TestFlushMetricTags
+=== PAUSE TestFlushMetricTags
+=== RUN   TestRecordFlushWrite
+=== PAUSE TestRecordFlushWrite
+=== RUN   TestPrepareFlushIDError
+=== PAUSE TestPrepareFlushIDError
+=== RUN   TestFlushRunWritesViaSink
+=== PAUSE TestFlushRunWritesViaSink
+=== RUN   TestFlushRunIDErrorSkipsWrite
+=== PAUSE TestFlushRunIDErrorSkipsWrite
+=== CONT  TestClassifyDispatch
+--- PASS: TestClassifyDispatch (0.00s)
+=== CONT  TestPrepareFlushNil
+--- PASS: TestPrepareFlushNil (0.00s)
+=== CONT  TestPrepareFlush
+=== CONT  TestFlushMetricTags
+--- PASS: TestPrepareFlush (0.00s)
+=== CONT  TestFlushRunWritesViaSink
+--- PASS: TestFlushMetricTags (0.00s)
+=== CONT  TestFlushRunIDErrorSkipsWrite
+--- PASS: TestFlushRunIDErrorSkipsWrite (0.00s)
+=== CONT  TestPrepareFlushIDError
+--- PASS: TestPrepareFlushIDError (0.00s)
+=== CONT  TestFlushActor
+--- PASS: TestFlushActor (0.00s)
+=== CONT  TestCacheableEventIDAndPersistLog
+--- PASS: TestCacheableEventIDAndPersistLog (0.00s)
+=== CONT  TestRecordFlushWrite
+--- PASS: TestRecordFlushWrite (0.00s)
+--- PASS: TestFlushRunWritesViaSink (0.00s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/storage/audit	0.419s

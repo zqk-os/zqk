@@ -1,0 +1,44 @@
+
+--- run 2026-09-05T05:22:33Z ---
+=== RUN   TestRunChangeJournalAggregationViaPipeline_NilJob
+=== PAUSE TestRunChangeJournalAggregationViaPipeline_NilJob
+=== RUN   TestRunCleanupConfigViaPipeline_NilHandler
+=== PAUSE TestRunCleanupConfigViaPipeline_NilHandler
+=== RUN   TestRunCleanupConfigViaPipeline_NilJob
+=== PAUSE TestRunCleanupConfigViaPipeline_NilJob
+=== RUN   TestRunAggregationMetricsCleanupViaPipeline_NilHandler
+=== PAUSE TestRunAggregationMetricsCleanupViaPipeline_NilHandler
+=== RUN   TestRunAggregationMetricsCleanupViaPipeline_NilJob
+=== PAUSE TestRunAggregationMetricsCleanupViaPipeline_NilJob
+=== RUN   TestRunGenericMetricsCleanupViaPipeline_NilHandler
+=== PAUSE TestRunGenericMetricsCleanupViaPipeline_NilHandler
+=== RUN   TestRunGenericMetricsCleanupViaPipeline_NilJob
+=== PAUSE TestRunGenericMetricsCleanupViaPipeline_NilJob
+=== RUN   TestRunRetentionToleranceViaPipeline_NilHandler
+=== PAUSE TestRunRetentionToleranceViaPipeline_NilHandler
+=== RUN   TestRunRetentionToleranceViaPipeline_NilJob
+=== PAUSE TestRunRetentionToleranceViaPipeline_NilJob
+=== RUN   TestRunSchedulerJobRetentionViaPipeline_NilHandler
+=== PAUSE TestRunSchedulerJobRetentionViaPipeline_NilHandler
+=== CONT  TestRunChangeJournalAggregationViaPipeline_NilJob
+=== CONT  TestRunGenericMetricsCleanupViaPipeline_NilHandler
+=== CONT  TestRunAggregationMetricsCleanupViaPipeline_NilHandler
+=== CONT  TestRunSchedulerJobRetentionViaPipeline_NilHandler
+--- PASS: TestRunGenericMetricsCleanupViaPipeline_NilHandler (0.00s)
+--- PASS: TestRunChangeJournalAggregationViaPipeline_NilJob (0.00s)
+--- PASS: TestRunAggregationMetricsCleanupViaPipeline_NilHandler (0.00s)
+=== CONT  TestRunRetentionToleranceViaPipeline_NilJob
+--- PASS: TestRunSchedulerJobRetentionViaPipeline_NilHandler (0.00s)
+=== CONT  TestRunRetentionToleranceViaPipeline_NilHandler
+--- PASS: TestRunRetentionToleranceViaPipeline_NilHandler (0.00s)
+=== CONT  TestRunAggregationMetricsCleanupViaPipeline_NilJob
+--- PASS: TestRunRetentionToleranceViaPipeline_NilJob (0.00s)
+--- PASS: TestRunAggregationMetricsCleanupViaPipeline_NilJob (0.00s)
+=== CONT  TestRunGenericMetricsCleanupViaPipeline_NilJob
+--- PASS: TestRunGenericMetricsCleanupViaPipeline_NilJob (0.00s)
+=== CONT  TestRunCleanupConfigViaPipeline_NilHandler
+=== CONT  TestRunCleanupConfigViaPipeline_NilJob
+--- PASS: TestRunCleanupConfigViaPipeline_NilHandler (0.00s)
+--- PASS: TestRunCleanupConfigViaPipeline_NilJob (0.00s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/scheduler	0.766s

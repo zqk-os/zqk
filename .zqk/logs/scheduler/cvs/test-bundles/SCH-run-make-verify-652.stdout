@@ -1,0 +1,64 @@
+
+--- run 2026-09-04T22:18:38Z ---
+=== RUN   TestExpectsPeerAck
+=== PAUSE TestExpectsPeerAck
+=== RUN   TestInferRoleHints_exactSeatIDOnly
+=== PAUSE TestInferRoleHints_exactSeatIDOnly
+=== RUN   TestCorrespondence_NoIdleOnEmptyInbox
+=== PAUSE TestCorrespondence_NoIdleOnEmptyInbox
+=== RUN   TestEnforceDirectedHourglass_broadcastOK
+=== PAUSE TestEnforceDirectedHourglass_broadcastOK
+=== RUN   TestEnforceDirectedHourglass_directedRequiresAwait
+=== PAUSE TestEnforceDirectedHourglass_directedRequiresAwait
+=== RUN   TestEnforceDirectedHourglass_directedWithAwaitOK
+=== PAUSE TestEnforceDirectedHourglass_directedWithAwaitOK
+=== RUN   TestNamedATKID
+=== PAUSE TestNamedATKID
+=== RUN   TestWorkerSeatForPersona
+=== PAUSE TestWorkerSeatForPersona
+=== RUN   TestIsCoordinatorDutySeat
+=== PAUSE TestIsCoordinatorDutySeat
+=== RUN   TestVendorPathPolicy_FindLeak
+=== PAUSE TestVendorPathPolicy_FindLeak
+=== CONT  TestExpectsPeerAck
+=== RUN   TestExpectsPeerAck/steer_directed
+=== CONT  TestEnforceDirectedHourglass_directedWithAwaitOK
+=== RUN   TestExpectsPeerAck/steer_undirected
+--- PASS: TestEnforceDirectedHourglass_directedWithAwaitOK (0.00s)
+=== CONT  TestVendorPathPolicy_FindLeak
+--- PASS: TestVendorPathPolicy_FindLeak (0.00s)
+=== CONT  TestIsCoordinatorDutySeat
+=== RUN   TestExpectsPeerAck/chat_directed_via_map
+=== RUN   TestExpectsPeerAck/mesh_undirected
+=== RUN   TestExpectsPeerAck/mesh_directed
+=== RUN   TestExpectsPeerAck/scan_tests_directed
+=== RUN   TestExpectsPeerAck/checkpoint_directed
+=== RUN   TestExpectsPeerAck/promote_directed
+=== RUN   TestExpectsPeerAck/wake_directed
+=== RUN   TestExpectsPeerAck/ack_never
+--- PASS: TestExpectsPeerAck (0.00s)
+    --- PASS: TestExpectsPeerAck/steer_directed (0.00s)
+    --- PASS: TestExpectsPeerAck/steer_undirected (0.00s)
+    --- PASS: TestExpectsPeerAck/chat_directed_via_map (0.00s)
+    --- PASS: TestExpectsPeerAck/mesh_undirected (0.00s)
+    --- PASS: TestExpectsPeerAck/mesh_directed (0.00s)
+    --- PASS: TestExpectsPeerAck/scan_tests_directed (0.00s)
+    --- PASS: TestExpectsPeerAck/checkpoint_directed (0.00s)
+    --- PASS: TestExpectsPeerAck/promote_directed (0.00s)
+    --- PASS: TestExpectsPeerAck/wake_directed (0.00s)
+    --- PASS: TestExpectsPeerAck/ack_never (0.00s)
+=== CONT  TestEnforceDirectedHourglass_broadcastOK
+--- PASS: TestEnforceDirectedHourglass_broadcastOK (0.00s)
+=== CONT  TestEnforceDirectedHourglass_directedRequiresAwait
+--- PASS: TestEnforceDirectedHourglass_directedRequiresAwait (0.00s)
+=== CONT  TestCorrespondence_NoIdleOnEmptyInbox
+--- PASS: TestCorrespondence_NoIdleOnEmptyInbox (0.00s)
+=== CONT  TestWorkerSeatForPersona
+--- PASS: TestWorkerSeatForPersona (0.01s)
+=== CONT  TestNamedATKID
+--- PASS: TestNamedATKID (0.00s)
+=== CONT  TestInferRoleHints_exactSeatIDOnly
+--- PASS: TestIsCoordinatorDutySeat (0.02s)
+--- PASS: TestInferRoleHints_exactSeatIDOnly (0.02s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/agentfeed	0.376s

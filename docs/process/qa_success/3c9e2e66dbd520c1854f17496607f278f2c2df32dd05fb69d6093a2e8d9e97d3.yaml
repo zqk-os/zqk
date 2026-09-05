@@ -1,0 +1,14 @@
+created_at: "2026-09-03T09:06:19Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1788426379782126000-6c044155
+item_id: BLI-CEF-PKG-CONSOLIDATE-001
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 86b8ab3d574c004a61020b73c23f52b9055049e90c3d755c8bbb383e059e384028fdd8cd69e13123b644e5f3f7eb65596e73e2d57d719ea3dafcb01b84ce8dfb
+schema_version: 2.0.0
+signature: 3044022009c9400d3f04df04fe2cc8e62f92716992eb397d4814036556621352bc6e6b9b02201b0764227287004a66648da50f6996cfe8f745442246f0a411eb511e4c9e1bf9
+status: success
+title: QA success for BLI-CEF-PKG-CONSOLIDATE-001
+updated_at: "2026-09-03T09:06:20Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

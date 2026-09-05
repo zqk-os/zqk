@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-386",
+  "created_at": "2026-09-04T21:34:31.167115Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-386",
+    "Tests": [
+      {
+        "Name": "TestBinaryDetector_GetPath",
+        "Package": "detector",
+        "PackagePath": "pkg/migration/detector",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/migration/detector/detector_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestGetBinaryHash",
+        "Package": "detector",
+        "PackagePath": "pkg/migration/detector",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/migration/detector/detector_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestVerifyBinaryIntegrity",
+        "Package": "detector",
+        "PackagePath": "pkg/migration/detector",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/migration/detector/detector_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestBinaryDetector_GetVersion",
+        "Package": "detector",
+        "PackagePath": "pkg/migration/detector",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/migration/detector/detector_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestBinaryDetector_IsTrustedSigner",
+        "Package": "detector",
+        "PackagePath": "pkg/migration/detector",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/migration/detector/detector_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestSupportsMigration",
+        "Package": "detector",
+        "PackagePath": "pkg/migration/detector",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/migration/detector/detector_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestGetModuleVersion",
+        "Package": "detector",
+        "PackagePath": "pkg/migration/detector",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/migration/detector/module_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestParseVersion",
+        "Package": "detector",
+        "PackagePath": "pkg/migration/detector",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/migration/detector/version_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestVersionCompare",
+        "Package": "detector",
+        "PackagePath": "pkg/migration/detector",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/migration/detector/version_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestVersionConstraint",
+        "Package": "detector",
+        "PackagePath": "pkg/migration/detector",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/migration/detector/version_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": true,
+    "EstimatedDuration": 300000000000,
+    "PackagePath": "pkg/migration/detector"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestBinaryDetector_GetPath",
+      "Package": "detector",
+      "PackagePath": "pkg/migration/detector",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/migration/detector/detector_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestGetBinaryHash",
+      "Package": "detector",
+      "PackagePath": "pkg/migration/detector",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/migration/detector/detector_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestVerifyBinaryIntegrity",
+      "Package": "detector",
+      "PackagePath": "pkg/migration/detector",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/migration/detector/detector_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestBinaryDetector_GetVersion",
+      "Package": "detector",
+      "PackagePath": "pkg/migration/detector",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/migration/detector/detector_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestBinaryDetector_IsTrustedSigner",
+      "Package": "detector",
+      "PackagePath": "pkg/migration/detector",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/migration/detector/detector_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestSupportsMigration",
+      "Package": "detector",
+      "PackagePath": "pkg/migration/detector",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/migration/detector/detector_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestGetModuleVersion",
+      "Package": "detector",
+      "PackagePath": "pkg/migration/detector",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/migration/detector/module_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestParseVersion",
+      "Package": "detector",
+      "PackagePath": "pkg/migration/detector",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/migration/detector/version_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestVersionCompare",
+      "Package": "detector",
+      "PackagePath": "pkg/migration/detector",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/migration/detector/version_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestVersionConstraint",
+      "Package": "detector",
+      "PackagePath": "pkg/migration/detector",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/migration/detector/version_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

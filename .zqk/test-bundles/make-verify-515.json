@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-515",
+  "created_at": "2026-09-04T21:34:32.469101Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-515",
+    "Tests": [
+      {
+        "Name": "TestASTAnalyzer_Analyze",
+        "Package": "ambient",
+        "PackagePath": "pkg/ambient",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/ambient/analyzer_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAutoMergeDaemon_Initialization",
+        "Package": "ambient",
+        "PackagePath": "pkg/ambient",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/ambient/automerge_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAutoMergeDaemon_CancelPropagation",
+        "Package": "ambient",
+        "PackagePath": "pkg/ambient",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/ambient/automerge_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAutoMergeDaemon_Poll",
+        "Package": "ambient",
+        "PackagePath": "pkg/ambient",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/ambient/automerge_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAutoMergeDaemon_VerifyAndMerge",
+        "Package": "ambient",
+        "PackagePath": "pkg/ambient",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/ambient/automerge_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestLoadConfig",
+        "Package": "ambient",
+        "PackagePath": "pkg/ambient",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/ambient/config_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestResolveService",
+        "Package": "ambient",
+        "PackagePath": "pkg/ambient",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/ambient/config_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestCSnapBuilder_BuildEnvelope",
+        "Package": "ambient",
+        "PackagePath": "pkg/ambient",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/ambient/csnap_builder_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestEventHub_PublishAndSubscribe",
+        "Package": "ambient",
+        "PackagePath": "pkg/ambient",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/ambient/eventhub_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestCoachHeuristics_ManualEdit",
+        "Package": "ambient",
+        "PackagePath": "pkg/ambient",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/ambient/heuristics_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 300000000000,
+    "PackagePath": "pkg/ambient"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestASTAnalyzer_Analyze",
+      "Package": "ambient",
+      "PackagePath": "pkg/ambient",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/ambient/analyzer_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestAutoMergeDaemon_Initialization",
+      "Package": "ambient",
+      "PackagePath": "pkg/ambient",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/ambient/automerge_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestAutoMergeDaemon_CancelPropagation",
+      "Package": "ambient",
+      "PackagePath": "pkg/ambient",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/ambient/automerge_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestAutoMergeDaemon_Poll",
+      "Package": "ambient",
+      "PackagePath": "pkg/ambient",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/ambient/automerge_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestAutoMergeDaemon_VerifyAndMerge",
+      "Package": "ambient",
+      "PackagePath": "pkg/ambient",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/ambient/automerge_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestLoadConfig",
+      "Package": "ambient",
+      "PackagePath": "pkg/ambient",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/ambient/config_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestResolveService",
+      "Package": "ambient",
+      "PackagePath": "pkg/ambient",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/ambient/config_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestCSnapBuilder_BuildEnvelope",
+      "Package": "ambient",
+      "PackagePath": "pkg/ambient",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/ambient/csnap_builder_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestEventHub_PublishAndSubscribe",
+      "Package": "ambient",
+      "PackagePath": "pkg/ambient",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/ambient/eventhub_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestCoachHeuristics_ManualEdit",
+      "Package": "ambient",
+      "PackagePath": "pkg/ambient",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/ambient/heuristics_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

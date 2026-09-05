@@ -1,0 +1,35 @@
+category: maintenance
+command: /bin/sh
+command_args:
+    - -c
+    - |-
+      set -e
+      ZQK="${ZQK_BIN:-zqk}"
+      "$ZQK" system check all --auto-fix --auto-fix-scheduler --timeout 540s
+created_at: "2026-08-21T11:09:16Z"
+created_by: ACC-1785920548450214012-68b850c0
+description: |
+    Runs `zqk system check all --auto-fix` every 5 minutes so auto-fixable issues
+    (missing hashes, hash mismatches, etc.) are applied regularly and the system reaches
+    a good state without waiting for manual check --auto-fix.
+    Uses a full check surface (refs on): --fast is incompatible with --auto-fix.
+    Uses --timeout 540s (below max_runtime_seconds 600) so the CLI does not stop at the
+    default ~2m floor for --auto-fix while proactive CAS cleanup and validation run.
+enabled: true
+execution_mode: reusable
+id: SCH-autofix-run
+job_type: run_wrapper
+kind: scheduler_job
+last_run_at: "2026-09-05T05:08:22Z"
+max_runtime_seconds: 600
+namespace_id: zqk:kernel
+next_run_at: "2026-09-05T05:10:00Z"
+schedule_expression: 0 */5 * * * *
+schema_version: 2.0.0
+source_type: internal
+status: active
+title: Auto-fix run (every 5 min)
+trigger_type: timer
+updated_at: "2026-09-05T05:08:45Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

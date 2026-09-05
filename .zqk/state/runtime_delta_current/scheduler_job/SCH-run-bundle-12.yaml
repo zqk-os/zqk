@@ -1,0 +1,38 @@
+category: testing
+command: /bin/sh
+command_args:
+    - -c
+    - sh /Users/lanceettl/zqk-restore-clone/scripts/check-test-contamination.sh go test ./pkg/specbuilder/generators -run '^(TestParallelImplementation|TestGenerateFromFile|TestConvenienceFunction)$' -v -count=1 -timeout 240s -p 2 -parallel 2 > /Users/lanceettl/zqk-restore-clone/.zqk/logs/scheduler/cvs/test-bundles/bundle-bundle-12.log 2>&1
+created_at: "2026-09-05T05:21:46Z"
+created_by: ACC-1785920548450214012-68b850c0
+description: 'Test bundle containing 3 test(s) from package pkg/specbuilder/generators. All tests are parallel-safe. Estimated duration: 1m30s. Tests: TestParallelImplementation, TestGenerateFromFile, TestConvenienceFunction. Log file: /Users/lanceettl/zqk-restore-clone/.zqk/logs/scheduler/cvs/test-bundles/bundle-bundle-12.log'
+enabled: true
+execution_mode: one_time
+id: SCH-run-bundle-12
+job_type: run_wrapper
+kind: scheduler_job
+last_run_at: "2026-09-05T05:56:48Z"
+max_runtime_seconds: 300
+metadata:
+    bundle_command_fingerprint: 7f0905f267867d08a3b1cbf4
+    bundle_id: bundle-12
+    estimated_duration_seconds: 90
+    is_parallel: true
+    log_file: /Users/lanceettl/zqk-restore-clone/.zqk/logs/scheduler/cvs/test-bundles/bundle-bundle-12.log
+    max_concurrent_same_package: 4
+    package_path: pkg/specbuilder/generators
+    test_count: 3
+namespace_id: zqk:kernel
+origin_project: zqk
+origin_system: zqk
+priority: normal
+retry_count: 0
+retry_delay_seconds: 5
+schema_version: 2.0.0
+status: active
+title: 'Test Bundle: pkg/specbuilder/generators (3 tests)'
+trigger_type: immediate
+updated_at: "2026-09-05T05:56:58Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+working_directory: /Users/lanceettl/zqk-restore-clone

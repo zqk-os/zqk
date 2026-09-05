@@ -1,0 +1,84 @@
+
+--- run 2026-09-04T22:01:29Z ---
+=== RUN   TestMissedTriggerAssessmentParts
+=== PAUSE TestMissedTriggerAssessmentParts
+=== RUN   TestAggregateEventsFromFile_MissingFile
+=== PAUSE TestAggregateEventsFromFile_MissingFile
+=== RUN   TestAggregateEventsFromFile_EmptyFile
+=== PAUSE TestAggregateEventsFromFile_EmptyFile
+=== RUN   TestAggregateEventsFromFile_ValidJSONL
+=== PAUSE TestAggregateEventsFromFile_ValidJSONL
+=== RUN   TestAggregateEventsFromFile_InvalidLineSkipped
+=== PAUSE TestAggregateEventsFromFile_InvalidLineSkipped
+=== RUN   TestFlagDuration_StringAndDuration
+=== PAUSE TestFlagDuration_StringAndDuration
+=== RUN   TestParsePackageList
+=== PAUSE TestParsePackageList
+=== RUN   TestDedupeTests
+=== PAUSE TestDedupeTests
+=== RUN   TestParseEventMetadata
+=== PAUSE TestParseEventMetadata
+=== RUN   TestParseSchedulerStatusDaemonPID
+=== PAUSE TestParseSchedulerStatusDaemonPID
+=== CONT  TestMissedTriggerAssessmentParts
+=== RUN   TestMissedTriggerAssessmentParts/empty_when_no_miss
+=== PAUSE TestMissedTriggerAssessmentParts/empty_when_no_miss
+=== RUN   TestMissedTriggerAssessmentParts/HF_high_frequency
+=== PAUSE TestMissedTriggerAssessmentParts/HF_high_frequency
+=== RUN   TestMissedTriggerAssessmentParts/FQ_frequent_cadence
+=== PAUSE TestMissedTriggerAssessmentParts/FQ_frequent_cadence
+=== RUN   TestMissedTriggerAssessmentParts/ST_stale_gap
+=== PAUSE TestMissedTriggerAssessmentParts/ST_stale_gap
+=== RUN   TestMissedTriggerAssessmentParts/LR_last_run_before_first_miss
+=== PAUSE TestMissedTriggerAssessmentParts/LR_last_run_before_first_miss
+=== RUN   TestMissedTriggerAssessmentParts/M_default
+=== PAUSE TestMissedTriggerAssessmentParts/M_default
+=== CONT  TestFlagDuration_StringAndDuration
+--- PASS: TestFlagDuration_StringAndDuration (0.00s)
+=== CONT  TestParseSchedulerStatusDaemonPID
+--- PASS: TestParseSchedulerStatusDaemonPID (0.00s)
+=== CONT  TestParseEventMetadata
+=== RUN   TestParseEventMetadata/activity_cache_top_level_duration
+=== PAUSE TestParseEventMetadata/activity_cache_top_level_duration
+=== RUN   TestParseEventMetadata/nested_metadata_int_duration
+=== PAUSE TestParseEventMetadata/nested_metadata_int_duration
+=== RUN   TestParseEventMetadata/nested_metadata_map_any_any
+=== PAUSE TestParseEventMetadata/nested_metadata_map_any_any
+=== RUN   TestParseEventMetadata/json_number_in_metadata
+=== PAUSE TestParseEventMetadata/json_number_in_metadata
+=== CONT  TestDedupeTests
+--- PASS: TestDedupeTests (0.00s)
+=== CONT  TestParsePackageList
+--- PASS: TestParsePackageList (0.00s)
+=== CONT  TestAggregateEventsFromFile_ValidJSONL
+--- PASS: TestAggregateEventsFromFile_ValidJSONL (0.01s)
+=== CONT  TestAggregateEventsFromFile_InvalidLineSkipped
+--- PASS: TestAggregateEventsFromFile_InvalidLineSkipped (0.00s)
+=== CONT  TestAggregateEventsFromFile_EmptyFile
+--- PASS: TestAggregateEventsFromFile_EmptyFile (0.00s)
+=== CONT  TestAggregateEventsFromFile_MissingFile
+--- PASS: TestAggregateEventsFromFile_MissingFile (0.00s)
+=== CONT  TestMissedTriggerAssessmentParts/empty_when_no_miss
+=== CONT  TestMissedTriggerAssessmentParts/ST_stale_gap
+=== CONT  TestMissedTriggerAssessmentParts/M_default
+=== CONT  TestMissedTriggerAssessmentParts/LR_last_run_before_first_miss
+=== CONT  TestMissedTriggerAssessmentParts/FQ_frequent_cadence
+=== CONT  TestMissedTriggerAssessmentParts/HF_high_frequency
+--- PASS: TestMissedTriggerAssessmentParts (0.00s)
+    --- PASS: TestMissedTriggerAssessmentParts/empty_when_no_miss (0.00s)
+    --- PASS: TestMissedTriggerAssessmentParts/ST_stale_gap (0.00s)
+    --- PASS: TestMissedTriggerAssessmentParts/M_default (0.00s)
+    --- PASS: TestMissedTriggerAssessmentParts/LR_last_run_before_first_miss (0.00s)
+    --- PASS: TestMissedTriggerAssessmentParts/FQ_frequent_cadence (0.00s)
+    --- PASS: TestMissedTriggerAssessmentParts/HF_high_frequency (0.00s)
+=== CONT  TestParseEventMetadata/activity_cache_top_level_duration
+=== CONT  TestParseEventMetadata/nested_metadata_map_any_any
+=== CONT  TestParseEventMetadata/json_number_in_metadata
+=== CONT  TestParseEventMetadata/nested_metadata_int_duration
+--- PASS: TestParseEventMetadata (0.01s)
+    --- PASS: TestParseEventMetadata/activity_cache_top_level_duration (0.01s)
+    --- PASS: TestParseEventMetadata/nested_metadata_map_any_any (0.00s)
+    --- PASS: TestParseEventMetadata/json_number_in_metadata (0.00s)
+    --- PASS: TestParseEventMetadata/nested_metadata_int_duration (0.00s)
+PASS
+ok  	github.com/lanceman/zqk/cmd/zqk/scheduler	0.914s

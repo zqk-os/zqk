@@ -1,0 +1,24 @@
+
+--- run 2026-09-04T21:44:57Z ---
+=== RUN   TestAggregate_StaleBlockingCategoryBlocks
+=== PAUSE TestAggregate_StaleBlockingCategoryBlocks
+=== RUN   TestAggregate_FreshPassDoesNotBlock
+=== PAUSE TestAggregate_FreshPassDoesNotBlock
+=== RUN   TestAggregate_StaleNonBlockingCategoryDoesNotBlock
+=== PAUSE TestAggregate_StaleNonBlockingCategoryDoesNotBlock
+=== RUN   TestAggregate_FailingCategoryStillBlocks
+=== PAUSE TestAggregate_FailingCategoryStillBlocks
+=== RUN   TestCategoryResult_IsStaleOnUnusableTimestamp
+=== PAUSE TestCategoryResult_IsStaleOnUnusableTimestamp
+=== CONT  TestAggregate_StaleBlockingCategoryBlocks
+=== CONT  TestAggregate_FailingCategoryStillBlocks
+--- PASS: TestAggregate_StaleBlockingCategoryBlocks (0.02s)
+--- PASS: TestAggregate_FailingCategoryStillBlocks (0.02s)
+=== CONT  TestAggregate_StaleNonBlockingCategoryDoesNotBlock
+=== CONT  TestAggregate_FreshPassDoesNotBlock
+--- PASS: TestAggregate_StaleNonBlockingCategoryDoesNotBlock (0.01s)
+=== CONT  TestCategoryResult_IsStaleOnUnusableTimestamp
+--- PASS: TestCategoryResult_IsStaleOnUnusableTimestamp (0.00s)
+--- PASS: TestAggregate_FreshPassDoesNotBlock (0.01s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/precommit	0.321s

@@ -1,0 +1,21 @@
+actual_effort: 0.03h
+assignee_persona_ref: PER-1781248465963688000-63316fc1
+branch_ref: integration/pri-cef-r27-envelope-001
+claimed_at: "2026-09-02T16:02:29Z"
+claimed_by: ACC-1785920548450214006-2e52b3e7
+commit_hash: 7466e8fb03ea07a177cf2a840378979419a1129c
+completed_at: "2026-09-02T15:56:28Z"
+created_at: "2026-09-02T15:53:29Z"
+created_by: ACC-1785920548450214006-2e52b3e7
+execution_prompt: Please add coverage CI for all commands, expand the race matrix, and test zero-test packages per BLI-CEF-COVERAGE-RACE-001.
+id: REDACTED
+kind: agent_task
+namespace_id: zqk:kernel
+prompt: Please add coverage CI for all commands, expand the race matrix, and test zero-test packages per BLI-CEF-COVERAGE-RACE-001.
+schema_version: 2.0.0
+started_at: "2026-09-02T15:54:25Z"
+status: implemented
+title: Add coverage CI
+updated_at: "2026-09-02T19:35:23Z"
+updated_by: ACC-1785920548450214006-2e52b3e7
+version_context: default

@@ -1,0 +1,177 @@
+{
+  "name": "make-verify-815",
+  "created_at": "2026-09-04T21:34:35.409545Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-815",
+    "Tests": [
+      {
+        "Name": "TestAgentWorktreeDir_envOverride",
+        "Package": "paths",
+        "PackagePath": "pkg/paths",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/paths/agent_worktree_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAgentWorktreeDir_notNestedInProjectEvenIfEnvInside",
+        "Package": "paths",
+        "PackagePath": "pkg/paths",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/paths/agent_worktree_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestPathsResolver",
+        "Package": "paths_test",
+        "PackagePath": "pkg/paths",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/paths/paths_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestProjectPath_UnderRoot",
+        "Package": "paths",
+        "PackagePath": "pkg/paths",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/paths/project_path_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestProjectPath_EscapeRejected",
+        "Package": "paths",
+        "PackagePath": "pkg/paths",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/paths/project_path_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestUnderProjectRoot",
+        "Package": "paths",
+        "PackagePath": "pkg/paths",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/paths/project_path_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestResolveProjectRoot_EnvPrecedence",
+        "Package": "paths",
+        "PackagePath": "pkg/paths",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/paths/project_root_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestIsValidProjectRoot",
+        "Package": "paths",
+        "PackagePath": "pkg/paths",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/paths/project_root_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestMustNotDestroyProjectRoot",
+        "Package": "paths",
+        "PackagePath": "pkg/paths",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/paths/safety_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 270000000000,
+    "PackagePath": "pkg/paths"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestAgentWorktreeDir_envOverride",
+      "Package": "paths",
+      "PackagePath": "pkg/paths",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/paths/agent_worktree_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestAgentWorktreeDir_notNestedInProjectEvenIfEnvInside",
+      "Package": "paths",
+      "PackagePath": "pkg/paths",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/paths/agent_worktree_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestPathsResolver",
+      "Package": "paths_test",
+      "PackagePath": "pkg/paths",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/paths/paths_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestProjectPath_UnderRoot",
+      "Package": "paths",
+      "PackagePath": "pkg/paths",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/paths/project_path_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestProjectPath_EscapeRejected",
+      "Package": "paths",
+      "PackagePath": "pkg/paths",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/paths/project_path_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestUnderProjectRoot",
+      "Package": "paths",
+      "PackagePath": "pkg/paths",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/paths/project_path_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestResolveProjectRoot_EnvPrecedence",
+      "Package": "paths",
+      "PackagePath": "pkg/paths",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/paths/project_root_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestIsValidProjectRoot",
+      "Package": "paths",
+      "PackagePath": "pkg/paths",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/paths/project_root_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestMustNotDestroyProjectRoot",
+      "Package": "paths",
+      "PackagePath": "pkg/paths",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/paths/safety_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

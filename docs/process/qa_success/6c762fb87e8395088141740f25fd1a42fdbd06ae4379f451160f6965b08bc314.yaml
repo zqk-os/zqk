@@ -1,0 +1,14 @@
+created_at: "2026-08-20T01:38:37Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1787189917048567000-2eeed870
+item_id: BLI-CEF-R8-P1-SEC-REST-001
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 2857702ca28e4b64fb5782140b43c1400e68fdeab30ab0062f4119523ca97d466e5f13c72adcfa41b92eacf21fa7f0a79b8a8e3a8d7c581e5c9afe0e69cb31dc
+schema_version: 2.0.0
+signature: 3046022100c4efbf5bead348b6ef830bfd20092f05386df281337b0098ac07460744226213022100b286b1044193e441e8231625d0ff0135696f63c892b8baef263c88b1a69f100c
+status: archived
+title: 'R8 P1 security remainder: safepath, gosec, JWT mix, node_modules, license headers'
+updated_at: "2026-09-01T07:28:20Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-834",
+  "created_at": "2026-09-04T21:34:35.613927Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-834",
+    "Tests": [
+      {
+        "Name": "TestAuthorizeDraftSweepApply_SystemFallbackRejected",
+        "Package": "object",
+        "PackagePath": "cmd/zqk/object",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/object/draft_sweep_rbac_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAuthorizeDraftSweepApply_WildcardWRNoDeleteDenied",
+        "Package": "object",
+        "PackagePath": "cmd/zqk/object",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/object/draft_sweep_rbac_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAuthorizeDraftSweepApply_PartialDeleteDenied",
+        "Package": "object",
+        "PackagePath": "cmd/zqk/object",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/object/draft_sweep_rbac_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestRequireElevatedInternal_CommunityRefuses",
+        "Package": "object",
+        "PackagePath": "cmd/zqk/object",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/object/elevated_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestRequireElevatedInternal_EnterpriseAllows",
+        "Package": "object",
+        "PackagePath": "cmd/zqk/object",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/object/elevated_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestRequireElevatedInternal_AdminBinaryAllows",
+        "Package": "object",
+        "PackagePath": "cmd/zqk/object",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/object/elevated_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestCLI_ObjectTemplateExtensibleObject_Integration",
+        "Package": "object",
+        "PackagePath": "cmd/zqk/object",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/object/extensible_object_cli_integration_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestGetOriginStatusForKind_BacklogItem",
+        "Package": "object",
+        "PackagePath": "cmd/zqk/object",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/object/get_initial_status_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestCreateTestObject_BacklogItem_SetsStatusExploring",
+        "Package": "object",
+        "PackagePath": "cmd/zqk/object",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/object/get_initial_status_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestBacklogItemCreate_UsesStatusExploring",
+        "Package": "object",
+        "PackagePath": "cmd/zqk/object",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/object/get_initial_status_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 900000000000,
+    "PackagePath": "cmd/zqk/object"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestAuthorizeDraftSweepApply_SystemFallbackRejected",
+      "Package": "object",
+      "PackagePath": "cmd/zqk/object",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/object/draft_sweep_rbac_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestAuthorizeDraftSweepApply_WildcardWRNoDeleteDenied",
+      "Package": "object",
+      "PackagePath": "cmd/zqk/object",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/object/draft_sweep_rbac_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestAuthorizeDraftSweepApply_PartialDeleteDenied",
+      "Package": "object",
+      "PackagePath": "cmd/zqk/object",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/object/draft_sweep_rbac_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestRequireElevatedInternal_CommunityRefuses",
+      "Package": "object",
+      "PackagePath": "cmd/zqk/object",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/object/elevated_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestRequireElevatedInternal_EnterpriseAllows",
+      "Package": "object",
+      "PackagePath": "cmd/zqk/object",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/object/elevated_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestRequireElevatedInternal_AdminBinaryAllows",
+      "Package": "object",
+      "PackagePath": "cmd/zqk/object",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/object/elevated_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestCLI_ObjectTemplateExtensibleObject_Integration",
+      "Package": "object",
+      "PackagePath": "cmd/zqk/object",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/object/extensible_object_cli_integration_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestGetOriginStatusForKind_BacklogItem",
+      "Package": "object",
+      "PackagePath": "cmd/zqk/object",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/object/get_initial_status_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestCreateTestObject_BacklogItem_SetsStatusExploring",
+      "Package": "object",
+      "PackagePath": "cmd/zqk/object",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/object/get_initial_status_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestBacklogItemCreate_UsesStatusExploring",
+      "Package": "object",
+      "PackagePath": "cmd/zqk/object",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/object/get_initial_status_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    }
+  }
+}

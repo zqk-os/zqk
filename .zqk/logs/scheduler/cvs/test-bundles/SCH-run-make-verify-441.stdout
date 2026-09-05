@@ -1,0 +1,44 @@
+
+--- run 2026-09-04T22:13:24Z ---
+=== RUN   TestGoroutineBuilder_StartWithContext
+=== PAUSE TestGoroutineBuilder_StartWithContext
+=== RUN   TestGoroutineBuilder_StartWithWaitGroup
+=== PAUSE TestGoroutineBuilder_StartWithWaitGroup
+=== RUN   TestGoroutineBuilder_StartWithPanicRecovery
+=== PAUSE TestGoroutineBuilder_StartWithPanicRecovery
+=== RUN   TestGoroutineBuilder_StartWithCleanup
+=== PAUSE TestGoroutineBuilder_StartWithCleanup
+=== RUN   TestGoroutineBuilder_StartWithContextFunction
+=== PAUSE TestGoroutineBuilder_StartWithContextFunction
+=== RUN   TestGoroutineBuilder_StartWithResult
+=== PAUSE TestGoroutineBuilder_StartWithResult
+=== RUN   TestGoroutineBuilder_WithBudget_ReserveAndRelease
+=== PAUSE TestGoroutineBuilder_WithBudget_ReserveAndRelease
+=== RUN   TestGoroutineBuilder_WithBudget_Exceeded
+=== PAUSE TestGoroutineBuilder_WithBudget_Exceeded
+=== RUN   TestGoroutineBuilder_WithBudget_StartWithContext
+=== PAUSE TestGoroutineBuilder_WithBudget_StartWithContext
+=== RUN   TestPool_NewPool_ReservesBudget
+=== PAUSE TestPool_NewPool_ReservesBudget
+=== CONT  TestGoroutineBuilder_StartWithContext
+=== CONT  TestPool_NewPool_ReservesBudget
+--- PASS: TestPool_NewPool_ReservesBudget (0.00s)
+=== CONT  TestGoroutineBuilder_WithBudget_StartWithContext
+=== CONT  TestGoroutineBuilder_WithBudget_Exceeded
+--- PASS: TestGoroutineBuilder_StartWithContext (0.01s)
+--- PASS: TestGoroutineBuilder_WithBudget_StartWithContext (0.05s)
+=== CONT  TestGoroutineBuilder_WithBudget_ReserveAndRelease
+--- PASS: TestGoroutineBuilder_WithBudget_ReserveAndRelease (0.00s)
+=== CONT  TestGoroutineBuilder_StartWithResult
+--- PASS: TestGoroutineBuilder_StartWithResult (0.00s)
+=== CONT  TestGoroutineBuilder_StartWithContextFunction
+--- PASS: TestGoroutineBuilder_WithBudget_Exceeded (0.05s)
+=== CONT  TestGoroutineBuilder_StartWithCleanup
+--- PASS: TestGoroutineBuilder_StartWithCleanup (0.00s)
+=== CONT  TestGoroutineBuilder_StartWithPanicRecovery
+--- PASS: TestGoroutineBuilder_StartWithContextFunction (0.01s)
+=== CONT  TestGoroutineBuilder_StartWithWaitGroup
+--- PASS: TestGoroutineBuilder_StartWithWaitGroup (0.00s)
+--- PASS: TestGoroutineBuilder_StartWithPanicRecovery (0.01s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/goroutinelabels	0.324s

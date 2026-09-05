@@ -1,0 +1,14 @@
+created_at: "2026-08-19T05:54:45Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1787118882533312000-40925c3d
+item_id: REDACTED
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 2857702ca28e4b64fb5782140b43c1400e68fdeab30ab0062f4119523ca97d466e5f13c72adcfa41b92eacf21fa7f0a79b8a8e3a8d7c581e5c9afe0e69cb31dc
+schema_version: 2.0.0
+signature: 304402200e40a078e7c053ed7aa239bb3132b48379dcb8c2700cfe50a17a96d6c0c72e97022064ae4e1a0f9eb8db4d0c1c0e47144896ab4d72c5c0c215363b0f34435ea67d7d
+status: archived
+title: 'COMMS reliable mesh gate: wake+ide_bridge+peer ack (proof of life ∧ work)'
+updated_at: "2026-09-01T07:28:33Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

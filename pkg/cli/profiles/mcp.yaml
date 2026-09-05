@@ -1,0 +1,19 @@
+# MCP CLI Profile Specification
+# Version: 1.0.0
+
+schema_version: "1.0.0"
+namespace_id: "zqk:kernel:cli"
+name: "mcp"
+extends: "base"
+description: |
+  MCP context: JSON output for machine readability, logs to stderr.
+  Used by Model Context Protocol server for AI agent communication.
+  Note: Logging to stderr is handled by the logging framework when ZQK_MCP_ACCOUNT_ID is set.
+
+spec:
+  format: "json"
+  verbose: false
+  quiet: false
+  flags:
+    format: "json"
+    context: "mcp"

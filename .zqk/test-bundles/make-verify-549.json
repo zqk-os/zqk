@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-549",
+  "created_at": "2026-09-04T21:34:32.799693Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-549",
+    "Tests": [
+      {
+        "Name": "TestAppendCVSMeasurementEvent_roundTrip",
+        "Package": "scheduler",
+        "PackagePath": "pkg/scheduler",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/scheduler/cvs_measurement_events_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestCvsMeasurementEventsEnabled",
+        "Package": "scheduler",
+        "PackagePath": "pkg/scheduler",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/scheduler/cvs_measurement_events_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestTruncateCVSHint",
+        "Package": "scheduler",
+        "PackagePath": "pkg/scheduler",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/scheduler/cvs_measurement_events_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestConvergenceOrchestrateScriptPath",
+        "Package": "scheduler",
+        "PackagePath": "pkg/scheduler",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/scheduler/cvs_orchestrate_subprocess_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestNewCVSOrchestrateRollupOnlyCommand_fields",
+        "Package": "scheduler",
+        "PackagePath": "pkg/scheduler",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/scheduler/cvs_orchestrate_subprocess_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestNewCVSOrchestrateRollupOnlyCommand_envRollupOut",
+        "Package": "scheduler",
+        "PackagePath": "pkg/scheduler",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/scheduler/cvs_orchestrate_subprocess_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestReadCVSRollupLatestSummary",
+        "Package": "scheduler",
+        "PackagePath": "pkg/scheduler",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/scheduler/cvs_rollup_latest_read_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestResolveCVSRollupLatestJSONPath_defaultMatchesPathsLayout",
+        "Package": "scheduler",
+        "PackagePath": "pkg/scheduler",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/scheduler/cvs_rollup_paths_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestResolveCVSRollupLatestJSONPath_absoluteEnv",
+        "Package": "scheduler",
+        "PackagePath": "pkg/scheduler",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/scheduler/cvs_rollup_paths_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestResolveCVSRollupLatestJSONPath_repoRelativeEnv",
+        "Package": "scheduler",
+        "PackagePath": "pkg/scheduler",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/scheduler/cvs_rollup_paths_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": true,
+    "EstimatedDuration": 300000000000,
+    "PackagePath": "pkg/scheduler"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestAppendCVSMeasurementEvent_roundTrip",
+      "Package": "scheduler",
+      "PackagePath": "pkg/scheduler",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/scheduler/cvs_measurement_events_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestCvsMeasurementEventsEnabled",
+      "Package": "scheduler",
+      "PackagePath": "pkg/scheduler",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/scheduler/cvs_measurement_events_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestTruncateCVSHint",
+      "Package": "scheduler",
+      "PackagePath": "pkg/scheduler",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/scheduler/cvs_measurement_events_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestConvergenceOrchestrateScriptPath",
+      "Package": "scheduler",
+      "PackagePath": "pkg/scheduler",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/scheduler/cvs_orchestrate_subprocess_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestNewCVSOrchestrateRollupOnlyCommand_fields",
+      "Package": "scheduler",
+      "PackagePath": "pkg/scheduler",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/scheduler/cvs_orchestrate_subprocess_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestNewCVSOrchestrateRollupOnlyCommand_envRollupOut",
+      "Package": "scheduler",
+      "PackagePath": "pkg/scheduler",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/scheduler/cvs_orchestrate_subprocess_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestReadCVSRollupLatestSummary",
+      "Package": "scheduler",
+      "PackagePath": "pkg/scheduler",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/scheduler/cvs_rollup_latest_read_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestResolveCVSRollupLatestJSONPath_defaultMatchesPathsLayout",
+      "Package": "scheduler",
+      "PackagePath": "pkg/scheduler",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/scheduler/cvs_rollup_paths_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestResolveCVSRollupLatestJSONPath_absoluteEnv",
+      "Package": "scheduler",
+      "PackagePath": "pkg/scheduler",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/scheduler/cvs_rollup_paths_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestResolveCVSRollupLatestJSONPath_repoRelativeEnv",
+      "Package": "scheduler",
+      "PackagePath": "pkg/scheduler",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/scheduler/cvs_rollup_paths_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

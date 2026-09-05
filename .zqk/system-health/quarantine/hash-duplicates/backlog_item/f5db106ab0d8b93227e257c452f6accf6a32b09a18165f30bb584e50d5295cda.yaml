@@ -1,0 +1,30 @@
+acceptance_considerations: Lower of seats >=4 on required axes; prefer 5
+base_sha: d4dbb3108b72a4d6dd9312c731f75c87c76d9992
+branch_ref: chore/cef-close-ac-ad-matrix
+created_at: "2026-09-04T07:32:21Z"
+created_by: ACC-1785920548450214006-2e52b3e7
+criteria_refs:
+    - CRIT-1785885889228395000-15c56d02
+description: CEF R28 — remesure after remediation until envelope min>=4
+estimated_effort: medium
+goal_refs:
+    - GOAL-CEF-SEC-FAILCLOSED
+id: BLI-CEF-R28-REMEASURE-001
+kind: backlog_item
+milestone_refs:
+    - MIL-001
+namespace_id: zqk:kernel
+persona_refs:
+    - PER-DEFAULT-AGENT
+priority: high
+priority_plan_ref: PRI-CEF-R29-REMEASURE-001
+priority_tier: P1
+problem_statement: CVS-CEF-UNTIL-45-001 desired_end_state requires dual-seat envelope min>=4.
+requirement_refs:
+    - REQ-CEF-R19-EVIDENCE-001
+schema_version: 2.0.0
+status: planned
+title: CEF R28 — remesure after remediation until envelope min>=4
+updated_at: "2026-09-04T23:07:35Z"
+updated_by: ACC-1785920548450214006-2e52b3e7
+version_context: default

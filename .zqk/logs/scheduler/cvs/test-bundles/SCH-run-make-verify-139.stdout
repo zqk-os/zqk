@@ -1,0 +1,44 @@
+
+--- run 2026-09-04T21:40:56Z ---
+=== RUN   TestLookupRefStatusRule_toleratesLifecycleParentheticals
+=== PAUSE TestLookupRefStatusRule_toleratesLifecycleParentheticals
+=== RUN   TestIsReusablePriorValidationState
+=== PAUSE TestIsReusablePriorValidationState
+=== RUN   TestRunningExecutableFingerprint_HasPathSizeMtime
+=== PAUSE TestRunningExecutableFingerprint_HasPathSizeMtime
+=== RUN   TestValidationFingerprintGlobs_IncludeUnlistedCheckerAndParser
+=== PAUSE TestValidationFingerprintGlobs_IncludeUnlistedCheckerAndParser
+=== RUN   TestValidationStateCache_UnlistedCheckerFileInvalidates
+=== PAUSE TestValidationStateCache_UnlistedCheckerFileInvalidates
+=== RUN   TestValidationStateCache_PolicyLifecycleYAMLInvalidates
+=== PAUSE TestValidationStateCache_PolicyLifecycleYAMLInvalidates
+=== RUN   TestValidationStateCache_ParserChangeInvalidates
+=== PAUSE TestValidationStateCache_ParserChangeInvalidates
+=== RUN   TestValidationStateCache_EmptyCodeChecksumInvalidates
+=== PAUSE TestValidationStateCache_EmptyCodeChecksumInvalidates
+=== RUN   TestValidationStateCache_OverlappingSave
+=== PAUSE TestValidationStateCache_OverlappingSave
+=== RUN   TestNewAsyncValidatorUsesSharedValidationCache
+=== PAUSE TestNewAsyncValidatorUsesSharedValidationCache
+=== CONT  TestLookupRefStatusRule_toleratesLifecycleParentheticals
+=== CONT  TestValidationStateCache_PolicyLifecycleYAMLInvalidates
+--- PASS: TestLookupRefStatusRule_toleratesLifecycleParentheticals (0.00s)
+=== CONT  TestValidationFingerprintGlobs_IncludeUnlistedCheckerAndParser
+--- PASS: TestValidationFingerprintGlobs_IncludeUnlistedCheckerAndParser (0.01s)
+=== CONT  TestValidationStateCache_UnlistedCheckerFileInvalidates
+--- PASS: TestValidationStateCache_PolicyLifecycleYAMLInvalidates (0.02s)
+=== CONT  TestValidationStateCache_OverlappingSave
+--- PASS: TestValidationStateCache_UnlistedCheckerFileInvalidates (0.02s)
+=== CONT  TestNewAsyncValidatorUsesSharedValidationCache
+--- PASS: TestNewAsyncValidatorUsesSharedValidationCache (0.00s)
+=== CONT  TestRunningExecutableFingerprint_HasPathSizeMtime
+--- PASS: TestRunningExecutableFingerprint_HasPathSizeMtime (0.00s)
+=== CONT  TestIsReusablePriorValidationState
+--- PASS: TestIsReusablePriorValidationState (0.00s)
+=== CONT  TestValidationStateCache_EmptyCodeChecksumInvalidates
+--- PASS: TestValidationStateCache_OverlappingSave (0.02s)
+=== CONT  TestValidationStateCache_ParserChangeInvalidates
+--- PASS: TestValidationStateCache_EmptyCodeChecksumInvalidates (0.03s)
+--- PASS: TestValidationStateCache_ParserChangeInvalidates (0.03s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/validation	0.761s

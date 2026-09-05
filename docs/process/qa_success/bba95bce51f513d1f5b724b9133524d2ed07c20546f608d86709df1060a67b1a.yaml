@@ -1,0 +1,14 @@
+created_at: "2026-09-04T18:42:36Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1788547356160363000-38f51e91
+item_id: AGENT-PREP-1788546236933805000-1cece833
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 86b8ab3d574c004a61020b73c23f52b9055049e90c3d755c8bbb383e059e384028fdd8cd69e13123b644e5f3f7eb65596e73e2d57d719ea3dafcb01b84ce8dfb
+schema_version: 2.0.0
+signature: 30450221009d4f4d31a3d3bac6280c2bc6c60461a8fb4490560e0cc277f1bb8c9336503db2022029013ccba3e5837d10b7430ca7937be3c8da087ebd26e50a0d6f392659887efb
+status: success
+title: QA success for AGENT-PREP-1788546236933805000-1cece833
+updated_at: "2026-09-04T18:42:36Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

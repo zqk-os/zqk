@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-387",
+  "created_at": "2026-09-04T21:34:31.180401Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-387",
+    "Tests": [
+      {
+        "Name": "TestCompatibilityConstraints_CLIVersion",
+        "Package": "detector",
+        "PackagePath": "pkg/migration/detector",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/migration/detector/manifest_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestCompatibilityConstraints_InvalidConstraint",
+        "Package": "detector",
+        "PackagePath": "pkg/migration/detector",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/migration/detector/manifest_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestBinaryManifest_CompatibilityPrecedence",
+        "Package": "detector",
+        "PackagePath": "pkg/migration/detector",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/migration/detector/manifest_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestLoadBinaryManifest_WithCompatibility",
+        "Package": "detector",
+        "PackagePath": "pkg/migration/detector",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/migration/detector/manifest_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestLoadBinaryManifest_WithEntryLevelCompatibility",
+        "Package": "detector",
+        "PackagePath": "pkg/migration/detector",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/migration/detector/manifest_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestVerifyBinaryAgainstManifest_CompatibilityCheck",
+        "Package": "detector",
+        "PackagePath": "pkg/migration/detector",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/migration/detector/manifest_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestVerifyCompatibility_ModulesAndBackends",
+        "Package": "detector",
+        "PackagePath": "pkg/migration/detector",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/migration/detector/manifest_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestVerifyModuleVersion",
+        "Package": "detector",
+        "PackagePath": "pkg/migration/detector",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/migration/detector/module_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestVerifyModuleVersion_ErrorMessages",
+        "Package": "detector",
+        "PackagePath": "pkg/migration/detector",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/migration/detector/module_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestFindGoMod",
+        "Package": "detector",
+        "PackagePath": "pkg/migration/detector",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/migration/detector/module_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 300000000000,
+    "PackagePath": "pkg/migration/detector"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestCompatibilityConstraints_CLIVersion",
+      "Package": "detector",
+      "PackagePath": "pkg/migration/detector",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/migration/detector/manifest_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestCompatibilityConstraints_InvalidConstraint",
+      "Package": "detector",
+      "PackagePath": "pkg/migration/detector",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/migration/detector/manifest_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestBinaryManifest_CompatibilityPrecedence",
+      "Package": "detector",
+      "PackagePath": "pkg/migration/detector",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/migration/detector/manifest_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestLoadBinaryManifest_WithCompatibility",
+      "Package": "detector",
+      "PackagePath": "pkg/migration/detector",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/migration/detector/manifest_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestLoadBinaryManifest_WithEntryLevelCompatibility",
+      "Package": "detector",
+      "PackagePath": "pkg/migration/detector",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/migration/detector/manifest_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestVerifyBinaryAgainstManifest_CompatibilityCheck",
+      "Package": "detector",
+      "PackagePath": "pkg/migration/detector",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/migration/detector/manifest_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestVerifyCompatibility_ModulesAndBackends",
+      "Package": "detector",
+      "PackagePath": "pkg/migration/detector",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/migration/detector/manifest_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestVerifyModuleVersion",
+      "Package": "detector",
+      "PackagePath": "pkg/migration/detector",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/migration/detector/module_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestVerifyModuleVersion_ErrorMessages",
+      "Package": "detector",
+      "PackagePath": "pkg/migration/detector",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/migration/detector/module_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestFindGoMod",
+      "Package": "detector",
+      "PackagePath": "pkg/migration/detector",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/migration/detector/module_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

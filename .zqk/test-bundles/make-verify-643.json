@@ -1,0 +1,177 @@
+{
+  "name": "make-verify-643",
+  "created_at": "2026-09-04T21:34:33.760085Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-643",
+    "Tests": [
+      {
+        "Name": "TestConcurrentGenerate_EmptyInput",
+        "Package": "zqkdev",
+        "PackagePath": "pkg/zqkdev",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/zqkdev/concurrent_generate_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestConcurrentGenerate_AllSucceed",
+        "Package": "zqkdev",
+        "PackagePath": "pkg/zqkdev",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/zqkdev/concurrent_generate_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestConcurrentGenerate_SomeErrors",
+        "Package": "zqkdev",
+        "PackagePath": "pkg/zqkdev",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/zqkdev/concurrent_generate_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestConcurrentGenerate_ContextCancellation",
+        "Package": "zqkdev",
+        "PackagePath": "pkg/zqkdev",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/zqkdev/concurrent_generate_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestConcurrentGenerate_BoundedConcurrency",
+        "Package": "zqkdev",
+        "PackagePath": "pkg/zqkdev",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/zqkdev/concurrent_generate_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestConcurrentGenerate_ErrorDetailsPreserved",
+        "Package": "zqkdev",
+        "PackagePath": "pkg/zqkdev",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/zqkdev/concurrent_generate_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestGenerateBuilders_HangReproduction",
+        "Package": "zqkdev",
+        "PackagePath": "pkg/zqkdev",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/zqkdev/generate_builders_hang_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestGenerateBuilders_GetLoadOrder_Hang",
+        "Package": "zqkdev",
+        "PackagePath": "pkg/zqkdev",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/zqkdev/generate_builders_hang_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestGenerateBuilders_FullCLIExecution",
+        "Package": "zqkdev",
+        "PackagePath": "pkg/zqkdev",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/zqkdev/generate_builders_hang_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 270000000000,
+    "PackagePath": "pkg/zqkdev"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestConcurrentGenerate_EmptyInput",
+      "Package": "zqkdev",
+      "PackagePath": "pkg/zqkdev",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/zqkdev/concurrent_generate_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestConcurrentGenerate_AllSucceed",
+      "Package": "zqkdev",
+      "PackagePath": "pkg/zqkdev",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/zqkdev/concurrent_generate_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestConcurrentGenerate_SomeErrors",
+      "Package": "zqkdev",
+      "PackagePath": "pkg/zqkdev",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/zqkdev/concurrent_generate_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestConcurrentGenerate_ContextCancellation",
+      "Package": "zqkdev",
+      "PackagePath": "pkg/zqkdev",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/zqkdev/concurrent_generate_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestConcurrentGenerate_BoundedConcurrency",
+      "Package": "zqkdev",
+      "PackagePath": "pkg/zqkdev",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/zqkdev/concurrent_generate_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestConcurrentGenerate_ErrorDetailsPreserved",
+      "Package": "zqkdev",
+      "PackagePath": "pkg/zqkdev",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/zqkdev/concurrent_generate_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestGenerateBuilders_HangReproduction",
+      "Package": "zqkdev",
+      "PackagePath": "pkg/zqkdev",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/zqkdev/generate_builders_hang_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestGenerateBuilders_GetLoadOrder_Hang",
+      "Package": "zqkdev",
+      "PackagePath": "pkg/zqkdev",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/zqkdev/generate_builders_hang_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestGenerateBuilders_FullCLIExecution",
+      "Package": "zqkdev",
+      "PackagePath": "pkg/zqkdev",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/zqkdev/generate_builders_hang_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

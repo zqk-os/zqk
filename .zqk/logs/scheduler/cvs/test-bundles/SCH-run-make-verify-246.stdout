@@ -1,0 +1,20 @@
+
+--- run 2026-09-04T21:46:13Z ---
+=== RUN   TestComputePackageConcurrencyLimitsFromBundles_AllParallelUsesMaxParallel
+=== PAUSE TestComputePackageConcurrencyLimitsFromBundles_AllParallelUsesMaxParallel
+=== RUN   TestComputePackageConcurrencyLimitsFromBundles_SequentialTestForcesOne
+=== PAUSE TestComputePackageConcurrencyLimitsFromBundles_SequentialTestForcesOne
+=== RUN   TestComputePackageConcurrencyLimitsFromBundles_SchedulerPackagePolicy
+=== PAUSE TestComputePackageConcurrencyLimitsFromBundles_SchedulerPackagePolicy
+=== RUN   TestWritePackageConcurrencyLimitsPatch_ConcurrentNoRenameRace
+=== PAUSE TestWritePackageConcurrencyLimitsPatch_ConcurrentNoRenameRace
+=== CONT  TestComputePackageConcurrencyLimitsFromBundles_AllParallelUsesMaxParallel
+--- PASS: TestComputePackageConcurrencyLimitsFromBundles_AllParallelUsesMaxParallel (0.00s)
+=== CONT  TestWritePackageConcurrencyLimitsPatch_ConcurrentNoRenameRace
+=== CONT  TestComputePackageConcurrencyLimitsFromBundles_SchedulerPackagePolicy
+--- PASS: TestComputePackageConcurrencyLimitsFromBundles_SchedulerPackagePolicy (0.00s)
+=== CONT  TestComputePackageConcurrencyLimitsFromBundles_SequentialTestForcesOne
+--- PASS: TestComputePackageConcurrencyLimitsFromBundles_SequentialTestForcesOne (0.00s)
+--- PASS: TestWritePackageConcurrencyLimitsPatch_ConcurrentNoRenameRace (0.05s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/testscan	0.680s

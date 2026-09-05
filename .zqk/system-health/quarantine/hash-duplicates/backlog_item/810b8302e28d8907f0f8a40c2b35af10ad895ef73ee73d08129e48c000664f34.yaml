@@ -1,0 +1,31 @@
+acceptance_considerations: Adapter registry; cef_diamond_scorecard measure works without --persist-session refuse
+commit_refs:
+    - e3484563fe4295c0d3299bd75b9979681065c478
+created_at: "2026-09-04T07:32:12Z"
+created_by: ACC-1785920548450214006-2e52b3e7
+criteria_refs:
+    - CRIT-1785642858257019000-cf0b69ea
+description: Pluggable CVS evaluation_surface adapters (CEF diamond + test-bundle)
+estimated_effort: 4 hours
+goal_refs:
+    - GOAL-CEF-OBS-HONEST
+id: BLI-CVS-EVAL-SURFACE-ADAPTER-001
+kind: backlog_item
+milestone_refs:
+    - MIL-001
+namespace_id: zqk:kernel
+priority: high
+priority_plan_ref: PRI-CVS-EVAL-SURFACE-001
+priority_tier: P0
+problem_statement: One convergence measure path; evaluation_surface selects adapter. CEF must not twin health.jsonl CVS ticks.
+requirement_refs:
+    - REQ-CEF-R19-EVIDENCE-001
+schema_version: 2.0.0
+stakeholders:
+    - PER-DEFAULT-OPERATOR
+started_at: "2026-09-04T20:19:00Z"
+status: in_progress
+title: Pluggable CVS evaluation_surface adapters (CEF diamond + test-bundle)
+updated_at: "2026-09-04T20:19:00Z"
+updated_by: ACC-1785920548450214006-2e52b3e7
+version_context: default

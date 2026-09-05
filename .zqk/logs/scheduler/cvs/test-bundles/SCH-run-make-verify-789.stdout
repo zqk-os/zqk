@@ -1,0 +1,56 @@
+
+--- run 2026-09-04T22:22:02Z ---
+=== RUN   TestSpecIndexKeepsDisplayLengthSeparateFromStorageLength
+=== PAUSE TestSpecIndexKeepsDisplayLengthSeparateFromStorageLength
+=== RUN   TestValidateHighVolumeStreamKindsMatchSpecIndex_mismatch
+=== PAUSE TestValidateHighVolumeStreamKindsMatchSpecIndex_mismatch
+=== RUN   TestValidateHighVolumeStreamKindsMatchSpecIndex_duplicateKindInYAML
+=== PAUSE TestValidateHighVolumeStreamKindsMatchSpecIndex_duplicateKindInYAML
+=== RUN   TestValidateHighVolumeStreamKindsMatchSpecIndex_emptyStorageInYAML
+=== PAUSE TestValidateHighVolumeStreamKindsMatchSpecIndex_emptyStorageInYAML
+=== RUN   TestValidateHighVolumeStreamKindsMatchSpecIndex_unknownStorageInYAML
+=== PAUSE TestValidateHighVolumeStreamKindsMatchSpecIndex_unknownStorageInYAML
+=== RUN   TestValidateHighVolumeStreamKindsMatchSpecIndex_skipsWithoutConfigFile
+=== PAUSE TestValidateHighVolumeStreamKindsMatchSpecIndex_skipsWithoutConfigFile
+=== RUN   TestBuildSpecIndexFromSpecsDir_SetsBuilderSpecCacheRevision
+=== PAUSE TestBuildSpecIndexFromSpecsDir_SetsBuilderSpecCacheRevision
+=== RUN   TestKindNamesFromSpecIndex
+=== PAUSE TestKindNamesFromSpecIndex
+=== RUN   TestRefreshMaterializedSpecIndex_WritesSpecIndexJSON
+=== PAUSE TestRefreshMaterializedSpecIndex_WritesSpecIndexJSON
+=== RUN   TestSpecIndexStorageProfileMatchesHighVolumeStreamKinds
+=== PAUSE TestSpecIndexStorageProfileMatchesHighVolumeStreamKinds
+=== CONT  TestSpecIndexKeepsDisplayLengthSeparateFromStorageLength
+=== CONT  TestValidateHighVolumeStreamKindsMatchSpecIndex_skipsWithoutConfigFile
+--- PASS: TestSpecIndexKeepsDisplayLengthSeparateFromStorageLength (0.02s)
+=== CONT  TestRefreshMaterializedSpecIndex_WritesSpecIndexJSON
+--- PASS: TestValidateHighVolumeStreamKindsMatchSpecIndex_skipsWithoutConfigFile (0.05s)
+=== CONT  TestSpecIndexStorageProfileMatchesHighVolumeStreamKinds
+--- PASS: TestRefreshMaterializedSpecIndex_WritesSpecIndexJSON (0.05s)
+=== CONT  TestKindNamesFromSpecIndex
+=== RUN   TestKindNamesFromSpecIndex/nil_index_errors
+=== PAUSE TestKindNamesFromSpecIndex/nil_index_errors
+=== RUN   TestKindNamesFromSpecIndex/empty_kinds_errors
+=== PAUSE TestKindNamesFromSpecIndex/empty_kinds_errors
+=== RUN   TestKindNamesFromSpecIndex/matches_index_keys
+=== PAUSE TestKindNamesFromSpecIndex/matches_index_keys
+=== CONT  TestBuildSpecIndexFromSpecsDir_SetsBuilderSpecCacheRevision
+--- PASS: TestBuildSpecIndexFromSpecsDir_SetsBuilderSpecCacheRevision (0.01s)
+=== CONT  TestValidateHighVolumeStreamKindsMatchSpecIndex_emptyStorageInYAML
+--- PASS: TestValidateHighVolumeStreamKindsMatchSpecIndex_emptyStorageInYAML (0.02s)
+=== CONT  TestValidateHighVolumeStreamKindsMatchSpecIndex_unknownStorageInYAML
+--- PASS: TestValidateHighVolumeStreamKindsMatchSpecIndex_unknownStorageInYAML (0.01s)
+=== CONT  TestValidateHighVolumeStreamKindsMatchSpecIndex_duplicateKindInYAML
+--- PASS: TestValidateHighVolumeStreamKindsMatchSpecIndex_duplicateKindInYAML (0.01s)
+=== CONT  TestValidateHighVolumeStreamKindsMatchSpecIndex_mismatch
+--- PASS: TestValidateHighVolumeStreamKindsMatchSpecIndex_mismatch (0.01s)
+=== CONT  TestKindNamesFromSpecIndex/nil_index_errors
+=== CONT  TestKindNamesFromSpecIndex/empty_kinds_errors
+=== CONT  TestKindNamesFromSpecIndex/matches_index_keys
+--- PASS: TestKindNamesFromSpecIndex (0.00s)
+    --- PASS: TestKindNamesFromSpecIndex/nil_index_errors (0.00s)
+    --- PASS: TestKindNamesFromSpecIndex/empty_kinds_errors (0.00s)
+    --- PASS: TestKindNamesFromSpecIndex/matches_index_keys (0.01s)
+--- PASS: TestSpecIndexStorageProfileMatchesHighVolumeStreamKinds (0.46s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/objects	1.164s

@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-516",
+  "created_at": "2026-09-04T21:34:32.487192Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-516",
+    "Tests": [
+      {
+        "Name": "TestCoachHeuristics_GrepPipe",
+        "Package": "ambient",
+        "PackagePath": "pkg/ambient",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/ambient/heuristics_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAutonomyInbox_C1_PowerOfTwoRounding",
+        "Package": "ambient",
+        "PackagePath": "pkg/ambient",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/ambient/inbox_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAutonomyInbox_C2_DefaultCapacity",
+        "Package": "ambient",
+        "PackagePath": "pkg/ambient",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/ambient/inbox_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAutonomyInbox_C3_MinCapacityPanic",
+        "Package": "ambient",
+        "PackagePath": "pkg/ambient",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/ambient/inbox_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAutonomyInbox_C4_PushSingleEvent",
+        "Package": "ambient",
+        "PackagePath": "pkg/ambient",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/ambient/inbox_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAutonomyInbox_C5_PopReturnsPushed",
+        "Package": "ambient",
+        "PackagePath": "pkg/ambient",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/ambient/inbox_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAutonomyInbox_C6_PopEmptyReturnsFalse",
+        "Package": "ambient",
+        "PackagePath": "pkg/ambient",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/ambient/inbox_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAutonomyInbox_C7_FIFOOrdering",
+        "Package": "ambient",
+        "PackagePath": "pkg/ambient",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/ambient/inbox_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAutonomyInbox_C8_FullBufferReturnsErrInboxFull",
+        "Package": "ambient",
+        "PackagePath": "pkg/ambient",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/ambient/inbox_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAutonomyInbox_C9_WraparoundCorrectness",
+        "Package": "ambient",
+        "PackagePath": "pkg/ambient",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/ambient/inbox_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 300000000000,
+    "PackagePath": "pkg/ambient"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestCoachHeuristics_GrepPipe",
+      "Package": "ambient",
+      "PackagePath": "pkg/ambient",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/ambient/heuristics_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestAutonomyInbox_C1_PowerOfTwoRounding",
+      "Package": "ambient",
+      "PackagePath": "pkg/ambient",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/ambient/inbox_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestAutonomyInbox_C2_DefaultCapacity",
+      "Package": "ambient",
+      "PackagePath": "pkg/ambient",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/ambient/inbox_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestAutonomyInbox_C3_MinCapacityPanic",
+      "Package": "ambient",
+      "PackagePath": "pkg/ambient",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/ambient/inbox_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestAutonomyInbox_C4_PushSingleEvent",
+      "Package": "ambient",
+      "PackagePath": "pkg/ambient",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/ambient/inbox_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestAutonomyInbox_C5_PopReturnsPushed",
+      "Package": "ambient",
+      "PackagePath": "pkg/ambient",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/ambient/inbox_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestAutonomyInbox_C6_PopEmptyReturnsFalse",
+      "Package": "ambient",
+      "PackagePath": "pkg/ambient",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/ambient/inbox_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestAutonomyInbox_C7_FIFOOrdering",
+      "Package": "ambient",
+      "PackagePath": "pkg/ambient",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/ambient/inbox_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestAutonomyInbox_C8_FullBufferReturnsErrInboxFull",
+      "Package": "ambient",
+      "PackagePath": "pkg/ambient",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/ambient/inbox_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestAutonomyInbox_C9_WraparoundCorrectness",
+      "Package": "ambient",
+      "PackagePath": "pkg/ambient",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/ambient/inbox_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

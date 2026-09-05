@@ -1,0 +1,62 @@
+
+--- run 2026-09-04T22:14:40Z ---
+=== RUN   TestParseColumnsFlag
+=== PAUSE TestParseColumnsFlag
+=== RUN   TestGetColumnWidth
+=== PAUSE TestGetColumnWidth
+=== RUN   TestTruncateString
+=== PAUSE TestTruncateString
+=== RUN   TestParseSchedulerStopWaitArgs
+=== PAUSE TestParseSchedulerStopWaitArgs
+=== RUN   TestAdjustOuterTimeoutForSchedulerStopWait
+=== PAUSE TestAdjustOuterTimeoutForSchedulerStopWait
+=== RUN   TestSchedulerStopWaitExemptFromChildCap
+=== PAUSE TestSchedulerStopWaitExemptFromChildCap
+=== CONT  TestParseColumnsFlag
+=== RUN   TestParseColumnsFlag/single_column
+=== RUN   TestParseColumnsFlag/multiple_columns
+=== CONT  TestParseSchedulerStopWaitArgs
+--- PASS: TestParseSchedulerStopWaitArgs (0.00s)
+=== CONT  TestGetColumnWidth
+=== RUN   TestParseColumnsFlag/with_spaces
+=== RUN   TestParseColumnsFlag/invalid_format_-_no_colon
+=== RUN   TestParseColumnsFlag/invalid_format_-_non-integer_width
+=== RUN   TestGetColumnWidth/columns_flag_override
+=== RUN   TestGetColumnWidth/spec_display_length
+=== RUN   TestGetColumnWidth/default_when_no_spec_or_flag
+=== RUN   TestGetColumnWidth/columns_flag_for_different_field
+--- PASS: TestGetColumnWidth (0.00s)
+    --- PASS: TestGetColumnWidth/columns_flag_override (0.00s)
+    --- PASS: TestGetColumnWidth/spec_display_length (0.00s)
+    --- PASS: TestGetColumnWidth/default_when_no_spec_or_flag (0.00s)
+    --- PASS: TestGetColumnWidth/columns_flag_for_different_field (0.00s)
+=== RUN   TestParseColumnsFlag/invalid_format_-_zero_width
+=== RUN   TestParseColumnsFlag/invalid_format_-_negative_width
+=== CONT  TestSchedulerStopWaitExemptFromChildCap
+=== RUN   TestParseColumnsFlag/empty_string
+=== CONT  TestAdjustOuterTimeoutForSchedulerStopWait
+=== CONT  TestTruncateString
+=== RUN   TestTruncateString/no_truncation_needed
+--- PASS: TestSchedulerStopWaitExemptFromChildCap (0.00s)
+--- PASS: TestAdjustOuterTimeoutForSchedulerStopWait (0.00s)
+=== RUN   TestTruncateString/truncation_needed
+--- PASS: TestParseColumnsFlag (0.00s)
+    --- PASS: TestParseColumnsFlag/single_column (0.00s)
+    --- PASS: TestParseColumnsFlag/multiple_columns (0.00s)
+    --- PASS: TestParseColumnsFlag/with_spaces (0.00s)
+    --- PASS: TestParseColumnsFlag/invalid_format_-_no_colon (0.00s)
+    --- PASS: TestParseColumnsFlag/invalid_format_-_non-integer_width (0.00s)
+    --- PASS: TestParseColumnsFlag/invalid_format_-_zero_width (0.00s)
+    --- PASS: TestParseColumnsFlag/invalid_format_-_negative_width (0.00s)
+    --- PASS: TestParseColumnsFlag/empty_string (0.00s)
+=== RUN   TestTruncateString/exact_length
+=== RUN   TestTruncateString/very_short_maxLen
+=== RUN   TestTruncateString/maxLen_1
+--- PASS: TestTruncateString (0.00s)
+    --- PASS: TestTruncateString/no_truncation_needed (0.00s)
+    --- PASS: TestTruncateString/truncation_needed (0.00s)
+    --- PASS: TestTruncateString/exact_length (0.00s)
+    --- PASS: TestTruncateString/very_short_maxLen (0.00s)
+    --- PASS: TestTruncateString/maxLen_1 (0.00s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/cli	0.330s

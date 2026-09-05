@@ -1,0 +1,32 @@
+
+--- run 2026-09-04T22:22:20Z ---
+=== RUN   TestReplacePathCache_and_AddPathAlias
+=== PAUSE TestReplacePathCache_and_AddPathAlias
+=== RUN   TestResolvePathStrict_processInternalSpecIndexSuffix
+=== PAUSE TestResolvePathStrict_processInternalSpecIndexSuffix
+=== RUN   TestRuntimeLayoutPaths_fallbackWithoutCache
+=== PAUSE TestRuntimeLayoutPaths_fallbackWithoutCache
+=== RUN   TestRuntimeLayoutPaths_honorPathCache
+=== PAUSE TestRuntimeLayoutPaths_honorPathCache
+=== RUN   TestSchedulerPIDFilePath
+=== PAUSE TestSchedulerPIDFilePath
+=== RUN   TestIsGitTrunkBranch
+=== PAUSE TestIsGitTrunkBranch
+=== RUN   TestShouldEvictLinkedTrunkLock
+=== PAUSE TestShouldEvictLinkedTrunkLock
+=== CONT  TestReplacePathCache_and_AddPathAlias
+=== CONT  TestSchedulerPIDFilePath
+--- PASS: TestSchedulerPIDFilePath (0.00s)
+=== CONT  TestShouldEvictLinkedTrunkLock
+--- PASS: TestShouldEvictLinkedTrunkLock (0.00s)
+=== CONT  TestRuntimeLayoutPaths_fallbackWithoutCache
+--- PASS: TestReplacePathCache_and_AddPathAlias (0.00s)
+=== CONT  TestRuntimeLayoutPaths_honorPathCache
+--- PASS: TestRuntimeLayoutPaths_fallbackWithoutCache (0.00s)
+=== CONT  TestIsGitTrunkBranch
+--- PASS: TestIsGitTrunkBranch (0.00s)
+=== CONT  TestResolvePathStrict_processInternalSpecIndexSuffix
+--- PASS: TestRuntimeLayoutPaths_honorPathCache (0.00s)
+--- PASS: TestResolvePathStrict_processInternalSpecIndexSuffix (0.00s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/paths	0.201s

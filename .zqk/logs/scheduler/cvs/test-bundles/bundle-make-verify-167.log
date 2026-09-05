@@ -1,0 +1,66 @@
+
+--- run 2026-09-04T21:40:26Z ---
+=== RUN   TestPrivilegeFiltering_AdminRole
+=== PAUSE TestPrivilegeFiltering_AdminRole
+=== RUN   TestPrivilegeFiltering_RoleRequirements
+=== PAUSE TestPrivilegeFiltering_RoleRequirements
+=== RUN   TestPrivilegeFiltering_WildcardPermissions
+=== PAUSE TestPrivilegeFiltering_WildcardPermissions
+=== RUN   TestPrivilegeFiltering_NoPermissions
+=== PAUSE TestPrivilegeFiltering_NoPermissions
+=== RUN   TestMCPToolRegistration_PrivilegeFiltering
+=== PAUSE TestMCPToolRegistration_PrivilegeFiltering
+=== RUN   TestMCPToolRegistration_AdminSeesAll
+=== PAUSE TestMCPToolRegistration_AdminSeesAll
+=== RUN   TestDiscoverCLICommands
+=== PAUSE TestDiscoverCLICommands
+=== RUN   TestFilterCommandsByPermissions
+=== PAUSE TestFilterCommandsByPermissions
+=== RUN   TestConvertCommandToMCPTool
+=== PAUSE TestConvertCommandToMCPTool
+=== RUN   TestInitializeSecurityContextFromMCP
+=== PAUSE TestInitializeSecurityContextFromMCP
+=== CONT  TestPrivilegeFiltering_AdminRole
+=== CONT  TestMCPToolRegistration_AdminSeesAll
+=== NAME  TestPrivilegeFiltering_AdminRole
+    cli_bridge_privilege_test.go:162: admin should be able to see 'object list' command
+    cli_bridge_privilege_test.go:165: admin should be able to see 'object create' command
+    cli_bridge_privilege_test.go:168: admin should be able to see 'object delete' command
+--- FAIL: TestPrivilegeFiltering_AdminRole (0.00s)
+=== CONT  TestPrivilegeFiltering_NoPermissions
+=== NAME  TestMCPToolRegistration_AdminSeesAll
+    cli_bridge_privilege_test.go:399: admin should be able to see 'object_list' tool (e.g. cli_object_list)
+    cli_bridge_privilege_test.go:402: admin should be able to see 'object_create' tool
+=== CONT  TestMCPToolRegistration_PrivilegeFiltering
+--- PASS: TestPrivilegeFiltering_NoPermissions (0.00s)
+=== NAME  TestMCPToolRegistration_AdminSeesAll
+    cli_bridge_privilege_test.go:405: admin should be able to see 'object_delete' tool
+--- FAIL: TestMCPToolRegistration_AdminSeesAll (0.00s)
+=== CONT  TestConvertCommandToMCPTool
+--- PASS: TestConvertCommandToMCPTool (0.00s)
+=== CONT  TestInitializeSecurityContextFromMCP
+=== NAME  TestMCPToolRegistration_PrivilegeFiltering
+    cli_bridge_privilege_test.go:340: read-only user should be able to see 'object_list' tool (e.g. cli_object_list)
+--- FAIL: TestMCPToolRegistration_PrivilegeFiltering (0.00s)
+=== CONT  TestPrivilegeFiltering_WildcardPermissions
+--- PASS: TestInitializeSecurityContextFromMCP (0.00s)
+=== CONT  TestPrivilegeFiltering_RoleRequirements
+=== NAME  TestPrivilegeFiltering_WildcardPermissions
+    cli_bridge_privilege_test.go:257: user with 'read:*' should be able to see 'object list' command
+--- FAIL: TestPrivilegeFiltering_WildcardPermissions (0.00s)
+=== CONT  TestFilterCommandsByPermissions
+=== NAME  TestPrivilegeFiltering_RoleRequirements
+    cli_bridge_privilege_test.go:201: developer should be able to see 'object list' command. got: [0x22d631780b40 0x22d631780bd0 0x22d631780c60]
+    cli_bridge_privilege_test.go:227: admin should be able to see admin-only commands
+--- FAIL: TestPrivilegeFiltering_RoleRequirements (0.00s)
+=== CONT  TestDiscoverCLICommands
+=== NAME  TestFilterCommandsByPermissions
+    cli_bridge_test.go:79: user with no permissions should see fewer commands than read-only user: got 0 (no-perms) >= 0 (read-only)
+--- FAIL: TestFilterCommandsByPermissions (0.00s)
+--- PASS: TestDiscoverCLICommands (0.00s)
+FAIL
+FAIL	github.com/lanceman/zqk/pkg/mcp	0.690s
+FAIL
+
+
+--- run 2026-09-04T21:40:26Z ---

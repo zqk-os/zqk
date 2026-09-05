@@ -1,0 +1,14 @@
+created_at: "2026-09-02T12:41:19Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1788352875762302000-2e09f9cd
+item_id: ZQK-1838
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 86b8ab3d574c004a61020b73c23f52b9055049e90c3d755c8bbb383e059e384028fdd8cd69e13123b644e5f3f7eb65596e73e2d57d719ea3dafcb01b84ce8dfb
+schema_version: 2.0.0
+signature: 304402202b3c2fa20a9651563b4e0a99a0438b9234a2465e9c86566805fc94ce1922b37002206ac6213894813ff9ce688fbf57cea45956948ca931931a9228355678f064331d
+status: success
+title: QA success for ZQK-1838
+updated_at: "2026-09-02T22:11:43Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

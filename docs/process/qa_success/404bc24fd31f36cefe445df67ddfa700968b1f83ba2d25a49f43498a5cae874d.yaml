@@ -1,0 +1,14 @@
+created_at: "2026-08-20T02:43:03Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1787193782735707000-a4b3bfcf
+item_id: CRIT-CEF-R8K-L-PERFORMANCE-002
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 2857702ca28e4b64fb5782140b43c1400e68fdeab30ab0062f4119523ca97d466e5f13c72adcfa41b92eacf21fa7f0a79b8a8e3a8d7c581e5c9afe0e69cb31dc
+schema_version: 2.0.0
+signature: 30450220766ace7902e98c964a790bf747520d5f397251643c4e1cbe3b2082838748b2e8022100dc1123886029d74625ee5b9f1f840f6c9f1dd2a11400918a7aee3543b22f23ac
+status: archived
+title: wal_backlog monitor uses bounded tail seek instead of full scan
+updated_at: "2026-09-01T07:47:50Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

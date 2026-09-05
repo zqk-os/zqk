@@ -1,0 +1,23 @@
+created_at: "2026-09-03T23:47:00Z"
+created_by: ACC-1785920548450214006-2e52b3e7
+id: AGI-1788479220435057000-d9930360
+instruction: |-
+    Repeatable dual-seat CEF remesure bound to CVS-CEF-UNTIL-45-001 + PIP-CEF-DIAMOND-REMEASURE-001 (29 bite-sized stages).
+
+    1) Freeze SHA + FREEZE.md; matrix rows pending (cef_diamond_scorecard).
+    2) Materialize: sh ./scripts/cef/materialize-package.sh <output_home> <AGENT_ID> <freeze_sha>
+    3) Mint ONE ATK per pipeline stage per seat (AGI stage executor). Max ~2 interactions each. Title: CEF <seat> <stage_id>.
+    4) ATK.description = stage.config.steps + success_gate + read_first + prior_context. Set pipeline_ref=PIP-CEF-DIAMOND-REMEASURE-001.
+    5) Hourglass steer named ATK only; advance stage only after success_gate + peer_ack substance.
+    6) Forbidden: dual-seat GPA reports; mega Wave ATKs that dump whole WAVE_PLAN into one task.
+    7) After both S40: COMPARE + matrix grades + CVS activity. Gate envelope_min>=4.
+kind: agent_instruction
+namespace_id: zqk:kernel
+persona_id: tpm
+plan_id: PRI-CEF-R27-ENVELOPE-001
+schema_version: 2.0.0
+status: approved
+title: CEF dual-seat remesure — TPM/orch runbook (repeatable)
+updated_at: "2026-09-04T00:14:08Z"
+updated_by: ACC-1785920548450214006-2e52b3e7
+version_context: default

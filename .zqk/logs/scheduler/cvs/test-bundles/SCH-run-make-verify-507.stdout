@@ -1,0 +1,24 @@
+
+--- run 2026-09-04T22:14:32Z ---
+=== RUN   TestNewAgentSkillLifecycleBuilder
+=== PAUSE TestNewAgentSkillLifecycleBuilder
+=== RUN   TestConvergenceSessionLifecycleBuilder_DraftToActiveAdmission
+=== PAUSE TestConvergenceSessionLifecycleBuilder_DraftToActiveAdmission
+=== RUN   TestNewDivisionLifecycleBuilder
+=== PAUSE TestNewDivisionLifecycleBuilder
+=== RUN   TestNewOrganizationLifecycleBuilder
+=== PAUSE TestNewOrganizationLifecycleBuilder
+=== RUN   TestNewPersonaLifecycleBuilder
+=== PAUSE TestNewPersonaLifecycleBuilder
+=== CONT  TestNewAgentSkillLifecycleBuilder
+--- PASS: TestNewAgentSkillLifecycleBuilder (0.00s)
+=== CONT  TestNewPersonaLifecycleBuilder
+--- PASS: TestNewPersonaLifecycleBuilder (0.00s)
+=== CONT  TestConvergenceSessionLifecycleBuilder_DraftToActiveAdmission
+--- PASS: TestConvergenceSessionLifecycleBuilder_DraftToActiveAdmission (0.00s)
+=== CONT  TestNewOrganizationLifecycleBuilder
+=== CONT  TestNewDivisionLifecycleBuilder
+--- PASS: TestNewOrganizationLifecycleBuilder (0.00s)
+--- PASS: TestNewDivisionLifecycleBuilder (0.00s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/specbuilder/bldr_lifecycle_v1	0.614s

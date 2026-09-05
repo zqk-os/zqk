@@ -1,0 +1,44 @@
+
+--- run 2026-09-04T22:18:35Z ---
+=== RUN   TestCreatedAtInclusiveWindow
+=== PAUSE TestCreatedAtInclusiveWindow
+=== RUN   TestWithStatusIn
+=== PAUSE TestWithStatusIn
+=== RUN   TestMergeFiltersArchivedBefore
+=== PAUSE TestMergeFiltersArchivedBefore
+=== RUN   TestCollectIDsAndExactWindow
+=== PAUSE TestCollectIDsAndExactWindow
+=== RUN   TestWindowStatusFilters
+=== PAUSE TestWindowStatusFilters
+=== RUN   TestEventsOldestFirst
+=== PAUSE TestEventsOldestFirst
+=== RUN   TestEventsNewestFirstAndFirstMatch
+=== PAUSE TestEventsNewestFirstAndFirstMatch
+=== RUN   TestLimitedAndFirstObject
+=== PAUSE TestLimitedAndFirstObject
+=== RUN   TestObjectQueryReceivesListQuery
+=== PAUSE TestObjectQueryReceivesListQuery
+=== RUN   TestRecordPersistOutcomeDuplicate
+=== PAUSE TestRecordPersistOutcomeDuplicate
+=== CONT  TestCreatedAtInclusiveWindow
+=== CONT  TestEventsOldestFirst
+--- PASS: TestEventsOldestFirst (0.00s)
+=== CONT  TestObjectQueryReceivesListQuery
+=== CONT  TestCollectIDsAndExactWindow
+=== CONT  TestWindowStatusFilters
+=== CONT  TestLimitedAndFirstObject
+=== CONT  TestWithStatusIn
+=== CONT  TestEventsNewestFirstAndFirstMatch
+--- PASS: TestCreatedAtInclusiveWindow (0.00s)
+=== CONT  TestRecordPersistOutcomeDuplicate
+--- PASS: TestObjectQueryReceivesListQuery (0.00s)
+--- PASS: TestRecordPersistOutcomeDuplicate (0.00s)
+--- PASS: TestCollectIDsAndExactWindow (0.00s)
+--- PASS: TestWindowStatusFilters (0.00s)
+--- PASS: TestLimitedAndFirstObject (0.00s)
+--- PASS: TestWithStatusIn (0.00s)
+=== CONT  TestMergeFiltersArchivedBefore
+--- PASS: TestEventsNewestFirstAndFirstMatch (0.00s)
+--- PASS: TestMergeFiltersArchivedBefore (0.00s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/storage/audit	0.488s

@@ -1,0 +1,33 @@
+{
+  "name": "make-verify-454",
+  "created_at": "2026-09-04T21:34:31.826753Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-454",
+    "Tests": [
+      {
+        "Name": "TestMCPToolsRegistration",
+        "Package": "main",
+        "PackagePath": "cmd/zqk/mcp-simple",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/mcp-simple/main_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 30000000000,
+    "PackagePath": "cmd/zqk/mcp-simple"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestMCPToolsRegistration",
+      "Package": "main",
+      "PackagePath": "cmd/zqk/mcp-simple",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/mcp-simple/main_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

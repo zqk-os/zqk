@@ -1,0 +1,58 @@
+
+--- run 2026-09-04T22:18:38Z ---
+=== RUN   TestNewAlignCmd
+=== PAUSE TestNewAlignCmd
+=== RUN   TestAlignCommandFlags
+=== PAUSE TestAlignCommandFlags
+=== RUN   TestGoalRefsFromObject
+=== PAUSE TestGoalRefsFromObject
+=== RUN   TestRoundTwo
+=== PAUSE TestRoundTwo
+=== RUN   TestAsyncValidation_HashRegistryCacheDeleteWhileLocked
+=== PAUSE TestAsyncValidation_HashRegistryCacheDeleteWhileLocked
+=== RUN   TestAsyncValidation_HashRegistryCacheBuggyPathWouldDeadlock
+=== PAUSE TestAsyncValidation_HashRegistryCacheBuggyPathWouldDeadlock
+=== RUN   TestEnqueueDiscoveryLostIDs
+=== PAUSE TestEnqueueDiscoveryLostIDs
+=== RUN   TestInitializeAsyncCheckContext_EnqueuesCachePrewarmTrigger
+=== PAUSE TestInitializeAsyncCheckContext_EnqueuesCachePrewarmTrigger
+=== RUN   TestDefaultCachePrewarmJobID_IsSCH007
+=== PAUSE TestDefaultCachePrewarmJobID_IsSCH007
+=== RUN   TestReleaseDiscoverySemaphoreIfAcquired
+=== PAUSE TestReleaseDiscoverySemaphoreIfAcquired
+=== CONT  TestNewAlignCmd
+=== CONT  TestAsyncValidation_HashRegistryCacheBuggyPathWouldDeadlock
+--- PASS: TestNewAlignCmd (0.00s)
+=== CONT  TestRoundTwo
+--- PASS: TestRoundTwo (0.00s)
+=== CONT  TestAsyncValidation_HashRegistryCacheDeleteWhileLocked
+=== NAME  TestAsyncValidation_HashRegistryCacheBuggyPathWouldDeadlock
+    async_check_deadlock_test.go:344: Fix verified: Direct map deletion works without deadlock
+--- PASS: TestAsyncValidation_HashRegistryCacheBuggyPathWouldDeadlock (0.01s)
+=== CONT  TestDefaultCachePrewarmJobID_IsSCH007
+--- PASS: TestDefaultCachePrewarmJobID_IsSCH007 (0.00s)
+=== CONT  TestReleaseDiscoverySemaphoreIfAcquired
+--- PASS: TestReleaseDiscoverySemaphoreIfAcquired (0.00s)
+=== CONT  TestGoalRefsFromObject
+=== RUN   TestGoalRefsFromObject/nil_goal_refs
+=== RUN   TestGoalRefsFromObject/empty_slice
+=== RUN   TestGoalRefsFromObject/one_ref
+=== RUN   TestGoalRefsFromObject/two_refs
+=== RUN   TestGoalRefsFromObject/string_slice
+=== RUN   TestGoalRefsFromObject/empty_string_omitted
+--- PASS: TestGoalRefsFromObject (0.00s)
+    --- PASS: TestGoalRefsFromObject/nil_goal_refs (0.00s)
+    --- PASS: TestGoalRefsFromObject/empty_slice (0.00s)
+    --- PASS: TestGoalRefsFromObject/one_ref (0.00s)
+    --- PASS: TestGoalRefsFromObject/two_refs (0.00s)
+    --- PASS: TestGoalRefsFromObject/string_slice (0.00s)
+    --- PASS: TestGoalRefsFromObject/empty_string_omitted (0.00s)
+=== CONT  TestInitializeAsyncCheckContext_EnqueuesCachePrewarmTrigger
+--- PASS: TestAsyncValidation_HashRegistryCacheDeleteWhileLocked (0.01s)
+=== CONT  TestAlignCommandFlags
+--- PASS: TestAlignCommandFlags (0.00s)
+=== CONT  TestEnqueueDiscoveryLostIDs
+--- PASS: TestEnqueueDiscoveryLostIDs (0.00s)
+--- PASS: TestInitializeAsyncCheckContext_EnqueuesCachePrewarmTrigger (0.03s)
+PASS
+ok  	github.com/lanceman/zqk/cmd/zqk/system	0.930s

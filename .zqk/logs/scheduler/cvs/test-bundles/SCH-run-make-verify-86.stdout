@@ -1,0 +1,72 @@
+
+--- run 2026-09-04T22:22:37Z ---
+=== RUN   TestEnhancePCSWithCommits
+=== PAUSE TestEnhancePCSWithCommits
+=== RUN   TestEnhanceEDDWithCommits
+=== PAUSE TestEnhanceEDDWithCommits
+=== RUN   TestGenerateDBSummary
+=== PAUSE TestGenerateDBSummary
+=== RUN   TestBuildCacheValidationBaseMetricInstance
+=== PAUSE TestBuildCacheValidationBaseMetricInstance
+=== RUN   TestBuildGraphProviderMetricsBaseMetricInstance
+=== PAUSE TestBuildGraphProviderMetricsBaseMetricInstance
+=== RUN   TestProfileLoader_LoadProfile_NamespaceIDValidation
+=== PAUSE TestProfileLoader_LoadProfile_NamespaceIDValidation
+=== RUN   TestProfileLoader_LoadProfile_InheritanceWithNamespaceID
+=== PAUSE TestProfileLoader_LoadProfile_InheritanceWithNamespaceID
+=== RUN   TestProfileLoader_LoadProfile_CircularInheritance
+=== PAUSE TestProfileLoader_LoadProfile_CircularInheritance
+=== RUN   TestMetricPipeline_Sample_UsesSingleSharedSamplerManyKinds
+=== PAUSE TestMetricPipeline_Sample_UsesSingleSharedSamplerManyKinds
+=== RUN   TestSamplerRegistry_RegisterSampler_SystemMetrics_DistinctCapped
+=== PAUSE TestSamplerRegistry_RegisterSampler_SystemMetrics_DistinctCapped
+=== CONT  TestEnhancePCSWithCommits
+=== CONT  TestProfileLoader_LoadProfile_NamespaceIDValidation
+=== RUN   TestEnhancePCSWithCommits/healthy_commit_frequency
+=== RUN   TestEnhancePCSWithCommits/very_low_commit_frequency
+=== RUN   TestEnhancePCSWithCommits/increasing_commit_pattern
+=== RUN   TestEnhancePCSWithCommits/decreasing_commit_pattern
+--- PASS: TestEnhancePCSWithCommits (0.00s)
+    --- PASS: TestEnhancePCSWithCommits/healthy_commit_frequency (0.00s)
+    --- PASS: TestEnhancePCSWithCommits/very_low_commit_frequency (0.00s)
+    --- PASS: TestEnhancePCSWithCommits/increasing_commit_pattern (0.00s)
+    --- PASS: TestEnhancePCSWithCommits/decreasing_commit_pattern (0.00s)
+=== CONT  TestMetricPipeline_Sample_UsesSingleSharedSamplerManyKinds
+=== RUN   TestProfileLoader_LoadProfile_NamespaceIDValidation/valid_namespace_id
+--- PASS: TestMetricPipeline_Sample_UsesSingleSharedSamplerManyKinds (0.00s)
+=== CONT  TestSamplerRegistry_RegisterSampler_SystemMetrics_DistinctCapped
+--- PASS: TestSamplerRegistry_RegisterSampler_SystemMetrics_DistinctCapped (0.00s)
+=== CONT  TestBuildCacheValidationBaseMetricInstance
+--- PASS: TestBuildCacheValidationBaseMetricInstance (0.01s)
+=== CONT  TestBuildGraphProviderMetricsBaseMetricInstance
+--- PASS: TestBuildGraphProviderMetricsBaseMetricInstance (0.00s)
+=== CONT  TestGenerateDBSummary
+=== RUN   TestGenerateDBSummary/empty_dependencies_and_blockers
+=== RUN   TestGenerateDBSummary/critical_blockers
+=== RUN   TestGenerateDBSummary/dependencies_and_blockers
+--- PASS: TestGenerateDBSummary (0.00s)
+    --- PASS: TestGenerateDBSummary/empty_dependencies_and_blockers (0.00s)
+    --- PASS: TestGenerateDBSummary/critical_blockers (0.00s)
+    --- PASS: TestGenerateDBSummary/dependencies_and_blockers (0.00s)
+=== CONT  TestEnhanceEDDWithCommits
+=== RUN   TestEnhanceEDDWithCommits/optimal_commit-to-work-item_ratio
+=== RUN   TestEnhanceEDDWithCommits/low_commit-to-work-item_ratio
+=== RUN   TestEnhanceEDDWithCommits/very_high_commit-to-work-item_ratio
+--- PASS: TestEnhanceEDDWithCommits (0.00s)
+    --- PASS: TestEnhanceEDDWithCommits/optimal_commit-to-work-item_ratio (0.00s)
+    --- PASS: TestEnhanceEDDWithCommits/low_commit-to-work-item_ratio (0.00s)
+    --- PASS: TestEnhanceEDDWithCommits/very_high_commit-to-work-item_ratio (0.00s)
+=== CONT  TestProfileLoader_LoadProfile_CircularInheritance
+=== RUN   TestProfileLoader_LoadProfile_NamespaceIDValidation/missing_namespace_id
+=== RUN   TestProfileLoader_LoadProfile_NamespaceIDValidation/wrong_namespace_id
+=== RUN   TestProfileLoader_LoadProfile_NamespaceIDValidation/empty_namespace_id
+--- PASS: TestProfileLoader_LoadProfile_CircularInheritance (0.02s)
+=== CONT  TestProfileLoader_LoadProfile_InheritanceWithNamespaceID
+--- PASS: TestProfileLoader_LoadProfile_NamespaceIDValidation (0.03s)
+    --- PASS: TestProfileLoader_LoadProfile_NamespaceIDValidation/valid_namespace_id (0.01s)
+    --- PASS: TestProfileLoader_LoadProfile_NamespaceIDValidation/missing_namespace_id (0.01s)
+    --- PASS: TestProfileLoader_LoadProfile_NamespaceIDValidation/wrong_namespace_id (0.00s)
+    --- PASS: TestProfileLoader_LoadProfile_NamespaceIDValidation/empty_namespace_id (0.00s)
+--- PASS: TestProfileLoader_LoadProfile_InheritanceWithNamespaceID (0.01s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/metrics	1.132s

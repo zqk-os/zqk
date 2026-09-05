@@ -1,0 +1,14 @@
+created_at: "2026-08-19T04:08:40Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1787112518860553000-283a721b
+item_id: PRI-GROOM-KERNEL-OPS-001
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 2857702ca28e4b64fb5782140b43c1400e68fdeab30ab0062f4119523ca97d466e5f13c72adcfa41b92eacf21fa7f0a79b8a8e3a8d7c581e5c9afe0e69cb31dc
+schema_version: 2.0.0
+signature: 304402200a65ad8e65bca17e3a959a79bcb0d7e12534856626e44fa1b26c8d839dd824e8022007e7891cc6300d02cecbff0b86d1b2a05c31e0da20de14103520665b8be4c7a3
+status: archived
+title: Grooming — kernel ops / storage / policy / perf residuals
+updated_at: "2026-09-01T08:11:49Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

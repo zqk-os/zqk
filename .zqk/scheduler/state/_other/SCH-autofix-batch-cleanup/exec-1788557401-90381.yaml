@@ -1,0 +1,7 @@
+job_id: SCH-autofix-batch-cleanup
+execution_id: exec-1788557401-90381
+state: completed
+process_id: 90381
+started_at: 2026-09-04T21:30:01.047823Z
+completed_at: 2026-09-04T21:30:01.213838Z
+policy_decision: execute

@@ -1,0 +1,141 @@
+{
+  "name": "make-verify-395",
+  "created_at": "2026-09-04T21:34:31.243737Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-395",
+    "Tests": [
+      {
+        "Name": "TestDefaultSchedulerDaemonBounds_arePositiveAndOrdered",
+        "Package": "testkit",
+        "PackagePath": "pkg/testkit",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/testkit/scheduler_daemon_bound_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestBoundSchedulerStartContext_cancelsAfterMax",
+        "Package": "testkit",
+        "PackagePath": "pkg/testkit",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/testkit/scheduler_daemon_bound_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestWaitChanOrBoundWithCap_prefersDone",
+        "Package": "testkit",
+        "PackagePath": "pkg/testkit",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/testkit/scheduler_daemon_bound_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestWaitChanOrBoundWithCap_capBeforeBound",
+        "Package": "testkit",
+        "PackagePath": "pkg/testkit",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/testkit/scheduler_daemon_bound_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAppendStandardStorageTeardownStages_Order",
+        "Package": "testkit",
+        "PackagePath": "pkg/testkit",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/testkit/teardown_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestTeardownOptions_DefaultWALTimeout",
+        "Package": "testkit",
+        "PackagePath": "pkg/testkit",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/testkit/teardown_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestSignTestCaseCompletion",
+        "Package": "testkit",
+        "PackagePath": "pkg/testkit",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/testkit/verification_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 210000000000,
+    "PackagePath": "pkg/testkit"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestDefaultSchedulerDaemonBounds_arePositiveAndOrdered",
+      "Package": "testkit",
+      "PackagePath": "pkg/testkit",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/testkit/scheduler_daemon_bound_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestBoundSchedulerStartContext_cancelsAfterMax",
+      "Package": "testkit",
+      "PackagePath": "pkg/testkit",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/testkit/scheduler_daemon_bound_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestWaitChanOrBoundWithCap_prefersDone",
+      "Package": "testkit",
+      "PackagePath": "pkg/testkit",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/testkit/scheduler_daemon_bound_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestWaitChanOrBoundWithCap_capBeforeBound",
+      "Package": "testkit",
+      "PackagePath": "pkg/testkit",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/testkit/scheduler_daemon_bound_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestAppendStandardStorageTeardownStages_Order",
+      "Package": "testkit",
+      "PackagePath": "pkg/testkit",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/testkit/teardown_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestTeardownOptions_DefaultWALTimeout",
+      "Package": "testkit",
+      "PackagePath": "pkg/testkit",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/testkit/teardown_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestSignTestCaseCompletion",
+      "Package": "testkit",
+      "PackagePath": "pkg/testkit",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/testkit/verification_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

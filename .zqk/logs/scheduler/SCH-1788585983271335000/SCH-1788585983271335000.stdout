@@ -1,0 +1,5 @@
+
+--- run 2026-09-05T05:57:33Z ---
+testing: warning: no tests to run
+PASS
+ok  	github.com/lanceman/zqk/cmd/zqk	2.800s [no tests to run]

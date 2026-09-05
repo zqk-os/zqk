@@ -1,0 +1,14 @@
+created_at: "2026-08-19T07:14:30Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1787123665924075000-1e6b372a
+item_id: PRI-GROOM-CLI-DNA-001
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 2857702ca28e4b64fb5782140b43c1400e68fdeab30ab0062f4119523ca97d466e5f13c72adcfa41b92eacf21fa7f0a79b8a8e3a8d7c581e5c9afe0e69cb31dc
+schema_version: 2.0.0
+signature: 304402205395c6a48852d3576dba4819fc3015680e55ebef9c3d5f6b31982d8063cc8ce3022052247dbbc6eb8aafb477cf3cae66714e475d1efec88e1b1ec6e81a5636d4be67
+status: archived
+title: Grooming — CLI DNA / command_spec / session residuals
+updated_at: "2026-09-01T07:40:42Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

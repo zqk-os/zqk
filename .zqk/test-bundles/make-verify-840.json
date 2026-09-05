@@ -1,0 +1,51 @@
+{
+  "name": "make-verify-840",
+  "created_at": "2026-09-04T21:34:35.675929Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-840",
+    "Tests": [
+      {
+        "Name": "TestObjectUpdate_AddRef_RemoveRef",
+        "Package": "object",
+        "PackagePath": "cmd/zqk/object",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/object/update_helpers_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestObjectUpdate_ComplexFieldUpdate",
+        "Package": "object",
+        "PackagePath": "cmd/zqk/object",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/object/update_helpers_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 180000000000,
+    "PackagePath": "cmd/zqk/object"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestObjectUpdate_AddRef_RemoveRef",
+      "Package": "object",
+      "PackagePath": "cmd/zqk/object",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/object/update_helpers_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestObjectUpdate_ComplexFieldUpdate",
+      "Package": "object",
+      "PackagePath": "cmd/zqk/object",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/object/update_helpers_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    }
+  }
+}

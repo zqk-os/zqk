@@ -1,0 +1,44 @@
+
+--- run 2026-09-04T22:21:25Z ---
+=== RUN   TestParseEdgeRole
+=== PAUSE TestParseEdgeRole
+=== RUN   TestEdgeRoleForKindField_DNA
+=== PAUSE TestEdgeRoleForKindField_DNA
+=== RUN   TestEdgeRoleFromSpec_WinsOverDNA
+=== PAUSE TestEdgeRoleFromSpec_WinsOverDNA
+=== RUN   TestHopMatchesFilter
+=== PAUSE TestHopMatchesFilter
+=== RUN   TestFieldRegistry_LoadFields
+=== PAUSE TestFieldRegistry_LoadFields
+=== RUN   TestFieldRegistry_GetFieldsForKind
+=== PAUSE TestFieldRegistry_GetFieldsForKind
+=== RUN   TestFieldRegistry_GetAllKinds
+=== PAUSE TestFieldRegistry_GetAllKinds
+=== RUN   TestFieldRegistry_Reload
+=== PAUSE TestFieldRegistry_Reload
+=== RUN   TestGetGlobalFieldRegistry
+=== PAUSE TestGetGlobalFieldRegistry
+=== RUN   TestGenerateFieldHelp
+=== PAUSE TestGenerateFieldHelp
+=== CONT  TestParseEdgeRole
+--- PASS: TestParseEdgeRole (0.00s)
+=== CONT  TestGenerateFieldHelp
+=== CONT  TestFieldRegistry_GetFieldsForKind
+=== CONT  TestFieldRegistry_LoadFields
+--- PASS: TestFieldRegistry_GetFieldsForKind (0.25s)
+--- PASS: TestGenerateFieldHelp (0.25s)
+=== CONT  TestHopMatchesFilter
+--- PASS: TestHopMatchesFilter (0.00s)
+=== CONT  TestEdgeRoleFromSpec_WinsOverDNA
+--- PASS: TestEdgeRoleFromSpec_WinsOverDNA (0.00s)
+=== CONT  TestEdgeRoleForKindField_DNA
+--- PASS: TestEdgeRoleForKindField_DNA (0.00s)
+=== CONT  TestFieldRegistry_Reload
+--- PASS: TestFieldRegistry_LoadFields (0.20s)
+=== CONT  TestGetGlobalFieldRegistry
+--- PASS: TestGetGlobalFieldRegistry (0.00s)
+=== CONT  TestFieldRegistry_GetAllKinds
+--- PASS: TestFieldRegistry_Reload (0.26s)
+--- PASS: TestFieldRegistry_GetAllKinds (0.19s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/objects	1.205s

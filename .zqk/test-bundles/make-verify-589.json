@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-589",
+  "created_at": "2026-09-04T21:34:33.183291Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-589",
+    "Tests": [
+      {
+        "Name": "TestRunWrapperHandler_JobLogFileWriting_AppendMode",
+        "Package": "scheduler",
+        "PackagePath": "pkg/scheduler",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/scheduler/handlers_run_wrapper_log_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestStripShellOutputRedirect",
+        "Package": "scheduler",
+        "PackagePath": "pkg/scheduler",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/scheduler/handlers_run_wrapper_log_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestRunWrapperHandler_TestCommandDetection",
+        "Package": "scheduler",
+        "PackagePath": "pkg/scheduler",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/scheduler/handlers_run_wrapper_test_command_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestRunWrapperHandler_ExtractTestInfo",
+        "Package": "scheduler",
+        "PackagePath": "pkg/scheduler",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/scheduler/handlers_run_wrapper_test_command_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestRunWrapperHandler_TestCommandTimeout",
+        "Package": "scheduler",
+        "PackagePath": "pkg/scheduler",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/scheduler/handlers_run_wrapper_test_command_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestRunWrapperHandler_TestCommandIsolation",
+        "Package": "scheduler",
+        "PackagePath": "pkg/scheduler",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/scheduler/handlers_run_wrapper_test_command_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestRunWrapperHandler_TestCommandExecution",
+        "Package": "scheduler",
+        "PackagePath": "pkg/scheduler",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/scheduler/handlers_run_wrapper_test_command_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestRunWrapperHandler_TestCommandTimeoutCalculation",
+        "Package": "scheduler",
+        "PackagePath": "pkg/scheduler",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/scheduler/handlers_run_wrapper_test_command_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestRunWrapperHandler_TestCommandSubmitIntegration",
+        "Package": "scheduler",
+        "PackagePath": "pkg/scheduler",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/scheduler/handlers_run_wrapper_test_command_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestSchedulerJobRetentionHandler_Execute",
+        "Package": "scheduler",
+        "PackagePath": "pkg/scheduler",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/scheduler/handlers_scheduler_job_retention_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 300000000000,
+    "PackagePath": "pkg/scheduler"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestRunWrapperHandler_JobLogFileWriting_AppendMode",
+      "Package": "scheduler",
+      "PackagePath": "pkg/scheduler",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/scheduler/handlers_run_wrapper_log_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestStripShellOutputRedirect",
+      "Package": "scheduler",
+      "PackagePath": "pkg/scheduler",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/scheduler/handlers_run_wrapper_log_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestRunWrapperHandler_TestCommandDetection",
+      "Package": "scheduler",
+      "PackagePath": "pkg/scheduler",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/scheduler/handlers_run_wrapper_test_command_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestRunWrapperHandler_ExtractTestInfo",
+      "Package": "scheduler",
+      "PackagePath": "pkg/scheduler",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/scheduler/handlers_run_wrapper_test_command_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestRunWrapperHandler_TestCommandTimeout",
+      "Package": "scheduler",
+      "PackagePath": "pkg/scheduler",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/scheduler/handlers_run_wrapper_test_command_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestRunWrapperHandler_TestCommandIsolation",
+      "Package": "scheduler",
+      "PackagePath": "pkg/scheduler",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/scheduler/handlers_run_wrapper_test_command_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestRunWrapperHandler_TestCommandExecution",
+      "Package": "scheduler",
+      "PackagePath": "pkg/scheduler",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/scheduler/handlers_run_wrapper_test_command_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestRunWrapperHandler_TestCommandTimeoutCalculation",
+      "Package": "scheduler",
+      "PackagePath": "pkg/scheduler",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/scheduler/handlers_run_wrapper_test_command_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestRunWrapperHandler_TestCommandSubmitIntegration",
+      "Package": "scheduler",
+      "PackagePath": "pkg/scheduler",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/scheduler/handlers_run_wrapper_test_command_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestSchedulerJobRetentionHandler_Execute",
+      "Package": "scheduler",
+      "PackagePath": "pkg/scheduler",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/scheduler/handlers_scheduler_job_retention_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

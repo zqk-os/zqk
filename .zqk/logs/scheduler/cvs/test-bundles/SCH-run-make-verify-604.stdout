@@ -1,0 +1,48 @@
+
+--- run 2026-09-04T22:17:57Z ---
+=== RUN   TestRegistryRun_EmptyEnabledMonitorsIsNotOK
+=== PAUSE TestRegistryRun_EmptyEnabledMonitorsIsNotOK
+=== RUN   TestRegistryRun_NilResultIsFail
+=== PAUSE TestRegistryRun_NilResultIsFail
+=== RUN   TestRegistryRun_MonitorErrorIsFail
+=== PAUSE TestRegistryRun_MonitorErrorIsFail
+=== RUN   TestRegistryRun_OKMonitorStaysOK
+=== PAUSE TestRegistryRun_OKMonitorStaysOK
+=== RUN   TestRegistry_RegistrationAndListing
+=== PAUSE TestRegistry_RegistrationAndListing
+=== RUN   TestRegistry_EnableDisableAndPersistence
+=== PAUSE TestRegistry_EnableDisableAndPersistence
+=== RUN   TestRegistry_RunSingleMonitor
+=== PAUSE TestRegistry_RunSingleMonitor
+=== RUN   TestRegistry_RunAllMonitorsAggregations
+=== PAUSE TestRegistry_RunAllMonitorsAggregations
+=== CONT  TestRegistryRun_EmptyEnabledMonitorsIsNotOK
+--- PASS: TestRegistryRun_EmptyEnabledMonitorsIsNotOK (0.00s)
+=== CONT  TestRegistry_RunAllMonitorsAggregations
+=== RUN   TestRegistry_RunAllMonitorsAggregations/all_ok
+=== RUN   TestRegistry_RunAllMonitorsAggregations/degraded_priority
+=== RUN   TestRegistry_RunAllMonitorsAggregations/fail_priority_over_degraded
+=== CONT  TestRegistry_RegistrationAndListing
+--- PASS: TestRegistry_RegistrationAndListing (0.00s)
+=== CONT  TestRegistryRun_OKMonitorStaysOK
+--- PASS: TestRegistryRun_OKMonitorStaysOK (0.00s)
+=== CONT  TestRegistryRun_MonitorErrorIsFail
+--- PASS: TestRegistryRun_MonitorErrorIsFail (0.00s)
+=== CONT  TestRegistryRun_NilResultIsFail
+--- PASS: TestRegistryRun_NilResultIsFail (0.00s)
+=== RUN   TestRegistry_RunAllMonitorsAggregations/unknown_status_treated_as_degraded
+=== CONT  TestRegistry_EnableDisableAndPersistence
+=== RUN   TestRegistry_RunAllMonitorsAggregations/monitor_error_treated_as_fail
+=== RUN   TestRegistry_RunAllMonitorsAggregations/nil_result_treated_as_fail
+--- PASS: TestRegistry_RunAllMonitorsAggregations (0.00s)
+    --- PASS: TestRegistry_RunAllMonitorsAggregations/all_ok (0.00s)
+    --- PASS: TestRegistry_RunAllMonitorsAggregations/degraded_priority (0.00s)
+    --- PASS: TestRegistry_RunAllMonitorsAggregations/fail_priority_over_degraded (0.00s)
+    --- PASS: TestRegistry_RunAllMonitorsAggregations/unknown_status_treated_as_degraded (0.00s)
+    --- PASS: TestRegistry_RunAllMonitorsAggregations/monitor_error_treated_as_fail (0.00s)
+    --- PASS: TestRegistry_RunAllMonitorsAggregations/nil_result_treated_as_fail (0.00s)
+=== CONT  TestRegistry_RunSingleMonitor
+--- PASS: TestRegistry_RunSingleMonitor (0.00s)
+--- PASS: TestRegistry_EnableDisableAndPersistence (0.01s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/healthcheck	0.296s

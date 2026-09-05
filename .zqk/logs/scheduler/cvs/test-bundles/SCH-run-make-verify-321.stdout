@@ -1,0 +1,118 @@
+
+--- run 2026-09-04T22:11:25Z ---
+=== RUN   TestCodeDraftSystemGuidance_forbidsLookup
+=== PAUSE TestCodeDraftSystemGuidance_forbidsLookup
+=== RUN   TestNextToolChoice
+=== PAUSE TestNextToolChoice
+=== RUN   TestNextToolChoiceFunction
+=== PAUSE TestNextToolChoiceFunction
+=== RUN   TestGuardSwarmToolCall_hourglassAndStatus
+=== PAUSE TestGuardSwarmToolCall_hourglassAndStatus
+=== RUN   TestShouldSoftBlockBashTool_allowsVetAndMod
+=== PAUSE TestShouldSoftBlockBashTool_allowsVetAndMod
+=== RUN   TestClipSwarmToolResult_listDump
+=== PAUSE TestClipSwarmToolResult_listDump
+=== RUN   TestClipSwarmToolResult_shortPassthrough
+=== PAUSE TestClipSwarmToolResult_shortPassthrough
+=== RUN   TestSwarmToolResultCap_listTighterThanRead
+=== PAUSE TestSwarmToolResultCap_listTighterThanRead
+=== CONT  TestCodeDraftSystemGuidance_forbidsLookup
+=== CONT  TestShouldSoftBlockBashTool_allowsVetAndMod
+--- PASS: TestCodeDraftSystemGuidance_forbidsLookup (0.00s)
+=== CONT  TestGuardSwarmToolCall_hourglassAndStatus
+=== RUN   TestGuardSwarmToolCall_hourglassAndStatus/agent_next
+=== RUN   TestGuardSwarmToolCall_hourglassAndStatus/prefixed_agent_next
+=== RUN   TestGuardSwarmToolCall_hourglassAndStatus/chat_send
+=== RUN   TestGuardSwarmToolCall_hourglassAndStatus/status_field
+--- PASS: TestShouldSoftBlockBashTool_allowsVetAndMod (0.00s)
+=== CONT  TestNextToolChoiceFunction
+=== RUN   TestNextToolChoiceFunction/pin_while_evidence_owed
+=== PAUSE TestNextToolChoiceFunction/pin_while_evidence_owed
+=== RUN   TestNextToolChoiceFunction/after_markdown
+=== PAUSE TestNextToolChoiceFunction/after_markdown
+=== RUN   TestGuardSwarmToolCall_hourglassAndStatus/status_assign
+=== RUN   TestNextToolChoiceFunction/no_pin_without_owed_work
+=== PAUSE TestNextToolChoiceFunction/no_pin_without_owed_work
+=== RUN   TestNextToolChoiceFunction/evidence_met
+=== PAUSE TestNextToolChoiceFunction/evidence_met
+=== CONT  TestNextToolChoice
+=== RUN   TestNextToolChoice/no_tools
+=== PAUSE TestNextToolChoice/no_tools
+=== RUN   TestGuardSwarmToolCall_hourglassAndStatus/plain_update
+=== RUN   TestNextToolChoice/idle_auto
+=== RUN   TestGuardSwarmToolCall_hourglassAndStatus/placeholder_id
+=== PAUSE TestNextToolChoice/idle_auto
+=== RUN   TestNextToolChoice/owes_work
+=== RUN   TestGuardSwarmToolCall_hourglassAndStatus/real_id
+=== PAUSE TestNextToolChoice/owes_work
+=== RUN   TestNextToolChoice/after_markdown
+=== PAUSE TestNextToolChoice/after_markdown
+=== CONT  TestClipSwarmToolResult_shortPassthrough
+=== RUN   TestGuardSwarmToolCall_hourglassAndStatus/unscoped_list
+--- PASS: TestClipSwarmToolResult_shortPassthrough (0.00s)
+=== RUN   TestGuardSwarmToolCall_hourglassAndStatus/priority_plan_verb
+=== RUN   TestGuardSwarmToolCall_hourglassAndStatus/invented_kind
+=== CONT  TestSwarmToolResultCap_listTighterThanRead
+--- PASS: TestSwarmToolResultCap_listTighterThanRead (0.00s)
+=== CONT  TestClipSwarmToolResult_listDump
+=== RUN   TestGuardSwarmToolCall_hourglassAndStatus/scoped_list
+--- PASS: TestClipSwarmToolResult_listDump (0.00s)
+=== CONT  TestNextToolChoiceFunction/pin_while_evidence_owed
+=== CONT  TestNextToolChoiceFunction/no_pin_without_owed_work
+=== RUN   TestGuardSwarmToolCall_hourglassAndStatus/list_without_limit
+=== CONT  TestNextToolChoiceFunction/evidence_met
+=== CONT  TestNextToolChoiceFunction/after_markdown
+--- PASS: TestNextToolChoiceFunction (0.00s)
+    --- PASS: TestNextToolChoiceFunction/pin_while_evidence_owed (0.00s)
+    --- PASS: TestNextToolChoiceFunction/no_pin_without_owed_work (0.00s)
+    --- PASS: TestNextToolChoiceFunction/evidence_met (0.00s)
+    --- PASS: TestNextToolChoiceFunction/after_markdown (0.00s)
+=== CONT  TestNextToolChoice/no_tools
+=== CONT  TestNextToolChoice/after_markdown
+=== CONT  TestNextToolChoice/owes_work
+=== CONT  TestNextToolChoice/idle_auto
+--- PASS: TestNextToolChoice (0.00s)
+    --- PASS: TestNextToolChoice/no_tools (0.00s)
+    --- PASS: TestNextToolChoice/after_markdown (0.00s)
+    --- PASS: TestNextToolChoice/owes_work (0.00s)
+    --- PASS: TestNextToolChoice/idle_auto (0.00s)
+=== RUN   TestGuardSwarmToolCall_hourglassAndStatus/list_over_limit
+=== RUN   TestGuardSwarmToolCall_hourglassAndStatus/shell_inner
+=== RUN   TestGuardSwarmToolCall_hourglassAndStatus/real_write
+=== RUN   TestGuardSwarmToolCall_hourglassAndStatus/tutorial_main
+=== RUN   TestGuardSwarmToolCall_hourglassAndStatus/vendor_py
+=== RUN   TestGuardSwarmToolCall_hourglassAndStatus/workflow_id_as_file
+=== RUN   TestGuardSwarmToolCall_hourglassAndStatus/catalog_schema
+=== RUN   TestGuardSwarmToolCall_hourglassAndStatus/catalog_list
+=== RUN   TestGuardSwarmToolCall_hourglassAndStatus/next_action
+=== RUN   TestGuardSwarmToolCall_hourglassAndStatus/replace_code
+=== RUN   TestGuardSwarmToolCall_hourglassAndStatus/stable_replace
+=== RUN   TestGuardSwarmToolCall_hourglassAndStatus/commit
+--- PASS: TestGuardSwarmToolCall_hourglassAndStatus (0.00s)
+    --- PASS: TestGuardSwarmToolCall_hourglassAndStatus/agent_next (0.00s)
+    --- PASS: TestGuardSwarmToolCall_hourglassAndStatus/prefixed_agent_next (0.00s)
+    --- PASS: TestGuardSwarmToolCall_hourglassAndStatus/chat_send (0.00s)
+    --- PASS: TestGuardSwarmToolCall_hourglassAndStatus/status_field (0.00s)
+    --- PASS: TestGuardSwarmToolCall_hourglassAndStatus/status_assign (0.00s)
+    --- PASS: TestGuardSwarmToolCall_hourglassAndStatus/plain_update (0.00s)
+    --- PASS: TestGuardSwarmToolCall_hourglassAndStatus/placeholder_id (0.00s)
+    --- PASS: TestGuardSwarmToolCall_hourglassAndStatus/real_id (0.00s)
+    --- PASS: TestGuardSwarmToolCall_hourglassAndStatus/unscoped_list (0.00s)
+    --- PASS: TestGuardSwarmToolCall_hourglassAndStatus/priority_plan_verb (0.00s)
+    --- PASS: TestGuardSwarmToolCall_hourglassAndStatus/invented_kind (0.00s)
+    --- PASS: TestGuardSwarmToolCall_hourglassAndStatus/scoped_list (0.00s)
+    --- PASS: TestGuardSwarmToolCall_hourglassAndStatus/list_without_limit (0.00s)
+    --- PASS: TestGuardSwarmToolCall_hourglassAndStatus/list_over_limit (0.00s)
+    --- PASS: TestGuardSwarmToolCall_hourglassAndStatus/shell_inner (0.00s)
+    --- PASS: TestGuardSwarmToolCall_hourglassAndStatus/real_write (0.00s)
+    --- PASS: TestGuardSwarmToolCall_hourglassAndStatus/tutorial_main (0.00s)
+    --- PASS: TestGuardSwarmToolCall_hourglassAndStatus/vendor_py (0.00s)
+    --- PASS: TestGuardSwarmToolCall_hourglassAndStatus/workflow_id_as_file (0.00s)
+    --- PASS: TestGuardSwarmToolCall_hourglassAndStatus/catalog_schema (0.00s)
+    --- PASS: TestGuardSwarmToolCall_hourglassAndStatus/catalog_list (0.00s)
+    --- PASS: TestGuardSwarmToolCall_hourglassAndStatus/next_action (0.00s)
+    --- PASS: TestGuardSwarmToolCall_hourglassAndStatus/replace_code (0.00s)
+    --- PASS: TestGuardSwarmToolCall_hourglassAndStatus/stable_replace (0.00s)
+    --- PASS: TestGuardSwarmToolCall_hourglassAndStatus/commit (0.00s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/swarm	0.637s

@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-599",
+  "created_at": "2026-09-04T21:34:33.284054Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-599",
+    "Tests": [
+      {
+        "Name": "TestScheduler_TriggerJob_PermissionDenied",
+        "Package": "scheduler",
+        "PackagePath": "pkg/scheduler",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/scheduler/scheduler_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestScheduler_StartStop_PermissionChecks",
+        "Package": "scheduler",
+        "PackagePath": "pkg/scheduler",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/scheduler/scheduler_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestScheduler_TriggerJobByLifecycle",
+        "Package": "scheduler",
+        "PackagePath": "pkg/scheduler",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/scheduler/scheduler_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestScheduler_MatchesLifecycleFilter",
+        "Package": "scheduler",
+        "PackagePath": "pkg/scheduler",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/scheduler/scheduler_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestScheduler_OneTimeJob_AutoDisable",
+        "Package": "scheduler",
+        "PackagePath": "pkg/scheduler",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/scheduler/scheduler_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestStop_WritesAbandonedEventForRunningJobs",
+        "Package": "scheduler",
+        "PackagePath": "pkg/scheduler",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/scheduler/scheduler_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestScheduler_TriggerJobByLifecycle_RequirementComplete",
+        "Package": "scheduler",
+        "PackagePath": "pkg/scheduler",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/scheduler/scheduler_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestScheduler_TriggerJobByLifecycle_MilestoneAutoComplete",
+        "Package": "scheduler",
+        "PackagePath": "pkg/scheduler",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/scheduler/scheduler_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestScheduleJob_ArchivedJobSkipped",
+        "Package": "scheduler",
+        "PackagePath": "pkg/scheduler",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/scheduler/scheduler_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestStorage_CreateSchedulerJob_DoesNotHang",
+        "Package": "scheduler",
+        "PackagePath": "pkg/scheduler",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/scheduler/storage_create_timeout_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 300000000000,
+    "PackagePath": "pkg/scheduler"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestScheduler_TriggerJob_PermissionDenied",
+      "Package": "scheduler",
+      "PackagePath": "pkg/scheduler",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/scheduler/scheduler_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestScheduler_StartStop_PermissionChecks",
+      "Package": "scheduler",
+      "PackagePath": "pkg/scheduler",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/scheduler/scheduler_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestScheduler_TriggerJobByLifecycle",
+      "Package": "scheduler",
+      "PackagePath": "pkg/scheduler",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/scheduler/scheduler_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestScheduler_MatchesLifecycleFilter",
+      "Package": "scheduler",
+      "PackagePath": "pkg/scheduler",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/scheduler/scheduler_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestScheduler_OneTimeJob_AutoDisable",
+      "Package": "scheduler",
+      "PackagePath": "pkg/scheduler",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/scheduler/scheduler_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestStop_WritesAbandonedEventForRunningJobs",
+      "Package": "scheduler",
+      "PackagePath": "pkg/scheduler",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/scheduler/scheduler_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestScheduler_TriggerJobByLifecycle_RequirementComplete",
+      "Package": "scheduler",
+      "PackagePath": "pkg/scheduler",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/scheduler/scheduler_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestScheduler_TriggerJobByLifecycle_MilestoneAutoComplete",
+      "Package": "scheduler",
+      "PackagePath": "pkg/scheduler",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/scheduler/scheduler_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestScheduleJob_ArchivedJobSkipped",
+      "Package": "scheduler",
+      "PackagePath": "pkg/scheduler",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/scheduler/scheduler_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestStorage_CreateSchedulerJob_DoesNotHang",
+      "Package": "scheduler",
+      "PackagePath": "pkg/scheduler",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/scheduler/storage_create_timeout_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

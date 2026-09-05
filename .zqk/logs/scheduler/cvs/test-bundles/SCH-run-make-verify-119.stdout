@@ -1,0 +1,49 @@
+
+--- run 2026-09-04T21:38:00Z ---
+=== RUN   TestAsyncValidator_BaselineComparison
+=== PAUSE TestAsyncValidator_BaselineComparison
+=== RUN   TestAsyncValidator_EventCallback
+=== PAUSE TestAsyncValidator_EventCallback
+=== RUN   TestAsyncValidator_EventCallbackNil
+=== PAUSE TestAsyncValidator_EventCallbackNil
+=== RUN   TestAsyncValidator_EventCallbackConcurrent
+=== PAUSE TestAsyncValidator_EventCallbackConcurrent
+=== RUN   TestAsyncValidator_SetEventCallback
+=== PAUSE TestAsyncValidator_SetEventCallback
+=== RUN   TestHostloadValidationYield_Positive
+=== PAUSE TestHostloadValidationYield_Positive
+=== RUN   TestValidationSemaphoreCapacity_FailFastCap
+=== PAUSE TestValidationSemaphoreCapacity_FailFastCap
+=== RUN   TestAwaitNestedValidation_TimeoutStillWaitsForDone
+=== PAUSE TestAwaitNestedValidation_TimeoutStillWaitsForDone
+=== RUN   TestAwaitNestedValidation_CompletesBeforeTimeout
+=== PAUSE TestAwaitNestedValidation_CompletesBeforeTimeout
+=== RUN   TestAsyncValidator_OnDemandPattern
+=== PAUSE TestAsyncValidator_OnDemandPattern
+=== CONT  TestAsyncValidator_BaselineComparison
+=== CONT  TestHostloadValidationYield_Positive
+--- PASS: TestHostloadValidationYield_Positive (0.00s)
+=== CONT  TestAsyncValidator_EventCallbackConcurrent
+--- PASS: TestAsyncValidator_EventCallbackConcurrent (0.14s)
+=== CONT  TestAsyncValidator_SetEventCallback
+--- PASS: TestAsyncValidator_SetEventCallback (0.53s)
+=== CONT  TestAwaitNestedValidation_CompletesBeforeTimeout
+--- PASS: TestAwaitNestedValidation_CompletesBeforeTimeout (0.00s)
+=== CONT  TestAsyncValidator_OnDemandPattern
+    async_validator_on_demand_test.go:48: Worker is running: 1 active workers
+--- PASS: TestAsyncValidator_OnDemandPattern (0.34s)
+=== CONT  TestAsyncValidator_EventCallbackNil
+=== NAME  TestAsyncValidator_BaselineComparison
+    async_validator_baseline_test.go:40: Synchronous validation: 100 results in 146.459µs
+    async_validator_baseline_test.go:41: Asynchronous validation: 100 results in 1.20576525s
+    async_validator_baseline_test.go:58: Warning: Async validation took longer than expected: 1.20576525s vs 146.459µs
+--- PASS: TestAsyncValidator_BaselineComparison (1.32s)
+=== CONT  TestAsyncValidator_EventCallback
+--- PASS: TestAsyncValidator_EventCallback (0.13s)
+=== CONT  TestAwaitNestedValidation_TimeoutStillWaitsForDone
+--- PASS: TestAwaitNestedValidation_TimeoutStillWaitsForDone (0.03s)
+=== CONT  TestValidationSemaphoreCapacity_FailFastCap
+--- PASS: TestValidationSemaphoreCapacity_FailFastCap (0.00s)
+--- PASS: TestAsyncValidator_EventCallbackNil (0.53s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/validation	2.165s

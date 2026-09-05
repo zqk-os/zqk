@@ -1,0 +1,14 @@
+created_at: "2026-08-19T04:55:19Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1787115318071025000-8aecba43
+item_id: REDACTED
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 2857702ca28e4b64fb5782140b43c1400e68fdeab30ab0062f4119523ca97d466e5f13c72adcfa41b92eacf21fa7f0a79b8a8e3a8d7c581e5c9afe0e69cb31dc
+schema_version: 2.0.0
+signature: 3045022065817a28891dacb6fd0c6fb04c7de1104ff6e32c0b304b63f23647c7aec3e053022100f0baf08909207b03cc753193895f0d13f578de0c85a28e691d6f8a16bba3a615
+status: archived
+title: rubric documents draft-plane honesty
+updated_at: "2026-09-01T07:28:46Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

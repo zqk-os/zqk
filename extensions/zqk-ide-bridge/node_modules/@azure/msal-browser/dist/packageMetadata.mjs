@@ -1,0 +1,8 @@
+/*! @azure/msal-browser v5.18.0 2026-08-04 */
+'use strict';
+/* eslint-disable header/header */
+const name = "@azure/msal-browser";
+const version = "5.18.0";
+
+export { name, version };
+//# sourceMappingURL=packageMetadata.mjs.map

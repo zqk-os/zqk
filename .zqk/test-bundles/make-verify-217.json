@@ -1,0 +1,105 @@
+{
+  "name": "make-verify-217",
+  "created_at": "2026-09-04T21:34:29.55167Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-217",
+    "Tests": [
+      {
+        "Name": "TestSigner_GenerateAndValidate",
+        "Package": "signedurl",
+        "PackagePath": "pkg/storage/signedurl",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/signedurl/signedurl_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestSigner_ExpiredURL",
+        "Package": "signedurl",
+        "PackagePath": "pkg/storage/signedurl",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/signedurl/signedurl_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestSigner_TamperedPath",
+        "Package": "signedurl",
+        "PackagePath": "pkg/storage/signedurl",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/signedurl/signedurl_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestSigner_TamperedSignature",
+        "Package": "signedurl",
+        "PackagePath": "pkg/storage/signedurl",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/signedurl/signedurl_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestSigner_InvalidFormat",
+        "Package": "signedurl",
+        "PackagePath": "pkg/storage/signedurl",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/signedurl/signedurl_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 450000000000,
+    "PackagePath": "pkg/storage/signedurl"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestSigner_GenerateAndValidate",
+      "Package": "signedurl",
+      "PackagePath": "pkg/storage/signedurl",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/signedurl/signedurl_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestSigner_ExpiredURL",
+      "Package": "signedurl",
+      "PackagePath": "pkg/storage/signedurl",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/signedurl/signedurl_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestSigner_TamperedPath",
+      "Package": "signedurl",
+      "PackagePath": "pkg/storage/signedurl",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/signedurl/signedurl_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestSigner_TamperedSignature",
+      "Package": "signedurl",
+      "PackagePath": "pkg/storage/signedurl",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/signedurl/signedurl_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestSigner_InvalidFormat",
+      "Package": "signedurl",
+      "PackagePath": "pkg/storage/signedurl",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/signedurl/signedurl_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    }
+  }
+}

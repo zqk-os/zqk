@@ -1,0 +1,105 @@
+{
+  "name": "make-verify-363",
+  "created_at": "2026-09-04T21:34:30.956894Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-363",
+    "Tests": [
+      {
+        "Name": "TestVectorClock_Compare",
+        "Package": "bridge",
+        "PackagePath": "pkg/bridge",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/bridge/p2p_conflict_resolution_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestVectorClock_Merge",
+        "Package": "bridge",
+        "PackagePath": "pkg/bridge",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/bridge/p2p_conflict_resolution_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestVectorClock_Increment",
+        "Package": "bridge",
+        "PackagePath": "pkg/bridge",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/bridge/p2p_conflict_resolution_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestConflictResolver_ResolveState",
+        "Package": "bridge",
+        "PackagePath": "pkg/bridge",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/bridge/p2p_conflict_resolution_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestTranslator",
+        "Package": "bridge",
+        "PackagePath": "pkg/bridge",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/bridge/translator_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 150000000000,
+    "PackagePath": "pkg/bridge"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestVectorClock_Compare",
+      "Package": "bridge",
+      "PackagePath": "pkg/bridge",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/bridge/p2p_conflict_resolution_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestVectorClock_Merge",
+      "Package": "bridge",
+      "PackagePath": "pkg/bridge",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/bridge/p2p_conflict_resolution_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestVectorClock_Increment",
+      "Package": "bridge",
+      "PackagePath": "pkg/bridge",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/bridge/p2p_conflict_resolution_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestConflictResolver_ResolveState",
+      "Package": "bridge",
+      "PackagePath": "pkg/bridge",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/bridge/p2p_conflict_resolution_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestTranslator",
+      "Package": "bridge",
+      "PackagePath": "pkg/bridge",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/bridge/translator_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

@@ -1,0 +1,14 @@
+created_at: "2026-08-19T00:28:46Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1787099326324880000-233ddb7a
+item_id: BLI-CEF-R2-SUP-SBOM
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 2857702ca28e4b64fb5782140b43c1400e68fdeab30ab0062f4119523ca97d466e5f13c72adcfa41b92eacf21fa7f0a79b8a8e3a8d7c581e5c9afe0e69cb31dc
+schema_version: 2.0.0
+signature: 30450221009f1dde39b5e93819b5936531ce878962fb094f4dd5e64a5b509678d7d978db530220467082d314b4c794b085c96a9432c566f5f642c40f3ed70c170db5e8ff69612a
+status: archived
+title: SBOM generation and dependency review path
+updated_at: "2026-09-01T07:21:13Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

@@ -1,0 +1,38 @@
+category: testing
+command: /bin/sh
+command_args:
+    - -c
+    - sh /Users/lanceettl/zqk-restore-clone/scripts/check-test-contamination.sh go test ./cmd/zqk/system -run '^(TestBulkCheckPath_MultipleObjects|TestCacheRefreshAuditEventViaCoordinator|TestCacheKeyConsistency_BucketedObjects_AutoFixVisible|TestCacheKeyConsistency_AsyncValidationPath|TestCacheKeyConsistency_NonBucketedObjects|TestObjectIDCache_Get_O1LargeKindBucket|TestObjectIDCache_GetEntriesByKind|TestObjectIDCache_IsPopulatedForProject|TestObjectIDCache_InvalidateAndUpdate|TestUpdateObjectIDCache_NoOpForHighVolumeKind)$' -v -count=1 -timeout 3540s -p 1 -parallel 2 > /Users/lanceettl/zqk-restore-clone/.zqk/logs/scheduler/cvs/test-bundles/bundle-bundle-16.log 2>&1
+created_at: "2026-09-05T05:21:46Z"
+created_by: ACC-1785920548450214012-68b850c0
+description: 'Test bundle containing 10 test(s) from package cmd/zqk/system. Tests must run sequentially. Estimated duration: 5m0s. Tests: TestBulkCheckPath_MultipleObjects, TestCacheRefreshAuditEventViaCoordinator, TestCacheKeyConsistency_BucketedObjects_AutoFixVisible, TestCacheKeyConsistency_AsyncValidationPath, TestCacheKeyConsistency_NonBucketedObjects, TestObjectIDCache_Get_O1LargeKindBucket, TestObjectIDCache_GetEntriesByKind, TestObjectIDCache_IsPopulatedForProject, TestObjectIDCache_InvalidateAndUpdate, TestUpdateObjectIDCache_NoOpForHighVolumeKind. Log file: /Users/lanceettl/zqk-restore-clone/.zqk/logs/scheduler/cvs/test-bundles/bundle-bundle-16.log'
+enabled: true
+execution_mode: one_time
+id: SCH-run-bundle-16
+job_type: run_wrapper
+kind: scheduler_job
+last_run_at: "2026-09-05T05:57:21Z"
+max_runtime_seconds: 3600
+metadata:
+    bundle_command_fingerprint: 4d3632e7c854b606b6078771
+    bundle_id: bundle-16
+    estimated_duration_seconds: 300
+    is_parallel: false
+    log_file: /Users/lanceettl/zqk-restore-clone/.zqk/logs/scheduler/cvs/test-bundles/bundle-bundle-16.log
+    max_concurrent_same_package: 1
+    package_path: cmd/zqk/system
+    test_count: 10
+namespace_id: zqk:kernel
+origin_project: zqk
+origin_system: zqk
+priority: normal
+retry_count: 0
+retry_delay_seconds: 5
+schema_version: 2.0.0
+status: active
+title: 'Test Bundle: cmd/zqk/system (10 tests)'
+trigger_type: immediate
+updated_at: "2026-09-05T05:57:22Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+working_directory: /Users/lanceettl/zqk-restore-clone

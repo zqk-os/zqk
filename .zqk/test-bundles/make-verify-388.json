@@ -1,0 +1,87 @@
+{
+  "name": "make-verify-388",
+  "created_at": "2026-09-04T21:34:31.18646Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-388",
+    "Tests": [
+      {
+        "Name": "TestHyperScaleOrchestrator_Orchestrate",
+        "Package": "pipeline",
+        "PackagePath": "pkg/pipeline",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/pipeline/hyper_scale_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestOrchestrator",
+        "Package": "pipeline",
+        "PackagePath": "pkg/pipeline",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/pipeline/orchestrator_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestLoadOutcomeKeyNamesFromYAML_duplicate",
+        "Package": "pipeline",
+        "PackagePath": "pkg/pipeline",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/pipeline/outcome_keys_generate_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestGenerateOutcomeKeysGoSource_roundTrip",
+        "Package": "pipeline",
+        "PackagePath": "pkg/pipeline",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/pipeline/outcome_keys_generate_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": true,
+    "EstimatedDuration": 120000000000,
+    "PackagePath": "pkg/pipeline"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestHyperScaleOrchestrator_Orchestrate",
+      "Package": "pipeline",
+      "PackagePath": "pkg/pipeline",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/pipeline/hyper_scale_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestOrchestrator",
+      "Package": "pipeline",
+      "PackagePath": "pkg/pipeline",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/pipeline/orchestrator_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestLoadOutcomeKeyNamesFromYAML_duplicate",
+      "Package": "pipeline",
+      "PackagePath": "pkg/pipeline",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/pipeline/outcome_keys_generate_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestGenerateOutcomeKeysGoSource_roundTrip",
+      "Package": "pipeline",
+      "PackagePath": "pkg/pipeline",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/pipeline/outcome_keys_generate_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

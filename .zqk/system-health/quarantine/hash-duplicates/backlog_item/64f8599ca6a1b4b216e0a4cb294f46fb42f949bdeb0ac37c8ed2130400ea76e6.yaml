@@ -1,0 +1,44 @@
+acceptance_considerations: Acceptance recorded as linked criteria; no narrative captured at migration time.
+actual_effort: 4h
+commit_refs:
+    - 45e2da5017
+created_at: "2026-08-05T06:01:12Z"
+created_by: ACC-1785920548450214012-68b850c0
+criteria_refs:
+    - CRIT-1785939744780736000-f031db61
+    - CRIT-1785939745681961000-6c9f5500
+    - CRIT-1785939746562840000-4e489162
+    - CRIT-1785939747485260000-01a01e40
+    - CRIT-1785939748395060000-3bfbf09b
+    - CRIT-1785939749312555000-82d4ccc1
+    - CRIT-1786697484446064000-46880c01
+description: 'Human feedback: injecting resolved_* into object get adds confusion, removes choice, and is susceptible to CAS pollution when get output is round-tripped. Desired shape: (1) default get = raw CAS/spec fields only; (2) resolved meta lives in a separate index/sidecar in the same folder (or companion API) keyed by id so UI can render titles/status by join or skip; (3) keep optional inline hydrate for agents that explicitly opt in; (4) scrub/fail any write path that accepts overlay keys. Evidence: 5 CAS instances already polluted with reference_resolver_overlay_* / resolved_milestone_refs. Related to CLI IA membrane REQ and help partitioning. Sealing invariant: resolved meta must never enter the CAS object bytes; content hash is the seal — a failed write cannot corrupt the object with partial hydration because hydration is not part of the hashed payload. Sidecar/index updates are independent of object CAS integrity. Progress 2026-08-05: shipped protective slice — default object get is raw CAS (no resolved_*/overlay flags); --link-hydration lazy|default|eager opt-in; create/update/bulk-update strip overlay keys before persist. Sidecar index still pending.'
+estimated_effort: 4h
+goal_refs:
+    - GOAL-1785885763755750000-6efcb274
+id: BLI-1785909672838827000-9fca84f5
+kind: backlog_item
+milestone_refs:
+    - MIL-1785886016336815000-ad6784be
+namespace_id: zqk:kernel
+owner_ref: ACC-1785920548450214012-68b850c0
+percent_complete: 100
+persona_refs:
+    - PER-1781486416823404000-bce2c1ce
+    - PER-1781486429759398000-a79939a1
+priority: high
+priority_tier: P1
+problem_statement: 'Human feedback: injecting resolved_* into object get adds confusion, removes choice, and is susceptible to CAS pollution when get output is round-tripped. Desired shape: (1) default get = raw CAS/spec fields only; (2) resolved meta lives in a separate index/sidecar in the same folder (or companion API) keyed by id so UI can render titles/status by join or skip; (3) keep optional inline hydrate for agents that explicitly opt in; (4) scrub/fail any write path that accepts overlay keys. Evidence: 5 CAS instances already polluted with reference_resolver_overlay_* / resolved_milestone_refs. Related to CLI IA membrane REQ and help partitioning. Sealing invariant: resolved meta must never enter the CAS object bytes; content hash is the seal — a failed write cannot corrupt the object with partial hydration because hydration is not part of the hashed payload. Sidecar/index updates are independent of object CAS integrity. Progress 2026-08-05: shipped protective slice — default object get is raw CAS (no resolved_*/overlay flags); --link-hydration lazy|default|eager opt-in; create/update/bulk-update strip overlay keys before persist. Sidecar index still pending.'
+related_object_refs:
+    - REQ-1785908734512726000-0db5c98e
+    - CRIT-1785909671882127000-160d5367
+    - CRIT-1785908735462279000-6d37037a
+    - BLI-1785908736395909000-25c4884e
+requirement_refs:
+    - REQ-1785908734512726000-0db5c98e
+schema_version: 2.0.0
+status: complete
+title: 'MMORCH before-launch P1: Decouple link hydration — raw get + resolved sidecar/index'
+updated_at: "2026-08-19T04:51:51Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

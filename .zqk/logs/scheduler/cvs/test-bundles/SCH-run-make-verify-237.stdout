@@ -1,0 +1,52 @@
+
+--- run 2026-09-04T21:44:47Z ---
+=== RUN   TestSessionConstants
+=== PAUSE TestSessionConstants
+=== RUN   TestStartWorkerSessionRequiresAgentID
+=== PAUSE TestStartWorkerSessionRequiresAgentID
+=== RUN   TestStartWorkerSessionCreatesFreshTypedSession
+=== PAUSE TestStartWorkerSessionCreatesFreshTypedSession
+=== RUN   TestStartWorkerSessionOmitsUnreadableParent
+=== PAUSE TestStartWorkerSessionOmitsUnreadableParent
+=== RUN   TestStartWorkerSessionReturnsCreateError
+=== PAUSE TestStartWorkerSessionReturnsCreateError
+=== RUN   TestSessionContext
+=== PAUSE TestSessionContext
+=== CONT  TestSessionConstants
+=== RUN   TestSessionConstants/CLI_session
+=== CONT  TestStartWorkerSessionOmitsUnreadableParent
+=== PAUSE TestSessionConstants/CLI_session
+=== RUN   TestSessionConstants/worker_session
+=== PAUSE TestSessionConstants/worker_session
+=== RUN   TestSessionConstants/active
+=== PAUSE TestSessionConstants/active
+=== RUN   TestSessionConstants/completed
+=== PAUSE TestSessionConstants/completed
+=== RUN   TestSessionConstants/error
+=== PAUSE TestSessionConstants/error
+=== RUN   TestSessionConstants/agentx
+=== PAUSE TestSessionConstants/agentx
+=== CONT  TestStartWorkerSessionCreatesFreshTypedSession
+--- PASS: TestStartWorkerSessionOmitsUnreadableParent (0.10s)
+=== CONT  TestStartWorkerSessionRequiresAgentID
+--- PASS: TestStartWorkerSessionRequiresAgentID (0.00s)
+=== CONT  TestStartWorkerSessionReturnsCreateError
+--- PASS: TestStartWorkerSessionCreatesFreshTypedSession (0.12s)
+=== CONT  TestSessionContext
+--- PASS: TestSessionContext (0.00s)
+=== CONT  TestSessionConstants/CLI_session
+=== CONT  TestSessionConstants/completed
+=== CONT  TestSessionConstants/agentx
+=== CONT  TestSessionConstants/error
+=== CONT  TestSessionConstants/active
+=== CONT  TestSessionConstants/worker_session
+--- PASS: TestSessionConstants (0.00s)
+    --- PASS: TestSessionConstants/CLI_session (0.00s)
+    --- PASS: TestSessionConstants/completed (0.00s)
+    --- PASS: TestSessionConstants/agentx (0.00s)
+    --- PASS: TestSessionConstants/error (0.00s)
+    --- PASS: TestSessionConstants/active (0.00s)
+    --- PASS: TestSessionConstants/worker_session (0.00s)
+--- PASS: TestStartWorkerSessionReturnsCreateError (0.02s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/zqksession	0.880s

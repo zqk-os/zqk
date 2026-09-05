@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-316",
+  "created_at": "2026-09-04T21:34:30.509717Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-316",
+    "Tests": [
+      {
+        "Name": "TestShouldSoftBlockBashTool",
+        "Package": "swarm",
+        "PackagePath": "pkg/swarm",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/swarm/prompts_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestBashSoftBlockGuidanceMessage_UsesBrandPrefix",
+        "Package": "swarm",
+        "PackagePath": "pkg/swarm",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/swarm/prompts_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestExecuteBashToolName",
+        "Package": "swarm",
+        "PackagePath": "pkg/swarm",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/swarm/prompts_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestDetectConsecutiveDuplicate",
+        "Package": "swarm",
+        "PackagePath": "pkg/swarm",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/swarm/prompts_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestDuplicateCallGuidanceMessage",
+        "Package": "swarm",
+        "PackagePath": "pkg/swarm",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/swarm/prompts_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestDetectContextGatheringLoop",
+        "Package": "swarm",
+        "PackagePath": "pkg/swarm",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/swarm/prompts_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestDetectRepeatingCycle",
+        "Package": "swarm",
+        "PackagePath": "pkg/swarm",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/swarm/prompts_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestIsKernelLookupTool",
+        "Package": "swarm",
+        "PackagePath": "pkg/swarm",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/swarm/prompts_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestIsContextGatheringTool",
+        "Package": "swarm",
+        "PackagePath": "pkg/swarm",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/swarm/prompts_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestInMemoryTaskQueue",
+        "Package": "swarm_test",
+        "PackagePath": "pkg/swarm",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/swarm/task_queue_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 300000000000,
+    "PackagePath": "pkg/swarm"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestShouldSoftBlockBashTool",
+      "Package": "swarm",
+      "PackagePath": "pkg/swarm",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/swarm/prompts_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestBashSoftBlockGuidanceMessage_UsesBrandPrefix",
+      "Package": "swarm",
+      "PackagePath": "pkg/swarm",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/swarm/prompts_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestExecuteBashToolName",
+      "Package": "swarm",
+      "PackagePath": "pkg/swarm",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/swarm/prompts_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestDetectConsecutiveDuplicate",
+      "Package": "swarm",
+      "PackagePath": "pkg/swarm",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/swarm/prompts_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestDuplicateCallGuidanceMessage",
+      "Package": "swarm",
+      "PackagePath": "pkg/swarm",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/swarm/prompts_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestDetectContextGatheringLoop",
+      "Package": "swarm",
+      "PackagePath": "pkg/swarm",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/swarm/prompts_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestDetectRepeatingCycle",
+      "Package": "swarm",
+      "PackagePath": "pkg/swarm",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/swarm/prompts_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestIsKernelLookupTool",
+      "Package": "swarm",
+      "PackagePath": "pkg/swarm",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/swarm/prompts_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestIsContextGatheringTool",
+      "Package": "swarm",
+      "PackagePath": "pkg/swarm",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/swarm/prompts_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestInMemoryTaskQueue",
+      "Package": "swarm_test",
+      "PackagePath": "pkg/swarm",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/swarm/task_queue_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

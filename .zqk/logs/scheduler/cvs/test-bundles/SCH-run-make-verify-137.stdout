@@ -1,0 +1,127 @@
+
+--- run 2026-09-04T21:39:58Z ---
+=== RUN   TestOutputWriter_Flush
+=== PAUSE TestOutputWriter_Flush
+=== RUN   TestOutputWriter_Shutdown
+=== PAUSE TestOutputWriter_Shutdown
+=== RUN   TestOutputWriter_ConcurrentStress
+=== PAUSE TestOutputWriter_ConcurrentStress
+=== RUN   TestOutputWriter_QueueFullBackpressure
+=== PAUSE TestOutputWriter_QueueFullBackpressure
+=== RUN   TestWriterOutputHandler_Buffered
+=== PAUSE TestWriterOutputHandler_Buffered
+=== RUN   TestWriterOutputHandler_Unbuffered
+=== PAUSE TestWriterOutputHandler_Unbuffered
+=== RUN   TestStringify
+=== PAUSE TestStringify
+=== RUN   TestValidateOwnerRefPrototypeRejection
+=== PAUSE TestValidateOwnerRefPrototypeRejection
+=== RUN   TestValidateOwnerRefPrototypeRejectionEdgeCases
+=== PAUSE TestValidateOwnerRefPrototypeRejectionEdgeCases
+=== RUN   TestValidatePrototypeAccountRef
+=== PAUSE TestValidatePrototypeAccountRef
+=== CONT  TestOutputWriter_Flush
+=== CONT  TestWriterOutputHandler_Unbuffered
+--- PASS: TestWriterOutputHandler_Unbuffered (0.00s)
+=== CONT  TestOutputWriter_QueueFullBackpressure
+--- PASS: TestOutputWriter_Flush (0.02s)
+=== CONT  TestValidatePrototypeAccountRef
+=== RUN   TestValidatePrototypeAccountRef/prototype_prefix_TEST
+=== PAUSE TestValidatePrototypeAccountRef/prototype_prefix_TEST
+=== RUN   TestValidatePrototypeAccountRef/prototype_prefix_PVT
+=== PAUSE TestValidatePrototypeAccountRef/prototype_prefix_PVT
+=== RUN   TestValidatePrototypeAccountRef/prototype_prefix_DEV
+=== PAUSE TestValidatePrototypeAccountRef/prototype_prefix_DEV
+=== RUN   TestValidatePrototypeAccountRef/prototype_prefix_SBOX
+=== PAUSE TestValidatePrototypeAccountRef/prototype_prefix_SBOX
+=== RUN   TestValidatePrototypeAccountRef/prototype_prefix_MOCK
+=== PAUSE TestValidatePrototypeAccountRef/prototype_prefix_MOCK
+=== RUN   TestValidatePrototypeAccountRef/prototype_prefix_PROTOTYPER
+=== PAUSE TestValidatePrototypeAccountRef/prototype_prefix_PROTOTYPER
+=== RUN   TestValidatePrototypeAccountRef/valid_prefix_ACC
+=== PAUSE TestValidatePrototypeAccountRef/valid_prefix_ACC
+=== RUN   TestValidatePrototypeAccountRef/valid_prefix_PRI
+=== PAUSE TestValidatePrototypeAccountRef/valid_prefix_PRI
+=== RUN   TestValidatePrototypeAccountRef/valid_empty_string
+=== PAUSE TestValidatePrototypeAccountRef/valid_empty_string
+=== CONT  TestValidateOwnerRefPrototypeRejectionEdgeCases
+=== RUN   TestValidateOwnerRefPrototypeRejectionEdgeCases/empty_owner_ref_is_allowed
+=== PAUSE TestValidateOwnerRefPrototypeRejectionEdgeCases/empty_owner_ref_is_allowed
+=== RUN   TestValidateOwnerRefPrototypeRejectionEdgeCases/nil_owner_ref_is_allowed
+=== PAUSE TestValidateOwnerRefPrototypeRejectionEdgeCases/nil_owner_ref_is_allowed
+=== RUN   TestValidateOwnerRefPrototypeRejectionEdgeCases/PROTOTYPER_prefix_rejected
+=== PAUSE TestValidateOwnerRefPrototypeRejectionEdgeCases/PROTOTYPER_prefix_rejected
+=== CONT  TestValidateOwnerRefPrototypeRejection
+=== RUN   TestValidateOwnerRefPrototypeRejection/prototype_account_owner_ref_rejected
+=== PAUSE TestValidateOwnerRefPrototypeRejection/prototype_account_owner_ref_rejected
+=== RUN   TestValidateOwnerRefPrototypeRejection/proptypo_account_owner_ref_rejected
+=== PAUSE TestValidateOwnerRefPrototypeRejection/proptypo_account_owner_ref_rejected
+=== RUN   TestValidateOwnerRefPrototypeRejection/development_account_owner_ref_rejected
+=== PAUSE TestValidateOwnerRefPrototypeRejection/development_account_owner_ref_rejected
+=== RUN   TestValidateOwnerRefPrototypeRejection/sandbox_account_owner_ref_rejected
+=== PAUSE TestValidateOwnerRefPrototypeRejection/sandbox_account_owner_ref_rejected
+=== RUN   TestValidateOwnerRefPrototypeRejection/mock_account_owner_ref_rejected
+=== PAUSE TestValidateOwnerRefPrototypeRejection/mock_account_owner_ref_rejected
+=== RUN   TestValidateOwnerRefPrototypeRejection/valid_production_account_owner_ref_accepted
+=== PAUSE TestValidateOwnerRefPrototypeRejection/valid_production_account_owner_ref_accepted
+=== RUN   TestValidateOwnerRefPrototypeRejection/non-account_owner_ref_rejected
+=== PAUSE TestValidateOwnerRefPrototypeRejection/non-account_owner_ref_rejected
+=== RUN   TestValidateOwnerRefPrototypeRejection/human_string_owner_ref_rejected
+=== PAUSE TestValidateOwnerRefPrototypeRejection/human_string_owner_ref_rejected
+=== CONT  TestStringify
+--- PASS: TestStringify (0.00s)
+=== CONT  TestWriterOutputHandler_Buffered
+--- PASS: TestWriterOutputHandler_Buffered (0.00s)
+=== CONT  TestOutputWriter_ConcurrentStress
+    output_queue_test.go:586: Enqueued 100000 packets in 61.244708ms (failed: 0)
+    output_queue_test.go:587: Processed all packets in 166.134292ms
+    output_queue_test.go:588: Throughput: 601923 packets/sec
+--- PASS: TestOutputWriter_ConcurrentStress (0.18s)
+=== CONT  TestOutputWriter_Shutdown
+--- PASS: TestOutputWriter_Shutdown (0.01s)
+=== CONT  TestValidatePrototypeAccountRef/prototype_prefix_TEST
+=== CONT  TestValidatePrototypeAccountRef/prototype_prefix_PROTOTYPER
+=== CONT  TestValidatePrototypeAccountRef/valid_empty_string
+=== CONT  TestValidatePrototypeAccountRef/valid_prefix_PRI
+=== CONT  TestValidatePrototypeAccountRef/valid_prefix_ACC
+=== CONT  TestValidatePrototypeAccountRef/prototype_prefix_SBOX
+=== CONT  TestValidatePrototypeAccountRef/prototype_prefix_MOCK
+=== CONT  TestValidatePrototypeAccountRef/prototype_prefix_DEV
+=== CONT  TestValidatePrototypeAccountRef/prototype_prefix_PVT
+--- PASS: TestValidatePrototypeAccountRef (0.00s)
+    --- PASS: TestValidatePrototypeAccountRef/prototype_prefix_TEST (0.00s)
+    --- PASS: TestValidatePrototypeAccountRef/prototype_prefix_PROTOTYPER (0.00s)
+    --- PASS: TestValidatePrototypeAccountRef/valid_empty_string (0.00s)
+    --- PASS: TestValidatePrototypeAccountRef/valid_prefix_PRI (0.00s)
+    --- PASS: TestValidatePrototypeAccountRef/valid_prefix_ACC (0.00s)
+    --- PASS: TestValidatePrototypeAccountRef/prototype_prefix_SBOX (0.00s)
+    --- PASS: TestValidatePrototypeAccountRef/prototype_prefix_MOCK (0.00s)
+    --- PASS: TestValidatePrototypeAccountRef/prototype_prefix_DEV (0.00s)
+    --- PASS: TestValidatePrototypeAccountRef/prototype_prefix_PVT (0.00s)
+=== CONT  TestValidateOwnerRefPrototypeRejectionEdgeCases/empty_owner_ref_is_allowed
+=== CONT  TestValidateOwnerRefPrototypeRejectionEdgeCases/nil_owner_ref_is_allowed
+=== CONT  TestValidateOwnerRefPrototypeRejectionEdgeCases/PROTOTYPER_prefix_rejected
+--- PASS: TestValidateOwnerRefPrototypeRejectionEdgeCases (0.00s)
+    --- PASS: TestValidateOwnerRefPrototypeRejectionEdgeCases/empty_owner_ref_is_allowed (0.55s)
+    --- PASS: TestValidateOwnerRefPrototypeRejectionEdgeCases/nil_owner_ref_is_allowed (0.00s)
+    --- PASS: TestValidateOwnerRefPrototypeRejectionEdgeCases/PROTOTYPER_prefix_rejected (0.00s)
+=== CONT  TestValidateOwnerRefPrototypeRejection/prototype_account_owner_ref_rejected
+=== CONT  TestValidateOwnerRefPrototypeRejection/mock_account_owner_ref_rejected
+=== CONT  TestValidateOwnerRefPrototypeRejection/human_string_owner_ref_rejected
+=== CONT  TestValidateOwnerRefPrototypeRejection/non-account_owner_ref_rejected
+=== CONT  TestValidateOwnerRefPrototypeRejection/valid_production_account_owner_ref_accepted
+=== CONT  TestValidateOwnerRefPrototypeRejection/development_account_owner_ref_rejected
+=== CONT  TestValidateOwnerRefPrototypeRejection/sandbox_account_owner_ref_rejected
+=== CONT  TestValidateOwnerRefPrototypeRejection/proptypo_account_owner_ref_rejected
+--- PASS: TestValidateOwnerRefPrototypeRejection (0.00s)
+    --- PASS: TestValidateOwnerRefPrototypeRejection/prototype_account_owner_ref_rejected (0.00s)
+    --- PASS: TestValidateOwnerRefPrototypeRejection/mock_account_owner_ref_rejected (0.00s)
+    --- PASS: TestValidateOwnerRefPrototypeRejection/human_string_owner_ref_rejected (0.00s)
+    --- PASS: TestValidateOwnerRefPrototypeRejection/non-account_owner_ref_rejected (0.00s)
+    --- PASS: TestValidateOwnerRefPrototypeRejection/valid_production_account_owner_ref_accepted (0.00s)
+    --- PASS: TestValidateOwnerRefPrototypeRejection/development_account_owner_ref_rejected (0.00s)
+    --- PASS: TestValidateOwnerRefPrototypeRejection/sandbox_account_owner_ref_rejected (0.00s)
+    --- PASS: TestValidateOwnerRefPrototypeRejection/proptypo_account_owner_ref_rejected (0.00s)
+--- PASS: TestOutputWriter_QueueFullBackpressure (10.16s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/validation	10.755s

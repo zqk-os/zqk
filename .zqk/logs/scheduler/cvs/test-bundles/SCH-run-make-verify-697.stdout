@@ -1,0 +1,54 @@
+
+--- run 2026-09-04T22:20:14Z ---
+=== RUN   TestStaleHashInValidationCache
+=== PAUSE TestStaleHashInValidationCache
+=== RUN   TestCollectResultsForCompletion_UsesCacheHitSnapshot
+=== PAUSE TestCollectResultsForCompletion_UsesCacheHitSnapshot
+=== RUN   TestCollectResultsForCompletion_MissingStateIsNotClean
+=== PAUSE TestCollectResultsForCompletion_MissingStateIsNotClean
+=== RUN   TestWriteLayeredSummary_NonPreliminaryIssuesInActiveLayer1
+=== PAUSE TestWriteLayeredSummary_NonPreliminaryIssuesInActiveLayer1
+=== RUN   TestWriteLayeredSummary_IdentifiedIssuesStayInMembraneLayer1
+=== PAUSE TestWriteLayeredSummary_IdentifiedIssuesStayInMembraneLayer1
+=== RUN   TestCollectResultsForCompletion_UsesCachedStateOlderThanMaxAge
+=== PAUSE TestCollectResultsForCompletion_UsesCachedStateOlderThanMaxAge
+=== RUN   TestNewCheckCmd
+=== PAUSE TestNewCheckCmd
+=== RUN   TestCheckCommandFlags
+=== PAUSE TestCheckCommandFlags
+=== RUN   TestCheckCommandRegistration
+=== PAUSE TestCheckCommandRegistration
+=== RUN   TestRequireCliHooksArgs
+=== PAUSE TestRequireCliHooksArgs
+=== CONT  TestStaleHashInValidationCache
+=== CONT  TestCollectResultsForCompletion_UsesCachedStateOlderThanMaxAge
+--- PASS: TestCollectResultsForCompletion_UsesCachedStateOlderThanMaxAge (0.01s)
+=== CONT  TestCheckCommandRegistration
+--- PASS: TestCheckCommandRegistration (0.00s)
+=== CONT  TestRequireCliHooksArgs
+--- PASS: TestRequireCliHooksArgs (0.00s)
+=== CONT  TestWriteLayeredSummary_NonPreliminaryIssuesInActiveLayer1
+--- PASS: TestWriteLayeredSummary_NonPreliminaryIssuesInActiveLayer1 (0.00s)
+=== CONT  TestWriteLayeredSummary_IdentifiedIssuesStayInMembraneLayer1
+--- PASS: TestWriteLayeredSummary_IdentifiedIssuesStayInMembraneLayer1 (0.00s)
+=== CONT  TestCheckCommandFlags
+--- PASS: TestCheckCommandFlags (0.00s)
+=== CONT  TestNewCheckCmd
+--- PASS: TestNewCheckCmd (0.00s)
+=== CONT  TestCollectResultsForCompletion_MissingStateIsNotClean
+=== NAME  TestStaleHashInValidationCache
+    check_stale_hash_test.go:61: Step 2: Registered original hash: 3df931595181d8c8
+    check_stale_hash_test.go:88: Step 3: File modified, new hash: 144d44648a821df7
+--- PASS: TestCollectResultsForCompletion_MissingStateIsNotClean (0.00s)
+=== CONT  TestCollectResultsForCompletion_UsesCacheHitSnapshot
+--- PASS: TestCollectResultsForCompletion_UsesCacheHitSnapshot (0.00s)
+=== NAME  TestStaleHashInValidationCache
+    check_stale_hash_test.go:102: Step 4: Updated registry with new hash: 144d44648a821df7
+    check_stale_hash_test.go:115: Step 5: Verified registry has correct hash: 144d44648a821df7
+    check_stale_hash_test.go:128: Step 7: Validation sees correct hash: 144d44648a821df7
+    check_stale_hash_test.go:136: ✅ Test passed: No hash mismatch detected
+    check_stale_hash_test.go:137:    Registry hash: 144d44648a821df7
+    check_stale_hash_test.go:138:    File hash: 144d44648a821df7
+--- PASS: TestStaleHashInValidationCache (0.04s)
+PASS
+ok  	github.com/lanceman/zqk/cmd/zqk/system	0.797s

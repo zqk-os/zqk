@@ -1,0 +1,44 @@
+
+--- run 2026-09-04T22:11:44Z ---
+=== RUN   TestAppendStewardEnqueueRecord_roundTripPathSegments
+=== PAUSE TestAppendStewardEnqueueRecord_roundTripPathSegments
+=== RUN   TestDrainStewardEnqueueLog_removesFile
+=== PAUSE TestDrainStewardEnqueueLog_removesFile
+=== RUN   TestAppendStewardEnqueueRecord_appendsMetricsJSONLWhenRecordingEnabled
+=== PAUSE TestAppendStewardEnqueueRecord_appendsMetricsJSONLWhenRecordingEnabled
+=== RUN   TestDrainStewardEnqueueLog_metricsDrainRow
+=== PAUSE TestDrainStewardEnqueueLog_metricsDrainRow
+=== RUN   TestStreamOrganism_OperationalEnvelopeCoversKnownProfiles
+=== PAUSE TestStreamOrganism_OperationalEnvelopeCoversKnownProfiles
+=== RUN   TestStreamOrganism_FilterDescriptorsByStorageProfile
+=== PAUSE TestStreamOrganism_FilterDescriptorsByStorageProfile
+=== RUN   TestStreamOrganism_ContractMatchesDescriptorProfiles
+=== PAUSE TestStreamOrganism_ContractMatchesDescriptorProfiles
+=== RUN   TestStreamOrganism_SpecIndexRegistryAndStreamAlignment
+=== PAUSE TestStreamOrganism_SpecIndexRegistryAndStreamAlignment
+=== RUN   TestStreamOrganism_RuntimeOrganismPathsAndManifest
+=== PAUSE TestStreamOrganism_RuntimeOrganismPathsAndManifest
+=== RUN   TestStreamOrganism_HighVolumeKindsYAMLAgreesWithSpecIndex
+=== PAUSE TestStreamOrganism_HighVolumeKindsYAMLAgreesWithSpecIndex
+=== CONT  TestAppendStewardEnqueueRecord_roundTripPathSegments
+=== CONT  TestStreamOrganism_FilterDescriptorsByStorageProfile
+--- PASS: TestAppendStewardEnqueueRecord_roundTripPathSegments (0.00s)
+=== CONT  TestDrainStewardEnqueueLog_metricsDrainRow
+--- PASS: TestStreamOrganism_FilterDescriptorsByStorageProfile (0.01s)
+=== CONT  TestStreamOrganism_OperationalEnvelopeCoversKnownProfiles
+--- PASS: TestStreamOrganism_OperationalEnvelopeCoversKnownProfiles (0.00s)
+=== CONT  TestStreamOrganism_RuntimeOrganismPathsAndManifest
+--- PASS: TestStreamOrganism_RuntimeOrganismPathsAndManifest (0.01s)
+=== CONT  TestStreamOrganism_HighVolumeKindsYAMLAgreesWithSpecIndex
+--- PASS: TestDrainStewardEnqueueLog_metricsDrainRow (0.01s)
+=== CONT  TestAppendStewardEnqueueRecord_appendsMetricsJSONLWhenRecordingEnabled
+--- PASS: TestStreamOrganism_HighVolumeKindsYAMLAgreesWithSpecIndex (0.01s)
+=== CONT  TestDrainStewardEnqueueLog_removesFile
+--- PASS: TestAppendStewardEnqueueRecord_appendsMetricsJSONLWhenRecordingEnabled (0.01s)
+=== CONT  TestStreamOrganism_SpecIndexRegistryAndStreamAlignment
+--- PASS: TestDrainStewardEnqueueLog_removesFile (0.01s)
+=== CONT  TestStreamOrganism_ContractMatchesDescriptorProfiles
+--- PASS: TestStreamOrganism_SpecIndexRegistryAndStreamAlignment (0.01s)
+--- PASS: TestStreamOrganism_ContractMatchesDescriptorProfiles (0.00s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/datacell	0.607s

@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-673",
+  "created_at": "2026-09-04T21:34:34.036419Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-673",
+    "Tests": [
+      {
+        "Name": "TestParseHumanLogClusters",
+        "Package": "system",
+        "PackagePath": "cmd/zqk/system",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/system/metrics_feed_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestRunMigrateCas_EmptyProjectRoot",
+        "Package": "system",
+        "PackagePath": "cmd/zqk/system",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/system/migrate_cas_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestRunMigrateCas_WithTestEnvironment",
+        "Package": "system",
+        "PackagePath": "cmd/zqk/system",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/system/migrate_cas_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestPublicCandidateGeneration",
+        "Package": "system",
+        "PackagePath": "cmd/zqk/system",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/system/public_candidate_validation_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestIsRepairCASCorruptionTSVHeader",
+        "Package": "system",
+        "PackagePath": "cmd/zqk/system",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/system/repair_cas_corruption_tsv_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestParseRepairCASCorruptionTSVLine",
+        "Package": "system",
+        "PackagePath": "cmd/zqk/system",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/system/repair_cas_corruption_tsv_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestExtractFieldsFromCorruptedYAML_BodyBlock_MetadataOK",
+        "Package": "system",
+        "PackagePath": "cmd/zqk/system",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/system/repair_yaml_extract_fields_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestExtractFieldsFromCorruptedYAML_BodyBlock_MetadataFallback",
+        "Package": "system",
+        "PackagePath": "cmd/zqk/system",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/system/repair_yaml_extract_fields_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestExtractFieldsFromCorruptedYAML_NoBody_ParsesNormally",
+        "Package": "system",
+        "PackagePath": "cmd/zqk/system",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/system/repair_yaml_extract_fields_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestExtractFieldsFromCorruptedYAML_NoBody_GitConflictMarkers",
+        "Package": "system",
+        "PackagePath": "cmd/zqk/system",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/system/repair_yaml_extract_fields_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 300000000000,
+    "PackagePath": "cmd/zqk/system"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestParseHumanLogClusters",
+      "Package": "system",
+      "PackagePath": "cmd/zqk/system",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/system/metrics_feed_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestRunMigrateCas_EmptyProjectRoot",
+      "Package": "system",
+      "PackagePath": "cmd/zqk/system",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/system/migrate_cas_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestRunMigrateCas_WithTestEnvironment",
+      "Package": "system",
+      "PackagePath": "cmd/zqk/system",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/system/migrate_cas_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestPublicCandidateGeneration",
+      "Package": "system",
+      "PackagePath": "cmd/zqk/system",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/system/public_candidate_validation_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestIsRepairCASCorruptionTSVHeader",
+      "Package": "system",
+      "PackagePath": "cmd/zqk/system",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/system/repair_cas_corruption_tsv_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestParseRepairCASCorruptionTSVLine",
+      "Package": "system",
+      "PackagePath": "cmd/zqk/system",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/system/repair_cas_corruption_tsv_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestExtractFieldsFromCorruptedYAML_BodyBlock_MetadataOK",
+      "Package": "system",
+      "PackagePath": "cmd/zqk/system",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/system/repair_yaml_extract_fields_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestExtractFieldsFromCorruptedYAML_BodyBlock_MetadataFallback",
+      "Package": "system",
+      "PackagePath": "cmd/zqk/system",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/system/repair_yaml_extract_fields_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestExtractFieldsFromCorruptedYAML_NoBody_ParsesNormally",
+      "Package": "system",
+      "PackagePath": "cmd/zqk/system",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/system/repair_yaml_extract_fields_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestExtractFieldsFromCorruptedYAML_NoBody_GitConflictMarkers",
+      "Package": "system",
+      "PackagePath": "cmd/zqk/system",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/system/repair_yaml_extract_fields_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

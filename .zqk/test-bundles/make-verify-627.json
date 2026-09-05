@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-627",
+  "created_at": "2026-09-04T21:34:33.590646Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-627",
+    "Tests": [
+      {
+        "Name": "TestCreatedAtInclusiveWindow",
+        "Package": "audit",
+        "PackagePath": "pkg/storage/audit",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/audit/query_filters_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestWithStatusIn",
+        "Package": "audit",
+        "PackagePath": "pkg/storage/audit",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/audit/query_filters_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestMergeFiltersArchivedBefore",
+        "Package": "audit",
+        "PackagePath": "pkg/storage/audit",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/audit/query_filters_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestCollectIDsAndExactWindow",
+        "Package": "audit",
+        "PackagePath": "pkg/storage/audit",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/audit/query_filters_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestWindowStatusFilters",
+        "Package": "audit",
+        "PackagePath": "pkg/storage/audit",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/audit/query_filters_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestEventsOldestFirst",
+        "Package": "audit",
+        "PackagePath": "pkg/storage/audit",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/audit/query_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestEventsNewestFirstAndFirstMatch",
+        "Package": "audit",
+        "PackagePath": "pkg/storage/audit",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/audit/query_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestLimitedAndFirstObject",
+        "Package": "audit",
+        "PackagePath": "pkg/storage/audit",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/audit/query_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestObjectQueryReceivesListQuery",
+        "Package": "audit",
+        "PackagePath": "pkg/storage/audit",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/audit/query_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestRecordPersistOutcomeDuplicate",
+        "Package": "audit",
+        "PackagePath": "pkg/storage/audit",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/audit/recorder_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": true,
+    "EstimatedDuration": 900000000000,
+    "PackagePath": "pkg/storage/audit"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestCreatedAtInclusiveWindow",
+      "Package": "audit",
+      "PackagePath": "pkg/storage/audit",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/audit/query_filters_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestWithStatusIn",
+      "Package": "audit",
+      "PackagePath": "pkg/storage/audit",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/audit/query_filters_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestMergeFiltersArchivedBefore",
+      "Package": "audit",
+      "PackagePath": "pkg/storage/audit",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/audit/query_filters_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestCollectIDsAndExactWindow",
+      "Package": "audit",
+      "PackagePath": "pkg/storage/audit",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/audit/query_filters_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestWindowStatusFilters",
+      "Package": "audit",
+      "PackagePath": "pkg/storage/audit",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/audit/query_filters_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestEventsOldestFirst",
+      "Package": "audit",
+      "PackagePath": "pkg/storage/audit",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/audit/query_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestEventsNewestFirstAndFirstMatch",
+      "Package": "audit",
+      "PackagePath": "pkg/storage/audit",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/audit/query_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestLimitedAndFirstObject",
+      "Package": "audit",
+      "PackagePath": "pkg/storage/audit",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/audit/query_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestObjectQueryReceivesListQuery",
+      "Package": "audit",
+      "PackagePath": "pkg/storage/audit",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/audit/query_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestRecordPersistOutcomeDuplicate",
+      "Package": "audit",
+      "PackagePath": "pkg/storage/audit",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/audit/recorder_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    }
+  }
+}

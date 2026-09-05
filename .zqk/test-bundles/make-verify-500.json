@@ -1,0 +1,123 @@
+{
+  "name": "make-verify-500",
+  "created_at": "2026-09-04T21:34:32.310329Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-500",
+    "Tests": [
+      {
+        "Name": "TestGetTestConfig_NoEnv",
+        "Package": "testing",
+        "PackagePath": "pkg/testing",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/testing/config_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestGetTestConfig_WithTestRoot",
+        "Package": "testing",
+        "PackagePath": "pkg/testing",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/testing/config_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestGetTestConfig_WithTestDataDir",
+        "Package": "testing",
+        "PackagePath": "pkg/testing",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/testing/config_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestGetMinTimeoutSecondsForPackage_Defaults",
+        "Package": "testing",
+        "PackagePath": "pkg/testing",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/testing/package_timeouts_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestGetMinTimeoutSecondsForPackage_ConfigOverride",
+        "Package": "testing",
+        "PackagePath": "pkg/testing",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/testing/package_timeouts_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestGetMinTimeoutSecondsForPackage_LongestMatch",
+        "Package": "testing",
+        "PackagePath": "pkg/testing",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/testing/package_timeouts_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 180000000000,
+    "PackagePath": "pkg/testing"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestGetTestConfig_NoEnv",
+      "Package": "testing",
+      "PackagePath": "pkg/testing",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/testing/config_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestGetTestConfig_WithTestRoot",
+      "Package": "testing",
+      "PackagePath": "pkg/testing",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/testing/config_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestGetTestConfig_WithTestDataDir",
+      "Package": "testing",
+      "PackagePath": "pkg/testing",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/testing/config_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestGetMinTimeoutSecondsForPackage_Defaults",
+      "Package": "testing",
+      "PackagePath": "pkg/testing",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/testing/package_timeouts_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestGetMinTimeoutSecondsForPackage_ConfigOverride",
+      "Package": "testing",
+      "PackagePath": "pkg/testing",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/testing/package_timeouts_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestGetMinTimeoutSecondsForPackage_LongestMatch",
+      "Package": "testing",
+      "PackagePath": "pkg/testing",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/testing/package_timeouts_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

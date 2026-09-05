@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-556",
+  "created_at": "2026-09-04T21:34:32.857439Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-556",
+    "Tests": [
+      {
+        "Name": "TestContextRefreshHandler_Execute_WithPolicies",
+        "Package": "scheduler",
+        "PackagePath": "pkg/scheduler",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/scheduler/handlers_context_refresh_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestContextRefreshHandler_Execute_StorageError",
+        "Package": "scheduler",
+        "PackagePath": "pkg/scheduler",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/scheduler/handlers_context_refresh_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestContextRefreshHandler_Execute_PolicyWithoutID",
+        "Package": "scheduler",
+        "PackagePath": "pkg/scheduler",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/scheduler/handlers_context_refresh_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestHandlerFactory_CreateHandler_ContextRefresh",
+        "Package": "scheduler",
+        "PackagePath": "pkg/scheduler",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/scheduler/handlers_context_refresh_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestWithZQKJobIDEnv_IncludesJobID",
+        "Package": "scheduler",
+        "PackagePath": "pkg/scheduler",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/scheduler/handlers_object_validation_env_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestRetentionArchiveCandidate",
+        "Package": "scheduler",
+        "PackagePath": "pkg/scheduler",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/scheduler/handlers_retention_archive_promote_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestRetentionCleanup_Smoke",
+        "Package": "scheduler",
+        "PackagePath": "pkg/scheduler",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/scheduler/handlers_retention_cleanup_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestSkipArchiveForOldestIDsPath",
+        "Package": "scheduler",
+        "PackagePath": "pkg/scheduler",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/scheduler/handlers_retention_tolerance_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestGetBatchConfig",
+        "Package": "scheduler",
+        "PackagePath": "pkg/scheduler",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/scheduler/handlers_retention_tolerance_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestErrObjectOverfill",
+        "Package": "scheduler",
+        "PackagePath": "pkg/scheduler",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/scheduler/handlers_retention_tolerance_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": true,
+    "EstimatedDuration": 300000000000,
+    "PackagePath": "pkg/scheduler"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestContextRefreshHandler_Execute_WithPolicies",
+      "Package": "scheduler",
+      "PackagePath": "pkg/scheduler",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/scheduler/handlers_context_refresh_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestContextRefreshHandler_Execute_StorageError",
+      "Package": "scheduler",
+      "PackagePath": "pkg/scheduler",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/scheduler/handlers_context_refresh_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestContextRefreshHandler_Execute_PolicyWithoutID",
+      "Package": "scheduler",
+      "PackagePath": "pkg/scheduler",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/scheduler/handlers_context_refresh_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestHandlerFactory_CreateHandler_ContextRefresh",
+      "Package": "scheduler",
+      "PackagePath": "pkg/scheduler",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/scheduler/handlers_context_refresh_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestWithZQKJobIDEnv_IncludesJobID",
+      "Package": "scheduler",
+      "PackagePath": "pkg/scheduler",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/scheduler/handlers_object_validation_env_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestRetentionArchiveCandidate",
+      "Package": "scheduler",
+      "PackagePath": "pkg/scheduler",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/scheduler/handlers_retention_archive_promote_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestRetentionCleanup_Smoke",
+      "Package": "scheduler",
+      "PackagePath": "pkg/scheduler",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/scheduler/handlers_retention_cleanup_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestSkipArchiveForOldestIDsPath",
+      "Package": "scheduler",
+      "PackagePath": "pkg/scheduler",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/scheduler/handlers_retention_tolerance_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestGetBatchConfig",
+      "Package": "scheduler",
+      "PackagePath": "pkg/scheduler",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/scheduler/handlers_retention_tolerance_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestErrObjectOverfill",
+      "Package": "scheduler",
+      "PackagePath": "pkg/scheduler",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/scheduler/handlers_retention_tolerance_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

@@ -1,0 +1,78 @@
+
+--- run 2026-09-04T21:41:14Z ---
+=== RUN   TestMCPEventSubscriber_LifetimeCounters
+=== PAUSE TestMCPEventSubscriber_LifetimeCounters
+=== RUN   TestMCPEventSubscriber_FeedSteerToActionRequired
+=== PAUSE TestMCPEventSubscriber_FeedSteerToActionRequired
+=== RUN   TestEventEmitterAdapter_EmitsTypedEvent
+=== PAUSE TestEventEmitterAdapter_EmitsTypedEvent
+=== RUN   TestResolveDaemonTCP
+=== PAUSE TestResolveDaemonTCP
+=== RUN   TestGitStashGuardOverDocsProcess
+=== PAUSE TestGitStashGuardOverDocsProcess
+=== RUN   TestParseReference
+=== PAUSE TestParseReference
+=== RUN   TestInferKindFromID
+=== PAUSE TestInferKindFromID
+=== RUN   TestInProcessCLIRunner_WhenSet_ServerUsesIt
+=== PAUSE TestInProcessCLIRunner_WhenSet_ServerUsesIt
+=== RUN   TestIsForeignMCPConfig
+=== PAUSE TestIsForeignMCPConfig
+=== RUN   TestInstallToIDE_skipsEmptyGeminiConfig
+=== PAUSE TestInstallToIDE_skipsEmptyGeminiConfig
+=== CONT  TestMCPEventSubscriber_LifetimeCounters
+=== CONT  TestParseReference
+=== RUN   TestParseReference/goal:GOAL-123
+=== RUN   TestParseReference/milestone:MIL-456
+=== RUN   TestParseReference/BLI-623
+=== RUN   TestParseReference/#00
+=== RUN   TestParseReference/invalid
+--- PASS: TestParseReference (0.00s)
+    --- PASS: TestParseReference/goal:GOAL-123 (0.00s)
+    --- PASS: TestParseReference/milestone:MIL-456 (0.00s)
+    --- PASS: TestParseReference/BLI-623 (0.00s)
+    --- PASS: TestParseReference/#00 (0.00s)
+    --- PASS: TestParseReference/invalid (0.00s)
+=== CONT  TestIsForeignMCPConfig
+--- PASS: TestIsForeignMCPConfig (0.00s)
+=== CONT  TestInstallToIDE_skipsEmptyGeminiConfig
+--- PASS: TestMCPEventSubscriber_LifetimeCounters (0.00s)
+=== CONT  TestResolveDaemonTCP
+--- PASS: TestResolveDaemonTCP (0.00s)
+=== CONT  TestGitStashGuardOverDocsProcess
+--- PASS: TestGitStashGuardOverDocsProcess (0.00s)
+=== CONT  TestEventEmitterAdapter_EmitsTypedEvent
+--- PASS: TestEventEmitterAdapter_EmitsTypedEvent (0.00s)
+=== CONT  TestInProcessCLIRunner_WhenSet_ServerUsesIt
+--- PASS: TestInProcessCLIRunner_WhenSet_ServerUsesIt (0.00s)
+=== CONT  TestMCPEventSubscriber_FeedSteerToActionRequired
+--- PASS: TestMCPEventSubscriber_FeedSteerToActionRequired (0.00s)
+=== CONT  TestInferKindFromID
+=== RUN   TestInferKindFromID/BLI-623
+=== RUN   TestInferKindFromID/MIL-001
+=== RUN   TestInferKindFromID/GOAL-123
+=== RUN   TestInferKindFromID/WS-001
+=== RUN   TestInferKindFromID/PRI-001
+=== RUN   TestInferKindFromID/REQ-001
+=== RUN   TestInferKindFromID/TEST-001
+=== RUN   TestInferKindFromID/CRIT-001
+=== RUN   TestInferKindFromID/DEC-001
+=== RUN   TestInferKindFromID/ROAD-001
+=== RUN   TestInferKindFromID/UNKNOWN-001
+=== RUN   TestInferKindFromID/#00
+--- PASS: TestInferKindFromID (0.00s)
+    --- PASS: TestInferKindFromID/BLI-623 (0.00s)
+    --- PASS: TestInferKindFromID/MIL-001 (0.00s)
+    --- PASS: TestInferKindFromID/GOAL-123 (0.00s)
+    --- PASS: TestInferKindFromID/WS-001 (0.00s)
+    --- PASS: TestInferKindFromID/PRI-001 (0.00s)
+    --- PASS: TestInferKindFromID/REQ-001 (0.00s)
+    --- PASS: TestInferKindFromID/TEST-001 (0.00s)
+    --- PASS: TestInferKindFromID/CRIT-001 (0.00s)
+    --- PASS: TestInferKindFromID/DEC-001 (0.00s)
+    --- PASS: TestInferKindFromID/ROAD-001 (0.00s)
+    --- PASS: TestInferKindFromID/UNKNOWN-001 (0.00s)
+    --- PASS: TestInferKindFromID/#00 (0.00s)
+--- PASS: TestInstallToIDE_skipsEmptyGeminiConfig (0.00s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/mcp	0.725s

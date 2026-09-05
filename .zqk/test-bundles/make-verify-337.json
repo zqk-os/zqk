@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-337",
+  "created_at": "2026-09-04T21:34:30.704354Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-337",
+    "Tests": [
+      {
+        "Name": "TestEnsureOrchestrationWorktree_retargetsStaleAgentBranch",
+        "Package": "agent",
+        "PackagePath": "cmd/zqk/agent",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/agent/orchestrate_reuse_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestWaitForAgentTaskReadableDraftPlane",
+        "Package": "agent",
+        "PackagePath": "cmd/zqk/agent",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/agent/orchestrate_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestRecoverCmd_MissingArgs",
+        "Package": "agent",
+        "PackagePath": "cmd/zqk/agent",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/agent/recover_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestRecoverCmd_WithArg",
+        "Package": "agent",
+        "PackagePath": "cmd/zqk/agent",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/agent/recover_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestScoreboardCmd",
+        "Package": "agent",
+        "PackagePath": "cmd/zqk/agent",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/agent/scoreboard_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestRecentFillSubmit_cooldown",
+        "Package": "agent",
+        "PackagePath": "cmd/zqk/agent",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/agent/seat_worker_fill_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestVerifyGoWorkAsCompletion_rejectsCodeThatDoesNotCompile",
+        "Package": "agent",
+        "PackagePath": "cmd/zqk/agent",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/agent/seat_worker_gate_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestVerifyGoWorkAsCompletion_rejectsFailingTests",
+        "Package": "agent",
+        "PackagePath": "cmd/zqk/agent",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/agent/seat_worker_gate_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestVerifyGoWorkAsCompletion_acceptsWorkingCode",
+        "Package": "agent",
+        "PackagePath": "cmd/zqk/agent",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/agent/seat_worker_gate_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestRevertSeatWrites_removesCreatedAndRestoresTracked",
+        "Package": "agent",
+        "PackagePath": "cmd/zqk/agent",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/agent/seat_worker_gate_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 300000000000,
+    "PackagePath": "cmd/zqk/agent"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestEnsureOrchestrationWorktree_retargetsStaleAgentBranch",
+      "Package": "agent",
+      "PackagePath": "cmd/zqk/agent",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/agent/orchestrate_reuse_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestWaitForAgentTaskReadableDraftPlane",
+      "Package": "agent",
+      "PackagePath": "cmd/zqk/agent",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/agent/orchestrate_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestRecoverCmd_MissingArgs",
+      "Package": "agent",
+      "PackagePath": "cmd/zqk/agent",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/agent/recover_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestRecoverCmd_WithArg",
+      "Package": "agent",
+      "PackagePath": "cmd/zqk/agent",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/agent/recover_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestScoreboardCmd",
+      "Package": "agent",
+      "PackagePath": "cmd/zqk/agent",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/agent/scoreboard_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestRecentFillSubmit_cooldown",
+      "Package": "agent",
+      "PackagePath": "cmd/zqk/agent",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/agent/seat_worker_fill_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestVerifyGoWorkAsCompletion_rejectsCodeThatDoesNotCompile",
+      "Package": "agent",
+      "PackagePath": "cmd/zqk/agent",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/agent/seat_worker_gate_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestVerifyGoWorkAsCompletion_rejectsFailingTests",
+      "Package": "agent",
+      "PackagePath": "cmd/zqk/agent",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/agent/seat_worker_gate_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestVerifyGoWorkAsCompletion_acceptsWorkingCode",
+      "Package": "agent",
+      "PackagePath": "cmd/zqk/agent",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/agent/seat_worker_gate_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestRevertSeatWrites_removesCreatedAndRestoresTracked",
+      "Package": "agent",
+      "PackagePath": "cmd/zqk/agent",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/agent/seat_worker_gate_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

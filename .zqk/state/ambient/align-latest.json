@@ -1,0 +1,542 @@
+{
+  "alignment": {
+    "alignment_score": 94.64,
+    "goal_work": {
+      "goal_coverage_pct": 94.64,
+      "items_with_goals": 1059,
+      "items_without_goals": 60,
+      "total_work_items": 1119
+    }
+  },
+  "alignment_score": 94.64,
+  "gaps_sample": [
+    {
+      "created_at": "2026-06-24T20:15:33Z",
+      "created_by": "ACC-1785920548450214012-68b850c0",
+      "description": "Implement pkg/llm API bindings for foundation models with structured JSON-schema tool calling support.",
+      "estimated_effort": "2 days",
+      "id": "BLI-1782332133353820000-6d99a4b7",
+      "kind": "backlog_item",
+      "milestone_refs": [
+        "MIL-038"
+      ],
+      "namespace_id": "zqk:kernel",
+      "persona_refs": [
+        "PER-1781248465963709000-9925efbe"
+      ],
+      "priority": "high",
+      "problem_statement": "Implement pkg/llm API bindings for foundation models with structured JSON-schema tool calling support.",
+      "schema_version": "2.0.0",
+      "status": "archived",
+      "title": "Native LLM Engine Foundation",
+      "updated_at": "2026-08-19T04:51:27Z",
+      "updated_by": "ACC-1785920548450214012-68b850c0",
+      "version_context": "default"
+    },
+    {
+      "created_at": "2026-06-24T20:15:33Z",
+      "created_by": "ACC-1785920548450214012-68b850c0",
+      "description": "Allow the Go LLM engine to securely execute local terminal commands and file edits natively.",
+      "estimated_effort": "2 days",
+      "id": "BLI-1782332133353840000-9cce8730",
+      "kind": "backlog_item",
+      "milestone_refs": [
+        "MIL-038"
+      ],
+      "namespace_id": "zqk:kernel",
+      "persona_refs": [
+        "PER-1781248465963709000-9925efbe"
+      ],
+      "priority": "high",
+      "problem_statement": "Allow the Go LLM engine to securely execute local terminal commands and file edits natively.",
+      "schema_version": "2.0.0",
+      "status": "archived",
+      "title": "Native MCP Execution Client",
+      "updated_at": "2026-08-19T04:51:29Z",
+      "updated_by": "ACC-1785920548450214012-68b850c0",
+      "version_context": "default"
+    },
+    {
+      "created_at": "2026-06-24T20:15:33Z",
+      "created_by": "ACC-1785920548450214012-68b850c0",
+      "description": "Update the daemon to poll for queued agent tasks and natively spawn the Swarm Worker goroutines.",
+      "estimated_effort": "2 days",
+      "id": "BLI-1782332133353846000-1bce9b2b",
+      "kind": "backlog_item",
+      "milestone_refs": [
+        "MIL-038"
+      ],
+      "namespace_id": "zqk:kernel",
+      "persona_refs": [
+        "PER-1781248465963709000-9925efbe"
+      ],
+      "priority": "medium",
+      "priority_tier": "P2",
+      "problem_statement": "Update the daemon to poll for queued agent tasks and natively spawn the Swarm Worker goroutines.",
+      "schema_version": "2.0.0",
+      "status": "archived",
+      "title": "Scheduler Daemon Swarm Integration",
+      "updated_at": "2026-08-19T04:52:18Z",
+      "updated_by": "ACC-1785920548450214012-68b850c0",
+      "version_context": "default"
+    },
+    {
+      "created_at": "2026-06-24T20:15:33Z",
+      "created_by": "ACC-1785920548450214012-68b850c0",
+      "description": "Ensure subagents operate under scoped account:agent:swarm-worker credentials.",
+      "estimated_effort": "2 days",
+      "id": "BLI-1782332133353850000-208e283a",
+      "kind": "backlog_item",
+      "milestone_refs": [
+        "MIL-038"
+      ],
+      "namespace_id": "zqk:kernel",
+      "persona_refs": [
+        "PER-1781248465963709000-9925efbe"
+      ],
+      "priority": "medium",
+      "priority_plan_ref": "PRI-GROOM-KERNEL-RELIABILITY-RESIDUAL-001",
+      "priority_tier": "P2",
+      "problem_statement": "Ensure subagents operate under scoped account:agent:swarm-worker credentials.",
+      "schema_version": "2.0.0",
+      "status": "archived",
+      "title": "Enforce RBAC for Native Swarm Workers",
+      "updated_at": "2026-08-19T04:53:04Z",
+      "updated_by": "ACC-1785920548450214012-68b850c0",
+      "version_context": "default"
+    },
+    {
+      "category": "Architecture",
+      "created_at": "2026-06-25T02:43:52Z",
+      "created_by": "ACC-1785920548450214012-68b850c0",
+      "description": "Implement the cognitive run loop bridging the LLM Client and MCP Executor for recursive tool execution.",
+      "estimated_effort": "2 days",
+      "id": "BLI-1782355432022941000-14bbe7e5",
+      "kind": "backlog_item",
+      "milestone_refs": [
+        "MIL-038"
+      ],
+      "namespace_id": "zqk:kernel",
+      "persona_refs": [
+        "PER-1781248465963709000-9925efbe"
+      ],
+      "priority": "medium",
+      "problem_statement": "Implement the cognitive run loop bridging the LLM Client and MCP Executor for recursive tool execution.",
+      "schema_version": "2.0.0",
+      "status": "archived",
+      "title": "Native Swarm Engine Run Loop",
+      "updated_at": "2026-08-19T04:51:25Z",
+      "updated_by": "ACC-1785920548450214012-68b850c0",
+      "version_context": "default"
+    },
+    {
+      "category": "Quality",
+      "commit_refs": [
+        "33a4363f5d"
+      ],
+      "created_at": "2026-06-25T02:58:58Z",
+      "created_by": "ACC-1785920548450214012-68b850c0",
+      "description": "Ensure make verify and integration tests properly teardown orphaned zqk scheduler foreground processes.",
+      "estimated_effort": "2 days",
+      "id": "BLI-1782356338791655000-75242080",
+      "kind": "backlog_item",
+      "milestone_refs": [
+        "MIL-038"
+      ],
+      "namespace_id": "zqk:kernel",
+      "persona_refs": [
+        "PER-1781248465963709000-9925efbe"
+      ],
+      "priority": "medium",
+      "priority_tier": "P0",
+      "problem_statement": "Ensure make verify and integration tests properly teardown orphaned zqk scheduler foreground processes.",
+      "schema_version": "2.0.0",
+      "status": "archived",
+      "title": "Harden Integration Test Teardown",
+      "updated_at": "2026-08-19T04:52:00Z",
+      "updated_by": "ACC-1785920548450214012-68b850c0",
+      "version_context": "default"
+    },
+    {
+      "category": "Architecture",
+      "commit_refs": [
+        "1111222233334444555566667777888899990000"
+      ],
+      "created_at": "2026-06-25T03:36:02Z",
+      "created_by": "ACC-1785920548450214012-68b850c0",
+      "description": "Implement task-specific process names or identifiers for the scheduler daemon to allow targeted teardowns during tests without friendly fire.",
+      "effort_variance": 0,
+      "estimated_effort": "2 days",
+      "id": "BLI-1782358562824147000-618f24d8",
+      "kind": "backlog_item",
+      "milestone_refs": [
+        "MIL-038"
+      ],
+      "namespace_id": "zqk:kernel",
+      "persona_refs": [
+        "PER-1781248465963709000-9925efbe"
+      ],
+      "priority": "medium",
+      "priority_plan_ref": "PRI-GROOM-KERNEL-RELIABILITY-RESIDUAL-001",
+      "problem_statement": "Implement task-specific process names or identifiers for the scheduler daemon to allow targeted teardowns during tests without friendly fire.",
+      "schema_version": "2.0.0",
+      "status": "archived",
+      "title": "Task-Specific Scheduler Process Identifiers",
+      "updated_at": "2026-08-19T04:53:06Z",
+      "updated_by": "ACC-1785920548450214012-68b850c0",
+      "version_context": "default"
+    },
+    {
+      "commit_refs": [
+        "4e231bf99e5251641db0019688ebbc75e7a91176"
+      ],
+      "context": "The Kernel Steward is a local LLM-powered perpetual agent that: (1) continuously scans the ZQK knowledge kernel for drift, increased error rates, policy violations, anomalies; (2) enriches the whats-next output with mission/vision/goals/requirements/milestones/roadmap context; (3) acts as arbiter/support assistant for the CAP orchestrator by injecting kernel-grounded next-action directives. It runs via the CAP sentinel stage using the local LLM API (Ollama/Qwen/similar). Key files: pkg/scheduler/handlers_cap_sentinel.go, pkg/agentprompt/builder.go, pkg/llm/",
+      "created_at": "2026-07-03T17:32:41Z",
+      "created_by": "ACC-1785920548450214012-68b850c0",
+      "estimated_effort": "2 days",
+      "id": "BLI-1783099961080769000-8fd196ea",
+      "kind": "backlog_item",
+      "milestone_refs": [
+        "MIL-038"
+      ],
+      "namespace_id": "zqk:kernel",
+      "priority": "medium",
+      "priority_tier": "P2",
+      "schema_version": "2.0.0",
+      "status": "archived",
+      "title": "Implement Kernel Steward: local LLM perpetual monitoring agent for CAP orchestration",
+      "updated_at": "2026-08-19T04:51:27Z",
+      "updated_by": "ACC-1785920548450214012-68b850c0",
+      "version_context": "default"
+    },
+    {
+      "actual_effort": "2h",
+      "commit_refs": [
+        "fc4d82859602f9367ebd0db41e3ceaf96d15d0df"
+      ],
+      "created_at": "2026-07-12T00:25:56Z",
+      "created_by": "ACC-1785920548450214012-68b850c0",
+      "description": "Implement Mean Time To Resolution for Ghost Drift",
+      "estimated_effort": "2h",
+      "id": "BLI-1783815956424322000-c8546c87",
+      "kind": "backlog_item",
+      "namespace_id": "zqk:kernel",
+      "priority": "high",
+      "priority_tier": "P1",
+      "problem_statement": "Implement Mean Time To Resolution for Ghost Drift",
+      "schema_version": "2.0.0",
+      "status": "archived",
+      "title": "Implement Ghost Drift MTTR metrics",
+      "updated_at": "2026-08-19T04:52:26Z",
+      "updated_by": "ACC-1785920548450214012-68b850c0",
+      "version_context": "default"
+    },
+    {
+      "acceptance_considerations": "Migrated acceptance gate for BLI-1784802110163487000-88336a63 (no prior acceptance_criteria).",
+      "actual_effort": "1d",
+      "commit_refs": [
+        "8eb37e5064"
+      ],
+      "created_at": "2026-07-23T10:21:50Z",
+      "created_by": "ACC-1785920548450214012-68b850c0",
+      "criteria_refs": [
+        "CRIT-1786695308165678000-4729925c"
+      ],
+      "description": "Create the pkg/shockwave package and implement the Go structs for ShockwaveRouter, PropagationRules, Splitters, Duplicators, and ReduceStrategy.",
+      "estimated_effort": "1d",
+      "id": "BLI-1784802110163487000-88336a63",
+      "kind": "backlog_item",
+      "milestone_refs": [
+        "MIL-033"
+      ],
+      "namespace_id": "zqk:kernel",
+      "owner_ref": "ACC-1785920548450214012-68b850c0",
+      "priority": "high",
+      "priority_tier": "P1",
+      "problem_statement": "Create the pkg/shockwave package and implement the Go structs for ShockwaveRouter, PropagationRules, Splitters, Duplicators, and ReduceStrategy.",
+      "requirement_refs": [
+        "REQ-155"
+      ],
+      "schema_version": "2.0.0",
+      "status": "archived",
+      "title": "Implement ShockwaveRouter Go Structs",
+      "updated_at": "2026-08-22T12:16:23Z",
+      "updated_by": "ACC-1785920548450214012-68b850c0",
+      "version_context": "default"
+    },
+    {
+      "acceptance_considerations": "Migrated acceptance gate for BLI-1784808341902234000-c0524c47 (no prior acceptance_criteria).",
+      "actual_effort": "4 hours",
+      "commit_refs": [
+        "9f939604f91c157d1e1bf1448c7c2bdf5cd3e4eb"
+      ],
+      "created_at": "2026-07-23T12:05:41Z",
+      "created_by": "ACC-1785920548450214012-68b850c0",
+      "criteria_refs": [
+        "CRIT-1786695308165709000-0d21750e"
+      ],
+      "description": "Upgrade runInteractiveWizard to use pkg/interactive template generation and $EDITOR, and support scenario bundle defaults.",
+      "estimated_effort": "1h",
+      "id": "BLI-1784808341902234000-c0524c47",
+      "kind": "backlog_item",
+      "milestone_refs": [
+        "MIL-1770584547498182000-e2084dee"
+      ],
+      "namespace_id": "zqk:kernel",
+      "owner_ref": "ACC-1785920548450214012-68b850c0",
+      "priority": "high",
+      "priority_tier": "P1",
+      "problem_statement": "Upgrade runInteractiveWizard to use pkg/interactive template generation and $EDITOR, and support scenario bundle defaults.",
+      "requirement_refs": [
+        "REQ-155"
+      ],
+      "schema_version": "2.0.0",
+      "status": "archived",
+      "title": "Upgrade Interactive Instantiation Wizard",
+      "updated_at": "2026-08-22T12:16:26Z",
+      "updated_by": "ACC-1785920548450214012-68b850c0",
+      "version_context": "default"
+    },
+    {
+      "acceptance_considerations": "Migrated acceptance gate for BLI-1784811472141858000-1d730854 (no prior acceptance_criteria).",
+      "actual_effort": "1 hour",
+      "created_at": "2026-07-23T12:57:52Z",
+      "created_by": "ACC-1785920548450214012-68b850c0",
+      "criteria_refs": [
+        "CRIT-1786695308165715000-7abe9ccb"
+      ],
+      "description": "Abstract and DRY up raw protocol handlers (HTTP, RPC, FTP) across the codebase into a unified pkg/transport or pkg/handler package. This will prevent snowflake routing implementations and ensure standard error handling, metrics emission, and middleware execution.",
+      "estimated_effort": "2 hours",
+      "id": "BLI-1784811472141858000-1d730854",
+      "kind": "backlog_item",
+      "milestone_refs": [
+        "MIL-033"
+      ],
+      "namespace_id": "zqk:kernel",
+      "owner_ref": "ACC-1785920548450214012-68b850c0",
+      "priority": "high",
+      "priority_tier": "P1",
+      "problem_statement": "Abstract and DRY up raw protocol handlers (HTTP, RPC, FTP) across the codebase into a unified pkg/transport or pkg/handler package. This will prevent snowflake routing implementations and ensure standard error handling, metrics emission, and middleware execution.",
+      "requirement_refs": [
+        "REQ-155"
+      ],
+      "schema_version": "2.0.0",
+      "status": "archived",
+      "title": "Centralized Request/Response Transport Handlers",
+      "updated_at": "2026-08-22T16:44:49Z",
+      "updated_by": "ACC-1785920548450214012-68b850c0",
+      "version_context": "default"
+    },
+    {
+      "acceptance_considerations": "Migrated acceptance gate for BLI-1784812237515848000-d62ae7b7 (no prior acceptance_criteria).",
+      "actual_effort": "1d",
+      "commit_refs": [
+        "8eb37e5064"
+      ],
+      "created_at": "2026-07-23T13:10:37Z",
+      "created_by": "ACC-1785920548450214012-68b850c0",
+      "criteria_refs": [
+        "CRIT-1786695308165721000-4f8164bd"
+      ],
+      "description": "Implement objective PR verification paired with cryptographic signing. When an agent opens a PR, if the system can objectively verify the tests and assert a cryptographic stamp (e.g. signed commit or digital signature payload in PR), the PR will auto-merge without human-in-the-loop intervention.",
+      "estimated_effort": "1d",
+      "id": "BLI-1784812237515848000-d62ae7b7",
+      "kind": "backlog_item",
+      "milestone_refs": [
+        "MIL-033"
+      ],
+      "namespace_id": "zqk:kernel",
+      "owner_ref": "ACC-1785920548450214012-68b850c0",
+      "priority": "high",
+      "priority_tier": "P0",
+      "problem_statement": "Implement objective PR verification paired with cryptographic signing. When an agent opens a PR, if the system can objectively verify the tests and assert a cryptographic stamp (e.g. signed commit or digital signature payload in PR), the PR will auto-merge without human-in-the-loop intervention.",
+      "requirement_refs": [
+        "REQ-155"
+      ],
+      "schema_version": "2.0.0",
+      "status": "archived",
+      "title": "Cryptographic Stamp Auto-Merge Protocol",
+      "updated_at": "2026-08-22T16:44:51Z",
+      "updated_by": "ACC-1785920548450214012-68b850c0",
+      "version_context": "default"
+    },
+    {
+      "acceptance_considerations": "Migrated acceptance gate for BLI-1784832046560540000-a95d8707 (no prior acceptance_criteria).",
+      "actual_effort": "0.5d",
+      "commit_refs": [
+        "a9657180fa"
+      ],
+      "created_at": "2026-07-23T18:40:46Z",
+      "created_by": "ACC-1785920548450214012-68b850c0",
+      "criteria_refs": [
+        "CRIT-1786695308165730000-95d4a247"
+      ],
+      "description": "The CAS index lag (missing index entries for existing valid hashed files) is currently bubbled up as a severe CAS violation in zqk system check. Since this is a known non-destructive indexing race condition inherent to our architecture, the storage provider should either lazily auto-heal the index upon detection or zqk system check should silently apply the auto-fix for index lags without raising user-facing errors.",
+      "estimated_effort": "1d",
+      "id": "BLI-1784832046560540000-a95d8707",
+      "kind": "backlog_item",
+      "milestone_refs": [
+        "MIL-033"
+      ],
+      "namespace_id": "zqk:kernel",
+      "owner_ref": "ACC-1785920548450214012-68b850c0",
+      "priority": "high",
+      "priority_tier": "P2",
+      "problem_statement": "The CAS index lag (missing index entries for existing valid hashed files) is currently bubbled up as a severe CAS violation in zqk system check. Since this is a known non-destructive indexing race condition inherent to our architecture, the storage provider should either lazily auto-heal the index upon detection or zqk system check should silently apply the auto-fix for index lags without raising user-facing errors.",
+      "requirement_refs": [
+        "REQ-155"
+      ],
+      "schema_version": "2.0.0",
+      "status": "archived",
+      "title": "Auto-Heal CAS Index Lag Silently",
+      "updated_at": "2026-08-22T21:23:23Z",
+      "updated_by": "ACC-1785920548450214012-68b850c0",
+      "version_context": "default"
+    },
+    {
+      "actual_effort": "0.5",
+      "actual_effort_hours": 0.5,
+      "category": "Process",
+      "created_at": "2026-07-24T06:00:20Z",
+      "created_by": "ACC-1785920548450214012-68b850c0",
+      "estimated_effort": "0.5",
+      "estimated_effort_hours": 0.5,
+      "id": "BLI-1784872820330606000-3fc61d93",
+      "kind": "backlog_item",
+      "milestone_ref": "MIL-1785183722322302000-d3386bed",
+      "milestone_refs": [
+        "MIL-006"
+      ],
+      "namespace_id": "zqk:kernel",
+      "notes": "TPM-authorized archive: empty Groom Batch residual cleanup.",
+      "priority_tier": "P2",
+      "schema_version": "2.0.0",
+      "status": "archived",
+      "title": "Groom Batch 4",
+      "updated_at": "2026-08-12T07:36:28Z",
+      "updated_by": "ACC-1785920548450214012-68b850c0",
+      "version_context": "default"
+    },
+    {
+      "actual_effort": "0.5",
+      "actual_effort_hours": 0.5,
+      "category": "Process",
+      "created_at": "2026-07-24T06:00:41Z",
+      "created_by": "ACC-1785920548450214012-68b850c0",
+      "estimated_effort": "0.5",
+      "estimated_effort_hours": 0.5,
+      "id": "BLI-1784872841559481000-035ed23d",
+      "kind": "backlog_item",
+      "milestone_ref": "MIL-1785183722322302000-d3386bed",
+      "milestone_refs": [
+        "MIL-006"
+      ],
+      "namespace_id": "zqk:kernel",
+      "notes": "TPM-authorized archive: empty Groom Batch residual cleanup.",
+      "priority_tier": "P2",
+      "schema_version": "2.0.0",
+      "status": "archived",
+      "title": "Groom Batch 6",
+      "updated_at": "2026-08-12T07:36:27Z",
+      "updated_by": "ACC-1785920548450214012-68b850c0",
+      "version_context": "default"
+    },
+    {
+      "actual_effort": "0.5",
+      "actual_effort_hours": 0.5,
+      "category": "Process",
+      "created_at": "2026-07-24T06:01:26Z",
+      "created_by": "ACC-1785920548450214012-68b850c0",
+      "estimated_effort": "0.5",
+      "estimated_effort_hours": 0.5,
+      "id": "BLI-1784872886264753000-089b3024",
+      "kind": "backlog_item",
+      "milestone_ref": "MIL-1785183722322302000-d3386bed",
+      "milestone_refs": [
+        "MIL-006"
+      ],
+      "namespace_id": "zqk:kernel",
+      "notes": "TPM-authorized archive: empty Groom Batch residual cleanup.",
+      "priority_tier": "P2",
+      "schema_version": "2.0.0",
+      "status": "archived",
+      "title": "Groom Batch 11",
+      "updated_at": "2026-08-12T07:36:27Z",
+      "updated_by": "ACC-1785920548450214012-68b850c0",
+      "version_context": "default"
+    },
+    {
+      "actual_effort": "0.5",
+      "actual_effort_hours": 0.5,
+      "category": "Process",
+      "created_at": "2026-07-24T06:01:53Z",
+      "created_by": "ACC-1785920548450214012-68b850c0",
+      "estimated_effort": "0.5",
+      "estimated_effort_hours": 0.5,
+      "id": "BLI-1784872913371649000-a9b48ff5",
+      "kind": "backlog_item",
+      "milestone_ref": "MIL-1785183722322302000-d3386bed",
+      "milestone_refs": [
+        "MIL-006"
+      ],
+      "namespace_id": "zqk:kernel",
+      "notes": "TPM-authorized archive: empty Groom Batch residual cleanup.",
+      "priority_tier": "P2",
+      "schema_version": "2.0.0",
+      "status": "archived",
+      "title": "Groom Batch 14",
+      "updated_at": "2026-08-12T07:36:27Z",
+      "updated_by": "ACC-1785920548450214012-68b850c0",
+      "version_context": "default"
+    },
+    {
+      "actual_effort": "0.5",
+      "actual_effort_hours": 0.5,
+      "category": "Process",
+      "created_at": "2026-07-24T06:02:02Z",
+      "created_by": "ACC-1785920548450214012-68b850c0",
+      "estimated_effort": "0.5",
+      "estimated_effort_hours": 0.5,
+      "id": "BLI-1784872922381979000-e74466f9",
+      "kind": "backlog_item",
+      "milestone_ref": "MIL-1785183722322302000-d3386bed",
+      "milestone_refs": [
+        "MIL-006"
+      ],
+      "namespace_id": "zqk:kernel",
+      "notes": "TPM-authorized archive: empty Groom Batch residual cleanup.",
+      "priority_tier": "P2",
+      "schema_version": "2.0.0",
+      "status": "archived",
+      "title": "Groom Batch 15",
+      "updated_at": "2026-08-12T07:36:26Z",
+      "updated_by": "ACC-1785920548450214012-68b850c0",
+      "version_context": "default"
+    },
+    {
+      "actual_effort": "0.5",
+      "actual_effort_hours": 0.5,
+      "category": "Process",
+      "created_at": "2026-07-24T06:02:21Z",
+      "created_by": "ACC-1785920548450214012-68b850c0",
+      "estimated_effort": "0.5",
+      "estimated_effort_hours": 0.5,
+      "id": "BLI-1784872941269326000-4a42cd33",
+      "kind": "backlog_item",
+      "milestone_ref": "MIL-1785183722322302000-d3386bed",
+      "milestone_refs": [
+        "MIL-006"
+      ],
+      "namespace_id": "zqk:kernel",
+      "notes": "TPM-authorized archive: empty Groom Batch residual cleanup.",
+      "priority_tier": "P2",
+      "schema_version": "2.0.0",
+      "status": "archived",
+      "title": "Groom Batch 17",
+      "updated_at": "2026-08-12T07:36:27Z",
+      "updated_by": "ACC-1785920548450214012-68b850c0",
+      "version_context": "default"
+    }
+  ],
+  "goals_count": 83
+}

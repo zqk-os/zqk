@@ -1,0 +1,28 @@
+
+--- run 2026-09-04T22:21:13Z ---
+=== RUN   TestServer_SteerAckPending
+=== PAUSE TestServer_SteerAckPending
+=== RUN   TestServer_Wake
+=== PAUSE TestServer_Wake
+=== RUN   TestServer_OpenAPI
+=== PAUSE TestServer_OpenAPI
+=== RUN   TestServer_RequiresProjectRoot
+=== PAUSE TestServer_RequiresProjectRoot
+=== RUN   TestServer_TLSConfig
+=== PAUSE TestServer_TLSConfig
+=== RUN   TestServer_Timeouts
+=== PAUSE TestServer_Timeouts
+=== CONT  TestServer_SteerAckPending
+=== CONT  TestServer_RequiresProjectRoot
+--- PASS: TestServer_RequiresProjectRoot (0.00s)
+=== CONT  TestServer_Timeouts
+--- PASS: TestServer_Timeouts (0.00s)
+=== CONT  TestServer_TLSConfig
+--- PASS: TestServer_TLSConfig (0.00s)
+=== CONT  TestServer_OpenAPI
+--- PASS: TestServer_OpenAPI (0.00s)
+=== CONT  TestServer_Wake
+--- PASS: TestServer_Wake (0.34s)
+--- PASS: TestServer_SteerAckPending (0.36s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/agentfeed/httpapi	0.943s

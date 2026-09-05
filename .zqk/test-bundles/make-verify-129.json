@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-129",
+  "created_at": "2026-09-04T21:34:28.605344Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-129",
+    "Tests": [
+      {
+        "Name": "TestParseNamespace",
+        "Package": "validation",
+        "PackagePath": "pkg/validation",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/validation/id_validator_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestIDValidator_ValidateID_WithNamespace",
+        "Package": "validation",
+        "PackagePath": "pkg/validation",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/validation/id_validator_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestIDValidator_ValidateID_AccountSpecialHandling",
+        "Package": "validation",
+        "PackagePath": "pkg/validation",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/validation/id_validator_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestIDValidator_ValidateID_ErrorPaths",
+        "Package": "validation",
+        "PackagePath": "pkg/validation",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/validation/id_validator_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestIDValidator_ValidateID_PrefixValidation",
+        "Package": "validation",
+        "PackagePath": "pkg/validation",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/validation/id_validator_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestIDValidator_InferKindFromID_WithNamespace",
+        "Package": "validation",
+        "PackagePath": "pkg/validation",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/validation/id_validator_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestExtractPrefixesFromPattern",
+        "Package": "validation",
+        "PackagePath": "pkg/validation",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/validation/id_validator_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestInstanceValidator_ValidateInstanceWithState",
+        "Package": "validation",
+        "PackagePath": "pkg/validation",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/validation/instance_validator_lifecycle_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestInstanceValidator_checkPrecondition",
+        "Package": "validation",
+        "PackagePath": "pkg/validation",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/validation/instance_validator_lifecycle_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestInstanceValidator_ValidateInstanceWithState_GraphData",
+        "Package": "validation",
+        "PackagePath": "pkg/validation",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/validation/instance_validator_lifecycle_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": true,
+    "EstimatedDuration": 300000000000,
+    "PackagePath": "pkg/validation"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestParseNamespace",
+      "Package": "validation",
+      "PackagePath": "pkg/validation",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/validation/id_validator_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestIDValidator_ValidateID_WithNamespace",
+      "Package": "validation",
+      "PackagePath": "pkg/validation",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/validation/id_validator_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestIDValidator_ValidateID_AccountSpecialHandling",
+      "Package": "validation",
+      "PackagePath": "pkg/validation",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/validation/id_validator_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestIDValidator_ValidateID_ErrorPaths",
+      "Package": "validation",
+      "PackagePath": "pkg/validation",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/validation/id_validator_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestIDValidator_ValidateID_PrefixValidation",
+      "Package": "validation",
+      "PackagePath": "pkg/validation",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/validation/id_validator_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestIDValidator_InferKindFromID_WithNamespace",
+      "Package": "validation",
+      "PackagePath": "pkg/validation",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/validation/id_validator_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestExtractPrefixesFromPattern",
+      "Package": "validation",
+      "PackagePath": "pkg/validation",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/validation/id_validator_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestInstanceValidator_ValidateInstanceWithState",
+      "Package": "validation",
+      "PackagePath": "pkg/validation",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/validation/instance_validator_lifecycle_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestInstanceValidator_checkPrecondition",
+      "Package": "validation",
+      "PackagePath": "pkg/validation",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/validation/instance_validator_lifecycle_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestInstanceValidator_ValidateInstanceWithState_GraphData",
+      "Package": "validation",
+      "PackagePath": "pkg/validation",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/validation/instance_validator_lifecycle_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

@@ -1,0 +1,52 @@
+
+--- run 2026-09-04T22:12:21Z ---
+=== RUN   TestLifecycleMigrationHelper_SpecialCharacters
+=== PAUSE TestLifecycleMigrationHelper_SpecialCharacters
+=== RUN   TestLifecycleMigrationHelper_LargeStatusList
+=== PAUSE TestLifecycleMigrationHelper_LargeStatusList
+=== RUN   TestLifecycleMigrationHelper_ConcurrentConversion
+=== PAUSE TestLifecycleMigrationHelper_ConcurrentConversion
+=== RUN   TestLifecycleMigrationHelper_FilePermissions
+=== PAUSE TestLifecycleMigrationHelper_FilePermissions
+=== RUN   TestLifecycleMigrationHelper_InvalidStatusStructure
+=== PAUSE TestLifecycleMigrationHelper_InvalidStatusStructure
+=== RUN   TestLifecycleMigrationHelper_InvalidTransitionStructure
+=== PAUSE TestLifecycleMigrationHelper_InvalidTransitionStructure
+=== RUN   TestLifecycleMigrationHelper_MalformedPercentComplete
+=== PAUSE TestLifecycleMigrationHelper_MalformedPercentComplete
+=== RUN   TestLifecycleMigrationHelper_DuplicateStatusValues
+=== PAUSE TestLifecycleMigrationHelper_DuplicateStatusValues
+=== RUN   TestLifecycleMigrationHelper_VeryLongObjectType
+=== PAUSE TestLifecycleMigrationHelper_VeryLongObjectType
+=== RUN   TestLifecycleMigrationHelper_ConcurrentFileCreation
+=== PAUSE TestLifecycleMigrationHelper_ConcurrentFileCreation
+=== CONT  TestLifecycleMigrationHelper_SpecialCharacters
+=== CONT  TestLifecycleMigrationHelper_InvalidTransitionStructure
+=== RUN   TestLifecycleMigrationHelper_InvalidTransitionStructure/transition_without_from
+=== RUN   TestLifecycleMigrationHelper_InvalidTransitionStructure/transition_without_to
+--- PASS: TestLifecycleMigrationHelper_SpecialCharacters (0.33s)
+--- PASS: TestLifecycleMigrationHelper_InvalidTransitionStructure (0.33s)
+    --- PASS: TestLifecycleMigrationHelper_InvalidTransitionStructure/transition_without_from (0.01s)
+    --- PASS: TestLifecycleMigrationHelper_InvalidTransitionStructure/transition_without_to (0.01s)
+=== CONT  TestLifecycleMigrationHelper_ConcurrentFileCreation
+=== CONT  TestLifecycleMigrationHelper_VeryLongObjectType
+--- PASS: TestLifecycleMigrationHelper_VeryLongObjectType (0.24s)
+=== CONT  TestLifecycleMigrationHelper_FilePermissions
+--- PASS: TestLifecycleMigrationHelper_FilePermissions (0.17s)
+=== CONT  TestLifecycleMigrationHelper_InvalidStatusStructure
+=== RUN   TestLifecycleMigrationHelper_InvalidStatusStructure/status_without_value
+=== RUN   TestLifecycleMigrationHelper_InvalidStatusStructure/status_without_display
+--- PASS: TestLifecycleMigrationHelper_InvalidStatusStructure (0.23s)
+    --- PASS: TestLifecycleMigrationHelper_InvalidStatusStructure/status_without_value (0.00s)
+    --- PASS: TestLifecycleMigrationHelper_InvalidStatusStructure/status_without_display (0.00s)
+=== CONT  TestLifecycleMigrationHelper_ConcurrentConversion
+--- PASS: TestLifecycleMigrationHelper_ConcurrentConversion (0.29s)
+=== CONT  TestLifecycleMigrationHelper_DuplicateStatusValues
+--- PASS: TestLifecycleMigrationHelper_DuplicateStatusValues (0.29s)
+=== CONT  TestLifecycleMigrationHelper_MalformedPercentComplete
+--- PASS: TestLifecycleMigrationHelper_ConcurrentFileCreation (1.38s)
+=== CONT  TestLifecycleMigrationHelper_LargeStatusList
+--- PASS: TestLifecycleMigrationHelper_MalformedPercentComplete (0.23s)
+--- PASS: TestLifecycleMigrationHelper_LargeStatusList (0.17s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/migration	2.507s

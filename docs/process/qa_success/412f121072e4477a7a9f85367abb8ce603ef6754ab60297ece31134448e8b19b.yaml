@@ -1,0 +1,14 @@
+created_at: "2026-09-02T03:01:29Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1788318088986581000-0fee7ff7
+item_id: PRI-CEF-REMAINING-OPEN-CLOSE-001
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 86b8ab3d574c004a61020b73c23f52b9055049e90c3d755c8bbb383e059e384028fdd8cd69e13123b644e5f3f7eb65596e73e2d57d719ea3dafcb01b84ce8dfb
+schema_version: 2.0.0
+signature: 3045022100f9312a766f9ba5e0c48fcc2416e16fe3b47d0ce487b03dee134016ed1826fe0c0220088978f6f435c0990f83869259576eedb557aedc85d5cb918491becb94bfeab6
+status: success
+title: QA success for PRI-CEF-REMAINING-OPEN-CLOSE-001
+updated_at: "2026-09-02T07:44:31Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

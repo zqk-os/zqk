@@ -1,0 +1,5 @@
+Starting Graph-State Sync Loop for task: ATK-1788481055360241000-6b0af0a5
+Error: sync-loop stagnation: no progress for 10 ticks (fingerprint unchanged), aborting
+2026-09-04T23:19:44Z [error] Command execution failed error=sync-loop stagnation: no progress for 10 ticks (fingerprint unchanged), aborting
+Error: unauthorized: invalid API key (not an ACC-* id and no keystore match); see POL-AGENT-API-KEY-001
+2026-09-05T03:23:03Z [error] Command execution failed error=unauthorized: invalid API key (not an ACC-* id and no keystore match); see POL-AGENT-API-KEY-001

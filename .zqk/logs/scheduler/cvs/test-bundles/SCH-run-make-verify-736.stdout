@@ -1,0 +1,20 @@
+
+--- run 2026-09-04T22:21:01Z ---
+=== RUN   TestLoadDataCellDescriptors_repo
+=== PAUSE TestLoadDataCellDescriptors_repo
+=== RUN   TestLoadDescriptorReadModel_repo
+=== PAUSE TestLoadDescriptorReadModel_repo
+=== RUN   TestDescriptorForKind
+=== PAUSE TestDescriptorForKind
+=== RUN   TestIndexDescriptorsByKind
+=== PAUSE TestIndexDescriptorsByKind
+=== CONT  TestLoadDataCellDescriptors_repo
+=== CONT  TestDescriptorForKind
+--- PASS: TestDescriptorForKind (0.00s)
+=== CONT  TestLoadDescriptorReadModel_repo
+--- PASS: TestLoadDataCellDescriptors_repo (0.01s)
+=== CONT  TestIndexDescriptorsByKind
+--- PASS: TestLoadDescriptorReadModel_repo (0.01s)
+--- PASS: TestIndexDescriptorsByKind (0.00s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/datacellregistry	0.282s

@@ -1,0 +1,44 @@
+
+--- run 2026-09-04T22:22:18Z ---
+=== RUN   TestCoordinator_ConcurrentSubscribe
+=== PAUSE TestCoordinator_ConcurrentSubscribe
+=== RUN   TestCoordinator_EmptyEventData
+=== PAUSE TestCoordinator_EmptyEventData
+=== RUN   TestCoordinator_Emit
+=== PAUSE TestCoordinator_Emit
+=== RUN   TestCoordinator_Subscribe
+=== PAUSE TestCoordinator_Subscribe
+=== RUN   TestEventContext_WithMethods
+=== PAUSE TestEventContext_WithMethods
+=== RUN   TestStorageAuditRouter_Emit
+=== PAUSE TestStorageAuditRouter_Emit
+=== RUN   TestMetricPipelineRouter_Emit
+=== PAUSE TestMetricPipelineRouter_Emit
+=== RUN   TestNewOperationalEvent
+=== PAUSE TestNewOperationalEvent
+=== RUN   TestNewOperationalEvent_DependencyRefStatus
+=== PAUSE TestNewOperationalEvent_DependencyRefStatus
+=== RUN   TestMetricsCollectorAdapter_EmitsViaCoordinator
+=== PAUSE TestMetricsCollectorAdapter_EmitsViaCoordinator
+=== CONT  TestCoordinator_ConcurrentSubscribe
+=== CONT  TestStorageAuditRouter_Emit
+--- PASS: TestCoordinator_ConcurrentSubscribe (0.01s)
+=== CONT  TestNewOperationalEvent_DependencyRefStatus
+--- PASS: TestNewOperationalEvent_DependencyRefStatus (0.00s)
+=== CONT  TestMetricsCollectorAdapter_EmitsViaCoordinator
+--- PASS: TestMetricsCollectorAdapter_EmitsViaCoordinator (0.00s)
+=== CONT  TestCoordinator_Emit
+--- PASS: TestCoordinator_Emit (0.00s)
+=== CONT  TestEventContext_WithMethods
+--- PASS: TestEventContext_WithMethods (0.00s)
+=== CONT  TestCoordinator_Subscribe
+--- PASS: TestCoordinator_Subscribe (0.00s)
+=== CONT  TestCoordinator_EmptyEventData
+--- PASS: TestCoordinator_EmptyEventData (0.00s)
+=== CONT  TestNewOperationalEvent
+--- PASS: TestNewOperationalEvent (0.00s)
+=== CONT  TestMetricPipelineRouter_Emit
+--- PASS: TestMetricPipelineRouter_Emit (0.06s)
+--- PASS: TestStorageAuditRouter_Emit (0.75s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/coordination	1.521s

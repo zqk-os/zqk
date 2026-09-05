@@ -1,0 +1,34 @@
+
+--- run 2026-09-04T22:23:15Z ---
+=== RUN   TestTPMRateLimiter_Cancel
+--- PASS: TestTPMRateLimiter_Cancel (0.10s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/circuitbreaker	0.308s
+
+--- run 2026-09-05T05:56:14Z ---
+=== RUN   TestObjectValidationHandlerBatchErrorCoversEveryID
+--- PASS: TestObjectValidationHandlerBatchErrorCoversEveryID (0.00s)
+=== RUN   TestPeerAckTimeoutAuditHandler_Execute
+--- PASS: TestPeerAckTimeoutAuditHandler_Execute (0.02s)
+=== RUN   TestPeerAckTimeoutAuditHandler_ExpiresWithShortMaxAge
+--- PASS: TestPeerAckTimeoutAuditHandler_ExpiresWithShortMaxAge (0.08s)
+=== RUN   TestRetentionMaxCount_IsHighVolumeKind
+--- PASS: TestRetentionMaxCount_IsHighVolumeKind (0.00s)
+=== RUN   TestRetentionToleranceHandler_Execute_StreamBackedWithLongLivedContext
+    handlers_retention_tolerance_test.go:163: TestRoot: /var/folders/gb/31sgyvn551ld6l0zfk50yl8h0000gn/T/TestRetentionToleranceHandler_Execute_StreamBackedWithLongLivedC2914627914/001
+    handlers_retention_tolerance_test.go:227: Count before Execute: 20
+    handlers_retention_tolerance_test.go:230: Execute err: <nil>
+    handlers_retention_tolerance_test.go:236: Count after Execute: 5
+--- PASS: TestRetentionToleranceHandler_Execute_StreamBackedWithLongLivedContext (1.40s)
+=== RUN   TestInvokeJobCallbackCommandRunsShellOneLinerWithoutLitteringWorkingDir
+--- PASS: TestInvokeJobCallbackCommandRunsShellOneLinerWithoutLitteringWorkingDir (0.02s)
+=== RUN   TestRunWrapperHandler_JobLogFileWriting
+--- PASS: TestRunWrapperHandler_JobLogFileWriting (0.22s)
+=== RUN   TestRunWrapperHandler_JobLogFileWriting_FailedCommand
+--- PASS: TestRunWrapperHandler_JobLogFileWriting_FailedCommand (0.19s)
+=== RUN   TestRunWrapperHandler_JobLogFileWriting_NoProjectRoot
+--- PASS: TestRunWrapperHandler_JobLogFileWriting_NoProjectRoot (0.16s)
+=== RUN   TestRunWrapperHandler_JobLogFileWriting_VerboseLogLevel
+--- PASS: TestRunWrapperHandler_JobLogFileWriting_VerboseLogLevel (0.22s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/scheduler	3.268s

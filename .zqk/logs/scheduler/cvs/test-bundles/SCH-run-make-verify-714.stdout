@@ -1,0 +1,168 @@
+
+--- run 2026-09-04T22:20:40Z ---
+=== RUN   TestCoerceNonNegInt
+=== PAUSE TestCoerceNonNegInt
+=== RUN   TestRecomputeRefsFromScope_NilProvider
+=== PAUSE TestRecomputeRefsFromScope_NilProvider
+=== RUN   TestRecomputeRefsFromScope_WrongScopeType
+=== PAUSE TestRecomputeRefsFromScope_WrongScopeType
+=== RUN   TestRecomputeRefsFromScope_EmptyScopeID
+=== PAUSE TestRecomputeRefsFromScope_EmptyScopeID
+=== RUN   TestRecomputeRefsFromScope_MalformedScopeID
+=== PAUSE TestRecomputeRefsFromScope_MalformedScopeID
+=== RUN   TestStatusRelevantRefs_NonPriorityPlan
+=== PAUSE TestStatusRelevantRefs_NonPriorityPlan
+=== RUN   TestStatusRelevantRefs_PriorityPlan_EmptyID
+=== PAUSE TestStatusRelevantRefs_PriorityPlan_EmptyID
+=== RUN   TestCompiledShockwaveYAMLMatchers
+=== PAUSE TestCompiledShockwaveYAMLMatchers
+=== RUN   TestDependencyRefTargetIDsIncludesCriteriaRefs
+=== PAUSE TestDependencyRefTargetIDsIncludesCriteriaRefs
+=== RUN   TestDependencyRefTargetIDsEmptyWithoutOutboundRefs
+=== PAUSE TestDependencyRefTargetIDsEmptyWithoutOutboundRefs
+=== CONT  TestCoerceNonNegInt
+=== CONT  TestStatusRelevantRefs_NonPriorityPlan
+=== CONT  TestRecomputeRefsFromScope_WrongScopeType
+=== CONT  TestRecomputeRefsFromScope_NilProvider
+=== CONT  TestRecomputeRefsFromScope_MalformedScopeID
+=== CONT  TestDependencyRefTargetIDsIncludesCriteriaRefs
+--- PASS: TestCoerceNonNegInt (0.00s)
+=== CONT  TestRecomputeRefsFromScope_EmptyScopeID
+=== CONT  TestCompiledShockwaveYAMLMatchers
+--- PASS: TestDependencyRefTargetIDsIncludesCriteriaRefs (0.00s)
+--- PASS: TestStatusRelevantRefs_NonPriorityPlan (0.00s)
+--- PASS: TestRecomputeRefsFromScope_WrongScopeType (0.00s)
+--- PASS: TestRecomputeRefsFromScope_NilProvider (0.00s)
+--- PASS: TestRecomputeRefsFromScope_MalformedScopeID (0.00s)
+--- PASS: TestRecomputeRefsFromScope_EmptyScopeID (0.00s)
+=== CONT  TestDependencyRefTargetIDsEmptyWithoutOutboundRefs
+--- PASS: TestDependencyRefTargetIDsEmptyWithoutOutboundRefs (0.00s)
+=== RUN   TestCompiledShockwaveYAMLMatchers/pri_active_locks
+=== PAUSE TestCompiledShockwaveYAMLMatchers/pri_active_locks
+=== RUN   TestCompiledShockwaveYAMLMatchers/pri_grooming_no_skip_seal
+=== PAUSE TestCompiledShockwaveYAMLMatchers/pri_grooming_no_skip_seal
+=== CONT  TestStatusRelevantRefs_PriorityPlan_EmptyID
+=== RUN   TestCompiledShockwaveYAMLMatchers/pri_paused_relocks
+--- PASS: TestStatusRelevantRefs_PriorityPlan_EmptyID (0.00s)
+=== PAUSE TestCompiledShockwaveYAMLMatchers/pri_paused_relocks
+=== RUN   TestCompiledShockwaveYAMLMatchers/pri_blocked_relocks
+=== PAUSE TestCompiledShockwaveYAMLMatchers/pri_blocked_relocks
+=== RUN   TestCompiledShockwaveYAMLMatchers/pri_already_locked
+=== PAUSE TestCompiledShockwaveYAMLMatchers/pri_already_locked
+=== RUN   TestCompiledShockwaveYAMLMatchers/pri_planned_child_no_lock
+=== PAUSE TestCompiledShockwaveYAMLMatchers/pri_planned_child_no_lock
+=== RUN   TestCompiledShockwaveYAMLMatchers/pri_complete_child_no_lock
+=== PAUSE TestCompiledShockwaveYAMLMatchers/pri_complete_child_no_lock
+=== RUN   TestCompiledShockwaveYAMLMatchers/pri_in_progress_exploring_no_yaml
+=== PAUSE TestCompiledShockwaveYAMLMatchers/pri_in_progress_exploring_no_yaml
+=== RUN   TestCompiledShockwaveYAMLMatchers/pri_active_validated_unseals
+=== PAUSE TestCompiledShockwaveYAMLMatchers/pri_active_validated_unseals
+=== RUN   TestCompiledShockwaveYAMLMatchers/pri_paused_exploring_unseals
+=== PAUSE TestCompiledShockwaveYAMLMatchers/pri_paused_exploring_unseals
+=== RUN   TestCompiledShockwaveYAMLMatchers/pri_blocked_validated_unseals
+=== PAUSE TestCompiledShockwaveYAMLMatchers/pri_blocked_validated_unseals
+=== RUN   TestCompiledShockwaveYAMLMatchers/pri_wrong_trigger
+=== PAUSE TestCompiledShockwaveYAMLMatchers/pri_wrong_trigger
+=== RUN   TestCompiledShockwaveYAMLMatchers/mil_not_started_locks
+=== PAUSE TestCompiledShockwaveYAMLMatchers/mil_not_started_locks
+=== RUN   TestCompiledShockwaveYAMLMatchers/mil_already_locked
+=== PAUSE TestCompiledShockwaveYAMLMatchers/mil_already_locked
+=== RUN   TestCompiledShockwaveYAMLMatchers/mil_planned_child_no_lock
+=== PAUSE TestCompiledShockwaveYAMLMatchers/mil_planned_child_no_lock
+=== RUN   TestCompiledShockwaveYAMLMatchers/mil_wrong_trigger
+=== PAUSE TestCompiledShockwaveYAMLMatchers/mil_wrong_trigger
+=== RUN   TestCompiledShockwaveYAMLMatchers/goal_proposed_activates
+=== PAUSE TestCompiledShockwaveYAMLMatchers/goal_proposed_activates
+=== RUN   TestCompiledShockwaveYAMLMatchers/goal_already_active
+=== PAUSE TestCompiledShockwaveYAMLMatchers/goal_already_active
+=== RUN   TestCompiledShockwaveYAMLMatchers/goal_wrong_trigger
+=== PAUSE TestCompiledShockwaveYAMLMatchers/goal_wrong_trigger
+=== RUN   TestCompiledShockwaveYAMLMatchers/crit_shovel_ready_locks
+=== PAUSE TestCompiledShockwaveYAMLMatchers/crit_shovel_ready_locks
+=== RUN   TestCompiledShockwaveYAMLMatchers/crit_already_locked
+=== PAUSE TestCompiledShockwaveYAMLMatchers/crit_already_locked
+=== RUN   TestCompiledShockwaveYAMLMatchers/crit_validated_noop
+=== PAUSE TestCompiledShockwaveYAMLMatchers/crit_validated_noop
+=== RUN   TestCompiledShockwaveYAMLMatchers/crit_complete_noop
+=== PAUSE TestCompiledShockwaveYAMLMatchers/crit_complete_noop
+=== RUN   TestCompiledShockwaveYAMLMatchers/crit_archived_noop
+=== PAUSE TestCompiledShockwaveYAMLMatchers/crit_archived_noop
+=== RUN   TestCompiledShockwaveYAMLMatchers/crit_blocked_noop
+=== PAUSE TestCompiledShockwaveYAMLMatchers/crit_blocked_noop
+=== RUN   TestCompiledShockwaveYAMLMatchers/crit_bli_planned_noop
+=== PAUSE TestCompiledShockwaveYAMLMatchers/crit_bli_planned_noop
+=== RUN   TestCompiledShockwaveYAMLMatchers/crit_bli_complete_noop
+=== PAUSE TestCompiledShockwaveYAMLMatchers/crit_bli_complete_noop
+=== RUN   TestCompiledShockwaveYAMLMatchers/crit_wrong_trigger
+=== PAUSE TestCompiledShockwaveYAMLMatchers/crit_wrong_trigger
+=== RUN   TestCompiledShockwaveYAMLMatchers/atk_parent_complete_matcher
+=== PAUSE TestCompiledShockwaveYAMLMatchers/atk_parent_complete_matcher
+=== RUN   TestCompiledShockwaveYAMLMatchers/atk_parent_archived_matcher
+=== PAUSE TestCompiledShockwaveYAMLMatchers/atk_parent_archived_matcher
+=== RUN   TestCompiledShockwaveYAMLMatchers/atk_parent_in_progress_noop
+=== PAUSE TestCompiledShockwaveYAMLMatchers/atk_parent_in_progress_noop
+=== CONT  TestCompiledShockwaveYAMLMatchers/pri_active_locks
+=== CONT  TestCompiledShockwaveYAMLMatchers/goal_proposed_activates
+=== CONT  TestCompiledShockwaveYAMLMatchers/pri_active_validated_unseals
+=== CONT  TestCompiledShockwaveYAMLMatchers/mil_wrong_trigger
+=== CONT  TestCompiledShockwaveYAMLMatchers/crit_archived_noop
+=== CONT  TestCompiledShockwaveYAMLMatchers/atk_parent_in_progress_noop
+=== CONT  TestCompiledShockwaveYAMLMatchers/atk_parent_archived_matcher
+=== CONT  TestCompiledShockwaveYAMLMatchers/atk_parent_complete_matcher
+=== CONT  TestCompiledShockwaveYAMLMatchers/crit_wrong_trigger
+=== CONT  TestCompiledShockwaveYAMLMatchers/crit_bli_complete_noop
+=== CONT  TestCompiledShockwaveYAMLMatchers/crit_bli_planned_noop
+=== CONT  TestCompiledShockwaveYAMLMatchers/crit_blocked_noop
+=== CONT  TestCompiledShockwaveYAMLMatchers/crit_shovel_ready_locks
+=== CONT  TestCompiledShockwaveYAMLMatchers/crit_complete_noop
+=== CONT  TestCompiledShockwaveYAMLMatchers/crit_validated_noop
+=== CONT  TestCompiledShockwaveYAMLMatchers/crit_already_locked
+=== CONT  TestCompiledShockwaveYAMLMatchers/goal_already_active
+=== CONT  TestCompiledShockwaveYAMLMatchers/goal_wrong_trigger
+=== CONT  TestCompiledShockwaveYAMLMatchers/mil_not_started_locks
+=== CONT  TestCompiledShockwaveYAMLMatchers/mil_planned_child_no_lock
+=== CONT  TestCompiledShockwaveYAMLMatchers/mil_already_locked
+=== CONT  TestCompiledShockwaveYAMLMatchers/pri_blocked_validated_unseals
+=== CONT  TestCompiledShockwaveYAMLMatchers/pri_wrong_trigger
+=== CONT  TestCompiledShockwaveYAMLMatchers/pri_paused_exploring_unseals
+=== CONT  TestCompiledShockwaveYAMLMatchers/pri_already_locked
+=== CONT  TestCompiledShockwaveYAMLMatchers/pri_in_progress_exploring_no_yaml
+=== CONT  TestCompiledShockwaveYAMLMatchers/pri_complete_child_no_lock
+=== CONT  TestCompiledShockwaveYAMLMatchers/pri_planned_child_no_lock
+=== CONT  TestCompiledShockwaveYAMLMatchers/pri_paused_relocks
+=== CONT  TestCompiledShockwaveYAMLMatchers/pri_blocked_relocks
+=== CONT  TestCompiledShockwaveYAMLMatchers/pri_grooming_no_skip_seal
+--- PASS: TestCompiledShockwaveYAMLMatchers (0.00s)
+    --- PASS: TestCompiledShockwaveYAMLMatchers/goal_proposed_activates (0.00s)
+    --- PASS: TestCompiledShockwaveYAMLMatchers/pri_active_locks (0.00s)
+    --- PASS: TestCompiledShockwaveYAMLMatchers/mil_wrong_trigger (0.00s)
+    --- PASS: TestCompiledShockwaveYAMLMatchers/pri_active_validated_unseals (0.00s)
+    --- PASS: TestCompiledShockwaveYAMLMatchers/crit_archived_noop (0.00s)
+    --- PASS: TestCompiledShockwaveYAMLMatchers/atk_parent_in_progress_noop (0.00s)
+    --- PASS: TestCompiledShockwaveYAMLMatchers/atk_parent_archived_matcher (0.00s)
+    --- PASS: TestCompiledShockwaveYAMLMatchers/crit_wrong_trigger (0.00s)
+    --- PASS: TestCompiledShockwaveYAMLMatchers/atk_parent_complete_matcher (0.00s)
+    --- PASS: TestCompiledShockwaveYAMLMatchers/crit_bli_complete_noop (0.00s)
+    --- PASS: TestCompiledShockwaveYAMLMatchers/crit_bli_planned_noop (0.00s)
+    --- PASS: TestCompiledShockwaveYAMLMatchers/crit_blocked_noop (0.00s)
+    --- PASS: TestCompiledShockwaveYAMLMatchers/crit_shovel_ready_locks (0.00s)
+    --- PASS: TestCompiledShockwaveYAMLMatchers/crit_complete_noop (0.00s)
+    --- PASS: TestCompiledShockwaveYAMLMatchers/crit_validated_noop (0.00s)
+    --- PASS: TestCompiledShockwaveYAMLMatchers/crit_already_locked (0.00s)
+    --- PASS: TestCompiledShockwaveYAMLMatchers/goal_already_active (0.00s)
+    --- PASS: TestCompiledShockwaveYAMLMatchers/mil_not_started_locks (0.00s)
+    --- PASS: TestCompiledShockwaveYAMLMatchers/goal_wrong_trigger (0.00s)
+    --- PASS: TestCompiledShockwaveYAMLMatchers/mil_planned_child_no_lock (0.00s)
+    --- PASS: TestCompiledShockwaveYAMLMatchers/mil_already_locked (0.00s)
+    --- PASS: TestCompiledShockwaveYAMLMatchers/pri_blocked_validated_unseals (0.00s)
+    --- PASS: TestCompiledShockwaveYAMLMatchers/pri_wrong_trigger (0.00s)
+    --- PASS: TestCompiledShockwaveYAMLMatchers/pri_already_locked (0.01s)
+    --- PASS: TestCompiledShockwaveYAMLMatchers/pri_paused_exploring_unseals (0.01s)
+    --- PASS: TestCompiledShockwaveYAMLMatchers/pri_in_progress_exploring_no_yaml (0.00s)
+    --- PASS: TestCompiledShockwaveYAMLMatchers/pri_complete_child_no_lock (0.00s)
+    --- PASS: TestCompiledShockwaveYAMLMatchers/pri_planned_child_no_lock (0.00s)
+    --- PASS: TestCompiledShockwaveYAMLMatchers/pri_blocked_relocks (0.00s)
+    --- PASS: TestCompiledShockwaveYAMLMatchers/pri_paused_relocks (0.00s)
+    --- PASS: TestCompiledShockwaveYAMLMatchers/pri_grooming_no_skip_seal (0.00s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/lifecycle	0.568s

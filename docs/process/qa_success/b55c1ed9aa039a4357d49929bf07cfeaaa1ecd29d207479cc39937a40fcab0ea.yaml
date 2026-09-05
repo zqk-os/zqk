@@ -1,0 +1,14 @@
+created_at: "2026-08-18T23:37:21Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1787096241091517000-73528a6c
+item_id: CRIT-CEF-R2-REL-MCP-RECONNECT-A
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 2857702ca28e4b64fb5782140b43c1400e68fdeab30ab0062f4119523ca97d466e5f13c72adcfa41b92eacf21fa7f0a79b8a8e3a8d7c581e5c9afe0e69cb31dc
+schema_version: 2.0.0
+signature: 30450220525085530191422105be8d974d0262930fee4f7875ea62d08b967574711ed919022100ee8be4410b4baa0f00f9dbc7929c3a6bf505b89cbce9c512a8879ea625600266
+status: archived
+title: QA success QAS-1787096241091517000-73528a6c
+updated_at: "2026-09-01T07:28:12Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

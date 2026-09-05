@@ -1,0 +1,44 @@
+
+--- run 2026-09-04T22:22:09Z ---
+=== RUN   TestSpecLoader_WorkEnvelopeMixinFields
+=== PAUSE TestSpecLoader_WorkEnvelopeMixinFields
+=== RUN   TestSpecLoader_OccupancyComposesOntoAgentTask
+=== PAUSE TestSpecLoader_OccupancyComposesOntoAgentTask
+=== RUN   TestSpecLoader_RemainingOpenComposesOntoPriorityPlan
+=== PAUSE TestSpecLoader_RemainingOpenComposesOntoPriorityPlan
+=== RUN   TestSpecLoader_FieldOverride
+=== PAUSE TestSpecLoader_FieldOverride
+=== RUN   TestSpecLoader_StorageProfileInheritance
+=== PAUSE TestSpecLoader_StorageProfileInheritance
+=== RUN   TestSpecLoader_StreamKindOverridesAuditableProfile
+=== PAUSE TestSpecLoader_StreamKindOverridesAuditableProfile
+=== RUN   TestSpecLoader_TraitInheritance
+=== PAUSE TestSpecLoader_TraitInheritance
+=== RUN   TestSpecLoader_ExcludeTraits
+=== PAUSE TestSpecLoader_ExcludeTraits
+=== RUN   TestSpecLoader_InheritanceChain
+=== PAUSE TestSpecLoader_InheritanceChain
+=== RUN   TestSpecLoader_CircularInheritance
+=== PAUSE TestSpecLoader_CircularInheritance
+=== CONT  TestSpecLoader_WorkEnvelopeMixinFields
+=== CONT  TestSpecLoader_StreamKindOverridesAuditableProfile
+--- PASS: TestSpecLoader_StreamKindOverridesAuditableProfile (0.01s)
+=== CONT  TestSpecLoader_InheritanceChain
+--- PASS: TestSpecLoader_InheritanceChain (0.01s)
+=== CONT  TestSpecLoader_CircularInheritance
+--- PASS: TestSpecLoader_WorkEnvelopeMixinFields (0.01s)
+=== CONT  TestSpecLoader_FieldOverride
+--- PASS: TestSpecLoader_CircularInheritance (0.01s)
+=== CONT  TestSpecLoader_StorageProfileInheritance
+--- PASS: TestSpecLoader_FieldOverride (0.01s)
+=== CONT  TestSpecLoader_RemainingOpenComposesOntoPriorityPlan
+--- PASS: TestSpecLoader_StorageProfileInheritance (0.00s)
+=== CONT  TestSpecLoader_OccupancyComposesOntoAgentTask
+--- PASS: TestSpecLoader_RemainingOpenComposesOntoPriorityPlan (0.02s)
+=== CONT  TestSpecLoader_ExcludeTraits
+--- PASS: TestSpecLoader_ExcludeTraits (0.01s)
+=== CONT  TestSpecLoader_TraitInheritance
+--- PASS: TestSpecLoader_OccupancyComposesOntoAgentTask (0.02s)
+--- PASS: TestSpecLoader_TraitInheritance (0.01s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/objects	0.566s

@@ -1,0 +1,177 @@
+{
+  "name": "make-verify-220",
+  "created_at": "2026-09-04T21:34:29.57925Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-220",
+    "Tests": [
+      {
+        "Name": "TestProcessor_FormatLogEntry",
+        "Package": "callback",
+        "PackagePath": "cmd/zqk/callback",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/callback/processor_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestQueue_Enqueue",
+        "Package": "callback",
+        "PackagePath": "cmd/zqk/callback",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/callback/queue_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestQueue_DequeueSorted",
+        "Package": "callback",
+        "PackagePath": "cmd/zqk/callback",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/callback/queue_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestQueue_DeterminePriority",
+        "Package": "callback",
+        "PackagePath": "cmd/zqk/callback",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/callback/queue_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestQueue_ConcurrentEnqueue",
+        "Package": "callback",
+        "PackagePath": "cmd/zqk/callback",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/callback/queue_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestQueue_ConcurrentEnqueueDequeue",
+        "Package": "callback",
+        "PackagePath": "cmd/zqk/callback",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/callback/queue_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestQueue_StartProcessing",
+        "Package": "callback",
+        "PackagePath": "cmd/zqk/callback",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/callback/queue_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestQueue_StopProcessing",
+        "Package": "callback",
+        "PackagePath": "cmd/zqk/callback",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/callback/queue_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestQueue_Size",
+        "Package": "callback",
+        "PackagePath": "cmd/zqk/callback",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/callback/queue_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": true,
+    "EstimatedDuration": 270000000000,
+    "PackagePath": "cmd/zqk/callback"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestProcessor_FormatLogEntry",
+      "Package": "callback",
+      "PackagePath": "cmd/zqk/callback",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/callback/processor_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestQueue_Enqueue",
+      "Package": "callback",
+      "PackagePath": "cmd/zqk/callback",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/callback/queue_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestQueue_DequeueSorted",
+      "Package": "callback",
+      "PackagePath": "cmd/zqk/callback",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/callback/queue_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestQueue_DeterminePriority",
+      "Package": "callback",
+      "PackagePath": "cmd/zqk/callback",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/callback/queue_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestQueue_ConcurrentEnqueue",
+      "Package": "callback",
+      "PackagePath": "cmd/zqk/callback",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/callback/queue_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestQueue_ConcurrentEnqueueDequeue",
+      "Package": "callback",
+      "PackagePath": "cmd/zqk/callback",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/callback/queue_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestQueue_StartProcessing",
+      "Package": "callback",
+      "PackagePath": "cmd/zqk/callback",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/callback/queue_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestQueue_StopProcessing",
+      "Package": "callback",
+      "PackagePath": "cmd/zqk/callback",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/callback/queue_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestQueue_Size",
+      "Package": "callback",
+      "PackagePath": "cmd/zqk/callback",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/callback/queue_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

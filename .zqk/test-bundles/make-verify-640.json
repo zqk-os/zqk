@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-640",
+  "created_at": "2026-09-04T21:34:33.727995Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-640",
+    "Tests": [
+      {
+        "Name": "TestGeminiClient_GenerateCompletion_NoAPIKey",
+        "Package": "llm",
+        "PackagePath": "pkg/llm",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/llm/gemini_client_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAnalyzeVideoFramesMock",
+        "Package": "llm",
+        "PackagePath": "pkg/llm",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/llm/multimodal_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestDescribeImageMock",
+        "Package": "llm",
+        "PackagePath": "pkg/llm",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/llm/multimodal_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestSemanticCompareMock",
+        "Package": "llm",
+        "PackagePath": "pkg/llm",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/llm/multimodal_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestQwenContextWindowConfig",
+        "Package": "llm",
+        "PackagePath": "pkg/llm",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/llm/qwen_client_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestResilientClient_FallbackOnTimeoutOrError",
+        "Package": "llm",
+        "PackagePath": "pkg/llm",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/llm/resilient_client_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestResilientClient_RequestTimeout",
+        "Package": "llm",
+        "PackagePath": "pkg/llm",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/llm/resilient_client_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestResilientClient_MockFallbackWhenNoSecondary",
+        "Package": "llm",
+        "PackagePath": "pkg/llm",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/llm/resilient_client_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestSanitizeUntrustedText",
+        "Package": "llm",
+        "PackagePath": "pkg/llm",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/llm/sanitize_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestGeminiClient_GenerateStructuredCompletion",
+        "Package": "llm",
+        "PackagePath": "pkg/llm",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/llm/structured_gemini_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 300000000000,
+    "PackagePath": "pkg/llm"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestGeminiClient_GenerateCompletion_NoAPIKey",
+      "Package": "llm",
+      "PackagePath": "pkg/llm",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/llm/gemini_client_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestAnalyzeVideoFramesMock",
+      "Package": "llm",
+      "PackagePath": "pkg/llm",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/llm/multimodal_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestDescribeImageMock",
+      "Package": "llm",
+      "PackagePath": "pkg/llm",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/llm/multimodal_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestSemanticCompareMock",
+      "Package": "llm",
+      "PackagePath": "pkg/llm",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/llm/multimodal_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestQwenContextWindowConfig",
+      "Package": "llm",
+      "PackagePath": "pkg/llm",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/llm/qwen_client_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestResilientClient_FallbackOnTimeoutOrError",
+      "Package": "llm",
+      "PackagePath": "pkg/llm",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/llm/resilient_client_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestResilientClient_RequestTimeout",
+      "Package": "llm",
+      "PackagePath": "pkg/llm",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/llm/resilient_client_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestResilientClient_MockFallbackWhenNoSecondary",
+      "Package": "llm",
+      "PackagePath": "pkg/llm",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/llm/resilient_client_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestSanitizeUntrustedText",
+      "Package": "llm",
+      "PackagePath": "pkg/llm",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/llm/sanitize_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestGeminiClient_GenerateStructuredCompletion",
+      "Package": "llm",
+      "PackagePath": "pkg/llm",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/llm/structured_gemini_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

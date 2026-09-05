@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-288",
+  "created_at": "2026-09-04T21:34:30.227095Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-288",
+    "Tests": [
+      {
+        "Name": "TestAppendStewardEnqueueRecord_roundTripPathSegments",
+        "Package": "datacell",
+        "PackagePath": "pkg/datacell",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/datacell/steward_enqueue_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestDrainStewardEnqueueLog_removesFile",
+        "Package": "datacell",
+        "PackagePath": "pkg/datacell",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/datacell/steward_enqueue_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAppendStewardEnqueueRecord_appendsMetricsJSONLWhenRecordingEnabled",
+        "Package": "datacell",
+        "PackagePath": "pkg/datacell",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/datacell/steward_metrics_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestDrainStewardEnqueueLog_metricsDrainRow",
+        "Package": "datacell",
+        "PackagePath": "pkg/datacell",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/datacell/steward_metrics_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestStreamOrganism_OperationalEnvelopeCoversKnownProfiles",
+        "Package": "datacell_test",
+        "PackagePath": "pkg/datacell",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/datacell/stream_organism_e2e_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestStreamOrganism_FilterDescriptorsByStorageProfile",
+        "Package": "datacell_test",
+        "PackagePath": "pkg/datacell",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/datacell/stream_organism_e2e_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestStreamOrganism_ContractMatchesDescriptorProfiles",
+        "Package": "datacell_test",
+        "PackagePath": "pkg/datacell",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/datacell/stream_organism_e2e_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestStreamOrganism_SpecIndexRegistryAndStreamAlignment",
+        "Package": "datacell_test",
+        "PackagePath": "pkg/datacell",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/datacell/stream_organism_e2e_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestStreamOrganism_RuntimeOrganismPathsAndManifest",
+        "Package": "datacell_test",
+        "PackagePath": "pkg/datacell",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/datacell/stream_organism_e2e_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestStreamOrganism_HighVolumeKindsYAMLAgreesWithSpecIndex",
+        "Package": "datacell_test",
+        "PackagePath": "pkg/datacell",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/datacell/stream_organism_e2e_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": true,
+    "EstimatedDuration": 300000000000,
+    "PackagePath": "pkg/datacell"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestAppendStewardEnqueueRecord_roundTripPathSegments",
+      "Package": "datacell",
+      "PackagePath": "pkg/datacell",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/datacell/steward_enqueue_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestDrainStewardEnqueueLog_removesFile",
+      "Package": "datacell",
+      "PackagePath": "pkg/datacell",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/datacell/steward_enqueue_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestAppendStewardEnqueueRecord_appendsMetricsJSONLWhenRecordingEnabled",
+      "Package": "datacell",
+      "PackagePath": "pkg/datacell",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/datacell/steward_metrics_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestDrainStewardEnqueueLog_metricsDrainRow",
+      "Package": "datacell",
+      "PackagePath": "pkg/datacell",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/datacell/steward_metrics_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestStreamOrganism_OperationalEnvelopeCoversKnownProfiles",
+      "Package": "datacell_test",
+      "PackagePath": "pkg/datacell",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/datacell/stream_organism_e2e_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestStreamOrganism_FilterDescriptorsByStorageProfile",
+      "Package": "datacell_test",
+      "PackagePath": "pkg/datacell",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/datacell/stream_organism_e2e_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestStreamOrganism_ContractMatchesDescriptorProfiles",
+      "Package": "datacell_test",
+      "PackagePath": "pkg/datacell",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/datacell/stream_organism_e2e_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestStreamOrganism_SpecIndexRegistryAndStreamAlignment",
+      "Package": "datacell_test",
+      "PackagePath": "pkg/datacell",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/datacell/stream_organism_e2e_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestStreamOrganism_RuntimeOrganismPathsAndManifest",
+      "Package": "datacell_test",
+      "PackagePath": "pkg/datacell",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/datacell/stream_organism_e2e_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestStreamOrganism_HighVolumeKindsYAMLAgreesWithSpecIndex",
+      "Package": "datacell_test",
+      "PackagePath": "pkg/datacell",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/datacell/stream_organism_e2e_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

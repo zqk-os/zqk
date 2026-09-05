@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-708",
+  "created_at": "2026-09-04T21:34:34.384278Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-708",
+    "Tests": [
+      {
+        "Name": "TestTryEmitAllAcceptanceCriteriaMetForBacklogItem_AppendsCriterionSatisfied",
+        "Package": "lifecycle",
+        "PackagePath": "pkg/lifecycle",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/lifecycle/criterion_backlog_emit_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestTryEmitForBacklogItemsContainingCriterion_LoadsViaCriteriaRefsIndex",
+        "Package": "lifecycle",
+        "PackagePath": "pkg/lifecycle",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/lifecycle/criterion_backlog_emit_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestCriterionStatusMeetsMilestoneGateForMilestone",
+        "Package": "lifecycle",
+        "PackagePath": "pkg/lifecycle",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/lifecycle/criterion_gate_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestStringRefsFromAny",
+        "Package": "lifecycle",
+        "PackagePath": "pkg/lifecycle",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/lifecycle/criterion_gate_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestTryEmitAllCriteriaCompleteForMilestone_AppendsCriterionSatisfied",
+        "Package": "lifecycle",
+        "PackagePath": "pkg/lifecycle",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/lifecycle/criterion_milestone_emit_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestTryEmitForMilestonesContainingCriterion_OnlySatisfiedMilestonesEmit",
+        "Package": "lifecycle",
+        "PackagePath": "pkg/lifecycle",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/lifecycle/criterion_milestone_emit_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestTryEmitAllBacklogItemsCompleteForMilestone_AppendsCriterionSatisfied",
+        "Package": "lifecycle",
+        "PackagePath": "pkg/lifecycle",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/lifecycle/criterion_milestone_emit_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestDependencyPropagationSubscriber_HandleEvent_NoUpdateWhenTerminal",
+        "Package": "lifecycle",
+        "PackagePath": "pkg/lifecycle",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/lifecycle/dependency_propagation_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestDependencyPropagationSubscriber_HandleEvent_SkipLockWhenSiblingNotReadyOrLater",
+        "Package": "lifecycle",
+        "PackagePath": "pkg/lifecycle",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/lifecycle/dependency_propagation_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestDependencyPropagationSubscriber_HandleEvent_OccupancyLockWhenLastDraftSiblingClears",
+        "Package": "lifecycle",
+        "PackagePath": "pkg/lifecycle",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/lifecycle/dependency_propagation_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 300000000000,
+    "PackagePath": "pkg/lifecycle"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestTryEmitAllAcceptanceCriteriaMetForBacklogItem_AppendsCriterionSatisfied",
+      "Package": "lifecycle",
+      "PackagePath": "pkg/lifecycle",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/lifecycle/criterion_backlog_emit_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestTryEmitForBacklogItemsContainingCriterion_LoadsViaCriteriaRefsIndex",
+      "Package": "lifecycle",
+      "PackagePath": "pkg/lifecycle",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/lifecycle/criterion_backlog_emit_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestCriterionStatusMeetsMilestoneGateForMilestone",
+      "Package": "lifecycle",
+      "PackagePath": "pkg/lifecycle",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/lifecycle/criterion_gate_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestStringRefsFromAny",
+      "Package": "lifecycle",
+      "PackagePath": "pkg/lifecycle",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/lifecycle/criterion_gate_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestTryEmitAllCriteriaCompleteForMilestone_AppendsCriterionSatisfied",
+      "Package": "lifecycle",
+      "PackagePath": "pkg/lifecycle",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/lifecycle/criterion_milestone_emit_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestTryEmitForMilestonesContainingCriterion_OnlySatisfiedMilestonesEmit",
+      "Package": "lifecycle",
+      "PackagePath": "pkg/lifecycle",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/lifecycle/criterion_milestone_emit_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestTryEmitAllBacklogItemsCompleteForMilestone_AppendsCriterionSatisfied",
+      "Package": "lifecycle",
+      "PackagePath": "pkg/lifecycle",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/lifecycle/criterion_milestone_emit_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestDependencyPropagationSubscriber_HandleEvent_NoUpdateWhenTerminal",
+      "Package": "lifecycle",
+      "PackagePath": "pkg/lifecycle",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/lifecycle/dependency_propagation_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestDependencyPropagationSubscriber_HandleEvent_SkipLockWhenSiblingNotReadyOrLater",
+      "Package": "lifecycle",
+      "PackagePath": "pkg/lifecycle",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/lifecycle/dependency_propagation_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestDependencyPropagationSubscriber_HandleEvent_OccupancyLockWhenLastDraftSiblingClears",
+      "Package": "lifecycle",
+      "PackagePath": "pkg/lifecycle",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/lifecycle/dependency_propagation_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

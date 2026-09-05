@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-111",
+  "created_at": "2026-09-04T21:34:28.450918Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-111",
+    "Tests": [
+      {
+        "Name": "TestInternalCompleteGroupBy_UsesSpecIndex",
+        "Package": "internal",
+        "PackagePath": "pkg/zqkcli",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/zqkcli/kind_completion_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestInternalCompleteFilterField_StripsOperator",
+        "Package": "internal",
+        "PackagePath": "pkg/zqkcli",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/zqkcli/kind_completion_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestGroupResults_SingleField",
+        "Package": "internal",
+        "PackagePath": "pkg/zqkcli",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/zqkcli/list_grouping_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestGroupResults_MultiField",
+        "Package": "internal",
+        "PackagePath": "pkg/zqkcli",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/zqkcli/list_grouping_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestGroupResults_MissingField",
+        "Package": "internal",
+        "PackagePath": "pkg/zqkcli",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/zqkcli/list_grouping_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestPerformanceComparison",
+        "Package": "internal",
+        "PackagePath": "pkg/zqkcli",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/zqkcli/performance_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestObjectOperationsLatency",
+        "Package": "internal",
+        "PackagePath": "pkg/zqkcli",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/zqkcli/performance_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestPerformanceScalability",
+        "Package": "internal",
+        "PackagePath": "pkg/zqkcli",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/zqkcli/performance_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestPerformanceJSONYAML",
+        "Package": "internal",
+        "PackagePath": "pkg/zqkcli",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/zqkcli/performance_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestPerformanceConcurrentOperations",
+        "Package": "internal",
+        "PackagePath": "pkg/zqkcli",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/zqkcli/performance_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 300000000000,
+    "PackagePath": "pkg/zqkcli"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestInternalCompleteGroupBy_UsesSpecIndex",
+      "Package": "internal",
+      "PackagePath": "pkg/zqkcli",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/zqkcli/kind_completion_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestInternalCompleteFilterField_StripsOperator",
+      "Package": "internal",
+      "PackagePath": "pkg/zqkcli",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/zqkcli/kind_completion_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestGroupResults_SingleField",
+      "Package": "internal",
+      "PackagePath": "pkg/zqkcli",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/zqkcli/list_grouping_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestGroupResults_MultiField",
+      "Package": "internal",
+      "PackagePath": "pkg/zqkcli",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/zqkcli/list_grouping_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestGroupResults_MissingField",
+      "Package": "internal",
+      "PackagePath": "pkg/zqkcli",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/zqkcli/list_grouping_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestPerformanceComparison",
+      "Package": "internal",
+      "PackagePath": "pkg/zqkcli",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/zqkcli/performance_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestObjectOperationsLatency",
+      "Package": "internal",
+      "PackagePath": "pkg/zqkcli",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/zqkcli/performance_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestPerformanceScalability",
+      "Package": "internal",
+      "PackagePath": "pkg/zqkcli",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/zqkcli/performance_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestPerformanceJSONYAML",
+      "Package": "internal",
+      "PackagePath": "pkg/zqkcli",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/zqkcli/performance_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestPerformanceConcurrentOperations",
+      "Package": "internal",
+      "PackagePath": "pkg/zqkcli",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/zqkcli/performance_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

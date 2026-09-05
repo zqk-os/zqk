@@ -1,0 +1,83 @@
+
+--- run 2026-09-04T21:41:38Z ---
+=== RUN   TestRBAC_EdgeCases
+=== PAUSE TestRBAC_EdgeCases
+=== RUN   TestRBAC_CommandAnnotationParsing
+=== PAUSE TestRBAC_CommandAnnotationParsing
+=== RUN   TestResourcesListResultNeverMarshalsNull
+=== PAUSE TestResourcesListResultNeverMarshalsNull
+=== RUN   TestRoleEnforcement_LifetimeCounters
+=== PAUSE TestRoleEnforcement_LifetimeCounters
+=== RUN   TestEnsureMCPIDERoleSymlinksCreatesDaemonAndIDEAdapter
+=== PAUSE TestEnsureMCPIDERoleSymlinksCreatesDaemonAndIDEAdapter
+=== RUN   TestEnsureMCPRoleSymlinkCreatesProxyLink
+=== PAUSE TestEnsureMCPRoleSymlinkCreatesProxyLink
+=== RUN   TestStripBrandSuffixesRoleNames
+=== PAUSE TestStripBrandSuffixesRoleNames
+=== RUN   TestSecurityModel_ObjectParentFieldCombinations
+=== PAUSE TestSecurityModel_ObjectParentFieldCombinations
+=== RUN   TestSecurityModel_PermissionTraversalAcyclic
+=== PAUSE TestSecurityModel_PermissionTraversalAcyclic
+=== RUN   TestSecurityModel_ComplexAccessPatterns
+=== PAUSE TestSecurityModel_ComplexAccessPatterns
+=== CONT  TestRBAC_EdgeCases
+=== CONT  TestEnsureMCPRoleSymlinkCreatesProxyLink
+=== RUN   TestRBAC_EdgeCases/empty_roles_empty_permissions
+=== RUN   TestRBAC_EdgeCases/nil_security_context
+=== RUN   TestRBAC_EdgeCases/multiple_roles_one_matches
+    rbac_test.go:633: Should see 'object list' with viewer role
+=== RUN   TestRBAC_EdgeCases/wildcard_permission_matches_all
+=== RUN   TestRBAC_EdgeCases/partial_wildcard_permission
+    rbac_test.go:684: Should see 'object list' with read:*
+    rbac_test.go:687: Should see 'object create' with write:*
+--- FAIL: TestRBAC_EdgeCases (0.00s)
+    --- PASS: TestRBAC_EdgeCases/empty_roles_empty_permissions (0.00s)
+    --- PASS: TestRBAC_EdgeCases/nil_security_context (0.00s)
+    --- FAIL: TestRBAC_EdgeCases/multiple_roles_one_matches (0.00s)
+    --- PASS: TestRBAC_EdgeCases/wildcard_permission_matches_all (0.00s)
+    --- FAIL: TestRBAC_EdgeCases/partial_wildcard_permission (0.00s)
+=== CONT  TestSecurityModel_PermissionTraversalAcyclic
+=== RUN   TestSecurityModel_PermissionTraversalAcyclic/simple_chain
+=== RUN   TestSecurityModel_PermissionTraversalAcyclic/direct_cycle
+=== RUN   TestSecurityModel_PermissionTraversalAcyclic/indirect_cycle
+=== RUN   TestSecurityModel_PermissionTraversalAcyclic/no_dependencies
+=== RUN   TestSecurityModel_PermissionTraversalAcyclic/multiple_paths,_no_cycle
+--- PASS: TestSecurityModel_PermissionTraversalAcyclic (0.00s)
+    --- PASS: TestSecurityModel_PermissionTraversalAcyclic/simple_chain (0.00s)
+    --- PASS: TestSecurityModel_PermissionTraversalAcyclic/direct_cycle (0.00s)
+    --- PASS: TestSecurityModel_PermissionTraversalAcyclic/indirect_cycle (0.00s)
+    --- PASS: TestSecurityModel_PermissionTraversalAcyclic/no_dependencies (0.00s)
+    --- PASS: TestSecurityModel_PermissionTraversalAcyclic/multiple_paths,_no_cycle (0.00s)
+=== CONT  TestSecurityModel_ComplexAccessPatterns
+--- PASS: TestSecurityModel_ComplexAccessPatterns (0.00s)
+=== CONT  TestSecurityModel_ObjectParentFieldCombinations
+--- PASS: TestSecurityModel_ObjectParentFieldCombinations (0.00s)
+=== CONT  TestRoleEnforcement_LifetimeCounters
+--- PASS: TestRoleEnforcement_LifetimeCounters (0.00s)
+=== CONT  TestEnsureMCPIDERoleSymlinksCreatesDaemonAndIDEAdapter
+--- PASS: TestEnsureMCPRoleSymlinkCreatesProxyLink (0.02s)
+=== CONT  TestStripBrandSuffixesRoleNames
+--- PASS: TestStripBrandSuffixesRoleNames (0.00s)
+=== CONT  TestResourcesListResultNeverMarshalsNull
+--- PASS: TestResourcesListResultNeverMarshalsNull (0.00s)
+=== CONT  TestRBAC_CommandAnnotationParsing
+=== RUN   TestRBAC_CommandAnnotationParsing/single_permission
+=== RUN   TestRBAC_CommandAnnotationParsing/multiple_permissions
+=== RUN   TestRBAC_CommandAnnotationParsing/single_role
+=== RUN   TestRBAC_CommandAnnotationParsing/multiple_roles
+=== RUN   TestRBAC_CommandAnnotationParsing/both_permissions_and_roles
+=== RUN   TestRBAC_CommandAnnotationParsing/whitespace_trimmed
+--- PASS: TestRBAC_CommandAnnotationParsing (0.00s)
+    --- PASS: TestRBAC_CommandAnnotationParsing/single_permission (0.00s)
+    --- PASS: TestRBAC_CommandAnnotationParsing/multiple_permissions (0.00s)
+    --- PASS: TestRBAC_CommandAnnotationParsing/single_role (0.00s)
+    --- PASS: TestRBAC_CommandAnnotationParsing/multiple_roles (0.00s)
+    --- PASS: TestRBAC_CommandAnnotationParsing/both_permissions_and_roles (0.00s)
+    --- PASS: TestRBAC_CommandAnnotationParsing/whitespace_trimmed (0.00s)
+--- PASS: TestEnsureMCPIDERoleSymlinksCreatesDaemonAndIDEAdapter (0.02s)
+FAIL
+FAIL	github.com/lanceman/zqk/pkg/mcp	0.771s
+FAIL
+
+
+--- run 2026-09-04T21:41:38Z ---

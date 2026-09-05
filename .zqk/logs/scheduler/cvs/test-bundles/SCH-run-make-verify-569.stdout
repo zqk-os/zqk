@@ -1,0 +1,44 @@
+
+--- run 2026-09-04T22:17:44Z ---
+=== RUN   TestLifecycleCheckHandler_Execute_NoError
+=== PAUSE TestLifecycleCheckHandler_Execute_NoError
+=== RUN   TestLogLevel_DefaultValue
+=== PAUSE TestLogLevel_DefaultValue
+=== RUN   TestLoopbackListenAddr_DefaultsToLoopback
+=== PAUSE TestLoopbackListenAddr_DefaultsToLoopback
+=== RUN   TestRunMetricsCollectionViaPipeline_NilHandler
+=== PAUSE TestRunMetricsCollectionViaPipeline_NilHandler
+=== RUN   TestRunMetricsCollectionViaPipeline_NilJob
+=== PAUSE TestRunMetricsCollectionViaPipeline_NilJob
+=== RUN   TestDefaultSchedulerMetricsCollector_RecordJobLoaded
+=== PAUSE TestDefaultSchedulerMetricsCollector_RecordJobLoaded
+=== RUN   TestDefaultSchedulerMetricsCollector_RecordJobExecution
+=== PAUSE TestDefaultSchedulerMetricsCollector_RecordJobExecution
+=== RUN   TestDefaultSchedulerMetricsCollector_RecordJobExecutionFailed
+=== PAUSE TestDefaultSchedulerMetricsCollector_RecordJobExecutionFailed
+=== RUN   TestDefaultSchedulerMetricsCollector_MultipleEvents
+=== PAUSE TestDefaultSchedulerMetricsCollector_MultipleEvents
+=== RUN   TestDefaultSchedulerMetricsCollector_Disabled
+=== PAUSE TestDefaultSchedulerMetricsCollector_Disabled
+=== CONT  TestLifecycleCheckHandler_Execute_NoError
+=== CONT  TestDefaultSchedulerMetricsCollector_RecordJobLoaded
+--- PASS: TestDefaultSchedulerMetricsCollector_RecordJobLoaded (0.00s)
+=== CONT  TestDefaultSchedulerMetricsCollector_MultipleEvents
+--- PASS: TestDefaultSchedulerMetricsCollector_MultipleEvents (0.00s)
+=== CONT  TestDefaultSchedulerMetricsCollector_Disabled
+--- PASS: TestDefaultSchedulerMetricsCollector_Disabled (0.00s)
+=== CONT  TestDefaultSchedulerMetricsCollector_RecordJobExecutionFailed
+--- PASS: TestDefaultSchedulerMetricsCollector_RecordJobExecutionFailed (0.00s)
+=== CONT  TestDefaultSchedulerMetricsCollector_RecordJobExecution
+--- PASS: TestDefaultSchedulerMetricsCollector_RecordJobExecution (0.00s)
+=== CONT  TestRunMetricsCollectionViaPipeline_NilHandler
+--- PASS: TestRunMetricsCollectionViaPipeline_NilHandler (0.00s)
+=== CONT  TestRunMetricsCollectionViaPipeline_NilJob
+--- PASS: TestRunMetricsCollectionViaPipeline_NilJob (0.00s)
+=== CONT  TestLoopbackListenAddr_DefaultsToLoopback
+--- PASS: TestLoopbackListenAddr_DefaultsToLoopback (0.00s)
+=== CONT  TestLogLevel_DefaultValue
+--- PASS: TestLogLevel_DefaultValue (0.00s)
+--- PASS: TestLifecycleCheckHandler_Execute_NoError (0.00s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/scheduler	0.642s

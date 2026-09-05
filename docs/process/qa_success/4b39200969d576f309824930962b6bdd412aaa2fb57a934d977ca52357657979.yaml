@@ -1,0 +1,14 @@
+created_at: "2026-08-18T22:07:02Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1787090812948150000-f461f09b
+item_id: CRIT-CEF-R2-REL-CAS-FSYNC-A
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 2857702ca28e4b64fb5782140b43c1400e68fdeab30ab0062f4119523ca97d466e5f13c72adcfa41b92eacf21fa7f0a79b8a8e3a8d7c581e5c9afe0e69cb31dc
+schema_version: 2.0.0
+signature: 3045022100cdc379db36018db0207d5f1896401a6c9420fa7f4ebadf142f57ba62659036b8022043acd7cbfcd0649e1bfc1bfd1316a57a24b6798493b455093d97d4bc51ecfafc
+status: archived
+title: 'Accept: CAS write path matches documented durability (fsync policy residual)'
+updated_at: "2026-09-01T07:12:46Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

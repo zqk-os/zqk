@@ -1,0 +1,289 @@
+
+--- run 2026-09-04T20:40:56Z ---
+Lint scope: branch (22 go files → 4 package dir(s) for go build)
+Build packages:
+  ./cmd/zqk/system
+  ./pkg/cli/bldr_cli_cmd_v1
+  ./pkg/scheduler
+  ./pkg/storage
+(golangci: small staged packages only. Mega-packages are go-build-only; PRECOMMIT_FULL=1 to force golangci.)
+→ parallel lint gates (wall clock = max of jobs, not the sum)
+  [lifecycle-yaml 0s exit=0]
+  [golangci-mega-skip 0s exit=0]
+  [agent-validate 0s exit=0]
+  [field-key 1s exit=0]
+  [cli-inner 0s exit=0]
+  [vds 1s exit=0]
+  [track 1s exit=0]
+  [agent-rules 1s exit=0]
+  [test-parallel 1s exit=0]
+  [env-literals 1s exit=0]
+  [cobra 2s exit=0]
+  [storage-boundaries 2s exit=0]
+  [goroutine 3s exit=0]
+  [go-build 13s exit=0]
+  [cli-dna 22s exit=0]
+  [done 23s]
+
+--- run 2026-09-04T21:16:42Z ---
+No Go changes staged or on this branch. Skipping lint checks.
+
+--- run 2026-09-04T21:20:00Z ---
+No Go changes staged or on this branch. Skipping lint checks.
+
+--- run 2026-09-04T21:30:00Z ---
+No Go changes staged or on this branch. Skipping lint checks.
+
+--- run 2026-09-04T21:40:24Z ---
+No Go changes staged or on this branch. Skipping lint checks.
+
+--- run 2026-09-04T21:54:08Z ---
+No Go changes staged or on this branch. Skipping lint checks.
+
+--- run 2026-09-04T22:03:00Z ---
+Lint scope: branch (3 go files → 3 package dir(s) for go build)
+Build packages:
+  ./internal/cli
+  ./pkg/cli
+  ./pkg/specbuilder/bldr_lifecycle_v1
+(golangci: small staged packages only. Mega-packages are go-build-only; PRECOMMIT_FULL=1 to force golangci.)
+→ parallel lint gates (wall clock = max of jobs, not the sum)
+  [lifecycle-yaml 0s exit=0]
+  [test-parallel 0s exit=0]
+  [track 0s exit=0]
+  [agent-rules 17s exit=0]
+  [agent-validate 8s exit=0]
+  [field-key 18s exit=0]
+  [cli-inner 18s exit=0]
+  [storage-boundaries 18s exit=0]
+  [vds 18s exit=0]
+  [goroutine 19s exit=1]
+  [env-literals 28s exit=0]
+  [cobra 29s exit=0]
+  [go-build 34s exit=0]
+  [cli-dna 52s exit=0]
+  [golangci-staged 56s exit=0]
+  [done 59s]
+
+--- run 2026-09-04T22:10:13Z ---
+Lint scope: branch (3 go files → 3 package dir(s) for go build)
+Build packages:
+  ./internal/cli
+  ./pkg/cli
+  ./pkg/specbuilder/bldr_lifecycle_v1
+(golangci: small staged packages only. Mega-packages are go-build-only; PRECOMMIT_FULL=1 to force golangci.)
+→ parallel lint gates (wall clock = max of jobs, not the sum)
+  [lifecycle-yaml 0s exit=0]
+  [test-parallel 0s exit=0]
+  [track 0s exit=0]
+  [agent-rules 0s exit=0]
+  [agent-validate 0s exit=0]
+  [field-key 0s exit=0]
+  [cli-inner 0s exit=0]
+  [storage-boundaries 0s exit=0]
+  [vds 0s exit=0]
+  [env-literals 1s exit=0]
+  [goroutine 1s exit=1]
+  [cobra 1s exit=0]
+  [go-build 2s exit=0]
+  [cli-dna 6s exit=0]
+  [golangci-staged 12s exit=0]
+  [done 14s]
+
+--- run 2026-09-04T22:20:11Z ---
+Lint scope: branch (3 go files → 3 package dir(s) for go build)
+Build packages:
+  ./internal/cli
+  ./pkg/cli
+  ./pkg/specbuilder/bldr_lifecycle_v1
+(golangci: small staged packages only. Mega-packages are go-build-only; PRECOMMIT_FULL=1 to force golangci.)
+→ parallel lint gates (wall clock = max of jobs, not the sum)
+  [lifecycle-yaml 0s exit=0]
+  [test-parallel 0s exit=0]
+  [track 0s exit=0]
+  [agent-rules 0s exit=0]
+  [agent-validate 0s exit=0]
+  [field-key 0s exit=0]
+  [cli-inner 0s exit=0]
+  [storage-boundaries 0s exit=0]
+  [vds 0s exit=0]
+  [env-literals 1s exit=0]
+  [cobra 1s exit=0]
+  [goroutine 1s exit=1]
+  [go-build 1s exit=0]
+  [cli-dna 5s exit=0]
+  [golangci-staged 11s exit=0]
+  [done 14s]
+
+--- run 2026-09-04T22:30:00Z ---
+Lint scope: branch (3 go files → 3 package dir(s) for go build)
+Build packages:
+  ./internal/cli
+  ./pkg/cli
+  ./pkg/specbuilder/bldr_lifecycle_v1
+(golangci: small staged packages only. Mega-packages are go-build-only; PRECOMMIT_FULL=1 to force golangci.)
+→ parallel lint gates (wall clock = max of jobs, not the sum)
+  [lifecycle-yaml 0s exit=0]
+  [test-parallel 0s exit=0]
+  [track 0s exit=0]
+  [agent-validate 0s exit=0]
+  [field-key 0s exit=0]
+  [cli-inner 0s exit=0]
+  [storage-boundaries 0s exit=0]
+  [vds 0s exit=0]
+  [agent-rules 0s exit=0]
+  [env-literals 1s exit=0]
+  [goroutine 1s exit=1]
+  [cobra 1s exit=0]
+  [go-build 2s exit=0]
+  [golangci-staged 5s exit=0]
+  [cli-dna 6s exit=0]
+  [done 8s]
+
+--- run 2026-09-04T22:40:00Z ---
+Lint scope: branch (3 go files → 3 package dir(s) for go build)
+Build packages:
+  ./internal/cli
+  ./pkg/cli
+  ./pkg/specbuilder/bldr_lifecycle_v1
+(golangci: small staged packages only. Mega-packages are go-build-only; PRECOMMIT_FULL=1 to force golangci.)
+→ parallel lint gates (wall clock = max of jobs, not the sum)
+  [lifecycle-yaml 0s exit=0]
+  [test-parallel 0s exit=0]
+  [track 0s exit=0]
+  [agent-validate 1s exit=0]
+  [field-key 1s exit=0]
+  [cli-inner 1s exit=0]
+  [storage-boundaries 1s exit=0]
+  [vds 1s exit=0]
+  [agent-rules 1s exit=0]
+  [goroutine 2s exit=1]
+  [env-literals 8s exit=0]
+  [cobra 8s exit=0]
+  [go-build 13s exit=0]
+  [cli-dna 19s exit=0]
+  [golangci-staged 23s exit=0]
+  [done 25s]
+
+--- run 2026-09-04T22:50:00Z ---
+No Go changes staged or on this branch. Skipping lint checks.
+
+--- run 2026-09-04T23:00:00Z ---
+No Go changes staged or on this branch. Skipping lint checks.
+
+--- run 2026-09-04T23:10:04Z ---
+No Go changes staged or on this branch. Skipping lint checks.
+
+--- run 2026-09-04T23:20:00Z ---
+No Go changes staged or on this branch. Skipping lint checks.
+
+--- run 2026-09-04T23:31:24Z ---
+No Go changes staged or on this branch. Skipping lint checks.
+
+--- run 2026-09-04T23:40:00Z ---
+No Go changes staged or on this branch. Skipping lint checks.
+
+--- run 2026-09-04T23:50:00Z ---
+No Go changes staged or on this branch. Skipping lint checks.
+
+--- run 2026-09-05T00:00:06Z ---
+No Go changes staged or on this branch. Skipping lint checks.
+
+--- run 2026-09-05T00:10:00Z ---
+No Go changes staged or on this branch. Skipping lint checks.
+
+--- run 2026-09-05T00:20:00Z ---
+No Go changes staged or on this branch. Skipping lint checks.
+
+--- run 2026-09-05T00:30:00Z ---
+No Go changes staged or on this branch. Skipping lint checks.
+
+--- run 2026-09-05T00:40:00Z ---
+Lint scope: staged (6 go files → 4 package dir(s) for go build)
+Build packages:
+  ./cmd/zqk/agent
+  ./cmd/zqk/system
+  ./pkg/circuitbreaker
+  ./pkg/cli/bldr_cli_cmd_v1
+(golangci: small staged packages only. Mega-packages are go-build-only; PRECOMMIT_FULL=1 to force golangci.)
+→ parallel lint gates (wall clock = max of jobs, not the sum)
+  [lifecycle-yaml 1s exit=0]
+  [storage-boundaries 0s exit=0]
+  [vds 0s exit=0]
+  [track 0s exit=0]
+  [agent-rules 0s exit=0]
+  [golangci-mega-skip 0s exit=0]
+  [cli-inner 0s exit=0]
+  [agent-validate 2s exit=1]
+  [goroutine 2s exit=0]
+  [field-key 4s exit=1]
+  [test-parallel 8s exit=0]
+  [env-literals 8s exit=0]
+  [cobra 8s exit=0]
+  [go-build 12s exit=0]
+  [cli-dna 20s exit=1]
+  [golangci-staged 27s exit=1]
+  [done 31s]
+
+--- run 2026-09-05T00:50:00Z ---
+No Go changes staged or on this branch. Skipping lint checks.
+
+--- run 2026-09-05T01:00:14Z ---
+No Go changes staged or on this branch. Skipping lint checks.
+
+--- run 2026-09-05T01:10:00Z ---
+No Go changes staged or on this branch. Skipping lint checks.
+
+--- run 2026-09-05T01:20:00Z ---
+No Go changes staged or on this branch. Skipping lint checks.
+
+--- run 2026-09-05T01:30:00Z ---
+No Go changes staged or on this branch. Skipping lint checks.
+
+--- run 2026-09-05T01:40:00Z ---
+No Go changes staged or on this branch. Skipping lint checks.
+
+--- run 2026-09-05T01:50:00Z ---
+No Go changes staged or on this branch. Skipping lint checks.
+
+--- run 2026-09-05T02:00:21Z ---
+No Go changes staged or on this branch. Skipping lint checks.
+
+--- run 2026-09-05T02:10:00Z ---
+No Go changes staged or on this branch. Skipping lint checks.
+
+--- run 2026-09-05T02:20:00Z ---
+No Go changes staged or on this branch. Skipping lint checks.
+
+--- run 2026-09-05T02:30:02Z ---
+No Go changes staged or on this branch. Skipping lint checks.
+
+--- run 2026-09-05T02:40:00Z ---
+No Go changes staged or on this branch. Skipping lint checks.
+
+--- run 2026-09-05T02:50:00Z ---
+No Go changes staged or on this branch. Skipping lint checks.
+
+--- run 2026-09-05T03:00:00Z ---
+No Go changes staged or on this branch. Skipping lint checks.
+
+--- run 2026-09-05T03:10:00Z ---
+No Go changes staged or on this branch. Skipping lint checks.
+
+--- run 2026-09-05T03:20:00Z ---
+No Go changes staged or on this branch. Skipping lint checks.
+
+--- run 2026-09-05T03:34:51Z ---
+No Go changes staged or on this branch. Skipping lint checks.
+
+--- run 2026-09-05T03:42:21Z ---
+No Go changes staged or on this branch. Skipping lint checks.
+
+--- run 2026-09-05T03:50:00Z ---
+No Go changes staged or on this branch. Skipping lint checks.
+
+--- run 2026-09-05T04:00:00Z ---
+No Go changes staged or on this branch. Skipping lint checks.
+
+--- run 2026-09-05T04:10:00Z ---
+No Go changes staged or on this branch. Skipping lint checks.

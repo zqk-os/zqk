@@ -1,0 +1,159 @@
+{
+  "name": "make-verify-399",
+  "created_at": "2026-09-04T21:34:31.281368Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-399",
+    "Tests": [
+      {
+        "Name": "TestMemoryInbox_Lifecycle",
+        "Package": "inbox_test",
+        "PackagePath": "pkg/hive/inbox",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/hive/inbox/inbox_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestMemoryInbox_Reject",
+        "Package": "inbox_test",
+        "PackagePath": "pkg/hive/inbox",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/hive/inbox/inbox_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestMemoryInbox_NotFound",
+        "Package": "inbox_test",
+        "PackagePath": "pkg/hive/inbox",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/hive/inbox/inbox_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestPersistentInbox_Replay",
+        "Package": "inbox_test",
+        "PackagePath": "pkg/hive/inbox",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/hive/inbox/persistent_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestPersistentInbox_Errors",
+        "Package": "inbox_test",
+        "PackagePath": "pkg/hive/inbox",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/hive/inbox/persistent_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestStorageInbox_Lifecycle",
+        "Package": "inbox_test",
+        "PackagePath": "pkg/hive/inbox",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/hive/inbox/storage_inbox_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestStorageInbox_Reject",
+        "Package": "inbox_test",
+        "PackagePath": "pkg/hive/inbox",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/hive/inbox/storage_inbox_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestStorageInbox_NotFound",
+        "Package": "inbox_test",
+        "PackagePath": "pkg/hive/inbox",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/hive/inbox/storage_inbox_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 240000000000,
+    "PackagePath": "pkg/hive/inbox"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestMemoryInbox_Lifecycle",
+      "Package": "inbox_test",
+      "PackagePath": "pkg/hive/inbox",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/hive/inbox/inbox_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestMemoryInbox_Reject",
+      "Package": "inbox_test",
+      "PackagePath": "pkg/hive/inbox",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/hive/inbox/inbox_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestMemoryInbox_NotFound",
+      "Package": "inbox_test",
+      "PackagePath": "pkg/hive/inbox",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/hive/inbox/inbox_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestPersistentInbox_Replay",
+      "Package": "inbox_test",
+      "PackagePath": "pkg/hive/inbox",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/hive/inbox/persistent_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestPersistentInbox_Errors",
+      "Package": "inbox_test",
+      "PackagePath": "pkg/hive/inbox",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/hive/inbox/persistent_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestStorageInbox_Lifecycle",
+      "Package": "inbox_test",
+      "PackagePath": "pkg/hive/inbox",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/hive/inbox/storage_inbox_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestStorageInbox_Reject",
+      "Package": "inbox_test",
+      "PackagePath": "pkg/hive/inbox",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/hive/inbox/storage_inbox_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestStorageInbox_NotFound",
+      "Package": "inbox_test",
+      "PackagePath": "pkg/hive/inbox",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/hive/inbox/storage_inbox_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

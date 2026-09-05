@@ -1,0 +1,98 @@
+
+--- run 2026-09-04T21:38:43Z ---
+=== RUN   TestAsyncValidator_OutputQueue_NoDeadlock
+=== PAUSE TestAsyncValidator_OutputQueue_NoDeadlock
+=== RUN   TestAsyncValidator_OutputQueue_FullQueue_NoDeadlock
+=== PAUSE TestAsyncValidator_OutputQueue_FullQueue_NoDeadlock
+=== RUN   TestAsyncValidator_OutputQueue_ConcurrentStop_NoDeadlock
+=== PAUSE TestAsyncValidator_OutputQueue_ConcurrentStop_NoDeadlock
+=== RUN   TestAsyncValidator_RealValidation_ReproducesHang
+=== PAUSE TestAsyncValidator_RealValidation_ReproducesHang
+=== RUN   TestAsyncValidator_HashRegistryContention
+=== PAUSE TestAsyncValidator_HashRegistryContention
+=== RUN   TestSemaphoreFullShouldWarn
+=== PAUSE TestSemaphoreFullShouldWarn
+=== RUN   TestAsyncValidator_BasicOperations
+=== PAUSE TestAsyncValidator_BasicOperations
+=== RUN   TestAsyncValidator_CacheIntegration
+=== PAUSE TestAsyncValidator_CacheIntegration
+=== RUN   TestAsyncValidator_ProgressReporting
+=== PAUSE TestAsyncValidator_ProgressReporting
+=== RUN   TestAsyncValidator_Enqueue_CacheOptimization
+=== PAUSE TestAsyncValidator_Enqueue_CacheOptimization
+=== CONT  TestAsyncValidator_OutputQueue_NoDeadlock
+=== CONT  TestSemaphoreFullShouldWarn
+=== RUN   TestSemaphoreFullShouldWarn/first_sample
+=== PAUSE TestSemaphoreFullShouldWarn/first_sample
+=== RUN   TestSemaphoreFullShouldWarn/draining
+=== PAUSE TestSemaphoreFullShouldWarn/draining
+=== RUN   TestSemaphoreFullShouldWarn/flat
+=== PAUSE TestSemaphoreFullShouldWarn/flat
+=== RUN   TestSemaphoreFullShouldWarn/growing
+=== PAUSE TestSemaphoreFullShouldWarn/growing
+=== RUN   TestSemaphoreFullShouldWarn/drained_to_zero
+=== PAUSE TestSemaphoreFullShouldWarn/drained_to_zero
+=== CONT  TestAsyncValidator_RealValidation_ReproducesHang
+    async_validator_real_validation_test.go:126: Progress: 50/500 completed
+    async_validator_real_validation_test.go:126: Progress: 100/500 completed
+=== NAME  TestAsyncValidator_OutputQueue_NoDeadlock
+    async_validator_output_queue_test.go:157: ✅ Stop() completed in 17.145541ms (expected < 4s)
+    async_validator_output_queue_test.go:169: ✅ Progress monitor completed (processed 192 progress updates)
+    async_validator_output_queue_test.go:176: Results written: 192/1000
+=== NAME  TestAsyncValidator_RealValidation_ReproducesHang
+    async_validator_real_validation_test.go:126: Progress: 150/500 completed
+    async_validator_real_validation_test.go:126: Progress: 200/500 completed
+=== CONT  TestAsyncValidator_HashRegistryContention
+--- PASS: TestAsyncValidator_OutputQueue_NoDeadlock (1.96s)
+=== NAME  TestAsyncValidator_RealValidation_ReproducesHang
+    async_validator_real_validation_test.go:126: Progress: 250/500 completed
+    async_validator_real_validation_test.go:126: Progress: 300/500 completed
+    async_validator_real_validation_test.go:126: Progress: 350/500 completed
+    async_validator_real_validation_test.go:126: Progress: 400/500 completed
+=== NAME  TestAsyncValidator_HashRegistryContention
+    async_validator_real_validation_test.go:277: ✅ Test passed: 200 validations, 200 loads, 200 saves
+--- PASS: TestAsyncValidator_HashRegistryContention (1.46s)
+=== CONT  TestAsyncValidator_OutputQueue_ConcurrentStop_NoDeadlock
+=== NAME  TestAsyncValidator_RealValidation_ReproducesHang
+    async_validator_real_validation_test.go:126: Progress: 450/500 completed
+    async_validator_real_validation_test.go:126: Progress: 500/500 completed
+    async_validator_real_validation_test.go:148: ✅ Test passed: 500 validations completed, Stop() took 2.160125ms
+=== NAME  TestAsyncValidator_OutputQueue_ConcurrentStop_NoDeadlock
+    async_validator_output_queue_test.go:384: ✅ All Stop() calls completed - no deadlock
+--- PASS: TestAsyncValidator_RealValidation_ReproducesHang (3.91s)
+=== CONT  TestAsyncValidator_ProgressReporting
+    async_validator_test.go:125: Progress: 1 completed, current: TEST-001
+    async_validator_test.go:125: Progress: 2 completed, current: TEST-003
+    async_validator_test.go:125: Progress: 3 completed, current: TEST-002
+    async_validator_test.go:125: Progress: 4 completed, current: TEST-004
+--- PASS: TestAsyncValidator_OutputQueue_ConcurrentStop_NoDeadlock (0.53s)
+=== CONT  TestAsyncValidator_Enqueue_CacheOptimization
+=== NAME  TestAsyncValidator_ProgressReporting
+    async_validator_test.go:125: Progress: 5 completed, current: TEST-005
+--- PASS: TestAsyncValidator_Enqueue_CacheOptimization (0.11s)
+=== CONT  TestAsyncValidator_CacheIntegration
+    async_validator_test.go:76: Cached state: ObjectID=TEST-001, LastValidated=2026-09-04 14:38:50.40097 -0700 PDT m=+4.300834084
+--- PASS: TestAsyncValidator_CacheIntegration (1.03s)
+=== CONT  TestAsyncValidator_BasicOperations
+    async_validator_test.go:41: Stats: total=0, stale=0, withIssues=0, queueSize=0
+--- PASS: TestAsyncValidator_BasicOperations (0.52s)
+=== CONT  TestAsyncValidator_OutputQueue_FullQueue_NoDeadlock
+    async_validator_output_queue_test.go:275: ✅ Stop() completed in 3.035042ms (expected < 4s)
+    async_validator_output_queue_test.go:279: Dropped results: 0 (expected with small queue)
+--- PASS: TestAsyncValidator_OutputQueue_FullQueue_NoDeadlock (0.64s)
+=== CONT  TestSemaphoreFullShouldWarn/first_sample
+=== CONT  TestSemaphoreFullShouldWarn/growing
+=== CONT  TestSemaphoreFullShouldWarn/drained_to_zero
+=== CONT  TestSemaphoreFullShouldWarn/flat
+=== CONT  TestSemaphoreFullShouldWarn/draining
+--- PASS: TestSemaphoreFullShouldWarn (0.00s)
+    --- PASS: TestSemaphoreFullShouldWarn/first_sample (0.00s)
+    --- PASS: TestSemaphoreFullShouldWarn/growing (0.00s)
+    --- PASS: TestSemaphoreFullShouldWarn/drained_to_zero (0.00s)
+    --- PASS: TestSemaphoreFullShouldWarn/flat (0.00s)
+    --- PASS: TestSemaphoreFullShouldWarn/draining (0.00s)
+=== NAME  TestAsyncValidator_ProgressReporting
+    async_validator_test.go:116: Progress monitoring completed: 5 tasks processed
+--- PASS: TestAsyncValidator_ProgressReporting (5.04s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/validation	9.721s

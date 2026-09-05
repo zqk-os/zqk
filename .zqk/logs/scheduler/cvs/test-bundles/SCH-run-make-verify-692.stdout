@@ -1,0 +1,118 @@
+
+--- run 2026-09-04T22:19:28Z ---
+=== RUN   TestTerminalProgressSubscriber_ValidationPhase
+=== PAUSE TestTerminalProgressSubscriber_ValidationPhase
+=== RUN   TestFormatDetection_RealCommandSimulation
+=== PAUSE TestFormatDetection_RealCommandSimulation
+=== RUN   TestFormatDetection_FlagChangedState
+=== PAUSE TestFormatDetection_FlagChangedState
+=== RUN   TestFormatDetection_HandlerPath
+=== PAUSE TestFormatDetection_HandlerPath
+=== RUN   TestHashRegistryCacheInvalidation
+=== PAUSE TestHashRegistryCacheInvalidation
+=== RUN   TestHashMismatchForBucketedObjects
+=== PAUSE TestHashMismatchForBucketedObjects
+=== RUN   TestHashMismatchDetectionAndFix
+=== PAUSE TestHashMismatchDetectionAndFix
+=== RUN   TestShouldDemoteStatusToErrorForUnresolvedIssues_policy
+=== PAUSE TestShouldDemoteStatusToErrorForUnresolvedIssues_policy
+=== RUN   TestWouldDemoteStatusToErrorForUnresolvedIssues_policy
+=== PAUSE TestWouldDemoteStatusToErrorForUnresolvedIssues_policy
+=== RUN   TestHashRegistryLocationForBucketedObjects
+=== PAUSE TestHashRegistryLocationForBucketedObjects
+=== CONT  TestTerminalProgressSubscriber_ValidationPhase
+=== CONT  TestHashMismatchForBucketedObjects
+--- PASS: TestTerminalProgressSubscriber_ValidationPhase (0.00s)
+=== CONT  TestWouldDemoteStatusToErrorForUnresolvedIssues_policy
+=== RUN   TestWouldDemoteStatusToErrorForUnresolvedIssues_policy/tier2_does_not_demote_complete
+=== PAUSE TestWouldDemoteStatusToErrorForUnresolvedIssues_policy/tier2_does_not_demote_complete
+=== RUN   TestWouldDemoteStatusToErrorForUnresolvedIssues_policy/tier2_does_not_demote_archived
+=== PAUSE TestWouldDemoteStatusToErrorForUnresolvedIssues_policy/tier2_does_not_demote_archived
+=== RUN   TestWouldDemoteStatusToErrorForUnresolvedIssues_policy/tier2_does_not_demote_exploring
+=== PAUSE TestWouldDemoteStatusToErrorForUnresolvedIssues_policy/tier2_does_not_demote_exploring
+=== RUN   TestWouldDemoteStatusToErrorForUnresolvedIssues_policy/invalid_lifecycle_demotes
+=== PAUSE TestWouldDemoteStatusToErrorForUnresolvedIssues_policy/invalid_lifecycle_demotes
+=== RUN   TestWouldDemoteStatusToErrorForUnresolvedIssues_policy/precondition_demotes_complete
+=== PAUSE TestWouldDemoteStatusToErrorForUnresolvedIssues_policy/precondition_demotes_complete
+=== RUN   TestWouldDemoteStatusToErrorForUnresolvedIssues_policy/completeness_does_not_demote_planned
+=== PAUSE TestWouldDemoteStatusToErrorForUnresolvedIssues_policy/completeness_does_not_demote_planned
+=== RUN   TestWouldDemoteStatusToErrorForUnresolvedIssues_policy/completeness_does_not_demote_archived
+=== PAUSE TestWouldDemoteStatusToErrorForUnresolvedIssues_policy/completeness_does_not_demote_archived
+=== RUN   TestWouldDemoteStatusToErrorForUnresolvedIssues_policy/completeness_does_not_demote_answered
+=== PAUSE TestWouldDemoteStatusToErrorForUnresolvedIssues_policy/completeness_does_not_demote_answered
+=== RUN   TestWouldDemoteStatusToErrorForUnresolvedIssues_policy/already_error
+=== PAUSE TestWouldDemoteStatusToErrorForUnresolvedIssues_policy/already_error
+=== RUN   TestWouldDemoteStatusToErrorForUnresolvedIssues_policy/integrity_ignored
+=== PAUSE TestWouldDemoteStatusToErrorForUnresolvedIssues_policy/integrity_ignored
+=== RUN   TestWouldDemoteStatusToErrorForUnresolvedIssues_policy/mixed_completeness_and_invalid
+=== PAUSE TestWouldDemoteStatusToErrorForUnresolvedIssues_policy/mixed_completeness_and_invalid
+=== RUN   TestWouldDemoteStatusToErrorForUnresolvedIssues_policy/account_never_demotes
+=== PAUSE TestWouldDemoteStatusToErrorForUnresolvedIssues_policy/account_never_demotes
+=== RUN   TestWouldDemoteStatusToErrorForUnresolvedIssues_policy/priority_plan_never_demotes
+=== PAUSE TestWouldDemoteStatusToErrorForUnresolvedIssues_policy/priority_plan_never_demotes
+=== CONT  TestHashRegistryLocationForBucketedObjects
+    check_impl_bucketed_registry_test.go:109: ✅ Hash registry correctly located in file's directory for bucketed object
+--- PASS: TestHashRegistryLocationForBucketedObjects (0.06s)
+=== CONT  TestFormatDetection_HandlerPath
+    check_format_detection_test.go:211: Format detection: formatStr="jsonl", format="jsonl", handler=true, IsStreaming=true
+=== NAME  TestHashMismatchForBucketedObjects
+    check_hash_mismatch_bucketed_test.go:124: Registry hash not updated after fix under bundler: expected 9762d6719090029bb12909e0443d5b55c364048339743b530c53d86f95fcd35b, got d5c3968d56bebc7cf60b8ec923be0caa0f76c68d86fd71cc79783809c66c9741
+--- SKIP: TestHashMismatchForBucketedObjects (0.09s)
+=== CONT  TestHashRegistryCacheInvalidation
+    check_hash_cache_invalidation_test.go:115: ⚠️  Cached registry still has old hash: 3bfce5940212a202 (expected: a7c089bd51d84ccc)
+    check_hash_cache_invalidation_test.go:116:    This is the bug - cached registry needs to be reloaded!
+    check_hash_cache_invalidation_test.go:135: ✅ Test passed: Hash registry cache invalidation works after reload
+    check_hash_cache_invalidation_test.go:136:    Original hash: 3bfce5940212a202
+    check_hash_cache_invalidation_test.go:137:    Updated hash: a7c089bd51d84ccc
+    check_hash_cache_invalidation_test.go:138:    Reloaded hash: a7c089bd51d84ccc
+    check_hash_cache_invalidation_test.go:139: 
+    check_hash_cache_invalidation_test.go:140:    Issue: Cached registries need to be reloaded after hash updates
+    check_hash_cache_invalidation_test.go:141:    Solution: Clear hash registry cache or reload after fix-hashes
+--- PASS: TestHashRegistryCacheInvalidation (0.06s)
+=== CONT  TestFormatDetection_FlagChangedState
+    check_format_detection_test.go:172: ✅ Format detection logic working: format="jsonl", handler=true, streaming=true
+--- PASS: TestFormatDetection_FlagChangedState (0.00s)
+=== CONT  TestShouldDemoteStatusToErrorForUnresolvedIssues_policy
+--- PASS: TestShouldDemoteStatusToErrorForUnresolvedIssues_policy (0.00s)
+=== CONT  TestHashMismatchDetectionAndFix
+    check_hash_mismatch_test.go:141: ✅ Test passed: Hash mismatch detection and fix works correctly
+    check_hash_mismatch_test.go:142:    Original hash: 01398ba9486a4a11
+    check_hash_mismatch_test.go:143:    New hash: 4fcc39c58aa99553
+    check_hash_mismatch_test.go:144:    Final registry hash: 4fcc39c58aa99553
+--- PASS: TestHashMismatchDetectionAndFix (0.03s)
+=== CONT  TestFormatDetection_RealCommandSimulation
+=== NAME  TestFormatDetection_HandlerPath
+    check_format_detection_test.go:265: ✅ Handler path working correctly - 1 valid JSONL objects
+=== NAME  TestFormatDetection_RealCommandSimulation
+    check_format_detection_test.go:124: ✅ Format detection working - found 2 valid JSONL lines
+--- PASS: TestFormatDetection_HandlerPath (0.56s)
+=== CONT  TestWouldDemoteStatusToErrorForUnresolvedIssues_policy/tier2_does_not_demote_complete
+=== CONT  TestWouldDemoteStatusToErrorForUnresolvedIssues_policy/completeness_does_not_demote_answered
+=== CONT  TestWouldDemoteStatusToErrorForUnresolvedIssues_policy/priority_plan_never_demotes
+=== CONT  TestWouldDemoteStatusToErrorForUnresolvedIssues_policy/account_never_demotes
+=== CONT  TestWouldDemoteStatusToErrorForUnresolvedIssues_policy/mixed_completeness_and_invalid
+=== CONT  TestWouldDemoteStatusToErrorForUnresolvedIssues_policy/integrity_ignored
+=== CONT  TestWouldDemoteStatusToErrorForUnresolvedIssues_policy/already_error
+=== CONT  TestWouldDemoteStatusToErrorForUnresolvedIssues_policy/precondition_demotes_complete
+=== CONT  TestWouldDemoteStatusToErrorForUnresolvedIssues_policy/completeness_does_not_demote_archived
+=== CONT  TestWouldDemoteStatusToErrorForUnresolvedIssues_policy/completeness_does_not_demote_planned
+=== CONT  TestWouldDemoteStatusToErrorForUnresolvedIssues_policy/tier2_does_not_demote_exploring
+=== CONT  TestWouldDemoteStatusToErrorForUnresolvedIssues_policy/invalid_lifecycle_demotes
+=== CONT  TestWouldDemoteStatusToErrorForUnresolvedIssues_policy/tier2_does_not_demote_archived
+--- PASS: TestWouldDemoteStatusToErrorForUnresolvedIssues_policy (0.00s)
+    --- PASS: TestWouldDemoteStatusToErrorForUnresolvedIssues_policy/tier2_does_not_demote_complete (0.00s)
+    --- PASS: TestWouldDemoteStatusToErrorForUnresolvedIssues_policy/completeness_does_not_demote_answered (0.00s)
+    --- PASS: TestWouldDemoteStatusToErrorForUnresolvedIssues_policy/priority_plan_never_demotes (0.00s)
+    --- PASS: TestWouldDemoteStatusToErrorForUnresolvedIssues_policy/account_never_demotes (0.00s)
+    --- PASS: TestWouldDemoteStatusToErrorForUnresolvedIssues_policy/mixed_completeness_and_invalid (0.00s)
+    --- PASS: TestWouldDemoteStatusToErrorForUnresolvedIssues_policy/integrity_ignored (0.00s)
+    --- PASS: TestWouldDemoteStatusToErrorForUnresolvedIssues_policy/already_error (0.00s)
+    --- PASS: TestWouldDemoteStatusToErrorForUnresolvedIssues_policy/precondition_demotes_complete (0.00s)
+    --- PASS: TestWouldDemoteStatusToErrorForUnresolvedIssues_policy/completeness_does_not_demote_archived (0.00s)
+    --- PASS: TestWouldDemoteStatusToErrorForUnresolvedIssues_policy/completeness_does_not_demote_planned (0.00s)
+    --- PASS: TestWouldDemoteStatusToErrorForUnresolvedIssues_policy/tier2_does_not_demote_exploring (0.00s)
+    --- PASS: TestWouldDemoteStatusToErrorForUnresolvedIssues_policy/invalid_lifecycle_demotes (0.00s)
+    --- PASS: TestWouldDemoteStatusToErrorForUnresolvedIssues_policy/tier2_does_not_demote_archived (0.00s)
+--- PASS: TestFormatDetection_RealCommandSimulation (0.45s)
+PASS
+ok  	github.com/lanceman/zqk/cmd/zqk/system	1.429s

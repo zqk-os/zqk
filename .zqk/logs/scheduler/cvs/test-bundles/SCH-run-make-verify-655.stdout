@@ -1,0 +1,28 @@
+
+--- run 2026-09-04T22:18:49Z ---
+=== RUN   TestShellPeerWakeAdapter_liveWorkerDelivery
+=== PAUSE TestShellPeerWakeAdapter_liveWorkerDelivery
+=== RUN   TestWakePasteStub_shortAndPointsAtFeed
+=== PAUSE TestWakePasteStub_shortAndPointsAtFeed
+=== RUN   TestWakePasteStub_agentIDPointerIsSeatNotEvent
+=== PAUSE TestWakePasteStub_agentIDPointerIsSeatNotEvent
+=== RUN   TestWakePasteStub_emptyAgentFallsBack
+=== PAUSE TestWakePasteStub_emptyAgentFallsBack
+=== RUN   TestWakePasteStubIn_readsSeatIDsFromPeerSeats
+=== PAUSE TestWakePasteStubIn_readsSeatIDsFromPeerSeats
+=== RUN   TestPeerAckPasteStub
+=== PAUSE TestPeerAckPasteStub
+=== CONT  TestShellPeerWakeAdapter_liveWorkerDelivery
+--- PASS: TestShellPeerWakeAdapter_liveWorkerDelivery (0.00s)
+=== CONT  TestWakePasteStub_agentIDPointerIsSeatNotEvent
+--- PASS: TestWakePasteStub_agentIDPointerIsSeatNotEvent (0.00s)
+=== CONT  TestWakePasteStub_shortAndPointsAtFeed
+--- PASS: TestWakePasteStub_shortAndPointsAtFeed (0.00s)
+=== CONT  TestPeerAckPasteStub
+--- PASS: TestPeerAckPasteStub (0.00s)
+=== CONT  TestWakePasteStubIn_readsSeatIDsFromPeerSeats
+=== CONT  TestWakePasteStub_emptyAgentFallsBack
+--- PASS: TestWakePasteStub_emptyAgentFallsBack (0.00s)
+--- PASS: TestWakePasteStubIn_readsSeatIDsFromPeerSeats (0.01s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/agentfeed	0.311s

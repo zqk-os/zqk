@@ -1,0 +1,44 @@
+
+--- run 2026-09-04T22:13:42Z ---
+=== RUN   TestApplyScenarioBundle_CreatesSchedulerJobFixture
+=== PAUSE TestApplyScenarioBundle_CreatesSchedulerJobFixture
+=== RUN   TestApplyScenarioBundle_CreatesTraceabilityObjects
+=== PAUSE TestApplyScenarioBundle_CreatesTraceabilityObjects
+=== RUN   TestApplyScenarioBundle_ProcessHygieneConfigTraceabilityBundleLoad
+=== PAUSE TestApplyScenarioBundle_ProcessHygieneConfigTraceabilityBundleLoad
+=== RUN   TestApplyScenarioBundle_CapLoopHonestyTraceabilityBundleLoad
+=== PAUSE TestApplyScenarioBundle_CapLoopHonestyTraceabilityBundleLoad
+=== RUN   TestApplyScenarioBundle_PersistenceBundleLoad
+=== PAUSE TestApplyScenarioBundle_PersistenceBundleLoad
+=== RUN   TestApplyScenarioBundle_EmitsScenarioSummary
+=== PAUSE TestApplyScenarioBundle_EmitsScenarioSummary
+=== RUN   TestApplyScenarioBundle_ConvergenceLifecycleBundle
+=== PAUSE TestApplyScenarioBundle_ConvergenceLifecycleBundle
+=== RUN   TestApplyScenarioBundle_TraceabilityLinkageQADisparityRemediation
+=== PAUSE TestApplyScenarioBundle_TraceabilityLinkageQADisparityRemediation
+=== RUN   TestConvergenceLifecycleBundle_MeasureAndApplySuggestedUpdate
+=== PAUSE TestConvergenceLifecycleBundle_MeasureAndApplySuggestedUpdate
+=== RUN   TestConvergenceLifecycleBundle_RemediateThenGreenTwoIterations
+=== PAUSE TestConvergenceLifecycleBundle_RemediateThenGreenTwoIterations
+=== CONT  TestApplyScenarioBundle_CreatesSchedulerJobFixture
+=== CONT  TestApplyScenarioBundle_EmitsScenarioSummary
+--- PASS: TestApplyScenarioBundle_CreatesSchedulerJobFixture (1.11s)
+=== CONT  TestConvergenceLifecycleBundle_MeasureAndApplySuggestedUpdate
+--- PASS: TestApplyScenarioBundle_EmitsScenarioSummary (1.15s)
+=== CONT  TestConvergenceLifecycleBundle_RemediateThenGreenTwoIterations
+--- PASS: TestConvergenceLifecycleBundle_MeasureAndApplySuggestedUpdate (1.86s)
+=== CONT  TestApplyScenarioBundle_CapLoopHonestyTraceabilityBundleLoad
+--- PASS: TestApplyScenarioBundle_CapLoopHonestyTraceabilityBundleLoad (0.01s)
+=== CONT  TestApplyScenarioBundle_PersistenceBundleLoad
+--- PASS: TestApplyScenarioBundle_PersistenceBundleLoad (0.00s)
+=== CONT  TestApplyScenarioBundle_TraceabilityLinkageQADisparityRemediation
+--- PASS: TestConvergenceLifecycleBundle_RemediateThenGreenTwoIterations (1.85s)
+=== CONT  TestApplyScenarioBundle_ProcessHygieneConfigTraceabilityBundleLoad
+--- PASS: TestApplyScenarioBundle_ProcessHygieneConfigTraceabilityBundleLoad (0.01s)
+=== CONT  TestApplyScenarioBundle_CreatesTraceabilityObjects
+--- PASS: TestApplyScenarioBundle_TraceabilityLinkageQADisparityRemediation (1.12s)
+=== CONT  TestApplyScenarioBundle_ConvergenceLifecycleBundle
+--- PASS: TestApplyScenarioBundle_CreatesTraceabilityObjects (1.10s)
+--- PASS: TestApplyScenarioBundle_ConvergenceLifecycleBundle (3.14s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/scenario	7.915s

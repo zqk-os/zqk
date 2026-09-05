@@ -1,0 +1,45 @@
+{
+  "schema": "zqk_swarm_init_run_v1",
+  "run_id": "SWI-20260905T001856Z",
+  "pipeline_id": "PIP-SWARM-INIT-MMORCH-001",
+  "dry_run": false,
+  "started_at": "2026-09-05T00:18:56Z",
+  "finished_at": "2026-09-05T00:19:03Z",
+  "ok": false,
+  "path": "/Users/lanceettl/zqk-restore-clone/.zqk/state/mesh/swarm_init/2026-09-05/SWI-20260905T001856Z.json",
+  "stages": [
+    {
+      "id": "control_plane",
+      "executor": "control_plane",
+      "status": "pass",
+      "evidence": {
+        "contract_paths_ok": true,
+        "doctor_issues": [
+          "peer_seats_present_but_no_live_pids: run feed doctor --refresh-seats"
+        ],
+        "dry_run": false,
+        "feed_health": "healthy",
+        "forbid_refresh_seats": true,
+        "mcp_ensure": "ok",
+        "mcp_subscribers": 1,
+        "mcp_tcp": "127.0.0.1:8443",
+        "night_duty_enabled": false
+      }
+    },
+    {
+      "id": "bind_seats",
+      "executor": "bind_seats",
+      "status": "fail",
+      "evidence": {
+        "agentapi_seats_checked": 2,
+        "dry_run": false,
+        "forbid_refresh_seats": true,
+        "issues": [
+          "peer-agent-1: missing pid",
+          "peer-agent-2: missing pid"
+        ]
+      },
+      "error": "bind_seats failed: peer-agent-1: missing pid; peer-agent-2: missing pid"
+    }
+  ]
+}

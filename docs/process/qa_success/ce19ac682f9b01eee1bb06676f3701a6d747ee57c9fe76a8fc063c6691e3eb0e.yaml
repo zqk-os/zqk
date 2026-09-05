@@ -1,0 +1,14 @@
+created_at: "2026-08-18T23:36:49Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1787096209360204000-d8e051ef
+item_id: BLI-CEF-R2-OBS-KILL-SYNTHETIC
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 2857702ca28e4b64fb5782140b43c1400e68fdeab30ab0062f4119523ca97d466e5f13c72adcfa41b92eacf21fa7f0a79b8a8e3a8d7c581e5c9afe0e69cb31dc
+schema_version: 2.0.0
+signature: 30450221008bc3af6866f42bc26b4e7539a96d80f65b0be331d20ddb76f7c007cd8a98735302201c8e4d56cefbb04571dc79bc0fce149fb72541bc9abd0a813aaab5b47458d91f
+status: archived
+title: Remove Autonomy Inbox synthetic health gauge (telemetryBaseHealth)
+updated_at: "2026-09-01T07:32:24Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

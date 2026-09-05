@@ -1,0 +1,3170 @@
+[2026-09-04T20:38:03Z] idle quiet age=1000000000s but idle cooldown active; skip nudge
+[2026-09-04T20:40:07Z] idle nudge → wake both peers (age=1000000000s)
+[2026-09-04T20:40:08Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-04T20:40:09Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-04T20:42:03Z] tpm update_complete → wake agy
+[2026-09-04T20:42:04Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+[2026-09-04T20:42:04Z] idle quiet age=117s but idle cooldown active; skip nudge
+[2026-09-04T20:44:03Z] idle nudge → wake both peers (age=236s)
+[2026-09-04T20:44:04Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-04T20:44:04Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-04T20:46:03Z] tpm update_complete → wake agy
+[2026-09-04T20:46:03Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+[2026-09-04T20:46:03Z] idle quiet age=119s but idle cooldown active; skip nudge
+[2026-09-04T20:48:03Z] idle nudge → wake both peers (age=239s)
+[2026-09-04T20:48:03Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-04T20:48:03Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-04T20:50:02Z] tpm update_complete → wake agy
+[2026-09-04T20:50:02Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+[2026-09-04T20:50:03Z] idle nudge → wake both peers (age=120s)
+[2026-09-04T20:50:03Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-04T20:50:03Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-04T20:52:02Z] tpm update_complete → wake agy
+[2026-09-04T20:52:02Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+[2026-09-04T20:52:02Z] idle quiet age=119s but idle cooldown active; skip nudge
+[2026-09-04T20:54:03Z] idle nudge → wake both peers (age=240s)
+[2026-09-04T20:54:03Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-04T20:54:03Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-04T20:56:03Z] tpm update_complete → wake agy
+[2026-09-04T20:56:03Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+[2026-09-04T20:56:03Z] idle nudge → wake both peers (age=120s)
+[2026-09-04T20:56:03Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-04T20:56:03Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-04T20:58:02Z] tpm update_complete → wake agy
+[2026-09-04T20:58:03Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+[2026-09-04T20:58:03Z] idle nudge → wake both peers (age=120s)
+[2026-09-04T20:58:03Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-04T20:58:03Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-04T21:00:03Z] tpm update_complete → wake agy
+[2026-09-04T21:00:03Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+[2026-09-04T21:00:03Z] idle nudge → wake both peers (age=120s)
+[2026-09-04T21:00:03Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-04T21:00:03Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-04T21:02:02Z] tpm update_complete → wake agy
+[2026-09-04T21:02:02Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+[2026-09-04T21:02:03Z] idle quiet age=119s but idle cooldown active; skip nudge
+[2026-09-04T21:04:02Z] idle nudge → wake both peers (age=239s)
+[2026-09-04T21:04:02Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-04T21:04:02Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-04T21:06:02Z] tpm update_complete → wake agy
+[2026-09-04T21:06:03Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+[2026-09-04T21:06:03Z] idle nudge → wake both peers (age=121s)
+[2026-09-04T21:06:03Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-04T21:06:03Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-04T21:08:02Z] tpm update_complete → wake agy
+[2026-09-04T21:08:02Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+[2026-09-04T21:08:03Z] idle nudge → wake both peers (age=119s)
+[2026-09-04T21:08:03Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-04T21:08:03Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-04T21:10:03Z] tpm update_complete → wake agy
+[2026-09-04T21:10:03Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+[2026-09-04T21:10:03Z] idle nudge → wake both peers (age=120s)
+[2026-09-04T21:10:03Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-04T21:10:03Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-04T21:12:03Z] tpm update_complete → wake agy
+[2026-09-04T21:12:03Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+[2026-09-04T21:12:03Z] idle nudge → wake both peers (age=120s)
+[2026-09-04T21:12:04Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-04T21:12:04Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-04T21:14:03Z] tpm update_complete → wake agy
+[2026-09-04T21:14:03Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+[2026-09-04T21:14:04Z] idle nudge → wake both peers (age=121s)
+[2026-09-04T21:14:04Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-04T21:14:04Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-04T21:16:03Z] tpm update_complete → wake agy
+[2026-09-04T21:16:03Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+[2026-09-04T21:16:03Z] idle quiet age=119s but idle cooldown active; skip nudge
+[2026-09-04T21:18:03Z] idle nudge → wake both peers (age=239s)
+[2026-09-04T21:18:03Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-04T21:18:03Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-04T21:20:03Z] tpm update_complete → wake agy
+[2026-09-04T21:20:03Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+[2026-09-04T21:20:03Z] idle nudge → wake both peers (age=120s)
+[2026-09-04T21:20:04Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-04T21:20:04Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-04T21:22:03Z] tpm update_complete → wake agy
+[2026-09-04T21:22:03Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+[2026-09-04T21:22:03Z] idle quiet age=119s but idle cooldown active; skip nudge
+[2026-09-04T21:24:03Z] idle nudge → wake both peers (age=239s)
+[2026-09-04T21:24:03Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-04T21:24:03Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-04T21:26:03Z] tpm update_complete → wake agy
+[2026-09-04T21:26:03Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+[2026-09-04T21:26:03Z] idle nudge → wake both peers (age=120s)
+[2026-09-04T21:26:03Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-04T21:26:03Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-04T21:28:03Z] tpm update_complete → wake agy
+[2026-09-04T21:28:03Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+[2026-09-04T21:28:04Z] idle nudge → wake both peers (age=121s)
+[2026-09-04T21:28:04Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-04T21:28:04Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-04T21:30:03Z] tpm update_complete → wake agy
+[2026-09-04T21:30:03Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+[2026-09-04T21:30:03Z] idle quiet age=119s but idle cooldown active; skip nudge
+[2026-09-04T21:32:03Z] idle nudge → wake both peers (age=239s)
+[2026-09-04T21:32:03Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-04T21:32:03Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-04T21:34:03Z] tpm update_complete → wake agy
+[2026-09-04T21:34:03Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+[2026-09-04T21:34:03Z] idle nudge → wake both peers (age=120s)
+[2026-09-04T21:34:03Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-04T21:34:03Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-04T21:36:07Z] tpm update_complete → wake agy
+[2026-09-04T21:36:07Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+[2026-09-04T21:36:08Z] idle nudge → wake both peers (age=125s)
+[2026-09-04T21:36:08Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-04T21:36:08Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-04T21:38:03Z] tpm update_complete → wake agy
+[2026-09-04T21:38:03Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+[2026-09-04T21:38:03Z] idle quiet age=115s but idle cooldown active; skip nudge
+[2026-09-04T21:40:04Z] idle nudge → wake both peers (age=236s)
+[2026-09-04T21:40:04Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-04T21:40:04Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-04T21:42:02Z] tpm update_complete → wake agy
+[2026-09-04T21:42:02Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+[2026-09-04T21:42:02Z] idle quiet age=118s but idle cooldown active; skip nudge
+[2026-09-04T21:44:03Z] idle nudge → wake both peers (age=239s)
+[2026-09-04T21:44:03Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-04T21:44:04Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-04T21:46:02Z] tpm update_complete → wake agy
+[2026-09-04T21:46:02Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+[2026-09-04T21:46:03Z] idle quiet age=120s but idle cooldown active; skip nudge
+[2026-09-04T21:48:03Z] idle nudge → wake both peers (age=240s)
+[2026-09-04T21:48:04Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-04T21:48:04Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-04T21:50:26Z] tpm update_complete → wake agy
+[2026-09-04T21:50:28Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+[2026-09-04T21:50:30Z] idle nudge → wake both peers (age=145s)
+[2026-09-04T21:50:33Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-04T21:50:34Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-04T21:52:32Z] tpm update_complete → wake agy
+[2026-09-04T21:52:33Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+[2026-09-04T21:52:34Z] idle nudge → wake both peers (age=123s)
+[2026-09-04T21:52:36Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-04T21:52:38Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-04T21:54:26Z] tpm update_complete → wake agy
+[2026-09-04T21:54:27Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+[2026-09-04T21:54:28Z] idle quiet age=113s but idle cooldown active; skip nudge
+[2026-09-04T21:56:05Z] idle nudge → wake both peers (age=210s)
+[2026-09-04T21:56:06Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-04T21:56:06Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-04T21:58:08Z] tpm update_complete → wake agy
+[2026-09-04T21:58:08Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+[2026-09-04T21:58:09Z] idle nudge → wake both peers (age=123s)
+[2026-09-04T21:58:09Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-04T21:58:09Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-04T22:00:03Z] tpm update_complete → wake agy
+[2026-09-04T22:00:04Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+[2026-09-04T22:00:04Z] idle quiet age=115s but idle cooldown active; skip nudge
+[2026-09-04T22:02:20Z] idle nudge → wake both peers (age=251s)
+[2026-09-04T22:02:28Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-04T22:02:28Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-04T22:04:03Z] tpm update_complete → wake agy
+[2026-09-04T22:04:03Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+[2026-09-04T22:04:03Z] idle quiet age=98s but idle cooldown active; skip nudge
+[2026-09-04T22:06:03Z] idle nudge → wake both peers (age=218s)
+[2026-09-04T22:06:03Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-04T22:06:03Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-04T22:08:06Z] tpm update_complete → wake agy
+[2026-09-04T22:08:06Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+[2026-09-04T22:08:07Z] idle nudge → wake both peers (age=124s)
+[2026-09-04T22:08:07Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-04T22:08:07Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-04T22:10:03Z] tpm update_complete → wake agy
+[2026-09-04T22:10:03Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+[2026-09-04T22:10:03Z] idle quiet age=116s but idle cooldown active; skip nudge
+[2026-09-04T22:12:03Z] idle nudge → wake both peers (age=236s)
+[2026-09-04T22:12:03Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-04T22:12:03Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-04T22:14:03Z] tpm update_complete → wake agy
+[2026-09-04T22:14:03Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+[2026-09-04T22:14:03Z] idle nudge → wake both peers (age=120s)
+[2026-09-04T22:14:03Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-04T22:14:03Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-04T22:16:02Z] tpm update_complete → wake agy
+[2026-09-04T22:16:02Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+[2026-09-04T22:16:02Z] idle quiet age=119s but idle cooldown active; skip nudge
+[2026-09-04T22:18:03Z] idle nudge → wake both peers (age=240s)
+[2026-09-04T22:18:03Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-04T22:18:03Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-04T22:20:06Z] tpm update_complete → wake agy
+[2026-09-04T22:20:06Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+[2026-09-04T22:20:06Z] idle nudge → wake both peers (age=123s)
+[2026-09-04T22:20:07Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-04T22:20:07Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-04T22:22:03Z] tpm update_complete → wake agy
+[2026-09-04T22:22:03Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+[2026-09-04T22:22:03Z] idle quiet age=117s but idle cooldown active; skip nudge
+[2026-09-04T22:24:03Z] idle nudge → wake both peers (age=237s)
+[2026-09-04T22:24:03Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-04T22:24:03Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-04T22:26:03Z] tpm update_complete → wake agy
+[2026-09-04T22:26:03Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+[2026-09-04T22:26:04Z] idle nudge → wake both peers (age=121s)
+[2026-09-04T22:26:04Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-04T22:26:04Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-04T22:28:04Z] tpm update_complete → wake agy
+[2026-09-04T22:28:04Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+[2026-09-04T22:28:05Z] idle nudge → wake both peers (age=121s)
+[2026-09-04T22:28:05Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-04T22:28:05Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-04T22:30:03Z] tpm update_complete → wake agy
+[2026-09-04T22:30:03Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+[2026-09-04T22:30:03Z] idle quiet age=118s but idle cooldown active; skip nudge
+[2026-09-04T22:32:04Z] idle nudge → wake both peers (age=239s)
+[2026-09-04T22:32:05Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-04T22:32:05Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-04T22:34:04Z] tpm update_complete → wake agy
+[2026-09-04T22:34:05Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+[2026-09-04T22:34:05Z] idle nudge → wake both peers (age=120s)
+[2026-09-04T22:34:05Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-04T22:34:05Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-04T22:36:03Z] tpm update_complete → wake agy
+[2026-09-04T22:36:03Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+[2026-09-04T22:36:03Z] idle quiet age=118s but idle cooldown active; skip nudge
+[2026-09-04T22:38:02Z] idle nudge → wake both peers (age=237s)
+[2026-09-04T22:38:03Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-04T22:38:03Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-04T22:40:03Z] tpm update_complete → wake agy
+[2026-09-04T22:40:03Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+[2026-09-04T22:40:03Z] idle nudge → wake both peers (age=121s)
+[2026-09-04T22:40:04Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-04T22:40:04Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-04T22:42:02Z] tpm update_complete → wake agy
+[2026-09-04T22:42:03Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+[2026-09-04T22:42:03Z] idle quiet age=119s but idle cooldown active; skip nudge
+[2026-09-04T22:44:04Z] idle nudge → wake both peers (age=240s)
+[2026-09-04T22:44:04Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-04T22:44:05Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-04T22:46:03Z] tpm update_complete → wake agy
+[2026-09-04T22:46:03Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+[2026-09-04T22:46:04Z] idle quiet age=120s but idle cooldown active; skip nudge
+[2026-09-04T22:48:03Z] idle nudge → wake both peers (age=239s)
+[2026-09-04T22:48:03Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-04T22:48:03Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-04T22:50:03Z] tpm update_complete → wake agy
+[2026-09-04T22:50:03Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+[2026-09-04T22:50:03Z] idle nudge → wake both peers (age=120s)
+[2026-09-04T22:50:04Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-04T22:50:04Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-04T22:52:03Z] tpm update_complete → wake agy
+[2026-09-04T22:52:03Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+[2026-09-04T22:52:03Z] idle quiet age=119s but idle cooldown active; skip nudge
+[2026-09-04T22:54:03Z] idle nudge → wake both peers (age=239s)
+[2026-09-04T22:54:03Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-04T22:54:03Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-04T22:56:03Z] tpm update_complete → wake agy
+[2026-09-04T22:56:04Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+[2026-09-04T22:56:04Z] idle nudge → wake both peers (age=121s)
+[2026-09-04T22:56:04Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-04T22:56:04Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-04T22:58:03Z] tpm update_complete → wake agy
+[2026-09-04T22:58:03Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+[2026-09-04T22:58:03Z] idle quiet age=119s but idle cooldown active; skip nudge
+[2026-09-04T23:00:03Z] idle nudge → wake both peers (age=239s)
+[2026-09-04T23:00:03Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-04T23:00:03Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-04T23:02:02Z] kernel feed → composer inject: steering cap-orchestrator AFE-1788562873132989000-853ef46f ACKONLY;
+[2026-09-04T23:02:02Z] tpm update_complete → wake agy
+[2026-09-04T23:02:03Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+[2026-09-04T23:04:02Z] idle nudge → wake both peers (age=239s)
+[2026-09-04T23:04:03Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-04T23:04:03Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-04T23:06:03Z] tpm update_complete → wake agy
+[2026-09-04T23:06:04Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+[2026-09-04T23:06:04Z] idle nudge → wake both peers (age=121s)
+[2026-09-04T23:06:04Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-04T23:06:04Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-04T23:08:04Z] tpm update_complete → wake agy
+[2026-09-04T23:08:04Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+[2026-09-04T23:08:04Z] idle nudge → wake both peers (age=120s)
+[2026-09-04T23:08:05Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-04T23:08:05Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-04T23:10:04Z] tpm update_complete → wake agy
+[2026-09-04T23:10:04Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+[2026-09-04T23:10:04Z] idle quiet age=119s but idle cooldown active; skip nudge
+[2026-09-04T23:12:12Z] idle nudge → wake both peers (age=96s)
+[2026-09-04T23:12:13Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-04T23:12:13Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-04T23:14:04Z] tpm update_complete → wake agy
+[2026-09-04T23:14:04Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+[2026-09-04T23:14:04Z] idle quiet age=112s but idle cooldown active; skip nudge
+[2026-09-04T23:16:03Z] idle nudge → wake both peers (age=231s)
+[2026-09-04T23:16:03Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-04T23:16:04Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-04T23:18:03Z] tpm update_complete → wake agy
+[2026-09-04T23:18:03Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+[2026-09-04T23:18:03Z] idle quiet age=120s but idle cooldown active; skip nudge
+[2026-09-04T23:20:03Z] idle nudge → wake both peers (age=240s)
+[2026-09-04T23:20:04Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-04T23:20:04Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-04T23:22:06Z] tpm update_complete → wake agy
+[2026-09-04T23:22:06Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+[2026-09-04T23:22:06Z] idle nudge → wake both peers (age=123s)
+[2026-09-04T23:22:07Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-04T23:22:07Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-04T23:24:05Z] tpm update_complete → wake agy
+[2026-09-04T23:24:06Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+[2026-09-04T23:24:06Z] idle quiet age=119s but idle cooldown active; skip nudge
+[2026-09-04T23:26:03Z] idle nudge → wake both peers (age=236s)
+[2026-09-04T23:26:04Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-04T23:26:04Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-04T23:28:03Z] tpm update_complete → wake agy
+[2026-09-04T23:28:03Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+[2026-09-04T23:28:03Z] idle quiet age=120s but idle cooldown active; skip nudge
+[2026-09-04T23:30:24Z] idle nudge → wake both peers (age=261s)
+[2026-09-04T23:30:26Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-04T23:30:28Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-04T23:32:02Z] tpm update_complete → wake agy
+[2026-09-04T23:32:02Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+[2026-09-04T23:32:02Z] idle quiet age=97s but idle cooldown active; skip nudge
+[2026-09-04T23:34:03Z] idle nudge → wake both peers (age=218s)
+[2026-09-04T23:34:03Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-04T23:34:03Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-04T23:36:02Z] tpm update_complete → wake agy
+[2026-09-04T23:36:03Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+[2026-09-04T23:36:03Z] idle nudge → wake both peers (age=120s)
+[2026-09-04T23:36:03Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-04T23:36:03Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-04T23:38:02Z] tpm update_complete → wake agy
+[2026-09-04T23:38:03Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+[2026-09-04T23:38:03Z] idle nudge → wake both peers (age=120s)
+[2026-09-04T23:38:03Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-04T23:38:03Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-04T23:40:02Z] tpm update_complete → wake agy
+[2026-09-04T23:40:02Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+[2026-09-04T23:40:03Z] idle nudge → wake both peers (age=120s)
+[2026-09-04T23:40:03Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-04T23:40:03Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-04T23:42:03Z] tpm update_complete → wake agy
+[2026-09-04T23:42:03Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+[2026-09-04T23:42:03Z] idle nudge → wake both peers (age=120s)
+[2026-09-04T23:42:03Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-04T23:42:03Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-04T23:44:03Z] tpm update_complete → wake agy
+[2026-09-04T23:44:03Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+[2026-09-04T23:44:03Z] idle nudge → wake both peers (age=120s)
+[2026-09-04T23:44:03Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-04T23:44:03Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-04T23:46:03Z] tpm update_complete → wake agy
+[2026-09-04T23:46:03Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+[2026-09-04T23:46:03Z] idle nudge → wake both peers (age=120s)
+[2026-09-04T23:46:03Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-04T23:46:03Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-04T23:48:31Z] tpm update_complete → wake agy
+[2026-09-04T23:48:32Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+[2026-09-04T23:48:32Z] idle nudge → wake both peers (age=149s)
+[2026-09-04T23:48:32Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-04T23:48:32Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-04T23:50:03Z] tpm update_complete → wake agy
+[2026-09-04T23:50:03Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+[2026-09-04T23:50:03Z] idle quiet age=91s but idle cooldown active; skip nudge
+[2026-09-04T23:52:03Z] idle nudge → wake both peers (age=211s)
+[2026-09-04T23:52:03Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-04T23:52:03Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-04T23:54:03Z] tpm update_complete → wake agy
+[2026-09-04T23:54:04Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+[2026-09-04T23:54:04Z] idle nudge → wake both peers (age=121s)
+[2026-09-04T23:54:04Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-04T23:54:04Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-04T23:56:03Z] tpm update_complete → wake agy
+[2026-09-04T23:56:03Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+[2026-09-04T23:56:03Z] idle quiet age=119s but idle cooldown active; skip nudge
+[2026-09-04T23:58:02Z] idle nudge → wake both peers (age=238s)
+[2026-09-04T23:58:03Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-04T23:58:03Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T00:00:02Z] tpm update_complete → wake agy
+[2026-09-05T00:00:03Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+[2026-09-05T00:00:03Z] idle nudge → wake both peers (age=121s)
+[2026-09-05T00:00:03Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T00:00:03Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T00:02:03Z] tpm update_complete → wake agy
+[2026-09-05T00:02:03Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+[2026-09-05T00:02:03Z] idle nudge → wake both peers (age=120s)
+[2026-09-05T00:02:03Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T00:02:03Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T00:04:02Z] tpm update_complete → wake agy
+[2026-09-05T00:04:02Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+[2026-09-05T00:04:03Z] idle nudge → wake both peers (age=120s)
+[2026-09-05T00:04:03Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T00:04:03Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T00:06:03Z] tpm update_complete → wake agy
+[2026-09-05T00:06:03Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+[2026-09-05T00:06:03Z] idle nudge → wake both peers (age=120s)
+[2026-09-05T00:06:03Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T00:06:03Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T00:08:03Z] tpm update_complete → wake agy
+[2026-09-05T00:08:03Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+[2026-09-05T00:08:03Z] idle nudge → wake both peers (age=120s)
+[2026-09-05T00:08:03Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T00:08:03Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T00:10:03Z] tpm update_complete → wake agy
+[2026-09-05T00:10:03Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+[2026-09-05T00:10:03Z] idle nudge → wake both peers (age=120s)
+[2026-09-05T00:10:03Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T00:10:03Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T00:12:03Z] tpm update_complete → wake agy
+[2026-09-05T00:12:03Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+[2026-09-05T00:12:03Z] idle nudge → wake both peers (age=120s)
+[2026-09-05T00:12:03Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T00:12:03Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T00:14:02Z] tpm update_complete → wake agy
+[2026-09-05T00:14:03Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+[2026-09-05T00:14:03Z] idle nudge → wake both peers (age=120s)
+[2026-09-05T00:14:03Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T00:14:03Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T00:16:02Z] tpm update_complete → wake agy
+[2026-09-05T00:16:02Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+[2026-09-05T00:16:02Z] idle quiet age=119s but idle cooldown active; skip nudge
+[2026-09-05T00:18:03Z] idle nudge → wake both peers (age=240s)
+[2026-09-05T00:18:03Z] error: no agentapi seats with pid in .zqk/state/mesh/peer_seats.json
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T00:18:03Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T00:20:04Z] tpm update_complete → wake agy
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T00:20:07Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T00:20:08Z] agy wake ok seat=peer-agent-2 pid=16729
+[2026-09-05T00:22:02Z] idle nudge → wake both peers (age=239s)
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T00:22:03Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T00:22:04Z] agy wake ok seat=peer-agent-2 pid=16729
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T00:22:04Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T00:24:02Z] tpm update_complete → wake agy
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T00:24:03Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T00:24:03Z] agy wake ok seat=peer-agent-2 pid=16729
+[2026-09-05T00:26:03Z] agy update_complete → wake tpm
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T00:26:03Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T00:28:02Z] idle nudge → wake both peers (age=207s)
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T00:28:03Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T00:28:04Z] agy wake ok seat=peer-agent-2 pid=16729
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T00:28:04Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T00:30:03Z] tpm update_complete → wake agy
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T00:30:04Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T00:30:08Z] agy wake ok seat=peer-agent-2 pid=16729
+[2026-09-05T00:30:08Z] agy update_complete → wake tpm
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T00:30:08Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T00:32:03Z] agy update_complete → wake tpm
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T00:32:03Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T00:34:03Z] idle nudge → wake both peers (age=234s)
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T00:34:05Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T00:34:05Z] agy wake ok seat=peer-agent-2 pid=16729
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T00:34:05Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T00:36:03Z] tpm update_complete → wake agy
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T00:36:05Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T00:36:06Z] agy wake ok seat=peer-agent-2 pid=16729
+[2026-09-05T00:36:06Z] agy update_complete → wake tpm
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T00:36:07Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T00:38:03Z] idle nudge → wake both peers (age=234s)
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T00:38:04Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T00:38:05Z] agy wake ok seat=peer-agent-2 pid=16729
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T00:38:05Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T00:40:06Z] tpm update_complete → wake agy
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T00:40:07Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T00:40:09Z] agy wake ok seat=peer-agent-2 pid=16729
+[2026-09-05T00:40:09Z] agy update_complete → wake tpm
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T00:40:09Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T00:42:03Z] agy update_complete → wake tpm
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T00:42:03Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T00:44:04Z] idle nudge → wake both peers (age=232s)
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T00:44:04Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T00:44:05Z] agy wake ok seat=peer-agent-2 pid=16729
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T00:44:05Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T00:46:05Z] tpm update_complete → wake agy
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T00:46:06Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T00:46:07Z] agy wake ok seat=peer-agent-2 pid=16729
+[2026-09-05T00:46:07Z] agy update_complete → wake tpm
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T00:46:07Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T00:48:03Z] agy update_complete → wake tpm
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T00:48:03Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T00:50:03Z] idle nudge → wake both peers (age=232s)
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T00:50:04Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T00:50:05Z] agy wake ok seat=peer-agent-2 pid=16729
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T00:50:05Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T00:52:04Z] tpm update_complete → wake agy
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T00:52:05Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T00:52:06Z] agy wake ok seat=peer-agent-2 pid=16729
+[2026-09-05T00:52:06Z] agy update_complete → wake tpm
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T00:52:06Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T00:52:06Z] cooldown agy→tpm; skipping summary=ACK wake: Standing by for user input
+[2026-09-05T00:54:03Z] idle nudge → wake both peers (age=167s)
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T00:54:04Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T00:54:05Z] agy wake ok seat=peer-agent-2 pid=16729
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T00:54:05Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T00:56:03Z] tpm update_complete → wake agy
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T00:56:04Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T00:56:05Z] agy wake ok seat=peer-agent-2 pid=16729
+[2026-09-05T00:56:05Z] agy update_complete → wake tpm
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T00:56:05Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T00:58:03Z] agy update_complete → wake tpm
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T00:58:03Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T01:00:03Z] idle nudge → wake both peers (age=236s)
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T01:00:04Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T01:00:05Z] agy wake ok seat=peer-agent-2 pid=16729
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T01:00:05Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T01:02:03Z] tpm update_complete → wake agy
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T01:02:04Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T01:02:05Z] agy wake ok seat=peer-agent-2 pid=16729
+[2026-09-05T01:02:05Z] agy update_complete → wake tpm
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T01:02:05Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T01:04:03Z] agy update_complete → wake tpm
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T01:04:03Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T01:06:03Z] idle nudge → wake both peers (age=235s)
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T01:06:04Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T01:06:04Z] agy wake ok seat=peer-agent-2 pid=16729
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T01:06:04Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T01:08:05Z] tpm update_complete → wake agy
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T01:08:06Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T01:08:07Z] agy wake ok seat=peer-agent-2 pid=16729
+[2026-09-05T01:08:07Z] agy update_complete → wake tpm
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T01:08:08Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T01:10:03Z] agy update_complete → wake tpm
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T01:10:03Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T01:12:03Z] idle nudge → wake both peers (age=233s)
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T01:12:04Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T01:12:04Z] agy wake ok seat=peer-agent-2 pid=16729
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T01:12:05Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T01:14:02Z] tpm update_complete → wake agy
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T01:14:03Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T01:14:04Z] agy wake ok seat=peer-agent-2 pid=16729
+[2026-09-05T01:14:04Z] agy update_complete → wake tpm
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T01:14:04Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T01:16:02Z] agy update_complete → wake tpm
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T01:16:02Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T01:18:02Z] idle nudge → wake both peers (age=234s)
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T01:18:03Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T01:18:04Z] agy wake ok seat=peer-agent-2 pid=16729
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T01:18:04Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T01:20:03Z] tpm update_complete → wake agy
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T01:20:04Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T01:20:05Z] agy wake ok seat=peer-agent-2 pid=16729
+[2026-09-05T01:20:05Z] agy update_complete → wake tpm
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T01:20:05Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T01:22:03Z] agy update_complete → wake tpm
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T01:22:03Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T01:24:03Z] idle nudge → wake both peers (age=233s)
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T01:24:05Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T01:24:06Z] agy wake ok seat=peer-agent-2 pid=16729
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T01:24:06Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T01:26:03Z] tpm update_complete → wake agy
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T01:26:05Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T01:26:05Z] agy wake ok seat=peer-agent-2 pid=16729
+[2026-09-05T01:26:05Z] agy update_complete → wake tpm
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T01:26:06Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T01:28:02Z] agy update_complete → wake tpm
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T01:28:03Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T01:30:03Z] idle nudge → wake both peers (age=235s)
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T01:30:04Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T01:30:05Z] agy wake ok seat=peer-agent-2 pid=16729
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T01:30:05Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T01:32:04Z] tpm update_complete → wake agy
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T01:32:04Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T01:32:05Z] agy wake ok seat=peer-agent-2 pid=16729
+[2026-09-05T01:32:05Z] agy update_complete → wake tpm
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T01:32:05Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T01:34:04Z] agy update_complete → wake tpm
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T01:34:04Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T01:36:03Z] idle nudge → wake both peers (age=235s)
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T01:36:04Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T01:36:05Z] agy wake ok seat=peer-agent-2 pid=16729
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T01:36:05Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T01:38:03Z] tpm update_complete → wake agy
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T01:38:04Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T01:38:05Z] agy wake ok seat=peer-agent-2 pid=16729
+[2026-09-05T01:38:05Z] agy update_complete → wake tpm
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T01:38:05Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T01:40:03Z] agy update_complete → wake tpm
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T01:40:03Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T01:42:03Z] idle nudge → wake both peers (age=234s)
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T01:42:03Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T01:42:04Z] agy wake ok seat=peer-agent-2 pid=16729
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T01:42:04Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T01:44:03Z] tpm update_complete → wake agy
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T01:44:04Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T01:44:05Z] agy wake ok seat=peer-agent-2 pid=16729
+[2026-09-05T01:44:05Z] agy update_complete → wake tpm
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T01:44:05Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T01:46:03Z] agy update_complete → wake tpm
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T01:46:03Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T01:48:03Z] idle nudge → wake both peers (age=235s)
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T01:48:03Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T01:48:04Z] agy wake ok seat=peer-agent-2 pid=16729
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T01:48:04Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T01:50:03Z] tpm update_complete → wake agy
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T01:50:04Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T01:50:05Z] agy wake ok seat=peer-agent-2 pid=16729
+[2026-09-05T01:50:05Z] agy update_complete → wake tpm
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T01:50:05Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T01:52:03Z] agy update_complete → wake tpm
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T01:52:03Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T01:54:03Z] idle nudge → wake both peers (age=236s)
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T01:54:04Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T01:54:05Z] agy wake ok seat=peer-agent-2 pid=16729
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T01:54:05Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T01:56:03Z] tpm update_complete → wake agy
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T01:56:04Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T01:56:04Z] agy wake ok seat=peer-agent-2 pid=16729
+[2026-09-05T01:56:04Z] agy update_complete → wake tpm
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T01:56:04Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T01:58:04Z] agy update_complete → wake tpm
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T01:58:04Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T02:00:03Z] idle nudge → wake both peers (age=236s)
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T02:00:04Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T02:00:05Z] agy wake ok seat=peer-agent-2 pid=16729
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T02:00:05Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T02:02:03Z] tpm update_complete → wake agy
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T02:02:04Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T02:02:05Z] agy wake ok seat=peer-agent-2 pid=16729
+[2026-09-05T02:02:05Z] agy update_complete → wake tpm
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T02:02:05Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T02:04:03Z] agy update_complete → wake tpm
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T02:04:03Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T02:06:03Z] idle nudge → wake both peers (age=235s)
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T02:06:04Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T02:06:05Z] agy wake ok seat=peer-agent-2 pid=16729
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T02:06:05Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T02:08:03Z] tpm update_complete → wake agy
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T02:08:04Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T02:08:05Z] agy wake ok seat=peer-agent-2 pid=16729
+[2026-09-05T02:08:05Z] agy update_complete → wake tpm
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T02:08:05Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T02:10:03Z] agy update_complete → wake tpm
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T02:10:03Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T02:12:03Z] idle nudge → wake both peers (age=235s)
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T02:12:04Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T02:12:05Z] agy wake ok seat=peer-agent-2 pid=16729
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T02:12:05Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T02:14:05Z] tpm update_complete → wake agy
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T02:14:06Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T02:14:07Z] agy wake ok seat=peer-agent-2 pid=16729
+[2026-09-05T02:14:07Z] agy update_complete → wake tpm
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T02:14:07Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T02:16:03Z] agy update_complete → wake tpm
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T02:16:03Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T02:18:03Z] idle nudge → wake both peers (age=233s)
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T02:18:04Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T02:18:05Z] agy wake ok seat=peer-agent-2 pid=16729
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T02:18:05Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T02:20:03Z] tpm update_complete → wake agy
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T02:20:04Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T02:20:04Z] agy wake ok seat=peer-agent-2 pid=16729
+[2026-09-05T02:20:05Z] agy update_complete → wake tpm
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T02:20:05Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T02:22:03Z] agy update_complete → wake tpm
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T02:22:03Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T02:24:03Z] idle nudge → wake both peers (age=235s)
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T02:24:04Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T02:24:04Z] agy wake ok seat=peer-agent-2 pid=16729
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T02:24:04Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T02:26:02Z] tpm update_complete → wake agy
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T02:26:03Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T02:26:04Z] agy wake ok seat=peer-agent-2 pid=16729
+[2026-09-05T02:26:04Z] agy update_complete → wake tpm
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T02:26:04Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T02:28:03Z] agy update_complete → wake tpm
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T02:28:03Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T02:30:03Z] idle nudge → wake both peers (age=236s)
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T02:30:04Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T02:30:05Z] agy wake ok seat=peer-agent-2 pid=16729
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T02:30:05Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T02:32:03Z] tpm update_complete → wake agy
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T02:32:03Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T02:32:04Z] agy wake ok seat=peer-agent-2 pid=16729
+[2026-09-05T02:32:04Z] agy update_complete → wake tpm
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T02:32:04Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T02:34:03Z] agy update_complete → wake tpm
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T02:34:03Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T02:36:03Z] idle nudge → wake both peers (age=235s)
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T02:36:04Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T02:36:05Z] agy wake ok seat=peer-agent-2 pid=16729
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T02:36:05Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T02:38:03Z] tpm update_complete → wake agy
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T02:38:04Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T02:38:05Z] agy wake ok seat=peer-agent-2 pid=16729
+[2026-09-05T02:38:05Z] agy update_complete → wake tpm
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T02:38:05Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T02:40:03Z] agy update_complete → wake tpm
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T02:40:03Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T02:42:03Z] idle nudge → wake both peers (age=236s)
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T02:42:04Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T02:42:05Z] agy wake ok seat=peer-agent-2 pid=16729
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T02:42:05Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T02:44:03Z] tpm update_complete → wake agy
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T02:44:04Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T02:44:04Z] agy wake ok seat=peer-agent-2 pid=16729
+[2026-09-05T02:44:04Z] agy update_complete → wake tpm
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T02:44:05Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T02:46:02Z] agy update_complete → wake tpm
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T02:46:02Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T02:48:02Z] idle nudge → wake both peers (age=235s)
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T02:48:03Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T02:48:04Z] agy wake ok seat=peer-agent-2 pid=16729
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T02:48:04Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T02:50:03Z] tpm update_complete → wake agy
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T02:50:04Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T02:50:05Z] agy wake ok seat=peer-agent-2 pid=16729
+[2026-09-05T02:50:05Z] agy update_complete → wake tpm
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T02:50:05Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T02:52:03Z] agy update_complete → wake tpm
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T02:52:03Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T02:54:03Z] idle nudge → wake both peers (age=233s)
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T02:54:03Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T02:54:04Z] agy wake ok seat=peer-agent-2 pid=16729
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T02:54:04Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T02:56:03Z] tpm update_complete → wake agy
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T02:56:04Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T02:56:05Z] agy wake ok seat=peer-agent-2 pid=16729
+[2026-09-05T02:56:05Z] agy update_complete → wake tpm
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T02:56:05Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T02:58:03Z] agy update_complete → wake tpm
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T02:58:03Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T03:00:05Z] idle nudge → wake both peers (age=238s)
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T03:00:06Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T03:00:07Z] agy wake ok seat=peer-agent-2 pid=16729
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T03:00:07Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T03:02:04Z] tpm update_complete → wake agy
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T03:02:04Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T03:02:05Z] agy wake ok seat=peer-agent-2 pid=16729
+[2026-09-05T03:02:05Z] agy update_complete → wake tpm
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T03:02:06Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T03:04:02Z] agy update_complete → wake tpm
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T03:04:03Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T03:06:03Z] idle nudge → wake both peers (age=235s)
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T03:06:04Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T03:06:04Z] agy wake ok seat=peer-agent-2 pid=16729
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T03:06:05Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T03:08:03Z] tpm update_complete → wake agy
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T03:08:04Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T03:08:04Z] agy wake ok seat=peer-agent-2 pid=16729
+[2026-09-05T03:08:05Z] agy update_complete → wake tpm
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T03:08:05Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T03:10:03Z] agy update_complete → wake tpm
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T03:10:03Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T03:12:03Z] idle nudge → wake both peers (age=236s)
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T03:12:04Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T03:12:04Z] agy wake ok seat=peer-agent-2 pid=16729
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T03:12:05Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T03:14:02Z] tpm update_complete → wake agy
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T03:14:03Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T03:14:04Z] agy wake ok seat=peer-agent-2 pid=16729
+[2026-09-05T03:14:04Z] agy update_complete → wake tpm
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T03:14:04Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T03:16:03Z] agy update_complete → wake tpm
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T03:16:03Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T03:16:03Z] cooldown agy→tpm; skipping summary=ACK wake (system ping)
+[2026-09-05T03:18:03Z] idle nudge → wake both peers (age=121s)
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T03:18:04Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T03:18:05Z] agy wake ok seat=peer-agent-2 pid=16729
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T03:18:05Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T03:20:03Z] tpm update_complete → wake agy
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T03:20:04Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T03:20:05Z] agy wake ok seat=peer-agent-2 pid=16729
+[2026-09-05T03:20:05Z] agy update_complete → wake tpm
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T03:20:05Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T03:20:05Z] cooldown agy→tpm; skipping summary=ACK wake (system ping)
+[2026-09-05T03:22:02Z] agy update_complete → wake tpm
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T03:22:03Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T03:22:03Z] cooldown agy→tpm; skipping summary=ACK wake (system ping)
+[2026-09-05T03:24:03Z] idle nudge → wake both peers (age=229s)
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T03:24:04Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T03:24:04Z] agy wake ok seat=peer-agent-2 pid=16729
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T03:24:04Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T03:26:03Z] tpm update_complete → wake agy
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T03:26:04Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T03:26:05Z] agy wake ok seat=peer-agent-2 pid=16729
+[2026-09-05T03:28:03Z] idle nudge → wake both peers (age=240s)
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T03:28:04Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T03:28:06Z] agy wake ok seat=peer-agent-2 pid=16729
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T03:28:07Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T03:30:07Z] tpm update_complete → wake agy
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T03:30:09Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T03:30:11Z] agy wake ok seat=peer-agent-2 pid=16729
+[2026-09-05T03:32:04Z] idle nudge → wake both peers (age=241s)
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T03:32:07Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T03:32:11Z] agy wake ok seat=peer-agent-2 pid=16729
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T03:32:13Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T03:34:05Z] tpm update_complete → wake agy
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T03:34:06Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T03:34:08Z] agy wake ok seat=peer-agent-2 pid=16729
+[2026-09-05T03:36:08Z] idle nudge → wake both peers (age=243s)
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T03:36:12Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T03:36:15Z] agy wake ok seat=peer-agent-2 pid=16729
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T03:36:15Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T03:38:05Z] tpm update_complete → wake agy
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T03:38:07Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T03:38:08Z] agy wake ok seat=peer-agent-2 pid=16729
+[2026-09-05T03:40:04Z] idle nudge → wake both peers (age=235s)
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T03:40:06Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T03:40:07Z] agy wake ok seat=peer-agent-2 pid=16729
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T03:40:08Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T03:42:04Z] tpm update_complete → wake agy
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T03:42:09Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T03:42:10Z] agy wake ok seat=peer-agent-2 pid=16729
+[2026-09-05T03:44:14Z] idle nudge → wake both peers (age=250s)
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T03:44:16Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T03:44:18Z] agy wake ok seat=peer-agent-2 pid=16729
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T03:44:18Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T03:46:05Z] tpm update_complete → wake agy
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T03:46:06Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T03:46:08Z] agy wake ok seat=peer-agent-2 pid=16729
+[2026-09-05T03:48:06Z] idle nudge → wake both peers (age=232s)
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T03:48:11Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T03:48:16Z] agy wake ok seat=peer-agent-2 pid=16729
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T03:48:17Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T03:50:05Z] tpm update_complete → wake agy
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T03:50:07Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T03:50:10Z] agy wake ok seat=peer-agent-2 pid=16729
+[2026-09-05T03:52:03Z] idle nudge → wake both peers (age=236s)
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T03:52:05Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T03:52:08Z] agy wake ok seat=peer-agent-2 pid=16729
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T03:52:09Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T03:54:03Z] tpm update_complete → wake agy
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T03:54:04Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T03:54:05Z] agy wake ok seat=peer-agent-2 pid=16729
+[2026-09-05T03:56:03Z] idle nudge → wake both peers (age=240s)
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T03:56:05Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T03:56:06Z] agy wake ok seat=peer-agent-2 pid=16729
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T03:56:06Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T03:58:03Z] tpm update_complete → wake agy
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T03:58:04Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T03:58:05Z] agy wake ok seat=peer-agent-2 pid=16729
+[2026-09-05T04:00:04Z] idle nudge → wake both peers (age=241s)
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T04:00:05Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T04:00:06Z] agy wake ok seat=peer-agent-2 pid=16729
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T04:00:07Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T04:02:03Z] tpm update_complete → wake agy
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T04:02:04Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T04:02:05Z] agy wake ok seat=peer-agent-2 pid=16729
+[2026-09-05T04:04:03Z] idle nudge → wake both peers (age=239s)
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T04:04:04Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T04:04:05Z] agy wake ok seat=peer-agent-2 pid=16729
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T04:04:05Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T04:06:03Z] tpm update_complete → wake agy
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T04:06:04Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T04:06:05Z] agy wake ok seat=peer-agent-2 pid=16729
+[2026-09-05T04:08:02Z] idle nudge → wake both peers (age=239s)
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T04:08:03Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T04:08:04Z] agy wake ok seat=peer-agent-2 pid=16729
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T04:08:04Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T04:10:03Z] tpm update_complete → wake agy
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T04:10:05Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T04:10:08Z] agy wake ok seat=peer-agent-2 pid=16729
+[2026-09-05T04:12:03Z] idle nudge → wake both peers (age=240s)
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T04:12:04Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T04:12:05Z] agy wake ok seat=peer-agent-2 pid=16729
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T04:12:05Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T04:14:02Z] tpm update_complete → wake agy
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T04:14:03Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T04:14:04Z] agy wake ok seat=peer-agent-2 pid=16729
+[2026-09-05T04:16:05Z] idle nudge → wake both peers (age=242s)
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T04:16:06Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T04:16:08Z] agy wake ok seat=peer-agent-2 pid=16729
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T04:16:08Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T04:18:02Z] tpm update_complete → wake agy
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T04:18:03Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T04:18:04Z] agy wake ok seat=peer-agent-2 pid=16729
+[2026-09-05T04:20:03Z] idle nudge → wake both peers (age=238s)
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T04:20:04Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T04:20:05Z] agy wake ok seat=peer-agent-2 pid=16729
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T04:20:05Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T04:22:03Z] tpm update_complete → wake agy
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T04:22:04Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T04:22:05Z] agy wake ok seat=peer-agent-2 pid=16729
+[2026-09-05T04:24:03Z] idle nudge → wake both peers (age=240s)
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T04:24:04Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T04:24:05Z] agy wake ok seat=peer-agent-2 pid=16729
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T04:24:05Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T04:26:04Z] tpm update_complete → wake agy
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T04:26:04Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T04:26:05Z] agy wake ok seat=peer-agent-2 pid=16729
+[2026-09-05T04:28:03Z] idle nudge → wake both peers (age=240s)
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T04:28:04Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T04:28:05Z] agy wake ok seat=peer-agent-2 pid=16729
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T04:28:05Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T04:30:05Z] tpm update_complete → wake agy
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T04:30:05Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T04:30:06Z] agy wake ok seat=peer-agent-2 pid=16729
+[2026-09-05T04:32:04Z] idle nudge → wake both peers (age=241s)
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T04:32:05Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T04:32:06Z] agy wake ok seat=peer-agent-2 pid=16729
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T04:32:06Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T04:34:03Z] tpm update_complete → wake agy
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T04:34:04Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T04:34:05Z] agy wake ok seat=peer-agent-2 pid=16729
+[2026-09-05T04:36:03Z] idle nudge → wake both peers (age=239s)
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T04:36:04Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T04:36:04Z] agy wake ok seat=peer-agent-2 pid=16729
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T04:36:05Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T04:38:03Z] tpm update_complete → wake agy
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T04:38:04Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T04:38:04Z] agy wake ok seat=peer-agent-2 pid=16729
+[2026-09-05T04:40:04Z] idle nudge → wake both peers (age=241s)
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T04:40:05Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T04:40:06Z] agy wake ok seat=peer-agent-2 pid=16729
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T04:40:06Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T04:42:03Z] tpm update_complete → wake agy
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T04:42:04Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T04:42:05Z] agy wake ok seat=peer-agent-2 pid=16729
+[2026-09-05T04:44:07Z] idle nudge → wake both peers (age=243s)
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T04:44:12Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T04:44:16Z] agy wake ok seat=peer-agent-2 pid=16729
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T04:44:17Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T04:46:03Z] tpm update_complete → wake agy
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T04:46:04Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T04:46:05Z] agy wake ok seat=peer-agent-2 pid=16729
+[2026-09-05T04:48:04Z] idle nudge → wake both peers (age=237s)
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T04:48:06Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T04:48:07Z] agy wake ok seat=peer-agent-2 pid=16729
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T04:48:08Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T04:50:06Z] tpm update_complete → wake agy
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T04:50:07Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T04:50:08Z] agy wake ok seat=peer-agent-2 pid=16729
+[2026-09-05T04:52:03Z] idle nudge → wake both peers (age=239s)
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T04:52:04Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T04:52:05Z] agy wake ok seat=peer-agent-2 pid=16729
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T04:52:05Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T04:54:05Z] tpm update_complete → wake agy
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T04:54:06Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T04:54:07Z] agy wake ok seat=peer-agent-2 pid=16729
+[2026-09-05T04:56:03Z] idle nudge → wake both peers (age=240s)
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T04:56:04Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T04:56:05Z] agy wake ok seat=peer-agent-2 pid=16729
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T04:56:05Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T04:58:04Z] tpm update_complete → wake agy
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T04:58:05Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T04:58:06Z] agy wake ok seat=peer-agent-2 pid=16729
+[2026-09-05T05:00:06Z] idle nudge → wake both peers (age=243s)
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T05:00:08Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T05:00:12Z] agy wake ok seat=peer-agent-2 pid=16729
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T05:00:12Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T05:02:03Z] tpm update_complete → wake agy
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T05:02:04Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T05:02:04Z] agy wake ok seat=peer-agent-2 pid=16729
+[2026-09-05T05:04:03Z] idle nudge → wake both peers (age=237s)
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T05:04:04Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T05:04:04Z] agy wake ok seat=peer-agent-2 pid=16729
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T05:04:05Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T05:06:03Z] tpm update_complete → wake agy
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T05:06:04Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T05:06:04Z] agy wake ok seat=peer-agent-2 pid=16729
+[2026-09-05T05:08:02Z] idle nudge → wake both peers (age=239s)
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T05:08:03Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T05:08:04Z] agy wake ok seat=peer-agent-2 pid=16729
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T05:08:04Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T05:10:03Z] tpm update_complete → wake agy
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T05:10:03Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T05:10:04Z] agy wake ok seat=peer-agent-2 pid=16729
+[2026-09-05T05:12:03Z] idle nudge → wake both peers (age=240s)
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T05:12:04Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T05:12:05Z] agy wake ok seat=peer-agent-2 pid=16729
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T05:12:05Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T05:14:03Z] tpm update_complete → wake agy
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T05:14:04Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T05:14:04Z] agy wake ok seat=peer-agent-2 pid=16729
+[2026-09-05T05:16:03Z] idle nudge → wake both peers (age=240s)
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T05:16:04Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T05:16:04Z] agy wake ok seat=peer-agent-2 pid=16729
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T05:16:04Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T05:18:02Z] tpm update_complete → wake agy
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T05:18:03Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T05:18:04Z] agy wake ok seat=peer-agent-2 pid=16729
+[2026-09-05T05:20:02Z] idle nudge → wake both peers (age=239s)
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T05:20:03Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T05:20:03Z] agy wake ok seat=peer-agent-2 pid=16729
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T05:20:03Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T05:22:03Z] tpm update_complete → wake agy
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T05:22:04Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T05:22:05Z] agy wake ok seat=peer-agent-2 pid=16729
+[2026-09-05T05:24:03Z] idle nudge → wake both peers (age=241s)
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T05:24:04Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T05:24:05Z] agy wake ok seat=peer-agent-2 pid=16729
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T05:24:05Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T05:26:02Z] tpm update_complete → wake agy
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T05:26:03Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T05:26:04Z] agy wake ok seat=peer-agent-2 pid=16729
+[2026-09-05T05:28:02Z] idle nudge → wake both peers (age=239s)
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T05:28:03Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T05:28:04Z] agy wake ok seat=peer-agent-2 pid=16729
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T05:28:04Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T05:30:03Z] tpm update_complete → wake agy
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T05:30:04Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T05:30:04Z] agy wake ok seat=peer-agent-2 pid=16729
+[2026-09-05T05:32:03Z] idle nudge → wake both peers (age=241s)
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T05:32:03Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T05:32:05Z] agy wake ok seat=peer-agent-2 pid=16729
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T05:32:05Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T05:34:03Z] tpm update_complete → wake agy
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T05:34:03Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T05:34:04Z] agy wake ok seat=peer-agent-2 pid=16729
+[2026-09-05T05:36:03Z] idle nudge → wake both peers (age=239s)
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T05:36:04Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T05:36:05Z] agy wake ok seat=peer-agent-2 pid=16729
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T05:36:05Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T05:38:05Z] tpm update_complete → wake agy
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T05:38:06Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T05:38:07Z] agy wake ok seat=peer-agent-2 pid=16729
+[2026-09-05T05:40:05Z] idle nudge → wake both peers (age=242s)
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T05:40:06Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T05:40:07Z] agy wake ok seat=peer-agent-2 pid=16729
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T05:40:07Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T05:42:03Z] tpm update_complete → wake agy
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T05:42:04Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T05:42:04Z] agy wake ok seat=peer-agent-2 pid=16729
+[2026-09-05T05:44:03Z] idle nudge → wake both peers (age=238s)
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T05:44:04Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T05:44:04Z] agy wake ok seat=peer-agent-2 pid=16729
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T05:44:05Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T05:46:03Z] tpm update_complete → wake agy
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T05:46:03Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T05:46:04Z] agy wake ok seat=peer-agent-2 pid=16729
+[2026-09-05T05:48:03Z] idle nudge → wake both peers (age=240s)
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T05:48:04Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T05:48:05Z] agy wake ok seat=peer-agent-2 pid=16729
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T05:48:05Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T05:50:02Z] tpm update_complete → wake agy
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T05:50:03Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T05:50:04Z] agy wake ok seat=peer-agent-2 pid=16729
+[2026-09-05T05:52:02Z] idle nudge → wake both peers (age=239s)
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T05:52:03Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T05:52:04Z] agy wake ok seat=peer-agent-2 pid=16729
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T05:52:04Z] tpm wake → wake-peer-tpm-01.sh ok
+[2026-09-05T05:54:03Z] tpm update_complete → wake agy
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T05:54:04Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T05:54:04Z] agy wake ok seat=peer-agent-2 pid=16729
+[2026-09-05T05:56:03Z] idle nudge → wake both peers (age=241s)
+agy pid=11765 tty=/dev/ttys003
+ls_address=127.0.0.1:53227
+conversation=da7b703a-9e9d-4db7-818c-3476885d1f58
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T05:56:04Z] agy wake ok seat=peer-agent-1 pid=11765
+agy pid=16729 tty=/dev/ttys004
+ls_address=127.0.0.1:54905
+conversation=9c0f961c-d344-4599-9a66-c1db5ae2e034
+agentapi: ok (notification strip — use --chat for prompt paste)
+agentapi: notify-only (applescript interrupt disabled; set WAKE_AGY_APPLESCRIPT_INTERRUPT=1 to re-enable)
+done delivery=agentapi_send-message_notify
+[2026-09-05T05:56:05Z] agy wake ok seat=peer-agent-2 pid=16729
+stamp:ok /Users/lanceettl/zqk-restore-clone/.zqk/logs/cursor-hooks/agent_chat_channel.jsonl
+done delivery=stamp
+[2026-09-05T05:56:05Z] tpm wake → wake-peer-tpm-01.sh ok
+/bin/sh: ./scripts/mesh/tpm-agy-watchdog.sh: No such file or directory
+/bin/sh: ./scripts/mesh/tpm-agy-watchdog.sh: No such file or directory
+/bin/sh: ./scripts/mesh/tpm-agy-watchdog.sh: No such file or directory
+/bin/sh: ./scripts/mesh/tpm-agy-watchdog.sh: No such file or directory
+/bin/sh: ./scripts/mesh/tpm-agy-watchdog.sh: No such file or directory
+/bin/sh: ./scripts/mesh/tpm-agy-watchdog.sh: No such file or directory
+/bin/sh: ./scripts/mesh/tpm-agy-watchdog.sh: No such file or directory
+/bin/sh: ./scripts/mesh/tpm-agy-watchdog.sh: No such file or directory
+/bin/sh: ./scripts/mesh/tpm-agy-watchdog.sh: No such file or directory
+/bin/sh: ./scripts/mesh/tpm-agy-watchdog.sh: No such file or directory
+/bin/sh: ./scripts/mesh/tpm-agy-watchdog.sh: No such file or directory
+/bin/sh: ./scripts/mesh/tpm-agy-watchdog.sh: No such file or directory
+/bin/sh: ./scripts/mesh/tpm-agy-watchdog.sh: No such file or directory
+/bin/sh: ./scripts/mesh/tpm-agy-watchdog.sh: No such file or directory
+/bin/sh: ./scripts/mesh/tpm-agy-watchdog.sh: No such file or directory
+/bin/sh: ./scripts/mesh/tpm-agy-watchdog.sh: No such file or directory
+/bin/sh: ./scripts/mesh/tpm-agy-watchdog.sh: No such file or directory
+/bin/sh: ./scripts/mesh/tpm-agy-watchdog.sh: No such file or directory
+/bin/sh: ./scripts/mesh/tpm-agy-watchdog.sh: No such file or directory
+/bin/sh: ./scripts/mesh/tpm-agy-watchdog.sh: No such file or directory
+/bin/sh: ./scripts/mesh/tpm-agy-watchdog.sh: No such file or directory
+/bin/sh: ./scripts/mesh/tpm-agy-watchdog.sh: No such file or directory
+/bin/sh: ./scripts/mesh/tpm-agy-watchdog.sh: No such file or directory
+/bin/sh: ./scripts/mesh/tpm-agy-watchdog.sh: No such file or directory
+/bin/sh: ./scripts/mesh/tpm-agy-watchdog.sh: No such file or directory
+/bin/sh: ./scripts/mesh/tpm-agy-watchdog.sh: No such file or directory
+/bin/sh: ./scripts/mesh/tpm-agy-watchdog.sh: No such file or directory
+/bin/sh: ./scripts/mesh/tpm-agy-watchdog.sh: No such file or directory
+/bin/sh: ./scripts/mesh/tpm-agy-watchdog.sh: No such file or directory
+/bin/sh: ./scripts/mesh/tpm-agy-watchdog.sh: No such file or directory
+/bin/sh: ./scripts/mesh/tpm-agy-watchdog.sh: No such file or directory
+/bin/sh: ./scripts/mesh/tpm-agy-watchdog.sh: No such file or directory
+/bin/sh: ./scripts/mesh/tpm-agy-watchdog.sh: No such file or directory
+/bin/sh: ./scripts/mesh/tpm-agy-watchdog.sh: No such file or directory
+/bin/sh: ./scripts/mesh/tpm-agy-watchdog.sh: No such file or directory
+/bin/sh: ./scripts/mesh/tpm-agy-watchdog.sh: No such file or directory
+/bin/sh: ./scripts/mesh/tpm-agy-watchdog.sh: No such file or directory
+/bin/sh: ./scripts/mesh/tpm-agy-watchdog.sh: No such file or directory
+/bin/sh: ./scripts/mesh/tpm-agy-watchdog.sh: No such file or directory
+/bin/sh: ./scripts/mesh/tpm-agy-watchdog.sh: No such file or directory
+/bin/sh: ./scripts/mesh/tpm-agy-watchdog.sh: No such file or directory
+/bin/sh: ./scripts/mesh/tpm-agy-watchdog.sh: No such file or directory
+/bin/sh: ./scripts/mesh/tpm-agy-watchdog.sh: No such file or directory

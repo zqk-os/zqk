@@ -1,0 +1,105 @@
+{
+  "name": "make-verify-474",
+  "created_at": "2026-09-04T21:34:32.024117Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-474",
+    "Tests": [
+      {
+        "Name": "TestOverBudget_UsesSampler",
+        "Package": "hostload",
+        "PackagePath": "pkg/hostload",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/hostload/level_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestOverBudgetExcludingSelf_selfHeatKeepsSlots",
+        "Package": "hostload",
+        "PackagePath": "pkg/hostload",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/hostload/level_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestOverBudgetExcludingSelf_foreignStarveRefusesExtra",
+        "Package": "hostload",
+        "PackagePath": "pkg/hostload",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/hostload/level_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestCurrentLevel_DisabledEnvIgnoresStarveSampler",
+        "Package": "hostload",
+        "PackagePath": "pkg/hostload",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/hostload/level_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestDisabled_ReadsBrandEnv",
+        "Package": "hostload",
+        "PackagePath": "pkg/hostload",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/hostload/snapshot_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 150000000000,
+    "PackagePath": "pkg/hostload"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestOverBudget_UsesSampler",
+      "Package": "hostload",
+      "PackagePath": "pkg/hostload",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/hostload/level_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestOverBudgetExcludingSelf_selfHeatKeepsSlots",
+      "Package": "hostload",
+      "PackagePath": "pkg/hostload",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/hostload/level_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestOverBudgetExcludingSelf_foreignStarveRefusesExtra",
+      "Package": "hostload",
+      "PackagePath": "pkg/hostload",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/hostload/level_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestCurrentLevel_DisabledEnvIgnoresStarveSampler",
+      "Package": "hostload",
+      "PackagePath": "pkg/hostload",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/hostload/level_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestDisabled_ReadsBrandEnv",
+      "Package": "hostload",
+      "PackagePath": "pkg/hostload",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/hostload/snapshot_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

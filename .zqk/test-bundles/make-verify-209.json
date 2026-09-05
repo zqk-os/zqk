@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-209",
+  "created_at": "2026-09-04T21:34:29.463886Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-209",
+    "Tests": [
+      {
+        "Name": "TestCompileFillItem_rank",
+        "Package": "whatsnext",
+        "PackagePath": "pkg/workflow/whatsnext",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/workflow/whatsnext/fill_item_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestApplyFillToInstruction",
+        "Package": "whatsnext",
+        "PackagePath": "pkg/workflow/whatsnext",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/workflow/whatsnext/fill_item_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestParseHumanLogClusters",
+        "Package": "whatsnext",
+        "PackagePath": "pkg/workflow/whatsnext",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/workflow/whatsnext/human_log_clusters_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestProjectStewardFocus_HumanLogClusters",
+        "Package": "whatsnext",
+        "PackagePath": "pkg/workflow/whatsnext",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/workflow/whatsnext/human_log_clusters_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestProjectStewardFocus_branchAhead",
+        "Package": "whatsnext",
+        "PackagePath": "pkg/workflow/whatsnext",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/workflow/whatsnext/kernel_ambience_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestProjectStewardFocus_GhostRefSignal",
+        "Package": "whatsnext",
+        "PackagePath": "pkg/workflow/whatsnext",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/workflow/whatsnext/kernel_ambience_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestProjectStewardFocus_blockingAndDrafts",
+        "Package": "whatsnext",
+        "PackagePath": "pkg/workflow/whatsnext",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/workflow/whatsnext/kernel_ambience_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestProjectStewardFocus_peerDraftNoSweep",
+        "Package": "whatsnext",
+        "PackagePath": "pkg/workflow/whatsnext",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/workflow/whatsnext/kernel_ambience_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestProjectStewardFocus_clean",
+        "Package": "whatsnext",
+        "PackagePath": "pkg/workflow/whatsnext",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/workflow/whatsnext/kernel_ambience_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestPrependStewardProjection_idempotent",
+        "Package": "whatsnext",
+        "PackagePath": "pkg/workflow/whatsnext",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/workflow/whatsnext/kernel_ambience_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": true,
+    "EstimatedDuration": 300000000000,
+    "PackagePath": "pkg/workflow/whatsnext"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestCompileFillItem_rank",
+      "Package": "whatsnext",
+      "PackagePath": "pkg/workflow/whatsnext",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/workflow/whatsnext/fill_item_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestApplyFillToInstruction",
+      "Package": "whatsnext",
+      "PackagePath": "pkg/workflow/whatsnext",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/workflow/whatsnext/fill_item_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestParseHumanLogClusters",
+      "Package": "whatsnext",
+      "PackagePath": "pkg/workflow/whatsnext",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/workflow/whatsnext/human_log_clusters_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestProjectStewardFocus_HumanLogClusters",
+      "Package": "whatsnext",
+      "PackagePath": "pkg/workflow/whatsnext",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/workflow/whatsnext/human_log_clusters_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestProjectStewardFocus_branchAhead",
+      "Package": "whatsnext",
+      "PackagePath": "pkg/workflow/whatsnext",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/workflow/whatsnext/kernel_ambience_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestProjectStewardFocus_GhostRefSignal",
+      "Package": "whatsnext",
+      "PackagePath": "pkg/workflow/whatsnext",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/workflow/whatsnext/kernel_ambience_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestProjectStewardFocus_blockingAndDrafts",
+      "Package": "whatsnext",
+      "PackagePath": "pkg/workflow/whatsnext",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/workflow/whatsnext/kernel_ambience_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestProjectStewardFocus_peerDraftNoSweep",
+      "Package": "whatsnext",
+      "PackagePath": "pkg/workflow/whatsnext",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/workflow/whatsnext/kernel_ambience_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestProjectStewardFocus_clean",
+      "Package": "whatsnext",
+      "PackagePath": "pkg/workflow/whatsnext",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/workflow/whatsnext/kernel_ambience_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestPrependStewardProjection_idempotent",
+      "Package": "whatsnext",
+      "PackagePath": "pkg/workflow/whatsnext",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/workflow/whatsnext/kernel_ambience_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

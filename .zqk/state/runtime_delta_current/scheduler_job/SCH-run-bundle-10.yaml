@@ -1,0 +1,38 @@
+category: testing
+command: /bin/sh
+command_args:
+    - -c
+    - sh /Users/lanceettl/zqk-restore-clone/scripts/check-test-contamination.sh go test ./pkg/mcp/ideadapter -run '^(TestAdapter_InitializeNoElicitationAndToolsList|TestAdapter_ControlResponsesNeverOnStdio|TestDefaultConfig_UsesIDEProxyClient|TestAdapter_RunSurvivesCanceledContext|TestDaemonSession_CallIgnoresCanceledParent|TestDaemonSession_CloseCancelsInFlightCall|TestSetDiagLogRoot_andDiagf|TestSetDiagLogRoot_emptyDisables)$' -v -count=1 -timeout 300s -p 1 -parallel 2 > /Users/lanceettl/zqk-restore-clone/.zqk/logs/scheduler/cvs/test-bundles/bundle-bundle-10.log 2>&1
+created_at: "2026-09-05T05:21:46Z"
+created_by: ACC-1785920548450214012-68b850c0
+description: 'Test bundle containing 8 test(s) from package pkg/mcp/ideadapter. Tests must run sequentially. Estimated duration: 4m0s. Tests: TestAdapter_InitializeNoElicitationAndToolsList, TestAdapter_ControlResponsesNeverOnStdio, TestDefaultConfig_UsesIDEProxyClient, TestAdapter_RunSurvivesCanceledContext, TestDaemonSession_CallIgnoresCanceledParent, TestDaemonSession_CloseCancelsInFlightCall, TestSetDiagLogRoot_andDiagf, TestSetDiagLogRoot_emptyDisables. Log file: /Users/lanceettl/zqk-restore-clone/.zqk/logs/scheduler/cvs/test-bundles/bundle-bundle-10.log'
+enabled: true
+execution_mode: one_time
+id: SCH-run-bundle-10
+job_type: run_wrapper
+kind: scheduler_job
+last_run_at: "2026-09-05T05:56:14Z"
+max_runtime_seconds: 360
+metadata:
+    bundle_command_fingerprint: 3f9543452a6f609ec5e8220f
+    bundle_id: bundle-10
+    estimated_duration_seconds: 240
+    is_parallel: false
+    log_file: /Users/lanceettl/zqk-restore-clone/.zqk/logs/scheduler/cvs/test-bundles/bundle-bundle-10.log
+    max_concurrent_same_package: 1
+    package_path: pkg/mcp/ideadapter
+    test_count: 8
+namespace_id: zqk:kernel
+origin_project: zqk
+origin_system: zqk
+priority: normal
+retry_count: 0
+retry_delay_seconds: 5
+schema_version: 2.0.0
+status: active
+title: 'Test Bundle: pkg/mcp/ideadapter (8 tests)'
+trigger_type: immediate
+updated_at: "2026-09-05T05:56:34Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+working_directory: /Users/lanceettl/zqk-restore-clone

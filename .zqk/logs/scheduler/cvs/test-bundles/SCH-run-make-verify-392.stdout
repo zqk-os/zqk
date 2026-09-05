@@ -1,0 +1,44 @@
+
+--- run 2026-09-04T22:12:26Z ---
+=== RUN   TestNewConversationProbe_emptyConversation
+=== PAUSE TestNewConversationProbe_emptyConversation
+=== RUN   TestNewConversationProbe_noBinFailClosed
+=== PAUSE TestNewConversationProbe_noBinFailClosed
+=== RUN   TestProbeConversationViaAgentAPI_emptyID
+=== PAUSE TestProbeConversationViaAgentAPI_emptyID
+=== RUN   TestPackage_defaultRegistryReady
+=== PAUSE TestPackage_defaultRegistryReady
+=== RUN   TestBindSeats_trajectoryNotFoundFails
+=== PAUSE TestBindSeats_trajectoryNotFoundFails
+=== RUN   TestBindSeats_liveMetadataPasses
+=== PAUSE TestBindSeats_liveMetadataPasses
+=== RUN   TestBindSeats_refreshSeatsForbidden
+=== PAUSE TestBindSeats_refreshSeatsForbidden
+=== RUN   TestOrchestratePlan_bodyIsOrchestratePlan
+=== PAUSE TestOrchestratePlan_bodyIsOrchestratePlan
+=== RUN   TestChatBootstrap_skipsWithoutAllowChat
+=== PAUSE TestChatBootstrap_skipsWithoutAllowChat
+=== RUN   TestCommsCheck_steersNonce
+=== PAUSE TestCommsCheck_steersNonce
+=== CONT  TestNewConversationProbe_emptyConversation
+--- PASS: TestNewConversationProbe_emptyConversation (0.00s)
+=== CONT  TestCommsCheck_steersNonce
+=== CONT  TestBindSeats_liveMetadataPasses
+--- PASS: TestCommsCheck_steersNonce (0.01s)
+--- PASS: TestBindSeats_liveMetadataPasses (0.01s)
+=== CONT  TestPackage_defaultRegistryReady
+=== CONT  TestBindSeats_trajectoryNotFoundFails
+--- PASS: TestPackage_defaultRegistryReady (0.00s)
+=== CONT  TestProbeConversationViaAgentAPI_emptyID
+--- PASS: TestProbeConversationViaAgentAPI_emptyID (0.00s)
+=== CONT  TestOrchestratePlan_bodyIsOrchestratePlan
+--- PASS: TestBindSeats_trajectoryNotFoundFails (0.00s)
+--- PASS: TestOrchestratePlan_bodyIsOrchestratePlan (0.00s)
+=== CONT  TestBindSeats_refreshSeatsForbidden
+=== CONT  TestChatBootstrap_skipsWithoutAllowChat
+--- PASS: TestChatBootstrap_skipsWithoutAllowChat (0.02s)
+=== CONT  TestNewConversationProbe_noBinFailClosed
+--- PASS: TestNewConversationProbe_noBinFailClosed (0.00s)
+--- PASS: TestBindSeats_refreshSeatsForbidden (0.02s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/swarminit	0.377s

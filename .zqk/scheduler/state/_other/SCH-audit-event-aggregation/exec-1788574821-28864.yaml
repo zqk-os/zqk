@@ -1,0 +1,7 @@
+job_id: SCH-audit-event-aggregation
+execution_id: exec-1788574821-28864
+state: completed
+process_id: 28864
+started_at: 2026-09-05T02:20:21.078538Z
+completed_at: 2026-09-05T02:20:23.982958Z
+policy_decision: execute

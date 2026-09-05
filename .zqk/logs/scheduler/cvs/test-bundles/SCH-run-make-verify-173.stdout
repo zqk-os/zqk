@@ -1,0 +1,44 @@
+
+--- run 2026-09-04T21:41:23Z ---
+=== RUN   TestLockingPattern_ShutdownBeforeLock
+=== PAUSE TestLockingPattern_ShutdownBeforeLock
+=== RUN   TestLockingPattern_ShutdownDuringLockWait
+=== PAUSE TestLockingPattern_ShutdownDuringLockWait
+=== RUN   TestLockingPattern_ShutdownAfterLockAcquisition
+=== PAUSE TestLockingPattern_ShutdownAfterLockAcquisition
+=== RUN   TestLockingPattern_ConcurrentReadLocks
+=== PAUSE TestLockingPattern_ConcurrentReadLocks
+=== RUN   TestLockingPattern_ShutdownSequenceDeadlock
+=== PAUSE TestLockingPattern_ShutdownSequenceDeadlock
+=== RUN   TestLockingPattern_WriteLockHeldTimeout
+=== PAUSE TestLockingPattern_WriteLockHeldTimeout
+=== RUN   TestLockingPattern_MultipleShutdownCalls
+=== PAUSE TestLockingPattern_MultipleShutdownCalls
+=== RUN   TestLockingPattern_StressTest
+=== PAUSE TestLockingPattern_StressTest
+=== RUN   TestMessageProcessor_ActorContextExtraction
+=== PAUSE TestMessageProcessor_ActorContextExtraction
+=== RUN   TestExtractActorContextFromArgs
+=== PAUSE TestExtractActorContextFromArgs
+=== CONT  TestLockingPattern_ShutdownBeforeLock
+--- PASS: TestLockingPattern_ShutdownBeforeLock (0.00s)
+=== CONT  TestExtractActorContextFromArgs
+=== CONT  TestLockingPattern_WriteLockHeldTimeout
+--- PASS: TestLockingPattern_WriteLockHeldTimeout (0.00s)
+=== CONT  TestLockingPattern_StressTest
+--- PASS: TestExtractActorContextFromArgs (0.00s)
+=== CONT  TestLockingPattern_MultipleShutdownCalls
+--- PASS: TestLockingPattern_StressTest (0.00s)
+=== CONT  TestMessageProcessor_ActorContextExtraction
+--- PASS: TestMessageProcessor_ActorContextExtraction (0.00s)
+=== CONT  TestLockingPattern_ConcurrentReadLocks
+--- PASS: TestLockingPattern_ConcurrentReadLocks (0.00s)
+=== CONT  TestLockingPattern_ShutdownSequenceDeadlock
+--- PASS: TestLockingPattern_MultipleShutdownCalls (0.00s)
+=== CONT  TestLockingPattern_ShutdownAfterLockAcquisition
+--- PASS: TestLockingPattern_ShutdownAfterLockAcquisition (0.00s)
+=== CONT  TestLockingPattern_ShutdownDuringLockWait
+--- PASS: TestLockingPattern_ShutdownSequenceDeadlock (0.01s)
+--- PASS: TestLockingPattern_ShutdownDuringLockWait (0.01s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/mcp	0.747s

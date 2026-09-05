@@ -1,0 +1,52 @@
+
+--- run 2026-09-04T22:14:35Z ---
+=== RUN   TestChannelLeakDetection
+=== PAUSE TestChannelLeakDetection
+=== RUN   TestChannelLeakDetection_UnclosedChannel
+=== PAUSE TestChannelLeakDetection_UnclosedChannel
+=== RUN   TestChannelLeakDetection_BufferedChannel
+=== PAUSE TestChannelLeakDetection_BufferedChannel
+=== RUN   TestChannelLeakDetection_SelectStatement
+=== PAUSE TestChannelLeakDetection_SelectStatement
+=== RUN   TestGoroutineManager_StartStop
+=== PAUSE TestGoroutineManager_StartStop
+=== RUN   TestGoroutineManager_Shutdown
+=== PAUSE TestGoroutineManager_Shutdown
+=== RUN   TestGoroutineManager_ErrorHandling
+=== PAUSE TestGoroutineManager_ErrorHandling
+=== RUN   TestGoroutineManager_ResourceCleanup
+=== PAUSE TestGoroutineManager_ResourceCleanup
+=== RUN   TestGoroutineManager_LeakDetection
+=== PAUSE TestGoroutineManager_LeakDetection
+=== RUN   TestGoroutineManager_MaxGoroutines
+=== PAUSE TestGoroutineManager_MaxGoroutines
+=== CONT  TestChannelLeakDetection
+=== RUN   TestChannelLeakDetection/ProperlyClosedChannel
+=== CONT  TestGoroutineManager_Shutdown
+=== RUN   TestChannelLeakDetection/ChannelClosedAfterUse
+=== RUN   TestChannelLeakDetection/ChannelInGoroutine_ProperlyClosed
+=== RUN   TestChannelLeakDetection/ChannelWithContext
+--- PASS: TestChannelLeakDetection (0.00s)
+    --- PASS: TestChannelLeakDetection/ProperlyClosedChannel (0.00s)
+    --- PASS: TestChannelLeakDetection/ChannelClosedAfterUse (0.00s)
+    --- PASS: TestChannelLeakDetection/ChannelInGoroutine_ProperlyClosed (0.00s)
+    --- PASS: TestChannelLeakDetection/ChannelWithContext (0.00s)
+=== CONT  TestGoroutineManager_StartStop
+=== CONT  TestChannelLeakDetection_SelectStatement
+--- PASS: TestGoroutineManager_StartStop (0.02s)
+--- PASS: TestChannelLeakDetection_SelectStatement (0.00s)
+=== CONT  TestChannelLeakDetection_BufferedChannel
+--- PASS: TestChannelLeakDetection_BufferedChannel (0.00s)
+=== CONT  TestChannelLeakDetection_UnclosedChannel
+--- PASS: TestChannelLeakDetection_UnclosedChannel (0.00s)
+=== CONT  TestGoroutineManager_LeakDetection
+--- PASS: TestGoroutineManager_LeakDetection (0.00s)
+=== CONT  TestGoroutineManager_MaxGoroutines
+--- PASS: TestGoroutineManager_MaxGoroutines (0.00s)
+=== CONT  TestGoroutineManager_ResourceCleanup
+--- PASS: TestGoroutineManager_ResourceCleanup (0.10s)
+=== CONT  TestGoroutineManager_ErrorHandling
+--- PASS: TestGoroutineManager_ErrorHandling (0.10s)
+--- PASS: TestGoroutineManager_Shutdown (0.50s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/runtime	1.124s

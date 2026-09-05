@@ -1,0 +1,14 @@
+created_at: "2026-08-20T09:45:21Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1787219118255992000-f5e5cc4e
+item_id: BLI-CEF-R9-COMPARE-001
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 2857702ca28e4b64fb5782140b43c1400e68fdeab30ab0062f4119523ca97d466e5f13c72adcfa41b92eacf21fa7f0a79b8a8e3a8d7c581e5c9afe0e69cb31dc
+schema_version: 2.0.0
+signature: 3046022100fd21458371c374f62428600982002dcf90362259a566c5e8e519e367212628c4022100b0916993fc99db767a1af18d62b825f9b42904fdc47f452cceded4665290821d
+status: archived
+title: COMPARE R9 dual-seat envelope vs R8 and list axes below 4
+updated_at: "2026-09-01T07:18:43Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

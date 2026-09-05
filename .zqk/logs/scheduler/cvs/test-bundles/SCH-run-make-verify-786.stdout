@@ -1,0 +1,44 @@
+
+--- run 2026-09-04T22:21:51Z ---
+=== RUN   TestExtractStringList_AlreadyTyped
+=== PAUSE TestExtractStringList_AlreadyTyped
+=== RUN   TestExtractStringList_Empty
+=== PAUSE TestExtractStringList_Empty
+=== RUN   TestCollectPersonaInteractionPolicyRefs_DualRead
+=== PAUSE TestCollectPersonaInteractionPolicyRefs_DualRead
+=== RUN   TestPersonaSeesLeadGantt
+=== PAUSE TestPersonaSeesLeadGantt
+=== RUN   TestCollectPersonaASKRefs_DualRead
+=== PAUSE TestCollectPersonaASKRefs_DualRead
+=== RUN   TestCollectPersonaASKRefs_ScalarString
+=== PAUSE TestCollectPersonaASKRefs_ScalarString
+=== RUN   TestHybridMask_WorkEnvelopeFollowsTraitsNotBLISnowflake
+=== PAUSE TestHybridMask_WorkEnvelopeFollowsTraitsNotBLISnowflake
+=== RUN   TestMergeShockwavePolicy_ChildModeInheritsLineageKinds
+=== PAUSE TestMergeShockwavePolicy_ChildModeInheritsLineageKinds
+=== RUN   TestShockwavePolicy_HopRoleConsultsEdgeRole
+=== PAUSE TestShockwavePolicy_HopRoleConsultsEdgeRole
+=== RUN   TestGetSnapableObjectQuery
+=== PAUSE TestGetSnapableObjectQuery
+=== CONT  TestExtractStringList_AlreadyTyped
+--- PASS: TestExtractStringList_AlreadyTyped (0.00s)
+=== CONT  TestGetSnapableObjectQuery
+=== CONT  TestCollectPersonaASKRefs_ScalarString
+--- PASS: TestCollectPersonaASKRefs_ScalarString (0.00s)
+=== CONT  TestShockwavePolicy_HopRoleConsultsEdgeRole
+--- PASS: TestShockwavePolicy_HopRoleConsultsEdgeRole (0.00s)
+=== CONT  TestMergeShockwavePolicy_ChildModeInheritsLineageKinds
+--- PASS: TestMergeShockwavePolicy_ChildModeInheritsLineageKinds (0.00s)
+=== CONT  TestHybridMask_WorkEnvelopeFollowsTraitsNotBLISnowflake
+--- PASS: TestGetSnapableObjectQuery (0.04s)
+=== CONT  TestPersonaSeesLeadGantt
+--- PASS: TestPersonaSeesLeadGantt (0.00s)
+=== CONT  TestCollectPersonaASKRefs_DualRead
+--- PASS: TestCollectPersonaASKRefs_DualRead (0.00s)
+=== CONT  TestCollectPersonaInteractionPolicyRefs_DualRead
+--- PASS: TestCollectPersonaInteractionPolicyRefs_DualRead (0.00s)
+=== CONT  TestExtractStringList_Empty
+--- PASS: TestExtractStringList_Empty (0.00s)
+--- PASS: TestHybridMask_WorkEnvelopeFollowsTraitsNotBLISnowflake (0.06s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/objects	0.652s

@@ -1,0 +1,44 @@
+
+--- run 2026-09-04T21:41:00Z ---
+=== RUN   TestEventEmitter_Emit
+=== PAUSE TestEventEmitter_Emit
+=== RUN   TestEventEmitter_Broadcast_MultipleSubscribersReceiveSameEvent
+=== PAUSE TestEventEmitter_Broadcast_MultipleSubscribersReceiveSameEvent
+=== RUN   TestEventEmitter_ClientToClient_TwoAgentsReceiveOperationalEvent
+=== PAUSE TestEventEmitter_ClientToClient_TwoAgentsReceiveOperationalEvent
+=== RUN   TestEventEmitter_Emit_Filtering
+=== PAUSE TestEventEmitter_Emit_Filtering
+=== RUN   TestEventEmitter_Emit_InactiveSubscriber
+=== PAUSE TestEventEmitter_Emit_InactiveSubscriber
+=== RUN   TestEventEmitter_Emit_FailingSubscriber
+=== PAUSE TestEventEmitter_Emit_FailingSubscriber
+=== RUN   TestEventEmitter_Cleanup
+=== PAUSE TestEventEmitter_Cleanup
+=== RUN   TestMCPEventSubscriber
+=== PAUSE TestMCPEventSubscriber
+=== RUN   TestMCPEventSubscriber_IdleTimeout
+=== PAUSE TestMCPEventSubscriber_IdleTimeout
+=== RUN   TestMCPEventSubscriber_WriteFailure
+=== PAUSE TestMCPEventSubscriber_WriteFailure
+=== CONT  TestEventEmitter_Emit
+--- PASS: TestEventEmitter_Emit (0.00s)
+=== CONT  TestMCPEventSubscriber_WriteFailure
+=== CONT  TestEventEmitter_Emit_FailingSubscriber
+--- PASS: TestMCPEventSubscriber_WriteFailure (0.00s)
+=== CONT  TestEventEmitter_Emit_Filtering
+--- PASS: TestEventEmitter_Emit_Filtering (0.00s)
+=== CONT  TestEventEmitter_Emit_InactiveSubscriber
+--- PASS: TestEventEmitter_Emit_FailingSubscriber (0.01s)
+--- PASS: TestEventEmitter_Emit_InactiveSubscriber (0.01s)
+=== CONT  TestEventEmitter_ClientToClient_TwoAgentsReceiveOperationalEvent
+--- PASS: TestEventEmitter_ClientToClient_TwoAgentsReceiveOperationalEvent (0.00s)
+=== CONT  TestMCPEventSubscriber
+=== CONT  TestEventEmitter_Broadcast_MultipleSubscribersReceiveSameEvent
+--- PASS: TestEventEmitter_Broadcast_MultipleSubscribersReceiveSameEvent (0.00s)
+=== CONT  TestMCPEventSubscriber_IdleTimeout
+--- PASS: TestMCPEventSubscriber (0.00s)
+=== CONT  TestEventEmitter_Cleanup
+--- PASS: TestEventEmitter_Cleanup (0.00s)
+--- PASS: TestMCPEventSubscriber_IdleTimeout (0.12s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/mcp	0.866s

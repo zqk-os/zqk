@@ -1,0 +1,21 @@
+{
+  "schema": "zqk_comms_check_latest_v1",
+  "status": "PASS",
+  "nonce": "CC-20260829T172348Z-28176",
+  "submitted_at": "2026-08-29T17:23:55Z",
+  "scored_at": "2026-08-29T17:24:12Z",
+  "seats": ["antigravity-1", "antigravity-2"],
+  "life": {
+    "antigravity-1": "AFE-1788024251806680000-d7dec002",
+    "antigravity-2": "AFE-1788024252200726000-7055c0ac"
+  },
+  "work": {
+    "antigravity-1": "AFE-1788024251921929000-25bb3405",
+    "antigravity-2": "AFE-1788024252237007000-fa9cd54f"
+  },
+  "jobs": {
+    "antigravity-1": "SCH-1788024229089877000",
+    "antigravity-2": "SCH-1788024232459493000"
+  },
+  "note": "Seat-authored peer_ack + nonce LIFE and COMMS-CHECK-REPLY WORK from ZQK-010/ZQK-011. Scheduler job success is not the score; feed JSONL is."
+}

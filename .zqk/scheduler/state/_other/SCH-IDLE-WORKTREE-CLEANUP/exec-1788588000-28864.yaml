@@ -1,0 +1,7 @@
+job_id: SCH-IDLE-WORKTREE-CLEANUP
+execution_id: exec-1788588000-28864
+state: completed
+process_id: 28864
+started_at: 2026-09-05T06:00:00.133216Z
+completed_at: 2026-09-05T06:00:01.039221Z
+policy_decision: execute

@@ -1,0 +1,44 @@
+
+--- run 2026-09-04T22:11:48Z ---
+=== RUN   TestListSpecs_NoMigrationsDir
+=== PAUSE TestListSpecs_NoMigrationsDir
+=== RUN   TestListSpecs_EmptyDir
+=== PAUSE TestListSpecs_EmptyDir
+=== RUN   TestListSpecs_ValidSpec
+=== PAUSE TestListSpecs_ValidSpec
+=== RUN   TestExecuteCommandStep_Success
+=== PAUSE TestExecuteCommandStep_Success
+=== RUN   TestExecuteCommandStep_RequiresCommand
+=== PAUSE TestExecuteCommandStep_RequiresCommand
+=== RUN   TestExecuteCommandStep_NonZeroExit
+=== PAUSE TestExecuteCommandStep_NonZeroExit
+=== RUN   TestValidatePrerequisites_EmptyPasses
+=== PAUSE TestValidatePrerequisites_EmptyPasses
+=== RUN   TestValidatePrerequisites_DirectoryMustExist
+=== PAUSE TestValidatePrerequisites_DirectoryMustExist
+=== RUN   TestValidatePrerequisites_DirectoryMustNotExist
+=== PAUSE TestValidatePrerequisites_DirectoryMustNotExist
+=== RUN   TestRunValidation_EmptyPasses
+=== PAUSE TestRunValidation_EmptyPasses
+=== CONT  TestListSpecs_NoMigrationsDir
+=== CONT  TestExecuteCommandStep_NonZeroExit
+--- PASS: TestListSpecs_NoMigrationsDir (0.00s)
+=== CONT  TestExecuteCommandStep_Success
+--- PASS: TestExecuteCommandStep_NonZeroExit (0.06s)
+=== CONT  TestExecuteCommandStep_RequiresCommand
+--- PASS: TestExecuteCommandStep_Success (0.06s)
+=== CONT  TestValidatePrerequisites_DirectoryMustNotExist
+--- PASS: TestValidatePrerequisites_DirectoryMustNotExist (0.04s)
+=== CONT  TestValidatePrerequisites_DirectoryMustExist
+--- PASS: TestExecuteCommandStep_RequiresCommand (0.04s)
+=== CONT  TestRunValidation_EmptyPasses
+--- PASS: TestRunValidation_EmptyPasses (0.06s)
+--- PASS: TestValidatePrerequisites_DirectoryMustExist (0.06s)
+=== CONT  TestListSpecs_ValidSpec
+=== CONT  TestValidatePrerequisites_EmptyPasses
+--- PASS: TestListSpecs_ValidSpec (0.03s)
+=== CONT  TestListSpecs_EmptyDir
+--- PASS: TestListSpecs_EmptyDir (0.01s)
+--- PASS: TestValidatePrerequisites_EmptyPasses (0.07s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/migration	0.816s

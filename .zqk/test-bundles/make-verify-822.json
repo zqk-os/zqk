@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-822",
+  "created_at": "2026-09-04T21:34:35.483526Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-822",
+    "Tests": [
+      {
+        "Name": "TestExpectedObjectGetMiss",
+        "Package": "coordination",
+        "PackagePath": "pkg/coordination",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/coordination/object_get_miss_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestCoordinatorOperationCallback_OnStart",
+        "Package": "coordination",
+        "PackagePath": "pkg/coordination",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/coordination/operation_callback_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestCoordinatorOperationCallback_OnProgress",
+        "Package": "coordination",
+        "PackagePath": "pkg/coordination",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/coordination/operation_callback_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestCoordinatorOperationCallback_OnComplete",
+        "Package": "coordination",
+        "PackagePath": "pkg/coordination",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/coordination/operation_callback_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestCoordinatorOperationCallback_OnError",
+        "Package": "coordination",
+        "PackagePath": "pkg/coordination",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/coordination/operation_callback_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestCoordinatorOperationCallback_OnCancel",
+        "Package": "coordination",
+        "PackagePath": "pkg/coordination",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/coordination/operation_callback_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestCoordinatorOperationCallback_NoStorageProvider",
+        "Package": "coordination",
+        "PackagePath": "pkg/coordination",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/coordination/operation_callback_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestCoordinatorOperationCallback_NoProjectRoot",
+        "Package": "coordination",
+        "PackagePath": "pkg/coordination",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/coordination/operation_callback_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestUnifiedMetricsCollector_Integration",
+        "Package": "coordination",
+        "PackagePath": "pkg/coordination",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/coordination/unified_metrics_collector_integration_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestUnifiedMetricsCollector_EventEmission",
+        "Package": "coordination",
+        "PackagePath": "pkg/coordination",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/coordination/unified_metrics_collector_integration_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": true,
+    "EstimatedDuration": 300000000000,
+    "PackagePath": "pkg/coordination"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestExpectedObjectGetMiss",
+      "Package": "coordination",
+      "PackagePath": "pkg/coordination",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/coordination/object_get_miss_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestCoordinatorOperationCallback_OnStart",
+      "Package": "coordination",
+      "PackagePath": "pkg/coordination",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/coordination/operation_callback_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestCoordinatorOperationCallback_OnProgress",
+      "Package": "coordination",
+      "PackagePath": "pkg/coordination",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/coordination/operation_callback_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestCoordinatorOperationCallback_OnComplete",
+      "Package": "coordination",
+      "PackagePath": "pkg/coordination",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/coordination/operation_callback_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestCoordinatorOperationCallback_OnError",
+      "Package": "coordination",
+      "PackagePath": "pkg/coordination",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/coordination/operation_callback_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestCoordinatorOperationCallback_OnCancel",
+      "Package": "coordination",
+      "PackagePath": "pkg/coordination",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/coordination/operation_callback_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestCoordinatorOperationCallback_NoStorageProvider",
+      "Package": "coordination",
+      "PackagePath": "pkg/coordination",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/coordination/operation_callback_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestCoordinatorOperationCallback_NoProjectRoot",
+      "Package": "coordination",
+      "PackagePath": "pkg/coordination",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/coordination/operation_callback_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestUnifiedMetricsCollector_Integration",
+      "Package": "coordination",
+      "PackagePath": "pkg/coordination",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/coordination/unified_metrics_collector_integration_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestUnifiedMetricsCollector_EventEmission",
+      "Package": "coordination",
+      "PackagePath": "pkg/coordination",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/coordination/unified_metrics_collector_integration_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

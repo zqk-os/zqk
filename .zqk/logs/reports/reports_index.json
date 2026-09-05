@@ -1,0 +1,28 @@
+{
+  "latest": {
+    "path": "object-count-report-20260905-040019.json",
+    "generated_at": "2026-09-05T04:00:14.68062Z",
+    "total_disk": 9378,
+    "total_object": 10054
+  },
+  "reports": [
+    {
+      "path": "object-count-report-20260905-040019.json",
+      "generated_at": "2026-09-05T04:00:14.68062Z",
+      "total_disk": 9378,
+      "total_object": 10054
+    },
+    {
+      "path": "object-count-report-20260905-000012.json",
+      "generated_at": "2026-09-05T00:00:07.625117Z",
+      "total_disk": 9386,
+      "total_object": 10730
+    },
+    {
+      "path": "object-count-report-20260904-204001.json",
+      "generated_at": "2026-09-04T20:39:57.86108Z",
+      "total_disk": 9306,
+      "total_object": 8884
+    }
+  ]
+}

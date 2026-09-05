@@ -1,0 +1,44 @@
+
+--- run 2026-09-04T22:16:12Z ---
+=== RUN   TestBuildTestBundleConvergenceSnapshot_Empty
+=== PAUSE TestBuildTestBundleConvergenceSnapshot_Empty
+=== RUN   TestBuildTestBundleConvergenceSnapshot_TrendingAway
+=== PAUSE TestBuildTestBundleConvergenceSnapshot_TrendingAway
+=== RUN   TestBuildTestBundleConvergenceSnapshot_RecoveredFailureSameFingerprint_IsNeutral
+=== PAUSE TestBuildTestBundleConvergenceSnapshot_RecoveredFailureSameFingerprint_IsNeutral
+=== RUN   TestBuildTestBundleConvergenceSnapshot_Neutral
+=== PAUSE TestBuildTestBundleConvergenceSnapshot_Neutral
+=== RUN   TestBuildTestBundleConvergenceSnapshot_QuarantinedFlake_IsNotGreen
+=== PAUSE TestBuildTestBundleConvergenceSnapshot_QuarantinedFlake_IsNotGreen
+=== RUN   TestCountMeasureTicksInLastHour
+=== PAUSE TestCountMeasureTicksInLastHour
+=== RUN   TestThresholdMaxTicksPerHour
+=== PAUSE TestThresholdMaxTicksPerHour
+=== RUN   TestCRIT9039_CoordinationChannel_PublishAndWatch
+=== PAUSE TestCRIT9039_CoordinationChannel_PublishAndWatch
+=== RUN   TestCRIT9042_SchedulerIntegration_PolicyDefaultActionSkip
+=== PAUSE TestCRIT9042_SchedulerIntegration_PolicyDefaultActionSkip
+=== RUN   TestCRIT9040_SchedulerIntegration_PersistsStateAndPublishesEvents
+=== PAUSE TestCRIT9040_SchedulerIntegration_PersistsStateAndPublishesEvents
+=== CONT  TestBuildTestBundleConvergenceSnapshot_Empty
+=== CONT  TestCountMeasureTicksInLastHour
+--- PASS: TestCountMeasureTicksInLastHour (0.00s)
+=== CONT  TestBuildTestBundleConvergenceSnapshot_Neutral
+--- PASS: TestBuildTestBundleConvergenceSnapshot_Neutral (0.00s)
+=== CONT  TestBuildTestBundleConvergenceSnapshot_QuarantinedFlake_IsNotGreen
+--- PASS: TestBuildTestBundleConvergenceSnapshot_Empty (0.00s)
+=== CONT  TestBuildTestBundleConvergenceSnapshot_RecoveredFailureSameFingerprint_IsNeutral
+--- PASS: TestBuildTestBundleConvergenceSnapshot_QuarantinedFlake_IsNotGreen (0.00s)
+=== CONT  TestBuildTestBundleConvergenceSnapshot_TrendingAway
+--- PASS: TestBuildTestBundleConvergenceSnapshot_RecoveredFailureSameFingerprint_IsNeutral (0.00s)
+=== CONT  TestCRIT9042_SchedulerIntegration_PolicyDefaultActionSkip
+--- PASS: TestBuildTestBundleConvergenceSnapshot_TrendingAway (0.01s)
+=== CONT  TestCRIT9040_SchedulerIntegration_PersistsStateAndPublishesEvents
+--- PASS: TestCRIT9042_SchedulerIntegration_PolicyDefaultActionSkip (1.37s)
+=== CONT  TestCRIT9039_CoordinationChannel_PublishAndWatch
+--- PASS: TestCRIT9040_SchedulerIntegration_PersistsStateAndPublishesEvents (1.37s)
+=== CONT  TestThresholdMaxTicksPerHour
+--- PASS: TestThresholdMaxTicksPerHour (0.00s)
+--- PASS: TestCRIT9039_CoordinationChannel_PublishAndWatch (0.16s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/scheduler	2.300s

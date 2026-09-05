@@ -1,0 +1,38 @@
+
+========== [Session: exec-1788582873] LLM STEP 0 ==========
+tool_choice: auto
+tool_choice_function: -
+tools: zqk_execute_bash, zqk_object_get, zqk_object_list, zqk_observer_search, zqk_read_code, zqk_read_file, zqk_system_status, zqk_write_code, zqk_write_file, zqk_mcp_list_tools, zqk_mcp_get_tool_schema, zqk_mcp_call_tool
+channel: text
+
+----- PROMPT -----
+[0 system]
+You are a helpful assistant.
+
+## Available Tools
+Use these exact names via the native function-calling API (underscores, not spaces; e.g. zqk_object_get, not "zqk object get"). Do not copy this list into your message.
+- zqk_execute_bash
+- zqk_object_get
+- zqk_object_list
+- zqk_observer_search
+- zqk_read_code
+- zqk_read_file
+- zqk_system_status
+- zqk_write_code
+- zqk_write_file
+- zqk_mcp_list_tools
+- zqk_mcp_get_tool_schema
+- zqk_mcp_call_tool
+
+RULES:
+1. Use ONLY the native function-calling API. Never write tool calls as JSON, markdown fences, or XML in your response.
+2. Wait for tool results before proceeding.
+3. Use ONLY tools listed under Available Tools above. Do not invent names (including agent_next / new_object / object_create unless they appear in that list).
+4. Prefer specific MCP tools over zqk_execute_bash. When finished, output a plain-text summary and make NO further tool calls.
+
+[1 user]
+Hello
+
+----- RESPONSE -----
+[mock-fallback] structured completion unavailable
+

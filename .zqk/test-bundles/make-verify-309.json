@@ -1,0 +1,87 @@
+{
+  "name": "make-verify-309",
+  "created_at": "2026-09-04T21:34:30.447769Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-309",
+    "Tests": [
+      {
+        "Name": "TestMerge_replaceAndAppend",
+        "Package": "tray",
+        "PackagePath": "pkg/tray",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/tray/tray_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestLoad_embeddedOnly",
+        "Package": "tray",
+        "PackagePath": "pkg/tray",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/tray/tray_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestLoad_userFile_invalidSchema",
+        "Package": "tray",
+        "PackagePath": "pkg/tray",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/tray/tray_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestLoad_userFile",
+        "Package": "tray",
+        "PackagePath": "pkg/tray",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/tray/tray_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 120000000000,
+    "PackagePath": "pkg/tray"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestMerge_replaceAndAppend",
+      "Package": "tray",
+      "PackagePath": "pkg/tray",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/tray/tray_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestLoad_embeddedOnly",
+      "Package": "tray",
+      "PackagePath": "pkg/tray",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/tray/tray_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestLoad_userFile_invalidSchema",
+      "Package": "tray",
+      "PackagePath": "pkg/tray",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/tray/tray_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestLoad_userFile",
+      "Package": "tray",
+      "PackagePath": "pkg/tray",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/tray/tray_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

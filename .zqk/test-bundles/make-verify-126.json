@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-126",
+  "created_at": "2026-09-04T21:34:28.591834Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-126",
+    "Tests": [
+      {
+        "Name": "TestResolveStringForPatternValidation",
+        "Package": "validation",
+        "PackagePath": "pkg/validation",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/validation/field_validators_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestResolveStringForPatternValidationWithField",
+        "Package": "validation",
+        "PackagePath": "pkg/validation",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/validation/field_validators_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestGoValidator_BreakGlassStillEnforcesCriteriaOnComplete",
+        "Package": "validation",
+        "PackagePath": "pkg/validation",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/validation/go_validator_break_glass_criteria_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestGoValidator_TrustedShockwaveStillEnforcesPlanChildrenHold",
+        "Package": "validation",
+        "PackagePath": "pkg/validation",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/validation/go_validator_break_glass_criteria_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestGoValidator_ShippedBacklogCompleteRefusesInProgressCriteria",
+        "Package": "validation",
+        "PackagePath": "pkg/validation",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/validation/go_validator_break_glass_criteria_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestGoValidator_CriteriaRefactorMeasuredDeltas",
+        "Package": "validation",
+        "PackagePath": "pkg/validation",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/validation/go_validator_custom_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestGoValidator_PriorityPlanSealRequiresPlannedChild",
+        "Package": "validation",
+        "PackagePath": "pkg/validation",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/validation/go_validator_preconditions_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestEvaluatePrecondition_ReadyBacklogTokenIsRecognized",
+        "Package": "validation",
+        "PackagePath": "pkg/validation",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/validation/go_validator_preconditions_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestEvaluatePrecondition_UnrecognizedStillFailOpen",
+        "Package": "validation",
+        "PackagePath": "pkg/validation",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/validation/go_validator_preconditions_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestEvaluatePrecondition_PriorityPlanValidated",
+        "Package": "validation",
+        "PackagePath": "pkg/validation",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/validation/go_validator_preconditions_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": true,
+    "EstimatedDuration": 300000000000,
+    "PackagePath": "pkg/validation"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestResolveStringForPatternValidation",
+      "Package": "validation",
+      "PackagePath": "pkg/validation",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/validation/field_validators_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestResolveStringForPatternValidationWithField",
+      "Package": "validation",
+      "PackagePath": "pkg/validation",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/validation/field_validators_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestGoValidator_BreakGlassStillEnforcesCriteriaOnComplete",
+      "Package": "validation",
+      "PackagePath": "pkg/validation",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/validation/go_validator_break_glass_criteria_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestGoValidator_TrustedShockwaveStillEnforcesPlanChildrenHold",
+      "Package": "validation",
+      "PackagePath": "pkg/validation",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/validation/go_validator_break_glass_criteria_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestGoValidator_ShippedBacklogCompleteRefusesInProgressCriteria",
+      "Package": "validation",
+      "PackagePath": "pkg/validation",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/validation/go_validator_break_glass_criteria_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestGoValidator_CriteriaRefactorMeasuredDeltas",
+      "Package": "validation",
+      "PackagePath": "pkg/validation",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/validation/go_validator_custom_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestGoValidator_PriorityPlanSealRequiresPlannedChild",
+      "Package": "validation",
+      "PackagePath": "pkg/validation",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/validation/go_validator_preconditions_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestEvaluatePrecondition_ReadyBacklogTokenIsRecognized",
+      "Package": "validation",
+      "PackagePath": "pkg/validation",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/validation/go_validator_preconditions_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestEvaluatePrecondition_UnrecognizedStillFailOpen",
+      "Package": "validation",
+      "PackagePath": "pkg/validation",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/validation/go_validator_preconditions_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestEvaluatePrecondition_PriorityPlanValidated",
+      "Package": "validation",
+      "PackagePath": "pkg/validation",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/validation/go_validator_preconditions_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

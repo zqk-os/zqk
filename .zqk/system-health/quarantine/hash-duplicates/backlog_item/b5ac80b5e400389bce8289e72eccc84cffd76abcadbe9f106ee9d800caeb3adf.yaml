@@ -1,0 +1,50 @@
+acceptance_considerations: Acceptance recorded as linked criteria; no narrative captured at migration time.
+actual_effort: 9h
+commit_refs:
+    - a183887ad4
+    - 87cad5c927
+created_at: "2026-08-05T04:45:37Z"
+created_by: ACC-1785920548450214012-68b850c0
+criteria_refs:
+    - CRIT-1785939710724061000-b5bf86b8
+    - CRIT-1785939711664754000-0d5bdde2
+    - CRIT-1785939712620448000-650bde67
+    - CRIT-1785939713697856000-9ec02878
+    - CRIT-1786697464558124000-e03d8bb3
+description: |
+    Wire seating so every agent run claims an ACC account bound to role + persona
+    (CRI-ACCOUNT-RBAC-READY). Support swarm_worker_N pool titles on distinct ACC-*
+    accounts. Align with POL-AGENT-ACCOUNT-LOGIN-001 and prepare-context / mesh wake
+    paths so subagents never run as anonymous account:system by default.
+estimated_effort: 8h
+goal_refs:
+    - GOAL-1785885763755750000-6efcb274
+id: BLI-1785905136581480000-1f317f44
+kind: backlog_item
+milestone_refs:
+    - MIL-1785886016336815000-ad6784be
+namespace_id: zqk:kernel
+owner_ref: ACC-1785920548450214012-68b850c0
+persona_refs:
+    - PER-1781486429759398000-a79939a1
+priority: high
+priority_tier: P0
+problem_statement: |-
+    Wire seating so every agent run claims an ACC account bound to role + persona
+    (CRI-ACCOUNT-RBAC-READY). Support swarm_worker_N pool titles on distinct ACC-*
+    accounts. Align with POL-AGENT-ACCOUNT-LOGIN-001 and prepare-context / mesh wake
+    paths so subagents never run as anonymous account:system by default.
+related_object_refs:
+    - REQ-1785905117601841000-468539c3
+    - CRIT-1785905131008420000-d90a0622
+    - POL-CODE-1785905132115717000-81ab632e
+requirement_refs:
+    - REQ-1785905117601841000-468539c3
+schema_version: 2.0.0
+stakeholder_refs:
+    - PER-1781486429759398000-a79939a1
+status: complete
+title: 'MMORCH P0: Enforce agent login as ACC account with role+persona binding'
+updated_at: "2026-08-19T04:52:02Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

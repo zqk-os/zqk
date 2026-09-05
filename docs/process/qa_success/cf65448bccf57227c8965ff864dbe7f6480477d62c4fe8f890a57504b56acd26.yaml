@@ -1,0 +1,14 @@
+created_at: "2026-08-17T23:58:14Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1787011094462872000-274b2879
+item_id: PRI-KERNEL-LF-DIAL-001
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 2857702ca28e4b64fb5782140b43c1400e68fdeab30ab0062f4119523ca97d466e5f13c72adcfa41b92eacf21fa7f0a79b8a8e3a8d7c581e5c9afe0e69cb31dc
+schema_version: 2.0.0
+signature: 3046022100d46c183998cc941f78feaad48525fc99fc467abcdfb464303d9281f2b9cc2c75022100cb6a16e39e1db4832d0bd0323dd9721b5f0e475d67463f4c42d933040bc85f1c
+status: archived
+title: Kernel lifecycle vs fitness dial — mid-flight column
+updated_at: "2026-09-01T07:29:35Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

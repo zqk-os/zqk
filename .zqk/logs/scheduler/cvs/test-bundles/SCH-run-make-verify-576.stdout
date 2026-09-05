@@ -1,0 +1,44 @@
+
+--- run 2026-09-04T22:18:24Z ---
+=== RUN   TestStewardCacheInvalidateDetail_jobIDPrefixAndCap
+=== PAUSE TestStewardCacheInvalidateDetail_jobIDPrefixAndCap
+=== RUN   TestStewardEnqueueCoordinator_Enqueue_writesJSONL
+=== PAUSE TestStewardEnqueueCoordinator_Enqueue_writesJSONL
+=== RUN   TestNewStewardEnqueueCoordinator_unknownProfile
+=== PAUSE TestNewStewardEnqueueCoordinator_unknownProfile
+=== RUN   TestNewCASEntityStewardEnqueueCoordinator_acceptsProfile
+=== PAUSE TestNewCASEntityStewardEnqueueCoordinator_acceptsProfile
+=== RUN   TestWriteTestBundleHealthStreamSummary
+=== PAUSE TestWriteTestBundleHealthStreamSummary
+=== RUN   TestRefuseSupervisorSelfStop_selfAndParent
+=== PAUSE TestRefuseSupervisorSelfStop_selfAndParent
+=== RUN   TestRefuseSupervisorSelfStop_unrelated
+=== PAUSE TestRefuseSupervisorSelfStop_unrelated
+=== RUN   TestSignalSchedulerByPID_refusesCallerPIDFile
+=== PAUSE TestSignalSchedulerByPID_refusesCallerPIDFile
+=== RUN   TestOrphanRecoveryStatusPreservesDurableContinuation
+=== PAUSE TestOrphanRecoveryStatusPreservesDurableContinuation
+=== RUN   TestResolveSwarmClaimant
+=== PAUSE TestResolveSwarmClaimant
+=== CONT  TestStewardCacheInvalidateDetail_jobIDPrefixAndCap
+=== CONT  TestRefuseSupervisorSelfStop_selfAndParent
+--- PASS: TestStewardCacheInvalidateDetail_jobIDPrefixAndCap (0.00s)
+=== CONT  TestWriteTestBundleHealthStreamSummary
+--- PASS: TestRefuseSupervisorSelfStop_selfAndParent (0.00s)
+=== CONT  TestNewCASEntityStewardEnqueueCoordinator_acceptsProfile
+--- PASS: TestNewCASEntityStewardEnqueueCoordinator_acceptsProfile (0.00s)
+=== CONT  TestNewStewardEnqueueCoordinator_unknownProfile
+--- PASS: TestNewStewardEnqueueCoordinator_unknownProfile (0.00s)
+=== CONT  TestStewardEnqueueCoordinator_Enqueue_writesJSONL
+--- PASS: TestWriteTestBundleHealthStreamSummary (0.01s)
+=== CONT  TestOrphanRecoveryStatusPreservesDurableContinuation
+--- PASS: TestOrphanRecoveryStatusPreservesDurableContinuation (0.00s)
+=== CONT  TestResolveSwarmClaimant
+--- PASS: TestStewardEnqueueCoordinator_Enqueue_writesJSONL (0.01s)
+=== CONT  TestSignalSchedulerByPID_refusesCallerPIDFile
+--- PASS: TestResolveSwarmClaimant (0.01s)
+=== CONT  TestRefuseSupervisorSelfStop_unrelated
+--- PASS: TestSignalSchedulerByPID_refusesCallerPIDFile (0.01s)
+--- PASS: TestRefuseSupervisorSelfStop_unrelated (0.01s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/scheduler	0.678s

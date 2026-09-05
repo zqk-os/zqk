@@ -1,0 +1,61 @@
+
+--- run 2026-09-04T22:20:19Z ---
+=== RUN   TestNewCompactJournalCmd_FlagsAndStructure
+=== PAUSE TestNewCompactJournalCmd_FlagsAndStructure
+=== RUN   TestScanObjectFilesWithContext_UsesCASIndexFastPath
+=== PAUSE TestScanObjectFilesWithContext_UsesCASIndexFastPath
+=== RUN   TestDiscoveryEarlyCompletion_StableCount
+=== PAUSE TestDiscoveryEarlyCompletion_StableCount
+=== RUN   TestDiscoveryEarlyCompletion_DoubleClosePrevention
+=== PAUSE TestDiscoveryEarlyCompletion_DoubleClosePrevention
+=== RUN   TestDiscoveryProgressEmission_Interval
+=== PAUSE TestDiscoveryProgressEmission_Interval
+=== RUN   TestDiscoveryStableCountDetection
+=== PAUSE TestDiscoveryStableCountDetection
+=== RUN   TestDiscoveryStreamingChannel_ConcurrentConsumption
+=== PAUSE TestDiscoveryStreamingChannel_ConcurrentConsumption
+=== RUN   TestDiscoveryEarlyCompletion_ContextCancellation
+=== PAUSE TestDiscoveryEarlyCompletion_ContextCancellation
+=== RUN   TestRunEnqueueValidationForObjectViaPipeline_EmptyInputs
+=== PAUSE TestRunEnqueueValidationForObjectViaPipeline_EmptyInputs
+=== RUN   TestNewEnsureRetentionJobsCmd
+=== PAUSE TestNewEnsureRetentionJobsCmd
+=== CONT  TestNewCompactJournalCmd_FlagsAndStructure
+=== CONT  TestDiscoveryStableCountDetection
+=== RUN   TestDiscoveryStableCountDetection/Initial_count
+=== RUN   TestDiscoveryStableCountDetection/Count_increases
+--- PASS: TestNewCompactJournalCmd_FlagsAndStructure (0.00s)
+=== CONT  TestNewEnsureRetentionJobsCmd
+--- PASS: TestNewEnsureRetentionJobsCmd (0.00s)
+=== CONT  TestRunEnqueueValidationForObjectViaPipeline_EmptyInputs
+=== RUN   TestDiscoveryStableCountDetection/Count_stable_for_2s
+--- PASS: TestRunEnqueueValidationForObjectViaPipeline_EmptyInputs (1.10s)
+=== CONT  TestDiscoveryEarlyCompletion_ContextCancellation
+    discovery_early_completion_test.go:343: Early completion triggered successfully
+--- PASS: TestDiscoveryEarlyCompletion_ContextCancellation (0.10s)
+=== CONT  TestDiscoveryStreamingChannel_ConcurrentConsumption
+--- PASS: TestDiscoveryStreamingChannel_ConcurrentConsumption (0.30s)
+=== CONT  TestDiscoveryEarlyCompletion_DoubleClosePrevention
+--- PASS: TestDiscoveryEarlyCompletion_DoubleClosePrevention (0.00s)
+=== CONT  TestDiscoveryProgressEmission_Interval
+=== RUN   TestDiscoveryStableCountDetection/Count_stable_for_3s
+--- PASS: TestDiscoveryStableCountDetection (3.50s)
+    --- PASS: TestDiscoveryStableCountDetection/Initial_count (0.00s)
+    --- PASS: TestDiscoveryStableCountDetection/Count_increases (0.50s)
+    --- PASS: TestDiscoveryStableCountDetection/Count_stable_for_2s (2.00s)
+    --- PASS: TestDiscoveryStableCountDetection/Count_stable_for_3s (1.00s)
+=== CONT  TestDiscoveryEarlyCompletion_StableCount
+=== NAME  TestDiscoveryProgressEmission_Interval
+    discovery_early_completion_test.go:174: Progress emitted at 2.008702708s (emit #1)
+    discovery_early_completion_test.go:174: Progress emitted at 5.000086542s (emit #2)
+    discovery_early_completion_test.go:196: Progress emission test: 2 emissions in ~6 seconds (expected 2-3)
+--- PASS: TestDiscoveryProgressEmission_Interval (6.00s)
+=== CONT  TestScanObjectFilesWithContext_UsesCASIndexFastPath
+--- PASS: TestScanObjectFilesWithContext_UsesCASIndexFastPath (0.06s)
+=== NAME  TestDiscoveryEarlyCompletion_StableCount
+    discovery_early_completion_test.go:82: Discovery completed (may have been early completion or timeout)
+    discovery_early_completion_test.go:89: Final results: 0 files collected, 0 streamed
+    discovery_early_completion_test.go:93: Note: No files collected - this may be expected if discovery goroutines haven't started yet
+--- PASS: TestDiscoveryEarlyCompletion_StableCount (8.35s)
+PASS
+ok  	github.com/lanceman/zqk/cmd/zqk/system	12.598s

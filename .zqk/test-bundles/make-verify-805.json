@@ -1,0 +1,51 @@
+{
+  "name": "make-verify-805",
+  "created_at": "2026-09-04T21:34:35.315851Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-805",
+    "Tests": [
+      {
+        "Name": "TestGenerateAndVerifyStamp",
+        "Package": "crypto",
+        "PackagePath": "pkg/crypto",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/crypto/stamp_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestVerifyStamp_InvalidKey",
+        "Package": "crypto",
+        "PackagePath": "pkg/crypto",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/crypto/stamp_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 60000000000,
+    "PackagePath": "pkg/crypto"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestGenerateAndVerifyStamp",
+      "Package": "crypto",
+      "PackagePath": "pkg/crypto",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/crypto/stamp_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestVerifyStamp_InvalidKey",
+      "Package": "crypto",
+      "PackagePath": "pkg/crypto",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/crypto/stamp_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

@@ -1,0 +1,14 @@
+created_at: "2026-09-02T02:47:45Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1788317265304312000-9533342a
+item_id: BLI-CEF-AGENTIC-INJECTION-001
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 86b8ab3d574c004a61020b73c23f52b9055049e90c3d755c8bbb383e059e384028fdd8cd69e13123b644e5f3f7eb65596e73e2d57d719ea3dafcb01b84ce8dfb
+schema_version: 2.0.0
+signature: 3046022100f42d6df358100accd91094a886917c87f1648c7316fb5c20f4ce7fb3d82ebbba0221009dc51b5884c9265f7d379777b84cdd4822e02e46035c5f294cad1f6594398ee4
+status: success
+title: QA success for BLI-CEF-AGENTIC-INJECTION-001
+updated_at: "2026-09-02T07:44:27Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

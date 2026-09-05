@@ -1,0 +1,14 @@
+created_at: "2026-08-20T00:13:06Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1787184784308937000-c409dd5d
+item_id: BLI-CEF-R5-DUAL-MEASURE-001
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 2857702ca28e4b64fb5782140b43c1400e68fdeab30ab0062f4119523ca97d466e5f13c72adcfa41b92eacf21fa7f0a79b8a8e3a8d7c581e5c9afe0e69cb31dc
+schema_version: 2.0.0
+signature: 3045022055fa63277a95d0a47d6af3bf0debd54c83c378e8f1fbbbbb76019d539ceaf7a202210088ab110a9627f2d1ea2cf1504cb07faf6df5f3fced11a634fa0215c6d72c365c
+status: archived
+title: Run dual-seat CEF R5 at one freeze SHA and persist packages
+updated_at: "2026-09-01T07:40:39Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

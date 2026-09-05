@@ -1,0 +1,141 @@
+{
+  "name": "make-verify-225",
+  "created_at": "2026-09-04T21:34:29.630555Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-225",
+    "Tests": [
+      {
+        "Name": "TestResolvePriorityPlan_ExplicitOverridesWorkCheck",
+        "Package": "workflow",
+        "PackagePath": "cmd/zqk/workflow",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/workflow/whats_next_plan_selection_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestCountBacklogByStatus_ReturnsCorrectCounts",
+        "Package": "workflow",
+        "PackagePath": "cmd/zqk/workflow",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/workflow/whats_next_plan_selection_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestWhatsNextPersonaFilter",
+        "Package": "workflow",
+        "PackagePath": "cmd/zqk/workflow",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/workflow/whats_next_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestWhatsNextTaskSpecificRouting",
+        "Package": "workflow",
+        "PackagePath": "cmd/zqk/workflow",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/workflow/whats_next_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestWhatsNextOperatorSeesLeadGantt",
+        "Package": "workflow",
+        "PackagePath": "cmd/zqk/workflow",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/workflow/whats_next_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestHasPersonaMatchUnassignedEligible",
+        "Package": "workflow",
+        "PackagePath": "cmd/zqk/workflow",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/workflow/whats_next_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestWhatsNextWorkerAgentIDSelectsSeatedPlan",
+        "Package": "workflow",
+        "PackagePath": "cmd/zqk/workflow",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/workflow/whats_next_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 210000000000,
+    "PackagePath": "cmd/zqk/workflow"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestResolvePriorityPlan_ExplicitOverridesWorkCheck",
+      "Package": "workflow",
+      "PackagePath": "cmd/zqk/workflow",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/workflow/whats_next_plan_selection_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestCountBacklogByStatus_ReturnsCorrectCounts",
+      "Package": "workflow",
+      "PackagePath": "cmd/zqk/workflow",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/workflow/whats_next_plan_selection_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestWhatsNextPersonaFilter",
+      "Package": "workflow",
+      "PackagePath": "cmd/zqk/workflow",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/workflow/whats_next_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestWhatsNextTaskSpecificRouting",
+      "Package": "workflow",
+      "PackagePath": "cmd/zqk/workflow",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/workflow/whats_next_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestWhatsNextOperatorSeesLeadGantt",
+      "Package": "workflow",
+      "PackagePath": "cmd/zqk/workflow",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/workflow/whats_next_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestHasPersonaMatchUnassignedEligible",
+      "Package": "workflow",
+      "PackagePath": "cmd/zqk/workflow",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/workflow/whats_next_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestWhatsNextWorkerAgentIDSelectsSeatedPlan",
+      "Package": "workflow",
+      "PackagePath": "cmd/zqk/workflow",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/workflow/whats_next_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

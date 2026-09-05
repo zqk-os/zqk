@@ -1,0 +1,44 @@
+
+--- run 2026-09-04T22:11:18Z ---
+=== RUN   TestMinimalMembrane_CoordinatorNilUsesNoop
+=== PAUSE TestMinimalMembrane_CoordinatorNilUsesNoop
+=== RUN   TestNoopCellCoordinator_Enqueue
+=== PAUSE TestNoopCellCoordinator_Enqueue
+=== RUN   TestMembraneReadPaths_CLIHookProfilePath
+=== PAUSE TestMembraneReadPaths_CLIHookProfilePath
+=== RUN   TestMembraneReadPaths_AllRuntimePaths
+=== PAUSE TestMembraneReadPaths_AllRuntimePaths
+=== RUN   TestRuntimeOrganismMembraneReadPaths
+=== PAUSE TestRuntimeOrganismMembraneReadPaths
+=== RUN   TestStreamMembraneReadPaths_StreamCurrentKindDir
+=== PAUSE TestStreamMembraneReadPaths_StreamCurrentKindDir
+=== RUN   TestStreamMembraneReadPathsWithCoordinator
+=== PAUSE TestStreamMembraneReadPathsWithCoordinator
+=== RUN   TestCASEntityMembraneReadPaths_PrimaryDir
+=== PAUSE TestCASEntityMembraneReadPaths_PrimaryDir
+=== RUN   TestOperationalEnvelopeForProfile_known
+=== PAUSE TestOperationalEnvelopeForProfile_known
+=== RUN   TestOperationalEnvelopeForProfile_unknown
+=== PAUSE TestOperationalEnvelopeForProfile_unknown
+=== CONT  TestMinimalMembrane_CoordinatorNilUsesNoop
+--- PASS: TestMinimalMembrane_CoordinatorNilUsesNoop (0.00s)
+=== CONT  TestRuntimeOrganismMembraneReadPaths
+=== CONT  TestStreamMembraneReadPaths_StreamCurrentKindDir
+--- PASS: TestStreamMembraneReadPaths_StreamCurrentKindDir (0.00s)
+=== CONT  TestOperationalEnvelopeForProfile_known
+--- PASS: TestOperationalEnvelopeForProfile_known (0.00s)
+=== CONT  TestOperationalEnvelopeForProfile_unknown
+--- PASS: TestOperationalEnvelopeForProfile_unknown (0.00s)
+=== CONT  TestCASEntityMembraneReadPaths_PrimaryDir
+--- PASS: TestRuntimeOrganismMembraneReadPaths (0.00s)
+=== CONT  TestStreamMembraneReadPathsWithCoordinator
+--- PASS: TestCASEntityMembraneReadPaths_PrimaryDir (0.00s)
+=== CONT  TestMembraneReadPaths_CLIHookProfilePath
+--- PASS: TestStreamMembraneReadPathsWithCoordinator (0.00s)
+=== CONT  TestMembraneReadPaths_AllRuntimePaths
+--- PASS: TestMembraneReadPaths_CLIHookProfilePath (0.00s)
+=== CONT  TestNoopCellCoordinator_Enqueue
+--- PASS: TestNoopCellCoordinator_Enqueue (0.00s)
+--- PASS: TestMembraneReadPaths_AllRuntimePaths (0.00s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/datacell	0.611s

@@ -1,0 +1,71 @@
+
+--- run 2026-09-04T22:14:06Z ---
+=== RUN   TestAgentTaskWorkDoneRequiresCommit
+=== PAUSE TestAgentTaskWorkDoneRequiresCommit
+=== RUN   TestCreateAuditEventWithBuilder_SessionID
+=== PAUSE TestCreateAuditEventWithBuilder_SessionID
+=== RUN   TestGetFallbackChangeJournalGenerator_Caching
+=== PAUSE TestGetFallbackChangeJournalGenerator_Caching
+=== RUN   TestGetFallbackChangeJournalGenerator_EmptyProjectRoot
+=== PAUSE TestGetFallbackChangeJournalGenerator_EmptyProjectRoot
+=== RUN   TestCAS_SkipIndexUpdateWaitAtomic
+=== PAUSE TestCAS_SkipIndexUpdateWaitAtomic
+=== RUN   TestDenyCoreKernelHardDelete_BlocksWorkstream
+=== PAUSE TestDenyCoreKernelHardDelete_BlocksWorkstream
+=== RUN   TestDenyCoreKernelHardDelete_AllowContext
+=== PAUSE TestDenyCoreKernelHardDelete_AllowContext
+=== RUN   TestDenyCoreKernelHardDelete_ElevationAloneNeverBypasses
+=== PAUSE TestDenyCoreKernelHardDelete_ElevationAloneNeverBypasses
+=== RUN   TestAcceptanceCriteria_ParseMixedContent
+=== PAUSE TestAcceptanceCriteria_ParseMixedContent
+=== RUN   TestAcceptanceCriteria_LookupCriteria
+=== PAUSE TestAcceptanceCriteria_LookupCriteria
+=== CONT  TestAgentTaskWorkDoneRequiresCommit
+=== CONT  TestDenyCoreKernelHardDelete_BlocksWorkstream
+--- PASS: TestAgentTaskWorkDoneRequiresCommit (0.00s)
+=== CONT  TestGetFallbackChangeJournalGenerator_EmptyProjectRoot
+--- PASS: TestGetFallbackChangeJournalGenerator_EmptyProjectRoot (0.00s)
+=== CONT  TestCAS_SkipIndexUpdateWaitAtomic
+--- PASS: TestCAS_SkipIndexUpdateWaitAtomic (0.00s)
+=== CONT  TestGetFallbackChangeJournalGenerator_Caching
+--- PASS: TestGetFallbackChangeJournalGenerator_Caching (0.00s)
+=== CONT  TestCreateAuditEventWithBuilder_SessionID
+--- PASS: TestDenyCoreKernelHardDelete_BlocksWorkstream (0.02s)
+=== CONT  TestAcceptanceCriteria_ParseMixedContent
+=== RUN   TestAcceptanceCriteria_ParseMixedContent/only_strings
+=== RUN   TestAcceptanceCriteria_ParseMixedContent/only_criteria_references
+=== RUN   TestAcceptanceCriteria_ParseMixedContent/mixed_strings_and_references
+=== RUN   TestAcceptanceCriteria_ParseMixedContent/empty_list
+=== RUN   TestAcceptanceCriteria_ParseMixedContent/invalid_reference_format
+--- PASS: TestAcceptanceCriteria_ParseMixedContent (0.00s)
+    --- PASS: TestAcceptanceCriteria_ParseMixedContent/only_strings (0.00s)
+    --- PASS: TestAcceptanceCriteria_ParseMixedContent/only_criteria_references (0.00s)
+    --- PASS: TestAcceptanceCriteria_ParseMixedContent/mixed_strings_and_references (0.00s)
+    --- PASS: TestAcceptanceCriteria_ParseMixedContent/empty_list (0.00s)
+    --- PASS: TestAcceptanceCriteria_ParseMixedContent/invalid_reference_format (0.00s)
+=== CONT  TestAcceptanceCriteria_LookupCriteria
+    acceptance_criteria_test.go:117: Skipping due to IDValidator.LoadPatterns sleep causing test timeout - test needs refactoring to avoid triggering pattern loading during cleanup
+--- SKIP: TestAcceptanceCriteria_LookupCriteria (0.00s)
+=== CONT  TestDenyCoreKernelHardDelete_ElevationAloneNeverBypasses
+=== RUN   TestDenyCoreKernelHardDelete_ElevationAloneNeverBypasses/delete_all
+=== PAUSE TestDenyCoreKernelHardDelete_ElevationAloneNeverBypasses/delete_all
+=== RUN   TestDenyCoreKernelHardDelete_ElevationAloneNeverBypasses/delete_core
+=== PAUSE TestDenyCoreKernelHardDelete_ElevationAloneNeverBypasses/delete_core
+=== RUN   TestDenyCoreKernelHardDelete_ElevationAloneNeverBypasses/admin_role
+=== PAUSE TestDenyCoreKernelHardDelete_ElevationAloneNeverBypasses/admin_role
+=== RUN   TestDenyCoreKernelHardDelete_ElevationAloneNeverBypasses/system_account
+=== PAUSE TestDenyCoreKernelHardDelete_ElevationAloneNeverBypasses/system_account
+=== CONT  TestDenyCoreKernelHardDelete_AllowContext
+--- PASS: TestDenyCoreKernelHardDelete_AllowContext (0.02s)
+=== CONT  TestDenyCoreKernelHardDelete_ElevationAloneNeverBypasses/delete_all
+=== CONT  TestDenyCoreKernelHardDelete_ElevationAloneNeverBypasses/admin_role
+=== CONT  TestDenyCoreKernelHardDelete_ElevationAloneNeverBypasses/system_account
+--- PASS: TestCreateAuditEventWithBuilder_SessionID (0.07s)
+=== CONT  TestDenyCoreKernelHardDelete_ElevationAloneNeverBypasses/delete_core
+--- PASS: TestDenyCoreKernelHardDelete_ElevationAloneNeverBypasses (0.00s)
+    --- PASS: TestDenyCoreKernelHardDelete_ElevationAloneNeverBypasses/delete_all (0.02s)
+    --- PASS: TestDenyCoreKernelHardDelete_ElevationAloneNeverBypasses/admin_role (0.01s)
+    --- PASS: TestDenyCoreKernelHardDelete_ElevationAloneNeverBypasses/system_account (0.01s)
+    --- PASS: TestDenyCoreKernelHardDelete_ElevationAloneNeverBypasses/delete_core (0.01s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/storage	0.747s

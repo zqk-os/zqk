@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-335",
+  "created_at": "2026-09-04T21:34:30.683947Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-335",
+    "Tests": [
+      {
+        "Name": "TestGetTranscriptContext",
+        "Package": "agent",
+        "PackagePath": "cmd/zqk/agent",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/agent/chat_responder_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestClaimCommand_Flags",
+        "Package": "agent_test",
+        "PackagePath": "cmd/zqk/agent",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/agent/claim_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestCountDocsEvalFindings_RequiresEvidencePathsRegardlessOfGrade",
+        "Package": "agent",
+        "PackagePath": "cmd/zqk/agent",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/agent/docs_eval_evidence_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestCountDocsEvalFindings_RejectsPercentJoinedJSONL",
+        "Package": "agent",
+        "PackagePath": "cmd/zqk/agent",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/agent/docs_eval_evidence_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestCountDocsEvalFindings_AllowsStubAuthHookSubstring",
+        "Package": "agent",
+        "PackagePath": "cmd/zqk/agent",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/agent/docs_eval_evidence_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestLoadLoopGuardConfig_Defaults",
+        "Package": "agent",
+        "PackagePath": "cmd/zqk/agent",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/agent/loop_guard_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestLoadLoopGuardConfig_EnvOverride",
+        "Package": "agent",
+        "PackagePath": "cmd/zqk/agent",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/agent/loop_guard_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestStagnationGuard_TripsOnUnchangedFingerprint",
+        "Package": "agent",
+        "PackagePath": "cmd/zqk/agent",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/agent/loop_guard_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestTaskProgressFingerprint_IncludesAttempts",
+        "Package": "agent",
+        "PackagePath": "cmd/zqk/agent",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/agent/loop_guard_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAgentNew",
+        "Package": "agent_test",
+        "PackagePath": "cmd/zqk/agent",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/agent/new_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 300000000000,
+    "PackagePath": "cmd/zqk/agent"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestGetTranscriptContext",
+      "Package": "agent",
+      "PackagePath": "cmd/zqk/agent",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/agent/chat_responder_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestClaimCommand_Flags",
+      "Package": "agent_test",
+      "PackagePath": "cmd/zqk/agent",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/agent/claim_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestCountDocsEvalFindings_RequiresEvidencePathsRegardlessOfGrade",
+      "Package": "agent",
+      "PackagePath": "cmd/zqk/agent",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/agent/docs_eval_evidence_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestCountDocsEvalFindings_RejectsPercentJoinedJSONL",
+      "Package": "agent",
+      "PackagePath": "cmd/zqk/agent",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/agent/docs_eval_evidence_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestCountDocsEvalFindings_AllowsStubAuthHookSubstring",
+      "Package": "agent",
+      "PackagePath": "cmd/zqk/agent",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/agent/docs_eval_evidence_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestLoadLoopGuardConfig_Defaults",
+      "Package": "agent",
+      "PackagePath": "cmd/zqk/agent",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/agent/loop_guard_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestLoadLoopGuardConfig_EnvOverride",
+      "Package": "agent",
+      "PackagePath": "cmd/zqk/agent",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/agent/loop_guard_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestStagnationGuard_TripsOnUnchangedFingerprint",
+      "Package": "agent",
+      "PackagePath": "cmd/zqk/agent",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/agent/loop_guard_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestTaskProgressFingerprint_IncludesAttempts",
+      "Package": "agent",
+      "PackagePath": "cmd/zqk/agent",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/agent/loop_guard_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestAgentNew",
+      "Package": "agent_test",
+      "PackagePath": "cmd/zqk/agent",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/agent/new_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

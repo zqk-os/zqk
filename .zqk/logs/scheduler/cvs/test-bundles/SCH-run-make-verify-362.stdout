@@ -1,0 +1,72 @@
+
+--- run 2026-09-04T22:11:45Z ---
+=== RUN   TestCheckSchedulerDaemonStatus_NoWarningForReadCommands
+=== PAUSE TestCheckSchedulerDaemonStatus_NoWarningForReadCommands
+=== RUN   TestCompletionCommand
+=== PAUSE TestCompletionCommand
+=== RUN   TestCompletionCommandHelp
+=== PAUSE TestCompletionCommandHelp
+=== RUN   TestCompletionCommandStructure
+=== PAUSE TestCompletionCommandStructure
+=== RUN   TestSessionTouch_TryReuseSessionDoesNotTouch
+=== PAUSE TestSessionTouch_TryReuseSessionDoesNotTouch
+=== CONT  TestCheckSchedulerDaemonStatus_NoWarningForReadCommands
+=== CONT  TestCompletionCommandStructure
+=== RUN   TestCheckSchedulerDaemonStatus_NoWarningForReadCommands/get_is_read-only
+=== PAUSE TestCheckSchedulerDaemonStatus_NoWarningForReadCommands/get_is_read-only
+=== RUN   TestCheckSchedulerDaemonStatus_NoWarningForReadCommands/list_is_read-only
+=== PAUSE TestCheckSchedulerDaemonStatus_NoWarningForReadCommands/list_is_read-only
+=== RUN   TestCheckSchedulerDaemonStatus_NoWarningForReadCommands/version_is_read-only
+=== PAUSE TestCheckSchedulerDaemonStatus_NoWarningForReadCommands/version_is_read-only
+=== RUN   TestCheckSchedulerDaemonStatus_NoWarningForReadCommands/status_is_read-only
+--- PASS: TestCompletionCommandStructure (0.00s)
+=== PAUSE TestCheckSchedulerDaemonStatus_NoWarningForReadCommands/status_is_read-only
+=== CONT  TestSessionTouch_TryReuseSessionDoesNotTouch
+=== RUN   TestCheckSchedulerDaemonStatus_NoWarningForReadCommands/count_is_read-only
+=== PAUSE TestCheckSchedulerDaemonStatus_NoWarningForReadCommands/count_is_read-only
+=== RUN   TestCheckSchedulerDaemonStatus_NoWarningForReadCommands/create_is_mutating
+=== PAUSE TestCheckSchedulerDaemonStatus_NoWarningForReadCommands/create_is_mutating
+=== RUN   TestCheckSchedulerDaemonStatus_NoWarningForReadCommands/update_is_mutating
+=== PAUSE TestCheckSchedulerDaemonStatus_NoWarningForReadCommands/update_is_mutating
+=== RUN   TestCheckSchedulerDaemonStatus_NoWarningForReadCommands/delete_is_mutating
+=== PAUSE TestCheckSchedulerDaemonStatus_NoWarningForReadCommands/delete_is_mutating
+=== RUN   TestCheckSchedulerDaemonStatus_NoWarningForReadCommands/workflow_is_mutating
+=== PAUSE TestCheckSchedulerDaemonStatus_NoWarningForReadCommands/workflow_is_mutating
+=== RUN   TestCheckSchedulerDaemonStatus_NoWarningForReadCommands/system_is_mutating
+=== PAUSE TestCheckSchedulerDaemonStatus_NoWarningForReadCommands/system_is_mutating
+=== CONT  TestCompletionCommandHelp
+--- PASS: TestCompletionCommandHelp (0.00s)
+=== CONT  TestCompletionCommand
+--- PASS: TestSessionTouch_TryReuseSessionDoesNotTouch (1.16s)
+=== CONT  TestCheckSchedulerDaemonStatus_NoWarningForReadCommands/get_is_read-only
+=== CONT  TestCheckSchedulerDaemonStatus_NoWarningForReadCommands/create_is_mutating
+=== CONT  TestCheckSchedulerDaemonStatus_NoWarningForReadCommands/system_is_mutating
+=== CONT  TestCheckSchedulerDaemonStatus_NoWarningForReadCommands/workflow_is_mutating
+=== CONT  TestCheckSchedulerDaemonStatus_NoWarningForReadCommands/delete_is_mutating
+=== CONT  TestCheckSchedulerDaemonStatus_NoWarningForReadCommands/update_is_mutating
+=== CONT  TestCheckSchedulerDaemonStatus_NoWarningForReadCommands/status_is_read-only
+=== CONT  TestCheckSchedulerDaemonStatus_NoWarningForReadCommands/count_is_read-only
+=== CONT  TestCheckSchedulerDaemonStatus_NoWarningForReadCommands/version_is_read-only
+=== CONT  TestCheckSchedulerDaemonStatus_NoWarningForReadCommands/list_is_read-only
+--- PASS: TestCheckSchedulerDaemonStatus_NoWarningForReadCommands (0.00s)
+    --- PASS: TestCheckSchedulerDaemonStatus_NoWarningForReadCommands/get_is_read-only (0.00s)
+    --- PASS: TestCheckSchedulerDaemonStatus_NoWarningForReadCommands/create_is_mutating (0.00s)
+    --- PASS: TestCheckSchedulerDaemonStatus_NoWarningForReadCommands/system_is_mutating (0.00s)
+    --- PASS: TestCheckSchedulerDaemonStatus_NoWarningForReadCommands/workflow_is_mutating (0.00s)
+    --- PASS: TestCheckSchedulerDaemonStatus_NoWarningForReadCommands/delete_is_mutating (0.00s)
+    --- PASS: TestCheckSchedulerDaemonStatus_NoWarningForReadCommands/update_is_mutating (0.00s)
+    --- PASS: TestCheckSchedulerDaemonStatus_NoWarningForReadCommands/status_is_read-only (0.00s)
+    --- PASS: TestCheckSchedulerDaemonStatus_NoWarningForReadCommands/count_is_read-only (0.00s)
+    --- PASS: TestCheckSchedulerDaemonStatus_NoWarningForReadCommands/version_is_read-only (0.00s)
+    --- PASS: TestCheckSchedulerDaemonStatus_NoWarningForReadCommands/list_is_read-only (0.00s)
+=== RUN   TestCompletionCommand/bash
+=== RUN   TestCompletionCommand/zsh
+=== RUN   TestCompletionCommand/fish
+=== RUN   TestCompletionCommand/invalid_shell
+--- PASS: TestCompletionCommand (11.70s)
+    --- PASS: TestCompletionCommand/bash (1.82s)
+    --- PASS: TestCompletionCommand/zsh (0.62s)
+    --- PASS: TestCompletionCommand/fish (0.63s)
+    --- PASS: TestCompletionCommand/invalid_shell (0.61s)
+PASS
+ok  	github.com/lanceman/zqk/cmd/zqk-community/app	12.622s

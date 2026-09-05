@@ -1,0 +1,51 @@
+{
+  "name": "make-verify-103",
+  "created_at": "2026-09-04T21:34:28.38621Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-103",
+    "Tests": [
+      {
+        "Name": "TestManifestDrivenTranslator",
+        "Package": "translator_test",
+        "PackagePath": "pkg/semantic/translator",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/semantic/translator/manifest_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestEngine_TranslateAndValidate",
+        "Package": "translator_test",
+        "PackagePath": "pkg/semantic/translator",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/semantic/translator/translator_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 60000000000,
+    "PackagePath": "pkg/semantic/translator"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestManifestDrivenTranslator",
+      "Package": "translator_test",
+      "PackagePath": "pkg/semantic/translator",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/semantic/translator/manifest_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestEngine_TranslateAndValidate",
+      "Package": "translator_test",
+      "PackagePath": "pkg/semantic/translator",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/semantic/translator/translator_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

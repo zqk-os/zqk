@@ -1,0 +1,87 @@
+{
+  "name": "make-verify-2",
+  "created_at": "2026-09-04T21:34:27.465771Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-2",
+    "Tests": [
+      {
+        "Name": "TestEnsureBundledObjectSpecsMigrated_CreatesObjectSpec",
+        "Package": "migration",
+        "PackagePath": "pkg/storage/migration",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/migration/bundled_object_spec_migration_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestHashMigration_Migrate",
+        "Package": "migration",
+        "PackagePath": "pkg/storage/migration",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/migration/hash_migration_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestHashMigration_ParseHashFile",
+        "Package": "migration",
+        "PackagePath": "pkg/storage/migration",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/migration/hash_migration_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestHashMigration_SkipExistingHashes",
+        "Package": "migration",
+        "PackagePath": "pkg/storage/migration",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/migration/hash_migration_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 360000000000,
+    "PackagePath": "pkg/storage/migration"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestEnsureBundledObjectSpecsMigrated_CreatesObjectSpec",
+      "Package": "migration",
+      "PackagePath": "pkg/storage/migration",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/migration/bundled_object_spec_migration_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestHashMigration_Migrate",
+      "Package": "migration",
+      "PackagePath": "pkg/storage/migration",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/migration/hash_migration_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestHashMigration_ParseHashFile",
+      "Package": "migration",
+      "PackagePath": "pkg/storage/migration",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/migration/hash_migration_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestHashMigration_SkipExistingHashes",
+      "Package": "migration",
+      "PackagePath": "pkg/storage/migration",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/migration/hash_migration_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    }
+  }
+}

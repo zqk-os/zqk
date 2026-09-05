@@ -1,0 +1,11 @@
+purpose: Per-execution scheduler job state files for cross-process visibility.
+layout_current: <bucket>/<job_id_segment>/<execution_id>.yaml (bucket = bundle|data-cell-stream|pkg|internal|ext|cmd|_other)
+layout_legacy: <job_id_segment>/<execution_id>.yaml (no bucket; still read — run: zqk scheduler state --migrate)
+layout_flat: <job_id>-<execution_id>.yaml (top-level flat; migrate moves into nested layout)
+states: [in_progress, completed, failed, deferred, skipped]
+notes:
+  - in_progress/deferred files may remain if a run is interrupted.
+  - completed/failed/skipped files are retained then cleaned best-effort (~7d).
+cli_hints:
+  - zqk scheduler state
+  - zqk scheduler history --job-id <JOB_ID>

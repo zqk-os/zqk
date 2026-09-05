@@ -1,0 +1,7 @@
+job_id: SCH-pre-commit-integrity
+execution_id: exec-1788556603-90381
+state: completed
+process_id: 90381
+started_at: 2026-09-04T21:16:43.943762Z
+completed_at: 2026-09-04T21:17:04.997187Z
+policy_decision: execute

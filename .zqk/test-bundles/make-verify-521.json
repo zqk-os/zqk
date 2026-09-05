@@ -1,0 +1,33 @@
+{
+  "name": "make-verify-521",
+  "created_at": "2026-09-04T21:34:32.526049Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-521",
+    "Tests": [
+      {
+        "Name": "TestBinaryStorageWrite",
+        "Package": "binary",
+        "PackagePath": "pkg/storage/binary",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/binary/provider_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 90000000000,
+    "PackagePath": "pkg/storage/binary"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestBinaryStorageWrite",
+      "Package": "binary",
+      "PackagePath": "pkg/storage/binary",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/binary/provider_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    }
+  }
+}

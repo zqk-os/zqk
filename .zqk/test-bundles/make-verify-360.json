@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-360",
+  "created_at": "2026-09-04T21:34:30.933228Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-360",
+    "Tests": [
+      {
+        "Name": "TestAuthMiddleware_Unauthorized",
+        "Package": "app",
+        "PackagePath": "cmd/zqk-community/app",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk-community/app/auth_middleware_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAuthMiddleware_Authorized_APIKey",
+        "Package": "app",
+        "PackagePath": "cmd/zqk-community/app",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk-community/app/auth_middleware_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAuthMiddleware_Authorized_Credentials",
+        "Package": "app",
+        "PackagePath": "cmd/zqk-community/app",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk-community/app/auth_middleware_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAuthMiddleware_BypassInit",
+        "Package": "app",
+        "PackagePath": "cmd/zqk-community/app",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk-community/app/auth_middleware_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestMCPCLISyncParity",
+        "Package": "app",
+        "PackagePath": "cmd/zqk-community/app",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk-community/app/cli_mcp_sync_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestCommandSpecParity",
+        "Package": "app",
+        "PackagePath": "cmd/zqk-community/app",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk-community/app/command_spec_parity_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestFields_AAAListKinds_Integration",
+        "Package": "app_test",
+        "PackagePath": "cmd/zqk-community/app",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk-community/app/fields_integration_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestFields_ObjectBacklogItem_Integration",
+        "Package": "app_test",
+        "PackagePath": "cmd/zqk-community/app",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk-community/app/fields_integration_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestFields_ObjectListKinds_JSON_Integration",
+        "Package": "app_test",
+        "PackagePath": "cmd/zqk-community/app",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk-community/app/fields_integration_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestFlagAudit",
+        "Package": "app",
+        "PackagePath": "cmd/zqk-community/app",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk-community/app/flag_audit_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 300000000000,
+    "PackagePath": "cmd/zqk-community/app"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestAuthMiddleware_Unauthorized",
+      "Package": "app",
+      "PackagePath": "cmd/zqk-community/app",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk-community/app/auth_middleware_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestAuthMiddleware_Authorized_APIKey",
+      "Package": "app",
+      "PackagePath": "cmd/zqk-community/app",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk-community/app/auth_middleware_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestAuthMiddleware_Authorized_Credentials",
+      "Package": "app",
+      "PackagePath": "cmd/zqk-community/app",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk-community/app/auth_middleware_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestAuthMiddleware_BypassInit",
+      "Package": "app",
+      "PackagePath": "cmd/zqk-community/app",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk-community/app/auth_middleware_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestMCPCLISyncParity",
+      "Package": "app",
+      "PackagePath": "cmd/zqk-community/app",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk-community/app/cli_mcp_sync_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestCommandSpecParity",
+      "Package": "app",
+      "PackagePath": "cmd/zqk-community/app",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk-community/app/command_spec_parity_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestFields_AAAListKinds_Integration",
+      "Package": "app_test",
+      "PackagePath": "cmd/zqk-community/app",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk-community/app/fields_integration_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestFields_ObjectBacklogItem_Integration",
+      "Package": "app_test",
+      "PackagePath": "cmd/zqk-community/app",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk-community/app/fields_integration_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestFields_ObjectListKinds_JSON_Integration",
+      "Package": "app_test",
+      "PackagePath": "cmd/zqk-community/app",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk-community/app/fields_integration_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestFlagAudit",
+      "Package": "app",
+      "PackagePath": "cmd/zqk-community/app",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk-community/app/flag_audit_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

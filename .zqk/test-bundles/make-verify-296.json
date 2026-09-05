@@ -1,0 +1,33 @@
+{
+  "name": "make-verify-296",
+  "created_at": "2026-09-04T21:34:30.299229Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-296",
+    "Tests": [
+      {
+        "Name": "TestMockGraphProvider",
+        "Package": "provider",
+        "PackagePath": "pkg/graph/provider",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/graph/provider/mock_provider_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 30000000000,
+    "PackagePath": "pkg/graph/provider"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestMockGraphProvider",
+      "Package": "provider",
+      "PackagePath": "pkg/graph/provider",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/graph/provider/mock_provider_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

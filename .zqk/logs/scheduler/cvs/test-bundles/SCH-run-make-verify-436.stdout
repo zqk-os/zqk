@@ -1,0 +1,23 @@
+
+--- run 2026-09-04T22:13:32Z ---
+=== RUN   TestLogRouter_DifferentFormatters
+=== PAUSE TestLogRouter_DifferentFormatters
+=== RUN   TestLogRouter_FileDestination
+=== PAUSE TestLogRouter_FileDestination
+=== RUN   TestLogRouter_StdoutStderr
+=== PAUSE TestLogRouter_StdoutStderr
+=== RUN   TestLogRouter_RemoveDestination
+=== PAUSE TestLogRouter_RemoveDestination
+=== CONT  TestLogRouter_DifferentFormatters
+=== CONT  TestLogRouter_StdoutStderr
+2026-09-04T22:13:33Z [info] stdout message
+2026-09-04T22:13:33Z [error] stderr message
+2026-09-04T22:13:33Z [error] stderr message
+--- PASS: TestLogRouter_StdoutStderr (0.00s)
+=== CONT  TestLogRouter_RemoveDestination
+--- PASS: TestLogRouter_RemoveDestination (0.00s)
+=== CONT  TestLogRouter_FileDestination
+--- PASS: TestLogRouter_DifferentFormatters (0.00s)
+--- PASS: TestLogRouter_FileDestination (0.00s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/logging	0.275s

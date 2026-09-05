@@ -1,0 +1,141 @@
+{
+  "name": "make-verify-537",
+  "created_at": "2026-09-04T21:34:32.696907Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-537",
+    "Tests": [
+      {
+        "Name": "TestMutatorPackagesReferenceAllowlistedKinds",
+        "Package": "kernelcas",
+        "PackagePath": "pkg/kernelcas",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/kernelcas/coverage_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAllKindsClosedSet",
+        "Package": "kernelcas",
+        "PackagePath": "pkg/kernelcas",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/kernelcas/coverage_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAllKinds_closedSet",
+        "Package": "kernelcas",
+        "PackagePath": "pkg/kernelcas",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/kernelcas/pipeline_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestRunReconcileIndex_neverRefusesWithoutCommit",
+        "Package": "kernelcas",
+        "PackagePath": "pkg/kernelcas",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/kernelcas/pipeline_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestRunErase_refusesCriticalWithoutReason",
+        "Package": "kernelcas",
+        "PackagePath": "pkg/kernelcas",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/kernelcas/pipeline_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestRunErase_allowsNonCritical",
+        "Package": "kernelcas",
+        "PackagePath": "pkg/kernelcas",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/kernelcas/pipeline_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestIsCriticalKind_includesBacklogAndTestCase",
+        "Package": "kernelcas",
+        "PackagePath": "pkg/kernelcas",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/kernelcas/pipeline_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 210000000000,
+    "PackagePath": "pkg/kernelcas"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestMutatorPackagesReferenceAllowlistedKinds",
+      "Package": "kernelcas",
+      "PackagePath": "pkg/kernelcas",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/kernelcas/coverage_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestAllKindsClosedSet",
+      "Package": "kernelcas",
+      "PackagePath": "pkg/kernelcas",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/kernelcas/coverage_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestAllKinds_closedSet",
+      "Package": "kernelcas",
+      "PackagePath": "pkg/kernelcas",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/kernelcas/pipeline_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestRunReconcileIndex_neverRefusesWithoutCommit",
+      "Package": "kernelcas",
+      "PackagePath": "pkg/kernelcas",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/kernelcas/pipeline_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestRunErase_refusesCriticalWithoutReason",
+      "Package": "kernelcas",
+      "PackagePath": "pkg/kernelcas",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/kernelcas/pipeline_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestRunErase_allowsNonCritical",
+      "Package": "kernelcas",
+      "PackagePath": "pkg/kernelcas",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/kernelcas/pipeline_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestIsCriticalKind_includesBacklogAndTestCase",
+      "Package": "kernelcas",
+      "PackagePath": "pkg/kernelcas",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/kernelcas/pipeline_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

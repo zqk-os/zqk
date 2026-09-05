@@ -1,0 +1,88 @@
+
+--- run 2026-09-04T22:16:25Z ---
+=== RUN   TestJobTypeHandlerRegistry_DataCellEnvelopeTick
+=== PAUSE TestJobTypeHandlerRegistry_DataCellEnvelopeTick
+=== RUN   TestShouldReenqueueTriggerAfterDispatchDrop
+=== PAUSE TestShouldReenqueueTriggerAfterDispatchDrop
+=== RUN   TestAppendDispatchPressureJSONL
+=== PAUSE TestAppendDispatchPressureJSONL
+=== RUN   TestRecordDispatchAttemptDropped_packageConcurrencyAddsPackagePath
+=== PAUSE TestRecordDispatchAttemptDropped_packageConcurrencyAddsPackagePath
+=== RUN   TestRecordDispatchAttemptDropped_resourceWaitAddsTriggeredPoolSnapshot
+=== PAUSE TestRecordDispatchAttemptDropped_resourceWaitAddsTriggeredPoolSnapshot
+=== RUN   TestRecordDispatchAttemptDropped_goroutineCeilingStage
+=== PAUSE TestRecordDispatchAttemptDropped_goroutineCeilingStage
+=== RUN   TestRecordDispatchAttemptDropped_executeJobOuterContextStage
+=== PAUSE TestRecordDispatchAttemptDropped_executeJobOuterContextStage
+=== RUN   TestDispatchEnvelopeTickResolvedJobs_Matrix
+=== PAUSE TestDispatchEnvelopeTickResolvedJobs_Matrix
+=== RUN   TestEnvelopeTickParseTokenJSONArray
+=== PAUSE TestEnvelopeTickParseTokenJSONArray
+=== RUN   TestEnvelopeTickTokenPolicyFromEnv_roundTrip
+=== PAUSE TestEnvelopeTickTokenPolicyFromEnv_roundTrip
+=== CONT  TestJobTypeHandlerRegistry_DataCellEnvelopeTick
+=== CONT  TestRecordDispatchAttemptDropped_goroutineCeilingStage
+--- PASS: TestJobTypeHandlerRegistry_DataCellEnvelopeTick (0.01s)
+=== CONT  TestEnvelopeTickParseTokenJSONArray
+--- PASS: TestEnvelopeTickParseTokenJSONArray (0.00s)
+=== CONT  TestEnvelopeTickTokenPolicyFromEnv_roundTrip
+--- PASS: TestEnvelopeTickTokenPolicyFromEnv_roundTrip (0.00s)
+=== CONT  TestDispatchEnvelopeTickResolvedJobs_Matrix
+=== RUN   TestDispatchEnvelopeTickResolvedJobs_Matrix/Mode_Off_(default)_evaluates_to_off_with_no_triggers
+=== PAUSE TestDispatchEnvelopeTickResolvedJobs_Matrix/Mode_Off_(default)_evaluates_to_off_with_no_triggers
+=== RUN   TestDispatchEnvelopeTickResolvedJobs_Matrix/Shadow_Mode_with_Core_Allowlist
+=== PAUSE TestDispatchEnvelopeTickResolvedJobs_Matrix/Shadow_Mode_with_Core_Allowlist
+=== RUN   TestDispatchEnvelopeTickResolvedJobs_Matrix/Shadow_Mode_rejects_Expanded_type_when_EXPAND_is_off
+=== PAUSE TestDispatchEnvelopeTickResolvedJobs_Matrix/Shadow_Mode_rejects_Expanded_type_when_EXPAND_is_off
+=== RUN   TestDispatchEnvelopeTickResolvedJobs_Matrix/Shadow_Mode_accepts_Expanded_type_when_EXPAND_is_on
+=== PAUSE TestDispatchEnvelopeTickResolvedJobs_Matrix/Shadow_Mode_accepts_Expanded_type_when_EXPAND_is_on
+=== RUN   TestDispatchEnvelopeTickResolvedJobs_Matrix/Allowlist_Extra_adds_custom_job_type
+=== PAUSE TestDispatchEnvelopeTickResolvedJobs_Matrix/Allowlist_Extra_adds_custom_job_type
+=== RUN   TestDispatchEnvelopeTickResolvedJobs_Matrix/Deny_Extra_overrides_allowlist
+=== PAUSE TestDispatchEnvelopeTickResolvedJobs_Matrix/Deny_Extra_overrides_allowlist
+=== RUN   TestDispatchEnvelopeTickResolvedJobs_Matrix/Max_Triggers_rate-limits_dispatch_count
+=== PAUSE TestDispatchEnvelopeTickResolvedJobs_Matrix/Max_Triggers_rate-limits_dispatch_count
+=== CONT  TestRecordDispatchAttemptDropped_executeJobOuterContextStage
+--- PASS: TestRecordDispatchAttemptDropped_executeJobOuterContextStage (0.02s)
+=== CONT  TestRecordDispatchAttemptDropped_packageConcurrencyAddsPackagePath
+--- PASS: TestRecordDispatchAttemptDropped_goroutineCeilingStage (0.03s)
+=== CONT  TestRecordDispatchAttemptDropped_resourceWaitAddsTriggeredPoolSnapshot
+--- PASS: TestRecordDispatchAttemptDropped_resourceWaitAddsTriggeredPoolSnapshot (0.01s)
+=== CONT  TestAppendDispatchPressureJSONL
+--- PASS: TestRecordDispatchAttemptDropped_packageConcurrencyAddsPackagePath (0.01s)
+=== CONT  TestShouldReenqueueTriggerAfterDispatchDrop
+=== RUN   TestShouldReenqueueTriggerAfterDispatchDrop/test_bundle_any_reason
+=== PAUSE TestShouldReenqueueTriggerAfterDispatchDrop/test_bundle_any_reason
+=== RUN   TestShouldReenqueueTriggerAfterDispatchDrop/maintenance_conflict
+=== PAUSE TestShouldReenqueueTriggerAfterDispatchDrop/maintenance_conflict
+=== RUN   TestShouldReenqueueTriggerAfterDispatchDrop/maintenance_dispatch_deadline_no_reen
+=== PAUSE TestShouldReenqueueTriggerAfterDispatchDrop/maintenance_dispatch_deadline_no_reen
+=== RUN   TestShouldReenqueueTriggerAfterDispatchDrop/conflict_but_concurrent_testing
+=== PAUSE TestShouldReenqueueTriggerAfterDispatchDrop/conflict_but_concurrent_testing
+=== CONT  TestDispatchEnvelopeTickResolvedJobs_Matrix/Mode_Off_(default)_evaluates_to_off_with_no_triggers
+=== CONT  TestDispatchEnvelopeTickResolvedJobs_Matrix/Allowlist_Extra_adds_custom_job_type
+=== CONT  TestDispatchEnvelopeTickResolvedJobs_Matrix/Max_Triggers_rate-limits_dispatch_count
+=== CONT  TestDispatchEnvelopeTickResolvedJobs_Matrix/Deny_Extra_overrides_allowlist
+=== CONT  TestDispatchEnvelopeTickResolvedJobs_Matrix/Shadow_Mode_rejects_Expanded_type_when_EXPAND_is_off
+=== CONT  TestDispatchEnvelopeTickResolvedJobs_Matrix/Shadow_Mode_accepts_Expanded_type_when_EXPAND_is_on
+=== CONT  TestDispatchEnvelopeTickResolvedJobs_Matrix/Shadow_Mode_with_Core_Allowlist
+--- PASS: TestDispatchEnvelopeTickResolvedJobs_Matrix (0.00s)
+    --- PASS: TestDispatchEnvelopeTickResolvedJobs_Matrix/Mode_Off_(default)_evaluates_to_off_with_no_triggers (0.00s)
+    --- PASS: TestDispatchEnvelopeTickResolvedJobs_Matrix/Allowlist_Extra_adds_custom_job_type (0.00s)
+    --- PASS: TestDispatchEnvelopeTickResolvedJobs_Matrix/Max_Triggers_rate-limits_dispatch_count (0.00s)
+    --- PASS: TestDispatchEnvelopeTickResolvedJobs_Matrix/Deny_Extra_overrides_allowlist (0.00s)
+    --- PASS: TestDispatchEnvelopeTickResolvedJobs_Matrix/Shadow_Mode_rejects_Expanded_type_when_EXPAND_is_off (0.00s)
+    --- PASS: TestDispatchEnvelopeTickResolvedJobs_Matrix/Shadow_Mode_accepts_Expanded_type_when_EXPAND_is_on (0.00s)
+    --- PASS: TestDispatchEnvelopeTickResolvedJobs_Matrix/Shadow_Mode_with_Core_Allowlist (0.00s)
+=== CONT  TestShouldReenqueueTriggerAfterDispatchDrop/test_bundle_any_reason
+=== CONT  TestShouldReenqueueTriggerAfterDispatchDrop/maintenance_conflict
+=== CONT  TestShouldReenqueueTriggerAfterDispatchDrop/maintenance_dispatch_deadline_no_reen
+=== CONT  TestShouldReenqueueTriggerAfterDispatchDrop/conflict_but_concurrent_testing
+--- PASS: TestShouldReenqueueTriggerAfterDispatchDrop (0.00s)
+    --- PASS: TestShouldReenqueueTriggerAfterDispatchDrop/test_bundle_any_reason (0.00s)
+    --- PASS: TestShouldReenqueueTriggerAfterDispatchDrop/maintenance_conflict (0.00s)
+    --- PASS: TestShouldReenqueueTriggerAfterDispatchDrop/maintenance_dispatch_deadline_no_reen (0.00s)
+    --- PASS: TestShouldReenqueueTriggerAfterDispatchDrop/conflict_but_concurrent_testing (0.00s)
+--- PASS: TestAppendDispatchPressureJSONL (0.01s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/scheduler	0.767s

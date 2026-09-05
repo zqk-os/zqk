@@ -1,0 +1,20 @@
+agent_heartbeat: "2026-09-03T02:20:59-07:00"
+agent_pid: 88774
+assignee_persona_ref: PER-ORCH-BETA
+backlog_item_ref: BLI-CEF-GOCYCLO-THRESHOLD-001
+branch_ref: integration/pri-cef-remediate-structure-001
+commit_refs:
+    - 38951fd480fbff7a8fde0c54b721c7e545a16632
+created_at: "2026-09-03T08:44:53Z"
+created_by: ACC-1785920548450214006-2e52b3e7
+id: ATK-1788425093136786000-9ba8bfc6
+kind: agent_task
+namespace_id: zqk:kernel
+priority_plan_ref: PRI-CEF-REMEDIATE-STRUCTURE-001
+schema_version: 2.0.0
+started_at: "2026-09-03T08:45:07Z"
+status: implemented
+title: Drop gocyclo threshold to <=20 with named exclusions
+updated_at: "2026-09-03T09:20:59Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

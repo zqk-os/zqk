@@ -1,0 +1,101 @@
+category: debug_new7
+created_at: "2026-04-06T02:40:38Z"
+created_by: ACC-1785920548450214012-68b850c0
+doc_entry_refs:
+    - DOC-1775197432882643000-89463915
+expected_outcome_kinds:
+    - agent_onboarding_preparation
+    - prompt_template
+id: PROMPT-1775443238169278000-3db7d1ea
+kind: prompt_template
+mandatory_constraints:
+    - CLI/MCP only for docs/process/ instance data; no direct YAML edits
+    - PRE_CHANGE_CHECKLIST + AGENT_GUIDELINES before substantive code changes
+    - Long tests via scan-tests/test-runner; foreground go test narrow + -timeout <= 60s
+    - 'Convergence: measure against active CVS desired_end_state when present'
+    - 'Semantic density: after logic works (before merge), run PRE_CHANGE_CHECKLIST §13 post-verify (docs/best-practices/coding/DRY_PATTERN_EXTRACTION.md, AGENT_CONTEXT_REFRESH.md after-logic block; rule of two / extract by third)'
+    - 'Multi-agent shared worktree: do not steal peers'' branches, discard their WIP, force-push main, or concurrent-edit matrix/CAS; claim via CLI+chat bus; announce lane ownership'
+    - Cross-vendor coordination via zqk_chat_send / agent_chat_channel.jsonl with stable agent_id; native zqk agent orchestrate + prompt-builder only (no vendor-brain loops)
+    - 'Mesh wake: feed/MCP + delivery_mode=notify only; never default to wake-agy --chat / AppleScript paste (POL-AGENT-MESH-WAKE-001)'
+    - 'Orchestration hourglass callback: directed feed steer MUST --await-peer-ack; agent next MUST --on-validation-failure wake (POL-AGENT-ORCH-HOURGLASS-001) — never fire-and-forget'
+namespace_id: zqk:kernel
+prompt_archetype: structured
+prompt_body: |
+    Review onboarding guides; internalize project protocols, coding standards, and architectural patterns. Adherence to established patterns is mandatory—document any deviation.
+
+    1.  **Posturing (Establish System State):**
+        -   Discover the canonical project state (re-query live objects; do not trust stale IDs in this prompt):
+            -   `zqk workflow whats-next --format json` (primary composite)
+            -   `zqk object list mission` (prefer `status=active`; archived missions are history only)
+            -   `zqk object list priority_plan --filter status=active` (not `in_progress`)
+            -   `zqk object list convergence_session` then client-filter `status=active` / `paused`
+        -   Fetch details of active items: `zqk object get <ID>` for identified plan/session/mission.
+        -   Register state in `agent_onboarding_preparation` (set status=in_progress or complete).
+        -   Snapshot: `docs/onboarding/AGENT_ONBOARDING_SNAPSHOT.md` / DOC linked on this prompt — re-verify commands there before acting.
+
+    2.  **Environment Readiness:**
+        -   Verify system health: `zqk system status` and `zqk system check`.
+        -   If environment is dirty: `make clean` and `make build-all` — but see §3a before destructive clean/rebuild that affects co-agents.
+        -   Ensure logs are clean; if `health.jsonl` is missing/empty, run targeted `zqk scheduler scan-tests --package ./pkg/...` (path often under `.zqk/logs/scheduler/cvs/test-bundles/`).
+        -   Agent boot configs: `generate-agent-configs` may be **zqk-admin only** (`ZQK_ADMIN_API_KEY=<ACC-*> ./bin/zqk-admin system generate-agent-configs`; legacy `account:*` keys rejected).
+
+    3.  **Swarm Capabilities & Orchestration (Prioritize Native Mechanisms):**
+        -   `invoke_subagent` is fully authorized to be used in conjunction with ZQK orchestration and tooling.
+        -   ZQK's `prompt-builder` and persona-aware context curation and injection must be the only mechanism used to prompt subagents.
+        -   **Utilize the ZQK Orchestrator:** Spawn native subagents via `zqk agent orchestrate`.
+        -   **Rely on the AST Observer:** Continuously monitor codebase changes and architectural alignment through the built-in Observer patterns rather than manual grepping.
+        -   **Use ZQK Chat Channels:** Cross-vendor mesh bus — `zqk_chat_send` → `.zqk/logs/agent_chat_channel.jsonl` (policy `.zqk/config/agent_chat_channel.json`). Always include a stable `agent_id` (e.g. `antigravity-1`, `antigravity-2`, `qwen-local`).
+        -   **Check the Tool Pod Mesh:** Leverage dynamically bound tool pods when resolving system-level dependencies.
+        -   **MCP IDE wire-up:** Prefer `zqk mcp proxy --tcp …` when IDE stdio and daemon TCP must bridge; do not invent parallel vendor-brain loops.
+
+    3a. **Multi-Agent Collaboration (Shared Worktree Integrity):**
+        Multiple instances of Antigravity and local Qwen models share one git worktree and one ZQK kernel. Preserve integrity without disrupting peers.
+
+        **Identity & lane ownership**
+        -   Announce presence on the chat channel with `agent_id`. Claim work by updating kernel assignees (`assignee_persona_ref` / persona) **and** emitting `{event:claim, work_id, agent_id}` on the bus.
+        -   Split lanes explicitly (BLI/ATK/PR ownership). Do not silently absorb another agent's claimed IDs.
+        -   Prefer persona-bound orchestration (`PER-ORCH-*`, swarm personas) over informal "whoever is online."
+
+        **Git / branch / worktree ground rules**
+        -   Before `checkout`, `rebase`, `reset`, or deleting branches: `git status -sb` and `git branch --show-current`. If the branch is not yours (another agent's feature PR lane), **do not steal it** — stash your WIP, switch to `main` or your own branch (`git checkout -B feature/…`), then continue.
+        -   Never `git restore` / discard peers' uncommitted work. Stash **only your own** paths; leave their dirty files alone.
+        -   Avoid `git clean -fdx`, force-checkout, or worktree-wide resets unless the human explicitly authorized them for the whole swarm.
+        -   Do not `git push --force` to `main`/`master`. Force-with-lease only on **your** feature branch after rebase, and announce on the bus if others may have based work on it.
+        -   Prefer one PR per lane. If you leave the shared tree dirty, leave a bus status note (branch name + what is safe to touch).
+        -   Watch for CAS renames under `docs/process/` (delete + untracked same `id:`) — stage via CLI/automation truth, not hand-revert of peer CAS updates.
+
+        **Kernel / process data integrity**
+        -   CLI/MCP only for `docs/process/` instance data. No concurrent hand-edits of the same object YAML.
+        -   Do not `--override` lifecycle/status unless the human explicitly authorizes it; prefer `promote` / coerce-on-create / fill preconditions.
+        -   Matrix / verification CSV: only the Matrix Steward (or designated role) updates from bus events — never concurrent CSV edits from multiple agents.
+        -   Scheduler: submit targeted `scan-tests`; do not spam `--all` or tight `scan-tests` loops that thrash `package_concurrency_limits.json` for everyone.
+
+        **Communication & handoff — Feed + notify (ship)**
+        -   Status, blocked, and task_complete events go on the **agent_feed** (bulk plane): MCP `zqk_chat_send` / `zqk feed steer|emit-status` → `.zqk/logs/agent_chat_channel.jsonl` (lite `.zqk/config/agent_chat_channel.json` must be `delivery_mode=notify`). Include evidence (PR URL, job id, log path).
+        -   **JSONL stamps alone do NOT wake an idle peer.** Wake with **notify-only**: `zqk feed steer` (auto-wake when delivery_mode=notify). See **POL-AGENT-MESH-WAKE-001** and **WFL-TPM-AGY-MESH-001**.
+        -   **Hourglass callback (mandatory when orchestrating):** directed `zqk feed steer --to-agent-id …` MUST include `--await-peer-ack`; swarm completion MUST use `zqk agent next <ATK> --on-validation-failure wake`. If delivery/ack/verify fails, the callback wakes the appropriate agent — never fire-and-forget (**POL-AGENT-ORCH-HOURGLASS-001**).
+        -   The mesh watchdog (`./scripts/mesh/tpm-agy-watchdog.sh --follow`) may nudge with notify-only; install: `./scripts/mesh/install-mesh-watchdog.sh`.
+        -   When pausing: state branch, uncommitted risk, next safe action for the other agent, and emit to the bus before stopping.
+
+    4.  **Governance & Compliance (Refer to these often):**
+        -   **CLI/MCP Only:** NEVER edit docs/process/ YAML directly. Use `zqk object update/create`.
+        -   **TDD Mandatory:** Tests before implementation.
+        -   **Post-Change Protocol:** Execute §13 from PRE_CHANGE_CHECKLIST (DRY_PATTERN_EXTRACTION.md, AGENT_CONTEXT_REFRESH.md) after logic is verified (before merge).
+        -   **Shared-tree discipline:** §3a above is mandatory whenever another agent may be active in the same worktree.
+
+    5.  **Recommendations & Ambiguity Resolution:**
+        -   Missing plans/CVS: Do not rely on stale markdown; always re-query live objects.
+        -   Agent Refresh: Periodically execute `sh ./scripts/agent-protocol-context-refresh.sh`.
+        -   When in doubt: `zqk object list policy` or check `docs/architecture/ARCHITECTURE_PATTERNS.md` (not only under `docs/process/architecture/`).
+        -   Worktree conflict: stop, announce on the bus, ask the human — do not "win" by overwriting.
+
+    6.  **Closing:**
+        -   Share your anticipated next steps (branch + claimed work_ids + what peers should avoid).
+        -   Finalize the current onboarding session by updating the preparation status object.
+schema_version: 2.0.0
+specificity_level: high
+status: active
+title: 'Onboarding: protocol posture + multi-agent shared-worktree integrity'
+updated_at: "2026-09-04T17:57:56Z"
+updated_by: ACC-1785920548450214006-2e52b3e7
+version_context: default

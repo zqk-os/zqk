@@ -1,0 +1,44 @@
+
+--- run 2026-09-04T22:16:18Z ---
+=== RUN   TestAppendCVSMeasurementEvent_roundTrip
+=== PAUSE TestAppendCVSMeasurementEvent_roundTrip
+=== RUN   TestCvsMeasurementEventsEnabled
+=== PAUSE TestCvsMeasurementEventsEnabled
+=== RUN   TestTruncateCVSHint
+=== PAUSE TestTruncateCVSHint
+=== RUN   TestConvergenceOrchestrateScriptPath
+=== PAUSE TestConvergenceOrchestrateScriptPath
+=== RUN   TestNewCVSOrchestrateRollupOnlyCommand_fields
+=== PAUSE TestNewCVSOrchestrateRollupOnlyCommand_fields
+=== RUN   TestNewCVSOrchestrateRollupOnlyCommand_envRollupOut
+=== PAUSE TestNewCVSOrchestrateRollupOnlyCommand_envRollupOut
+=== RUN   TestReadCVSRollupLatestSummary
+=== PAUSE TestReadCVSRollupLatestSummary
+=== RUN   TestResolveCVSRollupLatestJSONPath_defaultMatchesPathsLayout
+=== PAUSE TestResolveCVSRollupLatestJSONPath_defaultMatchesPathsLayout
+=== RUN   TestResolveCVSRollupLatestJSONPath_absoluteEnv
+=== PAUSE TestResolveCVSRollupLatestJSONPath_absoluteEnv
+=== RUN   TestResolveCVSRollupLatestJSONPath_repoRelativeEnv
+=== PAUSE TestResolveCVSRollupLatestJSONPath_repoRelativeEnv
+=== CONT  TestAppendCVSMeasurementEvent_roundTrip
+=== CONT  TestNewCVSOrchestrateRollupOnlyCommand_envRollupOut
+--- PASS: TestNewCVSOrchestrateRollupOnlyCommand_envRollupOut (0.00s)
+=== CONT  TestConvergenceOrchestrateScriptPath
+--- PASS: TestConvergenceOrchestrateScriptPath (0.00s)
+=== CONT  TestNewCVSOrchestrateRollupOnlyCommand_fields
+--- PASS: TestNewCVSOrchestrateRollupOnlyCommand_fields (0.00s)
+=== CONT  TestTruncateCVSHint
+--- PASS: TestTruncateCVSHint (0.00s)
+=== CONT  TestResolveCVSRollupLatestJSONPath_absoluteEnv
+--- PASS: TestResolveCVSRollupLatestJSONPath_absoluteEnv (0.01s)
+=== CONT  TestResolveCVSRollupLatestJSONPath_repoRelativeEnv
+--- PASS: TestResolveCVSRollupLatestJSONPath_repoRelativeEnv (0.01s)
+=== CONT  TestCvsMeasurementEventsEnabled
+--- PASS: TestCvsMeasurementEventsEnabled (0.00s)
+=== CONT  TestResolveCVSRollupLatestJSONPath_defaultMatchesPathsLayout
+--- PASS: TestResolveCVSRollupLatestJSONPath_defaultMatchesPathsLayout (0.01s)
+=== CONT  TestReadCVSRollupLatestSummary
+--- PASS: TestAppendCVSMeasurementEvent_roundTrip (0.04s)
+--- PASS: TestReadCVSRollupLatestSummary (0.01s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/scheduler	0.766s

@@ -1,0 +1,87 @@
+{
+  "name": "make-verify-3",
+  "created_at": "2026-09-04T21:34:27.473039Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-3",
+    "Tests": [
+      {
+        "Name": "TestPruneDiagnosticsCaptures_keepsNewestTenSets",
+        "Package": "diagnostics",
+        "PackagePath": "pkg/diagnostics",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/diagnostics/capture_prune_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestPruneDiagnosticsCaptures_leavesUnknownFiles",
+        "Package": "diagnostics",
+        "PackagePath": "pkg/diagnostics",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/diagnostics/capture_prune_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestThreadStackSkipThresholdFromEnv",
+        "Package": "diagnostics",
+        "PackagePath": "pkg/diagnostics",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/diagnostics/capture_thread_stack_env_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestBuildPprofServer_Timeouts",
+        "Package": "diagnostics",
+        "PackagePath": "pkg/diagnostics",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/diagnostics/pprof_server_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 120000000000,
+    "PackagePath": "pkg/diagnostics"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestPruneDiagnosticsCaptures_keepsNewestTenSets",
+      "Package": "diagnostics",
+      "PackagePath": "pkg/diagnostics",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/diagnostics/capture_prune_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestPruneDiagnosticsCaptures_leavesUnknownFiles",
+      "Package": "diagnostics",
+      "PackagePath": "pkg/diagnostics",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/diagnostics/capture_prune_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestThreadStackSkipThresholdFromEnv",
+      "Package": "diagnostics",
+      "PackagePath": "pkg/diagnostics",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/diagnostics/capture_thread_stack_env_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestBuildPprofServer_Timeouts",
+      "Package": "diagnostics",
+      "PackagePath": "pkg/diagnostics",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/diagnostics/pprof_server_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

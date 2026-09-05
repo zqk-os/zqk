@@ -1,0 +1,68 @@
+
+--- run 2026-09-04T22:11:36Z ---
+=== RUN   TestCASEntityPrimaryDir
+=== PAUSE TestCASEntityPrimaryDir
+=== RUN   TestContractForProfile_KnownProfiles
+=== PAUSE TestContractForProfile_KnownProfiles
+=== RUN   TestContractForProfile_UnknownProfile
+=== PAUSE TestContractForProfile_UnknownProfile
+=== RUN   TestProfileContractsMapMatchesKnownStorageProfiles
+=== PAUSE TestProfileContractsMapMatchesKnownStorageProfiles
+=== RUN   TestProfileContract_migrationChain_lightFileToCASToStream
+=== PAUSE TestProfileContract_migrationChain_lightFileToCASToStream
+=== RUN   TestOperationalEnvelope_profilesAreDistinctAcrossChain
+=== PAUSE TestOperationalEnvelope_profilesAreDistinctAcrossChain
+=== RUN   TestParseStorageProfile
+=== PAUSE TestParseStorageProfile
+=== RUN   TestKnownStorageProfiles_parseStringRoundTrip
+=== PAUSE TestKnownStorageProfiles_parseStringRoundTrip
+=== RUN   TestParseStorageProfile_allWireValues
+=== PAUSE TestParseStorageProfile_allWireValues
+=== RUN   TestStorageProfile_IsKnown
+=== PAUSE TestStorageProfile_IsKnown
+=== CONT  TestCASEntityPrimaryDir
+--- PASS: TestCASEntityPrimaryDir (0.00s)
+=== CONT  TestOperationalEnvelope_profilesAreDistinctAcrossChain
+=== CONT  TestParseStorageProfile_allWireValues
+--- PASS: TestOperationalEnvelope_profilesAreDistinctAcrossChain (0.00s)
+=== CONT  TestProfileContract_migrationChain_lightFileToCASToStream
+=== CONT  TestContractForProfile_UnknownProfile
+=== CONT  TestContractForProfile_KnownProfiles
+=== RUN   TestContractForProfile_KnownProfiles/cas_entity
+=== PAUSE TestContractForProfile_KnownProfiles/cas_entity
+=== CONT  TestProfileContractsMapMatchesKnownStorageProfiles
+=== CONT  TestParseStorageProfile
+--- PASS: TestParseStorageProfile_allWireValues (0.00s)
+=== CONT  TestStorageProfile_IsKnown
+--- PASS: TestStorageProfile_IsKnown (0.00s)
+=== CONT  TestKnownStorageProfiles_parseStringRoundTrip
+--- PASS: TestProfileContract_migrationChain_lightFileToCASToStream (0.00s)
+--- PASS: TestContractForProfile_UnknownProfile (0.00s)
+--- PASS: TestProfileContractsMapMatchesKnownStorageProfiles (0.00s)
+--- PASS: TestParseStorageProfile (0.00s)
+=== RUN   TestKnownStorageProfiles_parseStringRoundTrip/cas_entity
+=== RUN   TestContractForProfile_KnownProfiles/light_file
+=== PAUSE TestKnownStorageProfiles_parseStringRoundTrip/cas_entity
+=== PAUSE TestContractForProfile_KnownProfiles/light_file
+=== RUN   TestKnownStorageProfiles_parseStringRoundTrip/light_file
+=== PAUSE TestKnownStorageProfiles_parseStringRoundTrip/light_file
+=== RUN   TestContractForProfile_KnownProfiles/stream
+=== PAUSE TestContractForProfile_KnownProfiles/stream
+=== CONT  TestContractForProfile_KnownProfiles/cas_entity
+=== RUN   TestKnownStorageProfiles_parseStringRoundTrip/stream
+=== CONT  TestContractForProfile_KnownProfiles/stream
+=== PAUSE TestKnownStorageProfiles_parseStringRoundTrip/stream
+=== CONT  TestContractForProfile_KnownProfiles/light_file
+--- PASS: TestContractForProfile_KnownProfiles (0.00s)
+    --- PASS: TestContractForProfile_KnownProfiles/cas_entity (0.00s)
+    --- PASS: TestContractForProfile_KnownProfiles/stream (0.00s)
+    --- PASS: TestContractForProfile_KnownProfiles/light_file (0.00s)
+=== CONT  TestKnownStorageProfiles_parseStringRoundTrip/cas_entity
+=== CONT  TestKnownStorageProfiles_parseStringRoundTrip/stream
+=== CONT  TestKnownStorageProfiles_parseStringRoundTrip/light_file
+--- PASS: TestKnownStorageProfiles_parseStringRoundTrip (0.00s)
+    --- PASS: TestKnownStorageProfiles_parseStringRoundTrip/cas_entity (0.00s)
+    --- PASS: TestKnownStorageProfiles_parseStringRoundTrip/stream (0.00s)
+    --- PASS: TestKnownStorageProfiles_parseStringRoundTrip/light_file (0.00s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/datacell	0.571s

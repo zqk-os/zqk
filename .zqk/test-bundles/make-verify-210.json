@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-210",
+  "created_at": "2026-09-04T21:34:29.482932Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-210",
+    "Tests": [
+      {
+        "Name": "TestProjectStewardFocus_employedWorkflows",
+        "Package": "whatsnext",
+        "PackagePath": "pkg/workflow/whatsnext",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/workflow/whatsnext/kernel_ambience_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestTruncateAndFixtureHelpers",
+        "Package": "whatsnext",
+        "PackagePath": "pkg/workflow/whatsnext",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/workflow/whatsnext/kernel_ambience_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestEnrichStrategicAlignment_andSeatMode",
+        "Package": "whatsnext",
+        "PackagePath": "pkg/workflow/whatsnext",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/workflow/whatsnext/kernel_ambience_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestLoadKernelAmbience_fromCacheAndDrafts",
+        "Package": "whatsnext",
+        "PackagePath": "pkg/workflow/whatsnext",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/workflow/whatsnext/kernel_ambience_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestPriorityPlanPackagingCue",
+        "Package": "whatsnext",
+        "PackagePath": "pkg/workflow/whatsnext",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/workflow/whatsnext/packaging_cue_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestPlanStatusEligible",
+        "Package": "whatsnext",
+        "PackagePath": "pkg/workflow/whatsnext",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/workflow/whatsnext/plan_select_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestPriorityPlanScoreBonusConstant",
+        "Package": "whatsnext",
+        "PackagePath": "pkg/workflow/whatsnext",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/workflow/whatsnext/plan_select_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestPlanStatusExecutionReady",
+        "Package": "whatsnext",
+        "PackagePath": "pkg/workflow/whatsnext",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/workflow/whatsnext/plan_select_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestActiveOrderPenalty",
+        "Package": "whatsnext",
+        "PackagePath": "pkg/workflow/whatsnext",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/workflow/whatsnext/plan_select_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestInProgressPlanRanksAboveShovelReadyActive",
+        "Package": "whatsnext",
+        "PackagePath": "pkg/workflow/whatsnext",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/workflow/whatsnext/plan_select_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": true,
+    "EstimatedDuration": 300000000000,
+    "PackagePath": "pkg/workflow/whatsnext"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestProjectStewardFocus_employedWorkflows",
+      "Package": "whatsnext",
+      "PackagePath": "pkg/workflow/whatsnext",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/workflow/whatsnext/kernel_ambience_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestTruncateAndFixtureHelpers",
+      "Package": "whatsnext",
+      "PackagePath": "pkg/workflow/whatsnext",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/workflow/whatsnext/kernel_ambience_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestEnrichStrategicAlignment_andSeatMode",
+      "Package": "whatsnext",
+      "PackagePath": "pkg/workflow/whatsnext",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/workflow/whatsnext/kernel_ambience_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestLoadKernelAmbience_fromCacheAndDrafts",
+      "Package": "whatsnext",
+      "PackagePath": "pkg/workflow/whatsnext",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/workflow/whatsnext/kernel_ambience_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestPriorityPlanPackagingCue",
+      "Package": "whatsnext",
+      "PackagePath": "pkg/workflow/whatsnext",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/workflow/whatsnext/packaging_cue_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestPlanStatusEligible",
+      "Package": "whatsnext",
+      "PackagePath": "pkg/workflow/whatsnext",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/workflow/whatsnext/plan_select_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestPriorityPlanScoreBonusConstant",
+      "Package": "whatsnext",
+      "PackagePath": "pkg/workflow/whatsnext",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/workflow/whatsnext/plan_select_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestPlanStatusExecutionReady",
+      "Package": "whatsnext",
+      "PackagePath": "pkg/workflow/whatsnext",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/workflow/whatsnext/plan_select_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestActiveOrderPenalty",
+      "Package": "whatsnext",
+      "PackagePath": "pkg/workflow/whatsnext",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/workflow/whatsnext/plan_select_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestInProgressPlanRanksAboveShovelReadyActive",
+      "Package": "whatsnext",
+      "PackagePath": "pkg/workflow/whatsnext",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/workflow/whatsnext/plan_select_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

@@ -1,0 +1,16 @@
+
+--- run 2026-09-04T22:18:33Z ---
+=== RUN   TestGenerateYAMLExample_ParsesAsYAML
+=== PAUSE TestGenerateYAMLExample_ParsesAsYAML
+=== RUN   TestGenerateObjectSpecKindDraft_InheritedDefaults
+=== PAUSE TestGenerateObjectSpecKindDraft_InheritedDefaults
+=== RUN   TestGenerateObjectSpecKindDraft_StripsIncludedTraitGroups
+=== PAUSE TestGenerateObjectSpecKindDraft_StripsIncludedTraitGroups
+=== CONT  TestGenerateYAMLExample_ParsesAsYAML
+=== CONT  TestGenerateObjectSpecKindDraft_StripsIncludedTraitGroups
+--- PASS: TestGenerateObjectSpecKindDraft_StripsIncludedTraitGroups (0.02s)
+=== CONT  TestGenerateObjectSpecKindDraft_InheritedDefaults
+--- PASS: TestGenerateObjectSpecKindDraft_InheritedDefaults (0.03s)
+--- PASS: TestGenerateYAMLExample_ParsesAsYAML (0.21s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/cliexamples	0.502s

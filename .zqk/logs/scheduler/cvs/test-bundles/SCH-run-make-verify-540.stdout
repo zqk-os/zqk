@@ -1,0 +1,60 @@
+
+--- run 2026-09-04T22:14:50Z ---
+=== RUN   TestCreateAuthHook_NoneAndEmptyFailClosed
+=== PAUSE TestCreateAuthHook_NoneAndEmptyFailClosed
+=== RUN   TestAPIKeyAuthHook_Authenticate_ValidKeyFromHeader
+=== PAUSE TestAPIKeyAuthHook_Authenticate_ValidKeyFromHeader
+=== RUN   TestAPIKeyAuthHook_Authenticate_ValidKeyFromQuery
+=== PAUSE TestAPIKeyAuthHook_Authenticate_ValidKeyFromQuery
+=== RUN   TestAPIKeyAuthHook_Authenticate_HeaderPreferredOverQuery
+=== PAUSE TestAPIKeyAuthHook_Authenticate_HeaderPreferredOverQuery
+=== RUN   TestAPIKeyAuthHook_Authenticate_InvalidKey
+=== PAUSE TestAPIKeyAuthHook_Authenticate_InvalidKey
+=== RUN   TestAPIKeyAuthHook_Authenticate_NoKey
+=== PAUSE TestAPIKeyAuthHook_Authenticate_NoKey
+=== RUN   TestAPIKeyAuthHook_Authenticate_QueryOnly
+=== PAUSE TestAPIKeyAuthHook_Authenticate_QueryOnly
+=== RUN   TestAPIKeyAuthHook_Authenticate_NilValidKeys
+=== PAUSE TestAPIKeyAuthHook_Authenticate_NilValidKeys
+=== RUN   TestJWTAuthHook_Authenticate_ValidToken
+=== PAUSE TestJWTAuthHook_Authenticate_ValidToken
+=== RUN   TestJWTAuthHook_Authenticate_NoBearer
+=== PAUSE TestJWTAuthHook_Authenticate_NoBearer
+=== CONT  TestCreateAuthHook_NoneAndEmptyFailClosed
+=== RUN   TestCreateAuthHook_NoneAndEmptyFailClosed/type_none
+=== PAUSE TestCreateAuthHook_NoneAndEmptyFailClosed/type_none
+=== RUN   TestCreateAuthHook_NoneAndEmptyFailClosed/type_stub
+=== PAUSE TestCreateAuthHook_NoneAndEmptyFailClosed/type_stub
+=== CONT  TestAPIKeyAuthHook_Authenticate_NoKey
+=== RUN   TestCreateAuthHook_NoneAndEmptyFailClosed/type_stub_auth
+=== CONT  TestAPIKeyAuthHook_Authenticate_InvalidKey
+=== CONT  TestAPIKeyAuthHook_Authenticate_HeaderPreferredOverQuery
+=== CONT  TestAPIKeyAuthHook_Authenticate_ValidKeyFromQuery
+=== PAUSE TestCreateAuthHook_NoneAndEmptyFailClosed/type_stub_auth
+=== CONT  TestAPIKeyAuthHook_Authenticate_ValidKeyFromHeader
+=== CONT  TestJWTAuthHook_Authenticate_ValidToken
+=== RUN   TestCreateAuthHook_NoneAndEmptyFailClosed/type_
+=== PAUSE TestCreateAuthHook_NoneAndEmptyFailClosed/type_
+=== CONT  TestJWTAuthHook_Authenticate_NoBearer
+--- PASS: TestAPIKeyAuthHook_Authenticate_NoKey (0.00s)
+--- PASS: TestAPIKeyAuthHook_Authenticate_InvalidKey (0.00s)
+--- PASS: TestAPIKeyAuthHook_Authenticate_HeaderPreferredOverQuery (0.00s)
+--- PASS: TestAPIKeyAuthHook_Authenticate_ValidKeyFromQuery (0.00s)
+--- PASS: TestAPIKeyAuthHook_Authenticate_ValidKeyFromHeader (0.00s)
+--- PASS: TestJWTAuthHook_Authenticate_NoBearer (0.00s)
+=== CONT  TestAPIKeyAuthHook_Authenticate_NilValidKeys
+--- PASS: TestAPIKeyAuthHook_Authenticate_NilValidKeys (0.00s)
+=== CONT  TestAPIKeyAuthHook_Authenticate_QueryOnly
+--- PASS: TestAPIKeyAuthHook_Authenticate_QueryOnly (0.00s)
+=== CONT  TestCreateAuthHook_NoneAndEmptyFailClosed/type_none
+=== CONT  TestCreateAuthHook_NoneAndEmptyFailClosed/type_
+=== CONT  TestCreateAuthHook_NoneAndEmptyFailClosed/type_stub_auth
+=== CONT  TestCreateAuthHook_NoneAndEmptyFailClosed/type_stub
+--- PASS: TestCreateAuthHook_NoneAndEmptyFailClosed (0.00s)
+    --- PASS: TestCreateAuthHook_NoneAndEmptyFailClosed/type_none (0.00s)
+    --- PASS: TestCreateAuthHook_NoneAndEmptyFailClosed/type_ (0.00s)
+    --- PASS: TestCreateAuthHook_NoneAndEmptyFailClosed/type_stub_auth (0.00s)
+    --- PASS: TestCreateAuthHook_NoneAndEmptyFailClosed/type_stub (0.00s)
+--- PASS: TestJWTAuthHook_Authenticate_ValidToken (0.00s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/scheduler	0.796s

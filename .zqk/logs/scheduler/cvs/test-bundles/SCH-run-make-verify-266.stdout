@@ -1,0 +1,44 @@
+
+--- run 2026-09-04T21:50:48Z ---
+=== RUN   TestAppendAgentPromptRunJSONL
+=== PAUSE TestAppendAgentPromptRunJSONL
+=== RUN   TestConvergenceOrchestrateJobYAMLStructure
+=== PAUSE TestConvergenceOrchestrateJobYAMLStructure
+=== RUN   TestDetachedDaemonStartArgs_monolithicIncludesSchedulerSubcommand
+=== PAUSE TestDetachedDaemonStartArgs_monolithicIncludesSchedulerSubcommand
+=== RUN   TestDetachedDaemonStartArgs_standaloneOmitsSchedulerSubcommand
+=== PAUSE TestDetachedDaemonStartArgs_standaloneOmitsSchedulerSubcommand
+=== RUN   TestLastRunAtFromJob
+=== PAUSE TestLastRunAtFromJob
+=== RUN   TestProcessJobForMissedTriggers_ZeroOutWhenJobHasLastRunAt
+=== PAUSE TestProcessJobForMissedTriggers_ZeroOutWhenJobHasLastRunAt
+=== RUN   TestProcessJobForMissedTriggers_StillMissedWhenNoRunAfterExpected
+=== PAUSE TestProcessJobForMissedTriggers_StillMissedWhenNoRunAfterExpected
+=== RUN   TestProcessJobForMissedTriggers_EffectiveLastRunUsesStorageWhenNewer
+=== PAUSE TestProcessJobForMissedTriggers_EffectiveLastRunUsesStorageWhenNewer
+=== RUN   TestProcessJobForMissedTriggers_LateCompletionInSlotNotMissed
+=== PAUSE TestProcessJobForMissedTriggers_LateCompletionInSlotNotMissed
+=== RUN   TestCheckForMissedTriggers_CronSlotBoundary
+=== PAUSE TestCheckForMissedTriggers_CronSlotBoundary
+=== CONT  TestAppendAgentPromptRunJSONL
+--- PASS: TestAppendAgentPromptRunJSONL (0.33s)
+=== CONT  TestProcessJobForMissedTriggers_ZeroOutWhenJobHasLastRunAt
+--- PASS: TestProcessJobForMissedTriggers_ZeroOutWhenJobHasLastRunAt (0.00s)
+=== CONT  TestCheckForMissedTriggers_CronSlotBoundary
+--- PASS: TestCheckForMissedTriggers_CronSlotBoundary (0.00s)
+=== CONT  TestProcessJobForMissedTriggers_LateCompletionInSlotNotMissed
+--- PASS: TestProcessJobForMissedTriggers_LateCompletionInSlotNotMissed (0.00s)
+=== CONT  TestProcessJobForMissedTriggers_EffectiveLastRunUsesStorageWhenNewer
+--- PASS: TestProcessJobForMissedTriggers_EffectiveLastRunUsesStorageWhenNewer (0.00s)
+=== CONT  TestProcessJobForMissedTriggers_StillMissedWhenNoRunAfterExpected
+--- PASS: TestProcessJobForMissedTriggers_StillMissedWhenNoRunAfterExpected (0.00s)
+=== CONT  TestDetachedDaemonStartArgs_standaloneOmitsSchedulerSubcommand
+--- PASS: TestDetachedDaemonStartArgs_standaloneOmitsSchedulerSubcommand (0.00s)
+=== CONT  TestLastRunAtFromJob
+--- PASS: TestLastRunAtFromJob (0.00s)
+=== CONT  TestDetachedDaemonStartArgs_monolithicIncludesSchedulerSubcommand
+--- PASS: TestDetachedDaemonStartArgs_monolithicIncludesSchedulerSubcommand (0.00s)
+=== CONT  TestConvergenceOrchestrateJobYAMLStructure
+--- PASS: TestConvergenceOrchestrateJobYAMLStructure (0.05s)
+PASS
+ok  	github.com/lanceman/zqk/cmd/zqk/scheduler	6.680s

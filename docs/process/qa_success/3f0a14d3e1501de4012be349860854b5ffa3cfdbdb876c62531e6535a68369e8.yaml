@@ -1,0 +1,14 @@
+created_at: "2026-08-19T20:28:42Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1787171321771053000-80cd3c0f
+item_id: BLI-CEF-R3-LOGGING-OBS-001
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 2857702ca28e4b64fb5782140b43c1400e68fdeab30ab0062f4119523ca97d466e5f13c72adcfa41b92eacf21fa7f0a79b8a8e3a8d7c581e5c9afe0e69cb31dc
+schema_version: 2.0.0
+signature: 3045022100d095d3de9e0a49ba6012e8b726da454a9983f5dc09623468483ce1f227a5d2e502201253d44a9e8f302e5b3d15697038de966a3cf5f5392e7029aaf0c3ebff28452b
+status: archived
+title: Refactor fmt.Print Console Sites to Structured Logging
+updated_at: "2026-09-01T07:22:10Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

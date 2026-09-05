@@ -1,0 +1,70 @@
+{
+  "metadata": {
+    "version": "2.0",
+    "build_time": "2026-09-04T21:49:18.992189Z",
+    "project_root": "/Users/lanceettl/zqk-restore-clone",
+    "entry_count": 14
+  },
+  "buckets": {
+    "audit_event": {
+      "cache_update": {
+        "AUD-4729": {
+          "created_at": "2026-09-04T21:49:06Z"
+        }
+      },
+      "hash_registry_batch_complete": {
+        "AUD-4714": {
+          "created_at": "2026-09-04T21:49:05Z"
+        }
+      },
+      "hash_registry_batch_start": {
+        "AUD-4705": {
+          "created_at": "2026-09-04T21:49:05Z"
+        }
+      },
+      "listing_index_batch_start": {
+        "AUD-3538": {
+          "created_at": "2026-09-04T21:48:34Z"
+        },
+        "AUD-4652": {
+          "created_at": "2026-09-04T21:49:04Z"
+        }
+      },
+      "object_creation": {
+        "AUD-3351": {
+          "created_at": "2026-09-04T21:48:29Z"
+        }
+      },
+      "system_config_change": {
+        "AUD-3277": {
+          "created_at": "2026-09-04T21:48:21Z"
+        },
+        "AUD-3403": {
+          "created_at": "2026-09-04T21:48:32Z"
+        },
+        "AUD-4675": {
+          "created_at": "2026-09-04T21:49:05Z"
+        },
+        "AUD-4934": {
+          "created_at": "2026-09-04T21:49:09Z"
+        },
+        "AUD-4935": {
+          "created_at": "2026-09-04T21:49:09Z"
+        },
+        "AUD-5261": {
+          "created_at": "2026-09-04T21:49:17Z"
+        },
+        "AUD-5294": {
+          "created_at": "2026-09-04T21:49:18Z"
+        }
+      }
+    },
+    "zqk_session": {
+      "": {
+        "ZQK-6077": {
+          "created_at": "2026-09-04T21:48:26Z"
+        }
+      }
+    }
+  }
+}

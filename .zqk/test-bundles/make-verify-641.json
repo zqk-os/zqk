@@ -1,0 +1,123 @@
+{
+  "name": "make-verify-641",
+  "created_at": "2026-09-04T21:34:33.734923Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-641",
+    "Tests": [
+      {
+        "Name": "TestOpenAIClient_GenerateStructuredCompletion_MissingAPIKey",
+        "Package": "llm",
+        "PackagePath": "pkg/llm",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/llm/structured_openai_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestOpenAIClient_GenerateStructuredCompletion_Success",
+        "Package": "llm",
+        "PackagePath": "pkg/llm",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/llm/structured_openai_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestOpenAIClient_toolChoiceRequiredAndUnsupportedRetry",
+        "Package": "llm",
+        "PackagePath": "pkg/llm",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/llm/structured_openai_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestOpenAIClient_toolChoiceFunctionObject",
+        "Package": "llm",
+        "PackagePath": "pkg/llm",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/llm/structured_openai_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestOpenAIClient_sendsSamplingWhenSet",
+        "Package": "llm",
+        "PackagePath": "pkg/llm",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/llm/structured_openai_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestOpenAIClient_ShouldMock",
+        "Package": "llm",
+        "PackagePath": "pkg/llm",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/llm/structured_openai_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 180000000000,
+    "PackagePath": "pkg/llm"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestOpenAIClient_GenerateStructuredCompletion_MissingAPIKey",
+      "Package": "llm",
+      "PackagePath": "pkg/llm",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/llm/structured_openai_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestOpenAIClient_GenerateStructuredCompletion_Success",
+      "Package": "llm",
+      "PackagePath": "pkg/llm",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/llm/structured_openai_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestOpenAIClient_toolChoiceRequiredAndUnsupportedRetry",
+      "Package": "llm",
+      "PackagePath": "pkg/llm",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/llm/structured_openai_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestOpenAIClient_toolChoiceFunctionObject",
+      "Package": "llm",
+      "PackagePath": "pkg/llm",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/llm/structured_openai_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestOpenAIClient_sendsSamplingWhenSet",
+      "Package": "llm",
+      "PackagePath": "pkg/llm",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/llm/structured_openai_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestOpenAIClient_ShouldMock",
+      "Package": "llm",
+      "PackagePath": "pkg/llm",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/llm/structured_openai_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

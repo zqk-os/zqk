@@ -1,0 +1,36 @@
+
+--- run 2026-09-04T21:46:17Z ---
+=== RUN   TestIsolated_selectBacklogNext_PrefersP0OverP1
+=== PAUSE TestIsolated_selectBacklogNext_PrefersP0OverP1
+=== RUN   TestIsolated_selectBacklogNext_ExcludesTerminalStatuses
+=== PAUSE TestIsolated_selectBacklogNext_ExcludesTerminalStatuses
+=== RUN   TestIsolated_selectActiveConvergence_PicksMostRecentlyUpdated
+=== PAUSE TestIsolated_selectActiveConvergence_PicksMostRecentlyUpdated
+=== RUN   TestIsolated_enrichPriorityPlanBacklog_IncludesConvergenceSessionFields
+=== PAUSE TestIsolated_enrichPriorityPlanBacklog_IncludesConvergenceSessionFields
+=== RUN   TestIsolated_countOpenQuestions
+=== PAUSE TestIsolated_countOpenQuestions
+=== RUN   TestIsolated_enrichPriorityPlanBacklog_FillsSummariesAndGoalRefs
+=== PAUSE TestIsolated_enrichPriorityPlanBacklog_FillsSummariesAndGoalRefs
+=== RUN   TestIsolated_selectBacklogNext_EndToEndWithEnrichment
+=== PAUSE TestIsolated_selectBacklogNext_EndToEndWithEnrichment
+=== RUN   TestIsolated_workflowNextCyclesPlanAndBacklogToCompletion
+=== PAUSE TestIsolated_workflowNextCyclesPlanAndBacklogToCompletion
+=== CONT  TestIsolated_selectBacklogNext_PrefersP0OverP1
+=== CONT  TestIsolated_countOpenQuestions
+=== CONT  TestIsolated_selectActiveConvergence_PicksMostRecentlyUpdated
+=== CONT  TestIsolated_selectBacklogNext_ExcludesTerminalStatuses
+=== CONT  TestIsolated_selectBacklogNext_EndToEndWithEnrichment
+=== CONT  TestIsolated_workflowNextCyclesPlanAndBacklogToCompletion
+--- PASS: TestIsolated_selectBacklogNext_PrefersP0OverP1 (0.00s)
+=== CONT  TestIsolated_enrichPriorityPlanBacklog_IncludesConvergenceSessionFields
+--- PASS: TestIsolated_countOpenQuestions (0.00s)
+=== CONT  TestIsolated_enrichPriorityPlanBacklog_FillsSummariesAndGoalRefs
+--- PASS: TestIsolated_selectActiveConvergence_PicksMostRecentlyUpdated (0.00s)
+--- PASS: TestIsolated_selectBacklogNext_ExcludesTerminalStatuses (0.00s)
+--- PASS: TestIsolated_selectBacklogNext_EndToEndWithEnrichment (0.00s)
+--- PASS: TestIsolated_enrichPriorityPlanBacklog_IncludesConvergenceSessionFields (0.00s)
+--- PASS: TestIsolated_enrichPriorityPlanBacklog_FillsSummariesAndGoalRefs (0.00s)
+--- PASS: TestIsolated_workflowNextCyclesPlanAndBacklogToCompletion (0.00s)
+PASS
+ok  	github.com/lanceman/zqk/cmd/zqk/workflow	0.610s

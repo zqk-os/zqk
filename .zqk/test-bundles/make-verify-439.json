@@ -1,0 +1,87 @@
+{
+  "name": "make-verify-439",
+  "created_at": "2026-09-04T21:34:31.6679Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-439",
+    "Tests": [
+      {
+        "Name": "TestChunkerAndReassembler",
+        "Package": "chunking",
+        "PackagePath": "pkg/utils/chunking",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/utils/chunking/chunking_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestReassemblerOutOfOrder",
+        "Package": "chunking",
+        "PackagePath": "pkg/utils/chunking",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/utils/chunking/chunking_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestReassemblerHashTampering",
+        "Package": "chunking",
+        "PackagePath": "pkg/utils/chunking",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/utils/chunking/chunking_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestChunkerInvalidChunkSize",
+        "Package": "chunking",
+        "PackagePath": "pkg/utils/chunking",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/utils/chunking/chunking_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 120000000000,
+    "PackagePath": "pkg/utils/chunking"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestChunkerAndReassembler",
+      "Package": "chunking",
+      "PackagePath": "pkg/utils/chunking",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/utils/chunking/chunking_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestReassemblerOutOfOrder",
+      "Package": "chunking",
+      "PackagePath": "pkg/utils/chunking",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/utils/chunking/chunking_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestReassemblerHashTampering",
+      "Package": "chunking",
+      "PackagePath": "pkg/utils/chunking",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/utils/chunking/chunking_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestChunkerInvalidChunkSize",
+      "Package": "chunking",
+      "PackagePath": "pkg/utils/chunking",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/utils/chunking/chunking_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

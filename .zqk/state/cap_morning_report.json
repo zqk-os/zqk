@@ -1,0 +1,89 @@
+{
+  "generated_at": "2026-09-04T23:20:02Z",
+  "priority_plan": {
+    "id": "PRI-CEF-R28-REMEDIATE-001",
+    "title": "CEF R28 — remediate 2026-09-03 remesure residuals (lift envelope to 4)",
+    "status": "in_progress"
+  },
+  "backlog_counts_by_status": {
+    "complete": 2,
+    "deferred": 4,
+    "in_progress": 20,
+    "planned": 35,
+    "roadmap": 1,
+    "validated": 4
+  },
+  "pending_stage": {
+    "stage": "cap_stage_sentinel",
+    "entered_at": "2026-09-04T23:20:00Z",
+    "plan_id": "PRI-CEF-R28-REMEDIATE-001",
+    "cvs_id": "CVS-CEF-UNTIL-45-001",
+    "attempts": 1,
+    "last_attempt_at": "2026-09-04T23:20:00Z"
+  },
+  "failure_tracker": {
+    "consecutive_failures": 0,
+    "last_failure": "2026-09-04T22:40:10Z",
+    "last_stage": "cap_native_continuation",
+    "last_error": "pending verification task ATK-1788481055360241000-6b0af0a5 has no durable commit evidence",
+    "agent_escalations": 0
+  },
+  "health_signals": {
+    "FailingTestCount": 0,
+    "PolicyViolations": 0,
+    "SchedulerErrorRate": 0,
+    "DriftIndicators": null
+  },
+  "audit_report": {
+    "churn_indicators": [],
+    "frequent_timeouts": [],
+    "generated_at": "2026-09-04T23:20:02Z",
+    "high_failure_rate_commands": [],
+    "improvement_suggestions": [
+      {
+        "command": "zqk system check all --auto-fix --auto-fix-scheduler --timeout 540s",
+        "description": "Command averages 1m1.989341684s execution time. Consider optimization or progress indicators.",
+        "impact": "Faster command execution and better user experience",
+        "priority": "medium",
+        "type": "optimization"
+      },
+      {
+        "command": "zqk system check all --format json --auto-fix --timeout 1200s",
+        "description": "Command averages 38.878381642s execution time. Consider optimization or progress indicators.",
+        "impact": "Faster command execution and better user experience",
+        "priority": "low",
+        "type": "optimization"
+      }
+    ],
+    "slow_commands": [
+      {
+        "baseline": 61989341684,
+        "command": "zqk",
+        "invocation_count": 21,
+        "issue": "Slow execution",
+        "metric": "avg_duration",
+        "normalized_cmd": "zqk system check all --auto-fix --auto-fix-scheduler --timeout 540s",
+        "severity": "medium",
+        "value": "1m1.989341684s"
+      },
+      {
+        "baseline": 38878381642,
+        "command": "zqk",
+        "invocation_count": 3,
+        "issue": "Slow execution",
+        "metric": "avg_duration",
+        "normalized_cmd": "zqk system check all --format json --auto-fix --timeout 1200s",
+        "severity": "low",
+        "value": "38.878381642s"
+      }
+    ],
+    "summary": {
+      "churn_indicators_count": 0,
+      "frequent_timeouts_count": 0,
+      "high_failure_rate_commands_count": 0,
+      "improvement_suggestions_count": 2,
+      "slow_commands_count": 2
+    }
+  },
+  "directive": "[\"ZQK Observer Tip: APIKey missing, cannot generate dynamic tips.\"]"
+}

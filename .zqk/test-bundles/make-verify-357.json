@@ -1,0 +1,87 @@
+{
+  "name": "make-verify-357",
+  "created_at": "2026-09-04T21:34:30.891692Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-357",
+    "Tests": [
+      {
+        "Name": "TestEvalRefusePlanStatus_BLIInProgressRequiresExecutionFacingPlan",
+        "Package": "compose",
+        "PackagePath": "pkg/kernelcas/compose",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/kernelcas/compose/plan_immutability_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestEvalRefusePlanStatus_NewLinkRefusesActivePlan",
+        "Package": "compose",
+        "PackagePath": "pkg/kernelcas/compose",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/kernelcas/compose/plan_immutability_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestEvalRefusePlanStatus_PlannedBLIRefusesCompletePlan",
+        "Package": "compose",
+        "PackagePath": "pkg/kernelcas/compose",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/kernelcas/compose/plan_immutability_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestEvalRefusePlanStatus_ArchivedBLIRequiresArchivedPlan",
+        "Package": "compose",
+        "PackagePath": "pkg/kernelcas/compose",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/kernelcas/compose/plan_immutability_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 120000000000,
+    "PackagePath": "pkg/kernelcas/compose"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestEvalRefusePlanStatus_BLIInProgressRequiresExecutionFacingPlan",
+      "Package": "compose",
+      "PackagePath": "pkg/kernelcas/compose",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/kernelcas/compose/plan_immutability_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestEvalRefusePlanStatus_NewLinkRefusesActivePlan",
+      "Package": "compose",
+      "PackagePath": "pkg/kernelcas/compose",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/kernelcas/compose/plan_immutability_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestEvalRefusePlanStatus_PlannedBLIRefusesCompletePlan",
+      "Package": "compose",
+      "PackagePath": "pkg/kernelcas/compose",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/kernelcas/compose/plan_immutability_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestEvalRefusePlanStatus_ArchivedBLIRequiresArchivedPlan",
+      "Package": "compose",
+      "PackagePath": "pkg/kernelcas/compose",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/kernelcas/compose/plan_immutability_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

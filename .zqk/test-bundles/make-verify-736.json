@@ -1,0 +1,87 @@
+{
+  "name": "make-verify-736",
+  "created_at": "2026-09-04T21:34:34.647062Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-736",
+    "Tests": [
+      {
+        "Name": "TestLoadDataCellDescriptors_repo",
+        "Package": "datacellregistry",
+        "PackagePath": "pkg/datacellregistry",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/datacellregistry/registry_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestLoadDescriptorReadModel_repo",
+        "Package": "datacellregistry",
+        "PackagePath": "pkg/datacellregistry",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/datacellregistry/registry_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestDescriptorForKind",
+        "Package": "datacellregistry",
+        "PackagePath": "pkg/datacellregistry",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/datacellregistry/registry_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestIndexDescriptorsByKind",
+        "Package": "datacellregistry",
+        "PackagePath": "pkg/datacellregistry",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/datacellregistry/registry_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": true,
+    "EstimatedDuration": 120000000000,
+    "PackagePath": "pkg/datacellregistry"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestLoadDataCellDescriptors_repo",
+      "Package": "datacellregistry",
+      "PackagePath": "pkg/datacellregistry",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/datacellregistry/registry_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestLoadDescriptorReadModel_repo",
+      "Package": "datacellregistry",
+      "PackagePath": "pkg/datacellregistry",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/datacellregistry/registry_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestDescriptorForKind",
+      "Package": "datacellregistry",
+      "PackagePath": "pkg/datacellregistry",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/datacellregistry/registry_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestIndexDescriptorsByKind",
+      "Package": "datacellregistry",
+      "PackagePath": "pkg/datacellregistry",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/datacellregistry/registry_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

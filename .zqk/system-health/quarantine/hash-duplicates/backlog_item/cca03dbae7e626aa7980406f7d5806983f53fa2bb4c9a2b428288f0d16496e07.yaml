@@ -1,0 +1,53 @@
+acceptance_considerations: Acceptance recorded as linked criteria; no narrative captured at migration time.
+actual_effort: 9h
+commit_refs:
+    - 513ddb1e14
+    - a183887ad4
+created_at: "2026-08-05T04:45:34Z"
+created_by: ACC-1785920548450214012-68b850c0
+criteria_refs:
+    - CRIT-1785939705994388000-54233227
+    - CRIT-1785939706943334000-0f7d5b75
+    - CRIT-1785939707954671000-769957d9
+    - CRIT-1785939708989642000-ba59c46b
+    - CRIT-1786697464558120000-f20c06fe
+description: |
+    18/27 accounts still use account:* ids. Spec account.yaml still allows both
+    patterns. Migrate live seats to ACC-* (preserve username/title/display), update
+    id_prefixes + account spec validation to ACC-only for creates, add compatibility
+    alias resolution during transition, update callers that hardcode account:system
+    only where break-glass remains.
+estimated_effort: 8h
+goal_refs:
+    - GOAL-1785885763755750000-6efcb274
+id: BLI-1785905134201010000-07393484
+kind: backlog_item
+milestone_refs:
+    - MIL-1785886016336815000-ad6784be
+namespace_id: zqk:kernel
+owner_ref: ACC-1785920548450214012-68b850c0
+persona_refs:
+    - PER-1781486429759398000-a79939a1
+priority: high
+priority_tier: P0
+problem_statement: |-
+    18/27 accounts still use account:* ids. Spec account.yaml still allows both
+    patterns. Migrate live seats to ACC-* (preserve username/title/display), update
+    id_prefixes + account spec validation to ACC-only for creates, add compatibility
+    alias resolution during transition, update callers that hardcode account:system
+    only where break-glass remains.
+related_object_refs:
+    - REQ-1785905117601841000-468539c3
+    - REQ-STABLE-IDENTITY-STORAGE
+    - CRIT-1785905131008420000-d90a0622
+    - POL-CODE-1785905132115717000-81ab632e
+requirement_refs:
+    - REQ-1785905117601841000-468539c3
+schema_version: 2.0.0
+stakeholder_refs:
+    - PER-1781486429759398000-a79939a1
+status: complete
+title: 'MMORCH P0: Migrate account:* ids to ACC-* and retire dual id pattern in spec'
+updated_at: "2026-08-19T04:51:50Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

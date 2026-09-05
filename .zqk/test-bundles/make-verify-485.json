@@ -1,0 +1,87 @@
+{
+  "name": "make-verify-485",
+  "created_at": "2026-09-04T21:34:32.182522Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-485",
+    "Tests": [
+      {
+        "Name": "TestSuggest_genericVerboseHint",
+        "Package": "errorsuggest",
+        "PackagePath": "internal/cli/errorsuggest",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/internal/cli/errorsuggest/suggest_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestExperienceFromProfile",
+        "Package": "errorsuggest",
+        "PackagePath": "internal/cli/errorsuggest",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/internal/cli/errorsuggest/suggest_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestFormat",
+        "Package": "errorsuggest",
+        "PackagePath": "internal/cli/errorsuggest",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/internal/cli/errorsuggest/suggest_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestSuggest_nil",
+        "Package": "errorsuggest",
+        "PackagePath": "internal/cli/errorsuggest",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/internal/cli/errorsuggest/suggest_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 120000000000,
+    "PackagePath": "internal/cli/errorsuggest"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestSuggest_genericVerboseHint",
+      "Package": "errorsuggest",
+      "PackagePath": "internal/cli/errorsuggest",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/internal/cli/errorsuggest/suggest_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestExperienceFromProfile",
+      "Package": "errorsuggest",
+      "PackagePath": "internal/cli/errorsuggest",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/internal/cli/errorsuggest/suggest_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestFormat",
+      "Package": "errorsuggest",
+      "PackagePath": "internal/cli/errorsuggest",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/internal/cli/errorsuggest/suggest_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestSuggest_nil",
+      "Package": "errorsuggest",
+      "PackagePath": "internal/cli/errorsuggest",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/internal/cli/errorsuggest/suggest_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

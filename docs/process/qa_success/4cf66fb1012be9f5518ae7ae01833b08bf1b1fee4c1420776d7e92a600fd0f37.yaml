@@ -1,0 +1,14 @@
+created_at: "2026-08-19T07:37:45Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1787125065425261000-09597577
+item_id: REDACTED
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 2857702ca28e4b64fb5782140b43c1400e68fdeab30ab0062f4119523ca97d466e5f13c72adcfa41b92eacf21fa7f0a79b8a8e3a8d7c581e5c9afe0e69cb31dc
+schema_version: 2.0.0
+signature: 30460221009b9f63f5752b9f43eae95687dd379cc724ccbdb7771d5cb5fc0272d70787e70c022100d85c0daa3e5bcb831cb5a4136d96331611ef596cfdf6562e4837665d01f57cc7
+status: archived
+title: No priority_plan in complete/archived has a non-terminal BLI with that priority_plan_ref
+updated_at: "2026-09-01T07:21:00Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

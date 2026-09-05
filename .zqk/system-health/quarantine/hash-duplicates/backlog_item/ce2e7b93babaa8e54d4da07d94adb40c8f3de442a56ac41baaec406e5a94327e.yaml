@@ -1,0 +1,47 @@
+acceptance_considerations: Migrated acceptance gate for BLI-1784969955962654000-dc689643 (no prior acceptance_criteria).
+actual_effort: "0"
+category: Process
+commit_refs:
+    - e2a1e359bdc2f5b221a5dd2bbe6f68c3152b6154
+created_at: "2026-07-25T08:59:15Z"
+created_by: ACC-1785920548450214012-68b850c0
+criteria_refs:
+    - CRIT-1785885889228395000-15c56d02
+description: |-
+    ## Problem
+    `resources/list` marshals a nil Go slice as JSON null. Cursor schema expects an array → listOfferingsForUI fails → transport_closed.
+
+    ## Fix status
+    Patched in pkg/mcp/server_handlers_list.go (nil → empty slice) and rebuilt bin/zqk (2026-07-25). Needs regression test + merge to mainline.
+
+    ## Repro
+    Initialize MCP without registered resources; observe `"resources": null` then Cursor disconnect.
+estimated_effort: medium
+goal_refs:
+    - GOAL-OSS-CORE
+id: BLI-1784969955962654000-dc689643
+kind: backlog_item
+milestone_refs:
+    - MIL-001
+namespace_id: zqk:kernel
+notes: 'TPM HARD ACCEPT with TRACE CORRECTION: PR#1291/548b75883a is cosmetic ([]Resource{}→make) — NOT the fix. Real nil-guard introduced e2a1e359bd (2026-07-25) in server_handlers_list.go; regression TestResourcesListResultNeverMarshalsNull already on main. commit_refs corrected to e2a1e359bd. Reject false attribution to 548b75883a.'
+owner_ref: ACC-1785920548450214012-68b850c0
+persona_refs:
+    - PER-DEFAULT-AGENT
+priority: high
+priority_tier: P1
+problem_statement: |-
+    ## Problem
+    `resources/list` marshals a nil Go slice as JSON null. Cursor schema expects an array → listOfferingsForUI fails → transport_closed.
+
+    ## Fix status
+    Patched in pkg/mcp/server_handlers_list.go (nil → empty slice) and rebuilt bin/zqk (2026-07-25). Needs regression test + merge to mainline.
+
+    ## Repro
+    Initialize MCP without registered resources; observe `"resources": null` then Cursor disconnect.
+schema_version: 2.0.0
+status: archived
+title: MCP resources/list returns JSON null; Cursor drops connection
+updated_at: "2026-09-04T23:04:04Z"
+updated_by: ACC-1785920548450214006-2e52b3e7
+version_context: default

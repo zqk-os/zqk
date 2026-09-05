@@ -1,0 +1,44 @@
+
+--- run 2026-09-04T22:18:24Z ---
+=== RUN   TestAggregationKey
+=== PAUSE TestAggregationKey
+=== RUN   TestAppendEventFlushAtThreshold
+=== PAUSE TestAppendEventFlushAtThreshold
+=== RUN   TestAggregatedSummaryMap
+=== PAUSE TestAggregatedSummaryMap
+=== RUN   TestExpandIDRange
+=== PAUSE TestExpandIDRange
+=== RUN   TestExpandIDRanges
+=== PAUSE TestExpandIDRanges
+=== RUN   TestNumericPrefixedIDs
+=== PAUSE TestNumericPrefixedIDs
+=== RUN   TestListNumericPrefixedIDs
+=== PAUSE TestListNumericPrefixedIDs
+=== RUN   TestTimestampIDAndIndexEmpty
+=== PAUSE TestTimestampIDAndIndexEmpty
+=== RUN   TestTryAcquire
+=== PAUSE TestTryAcquire
+=== RUN   TestShouldAggregate
+=== PAUSE TestShouldAggregate
+=== CONT  TestAggregationKey
+=== CONT  TestNumericPrefixedIDs
+--- PASS: TestAggregationKey (0.00s)
+=== CONT  TestExpandIDRanges
+--- PASS: TestNumericPrefixedIDs (0.00s)
+=== CONT  TestExpandIDRange
+--- PASS: TestExpandIDRanges (0.00s)
+=== CONT  TestTryAcquire
+--- PASS: TestTryAcquire (0.00s)
+=== CONT  TestShouldAggregate
+--- PASS: TestShouldAggregate (0.00s)
+=== CONT  TestAggregatedSummaryMap
+--- PASS: TestAggregatedSummaryMap (0.00s)
+=== CONT  TestTimestampIDAndIndexEmpty
+--- PASS: TestTimestampIDAndIndexEmpty (0.00s)
+=== CONT  TestListNumericPrefixedIDs
+--- PASS: TestListNumericPrefixedIDs (0.00s)
+=== CONT  TestAppendEventFlushAtThreshold
+--- PASS: TestAppendEventFlushAtThreshold (0.00s)
+--- PASS: TestExpandIDRange (0.00s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/storage/audit	0.446s

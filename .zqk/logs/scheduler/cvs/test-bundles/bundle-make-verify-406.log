@@ -1,0 +1,26 @@
+
+--- run 2026-09-04T22:13:18Z ---
+=== RUN   TestWaitGroupPanic_Reproduce
+=== PAUSE TestWaitGroupPanic_Reproduce
+=== RUN   TestWaitGroupPanic_ConcurrentDuplicateCreates
+=== PAUSE TestWaitGroupPanic_ConcurrentDuplicateCreates
+=== RUN   TestWaitGroupPanic_WithActiveValidations
+=== PAUSE TestWaitGroupPanic_WithActiveValidations
+=== CONT  TestWaitGroupPanic_Reproduce
+=== CONT  TestWaitGroupPanic_WithActiveValidations
+=== NAME  TestWaitGroupPanic_Reproduce
+    scenario_builder_waitgroup_panic_test.go:98: First account creation should succeed: failed to create object in content-addressable storage: failed to commit live CAS identity: CAS identity cache post-sync failed: object-id-cache handler is required
+=== NAME  TestWaitGroupPanic_WithActiveValidations
+    scenario_builder_waitgroup_panic_test.go:352: First account creation should succeed: failed to create object in content-addressable storage: failed to commit live CAS identity: CAS identity cache post-sync failed: object-id-cache handler is required
+--- FAIL: TestWaitGroupPanic_Reproduce (1.10s)
+=== CONT  TestWaitGroupPanic_ConcurrentDuplicateCreates
+--- FAIL: TestWaitGroupPanic_WithActiveValidations (1.10s)
+=== NAME  TestWaitGroupPanic_ConcurrentDuplicateCreates
+    scenario_builder_waitgroup_panic_test.go:212: First account creation should succeed: failed to create object in content-addressable storage: failed to commit live CAS identity: CAS identity cache post-sync failed: object-id-cache handler is required
+--- FAIL: TestWaitGroupPanic_ConcurrentDuplicateCreates (0.79s)
+FAIL
+FAIL	github.com/lanceman/zqk/cmd/zqk/utility	2.477s
+FAIL
+
+
+--- run 2026-09-04T22:13:18Z ---

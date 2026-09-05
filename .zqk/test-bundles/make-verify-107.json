@@ -1,0 +1,87 @@
+{
+  "name": "make-verify-107",
+  "created_at": "2026-09-04T21:34:28.42075Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-107",
+    "Tests": [
+      {
+        "Name": "TestSearch_Basic",
+        "Package": "crud_test",
+        "PackagePath": "pkg/storage/crud",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/crud/file_search_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestSearch_MultipleTerms",
+        "Package": "crud_test",
+        "PackagePath": "pkg/storage/crud",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/crud/file_search_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestSearch_EmptyResult",
+        "Package": "crud_test",
+        "PackagePath": "pkg/storage/crud",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/crud/file_search_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestSearch_Highlighting",
+        "Package": "crud_test",
+        "PackagePath": "pkg/storage/crud",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/crud/file_search_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 360000000000,
+    "PackagePath": "pkg/storage/crud"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestSearch_Basic",
+      "Package": "crud_test",
+      "PackagePath": "pkg/storage/crud",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/crud/file_search_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestSearch_MultipleTerms",
+      "Package": "crud_test",
+      "PackagePath": "pkg/storage/crud",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/crud/file_search_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestSearch_EmptyResult",
+      "Package": "crud_test",
+      "PackagePath": "pkg/storage/crud",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/crud/file_search_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestSearch_Highlighting",
+      "Package": "crud_test",
+      "PackagePath": "pkg/storage/crud",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/crud/file_search_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    }
+  }
+}

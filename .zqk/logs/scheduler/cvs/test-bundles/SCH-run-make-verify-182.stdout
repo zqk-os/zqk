@@ -1,0 +1,58 @@
+
+--- run 2026-09-04T21:44:00Z ---
+=== RUN   TestWorkflowToolReturnsWithinRequestTimeout
+=== PAUSE TestWorkflowToolReturnsWithinRequestTimeout
+=== RUN   TestClientCancellationAbortsToolCall
+=== PAUSE TestClientCancellationAbortsToolCall
+=== RUN   TestHandleObserverSearch_findsSymbol
+=== PAUSE TestHandleObserverSearch_findsSymbol
+=== RUN   TestHandleObserverSearch_requiresArg
+=== PAUSE TestHandleObserverSearch_requiresArg
+=== RUN   TestRegisterObserverTools_exposesSearch
+=== PAUSE TestRegisterObserverTools_exposesSearch
+=== RUN   TestAliasModeOnlyBuiltinTools
+=== PAUSE TestAliasModeOnlyBuiltinTools
+=== RUN   TestToolsListFilteredByClientSecurityContext
+=== PAUSE TestToolsListFilteredByClientSecurityContext
+=== RUN   TestExtractWhatsNextLeadPlan
+=== PAUSE TestExtractWhatsNextLeadPlan
+=== RUN   TestDefaultTransport_concurrentReadersDoNotPanic
+=== PAUSE TestDefaultTransport_concurrentReadersDoNotPanic
+=== RUN   TestParseUnixPermission
+=== PAUSE TestParseUnixPermission
+=== CONT  TestWorkflowToolReturnsWithinRequestTimeout
+=== CONT  TestAliasModeOnlyBuiltinTools
+    tools_role_alias_test.go:35: alias_mode=true: 31 built-in tools, all prefixed with "mcp.test_"
+--- PASS: TestAliasModeOnlyBuiltinTools (0.00s)
+=== CONT  TestHandleObserverSearch_requiresArg
+--- PASS: TestHandleObserverSearch_requiresArg (0.00s)
+=== CONT  TestRegisterObserverTools_exposesSearch
+--- PASS: TestRegisterObserverTools_exposesSearch (0.00s)
+=== CONT  TestHandleObserverSearch_findsSymbol
+--- PASS: TestHandleObserverSearch_findsSymbol (0.01s)
+=== CONT  TestClientCancellationAbortsToolCall
+--- PASS: TestClientCancellationAbortsToolCall (0.00s)
+=== CONT  TestDefaultTransport_concurrentReadersDoNotPanic
+--- PASS: TestDefaultTransport_concurrentReadersDoNotPanic (0.00s)
+=== CONT  TestParseUnixPermission
+=== RUN   TestParseUnixPermission/full_access
+=== RUN   TestParseUnixPermission/read_only
+=== RUN   TestParseUnixPermission/read_and_execute
+=== RUN   TestParseUnixPermission/write_only
+=== RUN   TestParseUnixPermission/no_access
+=== RUN   TestParseUnixPermission/invalid_length
+--- PASS: TestParseUnixPermission (0.00s)
+    --- PASS: TestParseUnixPermission/full_access (0.00s)
+    --- PASS: TestParseUnixPermission/read_only (0.00s)
+    --- PASS: TestParseUnixPermission/read_and_execute (0.00s)
+    --- PASS: TestParseUnixPermission/write_only (0.00s)
+    --- PASS: TestParseUnixPermission/no_access (0.00s)
+    --- PASS: TestParseUnixPermission/invalid_length (0.00s)
+=== CONT  TestExtractWhatsNextLeadPlan
+--- PASS: TestExtractWhatsNextLeadPlan (0.00s)
+=== CONT  TestToolsListFilteredByClientSecurityContext
+    tools_role_alias_test.go:65: tools: system context=31, restricted context=27
+--- PASS: TestToolsListFilteredByClientSecurityContext (0.00s)
+--- PASS: TestWorkflowToolReturnsWithinRequestTimeout (0.47s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/mcp	1.131s

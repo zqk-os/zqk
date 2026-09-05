@@ -1,0 +1,516 @@
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":0,"message":"Async validator started","semaphore_capacity":4,"timestamp":"2026-09-04T20:39:56Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-04T20:40:00Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":0,"message":"Async validator started","semaphore_capacity":4,"timestamp":"2026-09-04T20:40:08Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"active_workers":0,"level":"info","message":"Stopping async validator","queue_size":8857,"timestamp":"2026-09-04T20:40:08Z","worker_stop_timeout":"1m0s"}
+{"level":"info","message":"All workers stopped","timestamp":"2026-09-04T20:40:08Z"}
+{"active_goroutines":0,"level":"info","message":"Async validator stopped","timestamp":"2026-09-04T20:40:08Z"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-04T20:40:30Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-04T20:40:50Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-04T20:41:56Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":0,"message":"Async validator started","semaphore_capacity":4,"timestamp":"2026-09-04T20:44:17Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"active_workers":0,"level":"info","message":"Stopping async validator","queue_size":8857,"timestamp":"2026-09-04T20:44:17Z","worker_stop_timeout":"1m0s"}
+{"level":"info","message":"All workers stopped","timestamp":"2026-09-04T20:44:17Z"}
+{"active_goroutines":0,"level":"info","message":"Async validator stopped","timestamp":"2026-09-04T20:44:17Z"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-04T20:44:21Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-04T20:54:04Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-04T21:04:22Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-04T21:14:46Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":1,"active_workers":0,"level":"info","message":"Stopping async validator","queue_size":0,"timestamp":"2026-09-04T21:14:48Z","worker_stop_timeout":"1m0s"}
+{"level":"info","message":"All workers stopped","timestamp":"2026-09-04T21:14:48Z"}
+{"active_goroutines":1,"level":"info","message":"Async validator stopped","timestamp":"2026-09-04T21:14:48Z"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-04T21:15:05Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":17,"active_workers":16,"level":"info","message":"Stopping async validator","queue_size":0,"timestamp":"2026-09-04T21:15:11Z","worker_stop_timeout":"1m0s"}
+{"level":"info","message":"All workers stopped","timestamp":"2026-09-04T21:15:11Z"}
+{"active_goroutines":1,"level":"info","message":"Async validator stopped","timestamp":"2026-09-04T21:15:11Z"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-04T21:16:46Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-04T21:16:48Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-04T21:20:09Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-04T21:25:03Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":17,"active_workers":16,"level":"info","message":"Stopping async validator","queue_size":0,"timestamp":"2026-09-04T21:25:08Z","worker_stop_timeout":"1m0s"}
+{"level":"info","message":"All workers stopped","timestamp":"2026-09-04T21:25:08Z"}
+{"active_goroutines":1,"level":"info","message":"Async validator stopped","timestamp":"2026-09-04T21:25:08Z"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":0,"message":"Async validator started","semaphore_capacity":4,"timestamp":"2026-09-04T21:30:01Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"active_workers":0,"level":"info","message":"Stopping async validator","queue_size":8787,"timestamp":"2026-09-04T21:30:01Z","worker_stop_timeout":"1m0s"}
+{"level":"info","message":"All workers stopped","timestamp":"2026-09-04T21:30:01Z"}
+{"active_goroutines":0,"level":"info","message":"Async validator stopped","timestamp":"2026-09-04T21:30:01Z"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-04T21:30:05Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":0,"message":"Async validator started","semaphore_capacity":4,"timestamp":"2026-09-04T21:35:02Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"active_workers":0,"level":"info","message":"Stopping async validator","queue_size":8787,"timestamp":"2026-09-04T21:35:02Z","worker_stop_timeout":"1m0s"}
+{"level":"info","message":"All workers stopped","timestamp":"2026-09-04T21:35:02Z"}
+{"active_goroutines":0,"level":"info","message":"Async validator stopped","timestamp":"2026-09-04T21:35:02Z"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-04T21:35:04Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-04T21:35:42Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-04T21:37:01Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-04T21:40:09Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-04T21:46:42Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":0,"message":"Async validator started","semaphore_capacity":4,"timestamp":"2026-09-04T21:50:02Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"active_workers":0,"level":"info","message":"Stopping async validator","queue_size":8874,"timestamp":"2026-09-04T21:50:02Z","worker_stop_timeout":"1m0s"}
+{"level":"info","message":"All workers stopped","timestamp":"2026-09-04T21:50:02Z"}
+{"active_goroutines":0,"level":"info","message":"Async validator stopped","timestamp":"2026-09-04T21:50:02Z"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":0,"message":"Async validator started","semaphore_capacity":4,"timestamp":"2026-09-04T21:50:03Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"active_workers":0,"level":"info","message":"Stopping async validator","queue_size":8875,"timestamp":"2026-09-04T21:50:03Z","worker_stop_timeout":"1m0s"}
+{"level":"info","message":"All workers stopped","timestamp":"2026-09-04T21:50:03Z"}
+{"active_goroutines":0,"level":"info","message":"Async validator stopped","timestamp":"2026-09-04T21:50:03Z"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-04T21:50:04Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":17,"active_workers":16,"level":"info","message":"Stopping async validator","queue_size":0,"timestamp":"2026-09-04T21:53:47Z","worker_stop_timeout":"1m0s"}
+{"level":"info","message":"All workers stopped","timestamp":"2026-09-04T21:53:47Z"}
+{"active_goroutines":1,"level":"info","message":"Async validator stopped","timestamp":"2026-09-04T21:53:47Z"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":0,"message":"Async validator started","semaphore_capacity":4,"timestamp":"2026-09-04T21:55:00Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"active_workers":0,"level":"info","message":"Stopping async validator","queue_size":8860,"timestamp":"2026-09-04T21:55:01Z","worker_stop_timeout":"1m0s"}
+{"level":"info","message":"All workers stopped","timestamp":"2026-09-04T21:55:01Z"}
+{"active_goroutines":0,"level":"info","message":"Async validator stopped","timestamp":"2026-09-04T21:55:01Z"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-04T21:55:36Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-04T22:04:05Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-04T22:06:55Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-04T22:10:49Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":0,"message":"Async validator started","semaphore_capacity":4,"timestamp":"2026-09-04T22:15:05Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"active_workers":0,"level":"info","message":"Stopping async validator","queue_size":8929,"timestamp":"2026-09-04T22:15:05Z","worker_stop_timeout":"1m0s"}
+{"level":"info","message":"All workers stopped","timestamp":"2026-09-04T22:15:05Z"}
+{"active_goroutines":0,"level":"info","message":"Async validator stopped","timestamp":"2026-09-04T22:15:05Z"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-04T22:15:40Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":0,"message":"Async validator started","semaphore_capacity":4,"timestamp":"2026-09-04T22:20:02Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-04T22:20:03Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-04T22:23:03Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-04T22:23:25Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-04T22:23:41Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-04T22:23:53Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-04T22:24:04Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-04T22:24:19Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":0,"message":"Async validator started","semaphore_capacity":4,"timestamp":"2026-09-04T22:25:02Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"active_workers":0,"level":"info","message":"Stopping async validator","queue_size":70,"timestamp":"2026-09-04T22:25:02Z","worker_stop_timeout":"1m0s"}
+{"level":"info","message":"All workers stopped","timestamp":"2026-09-04T22:25:02Z"}
+{"active_goroutines":0,"level":"info","message":"Async validator stopped","timestamp":"2026-09-04T22:25:02Z"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-04T22:25:03Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":0,"message":"Async validator started","semaphore_capacity":4,"timestamp":"2026-09-04T22:30:00Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"active_workers":0,"level":"info","message":"Stopping async validator","queue_size":70,"timestamp":"2026-09-04T22:30:00Z","worker_stop_timeout":"1m0s"}
+{"level":"info","message":"All workers stopped","timestamp":"2026-09-04T22:30:00Z"}
+{"active_goroutines":0,"level":"info","message":"Async validator stopped","timestamp":"2026-09-04T22:30:00Z"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-04T22:30:06Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":0,"message":"Async validator started","semaphore_capacity":4,"timestamp":"2026-09-04T22:35:02Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-04T22:35:03Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":0,"message":"Async validator started","semaphore_capacity":4,"timestamp":"2026-09-04T22:40:04Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"active_workers":0,"level":"info","message":"Stopping async validator","queue_size":70,"timestamp":"2026-09-04T22:40:04Z","worker_stop_timeout":"1m0s"}
+{"level":"info","message":"All workers stopped","timestamp":"2026-09-04T22:40:04Z"}
+{"active_goroutines":0,"level":"info","message":"Async validator stopped","timestamp":"2026-09-04T22:40:04Z"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-04T22:40:44Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-04T22:45:43Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-04T22:47:11Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-04T22:50:02Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-04T22:50:12Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":2,"active_workers":1,"level":"info","message":"Stopping async validator","queue_size":0,"timestamp":"2026-09-04T22:50:13Z","worker_stop_timeout":"1m0s"}
+{"level":"info","message":"All workers stopped","timestamp":"2026-09-04T22:50:13Z"}
+{"active_goroutines":1,"level":"info","message":"Async validator stopped","timestamp":"2026-09-04T22:50:13Z"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-04T22:53:36Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-04T22:55:03Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":0,"message":"Async validator started","semaphore_capacity":4,"timestamp":"2026-09-04T23:00:02Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"active_workers":0,"level":"info","message":"Stopping async validator","queue_size":8929,"timestamp":"2026-09-04T23:00:02Z","worker_stop_timeout":"1m0s"}
+{"level":"info","message":"All workers stopped","timestamp":"2026-09-04T23:00:02Z"}
+{"active_goroutines":0,"level":"info","message":"Async validator stopped","timestamp":"2026-09-04T23:00:02Z"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-04T23:00:05Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-04T23:00:39Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-04T23:05:36Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-04T23:06:46Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-04T23:06:50Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-04T23:07:17Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-04T23:07:42Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":0,"message":"Async validator started","semaphore_capacity":4,"timestamp":"2026-09-04T23:10:15Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-04T23:10:24Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-04T23:10:44Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":2,"active_workers":1,"level":"info","message":"Stopping async validator","queue_size":0,"timestamp":"2026-09-04T23:10:46Z","worker_stop_timeout":"1m0s"}
+{"level":"info","message":"All workers stopped","timestamp":"2026-09-04T23:10:46Z"}
+{"active_goroutines":1,"level":"info","message":"Async validator stopped","timestamp":"2026-09-04T23:10:46Z"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-04T23:11:35Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":2,"active_workers":1,"level":"info","message":"Stopping async validator","queue_size":0,"timestamp":"2026-09-04T23:11:36Z","worker_stop_timeout":"1m0s"}
+{"level":"info","message":"All workers stopped","timestamp":"2026-09-04T23:11:36Z"}
+{"active_goroutines":1,"level":"info","message":"Async validator stopped","timestamp":"2026-09-04T23:11:36Z"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-04T23:12:08Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":2,"active_workers":1,"level":"info","message":"Stopping async validator","queue_size":0,"timestamp":"2026-09-04T23:12:09Z","worker_stop_timeout":"1m0s"}
+{"level":"info","message":"All workers stopped","timestamp":"2026-09-04T23:12:09Z"}
+{"active_goroutines":1,"level":"info","message":"Async validator stopped","timestamp":"2026-09-04T23:12:09Z"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-04T23:12:36Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-04T23:13:16Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":2,"active_workers":1,"level":"info","message":"Stopping async validator","queue_size":0,"timestamp":"2026-09-04T23:13:21Z","worker_stop_timeout":"1m0s"}
+{"level":"info","message":"All workers stopped","timestamp":"2026-09-04T23:13:21Z"}
+{"active_goroutines":1,"level":"info","message":"Async validator stopped","timestamp":"2026-09-04T23:13:21Z"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-04T23:14:02Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-04T23:14:20Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-04T23:14:38Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":0,"message":"Async validator started","semaphore_capacity":4,"timestamp":"2026-09-04T23:15:03Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"active_workers":0,"level":"info","message":"Stopping async validator","queue_size":8943,"timestamp":"2026-09-04T23:15:03Z","worker_stop_timeout":"1m0s"}
+{"level":"info","message":"All workers stopped","timestamp":"2026-09-04T23:15:03Z"}
+{"active_goroutines":0,"level":"info","message":"Async validator stopped","timestamp":"2026-09-04T23:15:03Z"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-04T23:16:03Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-04T23:19:36Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-04T23:19:54Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":0,"message":"Async validator started","semaphore_capacity":4,"timestamp":"2026-09-04T23:20:05Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"active_workers":0,"level":"info","message":"Stopping async validator","queue_size":8944,"timestamp":"2026-09-04T23:20:05Z","worker_stop_timeout":"1m0s"}
+{"level":"info","message":"All workers stopped","timestamp":"2026-09-04T23:20:05Z"}
+{"active_goroutines":0,"level":"info","message":"Async validator stopped","timestamp":"2026-09-04T23:20:05Z"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-04T23:20:12Z","worker_stop_timeout":"1m0s"}
+{"file_path":"/Users/lanceettl/zqk-restore-clone/docs/process/risk_blockers/f59c9ffdcd87f424fcba5cdf31020606ea264c2b06998d9fa726f7a98ded09e1.yaml","level":"warn","message":"Missing CAS file detected - stale index entry","note":"CAS index entry exists but hash file is missing - recovery needed","object_id":"RIS-1788517005867201000-ef07fd19","object_kind":"risk_blocker","timestamp":"2026-09-04T23:20:56Z"}
+{"error":"Missing CAS file detected: stale index entry for object RIS-1788517005867201000-ef07fd19 (CAS index entry exists but hash file is missing - recovery needed)","file_path":"/Users/lanceettl/zqk-restore-clone/docs/process/risk_blockers/f59c9ffdcd87f424fcba5cdf31020606ea264c2b06998d9fa726f7a98ded09e1.yaml","level":"error","message":"Validation failed","object_id":"RIS-1788517005867201000-ef07fd19","object_kind":"risk_blocker","timestamp":"2026-09-04T23:20:56Z"}
+{"file_path":"/Users/lanceettl/zqk-restore-clone/docs/process/priority_plans/e9044eb180221f4031bd6116ff278b5d9c88f3f6725a87a3746e7d666a5b7f86.yaml","level":"warn","message":"Missing CAS file detected - stale index entry","note":"CAS index entry exists but hash file is missing - recovery needed","object_id":"PRI-CEF-R29-REMEASURE-001","object_kind":"priority_plan","timestamp":"2026-09-04T23:20:56Z"}
+{"error":"Missing CAS file detected: stale index entry for object PRI-CEF-R29-REMEASURE-001 (CAS index entry exists but hash file is missing - recovery needed)","file_path":"/Users/lanceettl/zqk-restore-clone/docs/process/priority_plans/e9044eb180221f4031bd6116ff278b5d9c88f3f6725a87a3746e7d666a5b7f86.yaml","level":"error","message":"Validation failed","object_id":"PRI-CEF-R29-REMEASURE-001","object_kind":"priority_plan","timestamp":"2026-09-04T23:20:56Z"}
+{"file_path":"/Users/lanceettl/zqk-restore-clone/docs/process/risk_blockers/92f78b6baed2e1c4f68e93d5ac090ef4d30985ad3c8651bc8841b126611b27b4.yaml","level":"warn","message":"Missing CAS file detected - stale index entry","note":"CAS index entry exists but hash file is missing - recovery needed","object_id":"RIS-1788516275964999000-4870a2f9","object_kind":"risk_blocker","timestamp":"2026-09-04T23:20:57Z"}
+{"error":"Missing CAS file detected: stale index entry for object RIS-1788516275964999000-4870a2f9 (CAS index entry exists but hash file is missing - recovery needed)","file_path":"/Users/lanceettl/zqk-restore-clone/docs/process/risk_blockers/92f78b6baed2e1c4f68e93d5ac090ef4d30985ad3c8651bc8841b126611b27b4.yaml","level":"error","message":"Validation failed","object_id":"RIS-1788516275964999000-4870a2f9","object_kind":"risk_blocker","timestamp":"2026-09-04T23:20:57Z"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-04T23:21:16Z","worker_stop_timeout":"1m0s"}
+{"file_path":"/Users/lanceettl/zqk-restore-clone/docs/process/agent_tasks/e80a94f538580fbcd8a555e37063a7769c1e9bb20dced72de03a4f31ce6cba54.yaml","level":"warn","message":"Missing CAS file detected - stale index entry","note":"CAS index entry exists but hash file is missing - recovery needed","object_id":"ATK-1788550354280675000-226610c8","object_kind":"agent_task","timestamp":"2026-09-04T23:25:24Z"}
+{"error":"Missing CAS file detected: stale index entry for object ATK-1788550354280675000-226610c8 (CAS index entry exists but hash file is missing - recovery needed)","file_path":"/Users/lanceettl/zqk-restore-clone/docs/process/agent_tasks/e80a94f538580fbcd8a555e37063a7769c1e9bb20dced72de03a4f31ce6cba54.yaml","level":"error","message":"Validation failed","object_id":"ATK-1788550354280675000-226610c8","object_kind":"agent_task","timestamp":"2026-09-04T23:25:24Z"}
+{"file_path":"/Users/lanceettl/zqk-restore-clone/docs/process/agent_tasks/d56ccd4b691ed66b35bfca3c364c13df36c689a0e10e3c0a377160aa75aa2251.yaml","level":"warn","message":"Missing CAS file detected - stale index entry","note":"CAS index entry exists but hash file is missing - recovery needed","object_id":"ATK-1788499020404910000-247f2d01","object_kind":"agent_task","timestamp":"2026-09-04T23:25:24Z"}
+{"error":"Missing CAS file detected: stale index entry for object ATK-1788499020404910000-247f2d01 (CAS index entry exists but hash file is missing - recovery needed)","file_path":"/Users/lanceettl/zqk-restore-clone/docs/process/agent_tasks/d56ccd4b691ed66b35bfca3c364c13df36c689a0e10e3c0a377160aa75aa2251.yaml","level":"error","message":"Validation failed","object_id":"ATK-1788499020404910000-247f2d01","object_kind":"agent_task","timestamp":"2026-09-04T23:25:24Z"}
+{"file_path":"/Users/lanceettl/zqk-restore-clone/docs/process/agent_tasks/2417f16a040b50f5a677be233a7e466e6aa3831460d8409419d3a5f0cc967931.yaml","level":"warn","message":"Missing CAS file detected - stale index entry","note":"CAS index entry exists but hash file is missing - recovery needed","object_id":"ATK-1788499018750147000-1f013fd8","object_kind":"agent_task","timestamp":"2026-09-04T23:25:25Z"}
+{"error":"Missing CAS file detected: stale index entry for object ATK-1788499018750147000-1f013fd8 (CAS index entry exists but hash file is missing - recovery needed)","file_path":"/Users/lanceettl/zqk-restore-clone/docs/process/agent_tasks/2417f16a040b50f5a677be233a7e466e6aa3831460d8409419d3a5f0cc967931.yaml","level":"error","message":"Validation failed","object_id":"ATK-1788499018750147000-1f013fd8","object_kind":"agent_task","timestamp":"2026-09-04T23:25:25Z"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-04T23:29:28Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":0,"message":"Async validator started","semaphore_capacity":4,"timestamp":"2026-09-04T23:30:13Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"active_workers":0,"level":"info","message":"Stopping async validator","queue_size":8945,"timestamp":"2026-09-04T23:30:13Z","worker_stop_timeout":"1m0s"}
+{"level":"info","message":"All workers stopped","timestamp":"2026-09-04T23:30:13Z"}
+{"active_goroutines":0,"level":"info","message":"Async validator stopped","timestamp":"2026-09-04T23:30:13Z"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":0,"message":"Async validator started","semaphore_capacity":4,"timestamp":"2026-09-04T23:30:28Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"active_workers":0,"level":"info","message":"Stopping async validator","queue_size":8944,"timestamp":"2026-09-04T23:30:29Z","worker_stop_timeout":"1m0s"}
+{"level":"info","message":"All workers stopped","timestamp":"2026-09-04T23:30:29Z"}
+{"active_goroutines":0,"level":"info","message":"Async validator stopped","timestamp":"2026-09-04T23:30:29Z"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-04T23:30:43Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":2,"active_workers":1,"level":"info","message":"Stopping async validator","queue_size":0,"timestamp":"2026-09-04T23:30:49Z","worker_stop_timeout":"1m0s"}
+{"level":"info","message":"All workers stopped","timestamp":"2026-09-04T23:30:49Z"}
+{"active_goroutines":1,"level":"info","message":"Async validator stopped","timestamp":"2026-09-04T23:30:49Z"}
+{"file_path":"/Users/lanceettl/zqk-restore-clone/docs/process/backlog/49f4f67e7d287c5c5527f1f7a11f1d5b30cf3fd94f82180db2e885b1c69d318e.yaml","level":"warn","message":"Missing CAS file detected - stale index entry","note":"CAS index entry exists but hash file is missing - recovery needed","object_id":"BLI-1788548246877789000-b3f2ca4f","object_kind":"backlog_item","timestamp":"2026-09-04T23:30:59Z"}
+{"error":"Missing CAS file detected: stale index entry for object BLI-1788548246877789000-b3f2ca4f (CAS index entry exists but hash file is missing - recovery needed)","file_path":"/Users/lanceettl/zqk-restore-clone/docs/process/backlog/49f4f67e7d287c5c5527f1f7a11f1d5b30cf3fd94f82180db2e885b1c69d318e.yaml","level":"error","message":"Validation failed","object_id":"BLI-1788548246877789000-b3f2ca4f","object_kind":"backlog_item","timestamp":"2026-09-04T23:30:59Z"}
+{"file_path":"/Users/lanceettl/zqk-restore-clone/docs/process/backlog/4f7b511cda8fa9def4cc2addb4398d1bb7f07375629ca7abe68f41fdd5b2fb3b.yaml","level":"warn","message":"Missing CAS file detected - stale index entry","note":"CAS index entry exists but hash file is missing - recovery needed","object_id":"BLI-1788548259895496000-f99d8702","object_kind":"backlog_item","timestamp":"2026-09-04T23:30:59Z"}
+{"error":"Missing CAS file detected: stale index entry for object BLI-1788548259895496000-f99d8702 (CAS index entry exists but hash file is missing - recovery needed)","file_path":"/Users/lanceettl/zqk-restore-clone/docs/process/backlog/4f7b511cda8fa9def4cc2addb4398d1bb7f07375629ca7abe68f41fdd5b2fb3b.yaml","level":"error","message":"Validation failed","object_id":"BLI-1788548259895496000-f99d8702","object_kind":"backlog_item","timestamp":"2026-09-04T23:30:59Z"}
+{"file_path":"/Users/lanceettl/zqk-restore-clone/docs/process/backlog/dd8a71ec6a3fd9e9a8edcfdab92b36247443cbc808cd3044bf1c3a379b8dd36b.yaml","level":"warn","message":"Missing CAS file detected - stale index entry","note":"CAS index entry exists but hash file is missing - recovery needed","object_id":"BLI-1788548098807943000-e826f191","object_kind":"backlog_item","timestamp":"2026-09-04T23:31:00Z"}
+{"error":"Missing CAS file detected: stale index entry for object BLI-1788548098807943000-e826f191 (CAS index entry exists but hash file is missing - recovery needed)","file_path":"/Users/lanceettl/zqk-restore-clone/docs/process/backlog/dd8a71ec6a3fd9e9a8edcfdab92b36247443cbc808cd3044bf1c3a379b8dd36b.yaml","level":"error","message":"Validation failed","object_id":"BLI-1788548098807943000-e826f191","object_kind":"backlog_item","timestamp":"2026-09-04T23:31:00Z"}
+{"file_path":"/Users/lanceettl/zqk-restore-clone/docs/process/backlog/795ecc4a9bcf7f946d239ed620874a97a74d576a9eb9f113b82864af262771b0.yaml","level":"warn","message":"Missing CAS file detected - stale index entry","note":"CAS index entry exists but hash file is missing - recovery needed","object_id":"BLI-1788548094697560000-21dfce6f","object_kind":"backlog_item","timestamp":"2026-09-04T23:31:00Z"}
+{"error":"Missing CAS file detected: stale index entry for object BLI-1788548094697560000-21dfce6f (CAS index entry exists but hash file is missing - recovery needed)","file_path":"/Users/lanceettl/zqk-restore-clone/docs/process/backlog/795ecc4a9bcf7f946d239ed620874a97a74d576a9eb9f113b82864af262771b0.yaml","level":"error","message":"Validation failed","object_id":"BLI-1788548094697560000-21dfce6f","object_kind":"backlog_item","timestamp":"2026-09-04T23:31:00Z"}
+{"file_path":"/Users/lanceettl/zqk-restore-clone/docs/process/backlog/e8ddee0d5b6b82da39ed90a984477e3ba981b34a6119ca9d12c20c707d2a6327.yaml","level":"warn","message":"Missing CAS file detected - stale index entry","note":"CAS index entry exists but hash file is missing - recovery needed","object_id":"BLI-1788548263044190000-b588d1ae","object_kind":"backlog_item","timestamp":"2026-09-04T23:31:00Z"}
+{"error":"Missing CAS file detected: stale index entry for object BLI-1788548263044190000-b588d1ae (CAS index entry exists but hash file is missing - recovery needed)","file_path":"/Users/lanceettl/zqk-restore-clone/docs/process/backlog/e8ddee0d5b6b82da39ed90a984477e3ba981b34a6119ca9d12c20c707d2a6327.yaml","level":"error","message":"Validation failed","object_id":"BLI-1788548263044190000-b588d1ae","object_kind":"backlog_item","timestamp":"2026-09-04T23:31:00Z"}
+{"file_path":"/Users/lanceettl/zqk-restore-clone/docs/process/backlog/08cfa56ac3a367b9e70f9ef94f6ca7339fa2c2d497ae9c254c70a8fe375d1f8d.yaml","level":"warn","message":"Missing CAS file detected - stale index entry","note":"CAS index entry exists but hash file is missing - recovery needed","object_id":"BLI-1788548269500960000-651a02b7","object_kind":"backlog_item","timestamp":"2026-09-04T23:31:01Z"}
+{"error":"Missing CAS file detected: stale index entry for object BLI-1788548269500960000-651a02b7 (CAS index entry exists but hash file is missing - recovery needed)","file_path":"/Users/lanceettl/zqk-restore-clone/docs/process/backlog/08cfa56ac3a367b9e70f9ef94f6ca7339fa2c2d497ae9c254c70a8fe375d1f8d.yaml","level":"error","message":"Validation failed","object_id":"BLI-1788548269500960000-651a02b7","object_kind":"backlog_item","timestamp":"2026-09-04T23:31:01Z"}
+{"file_path":"/Users/lanceettl/zqk-restore-clone/docs/process/backlog/30b916af3f198c412132d99a6f1f2f1ac57d2293a28cb1e2981946b8c2d3c15a.yaml","level":"warn","message":"Missing CAS file detected - stale index entry","note":"CAS index entry exists but hash file is missing - recovery needed","object_id":"BLI-1788548250093905000-cfb65a3c","object_kind":"backlog_item","timestamp":"2026-09-04T23:31:02Z"}
+{"error":"Missing CAS file detected: stale index entry for object BLI-1788548250093905000-cfb65a3c (CAS index entry exists but hash file is missing - recovery needed)","file_path":"/Users/lanceettl/zqk-restore-clone/docs/process/backlog/30b916af3f198c412132d99a6f1f2f1ac57d2293a28cb1e2981946b8c2d3c15a.yaml","level":"error","message":"Validation failed","object_id":"BLI-1788548250093905000-cfb65a3c","object_kind":"backlog_item","timestamp":"2026-09-04T23:31:02Z"}
+{"file_path":"/Users/lanceettl/zqk-restore-clone/docs/process/backlog/f2f5f9fa30dd8563b8dcf2915785e4f4ae34d8be5bcfe68cc7a16c8d931c3f20.yaml","level":"warn","message":"Missing CAS file detected - stale index entry","note":"CAS index entry exists but hash file is missing - recovery needed","object_id":"BLI-1788548107160125000-c596bec4","object_kind":"backlog_item","timestamp":"2026-09-04T23:31:02Z"}
+{"error":"Missing CAS file detected: stale index entry for object BLI-1788548107160125000-c596bec4 (CAS index entry exists but hash file is missing - recovery needed)","file_path":"/Users/lanceettl/zqk-restore-clone/docs/process/backlog/f2f5f9fa30dd8563b8dcf2915785e4f4ae34d8be5bcfe68cc7a16c8d931c3f20.yaml","level":"error","message":"Validation failed","object_id":"BLI-1788548107160125000-c596bec4","object_kind":"backlog_item","timestamp":"2026-09-04T23:31:02Z"}
+{"file_path":"/Users/lanceettl/zqk-restore-clone/docs/process/backlog/f948a36985cb7cf90aee28fa81aacad898fb8a598fe4495fc940cb98de5f576e.yaml","level":"warn","message":"Missing CAS file detected - stale index entry","note":"CAS index entry exists but hash file is missing - recovery needed","object_id":"BLI-1788548256672449000-41a5bc43","object_kind":"backlog_item","timestamp":"2026-09-04T23:31:03Z"}
+{"error":"Missing CAS file detected: stale index entry for object BLI-1788548256672449000-41a5bc43 (CAS index entry exists but hash file is missing - recovery needed)","file_path":"/Users/lanceettl/zqk-restore-clone/docs/process/backlog/f948a36985cb7cf90aee28fa81aacad898fb8a598fe4495fc940cb98de5f576e.yaml","level":"error","message":"Validation failed","object_id":"BLI-1788548256672449000-41a5bc43","object_kind":"backlog_item","timestamp":"2026-09-04T23:31:03Z"}
+{"file_path":"/Users/lanceettl/zqk-restore-clone/docs/process/backlog/91b6038a1d2a6c9e349fc7ccb9ba27f887bcd8ca170f55f9b169f9e23cbebaa0.yaml","level":"warn","message":"Missing CAS file detected - stale index entry","note":"CAS index entry exists but hash file is missing - recovery needed","object_id":"BLI-1788548103102893000-70173ccb","object_kind":"backlog_item","timestamp":"2026-09-04T23:31:03Z"}
+{"error":"Missing CAS file detected: stale index entry for object BLI-1788548103102893000-70173ccb (CAS index entry exists but hash file is missing - recovery needed)","file_path":"/Users/lanceettl/zqk-restore-clone/docs/process/backlog/91b6038a1d2a6c9e349fc7ccb9ba27f887bcd8ca170f55f9b169f9e23cbebaa0.yaml","level":"error","message":"Validation failed","object_id":"BLI-1788548103102893000-70173ccb","object_kind":"backlog_item","timestamp":"2026-09-04T23:31:03Z"}
+{"file_path":"/Users/lanceettl/zqk-restore-clone/docs/process/backlog/450dedbabcdc100753cc749045396bcda7f0f2aea799813a423ee57442e7eb66.yaml","level":"warn","message":"Missing CAS file detected - stale index entry","note":"CAS index entry exists but hash file is missing - recovery needed","object_id":"BLI-1788548199234103000-56efae04","object_kind":"backlog_item","timestamp":"2026-09-04T23:31:05Z"}
+{"error":"Missing CAS file detected: stale index entry for object BLI-1788548199234103000-56efae04 (CAS index entry exists but hash file is missing - recovery needed)","file_path":"/Users/lanceettl/zqk-restore-clone/docs/process/backlog/450dedbabcdc100753cc749045396bcda7f0f2aea799813a423ee57442e7eb66.yaml","level":"error","message":"Validation failed","object_id":"BLI-1788548199234103000-56efae04","object_kind":"backlog_item","timestamp":"2026-09-04T23:31:05Z"}
+{"file_path":"/Users/lanceettl/zqk-restore-clone/docs/process/backlog/233a4007b0cf2a81b2d210db1d55c3751c2e162d0a407e2e96714f2f4e967ff8.yaml","level":"warn","message":"Missing CAS file detected - stale index entry","note":"CAS index entry exists but hash file is missing - recovery needed","object_id":"BLI-1788548087212129000-cf2105bc","object_kind":"backlog_item","timestamp":"2026-09-04T23:31:05Z"}
+{"error":"Missing CAS file detected: stale index entry for object BLI-1788548087212129000-cf2105bc (CAS index entry exists but hash file is missing - recovery needed)","file_path":"/Users/lanceettl/zqk-restore-clone/docs/process/backlog/233a4007b0cf2a81b2d210db1d55c3751c2e162d0a407e2e96714f2f4e967ff8.yaml","level":"error","message":"Validation failed","object_id":"BLI-1788548087212129000-cf2105bc","object_kind":"backlog_item","timestamp":"2026-09-04T23:31:05Z"}
+{"file_path":"/Users/lanceettl/zqk-restore-clone/docs/process/backlog/e059d03830bcf92124f1a87728de54202dc40851ffcb74f1f1bdf70f9fcde6c9.yaml","level":"warn","message":"Missing CAS file detected - stale index entry","note":"CAS index entry exists but hash file is missing - recovery needed","object_id":"BLI-1788512148256431000-3c34b1cd","object_kind":"backlog_item","timestamp":"2026-09-04T23:31:05Z"}
+{"error":"Missing CAS file detected: stale index entry for object BLI-1788512148256431000-3c34b1cd (CAS index entry exists but hash file is missing - recovery needed)","file_path":"/Users/lanceettl/zqk-restore-clone/docs/process/backlog/e059d03830bcf92124f1a87728de54202dc40851ffcb74f1f1bdf70f9fcde6c9.yaml","level":"error","message":"Validation failed","object_id":"BLI-1788512148256431000-3c34b1cd","object_kind":"backlog_item","timestamp":"2026-09-04T23:31:05Z"}
+{"file_path":"/Users/lanceettl/zqk-restore-clone/docs/process/backlog/a64edf16565039f4834a1e735514013e2ca011d2548aea313d62dc13639c1168.yaml","level":"warn","message":"Missing CAS file detected - stale index entry","note":"CAS index entry exists but hash file is missing - recovery needed","object_id":"BLI-1788548091265398000-b1042e22","object_kind":"backlog_item","timestamp":"2026-09-04T23:31:05Z"}
+{"error":"Missing CAS file detected: stale index entry for object BLI-1788548091265398000-b1042e22 (CAS index entry exists but hash file is missing - recovery needed)","file_path":"/Users/lanceettl/zqk-restore-clone/docs/process/backlog/a64edf16565039f4834a1e735514013e2ca011d2548aea313d62dc13639c1168.yaml","level":"error","message":"Validation failed","object_id":"BLI-1788548091265398000-b1042e22","object_kind":"backlog_item","timestamp":"2026-09-04T23:31:05Z"}
+{"file_path":"/Users/lanceettl/zqk-restore-clone/docs/process/backlog/d7888bb5ae73c01ba776bb27f1cc5d497dc98b1d916c9be9fb220143adbaffce.yaml","level":"warn","message":"Missing CAS file detected - stale index entry","note":"CAS index entry exists but hash file is missing - recovery needed","object_id":"BLI-1788548083036423000-63226054","object_kind":"backlog_item","timestamp":"2026-09-04T23:31:06Z"}
+{"error":"Missing CAS file detected: stale index entry for object BLI-1788548083036423000-63226054 (CAS index entry exists but hash file is missing - recovery needed)","file_path":"/Users/lanceettl/zqk-restore-clone/docs/process/backlog/d7888bb5ae73c01ba776bb27f1cc5d497dc98b1d916c9be9fb220143adbaffce.yaml","level":"error","message":"Validation failed","object_id":"BLI-1788548083036423000-63226054","object_kind":"backlog_item","timestamp":"2026-09-04T23:31:06Z"}
+{"file_path":"/Users/lanceettl/zqk-restore-clone/docs/process/backlog/508c18bc48ba12449b2efa09ea7ef46d0b002855441e478bc4b0fcbd99342132.yaml","level":"warn","message":"Missing CAS file detected - stale index entry","note":"CAS index entry exists but hash file is missing - recovery needed","object_id":"BLI-1788548253343570000-fb09e92b","object_kind":"backlog_item","timestamp":"2026-09-04T23:31:07Z"}
+{"error":"Missing CAS file detected: stale index entry for object BLI-1788548253343570000-fb09e92b (CAS index entry exists but hash file is missing - recovery needed)","file_path":"/Users/lanceettl/zqk-restore-clone/docs/process/backlog/508c18bc48ba12449b2efa09ea7ef46d0b002855441e478bc4b0fcbd99342132.yaml","level":"error","message":"Validation failed","object_id":"BLI-1788548253343570000-fb09e92b","object_kind":"backlog_item","timestamp":"2026-09-04T23:31:07Z"}
+{"file_path":"/Users/lanceettl/zqk-restore-clone/docs/process/backlog/1f2eba80b1edf3a6991f8af175531f5fd1ee4c138c0843de2650f8c9f5b208fc.yaml","level":"warn","message":"Missing CAS file detected - stale index entry","note":"CAS index entry exists but hash file is missing - recovery needed","object_id":"BLI-1788548266408116000-f6e99d56","object_kind":"backlog_item","timestamp":"2026-09-04T23:31:07Z"}
+{"error":"Missing CAS file detected: stale index entry for object BLI-1788548266408116000-f6e99d56 (CAS index entry exists but hash file is missing - recovery needed)","file_path":"/Users/lanceettl/zqk-restore-clone/docs/process/backlog/1f2eba80b1edf3a6991f8af175531f5fd1ee4c138c0843de2650f8c9f5b208fc.yaml","level":"error","message":"Validation failed","object_id":"BLI-1788548266408116000-f6e99d56","object_kind":"backlog_item","timestamp":"2026-09-04T23:31:07Z"}
+{"file_path":"/Users/lanceettl/zqk-restore-clone/docs/process/backlog/1339022193f1bd4109e7fe2610cf84d58e85f138db5a20e2b1e884a433ca05e6.yaml","level":"warn","message":"Missing CAS file detected - stale index entry","note":"CAS index entry exists but hash file is missing - recovery needed","object_id":"BLI-1788548243519619000-4d54aec2","object_kind":"backlog_item","timestamp":"2026-09-04T23:31:07Z"}
+{"error":"Missing CAS file detected: stale index entry for object BLI-1788548243519619000-4d54aec2 (CAS index entry exists but hash file is missing - recovery needed)","file_path":"/Users/lanceettl/zqk-restore-clone/docs/process/backlog/1339022193f1bd4109e7fe2610cf84d58e85f138db5a20e2b1e884a433ca05e6.yaml","level":"error","message":"Validation failed","object_id":"BLI-1788548243519619000-4d54aec2","object_kind":"backlog_item","timestamp":"2026-09-04T23:31:07Z"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-04T23:31:32Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":0,"message":"Async validator started","semaphore_capacity":4,"timestamp":"2026-09-04T23:35:01Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-04T23:35:04Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-04T23:35:06Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-04T23:38:29Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-04T23:40:04Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-04T23:45:03Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-04T23:48:51Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-04T23:50:05Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-04T23:55:03Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-05T00:00:05Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-05T00:00:22Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-05T00:04:00Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-05T00:05:03Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-05T00:06:34Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-05T00:10:03Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-05T00:15:07Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":0,"message":"Async validator started","semaphore_capacity":4,"timestamp":"2026-09-05T00:20:00Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"active_workers":0,"level":"info","message":"Stopping async validator","queue_size":8947,"timestamp":"2026-09-05T00:20:00Z","worker_stop_timeout":"1m0s"}
+{"level":"info","message":"All workers stopped","timestamp":"2026-09-05T00:20:00Z"}
+{"active_goroutines":0,"level":"info","message":"Async validator stopped","timestamp":"2026-09-05T00:20:00Z"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-05T00:20:34Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-05T00:25:03Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-05T00:30:04Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-05T00:35:03Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-05T00:36:16Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":0,"message":"Async validator started","semaphore_capacity":4,"timestamp":"2026-09-05T00:40:00Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"active_workers":0,"level":"info","message":"Stopping async validator","queue_size":8948,"timestamp":"2026-09-05T00:40:00Z","worker_stop_timeout":"1m0s"}
+{"level":"info","message":"All workers stopped","timestamp":"2026-09-05T00:40:00Z"}
+{"active_goroutines":0,"level":"info","message":"Async validator stopped","timestamp":"2026-09-05T00:40:00Z"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":0,"message":"Async validator started","semaphore_capacity":4,"timestamp":"2026-09-05T00:40:00Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"active_workers":0,"level":"info","message":"Stopping async validator","queue_size":8948,"timestamp":"2026-09-05T00:40:00Z","worker_stop_timeout":"1m0s"}
+{"level":"info","message":"All workers stopped","timestamp":"2026-09-05T00:40:00Z"}
+{"active_goroutines":0,"level":"info","message":"Async validator stopped","timestamp":"2026-09-05T00:40:00Z"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":0,"message":"Async validator started","semaphore_capacity":4,"timestamp":"2026-09-05T00:40:05Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"active_workers":0,"level":"info","message":"Stopping async validator","queue_size":8948,"timestamp":"2026-09-05T00:40:05Z","worker_stop_timeout":"1m0s"}
+{"level":"info","message":"All workers stopped","timestamp":"2026-09-05T00:40:05Z"}
+{"active_goroutines":0,"level":"info","message":"Async validator stopped","timestamp":"2026-09-05T00:40:05Z"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-05T00:40:27Z","worker_stop_timeout":"1m0s"}
+{"file_path":"/Users/lanceettl/zqk-restore-clone/docs/process/backlog/9f9829a8fa0c5f5034074e69849363b62d3272ffc915c546ed359e757c2d6d3e.yaml","level":"warn","message":"Missing CAS file detected - stale index entry","note":"CAS index entry exists but hash file is missing - recovery needed","object_id":"BLI-1784969955962654000-dc689643","object_kind":"backlog_item","timestamp":"2026-09-05T00:41:19Z"}
+{"error":"Missing CAS file detected: stale index entry for object BLI-1784969955962654000-dc689643 (CAS index entry exists but hash file is missing - recovery needed)","file_path":"/Users/lanceettl/zqk-restore-clone/docs/process/backlog/9f9829a8fa0c5f5034074e69849363b62d3272ffc915c546ed359e757c2d6d3e.yaml","level":"error","message":"Validation failed","object_id":"BLI-1784969955962654000-dc689643","object_kind":"backlog_item","timestamp":"2026-09-05T00:41:19Z"}
+{"file_path":"/Users/lanceettl/zqk-restore-clone/docs/process/backlog/b184a082657e794a7ce18227911eadb60cffdbb8ef1766735e3d5c852dd1d11f.yaml","level":"warn","message":"Missing CAS file detected - stale index entry","note":"CAS index entry exists but hash file is missing - recovery needed","object_id":"BLI-CEF-R28-REMEASURE-001","object_kind":"backlog_item","timestamp":"2026-09-05T00:41:19Z"}
+{"error":"Missing CAS file detected: stale index entry for object BLI-CEF-R28-REMEASURE-001 (CAS index entry exists but hash file is missing - recovery needed)","file_path":"/Users/lanceettl/zqk-restore-clone/docs/process/backlog/b184a082657e794a7ce18227911eadb60cffdbb8ef1766735e3d5c852dd1d11f.yaml","level":"error","message":"Validation failed","object_id":"BLI-CEF-R28-REMEASURE-001","object_kind":"backlog_item","timestamp":"2026-09-05T00:41:19Z"}
+{"file_path":"/Users/lanceettl/zqk-restore-clone/docs/process/backlog/1c2fef4238d7d8b4912dc7b3bb702331281bddf84f2723b525fb687835cfe4e7.yaml","level":"warn","message":"Missing CAS file detected - stale index entry","note":"CAS index entry exists but hash file is missing - recovery needed","object_id":"BLI-CEF-R28-OBJECTIFY-RESIDUALS-001","object_kind":"backlog_item","timestamp":"2026-09-05T00:41:19Z"}
+{"error":"Missing CAS file detected: stale index entry for object BLI-CEF-R28-OBJECTIFY-RESIDUALS-001 (CAS index entry exists but hash file is missing - recovery needed)","file_path":"/Users/lanceettl/zqk-restore-clone/docs/process/backlog/1c2fef4238d7d8b4912dc7b3bb702331281bddf84f2723b525fb687835cfe4e7.yaml","level":"error","message":"Validation failed","object_id":"BLI-CEF-R28-OBJECTIFY-RESIDUALS-001","object_kind":"backlog_item","timestamp":"2026-09-05T00:41:19Z"}
+{"file_path":"/Users/lanceettl/zqk-restore-clone/docs/process/backlog/f11a703ba42dfd05a23e6ab8298283f9d060d4362c0051f1f98b2ee662cb2d0b.yaml","level":"warn","message":"Missing CAS file detected - stale index entry","note":"CAS index entry exists but hash file is missing - recovery needed","object_id":"BLI-CVS-EVAL-SURFACE-ADAPTER-001","object_kind":"backlog_item","timestamp":"2026-09-05T00:41:19Z"}
+{"error":"Missing CAS file detected: stale index entry for object BLI-CVS-EVAL-SURFACE-ADAPTER-001 (CAS index entry exists but hash file is missing - recovery needed)","file_path":"/Users/lanceettl/zqk-restore-clone/docs/process/backlog/f11a703ba42dfd05a23e6ab8298283f9d060d4362c0051f1f98b2ee662cb2d0b.yaml","level":"error","message":"Validation failed","object_id":"BLI-CVS-EVAL-SURFACE-ADAPTER-001","object_kind":"backlog_item","timestamp":"2026-09-05T00:41:19Z"}
+{"file_path":"/Users/lanceettl/zqk-restore-clone/docs/process/backlog/7cae4f6b409ae7650023ed8d0d135b0a42b690d3a06acd8eabf25b50ad8b6ce6.yaml","level":"warn","message":"Missing CAS file detected - stale index entry","note":"CAS index entry exists but hash file is missing - recovery needed","object_id":"BLI-CEF-R28-SEC-STUB-AUTH-001","object_kind":"backlog_item","timestamp":"2026-09-05T00:41:20Z"}
+{"error":"Missing CAS file detected: stale index entry for object BLI-CEF-R28-SEC-STUB-AUTH-001 (CAS index entry exists but hash file is missing - recovery needed)","file_path":"/Users/lanceettl/zqk-restore-clone/docs/process/backlog/7cae4f6b409ae7650023ed8d0d135b0a42b690d3a06acd8eabf25b50ad8b6ce6.yaml","level":"error","message":"Validation failed","object_id":"BLI-CEF-R28-SEC-STUB-AUTH-001","object_kind":"backlog_item","timestamp":"2026-09-05T00:41:20Z"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":0,"message":"Async validator started","semaphore_capacity":4,"timestamp":"2026-09-05T00:45:00Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-05T00:45:11Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-05T00:47:42Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-05T00:50:03Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-05T00:55:06Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":0,"message":"Async validator started","semaphore_capacity":4,"timestamp":"2026-09-05T01:00:00Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"active_workers":0,"level":"info","message":"Stopping async validator","queue_size":71,"timestamp":"2026-09-05T01:00:00Z","worker_stop_timeout":"1m0s"}
+{"level":"info","message":"All workers stopped","timestamp":"2026-09-05T01:00:00Z"}
+{"active_goroutines":0,"level":"info","message":"Async validator stopped","timestamp":"2026-09-05T01:00:00Z"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-05T01:00:06Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-05T01:00:10Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-05T01:05:03Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":0,"message":"Async validator started","semaphore_capacity":4,"timestamp":"2026-09-05T01:10:00Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":0,"message":"Async validator started","semaphore_capacity":4,"timestamp":"2026-09-05T01:10:00Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"active_workers":0,"level":"info","message":"Stopping async validator","queue_size":71,"timestamp":"2026-09-05T01:10:00Z","worker_stop_timeout":"1m0s"}
+{"level":"info","message":"All workers stopped","timestamp":"2026-09-05T01:10:00Z"}
+{"active_goroutines":0,"level":"info","message":"Async validator stopped","timestamp":"2026-09-05T01:10:00Z"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-05T01:10:08Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-05T01:15:07Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":0,"message":"Async validator started","semaphore_capacity":4,"timestamp":"2026-09-05T01:20:00Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"active_workers":0,"level":"info","message":"Stopping async validator","queue_size":71,"timestamp":"2026-09-05T01:20:00Z","worker_stop_timeout":"1m0s"}
+{"level":"info","message":"All workers stopped","timestamp":"2026-09-05T01:20:00Z"}
+{"active_goroutines":0,"level":"info","message":"Async validator stopped","timestamp":"2026-09-05T01:20:00Z"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":0,"message":"Async validator started","semaphore_capacity":4,"timestamp":"2026-09-05T01:20:03Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"active_workers":0,"level":"info","message":"Stopping async validator","queue_size":71,"timestamp":"2026-09-05T01:20:03Z","worker_stop_timeout":"1m0s"}
+{"level":"info","message":"All workers stopped","timestamp":"2026-09-05T01:20:03Z"}
+{"active_goroutines":0,"level":"info","message":"Async validator stopped","timestamp":"2026-09-05T01:20:03Z"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-05T01:20:05Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-05T01:25:06Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":0,"message":"Async validator started","semaphore_capacity":4,"timestamp":"2026-09-05T01:30:00Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":0,"message":"Async validator started","semaphore_capacity":4,"timestamp":"2026-09-05T01:30:02Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-05T01:30:09Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":2,"active_workers":1,"level":"info","message":"Stopping async validator","queue_size":0,"timestamp":"2026-09-05T01:30:10Z","worker_stop_timeout":"1m0s"}
+{"level":"info","message":"All workers stopped","timestamp":"2026-09-05T01:30:10Z"}
+{"active_goroutines":1,"level":"info","message":"Async validator stopped","timestamp":"2026-09-05T01:30:10Z"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-05T01:35:04Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-05T01:40:07Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":2,"active_workers":1,"level":"info","message":"Stopping async validator","queue_size":0,"timestamp":"2026-09-05T01:40:08Z","worker_stop_timeout":"1m0s"}
+{"level":"info","message":"All workers stopped","timestamp":"2026-09-05T01:40:08Z"}
+{"active_goroutines":1,"level":"info","message":"Async validator stopped","timestamp":"2026-09-05T01:40:08Z"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-05T01:45:07Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-05T01:50:08Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-05T01:55:07Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":17,"active_workers":16,"level":"info","message":"Stopping async validator","queue_size":0,"timestamp":"2026-09-05T01:55:14Z","worker_stop_timeout":"1m0s"}
+{"level":"info","message":"All workers stopped","timestamp":"2026-09-05T01:55:14Z"}
+{"active_goroutines":1,"level":"info","message":"Async validator stopped","timestamp":"2026-09-05T01:55:14Z"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":0,"message":"Async validator started","semaphore_capacity":4,"timestamp":"2026-09-05T02:00:01Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"active_workers":0,"level":"info","message":"Stopping async validator","queue_size":71,"timestamp":"2026-09-05T02:00:01Z","worker_stop_timeout":"1m0s"}
+{"level":"info","message":"All workers stopped","timestamp":"2026-09-05T02:00:01Z"}
+{"active_goroutines":0,"level":"info","message":"Async validator stopped","timestamp":"2026-09-05T02:00:01Z"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":0,"message":"Async validator started","semaphore_capacity":4,"timestamp":"2026-09-05T02:00:01Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"active_workers":0,"level":"info","message":"Stopping async validator","queue_size":71,"timestamp":"2026-09-05T02:00:01Z","worker_stop_timeout":"1m0s"}
+{"level":"info","message":"All workers stopped","timestamp":"2026-09-05T02:00:01Z"}
+{"active_goroutines":0,"level":"info","message":"Async validator stopped","timestamp":"2026-09-05T02:00:01Z"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-05T02:00:05Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-05T02:00:11Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-05T02:00:19Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-05T02:05:03Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":17,"active_workers":16,"level":"info","message":"Stopping async validator","queue_size":0,"timestamp":"2026-09-05T02:05:12Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-05T02:10:08Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-05T02:15:03Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-05T02:20:05Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-05T02:25:06Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":0,"message":"Async validator started","semaphore_capacity":4,"timestamp":"2026-09-05T02:30:00Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"active_workers":0,"level":"info","message":"Stopping async validator","queue_size":8950,"timestamp":"2026-09-05T02:30:00Z","worker_stop_timeout":"1m0s"}
+{"level":"info","message":"All workers stopped","timestamp":"2026-09-05T02:30:00Z"}
+{"active_goroutines":0,"level":"info","message":"Async validator stopped","timestamp":"2026-09-05T02:30:00Z"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-05T02:30:09Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":0,"message":"Async validator started","semaphore_capacity":4,"timestamp":"2026-09-05T02:35:01Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"active_workers":0,"level":"info","message":"Stopping async validator","queue_size":71,"timestamp":"2026-09-05T02:35:01Z","worker_stop_timeout":"1m0s"}
+{"level":"info","message":"All workers stopped","timestamp":"2026-09-05T02:35:01Z"}
+{"active_goroutines":0,"level":"info","message":"Async validator stopped","timestamp":"2026-09-05T02:35:01Z"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-05T02:35:03Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":0,"message":"Async validator started","semaphore_capacity":4,"timestamp":"2026-09-05T02:40:00Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"active_workers":0,"level":"info","message":"Stopping async validator","queue_size":71,"timestamp":"2026-09-05T02:40:00Z","worker_stop_timeout":"1m0s"}
+{"level":"info","message":"All workers stopped","timestamp":"2026-09-05T02:40:00Z"}
+{"active_goroutines":0,"level":"info","message":"Async validator stopped","timestamp":"2026-09-05T02:40:00Z"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-05T02:40:07Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":2,"active_workers":1,"level":"info","message":"Stopping async validator","queue_size":0,"timestamp":"2026-09-05T02:40:09Z","worker_stop_timeout":"1m0s"}
+{"level":"info","message":"All workers stopped","timestamp":"2026-09-05T02:40:09Z"}
+{"active_goroutines":1,"level":"info","message":"Async validator stopped","timestamp":"2026-09-05T02:40:09Z"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":0,"message":"Async validator started","semaphore_capacity":4,"timestamp":"2026-09-05T02:45:00Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-05T02:45:12Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-05T02:50:04Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-05T02:55:06Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-05T03:00:08Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-05T03:00:17Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-05T03:05:03Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":17,"active_workers":16,"level":"info","message":"Stopping async validator","queue_size":0,"timestamp":"2026-09-05T03:05:11Z","worker_stop_timeout":"1m0s"}
+{"level":"info","message":"All workers stopped","timestamp":"2026-09-05T03:05:11Z"}
+{"active_goroutines":1,"level":"info","message":"Async validator stopped","timestamp":"2026-09-05T03:05:11Z"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-05T03:08:53Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-05T03:09:32Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":0,"message":"Async validator started","semaphore_capacity":4,"timestamp":"2026-09-05T03:10:00Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"active_workers":0,"level":"info","message":"Stopping async validator","queue_size":8950,"timestamp":"2026-09-05T03:10:00Z","worker_stop_timeout":"1m0s"}
+{"level":"info","message":"All workers stopped","timestamp":"2026-09-05T03:10:00Z"}
+{"active_goroutines":0,"level":"info","message":"Async validator stopped","timestamp":"2026-09-05T03:10:00Z"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-05T03:10:04Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-05T03:10:49Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-05T03:15:14Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":17,"active_workers":16,"level":"info","message":"Stopping async validator","queue_size":0,"timestamp":"2026-09-05T03:15:22Z","worker_stop_timeout":"1m0s"}
+{"level":"info","message":"All workers stopped","timestamp":"2026-09-05T03:15:22Z"}
+{"active_goroutines":1,"level":"info","message":"Async validator stopped","timestamp":"2026-09-05T03:15:22Z"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-05T03:19:05Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":0,"message":"Async validator started","semaphore_capacity":4,"timestamp":"2026-09-05T03:20:03Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"active_workers":0,"level":"info","message":"Stopping async validator","queue_size":8952,"timestamp":"2026-09-05T03:20:03Z","worker_stop_timeout":"1m0s"}
+{"level":"info","message":"All workers stopped","timestamp":"2026-09-05T03:20:03Z"}
+{"active_goroutines":0,"level":"info","message":"Async validator stopped","timestamp":"2026-09-05T03:20:03Z"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-05T03:20:13Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-05T03:20:49Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-05T03:24:55Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":0,"message":"Async validator started","semaphore_capacity":4,"timestamp":"2026-09-05T03:25:00Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"active_workers":0,"level":"info","message":"Stopping async validator","queue_size":8953,"timestamp":"2026-09-05T03:25:00Z","worker_stop_timeout":"1m0s"}
+{"level":"info","message":"All workers stopped","timestamp":"2026-09-05T03:25:00Z"}
+{"active_goroutines":0,"level":"info","message":"Async validator stopped","timestamp":"2026-09-05T03:25:00Z"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-05T03:25:06Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-05T03:25:10Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-05T03:25:13Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-05T03:25:28Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-05T03:26:00Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-05T03:26:23Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-05T03:27:34Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-05T03:27:58Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-05T03:28:05Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-05T03:28:33Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-05T03:28:48Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-05T03:29:16Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":0,"message":"Async validator started","semaphore_capacity":4,"timestamp":"2026-09-05T03:30:02Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"active_workers":0,"level":"info","message":"Stopping async validator","queue_size":8959,"timestamp":"2026-09-05T03:30:03Z","worker_stop_timeout":"1m0s"}
+{"level":"info","message":"All workers stopped","timestamp":"2026-09-05T03:30:03Z"}
+{"active_goroutines":0,"level":"info","message":"Async validator stopped","timestamp":"2026-09-05T03:30:03Z"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-05T03:30:20Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-05T03:32:48Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":0,"message":"Async validator started","semaphore_capacity":4,"timestamp":"2026-09-05T03:35:03Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"active_workers":0,"level":"info","message":"Stopping async validator","queue_size":8959,"timestamp":"2026-09-05T03:35:03Z","worker_stop_timeout":"1m0s"}
+{"level":"info","message":"All workers stopped","timestamp":"2026-09-05T03:35:03Z"}
+{"active_goroutines":0,"level":"info","message":"Async validator stopped","timestamp":"2026-09-05T03:35:03Z"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-05T03:35:07Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-05T03:36:07Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-05T03:36:45Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":2,"active_workers":1,"level":"info","message":"Stopping async validator","queue_size":0,"timestamp":"2026-09-05T03:36:47Z","worker_stop_timeout":"1m0s"}
+{"level":"info","message":"All workers stopped","timestamp":"2026-09-05T03:36:47Z"}
+{"active_goroutines":1,"level":"info","message":"Async validator stopped","timestamp":"2026-09-05T03:36:47Z"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-05T03:37:04Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-05T03:37:21Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":2,"active_workers":1,"level":"info","message":"Stopping async validator","queue_size":0,"timestamp":"2026-09-05T03:37:27Z","worker_stop_timeout":"1m0s"}
+{"level":"info","message":"All workers stopped","timestamp":"2026-09-05T03:37:27Z"}
+{"active_goroutines":1,"level":"info","message":"Async validator stopped","timestamp":"2026-09-05T03:37:27Z"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":0,"message":"Async validator started","semaphore_capacity":4,"timestamp":"2026-09-05T03:40:00Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"active_workers":0,"level":"info","message":"Stopping async validator","queue_size":8966,"timestamp":"2026-09-05T03:40:00Z","worker_stop_timeout":"1m0s"}
+{"level":"info","message":"All workers stopped","timestamp":"2026-09-05T03:40:00Z"}
+{"active_goroutines":0,"level":"info","message":"Async validator stopped","timestamp":"2026-09-05T03:40:00Z"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":0,"message":"Async validator started","semaphore_capacity":4,"timestamp":"2026-09-05T03:40:00Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"active_workers":0,"level":"info","message":"Stopping async validator","queue_size":8966,"timestamp":"2026-09-05T03:40:00Z","worker_stop_timeout":"1m0s"}
+{"level":"info","message":"All workers stopped","timestamp":"2026-09-05T03:40:00Z"}
+{"active_goroutines":0,"level":"info","message":"Async validator stopped","timestamp":"2026-09-05T03:40:00Z"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-05T03:40:11Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-05T03:42:30Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":0,"message":"Async validator started","semaphore_capacity":4,"timestamp":"2026-09-05T03:45:04Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"active_workers":0,"level":"info","message":"Stopping async validator","queue_size":8966,"timestamp":"2026-09-05T03:45:04Z","worker_stop_timeout":"1m0s"}
+{"level":"info","message":"All workers stopped","timestamp":"2026-09-05T03:45:04Z"}
+{"active_goroutines":0,"level":"info","message":"Async validator stopped","timestamp":"2026-09-05T03:45:04Z"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":0,"message":"Async validator started","semaphore_capacity":4,"timestamp":"2026-09-05T03:45:16Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"active_workers":0,"level":"info","message":"Stopping async validator","queue_size":8966,"timestamp":"2026-09-05T03:45:16Z","worker_stop_timeout":"1m0s"}
+{"level":"info","message":"All workers stopped","timestamp":"2026-09-05T03:45:16Z"}
+{"active_goroutines":0,"level":"info","message":"Async validator stopped","timestamp":"2026-09-05T03:45:16Z"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-05T03:45:31Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-05T03:45:32Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-05T03:46:26Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-05T03:48:08Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-05T03:48:49Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":0,"message":"Async validator started","semaphore_capacity":4,"timestamp":"2026-09-05T03:50:00Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":0,"message":"Async validator started","semaphore_capacity":4,"timestamp":"2026-09-05T03:50:07Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"active_workers":0,"level":"info","message":"Stopping async validator","queue_size":8966,"timestamp":"2026-09-05T03:50:07Z","worker_stop_timeout":"1m0s"}
+{"level":"info","message":"All workers stopped","timestamp":"2026-09-05T03:50:07Z"}
+{"active_goroutines":0,"level":"info","message":"Async validator stopped","timestamp":"2026-09-05T03:50:07Z"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-05T03:50:15Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-05T03:52:16Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-05T03:52:41Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-05T03:54:21Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":0,"message":"Async validator started","semaphore_capacity":4,"timestamp":"2026-09-05T03:55:03Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"active_workers":0,"level":"info","message":"Stopping async validator","queue_size":8968,"timestamp":"2026-09-05T03:55:03Z","worker_stop_timeout":"1m0s"}
+{"level":"info","message":"All workers stopped","timestamp":"2026-09-05T03:55:03Z"}
+{"active_goroutines":0,"level":"info","message":"Async validator stopped","timestamp":"2026-09-05T03:55:03Z"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-05T03:55:09Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-05T03:55:14Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":2,"active_workers":1,"level":"info","message":"Stopping async validator","queue_size":0,"timestamp":"2026-09-05T03:55:15Z","worker_stop_timeout":"1m0s"}
+{"level":"info","message":"All workers stopped","timestamp":"2026-09-05T03:55:15Z"}
+{"active_goroutines":1,"level":"info","message":"Async validator stopped","timestamp":"2026-09-05T03:55:15Z"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-05T03:56:17Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":0,"message":"Async validator started","semaphore_capacity":4,"timestamp":"2026-09-05T04:00:01Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"active_workers":0,"level":"info","message":"Stopping async validator","queue_size":8969,"timestamp":"2026-09-05T04:00:01Z","worker_stop_timeout":"1m0s"}
+{"level":"info","message":"All workers stopped","timestamp":"2026-09-05T04:00:01Z"}
+{"active_goroutines":0,"level":"info","message":"Async validator stopped","timestamp":"2026-09-05T04:00:01Z"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":0,"message":"Async validator started","semaphore_capacity":4,"timestamp":"2026-09-05T04:00:03Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"active_workers":0,"level":"info","message":"Stopping async validator","queue_size":8969,"timestamp":"2026-09-05T04:00:03Z","worker_stop_timeout":"1m0s"}
+{"level":"info","message":"All workers stopped","timestamp":"2026-09-05T04:00:03Z"}
+{"active_goroutines":0,"level":"info","message":"Async validator stopped","timestamp":"2026-09-05T04:00:03Z"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-05T04:00:15Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":2,"active_workers":1,"level":"info","message":"Stopping async validator","queue_size":0,"timestamp":"2026-09-05T04:00:16Z","worker_stop_timeout":"1m0s"}
+{"level":"info","message":"All workers stopped","timestamp":"2026-09-05T04:00:16Z"}
+{"active_goroutines":1,"level":"info","message":"Async validator stopped","timestamp":"2026-09-05T04:00:16Z"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-05T04:00:17Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-05T04:00:27Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-05T04:04:45Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-05T04:05:09Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":0,"message":"Async validator started","semaphore_capacity":4,"timestamp":"2026-09-05T04:10:00Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"active_workers":0,"level":"info","message":"Stopping async validator","queue_size":8970,"timestamp":"2026-09-05T04:10:00Z","worker_stop_timeout":"1m0s"}
+{"level":"info","message":"All workers stopped","timestamp":"2026-09-05T04:10:00Z"}
+{"active_goroutines":0,"level":"info","message":"Async validator stopped","timestamp":"2026-09-05T04:10:00Z"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-05T04:10:09Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-05T04:13:27Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":0,"message":"Async validator started","semaphore_capacity":4,"timestamp":"2026-09-05T04:15:04Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"active_workers":0,"level":"info","message":"Stopping async validator","queue_size":8971,"timestamp":"2026-09-05T04:15:04Z","worker_stop_timeout":"1m0s"}
+{"level":"info","message":"All workers stopped","timestamp":"2026-09-05T04:15:04Z"}
+{"active_goroutines":0,"level":"info","message":"Async validator stopped","timestamp":"2026-09-05T04:15:04Z"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-05T04:15:10Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-05T04:15:24Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-05T04:20:11Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-05T04:25:04Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":17,"active_workers":16,"level":"info","message":"Stopping async validator","queue_size":0,"timestamp":"2026-09-05T04:25:20Z","worker_stop_timeout":"1m0s"}
+{"level":"info","message":"All workers stopped","timestamp":"2026-09-05T04:25:20Z"}
+{"active_goroutines":1,"level":"info","message":"Async validator stopped","timestamp":"2026-09-05T04:25:20Z"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":0,"message":"Async validator started","semaphore_capacity":4,"timestamp":"2026-09-05T04:30:00Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"active_workers":0,"level":"info","message":"Stopping async validator","queue_size":8972,"timestamp":"2026-09-05T04:30:00Z","worker_stop_timeout":"1m0s"}
+{"level":"info","message":"All workers stopped","timestamp":"2026-09-05T04:30:00Z"}
+{"active_goroutines":0,"level":"info","message":"Async validator stopped","timestamp":"2026-09-05T04:30:00Z"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-05T04:30:08Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-05T04:35:04Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-05T04:40:06Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-05T04:42:01Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-05T04:45:48Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":0,"message":"Async validator started","semaphore_capacity":4,"timestamp":"2026-09-05T05:00:00Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"active_workers":0,"level":"info","message":"Stopping async validator","queue_size":8974,"timestamp":"2026-09-05T05:00:00Z","worker_stop_timeout":"1m0s"}
+{"level":"info","message":"All workers stopped","timestamp":"2026-09-05T05:00:00Z"}
+{"active_goroutines":0,"level":"info","message":"Async validator stopped","timestamp":"2026-09-05T05:00:00Z"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-05T05:08:26Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-05T05:08:50Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-05T05:09:01Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":0,"message":"Async validator started","semaphore_capacity":4,"timestamp":"2026-09-05T05:10:00Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"active_workers":0,"level":"info","message":"Stopping async validator","queue_size":8974,"timestamp":"2026-09-05T05:10:00Z","worker_stop_timeout":"1m0s"}
+{"level":"info","message":"All workers stopped","timestamp":"2026-09-05T05:10:00Z"}
+{"active_goroutines":0,"level":"info","message":"Async validator stopped","timestamp":"2026-09-05T05:10:00Z"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-05T05:22:10Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-05T05:24:50Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-05T05:25:08Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-05T05:25:16Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-05T05:25:40Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-05T05:32:04Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-05T05:47:20Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-05T05:51:44Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-05T05:52:16Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":0,"cache_save_timeout":"20s","level":"info","max_workers":16,"message":"Async validator started","semaphore_capacity":16,"timestamp":"2026-09-05T06:50:23Z","worker_stop_timeout":"1m0s"}
+{"active_goroutines":17,"active_workers":16,"level":"info","message":"Stopping async validator","queue_size":0,"timestamp":"2026-09-05T06:50:25Z","worker_stop_timeout":"1m0s"}
+{"level":"info","message":"All workers stopped","timestamp":"2026-09-05T06:50:25Z"}
+{"active_goroutines":1,"level":"info","message":"Async validator stopped","timestamp":"2026-09-05T06:50:25Z"}

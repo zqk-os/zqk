@@ -1,0 +1,32 @@
+assignee_persona_ref: PER-ORCH-ALPHA
+backlog_item_ref: BLI-CEF-R27-DUAL-SEAT-REMEASURE-001
+branch_ref: integration/pri-cef-r27-envelope-001
+created_at: "2026-09-04T00:18:00Z"
+created_by: ACC-1785920548450214006-2e52b3e7
+description: |
+    pipeline_ref=PIP-CEF-DIAMOND-REMEASURE-001 stage=W1_arch_specialist
+    PRIOR: S00 skeleton + S01 preflight under docs/quality/cef-runs/2026-09-03-AGENT_AC. ONLY L-ARCHITECTURE specialist (~2 interactions).
+    READ FIRST:
+    - docs/quality/codebase_evaluation/rubrics/L-ARCHITECTURE.md
+    - docs/quality/codebase_evaluation/prompts/L-ARCHITECTURE/specialist.md
+    - docs/quality/codebase_evaluation/schemas/finding.schema.json
+    - docs/quality/cef-runs/2026-09-03-AGENT_AC/run_scope.yaml
+    STEPS:
+    1) Overwrite docs/quality/cef-runs/2026-09-03-AGENT_AC/findings/L-ARCHITECTURE.jsonl with real findings (delete STUB). Schema-valid.
+    2) Cite concrete paths; prefer E2+. Density per WAVE_PLAN Wave 1.
+    3) Append <=5 lines to docs/quality/cef-runs/2026-09-03-AGENT_AC/run_log.md.
+    4) Feed ack as antigravity-1: finding_count + top finding_ids + success_gate met.
+    SUCCESS_GATE: findings/L-ARCHITECTURE.jsonl has >=1 real finding_id (not F-STUB-000); no REPLACE_ME in that file.
+    FORBID: app source edits; process mint; dual-seat GPA; sibling package; scorecard grades.
+id: ATK-1788480982679170000-dbcf39aa
+kind: agent_task
+namespace_id: zqk:kernel
+pipeline_ref: PIP-CEF-DIAMOND-REMEASURE-001
+priority_plan_ref: PRI-CEF-R27-ENVELOPE-001
+schema_version: 2.0.0
+started_at: "2026-09-04T00:16:28Z"
+status: archived
+title: CEF AGENT_AC W1_arch_specialist — L-ARCHITECTURE
+updated_at: "2026-09-04T03:57:05Z"
+updated_by: ACC-1785920548450214006-2e52b3e7
+version_context: default

@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-223",
+  "created_at": "2026-09-04T21:34:29.608806Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-223",
+    "Tests": [
+      {
+        "Name": "TestResolveSession_EnvOverridesStateFile",
+        "Package": "workflow",
+        "PackagePath": "cmd/zqk/workflow",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/workflow/next_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestResolveSession_StateFileFallback",
+        "Package": "workflow",
+        "PackagePath": "cmd/zqk/workflow",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/workflow/next_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestSelectPolicyInterrupt_ReturnsLatestUnackedCritical",
+        "Package": "workflow",
+        "PackagePath": "cmd/zqk/workflow",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/workflow/next_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestResolvePriorityPlan",
+        "Package": "workflow",
+        "PackagePath": "cmd/zqk/workflow",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/workflow/tree_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestTreeResolver_Resolve",
+        "Package": "workflow",
+        "PackagePath": "cmd/zqk/workflow",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/workflow/tree_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestBuildWhatsNextCorrespondence_requiresAgentID",
+        "Package": "workflow",
+        "PackagePath": "cmd/zqk/workflow",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/workflow/whats_next_correspondence_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestBuildWhatsNextCorrespondence_withActiveTask",
+        "Package": "workflow",
+        "PackagePath": "cmd/zqk/workflow",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/workflow/whats_next_correspondence_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestCompileWhatsNextDrive_emptyColumnIsStratplan",
+        "Package": "workflow",
+        "PackagePath": "cmd/zqk/workflow",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/workflow/whats_next_drive_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestCompileWhatsNextDrive_executingColumnIsStratplanWithAmbient",
+        "Package": "workflow",
+        "PackagePath": "cmd/zqk/workflow",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/workflow/whats_next_drive_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestCompileWhatsNextDrive_shapedNextHourglassesLead",
+        "Package": "workflow",
+        "PackagePath": "cmd/zqk/workflow",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/workflow/whats_next_drive_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 300000000000,
+    "PackagePath": "cmd/zqk/workflow"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestResolveSession_EnvOverridesStateFile",
+      "Package": "workflow",
+      "PackagePath": "cmd/zqk/workflow",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/workflow/next_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestResolveSession_StateFileFallback",
+      "Package": "workflow",
+      "PackagePath": "cmd/zqk/workflow",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/workflow/next_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestSelectPolicyInterrupt_ReturnsLatestUnackedCritical",
+      "Package": "workflow",
+      "PackagePath": "cmd/zqk/workflow",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/workflow/next_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestResolvePriorityPlan",
+      "Package": "workflow",
+      "PackagePath": "cmd/zqk/workflow",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/workflow/tree_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestTreeResolver_Resolve",
+      "Package": "workflow",
+      "PackagePath": "cmd/zqk/workflow",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/workflow/tree_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestBuildWhatsNextCorrespondence_requiresAgentID",
+      "Package": "workflow",
+      "PackagePath": "cmd/zqk/workflow",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/workflow/whats_next_correspondence_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestBuildWhatsNextCorrespondence_withActiveTask",
+      "Package": "workflow",
+      "PackagePath": "cmd/zqk/workflow",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/workflow/whats_next_correspondence_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestCompileWhatsNextDrive_emptyColumnIsStratplan",
+      "Package": "workflow",
+      "PackagePath": "cmd/zqk/workflow",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/workflow/whats_next_drive_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestCompileWhatsNextDrive_executingColumnIsStratplanWithAmbient",
+      "Package": "workflow",
+      "PackagePath": "cmd/zqk/workflow",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/workflow/whats_next_drive_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestCompileWhatsNextDrive_shapedNextHourglassesLead",
+      "Package": "workflow",
+      "PackagePath": "cmd/zqk/workflow",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/workflow/whats_next_drive_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

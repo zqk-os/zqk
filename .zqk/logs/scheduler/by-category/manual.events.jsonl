@@ -1,0 +1,2 @@
+{"category":"manual","event_type":"started","job_id":"SCH-1788563425375298000","job_type":"run_wrapper","timestamp":"2026-09-04T23:15:11Z","title":"agent git commit","trigger_type":"immediate"}
+{"category":"manual","duration":"2.157135875s","error":"command failed after 1 attempts: exit status 1","event_type":"failed","job_id":"SCH-1788563425375298000","job_type":"run_wrapper","timestamp":"2026-09-04T23:15:13Z","title":"agent git commit","trigger_type":"immediate"}

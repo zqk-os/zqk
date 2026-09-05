@@ -1,0 +1,32 @@
+
+--- run 2026-09-04T21:43:48Z ---
+=== RUN   TestMaybeWakeOnPlanBacklogError_Wakes
+=== PAUSE TestMaybeWakeOnPlanBacklogError_Wakes
+=== RUN   TestMaybeWakeOnPlanBacklogError_SkipsNonError
+=== PAUSE TestMaybeWakeOnPlanBacklogError_SkipsNonError
+=== RUN   TestWakePrimary_AgentChat
+=== PAUSE TestWakePrimary_AgentChat
+=== RUN   TestWakePrimary_ScriptAdapter
+=== PAUSE TestWakePrimary_ScriptAdapter
+=== RUN   TestWakePrimary_UnknownAdapter
+=== PAUSE TestWakePrimary_UnknownAdapter
+=== RUN   TestAppendAttentivenessContext_IncludesPRIAndTopBLIs
+=== PAUSE TestAppendAttentivenessContext_IncludesPRIAndTopBLIs
+=== RUN   TestComposeWakeMessage_UsesRequestFields
+=== PAUSE TestComposeWakeMessage_UsesRequestFields
+=== CONT  TestMaybeWakeOnPlanBacklogError_Wakes
+=== CONT  TestWakePrimary_UnknownAdapter
+--- PASS: TestMaybeWakeOnPlanBacklogError_Wakes (0.01s)
+=== CONT  TestComposeWakeMessage_UsesRequestFields
+--- PASS: TestComposeWakeMessage_UsesRequestFields (0.00s)
+=== CONT  TestWakePrimary_AgentChat
+--- PASS: TestWakePrimary_UnknownAdapter (0.01s)
+=== CONT  TestWakePrimary_ScriptAdapter
+--- PASS: TestWakePrimary_AgentChat (0.02s)
+=== CONT  TestMaybeWakeOnPlanBacklogError_SkipsNonError
+--- PASS: TestMaybeWakeOnPlanBacklogError_SkipsNonError (0.00s)
+=== CONT  TestAppendAttentivenessContext_IncludesPRIAndTopBLIs
+--- PASS: TestAppendAttentivenessContext_IncludesPRIAndTopBLIs (0.00s)
+--- PASS: TestWakePrimary_ScriptAdapter (0.30s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/primaryorch	0.651s

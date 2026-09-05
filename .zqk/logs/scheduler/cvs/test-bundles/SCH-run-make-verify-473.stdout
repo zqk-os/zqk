@@ -1,0 +1,20 @@
+
+--- run 2026-09-04T22:13:37Z ---
+=== RUN   TestDarwinCGOReadCPUTicks
+=== PAUSE TestDarwinCGOReadCPUTicks
+=== RUN   TestDarwinSensors_Readable
+=== PAUSE TestDarwinSensors_Readable
+=== RUN   TestScale
+=== PAUSE TestScale
+=== RUN   TestSnapshotLevel_IdleAndLoad
+=== PAUSE TestSnapshotLevel_IdleAndLoad
+=== CONT  TestDarwinCGOReadCPUTicks
+=== CONT  TestScale
+--- PASS: TestDarwinCGOReadCPUTicks (0.00s)
+=== CONT  TestDarwinSensors_Readable
+--- PASS: TestScale (0.00s)
+=== CONT  TestSnapshotLevel_IdleAndLoad
+--- PASS: TestSnapshotLevel_IdleAndLoad (0.00s)
+--- PASS: TestDarwinSensors_Readable (0.00s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/hostload	0.366s

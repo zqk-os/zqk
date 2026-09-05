@@ -1,0 +1,50 @@
+
+--- run 2026-09-04T21:44:06Z ---
+=== RUN   TestWorkflowAddCommand
+=== PAUSE TestWorkflowAddCommand
+=== RUN   TestApplyDecision_PolicyInterruptPrecedence
+=== PAUSE TestApplyDecision_PolicyInterruptPrecedence
+=== RUN   TestApplyDecision_ConvergencePrecedenceOverBacklog
+=== PAUSE TestApplyDecision_ConvergencePrecedenceOverBacklog
+=== RUN   TestApplyDecision_BacklogFallback
+=== PAUSE TestApplyDecision_BacklogFallback
+=== RUN   TestTruncateWorkflowText
+=== PAUSE TestTruncateWorkflowText
+=== RUN   TestStringSliceFromAnyField
+=== PAUSE TestStringSliceFromAnyField
+=== RUN   TestPriorityRank
+=== PAUSE TestPriorityRank
+=== RUN   TestPriorityPlanLooksShaped_UsesInheritedTitleAndWorkstream
+=== PAUSE TestPriorityPlanLooksShaped_UsesInheritedTitleAndWorkstream
+=== RUN   TestIsolated_resolveCurrentPlanID_PrefersLowerActiveOrder
+=== PAUSE TestIsolated_resolveCurrentPlanID_PrefersLowerActiveOrder
+=== RUN   TestIsolated_resolveCurrentPlanID_FallbackRecencyWhenNoActiveOrder
+=== PAUSE TestIsolated_resolveCurrentPlanID_FallbackRecencyWhenNoActiveOrder
+=== CONT  TestWorkflowAddCommand
+=== CONT  TestStringSliceFromAnyField
+--- PASS: TestStringSliceFromAnyField (0.00s)
+=== CONT  TestIsolated_resolveCurrentPlanID_FallbackRecencyWhenNoActiveOrder
+--- PASS: TestIsolated_resolveCurrentPlanID_FallbackRecencyWhenNoActiveOrder (0.00s)
+=== CONT  TestPriorityPlanLooksShaped_UsesInheritedTitleAndWorkstream
+--- PASS: TestPriorityPlanLooksShaped_UsesInheritedTitleAndWorkstream (0.00s)
+=== CONT  TestIsolated_resolveCurrentPlanID_PrefersLowerActiveOrder
+--- PASS: TestIsolated_resolveCurrentPlanID_PrefersLowerActiveOrder (0.00s)
+=== CONT  TestPriorityRank
+--- PASS: TestPriorityRank (0.00s)
+=== CONT  TestApplyDecision_BacklogFallback
+--- PASS: TestApplyDecision_BacklogFallback (0.00s)
+=== CONT  TestTruncateWorkflowText
+--- PASS: TestTruncateWorkflowText (0.00s)
+=== CONT  TestApplyDecision_ConvergencePrecedenceOverBacklog
+--- PASS: TestApplyDecision_ConvergencePrecedenceOverBacklog (0.00s)
+=== CONT  TestApplyDecision_PolicyInterruptPrecedence
+--- PASS: TestApplyDecision_PolicyInterruptPrecedence (0.00s)
+=== NAME  TestWorkflowAddCommand
+    add_test.go:44: failed to create goal: object-id-cache handler is required
+--- FAIL: TestWorkflowAddCommand (22.04s)
+FAIL
+FAIL	github.com/lanceman/zqk/cmd/zqk/workflow	23.410s
+FAIL
+
+
+--- run 2026-09-04T21:44:06Z ---

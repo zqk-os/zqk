@@ -1,0 +1,14 @@
+created_at: "2026-08-19T10:30:16Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1787135408847255000-4a2f1cb2
+item_id: BLI-STEWARD-CI-GATE-ENFORCEMENT-001
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 2857702ca28e4b64fb5782140b43c1400e68fdeab30ab0062f4119523ca97d466e5f13c72adcfa41b92eacf21fa7f0a79b8a8e3a8d7c581e5c9afe0e69cb31dc
+schema_version: 2.0.0
+signature: 3044022075f628aa7fb0d24f99b7664f7cc5eed2cde99d3cfaa39b1544f8fa91a4c2f1f102205c5ab15124ca9a4c88b4fee593c0aeec99e2fa446881e8ad95d85b3a269ce124
+status: archived
+title: Automate fail-closed pre-commit and test-bundle verification for gitevidence
+updated_at: "2026-09-01T07:21:42Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

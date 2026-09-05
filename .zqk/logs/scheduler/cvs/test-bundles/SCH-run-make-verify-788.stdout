@@ -1,0 +1,44 @@
+
+--- run 2026-09-04T22:21:58Z ---
+=== RUN   TestSpecCacheUpdateBuffer_IntegrationWithSpecLoader
+=== PAUSE TestSpecCacheUpdateBuffer_IntegrationWithSpecLoader
+=== RUN   TestMergeResolvedOverlayChildWins
+=== PAUSE TestMergeResolvedOverlayChildWins
+=== RUN   TestSpecDependencyGraph_CycleDetection
+=== PAUSE TestSpecDependencyGraph_CycleDetection
+=== RUN   TestSpecDependencyGraph_BuildGraph
+=== PAUSE TestSpecDependencyGraph_BuildGraph
+=== RUN   TestSpecDependencyGraph_DetectCycles
+=== PAUSE TestSpecDependencyGraph_DetectCycles
+=== RUN   TestSpecDependencyGraph_TopologicalSort
+=== PAUSE TestSpecDependencyGraph_TopologicalSort
+=== RUN   TestSpecDependencyGraph_MissingParent
+=== PAUSE TestSpecDependencyGraph_MissingParent
+=== RUN   TestSpecDependencyGraph_ValidateGraph
+=== PAUSE TestSpecDependencyGraph_ValidateGraph
+=== RUN   TestGraphValidationError_LogFields
+=== PAUSE TestGraphValidationError_LogFields
+=== RUN   TestSpecDependencyGraph_SpecCacheRevisionTracking
+=== PAUSE TestSpecDependencyGraph_SpecCacheRevisionTracking
+=== CONT  TestSpecCacheUpdateBuffer_IntegrationWithSpecLoader
+=== CONT  TestSpecDependencyGraph_TopologicalSort
+--- PASS: TestSpecDependencyGraph_TopologicalSort (0.19s)
+=== CONT  TestGraphValidationError_LogFields
+--- PASS: TestGraphValidationError_LogFields (0.00s)
+=== CONT  TestSpecDependencyGraph_SpecCacheRevisionTracking
+--- PASS: TestSpecDependencyGraph_SpecCacheRevisionTracking (0.03s)
+=== CONT  TestSpecDependencyGraph_BuildGraph
+--- PASS: TestSpecDependencyGraph_BuildGraph (0.03s)
+=== CONT  TestSpecDependencyGraph_DetectCycles
+--- PASS: TestSpecDependencyGraph_DetectCycles (0.03s)
+=== CONT  TestSpecDependencyGraph_CycleDetection
+--- PASS: TestSpecDependencyGraph_CycleDetection (0.01s)
+=== CONT  TestMergeResolvedOverlayChildWins
+--- PASS: TestMergeResolvedOverlayChildWins (0.00s)
+=== CONT  TestSpecDependencyGraph_ValidateGraph
+--- PASS: TestSpecCacheUpdateBuffer_IntegrationWithSpecLoader (0.30s)
+=== CONT  TestSpecDependencyGraph_MissingParent
+--- PASS: TestSpecDependencyGraph_ValidateGraph (0.04s)
+--- PASS: TestSpecDependencyGraph_MissingParent (0.04s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/objects	1.068s

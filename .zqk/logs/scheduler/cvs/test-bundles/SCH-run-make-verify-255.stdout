@@ -1,0 +1,44 @@
+
+--- run 2026-09-04T21:46:31Z ---
+=== RUN   TestLifecycleBuilder_InvalidFieldTypes
+=== PAUSE TestLifecycleBuilder_InvalidFieldTypes
+=== RUN   TestLifecycleBuilder_EmptyStatuses
+=== PAUSE TestLifecycleBuilder_EmptyStatuses
+=== RUN   TestLifecycleBuilder_InvalidSourceTypeEnum
+=== PAUSE TestLifecycleBuilder_InvalidSourceTypeEnum
+=== RUN   TestLifecycleBuilder_ObjectTypePattern
+=== PAUSE TestLifecycleBuilder_ObjectTypePattern
+=== RUN   TestLifecycleBuilder_ExtendsOptional
+=== PAUSE TestLifecycleBuilder_ExtendsOptional
+=== RUN   TestLifecycleBuilder_TransitionsOptional
+=== PAUSE TestLifecycleBuilder_TransitionsOptional
+=== RUN   TestLifecycleBuilder_MultipleBuilds
+=== PAUSE TestLifecycleBuilder_MultipleBuilds
+=== RUN   TestLifecycleBuilder_GetVersionConsistency
+=== PAUSE TestLifecycleBuilder_GetVersionConsistency
+=== RUN   TestLifecycleBuilder_GetOntologyConsistency
+=== PAUSE TestLifecycleBuilder_GetOntologyConsistency
+=== RUN   TestLifecycleBuilder_RegistryConsistency
+=== PAUSE TestLifecycleBuilder_RegistryConsistency
+=== CONT  TestLifecycleBuilder_InvalidFieldTypes
+=== CONT  TestLifecycleBuilder_TransitionsOptional
+--- PASS: TestLifecycleBuilder_InvalidFieldTypes (0.00s)
+=== CONT  TestLifecycleBuilder_ObjectTypePattern
+--- PASS: TestLifecycleBuilder_TransitionsOptional (0.00s)
+--- PASS: TestLifecycleBuilder_ObjectTypePattern (0.00s)
+=== CONT  TestLifecycleBuilder_ExtendsOptional
+--- PASS: TestLifecycleBuilder_ExtendsOptional (0.00s)
+=== CONT  TestLifecycleBuilder_GetOntologyConsistency
+--- PASS: TestLifecycleBuilder_GetOntologyConsistency (0.00s)
+=== CONT  TestLifecycleBuilder_EmptyStatuses
+--- PASS: TestLifecycleBuilder_EmptyStatuses (0.00s)
+=== CONT  TestLifecycleBuilder_InvalidSourceTypeEnum
+--- PASS: TestLifecycleBuilder_InvalidSourceTypeEnum (0.00s)
+=== CONT  TestLifecycleBuilder_RegistryConsistency
+--- PASS: TestLifecycleBuilder_RegistryConsistency (0.00s)
+=== CONT  TestLifecycleBuilder_MultipleBuilds
+=== CONT  TestLifecycleBuilder_GetVersionConsistency
+--- PASS: TestLifecycleBuilder_MultipleBuilds (0.00s)
+--- PASS: TestLifecycleBuilder_GetVersionConsistency (0.00s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/specbuilder/bldr_v2	0.379s

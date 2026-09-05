@@ -1,0 +1,14 @@
+created_at: "2026-08-19T00:28:37Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1787099317041045000-b24ee49f
+item_id: BLI-CEF-R2-CON-OPQUEUE
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 2857702ca28e4b64fb5782140b43c1400e68fdeab30ab0062f4119523ca97d466e5f13c72adcfa41b92eacf21fa7f0a79b8a8e3a8d7c581e5c9afe0e69cb31dc
+schema_version: 2.0.0
+signature: 3045022100b07b848d38c7805b0efa9d2d7c5325ac93caf03148efae9b7ce7cae14539bf1402204217896a2d9512479e3a5aed56bbe72241b4d3cfebc874a29f010f018afbbf87
+status: archived
+title: OperationQueue wake callbacks must be bounded and ctx-aware
+updated_at: "2026-09-01T06:54:24Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

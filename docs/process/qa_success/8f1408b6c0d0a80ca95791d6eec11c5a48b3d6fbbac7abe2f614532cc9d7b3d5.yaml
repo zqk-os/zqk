@@ -1,0 +1,14 @@
+created_at: "2026-08-17T23:58:04Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1787011081778297000-6bfe7b5e
+item_id: PRI-CAS-MEMBRANE-ENFORCE-001
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 2857702ca28e4b64fb5782140b43c1400e68fdeab30ab0062f4119523ca97d466e5f13c72adcfa41b92eacf21fa7f0a79b8a8e3a8d7c581e5c9afe0e69cb31dc
+schema_version: 2.0.0
+signature: 3045022057ff15e6b585b0ffbb4059e7780219052a1720d21d3094041b57828e8052dfb30221009128aa2d3bedc09651a9f6b0b23c01fe531be30274298ce1448c679e9280b03d
+status: archived
+title: CAS membrane enforce — PrivilegedWriter fail-closed + path deny
+updated_at: "2026-09-01T07:46:45Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

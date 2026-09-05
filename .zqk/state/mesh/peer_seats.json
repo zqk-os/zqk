@@ -1,0 +1,31 @@
+{
+  "schema_version": "1",
+  "seats": {
+    "peer-agent-1": {
+      "pid": 11765,
+      "conversation": "da7b703a-9e9d-4db7-818c-3476885d1f58",
+      "wake": "agentapi",
+      "persona_ref": "PER-ORCH-ALPHA",
+      "note": "Primary TPM",
+      "duty": "worker"
+    },
+    "peer-agent-2": {
+      "pid": 16729,
+      "conversation": "9c0f961c-d344-4599-9a66-c1db5ae2e034",
+      "wake": "agentapi",
+      "persona_ref": "PER-ORCH-BETA",
+      "note": "Secondary TPM",
+      "duty": "worker"
+    },
+    "worker-agent-1": {
+      "wake": "stamp",
+      "persona_ref": "PER-1788569251914239000",
+      "note": "Local Qwen Daemon 1"
+    },
+    "worker-agent-2": {
+      "wake": "stamp",
+      "persona_ref": "PER-1788569262027918000",
+      "note": "Local Qwen Daemon 2"
+    }
+  }
+}

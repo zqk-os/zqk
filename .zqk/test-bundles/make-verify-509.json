@@ -1,0 +1,33 @@
+{
+  "name": "make-verify-509",
+  "created_at": "2026-09-04T21:34:32.405076Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-509",
+    "Tests": [
+      {
+        "Name": "TestBridge",
+        "Package": "impl",
+        "PackagePath": "pkg/bridge/impl",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/bridge/impl/bridge_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 30000000000,
+    "PackagePath": "pkg/bridge/impl"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestBridge",
+      "Package": "impl",
+      "PackagePath": "pkg/bridge/impl",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/bridge/impl/bridge_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

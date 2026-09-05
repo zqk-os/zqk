@@ -1,0 +1,44 @@
+
+--- run 2026-09-04T22:19:33Z ---
+=== RUN   TestIsIdentityRewriteField
+=== PAUSE TestIsIdentityRewriteField
+=== RUN   TestPkgStorageMustNotImportCLI
+=== PAUSE TestPkgStorageMustNotImportCLI
+=== RUN   TestPrivilegedWriterDaemonTypeExists
+=== PAUSE TestPrivilegedWriterDaemonTypeExists
+=== RUN   TestIPCWriterTypeExists
+=== PAUSE TestIPCWriterTypeExists
+=== RUN   TestApplyCompleteTransitionDefaults_ComputesWallClockEffort
+=== PAUSE TestApplyCompleteTransitionDefaults_ComputesWallClockEffort
+=== RUN   TestApplyCompleteTransitionDefaults_PlaceholderWhenNoTimestamps
+=== PAUSE TestApplyCompleteTransitionDefaults_PlaceholderWhenNoTimestamps
+=== RUN   TestApplyCompleteTransitionDefaults_ClampsOverstatedActual
+=== PAUSE TestApplyCompleteTransitionDefaults_ClampsOverstatedActual
+=== RUN   TestApplyCompleteTransitionDefaults_KeepsUnderstatedActual
+=== PAUSE TestApplyCompleteTransitionDefaults_KeepsUnderstatedActual
+=== RUN   TestApplyCompleteTransitionDefaults_StampsStartedAtOnExecutionLocked
+=== PAUSE TestApplyCompleteTransitionDefaults_StampsStartedAtOnExecutionLocked
+=== RUN   TestApplyCompleteTransitionDefaults_SkipsNonCompletableKind
+=== PAUSE TestApplyCompleteTransitionDefaults_SkipsNonCompletableKind
+=== CONT  TestIsIdentityRewriteField
+--- PASS: TestIsIdentityRewriteField (0.00s)
+=== CONT  TestApplyCompleteTransitionDefaults_SkipsNonCompletableKind
+=== CONT  TestApplyCompleteTransitionDefaults_PlaceholderWhenNoTimestamps
+=== CONT  TestApplyCompleteTransitionDefaults_KeepsUnderstatedActual
+--- PASS: TestApplyCompleteTransitionDefaults_SkipsNonCompletableKind (0.02s)
+--- PASS: TestApplyCompleteTransitionDefaults_PlaceholderWhenNoTimestamps (0.02s)
+=== CONT  TestApplyCompleteTransitionDefaults_StampsStartedAtOnExecutionLocked
+--- PASS: TestApplyCompleteTransitionDefaults_StampsStartedAtOnExecutionLocked (0.00s)
+=== CONT  TestIPCWriterTypeExists
+--- PASS: TestIPCWriterTypeExists (0.00s)
+=== CONT  TestApplyCompleteTransitionDefaults_ComputesWallClockEffort
+--- PASS: TestApplyCompleteTransitionDefaults_ComputesWallClockEffort (0.00s)
+=== CONT  TestPrivilegedWriterDaemonTypeExists
+--- PASS: TestPrivilegedWriterDaemonTypeExists (0.00s)
+=== CONT  TestPkgStorageMustNotImportCLI
+--- PASS: TestApplyCompleteTransitionDefaults_KeepsUnderstatedActual (0.00s)
+=== CONT  TestApplyCompleteTransitionDefaults_ClampsOverstatedActual
+--- PASS: TestApplyCompleteTransitionDefaults_ClampsOverstatedActual (0.00s)
+--- PASS: TestPkgStorageMustNotImportCLI (0.50s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/storage	1.101s

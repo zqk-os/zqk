@@ -1,0 +1,3 @@
+⚠️  Swarm engine execution failed (execution_id=exec-1788584294): model consistently produced empty responses with no tool calls
+Error: swarm engine execution failed: model consistently produced empty responses with no tool calls
+2026-09-05T05:00:22Z [error] Command execution failed error=swarm engine execution failed: model consistently produced empty responses with no tool calls

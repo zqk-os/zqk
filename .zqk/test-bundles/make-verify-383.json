@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-383",
+  "created_at": "2026-09-04T21:34:31.151409Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-383",
+    "Tests": [
+      {
+        "Name": "TestFields_ObjectListKinds_JSON_Integration",
+        "Package": "app_test",
+        "PackagePath": "cmd/zqk/app",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/app/fields_integration_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestFlagAudit",
+        "Package": "app",
+        "PackagePath": "cmd/zqk/app",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/app/flag_audit_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestFlagCollisions",
+        "Package": "app",
+        "PackagePath": "cmd/zqk/app",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/app/flag_collision_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestCommandFlagPermutations",
+        "Package": "app",
+        "PackagePath": "cmd/zqk/app",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/app/flag_permutation_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestJoinCommand_Registration",
+        "Package": "app",
+        "PackagePath": "cmd/zqk/app",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/app/join_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestMaxOSThreads_DefaultAndClamp",
+        "Package": "app",
+        "PackagePath": "cmd/zqk/app",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/app/max_os_threads_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestINV_RBAC_PD_001_PlannerDoerSplit",
+        "Package": "app",
+        "PackagePath": "cmd/zqk/app",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/app/planner_doer_rbac_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestRollbackList_Integration",
+        "Package": "app_test",
+        "PackagePath": "cmd/zqk/app",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/app/rollback_integration_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestRollbackApply_NotFound_Integration",
+        "Package": "app_test",
+        "PackagePath": "cmd/zqk/app",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/app/rollback_integration_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestRollbackRetain_Integration",
+        "Package": "app_test",
+        "PackagePath": "cmd/zqk/app",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/app/rollback_integration_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 300000000000,
+    "PackagePath": "cmd/zqk/app"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestFields_ObjectListKinds_JSON_Integration",
+      "Package": "app_test",
+      "PackagePath": "cmd/zqk/app",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/app/fields_integration_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestFlagAudit",
+      "Package": "app",
+      "PackagePath": "cmd/zqk/app",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/app/flag_audit_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestFlagCollisions",
+      "Package": "app",
+      "PackagePath": "cmd/zqk/app",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/app/flag_collision_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestCommandFlagPermutations",
+      "Package": "app",
+      "PackagePath": "cmd/zqk/app",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/app/flag_permutation_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestJoinCommand_Registration",
+      "Package": "app",
+      "PackagePath": "cmd/zqk/app",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/app/join_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestMaxOSThreads_DefaultAndClamp",
+      "Package": "app",
+      "PackagePath": "cmd/zqk/app",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/app/max_os_threads_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestINV_RBAC_PD_001_PlannerDoerSplit",
+      "Package": "app",
+      "PackagePath": "cmd/zqk/app",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/app/planner_doer_rbac_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestRollbackList_Integration",
+      "Package": "app_test",
+      "PackagePath": "cmd/zqk/app",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/app/rollback_integration_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestRollbackApply_NotFound_Integration",
+      "Package": "app_test",
+      "PackagePath": "cmd/zqk/app",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/app/rollback_integration_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestRollbackRetain_Integration",
+      "Package": "app_test",
+      "PackagePath": "cmd/zqk/app",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/app/rollback_integration_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

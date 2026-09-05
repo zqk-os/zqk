@@ -1,0 +1,5 @@
+{
+  "schema": "zqk_tpm_return_wake_v1",
+  "fired_at": "2026-08-29T03:27:37Z",
+  "handoff": ".zqk/state/ambient/away-handoff-20260828.json"
+}

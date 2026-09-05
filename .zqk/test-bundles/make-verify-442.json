@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-442",
+  "created_at": "2026-09-04T21:34:31.69529Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-442",
+    "Tests": [
+      {
+        "Name": "TestPool_Stop_WithoutStart_ReleasesBudget",
+        "Package": "goroutinelabels",
+        "PackagePath": "pkg/goroutinelabels",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/goroutinelabels/pool_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestPool_Start_Submit_Stop",
+        "Package": "goroutinelabels",
+        "PackagePath": "pkg/goroutinelabels",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/goroutinelabels/pool_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestPool_Submit_BeforeStart_ReturnsCanceled",
+        "Package": "goroutinelabels",
+        "PackagePath": "pkg/goroutinelabels",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/goroutinelabels/pool_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestPool_Submit_AfterStop_ReturnsCanceled",
+        "Package": "goroutinelabels",
+        "PackagePath": "pkg/goroutinelabels",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/goroutinelabels/pool_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestPool_SubmitNonBlocking_Full",
+        "Package": "goroutinelabels",
+        "PackagePath": "pkg/goroutinelabels",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/goroutinelabels/pool_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestPool_Submit_DeadlineExceededWhenWorkerHeldByLongTask",
+        "Package": "goroutinelabels",
+        "PackagePath": "pkg/goroutinelabels",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/goroutinelabels/pool_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestPool_QueuePressureSnapshot",
+        "Package": "goroutinelabels",
+        "PackagePath": "pkg/goroutinelabels",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/goroutinelabels/pool_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestPool_Stop_ReleasesBudget",
+        "Package": "goroutinelabels",
+        "PackagePath": "pkg/goroutinelabels",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/goroutinelabels/pool_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestPool_Start_Idempotent",
+        "Package": "goroutinelabels",
+        "PackagePath": "pkg/goroutinelabels",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/goroutinelabels/pool_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestPool_NewPool_InvalidWorkerCount_ReturnsFallback",
+        "Package": "goroutinelabels",
+        "PackagePath": "pkg/goroutinelabels",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/goroutinelabels/pool_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": true,
+    "EstimatedDuration": 300000000000,
+    "PackagePath": "pkg/goroutinelabels"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestPool_Stop_WithoutStart_ReleasesBudget",
+      "Package": "goroutinelabels",
+      "PackagePath": "pkg/goroutinelabels",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/goroutinelabels/pool_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestPool_Start_Submit_Stop",
+      "Package": "goroutinelabels",
+      "PackagePath": "pkg/goroutinelabels",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/goroutinelabels/pool_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestPool_Submit_BeforeStart_ReturnsCanceled",
+      "Package": "goroutinelabels",
+      "PackagePath": "pkg/goroutinelabels",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/goroutinelabels/pool_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestPool_Submit_AfterStop_ReturnsCanceled",
+      "Package": "goroutinelabels",
+      "PackagePath": "pkg/goroutinelabels",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/goroutinelabels/pool_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestPool_SubmitNonBlocking_Full",
+      "Package": "goroutinelabels",
+      "PackagePath": "pkg/goroutinelabels",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/goroutinelabels/pool_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestPool_Submit_DeadlineExceededWhenWorkerHeldByLongTask",
+      "Package": "goroutinelabels",
+      "PackagePath": "pkg/goroutinelabels",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/goroutinelabels/pool_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestPool_QueuePressureSnapshot",
+      "Package": "goroutinelabels",
+      "PackagePath": "pkg/goroutinelabels",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/goroutinelabels/pool_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestPool_Stop_ReleasesBudget",
+      "Package": "goroutinelabels",
+      "PackagePath": "pkg/goroutinelabels",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/goroutinelabels/pool_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestPool_Start_Idempotent",
+      "Package": "goroutinelabels",
+      "PackagePath": "pkg/goroutinelabels",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/goroutinelabels/pool_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestPool_NewPool_InvalidWorkerCount_ReturnsFallback",
+      "Package": "goroutinelabels",
+      "PackagePath": "pkg/goroutinelabels",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/goroutinelabels/pool_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

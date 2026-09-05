@@ -1,0 +1,14 @@
+created_at: "2026-08-19T09:25:32Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1787131527898098000-17b2c08e
+item_id: REDACTED
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 2857702ca28e4b64fb5782140b43c1400e68fdeab30ab0062f4119523ca97d466e5f13c72adcfa41b92eacf21fa7f0a79b8a8e3a8d7c581e5c9afe0e69cb31dc
+schema_version: 2.0.0
+signature: 304602210081509471a9e49d4388694220906268f7a8f45e38d7bb99c8f8414ce39a77bdf2022100f5e971ed6e867273d2a2ae2b42e3d15222140eb828db9e831ac498528c11594d
+status: archived
+title: Lifecycle vs fitness dial residuals — verify surfaces after PRI-KERNEL-LF-DIAL-001
+updated_at: "2026-09-01T07:34:58Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

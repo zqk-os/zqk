@@ -1,0 +1,16 @@
+{
+  "schema": "zqk_identity_status_v1",
+  "account_id": "ACC-1785920548450214012-68b850c0",
+  "persona_ref": "PER-DEFAULT-AGENT",
+  "roles": [
+    "admin"
+  ],
+  "lane": "admin",
+  "permissions": [
+    "read:*",
+    "write:*",
+    "delete:*"
+  ],
+  "write_star": true,
+  "updated_at": "2026-09-05T06:50:20Z"
+}

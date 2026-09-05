@@ -1,0 +1,44 @@
+
+--- run 2026-09-05T05:25:17Z ---
+=== RUN   TestNotificationContext_Disabled
+=== PAUSE TestNotificationContext_Disabled
+=== RUN   TestNotificationContext_ContextIntegration
+=== PAUSE TestNotificationContext_ContextIntegration
+=== RUN   TestNotificationContext_Channels
+=== PAUSE TestNotificationContext_Channels
+=== RUN   TestNotificationContext_SetMinPriority
+=== PAUSE TestNotificationContext_SetMinPriority
+=== RUN   TestNotificationContext_SetEnabled
+=== PAUSE TestNotificationContext_SetEnabled
+=== RUN   TestNotificationContext_SetCategories
+=== PAUSE TestNotificationContext_SetCategories
+=== RUN   TestNotificationDisplay_TerminalNotification
+=== PAUSE TestNotificationDisplay_TerminalNotification
+=== RUN   TestNotificationDisplay_DesktopNotification
+=== PAUSE TestNotificationDisplay_DesktopNotification
+=== RUN   TestCreateJobNotification_Completed
+=== PAUSE TestCreateJobNotification_Completed
+=== RUN   TestCreateJobNotification_Failed
+=== PAUSE TestCreateJobNotification_Failed
+=== CONT  TestNotificationContext_Disabled
+=== CONT  TestNotificationContext_SetCategories
+--- PASS: TestNotificationContext_Disabled (0.00s)
+--- PASS: TestNotificationContext_SetCategories (0.00s)
+=== CONT  TestCreateJobNotification_Failed
+--- PASS: TestCreateJobNotification_Failed (0.00s)
+=== CONT  TestNotificationDisplay_DesktopNotification
+=== CONT  TestCreateJobNotification_Completed
+--- PASS: TestCreateJobNotification_Completed (0.00s)
+=== CONT  TestNotificationDisplay_TerminalNotification
+--- PASS: TestNotificationDisplay_TerminalNotification (0.00s)
+=== CONT  TestNotificationContext_SetMinPriority
+--- PASS: TestNotificationContext_SetMinPriority (0.00s)
+=== CONT  TestNotificationContext_SetEnabled
+--- PASS: TestNotificationContext_SetEnabled (0.00s)
+=== CONT  TestNotificationContext_Channels
+--- PASS: TestNotificationContext_Channels (0.00s)
+=== CONT  TestNotificationContext_ContextIntegration
+--- PASS: TestNotificationContext_ContextIntegration (0.00s)
+--- PASS: TestNotificationDisplay_DesktopNotification (0.13s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/scheduler	0.836s

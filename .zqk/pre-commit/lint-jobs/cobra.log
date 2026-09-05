@@ -1,0 +1,4 @@
+=== cobra Flags().Get* error-ladder check ===
+check-cobra-flag-get-err-repo.sh: starting (go run may compile briefly, then AST scan with periodic stderr progress)...
+check_cobra_flag_get_err: progress scanned=49/49 hits=0
+check_cobra_flag_get_err: ok (0 violations in 49 files; prefixes=cmd/zqk/feed,cmd/zqk/validate,cmd/zqk/workflow,pkg/cli/crud_helpers.go,pkg/cli/data_loader.go,pkg/cli/dry_run.go,pkg/cli/flag_get.go,pkg/cli/harness.go,pkg/cli/update_data_loader.go,pkg/cli/query_flags.go,pkg/cli/fields_flags.go,pkg/zqkcli/bulk_helpers.go,pkg/zqkcli/count_helpers.go,pkg/zqkcli/create_helpers.go,pkg/zqkcli/list_all_helpers.go,pkg/zqkcli/list_helpers.go,pkg/zqkcli/list_output.go,pkg/zqkcli/update_helpers.go,internal/cli/data_loader.go,internal/cli/dry_run.go,internal/cli/processor.go)

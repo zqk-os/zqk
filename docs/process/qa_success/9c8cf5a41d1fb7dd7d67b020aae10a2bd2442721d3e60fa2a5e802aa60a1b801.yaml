@@ -1,0 +1,14 @@
+created_at: "2026-08-19T06:57:13Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1787122630462011000-78554ff7
+item_id: REDACTED
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 2857702ca28e4b64fb5782140b43c1400e68fdeab30ab0062f4119523ca97d466e5f13c72adcfa41b92eacf21fa7f0a79b8a8e3a8d7c581e5c9afe0e69cb31dc
+schema_version: 2.0.0
+signature: 3045022100f5a02a532930350389e7b52154f7f18d60e4b0a4eff9459a084685a13874e2cc02206d1f5eb3f0339ed1cf298b2d451400616b7295a246ce7bd0bc013834aa89876a
+status: archived
+title: Native filescope resolver
+updated_at: "2026-09-01T07:22:57Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

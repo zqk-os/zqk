@@ -1,0 +1,159 @@
+{
+  "name": "make-verify-604",
+  "created_at": "2026-09-04T21:34:33.342082Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-604",
+    "Tests": [
+      {
+        "Name": "TestRegistryRun_EmptyEnabledMonitorsIsNotOK",
+        "Package": "healthcheck",
+        "PackagePath": "pkg/healthcheck",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/healthcheck/registry_impl_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestRegistryRun_NilResultIsFail",
+        "Package": "healthcheck",
+        "PackagePath": "pkg/healthcheck",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/healthcheck/registry_impl_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestRegistryRun_MonitorErrorIsFail",
+        "Package": "healthcheck",
+        "PackagePath": "pkg/healthcheck",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/healthcheck/registry_impl_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestRegistryRun_OKMonitorStaysOK",
+        "Package": "healthcheck",
+        "PackagePath": "pkg/healthcheck",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/healthcheck/registry_impl_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestRegistry_RegistrationAndListing",
+        "Package": "healthcheck_test",
+        "PackagePath": "pkg/healthcheck",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/healthcheck/registry_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestRegistry_EnableDisableAndPersistence",
+        "Package": "healthcheck_test",
+        "PackagePath": "pkg/healthcheck",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/healthcheck/registry_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestRegistry_RunSingleMonitor",
+        "Package": "healthcheck_test",
+        "PackagePath": "pkg/healthcheck",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/healthcheck/registry_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestRegistry_RunAllMonitorsAggregations",
+        "Package": "healthcheck_test",
+        "PackagePath": "pkg/healthcheck",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/healthcheck/registry_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": true,
+    "EstimatedDuration": 240000000000,
+    "PackagePath": "pkg/healthcheck"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestRegistryRun_EmptyEnabledMonitorsIsNotOK",
+      "Package": "healthcheck",
+      "PackagePath": "pkg/healthcheck",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/healthcheck/registry_impl_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestRegistryRun_NilResultIsFail",
+      "Package": "healthcheck",
+      "PackagePath": "pkg/healthcheck",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/healthcheck/registry_impl_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestRegistryRun_MonitorErrorIsFail",
+      "Package": "healthcheck",
+      "PackagePath": "pkg/healthcheck",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/healthcheck/registry_impl_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestRegistryRun_OKMonitorStaysOK",
+      "Package": "healthcheck",
+      "PackagePath": "pkg/healthcheck",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/healthcheck/registry_impl_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestRegistry_RegistrationAndListing",
+      "Package": "healthcheck_test",
+      "PackagePath": "pkg/healthcheck",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/healthcheck/registry_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestRegistry_EnableDisableAndPersistence",
+      "Package": "healthcheck_test",
+      "PackagePath": "pkg/healthcheck",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/healthcheck/registry_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestRegistry_RunSingleMonitor",
+      "Package": "healthcheck_test",
+      "PackagePath": "pkg/healthcheck",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/healthcheck/registry_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestRegistry_RunAllMonitorsAggregations",
+      "Package": "healthcheck_test",
+      "PackagePath": "pkg/healthcheck",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/healthcheck/registry_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

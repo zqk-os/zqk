@@ -1,0 +1,14 @@
+created_at: "2026-08-20T04:45:02Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1787201101257261000-7fa1c005
+item_id: CRIT-CEF-R8K-ARCH-001
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 2857702ca28e4b64fb5782140b43c1400e68fdeab30ab0062f4119523ca97d466e5f13c72adcfa41b92eacf21fa7f0a79b8a8e3a8d7c581e5c9afe0e69cb31dc
+schema_version: 2.0.0
+signature: 304402200fac0686d49b2376172ca53f9203a1bfcbafe9730731c42f47afa944a4087c5f022057567610d4e0c214b8c58b0000a78d101c143508b1ae1d52d47fb57897d3f5cf
+status: archived
+title: 'AGENT_K F-ARCH-001: Storage package modular subpackages'
+updated_at: "2026-09-01T07:35:58Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

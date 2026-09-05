@@ -1,0 +1,40 @@
+
+--- run 2026-09-04T22:13:25Z ---
+=== RUN   TestErrExitCode_Error
+=== PAUSE TestErrExitCode_Error
+=== RUN   TestNewQuickCmd_RequiresPreset
+=== PAUSE TestNewQuickCmd_RequiresPreset
+=== RUN   TestReportsPCS_StatusInterpretation
+=== PAUSE TestReportsPCS_StatusInterpretation
+=== RUN   TestReportsEDD_StatusInterpretation
+=== PAUSE TestReportsEDD_StatusInterpretation
+=== CONT  TestErrExitCode_Error
+--- PASS: TestErrExitCode_Error (0.00s)
+=== CONT  TestReportsPCS_StatusInterpretation
+=== RUN   TestReportsPCS_StatusInterpretation/excellent
+=== CONT  TestReportsEDD_StatusInterpretation
+=== RUN   TestReportsPCS_StatusInterpretation/good
+=== RUN   TestReportsEDD_StatusInterpretation/significant_underestimation
+=== RUN   TestReportsPCS_StatusInterpretation/fair
+=== RUN   TestReportsPCS_StatusInterpretation/poor
+=== RUN   TestReportsPCS_StatusInterpretation/critical
+=== RUN   TestReportsEDD_StatusInterpretation/moderate_underestimation
+--- PASS: TestReportsPCS_StatusInterpretation (0.00s)
+    --- PASS: TestReportsPCS_StatusInterpretation/excellent (0.00s)
+    --- PASS: TestReportsPCS_StatusInterpretation/good (0.00s)
+    --- PASS: TestReportsPCS_StatusInterpretation/fair (0.00s)
+    --- PASS: TestReportsPCS_StatusInterpretation/poor (0.00s)
+    --- PASS: TestReportsPCS_StatusInterpretation/critical (0.00s)
+=== RUN   TestReportsEDD_StatusInterpretation/good_accuracy
+=== CONT  TestNewQuickCmd_RequiresPreset
+=== RUN   TestReportsEDD_StatusInterpretation/moderate_overestimation
+=== RUN   TestReportsEDD_StatusInterpretation/significant_overestimation
+--- PASS: TestReportsEDD_StatusInterpretation (0.00s)
+    --- PASS: TestReportsEDD_StatusInterpretation/significant_underestimation (0.00s)
+    --- PASS: TestReportsEDD_StatusInterpretation/moderate_underestimation (0.00s)
+    --- PASS: TestReportsEDD_StatusInterpretation/good_accuracy (0.00s)
+    --- PASS: TestReportsEDD_StatusInterpretation/moderate_overestimation (0.00s)
+    --- PASS: TestReportsEDD_StatusInterpretation/significant_overestimation (0.00s)
+--- PASS: TestNewQuickCmd_RequiresPreset (0.00s)
+PASS
+ok  	github.com/lanceman/zqk/cmd/zqk/reports	0.597s

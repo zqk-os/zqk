@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-119",
+  "created_at": "2026-09-04T21:34:28.525682Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-119",
+    "Tests": [
+      {
+        "Name": "TestAsyncValidator_BaselineComparison",
+        "Package": "validation",
+        "PackagePath": "pkg/validation",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/validation/async_validator_baseline_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAsyncValidator_EventCallback",
+        "Package": "validation",
+        "PackagePath": "pkg/validation",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/validation/async_validator_event_callback_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAsyncValidator_EventCallbackNil",
+        "Package": "validation",
+        "PackagePath": "pkg/validation",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/validation/async_validator_event_callback_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAsyncValidator_EventCallbackConcurrent",
+        "Package": "validation",
+        "PackagePath": "pkg/validation",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/validation/async_validator_event_callback_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAsyncValidator_SetEventCallback",
+        "Package": "validation",
+        "PackagePath": "pkg/validation",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/validation/async_validator_event_callback_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestHostloadValidationYield_Positive",
+        "Package": "validation",
+        "PackagePath": "pkg/validation",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/validation/async_validator_hostload_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestValidationSemaphoreCapacity_FailFastCap",
+        "Package": "validation",
+        "PackagePath": "pkg/validation",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/validation/async_validator_lifecycle_semaphore_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAwaitNestedValidation_TimeoutStillWaitsForDone",
+        "Package": "validation",
+        "PackagePath": "pkg/validation",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/validation/async_validator_lifecycle_semaphore_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAwaitNestedValidation_CompletesBeforeTimeout",
+        "Package": "validation",
+        "PackagePath": "pkg/validation",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/validation/async_validator_lifecycle_semaphore_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAsyncValidator_OnDemandPattern",
+        "Package": "validation",
+        "PackagePath": "pkg/validation",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/validation/async_validator_on_demand_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": true,
+    "EstimatedDuration": 300000000000,
+    "PackagePath": "pkg/validation"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestAsyncValidator_BaselineComparison",
+      "Package": "validation",
+      "PackagePath": "pkg/validation",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/validation/async_validator_baseline_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestAsyncValidator_EventCallback",
+      "Package": "validation",
+      "PackagePath": "pkg/validation",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/validation/async_validator_event_callback_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestAsyncValidator_EventCallbackNil",
+      "Package": "validation",
+      "PackagePath": "pkg/validation",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/validation/async_validator_event_callback_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestAsyncValidator_EventCallbackConcurrent",
+      "Package": "validation",
+      "PackagePath": "pkg/validation",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/validation/async_validator_event_callback_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestAsyncValidator_SetEventCallback",
+      "Package": "validation",
+      "PackagePath": "pkg/validation",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/validation/async_validator_event_callback_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestHostloadValidationYield_Positive",
+      "Package": "validation",
+      "PackagePath": "pkg/validation",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/validation/async_validator_hostload_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestValidationSemaphoreCapacity_FailFastCap",
+      "Package": "validation",
+      "PackagePath": "pkg/validation",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/validation/async_validator_lifecycle_semaphore_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestAwaitNestedValidation_TimeoutStillWaitsForDone",
+      "Package": "validation",
+      "PackagePath": "pkg/validation",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/validation/async_validator_lifecycle_semaphore_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestAwaitNestedValidation_CompletesBeforeTimeout",
+      "Package": "validation",
+      "PackagePath": "pkg/validation",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/validation/async_validator_lifecycle_semaphore_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestAsyncValidator_OnDemandPattern",
+      "Package": "validation",
+      "PackagePath": "pkg/validation",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/validation/async_validator_on_demand_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

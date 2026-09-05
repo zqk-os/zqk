@@ -1,0 +1,28 @@
+
+--- run 2026-09-04T22:21:06Z ---
+=== RUN   TestSearch_nameFindsTypeNotVendor
+=== PAUSE TestSearch_nameFindsTypeNotVendor
+=== RUN   TestSearch_pathListsFile
+=== PAUSE TestSearch_pathListsFile
+=== RUN   TestSearch_requiresNameOrPath
+=== PAUSE TestSearch_requiresNameOrPath
+=== RUN   TestSearch_rejectsEscape
+=== PAUSE TestSearch_rejectsEscape
+=== RUN   TestSearchTokens_andInferPath
+=== PAUSE TestSearchTokens_andInferPath
+=== RUN   TestFormatHit
+=== PAUSE TestFormatHit
+=== CONT  TestSearch_nameFindsTypeNotVendor
+=== CONT  TestSearch_rejectsEscape
+--- PASS: TestSearch_rejectsEscape (0.00s)
+=== CONT  TestFormatHit
+--- PASS: TestFormatHit (0.00s)
+=== CONT  TestSearchTokens_andInferPath
+--- PASS: TestSearchTokens_andInferPath (0.00s)
+=== CONT  TestSearch_requiresNameOrPath
+--- PASS: TestSearch_requiresNameOrPath (0.00s)
+=== CONT  TestSearch_pathListsFile
+--- PASS: TestSearch_nameFindsTypeNotVendor (0.01s)
+--- PASS: TestSearch_pathListsFile (0.01s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/observer	0.624s

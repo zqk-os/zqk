@@ -1,0 +1,23 @@
+category: maintenance
+created_at: "2026-08-21T11:09:09Z"
+created_by: ACC-1785920548450214012-68b850c0
+description: |
+    Timer job: aggregates diagnostics.jsonl into scheduler-metrics-summary.json every 15 minutes.
+enabled: true
+execution_mode: reusable
+id: SCH-evag
+job_type: scheduler_events_aggregation
+kind: scheduler_job
+last_run_at: "2026-09-05T06:00:01Z"
+max_runtime_seconds: 300
+namespace_id: zqk:kernel
+next_run_at: "2026-09-05T06:15:00Z"
+schedule_expression: 0 */15 * * * *
+schema_version: 2.0.0
+source_type: internal
+status: active
+title: Scheduler Events Aggregation
+trigger_type: timer
+updated_at: "2026-09-05T06:00:01Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

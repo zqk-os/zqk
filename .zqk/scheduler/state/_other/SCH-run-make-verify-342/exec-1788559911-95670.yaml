@@ -1,0 +1,7 @@
+job_id: SCH-run-make-verify-342
+execution_id: exec-1788559911-95670
+state: failed
+process_id: 95670
+started_at: 2026-09-04T22:11:51.853222Z
+completed_at: 2026-09-04T22:11:53.708655Z
+policy_decision: execute

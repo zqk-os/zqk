@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-375",
+  "created_at": "2026-09-04T21:34:31.066327Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-375",
+    "Tests": [
+      {
+        "Name": "TestLoadEmbeddedDefaultRules",
+        "Package": "processhygiene",
+        "PackagePath": "pkg/processhygiene",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/processhygiene/scan_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestScanObjects",
+        "Package": "processhygiene",
+        "PackagePath": "pkg/processhygiene",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/processhygiene/scan_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestCountByRule",
+        "Package": "processhygiene",
+        "PackagePath": "pkg/processhygiene",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/processhygiene/scan_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestCompileRuleInvalid",
+        "Package": "processhygiene",
+        "PackagePath": "pkg/processhygiene",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/processhygiene/scan_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestSecretScanningWorkflowAndDocs",
+        "Package": "processhygiene_test",
+        "PackagePath": "pkg/processhygiene",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/processhygiene/secret_scan_workflow_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestNoSrcTrash",
+        "Package": "processhygiene_test",
+        "PackagePath": "pkg/processhygiene",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/processhygiene/src_trash_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestLoadRulesFromStorage_SkipDisabledAndSortOrder",
+        "Package": "processhygiene",
+        "PackagePath": "pkg/processhygiene",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/processhygiene/storage_rules_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestResolveRulesWithOptions_StorageNonEmpty",
+        "Package": "processhygiene",
+        "PackagePath": "pkg/processhygiene",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/processhygiene/storage_rules_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestResolveRulesWithOptions_StorageEmptyFallsBackToEmbedded",
+        "Package": "processhygiene",
+        "PackagePath": "pkg/processhygiene",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/processhygiene/storage_rules_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestResolveRulesWithOptions_RulesFileOverrides",
+        "Package": "processhygiene",
+        "PackagePath": "pkg/processhygiene",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/processhygiene/storage_rules_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 300000000000,
+    "PackagePath": "pkg/processhygiene"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestLoadEmbeddedDefaultRules",
+      "Package": "processhygiene",
+      "PackagePath": "pkg/processhygiene",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/processhygiene/scan_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestScanObjects",
+      "Package": "processhygiene",
+      "PackagePath": "pkg/processhygiene",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/processhygiene/scan_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestCountByRule",
+      "Package": "processhygiene",
+      "PackagePath": "pkg/processhygiene",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/processhygiene/scan_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestCompileRuleInvalid",
+      "Package": "processhygiene",
+      "PackagePath": "pkg/processhygiene",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/processhygiene/scan_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestSecretScanningWorkflowAndDocs",
+      "Package": "processhygiene_test",
+      "PackagePath": "pkg/processhygiene",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/processhygiene/secret_scan_workflow_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestNoSrcTrash",
+      "Package": "processhygiene_test",
+      "PackagePath": "pkg/processhygiene",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/processhygiene/src_trash_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestLoadRulesFromStorage_SkipDisabledAndSortOrder",
+      "Package": "processhygiene",
+      "PackagePath": "pkg/processhygiene",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/processhygiene/storage_rules_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestResolveRulesWithOptions_StorageNonEmpty",
+      "Package": "processhygiene",
+      "PackagePath": "pkg/processhygiene",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/processhygiene/storage_rules_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestResolveRulesWithOptions_StorageEmptyFallsBackToEmbedded",
+      "Package": "processhygiene",
+      "PackagePath": "pkg/processhygiene",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/processhygiene/storage_rules_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestResolveRulesWithOptions_RulesFileOverrides",
+      "Package": "processhygiene",
+      "PackagePath": "pkg/processhygiene",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/processhygiene/storage_rules_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

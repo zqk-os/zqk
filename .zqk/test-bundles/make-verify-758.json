@@ -1,0 +1,87 @@
+{
+  "name": "make-verify-758",
+  "created_at": "2026-09-04T21:34:34.832883Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-758",
+    "Tests": [
+      {
+        "Name": "TestSystemInspector",
+        "Package": "systempeel_test",
+        "PackagePath": "pkg/systempeel",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/systempeel/peel_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestFindFilesExceedingThreshold",
+        "Package": "systempeel_test",
+        "PackagePath": "pkg/systempeel",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/systempeel/peel_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestPeeledComponentRegistry",
+        "Package": "systempeel_test",
+        "PackagePath": "pkg/systempeel",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/systempeel/peel_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAttachPeeledCommand",
+        "Package": "systempeel_test",
+        "PackagePath": "pkg/systempeel",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/systempeel/peel_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 120000000000,
+    "PackagePath": "pkg/systempeel"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestSystemInspector",
+      "Package": "systempeel_test",
+      "PackagePath": "pkg/systempeel",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/systempeel/peel_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestFindFilesExceedingThreshold",
+      "Package": "systempeel_test",
+      "PackagePath": "pkg/systempeel",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/systempeel/peel_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestPeeledComponentRegistry",
+      "Package": "systempeel_test",
+      "PackagePath": "pkg/systempeel",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/systempeel/peel_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestAttachPeeledCommand",
+      "Package": "systempeel_test",
+      "PackagePath": "pkg/systempeel",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/systempeel/peel_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

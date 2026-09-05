@@ -1,0 +1,14 @@
+created_at: "2026-09-05T03:28:22Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1788578902881780000-434c9132
+item_id: PRI-CEF-R28-REMEDIATE-001
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 86b8ab3d574c004a61020b73c23f52b9055049e90c3d755c8bbb383e059e384028fdd8cd69e13123b644e5f3f7eb65596e73e2d57d719ea3dafcb01b84ce8dfb
+schema_version: 2.0.0
+signature: 30450221008f1f3d646531bee45be9fa4bff4df6f84e5b878ea24c1fdbfeaeafad837a188502200619a9fd8b506373761ed78e8db4f40e163ab4254b3a6dbcb23d14868be498fb
+status: success
+title: QA success for PRI-CEF-R28-REMEDIATE-001
+updated_at: "2026-09-05T03:28:23Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

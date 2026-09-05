@@ -1,0 +1,104 @@
+
+--- run 2026-09-04T22:21:42Z ---
+=== RUN   TestLifecycleLoader_LoadLifecycle_strategicAlignmentKinds
+=== PAUSE TestLifecycleLoader_LoadLifecycle_strategicAlignmentKinds
+=== RUN   TestLifecycleLoader_GetTransitionPreconditions
+=== PAUSE TestLifecycleLoader_GetTransitionPreconditions
+=== RUN   TestLifecycleLoader_IsTerminalStatusForKind_convergence_session
+=== PAUSE TestLifecycleLoader_IsTerminalStatusForKind_convergence_session
+=== RUN   TestNextProgressLifecycleStatus
+=== PAUSE TestNextProgressLifecycleStatus
+=== RUN   TestNextProgressLifecycleStatus_RefusesNonProgressOnlyEdges
+=== PAUSE TestNextProgressLifecycleStatus_RefusesNonProgressOnlyEdges
+=== RUN   TestPromoteTransitionTargets_HopLimit
+=== PAUSE TestPromoteTransitionTargets_HopLimit
+=== RUN   TestPromoteTransitionTargets_NoCascade
+=== PAUSE TestPromoteTransitionTargets_NoCascade
+=== RUN   TestResolveStatusForKind_BacklogAliasesAndCanonical
+=== PAUSE TestResolveStatusForKind_BacklogAliasesAndCanonical
+=== RUN   TestNormalizeStatusForKind_UsesStatusMapping
+=== PAUSE TestNormalizeStatusForKind_UsesStatusMapping
+=== RUN   TestIsValidTransition_UnknownFromRepairPark
+=== PAUSE TestIsValidTransition_UnknownFromRepairPark
+=== CONT  TestLifecycleLoader_LoadLifecycle_strategicAlignmentKinds
+=== CONT  TestPromoteTransitionTargets_HopLimit
+=== RUN   TestLifecycleLoader_LoadLifecycle_strategicAlignmentKinds/stakeholder_profile
+=== RUN   TestLifecycleLoader_LoadLifecycle_strategicAlignmentKinds/strategic_context
+=== RUN   TestLifecycleLoader_LoadLifecycle_strategicAlignmentKinds/important_date
+--- PASS: TestLifecycleLoader_LoadLifecycle_strategicAlignmentKinds (0.00s)
+    --- PASS: TestLifecycleLoader_LoadLifecycle_strategicAlignmentKinds/stakeholder_profile (0.00s)
+    --- PASS: TestLifecycleLoader_LoadLifecycle_strategicAlignmentKinds/strategic_context (0.00s)
+    --- PASS: TestLifecycleLoader_LoadLifecycle_strategicAlignmentKinds/important_date (0.00s)
+=== CONT  TestNextProgressLifecycleStatus
+=== RUN   TestNextProgressLifecycleStatus/backlog_validated_skips_parking_and_archive
+=== NAME  TestPromoteTransitionTargets_HopLimit
+    lifecycle_promote_test.go:32: overshoot detected: in_progress→complete is a two-hop target not reachable in one hop; direct targets=map[archived:{} blocked:{} cancelled:{} complete:{} paused:{}], nextTargets["complete"]=map[active:{} archived:{} grooming:{}]
+=== PAUSE TestNextProgressLifecycleStatus/backlog_validated_skips_parking_and_archive
+--- FAIL: TestPromoteTransitionTargets_HopLimit (0.00s)
+=== RUN   TestNextProgressLifecycleStatus/criteria_advances_primary_path
+=== PAUSE TestNextProgressLifecycleStatus/criteria_advances_primary_path
+=== RUN   TestNextProgressLifecycleStatus/error_recovers_to_earlier_declared_progress_status
+=== PAUSE TestNextProgressLifecycleStatus/error_recovers_to_earlier_declared_progress_status
+=== RUN   TestNextProgressLifecycleStatus/active_plan_advances_to_execution_lock_instead_of_grooming
+=== CONT  TestNextProgressLifecycleStatus_RefusesNonProgressOnlyEdges
+=== PAUSE TestNextProgressLifecycleStatus/active_plan_advances_to_execution_lock_instead_of_grooming
+=== CONT  TestLifecycleLoader_IsTerminalStatusForKind_convergence_session
+--- PASS: TestNextProgressLifecycleStatus_RefusesNonProgressOnlyEdges (0.00s)
+=== CONT  TestNormalizeStatusForKind_UsesStatusMapping
+--- PASS: TestLifecycleLoader_IsTerminalStatusForKind_convergence_session (0.00s)
+=== CONT  TestIsValidTransition_UnknownFromRepairPark
+--- PASS: TestIsValidTransition_UnknownFromRepairPark (0.00s)
+=== CONT  TestLifecycleLoader_GetTransitionPreconditions
+    lifecycle_loader_test.go:355: Preconditions for validated -> planned: [Standard checks pass]
+--- PASS: TestLifecycleLoader_GetTransitionPreconditions (0.01s)
+=== CONT  TestResolveStatusForKind_BacklogAliasesAndCanonical
+=== RUN   TestResolveStatusForKind_BacklogAliasesAndCanonical/canonical_exploring
+=== PAUSE TestResolveStatusForKind_BacklogAliasesAndCanonical/canonical_exploring
+=== RUN   TestResolveStatusForKind_BacklogAliasesAndCanonical/alias_proposed
+=== PAUSE TestResolveStatusForKind_BacklogAliasesAndCanonical/alias_proposed
+=== RUN   TestResolveStatusForKind_BacklogAliasesAndCanonical/canonical_validated
+=== PAUSE TestResolveStatusForKind_BacklogAliasesAndCanonical/canonical_validated
+=== RUN   TestResolveStatusForKind_BacklogAliasesAndCanonical/canonical_roadmap
+=== PAUSE TestResolveStatusForKind_BacklogAliasesAndCanonical/canonical_roadmap
+=== RUN   TestResolveStatusForKind_BacklogAliasesAndCanonical/canonical_deferred
+=== PAUSE TestResolveStatusForKind_BacklogAliasesAndCanonical/canonical_deferred
+=== RUN   TestResolveStatusForKind_BacklogAliasesAndCanonical/canonical_complete
+=== PAUSE TestResolveStatusForKind_BacklogAliasesAndCanonical/canonical_complete
+=== RUN   TestResolveStatusForKind_BacklogAliasesAndCanonical/alias_implemented
+=== PAUSE TestResolveStatusForKind_BacklogAliasesAndCanonical/alias_implemented
+=== RUN   TestResolveStatusForKind_BacklogAliasesAndCanonical/unknown_status
+=== PAUSE TestResolveStatusForKind_BacklogAliasesAndCanonical/unknown_status
+=== CONT  TestPromoteTransitionTargets_NoCascade
+--- PASS: TestNormalizeStatusForKind_UsesStatusMapping (0.01s)
+=== CONT  TestNextProgressLifecycleStatus/backlog_validated_skips_parking_and_archive
+=== NAME  TestPromoteTransitionTargets_NoCascade
+    lifecycle_promote_test.go:60: PROMOTE OVERSHOOT: in_progress→complete is directly reachable but should require 2 hops through active
+--- FAIL: TestPromoteTransitionTargets_NoCascade (0.00s)
+=== CONT  TestNextProgressLifecycleStatus/error_recovers_to_earlier_declared_progress_status
+=== CONT  TestNextProgressLifecycleStatus/active_plan_advances_to_execution_lock_instead_of_grooming
+=== CONT  TestNextProgressLifecycleStatus/criteria_advances_primary_path
+=== CONT  TestResolveStatusForKind_BacklogAliasesAndCanonical/canonical_exploring
+--- PASS: TestNextProgressLifecycleStatus (0.00s)
+    --- PASS: TestNextProgressLifecycleStatus/backlog_validated_skips_parking_and_archive (0.00s)
+    --- PASS: TestNextProgressLifecycleStatus/error_recovers_to_earlier_declared_progress_status (0.00s)
+    --- PASS: TestNextProgressLifecycleStatus/active_plan_advances_to_execution_lock_instead_of_grooming (0.00s)
+    --- PASS: TestNextProgressLifecycleStatus/criteria_advances_primary_path (0.00s)
+=== CONT  TestResolveStatusForKind_BacklogAliasesAndCanonical/canonical_deferred
+=== CONT  TestResolveStatusForKind_BacklogAliasesAndCanonical/unknown_status
+=== CONT  TestResolveStatusForKind_BacklogAliasesAndCanonical/alias_implemented
+=== CONT  TestResolveStatusForKind_BacklogAliasesAndCanonical/canonical_complete
+=== CONT  TestResolveStatusForKind_BacklogAliasesAndCanonical/canonical_validated
+=== CONT  TestResolveStatusForKind_BacklogAliasesAndCanonical/canonical_roadmap
+=== CONT  TestResolveStatusForKind_BacklogAliasesAndCanonical/alias_proposed
+--- PASS: TestResolveStatusForKind_BacklogAliasesAndCanonical (0.00s)
+    --- PASS: TestResolveStatusForKind_BacklogAliasesAndCanonical/canonical_exploring (0.00s)
+    --- PASS: TestResolveStatusForKind_BacklogAliasesAndCanonical/unknown_status (0.00s)
+    --- PASS: TestResolveStatusForKind_BacklogAliasesAndCanonical/alias_implemented (0.00s)
+    --- PASS: TestResolveStatusForKind_BacklogAliasesAndCanonical/canonical_complete (0.00s)
+    --- PASS: TestResolveStatusForKind_BacklogAliasesAndCanonical/canonical_validated (0.00s)
+    --- PASS: TestResolveStatusForKind_BacklogAliasesAndCanonical/canonical_roadmap (0.00s)
+    --- PASS: TestResolveStatusForKind_BacklogAliasesAndCanonical/alias_proposed (0.00s)
+    --- PASS: TestResolveStatusForKind_BacklogAliasesAndCanonical/canonical_deferred (0.00s)
+FAIL
+FAIL	github.com/lanceman/zqk/pkg/objects	0.637s
+FAIL

@@ -1,0 +1,14 @@
+created_at: "2026-08-18T23:37:11Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1787096230944931000-ef1b64e7
+item_id: CRIT-CEF-R2-ARCH-GOMOD-REPLACES-A
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 2857702ca28e4b64fb5782140b43c1400e68fdeab30ab0062f4119523ca97d466e5f13c72adcfa41b92eacf21fa7f0a79b8a8e3a8d7c581e5c9afe0e69cb31dc
+schema_version: 2.0.0
+signature: 3046022100deea84efcb9572159bcf4b41bef93a5a8162805ba57565055a30259d00a31afc0221008e42bebe1afdb897d9d62d661de8fadb37e195909bc37f322cc078dbdb780b62
+status: archived
+title: 'Accept: Delete or materialize 89 no-op go.mod replace directives'
+updated_at: "2026-09-01T07:22:34Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

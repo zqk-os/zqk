@@ -1,0 +1,34 @@
+agent_heartbeat: "2026-09-04T16:19:46-07:00"
+agent_pid: 42278
+assignee_persona_ref: PER-1781248465963709000-9925efbe
+branch_ref: integration/pri-cef-r28-remediate-001
+claimed_at: "2026-09-04T09:26:38Z"
+claimed_by: qwen-2
+created_at: "2026-09-04T08:26:33Z"
+created_by: ACC-1785920548450214012-68b850c0
+description: Assigned seat qwen-2. Branch integration/pri-cef-r28-remediate-001. BLI-CEF-R28-REMEASURE-001. After SEC lift, run path-honest dual-seat remesure (freeze SHA=origin/main tip); fill docs/quality/CEF_DIAMOND_SCORECARD_MATRIX.csv; CVS-CEF-UNTIL-45-001 measure --persist-session. agent next --on-validation-failure wake.
+estimated_effort: 4 hours
+hourglass_on: false
+id: ATK-1788510393845163000-359b2a67
+kind: agent_task
+namespace_id: zqk:kernel
+notes: 'autofix demote: Invalid lifecycle status ''completed'' for kind ''agent_task'''
+pipeline_ref: PRI-CEF-R28-REMEDIATE-001
+schema_version: 2.0.0
+started_at: "2026-09-04T08:29:39Z"
+status: implemented
+task_steps:
+    - description: Advance BLI tranche
+      status: error
+      title: Implementation Phase
+      verification_feedback: Hourglass timer expired (process died or hung)
+    - command: "true"
+      description: Targeted tests + pre-commit green
+      status: error
+      title: Validation Phase
+      verification_feedback: Hourglass timer expired (process died or hung)
+      verification_strategy: command_exit_code
+title: 'SWARM qwen-2: CEF R28 — dual-seat remesure until envelope min>=4'
+updated_at: "2026-09-04T23:19:46Z"
+updated_by: ACC-1785920548450214006-2e52b3e7
+version_context: default

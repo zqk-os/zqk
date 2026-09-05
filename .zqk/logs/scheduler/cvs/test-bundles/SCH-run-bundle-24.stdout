@@ -1,0 +1,140 @@
+
+--- run 2026-09-05T05:22:22Z ---
+=== RUN   TestParseDurationOrHoursSuffix
+=== PAUSE TestParseDurationOrHoursSuffix
+=== RUN   TestCatchUpAgeLookback
+=== PAUSE TestCatchUpAgeLookback
+=== RUN   TestMetricLimitAuditEventLookback
+=== PAUSE TestMetricLimitAuditEventLookback
+=== RUN   TestAuditAggregationDegradedSuccessOutcomePatch
+=== PAUSE TestAuditAggregationDegradedSuccessOutcomePatch
+=== RUN   TestAuditAggregationRetentionOutcomeFields
+=== PAUSE TestAuditAggregationRetentionOutcomeFields
+=== RUN   TestRetentionDaysFromJobEnv
+=== PAUSE TestRetentionDaysFromJobEnv
+=== RUN   TestRunAuditAggregationViaPipeline_NilHandler
+=== PAUSE TestRunAuditAggregationViaPipeline_NilHandler
+=== RUN   TestRunAuditAggregationViaPipeline_NilJob
+=== PAUSE TestRunAuditAggregationViaPipeline_NilJob
+=== RUN   TestCreateAuthHook_UnknownTypeFailsClosed
+=== PAUSE TestCreateAuthHook_UnknownTypeFailsClosed
+=== RUN   TestCreateAuthHook_KnownTypesStillBuild
+=== PAUSE TestCreateAuthHook_KnownTypesStillBuild
+=== CONT  TestParseDurationOrHoursSuffix
+=== CONT  TestRetentionDaysFromJobEnv
+=== RUN   TestParseDurationOrHoursSuffix/empty
+=== RUN   TestRetentionDaysFromJobEnv/nil_env
+=== PAUSE TestParseDurationOrHoursSuffix/empty
+=== RUN   TestParseDurationOrHoursSuffix/standard
+=== PAUSE TestRetentionDaysFromJobEnv/nil_env
+=== PAUSE TestParseDurationOrHoursSuffix/standard
+=== RUN   TestParseDurationOrHoursSuffix/legacy_bare_hours
+=== PAUSE TestParseDurationOrHoursSuffix/legacy_bare_hours
+=== RUN   TestParseDurationOrHoursSuffix/invalid
+=== PAUSE TestParseDurationOrHoursSuffix/invalid
+=== RUN   TestRetentionDaysFromJobEnv/empty_map
+=== PAUSE TestRetentionDaysFromJobEnv/empty_map
+=== CONT  TestCreateAuthHook_UnknownTypeFailsClosed
+=== RUN   TestRetentionDaysFromJobEnv/retention_days
+=== PAUSE TestRetentionDaysFromJobEnv/retention_days
+=== RUN   TestRetentionDaysFromJobEnv/retention_duration_hours
+=== PAUSE TestRetentionDaysFromJobEnv/retention_duration_hours
+=== RUN   TestRetentionDaysFromJobEnv/retention_duration_with_h_suffix_fallback
+--- PASS: TestCreateAuthHook_UnknownTypeFailsClosed (0.00s)
+=== PAUSE TestRetentionDaysFromJobEnv/retention_duration_with_h_suffix_fallback
+=== RUN   TestRetentionDaysFromJobEnv/invalid_days_does_not_fall_through_to_duration
+=== PAUSE TestRetentionDaysFromJobEnv/invalid_days_does_not_fall_through_to_duration
+=== RUN   TestRetentionDaysFromJobEnv/empty_days_key_uses_duration
+=== PAUSE TestRetentionDaysFromJobEnv/empty_days_key_uses_duration
+=== CONT  TestAuditAggregationDegradedSuccessOutcomePatch
+=== CONT  TestCreateAuthHook_KnownTypesStillBuild
+=== RUN   TestCreateAuthHook_KnownTypesStillBuild/jwt
+--- PASS: TestAuditAggregationDegradedSuccessOutcomePatch (0.00s)
+=== CONT  TestAuditAggregationRetentionOutcomeFields
+=== PAUSE TestCreateAuthHook_KnownTypesStillBuild/jwt
+--- PASS: TestAuditAggregationRetentionOutcomeFields (0.00s)
+=== CONT  TestRunAuditAggregationViaPipeline_NilJob
+=== RUN   TestCreateAuthHook_KnownTypesStillBuild/x509
+=== PAUSE TestCreateAuthHook_KnownTypesStillBuild/x509
+=== RUN   TestCreateAuthHook_KnownTypesStillBuild/api_key
+=== PAUSE TestCreateAuthHook_KnownTypesStillBuild/api_key
+--- PASS: TestRunAuditAggregationViaPipeline_NilJob (0.00s)
+=== CONT  TestRunAuditAggregationViaPipeline_NilHandler
+--- PASS: TestRunAuditAggregationViaPipeline_NilHandler (0.00s)
+=== CONT  TestMetricLimitAuditEventLookback
+=== RUN   TestCreateAuthHook_KnownTypesStillBuild/oauth2
+=== PAUSE TestCreateAuthHook_KnownTypesStillBuild/oauth2
+=== RUN   TestMetricLimitAuditEventLookback/deleteAfter_zero_falls_back_to_catch-up_only
+=== CONT  TestCatchUpAgeLookback
+=== PAUSE TestMetricLimitAuditEventLookback/deleteAfter_zero_falls_back_to_catch-up_only
+=== RUN   TestCatchUpAgeLookback/default_window_only
+=== RUN   TestMetricLimitAuditEventLookback/half_retention_when_no_shortening
+=== PAUSE TestMetricLimitAuditEventLookback/half_retention_when_no_shortening
+=== RUN   TestMetricLimitAuditEventLookback/effective_shorter_than_half
+=== PAUSE TestMetricLimitAuditEventLookback/effective_shorter_than_half
+=== RUN   TestMetricLimitAuditEventLookback/window_shorter_than_half_retention_when_not_count-shortened
+=== PAUSE TestMetricLimitAuditEventLookback/window_shorter_than_half_retention_when_not_count-shortened
+=== PAUSE TestCatchUpAgeLookback/default_window_only
+=== RUN   TestCatchUpAgeLookback/effective_shorter_than_window
+=== CONT  TestParseDurationOrHoursSuffix/empty
+=== PAUSE TestCatchUpAgeLookback/effective_shorter_than_window
+=== RUN   TestCatchUpAgeLookback/window_shorter_than_effective
+=== PAUSE TestCatchUpAgeLookback/window_shorter_than_effective
+=== RUN   TestCatchUpAgeLookback/equal
+=== CONT  TestParseDurationOrHoursSuffix/invalid
+=== PAUSE TestCatchUpAgeLookback/equal
+=== RUN   TestCatchUpAgeLookback/long_window_critical_effective
+=== PAUSE TestCatchUpAgeLookback/long_window_critical_effective
+=== CONT  TestParseDurationOrHoursSuffix/legacy_bare_hours
+=== CONT  TestRetentionDaysFromJobEnv/nil_env
+=== CONT  TestParseDurationOrHoursSuffix/standard
+--- PASS: TestParseDurationOrHoursSuffix (0.00s)
+    --- PASS: TestParseDurationOrHoursSuffix/empty (0.00s)
+    --- PASS: TestParseDurationOrHoursSuffix/invalid (0.00s)
+    --- PASS: TestParseDurationOrHoursSuffix/legacy_bare_hours (0.00s)
+    --- PASS: TestParseDurationOrHoursSuffix/standard (0.00s)
+=== CONT  TestRetentionDaysFromJobEnv/empty_days_key_uses_duration
+=== CONT  TestRetentionDaysFromJobEnv/invalid_days_does_not_fall_through_to_duration
+=== CONT  TestRetentionDaysFromJobEnv/retention_duration_hours
+=== CONT  TestRetentionDaysFromJobEnv/retention_duration_with_h_suffix_fallback
+=== CONT  TestRetentionDaysFromJobEnv/retention_days
+=== CONT  TestRetentionDaysFromJobEnv/empty_map
+=== CONT  TestCreateAuthHook_KnownTypesStillBuild/jwt
+=== CONT  TestCreateAuthHook_KnownTypesStillBuild/api_key
+=== CONT  TestCreateAuthHook_KnownTypesStillBuild/x509
+=== CONT  TestMetricLimitAuditEventLookback/deleteAfter_zero_falls_back_to_catch-up_only
+=== CONT  TestMetricLimitAuditEventLookback/window_shorter_than_half_retention_when_not_count-shortened
+--- PASS: TestRetentionDaysFromJobEnv (0.00s)
+    --- PASS: TestRetentionDaysFromJobEnv/nil_env (0.00s)
+    --- PASS: TestRetentionDaysFromJobEnv/empty_days_key_uses_duration (0.00s)
+    --- PASS: TestRetentionDaysFromJobEnv/invalid_days_does_not_fall_through_to_duration (0.00s)
+    --- PASS: TestRetentionDaysFromJobEnv/retention_duration_hours (0.00s)
+    --- PASS: TestRetentionDaysFromJobEnv/retention_duration_with_h_suffix_fallback (0.00s)
+    --- PASS: TestRetentionDaysFromJobEnv/retention_days (0.00s)
+    --- PASS: TestRetentionDaysFromJobEnv/empty_map (0.00s)
+=== CONT  TestMetricLimitAuditEventLookback/effective_shorter_than_half
+=== CONT  TestCreateAuthHook_KnownTypesStillBuild/oauth2
+=== CONT  TestMetricLimitAuditEventLookback/half_retention_when_no_shortening
+--- PASS: TestCreateAuthHook_KnownTypesStillBuild (0.00s)
+    --- PASS: TestCreateAuthHook_KnownTypesStillBuild/jwt (0.00s)
+    --- PASS: TestCreateAuthHook_KnownTypesStillBuild/api_key (0.00s)
+    --- PASS: TestCreateAuthHook_KnownTypesStillBuild/x509 (0.00s)
+    --- PASS: TestCreateAuthHook_KnownTypesStillBuild/oauth2 (0.00s)
+--- PASS: TestMetricLimitAuditEventLookback (0.00s)
+    --- PASS: TestMetricLimitAuditEventLookback/deleteAfter_zero_falls_back_to_catch-up_only (0.00s)
+    --- PASS: TestMetricLimitAuditEventLookback/window_shorter_than_half_retention_when_not_count-shortened (0.00s)
+    --- PASS: TestMetricLimitAuditEventLookback/effective_shorter_than_half (0.00s)
+    --- PASS: TestMetricLimitAuditEventLookback/half_retention_when_no_shortening (0.00s)
+=== CONT  TestCatchUpAgeLookback/long_window_critical_effective
+=== CONT  TestCatchUpAgeLookback/equal
+=== CONT  TestCatchUpAgeLookback/window_shorter_than_effective
+=== CONT  TestCatchUpAgeLookback/effective_shorter_than_window
+=== CONT  TestCatchUpAgeLookback/default_window_only
+--- PASS: TestCatchUpAgeLookback (0.00s)
+    --- PASS: TestCatchUpAgeLookback/long_window_critical_effective (0.00s)
+    --- PASS: TestCatchUpAgeLookback/equal (0.00s)
+    --- PASS: TestCatchUpAgeLookback/window_shorter_than_effective (0.00s)
+    --- PASS: TestCatchUpAgeLookback/effective_shorter_than_window (0.00s)
+    --- PASS: TestCatchUpAgeLookback/default_window_only (0.00s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/scheduler	0.961s

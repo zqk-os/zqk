@@ -1,0 +1,28 @@
+
+--- run 2026-09-04T21:49:47Z ---
+=== RUN   TestParseYAMLFile
+=== PAUSE TestParseYAMLFile
+=== RUN   TestParseYAMLFile_InvalidYAML
+=== PAUSE TestParseYAMLFile_InvalidYAML
+=== RUN   TestParseYAMLFile_MissingRequiredFields
+=== PAUSE TestParseYAMLFile_MissingRequiredFields
+=== RUN   TestExtractReferenceFields
+=== PAUSE TestExtractReferenceFields
+=== RUN   TestExtractReferenceFields_SkipsGitBranchRef
+=== PAUSE TestExtractReferenceFields_SkipsGitBranchRef
+=== RUN   TestExtractReferenceFields_NoReferences
+=== PAUSE TestExtractReferenceFields_NoReferences
+=== CONT  TestParseYAMLFile
+=== CONT  TestExtractReferenceFields
+--- PASS: TestExtractReferenceFields (0.00s)
+=== CONT  TestExtractReferenceFields_NoReferences
+--- PASS: TestExtractReferenceFields_NoReferences (0.00s)
+=== CONT  TestExtractReferenceFields_SkipsGitBranchRef
+--- PASS: TestExtractReferenceFields_SkipsGitBranchRef (0.00s)
+=== CONT  TestParseYAMLFile_MissingRequiredFields
+--- PASS: TestParseYAMLFile_MissingRequiredFields (0.02s)
+=== CONT  TestParseYAMLFile_InvalidYAML
+--- PASS: TestParseYAMLFile (0.02s)
+--- PASS: TestParseYAMLFile_InvalidYAML (0.02s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/migration/parser	0.395s

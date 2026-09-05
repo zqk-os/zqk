@@ -1,0 +1,24 @@
+{
+  "updated_at": "2026-09-05T05:08:21Z",
+  "block": false,
+  "categories": {
+    "integrity": {
+      "ok": false,
+      "summary": "Tier 1 or integrity issues found",
+      "blocking": false,
+      "updated_at": "2026-09-05T04:01:06Z"
+    },
+    "lint": {
+      "ok": true,
+      "summary": "no go changes in scope",
+      "blocking": true,
+      "updated_at": "2026-09-05T04:10:01Z"
+    },
+    "policy": {
+      "ok": true,
+      "summary": "no go changes in scope",
+      "blocking": true,
+      "updated_at": "2026-09-05T05:08:21Z"
+    }
+  }
+}

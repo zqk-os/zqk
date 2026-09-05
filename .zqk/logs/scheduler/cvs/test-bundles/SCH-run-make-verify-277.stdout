@@ -1,0 +1,44 @@
+
+--- run 2026-09-04T21:50:35Z ---
+=== RUN   TestDeliverer_Names
+=== PAUSE TestDeliverer_Names
+=== RUN   TestComposite_Deliver
+=== PAUSE TestComposite_Deliver
+=== RUN   TestComposite_NilStep
+=== PAUSE TestComposite_NilStep
+=== RUN   TestHTTPDeliverer_Deliver
+=== PAUSE TestHTTPDeliverer_Deliver
+=== RUN   TestHTTPDeliverer_EmptyURL
+=== PAUSE TestHTTPDeliverer_EmptyURL
+=== RUN   TestHTTPDeliverer_WhitespaceOnlyURL
+=== PAUSE TestHTTPDeliverer_WhitespaceOnlyURL
+=== RUN   TestHTTPDeliverer_UnsupportedScheme
+=== PAUSE TestHTTPDeliverer_UnsupportedScheme
+=== RUN   TestHTTPDeliverer_MissingScheme
+=== PAUSE TestHTTPDeliverer_MissingScheme
+=== RUN   TestHTTPDeliverer_Non2xxReturnsErrorAndStatus
+=== PAUSE TestHTTPDeliverer_Non2xxReturnsErrorAndStatus
+=== RUN   TestHTTPDeliverer_CustomClient
+=== PAUSE TestHTTPDeliverer_CustomClient
+=== CONT  TestDeliverer_Names
+--- PASS: TestDeliverer_Names (0.00s)
+=== CONT  TestHTTPDeliverer_WhitespaceOnlyURL
+--- PASS: TestHTTPDeliverer_WhitespaceOnlyURL (0.00s)
+=== CONT  TestHTTPDeliverer_Non2xxReturnsErrorAndStatus
+=== CONT  TestHTTPDeliverer_CustomClient
+--- PASS: TestHTTPDeliverer_Non2xxReturnsErrorAndStatus (0.00s)
+=== CONT  TestHTTPDeliverer_MissingScheme
+--- PASS: TestHTTPDeliverer_MissingScheme (0.00s)
+=== CONT  TestHTTPDeliverer_UnsupportedScheme
+--- PASS: TestHTTPDeliverer_UnsupportedScheme (0.00s)
+=== CONT  TestHTTPDeliverer_Deliver
+--- PASS: TestHTTPDeliverer_CustomClient (0.00s)
+=== CONT  TestHTTPDeliverer_EmptyURL
+--- PASS: TestHTTPDeliverer_EmptyURL (0.00s)
+=== CONT  TestComposite_NilStep
+--- PASS: TestComposite_NilStep (0.00s)
+=== CONT  TestComposite_Deliver
+--- PASS: TestHTTPDeliverer_Deliver (0.00s)
+--- PASS: TestComposite_Deliver (0.01s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/agentdelivery	1.015s

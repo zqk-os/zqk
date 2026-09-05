@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-646",
+  "created_at": "2026-09-04T21:34:33.778622Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-646",
+    "Tests": [
+      {
+        "Name": "TestAppendEvent_writesJSONLAndACK",
+        "Package": "agentfeed",
+        "PackagePath": "pkg/agentfeed",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentfeed/append_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAppendEvent_writesRoleWhenSet",
+        "Package": "agentfeed",
+        "PackagePath": "pkg/agentfeed",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentfeed/append_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAppendEvent_disabledFails",
+        "Package": "agentfeed",
+        "PackagePath": "pkg/agentfeed",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentfeed/append_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAppendEvent_respectsEventsPathOverride",
+        "Package": "agentfeed",
+        "PackagePath": "pkg/agentfeed",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentfeed/append_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAppendEvent_missingMessage",
+        "Package": "agentfeed",
+        "PackagePath": "pkg/agentfeed",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentfeed/append_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAppendEvent_invokesEventEmitter",
+        "Package": "agentfeed",
+        "PackagePath": "pkg/agentfeed",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentfeed/append_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestRegisterPeerAckAwait_listsOpen",
+        "Package": "agentfeed",
+        "PackagePath": "pkg/agentfeed",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentfeed/await_peer_ack_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestCompletePeerAckAwaits_firesCallbackOnce",
+        "Package": "agentfeed",
+        "PackagePath": "pkg/agentfeed",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentfeed/await_peer_ack_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAppendPeerAckWithSession_completesOpenAwait",
+        "Package": "agentfeed",
+        "PackagePath": "pkg/agentfeed",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentfeed/await_peer_ack_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestRegisterPeerAckAwait_requiresEventAndFrom",
+        "Package": "agentfeed",
+        "PackagePath": "pkg/agentfeed",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentfeed/await_peer_ack_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 300000000000,
+    "PackagePath": "pkg/agentfeed"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestAppendEvent_writesJSONLAndACK",
+      "Package": "agentfeed",
+      "PackagePath": "pkg/agentfeed",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentfeed/append_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestAppendEvent_writesRoleWhenSet",
+      "Package": "agentfeed",
+      "PackagePath": "pkg/agentfeed",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentfeed/append_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestAppendEvent_disabledFails",
+      "Package": "agentfeed",
+      "PackagePath": "pkg/agentfeed",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentfeed/append_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestAppendEvent_respectsEventsPathOverride",
+      "Package": "agentfeed",
+      "PackagePath": "pkg/agentfeed",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentfeed/append_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestAppendEvent_missingMessage",
+      "Package": "agentfeed",
+      "PackagePath": "pkg/agentfeed",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentfeed/append_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestAppendEvent_invokesEventEmitter",
+      "Package": "agentfeed",
+      "PackagePath": "pkg/agentfeed",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentfeed/append_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestRegisterPeerAckAwait_listsOpen",
+      "Package": "agentfeed",
+      "PackagePath": "pkg/agentfeed",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentfeed/await_peer_ack_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestCompletePeerAckAwaits_firesCallbackOnce",
+      "Package": "agentfeed",
+      "PackagePath": "pkg/agentfeed",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentfeed/await_peer_ack_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestAppendPeerAckWithSession_completesOpenAwait",
+      "Package": "agentfeed",
+      "PackagePath": "pkg/agentfeed",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentfeed/await_peer_ack_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestRegisterPeerAckAwait_requiresEventAndFrom",
+      "Package": "agentfeed",
+      "PackagePath": "pkg/agentfeed",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentfeed/await_peer_ack_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

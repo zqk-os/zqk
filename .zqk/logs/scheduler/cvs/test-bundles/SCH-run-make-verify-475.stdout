@@ -1,0 +1,84 @@
+
+--- run 2026-09-04T22:13:40Z ---
+=== RUN   TestClassifyAmbience
+=== PAUSE TestClassifyAmbience
+=== RUN   TestAppendStratplanAmbient
+=== PAUSE TestAppendStratplanAmbient
+=== RUN   TestAppendStratplanAmbient_MissingAlign
+=== PAUSE TestAppendStratplanAmbient_MissingAlign
+=== RUN   TestCompileStratplanCommandHint_FreshAlignPointsAtNextColumn
+=== PAUSE TestCompileStratplanCommandHint_FreshAlignPointsAtNextColumn
+=== RUN   TestHintOrchestratePlan
+=== PAUSE TestHintOrchestratePlan
+=== RUN   TestCompileStratplanCommandHint_ShapedNextHourglassesExecutingLead
+=== PAUSE TestCompileStratplanCommandHint_ShapedNextHourglassesExecutingLead
+=== RUN   TestCompileStratplanCommandHint_MissingOrStaleAlign
+=== PAUSE TestCompileStratplanCommandHint_MissingOrStaleAlign
+=== RUN   TestCompileStratplanCommandHint_FreshAlignDraftPlane
+=== PAUSE TestCompileStratplanCommandHint_FreshAlignDraftPlane
+=== RUN   TestFinalizeAlignFreshness
+=== PAUSE TestFinalizeAlignFreshness
+=== RUN   TestRankNextPlanLabels_GroomingFirst
+=== PAUSE TestRankNextPlanLabels_GroomingFirst
+=== CONT  TestClassifyAmbience
+=== RUN   TestClassifyAmbience/inbox_is_TPM_swarm_hunger
+=== PAUSE TestClassifyAmbience/inbox_is_TPM_swarm_hunger
+=== CONT  TestCompileStratplanCommandHint_ShapedNextHourglassesExecutingLead
+--- PASS: TestCompileStratplanCommandHint_ShapedNextHourglassesExecutingLead (0.00s)
+=== RUN   TestClassifyAmbience/empty_column_no_intake
+=== CONT  TestRankNextPlanLabels_GroomingFirst
+--- PASS: TestRankNextPlanLabels_GroomingFirst (0.00s)
+=== CONT  TestFinalizeAlignFreshness
+--- PASS: TestFinalizeAlignFreshness (0.00s)
+=== CONT  TestCompileStratplanCommandHint_FreshAlignDraftPlane
+--- PASS: TestCompileStratplanCommandHint_FreshAlignDraftPlane (0.00s)
+=== CONT  TestCompileStratplanCommandHint_MissingOrStaleAlign
+--- PASS: TestCompileStratplanCommandHint_MissingOrStaleAlign (0.00s)
+=== CONT  TestCompileStratplanCommandHint_FreshAlignPointsAtNextColumn
+--- PASS: TestCompileStratplanCommandHint_FreshAlignPointsAtNextColumn (0.00s)
+=== CONT  TestHintOrchestratePlan
+--- PASS: TestHintOrchestratePlan (0.00s)
+=== CONT  TestAppendStratplanAmbient_MissingAlign
+--- PASS: TestAppendStratplanAmbient_MissingAlign (0.00s)
+=== CONT  TestAppendStratplanAmbient
+--- PASS: TestAppendStratplanAmbient (0.00s)
+=== PAUSE TestClassifyAmbience/empty_column_no_intake
+=== RUN   TestClassifyAmbience/executing_column_is_stratplan_not_groom
+=== PAUSE TestClassifyAmbience/executing_column_is_stratplan_not_groom
+=== RUN   TestClassifyAmbience/locked_plan_status_is_stratplan
+=== PAUSE TestClassifyAmbience/locked_plan_status_is_stratplan
+=== RUN   TestClassifyAmbience/unsealed_exploring_is_true_groom
+=== PAUSE TestClassifyAmbience/unsealed_exploring_is_true_groom
+=== RUN   TestClassifyAmbience/idle_TPM
+=== PAUSE TestClassifyAmbience/idle_TPM
+=== RUN   TestClassifyAmbience/hourglass_waiting_is_keep-working_idle
+=== PAUSE TestClassifyAmbience/hourglass_waiting_is_keep-working_idle
+=== RUN   TestClassifyAmbience/push-ahead_beats_planned_idle
+=== PAUSE TestClassifyAmbience/push-ahead_beats_planned_idle
+=== RUN   TestClassifyAmbience/inbox_beats_push-ahead
+=== PAUSE TestClassifyAmbience/inbox_beats_push-ahead
+=== RUN   TestClassifyAmbience/push-ahead_beats_stratplan
+=== PAUSE TestClassifyAmbience/push-ahead_beats_stratplan
+=== CONT  TestClassifyAmbience/inbox_is_TPM_swarm_hunger
+=== CONT  TestClassifyAmbience/unsealed_exploring_is_true_groom
+=== CONT  TestClassifyAmbience/idle_TPM
+=== CONT  TestClassifyAmbience/executing_column_is_stratplan_not_groom
+=== CONT  TestClassifyAmbience/empty_column_no_intake
+=== CONT  TestClassifyAmbience/locked_plan_status_is_stratplan
+=== CONT  TestClassifyAmbience/push-ahead_beats_stratplan
+=== CONT  TestClassifyAmbience/hourglass_waiting_is_keep-working_idle
+=== CONT  TestClassifyAmbience/push-ahead_beats_planned_idle
+=== CONT  TestClassifyAmbience/inbox_beats_push-ahead
+--- PASS: TestClassifyAmbience (0.00s)
+    --- PASS: TestClassifyAmbience/inbox_is_TPM_swarm_hunger (0.00s)
+    --- PASS: TestClassifyAmbience/unsealed_exploring_is_true_groom (0.00s)
+    --- PASS: TestClassifyAmbience/idle_TPM (0.00s)
+    --- PASS: TestClassifyAmbience/executing_column_is_stratplan_not_groom (0.00s)
+    --- PASS: TestClassifyAmbience/empty_column_no_intake (0.00s)
+    --- PASS: TestClassifyAmbience/locked_plan_status_is_stratplan (0.00s)
+    --- PASS: TestClassifyAmbience/push-ahead_beats_stratplan (0.00s)
+    --- PASS: TestClassifyAmbience/hourglass_waiting_is_keep-working_idle (0.00s)
+    --- PASS: TestClassifyAmbience/push-ahead_beats_planned_idle (0.00s)
+    --- PASS: TestClassifyAmbience/inbox_beats_push-ahead (0.00s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/interactionpolicy	0.583s

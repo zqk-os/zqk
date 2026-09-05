@@ -1,0 +1,7 @@
+job_id: SCH-autofix-process-pending
+execution_id: exec-1788570012-28864
+state: completed
+process_id: 28864
+started_at: 2026-09-05T01:00:12.630331Z
+completed_at: 2026-09-05T01:00:14.028826Z
+policy_decision: execute

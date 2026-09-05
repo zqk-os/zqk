@@ -1,0 +1,52 @@
+callback_on_completion: /Users/lanceettl/zqk-restore-clone/scripts/agent-ops/scheduler-job-callback.py --log /Users/lanceettl/zqk-restore-clone/.zqk/logs/agent-ops/git-commit-20260904T231023Z.callback.json --inflight /Users/lanceettl/zqk-restore-clone/.zqk/state/agent_commit_inflight
+callback_on_error: /Users/lanceettl/zqk-restore-clone/scripts/agent-ops/scheduler-job-callback.py --log /Users/lanceettl/zqk-restore-clone/.zqk/logs/agent-ops/git-commit-20260904T231023Z.callback.json --inflight /Users/lanceettl/zqk-restore-clone/.zqk/state/agent_commit_inflight
+category: manual
+command: /Users/lanceettl/zqk-restore-clone/scripts/git-commit-as-agent.sh
+command_args:
+    - -m
+    - |-
+      fix(kernel): R29 remesure column + ambience triage (ACKONLY)
+
+      Move BLI-CEF-R28-REMEASURE-001 to planned on grooming PRI-CEF-R29-REMEASURE-001
+      (avoid stuffing sealed R28). Replace ghost MS-CEF-001 with MIL-001 on archived
+      MCP resources BLI. Objectify claim verified.
+
+      Assisted-By: cursor-agent
+      Agent-Session: tpm-ackonly-cap-orch
+created_at: "2026-09-04T23:10:25Z"
+created_by: ACC-1785920548450214012-68b850c0
+description: |-
+    Background job submitted via CLI: /Users/lanceettl/zqk-restore-clone/scripts/git-commit-as-agent.sh -m fix(kernel): R29 remesure column + ambience triage (ACKONLY)
+
+    Move BLI-CEF-R28-REMEASURE-001 to planned on grooming PRI-CEF-R29-REMEASURE-001
+    (avoid stuffing sealed R28). Replace ghost MS-CEF-001 with MIL-001 on archived
+    MCP resources BLI. Objectify claim verified.
+
+    Assisted-By: cursor-agent
+    Agent-Session: tpm-ackonly-cap-orch
+enabled: false
+environment_variables:
+    CURSOR_EXTENSION_HOST_ROLE: agent-exec
+    ZQK_AGENT_COMMIT_IN_SCHEDULER: "1"
+    ZQK_ALLOW_UNSTAGED_PROCESS_CAS: "1"
+execution_mode: one_time
+id: SCH-1788563425375298000
+job_type: run_wrapper
+kind: scheduler_job
+last_run_at: "2026-09-04T23:15:11Z"
+max_runtime_seconds: 600
+namespace_id: zqk:kernel
+next_run_at: "2026-09-04T23:10:31Z"
+origin_project: zqk
+origin_system: zqk
+priority: high
+retry_count: 0
+retry_delay_seconds: 5
+schema_version: 2.0.0
+status: active
+title: agent git commit
+trigger_type: immediate
+updated_at: "2026-09-04T23:15:13Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+working_directory: /Users/lanceettl/zqk-restore-clone

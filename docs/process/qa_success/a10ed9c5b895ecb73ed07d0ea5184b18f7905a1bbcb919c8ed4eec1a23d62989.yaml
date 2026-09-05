@@ -1,0 +1,14 @@
+created_at: "2026-08-18T23:37:04Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1787096224406929000-ecc409a9
+item_id: BLI-CEF-R2-ARCH-STORAGE-CLI
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 2857702ca28e4b64fb5782140b43c1400e68fdeab30ab0062f4119523ca97d466e5f13c72adcfa41b92eacf21fa7f0a79b8a8e3a8d7c581e5c9afe0e69cb31dc
+schema_version: 2.0.0
+signature: 3045022100cb1b16cd6f6001ebf2efb0cdfcd0e813f87b803f6b03982ce0a468efb20d2e7b02203772c8af6403bba732fe667ceb04e6be41a6fdd5a73e16cce98d92543a571f2b
+status: archived
+title: Break pkg/storage dependency on internal/cli (and CLI tracker coupling)
+updated_at: "2026-09-01T07:38:17Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

@@ -1,0 +1,44 @@
+
+--- run 2026-09-04T22:11:32Z ---
+=== RUN   TestConvenienceFunctions
+=== PAUSE TestConvenienceFunctions
+=== RUN   TestScenarioBuilder_Integration
+=== PAUSE TestScenarioBuilder_Integration
+=== RUN   TestScenarioWriter_WriteToFile
+=== PAUSE TestScenarioWriter_WriteToFile
+=== RUN   TestScenarioWriter_WriteToString
+=== PAUSE TestScenarioWriter_WriteToString
+=== RUN   TestScenarioGenerator_GenerateFromSpecs
+=== PAUSE TestScenarioGenerator_GenerateFromSpecs
+=== RUN   TestScenarioGenerator_GenerateFromFile
+=== PAUSE TestScenarioGenerator_GenerateFromFile
+=== RUN   TestScenarioGenerator_BuildScenarioFromSpec
+=== PAUSE TestScenarioGenerator_BuildScenarioFromSpec
+=== RUN   TestScenarioGenerator_GenerateFilename
+=== PAUSE TestScenarioGenerator_GenerateFilename
+=== RUN   TestGenerateScenariosFromSpecFile
+=== PAUSE TestGenerateScenariosFromSpecFile
+=== RUN   TestScenarioLoader_InvalidYAML
+=== PAUSE TestScenarioLoader_InvalidYAML
+=== CONT  TestConvenienceFunctions
+=== CONT  TestScenarioGenerator_GenerateFromFile
+--- PASS: TestConvenienceFunctions (0.00s)
+=== CONT  TestGenerateScenariosFromSpecFile
+--- PASS: TestGenerateScenariosFromSpecFile (0.02s)
+=== CONT  TestScenarioLoader_InvalidYAML
+--- PASS: TestScenarioLoader_InvalidYAML (0.02s)
+=== CONT  TestScenarioWriter_WriteToString
+--- PASS: TestScenarioWriter_WriteToString (0.00s)
+=== CONT  TestScenarioGenerator_GenerateFromSpecs
+--- PASS: TestScenarioGenerator_GenerateFromFile (0.05s)
+=== CONT  TestScenarioGenerator_GenerateFilename
+--- PASS: TestScenarioGenerator_GenerateFilename (0.00s)
+=== CONT  TestScenarioGenerator_BuildScenarioFromSpec
+--- PASS: TestScenarioGenerator_BuildScenarioFromSpec (0.00s)
+=== CONT  TestScenarioWriter_WriteToFile
+--- PASS: TestScenarioWriter_WriteToFile (0.02s)
+=== CONT  TestScenarioBuilder_Integration
+--- PASS: TestScenarioBuilder_Integration (0.00s)
+--- PASS: TestScenarioGenerator_GenerateFromSpecs (0.02s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/mcp/testing	0.727s

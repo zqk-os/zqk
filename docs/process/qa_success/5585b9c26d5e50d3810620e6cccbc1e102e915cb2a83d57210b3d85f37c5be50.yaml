@@ -1,0 +1,14 @@
+created_at: "2026-09-02T06:50:05Z"
+created_by: ACC-1785920548450214006-2e52b3e7
+id: QAS-1788331804414627000-cf0a4ae6
+item_id: BLI-CEF-STORAGE-DECOMPOSE-001
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 86b8ab3d574c004a61020b73c23f52b9055049e90c3d755c8bbb383e059e384028fdd8cd69e13123b644e5f3f7eb65596e73e2d57d719ea3dafcb01b84ce8dfb
+schema_version: 2.0.0
+signature: 304502207f7bb03becc77cea353c37e292ed2f4e2dc754b43a49b54dca119973f29ad4a8022100b4f28c9bea6b842727b32190c5bfe5f92799cba48c12a7444f2a7509fa4ceb40
+status: success
+title: QA success for BLI-CEF-STORAGE-DECOMPOSE-001
+updated_at: "2026-09-02T06:50:05Z"
+updated_by: ACC-1785920548450214006-2e52b3e7
+version_context: default

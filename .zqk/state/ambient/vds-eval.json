@@ -1,0 +1,1507 @@
+{
+  "schema": "zqk_vds_evaluate_v1",
+  "policy_id": "POL-WORKFLOW-VDS",
+  "glossary_canonical_title": "Verifiable Decomposition Spine (VDS)",
+  "glossary_term_ref": "GLS-1785637392058851000-6659f7a9",
+  "glossary_acronym_ref": "GLS-1785637405161550000-01091b92",
+  "glossary_resolved_by": "customization",
+  "verdict": "FAIL",
+  "tone": "Done means re-runnable evidence. Narrative is never a gate.",
+  "culture": [
+    "Glossary: Verifiable Decomposition Spine (VDS) (acronym VDS); policy POL-WORKFLOW-VDS; term_ref=GLS-1785637392058851000-6659f7a9; acronym_ref=GLS-1785637405161550000-01091b92",
+    "Name stage + chunk_id before claiming progress.",
+    "Every done claim needs rubric_ref, dsl_checks, evidence_refs, independent_verify.",
+    "Customization changes how checks run — never whether gates exist.",
+    "Waivers are human-authored objects only; agents must not self-waive."
+  ],
+  "spine_profile_id": "verifiable_decomposition_spine_v1",
+  "customization_profile_id": "verifiable_decomposition_customization_v1",
+  "test_execution_mode": "scheduler",
+  "chunks": [
+    {
+      "chunk_id": "vds-spine-policy-active",
+      "stage": "design",
+      "claim": "POL-WORKFLOW-VDS is active and agents have an evaluable gate surface",
+      "verdict": "PASS",
+      "checklist": [
+        {
+          "id": "chunk_id",
+          "ok": true,
+          "detail": "vds-spine-policy-active"
+        },
+        {
+          "id": "stage",
+          "ok": true,
+          "detail": "design"
+        },
+        {
+          "id": "claim",
+          "ok": true,
+          "detail": "POL-WORKFLOW-VDS is active and agents have an evaluable gate surface"
+        },
+        {
+          "id": "rubric_ref",
+          "ok": true,
+          "detail": "GLS-1785637392058851000-6659f7a9"
+        },
+        {
+          "id": "dsl_checks",
+          "ok": true,
+          "detail": "object_exists:POL-WORKFLOW-VDS; field_nonempty:POL-WORKFLOW-VDS:title; field_nonempty:POL-WORKFLOW-VDS:body; object_exists:GLS-1785637392058851000-6659f7a9; field_nonempty:GLS-1785637392058851000-6659f7a9:definition"
+        },
+        {
+          "id": "evidence_refs",
+          "ok": true,
+          "detail": "POL-WORKFLOW-VDS; GLS-1785637392058851000-6659f7a9; GLS-1785637405161550000-01091b92; docs/quality/verifiable_decomposition_spine_profile.yaml; docs/architecture/VERIFIABLE_DECOMPOSITION_SPINE.md"
+        },
+        {
+          "id": "stage_gate",
+          "ok": true,
+          "detail": "gate=yes"
+        },
+        {
+          "id": "predicates",
+          "ok": true,
+          "detail": "all dsl_checks passed (or waived)"
+        },
+        {
+          "id": "independent_verify",
+          "ok": true,
+          "detail": "yes — confirmed by this evaluate run"
+        }
+      ],
+      "predicates": [
+        {
+          "predicate": "object_exists:POL-WORKFLOW-VDS",
+          "ok": true,
+          "detail": "object found"
+        },
+        {
+          "predicate": "field_nonempty:POL-WORKFLOW-VDS:title",
+          "ok": true,
+          "detail": "field present"
+        },
+        {
+          "predicate": "field_nonempty:POL-WORKFLOW-VDS:body",
+          "ok": true,
+          "detail": "field present"
+        },
+        {
+          "predicate": "object_exists:GLS-1785637392058851000-6659f7a9",
+          "ok": true,
+          "detail": "object found"
+        },
+        {
+          "predicate": "field_nonempty:GLS-1785637392058851000-6659f7a9:definition",
+          "ok": true,
+          "detail": "field present"
+        }
+      ],
+      "rubric_ref": "GLS-1785637392058851000-6659f7a9",
+      "evidence_refs": [
+        "POL-WORKFLOW-VDS",
+        "GLS-1785637392058851000-6659f7a9",
+        "GLS-1785637405161550000-01091b92",
+        "docs/quality/verifiable_decomposition_spine_profile.yaml",
+        "docs/architecture/VERIFIABLE_DECOMPOSITION_SPINE.md"
+      ]
+    },
+    {
+      "chunk_id": "vds-vendor-projection-cursor",
+      "stage": "implement",
+      "claim": "Kernel→Cursor VDS projection exists with drift check (vendor_providers)",
+      "verdict": "PASS",
+      "checklist": [
+        {
+          "id": "chunk_id",
+          "ok": true,
+          "detail": "vds-vendor-projection-cursor"
+        },
+        {
+          "id": "stage",
+          "ok": true,
+          "detail": "implement"
+        },
+        {
+          "id": "claim",
+          "ok": true,
+          "detail": "Kernel→Cursor VDS projection exists with drift check (vendor_providers)"
+        },
+        {
+          "id": "rubric_ref",
+          "ok": true,
+          "detail": "GLS-1785637392058851000-6659f7a9"
+        },
+        {
+          "id": "dsl_checks",
+          "ok": true,
+          "detail": "path_exists:docs/architecture/KERNEL_VENDOR_INSTRUCTION_PROJECTION.md; path_exists:.cursor/rules/verifiable-decomposition-spine.mdc; path_exists:scripts/check-vds-vendor-project.sh; object_exists:POL-WORKFLOW-VDS"
+        },
+        {
+          "id": "evidence_refs",
+          "ok": true,
+          "detail": "docs/architecture/KERNEL_VENDOR_INSTRUCTION_PROJECTION.md; .cursor/rules/verifiable-decomposition-spine.mdc; scripts/check-vds-vendor-project.sh; docs/quality/verifiable_decomposition_customization.yaml; [REDACTED-ID]"
+        },
+        {
+          "id": "stage_gate",
+          "ok": true,
+          "detail": "gate=yes"
+        },
+        {
+          "id": "predicates",
+          "ok": true,
+          "detail": "all dsl_checks passed (or waived)"
+        },
+        {
+          "id": "independent_verify",
+          "ok": true,
+          "detail": "yes — confirmed by this evaluate run"
+        }
+      ],
+      "predicates": [
+        {
+          "predicate": "path_exists:docs/architecture/KERNEL_VENDOR_INSTRUCTION_PROJECTION.md",
+          "ok": true,
+          "detail": "path found"
+        },
+        {
+          "predicate": "path_exists:.cursor/rules/verifiable-decomposition-spine.mdc",
+          "ok": true,
+          "detail": "path found"
+        },
+        {
+          "predicate": "path_exists:scripts/check-vds-vendor-project.sh",
+          "ok": true,
+          "detail": "path found"
+        },
+        {
+          "predicate": "object_exists:POL-WORKFLOW-VDS",
+          "ok": true,
+          "detail": "object found"
+        }
+      ],
+      "rubric_ref": "GLS-1785637392058851000-6659f7a9",
+      "evidence_refs": [
+        "docs/architecture/KERNEL_VENDOR_INSTRUCTION_PROJECTION.md",
+        ".cursor/rules/verifiable-decomposition-spine.mdc",
+        "scripts/check-vds-vendor-project.sh",
+        "docs/quality/verifiable_decomposition_customization.yaml",
+        "[REDACTED-ID]"
+      ]
+    },
+    {
+      "chunk_id": "vds-swarm-evaluate-habit",
+      "stage": "design",
+      "claim": "Swarm agents have a fluent VDS evaluate + project check surface before claiming done",
+      "verdict": "PASS",
+      "checklist": [
+        {
+          "id": "chunk_id",
+          "ok": true,
+          "detail": "vds-swarm-evaluate-habit"
+        },
+        {
+          "id": "stage",
+          "ok": true,
+          "detail": "design"
+        },
+        {
+          "id": "claim",
+          "ok": true,
+          "detail": "Swarm agents have a fluent VDS evaluate + project check surface before claiming…"
+        },
+        {
+          "id": "rubric_ref",
+          "ok": true,
+          "detail": "GLS-1785637406673432000-2a625c80"
+        },
+        {
+          "id": "dsl_checks",
+          "ok": true,
+          "detail": "path_exists:.zqk/cli/specs/workflow/vds/evaluate_command.yaml; path_exists:.zqk/cli/specs/workflow/vds/project_command.yaml; path_exists:docs/architecture/VERIFIABLE_DECOMPOSITION_SPINE.md; object_exists:GLS-1785637406673432000-2a625c80"
+        },
+        {
+          "id": "evidence_refs",
+          "ok": true,
+          "detail": "docs/architecture/VERIFIABLE_DECOMPOSITION_SPINE.md; .zqk/cli/specs/workflow/vds/; GLS-1785637406673432000-2a625c80"
+        },
+        {
+          "id": "stage_gate",
+          "ok": true,
+          "detail": "gate=yes"
+        },
+        {
+          "id": "predicates",
+          "ok": true,
+          "detail": "all dsl_checks passed (or waived)"
+        },
+        {
+          "id": "independent_verify",
+          "ok": true,
+          "detail": "yes — confirmed by this evaluate run"
+        }
+      ],
+      "predicates": [
+        {
+          "predicate": "path_exists:.zqk/cli/specs/workflow/vds/evaluate_command.yaml",
+          "ok": true,
+          "detail": "path found"
+        },
+        {
+          "predicate": "path_exists:.zqk/cli/specs/workflow/vds/project_command.yaml",
+          "ok": true,
+          "detail": "path found"
+        },
+        {
+          "predicate": "path_exists:docs/architecture/VERIFIABLE_DECOMPOSITION_SPINE.md",
+          "ok": true,
+          "detail": "path found"
+        },
+        {
+          "predicate": "object_exists:GLS-1785637406673432000-2a625c80",
+          "ok": true,
+          "detail": "object found"
+        }
+      ],
+      "rubric_ref": "GLS-1785637406673432000-2a625c80",
+      "evidence_refs": [
+        "docs/architecture/VERIFIABLE_DECOMPOSITION_SPINE.md",
+        ".zqk/cli/specs/workflow/vds/",
+        "GLS-1785637406673432000-2a625c80"
+      ]
+    },
+    {
+      "chunk_id": "pw-fail-closed-membrane",
+      "stage": "implement",
+      "claim": "PrivilegedWriter fails closed when daemon is unavailable",
+      "verdict": "PASS",
+      "checklist": [
+        {
+          "id": "chunk_id",
+          "ok": true,
+          "detail": "pw-fail-closed-membrane"
+        },
+        {
+          "id": "stage",
+          "ok": true,
+          "detail": "implement"
+        },
+        {
+          "id": "claim",
+          "ok": true,
+          "detail": "PrivilegedWriter fails closed when daemon is unavailable"
+        },
+        {
+          "id": "rubric_ref",
+          "ok": true,
+          "detail": "BLI-CAS-PW-FAIL-CLOSED-001"
+        },
+        {
+          "id": "dsl_checks",
+          "ok": true,
+          "detail": "path_exists:pkg/storage/privileged_writer_fail_closed_test.go"
+        },
+        {
+          "id": "evidence_refs",
+          "ok": true,
+          "detail": "pkg/storage/privileged_writer_fail_closed_test.go; pkg/storage/object_storage_file_create.go; pkg/storage/object_storage_file_delete.go; pkg/storage/object_storage_file_update.go"
+        },
+        {
+          "id": "stage_gate",
+          "ok": true,
+          "detail": "gate=yes"
+        },
+        {
+          "id": "predicates",
+          "ok": true,
+          "detail": "all dsl_checks passed (or waived)"
+        },
+        {
+          "id": "independent_verify",
+          "ok": true,
+          "detail": "yes — confirmed by this evaluate run"
+        }
+      ],
+      "predicates": [
+        {
+          "predicate": "path_exists:pkg/storage/privileged_writer_fail_closed_test.go",
+          "ok": true,
+          "detail": "path found"
+        }
+      ],
+      "rubric_ref": "BLI-CAS-PW-FAIL-CLOSED-001",
+      "evidence_refs": [
+        "pkg/storage/privileged_writer_fail_closed_test.go",
+        "pkg/storage/object_storage_file_create.go",
+        "pkg/storage/object_storage_file_delete.go",
+        "pkg/storage/object_storage_file_update.go"
+      ]
+    },
+    {
+      "chunk_id": "cas-hand-dup-membrane",
+      "stage": "implement",
+      "claim": "System-check blocking for hand-CAS and duplicate-id orphans is implemented",
+      "verdict": "PASS",
+      "checklist": [
+        {
+          "id": "chunk_id",
+          "ok": true,
+          "detail": "cas-hand-dup-membrane"
+        },
+        {
+          "id": "stage",
+          "ok": true,
+          "detail": "implement"
+        },
+        {
+          "id": "claim",
+          "ok": true,
+          "detail": "System-check blocking for hand-CAS and duplicate-id orphans is implemented"
+        },
+        {
+          "id": "rubric_ref",
+          "ok": true,
+          "detail": "CRIT-CAS-HAND-DUP-CHECK-001"
+        },
+        {
+          "id": "dsl_checks",
+          "ok": true,
+          "detail": "path_exists:pkg/processhygiene/handcas_dupdup_test.go"
+        },
+        {
+          "id": "evidence_refs",
+          "ok": true,
+          "detail": "pkg/processhygiene/handcas_dupdup_test.go; pkg/processhygiene/handcas_dup_scan.go; SCH-run-bundle-0; .zqk/logs/scheduler/cvs/test-bundles/bundle-bundle-0-1786453802.log; SCH-run-bundle-1; .zqk/logs/scheduler/cvs/test-bundles/bundle-bundle-1-1786453802.log"
+        },
+        {
+          "id": "stage_gate",
+          "ok": true,
+          "detail": "gate=yes"
+        },
+        {
+          "id": "predicates",
+          "ok": true,
+          "detail": "all dsl_checks passed (or waived)"
+        },
+        {
+          "id": "independent_verify",
+          "ok": true,
+          "detail": "yes — confirmed by this evaluate run"
+        }
+      ],
+      "predicates": [
+        {
+          "predicate": "path_exists:pkg/processhygiene/handcas_dupdup_test.go",
+          "ok": true,
+          "detail": "path found"
+        }
+      ],
+      "rubric_ref": "CRIT-CAS-HAND-DUP-CHECK-001",
+      "evidence_refs": [
+        "pkg/processhygiene/handcas_dupdup_test.go",
+        "pkg/processhygiene/handcas_dup_scan.go",
+        "SCH-run-bundle-0",
+        ".zqk/logs/scheduler/cvs/test-bundles/bundle-bundle-0-1786453802.log",
+        "SCH-run-bundle-1",
+        ".zqk/logs/scheduler/cvs/test-bundles/bundle-bundle-1-1786453802.log"
+      ]
+    },
+    {
+      "chunk_id": "agentidle-datacell-membrane",
+      "stage": "implement",
+      "claim": "Agent idleness accumulator uses datacell lite-file pattern with schema_version and 0600 permissions",
+      "verdict": "PASS",
+      "checklist": [
+        {
+          "id": "chunk_id",
+          "ok": true,
+          "detail": "agentidle-datacell-membrane"
+        },
+        {
+          "id": "stage",
+          "ok": true,
+          "detail": "implement"
+        },
+        {
+          "id": "claim",
+          "ok": true,
+          "detail": "Agent idleness accumulator uses datacell lite-file pattern with schema_version …"
+        },
+        {
+          "id": "rubric_ref",
+          "ok": true,
+          "detail": "BLI-AGENT-IDLE-PR1522-REMEDIATE-001"
+        },
+        {
+          "id": "dsl_checks",
+          "ok": true,
+          "detail": "path_exists:pkg/agentidle/store_test.go"
+        },
+        {
+          "id": "evidence_refs",
+          "ok": true,
+          "detail": "pkg/agentidle/store_test.go; pkg/agentidle/store.go; cmd/zqk/agent/scoreboard.go"
+        },
+        {
+          "id": "stage_gate",
+          "ok": true,
+          "detail": "gate=yes"
+        },
+        {
+          "id": "predicates",
+          "ok": true,
+          "detail": "all dsl_checks passed (or waived)"
+        },
+        {
+          "id": "independent_verify",
+          "ok": true,
+          "detail": "yes — confirmed by this evaluate run"
+        }
+      ],
+      "predicates": [
+        {
+          "predicate": "path_exists:pkg/agentidle/store_test.go",
+          "ok": true,
+          "detail": "path found"
+        }
+      ],
+      "rubric_ref": "BLI-AGENT-IDLE-PR1522-REMEDIATE-001",
+      "evidence_refs": [
+        "pkg/agentidle/store_test.go",
+        "pkg/agentidle/store.go",
+        "cmd/zqk/agent/scoreboard.go"
+      ]
+    },
+    {
+      "chunk_id": "mcp-comms-restart-safe-closure",
+      "stage": "integrate_verify",
+      "claim": "MCP configuration and notify-only dual-seat COMMS pass after restart and fail closed without a seat worker",
+      "verdict": "PASS",
+      "checklist": [
+        {
+          "id": "chunk_id",
+          "ok": true,
+          "detail": "mcp-comms-restart-safe-closure"
+        },
+        {
+          "id": "stage",
+          "ok": true,
+          "detail": "integrate_verify"
+        },
+        {
+          "id": "claim",
+          "ok": true,
+          "detail": "MCP configuration and notify-only dual-seat COMMS pass after restart and fail c…"
+        },
+        {
+          "id": "rubric_ref",
+          "ok": true,
+          "detail": "CRIT-MCP-COMMS-E2E-CLOSURE-001"
+        },
+        {
+          "id": "dsl_checks",
+          "ok": true,
+          "detail": "object_exists:BLI-MCP-COMMS-E2E-CLOSURE-001; object_exists:CRIT-MCP-COMMS-E2E-CLOSURE-001; path_exists:cmd/zqk/system/mcp_comms_e2e_closure_test.go; path_exists:pkg/agentfeed/seat_worker_test.go"
+        },
+        {
+          "id": "evidence_refs",
+          "ok": true,
+          "detail": "SCH-run-mcp-comms-closure-20260815-0; SCH-run-mcp-comms-closure-20260815-1; SCH-run-mcp-comms-closure-20260815-2; SCH-run-mcp-comms-closure-20260815-3; .zqk/logs/scheduler/cvs/test-bundles/SCH-run-mcp-comms-closure-20260815-0.stdout; .zqk/logs/scheduler/cvs/test-bundles/SCH-run-mcp-comms-closure-20260815-1.stdout; .zqk/logs/scheduler/cvs/test-bundles/SCH-run-mcp-comms-closure-20260815-2.stdout; .zqk/logs/scheduler/cvs/test-bundles/SCH-run-mcp-comms-closure-20260815-3.stdout; .zqk/logs/ide-hooks/agent_chat_channel.jsonl; AFE-1786823288046424000-fa2f5f2d; AFE-1786823343392121000-97b2ae40; AFE-1786823347062971000-983e8ec2"
+        },
+        {
+          "id": "stage_gate",
+          "ok": true,
+          "detail": "gate_* omitted (allowed); prefer setting stage gate to yes"
+        },
+        {
+          "id": "predicates",
+          "ok": true,
+          "detail": "all dsl_checks passed (or waived)"
+        },
+        {
+          "id": "independent_verify",
+          "ok": true,
+          "detail": "yes — confirmed by this evaluate run"
+        }
+      ],
+      "predicates": [
+        {
+          "predicate": "object_exists:BLI-MCP-COMMS-E2E-CLOSURE-001",
+          "ok": true,
+          "detail": "object found"
+        },
+        {
+          "predicate": "object_exists:CRIT-MCP-COMMS-E2E-CLOSURE-001",
+          "ok": true,
+          "detail": "object found"
+        },
+        {
+          "predicate": "path_exists:cmd/zqk/system/mcp_comms_e2e_closure_test.go",
+          "ok": true,
+          "detail": "path found"
+        },
+        {
+          "predicate": "path_exists:pkg/agentfeed/seat_worker_test.go",
+          "ok": true,
+          "detail": "path found"
+        }
+      ],
+      "rubric_ref": "CRIT-MCP-COMMS-E2E-CLOSURE-001",
+      "evidence_refs": [
+        "SCH-run-mcp-comms-closure-20260815-0",
+        "SCH-run-mcp-comms-closure-20260815-1",
+        "SCH-run-mcp-comms-closure-20260815-2",
+        "SCH-run-mcp-comms-closure-20260815-3",
+        ".zqk/logs/scheduler/cvs/test-bundles/SCH-run-mcp-comms-closure-20260815-0.stdout",
+        ".zqk/logs/scheduler/cvs/test-bundles/SCH-run-mcp-comms-closure-20260815-1.stdout",
+        ".zqk/logs/scheduler/cvs/test-bundles/SCH-run-mcp-comms-closure-20260815-2.stdout",
+        ".zqk/logs/scheduler/cvs/test-bundles/SCH-run-mcp-comms-closure-20260815-3.stdout",
+        ".zqk/logs/ide-hooks/agent_chat_channel.jsonl",
+        "AFE-1786823288046424000-fa2f5f2d",
+        "AFE-1786823343392121000-97b2ae40",
+        "AFE-1786823347062971000-983e8ec2"
+      ]
+    },
+    {
+      "chunk_id": "vds-test-repo-write-gate",
+      "stage": "implement",
+      "claim": "Test time repo write gate prevents tests from mutating real repository docs/process and .zqk state",
+      "verdict": "PASS",
+      "checklist": [
+        {
+          "id": "chunk_id",
+          "ok": true,
+          "detail": "vds-test-repo-write-gate"
+        },
+        {
+          "id": "stage",
+          "ok": true,
+          "detail": "implement"
+        },
+        {
+          "id": "claim",
+          "ok": true,
+          "detail": "Test time repo write gate prevents tests from mutating real repository docs/pro…"
+        },
+        {
+          "id": "rubric_ref",
+          "ok": true,
+          "detail": "CRIT-CEF-R13-NO-REPO-WRITE-GATE-001"
+        },
+        {
+          "id": "dsl_checks",
+          "ok": true,
+          "detail": "path_exists:pkg/testenvroot/os_wrappers.go; path_exists:pkg/testenvroot/os_wrappers_test.go"
+        },
+        {
+          "id": "evidence_refs",
+          "ok": true,
+          "detail": "pkg/testenvroot/os_wrappers.go; pkg/testenvroot/os_wrappers_test.go"
+        },
+        {
+          "id": "stage_gate",
+          "ok": true,
+          "detail": "gate=yes"
+        },
+        {
+          "id": "predicates",
+          "ok": true,
+          "detail": "all dsl_checks passed (or waived)"
+        },
+        {
+          "id": "independent_verify",
+          "ok": true,
+          "detail": "yes — confirmed by this evaluate run"
+        }
+      ],
+      "predicates": [
+        {
+          "predicate": "path_exists:pkg/testenvroot/os_wrappers.go",
+          "ok": true,
+          "detail": "path found"
+        },
+        {
+          "predicate": "path_exists:pkg/testenvroot/os_wrappers_test.go",
+          "ok": true,
+          "detail": "path found"
+        }
+      ],
+      "rubric_ref": "CRIT-CEF-R13-NO-REPO-WRITE-GATE-001",
+      "evidence_refs": [
+        "pkg/testenvroot/os_wrappers.go",
+        "pkg/testenvroot/os_wrappers_test.go"
+      ]
+    },
+    {
+      "chunk_id": "file-cas-extract-membrane",
+      "stage": "implement",
+      "claim": "File and CAS read-write plane extracted behind stable facade without changing hashing behavior",
+      "verdict": "PASS",
+      "checklist": [
+        {
+          "id": "chunk_id",
+          "ok": true,
+          "detail": "file-cas-extract-membrane"
+        },
+        {
+          "id": "stage",
+          "ok": true,
+          "detail": "implement"
+        },
+        {
+          "id": "claim",
+          "ok": true,
+          "detail": "File and CAS read-write plane extracted behind stable facade without changing h…"
+        },
+        {
+          "id": "rubric_ref",
+          "ok": true,
+          "detail": "BLI-CEF-R12-FILE-CAS-EXTRACT-001"
+        },
+        {
+          "id": "dsl_checks",
+          "ok": true,
+          "detail": "path_exists:pkg/storage/filecas/content_addressable_storage.go; path_exists:pkg/storage/filecas/content_addressable_storage_file.go; path_exists:pkg/storage/filecas/content_addressable_storage_index.go"
+        },
+        {
+          "id": "evidence_refs",
+          "ok": true,
+          "detail": "pkg/storage/filecas/content_addressable_storage.go; pkg/storage/filecas/content_addressable_storage_file.go; pkg/storage/filecas/content_addressable_storage_index.go; pkg/storage/object_storage_file_cas.go"
+        },
+        {
+          "id": "stage_gate",
+          "ok": true,
+          "detail": "gate=yes"
+        },
+        {
+          "id": "predicates",
+          "ok": true,
+          "detail": "all dsl_checks passed (or waived)"
+        },
+        {
+          "id": "independent_verify",
+          "ok": true,
+          "detail": "yes — confirmed by this evaluate run"
+        }
+      ],
+      "predicates": [
+        {
+          "predicate": "path_exists:pkg/storage/filecas/content_addressable_storage.go",
+          "ok": true,
+          "detail": "path found"
+        },
+        {
+          "predicate": "path_exists:pkg/storage/filecas/content_addressable_storage_file.go",
+          "ok": true,
+          "detail": "path found"
+        },
+        {
+          "predicate": "path_exists:pkg/storage/filecas/content_addressable_storage_index.go",
+          "ok": true,
+          "detail": "path found"
+        }
+      ],
+      "rubric_ref": "BLI-CEF-R12-FILE-CAS-EXTRACT-001",
+      "evidence_refs": [
+        "pkg/storage/filecas/content_addressable_storage.go",
+        "pkg/storage/filecas/content_addressable_storage_file.go",
+        "pkg/storage/filecas/content_addressable_storage_index.go",
+        "pkg/storage/object_storage_file_cas.go"
+      ]
+    },
+    {
+      "chunk_id": "sbom-dependency-review",
+      "stage": "implement",
+      "claim": "SBOM generation and dependency review path exists",
+      "verdict": "PASS",
+      "checklist": [
+        {
+          "id": "chunk_id",
+          "ok": true,
+          "detail": "sbom-dependency-review"
+        },
+        {
+          "id": "stage",
+          "ok": true,
+          "detail": "implement"
+        },
+        {
+          "id": "claim",
+          "ok": true,
+          "detail": "SBOM generation and dependency review path exists"
+        },
+        {
+          "id": "rubric_ref",
+          "ok": true,
+          "detail": "CRIT-CEF-R2-SUP-SBOM-A"
+        },
+        {
+          "id": "dsl_checks",
+          "ok": true,
+          "detail": "object_exists:BLI-CEF-R18-SBOM-001; object_exists:CRIT-CEF-R2-SUP-SBOM-A; path_exists:.github/workflows/sbom.yml; path_exists:.github/dependabot.yml; path_exists:SECURITY.md"
+        },
+        {
+          "id": "evidence_refs",
+          "ok": true,
+          "detail": ".github/workflows/sbom.yml; .github/dependabot.yml; SECURITY.md; pkg/gitevidence/commit_refs_test.go"
+        },
+        {
+          "id": "stage_gate",
+          "ok": true,
+          "detail": "gate=yes"
+        },
+        {
+          "id": "predicates",
+          "ok": true,
+          "detail": "all dsl_checks passed (or waived)"
+        },
+        {
+          "id": "independent_verify",
+          "ok": true,
+          "detail": "yes — confirmed by this evaluate run"
+        }
+      ],
+      "predicates": [
+        {
+          "predicate": "object_exists:BLI-CEF-R18-SBOM-001",
+          "ok": true,
+          "detail": "object found"
+        },
+        {
+          "predicate": "object_exists:CRIT-CEF-R2-SUP-SBOM-A",
+          "ok": true,
+          "detail": "object found"
+        },
+        {
+          "predicate": "path_exists:.github/workflows/sbom.yml",
+          "ok": true,
+          "detail": "path found"
+        },
+        {
+          "predicate": "path_exists:.github/dependabot.yml",
+          "ok": true,
+          "detail": "path found"
+        },
+        {
+          "predicate": "path_exists:SECURITY.md",
+          "ok": true,
+          "detail": "path found"
+        }
+      ],
+      "rubric_ref": "CRIT-CEF-R2-SUP-SBOM-A",
+      "evidence_refs": [
+        ".github/workflows/sbom.yml",
+        ".github/dependabot.yml",
+        "SECURITY.md",
+        "pkg/gitevidence/commit_refs_test.go"
+      ]
+    },
+    {
+      "chunk_id": "vds-plan-mergeback-gate",
+      "stage": "implement",
+      "claim": "Plan cannot complete until its branch is an ancestor of trunk",
+      "verdict": "PASS",
+      "checklist": [
+        {
+          "id": "chunk_id",
+          "ok": true,
+          "detail": "vds-plan-mergeback-gate"
+        },
+        {
+          "id": "stage",
+          "ok": true,
+          "detail": "implement"
+        },
+        {
+          "id": "claim",
+          "ok": true,
+          "detail": "Plan cannot complete until its branch is an ancestor of trunk"
+        },
+        {
+          "id": "rubric_ref",
+          "ok": true,
+          "detail": "CRIT-CEF-R20-PLAN-MERGEBACK-GATE-001"
+        },
+        {
+          "id": "dsl_checks",
+          "ok": true,
+          "detail": "object_exists:BLI-CEF-R20-PLAN-MERGEBACK-GATE-001; object_exists:CRIT-CEF-R20-PLAN-MERGEBACK-GATE-001; path_exists:pkg/gitevidence/commit_refs.go; path_exists:pkg/gitevidence/commit_refs_test.go; path_exists:pkg/validation/go_validator.go"
+        },
+        {
+          "id": "evidence_refs",
+          "ok": true,
+          "detail": "pkg/gitevidence/commit_refs.go; pkg/gitevidence/commit_refs_test.go; pkg/validation/go_validator.go"
+        },
+        {
+          "id": "stage_gate",
+          "ok": true,
+          "detail": "gate=yes"
+        },
+        {
+          "id": "predicates",
+          "ok": true,
+          "detail": "all dsl_checks passed (or waived)"
+        },
+        {
+          "id": "independent_verify",
+          "ok": true,
+          "detail": "yes — confirmed by this evaluate run"
+        }
+      ],
+      "predicates": [
+        {
+          "predicate": "object_exists:BLI-CEF-R20-PLAN-MERGEBACK-GATE-001",
+          "ok": true,
+          "detail": "object found"
+        },
+        {
+          "predicate": "object_exists:CRIT-CEF-R20-PLAN-MERGEBACK-GATE-001",
+          "ok": true,
+          "detail": "object found"
+        },
+        {
+          "predicate": "path_exists:pkg/gitevidence/commit_refs.go",
+          "ok": true,
+          "detail": "path found"
+        },
+        {
+          "predicate": "path_exists:pkg/gitevidence/commit_refs_test.go",
+          "ok": true,
+          "detail": "path found"
+        },
+        {
+          "predicate": "path_exists:pkg/validation/go_validator.go",
+          "ok": true,
+          "detail": "path found"
+        }
+      ],
+      "rubric_ref": "CRIT-CEF-R20-PLAN-MERGEBACK-GATE-001",
+      "evidence_refs": [
+        "pkg/gitevidence/commit_refs.go",
+        "pkg/gitevidence/commit_refs_test.go",
+        "pkg/validation/go_validator.go"
+      ]
+    },
+    {
+      "chunk_id": "vds-refactor-delta-criteria",
+      "stage": "implement",
+      "claim": "Refactor criteria must assert measured deltas, not existence",
+      "verdict": "PASS",
+      "checklist": [
+        {
+          "id": "chunk_id",
+          "ok": true,
+          "detail": "vds-refactor-delta-criteria"
+        },
+        {
+          "id": "stage",
+          "ok": true,
+          "detail": "implement"
+        },
+        {
+          "id": "claim",
+          "ok": true,
+          "detail": "Refactor criteria must assert measured deltas, not existence"
+        },
+        {
+          "id": "rubric_ref",
+          "ok": true,
+          "detail": "CRIT-CEF-R20-REFACTOR-DELTA-CRITERIA-001"
+        },
+        {
+          "id": "dsl_checks",
+          "ok": true,
+          "detail": "object_exists:BLI-CEF-R20-REFACTOR-DELTA-CRITERIA-001; object_exists:CRIT-CEF-R20-REFACTOR-DELTA-CRITERIA-001; path_exists:pkg/agentclaim/claim.go; path_exists:pkg/agentclaim/claim_test.go; path_exists:tools/git-hooks/commit-msg"
+        },
+        {
+          "id": "evidence_refs",
+          "ok": true,
+          "detail": "pkg/agentclaim/claim.go; pkg/agentclaim/claim_test.go; tools/git-hooks/commit-msg"
+        },
+        {
+          "id": "stage_gate",
+          "ok": true,
+          "detail": "gate=yes"
+        },
+        {
+          "id": "predicates",
+          "ok": true,
+          "detail": "all dsl_checks passed (or waived)"
+        },
+        {
+          "id": "independent_verify",
+          "ok": true,
+          "detail": "yes — confirmed by this evaluate run"
+        }
+      ],
+      "predicates": [
+        {
+          "predicate": "object_exists:BLI-CEF-R20-REFACTOR-DELTA-CRITERIA-001",
+          "ok": true,
+          "detail": "object found"
+        },
+        {
+          "predicate": "object_exists:CRIT-CEF-R20-REFACTOR-DELTA-CRITERIA-001",
+          "ok": true,
+          "detail": "object found"
+        },
+        {
+          "predicate": "path_exists:pkg/agentclaim/claim.go",
+          "ok": true,
+          "detail": "path found"
+        },
+        {
+          "predicate": "path_exists:pkg/agentclaim/claim_test.go",
+          "ok": true,
+          "detail": "path found"
+        },
+        {
+          "predicate": "path_exists:tools/git-hooks/commit-msg",
+          "ok": true,
+          "detail": "path found"
+        }
+      ],
+      "rubric_ref": "CRIT-CEF-R20-REFACTOR-DELTA-CRITERIA-001",
+      "evidence_refs": [
+        "pkg/agentclaim/claim.go",
+        "pkg/agentclaim/claim_test.go",
+        "tools/git-hooks/commit-msg"
+      ]
+    },
+    {
+      "chunk_id": "concurrency-ctx-001",
+      "stage": "implement",
+      "claim": "Honor ctx on locks/queues; bound race CI to concurrency packages",
+      "verdict": "PASS",
+      "checklist": [
+        {
+          "id": "chunk_id",
+          "ok": true,
+          "detail": "concurrency-ctx-001"
+        },
+        {
+          "id": "stage",
+          "ok": true,
+          "detail": "implement"
+        },
+        {
+          "id": "claim",
+          "ok": true,
+          "detail": "Honor ctx on locks/queues; bound race CI to concurrency packages"
+        },
+        {
+          "id": "rubric_ref",
+          "ok": true,
+          "detail": "CRIT-CEF-ARCH-CONCURRENCY-CTX-001"
+        },
+        {
+          "id": "dsl_checks",
+          "ok": true,
+          "detail": "object_exists:BLI-CEF-ARCH-CONCURRENCY-CTX-001; object_exists:CRIT-CEF-ARCH-CONCURRENCY-CTX-001; path_exists:pkg/concurrency/timeout_mutex.go; path_exists:pkg/storage/operation_queue.go; path_exists:pkg/mcp/tools_verification.go; path_exists:.github/workflows/go-quality.yml"
+        },
+        {
+          "id": "evidence_refs",
+          "ok": true,
+          "detail": "pkg/concurrency/timeout_mutex.go; pkg/storage/operation_queue.go; pkg/mcp/tools_verification.go; .github/workflows/go-quality.yml"
+        },
+        {
+          "id": "stage_gate",
+          "ok": true,
+          "detail": "gate=yes"
+        },
+        {
+          "id": "predicates",
+          "ok": true,
+          "detail": "all dsl_checks passed (or waived)"
+        },
+        {
+          "id": "independent_verify",
+          "ok": true,
+          "detail": "yes — confirmed by this evaluate run"
+        }
+      ],
+      "predicates": [
+        {
+          "predicate": "object_exists:BLI-CEF-ARCH-CONCURRENCY-CTX-001",
+          "ok": true,
+          "detail": "object found"
+        },
+        {
+          "predicate": "object_exists:CRIT-CEF-ARCH-CONCURRENCY-CTX-001",
+          "ok": true,
+          "detail": "object found"
+        },
+        {
+          "predicate": "path_exists:pkg/concurrency/timeout_mutex.go",
+          "ok": true,
+          "detail": "path found"
+        },
+        {
+          "predicate": "path_exists:pkg/storage/operation_queue.go",
+          "ok": true,
+          "detail": "path found"
+        },
+        {
+          "predicate": "path_exists:pkg/mcp/tools_verification.go",
+          "ok": true,
+          "detail": "path found"
+        },
+        {
+          "predicate": "path_exists:.github/workflows/go-quality.yml",
+          "ok": true,
+          "detail": "path found"
+        }
+      ],
+      "rubric_ref": "CRIT-CEF-ARCH-CONCURRENCY-CTX-001",
+      "evidence_refs": [
+        "pkg/concurrency/timeout_mutex.go",
+        "pkg/storage/operation_queue.go",
+        "pkg/mcp/tools_verification.go",
+        ".github/workflows/go-quality.yml"
+      ]
+    },
+    {
+      "chunk_id": "arch-god-packages-001",
+      "stage": "implement",
+      "claim": "Split remaining god-packages and kill no-op replaces",
+      "verdict": "PASS",
+      "checklist": [
+        {
+          "id": "chunk_id",
+          "ok": true,
+          "detail": "arch-god-packages-001"
+        },
+        {
+          "id": "stage",
+          "ok": true,
+          "detail": "implement"
+        },
+        {
+          "id": "claim",
+          "ok": true,
+          "detail": "Split remaining god-packages and kill no-op replaces"
+        },
+        {
+          "id": "rubric_ref",
+          "ok": true,
+          "detail": "CRIT-CEF-ARCH-GOD-PACKAGES-001"
+        },
+        {
+          "id": "dsl_checks",
+          "ok": true,
+          "detail": "object_exists:BLI-CEF-ARCH-GOD-PACKAGES-001; path_exists:go.mod"
+        },
+        {
+          "id": "evidence_refs",
+          "ok": true,
+          "detail": "go.mod"
+        },
+        {
+          "id": "stage_gate",
+          "ok": true,
+          "detail": "gate=yes"
+        },
+        {
+          "id": "predicates",
+          "ok": true,
+          "detail": "all dsl_checks passed (or waived)"
+        },
+        {
+          "id": "independent_verify",
+          "ok": true,
+          "detail": "yes — confirmed by this evaluate run"
+        }
+      ],
+      "predicates": [
+        {
+          "predicate": "object_exists:BLI-CEF-ARCH-GOD-PACKAGES-001",
+          "ok": true,
+          "detail": "object found"
+        },
+        {
+          "predicate": "path_exists:go.mod",
+          "ok": true,
+          "detail": "path found"
+        }
+      ],
+      "rubric_ref": "CRIT-CEF-ARCH-GOD-PACKAGES-001",
+      "evidence_refs": [
+        "go.mod"
+      ]
+    },
+    {
+      "chunk_id": "cef-r27-remeasure",
+      "stage": "implement",
+      "claim": "R27 dual-seat COMPARE correctly measures TST/RCV/SEC towards 5 with no empty drivers",
+      "verdict": "PASS",
+      "checklist": [
+        {
+          "id": "chunk_id",
+          "ok": true,
+          "detail": "cef-r27-remeasure"
+        },
+        {
+          "id": "stage",
+          "ok": true,
+          "detail": "implement"
+        },
+        {
+          "id": "claim",
+          "ok": true,
+          "detail": "R27 dual-seat COMPARE correctly measures TST/RCV/SEC towards 5 with no empty dr…"
+        },
+        {
+          "id": "rubric_ref",
+          "ok": true,
+          "detail": "CRIT-CEF-R27-TST-RCV-SEC-001"
+        },
+        {
+          "id": "dsl_checks",
+          "ok": true,
+          "detail": "path_exists:docs/quality/cef-runs/2026-08-31-COMPARE.md; path_exists:docs/quality/cef-runs/2026-08-31-AGENT_W/scorecard.json; path_exists:docs/quality/cef-runs/2026-08-31-AGENT_X/scorecard.json"
+        },
+        {
+          "id": "evidence_refs",
+          "ok": true,
+          "detail": "docs/quality/cef-runs/2026-08-31-COMPARE.md; docs/quality/cef-runs/2026-08-31-AGENT_W/scorecard.json; docs/quality/cef-runs/2026-08-31-AGENT_X/scorecard.json"
+        },
+        {
+          "id": "stage_gate",
+          "ok": true,
+          "detail": "gate=yes"
+        },
+        {
+          "id": "predicates",
+          "ok": true,
+          "detail": "all dsl_checks passed (or waived)"
+        },
+        {
+          "id": "independent_verify",
+          "ok": true,
+          "detail": "yes — confirmed by this evaluate run"
+        }
+      ],
+      "predicates": [
+        {
+          "predicate": "path_exists:docs/quality/cef-runs/2026-08-31-COMPARE.md",
+          "ok": true,
+          "detail": "path found"
+        },
+        {
+          "predicate": "path_exists:docs/quality/cef-runs/2026-08-31-AGENT_W/scorecard.json",
+          "ok": true,
+          "detail": "path found"
+        },
+        {
+          "predicate": "path_exists:docs/quality/cef-runs/2026-08-31-AGENT_X/scorecard.json",
+          "ok": true,
+          "detail": "path found"
+        }
+      ],
+      "rubric_ref": "CRIT-CEF-R27-TST-RCV-SEC-001",
+      "evidence_refs": [
+        "docs/quality/cef-runs/2026-08-31-COMPARE.md",
+        "docs/quality/cef-runs/2026-08-31-AGENT_W/scorecard.json",
+        "docs/quality/cef-runs/2026-08-31-AGENT_X/scorecard.json"
+      ]
+    },
+    {
+      "chunk_id": "orch-boundaries",
+      "stage": "implement",
+      "claim": "Document orch packages; DIP scheduler-storage; stop MCP importing CLI",
+      "verdict": "PASS",
+      "checklist": [
+        {
+          "id": "chunk_id",
+          "ok": true,
+          "detail": "orch-boundaries"
+        },
+        {
+          "id": "stage",
+          "ok": true,
+          "detail": "implement"
+        },
+        {
+          "id": "claim",
+          "ok": true,
+          "detail": "Document orch packages; DIP scheduler-storage; stop MCP importing CLI"
+        },
+        {
+          "id": "rubric_ref",
+          "ok": true,
+          "detail": "CRIT-CEF-ORCH-PACKAGE-DOC-001"
+        },
+        {
+          "id": "dsl_checks",
+          "ok": true,
+          "detail": "object_exists:BLI-CEF-ORCH-BOUNDARIES-001; object_exists:CRIT-CEF-ORCH-PACKAGE-DOC-001; path_exists:pkg/pipeline/doc.go"
+        },
+        {
+          "id": "evidence_refs",
+          "ok": true,
+          "detail": "pkg/pipeline/doc.go"
+        },
+        {
+          "id": "stage_gate",
+          "ok": true,
+          "detail": "gate=yes"
+        },
+        {
+          "id": "predicates",
+          "ok": true,
+          "detail": "all dsl_checks passed (or waived)"
+        },
+        {
+          "id": "independent_verify",
+          "ok": true,
+          "detail": "yes — confirmed by this evaluate run"
+        }
+      ],
+      "predicates": [
+        {
+          "predicate": "object_exists:BLI-CEF-ORCH-BOUNDARIES-001",
+          "ok": true,
+          "detail": "object found"
+        },
+        {
+          "predicate": "object_exists:CRIT-CEF-ORCH-PACKAGE-DOC-001",
+          "ok": true,
+          "detail": "object found"
+        },
+        {
+          "predicate": "path_exists:pkg/pipeline/doc.go",
+          "ok": true,
+          "detail": "path found"
+        }
+      ],
+      "rubric_ref": "CRIT-CEF-ORCH-PACKAGE-DOC-001",
+      "evidence_refs": [
+        "pkg/pipeline/doc.go"
+      ]
+    },
+    {
+      "chunk_id": "scheduler-storage-dip",
+      "stage": "implement",
+      "claim": "Scheduler depends on a StorageProvider interface not pkg/storage concrete",
+      "verdict": "PASS",
+      "checklist": [
+        {
+          "id": "chunk_id",
+          "ok": true,
+          "detail": "scheduler-storage-dip"
+        },
+        {
+          "id": "stage",
+          "ok": true,
+          "detail": "implement"
+        },
+        {
+          "id": "claim",
+          "ok": true,
+          "detail": "Scheduler depends on a StorageProvider interface not pkg/storage concrete"
+        },
+        {
+          "id": "rubric_ref",
+          "ok": true,
+          "detail": "CRIT-CEF-SCHEDULER-STORAGE-DIP-001"
+        },
+        {
+          "id": "dsl_checks",
+          "ok": true,
+          "detail": "object_exists:CRIT-CEF-SCHEDULER-STORAGE-DIP-001; path_exists:pkg/scheduler/convergence_engine.go"
+        },
+        {
+          "id": "evidence_refs",
+          "ok": true,
+          "detail": "pkg/scheduler/convergence_engine.go"
+        },
+        {
+          "id": "stage_gate",
+          "ok": true,
+          "detail": "gate=yes"
+        },
+        {
+          "id": "predicates",
+          "ok": true,
+          "detail": "all dsl_checks passed (or waived)"
+        },
+        {
+          "id": "independent_verify",
+          "ok": true,
+          "detail": "yes — confirmed by this evaluate run"
+        }
+      ],
+      "predicates": [
+        {
+          "predicate": "object_exists:CRIT-CEF-SCHEDULER-STORAGE-DIP-001",
+          "ok": true,
+          "detail": "object found"
+        },
+        {
+          "predicate": "path_exists:pkg/scheduler/convergence_engine.go",
+          "ok": true,
+          "detail": "path found"
+        }
+      ],
+      "rubric_ref": "CRIT-CEF-SCHEDULER-STORAGE-DIP-001",
+      "evidence_refs": [
+        "pkg/scheduler/convergence_engine.go"
+      ]
+    },
+    {
+      "chunk_id": "mcp-no-cli-import",
+      "stage": "implement",
+      "claim": "pkg/mcp does not import pkg/cli",
+      "verdict": "PASS",
+      "checklist": [
+        {
+          "id": "chunk_id",
+          "ok": true,
+          "detail": "mcp-no-cli-import"
+        },
+        {
+          "id": "stage",
+          "ok": true,
+          "detail": "implement"
+        },
+        {
+          "id": "claim",
+          "ok": true,
+          "detail": "pkg/mcp does not import pkg/cli"
+        },
+        {
+          "id": "rubric_ref",
+          "ok": true,
+          "detail": "CRIT-CEF-MCP-NO-CLI-IMPORT-001"
+        },
+        {
+          "id": "dsl_checks",
+          "ok": true,
+          "detail": "object_exists:CRIT-CEF-MCP-NO-CLI-IMPORT-001; path_exists:pkg/mcp/serve_coordinator.go; path_exists:pkg/mcp/cli_ontology_jsonld.go"
+        },
+        {
+          "id": "evidence_refs",
+          "ok": true,
+          "detail": "pkg/mcp/serve_coordinator.go; pkg/mcp/cli_ontology_jsonld.go"
+        },
+        {
+          "id": "stage_gate",
+          "ok": true,
+          "detail": "gate=yes"
+        },
+        {
+          "id": "predicates",
+          "ok": true,
+          "detail": "all dsl_checks passed (or waived)"
+        },
+        {
+          "id": "independent_verify",
+          "ok": true,
+          "detail": "yes — confirmed by this evaluate run"
+        }
+      ],
+      "predicates": [
+        {
+          "predicate": "object_exists:CRIT-CEF-MCP-NO-CLI-IMPORT-001",
+          "ok": true,
+          "detail": "object found"
+        },
+        {
+          "predicate": "path_exists:pkg/mcp/serve_coordinator.go",
+          "ok": true,
+          "detail": "path found"
+        },
+        {
+          "predicate": "path_exists:pkg/mcp/cli_ontology_jsonld.go",
+          "ok": true,
+          "detail": "path found"
+        }
+      ],
+      "rubric_ref": "CRIT-CEF-MCP-NO-CLI-IMPORT-001",
+      "evidence_refs": [
+        "pkg/mcp/serve_coordinator.go",
+        "pkg/mcp/cli_ontology_jsonld.go"
+      ]
+    },
+    {
+      "chunk_id": "vds-generated-lint-exclude",
+      "stage": "implementation",
+      "claim": "Verify that generated specbuilders are excluded from lint and quality LOC",
+      "verdict": "FAIL",
+      "checklist": [
+        {
+          "id": "chunk_id",
+          "ok": true,
+          "detail": "vds-generated-lint-exclude"
+        },
+        {
+          "id": "stage",
+          "ok": false,
+          "detail": "must be one of: intent_capture, design, implement, integrate_verify, operate_release"
+        },
+        {
+          "id": "claim",
+          "ok": true,
+          "detail": "Verify that generated specbuilders are excluded from lint and quality LOC"
+        },
+        {
+          "id": "rubric_ref",
+          "ok": false,
+          "detail": "required — criteria id, matrix row, or rubric anchor"
+        },
+        {
+          "id": "dsl_checks",
+          "ok": true,
+          "detail": "object_exists:CRIT-CEF-GENERATED-LINT-EXCLUDE-001; object_exists:BLI-CEF-GENERATED-EXCLUDE-001"
+        },
+        {
+          "id": "evidence_refs",
+          "ok": false,
+          "detail": "required — re-runnable footprints (ids, job ids, log paths)"
+        },
+        {
+          "id": "stage_gate",
+          "ok": false,
+          "detail": "unknown stage"
+        },
+        {
+          "id": "predicates",
+          "ok": true,
+          "detail": "all dsl_checks passed (or waived)"
+        },
+        {
+          "id": "independent_verify",
+          "ok": true,
+          "detail": "yes — confirmed by this evaluate run"
+        }
+      ],
+      "predicates": [
+        {
+          "predicate": "object_exists:CRIT-CEF-GENERATED-LINT-EXCLUDE-001",
+          "ok": true,
+          "detail": "object found"
+        },
+        {
+          "predicate": "object_exists:BLI-CEF-GENERATED-EXCLUDE-001",
+          "ok": true,
+          "detail": "object found"
+        }
+      ],
+      "next_actions": [
+        "Set stage to one of intent_capture|design|implement|integrate_verify|operate_release",
+        "For tests: zqk scheduler scan-tests --package ./path/to/pkg then put job id + log path in evidence_refs",
+        "Re-run: zqk workflow vds evaluate --file \u003cchunks.yaml\u003e --format json"
+      ]
+    }
+  ],
+  "failed_chunk_ids": [
+    "vds-generated-lint-exclude"
+  ],
+  "next_actions": [
+    "Set stage to one of intent_capture|design|implement|integrate_verify|operate_release",
+    "For tests: zqk scheduler scan-tests --package ./path/to/pkg then put job id + log path in evidence_refs",
+    "Re-run: zqk workflow vds evaluate --file \u003cchunks.yaml\u003e --format json"
+  ],
+  "agent_brief": "# VDS FAIL (POL-WORKFLOW-VDS)\n\nDone means re-runnable evidence. Narrative is never a gate.\n\n- Glossary: Verifiable Decomposition Spine (VDS) (acronym VDS); policy POL-WORKFLOW-VDS; term_ref=GLS-1785637392058851000-6659f7a9; acronym_ref=GLS-1785637405161550000-01091b92\n- Name stage + chunk_id before claiming progress.\n- Every done claim needs rubric_ref, dsl_checks, evidence_refs, independent_verify.\n- Customization changes how checks run — never whether gates exist.\n- Waivers are human-authored objects only; agents must not self-waive.\n\n## Chunks\n\n### `vds-spine-policy-active` — design — **PASS**\nPOL-WORKFLOW-VDS is active and agents have an evaluable gate surface\n\n| check | ok | detail |\n|---|---|---|\n| chunk_id | ok | vds-spine-policy-active |\n| stage | ok | design |\n| claim | ok | POL-WORKFLOW-VDS is active and agents have an evaluable gate surface |\n| rubric_ref | ok | GLS-1785637392058851000-6659f7a9 |\n| dsl_checks | ok | object_exists:POL-WORKFLOW-VDS; field_nonempty:POL-WORKFLOW-VDS:title; field_nonempty:POL-WORKFLOW-VDS:body; object_exists:GLS-1785637392058851000-6659f7a9; field_nonempty:GLS-1785637392058851000-6659f7a9:definition |\n| evidence_refs | ok | POL-WORKFLOW-VDS; GLS-1785637392058851000-6659f7a9; GLS-1785637405161550000-01091b92; docs/quality/verifiable_decomposition_spine_profile.yaml; docs/architecture/VERIFIABLE_DECOMPOSITION_SPINE.md |\n| stage_gate | ok | gate=yes |\n| predicates | ok | all dsl_checks passed (or waived) |\n| independent_verify | ok | yes — confirmed by this evaluate run |\n\n### `vds-vendor-projection-cursor` — implement — **PASS**\nKernel→Cursor VDS projection exists with drift check (vendor_providers)\n\n| check | ok | detail |\n|---|---|---|\n| chunk_id | ok | vds-vendor-projection-cursor |\n| stage | ok | implement |\n| claim | ok | Kernel→Cursor VDS projection exists with drift check (vendor_providers) |\n| rubric_ref | ok | GLS-1785637392058851000-6659f7a9 |\n| dsl_checks | ok | path_exists:docs/architecture/KERNEL_VENDOR_INSTRUCTION_PROJECTION.md; path_exists:.cursor/rules/verifiable-decomposition-spine.mdc; path_exists:scripts/check-vds-vendor-project.sh; object_exists:POL-WORKFLOW-VDS |\n| evidence_refs | ok | docs/architecture/KERNEL_VENDOR_INSTRUCTION_PROJECTION.md; .cursor/rules/verifiable-decomposition-spine.mdc; scripts/check-vds-vendor-project.sh; docs/quality/verifiable_decomposition_customization.yaml; [REDACTED-ID] |\n| stage_gate | ok | gate=yes |\n| predicates | ok | all dsl_checks passed (or waived) |\n| independent_verify | ok | yes — confirmed by this evaluate run |\n\n### `vds-swarm-evaluate-habit` — design — **PASS**\nSwarm agents have a fluent VDS evaluate + project check surface before claiming done\n\n| check | ok | detail |\n|---|---|---|\n| chunk_id | ok | vds-swarm-evaluate-habit |\n| stage | ok | design |\n| claim | ok | Swarm agents have a fluent VDS evaluate + project check surface before claiming… |\n| rubric_ref | ok | GLS-1785637406673432000-2a625c80 |\n| dsl_checks | ok | path_exists:.zqk/cli/specs/workflow/vds/evaluate_command.yaml; path_exists:.zqk/cli/specs/workflow/vds/project_command.yaml; path_exists:docs/architecture/VERIFIABLE_DECOMPOSITION_SPINE.md; object_exists:GLS-1785637406673432000-2a625c80 |\n| evidence_refs | ok | docs/architecture/VERIFIABLE_DECOMPOSITION_SPINE.md; .zqk/cli/specs/workflow/vds/; GLS-1785637406673432000-2a625c80 |\n| stage_gate | ok | gate=yes |\n| predicates | ok | all dsl_checks passed (or waived) |\n| independent_verify | ok | yes — confirmed by this evaluate run |\n\n### `pw-fail-closed-membrane` — implement — **PASS**\nPrivilegedWriter fails closed when daemon is unavailable\n\n| check | ok | detail |\n|---|---|---|\n| chunk_id | ok | pw-fail-closed-membrane |\n| stage | ok | implement |\n| claim | ok | PrivilegedWriter fails closed when daemon is unavailable |\n| rubric_ref | ok | BLI-CAS-PW-FAIL-CLOSED-001 |\n| dsl_checks | ok | path_exists:pkg/storage/privileged_writer_fail_closed_test.go |\n| evidence_refs | ok | pkg/storage/privileged_writer_fail_closed_test.go; pkg/storage/object_storage_file_create.go; pkg/storage/object_storage_file_delete.go; pkg/storage/object_storage_file_update.go |\n| stage_gate | ok | gate=yes |\n| predicates | ok | all dsl_checks passed (or waived) |\n| independent_verify | ok | yes — confirmed by this evaluate run |\n\n### `cas-hand-dup-membrane` — implement — **PASS**\nSystem-check blocking for hand-CAS and duplicate-id orphans is implemented\n\n| check | ok | detail |\n|---|---|---|\n| chunk_id | ok | cas-hand-dup-membrane |\n| stage | ok | implement |\n| claim | ok | System-check blocking for hand-CAS and duplicate-id orphans is implemented |\n| rubric_ref | ok | CRIT-CAS-HAND-DUP-CHECK-001 |\n| dsl_checks | ok | path_exists:pkg/processhygiene/handcas_dupdup_test.go |\n| evidence_refs | ok | pkg/processhygiene/handcas_dupdup_test.go; pkg/processhygiene/handcas_dup_scan.go; SCH-run-bundle-0; .zqk/logs/scheduler/cvs/test-bundles/bundle-bundle-0-1786453802.log; SCH-run-bundle-1; .zqk/logs/scheduler/cvs/test-bundles/bundle-bundle-1-1786453802.log |\n| stage_gate | ok | gate=yes |\n| predicates | ok | all dsl_checks passed (or waived) |\n| independent_verify | ok | yes — confirmed by this evaluate run |\n\n### `agentidle-datacell-membrane` — implement — **PASS**\nAgent idleness accumulator uses datacell lite-file pattern with schema_version and 0600 permissions\n\n| check | ok | detail |\n|---|---|---|\n| chunk_id | ok | agentidle-datacell-membrane |\n| stage | ok | implement |\n| claim | ok | Agent idleness accumulator uses datacell lite-file pattern with schema_version … |\n| rubric_ref | ok | BLI-AGENT-IDLE-PR1522-REMEDIATE-001 |\n| dsl_checks | ok | path_exists:pkg/agentidle/store_test.go |\n| evidence_refs | ok | pkg/agentidle/store_test.go; pkg/agentidle/store.go; cmd/zqk/agent/scoreboard.go |\n| stage_gate | ok | gate=yes |\n| predicates | ok | all dsl_checks passed (or waived) |\n| independent_verify | ok | yes — confirmed by this evaluate run |\n\n### `mcp-comms-restart-safe-closure` — integrate_verify — **PASS**\nMCP configuration and notify-only dual-seat COMMS pass after restart and fail closed without a seat worker\n\n| check | ok | detail |\n|---|---|---|\n| chunk_id | ok | mcp-comms-restart-safe-closure |\n| stage | ok | integrate_verify |\n| claim | ok | MCP configuration and notify-only dual-seat COMMS pass after restart and fail c… |\n| rubric_ref | ok | CRIT-MCP-COMMS-E2E-CLOSURE-001 |\n| dsl_checks | ok | object_exists:BLI-MCP-COMMS-E2E-CLOSURE-001; object_exists:CRIT-MCP-COMMS-E2E-CLOSURE-001; path_exists:cmd/zqk/system/mcp_comms_e2e_closure_test.go; path_exists:pkg/agentfeed/seat_worker_test.go |\n| evidence_refs | ok | SCH-run-mcp-comms-closure-20260815-0; SCH-run-mcp-comms-closure-20260815-1; SCH-run-mcp-comms-closure-20260815-2; SCH-run-mcp-comms-closure-20260815-3; .zqk/logs/scheduler/cvs/test-bundles/SCH-run-mcp-comms-closure-20260815-0.stdout; .zqk/logs/scheduler/cvs/test-bundles/SCH-run-mcp-comms-closure-20260815-1.stdout; .zqk/logs/scheduler/cvs/test-bundles/SCH-run-mcp-comms-closure-20260815-2.stdout; .zqk/logs/scheduler/cvs/test-bundles/SCH-run-mcp-comms-closure-20260815-3.stdout; .zqk/logs/ide-hooks/agent_chat_channel.jsonl; AFE-1786823288046424000-fa2f5f2d; AFE-1786823343392121000-97b2ae40; AFE-1786823347062971000-983e8ec2 |\n| stage_gate | ok | gate_* omitted (allowed); prefer setting stage gate to yes |\n| predicates | ok | all dsl_checks passed (or waived) |\n| independent_verify | ok | yes — confirmed by this evaluate run |\n\n### `vds-test-repo-write-gate` — implement — **PASS**\nTest time repo write gate prevents tests from mutating real repository docs/process and .zqk state\n\n| check | ok | detail |\n|---|---|---|\n| chunk_id | ok | vds-test-repo-write-gate |\n| stage | ok | implement |\n| claim | ok | Test time repo write gate prevents tests from mutating real repository docs/pro… |\n| rubric_ref | ok | CRIT-CEF-R13-NO-REPO-WRITE-GATE-001 |\n| dsl_checks | ok | path_exists:pkg/testenvroot/os_wrappers.go; path_exists:pkg/testenvroot/os_wrappers_test.go |\n| evidence_refs | ok | pkg/testenvroot/os_wrappers.go; pkg/testenvroot/os_wrappers_test.go |\n| stage_gate | ok | gate=yes |\n| predicates | ok | all dsl_checks passed (or waived) |\n| independent_verify | ok | yes — confirmed by this evaluate run |\n\n### `file-cas-extract-membrane` — implement — **PASS**\nFile and CAS read-write plane extracted behind stable facade without changing hashing behavior\n\n| check | ok | detail |\n|---|---|---|\n| chunk_id | ok | file-cas-extract-membrane |\n| stage | ok | implement |\n| claim | ok | File and CAS read-write plane extracted behind stable facade without changing h… |\n| rubric_ref | ok | BLI-CEF-R12-FILE-CAS-EXTRACT-001 |\n| dsl_checks | ok | path_exists:pkg/storage/filecas/content_addressable_storage.go; path_exists:pkg/storage/filecas/content_addressable_storage_file.go; path_exists:pkg/storage/filecas/content_addressable_storage_index.go |\n| evidence_refs | ok | pkg/storage/filecas/content_addressable_storage.go; pkg/storage/filecas/content_addressable_storage_file.go; pkg/storage/filecas/content_addressable_storage_index.go; pkg/storage/object_storage_file_cas.go |\n| stage_gate | ok | gate=yes |\n| predicates | ok | all dsl_checks passed (or waived) |\n| independent_verify | ok | yes — confirmed by this evaluate run |\n\n### `sbom-dependency-review` — implement — **PASS**\nSBOM generation and dependency review path exists\n\n| check | ok | detail |\n|---|---|---|\n| chunk_id | ok | sbom-dependency-review |\n| stage | ok | implement |\n| claim | ok | SBOM generation and dependency review path exists |\n| rubric_ref | ok | CRIT-CEF-R2-SUP-SBOM-A |\n| dsl_checks | ok | object_exists:BLI-CEF-R18-SBOM-001; object_exists:CRIT-CEF-R2-SUP-SBOM-A; path_exists:.github/workflows/sbom.yml; path_exists:.github/dependabot.yml; path_exists:SECURITY.md |\n| evidence_refs | ok | .github/workflows/sbom.yml; .github/dependabot.yml; SECURITY.md; pkg/gitevidence/commit_refs_test.go |\n| stage_gate | ok | gate=yes |\n| predicates | ok | all dsl_checks passed (or waived) |\n| independent_verify | ok | yes — confirmed by this evaluate run |\n\n### `vds-plan-mergeback-gate` — implement — **PASS**\nPlan cannot complete until its branch is an ancestor of trunk\n\n| check | ok | detail |\n|---|---|---|\n| chunk_id | ok | vds-plan-mergeback-gate |\n| stage | ok | implement |\n| claim | ok | Plan cannot complete until its branch is an ancestor of trunk |\n| rubric_ref | ok | CRIT-CEF-R20-PLAN-MERGEBACK-GATE-001 |\n| dsl_checks | ok | object_exists:BLI-CEF-R20-PLAN-MERGEBACK-GATE-001; object_exists:CRIT-CEF-R20-PLAN-MERGEBACK-GATE-001; path_exists:pkg/gitevidence/commit_refs.go; path_exists:pkg/gitevidence/commit_refs_test.go; path_exists:pkg/validation/go_validator.go |\n| evidence_refs | ok | pkg/gitevidence/commit_refs.go; pkg/gitevidence/commit_refs_test.go; pkg/validation/go_validator.go |\n| stage_gate | ok | gate=yes |\n| predicates | ok | all dsl_checks passed (or waived) |\n| independent_verify | ok | yes — confirmed by this evaluate run |\n\n### `vds-refactor-delta-criteria` — implement — **PASS**\nRefactor criteria must assert measured deltas, not existence\n\n| check | ok | detail |\n|---|---|---|\n| chunk_id | ok | vds-refactor-delta-criteria |\n| stage | ok | implement |\n| claim | ok | Refactor criteria must assert measured deltas, not existence |\n| rubric_ref | ok | CRIT-CEF-R20-REFACTOR-DELTA-CRITERIA-001 |\n| dsl_checks | ok | object_exists:BLI-CEF-R20-REFACTOR-DELTA-CRITERIA-001; object_exists:CRIT-CEF-R20-REFACTOR-DELTA-CRITERIA-001; path_exists:pkg/agentclaim/claim.go; path_exists:pkg/agentclaim/claim_test.go; path_exists:tools/git-hooks/commit-msg |\n| evidence_refs | ok | pkg/agentclaim/claim.go; pkg/agentclaim/claim_test.go; tools/git-hooks/commit-msg |\n| stage_gate | ok | gate=yes |\n| predicates | ok | all dsl_checks passed (or waived) |\n| independent_verify | ok | yes — confirmed by this evaluate run |\n\n### `concurrency-ctx-001` — implement — **PASS**\nHonor ctx on locks/queues; bound race CI to concurrency packages\n\n| check | ok | detail |\n|---|---|---|\n| chunk_id | ok | concurrency-ctx-001 |\n| stage | ok | implement |\n| claim | ok | Honor ctx on locks/queues; bound race CI to concurrency packages |\n| rubric_ref | ok | CRIT-CEF-ARCH-CONCURRENCY-CTX-001 |\n| dsl_checks | ok | object_exists:BLI-CEF-ARCH-CONCURRENCY-CTX-001; object_exists:CRIT-CEF-ARCH-CONCURRENCY-CTX-001; path_exists:pkg/concurrency/timeout_mutex.go; path_exists:pkg/storage/operation_queue.go; path_exists:pkg/mcp/tools_verification.go; path_exists:.github/workflows/go-quality.yml |\n| evidence_refs | ok | pkg/concurrency/timeout_mutex.go; pkg/storage/operation_queue.go; pkg/mcp/tools_verification.go; .github/workflows/go-quality.yml |\n| stage_gate | ok | gate=yes |\n| predicates | ok | all dsl_checks passed (or waived) |\n| independent_verify | ok | yes — confirmed by this evaluate run |\n\n### `arch-god-packages-001` — implement — **PASS**\nSplit remaining god-packages and kill no-op replaces\n\n| check | ok | detail |\n|---|---|---|\n| chunk_id | ok | arch-god-packages-001 |\n| stage | ok | implement |\n| claim | ok | Split remaining god-packages and kill no-op replaces |\n| rubric_ref | ok | CRIT-CEF-ARCH-GOD-PACKAGES-001 |\n| dsl_checks | ok | object_exists:BLI-CEF-ARCH-GOD-PACKAGES-001; path_exists:go.mod |\n| evidence_refs | ok | go.mod |\n| stage_gate | ok | gate=yes |\n| predicates | ok | all dsl_checks passed (or waived) |\n| independent_verify | ok | yes — confirmed by this evaluate run |\n\n### `cef-r27-remeasure` — implement — **PASS**\nR27 dual-seat COMPARE correctly measures TST/RCV/SEC towards 5 with no empty drivers\n\n| check | ok | detail |\n|---|---|---|\n| chunk_id | ok | cef-r27-remeasure |\n| stage | ok | implement |\n| claim | ok | R27 dual-seat COMPARE correctly measures TST/RCV/SEC towards 5 with no empty dr… |\n| rubric_ref | ok | CRIT-CEF-R27-TST-RCV-SEC-001 |\n| dsl_checks | ok | path_exists:docs/quality/cef-runs/2026-08-31-COMPARE.md; path_exists:docs/quality/cef-runs/2026-08-31-AGENT_W/scorecard.json; path_exists:docs/quality/cef-runs/2026-08-31-AGENT_X/scorecard.json |\n| evidence_refs | ok | docs/quality/cef-runs/2026-08-31-COMPARE.md; docs/quality/cef-runs/2026-08-31-AGENT_W/scorecard.json; docs/quality/cef-runs/2026-08-31-AGENT_X/scorecard.json |\n| stage_gate | ok | gate=yes |\n| predicates | ok | all dsl_checks passed (or waived) |\n| independent_verify | ok | yes — confirmed by this evaluate run |\n\n### `orch-boundaries` — implement — **PASS**\nDocument orch packages; DIP scheduler-storage; stop MCP importing CLI\n\n| check | ok | detail |\n|---|---|---|\n| chunk_id | ok | orch-boundaries |\n| stage | ok | implement |\n| claim | ok | Document orch packages; DIP scheduler-storage; stop MCP importing CLI |\n| rubric_ref | ok | CRIT-CEF-ORCH-PACKAGE-DOC-001 |\n| dsl_checks | ok | object_exists:BLI-CEF-ORCH-BOUNDARIES-001; object_exists:CRIT-CEF-ORCH-PACKAGE-DOC-001; path_exists:pkg/pipeline/doc.go |\n| evidence_refs | ok | pkg/pipeline/doc.go |\n| stage_gate | ok | gate=yes |\n| predicates | ok | all dsl_checks passed (or waived) |\n| independent_verify | ok | yes — confirmed by this evaluate run |\n\n### `scheduler-storage-dip` — implement — **PASS**\nScheduler depends on a StorageProvider interface not pkg/storage concrete\n\n| check | ok | detail |\n|---|---|---|\n| chunk_id | ok | scheduler-storage-dip |\n| stage | ok | implement |\n| claim | ok | Scheduler depends on a StorageProvider interface not pkg/storage concrete |\n| rubric_ref | ok | CRIT-CEF-SCHEDULER-STORAGE-DIP-001 |\n| dsl_checks | ok | object_exists:CRIT-CEF-SCHEDULER-STORAGE-DIP-001; path_exists:pkg/scheduler/convergence_engine.go |\n| evidence_refs | ok | pkg/scheduler/convergence_engine.go |\n| stage_gate | ok | gate=yes |\n| predicates | ok | all dsl_checks passed (or waived) |\n| independent_verify | ok | yes — confirmed by this evaluate run |\n\n### `mcp-no-cli-import` — implement — **PASS**\npkg/mcp does not import pkg/cli\n\n| check | ok | detail |\n|---|---|---|\n| chunk_id | ok | mcp-no-cli-import |\n| stage | ok | implement |\n| claim | ok | pkg/mcp does not import pkg/cli |\n| rubric_ref | ok | CRIT-CEF-MCP-NO-CLI-IMPORT-001 |\n| dsl_checks | ok | object_exists:CRIT-CEF-MCP-NO-CLI-IMPORT-001; path_exists:pkg/mcp/serve_coordinator.go; path_exists:pkg/mcp/cli_ontology_jsonld.go |\n| evidence_refs | ok | pkg/mcp/serve_coordinator.go; pkg/mcp/cli_ontology_jsonld.go |\n| stage_gate | ok | gate=yes |\n| predicates | ok | all dsl_checks passed (or waived) |\n| independent_verify | ok | yes — confirmed by this evaluate run |\n\n### `vds-generated-lint-exclude` — implementation — **FAIL**\nVerify that generated specbuilders are excluded from lint and quality LOC\n\n| check | ok | detail |\n|---|---|---|\n| chunk_id | ok | vds-generated-lint-exclude |\n| stage | FAIL | must be one of: intent_capture, design, implement, integrate_verify, operate_release |\n| claim | ok | Verify that generated specbuilders are excluded from lint and quality LOC |\n| rubric_ref | FAIL | required — criteria id, matrix row, or rubric anchor |\n| dsl_checks | ok | object_exists:CRIT-CEF-GENERATED-LINT-EXCLUDE-001; object_exists:BLI-CEF-GENERATED-EXCLUDE-001 |\n| evidence_refs | FAIL | required — re-runnable footprints (ids, job ids, log paths) |\n| stage_gate | FAIL | unknown stage |\n| predicates | ok | all dsl_checks passed (or waived) |\n| independent_verify | ok | yes — confirmed by this evaluate run |\n\nNext:\n- Set stage to one of intent_capture|design|implement|integrate_verify|operate_release\n- For tests: zqk scheduler scan-tests --package ./path/to/pkg then put job id + log path in evidence_refs\n- Re-run: zqk workflow vds evaluate --file \u003cchunks.yaml\u003e --format json\n\n## Global next\n- Set stage to one of intent_capture|design|implement|integrate_verify|operate_release\n- For tests: zqk scheduler scan-tests --package ./path/to/pkg then put job id + log path in evidence_refs\n- Re-run: zqk workflow vds evaluate --file \u003cchunks.yaml\u003e --format json\n\n```\nzqk workflow vds evaluate --format json\n```\n",
+  "run_commands": false
+}

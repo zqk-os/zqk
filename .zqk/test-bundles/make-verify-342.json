@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-342",
+  "created_at": "2026-09-04T21:34:30.748217Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-342",
+    "Tests": [
+      {
+        "Name": "TestGoPackagesWritten_ignoresPathsOutsideRoot",
+        "Package": "agent",
+        "PackagePath": "cmd/zqk/agent",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/agent/seat_worker_gate_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestVerifyGoWorkAsCompletion_rejectsNoMutationWrites",
+        "Package": "agent",
+        "PackagePath": "cmd/zqk/agent",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/agent/seat_worker_gate_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestVerifyGoWorkAsCompletion_acceptsNonGoMutationWrite",
+        "Package": "agent",
+        "PackagePath": "cmd/zqk/agent",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/agent/seat_worker_gate_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestRevertSeatWrites_skipsProcessData",
+        "Package": "agent",
+        "PackagePath": "cmd/zqk/agent",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/agent/seat_worker_gate_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestParseOrchestratePlanDirective",
+        "Package": "agent",
+        "PackagePath": "cmd/zqk/agent",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/agent/seat_worker_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestExtractATKIDFromSteer",
+        "Package": "agent",
+        "PackagePath": "cmd/zqk/agent",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/agent/seat_worker_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestSeatWorkerWorkClass",
+        "Package": "agent",
+        "PackagePath": "cmd/zqk/agent",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/agent/seat_worker_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestBuildSeatWorkerAgentXPromptsRefusesWithoutStorage",
+        "Package": "agent",
+        "PackagePath": "cmd/zqk/agent",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/agent/seat_worker_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestBuildSeatWorkerAgentXPromptsRefusesSteerWithoutATK",
+        "Package": "agent",
+        "PackagePath": "cmd/zqk/agent",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/agent/seat_worker_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestParseOrchestratePlanDirectiveRejectsUnsafeID",
+        "Package": "agent",
+        "PackagePath": "cmd/zqk/agent",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/agent/seat_worker_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": true,
+    "EstimatedDuration": 300000000000,
+    "PackagePath": "cmd/zqk/agent"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestGoPackagesWritten_ignoresPathsOutsideRoot",
+      "Package": "agent",
+      "PackagePath": "cmd/zqk/agent",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/agent/seat_worker_gate_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestVerifyGoWorkAsCompletion_rejectsNoMutationWrites",
+      "Package": "agent",
+      "PackagePath": "cmd/zqk/agent",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/agent/seat_worker_gate_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestVerifyGoWorkAsCompletion_acceptsNonGoMutationWrite",
+      "Package": "agent",
+      "PackagePath": "cmd/zqk/agent",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/agent/seat_worker_gate_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestRevertSeatWrites_skipsProcessData",
+      "Package": "agent",
+      "PackagePath": "cmd/zqk/agent",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/agent/seat_worker_gate_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestParseOrchestratePlanDirective",
+      "Package": "agent",
+      "PackagePath": "cmd/zqk/agent",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/agent/seat_worker_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestExtractATKIDFromSteer",
+      "Package": "agent",
+      "PackagePath": "cmd/zqk/agent",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/agent/seat_worker_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestSeatWorkerWorkClass",
+      "Package": "agent",
+      "PackagePath": "cmd/zqk/agent",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/agent/seat_worker_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestBuildSeatWorkerAgentXPromptsRefusesWithoutStorage",
+      "Package": "agent",
+      "PackagePath": "cmd/zqk/agent",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/agent/seat_worker_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestBuildSeatWorkerAgentXPromptsRefusesSteerWithoutATK",
+      "Package": "agent",
+      "PackagePath": "cmd/zqk/agent",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/agent/seat_worker_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestParseOrchestratePlanDirectiveRejectsUnsafeID",
+      "Package": "agent",
+      "PackagePath": "cmd/zqk/agent",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/agent/seat_worker_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

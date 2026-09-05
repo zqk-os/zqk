@@ -1,0 +1,121 @@
+{
+  "cases": [
+    {
+      "name": "satisfied",
+      "tb": {
+        "ready_for_session_completion": true,
+        "failing_fingerprints_now": [],
+        "delta_assessment": "neutral"
+      },
+      "fk": 0,
+      "ze": 0,
+      "matrix_pending": null,
+      "matrix_err": "",
+      "children": [],
+      "want_status": "satisfied",
+      "want_ready_parent": true,
+      "want_blocker_codes": [],
+      "want_primary_measurement_outcome": "measurement_yields_convergence",
+      "want_primary_measurement_outcome_detail": "all_configured_surfaces_green"
+    },
+    {
+      "name": "blocked_fingerprints",
+      "tb": {
+        "ready_for_session_completion": false,
+        "failing_fingerprints_now": ["abc"],
+        "delta_assessment": "neutral"
+      },
+      "fk": 0,
+      "ze": 0,
+      "matrix_pending": null,
+      "matrix_err": "",
+      "children": [],
+      "want_status": "blocked",
+      "want_ready_parent": false,
+      "want_blocker_codes": ["test_bundles_failing"],
+      "want_primary_measurement_outcome": "measurement_yields_divergence",
+      "want_primary_measurement_outcome_detail": "bundle_health_bad_signal"
+    },
+    {
+      "name": "ready_for_review_matrix_only",
+      "tb": {
+        "ready_for_session_completion": true,
+        "failing_fingerprints_now": [],
+        "delta_assessment": "neutral"
+      },
+      "fk": 0,
+      "ze": 0,
+      "matrix_pending": 3,
+      "matrix_err": "",
+      "children": [],
+      "want_status": "ready_for_review",
+      "want_ready_parent": false,
+      "want_blocker_codes": ["matrix_rows_pending"],
+      "want_blocker_details": {
+        "matrix_rows_pending": "3 human-scope .go row(s) not fully done (gate columns)"
+      },
+      "want_primary_measurement_outcome": "measurement_yields_divergence",
+      "want_primary_measurement_outcome_detail": "follow_up_required_matrix_or_child"
+    },
+    {
+      "name": "ready_for_review_child_only",
+      "tb": {
+        "ready_for_session_completion": true,
+        "failing_fingerprints_now": [],
+        "delta_assessment": "neutral"
+      },
+      "fk": 0,
+      "ze": 0,
+      "matrix_pending": null,
+      "matrix_err": "",
+      "children": [
+        {
+          "id": "CVS-child",
+          "status": "active",
+          "blockers": ["child_status_active"]
+        }
+      ],
+      "want_status": "ready_for_review",
+      "want_ready_parent": false,
+      "want_blocker_codes": ["child_session"],
+      "want_primary_measurement_outcome": "measurement_yields_divergence",
+      "want_primary_measurement_outcome_detail": "follow_up_required_matrix_or_child"
+    },
+    {
+      "name": "partial_bundle_gate",
+      "tb": {
+        "ready_for_session_completion": false,
+        "failing_fingerprints_now": [],
+        "delta_assessment": "neutral"
+      },
+      "fk": 0,
+      "ze": 0,
+      "matrix_pending": null,
+      "matrix_err": "",
+      "children": [],
+      "want_status": "partial",
+      "want_ready_parent": false,
+      "want_blocker_codes": ["bundle_gate_not_ready"],
+      "want_primary_measurement_outcome": "measurement_yields_ambiguous_outcome",
+      "want_primary_measurement_outcome_detail": "bundle_window_incomplete_or_gates_skipped"
+    },
+    {
+      "name": "blocked_field_key_gate",
+      "tb": {
+        "ready_for_session_completion": true,
+        "failing_fingerprints_now": [],
+        "delta_assessment": "neutral"
+      },
+      "fk": 1,
+      "ze": 0,
+      "matrix_pending": null,
+      "matrix_err": "",
+      "children": [],
+      "want_status": "blocked",
+      "want_ready_parent": false,
+      "want_blocker_codes": ["field_key_literals_gate"],
+      "want_primary_measurement_outcome": "measurement_yields_halt_or_error",
+      "want_primary_measurement_outcome_detail": "literal_gate_failed"
+    }
+  ]
+}

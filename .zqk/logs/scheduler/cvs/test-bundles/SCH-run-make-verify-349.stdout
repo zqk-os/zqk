@@ -1,0 +1,39 @@
+
+--- run 2026-09-04T22:11:40Z ---
+=== RUN   TestForbidGitCleanProcess_blocksStashUntracked
+=== PAUSE TestForbidGitCleanProcess_blocksStashUntracked
+=== RUN   TestScanStashForProcessCAS_emptyStashExitsZero
+=== PAUSE TestScanStashForProcessCAS_emptyStashExitsZero
+=== RUN   TestPreCommitGates_referencedScriptsExistAndAreExecutable
+=== PAUSE TestPreCommitGates_referencedScriptsExistAndAreExecutable
+=== RUN   TestProductionGoReferencedScripts_exist
+=== PAUSE TestProductionGoReferencedScripts_exist
+=== RUN   TestAgentRulesGate_isWiredIntoPreCommit
+=== PAUSE TestAgentRulesGate_isWiredIntoPreCommit
+=== RUN   TestValidate_OK
+=== PAUSE TestValidate_OK
+=== RUN   TestValidate_CustomRulesDir
+=== PAUSE TestValidate_CustomRulesDir
+=== RUN   TestValidate_Mismatch
+=== PAUSE TestValidate_Mismatch
+=== CONT  TestForbidGitCleanProcess_blocksStashUntracked
+=== CONT  TestAgentRulesGate_isWiredIntoPreCommit
+--- PASS: TestAgentRulesGate_isWiredIntoPreCommit (0.00s)
+=== CONT  TestValidate_CustomRulesDir
+--- PASS: TestValidate_CustomRulesDir (0.01s)
+=== CONT  TestValidate_Mismatch
+--- PASS: TestValidate_Mismatch (0.01s)
+=== CONT  TestPreCommitGates_referencedScriptsExistAndAreExecutable
+    gate_correspondence_test.go:101: verified 28 gate script invocations across 3 chain files
+--- PASS: TestPreCommitGates_referencedScriptsExistAndAreExecutable (0.01s)
+=== CONT  TestProductionGoReferencedScripts_exist
+--- PASS: TestForbidGitCleanProcess_blocksStashUntracked (0.04s)
+=== CONT  TestScanStashForProcessCAS_emptyStashExitsZero
+--- PASS: TestScanStashForProcessCAS_emptyStashExitsZero (0.35s)
+=== CONT  TestValidate_OK
+--- PASS: TestValidate_OK (0.01s)
+=== NAME  TestProductionGoReferencedScripts_exist
+    gate_correspondence_test.go:150: verified 6 distinct scripts referenced from production Go
+--- PASS: TestProductionGoReferencedScripts_exist (3.04s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/agentrules	3.576s

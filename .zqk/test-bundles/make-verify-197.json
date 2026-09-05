@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-197",
+  "created_at": "2026-09-04T21:34:29.33395Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-197",
+    "Tests": [
+      {
+        "Name": "TestEnsureCASIndexMatchesContentHash_NoopWhenAligned",
+        "Package": "cas_test",
+        "PackagePath": "pkg/storage/cas",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/cas/cas_index_postwrite_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestListingIndexCallback_LifetimeCounters",
+        "Package": "cas",
+        "PackagePath": "pkg/storage/cas",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/cas/cas_index_write_queue_callback_stats_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestListingIndexWriteQueue_OperationCallback",
+        "Package": "cas",
+        "PackagePath": "pkg/storage/cas",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/cas/cas_index_write_queue_callback_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestListingIndexWriteQueue_StatsCounters",
+        "Package": "cas",
+        "PackagePath": "pkg/storage/cas",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/cas/cas_index_write_queue_callback_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestListingIndexWriteQueue_StatsCounters_Delta",
+        "Package": "cas",
+        "PackagePath": "pkg/storage/cas",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/cas/cas_index_write_queue_callback_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestListingIndexWriteQueue_StatsCounters_ProcessedDelta",
+        "Package": "cas",
+        "PackagePath": "pkg/storage/cas",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/cas/cas_index_write_queue_callback_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestListingIndex_BatchCallbackAtomicPointer",
+        "Package": "cas",
+        "PackagePath": "pkg/storage/cas",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/cas/cas_index_write_queue_callbacks_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestListingIndex_StateChangeCallbackAtomicPointer",
+        "Package": "cas",
+        "PackagePath": "pkg/storage/cas",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/cas/cas_index_write_queue_callbacks_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestListingIndexWriteQueue_OnDemandPattern",
+        "Package": "cas_test",
+        "PackagePath": "pkg/storage/cas",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/cas/cas_index_write_queue_on_demand_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestListingIndexWriteQueue_CoordinatorIntegration",
+        "Package": "cas_test",
+        "PackagePath": "pkg/storage/cas",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/cas/cas_index_write_queue_on_demand_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 900000000000,
+    "PackagePath": "pkg/storage/cas"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestEnsureCASIndexMatchesContentHash_NoopWhenAligned",
+      "Package": "cas_test",
+      "PackagePath": "pkg/storage/cas",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/cas/cas_index_postwrite_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestListingIndexCallback_LifetimeCounters",
+      "Package": "cas",
+      "PackagePath": "pkg/storage/cas",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/cas/cas_index_write_queue_callback_stats_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestListingIndexWriteQueue_OperationCallback",
+      "Package": "cas",
+      "PackagePath": "pkg/storage/cas",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/cas/cas_index_write_queue_callback_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestListingIndexWriteQueue_StatsCounters",
+      "Package": "cas",
+      "PackagePath": "pkg/storage/cas",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/cas/cas_index_write_queue_callback_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestListingIndexWriteQueue_StatsCounters_Delta",
+      "Package": "cas",
+      "PackagePath": "pkg/storage/cas",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/cas/cas_index_write_queue_callback_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestListingIndexWriteQueue_StatsCounters_ProcessedDelta",
+      "Package": "cas",
+      "PackagePath": "pkg/storage/cas",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/cas/cas_index_write_queue_callback_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestListingIndex_BatchCallbackAtomicPointer",
+      "Package": "cas",
+      "PackagePath": "pkg/storage/cas",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/cas/cas_index_write_queue_callbacks_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestListingIndex_StateChangeCallbackAtomicPointer",
+      "Package": "cas",
+      "PackagePath": "pkg/storage/cas",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/cas/cas_index_write_queue_callbacks_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestListingIndexWriteQueue_OnDemandPattern",
+      "Package": "cas_test",
+      "PackagePath": "pkg/storage/cas",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/cas/cas_index_write_queue_on_demand_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestListingIndexWriteQueue_CoordinatorIntegration",
+      "Package": "cas_test",
+      "PackagePath": "pkg/storage/cas",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/cas/cas_index_write_queue_on_demand_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    }
+  }
+}

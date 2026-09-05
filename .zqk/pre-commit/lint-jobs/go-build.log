@@ -1,0 +1,4 @@
+=== go build (staged packages only) ===
+
+=== cvs_convergence_orchestrate.sh (bash -n) ===
+ok: bash -n scripts/cvs_convergence_orchestrate.sh

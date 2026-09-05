@@ -1,0 +1,27 @@
+acceptance_considerations: Done when CRIT-OPENCORE-HYGIENE-INVENTORY-001 is validated via zqk workflow vds evaluate on BLI-OPENCORE-HYGIENE-INVENTORY-001. Not lingering launch; stay on the grooming column named in priority_plan_ref.
+created_at: "2026-08-31T20:26:47Z"
+created_by: ACC-1785920548450214012-68b850c0
+criteria_refs:
+    - CRIT-OPENCORE-HYGIENE-INVENTORY-001
+description: Companion to public-payload BLI. Inventory-only; do not publish. Living-store stays on lingering.
+estimated_effort: 2d
+id: BLI-OPENCORE-HYGIENE-INVENTORY-001
+kind: backlog_item
+milestone_refs:
+    - MIL-CEF-R2-M2-ARCH
+namespace_id: zqk:kernel
+persona_refs:
+    - PER-ORCH-ALPHA
+priority: high
+priority_plan_ref: PRI-OPENCORE-PUBLISH-001
+priority_tier: P1
+problem_statement: Companion to public-payload BLI. Inventory-only; do not publish. Living-store stays on lingering.
+requirement_refs:
+    - REQ-1786418657060772000-041fddbf
+schema_version: 2.0.0
+started_at: "2026-09-05T03:28:39Z"
+status: in_progress
+title: Open-core agnostic hygiene inventory (no public push)
+updated_at: "2026-09-05T03:28:39Z"
+updated_by: ACC-1785920548450214006-2e52b3e7
+version_context: default

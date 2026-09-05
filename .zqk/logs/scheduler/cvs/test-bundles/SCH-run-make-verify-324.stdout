@@ -1,0 +1,48 @@
+
+--- run 2026-09-04T22:11:21Z ---
+=== RUN   TestExecutor_EmptyTestList
+=== PAUSE TestExecutor_EmptyTestList
+=== RUN   TestExecutor_DependencyFailure
+=== PAUSE TestExecutor_DependencyFailure
+=== RUN   TestExecutor_StoreResultOverwrite
+=== PAUSE TestExecutor_StoreResultOverwrite
+=== RUN   TestExecutor_SkippedStepDependency
+=== PAUSE TestExecutor_SkippedStepDependency
+=== RUN   TestExecutor_StepWithNoArgs
+=== PAUSE TestExecutor_StepWithNoArgs
+=== RUN   TestExecutor_StepWithEmptyArgs
+=== PAUSE TestExecutor_StepWithEmptyArgs
+=== RUN   TestExecutor_ResultNotMap
+=== PAUSE TestExecutor_ResultNotMap
+=== RUN   TestExecutor_ContextCancellation
+=== PAUSE TestExecutor_ContextCancellation
+=== RUN   TestElicitationToSuccessProcessor
+=== PAUSE TestElicitationToSuccessProcessor
+=== RUN   TestElicitationToSuccessProcessor_NoError
+=== PAUSE TestElicitationToSuccessProcessor_NoError
+=== CONT  TestExecutor_EmptyTestList
+=== CONT  TestExecutor_StepWithEmptyArgs
+--- PASS: TestExecutor_EmptyTestList (0.00s)
+=== CONT  TestExecutor_SkippedStepDependency
+--- PASS: TestExecutor_SkippedStepDependency (0.00s)
+=== CONT  TestExecutor_StepWithNoArgs
+--- PASS: TestExecutor_StepWithEmptyArgs (0.00s)
+=== CONT  TestExecutor_StoreResultOverwrite
+--- PASS: TestExecutor_StepWithNoArgs (0.00s)
+=== CONT  TestElicitationToSuccessProcessor
+--- PASS: TestElicitationToSuccessProcessor (0.00s)
+=== CONT  TestExecutor_ContextCancellation
+--- PASS: TestExecutor_StoreResultOverwrite (0.00s)
+=== CONT  TestExecutor_ResultNotMap
+=== NAME  TestExecutor_ContextCancellation
+    executor_edge_cases_test.go:296: Context cancellation not enforced (tool-dependent)
+--- PASS: TestExecutor_ContextCancellation (0.00s)
+=== CONT  TestExecutor_DependencyFailure
+=== NAME  TestExecutor_ResultNotMap
+    executor_edge_cases_test.go:257: Result validation: test step Echo step validation failed: field message: expected test, got Echo: test
+--- PASS: TestExecutor_ResultNotMap (0.00s)
+=== CONT  TestElicitationToSuccessProcessor_NoError
+--- PASS: TestElicitationToSuccessProcessor_NoError (0.00s)
+--- PASS: TestExecutor_DependencyFailure (0.00s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/mcp/testing	0.672s

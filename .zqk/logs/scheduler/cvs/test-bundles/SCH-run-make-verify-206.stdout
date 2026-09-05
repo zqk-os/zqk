@@ -1,0 +1,24 @@
+
+--- run 2026-09-04T21:43:50Z ---
+=== RUN   TestCASOrphanGuard_CheckPackageIntegrity_cleanTree
+=== PAUSE TestCASOrphanGuard_CheckPackageIntegrity_cleanTree
+=== RUN   TestCASOrphanGuard_CheckPackageIntegrity_skipsInternalDir
+=== PAUSE TestCASOrphanGuard_CheckPackageIntegrity_skipsInternalDir
+=== RUN   TestShouldUseObjectDraftPlane_PreliminaryStatuses
+=== PAUSE TestShouldUseObjectDraftPlane_PreliminaryStatuses
+=== RUN   TestRefuseCriteriaCASWithoutCategory
+=== PAUSE TestRefuseCriteriaCASWithoutCategory
+=== RUN   TestUseObjectDraftPlane_incompleteCriteria
+=== PAUSE TestUseObjectDraftPlane_incompleteCriteria
+=== CONT  TestCASOrphanGuard_CheckPackageIntegrity_cleanTree
+=== CONT  TestRefuseCriteriaCASWithoutCategory
+--- PASS: TestRefuseCriteriaCASWithoutCategory (0.00s)
+=== CONT  TestShouldUseObjectDraftPlane_PreliminaryStatuses
+--- PASS: TestShouldUseObjectDraftPlane_PreliminaryStatuses (0.00s)
+=== CONT  TestCASOrphanGuard_CheckPackageIntegrity_skipsInternalDir
+--- PASS: TestCASOrphanGuard_CheckPackageIntegrity_skipsInternalDir (0.00s)
+=== CONT  TestUseObjectDraftPlane_incompleteCriteria
+--- PASS: TestUseObjectDraftPlane_incompleteCriteria (0.00s)
+--- PASS: TestCASOrphanGuard_CheckPackageIntegrity_cleanTree (0.01s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/storage/cas	0.623s

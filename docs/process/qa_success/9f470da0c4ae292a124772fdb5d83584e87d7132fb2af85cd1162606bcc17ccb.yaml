@@ -1,0 +1,14 @@
+created_at: "2026-08-19T09:26:30Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1787131582709431000-daa25994
+item_id: REDACTED
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 2857702ca28e4b64fb5782140b43c1400e68fdeab30ab0062f4119523ca97d466e5f13c72adcfa41b92eacf21fa7f0a79b8a8e3a8d7c581e5c9afe0e69cb31dc
+schema_version: 2.0.0
+signature: 3045022100f63aea71212a4785fb9b9bbc2a1b6974b21de7353f7d197cdb08c7ac68d829a202203006875bbb2540e0e426f9bfd6dd3f28b73840176dac4eca494c6db2a79d6a80
+status: archived
+title: CAP fail-closed evidence refresh on current stable
+updated_at: "2026-09-01T07:10:50Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

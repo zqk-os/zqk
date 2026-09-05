@@ -1,0 +1,87 @@
+{
+  "name": "make-verify-85",
+  "created_at": "2026-09-04T21:34:28.204724Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-85",
+    "Tests": [
+      {
+        "Name": "TestScalarMetricAggregator_Aggregate",
+        "Package": "metrics",
+        "PackagePath": "pkg/metrics",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/metrics/scalar_aggregator_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestStatusHistoryMetricAggregator_Aggregate",
+        "Package": "metrics",
+        "PackagePath": "pkg/metrics",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/metrics/status_history_aggregator_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestTimeSeries_WriteAndReadRange",
+        "Package": "metrics",
+        "PackagePath": "pkg/metrics",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/metrics/timeseries_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestTimeSeries_SanitizeSeriesName",
+        "Package": "metrics",
+        "PackagePath": "pkg/metrics",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/metrics/timeseries_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 120000000000,
+    "PackagePath": "pkg/metrics"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestScalarMetricAggregator_Aggregate",
+      "Package": "metrics",
+      "PackagePath": "pkg/metrics",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/metrics/scalar_aggregator_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestStatusHistoryMetricAggregator_Aggregate",
+      "Package": "metrics",
+      "PackagePath": "pkg/metrics",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/metrics/status_history_aggregator_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestTimeSeries_WriteAndReadRange",
+      "Package": "metrics",
+      "PackagePath": "pkg/metrics",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/metrics/timeseries_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestTimeSeries_SanitizeSeriesName",
+      "Package": "metrics",
+      "PackagePath": "pkg/metrics",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/metrics/timeseries_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

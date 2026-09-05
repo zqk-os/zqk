@@ -1,0 +1,20 @@
+
+--- run 2026-09-04T22:14:47Z ---
+=== RUN   TestUpdateMatrixCSVByFilter_limit
+=== PAUSE TestUpdateMatrixCSVByFilter_limit
+=== RUN   TestUpdateMatrixCSVRow_invalidGate
+=== PAUSE TestUpdateMatrixCSVRow_invalidGate
+=== RUN   TestValidateMatrixRegistry_ok
+=== PAUSE TestValidateMatrixRegistry_ok
+=== RUN   TestValidateMatrixRegistry_missingSessionColumn
+=== PAUSE TestValidateMatrixRegistry_missingSessionColumn
+=== CONT  TestUpdateMatrixCSVByFilter_limit
+=== CONT  TestValidateMatrixRegistry_ok
+--- PASS: TestValidateMatrixRegistry_ok (0.02s)
+=== CONT  TestValidateMatrixRegistry_missingSessionColumn
+--- PASS: TestUpdateMatrixCSVByFilter_limit (0.02s)
+=== CONT  TestUpdateMatrixCSVRow_invalidGate
+--- PASS: TestValidateMatrixRegistry_missingSessionColumn (0.02s)
+--- PASS: TestUpdateMatrixCSVRow_invalidGate (0.02s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/quality	0.573s

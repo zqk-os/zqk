@@ -1,0 +1,14 @@
+created_at: "2026-08-18T23:37:27Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1787096247247190000-f9cd17db
+item_id: BLI-CEF-R2-SEC-MCP-TCP-AUTH
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 2857702ca28e4b64fb5782140b43c1400e68fdeab30ab0062f4119523ca97d466e5f13c72adcfa41b92eacf21fa7f0a79b8a8e3a8d7c581e5c9afe0e69cb31dc
+schema_version: 2.0.0
+signature: 30440220057829def0d6b05efdde711d962d5f343395048191daf7668273109fac080513022023f13abe8adc204f050bacc076eb6c84e093eb804c5357342677ec06b92fcb4d
+status: archived
+title: MCP TCP bind requires auth and/or mTLS
+updated_at: "2026-09-01T07:43:02Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

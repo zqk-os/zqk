@@ -1,0 +1,44 @@
+
+--- run 2026-09-05T05:23:18Z ---
+=== RUN   TestLogEventDataCellEnvelopeTick_matchesJobTypeConstant
+=== PAUSE TestLogEventDataCellEnvelopeTick_matchesJobTypeConstant
+=== RUN   TestDryRunDataCellEnvelopePolicy_ExecuteDefault
+=== PAUSE TestDryRunDataCellEnvelopePolicy_ExecuteDefault
+=== RUN   TestDryRunDataCellEnvelopePolicy_UnknownProfile
+=== PAUSE TestDryRunDataCellEnvelopePolicy_UnknownProfile
+=== RUN   TestDryRunDataCellEnvelopePoliciesForKnownProfiles
+=== PAUSE TestDryRunDataCellEnvelopePoliciesForKnownProfiles
+=== RUN   TestDataCellEnvelopeTickHandler_Execute
+=== PAUSE TestDataCellEnvelopeTickHandler_Execute
+=== RUN   TestDataCellEnvelopeTickHandler_Execute_drainsStewardEnqueue
+=== PAUSE TestDataCellEnvelopeTickHandler_Execute_drainsStewardEnqueue
+=== RUN   TestDataCellEnvelopeTickHandler_AppendsMetricsJSONL
+=== PAUSE TestDataCellEnvelopeTickHandler_AppendsMetricsJSONL
+=== RUN   TestDataCellEnvelopeTickHandler_AppendsMetricsJSONL_tokenPolicyDenyJSON
+=== PAUSE TestDataCellEnvelopeTickHandler_AppendsMetricsJSONL_tokenPolicyDenyJSON
+=== RUN   TestDataCellEnvelopeTickHandler_AppendsMetricsJSONL_tokenPolicyAllowJSON
+=== PAUSE TestDataCellEnvelopeTickHandler_AppendsMetricsJSONL_tokenPolicyAllowJSON
+=== RUN   TestDataCellEnvelopeTickHandler_AppendsMetricsJSONL_tokenPolicyInvalidJSONFallsBackToFullResolution
+=== PAUSE TestDataCellEnvelopeTickHandler_AppendsMetricsJSONL_tokenPolicyInvalidJSONFallsBackToFullResolution
+=== CONT  TestLogEventDataCellEnvelopeTick_matchesJobTypeConstant
+--- PASS: TestLogEventDataCellEnvelopeTick_matchesJobTypeConstant (0.00s)
+=== CONT  TestDataCellEnvelopeTickHandler_Execute
+=== CONT  TestDataCellEnvelopeTickHandler_Execute_drainsStewardEnqueue
+--- PASS: TestDataCellEnvelopeTickHandler_Execute (0.00s)
+=== CONT  TestDataCellEnvelopeTickHandler_AppendsMetricsJSONL_tokenPolicyAllowJSON
+--- PASS: TestDataCellEnvelopeTickHandler_Execute_drainsStewardEnqueue (0.01s)
+=== CONT  TestDryRunDataCellEnvelopePolicy_UnknownProfile
+--- PASS: TestDryRunDataCellEnvelopePolicy_UnknownProfile (0.00s)
+=== CONT  TestDataCellEnvelopeTickHandler_AppendsMetricsJSONL_tokenPolicyInvalidJSONFallsBackToFullResolution
+--- PASS: TestDataCellEnvelopeTickHandler_AppendsMetricsJSONL_tokenPolicyAllowJSON (0.01s)
+=== CONT  TestDryRunDataCellEnvelopePoliciesForKnownProfiles
+--- PASS: TestDryRunDataCellEnvelopePoliciesForKnownProfiles (0.00s)
+=== CONT  TestDryRunDataCellEnvelopePolicy_ExecuteDefault
+--- PASS: TestDryRunDataCellEnvelopePolicy_ExecuteDefault (0.00s)
+=== CONT  TestDataCellEnvelopeTickHandler_AppendsMetricsJSONL
+--- PASS: TestDataCellEnvelopeTickHandler_AppendsMetricsJSONL_tokenPolicyInvalidJSONFallsBackToFullResolution (0.01s)
+=== CONT  TestDataCellEnvelopeTickHandler_AppendsMetricsJSONL_tokenPolicyDenyJSON
+--- PASS: TestDataCellEnvelopeTickHandler_AppendsMetricsJSONL (0.01s)
+--- PASS: TestDataCellEnvelopeTickHandler_AppendsMetricsJSONL_tokenPolicyDenyJSON (0.01s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/scheduler	0.795s

@@ -1,0 +1,141 @@
+{
+  "name": "make-verify-531",
+  "created_at": "2026-09-04T21:34:32.626337Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-531",
+    "Tests": [
+      {
+        "Name": "TestImageVerificationPipeline",
+        "Package": "quality",
+        "PackagePath": "pkg/quality",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/quality/image_sentinel_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestSentinelPipeline",
+        "Package": "quality",
+        "PackagePath": "pkg/quality",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/quality/sentinel_pipeline_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestRunTestBundleMatrixPipeline_nilOptions",
+        "Package": "quality",
+        "PackagePath": "pkg/quality",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/quality/test_bundle_matrix_pipeline_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestRunTestBundleMatrixPipeline_emptyProjectRoot",
+        "Package": "quality",
+        "PackagePath": "pkg/quality",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/quality/test_bundle_matrix_pipeline_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestRunTestBundleMatrixPipeline_missingGenerateScript",
+        "Package": "quality",
+        "PackagePath": "pkg/quality",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/quality/test_bundle_matrix_pipeline_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "Test_matrixVerifySucceededForContextEvent",
+        "Package": "quality",
+        "PackagePath": "pkg/quality",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/quality/test_bundle_matrix_pipeline_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestRunTestBundleMatrixPipeline_smokeNoVerify",
+        "Package": "quality",
+        "PackagePath": "pkg/quality",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/quality/test_bundle_matrix_pipeline_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 210000000000,
+    "PackagePath": "pkg/quality"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestImageVerificationPipeline",
+      "Package": "quality",
+      "PackagePath": "pkg/quality",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/quality/image_sentinel_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestSentinelPipeline",
+      "Package": "quality",
+      "PackagePath": "pkg/quality",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/quality/sentinel_pipeline_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestRunTestBundleMatrixPipeline_nilOptions",
+      "Package": "quality",
+      "PackagePath": "pkg/quality",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/quality/test_bundle_matrix_pipeline_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestRunTestBundleMatrixPipeline_emptyProjectRoot",
+      "Package": "quality",
+      "PackagePath": "pkg/quality",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/quality/test_bundle_matrix_pipeline_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestRunTestBundleMatrixPipeline_missingGenerateScript",
+      "Package": "quality",
+      "PackagePath": "pkg/quality",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/quality/test_bundle_matrix_pipeline_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "Test_matrixVerifySucceededForContextEvent",
+      "Package": "quality",
+      "PackagePath": "pkg/quality",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/quality/test_bundle_matrix_pipeline_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestRunTestBundleMatrixPipeline_smokeNoVerify",
+      "Package": "quality",
+      "PackagePath": "pkg/quality",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/quality/test_bundle_matrix_pipeline_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

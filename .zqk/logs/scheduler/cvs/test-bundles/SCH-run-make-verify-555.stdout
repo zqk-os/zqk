@@ -1,0 +1,48 @@
+
+--- run 2026-09-04T22:16:42Z ---
+=== RUN   TestClearCAPStageFailureAttemptsPreservesEntryWatermark
+=== PAUSE TestClearCAPStageFailureAttemptsPreservesEntryWatermark
+=== RUN   TestCAPStageQuarantineActiveRequiresMatchingScope
+=== PAUSE TestCAPStageQuarantineActiveRequiresMatchingScope
+=== RUN   TestReviewDeliveryComplete_RequiresFreshTimestamp
+=== PAUSE TestReviewDeliveryComplete_RequiresFreshTimestamp
+=== RUN   TestReviewResultStaleReason
+=== PAUSE TestReviewResultStaleReason
+=== RUN   TestVerifyCriticalPackagesHealth_UsesRecentRunsNotNewestCreatedJob
+=== PAUSE TestVerifyCriticalPackagesHealth_UsesRecentRunsNotNewestCreatedJob
+=== RUN   TestCriticalRootForPackagePath
+=== PAUSE TestCriticalRootForPackagePath
+=== RUN   TestReviewSystemCheck_PublicBlockersFail
+=== PAUSE TestReviewSystemCheck_PublicBlockersFail
+=== RUN   TestBuildBatchMetricErrorRecord
+=== PAUSE TestBuildBatchMetricErrorRecord
+=== RUN   TestNewContextRefreshHandler
+=== PAUSE TestNewContextRefreshHandler
+=== RUN   TestContextRefreshHandler_Execute_NoPolicies
+=== PAUSE TestContextRefreshHandler_Execute_NoPolicies
+=== CONT  TestClearCAPStageFailureAttemptsPreservesEntryWatermark
+=== CONT  TestCriticalRootForPackagePath
+--- PASS: TestCriticalRootForPackagePath (0.00s)
+=== CONT  TestReviewResultStaleReason
+--- PASS: TestReviewResultStaleReason (0.00s)
+=== CONT  TestVerifyCriticalPackagesHealth_UsesRecentRunsNotNewestCreatedJob
+--- PASS: TestVerifyCriticalPackagesHealth_UsesRecentRunsNotNewestCreatedJob (0.02s)
+=== CONT  TestNewContextRefreshHandler
+--- PASS: TestClearCAPStageFailureAttemptsPreservesEntryWatermark (0.03s)
+=== CONT  TestContextRefreshHandler_Execute_NoPolicies
+=== RUN   TestNewContextRefreshHandler/with_project_root
+=== RUN   TestNewContextRefreshHandler/empty_project_root_(extracted_from_storage)
+--- PASS: TestNewContextRefreshHandler (0.38s)
+    --- PASS: TestNewContextRefreshHandler/with_project_root (0.00s)
+    --- PASS: TestNewContextRefreshHandler/empty_project_root_(extracted_from_storage) (0.00s)
+--- PASS: TestContextRefreshHandler_Execute_NoPolicies (0.37s)
+=== CONT  TestReviewDeliveryComplete_RequiresFreshTimestamp
+=== CONT  TestCAPStageQuarantineActiveRequiresMatchingScope
+--- PASS: TestCAPStageQuarantineActiveRequiresMatchingScope (0.01s)
+=== CONT  TestBuildBatchMetricErrorRecord
+--- PASS: TestReviewDeliveryComplete_RequiresFreshTimestamp (0.01s)
+=== CONT  TestReviewSystemCheck_PublicBlockersFail
+--- PASS: TestReviewSystemCheck_PublicBlockersFail (0.00s)
+--- PASS: TestBuildBatchMetricErrorRecord (0.01s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/scheduler	1.211s

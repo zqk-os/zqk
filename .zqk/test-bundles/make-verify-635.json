@@ -1,0 +1,51 @@
+{
+  "name": "make-verify-635",
+  "created_at": "2026-09-04T21:34:33.66974Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-635",
+    "Tests": [
+      {
+        "Name": "TestDoc",
+        "Package": "rpcpool_test",
+        "PackagePath": "pkg/graph/rpcpool",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/graph/rpcpool/doc_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestRpcpoolInit",
+        "Package": "rpcpool",
+        "PackagePath": "pkg/graph/rpcpool",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/graph/rpcpool/rpcpool_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 60000000000,
+    "PackagePath": "pkg/graph/rpcpool"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestDoc",
+      "Package": "rpcpool_test",
+      "PackagePath": "pkg/graph/rpcpool",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/graph/rpcpool/doc_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestRpcpoolInit",
+      "Package": "rpcpool",
+      "PackagePath": "pkg/graph/rpcpool",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/graph/rpcpool/rpcpool_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

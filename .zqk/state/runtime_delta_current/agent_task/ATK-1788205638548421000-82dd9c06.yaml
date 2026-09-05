@@ -1,0 +1,19 @@
+assignee_persona_ref: PER-ORCH-ALPHA
+backlog_item_ref: BLI-LAUNCH-UX-EDGE-IMAGE-001
+branch_ref: integration/pri-PRI-CEF-LINGERING-INTAKE-001
+claimed_at: "2026-08-31T19:47:43Z"
+claimed_by: antigravity-1
+commit_hash: 067bb0a672f836062c3d163ab5c6fae5376a9424
+created_at: "2026-08-31T19:47:18Z"
+created_by: ACC-1785920548450214012-68b850c0
+description: Execute BLI-LAUNCH-UX-EDGE-IMAGE-001
+id: ATK-1788205638548421000-82dd9c06
+kind: agent_task
+namespace_id: zqk:kernel
+schema_version: 2.0.0
+started_at: "2026-08-31T19:59:17Z"
+status: archived
+title: Execute BLI-LAUNCH-UX-EDGE-IMAGE-001
+updated_at: "2026-09-02T21:35:07Z"
+updated_by: ACC-1785920548450214006-2e52b3e7
+version_context: default

@@ -1,0 +1,105 @@
+{
+  "name": "make-verify-397",
+  "created_at": "2026-09-04T21:34:31.255918Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-397",
+    "Tests": [
+      {
+        "Name": "TestTryClaim_RefusesProposed",
+        "Package": "agentclaim",
+        "PackagePath": "pkg/agentclaim",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentclaim/claim_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestTryClaim_ApprovedHopsInProgress",
+        "Package": "agentclaim",
+        "PackagePath": "pkg/agentclaim",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentclaim/claim_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestTryClaim_RefusesWhenParentBacklogComplete",
+        "Package": "agentclaim",
+        "PackagePath": "pkg/agentclaim",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentclaim/claim_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestTryClaim_stampsBranchRefAndBaseSha",
+        "Package": "agentclaim",
+        "PackagePath": "pkg/agentclaim",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentclaim/provenance_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestClaimTargetIDs_fromForRefAndLists",
+        "Package": "agentclaim",
+        "PackagePath": "pkg/agentclaim",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentclaim/provenance_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": true,
+    "EstimatedDuration": 150000000000,
+    "PackagePath": "pkg/agentclaim"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestTryClaim_RefusesProposed",
+      "Package": "agentclaim",
+      "PackagePath": "pkg/agentclaim",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentclaim/claim_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestTryClaim_ApprovedHopsInProgress",
+      "Package": "agentclaim",
+      "PackagePath": "pkg/agentclaim",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentclaim/claim_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestTryClaim_RefusesWhenParentBacklogComplete",
+      "Package": "agentclaim",
+      "PackagePath": "pkg/agentclaim",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentclaim/claim_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestTryClaim_stampsBranchRefAndBaseSha",
+      "Package": "agentclaim",
+      "PackagePath": "pkg/agentclaim",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentclaim/provenance_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestClaimTargetIDs_fromForRefAndLists",
+      "Package": "agentclaim",
+      "PackagePath": "pkg/agentclaim",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentclaim/provenance_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

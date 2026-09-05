@@ -1,0 +1,16 @@
+
+--- run 2026-09-04T21:37:54Z ---
+=== RUN   TestStreamRegistrySnapshot_RefreshCoalescesWithinInterval
+=== PAUSE TestStreamRegistrySnapshot_RefreshCoalescesWithinInterval
+=== RUN   TestBackfillWorkEnvelopeCompletedAt_NilStore
+=== PAUSE TestBackfillWorkEnvelopeCompletedAt_NilStore
+=== RUN   TestEffortAwareKindNamesIncludesTimesheetKinds
+=== PAUSE TestEffortAwareKindNamesIncludesTimesheetKinds
+=== CONT  TestStreamRegistrySnapshot_RefreshCoalescesWithinInterval
+=== CONT  TestEffortAwareKindNamesIncludesTimesheetKinds
+--- PASS: TestStreamRegistrySnapshot_RefreshCoalescesWithinInterval (0.00s)
+=== CONT  TestBackfillWorkEnvelopeCompletedAt_NilStore
+--- PASS: TestBackfillWorkEnvelopeCompletedAt_NilStore (0.00s)
+--- PASS: TestEffortAwareKindNamesIncludesTimesheetKinds (0.38s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/storage	1.084s

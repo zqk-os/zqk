@@ -1,0 +1,14 @@
+created_at: "2026-08-20T01:38:38Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1787189918142616000-b05caf55
+item_id: BLI-CEF-R8-P1-TST-001
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 2857702ca28e4b64fb5782140b43c1400e68fdeab30ab0062f4119523ca97d466e5f13c72adcfa41b92eacf21fa7f0a79b8a8e3a8d7c581e5c9afe0e69cb31dc
+schema_version: 2.0.0
+signature: 304502210090215c98fa98242ea4da3bc92c43c855242f0809e3729d7f34f53db057371b4a02204b41709c6ac5da8cf7a65e47de1bd7e494f278524bf06f5df376ff446d1d9213
+status: archived
+title: 'R8 P1 testing remainder: race CI, coverage, leak detection, time.Sleep flakes'
+updated_at: "2026-09-01T08:10:50Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

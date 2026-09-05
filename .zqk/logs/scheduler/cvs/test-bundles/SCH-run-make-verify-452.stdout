@@ -1,0 +1,32 @@
+
+--- run 2026-09-04T22:13:29Z ---
+=== RUN   TestFormatOutput_JSONEmitsBraceForObject
+=== PAUSE TestFormatOutput_JSONEmitsBraceForObject
+=== RUN   TestTableFormatHandler_UsesYAMLStyleNotJSONBrace
+=== PAUSE TestTableFormatHandler_UsesYAMLStyleNotJSONBrace
+=== RUN   TestYAMLFormatHandler_StreamWritesSameFamilyAsFormat
+=== PAUSE TestYAMLFormatHandler_StreamWritesSameFamilyAsFormat
+=== RUN   TestValidateAnnotatedKind_noAnnotation_isNoOp
+=== PAUSE TestValidateAnnotatedKind_noAnnotation_isNoOp
+=== RUN   TestValidateBulkUpdateFileKind_skipsWithoutFileFlag
+=== PAUSE TestValidateBulkUpdateFileKind_skipsWithoutFileFlag
+=== RUN   TestValidateSystemCompactStream_skipsWhenAll
+=== PAUSE TestValidateSystemCompactStream_skipsWhenAll
+=== RUN   TestValidateFieldsParentKind_storesCanonical
+=== PAUSE TestValidateFieldsParentKind_storesCanonical
+=== CONT  TestFormatOutput_JSONEmitsBraceForObject
+=== CONT  TestValidateBulkUpdateFileKind_skipsWithoutFileFlag
+--- PASS: TestValidateBulkUpdateFileKind_skipsWithoutFileFlag (0.00s)
+--- PASS: TestFormatOutput_JSONEmitsBraceForObject (0.00s)
+=== CONT  TestYAMLFormatHandler_StreamWritesSameFamilyAsFormat
+=== CONT  TestValidateAnnotatedKind_noAnnotation_isNoOp
+--- PASS: TestValidateAnnotatedKind_noAnnotation_isNoOp (0.00s)
+=== CONT  TestValidateFieldsParentKind_storesCanonical
+--- PASS: TestYAMLFormatHandler_StreamWritesSameFamilyAsFormat (0.00s)
+=== CONT  TestTableFormatHandler_UsesYAMLStyleNotJSONBrace
+--- PASS: TestTableFormatHandler_UsesYAMLStyleNotJSONBrace (0.00s)
+=== CONT  TestValidateSystemCompactStream_skipsWhenAll
+--- PASS: TestValidateSystemCompactStream_skipsWhenAll (0.00s)
+--- PASS: TestValidateFieldsParentKind_storesCanonical (0.35s)
+PASS
+ok  	github.com/lanceman/zqk/internal/cli	0.890s

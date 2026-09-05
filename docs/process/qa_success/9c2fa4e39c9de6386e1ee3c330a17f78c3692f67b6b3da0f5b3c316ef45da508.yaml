@@ -1,0 +1,14 @@
+created_at: "2026-08-20T04:57:56Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1787201876192948000-c2d1b17e
+item_id: CRIT-CEF-R8L-DOC-02
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 2857702ca28e4b64fb5782140b43c1400e68fdeab30ab0062f4119523ca97d466e5f13c72adcfa41b92eacf21fa7f0a79b8a8e3a8d7c581e5c9afe0e69cb31dc
+schema_version: 2.0.0
+signature: 3045022100bcab503ce6c1fd72eb44e6233e90ba3ec229feb5e5a7420268360dadc7dce75a02206453784ac1e13b3a06717823a4efa52fc595d34e47fb80ca88d5272437939ca4
+status: archived
+title: GoDoc documentation coverage across exported packages
+updated_at: "2026-09-01T07:36:49Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

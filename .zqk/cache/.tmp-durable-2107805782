@@ -1,0 +1,46 @@
+{
+  "metadata": {
+    "version": "2.0",
+    "build_time": "2026-09-04T21:49:06.514792Z",
+    "project_root": "/Users/lanceettl/zqk-restore-clone",
+    "entry_count": 8
+  },
+  "buckets": {
+    "audit_event": {
+      "listing_index_batch_start": {
+        "AUD-3615": {
+          "created_at": "2026-09-04T21:48:35Z"
+        },
+        "AUD-4720": {
+          "created_at": "2026-09-04T21:49:06Z"
+        }
+      },
+      "object_creation": {
+        "AUD-3585": {
+          "created_at": "2026-09-04T21:48:35Z"
+        }
+      },
+      "system_config_change": {
+        "AUD-3313": {
+          "created_at": "2026-09-04T21:48:26Z"
+        },
+        "AUD-3589": {
+          "created_at": "2026-09-04T21:48:35Z"
+        },
+        "AUD-3591": {
+          "created_at": "2026-09-04T21:48:35Z"
+        },
+        "AUD-3598": {
+          "created_at": "2026-09-04T21:48:35Z"
+        }
+      }
+    },
+    "zqk_session": {
+      "": {
+        "ZQK-6109": {
+          "created_at": "2026-09-04T21:48:34Z"
+        }
+      }
+    }
+  }
+}

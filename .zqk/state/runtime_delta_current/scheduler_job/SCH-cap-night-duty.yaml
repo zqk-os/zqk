@@ -1,0 +1,25 @@
+category: maintenance
+command: /usr/bin/env NIGHT_DUTY_CVS_ID=CVS-CEF-UNTIL-45-001 NIGHT_DUTY_PLAN_ID=PRI-CEF-R28-REMEDIATE-001 NIGHT_DUTY_WAKE_MODE=notify ./scripts/mesh/night-duty-tick.sh
+created_at: "2026-08-12T12:04:14Z"
+created_by: ACC-1785920548450214012-68b850c0
+description: |
+    Overnight CAP integrity check and agent feeding loop. Runs scripts/mesh/night-duty-tick.sh
+    to ensure swarm never idles.
+enabled: false
+execution_mode: reusable
+id: SCH-cap-night-duty
+job_type: run_wrapper
+kind: scheduler_job
+last_run_at: "2026-09-04T23:50:00Z"
+log_level: default
+namespace_id: zqk:kernel
+next_run_at: "2026-09-04T23:52:00Z"
+priority: normal
+schedule_expression: 0 */2 * * * *
+schema_version: 2.0.0
+status: active
+title: CAP Night Duty
+trigger_type: timer
+updated_at: "2026-09-04T23:51:49Z"
+updated_by: ACC-1785920548450214006-2e52b3e7
+version_context: default

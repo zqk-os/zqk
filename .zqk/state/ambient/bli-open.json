@@ -1,0 +1,141 @@
+{
+  "meta": {
+    "namespace_isolation_active": true,
+    "namespace_scope": "zqk:kernel",
+    "namespace_scope_mode": "default_kernel",
+    "returned_count": 19,
+    "total_count": 19
+  },
+  "objects": [
+    {
+      "id": "BLI-1786730195735435000-79711863",
+      "priority": "high",
+      "priority_plan_ref": "PRI-HOLDING-POST-LAUNCH-001",
+      "status": "deferred",
+      "title": "Native CASable staged-process gate (Go + kernel resolver)"
+    },
+    {
+      "id": "BLI-1786951788129303000-f388e71d",
+      "priority_plan_ref": "PRI-HOLDING-POST-LAUNCH-001",
+      "status": "deferred",
+      "title": "Portable AgentX completion verifier (retire Go/ZQK-hardcoded gate)"
+    },
+    {
+      "id": "BLI-1786953250673577000-8027de0e",
+      "priority_plan_ref": "PRI-HOLDING-POST-LAUNCH-001",
+      "status": "deferred",
+      "title": "Migrate remaining nil-storage test teardowns to isolated project framework"
+    },
+    {
+      "id": "BLI-1787823839546074000-3d025dfb",
+      "priority": "low",
+      "priority_plan_ref": "PRI-HOLDING-POST-LAUNCH-001",
+      "status": "deferred",
+      "title": "Pull qwen3-coder-next when a 64GB+ host exists"
+    },
+    {
+      "id": "BLI-1788171963272229000-4e793d09",
+      "priority_plan_ref": "PRI-HOLDING-POST-LAUNCH-001",
+      "status": "validated",
+      "title": "Reduce CLI churn and user confusion"
+    },
+    {
+      "id": "BLI-CEF-COMMS-PHASE-B-LAUNCH-001",
+      "priority": "high",
+      "priority_plan_ref": "PRI-CEF-LINGERING-INTAKE-001",
+      "status": "planned",
+      "title": "Phase B notify+seat-worker is the public-launch comms path"
+    },
+    {
+      "id": "BLI-CEF-LIST-REFS-FILTER-001",
+      "priority": "high",
+      "priority_plan_ref": "PRI-CEF-LINGERING-INTAKE-001",
+      "status": "planned",
+      "title": "List filters on *_refs must match list membership, not whole-list equality"
+    },
+    {
+      "id": "BLI-CEF-QA-SUCCESS-SPEC-001",
+      "priority": "high",
+      "priority_plan_ref": "PRI-CEF-ARCH-FOLLOWON-001",
+      "status": "planned",
+      "title": "Formalize qa_success stub spec or migrate to signed audit_event"
+    },
+    {
+      "id": "BLI-CEF-R27-DUAL-SEAT-REMEASURE-001",
+      "priority": "high",
+      "priority_plan_ref": "PRI-CEF-R27-ENVELOPE-001",
+      "status": "planned",
+      "title": "Dual-seat CEF R27 remesure after launch P0s (floor 4 / target 4.5)"
+    },
+    {
+      "id": "BLI-CEF-SW-KERNELIZE-FAMILIES-001",
+      "priority": "high",
+      "priority_plan_ref": "PRI-CEF-ARCH-FOLLOWON-001",
+      "status": "planned",
+      "title": "Kernelize lifecycle shockwave families onto an unsealed plan"
+    },
+    {
+      "id": "BLI-CLI-START-COMPLETE-VERBS-001",
+      "priority": "low",
+      "priority_plan_ref": "PRI-HOLDING-POST-LAUNCH-001",
+      "status": "roadmap",
+      "title": "Role-constrained object start and complete aliases (post-launch polish)"
+    },
+    {
+      "id": "BLI-KERNEL-LIVING-STORE-001",
+      "priority": "high",
+      "priority_plan_ref": "PRI-CEF-LINGERING-INTAKE-001",
+      "status": "planned",
+      "title": "Decouple living kernel from code-branch checkout (sidecar + flush, not two SSOT gits)"
+    },
+    {
+      "id": "BLI-LAUNCH-CEF-DIAMOND-FLOOR-001",
+      "priority": "high",
+      "priority_plan_ref": "PRI-CEF-LINGERING-INTAKE-001",
+      "status": "planned",
+      "title": "Drive CEF until every axis is 4+ (target 4.5, moonshot 5.0)"
+    },
+    {
+      "id": "BLI-LAUNCH-MARKETING-SITE-001",
+      "priority": "high",
+      "priority_plan_ref": "PRI-CEF-LINGERING-INTAKE-001",
+      "status": "planned",
+      "title": "Marketing site slice ready for community open-core launch"
+    },
+    {
+      "id": "BLI-LAUNCH-PUBLIC-PAYLOAD-001",
+      "priority": "high",
+      "priority_plan_ref": "PRI-OPENCORE-PUBLISH-001",
+      "status": "planned",
+      "title": "Drive public-release payload check to green (no push)"
+    },
+    {
+      "id": "BLI-LAUNCH-REQ-HONESTY-001",
+      "priority": "medium",
+      "priority_plan_ref": "PRI-CEF-LINGERING-INTAKE-001",
+      "status": "planned",
+      "title": "Police requirements backlog — close delivered CEF REQs or bind residuals"
+    },
+    {
+      "id": "BLI-LAUNCH-REQUIREMENTS-POLICE-001",
+      "priority": "high",
+      "priority_plan_ref": "PRI-HOLDING-POST-LAUNCH-001",
+      "status": "planned",
+      "title": "Police requirements backlog — close delivered CEF REQs or bind residuals"
+    },
+    {
+      "id": "BLI-LAUNCH-TTV-5MIN-001",
+      "priority": "high",
+      "priority_plan_ref": "PRI-CEF-LINGERING-INTAKE-001",
+      "status": "planned",
+      "title": "Five minutes or less from install to realized kernel value"
+    },
+    {
+      "id": "BLI-LAUNCH-UX-EDGE-IMAGE-001",
+      "priority": "high",
+      "priority_plan_ref": "PRI-CEF-LINGERING-INTAKE-001",
+      "status": "planned",
+      "title": "Close first-run edge bugs that would hurt zqk's community image"
+    }
+  ]
+}

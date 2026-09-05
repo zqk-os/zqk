@@ -1,0 +1,14 @@
+created_at: "2026-08-19T10:16:52Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1787134609358316000-7c510bb6
+item_id: BLI-COMMUNITY-INSTALL-SH-VERIFY-001
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 2857702ca28e4b64fb5782140b43c1400e68fdeab30ab0062f4119523ca97d466e5f13c72adcfa41b92eacf21fa7f0a79b8a8e3a8d7c581e5c9afe0e69cb31dc
+schema_version: 2.0.0
+signature: 304402202ad91e048f1473e94cad7d9c11b1bebc3c5c7c2e185c8a32a44140283514dd1502203ec31ac9fee1aac6626dd2a3173963f53155c18ade9b019bff9db8b22848b8cc
+status: archived
+title: curl | sh installer automated script and non-interactive dry-run validation
+updated_at: "2026-09-01T07:19:37Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

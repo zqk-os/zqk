@@ -1,0 +1,7 @@
+job_id: SCH-BUNDLE-TEST-001
+execution_id: exec-1788575100-28864
+state: completed
+process_id: 28864
+started_at: 2026-09-05T02:25:00.120926Z
+completed_at: 2026-09-05T02:25:00.390887Z
+policy_decision: execute

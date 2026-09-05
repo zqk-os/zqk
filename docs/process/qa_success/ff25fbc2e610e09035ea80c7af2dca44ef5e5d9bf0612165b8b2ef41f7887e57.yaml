@@ -1,0 +1,14 @@
+created_at: "2026-08-18T23:37:24Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1787096244434447000-30023e10
+item_id: CRIT-CEF-R2-REL-OIDCACHE-SWALLOW-A
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 2857702ca28e4b64fb5782140b43c1400e68fdeab30ab0062f4119523ca97d466e5f13c72adcfa41b92eacf21fa7f0a79b8a8e3a8d7c581e5c9afe0e69cb31dc
+schema_version: 2.0.0
+signature: 30450221008e78fdd51be2da895d6faac9e6060de5042fb2fcb989410b0f66d7f3bc6d8a8902204eb6d9cd9b960dc6b8ca5cfe537b9ac98ab4751334a9fd87cd2fc9d6250c0ba4
+status: archived
+title: 'Accept: ObjectIDCache must not silently swallow disk I/O errors'
+updated_at: "2026-09-01T07:06:29Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

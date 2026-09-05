@@ -1,0 +1,14 @@
+created_at: "2026-09-03T09:06:05Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1788426365941694000-57ddda51
+item_id: CRIT-CEF-YAML-PARSE-CACHE-001
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 86b8ab3d574c004a61020b73c23f52b9055049e90c3d755c8bbb383e059e384028fdd8cd69e13123b644e5f3f7eb65596e73e2d57d719ea3dafcb01b84ce8dfb
+schema_version: 2.0.0
+signature: 3045022100e80b57e5b0ee2410ea65e2963cc2dc35d0c5005557c8d9ca551fdd4ec184e3ed02204864d630346c09f10b20b2782b8ce6290d8c17cf84f8d8d1d925d2c1171acba0
+status: success
+title: QA success for CRIT-CEF-YAML-PARSE-CACHE-001
+updated_at: "2026-09-03T09:06:06Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

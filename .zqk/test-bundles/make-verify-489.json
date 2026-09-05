@@ -1,0 +1,105 @@
+{
+  "name": "make-verify-489",
+  "created_at": "2026-09-04T21:34:32.215603Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-489",
+    "Tests": [
+      {
+        "Name": "TestSemanticCache_Hit",
+        "Package": "semanticcache",
+        "PackagePath": "pkg/llm/semanticcache",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/llm/semanticcache/cache_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestSemanticCache_Miss",
+        "Package": "semanticcache",
+        "PackagePath": "pkg/llm/semanticcache",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/llm/semanticcache/cache_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestSemanticCache_GenerateEmbedding",
+        "Package": "semanticcache",
+        "PackagePath": "pkg/llm/semanticcache",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/llm/semanticcache/cache_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestSemanticCache_GenerateCompletion",
+        "Package": "semanticcache",
+        "PackagePath": "pkg/llm/semanticcache",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/llm/semanticcache/cache_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestCognitiveLiquidityPool",
+        "Package": "semanticcache_test",
+        "PackagePath": "pkg/llm/semanticcache",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/llm/semanticcache/liquidity_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 150000000000,
+    "PackagePath": "pkg/llm/semanticcache"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestSemanticCache_Hit",
+      "Package": "semanticcache",
+      "PackagePath": "pkg/llm/semanticcache",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/llm/semanticcache/cache_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestSemanticCache_Miss",
+      "Package": "semanticcache",
+      "PackagePath": "pkg/llm/semanticcache",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/llm/semanticcache/cache_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestSemanticCache_GenerateEmbedding",
+      "Package": "semanticcache",
+      "PackagePath": "pkg/llm/semanticcache",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/llm/semanticcache/cache_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestSemanticCache_GenerateCompletion",
+      "Package": "semanticcache",
+      "PackagePath": "pkg/llm/semanticcache",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/llm/semanticcache/cache_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestCognitiveLiquidityPool",
+      "Package": "semanticcache_test",
+      "PackagePath": "pkg/llm/semanticcache",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/llm/semanticcache/liquidity_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

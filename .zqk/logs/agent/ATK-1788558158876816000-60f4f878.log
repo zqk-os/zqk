@@ -1,0 +1,2 @@
+Error: failed to read task ATK-1788558158876816000-60f4f878: STREAM_CAS_READ_FAILED: ATK-1788558158876816000-60f4f878 agent_task object ATK-1788558158876816000-60f4f878 (kind: agent_task) not found: cas index miss: object not found
+[mock-fallback] structured completion unavailable

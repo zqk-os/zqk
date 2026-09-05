@@ -1,0 +1,9 @@
+{"effort_variance":0,"event_type":"lifecycle_transition_applied","id":"MIL-014","kind":"process_lifecycle","to_status":"complete","ts_rfc3339nano":"2026-09-03T20:05:18.432769Z"}
+{"effort_variance":0,"event_type":"lifecycle_transition_applied","id":"MIL-1785183722322302000-d3386bed","kind":"process_lifecycle","to_status":"complete","ts_rfc3339nano":"2026-09-03T20:06:44.956293Z"}
+{"effort_variance":0,"event_type":"lifecycle_transition_applied","id":"MIL-1785700135247212000-5de70c16","kind":"process_lifecycle","to_status":"complete","ts_rfc3339nano":"2026-09-03T20:06:49.096071Z"}
+{"effort_variance":0,"event_type":"lifecycle_transition_applied","id":"MIL-006","kind":"process_lifecycle","to_status":"complete","ts_rfc3339nano":"2026-09-03T20:08:01.505515Z"}
+{"effort_variance":0,"event_type":"lifecycle_transition_applied","id":"MIL-CEF-M5-PRELAUNCH","kind":"process_lifecycle","to_status":"complete","ts_rfc3339nano":"2026-09-03T20:08:30.70099Z"}
+{"effort_variance":0,"event_type":"lifecycle_transition_applied","id":"MIL-1779679418846734000-a3d3ed40","kind":"process_lifecycle","to_status":"complete","ts_rfc3339nano":"2026-09-03T20:09:38.589473Z"}
+{"effort_variance":0,"event_type":"lifecycle_transition_applied","id":"MIL-1784802189627789000-7c7d2d22","kind":"process_lifecycle","to_status":"complete","ts_rfc3339nano":"2026-09-03T20:09:46.156171Z"}
+{"effort_variance":0,"event_type":"lifecycle_transition_applied","id":"MIL-1785125017702622000-7a2d0f33","kind":"process_lifecycle","to_status":"complete","ts_rfc3339nano":"2026-09-03T20:11:03.871949Z"}
+{"effort_variance":0,"event_type":"lifecycle_transition_applied","id":"MIL-1785219416511376000-de137666","kind":"process_lifecycle","to_status":"complete","ts_rfc3339nano":"2026-09-03T20:11:14.98713Z"}

@@ -1,0 +1,14 @@
+created_at: "2026-08-19T00:28:33Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1787099313027673000-51875655
+item_id: CRIT-CEF-R2-SEC-SANDBOX-DENYLIST-A
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 2857702ca28e4b64fb5782140b43c1400e68fdeab30ab0062f4119523ca97d466e5f13c72adcfa41b92eacf21fa7f0a79b8a8e3a8d7c581e5c9afe0e69cb31dc
+schema_version: 2.0.0
+signature: 3045022069b24c8fffc0696c22674c7be5671c17c870ba5a8983c99c2fb4b527ef0dea86022100a20597a123ee4885ccf458dba7ce7ee9b2e2f4dc4cf89eb3dc5446db1808279a
+status: archived
+title: 'Accept: MCP shell write guard beyond token denylist'
+updated_at: "2026-09-01T07:19:58Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

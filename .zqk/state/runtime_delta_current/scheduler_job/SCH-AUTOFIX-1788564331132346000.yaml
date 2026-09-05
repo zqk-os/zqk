@@ -1,0 +1,31 @@
+category: auto_fix
+command: zqk
+command_args:
+    - system
+    - auto-fix-batch
+    - --batch-file
+    - /Users/lanceettl/zqk-restore-clone/.zqk/autofix/AUTOFIX-1788564331125826000.json
+    - --project-root
+    - /Users/lanceettl/zqk-restore-clone
+created_at: "2026-09-04T23:25:31Z"
+created_by: ACC-1785920548450214012-68b850c0
+description: Auto-fix batch AUTOFIX-1788564331125826000 processing 10 issues
+enabled: true
+execution_mode: one_time
+id: SCH-AUTOFIX-1788564331132346000
+job_type: run_wrapper
+kind: scheduler_job
+last_run_at: "2026-09-04T23:26:36Z"
+log_level: default
+max_runtime_seconds: 3600
+namespace_id: zqk:kernel
+retry_count: 1
+retry_delay_seconds: 30
+schema_version: 2.0.0
+status: active
+title: 'Auto-fix batch: 10 issues'
+trigger_type: manual
+updated_at: "2026-09-04T23:27:10Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+working_directory: /Users/lanceettl/zqk-restore-clone

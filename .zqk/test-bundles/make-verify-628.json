@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-628",
+  "created_at": "2026-09-04T21:34:33.604745Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-628",
+    "Tests": [
+      {
+        "Name": "TestRecordPersistOutcomeRetryOK",
+        "Package": "audit",
+        "PackagePath": "pkg/storage/audit",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/audit/recorder_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestRecordBuffered",
+        "Package": "audit",
+        "PackagePath": "pkg/storage/audit",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/audit/recorder_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAggregationResultConstructors",
+        "Package": "audit",
+        "PackagePath": "pkg/storage/audit",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/audit/result_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestWriteFlushRecords",
+        "Package": "audit",
+        "PackagePath": "pkg/storage/audit",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/audit/sink_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestWriteFlushNilSink",
+        "Package": "audit",
+        "PackagePath": "pkg/storage/audit",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/audit/sink_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestWriteFlushError",
+        "Package": "audit",
+        "PackagePath": "pkg/storage/audit",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/audit/sink_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestMetricsSnapshotRates",
+        "Package": "audit",
+        "PackagePath": "pkg/storage/audit",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/audit/snapshot_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestClassifyEventType",
+        "Package": "audit",
+        "PackagePath": "pkg/storage/audit",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/audit/snapshot_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestCommandMetricMetadata",
+        "Package": "audit",
+        "PackagePath": "pkg/storage/audit",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/audit/snapshot_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestTallyEvents",
+        "Package": "audit",
+        "PackagePath": "pkg/storage/audit",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/audit/tally_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": true,
+    "EstimatedDuration": 900000000000,
+    "PackagePath": "pkg/storage/audit"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestRecordPersistOutcomeRetryOK",
+      "Package": "audit",
+      "PackagePath": "pkg/storage/audit",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/audit/recorder_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestRecordBuffered",
+      "Package": "audit",
+      "PackagePath": "pkg/storage/audit",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/audit/recorder_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestAggregationResultConstructors",
+      "Package": "audit",
+      "PackagePath": "pkg/storage/audit",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/audit/result_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestWriteFlushRecords",
+      "Package": "audit",
+      "PackagePath": "pkg/storage/audit",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/audit/sink_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestWriteFlushNilSink",
+      "Package": "audit",
+      "PackagePath": "pkg/storage/audit",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/audit/sink_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestWriteFlushError",
+      "Package": "audit",
+      "PackagePath": "pkg/storage/audit",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/audit/sink_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestMetricsSnapshotRates",
+      "Package": "audit",
+      "PackagePath": "pkg/storage/audit",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/audit/snapshot_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestClassifyEventType",
+      "Package": "audit",
+      "PackagePath": "pkg/storage/audit",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/audit/snapshot_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestCommandMetricMetadata",
+      "Package": "audit",
+      "PackagePath": "pkg/storage/audit",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/audit/snapshot_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestTallyEvents",
+      "Package": "audit",
+      "PackagePath": "pkg/storage/audit",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/audit/tally_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    }
+  }
+}

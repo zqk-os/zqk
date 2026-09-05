@@ -1,0 +1,32 @@
+
+--- run 2026-09-04T22:14:37Z ---
+=== RUN   TestEnvelopeFromAttentionMode_RoundTrip
+=== PAUSE TestEnvelopeFromAttentionMode_RoundTrip
+=== RUN   TestParseLeadingEnvelope_Absent
+=== PAUSE TestParseLeadingEnvelope_Absent
+=== RUN   TestParseLeadingEnvelope_SchemaMismatch
+=== PAUSE TestParseLeadingEnvelope_SchemaMismatch
+=== RUN   TestEnvelopeHelpers
+=== PAUSE TestEnvelopeHelpers
+=== RUN   TestObserverToolAccessSection_namesSearchTool
+=== PAUSE TestObserverToolAccessSection_namesSearchTool
+=== RUN   TestRelevantObserverSection_includesHits
+=== PAUSE TestRelevantObserverSection_includesHits
+=== RUN   TestClassifyWorkClass
+=== PAUSE TestClassifyWorkClass
+=== CONT  TestEnvelopeFromAttentionMode_RoundTrip
+=== CONT  TestObserverToolAccessSection_namesSearchTool
+--- PASS: TestObserverToolAccessSection_namesSearchTool (0.00s)
+=== CONT  TestParseLeadingEnvelope_SchemaMismatch
+--- PASS: TestParseLeadingEnvelope_SchemaMismatch (0.00s)
+=== CONT  TestEnvelopeHelpers
+--- PASS: TestEnvelopeFromAttentionMode_RoundTrip (0.00s)
+=== CONT  TestClassifyWorkClass
+=== CONT  TestParseLeadingEnvelope_Absent
+--- PASS: TestParseLeadingEnvelope_Absent (0.00s)
+=== CONT  TestRelevantObserverSection_includesHits
+--- PASS: TestClassifyWorkClass (0.00s)
+--- PASS: TestEnvelopeHelpers (0.00s)
+--- PASS: TestRelevantObserverSection_includesHits (0.01s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/agentprompt	0.607s

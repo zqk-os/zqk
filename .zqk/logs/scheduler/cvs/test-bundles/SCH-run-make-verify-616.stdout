@@ -1,0 +1,36 @@
+
+--- run 2026-09-04T22:18:09Z ---
+=== RUN   TestNewAgentSwarmInitCommandBuilder
+=== PAUSE TestNewAgentSwarmInitCommandBuilder
+=== RUN   TestNewCheckoutCommandBuilder
+=== PAUSE TestNewCheckoutCommandBuilder
+=== RUN   TestNewCiCommandBuilder
+=== PAUSE TestNewCiCommandBuilder
+=== RUN   TestNewMcpSvcCursorAdapterCommandBuilder
+=== PAUSE TestNewMcpSvcCursorAdapterCommandBuilder
+=== RUN   TestNewNewCommandSpecCommandBuilder
+=== PAUSE TestNewNewCommandSpecCommandBuilder
+=== RUN   TestNewRunCommandBuilder
+=== PAUSE TestNewRunCommandBuilder
+=== RUN   TestNewSchedulerPrintCursorPasteApplescriptCommandBuilder
+=== PAUSE TestNewSchedulerPrintCursorPasteApplescriptCommandBuilder
+=== RUN   TestNewSystemValidateCommandSpecsCommandBuilder
+=== PAUSE TestNewSystemValidateCommandSpecsCommandBuilder
+=== CONT  TestNewAgentSwarmInitCommandBuilder
+=== CONT  TestNewNewCommandSpecCommandBuilder
+--- PASS: TestNewNewCommandSpecCommandBuilder (0.00s)
+--- PASS: TestNewAgentSwarmInitCommandBuilder (0.00s)
+=== CONT  TestNewSchedulerPrintCursorPasteApplescriptCommandBuilder
+--- PASS: TestNewSchedulerPrintCursorPasteApplescriptCommandBuilder (0.00s)
+=== CONT  TestNewCiCommandBuilder
+--- PASS: TestNewCiCommandBuilder (0.00s)
+=== CONT  TestNewMcpSvcCursorAdapterCommandBuilder
+--- PASS: TestNewMcpSvcCursorAdapterCommandBuilder (0.00s)
+=== CONT  TestNewSystemValidateCommandSpecsCommandBuilder
+=== CONT  TestNewRunCommandBuilder
+--- PASS: TestNewSystemValidateCommandSpecsCommandBuilder (0.00s)
+=== CONT  TestNewCheckoutCommandBuilder
+--- PASS: TestNewCheckoutCommandBuilder (0.00s)
+--- PASS: TestNewRunCommandBuilder (0.00s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/cli/bldr_cli_cmd_v1	0.563s

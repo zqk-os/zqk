@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-460",
+  "created_at": "2026-09-04T21:34:31.88601Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-460",
+    "Tests": [
+      {
+        "Name": "TestCommandSpec_ComparisonWithProgrammatic",
+        "Package": "cli",
+        "PackagePath": "pkg/cli",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/cli/command_spec_comparison_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestApplyCommandSpecCoverageBaseline",
+        "Package": "cli",
+        "PackagePath": "pkg/cli",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/cli/command_spec_coverage_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAnalyzeCommandSpecCoverageFindsUnspecifiedCommand",
+        "Package": "cli",
+        "PackagePath": "pkg/cli",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/cli/command_spec_coverage_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestCommandSpec_EndToEndScenario",
+        "Package": "cli",
+        "PackagePath": "pkg/cli",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/cli/command_spec_scenario_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestCommandSpec_GraphStorage",
+        "Package": "cli",
+        "PackagePath": "pkg/cli",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/cli/command_spec_scenario_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestCommandSpec_LoadFromYAML",
+        "Package": "cli",
+        "PackagePath": "pkg/cli",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/cli/command_spec_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestCRUDCommandSpec_LoadFromYAML",
+        "Package": "cli",
+        "PackagePath": "pkg/cli",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/cli/command_spec_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestCommandSpec_ExternalSpecReference",
+        "Package": "cli",
+        "PackagePath": "pkg/cli",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/cli/command_spec_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestCommandSpec_Validation",
+        "Package": "cli",
+        "PackagePath": "pkg/cli",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/cli/command_spec_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestCRUDCommandSpec_Validation",
+        "Package": "cli",
+        "PackagePath": "pkg/cli",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/cli/command_spec_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": true,
+    "EstimatedDuration": 300000000000,
+    "PackagePath": "pkg/cli"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestCommandSpec_ComparisonWithProgrammatic",
+      "Package": "cli",
+      "PackagePath": "pkg/cli",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/cli/command_spec_comparison_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestApplyCommandSpecCoverageBaseline",
+      "Package": "cli",
+      "PackagePath": "pkg/cli",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/cli/command_spec_coverage_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestAnalyzeCommandSpecCoverageFindsUnspecifiedCommand",
+      "Package": "cli",
+      "PackagePath": "pkg/cli",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/cli/command_spec_coverage_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestCommandSpec_EndToEndScenario",
+      "Package": "cli",
+      "PackagePath": "pkg/cli",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/cli/command_spec_scenario_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestCommandSpec_GraphStorage",
+      "Package": "cli",
+      "PackagePath": "pkg/cli",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/cli/command_spec_scenario_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestCommandSpec_LoadFromYAML",
+      "Package": "cli",
+      "PackagePath": "pkg/cli",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/cli/command_spec_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestCRUDCommandSpec_LoadFromYAML",
+      "Package": "cli",
+      "PackagePath": "pkg/cli",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/cli/command_spec_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestCommandSpec_ExternalSpecReference",
+      "Package": "cli",
+      "PackagePath": "pkg/cli",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/cli/command_spec_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestCommandSpec_Validation",
+      "Package": "cli",
+      "PackagePath": "pkg/cli",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/cli/command_spec_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestCRUDCommandSpec_Validation",
+      "Package": "cli",
+      "PackagePath": "pkg/cli",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/cli/command_spec_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

@@ -1,0 +1,14 @@
+created_at: "2026-09-03T10:14:19Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1788430459772905000-d4e05e41
+item_id: MIL-CEF-R2-M2-ARCH
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 86b8ab3d574c004a61020b73c23f52b9055049e90c3d755c8bbb383e059e384028fdd8cd69e13123b644e5f3f7eb65596e73e2d57d719ea3dafcb01b84ce8dfb
+schema_version: 2.0.0
+signature: 3046022100e67ce8d80ad6c1922029a8c9da6125db5b19667b95c2b72e4ec207970a0ce723022100b459fc613e7bbba70f3ef96ab6c14c458b855967b8bfb2ce6acded17b06d0eec
+status: success
+title: QA success for MIL-CEF-R2-M2-ARCH
+updated_at: "2026-09-03T10:14:21Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

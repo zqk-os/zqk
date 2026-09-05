@@ -1,0 +1,7 @@
+job_id: SCH-run-bundle-17
+execution_id: exec-1788587842-28864
+state: failed
+process_id: 28864
+started_at: 2026-09-05T05:57:22.198306Z
+completed_at: 2026-09-05T05:57:22.484658Z
+policy_decision: execute

@@ -1,0 +1,16 @@
+
+--- run 2026-09-04T21:37:18Z ---
+=== RUN   TestRewriteObjectIDForRawRename
+=== PAUSE TestRewriteObjectIDForRawRename
+=== RUN   TestRewriteObjectIDForRawRenameRejectsEmptyID
+=== PAUSE TestRewriteObjectIDForRawRenameRejectsEmptyID
+=== RUN   TestLiveCASBlobUnreadable
+=== PAUSE TestLiveCASBlobUnreadable
+=== CONT  TestRewriteObjectIDForRawRename
+=== CONT  TestLiveCASBlobUnreadable
+--- PASS: TestLiveCASBlobUnreadable (0.00s)
+=== CONT  TestRewriteObjectIDForRawRenameRejectsEmptyID
+--- PASS: TestRewriteObjectIDForRawRename (0.00s)
+--- PASS: TestRewriteObjectIDForRawRenameRejectsEmptyID (0.00s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/storage/crud	0.820s

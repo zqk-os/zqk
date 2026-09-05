@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-785",
+  "created_at": "2026-09-04T21:34:35.114387Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-785",
+    "Tests": [
+      {
+        "Name": "TestLifecycleLoader_EnsureReady_WarnsInvalidYAML",
+        "Package": "objects",
+        "PackagePath": "pkg/objects",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/objects/lifecycle_yaml_parse_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestLoaderOrderError_Error",
+        "Package": "objects",
+        "PackagePath": "pkg/objects",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/objects/loader_order_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestNewLoadingOrder",
+        "Package": "objects",
+        "PackagePath": "pkg/objects",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/objects/loader_order_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestLoadingOrder_MarkSpecLoaded",
+        "Package": "objects",
+        "PackagePath": "pkg/objects",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/objects/loader_order_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestLoadingOrder_RequireSpecLoaded",
+        "Package": "objects",
+        "PackagePath": "pkg/objects",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/objects/loader_order_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestGetRequiredSpecs",
+        "Package": "objects",
+        "PackagePath": "pkg/objects",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/objects/loader_order_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestParseObject",
+        "Package": "objects",
+        "PackagePath": "pkg/objects",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/objects/parsed_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestParseObject_ToMap",
+        "Package": "objects",
+        "PackagePath": "pkg/objects",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/objects/parsed_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestParseObject_GetField",
+        "Package": "objects",
+        "PackagePath": "pkg/objects",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/objects/parsed_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestExtractStringList",
+        "Package": "objects",
+        "PackagePath": "pkg/objects",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/objects/parsed_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": true,
+    "EstimatedDuration": 300000000000,
+    "PackagePath": "pkg/objects"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestLifecycleLoader_EnsureReady_WarnsInvalidYAML",
+      "Package": "objects",
+      "PackagePath": "pkg/objects",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/objects/lifecycle_yaml_parse_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestLoaderOrderError_Error",
+      "Package": "objects",
+      "PackagePath": "pkg/objects",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/objects/loader_order_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestNewLoadingOrder",
+      "Package": "objects",
+      "PackagePath": "pkg/objects",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/objects/loader_order_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestLoadingOrder_MarkSpecLoaded",
+      "Package": "objects",
+      "PackagePath": "pkg/objects",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/objects/loader_order_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestLoadingOrder_RequireSpecLoaded",
+      "Package": "objects",
+      "PackagePath": "pkg/objects",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/objects/loader_order_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestGetRequiredSpecs",
+      "Package": "objects",
+      "PackagePath": "pkg/objects",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/objects/loader_order_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestParseObject",
+      "Package": "objects",
+      "PackagePath": "pkg/objects",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/objects/parsed_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestParseObject_ToMap",
+      "Package": "objects",
+      "PackagePath": "pkg/objects",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/objects/parsed_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestParseObject_GetField",
+      "Package": "objects",
+      "PackagePath": "pkg/objects",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/objects/parsed_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestExtractStringList",
+      "Package": "objects",
+      "PackagePath": "pkg/objects",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/objects/parsed_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

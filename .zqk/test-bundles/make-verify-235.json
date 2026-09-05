@@ -1,0 +1,105 @@
+{
+  "name": "make-verify-235",
+  "created_at": "2026-09-04T21:34:29.736892Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-235",
+    "Tests": [
+      {
+        "Name": "TestGatewayDispatcher_Dispatch",
+        "Package": "shockwave",
+        "PackagePath": "pkg/shockwave",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/shockwave/dispatcher_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestGatewayDispatcher_Dispatch_InvalidKind",
+        "Package": "shockwave",
+        "PackagePath": "pkg/shockwave",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/shockwave/dispatcher_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestNewShockwaveRouter",
+        "Package": "shockwave",
+        "PackagePath": "pkg/shockwave",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/shockwave/router_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestNeuron_DispatchSplit",
+        "Package": "shockwave",
+        "PackagePath": "pkg/shockwave",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/shockwave/shockwave_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestNeuron_DispatchDuplicate",
+        "Package": "shockwave",
+        "PackagePath": "pkg/shockwave",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/shockwave/shockwave_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 150000000000,
+    "PackagePath": "pkg/shockwave"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestGatewayDispatcher_Dispatch",
+      "Package": "shockwave",
+      "PackagePath": "pkg/shockwave",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/shockwave/dispatcher_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestGatewayDispatcher_Dispatch_InvalidKind",
+      "Package": "shockwave",
+      "PackagePath": "pkg/shockwave",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/shockwave/dispatcher_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestNewShockwaveRouter",
+      "Package": "shockwave",
+      "PackagePath": "pkg/shockwave",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/shockwave/router_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestNeuron_DispatchSplit",
+      "Package": "shockwave",
+      "PackagePath": "pkg/shockwave",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/shockwave/shockwave_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestNeuron_DispatchDuplicate",
+      "Package": "shockwave",
+      "PackagePath": "pkg/shockwave",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/shockwave/shockwave_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

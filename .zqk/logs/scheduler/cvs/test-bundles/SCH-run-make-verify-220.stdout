@@ -1,0 +1,74 @@
+
+--- run 2026-09-04T21:45:45Z ---
+=== RUN   TestProcessor_FormatLogEntry
+=== PAUSE TestProcessor_FormatLogEntry
+=== RUN   TestQueue_Enqueue
+=== PAUSE TestQueue_Enqueue
+=== RUN   TestQueue_DequeueSorted
+=== PAUSE TestQueue_DequeueSorted
+=== RUN   TestQueue_DeterminePriority
+=== PAUSE TestQueue_DeterminePriority
+=== RUN   TestQueue_ConcurrentEnqueue
+=== PAUSE TestQueue_ConcurrentEnqueue
+=== RUN   TestQueue_ConcurrentEnqueueDequeue
+=== PAUSE TestQueue_ConcurrentEnqueueDequeue
+=== RUN   TestQueue_StartProcessing
+=== PAUSE TestQueue_StartProcessing
+=== RUN   TestQueue_StopProcessing
+=== PAUSE TestQueue_StopProcessing
+=== RUN   TestQueue_Size
+=== PAUSE TestQueue_Size
+=== CONT  TestProcessor_FormatLogEntry
+=== CONT  TestQueue_ConcurrentEnqueueDequeue
+=== RUN   TestProcessor_FormatLogEntry/completion_callback
+=== RUN   TestProcessor_FormatLogEntry/error_callback
+=== RUN   TestProcessor_FormatLogEntry/status_callback
+--- PASS: TestProcessor_FormatLogEntry (0.02s)
+    --- PASS: TestProcessor_FormatLogEntry/completion_callback (0.01s)
+    --- PASS: TestProcessor_FormatLogEntry/error_callback (0.01s)
+    --- PASS: TestProcessor_FormatLogEntry/status_callback (0.01s)
+=== CONT  TestQueue_ConcurrentEnqueue
+--- PASS: TestQueue_ConcurrentEnqueue (0.00s)
+=== CONT  TestQueue_DeterminePriority
+=== RUN   TestQueue_DeterminePriority/completion_callback
+=== RUN   TestQueue_DeterminePriority/error_callback
+=== RUN   TestQueue_DeterminePriority/status_callback
+=== RUN   TestQueue_DeterminePriority/unknown_callback
+=== RUN   TestQueue_DeterminePriority/empty_callback_type
+--- PASS: TestQueue_DeterminePriority (0.00s)
+    --- PASS: TestQueue_DeterminePriority/completion_callback (0.00s)
+    --- PASS: TestQueue_DeterminePriority/error_callback (0.00s)
+    --- PASS: TestQueue_DeterminePriority/status_callback (0.00s)
+    --- PASS: TestQueue_DeterminePriority/unknown_callback (0.00s)
+    --- PASS: TestQueue_DeterminePriority/empty_callback_type (0.00s)
+=== CONT  TestQueue_DequeueSorted
+=== RUN   TestQueue_DequeueSorted/timestamp_sort_oldest_first
+=== RUN   TestQueue_DequeueSorted/priority_sort_highest_first
+=== RUN   TestQueue_DequeueSorted/partial_dequeue
+--- PASS: TestQueue_DequeueSorted (0.00s)
+    --- PASS: TestQueue_DequeueSorted/timestamp_sort_oldest_first (0.00s)
+    --- PASS: TestQueue_DequeueSorted/priority_sort_highest_first (0.00s)
+    --- PASS: TestQueue_DequeueSorted/partial_dequeue (0.00s)
+=== CONT  TestQueue_Enqueue
+=== RUN   TestQueue_Enqueue/unlimited_queue
+=== RUN   TestQueue_Enqueue/limited_queue_within_capacity
+=== RUN   TestQueue_Enqueue/limited_queue_at_capacity
+=== RUN   TestQueue_Enqueue/limited_queue_exceeds_capacity
+--- PASS: TestQueue_Enqueue (0.00s)
+    --- PASS: TestQueue_Enqueue/unlimited_queue (0.00s)
+    --- PASS: TestQueue_Enqueue/limited_queue_within_capacity (0.00s)
+    --- PASS: TestQueue_Enqueue/limited_queue_at_capacity (0.00s)
+    --- PASS: TestQueue_Enqueue/limited_queue_exceeds_capacity (0.00s)
+=== CONT  TestQueue_StopProcessing
+    queue_test.go:515: processed 0 entries before stop
+    queue_test.go:519: queue has 20 remaining entries after stop (acceptable)
+--- PASS: TestQueue_StopProcessing (0.00s)
+=== CONT  TestQueue_Size
+--- PASS: TestQueue_Size (0.00s)
+=== CONT  TestQueue_StartProcessing
+=== NAME  TestQueue_ConcurrentEnqueueDequeue
+    queue_test.go:377: Enqueued: 50, Dequeued: 50, Remaining in queue: 0
+--- PASS: TestQueue_ConcurrentEnqueueDequeue (0.12s)
+--- PASS: TestQueue_StartProcessing (0.21s)
+PASS
+ok  	github.com/lanceman/zqk/cmd/zqk/callback	0.939s

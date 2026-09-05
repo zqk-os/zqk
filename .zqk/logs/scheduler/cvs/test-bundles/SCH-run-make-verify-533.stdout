@@ -1,0 +1,44 @@
+
+--- run 2026-09-04T22:14:43Z ---
+=== RUN   TestParseColumnValuePairs
+=== PAUSE TestParseColumnValuePairs
+=== RUN   TestApplyValueMapToUpdates
+=== PAUSE TestApplyValueMapToUpdates
+=== RUN   TestLoadMatrixRegistry_valueMap
+=== PAUSE TestLoadMatrixRegistry_valueMap
+=== RUN   TestSummarizeMatrixCSV_vettingStyle
+=== PAUSE TestSummarizeMatrixCSV_vettingStyle
+=== RUN   TestUpdateMatrixCSVRow_codebaseVetting
+=== PAUSE TestUpdateMatrixCSVRow_codebaseVetting
+=== RUN   TestUpdateMatrixCSVRow_dryRun
+=== PAUSE TestUpdateMatrixCSVRow_dryRun
+=== RUN   TestUpdateMatrixCSVRow_valueMap
+=== PAUSE TestUpdateMatrixCSVRow_valueMap
+=== RUN   TestUpdateMatrixCSVRow_backup
+=== PAUSE TestUpdateMatrixCSVRow_backup
+=== RUN   TestUpdateMatrixCSVByFilter_bulk
+=== PAUSE TestUpdateMatrixCSVByFilter_bulk
+=== RUN   TestUpdateMatrixCSVByFilter_cvsIDs
+=== PAUSE TestUpdateMatrixCSVByFilter_cvsIDs
+=== CONT  TestParseColumnValuePairs
+--- PASS: TestParseColumnValuePairs (0.00s)
+=== CONT  TestUpdateMatrixCSVByFilter_cvsIDs
+=== CONT  TestUpdateMatrixCSVRow_dryRun
+--- PASS: TestUpdateMatrixCSVRow_dryRun (0.08s)
+=== CONT  TestUpdateMatrixCSVRow_backup
+--- PASS: TestUpdateMatrixCSVByFilter_cvsIDs (0.09s)
+=== CONT  TestUpdateMatrixCSVByFilter_bulk
+--- PASS: TestUpdateMatrixCSVRow_backup (0.02s)
+=== CONT  TestUpdateMatrixCSVRow_valueMap
+--- PASS: TestUpdateMatrixCSVByFilter_bulk (0.02s)
+=== CONT  TestSummarizeMatrixCSV_vettingStyle
+--- PASS: TestSummarizeMatrixCSV_vettingStyle (0.01s)
+=== CONT  TestUpdateMatrixCSVRow_codebaseVetting
+--- PASS: TestUpdateMatrixCSVRow_valueMap (0.02s)
+=== CONT  TestLoadMatrixRegistry_valueMap
+--- PASS: TestLoadMatrixRegistry_valueMap (0.01s)
+=== CONT  TestApplyValueMapToUpdates
+--- PASS: TestApplyValueMapToUpdates (0.00s)
+--- PASS: TestUpdateMatrixCSVRow_codebaseVetting (0.02s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/quality	1.031s

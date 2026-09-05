@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-258",
+  "created_at": "2026-09-04T21:34:29.942092Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-258",
+    "Tests": [
+      {
+        "Name": "TestCLI_AgentPromptChatMatrix_MultiCycle",
+        "Package": "scheduler",
+        "PackagePath": "cmd/zqk/scheduler",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/scheduler/attention_mode_chat_matrix_integration_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAuditSchedulerInitFull",
+        "Package": "scheduler",
+        "PackagePath": "cmd/zqk/scheduler",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/scheduler/audit_init_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestBuildAppleScriptIDEPaste_embeddedScript",
+        "Package": "scheduler",
+        "PackagePath": "cmd/zqk/scheduler",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/scheduler/convergence_agent_prompt_validate_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestLoadIDEPasteAutomation_customPrefixSteps",
+        "Package": "scheduler",
+        "PackagePath": "cmd/zqk/scheduler",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/scheduler/convergence_agent_prompt_validate_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestLoadIDEPasteAutomation_invalidToken",
+        "Package": "scheduler",
+        "PackagePath": "cmd/zqk/scheduler",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/scheduler/convergence_agent_prompt_validate_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestLoadIDEPasteAutomation_builtinAlias",
+        "Package": "scheduler",
+        "PackagePath": "cmd/zqk/scheduler",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/scheduler/convergence_agent_prompt_validate_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestBuildAppleScriptIDEPaste_appNameOverride",
+        "Package": "scheduler",
+        "PackagePath": "cmd/zqk/scheduler",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/scheduler/convergence_agent_prompt_validate_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestConvergenceOrchestrateJobYAML_CLIValidate",
+        "Package": "scheduler",
+        "PackagePath": "cmd/zqk/scheduler",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/scheduler/convergence_orchestrate_job_yaml_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestSchedulerConvergenceDelegatesRegistered",
+        "Package": "scheduler",
+        "PackagePath": "cmd/zqk/scheduler",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/scheduler/convergence_shell_scripts_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestGatherLatestCriteriaEvidence_KeepsNewestTimestamp",
+        "Package": "scheduler",
+        "PackagePath": "cmd/zqk/scheduler",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/scheduler/criteria_evidence_cmd_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 300000000000,
+    "PackagePath": "cmd/zqk/scheduler"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestCLI_AgentPromptChatMatrix_MultiCycle",
+      "Package": "scheduler",
+      "PackagePath": "cmd/zqk/scheduler",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/scheduler/attention_mode_chat_matrix_integration_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestAuditSchedulerInitFull",
+      "Package": "scheduler",
+      "PackagePath": "cmd/zqk/scheduler",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/scheduler/audit_init_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestBuildAppleScriptIDEPaste_embeddedScript",
+      "Package": "scheduler",
+      "PackagePath": "cmd/zqk/scheduler",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/scheduler/convergence_agent_prompt_validate_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestLoadIDEPasteAutomation_customPrefixSteps",
+      "Package": "scheduler",
+      "PackagePath": "cmd/zqk/scheduler",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/scheduler/convergence_agent_prompt_validate_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestLoadIDEPasteAutomation_invalidToken",
+      "Package": "scheduler",
+      "PackagePath": "cmd/zqk/scheduler",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/scheduler/convergence_agent_prompt_validate_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestLoadIDEPasteAutomation_builtinAlias",
+      "Package": "scheduler",
+      "PackagePath": "cmd/zqk/scheduler",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/scheduler/convergence_agent_prompt_validate_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestBuildAppleScriptIDEPaste_appNameOverride",
+      "Package": "scheduler",
+      "PackagePath": "cmd/zqk/scheduler",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/scheduler/convergence_agent_prompt_validate_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestConvergenceOrchestrateJobYAML_CLIValidate",
+      "Package": "scheduler",
+      "PackagePath": "cmd/zqk/scheduler",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/scheduler/convergence_orchestrate_job_yaml_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestSchedulerConvergenceDelegatesRegistered",
+      "Package": "scheduler",
+      "PackagePath": "cmd/zqk/scheduler",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/scheduler/convergence_shell_scripts_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestGatherLatestCriteriaEvidence_KeepsNewestTimestamp",
+      "Package": "scheduler",
+      "PackagePath": "cmd/zqk/scheduler",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/scheduler/criteria_evidence_cmd_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

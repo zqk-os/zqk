@@ -1,0 +1,35 @@
+agent_heartbeat: '2026-09-04T16:14:28-07:00'
+agent_pid: 40241
+assignee_persona_ref: PER-1781248465963709000-9925efbe
+branch_ref: integration/pri-cef-r28-remediate-001
+claimed_at: '2026-09-04T09:34:34Z'
+claimed_by: qwen-1
+created_at: '2026-09-04T08:26:28Z'
+created_by: ACC-1785920548450214012-68b850c0
+description: Assigned seat qwen-1. Branch integration/pri-cef-r28-remediate-001 off
+  origin/main. BLI-CEF-R28-SEC-STUB-AUTH-001. StubAuthHook already excluded from createAuthHook
+  on main (73c0048051). Prove with tests; update CEF scorecard SEC evidence; agent
+  next --on-validation-failure wake.
+estimated_effort: 4 hours
+hourglass_on: true
+id: ATK-1788510388168756000-e2848cec
+kind: agent_task
+namespace_id: zqk:kernel
+pipeline_ref: PRI-CEF-R28-REMEDIATE-001
+schema_version: 2.0.0
+started_at: '2026-09-04T08:29:59Z'
+status: in_progress
+task_steps:
+- description: Advance BLI tranche
+  status: pending
+  title: Implementation Phase
+- command: 'true'
+  description: Targeted tests + pre-commit green
+  status: pending
+  title: Validation Phase
+  verification_strategy: command_exit_code
+title: "SWARM qwen-1: CEF R28 \u2014 lift StubAuthHook / SEC grade from 2 (verify\
+  \ merge #1789; remesure SEC)"
+updated_at: '2026-09-04T23:14:28Z'
+updated_by: ACC-1785920548450214006-2e52b3e7
+version_context: default

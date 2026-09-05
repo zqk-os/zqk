@@ -1,0 +1,1162 @@
+{
+  "meta": {
+    "hidden_outside_scope": 3,
+    "namespace_isolation_active": true,
+    "namespace_scope": "zqk:kernel",
+    "namespace_scope_mode": "default_kernel",
+    "returned_count": 216,
+    "total_count": 216
+  },
+  "objects": [
+    {
+      "id": "REQ-009",
+      "priority": "p3",
+      "status": "complete",
+      "title": "Pagination for Long Lists"
+    },
+    {
+      "id": "REQ-010",
+      "priority": "p0",
+      "status": "deferred",
+      "title": "Multiple Users Support"
+    },
+    {
+      "id": "REQ-024",
+      "status": "deferred",
+      "title": "Context-Aware Log Output"
+    },
+    {
+      "id": "REQ-031",
+      "status": "rejected",
+      "title": "CLI Standardization and Dry-Run Context Support"
+    },
+    {
+      "id": "REQ-032",
+      "status": "rejected",
+      "title": "Object Storage Bucketing Strategy Requirement"
+    },
+    {
+      "id": "REQ-035",
+      "priority": "p1",
+      "status": "rejected",
+      "title": "Unified Spec Storage for File and Graph Backends"
+    },
+    {
+      "id": "REQ-036",
+      "priority": "p1",
+      "status": "rejected",
+      "title": "Scheduler Coordination Kernel for Distributed Job Awareness"
+    },
+    {
+      "id": "REQ-037",
+      "priority": "p1",
+      "status": "active",
+      "title": "REQ-037"
+    },
+    {
+      "id": "REQ-153",
+      "priority": "p2",
+      "status": "complete",
+      "title": "Terminal Output Polish with ASCII Colors"
+    },
+    {
+      "id": "REQ-155",
+      "priority": "p2",
+      "status": "complete",
+      "title": "Template Drivers for System Objects"
+    },
+    {
+      "id": "REQ-1770586730045449000-56f50113",
+      "status": "rejected",
+      "title": "CLI error-suggestion service for actionable messages and validation feedback"
+    },
+    {
+      "id": "REQ-1772465479240343000-fe3d44ff",
+      "priority": "p0",
+      "status": "complete",
+      "title": "Document and support manual reset (shut down, bulk delete, sacrifice data)"
+    },
+    {
+      "id": "REQ-1772465479241855000-c12f3822",
+      "priority": "p1",
+      "status": "complete",
+      "title": "Make count and oldest N cheap in storage layer"
+    },
+    {
+      "id": "REQ-1772465480001022000-fb254a61",
+      "priority": "p1",
+      "status": "complete",
+      "title": "Bulk delete and batch index updates as default"
+    },
+    {
+      "id": "REQ-1772465480408695000-fc0ee477",
+      "priority": "p1",
+      "status": "complete",
+      "title": "Decouple ordered structure build from aggregation job"
+    },
+    {
+      "id": "REQ-1772465482564192000-64c6eb8e",
+      "priority": "p2",
+      "status": "complete",
+      "title": "Retention status and targets in main feedback loop"
+    },
+    {
+      "id": "REQ-1772597921461548000-96f7040e",
+      "priority": "p0",
+      "status": "active",
+      "title": "Stream path cache highest priority; everything uses it"
+    },
+    {
+      "id": "REQ-1779770948679133000-db3ba246",
+      "status": "rejected",
+      "title": "Hive Mind Memory Specification"
+    },
+    {
+      "id": "REQ-1779775429189373000-be51f870",
+      "status": "rejected",
+      "title": "Ontology Versioning Schema"
+    },
+    {
+      "id": "REQ-1779825324358506000-fc859c78",
+      "status": "rejected",
+      "title": "QA Auditor Service"
+    },
+    {
+      "id": "REQ-1779825509425283000-887ab615",
+      "status": "rejected",
+      "title": "QA Governance Gate"
+    },
+    {
+      "id": "REQ-1780233109647690000-0fc500cf",
+      "status": "complete",
+      "title": "Agent Skill Marketplace Protocol"
+    },
+    {
+      "id": "REQ-1780428089228035000-5e65ade8",
+      "priority": "p1",
+      "status": "complete",
+      "title": "Ontology Schema Versioning Interfaces"
+    },
+    {
+      "id": "REQ-1780428723443369000-74fa8944",
+      "priority": "p1",
+      "status": "complete",
+      "title": "Semantic Translator Interface"
+    },
+    {
+      "id": "REQ-1780429186186916000-8811f4ba",
+      "priority": "p1",
+      "status": "complete",
+      "title": "Semantic Graph Traversal Engine"
+    },
+    {
+      "id": "REQ-1780429323587691000-41fdce6a",
+      "priority": "p1",
+      "status": "complete",
+      "title": "Capability Object Formalization"
+    },
+    {
+      "id": "REQ-1780431178693917000-e737b0f9",
+      "priority": "p1",
+      "status": "complete",
+      "title": "Translation Manifest Architecture"
+    },
+    {
+      "id": "REQ-1780432408025616000-1c6e7934",
+      "priority": "p1",
+      "status": "complete",
+      "title": "Autonomy Inbox Architecture"
+    },
+    {
+      "id": "REQ-1780433563266015000-419b9c2d",
+      "priority": "p1",
+      "status": "complete",
+      "title": "Persistent Inbox Storage"
+    },
+    {
+      "id": "REQ-1780457530145847000-a29d01ad",
+      "priority": "p1",
+      "status": "complete",
+      "title": "Automated Marketing Synthesizer (API)"
+    },
+    {
+      "id": "REQ-1781418317922302000-d1d60184",
+      "status": "active",
+      "title": "REQ: Phase 4 Strategy - Agent Orchestration \u0026 Autonomy State Synchronization and Locking Mechanisms"
+    },
+    {
+      "id": "REQ-1781420699235793000-0669c9a9",
+      "status": "active",
+      "title": "REQ: Developer Experience (1 week)"
+    },
+    {
+      "id": "REQ-1781420753181107000-9a25c04b",
+      "status": "active",
+      "title": "REQ: Phase 1 Core – Backlog (1 week)"
+    },
+    {
+      "id": "REQ-1781420803081499000-d93a0ed9",
+      "status": "active",
+      "title": "REQ: Process \u0026 System (1 week)"
+    },
+    {
+      "id": "REQ-1781420888932933000-36c20872",
+      "status": "active",
+      "title": "REQ: MCP Server Improvements"
+    },
+    {
+      "id": "REQ-1783631871956681000-30a414f3",
+      "status": "active",
+      "title": "Local LLM Tool Fallback \u0026 Timeout Handler"
+    },
+    {
+      "id": "REQ-1783631875827893000-0f9bc49d",
+      "status": "active",
+      "title": "Token Budgeting and Context Windows Management"
+    },
+    {
+      "id": "REQ-1783631879970659000-9ecdffd4",
+      "status": "active",
+      "title": "Strict Verification Loop Governance"
+    },
+    {
+      "id": "REQ-1784668784282727000-9caf684a",
+      "status": "active",
+      "title": "GTM Web Portal and Verification Gate"
+    },
+    {
+      "id": "REQ-1784675950989294000-0408bfd8",
+      "status": "active",
+      "title": "Pro Tier Capabilities Baseline"
+    },
+    {
+      "id": "REQ-1784679423046947000-d61026a6",
+      "status": "active",
+      "title": "Enterprise Capability: Memgraph Real-time Sync"
+    },
+    {
+      "id": "REQ-1784679424396943000-044d7e7a",
+      "status": "active",
+      "title": "Enterprise Capability: SOC2 Matrices"
+    },
+    {
+      "id": "REQ-1784679425912459000-28bf826a",
+      "status": "active",
+      "title": "Enterprise Capability: Team Scaling"
+    },
+    {
+      "id": "REQ-1784698850563508000-41cedab9",
+      "status": "active",
+      "title": "Agent Idle Prevention Capabilities"
+    },
+    {
+      "id": "REQ-1784731351128345000-d2f32aa9",
+      "status": "active",
+      "title": "Memgraph Real-time Synchronization"
+    },
+    {
+      "id": "REQ-1784731361821345000-89acf1cd",
+      "status": "active",
+      "title": "SOC2 Compliance Cryptographic Matrices"
+    },
+    {
+      "id": "REQ-1784767675705001000-e0560520",
+      "status": "active",
+      "title": "Test Req"
+    },
+    {
+      "id": "REQ-1784770807791516000-ed433048",
+      "status": "active",
+      "title": "Build a New Telemetry Dashboard"
+    },
+    {
+      "id": "REQ-1784782305173479000-ff814e5e",
+      "priority": "p1",
+      "status": "active",
+      "title": "Integrate IDE-specific hook listeners for steering coding agents"
+    },
+    {
+      "id": "REQ-1784795209519733000-7cfa9dc8",
+      "status": "active",
+      "title": "Interactive Mode Telemetry"
+    },
+    {
+      "id": "REQ-1784912701287125000-ab853112",
+      "priority": "p0",
+      "status": "active",
+      "title": "CLI Tripartite Identity Parsing"
+    },
+    {
+      "id": "REQ-1784912702276562000-73a193dc",
+      "priority": "p0",
+      "status": "active",
+      "title": "Vocabulary Scheme Graph Traversal"
+    },
+    {
+      "id": "REQ-1784912801900758000-1957a848",
+      "status": "active",
+      "title": "CLI Tripartite Identity Parsing"
+    },
+    {
+      "id": "REQ-1784912803357327000-bcb1bf7b",
+      "status": "active",
+      "title": "Vocabulary Scheme Graph Traversal"
+    },
+    {
+      "id": "REQ-1784912862551273000-6e5a08f5",
+      "status": "active",
+      "title": "CLI Tripartite Identity Parsing"
+    },
+    {
+      "id": "REQ-1784912863523963000-eead4c73",
+      "status": "active",
+      "title": "Vocabulary Scheme Graph Traversal"
+    },
+    {
+      "id": "REQ-1785008237068876000-edec9b51",
+      "priority": "p2",
+      "status": "active",
+      "title": "Change Attribution: Audit events must propagate author session to shockwave routes"
+    },
+    {
+      "id": "REQ-1785008238852305000-2dfd0e0d",
+      "priority": "p0",
+      "status": "active",
+      "title": "Targeted Notification Routing: Exclude author from wake notifications"
+    },
+    {
+      "id": "REQ-1785008240643869000-1a32fd5b",
+      "priority": "p2",
+      "status": "rejected",
+      "title": "Subscription Scoping: Agents must be able to subscribe by object kind"
+    },
+    {
+      "id": "REQ-1785008242763254000-e28dc4a1",
+      "priority": "p2",
+      "status": "active",
+      "title": "Kernel Identity: Shockwave notifications must include project root"
+    },
+    {
+      "id": "REQ-1785008244742150000-3654935b",
+      "priority": "p2",
+      "status": "rejected",
+      "title": "Notification Envelope Schema: Structured JSON notification format"
+    },
+    {
+      "id": "REQ-1785020724461690000-6ff827fd",
+      "priority": "p0",
+      "status": "active",
+      "title": "Cryptographic Stamp Validation Local Fallback"
+    },
+    {
+      "id": "REQ-1785020731802682000-a3f31160",
+      "priority": "p0",
+      "status": "active",
+      "title": "Cryptographic Stamp Auto-Merge Sequence Documentation"
+    },
+    {
+      "id": "REQ-1785124743423294000-63639a45",
+      "status": "active",
+      "title": "MCP Stdio Proxy Daemon"
+    },
+    {
+      "id": "REQ-1785165360486952000-c1dfac70",
+      "priority": "p0",
+      "status": "active",
+      "title": "Non-Functional Requirement: Runtime Memory Footprint Cap (300MB RSS)"
+    },
+    {
+      "id": "REQ-1785165364958106000-21062bb3",
+      "priority": "p0",
+      "status": "active",
+      "title": "Non-Functional Requirement: Ergonomic OOM Safety and Streaming Output"
+    },
+    {
+      "id": "REQ-1785165368301123000-439d0cde",
+      "priority": "p0",
+      "status": "active",
+      "title": "Non-Functional Requirement: Objective Kernel Posture and Health Telemetry"
+    },
+    {
+      "id": "REQ-1785699950223838000-536ca1bf",
+      "status": "active",
+      "title": "Local CI must run go test against a committed checkout, not the live studio tree"
+    },
+    {
+      "id": "REQ-1785784859577332000-344f1e9a",
+      "status": "active",
+      "title": "Kernel process mutations must run through pkg/pipeline kinds"
+    },
+    {
+      "id": "REQ-1785784861144656000-2951034e",
+      "status": "active",
+      "title": "Kernel process mutations must run through pkg/pipeline kinds"
+    },
+    {
+      "id": "REQ-1785786963374513000-fcbc8468",
+      "status": "active",
+      "title": "CAP metrics-plane to agent_feed digest (restored stub)"
+    },
+    {
+      "id": "REQ-1785885781250041000-d05108de",
+      "priority": "p0",
+      "status": "active",
+      "title": "REQ-MMORCH-001 TPM Perpetual CAP Loop"
+    },
+    {
+      "id": "REQ-1785885782919744000-e6a2d175",
+      "priority": "p0",
+      "status": "active",
+      "title": "REQ-MMORCH-002 Backlog Hygiene and Shovel-Readiness Gates"
+    },
+    {
+      "id": "REQ-1785885784655713000-2b07e696",
+      "priority": "p0",
+      "status": "active",
+      "title": "REQ-MMORCH-003 Subagent Context Injection Protocol"
+    },
+    {
+      "id": "REQ-1785885786383550000-cd8e26b6",
+      "priority": "p0",
+      "status": "active",
+      "title": "REQ-MMORCH-004 Swarm Throughput Observability"
+    },
+    {
+      "id": "REQ-1785885788031751000-a1e35fec",
+      "priority": "p0",
+      "status": "active",
+      "title": "REQ-MMORCH-005 Multi-Agent Work Claim Semantics"
+    },
+    {
+      "id": "REQ-1785885789689154000-9d0c369d",
+      "priority": "p0",
+      "status": "active",
+      "title": "REQ-MMORCH-006 Operational Runbook and Bootstrap Workflows"
+    },
+    {
+      "id": "REQ-1785885791352905000-5dfec78d",
+      "priority": "p0",
+      "status": "active",
+      "title": "REQ-MMORCH-007 Process Audit Cadence and Reporting"
+    },
+    {
+      "id": "REQ-1785895564241296000-bf266adb",
+      "status": "active",
+      "title": "Bulletproof CAS object-id-cache coherence and graph lockstep"
+    },
+    {
+      "id": "REQ-1785903690847761000-a5449df3",
+      "priority": "p0",
+      "status": "active",
+      "title": "Inventory membrane honesty — namespace scope must be visible on list/count"
+    },
+    {
+      "id": "REQ-1785905117601841000-468539c3",
+      "priority": "p0",
+      "status": "active",
+      "title": "Agent identity triad — ACC account + role + persona required for all agent work"
+    },
+    {
+      "id": "REQ-1785905287974978000-85b10c21",
+      "priority": "p0",
+      "status": "active",
+      "title": "Per-agent ZQK_API_KEY — no shared credentials; attribution must not collapse to owner"
+    },
+    {
+      "id": "REQ-1785905520527169000-4fb88f5d",
+      "priority": "p0",
+      "status": "active",
+      "title": "Planner vs doer privilege demarcation via account + role + persona"
+    },
+    {
+      "id": "REQ-1785908734512726000-0db5c98e",
+      "priority": "p1",
+      "status": "active",
+      "title": "CLI Information Architecture — command membrane must not sprawl into mystery kinds"
+    },
+    {
+      "id": "REQ-1785930125333916000-14c57300",
+      "status": "active",
+      "title": "Object CRUD elevated mode via --internal + license entitlement"
+    },
+    {
+      "id": "REQ-1786331858536124000-45977c14",
+      "priority": "p0",
+      "status": "active",
+      "title": "REQ: Idempotent restored-project configure recipe"
+    },
+    {
+      "id": "REQ-1786331859484491000-38651097",
+      "priority": "p0",
+      "status": "active",
+      "title": "REQ: Restored-config documentation and tunable prompt_template"
+    },
+    {
+      "id": "REQ-1786331860547805000-9d29ca6b",
+      "priority": "p0",
+      "status": "active",
+      "title": "REQ: Fail-closed project-root wipe guards and hazard inventory"
+    },
+    {
+      "id": "REQ-1786418657060772000-041fddbf",
+      "status": "active",
+      "title": "Tech debt overlords + open-core agnostic hygiene inventories"
+    },
+    {
+      "id": "REQ-1786742913550328000-2ee7f979",
+      "status": "active",
+      "title": "Orphaned Requirements Ownership and Grooming"
+    },
+    {
+      "id": "REQ-1786742915016509000-0d08fc11",
+      "status": "active",
+      "title": "Hive Mind Memory Scalability (Graph + Vector)"
+    },
+    {
+      "id": "REQ-1787015869710197000-ac139b3e",
+      "status": "active",
+      "title": "CVS status semantics matrix must be machine-authoritative across CAP/tick/whats-next"
+    },
+    {
+      "id": "REQ-1787015871276369000-f0ae8de8",
+      "status": "active",
+      "title": "CVS draft→active admission must fail-closed on missing contract fields"
+    },
+    {
+      "id": "REQ-1787075085088349000-53c24a8e",
+      "priority": "p2",
+      "status": "active",
+      "title": "Fileutil I/O metrics collector"
+    },
+    {
+      "id": "REQ-1787077442888310000-37c38636",
+      "priority": "p0",
+      "status": "active",
+      "title": "Lifecycle stage membranes shockwave the cluster fail-closed"
+    },
+    {
+      "id": "REQ-301",
+      "status": "complete",
+      "title": "Cellular Specialization"
+    },
+    {
+      "id": "REQ-302",
+      "status": "complete",
+      "title": "Industrial Spinal Cord"
+    },
+    {
+      "id": "REQ-303",
+      "status": "complete",
+      "title": "Strategic Inference Engine"
+    },
+    {
+      "id": "REQ-304",
+      "status": "complete",
+      "title": "High-Throughput Semantic Codecs"
+    },
+    {
+      "id": "REQ-401",
+      "status": "complete",
+      "title": "HTS Data Cell Assembly"
+    },
+    {
+      "id": "REQ-402",
+      "status": "complete",
+      "title": "P2P Transfer Protocol"
+    },
+    {
+      "id": "REQ-403",
+      "status": "complete",
+      "title": "Federated Economic Policy"
+    },
+    {
+      "id": "REQ-404",
+      "status": "complete",
+      "title": "Keystore Mesh Integration"
+    },
+    {
+      "id": "REQ-405",
+      "status": "complete",
+      "title": "Content-Addressable Verification"
+    },
+    {
+      "id": "REQ-409",
+      "status": "complete",
+      "title": "Mesh Reputation Heuristics"
+    },
+    {
+      "id": "REQ-410",
+      "status": "complete",
+      "title": "Cellular Fission Protocol"
+    },
+    {
+      "id": "REQ-411",
+      "status": "complete",
+      "title": "Innovation Maturation Sandbox"
+    },
+    {
+      "id": "REQ-412",
+      "status": "complete",
+      "title": "Signal-Based Fitness Heuristics"
+    },
+    {
+      "id": "REQ-413",
+      "status": "complete",
+      "title": "Federated Query Engine"
+    },
+    {
+      "id": "REQ-501",
+      "status": "complete",
+      "title": "Mandatory Cryptographic Provenance"
+    },
+    {
+      "id": "REQ-502",
+      "status": "complete",
+      "title": "Weighted Reputation \u0026 Decay"
+    },
+    {
+      "id": "REQ-503",
+      "status": "complete",
+      "title": "Hard-Block Governance"
+    },
+    {
+      "id": "REQ-504",
+      "status": "complete",
+      "title": "Cross-Kernel Ontology Synchronization"
+    },
+    {
+      "id": "REQ-9001",
+      "priority": "p1",
+      "status": "complete",
+      "title": "Cache refresh is a privileged operation that affects all users."
+    },
+    {
+      "id": "REQ-9002",
+      "priority": "p1",
+      "status": "complete",
+      "title": "Every cache refresh operation must be audited with logs."
+    },
+    {
+      "id": "REQ-9003",
+      "priority": "p1",
+      "status": "complete",
+      "title": "When --refresh-cache flag is used, the system must wait."
+    },
+    {
+      "id": "REQ-9004",
+      "status": "complete",
+      "title": "Internal Kinds Explicit Listing Support"
+    },
+    {
+      "id": "REQ-9005",
+      "status": "complete",
+      "title": "Trait Validation System for Spec Loading"
+    },
+    {
+      "id": "REQ-9006",
+      "status": "rejected",
+      "title": "Prevent Direct Commits to Main Branch"
+    },
+    {
+      "id": "REQ-9017",
+      "priority": "p0",
+      "status": "rejected",
+      "title": "Scheduler System Robustness and Thread Safety"
+    },
+    {
+      "id": "REQ-9090",
+      "status": "rejected",
+      "title": "Change journal compaction with dictionary compression"
+    },
+    {
+      "id": "REQ-999",
+      "priority": "p1",
+      "status": "deferred",
+      "title": "All CRUD operations must be validated against policies."
+    },
+    {
+      "id": "REQ-AGENT-IDLENESS-001",
+      "status": "active",
+      "title": "Agent idleness accumulator — measurable idle by seat and task"
+    },
+    {
+      "id": "REQ-CAP-FAIL-CLOSED-ORCHESTRATION-001",
+      "priority": "p0",
+      "status": "active",
+      "title": "Overnight CAP must deliver artifacts or bounded terminal failure"
+    },
+    {
+      "id": "REQ-CAPH-001",
+      "priority": "p0",
+      "status": "active",
+      "title": "CAP orchestrator binds parent CVS and advances only via verified delivery and journal"
+    },
+    {
+      "id": "REQ-CAS-DRAFT-SWEEP-RBAC-001",
+      "status": "active",
+      "title": "Draft-sweep RBAC gate"
+    },
+    {
+      "id": "REQ-CAS-HAND-DUP-CHECK-BLOCK-001",
+      "status": "active",
+      "title": "Hand-CAS and duplicate-id orphan checks block"
+    },
+    {
+      "id": "REQ-CEF-ARCH-001",
+      "status": "active",
+      "title": "Bounded cmd/zqk/system decomposition tranche-1"
+    },
+    {
+      "id": "REQ-CEF-ARCH-002",
+      "status": "active",
+      "title": "Globals inventory and single recommended event path"
+    },
+    {
+      "id": "REQ-CEF-DOC-001",
+      "status": "active",
+      "title": "First-run docs match kernel bootstrap reality"
+    },
+    {
+      "id": "REQ-CEF-FRIC-001",
+      "status": "active",
+      "title": "Draft-plane cleanup must not destroy freshly materialized CAS objects"
+    },
+    {
+      "id": "REQ-CEF-OBS-001",
+      "status": "active",
+      "title": "Health APIs never emit synthetic scores without synthetic marker"
+    },
+    {
+      "id": "REQ-CEF-OBS-002",
+      "status": "active",
+      "title": "Degraded and stub results are labeled; docs do not teach false success"
+    },
+    {
+      "id": "REQ-CEF-R10-ENVELOPE-5",
+      "status": "active",
+      "title": "Dual-seat CEF envelope of 5 on all required diamond axes"
+    },
+    {
+      "id": "REQ-CEF-R12-ARCH-GOD-STORAGE",
+      "status": "active",
+      "title": "Split pkg/storage god-package into bounded subpackages"
+    },
+    {
+      "id": "REQ-CEF-R13-TST-ISOLATION-001",
+      "status": "active",
+      "title": "Test isolation and honest test health lift TST to 5"
+    },
+    {
+      "id": "REQ-CEF-R14-RCV-SEC-001",
+      "status": "active",
+      "title": "Recoverability and security evidence lift RCV and SEC to 5"
+    },
+    {
+      "id": "REQ-CEF-R19-EVIDENCE-001",
+      "status": "active",
+      "title": "Closure evidence must be machine-checkable"
+    },
+    {
+      "id": "REQ-CEF-R2-ARCH-GLOBALS-DI",
+      "status": "active",
+      "title": "Replace global scheduler/cache setter injection with explicit DI"
+    },
+    {
+      "id": "REQ-CEF-R2-ARCH-GOD-SCHEDULER",
+      "status": "active",
+      "title": "Split scheduler god file handlers_cap_orchestrator (\u003e2k LOC)"
+    },
+    {
+      "id": "REQ-CEF-R2-ARCH-GOMOD-REPLACES",
+      "status": "active",
+      "title": "Delete or materialize 89 no-op go.mod replace directives"
+    },
+    {
+      "id": "REQ-CEF-R2-ARCH-STORAGE-CLI",
+      "status": "active",
+      "title": "Break pkg/storage dependency on internal/cli (and CLI tracker coupling)"
+    },
+    {
+      "id": "REQ-CEF-R2-ARCH-SYSTEM-TRANCHE2",
+      "status": "active",
+      "title": "cmd/zqk/system tranche-2: extract ObjectIDCache/check_cache with LOC gate"
+    },
+    {
+      "id": "REQ-CEF-R2-CON-LOCK-TIMEOUT",
+      "status": "active",
+      "title": "WithLockTimeout must honor context cancellation (not bare Mutex.Lock)"
+    },
+    {
+      "id": "REQ-CEF-R2-CON-MCP-VERIFY-CMD",
+      "status": "active",
+      "title": "MCP verification tool uses CommandContext and cleans up"
+    },
+    {
+      "id": "REQ-CEF-R2-CON-OPQUEUE",
+      "status": "active",
+      "title": "OperationQueue wake callbacks must be bounded and ctx-aware"
+    },
+    {
+      "id": "REQ-CEF-R2-CON-RACE-EXPAND",
+      "status": "active",
+      "title": "Expand CI -race to pkg/concurrency and circuitbreaker"
+    },
+    {
+      "id": "REQ-CEF-R2-CQ-ERR-SWALLOW",
+      "status": "active",
+      "title": "Reduce numbered err_swallow_* noise in pkg/storage"
+    },
+    {
+      "id": "REQ-CEF-R2-DOC-JARGON",
+      "status": "active",
+      "title": "README/onboarding lead with stranger-usable path not jargon"
+    },
+    {
+      "id": "REQ-CEF-R2-OBS-FMT-PRINTF",
+      "status": "active",
+      "title": "Replace fmt.Printf in object daemon with structured logging"
+    },
+    {
+      "id": "REQ-CEF-R2-OBS-HEALTHCHECK-FALSEGREEN",
+      "status": "active",
+      "title": "Healthcheck registry must not false-green on empty/nil monitor results"
+    },
+    {
+      "id": "REQ-CEF-R2-OBS-KILL-SYNTHETIC",
+      "status": "active",
+      "title": "Remove Autonomy Inbox synthetic health gauge (telemetryBaseHealth)"
+    },
+    {
+      "id": "REQ-CEF-R2-PERF-LIMIT0",
+      "status": "active",
+      "title": "Bound stream segment list when limit=0"
+    },
+    {
+      "id": "REQ-CEF-R2-PERF-LIST-N1",
+      "status": "active",
+      "title": "Address N+1 FileObjectStorage list reads"
+    },
+    {
+      "id": "REQ-CEF-R2-REL-CAS-FSYNC",
+      "status": "active",
+      "title": "CAS write path matches documented durability (fsync policy residual)"
+    },
+    {
+      "id": "REQ-CEF-R2-REL-MCP-PERMS-FAILOPEN",
+      "status": "active",
+      "title": "MCP command permissions fail-closed for unannotated commands"
+    },
+    {
+      "id": "REQ-CEF-R2-REL-MCP-RECONNECT",
+      "status": "active",
+      "title": "Reduce MCP/ide-adapter reconnect thrash under load"
+    },
+    {
+      "id": "REQ-CEF-R2-REL-OIDCACHE-SWALLOW",
+      "status": "active",
+      "title": "ObjectIDCache must not silently swallow disk I/O errors"
+    },
+    {
+      "id": "REQ-CEF-R2-REL-REVINDEX-FAILOPEN",
+      "status": "active",
+      "title": "Reverse reference index must not fail-open on load error"
+    },
+    {
+      "id": "REQ-CEF-R2-REL-WAL-CLOSE",
+      "status": "active",
+      "title": "WAL Close must surface Flush errors"
+    },
+    {
+      "id": "REQ-CEF-R2-SEC-ENV-TRUST",
+      "status": "active",
+      "title": "Shim env trust must not enable stamp forgery / policy bypass"
+    },
+    {
+      "id": "REQ-CEF-R2-SEC-HARDCODED-ACC",
+      "status": "active",
+      "title": "Remove hardcoded system account ID as auth fallback"
+    },
+    {
+      "id": "REQ-CEF-R2-SEC-HTTP-TIMEOUTS",
+      "status": "active",
+      "title": "HTTP listeners set ReadHeaderTimeout/WriteTimeout"
+    },
+    {
+      "id": "REQ-CEF-R2-SEC-MCP-TCP-AUTH",
+      "status": "active",
+      "title": "MCP TCP bind requires auth and/or mTLS"
+    },
+    {
+      "id": "REQ-CEF-R2-SEC-PATH-TRAVERSAL",
+      "status": "active",
+      "title": "MCP workspace write guard must contain path traversal"
+    },
+    {
+      "id": "REQ-CEF-R2-SEC-SANDBOX-DENYLIST",
+      "status": "active",
+      "title": "MCP shell write guard beyond token denylist"
+    },
+    {
+      "id": "REQ-CEF-R2-SUP-SBOM",
+      "status": "active",
+      "title": "SBOM generation and dependency review path"
+    },
+    {
+      "id": "REQ-CEF-R2-SUP-SECRET-SCAN",
+      "status": "active",
+      "title": "Add automated secret scanning to CI"
+    },
+    {
+      "id": "REQ-CEF-R2-TST-HEALTHCHECK-COV",
+      "status": "active",
+      "title": "Add tests for pkg/healthcheck (currently 0)"
+    },
+    {
+      "id": "REQ-CEF-R2-TST-RACE-GREEN-PROOF",
+      "status": "active",
+      "title": "Cite green race-hot-packages CI run on main"
+    },
+    {
+      "id": "REQ-CEF-R2-TST-SLEEP-FLAKE",
+      "status": "active",
+      "title": "Reduce systemic time.Sleep flakiness in tests (Top offenders)"
+    },
+    {
+      "id": "REQ-CEF-R2-USA-COMMUNITY-FIRST",
+      "status": "active",
+      "title": "README agent link prefers COMMUNITY_FIRST_RUN over Studio essay"
+    },
+    {
+      "id": "REQ-CEF-R20-PROVENANCE-001",
+      "status": "active",
+      "title": "Branch provenance and single-writer code location"
+    },
+    {
+      "id": "REQ-CEF-R26-LIFECYCLE-EXAM-001",
+      "status": "active",
+      "title": "Every persisted kernel kind has a five-question lifecycle exam"
+    },
+    {
+      "id": "REQ-CEF-REL-001",
+      "status": "active",
+      "title": "Documented per-OS CAS durability policy with matching tests"
+    },
+    {
+      "id": "REQ-CEF-REL-002",
+      "status": "active",
+      "title": "No P0 goroutine leaks on orchestrator error paths"
+    },
+    {
+      "id": "REQ-CEF-S18-TRANSITION-MATRIX-001",
+      "priority": "p0",
+      "status": "active",
+      "title": "Every creatable kind must have fail-closed lifecycle transition tests"
+    },
+    {
+      "id": "REQ-CEF-SEC-001",
+      "status": "active",
+      "title": "Network listeners default to loopback; no auth-free public binds"
+    },
+    {
+      "id": "REQ-CEF-SEC-002",
+      "status": "active",
+      "title": "Auth hooks fail-closed on unknown types"
+    },
+    {
+      "id": "REQ-CEF-SEC-003",
+      "status": "active",
+      "title": "Agent execution sandbox is allowlist-based"
+    },
+    {
+      "id": "REQ-CEF-SEC-004",
+      "status": "active",
+      "title": "Crypto-quality randomness for federation tokens"
+    },
+    {
+      "id": "REQ-CEF-SEC-005",
+      "status": "active",
+      "title": "CI write paths never trust PR body stamps via pull_request_target"
+    },
+    {
+      "id": "REQ-CEF-SUP-001",
+      "status": "active",
+      "title": "CI linter config matches pinned tool major version"
+    },
+    {
+      "id": "REQ-CEF-SUP-002",
+      "status": "active",
+      "title": "Minimum supply hygiene disclosure path dep updates install checksum"
+    },
+    {
+      "id": "REQ-CEF-TST-001",
+      "status": "active",
+      "title": "CI runs -race on storage scheduler mcp packages"
+    },
+    {
+      "id": "REQ-COMMS-RELIABLE-001",
+      "status": "active",
+      "title": "Reliable mesh interrupt: live wake or explicit unrepaired fault"
+    },
+    {
+      "id": "REQ-COMMS-RUNTIME-SESSION-001",
+      "status": "active",
+      "title": "Seat-worker runtime identity is bound to a zqk_session"
+    },
+    {
+      "id": "REQ-COMMS-SEAT-WORKER-001",
+      "status": "active",
+      "title": "ZQK-native seat worker executes directed COMMS/ATK (notify is doorbell only)"
+    },
+    {
+      "id": "REQ-CRYPTO-001",
+      "status": "active",
+      "title": "Cryptographic Test Case Verification"
+    },
+    {
+      "id": "REQ-DRAFT-SWEEP-RBAC-001",
+      "status": "active",
+      "title": "Draft-plane sweep apply is RBAC-permissioned"
+    },
+    {
+      "id": "REQ-ENV-BREAKGLASS-SIGNED-LOGIN-001",
+      "status": "active",
+      "title": "No env privilege overrides — signed per-ACC login only"
+    },
+    {
+      "id": "REQ-KERNEL-LIFECYCLE-FITNESS-001",
+      "status": "active",
+      "title": "Separate lifecycle process state from contextual fitness findings"
+    },
+    {
+      "id": "REQ-KERNEL-LIVING-STORE-001",
+      "priority": "p0",
+      "status": "active",
+      "title": "Studio living kernel must survive code-branch checkout without test cross-contamination"
+    },
+    {
+      "id": "REQ-KERNEL-REF-GRAPH-ACYCLIC-001",
+      "priority": "p1",
+      "status": "active",
+      "title": "Typed graph edges are one-owner; related_object_refs is not a second store"
+    },
+    {
+      "id": "REQ-KERNEL-WORK-ENVELOPE-001",
+      "status": "active",
+      "title": "Work envelope facets with autofill clocks and actual effort"
+    },
+    {
+      "id": "REQ-MCP-DENY-PROCESS-PATHS-001",
+      "status": "active",
+      "title": "MCP deny process CAS paths"
+    },
+    {
+      "id": "REQ-MCP-SPEC-CONFIG-001",
+      "status": "active",
+      "title": "MCP configuration remains a first-class kernel contract"
+    },
+    {
+      "id": "REQ-METRICS-AMBIENT-FEEDER-001",
+      "priority": "p0",
+      "status": "active",
+      "title": "Kernel must feed seats from continuous metrics/audit — not grep/CAP-ping theater"
+    },
+    {
+      "id": "REQ-OC-PROOF-HELLO-001",
+      "status": "archived",
+      "title": "OC orch proof — shared hello kernel note"
+    },
+    {
+      "id": "REQ-ORPHANED-BLIS",
+      "priority": "p3",
+      "status": "active",
+      "title": "Orphaned Backlog Items Repository"
+    },
+    {
+      "id": "REQ-OWNER-REF-NO-PROTOTYPE-ACC-001",
+      "status": "active",
+      "title": "No prototype ACC on production owner_ref"
+    },
+    {
+      "id": "REQ-PHC-001",
+      "priority": "p2",
+      "status": "complete",
+      "title": "Persisted process-hygiene rule objects and storage-backed resolution for object-hygiene-scan"
+    },
+    {
+      "id": "REQ-STABLE-IDENTITY-STORAGE",
+      "priority": "p0",
+      "status": "active",
+      "title": "Deterministic Stable-Identity Storage \u0026 Integrity Verification Protocol"
+    },
+    {
+      "id": "REQ-STRAT-FB",
+      "status": "active",
+      "title": "STRAT-PLAN-006 Reviewer Constraints"
+    },
+    {
+      "id": "REQ-STREAM-001",
+      "status": "complete",
+      "title": "Policy-driven object stream stewardship"
+    },
+    {
+      "id": "REQ-SYM-001",
+      "priority": "p0",
+      "status": "complete",
+      "title": "Universal Autonomy Inbox Schema"
+    },
+    {
+      "id": "REQ-SYM-003",
+      "status": "complete",
+      "title": "Federated State Synchronization Protocol"
+    },
+    {
+      "id": "REQ-SYM-020",
+      "status": "active",
+      "title": "Strict TDE Validation"
+    },
+    {
+      "id": "REQ-SYM-021",
+      "status": "active",
+      "title": "Skill Integrity Proofs"
+    },
+    {
+      "id": "REQ-SYM-030",
+      "status": "active",
+      "title": "Real-time Workspace Observation"
+    },
+    {
+      "id": "REQ-SYM-031",
+      "status": "active",
+      "title": "Predictive Event Heuristics"
+    },
+    {
+      "id": "REQ-SYM-900",
+      "status": "complete",
+      "title": "Implement Status Shockwave Event Propagation"
+    },
+    {
+      "id": "REQ-SYM-911",
+      "priority": "p1",
+      "status": "complete",
+      "title": "Entitlements Decoupling Interface"
+    },
+    {
+      "id": "REQ-SYM-912",
+      "priority": "p1",
+      "status": "complete",
+      "title": "Dynamic Schema Registration API"
+    },
+    {
+      "id": "REQ-SYM-913",
+      "priority": "p1",
+      "status": "complete",
+      "title": "Local Mutation Hook Registry"
+    },
+    {
+      "id": "REQ-SYM-914",
+      "priority": "p1",
+      "status": "complete",
+      "title": "Pluggable Spine Driver Architecture"
+    }
+  ]
+}

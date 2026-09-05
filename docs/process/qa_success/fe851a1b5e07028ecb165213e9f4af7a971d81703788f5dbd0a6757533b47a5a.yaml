@@ -1,0 +1,14 @@
+created_at: "2026-08-20T00:48:00Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1787186880170089000-3cccde45
+item_id: BLI-CEF-R7-SEAT-L-001
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 2857702ca28e4b64fb5782140b43c1400e68fdeab30ab0062f4119523ca97d466e5f13c72adcfa41b92eacf21fa7f0a79b8a8e3a8d7c581e5c9afe0e69cb31dc
+schema_version: 2.0.0
+signature: 304602210089f27ad680b56d3d4cf474925b7e979c90020ac9c99d4eb99da3b0e71899e0a4022100bb74942076c48955bc6c4815031c5b0602585f21166b59dc37a01d1716a5ce07
+status: archived
+title: Scrupulous CEF truth map as AGENT_L (full waves)
+updated_at: "2026-09-01T07:48:27Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

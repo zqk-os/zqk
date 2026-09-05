@@ -1,0 +1,159 @@
+{
+  "name": "make-verify-264",
+  "created_at": "2026-09-04T21:34:30.005806Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-264",
+    "Tests": [
+      {
+        "Name": "TestMarshalConvergenceOutputJSON_PhaseAlignment",
+        "Package": "scheduler",
+        "PackagePath": "cmd/zqk/scheduler",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/scheduler/test_failures_convergence_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestMarshalConvergenceOutputJSON_CompletionGateObservabilityNote",
+        "Package": "scheduler",
+        "PackagePath": "cmd/zqk/scheduler",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/scheduler/test_failures_convergence_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestFormatAgentMarkdown",
+        "Package": "scheduler",
+        "PackagePath": "cmd/zqk/scheduler",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/scheduler/test_failures_convergence_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestFormatAgentMarkdown_CLIStaleBinaryHintOnUnknownFlowVariant",
+        "Package": "scheduler",
+        "PackagePath": "cmd/zqk/scheduler",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/scheduler/test_failures_convergence_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestFormatAgentMarkdown_prefersCVSNextActionWhenSuggestedIsBundleOnly",
+        "Package": "scheduler",
+        "PackagePath": "cmd/zqk/scheduler",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/scheduler/test_failures_convergence_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestTestRunnerAssemblesJobCorrectly",
+        "Package": "scheduler",
+        "PackagePath": "cmd/zqk/scheduler",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/scheduler/test_runner_validation_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestTestRunnerJobYAMLStructure",
+        "Package": "scheduler",
+        "PackagePath": "cmd/zqk/scheduler",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/scheduler/test_runner_validation_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestWebSocketTelemetry",
+        "Package": "scheduler",
+        "PackagePath": "cmd/zqk/scheduler",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/scheduler/websocket_telemetry_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 240000000000,
+    "PackagePath": "cmd/zqk/scheduler"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestMarshalConvergenceOutputJSON_PhaseAlignment",
+      "Package": "scheduler",
+      "PackagePath": "cmd/zqk/scheduler",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/scheduler/test_failures_convergence_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestMarshalConvergenceOutputJSON_CompletionGateObservabilityNote",
+      "Package": "scheduler",
+      "PackagePath": "cmd/zqk/scheduler",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/scheduler/test_failures_convergence_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestFormatAgentMarkdown",
+      "Package": "scheduler",
+      "PackagePath": "cmd/zqk/scheduler",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/scheduler/test_failures_convergence_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestFormatAgentMarkdown_CLIStaleBinaryHintOnUnknownFlowVariant",
+      "Package": "scheduler",
+      "PackagePath": "cmd/zqk/scheduler",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/scheduler/test_failures_convergence_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestFormatAgentMarkdown_prefersCVSNextActionWhenSuggestedIsBundleOnly",
+      "Package": "scheduler",
+      "PackagePath": "cmd/zqk/scheduler",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/scheduler/test_failures_convergence_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestTestRunnerAssemblesJobCorrectly",
+      "Package": "scheduler",
+      "PackagePath": "cmd/zqk/scheduler",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/scheduler/test_runner_validation_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestTestRunnerJobYAMLStructure",
+      "Package": "scheduler",
+      "PackagePath": "cmd/zqk/scheduler",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/scheduler/test_runner_validation_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestWebSocketTelemetry",
+      "Package": "scheduler",
+      "PackagePath": "cmd/zqk/scheduler",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/scheduler/websocket_telemetry_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

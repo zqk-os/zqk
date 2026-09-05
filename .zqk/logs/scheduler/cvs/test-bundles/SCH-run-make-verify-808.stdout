@@ -1,0 +1,45 @@
+
+--- run 2026-09-04T22:22:11Z ---
+=== RUN   TestMemGraphConnection_ExecuteBatch
+=== PAUSE TestMemGraphConnection_ExecuteBatch
+=== RUN   TestMemGraphConnection_CloseInternal
+=== PAUSE TestMemGraphConnection_CloseInternal
+=== RUN   TestMemGraphConnectionPool_Starvation
+=== PAUSE TestMemGraphConnectionPool_Starvation
+=== RUN   TestMemGraphConnectionPool_Timeout
+=== PAUSE TestMemGraphConnectionPool_Timeout
+=== RUN   TestMemGraphConnectionPool_ConcurrentAccess
+=== PAUSE TestMemGraphConnectionPool_ConcurrentAccess
+=== RUN   TestMemGraphConnectionPool_ConnectionLeak
+=== PAUSE TestMemGraphConnectionPool_ConnectionLeak
+=== RUN   TestMemGraphConnectionPool_HangingConnection
+=== PAUSE TestMemGraphConnectionPool_HangingConnection
+=== RUN   TestMemGraphConnectionPool_ReturnConnectionWithOpenTransaction
+=== PAUSE TestMemGraphConnectionPool_ReturnConnectionWithOpenTransaction
+=== RUN   TestNewMemGraphConnectionPool
+=== PAUSE TestNewMemGraphConnectionPool
+=== RUN   TestNewMemGraphConnectionPool_DefaultSize
+=== PAUSE TestNewMemGraphConnectionPool_DefaultSize
+=== CONT  TestMemGraphConnection_ExecuteBatch
+    connection_test.go:358: ExecuteBatch failed (expected until implementation): bolt client not initialized
+--- PASS: TestMemGraphConnection_ExecuteBatch (0.00s)
+=== CONT  TestMemGraphConnectionPool_ConnectionLeak
+--- PASS: TestMemGraphConnectionPool_ConnectionLeak (0.00s)
+=== CONT  TestMemGraphConnectionPool_Timeout
+=== CONT  TestMemGraphConnectionPool_ConcurrentAccess
+--- PASS: TestMemGraphConnectionPool_Timeout (0.01s)
+=== CONT  TestMemGraphConnectionPool_Starvation
+--- PASS: TestMemGraphConnectionPool_ConcurrentAccess (0.03s)
+=== CONT  TestMemGraphConnection_CloseInternal
+--- PASS: TestMemGraphConnection_CloseInternal (0.00s)
+=== CONT  TestNewMemGraphConnectionPool
+--- PASS: TestNewMemGraphConnectionPool (0.00s)
+=== CONT  TestNewMemGraphConnectionPool_DefaultSize
+--- PASS: TestNewMemGraphConnectionPool_DefaultSize (0.00s)
+=== CONT  TestMemGraphConnectionPool_ReturnConnectionWithOpenTransaction
+--- PASS: TestMemGraphConnectionPool_ReturnConnectionWithOpenTransaction (0.01s)
+=== CONT  TestMemGraphConnectionPool_HangingConnection
+--- PASS: TestMemGraphConnectionPool_Starvation (0.10s)
+--- PASS: TestMemGraphConnectionPool_HangingConnection (0.20s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/graph/memgraph	0.493s

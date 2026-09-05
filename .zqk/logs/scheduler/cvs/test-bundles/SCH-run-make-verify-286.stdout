@@ -1,0 +1,52 @@
+
+--- run 2026-09-04T22:11:28Z ---
+=== RUN   TestOperationalEnvelopeForKind_archiveColdPathAugments
+=== PAUSE TestOperationalEnvelopeForKind_archiveColdPathAugments
+=== RUN   TestOperationalEnvelopeForKind_auditEventOverrideRemovesStreamDefaultArchive
+=== PAUSE TestOperationalEnvelopeForKind_auditEventOverrideRemovesStreamDefaultArchive
+=== RUN   TestOperationalEnvelopeForKind_changeJournalOverrideRemovesStreamDefaultScan
+=== PAUSE TestOperationalEnvelopeForKind_changeJournalOverrideRemovesStreamDefaultScan
+=== RUN   TestOperationalEnvelopeHasKindOverride
+=== PAUSE TestOperationalEnvelopeHasKindOverride
+=== RUN   TestEnvelopeTickKindOverrideSummaries_nonEmpty
+=== PAUSE TestEnvelopeTickKindOverrideSummaries_nonEmpty
+=== RUN   TestApplyOperationalEnvelopeKindOverride_replaceAndRemove
+=== PAUSE TestApplyOperationalEnvelopeKindOverride_replaceAndRemove
+=== RUN   TestRuntimePaths
+=== PAUSE TestRuntimePaths
+=== RUN   TestRuntimePaths_RespectPathAliasOverride
+=== PAUSE TestRuntimePaths_RespectPathAliasOverride
+=== RUN   TestStreamCurrentKindDir
+=== PAUSE TestStreamCurrentKindDir
+=== RUN   TestProcessPrimaryDir
+=== PAUSE TestProcessPrimaryDir
+=== CONT  TestOperationalEnvelopeForKind_archiveColdPathAugments
+=== CONT  TestApplyOperationalEnvelopeKindOverride_replaceAndRemove
+=== RUN   TestApplyOperationalEnvelopeKindOverride_replaceAndRemove/replace_clears_category
+=== PAUSE TestApplyOperationalEnvelopeKindOverride_replaceAndRemove/replace_clears_category
+=== RUN   TestApplyOperationalEnvelopeKindOverride_replaceAndRemove/remove_then_augment_path_via_OperationalEnvelopeForKind_ordering
+=== PAUSE TestApplyOperationalEnvelopeKindOverride_replaceAndRemove/remove_then_augment_path_via_OperationalEnvelopeForKind_ordering
+=== CONT  TestStreamCurrentKindDir
+--- PASS: TestStreamCurrentKindDir (0.00s)
+=== CONT  TestProcessPrimaryDir
+--- PASS: TestProcessPrimaryDir (0.00s)
+=== CONT  TestOperationalEnvelopeHasKindOverride
+--- PASS: TestOperationalEnvelopeHasKindOverride (0.00s)
+=== CONT  TestEnvelopeTickKindOverrideSummaries_nonEmpty
+--- PASS: TestEnvelopeTickKindOverrideSummaries_nonEmpty (0.00s)
+=== CONT  TestOperationalEnvelopeForKind_changeJournalOverrideRemovesStreamDefaultScan
+--- PASS: TestOperationalEnvelopeForKind_archiveColdPathAugments (0.00s)
+=== CONT  TestRuntimePaths_RespectPathAliasOverride
+--- PASS: TestOperationalEnvelopeForKind_changeJournalOverrideRemovesStreamDefaultScan (0.00s)
+=== CONT  TestRuntimePaths
+--- PASS: TestRuntimePaths (0.00s)
+=== CONT  TestOperationalEnvelopeForKind_auditEventOverrideRemovesStreamDefaultArchive
+--- PASS: TestOperationalEnvelopeForKind_auditEventOverrideRemovesStreamDefaultArchive (0.00s)
+=== CONT  TestApplyOperationalEnvelopeKindOverride_replaceAndRemove/replace_clears_category
+=== CONT  TestApplyOperationalEnvelopeKindOverride_replaceAndRemove/remove_then_augment_path_via_OperationalEnvelopeForKind_ordering
+--- PASS: TestApplyOperationalEnvelopeKindOverride_replaceAndRemove (0.00s)
+    --- PASS: TestApplyOperationalEnvelopeKindOverride_replaceAndRemove/replace_clears_category (0.00s)
+    --- PASS: TestApplyOperationalEnvelopeKindOverride_replaceAndRemove/remove_then_augment_path_via_OperationalEnvelopeForKind_ordering (0.00s)
+--- PASS: TestRuntimePaths_RespectPathAliasOverride (0.00s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/datacell	0.592s

@@ -1,0 +1,44 @@
+
+--- run 2026-09-04T21:41:03Z ---
+=== RUN   TestShrinkGuardSkipSave
+=== PAUSE TestShrinkGuardSkipSave
+=== RUN   TestSave_SkipsOlderInMemoryWhenDiskIsNewer
+=== PAUSE TestSave_SkipsOlderInMemoryWhenDiskIsNewer
+=== RUN   TestClear_SuppressesLoadFromRacedRestore
+=== PAUSE TestClear_SuppressesLoadFromRacedRestore
+=== RUN   TestValidationStateCache_BasicOperations
+=== PAUSE TestValidationStateCache_BasicOperations
+=== RUN   TestValidationStateCache_SetRejectsOversizedID
+=== PAUSE TestValidationStateCache_SetRejectsOversizedID
+=== RUN   TestValidationStateCache_Persistence
+=== PAUSE TestValidationStateCache_Persistence
+=== RUN   TestValidationStateCache_StaleDetection
+=== PAUSE TestValidationStateCache_StaleDetection
+=== RUN   TestValidationStateCache_InvalidateByKind
+=== PAUSE TestValidationStateCache_InvalidateByKind
+=== RUN   TestValidationStateCache_GetByTier
+=== PAUSE TestValidationStateCache_GetByTier
+=== RUN   TestValidationStateCache_Count
+=== PAUSE TestValidationStateCache_Count
+=== CONT  TestShrinkGuardSkipSave
+=== CONT  TestValidationStateCache_Persistence
+--- PASS: TestShrinkGuardSkipSave (0.01s)
+=== CONT  TestValidationStateCache_GetByTier
+--- PASS: TestValidationStateCache_Persistence (0.01s)
+=== CONT  TestValidationStateCache_Count
+--- PASS: TestValidationStateCache_GetByTier (0.01s)
+=== CONT  TestValidationStateCache_BasicOperations
+--- PASS: TestValidationStateCache_Count (0.00s)
+=== CONT  TestValidationStateCache_SetRejectsOversizedID
+--- PASS: TestValidationStateCache_BasicOperations (0.00s)
+=== CONT  TestClear_SuppressesLoadFromRacedRestore
+--- PASS: TestValidationStateCache_SetRejectsOversizedID (0.00s)
+=== CONT  TestValidationStateCache_InvalidateByKind
+--- PASS: TestValidationStateCache_InvalidateByKind (0.00s)
+=== CONT  TestSave_SkipsOlderInMemoryWhenDiskIsNewer
+--- PASS: TestClear_SuppressesLoadFromRacedRestore (0.01s)
+=== CONT  TestValidationStateCache_StaleDetection
+--- PASS: TestSave_SkipsOlderInMemoryWhenDiskIsNewer (0.01s)
+--- PASS: TestValidationStateCache_StaleDetection (0.16s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/validation	0.793s

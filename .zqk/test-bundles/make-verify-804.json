@@ -1,0 +1,33 @@
+{
+  "name": "make-verify-804",
+  "created_at": "2026-09-04T21:34:35.299974Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-804",
+    "Tests": [
+      {
+        "Name": "TestLintBypassAuditEventViaCoordinator",
+        "Package": "automation",
+        "PackagePath": "cmd/zqk/automation",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/automation/lint_bypass_coordination_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 30000000000,
+    "PackagePath": "cmd/zqk/automation"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestLintBypassAuditEventViaCoordinator",
+      "Package": "automation",
+      "PackagePath": "cmd/zqk/automation",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/automation/lint_bypass_coordination_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

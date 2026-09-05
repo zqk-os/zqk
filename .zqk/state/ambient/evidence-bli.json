@@ -1,0 +1,42 @@
+{
+  "actual_effort": "0h",
+  "commit_refs": [
+    "d536d7066de4ad1b97164ce9d508bd5e7bcfb0f9"
+  ],
+  "created_at": "2026-09-01T04:12:11Z",
+  "created_by": "ACC-1785920548450214012-68b850c0",
+  "criteria_refs": [
+    "CRIT-CEF-GENERATED-LINT-EXCLUDE-001"
+  ],
+  "description": "AA F-ARCH-003, AA F-CQ-002.\n",
+  "estimated_effort": "1h",
+  "goal_refs": [
+    "GOAL-LAUNCH-READINESS",
+    "GOAL-OSS-CORE"
+  ],
+  "id": "BLI-CEF-GENERATED-EXCLUDE-001",
+  "kind": "backlog_item",
+  "milestone_refs": [
+    "MIL-CEF-REMEDIATE-STRUCTURE-001"
+  ],
+  "namespace_id": "zqk:kernel",
+  "persona_refs": [
+    "PER-ORCH-BETA"
+  ],
+  "priority": "medium",
+  "priority_plan_ref": "PRI-CEF-REMEDIATE-STRUCTURE-001",
+  "priority_tier": "P2",
+  "requirement_refs": [
+    "REQ-CEF-GENERATED-METRICS-001"
+  ],
+  "schema_version": "2.0.0",
+  "started_at": "2026-09-03T00:09:42Z",
+  "status": "in_progress",
+  "title": "Exclude generated specbuilder from lint and quality LOC",
+  "updated_at": "2026-09-03T00:09:42Z",
+  "updated_by": "ACC-1785920548450214006-2e52b3e7",
+  "version_context": "default",
+  "workstream_refs": [
+    "WS-CEF-ARCHITECTURE"
+  ]
+}

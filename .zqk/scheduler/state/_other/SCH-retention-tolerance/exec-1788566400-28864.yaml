@@ -1,0 +1,7 @@
+job_id: SCH-retention-tolerance
+execution_id: exec-1788566400-28864
+state: completed
+process_id: 28864
+started_at: 2026-09-05T00:00:00.144461Z
+completed_at: 2026-09-05T00:04:11.173798Z
+policy_decision: execute

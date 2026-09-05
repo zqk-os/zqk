@@ -1,0 +1,129 @@
+
+--- run 2026-09-04T22:23:13Z ---
+=== RUN   TestNewFixedWindowLimiter
+=== PAUSE TestNewFixedWindowLimiter
+=== RUN   TestFixedWindowLimiter_Allow_underLimit
+=== PAUSE TestFixedWindowLimiter_Allow_underLimit
+=== RUN   TestFixedWindowLimiter_Allow_perKey
+=== PAUSE TestFixedWindowLimiter_Allow_perKey
+=== RUN   TestFixedWindowLimiter_Allow_windowReset
+=== PAUSE TestFixedWindowLimiter_Allow_windowReset
+=== RUN   TestFixedWindowLimiter_zeroLimit_usesOne
+=== PAUSE TestFixedWindowLimiter_zeroLimit_usesOne
+=== CONT  TestNewFixedWindowLimiter
+--- PASS: TestNewFixedWindowLimiter (0.00s)
+=== CONT  TestFixedWindowLimiter_zeroLimit_usesOne
+--- PASS: TestFixedWindowLimiter_zeroLimit_usesOne (0.00s)
+=== CONT  TestFixedWindowLimiter_Allow_windowReset
+--- PASS: TestFixedWindowLimiter_Allow_windowReset (0.00s)
+=== CONT  TestFixedWindowLimiter_Allow_perKey
+--- PASS: TestFixedWindowLimiter_Allow_perKey (0.00s)
+=== CONT  TestFixedWindowLimiter_Allow_underLimit
+--- PASS: TestFixedWindowLimiter_Allow_underLimit (0.00s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/circuitbreaker	0.205s
+
+--- run 2026-09-05T05:56:35Z ---
+=== RUN   TestRunWrapperHandler_JobLogFileWriting_AppendMode
+--- PASS: TestRunWrapperHandler_JobLogFileWriting_AppendMode (0.32s)
+=== RUN   TestStripShellOutputRedirect
+=== RUN   TestStripShellOutputRedirect/strip_>_path_2>&1
+=== RUN   TestStripShellOutputRedirect/strip_>>_path_2>&1
+=== RUN   TestStripShellOutputRedirect/no_redirect
+=== RUN   TestStripShellOutputRedirect/no_2>&1_suffix
+--- PASS: TestStripShellOutputRedirect (0.00s)
+    --- PASS: TestStripShellOutputRedirect/strip_>_path_2>&1 (0.00s)
+    --- PASS: TestStripShellOutputRedirect/strip_>>_path_2>&1 (0.00s)
+    --- PASS: TestStripShellOutputRedirect/no_redirect (0.00s)
+    --- PASS: TestStripShellOutputRedirect/no_2>&1_suffix (0.00s)
+=== RUN   TestRunWrapperHandler_TestCommandDetection
+=== RUN   TestRunWrapperHandler_TestCommandDetection/go_test_command
+=== RUN   TestRunWrapperHandler_TestCommandDetection/go_test_with_package
+=== RUN   TestRunWrapperHandler_TestCommandDetection/go_test_with_run_flag
+=== RUN   TestRunWrapperHandler_TestCommandDetection/command_contains_test
+=== RUN   TestRunWrapperHandler_TestCommandDetection/non-test_command
+=== RUN   TestRunWrapperHandler_TestCommandDetection/go_build_(not_test)
+=== RUN   TestRunWrapperHandler_TestCommandDetection/test_in_different_context
+=== RUN   TestRunWrapperHandler_TestCommandDetection/shell_-c_go_test_(test_bundle_jobs)
+=== RUN   TestRunWrapperHandler_TestCommandDetection/shell_-c_non-test_script
+--- PASS: TestRunWrapperHandler_TestCommandDetection (0.17s)
+    --- PASS: TestRunWrapperHandler_TestCommandDetection/go_test_command (0.00s)
+    --- PASS: TestRunWrapperHandler_TestCommandDetection/go_test_with_package (0.00s)
+    --- PASS: TestRunWrapperHandler_TestCommandDetection/go_test_with_run_flag (0.00s)
+    --- PASS: TestRunWrapperHandler_TestCommandDetection/command_contains_test (0.00s)
+    --- PASS: TestRunWrapperHandler_TestCommandDetection/non-test_command (0.00s)
+    --- PASS: TestRunWrapperHandler_TestCommandDetection/go_build_(not_test) (0.00s)
+    --- PASS: TestRunWrapperHandler_TestCommandDetection/test_in_different_context (0.00s)
+    --- PASS: TestRunWrapperHandler_TestCommandDetection/shell_-c_go_test_(test_bundle_jobs) (0.00s)
+    --- PASS: TestRunWrapperHandler_TestCommandDetection/shell_-c_non-test_script (0.00s)
+=== RUN   TestRunWrapperHandler_ExtractTestInfo
+=== RUN   TestRunWrapperHandler_ExtractTestInfo/full_test_suite
+=== RUN   TestRunWrapperHandler_ExtractTestInfo/package_with_test_name
+=== RUN   TestRunWrapperHandler_ExtractTestInfo/package_with_qualified_test_name
+=== RUN   TestRunWrapperHandler_ExtractTestInfo/package_without_test_name
+=== RUN   TestRunWrapperHandler_ExtractTestInfo/nested_package_path
+=== RUN   TestRunWrapperHandler_ExtractTestInfo/multiple_flags
+--- PASS: TestRunWrapperHandler_ExtractTestInfo (0.15s)
+    --- PASS: TestRunWrapperHandler_ExtractTestInfo/full_test_suite (0.00s)
+    --- PASS: TestRunWrapperHandler_ExtractTestInfo/package_with_test_name (0.00s)
+    --- PASS: TestRunWrapperHandler_ExtractTestInfo/package_with_qualified_test_name (0.00s)
+    --- PASS: TestRunWrapperHandler_ExtractTestInfo/package_without_test_name (0.00s)
+    --- PASS: TestRunWrapperHandler_ExtractTestInfo/nested_package_path (0.00s)
+    --- PASS: TestRunWrapperHandler_ExtractTestInfo/multiple_flags (0.00s)
+=== RUN   TestRunWrapperHandler_TestCommandTimeout
+=== RUN   TestRunWrapperHandler_TestCommandTimeout/full_test_suite_uses_default_timeout
+    handlers_run_wrapper_test_command_test.go:220: Test info extracted: testName="", packageName=""
+    handlers_run_wrapper_test_command_test.go:226: Full test suite would use default 3600s timeout
+=== RUN   TestRunWrapperHandler_TestCommandTimeout/full_test_suite_with_low_timeout_gets_upgraded
+    handlers_run_wrapper_test_command_test.go:220: Test info extracted: testName="", packageName=""
+    handlers_run_wrapper_test_command_test.go:226: Full test suite would use default 3600s timeout
+=== RUN   TestRunWrapperHandler_TestCommandTimeout/full_test_suite_with_high_timeout_preserved
+    handlers_run_wrapper_test_command_test.go:220: Test info extracted: testName="", packageName=""
+=== RUN   TestRunWrapperHandler_TestCommandTimeout/package_test_without_test_name
+    handlers_run_wrapper_test_command_test.go:220: Test info extracted: testName="", packageName="storage"
+=== RUN   TestRunWrapperHandler_TestCommandTimeout/specific_test_with_name
+    handlers_run_wrapper_test_command_test.go:220: Test info extracted: testName="TestCAS_Create", packageName="storage"
+--- PASS: TestRunWrapperHandler_TestCommandTimeout (0.16s)
+    --- PASS: TestRunWrapperHandler_TestCommandTimeout/full_test_suite_uses_default_timeout (0.00s)
+    --- PASS: TestRunWrapperHandler_TestCommandTimeout/full_test_suite_with_low_timeout_gets_upgraded (0.00s)
+    --- PASS: TestRunWrapperHandler_TestCommandTimeout/full_test_suite_with_high_timeout_preserved (0.00s)
+    --- PASS: TestRunWrapperHandler_TestCommandTimeout/package_test_without_test_name (0.00s)
+    --- PASS: TestRunWrapperHandler_TestCommandTimeout/specific_test_with_name (0.00s)
+=== RUN   TestRunWrapperHandler_TestCommandIsolation
+=== RUN   TestRunWrapperHandler_TestCommandIsolation/SCH-TEST-1
+    handlers_run_wrapper_test_command_test.go:272: Job SCH-TEST-1: testName="TestCAS_Create", packageName="storage"
+=== RUN   TestRunWrapperHandler_TestCommandIsolation/SCH-TEST-2
+    handlers_run_wrapper_test_command_test.go:272: Job SCH-TEST-2: testName="TestSubmit", packageName="system"
+=== RUN   TestRunWrapperHandler_TestCommandIsolation/SCH-TEST-3
+    handlers_run_wrapper_test_command_test.go:272: Job SCH-TEST-3: testName="TestRunWrapper", packageName="scheduler"
+--- PASS: TestRunWrapperHandler_TestCommandIsolation (0.16s)
+    --- PASS: TestRunWrapperHandler_TestCommandIsolation/SCH-TEST-1 (0.00s)
+    --- PASS: TestRunWrapperHandler_TestCommandIsolation/SCH-TEST-2 (0.00s)
+    --- PASS: TestRunWrapperHandler_TestCommandIsolation/SCH-TEST-3 (0.00s)
+=== RUN   TestRunWrapperHandler_TestCommandExecution
+--- PASS: TestRunWrapperHandler_TestCommandExecution (0.21s)
+=== RUN   TestRunWrapperHandler_TestCommandTimeoutCalculation
+=== RUN   TestRunWrapperHandler_TestCommandTimeoutCalculation/full_test_suite_default
+    handlers_run_wrapper_test_command_test.go:386: Extracted: testName="", packageName=""
+    handlers_run_wrapper_test_command_test.go:393: Full test suite would use 3600s default timeout
+=== RUN   TestRunWrapperHandler_TestCommandTimeoutCalculation/full_test_suite_low_timeout_upgraded
+    handlers_run_wrapper_test_command_test.go:386: Extracted: testName="", packageName=""
+    handlers_run_wrapper_test_command_test.go:393: Full test suite would use 3600s default timeout
+=== RUN   TestRunWrapperHandler_TestCommandTimeoutCalculation/package_test_preserves_timeout
+    handlers_run_wrapper_test_command_test.go:386: Extracted: testName="", packageName="storage"
+    handlers_run_wrapper_test_command_test.go:401: Specific test would use testtiming.GetExpectedTimeout("", "storage")
+=== RUN   TestRunWrapperHandler_TestCommandTimeoutCalculation/specific_test_uses_timing_data
+    handlers_run_wrapper_test_command_test.go:386: Extracted: testName="TestCAS_Create", packageName="storage"
+    handlers_run_wrapper_test_command_test.go:401: Specific test would use testtiming.GetExpectedTimeout("TestCAS_Create", "storage")
+--- PASS: TestRunWrapperHandler_TestCommandTimeoutCalculation (0.18s)
+    --- PASS: TestRunWrapperHandler_TestCommandTimeoutCalculation/full_test_suite_default (0.00s)
+    --- PASS: TestRunWrapperHandler_TestCommandTimeoutCalculation/full_test_suite_low_timeout_upgraded (0.00s)
+    --- PASS: TestRunWrapperHandler_TestCommandTimeoutCalculation/package_test_preserves_timeout (0.00s)
+    --- PASS: TestRunWrapperHandler_TestCommandTimeoutCalculation/specific_test_uses_timing_data (0.00s)
+=== RUN   TestRunWrapperHandler_TestCommandSubmitIntegration
+    handlers_run_wrapper_test_command_test.go:443: Test job: testName="", packageName="scheduler"
+--- PASS: TestRunWrapperHandler_TestCommandSubmitIntegration (0.19s)
+=== RUN   TestSchedulerJobRetentionHandler_Execute
+--- PASS: TestSchedulerJobRetentionHandler_Execute (2.64s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/scheduler	4.995s

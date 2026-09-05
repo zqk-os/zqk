@@ -1,0 +1,83 @@
+{
+  "metadata": {
+    "version": "2.0",
+    "build_time": "2026-09-04T21:48:58.960469Z",
+    "project_root": "/Users/lanceettl/zqk-restore-clone",
+    "entry_count": 17
+  },
+  "buckets": {
+    "audit_event": {
+      "cache_update": {
+        "AUD-4360": {
+          "created_at": "2026-09-04T21:48:53Z"
+        },
+        "AUD-4445": {
+          "created_at": "2026-09-04T21:48:56Z"
+        }
+      },
+      "hash_registry_batch_complete": {
+        "AUD-4380": {
+          "created_at": "2026-09-04T21:48:54Z"
+        }
+      },
+      "hash_registry_batch_start": {
+        "AUD-4365": {
+          "created_at": "2026-09-04T21:48:53Z"
+        }
+      },
+      "listing_index_batch_complete": {
+        "AUD-4293": {
+          "created_at": "2026-09-04T21:48:49Z"
+        },
+        "AUD-4427": {
+          "created_at": "2026-09-04T21:48:56Z"
+        }
+      },
+      "listing_index_batch_start": {
+        "AUD-3638": {
+          "created_at": "2026-09-04T21:48:36Z"
+        },
+        "AUD-4318": {
+          "created_at": "2026-09-04T21:48:51Z"
+        },
+        "AUD-4441": {
+          "created_at": "2026-09-04T21:48:56Z"
+        }
+      },
+      "object_creation": {
+        "AUD-3544": {
+          "created_at": "2026-09-04T21:48:34Z"
+        }
+      },
+      "orphan_cleanup_complete": {
+        "AUD-4343": {
+          "created_at": "2026-09-04T21:48:53Z"
+        },
+        "AUD-4501": {
+          "created_at": "2026-09-04T21:48:58Z"
+        }
+      },
+      "system_config_change": {
+        "AUD-3294": {
+          "created_at": "2026-09-04T21:48:25Z"
+        },
+        "AUD-3568": {
+          "created_at": "2026-09-04T21:48:34Z"
+        },
+        "AUD-3583": {
+          "created_at": "2026-09-04T21:48:35Z"
+        },
+        "AUD-4454": {
+          "created_at": "2026-09-04T21:48:56Z"
+        }
+      }
+    },
+    "zqk_session": {
+      "": {
+        "ZQK-6104": {
+          "created_at": "2026-09-04T21:48:34Z"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,51 @@
+{
+  "name": "make-verify-290",
+  "created_at": "2026-09-04T21:34:30.251437Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-290",
+    "Tests": [
+      {
+        "Name": "TestOperationalEnvelopeForKind_AddOverride",
+        "Package": "datacell",
+        "PackagePath": "pkg/datacell",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/datacell/operational_envelope_override_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestStewardshipRegistry",
+        "Package": "datacell",
+        "PackagePath": "pkg/datacell",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/datacell/steward_registry_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 60000000000,
+    "PackagePath": "pkg/datacell"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestOperationalEnvelopeForKind_AddOverride",
+      "Package": "datacell",
+      "PackagePath": "pkg/datacell",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/datacell/operational_envelope_override_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestStewardshipRegistry",
+      "Package": "datacell",
+      "PackagePath": "pkg/datacell",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/datacell/steward_registry_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

@@ -1,0 +1,51 @@
+{
+  "name": "make-verify-481",
+  "created_at": "2026-09-04T21:34:32.140713Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-481",
+    "Tests": [
+      {
+        "Name": "TestCreateOrderFromSpecIndex_WithIndexUsesSpecOrder",
+        "Package": "scenario",
+        "PackagePath": "pkg/scenario",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/scenario/create_order_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestDraftBundleYAML_loads",
+        "Package": "scenario",
+        "PackagePath": "pkg/scenario",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/scenario/draft_bundle_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 60000000000,
+    "PackagePath": "pkg/scenario"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestCreateOrderFromSpecIndex_WithIndexUsesSpecOrder",
+      "Package": "scenario",
+      "PackagePath": "pkg/scenario",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/scenario/create_order_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestDraftBundleYAML_loads",
+      "Package": "scenario",
+      "PackagePath": "pkg/scenario",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/scenario/draft_bundle_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

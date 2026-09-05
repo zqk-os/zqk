@@ -1,0 +1,15 @@
+created_at: "2026-09-03T00:28:29Z"
+created_by: ACC-1785920548450214006-2e52b3e7
+description: Passed VDS chunks
+id: QAS-CEF-COVERAGE-RACE-001
+item_id: BLI-CEF-COVERAGE-RACE-001
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 86b8ab3d574c004a61020b73c23f52b9055049e90c3d755c8bbb383e059e384028fdd8cd69e13123b644e5f3f7eb65596e73e2d57d719ea3dafcb01b84ce8dfb
+schema_version: 2.0.0
+signature: 304502204b7c7f153c1df229917cb50579eeefef091e61b6a6871775ce3f91f2da52ee9e022100b9424c20aef81fd0c1164bfa572bddc3c2dd1630d0401745ca6ced21c0c00799
+status: success
+title: QA Success for Coverage Race BLI
+updated_at: "2026-09-03T00:28:39Z"
+updated_by: ACC-1785920548450214006-2e52b3e7
+version_context: default

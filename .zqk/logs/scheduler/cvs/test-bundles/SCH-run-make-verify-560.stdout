@@ -1,0 +1,44 @@
+
+--- run 2026-09-04T22:17:03Z ---
+=== RUN   TestLogEventRunWrapper_constantsDerivedFromJobType
+=== PAUSE TestLogEventRunWrapper_constantsDerivedFromJobType
+=== RUN   TestLogEventCASRecoveryKind_wirePrefixStable
+=== PAUSE TestLogEventCASRecoveryKind_wirePrefixStable
+=== RUN   TestLogEventTestIO_constantsDerivedFromJobType
+=== PAUSE TestLogEventTestIO_constantsDerivedFromJobType
+=== RUN   TestLogEventLifecycleCheck_constantsDerivedFromJobType
+=== PAUSE TestLogEventLifecycleCheck_constantsDerivedFromJobType
+=== RUN   TestLogEventNoOpHandler_wirePrefixStable
+=== PAUSE TestLogEventNoOpHandler_wirePrefixStable
+=== RUN   TestLogEventSchedulerEventsAggregation_constantsDerivedFromJobType
+=== PAUSE TestLogEventSchedulerEventsAggregation_constantsDerivedFromJobType
+=== RUN   TestLogEventRetentionTolerance_constantsDerivedFromJobType
+=== PAUSE TestLogEventRetentionTolerance_constantsDerivedFromJobType
+=== RUN   TestLogEventCachePrewarm_constantsDerivedFromJobType
+=== PAUSE TestLogEventCachePrewarm_constantsDerivedFromJobType
+=== RUN   TestLogEventCallbackListener_constantsDerivedFromJobType
+=== PAUSE TestLogEventCallbackListener_constantsDerivedFromJobType
+=== RUN   TestLogEventAuditAggregation_constantsDerivedFromJobType
+=== PAUSE TestLogEventAuditAggregation_constantsDerivedFromJobType
+=== CONT  TestLogEventRunWrapper_constantsDerivedFromJobType
+--- PASS: TestLogEventRunWrapper_constantsDerivedFromJobType (0.00s)
+=== CONT  TestLogEventSchedulerEventsAggregation_constantsDerivedFromJobType
+--- PASS: TestLogEventSchedulerEventsAggregation_constantsDerivedFromJobType (0.00s)
+=== CONT  TestLogEventCallbackListener_constantsDerivedFromJobType
+--- PASS: TestLogEventCallbackListener_constantsDerivedFromJobType (0.00s)
+=== CONT  TestLogEventCachePrewarm_constantsDerivedFromJobType
+--- PASS: TestLogEventCachePrewarm_constantsDerivedFromJobType (0.00s)
+=== CONT  TestLogEventRetentionTolerance_constantsDerivedFromJobType
+--- PASS: TestLogEventRetentionTolerance_constantsDerivedFromJobType (0.00s)
+=== CONT  TestLogEventLifecycleCheck_constantsDerivedFromJobType
+--- PASS: TestLogEventLifecycleCheck_constantsDerivedFromJobType (0.00s)
+=== CONT  TestLogEventNoOpHandler_wirePrefixStable
+--- PASS: TestLogEventNoOpHandler_wirePrefixStable (0.00s)
+=== CONT  TestLogEventCASRecoveryKind_wirePrefixStable
+--- PASS: TestLogEventCASRecoveryKind_wirePrefixStable (0.00s)
+=== CONT  TestLogEventAuditAggregation_constantsDerivedFromJobType
+--- PASS: TestLogEventAuditAggregation_constantsDerivedFromJobType (0.00s)
+=== CONT  TestLogEventTestIO_constantsDerivedFromJobType
+--- PASS: TestLogEventTestIO_constantsDerivedFromJobType (0.00s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/scheduler	0.722s

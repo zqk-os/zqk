@@ -1,0 +1,141 @@
+{
+  "name": "make-verify-191",
+  "created_at": "2026-09-04T21:34:29.267962Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-191",
+    "Tests": [
+      {
+        "Name": "TestOrganizationalSync_Integration",
+        "Package": "organizational",
+        "PackagePath": "cmd/zqk/organizational",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/organizational/sync_integration_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestOrganizationalAnalyzeImpact_Integration",
+        "Package": "organizational",
+        "PackagePath": "cmd/zqk/organizational",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/organizational/sync_integration_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestOrganizationalRecordChange_Integration",
+        "Package": "organizational",
+        "PackagePath": "cmd/zqk/organizational",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/organizational/sync_integration_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestOrgSyncAllowedKinds",
+        "Package": "organizational",
+        "PackagePath": "cmd/zqk/organizational",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/organizational/sync_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestUnmarshalOrgSync_validYAML",
+        "Package": "organizational",
+        "PackagePath": "cmd/zqk/organizational",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/organizational/sync_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestMarshalOrgSync_roundTrip",
+        "Package": "organizational",
+        "PackagePath": "cmd/zqk/organizational",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/organizational/sync_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAllowedKindsList_nonEmpty",
+        "Package": "organizational",
+        "PackagePath": "cmd/zqk/organizational",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/organizational/sync_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": true,
+    "EstimatedDuration": 210000000000,
+    "PackagePath": "cmd/zqk/organizational"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestOrganizationalSync_Integration",
+      "Package": "organizational",
+      "PackagePath": "cmd/zqk/organizational",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/organizational/sync_integration_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestOrganizationalAnalyzeImpact_Integration",
+      "Package": "organizational",
+      "PackagePath": "cmd/zqk/organizational",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/organizational/sync_integration_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestOrganizationalRecordChange_Integration",
+      "Package": "organizational",
+      "PackagePath": "cmd/zqk/organizational",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/organizational/sync_integration_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestOrgSyncAllowedKinds",
+      "Package": "organizational",
+      "PackagePath": "cmd/zqk/organizational",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/organizational/sync_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestUnmarshalOrgSync_validYAML",
+      "Package": "organizational",
+      "PackagePath": "cmd/zqk/organizational",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/organizational/sync_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestMarshalOrgSync_roundTrip",
+      "Package": "organizational",
+      "PackagePath": "cmd/zqk/organizational",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/organizational/sync_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestAllowedKindsList_nonEmpty",
+      "Package": "organizational",
+      "PackagePath": "cmd/zqk/organizational",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/organizational/sync_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

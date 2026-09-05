@@ -1,0 +1,123 @@
+{
+  "name": "make-verify-655",
+  "created_at": "2026-09-04T21:34:33.85846Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-655",
+    "Tests": [
+      {
+        "Name": "TestShellPeerWakeAdapter_liveWorkerDelivery",
+        "Package": "agentfeed",
+        "PackagePath": "pkg/agentfeed",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentfeed/wake_adapter_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestWakePasteStub_shortAndPointsAtFeed",
+        "Package": "agentfeed",
+        "PackagePath": "pkg/agentfeed",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentfeed/wake_paste_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestWakePasteStub_agentIDPointerIsSeatNotEvent",
+        "Package": "agentfeed",
+        "PackagePath": "pkg/agentfeed",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentfeed/wake_paste_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestWakePasteStub_emptyAgentFallsBack",
+        "Package": "agentfeed",
+        "PackagePath": "pkg/agentfeed",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentfeed/wake_paste_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestWakePasteStubIn_readsSeatIDsFromPeerSeats",
+        "Package": "agentfeed",
+        "PackagePath": "pkg/agentfeed",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentfeed/wake_paste_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestPeerAckPasteStub",
+        "Package": "agentfeed",
+        "PackagePath": "pkg/agentfeed",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentfeed/wake_paste_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": true,
+    "EstimatedDuration": 180000000000,
+    "PackagePath": "pkg/agentfeed"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestShellPeerWakeAdapter_liveWorkerDelivery",
+      "Package": "agentfeed",
+      "PackagePath": "pkg/agentfeed",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentfeed/wake_adapter_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestWakePasteStub_shortAndPointsAtFeed",
+      "Package": "agentfeed",
+      "PackagePath": "pkg/agentfeed",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentfeed/wake_paste_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestWakePasteStub_agentIDPointerIsSeatNotEvent",
+      "Package": "agentfeed",
+      "PackagePath": "pkg/agentfeed",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentfeed/wake_paste_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestWakePasteStub_emptyAgentFallsBack",
+      "Package": "agentfeed",
+      "PackagePath": "pkg/agentfeed",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentfeed/wake_paste_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestWakePasteStubIn_readsSeatIDsFromPeerSeats",
+      "Package": "agentfeed",
+      "PackagePath": "pkg/agentfeed",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentfeed/wake_paste_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestPeerAckPasteStub",
+      "Package": "agentfeed",
+      "PackagePath": "pkg/agentfeed",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentfeed/wake_paste_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

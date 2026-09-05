@@ -1,0 +1,14 @@
+created_at: "2026-08-19T07:01:50Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1787122906932062000-888919ba
+item_id: REDACTED
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 2857702ca28e4b64fb5782140b43c1400e68fdeab30ab0062f4119523ca97d466e5f13c72adcfa41b92eacf21fa7f0a79b8a8e3a8d7c581e5c9afe0e69cb31dc
+schema_version: 2.0.0
+signature: 3045022008cc501ff55f9b7f7195964d6ec7bb63ffd39fa65bdcdebaa34bd652937d2e67022100a78396b35e31a7650e7dfcb2a3c844893dbfab49dbb3069eee30324f89dd46ba
+status: archived
+title: QA success QAS-1787122906932062000-888919ba
+updated_at: "2026-09-01T07:25:40Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

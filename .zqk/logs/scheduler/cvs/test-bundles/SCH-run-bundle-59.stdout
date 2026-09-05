@@ -1,0 +1,44 @@
+
+--- run 2026-09-05T05:25:32Z ---
+=== RUN   TestPolicyEngine_ReconcilesStaleInProgressFromOtherPID
+=== PAUSE TestPolicyEngine_ReconcilesStaleInProgressFromOtherPID
+=== RUN   TestCRIT9038_PolicyEngine_EvaluateSkipsWhenInProgress
+=== PAUSE TestCRIT9038_PolicyEngine_EvaluateSkipsWhenInProgress
+=== RUN   TestCRIT9038_PolicyEngine_EvaluateSkipsWhenDeferred
+=== PAUSE TestCRIT9038_PolicyEngine_EvaluateSkipsWhenDeferred
+=== RUN   TestCRIT9041_PolicyEngine_SaveAndLoad_PersistsToDisk
+=== PAUSE TestCRIT9041_PolicyEngine_SaveAndLoad_PersistsToDisk
+=== RUN   TestCRIT9041_PolicyEngine_LoadPolicy_IgnoresUnknownFieldsAndDefaultsSchemaVersion
+=== PAUSE TestCRIT9041_PolicyEngine_LoadPolicy_IgnoresUnknownFieldsAndDefaultsSchemaVersion
+=== RUN   TestCRIT9042_PolicyEngine_Evaluate_UsesPolicyDefaultActionSkipWhenNoState
+=== PAUSE TestCRIT9042_PolicyEngine_Evaluate_UsesPolicyDefaultActionSkipWhenNoState
+=== RUN   TestPolicyEngine_Evaluate_SkipWindowSkipsMatchingJob
+=== PAUSE TestPolicyEngine_Evaluate_SkipWindowSkipsMatchingJob
+=== RUN   TestConvergenceTickEnvKeysForwardedFromTestBundleJob_convergenceKeys
+=== PAUSE TestConvergenceTickEnvKeysForwardedFromTestBundleJob_convergenceKeys
+=== RUN   TestPersistLoadRunningJobsSnapshot
+=== PAUSE TestPersistLoadRunningJobsSnapshot
+=== RUN   TestSchedulerRuntimeLogEvents_wirePrefixes
+=== PAUSE TestSchedulerRuntimeLogEvents_wirePrefixes
+=== CONT  TestPolicyEngine_ReconcilesStaleInProgressFromOtherPID
+=== CONT  TestCRIT9042_PolicyEngine_Evaluate_UsesPolicyDefaultActionSkipWhenNoState
+--- PASS: TestCRIT9042_PolicyEngine_Evaluate_UsesPolicyDefaultActionSkipWhenNoState (0.00s)
+=== CONT  TestPersistLoadRunningJobsSnapshot
+--- PASS: TestPolicyEngine_ReconcilesStaleInProgressFromOtherPID (0.01s)
+=== CONT  TestSchedulerRuntimeLogEvents_wirePrefixes
+--- PASS: TestSchedulerRuntimeLogEvents_wirePrefixes (0.00s)
+=== CONT  TestCRIT9041_PolicyEngine_SaveAndLoad_PersistsToDisk
+--- PASS: TestPersistLoadRunningJobsSnapshot (0.01s)
+=== CONT  TestCRIT9041_PolicyEngine_LoadPolicy_IgnoresUnknownFieldsAndDefaultsSchemaVersion
+--- PASS: TestCRIT9041_PolicyEngine_SaveAndLoad_PersistsToDisk (0.00s)
+=== CONT  TestCRIT9038_PolicyEngine_EvaluateSkipsWhenDeferred
+--- PASS: TestCRIT9041_PolicyEngine_LoadPolicy_IgnoresUnknownFieldsAndDefaultsSchemaVersion (0.00s)
+=== CONT  TestConvergenceTickEnvKeysForwardedFromTestBundleJob_convergenceKeys
+--- PASS: TestConvergenceTickEnvKeysForwardedFromTestBundleJob_convergenceKeys (0.00s)
+=== CONT  TestCRIT9038_PolicyEngine_EvaluateSkipsWhenInProgress
+--- PASS: TestCRIT9038_PolicyEngine_EvaluateSkipsWhenInProgress (0.01s)
+=== CONT  TestPolicyEngine_Evaluate_SkipWindowSkipsMatchingJob
+--- PASS: TestCRIT9038_PolicyEngine_EvaluateSkipsWhenDeferred (0.01s)
+--- PASS: TestPolicyEngine_Evaluate_SkipWindowSkipsMatchingJob (0.01s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/scheduler	0.781s

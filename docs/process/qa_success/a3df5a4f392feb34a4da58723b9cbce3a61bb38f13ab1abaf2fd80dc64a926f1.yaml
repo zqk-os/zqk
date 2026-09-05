@@ -1,0 +1,14 @@
+created_at: "2026-08-19T08:24:34Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1787127872327075000-f1c9187f
+item_id: CRIT-COMMS-RUNTIME-SESSION-FEED-LINK-001
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 2857702ca28e4b64fb5782140b43c1400e68fdeab30ab0062f4119523ca97d466e5f13c72adcfa41b92eacf21fa7f0a79b8a8e3a8d7c581e5c9afe0e69cb31dc
+schema_version: 2.0.0
+signature: 304502200998f187553050b087d27be15084a183ebb7197e4b90be86441c1ae6d32c8e6e022100f8d8341a7ae71a9fd11db4f736e9c2d37a15ff0da46b5854e08a6c8fe5ca1ab6
+status: archived
+title: Feed evidence and heartbeats carry worker session_id provenance
+updated_at: "2026-09-01T07:48:18Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

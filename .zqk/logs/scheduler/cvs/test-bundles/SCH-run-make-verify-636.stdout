@@ -1,0 +1,28 @@
+
+--- run 2026-09-04T22:18:28Z ---
+=== RUN   TestArchiveGenerationIncludesNewObjectSpec
+=== PAUSE TestArchiveGenerationIncludesNewObjectSpec
+=== RUN   TestManifestPaths_EmbeddedArchive
+=== PAUSE TestManifestPaths_EmbeddedArchive
+=== RUN   TestShouldExcludeCommunityCommandSpec
+=== PAUSE TestShouldExcludeCommunityCommandSpec
+=== RUN   TestExtractEmbeddedToTempProject
+=== PAUSE TestExtractEmbeddedToTempProject
+=== RUN   TestFindSourceProjectRoot_findsRepoWithProcessInternal
+=== PAUSE TestFindSourceProjectRoot_findsRepoWithProcessInternal
+=== RUN   TestExtractFiles_sourceFallbackCopiesConfig
+=== PAUSE TestExtractFiles_sourceFallbackCopiesConfig
+=== CONT  TestArchiveGenerationIncludesNewObjectSpec
+=== CONT  TestExtractEmbeddedToTempProject
+--- PASS: TestArchiveGenerationIncludesNewObjectSpec (0.26s)
+=== CONT  TestExtractFiles_sourceFallbackCopiesConfig
+--- PASS: TestExtractEmbeddedToTempProject (0.44s)
+=== CONT  TestFindSourceProjectRoot_findsRepoWithProcessInternal
+--- PASS: TestFindSourceProjectRoot_findsRepoWithProcessInternal (0.00s)
+=== CONT  TestShouldExcludeCommunityCommandSpec
+--- PASS: TestShouldExcludeCommunityCommandSpec (0.00s)
+=== CONT  TestManifestPaths_EmbeddedArchive
+--- PASS: TestManifestPaths_EmbeddedArchive (0.00s)
+--- PASS: TestExtractFiles_sourceFallbackCopiesConfig (0.22s)
+PASS
+ok  	github.com/lanceman/zqk/internal/bootstrap	0.769s

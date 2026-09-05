@@ -1,0 +1,59 @@
+
+--- run 2026-09-04T21:43:17Z ---
+=== RUN   TestTouchSessionLastActivity_throttlesPersist
+=== PAUSE TestTouchSessionLastActivity_throttlesPersist
+=== RUN   TestCurrentSessionLeaseExpired
+=== PAUSE TestCurrentSessionLeaseExpired
+=== RUN   TestShutdownDeadlockExactReproduction
+=== PAUSE TestShutdownDeadlockExactReproduction
+=== RUN   TestShutdownDeadlock
+=== PAUSE TestShutdownDeadlock
+=== RUN   TestShutdownDeadlockConcurrentLogs
+=== PAUSE TestShutdownDeadlockConcurrentLogs
+=== RUN   TestStartupDeadlockExactSequence
+=== PAUSE TestStartupDeadlockExactSequence
+=== RUN   TestToolRegistrationFlow
+=== PAUSE TestToolRegistrationFlow
+=== RUN   TestApplyToolsAllowlist
+=== PAUSE TestApplyToolsAllowlist
+=== RUN   TestMcpFilterExprs_ListAndCountShareMembrane
+=== PAUSE TestMcpFilterExprs_ListAndCountShareMembrane
+=== RUN   TestWorkflowAndCommonToolsReturnWithCancelledContext
+=== PAUSE TestWorkflowAndCommonToolsReturnWithCancelledContext
+=== CONT  TestTouchSessionLastActivity_throttlesPersist
+=== CONT  TestStartupDeadlockExactSequence
+    startup_deadlock_test.go:29: skipping exact-sequence test unless MCP_RUN_DEADLOCK_REPRODUCTION=1 (timing-sensitive)
+--- SKIP: TestStartupDeadlockExactSequence (0.00s)
+=== CONT  TestMcpFilterExprs_ListAndCountShareMembrane
+--- PASS: TestMcpFilterExprs_ListAndCountShareMembrane (0.00s)
+=== CONT  TestWorkflowAndCommonToolsReturnWithCancelledContext
+=== RUN   TestWorkflowAndCommonToolsReturnWithCancelledContext/get_current_backlog_item
+=== RUN   TestWorkflowAndCommonToolsReturnWithCancelledContext/get_next_backlog_item
+=== RUN   TestWorkflowAndCommonToolsReturnWithCancelledContext/get_current_priority_plan
+=== RUN   TestWorkflowAndCommonToolsReturnWithCancelledContext/object_list
+--- PASS: TestTouchSessionLastActivity_throttlesPersist (0.00s)
+=== CONT  TestShutdownDeadlock
+=== RUN   TestWorkflowAndCommonToolsReturnWithCancelledContext/object_count
+=== RUN   TestWorkflowAndCommonToolsReturnWithCancelledContext/system_status
+--- PASS: TestWorkflowAndCommonToolsReturnWithCancelledContext (0.00s)
+    --- PASS: TestWorkflowAndCommonToolsReturnWithCancelledContext/get_current_backlog_item (0.00s)
+    --- PASS: TestWorkflowAndCommonToolsReturnWithCancelledContext/get_next_backlog_item (0.00s)
+    --- PASS: TestWorkflowAndCommonToolsReturnWithCancelledContext/get_current_priority_plan (0.00s)
+    --- PASS: TestWorkflowAndCommonToolsReturnWithCancelledContext/object_list (0.00s)
+    --- PASS: TestWorkflowAndCommonToolsReturnWithCancelledContext/object_count (0.00s)
+    --- PASS: TestWorkflowAndCommonToolsReturnWithCancelledContext/system_status (0.00s)
+=== CONT  TestShutdownDeadlockConcurrentLogs
+--- PASS: TestShutdownDeadlockConcurrentLogs (0.00s)
+=== CONT  TestShutdownDeadlockExactReproduction
+    shutdown_deadlock_test.go:34: skipping exact-reproduction test unless MCP_RUN_DEADLOCK_REPRODUCTION=1 (timing-sensitive)
+--- SKIP: TestShutdownDeadlockExactReproduction (0.00s)
+=== CONT  TestCurrentSessionLeaseExpired
+--- PASS: TestCurrentSessionLeaseExpired (0.00s)
+=== CONT  TestApplyToolsAllowlist
+--- PASS: TestApplyToolsAllowlist (0.00s)
+=== CONT  TestToolRegistrationFlow
+    tool_registration_test.go:59: Tool registration flow: initial=1, afterPrepare=1, final=32
+--- PASS: TestToolRegistrationFlow (0.00s)
+--- PASS: TestShutdownDeadlock (0.10s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/mcp	0.736s

@@ -1,0 +1,21 @@
+actual_effort: 0.33h
+assignee_persona_ref: PER-ORCH-ALPHA
+backlog_item_ref: BLI-LAUNCH-CEF-DIAMOND-FLOOR-001
+branch_ref: integration/pri-PRI-CEF-LINGERING-INTAKE-001
+claimed_at: "2026-08-31T19:47:36Z"
+claimed_by: antigravity-1
+commit_hash: c7fc75b0d8da9a107efcad7f75cfb25359d5d4b6
+completed_at: "2026-08-31T20:19:11Z"
+created_at: "2026-08-31T19:47:15Z"
+created_by: ACC-1785920548450214012-68b850c0
+description: Execute BLI-LAUNCH-CEF-DIAMOND-FLOOR-001
+id: ATK-1788205635859417000-b35291c9
+kind: agent_task
+namespace_id: zqk:kernel
+schema_version: 2.0.0
+started_at: "2026-08-31T19:59:08Z"
+status: implemented
+title: Execute BLI-LAUNCH-CEF-DIAMOND-FLOOR-001
+updated_at: "2026-08-31T20:19:11Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

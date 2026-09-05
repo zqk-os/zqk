@@ -1,0 +1,2 @@
+{"event_type":"started","job_id":"SCH-scheduler-job-retention","job_type":"scheduler_job_retention","timestamp":"2026-09-05T04:00:00Z"}
+{"duration":"33.21610775s","event_type":"completed","job_id":"SCH-scheduler-job-retention","job_type":"scheduler_job_retention","timestamp":"2026-09-05T04:00:33Z"}

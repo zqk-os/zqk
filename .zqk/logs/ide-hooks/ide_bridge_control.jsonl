@@ -1,0 +1,66 @@
+{"schema":"zqk_ide_bridge_v1","command":"zqk.mcp.reloadClient","ts":"2026-09-04T20:38:19Z"}
+{"schema":"zqk_ide_bridge_v1","command":"zqk.wake.attn","ts":"2026-09-04T20:38:45Z","args":["PROOF-OF-LIFE: ATTN qwen-1 NIGHT-DUTY: claim ATK-1788551198213493000-83e1df76 — swarm must not idle. Hourglass on."]}
+{"schema":"zqk_ide_bridge_v1","command":"zqk.wake.attn","ts":"2026-09-04T20:38:48Z","args":["PROOF-OF-LIFE: ATTN qwen-2 NIGHT-DUTY: claim ATK-1788551205600636000-f21bec19 — swarm must not idle. Hourglass on."]}
+{"schema":"zqk_ide_bridge_v1","command":"zqk.wake.attn","ts":"2026-09-04T20:38:50Z","args":["PROOF-OF-LIFE: night-duty tick: CVS=CVS-CEF-UNTIL-45-001 exit NOT met — continuing"]}
+{"schema":"zqk_ide_bridge_v1","command":"zqk.wake.attn","ts":"2026-09-04T20:41:53Z","args":["PROOF-OF-LIFE: night-duty tick: CVS=CVS-CEF-UNTIL-45-001 exit NOT met — continuing"]}
+{"schema":"zqk_ide_bridge_v1","command":"zqk.wake.attn","ts":"2026-09-04T20:42:35Z","args":["PROOF-OF-LIFE: night-duty tick: CVS=CVS-CEF-UNTIL-45-001 exit NOT met — continuing"]}
+{"schema":"zqk_ide_bridge_v1","command":"zqk.wake.attn","ts":"2026-09-04T20:44:53Z","args":["PROOF-OF-LIFE: night-duty tick: CVS=CVS-CEF-UNTIL-45-001 exit NOT met — continuing"]}
+{"schema":"zqk_ide_bridge_v1","command":"zqk.mcp.reloadClient","ts":"2026-09-04T21:15:00Z"}
+{"schema":"zqk_ide_bridge_v1","command":"zqk.wake.attn","ts":"2026-09-04T21:16:33Z","args":["PROOF-OF-LIFE: ATTN qwen-2 NIGHT-DUTY: claim ATK-1788550361907437000-1dee8400 — swarm must not idle. Hourglass on."]}
+{"schema":"zqk_ide_bridge_v1","command":"zqk.wake.attn","ts":"2026-09-04T21:16:35Z","args":["PROOF-OF-LIFE: night-duty tick: CVS=CVS-CEF-UNTIL-45-001 exit NOT met — continuing"]}
+{"schema":"zqk_ide_bridge_v1","command":"zqk.wake.attn","ts":"2026-09-04T21:18:30Z","args":["PROOF-OF-LIFE: night-duty tick: CVS=CVS-CEF-UNTIL-45-001 exit NOT met — continuing"]}
+{"schema":"zqk_ide_bridge_v1","command":"zqk.wake.attn","ts":"2026-09-04T21:20:39Z","args":["PROOF-OF-LIFE: night-duty tick: CVS=CVS-CEF-UNTIL-45-001 exit NOT met — continuing"]}
+{"schema":"zqk_ide_bridge_v1","command":"zqk.wake.attn","ts":"2026-09-04T21:22:39Z","args":["PROOF-OF-LIFE: night-duty tick: CVS=CVS-CEF-UNTIL-45-001 exit NOT met — continuing"]}
+{"schema":"zqk_ide_bridge_v1","command":"zqk.wake.attn","ts":"2026-09-04T21:24:36Z","args":["PROOF-OF-LIFE: night-duty tick: CVS=CVS-CEF-UNTIL-45-001 exit NOT met — continuing"]}
+{"schema":"zqk_ide_bridge_v1","command":"zqk.wake.attn","ts":"2026-09-04T21:26:38Z","args":["PROOF-OF-LIFE: night-duty tick: CVS=CVS-CEF-UNTIL-45-001 exit NOT met — continuing"]}
+{"schema":"zqk_ide_bridge_v1","command":"zqk.wake.attn","ts":"2026-09-04T21:28:46Z","args":["PROOF-OF-LIFE: night-duty tick: CVS=CVS-CEF-UNTIL-45-001 exit NOT met — continuing"]}
+{"schema":"zqk_ide_bridge_v1","command":"zqk.wake.attn","ts":"2026-09-04T21:30:40Z","args":["PROOF-OF-LIFE: night-duty tick: CVS=CVS-CEF-UNTIL-45-001 exit NOT met — continuing"]}
+{"schema":"zqk_ide_bridge_v1","command":"zqk.wake.attn","ts":"2026-09-04T21:32:41Z","args":["PROOF-OF-LIFE: night-duty tick: CVS=CVS-CEF-UNTIL-45-001 exit NOT met — continuing"]}
+{"schema":"zqk_ide_bridge_v1","command":"zqk.wake.attn","ts":"2026-09-04T21:36:43Z","args":["PROOF-OF-LIFE: night-duty tick: CVS=CVS-CEF-UNTIL-45-001 exit NOT met — continuing"]}
+{"schema":"zqk_ide_bridge_v1","command":"zqk.mcp.reloadClient","ts":"2026-09-04T21:37:42Z"}
+{"schema":"zqk_ide_bridge_v1","command":"zqk.wake.attn","ts":"2026-09-04T21:38:42Z","args":["PROOF-OF-LIFE: night-duty tick: CVS=CVS-CEF-UNTIL-45-001 exit NOT met — continuing"]}
+{"schema":"zqk_ide_bridge_v1","command":"zqk.wake.attn","ts":"2026-09-04T21:40:50Z","args":["PROOF-OF-LIFE: night-duty tick: CVS=CVS-CEF-UNTIL-45-001 exit NOT met — continuing"]}
+{"schema":"zqk_ide_bridge_v1","command":"zqk.wake.attn","ts":"2026-09-04T21:43:09Z","args":["PROOF-OF-LIFE: night-duty tick: CVS=CVS-CEF-UNTIL-45-001 exit NOT met — continuing"]}
+{"schema":"zqk_ide_bridge_v1","command":"zqk.wake.attn","ts":"2026-09-04T21:45:44Z","args":["PROOF-OF-LIFE: night-duty tick: CVS=CVS-CEF-UNTIL-45-001 exit NOT met — continuing"]}
+{"schema":"zqk_ide_bridge_v1","command":"zqk.wake.attn","ts":"2026-09-04T21:48:04Z","args":["PROOF-OF-LIFE: night-duty tick: CVS=CVS-CEF-UNTIL-45-001 exit NOT met — continuing"]}
+{"schema":"zqk_ide_bridge_v1","command":"zqk.wake.attn","ts":"2026-09-04T21:55:25Z","args":["PROOF-OF-LIFE: night-duty tick: CVS=CVS-CEF-UNTIL-45-001 exit NOT met — continuing"]}
+{"schema":"zqk_ide_bridge_v1","command":"zqk.wake.attn","ts":"2026-09-04T22:02:36Z","args":["PROOF-OF-LIFE: night-duty tick: CVS=CVS-CEF-UNTIL-45-001 exit NOT met — continuing"]}
+{"schema":"zqk_ide_bridge_v1","command":"zqk.wake.attn","ts":"2026-09-04T22:50:41Z","args":["PROOF-OF-LIFE: night-duty tick: CVS=CVS-CEF-UNTIL-45-001 exit NOT met — continuing"]}
+{"schema":"zqk_ide_bridge_v1","command":"zqk.wake.attn","ts":"2026-09-04T22:52:38Z","args":["PROOF-OF-LIFE: night-duty tick: CVS=CVS-CEF-UNTIL-45-001 exit NOT met — continuing"]}
+{"schema":"zqk_ide_bridge_v1","command":"zqk.wake.attn","ts":"2026-09-04T22:54:36Z","args":["PROOF-OF-LIFE: night-duty tick: CVS=CVS-CEF-UNTIL-45-001 exit NOT met — continuing"]}
+{"schema":"zqk_ide_bridge_v1","command":"zqk.wake.attn","ts":"2026-09-04T22:56:38Z","args":["PROOF-OF-LIFE: night-duty tick: CVS=CVS-CEF-UNTIL-45-001 exit NOT met — continuing"]}
+{"schema":"zqk_ide_bridge_v1","command":"zqk.wake.attn","ts":"2026-09-04T22:58:36Z","args":["PROOF-OF-LIFE: night-duty tick: CVS=CVS-CEF-UNTIL-45-001 exit NOT met — continuing"]}
+{"schema":"zqk_ide_bridge_v1","command":"zqk.wake.attn","ts":"2026-09-04T23:00:35Z","args":["PROOF-OF-LIFE: night-duty tick: CVS=CVS-CEF-UNTIL-45-001 exit NOT met — continuing"]}
+{"schema":"zqk_ide_bridge_v1","command":"zqk.wake.attn","ts":"2026-09-04T23:01:13Z","args":["PROOF-OF-LIFE: {\"agent_idle_digest\":\"sync-loop-agent:ATK-1788510388168756000-e2848cec: 2s\\nsync-loop-agent:ATK-1788510393845163000-359b2a67: 24s\\nsync-loop-agent:ATK-1788550361907437000-1dee8400: 20s\\nsync-loop-agent:ATK-1788551198213493000…"]}
+{"schema":"zqk_ide_bridge_v1","command":"zqk.wake.attn","ts":"2026-09-04T23:02:02Z","args":["ATTN TPM inbox: steering cap-orchestrator AFE-1788562873132989000-853ef46f ACKONLY; \u2014 whats-next --agent-id cursor-composer; ack; do substance; do not hourglass (no live ATK / COMMS-CHECK) (substance on feed)"]}
+{"schema":"zqk_ide_bridge_v1","command":"zqk.wake.attn","ts":"2026-09-04T23:02:37Z","args":["PROOF-OF-LIFE: night-duty tick: CVS=CVS-CEF-UNTIL-45-001 exit NOT met — continuing"]}
+{"schema":"zqk_ide_bridge_v1","command":"zqk.wake.attn","ts":"2026-09-04T23:02:50Z","args":["PROOF-OF-LIFE: ATTN TPM — peer_ack received for AFE-1788562873132989000-853ef46f"]}
+{"schema":"zqk_ide_bridge_v1","command":"zqk.wake.attn","ts":"2026-09-04T23:04:37Z","args":["PROOF-OF-LIFE: night-duty tick: CVS=CVS-CEF-UNTIL-45-001 exit NOT met — continuing"]}
+{"schema":"zqk_ide_bridge_v1","command":"zqk.wake.attn","ts":"2026-09-04T23:06:43Z","args":["PROOF-OF-LIFE: night-duty tick: CVS=CVS-CEF-UNTIL-45-001 exit NOT met — continuing"]}
+{"schema":"zqk_ide_bridge_v1","command":"zqk.wake.attn","ts":"2026-09-04T23:09:57Z","args":["PROOF-OF-LIFE: night-duty tick: CVS=CVS-CEF-UNTIL-45-001 exit NOT met — continuing"]}
+{"schema":"zqk_ide_bridge_v1","command":"zqk.wake.attn","ts":"2026-09-04T23:11:38Z","args":["PROOF-OF-LIFE: night-duty tick: CVS=CVS-CEF-UNTIL-45-001 exit NOT met — continuing"]}
+{"schema":"zqk_ide_bridge_v1","command":"zqk.wake.attn","ts":"2026-09-04T23:16:03Z","args":["PROOF-OF-LIFE: night-duty tick: CVS=CVS-CEF-UNTIL-45-001 exit NOT met — continuing"]}
+{"schema":"zqk_ide_bridge_v1","command":"zqk.wake.attn","ts":"2026-09-04T23:18:41Z","args":["PROOF-OF-LIFE: night-duty tick: CVS=CVS-CEF-UNTIL-45-001 exit NOT met — continuing"]}
+{"schema":"zqk_ide_bridge_v1","command":"zqk.wake.attn","ts":"2026-09-04T23:21:10Z","args":["PROOF-OF-LIFE: night-duty tick: CVS=CVS-CEF-UNTIL-45-001 exit NOT met — continuing"]}
+{"schema":"zqk_ide_bridge_v1","command":"zqk.wake.attn","ts":"2026-09-04T23:26:32Z","args":["PROOF-OF-LIFE: night-duty tick: CVS=CVS-CEF-UNTIL-45-001 exit NOT met — continuing"]}
+{"schema":"zqk_ide_bridge_v1","command":"zqk.wake.attn","ts":"2026-09-04T23:28:48Z","args":["PROOF-OF-LIFE: night-duty tick: CVS=CVS-CEF-UNTIL-45-001 exit NOT met — continuing"]}
+{"schema":"zqk_ide_bridge_v1","command":"zqk.wake.attn","ts":"2026-09-04T23:31:22Z","args":["PROOF-OF-LIFE: night-duty tick: CVS=CVS-CEF-UNTIL-45-001 exit NOT met — continuing"]}
+{"schema":"zqk_ide_bridge_v1","command":"zqk.wake.attn","ts":"2026-09-04T23:33:15Z","args":["PROOF-OF-LIFE: night-duty tick: CVS=CVS-CEF-UNTIL-45-001 exit NOT met — continuing"]}
+{"schema":"zqk_ide_bridge_v1","command":"zqk.wake.attn","ts":"2026-09-04T23:34:34Z","args":["PROOF-OF-LIFE: night-duty tick: CVS=CVS-CEF-UNTIL-45-001 exit NOT met — continuing"]}
+{"schema":"zqk_ide_bridge_v1","command":"zqk.wake.attn","ts":"2026-09-04T23:36:35Z","args":["PROOF-OF-LIFE: night-duty tick: CVS=CVS-CEF-UNTIL-45-001 exit NOT met — continuing"]}
+{"schema":"zqk_ide_bridge_v1","command":"zqk.wake.attn","ts":"2026-09-04T23:38:37Z","args":["PROOF-OF-LIFE: night-duty tick: CVS=CVS-CEF-UNTIL-45-001 exit NOT met — continuing"]}
+{"schema":"zqk_ide_bridge_v1","command":"zqk.wake.attn","ts":"2026-09-04T23:40:36Z","args":["PROOF-OF-LIFE: night-duty tick: CVS=CVS-CEF-UNTIL-45-001 exit NOT met — continuing"]}
+{"schema":"zqk_ide_bridge_v1","command":"zqk.wake.attn","ts":"2026-09-04T23:42:36Z","args":["PROOF-OF-LIFE: night-duty tick: CVS=CVS-CEF-UNTIL-45-001 exit NOT met — continuing"]}
+{"schema":"zqk_ide_bridge_v1","command":"zqk.wake.attn","ts":"2026-09-04T23:44:34Z","args":["PROOF-OF-LIFE: night-duty tick: CVS=CVS-CEF-UNTIL-45-001 exit NOT met — continuing"]}
+{"schema":"zqk_ide_bridge_v1","command":"zqk.wake.attn","ts":"2026-09-04T23:46:33Z","args":["PROOF-OF-LIFE: night-duty tick: CVS=CVS-CEF-UNTIL-45-001 exit NOT met — continuing"]}
+{"schema":"zqk_ide_bridge_v1","command":"zqk.wake.attn","ts":"2026-09-04T23:49:03Z","args":["PROOF-OF-LIFE: night-duty tick: CVS=CVS-CEF-UNTIL-45-001 exit NOT met — continuing"]}
+{"schema":"zqk_ide_bridge_v1","command":"zqk.wake.attn","ts":"2026-09-04T23:50:35Z","args":["PROOF-OF-LIFE: night-duty tick: CVS=CVS-CEF-UNTIL-45-001 exit NOT met — continuing"]}
+{"schema":"zqk_ide_bridge_v1","command":"zqk.wake.attn","ts":"2026-09-05T00:29:27Z","args":["PROOF-OF-LIFE: CEF L-PERFORMANCE evaluation completed. 3 findings found. nonce"]}
+{"schema":"zqk_ide_bridge_v1","command":"zqk.wake.attn","ts":"2026-09-05T00:29:33Z","args":["PROOF-OF-LIFE: ATTN TPM — peer_ack received for AFE-1788568167072722000-4c3df646"]}
+{"schema":"zqk_ide_bridge_v1","command":"zqk.wake.attn","ts":"2026-09-05T00:36:42Z","args":["PROOF-OF-LIFE: Next grooming plan PRI-CEF-R29-REMEASURE-001 is shaped. I have successfully promoted the 4 intentional drafts from the draft plane. Passing the lead in_progress PRI PRI-CEF-R27-ENVELOPE-001 to you via hourglass."]}
+{"schema":"zqk_ide_bridge_v1","command":"zqk.wake.attn","ts":"2026-09-05T00:37:04Z","args":["PROOF-OF-LIFE: ATTN TPM — peer_ack received for AFE-1788568602605429000-dc5f1e87"]}
+{"schema":"zqk_ide_bridge_v1","command":"zqk.wake.attn","ts":"2026-09-05T00:37:21Z","args":["PROOF-OF-LIFE: PRI-CEF-R27-ENVELOPE-001"]}
+{"schema":"zqk_ide_bridge_v1","command":"zqk.wake.attn","ts":"2026-09-05T00:37:28Z","args":["PROOF-OF-LIFE: ATTN TPM — peer_ack received for AFE-1788568640827725000-b1c61649"]}
+{"schema":"zqk_ide_bridge_v1","command":"zqk.wake.attn","ts":"2026-09-05T00:51:12Z","args":["PROOF-OF-LIFE: Hourglassing lead PRI-CEF-R27-ENVELOPE-001"]}
+{"schema":"zqk_ide_bridge_v1","command":"zqk.wake.attn","ts":"2026-09-05T00:51:33Z","args":["PROOF-OF-LIFE: ATTN TPM — peer_ack received for AFE-1788569472017085000-b672b19e"]}
+{"schema":"zqk_ide_bridge_v1","command":"zqk.wake.attn","ts":"2026-09-05T03:46:10Z","args":["PROOF-OF-LIFE: All 33 ghost refs have been resolved. They were caused by cache lag after the R27 workers committed the missing priority plan. I ran a full system check without --fast to update the cache and clear the ghost refs. The draft p…"]}

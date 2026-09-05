@@ -1,0 +1,87 @@
+{
+  "name": "make-verify-303",
+  "created_at": "2026-09-04T21:34:30.402906Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-303",
+    "Tests": [
+      {
+        "Name": "TestZQKShim_E2E",
+        "Package": "main_test",
+        "PackagePath": "cmd/zqk-shim",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk-shim/e2e_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestIsMutatingOperation",
+        "Package": "main",
+        "PackagePath": "cmd/zqk-shim",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk-shim/main_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestValidatePOLCODE009_BypassRequiresBreakGlass",
+        "Package": "main",
+        "PackagePath": "cmd/zqk-shim",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk-shim/main_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestResolveTrustedAgentPrivateKey",
+        "Package": "main",
+        "PackagePath": "cmd/zqk-shim",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk-shim/main_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 120000000000,
+    "PackagePath": "cmd/zqk-shim"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestZQKShim_E2E",
+      "Package": "main_test",
+      "PackagePath": "cmd/zqk-shim",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk-shim/e2e_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestIsMutatingOperation",
+      "Package": "main",
+      "PackagePath": "cmd/zqk-shim",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk-shim/main_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestValidatePOLCODE009_BypassRequiresBreakGlass",
+      "Package": "main",
+      "PackagePath": "cmd/zqk-shim",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk-shim/main_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestResolveTrustedAgentPrivateKey",
+      "Package": "main",
+      "PackagePath": "cmd/zqk-shim",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk-shim/main_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

@@ -1,0 +1,2 @@
+=== TRACK: workaround contracts (in-scope files only; PRECOMMIT_FULL=1 for repo grep) ===
+62:	// TRACK: PRI-STABILIZE-FAILCLOSED-READS-001

@@ -1,0 +1,66 @@
+
+--- run 2026-09-04T22:17:27Z ---
+=== RUN   TestJobLogFileStem_ChurnNestedSchedulerJobShort
+=== PAUSE TestJobLogFileStem_ChurnNestedSchedulerJobShort
+=== RUN   TestIsSchedulerJobMarkedForDeletion
+=== PAUSE TestIsSchedulerJobMarkedForDeletion
+=== RUN   TestJobStateRegistry_Summarize
+=== PAUSE TestJobStateRegistry_Summarize
+=== RUN   TestCRIT9037_JobStateRegistry_RegisterAndGetExecutionState
+=== PAUSE TestCRIT9037_JobStateRegistry_RegisterAndGetExecutionState
+=== RUN   TestCRIT9037_JobStateRegistry_ListInProgressIncludesDeferred
+=== PAUSE TestCRIT9037_JobStateRegistry_ListInProgressIncludesDeferred
+=== RUN   TestCRIT9037_JobStateRegistry_CompleteExecutionMovesStateOutOfInProgress
+=== PAUSE TestCRIT9037_JobStateRegistry_CompleteExecutionMovesStateOutOfInProgress
+=== RUN   TestCRIT9037_JobStateRegistry_CompleteExecutionMarksFailed
+=== PAUSE TestCRIT9037_JobStateRegistry_CompleteExecutionMarksFailed
+=== RUN   TestJobStateRegistry_MigrateLegacyFlatStateFilesBestEffort
+=== PAUSE TestJobStateRegistry_MigrateLegacyFlatStateFilesBestEffort
+=== RUN   TestJobStateRegistry_CleanStaleLocks
+=== PAUSE TestJobStateRegistry_CleanStaleLocks
+=== RUN   TestJobStateRegistry_MigrateUnbucketedJobStateDirsBestEffort
+=== PAUSE TestJobStateRegistry_MigrateUnbucketedJobStateDirsBestEffort
+=== CONT  TestJobLogFileStem_ChurnNestedSchedulerJobShort
+=== CONT  TestCRIT9037_JobStateRegistry_CompleteExecutionMovesStateOutOfInProgress
+--- PASS: TestJobLogFileStem_ChurnNestedSchedulerJobShort (0.00s)
+=== CONT  TestCRIT9037_JobStateRegistry_RegisterAndGetExecutionState
+--- PASS: TestCRIT9037_JobStateRegistry_RegisterAndGetExecutionState (0.08s)
+=== CONT  TestCRIT9037_JobStateRegistry_ListInProgressIncludesDeferred
+--- PASS: TestCRIT9037_JobStateRegistry_CompleteExecutionMovesStateOutOfInProgress (0.11s)
+=== CONT  TestJobStateRegistry_CleanStaleLocks
+--- PASS: TestJobStateRegistry_CleanStaleLocks (0.01s)
+=== CONT  TestJobStateRegistry_MigrateUnbucketedJobStateDirsBestEffort
+--- PASS: TestCRIT9037_JobStateRegistry_ListInProgressIncludesDeferred (0.04s)
+=== CONT  TestJobStateRegistry_MigrateLegacyFlatStateFilesBestEffort
+--- PASS: TestJobStateRegistry_MigrateUnbucketedJobStateDirsBestEffort (0.02s)
+=== CONT  TestJobStateRegistry_Summarize
+--- PASS: TestJobStateRegistry_MigrateLegacyFlatStateFilesBestEffort (0.01s)
+=== CONT  TestCRIT9037_JobStateRegistry_CompleteExecutionMarksFailed
+--- PASS: TestJobStateRegistry_Summarize (0.02s)
+=== CONT  TestIsSchedulerJobMarkedForDeletion
+=== RUN   TestIsSchedulerJobMarkedForDeletion/nil
+=== RUN   TestIsSchedulerJobMarkedForDeletion/empty
+=== RUN   TestIsSchedulerJobMarkedForDeletion/reusable_enabled
+=== RUN   TestIsSchedulerJobMarkedForDeletion/reusable_disabled
+=== RUN   TestIsSchedulerJobMarkedForDeletion/one_time_enabled_active
+=== RUN   TestIsSchedulerJobMarkedForDeletion/one_time_enabled_no_status
+=== RUN   TestIsSchedulerJobMarkedForDeletion/one_time_disabled_by_enabled
+=== RUN   TestIsSchedulerJobMarkedForDeletion/one_time_disabled_by_status
+=== RUN   TestIsSchedulerJobMarkedForDeletion/one_time_both
+=== RUN   TestIsSchedulerJobMarkedForDeletion/one_time_archived_still_enabled
+=== RUN   TestIsSchedulerJobMarkedForDeletion/reusable_archived
+--- PASS: TestIsSchedulerJobMarkedForDeletion (0.00s)
+    --- PASS: TestIsSchedulerJobMarkedForDeletion/nil (0.00s)
+    --- PASS: TestIsSchedulerJobMarkedForDeletion/empty (0.00s)
+    --- PASS: TestIsSchedulerJobMarkedForDeletion/reusable_enabled (0.00s)
+    --- PASS: TestIsSchedulerJobMarkedForDeletion/reusable_disabled (0.00s)
+    --- PASS: TestIsSchedulerJobMarkedForDeletion/one_time_enabled_active (0.00s)
+    --- PASS: TestIsSchedulerJobMarkedForDeletion/one_time_enabled_no_status (0.00s)
+    --- PASS: TestIsSchedulerJobMarkedForDeletion/one_time_disabled_by_enabled (0.00s)
+    --- PASS: TestIsSchedulerJobMarkedForDeletion/one_time_disabled_by_status (0.00s)
+    --- PASS: TestIsSchedulerJobMarkedForDeletion/one_time_both (0.00s)
+    --- PASS: TestIsSchedulerJobMarkedForDeletion/one_time_archived_still_enabled (0.00s)
+    --- PASS: TestIsSchedulerJobMarkedForDeletion/reusable_archived (0.00s)
+--- PASS: TestCRIT9037_JobStateRegistry_CompleteExecutionMarksFailed (0.02s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/scheduler	0.910s

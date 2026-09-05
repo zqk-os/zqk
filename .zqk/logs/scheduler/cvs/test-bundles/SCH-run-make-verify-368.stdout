@@ -1,0 +1,52 @@
+
+--- run 2026-09-04T22:11:56Z ---
+=== RUN   TestRunValidation_ObjectCount
+=== PAUSE TestRunValidation_ObjectCount
+=== RUN   TestLoadHistory_NoFile
+=== PAUSE TestLoadHistory_NoFile
+=== RUN   TestHasRun_NoHistory
+=== PAUSE TestHasRun_NoHistory
+=== RUN   TestRecordSuccess_AndLoadHistory
+=== PAUSE TestRecordSuccess_AndLoadHistory
+=== RUN   TestRecordSuccess_CreatesStateDir
+=== PAUSE TestRecordSuccess_CreatesStateDir
+=== RUN   TestHasRun_AfterRecordSuccess
+=== PAUSE TestHasRun_AfterRecordSuccess
+=== RUN   TestRecordSuccess_RejectsEmpty
+=== PAUSE TestRecordSuccess_RejectsEmpty
+=== RUN   TestLifecycleMigrationHelper_EmptyLifecycleFile
+=== PAUSE TestLifecycleMigrationHelper_EmptyLifecycleFile
+=== RUN   TestLifecycleMigrationHelper_InvalidYAML
+=== PAUSE TestLifecycleMigrationHelper_InvalidYAML
+=== RUN   TestLifecycleMigrationHelper_MissingRequiredFields
+=== PAUSE TestLifecycleMigrationHelper_MissingRequiredFields
+=== CONT  TestRunValidation_ObjectCount
+=== CONT  TestHasRun_AfterRecordSuccess
+--- PASS: TestHasRun_AfterRecordSuccess (0.03s)
+=== CONT  TestLifecycleMigrationHelper_InvalidYAML
+--- PASS: TestRunValidation_ObjectCount (0.06s)
+=== CONT  TestLifecycleMigrationHelper_MissingRequiredFields
+=== RUN   TestLifecycleMigrationHelper_MissingRequiredFields/missing_statuses
+=== RUN   TestLifecycleMigrationHelper_MissingRequiredFields/empty_statuses
+=== RUN   TestLifecycleMigrationHelper_MissingRequiredFields/missing_object_type_but_provided_in_filename
+--- PASS: TestLifecycleMigrationHelper_InvalidYAML (0.26s)
+=== CONT  TestLifecycleMigrationHelper_EmptyLifecycleFile
+--- PASS: TestLifecycleMigrationHelper_MissingRequiredFields (0.26s)
+    --- PASS: TestLifecycleMigrationHelper_MissingRequiredFields/missing_statuses (0.01s)
+    --- PASS: TestLifecycleMigrationHelper_MissingRequiredFields/empty_statuses (0.00s)
+    --- PASS: TestLifecycleMigrationHelper_MissingRequiredFields/missing_object_type_but_provided_in_filename (0.00s)
+=== CONT  TestRecordSuccess_RejectsEmpty
+--- PASS: TestRecordSuccess_RejectsEmpty (0.00s)
+=== CONT  TestRecordSuccess_AndLoadHistory
+--- PASS: TestRecordSuccess_AndLoadHistory (0.01s)
+=== CONT  TestRecordSuccess_CreatesStateDir
+--- PASS: TestRecordSuccess_CreatesStateDir (0.00s)
+=== CONT  TestHasRun_NoHistory
+--- PASS: TestHasRun_NoHistory (0.00s)
+=== CONT  TestLoadHistory_NoFile
+--- PASS: TestLoadHistory_NoFile (0.00s)
+=== NAME  TestLifecycleMigrationHelper_EmptyLifecycleFile
+    lifecycle_migration_edge_case_test.go:41: Empty lifecycle file parsed successfully (validation will catch issues)
+--- PASS: TestLifecycleMigrationHelper_EmptyLifecycleFile (0.16s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/migration	1.114s

@@ -1,0 +1,24 @@
+
+--- run 2026-09-04T21:37:51Z ---
+=== RUN   TestRelSlashInsideDir
+=== PAUSE TestRelSlashInsideDir
+=== RUN   TestRelWalksOutOfDir
+=== PAUSE TestRelWalksOutOfDir
+=== RUN   TestKindBucketPathToStore_RelativeWhenInsideKindDir
+=== PAUSE TestKindBucketPathToStore_RelativeWhenInsideKindDir
+=== RUN   TestKindBucketPathToStore_DraftPlaneStaysAbsolute
+=== PAUSE TestKindBucketPathToStore_DraftPlaneStaysAbsolute
+=== RUN   TestPkgObjectIDCacheMustNotImportCLI
+=== PAUSE TestPkgObjectIDCacheMustNotImportCLI
+=== CONT  TestRelSlashInsideDir
+--- PASS: TestRelSlashInsideDir (0.00s)
+=== CONT  TestPkgObjectIDCacheMustNotImportCLI
+=== CONT  TestKindBucketPathToStore_DraftPlaneStaysAbsolute
+--- PASS: TestKindBucketPathToStore_DraftPlaneStaysAbsolute (0.01s)
+=== CONT  TestKindBucketPathToStore_RelativeWhenInsideKindDir
+--- PASS: TestKindBucketPathToStore_RelativeWhenInsideKindDir (0.00s)
+=== CONT  TestRelWalksOutOfDir
+--- PASS: TestRelWalksOutOfDir (0.00s)
+--- PASS: TestPkgObjectIDCacheMustNotImportCLI (0.01s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/objectidcache	0.698s

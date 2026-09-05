@@ -1,0 +1,219 @@
+
+--- run 2026-09-04T21:39:33Z ---
+=== RUN   TestInstanceValidator_ValidateInstance
+=== PAUSE TestInstanceValidator_ValidateInstance
+=== RUN   TestInstanceValidator_ValidateEnum
+=== PAUSE TestInstanceValidator_ValidateEnum
+=== RUN   TestInstanceValidator_validateType
+=== PAUSE TestInstanceValidator_validateType
+=== RUN   TestInstanceValidator_validateEnum
+=== PAUSE TestInstanceValidator_validateEnum
+=== RUN   TestInstanceValidator_validateSemanticType
+=== PAUSE TestInstanceValidator_validateSemanticType
+=== RUN   TestLifecycleTransitions_noDivergentDuplicates
+=== PAUSE TestLifecycleTransitions_noDivergentDuplicates
+=== RUN   TestDuplicateEdges_detectsDivergence
+=== PAUSE TestDuplicateEdges_detectsDivergence
+=== RUN   TestValidationMetrics_BasicOperations
+=== PAUSE TestValidationMetrics_BasicOperations
+=== RUN   TestValidationMetrics_Counters
+=== PAUSE TestValidationMetrics_Counters
+=== RUN   TestValidationMetrics_Setters
+=== PAUSE TestValidationMetrics_Setters
+=== CONT  TestInstanceValidator_ValidateInstance
+=== CONT  TestLifecycleTransitions_noDivergentDuplicates
+    lifecycle_transition_integrity_test.go:83: scanned 65 lifecycles; 4 redundant duplicate transitions (identical preconditions, harmless)
+--- PASS: TestLifecycleTransitions_noDivergentDuplicates (0.04s)
+=== CONT  TestValidationMetrics_Counters
+--- PASS: TestValidationMetrics_Counters (0.00s)
+=== CONT  TestValidationMetrics_Setters
+--- PASS: TestValidationMetrics_Setters (0.00s)
+=== CONT  TestValidationMetrics_BasicOperations
+--- PASS: TestValidationMetrics_BasicOperations (0.00s)
+=== CONT  TestInstanceValidator_validateEnum
+=== RUN   TestInstanceValidator_validateEnum/valid_enum
+=== RUN   TestInstanceValidator_validateEnum/invalid_enum
+=== RUN   TestInstanceValidator_validateEnum/case_insensitive
+=== RUN   TestInstanceValidator_validateEnum/int_enum
+=== RUN   TestInstanceValidator_validateEnum/int_enum_invalid
+--- PASS: TestInstanceValidator_validateEnum (0.00s)
+    --- PASS: TestInstanceValidator_validateEnum/valid_enum (0.00s)
+    --- PASS: TestInstanceValidator_validateEnum/invalid_enum (0.00s)
+    --- PASS: TestInstanceValidator_validateEnum/case_insensitive (0.00s)
+    --- PASS: TestInstanceValidator_validateEnum/int_enum (0.00s)
+    --- PASS: TestInstanceValidator_validateEnum/int_enum_invalid (0.00s)
+=== CONT  TestInstanceValidator_validateSemanticType
+=== RUN   TestInstanceValidator_validateSemanticType/statement_valid
+=== RUN   TestInstanceValidator_validateSemanticType/statement_int_valid
+=== RUN   TestInstanceValidator_validateSemanticType/statement_invalid
+=== RUN   TestInstanceValidator_validateSemanticType/list_valid
+=== RUN   TestInstanceValidator_validateSemanticType/list_invalid
+=== RUN   TestInstanceValidator_validateSemanticType/reference_valid
+=== RUN   TestInstanceValidator_validateSemanticType/reference_empty
+=== RUN   TestInstanceValidator_validateSemanticType/reference_invalid_type
+=== RUN   TestInstanceValidator_validateSemanticType/comparison_valid
+=== RUN   TestInstanceValidator_validateSemanticType/comparison_invalid
+=== RUN   TestInstanceValidator_validateSemanticType/expression_valid
+=== RUN   TestInstanceValidator_validateSemanticType/unknown_semantic_type
+--- PASS: TestInstanceValidator_validateSemanticType (0.00s)
+    --- PASS: TestInstanceValidator_validateSemanticType/statement_valid (0.00s)
+    --- PASS: TestInstanceValidator_validateSemanticType/statement_int_valid (0.00s)
+    --- PASS: TestInstanceValidator_validateSemanticType/statement_invalid (0.00s)
+    --- PASS: TestInstanceValidator_validateSemanticType/list_valid (0.00s)
+    --- PASS: TestInstanceValidator_validateSemanticType/list_invalid (0.00s)
+    --- PASS: TestInstanceValidator_validateSemanticType/reference_valid (0.00s)
+    --- PASS: TestInstanceValidator_validateSemanticType/reference_empty (0.00s)
+    --- PASS: TestInstanceValidator_validateSemanticType/reference_invalid_type (0.00s)
+    --- PASS: TestInstanceValidator_validateSemanticType/comparison_valid (0.00s)
+    --- PASS: TestInstanceValidator_validateSemanticType/comparison_invalid (0.00s)
+    --- PASS: TestInstanceValidator_validateSemanticType/expression_valid (0.00s)
+    --- PASS: TestInstanceValidator_validateSemanticType/unknown_semantic_type (0.00s)
+=== CONT  TestInstanceValidator_validateType
+=== RUN   TestInstanceValidator_validateType/string_valid
+=== RUN   TestInstanceValidator_validateType/string_invalid
+=== RUN   TestInstanceValidator_validateType/string_invalid_nil
+=== RUN   TestInstanceValidator_validateType/int_valid
+=== RUN   TestInstanceValidator_validateType/int_valid_integer_alias
+=== RUN   TestInstanceValidator_validateType/int_from_int64
+=== RUN   TestInstanceValidator_validateType/int_from_float
+=== RUN   TestInstanceValidator_validateType/int_from_float64
+=== RUN   TestInstanceValidator_validateType/int_invalid
+=== RUN   TestInstanceValidator_validateType/int_invalid_nil
+=== RUN   TestInstanceValidator_validateType/int_from_float64_with_decimals
+=== RUN   TestInstanceValidator_validateType/float_valid
+=== RUN   TestInstanceValidator_validateType/number_valid
+=== RUN   TestInstanceValidator_validateType/float_invalid
+=== RUN   TestInstanceValidator_validateType/float_invalid_int
+=== RUN   TestInstanceValidator_validateType/bool_valid_true
+=== RUN   TestInstanceValidator_validateType/bool_valid_false
+=== RUN   TestInstanceValidator_validateType/boolean_valid
+=== RUN   TestInstanceValidator_validateType/bool_invalid
+=== RUN   TestInstanceValidator_validateType/bool_invalid_number
+=== RUN   TestInstanceValidator_validateType/list_valid_string_slice
+=== RUN   TestInstanceValidator_validateType/array_valid_int_slice
+=== RUN   TestInstanceValidator_validateType/list_valid_empty
+=== RUN   TestInstanceValidator_validateType/list_invalid
+=== RUN   TestInstanceValidator_validateType/list_invalid_map
+=== RUN   TestInstanceValidator_validateType/object_valid
+=== RUN   TestInstanceValidator_validateType/map_valid
+=== RUN   TestInstanceValidator_validateType/object_valid_empty
+=== RUN   TestInstanceValidator_validateType/object_invalid
+=== RUN   TestInstanceValidator_validateType/object_invalid_string
+=== RUN   TestInstanceValidator_validateType/date_valid
+=== RUN   TestInstanceValidator_validateType/date_valid_with_leading_zeros
+=== RUN   TestInstanceValidator_validateType/date_invalid_format
+=== RUN   TestInstanceValidator_validateType/date_invalid_type
+=== RUN   TestInstanceValidator_validateType/date_invalid_string
+=== RUN   TestInstanceValidator_validateType/date_invalid_short
+=== RUN   TestInstanceValidator_validateType/date_invalid_long
+=== RUN   TestInstanceValidator_validateType/datetime_valid
+=== RUN   TestInstanceValidator_validateType/datetime_valid_with_milliseconds
+=== RUN   TestInstanceValidator_validateType/datetime_invalid
+=== RUN   TestInstanceValidator_validateType/datetime_invalid_format
+=== RUN   TestInstanceValidator_validateType/datetime_invalid_type
+=== RUN   TestInstanceValidator_validateType/datetime_valid_with_milliseconds#01
+=== RUN   TestInstanceValidator_validateType/text_valid
+=== RUN   TestInstanceValidator_validateType/text_valid_empty
+=== RUN   TestInstanceValidator_validateType/text_invalid
+=== RUN   TestInstanceValidator_validateType/unknown_type
+=== RUN   TestInstanceValidator_validateType/empty_type
+=== RUN   TestInstanceValidator_validateType/enum_type
+--- PASS: TestInstanceValidator_validateType (0.00s)
+    --- PASS: TestInstanceValidator_validateType/string_valid (0.00s)
+    --- PASS: TestInstanceValidator_validateType/string_invalid (0.00s)
+    --- PASS: TestInstanceValidator_validateType/string_invalid_nil (0.00s)
+    --- PASS: TestInstanceValidator_validateType/int_valid (0.00s)
+    --- PASS: TestInstanceValidator_validateType/int_valid_integer_alias (0.00s)
+    --- PASS: TestInstanceValidator_validateType/int_from_int64 (0.00s)
+    --- PASS: TestInstanceValidator_validateType/int_from_float (0.00s)
+    --- PASS: TestInstanceValidator_validateType/int_from_float64 (0.00s)
+    --- PASS: TestInstanceValidator_validateType/int_invalid (0.00s)
+    --- PASS: TestInstanceValidator_validateType/int_invalid_nil (0.00s)
+    --- PASS: TestInstanceValidator_validateType/int_from_float64_with_decimals (0.00s)
+    --- PASS: TestInstanceValidator_validateType/float_valid (0.00s)
+    --- PASS: TestInstanceValidator_validateType/number_valid (0.00s)
+    --- PASS: TestInstanceValidator_validateType/float_invalid (0.00s)
+    --- PASS: TestInstanceValidator_validateType/float_invalid_int (0.00s)
+    --- PASS: TestInstanceValidator_validateType/bool_valid_true (0.00s)
+    --- PASS: TestInstanceValidator_validateType/bool_valid_false (0.00s)
+    --- PASS: TestInstanceValidator_validateType/boolean_valid (0.00s)
+    --- PASS: TestInstanceValidator_validateType/bool_invalid (0.00s)
+    --- PASS: TestInstanceValidator_validateType/bool_invalid_number (0.00s)
+    --- PASS: TestInstanceValidator_validateType/list_valid_string_slice (0.00s)
+    --- PASS: TestInstanceValidator_validateType/array_valid_int_slice (0.00s)
+    --- PASS: TestInstanceValidator_validateType/list_valid_empty (0.00s)
+    --- PASS: TestInstanceValidator_validateType/list_invalid (0.00s)
+    --- PASS: TestInstanceValidator_validateType/list_invalid_map (0.00s)
+    --- PASS: TestInstanceValidator_validateType/object_valid (0.00s)
+    --- PASS: TestInstanceValidator_validateType/map_valid (0.00s)
+    --- PASS: TestInstanceValidator_validateType/object_valid_empty (0.00s)
+    --- PASS: TestInstanceValidator_validateType/object_invalid (0.00s)
+    --- PASS: TestInstanceValidator_validateType/object_invalid_string (0.00s)
+    --- PASS: TestInstanceValidator_validateType/date_valid (0.00s)
+    --- PASS: TestInstanceValidator_validateType/date_valid_with_leading_zeros (0.00s)
+    --- PASS: TestInstanceValidator_validateType/date_invalid_format (0.00s)
+    --- PASS: TestInstanceValidator_validateType/date_invalid_type (0.00s)
+    --- PASS: TestInstanceValidator_validateType/date_invalid_string (0.00s)
+    --- PASS: TestInstanceValidator_validateType/date_invalid_short (0.00s)
+    --- PASS: TestInstanceValidator_validateType/date_invalid_long (0.00s)
+    --- PASS: TestInstanceValidator_validateType/datetime_valid (0.00s)
+    --- PASS: TestInstanceValidator_validateType/datetime_valid_with_milliseconds (0.00s)
+    --- PASS: TestInstanceValidator_validateType/datetime_invalid (0.00s)
+    --- PASS: TestInstanceValidator_validateType/datetime_invalid_format (0.00s)
+    --- PASS: TestInstanceValidator_validateType/datetime_invalid_type (0.00s)
+    --- PASS: TestInstanceValidator_validateType/datetime_valid_with_milliseconds#01 (0.00s)
+    --- PASS: TestInstanceValidator_validateType/text_valid (0.00s)
+    --- PASS: TestInstanceValidator_validateType/text_valid_empty (0.00s)
+    --- PASS: TestInstanceValidator_validateType/text_invalid (0.00s)
+    --- PASS: TestInstanceValidator_validateType/unknown_type (0.00s)
+    --- PASS: TestInstanceValidator_validateType/empty_type (0.00s)
+    --- PASS: TestInstanceValidator_validateType/enum_type (0.00s)
+=== CONT  TestDuplicateEdges_detectsDivergence
+=== RUN   TestDuplicateEdges_detectsDivergence/unique_edges_are_clean
+=== PAUSE TestDuplicateEdges_detectsDivergence/unique_edges_are_clean
+=== RUN   TestDuplicateEdges_detectsDivergence/exact_repeat_is_redundant_not_divergent
+=== PAUSE TestDuplicateEdges_detectsDivergence/exact_repeat_is_redundant_not_divergent
+=== RUN   TestDuplicateEdges_detectsDivergence/repeat_with_extra_precondition_is_divergent
+=== PAUSE TestDuplicateEdges_detectsDivergence/repeat_with_extra_precondition_is_divergent
+=== RUN   TestDuplicateEdges_detectsDivergence/repeat_where_one_has_none_is_divergent
+=== PAUSE TestDuplicateEdges_detectsDivergence/repeat_where_one_has_none_is_divergent
+=== RUN   TestDuplicateEdges_detectsDivergence/precondition_order_does_not_make_a_duplicate_divergent
+=== PAUSE TestDuplicateEdges_detectsDivergence/precondition_order_does_not_make_a_duplicate_divergent
+=== CONT  TestInstanceValidator_ValidateEnum
+=== RUN   TestInstanceValidator_ValidateEnum/exact_match_string
+=== RUN   TestInstanceValidator_ValidateEnum/case_insensitive_match
+=== RUN   TestInstanceValidator_ValidateEnum/no_match_string
+=== RUN   TestInstanceValidator_ValidateEnum/exact_match_int
+=== RUN   TestInstanceValidator_ValidateEnum/no_match_int
+=== RUN   TestInstanceValidator_ValidateEnum/empty_enum_values
+=== RUN   TestInstanceValidator_ValidateEnum/nil_value
+--- PASS: TestInstanceValidator_ValidateEnum (0.00s)
+    --- PASS: TestInstanceValidator_ValidateEnum/exact_match_string (0.00s)
+    --- PASS: TestInstanceValidator_ValidateEnum/case_insensitive_match (0.00s)
+    --- PASS: TestInstanceValidator_ValidateEnum/no_match_string (0.00s)
+    --- PASS: TestInstanceValidator_ValidateEnum/exact_match_int (0.00s)
+    --- PASS: TestInstanceValidator_ValidateEnum/no_match_int (0.00s)
+    --- PASS: TestInstanceValidator_ValidateEnum/empty_enum_values (0.00s)
+    --- PASS: TestInstanceValidator_ValidateEnum/nil_value (0.00s)
+=== CONT  TestDuplicateEdges_detectsDivergence/unique_edges_are_clean
+=== CONT  TestDuplicateEdges_detectsDivergence/repeat_where_one_has_none_is_divergent
+=== CONT  TestDuplicateEdges_detectsDivergence/precondition_order_does_not_make_a_duplicate_divergent
+=== CONT  TestDuplicateEdges_detectsDivergence/repeat_with_extra_precondition_is_divergent
+=== CONT  TestDuplicateEdges_detectsDivergence/exact_repeat_is_redundant_not_divergent
+--- PASS: TestDuplicateEdges_detectsDivergence (0.00s)
+    --- PASS: TestDuplicateEdges_detectsDivergence/unique_edges_are_clean (0.00s)
+    --- PASS: TestDuplicateEdges_detectsDivergence/repeat_where_one_has_none_is_divergent (0.00s)
+    --- PASS: TestDuplicateEdges_detectsDivergence/precondition_order_does_not_make_a_duplicate_divergent (0.00s)
+    --- PASS: TestDuplicateEdges_detectsDivergence/repeat_with_extra_precondition_is_divergent (0.00s)
+    --- PASS: TestDuplicateEdges_detectsDivergence/exact_repeat_is_redundant_not_divergent (0.00s)
+=== RUN   TestInstanceValidator_ValidateInstance/valid_backlog_item
+=== RUN   TestInstanceValidator_ValidateInstance/missing_required_field
+=== RUN   TestInstanceValidator_ValidateInstance/invalid_enum_value
+=== RUN   TestInstanceValidator_ValidateInstance/invalid_pattern
+--- PASS: TestInstanceValidator_ValidateInstance (0.54s)
+    --- PASS: TestInstanceValidator_ValidateInstance/valid_backlog_item (0.41s)
+    --- PASS: TestInstanceValidator_ValidateInstance/missing_required_field (0.00s)
+    --- PASS: TestInstanceValidator_ValidateInstance/invalid_enum_value (0.00s)
+    --- PASS: TestInstanceValidator_ValidateInstance/invalid_pattern (0.00s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/validation	1.167s

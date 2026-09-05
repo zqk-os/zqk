@@ -1,0 +1,14 @@
+created_at: "2026-08-18T23:36:56Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1787096216604102000-2a4a4ac7
+item_id: REDACTED
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 2857702ca28e4b64fb5782140b43c1400e68fdeab30ab0062f4119523ca97d466e5f13c72adcfa41b92eacf21fa7f0a79b8a8e3a8d7c581e5c9afe0e69cb31dc
+schema_version: 2.0.0
+signature: 304402204349b2b6e00ba3b107ff6ad7ec1eb54c80b90dfc3dbd530ccb49be789475d3c902201200f30a5badcf3a3250c7c6af1254fe51cd2af852a3ea8ff199200a05f02c83
+status: archived
+title: 'Single authoritative behavior matrix (DEC or architecture section linked from BLI) covering draft, active, paused, escalated, error, completed, abandoned, archived × {draft_plane, '
+updated_at: "2026-09-01T07:09:18Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

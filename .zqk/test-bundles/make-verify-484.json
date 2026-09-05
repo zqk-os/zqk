@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-484",
+  "created_at": "2026-09-04T21:34:32.163857Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-484",
+    "Tests": [
+      {
+        "Name": "TestSuggest_notFound",
+        "Package": "errorsuggest",
+        "PackagePath": "internal/cli/errorsuggest",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/internal/cli/errorsuggest/suggest_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestSuggest_notFoundBeginner",
+        "Package": "errorsuggest",
+        "PackagePath": "internal/cli/errorsuggest",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/internal/cli/errorsuggest/suggest_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestSuggest_validation",
+        "Package": "errorsuggest",
+        "PackagePath": "internal/cli/errorsuggest",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/internal/cli/errorsuggest/suggest_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestSuggest_permission",
+        "Package": "errorsuggest",
+        "PackagePath": "internal/cli/errorsuggest",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/internal/cli/errorsuggest/suggest_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestSuggest_unknownFlagFieldSuggestsFields",
+        "Package": "errorsuggest",
+        "PackagePath": "internal/cli/errorsuggest",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/internal/cli/errorsuggest/suggest_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestSuggest_unknownCommand",
+        "Package": "errorsuggest",
+        "PackagePath": "internal/cli/errorsuggest",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/internal/cli/errorsuggest/suggest_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestSuggest_required",
+        "Package": "errorsuggest",
+        "PackagePath": "internal/cli/errorsuggest",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/internal/cli/errorsuggest/suggest_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestSuggest_expertTruncates",
+        "Package": "errorsuggest",
+        "PackagePath": "internal/cli/errorsuggest",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/internal/cli/errorsuggest/suggest_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestSuggest_verboseAddsHint",
+        "Package": "errorsuggest",
+        "PackagePath": "internal/cli/errorsuggest",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/internal/cli/errorsuggest/suggest_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestSuggest_genericNoHint",
+        "Package": "errorsuggest",
+        "PackagePath": "internal/cli/errorsuggest",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/internal/cli/errorsuggest/suggest_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 300000000000,
+    "PackagePath": "internal/cli/errorsuggest"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestSuggest_notFound",
+      "Package": "errorsuggest",
+      "PackagePath": "internal/cli/errorsuggest",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/internal/cli/errorsuggest/suggest_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestSuggest_notFoundBeginner",
+      "Package": "errorsuggest",
+      "PackagePath": "internal/cli/errorsuggest",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/internal/cli/errorsuggest/suggest_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestSuggest_validation",
+      "Package": "errorsuggest",
+      "PackagePath": "internal/cli/errorsuggest",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/internal/cli/errorsuggest/suggest_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestSuggest_permission",
+      "Package": "errorsuggest",
+      "PackagePath": "internal/cli/errorsuggest",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/internal/cli/errorsuggest/suggest_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestSuggest_unknownFlagFieldSuggestsFields",
+      "Package": "errorsuggest",
+      "PackagePath": "internal/cli/errorsuggest",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/internal/cli/errorsuggest/suggest_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestSuggest_unknownCommand",
+      "Package": "errorsuggest",
+      "PackagePath": "internal/cli/errorsuggest",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/internal/cli/errorsuggest/suggest_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestSuggest_required",
+      "Package": "errorsuggest",
+      "PackagePath": "internal/cli/errorsuggest",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/internal/cli/errorsuggest/suggest_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestSuggest_expertTruncates",
+      "Package": "errorsuggest",
+      "PackagePath": "internal/cli/errorsuggest",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/internal/cli/errorsuggest/suggest_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestSuggest_verboseAddsHint",
+      "Package": "errorsuggest",
+      "PackagePath": "internal/cli/errorsuggest",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/internal/cli/errorsuggest/suggest_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestSuggest_genericNoHint",
+      "Package": "errorsuggest",
+      "PackagePath": "internal/cli/errorsuggest",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/internal/cli/errorsuggest/suggest_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

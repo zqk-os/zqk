@@ -1,0 +1,44 @@
+
+--- run 2026-09-04T22:20:45Z ---
+=== RUN   TestResolveSpecFieldOperation
+=== PAUSE TestResolveSpecFieldOperation
+=== RUN   TestFieldOpRequiresDefinitionFile
+=== PAUSE TestFieldOpRequiresDefinitionFile
+=== RUN   TestFieldOperation_ResolvedOperation
+=== PAUSE TestFieldOperation_ResolvedOperation
+=== RUN   TestAnalyzeSpecLoaderMetrics_LowSeverity
+=== PAUSE TestAnalyzeSpecLoaderMetrics_LowSeverity
+=== RUN   TestAnalyzeSpecLoaderMetrics_HighContention
+=== PAUSE TestAnalyzeSpecLoaderMetrics_HighContention
+=== RUN   TestAnalyzeSpecLoaderMetrics_CriticalSeverity
+=== PAUSE TestAnalyzeSpecLoaderMetrics_CriticalSeverity
+=== RUN   TestAnalyzeSpecLoaderMetrics_TimeoutRate
+=== PAUSE TestAnalyzeSpecLoaderMetrics_TimeoutRate
+=== RUN   TestLogSpecLoaderMetricsAnalysis
+=== PAUSE TestLogSpecLoaderMetricsAnalysis
+=== RUN   TestGetRecommendedSemaphoreCapacity_NoData
+=== PAUSE TestGetRecommendedSemaphoreCapacity_NoData
+=== RUN   TestRunStaleCASCleanupForResults_EmptyResults
+=== PAUSE TestRunStaleCASCleanupForResults_EmptyResults
+=== CONT  TestResolveSpecFieldOperation
+--- PASS: TestResolveSpecFieldOperation (0.00s)
+=== CONT  TestAnalyzeSpecLoaderMetrics_HighContention
+=== CONT  TestAnalyzeSpecLoaderMetrics_CriticalSeverity
+--- PASS: TestAnalyzeSpecLoaderMetrics_HighContention (0.00s)
+=== CONT  TestFieldOperation_ResolvedOperation
+--- PASS: TestFieldOperation_ResolvedOperation (0.00s)
+=== CONT  TestAnalyzeSpecLoaderMetrics_LowSeverity
+--- PASS: TestAnalyzeSpecLoaderMetrics_LowSeverity (0.00s)
+=== CONT  TestFieldOpRequiresDefinitionFile
+--- PASS: TestFieldOpRequiresDefinitionFile (0.00s)
+=== CONT  TestGetRecommendedSemaphoreCapacity_NoData
+--- PASS: TestAnalyzeSpecLoaderMetrics_CriticalSeverity (0.00s)
+=== CONT  TestLogSpecLoaderMetricsAnalysis
+--- PASS: TestGetRecommendedSemaphoreCapacity_NoData (0.00s)
+=== CONT  TestRunStaleCASCleanupForResults_EmptyResults
+--- PASS: TestRunStaleCASCleanupForResults_EmptyResults (0.00s)
+=== CONT  TestAnalyzeSpecLoaderMetrics_TimeoutRate
+--- PASS: TestAnalyzeSpecLoaderMetrics_TimeoutRate (0.00s)
+--- PASS: TestLogSpecLoaderMetricsAnalysis (0.00s)
+PASS
+ok  	github.com/lanceman/zqk/cmd/zqk/system	0.720s

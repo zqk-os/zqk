@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-771",
+  "created_at": "2026-09-04T21:34:34.972766Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-771",
+    "Tests": [
+      {
+        "Name": "TestSuperviseStatusPayload_Diagnostics",
+        "Package": "mcp",
+        "PackagePath": "cmd/zqk/mcp",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/mcp/daemon_control_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestDaemonCommandWiresTCPFlag",
+        "Package": "mcp",
+        "PackagePath": "cmd/zqk/mcp",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/mcp/daemon_tcp_smoke_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestSetDetach",
+        "Package": "mcp",
+        "PackagePath": "cmd/zqk/mcp",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/mcp/detach_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestEnsureCommandWiresTCPFlag",
+        "Package": "mcp",
+        "PackagePath": "cmd/zqk/mcp",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/mcp/ensure_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestResolveMCPDaemonBinPathPrefersZQKBinOverStable",
+        "Package": "mcp",
+        "PackagePath": "cmd/zqk/mcp",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/mcp/ensure_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestResolveMCPDaemonBinPathPrefersStableOverTip",
+        "Package": "mcp",
+        "PackagePath": "cmd/zqk/mcp",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/mcp/ensure_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestOSSignalTriggersShutdown",
+        "Package": "mcp",
+        "PackagePath": "cmd/zqk/mcp",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/mcp/mcp_shutdown_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestNewMCPCmd_wiresEnsureSuperviseDaemonProxy",
+        "Package": "mcp",
+        "PackagePath": "cmd/zqk/mcp",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/mcp/mcp_wiring_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestServeCommandFlags",
+        "Package": "mcp",
+        "PackagePath": "cmd/zqk/mcp",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/mcp/mcp_wiring_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestProxyCmd_RunProxy",
+        "Package": "mcp",
+        "PackagePath": "cmd/zqk/mcp",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/mcp/proxy_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 300000000000,
+    "PackagePath": "cmd/zqk/mcp"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestSuperviseStatusPayload_Diagnostics",
+      "Package": "mcp",
+      "PackagePath": "cmd/zqk/mcp",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/mcp/daemon_control_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestDaemonCommandWiresTCPFlag",
+      "Package": "mcp",
+      "PackagePath": "cmd/zqk/mcp",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/mcp/daemon_tcp_smoke_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestSetDetach",
+      "Package": "mcp",
+      "PackagePath": "cmd/zqk/mcp",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/mcp/detach_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestEnsureCommandWiresTCPFlag",
+      "Package": "mcp",
+      "PackagePath": "cmd/zqk/mcp",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/mcp/ensure_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestResolveMCPDaemonBinPathPrefersZQKBinOverStable",
+      "Package": "mcp",
+      "PackagePath": "cmd/zqk/mcp",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/mcp/ensure_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestResolveMCPDaemonBinPathPrefersStableOverTip",
+      "Package": "mcp",
+      "PackagePath": "cmd/zqk/mcp",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/mcp/ensure_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestOSSignalTriggersShutdown",
+      "Package": "mcp",
+      "PackagePath": "cmd/zqk/mcp",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/mcp/mcp_shutdown_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestNewMCPCmd_wiresEnsureSuperviseDaemonProxy",
+      "Package": "mcp",
+      "PackagePath": "cmd/zqk/mcp",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/mcp/mcp_wiring_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestServeCommandFlags",
+      "Package": "mcp",
+      "PackagePath": "cmd/zqk/mcp",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/mcp/mcp_wiring_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestProxyCmd_RunProxy",
+      "Package": "mcp",
+      "PackagePath": "cmd/zqk/mcp",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/mcp/proxy_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

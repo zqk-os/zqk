@@ -1,0 +1,14 @@
+created_at: "2026-08-19T07:45:05Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1787125499278716000-4fcf76bf
+item_id: REDACTED
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 2857702ca28e4b64fb5782140b43c1400e68fdeab30ab0062f4119523ca97d466e5f13c72adcfa41b92eacf21fa7f0a79b8a8e3a8d7c581e5c9afe0e69cb31dc
+schema_version: 2.0.0
+signature: 3045022100a29cd0e083d9049244ea60a7e3f5b0ae6f4dfbb928d22915a7b9b058b8f60f4602204f8c6ea1b43b272e906d9f0721eb82f5e8777b5e951e47e9a903c584681444f1
+status: archived
+title: 'Acceptance: Core-object archive aggregate+compress'
+updated_at: "2026-09-01T07:23:20Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

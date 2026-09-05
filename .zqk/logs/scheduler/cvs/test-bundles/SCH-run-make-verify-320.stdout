@@ -1,0 +1,44 @@
+
+--- run 2026-09-04T22:11:20Z ---
+=== RUN   TestFormatAvailableToolsSuffix_namesOnly
+=== PAUSE TestFormatAvailableToolsSuffix_namesOnly
+=== RUN   TestFormatLLMTrace_includesPromptAndResponse
+=== PAUSE TestFormatLLMTrace_includesPromptAndResponse
+=== RUN   TestToolChannelHint_hermes
+=== PAUSE TestToolChannelHint_hermes
+=== RUN   TestIsEagerTool_writeCodeIsEager
+=== PAUSE TestIsEagerTool_writeCodeIsEager
+=== RUN   TestMCPChildEnviron_keepsProjectRootSetsWorktree
+=== PAUSE TestMCPChildEnviron_keepsProjectRootSetsWorktree
+=== RUN   TestExecuteToolCall_mcpCallToolRejectsShellName
+=== PAUSE TestExecuteToolCall_mcpCallToolRejectsShellName
+=== RUN   TestNormalizeToolName_prefersExactLazyWriteCode
+=== PAUSE TestNormalizeToolName_prefersExactLazyWriteCode
+=== RUN   TestCodeDraftToolNames_excludesLookup
+=== PAUSE TestCodeDraftToolNames_excludesLookup
+=== RUN   TestFilterToolsByAllowlist
+=== PAUSE TestFilterToolsByAllowlist
+=== RUN   TestApplyCodeDraftHarness
+=== PAUSE TestApplyCodeDraftHarness
+=== CONT  TestFormatAvailableToolsSuffix_namesOnly
+=== CONT  TestExecuteToolCall_mcpCallToolRejectsShellName
+--- PASS: TestFormatAvailableToolsSuffix_namesOnly (0.00s)
+=== CONT  TestFilterToolsByAllowlist
+--- PASS: TestFilterToolsByAllowlist (0.00s)
+=== CONT  TestApplyCodeDraftHarness
+--- PASS: TestApplyCodeDraftHarness (0.00s)
+=== CONT  TestIsEagerTool_writeCodeIsEager
+--- PASS: TestIsEagerTool_writeCodeIsEager (0.00s)
+=== CONT  TestMCPChildEnviron_keepsProjectRootSetsWorktree
+--- PASS: TestMCPChildEnviron_keepsProjectRootSetsWorktree (0.00s)
+=== CONT  TestCodeDraftToolNames_excludesLookup
+--- PASS: TestCodeDraftToolNames_excludesLookup (0.00s)
+=== CONT  TestToolChannelHint_hermes
+--- PASS: TestToolChannelHint_hermes (0.00s)
+=== CONT  TestFormatLLMTrace_includesPromptAndResponse
+--- PASS: TestFormatLLMTrace_includesPromptAndResponse (0.00s)
+=== CONT  TestNormalizeToolName_prefersExactLazyWriteCode
+--- PASS: TestNormalizeToolName_prefersExactLazyWriteCode (0.00s)
+--- PASS: TestExecuteToolCall_mcpCallToolRejectsShellName (0.00s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/swarm	0.637s

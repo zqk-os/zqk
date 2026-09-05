@@ -1,0 +1,14 @@
+created_at: "2026-08-20T00:48:03Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1787186882197183000-5f664422
+item_id: BLI-CEF-R7-COMPARE-001
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 2857702ca28e4b64fb5782140b43c1400e68fdeab30ab0062f4119523ca97d466e5f13c72adcfa41b92eacf21fa7f0a79b8a8e3a8d7c581e5c9afe0e69cb31dc
+schema_version: 2.0.0
+signature: 304402206776a68706bf7e27cff9b1ca278708da9698fe274d543acb94c373fa6dab7a4b022003cdc1e08ba09c69070002bdf28dc2c4ff647b6b077e5c452a5e83ec7d7fac06
+status: archived
+title: Write R7 COMPARE after both scrupulous packages exist
+updated_at: "2026-09-01T07:47:02Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

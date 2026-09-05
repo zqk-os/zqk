@@ -1,0 +1,60 @@
+{
+  "schema": "zqk_tpm_groom_ahead_v1",
+  "measured_at": "2026-09-01T16:34:39Z",
+  "policy_id": "POL-AGENT-TPM-GROOM-AHEAD-001",
+  "lead_priority_plan": "PRI-CEF-REMEDIATE-FAILCLOSED-001",
+  "seal": "held",
+  "lead_counts": {
+    "planned": 0,
+    "in_progress": 10,
+    "complete": 0
+  },
+  "align_age_policy": "fresh_skip",
+  "draft_plane": {
+    "count": 2,
+    "promote": false,
+    "items": [
+      {
+        "id": "ATK-1788242482010632000-d8b3ef9a",
+        "action": "leave_do_not_promote"
+      },
+      {
+        "id": "BLI-TRACK-STORAGE-SPLIT-001",
+        "action": "leave_do_not_promote"
+      }
+    ]
+  },
+  "next_priority_plans": [
+    {
+      "id": "PRI-HOLDING-POST-LAUNCH-001",
+      "claim": false
+    },
+    {
+      "id": "PRI-OPENCORE-PUBLISH-001",
+      "claim": false
+    },
+    {
+      "id": "PRI-REQ-RESIDUAL-TRACE-001",
+      "claim": false
+    },
+    {
+      "id": "PRI-TECH-DEBT-PLANNED-001",
+      "claim": false
+    }
+  ],
+  "executing_non_lead": {
+    "id": "PRI-CEF-REMEDIATE-STRUCTURE-001",
+    "seat": "antigravity-2",
+    "in_progress": [
+      "BLI-CEF-STORAGE-DECOMPOSE-001"
+    ],
+    "planned_remaining": 7,
+    "do_not_orch_until_storage_slice_lands": true
+  },
+  "policy_interrupt": {
+    "dedupe_key": "qa-disparity-BLI-COMPLETE-HOP-WIRE-VERIFYCOMPLETE-001",
+    "acked": false,
+    "reason": "BLI complete but commit_refs empty and test_refs null; do not ack-all; do not mint KEY-AUDITOR"
+  },
+  "align_refreshed": true
+}

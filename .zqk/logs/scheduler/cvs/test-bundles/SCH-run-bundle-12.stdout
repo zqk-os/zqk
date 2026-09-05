@@ -1,0 +1,48 @@
+
+--- run 2026-09-04T22:23:17Z ---
+=== RUN   TestNewAgentSkillLifecycleBuilder
+=== PAUSE TestNewAgentSkillLifecycleBuilder
+=== RUN   TestConvergenceSessionLifecycleBuilder_DraftToActiveAdmission
+=== PAUSE TestConvergenceSessionLifecycleBuilder_DraftToActiveAdmission
+=== RUN   TestNewDivisionLifecycleBuilder
+=== PAUSE TestNewDivisionLifecycleBuilder
+=== RUN   TestNewOrganizationLifecycleBuilder
+=== PAUSE TestNewOrganizationLifecycleBuilder
+=== RUN   TestNewPersonaLifecycleBuilder
+=== PAUSE TestNewPersonaLifecycleBuilder
+=== CONT  TestNewAgentSkillLifecycleBuilder
+--- PASS: TestNewAgentSkillLifecycleBuilder (0.00s)
+=== CONT  TestNewPersonaLifecycleBuilder
+--- PASS: TestNewPersonaLifecycleBuilder (0.00s)
+=== CONT  TestNewDivisionLifecycleBuilder
+--- PASS: TestNewDivisionLifecycleBuilder (0.00s)
+=== CONT  TestConvergenceSessionLifecycleBuilder_DraftToActiveAdmission
+--- PASS: TestConvergenceSessionLifecycleBuilder_DraftToActiveAdmission (0.00s)
+=== CONT  TestNewOrganizationLifecycleBuilder
+--- PASS: TestNewOrganizationLifecycleBuilder (0.00s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/specbuilder/bldr_lifecycle_v1	0.568s
+
+--- run 2026-09-05T05:56:49Z ---
+=== RUN   TestSchedulerJobRetentionHandler_Execute_NoOldJobs
+--- PASS: TestSchedulerJobRetentionHandler_Execute_NoOldJobs (0.49s)
+=== RUN   TestSchedulerJobRetentionHandler_Execute_ZeroRetentionDays
+--- PASS: TestSchedulerJobRetentionHandler_Execute_ZeroRetentionDays (1.66s)
+=== RUN   TestCacheInvalidationHandler_Execute
+--- PASS: TestCacheInvalidationHandler_Execute (0.32s)
+=== RUN   TestCacheInvalidationHandler_MissingEventData
+--- PASS: TestCacheInvalidationHandler_MissingEventData (0.26s)
+=== RUN   TestObjectValidationHandler_MissingEventData
+--- PASS: TestObjectValidationHandler_MissingEventData (0.28s)
+=== RUN   TestObjectValidationHandler_InvalidEventData
+--- PASS: TestObjectValidationHandler_InvalidEventData (0.25s)
+=== RUN   TestObjectValidationHandler_MissingKindOrID
+--- PASS: TestObjectValidationHandler_MissingKindOrID (0.39s)
+=== RUN   TestObjectValidationHandler_AcceptsBatchFormat
+--- PASS: TestObjectValidationHandler_AcceptsBatchFormat (0.37s)
+=== RUN   TestCascadeUpdateHandler_Execute
+--- PASS: TestCascadeUpdateHandler_Execute (0.36s)
+=== RUN   TestCascadeUpdateHandler_MissingParameters
+--- PASS: TestCascadeUpdateHandler_MissingParameters (0.31s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/scheduler	5.555s

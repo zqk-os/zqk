@@ -1,0 +1,33 @@
+{
+  "name": "make-verify-295",
+  "created_at": "2026-09-04T21:34:30.292865Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-295",
+    "Tests": [
+      {
+        "Name": "TestEncodeMetricsSnapshotForPersistence",
+        "Package": "provider",
+        "PackagePath": "pkg/graph/provider",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/graph/provider/metrics_snapshot_encode_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": true,
+    "EstimatedDuration": 30000000000,
+    "PackagePath": "pkg/graph/provider"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestEncodeMetricsSnapshotForPersistence",
+      "Package": "provider",
+      "PackagePath": "pkg/graph/provider",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/graph/provider/metrics_snapshot_encode_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

@@ -1,0 +1,14 @@
+created_at: "2026-08-19T06:52:10Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1787122324951003000-093d0b48
+item_id: REDACTED
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 2857702ca28e4b64fb5782140b43c1400e68fdeab30ab0062f4119523ca97d466e5f13c72adcfa41b92eacf21fa7f0a79b8a8e3a8d7c581e5c9afe0e69cb31dc
+schema_version: 2.0.0
+signature: 3046022100bdcd428a78dc63a40f25f97391b67f2b5490ecc72e7dc827872f71d89a336f6b0221009671c0aa93d677a28ee647d57b4929b06c7c051046ddf61141a0f57c7014c6bd
+status: archived
+title: Recover mega PRI-bdc4dd36 BLIs stuck in status=error (D11 lifecycle trap)
+updated_at: "2026-09-01T07:30:18Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

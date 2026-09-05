@@ -1,0 +1,14 @@
+created_at: "2026-08-19T10:17:05Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1787134624315640000-4db81423
+item_id: BLI-COMMUNITY-GIT-EVIDENCE-STEWARD-001
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 2857702ca28e4b64fb5782140b43c1400e68fdeab30ab0062f4119523ca97d466e5f13c72adcfa41b92eacf21fa7f0a79b8a8e3a8d7c581e5c9afe0e69cb31dc
+schema_version: 2.0.0
+signature: 30450220637d51977d957265d0d2132e16cac97d93acb9fba4252e170298d556d7ef575d022100d54605731e3f72ce16e6a520d888faed5cb164df4c47b8aaf1a28e1753d007c0
+status: archived
+title: Git mutation evidence steward automated verification & fail-closed CI gate
+updated_at: "2026-09-01T07:37:08Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

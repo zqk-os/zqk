@@ -1,0 +1,159 @@
+{
+  "name": "make-verify-94",
+  "created_at": "2026-09-04T21:34:28.295677Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-94",
+    "Tests": [
+      {
+        "Name": "TestAdapter_InitializeNoElicitationAndToolsList",
+        "Package": "ideadapter",
+        "PackagePath": "pkg/mcp/ideadapter",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/ideadapter/adapter_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAdapter_ControlResponsesNeverOnStdio",
+        "Package": "ideadapter",
+        "PackagePath": "pkg/mcp/ideadapter",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/ideadapter/adapter_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestDefaultConfig_UsesIDEProxyClient",
+        "Package": "ideadapter",
+        "PackagePath": "pkg/mcp/ideadapter",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/ideadapter/adapter_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAdapter_RunSurvivesCanceledContext",
+        "Package": "ideadapter",
+        "PackagePath": "pkg/mcp/ideadapter",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/ideadapter/adapter_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestDaemonSession_CallIgnoresCanceledParent",
+        "Package": "ideadapter",
+        "PackagePath": "pkg/mcp/ideadapter",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/ideadapter/adapter_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestDaemonSession_CloseCancelsInFlightCall",
+        "Package": "ideadapter",
+        "PackagePath": "pkg/mcp/ideadapter",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/ideadapter/adapter_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestSetDiagLogRoot_andDiagf",
+        "Package": "ideadapter",
+        "PackagePath": "pkg/mcp/ideadapter",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/ideadapter/diag_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestSetDiagLogRoot_emptyDisables",
+        "Package": "ideadapter",
+        "PackagePath": "pkg/mcp/ideadapter",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/ideadapter/diag_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 240000000000,
+    "PackagePath": "pkg/mcp/ideadapter"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestAdapter_InitializeNoElicitationAndToolsList",
+      "Package": "ideadapter",
+      "PackagePath": "pkg/mcp/ideadapter",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/ideadapter/adapter_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestAdapter_ControlResponsesNeverOnStdio",
+      "Package": "ideadapter",
+      "PackagePath": "pkg/mcp/ideadapter",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/ideadapter/adapter_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestDefaultConfig_UsesIDEProxyClient",
+      "Package": "ideadapter",
+      "PackagePath": "pkg/mcp/ideadapter",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/ideadapter/adapter_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestAdapter_RunSurvivesCanceledContext",
+      "Package": "ideadapter",
+      "PackagePath": "pkg/mcp/ideadapter",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/ideadapter/adapter_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestDaemonSession_CallIgnoresCanceledParent",
+      "Package": "ideadapter",
+      "PackagePath": "pkg/mcp/ideadapter",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/ideadapter/adapter_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestDaemonSession_CloseCancelsInFlightCall",
+      "Package": "ideadapter",
+      "PackagePath": "pkg/mcp/ideadapter",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/ideadapter/adapter_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestSetDiagLogRoot_andDiagf",
+      "Package": "ideadapter",
+      "PackagePath": "pkg/mcp/ideadapter",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/ideadapter/diag_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestSetDiagLogRoot_emptyDisables",
+      "Package": "ideadapter",
+      "PackagePath": "pkg/mcp/ideadapter",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/ideadapter/diag_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

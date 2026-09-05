@@ -1,0 +1,14 @@
+created_at: "2026-08-19T01:27:56Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1787102875246674000-d841b955
+item_id: REDACTED
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 2857702ca28e4b64fb5782140b43c1400e68fdeab30ab0062f4119523ca97d466e5f13c72adcfa41b92eacf21fa7f0a79b8a8e3a8d7c581e5c9afe0e69cb31dc
+schema_version: 2.0.0
+signature: 30440220165a29389d1357babae7806ce65f24458d623d5a269e2b03c529e29f7a2ef7d4022014b2d3b9c4c9db2ccfd473dffdb118faf519036bcf24bc88766b13f70b8c2413
+status: archived
+title: Strategic-kind status vocabulary — goals/REQ/RIS/CRIT/ATK semantics + teeth
+updated_at: "2026-09-01T07:18:48Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

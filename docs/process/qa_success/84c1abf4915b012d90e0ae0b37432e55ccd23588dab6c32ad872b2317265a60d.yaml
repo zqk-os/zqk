@@ -1,0 +1,14 @@
+created_at: "2026-08-19T03:02:02Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1787108517036883000-b6e66a4f
+item_id: BLI-FUEL-COMMS-CURSOR-TPM-LIVE-WAKE-001
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 2857702ca28e4b64fb5782140b43c1400e68fdeab30ab0062f4119523ca97d466e5f13c72adcfa41b92eacf21fa7f0a79b8a8e3a8d7c581e5c9afe0e69cb31dc
+schema_version: 2.0.0
+signature: 3045022100c799dc029b859055ae3e9cab5077e9a5405ff55d6b0c7827da80286efa98590502203b9bdc50bfaa803b802e5bd7aa8484b5ed81b82bb34235ad16d92396683503d5
+status: archived
+title: 'Fuel: COMMS Cursor TPM live wake plan activation'
+updated_at: "2026-09-01T07:30:05Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

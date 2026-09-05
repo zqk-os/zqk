@@ -1,0 +1,90 @@
+{
+  "metadata": {
+    "version": "2.0",
+    "build_time": "2026-09-04T23:07:13.604291Z",
+    "project_root": "/Users/lanceettl/zqk-restore-clone",
+    "entry_count": 18
+  },
+  "buckets": {
+    "audit_event": {
+      "cache_update": {
+        "AUD-2002": {
+          "created_at": "2026-09-04T23:07:13Z"
+        }
+      },
+      "hash_registry_batch_start": {
+        "AUD-2005": {
+          "created_at": "2026-09-04T23:07:13Z"
+        }
+      },
+      "listing_index_batch_complete": {
+        "AUD-2000": {
+          "created_at": "2026-09-04T23:07:13Z"
+        }
+      },
+      "listing_index_batch_start": {
+        "AUD-1995": {
+          "created_at": "2026-09-04T23:07:13Z"
+        },
+        "AUD-1999": {
+          "created_at": "2026-09-04T23:07:13Z"
+        }
+      },
+      "object_creation": {
+        "AUD-1988": {
+          "created_at": "2026-09-04T23:07:12Z"
+        },
+        "AUD-1997": {
+          "created_at": "2026-09-04T23:07:13Z"
+        }
+      },
+      "system_config_change": {
+        "AUD-1974": {
+          "created_at": "2026-09-04T23:07:12Z"
+        },
+        "AUD-1990": {
+          "created_at": "2026-09-04T23:07:12Z"
+        },
+        "AUD-1991": {
+          "created_at": "2026-09-04T23:07:12Z"
+        },
+        "AUD-1992": {
+          "created_at": "2026-09-04T23:07:12Z"
+        },
+        "AUD-1994": {
+          "created_at": "2026-09-04T23:07:13Z"
+        }
+      }
+    },
+    "base_metric": {
+      "": {
+        "BAS-1788563233041606000-c82c1123": {
+          "created_at": "2026-09-04T23:07:13Z"
+        },
+        "BAS-1788563233321102000-c1d9f7a5": {
+          "created_at": "2026-09-04T23:07:13Z"
+        },
+        "BAS-1788563233381783000-1475d131": {
+          "created_at": "2026-09-04T23:07:13Z"
+        }
+      }
+    },
+    "change_journal_entry": {
+      "": {
+        "CHA-21401": {
+          "created_at": "2026-09-04T23:07:12Z"
+        },
+        "CHA-21402": {
+          "created_at": "2026-09-04T23:07:13Z"
+        }
+      }
+    },
+    "zqk_session": {
+      "": {
+        "ZQK-6275": {
+          "created_at": "2026-09-04T23:07:12Z"
+        }
+      }
+    }
+  }
+}

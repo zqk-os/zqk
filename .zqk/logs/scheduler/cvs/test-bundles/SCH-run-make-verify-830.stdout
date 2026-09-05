@@ -1,0 +1,28 @@
+
+--- run 2026-09-04T22:23:01Z ---
+=== RUN   TestGuardManualStatusUpdate_refusesWithoutOverride
+=== PAUSE TestGuardManualStatusUpdate_refusesWithoutOverride
+=== RUN   TestGuardManualStatusUpdate_autoStatusAllowed
+=== PAUSE TestGuardManualStatusUpdate_autoStatusAllowed
+=== RUN   TestGuardManualStatusUpdate_nonStatusPasses
+=== PAUSE TestGuardManualStatusUpdate_nonStatusPasses
+=== RUN   TestWstransCommandsExist
+=== PAUSE TestWstransCommandsExist
+=== RUN   TestWstransShowHasRunE
+=== PAUSE TestWstransShowHasRunE
+=== RUN   TestWstransListHasRunE
+=== PAUSE TestWstransListHasRunE
+=== CONT  TestGuardManualStatusUpdate_refusesWithoutOverride
+=== CONT  TestWstransCommandsExist
+--- PASS: TestGuardManualStatusUpdate_refusesWithoutOverride (0.00s)
+=== CONT  TestWstransListHasRunE
+--- PASS: TestWstransListHasRunE (0.00s)
+=== CONT  TestGuardManualStatusUpdate_nonStatusPasses
+--- PASS: TestGuardManualStatusUpdate_nonStatusPasses (0.00s)
+=== CONT  TestWstransShowHasRunE
+--- PASS: TestWstransShowHasRunE (0.00s)
+=== CONT  TestGuardManualStatusUpdate_autoStatusAllowed
+--- PASS: TestGuardManualStatusUpdate_autoStatusAllowed (0.00s)
+--- PASS: TestWstransCommandsExist (0.00s)
+PASS
+ok  	github.com/lanceman/zqk/cmd/zqk/object	0.727s

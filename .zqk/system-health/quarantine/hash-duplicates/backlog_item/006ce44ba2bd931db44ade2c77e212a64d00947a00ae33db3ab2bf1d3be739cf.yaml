@@ -1,0 +1,29 @@
+acceptance_considerations: Residuals linked to REQ/CRIT or deferred with reason
+created_at: "2026-09-04T07:32:18Z"
+created_by: ACC-1785920548450214006-2e52b3e7
+criteria_refs:
+    - CRIT-1785885889228395000-15c56d02
+description: CEF R28 — objectify remesure residuals into shovelable BLIs
+estimated_effort: medium
+goal_refs:
+    - GOAL-CEF-SEC-FAILCLOSED
+id: BLI-CEF-R28-OBJECTIFY-RESIDUALS-001
+kind: backlog_item
+milestone_refs:
+    - MIL-001
+namespace_id: zqk:kernel
+persona_refs:
+    - PER-DEFAULT-AGENT
+priority: high
+priority_plan_ref: PRI-CEF-R28-REMEDIATE-001
+priority_tier: P1
+problem_statement: Findings/adversarials under cef-runs need tracked work items not chat debt.
+requirement_refs:
+    - REQ-CEF-R19-EVIDENCE-001
+schema_version: 2.0.0
+started_at: "2026-09-04T21:45:42Z"
+status: in_progress
+title: CEF R28 — objectify remesure residuals into shovelable BLIs
+updated_at: "2026-09-04T21:45:42Z"
+updated_by: ACC-1785920548450214006-2e52b3e7
+version_context: default

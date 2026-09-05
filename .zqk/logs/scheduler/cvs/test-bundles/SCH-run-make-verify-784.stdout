@@ -1,0 +1,44 @@
+
+--- run 2026-09-04T22:21:45Z ---
+=== RUN   TestNormalizeStatusForKind_UnknownFailsClosed
+=== PAUSE TestNormalizeStatusForKind_UnknownFailsClosed
+=== RUN   TestPlanWhatsNextCandidateStatuses_IncludesGrooming
+=== PAUSE TestPlanWhatsNextCandidateStatuses_IncludesGrooming
+=== RUN   TestPlanHasWrittenIdentity_PrefersInheritedTitle
+=== PAUSE TestPlanHasWrittenIdentity_PrefersInheritedTitle
+=== RUN   TestPlanHasWorkstreamLane_PluralOrSingular
+=== PAUSE TestPlanHasWorkstreamLane_PluralOrSingular
+=== RUN   TestBacklogCountsAsExecutionFuel
+=== PAUSE TestBacklogCountsAsExecutionFuel
+=== RUN   TestPlanSeatedPersonaBonus
+=== PAUSE TestPlanSeatedPersonaBonus
+=== RUN   TestParseLifecycleYAMLDir_RepoParses
+=== PAUSE TestParseLifecycleYAMLDir_RepoParses
+=== RUN   TestParseConfigYAMLDir_RepoParses
+=== PAUSE TestParseConfigYAMLDir_RepoParses
+=== RUN   TestParseLifecycleYAMLDir_SmashedBoolFlag
+=== PAUSE TestParseLifecycleYAMLDir_SmashedBoolFlag
+=== RUN   TestParseLifecycleYAMLDir_UnquotedColonPostcondition
+=== PAUSE TestParseLifecycleYAMLDir_UnquotedColonPostcondition
+=== CONT  TestNormalizeStatusForKind_UnknownFailsClosed
+=== CONT  TestPlanSeatedPersonaBonus
+--- PASS: TestPlanSeatedPersonaBonus (0.00s)
+=== CONT  TestPlanHasWorkstreamLane_PluralOrSingular
+--- PASS: TestPlanHasWorkstreamLane_PluralOrSingular (0.00s)
+=== CONT  TestBacklogCountsAsExecutionFuel
+--- PASS: TestNormalizeStatusForKind_UnknownFailsClosed (0.00s)
+=== CONT  TestParseLifecycleYAMLDir_SmashedBoolFlag
+--- PASS: TestBacklogCountsAsExecutionFuel (0.00s)
+=== CONT  TestParseLifecycleYAMLDir_UnquotedColonPostcondition
+--- PASS: TestParseLifecycleYAMLDir_SmashedBoolFlag (0.02s)
+=== CONT  TestParseConfigYAMLDir_RepoParses
+--- PASS: TestParseLifecycleYAMLDir_UnquotedColonPostcondition (0.02s)
+=== CONT  TestPlanHasWrittenIdentity_PrefersInheritedTitle
+--- PASS: TestPlanHasWrittenIdentity_PrefersInheritedTitle (0.00s)
+=== CONT  TestPlanWhatsNextCandidateStatuses_IncludesGrooming
+--- PASS: TestPlanWhatsNextCandidateStatuses_IncludesGrooming (0.00s)
+=== CONT  TestParseLifecycleYAMLDir_RepoParses
+--- PASS: TestParseConfigYAMLDir_RepoParses (0.01s)
+--- PASS: TestParseLifecycleYAMLDir_RepoParses (0.04s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/objects	0.628s

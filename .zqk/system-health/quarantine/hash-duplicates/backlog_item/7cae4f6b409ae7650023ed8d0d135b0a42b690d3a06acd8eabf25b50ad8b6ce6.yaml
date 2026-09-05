@@ -1,0 +1,19 @@
+acceptance_considerations: SEC axis >=4 on both seats after remesure
+created_at: "2026-09-04T07:32:15Z"
+created_by: ACC-1785920548450214006-2e52b3e7
+description: CEF R28 — lift StubAuthHook / SEC grade from 2
+goal_refs:
+    - GOAL-CEF-SEC-FAILCLOSED
+id: BLI-CEF-R28-SEC-STUB-AUTH-001
+kind: backlog_item
+namespace_id: zqk:kernel
+priority_plan_ref: PRI-CEF-R28-REMEDIATE-001
+problem_statement: 2026-09-03 dual-seat remesure SEC=2 from stub auth; path-honest findings need real remediation.
+requirement_refs:
+    - REQ-CEF-R19-EVIDENCE-001
+schema_version: 2.0.0
+status: validated
+title: CEF R28 — lift StubAuthHook / SEC grade from 2
+updated_at: "2026-09-04T07:36:21Z"
+updated_by: ACC-1785920548450214006-2e52b3e7
+version_context: default

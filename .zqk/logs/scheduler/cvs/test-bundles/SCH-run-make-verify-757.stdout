@@ -1,0 +1,16 @@
+
+--- run 2026-09-04T22:21:08Z ---
+=== RUN   TestOutputEquivalence
+=== PAUSE TestOutputEquivalence
+=== RUN   TestAdapterIntegration
+=== PAUSE TestAdapterIntegration
+=== RUN   TestAdapterValidation
+=== PAUSE TestAdapterValidation
+=== CONT  TestOutputEquivalence
+=== CONT  TestAdapterValidation
+--- PASS: TestAdapterValidation (0.00s)
+=== CONT  TestAdapterIntegration
+--- PASS: TestAdapterIntegration (0.00s)
+--- PASS: TestOutputEquivalence (0.01s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/specbuilder/adapters	0.592s

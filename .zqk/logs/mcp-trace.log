@@ -1,0 +1,1026 @@
+[2026-09-05 03:28:47.251] [MCP_INFO] Trace logging initialized successfully
+[2026-09-05 03:28:47.251] [MCP_SPEC] name=* state=storage_unavailable reason=storage provider not set
+[2026-09-05 03:28:47.252] [MCP_SPEC] name=example_onboarding.yaml state=fallback_selected source=/Users/lanceettl/zqk-restore-clone/.zqk/mcp/specs/example_onboarding.yaml reason=storage provider not set
+[2026-09-05 03:28:47.252] [MCP_SPEC] name=example_tools.yaml state=fallback_selected source=/Users/lanceettl/zqk-restore-clone/.zqk/mcp/specs/example_tools.yaml reason=storage provider not set
+[2026-09-05 03:28:47.252] [MCP_DEBUG] Waiting for message from client: event=waiting_for_message
+[2026-09-05 03:28:47.253] [MCP_DEBUG] Message read completed successfully, timeout reset: event=message_read_success
+[2026-09-05 03:28:47.253] [MCP_DEBUG] Request received: method=initialize id=1
+[2026-09-05 03:28:47.253] [MCP_DEBUG] initialize called: current_state=initialized:false, tools_count=11
+[2026-09-05 03:28:47.253] [MCP_DEBUG] prepareReinitialization: first initialization, keeping existing tools (count=11)
+[2026-09-05 03:28:47.253] [MCP_DEBUG] registerToolsAndResources: starting with 11 tools
+[2026-09-05 03:28:47.253] [MCP_SPEC] name=onboarding_prompts state=storage_unavailable reason=storage provider is not configured
+[2026-09-05 03:28:47.253] [MCP_SPEC] name=onboarding_prompts state=fallback_selected source=programmatic reason=storage provider is not configured
+[2026-09-05 03:28:47.253] [MCP_DEBUG] registerToolsAndResources: registered tools, now have 32 tools (was 11)
+[2026-09-05 03:28:47.254] [MCP_DEBUG] registerToolsAndResources: tool names: [zqk_get_tool_metrics zqk_create_object_interactive zqk_observer_search zqk_resolve_references zqk_object_get zqk_report_blockers zqk_report_vitality zqk_report_qa_success zqk_get_next_backlog_item zqk_report_pcs zqk_ide_bridge_request zqk_read_file zqk_server_shutdown zqk_system_status zqk_report_maturation zqk_test_echo zqk_graph_traversal zqk_report_edd zqk_get_current_priority_plan zqk_system_check zqk_chat_send zqk_write_file zqk_read_code zqk_write_code custom_analysis zqk_get_priority_plan_items zqk_get_current_backlog_item zqk_get_metrics zqk_object_list zqk_execute_bash zqk_state_aware_query zqk_object_count]
+[2026-09-05 03:28:47.254] [MCP_SPEC] name=critical_resources state=storage_unavailable reason=storage provider is not configured
+[2026-09-05 03:28:47.254] [MCP_WARN] Failed to load critical resources spec: MCP server initialization failed: critical resources spec file not found in any of the expected locations. Checked paths: [.zqk/mcp_specs/critical_resources.yaml docs/process/mcp_specs/critical_resources.yaml mcp_specs/critical_resources.yaml]. Please create a critical_resources.yaml spec file in one of these locations or ensure mcp_spec objects are available in storage.. Server will continue without critical resources.
+[2026-09-05 03:28:47.254] [MCP_SPEC] name=critical_resources state=storage_unavailable reason=storage provider is not configured
+[2026-09-05 03:28:47.269] [MCP_DEBUG] registerToolsAndResources: applied tools allowlist, 32 -> 14 tools
+[2026-09-05 03:28:47.269] [MCP_DEBUG] registerToolsAndResources: completed, final tool count=14
+[2026-09-05 03:28:47.269] [MCP_DEBUG] About to set initialized=true: tools_count=14
+[2026-09-05 03:28:47.269] [MCP_INFO] MCP server ready: tools_count=14
+[2026-09-05 03:28:47.270] [MCP_DEBUG] Response queued: id=1 success=true active=true
+[2026-09-05 03:28:47.270] [MCP_DEBUG] Waiting for message from client: event=waiting_for_message
+[2026-09-05 03:28:47.270] [MCP_DEBUG] Response written: id=1 success=true
+[2026-09-05 03:28:47.270] [MCP_DEBUG] Message read completed successfully, timeout reset: event=message_read_success
+[2026-09-05 03:28:47.275] [MCP_DEBUG] Notification received: method=notifications/initialized
+[2026-09-05 03:28:47.275] [MCP_DEBUG] Notification processed: method=notifications/initialized state=handled
+[2026-09-05 03:28:47.275] [MCP_DEBUG] Waiting for message from client: event=waiting_for_message
+[2026-09-05 03:28:47.275] [MCP_DEBUG] Message read completed successfully, timeout reset: event=message_read_success
+[2026-09-05 03:28:47.275] [MCP_DEBUG] Request received: method=tools/list id=2
+[2026-09-05 03:28:47.276] [MCP_DEBUG] tools/list called: initialized=true, tools_count=14, rootCommand=false
+[2026-09-05 03:28:47.276] [MCP_DEBUG] tools/list: registered tools: [zqk_object_get zqk_ide_bridge_request zqk_read_file zqk_system_status zqk_get_current_priority_plan zqk_chat_send zqk_write_file zqk_read_code zqk_write_code zqk_get_current_backlog_item zqk_object_list zqk_execute_bash zqk_object_count zqk_observer_search] (count=14)
+[2026-09-05 03:28:47.276] [MCP_DEBUG] tools/list: cached tools count=14
+[2026-09-05 03:28:47.276] [MCP_DEBUG] tools/list: returning 14 tools (initialized=true, rootCommand=false)
+[2026-09-05 03:28:47.276] [MCP_DEBUG] Response queued: id=2 success=true active=true
+[2026-09-05 03:28:47.276] [MCP_DEBUG] Waiting for message from client: event=waiting_for_message
+[2026-09-05 03:28:47.276] [MCP_DEBUG] Response written: id=2 success=true
+[2026-09-05 03:28:47.286] [MCP_DEBUG] Server initialization complete: initialized=true tools_count=14
+[2026-09-05 03:28:47.287] [MCP_INFO] Client initialized and ready: client_id=admin__client_1788578927253291000_1788578927 tools=14 prompts=12
+[2026-09-05 03:28:47.376] [MCP_INFO] ← Welcome message sent to client: client_id=admin_client_1788578927253291000_1788578927
+[2026-09-05 03:29:07.868] [MCP_DEBUG] Message read completed successfully, timeout reset: event=message_read_success
+[2026-09-05 03:29:07.868] [MCP_DEBUG] Request received: method=tools/call id=3
+[2026-09-05 03:29:07.869] [MCP_TRACE] → Tool call started: tool=zqk_system_status client_id=admin_client_1788578927253291000_1788578927
+[2026-09-05 03:29:09.626] [MCP_CLI_DIAG] path=/Users/lanceettl/zqk-restore-clone/bin/zqk-stable dir=/Users/lanceettl/zqk-restore-clone args=[system status --format json --context mcp] duration=1.756439625s stderr_len=0 err=<nil>
+[2026-09-05 03:29:09.626] [MCP_TRACE] ← Tool call completed: tool=zqk_system_status, duration=1.75761125s client_id=admin_client_1788578927253291000_1788578927
+[2026-09-05 03:29:09.627] [MCP_DEBUG] Response queued: id=3 success=true active=true
+[2026-09-05 03:29:09.627] [MCP_DEBUG] Waiting for message from client: event=waiting_for_message
+[2026-09-05 03:29:09.627] [MCP_DEBUG] Response written: id=3 success=true
+[2026-09-05 03:29:09.627] [MCP_DEBUG] Message read completed successfully, timeout reset: event=message_read_success
+[2026-09-05 03:29:09.627] [MCP_DEBUG] Request received: method=tools/call id=4
+[2026-09-05 03:29:09.627] [MCP_TRACE] → Tool call started: tool=zqk_object_get client_id=admin_client_1788578927253291000_1788578927
+[2026-09-05 03:29:11.211] [MCP_CLI_DIAG] path=/Users/lanceettl/zqk-restore-clone/bin/zqk-stable dir=/Users/lanceettl/zqk-restore-clone args=[object get ATK-1788578918915515000-f7638cab --format json --context mcp] duration=1.583506042s stderr_len=0 err=<nil>
+[2026-09-05 03:29:11.211] [MCP_TRACE] ← Tool call completed: tool=zqk_object_get, duration=1.584185334s client_id=admin_client_1788578927253291000_1788578927
+[2026-09-05 03:29:11.211] [MCP_DEBUG] Response queued: id=4 success=true active=true
+[2026-09-05 03:29:11.211] [MCP_DEBUG] Waiting for message from client: event=waiting_for_message
+[2026-09-05 03:29:11.211] [MCP_DEBUG] Response written: id=4 success=true
+[2026-09-05 03:29:18.991] [MCP_DEBUG] Message read completed successfully, timeout reset: event=message_read_success
+[2026-09-05 03:29:18.991] [MCP_DEBUG] Request received: method=tools/call id=5
+[2026-09-05 03:29:18.991] [MCP_TRACE] → Tool call started: tool=zqk_object_get client_id=admin_client_1788578927253291000_1788578927
+[2026-09-05 03:29:22.184] [MCP_CLI_DIAG] path=/Users/lanceettl/zqk-restore-clone/bin/zqk-stable dir=/Users/lanceettl/zqk-restore-clone args=[object get PRI-OPENCORE-PUBLISH-001 --format json --context mcp] duration=3.192774709s stderr_len=0 err=<nil>
+[2026-09-05 03:29:22.185] [MCP_TRACE] ← Tool call completed: tool=zqk_object_get, duration=3.1935605s client_id=admin_client_1788578927253291000_1788578927
+[2026-09-05 03:29:22.185] [MCP_DEBUG] Response queued: id=5 success=true active=true
+[2026-09-05 03:29:22.185] [MCP_DEBUG] Waiting for message from client: event=waiting_for_message
+[2026-09-05 03:29:22.185] [MCP_DEBUG] Response written: id=5 success=true
+[2026-09-05 03:29:35.492] [MCP_DEBUG] Message read completed successfully, timeout reset: event=message_read_success
+[2026-09-05 03:29:35.492] [MCP_DEBUG] Request received: method=tools/call id=6
+[2026-09-05 03:29:35.492] [MCP_TRACE] → Tool call started: tool=zqk_observer_search client_id=admin_client_1788578927253291000_1788578927
+[2026-09-05 03:29:36.393] [MCP_TRACE] ← Tool call completed: tool=zqk_observer_search, duration=900.758ms client_id=admin_client_1788578927253291000_1788578927
+[2026-09-05 03:29:36.395] [MCP_DEBUG] Response queued: id=6 success=true active=true
+[2026-09-05 03:29:36.395] [MCP_DEBUG] Waiting for message from client: event=waiting_for_message
+[2026-09-05 03:29:36.395] [MCP_DEBUG] Response written: id=6 success=true
+[2026-09-05 03:29:36.396] [MCP_DEBUG] Message read completed successfully, timeout reset: event=message_read_success
+[2026-09-05 03:29:36.396] [MCP_DEBUG] Request received: method=tools/call id=7
+[2026-09-05 03:29:36.396] [MCP_TRACE] → Tool call started: tool=zqk_observer_search client_id=admin_client_1788578927253291000_1788578927
+[2026-09-05 03:29:37.823] [MCP_TRACE] ← Tool call completed: tool=zqk_observer_search, duration=1.427343416s client_id=admin_client_1788578927253291000_1788578927
+[2026-09-05 03:29:37.823] [MCP_DEBUG] Response written: id=7 success=true
+[2026-09-05 03:29:37.823] [MCP_DEBUG] Response queued: id=7 success=true active=true
+[2026-09-05 03:29:37.824] [MCP_DEBUG] Waiting for message from client: event=waiting_for_message
+[2026-09-05 03:29:45.480] [MCP_DEBUG] Message read completed successfully, timeout reset: event=message_read_success
+[2026-09-05 03:29:45.480] [MCP_DEBUG] Request received: method=tools/call id=8
+[2026-09-05 03:29:45.480] [MCP_TRACE] → Tool call started: tool=zqk_observer_search client_id=admin_client_1788578927253291000_1788578927
+[2026-09-05 03:29:46.032] [MCP_TRACE] ← Tool call completed: tool=zqk_observer_search, duration=551.969709ms client_id=admin_client_1788578927253291000_1788578927
+[2026-09-05 03:29:46.032] [MCP_DEBUG] Response queued: id=8 success=true active=true
+[2026-09-05 03:29:46.032] [MCP_DEBUG] Waiting for message from client: event=waiting_for_message
+[2026-09-05 03:29:46.032] [MCP_DEBUG] Response written: id=8 success=true
+[2026-09-05 03:29:46.032] [MCP_DEBUG] Message read completed successfully, timeout reset: event=message_read_success
+[2026-09-05 03:29:46.032] [MCP_DEBUG] Request received: method=tools/call id=9
+[2026-09-05 03:29:46.032] [MCP_TRACE] → Tool call started: tool=zqk_observer_search client_id=admin_client_1788578927253291000_1788578927
+[2026-09-05 03:29:47.324] [MCP_TRACE] ← Tool call completed: tool=zqk_observer_search, duration=1.291353792s client_id=admin_client_1788578927253291000_1788578927
+[2026-09-05 03:29:47.324] [MCP_DEBUG] Response queued: id=9 success=true active=true
+[2026-09-05 03:29:47.324] [MCP_DEBUG] Waiting for message from client: event=waiting_for_message
+[2026-09-05 03:29:47.324] [MCP_DEBUG] Response written: id=9 success=true
+[2026-09-05 03:29:50.499] [MCP_DEBUG] Message read completed successfully, timeout reset: event=message_read_success
+[2026-09-05 03:29:50.499] [MCP_DEBUG] Request received: method=tools/call id=10
+[2026-09-05 03:29:50.499] [MCP_TRACE] → Tool call started: tool=zqk_read_code client_id=admin_client_1788578927253291000_1788578927
+[2026-09-05 03:29:50.500] [MCP_TRACE] ← Tool call completed: tool=zqk_read_code, duration=878.333µs client_id=admin_client_1788578927253291000_1788578927
+[2026-09-05 03:29:50.500] [MCP_DEBUG] Response queued: id=10 success=true active=true
+[2026-09-05 03:29:50.500] [MCP_DEBUG] Waiting for message from client: event=waiting_for_message
+[2026-09-05 03:29:50.500] [MCP_DEBUG] Response written: id=10 success=true
+[2026-09-05 03:30:11.451] [MCP_DEBUG] Message read completed successfully, timeout reset: event=message_read_success
+[2026-09-05 03:30:11.451] [MCP_DEBUG] Request received: method=tools/call id=11
+[2026-09-05 03:30:11.451] [MCP_TRACE] → Tool call started: tool=zqk_observer_search client_id=admin_client_1788578927253291000_1788578927
+[2026-09-05 03:30:12.767] [MCP_TRACE] ← Tool call completed: tool=zqk_observer_search, duration=1.316088625s client_id=admin_client_1788578927253291000_1788578927
+[2026-09-05 03:30:12.767] [MCP_DEBUG] Response queued: id=11 success=true active=true
+[2026-09-05 03:30:12.767] [MCP_DEBUG] Waiting for message from client: event=waiting_for_message
+[2026-09-05 03:30:12.767] [MCP_DEBUG] Response written: id=11 success=true
+[2026-09-05 03:30:12.768] [MCP_DEBUG] Message read completed successfully, timeout reset: event=message_read_success
+[2026-09-05 03:30:12.768] [MCP_DEBUG] Request received: method=tools/call id=12
+[2026-09-05 03:30:12.768] [MCP_TRACE] → Tool call started: tool=zqk_object_list client_id=admin_client_1788578927253291000_1788578927
+[2026-09-05 03:30:29.040] [MCP_CLI_DIAG] path=/Users/lanceettl/zqk-restore-clone/bin/zqk-stable dir=/Users/lanceettl/zqk-restore-clone args=[object list backlog_item --filter status=in_progress --limit 10 --context mcp] duration=16.247405875s stderr_len=0 err=<nil>
+[2026-09-05 03:30:29.041] [MCP_TRACE] ← Tool call completed: tool=zqk_object_list, duration=16.248140833s client_id=admin_client_1788578927253291000_1788578927
+[2026-09-05 03:30:29.041] [MCP_DEBUG] Response queued: id=12 success=true active=true
+[2026-09-05 03:30:29.041] [MCP_DEBUG] Waiting for message from client: event=waiting_for_message
+[2026-09-05 03:30:29.041] [MCP_DEBUG] Response written: id=12 success=true
+[2026-09-05 03:30:38.781] [MCP_DEBUG] Message read completed successfully, timeout reset: event=message_read_success
+[2026-09-05 03:30:38.781] [MCP_DEBUG] Request received: method=tools/call id=13
+[2026-09-05 03:30:38.786] [MCP_TRACE] → Tool call started: tool=zqk_read_code client_id=admin_client_1788578927253291000_1788578927
+[2026-09-05 03:30:38.787] [MCP_TRACE] ← Tool call completed: tool=zqk_read_code, duration=1.346583ms client_id=admin_client_1788578927253291000_1788578927
+[2026-09-05 03:30:38.788] [MCP_DEBUG] Response queued: id=13 success=true active=true
+[2026-09-05 03:30:38.788] [MCP_DEBUG] Waiting for message from client: event=waiting_for_message
+[2026-09-05 03:30:38.788] [MCP_DEBUG] Response written: id=13 success=true
+[2026-09-05 03:30:50.667] [MCP_DEBUG] Message read completed successfully, timeout reset: event=message_read_success
+[2026-09-05 03:30:50.668] [MCP_DEBUG] Request received: method=tools/call id=14
+[2026-09-05 03:30:50.668] [MCP_TRACE] → Tool call started: tool=zqk_observer_search client_id=admin_client_1788578927253291000_1788578927
+[2026-09-05 03:30:50.680] [MCP_TRACE] ← Tool call completed: tool=zqk_observer_search, duration=12.700625ms client_id=admin_client_1788578927253291000_1788578927
+[2026-09-05 03:30:50.684] [MCP_DEBUG] Response queued: id=14 success=true active=true
+[2026-09-05 03:30:50.684] [MCP_DEBUG] Waiting for message from client: event=waiting_for_message
+[2026-09-05 03:30:50.684] [MCP_DEBUG] Response written: id=14 success=true
+[2026-09-05 03:31:59.548] [MCP_DEBUG] Message read completed successfully, timeout reset: event=message_read_success
+[2026-09-05 03:31:59.548] [MCP_DEBUG] Request received: method=tools/call id=15
+[2026-09-05 03:31:59.548] [MCP_TRACE] → Tool call started: tool=zqk_write_file client_id=admin_client_1788578927253291000_1788578927
+[2026-09-05 03:31:59.549] [MCP_TRACE] ← Tool call completed: tool=zqk_write_file, duration=496.666µs client_id=admin_client_1788578927253291000_1788578927
+[2026-09-05 03:31:59.549] [MCP_DEBUG] Response queued: id=15 success=true active=true
+[2026-09-05 03:31:59.549] [MCP_DEBUG] Waiting for message from client: event=waiting_for_message
+[2026-09-05 03:31:59.549] [MCP_DEBUG] Response written: id=15 success=true
+[2026-09-05 03:32:44.839] [MCP_DEBUG] Message read completed successfully, timeout reset: event=message_read_success
+[2026-09-05 03:32:44.839] [MCP_DEBUG] Request received: method=tools/call id=16
+[2026-09-05 03:32:44.840] [MCP_TRACE] → Tool call started: tool=zqk_write_file client_id=admin_client_1788578927253291000_1788578927
+[2026-09-05 03:32:44.840] [MCP_TRACE] ← Tool call completed: tool=zqk_write_file, duration=662.041µs client_id=admin_client_1788578927253291000_1788578927
+[2026-09-05 03:32:44.840] [MCP_DEBUG] Response queued: id=16 success=true active=true
+[2026-09-05 03:32:44.840] [MCP_DEBUG] Waiting for message from client: event=waiting_for_message
+[2026-09-05 03:32:44.840] [MCP_DEBUG] Response written: id=16 success=true
+[2026-09-05 03:33:15.421] [MCP_DEBUG] Message read completed successfully, timeout reset: event=message_read_success
+[2026-09-05 03:33:15.421] [MCP_DEBUG] Request received: method=tools/call id=17
+[2026-09-05 03:33:15.421] [MCP_TRACE] → Tool call started: tool=zqk_write_file client_id=admin_client_1788578927253291000_1788578927
+[2026-09-05 03:33:15.468] [MCP_TRACE] ← Tool call completed: tool=zqk_write_file, duration=46.190125ms client_id=admin_client_1788578927253291000_1788578927
+[2026-09-05 03:33:15.468] [MCP_DEBUG] Response queued: id=17 success=true active=true
+[2026-09-05 03:33:15.468] [MCP_DEBUG] Waiting for message from client: event=waiting_for_message
+[2026-09-05 03:33:15.468] [MCP_DEBUG] Response written: id=17 success=true
+[2026-09-05 03:33:27.909] [MCP_DEBUG] Message read completed successfully, timeout reset: event=message_read_success
+[2026-09-05 03:33:27.910] [MCP_DEBUG] Request received: method=tools/call id=18
+[2026-09-05 03:33:27.910] [MCP_TRACE] → Tool call started: tool=zqk_system_status client_id=admin_client_1788578927253291000_1788578927
+[2026-09-05 03:33:31.135] [MCP_CLI_DIAG] path=/Users/lanceettl/zqk-restore-clone/bin/zqk-stable dir=/Users/lanceettl/zqk-restore-clone args=[system status --context mcp] duration=3.224879917s stderr_len=0 err=<nil>
+[2026-09-05 03:33:31.136] [MCP_TRACE] ← Tool call completed: tool=zqk_system_status, duration=3.22650925s client_id=admin_client_1788578927253291000_1788578927
+[2026-09-05 03:33:31.136] [MCP_DEBUG] Response queued: id=18 success=true active=true
+[2026-09-05 03:33:31.136] [MCP_DEBUG] Waiting for message from client: event=waiting_for_message
+[2026-09-05 03:33:31.137] [MCP_DEBUG] Response written: id=18 success=true
+[2026-09-05 03:33:49.969] [MCP_DEBUG] Message read completed successfully, timeout reset: event=message_read_success
+[2026-09-05 03:33:49.969] [MCP_DEBUG] Request received: method=tools/call id=19
+[2026-09-05 03:33:49.970] [MCP_TRACE] → Tool call started: tool=zqk_read_code client_id=admin_client_1788578927253291000_1788578927
+[2026-09-05 03:33:49.970] [MCP_TRACE] ← Tool call completed: tool=zqk_read_code, duration=773.083µs client_id=admin_client_1788578927253291000_1788578927
+[2026-09-05 03:33:49.971] [MCP_DEBUG] Response queued: id=19 success=true active=true
+[2026-09-05 03:33:49.971] [MCP_DEBUG] Waiting for message from client: event=waiting_for_message
+[2026-09-05 03:33:49.971] [MCP_DEBUG] Response written: id=19 success=true
+[2026-09-05 03:34:25.797] [MCP_DEBUG] Message read completed successfully, timeout reset: event=message_read_success
+[2026-09-05 03:34:25.797] [MCP_DEBUG] Request received: method=tools/call id=20
+[2026-09-05 03:34:25.797] [MCP_TRACE] → Tool call started: tool=zqk_write_file client_id=admin_client_1788578927253291000_1788578927
+[2026-09-05 03:34:25.798] [MCP_TRACE] ← Tool call completed: tool=zqk_write_file, duration=914.417µs client_id=admin_client_1788578927253291000_1788578927
+[2026-09-05 03:34:25.798] [MCP_DEBUG] Response queued: id=20 success=true active=true
+[2026-09-05 03:34:25.798] [MCP_DEBUG] Waiting for message from client: event=waiting_for_message
+[2026-09-05 03:34:25.798] [MCP_DEBUG] Response written: id=20 success=true
+[2026-09-05 03:34:45.510] [MCP_DEBUG] Message read completed successfully, timeout reset: event=message_read_success
+[2026-09-05 03:34:45.511] [MCP_DEBUG] Request received: method=tools/call id=21
+[2026-09-05 03:34:45.511] [MCP_TRACE] → Tool call started: tool=zqk_read_code client_id=admin_client_1788578927253291000_1788578927
+[2026-09-05 03:34:45.511] [MCP_TRACE] ← Tool call completed: tool=zqk_read_code, duration=723.542µs client_id=admin_client_1788578927253291000_1788578927
+[2026-09-05 03:34:45.511] [MCP_DEBUG] Response queued: id=21 success=true active=true
+[2026-09-05 03:34:45.511] [MCP_DEBUG] Waiting for message from client: event=waiting_for_message
+[2026-09-05 03:34:45.511] [MCP_DEBUG] Response written: id=21 success=true
+[2026-09-05 03:35:18.673] [MCP_DEBUG] Message read completed successfully, timeout reset: event=message_read_success
+[2026-09-05 03:35:18.674] [MCP_DEBUG] Request received: method=tools/call id=22
+[2026-09-05 03:35:18.674] [MCP_TRACE] → Tool call started: tool=zqk_read_code client_id=admin_client_1788578927253291000_1788578927
+[2026-09-05 03:35:18.675] [MCP_TRACE] ← Tool call completed: tool=zqk_read_code, duration=1.441125ms client_id=admin_client_1788578927253291000_1788578927
+[2026-09-05 03:35:18.675] [MCP_DEBUG] Response queued: id=22 success=true active=true
+[2026-09-05 03:35:18.675] [MCP_DEBUG] Waiting for message from client: event=waiting_for_message
+[2026-09-05 03:35:18.675] [MCP_DEBUG] Response written: id=22 success=true
+[2026-09-05 03:35:42.616] [MCP_INFO] Trace logging initialized successfully
+[2026-09-05 03:35:42.622] [MCP_SPEC] name=* state=storage_unavailable reason=storage provider not set
+[2026-09-05 03:35:42.623] [MCP_SPEC] name=example_onboarding.yaml state=fallback_selected source=/Users/lanceettl/zqk-restore-clone/.zqk/mcp/specs/example_onboarding.yaml reason=storage provider not set
+[2026-09-05 03:35:42.626] [MCP_SPEC] name=example_tools.yaml state=fallback_selected source=/Users/lanceettl/zqk-restore-clone/.zqk/mcp/specs/example_tools.yaml reason=storage provider not set
+[2026-09-05 03:35:42.627] [MCP_DEBUG] Waiting for message from client: event=waiting_for_message
+[2026-09-05 03:35:42.627] [MCP_DEBUG] Message read completed successfully, timeout reset: event=message_read_success
+[2026-09-05 03:35:42.627] [MCP_DEBUG] Request received: method=initialize id=1
+[2026-09-05 03:35:42.627] [MCP_DEBUG] initialize called: current_state=initialized:false, tools_count=11
+[2026-09-05 03:35:42.627] [MCP_DEBUG] prepareReinitialization: first initialization, keeping existing tools (count=11)
+[2026-09-05 03:35:42.627] [MCP_DEBUG] registerToolsAndResources: starting with 11 tools
+[2026-09-05 03:35:42.628] [MCP_SPEC] name=onboarding_prompts state=storage_unavailable reason=storage provider is not configured
+[2026-09-05 03:35:42.628] [MCP_SPEC] name=onboarding_prompts state=fallback_selected source=programmatic reason=storage provider is not configured
+[2026-09-05 03:35:42.628] [MCP_DEBUG] registerToolsAndResources: registered tools, now have 32 tools (was 11)
+[2026-09-05 03:35:42.628] [MCP_DEBUG] registerToolsAndResources: tool names: [zqk_system_status zqk_system_check zqk_get_next_backlog_item zqk_get_tool_metrics zqk_report_maturation custom_analysis zqk_graph_traversal zqk_get_current_priority_plan zqk_execute_bash zqk_server_shutdown zqk_object_get zqk_chat_send zqk_resolve_references zqk_state_aware_query zqk_get_current_backlog_item zqk_test_echo zqk_create_object_interactive zqk_report_pcs zqk_object_list zqk_read_code zqk_write_code zqk_get_priority_plan_items zqk_object_count zqk_get_metrics zqk_report_edd zqk_observer_search zqk_ide_bridge_request zqk_read_file zqk_write_file zqk_report_blockers zqk_report_vitality zqk_report_qa_success]
+[2026-09-05 03:35:42.628] [MCP_SPEC] name=critical_resources state=storage_unavailable reason=storage provider is not configured
+[2026-09-05 03:35:42.628] [MCP_SPEC] name=critical_resources state=storage_unavailable reason=storage provider is not configured
+[2026-09-05 03:35:42.628] [MCP_WARN] Failed to load critical resources spec: MCP server initialization failed: critical resources spec file not found in any of the expected locations. Checked paths: [.zqk/mcp_specs/critical_resources.yaml docs/process/mcp_specs/critical_resources.yaml mcp_specs/critical_resources.yaml]. Please create a critical_resources.yaml spec file in one of these locations or ensure mcp_spec objects are available in storage.. Server will continue without critical resources.
+[2026-09-05 03:35:42.655] [MCP_DEBUG] registerToolsAndResources: applied tools allowlist, 32 -> 14 tools
+[2026-09-05 03:35:42.655] [MCP_DEBUG] registerToolsAndResources: completed, final tool count=14
+[2026-09-05 03:35:42.655] [MCP_DEBUG] About to set initialized=true: tools_count=14
+[2026-09-05 03:35:42.655] [MCP_INFO] MCP server ready: tools_count=14
+[2026-09-05 03:35:42.655] [MCP_DEBUG] Response queued: id=1 success=true active=true
+[2026-09-05 03:35:42.655] [MCP_DEBUG] Waiting for message from client: event=waiting_for_message
+[2026-09-05 03:35:42.655] [MCP_DEBUG] Response written: id=1 success=true
+[2026-09-05 03:35:42.655] [MCP_DEBUG] Message read completed successfully, timeout reset: event=message_read_success
+[2026-09-05 03:35:42.655] [MCP_DEBUG] Notification received: method=notifications/initialized
+[2026-09-05 03:35:42.657] [MCP_DEBUG] Notification processed: method=notifications/initialized state=handled
+[2026-09-05 03:35:42.657] [MCP_DEBUG] Waiting for message from client: event=waiting_for_message
+[2026-09-05 03:35:42.657] [MCP_DEBUG] Message read completed successfully, timeout reset: event=message_read_success
+[2026-09-05 03:35:42.657] [MCP_DEBUG] Request received: method=tools/list id=2
+[2026-09-05 03:35:42.657] [MCP_DEBUG] tools/list called: initialized=true, tools_count=14, rootCommand=false
+[2026-09-05 03:35:42.657] [MCP_DEBUG] tools/list: registered tools: [zqk_object_list zqk_read_code zqk_write_code zqk_object_count zqk_observer_search zqk_ide_bridge_request zqk_read_file zqk_write_file zqk_system_status zqk_get_current_priority_plan zqk_execute_bash zqk_object_get zqk_chat_send zqk_get_current_backlog_item] (count=14)
+[2026-09-05 03:35:42.657] [MCP_DEBUG] tools/list: cached tools count=14
+[2026-09-05 03:35:42.657] [MCP_DEBUG] tools/list: returning 14 tools (initialized=true, rootCommand=false)
+[2026-09-05 03:35:42.657] [MCP_DEBUG] Response queued: id=2 success=true active=true
+[2026-09-05 03:35:42.657] [MCP_DEBUG] Waiting for message from client: event=waiting_for_message
+[2026-09-05 03:35:42.657] [MCP_DEBUG] Response written: id=2 success=true
+[2026-09-05 03:35:42.666] [MCP_DEBUG] Server initialization complete: initialized=true tools_count=14
+[2026-09-05 03:35:42.666] [MCP_INFO] Client initialized and ready: client_id=admin__client_1788579342627608000_1788579342 tools=14 prompts=12
+[2026-09-05 03:35:42.757] [MCP_INFO] ← Welcome message sent to client: client_id=admin_client_1788579342627608000_1788579342
+[2026-09-05 03:35:53.090] [MCP_DEBUG] Message read completed successfully, timeout reset: event=message_read_success
+[2026-09-05 03:35:53.091] [MCP_DEBUG] Request received: method=tools/call id=3
+[2026-09-05 03:35:53.091] [MCP_TRACE] → Tool call started: tool=zqk_object_get client_id=admin_client_1788579342627608000_1788579342
+[2026-09-05 03:35:56.839] [MCP_CLI_DIAG] path=/Users/lanceettl/zqk-restore-clone/bin/zqk-stable dir=/Users/lanceettl/zqk-restore-clone args=[object get POL-ONBOARD-001 --context mcp] duration=3.74763275s stderr_len=0 err=<nil>
+[2026-09-05 03:35:56.839] [MCP_TRACE] ← Tool call completed: tool=zqk_object_get, duration=3.748685417s client_id=admin_client_1788579342627608000_1788579342
+[2026-09-05 03:35:56.840] [MCP_DEBUG] Response queued: id=3 success=true active=true
+[2026-09-05 03:35:56.840] [MCP_DEBUG] Waiting for message from client: event=waiting_for_message
+[2026-09-05 03:35:56.840] [MCP_DEBUG] Response written: id=3 success=true
+[2026-09-05 03:35:56.840] [MCP_DEBUG] Message read completed successfully, timeout reset: event=message_read_success
+[2026-09-05 03:35:56.840] [MCP_DEBUG] Request received: method=tools/call id=4
+[2026-09-05 03:35:56.841] [MCP_TRACE] → Tool call started: tool=zqk_object_get client_id=admin_client_1788579342627608000_1788579342
+[2026-09-05 03:36:00.957] [MCP_CLI_DIAG] path=/Users/lanceettl/zqk-restore-clone/bin/zqk-stable dir=/Users/lanceettl/zqk-restore-clone args=[object get POL-ONBOARD-002 --context mcp] duration=4.115846292s stderr_len=0 err=<nil>
+[2026-09-05 03:36:00.957] [MCP_TRACE] ← Tool call completed: tool=zqk_object_get, duration=4.116538875s client_id=admin_client_1788579342627608000_1788579342
+[2026-09-05 03:36:00.957] [MCP_DEBUG] Response queued: id=4 success=true active=true
+[2026-09-05 03:36:00.957] [MCP_DEBUG] Waiting for message from client: event=waiting_for_message
+[2026-09-05 03:36:00.957] [MCP_DEBUG] Response written: id=4 success=true
+[2026-09-05 03:36:00.958] [MCP_DEBUG] Message read completed successfully, timeout reset: event=message_read_success
+[2026-09-05 03:36:00.958] [MCP_DEBUG] Request received: method=tools/call id=5
+[2026-09-05 03:36:00.958] [MCP_TRACE] → Tool call started: tool=zqk_object_get client_id=admin_client_1788579342627608000_1788579342
+[2026-09-05 03:36:06.659] [MCP_CLI_DIAG] path=/Users/lanceettl/zqk-restore-clone/bin/zqk-stable dir=/Users/lanceettl/zqk-restore-clone args=[object get POL-WORKFLOW-VDS --context mcp] duration=5.7004475s stderr_len=0 err=<nil>
+[2026-09-05 03:36:06.660] [MCP_TRACE] ← Tool call completed: tool=zqk_object_get, duration=5.702008958s client_id=admin_client_1788579342627608000_1788579342
+[2026-09-05 03:36:06.660] [MCP_DEBUG] Response queued: id=5 success=true active=true
+[2026-09-05 03:36:06.660] [MCP_DEBUG] Waiting for message from client: event=waiting_for_message
+[2026-09-05 03:36:06.660] [MCP_DEBUG] Response written: id=5 success=true
+[2026-09-05 03:36:06.668] [MCP_DEBUG] Message read completed successfully, timeout reset: event=message_read_success
+[2026-09-05 03:36:06.668] [MCP_DEBUG] Request received: method=tools/call id=6
+[2026-09-05 03:36:06.669] [MCP_TRACE] → Tool call started: tool=zqk_object_get client_id=admin_client_1788579342627608000_1788579342
+[2026-09-05 03:36:12.373] [MCP_CLI_DIAG] path=/Users/lanceettl/zqk-restore-clone/bin/zqk-stable dir=/Users/lanceettl/zqk-restore-clone args=[object get ASK-DEFAULT-FEED-CORRESPONDENCE --context mcp] duration=5.704067125s stderr_len=0 err=<nil>
+[2026-09-05 03:36:12.378] [MCP_TRACE] ← Tool call completed: tool=zqk_object_get, duration=5.709252708s client_id=admin_client_1788579342627608000_1788579342
+[2026-09-05 03:36:12.378] [MCP_DEBUG] Response queued: id=6 success=true active=true
+[2026-09-05 03:36:12.378] [MCP_DEBUG] Waiting for message from client: event=waiting_for_message
+[2026-09-05 03:36:12.378] [MCP_DEBUG] Response written: id=6 success=true
+[2026-09-05 03:36:33.106] [MCP_DEBUG] Message read completed successfully, timeout reset: event=message_read_success
+[2026-09-05 03:36:33.106] [MCP_DEBUG] Request received: method=tools/call id=7
+[2026-09-05 03:36:33.106] [MCP_TRACE] → Tool call started: tool=zqk_read_file client_id=admin_client_1788579342627608000_1788579342
+[2026-09-05 03:36:33.106] [MCP_ERROR] ✗ Tool call failed: tool=zqk_read_file, duration=91.292µs, error=open /go.mod: no such file or directory client_id=admin_client_1788579342627608000_1788579342
+[2026-09-05 03:36:33.106] [MCP_DEBUG] Response queued: id=7 success=true active=true
+[2026-09-05 03:36:33.106] [MCP_DEBUG] Waiting for message from client: event=waiting_for_message
+[2026-09-05 03:36:33.106] [MCP_DEBUG] Response written: id=7 success=true
+[2026-09-05 03:36:35.344] [MCP_DEBUG] Message read completed successfully, timeout reset: event=message_read_success
+[2026-09-05 03:36:35.344] [MCP_DEBUG] Request received: method=tools/call id=8
+[2026-09-05 03:36:35.344] [MCP_TRACE] → Tool call started: tool=zqk_observer_search client_id=admin_client_1788579342627608000_1788579342
+[2026-09-05 03:36:37.264] [MCP_INFO] Trace logging initialized successfully
+[2026-09-05 03:36:37.264] [MCP_SPEC] name=* state=storage_unavailable reason=storage provider not set
+[2026-09-05 03:36:37.265] [MCP_SPEC] name=example_onboarding.yaml state=fallback_selected source=/Users/lanceettl/zqk-restore-clone/.zqk/mcp/specs/example_onboarding.yaml reason=storage provider not set
+[2026-09-05 03:36:37.266] [MCP_SPEC] name=example_tools.yaml state=fallback_selected source=/Users/lanceettl/zqk-restore-clone/.zqk/mcp/specs/example_tools.yaml reason=storage provider not set
+[2026-09-05 03:36:37.266] [MCP_DEBUG] Waiting for message from client: event=waiting_for_message
+[2026-09-05 03:36:37.266] [MCP_DEBUG] Message read completed successfully, timeout reset: event=message_read_success
+[2026-09-05 03:36:37.266] [MCP_DEBUG] Request received: method=initialize id=1
+[2026-09-05 03:36:37.266] [MCP_DEBUG] initialize called: current_state=initialized:false, tools_count=11
+[2026-09-05 03:36:37.266] [MCP_DEBUG] prepareReinitialization: first initialization, keeping existing tools (count=11)
+[2026-09-05 03:36:37.266] [MCP_DEBUG] registerToolsAndResources: starting with 11 tools
+[2026-09-05 03:36:37.267] [MCP_SPEC] name=onboarding_prompts state=storage_unavailable reason=storage provider is not configured
+[2026-09-05 03:36:37.267] [MCP_SPEC] name=onboarding_prompts state=fallback_selected source=programmatic reason=storage provider is not configured
+[2026-09-05 03:36:37.267] [MCP_DEBUG] registerToolsAndResources: registered tools, now have 32 tools (was 11)
+[2026-09-05 03:36:37.267] [MCP_DEBUG] registerToolsAndResources: tool names: [zqk_read_file zqk_report_vitality zqk_report_qa_success zqk_test_echo zqk_get_current_priority_plan zqk_resolve_references zqk_object_get zqk_system_check zqk_report_maturation zqk_observer_search zqk_write_file zqk_read_code zqk_chat_send zqk_object_list zqk_create_object_interactive zqk_server_shutdown zqk_system_status zqk_get_priority_plan_items zqk_get_current_backlog_item zqk_get_metrics zqk_write_code zqk_state_aware_query zqk_graph_traversal zqk_execute_bash custom_analysis zqk_object_count zqk_report_pcs zqk_get_tool_metrics zqk_ide_bridge_request zqk_get_next_backlog_item zqk_report_edd zqk_report_blockers]
+[2026-09-05 03:36:37.267] [MCP_SPEC] name=critical_resources state=storage_unavailable reason=storage provider is not configured
+[2026-09-05 03:36:37.267] [MCP_SPEC] name=critical_resources state=storage_unavailable reason=storage provider is not configured
+[2026-09-05 03:36:37.267] [MCP_WARN] Failed to load critical resources spec: MCP server initialization failed: critical resources spec file not found in any of the expected locations. Checked paths: [.zqk/mcp_specs/critical_resources.yaml docs/process/mcp_specs/critical_resources.yaml mcp_specs/critical_resources.yaml]. Please create a critical_resources.yaml spec file in one of these locations or ensure mcp_spec objects are available in storage.. Server will continue without critical resources.
+[2026-09-05 03:36:37.277] [MCP_DEBUG] registerToolsAndResources: applied tools allowlist, 32 -> 14 tools
+[2026-09-05 03:36:37.277] [MCP_DEBUG] registerToolsAndResources: completed, final tool count=14
+[2026-09-05 03:36:37.277] [MCP_DEBUG] About to set initialized=true: tools_count=14
+[2026-09-05 03:36:37.277] [MCP_INFO] MCP server ready: tools_count=14
+[2026-09-05 03:36:37.277] [MCP_DEBUG] Response queued: id=1 success=true active=true
+[2026-09-05 03:36:37.277] [MCP_DEBUG] Waiting for message from client: event=waiting_for_message
+[2026-09-05 03:36:37.277] [MCP_DEBUG] Response written: id=1 success=true
+[2026-09-05 03:36:37.278] [MCP_DEBUG] Message read completed successfully, timeout reset: event=message_read_success
+[2026-09-05 03:36:37.278] [MCP_DEBUG] Notification received: method=notifications/initialized
+[2026-09-05 03:36:37.278] [MCP_DEBUG] Notification processed: method=notifications/initialized state=handled
+[2026-09-05 03:36:37.278] [MCP_DEBUG] Waiting for message from client: event=waiting_for_message
+[2026-09-05 03:36:37.278] [MCP_DEBUG] Message read completed successfully, timeout reset: event=message_read_success
+[2026-09-05 03:36:37.278] [MCP_DEBUG] Request received: method=tools/list id=2
+[2026-09-05 03:36:37.278] [MCP_DEBUG] tools/list called: initialized=true, tools_count=14, rootCommand=false
+[2026-09-05 03:36:37.278] [MCP_DEBUG] tools/list: registered tools: [zqk_ide_bridge_request zqk_read_file zqk_get_current_priority_plan zqk_object_get zqk_observer_search zqk_write_file zqk_read_code zqk_chat_send zqk_object_list zqk_system_status zqk_get_current_backlog_item zqk_write_code zqk_execute_bash zqk_object_count] (count=14)
+[2026-09-05 03:36:37.278] [MCP_DEBUG] tools/list: cached tools count=14
+[2026-09-05 03:36:37.278] [MCP_DEBUG] tools/list: returning 14 tools (initialized=true, rootCommand=false)
+[2026-09-05 03:36:37.278] [MCP_DEBUG] Response queued: id=2 success=true active=true
+[2026-09-05 03:36:37.278] [MCP_DEBUG] Waiting for message from client: event=waiting_for_message
+[2026-09-05 03:36:37.278] [MCP_DEBUG] Response written: id=2 success=true
+[2026-09-05 03:36:37.288] [MCP_DEBUG] Server initialization complete: initialized=true tools_count=14
+[2026-09-05 03:36:37.288] [MCP_INFO] Client initialized and ready: client_id=admin__client_1788579397266903000_1788579397 tools=14 prompts=12
+[2026-09-05 03:36:37.378] [MCP_INFO] ← Welcome message sent to client: client_id=admin_client_1788579397266903000_1788579397
+[2026-09-05 03:36:47.805] [MCP_DEBUG] Message read completed successfully, timeout reset: event=message_read_success
+[2026-09-05 03:36:47.805] [MCP_DEBUG] Request received: method=tools/call id=3
+[2026-09-05 03:36:47.805] [MCP_TRACE] → Tool call started: tool=zqk_object_get client_id=admin_client_1788579397266903000_1788579397
+[2026-09-05 03:36:48.042] [MCP_TRACE] ← Tool call completed: tool=zqk_observer_search, duration=12.698166584s client_id=admin_client_1788579342627608000_1788579342
+[2026-09-05 03:36:48.042] [MCP_DEBUG] Response queued: id=8 success=true active=true
+[2026-09-05 03:36:48.042] [MCP_DEBUG] Waiting for message from client: event=waiting_for_message
+[2026-09-05 03:36:48.043] [MCP_DEBUG] Response written: id=8 success=true
+[2026-09-05 03:36:52.284] [MCP_CLI_DIAG] path=/Users/lanceettl/zqk-restore-clone/bin/zqk-stable dir=/Users/lanceettl/zqk-restore-clone args=[object get ATK-1788579390106894000-a1118297 --format json --context mcp] duration=4.477646875s stderr_len=0 err=<nil>
+[2026-09-05 03:36:52.285] [MCP_TRACE] ← Tool call completed: tool=zqk_object_get, duration=4.479142417s client_id=admin_client_1788579397266903000_1788579397
+[2026-09-05 03:36:52.285] [MCP_DEBUG] Response queued: id=3 success=true active=true
+[2026-09-05 03:36:52.285] [MCP_DEBUG] Waiting for message from client: event=waiting_for_message
+[2026-09-05 03:36:52.285] [MCP_DEBUG] Response written: id=3 success=true
+[2026-09-05 03:36:52.286] [MCP_DEBUG] Message read completed successfully, timeout reset: event=message_read_success
+[2026-09-05 03:36:52.286] [MCP_DEBUG] Request received: method=tools/call id=4
+[2026-09-05 03:36:52.286] [MCP_TRACE] → Tool call started: tool=zqk_object_get client_id=admin_client_1788579397266903000_1788579397
+[2026-09-05 03:36:55.774] [MCP_CLI_DIAG] path=/Users/lanceettl/zqk-restore-clone/bin/zqk-stable dir=/Users/lanceettl/zqk-restore-clone args=[object get POL-ONBOARD-001 --format json --context mcp] duration=3.487149792s stderr_len=0 err=<nil>
+[2026-09-05 03:36:55.776] [MCP_TRACE] ← Tool call completed: tool=zqk_object_get, duration=3.490064s client_id=admin_client_1788579397266903000_1788579397
+[2026-09-05 03:36:55.776] [MCP_DEBUG] Response queued: id=4 success=true active=true
+[2026-09-05 03:36:55.776] [MCP_DEBUG] Waiting for message from client: event=waiting_for_message
+[2026-09-05 03:36:55.777] [MCP_DEBUG] Response written: id=4 success=true
+[2026-09-05 03:36:55.778] [MCP_DEBUG] Message read completed successfully, timeout reset: event=message_read_success
+[2026-09-05 03:36:55.778] [MCP_DEBUG] Request received: method=tools/call id=5
+[2026-09-05 03:36:55.778] [MCP_TRACE] → Tool call started: tool=zqk_object_get client_id=admin_client_1788579397266903000_1788579397
+[2026-09-05 03:36:59.893] [MCP_CLI_DIAG] path=/Users/lanceettl/zqk-restore-clone/bin/zqk-stable dir=/Users/lanceettl/zqk-restore-clone args=[object get POL-AGENT-INSTRUCTION-RUBRIC-001 --format json --context mcp] duration=4.113970917s stderr_len=0 err=<nil>
+[2026-09-05 03:36:59.893] [MCP_TRACE] ← Tool call completed: tool=zqk_object_get, duration=4.114700042s client_id=admin_client_1788579397266903000_1788579397
+[2026-09-05 03:36:59.893] [MCP_DEBUG] Response queued: id=5 success=true active=true
+[2026-09-05 03:36:59.893] [MCP_DEBUG] Waiting for message from client: event=waiting_for_message
+[2026-09-05 03:36:59.893] [MCP_DEBUG] Response written: id=5 success=true
+[2026-09-05 03:37:12.723] [MCP_INFO] Trace logging initialized successfully
+[2026-09-05 03:37:12.724] [MCP_SPEC] name=* state=storage_unavailable reason=storage provider not set
+[2026-09-05 03:37:12.807] [MCP_SPEC] name=example_onboarding.yaml state=fallback_selected source=/Users/lanceettl/zqk-restore-clone/.zqk/mcp/specs/example_onboarding.yaml reason=storage provider not set
+[2026-09-05 03:37:12.808] [MCP_SPEC] name=example_tools.yaml state=fallback_selected source=/Users/lanceettl/zqk-restore-clone/.zqk/mcp/specs/example_tools.yaml reason=storage provider not set
+[2026-09-05 03:37:12.808] [MCP_DEBUG] Waiting for message from client: event=waiting_for_message
+[2026-09-05 03:37:12.808] [MCP_DEBUG] Message read completed successfully, timeout reset: event=message_read_success
+[2026-09-05 03:37:12.808] [MCP_DEBUG] Request received: method=initialize id=1
+[2026-09-05 03:37:12.808] [MCP_DEBUG] initialize called: current_state=initialized:false, tools_count=11
+[2026-09-05 03:37:12.808] [MCP_DEBUG] prepareReinitialization: first initialization, keeping existing tools (count=11)
+[2026-09-05 03:37:12.808] [MCP_DEBUG] registerToolsAndResources: starting with 11 tools
+[2026-09-05 03:37:12.809] [MCP_SPEC] name=onboarding_prompts state=storage_unavailable reason=storage provider is not configured
+[2026-09-05 03:37:12.809] [MCP_SPEC] name=onboarding_prompts state=fallback_selected source=programmatic reason=storage provider is not configured
+[2026-09-05 03:37:12.809] [MCP_DEBUG] registerToolsAndResources: registered tools, now have 32 tools (was 11)
+[2026-09-05 03:37:12.809] [MCP_DEBUG] registerToolsAndResources: tool names: [zqk_report_qa_success zqk_test_echo custom_analysis zqk_object_get zqk_graph_traversal zqk_object_list zqk_execute_bash zqk_system_check zqk_get_priority_plan_items zqk_get_tool_metrics zqk_create_object_interactive zqk_read_code zqk_resolve_references zqk_get_metrics zqk_chat_send zqk_get_current_priority_plan zqk_write_code zqk_get_next_backlog_item zqk_ide_bridge_request zqk_read_file zqk_object_count zqk_report_vitality zqk_report_blockers zqk_report_maturation zqk_server_shutdown zqk_write_file zqk_state_aware_query zqk_report_pcs zqk_observer_search zqk_system_status zqk_get_current_backlog_item zqk_report_edd]
+[2026-09-05 03:37:12.809] [MCP_SPEC] name=critical_resources state=storage_unavailable reason=storage provider is not configured
+[2026-09-05 03:37:12.809] [MCP_SPEC] name=critical_resources state=storage_unavailable reason=storage provider is not configured
+[2026-09-05 03:37:12.809] [MCP_WARN] Failed to load critical resources spec: MCP server initialization failed: critical resources spec file not found in any of the expected locations. Checked paths: [.zqk/mcp_specs/critical_resources.yaml docs/process/mcp_specs/critical_resources.yaml mcp_specs/critical_resources.yaml]. Please create a critical_resources.yaml spec file in one of these locations or ensure mcp_spec objects are available in storage.. Server will continue without critical resources.
+[2026-09-05 03:37:12.911] [MCP_DEBUG] registerToolsAndResources: applied tools allowlist, 32 -> 14 tools
+[2026-09-05 03:37:12.911] [MCP_DEBUG] registerToolsAndResources: completed, final tool count=14
+[2026-09-05 03:37:12.911] [MCP_DEBUG] About to set initialized=true: tools_count=14
+[2026-09-05 03:37:12.911] [MCP_INFO] MCP server ready: tools_count=14
+[2026-09-05 03:37:12.911] [MCP_DEBUG] Response queued: id=1 success=true active=true
+[2026-09-05 03:37:12.911] [MCP_DEBUG] Waiting for message from client: event=waiting_for_message
+[2026-09-05 03:37:12.911] [MCP_DEBUG] Response written: id=1 success=true
+[2026-09-05 03:37:12.912] [MCP_DEBUG] Message read completed successfully, timeout reset: event=message_read_success
+[2026-09-05 03:37:12.912] [MCP_DEBUG] Notification received: method=notifications/initialized
+[2026-09-05 03:37:12.912] [MCP_DEBUG] Notification processed: method=notifications/initialized state=handled
+[2026-09-05 03:37:12.912] [MCP_DEBUG] Waiting for message from client: event=waiting_for_message
+[2026-09-05 03:37:12.912] [MCP_DEBUG] Message read completed successfully, timeout reset: event=message_read_success
+[2026-09-05 03:37:12.912] [MCP_DEBUG] Request received: method=tools/list id=2
+[2026-09-05 03:37:12.912] [MCP_DEBUG] tools/list called: initialized=true, tools_count=14, rootCommand=false
+[2026-09-05 03:37:12.912] [MCP_DEBUG] tools/list: registered tools: [zqk_object_list zqk_execute_bash zqk_read_code zqk_chat_send zqk_get_current_priority_plan zqk_write_code zqk_ide_bridge_request zqk_read_file zqk_object_count zqk_write_file zqk_observer_search zqk_system_status zqk_get_current_backlog_item zqk_object_get] (count=14)
+[2026-09-05 03:37:12.912] [MCP_DEBUG] tools/list: cached tools count=14
+[2026-09-05 03:37:12.912] [MCP_DEBUG] tools/list: returning 14 tools (initialized=true, rootCommand=false)
+[2026-09-05 03:37:12.912] [MCP_DEBUG] Response queued: id=2 success=true active=true
+[2026-09-05 03:37:12.912] [MCP_DEBUG] Waiting for message from client: event=waiting_for_message
+[2026-09-05 03:37:12.912] [MCP_DEBUG] Response written: id=2 success=true
+[2026-09-05 03:37:12.922] [MCP_DEBUG] Server initialization complete: initialized=true tools_count=14
+[2026-09-05 03:37:12.922] [MCP_INFO] Client initialized and ready: client_id=admin__client_1788579432808935000_1788579432 tools=14 prompts=12
+[2026-09-05 03:37:13.013] [MCP_INFO] ← Welcome message sent to client: client_id=admin_client_1788579432808935000_1788579432
+[2026-09-05 03:37:40.873] [MCP_DEBUG] Message read completed successfully, timeout reset: event=message_read_success
+[2026-09-05 03:37:40.873] [MCP_DEBUG] Request received: method=tools/call id=3
+[2026-09-05 03:37:40.873] [MCP_TRACE] → Tool call started: tool=zqk_object_get client_id=admin_client_1788579432808935000_1788579432
+[2026-09-05 03:37:44.793] [MCP_CLI_DIAG] path=/Users/lanceettl/zqk-restore-clone/bin/zqk-stable dir=/Users/lanceettl/zqk-restore-clone args=[object get POL-ONBOARD-001 --fields body --fields description --context mcp] duration=3.919855458s stderr_len=0 err=<nil>
+[2026-09-05 03:37:44.793] [MCP_TRACE] ← Tool call completed: tool=zqk_object_get, duration=3.920297083s client_id=admin_client_1788579432808935000_1788579432
+[2026-09-05 03:37:44.794] [MCP_DEBUG] Response queued: id=3 success=true active=true
+[2026-09-05 03:37:44.794] [MCP_DEBUG] Waiting for message from client: event=waiting_for_message
+[2026-09-05 03:37:44.794] [MCP_DEBUG] Response written: id=3 success=true
+[2026-09-05 03:37:44.794] [MCP_DEBUG] Message read completed successfully, timeout reset: event=message_read_success
+[2026-09-05 03:37:44.794] [MCP_DEBUG] Request received: method=tools/call id=4
+[2026-09-05 03:37:44.794] [MCP_TRACE] → Tool call started: tool=zqk_object_get client_id=admin_client_1788579432808935000_1788579432
+[2026-09-05 03:37:48.537] [MCP_CLI_DIAG] path=/Users/lanceettl/zqk-restore-clone/bin/zqk-stable dir=/Users/lanceettl/zqk-restore-clone args=[object get POL-ONBOARD-002 --fields body --fields description --context mcp] duration=3.742191084s stderr_len=0 err=<nil>
+[2026-09-05 03:37:48.538] [MCP_TRACE] ← Tool call completed: tool=zqk_object_get, duration=3.743577417s client_id=admin_client_1788579432808935000_1788579432
+[2026-09-05 03:37:48.538] [MCP_DEBUG] Response queued: id=4 success=true active=true
+[2026-09-05 03:37:48.538] [MCP_DEBUG] Waiting for message from client: event=waiting_for_message
+[2026-09-05 03:37:48.538] [MCP_DEBUG] Response written: id=4 success=true
+[2026-09-05 03:37:48.538] [MCP_DEBUG] Message read completed successfully, timeout reset: event=message_read_success
+[2026-09-05 03:37:48.538] [MCP_DEBUG] Request received: method=tools/call id=5
+[2026-09-05 03:37:48.538] [MCP_TRACE] → Tool call started: tool=zqk_object_get client_id=admin_client_1788579432808935000_1788579432
+[2026-09-05 03:37:52.887] [MCP_CLI_DIAG] path=/Users/lanceettl/zqk-restore-clone/bin/zqk-stable dir=/Users/lanceettl/zqk-restore-clone args=[object get POL-CODE-CAS-COMMIT-001 --fields body --fields description --context mcp] duration=4.348105916s stderr_len=0 err=<nil>
+[2026-09-05 03:37:52.890] [MCP_TRACE] ← Tool call completed: tool=zqk_object_get, duration=4.351535916s client_id=admin_client_1788579432808935000_1788579432
+[2026-09-05 03:37:52.890] [MCP_DEBUG] Response queued: id=5 success=true active=true
+[2026-09-05 03:37:52.890] [MCP_DEBUG] Waiting for message from client: event=waiting_for_message
+[2026-09-05 03:37:52.890] [MCP_DEBUG] Response written: id=5 success=true
+[2026-09-05 03:37:52.891] [MCP_DEBUG] Message read completed successfully, timeout reset: event=message_read_success
+[2026-09-05 03:37:52.891] [MCP_DEBUG] Request received: method=tools/call id=6
+[2026-09-05 03:37:52.891] [MCP_TRACE] → Tool call started: tool=zqk_object_get client_id=admin_client_1788579432808935000_1788579432
+[2026-09-05 03:37:57.432] [MCP_CLI_DIAG] path=/Users/lanceettl/zqk-restore-clone/bin/zqk-stable dir=/Users/lanceettl/zqk-restore-clone args=[object get POL-WORKFLOW-VDS --fields body --fields description --context mcp] duration=4.541334708s stderr_len=0 err=<nil>
+[2026-09-05 03:37:57.433] [MCP_TRACE] ← Tool call completed: tool=zqk_object_get, duration=4.541868375s client_id=admin_client_1788579432808935000_1788579432
+[2026-09-05 03:37:57.433] [MCP_DEBUG] Response queued: id=6 success=true active=true
+[2026-09-05 03:37:57.433] [MCP_DEBUG] Waiting for message from client: event=waiting_for_message
+[2026-09-05 03:37:57.433] [MCP_DEBUG] Response written: id=6 success=true
+[2026-09-05 03:38:42.790] [MCP_DEBUG] Message read completed successfully, timeout reset: event=message_read_success
+[2026-09-05 03:38:42.790] [MCP_DEBUG] Request received: method=tools/call id=6
+[2026-09-05 03:38:42.790] [MCP_TRACE] → Tool call started: tool=zqk_observer_search client_id=admin_client_1788579397266903000_1788579397
+[2026-09-05 03:38:45.541] [MCP_TRACE] ← Tool call completed: tool=zqk_observer_search, duration=2.75028775s client_id=admin_client_1788579397266903000_1788579397
+[2026-09-05 03:38:45.541] [MCP_DEBUG] Response queued: id=6 success=true active=true
+[2026-09-05 03:38:45.541] [MCP_DEBUG] Waiting for message from client: event=waiting_for_message
+[2026-09-05 03:38:45.541] [MCP_DEBUG] Response written: id=6 success=true
+[2026-09-05 03:38:45.541] [MCP_DEBUG] Message read completed successfully, timeout reset: event=message_read_success
+[2026-09-05 03:38:45.541] [MCP_DEBUG] Request received: method=tools/call id=7
+[2026-09-05 03:38:45.541] [MCP_TRACE] → Tool call started: tool=zqk_observer_search client_id=admin_client_1788579397266903000_1788579397
+[2026-09-05 03:38:53.433] [MCP_TRACE] ← Tool call completed: tool=zqk_observer_search, duration=7.891511375s client_id=admin_client_1788579397266903000_1788579397
+[2026-09-05 03:38:53.433] [MCP_DEBUG] Response queued: id=7 success=true active=true
+[2026-09-05 03:38:53.433] [MCP_DEBUG] Waiting for message from client: event=waiting_for_message
+[2026-09-05 03:38:53.433] [MCP_DEBUG] Response written: id=7 success=true
+[2026-09-05 03:38:53.434] [MCP_DEBUG] Message read completed successfully, timeout reset: event=message_read_success
+[2026-09-05 03:38:53.434] [MCP_DEBUG] Request received: method=tools/call id=8
+[2026-09-05 03:38:53.434] [MCP_TRACE] → Tool call started: tool=zqk_observer_search client_id=admin_client_1788579397266903000_1788579397
+[2026-09-05 03:38:56.212] [MCP_TRACE] ← Tool call completed: tool=zqk_observer_search, duration=2.778231208s client_id=admin_client_1788579397266903000_1788579397
+[2026-09-05 03:38:56.212] [MCP_DEBUG] Response queued: id=8 success=true active=true
+[2026-09-05 03:38:56.212] [MCP_DEBUG] Waiting for message from client: event=waiting_for_message
+[2026-09-05 03:38:56.213] [MCP_DEBUG] Response written: id=8 success=true
+[2026-09-05 03:39:02.730] [MCP_DEBUG] Message read completed successfully, timeout reset: event=message_read_success
+[2026-09-05 03:39:02.730] [MCP_DEBUG] Request received: method=tools/call id=9
+[2026-09-05 03:39:02.730] [MCP_TRACE] → Tool call started: tool=zqk_read_code client_id=admin_client_1788579342627608000_1788579342
+[2026-09-05 03:39:02.730] [MCP_ERROR] ✗ Tool call failed: tool=zqk_read_code, duration=112.417µs, error=open /Users/lanceettl/zqk-restore-clone/pkg/release/payload_check.go: no such file or directory client_id=admin_client_1788579342627608000_1788579342
+[2026-09-05 03:39:02.730] [MCP_DEBUG] Response queued: id=9 success=true active=true
+[2026-09-05 03:39:02.730] [MCP_DEBUG] Waiting for message from client: event=waiting_for_message
+[2026-09-05 03:39:02.730] [MCP_DEBUG] Response written: id=9 success=true
+[2026-09-05 03:39:02.730] [MCP_DEBUG] Message read completed successfully, timeout reset: event=message_read_success
+[2026-09-05 03:39:02.730] [MCP_DEBUG] Request received: method=tools/call id=10
+[2026-09-05 03:39:02.730] [MCP_TRACE] → Tool call started: tool=zqk_read_code client_id=admin_client_1788579342627608000_1788579342
+[2026-09-05 03:39:02.731] [MCP_ERROR] ✗ Tool call failed: tool=zqk_read_code, duration=98.459µs, error=open /Users/lanceettl/zqk-restore-clone/cmd/zqk/release.go: no such file or directory client_id=admin_client_1788579342627608000_1788579342
+[2026-09-05 03:39:02.731] [MCP_DEBUG] Response queued: id=10 success=true active=true
+[2026-09-05 03:39:02.731] [MCP_DEBUG] Waiting for message from client: event=waiting_for_message
+[2026-09-05 03:39:02.731] [MCP_DEBUG] Response written: id=10 success=true
+[2026-09-05 03:39:17.686] [MCP_DEBUG] Message read completed successfully, timeout reset: event=message_read_success
+[2026-09-05 03:39:17.686] [MCP_DEBUG] Request received: method=tools/call id=9
+[2026-09-05 03:39:17.686] [MCP_TRACE] → Tool call started: tool=zqk_read_code client_id=admin_client_1788579397266903000_1788579397
+[2026-09-05 03:39:17.691] [MCP_TRACE] ← Tool call completed: tool=zqk_read_code, duration=1.094667ms client_id=admin_client_1788579397266903000_1788579397
+[2026-09-05 03:39:17.691] [MCP_DEBUG] Response queued: id=9 success=true active=true
+[2026-09-05 03:39:17.691] [MCP_DEBUG] Waiting for message from client: event=waiting_for_message
+[2026-09-05 03:39:17.691] [MCP_DEBUG] Response written: id=9 success=true
+[2026-09-05 03:39:20.376] [MCP_DEBUG] Message read completed successfully, timeout reset: event=message_read_success
+[2026-09-05 03:39:20.376] [MCP_DEBUG] Request received: method=tools/call id=7
+[2026-09-05 03:39:20.376] [MCP_TRACE] → Tool call started: tool=zqk_read_code client_id=admin_client_1788579432808935000_1788579432
+[2026-09-05 03:39:20.376] [MCP_TRACE] ← Tool call completed: tool=zqk_read_code, duration=331.75µs client_id=admin_client_1788579432808935000_1788579432
+[2026-09-05 03:39:20.376] [MCP_DEBUG] Response queued: id=7 success=true active=true
+[2026-09-05 03:39:20.376] [MCP_DEBUG] Waiting for message from client: event=waiting_for_message
+[2026-09-05 03:39:20.376] [MCP_DEBUG] Response written: id=7 success=true
+[2026-09-05 03:39:20.376] [MCP_DEBUG] Message read completed successfully, timeout reset: event=message_read_success
+[2026-09-05 03:39:20.376] [MCP_DEBUG] Request received: method=tools/call id=8
+[2026-09-05 03:39:20.376] [MCP_TRACE] → Tool call started: tool=zqk_observer_search client_id=admin_client_1788579432808935000_1788579432
+[2026-09-05 03:39:22.765] [MCP_TRACE] ← Tool call completed: tool=zqk_observer_search, duration=2.3886825s client_id=admin_client_1788579432808935000_1788579432
+[2026-09-05 03:39:22.765] [MCP_DEBUG] Response queued: id=8 success=true active=true
+[2026-09-05 03:39:22.765] [MCP_DEBUG] Waiting for message from client: event=waiting_for_message
+[2026-09-05 03:39:22.765] [MCP_DEBUG] Response written: id=8 success=true
+[2026-09-05 03:39:26.329] [MCP_DEBUG] Message read completed successfully, timeout reset: event=message_read_success
+[2026-09-05 03:39:26.329] [MCP_DEBUG] Request received: method=tools/call id=11
+[2026-09-05 03:39:26.329] [MCP_TRACE] → Tool call started: tool=zqk_observer_search client_id=admin_client_1788579342627608000_1788579342
+[2026-09-05 03:39:26.541] [MCP_TRACE] ← Tool call completed: tool=zqk_observer_search, duration=211.690583ms client_id=admin_client_1788579342627608000_1788579342
+[2026-09-05 03:39:26.543] [MCP_DEBUG] Response queued: id=11 success=true active=true
+[2026-09-05 03:39:26.544] [MCP_DEBUG] Waiting for message from client: event=waiting_for_message
+[2026-09-05 03:39:26.543] [MCP_DEBUG] Response written: id=11 success=true
+[2026-09-05 03:39:38.578] [MCP_DEBUG] Message read completed successfully, timeout reset: event=message_read_success
+[2026-09-05 03:39:38.578] [MCP_DEBUG] Request received: method=tools/call id=9
+[2026-09-05 03:39:38.578] [MCP_TRACE] → Tool call started: tool=zqk_system_status client_id=admin_client_1788579432808935000_1788579432
+[2026-09-05 03:39:40.171] [MCP_CLI_DIAG] path=/Users/lanceettl/zqk-restore-clone/bin/zqk-stable dir=/Users/lanceettl/zqk-restore-clone args=[system status --format json --context mcp] duration=1.593171167s stderr_len=0 err=<nil>
+[2026-09-05 03:39:40.172] [MCP_TRACE] ← Tool call completed: tool=zqk_system_status, duration=1.593696375s client_id=admin_client_1788579432808935000_1788579432
+[2026-09-05 03:39:40.172] [MCP_DEBUG] Response queued: id=9 success=true active=true
+[2026-09-05 03:39:40.172] [MCP_DEBUG] Waiting for message from client: event=waiting_for_message
+[2026-09-05 03:39:40.172] [MCP_DEBUG] Response written: id=9 success=true
+[2026-09-05 03:39:45.959] [MCP_DEBUG] Message read completed successfully, timeout reset: event=message_read_success
+[2026-09-05 03:39:45.959] [MCP_DEBUG] Request received: method=tools/call id=12
+[2026-09-05 03:39:45.960] [MCP_TRACE] → Tool call started: tool=zqk_observer_search client_id=admin_client_1788579342627608000_1788579342
+[2026-09-05 03:39:46.619] [MCP_TRACE] ← Tool call completed: tool=zqk_observer_search, duration=659.882417ms client_id=admin_client_1788579342627608000_1788579342
+[2026-09-05 03:39:46.620] [MCP_DEBUG] Response queued: id=12 success=true active=true
+[2026-09-05 03:39:46.620] [MCP_DEBUG] Waiting for message from client: event=waiting_for_message
+[2026-09-05 03:39:46.620] [MCP_DEBUG] Response written: id=12 success=true
+[2026-09-05 03:40:03.698] [MCP_DEBUG] Message read completed successfully, timeout reset: event=message_read_success
+[2026-09-05 03:40:03.698] [MCP_DEBUG] Request received: method=tools/call id=10
+[2026-09-05 03:40:03.698] [MCP_TRACE] → Tool call started: tool=zqk_write_file client_id=admin_client_1788579397266903000_1788579397
+[2026-09-05 03:40:03.723] [MCP_TRACE] ← Tool call completed: tool=zqk_write_file, duration=24.26975ms client_id=admin_client_1788579397266903000_1788579397
+[2026-09-05 03:40:03.723] [MCP_DEBUG] Response queued: id=10 success=true active=true
+[2026-09-05 03:40:03.723] [MCP_DEBUG] Waiting for message from client: event=waiting_for_message
+[2026-09-05 03:40:03.723] [MCP_DEBUG] Response written: id=10 success=true
+[2026-09-05 03:41:28.530] [MCP_DEBUG] Message read completed successfully, timeout reset: event=message_read_success
+[2026-09-05 03:41:28.530] [MCP_DEBUG] Request received: method=tools/call id=10
+[2026-09-05 03:41:28.530] [MCP_TRACE] → Tool call started: tool=zqk_write_code client_id=admin_client_1788579432808935000_1788579432
+[2026-09-05 03:41:28.538] [MCP_TRACE] ← Tool call completed: tool=zqk_write_code, duration=7.302625ms client_id=admin_client_1788579432808935000_1788579432
+[2026-09-05 03:41:28.538] [MCP_DEBUG] Response queued: id=10 success=true active=true
+[2026-09-05 03:41:28.538] [MCP_DEBUG] Waiting for message from client: event=waiting_for_message
+[2026-09-05 03:41:28.538] [MCP_DEBUG] Response written: id=10 success=true
+[2026-09-05 03:41:51.304] [MCP_DEBUG] Message read completed successfully, timeout reset: event=message_read_success
+[2026-09-05 03:41:51.304] [MCP_DEBUG] Request received: method=tools/call id=11
+[2026-09-05 03:41:51.304] [MCP_TRACE] → Tool call started: tool=zqk_write_file client_id=admin_client_1788579397266903000_1788579397
+[2026-09-05 03:41:51.305] [MCP_TRACE] ← Tool call completed: tool=zqk_write_file, duration=522.917µs client_id=admin_client_1788579397266903000_1788579397
+[2026-09-05 03:41:51.305] [MCP_DEBUG] Response queued: id=11 success=true active=true
+[2026-09-05 03:41:51.305] [MCP_DEBUG] Response written: id=11 success=true
+[2026-09-05 03:41:51.305] [MCP_DEBUG] Waiting for message from client: event=waiting_for_message
+[2026-09-05 03:43:47.006] [MCP_DEBUG] Message read completed successfully, timeout reset: event=message_read_success
+[2026-09-05 03:43:47.006] [MCP_DEBUG] Request received: method=tools/call id=13
+[2026-09-05 03:43:47.007] [MCP_TRACE] → Tool call started: tool=zqk_write_file client_id=admin_client_1788579342627608000_1788579342
+[2026-09-05 03:43:47.008] [MCP_TRACE] ← Tool call completed: tool=zqk_write_file, duration=1.248833ms client_id=admin_client_1788579342627608000_1788579342
+[2026-09-05 03:43:47.008] [MCP_DEBUG] Response queued: id=13 success=true active=true
+[2026-09-05 03:43:47.008] [MCP_DEBUG] Waiting for message from client: event=waiting_for_message
+[2026-09-05 03:43:47.008] [MCP_DEBUG] Response written: id=13 success=true
+[2026-09-05 03:44:25.561] [MCP_DEBUG] Message read completed successfully, timeout reset: event=message_read_success
+[2026-09-05 03:44:25.564] [MCP_DEBUG] Request received: method=tools/call id=14
+[2026-09-05 03:44:25.564] [MCP_TRACE] → Tool call started: tool=zqk_write_file client_id=admin_client_1788579342627608000_1788579342
+[2026-09-05 03:44:25.573] [MCP_TRACE] ← Tool call completed: tool=zqk_write_file, duration=8.122917ms client_id=admin_client_1788579342627608000_1788579342
+[2026-09-05 03:44:25.573] [MCP_DEBUG] Response queued: id=14 success=true active=true
+[2026-09-05 03:44:25.573] [MCP_DEBUG] Waiting for message from client: event=waiting_for_message
+[2026-09-05 03:44:25.575] [MCP_DEBUG] Response written: id=14 success=true
+[2026-09-05 03:44:45.462] [MCP_DEBUG] Message read completed successfully, timeout reset: event=message_read_success
+[2026-09-05 03:44:45.462] [MCP_DEBUG] Request received: method=tools/call id=15
+[2026-09-05 03:44:45.463] [MCP_TRACE] → Tool call started: tool=zqk_write_file client_id=admin_client_1788579342627608000_1788579342
+[2026-09-05 03:44:45.492] [MCP_TRACE] ← Tool call completed: tool=zqk_write_file, duration=28.463208ms client_id=admin_client_1788579342627608000_1788579342
+[2026-09-05 03:44:45.492] [MCP_DEBUG] Response queued: id=15 success=true active=true
+[2026-09-05 03:44:45.492] [MCP_DEBUG] Waiting for message from client: event=waiting_for_message
+[2026-09-05 03:44:45.492] [MCP_DEBUG] Response written: id=15 success=true
+[2026-09-05 03:44:48.229] [MCP_DEBUG] Message read completed successfully, timeout reset: event=message_read_success
+[2026-09-05 03:44:48.229] [MCP_DEBUG] Request received: method=tools/call id=16
+[2026-09-05 03:44:48.229] [MCP_TRACE] → Tool call started: tool=zqk_execute_bash client_id=admin_client_1788579342627608000_1788579342
+[2026-09-05 03:44:48.548] [MCP_TRACE] ← Tool call completed: tool=zqk_execute_bash, duration=318.883ms client_id=admin_client_1788579342627608000_1788579342
+[2026-09-05 03:44:48.548] [MCP_DEBUG] Response queued: id=16 success=true active=true
+[2026-09-05 03:44:48.548] [MCP_DEBUG] Waiting for message from client: event=waiting_for_message
+[2026-09-05 03:44:48.548] [MCP_DEBUG] Response written: id=16 success=true
+[2026-09-05 03:45:19.518] [MCP_DEBUG] Message read completed successfully, timeout reset: event=message_read_success
+[2026-09-05 03:45:19.518] [MCP_DEBUG] Request received: method=tools/call id=17
+[2026-09-05 03:45:19.518] [MCP_TRACE] → Tool call started: tool=zqk_write_file client_id=admin_client_1788579342627608000_1788579342
+[2026-09-05 03:45:19.519] [MCP_TRACE] ← Tool call completed: tool=zqk_write_file, duration=866.542µs client_id=admin_client_1788579342627608000_1788579342
+[2026-09-05 03:45:19.519] [MCP_DEBUG] Response queued: id=17 success=true active=true
+[2026-09-05 03:45:19.519] [MCP_DEBUG] Waiting for message from client: event=waiting_for_message
+[2026-09-05 03:45:19.519] [MCP_DEBUG] Response written: id=17 success=true
+[2026-09-05 03:45:59.659] [MCP_DEBUG] Message read completed successfully, timeout reset: event=message_read_success
+[2026-09-05 03:45:59.659] [MCP_DEBUG] Request received: method=tools/call id=18
+[2026-09-05 03:45:59.659] [MCP_TRACE] → Tool call started: tool=zqk_write_file client_id=admin_client_1788579342627608000_1788579342
+[2026-09-05 03:45:59.676] [MCP_TRACE] ← Tool call completed: tool=zqk_write_file, duration=16.568584ms client_id=admin_client_1788579342627608000_1788579342
+[2026-09-05 03:45:59.676] [MCP_DEBUG] Response queued: id=18 success=true active=true
+[2026-09-05 03:45:59.676] [MCP_DEBUG] Waiting for message from client: event=waiting_for_message
+[2026-09-05 03:45:59.676] [MCP_DEBUG] Response written: id=18 success=true
+[2026-09-05 03:46:38.740] [MCP_DEBUG] Message read completed successfully, timeout reset: event=message_read_success
+[2026-09-05 03:46:38.740] [MCP_DEBUG] Request received: method=tools/call id=19
+[2026-09-05 03:46:38.740] [MCP_TRACE] → Tool call started: tool=zqk_write_code client_id=admin_client_1788579342627608000_1788579342
+[2026-09-05 03:46:38.769] [MCP_TRACE] ← Tool call completed: tool=zqk_write_code, duration=28.403375ms client_id=admin_client_1788579342627608000_1788579342
+[2026-09-05 03:46:38.769] [MCP_DEBUG] Response queued: id=19 success=true active=true
+[2026-09-05 03:46:38.769] [MCP_DEBUG] Waiting for message from client: event=waiting_for_message
+[2026-09-05 03:46:38.769] [MCP_DEBUG] Response written: id=19 success=true
+[2026-09-05 03:47:07.894] [MCP_DEBUG] Message read completed successfully, timeout reset: event=message_read_success
+[2026-09-05 03:47:07.894] [MCP_DEBUG] Request received: method=tools/call id=20
+[2026-09-05 03:47:07.895] [MCP_TRACE] → Tool call started: tool=zqk_write_code client_id=admin_client_1788579342627608000_1788579342
+[2026-09-05 03:47:07.927] [MCP_TRACE] ← Tool call completed: tool=zqk_write_code, duration=32.676208ms client_id=admin_client_1788579342627608000_1788579342
+[2026-09-05 03:47:07.930] [MCP_DEBUG] Response queued: id=20 success=true active=true
+[2026-09-05 03:47:07.930] [MCP_DEBUG] Waiting for message from client: event=waiting_for_message
+[2026-09-05 03:47:07.930] [MCP_DEBUG] Response written: id=20 success=true
+[2026-09-05 03:47:45.150] [MCP_DEBUG] Message read completed successfully, timeout reset: event=message_read_success
+[2026-09-05 03:47:45.151] [MCP_DEBUG] Request received: method=tools/call id=21
+[2026-09-05 03:47:45.151] [MCP_TRACE] → Tool call started: tool=zqk_write_code client_id=admin_client_1788579342627608000_1788579342
+[2026-09-05 03:47:45.164] [MCP_TRACE] ← Tool call completed: tool=zqk_write_code, duration=12.810667ms client_id=admin_client_1788579342627608000_1788579342
+[2026-09-05 03:47:45.164] [MCP_DEBUG] Response queued: id=21 success=true active=true
+[2026-09-05 03:47:45.164] [MCP_DEBUG] Waiting for message from client: event=waiting_for_message
+[2026-09-05 03:47:45.164] [MCP_DEBUG] Response written: id=21 success=true
+[2026-09-05 03:48:49.046] [MCP_DEBUG] Message read completed successfully, timeout reset: event=message_read_success
+[2026-09-05 03:48:49.046] [MCP_DEBUG] Request received: method=tools/call id=22
+[2026-09-05 03:48:49.046] [MCP_TRACE] → Tool call started: tool=zqk_write_code client_id=admin_client_1788579342627608000_1788579342
+[2026-09-05 03:48:49.059] [MCP_TRACE] ← Tool call completed: tool=zqk_write_code, duration=12.369958ms client_id=admin_client_1788579342627608000_1788579342
+[2026-09-05 03:48:49.059] [MCP_DEBUG] Response queued: id=22 success=true active=true
+[2026-09-05 03:48:49.059] [MCP_DEBUG] Waiting for message from client: event=waiting_for_message
+[2026-09-05 03:48:49.059] [MCP_DEBUG] Response written: id=22 success=true
+[2026-09-05 03:50:02.799] [MCP_DEBUG] Message read completed successfully, timeout reset: event=message_read_success
+[2026-09-05 03:50:02.803] [MCP_DEBUG] Request received: method=tools/call id=23
+[2026-09-05 03:50:02.804] [MCP_TRACE] → Tool call started: tool=zqk_write_code client_id=admin_client_1788579342627608000_1788579342
+[2026-09-05 03:50:02.858] [MCP_TRACE] ← Tool call completed: tool=zqk_write_code, duration=53.474ms client_id=admin_client_1788579342627608000_1788579342
+[2026-09-05 03:50:02.858] [MCP_DEBUG] Response queued: id=23 success=true active=true
+[2026-09-05 03:50:02.858] [MCP_DEBUG] Waiting for message from client: event=waiting_for_message
+[2026-09-05 03:50:02.858] [MCP_DEBUG] Response written: id=23 success=true
+[2026-09-05 03:52:14.317] [MCP_DEBUG] Message read completed successfully, timeout reset: event=message_read_success
+[2026-09-05 03:52:14.317] [MCP_DEBUG] Request received: method=tools/call id=24
+[2026-09-05 03:52:14.317] [MCP_TRACE] → Tool call started: tool=zqk_read_code client_id=admin_client_1788579342627608000_1788579342
+[2026-09-05 03:52:14.318] [MCP_TRACE] ← Tool call completed: tool=zqk_read_code, duration=754.792µs client_id=admin_client_1788579342627608000_1788579342
+[2026-09-05 03:52:14.318] [MCP_DEBUG] Response queued: id=24 success=true active=true
+[2026-09-05 03:52:14.318] [MCP_DEBUG] Waiting for message from client: event=waiting_for_message
+[2026-09-05 03:52:14.318] [MCP_DEBUG] Response written: id=24 success=true
+[2026-09-05 03:53:46.016] [MCP_DEBUG] Message read completed successfully, timeout reset: event=message_read_success
+[2026-09-05 03:53:46.018] [MCP_DEBUG] Request received: method=tools/call id=25
+[2026-09-05 03:53:46.019] [MCP_TRACE] → Tool call started: tool=zqk_write_file client_id=admin_client_1788579342627608000_1788579342
+[2026-09-05 03:53:46.022] [MCP_TRACE] ← Tool call completed: tool=zqk_write_file, duration=1.811042ms client_id=admin_client_1788579342627608000_1788579342
+[2026-09-05 03:53:46.023] [MCP_DEBUG] Response queued: id=25 success=true active=true
+[2026-09-05 03:53:46.023] [MCP_DEBUG] Waiting for message from client: event=waiting_for_message
+[2026-09-05 03:53:46.023] [MCP_DEBUG] Response written: id=25 success=true
+[2026-09-05 03:55:08.337] [MCP_DEBUG] Message read completed successfully, timeout reset: event=message_read_success
+[2026-09-05 03:55:08.338] [MCP_DEBUG] Request received: method=tools/call id=26
+[2026-09-05 03:55:08.338] [MCP_TRACE] → Tool call started: tool=zqk_write_code client_id=admin_client_1788579342627608000_1788579342
+[2026-09-05 03:55:08.363] [MCP_TRACE] ← Tool call completed: tool=zqk_write_code, duration=24.807292ms client_id=admin_client_1788579342627608000_1788579342
+[2026-09-05 03:55:08.363] [MCP_DEBUG] Response queued: id=26 success=true active=true
+[2026-09-05 03:55:08.363] [MCP_DEBUG] Waiting for message from client: event=waiting_for_message
+[2026-09-05 03:55:08.363] [MCP_DEBUG] Response written: id=26 success=true
+[2026-09-05 04:11:17.813] [MCP_INFO] Trace logging initialized successfully
+[2026-09-05 04:11:17.817] [MCP_SPEC] name=* state=storage_selected reason=<nil>
+[2026-09-05 04:11:17.817] [MCP_DEBUG] Waiting for message from client: event=waiting_for_message
+[2026-09-05 04:11:17.817] [MCP_DEBUG] Message read completed successfully, timeout reset: event=message_read_success
+[2026-09-05 04:11:17.817] [MCP_DEBUG] Request received: method=initialize id=1
+[2026-09-05 04:11:17.818] [MCP_DEBUG] initialize called: current_state=initialized:false, tools_count=0
+[2026-09-05 04:11:17.818] [MCP_DEBUG] prepareReinitialization: first initialization, keeping existing tools (count=0)
+[2026-09-05 04:11:17.875] [MCP_DEBUG] registerToolsAndResources: starting with 0 tools
+[2026-09-05 04:11:17.877] [MCP_SPEC] name=onboarding_prompts state=storage_selected reason=<nil>
+[2026-09-05 04:11:17.877] [MCP_DEBUG] registerToolsAndResources: registered tools, now have 31 tools (was 0)
+[2026-09-05 04:11:17.877] [MCP_DEBUG] registerToolsAndResources: tool names: [zqk_system_status zqk_object_get zqk_system_check zqk_get_next_backlog_item zqk_report_qa_success zqk_get_current_backlog_item zqk_resolve_references zqk_state_aware_query zqk_object_count zqk_get_metrics zqk_report_pcs zqk_report_edd zqk_graph_traversal zqk_test_echo zqk_object_list zqk_server_shutdown zqk_get_current_priority_plan zqk_get_priority_plan_items zqk_report_blockers zqk_read_code zqk_get_tool_metrics zqk_report_vitality zqk_write_code zqk_observer_search zqk_chat_send zqk_ide_bridge_request zqk_report_maturation zqk_read_file zqk_write_file zqk_create_object_interactive zqk_execute_bash]
+[2026-09-05 04:11:17.879] [MCP_SPEC] name=critical_resources state=storage_selected reason=<nil>
+[2026-09-05 04:11:17.880] [MCP_SPEC] name=critical_resources state=storage_selected reason=<nil>
+[2026-09-05 04:11:17.889] [MCP_DEBUG] registerToolsAndResources: applied tools allowlist, 31 -> 14 tools
+[2026-09-05 04:11:17.889] [MCP_DEBUG] registerToolsAndResources: completed, final tool count=14
+[2026-09-05 04:11:17.889] [MCP_DEBUG] About to set initialized=true: tools_count=14
+[2026-09-05 04:11:17.889] [MCP_INFO] MCP server ready: tools_count=14
+[2026-09-05 04:11:17.889] [MCP_DEBUG] Response queued: id=1 success=true active=true
+[2026-09-05 04:11:17.889] [MCP_DEBUG] Waiting for message from client: event=waiting_for_message
+[2026-09-05 04:11:17.889] [MCP_DEBUG] Response written: id=1 success=true
+[2026-09-05 04:11:17.890] [MCP_DEBUG] Message read completed successfully, timeout reset: event=message_read_success
+[2026-09-05 04:11:17.890] [MCP_DEBUG] Notification received: method=notifications/initialized
+[2026-09-05 04:11:17.890] [MCP_DEBUG] Notification processed: method=notifications/initialized state=handled
+[2026-09-05 04:11:17.890] [MCP_DEBUG] Waiting for message from client: event=waiting_for_message
+[2026-09-05 04:11:17.890] [MCP_DEBUG] Message read completed successfully, timeout reset: event=message_read_success
+[2026-09-05 04:11:17.890] [MCP_DEBUG] Request received: method=tools/list id=2
+[2026-09-05 04:11:17.890] [MCP_DEBUG] tools/list called: initialized=true, tools_count=14, rootCommand=true
+[2026-09-05 04:11:17.890] [MCP_DEBUG] tools/list: registered tools: [zqk_get_current_backlog_item zqk_object_count zqk_object_list zqk_get_current_priority_plan zqk_read_code zqk_write_code zqk_observer_search zqk_chat_send zqk_ide_bridge_request zqk_read_file zqk_write_file zqk_execute_bash zqk_system_status zqk_object_get] (count=14)
+[2026-09-05 04:11:17.890] [MCP_DEBUG] tools/list: cached tools count=14
+[2026-09-05 04:11:17.890] [MCP_DEBUG] tools/list: returning 14 tools (initialized=true, rootCommand=true)
+[2026-09-05 04:11:17.890] [MCP_DEBUG] Response queued: id=2 success=true active=true
+[2026-09-05 04:11:17.890] [MCP_DEBUG] Waiting for message from client: event=waiting_for_message
+[2026-09-05 04:11:17.890] [MCP_DEBUG] Response written: id=2 success=true
+[2026-09-05 04:11:17.902] [MCP_DEBUG] Server initialization complete: initialized=true tools_count=14
+[2026-09-05 04:11:17.902] [MCP_INFO] Client initialized and ready: client_id=admin__client_1788581477818113000_1788581477 tools=14 prompts=11
+[2026-09-05 04:11:17.990] [MCP_INFO] ← Welcome message sent to client: client_id=admin_client_1788581477818113000_1788581477
+[2026-09-05 04:12:18.081] [MCP_DEBUG] Message read completed successfully, timeout reset: event=message_read_success
+[2026-09-05 04:12:18.082] [MCP_DEBUG] Request received: method=tools/call id=3
+[2026-09-05 04:12:18.082] [MCP_TRACE] → Tool call started: tool=zqk_execute_bash client_id=admin_client_1788581477818113000_1788581477
+[2026-09-05 04:12:18.479] [MCP_TRACE] ← Tool call completed: tool=zqk_execute_bash, duration=396.927083ms client_id=admin_client_1788581477818113000_1788581477
+[2026-09-05 04:12:18.480] [MCP_DEBUG] Response queued: id=3 success=true active=true
+[2026-09-05 04:12:18.480] [MCP_DEBUG] Waiting for message from client: event=waiting_for_message
+[2026-09-05 04:12:18.480] [MCP_DEBUG] Response written: id=3 success=true
+[2026-09-05 04:12:23.837] [MCP_DEBUG] Message read completed successfully, timeout reset: event=message_read_success
+[2026-09-05 04:12:23.838] [MCP_DEBUG] Request received: method=tools/call id=4
+[2026-09-05 04:12:23.838] [MCP_TRACE] → Tool call started: tool=zqk_observer_search client_id=admin_client_1788581477818113000_1788581477
+[2026-09-05 04:12:24.047] [MCP_TRACE] ← Tool call completed: tool=zqk_observer_search, duration=209.306416ms client_id=admin_client_1788581477818113000_1788581477
+[2026-09-05 04:12:24.047] [MCP_DEBUG] Response queued: id=4 success=true active=true
+[2026-09-05 04:12:24.047] [MCP_DEBUG] Waiting for message from client: event=waiting_for_message
+[2026-09-05 04:12:24.047] [MCP_DEBUG] Response written: id=4 success=true
+[2026-09-05 04:12:32.761] [MCP_DEBUG] Message read completed successfully, timeout reset: event=message_read_success
+[2026-09-05 04:12:32.762] [MCP_DEBUG] Request received: method=tools/call id=5
+[2026-09-05 04:12:32.762] [MCP_TRACE] → Tool call started: tool=zqk_read_file client_id=admin_client_1788581477818113000_1788581477
+[2026-09-05 04:12:32.765] [MCP_TRACE] ← Tool call completed: tool=zqk_read_file, duration=2.350375ms client_id=admin_client_1788581477818113000_1788581477
+[2026-09-05 04:12:32.765] [MCP_DEBUG] Response queued: id=5 success=true active=true
+[2026-09-05 04:12:32.765] [MCP_DEBUG] Waiting for message from client: event=waiting_for_message
+[2026-09-05 04:12:32.765] [MCP_DEBUG] Response written: id=5 success=true
+[2026-09-05 04:12:32.765] [MCP_DEBUG] Message read completed successfully, timeout reset: event=message_read_success
+[2026-09-05 04:12:32.765] [MCP_DEBUG] Request received: method=tools/call id=6
+[2026-09-05 04:12:32.765] [MCP_TRACE] → Tool call started: tool=zqk_read_file client_id=admin_client_1788581477818113000_1788581477
+[2026-09-05 04:12:32.766] [MCP_TRACE] ← Tool call completed: tool=zqk_read_file, duration=390.791µs client_id=admin_client_1788581477818113000_1788581477
+[2026-09-05 04:12:32.766] [MCP_DEBUG] Response queued: id=6 success=true active=true
+[2026-09-05 04:12:32.766] [MCP_DEBUG] Waiting for message from client: event=waiting_for_message
+[2026-09-05 04:12:32.766] [MCP_DEBUG] Response written: id=6 success=true
+[2026-09-05 04:12:36.115] [MCP_DEBUG] Message read completed successfully, timeout reset: event=message_read_success
+[2026-09-05 04:12:36.115] [MCP_DEBUG] Request received: method=tools/call id=7
+[2026-09-05 04:12:36.115] [MCP_TRACE] → Tool call started: tool=zqk_read_code client_id=admin_client_1788581477818113000_1788581477
+[2026-09-05 04:12:36.129] [MCP_TRACE] ← Tool call completed: tool=zqk_read_code, duration=13.5725ms client_id=admin_client_1788581477818113000_1788581477
+[2026-09-05 04:12:36.129] [MCP_DEBUG] Response queued: id=7 success=true active=true
+[2026-09-05 04:12:36.129] [MCP_DEBUG] Waiting for message from client: event=waiting_for_message
+[2026-09-05 04:12:36.129] [MCP_DEBUG] Response written: id=7 success=true
+[2026-09-05 04:12:36.131] [MCP_DEBUG] Message read completed successfully, timeout reset: event=message_read_success
+[2026-09-05 04:12:36.131] [MCP_DEBUG] Request received: method=tools/call id=8
+[2026-09-05 04:12:36.131] [MCP_TRACE] → Tool call started: tool=zqk_observer_search client_id=admin_client_1788581477818113000_1788581477
+[2026-09-05 04:12:36.330] [MCP_TRACE] ← Tool call completed: tool=zqk_observer_search, duration=198.937ms client_id=admin_client_1788581477818113000_1788581477
+[2026-09-05 04:12:36.336] [MCP_DEBUG] Response queued: id=8 success=true active=true
+[2026-09-05 04:12:36.336] [MCP_DEBUG] Response written: id=8 success=true
+[2026-09-05 04:12:36.336] [MCP_DEBUG] Waiting for message from client: event=waiting_for_message
+[2026-09-05 04:12:42.588] [MCP_INFO] Trace logging initialized successfully
+[2026-09-05 04:12:42.590] [MCP_SPEC] name=* state=storage_selected reason=<nil>
+[2026-09-05 04:12:42.591] [MCP_DEBUG] Waiting for message from client: event=waiting_for_message
+[2026-09-05 04:12:42.591] [MCP_DEBUG] Message read completed successfully, timeout reset: event=message_read_success
+[2026-09-05 04:12:42.591] [MCP_DEBUG] Request received: method=initialize id=1
+[2026-09-05 04:12:42.591] [MCP_DEBUG] initialize called: current_state=initialized:false, tools_count=0
+[2026-09-05 04:12:42.591] [MCP_DEBUG] prepareReinitialization: first initialization, keeping existing tools (count=0)
+[2026-09-05 04:12:42.618] [MCP_DEBUG] registerToolsAndResources: starting with 0 tools
+[2026-09-05 04:12:42.619] [MCP_SPEC] name=onboarding_prompts state=storage_selected reason=<nil>
+[2026-09-05 04:12:42.619] [MCP_DEBUG] registerToolsAndResources: registered tools, now have 31 tools (was 0)
+[2026-09-05 04:12:42.619] [MCP_DEBUG] registerToolsAndResources: tool names: [zqk_object_list zqk_object_get zqk_get_priority_plan_items zqk_report_vitality zqk_get_metrics zqk_report_edd zqk_report_blockers zqk_report_maturation zqk_write_code zqk_graph_traversal zqk_state_aware_query zqk_system_status zqk_read_code zqk_ide_bridge_request zqk_get_next_backlog_item zqk_read_file zqk_test_echo zqk_get_current_backlog_item zqk_report_pcs zqk_execute_bash zqk_get_tool_metrics zqk_write_file zqk_resolve_references zqk_system_check zqk_create_object_interactive zqk_report_qa_success zqk_observer_search zqk_server_shutdown zqk_object_count zqk_get_current_priority_plan zqk_chat_send]
+[2026-09-05 04:12:42.620] [MCP_SPEC] name=critical_resources state=storage_selected reason=<nil>
+[2026-09-05 04:12:42.620] [MCP_SPEC] name=critical_resources state=storage_selected reason=<nil>
+[2026-09-05 04:12:42.628] [MCP_DEBUG] registerToolsAndResources: applied tools allowlist, 31 -> 14 tools
+[2026-09-05 04:12:42.628] [MCP_DEBUG] registerToolsAndResources: completed, final tool count=14
+[2026-09-05 04:12:42.628] [MCP_DEBUG] About to set initialized=true: tools_count=14
+[2026-09-05 04:12:42.628] [MCP_INFO] MCP server ready: tools_count=14
+[2026-09-05 04:12:42.628] [MCP_DEBUG] Response queued: id=1 success=true active=true
+[2026-09-05 04:12:42.628] [MCP_DEBUG] Waiting for message from client: event=waiting_for_message
+[2026-09-05 04:12:42.628] [MCP_DEBUG] Response written: id=1 success=true
+[2026-09-05 04:12:42.628] [MCP_DEBUG] Message read completed successfully, timeout reset: event=message_read_success
+[2026-09-05 04:12:42.628] [MCP_DEBUG] Notification received: method=notifications/initialized
+[2026-09-05 04:12:42.628] [MCP_DEBUG] Notification processed: method=notifications/initialized state=handled
+[2026-09-05 04:12:42.628] [MCP_DEBUG] Waiting for message from client: event=waiting_for_message
+[2026-09-05 04:12:42.628] [MCP_DEBUG] Message read completed successfully, timeout reset: event=message_read_success
+[2026-09-05 04:12:42.628] [MCP_DEBUG] Request received: method=tools/list id=2
+[2026-09-05 04:12:42.628] [MCP_DEBUG] tools/list called: initialized=true, tools_count=14, rootCommand=true
+[2026-09-05 04:12:42.628] [MCP_DEBUG] tools/list: registered tools: [zqk_observer_search zqk_object_count zqk_get_current_priority_plan zqk_chat_send zqk_object_list zqk_object_get zqk_write_code zqk_system_status zqk_read_code zqk_ide_bridge_request zqk_read_file zqk_get_current_backlog_item zqk_execute_bash zqk_write_file] (count=14)
+[2026-09-05 04:12:42.628] [MCP_DEBUG] tools/list: cached tools count=14
+[2026-09-05 04:12:42.628] [MCP_DEBUG] tools/list: returning 14 tools (initialized=true, rootCommand=true)
+[2026-09-05 04:12:42.629] [MCP_DEBUG] Response queued: id=2 success=true active=true
+[2026-09-05 04:12:42.629] [MCP_DEBUG] Waiting for message from client: event=waiting_for_message
+[2026-09-05 04:12:42.629] [MCP_DEBUG] Response written: id=2 success=true
+[2026-09-05 04:12:42.640] [MCP_DEBUG] Server initialization complete: initialized=true tools_count=14
+[2026-09-05 04:12:42.640] [MCP_INFO] Client initialized and ready: client_id=admin__client_1788581562591255000_1788581562 tools=14 prompts=11
+[2026-09-05 04:12:42.729] [MCP_INFO] ← Welcome message sent to client: client_id=admin_client_1788581562591255000_1788581562
+[2026-09-05 04:13:10.051] [MCP_DEBUG] Message read completed with error: error=EOF event=message_read_error
+[2026-09-05 04:13:10.052] [MCP_INFO] Client disconnected (EOF) - resetting state for re-initialization
+[2026-09-05 04:13:10.052] [MCP_DEBUG] Cleared client ID (was: admin_client_1788581562591255000_1788581562)
+[2026-09-05 04:13:10.052] [MCP_DEBUG] Message read completed with error: error=EOF event=message_read_error
+[2026-09-05 04:13:10.052] [MCP_INFO] Client disconnected (EOF) - resetting state for re-initialization
+[2026-09-05 04:13:10.052] [MCP_DEBUG] Cleared client ID (was: admin_client_1788581477818113000_1788581477)
+[2026-09-05 04:13:10.053] [MCP_DEBUG] Cleared tools and prompts (was 14 tools)
+[2026-09-05 04:13:10.053] [MCP_DEBUG] Cleared tools and prompts (was 14 tools)
+[2026-09-05 04:13:10.054] [MCP_SPEC] name=onboarding_prompts state=storage_selected reason=<nil>
+[2026-09-05 04:13:10.054] [MCP_SPEC] name=onboarding_prompts state=storage_selected reason=<nil>
+[2026-09-05 04:13:10.056] [MCP_DEBUG] Re-registered built-in tools (17 tools ready for next client)
+[2026-09-05 04:13:10.056] [MCP_DEBUG] Re-registered built-in tools (17 tools ready for next client)
+[2026-09-05 04:14:27.860] [MCP_INFO] Trace logging initialized successfully
+[2026-09-05 04:14:27.863] [MCP_SPEC] name=* state=storage_selected reason=<nil>
+[2026-09-05 04:14:27.863] [MCP_DEBUG] Waiting for message from client: event=waiting_for_message
+[2026-09-05 04:14:27.863] [MCP_DEBUG] Message read completed successfully, timeout reset: event=message_read_success
+[2026-09-05 04:14:27.863] [MCP_DEBUG] Request received: method=initialize id=1
+[2026-09-05 04:14:27.863] [MCP_DEBUG] initialize called: current_state=initialized:false, tools_count=0
+[2026-09-05 04:14:27.863] [MCP_DEBUG] prepareReinitialization: first initialization, keeping existing tools (count=0)
+[2026-09-05 04:14:27.905] [MCP_DEBUG] registerToolsAndResources: starting with 0 tools
+[2026-09-05 04:14:27.906] [MCP_SPEC] name=onboarding_prompts state=storage_selected reason=<nil>
+[2026-09-05 04:14:27.906] [MCP_DEBUG] registerToolsAndResources: registered tools, now have 31 tools (was 0)
+[2026-09-05 04:14:27.906] [MCP_DEBUG] registerToolsAndResources: tool names: [zqk_test_echo zqk_create_object_interactive zqk_system_check zqk_get_current_backlog_item zqk_get_next_backlog_item zqk_resolve_references zqk_report_pcs zqk_write_file zqk_graph_traversal zqk_report_blockers zqk_read_file zqk_read_code zqk_chat_send zqk_ide_bridge_request zqk_server_shutdown zqk_object_count zqk_report_vitality zqk_report_qa_success zqk_execute_bash zqk_write_code zqk_observer_search zqk_object_get zqk_get_current_priority_plan zqk_get_priority_plan_items zqk_get_tool_metrics zqk_state_aware_query zqk_report_edd zqk_report_maturation zqk_object_list zqk_system_status zqk_get_metrics]
+[2026-09-05 04:14:27.907] [MCP_SPEC] name=critical_resources state=storage_selected reason=<nil>
+[2026-09-05 04:14:27.907] [MCP_SPEC] name=critical_resources state=storage_selected reason=<nil>
+[2026-09-05 04:14:27.915] [MCP_DEBUG] registerToolsAndResources: applied tools allowlist, 31 -> 14 tools
+[2026-09-05 04:14:27.915] [MCP_DEBUG] registerToolsAndResources: completed, final tool count=14
+[2026-09-05 04:14:27.915] [MCP_DEBUG] About to set initialized=true: tools_count=14
+[2026-09-05 04:14:27.915] [MCP_INFO] MCP server ready: tools_count=14
+[2026-09-05 04:14:27.915] [MCP_DEBUG] Response queued: id=1 success=true active=true
+[2026-09-05 04:14:27.915] [MCP_DEBUG] Waiting for message from client: event=waiting_for_message
+[2026-09-05 04:14:27.915] [MCP_DEBUG] Response written: id=1 success=true
+[2026-09-05 04:14:27.915] [MCP_DEBUG] Message read completed successfully, timeout reset: event=message_read_success
+[2026-09-05 04:14:27.915] [MCP_DEBUG] Notification received: method=notifications/initialized
+[2026-09-05 04:14:27.915] [MCP_DEBUG] Notification processed: method=notifications/initialized state=handled
+[2026-09-05 04:14:27.915] [MCP_DEBUG] Waiting for message from client: event=waiting_for_message
+[2026-09-05 04:14:27.915] [MCP_DEBUG] Message read completed successfully, timeout reset: event=message_read_success
+[2026-09-05 04:14:27.915] [MCP_DEBUG] Request received: method=tools/list id=2
+[2026-09-05 04:14:27.916] [MCP_DEBUG] tools/list called: initialized=true, tools_count=14, rootCommand=true
+[2026-09-05 04:14:27.916] [MCP_DEBUG] tools/list: registered tools: [zqk_object_list zqk_system_status zqk_get_current_backlog_item zqk_write_file zqk_read_file zqk_read_code zqk_chat_send zqk_ide_bridge_request zqk_object_count zqk_execute_bash zqk_write_code zqk_observer_search zqk_object_get zqk_get_current_priority_plan] (count=14)
+[2026-09-05 04:14:27.916] [MCP_DEBUG] tools/list: cached tools count=14
+[2026-09-05 04:14:27.916] [MCP_DEBUG] tools/list: returning 14 tools (initialized=true, rootCommand=true)
+[2026-09-05 04:14:27.916] [MCP_DEBUG] Response queued: id=2 success=true active=true
+[2026-09-05 04:14:27.916] [MCP_DEBUG] Waiting for message from client: event=waiting_for_message
+[2026-09-05 04:14:27.916] [MCP_DEBUG] Response written: id=2 success=true
+[2026-09-05 04:14:27.926] [MCP_DEBUG] Server initialization complete: initialized=true tools_count=14
+[2026-09-05 04:14:27.926] [MCP_INFO] Client initialized and ready: client_id=admin__client_1788581667863525000_1788581667 tools=14 prompts=11
+[2026-09-05 04:14:28.017] [MCP_INFO] ← Welcome message sent to client: client_id=admin_client_1788581667863525000_1788581667
+[2026-09-05 04:20:51.433] [MCP_INFO] Trace logging initialized successfully
+[2026-09-05 04:20:51.437] [MCP_SPEC] name=* state=storage_selected reason=<nil>
+[2026-09-05 04:20:51.437] [MCP_DEBUG] Waiting for message from client: event=waiting_for_message
+[2026-09-05 04:20:51.437] [MCP_DEBUG] Message read completed successfully, timeout reset: event=message_read_success
+[2026-09-05 04:20:51.437] [MCP_DEBUG] Request received: method=initialize id=1
+[2026-09-05 04:20:51.437] [MCP_DEBUG] initialize called: current_state=initialized:false, tools_count=0
+[2026-09-05 04:20:51.437] [MCP_DEBUG] prepareReinitialization: first initialization, keeping existing tools (count=0)
+[2026-09-05 04:20:51.486] [MCP_DEBUG] registerToolsAndResources: starting with 0 tools
+[2026-09-05 04:20:51.488] [MCP_SPEC] name=onboarding_prompts state=storage_selected reason=<nil>
+[2026-09-05 04:20:51.488] [MCP_DEBUG] registerToolsAndResources: registered tools, now have 31 tools (was 0)
+[2026-09-05 04:20:51.488] [MCP_DEBUG] registerToolsAndResources: tool names: [zqk_resolve_references zqk_system_check zqk_get_current_priority_plan zqk_report_pcs zqk_ide_bridge_request zqk_graph_traversal zqk_object_get zqk_system_status zqk_get_priority_plan_items zqk_report_edd zqk_object_list zqk_server_shutdown zqk_object_count zqk_report_maturation zqk_report_qa_success zqk_execute_bash zqk_chat_send zqk_create_object_interactive zqk_get_tool_metrics zqk_read_code zqk_report_vitality zqk_write_file zqk_observer_search zqk_test_echo zqk_report_blockers zqk_state_aware_query zqk_get_current_backlog_item zqk_get_next_backlog_item zqk_read_file zqk_write_code zqk_get_metrics]
+[2026-09-05 04:20:51.489] [MCP_SPEC] name=critical_resources state=storage_selected reason=<nil>
+[2026-09-05 04:20:51.489] [MCP_SPEC] name=critical_resources state=storage_selected reason=<nil>
+[2026-09-05 04:20:51.497] [MCP_DEBUG] registerToolsAndResources: applied tools allowlist, 31 -> 14 tools
+[2026-09-05 04:20:51.497] [MCP_DEBUG] registerToolsAndResources: completed, final tool count=14
+[2026-09-05 04:20:51.497] [MCP_DEBUG] About to set initialized=true: tools_count=14
+[2026-09-05 04:20:51.497] [MCP_INFO] MCP server ready: tools_count=14
+[2026-09-05 04:20:51.497] [MCP_DEBUG] Response queued: id=1 success=true active=true
+[2026-09-05 04:20:51.497] [MCP_DEBUG] Waiting for message from client: event=waiting_for_message
+[2026-09-05 04:20:51.497] [MCP_DEBUG] Response written: id=1 success=true
+[2026-09-05 04:20:51.498] [MCP_DEBUG] Message read completed successfully, timeout reset: event=message_read_success
+[2026-09-05 04:20:51.498] [MCP_DEBUG] Notification received: method=notifications/initialized
+[2026-09-05 04:20:51.498] [MCP_DEBUG] Notification processed: method=notifications/initialized state=handled
+[2026-09-05 04:20:51.498] [MCP_DEBUG] Waiting for message from client: event=waiting_for_message
+[2026-09-05 04:20:51.498] [MCP_DEBUG] Message read completed successfully, timeout reset: event=message_read_success
+[2026-09-05 04:20:51.498] [MCP_DEBUG] Request received: method=tools/list id=2
+[2026-09-05 04:20:51.498] [MCP_DEBUG] tools/list called: initialized=true, tools_count=14, rootCommand=true
+[2026-09-05 04:20:51.498] [MCP_DEBUG] tools/list: registered tools: [zqk_execute_bash zqk_chat_send zqk_read_code zqk_write_file zqk_observer_search zqk_get_current_backlog_item zqk_read_file zqk_write_code zqk_get_current_priority_plan zqk_ide_bridge_request zqk_object_get zqk_system_status zqk_object_list zqk_object_count] (count=14)
+[2026-09-05 04:20:51.498] [MCP_DEBUG] tools/list: cached tools count=14
+[2026-09-05 04:20:51.498] [MCP_DEBUG] tools/list: returning 14 tools (initialized=true, rootCommand=true)
+[2026-09-05 04:20:51.498] [MCP_DEBUG] Response queued: id=2 success=true active=true
+[2026-09-05 04:20:51.498] [MCP_DEBUG] Waiting for message from client: event=waiting_for_message
+[2026-09-05 04:20:51.498] [MCP_DEBUG] Response written: id=2 success=true
+[2026-09-05 04:20:51.509] [MCP_DEBUG] Server initialization complete: initialized=true tools_count=14
+[2026-09-05 04:20:51.510] [MCP_INFO] Client initialized and ready: client_id=admin__client_1788582051437460000_1788582051 tools=14 prompts=11
+[2026-09-05 04:20:51.600] [MCP_INFO] ← Welcome message sent to client: client_id=admin_client_1788582051437460000_1788582051
+[2026-09-05 04:21:50.462] [MCP_DEBUG] Message read completed successfully, timeout reset: event=message_read_success
+[2026-09-05 04:21:50.462] [MCP_DEBUG] Request received: method=tools/call id=3
+[2026-09-05 04:21:50.462] [MCP_TRACE] → Tool call started: tool=zqk_execute_bash client_id=admin_client_1788582051437460000_1788582051
+[2026-09-05 04:21:50.944] [MCP_TRACE] ← Tool call completed: tool=zqk_execute_bash, duration=481.587583ms client_id=admin_client_1788582051437460000_1788582051
+[2026-09-05 04:21:50.944] [MCP_DEBUG] Response queued: id=3 success=true active=true
+[2026-09-05 04:21:50.944] [MCP_DEBUG] Waiting for message from client: event=waiting_for_message
+[2026-09-05 04:21:50.944] [MCP_DEBUG] Response written: id=3 success=true
+[2026-09-05 04:21:50.944] [MCP_DEBUG] Message read completed successfully, timeout reset: event=message_read_success
+[2026-09-05 04:21:50.944] [MCP_DEBUG] Request received: method=tools/call id=4
+[2026-09-05 04:21:50.944] [MCP_TRACE] → Tool call started: tool=zqk_observer_search client_id=admin_client_1788582051437460000_1788582051
+[2026-09-05 04:21:50.951] [MCP_TRACE] ← Tool call completed: tool=zqk_observer_search, duration=7.314625ms client_id=admin_client_1788582051437460000_1788582051
+[2026-09-05 04:21:50.952] [MCP_DEBUG] Response queued: id=4 success=true active=true
+[2026-09-05 04:21:50.952] [MCP_DEBUG] Waiting for message from client: event=waiting_for_message
+[2026-09-05 04:21:50.952] [MCP_DEBUG] Response written: id=4 success=true
+[2026-09-05 04:22:01.669] [MCP_DEBUG] Message read completed successfully, timeout reset: event=message_read_success
+[2026-09-05 04:22:01.669] [MCP_DEBUG] Request received: method=tools/call id=5
+[2026-09-05 04:22:01.669] [MCP_TRACE] → Tool call started: tool=zqk_observer_search client_id=admin_client_1788582051437460000_1788582051
+[2026-09-05 04:22:01.681] [MCP_TRACE] ← Tool call completed: tool=zqk_observer_search, duration=11.639875ms client_id=admin_client_1788582051437460000_1788582051
+[2026-09-05 04:22:01.681] [MCP_DEBUG] Response queued: id=5 success=true active=true
+[2026-09-05 04:22:01.681] [MCP_DEBUG] Waiting for message from client: event=waiting_for_message
+[2026-09-05 04:22:01.681] [MCP_DEBUG] Response written: id=5 success=true
+[2026-09-05 04:22:11.778] [MCP_DEBUG] Message read completed successfully, timeout reset: event=message_read_success
+[2026-09-05 04:22:11.778] [MCP_DEBUG] Request received: method=tools/call id=6
+[2026-09-05 04:22:11.778] [MCP_TRACE] → Tool call started: tool=zqk_execute_bash client_id=admin_client_1788582051437460000_1788582051
+[2026-09-05 04:22:11.778] [MCP_ERROR] ✗ Tool call failed: tool=zqk_execute_bash, duration=109.875µs, error=ALLOWLIST DENY: "1" is not in the agent sandbox allowlist; use a dedicated zqk MCP tool instead client_id=admin_client_1788582051437460000_1788582051
+[2026-09-05 04:22:11.778] [MCP_DEBUG] Response queued: id=6 success=true active=true
+[2026-09-05 04:22:11.778] [MCP_DEBUG] Waiting for message from client: event=waiting_for_message
+[2026-09-05 04:22:11.778] [MCP_DEBUG] Response written: id=6 success=true
+[2026-09-05 04:22:14.463] [MCP_DEBUG] Message read completed successfully, timeout reset: event=message_read_success
+[2026-09-05 04:22:14.463] [MCP_DEBUG] Request received: method=tools/call id=7
+[2026-09-05 04:22:14.463] [MCP_TRACE] → Tool call started: tool=zqk_execute_bash client_id=admin_client_1788582051437460000_1788582051
+[2026-09-05 04:22:14.463] [MCP_ERROR] ✗ Tool call failed: tool=zqk_execute_bash, duration=201.292µs, error=ALLOWLIST DENY: "1" is not in the agent sandbox allowlist; use a dedicated zqk MCP tool instead client_id=admin_client_1788582051437460000_1788582051
+[2026-09-05 04:22:14.463] [MCP_DEBUG] Response queued: id=7 success=true active=true
+[2026-09-05 04:22:14.463] [MCP_DEBUG] Waiting for message from client: event=waiting_for_message
+[2026-09-05 04:22:14.463] [MCP_DEBUG] Response written: id=7 success=true
+[2026-09-05 04:22:16.849] [MCP_DEBUG] Message read completed successfully, timeout reset: event=message_read_success
+[2026-09-05 04:22:16.850] [MCP_DEBUG] Request received: method=tools/call id=8
+[2026-09-05 04:22:16.850] [MCP_TRACE] → Tool call started: tool=zqk_execute_bash client_id=admin_client_1788582051437460000_1788582051
+[2026-09-05 04:22:16.850] [MCP_ERROR] ✗ Tool call failed: tool=zqk_execute_bash, duration=226.667µs, error=ALLOWLIST DENY: "1" is not in the agent sandbox allowlist; use a dedicated zqk MCP tool instead client_id=admin_client_1788582051437460000_1788582051
+[2026-09-05 04:22:16.850] [MCP_DEBUG] Response queued: id=8 success=true active=true
+[2026-09-05 04:22:16.850] [MCP_DEBUG] Waiting for message from client: event=waiting_for_message
+[2026-09-05 04:22:16.850] [MCP_DEBUG] Response written: id=8 success=true
+[2026-09-05 04:22:18.805] [MCP_DEBUG] Message read completed successfully, timeout reset: event=message_read_success
+[2026-09-05 04:22:18.805] [MCP_DEBUG] Request received: method=tools/call id=9
+[2026-09-05 04:22:18.805] [MCP_TRACE] → Tool call started: tool=zqk_execute_bash client_id=admin_client_1788582051437460000_1788582051
+[2026-09-05 04:22:18.805] [MCP_ERROR] ✗ Tool call failed: tool=zqk_execute_bash, duration=79.25µs, error=ALLOWLIST DENY: "1" is not in the agent sandbox allowlist; use a dedicated zqk MCP tool instead client_id=admin_client_1788582051437460000_1788582051
+[2026-09-05 04:22:18.805] [MCP_DEBUG] Response queued: id=9 success=true active=true
+[2026-09-05 04:22:18.805] [MCP_DEBUG] Waiting for message from client: event=waiting_for_message
+[2026-09-05 04:22:18.805] [MCP_DEBUG] Response written: id=9 success=true
+[2026-09-05 04:22:22.513] [MCP_DEBUG] Message read completed successfully, timeout reset: event=message_read_success
+[2026-09-05 04:22:22.513] [MCP_DEBUG] Request received: method=tools/call id=10
+[2026-09-05 04:22:22.513] [MCP_TRACE] → Tool call started: tool=zqk_read_file client_id=admin_client_1788582051437460000_1788582051
+[2026-09-05 04:22:22.514] [MCP_TRACE] ← Tool call completed: tool=zqk_read_file, duration=562.166µs client_id=admin_client_1788582051437460000_1788582051
+[2026-09-05 04:22:22.514] [MCP_DEBUG] Response queued: id=10 success=true active=true
+[2026-09-05 04:22:22.514] [MCP_DEBUG] Waiting for message from client: event=waiting_for_message
+[2026-09-05 04:22:22.514] [MCP_DEBUG] Response written: id=10 success=true
+[2026-09-05 04:22:22.514] [MCP_DEBUG] Message read completed successfully, timeout reset: event=message_read_success
+[2026-09-05 04:22:22.514] [MCP_DEBUG] Request received: method=tools/call id=11
+[2026-09-05 04:22:22.515] [MCP_TRACE] → Tool call started: tool=zqk_read_file client_id=admin_client_1788582051437460000_1788582051
+[2026-09-05 04:22:22.515] [MCP_TRACE] ← Tool call completed: tool=zqk_read_file, duration=746.458µs client_id=admin_client_1788582051437460000_1788582051
+[2026-09-05 04:22:22.515] [MCP_DEBUG] Response queued: id=11 success=true active=true
+[2026-09-05 04:22:22.515] [MCP_DEBUG] Waiting for message from client: event=waiting_for_message
+[2026-09-05 04:22:22.515] [MCP_DEBUG] Response written: id=11 success=true
+[2026-09-05 04:22:28.235] [MCP_DEBUG] Message read completed successfully, timeout reset: event=message_read_success
+[2026-09-05 04:22:28.235] [MCP_DEBUG] Request received: method=tools/call id=12
+[2026-09-05 04:22:28.236] [MCP_TRACE] → Tool call started: tool=zqk_observer_search client_id=admin_client_1788582051437460000_1788582051
+[2026-09-05 04:22:28.268] [MCP_TRACE] ← Tool call completed: tool=zqk_observer_search, duration=31.949458ms client_id=admin_client_1788582051437460000_1788582051
+[2026-09-05 04:22:28.268] [MCP_DEBUG] Response queued: id=12 success=true active=true
+[2026-09-05 04:22:28.268] [MCP_DEBUG] Waiting for message from client: event=waiting_for_message
+[2026-09-05 04:22:28.268] [MCP_DEBUG] Response written: id=12 success=true
+[2026-09-05 04:22:42.881] [MCP_DEBUG] Message read completed with error: error=EOF event=message_read_error
+[2026-09-05 04:22:42.881] [MCP_INFO] Client disconnected (EOF) - resetting state for re-initialization
+[2026-09-05 04:22:42.881] [MCP_DEBUG] Cleared client ID (was: admin_client_1788582051437460000_1788582051)
+[2026-09-05 04:22:42.890] [MCP_DEBUG] Cleared tools and prompts (was 14 tools)
+[2026-09-05 04:22:42.892] [MCP_SPEC] name=onboarding_prompts state=storage_selected reason=<nil>
+[2026-09-05 04:22:42.893] [MCP_DEBUG] Re-registered built-in tools (17 tools ready for next client)
+[2026-09-05 04:29:06.080] [MCP_INFO] Trace logging initialized successfully
+[2026-09-05 04:29:06.086] [MCP_SPEC] name=* state=storage_selected reason=<nil>
+[2026-09-05 04:29:06.086] [MCP_DEBUG] Waiting for message from client: event=waiting_for_message
+[2026-09-05 04:29:06.086] [MCP_DEBUG] Message read completed successfully, timeout reset: event=message_read_success
+[2026-09-05 04:29:06.086] [MCP_DEBUG] Request received: method=initialize id=1
+[2026-09-05 04:29:06.086] [MCP_DEBUG] initialize called: current_state=initialized:false, tools_count=0
+[2026-09-05 04:29:06.086] [MCP_DEBUG] prepareReinitialization: first initialization, keeping existing tools (count=0)
+[2026-09-05 04:29:06.145] [MCP_DEBUG] registerToolsAndResources: starting with 0 tools
+[2026-09-05 04:29:06.146] [MCP_SPEC] name=onboarding_prompts state=storage_selected reason=<nil>
+[2026-09-05 04:29:06.146] [MCP_DEBUG] registerToolsAndResources: registered tools, now have 31 tools (was 0)
+[2026-09-05 04:29:06.146] [MCP_DEBUG] registerToolsAndResources: tool names: [zqk_read_code zqk_test_echo zqk_server_shutdown zqk_system_check zqk_get_next_backlog_item zqk_report_edd zqk_report_blockers zqk_write_file zqk_resolve_references zqk_get_metrics zqk_chat_send zqk_ide_bridge_request zqk_state_aware_query zqk_create_object_interactive zqk_get_current_priority_plan zqk_get_priority_plan_items zqk_execute_bash zqk_get_current_backlog_item zqk_report_maturation zqk_observer_search zqk_graph_traversal zqk_object_count zqk_system_status zqk_report_pcs zqk_read_file zqk_object_get zqk_get_tool_metrics zqk_report_qa_success zqk_write_code zqk_object_list zqk_report_vitality]
+[2026-09-05 04:29:06.147] [MCP_SPEC] name=critical_resources state=storage_selected reason=<nil>
+[2026-09-05 04:29:06.147] [MCP_SPEC] name=critical_resources state=storage_selected reason=<nil>
+[2026-09-05 04:29:06.179] [MCP_DEBUG] registerToolsAndResources: applied tools allowlist, 31 -> 14 tools
+[2026-09-05 04:29:06.179] [MCP_DEBUG] registerToolsAndResources: completed, final tool count=14
+[2026-09-05 04:29:06.179] [MCP_DEBUG] About to set initialized=true: tools_count=14
+[2026-09-05 04:29:06.179] [MCP_INFO] MCP server ready: tools_count=14
+[2026-09-05 04:29:06.179] [MCP_DEBUG] Response queued: id=1 success=true active=true
+[2026-09-05 04:29:06.179] [MCP_DEBUG] Waiting for message from client: event=waiting_for_message
+[2026-09-05 04:29:06.179] [MCP_DEBUG] Response written: id=1 success=true
+[2026-09-05 04:29:06.179] [MCP_DEBUG] Message read completed successfully, timeout reset: event=message_read_success
+[2026-09-05 04:29:06.179] [MCP_DEBUG] Notification received: method=notifications/initialized
+[2026-09-05 04:29:06.179] [MCP_DEBUG] Notification processed: method=notifications/initialized state=handled
+[2026-09-05 04:29:06.179] [MCP_DEBUG] Waiting for message from client: event=waiting_for_message
+[2026-09-05 04:29:06.179] [MCP_DEBUG] Message read completed successfully, timeout reset: event=message_read_success
+[2026-09-05 04:29:06.179] [MCP_DEBUG] Request received: method=tools/list id=2
+[2026-09-05 04:29:06.179] [MCP_DEBUG] tools/list called: initialized=true, tools_count=14, rootCommand=true
+[2026-09-05 04:29:06.180] [MCP_DEBUG] tools/list: registered tools: [zqk_get_current_priority_plan zqk_execute_bash zqk_get_current_backlog_item zqk_observer_search zqk_object_count zqk_system_status zqk_read_file zqk_object_get zqk_write_code zqk_object_list zqk_read_code zqk_write_file zqk_chat_send zqk_ide_bridge_request] (count=14)
+[2026-09-05 04:29:06.180] [MCP_DEBUG] tools/list: cached tools count=14
+[2026-09-05 04:29:06.180] [MCP_DEBUG] tools/list: returning 14 tools (initialized=true, rootCommand=true)
+[2026-09-05 04:29:06.180] [MCP_DEBUG] Response queued: id=2 success=true active=true
+[2026-09-05 04:29:06.180] [MCP_DEBUG] Waiting for message from client: event=waiting_for_message
+[2026-09-05 04:29:06.180] [MCP_DEBUG] Response written: id=2 success=true
+[2026-09-05 04:29:06.190] [MCP_DEBUG] Server initialization complete: initialized=true tools_count=14
+[2026-09-05 04:29:06.190] [MCP_INFO] Client initialized and ready: client_id=admin__client_1788582546087218000_1788582546 tools=14 prompts=11
+[2026-09-05 04:29:06.281] [MCP_INFO] ← Welcome message sent to client: client_id=admin_client_1788582546087218000_1788582546
+[2026-09-05 04:30:31.727] [MCP_DEBUG] Message read completed successfully, timeout reset: event=message_read_success
+[2026-09-05 04:30:31.727] [MCP_DEBUG] Request received: method=tools/call id=3
+[2026-09-05 04:30:31.727] [MCP_TRACE] → Tool call started: tool=zqk_system_status client_id=admin_client_1788582546087218000_1788582546
+[2026-09-05 04:30:32.094] [MCP_TRACE] ← Tool call completed: tool=zqk_system_status, duration=366.521625ms client_id=admin_client_1788582546087218000_1788582546
+[2026-09-05 04:30:32.094] [MCP_DEBUG] Response queued: id=3 success=true active=true
+[2026-09-05 04:30:32.094] [MCP_DEBUG] Waiting for message from client: event=waiting_for_message
+[2026-09-05 04:30:32.094] [MCP_DEBUG] Response written: id=3 success=true
+[2026-09-05 04:30:37.013] [MCP_DEBUG] Message read completed successfully, timeout reset: event=message_read_success
+[2026-09-05 04:30:37.013] [MCP_DEBUG] Request received: method=tools/call id=4
+[2026-09-05 04:30:37.013] [MCP_TRACE] → Tool call started: tool=zqk_system_status client_id=admin_client_1788582546087218000_1788582546
+[2026-09-05 04:30:37.189] [MCP_TRACE] ← Tool call completed: tool=zqk_system_status, duration=176.189291ms client_id=admin_client_1788582546087218000_1788582546
+[2026-09-05 04:30:37.189] [MCP_DEBUG] Response queued: id=4 success=true active=true
+[2026-09-05 04:30:37.189] [MCP_DEBUG] Waiting for message from client: event=waiting_for_message
+[2026-09-05 04:30:37.189] [MCP_DEBUG] Response written: id=4 success=true
+[2026-09-05 04:30:46.851] [MCP_DEBUG] Message read completed successfully, timeout reset: event=message_read_success
+[2026-09-05 04:30:46.851] [MCP_DEBUG] Request received: method=tools/call id=5
+[2026-09-05 04:30:46.851] [MCP_TRACE] → Tool call started: tool=zqk_observer_search client_id=admin_client_1788582546087218000_1788582546
+[2026-09-05 04:30:46.859] [MCP_TRACE] ← Tool call completed: tool=zqk_observer_search, duration=8.106292ms client_id=admin_client_1788582546087218000_1788582546
+[2026-09-05 04:30:46.860] [MCP_DEBUG] Response queued: id=5 success=true active=true
+[2026-09-05 04:30:46.860] [MCP_DEBUG] Waiting for message from client: event=waiting_for_message
+[2026-09-05 04:30:46.860] [MCP_DEBUG] Response written: id=5 success=true
+[2026-09-05 04:30:46.860] [MCP_DEBUG] Message read completed successfully, timeout reset: event=message_read_success
+[2026-09-05 04:30:46.860] [MCP_DEBUG] Request received: method=tools/call id=6
+[2026-09-05 04:30:46.860] [MCP_TRACE] → Tool call started: tool=zqk_read_code client_id=admin_client_1788582546087218000_1788582546
+[2026-09-05 04:30:46.860] [MCP_ERROR] ✗ Tool call failed: tool=zqk_read_code, duration=171.125µs, error=open /Users/lanceettl/zqk-restore-clone/pkg/scheduler/bundle_executor.go: no such file or directory client_id=admin_client_1788582546087218000_1788582546
+[2026-09-05 04:30:46.860] [MCP_DEBUG] Response queued: id=6 success=true active=true
+[2026-09-05 04:30:46.860] [MCP_DEBUG] Waiting for message from client: event=waiting_for_message
+[2026-09-05 04:30:46.860] [MCP_DEBUG] Response written: id=6 success=true
+[2026-09-05 04:30:59.166] [MCP_DEBUG] Message read completed successfully, timeout reset: event=message_read_success
+[2026-09-05 04:30:59.166] [MCP_DEBUG] Request received: method=tools/call id=7
+[2026-09-05 04:30:59.166] [MCP_TRACE] → Tool call started: tool=zqk_observer_search client_id=admin_client_1788582546087218000_1788582546
+[2026-09-05 04:30:59.286] [MCP_TRACE] ← Tool call completed: tool=zqk_observer_search, duration=120.02225ms client_id=admin_client_1788582546087218000_1788582546
+[2026-09-05 04:30:59.287] [MCP_DEBUG] Response queued: id=7 success=true active=true
+[2026-09-05 04:30:59.287] [MCP_DEBUG] Waiting for message from client: event=waiting_for_message
+[2026-09-05 04:30:59.287] [MCP_DEBUG] Response written: id=7 success=true
+[2026-09-05 04:31:04.772] [MCP_DEBUG] Message read completed successfully, timeout reset: event=message_read_success
+[2026-09-05 04:31:04.772] [MCP_DEBUG] Request received: method=tools/call id=8
+[2026-09-05 04:31:04.772] [MCP_TRACE] → Tool call started: tool=zqk_observer_search client_id=admin_client_1788582546087218000_1788582546
+[2026-09-05 04:31:04.775] [MCP_TRACE] ← Tool call completed: tool=zqk_observer_search, duration=3.469875ms client_id=admin_client_1788582546087218000_1788582546
+[2026-09-05 04:31:04.775] [MCP_DEBUG] Response queued: id=8 success=true active=true
+[2026-09-05 04:31:04.775] [MCP_DEBUG] Waiting for message from client: event=waiting_for_message
+[2026-09-05 04:31:04.775] [MCP_DEBUG] Response written: id=8 success=true
+[2026-09-05 04:31:14.740] [MCP_DEBUG] Message read completed successfully, timeout reset: event=message_read_success
+[2026-09-05 04:31:14.740] [MCP_DEBUG] Request received: method=tools/call id=9
+[2026-09-05 04:31:14.740] [MCP_TRACE] → Tool call started: tool=zqk_observer_search client_id=admin_client_1788582546087218000_1788582546
+[2026-09-05 04:31:14.782] [MCP_TRACE] ← Tool call completed: tool=zqk_observer_search, duration=42.282834ms client_id=admin_client_1788582546087218000_1788582546
+[2026-09-05 04:31:14.785] [MCP_DEBUG] Response queued: id=9 success=true active=true
+[2026-09-05 04:31:14.785] [MCP_DEBUG] Waiting for message from client: event=waiting_for_message
+[2026-09-05 04:31:14.785] [MCP_DEBUG] Response written: id=9 success=true
+[2026-09-05 04:32:37.479] [MCP_DEBUG] Message read completed successfully, timeout reset: event=message_read_success
+[2026-09-05 04:32:37.480] [MCP_DEBUG] Request received: method=tools/call id=10
+[2026-09-05 04:32:37.484] [MCP_TRACE] → Tool call started: tool=zqk_observer_search client_id=admin_client_1788582546087218000_1788582546
+[2026-09-05 04:32:37.488] [MCP_TRACE] ← Tool call completed: tool=zqk_observer_search, duration=4.610041ms client_id=admin_client_1788582546087218000_1788582546
+[2026-09-05 04:32:37.491] [MCP_DEBUG] Response queued: id=10 success=true active=true
+[2026-09-05 04:32:37.491] [MCP_DEBUG] Waiting for message from client: event=waiting_for_message
+[2026-09-05 04:32:37.491] [MCP_DEBUG] Response written: id=10 success=true
+[2026-09-05 04:34:33.091] [MCP_INFO] Trace logging initialized successfully
+[2026-09-05 04:34:33.095] [MCP_SPEC] name=* state=storage_selected reason=<nil>
+[2026-09-05 04:34:33.095] [MCP_DEBUG] Waiting for message from client: event=waiting_for_message
+[2026-09-05 04:34:33.095] [MCP_DEBUG] Message read completed successfully, timeout reset: event=message_read_success
+[2026-09-05 04:34:33.095] [MCP_DEBUG] Request received: method=initialize id=1
+[2026-09-05 04:34:33.095] [MCP_DEBUG] initialize called: current_state=initialized:false, tools_count=0
+[2026-09-05 04:34:33.095] [MCP_DEBUG] prepareReinitialization: first initialization, keeping existing tools (count=0)
+[2026-09-05 04:34:33.102] [MCP_DEBUG] registerToolsAndResources: starting with 0 tools
+[2026-09-05 04:34:33.103] [MCP_SPEC] name=onboarding_prompts state=storage_selected reason=<nil>
+[2026-09-05 04:34:33.103] [MCP_DEBUG] registerToolsAndResources: registered tools, now have 31 tools (was 0)
+[2026-09-05 04:34:33.103] [MCP_DEBUG] registerToolsAndResources: tool names: [zqk_resolve_references zqk_get_current_backlog_item zqk_execute_bash zqk_chat_send zqk_state_aware_query zqk_server_shutdown zqk_get_metrics zqk_write_file zqk_write_code zqk_test_echo zqk_system_status zqk_create_object_interactive zqk_report_blockers zqk_report_vitality zqk_report_qa_success zqk_object_get zqk_report_maturation zqk_object_list zqk_object_count zqk_report_pcs zqk_read_file zqk_get_current_priority_plan zqk_get_priority_plan_items zqk_get_tool_metrics zqk_observer_search zqk_system_check zqk_report_edd zqk_read_code zqk_ide_bridge_request zqk_graph_traversal zqk_get_next_backlog_item]
+[2026-09-05 04:34:33.104] [MCP_SPEC] name=critical_resources state=storage_selected reason=<nil>
+[2026-09-05 04:34:33.104] [MCP_SPEC] name=critical_resources state=storage_selected reason=<nil>
+[2026-09-05 04:34:33.112] [MCP_DEBUG] registerToolsAndResources: applied tools allowlist, 31 -> 14 tools
+[2026-09-05 04:34:33.112] [MCP_DEBUG] registerToolsAndResources: completed, final tool count=14
+[2026-09-05 04:34:33.112] [MCP_DEBUG] About to set initialized=true: tools_count=14
+[2026-09-05 04:34:33.112] [MCP_INFO] MCP server ready: tools_count=14
+[2026-09-05 04:34:33.112] [MCP_DEBUG] Response queued: id=1 success=true active=true
+[2026-09-05 04:34:33.112] [MCP_DEBUG] Waiting for message from client: event=waiting_for_message
+[2026-09-05 04:34:33.112] [MCP_DEBUG] Response written: id=1 success=true
+[2026-09-05 04:34:33.112] [MCP_DEBUG] Message read completed successfully, timeout reset: event=message_read_success
+[2026-09-05 04:34:33.112] [MCP_DEBUG] Notification received: method=notifications/initialized
+[2026-09-05 04:34:33.112] [MCP_DEBUG] Notification processed: method=notifications/initialized state=handled
+[2026-09-05 04:34:33.112] [MCP_DEBUG] Waiting for message from client: event=waiting_for_message
+[2026-09-05 04:34:33.112] [MCP_DEBUG] Message read completed successfully, timeout reset: event=message_read_success
+[2026-09-05 04:34:33.112] [MCP_DEBUG] Request received: method=tools/list id=2
+[2026-09-05 04:34:33.112] [MCP_DEBUG] tools/list called: initialized=true, tools_count=14, rootCommand=true
+[2026-09-05 04:34:33.112] [MCP_DEBUG] tools/list: registered tools: [zqk_object_get zqk_object_list zqk_object_count zqk_read_file zqk_get_current_priority_plan zqk_observer_search zqk_read_code zqk_ide_bridge_request zqk_get_current_backlog_item zqk_execute_bash zqk_chat_send zqk_write_file zqk_write_code zqk_system_status] (count=14)
+[2026-09-05 04:34:33.112] [MCP_DEBUG] tools/list: cached tools count=14
+[2026-09-05 04:34:33.112] [MCP_DEBUG] tools/list: returning 14 tools (initialized=true, rootCommand=true)
+[2026-09-05 04:34:33.112] [MCP_DEBUG] Response queued: id=2 success=true active=true
+[2026-09-05 04:34:33.112] [MCP_DEBUG] Waiting for message from client: event=waiting_for_message
+[2026-09-05 04:34:33.112] [MCP_DEBUG] Response written: id=2 success=true
+[2026-09-05 04:34:33.123] [MCP_DEBUG] Server initialization complete: initialized=true tools_count=14
+[2026-09-05 04:34:33.123] [MCP_INFO] Client initialized and ready: client_id=admin__client_1788582873095327000_1788582873 tools=14 prompts=11
+[2026-09-05 04:34:33.213] [MCP_INFO] ← Welcome message sent to client: client_id=admin_client_1788582873095327000_1788582873
+[2026-09-05 04:36:29.956] [MCP_DEBUG] Message read completed successfully, timeout reset: event=message_read_success
+[2026-09-05 04:36:29.956] [MCP_DEBUG] Request received: method=tools/call id=11
+[2026-09-05 04:36:29.956] [MCP_TRACE] → Tool call started: tool=zqk_object_list client_id=admin_client_1788582546087218000_1788582546
+[2026-09-05 04:36:34.909] [MCP_TRACE] ← Tool call completed: tool=zqk_object_list, duration=4.952926083s client_id=admin_client_1788582546087218000_1788582546
+[2026-09-05 04:36:34.909] [MCP_DEBUG] Response queued: id=11 success=true active=true
+[2026-09-05 04:36:34.909] [MCP_DEBUG] Waiting for message from client: event=waiting_for_message
+[2026-09-05 04:36:34.909] [MCP_DEBUG] Response written: id=11 success=true
+[2026-09-05 04:39:24.601] [MCP_DEBUG] Message read completed successfully, timeout reset: event=message_read_success
+[2026-09-05 04:39:24.601] [MCP_DEBUG] Request received: method=tools/call id=12
+[2026-09-05 04:39:24.601] [MCP_TRACE] → Tool call started: tool=zqk_read_code client_id=admin_client_1788582546087218000_1788582546
+[2026-09-05 04:39:24.601] [MCP_ERROR] ✗ Tool call failed: tool=zqk_read_code, duration=110.042µs, error=open /Users/lanceettl/zqk-restore-clone/pkg/scheduler/bundle_executor.go: no such file or directory client_id=admin_client_1788582546087218000_1788582546
+[2026-09-05 04:39:24.601] [MCP_DEBUG] Response queued: id=12 success=true active=true
+[2026-09-05 04:39:24.601] [MCP_DEBUG] Waiting for message from client: event=waiting_for_message
+[2026-09-05 04:39:24.601] [MCP_DEBUG] Response written: id=12 success=true
+[2026-09-05 04:41:32.662] [MCP_DEBUG] Message read completed with error: error=EOF event=message_read_error
+[2026-09-05 04:41:32.662] [MCP_INFO] Client disconnected (EOF) - resetting state for re-initialization
+[2026-09-05 04:41:32.662] [MCP_DEBUG] Cleared client ID (was: admin_client_1788582546087218000_1788582546)
+[2026-09-05 04:41:32.663] [MCP_DEBUG] Cleared tools and prompts (was 14 tools)
+[2026-09-05 04:41:32.667] [MCP_SPEC] name=onboarding_prompts state=storage_selected reason=<nil>
+[2026-09-05 04:41:32.672] [MCP_DEBUG] Re-registered built-in tools (17 tools ready for next client)

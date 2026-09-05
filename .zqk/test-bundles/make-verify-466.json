@@ -1,0 +1,33 @@
+{
+  "name": "make-verify-466",
+  "created_at": "2026-09-04T21:34:31.945911Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-466",
+    "Tests": [
+      {
+        "Name": "TestInterceptor",
+        "Package": "github",
+        "PackagePath": "pkg/osmosis/github",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/osmosis/github/interceptor_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 30000000000,
+    "PackagePath": "pkg/osmosis/github"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestInterceptor",
+      "Package": "github",
+      "PackagePath": "pkg/osmosis/github",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/osmosis/github/interceptor_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

@@ -1,0 +1,60 @@
+
+--- run 2026-09-05T05:25:22Z ---
+=== RUN   TestCreateJobNotification_StatusUpdate
+=== PAUSE TestCreateJobNotification_StatusUpdate
+=== RUN   TestRunObjectValidationViaPipeline_NilHandler
+=== PAUSE TestRunObjectValidationViaPipeline_NilHandler
+=== RUN   TestRunObjectValidationViaPipeline_NilJob
+=== PAUSE TestRunObjectValidationViaPipeline_NilJob
+=== RUN   TestRunOperationExecutionViaPipeline_NilHandler
+=== PAUSE TestRunOperationExecutionViaPipeline_NilHandler
+=== RUN   TestRunOperationExecutionViaPipeline_NilJob
+=== PAUSE TestRunOperationExecutionViaPipeline_NilJob
+=== RUN   TestPIDFile_WriteReadRemove
+=== PAUSE TestPIDFile_WriteReadRemove
+=== RUN   TestPIDFile_ReadNonExistent
+=== PAUSE TestPIDFile_ReadNonExistent
+=== RUN   TestIsPIDFileNotExist
+=== PAUSE TestIsPIDFileNotExist
+=== RUN   TestIsSchedulerRunning_NoRetryOnFileNotExist
+=== PAUSE TestIsSchedulerRunning_NoRetryOnFileNotExist
+=== RUN   TestIsSchedulerRunning_NotRunning
+=== PAUSE TestIsSchedulerRunning_NotRunning
+=== CONT  TestCreateJobNotification_StatusUpdate
+--- PASS: TestCreateJobNotification_StatusUpdate (0.00s)
+=== CONT  TestIsSchedulerRunning_NotRunning
+=== CONT  TestPIDFile_WriteReadRemove
+--- PASS: TestIsSchedulerRunning_NotRunning (0.01s)
+=== CONT  TestRunOperationExecutionViaPipeline_NilHandler
+--- PASS: TestRunOperationExecutionViaPipeline_NilHandler (0.00s)
+=== CONT  TestRunOperationExecutionViaPipeline_NilJob
+--- PASS: TestRunOperationExecutionViaPipeline_NilJob (0.00s)
+=== CONT  TestIsPIDFileNotExist
+=== RUN   TestIsPIDFileNotExist/nil_error
+=== PAUSE TestIsPIDFileNotExist/nil_error
+=== RUN   TestIsPIDFileNotExist/file_not_found
+=== PAUSE TestIsPIDFileNotExist/file_not_found
+=== RUN   TestIsPIDFileNotExist/timeout
+=== PAUSE TestIsPIDFileNotExist/timeout
+=== RUN   TestIsPIDFileNotExist/wrapped_not_exist
+=== PAUSE TestIsPIDFileNotExist/wrapped_not_exist
+=== CONT  TestIsSchedulerRunning_NoRetryOnFileNotExist
+--- PASS: TestIsSchedulerRunning_NoRetryOnFileNotExist (0.00s)
+=== CONT  TestRunObjectValidationViaPipeline_NilJob
+--- PASS: TestRunObjectValidationViaPipeline_NilJob (0.00s)
+=== CONT  TestPIDFile_ReadNonExistent
+--- PASS: TestPIDFile_WriteReadRemove (0.02s)
+=== CONT  TestRunObjectValidationViaPipeline_NilHandler
+--- PASS: TestRunObjectValidationViaPipeline_NilHandler (0.00s)
+=== CONT  TestIsPIDFileNotExist/nil_error
+=== CONT  TestIsPIDFileNotExist/timeout
+=== CONT  TestIsPIDFileNotExist/wrapped_not_exist
+=== CONT  TestIsPIDFileNotExist/file_not_found
+--- PASS: TestIsPIDFileNotExist (0.00s)
+    --- PASS: TestIsPIDFileNotExist/nil_error (0.00s)
+    --- PASS: TestIsPIDFileNotExist/timeout (0.00s)
+    --- PASS: TestIsPIDFileNotExist/wrapped_not_exist (0.00s)
+    --- PASS: TestIsPIDFileNotExist/file_not_found (0.00s)
+--- PASS: TestPIDFile_ReadNonExistent (0.00s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/scheduler	0.825s

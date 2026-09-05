@@ -1,0 +1,14 @@
+created_at: "2026-08-20T04:42:39Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1787200958740981000-2868446c
+item_id: CRIT-CEF-R8L-SEC-03
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 2857702ca28e4b64fb5782140b43c1400e68fdeab30ab0062f4119523ca97d466e5f13c72adcfa41b92eacf21fa7f0a79b8a8e3a8d7c581e5c9afe0e69cb31dc
+schema_version: 2.0.0
+signature: 3045022100d357b554cba1a205c8243461010c3c0fd77845cedbceac3c84dc5688ee8aa31502206eccb534780abcd27c21016ea066eb4fabeb41baea1c8f1fcd7168e5a49cd07b
+status: archived
+title: node_modules added to .gitignore
+updated_at: "2026-09-01T07:12:46Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

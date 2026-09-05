@@ -1,0 +1,271 @@
+
+--- run 2026-09-04T22:21:17Z ---
+=== RUN   TestCheckStuckCondition_ReturnsStuckWhenNoProgress
+=== PAUSE TestCheckStuckCondition_ReturnsStuckWhenNoProgress
+=== RUN   TestEmitValidationFinishTrailer_Order
+=== PAUSE TestEmitValidationFinishTrailer_Order
+=== RUN   TestValidationProgressStatus
+=== PAUSE TestValidationProgressStatus
+=== RUN   TestWriteValidationProgressLine_TickerSkipsFinalSnapshot
+=== PAUSE TestWriteValidationProgressLine_TickerSkipsFinalSnapshot
+=== RUN   TestEmitValidationFinishTrailer_SkipsDuplicateProgress
+=== PAUSE TestEmitValidationFinishTrailer_SkipsDuplicateProgress
+=== RUN   TestParseWallClockClampTarget
+=== PAUSE TestParseWallClockClampTarget
+=== RUN   TestWallClockClampSafeToAutoFix
+=== PAUSE TestWallClockClampSafeToAutoFix
+=== RUN   TestIsIssueFixableForBatch_WallClockClampRequiresAutoFixable
+=== PAUSE TestIsIssueFixableForBatch_WallClockClampRequiresAutoFixable
+=== RUN   TestIsIssueFixableForBatch_SkipsDestructiveRegistration
+=== PAUSE TestIsIssueFixableForBatch_SkipsDestructiveRegistration
+=== RUN   TestShouldProcessIssue_WallClockClampNotBlanketTier
+=== PAUSE TestShouldProcessIssue_WallClockClampNotBlanketTier
+=== CONT  TestCheckStuckCondition_ReturnsStuckWhenNoProgress
+=== CONT  TestParseWallClockClampTarget
+goroutine 51 [running]:
+runtime/pprof.writeGoroutineStacks({0x1048555d8, 0x413dc1e52060})
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/pprof/pprof.go:819 +0x6c
+runtime/pprof.writeGoroutine({0x1048555d8?, 0x413dc1e52060?}, 0x413dc2e67948?)
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/pprof/pprof.go:782 +0x2c
+runtime/pprof.(*Profile).WriteTo(0x0?, {0x1048555d8?, 0x413dc1e52060?}, 0x1035c8d31?)
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/pprof/pprof.go:408 +0x144
+github.com/lanceman/zqk/cmd/zqk/system.dumpGoroutineStacksOnStuck(0x413dc2321520, 0x2e90ee1d50)
+	/Users/lanceettl/zqk-restore-clone/cmd/zqk/system/show_validation_progress_stuck_diagnostics.go:60 +0x65c
+github.com/lanceman/zqk/cmd/zqk/system.checkStuckCondition(0x413dc2321520, 0x5, 0x0, 0x0, 0x5)
+	/Users/lanceettl/zqk-restore-clone/cmd/zqk/system/show_validation_progress_display.go:279 +0xbdc
+github.com/lanceman/zqk/cmd/zqk/system.TestCheckStuckCondition_ReturnsStuckWhenNoProgress(0x413dc2dab208)
+	/Users/lanceettl/zqk-restore-clone/cmd/zqk/system/validation_progress_behavior_test.go:175 +0x240
+testing.tRunner(0x413dc2dab208, 0x104835530)
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/testing/testing.go:2036 +0xc4
+created by testing.(*T).Run in goroutine 1
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/testing/testing.go:2101 +0x3a8
+
+goroutine 1 [chan receive]:
+testing.tRunner.func1()
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/testing/testing.go:1993 +0x3c8
+testing.tRunner(0x413dc2daafc8, 0x413dc2f4bbc8)
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/testing/testing.go:2042 +0x100
+testing.runTests({0x1035b7009, 0x17}, {0x1035ef602, 0x26}, 0x413dc2623080, {0x1049063c0, 0x1d9, 0x1d9}, {0x413dc2f4bc68?, 0x10266e308?, ...})
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/testing/testing.go:2583 +0x3f0
+testing.(*M).Run(0x413dc26aac80)
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/testing/testing.go:2443 +0x578
+github.com/lanceman/zqk/cmd/zqk/system.TestMain(0x413dc26aac80)
+	/Users/lanceettl/zqk-restore-clone/cmd/zqk/system/main_test.go:42 +0x118
+main.main()
+	_testmain.go:996 +0x88
+
+goroutine 50 [select]:
+github.com/lanceman/zqk/pkg/storage.(*ioQueue).startWorker(0x413dc263bce0)
+	/Users/lanceettl/zqk-restore-clone/pkg/storage/io_queue_worker.go:31 +0x1c0
+github.com/lanceman/zqk/pkg/goroutinelabels.(*GoroutineBuilder).StartSimple.func1.4(0x1035a0af8?, 0x0?)
+	/Users/lanceettl/zqk-restore-clone/pkg/goroutinelabels/builder.go:525 +0x48
+github.com/lanceman/zqk/pkg/goroutinelabels.(*GoroutineBuilder).StartSimple.func1()
+	/Users/lanceettl/zqk-restore-clone/pkg/goroutinelabels/builder.go:526 +0x2b0
+created by github.com/lanceman/zqk/pkg/goroutinelabels.(*GoroutineBuilder).StartSimple in goroutine 1
+	/Users/lanceettl/zqk-restore-clone/pkg/goroutinelabels/builder.go:460 +0x1d4
+
+goroutine 52 [chan receive]:
+testing.(*testState).waitParallel(0x413dc24299f0)
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/testing/testing.go:2220 +0x158
+testing.(*T).Parallel(0x413dc2746008)
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/testing/testing.go:1804 +0x1a0
+github.com/lanceman/zqk/cmd/zqk/system.TestEmitValidationFinishTrailer_Order(0x413dc2746008)
+	/Users/lanceettl/zqk-restore-clone/cmd/zqk/system/validation_progress_behavior_test.go:210 +0x28
+testing.tRunner(0x413dc2746008, 0x104835660)
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/testing/testing.go:2036 +0xc4
+created by testing.(*T).Run in goroutine 1
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/testing/testing.go:2101 +0x3a8
+
+goroutine 53 [chan receive]:
+testing.(*testState).waitParallel(0x413dc24299f0)
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/testing/testing.go:2220 +0x158
+testing.(*T).Parallel(0x413dc2746248)
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/testing/testing.go:1804 +0x1a0
+github.com/lanceman/zqk/cmd/zqk/system.TestValidationProgressStatus(0x413dc2746248)
+	/Users/lanceettl/zqk-restore-clone/cmd/zqk/system/validation_progress_behavior_test.go:264 +0x28
+testing.tRunner(0x413dc2746248, 0x104835fc8)
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/testing/testing.go:2036 +0xc4
+created by testing.(*T).Run in goroutine 1
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/testing/testing.go:2101 +0x3a8
+
+goroutine 54 [chan receive]:
+testing.(*testState).waitParallel(0x413dc24299f0)
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/testing/testing.go:2220 +0x158
+testing.(*T).Parallel(0x413dc2746488)
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/testing/testing.go:1804 +0x1a0
+github.com/lanceman/zqk/cmd/zqk/system.TestWriteValidationProgressLine_TickerSkipsFinalSnapshot(0x413dc2746488)
+	/Users/lanceettl/zqk-restore-clone/cmd/zqk/system/validation_progress_behavior_test.go:327 +0x28
+testing.tRunner(0x413dc2746488, 0x1048360a0)
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/testing/testing.go:2036 +0xc4
+created by testing.(*T).Run in goroutine 1
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/testing/testing.go:2101 +0x3a8
+
+goroutine 55 [chan receive]:
+testing.(*testState).waitParallel(0x413dc24299f0)
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/testing/testing.go:2220 +0x158
+testing.(*T).Parallel(0x413dc27466c8)
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/testing/testing.go:1804 +0x1a0
+github.com/lanceman/zqk/cmd/zqk/system.TestEmitValidationFinishTrailer_SkipsDuplicateProgress(0x413dc27466c8)
+	/Users/lanceettl/zqk-restore-clone/cmd/zqk/system/validation_progress_behavior_test.go:348 +0x28
+testing.tRunner(0x413dc27466c8, 0x104835668)
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/testing/testing.go:2036 +0xc4
+created by testing.(*T).Run in goroutine 1
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/testing/testing.go:2101 +0x3a8
+
+goroutine 56 [runnable]:
+gopkg.in/yaml%2ev3.read(0x413dc2914008?, {0x413dc2710ea0?, 0x7?, 0x20?})
+	/Users/lanceettl/go/pkg/mod/gopkg.in/yaml.v3@v3.0.1/scannerc.go:542 +0x248
+gopkg.in/yaml%2ev3.yaml_parser_scan_plain_scalar(0x413dc2914008, 0x413dc2e6b058)
+	/Users/lanceettl/go/pkg/mod/gopkg.in/yaml.v3@v3.0.1/scannerc.go:2759 +0x690
+gopkg.in/yaml%2ev3.yaml_parser_fetch_plain_scalar(0x413dc2914008)
+	/Users/lanceettl/go/pkg/mod/gopkg.in/yaml.v3@v3.0.1/scannerc.go:1527 +0x5c
+gopkg.in/yaml%2ev3.yaml_parser_fetch_next_token(0x413dc2914008)
+	/Users/lanceettl/go/pkg/mod/gopkg.in/yaml.v3@v3.0.1/scannerc.go:874 +0x624
+gopkg.in/yaml%2ev3.yaml_parser_fetch_more_tokens(0x413dc2914008)
+	/Users/lanceettl/go/pkg/mod/gopkg.in/yaml.v3@v3.0.1/scannerc.go:677 +0x164
+gopkg.in/yaml%2ev3.peek_token(0x413dc2914008)
+	/Users/lanceettl/go/pkg/mod/gopkg.in/yaml.v3@v3.0.1/parserc.go:69 +0x28
+gopkg.in/yaml%2ev3.yaml_parser_parse_block_sequence_entry(0x413dc2914008, 0x413dc29142b8, 0x18?)
+	/Users/lanceettl/go/pkg/mod/gopkg.in/yaml.v3@v3.0.1/parserc.go:707 +0x194
+gopkg.in/yaml%2ev3.yaml_parser_state_machine(0x413dc2e6b418?, 0x4?)
+	/Users/lanceettl/go/pkg/mod/gopkg.in/yaml.v3@v3.0.1/parserc.go:182 +0xf0
+gopkg.in/yaml%2ev3.yaml_parser_parse(0x3?, 0x413dc2e88a80?)
+	/Users/lanceettl/go/pkg/mod/gopkg.in/yaml.v3@v3.0.1/parserc.go:129 +0x9c
+gopkg.in/yaml%2ev3.(*parser).peek(0x413dc2914008)
+	/Users/lanceettl/go/pkg/mod/gopkg.in/yaml.v3@v3.0.1/decode.go:106 +0x30
+gopkg.in/yaml%2ev3.(*parser).sequence(0x413dc2914008)
+	/Users/lanceettl/go/pkg/mod/gopkg.in/yaml.v3@v3.0.1/decode.go:261 +0x110
+gopkg.in/yaml%2ev3.(*parser).parse(0x413dc2914008)
+	/Users/lanceettl/go/pkg/mod/gopkg.in/yaml.v3@v3.0.1/decode.go:157 +0x100
+gopkg.in/yaml%2ev3.(*parser).parseChild(...)
+	/Users/lanceettl/go/pkg/mod/gopkg.in/yaml.v3@v3.0.1/decode.go:197
+gopkg.in/yaml%2ev3.(*parser).mapping(0x413dc2914008)
+	/Users/lanceettl/go/pkg/mod/gopkg.in/yaml.v3@v3.0.1/decode.go:288 +0x208
+gopkg.in/yaml%2ev3.(*parser).parse(0x413dc2914008)
+	/Users/lanceettl/go/pkg/mod/gopkg.in/yaml.v3@v3.0.1/decode.go:155 +0x120
+gopkg.in/yaml%2ev3.(*parser).parseChild(...)
+	/Users/lanceettl/go/pkg/mod/gopkg.in/yaml.v3@v3.0.1/decode.go:197
+gopkg.in/yaml%2ev3.(*parser).mapping(0x413dc2914008)
+	/Users/lanceettl/go/pkg/mod/gopkg.in/yaml.v3@v3.0.1/decode.go:288 +0x208
+gopkg.in/yaml%2ev3.(*parser).parse(0x413dc2914008)
+	/Users/lanceettl/go/pkg/mod/gopkg.in/yaml.v3@v3.0.1/decode.go:155 +0x120
+gopkg.in/yaml%2ev3.(*parser).parseChild(...)
+	/Users/lanceettl/go/pkg/mod/gopkg.in/yaml.v3@v3.0.1/decode.go:197
+gopkg.in/yaml%2ev3.(*parser).mapping(0x413dc2914008)
+	/Users/lanceettl/go/pkg/mod/gopkg.in/yaml.v3@v3.0.1/decode.go:288 +0x208
+gopkg.in/yaml%2ev3.(*parser).parse(0x413dc2914008)
+	/Users/lanceettl/go/pkg/mod/gopkg.in/yaml.v3@v3.0.1/decode.go:155 +0x120
+gopkg.in/yaml%2ev3.(*parser).parseChild(...)
+	/Users/lanceettl/go/pkg/mod/gopkg.in/yaml.v3@v3.0.1/decode.go:197
+gopkg.in/yaml%2ev3.(*parser).document(0x413dc2914008)
+	/Users/lanceettl/go/pkg/mod/gopkg.in/yaml.v3@v3.0.1/decode.go:206 +0x78
+gopkg.in/yaml%2ev3.(*parser).parse(0x413dc2914008)
+	/Users/lanceettl/go/pkg/mod/gopkg.in/yaml.v3@v3.0.1/decode.go:159 +0xb4
+gopkg.in/yaml%2ev3.unmarshal({0x413dc2668a80, 0x6a34, 0x6a35}, {0x1045dc140, 0x413dc25a2120}, 0x60?)
+	/Users/lanceettl/go/pkg/mod/gopkg.in/yaml.v3@v3.0.1/yaml.go:161 +0x25c
+gopkg.in/yaml%2ev3.Unmarshal(...)
+	/Users/lanceettl/go/pkg/mod/gopkg.in/yaml.v3@v3.0.1/yaml.go:89
+github.com/lanceman/zqk/pkg/objects.(*SpecLoader).getOntologyFromFile(0x413dc25180b0, {0x413dc1efc000, 0x7e})
+	/Users/lanceettl/zqk-restore-clone/pkg/objects/spec_loader.go:882 +0x16c
+github.com/lanceman/zqk/pkg/objects.(*SpecLoader).LoadSpecWithInheritance(0x413dc25180b0, {0x413dc2e8a000, 0x11})
+	/Users/lanceettl/zqk-restore-clone/pkg/objects/spec_loader.go:381 +0x210
+github.com/lanceman/zqk/pkg/objects.KindHasTrait({0x103598c56, 0xc}, {0x103598e2a, 0xc})
+	/Users/lanceettl/zqk-restore-clone/pkg/objects/trait_lookup.go:32 +0x84
+github.com/lanceman/zqk/pkg/objects.KindHasNamedTrait(...)
+	/Users/lanceettl/zqk-restore-clone/pkg/objects/trait_lookup.go:56
+github.com/lanceman/zqk/cmd/zqk/system.generateFixCommand({0x10358ba74, 0x5}, {0x103598c56, 0xc}, {0x10359b226, 0xd}, {0x10362fb46, 0x3c}, {0x1035d03f8, 0x1e}, ...)
+	/Users/lanceettl/zqk-restore-clone/cmd/zqk/system/check_instance_validation_helpers.go:362 +0x11c
+github.com/lanceman/zqk/cmd/zqk/system.TestParseWallClockClampTarget(0x413dc2746908)
+	/Users/lanceettl/zqk-restore-clone/cmd/zqk/system/wall_clock_clamp_fix_test.go:22 +0x148
+testing.tRunner(0x413dc2746908, 0x104835b80)
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/testing/testing.go:2036 +0xc4
+created by testing.(*T).Run in goroutine 1
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/testing/testing.go:2101 +0x3a8
+
+goroutine 57 [chan receive]:
+testing.(*testState).waitParallel(0x413dc24299f0)
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/testing/testing.go:2220 +0x158
+testing.(*T).Parallel(0x413dc2746b48)
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/testing/testing.go:1804 +0x1a0
+github.com/lanceman/zqk/cmd/zqk/system.TestWallClockClampSafeToAutoFix(0x413dc2746b48)
+	/Users/lanceettl/zqk-restore-clone/cmd/zqk/system/wall_clock_clamp_fix_test.go:43 +0x28
+testing.tRunner(0x413dc2746b48, 0x104836068)
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/testing/testing.go:2036 +0xc4
+created by testing.(*T).Run in goroutine 1
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/testing/testing.go:2101 +0x3a8
+
+goroutine 58 [chan receive]:
+testing.(*testState).waitParallel(0x413dc24299f0)
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/testing/testing.go:2220 +0x158
+testing.(*T).Parallel(0x413dc2746d88)
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/testing/testing.go:1804 +0x1a0
+github.com/lanceman/zqk/cmd/zqk/system.TestIsIssueFixableForBatch_WallClockClampRequiresAutoFixable(0x413dc2746d88)
+	/Users/lanceettl/zqk-restore-clone/cmd/zqk/system/wall_clock_clamp_fix_test.go:68 +0x24
+testing.tRunner(0x413dc2746d88, 0x104835990)
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/testing/testing.go:2036 +0xc4
+created by testing.(*T).Run in goroutine 1
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/testing/testing.go:2101 +0x3a8
+
+goroutine 59 [chan receive]:
+testing.(*testState).waitParallel(0x413dc24299f0)
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/testing/testing.go:2220 +0x158
+testing.(*T).Parallel(0x413dc2746fc8)
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/testing/testing.go:1804 +0x1a0
+github.com/lanceman/zqk/cmd/zqk/system.TestIsIssueFixableForBatch_SkipsDestructiveRegistration(0x413dc2746fc8)
+	/Users/lanceettl/zqk-restore-clone/cmd/zqk/system/wall_clock_clamp_fix_test.go:86 +0x28
+testing.tRunner(0x413dc2746fc8, 0x104835988)
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/testing/testing.go:2036 +0xc4
+created by testing.(*T).Run in goroutine 1
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/testing/testing.go:2101 +0x3a8
+
+goroutine 60 [chan receive]:
+testing.(*testState).waitParallel(0x413dc24299f0)
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/testing/testing.go:2220 +0x158
+testing.(*T).Parallel(0x413dc2747208)
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/testing/testing.go:1804 +0x1a0
+github.com/lanceman/zqk/cmd/zqk/system.TestShouldProcessIssue_WallClockClampNotBlanketTier(0x413dc2747208)
+	/Users/lanceettl/zqk-restore-clone/cmd/zqk/system/wall_clock_clamp_fix_test.go:101 +0x28
+testing.tRunner(0x413dc2747208, 0x104835d40)
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/testing/testing.go:2036 +0xc4
+created by testing.(*T).Run in goroutine 1
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/testing/testing.go:2101 +0x3a8
+
+goroutine 61 [select]:
+github.com/lanceman/zqk/pkg/validation.(*sharedValidationCache).runFlusher(0x413dc2975320, {0x1048603d8, 0x104935840})
+	/Users/lanceettl/zqk-restore-clone/pkg/validation/state_cache_shared.go:106 +0x94
+github.com/lanceman/zqk/pkg/validation.getSharedValidationCache.func1()
+	/Users/lanceettl/zqk-restore-clone/pkg/validation/state_cache_shared.go:85 +0x30
+github.com/lanceman/zqk/pkg/goroutinelabels.(*GoroutineBuilder).StartSimple.func1.4(0x1035d5788?, 0x413dc1f16ec8?)
+	/Users/lanceettl/zqk-restore-clone/pkg/goroutinelabels/builder.go:525 +0x48
+github.com/lanceman/zqk/pkg/goroutinelabels.(*GoroutineBuilder).StartSimple.func1()
+	/Users/lanceettl/zqk-restore-clone/pkg/goroutinelabels/builder.go:526 +0x2b0
+created by github.com/lanceman/zqk/pkg/goroutinelabels.(*GoroutineBuilder).StartSimple in goroutine 51
+	/Users/lanceettl/zqk-restore-clone/pkg/goroutinelabels/builder.go:460 +0x1d4
+--- PASS: TestCheckStuckCondition_ReturnsStuckWhenNoProgress (0.00s)
+=== CONT  TestWriteValidationProgressLine_TickerSkipsFinalSnapshot
+--- PASS: TestWriteValidationProgressLine_TickerSkipsFinalSnapshot (0.00s)
+=== CONT  TestEmitValidationFinishTrailer_SkipsDuplicateProgress
+--- PASS: TestEmitValidationFinishTrailer_SkipsDuplicateProgress (0.00s)
+=== CONT  TestIsIssueFixableForBatch_SkipsDestructiveRegistration
+--- PASS: TestIsIssueFixableForBatch_SkipsDestructiveRegistration (0.00s)
+=== CONT  TestShouldProcessIssue_WallClockClampNotBlanketTier
+--- PASS: TestShouldProcessIssue_WallClockClampNotBlanketTier (0.00s)
+=== CONT  TestIsIssueFixableForBatch_WallClockClampRequiresAutoFixable
+--- PASS: TestIsIssueFixableForBatch_WallClockClampRequiresAutoFixable (0.00s)
+=== CONT  TestValidationProgressStatus
+=== RUN   TestValidationProgressStatus/trailer_owns_completed
+=== RUN   TestValidationProgressStatus/ticker_must_not_claim_completed
+=== RUN   TestValidationProgressStatus/empty_queue_with_in-flight_workers_is_drain_not_processing-results
+=== RUN   TestValidationProgressStatus/queue_has_work
+--- PASS: TestValidationProgressStatus (0.00s)
+    --- PASS: TestValidationProgressStatus/trailer_owns_completed (0.00s)
+    --- PASS: TestValidationProgressStatus/ticker_must_not_claim_completed (0.00s)
+    --- PASS: TestValidationProgressStatus/empty_queue_with_in-flight_workers_is_drain_not_processing-results (0.00s)
+    --- PASS: TestValidationProgressStatus/queue_has_work (0.00s)
+=== CONT  TestWallClockClampSafeToAutoFix
+--- PASS: TestWallClockClampSafeToAutoFix (0.01s)
+=== CONT  TestEmitValidationFinishTrailer_Order
+--- PASS: TestParseWallClockClampTarget (0.02s)
+--- PASS: TestEmitValidationFinishTrailer_Order (0.00s)
+PASS
+ok  	github.com/lanceman/zqk/cmd/zqk/system	0.751s

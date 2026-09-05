@@ -1,0 +1,2 @@
+=== CLI inner context guard ===
+skip: internal/cli/context.go not staged

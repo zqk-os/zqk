@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-381",
+  "created_at": "2026-09-04T21:34:31.126381Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-381",
+    "Tests": [
+      {
+        "Name": "TestRejectionMessage_ReferencesRequirement",
+        "Package": "app",
+        "PackagePath": "cmd/zqk/app",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/app/draft_sweep_auth_edge_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestCheckDraftSweepEntitlement_PersonaSubstringMatch",
+        "Package": "app",
+        "PackagePath": "cmd/zqk/app",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/app/draft_sweep_auth_edge_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestIsDraftSweepCommand_DetectsKnownCommands",
+        "Package": "app",
+        "PackagePath": "cmd/zqk/app",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/app/draft_sweep_auth_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestIsDraftSweepCommand_RejectsUnknownCommands",
+        "Package": "app",
+        "PackagePath": "cmd/zqk/app",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/app/draft_sweep_auth_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestCheckDraftSweepEntitlement_SystemAccountAllowed",
+        "Package": "app",
+        "PackagePath": "cmd/zqk/app",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/app/draft_sweep_auth_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestCheckDraftSweepEntitlement_TestHarnessAllowed",
+        "Package": "app",
+        "PackagePath": "cmd/zqk/app",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/app/draft_sweep_auth_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestCheckDraftSweepEntitlement_AgentSessionTokenAllowed",
+        "Package": "app",
+        "PackagePath": "cmd/zqk/app",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/app/draft_sweep_auth_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestCheckDraftSweepEntitlement_ValidPermAllows",
+        "Package": "app",
+        "PackagePath": "cmd/zqk/app",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/app/draft_sweep_auth_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestCheckDraftSweepEntitlement_ValidPermAllowsViaHasPerm",
+        "Package": "app",
+        "PackagePath": "cmd/zqk/app",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/app/draft_sweep_auth_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestCheckDraftSweepEntitlement_NilContextDenied",
+        "Package": "app",
+        "PackagePath": "cmd/zqk/app",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/app/draft_sweep_auth_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 300000000000,
+    "PackagePath": "cmd/zqk/app"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestRejectionMessage_ReferencesRequirement",
+      "Package": "app",
+      "PackagePath": "cmd/zqk/app",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/app/draft_sweep_auth_edge_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestCheckDraftSweepEntitlement_PersonaSubstringMatch",
+      "Package": "app",
+      "PackagePath": "cmd/zqk/app",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/app/draft_sweep_auth_edge_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestIsDraftSweepCommand_DetectsKnownCommands",
+      "Package": "app",
+      "PackagePath": "cmd/zqk/app",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/app/draft_sweep_auth_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestIsDraftSweepCommand_RejectsUnknownCommands",
+      "Package": "app",
+      "PackagePath": "cmd/zqk/app",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/app/draft_sweep_auth_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestCheckDraftSweepEntitlement_SystemAccountAllowed",
+      "Package": "app",
+      "PackagePath": "cmd/zqk/app",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/app/draft_sweep_auth_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestCheckDraftSweepEntitlement_TestHarnessAllowed",
+      "Package": "app",
+      "PackagePath": "cmd/zqk/app",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/app/draft_sweep_auth_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestCheckDraftSweepEntitlement_AgentSessionTokenAllowed",
+      "Package": "app",
+      "PackagePath": "cmd/zqk/app",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/app/draft_sweep_auth_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestCheckDraftSweepEntitlement_ValidPermAllows",
+      "Package": "app",
+      "PackagePath": "cmd/zqk/app",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/app/draft_sweep_auth_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestCheckDraftSweepEntitlement_ValidPermAllowsViaHasPerm",
+      "Package": "app",
+      "PackagePath": "cmd/zqk/app",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/app/draft_sweep_auth_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestCheckDraftSweepEntitlement_NilContextDenied",
+      "Package": "app",
+      "PackagePath": "cmd/zqk/app",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/app/draft_sweep_auth_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

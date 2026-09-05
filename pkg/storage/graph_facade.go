@@ -1,0 +1,14 @@
+package storage
+
+// Facade boundary for upcoming decomposition. TRACK: BLI-TRACK-STORAGE-SPLIT-001
+
+import (
+	"github.com/lanceman/zqk/pkg/graph/provider"
+	"github.com/lanceman/zqk/pkg/storage/graph"
+)
+
+type GraphLock = graph.GraphLock
+
+func NewGraphLock(pool provider.ConnectionPool, resourceID, ownerID string) *GraphLock {
+	return graph.NewGraphLock(pool, resourceID, ownerID)
+}

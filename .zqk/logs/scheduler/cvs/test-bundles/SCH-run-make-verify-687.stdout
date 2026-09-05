@@ -1,0 +1,48 @@
+
+--- run 2026-09-04T22:18:59Z ---
+=== RUN   TestAsyncValidation_ContextCancellation
+=== PAUSE TestAsyncValidation_ContextCancellation
+=== RUN   TestConvertCheckResultToValidationState
+=== PAUSE TestConvertCheckResultToValidationState
+=== RUN   TestAsyncValidation_ErrorHandling
+=== PAUSE TestAsyncValidation_ErrorHandling
+=== RUN   TestAsyncValidation_FailedValidationTracking
+=== PAUSE TestAsyncValidation_FailedValidationTracking
+=== RUN   TestAsyncValidation_MetricsCapture
+=== PAUSE TestAsyncValidation_MetricsCapture
+=== RUN   TestDecodeAutoFixBatchRecoversTrailingConcurrentWrite
+=== PAUSE TestDecodeAutoFixBatchRecoversTrailingConcurrentWrite
+=== RUN   TestTryAcquireAutoFixProcessingLockSerializesProcessors
+=== PAUSE TestTryAcquireAutoFixProcessingLockSerializesProcessors
+=== RUN   TestAcquireExclusiveAutoFixCheckLock_RejectsSecondCheck
+=== PAUSE TestAcquireExclusiveAutoFixCheckLock_RejectsSecondCheck
+=== RUN   TestAutofixChunkCommitLogMessage
+=== PAUSE TestAutofixChunkCommitLogMessage
+=== RUN   TestNormalizeAutoFixBatchIssues_LegacyFlat
+=== PAUSE TestNormalizeAutoFixBatchIssues_LegacyFlat
+=== CONT  TestAsyncValidation_ContextCancellation
+=== CONT  TestDecodeAutoFixBatchRecoversTrailingConcurrentWrite
+--- PASS: TestDecodeAutoFixBatchRecoversTrailingConcurrentWrite (0.00s)
+=== CONT  TestAutofixChunkCommitLogMessage
+--- PASS: TestAutofixChunkCommitLogMessage (0.00s)
+=== CONT  TestNormalizeAutoFixBatchIssues_LegacyFlat
+--- PASS: TestNormalizeAutoFixBatchIssues_LegacyFlat (0.00s)
+=== CONT  TestAcquireExclusiveAutoFixCheckLock_RejectsSecondCheck
+--- PASS: TestAcquireExclusiveAutoFixCheckLock_RejectsSecondCheck (0.06s)
+=== CONT  TestTryAcquireAutoFixProcessingLockSerializesProcessors
+--- PASS: TestTryAcquireAutoFixProcessingLockSerializesProcessors (0.03s)
+=== CONT  TestAsyncValidation_FailedValidationTracking
+--- PASS: TestAsyncValidation_FailedValidationTracking (0.12s)
+=== CONT  TestAsyncValidation_MetricsCapture
+    async_check_test.go:942: Validation stats: total=0, queueSize=0
+    async_check_test.go:957: No cached states found (may be timing issue or cache not persisted)
+--- PASS: TestAsyncValidation_MetricsCapture (0.14s)
+=== CONT  TestAsyncValidation_ErrorHandling
+--- PASS: TestAsyncValidation_ErrorHandling (0.02s)
+=== CONT  TestConvertCheckResultToValidationState
+--- PASS: TestConvertCheckResultToValidationState (0.00s)
+=== NAME  TestAsyncValidation_ContextCancellation
+    async_check_test.go:746: After cancellation: 5 states cached
+--- PASS: TestAsyncValidation_ContextCancellation (0.87s)
+PASS
+ok  	github.com/lanceman/zqk/cmd/zqk/system	1.693s

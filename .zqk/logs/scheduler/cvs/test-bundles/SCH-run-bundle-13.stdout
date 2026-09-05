@@ -1,0 +1,24 @@
+
+--- run 2026-09-05T05:56:58Z ---
+=== RUN   TestOperationExecutionHandler_Execute
+--- PASS: TestOperationExecutionHandler_Execute (1.12s)
+=== RUN   TestOperationExecutionHandler_DeleteOperation
+--- PASS: TestOperationExecutionHandler_DeleteOperation (0.85s)
+=== RUN   TestOperationExecutionHandler_MissingParameters
+--- PASS: TestOperationExecutionHandler_MissingParameters (0.32s)
+=== RUN   TestOperationExecutionHandler_InvalidOperationType
+--- PASS: TestOperationExecutionHandler_InvalidOperationType (0.35s)
+=== RUN   TestWatchdogEvaluationHandler
+--- PASS: TestWatchdogEvaluationHandler (0.84s)
+=== RUN   TestBuildMissedDeadlineRiskBlocker_LifecycleValid
+--- PASS: TestBuildMissedDeadlineRiskBlocker_LifecycleValid (0.00s)
+=== RUN   TestRefsContainID
+--- PASS: TestRefsContainID (0.00s)
+=== RUN   TestCompareIssuesToBundleHealth_StaleIssueGreenLatest
+--- PASS: TestCompareIssuesToBundleHealth_StaleIssueGreenLatest (0.02s)
+=== RUN   TestClearIssues_WritesToAbsolutePathAndReturnsIt
+--- PASS: TestClearIssues_WritesToAbsolutePathAndReturnsIt (0.02s)
+=== RUN   TestClearIssues_NormalizesRelativePath
+--- PASS: TestClearIssues_NormalizesRelativePath (0.01s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/scheduler	4.328s

@@ -1,0 +1,44 @@
+
+--- run 2026-09-04T21:43:10Z ---
+=== RUN   TestCASIndexWriteQueueWorker_ShutdownPropagatesFinalBatchError
+=== PAUSE TestCASIndexWriteQueueWorker_ShutdownPropagatesFinalBatchError
+=== RUN   TestExtractRefFields_collectsAllRefTypes
+=== PAUSE TestExtractRefFields_collectsAllRefTypes
+=== RUN   TestCASOrphanGuard_CheckPackageIntegrity_detectsOrphans
+=== PAUSE TestCASOrphanGuard_CheckPackageIntegrity_detectsOrphans
+=== RUN   TestSetMappings_UpdatesWhenChanged
+=== PAUSE TestSetMappings_UpdatesWhenChanged
+=== RUN   TestRemoveOrphanCASHashFileSync_DeletesSoleLookingPredecessorWhenKeeperKnown
+=== PAUSE TestRemoveOrphanCASHashFileSync_DeletesSoleLookingPredecessorWhenKeeperKnown
+=== RUN   TestFileObjectStorage_UpdateLeavesExactlyOneCASBlob
+=== PAUSE TestFileObjectStorage_UpdateLeavesExactlyOneCASBlob
+=== RUN   TestCAS_UpdateSweepsPlantedPredecessorWithoutQueueWait
+=== PAUSE TestCAS_UpdateSweepsPlantedPredecessorWithoutQueueWait
+=== RUN   TestRemoveOrphanCASHashFileSync_RefusesSoleSurvivor
+=== PAUSE TestRemoveOrphanCASHashFileSync_RefusesSoleSurvivor
+=== RUN   TestRemoveOrphanCASHashFileSync_DeletesWhenReplacementExists
+=== PAUSE TestRemoveOrphanCASHashFileSync_DeletesWhenReplacementExists
+=== RUN   TestRemoveOrphanCASHashFileSync_KeeperHashOverridesSoleSurvivor
+=== PAUSE TestRemoveOrphanCASHashFileSync_KeeperHashOverridesSoleSurvivor
+=== CONT  TestCASIndexWriteQueueWorker_ShutdownPropagatesFinalBatchError
+=== CONT  TestFileObjectStorage_UpdateLeavesExactlyOneCASBlob
+--- PASS: TestCASIndexWriteQueueWorker_ShutdownPropagatesFinalBatchError (0.01s)
+=== CONT  TestRemoveOrphanCASHashFileSync_DeletesWhenReplacementExists
+--- PASS: TestRemoveOrphanCASHashFileSync_DeletesWhenReplacementExists (0.01s)
+=== CONT  TestRemoveOrphanCASHashFileSync_KeeperHashOverridesSoleSurvivor
+--- PASS: TestRemoveOrphanCASHashFileSync_KeeperHashOverridesSoleSurvivor (0.01s)
+=== CONT  TestRemoveOrphanCASHashFileSync_RefusesSoleSurvivor
+--- PASS: TestRemoveOrphanCASHashFileSync_RefusesSoleSurvivor (0.01s)
+=== CONT  TestSetMappings_UpdatesWhenChanged
+--- PASS: TestSetMappings_UpdatesWhenChanged (0.02s)
+=== CONT  TestRemoveOrphanCASHashFileSync_DeletesSoleLookingPredecessorWhenKeeperKnown
+--- PASS: TestRemoveOrphanCASHashFileSync_DeletesSoleLookingPredecessorWhenKeeperKnown (0.01s)
+=== CONT  TestCAS_UpdateSweepsPlantedPredecessorWithoutQueueWait
+--- PASS: TestCAS_UpdateSweepsPlantedPredecessorWithoutQueueWait (0.12s)
+=== CONT  TestCASOrphanGuard_CheckPackageIntegrity_detectsOrphans
+--- PASS: TestCASOrphanGuard_CheckPackageIntegrity_detectsOrphans (0.03s)
+=== CONT  TestExtractRefFields_collectsAllRefTypes
+--- PASS: TestExtractRefFields_collectsAllRefTypes (0.00s)
+--- PASS: TestFileObjectStorage_UpdateLeavesExactlyOneCASBlob (1.82s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/storage/cas	2.632s

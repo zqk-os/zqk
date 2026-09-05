@@ -1,0 +1,51 @@
+{
+  "name": "make-verify-490",
+  "created_at": "2026-09-04T21:34:32.221007Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-490",
+    "Tests": [
+      {
+        "Name": "TestSynthesisIntentWorkersBounded",
+        "Package": "service",
+        "PackagePath": "pkg/orchestration/service",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/orchestration/service/listener_bound_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestSynthesisService",
+        "Package": "service",
+        "PackagePath": "pkg/orchestration/service",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/orchestration/service/listener_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 60000000000,
+    "PackagePath": "pkg/orchestration/service"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestSynthesisIntentWorkersBounded",
+      "Package": "service",
+      "PackagePath": "pkg/orchestration/service",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/orchestration/service/listener_bound_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestSynthesisService",
+      "Package": "service",
+      "PackagePath": "pkg/orchestration/service",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/orchestration/service/listener_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

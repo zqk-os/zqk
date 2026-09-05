@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-620",
+  "created_at": "2026-09-04T21:34:33.517511Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-620",
+    "Tests": [
+      {
+        "Name": "TestAsyncRouter_OnDemandPattern",
+        "Package": "transceiver",
+        "PackagePath": "pkg/scheduler/transceiver",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/scheduler/transceiver/async_router_on_demand_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAsyncRouter_CoordinatorIntegration",
+        "Package": "transceiver",
+        "PackagePath": "pkg/scheduler/transceiver",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/scheduler/transceiver/async_router_on_demand_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAsyncRouter_ShutdownCoordination",
+        "Package": "transceiver",
+        "PackagePath": "pkg/scheduler/transceiver",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/scheduler/transceiver/async_router_on_demand_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAsyncRouter_MultipleWorkers",
+        "Package": "transceiver",
+        "PackagePath": "pkg/scheduler/transceiver",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/scheduler/transceiver/async_router_on_demand_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAsyncRouter_ConcurrentOperations",
+        "Package": "transceiver",
+        "PackagePath": "pkg/scheduler/transceiver",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/scheduler/transceiver/async_router_on_demand_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestSchedulerTransceiverLogEvents_wirePrefix",
+        "Package": "transceiver",
+        "PackagePath": "pkg/scheduler/transceiver",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/scheduler/transceiver/log_events_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestRouter_RegisterAdapter",
+        "Package": "transceiver",
+        "PackagePath": "pkg/scheduler/transceiver",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/scheduler/transceiver/router_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestRouter_LoadRules",
+        "Package": "transceiver",
+        "PackagePath": "pkg/scheduler/transceiver",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/scheduler/transceiver/router_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestRouter_Route",
+        "Package": "transceiver",
+        "PackagePath": "pkg/scheduler/transceiver",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/scheduler/transceiver/router_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestRouter_Route_NoMatch",
+        "Package": "transceiver",
+        "PackagePath": "pkg/scheduler/transceiver",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/scheduler/transceiver/router_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": true,
+    "EstimatedDuration": 300000000000,
+    "PackagePath": "pkg/scheduler/transceiver"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestAsyncRouter_OnDemandPattern",
+      "Package": "transceiver",
+      "PackagePath": "pkg/scheduler/transceiver",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/scheduler/transceiver/async_router_on_demand_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestAsyncRouter_CoordinatorIntegration",
+      "Package": "transceiver",
+      "PackagePath": "pkg/scheduler/transceiver",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/scheduler/transceiver/async_router_on_demand_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestAsyncRouter_ShutdownCoordination",
+      "Package": "transceiver",
+      "PackagePath": "pkg/scheduler/transceiver",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/scheduler/transceiver/async_router_on_demand_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestAsyncRouter_MultipleWorkers",
+      "Package": "transceiver",
+      "PackagePath": "pkg/scheduler/transceiver",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/scheduler/transceiver/async_router_on_demand_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestAsyncRouter_ConcurrentOperations",
+      "Package": "transceiver",
+      "PackagePath": "pkg/scheduler/transceiver",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/scheduler/transceiver/async_router_on_demand_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestSchedulerTransceiverLogEvents_wirePrefix",
+      "Package": "transceiver",
+      "PackagePath": "pkg/scheduler/transceiver",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/scheduler/transceiver/log_events_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestRouter_RegisterAdapter",
+      "Package": "transceiver",
+      "PackagePath": "pkg/scheduler/transceiver",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/scheduler/transceiver/router_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestRouter_LoadRules",
+      "Package": "transceiver",
+      "PackagePath": "pkg/scheduler/transceiver",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/scheduler/transceiver/router_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestRouter_Route",
+      "Package": "transceiver",
+      "PackagePath": "pkg/scheduler/transceiver",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/scheduler/transceiver/router_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestRouter_Route_NoMatch",
+      "Package": "transceiver",
+      "PackagePath": "pkg/scheduler/transceiver",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/scheduler/transceiver/router_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

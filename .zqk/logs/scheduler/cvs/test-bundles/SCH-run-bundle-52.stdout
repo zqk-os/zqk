@@ -1,0 +1,76 @@
+
+--- run 2026-09-05T05:24:55Z ---
+=== RUN   TestJobTriggerQueue_EmptyQueue
+=== PAUSE TestJobTriggerQueue_EmptyQueue
+=== RUN   TestJobTriggerQueue_PeekTriggerRequests
+=== PAUSE TestJobTriggerQueue_PeekTriggerRequests
+=== RUN   TestJobTriggerQueue_RequestMetadata
+=== PAUSE TestJobTriggerQueue_RequestMetadata
+=== RUN   TestJobTriggerQueue_Persistence
+=== PAUSE TestJobTriggerQueue_Persistence
+=== RUN   TestJobTriggerQueue_QueueFileFormat
+=== PAUSE TestJobTriggerQueue_QueueFileFormat
+=== RUN   TestJobIDLooksLikeCrossProcessTimestampTestRunner
+=== PAUSE TestJobIDLooksLikeCrossProcessTimestampTestRunner
+=== RUN   TestBatchNeedsCASReconcileBeforeTriggerReload
+=== PAUSE TestBatchNeedsCASReconcileBeforeTriggerReload
+=== RUN   TestLoadJobsPausedScheduleExemptIDs_FromYAML
+=== PAUSE TestLoadJobsPausedScheduleExemptIDs_FromYAML
+=== RUN   TestBuildOverlayFromBindingObjects_DeterministicPriority
+=== PAUSE TestBuildOverlayFromBindingObjects_DeterministicPriority
+=== RUN   TestBuildOverlayFromBindingObjects_IgnoresUnknownsAndDisabled
+=== PAUSE TestBuildOverlayFromBindingObjects_IgnoresUnknownsAndDisabled
+=== CONT  TestJobTriggerQueue_EmptyQueue
+=== CONT  TestJobIDLooksLikeCrossProcessTimestampTestRunner
+=== RUN   TestJobIDLooksLikeCrossProcessTimestampTestRunner/SCH-1774181824
+=== PAUSE TestJobIDLooksLikeCrossProcessTimestampTestRunner/SCH-1774181824
+=== RUN   TestJobIDLooksLikeCrossProcessTimestampTestRunner/SCH-1234567890
+=== PAUSE TestJobIDLooksLikeCrossProcessTimestampTestRunner/SCH-1234567890
+=== RUN   TestJobIDLooksLikeCrossProcessTimestampTestRunner/SCH-1788056998365283000
+=== PAUSE TestJobIDLooksLikeCrossProcessTimestampTestRunner/SCH-1788056998365283000
+=== RUN   TestJobIDLooksLikeCrossProcessTimestampTestRunner/SCH-001
+=== PAUSE TestJobIDLooksLikeCrossProcessTimestampTestRunner/SCH-001
+=== RUN   TestJobIDLooksLikeCrossProcessTimestampTestRunner/SCH-123
+=== PAUSE TestJobIDLooksLikeCrossProcessTimestampTestRunner/SCH-123
+=== RUN   TestJobIDLooksLikeCrossProcessTimestampTestRunner/SCH-run-test-1774181824
+=== PAUSE TestJobIDLooksLikeCrossProcessTimestampTestRunner/SCH-run-test-1774181824
+=== RUN   TestJobIDLooksLikeCrossProcessTimestampTestRunner/SCH-run-pkg-storage-1
+=== PAUSE TestJobIDLooksLikeCrossProcessTimestampTestRunner/SCH-run-pkg-storage-1
+=== RUN   TestJobIDLooksLikeCrossProcessTimestampTestRunner/OTHER-1774181824
+=== PAUSE TestJobIDLooksLikeCrossProcessTimestampTestRunner/OTHER-1774181824
+=== CONT  TestBuildOverlayFromBindingObjects_DeterministicPriority
+--- PASS: TestBuildOverlayFromBindingObjects_DeterministicPriority (0.00s)
+=== CONT  TestBuildOverlayFromBindingObjects_IgnoresUnknownsAndDisabled
+--- PASS: TestBuildOverlayFromBindingObjects_IgnoresUnknownsAndDisabled (0.00s)
+=== CONT  TestJobTriggerQueue_Persistence
+--- PASS: TestJobTriggerQueue_EmptyQueue (0.01s)
+=== CONT  TestJobTriggerQueue_QueueFileFormat
+--- PASS: TestJobTriggerQueue_Persistence (0.01s)
+=== CONT  TestLoadJobsPausedScheduleExemptIDs_FromYAML
+--- PASS: TestJobTriggerQueue_QueueFileFormat (0.01s)
+=== CONT  TestJobTriggerQueue_RequestMetadata
+--- PASS: TestLoadJobsPausedScheduleExemptIDs_FromYAML (0.01s)
+=== CONT  TestJobTriggerQueue_PeekTriggerRequests
+--- PASS: TestJobTriggerQueue_RequestMetadata (0.02s)
+=== CONT  TestBatchNeedsCASReconcileBeforeTriggerReload
+--- PASS: TestBatchNeedsCASReconcileBeforeTriggerReload (0.00s)
+=== CONT  TestJobIDLooksLikeCrossProcessTimestampTestRunner/SCH-1774181824
+=== CONT  TestJobIDLooksLikeCrossProcessTimestampTestRunner/SCH-123
+=== CONT  TestJobIDLooksLikeCrossProcessTimestampTestRunner/OTHER-1774181824
+=== CONT  TestJobIDLooksLikeCrossProcessTimestampTestRunner/SCH-run-pkg-storage-1
+=== CONT  TestJobIDLooksLikeCrossProcessTimestampTestRunner/SCH-run-test-1774181824
+=== CONT  TestJobIDLooksLikeCrossProcessTimestampTestRunner/SCH-1788056998365283000
+=== CONT  TestJobIDLooksLikeCrossProcessTimestampTestRunner/SCH-001
+=== CONT  TestJobIDLooksLikeCrossProcessTimestampTestRunner/SCH-1234567890
+--- PASS: TestJobIDLooksLikeCrossProcessTimestampTestRunner (0.00s)
+    --- PASS: TestJobIDLooksLikeCrossProcessTimestampTestRunner/SCH-1774181824 (0.00s)
+    --- PASS: TestJobIDLooksLikeCrossProcessTimestampTestRunner/SCH-123 (0.00s)
+    --- PASS: TestJobIDLooksLikeCrossProcessTimestampTestRunner/OTHER-1774181824 (0.00s)
+    --- PASS: TestJobIDLooksLikeCrossProcessTimestampTestRunner/SCH-run-pkg-storage-1 (0.00s)
+    --- PASS: TestJobIDLooksLikeCrossProcessTimestampTestRunner/SCH-run-test-1774181824 (0.00s)
+    --- PASS: TestJobIDLooksLikeCrossProcessTimestampTestRunner/SCH-1788056998365283000 (0.00s)
+    --- PASS: TestJobIDLooksLikeCrossProcessTimestampTestRunner/SCH-001 (0.00s)
+    --- PASS: TestJobIDLooksLikeCrossProcessTimestampTestRunner/SCH-1234567890 (0.00s)
+--- PASS: TestJobTriggerQueue_PeekTriggerRequests (0.02s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/scheduler	0.816s

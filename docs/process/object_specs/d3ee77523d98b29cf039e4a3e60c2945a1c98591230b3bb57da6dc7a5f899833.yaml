@@ -1,0 +1,17 @@
+created_at: "2026-08-12T03:25:25Z"
+created_by: ACC-1785920548450214012-68b850c0
+file_path: /private/var/folders/gb/31sgyvn551ld6l0zfk50yl8h0000gn/T/TestInit_Greenfield879893214/001/docs/process/_internal/object_specs/scheduler_handler_binding.yaml
+id: OBJ-scheduler_handler_binding
+kind: object_spec
+namespace_id: zqk:kernel
+ontology: scheduler_handler_binding
+origin_project: zqk
+origin_system: zqk
+schema_version: 2.0.0
+source_type: internal
+status: implemented
+title: Optional dynamic binding overlay for scheduler job handler dispatch.
+updated_at: "2026-08-12T03:25:25Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+visibility: internal

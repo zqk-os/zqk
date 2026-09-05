@@ -1,0 +1,24 @@
+
+--- run 2026-09-04T22:20:55Z ---
+=== RUN   TestRemoveOrphanCASHashFileSync
+=== PAUSE TestRemoveOrphanCASHashFileSync
+=== RUN   TestCasHashFilenameRe
+=== PAUSE TestCasHashFilenameRe
+=== RUN   TestCasHashFilePeekObjectID_ignoresIndentedNestedID
+=== PAUSE TestCasHashFilePeekObjectID_ignoresIndentedNestedID
+=== RUN   TestCasHashFilePeekObjectID_quotedAndMissing
+=== PAUSE TestCasHashFilePeekObjectID_quotedAndMissing
+=== RUN   TestCasHashFilePeekObjectID_idAfterLongPrefix
+=== PAUSE TestCasHashFilePeekObjectID_idAfterLongPrefix
+=== CONT  TestRemoveOrphanCASHashFileSync
+=== CONT  TestCasHashFilePeekObjectID_quotedAndMissing
+--- PASS: TestCasHashFilePeekObjectID_quotedAndMissing (0.01s)
+=== CONT  TestCasHashFilePeekObjectID_ignoresIndentedNestedID
+--- PASS: TestRemoveOrphanCASHashFileSync (0.01s)
+=== CONT  TestCasHashFilenameRe
+--- PASS: TestCasHashFilenameRe (0.00s)
+=== CONT  TestCasHashFilePeekObjectID_idAfterLongPrefix
+--- PASS: TestCasHashFilePeekObjectID_ignoresIndentedNestedID (0.01s)
+--- PASS: TestCasHashFilePeekObjectID_idAfterLongPrefix (0.01s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/storage/filecas	0.289s

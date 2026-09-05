@@ -1,0 +1,24 @@
+
+--- run 2026-09-04T22:21:14Z ---
+=== RUN   TestNewFixedWindowLimiter
+=== PAUSE TestNewFixedWindowLimiter
+=== RUN   TestFixedWindowLimiter_Allow_underLimit
+=== PAUSE TestFixedWindowLimiter_Allow_underLimit
+=== RUN   TestFixedWindowLimiter_Allow_perKey
+=== PAUSE TestFixedWindowLimiter_Allow_perKey
+=== RUN   TestFixedWindowLimiter_Allow_windowReset
+=== PAUSE TestFixedWindowLimiter_Allow_windowReset
+=== RUN   TestFixedWindowLimiter_zeroLimit_usesOne
+=== PAUSE TestFixedWindowLimiter_zeroLimit_usesOne
+=== CONT  TestNewFixedWindowLimiter
+--- PASS: TestNewFixedWindowLimiter (0.00s)
+=== CONT  TestFixedWindowLimiter_zeroLimit_usesOne
+--- PASS: TestFixedWindowLimiter_zeroLimit_usesOne (0.00s)
+=== CONT  TestFixedWindowLimiter_Allow_windowReset
+--- PASS: TestFixedWindowLimiter_Allow_windowReset (0.00s)
+=== CONT  TestFixedWindowLimiter_Allow_perKey
+--- PASS: TestFixedWindowLimiter_Allow_perKey (0.00s)
+=== CONT  TestFixedWindowLimiter_Allow_underLimit
+--- PASS: TestFixedWindowLimiter_Allow_underLimit (0.00s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/circuitbreaker	0.269s

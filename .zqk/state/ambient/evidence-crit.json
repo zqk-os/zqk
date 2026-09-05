@@ -1,0 +1,21 @@
+{
+  "category": "non-functional",
+  "commit_refs": [
+    "d536d7066de4ad1b97164ce9d508bd5e7bcfb0f9"
+  ],
+  "created_at": "2026-09-01T04:06:51Z",
+  "created_by": "ACC-1785920548450214012-68b850c0",
+  "description": "Done when: 471 Code-generated files / specbuilder are skipped by\ngolangci-lint and documented in metrics. Sources: AA F-ARCH-003, AA F-CQ-002.\n",
+  "goal_refs": [
+    "GOAL-LAUNCH-READINESS"
+  ],
+  "id": "CRIT-CEF-GENERATED-LINT-EXCLUDE-001",
+  "kind": "criteria",
+  "namespace_id": "zqk:kernel",
+  "schema_version": "2.0.0",
+  "status": "in_progress",
+  "title": "Code-generated trees are excluded from golangci and quality LOC dashboards",
+  "updated_at": "2026-09-03T00:10:42Z",
+  "updated_by": "ACC-1785920548450214006-2e52b3e7",
+  "version_context": "default"
+}

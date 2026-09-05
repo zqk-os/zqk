@@ -1,0 +1,87 @@
+{
+  "name": "make-verify-742",
+  "created_at": "2026-09-04T21:34:34.7022Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-742",
+    "Tests": [
+      {
+        "Name": "TestClassifyIssue_processFailureVsCompleteness",
+        "Package": "fitness_test",
+        "PackagePath": "pkg/fitness",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/fitness/fitness_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestShouldDemoteToError_onlyProcessFailure",
+        "Package": "fitness_test",
+        "PackagePath": "pkg/fitness",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/fitness/fitness_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestVisibleOnSurface",
+        "Package": "fitness_test",
+        "PackagePath": "pkg/fitness",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/fitness/fitness_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestFamilyOfKind",
+        "Package": "fitness_test",
+        "PackagePath": "pkg/fitness",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/fitness/fitness_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": true,
+    "EstimatedDuration": 120000000000,
+    "PackagePath": "pkg/fitness"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestClassifyIssue_processFailureVsCompleteness",
+      "Package": "fitness_test",
+      "PackagePath": "pkg/fitness",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/fitness/fitness_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestShouldDemoteToError_onlyProcessFailure",
+      "Package": "fitness_test",
+      "PackagePath": "pkg/fitness",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/fitness/fitness_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestVisibleOnSurface",
+      "Package": "fitness_test",
+      "PackagePath": "pkg/fitness",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/fitness/fitness_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestFamilyOfKind",
+      "Package": "fitness_test",
+      "PackagePath": "pkg/fitness",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/fitness/fitness_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

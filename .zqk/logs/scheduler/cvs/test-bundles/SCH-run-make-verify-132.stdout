@@ -1,0 +1,108 @@
+
+--- run 2026-09-04T21:39:41Z ---
+=== RUN   TestDiscoverNamespacesFromRegistry
+=== PAUSE TestDiscoverNamespacesFromRegistry
+=== RUN   TestParseReferenceRules
+=== PAUSE TestParseReferenceRules
+=== RUN   TestNewNamespaceDiscovery
+=== PAUSE TestNewNamespaceDiscovery
+=== RUN   TestNamespaceRegistry_GetNamespaceForKind
+=== PAUSE TestNamespaceRegistry_GetNamespaceForKind
+=== RUN   TestNamespaceRegistry_RegisterNamespace
+=== PAUSE TestNamespaceRegistry_RegisterNamespace
+=== RUN   TestNamespaceRegistry_GetAllNamespaces
+=== PAUSE TestNamespaceRegistry_GetAllNamespaces
+=== RUN   TestNamespaceRegistry_InferNamespaceFromKind
+=== PAUSE TestNamespaceRegistry_InferNamespaceFromKind
+=== RUN   TestNamespaceRegistry_InferNamespaceFromKind_WithRegistered
+=== PAUSE TestNamespaceRegistry_InferNamespaceFromKind_WithRegistered
+=== RUN   TestGetNamespaceRegistry
+=== PAUSE TestGetNamespaceRegistry
+=== RUN   TestGetNamespaceRegistry_ConcurrentAccess
+=== PAUSE TestGetNamespaceRegistry_ConcurrentAccess
+=== CONT  TestDiscoverNamespacesFromRegistry
+=== CONT  TestNamespaceRegistry_GetAllNamespaces
+--- PASS: TestDiscoverNamespacesFromRegistry (0.00s)
+=== CONT  TestGetNamespaceRegistry
+--- PASS: TestGetNamespaceRegistry (0.11s)
+=== CONT  TestGetNamespaceRegistry_ConcurrentAccess
+--- PASS: TestGetNamespaceRegistry_ConcurrentAccess (0.00s)
+=== CONT  TestNamespaceRegistry_GetNamespaceForKind
+--- PASS: TestNamespaceRegistry_GetAllNamespaces (0.11s)
+=== CONT  TestNamespaceRegistry_RegisterNamespace
+=== RUN   TestNamespaceRegistry_GetNamespaceForKind/goal
+=== RUN   TestNamespaceRegistry_GetNamespaceForKind/backlog_item
+=== RUN   TestNamespaceRegistry_GetNamespaceForKind/milestone
+=== RUN   TestNamespaceRegistry_GetNamespaceForKind/workstream
+=== RUN   TestNamespaceRegistry_GetNamespaceForKind/account
+=== RUN   TestNamespaceRegistry_GetNamespaceForKind/role
+=== RUN   TestNamespaceRegistry_GetNamespaceForKind/organization
+=== RUN   TestNamespaceRegistry_GetNamespaceForKind/division
+=== RUN   TestNamespaceRegistry_GetNamespaceForKind/department
+=== RUN   TestNamespaceRegistry_GetNamespaceForKind/team
+=== RUN   TestNamespaceRegistry_GetNamespaceForKind/partnership
+=== RUN   TestNamespaceRegistry_GetNamespaceForKind/unknown_kind
+--- PASS: TestNamespaceRegistry_GetNamespaceForKind (0.11s)
+    --- PASS: TestNamespaceRegistry_GetNamespaceForKind/goal (0.00s)
+    --- PASS: TestNamespaceRegistry_GetNamespaceForKind/backlog_item (0.00s)
+    --- PASS: TestNamespaceRegistry_GetNamespaceForKind/milestone (0.00s)
+    --- PASS: TestNamespaceRegistry_GetNamespaceForKind/workstream (0.00s)
+    --- PASS: TestNamespaceRegistry_GetNamespaceForKind/account (0.00s)
+    --- PASS: TestNamespaceRegistry_GetNamespaceForKind/role (0.00s)
+    --- PASS: TestNamespaceRegistry_GetNamespaceForKind/organization (0.00s)
+    --- PASS: TestNamespaceRegistry_GetNamespaceForKind/division (0.00s)
+    --- PASS: TestNamespaceRegistry_GetNamespaceForKind/department (0.00s)
+    --- PASS: TestNamespaceRegistry_GetNamespaceForKind/team (0.00s)
+    --- PASS: TestNamespaceRegistry_GetNamespaceForKind/partnership (0.00s)
+    --- PASS: TestNamespaceRegistry_GetNamespaceForKind/unknown_kind (0.00s)
+=== CONT  TestNewNamespaceDiscovery
+--- PASS: TestNewNamespaceDiscovery (0.00s)
+=== CONT  TestParseReferenceRules
+--- PASS: TestParseReferenceRules (0.00s)
+=== CONT  TestNamespaceRegistry_InferNamespaceFromKind_WithRegistered
+--- PASS: TestNamespaceRegistry_InferNamespaceFromKind_WithRegistered (0.00s)
+=== CONT  TestNamespaceRegistry_InferNamespaceFromKind
+=== RUN   TestNamespaceRegistry_InferNamespaceFromKind/organization
+=== RUN   TestNamespaceRegistry_InferNamespaceFromKind/division
+=== RUN   TestNamespaceRegistry_InferNamespaceFromKind/department
+=== RUN   TestNamespaceRegistry_InferNamespaceFromKind/team
+=== RUN   TestNamespaceRegistry_InferNamespaceFromKind/partnership
+=== RUN   TestNamespaceRegistry_InferNamespaceFromKind/integration_jira
+=== RUN   TestNamespaceRegistry_InferNamespaceFromKind/integration_github
+=== RUN   TestNamespaceRegistry_InferNamespaceFromKind/jira_integration
+=== RUN   TestNamespaceRegistry_InferNamespaceFromKind/github_integration
+=== RUN   TestNamespaceRegistry_InferNamespaceFromKind/integration_test_integration
+=== RUN   TestNamespaceRegistry_InferNamespaceFromKind/unknown_kind
+=== RUN   TestNamespaceRegistry_InferNamespaceFromKind/random_object
+=== RUN   TestNamespaceRegistry_InferNamespaceFromKind/#00
+=== RUN   TestNamespaceRegistry_InferNamespaceFromKind/goal
+=== RUN   TestNamespaceRegistry_InferNamespaceFromKind/milestone
+=== RUN   TestNamespaceRegistry_InferNamespaceFromKind/backlog_item
+=== RUN   TestNamespaceRegistry_InferNamespaceFromKind/account
+=== RUN   TestNamespaceRegistry_InferNamespaceFromKind/integration_
+--- PASS: TestNamespaceRegistry_RegisterNamespace (0.11s)
+=== RUN   TestNamespaceRegistry_InferNamespaceFromKind/_integration
+=== RUN   TestNamespaceRegistry_InferNamespaceFromKind/integration
+--- PASS: TestNamespaceRegistry_InferNamespaceFromKind (0.00s)
+    --- PASS: TestNamespaceRegistry_InferNamespaceFromKind/organization (0.00s)
+    --- PASS: TestNamespaceRegistry_InferNamespaceFromKind/division (0.00s)
+    --- PASS: TestNamespaceRegistry_InferNamespaceFromKind/department (0.00s)
+    --- PASS: TestNamespaceRegistry_InferNamespaceFromKind/team (0.00s)
+    --- PASS: TestNamespaceRegistry_InferNamespaceFromKind/partnership (0.00s)
+    --- PASS: TestNamespaceRegistry_InferNamespaceFromKind/integration_jira (0.00s)
+    --- PASS: TestNamespaceRegistry_InferNamespaceFromKind/integration_github (0.00s)
+    --- PASS: TestNamespaceRegistry_InferNamespaceFromKind/jira_integration (0.00s)
+    --- PASS: TestNamespaceRegistry_InferNamespaceFromKind/github_integration (0.00s)
+    --- PASS: TestNamespaceRegistry_InferNamespaceFromKind/integration_test_integration (0.00s)
+    --- PASS: TestNamespaceRegistry_InferNamespaceFromKind/unknown_kind (0.00s)
+    --- PASS: TestNamespaceRegistry_InferNamespaceFromKind/random_object (0.00s)
+    --- PASS: TestNamespaceRegistry_InferNamespaceFromKind/#00 (0.00s)
+    --- PASS: TestNamespaceRegistry_InferNamespaceFromKind/goal (0.00s)
+    --- PASS: TestNamespaceRegistry_InferNamespaceFromKind/milestone (0.00s)
+    --- PASS: TestNamespaceRegistry_InferNamespaceFromKind/backlog_item (0.00s)
+    --- PASS: TestNamespaceRegistry_InferNamespaceFromKind/account (0.00s)
+    --- PASS: TestNamespaceRegistry_InferNamespaceFromKind/integration_ (0.00s)
+    --- PASS: TestNamespaceRegistry_InferNamespaceFromKind/_integration (0.00s)
+    --- PASS: TestNamespaceRegistry_InferNamespaceFromKind/integration (0.00s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/validation	0.812s

@@ -1,0 +1,22 @@
+assignee_persona_ref: PER-ORCH-ALPHA
+backlog_item_ref: BLI-CEF-R27-DUAL-SEAT-REMEASURE-001
+branch_ref: integration/pri-cef-r27-envelope-001
+created_at: "2026-09-03T23:41:37Z"
+created_by: ACC-1785920548450214006-2e52b3e7
+description: |-
+    SOLO CEF v0.1.0 Wave 0 for AGENT_AC (antigravity-1). Freeze SHA c5f525fcc4163142e7978da9dd80e2fb09759718.
+    MUST follow docs/quality/cef-runs/2026-09-03-KICKOFF-AGENT_AC.md and docs/quality/codebase_evaluation/* rubrics.
+    REQUIRED artifacts under docs/quality/cef-runs/2026-09-03-AGENT_AC/: run_scope.yaml (exact kickoff freeze), preflight.json, tooling_gaps.md (start), run_log.md, draft diagrams/**.
+    Do NOT invent GPA axes. Do NOT use docs/reports/dual-seat. Do NOT mint process objects. Do NOT modify application source.
+    Do NOT read AGENT_AD package. Gate: languages detected; globs frozen; tools listed. Then feed ack + steer TPM that Wave 0 done and await Wave 1 ATK.
+id: ATK-1788478897544979000-d5652ee7
+kind: agent_task
+namespace_id: zqk:kernel
+priority_plan_ref: PRI-CEF-R27-ENVELOPE-001
+schema_version: 2.0.0
+started_at: "2026-09-03T23:41:43Z"
+status: archived
+title: CEF R27 AGENT_AC Wave 0 L-PREFLIGHT
+updated_at: "2026-09-04T03:57:05Z"
+updated_by: ACC-1785920548450214006-2e52b3e7
+version_context: default

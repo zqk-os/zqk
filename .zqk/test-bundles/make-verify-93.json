@@ -1,0 +1,69 @@
+{
+  "name": "make-verify-93",
+  "created_at": "2026-09-04T21:34:28.28389Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-93",
+    "Tests": [
+      {
+        "Name": "TestPolicyInstanceBuilder_SequenceFormatWithSpecialChars",
+        "Package": "bldr_instance_v1",
+        "PackagePath": "pkg/specbuilder/bldr_instance_v1",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/specbuilder/bldr_instance_v1/policy_instance_builder_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestPolicyInstanceBuilder_SequenceFormat_EdgeCases",
+        "Package": "bldr_instance_v1",
+        "PackagePath": "pkg/specbuilder/bldr_instance_v1",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/specbuilder/bldr_instance_v1/policy_instance_builder_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestPolicyInstanceBuilder_Registry",
+        "Package": "bldr_instance_v1",
+        "PackagePath": "pkg/specbuilder/bldr_instance_v1",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/specbuilder/bldr_instance_v1/policy_instance_builder_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": true,
+    "EstimatedDuration": 90000000000,
+    "PackagePath": "pkg/specbuilder/bldr_instance_v1"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestPolicyInstanceBuilder_SequenceFormatWithSpecialChars",
+      "Package": "bldr_instance_v1",
+      "PackagePath": "pkg/specbuilder/bldr_instance_v1",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/specbuilder/bldr_instance_v1/policy_instance_builder_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestPolicyInstanceBuilder_SequenceFormat_EdgeCases",
+      "Package": "bldr_instance_v1",
+      "PackagePath": "pkg/specbuilder/bldr_instance_v1",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/specbuilder/bldr_instance_v1/policy_instance_builder_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestPolicyInstanceBuilder_Registry",
+      "Package": "bldr_instance_v1",
+      "PackagePath": "pkg/specbuilder/bldr_instance_v1",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/specbuilder/bldr_instance_v1/policy_instance_builder_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

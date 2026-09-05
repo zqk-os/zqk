@@ -1,0 +1,102 @@
+
+--- run 2026-09-04T21:39:48Z ---
+=== RUN   TestParseNamespaceFromReference
+=== PAUSE TestParseNamespaceFromReference
+=== RUN   TestOntologyRegistry_RegisterAndGetMapping
+=== PAUSE TestOntologyRegistry_RegisterAndGetMapping
+=== RUN   TestOntologyRegistry_ValidateSemanticType
+=== PAUSE TestOntologyRegistry_ValidateSemanticType
+=== RUN   TestOntologyRegistry_GetSchemaOrgTypes
+=== PAUSE TestOntologyRegistry_GetSchemaOrgTypes
+=== RUN   TestOntologyRegistry_GetISO11179Type
+=== PAUSE TestOntologyRegistry_GetISO11179Type
+=== RUN   TestOntologyRegistry_GetBFOType
+=== PAUSE TestOntologyRegistry_GetBFOType
+=== RUN   TestGlobalOntologyRegistry
+=== PAUSE TestGlobalOntologyRegistry
+=== RUN   TestOntologyRegistry_StatementObjectValidation
+=== PAUSE TestOntologyRegistry_StatementObjectValidation
+=== RUN   TestOntologyRegistry_ComparisonOperators
+=== PAUSE TestOntologyRegistry_ComparisonOperators
+=== RUN   TestOntologyRegistry_RegisterMapping
+=== PAUSE TestOntologyRegistry_RegisterMapping
+=== CONT  TestParseNamespaceFromReference
+=== RUN   TestParseNamespaceFromReference/full_namespace_format
+=== RUN   TestParseNamespaceFromReference/short_format
+=== RUN   TestParseNamespaceFromReference/legacy_format
+=== RUN   TestParseNamespaceFromReference/domain_namespace_format
+=== CONT  TestOntologyRegistry_GetBFOType
+--- PASS: TestOntologyRegistry_GetBFOType (0.00s)
+=== CONT  TestOntologyRegistry_GetISO11179Type
+--- PASS: TestOntologyRegistry_GetISO11179Type (0.00s)
+=== CONT  TestOntologyRegistry_GetSchemaOrgTypes
+--- PASS: TestOntologyRegistry_GetSchemaOrgTypes (0.00s)
+=== CONT  TestOntologyRegistry_ValidateSemanticType
+=== RUN   TestParseNamespaceFromReference/account_reference_format
+=== RUN   TestOntologyRegistry_ValidateSemanticType/valid_statement_string
+=== RUN   TestParseNamespaceFromReference/account_reference_with_default
+=== RUN   TestOntologyRegistry_ValidateSemanticType/valid_statement_object
+=== RUN   TestParseNamespaceFromReference/short_format_with_empty_ID
+=== RUN   TestOntologyRegistry_ValidateSemanticType/valid_statement_int
+=== RUN   TestParseNamespaceFromReference/short_format_with_complex_ID
+=== RUN   TestParseNamespaceFromReference/short_format_with_underscore_kind
+=== RUN   TestParseNamespaceFromReference/legacy_format_with_complex_ID
+=== RUN   TestParseNamespaceFromReference/legacy_format_with_numeric_ID
+=== RUN   TestParseNamespaceFromReference/empty_reference
+=== RUN   TestParseNamespaceFromReference/multiple_colons_(malformed)
+=== RUN   TestOntologyRegistry_ValidateSemanticType/valid_statement_bool
+=== RUN   TestParseNamespaceFromReference/only_colons
+=== RUN   TestOntologyRegistry_ValidateSemanticType/valid_reference
+=== RUN   TestParseNamespaceFromReference/short_format_with_different_default
+=== RUN   TestOntologyRegistry_ValidateSemanticType/invalid_reference_empty
+=== RUN   TestParseNamespaceFromReference/legacy_format_with_different_default
+=== RUN   TestOntologyRegistry_ValidateSemanticType/invalid_reference_number
+--- PASS: TestParseNamespaceFromReference (0.00s)
+    --- PASS: TestParseNamespaceFromReference/full_namespace_format (0.00s)
+    --- PASS: TestParseNamespaceFromReference/short_format (0.00s)
+    --- PASS: TestParseNamespaceFromReference/legacy_format (0.00s)
+    --- PASS: TestParseNamespaceFromReference/domain_namespace_format (0.00s)
+    --- PASS: TestParseNamespaceFromReference/account_reference_format (0.00s)
+    --- PASS: TestParseNamespaceFromReference/account_reference_with_default (0.00s)
+    --- PASS: TestParseNamespaceFromReference/short_format_with_empty_ID (0.00s)
+    --- PASS: TestParseNamespaceFromReference/short_format_with_complex_ID (0.00s)
+    --- PASS: TestParseNamespaceFromReference/short_format_with_underscore_kind (0.00s)
+    --- PASS: TestParseNamespaceFromReference/legacy_format_with_complex_ID (0.00s)
+    --- PASS: TestParseNamespaceFromReference/legacy_format_with_numeric_ID (0.00s)
+    --- PASS: TestParseNamespaceFromReference/empty_reference (0.00s)
+    --- PASS: TestParseNamespaceFromReference/multiple_colons_(malformed) (0.00s)
+    --- PASS: TestParseNamespaceFromReference/only_colons (0.00s)
+    --- PASS: TestParseNamespaceFromReference/short_format_with_different_default (0.00s)
+    --- PASS: TestParseNamespaceFromReference/legacy_format_with_different_default (0.00s)
+=== CONT  TestOntologyRegistry_RegisterAndGetMapping
+=== RUN   TestOntologyRegistry_ValidateSemanticType/valid_list
+--- PASS: TestOntologyRegistry_RegisterAndGetMapping (0.00s)
+=== CONT  TestOntologyRegistry_ComparisonOperators
+=== RUN   TestOntologyRegistry_ValidateSemanticType/invalid_list_nil
+=== RUN   TestOntologyRegistry_ValidateSemanticType/valid_comparison
+=== RUN   TestOntologyRegistry_ValidateSemanticType/invalid_comparison_operator
+--- PASS: TestOntologyRegistry_ComparisonOperators (0.00s)
+=== RUN   TestOntologyRegistry_ValidateSemanticType/valid_expression
+=== CONT  TestOntologyRegistry_RegisterMapping
+=== RUN   TestOntologyRegistry_ValidateSemanticType/unknown_semantic_type
+--- PASS: TestOntologyRegistry_RegisterMapping (0.00s)
+=== CONT  TestOntologyRegistry_StatementObjectValidation
+--- PASS: TestOntologyRegistry_ValidateSemanticType (0.00s)
+    --- PASS: TestOntologyRegistry_ValidateSemanticType/valid_statement_string (0.00s)
+    --- PASS: TestOntologyRegistry_ValidateSemanticType/valid_statement_object (0.00s)
+    --- PASS: TestOntologyRegistry_ValidateSemanticType/valid_statement_int (0.00s)
+    --- PASS: TestOntologyRegistry_ValidateSemanticType/valid_statement_bool (0.00s)
+    --- PASS: TestOntologyRegistry_ValidateSemanticType/valid_reference (0.00s)
+    --- PASS: TestOntologyRegistry_ValidateSemanticType/invalid_reference_empty (0.00s)
+    --- PASS: TestOntologyRegistry_ValidateSemanticType/invalid_reference_number (0.00s)
+    --- PASS: TestOntologyRegistry_ValidateSemanticType/valid_list (0.00s)
+    --- PASS: TestOntologyRegistry_ValidateSemanticType/invalid_list_nil (0.00s)
+    --- PASS: TestOntologyRegistry_ValidateSemanticType/valid_comparison (0.00s)
+    --- PASS: TestOntologyRegistry_ValidateSemanticType/invalid_comparison_operator (0.00s)
+    --- PASS: TestOntologyRegistry_ValidateSemanticType/valid_expression (0.00s)
+    --- PASS: TestOntologyRegistry_ValidateSemanticType/unknown_semantic_type (0.00s)
+=== CONT  TestGlobalOntologyRegistry
+--- PASS: TestOntologyRegistry_StatementObjectValidation (0.00s)
+--- PASS: TestGlobalOntologyRegistry (0.00s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/validation	0.601s

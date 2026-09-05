@@ -1,0 +1,52 @@
+
+--- run 2026-09-04T22:21:15Z ---
+=== RUN   TestArchiveStatusForKind
+=== PAUSE TestArchiveStatusForKind
+=== RUN   TestCoerceToStringList_preservesObjectStages
+=== PAUSE TestCoerceToStringList_preservesObjectStages
+=== RUN   TestCoerceToStringList_stringBecomesList
+=== PAUSE TestCoerceToStringList_stringBecomesList
+=== RUN   TestCoerceToStringList_newlineConcatBecomesList
+=== PAUSE TestCoerceToStringList_newlineConcatBecomesList
+=== RUN   TestCoerceMutationFields_goalRefsString
+=== PAUSE TestCoerceMutationFields_goalRefsString
+=== RUN   TestCoerceMutationFields_criteriaTypeAliasesCategory
+=== PAUSE TestCoerceMutationFields_criteriaTypeAliasesCategory
+=== RUN   TestCoerceMutationFields_criteriaTypeKeyAliasesCategory
+=== PAUSE TestCoerceMutationFields_criteriaTypeKeyAliasesCategory
+=== RUN   TestRequireCriteriaCategory
+=== PAUSE TestRequireCriteriaCategory
+=== RUN   TestAppendRefList_appendsOntoExistingSlice
+=== PAUSE TestAppendRefList_appendsOntoExistingSlice
+=== RUN   TestFieldLooksLikeRefList
+=== PAUSE TestFieldLooksLikeRefList
+=== CONT  TestArchiveStatusForKind
+=== RUN   TestArchiveStatusForKind/question_has_no_archive_status
+=== PAUSE TestArchiveStatusForKind/question_has_no_archive_status
+=== RUN   TestArchiveStatusForKind/backlog_item_uses_archived
+=== PAUSE TestArchiveStatusForKind/backlog_item_uses_archived
+=== CONT  TestArchiveStatusForKind/question_has_no_archive_status
+=== CONT  TestCoerceMutationFields_criteriaTypeAliasesCategory
+--- PASS: TestCoerceMutationFields_criteriaTypeAliasesCategory (0.00s)
+=== CONT  TestCoerceToStringList_stringBecomesList
+--- PASS: TestCoerceToStringList_stringBecomesList (0.00s)
+=== CONT  TestCoerceMutationFields_goalRefsString
+--- PASS: TestCoerceMutationFields_goalRefsString (0.00s)
+=== CONT  TestCoerceToStringList_newlineConcatBecomesList
+--- PASS: TestCoerceToStringList_newlineConcatBecomesList (0.00s)
+=== CONT  TestCoerceToStringList_preservesObjectStages
+--- PASS: TestCoerceToStringList_preservesObjectStages (0.00s)
+=== CONT  TestArchiveStatusForKind/backlog_item_uses_archived
+=== CONT  TestAppendRefList_appendsOntoExistingSlice
+--- PASS: TestAppendRefList_appendsOntoExistingSlice (0.00s)
+=== CONT  TestFieldLooksLikeRefList
+--- PASS: TestFieldLooksLikeRefList (0.00s)
+=== CONT  TestRequireCriteriaCategory
+--- PASS: TestRequireCriteriaCategory (0.00s)
+=== CONT  TestCoerceMutationFields_criteriaTypeKeyAliasesCategory
+--- PASS: TestCoerceMutationFields_criteriaTypeKeyAliasesCategory (0.00s)
+--- PASS: TestArchiveStatusForKind (0.00s)
+    --- PASS: TestArchiveStatusForKind/question_has_no_archive_status (0.00s)
+    --- PASS: TestArchiveStatusForKind/backlog_item_uses_archived (0.00s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/objects	0.674s

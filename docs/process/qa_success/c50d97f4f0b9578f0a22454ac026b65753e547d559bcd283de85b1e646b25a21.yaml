@@ -1,0 +1,14 @@
+created_at: "2026-08-20T11:23:18Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1787224989099085000-d49621fd
+item_id: CRIT-CEF-R10-COMPARE-001
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 2857702ca28e4b64fb5782140b43c1400e68fdeab30ab0062f4119523ca97d466e5f13c72adcfa41b92eacf21fa7f0a79b8a8e3a8d7c581e5c9afe0e69cb31dc
+schema_version: 2.0.0
+signature: 3044022001e48276feeeb9da8d02cc817d7f0f59556767807049e2e47f84361a3d494768022030ba95c87d30260c0162224f5afb5f5d1ad96583d0f3164fd5e55e2e771b7aa8
+status: archived
+title: COMPARE envelope min(seats) vs hater; list axes still below 5
+updated_at: "2026-09-01T07:16:58Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

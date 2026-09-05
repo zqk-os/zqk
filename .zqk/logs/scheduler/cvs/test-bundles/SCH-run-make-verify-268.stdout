@@ -1,0 +1,60 @@
+
+--- run 2026-09-04T22:10:00Z ---
+=== RUN   TestSchedulerStateCommandRegistered
+=== PAUSE TestSchedulerStateCommandRegistered
+=== RUN   TestSchedulerStartCommand_BackgroundDefault
+=== PAUSE TestSchedulerStartCommand_BackgroundDefault
+=== RUN   TestFormatActivityCompactUTC
+=== PAUSE TestFormatActivityCompactUTC
+=== RUN   TestStuckJobAssessmentParts
+=== PAUSE TestStuckJobAssessmentParts
+=== RUN   TestCountGoPathGrepHitLines
+=== PAUSE TestCountGoPathGrepHitLines
+=== RUN   TestFormatAgentMarkdown_LinkedBacklogSection
+=== PAUSE TestFormatAgentMarkdown_LinkedBacklogSection
+=== RUN   TestFormatAgentMarkdown_convergenceRecommendationRespectsCompletionGateBypass
+=== PAUSE TestFormatAgentMarkdown_convergenceRecommendationRespectsCompletionGateBypass
+=== RUN   TestReadTestBundleHealthTailForAgentPrompt_MissingFile
+=== PAUSE TestReadTestBundleHealthTailForAgentPrompt_MissingFile
+=== RUN   TestReadTestBundleHealthTailForAgentPrompt_WithFile
+=== PAUSE TestReadTestBundleHealthTailForAgentPrompt_WithFile
+=== CONT  TestSchedulerStateCommandRegistered
+--- PASS: TestSchedulerStateCommandRegistered (0.01s)
+=== CONT  TestFormatAgentMarkdown_LinkedBacklogSection
+--- PASS: TestFormatAgentMarkdown_LinkedBacklogSection (0.00s)
+=== CONT  TestReadTestBundleHealthTailForAgentPrompt_WithFile
+--- PASS: TestReadTestBundleHealthTailForAgentPrompt_WithFile (0.01s)
+=== CONT  TestReadTestBundleHealthTailForAgentPrompt_MissingFile
+--- PASS: TestReadTestBundleHealthTailForAgentPrompt_MissingFile (0.00s)
+=== CONT  TestFormatAgentMarkdown_convergenceRecommendationRespectsCompletionGateBypass
+--- PASS: TestFormatAgentMarkdown_convergenceRecommendationRespectsCompletionGateBypass (0.00s)
+=== CONT  TestStuckJobAssessmentParts
+=== RUN   TestStuckJobAssessmentParts/REC
+=== PAUSE TestStuckJobAssessmentParts/REC
+=== RUN   TestStuckJobAssessmentParts/WCH
+=== PAUSE TestStuckJobAssessmentParts/WCH
+=== RUN   TestStuckJobAssessmentParts/INV
+=== PAUSE TestStuckJobAssessmentParts/INV
+=== CONT  TestCountGoPathGrepHitLines
+--- PASS: TestCountGoPathGrepHitLines (0.00s)
+=== CONT  TestFormatActivityCompactUTC
+=== RUN   TestFormatActivityCompactUTC/same_year_omits_year
+=== PAUSE TestFormatActivityCompactUTC/same_year_omits_year
+=== RUN   TestFormatActivityCompactUTC/different_year_includes_year
+=== PAUSE TestFormatActivityCompactUTC/different_year_includes_year
+=== CONT  TestSchedulerStartCommand_BackgroundDefault
+--- PASS: TestSchedulerStartCommand_BackgroundDefault (0.02s)
+=== CONT  TestStuckJobAssessmentParts/REC
+=== CONT  TestStuckJobAssessmentParts/INV
+=== CONT  TestStuckJobAssessmentParts/WCH
+--- PASS: TestStuckJobAssessmentParts (0.00s)
+    --- PASS: TestStuckJobAssessmentParts/REC (0.00s)
+    --- PASS: TestStuckJobAssessmentParts/INV (0.00s)
+    --- PASS: TestStuckJobAssessmentParts/WCH (0.00s)
+=== CONT  TestFormatActivityCompactUTC/same_year_omits_year
+=== CONT  TestFormatActivityCompactUTC/different_year_includes_year
+--- PASS: TestFormatActivityCompactUTC (0.00s)
+    --- PASS: TestFormatActivityCompactUTC/same_year_omits_year (0.00s)
+    --- PASS: TestFormatActivityCompactUTC/different_year_includes_year (0.00s)
+PASS
+ok  	github.com/lanceman/zqk/cmd/zqk/scheduler	0.943s

@@ -1,0 +1,34 @@
+agent_heartbeat: '2026-09-04T15:04:48-07:00'
+agent_pid: 9255
+assignee_persona_ref: PER-1781248465963709000-9925efbe
+created_at: '2026-09-04T19:46:38Z'
+created_by: ACC-1785920548450214012-68b850c0
+description: "Parent CVS=CVS-CEF-UNTIL-45-001. Seat: antigravity-1.\nAdvance BLI-1788512148256431000-3c34b1cd\
+  \ (CEF R28 \u2014 remesure remaining diamond lenses after StubAuth).\nTDD first;\
+  \ pre-commit before push; no docs/process hand-edits.\nFeed SWARM-REPLY with BLI\
+  \ id + commit evidence; agent next --on-validation-failure wake.\nHourglass on \u2014\
+  \ do not idle.\n"
+estimated_effort: 4 hours
+id: ATK-1788551198213493000-83e1df76
+kind: agent_task
+namespace_id: zqk:kernel
+notes: 'autofix demote: Invalid lifecycle status ''pending'' for kind ''agent_task'''
+pipeline_ref: PRI-CEF-R28-REMEDIATE-001
+schema_version: 2.0.0
+status: approved
+task_steps:
+- description: Advance BLI tranche
+  status: completed
+  title: Implementation Phase
+- command: 'true'
+  description: Targeted tests + pre-commit green
+  status: error
+  title: Validation Phase
+  verification_feedback: Hourglass timer expired (process died or hung)
+  verification_strategy: command_exit_code
+title: "SWARM antigravity-1: CEF R28 \u2014 remesure remaining diamond lenses after\
+  \ StubAuth"
+updated_at: '2026-09-04T23:06:20Z'
+updated_by: ACC-1785920548450214006-2e52b3e7
+version_context: default
+branch_ref: integration/pri-cef-r28-remediate-001

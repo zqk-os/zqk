@@ -1,0 +1,193 @@
+{
+  "metadata": {
+    "version": "2.0",
+    "build_time": "2026-09-04T21:50:21.406345Z",
+    "project_root": "/Users/lanceettl/zqk-restore-clone",
+    "entry_count": 53
+  },
+  "buckets": {
+    "audit_event": {
+      "cache_update": {
+        "AUD-6399": {
+          "created_at": "2026-09-04T21:49:52Z"
+        }
+      },
+      "hash_registry_batch_complete": {
+        "AUD-6427": {
+          "created_at": "2026-09-04T21:49:52Z"
+        }
+      },
+      "hash_registry_batch_start": {
+        "AUD-6405": {
+          "created_at": "2026-09-04T21:49:52Z"
+        }
+      },
+      "listing_index_batch_complete": {
+        "AUD-6309": {
+          "created_at": "2026-09-04T21:49:49Z"
+        },
+        "AUD-6380": {
+          "created_at": "2026-09-04T21:49:51Z"
+        }
+      },
+      "listing_index_batch_start": {
+        "AUD-6317": {
+          "created_at": "2026-09-04T21:49:50Z"
+        }
+      },
+      "object_creation": {
+        "AUD-6654": {
+          "created_at": "2026-09-04T21:50:02Z"
+        }
+      },
+      "system_config_change": {
+        "AUD-5928": {
+          "created_at": "2026-09-04T21:49:42Z"
+        },
+        "AUD-5960": {
+          "created_at": "2026-09-04T21:49:42Z"
+        },
+        "AUD-6056": {
+          "created_at": "2026-09-04T21:49:44Z"
+        },
+        "AUD-6065": {
+          "created_at": "2026-09-04T21:49:44Z"
+        },
+        "AUD-6067": {
+          "created_at": "2026-09-04T21:49:45Z"
+        },
+        "AUD-6069": {
+          "created_at": "2026-09-04T21:49:45Z"
+        },
+        "AUD-6072": {
+          "created_at": "2026-09-04T21:49:45Z"
+        },
+        "AUD-6073": {
+          "created_at": "2026-09-04T21:49:45Z"
+        },
+        "AUD-6077": {
+          "created_at": "2026-09-04T21:49:45Z"
+        },
+        "AUD-6085": {
+          "created_at": "2026-09-04T21:49:45Z"
+        },
+        "AUD-6407": {
+          "created_at": "2026-09-04T21:49:52Z"
+        },
+        "AUD-6550": {
+          "created_at": "2026-09-04T21:49:57Z"
+        },
+        "AUD-6614": {
+          "created_at": "2026-09-04T21:50:01Z"
+        },
+        "AUD-6621": {
+          "created_at": "2026-09-04T21:50:01Z"
+        },
+        "AUD-6623": {
+          "created_at": "2026-09-04T21:50:01Z"
+        },
+        "AUD-6625": {
+          "created_at": "2026-09-04T21:50:01Z"
+        },
+        "AUD-6628": {
+          "created_at": "2026-09-04T21:50:01Z"
+        },
+        "AUD-6632": {
+          "created_at": "2026-09-04T21:50:01Z"
+        },
+        "AUD-6634": {
+          "created_at": "2026-09-04T21:50:01Z"
+        },
+        "AUD-6806": {
+          "created_at": "2026-09-04T21:50:06Z"
+        },
+        "AUD-6998": {
+          "created_at": "2026-09-04T21:50:09Z"
+        },
+        "AUD-6999": {
+          "created_at": "2026-09-04T21:50:09Z"
+        },
+        "AUD-7020": {
+          "created_at": "2026-09-04T21:50:09Z"
+        },
+        "AUD-7026": {
+          "created_at": "2026-09-04T21:50:09Z"
+        },
+        "AUD-7027": {
+          "created_at": "2026-09-04T21:50:09Z"
+        },
+        "AUD-7033": {
+          "created_at": "2026-09-04T21:50:09Z"
+        },
+        "AUD-7036": {
+          "created_at": "2026-09-04T21:50:09Z"
+        },
+        "AUD-7038": {
+          "created_at": "2026-09-04T21:50:09Z"
+        },
+        "AUD-7094": {
+          "created_at": "2026-09-04T21:50:10Z"
+        },
+        "AUD-7105": {
+          "created_at": "2026-09-04T21:50:10Z"
+        },
+        "AUD-7166": {
+          "created_at": "2026-09-04T21:50:11Z"
+        },
+        "AUD-7226": {
+          "created_at": "2026-09-04T21:50:13Z"
+        },
+        "AUD-7271": {
+          "created_at": "2026-09-04T21:50:13Z"
+        },
+        "AUD-7287": {
+          "created_at": "2026-09-04T21:50:14Z"
+        },
+        "AUD-7316": {
+          "created_at": "2026-09-04T21:50:14Z"
+        },
+        "AUD-7324": {
+          "created_at": "2026-09-04T21:50:15Z"
+        },
+        "AUD-7380": {
+          "created_at": "2026-09-04T21:50:16Z"
+        },
+        "AUD-7396": {
+          "created_at": "2026-09-04T21:50:16Z"
+        },
+        "AUD-7438": {
+          "created_at": "2026-09-04T21:50:17Z"
+        },
+        "AUD-7446": {
+          "created_at": "2026-09-04T21:50:17Z"
+        },
+        "AUD-7506": {
+          "created_at": "2026-09-04T21:50:18Z"
+        },
+        "AUD-7625": {
+          "created_at": "2026-09-04T21:50:21Z"
+        }
+      }
+    },
+    "base_metric": {
+      "": {
+        "BAS-1788558592642633000-b06803da": {
+          "created_at": "2026-09-04T21:49:52Z"
+        },
+        "BAS-1788558601400023000-3249b735": {
+          "created_at": "2026-09-04T21:50:01Z"
+        },
+        "BAS-1788558609747697000-ea776825": {
+          "created_at": "2026-09-04T21:50:09Z"
+        }
+      }
+    },
+    "zqk_session": {
+      "": {
+        "ZQK-6128": {
+          "created_at": "2026-09-04T21:49:44Z"
+        }
+      }
+    }
+  }
+}

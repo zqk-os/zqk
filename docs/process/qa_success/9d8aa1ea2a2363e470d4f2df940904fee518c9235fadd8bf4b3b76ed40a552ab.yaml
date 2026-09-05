@@ -1,0 +1,14 @@
+created_at: "2026-08-19T02:02:11Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1787104929849336000-f1a833bc
+item_id: REDACTED
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 2857702ca28e4b64fb5782140b43c1400e68fdeab30ab0062f4119523ca97d466e5f13c72adcfa41b92eacf21fa7f0a79b8a8e3a8d7c581e5c9afe0e69cb31dc
+schema_version: 2.0.0
+signature: 3046022100fd010b6f0219cab14f185f7f182c263bd70d5df8176b5404db72d57476307879022100dc15e83a6ce74d924542766966c119c0302ad03c62ccd7268caf48ed62f2a0b8
+status: archived
+title: Fail-closed new-command membrane — DNA (+ optional CSPEC) before ship
+updated_at: "2026-09-01T07:45:48Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

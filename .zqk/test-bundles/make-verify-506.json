@@ -1,0 +1,33 @@
+{
+  "name": "make-verify-506",
+  "created_at": "2026-09-04T21:34:32.37306Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-506",
+    "Tests": [
+      {
+        "Name": "TestActivityTicker",
+        "Package": "ticker",
+        "PackagePath": "pkg/orchestration/ticker",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/orchestration/ticker/ticker_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 30000000000,
+    "PackagePath": "pkg/orchestration/ticker"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestActivityTicker",
+      "Package": "ticker",
+      "PackagePath": "pkg/orchestration/ticker",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/orchestration/ticker/ticker_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

@@ -1,0 +1,44 @@
+
+--- run 2026-09-04T22:14:40Z ---
+=== RUN   TestBuildMatrixActivityLogEntry_shape
+=== PAUSE TestBuildMatrixActivityLogEntry_shape
+=== RUN   TestQueryMatrixCSV_filters
+=== PAUSE TestQueryMatrixCSV_filters
+=== RUN   TestQueryMatrixCSV_goOnly
+=== PAUSE TestQueryMatrixCSV_goOnly
+=== RUN   TestQueryMatrixCSV_limit
+=== PAUSE TestQueryMatrixCSV_limit
+=== RUN   TestQueryMatrixCSV_cvsIDRequiresColumn
+=== PAUSE TestQueryMatrixCSV_cvsIDRequiresColumn
+=== RUN   TestQueryMatrixCSV_columnsProjection
+=== PAUSE TestQueryMatrixCSV_columnsProjection
+=== RUN   TestQueryMatrixCSV_columnsUnknown
+=== PAUSE TestQueryMatrixCSV_columnsUnknown
+=== RUN   TestFormatMatrixGetResultCSV
+=== PAUSE TestFormatMatrixGetResultCSV
+=== RUN   TestQueryMatrixCSV_columnsDuplicate
+=== PAUSE TestQueryMatrixCSV_columnsDuplicate
+=== RUN   TestListMatricesFromRegistry
+=== PAUSE TestListMatricesFromRegistry
+=== CONT  TestBuildMatrixActivityLogEntry_shape
+=== CONT  TestQueryMatrixCSV_columnsProjection
+--- PASS: TestBuildMatrixActivityLogEntry_shape (0.00s)
+=== CONT  TestQueryMatrixCSV_limit
+--- PASS: TestQueryMatrixCSV_limit (0.01s)
+=== CONT  TestQueryMatrixCSV_cvsIDRequiresColumn
+--- PASS: TestQueryMatrixCSV_columnsProjection (0.01s)
+=== CONT  TestQueryMatrixCSV_goOnly
+--- PASS: TestQueryMatrixCSV_cvsIDRequiresColumn (0.01s)
+=== CONT  TestQueryMatrixCSV_filters
+--- PASS: TestQueryMatrixCSV_goOnly (0.01s)
+=== CONT  TestQueryMatrixCSV_columnsDuplicate
+--- PASS: TestQueryMatrixCSV_filters (0.01s)
+=== CONT  TestListMatricesFromRegistry
+--- PASS: TestQueryMatrixCSV_columnsDuplicate (0.01s)
+=== CONT  TestFormatMatrixGetResultCSV
+--- PASS: TestFormatMatrixGetResultCSV (0.00s)
+=== CONT  TestQueryMatrixCSV_columnsUnknown
+--- PASS: TestQueryMatrixCSV_columnsUnknown (0.00s)
+--- PASS: TestListMatricesFromRegistry (0.01s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/quality	0.695s

@@ -1,0 +1,14 @@
+created_at: "2026-09-03T07:39:11Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1788421151681854000-4131af96
+item_id: CRIT-CEF-GOCYCLO-THRESHOLD-20-001
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 86b8ab3d574c004a61020b73c23f52b9055049e90c3d755c8bbb383e059e384028fdd8cd69e13123b644e5f3f7eb65596e73e2d57d719ea3dafcb01b84ce8dfb
+schema_version: 2.0.0
+signature: 3045022017496a9743c7025f38e0659f1f8d95d24db19eef3daf0475634e2dafc8764a2b0221008a8b09fdd4dee14e15841b42c624acdfe18d04fd477d2f7fc93fd696d184ad96
+status: success
+title: QA success for CRIT-CEF-GOCYCLO-THRESHOLD-20-001
+updated_at: "2026-09-03T07:39:12Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

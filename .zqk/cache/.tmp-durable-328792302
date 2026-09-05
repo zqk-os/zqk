@@ -1,0 +1,25 @@
+{
+  "metadata": {
+    "version": "2.0",
+    "build_time": "2026-09-04T21:49:25.858133Z",
+    "project_root": "/Users/lanceettl/zqk-restore-clone",
+    "entry_count": 3
+  },
+  "buckets": {
+    "audit_event": {
+      "integrity_recovery": {
+        "AUD-ik-ATK-1788499964586342000-003a2053-09720a4c441e1430318953b9f3af12ea55a0f702bd430434ac6b86b83b139b07": {
+          "created_at": "2026-09-04T21:49:23Z"
+        }
+      },
+      "system_config_change": {
+        "AUD-5473": {
+          "created_at": "2026-09-04T21:49:22Z"
+        },
+        "AUD-5529": {
+          "created_at": "2026-09-04T21:49:25Z"
+        }
+      }
+    }
+  }
+}

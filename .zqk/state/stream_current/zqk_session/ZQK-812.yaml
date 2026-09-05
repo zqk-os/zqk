@@ -1,0 +1,13 @@
+account_id: ACC-1785920548450214006-2e52b3e7
+created_at: "2026-09-02T09:05:41Z"
+created_by: ACC-1785920548450214006-2e52b3e7
+id: ZQK-812
+kind: zqk_session
+namespace_id: zqk:kernel
+schema_version: 2.0.0
+session_type: cli
+status: active
+title: zqk system validate-command-specs
+updated_at: "2026-09-02T09:05:41Z"
+updated_by: ACC-1785920548450214006-2e52b3e7
+version_context: default

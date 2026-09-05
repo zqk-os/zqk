@@ -1,0 +1,87 @@
+{
+  "name": "make-verify-644",
+  "created_at": "2026-09-04T21:34:33.765322Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-644",
+    "Tests": [
+      {
+        "Name": "TestVerifyCompletionIntegration",
+        "Package": "validate",
+        "PackagePath": "cmd/zqk/validate",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/validate/completion_integration_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestComputeTestCaseHash",
+        "Package": "validate",
+        "PackagePath": "cmd/zqk/validate",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/validate/completion_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestResolvePriorityPlan",
+        "Package": "validate",
+        "PackagePath": "cmd/zqk/validate",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/validate/tree_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestTreeResolver_Resolve",
+        "Package": "validate",
+        "PackagePath": "cmd/zqk/validate",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/validate/tree_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 120000000000,
+    "PackagePath": "cmd/zqk/validate"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestVerifyCompletionIntegration",
+      "Package": "validate",
+      "PackagePath": "cmd/zqk/validate",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/validate/completion_integration_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestComputeTestCaseHash",
+      "Package": "validate",
+      "PackagePath": "cmd/zqk/validate",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/validate/completion_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestResolvePriorityPlan",
+      "Package": "validate",
+      "PackagePath": "cmd/zqk/validate",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/validate/tree_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestTreeResolver_Resolve",
+      "Package": "validate",
+      "PackagePath": "cmd/zqk/validate",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/validate/tree_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

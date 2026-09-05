@@ -1,0 +1,14 @@
+created_at: "2026-08-19T07:02:43Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1787122961657660000-fc4113b1
+item_id: BLI-STRAT-TRACEABILITY
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 2857702ca28e4b64fb5782140b43c1400e68fdeab30ab0062f4119523ca97d466e5f13c72adcfa41b92eacf21fa7f0a79b8a8e3a8d7c581e5c9afe0e69cb31dc
+schema_version: 2.0.0
+signature: 3045022100bb3a204ede78b0a1d81f25d0685f95c68e0bc513c8107d6ba70cac4a6842bdc0022072a884f81b49332f6c5b394a631db03366bc204d1fabd0fe8273eb5b0f663bd6
+status: archived
+title: Traceability in Ambient Orchestration
+updated_at: "2026-09-01T07:38:00Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

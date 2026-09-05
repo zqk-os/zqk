@@ -1,0 +1,51 @@
+{
+  "name": "make-verify-529",
+  "created_at": "2026-09-04T21:34:32.616081Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-529",
+    "Tests": [
+      {
+        "Name": "TestExportToYAML",
+        "Package": "exporter",
+        "PackagePath": "pkg/migration/exporter",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/migration/exporter/exporter_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestToLabel",
+        "Package": "exporter",
+        "PackagePath": "pkg/migration/exporter",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/migration/exporter/exporter_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": true,
+    "EstimatedDuration": 60000000000,
+    "PackagePath": "pkg/migration/exporter"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestExportToYAML",
+      "Package": "exporter",
+      "PackagePath": "pkg/migration/exporter",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/migration/exporter/exporter_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestToLabel",
+      "Package": "exporter",
+      "PackagePath": "pkg/migration/exporter",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/migration/exporter/exporter_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

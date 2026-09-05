@@ -1,0 +1,51 @@
+acceptance_considerations: Acceptance recorded as linked criteria; no narrative captured at migration time.
+actual_effort: 3h
+commit_refs:
+    - 28d9da9319d0
+created_at: "2026-08-05T04:52:20Z"
+created_by: ACC-1785920548450214012-68b850c0
+criteria_refs:
+    - CRIT-1785939719830187000-2aa1dfa3
+    - CRIT-1785939720745291000-f3f5d01b
+    - CRIT-1785939721871437000-858ca55c
+    - CRIT-1785939722968059000-586cfdaa
+    - CRIT-1786697464558143000-5ff3e318
+description: |
+    Define/update roles (planner vs doer) so permissions match POL-AGENT-PLANNER-DOER-001.
+    Bind personas/ACCs accordingly. Enforce at AuthMiddleware / storage decorator:
+    doers can promote/demote agent_task; cannot write strategic kernel kinds or
+    orchestrate peers. Planners cannot write code/test as implementers.
+    Evidence: CRI-PLANNER-DOER-SPLIT + negative tests.
+estimated_effort: 10h
+goal_refs:
+    - GOAL-1785885763755750000-6efcb274
+id: BLI-1785905540598640000-12d5118e
+kind: backlog_item
+milestone_refs:
+    - MIL-1785886016336815000-ad6784be
+namespace_id: zqk:kernel
+next_action: 'Merged #1385; promote to complete'
+owner_ref: ACC-1785920548450214012-68b850c0
+persona_refs:
+    - PER-1781486429759398000-a79939a1
+priority: high
+priority_tier: P0
+problem_statement: |-
+    Define/update roles (planner vs doer) so permissions match POL-AGENT-PLANNER-DOER-001.
+    Bind personas/ACCs accordingly. Enforce at AuthMiddleware / storage decorator:
+    doers can promote/demote agent_task; cannot write strategic kernel kinds or
+    orchestrate peers. Planners cannot write code/test as implementers.
+    Evidence: CRI-PLANNER-DOER-SPLIT + negative tests.
+related_object_refs:
+    - REQ-1785905520527169000-4fb88f5d
+    - CRIT-1785905538812505000-ad8b9f88
+    - POL-CODE-1785905539682847000-37bb6e60
+requirement_refs:
+    - REQ-1785905520527169000-4fb88f5d
+    - REQ-1785905117601841000-468539c3
+schema_version: 2.0.0
+status: archived
+title: 'MMORCH P0: Encode planner vs doer role matrix + RBAC deny cross-lane'
+updated_at: "2026-08-19T04:51:28Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

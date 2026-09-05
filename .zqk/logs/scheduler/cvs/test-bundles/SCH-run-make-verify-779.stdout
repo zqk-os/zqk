@@ -1,0 +1,44 @@
+
+--- run 2026-09-04T22:21:29Z ---
+=== RUN   TestGenerateFieldList
+=== PAUSE TestGenerateFieldList
+=== RUN   TestGenerateFilterableFields
+=== PAUSE TestGenerateFilterableFields
+=== RUN   TestGenerateSortableFields
+=== PAUSE TestGenerateSortableFields
+=== RUN   TestGenerateGroupableFields
+=== PAUSE TestGenerateGroupableFields
+=== RUN   TestSupplementalFieldKeyNamesPreserveCrossPlanReferences
+=== PAUSE TestSupplementalFieldKeyNamesPreserveCrossPlanReferences
+=== RUN   TestMaybeStripRedundantTopLevelTraits_BacklogItemSpecTraits
+=== PAUSE TestMaybeStripRedundantTopLevelTraits_BacklogItemSpecTraits
+=== RUN   TestDefaultKernelCriticalForProfile_unresolvedFailsClosed
+=== PAUSE TestDefaultKernelCriticalForProfile_unresolvedFailsClosed
+=== RUN   TestEffectiveKernelCritical_inference
+=== PAUSE TestEffectiveKernelCritical_inference
+=== RUN   TestSpecKindSummary_EffectiveKernelCritical_nilUsesProfile
+=== PAUSE TestSpecKindSummary_EffectiveKernelCritical_nilUsesProfile
+=== RUN   TestDynamicKindMapper_GetDirectoryFromKind
+=== PAUSE TestDynamicKindMapper_GetDirectoryFromKind
+=== CONT  TestGenerateFieldList
+=== CONT  TestMaybeStripRedundantTopLevelTraits_BacklogItemSpecTraits
+=== CONT  TestGenerateGroupableFields
+--- PASS: TestMaybeStripRedundantTopLevelTraits_BacklogItemSpecTraits (0.07s)
+--- PASS: TestGenerateGroupableFields (0.32s)
+=== CONT  TestSupplementalFieldKeyNamesPreserveCrossPlanReferences
+--- PASS: TestSupplementalFieldKeyNamesPreserveCrossPlanReferences (0.00s)
+=== CONT  TestSpecKindSummary_EffectiveKernelCritical_nilUsesProfile
+--- PASS: TestSpecKindSummary_EffectiveKernelCritical_nilUsesProfile (0.00s)
+=== CONT  TestDynamicKindMapper_GetDirectoryFromKind
+--- PASS: TestDynamicKindMapper_GetDirectoryFromKind (0.00s)
+=== CONT  TestGenerateSortableFields
+--- PASS: TestGenerateSortableFields (0.00s)
+=== CONT  TestEffectiveKernelCritical_inference
+--- PASS: TestEffectiveKernelCritical_inference (0.00s)
+=== CONT  TestDefaultKernelCriticalForProfile_unresolvedFailsClosed
+--- PASS: TestDefaultKernelCriticalForProfile_unresolvedFailsClosed (0.00s)
+=== CONT  TestGenerateFilterableFields
+--- PASS: TestGenerateFilterableFields (0.00s)
+--- PASS: TestGenerateFieldList (0.39s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/objects	0.987s

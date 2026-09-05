@@ -1,0 +1,601 @@
+{
+  "agent_idle_digest": "sync-loop-agent:ATK-1788510388168756000-e2848cec: 2s\nsync-loop-agent:ATK-1788510393845163000-359b2a67: 24s\nsync-loop-agent:ATK-1788550361907437000-1dee8400: 20s\nsync-loop-agent:ATK-1788551198213493000-83e1df76: 30s\nsync-loop-agent:ATK-1788551205600636000-f21bec19: 2s\n",
+  "align_pointer": {
+    "id": "PRI-CEF-R28-REMEDIATE-001",
+    "shaped": true,
+    "status": "in_progress",
+    "title": "CEF R28 — remediate 2026-09-03 remesure residuals (lift envelope to 4)"
+  },
+  "base_metrics": {
+    "meta": {
+      "hidden_outside_scope": 1757,
+      "namespace_isolation_active": true,
+      "namespace_scope": "zqk:kernel",
+      "namespace_scope_mode": "default_kernel",
+      "returned_count": 0,
+      "total_count": 0
+    },
+    "objects": null
+  },
+  "command_metrics": {
+    "meta": {
+      "namespace_isolation_active": true,
+      "namespace_scope": "zqk:kernel",
+      "namespace_scope_mode": "default_kernel",
+      "returned_count": 0,
+      "total_count": 0
+    },
+    "objects": null
+  },
+  "cvs_id": "CVS-CEF-UNTIL-45-001",
+  "focus_child_cvs_id": "",
+  "next_admin_action": {
+    "command": "zqk system check all --auto-fix --auto-fix-scheduler --timeout 540s",
+    "description": "Command averages 34.346482131s execution time. Consider optimization or progress indicators.",
+    "impact": "Faster command execution and better user experience",
+    "priority": "low",
+    "type": "optimization"
+  },
+  "object_count": {
+    "count_scope": "public kinds only (visibility≠internal). Internals: object count --internal (entitled) or object count \u003ckind\u003e. system check validates a subset from the object ID cache (built from docs/process).",
+    "counts_by_kind": {
+      "account": 53,
+      "agent_instruction": 15,
+      "agent_onboarding_preparation": 1,
+      "agent_skill": 39,
+      "backlog_item": 1141,
+      "convergence_session": 14,
+      "criteria": 1320,
+      "decision": 15,
+      "doc_entry": 2052,
+      "domain_registry": 7,
+      "goal": 83,
+      "library": 1,
+      "milestone": 130,
+      "mission": 2,
+      "namespace": 3,
+      "namespace_registry": 1,
+      "persona": 56,
+      "policy": 136,
+      "priority_plan": 100,
+      "prompt_template": 39,
+      "question": 16,
+      "requirement": 240,
+      "risk_blocker": 152,
+      "roadmap": 12,
+      "role": 18,
+      "rule": 9,
+      "scenario": 1,
+      "stakeholder_profile": 1,
+      "strategic_context": 10,
+      "strategic_plan": 1,
+      "team_configuration": 4,
+      "test_case": 55,
+      "verification_matrix": 1,
+      "workflow": 10,
+      "workstream": 37
+    },
+    "meta": {
+      "all_kinds": false,
+      "discovery_lane": "full",
+      "find_vs_count_recipe": "Public: zqk object count. Internal inventory: zqk object count --internal (entitled) or zqk object count \u003ckind\u003e. Dir↔kind: docs/process/\u003cplural\u003e via kind_mappings_config (list-vocabulary / object fields --list-kinds). HV orphan ≈ process-dir YAML leftovers for stream kinds (or disk−count for cas).",
+      "high_volume_object_counts": {
+        "cas_disk": 430,
+        "orphan": 4740,
+        "stream": 494
+      },
+      "include_zero_count": false,
+      "intentional_exclusions": "Default all-kinds count skips visibility:internal kinds (match object list) and zero-count kinds. Use --internal and/or --include-zero-count for full registry inventory. HV rollup in meta always includes high_volume_kinds (stream/cas_disk/orphan).",
+      "membrane": "persona_rbac_discovery",
+      "namespace_isolation_active": true,
+      "namespace_scope": "zqk:kernel",
+      "namespace_scope_mode": "default_kernel",
+      "omitted_zero_count_kinds": 25,
+      "registry_kind_count": 104,
+      "skipped_count_error_kinds": 0,
+      "skipped_internal_kind_count": 44,
+      "skipped_internal_kinds": [
+        "agent_feed",
+        "agent_task",
+        "audit_aggregation_metric",
+        "audit_event",
+        "audit_event_aggregation",
+        "auth_strategy",
+        "auto_fix_rule",
+        "base_metric",
+        "bucketing_strategy",
+        "certificate",
+        "change_journal_entry",
+        "code_quality_metric",
+        "code_reference",
+        "context_refresh_schedule",
+        "extensible_object",
+        "file_lock_metric",
+        "glossary_term",
+        "glossary_term_relation",
+        "integrity_manifest",
+        "keystore_entry",
+        "kind_mapping_metric",
+        "kind_synonym",
+        "lifecycle",
+        "mcp_built_in_tool",
+        "mcp_session",
+        "mcp_spec",
+        "object_spec",
+        "pipeline",
+        "pipeline_definition",
+        "pipeline_execution",
+        "qa_success",
+        "resolver",
+        "rollback_report",
+        "scheduler_handler_binding",
+        "scheduler_health_metric",
+        "scheduler_job",
+        "tde_envelope",
+        "technical_debt",
+        "template",
+        "test_audit_aggregation_metric",
+        "test_command_rule",
+        "vocabulary_scheme",
+        "watchdog_registration",
+        "zqk_session"
+      ],
+      "visibility_scope": "public_kinds_only"
+    },
+    "total_kinds": 35,
+    "total_objects": 5775
+  },
+  "outliers_failures": [
+    {
+      "avg_duration": 0,
+      "baseline_duration": 0,
+      "command": "zqk-mcp-ide-adapter",
+      "error_rate": 100,
+      "failure_count": 1,
+      "fastest_duration": 1800100393708,
+      "first_seen": "2026-09-04T13:38:19.630546-07:00",
+      "invocation_count": 1,
+      "last_seen": "2026-09-04T13:38:19.630546-07:00",
+      "normalized_cmd": "zqk-mcp-ide-adapter mcp ide-adapter --tcp 127.0.0.1:8443",
+      "slowest_duration": 1800100393708,
+      "success_count": 0,
+      "timeout_count": 1,
+      "timeout_rate": 100
+    },
+    {
+      "avg_duration": 0,
+      "avg_memory_bytes": 195983672,
+      "baseline_duration": 0,
+      "command": "zqk",
+      "error_rate": 100,
+      "failure_count": 1,
+      "fastest_duration": 401327366792,
+      "first_seen": "2026-09-04T14:48:21.988568-07:00",
+      "invocation_count": 1,
+      "last_seen": "2026-09-04T14:48:21.988568-07:00",
+      "max_memory_bytes": 195983672,
+      "normalized_cmd": "zqk agent sync-loop ATK-1788551198213493000-83e1df76",
+      "slowest_duration": 401327366792,
+      "success_count": 0,
+      "timeout_count": 0,
+      "timeout_rate": 0
+    }
+  ],
+  "outliers_slow": [
+    {
+      "avg_duration": 34346482131,
+      "avg_memory_bytes": 198845969,
+      "baseline_duration": 34346482131,
+      "command": "zqk",
+      "error_rate": 0,
+      "failure_count": 0,
+      "fastest_duration": 6558387416,
+      "first_seen": "2026-09-04T14:15:01.115796-07:00",
+      "invocation_count": 19,
+      "last_seen": "2026-09-04T15:55:00.607165-07:00",
+      "max_memory_bytes": 257517896,
+      "normalized_cmd": "zqk system check all --auto-fix --auto-fix-scheduler --timeout 540s",
+      "slowest_duration": 266419062667,
+      "success_count": 19,
+      "timeout_count": 0,
+      "timeout_rate": 0
+    },
+    {
+      "avg_duration": 28184367987,
+      "avg_memory_bytes": 251049081,
+      "baseline_duration": 28184367987,
+      "command": "zqk",
+      "error_rate": 0,
+      "failure_count": 0,
+      "fastest_duration": 13066650375,
+      "first_seen": "2026-09-04T14:16:45.055015-07:00",
+      "invocation_count": 2,
+      "last_seen": "2026-09-04T15:04:01.459873-07:00",
+      "max_memory_bytes": 253651272,
+      "normalized_cmd": "zqk system check all --format json --auto-fix --timeout 1200s",
+      "slowest_duration": 164243826500,
+      "success_count": 2,
+      "timeout_count": 0,
+      "timeout_rate": 0
+    },
+    {
+      "avg_duration": 23196829542,
+      "avg_memory_bytes": 171063608,
+      "baseline_duration": 23196829542,
+      "command": "zqk",
+      "error_rate": 0,
+      "failure_count": 0,
+      "fastest_duration": 23196829542,
+      "first_seen": "2026-09-04T14:37:00.394828-07:00",
+      "invocation_count": 1,
+      "last_seen": "2026-09-04T14:37:00.394828-07:00",
+      "max_memory_bytes": 171063608,
+      "normalized_cmd": "zqk system check",
+      "slowest_duration": 23196829542,
+      "success_count": 1,
+      "timeout_count": 0,
+      "timeout_rate": 0
+    },
+    {
+      "avg_duration": 52331357250,
+      "avg_memory_bytes": 120711464,
+      "baseline_duration": 52331357250,
+      "command": "zqk",
+      "error_rate": 0,
+      "failure_count": 0,
+      "fastest_duration": 52331357250,
+      "first_seen": "2026-09-04T16:00:02.839651-07:00",
+      "invocation_count": 1,
+      "last_seen": "2026-09-04T16:00:02.839651-07:00",
+      "max_memory_bytes": 120711464,
+      "normalized_cmd": "zqk object count --format json",
+      "slowest_duration": 52331357250,
+      "success_count": 1,
+      "timeout_count": 0,
+      "timeout_rate": 0
+    },
+    {
+      "avg_duration": 12166854334,
+      "avg_memory_bytes": 223164728,
+      "baseline_duration": 12166854334,
+      "command": "zqk",
+      "error_rate": 0,
+      "failure_count": 0,
+      "fastest_duration": 12166854334,
+      "first_seen": "2026-09-04T15:47:09.050704-07:00",
+      "invocation_count": 1,
+      "last_seen": "2026-09-04T15:47:09.050704-07:00",
+      "max_memory_bytes": 223164728,
+      "normalized_cmd": "zqk system check all --auto-fix --fast --ignore-scheduler-down",
+      "slowest_duration": 12166854334,
+      "success_count": 1,
+      "timeout_count": 0,
+      "timeout_rate": 0
+    },
+    {
+      "avg_duration": 11719288875,
+      "avg_memory_bytes": 98130200,
+      "baseline_duration": 11719288875,
+      "command": "zqk",
+      "error_rate": 0,
+      "failure_count": 0,
+      "fastest_duration": 11719288875,
+      "first_seen": "2026-09-04T15:02:44.637688-07:00",
+      "invocation_count": 1,
+      "last_seen": "2026-09-04T15:02:44.637688-07:00",
+      "max_memory_bytes": 98130200,
+      "normalized_cmd": "zqk system improvement-report --emit-events",
+      "slowest_duration": 11719288875,
+      "success_count": 1,
+      "timeout_count": 0,
+      "timeout_rate": 0
+    }
+  ],
+  "outliers_timeouts": [
+    {
+      "avg_duration": 0,
+      "baseline_duration": 0,
+      "command": "zqk-mcp-ide-adapter",
+      "error_rate": 100,
+      "failure_count": 1,
+      "fastest_duration": 1800100393708,
+      "first_seen": "2026-09-04T13:38:19.630546-07:00",
+      "invocation_count": 1,
+      "last_seen": "2026-09-04T13:38:19.630546-07:00",
+      "normalized_cmd": "zqk-mcp-ide-adapter mcp ide-adapter --tcp 127.0.0.1:8443",
+      "slowest_duration": 1800100393708,
+      "success_count": 0,
+      "timeout_count": 1,
+      "timeout_rate": 100
+    }
+  ],
+  "review": {
+    "coverage_gaps": null,
+    "cvs_id": "CVS-CEF-UNTIL-45-001",
+    "errors": [],
+    "focus_child_cvs_id": "",
+    "public_blockers": 0,
+    "ready_for_parent_completion": false,
+    "ready_for_session_completion": false,
+    "scheduler_health": true,
+    "source": "cap_orchestrator.executeReviewStage",
+    "system_check": true,
+    "tests_passed": true,
+    "timestamp": "2026-09-04T22:50:22Z"
+  },
+  "scheduler_health": {
+    "meta": {
+      "hidden_outside_scope": 4845,
+      "namespace_isolation_active": true,
+      "namespace_scope": "zqk:kernel",
+      "namespace_scope_mode": "default_kernel",
+      "returned_count": 0,
+      "total_count": 0
+    },
+    "objects": null
+  },
+  "source": "cap_orchestrator.executeMetricsStage",
+  "system_metrics_summary": {
+    "churn_indicators": [],
+    "frequent_timeouts": [],
+    "generated_at": "2026-09-04T23:01:01Z",
+    "high_failure_rate_commands": [],
+    "improvement_suggestions": [
+      {
+        "command": "zqk system check all --auto-fix --auto-fix-scheduler --timeout 540s",
+        "description": "Command averages 34.346482131s execution time. Consider optimization or progress indicators.",
+        "impact": "Faster command execution and better user experience",
+        "priority": "low",
+        "type": "optimization"
+      }
+    ],
+    "slow_commands": [
+      {
+        "baseline": 34346482131,
+        "command": "zqk",
+        "invocation_count": 19,
+        "issue": "Slow execution",
+        "metric": "avg_duration",
+        "normalized_cmd": "zqk system check all --auto-fix --auto-fix-scheduler --timeout 540s",
+        "severity": "low",
+        "value": "34.346482131s"
+      }
+    ],
+    "summary": {
+      "churn_indicators_count": 0,
+      "frequent_timeouts_count": 0,
+      "high_failure_rate_commands_count": 0,
+      "improvement_suggestions_count": 1,
+      "slow_commands_count": 1
+    }
+  },
+  "timestamp": "2026-09-04T23:01:11Z",
+  "whats_next": {
+    "active_plans": [
+      {
+        "id": "PRI-CEF-R27-ENVELOPE-001",
+        "shaped": true,
+        "status": "in_progress",
+        "title": "CEF R27 — dual-seat remesure after launch P0s (floor 4 / target 4.5)"
+      },
+      {
+        "id": "PRI-CEF-R28-REMEDIATE-001",
+        "shaped": true,
+        "status": "in_progress",
+        "title": "CEF R28 — remediate 2026-09-03 remesure residuals (lift envelope to 4)"
+      },
+      {
+        "id": "PRI-CVS-EVAL-SURFACE-001",
+        "status": "grooming",
+        "title": "CVS evaluation-surface adapters — one orchestrator, pluggable measure"
+      },
+      {
+        "id": "PRI-HOLDING-POST-LAUNCH-001",
+        "shaped": true,
+        "status": "grooming",
+        "title": "Post-launch holding — deferred/roadmap not for this swarm"
+      },
+      {
+        "id": "PRI-MESH-SWARM-INIT-001",
+        "shaped": true,
+        "status": "grooming",
+        "title": "Mesh swarm-init pipeline (grooming)"
+      },
+      {
+        "id": "PRI-OPENCORE-PUBLISH-001",
+        "shaped": true,
+        "status": "grooming",
+        "title": "Open-core publish prep — payload check green, no public push"
+      },
+      {
+        "id": "PRI-REQ-RESIDUAL-TRACE-001",
+        "shaped": true,
+        "status": "grooming",
+        "title": "Residual requirement traceability — bind active REQs onto planned covering BLIs"
+      },
+      {
+        "id": "PRI-TECH-DEBT-PLANNED-001",
+        "shaped": true,
+        "status": "grooming",
+        "title": "Planned tech-debt queue — kernel performance, CAS, lifecycle, env"
+      }
+    ],
+    "agent_instruction": "KERNEL STEWARD: peer seat: execute the whats-next priority_plan the system proposes; claim BLIs; prepare-context + orchestrate/subagent scale-up (WFL-SUBAGENT-DISPATCH); hourglass on handoffs; align score 93.2 STALE age=3h gaps=77 — persist zqk system align --format json -o .zqk/state/ambient/align-latest.json; trust active_order only after refresh against mission/vision/strat; draft plane 1 — promote intentional drafts; sweep apply forbidden without RBAC delete:object_draft_plane; top issues to triage: 1x status: backlog item status \"validated\" cannot link to in_progress priority plan PRI-CEF-R28-REMEDIATE-001; demote the plan to grooming (or promote the item to planned) so execution-facing scope stays ready-only | 1x Cannot determine object kind for reference MS-CEF-001 in field milestone_refs; employed workflows (8): WFL-AGENT-BOOTSTRAP, WFL-MMORCH-OPERATIONAL-RUNBOOK, WFL-MULTI-AGENT-WORK-CLAIM, WFL-SUBAGENT-DISPATCH, WFL-TPM-AGY-MESH-001, WFL-AGENT-CMD-PIPELINE-001, WFL-AGENT-KERNEL-WORKTREE-BIND-001, WFL-AGENT-THREE-PLAN-RUNWAY-001 — keep contracts fresh via kernel_ambience.employed_workflows / zqk object get \u003cWFL\u003e\n\nPeer: run zqk workflow whats-next --agent-id \u003cyou\u003e --format json; execute the proposed priority_plan/BLIs; prepare-context then orchestrate/subagent scale-up; agent next --on-validation-failure wake; draft plane: promote/fix only — never draft sweep apply without RBAC delete:object_draft_plane. Seat: always pass --agent-id matching peer_seats.json (opaque seat id, not a vendor nickname). COMMS-CHECK / STEWARD: zqk feed ack --agent-id \u003cyou\u003e --in-reply-to \u003cAFE\u003e; echo nonce via zqk feed steer --to-agent-id \u003ccoordinator seat\u003e --await-peer-ack (not IDE chat). Workflows: honor kernel_ambience.employed_workflows (mesh/MMORCH/subagent/bootstrap) — do not drift from active WFL contracts.\n\ncap_stage_metrics",
+    "backlog_counts_by_status": {
+      "complete": 1,
+      "in_progress": 18,
+      "planned": 1,
+      "validated": 1
+    },
+    "convergence_sessions_active": [
+      {
+        "current_phase": "c1_scope",
+        "id": "CVS-1787015873043417000-b71a697e",
+        "status": "active",
+        "title": "CVS lifecycle membrane — CAP-bound parent for admission + status semantics"
+      },
+      {
+        "current_phase": "c4_act",
+        "id": "CVS-CEF-UNTIL-45-001",
+        "status": "active",
+        "title": "CEF until dual-seat envelope is 4/5 — pre community fork"
+      }
+    ],
+    "correspondence": {
+      "agent_id": "cap-orchestrator",
+      "inbox_unacked": [],
+      "next_action_hint": "continue",
+      "outbox_awaiting_peer_ack": []
+    },
+    "fill_item": {
+      "command_hint": "zqk object list --filter status=draft",
+      "kind": "draft_plane",
+      "lease_seconds": 2700,
+      "reason": "draft plane 1"
+    },
+    "guiding_step": {
+      "command_hint": "zqk object list --filter status=draft",
+      "event": "idle",
+      "guiding_step": "Lead priority_plan has planned BLIs. Do not remint ORCHESTRATE_PLAN unless the plan has a live ATK (pending/in_progress/approved/proposed). Terminal-only ATKs (implemented/archived/error) are inventory, not a dispatch signal. If fill_item is present, do that kernel fill instead of shutdown. Chat is not the scheduler. Do not claim orch-bound work. Do not re-groom items already planned. Do this fill instead of shutdown or reminting ORCHESTRATE_PLAN: draft plane 1.",
+      "hydrated": false,
+      "policy_id": "POL-AGENT-TPM-PROCESS-ADMIN-001"
+    },
+    "kernel_ambience": {
+      "available": true,
+      "blocking_issues": 0,
+      "draft_plane_by_kind": {
+        "backlog_item": 1
+      },
+      "draft_plane_total": 1,
+      "employed_workflows": [
+        {
+          "id": "WFL-AGENT-BOOTSTRAP",
+          "source": "active",
+          "summary": "5-step start of session workflow for any agent. 1. Identify current persona and role. 2. Read POL-AGENT-ORCH-HOURGLASS-001 and WFL-TPM-AGY-MESH-001. 3. Query a…",
+          "title": "Start-of-Session Workflow for Agents"
+        },
+        {
+          "id": "WFL-MMORCH-OPERATIONAL-RUNBOOK",
+          "source": "active",
+          "summary": "Step -1 — PEER SESSION BOOTSTRAP (before COMMS / backlog push):",
+          "title": "Daily Operations Runbook for MMORCH"
+        },
+        {
+          "id": "WFL-MULTI-AGENT-WORK-CLAIM",
+          "source": "active",
+          "summary": "Prevents work duplication in an N:M topology. An agent MUST claim a BLI/ATK before exclusive execution (claimed_by/claimed_at via zqk agent claim / execute). O…",
+          "title": "Atomic Claim and Release Semantics"
+        },
+        {
+          "id": "WFL-SUBAGENT-DISPATCH",
+          "source": "active",
+          "summary": "Codifies the launch, monitor, collect pattern for subagents. Never launch a subagent \"cold\". Always prime it with context from zqk agent prepare-context. Ensur…",
+          "title": "Context-Rich Subagent Launch Workflow"
+        },
+        {
+          "id": "WFL-TPM-AGY-MESH-001",
+          "source": "active",
+          "summary": "Two-plane multi-seat mesh correspondence (N:M operational contract — Phase A ship path):",
+          "title": "TPM ↔ AGY mesh correspondence workflow (N:M)"
+        },
+        {
+          "id": "WFL-AGENT-CMD-PIPELINE-001",
+          "source": "active",
+          "summary": "# Agent command pipeline",
+          "title": "Agent command pipeline"
+        },
+        {
+          "id": "WFL-AGENT-KERNEL-WORKTREE-BIND-001",
+          "source": "active",
+          "summary": "Protocol for multiple agents in different git folders on one seated kernel.",
+          "title": "Bind ATK git worktrees to the seated kernel (settings wedge)"
+        },
+        {
+          "id": "WFL-AGENT-THREE-PLAN-RUNWAY-001",
+          "source": "active",
+          "summary": "How every seat operates while three `priority_plan` columns are live.",
+          "title": "Keep a 3-plan Gantt runway (lead execute + two grooming columns)"
+        }
+      ],
+      "ghost_ref_count": 0,
+      "measured_at": "2026-09-04T22:06:45Z",
+      "note": "Instance validation from last system-check cache + live draft-plane walk — not a fresh full check; employed_workflows keep active WFL contracts fresh in context",
+      "object_compliance_ok": true,
+      "seat_mode": "peer_execution",
+      "source_path": "/Users/lanceettl/zqk-restore-clone/.zqk/pre-commit/system-check.json",
+      "steward_focus": "peer seat: execute the whats-next priority_plan the system proposes; claim BLIs; prepare-context + orchestrate/subagent scale-up (WFL-SUBAGENT-DISPATCH); hourglass on handoffs; align score 93.2 STALE age=3h gaps=77 — persist zqk system align --format json -o .zqk/state/ambient/align-latest.json; trust active_order only after refresh against mission/vision/strat; draft plane 1 — promote intentional drafts; sweep apply forbidden without RBAC delete:object_draft_plane; top issues to triage: 1x status: backlog item status \"validated\" cannot link to in_progress priority plan PRI-CEF-R28-REMEDIATE-001; demote the plan to grooming (or promote the item to planned) so execution-facing scope stays ready-only | 1x Cannot determine object kind for reference MS-CEF-001 in field milestone_refs; employed workflows (8): WFL-AGENT-BOOTSTRAP, WFL-MMORCH-OPERATIONAL-RUNBOOK, WFL-MULTI-AGENT-WORK-CLAIM, WFL-SUBAGENT-DISPATCH, WFL-TPM-AGY-MESH-001, WFL-AGENT-CMD-PIPELINE-001, WFL-AGENT-KERNEL-WORKTREE-BIND-001, WFL-AGENT-THREE-PLAN-RUNWAY-001 — keep contracts fresh via kernel_ambience.employed_workflows / zqk object get \u003cWFL\u003e",
+      "strategic_alignment": {
+        "alignment_score": 93.25,
+        "available": true,
+        "goals_count": 83,
+        "items_with_goals": 1064,
+        "items_without_goals": 77,
+        "measured_at": "2026-09-04T19:31:50Z",
+        "note": "from zqk system align cache — peers trust whats-next priority_plan; TPM refreshes align + active_order",
+        "source_path": "/Users/lanceettl/zqk-restore-clone/.zqk/state/ambient/align-latest.json"
+      },
+      "top_issue_clusters": [
+        {
+          "count": 1,
+          "message": "status: backlog item status \"validated\" cannot link to in_progress priority plan PRI-CEF-R28-REMEDIATE-001; demote the plan to grooming (or promote the item to planned) so execution-facing scope stays ready-only"
+        },
+        {
+          "count": 1,
+          "message": "Cannot determine object kind for reference MS-CEF-001 in field milestone_refs"
+        }
+      ],
+      "total_issues": 2,
+      "total_objects": 8928,
+      "warnings": 2
+    },
+    "measure_compressed": {
+      "convergence_session_id": "CVS-1787015873043417000-b71a697e",
+      "delta_assessment": "trending_away",
+      "failing_fingerprints_now": [
+        "169c5ba7e70a55ce97d8fb1d",
+        "28608061b0d4f7022effe1a2",
+        "3f8152cbcfecf5c3ca3a4f46",
+        "481997a1d958834a8f0c1213",
+        "484be80c644f15f3ab6b6ef2",
+        "4f157e028d27e40aaef73bca",
+        "559109853fbe294af7d8d34f",
+        "5a42c568a043218a0641d12a",
+        "707d7bc4c7fcdf537daa1781",
+        "73a97d9577a63164ae60609f",
+        "741dd1e564bcfeeed103f849",
+        "7491986d3880bc2e81c58186",
+        "9266eb87d9516c1105bb6c1b",
+        "9bad2e6e5df4edb9599e1918",
+        "a9a0f11f22b07de2a8025bff",
+        "beed10c13687b7ae03a82c9b",
+        "c4a5bf26b83f1c223bcbdb9d",
+        "dcba1224ec8c136c656513f7",
+        "dd8829df9872ad588f4aa756",
+        "f967a5b1f784f2c1027c5ac1"
+      ],
+      "had_failure_in_window": true,
+      "health_watermark_rfc3339": "2026-09-04T22:23:38Z",
+      "next_action_hint": "One or more bundle fingerprints still failing; use suggested_rerun_by_fingerprint or apply a fix, then re-run bundles.",
+      "next_action_suggested": "One or more bundle fingerprints still failing; use suggested_rerun_by_fingerprint or apply a fix, then re-run bundles.\n\nSuggested reruns (one command per failing fingerprint):\n- 28608061b0d4f7022effe1a2: go test ./pkg/objects -run '^(TestPromoteTransitionTargets_HopLimit|TestPromoteTransitionTargets_NoCascade)$' -v -count=1 -timeout 330s\n- 481997a1d958834a8f0c1213: go test ./cmd/zqk/workflow -run '^TestWorkflowAddCommand$' -v -count=1 -timeout 480s\n- 4f157e028d27e40aaef73bca: go test ./cmd/zqk/utility -run '^(TestWaitGroupPanic_ConcurrentDuplicateCreates|TestWaitGroupPanic_Reproduce|TestWaitGroupPanic_WithActiveValidations)$' -v -count=1 -timeout 480s\n- 559109853fbe294af7d8d34f: go test ./pkg/mcp -run '^(TestPrivilegeFiltering_ReadOnlyCommands|TestPrivilegeFiltering_WritePermissions)$' -v -count=1 -timeout 330s\n- 5a42c568a043218a0641d12a: go test ./pkg/mcp -run '^(TestFilterCommandsByPermissions|TestMCPToolRegistration_AdminSeesAll|TestMCPToolRegistration_PrivilegeFiltering|TestPrivilegeFiltering_AdminRole|TestPrivilegeFiltering_RoleRequirements|TestPrivilegeFiltering_WildcardPermissions)$' -v -count=1 -timeout 330s\n- 73a97d9577a63164ae60609f: go test ./pkg/mcp -run '^(TestRBAC_ConfigBasedFiltering|TestRBAC_EdgeCases_Comprehensive|TestRBAC_MCPToolRegistration|TestRBAC_MultiAgentScenarios|TestRBAC_PermissionBasedFiltering|TestRBAC_RoleBasedCommandFiltering)$' -v -count=1 -timeout 330s\n- 7491986d3880bc2e81c58186: go test ./pkg/mcp -run '^TestRBAC_EdgeCases$' -v -count=1 -timeout 330s\n- 9266eb87d9516c1105bb6c1b: go test ./cmd/zqk -run '^TestHelpMenuParity$' -v -count=1 -timeout 480s\n- 9bad2e6e5df4edb9599e1918: go test ./cmd/zqk/system -run '^TestAutoFixMissingHash_BucketedObject$' -v -count=1 -timeout 3480s\n- dcba1224ec8c136c656513f7: go test ./cmd/zqk/object -run '^(TestBulkUpdateCmd|TestDynamicCLIDelete)$' -v -count=1 -timeout 1680s\n- dd8829df9872ad588f4aa756: go test ./pkg/objects -run '^TestSpecLoader_DoubleCheckedLocking$' -v -count=1 -timeout 330s\n",
+      "phase_router": {
+        "measurement_implied_phase": "c4_act",
+        "phase_alignment": "session_behind",
+        "routing_profile": "default",
+        "suggested_current_phase": "c4_act"
+      },
+      "primary_measurement_outcome": "measurement_yields_divergence",
+      "primary_measurement_outcome_detail": "bundle_health_bad_signal",
+      "ready_for_session_completion": false,
+      "recommended_next_action": "Fix failing test bundles (20 fingerprint(s) in latest measurement): run targeted zqk scheduler scan-tests --package … and inspect .zqk/logs/scheduler/cvs/test-bundles/; re-run measure when green.",
+      "rollup_status": "blocked"
+    },
+    "measure_session_id": "CVS-1787015873043417000-b71a697e",
+    "priority_plan": {
+      "id": "PRI-CEF-R28-REMEDIATE-001",
+      "shaped": true,
+      "status": "in_progress",
+      "title": "CEF R28 — remediate 2026-09-03 remesure residuals (lift envelope to 4)"
+    },
+    "schema": "zqk_whats_next_v1"
+  }
+}

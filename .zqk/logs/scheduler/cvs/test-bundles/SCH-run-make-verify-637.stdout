@@ -1,0 +1,20 @@
+
+--- run 2026-09-04T22:18:31Z ---
+=== RUN   TestBrandSettings_ResolveSnapshotBackupDir
+=== PAUSE TestBrandSettings_ResolveSnapshotBackupDir
+=== RUN   TestResolveStateCommitBackup_viaSettingsShape
+=== PAUSE TestResolveStateCommitBackup_viaSettingsShape
+=== RUN   TestContext_PathResolver
+=== PAUSE TestContext_PathResolver
+=== RUN   TestContext_WithPathResolver
+=== PAUSE TestContext_WithPathResolver
+=== CONT  TestBrandSettings_ResolveSnapshotBackupDir
+--- PASS: TestBrandSettings_ResolveSnapshotBackupDir (0.00s)
+=== CONT  TestContext_WithPathResolver
+--- PASS: TestContext_WithPathResolver (0.00s)
+=== CONT  TestContext_PathResolver
+--- PASS: TestContext_PathResolver (0.00s)
+=== CONT  TestResolveStateCommitBackup_viaSettingsShape
+--- PASS: TestResolveStateCommitBackup_viaSettingsShape (0.00s)
+PASS
+ok  	github.com/lanceman/zqk/internal/cli/context	0.309s

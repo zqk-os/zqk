@@ -1,0 +1,14 @@
+created_at: "2026-08-19T10:16:43Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1787134602713710000-d968b89c
+item_id: BLI-COMMUNITY-BREW-TAP-VERIFY-001
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 2857702ca28e4b64fb5782140b43c1400e68fdeab30ab0062f4119523ca97d466e5f13c72adcfa41b92eacf21fa7f0a79b8a8e3a8d7c581e5c9afe0e69cb31dc
+schema_version: 2.0.0
+signature: 3046022100840ad9a6a8d9fffaaee3941231a13202e8e9adce48b53976a9d183e0cc61cdb0022100ab59a8db7078225553b514466f344da0fda7fe1848f028985a96035524d1e64a
+status: archived
+title: 'QA   '
+updated_at: "2026-09-01T09:18:07Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

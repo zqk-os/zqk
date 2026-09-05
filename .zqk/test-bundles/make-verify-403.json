@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-403",
+  "created_at": "2026-09-04T21:34:31.319655Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-403",
+    "Tests": [
+      {
+        "Name": "TestCollectFilesByKind",
+        "Package": "utility",
+        "PackagePath": "cmd/zqk/utility",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/utility/fix_hashes_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestCollectInternalFiles",
+        "Package": "utility",
+        "PackagePath": "cmd/zqk/utility",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/utility/fix_hashes_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestFixHashesWithKindFlag",
+        "Package": "utility",
+        "PackagePath": "cmd/zqk/utility",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/utility/fix_hashes_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestGetPrefixFromID",
+        "Package": "utility",
+        "PackagePath": "cmd/zqk/utility",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/utility/fix_hashes_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestEnsurePrefixForKind",
+        "Package": "utility",
+        "PackagePath": "cmd/zqk/utility",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/utility/fix_registration_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestHandleLoadDataFile_EmitsEvents",
+        "Package": "utility",
+        "PackagePath": "cmd/zqk/utility",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/utility/scenario_builder_data_loader_event_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestHandleLoadDataFile_EmitsErrorOnFileNotFound",
+        "Package": "utility",
+        "PackagePath": "cmd/zqk/utility",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/utility/scenario_builder_data_loader_event_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestBuildFromDataFile_EmitsEvents",
+        "Package": "utility",
+        "PackagePath": "cmd/zqk/utility",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/utility/scenario_builder_data_loader_event_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestHandleLoadDataFile_ParsesYAMLArray",
+        "Package": "utility",
+        "PackagePath": "cmd/zqk/utility",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/utility/scenario_builder_data_loader_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestHandleLoadDataFile_YAMLListFormat",
+        "Package": "utility",
+        "PackagePath": "cmd/zqk/utility",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/utility/scenario_builder_data_loader_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": true,
+    "EstimatedDuration": 300000000000,
+    "PackagePath": "cmd/zqk/utility"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestCollectFilesByKind",
+      "Package": "utility",
+      "PackagePath": "cmd/zqk/utility",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/utility/fix_hashes_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestCollectInternalFiles",
+      "Package": "utility",
+      "PackagePath": "cmd/zqk/utility",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/utility/fix_hashes_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestFixHashesWithKindFlag",
+      "Package": "utility",
+      "PackagePath": "cmd/zqk/utility",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/utility/fix_hashes_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestGetPrefixFromID",
+      "Package": "utility",
+      "PackagePath": "cmd/zqk/utility",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/utility/fix_hashes_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestEnsurePrefixForKind",
+      "Package": "utility",
+      "PackagePath": "cmd/zqk/utility",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/utility/fix_registration_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestHandleLoadDataFile_EmitsEvents",
+      "Package": "utility",
+      "PackagePath": "cmd/zqk/utility",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/utility/scenario_builder_data_loader_event_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestHandleLoadDataFile_EmitsErrorOnFileNotFound",
+      "Package": "utility",
+      "PackagePath": "cmd/zqk/utility",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/utility/scenario_builder_data_loader_event_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestBuildFromDataFile_EmitsEvents",
+      "Package": "utility",
+      "PackagePath": "cmd/zqk/utility",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/utility/scenario_builder_data_loader_event_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestHandleLoadDataFile_ParsesYAMLArray",
+      "Package": "utility",
+      "PackagePath": "cmd/zqk/utility",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/utility/scenario_builder_data_loader_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestHandleLoadDataFile_YAMLListFormat",
+      "Package": "utility",
+      "PackagePath": "cmd/zqk/utility",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/utility/scenario_builder_data_loader_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

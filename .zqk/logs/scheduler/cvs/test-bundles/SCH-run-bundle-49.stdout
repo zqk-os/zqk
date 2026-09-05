@@ -1,0 +1,44 @@
+
+--- run 2026-09-05T05:24:38Z ---
+=== RUN   TestJobLock_ConcurrentAcquisition
+=== PAUSE TestJobLock_ConcurrentAcquisition
+=== RUN   TestIsChurnStyleSchedulerJobID
+=== PAUSE TestIsChurnStyleSchedulerJobID
+=== RUN   TestJobLogsTestBundlesDir_UnderCVSNamespace
+=== PAUSE TestJobLogsTestBundlesDir_UnderCVSNamespace
+=== RUN   TestNormalizeTestBundleRedirectLogPath_legacyFlat
+=== PAUSE TestNormalizeTestBundleRedirectLogPath_legacyFlat
+=== RUN   TestMergeLegacyFlatTestBundleFilesIntoCanonical
+=== PAUSE TestMergeLegacyFlatTestBundleFilesIntoCanonical
+=== RUN   TestMaybeMigrateLegacyFlatTestBundlesDir
+=== PAUSE TestMaybeMigrateLegacyFlatTestBundlesDir
+=== RUN   TestCVSMeasurementEventsFilePath_UnderCVSRoot
+=== PAUSE TestCVSMeasurementEventsFilePath_UnderCVSRoot
+=== RUN   TestJobLogDir_ChurnUsesSharedSubdir
+=== PAUSE TestJobLogDir_ChurnUsesSharedSubdir
+=== RUN   TestJobLogFileStem_LongIDUsesHashPrefix
+=== PAUSE TestJobLogFileStem_LongIDUsesHashPrefix
+=== RUN   TestJobStdoutFilePath_UnderChurnDir
+=== PAUSE TestJobStdoutFilePath_UnderChurnDir
+=== CONT  TestJobLock_ConcurrentAcquisition
+=== CONT  TestMaybeMigrateLegacyFlatTestBundlesDir
+--- PASS: TestJobLock_ConcurrentAcquisition (0.01s)
+=== CONT  TestJobLogFileStem_LongIDUsesHashPrefix
+--- PASS: TestJobLogFileStem_LongIDUsesHashPrefix (0.00s)
+=== CONT  TestJobStdoutFilePath_UnderChurnDir
+--- PASS: TestJobStdoutFilePath_UnderChurnDir (0.00s)
+=== CONT  TestNormalizeTestBundleRedirectLogPath_legacyFlat
+--- PASS: TestMaybeMigrateLegacyFlatTestBundlesDir (0.02s)
+=== CONT  TestMergeLegacyFlatTestBundleFilesIntoCanonical
+--- PASS: TestNormalizeTestBundleRedirectLogPath_legacyFlat (0.00s)
+=== CONT  TestJobLogsTestBundlesDir_UnderCVSNamespace
+--- PASS: TestJobLogsTestBundlesDir_UnderCVSNamespace (0.00s)
+=== CONT  TestIsChurnStyleSchedulerJobID
+--- PASS: TestIsChurnStyleSchedulerJobID (0.00s)
+=== CONT  TestJobLogDir_ChurnUsesSharedSubdir
+--- PASS: TestJobLogDir_ChurnUsesSharedSubdir (0.00s)
+=== CONT  TestCVSMeasurementEventsFilePath_UnderCVSRoot
+--- PASS: TestCVSMeasurementEventsFilePath_UnderCVSRoot (0.00s)
+--- PASS: TestMergeLegacyFlatTestBundleFilesIntoCanonical (0.01s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/scheduler	0.859s

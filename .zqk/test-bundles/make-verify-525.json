@@ -1,0 +1,141 @@
+{
+  "name": "make-verify-525",
+  "created_at": "2026-09-04T21:34:32.58191Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-525",
+    "Tests": [
+      {
+        "Name": "TestEnvelopeFromAttentionMode_RoundTrip",
+        "Package": "agentprompt",
+        "PackagePath": "pkg/agentprompt",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentprompt/envelope_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestParseLeadingEnvelope_Absent",
+        "Package": "agentprompt",
+        "PackagePath": "pkg/agentprompt",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentprompt/envelope_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestParseLeadingEnvelope_SchemaMismatch",
+        "Package": "agentprompt",
+        "PackagePath": "pkg/agentprompt",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentprompt/envelope_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestEnvelopeHelpers",
+        "Package": "agentprompt",
+        "PackagePath": "pkg/agentprompt",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentprompt/envelope_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestObserverToolAccessSection_namesSearchTool",
+        "Package": "agentprompt",
+        "PackagePath": "pkg/agentprompt",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentprompt/observer_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestRelevantObserverSection_includesHits",
+        "Package": "agentprompt",
+        "PackagePath": "pkg/agentprompt",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentprompt/observer_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestClassifyWorkClass",
+        "Package": "agentprompt",
+        "PackagePath": "pkg/agentprompt",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentprompt/work_class_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": true,
+    "EstimatedDuration": 210000000000,
+    "PackagePath": "pkg/agentprompt"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestEnvelopeFromAttentionMode_RoundTrip",
+      "Package": "agentprompt",
+      "PackagePath": "pkg/agentprompt",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentprompt/envelope_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestParseLeadingEnvelope_Absent",
+      "Package": "agentprompt",
+      "PackagePath": "pkg/agentprompt",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentprompt/envelope_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestParseLeadingEnvelope_SchemaMismatch",
+      "Package": "agentprompt",
+      "PackagePath": "pkg/agentprompt",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentprompt/envelope_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestEnvelopeHelpers",
+      "Package": "agentprompt",
+      "PackagePath": "pkg/agentprompt",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentprompt/envelope_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestObserverToolAccessSection_namesSearchTool",
+      "Package": "agentprompt",
+      "PackagePath": "pkg/agentprompt",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentprompt/observer_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestRelevantObserverSection_includesHits",
+      "Package": "agentprompt",
+      "PackagePath": "pkg/agentprompt",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentprompt/observer_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestClassifyWorkClass",
+      "Package": "agentprompt",
+      "PackagePath": "pkg/agentprompt",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentprompt/work_class_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

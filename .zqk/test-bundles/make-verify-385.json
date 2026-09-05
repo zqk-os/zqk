@@ -1,0 +1,105 @@
+{
+  "name": "make-verify-385",
+  "created_at": "2026-09-04T21:34:31.159272Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-385",
+    "Tests": [
+      {
+        "Name": "TestGeminiAdapter_Ingest",
+        "Package": "adapters",
+        "PackagePath": "pkg/ingestion/adapters",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/ingestion/adapters/gemini_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestGeminiAdapter_Ingest_NoDir",
+        "Package": "adapters",
+        "PackagePath": "pkg/ingestion/adapters",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/ingestion/adapters/gemini_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAgentTranslator_Translate_GeminiSkill",
+        "Package": "adapters",
+        "PackagePath": "pkg/ingestion/adapters",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/ingestion/adapters/translator_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAgentTranslator_Translate_IDERule",
+        "Package": "adapters",
+        "PackagePath": "pkg/ingestion/adapters",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/ingestion/adapters/translator_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAgentTranslator_Translate_UnknownFormat",
+        "Package": "adapters",
+        "PackagePath": "pkg/ingestion/adapters",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/ingestion/adapters/translator_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 150000000000,
+    "PackagePath": "pkg/ingestion/adapters"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestGeminiAdapter_Ingest",
+      "Package": "adapters",
+      "PackagePath": "pkg/ingestion/adapters",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/ingestion/adapters/gemini_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestGeminiAdapter_Ingest_NoDir",
+      "Package": "adapters",
+      "PackagePath": "pkg/ingestion/adapters",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/ingestion/adapters/gemini_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestAgentTranslator_Translate_GeminiSkill",
+      "Package": "adapters",
+      "PackagePath": "pkg/ingestion/adapters",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/ingestion/adapters/translator_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestAgentTranslator_Translate_IDERule",
+      "Package": "adapters",
+      "PackagePath": "pkg/ingestion/adapters",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/ingestion/adapters/translator_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestAgentTranslator_Translate_UnknownFormat",
+      "Package": "adapters",
+      "PackagePath": "pkg/ingestion/adapters",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/ingestion/adapters/translator_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

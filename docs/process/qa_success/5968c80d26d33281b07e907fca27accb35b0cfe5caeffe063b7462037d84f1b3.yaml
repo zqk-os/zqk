@@ -1,0 +1,14 @@
+created_at: "2026-09-03T21:30:49Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1788471049882660000-fa14da2e
+item_id: BLI-MEGA-CHILD-051
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 86b8ab3d574c004a61020b73c23f52b9055049e90c3d755c8bbb383e059e384028fdd8cd69e13123b644e5f3f7eb65596e73e2d57d719ea3dafcb01b84ce8dfb
+schema_version: 2.0.0
+signature: 304502206e5bf3326c94af7a6a6b8acf969e0e41bf1fb8835e5e6a88cf2a24843979bc18022100ae31dfd67fb5287af0e406be332f7f6bdc369ccff092ea6df7cf2c0aeb5f43ac
+status: success
+title: QA success for BLI-MEGA-CHILD-051
+updated_at: "2026-09-03T21:30:50Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

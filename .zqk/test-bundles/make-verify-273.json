@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-273",
+  "created_at": "2026-09-04T21:34:30.085039Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-273",
+    "Tests": [
+      {
+        "Name": "TestInProcessWarmGetBenchmark",
+        "Package": "objectget",
+        "PackagePath": "pkg/objectget",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/objectget/inprocess_bench_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestBuildObjectGetArgv",
+        "Package": "objectget",
+        "PackagePath": "pkg/objectget",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/objectget/objectget_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestOverlayPlanForMilestoneReportUsesCriteriaOnly",
+        "Package": "objectget",
+        "PackagePath": "pkg/objectget",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/objectget/objectget_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestOverlayPlanHydrationOverridesResolver",
+        "Package": "objectget",
+        "PackagePath": "pkg/objectget",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/objectget/objectget_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestParseLinkHydration",
+        "Package": "objectget",
+        "PackagePath": "pkg/objectget",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/objectget/objectget_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestNormalizeReferenceOverlayConfig",
+        "Package": "objectget",
+        "PackagePath": "pkg/objectget",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/objectget/objectget_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestOverlayPlanForDefaultViewIsRaw",
+        "Package": "objectget",
+        "PackagePath": "pkg/objectget",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/objectget/objectget_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestInferKindFromObjectID_withProjectRoot",
+        "Package": "objectget",
+        "PackagePath": "pkg/objectget",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/objectget/objectget_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestIsReferenceResolverOverlayFieldKey",
+        "Package": "objectget",
+        "PackagePath": "pkg/objectget",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/objectget/strip_overlay_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestStripReferenceResolverOverlayFields",
+        "Package": "objectget",
+        "PackagePath": "pkg/objectget",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/objectget/strip_overlay_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 300000000000,
+    "PackagePath": "pkg/objectget"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestInProcessWarmGetBenchmark",
+      "Package": "objectget",
+      "PackagePath": "pkg/objectget",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/objectget/inprocess_bench_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestBuildObjectGetArgv",
+      "Package": "objectget",
+      "PackagePath": "pkg/objectget",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/objectget/objectget_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestOverlayPlanForMilestoneReportUsesCriteriaOnly",
+      "Package": "objectget",
+      "PackagePath": "pkg/objectget",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/objectget/objectget_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestOverlayPlanHydrationOverridesResolver",
+      "Package": "objectget",
+      "PackagePath": "pkg/objectget",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/objectget/objectget_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestParseLinkHydration",
+      "Package": "objectget",
+      "PackagePath": "pkg/objectget",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/objectget/objectget_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestNormalizeReferenceOverlayConfig",
+      "Package": "objectget",
+      "PackagePath": "pkg/objectget",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/objectget/objectget_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestOverlayPlanForDefaultViewIsRaw",
+      "Package": "objectget",
+      "PackagePath": "pkg/objectget",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/objectget/objectget_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestInferKindFromObjectID_withProjectRoot",
+      "Package": "objectget",
+      "PackagePath": "pkg/objectget",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/objectget/objectget_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestIsReferenceResolverOverlayFieldKey",
+      "Package": "objectget",
+      "PackagePath": "pkg/objectget",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/objectget/strip_overlay_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestStripReferenceResolverOverlayFields",
+      "Package": "objectget",
+      "PackagePath": "pkg/objectget",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/objectget/strip_overlay_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

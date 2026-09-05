@@ -1,0 +1,54 @@
+acceptance_considerations: Acceptance recorded as linked criteria; no narrative captured at migration time.
+actual_effort: 4h
+commit_refs:
+    - 9e0166926f
+    - a68b915eec
+created_at: "2026-08-05T04:21:49Z"
+created_by: ACC-1785920548450214012-68b850c0
+criteria_refs:
+    - CRIT-1785939698326435000-4e4d4c37
+    - CRIT-1785939699146367000-ab04cbb3
+    - CRIT-1785939699976286000-3224c6db
+    - CRIT-1786697464558109000-9ca05e53
+description: |
+    Bare object count currently returns ~44 kinds and omits kinds that
+    object count <kind> can see (glossary_term, technical_debt, agent_task,
+    scheduler_job, pipeline_definition, …). Stream-backed kinds and disk
+    orphans (e.g. mcp_sessions YAML vs stream count 0) need an explicit
+    inventory contract so find-vs-count audits are meaningful before launch.
+    Pair with namespace demarcation BLI; do not expand Open-Core scope.
+estimated_effort: 6h
+goal_refs:
+    - GOAL-1785885763755750000-6efcb274
+id: BLI-1785903709847957000-8c7a991c
+kind: backlog_item
+milestone_refs:
+    - MIL-1785886016336815000-ad6784be
+namespace_id: zqk:kernel
+owner_ref: ACC-1785920548450214012-68b850c0
+percent_complete: 100
+persona_refs:
+    - PER-1781486429759398000-a79939a1
+    - PER-1781486391201872000-779baf38
+priority: high
+priority_tier: P1
+problem_statement: |-
+    Bare object count currently returns ~44 kinds and omits kinds that
+    object count <kind> can see (glossary_term, technical_debt, agent_task,
+    scheduler_job, pipeline_definition, …). Stream-backed kinds and disk
+    orphans (e.g. mcp_sessions YAML vs stream count 0) need an explicit
+    inventory contract so find-vs-count audits are meaningful before launch.
+    Pair with namespace demarcation BLI; do not expand Open-Core scope.
+related_object_refs:
+    - REQ-1785903690847761000-a5449df3
+    - REQ-1785895564241296000-bf266adb
+requirement_refs:
+    - REQ-1785903690847761000-a5449df3
+schema_version: 2.0.0
+stakeholder_refs:
+    - PER-1781486429759398000-a79939a1
+status: archived
+title: 'MMORCH P1: All-kinds object count must enumerate every listable kind'
+updated_at: "2026-08-19T04:52:27Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-754",
+  "created_at": "2026-09-04T21:34:34.806988Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-754",
+    "Tests": [
+      {
+        "Name": "TestObserverEmitter_SubscribeAndEmit",
+        "Package": "observer",
+        "PackagePath": "pkg/observer",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/observer/events_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestObserverEmitter_EmitSetsTimestamp",
+        "Package": "observer",
+        "PackagePath": "pkg/observer",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/observer/events_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestObserverEmitter_MultipleSubscribers",
+        "Package": "observer",
+        "PackagePath": "pkg/observer",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/observer/events_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestObserverEmitter_ConcurrentSubscribeAndEmit",
+        "Package": "observer",
+        "PackagePath": "pkg/observer",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/observer/events_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestObserverEmitter_ContextCancelled_SubscriberMayNotRun",
+        "Package": "observer",
+        "PackagePath": "pkg/observer",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/observer/events_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestObserverEmitter_NoSubscribers",
+        "Package": "observer",
+        "PackagePath": "pkg/observer",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/observer/events_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestNotifyAgentConnection_NotifiesCallbacksAndEmitter",
+        "Package": "observer",
+        "PackagePath": "pkg/observer",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/observer/events_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestExtractFromDir_GoOnly",
+        "Package": "observer",
+        "PackagePath": "pkg/observer",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/observer/extract_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestExtractFromDir_MultiFile",
+        "Package": "observer",
+        "PackagePath": "pkg/observer",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/observer/extract_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestCollectDependencies",
+        "Package": "observer",
+        "PackagePath": "pkg/observer",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/observer/go_extractor_structural_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 300000000000,
+    "PackagePath": "pkg/observer"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestObserverEmitter_SubscribeAndEmit",
+      "Package": "observer",
+      "PackagePath": "pkg/observer",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/observer/events_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestObserverEmitter_EmitSetsTimestamp",
+      "Package": "observer",
+      "PackagePath": "pkg/observer",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/observer/events_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestObserverEmitter_MultipleSubscribers",
+      "Package": "observer",
+      "PackagePath": "pkg/observer",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/observer/events_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestObserverEmitter_ConcurrentSubscribeAndEmit",
+      "Package": "observer",
+      "PackagePath": "pkg/observer",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/observer/events_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestObserverEmitter_ContextCancelled_SubscriberMayNotRun",
+      "Package": "observer",
+      "PackagePath": "pkg/observer",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/observer/events_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestObserverEmitter_NoSubscribers",
+      "Package": "observer",
+      "PackagePath": "pkg/observer",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/observer/events_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestNotifyAgentConnection_NotifiesCallbacksAndEmitter",
+      "Package": "observer",
+      "PackagePath": "pkg/observer",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/observer/events_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestExtractFromDir_GoOnly",
+      "Package": "observer",
+      "PackagePath": "pkg/observer",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/observer/extract_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestExtractFromDir_MultiFile",
+      "Package": "observer",
+      "PackagePath": "pkg/observer",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/observer/extract_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestCollectDependencies",
+      "Package": "observer",
+      "PackagePath": "pkg/observer",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/observer/go_extractor_structural_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

@@ -1,0 +1,44 @@
+
+--- run 2026-09-04T22:16:33Z ---
+=== RUN   TestMetricCreationTimeoutFromJobRuntime
+=== PAUSE TestMetricCreationTimeoutFromJobRuntime
+=== RUN   TestRunWithTimeout_ReturnsFalseAfterTimeout
+=== PAUSE TestRunWithTimeout_ReturnsFalseAfterTimeout
+=== RUN   TestRunWithTimeout_ReturnsTrueWhenFnReturnsQuickly
+=== PAUSE TestRunWithTimeout_ReturnsTrueWhenFnReturnsQuickly
+=== RUN   TestAuditAggregationHandler_SingletonLockPreventsConcurrentRuns
+=== PAUSE TestAuditAggregationHandler_SingletonLockPreventsConcurrentRuns
+=== RUN   TestCapOrchestratorHandlerFileStaysUnder2k
+=== PAUSE TestCapOrchestratorHandlerFileStaysUnder2k
+=== RUN   TestHasOpenAgentInstruction_MatchesPersonaPlanStage
+=== PAUSE TestHasOpenAgentInstruction_MatchesPersonaPlanStage
+=== RUN   TestWakeAgentAndScheduleHourglass_TriggersWakeAgyForTPM
+=== PAUSE TestWakeAgentAndScheduleHourglass_TriggersWakeAgyForTPM
+=== RUN   TestResumePendingVerificationTasksRequiresCommitEvidence
+=== PAUSE TestResumePendingVerificationTasksRequiresCommitEvidence
+=== RUN   TestMintAgentTaskID
+=== PAUSE TestMintAgentTaskID
+=== RUN   TestCapOrchestratorHandler_hasOpenTaskForPlan
+=== PAUSE TestCapOrchestratorHandler_hasOpenTaskForPlan
+=== CONT  TestMetricCreationTimeoutFromJobRuntime
+--- PASS: TestMetricCreationTimeoutFromJobRuntime (0.00s)
+=== CONT  TestCapOrchestratorHandlerFileStaysUnder2k
+=== CONT  TestHasOpenAgentInstruction_MatchesPersonaPlanStage
+--- PASS: TestCapOrchestratorHandlerFileStaysUnder2k (0.00s)
+=== CONT  TestMintAgentTaskID
+--- PASS: TestMintAgentTaskID (0.00s)
+=== CONT  TestCapOrchestratorHandler_hasOpenTaskForPlan
+--- PASS: TestCapOrchestratorHandler_hasOpenTaskForPlan (0.00s)
+=== CONT  TestAuditAggregationHandler_SingletonLockPreventsConcurrentRuns
+--- PASS: TestHasOpenAgentInstruction_MatchesPersonaPlanStage (0.00s)
+=== CONT  TestRunWithTimeout_ReturnsTrueWhenFnReturnsQuickly
+--- PASS: TestRunWithTimeout_ReturnsTrueWhenFnReturnsQuickly (0.00s)
+=== CONT  TestRunWithTimeout_ReturnsFalseAfterTimeout
+--- PASS: TestAuditAggregationHandler_SingletonLockPreventsConcurrentRuns (0.01s)
+=== CONT  TestResumePendingVerificationTasksRequiresCommitEvidence
+--- PASS: TestResumePendingVerificationTasksRequiresCommitEvidence (0.00s)
+=== CONT  TestWakeAgentAndScheduleHourglass_TriggersWakeAgyForTPM
+--- PASS: TestRunWithTimeout_ReturnsFalseAfterTimeout (0.11s)
+--- PASS: TestWakeAgentAndScheduleHourglass_TriggersWakeAgyForTPM (0.32s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/scheduler	1.068s

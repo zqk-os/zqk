@@ -1,0 +1,14 @@
+created_at: "2026-08-19T07:17:17Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1787123836464767000-34fe100d
+item_id: REDACTED
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 2857702ca28e4b64fb5782140b43c1400e68fdeab30ab0062f4119523ca97d466e5f13c72adcfa41b92eacf21fa7f0a79b8a8e3a8d7c581e5c9afe0e69cb31dc
+schema_version: 2.0.0
+signature: 30440220272613ea57b9e08c14f0f9c01c5d3161658b534839483b75f96b4bf2ae60f1b902207757da2735b30861fe9044de9497dc37b0f6556ba8b0ed22ee831b8cb0e803f7
+status: archived
+title: 'Acceptance: Fold formalization snag catalog into net_new'
+updated_at: "2026-09-01T07:12:55Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

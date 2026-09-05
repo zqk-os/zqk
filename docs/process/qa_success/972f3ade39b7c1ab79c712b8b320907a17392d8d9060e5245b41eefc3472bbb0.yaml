@@ -1,0 +1,14 @@
+created_at: "2026-09-03T23:19:30Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1788477570196444000-c8a3d222
+item_id: CRIT-CEF-R27-DRIVERS-001
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 86b8ab3d574c004a61020b73c23f52b9055049e90c3d755c8bbb383e059e384028fdd8cd69e13123b644e5f3f7eb65596e73e2d57d719ea3dafcb01b84ce8dfb
+schema_version: 2.0.0
+signature: 3045022100ccc53577d6b79ee564fbca94ba8cff6e6a0ac8772b737960de8e32d3b1dc8094022010140089dc08ade3cc102006545f4ee19d3007a7ebc8a2a7790270bb5f24c13a
+status: success
+title: QA success for CRIT-CEF-R27-DRIVERS-001
+updated_at: "2026-09-03T23:19:30Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

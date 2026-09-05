@@ -1,0 +1,59 @@
+Sync objects between backends or environments with branch management.
+
+This command synchronizes local state with remote repository using Git.
+It can pull changes from remote, push local changes, and verify signatures.
+
+Enhanced features:
+  - Automatic branch creation based on current priority plan
+  - Staging and committing changes in accordance with branch policies
+  - Automatic commit message generation based on changes
+  - System health check enforcement before commit/push (POL-CODE-004, POL-CODE-005)
+  - Pull Request/Merge Request creation (GitHub/GitLab) per priority plan (POL-WORKFLOW-002)
+
+Branch Policy:
+  - One feature branch per priority plan (e.g., feature/pri-210-phase-4)
+  - Automatically creates branch if it doesn't exist
+  - Ensures you're on the correct branch for the current priority plan
+  - If no active priority plan exists, branch management is skipped (use --message for commits)
+
+System Health Check (POL-CODE-004, POL-CODE-005):
+  - Automatically runs before commit/push operations (enabled by default)
+  - Blocks commit/push if Tier 1 (blocking) violations are detected
+  - Warns if Tier 2 (warnings) threshold is exceeded (threshold: 0)
+  - Use --skip-check to bypass (not recommended)
+
+  Pull changes from remote
+  zqk system sync --pull
+  Stage, commit, and push changes
+  zqk system sync --stage --commit --push
+  Auto-commit with generated message
+  zqk system sync --auto-commit --push
+  Custom commit message
+  zqk system sync --commit --message "Implement BLI-657 and BLI-659"
+  Dry run to see what would happen
+  zqk system sync --stage --auto-commit --push --dry-run
+  Create PR/MR after push
+  zqk system sync --stage --auto-commit --push --create-pr
+  Create PR with custom title and body
+  zqk system sync --push --create-pr --pr-title "Custom Title" --pr-body "Custom body"
+
+Usage:
+  zqk system sync [flags]
+
+Flags:
+      --auto-commit       Auto-generate commit message and commit
+      --commit            Commit staged changes (requires --message or --auto-commit)
+      --create-pr         Create Pull Request (GitHub) or Merge Request (GitLab) after push
+      --dry-run           Validate without executing
+  -F, --force             Skip confirmation
+      --message string    Commit message (required if --commit without --auto-commit)
+      --pr-body string    PR/MR body (auto-generated from priority plan if not provided)
+      --pr-title string   PR/MR title (auto-generated from priority plan if not provided)
+      --pull              Pull changes from remote
+      --push              Push changes to remote
+      --skip-check        Skip system health check (not recommended)
+      --stage             Stage all changes
+      --verify            Verify signatures
+
+Global Flags:
+      --allow-degraded   Allow scheduler-dependent commands to run when scheduler daemon is not running

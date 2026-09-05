@@ -1,0 +1,154 @@
+{
+  "schema_version": 1,
+  "built_at_utc": "2026-09-05T06:00:01Z",
+  "enum_values": [
+    "context_refresh",
+    "manifest_snapshot",
+    "test_runner",
+    "aggregation",
+    "lifecycle_check",
+    "audit_event_aggregation",
+    "change_journal_aggregation",
+    "integrity_check",
+    "cache_prewarm",
+    "cache_invalidation",
+    "cascade_update",
+    "operation_execution",
+    "run_wrapper",
+    "callback_listener",
+    "metrics_collection",
+    "retention_tolerance",
+    "scheduler_job_retention",
+    "autofix_batch_cleanup",
+    "aggregation_metrics_cleanup",
+    "generic_metrics_cleanup",
+    "maintenance",
+    "object_validation",
+    "scheduler_events_aggregation",
+    "cleanup",
+    "convergence_session_tick",
+    "data_cell_envelope_tick",
+    "auto_transition",
+    "cap_orchestrator",
+    "emergency_manager",
+    "idle_cleanup"
+  ],
+  "handler_present": {
+    "aggregation": false,
+    "aggregation_metrics_cleanup": true,
+    "audit_event_aggregation": true,
+    "auto_transition": true,
+    "autofix_batch_cleanup": true,
+    "cache_invalidation": true,
+    "cache_prewarm": true,
+    "callback_listener": true,
+    "cap_orchestrator": true,
+    "cascade_update": true,
+    "change_journal_aggregation": true,
+    "cleanup": true,
+    "context_refresh": true,
+    "convergence_session_tick": true,
+    "data_cell_envelope_tick": true,
+    "emergency_manager": true,
+    "generic_metrics_cleanup": true,
+    "idle_cleanup": true,
+    "integrity_check": true,
+    "lifecycle_check": true,
+    "maintenance": false,
+    "manifest_snapshot": false,
+    "metrics_collection": true,
+    "object_validation": true,
+    "operation_execution": true,
+    "retention_tolerance": true,
+    "run_wrapper": true,
+    "scheduler_events_aggregation": true,
+    "scheduler_job_retention": true,
+    "test_runner": false
+  },
+  "groups": {
+    "aggregation": [
+      "aggregation",
+      "audit_event_aggregation",
+      "change_journal_aggregation",
+      "aggregation_metrics_cleanup",
+      "scheduler_events_aggregation"
+    ],
+    "cache": [
+      "cache_prewarm",
+      "cache_invalidation"
+    ],
+    "callbacks": [
+      "callback_listener"
+    ],
+    "convergence": [
+      "convergence_session_tick"
+    ],
+    "lifecycle": [
+      "lifecycle_check"
+    ],
+    "maintenance": [
+      "maintenance"
+    ],
+    "metrics": [
+      "metrics_collection",
+      "generic_metrics_cleanup"
+    ],
+    "operations": [
+      "cascade_update",
+      "operation_execution"
+    ],
+    "other": [
+      "context_refresh",
+      "manifest_snapshot",
+      "test_runner",
+      "run_wrapper",
+      "autofix_batch_cleanup",
+      "cleanup",
+      "data_cell_envelope_tick",
+      "auto_transition",
+      "cap_orchestrator",
+      "emergency_manager",
+      "idle_cleanup"
+    ],
+    "retention": [
+      "retention_tolerance",
+      "scheduler_job_retention"
+    ],
+    "validation": [
+      "integrity_check",
+      "object_validation"
+    ]
+  },
+  "group_of": {
+    "aggregation": "aggregation",
+    "aggregation_metrics_cleanup": "aggregation",
+    "audit_event_aggregation": "aggregation",
+    "auto_transition": "other",
+    "autofix_batch_cleanup": "other",
+    "cache_invalidation": "cache",
+    "cache_prewarm": "cache",
+    "callback_listener": "callbacks",
+    "cap_orchestrator": "other",
+    "cascade_update": "operations",
+    "change_journal_aggregation": "aggregation",
+    "cleanup": "other",
+    "context_refresh": "other",
+    "convergence_session_tick": "convergence",
+    "data_cell_envelope_tick": "other",
+    "emergency_manager": "other",
+    "generic_metrics_cleanup": "metrics",
+    "idle_cleanup": "other",
+    "integrity_check": "validation",
+    "lifecycle_check": "lifecycle",
+    "maintenance": "maintenance",
+    "manifest_snapshot": "other",
+    "metrics_collection": "metrics",
+    "object_validation": "validation",
+    "operation_execution": "operations",
+    "retention_tolerance": "retention",
+    "run_wrapper": "other",
+    "scheduler_events_aggregation": "aggregation",
+    "scheduler_job_retention": "retention",
+    "test_runner": "other"
+  }
+}

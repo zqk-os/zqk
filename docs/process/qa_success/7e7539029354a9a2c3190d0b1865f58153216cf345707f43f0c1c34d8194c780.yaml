@@ -1,0 +1,14 @@
+created_at: "2026-08-19T00:28:48Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1787099328552532000-4af045d3
+item_id: BLI-CEF-R2-CON-MCP-VERIFY-CMD
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 2857702ca28e4b64fb5782140b43c1400e68fdeab30ab0062f4119523ca97d466e5f13c72adcfa41b92eacf21fa7f0a79b8a8e3a8d7c581e5c9afe0e69cb31dc
+schema_version: 2.0.0
+signature: 304402206a7a25825d8fc91df59ada0335638074fb9146b30c8d666c4a8186597604b8be022002bc0e490d7f1df76742e7bfb30c0eccf95c36b38cc07e79dd0659abb79f0e8f
+status: archived
+title: MCP verification tool uses CommandContext and cleans up
+updated_at: "2026-09-01T07:48:31Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

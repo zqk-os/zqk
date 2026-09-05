@@ -1,0 +1,14 @@
+created_at: "2026-08-18T23:37:14Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1787096234079332000-2a75b0d7
+item_id: BLI-CEF-R2-REL-WAL-CLOSE
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 2857702ca28e4b64fb5782140b43c1400e68fdeab30ab0062f4119523ca97d466e5f13c72adcfa41b92eacf21fa7f0a79b8a8e3a8d7c581e5c9afe0e69cb31dc
+schema_version: 2.0.0
+signature: 3046022100c1c4f0f1fe72bb59ad16ed1aec9e5490a6ea762365c08e8f97bca445fd957d93022100a914b71c42ba7d54ae9134d4de1e398a531d896613a0c333c6f045680667ed00
+status: archived
+title: WAL Close must surface Flush errors
+updated_at: "2026-09-01T07:08:35Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

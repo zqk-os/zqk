@@ -1,0 +1,123 @@
+{
+  "name": "make-verify-830",
+  "created_at": "2026-09-04T21:34:35.575039Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-830",
+    "Tests": [
+      {
+        "Name": "TestGuardManualStatusUpdate_refusesWithoutOverride",
+        "Package": "object",
+        "PackagePath": "cmd/zqk/object",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/object/update_helpers_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestGuardManualStatusUpdate_autoStatusAllowed",
+        "Package": "object",
+        "PackagePath": "cmd/zqk/object",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/object/update_helpers_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestGuardManualStatusUpdate_nonStatusPasses",
+        "Package": "object",
+        "PackagePath": "cmd/zqk/object",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/object/update_helpers_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestWstransCommandsExist",
+        "Package": "object",
+        "PackagePath": "cmd/zqk/object",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/object/wstrans_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestWstransShowHasRunE",
+        "Package": "object",
+        "PackagePath": "cmd/zqk/object",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/object/wstrans_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestWstransListHasRunE",
+        "Package": "object",
+        "PackagePath": "cmd/zqk/object",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/object/wstrans_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": true,
+    "EstimatedDuration": 540000000000,
+    "PackagePath": "cmd/zqk/object"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestGuardManualStatusUpdate_refusesWithoutOverride",
+      "Package": "object",
+      "PackagePath": "cmd/zqk/object",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/object/update_helpers_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestGuardManualStatusUpdate_autoStatusAllowed",
+      "Package": "object",
+      "PackagePath": "cmd/zqk/object",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/object/update_helpers_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestGuardManualStatusUpdate_nonStatusPasses",
+      "Package": "object",
+      "PackagePath": "cmd/zqk/object",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/object/update_helpers_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestWstransCommandsExist",
+      "Package": "object",
+      "PackagePath": "cmd/zqk/object",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/object/wstrans_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestWstransShowHasRunE",
+      "Package": "object",
+      "PackagePath": "cmd/zqk/object",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/object/wstrans_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestWstransListHasRunE",
+      "Package": "object",
+      "PackagePath": "cmd/zqk/object",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/object/wstrans_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    }
+  }
+}

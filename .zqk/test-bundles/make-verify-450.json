@@ -1,0 +1,105 @@
+{
+  "name": "make-verify-450",
+  "created_at": "2026-09-04T21:34:31.776266Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-450",
+    "Tests": [
+      {
+        "Name": "TestResolveLastDraftFile_wrongKind",
+        "Package": "cli",
+        "PackagePath": "internal/cli",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/internal/cli/last_draft_pointer_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestScanForObjectIDs",
+        "Package": "cli",
+        "PackagePath": "internal/cli",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/internal/cli/semantic_link_handler_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestStorageAvailableForOptionalUse",
+        "Package": "cli",
+        "PackagePath": "internal/cli",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/internal/cli/storage_context_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestGetObjectStorageForCommand_ErrStorageNotInContextWhenProjectRootEmpty",
+        "Package": "cli",
+        "PackagePath": "internal/cli",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/internal/cli/storage_context_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestRegisterStorageForProjectRoot_NoOpWhenEmptyProjectRootOrNilProvider",
+        "Package": "cli",
+        "PackagePath": "internal/cli",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/internal/cli/storage_context_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 150000000000,
+    "PackagePath": "internal/cli"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestResolveLastDraftFile_wrongKind",
+      "Package": "cli",
+      "PackagePath": "internal/cli",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/internal/cli/last_draft_pointer_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestScanForObjectIDs",
+      "Package": "cli",
+      "PackagePath": "internal/cli",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/internal/cli/semantic_link_handler_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestStorageAvailableForOptionalUse",
+      "Package": "cli",
+      "PackagePath": "internal/cli",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/internal/cli/storage_context_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestGetObjectStorageForCommand_ErrStorageNotInContextWhenProjectRootEmpty",
+      "Package": "cli",
+      "PackagePath": "internal/cli",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/internal/cli/storage_context_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestRegisterStorageForProjectRoot_NoOpWhenEmptyProjectRootOrNilProvider",
+      "Package": "cli",
+      "PackagePath": "internal/cli",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/internal/cli/storage_context_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

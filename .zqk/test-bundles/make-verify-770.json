@@ -1,0 +1,51 @@
+{
+  "name": "make-verify-770",
+  "created_at": "2026-09-04T21:34:34.955422Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-770",
+    "Tests": [
+      {
+        "Name": "TestDoc",
+        "Package": "processing_test",
+        "PackagePath": "pkg/processing",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/processing/doc_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestProcessingInit",
+        "Package": "processing",
+        "PackagePath": "pkg/processing",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/processing/processing_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 60000000000,
+    "PackagePath": "pkg/processing"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestDoc",
+      "Package": "processing_test",
+      "PackagePath": "pkg/processing",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/processing/doc_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestProcessingInit",
+      "Package": "processing",
+      "PackagePath": "pkg/processing",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/processing/processing_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

@@ -1,0 +1,194 @@
+
+--- run 2026-09-04T22:22:32Z ---
+=== RUN   TestKindHasTrait_WorkEnvelopeFacets
+=== PAUSE TestKindHasTrait_WorkEnvelopeFacets
+=== RUN   TestTraitRegistry_IsValidTrait
+=== PAUSE TestTraitRegistry_IsValidTrait
+=== RUN   TestTraitRegistry_ValidateTraits
+=== PAUSE TestTraitRegistry_ValidateTraits
+=== RUN   TestTraitRegistry_ValidateTraitFieldConsistency
+=== PAUSE TestTraitRegistry_ValidateTraitFieldConsistency
+=== RUN   TestTraitRegistry_LoadTraitsFromDirectory
+=== PAUSE TestTraitRegistry_LoadTraitsFromDirectory
+=== RUN   TestTraitRegistry_ExpandTraitGroup
+=== PAUSE TestTraitRegistry_ExpandTraitGroup
+=== RUN   TestTraitRegistry_ExpandTraits
+=== PAUSE TestTraitRegistry_ExpandTraits
+=== RUN   TestExtractFieldTraits
+=== PAUSE TestExtractFieldTraits
+=== RUN   TestTraitYAML_SnakeCaseLevelKeys
+=== PAUSE TestTraitYAML_SnakeCaseLevelKeys
+=== RUN   TestTraitRegistry_ValidateRedundantIncludes
+=== PAUSE TestTraitRegistry_ValidateRedundantIncludes
+=== CONT  TestKindHasTrait_WorkEnvelopeFacets
+=== RUN   TestKindHasTrait_WorkEnvelopeFacets/backlog_item
+=== CONT  TestTraitRegistry_ExpandTraitGroup
+=== PAUSE TestKindHasTrait_WorkEnvelopeFacets/backlog_item
+=== RUN   TestTraitRegistry_ExpandTraitGroup/expand_base_auditable_traits
+=== RUN   TestKindHasTrait_WorkEnvelopeFacets/milestone
+=== PAUSE TestKindHasTrait_WorkEnvelopeFacets/milestone
+=== RUN   TestKindHasTrait_WorkEnvelopeFacets/technical_debt
+=== PAUSE TestKindHasTrait_WorkEnvelopeFacets/technical_debt
+=== RUN   TestKindHasTrait_WorkEnvelopeFacets/agent_task
+=== PAUSE TestKindHasTrait_WorkEnvelopeFacets/agent_task
+=== RUN   TestKindHasTrait_WorkEnvelopeFacets/requirement
+=== PAUSE TestKindHasTrait_WorkEnvelopeFacets/requirement
+=== RUN   TestKindHasTrait_WorkEnvelopeFacets/goal
+=== PAUSE TestKindHasTrait_WorkEnvelopeFacets/goal
+=== RUN   TestKindHasTrait_WorkEnvelopeFacets/roadmap
+=== PAUSE TestKindHasTrait_WorkEnvelopeFacets/roadmap
+=== RUN   TestKindHasTrait_WorkEnvelopeFacets/workstream
+=== PAUSE TestKindHasTrait_WorkEnvelopeFacets/workstream
+=== RUN   TestKindHasTrait_WorkEnvelopeFacets/priority_plan
+=== PAUSE TestKindHasTrait_WorkEnvelopeFacets/priority_plan
+=== RUN   TestKindHasTrait_WorkEnvelopeFacets/strategic_plan
+=== PAUSE TestKindHasTrait_WorkEnvelopeFacets/strategic_plan
+=== RUN   TestKindHasTrait_WorkEnvelopeFacets/test_case
+=== PAUSE TestKindHasTrait_WorkEnvelopeFacets/test_case
+=== RUN   TestKindHasTrait_WorkEnvelopeFacets/convergence_session
+=== PAUSE TestKindHasTrait_WorkEnvelopeFacets/convergence_session
+=== RUN   TestKindHasTrait_WorkEnvelopeFacets/criteria
+=== PAUSE TestKindHasTrait_WorkEnvelopeFacets/criteria
+=== RUN   TestKindHasTrait_WorkEnvelopeFacets/glossary_term
+=== PAUSE TestKindHasTrait_WorkEnvelopeFacets/glossary_term
+=== RUN   TestKindHasTrait_WorkEnvelopeFacets/policy
+=== PAUSE TestKindHasTrait_WorkEnvelopeFacets/policy
+=== RUN   TestKindHasTrait_WorkEnvelopeFacets/mission
+=== PAUSE TestKindHasTrait_WorkEnvelopeFacets/mission
+=== RUN   TestKindHasTrait_WorkEnvelopeFacets/vision
+=== PAUSE TestKindHasTrait_WorkEnvelopeFacets/vision
+=== CONT  TestTraitRegistry_LoadTraitsFromDirectory
+=== RUN   TestTraitRegistry_ExpandTraitGroup/expand_base_object_traits_(recursive)
+=== RUN   TestTraitRegistry_ExpandTraitGroup/non-group_trait_returns_itself
+=== RUN   TestTraitRegistry_ExpandTraitGroup/effort_aware_composes_completable_and_keeps_itself
+=== RUN   TestTraitRegistry_ExpandTraitGroup/invalid_trait
+=== RUN   TestTraitRegistry_ExpandTraitGroup/expand_read_only_group
+=== RUN   TestTraitRegistry_ExpandTraitGroup/expand_confidential_group
+=== RUN   TestTraitRegistry_ExpandTraitGroup/expand_field_immutable_group
+=== RUN   TestTraitRegistry_ExpandTraitGroup/expand_field_queryable_group
+=== RUN   TestTraitRegistry_ExpandTraitGroup/expand_field_mutable_group
+=== RUN   TestTraitRegistry_ExpandTraitGroup/expand_field_reference_group
+--- PASS: TestTraitRegistry_ExpandTraitGroup (0.02s)
+    --- PASS: TestTraitRegistry_ExpandTraitGroup/expand_base_auditable_traits (0.02s)
+    --- PASS: TestTraitRegistry_ExpandTraitGroup/expand_base_object_traits_(recursive) (0.00s)
+    --- PASS: TestTraitRegistry_ExpandTraitGroup/non-group_trait_returns_itself (0.00s)
+    --- PASS: TestTraitRegistry_ExpandTraitGroup/effort_aware_composes_completable_and_keeps_itself (0.00s)
+    --- PASS: TestTraitRegistry_ExpandTraitGroup/invalid_trait (0.00s)
+    --- PASS: TestTraitRegistry_ExpandTraitGroup/expand_read_only_group (0.00s)
+    --- PASS: TestTraitRegistry_ExpandTraitGroup/expand_confidential_group (0.00s)
+    --- PASS: TestTraitRegistry_ExpandTraitGroup/expand_field_immutable_group (0.00s)
+    --- PASS: TestTraitRegistry_ExpandTraitGroup/expand_field_queryable_group (0.00s)
+    --- PASS: TestTraitRegistry_ExpandTraitGroup/expand_field_mutable_group (0.00s)
+    --- PASS: TestTraitRegistry_ExpandTraitGroup/expand_field_reference_group (0.00s)
+=== CONT  TestTraitRegistry_ValidateTraitFieldConsistency
+=== RUN   TestTraitRegistry_ValidateTraitFieldConsistency/consistent_traits
+--- PASS: TestTraitRegistry_LoadTraitsFromDirectory (0.02s)
+=== CONT  TestTraitRegistry_ValidateTraits
+=== RUN   TestTraitRegistry_ValidateTraits/valid_standard_traits
+=== RUN   TestTraitRegistry_ValidateTraitFieldConsistency/field_trait_not_in_object
+=== RUN   TestTraitRegistry_ValidateTraitFieldConsistency/empty_field_traits
+=== RUN   TestTraitRegistry_ValidateTraitFieldConsistency/multiple_field_traits
+--- PASS: TestTraitRegistry_ValidateTraitFieldConsistency (0.01s)
+    --- PASS: TestTraitRegistry_ValidateTraitFieldConsistency/consistent_traits (0.01s)
+    --- PASS: TestTraitRegistry_ValidateTraitFieldConsistency/field_trait_not_in_object (0.00s)
+    --- PASS: TestTraitRegistry_ValidateTraitFieldConsistency/empty_field_traits (0.00s)
+    --- PASS: TestTraitRegistry_ValidateTraitFieldConsistency/multiple_field_traits (0.00s)
+=== CONT  TestTraitRegistry_IsValidTrait
+=== RUN   TestTraitRegistry_IsValidTrait/standard_trait
+=== RUN   TestTraitRegistry_ValidateTraits/valid_with_dependencies
+=== RUN   TestTraitRegistry_ValidateTraits/missing_dependency
+=== RUN   TestTraitRegistry_ValidateTraits/effort_aware_composes_completable
+=== RUN   TestTraitRegistry_ValidateTraits/invalid_trait
+=== RUN   TestTraitRegistry_ValidateTraits/duplicate_trait
+=== RUN   TestTraitRegistry_ValidateTraits/field_level_trait
+=== RUN   TestTraitRegistry_ValidateTraits/field_level_with_object-only_trait
+--- PASS: TestTraitRegistry_ValidateTraits (0.01s)
+    --- PASS: TestTraitRegistry_ValidateTraits/valid_standard_traits (0.01s)
+    --- PASS: TestTraitRegistry_ValidateTraits/valid_with_dependencies (0.00s)
+    --- PASS: TestTraitRegistry_ValidateTraits/missing_dependency (0.00s)
+    --- PASS: TestTraitRegistry_ValidateTraits/effort_aware_composes_completable (0.00s)
+    --- PASS: TestTraitRegistry_ValidateTraits/invalid_trait (0.00s)
+    --- PASS: TestTraitRegistry_ValidateTraits/duplicate_trait (0.00s)
+    --- PASS: TestTraitRegistry_ValidateTraits/field_level_trait (0.00s)
+    --- PASS: TestTraitRegistry_ValidateTraits/field_level_with_object-only_trait (0.00s)
+=== CONT  TestTraitYAML_SnakeCaseLevelKeys
+=== RUN   TestTraitRegistry_IsValidTrait/standard_trait#01
+=== RUN   TestTraitRegistry_IsValidTrait/standard_trait#02
+=== RUN   TestTraitRegistry_IsValidTrait/domain-specific_trait
+=== RUN   TestTraitRegistry_IsValidTrait/invalid_trait
+=== RUN   TestTraitRegistry_IsValidTrait/empty_trait
+--- PASS: TestTraitRegistry_IsValidTrait (0.01s)
+    --- PASS: TestTraitRegistry_IsValidTrait/standard_trait (0.01s)
+    --- PASS: TestTraitRegistry_IsValidTrait/standard_trait#01 (0.00s)
+    --- PASS: TestTraitRegistry_IsValidTrait/standard_trait#02 (0.00s)
+    --- PASS: TestTraitRegistry_IsValidTrait/domain-specific_trait (0.00s)
+    --- PASS: TestTraitRegistry_IsValidTrait/invalid_trait (0.00s)
+    --- PASS: TestTraitRegistry_IsValidTrait/empty_trait (0.00s)
+=== CONT  TestTraitRegistry_ValidateRedundantIncludes
+=== RUN   TestTraitRegistry_ValidateRedundantIncludes/base_object_traits_restates_base_auditable_traits
+=== RUN   TestTraitRegistry_ValidateRedundantIncludes/effort_aware_restates_completable
+=== RUN   TestTraitRegistry_ValidateRedundantIncludes/base_object_traits_alone_is_not_redundant
+=== RUN   TestTraitRegistry_ValidateRedundantIncludes/effort_aware_plus_additive_trait_is_not_redundant
+--- PASS: TestTraitRegistry_ValidateRedundantIncludes (0.01s)
+    --- PASS: TestTraitRegistry_ValidateRedundantIncludes/base_object_traits_restates_base_auditable_traits (0.01s)
+    --- PASS: TestTraitRegistry_ValidateRedundantIncludes/effort_aware_restates_completable (0.00s)
+    --- PASS: TestTraitRegistry_ValidateRedundantIncludes/base_object_traits_alone_is_not_redundant (0.00s)
+    --- PASS: TestTraitRegistry_ValidateRedundantIncludes/effort_aware_plus_additive_trait_is_not_redundant (0.00s)
+=== CONT  TestExtractFieldTraits
+=== RUN   TestExtractFieldTraits/traits_as_list
+=== RUN   TestExtractFieldTraits/no_traits
+=== RUN   TestExtractFieldTraits/traits_as_strings
+=== RUN   TestExtractFieldTraits/empty_traits
+--- PASS: TestExtractFieldTraits (0.00s)
+    --- PASS: TestExtractFieldTraits/traits_as_list (0.00s)
+    --- PASS: TestExtractFieldTraits/no_traits (0.00s)
+    --- PASS: TestExtractFieldTraits/traits_as_strings (0.00s)
+    --- PASS: TestExtractFieldTraits/empty_traits (0.00s)
+=== CONT  TestTraitRegistry_ExpandTraits
+=== RUN   TestTraitRegistry_ExpandTraits/expand_trait_group_with_specific_traits
+--- PASS: TestTraitYAML_SnakeCaseLevelKeys (0.01s)
+=== CONT  TestKindHasTrait_WorkEnvelopeFacets/backlog_item
+=== RUN   TestTraitRegistry_ExpandTraits/regular_traits_unchanged
+=== RUN   TestTraitRegistry_ExpandTraits/effort_aware_composes_completable
+=== RUN   TestTraitRegistry_ExpandTraits/invalid_trait_in_list
+--- PASS: TestTraitRegistry_ExpandTraits (0.01s)
+    --- PASS: TestTraitRegistry_ExpandTraits/expand_trait_group_with_specific_traits (0.01s)
+    --- PASS: TestTraitRegistry_ExpandTraits/regular_traits_unchanged (0.00s)
+    --- PASS: TestTraitRegistry_ExpandTraits/effort_aware_composes_completable (0.00s)
+    --- PASS: TestTraitRegistry_ExpandTraits/invalid_trait_in_list (0.00s)
+=== CONT  TestKindHasTrait_WorkEnvelopeFacets/strategic_plan
+=== CONT  TestKindHasTrait_WorkEnvelopeFacets/vision
+=== CONT  TestKindHasTrait_WorkEnvelopeFacets/mission
+=== CONT  TestKindHasTrait_WorkEnvelopeFacets/policy
+=== CONT  TestKindHasTrait_WorkEnvelopeFacets/glossary_term
+=== CONT  TestKindHasTrait_WorkEnvelopeFacets/criteria
+=== CONT  TestKindHasTrait_WorkEnvelopeFacets/convergence_session
+=== CONT  TestKindHasTrait_WorkEnvelopeFacets/test_case
+=== CONT  TestKindHasTrait_WorkEnvelopeFacets/goal
+=== CONT  TestKindHasTrait_WorkEnvelopeFacets/priority_plan
+=== CONT  TestKindHasTrait_WorkEnvelopeFacets/workstream
+=== CONT  TestKindHasTrait_WorkEnvelopeFacets/roadmap
+=== CONT  TestKindHasTrait_WorkEnvelopeFacets/agent_task
+=== CONT  TestKindHasTrait_WorkEnvelopeFacets/requirement
+=== CONT  TestKindHasTrait_WorkEnvelopeFacets/technical_debt
+=== CONT  TestKindHasTrait_WorkEnvelopeFacets/milestone
+--- PASS: TestKindHasTrait_WorkEnvelopeFacets (0.00s)
+    --- PASS: TestKindHasTrait_WorkEnvelopeFacets/backlog_item (0.01s)
+    --- PASS: TestKindHasTrait_WorkEnvelopeFacets/strategic_plan (0.01s)
+    --- PASS: TestKindHasTrait_WorkEnvelopeFacets/mission (0.00s)
+    --- PASS: TestKindHasTrait_WorkEnvelopeFacets/vision (0.00s)
+    --- PASS: TestKindHasTrait_WorkEnvelopeFacets/glossary_term (0.00s)
+    --- PASS: TestKindHasTrait_WorkEnvelopeFacets/policy (0.01s)
+    --- PASS: TestKindHasTrait_WorkEnvelopeFacets/criteria (0.00s)
+    --- PASS: TestKindHasTrait_WorkEnvelopeFacets/convergence_session (0.00s)
+    --- PASS: TestKindHasTrait_WorkEnvelopeFacets/test_case (0.00s)
+    --- PASS: TestKindHasTrait_WorkEnvelopeFacets/goal (0.00s)
+    --- PASS: TestKindHasTrait_WorkEnvelopeFacets/priority_plan (0.00s)
+    --- PASS: TestKindHasTrait_WorkEnvelopeFacets/workstream (0.00s)
+    --- PASS: TestKindHasTrait_WorkEnvelopeFacets/roadmap (0.00s)
+    --- PASS: TestKindHasTrait_WorkEnvelopeFacets/agent_task (0.00s)
+    --- PASS: TestKindHasTrait_WorkEnvelopeFacets/requirement (0.00s)
+    --- PASS: TestKindHasTrait_WorkEnvelopeFacets/technical_debt (0.00s)
+    --- PASS: TestKindHasTrait_WorkEnvelopeFacets/milestone (0.00s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/objects	0.707s

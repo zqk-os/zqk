@@ -1,0 +1,14 @@
+created_at: "2026-08-19T03:58:13Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1787111884913682000-ce8339cc
+item_id: PRI-GROOM-COMMS-MESH-001
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 2857702ca28e4b64fb5782140b43c1400e68fdeab30ab0062f4119523ca97d466e5f13c72adcfa41b92eacf21fa7f0a79b8a8e3a8d7c581e5c9afe0e69cb31dc
+schema_version: 2.0.0
+signature: 30460221009d4dcabf08648fac3f3a597224850b2572517ceb8ca87b08e89324d9c9a558df022100a00a200a7abc34063c431341fab18a49b930d7b76d46b3c6ceb920201d79f6e5
+status: archived
+title: Grooming — COMMS/mesh/seat/MCP wake residuals
+updated_at: "2026-09-01T07:05:02Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

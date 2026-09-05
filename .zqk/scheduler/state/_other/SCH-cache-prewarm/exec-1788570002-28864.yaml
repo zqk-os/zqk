@@ -1,0 +1,7 @@
+job_id: SCH-cache-prewarm
+execution_id: exec-1788570002-28864
+state: completed
+process_id: 28864
+started_at: 2026-09-05T01:00:02.102601Z
+completed_at: 2026-09-05T01:00:02.683257Z
+policy_decision: execute

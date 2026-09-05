@@ -1,0 +1,14 @@
+created_at: "2026-08-18T23:37:27Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1787096247592692000-65a4b6a2
+item_id: BLI-CEF-R2-SEC-ENV-TRUST
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 2857702ca28e4b64fb5782140b43c1400e68fdeab30ab0062f4119523ca97d466e5f13c72adcfa41b92eacf21fa7f0a79b8a8e3a8d7c581e5c9afe0e69cb31dc
+schema_version: 2.0.0
+signature: 30450220107050bc6faee2fb8daae33f33878d4a92138865b9671f2aa16560eef58c1ad5022100adad6e7c58f0165157704dd75dfbb72460248a7e9cd776d444f02d3a6d26c78f
+status: archived
+title: Shim env trust must not enable stamp forgery / policy bypass
+updated_at: "2026-09-01T07:11:01Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

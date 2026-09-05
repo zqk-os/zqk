@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-789",
+  "created_at": "2026-09-04T21:34:35.150747Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-789",
+    "Tests": [
+      {
+        "Name": "TestSpecIndexKeepsDisplayLengthSeparateFromStorageLength",
+        "Package": "objects",
+        "PackagePath": "pkg/objects",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/objects/spec_index_display_length_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestValidateHighVolumeStreamKindsMatchSpecIndex_mismatch",
+        "Package": "objects",
+        "PackagePath": "pkg/objects",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/objects/spec_index_high_volume_validate_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestValidateHighVolumeStreamKindsMatchSpecIndex_duplicateKindInYAML",
+        "Package": "objects",
+        "PackagePath": "pkg/objects",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/objects/spec_index_high_volume_validate_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestValidateHighVolumeStreamKindsMatchSpecIndex_emptyStorageInYAML",
+        "Package": "objects",
+        "PackagePath": "pkg/objects",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/objects/spec_index_high_volume_validate_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestValidateHighVolumeStreamKindsMatchSpecIndex_unknownStorageInYAML",
+        "Package": "objects",
+        "PackagePath": "pkg/objects",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/objects/spec_index_high_volume_validate_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestValidateHighVolumeStreamKindsMatchSpecIndex_skipsWithoutConfigFile",
+        "Package": "objects",
+        "PackagePath": "pkg/objects",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/objects/spec_index_high_volume_validate_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestBuildSpecIndexFromSpecsDir_SetsBuilderSpecCacheRevision",
+        "Package": "objects",
+        "PackagePath": "pkg/objects",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/objects/spec_index_revision_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestKindNamesFromSpecIndex",
+        "Package": "objects",
+        "PackagePath": "pkg/objects",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/objects/spec_index_revision_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestRefreshMaterializedSpecIndex_WritesSpecIndexJSON",
+        "Package": "objects",
+        "PackagePath": "pkg/objects",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/objects/spec_index_revision_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestSpecIndexStorageProfileMatchesHighVolumeStreamKinds",
+        "Package": "objects",
+        "PackagePath": "pkg/objects",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/objects/spec_index_storage_profile_consistency_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": true,
+    "EstimatedDuration": 300000000000,
+    "PackagePath": "pkg/objects"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestSpecIndexKeepsDisplayLengthSeparateFromStorageLength",
+      "Package": "objects",
+      "PackagePath": "pkg/objects",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/objects/spec_index_display_length_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestValidateHighVolumeStreamKindsMatchSpecIndex_mismatch",
+      "Package": "objects",
+      "PackagePath": "pkg/objects",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/objects/spec_index_high_volume_validate_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestValidateHighVolumeStreamKindsMatchSpecIndex_duplicateKindInYAML",
+      "Package": "objects",
+      "PackagePath": "pkg/objects",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/objects/spec_index_high_volume_validate_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestValidateHighVolumeStreamKindsMatchSpecIndex_emptyStorageInYAML",
+      "Package": "objects",
+      "PackagePath": "pkg/objects",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/objects/spec_index_high_volume_validate_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestValidateHighVolumeStreamKindsMatchSpecIndex_unknownStorageInYAML",
+      "Package": "objects",
+      "PackagePath": "pkg/objects",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/objects/spec_index_high_volume_validate_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestValidateHighVolumeStreamKindsMatchSpecIndex_skipsWithoutConfigFile",
+      "Package": "objects",
+      "PackagePath": "pkg/objects",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/objects/spec_index_high_volume_validate_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestBuildSpecIndexFromSpecsDir_SetsBuilderSpecCacheRevision",
+      "Package": "objects",
+      "PackagePath": "pkg/objects",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/objects/spec_index_revision_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestKindNamesFromSpecIndex",
+      "Package": "objects",
+      "PackagePath": "pkg/objects",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/objects/spec_index_revision_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestRefreshMaterializedSpecIndex_WritesSpecIndexJSON",
+      "Package": "objects",
+      "PackagePath": "pkg/objects",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/objects/spec_index_revision_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestSpecIndexStorageProfileMatchesHighVolumeStreamKinds",
+      "Package": "objects",
+      "PackagePath": "pkg/objects",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/objects/spec_index_storage_profile_consistency_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

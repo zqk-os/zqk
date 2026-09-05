@@ -1,0 +1,7 @@
+job_id: SCH-1788563425375298000
+execution_id: exec-1788563711-28864
+state: failed
+process_id: 28864
+started_at: 2026-09-04T23:15:11.462628Z
+completed_at: 2026-09-04T23:15:13.632593Z
+policy_decision: execute

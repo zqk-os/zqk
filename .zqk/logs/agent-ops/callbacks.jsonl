@@ -1,0 +1,2 @@
+{"schema":"zqk_scheduler_job_callback_v1","event_type":"scheduler_job_callback","job_id":"SCH-1788563425375298000","outcome":"error","log":"/Users/lanceettl/zqk-restore-clone/.zqk/logs/agent-ops/git-commit-20260904T231023Z.callback.json","ts":"2026-09-04T23:15:13Z"}
+{"schema":"zqk_scheduler_job_callback_v1","event_type":"scheduler_job_callback","job_id":"SCH-1788563425375298000","outcome":"error","log":"/Users/lanceettl/zqk-restore-clone/.zqk/logs/agent-ops/git-commit-20260904T231023Z.callback.json","ts":"2026-09-04T23:15:13Z"}

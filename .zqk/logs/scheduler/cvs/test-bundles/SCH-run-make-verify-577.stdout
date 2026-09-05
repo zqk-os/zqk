@@ -1,0 +1,56 @@
+
+--- run 2026-09-04T22:18:30Z ---
+=== RUN   TestApplyCodeDraftSampling
+=== PAUSE TestApplyCodeDraftSampling
+=== RUN   TestRunTestIOViaPipeline_NilHandler
+=== PAUSE TestRunTestIOViaPipeline_NilHandler
+=== RUN   TestRunTestIOViaPipeline_NilJob
+=== PAUSE TestRunTestIOViaPipeline_NilJob
+=== RUN   TestParseTriggerType
+=== PAUSE TestParseTriggerType
+=== RUN   TestValidateTriggerRequirements
+=== PAUSE TestValidateTriggerRequirements
+=== CONT  TestApplyCodeDraftSampling
+=== CONT  TestParseTriggerType
+--- PASS: TestApplyCodeDraftSampling (0.00s)
+=== CONT  TestRunTestIOViaPipeline_NilJob
+--- PASS: TestRunTestIOViaPipeline_NilJob (0.00s)
+=== CONT  TestRunTestIOViaPipeline_NilHandler
+--- PASS: TestRunTestIOViaPipeline_NilHandler (0.00s)
+=== CONT  TestValidateTriggerRequirements
+=== RUN   TestValidateTriggerRequirements/Timer_with_schedule_expression
+=== RUN   TestParseTriggerType/Valid_timer_trigger
+=== RUN   TestValidateTriggerRequirements/Timer_without_schedule_expression
+=== RUN   TestValidateTriggerRequirements/Workflow_with_workflow_ref
+=== RUN   TestValidateTriggerRequirements/Workflow_without_workflow_ref
+=== RUN   TestValidateTriggerRequirements/Event_with_event_filter
+=== RUN   TestValidateTriggerRequirements/Event_without_event_filter
+=== RUN   TestParseTriggerType/Valid_manual_trigger
+=== RUN   TestValidateTriggerRequirements/Lifecycle_with_lifecycle_filter
+=== RUN   TestValidateTriggerRequirements/Lifecycle_without_lifecycle_filter
+=== RUN   TestValidateTriggerRequirements/Manual_trigger_(no_requirements)
+=== RUN   TestParseTriggerType/Empty_string_defaults_to_timer
+=== RUN   TestValidateTriggerRequirements/Immediate_trigger_(no_requirements)
+=== RUN   TestParseTriggerType/Unknown_trigger_defaults_to_timer
+=== RUN   TestValidateTriggerRequirements/Unknown_trigger_type
+=== RUN   TestParseTriggerType/Valid_lifecycle_trigger
+--- PASS: TestParseTriggerType (0.00s)
+    --- PASS: TestParseTriggerType/Valid_timer_trigger (0.00s)
+    --- PASS: TestParseTriggerType/Valid_manual_trigger (0.00s)
+    --- PASS: TestParseTriggerType/Empty_string_defaults_to_timer (0.00s)
+    --- PASS: TestParseTriggerType/Unknown_trigger_defaults_to_timer (0.00s)
+    --- PASS: TestParseTriggerType/Valid_lifecycle_trigger (0.00s)
+--- PASS: TestValidateTriggerRequirements (0.00s)
+    --- PASS: TestValidateTriggerRequirements/Timer_with_schedule_expression (0.00s)
+    --- PASS: TestValidateTriggerRequirements/Timer_without_schedule_expression (0.00s)
+    --- PASS: TestValidateTriggerRequirements/Workflow_with_workflow_ref (0.00s)
+    --- PASS: TestValidateTriggerRequirements/Workflow_without_workflow_ref (0.00s)
+    --- PASS: TestValidateTriggerRequirements/Event_with_event_filter (0.00s)
+    --- PASS: TestValidateTriggerRequirements/Event_without_event_filter (0.00s)
+    --- PASS: TestValidateTriggerRequirements/Lifecycle_with_lifecycle_filter (0.00s)
+    --- PASS: TestValidateTriggerRequirements/Lifecycle_without_lifecycle_filter (0.00s)
+    --- PASS: TestValidateTriggerRequirements/Manual_trigger_(no_requirements) (0.00s)
+    --- PASS: TestValidateTriggerRequirements/Immediate_trigger_(no_requirements) (0.00s)
+    --- PASS: TestValidateTriggerRequirements/Unknown_trigger_type (0.00s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/scheduler	0.651s

@@ -1,0 +1,52 @@
+
+--- run 2026-09-04T22:13:25Z ---
+=== RUN   TestProgressLogger_OverwriteBehavior
+=== PAUSE TestProgressLogger_OverwriteBehavior
+=== RUN   TestProgressLogger_ContextAware
+=== PAUSE TestProgressLogger_ContextAware
+=== RUN   TestProgressLogger_WithFields
+=== PAUSE TestProgressLogger_WithFields
+=== RUN   TestProgressRouting_SeparateFromLogs
+=== PAUSE TestProgressRouting_SeparateFromLogs
+=== RUN   TestProgressRouting_ContextAwareFormatter
+=== PAUSE TestProgressRouting_ContextAwareFormatter
+=== RUN   TestProgressRouting_OverwriteBehavior
+=== PAUSE TestProgressRouting_OverwriteBehavior
+=== RUN   TestProgressRouting_StatusChanges
+=== PAUSE TestProgressRouting_StatusChanges
+=== RUN   TestProgressRouting_StreamEvents
+=== PAUSE TestProgressRouting_StreamEvents
+=== RUN   TestLogRouter_MultipleDestinations
+=== PAUSE TestLogRouter_MultipleDestinations
+=== RUN   TestLogRouter_LevelFiltering
+=== PAUSE TestLogRouter_LevelFiltering
+=== CONT  TestProgressLogger_OverwriteBehavior
+=== CONT  TestProgressRouting_OverwriteBehavior
+--- PASS: TestProgressRouting_OverwriteBehavior (0.00s)
+=== CONT  TestLogRouter_MultipleDestinations
+--- PASS: TestProgressLogger_OverwriteBehavior (0.00s)
+=== CONT  TestLogRouter_LevelFiltering
+--- PASS: TestLogRouter_LevelFiltering (0.00s)
+=== CONT  TestProgressRouting_StreamEvents
+--- PASS: TestProgressRouting_StreamEvents (0.00s)
+=== CONT  TestProgressRouting_SeparateFromLogs
+--- PASS: TestProgressRouting_SeparateFromLogs (0.00s)
+=== CONT  TestProgressRouting_ContextAwareFormatter
+=== RUN   TestProgressRouting_ContextAwareFormatter/MCP_profile_uses_JSON
+--- PASS: TestLogRouter_MultipleDestinations (0.00s)
+=== CONT  TestProgressLogger_WithFields
+=== RUN   TestProgressRouting_ContextAwareFormatter/AI_Agent_profile_uses_JSON
+=== RUN   TestProgressRouting_ContextAwareFormatter/Human_profile_uses_text
+=== RUN   TestProgressRouting_ContextAwareFormatter/Debug_profile_uses_compact
+--- PASS: TestProgressLogger_WithFields (0.00s)
+=== CONT  TestProgressLogger_ContextAware
+--- PASS: TestProgressRouting_ContextAwareFormatter (0.00s)
+    --- PASS: TestProgressRouting_ContextAwareFormatter/MCP_profile_uses_JSON (0.00s)
+    --- PASS: TestProgressRouting_ContextAwareFormatter/AI_Agent_profile_uses_JSON (0.00s)
+    --- PASS: TestProgressRouting_ContextAwareFormatter/Human_profile_uses_text (0.00s)
+    --- PASS: TestProgressRouting_ContextAwareFormatter/Debug_profile_uses_compact (0.00s)
+=== CONT  TestProgressRouting_StatusChanges
+--- PASS: TestProgressRouting_StatusChanges (0.00s)
+--- PASS: TestProgressLogger_ContextAware (0.00s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/logging	0.252s

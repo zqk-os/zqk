@@ -1,0 +1,7 @@
+job_id: SCH-dce-tick
+execution_id: exec-1788588000-28864
+state: completed
+process_id: 28864
+started_at: 2026-09-05T06:00:00.069659Z
+completed_at: 2026-09-05T06:00:00.187152Z
+policy_decision: execute

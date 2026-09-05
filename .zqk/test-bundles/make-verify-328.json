@@ -1,0 +1,69 @@
+{
+  "name": "make-verify-328",
+  "created_at": "2026-09-04T21:34:30.626226Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-328",
+    "Tests": [
+      {
+        "Name": "TestExecutor_ErrorValidation_Code",
+        "Package": "testing",
+        "PackagePath": "pkg/mcp/testing",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/testing/validation_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestExecutor_DeepEquality",
+        "Package": "testing",
+        "PackagePath": "pkg/mcp/testing",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/testing/validation_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestExecutor_DeepEquality_Fail",
+        "Package": "testing",
+        "PackagePath": "pkg/mcp/testing",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/testing/validation_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": true,
+    "EstimatedDuration": 90000000000,
+    "PackagePath": "pkg/mcp/testing"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestExecutor_ErrorValidation_Code",
+      "Package": "testing",
+      "PackagePath": "pkg/mcp/testing",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/testing/validation_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestExecutor_DeepEquality",
+      "Package": "testing",
+      "PackagePath": "pkg/mcp/testing",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/testing/validation_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestExecutor_DeepEquality_Fail",
+      "Package": "testing",
+      "PackagePath": "pkg/mcp/testing",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/testing/validation_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

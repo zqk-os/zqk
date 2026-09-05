@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-90",
+  "created_at": "2026-09-04T21:34:28.254905Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-90",
+    "Tests": [
+      {
+        "Name": "TestGlossaryTermInstanceBuilder_Build",
+        "Package": "bldr_instance_v1",
+        "PackagePath": "pkg/specbuilder/bldr_instance_v1",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/specbuilder/bldr_instance_v1/glossary_term_instance_builder_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestLifecycleInstanceBuilder_Build",
+        "Package": "bldr_instance_v1",
+        "PackagePath": "pkg/specbuilder/bldr_instance_v1",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/specbuilder/bldr_instance_v1/lifecycle_instance_builder_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestLifecycleInstanceBuilder_SetObjectType",
+        "Package": "bldr_instance_v1",
+        "PackagePath": "pkg/specbuilder/bldr_instance_v1",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/specbuilder/bldr_instance_v1/lifecycle_instance_builder_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestLifecycleInstanceBuilder_SetSourceType",
+        "Package": "bldr_instance_v1",
+        "PackagePath": "pkg/specbuilder/bldr_instance_v1",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/specbuilder/bldr_instance_v1/lifecycle_instance_builder_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestLifecycleInstanceBuilder_SetExtends",
+        "Package": "bldr_instance_v1",
+        "PackagePath": "pkg/specbuilder/bldr_instance_v1",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/specbuilder/bldr_instance_v1/lifecycle_instance_builder_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestLifecycleInstanceBuilder_SetStatusMapping",
+        "Package": "bldr_instance_v1",
+        "PackagePath": "pkg/specbuilder/bldr_instance_v1",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/specbuilder/bldr_instance_v1/lifecycle_instance_builder_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestLifecycleInstanceBuilder_SetStatuses",
+        "Package": "bldr_instance_v1",
+        "PackagePath": "pkg/specbuilder/bldr_instance_v1",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/specbuilder/bldr_instance_v1/lifecycle_instance_builder_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestLifecycleInstanceBuilder_SetTransitions",
+        "Package": "bldr_instance_v1",
+        "PackagePath": "pkg/specbuilder/bldr_instance_v1",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/specbuilder/bldr_instance_v1/lifecycle_instance_builder_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestLifecycleInstanceBuilder_SetPercentComplete",
+        "Package": "bldr_instance_v1",
+        "PackagePath": "pkg/specbuilder/bldr_instance_v1",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/specbuilder/bldr_instance_v1/lifecycle_instance_builder_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestLifecycleInstanceBuilder_LoadFromYAML",
+        "Package": "bldr_instance_v1",
+        "PackagePath": "pkg/specbuilder/bldr_instance_v1",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/specbuilder/bldr_instance_v1/lifecycle_instance_builder_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": true,
+    "EstimatedDuration": 300000000000,
+    "PackagePath": "pkg/specbuilder/bldr_instance_v1"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestGlossaryTermInstanceBuilder_Build",
+      "Package": "bldr_instance_v1",
+      "PackagePath": "pkg/specbuilder/bldr_instance_v1",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/specbuilder/bldr_instance_v1/glossary_term_instance_builder_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestLifecycleInstanceBuilder_Build",
+      "Package": "bldr_instance_v1",
+      "PackagePath": "pkg/specbuilder/bldr_instance_v1",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/specbuilder/bldr_instance_v1/lifecycle_instance_builder_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestLifecycleInstanceBuilder_SetObjectType",
+      "Package": "bldr_instance_v1",
+      "PackagePath": "pkg/specbuilder/bldr_instance_v1",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/specbuilder/bldr_instance_v1/lifecycle_instance_builder_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestLifecycleInstanceBuilder_SetSourceType",
+      "Package": "bldr_instance_v1",
+      "PackagePath": "pkg/specbuilder/bldr_instance_v1",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/specbuilder/bldr_instance_v1/lifecycle_instance_builder_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestLifecycleInstanceBuilder_SetExtends",
+      "Package": "bldr_instance_v1",
+      "PackagePath": "pkg/specbuilder/bldr_instance_v1",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/specbuilder/bldr_instance_v1/lifecycle_instance_builder_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestLifecycleInstanceBuilder_SetStatusMapping",
+      "Package": "bldr_instance_v1",
+      "PackagePath": "pkg/specbuilder/bldr_instance_v1",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/specbuilder/bldr_instance_v1/lifecycle_instance_builder_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestLifecycleInstanceBuilder_SetStatuses",
+      "Package": "bldr_instance_v1",
+      "PackagePath": "pkg/specbuilder/bldr_instance_v1",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/specbuilder/bldr_instance_v1/lifecycle_instance_builder_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestLifecycleInstanceBuilder_SetTransitions",
+      "Package": "bldr_instance_v1",
+      "PackagePath": "pkg/specbuilder/bldr_instance_v1",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/specbuilder/bldr_instance_v1/lifecycle_instance_builder_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestLifecycleInstanceBuilder_SetPercentComplete",
+      "Package": "bldr_instance_v1",
+      "PackagePath": "pkg/specbuilder/bldr_instance_v1",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/specbuilder/bldr_instance_v1/lifecycle_instance_builder_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestLifecycleInstanceBuilder_LoadFromYAML",
+      "Package": "bldr_instance_v1",
+      "PackagePath": "pkg/specbuilder/bldr_instance_v1",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/specbuilder/bldr_instance_v1/lifecycle_instance_builder_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

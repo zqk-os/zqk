@@ -1,0 +1,44 @@
+
+--- run 2026-09-04T22:17:52Z ---
+=== RUN   TestDenyCoreKernelHardDelete_WriteStarNotEnough
+=== PAUSE TestDenyCoreKernelHardDelete_WriteStarNotEnough
+=== RUN   TestDenyCoreKernelHardDelete_NonCoreOK
+=== PAUSE TestDenyCoreKernelHardDelete_NonCoreOK
+=== RUN   TestFileObjectTransaction_DeleteRefusesCoreWithoutAllow
+=== PAUSE TestFileObjectTransaction_DeleteRefusesCoreWithoutAllow
+=== RUN   TestIsCoreKernelKind
+=== PAUSE TestIsCoreKernelKind
+=== RUN   TestCRITStorageFileSizeNamedFiles
+=== PAUSE TestCRITStorageFileSizeNamedFiles
+=== RUN   TestCRITStorageSubpackageInterfaces
+=== PAUSE TestCRITStorageSubpackageInterfaces
+=== RUN   TestCRITOrchestrateOver800HasTRACK
+=== PAUSE TestCRITOrchestrateOver800HasTRACK
+=== RUN   TestStorageProcessSettersStayOnAllowlist
+=== PAUSE TestStorageProcessSettersStayOnAllowlist
+=== RUN   TestHierarchyParentIDs_CollectsListAndSingular
+=== PAUSE TestHierarchyParentIDs_CollectsListAndSingular
+=== RUN   TestHierarchyBubbleToStatus
+=== PAUSE TestHierarchyBubbleToStatus
+=== CONT  TestDenyCoreKernelHardDelete_WriteStarNotEnough
+=== CONT  TestStorageProcessSettersStayOnAllowlist
+=== CONT  TestHierarchyBubbleToStatus
+--- PASS: TestHierarchyBubbleToStatus (0.00s)
+=== CONT  TestHierarchyParentIDs_CollectsListAndSingular
+--- PASS: TestDenyCoreKernelHardDelete_WriteStarNotEnough (0.01s)
+--- PASS: TestHierarchyParentIDs_CollectsListAndSingular (0.00s)
+=== CONT  TestCRITOrchestrateOver800HasTRACK
+--- PASS: TestCRITOrchestrateOver800HasTRACK (0.02s)
+=== CONT  TestFileObjectTransaction_DeleteRefusesCoreWithoutAllow
+--- PASS: TestFileObjectTransaction_DeleteRefusesCoreWithoutAllow (0.01s)
+=== CONT  TestCRITStorageFileSizeNamedFiles
+--- PASS: TestCRITStorageFileSizeNamedFiles (0.00s)
+=== CONT  TestIsCoreKernelKind
+--- PASS: TestIsCoreKernelKind (0.05s)
+=== CONT  TestCRITStorageSubpackageInterfaces
+--- PASS: TestCRITStorageSubpackageInterfaces (0.00s)
+=== CONT  TestDenyCoreKernelHardDelete_NonCoreOK
+--- PASS: TestDenyCoreKernelHardDelete_NonCoreOK (0.01s)
+--- PASS: TestStorageProcessSettersStayOnAllowlist (0.28s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/storage	0.904s

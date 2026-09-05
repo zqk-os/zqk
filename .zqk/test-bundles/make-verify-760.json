@@ -1,0 +1,33 @@
+{
+  "name": "make-verify-760",
+  "created_at": "2026-09-04T21:34:34.855071Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-760",
+    "Tests": [
+      {
+        "Name": "TestPolicyWrappersMatchPrimitives",
+        "Package": "appledouble",
+        "PackagePath": "pkg/appledouble",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/appledouble/appledouble_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 30000000000,
+    "PackagePath": "pkg/appledouble"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestPolicyWrappersMatchPrimitives",
+      "Package": "appledouble",
+      "PackagePath": "pkg/appledouble",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/appledouble/appledouble_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

@@ -1,0 +1,105 @@
+{
+  "name": "make-verify-377",
+  "created_at": "2026-09-04T21:34:31.081885Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-377",
+    "Tests": [
+      {
+        "Name": "TestQueueManager_OnDemandPattern",
+        "Package": "id_generation",
+        "PackagePath": "pkg/storage/id_generation",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/id_generation/queue_on_demand_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestQueueManager_CoordinatorIntegration",
+        "Package": "id_generation",
+        "PackagePath": "pkg/storage/id_generation",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/id_generation/queue_on_demand_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestQueueManager_IdleShutdown",
+        "Package": "id_generation",
+        "PackagePath": "pkg/storage/id_generation",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/id_generation/queue_on_demand_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestQueueManager_NoCallback",
+        "Package": "id_generation",
+        "PackagePath": "pkg/storage/id_generation",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/id_generation/queue_on_demand_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestQueueManager_ConcurrentQueueCreation",
+        "Package": "id_generation",
+        "PackagePath": "pkg/storage/id_generation",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/id_generation/queue_on_demand_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": true,
+    "EstimatedDuration": 450000000000,
+    "PackagePath": "pkg/storage/id_generation"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestQueueManager_OnDemandPattern",
+      "Package": "id_generation",
+      "PackagePath": "pkg/storage/id_generation",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/id_generation/queue_on_demand_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestQueueManager_CoordinatorIntegration",
+      "Package": "id_generation",
+      "PackagePath": "pkg/storage/id_generation",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/id_generation/queue_on_demand_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestQueueManager_IdleShutdown",
+      "Package": "id_generation",
+      "PackagePath": "pkg/storage/id_generation",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/id_generation/queue_on_demand_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestQueueManager_NoCallback",
+      "Package": "id_generation",
+      "PackagePath": "pkg/storage/id_generation",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/id_generation/queue_on_demand_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestQueueManager_ConcurrentQueueCreation",
+      "Package": "id_generation",
+      "PackagePath": "pkg/storage/id_generation",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/id_generation/queue_on_demand_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    }
+  }
+}

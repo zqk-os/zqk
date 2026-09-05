@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-356",
+  "created_at": "2026-09-04T21:34:30.885514Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-356",
+    "Tests": [
+      {
+        "Name": "TestValidateObjectIntent_transitionRequiresEffort",
+        "Package": "compose",
+        "PackagePath": "pkg/kernelcas/compose",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/kernelcas/compose/compose_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestValidateObjectIntent_transitionRequiresShovelReady",
+        "Package": "compose",
+        "PackagePath": "pkg/kernelcas/compose",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/kernelcas/compose/compose_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestValidateObjectIntent_plannedDoesNotUseShovelReadyOverlay",
+        "Package": "compose",
+        "PackagePath": "pkg/kernelcas/compose",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/kernelcas/compose/compose_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestDecide_eraseCriticalRefusesWithoutReason",
+        "Package": "compose",
+        "PackagePath": "pkg/kernelcas/compose",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/kernelcas/compose/compose_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestMembershipOverlay_bareForceDoesNotSkip",
+        "Package": "compose",
+        "PackagePath": "pkg/kernelcas/compose",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/kernelcas/compose/compose_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestValidateObject_selfRefsRefuseLoops",
+        "Package": "compose",
+        "PackagePath": "pkg/kernelcas/compose",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/kernelcas/compose/compose_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestBacklogItemHierarchyGateRespectsDraftPlane",
+        "Package": "compose",
+        "PackagePath": "pkg/kernelcas/compose",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/kernelcas/compose/draft_plane_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestBacklogItemHierarchyGateSatisfiedByEitherRef",
+        "Package": "compose",
+        "PackagePath": "pkg/kernelcas/compose",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/kernelcas/compose/draft_plane_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestOverlayRules_statusesExistInTheLifecycleTheyGate",
+        "Package": "compose",
+        "PackagePath": "pkg/kernelcas/compose",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/kernelcas/compose/overlay_lifecycle_correspondence_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestRequirementUnverifiedCriteria_barrierNowFires",
+        "Package": "compose",
+        "PackagePath": "pkg/kernelcas/compose",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/kernelcas/compose/overlay_lifecycle_correspondence_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 300000000000,
+    "PackagePath": "pkg/kernelcas/compose"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestValidateObjectIntent_transitionRequiresEffort",
+      "Package": "compose",
+      "PackagePath": "pkg/kernelcas/compose",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/kernelcas/compose/compose_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestValidateObjectIntent_transitionRequiresShovelReady",
+      "Package": "compose",
+      "PackagePath": "pkg/kernelcas/compose",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/kernelcas/compose/compose_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestValidateObjectIntent_plannedDoesNotUseShovelReadyOverlay",
+      "Package": "compose",
+      "PackagePath": "pkg/kernelcas/compose",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/kernelcas/compose/compose_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestDecide_eraseCriticalRefusesWithoutReason",
+      "Package": "compose",
+      "PackagePath": "pkg/kernelcas/compose",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/kernelcas/compose/compose_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestMembershipOverlay_bareForceDoesNotSkip",
+      "Package": "compose",
+      "PackagePath": "pkg/kernelcas/compose",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/kernelcas/compose/compose_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestValidateObject_selfRefsRefuseLoops",
+      "Package": "compose",
+      "PackagePath": "pkg/kernelcas/compose",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/kernelcas/compose/compose_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestBacklogItemHierarchyGateRespectsDraftPlane",
+      "Package": "compose",
+      "PackagePath": "pkg/kernelcas/compose",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/kernelcas/compose/draft_plane_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestBacklogItemHierarchyGateSatisfiedByEitherRef",
+      "Package": "compose",
+      "PackagePath": "pkg/kernelcas/compose",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/kernelcas/compose/draft_plane_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestOverlayRules_statusesExistInTheLifecycleTheyGate",
+      "Package": "compose",
+      "PackagePath": "pkg/kernelcas/compose",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/kernelcas/compose/overlay_lifecycle_correspondence_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestRequirementUnverifiedCriteria_barrierNowFires",
+      "Package": "compose",
+      "PackagePath": "pkg/kernelcas/compose",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/kernelcas/compose/overlay_lifecycle_correspondence_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

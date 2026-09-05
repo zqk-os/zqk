@@ -1,0 +1,69 @@
+{
+  "name": "make-verify-513",
+  "created_at": "2026-09-04T21:34:32.45144Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-513",
+    "Tests": [
+      {
+        "Name": "TestGoroutineLeakDetection",
+        "Package": "runtime",
+        "PackagePath": "pkg/runtime",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/runtime/leak_detection_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestShutdownTimeout",
+        "Package": "runtime",
+        "PackagePath": "pkg/runtime",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/runtime/leak_detection_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestResourceCleanup",
+        "Package": "runtime",
+        "PackagePath": "pkg/runtime",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/runtime/leak_detection_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": true,
+    "EstimatedDuration": 90000000000,
+    "PackagePath": "pkg/runtime"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestGoroutineLeakDetection",
+      "Package": "runtime",
+      "PackagePath": "pkg/runtime",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/runtime/leak_detection_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestShutdownTimeout",
+      "Package": "runtime",
+      "PackagePath": "pkg/runtime",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/runtime/leak_detection_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestResourceCleanup",
+      "Package": "runtime",
+      "PackagePath": "pkg/runtime",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/runtime/leak_detection_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

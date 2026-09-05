@@ -1,0 +1,139 @@
+{
+  "awaits": [
+    {
+      "id": "AWAIT-1788550360058988000-1f502fcd",
+      "event_id": "AFE-1788550360056396000-5d501807",
+      "from_agent_id": "cursor-composer",
+      "to_agent_id": "antigravity-1",
+      "action": "wake",
+      "wake_message": "ATTN TPM — peer_ack received for AFE-1788550360056396000-5d501807",
+      "status": "open",
+      "created_at": "2026-09-04T19:32:40Z"
+    },
+    {
+      "id": "AWAIT-1788550367470135000-255e5c21",
+      "event_id": "AFE-1788550367468248000-fcb8e91b",
+      "from_agent_id": "cursor-composer",
+      "to_agent_id": "antigravity-2",
+      "action": "wake",
+      "wake_message": "ATTN TPM — peer_ack received for AFE-1788550367468248000-fcb8e91b",
+      "status": "open",
+      "created_at": "2026-09-04T19:32:47Z"
+    },
+    {
+      "id": "AWAIT-1788551203917187000-6a6e1c0b",
+      "event_id": "AFE-1788551203915812000-d351e4ce",
+      "from_agent_id": "cursor-composer",
+      "to_agent_id": "antigravity-1",
+      "action": "wake",
+      "wake_message": "ATTN TPM — peer_ack received for AFE-1788551203915812000-d351e4ce",
+      "status": "open",
+      "created_at": "2026-09-04T19:46:43Z"
+    },
+    {
+      "id": "AWAIT-1788551211653718000-f89b9c8d",
+      "event_id": "AFE-1788551211652707000-d7ee3a4c",
+      "from_agent_id": "cursor-composer",
+      "to_agent_id": "antigravity-2",
+      "action": "wake",
+      "wake_message": "ATTN TPM — peer_ack received for AFE-1788551211652707000-d7ee3a4c",
+      "status": "open",
+      "created_at": "2026-09-04T19:46:51Z"
+    },
+    {
+      "id": "AWAIT-1788554324866464000-6e8fea0c",
+      "event_id": "AFE-1788554324866083000-bfcc9804",
+      "from_agent_id": "cursor-composer",
+      "to_agent_id": "qwen-1",
+      "action": "wake",
+      "wake_message": "ATTN TPM — peer_ack received for AFE-1788554324866083000-bfcc9804",
+      "status": "open",
+      "created_at": "2026-09-04T20:38:44Z"
+    },
+    {
+      "id": "AWAIT-1788554328451352000-ec21ce3e",
+      "event_id": "AFE-1788554328448272000-d642baa0",
+      "from_agent_id": "cursor-composer",
+      "to_agent_id": "qwen-2",
+      "action": "wake",
+      "wake_message": "ATTN TPM — peer_ack received for AFE-1788554328448272000-d642baa0",
+      "status": "open",
+      "created_at": "2026-09-04T20:38:48Z"
+    },
+    {
+      "id": "AWAIT-1788556593251401000-355128ad",
+      "event_id": "AFE-1788556593248107000-6d66be26",
+      "from_agent_id": "cursor-composer",
+      "to_agent_id": "qwen-2",
+      "action": "wake",
+      "wake_message": "ATTN TPM — peer_ack received for AFE-1788556593248107000-6d66be26",
+      "status": "open",
+      "created_at": "2026-09-04T21:16:33Z"
+    },
+    {
+      "id": "AWAIT-1788562873134412000-fb2b56c8",
+      "event_id": "AFE-1788562873132989000-853ef46f",
+      "from_agent_id": "cap-orchestrator",
+      "to_agent_id": "cursor-composer",
+      "action": "wake",
+      "wake_message": "ATTN TPM — peer_ack received for AFE-1788562873132989000-853ef46f",
+      "status": "completed",
+      "created_at": "2026-09-04T23:01:13Z",
+      "completed_at": "2026-09-04T23:02:50Z"
+    },
+    {
+      "id": "AWAIT-1788568167074536000-74d8d449",
+      "event_id": "AFE-1788568167072722000-4c3df646",
+      "from_agent_id": "peer-agent-2",
+      "to_agent_id": "peer-agent-1",
+      "action": "wake",
+      "wake_message": "ATTN TPM — peer_ack received for AFE-1788568167072722000-4c3df646",
+      "status": "completed",
+      "created_at": "2026-09-05T00:29:27Z",
+      "completed_at": "2026-09-05T00:29:33Z"
+    },
+    {
+      "id": "AWAIT-1788568602606669000-020fedc0",
+      "event_id": "AFE-1788568602605429000-dc5f1e87",
+      "from_agent_id": "peer-agent-2",
+      "to_agent_id": "peer-agent-1",
+      "action": "wake",
+      "wake_message": "ATTN TPM — peer_ack received for AFE-1788568602605429000-dc5f1e87",
+      "status": "completed",
+      "created_at": "2026-09-05T00:36:42Z",
+      "completed_at": "2026-09-05T00:37:03Z"
+    },
+    {
+      "id": "AWAIT-1788568640828252000-24bd0a5f",
+      "event_id": "AFE-1788568640827725000-b1c61649",
+      "from_agent_id": "peer-agent-2",
+      "to_agent_id": "peer-agent-1",
+      "action": "wake",
+      "wake_message": "ATTN TPM — peer_ack received for AFE-1788568640827725000-b1c61649",
+      "status": "completed",
+      "created_at": "2026-09-05T00:37:20Z",
+      "completed_at": "2026-09-05T00:37:28Z"
+    },
+    {
+      "id": "AWAIT-1788569472020834000-186df03d",
+      "event_id": "AFE-1788569472017085000-b672b19e",
+      "from_agent_id": "peer-agent-2",
+      "to_agent_id": "peer-agent-1",
+      "action": "wake",
+      "wake_message": "ATTN TPM — peer_ack received for AFE-1788569472017085000-b672b19e",
+      "status": "completed",
+      "created_at": "2026-09-05T00:51:12Z",
+      "completed_at": "2026-09-05T00:51:32Z"
+    },
+    {
+      "id": "AWAIT-1788579970545237000-505898a9",
+      "event_id": "AFE-1788579970507181000-28b440a9",
+      "from_agent_id": "peer-agent-1",
+      "to_agent_id": "ttys004",
+      "action": "wake",
+      "wake_message": "ATTN TPM — peer_ack received for AFE-1788579970507181000-28b440a9",
+      "status": "open",
+      "created_at": "2026-09-05T03:46:10Z"
+    }
+  ]
+}

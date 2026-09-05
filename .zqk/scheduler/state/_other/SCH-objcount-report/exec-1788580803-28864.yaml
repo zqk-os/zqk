@@ -1,0 +1,7 @@
+job_id: SCH-objcount-report
+execution_id: exec-1788580803-28864
+state: completed
+process_id: 28864
+started_at: 2026-09-05T04:00:03.625269Z
+completed_at: 2026-09-05T04:00:23.357836Z
+policy_decision: execute

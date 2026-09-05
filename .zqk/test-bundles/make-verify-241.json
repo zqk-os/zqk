@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-241",
+  "created_at": "2026-09-04T21:34:29.790031Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-241",
+    "Tests": [
+      {
+        "Name": "TestAuditLoggingPlugin_Name",
+        "Package": "plugins",
+        "PackagePath": "pkg/pipeline/plugins",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/pipeline/plugins/audit_logging_plugin_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAuditLoggingPlugin_Execute_Success",
+        "Package": "plugins",
+        "PackagePath": "pkg/pipeline/plugins",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/pipeline/plugins/audit_logging_plugin_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAuditLoggingPlugin_Validate_Success",
+        "Package": "plugins",
+        "PackagePath": "pkg/pipeline/plugins",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/pipeline/plugins/audit_logging_plugin_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAuditLoggingPlugin_Validate_Failure",
+        "Package": "plugins",
+        "PackagePath": "pkg/pipeline/plugins",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/pipeline/plugins/audit_logging_plugin_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestGraphExclusiveStatePlugin_Execute",
+        "Package": "plugins",
+        "PackagePath": "pkg/pipeline/plugins",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/pipeline/plugins/graph_exclusive_state_plugin_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestInteractiveInstantiationPlugin_Name",
+        "Package": "plugins",
+        "PackagePath": "pkg/pipeline/plugins",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/pipeline/plugins/interactive_instantiation_plugin_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestInteractiveInstantiationPlugin_Execute",
+        "Package": "plugins",
+        "PackagePath": "pkg/pipeline/plugins",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/pipeline/plugins/interactive_instantiation_plugin_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestPerformanceMetricsPlugin_Execute",
+        "Package": "plugins",
+        "PackagePath": "pkg/pipeline/plugins",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/pipeline/plugins/performance_metrics_plugin_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestPerformanceMetricsPlugin_Validate_Fails",
+        "Package": "plugins",
+        "PackagePath": "pkg/pipeline/plugins",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/pipeline/plugins/performance_metrics_plugin_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestContextHydrationPlugin_Execute",
+        "Package": "plugins",
+        "PackagePath": "pkg/pipeline/plugins",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/pipeline/plugins/plugin_context_hydration_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 300000000000,
+    "PackagePath": "pkg/pipeline/plugins"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestAuditLoggingPlugin_Name",
+      "Package": "plugins",
+      "PackagePath": "pkg/pipeline/plugins",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/pipeline/plugins/audit_logging_plugin_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestAuditLoggingPlugin_Execute_Success",
+      "Package": "plugins",
+      "PackagePath": "pkg/pipeline/plugins",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/pipeline/plugins/audit_logging_plugin_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestAuditLoggingPlugin_Validate_Success",
+      "Package": "plugins",
+      "PackagePath": "pkg/pipeline/plugins",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/pipeline/plugins/audit_logging_plugin_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestAuditLoggingPlugin_Validate_Failure",
+      "Package": "plugins",
+      "PackagePath": "pkg/pipeline/plugins",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/pipeline/plugins/audit_logging_plugin_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestGraphExclusiveStatePlugin_Execute",
+      "Package": "plugins",
+      "PackagePath": "pkg/pipeline/plugins",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/pipeline/plugins/graph_exclusive_state_plugin_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestInteractiveInstantiationPlugin_Name",
+      "Package": "plugins",
+      "PackagePath": "pkg/pipeline/plugins",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/pipeline/plugins/interactive_instantiation_plugin_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestInteractiveInstantiationPlugin_Execute",
+      "Package": "plugins",
+      "PackagePath": "pkg/pipeline/plugins",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/pipeline/plugins/interactive_instantiation_plugin_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestPerformanceMetricsPlugin_Execute",
+      "Package": "plugins",
+      "PackagePath": "pkg/pipeline/plugins",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/pipeline/plugins/performance_metrics_plugin_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestPerformanceMetricsPlugin_Validate_Fails",
+      "Package": "plugins",
+      "PackagePath": "pkg/pipeline/plugins",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/pipeline/plugins/performance_metrics_plugin_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestContextHydrationPlugin_Execute",
+      "Package": "plugins",
+      "PackagePath": "pkg/pipeline/plugins",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/pipeline/plugins/plugin_context_hydration_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

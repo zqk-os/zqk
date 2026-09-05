@@ -1,0 +1,178 @@
+
+--- run 2026-09-04T22:13:03Z ---
+=== RUN   TestValidateOwnerRefProduction_CaseInsensitivePrefix
+=== PAUSE TestValidateOwnerRefProduction_CaseInsensitivePrefix
+=== RUN   TestValidateOwnerRefProduction_ValidLowercasePrefix
+=== PAUSE TestValidateOwnerRefProduction_ValidLowercasePrefix
+=== RUN   TestIsPrototypeAccount_KnownHashesUnit
+=== PAUSE TestIsPrototypeAccount_KnownHashesUnit
+=== RUN   TestIsPrototypeAccount_SuffixDetectionUnit
+=== PAUSE TestIsPrototypeAccount_SuffixDetectionUnit
+=== RUN   TestIsPrototypeAccount_EmptyUnit
+=== PAUSE TestIsPrototypeAccount_EmptyUnit
+=== RUN   TestValidateOwnerRefProduction_RejectUnit
+=== PAUSE TestValidateOwnerRefProduction_RejectUnit
+=== RUN   TestValidateOwnerRefProduction_Rejections
+=== PAUSE TestValidateOwnerRefProduction_Rejections
+=== RUN   TestValidateOwnerRefProduction_Acceptances
+=== PAUSE TestValidateOwnerRefProduction_Acceptances
+=== RUN   TestValidateOwnerRefProduction_Integration
+=== PAUSE TestValidateOwnerRefProduction_Integration
+=== RUN   TestIsPrototypeAccount_Boundaries
+=== PAUSE TestIsPrototypeAccount_Boundaries
+=== CONT  TestValidateOwnerRefProduction_CaseInsensitivePrefix
+=== RUN   TestValidateOwnerRefProduction_CaseInsensitivePrefix/lowercase_acc_with_PROTO_suffix
+=== CONT  TestValidateOwnerRefProduction_RejectUnit
+=== RUN   TestValidateOwnerRefProduction_RejectUnit/known_hash
+=== PAUSE TestValidateOwnerRefProduction_RejectUnit/known_hash
+=== PAUSE TestValidateOwnerRefProduction_CaseInsensitivePrefix/lowercase_acc_with_PROTO_suffix
+=== RUN   TestValidateOwnerRefProduction_RejectUnit/known_hash_uppercase
+=== PAUSE TestValidateOwnerRefProduction_RejectUnit/known_hash_uppercase
+=== RUN   TestValidateOwnerRefProduction_CaseInsensitivePrefix/lowercase_acc_with_TEST_suffix
+=== RUN   TestValidateOwnerRefProduction_RejectUnit/proto_suffix
+=== PAUSE TestValidateOwnerRefProduction_RejectUnit/proto_suffix
+=== PAUSE TestValidateOwnerRefProduction_CaseInsensitivePrefix/lowercase_acc_with_TEST_suffix
+=== RUN   TestValidateOwnerRefProduction_CaseInsensitivePrefix/mixed_case_ACC_with_prototype_keyword
+=== PAUSE TestValidateOwnerRefProduction_CaseInsensitivePrefix/mixed_case_ACC_with_prototype_keyword
+=== CONT  TestIsPrototypeAccount_Boundaries
+=== RUN   TestIsPrototypeAccount_Boundaries/no_ACC_prefix
+=== PAUSE TestIsPrototypeAccount_Boundaries/no_ACC_prefix
+=== RUN   TestValidateOwnerRefProduction_RejectUnit/human_string
+=== RUN   TestIsPrototypeAccount_Boundaries/ACC_with_trailing_dash_only
+=== PAUSE TestValidateOwnerRefProduction_RejectUnit/human_string
+=== PAUSE TestIsPrototypeAccount_Boundaries/ACC_with_trailing_dash_only
+=== RUN   TestIsPrototypeAccount_Boundaries/short_ACC_no_internal_dash
+=== PAUSE TestIsPrototypeAccount_Boundaries/short_ACC_no_internal_dash
+=== RUN   TestValidateOwnerRefProduction_RejectUnit/no_acc_prefix
+=== PAUSE TestValidateOwnerRefProduction_RejectUnit/no_acc_prefix
+=== CONT  TestValidateOwnerRefProduction_Integration
+=== RUN   TestValidateOwnerRefProduction_Integration/prototype_hash_is_rejected
+=== CONT  TestValidateOwnerRefProduction_Acceptances
+=== RUN   TestValidateOwnerRefProduction_Acceptances/valid_hex_suffix
+=== PAUSE TestValidateOwnerRefProduction_Acceptances/valid_hex_suffix
+=== RUN   TestValidateOwnerRefProduction_Acceptances/standard_ACC_ID
+=== PAUSE TestValidateOwnerRefProduction_Acceptances/standard_ACC_ID
+=== RUN   TestValidateOwnerRefProduction_Integration/valid_production_account_passes
+=== RUN   TestValidateOwnerRefProduction_Acceptances/empty_tolerance
+=== RUN   TestValidateOwnerRefProduction_Integration/empty_owner_ref_is_tolerated
+=== PAUSE TestValidateOwnerRefProduction_Acceptances/empty_tolerance
+=== RUN   TestValidateOwnerRefProduction_Acceptances/whitespace-prefixed
+=== PAUSE TestValidateOwnerRefProduction_Acceptances/whitespace-prefixed
+--- PASS: TestValidateOwnerRefProduction_Integration (0.00s)
+    --- PASS: TestValidateOwnerRefProduction_Integration/prototype_hash_is_rejected (0.00s)
+    --- PASS: TestValidateOwnerRefProduction_Integration/valid_production_account_passes (0.00s)
+    --- PASS: TestValidateOwnerRefProduction_Integration/empty_owner_ref_is_tolerated (0.00s)
+=== CONT  TestIsPrototypeAccount_EmptyUnit
+--- PASS: TestIsPrototypeAccount_EmptyUnit (0.00s)
+=== CONT  TestValidateOwnerRefProduction_ValidLowercasePrefix
+=== RUN   TestValidateOwnerRefProduction_ValidLowercasePrefix/valid_lowercase_acc_hex_suffix
+=== PAUSE TestValidateOwnerRefProduction_ValidLowercasePrefix/valid_lowercase_acc_hex_suffix
+=== RUN   TestValidateOwnerRefProduction_ValidLowercasePrefix/valid_mixed_case_ACC_standard_ID
+=== PAUSE TestValidateOwnerRefProduction_ValidLowercasePrefix/valid_mixed_case_ACC_standard_ID
+=== RUN   TestValidateOwnerRefProduction_ValidLowercasePrefix/trimmed_lowercase_acc
+=== CONT  TestValidateOwnerRefProduction_Rejections
+=== RUN   TestValidateOwnerRefProduction_Rejections/known_hash_test-user
+=== PAUSE TestValidateOwnerRefProduction_Rejections/known_hash_test-user
+=== RUN   TestValidateOwnerRefProduction_Rejections/known_hash_test-agent_lowercase
+=== PAUSE TestValidateOwnerRefProduction_Rejections/known_hash_test-agent_lowercase
+=== RUN   TestValidateOwnerRefProduction_Rejections/known_hash_test-agent_uppercase
+=== PAUSE TestValidateOwnerRefProduction_ValidLowercasePrefix/trimmed_lowercase_acc
+=== PAUSE TestValidateOwnerRefProduction_Rejections/known_hash_test-agent_uppercase
+=== CONT  TestIsPrototypeAccount_KnownHashesUnit
+=== RUN   TestValidateOwnerRefProduction_Rejections/suffix_proto
+=== PAUSE TestValidateOwnerRefProduction_Rejections/suffix_proto
+=== RUN   TestIsPrototypeAccount_KnownHashesUnit/known_test-user
+=== RUN   TestValidateOwnerRefProduction_Rejections/suffix_test
+=== PAUSE TestIsPrototypeAccount_KnownHashesUnit/known_test-user
+=== PAUSE TestValidateOwnerRefProduction_Rejections/suffix_test
+=== RUN   TestIsPrototypeAccount_KnownHashesUnit/known_test-agent_uppercase
+=== PAUSE TestIsPrototypeAccount_KnownHashesUnit/known_test-agent_uppercase
+=== RUN   TestValidateOwnerRefProduction_Rejections/suffix_PROTOTYPE
+=== PAUSE TestValidateOwnerRefProduction_Rejections/suffix_PROTOTYPE
+=== RUN   TestIsPrototypeAccount_KnownHashesUnit/valid_account
+=== CONT  TestIsPrototypeAccount_SuffixDetectionUnit
+=== PAUSE TestIsPrototypeAccount_KnownHashesUnit/valid_account
+=== RUN   TestIsPrototypeAccount_SuffixDetectionUnit/suffix_proto
+=== PAUSE TestIsPrototypeAccount_SuffixDetectionUnit/suffix_proto
+=== RUN   TestIsPrototypeAccount_SuffixDetectionUnit/suffix_test
+=== CONT  TestValidateOwnerRefProduction_CaseInsensitivePrefix/lowercase_acc_with_PROTO_suffix
+=== CONT  TestValidateOwnerRefProduction_CaseInsensitivePrefix/mixed_case_ACC_with_prototype_keyword
+=== PAUSE TestIsPrototypeAccount_SuffixDetectionUnit/suffix_test
+=== CONT  TestValidateOwnerRefProduction_CaseInsensitivePrefix/lowercase_acc_with_TEST_suffix
+=== RUN   TestIsPrototypeAccount_SuffixDetectionUnit/suffix_PROTOTYPE
+--- PASS: TestValidateOwnerRefProduction_CaseInsensitivePrefix (0.00s)
+    --- PASS: TestValidateOwnerRefProduction_CaseInsensitivePrefix/lowercase_acc_with_PROTO_suffix (0.00s)
+    --- PASS: TestValidateOwnerRefProduction_CaseInsensitivePrefix/mixed_case_ACC_with_prototype_keyword (0.00s)
+    --- PASS: TestValidateOwnerRefProduction_CaseInsensitivePrefix/lowercase_acc_with_TEST_suffix (0.00s)
+=== CONT  TestIsPrototypeAccount_Boundaries/no_ACC_prefix
+=== PAUSE TestIsPrototypeAccount_SuffixDetectionUnit/suffix_PROTOTYPE
+=== RUN   TestIsPrototypeAccount_SuffixDetectionUnit/valid_hex
+=== PAUSE TestIsPrototypeAccount_SuffixDetectionUnit/valid_hex
+=== CONT  TestIsPrototypeAccount_Boundaries/short_ACC_no_internal_dash
+=== CONT  TestIsPrototypeAccount_Boundaries/ACC_with_trailing_dash_only
+=== RUN   TestIsPrototypeAccount_SuffixDetectionUnit/standard
+--- PASS: TestIsPrototypeAccount_Boundaries (0.00s)
+    --- PASS: TestIsPrototypeAccount_Boundaries/no_ACC_prefix (0.00s)
+    --- PASS: TestIsPrototypeAccount_Boundaries/short_ACC_no_internal_dash (0.00s)
+    --- PASS: TestIsPrototypeAccount_Boundaries/ACC_with_trailing_dash_only (0.00s)
+=== CONT  TestValidateOwnerRefProduction_RejectUnit/known_hash
+=== PAUSE TestIsPrototypeAccount_SuffixDetectionUnit/standard
+=== CONT  TestValidateOwnerRefProduction_RejectUnit/no_acc_prefix
+=== CONT  TestValidateOwnerRefProduction_RejectUnit/human_string
+=== CONT  TestValidateOwnerRefProduction_RejectUnit/known_hash_uppercase
+=== CONT  TestValidateOwnerRefProduction_RejectUnit/proto_suffix
+--- PASS: TestValidateOwnerRefProduction_RejectUnit (0.00s)
+    --- PASS: TestValidateOwnerRefProduction_RejectUnit/known_hash (0.00s)
+    --- PASS: TestValidateOwnerRefProduction_RejectUnit/no_acc_prefix (0.00s)
+    --- PASS: TestValidateOwnerRefProduction_RejectUnit/human_string (0.00s)
+    --- PASS: TestValidateOwnerRefProduction_RejectUnit/known_hash_uppercase (0.00s)
+    --- PASS: TestValidateOwnerRefProduction_RejectUnit/proto_suffix (0.00s)
+=== CONT  TestValidateOwnerRefProduction_Acceptances/valid_hex_suffix
+=== CONT  TestValidateOwnerRefProduction_Acceptances/whitespace-prefixed
+=== CONT  TestValidateOwnerRefProduction_Acceptances/empty_tolerance
+=== CONT  TestValidateOwnerRefProduction_ValidLowercasePrefix/valid_lowercase_acc_hex_suffix
+=== CONT  TestValidateOwnerRefProduction_Acceptances/standard_ACC_ID
+=== CONT  TestValidateOwnerRefProduction_ValidLowercasePrefix/trimmed_lowercase_acc
+--- PASS: TestValidateOwnerRefProduction_Acceptances (0.00s)
+    --- PASS: TestValidateOwnerRefProduction_Acceptances/valid_hex_suffix (0.00s)
+    --- PASS: TestValidateOwnerRefProduction_Acceptances/whitespace-prefixed (0.00s)
+    --- PASS: TestValidateOwnerRefProduction_Acceptances/empty_tolerance (0.00s)
+    --- PASS: TestValidateOwnerRefProduction_Acceptances/standard_ACC_ID (0.00s)
+=== CONT  TestValidateOwnerRefProduction_Rejections/known_hash_test-user
+=== CONT  TestValidateOwnerRefProduction_ValidLowercasePrefix/valid_mixed_case_ACC_standard_ID
+--- PASS: TestValidateOwnerRefProduction_ValidLowercasePrefix (0.00s)
+    --- PASS: TestValidateOwnerRefProduction_ValidLowercasePrefix/valid_lowercase_acc_hex_suffix (0.00s)
+    --- PASS: TestValidateOwnerRefProduction_ValidLowercasePrefix/trimmed_lowercase_acc (0.00s)
+    --- PASS: TestValidateOwnerRefProduction_ValidLowercasePrefix/valid_mixed_case_ACC_standard_ID (0.00s)
+=== CONT  TestValidateOwnerRefProduction_Rejections/suffix_PROTOTYPE
+=== CONT  TestValidateOwnerRefProduction_Rejections/known_hash_test-agent_lowercase
+=== CONT  TestValidateOwnerRefProduction_Rejections/known_hash_test-agent_uppercase
+=== CONT  TestValidateOwnerRefProduction_Rejections/suffix_test
+=== CONT  TestIsPrototypeAccount_KnownHashesUnit/known_test-user
+=== CONT  TestValidateOwnerRefProduction_Rejections/suffix_proto
+--- PASS: TestValidateOwnerRefProduction_Rejections (0.00s)
+    --- PASS: TestValidateOwnerRefProduction_Rejections/known_hash_test-user (0.00s)
+    --- PASS: TestValidateOwnerRefProduction_Rejections/suffix_PROTOTYPE (0.00s)
+    --- PASS: TestValidateOwnerRefProduction_Rejections/known_hash_test-agent_lowercase (0.00s)
+    --- PASS: TestValidateOwnerRefProduction_Rejections/known_hash_test-agent_uppercase (0.00s)
+    --- PASS: TestValidateOwnerRefProduction_Rejections/suffix_test (0.00s)
+    --- PASS: TestValidateOwnerRefProduction_Rejections/suffix_proto (0.00s)
+=== CONT  TestIsPrototypeAccount_KnownHashesUnit/known_test-agent_uppercase
+=== CONT  TestIsPrototypeAccount_SuffixDetectionUnit/suffix_proto
+=== CONT  TestIsPrototypeAccount_KnownHashesUnit/valid_account
+--- PASS: TestIsPrototypeAccount_KnownHashesUnit (0.00s)
+    --- PASS: TestIsPrototypeAccount_KnownHashesUnit/known_test-user (0.00s)
+    --- PASS: TestIsPrototypeAccount_KnownHashesUnit/known_test-agent_uppercase (0.00s)
+    --- PASS: TestIsPrototypeAccount_KnownHashesUnit/valid_account (0.00s)
+=== CONT  TestIsPrototypeAccount_SuffixDetectionUnit/standard
+=== CONT  TestIsPrototypeAccount_SuffixDetectionUnit/suffix_PROTOTYPE
+=== CONT  TestIsPrototypeAccount_SuffixDetectionUnit/suffix_test
+=== CONT  TestIsPrototypeAccount_SuffixDetectionUnit/valid_hex
+--- PASS: TestIsPrototypeAccount_SuffixDetectionUnit (0.00s)
+    --- PASS: TestIsPrototypeAccount_SuffixDetectionUnit/suffix_proto (0.00s)
+    --- PASS: TestIsPrototypeAccount_SuffixDetectionUnit/standard (0.00s)
+    --- PASS: TestIsPrototypeAccount_SuffixDetectionUnit/suffix_PROTOTYPE (0.00s)
+    --- PASS: TestIsPrototypeAccount_SuffixDetectionUnit/suffix_test (0.00s)
+    --- PASS: TestIsPrototypeAccount_SuffixDetectionUnit/valid_hex (0.00s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/authcred	0.363s

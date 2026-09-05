@@ -1,0 +1,44 @@
+
+--- run 2026-09-04T22:19:09Z ---
+=== RUN   TestIssueStillAppliesToObject_EmptyRefAndRequired
+=== PAUSE TestIssueStillAppliesToObject_EmptyRefAndRequired
+=== RUN   TestIssueStillAppliesToObject_MissingRefUnlinked
+=== PAUSE TestIssueStillAppliesToObject_MissingRefUnlinked
+=== RUN   TestIssueStillAppliesToObject_EnumResolved
+=== PAUSE TestIssueStillAppliesToObject_EnumResolved
+=== RUN   TestFilterStaleAutoFixBatchIssues
+=== PAUSE TestFilterStaleAutoFixBatchIssues
+=== RUN   TestPrunePendingAutofixBatchesForObjectID
+=== PAUSE TestPrunePendingAutofixBatchesForObjectID
+=== RUN   TestMaybeClearStaleAutofixBatchesAfterLiveGreen
+=== PAUSE TestMaybeClearStaleAutofixBatchesAfterLiveGreen
+=== RUN   TestSystemCheckIsFullKernelScan
+=== PAUSE TestSystemCheckIsFullKernelScan
+=== RUN   TestParseMustBeOneOfValues
+=== PAUSE TestParseMustBeOneOfValues
+=== RUN   TestCasIndexSparseVersusDisk
+=== PAUSE TestCasIndexSparseVersusDisk
+=== RUN   TestExtractObjectIDFromYAMLHead_IgnoresNestedID
+=== PAUSE TestExtractObjectIDFromYAMLHead_IgnoresNestedID
+=== CONT  TestIssueStillAppliesToObject_EmptyRefAndRequired
+=== CONT  TestMaybeClearStaleAutofixBatchesAfterLiveGreen
+--- PASS: TestIssueStillAppliesToObject_EmptyRefAndRequired (0.00s)
+=== CONT  TestPrunePendingAutofixBatchesForObjectID
+--- PASS: TestMaybeClearStaleAutofixBatchesAfterLiveGreen (0.01s)
+=== CONT  TestCasIndexSparseVersusDisk
+--- PASS: TestCasIndexSparseVersusDisk (0.00s)
+=== CONT  TestExtractObjectIDFromYAMLHead_IgnoresNestedID
+--- PASS: TestExtractObjectIDFromYAMLHead_IgnoresNestedID (0.00s)
+=== CONT  TestIssueStillAppliesToObject_EnumResolved
+--- PASS: TestIssueStillAppliesToObject_EnumResolved (0.00s)
+=== CONT  TestFilterStaleAutoFixBatchIssues
+--- PASS: TestFilterStaleAutoFixBatchIssues (0.00s)
+=== CONT  TestParseMustBeOneOfValues
+--- PASS: TestParseMustBeOneOfValues (0.00s)
+=== CONT  TestSystemCheckIsFullKernelScan
+--- PASS: TestSystemCheckIsFullKernelScan (0.00s)
+=== CONT  TestIssueStillAppliesToObject_MissingRefUnlinked
+--- PASS: TestIssueStillAppliesToObject_MissingRefUnlinked (0.00s)
+--- PASS: TestPrunePendingAutofixBatchesForObjectID (0.01s)
+PASS
+ok  	github.com/lanceman/zqk/cmd/zqk/system	0.913s

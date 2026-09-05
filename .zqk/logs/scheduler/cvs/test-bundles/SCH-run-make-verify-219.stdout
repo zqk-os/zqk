@@ -1,0 +1,45 @@
+
+--- run 2026-09-04T21:43:54Z ---
+=== RUN   TestProcessor_FormatJSONL
+=== PAUSE TestProcessor_FormatJSONL
+=== RUN   TestProcessor_FormatJSON
+=== PAUSE TestProcessor_FormatJSON
+=== RUN   TestProcessor_FormatText
+=== PAUSE TestProcessor_FormatText
+=== RUN   TestProcessor_MultipleFormatsInSameFile
+=== PAUSE TestProcessor_MultipleFormatsInSameFile
+=== RUN   TestProcessor_FormatLogEntry_InvalidFormat
+=== PAUSE TestProcessor_FormatLogEntry_InvalidFormat
+=== RUN   TestProcessor_Initialize
+=== PAUSE TestProcessor_Initialize
+=== RUN   TestProcessor_Enqueue
+=== PAUSE TestProcessor_Enqueue
+=== RUN   TestProcessor_ProcessDirect
+=== PAUSE TestProcessor_ProcessDirect
+=== RUN   TestProcessor_QueueSizeLimit
+=== PAUSE TestProcessor_QueueSizeLimit
+=== RUN   TestProcessor_Shutdown
+=== PAUSE TestProcessor_Shutdown
+=== CONT  TestProcessor_FormatJSONL
+=== CONT  TestProcessor_Initialize
+--- PASS: TestProcessor_Initialize (0.00s)
+=== CONT  TestProcessor_MultipleFormatsInSameFile
+--- PASS: TestProcessor_FormatJSONL (0.01s)
+=== CONT  TestProcessor_FormatLogEntry_InvalidFormat
+--- PASS: TestProcessor_MultipleFormatsInSameFile (0.01s)
+=== CONT  TestProcessor_QueueSizeLimit
+    processor_test.go:279: got 5 queue full errors as expected
+--- PASS: TestProcessor_QueueSizeLimit (0.02s)
+=== CONT  TestProcessor_Shutdown
+--- PASS: TestProcessor_Shutdown (0.00s)
+=== CONT  TestProcessor_ProcessDirect
+--- PASS: TestProcessor_ProcessDirect (0.01s)
+=== CONT  TestProcessor_Enqueue
+--- PASS: TestProcessor_FormatLogEntry_InvalidFormat (0.21s)
+=== CONT  TestProcessor_FormatText
+--- PASS: TestProcessor_FormatText (0.02s)
+=== CONT  TestProcessor_FormatJSON
+--- PASS: TestProcessor_Enqueue (0.20s)
+--- PASS: TestProcessor_FormatJSON (0.01s)
+PASS
+ok  	github.com/lanceman/zqk/cmd/zqk/callback	0.955s

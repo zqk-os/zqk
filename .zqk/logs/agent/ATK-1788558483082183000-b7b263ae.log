@@ -1,0 +1,3 @@
+Starting Graph-State Sync Loop for task: ATK-1788558483082183000-b7b263ae
+Committed mutation ik::ATK-1788558483082183000-b7b263ae::6c373bd6f78688952f0e388f50074a4358f0973b4a476a5c9ec025aed99f86a2
+Error: failed to read agent task: ATK-1788558483082183000-b7b263ae: STREAM_CAS_READ_FAILED: ATK-1788558483082183000-b7b263ae agent_task object ATK-1788558483082183000-b7b263ae (kind: agent_task) not found: cas index miss: object not found

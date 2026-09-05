@@ -1,0 +1,55 @@
+acceptance_considerations: Acceptance recorded as linked criteria; no narrative captured at migration time.
+actual_effort: 8h
+commit_refs:
+    - 77eae516c9
+    - ca282d8950
+created_at: "2026-08-05T04:30:42Z"
+created_by: ACC-1785920548450214012-68b850c0
+criteria_refs:
+    - CRIT-1785939701603722000-b8667f90
+    - CRIT-1785939702461724000-aa204b6c
+    - CRIT-1785939703374058000-48a2ebf7
+    - CRIT-1785939704264615000-133dd151
+    - CRIT-1786697464558114000-82f896ef
+description: |
+    Personas must link to agent_skill (ASK) before they are treated as ready/usable.
+    Work: (1) land CRI-PERSONA-SKILL-BOUND as complete criteria; (2) canonicalize
+    agent_skill_refs (migrate related_object_refs ASK-* where needed); (3) gate
+    promote-to-ready/active (once persona lifecycle has active) or dispatch/seat
+    binding on non-empty resolving ASK links; (4) backfill the 21 unbound personas
+    or explicitly deprecate duplicates.
+estimated_effort: 4h
+goal_refs:
+    - GOAL-1785885763755750000-6efcb274
+id: BLI-1785904242062561000-ec024787
+kind: backlog_item
+milestone_refs:
+    - MIL-1785886016336815000-ad6784be
+namespace_id: zqk:kernel
+owner_ref: ACC-1785920548450214012-68b850c0
+percent_complete: 100
+persona_refs:
+    - PER-1781486429759398000-a79939a1
+priority: high
+priority_tier: P1
+problem_statement: |-
+    Personas must link to agent_skill (ASK) before they are treated as ready/usable.
+    Work: (1) land CRI-PERSONA-SKILL-BOUND as complete criteria; (2) canonicalize
+    agent_skill_refs (migrate related_object_refs ASK-* where needed); (3) gate
+    promote-to-ready/active (once persona lifecycle has active) or dispatch/seat
+    binding on non-empty resolving ASK links; (4) backfill the 21 unbound personas
+    or explicitly deprecate duplicates.
+related_object_refs:
+    - GOAL-1785885763755750000-6efcb274
+    - POL-WORKFLOW-007
+    - CRIT-1785904241054969000-a088a7d9
+requirement_refs:
+    - REQ-1785903690847761000-a5449df3
+schema_version: 2.0.0
+stakeholder_refs:
+    - PER-1781486429759398000-a79939a1
+status: archived
+title: 'MMORCH P1: Enforce CRI-PERSONA-SKILL-BOUND for persona readiness'
+updated_at: "2026-08-19T04:51:29Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

@@ -1,0 +1,213 @@
+{
+  "metadata": {
+    "version": "2.0",
+    "build_time": "2026-09-04T20:45:53.070117Z",
+    "project_root": "/Users/lanceettl/zqk-restore-clone",
+    "entry_count": 57
+  },
+  "buckets": {
+    "audit_event": {
+      "cache_update": {
+        "AUD-4082": {
+          "created_at": "2026-09-04T20:45:48Z"
+        },
+        "AUD-4085": {
+          "created_at": "2026-09-04T20:45:48Z"
+        },
+        "AUD-4167": {
+          "created_at": "2026-09-04T20:45:50Z"
+        },
+        "AUD-4180": {
+          "created_at": "2026-09-04T20:45:50Z"
+        },
+        "AUD-4215": {
+          "created_at": "2026-09-04T20:45:51Z"
+        }
+      },
+      "command_execution": {
+        "AUD-4282": {
+          "created_at": "2026-09-04T20:45:52Z"
+        }
+      },
+      "hash_registry_batch_complete": {
+        "AUD-4190": {
+          "created_at": "2026-09-04T20:45:51Z"
+        }
+      },
+      "integrity_recovery": {
+        "AUD-ik-PRI-CEF-R28-REMEDIATE-001-0dc0b2d1af38a23406ce846e87523eae1cbc95ad9811e8654473d7a8978108ea": {
+          "created_at": "2026-09-04T20:45:50Z"
+        },
+        "AUD-ik-PRI-CEF-R28-REMEDIATE-001-92694c58f81e90542172485e78183f9a3d7138e80a1116cba56d371edaba0285": {
+          "created_at": "2026-09-04T20:45:50Z"
+        }
+      },
+      "listing_index_batch_complete": {
+        "AUD-4078": {
+          "created_at": "2026-09-04T20:45:48Z"
+        },
+        "AUD-4170": {
+          "created_at": "2026-09-04T20:45:50Z"
+        },
+        "AUD-4210": {
+          "created_at": "2026-09-04T20:45:51Z"
+        },
+        "AUD-4240": {
+          "created_at": "2026-09-04T20:45:51Z"
+        },
+        "AUD-4289": {
+          "created_at": "2026-09-04T20:45:52Z"
+        }
+      },
+      "listing_index_batch_start": {
+        "AUD-4076": {
+          "created_at": "2026-09-04T20:45:48Z"
+        },
+        "AUD-4206": {
+          "created_at": "2026-09-04T20:45:51Z"
+        },
+        "AUD-4225": {
+          "created_at": "2026-09-04T20:45:51Z"
+        },
+        "AUD-4279": {
+          "created_at": "2026-09-04T20:45:52Z"
+        }
+      },
+      "object_creation": {
+        "AUD-4072": {
+          "created_at": "2026-09-04T20:45:48Z"
+        },
+        "AUD-4101": {
+          "created_at": "2026-09-04T20:45:48Z"
+        },
+        "AUD-4201": {
+          "created_at": "2026-09-04T20:45:51Z"
+        }
+      },
+      "orphan_cleanup_complete": {
+        "AUD-4139": {
+          "created_at": "2026-09-04T20:45:50Z"
+        }
+      },
+      "system_config_change": {
+        "AUD-4055": {
+          "created_at": "2026-09-04T20:45:47Z"
+        },
+        "AUD-4073": {
+          "created_at": "2026-09-04T20:45:48Z"
+        },
+        "AUD-4075": {
+          "created_at": "2026-09-04T20:45:48Z"
+        },
+        "AUD-4087": {
+          "created_at": "2026-09-04T20:45:48Z"
+        },
+        "AUD-4090": {
+          "created_at": "2026-09-04T20:45:48Z"
+        },
+        "AUD-4091": {
+          "created_at": "2026-09-04T20:45:48Z"
+        },
+        "AUD-4094": {
+          "created_at": "2026-09-04T20:45:48Z"
+        },
+        "AUD-4096": {
+          "created_at": "2026-09-04T20:45:48Z"
+        },
+        "AUD-4097": {
+          "created_at": "2026-09-04T20:45:48Z"
+        },
+        "AUD-4099": {
+          "created_at": "2026-09-04T20:45:48Z"
+        },
+        "AUD-4102": {
+          "created_at": "2026-09-04T20:45:48Z"
+        },
+        "AUD-4103": {
+          "created_at": "2026-09-04T20:45:48Z"
+        },
+        "AUD-4105": {
+          "created_at": "2026-09-04T20:45:48Z"
+        },
+        "AUD-4147": {
+          "created_at": "2026-09-04T20:45:50Z"
+        },
+        "AUD-4153": {
+          "created_at": "2026-09-04T20:45:50Z"
+        },
+        "AUD-4155": {
+          "created_at": "2026-09-04T20:45:50Z"
+        },
+        "AUD-4157": {
+          "created_at": "2026-09-04T20:45:50Z"
+        },
+        "AUD-4164": {
+          "created_at": "2026-09-04T20:45:50Z"
+        },
+        "AUD-4165": {
+          "created_at": "2026-09-04T20:45:50Z"
+        },
+        "AUD-4186": {
+          "created_at": "2026-09-04T20:45:51Z"
+        },
+        "AUD-4193": {
+          "created_at": "2026-09-04T20:45:51Z"
+        },
+        "AUD-4204": {
+          "created_at": "2026-09-04T20:45:51Z"
+        },
+        "AUD-4223": {
+          "created_at": "2026-09-04T20:45:51Z"
+        },
+        "AUD-4275": {
+          "created_at": "2026-09-04T20:45:52Z"
+        },
+        "AUD-4296": {
+          "created_at": "2026-09-04T20:45:52Z"
+        },
+        "AUD-4304": {
+          "created_at": "2026-09-04T20:45:52Z"
+        },
+        "AUD-4305": {
+          "created_at": "2026-09-04T20:45:52Z"
+        },
+        "AUD-4312": {
+          "created_at": "2026-09-04T20:45:52Z"
+        }
+      }
+    },
+    "base_metric": {
+      "": {
+        "BAS-1788554748481975000-1df9ff2d": {
+          "created_at": "2026-09-04T20:45:48Z"
+        },
+        "BAS-1788554748645538000-9ccce1b8": {
+          "created_at": "2026-09-04T20:45:48Z"
+        },
+        "BAS-1788554750548544000-6a579340": {
+          "created_at": "2026-09-04T20:45:50Z"
+        },
+        "BAS-1788554750573185000-12601448": {
+          "created_at": "2026-09-04T20:45:50Z"
+        },
+        "BAS-1788554751105894000-5147b098": {
+          "created_at": "2026-09-04T20:45:51Z"
+        }
+      }
+    },
+    "change_journal_entry": {
+      "": {
+        "CHA-9101": {
+          "created_at": "2026-09-04T20:45:48Z"
+        }
+      }
+    },
+    "zqk_session": {
+      "": {
+        "ZQK-5995": {
+          "created_at": "2026-09-04T20:45:47Z"
+        }
+      }
+    }
+  }
+}

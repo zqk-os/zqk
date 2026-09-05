@@ -1,0 +1,72 @@
+
+--- run 2026-09-04T22:13:05Z ---
+=== RUN   TestBuildDependencyGraphAndSort_CircularDependency
+=== PAUSE TestBuildDependencyGraphAndSort_CircularDependency
+=== RUN   TestReferenceExistsMemoized
+=== PAUSE TestReferenceExistsMemoized
+=== RUN   TestVerifyReferencedObjectsExistMemoized
+=== PAUSE TestVerifyReferencedObjectsExistMemoized
+=== RUN   TestScenarioBuilderEventSubscriber_HandleEvent
+=== PAUSE TestScenarioBuilderEventSubscriber_HandleEvent
+=== RUN   TestScenarioBuilderEventSubscriber_Integration
+=== PAUSE TestScenarioBuilderEventSubscriber_Integration
+=== RUN   TestScenarioBuilderEventSubscriber_NonScenarioBuilderEvents
+=== PAUSE TestScenarioBuilderEventSubscriber_NonScenarioBuilderEvents
+=== RUN   TestScenarioBuilder_emitCoordinatorEvent
+=== PAUSE TestScenarioBuilder_emitCoordinatorEvent
+=== RUN   TestScenarioBuilder_emitCoordinatorEvent_RequiredCoordinator
+=== PAUSE TestScenarioBuilder_emitCoordinatorEvent_RequiredCoordinator
+=== RUN   TestResolveReferencesFromIDStream
+=== PAUSE TestResolveReferencesFromIDStream
+=== RUN   TestConfigFileWatcher_RegisterAndDetectChanges
+=== PAUSE TestConfigFileWatcher_RegisterAndDetectChanges
+=== CONT  TestBuildDependencyGraphAndSort_CircularDependency
+=== CONT  TestScenarioBuilderEventSubscriber_NonScenarioBuilderEvents
+--- PASS: TestScenarioBuilderEventSubscriber_NonScenarioBuilderEvents (0.20s)
+=== CONT  TestResolveReferencesFromIDStream
+=== RUN   TestResolveReferencesFromIDStream/resolve_single_reference
+=== RUN   TestResolveReferencesFromIDStream/resolve_list_reference
+=== RUN   TestResolveReferencesFromIDStream/resolve_account_reference
+=== RUN   TestResolveReferencesFromIDStream/no_references_to_resolve
+--- PASS: TestResolveReferencesFromIDStream (0.00s)
+    --- PASS: TestResolveReferencesFromIDStream/resolve_single_reference (0.00s)
+    --- PASS: TestResolveReferencesFromIDStream/resolve_list_reference (0.00s)
+    --- PASS: TestResolveReferencesFromIDStream/resolve_account_reference (0.00s)
+    --- PASS: TestResolveReferencesFromIDStream/no_references_to_resolve (0.00s)
+=== CONT  TestConfigFileWatcher_RegisterAndDetectChanges
+--- PASS: TestBuildDependencyGraphAndSort_CircularDependency (0.33s)
+=== CONT  TestScenarioBuilder_emitCoordinatorEvent_RequiredCoordinator
+--- PASS: TestScenarioBuilder_emitCoordinatorEvent_RequiredCoordinator (0.00s)
+=== CONT  TestScenarioBuilder_emitCoordinatorEvent
+=== RUN   TestScenarioBuilder_emitCoordinatorEvent/progress_event
+=== RUN   TestScenarioBuilder_emitCoordinatorEvent/warning_event
+=== RUN   TestScenarioBuilder_emitCoordinatorEvent/error_event
+=== RUN   TestScenarioBuilder_emitCoordinatorEvent/complete_event
+--- PASS: TestScenarioBuilder_emitCoordinatorEvent (0.87s)
+    --- PASS: TestScenarioBuilder_emitCoordinatorEvent/progress_event (0.24s)
+    --- PASS: TestScenarioBuilder_emitCoordinatorEvent/warning_event (0.20s)
+    --- PASS: TestScenarioBuilder_emitCoordinatorEvent/error_event (0.22s)
+    --- PASS: TestScenarioBuilder_emitCoordinatorEvent/complete_event (0.20s)
+=== CONT  TestScenarioBuilderEventSubscriber_HandleEvent
+=== RUN   TestScenarioBuilderEventSubscriber_HandleEvent/progress_event_with_kind_and_count
+=== RUN   TestScenarioBuilderEventSubscriber_HandleEvent/progress_event_with_message
+=== RUN   TestScenarioBuilderEventSubscriber_HandleEvent/warning_event
+=== RUN   TestScenarioBuilderEventSubscriber_HandleEvent/error_event
+=== RUN   TestScenarioBuilderEventSubscriber_HandleEvent/complete_event
+=== RUN   TestScenarioBuilderEventSubscriber_HandleEvent/non-scenario_builder_event_(should_be_ignored)
+--- PASS: TestScenarioBuilderEventSubscriber_HandleEvent (0.00s)
+    --- PASS: TestScenarioBuilderEventSubscriber_HandleEvent/progress_event_with_kind_and_count (0.00s)
+    --- PASS: TestScenarioBuilderEventSubscriber_HandleEvent/progress_event_with_message (0.00s)
+    --- PASS: TestScenarioBuilderEventSubscriber_HandleEvent/warning_event (0.00s)
+    --- PASS: TestScenarioBuilderEventSubscriber_HandleEvent/error_event (0.00s)
+    --- PASS: TestScenarioBuilderEventSubscriber_HandleEvent/complete_event (0.00s)
+    --- PASS: TestScenarioBuilderEventSubscriber_HandleEvent/non-scenario_builder_event_(should_be_ignored) (0.00s)
+=== CONT  TestVerifyReferencedObjectsExistMemoized
+--- PASS: TestVerifyReferencedObjectsExistMemoized (0.44s)
+=== CONT  TestReferenceExistsMemoized
+--- PASS: TestReferenceExistsMemoized (0.39s)
+=== CONT  TestScenarioBuilderEventSubscriber_Integration
+--- PASS: TestScenarioBuilderEventSubscriber_Integration (0.00s)
+--- PASS: TestConfigFileWatcher_RegisterAndDetectChanges (7.01s)
+PASS
+ok  	github.com/lanceman/zqk/cmd/zqk/utility	8.161s

@@ -1,0 +1,7 @@
+job_id: SCH-AUTOFIX-1788564331132346000
+execution_id: exec-1788564396-28864
+state: failed
+process_id: 28864
+started_at: 2026-09-04T23:26:36.366752Z
+completed_at: 2026-09-04T23:27:10.023553Z
+policy_decision: execute

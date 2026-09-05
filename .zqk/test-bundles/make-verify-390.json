@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-390",
+  "created_at": "2026-09-04T21:34:31.207711Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-390",
+    "Tests": [
+      {
+        "Name": "TestMetricsResolve_Prepend_NoMetricRecord",
+        "Package": "pipeline",
+        "PackagePath": "pkg/pipeline",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/pipeline/metrics_resolve_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestNativeSwarmDispatcher",
+        "Package": "pipeline",
+        "PackagePath": "pkg/pipeline",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/pipeline/native_dispatcher_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestPipelineRouter",
+        "Package": "pipeline_test",
+        "PackagePath": "pkg/pipeline",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/pipeline/pipeline_router_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestEnvelope_Fields",
+        "Package": "pipeline",
+        "PackagePath": "pkg/pipeline",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/pipeline/pipeline_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestPipeline_Run_SucceedsAndOrdersStages",
+        "Package": "pipeline",
+        "PackagePath": "pkg/pipeline",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/pipeline/pipeline_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestPipeline_Run_StopsOnError",
+        "Package": "pipeline",
+        "PackagePath": "pkg/pipeline",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/pipeline/pipeline_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestNewBuilder_KindAndStages",
+        "Package": "pipeline",
+        "PackagePath": "pkg/pipeline",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/pipeline/pipeline_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestPipeline_Run_ShortCircuitsMetricsWithoutMetricsConfig",
+        "Package": "pipeline",
+        "PackagePath": "pkg/pipeline",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/pipeline/pipeline_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestPipeline_BucketingStrategyPassesBuckets",
+        "Package": "pipeline",
+        "PackagePath": "pkg/pipeline",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/pipeline/pipeline_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestDefaultMetricsConfigWithStrategy",
+        "Package": "pipeline",
+        "PackagePath": "pkg/pipeline",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/pipeline/pipeline_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 300000000000,
+    "PackagePath": "pkg/pipeline"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestMetricsResolve_Prepend_NoMetricRecord",
+      "Package": "pipeline",
+      "PackagePath": "pkg/pipeline",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/pipeline/metrics_resolve_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestNativeSwarmDispatcher",
+      "Package": "pipeline",
+      "PackagePath": "pkg/pipeline",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/pipeline/native_dispatcher_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestPipelineRouter",
+      "Package": "pipeline_test",
+      "PackagePath": "pkg/pipeline",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/pipeline/pipeline_router_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestEnvelope_Fields",
+      "Package": "pipeline",
+      "PackagePath": "pkg/pipeline",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/pipeline/pipeline_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestPipeline_Run_SucceedsAndOrdersStages",
+      "Package": "pipeline",
+      "PackagePath": "pkg/pipeline",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/pipeline/pipeline_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestPipeline_Run_StopsOnError",
+      "Package": "pipeline",
+      "PackagePath": "pkg/pipeline",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/pipeline/pipeline_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestNewBuilder_KindAndStages",
+      "Package": "pipeline",
+      "PackagePath": "pkg/pipeline",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/pipeline/pipeline_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestPipeline_Run_ShortCircuitsMetricsWithoutMetricsConfig",
+      "Package": "pipeline",
+      "PackagePath": "pkg/pipeline",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/pipeline/pipeline_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestPipeline_BucketingStrategyPassesBuckets",
+      "Package": "pipeline",
+      "PackagePath": "pkg/pipeline",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/pipeline/pipeline_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestDefaultMetricsConfigWithStrategy",
+      "Package": "pipeline",
+      "PackagePath": "pkg/pipeline",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/pipeline/pipeline_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

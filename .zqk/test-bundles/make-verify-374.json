@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-374",
+  "created_at": "2026-09-04T21:34:31.063371Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-374",
+    "Tests": [
+      {
+        "Name": "TestRuleConfigDescription",
+        "Package": "processhygiene",
+        "PackagePath": "pkg/processhygiene",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/processhygiene/handcas_dupdup_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestFindingsAreActionable",
+        "Package": "processhygiene",
+        "PackagePath": "pkg/processhygiene",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/processhygiene/handcas_dupdup_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestDuplicateIDFindingsContainRuleIDAndInfo",
+        "Package": "processhygiene",
+        "PackagePath": "pkg/processhygiene",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/processhygiene/handcas_dupdup_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestRejectsBadInput",
+        "Package": "processhygiene",
+        "PackagePath": "pkg/processhygiene",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/processhygiene/handcas_dupdup_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestInternalObjectKindFitness",
+        "Package": "processhygiene",
+        "PackagePath": "pkg/processhygiene",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/processhygiene/internal_kind_fitness_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestPublicKindFitnessScorecardIntegrity",
+        "Package": "processhygiene_test",
+        "PackagePath": "pkg/processhygiene",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/processhygiene/public_kind_fitness_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestReadmeLeadsWithStrangerUsablePath",
+        "Package": "processhygiene_test",
+        "PackagePath": "pkg/processhygiene",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/processhygiene/readme_onboarding_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestReadmePrefersCommunityFirstRunOverStudioPack",
+        "Package": "processhygiene_test",
+        "PackagePath": "pkg/processhygiene",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/processhygiene/readme_onboarding_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestRootScratchGitignoreAndHygiene",
+        "Package": "processhygiene_test",
+        "PackagePath": "pkg/processhygiene",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/processhygiene/root_scratch_gitignore_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestSBOMAndDependabotConfiguration",
+        "Package": "processhygiene_test",
+        "PackagePath": "pkg/processhygiene",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/processhygiene/sbom_workflow_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 300000000000,
+    "PackagePath": "pkg/processhygiene"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestRuleConfigDescription",
+      "Package": "processhygiene",
+      "PackagePath": "pkg/processhygiene",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/processhygiene/handcas_dupdup_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestFindingsAreActionable",
+      "Package": "processhygiene",
+      "PackagePath": "pkg/processhygiene",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/processhygiene/handcas_dupdup_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestDuplicateIDFindingsContainRuleIDAndInfo",
+      "Package": "processhygiene",
+      "PackagePath": "pkg/processhygiene",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/processhygiene/handcas_dupdup_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestRejectsBadInput",
+      "Package": "processhygiene",
+      "PackagePath": "pkg/processhygiene",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/processhygiene/handcas_dupdup_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestInternalObjectKindFitness",
+      "Package": "processhygiene",
+      "PackagePath": "pkg/processhygiene",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/processhygiene/internal_kind_fitness_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestPublicKindFitnessScorecardIntegrity",
+      "Package": "processhygiene_test",
+      "PackagePath": "pkg/processhygiene",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/processhygiene/public_kind_fitness_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestReadmeLeadsWithStrangerUsablePath",
+      "Package": "processhygiene_test",
+      "PackagePath": "pkg/processhygiene",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/processhygiene/readme_onboarding_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestReadmePrefersCommunityFirstRunOverStudioPack",
+      "Package": "processhygiene_test",
+      "PackagePath": "pkg/processhygiene",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/processhygiene/readme_onboarding_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestRootScratchGitignoreAndHygiene",
+      "Package": "processhygiene_test",
+      "PackagePath": "pkg/processhygiene",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/processhygiene/root_scratch_gitignore_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestSBOMAndDependabotConfiguration",
+      "Package": "processhygiene_test",
+      "PackagePath": "pkg/processhygiene",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/processhygiene/sbom_workflow_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

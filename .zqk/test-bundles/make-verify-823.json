@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-823",
+  "created_at": "2026-09-04T21:34:35.506075Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-823",
+    "Tests": [
+      {
+        "Name": "TestParseJSONLDClasses",
+        "Package": "translation",
+        "PackagePath": "pkg/translation",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/translation/jsonld_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestRDFOWLTranslator_Translate_JSONLD_ProducesDomainRegistry",
+        "Package": "translation",
+        "PackagePath": "pkg/translation",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/translation/jsonld_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestParseJSONLDClasses_Empty",
+        "Package": "translation",
+        "PackagePath": "pkg/translation",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/translation/jsonld_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestLocalNameFromJSONLDID",
+        "Package": "translation",
+        "PackagePath": "pkg/translation",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/translation/jsonld_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestParseRDFXMLClasses",
+        "Package": "translation",
+        "PackagePath": "pkg/translation",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/translation/rdf_xml_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestRDFOWLTranslator_Translate_RDFXML_ProducesDomainRegistry",
+        "Package": "translation",
+        "PackagePath": "pkg/translation",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/translation/rdf_xml_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestLocalNameFromRDFAbout",
+        "Package": "translation",
+        "PackagePath": "pkg/translation",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/translation/rdf_xml_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestRegistry_GetAndTranslate",
+        "Package": "translation",
+        "PackagePath": "pkg/translation",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/translation/registry_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestParseTurtleClasses",
+        "Package": "translation",
+        "PackagePath": "pkg/translation",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/translation/turtle_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestRDFOWLTranslator_Translate_ProducesDomainRegistry",
+        "Package": "translation",
+        "PackagePath": "pkg/translation",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/translation/turtle_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": true,
+    "EstimatedDuration": 300000000000,
+    "PackagePath": "pkg/translation"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestParseJSONLDClasses",
+      "Package": "translation",
+      "PackagePath": "pkg/translation",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/translation/jsonld_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestRDFOWLTranslator_Translate_JSONLD_ProducesDomainRegistry",
+      "Package": "translation",
+      "PackagePath": "pkg/translation",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/translation/jsonld_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestParseJSONLDClasses_Empty",
+      "Package": "translation",
+      "PackagePath": "pkg/translation",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/translation/jsonld_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestLocalNameFromJSONLDID",
+      "Package": "translation",
+      "PackagePath": "pkg/translation",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/translation/jsonld_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestParseRDFXMLClasses",
+      "Package": "translation",
+      "PackagePath": "pkg/translation",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/translation/rdf_xml_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestRDFOWLTranslator_Translate_RDFXML_ProducesDomainRegistry",
+      "Package": "translation",
+      "PackagePath": "pkg/translation",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/translation/rdf_xml_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestLocalNameFromRDFAbout",
+      "Package": "translation",
+      "PackagePath": "pkg/translation",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/translation/rdf_xml_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestRegistry_GetAndTranslate",
+      "Package": "translation",
+      "PackagePath": "pkg/translation",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/translation/registry_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestParseTurtleClasses",
+      "Package": "translation",
+      "PackagePath": "pkg/translation",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/translation/turtle_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestRDFOWLTranslator_Translate_ProducesDomainRegistry",
+      "Package": "translation",
+      "PackagePath": "pkg/translation",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/translation/turtle_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

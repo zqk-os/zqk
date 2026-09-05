@@ -1,0 +1,151 @@
+
+--- run 2026-09-04T21:39:58Z ---
+=== RUN   TestValidateAgentRegistrationWithClientInfo
+=== PAUSE TestValidateAgentRegistrationWithClientInfo
+=== RUN   TestIsHumanClient
+=== PAUSE TestIsHumanClient
+=== RUN   TestEnforceAgentRegistry
+=== PAUSE TestEnforceAgentRegistry
+=== RUN   TestGetExpectedProfile
+=== PAUSE TestGetExpectedProfile
+=== RUN   TestIsTrustedLoopbackAdapterExactMatchOnly
+=== PAUSE TestIsTrustedLoopbackAdapterExactMatchOnly
+=== RUN   TestAsyncHandler_LifetimeCounters
+=== PAUSE TestAsyncHandler_LifetimeCounters
+=== RUN   TestAsyncHandler_CapacityLimit
+=== PAUSE TestAsyncHandler_CapacityLimit
+=== RUN   TestHasPermission_UnannotatedFailClosed
+=== PAUSE TestHasPermission_UnannotatedFailClosed
+=== RUN   TestPrivilegeFiltering_ReadOnlyCommands
+=== PAUSE TestPrivilegeFiltering_ReadOnlyCommands
+=== RUN   TestPrivilegeFiltering_WritePermissions
+=== PAUSE TestPrivilegeFiltering_WritePermissions
+=== CONT  TestValidateAgentRegistrationWithClientInfo
+=== CONT  TestAsyncHandler_LifetimeCounters
+=== RUN   TestValidateAgentRegistrationWithClientInfo/nil_config_allows_all
+=== RUN   TestValidateAgentRegistrationWithClientInfo/empty_registry_allows_all
+=== RUN   TestValidateAgentRegistrationWithClientInfo/found_by_account_id
+=== RUN   TestValidateAgentRegistrationWithClientInfo/found_by_client_id_when_account_id_not_found
+=== RUN   TestValidateAgentRegistrationWithClientInfo/require_account_id_rejects_non-human_client_without_account_id
+=== RUN   TestValidateAgentRegistrationWithClientInfo/require_account_id_allows_human_client_without_account_id
+=== RUN   TestValidateAgentRegistrationWithClientInfo/unregistered_agent_allowed_when_not_in_registry
+--- PASS: TestValidateAgentRegistrationWithClientInfo (0.00s)
+    --- PASS: TestValidateAgentRegistrationWithClientInfo/nil_config_allows_all (0.00s)
+    --- PASS: TestValidateAgentRegistrationWithClientInfo/empty_registry_allows_all (0.00s)
+    --- PASS: TestValidateAgentRegistrationWithClientInfo/found_by_account_id (0.00s)
+    --- PASS: TestValidateAgentRegistrationWithClientInfo/found_by_client_id_when_account_id_not_found (0.00s)
+    --- PASS: TestValidateAgentRegistrationWithClientInfo/require_account_id_rejects_non-human_client_without_account_id (0.00s)
+    --- PASS: TestValidateAgentRegistrationWithClientInfo/require_account_id_allows_human_client_without_account_id (0.00s)
+    --- PASS: TestValidateAgentRegistrationWithClientInfo/unregistered_agent_allowed_when_not_in_registry (0.00s)
+=== CONT  TestIsTrustedLoopbackAdapterExactMatchOnly
+--- PASS: TestIsTrustedLoopbackAdapterExactMatchOnly (0.00s)
+=== CONT  TestGetExpectedProfile
+=== RUN   TestGetExpectedProfile/explicit_profile_in_registry
+=== RUN   TestGetExpectedProfile/admin_role_maps_to_mcp
+=== RUN   TestGetExpectedProfile/founder_role_maps_to_mcp
+=== RUN   TestGetExpectedProfile/executive_role_maps_to_ai-agent
+=== RUN   TestGetExpectedProfile/owner_role_maps_to_ai-agent
+=== RUN   TestGetExpectedProfile/developer_role_maps_to_ai-agent
+=== RUN   TestGetExpectedProfile/viewer_role_maps_to_ai-agent
+=== RUN   TestGetExpectedProfile/observer_agent_role_maps_to_ai-agent
+=== RUN   TestGetExpectedProfile/test_agent_role_maps_to_ai-agent
+=== RUN   TestGetExpectedProfile/coder_agent_role_maps_to_ai-agent
+=== RUN   TestGetExpectedProfile/collective_role_maps_to_ai-agent
+=== RUN   TestGetExpectedProfile/case_insensitive_role_matching
+=== RUN   TestGetExpectedProfile/multiple_roles_-_first_match_wins
+=== RUN   TestGetExpectedProfile/unknown_role_uses_default_profile
+=== RUN   TestGetExpectedProfile/unknown_role_no_default_uses_ai-agent
+=== RUN   TestGetExpectedProfile/empty_roles_uses_default_profile
+=== RUN   TestGetExpectedProfile/nil_roles_uses_default_profile
+=== RUN   TestGetExpectedProfile/explicit_profile_overrides_role_mapping
+--- PASS: TestGetExpectedProfile (0.00s)
+    --- PASS: TestGetExpectedProfile/explicit_profile_in_registry (0.00s)
+    --- PASS: TestGetExpectedProfile/admin_role_maps_to_mcp (0.00s)
+    --- PASS: TestGetExpectedProfile/founder_role_maps_to_mcp (0.00s)
+    --- PASS: TestGetExpectedProfile/executive_role_maps_to_ai-agent (0.00s)
+    --- PASS: TestGetExpectedProfile/owner_role_maps_to_ai-agent (0.00s)
+    --- PASS: TestGetExpectedProfile/developer_role_maps_to_ai-agent (0.00s)
+    --- PASS: TestGetExpectedProfile/viewer_role_maps_to_ai-agent (0.00s)
+    --- PASS: TestGetExpectedProfile/observer_agent_role_maps_to_ai-agent (0.00s)
+    --- PASS: TestGetExpectedProfile/test_agent_role_maps_to_ai-agent (0.00s)
+    --- PASS: TestGetExpectedProfile/coder_agent_role_maps_to_ai-agent (0.00s)
+    --- PASS: TestGetExpectedProfile/collective_role_maps_to_ai-agent (0.00s)
+    --- PASS: TestGetExpectedProfile/case_insensitive_role_matching (0.00s)
+    --- PASS: TestGetExpectedProfile/multiple_roles_-_first_match_wins (0.00s)
+    --- PASS: TestGetExpectedProfile/unknown_role_uses_default_profile (0.00s)
+    --- PASS: TestGetExpectedProfile/unknown_role_no_default_uses_ai-agent (0.00s)
+    --- PASS: TestGetExpectedProfile/empty_roles_uses_default_profile (0.00s)
+    --- PASS: TestGetExpectedProfile/nil_roles_uses_default_profile (0.00s)
+    --- PASS: TestGetExpectedProfile/explicit_profile_overrides_role_mapping (0.00s)
+=== CONT  TestEnforceAgentRegistry
+=== RUN   TestEnforceAgentRegistry/nil_agentConfig_returns_original
+=== RUN   TestEnforceAgentRegistry/enforce_account_id
+=== RUN   TestEnforceAgentRegistry/enforce_roles
+=== RUN   TestEnforceAgentRegistry/enforce_both_account_id_and_roles
+=== RUN   TestEnforceAgentRegistry/override_existing_account_id
+=== RUN   TestEnforceAgentRegistry/override_existing_roles
+=== RUN   TestEnforceAgentRegistry/empty_roles_slice
+--- PASS: TestEnforceAgentRegistry (0.00s)
+    --- PASS: TestEnforceAgentRegistry/nil_agentConfig_returns_original (0.00s)
+    --- PASS: TestEnforceAgentRegistry/enforce_account_id (0.00s)
+    --- PASS: TestEnforceAgentRegistry/enforce_roles (0.00s)
+    --- PASS: TestEnforceAgentRegistry/enforce_both_account_id_and_roles (0.00s)
+    --- PASS: TestEnforceAgentRegistry/override_existing_account_id (0.00s)
+    --- PASS: TestEnforceAgentRegistry/override_existing_roles (0.00s)
+    --- PASS: TestEnforceAgentRegistry/empty_roles_slice (0.00s)
+=== CONT  TestIsHumanClient
+=== RUN   TestIsHumanClient/ide-seat-01_in_name
+=== RUN   TestIsHumanClient/ide-seat-01_in_id
+=== RUN   TestIsHumanClient/vscode_in_name
+=== RUN   TestIsHumanClient/ide_in_name
+=== RUN   TestIsHumanClient/code_in_name
+=== RUN   TestIsHumanClient/neovim_in_name
+=== RUN   TestIsHumanClient/vim_in_name
+=== RUN   TestIsHumanClient/emacs_in_name
+=== RUN   TestIsHumanClient/intellij_in_name
+=== RUN   TestIsHumanClient/idea_in_name
+=== RUN   TestIsHumanClient/sublime_in_name
+=== RUN   TestIsHumanClient/atom_in_name
+=== RUN   TestIsHumanClient/case_insensitive_-_IDE-SEAT
+=== RUN   TestIsHumanClient/case_insensitive_-_IDE-VSCode
+=== RUN   TestIsHumanClient/partial_match_-_my-ide-editor
+=== RUN   TestIsHumanClient/ai_agent_not_human
+=== RUN   TestIsHumanClient/unknown_client_not_human
+=== RUN   TestIsHumanClient/empty_strings_not_human
+--- PASS: TestIsHumanClient (0.00s)
+    --- PASS: TestIsHumanClient/ide-seat-01_in_name (0.00s)
+    --- PASS: TestIsHumanClient/ide-seat-01_in_id (0.00s)
+    --- PASS: TestIsHumanClient/vscode_in_name (0.00s)
+    --- PASS: TestIsHumanClient/ide_in_name (0.00s)
+    --- PASS: TestIsHumanClient/code_in_name (0.00s)
+    --- PASS: TestIsHumanClient/neovim_in_name (0.00s)
+    --- PASS: TestIsHumanClient/vim_in_name (0.00s)
+    --- PASS: TestIsHumanClient/emacs_in_name (0.00s)
+    --- PASS: TestIsHumanClient/intellij_in_name (0.00s)
+    --- PASS: TestIsHumanClient/idea_in_name (0.00s)
+    --- PASS: TestIsHumanClient/sublime_in_name (0.00s)
+    --- PASS: TestIsHumanClient/atom_in_name (0.00s)
+    --- PASS: TestIsHumanClient/case_insensitive_-_IDE-SEAT (0.00s)
+    --- PASS: TestIsHumanClient/case_insensitive_-_IDE-VSCode (0.00s)
+    --- PASS: TestIsHumanClient/partial_match_-_my-ide-editor (0.00s)
+    --- PASS: TestIsHumanClient/ai_agent_not_human (0.00s)
+    --- PASS: TestIsHumanClient/unknown_client_not_human (0.00s)
+    --- PASS: TestIsHumanClient/empty_strings_not_human (0.00s)
+=== CONT  TestPrivilegeFiltering_ReadOnlyCommands
+    cli_bridge_privilege_test.go:44: read-only user should be able to see 'object list' command. Filtered commands: []
+--- FAIL: TestPrivilegeFiltering_ReadOnlyCommands (0.00s)
+=== CONT  TestPrivilegeFiltering_WritePermissions
+    cli_bridge_privilege_test.go:95: user with write permissions should be able to see 'object list' command
+    cli_bridge_privilege_test.go:108: user with write permissions should be able to see 'object create' command
+--- FAIL: TestPrivilegeFiltering_WritePermissions (0.00s)
+=== CONT  TestHasPermission_UnannotatedFailClosed
+--- PASS: TestHasPermission_UnannotatedFailClosed (0.00s)
+=== CONT  TestAsyncHandler_CapacityLimit
+--- PASS: TestAsyncHandler_LifetimeCounters (0.05s)
+--- PASS: TestAsyncHandler_CapacityLimit (0.10s)
+FAIL
+FAIL	github.com/lanceman/zqk/pkg/mcp	0.902s
+FAIL
+
+
+--- run 2026-09-04T21:39:58Z ---

@@ -1,0 +1,19 @@
+{
+  "title": "CAP Loop Stuck — Agent Recovery Failed",
+  "severity": "critical",
+  "timestamp": "2026-09-05T01:50:00Z",
+  "issues": [
+    "cap_native_continuation failed: pending verification task ATK-1788429980944413000-64d67e14 has no durable commit evidence"
+  ],
+  "context": {
+    "consecutive_failures": 14,
+    "last_error": "pending verification task ATK-1788429980944413000-64d67e14 has no durable commit evidence",
+    "last_stage": "cap_native_continuation"
+  },
+  "suggested_actions": [
+    "zqk scheduler status",
+    "cat .zqk/state/cap_failure_tracker.json",
+    "cat .zqk/state/cap_review_result.json",
+    "go test ./pkg/scheduler/..."
+  ]
+}

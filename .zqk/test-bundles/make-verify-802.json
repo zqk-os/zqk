@@ -1,0 +1,159 @@
+{
+  "name": "make-verify-802",
+  "created_at": "2026-09-04T21:34:35.28383Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-802",
+    "Tests": [
+      {
+        "Name": "TestRegisterStatusAlias",
+        "Package": "objects",
+        "PackagePath": "pkg/objects",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/objects/status_normalize_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestStatusesForRole_agreesWithForwardRoleLookup",
+        "Package": "objects",
+        "PackagePath": "pkg/objects",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/objects/status_role_correspondence_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestTerminalFlagAndTerminalRoleAgree",
+        "Package": "objects",
+        "PackagePath": "pkg/objects",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/objects/terminal_flag_role_correspondence_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestTerminalFlagIsNotAboutOutgoingTransitions",
+        "Package": "objects",
+        "PackagePath": "pkg/objects",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/objects/terminal_flag_role_correspondence_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestLookupTraitRegistryIsShared",
+        "Package": "objects",
+        "PackagePath": "pkg/objects",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/objects/trait_lookup_shared_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestKindHasTraitConcurrentReads",
+        "Package": "objects",
+        "PackagePath": "pkg/objects",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/objects/trait_lookup_shared_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestKindHasTraitDoesNotRebuildRegistryPerCall",
+        "Package": "objects",
+        "PackagePath": "pkg/objects",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/objects/trait_lookup_shared_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestKindHasTraitStableAcrossCalls",
+        "Package": "objects",
+        "PackagePath": "pkg/objects",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/objects/trait_lookup_shared_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 240000000000,
+    "PackagePath": "pkg/objects"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestRegisterStatusAlias",
+      "Package": "objects",
+      "PackagePath": "pkg/objects",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/objects/status_normalize_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestStatusesForRole_agreesWithForwardRoleLookup",
+      "Package": "objects",
+      "PackagePath": "pkg/objects",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/objects/status_role_correspondence_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestTerminalFlagAndTerminalRoleAgree",
+      "Package": "objects",
+      "PackagePath": "pkg/objects",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/objects/terminal_flag_role_correspondence_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestTerminalFlagIsNotAboutOutgoingTransitions",
+      "Package": "objects",
+      "PackagePath": "pkg/objects",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/objects/terminal_flag_role_correspondence_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestLookupTraitRegistryIsShared",
+      "Package": "objects",
+      "PackagePath": "pkg/objects",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/objects/trait_lookup_shared_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestKindHasTraitConcurrentReads",
+      "Package": "objects",
+      "PackagePath": "pkg/objects",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/objects/trait_lookup_shared_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestKindHasTraitDoesNotRebuildRegistryPerCall",
+      "Package": "objects",
+      "PackagePath": "pkg/objects",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/objects/trait_lookup_shared_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestKindHasTraitStableAcrossCalls",
+      "Package": "objects",
+      "PackagePath": "pkg/objects",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/objects/trait_lookup_shared_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

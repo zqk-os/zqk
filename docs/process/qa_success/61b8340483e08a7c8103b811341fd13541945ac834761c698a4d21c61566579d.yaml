@@ -1,0 +1,14 @@
+created_at: "2026-08-19T00:28:45Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1787099325215045000-d22814fd
+item_id: CRIT-CEF-R2-SUP-SBOM-A
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 2857702ca28e4b64fb5782140b43c1400e68fdeab30ab0062f4119523ca97d466e5f13c72adcfa41b92eacf21fa7f0a79b8a8e3a8d7c581e5c9afe0e69cb31dc
+schema_version: 2.0.0
+signature: 30440220622ba0ee48f9167a0ae857d87861c0ca07ffd66ace45bf1f8db717df3d6c2c430220669df2297d28528de64abd4c0fa84304590bc91e38f07e0b75ced959e2029aa7
+status: archived
+title: 'Accept: SBOM generation and dependency review path'
+updated_at: "2026-09-01T07:16:32Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

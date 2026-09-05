@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-440",
+  "created_at": "2026-09-04T21:34:31.674339Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-440",
+    "Tests": [
+      {
+        "Name": "TestBudget_Reserve_Release",
+        "Package": "goroutinelabels",
+        "PackagePath": "pkg/goroutinelabels",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/goroutinelabels/budget_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestBudget_Reserve_Exceeded",
+        "Package": "goroutinelabels",
+        "PackagePath": "pkg/goroutinelabels",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/goroutinelabels/budget_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestBudget_Reserve_ExactThenExceed",
+        "Package": "goroutinelabels",
+        "PackagePath": "pkg/goroutinelabels",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/goroutinelabels/budget_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestBudget_Unbounded",
+        "Package": "goroutinelabels",
+        "PackagePath": "pkg/goroutinelabels",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/goroutinelabels/budget_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestBudget_Release_Idempotent",
+        "Package": "goroutinelabels",
+        "PackagePath": "pkg/goroutinelabels",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/goroutinelabels/budget_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestBudget_Reserve_ZeroOrNegative",
+        "Package": "goroutinelabels",
+        "PackagePath": "pkg/goroutinelabels",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/goroutinelabels/budget_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestBudget_MaxTotal",
+        "Package": "goroutinelabels",
+        "PackagePath": "pkg/goroutinelabels",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/goroutinelabels/budget_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestBudget_ConcurrentReserveRelease",
+        "Package": "goroutinelabels",
+        "PackagePath": "pkg/goroutinelabels",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/goroutinelabels/budget_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestGoroutineBuilder_StartSimple",
+        "Package": "goroutinelabels",
+        "PackagePath": "pkg/goroutinelabels",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/goroutinelabels/builder_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestGoroutineBuilder_StartWithError",
+        "Package": "goroutinelabels",
+        "PackagePath": "pkg/goroutinelabels",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/goroutinelabels/builder_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": true,
+    "EstimatedDuration": 300000000000,
+    "PackagePath": "pkg/goroutinelabels"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestBudget_Reserve_Release",
+      "Package": "goroutinelabels",
+      "PackagePath": "pkg/goroutinelabels",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/goroutinelabels/budget_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestBudget_Reserve_Exceeded",
+      "Package": "goroutinelabels",
+      "PackagePath": "pkg/goroutinelabels",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/goroutinelabels/budget_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestBudget_Reserve_ExactThenExceed",
+      "Package": "goroutinelabels",
+      "PackagePath": "pkg/goroutinelabels",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/goroutinelabels/budget_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestBudget_Unbounded",
+      "Package": "goroutinelabels",
+      "PackagePath": "pkg/goroutinelabels",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/goroutinelabels/budget_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestBudget_Release_Idempotent",
+      "Package": "goroutinelabels",
+      "PackagePath": "pkg/goroutinelabels",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/goroutinelabels/budget_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestBudget_Reserve_ZeroOrNegative",
+      "Package": "goroutinelabels",
+      "PackagePath": "pkg/goroutinelabels",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/goroutinelabels/budget_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestBudget_MaxTotal",
+      "Package": "goroutinelabels",
+      "PackagePath": "pkg/goroutinelabels",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/goroutinelabels/budget_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestBudget_ConcurrentReserveRelease",
+      "Package": "goroutinelabels",
+      "PackagePath": "pkg/goroutinelabels",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/goroutinelabels/budget_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestGoroutineBuilder_StartSimple",
+      "Package": "goroutinelabels",
+      "PackagePath": "pkg/goroutinelabels",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/goroutinelabels/builder_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestGoroutineBuilder_StartWithError",
+      "Package": "goroutinelabels",
+      "PackagePath": "pkg/goroutinelabels",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/goroutinelabels/builder_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

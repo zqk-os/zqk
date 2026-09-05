@@ -1,0 +1,47 @@
+
+--- run 2026-09-04T22:22:26Z ---
+=== RUN   TestExpectedObjectGetMiss
+=== PAUSE TestExpectedObjectGetMiss
+=== RUN   TestCoordinatorOperationCallback_OnStart
+=== PAUSE TestCoordinatorOperationCallback_OnStart
+=== RUN   TestCoordinatorOperationCallback_OnProgress
+=== PAUSE TestCoordinatorOperationCallback_OnProgress
+=== RUN   TestCoordinatorOperationCallback_OnComplete
+=== PAUSE TestCoordinatorOperationCallback_OnComplete
+=== RUN   TestCoordinatorOperationCallback_OnError
+=== PAUSE TestCoordinatorOperationCallback_OnError
+=== RUN   TestCoordinatorOperationCallback_OnCancel
+=== PAUSE TestCoordinatorOperationCallback_OnCancel
+=== RUN   TestCoordinatorOperationCallback_NoStorageProvider
+=== PAUSE TestCoordinatorOperationCallback_NoStorageProvider
+=== RUN   TestCoordinatorOperationCallback_NoProjectRoot
+=== PAUSE TestCoordinatorOperationCallback_NoProjectRoot
+=== RUN   TestUnifiedMetricsCollector_Integration
+=== PAUSE TestUnifiedMetricsCollector_Integration
+=== RUN   TestUnifiedMetricsCollector_EventEmission
+=== PAUSE TestUnifiedMetricsCollector_EventEmission
+=== CONT  TestExpectedObjectGetMiss
+=== CONT  TestCoordinatorOperationCallback_OnCancel
+--- PASS: TestExpectedObjectGetMiss (0.00s)
+=== CONT  TestCoordinatorOperationCallback_OnError
+--- PASS: TestCoordinatorOperationCallback_OnCancel (0.61s)
+--- PASS: TestCoordinatorOperationCallback_OnError (0.61s)
+=== CONT  TestCoordinatorOperationCallback_OnComplete
+=== CONT  TestCoordinatorOperationCallback_OnProgress
+--- PASS: TestCoordinatorOperationCallback_OnProgress (0.60s)
+=== CONT  TestCoordinatorOperationCallback_OnStart
+--- PASS: TestCoordinatorOperationCallback_OnComplete (0.60s)
+=== CONT  TestUnifiedMetricsCollector_Integration
+--- PASS: TestCoordinatorOperationCallback_OnStart (0.50s)
+=== CONT  TestUnifiedMetricsCollector_EventEmission
+=== NAME  TestUnifiedMetricsCollector_Integration
+    unified_metrics_collector_integration_test.go:101: Some metrics collection failed (expected in some cases): some metrics collection failed: [failed to collect file lock metrics: failed to create file lock metric: status "completed" not found in lifecycle for kind "file_lock_metric": lifecycle status unknown]
+    unified_metrics_collector_integration_test.go:110: Collected 2 metric IDs: [CMD-1788560550769744000 CMD-1788560550818055000]
+--- PASS: TestUnifiedMetricsCollector_Integration (0.68s)
+=== CONT  TestCoordinatorOperationCallback_NoProjectRoot
+--- PASS: TestCoordinatorOperationCallback_NoProjectRoot (0.30s)
+=== CONT  TestCoordinatorOperationCallback_NoStorageProvider
+--- PASS: TestCoordinatorOperationCallback_NoStorageProvider (0.00s)
+--- PASS: TestUnifiedMetricsCollector_EventEmission (1.33s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/coordination	3.578s

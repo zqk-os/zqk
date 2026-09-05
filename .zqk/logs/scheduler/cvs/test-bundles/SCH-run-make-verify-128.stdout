@@ -1,0 +1,136 @@
+
+--- run 2026-09-04T21:39:26Z ---
+=== RUN   TestGoValidator_evaluateDynamicRule
+=== PAUSE TestGoValidator_evaluateDynamicRule
+=== RUN   TestGoValidator_applySpecDefaults_IgnoresChecklistProse
+=== PAUSE TestGoValidator_applySpecDefaults_IgnoresChecklistProse
+=== RUN   TestIDValidator_ValidateID
+=== PAUSE TestIDValidator_ValidateID
+=== RUN   TestIDValidator_InferKindFromID
+=== PAUSE TestIDValidator_InferKindFromID
+=== RUN   TestIDValidator_InferKindFromID_LongestPrefix
+=== PAUSE TestIDValidator_InferKindFromID_LongestPrefix
+=== RUN   TestIDValidator_InferKindFromID_DefaultPolicy
+=== PAUSE TestIDValidator_InferKindFromID_DefaultPolicy
+=== RUN   TestIDPrefixesConfigYAML_policyIncludesDefault
+=== PAUSE TestIDPrefixesConfigYAML_policyIncludesDefault
+=== RUN   TestIDValidator_GetValidPrefixes
+=== PAUSE TestIDValidator_GetValidPrefixes
+=== RUN   TestIDValidator_AuditAggregationMetric
+=== PAUSE TestIDValidator_AuditAggregationMetric
+=== RUN   TestParseGraphSpecNode
+=== PAUSE TestParseGraphSpecNode
+=== CONT  TestGoValidator_evaluateDynamicRule
+=== CONT  TestIDValidator_InferKindFromID_DefaultPolicy
+=== RUN   TestGoValidator_evaluateDynamicRule/field_presence_rule_matches_and_fails
+=== RUN   TestGoValidator_evaluateDynamicRule/field_presence_rule_passes_when_field_is_set
+=== RUN   TestGoValidator_evaluateDynamicRule/active_reference_rule_fails_on_non-active_ref
+--- PASS: TestGoValidator_evaluateDynamicRule (0.00s)
+    --- PASS: TestGoValidator_evaluateDynamicRule/field_presence_rule_matches_and_fails (0.00s)
+    --- PASS: TestGoValidator_evaluateDynamicRule/field_presence_rule_passes_when_field_is_set (0.00s)
+    --- PASS: TestGoValidator_evaluateDynamicRule/active_reference_rule_fails_on_non-active_ref (0.00s)
+=== CONT  TestIDValidator_AuditAggregationMetric
+=== CONT  TestParseGraphSpecNode
+--- PASS: TestIDValidator_InferKindFromID_DefaultPolicy (0.18s)
+=== RUN   TestParseGraphSpecNode/node_with_ontology_property
+=== RUN   TestParseGraphSpecNode/node_with_kind_property_(fallback)
+=== RUN   TestParseGraphSpecNode/node_with_type_property_(fallback)
+=== RUN   TestParseGraphSpecNode/node_with_id_template
+=== RUN   TestParseGraphSpecNode/node_with_id_prefixes
+=== RUN   TestParseGraphSpecNode/node_with_nested_pattern
+=== RUN   TestParseGraphSpecNode/node_with_empty_ontology
+=== RUN   TestParseGraphSpecNode/node_without_ontology/kind/type
+=== RUN   TestParseGraphSpecNode/node_with_empty_properties
+=== RUN   TestParseGraphSpecNode/node_with_id_prefixes_containing_non-strings
+--- PASS: TestParseGraphSpecNode (0.00s)
+    --- PASS: TestParseGraphSpecNode/node_with_ontology_property (0.00s)
+    --- PASS: TestParseGraphSpecNode/node_with_kind_property_(fallback) (0.00s)
+    --- PASS: TestParseGraphSpecNode/node_with_type_property_(fallback) (0.00s)
+    --- PASS: TestParseGraphSpecNode/node_with_id_template (0.00s)
+    --- PASS: TestParseGraphSpecNode/node_with_id_prefixes (0.00s)
+    --- PASS: TestParseGraphSpecNode/node_with_nested_pattern (0.00s)
+    --- PASS: TestParseGraphSpecNode/node_with_empty_ontology (0.00s)
+    --- PASS: TestParseGraphSpecNode/node_without_ontology/kind/type (0.00s)
+    --- PASS: TestParseGraphSpecNode/node_with_empty_properties (0.00s)
+    --- PASS: TestParseGraphSpecNode/node_with_id_prefixes_containing_non-strings (0.00s)
+=== CONT  TestIDValidator_InferKindFromID
+--- PASS: TestIDValidator_AuditAggregationMetric (0.18s)
+=== CONT  TestIDValidator_InferKindFromID_LongestPrefix
+=== RUN   TestIDValidator_InferKindFromID/BLI-001
+=== RUN   TestIDValidator_InferKindFromID/MIL-001
+=== RUN   TestIDValidator_InferKindFromID/GOAL-123
+=== RUN   TestIDValidator_InferKindFromID/PRI-208
+=== RUN   TestIDValidator_InferKindFromID/PRIO-002
+=== RUN   TestIDValidator_InferKindFromID/REQ-016
+=== RUN   TestIDValidator_InferKindFromID/REQU-001
+=== RUN   TestIDValidator_InferKindFromID/TEST-011
+=== RUN   TestIDValidator_InferKindFromID/CRIT-8193
+=== RUN   TestIDValidator_InferKindFromID/UNKNOWN-001
+--- PASS: TestIDValidator_InferKindFromID (0.11s)
+    --- PASS: TestIDValidator_InferKindFromID/BLI-001 (0.00s)
+    --- PASS: TestIDValidator_InferKindFromID/MIL-001 (0.00s)
+    --- PASS: TestIDValidator_InferKindFromID/GOAL-123 (0.00s)
+    --- PASS: TestIDValidator_InferKindFromID/PRI-208 (0.00s)
+    --- PASS: TestIDValidator_InferKindFromID/PRIO-002 (0.00s)
+    --- PASS: TestIDValidator_InferKindFromID/REQ-016 (0.00s)
+    --- PASS: TestIDValidator_InferKindFromID/REQU-001 (0.00s)
+    --- PASS: TestIDValidator_InferKindFromID/TEST-011 (0.00s)
+    --- PASS: TestIDValidator_InferKindFromID/CRIT-8193 (0.00s)
+    --- PASS: TestIDValidator_InferKindFromID/UNKNOWN-001 (0.00s)
+=== CONT  TestIDValidator_GetValidPrefixes
+=== RUN   TestIDValidator_InferKindFromID_LongestPrefix/NAMESPACE-REGISTRY-001
+=== RUN   TestIDValidator_InferKindFromID_LongestPrefix/NAMESPACE-001
+=== RUN   TestIDValidator_InferKindFromID_LongestPrefix/NAM-001
+=== RUN   TestIDValidator_InferKindFromID_LongestPrefix/NSR-001
+--- PASS: TestIDValidator_InferKindFromID_LongestPrefix (0.11s)
+    --- PASS: TestIDValidator_InferKindFromID_LongestPrefix/NAMESPACE-REGISTRY-001 (0.00s)
+    --- PASS: TestIDValidator_InferKindFromID_LongestPrefix/NAMESPACE-001 (0.00s)
+    --- PASS: TestIDValidator_InferKindFromID_LongestPrefix/NAM-001 (0.00s)
+    --- PASS: TestIDValidator_InferKindFromID_LongestPrefix/NSR-001 (0.00s)
+=== CONT  TestIDValidator_ValidateID
+=== RUN   TestIDValidator_GetValidPrefixes/backlog_item
+=== RUN   TestIDValidator_GetValidPrefixes/priority_plan
+=== RUN   TestIDValidator_GetValidPrefixes/requirement
+=== RUN   TestIDValidator_GetValidPrefixes/audit_aggregation_metric
+=== RUN   TestIDValidator_GetValidPrefixes/unknown_kind
+--- PASS: TestIDValidator_GetValidPrefixes (0.15s)
+    --- PASS: TestIDValidator_GetValidPrefixes/backlog_item (0.00s)
+    --- PASS: TestIDValidator_GetValidPrefixes/priority_plan (0.00s)
+    --- PASS: TestIDValidator_GetValidPrefixes/requirement (0.00s)
+    --- PASS: TestIDValidator_GetValidPrefixes/audit_aggregation_metric (0.00s)
+    --- PASS: TestIDValidator_GetValidPrefixes/unknown_kind (0.00s)
+=== CONT  TestIDPrefixesConfigYAML_policyIncludesDefault
+--- PASS: TestIDPrefixesConfigYAML_policyIncludesDefault (0.00s)
+=== CONT  TestGoValidator_applySpecDefaults_IgnoresChecklistProse
+--- PASS: TestGoValidator_applySpecDefaults_IgnoresChecklistProse (0.00s)
+=== RUN   TestIDValidator_ValidateID/BLI-001_backlog_item
+=== RUN   TestIDValidator_ValidateID/BLI-123_backlog_item
+=== RUN   TestIDValidator_ValidateID/MIL-001_milestone
+=== RUN   TestIDValidator_ValidateID/GOAL-123_goal
+=== RUN   TestIDValidator_ValidateID/PRI-208_priority_plan
+=== RUN   TestIDValidator_ValidateID/PRIO-002_priority_plan
+=== RUN   TestIDValidator_ValidateID/REQ-016_requirement
+=== RUN   TestIDValidator_ValidateID/REQU-001_requirement
+=== RUN   TestIDValidator_ValidateID/TEST-011_test_case
+=== RUN   TestIDValidator_ValidateID/CRIT-8193_criteria
+=== RUN   TestIDValidator_ValidateID/INVALID-001_backlog_item
+=== RUN   TestIDValidator_ValidateID/BLI-001_milestone
+=== RUN   TestIDValidator_ValidateID/UNKNOWN-001_unknown_kind
+=== RUN   TestIDValidator_ValidateID/xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx_backlog_item
+--- PASS: TestIDValidator_ValidateID (0.15s)
+    --- PASS: TestIDValidator_ValidateID/BLI-001_backlog_item (0.00s)
+    --- PASS: TestIDValidator_ValidateID/BLI-123_backlog_item (0.00s)
+    --- PASS: TestIDValidator_ValidateID/MIL-001_milestone (0.00s)
+    --- PASS: TestIDValidator_ValidateID/GOAL-123_goal (0.00s)
+    --- PASS: TestIDValidator_ValidateID/PRI-208_priority_plan (0.00s)
+    --- PASS: TestIDValidator_ValidateID/PRIO-002_priority_plan (0.00s)
+    --- PASS: TestIDValidator_ValidateID/REQ-016_requirement (0.00s)
+    --- PASS: TestIDValidator_ValidateID/REQU-001_requirement (0.00s)
+    --- PASS: TestIDValidator_ValidateID/TEST-011_test_case (0.00s)
+    --- PASS: TestIDValidator_ValidateID/CRIT-8193_criteria (0.00s)
+    --- PASS: TestIDValidator_ValidateID/INVALID-001_backlog_item (0.00s)
+    --- PASS: TestIDValidator_ValidateID/BLI-001_milestone (0.00s)
+    --- PASS: TestIDValidator_ValidateID/UNKNOWN-001_unknown_kind (0.00s)
+    --- PASS: TestIDValidator_ValidateID/xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx_backlog_item (0.00s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/validation	1.140s

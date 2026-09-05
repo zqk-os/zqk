@@ -1,0 +1,44 @@
+
+--- run 2026-09-04T22:11:16Z ---
+=== RUN   TestEngine_correlationFields_preferExplicitIdentity
+=== PAUSE TestEngine_correlationFields_preferExplicitIdentity
+=== RUN   TestPreserveToolSchemas
+=== PAUSE TestPreserveToolSchemas
+=== RUN   TestIsMutationEvidenceTool_acceptsChannelAndProductPrefixes
+=== PAUSE TestIsMutationEvidenceTool_acceptsChannelAndProductPrefixes
+=== RUN   TestToolNameAllowed_acceptsProductWriteWhenStableNameRequired
+=== PAUSE TestToolNameAllowed_acceptsProductWriteWhenStableNameRequired
+=== RUN   TestExtractHallucinatedToolCallsFromProseAndPrettyJSON
+=== PAUSE TestExtractHallucinatedToolCallsFromProseAndPrettyJSON
+=== RUN   TestRecoverMarkdownToolCalls_clearsContent
+=== PAUSE TestRecoverMarkdownToolCalls_clearsContent
+=== RUN   TestExtractHermesToolCalls
+=== PAUSE TestExtractHermesToolCalls
+=== RUN   TestFilterRecoveredToolCalls_dropsLookupWhileWritePinned
+=== PAUSE TestFilterRecoveredToolCalls_dropsLookupWhileWritePinned
+=== RUN   TestUnpaidLookupStreak
+=== PAUSE TestUnpaidLookupStreak
+=== RUN   TestFilterUnpaidLookupCalls
+=== PAUSE TestFilterUnpaidLookupCalls
+=== CONT  TestEngine_correlationFields_preferExplicitIdentity
+=== CONT  TestRecoverMarkdownToolCalls_clearsContent
+--- PASS: TestEngine_correlationFields_preferExplicitIdentity (0.00s)
+=== CONT  TestUnpaidLookupStreak
+--- PASS: TestUnpaidLookupStreak (0.00s)
+=== CONT  TestFilterUnpaidLookupCalls
+--- PASS: TestFilterUnpaidLookupCalls (0.00s)
+=== CONT  TestExtractHallucinatedToolCallsFromProseAndPrettyJSON
+--- PASS: TestRecoverMarkdownToolCalls_clearsContent (0.00s)
+--- PASS: TestExtractHallucinatedToolCallsFromProseAndPrettyJSON (0.00s)
+=== CONT  TestIsMutationEvidenceTool_acceptsChannelAndProductPrefixes
+=== CONT  TestToolNameAllowed_acceptsProductWriteWhenStableNameRequired
+=== CONT  TestPreserveToolSchemas
+=== CONT  TestExtractHermesToolCalls
+--- PASS: TestIsMutationEvidenceTool_acceptsChannelAndProductPrefixes (0.00s)
+--- PASS: TestToolNameAllowed_acceptsProductWriteWhenStableNameRequired (0.00s)
+--- PASS: TestPreserveToolSchemas (0.00s)
+=== CONT  TestFilterRecoveredToolCalls_dropsLookupWhileWritePinned
+--- PASS: TestFilterRecoveredToolCalls_dropsLookupWhileWritePinned (0.00s)
+--- PASS: TestExtractHermesToolCalls (0.00s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/swarm	0.674s

@@ -1,0 +1,44 @@
+
+--- run 2026-09-04T22:20:49Z ---
+=== RUN   TestPlanStageMembraneHop_BlockedHopFreezesTree
+=== PAUSE TestPlanStageMembraneHop_BlockedHopFreezesTree
+=== RUN   TestPlanStageMembraneHop_MissingOutboundRefBlocks
+=== PAUSE TestPlanStageMembraneHop_MissingOutboundRefBlocks
+=== RUN   TestPlanStageMembraneHop_PriorityPlanIncludesChildBLIs
+=== PAUSE TestPlanStageMembraneHop_PriorityPlanIncludesChildBLIs
+=== RUN   TestApplyStageMembraneHop_AllOrNamedImpediment
+=== PAUSE TestApplyStageMembraneHop_AllOrNamedImpediment
+=== RUN   TestPlanStageMembraneHop_PruneGoalCascadesBranchNotVision
+=== PAUSE TestPlanStageMembraneHop_PruneGoalCascadesBranchNotVision
+=== RUN   TestApplyStageMembraneHop_LineageRollupShowsCollapsedBranch
+=== PAUSE TestApplyStageMembraneHop_LineageRollupShowsCollapsedBranch
+=== RUN   TestApplyStageMembraneHop_WriteFailureNamesImpediment
+=== PAUSE TestApplyStageMembraneHop_WriteFailureNamesImpediment
+=== RUN   TestPlanStageMembraneHop_PrunePRIStopsAtWorkstream
+=== PAUSE TestPlanStageMembraneHop_PrunePRIStopsAtWorkstream
+=== RUN   TestPlanStageMembraneHop_SharedWorkstreamBlocksLivePRI
+=== PAUSE TestPlanStageMembraneHop_SharedWorkstreamBlocksLivePRI
+=== RUN   TestPlanStageMembraneHop_SharedWorkstreamArchivesLaneNotBLIs
+=== PAUSE TestPlanStageMembraneHop_SharedWorkstreamArchivesLaneNotBLIs
+=== CONT  TestPlanStageMembraneHop_BlockedHopFreezesTree
+=== CONT  TestApplyStageMembraneHop_LineageRollupShowsCollapsedBranch
+--- PASS: TestPlanStageMembraneHop_BlockedHopFreezesTree (0.00s)
+=== CONT  TestApplyStageMembraneHop_AllOrNamedImpediment
+--- PASS: TestApplyStageMembraneHop_AllOrNamedImpediment (0.00s)
+--- PASS: TestApplyStageMembraneHop_LineageRollupShowsCollapsedBranch (0.00s)
+=== CONT  TestPlanStageMembraneHop_PruneGoalCascadesBranchNotVision
+--- PASS: TestPlanStageMembraneHop_PruneGoalCascadesBranchNotVision (0.00s)
+=== CONT  TestPlanStageMembraneHop_SharedWorkstreamBlocksLivePRI
+=== CONT  TestPlanStageMembraneHop_PriorityPlanIncludesChildBLIs
+=== CONT  TestPlanStageMembraneHop_PrunePRIStopsAtWorkstream
+--- PASS: TestPlanStageMembraneHop_SharedWorkstreamBlocksLivePRI (0.00s)
+--- PASS: TestPlanStageMembraneHop_PriorityPlanIncludesChildBLIs (0.00s)
+--- PASS: TestPlanStageMembraneHop_PrunePRIStopsAtWorkstream (0.00s)
+=== CONT  TestPlanStageMembraneHop_SharedWorkstreamArchivesLaneNotBLIs
+--- PASS: TestPlanStageMembraneHop_SharedWorkstreamArchivesLaneNotBLIs (0.00s)
+=== CONT  TestPlanStageMembraneHop_MissingOutboundRefBlocks
+--- PASS: TestPlanStageMembraneHop_MissingOutboundRefBlocks (0.00s)
+=== CONT  TestApplyStageMembraneHop_WriteFailureNamesImpediment
+--- PASS: TestApplyStageMembraneHop_WriteFailureNamesImpediment (0.00s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/lifecycle	0.520s

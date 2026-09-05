@@ -1,0 +1,52 @@
+
+--- run 2026-09-04T22:13:56Z ---
+=== RUN   TestParseFieldsFlags
+=== PAUSE TestParseFieldsFlags
+=== RUN   TestParseFieldsFlags_DefaultFormat
+=== PAUSE TestParseFieldsFlags_DefaultFormat
+=== RUN   TestFormatKindFieldsSegregatedTable
+=== PAUSE TestFormatKindFieldsSegregatedTable
+=== RUN   TestFormatKindFieldsSegregatedJSON
+=== PAUSE TestFormatKindFieldsSegregatedJSON
+=== RUN   TestKindFieldsSegregatedData
+=== PAUSE TestKindFieldsSegregatedData
+=== RUN   TestListTraitSetFromExpanded
+=== PAUSE TestListTraitSetFromExpanded
+=== RUN   TestRun_ResolvedSet_CountOnly
+=== PAUSE TestRun_ResolvedSet_CountOnly
+=== RUN   TestRun_ResolvedSet_TableAndJSON
+=== PAUSE TestRun_ResolvedSet_TableAndJSON
+=== RUN   TestRun_ExpandTraits
+=== PAUSE TestRun_ExpandTraits
+=== RUN   TestFlagBag_FirstErrorWins
+=== PAUSE TestFlagBag_FirstErrorWins
+=== CONT  TestParseFieldsFlags
+=== CONT  TestListTraitSetFromExpanded
+=== RUN   TestListTraitSetFromExpanded/empty
+--- PASS: TestParseFieldsFlags (0.00s)
+=== CONT  TestFormatKindFieldsSegregatedJSON
+=== RUN   TestListTraitSetFromExpanded/listable_only
+=== RUN   TestListTraitSetFromExpanded/read_only_group_subset
+=== RUN   TestListTraitSetFromExpanded/unknown_traits_ignored
+--- PASS: TestListTraitSetFromExpanded (0.00s)
+    --- PASS: TestListTraitSetFromExpanded/empty (0.00s)
+    --- PASS: TestListTraitSetFromExpanded/listable_only (0.00s)
+    --- PASS: TestListTraitSetFromExpanded/read_only_group_subset (0.00s)
+    --- PASS: TestListTraitSetFromExpanded/unknown_traits_ignored (0.00s)
+=== CONT  TestKindFieldsSegregatedData
+--- PASS: TestKindFieldsSegregatedData (0.00s)
+=== CONT  TestFormatKindFieldsSegregatedTable
+--- PASS: TestFormatKindFieldsSegregatedTable (0.00s)
+=== CONT  TestParseFieldsFlags_DefaultFormat
+--- PASS: TestParseFieldsFlags_DefaultFormat (0.00s)
+=== CONT  TestRun_ExpandTraits
+--- PASS: TestFormatKindFieldsSegregatedJSON (0.00s)
+=== CONT  TestFlagBag_FirstErrorWins
+--- PASS: TestRun_ExpandTraits (0.00s)
+=== CONT  TestRun_ResolvedSet_TableAndJSON
+--- PASS: TestRun_ResolvedSet_TableAndJSON (0.00s)
+=== CONT  TestRun_ResolvedSet_CountOnly
+--- PASS: TestRun_ResolvedSet_CountOnly (0.00s)
+--- PASS: TestFlagBag_FirstErrorWins (0.00s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/cli	0.336s

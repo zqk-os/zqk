@@ -1,0 +1,44 @@
+
+--- run 2026-09-04T22:11:07Z ---
+=== RUN   TestStewardMaintenanceCoordinator_Enqueue
+=== PAUSE TestStewardMaintenanceCoordinator_Enqueue
+=== RUN   TestStewardMaintenanceCoordinator_nilSafe
+=== PAUSE TestStewardMaintenanceCoordinator_nilSafe
+=== RUN   TestTruncateStewardEnqueueDetail
+=== PAUSE TestTruncateStewardEnqueueDetail
+=== RUN   TestAllOperationalEnvelopeDiscoveryTokens_nonEmpty
+=== PAUSE TestAllOperationalEnvelopeDiscoveryTokens_nonEmpty
+=== RUN   TestResolvedSchedulerJobTypesFromDiscoveryTokens_sortedUnique
+=== PAUSE TestResolvedSchedulerJobTypesFromDiscoveryTokens_sortedUnique
+=== RUN   TestEnvelopeDiscoveryTokensMappedOrDocumentationOnly
+=== PAUSE TestEnvelopeDiscoveryTokensMappedOrDocumentationOnly
+=== RUN   TestResolvedEnvelopeTokenJobEdges_coversBindings
+=== PAUSE TestResolvedEnvelopeTokenJobEdges_coversBindings
+=== RUN   TestResolvedSchedulerJobTypesFromTokenEdgesWithPolicy_denyToken
+=== PAUSE TestResolvedSchedulerJobTypesFromTokenEdgesWithPolicy_denyToken
+=== RUN   TestResolvedSchedulerJobTypesFromTokenEdgesWithPolicy_allowRestrictive
+=== PAUSE TestResolvedSchedulerJobTypesFromTokenEdgesWithPolicy_allowRestrictive
+=== RUN   TestResolvedSchedulerJobTypesFromTokenEdgesWithPolicy_allowEmptySuppressesAll
+=== PAUSE TestResolvedSchedulerJobTypesFromTokenEdgesWithPolicy_allowEmptySuppressesAll
+=== CONT  TestStewardMaintenanceCoordinator_Enqueue
+=== CONT  TestEnvelopeDiscoveryTokensMappedOrDocumentationOnly
+--- PASS: TestEnvelopeDiscoveryTokensMappedOrDocumentationOnly (0.00s)
+=== CONT  TestResolvedSchedulerJobTypesFromDiscoveryTokens_sortedUnique
+--- PASS: TestResolvedSchedulerJobTypesFromDiscoveryTokens_sortedUnique (0.00s)
+=== CONT  TestAllOperationalEnvelopeDiscoveryTokens_nonEmpty
+--- PASS: TestAllOperationalEnvelopeDiscoveryTokens_nonEmpty (0.00s)
+=== CONT  TestTruncateStewardEnqueueDetail
+--- PASS: TestTruncateStewardEnqueueDetail (0.00s)
+=== CONT  TestStewardMaintenanceCoordinator_nilSafe
+--- PASS: TestStewardMaintenanceCoordinator_nilSafe (0.00s)
+=== CONT  TestResolvedSchedulerJobTypesFromTokenEdgesWithPolicy_denyToken
+--- PASS: TestResolvedSchedulerJobTypesFromTokenEdgesWithPolicy_denyToken (0.00s)
+=== CONT  TestResolvedSchedulerJobTypesFromTokenEdgesWithPolicy_allowEmptySuppressesAll
+--- PASS: TestResolvedSchedulerJobTypesFromTokenEdgesWithPolicy_allowEmptySuppressesAll (0.00s)
+=== CONT  TestResolvedSchedulerJobTypesFromTokenEdgesWithPolicy_allowRestrictive
+--- PASS: TestResolvedSchedulerJobTypesFromTokenEdgesWithPolicy_allowRestrictive (0.00s)
+=== CONT  TestResolvedEnvelopeTokenJobEdges_coversBindings
+--- PASS: TestResolvedEnvelopeTokenJobEdges_coversBindings (0.00s)
+--- PASS: TestStewardMaintenanceCoordinator_Enqueue (0.05s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/datacell	0.825s

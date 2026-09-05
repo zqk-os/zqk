@@ -1,0 +1,20 @@
+
+--- run 2026-09-04T22:21:13Z ---
+=== RUN   TestWithRLockTimeout_ContextCancellation
+=== PAUSE TestWithRLockTimeout_ContextCancellation
+=== RUN   TestWithLockTimeout_BLI_CEF_R16_LOCK_TIMEOUT_001
+=== PAUSE TestWithLockTimeout_BLI_CEF_R16_LOCK_TIMEOUT_001
+=== RUN   TestAcquireLockWithContext_noTryLockFailsClosed
+=== PAUSE TestAcquireLockWithContext_noTryLockFailsClosed
+=== RUN   TestWithLockTimeout_noTryLockFailsClosed
+=== PAUSE TestWithLockTimeout_noTryLockFailsClosed
+=== CONT  TestWithRLockTimeout_ContextCancellation
+=== CONT  TestWithLockTimeout_noTryLockFailsClosed
+--- PASS: TestWithLockTimeout_noTryLockFailsClosed (0.00s)
+=== CONT  TestAcquireLockWithContext_noTryLockFailsClosed
+--- PASS: TestAcquireLockWithContext_noTryLockFailsClosed (0.00s)
+=== CONT  TestWithLockTimeout_BLI_CEF_R16_LOCK_TIMEOUT_001
+--- PASS: TestWithRLockTimeout_ContextCancellation (0.02s)
+--- PASS: TestWithLockTimeout_BLI_CEF_R16_LOCK_TIMEOUT_001 (0.03s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/concurrency	0.238s

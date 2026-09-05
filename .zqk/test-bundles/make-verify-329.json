@@ -1,0 +1,51 @@
+{
+  "name": "make-verify-329",
+  "created_at": "2026-09-04T21:34:30.632747Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-329",
+    "Tests": [
+      {
+        "Name": "TestInteractiveCreationAllKinds",
+        "Package": "testing",
+        "PackagePath": "pkg/mcp/testing",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/testing/scenario_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestInteractiveCreationFromFile",
+        "Package": "testing",
+        "PackagePath": "pkg/mcp/testing",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/testing/scenario_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 60000000000,
+    "PackagePath": "pkg/mcp/testing"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestInteractiveCreationAllKinds",
+      "Package": "testing",
+      "PackagePath": "pkg/mcp/testing",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/testing/scenario_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestInteractiveCreationFromFile",
+      "Package": "testing",
+      "PackagePath": "pkg/mcp/testing",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mcp/testing/scenario_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

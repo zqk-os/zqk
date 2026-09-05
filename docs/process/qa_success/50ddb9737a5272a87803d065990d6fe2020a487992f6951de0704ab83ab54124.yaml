@@ -1,0 +1,14 @@
+created_at: "2026-08-19T00:28:20Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1787099300053277000-260fe6ee
+item_id: PRI-CEF-R2-S2-ARCH
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 2857702ca28e4b64fb5782140b43c1400e68fdeab30ab0062f4119523ca97d466e5f13c72adcfa41b92eacf21fa7f0a79b8a8e3a8d7c581e5c9afe0e69cb31dc
+schema_version: 2.0.0
+signature: 3045022100e9cf78c5b5da0f1e9a1affd95f2ce9f0479183f6984baee413dc62be090bbd9902202267f196d83d8ee5dcb08c0739e66cb72336962a9f2c40d0798f7d378d48bdc4
+status: archived
+title: CEF R2 S2 — Architecture navigability
+updated_at: "2026-09-01T07:31:36Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

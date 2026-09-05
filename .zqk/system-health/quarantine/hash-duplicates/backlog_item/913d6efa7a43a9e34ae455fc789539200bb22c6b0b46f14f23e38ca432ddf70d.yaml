@@ -1,0 +1,58 @@
+acceptance_considerations: Acceptance recorded as linked criteria; no narrative captured at migration time.
+actual_effort: 2d
+category: Product
+claimed_at: "2026-08-19T07:10:00Z"
+claimed_by: antigravity-2
+commit_refs:
+    - 2f76d8025a
+created_at: "2026-08-05T11:41:46Z"
+created_by: ACC-1785920548450214012-68b850c0
+criteria_refs:
+    - CRIT-1785944285894274000-c45fe208
+    - CRIT-1785944286956314000-68f83016
+    - CRIT-1785944287826817000-5512b302
+    - CRIT-1785944288695756000-6ea86199
+    - CRIT-1785944289527462000-2e2b27dc
+    - CRIT-1785944290353657000-b5adcff1
+    - CRIT-1786697484446076000-4eb30895
+    - CRIT-1787123086288250000-4aa4d5b8
+decision_refs:
+    - DEC-1785930071988960000-364a5796
+description: |
+    Implement DEC-1785930071988960000-364a5796: single object plane; elevated
+    access is --internal gated by license/entitlement (see
+    docs/strategy/open-core/OBJECT_PLANE_INTERNAL_FLAG.md).
+estimated_effort: 1-2 weeks
+goal_refs:
+    - GOAL-OSS-CORE
+id: BLI-1785930106857898000-94b9a5bc
+kind: backlog_item
+milestone_refs:
+    - MIL-1785183722322302000-d3386bed
+namespace_id: zqk:kernel
+next_action: ATK-1785931170239058000-69b53308 tranche 1 in progress (TDD)
+owner_ref: ACC-1785920548450214012-68b850c0
+persona: cursor-composer
+priority: high
+priority_plan_ref: PRI-GROOM-CLI-DNA-001
+priority_tier: P1
+problem_statement: |-
+    Implement DEC-1785930071988960000-364a5796: single object plane; elevated
+    access is --internal gated by license/entitlement (see
+    docs/strategy/open-core/OBJECT_PLANE_INTERNAL_FLAG.md).
+related_object_refs:
+    - DEC-1785930071988960000-364a5796
+    - DOC-1785930096246149000-1a73f2c7
+requirement_refs:
+    - REQ-1785930125333916000-14c57300
+schema_version: 2.0.0
+stakeholders:
+    - human-owner
+    - open-core
+status: complete
+technical_spec_refs:
+    - DEC-1785930071988960000-364a5796
+title: Unify elevated object access under object --internal (license-gated)
+updated_at: "2026-08-19T07:10:48Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

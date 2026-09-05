@@ -1,0 +1,11 @@
+```
+{
+  "type": "function",
+  "function": {
+    "zqk_write_code": {
+      "path": "pkg/cli/bldr_cli_cmd_v1/automation_lint_bypass_audit_command_builder.go",
+      "content": "package bldr_cli_cmd_v1\n\nimport (\n\tclipkg \"github.com/lanceman/zqk/pkg/cli\"\n\t\"github.com/spf13/cobra\"\n)\n\nconst lintBypassAuditSpec string = \"Generated spec for lint-bypass-audit\"\n\n// NewAutomationLintBypassAuditCommandBuilder creates a new automation_lint_bypass_audit command\nfunc NewAutomationLintBypassAuditCommandBuilder() *cobra.Command {\n\tbuilder := clipkg.NewCommandBuilder(\"\")\n\tbuilder.WithShort(lintBypassAuditSpec)\n\tbuilder.WithCommonFlags(false, nil)\n\tcmd := builder.Build()\n\treturn cmd\n}\n\n\n--- AST AUDIT VIOLATIONS ---\n- [low] Potential magic string 'Generated spec for lint-bypass-audit'. Extract to a named constant if used more than once. (Line 11)\nPlease fix these violations to comply with ZQK architecture standards.\n"
+    }
+  }
+}
+```

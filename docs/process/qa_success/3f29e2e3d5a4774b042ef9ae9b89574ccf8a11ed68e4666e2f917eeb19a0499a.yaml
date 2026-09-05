@@ -1,0 +1,14 @@
+created_at: "2026-09-05T03:25:09Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1788578709124874000-09f9c26a
+item_id: PRI-OPENCORE-PUBLISH-001
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 86b8ab3d574c004a61020b73c23f52b9055049e90c3d755c8bbb383e059e384028fdd8cd69e13123b644e5f3f7eb65596e73e2d57d719ea3dafcb01b84ce8dfb
+schema_version: 2.0.0
+signature: 3045022100c77db7fed06f96d0f0ebc18c8da460ef67234ef1c130949b44ef4cae3173f3fa02203f1d9c3393f948802dba9342a63e30d1fbdfebb936bec01d06f72a487644d048
+status: success
+title: QA success for PRI-OPENCORE-PUBLISH-001
+updated_at: "2026-09-05T03:25:11Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

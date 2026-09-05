@@ -1,0 +1,14 @@
+created_at: "2026-08-20T04:56:30Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1787201790006800000-243a8580
+item_id: CRIT-CEF-R8K-DOC-001
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 2857702ca28e4b64fb5782140b43c1400e68fdeab30ab0062f4119523ca97d466e5f13c72adcfa41b92eacf21fa7f0a79b8a8e3a8d7c581e5c9afe0e69cb31dc
+schema_version: 2.0.0
+signature: 3046022100dbaaf298f2ffe035fd8bd38ac0ef6aa98515582e0be1e333cdb8a013d2fc1147022100d2916746e7066009f829dfd5711c517c3811813fc58e26cd3d9667227d8c32ad
+status: archived
+title: Document lifecycle metadata and ADR index implemented
+updated_at: "2026-09-01T07:47:53Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

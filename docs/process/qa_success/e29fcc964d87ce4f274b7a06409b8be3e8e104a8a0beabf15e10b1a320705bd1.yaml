@@ -1,0 +1,14 @@
+created_at: "2026-08-20T10:15:35Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1787220930629829000-5340d06c
+item_id: BLI-CEF-R10-HATER-001
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 2857702ca28e4b64fb5782140b43c1400e68fdeab30ab0062f4119523ca97d466e5f13c72adcfa41b92eacf21fa7f0a79b8a8e3a8d7c581e5c9afe0e69cb31dc
+schema_version: 2.0.0
+signature: 304402202b38df3cb5a0e6546ec3723cf2cdb8fce2ad03776b951a60fe1516bbea6adf9d022019e1a31e65bab64d2e4f4757e588377b28328853f8c4b5ac3a0fcef0e9487845
+status: archived
+title: Independently verify R9-HATER; do not treat envelope-4 as scored
+updated_at: "2026-09-01T07:49:51Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

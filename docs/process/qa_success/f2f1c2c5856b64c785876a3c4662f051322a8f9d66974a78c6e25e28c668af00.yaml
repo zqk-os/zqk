@@ -1,0 +1,14 @@
+created_at: "2026-08-19T20:28:25Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1787171305327580000-ebc60b0f
+item_id: CRIT-GIT-EVIDENCE-CI-PRECOMMIT-001
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 2857702ca28e4b64fb5782140b43c1400e68fdeab30ab0062f4119523ca97d466e5f13c72adcfa41b92eacf21fa7f0a79b8a8e3a8d7c581e5c9afe0e69cb31dc
+schema_version: 2.0.0
+signature: 3046022100bbbc9be7c3509283de2bb882d220cfe55615ca2a234f549c613bea23ab50db33022100c870dcc379551c9bd1438b44e10e41c47b3cafce148c21fb633be32482350c00
+status: archived
+title: Pre-commit and CI hooks fail-close on invalid or unverified commit_refs
+updated_at: "2026-09-01T07:46:18Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

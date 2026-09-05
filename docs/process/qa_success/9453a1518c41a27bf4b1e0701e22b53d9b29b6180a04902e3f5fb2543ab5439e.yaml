@@ -1,0 +1,14 @@
+created_at: "2026-08-19T08:03:49Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1787126620965890000-38f97087
+item_id: REDACTED
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 2857702ca28e4b64fb5782140b43c1400e68fdeab30ab0062f4119523ca97d466e5f13c72adcfa41b92eacf21fa7f0a79b8a8e3a8d7c581e5c9afe0e69cb31dc
+schema_version: 2.0.0
+signature: 30450220677765886bc584bd37757e95779199822a678dae7a82b584d891812498e2a25102210091125a7653b54dc3a614e07699df9a5f6e12d257b090feb2bf9d2024e654a6ae
+status: archived
+title: pkg/workflow/whatsnext.Execute (CAP/orchestrate) shares the same ambience as CLI
+updated_at: "2026-09-01T07:30:55Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

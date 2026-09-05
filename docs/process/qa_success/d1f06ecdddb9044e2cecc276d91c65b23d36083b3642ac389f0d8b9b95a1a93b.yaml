@@ -1,0 +1,14 @@
+created_at: "2026-08-19T00:28:36Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1787099316646324000-c5f7dfe2
+item_id: CRIT-CEF-R2-CON-OPQUEUE-A
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 2857702ca28e4b64fb5782140b43c1400e68fdeab30ab0062f4119523ca97d466e5f13c72adcfa41b92eacf21fa7f0a79b8a8e3a8d7c581e5c9afe0e69cb31dc
+schema_version: 2.0.0
+signature: 3045022100d123919d3d566710f9ca7b2a89068bedabcf2a6ee056766b5c27c9bb9ce0661c022052dc5b66fe6ef1f5ed88af75188ef01e130347c94768a5faa52bf8dbbe367007
+status: archived
+title: 'Accept: OperationQueue wake callbacks must be bounded and ctx-aware'
+updated_at: "2026-09-01T07:35:04Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

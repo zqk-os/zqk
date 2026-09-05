@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-605",
+  "created_at": "2026-09-04T21:34:33.352647Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-605",
+    "Tests": [
+      {
+        "Name": "TestNormalizeChecklistAtoms",
+        "Package": "builders",
+        "PackagePath": "pkg/specbuilder/builders",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/specbuilder/builders/checklist_vocab_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestGenerateFieldConstantsCode_Auditable",
+        "Package": "builders",
+        "PackagePath": "pkg/specbuilder/builders",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/specbuilder/builders/codegen_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestGenerateFieldConstantsCode_BaseObject",
+        "Package": "builders",
+        "PackagePath": "pkg/specbuilder/builders",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/specbuilder/builders/codegen_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestGenerateFieldConstantsCode_FieldFiltering",
+        "Package": "builders",
+        "PackagePath": "pkg/specbuilder/builders",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/specbuilder/builders/codegen_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestGenerateBuilderFromYAML_ConstantsGeneration",
+        "Package": "builders",
+        "PackagePath": "pkg/specbuilder/builders",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/specbuilder/builders/codegen_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestConcurrencyStressAllGenerators",
+        "Package": "builders_test",
+        "PackagePath": "pkg/specbuilder/builders",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/specbuilder/builders/concurrency_stress_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestBaseGeneratorConcurrency",
+        "Package": "builders_test",
+        "PackagePath": "pkg/specbuilder/builders",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/specbuilder/builders/concurrency_stress_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestInstanceBuilderNotThreadSafe",
+        "Package": "builders_test",
+        "PackagePath": "pkg/specbuilder/builders",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/specbuilder/builders/concurrency_stress_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestFieldBuilder",
+        "Package": "builders",
+        "PackagePath": "pkg/specbuilder/builders",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/specbuilder/builders/field_builder_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAuditableBuilder",
+        "Package": "builders_test",
+        "PackagePath": "pkg/specbuilder/builders",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/specbuilder/builders/generator_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": true,
+    "EstimatedDuration": 300000000000,
+    "PackagePath": "pkg/specbuilder/builders"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestNormalizeChecklistAtoms",
+      "Package": "builders",
+      "PackagePath": "pkg/specbuilder/builders",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/specbuilder/builders/checklist_vocab_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestGenerateFieldConstantsCode_Auditable",
+      "Package": "builders",
+      "PackagePath": "pkg/specbuilder/builders",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/specbuilder/builders/codegen_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestGenerateFieldConstantsCode_BaseObject",
+      "Package": "builders",
+      "PackagePath": "pkg/specbuilder/builders",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/specbuilder/builders/codegen_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestGenerateFieldConstantsCode_FieldFiltering",
+      "Package": "builders",
+      "PackagePath": "pkg/specbuilder/builders",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/specbuilder/builders/codegen_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestGenerateBuilderFromYAML_ConstantsGeneration",
+      "Package": "builders",
+      "PackagePath": "pkg/specbuilder/builders",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/specbuilder/builders/codegen_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestConcurrencyStressAllGenerators",
+      "Package": "builders_test",
+      "PackagePath": "pkg/specbuilder/builders",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/specbuilder/builders/concurrency_stress_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestBaseGeneratorConcurrency",
+      "Package": "builders_test",
+      "PackagePath": "pkg/specbuilder/builders",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/specbuilder/builders/concurrency_stress_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestInstanceBuilderNotThreadSafe",
+      "Package": "builders_test",
+      "PackagePath": "pkg/specbuilder/builders",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/specbuilder/builders/concurrency_stress_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestFieldBuilder",
+      "Package": "builders",
+      "PackagePath": "pkg/specbuilder/builders",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/specbuilder/builders/field_builder_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestAuditableBuilder",
+      "Package": "builders_test",
+      "PackagePath": "pkg/specbuilder/builders",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/specbuilder/builders/generator_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

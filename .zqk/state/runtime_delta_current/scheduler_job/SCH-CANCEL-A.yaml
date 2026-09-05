@@ -1,0 +1,24 @@
+allow_parallel_execution: true
+category: test
+command: "true"
+command_args: []
+created_at: "2026-08-11T12:27:05Z"
+created_by: ACC-1785920548450214012-68b850c0
+enabled: false
+execution_mode: reusable
+id: SCH-CANCEL-A
+job_type: run_wrapper
+kind: scheduler_job
+last_run_at: "2026-09-04T23:09:07Z"
+max_runtime_seconds: 5
+namespace_id: zqk:kernel
+next_run_at: "2026-09-04T23:06:17Z"
+origin_project: zqk
+origin_system: zqk
+schema_version: 2.0.0
+status: active
+title: Cancel test SCH-CANCEL-A
+trigger_type: immediate
+updated_at: "2026-09-04T23:09:07Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

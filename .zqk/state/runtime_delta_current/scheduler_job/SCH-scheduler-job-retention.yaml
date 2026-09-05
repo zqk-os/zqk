@@ -1,0 +1,30 @@
+category: maintenance
+created_at: "2026-08-29T15:50:54Z"
+created_by: ACC-1785920548450214012-68b850c0
+description: |
+    Deletes one_time scheduler jobs that have already run (enabled=false) older than
+    RETENTION_DAYS, plus their log dirs. Reusable timer jobs are never touched.
+    Without this job, docs/process/scheduler_jobs/ grows without bound from
+    `scheduler submit` (object-count-report disk vs index disparity).
+enabled: true
+environment_variables:
+    BATCH_SIZE: "100"
+    MAX_BATCHES: "50"
+    RETENTION_DAYS: "7"
+execution_mode: reusable
+id: SCH-scheduler-job-retention
+job_type: scheduler_job_retention
+kind: scheduler_job
+last_run_at: "2026-09-05T04:00:00Z"
+max_runtime_seconds: 600
+namespace_id: zqk:kernel
+next_run_at: "2026-09-05T11:00:00Z"
+schedule_expression: 0 4 * * *
+schema_version: 2.0.0
+source_type: internal
+status: active
+title: Scheduler job store retention (one_time)
+trigger_type: timer
+updated_at: "2026-09-05T04:00:33Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-836",
+  "created_at": "2026-09-04T21:34:35.637287Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-836",
+    "Tests": [
+      {
+        "Name": "TestCompleteListProjectFields_UsesSpecIndexAndCommaSegments",
+        "Package": "object",
+        "PackagePath": "cmd/zqk/object",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/object/kind_completion_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestCompleteFilterField_UsesSpecIndexAndStripsOperator",
+        "Package": "object",
+        "PackagePath": "cmd/zqk/object",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/object/kind_completion_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestLifecycleMatrix_Workstream",
+        "Package": "object",
+        "PackagePath": "cmd/zqk/object",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/object/lifecycle_matrix_integration_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestLifecycleMatrix_AllKinds",
+        "Package": "object",
+        "PackagePath": "cmd/zqk/object",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/object/lifecycle_matrix_integration_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestLifecycleMatrix_IdentityValidationFailClosed",
+        "Package": "object",
+        "PackagePath": "cmd/zqk/object",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/object/lifecycle_matrix_integration_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestApplyNamespaceBoundaries",
+        "Package": "object",
+        "PackagePath": "cmd/zqk/object",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/object/list_namespace_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAttachNamespaceScopeMeta",
+        "Package": "object",
+        "PackagePath": "cmd/zqk/object",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/object/list_namespace_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestCLI_MigrateVettingMatrix_AppendCVSActivity_Integration",
+        "Package": "object",
+        "PackagePath": "cmd/zqk/object",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/object/migrate_vetting_matrix_cli_integration_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestMoveCommand_BasicMove",
+        "Package": "object",
+        "PackagePath": "cmd/zqk/object",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/object/move_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestMoveCommand_MoveBetweenKinds",
+        "Package": "object",
+        "PackagePath": "cmd/zqk/object",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/object/move_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 900000000000,
+    "PackagePath": "cmd/zqk/object"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestCompleteListProjectFields_UsesSpecIndexAndCommaSegments",
+      "Package": "object",
+      "PackagePath": "cmd/zqk/object",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/object/kind_completion_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestCompleteFilterField_UsesSpecIndexAndStripsOperator",
+      "Package": "object",
+      "PackagePath": "cmd/zqk/object",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/object/kind_completion_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestLifecycleMatrix_Workstream",
+      "Package": "object",
+      "PackagePath": "cmd/zqk/object",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/object/lifecycle_matrix_integration_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestLifecycleMatrix_AllKinds",
+      "Package": "object",
+      "PackagePath": "cmd/zqk/object",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/object/lifecycle_matrix_integration_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestLifecycleMatrix_IdentityValidationFailClosed",
+      "Package": "object",
+      "PackagePath": "cmd/zqk/object",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/object/lifecycle_matrix_integration_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestApplyNamespaceBoundaries",
+      "Package": "object",
+      "PackagePath": "cmd/zqk/object",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/object/list_namespace_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestAttachNamespaceScopeMeta",
+      "Package": "object",
+      "PackagePath": "cmd/zqk/object",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/object/list_namespace_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestCLI_MigrateVettingMatrix_AppendCVSActivity_Integration",
+      "Package": "object",
+      "PackagePath": "cmd/zqk/object",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/object/migrate_vetting_matrix_cli_integration_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestMoveCommand_BasicMove",
+      "Package": "object",
+      "PackagePath": "cmd/zqk/object",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/object/move_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestMoveCommand_MoveBetweenKinds",
+      "Package": "object",
+      "PackagePath": "cmd/zqk/object",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/object/move_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    }
+  }
+}

@@ -1,0 +1,100 @@
+
+--- run 2026-09-04T22:17:13Z ---
+=== RUN   TestCheckinTimerType_isNotTheKillSentinel
+=== PAUSE TestCheckinTimerType_isNotTheKillSentinel
+=== RUN   TestHourglassSourcePresent
+=== PAUSE TestHourglassSourcePresent
+=== RUN   TestRunIntegrityCheckViaPipeline_NilHandler
+=== PAUSE TestRunIntegrityCheckViaPipeline_NilHandler
+=== RUN   TestRunIntegrityCheckViaPipeline_NilJob
+=== PAUSE TestRunIntegrityCheckViaPipeline_NilJob
+=== RUN   TestOneTimeImmediateShouldStartOnReload
+=== PAUSE TestOneTimeImmediateShouldStartOnReload
+=== RUN   TestJobIDLooksLikeCLISubmitNanos
+=== PAUSE TestJobIDLooksLikeCLISubmitNanos
+=== RUN   TestShouldInvokeConfiguredJobCallback
+=== PAUSE TestShouldInvokeConfiguredJobCallback
+=== RUN   TestJobEnvAffirmative_convergenceTickRollup
+=== PAUSE TestJobEnvAffirmative_convergenceTickRollup
+=== RUN   TestJobLoader_LoadJobs
+=== PAUSE TestJobLoader_LoadJobs
+=== RUN   TestPriorityRank_and_rawJobPriority
+=== PAUSE TestPriorityRank_and_rawJobPriority
+=== CONT  TestCheckinTimerType_isNotTheKillSentinel
+--- PASS: TestCheckinTimerType_isNotTheKillSentinel (0.00s)
+=== CONT  TestJobIDLooksLikeCLISubmitNanos
+--- PASS: TestJobIDLooksLikeCLISubmitNanos (0.00s)
+=== CONT  TestRunIntegrityCheckViaPipeline_NilJob
+--- PASS: TestRunIntegrityCheckViaPipeline_NilJob (0.00s)
+=== CONT  TestRunIntegrityCheckViaPipeline_NilHandler
+--- PASS: TestRunIntegrityCheckViaPipeline_NilHandler (0.00s)
+=== CONT  TestHourglassSourcePresent
+--- PASS: TestHourglassSourcePresent (0.00s)
+=== CONT  TestOneTimeImmediateShouldStartOnReload
+=== CONT  TestJobLoader_LoadJobs
+=== RUN   TestOneTimeImmediateShouldStartOnReload/cli_submit_manual
+=== PAUSE TestOneTimeImmediateShouldStartOnReload/cli_submit_manual
+=== RUN   TestOneTimeImmediateShouldStartOnReload/callback_bearing
+=== PAUSE TestOneTimeImmediateShouldStartOnReload/callback_bearing
+=== RUN   TestOneTimeImmediateShouldStartOnReload/pending_already_queued
+=== PAUSE TestOneTimeImmediateShouldStartOnReload/pending_already_queued
+=== RUN   TestOneTimeImmediateShouldStartOnReload/already_started
+=== PAUSE TestOneTimeImmediateShouldStartOnReload/already_started
+=== RUN   TestOneTimeImmediateShouldStartOnReload/disabled_spent
+=== PAUSE TestOneTimeImmediateShouldStartOnReload/disabled_spent
+=== RUN   TestOneTimeImmediateShouldStartOnReload/test_bundle
+=== PAUSE TestOneTimeImmediateShouldStartOnReload/test_bundle
+=== RUN   TestOneTimeImmediateShouldStartOnReload/timer_job
+=== PAUSE TestOneTimeImmediateShouldStartOnReload/timer_job
+=== CONT  TestPriorityRank_and_rawJobPriority
+--- PASS: TestPriorityRank_and_rawJobPriority (0.00s)
+=== CONT  TestJobEnvAffirmative_convergenceTickRollup
+=== RUN   TestJobEnvAffirmative_convergenceTickRollup/#00
+=== PAUSE TestJobEnvAffirmative_convergenceTickRollup/#00
+=== RUN   TestJobEnvAffirmative_convergenceTickRollup/0
+=== PAUSE TestJobEnvAffirmative_convergenceTickRollup/0
+=== RUN   TestJobEnvAffirmative_convergenceTickRollup/false
+=== PAUSE TestJobEnvAffirmative_convergenceTickRollup/false
+=== RUN   TestJobEnvAffirmative_convergenceTickRollup/1
+=== PAUSE TestJobEnvAffirmative_convergenceTickRollup/1
+=== RUN   TestJobEnvAffirmative_convergenceTickRollup/true
+=== PAUSE TestJobEnvAffirmative_convergenceTickRollup/true
+=== RUN   TestJobEnvAffirmative_convergenceTickRollup/TRUE
+=== PAUSE TestJobEnvAffirmative_convergenceTickRollup/TRUE
+=== RUN   TestJobEnvAffirmative_convergenceTickRollup/yes
+=== PAUSE TestJobEnvAffirmative_convergenceTickRollup/yes
+=== CONT  TestShouldInvokeConfiguredJobCallback
+--- PASS: TestShouldInvokeConfiguredJobCallback (0.00s)
+=== CONT  TestOneTimeImmediateShouldStartOnReload/cli_submit_manual
+=== CONT  TestOneTimeImmediateShouldStartOnReload/disabled_spent
+=== CONT  TestOneTimeImmediateShouldStartOnReload/timer_job
+=== CONT  TestOneTimeImmediateShouldStartOnReload/test_bundle
+=== CONT  TestOneTimeImmediateShouldStartOnReload/pending_already_queued
+=== CONT  TestOneTimeImmediateShouldStartOnReload/already_started
+=== CONT  TestOneTimeImmediateShouldStartOnReload/callback_bearing
+--- PASS: TestOneTimeImmediateShouldStartOnReload (0.00s)
+    --- PASS: TestOneTimeImmediateShouldStartOnReload/cli_submit_manual (0.00s)
+    --- PASS: TestOneTimeImmediateShouldStartOnReload/disabled_spent (0.00s)
+    --- PASS: TestOneTimeImmediateShouldStartOnReload/timer_job (0.00s)
+    --- PASS: TestOneTimeImmediateShouldStartOnReload/test_bundle (0.00s)
+    --- PASS: TestOneTimeImmediateShouldStartOnReload/pending_already_queued (0.00s)
+    --- PASS: TestOneTimeImmediateShouldStartOnReload/already_started (0.00s)
+    --- PASS: TestOneTimeImmediateShouldStartOnReload/callback_bearing (0.00s)
+=== CONT  TestJobEnvAffirmative_convergenceTickRollup/#00
+=== CONT  TestJobEnvAffirmative_convergenceTickRollup/true
+=== CONT  TestJobEnvAffirmative_convergenceTickRollup/yes
+=== CONT  TestJobEnvAffirmative_convergenceTickRollup/TRUE
+=== CONT  TestJobEnvAffirmative_convergenceTickRollup/false
+=== CONT  TestJobEnvAffirmative_convergenceTickRollup/1
+=== CONT  TestJobEnvAffirmative_convergenceTickRollup/0
+--- PASS: TestJobEnvAffirmative_convergenceTickRollup (0.00s)
+    --- PASS: TestJobEnvAffirmative_convergenceTickRollup/#00 (0.00s)
+    --- PASS: TestJobEnvAffirmative_convergenceTickRollup/true (0.00s)
+    --- PASS: TestJobEnvAffirmative_convergenceTickRollup/yes (0.00s)
+    --- PASS: TestJobEnvAffirmative_convergenceTickRollup/TRUE (0.00s)
+    --- PASS: TestJobEnvAffirmative_convergenceTickRollup/false (0.00s)
+    --- PASS: TestJobEnvAffirmative_convergenceTickRollup/1 (0.00s)
+    --- PASS: TestJobEnvAffirmative_convergenceTickRollup/0 (0.00s)
+--- PASS: TestJobLoader_LoadJobs (1.46s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/scheduler	2.256s

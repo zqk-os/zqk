@@ -1,0 +1,91 @@
+{"event_type":"started","job_id":"SCH-cap-orchestrator","job_type":"cap_orchestrator","timestamp":"2026-09-04T20:40:09Z"}
+{"duration":"325.711875ms","error":"pending verification task ATK-1788429980944413000-64d67e14 has no durable commit evidence","event_type":"failed","job_id":"SCH-cap-orchestrator","job_type":"cap_orchestrator","timestamp":"2026-09-04T20:40:09Z"}
+{"event_type":"started","job_id":"SCH-cap-orchestrator","job_type":"cap_orchestrator","timestamp":"2026-09-04T21:14:41Z"}
+{"duration":"3.766200708s","error":"pending verification task ATK-1788429980944413000-64d67e14 has no durable commit evidence","event_type":"failed","job_id":"SCH-cap-orchestrator","job_type":"cap_orchestrator","timestamp":"2026-09-04T21:14:45Z"}
+{"event_type":"started","job_id":"SCH-cap-orchestrator","job_type":"cap_orchestrator","timestamp":"2026-09-04T21:20:00Z"}
+{"duration":"669.214583ms","error":"pending verification task ATK-1788429980944413000-64d67e14 has no durable commit evidence","event_type":"failed","job_id":"SCH-cap-orchestrator","job_type":"cap_orchestrator","timestamp":"2026-09-04T21:20:01Z"}
+{"event_type":"started","job_id":"SCH-cap-orchestrator","job_type":"cap_orchestrator","timestamp":"2026-09-04T21:30:00Z"}
+{"duration":"1.10608325s","error":"pending verification task ATK-1788429980944413000-64d67e14 has no durable commit evidence","event_type":"failed","job_id":"SCH-cap-orchestrator","job_type":"cap_orchestrator","timestamp":"2026-09-04T21:30:01Z"}
+{"event_type":"started","job_id":"SCH-cap-orchestrator","job_type":"cap_orchestrator","timestamp":"2026-09-04T21:37:17Z"}
+{"duration":"3.217023084s","error":"pending verification task ATK-1788429980944413000-64d67e14 has no durable commit evidence","event_type":"failed","job_id":"SCH-cap-orchestrator","job_type":"cap_orchestrator","timestamp":"2026-09-04T21:37:23Z"}
+{"event_type":"started","job_id":"SCH-cap-orchestrator","job_type":"cap_orchestrator","timestamp":"2026-09-04T21:40:00Z"}
+{"duration":"640.573208ms","error":"pending verification task ATK-1788429980944413000-64d67e14 has no durable commit evidence","event_type":"failed","job_id":"SCH-cap-orchestrator","job_type":"cap_orchestrator","timestamp":"2026-09-04T21:40:00Z"}
+{"event_type":"started","job_id":"SCH-cap-orchestrator","job_type":"cap_orchestrator","timestamp":"2026-09-04T21:50:00Z"}
+{"duration":"2.047767792s","error":"pending verification task ATK-1788481055360241000-6b0af0a5 has no durable commit evidence","event_type":"failed","job_id":"SCH-cap-orchestrator","job_type":"cap_orchestrator","timestamp":"2026-09-04T21:50:03Z"}
+{"event_type":"started","job_id":"SCH-cap-orchestrator","job_type":"cap_orchestrator","timestamp":"2026-09-04T22:00:00Z"}
+{"duration":"1.157028167s","error":"pending verification task ATK-1788481055360241000-6b0af0a5 has no durable commit evidence","event_type":"failed","job_id":"SCH-cap-orchestrator","job_type":"cap_orchestrator","timestamp":"2026-09-04T22:00:01Z"}
+{"event_type":"started","job_id":"SCH-cap-orchestrator","job_type":"cap_orchestrator","timestamp":"2026-09-04T22:10:00Z"}
+{"duration":"4.912087791s","error":"pending verification task ATK-1788481055360241000-6b0af0a5 has no durable commit evidence","event_type":"failed","job_id":"SCH-cap-orchestrator","job_type":"cap_orchestrator","timestamp":"2026-09-04T22:10:05Z"}
+{"event_type":"started","job_id":"SCH-cap-orchestrator","job_type":"cap_orchestrator","timestamp":"2026-09-04T22:20:00Z"}
+{"duration":"571.570167ms","error":"pending verification task ATK-1788481055360241000-6b0af0a5 has no durable commit evidence","event_type":"failed","job_id":"SCH-cap-orchestrator","job_type":"cap_orchestrator","timestamp":"2026-09-04T22:20:00Z"}
+{"event_type":"started","job_id":"SCH-cap-orchestrator","job_type":"cap_orchestrator","timestamp":"2026-09-04T22:30:00Z"}
+{"duration":"754.840625ms","error":"pending verification task ATK-1788481055360241000-6b0af0a5 has no durable commit evidence","event_type":"failed","job_id":"SCH-cap-orchestrator","job_type":"cap_orchestrator","timestamp":"2026-09-04T22:30:00Z"}
+{"event_type":"started","job_id":"SCH-cap-orchestrator","job_type":"cap_orchestrator","timestamp":"2026-09-04T22:40:00Z"}
+{"duration":"10.439255917s","error":"pending verification task ATK-1788481055360241000-6b0af0a5 has no durable commit evidence","event_type":"failed","job_id":"SCH-cap-orchestrator","job_type":"cap_orchestrator","timestamp":"2026-09-04T22:40:10Z"}
+{"event_type":"started","job_id":"SCH-cap-orchestrator","job_type":"cap_orchestrator","timestamp":"2026-09-04T22:48:21Z"}
+{"duration":"4.245332417s","event_type":"completed","job_id":"SCH-cap-orchestrator","job_type":"cap_orchestrator","timestamp":"2026-09-04T22:48:25Z"}
+{"event_type":"started","job_id":"SCH-cap-orchestrator","job_type":"cap_orchestrator","timestamp":"2026-09-04T22:50:00Z"}
+{"duration":"22.530249541s","event_type":"completed","job_id":"SCH-cap-orchestrator","job_type":"cap_orchestrator","timestamp":"2026-09-04T22:50:22Z"}
+{"event_type":"started","job_id":"SCH-cap-orchestrator","job_type":"cap_orchestrator","timestamp":"2026-09-04T23:00:00Z"}
+{"duration":"1m12.999151917s","event_type":"completed","job_id":"SCH-cap-orchestrator","job_type":"cap_orchestrator","timestamp":"2026-09-04T23:01:13Z"}
+{"event_type":"started","job_id":"SCH-cap-orchestrator","job_type":"cap_orchestrator","timestamp":"2026-09-04T23:10:00Z"}
+{"duration":"15.650684375s","event_type":"completed","job_id":"SCH-cap-orchestrator","job_type":"cap_orchestrator","timestamp":"2026-09-04T23:10:16Z"}
+{"event_type":"started","job_id":"SCH-cap-orchestrator","job_type":"cap_orchestrator","timestamp":"2026-09-04T23:20:00Z"}
+{"duration":"2.084645041s","event_type":"completed","job_id":"SCH-cap-orchestrator","job_type":"cap_orchestrator","timestamp":"2026-09-04T23:20:02Z"}
+{"event_type":"started","job_id":"SCH-cap-orchestrator","job_type":"cap_orchestrator","timestamp":"2026-09-04T23:30:00Z"}
+{"duration":"34.702610458s","event_type":"completed","job_id":"SCH-cap-orchestrator","job_type":"cap_orchestrator","timestamp":"2026-09-04T23:30:35Z"}
+{"event_type":"started","job_id":"SCH-cap-orchestrator","job_type":"cap_orchestrator","timestamp":"2026-09-04T23:40:00Z"}
+{"duration":"135.642458ms","error":"pending verification task ATK-1788499921657193000-98febcad has no durable commit evidence","event_type":"failed","job_id":"SCH-cap-orchestrator","job_type":"cap_orchestrator","timestamp":"2026-09-04T23:40:00Z"}
+{"event_type":"started","job_id":"SCH-cap-orchestrator","job_type":"cap_orchestrator","timestamp":"2026-09-04T23:50:00Z"}
+{"duration":"1.777688041s","error":"pending verification task ATK-1788429980944413000-64d67e14 has no durable commit evidence","event_type":"failed","job_id":"SCH-cap-orchestrator","job_type":"cap_orchestrator","timestamp":"2026-09-04T23:50:01Z"}
+{"event_type":"started","job_id":"SCH-cap-orchestrator","job_type":"cap_orchestrator","timestamp":"2026-09-05T00:00:00Z"}
+{"duration":"3.009994333s","error":"pending verification task ATK-1788429980944413000-64d67e14 has no durable commit evidence","event_type":"failed","job_id":"SCH-cap-orchestrator","job_type":"cap_orchestrator","timestamp":"2026-09-05T00:00:03Z"}
+{"event_type":"started","job_id":"SCH-cap-orchestrator","job_type":"cap_orchestrator","timestamp":"2026-09-05T00:10:00Z"}
+{"duration":"1.1123425s","error":"pending verification task ATK-1788429980944413000-64d67e14 has no durable commit evidence","event_type":"failed","job_id":"SCH-cap-orchestrator","job_type":"cap_orchestrator","timestamp":"2026-09-05T00:10:01Z"}
+{"event_type":"started","job_id":"SCH-cap-orchestrator","job_type":"cap_orchestrator","timestamp":"2026-09-05T00:20:00Z"}
+{"duration":"11.342185625s","error":"pending verification task ATK-1788429980944413000-64d67e14 has no durable commit evidence","event_type":"failed","job_id":"SCH-cap-orchestrator","job_type":"cap_orchestrator","timestamp":"2026-09-05T00:20:11Z"}
+{"event_type":"started","job_id":"SCH-cap-orchestrator","job_type":"cap_orchestrator","timestamp":"2026-09-05T00:30:00Z"}
+{"duration":"1.016831s","error":"pending verification task ATK-1788429980944413000-64d67e14 has no durable commit evidence","event_type":"failed","job_id":"SCH-cap-orchestrator","job_type":"cap_orchestrator","timestamp":"2026-09-05T00:30:01Z"}
+{"event_type":"started","job_id":"SCH-cap-orchestrator","job_type":"cap_orchestrator","timestamp":"2026-09-05T00:40:00Z"}
+{"duration":"288.315416ms","error":"pending verification task ATK-1788429980944413000-64d67e14 has no durable commit evidence","event_type":"failed","job_id":"SCH-cap-orchestrator","job_type":"cap_orchestrator","timestamp":"2026-09-05T00:40:00Z"}
+{"event_type":"started","job_id":"SCH-cap-orchestrator","job_type":"cap_orchestrator","timestamp":"2026-09-05T00:50:00Z"}
+{"duration":"220.878083ms","error":"pending verification task ATK-1788429980944413000-64d67e14 has no durable commit evidence","event_type":"failed","job_id":"SCH-cap-orchestrator","job_type":"cap_orchestrator","timestamp":"2026-09-05T00:50:00Z"}
+{"event_type":"started","job_id":"SCH-cap-orchestrator","job_type":"cap_orchestrator","timestamp":"2026-09-05T01:00:00Z"}
+{"duration":"281.799417ms","error":"pending verification task ATK-1788429980944413000-64d67e14 has no durable commit evidence","event_type":"failed","job_id":"SCH-cap-orchestrator","job_type":"cap_orchestrator","timestamp":"2026-09-05T01:00:01Z"}
+{"event_type":"started","job_id":"SCH-cap-orchestrator","job_type":"cap_orchestrator","timestamp":"2026-09-05T01:10:00Z"}
+{"duration":"249.252459ms","error":"pending verification task ATK-1788429980944413000-64d67e14 has no durable commit evidence","event_type":"failed","job_id":"SCH-cap-orchestrator","job_type":"cap_orchestrator","timestamp":"2026-09-05T01:10:00Z"}
+{"event_type":"started","job_id":"SCH-cap-orchestrator","job_type":"cap_orchestrator","timestamp":"2026-09-05T01:20:00Z"}
+{"duration":"265.997ms","error":"pending verification task ATK-1788429980944413000-64d67e14 has no durable commit evidence","event_type":"failed","job_id":"SCH-cap-orchestrator","job_type":"cap_orchestrator","timestamp":"2026-09-05T01:20:00Z"}
+{"event_type":"started","job_id":"SCH-cap-orchestrator","job_type":"cap_orchestrator","timestamp":"2026-09-05T01:30:00Z"}
+{"duration":"391.139167ms","error":"pending verification task ATK-1788429980944413000-64d67e14 has no durable commit evidence","event_type":"failed","job_id":"SCH-cap-orchestrator","job_type":"cap_orchestrator","timestamp":"2026-09-05T01:30:01Z"}
+{"event_type":"started","job_id":"SCH-cap-orchestrator","job_type":"cap_orchestrator","timestamp":"2026-09-05T01:40:00Z"}
+{"duration":"238.489583ms","error":"pending verification task ATK-1788429980944413000-64d67e14 has no durable commit evidence","event_type":"failed","job_id":"SCH-cap-orchestrator","job_type":"cap_orchestrator","timestamp":"2026-09-05T01:40:00Z"}
+{"event_type":"started","job_id":"SCH-cap-orchestrator","job_type":"cap_orchestrator","timestamp":"2026-09-05T01:50:00Z"}
+{"duration":"344.75875ms","error":"pending verification task ATK-1788429980944413000-64d67e14 has no durable commit evidence","event_type":"failed","job_id":"SCH-cap-orchestrator","job_type":"cap_orchestrator","timestamp":"2026-09-05T01:50:00Z"}
+{"event_type":"started","job_id":"SCH-cap-orchestrator","job_type":"cap_orchestrator","timestamp":"2026-09-05T02:00:00Z"}
+{"duration":"418.325833ms","error":"pending verification task ATK-1788429980944413000-64d67e14 has no durable commit evidence","event_type":"failed","job_id":"SCH-cap-orchestrator","job_type":"cap_orchestrator","timestamp":"2026-09-05T02:00:00Z"}
+{"event_type":"started","job_id":"SCH-cap-orchestrator","job_type":"cap_orchestrator","timestamp":"2026-09-05T02:10:00Z"}
+{"duration":"298.132625ms","error":"pending verification task ATK-1788429980944413000-64d67e14 has no durable commit evidence","event_type":"failed","job_id":"SCH-cap-orchestrator","job_type":"cap_orchestrator","timestamp":"2026-09-05T02:10:00Z"}
+{"event_type":"started","job_id":"SCH-cap-orchestrator","job_type":"cap_orchestrator","timestamp":"2026-09-05T02:20:00Z"}
+{"duration":"236.455417ms","error":"pending verification task ATK-1788429980944413000-64d67e14 has no durable commit evidence","event_type":"failed","job_id":"SCH-cap-orchestrator","job_type":"cap_orchestrator","timestamp":"2026-09-05T02:20:00Z"}
+{"event_type":"started","job_id":"SCH-cap-orchestrator","job_type":"cap_orchestrator","timestamp":"2026-09-05T02:30:00Z"}
+{"duration":"391.60775ms","error":"pending verification task ATK-1788429980944413000-64d67e14 has no durable commit evidence","event_type":"failed","job_id":"SCH-cap-orchestrator","job_type":"cap_orchestrator","timestamp":"2026-09-05T02:30:00Z"}
+{"event_type":"started","job_id":"SCH-cap-orchestrator","job_type":"cap_orchestrator","timestamp":"2026-09-05T02:40:00Z"}
+{"duration":"227.765291ms","error":"pending verification task ATK-1788429980944413000-64d67e14 has no durable commit evidence","event_type":"failed","job_id":"SCH-cap-orchestrator","job_type":"cap_orchestrator","timestamp":"2026-09-05T02:40:00Z"}
+{"event_type":"started","job_id":"SCH-cap-orchestrator","job_type":"cap_orchestrator","timestamp":"2026-09-05T02:50:00Z"}
+{"duration":"250.539ms","error":"pending verification task ATK-1788429980944413000-64d67e14 has no durable commit evidence","event_type":"failed","job_id":"SCH-cap-orchestrator","job_type":"cap_orchestrator","timestamp":"2026-09-05T02:50:00Z"}
+{"event_type":"started","job_id":"SCH-cap-orchestrator","job_type":"cap_orchestrator","timestamp":"2026-09-05T03:00:00Z"}
+{"duration":"454.672167ms","error":"pending verification task ATK-1788429980944413000-64d67e14 has no durable commit evidence","event_type":"failed","job_id":"SCH-cap-orchestrator","job_type":"cap_orchestrator","timestamp":"2026-09-05T03:00:00Z"}
+{"event_type":"started","job_id":"SCH-cap-orchestrator","job_type":"cap_orchestrator","timestamp":"2026-09-05T03:10:00Z"}
+{"duration":"333.798542ms","error":"pending verification task ATK-1788429980944413000-64d67e14 has no durable commit evidence","event_type":"failed","job_id":"SCH-cap-orchestrator","job_type":"cap_orchestrator","timestamp":"2026-09-05T03:10:00Z"}
+{"event_type":"started","job_id":"SCH-cap-orchestrator","job_type":"cap_orchestrator","timestamp":"2026-09-05T03:20:00Z"}
+{"duration":"404.60925ms","error":"pending verification task ATK-1788429980944413000-64d67e14 has no durable commit evidence","event_type":"failed","job_id":"SCH-cap-orchestrator","job_type":"cap_orchestrator","timestamp":"2026-09-05T03:20:00Z"}
+{"event_type":"started","job_id":"SCH-cap-orchestrator","job_type":"cap_orchestrator","timestamp":"2026-09-05T03:30:00Z"}
+{"duration":"1.491035958s","error":"pending verification task ATK-1788429980944413000-64d67e14 has no durable commit evidence","event_type":"failed","job_id":"SCH-cap-orchestrator","job_type":"cap_orchestrator","timestamp":"2026-09-05T03:30:01Z"}
+{"event_type":"started","job_id":"SCH-cap-orchestrator","job_type":"cap_orchestrator","timestamp":"2026-09-05T03:40:00Z"}
+{"duration":"844.234458ms","event_type":"completed","job_id":"SCH-cap-orchestrator","job_type":"cap_orchestrator","timestamp":"2026-09-05T03:40:01Z"}
+{"event_type":"started","job_id":"SCH-cap-orchestrator","job_type":"cap_orchestrator","timestamp":"2026-09-05T03:50:00Z"}
+{"duration":"601.545041ms","event_type":"completed","job_id":"SCH-cap-orchestrator","job_type":"cap_orchestrator","timestamp":"2026-09-05T03:50:00Z"}
+{"event_type":"started","job_id":"SCH-cap-orchestrator","job_type":"cap_orchestrator","timestamp":"2026-09-05T04:00:04Z"}
+{"duration":"7.01580025s","event_type":"completed","job_id":"SCH-cap-orchestrator","job_type":"cap_orchestrator","timestamp":"2026-09-05T04:00:11Z"}
+{"event_type":"started","job_id":"SCH-cap-orchestrator","job_type":"cap_orchestrator","timestamp":"2026-09-05T04:10:00Z"}

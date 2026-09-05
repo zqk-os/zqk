@@ -1,0 +1,20 @@
+
+--- run 2026-09-04T22:13:16Z ---
+=== RUN   TestResolveReference
+=== PAUSE TestResolveReference
+=== RUN   TestResolveReferences
+=== PAUSE TestResolveReferences
+=== RUN   TestResolveReferenceField
+=== PAUSE TestResolveReferenceField
+=== RUN   TestResolveReferenceField_Array
+=== PAUSE TestResolveReferenceField_Array
+=== CONT  TestResolveReference
+--- PASS: TestResolveReference (0.00s)
+=== CONT  TestResolveReferenceField_Array
+--- PASS: TestResolveReferenceField_Array (0.00s)
+=== CONT  TestResolveReferences
+--- PASS: TestResolveReferences (0.00s)
+=== CONT  TestResolveReferenceField
+--- PASS: TestResolveReferenceField (0.00s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/migration/resolver	0.432s

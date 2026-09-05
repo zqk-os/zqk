@@ -1,0 +1,123 @@
+{
+  "name": "make-verify-826",
+  "created_at": "2026-09-04T21:34:35.536865Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-826",
+    "Tests": [
+      {
+        "Name": "TestCloseAfterFlush_ReturnsFlushError",
+        "Package": "walutil",
+        "PackagePath": "pkg/walutil",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/walutil/json_line_wal_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestJSONLineWAL_CloseReturnsFlushError",
+        "Package": "walutil",
+        "PackagePath": "pkg/walutil",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/walutil/json_line_wal_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestReplayFromCursor_SeeksPastAppliedAndDeliversNew",
+        "Package": "walutil",
+        "PackagePath": "pkg/walutil",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/walutil/replay_cursor_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestReplayFromCursor_IdleAtEOFScansNothing",
+        "Package": "walutil",
+        "PackagePath": "pkg/walutil",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/walutil/replay_cursor_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestParseReplayCursorCheckpoint_Compat",
+        "Package": "walutil",
+        "PackagePath": "pkg/walutil",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/walutil/replay_cursor_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestExtractSeqFromJSONLine",
+        "Package": "walutil",
+        "PackagePath": "pkg/walutil",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/walutil/replay_cursor_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 180000000000,
+    "PackagePath": "pkg/walutil"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestCloseAfterFlush_ReturnsFlushError",
+      "Package": "walutil",
+      "PackagePath": "pkg/walutil",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/walutil/json_line_wal_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestJSONLineWAL_CloseReturnsFlushError",
+      "Package": "walutil",
+      "PackagePath": "pkg/walutil",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/walutil/json_line_wal_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestReplayFromCursor_SeeksPastAppliedAndDeliversNew",
+      "Package": "walutil",
+      "PackagePath": "pkg/walutil",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/walutil/replay_cursor_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestReplayFromCursor_IdleAtEOFScansNothing",
+      "Package": "walutil",
+      "PackagePath": "pkg/walutil",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/walutil/replay_cursor_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestParseReplayCursorCheckpoint_Compat",
+      "Package": "walutil",
+      "PackagePath": "pkg/walutil",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/walutil/replay_cursor_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestExtractSeqFromJSONLine",
+      "Package": "walutil",
+      "PackagePath": "pkg/walutil",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/walutil/replay_cursor_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

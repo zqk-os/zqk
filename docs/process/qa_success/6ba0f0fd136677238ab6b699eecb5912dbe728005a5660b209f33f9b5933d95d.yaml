@@ -1,0 +1,14 @@
+created_at: "2026-08-19T04:24:52Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1787113489262023000-2aadc8e3
+item_id: BLI-STABLE-IDENTITY-STORAGE-003
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 2857702ca28e4b64fb5782140b43c1400e68fdeab30ab0062f4119523ca97d466e5f13c72adcfa41b92eacf21fa7f0a79b8a8e3a8d7c581e5c9afe0e69cb31dc
+schema_version: 2.0.0
+signature: 3046022100b9e6910d17eea9c46dd8d59133d31d89377342ab902eff5f835eaf90e543513e022100b95d13c684f88923ebae4e1d1e05bb0993b181b39816fcde375c9c5c4c3d78fa
+status: archived
+title: CAS Hash Migration CLI Command & Zero-Orphan Cleanup Pipeline
+updated_at: "2026-09-01T07:20:43Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

@@ -1,0 +1,105 @@
+{
+  "name": "make-verify-269",
+  "created_at": "2026-09-04T21:34:30.058593Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-269",
+    "Tests": [
+      {
+        "Name": "TestValidateEvidence_ValidGreenEvidencePasses",
+        "Package": "closureevidence_test",
+        "PackagePath": "pkg/closureevidence",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/closureevidence/closure_gate_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestValidateEvidence_MissingFieldsFail",
+        "Package": "closureevidence_test",
+        "PackagePath": "pkg/closureevidence",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/closureevidence/closure_gate_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestValidateEvidence_MissingOrEmptyBundleLogFails",
+        "Package": "closureevidence_test",
+        "PackagePath": "pkg/closureevidence",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/closureevidence/closure_gate_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestValidateEvidence_FailingHealthOutcomeFails",
+        "Package": "closureevidence_test",
+        "PackagePath": "pkg/closureevidence",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/closureevidence/closure_gate_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestValidateObjectClosureEvidence_NestedAndTopLevel",
+        "Package": "closureevidence_test",
+        "PackagePath": "pkg/closureevidence",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/closureevidence/closure_gate_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 150000000000,
+    "PackagePath": "pkg/closureevidence"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestValidateEvidence_ValidGreenEvidencePasses",
+      "Package": "closureevidence_test",
+      "PackagePath": "pkg/closureevidence",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/closureevidence/closure_gate_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestValidateEvidence_MissingFieldsFail",
+      "Package": "closureevidence_test",
+      "PackagePath": "pkg/closureevidence",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/closureevidence/closure_gate_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestValidateEvidence_MissingOrEmptyBundleLogFails",
+      "Package": "closureevidence_test",
+      "PackagePath": "pkg/closureevidence",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/closureevidence/closure_gate_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestValidateEvidence_FailingHealthOutcomeFails",
+      "Package": "closureevidence_test",
+      "PackagePath": "pkg/closureevidence",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/closureevidence/closure_gate_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestValidateObjectClosureEvidence_NestedAndTopLevel",
+      "Package": "closureevidence_test",
+      "PackagePath": "pkg/closureevidence",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/closureevidence/closure_gate_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

@@ -1,0 +1,51 @@
+{
+  "name": "make-verify-376",
+  "created_at": "2026-09-04T21:34:31.075484Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-376",
+    "Tests": [
+      {
+        "Name": "TestStrategicKindStatusVocabulary",
+        "Package": "processhygiene",
+        "PackagePath": "pkg/processhygiene",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/processhygiene/strategic_vocabulary_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestStrategicPopulationHonesty",
+        "Package": "processhygiene",
+        "PackagePath": "pkg/processhygiene",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/processhygiene/strategic_vocabulary_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 60000000000,
+    "PackagePath": "pkg/processhygiene"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestStrategicKindStatusVocabulary",
+      "Package": "processhygiene",
+      "PackagePath": "pkg/processhygiene",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/processhygiene/strategic_vocabulary_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestStrategicPopulationHonesty",
+      "Package": "processhygiene",
+      "PackagePath": "pkg/processhygiene",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/processhygiene/strategic_vocabulary_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

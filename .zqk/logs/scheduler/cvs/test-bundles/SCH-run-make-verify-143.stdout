@@ -1,0 +1,8 @@
+
+--- run 2026-09-04T21:41:18Z ---
+=== RUN   TestValidatorRegistry_Get_normalizesTypedNil
+=== PAUSE TestValidatorRegistry_Get_normalizesTypedNil
+=== CONT  TestValidatorRegistry_Get_normalizesTypedNil
+--- PASS: TestValidatorRegistry_Get_normalizesTypedNil (0.00s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/validation	0.583s

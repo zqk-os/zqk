@@ -1,0 +1,14 @@
+created_at: "2026-08-18T23:37:05Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1787096225695011000-faa5ac9f
+item_id: CRIT-CEF-R2-ARCH-SYSTEM-TRANCHE2-A
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 2857702ca28e4b64fb5782140b43c1400e68fdeab30ab0062f4119523ca97d466e5f13c72adcfa41b92eacf21fa7f0a79b8a8e3a8d7c581e5c9afe0e69cb31dc
+schema_version: 2.0.0
+signature: 30440220545bd041c6e791297005e34f6b0b2dafb3293390c6838801d7d657763a64975d022046c2a04127eb258db3ba2c3fc8a76267fe3a257d35fc35aba461b5d60adb5ba5
+status: archived
+title: 'Accept: cmd/zqk/system tranche-2 extract ObjectIDCache/check_cache with LOC gate'
+updated_at: "2026-09-01T07:47:30Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

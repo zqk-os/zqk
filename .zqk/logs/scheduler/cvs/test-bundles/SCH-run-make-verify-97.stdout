@@ -1,0 +1,32 @@
+
+--- run 2026-09-04T22:22:51Z ---
+=== RUN   TestKeepAlivePlistXML_CrashOnlyNotUnconditional
+=== PAUSE TestKeepAlivePlistXML_CrashOnlyNotUnconditional
+=== RUN   TestSchedulerEnvironmentPlistXMLMarksLongLivedDaemon
+=== PAUSE TestSchedulerEnvironmentPlistXMLMarksLongLivedDaemon
+=== RUN   TestDarwinStopDisarmsKeepAlive
+=== PAUSE TestDarwinStopDisarmsKeepAlive
+=== RUN   TestRefuseIfCallerDescendsFromUnit_liveAncestor
+=== PAUSE TestRefuseIfCallerDescendsFromUnit_liveAncestor
+=== RUN   TestRefuseIfCallerDescendsFromUnit_missingPID
+=== PAUSE TestRefuseIfCallerDescendsFromUnit_missingPID
+=== RUN   TestRootIDStableAcrossSamePath
+=== PAUSE TestRootIDStableAcrossSamePath
+=== RUN   TestRegistryUpsertFindOrphans
+=== PAUSE TestRegistryUpsertFindOrphans
+=== CONT  TestKeepAlivePlistXML_CrashOnlyNotUnconditional
+--- PASS: TestKeepAlivePlistXML_CrashOnlyNotUnconditional (0.00s)
+=== CONT  TestRegistryUpsertFindOrphans
+=== CONT  TestRefuseIfCallerDescendsFromUnit_liveAncestor
+--- PASS: TestRegistryUpsertFindOrphans (0.00s)
+=== CONT  TestRootIDStableAcrossSamePath
+--- PASS: TestRootIDStableAcrossSamePath (0.00s)
+=== CONT  TestRefuseIfCallerDescendsFromUnit_missingPID
+--- PASS: TestRefuseIfCallerDescendsFromUnit_missingPID (0.00s)
+=== CONT  TestSchedulerEnvironmentPlistXMLMarksLongLivedDaemon
+--- PASS: TestSchedulerEnvironmentPlistXMLMarksLongLivedDaemon (0.00s)
+=== CONT  TestDarwinStopDisarmsKeepAlive
+--- PASS: TestDarwinStopDisarmsKeepAlive (0.00s)
+--- PASS: TestRefuseIfCallerDescendsFromUnit_liveAncestor (0.01s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/scheduler/hostservice	0.283s

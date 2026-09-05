@@ -1,0 +1,33 @@
+{
+  "name": "make-verify-311",
+  "created_at": "2026-09-04T21:34:30.472277Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-311",
+    "Tests": [
+      {
+        "Name": "TestSentinelManager_Hooks",
+        "Package": "multimodal",
+        "PackagePath": "pkg/mesh/multimodal",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mesh/multimodal/sentinel_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 30000000000,
+    "PackagePath": "pkg/mesh/multimodal"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestSentinelManager_Hooks",
+      "Package": "multimodal",
+      "PackagePath": "pkg/mesh/multimodal",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mesh/multimodal/sentinel_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

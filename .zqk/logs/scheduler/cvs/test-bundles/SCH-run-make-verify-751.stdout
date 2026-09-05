@@ -1,0 +1,38 @@
+
+--- run 2026-09-04T22:21:02Z ---
+=== RUN   TestCommitAnalyzer_AnalyzeCommit
+=== PAUSE TestCommitAnalyzer_AnalyzeCommit
+=== RUN   TestCommitAnalyzer_AnalyzeCommits
+=== PAUSE TestCommitAnalyzer_AnalyzeCommits
+=== RUN   TestCommitAnalyzer_AnalyzeRecent
+=== PAUSE TestCommitAnalyzer_AnalyzeRecent
+=== RUN   TestCommitAnalyzer_ExtractWorkItemReferences
+=== PAUSE TestCommitAnalyzer_ExtractWorkItemReferences
+=== RUN   TestCommitAnalyzer_Timeout
+=== PAUSE TestCommitAnalyzer_Timeout
+=== RUN   TestCommitAnalyzer_Retry
+=== PAUSE TestCommitAnalyzer_Retry
+=== RUN   TestCountAheadUpstream
+=== PAUSE TestCountAheadUpstream
+=== CONT  TestCommitAnalyzer_AnalyzeCommit
+=== CONT  TestCommitAnalyzer_Timeout
+--- PASS: TestCommitAnalyzer_Timeout (0.45s)
+=== CONT  TestCountAheadUpstream
+--- PASS: TestCommitAnalyzer_AnalyzeCommit (0.54s)
+=== CONT  TestCommitAnalyzer_AnalyzeRecent
+--- PASS: TestCountAheadUpstream (0.72s)
+=== CONT  TestCommitAnalyzer_ExtractWorkItemReferences
+=== RUN   TestCommitAnalyzer_ExtractWorkItemReferences/multiple_references
+=== CONT  TestCommitAnalyzer_AnalyzeCommits
+--- PASS: TestCommitAnalyzer_AnalyzeRecent (0.82s)
+=== RUN   TestCommitAnalyzer_ExtractWorkItemReferences/no_references
+=== RUN   TestCommitAnalyzer_ExtractWorkItemReferences/duplicate_references
+--- PASS: TestCommitAnalyzer_AnalyzeCommits (0.54s)
+=== CONT  TestCommitAnalyzer_Retry
+--- PASS: TestCommitAnalyzer_ExtractWorkItemReferences (0.75s)
+    --- PASS: TestCommitAnalyzer_ExtractWorkItemReferences/multiple_references (0.22s)
+    --- PASS: TestCommitAnalyzer_ExtractWorkItemReferences/no_references (0.21s)
+    --- PASS: TestCommitAnalyzer_ExtractWorkItemReferences/duplicate_references (0.21s)
+--- PASS: TestCommitAnalyzer_Retry (0.25s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/git	2.828s

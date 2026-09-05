@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-622",
+  "created_at": "2026-09-04T21:34:33.548598Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-622",
+    "Tests": [
+      {
+        "Name": "TestDefaultRules",
+        "Package": "audit",
+        "PackagePath": "pkg/storage/audit",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/audit/aggregation_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAwaitCreateID",
+        "Package": "audit",
+        "PackagePath": "pkg/storage/audit",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/audit/await_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAwaitCreateError",
+        "Package": "audit",
+        "PackagePath": "pkg/storage/audit",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/audit/await_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAwaitCreateTimeout",
+        "Package": "audit",
+        "PackagePath": "pkg/storage/audit",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/audit/await_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAwaitCreateCanceled",
+        "Package": "audit",
+        "PackagePath": "pkg/storage/audit",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/audit/await_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestCloneAndExtractGroup",
+        "Package": "audit",
+        "PackagePath": "pkg/storage/audit",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/audit/buffer_ops_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestResolveActor",
+        "Package": "audit",
+        "PackagePath": "pkg/storage/audit",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/audit/build_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestBufferCheckMap",
+        "Package": "audit",
+        "PackagePath": "pkg/storage/audit",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/audit/build_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestPopulateEvent",
+        "Package": "audit",
+        "PackagePath": "pkg/storage/audit",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/audit/build_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestBulkStatusWriterRecords",
+        "Package": "audit",
+        "PackagePath": "pkg/storage/audit",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/audit/bulk_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": true,
+    "EstimatedDuration": 900000000000,
+    "PackagePath": "pkg/storage/audit"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestDefaultRules",
+      "Package": "audit",
+      "PackagePath": "pkg/storage/audit",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/audit/aggregation_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestAwaitCreateID",
+      "Package": "audit",
+      "PackagePath": "pkg/storage/audit",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/audit/await_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestAwaitCreateError",
+      "Package": "audit",
+      "PackagePath": "pkg/storage/audit",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/audit/await_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestAwaitCreateTimeout",
+      "Package": "audit",
+      "PackagePath": "pkg/storage/audit",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/audit/await_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestAwaitCreateCanceled",
+      "Package": "audit",
+      "PackagePath": "pkg/storage/audit",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/audit/await_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestCloneAndExtractGroup",
+      "Package": "audit",
+      "PackagePath": "pkg/storage/audit",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/audit/buffer_ops_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestResolveActor",
+      "Package": "audit",
+      "PackagePath": "pkg/storage/audit",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/audit/build_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestBufferCheckMap",
+      "Package": "audit",
+      "PackagePath": "pkg/storage/audit",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/audit/build_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestPopulateEvent",
+      "Package": "audit",
+      "PackagePath": "pkg/storage/audit",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/audit/build_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestBulkStatusWriterRecords",
+      "Package": "audit",
+      "PackagePath": "pkg/storage/audit",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/audit/bulk_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    }
+  }
+}

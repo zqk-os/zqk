@@ -1,0 +1,103 @@
+
+--- run 2026-09-04T22:19:13Z ---
+=== RUN   TestDetectOrphanedFiles_StaleIndexHashIsDriftNotBlockingOrphan
+=== PAUSE TestDetectOrphanedFiles_StaleIndexHashIsDriftNotBlockingOrphan
+=== RUN   TestDetectOrphanedFiles_EmptyIndexReindexesSoleCriteria
+=== PAUSE TestDetectOrphanedFiles_EmptyIndexReindexesSoleCriteria
+=== RUN   TestCleanupHashDuplicates_RefusesMisgroupedNestedID
+=== PAUSE TestCleanupHashDuplicates_RefusesMisgroupedNestedID
+=== RUN   TestDetectOrphanedFiles_NeverDeletesTraditionalFile
+=== PAUSE TestDetectOrphanedFiles_NeverDeletesTraditionalFile
+=== RUN   TestConvertCheckResultToValidationState_DropsCacheCoherenceIssues
+=== PAUSE TestConvertCheckResultToValidationState_DropsCacheCoherenceIssues
+=== RUN   TestShouldUseCachedState_RejectsCacheCoherenceIssues
+=== PAUSE TestShouldUseCachedState_RejectsCacheCoherenceIssues
+=== RUN   TestShouldUseCachedState_RejectsGhostRef
+=== PAUSE TestShouldUseCachedState_RejectsGhostRef
+=== RUN   TestCheckCacheOnly
+=== PAUSE TestCheckCacheOnly
+=== RUN   TestCheckCommand_JSONLOutput_Quick
+=== PAUSE TestCheckCommand_JSONLOutput_Quick
+=== RUN   TestCheckCommand_JSONLOutput
+=== PAUSE TestCheckCommand_JSONLOutput
+=== CONT  TestDetectOrphanedFiles_StaleIndexHashIsDriftNotBlockingOrphan
+=== CONT  TestShouldUseCachedState_RejectsCacheCoherenceIssues
+--- PASS: TestShouldUseCachedState_RejectsCacheCoherenceIssues (0.13s)
+=== CONT  TestDetectOrphanedFiles_NeverDeletesTraditionalFile
+--- PASS: TestDetectOrphanedFiles_NeverDeletesTraditionalFile (0.38s)
+=== CONT  TestConvertCheckResultToValidationState_DropsCacheCoherenceIssues
+--- PASS: TestConvertCheckResultToValidationState_DropsCacheCoherenceIssues (0.00s)
+=== CONT  TestCleanupHashDuplicates_RefusesMisgroupedNestedID
+--- PASS: TestCleanupHashDuplicates_RefusesMisgroupedNestedID (0.01s)
+=== CONT  TestDetectOrphanedFiles_EmptyIndexReindexesSoleCriteria
+--- PASS: TestDetectOrphanedFiles_StaleIndexHashIsDriftNotBlockingOrphan (0.56s)
+=== CONT  TestCheckCommand_JSONLOutput_Quick
+    check_cli_output_quick_test.go:32: Output file not found - run check command first to create: test-scenarios/check-violation-resolver/check-original.jsonl
+--- SKIP: TestCheckCommand_JSONLOutput_Quick (0.00s)
+=== CONT  TestCheckCommand_JSONLOutput
+--- PASS: TestDetectOrphanedFiles_EmptyIndexReindexesSoleCriteria (0.03s)
+=== CONT  TestCheckCacheOnly
+System check starting...
+Preparing loaders and cache...
+Loaders starting...
+Loaders ready.
+Loading object ID cache...
+Cache ready, starting validator...
+    check_cache_only_test.go:106: Cache populated with issue.
+    check_cache_only_test.go:117: Validator finished, cache should be populated.
+    check_cache_only_test.go:161: Captured Output:
+        
+        === System Check: Pre-Membrane (Object Draft Plane) ===
+        
+        ┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
+        │ Draft Plane: Preliminary Objects That Have Not Crossed the CAS Membrane                          │
+        ├────────────────────────────────┬─────────────────┬───────────────────────────────────────────────┤
+        │ KIND                           │ OBJECTS         │ SAMPLE OBJECT IDS                             │
+        ├────────────────────────────────┼─────────────────┼───────────────────────────────────────────────┤
+        │ None awaiting crossing.        │ 0               │ -                                             │
+        └────────────────────────────────┴─────────────────┴───────────────────────────────────────────────┘
+        Stored under .zqk/object_drafts/ — outside CAS, so Layers 0-3 below do not cover these objects.
+        Get-by-ID works; normal list/count omit them. Promote once the crossing obligations are met (materializes into CAS), or delete when abandoned.
+        
+        
+        === System Check: High-Level Layered Summary ===
+        
+        ┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
+        │ Layer 0: CAS & Integrity Blockers                                                                │
+        ├─────────────────────────────────────────────────────────┬────────────┬───────────────────────────┤
+        │ ISSUE                                                   │ SEVERITY   │ KIND                      │
+        ├─────────────────────────────────────────────────────────┼────────────┼───────────────────────────┤
+        │ No CAS or integrity blockers found.                     │ -          │ -                         │
+        └─────────────────────────────────────────────────────────┴────────────┴───────────────────────────┘
+        ┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
+        │ Layer 1: Objects Needing Fixes (Inside CAS Membrane)                                             │
+        ├─────────────────────────────────────────────────────────┬────────────┬───────────────────────────┤
+        │ ISSUE                                                   │ SEVERITY   │ KIND                      │
+        ├─────────────────────────────────────────────────────────┼────────────┼───────────────────────────┤
+        │ Mock Tier 1 issue                                       │ ❌         │ Backlog item (1)          │
+        └─────────────────────────────────────────────────────────┴────────────┴───────────────────────────┘
+        ┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
+        │ Layer 2: Objects Ready for Execution/Promotion                                                   │
+        ├────────────────────────────────┬─────────────────┬───────────────────────────────────────────────┤
+        │ KIND                           │ READY COUNT     │ STATUS BREAKDOWN                              │
+        ├────────────────────────────────┼─────────────────┼───────────────────────────────────────────────┤
+        │ -                              │ -               │ No objects ready for execution or promotion.  │
+        └────────────────────────────────┴─────────────────┴───────────────────────────────────────────────┘
+        ┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
+        │ Layer 3: Completed and Validated Items                                                           │
+        ├────────────────────────────────┬───────────────────┬─────────────────────────────────────────────┤
+        │ KIND                           │ COMPLETED COUNT   │ STATUS BREAKDOWN                            │
+        ├────────────────────────────────┼───────────────────┼─────────────────────────────────────────────┤
+        │ -                              │ -                 │ No completed objects found in this check    │
+        │                                │                   │ run.                                        │
+        └────────────────────────────────┴───────────────────┴─────────────────────────────────────────────┘
+--- PASS: TestCheckCacheOnly (0.16s)
+=== CONT  TestShouldUseCachedState_RejectsGhostRef
+--- PASS: TestShouldUseCachedState_RejectsGhostRef (0.01s)
+Discovery starting...
+Starting discovery across 22 kinds...
+=== NAME  TestCheckCommand_JSONLOutput
+    check_cli_output_test.go:82: Output file is empty (no objects found in test environment) - this is expected for format testing
+--- SKIP: TestCheckCommand_JSONLOutput (2.48s)
+PASS
+ok  	github.com/lanceman/zqk/cmd/zqk/system	3.810s

@@ -1,0 +1,76 @@
+
+--- run 2026-09-04T22:13:27Z ---
+=== RUN   TestCommandContextOr
+=== PAUSE TestCommandContextOr
+=== RUN   TestContextFromInner
+=== PAUSE TestContextFromInner
+=== RUN   TestWrapperContext_PathResolver
+=== PAUSE TestWrapperContext_PathResolver
+=== RUN   TestWrapperContext_WithPathResolver
+=== PAUSE TestWrapperContext_WithPathResolver
+=== RUN   TestParseFieldValue
+=== PAUSE TestParseFieldValue
+=== RUN   TestParseFieldFlags_complexValues
+=== PAUSE TestParseFieldFlags_complexValues
+=== RUN   TestParseFieldFlags_goalRefsBareStringBecomesList
+=== PAUSE TestParseFieldFlags_goalRefsBareStringBecomesList
+=== RUN   TestParseFieldFlagsWithAppend_goalRefsAppendsList
+=== PAUSE TestParseFieldFlagsWithAppend_goalRefsAppendsList
+=== RUN   TestCSVFormatHandler_matrixGetOnly
+=== PAUSE TestCSVFormatHandler_matrixGetOnly
+=== RUN   TestFormatOutput_YAMLEmitsNativeYAMLDocuments
+=== PAUSE TestFormatOutput_YAMLEmitsNativeYAMLDocuments
+=== CONT  TestCommandContextOr
+--- PASS: TestCommandContextOr (0.00s)
+=== CONT  TestFormatOutput_YAMLEmitsNativeYAMLDocuments
+=== CONT  TestParseFieldFlags_complexValues
+--- PASS: TestParseFieldFlags_complexValues (0.00s)
+=== CONT  TestCSVFormatHandler_matrixGetOnly
+--- PASS: TestCSVFormatHandler_matrixGetOnly (0.00s)
+=== CONT  TestParseFieldFlagsWithAppend_goalRefsAppendsList
+--- PASS: TestFormatOutput_YAMLEmitsNativeYAMLDocuments (0.00s)
+=== CONT  TestParseFieldValue
+--- PASS: TestParseFieldFlagsWithAppend_goalRefsAppendsList (0.00s)
+=== CONT  TestParseFieldFlags_goalRefsBareStringBecomesList
+=== RUN   TestParseFieldValue/empty
+--- PASS: TestParseFieldFlags_goalRefsBareStringBecomesList (0.00s)
+=== CONT  TestWrapperContext_PathResolver
+=== RUN   TestParseFieldValue/plain_string
+=== RUN   TestParseFieldValue/string_with_spaces
+--- PASS: TestWrapperContext_PathResolver (0.00s)
+=== CONT  TestWrapperContext_WithPathResolver
+=== RUN   TestParseFieldValue/number
+--- PASS: TestWrapperContext_WithPathResolver (0.00s)
+=== CONT  TestContextFromInner
+--- PASS: TestContextFromInner (0.00s)
+=== RUN   TestParseFieldValue/float
+=== RUN   TestParseFieldValue/bool_true
+=== RUN   TestParseFieldValue/bool_false
+=== RUN   TestParseFieldValue/json_list_of_strings
+=== RUN   TestParseFieldValue/json_array_numbers
+=== RUN   TestParseFieldValue/json_array
+=== RUN   TestParseFieldValue/json_object
+=== RUN   TestParseFieldValue/json_nested
+=== RUN   TestParseFieldValue/backward_compat_non-json_string
+=== RUN   TestParseFieldValue/backward_compat_single_word
+=== RUN   TestParseFieldValue/prose_with_colon_not_a_map
+=== RUN   TestParseFieldValue/json_string_with_colon
+--- PASS: TestParseFieldValue (0.00s)
+    --- PASS: TestParseFieldValue/empty (0.00s)
+    --- PASS: TestParseFieldValue/plain_string (0.00s)
+    --- PASS: TestParseFieldValue/string_with_spaces (0.00s)
+    --- PASS: TestParseFieldValue/number (0.00s)
+    --- PASS: TestParseFieldValue/float (0.00s)
+    --- PASS: TestParseFieldValue/bool_true (0.00s)
+    --- PASS: TestParseFieldValue/bool_false (0.00s)
+    --- PASS: TestParseFieldValue/json_list_of_strings (0.00s)
+    --- PASS: TestParseFieldValue/json_array_numbers (0.00s)
+    --- PASS: TestParseFieldValue/json_array (0.00s)
+    --- PASS: TestParseFieldValue/json_object (0.00s)
+    --- PASS: TestParseFieldValue/json_nested (0.00s)
+    --- PASS: TestParseFieldValue/backward_compat_non-json_string (0.00s)
+    --- PASS: TestParseFieldValue/backward_compat_single_word (0.00s)
+    --- PASS: TestParseFieldValue/prose_with_colon_not_a_map (0.00s)
+    --- PASS: TestParseFieldValue/json_string_with_colon (0.00s)
+PASS
+ok  	github.com/lanceman/zqk/internal/cli	0.625s

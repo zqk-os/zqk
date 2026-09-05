@@ -1,0 +1,48 @@
+
+--- run 2026-09-04T22:22:48Z ---
+=== RUN   TestGlossaryTermInstanceBuilder_Build
+=== PAUSE TestGlossaryTermInstanceBuilder_Build
+=== RUN   TestLifecycleInstanceBuilder_Build
+=== PAUSE TestLifecycleInstanceBuilder_Build
+=== RUN   TestLifecycleInstanceBuilder_SetObjectType
+=== PAUSE TestLifecycleInstanceBuilder_SetObjectType
+=== RUN   TestLifecycleInstanceBuilder_SetSourceType
+=== PAUSE TestLifecycleInstanceBuilder_SetSourceType
+=== RUN   TestLifecycleInstanceBuilder_SetExtends
+=== PAUSE TestLifecycleInstanceBuilder_SetExtends
+=== RUN   TestLifecycleInstanceBuilder_SetStatusMapping
+=== PAUSE TestLifecycleInstanceBuilder_SetStatusMapping
+=== RUN   TestLifecycleInstanceBuilder_SetStatuses
+=== PAUSE TestLifecycleInstanceBuilder_SetStatuses
+=== RUN   TestLifecycleInstanceBuilder_SetTransitions
+=== PAUSE TestLifecycleInstanceBuilder_SetTransitions
+=== RUN   TestLifecycleInstanceBuilder_SetPercentComplete
+=== PAUSE TestLifecycleInstanceBuilder_SetPercentComplete
+=== RUN   TestLifecycleInstanceBuilder_LoadFromYAML
+=== PAUSE TestLifecycleInstanceBuilder_LoadFromYAML
+=== CONT  TestGlossaryTermInstanceBuilder_Build
+=== CONT  TestLifecycleInstanceBuilder_SetStatuses
+--- PASS: TestGlossaryTermInstanceBuilder_Build (0.00s)
+=== CONT  TestLifecycleInstanceBuilder_SetPercentComplete
+--- PASS: TestLifecycleInstanceBuilder_SetPercentComplete (0.00s)
+=== CONT  TestLifecycleInstanceBuilder_LoadFromYAML
+--- PASS: TestLifecycleInstanceBuilder_SetStatuses (0.00s)
+=== CONT  TestLifecycleInstanceBuilder_SetSourceType
+=== RUN   TestLifecycleInstanceBuilder_SetSourceType/built-in
+=== RUN   TestLifecycleInstanceBuilder_SetSourceType/internal
+--- PASS: TestLifecycleInstanceBuilder_SetSourceType (0.00s)
+    --- PASS: TestLifecycleInstanceBuilder_SetSourceType/built-in (0.00s)
+    --- PASS: TestLifecycleInstanceBuilder_SetSourceType/internal (0.00s)
+=== CONT  TestLifecycleInstanceBuilder_SetStatusMapping
+--- PASS: TestLifecycleInstanceBuilder_SetStatusMapping (0.00s)
+=== CONT  TestLifecycleInstanceBuilder_SetExtends
+--- PASS: TestLifecycleInstanceBuilder_SetExtends (0.00s)
+=== CONT  TestLifecycleInstanceBuilder_SetTransitions
+--- PASS: TestLifecycleInstanceBuilder_SetTransitions (0.00s)
+=== CONT  TestLifecycleInstanceBuilder_SetObjectType
+--- PASS: TestLifecycleInstanceBuilder_SetObjectType (0.00s)
+=== CONT  TestLifecycleInstanceBuilder_Build
+--- PASS: TestLifecycleInstanceBuilder_Build (0.00s)
+--- PASS: TestLifecycleInstanceBuilder_LoadFromYAML (0.01s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/specbuilder/bldr_instance_v1	0.499s

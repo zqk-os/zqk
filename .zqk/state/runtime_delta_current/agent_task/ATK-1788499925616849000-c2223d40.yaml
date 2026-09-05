@@ -1,0 +1,32 @@
+agent_heartbeat: "2026-09-04T16:13:11-07:00"
+agent_pid: 39521
+assignee_persona_ref: PER-ORCH-ALPHA
+backlog_item_ref: BLI-CEF-R27-DUAL-SEAT-REMEASURE-001
+branch_ref: integration/pri-cef-r27-envelope-001
+created_at: "2026-09-04T05:32:05Z"
+created_by: ACC-1785920548450214006-2e52b3e7
+description: |
+    pipeline_ref=PIP-CEF-DIAMOND-REMEASURE-001 stage=W2_con_adversarial
+    PRIOR: bite-sized CEF remesure under docs/quality/cef-runs/2026-09-03-AGENT_AC.
+    Attack L-CONCURRENCY. Overwrite adversarial/L-CONCURRENCY.jsonl.
+    READ: docs/quality/codebase_evaluation/prompts/L-CONCURRENCY/adversarial.md; docs/quality/cef-runs/2026-09-03-AGENT_AC/findings/L-CONCURRENCY.jsonl
+    STEPS:
+    1) Read docs/quality/cef-runs/2026-09-03-AGENT_AC/findings/L-CONCURRENCY.jsonl then overwrite docs/quality/cef-runs/2026-09-03-AGENT_AC/adversarial/L-CONCURRENCY.jsonl.
+    2) Attack false-green / hallucinated paths / weak evidence.
+    3) Append <=5 lines to docs/quality/cef-runs/2026-09-03-AGENT_AC/run_log.md.
+    4) Feed ack as qwen-1: attacks_filed.
+    SUCCESS_GATE: docs/quality/cef-runs/2026-09-03-AGENT_AC/adversarial/L-CONCURRENCY.jsonl overwritten with >=1 finding_id attack rows; not STUB.
+    FORBID: source edits; process mint; dual-seat GPA; sibling package before COMPARE.
+hourglass_on: true
+id: ATK-1788499925616849000-c2223d40
+kind: agent_task
+namespace_id: zqk:kernel
+pipeline_ref: PIP-CEF-DIAMOND-REMEASURE-001
+priority_plan_ref: PRI-CEF-R27-ENVELOPE-001
+schema_version: 2.0.0
+started_at: "2026-09-04T05:54:22Z"
+status: implemented
+title: CEF AGENT_AC W2_con_adversarial — L-CONCURRENCY
+updated_at: "2026-09-04T23:13:11Z"
+updated_by: ACC-1785920548450214006-2e52b3e7
+version_context: default

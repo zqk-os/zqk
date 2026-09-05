@@ -1,0 +1,123 @@
+{
+  "name": "make-verify-712",
+  "created_at": "2026-09-04T21:34:34.423395Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-712",
+    "Tests": [
+      {
+        "Name": "TestTransitionRule_RuleMatch_MilestoneBacklogCriterion",
+        "Package": "lifecycle",
+        "PackagePath": "pkg/lifecycle",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/lifecycle/rules_milestone_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestApplyDependencyRefEvent_CriteriaParentLockMatrix",
+        "Package": "lifecycle",
+        "PackagePath": "pkg/lifecycle",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/lifecycle/shockwave_compiled_paths_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestApplyDependencyRefEvent_AgentTaskNotStatusReactive",
+        "Package": "lifecycle",
+        "PackagePath": "pkg/lifecycle",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/lifecycle/shockwave_compiled_paths_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestApplyDependencyRefEvents_SelectiveCriteriaLock",
+        "Package": "lifecycle",
+        "PackagePath": "pkg/lifecycle",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/lifecycle/shockwave_compiled_paths_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestApplyDependencyRefEvents_NoCriteriaRefsIsNoop",
+        "Package": "lifecycle",
+        "PackagePath": "pkg/lifecycle",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/lifecycle/shockwave_compiled_paths_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestDependencyPropagationSubscriber_HandleEvent_LocksCriteria",
+        "Package": "lifecycle",
+        "PackagePath": "pkg/lifecycle",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/lifecycle/shockwave_compiled_paths_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 180000000000,
+    "PackagePath": "pkg/lifecycle"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestTransitionRule_RuleMatch_MilestoneBacklogCriterion",
+      "Package": "lifecycle",
+      "PackagePath": "pkg/lifecycle",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/lifecycle/rules_milestone_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestApplyDependencyRefEvent_CriteriaParentLockMatrix",
+      "Package": "lifecycle",
+      "PackagePath": "pkg/lifecycle",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/lifecycle/shockwave_compiled_paths_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestApplyDependencyRefEvent_AgentTaskNotStatusReactive",
+      "Package": "lifecycle",
+      "PackagePath": "pkg/lifecycle",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/lifecycle/shockwave_compiled_paths_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestApplyDependencyRefEvents_SelectiveCriteriaLock",
+      "Package": "lifecycle",
+      "PackagePath": "pkg/lifecycle",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/lifecycle/shockwave_compiled_paths_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestApplyDependencyRefEvents_NoCriteriaRefsIsNoop",
+      "Package": "lifecycle",
+      "PackagePath": "pkg/lifecycle",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/lifecycle/shockwave_compiled_paths_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestDependencyPropagationSubscriber_HandleEvent_LocksCriteria",
+      "Package": "lifecycle",
+      "PackagePath": "pkg/lifecycle",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/lifecycle/shockwave_compiled_paths_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

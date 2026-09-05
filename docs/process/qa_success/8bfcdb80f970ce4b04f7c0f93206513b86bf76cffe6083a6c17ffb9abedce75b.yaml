@@ -1,0 +1,14 @@
+created_at: "2026-09-02T02:47:43Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1788317263114651000-6d5fab6c
+item_id: BLI-CEF-REPLACE-PANICS-001
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 86b8ab3d574c004a61020b73c23f52b9055049e90c3d755c8bbb383e059e384028fdd8cd69e13123b644e5f3f7eb65596e73e2d57d719ea3dafcb01b84ce8dfb
+schema_version: 2.0.0
+signature: 30450220522d7d5381ace0cdc48fb65fca430c0393130c762fe569e3a7df4e6b5533c97d022100893e232536fd7ee8aa2fbe21ce14716fbdf856b265141c0609ed8d18d46e8054
+status: success
+title: QA success for BLI-CEF-REPLACE-PANICS-001
+updated_at: "2026-09-02T07:45:21Z"
+updated_by: ACC-1785920548450214006-2e52b3e7
+version_context: default

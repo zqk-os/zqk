@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-425",
+  "created_at": "2026-09-04T21:34:31.547601Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-425",
+    "Tests": [
+      {
+        "Name": "TestIsStrategicKernelKind",
+        "Package": "authcred",
+        "PackagePath": "pkg/authcred",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/authcred/planner_doer_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestHasWriteCode",
+        "Package": "authcred",
+        "PackagePath": "pkg/authcred",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/authcred/planner_doer_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestValidateOwnerRefProduction_DeterministicError",
+        "Package": "authcred_test",
+        "PackagePath": "pkg/authcred",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/authcred/prototype_rejection_integration_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestValidateOwnerRefProduction_DeterministicErrorUnit",
+        "Package": "authcred",
+        "PackagePath": "pkg/authcred",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/authcred/prototype_rejection_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestHashAndResolveSecret",
+        "Package": "authcred",
+        "PackagePath": "pkg/authcred",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/authcred/seating_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestSeatCredentialRoundTrip",
+        "Package": "authcred",
+        "PackagePath": "pkg/authcred",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/authcred/seating_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestResolveSeatAccount",
+        "Package": "authcred",
+        "PackagePath": "pkg/authcred",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/authcred/seating_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestResolveSeatAccount_plannerFromRoleObject",
+        "Package": "authcred",
+        "PackagePath": "pkg/authcred",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/authcred/seating_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestCanonicalAccountID",
+        "Package": "authcred",
+        "PackagePath": "pkg/authcred",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/authcred/seating_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestWithSeatAPIKeyEnv",
+        "Package": "authcred",
+        "PackagePath": "pkg/authcred",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/authcred/seating_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 300000000000,
+    "PackagePath": "pkg/authcred"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestIsStrategicKernelKind",
+      "Package": "authcred",
+      "PackagePath": "pkg/authcred",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/authcred/planner_doer_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestHasWriteCode",
+      "Package": "authcred",
+      "PackagePath": "pkg/authcred",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/authcred/planner_doer_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestValidateOwnerRefProduction_DeterministicError",
+      "Package": "authcred_test",
+      "PackagePath": "pkg/authcred",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/authcred/prototype_rejection_integration_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestValidateOwnerRefProduction_DeterministicErrorUnit",
+      "Package": "authcred",
+      "PackagePath": "pkg/authcred",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/authcred/prototype_rejection_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestHashAndResolveSecret",
+      "Package": "authcred",
+      "PackagePath": "pkg/authcred",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/authcred/seating_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestSeatCredentialRoundTrip",
+      "Package": "authcred",
+      "PackagePath": "pkg/authcred",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/authcred/seating_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestResolveSeatAccount",
+      "Package": "authcred",
+      "PackagePath": "pkg/authcred",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/authcred/seating_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestResolveSeatAccount_plannerFromRoleObject",
+      "Package": "authcred",
+      "PackagePath": "pkg/authcred",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/authcred/seating_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestCanonicalAccountID",
+      "Package": "authcred",
+      "PackagePath": "pkg/authcred",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/authcred/seating_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestWithSeatAPIKeyEnv",
+      "Package": "authcred",
+      "PackagePath": "pkg/authcred",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/authcred/seating_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

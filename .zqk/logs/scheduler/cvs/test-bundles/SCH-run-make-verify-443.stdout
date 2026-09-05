@@ -1,0 +1,20 @@
+
+--- run 2026-09-04T22:13:34Z ---
+=== RUN   TestPool_NewPool_BudgetExceeded_ReturnsFallback
+=== PAUSE TestPool_NewPool_BudgetExceeded_ReturnsFallback
+=== RUN   TestPool_NewPool_NilBudget_ReturnsFallback
+=== PAUSE TestPool_NewPool_NilBudget_ReturnsFallback
+=== RUN   TestPool_Submit_RespectsCallerContext
+=== PAUSE TestPool_Submit_RespectsCallerContext
+=== RUN   TestPool_ConcurrentSubmitAndStop
+=== PAUSE TestPool_ConcurrentSubmitAndStop
+=== CONT  TestPool_NewPool_BudgetExceeded_ReturnsFallback
+--- PASS: TestPool_NewPool_BudgetExceeded_ReturnsFallback (0.00s)
+=== CONT  TestPool_ConcurrentSubmitAndStop
+=== CONT  TestPool_Submit_RespectsCallerContext
+--- PASS: TestPool_Submit_RespectsCallerContext (0.00s)
+=== CONT  TestPool_NewPool_NilBudget_ReturnsFallback
+--- PASS: TestPool_NewPool_NilBudget_ReturnsFallback (0.00s)
+--- PASS: TestPool_ConcurrentSubmitAndStop (0.02s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/goroutinelabels	0.278s

@@ -1,0 +1,81 @@
+assignee_persona_ref: PER-TRIAGE-LIAISON-001
+created_at: "2026-08-31T10:52:37Z"
+created_by: ACC-1785920548450214012-68b850c0
+description: |
+    # Agent Task Envelope
+    zqk_task_envelope_v1
+
+    Static context lives in kernel objects. Do not treat this description as a copy of policy or skill bodies.
+    Resolve at execute: `zqk object get <id>`, `zqk agent prepare-context --task-id <ATK>`, or `zqk workflow whats-next`.
+
+    ## Dynamic
+    - Plan: CEF lingering intake — COMMS P0 and unplanned fuel (PRI-CEF-LINGERING-INTAKE-001)
+    - Target: coder-agent (capability: )
+    - Persona: PER-TRIAGE-LIAISON-001
+    - Task: Phase B notify+seat-worker is the public-launch comms path
+
+    ## Standing refs (do not duplicate bodies)
+    - `POL-ONBOARD-001` — `zqk object get POL-ONBOARD-001`
+    - `POL-ONBOARD-002` — `zqk object get POL-ONBOARD-002`
+    - `POL-AGENT-INSTRUCTION-RUBRIC-001` — `zqk object get POL-AGENT-INSTRUCTION-RUBRIC-001`
+    - `POL-WORKFLOW-VDS` — `zqk object get POL-WORKFLOW-VDS`
+    - `POL-CODE-CAS-COMMIT-001` — `zqk object get POL-CODE-CAS-COMMIT-001`
+    - `POL-CODE-1784753087498298000-bedce972` — `zqk object get POL-CODE-1784753087498298000-bedce972`
+
+    ## Bound policies
+    - `POL-ONBOARD-001`
+    - `POL-ONBOARD-002`
+    - `POL-AGENT-INSTRUCTION-RUBRIC-001`
+    - `POL-WORKFLOW-VDS`
+    - `POL-CODE-CAS-COMMIT-001`
+    - `POL-CODE-1784753087498298000-bedce972`
+    - `POL-AGENT-INTERACTION-POLICY-001`
+    - `POL-AGENT-TPM-PROCESS-ADMIN-001`
+
+    ## Bound skills
+    - `ASK-1781037416510742000-284d1135` — `zqk object get ASK-1781037416510742000-284d1135`
+    - `ASK-1785886320695053000-499835d8` — `zqk object get ASK-1785886320695053000-499835d8`
+    - `ASK-1785886324283087000-34320add` — `zqk object get ASK-1785886324283087000-34320add`
+    - `ASK-1786081148616665000-c78bdd4d` — `zqk object get ASK-1786081148616665000-c78bdd4d`
+    - `ASK-DEFAULT-FEED-CORRESPONDENCE` — `zqk object get ASK-DEFAULT-FEED-CORRESPONDENCE`
+    - `ASK-TRIAGE-LIAISON-001` — `zqk object get ASK-TRIAGE-LIAISON-001`
+
+    ## Observer
+    Do not persist an AST census. At execute time call observer_search, then read_code the returned path.
+estimated_effort: 1d
+id: ATK-1788173557241793000-eb1ebed1
+kind: agent_task
+model_tier: tier_1_complex
+namespace_id: zqk:kernel
+policy_refs:
+    - POL-ONBOARD-001
+    - POL-ONBOARD-002
+    - POL-AGENT-INSTRUCTION-RUBRIC-001
+    - POL-WORKFLOW-VDS
+    - POL-CODE-CAS-COMMIT-001
+    - POL-CODE-1784753087498298000-bedce972
+    - POL-AGENT-INTERACTION-POLICY-001
+    - POL-AGENT-TPM-PROCESS-ADMIN-001
+priority_plan_ref: PRI-CEF-LINGERING-INTAKE-001
+related_object_refs:
+    - ASK-1781037416510742000-284d1135
+    - ASK-1785886320695053000-499835d8
+    - ASK-1785886324283087000-34320add
+    - ASK-1786081148616665000-c78bdd4d
+    - ASK-DEFAULT-FEED-CORRESPONDENCE
+    - ASK-TRIAGE-LIAISON-001
+schema_version: 2.0.0
+status: archived
+task_steps:
+    - description: Resolve the task envelope refs (`zqk object get`, `zqk agent prepare-context`) and execute the dynamic task. Do not copy policy or skill bodies onto the task object.
+      status: pending_implementation
+      title: Implementation Phase
+    - command: ./bin/zqk agent validate
+      description: Must pass targeted validation script.
+      status: pending
+      title: Validation Phase
+      verification_strategy: command_exit_code
+title: 'Execute Task: Phase B notify+seat-worker is the public-launch comms path'
+updated_at: "2026-09-02T21:35:07Z"
+updated_by: ACC-1785920548450214006-2e52b3e7
+version_context: default

@@ -1,0 +1,14 @@
+created_at: "2026-08-20T04:57:26Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1787201844783071000-94b11a08
+item_id: CRIT-CEF-R8L-PERF-02
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 2857702ca28e4b64fb5782140b43c1400e68fdeab30ab0062f4119523ca97d466e5f13c72adcfa41b92eacf21fa7f0a79b8a8e3a8d7c581e5c9afe0e69cb31dc
+schema_version: 2.0.0
+signature: 304402200f1e7a7294ed6c06f1f33986215a2b3dac27c58a09de4baf4c6ba4beb5b01b6602200aaafb531a64f190c831b08cb71d1b86c8da0ac335dc92d6e6e2c2dafc8ba4a8
+status: archived
+title: Resolved CRIT-CEF-R8L-PERF-02
+updated_at: "2026-09-01T07:13:33Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

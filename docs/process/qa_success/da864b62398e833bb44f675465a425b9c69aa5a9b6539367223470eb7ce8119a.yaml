@@ -1,0 +1,14 @@
+created_at: "2026-09-03T09:06:00Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1788426360808684000-0e613aed
+item_id: BLI-CEF-STORAGE-INDEX-CACHE-001
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 86b8ab3d574c004a61020b73c23f52b9055049e90c3d755c8bbb383e059e384028fdd8cd69e13123b644e5f3f7eb65596e73e2d57d719ea3dafcb01b84ce8dfb
+schema_version: 2.0.0
+signature: 304402201795c3ee746a194d58433bfd7f72da7581785f9558b65a0b3752e507090c15e0022038529b42de37f01172157a7c4b98fee499376b2d3848bd5b1e750dcba4b89c89
+status: success
+title: QA success for BLI-CEF-STORAGE-INDEX-CACHE-001
+updated_at: "2026-09-03T09:06:01Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

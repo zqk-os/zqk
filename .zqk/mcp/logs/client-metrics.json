@@ -1,0 +1,4813 @@
+{
+  "metrics": {
+    "seq_1788554292950118000_1788554292": {
+      "sequence_id": "seq_1788554292950118000_1788554292",
+      "client_id": "client_1788554292950112000_1788554292",
+      "first_event": "2026-09-04T13:38:13.05909-07:00",
+      "last_event": "2026-09-04T14:13:28.078373-07:00",
+      "total_events": 32,
+      "events": [
+        {
+          "event_type": "initialize",
+          "client_id": "client_1788554292950112000_1788554292",
+          "timestamp": "2026-09-04T13:38:13.05909-07:00",
+          "fields": {
+            "client_name": "zqk-feed-steer",
+            "client_version": "dev",
+            "tools_count": 14
+          },
+          "sequence_id": "seq_1788554292950118000_1788554292",
+          "sequence_pos": 0
+        },
+        {
+          "event_type": "events_list",
+          "client_id": "client_1788554292950112000_1788554292",
+          "timestamp": "2026-09-04T13:38:13.059528-07:00",
+          "duration": 437542,
+          "fields": {
+            "_record_prep_duration_ns": 7083
+          },
+          "sequence_id": "seq_1788554292950118000_1788554292",
+          "sequence_pos": 1
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "client_1788554292950112000_1788554292",
+          "timestamp": "2026-09-04T13:38:13.070665-07:00",
+          "duration": 11136542,
+          "fields": {
+            "_record_prep_duration_ns": 1000,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788554292950118000_1788554292",
+          "sequence_pos": 2
+        },
+        {
+          "event_type": "initialize",
+          "client_id": "client_1788554299718183000_1788554299",
+          "timestamp": "2026-09-04T13:38:19.72451-07:00",
+          "duration": 6653844125,
+          "fields": {
+            "client_name": "ide-ide-proxy",
+            "client_version": "ide-adapter",
+            "tools_count": 14
+          },
+          "sequence_id": "seq_1788554292950118000_1788554292",
+          "sequence_pos": 3
+        },
+        {
+          "event_type": "notification_initialized",
+          "client_id": "client_1788554299718183000_1788554299",
+          "timestamp": "2026-09-04T13:38:19.729977-07:00",
+          "duration": 5467666,
+          "sequence_id": "seq_1788554292950118000_1788554292",
+          "sequence_pos": 4
+        },
+        {
+          "event_type": "events_subscribe",
+          "client_id": "admin_client_1788554299718183000_1788554299",
+          "timestamp": "2026-09-04T13:38:19.733094-07:00",
+          "duration": 3116959,
+          "fields": {
+            "_record_prep_duration_ns": 1083,
+            "event_types": [
+              "action.required"
+            ]
+          },
+          "sequence_id": "seq_1788554292950118000_1788554292",
+          "sequence_pos": 5
+        },
+        {
+          "event_type": "notification_sent",
+          "client_id": "admin_client_1788554299718183000_1788554299",
+          "timestamp": "2026-09-04T13:38:19.831055-07:00",
+          "duration": 97960416,
+          "fields": {
+            "message_len": 76,
+            "message_type": "welcome",
+            "priority": "medium"
+          },
+          "sequence_id": "seq_1788554292950118000_1788554292",
+          "sequence_pos": 6
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "client_1788554324912635000_1788554324",
+          "timestamp": "2026-09-04T13:38:44.917822-07:00",
+          "duration": 25091455959,
+          "fields": {
+            "_record_prep_duration_ns": 1458,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788554292950118000_1788554292",
+          "sequence_pos": 7
+        },
+        {
+          "event_type": "initialize",
+          "client_id": "client_1788554324912635000_1788554324",
+          "timestamp": "2026-09-04T13:38:44.920297-07:00",
+          "duration": 2477125,
+          "fields": {
+            "client_name": "zqk-feed-steer",
+            "client_version": "dev",
+            "tools_count": 14
+          },
+          "sequence_id": "seq_1788554292950118000_1788554292",
+          "sequence_pos": 8
+        },
+        {
+          "event_type": "events_list",
+          "client_id": "client_1788554324912635000_1788554324",
+          "timestamp": "2026-09-04T13:38:44.92064-07:00",
+          "duration": 343166,
+          "fields": {
+            "_record_prep_duration_ns": 5083
+          },
+          "sequence_id": "seq_1788554292950118000_1788554292",
+          "sequence_pos": 9
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "client_1788554324912635000_1788554324",
+          "timestamp": "2026-09-04T13:38:44.931728-07:00",
+          "duration": 11096917,
+          "fields": {
+            "_record_prep_duration_ns": 917,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788554292950118000_1788554292",
+          "sequence_pos": 10
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "client_1788554328484935000_1788554328",
+          "timestamp": "2026-09-04T13:38:48.484994-07:00",
+          "duration": 3555778792,
+          "fields": {
+            "_record_prep_duration_ns": 1000,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788554292950118000_1788554292",
+          "sequence_pos": 11
+        },
+        {
+          "event_type": "initialize",
+          "client_id": "client_1788554328484935000_1788554328",
+          "timestamp": "2026-09-04T13:38:48.490421-07:00",
+          "duration": 5430541,
+          "fields": {
+            "client_name": "zqk-feed-steer",
+            "client_version": "dev",
+            "tools_count": 14
+          },
+          "sequence_id": "seq_1788554292950118000_1788554292",
+          "sequence_pos": 12
+        },
+        {
+          "event_type": "events_list",
+          "client_id": "client_1788554328484935000_1788554328",
+          "timestamp": "2026-09-04T13:38:48.490874-07:00",
+          "duration": 452792,
+          "fields": {
+            "_record_prep_duration_ns": 5542
+          },
+          "sequence_id": "seq_1788554292950118000_1788554292",
+          "sequence_pos": 13
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "client_1788554328484935000_1788554328",
+          "timestamp": "2026-09-04T13:38:48.503183-07:00",
+          "duration": 12316833,
+          "fields": {
+            "_record_prep_duration_ns": 1084,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788554292950118000_1788554292",
+          "sequence_pos": 14
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "client_1788554328484935000_1788554328",
+          "timestamp": "2026-09-04T13:41:23.62962-07:00",
+          "duration": 155136775750,
+          "fields": {
+            "_record_prep_duration_ns": 750,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788554292950118000_1788554292",
+          "sequence_pos": 15
+        },
+        {
+          "event_type": "initialize",
+          "client_id": "client_1788554484792496000_1788554484",
+          "timestamp": "2026-09-04T13:41:24.802594-07:00",
+          "duration": 1172978834,
+          "fields": {
+            "client_name": "zqk-feed-steer",
+            "client_version": "dev",
+            "tools_count": 14
+          },
+          "sequence_id": "seq_1788554292950118000_1788554292",
+          "sequence_pos": 16
+        },
+        {
+          "event_type": "events_list",
+          "client_id": "client_1788554484792496000_1788554484",
+          "timestamp": "2026-09-04T13:41:24.80287-07:00",
+          "duration": 275875,
+          "fields": {
+            "_record_prep_duration_ns": 7125
+          },
+          "sequence_id": "seq_1788554292950118000_1788554292",
+          "sequence_pos": 17
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "client_1788554484792496000_1788554484",
+          "timestamp": "2026-09-04T13:41:24.813188-07:00",
+          "duration": 10318291,
+          "fields": {
+            "_record_prep_duration_ns": 792,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788554292950118000_1788554292",
+          "sequence_pos": 18
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "client_1788554484792496000_1788554484",
+          "timestamp": "2026-09-04T13:42:03.989474-07:00",
+          "duration": 39176448875,
+          "fields": {
+            "_record_prep_duration_ns": 2250,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788554292950118000_1788554292",
+          "sequence_pos": 19
+        },
+        {
+          "event_type": "initialize",
+          "client_id": "client_1788554525329424000_1788554525",
+          "timestamp": "2026-09-04T13:42:05.349081-07:00",
+          "duration": 1359613542,
+          "fields": {
+            "client_name": "zqk-feed-steer",
+            "client_version": "dev",
+            "tools_count": 14
+          },
+          "sequence_id": "seq_1788554292950118000_1788554292",
+          "sequence_pos": 20
+        },
+        {
+          "event_type": "events_list",
+          "client_id": "client_1788554525329424000_1788554525",
+          "timestamp": "2026-09-04T13:42:05.349467-07:00",
+          "duration": 385417,
+          "fields": {
+            "_record_prep_duration_ns": 9875
+          },
+          "sequence_id": "seq_1788554292950118000_1788554292",
+          "sequence_pos": 21
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "client_1788554525329424000_1788554525",
+          "timestamp": "2026-09-04T13:42:05.369647-07:00",
+          "duration": 20180541,
+          "fields": {
+            "_record_prep_duration_ns": 2334,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788554292950118000_1788554292",
+          "sequence_pos": 22
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "client_1788554525329424000_1788554525",
+          "timestamp": "2026-09-04T13:44:03.206806-07:00",
+          "duration": 117837648334,
+          "fields": {
+            "_record_prep_duration_ns": 791,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788554292950118000_1788554292",
+          "sequence_pos": 23
+        },
+        {
+          "event_type": "initialize",
+          "client_id": "client_1788554645411711000_1788554645",
+          "timestamp": "2026-09-04T13:44:05.418044-07:00",
+          "duration": 2211247125,
+          "fields": {
+            "client_name": "zqk-feed-steer",
+            "client_version": "dev",
+            "tools_count": 14
+          },
+          "sequence_id": "seq_1788554292950118000_1788554292",
+          "sequence_pos": 24
+        },
+        {
+          "event_type": "events_list",
+          "client_id": "client_1788554645411711000_1788554645",
+          "timestamp": "2026-09-04T13:44:05.41833-07:00",
+          "duration": 285958,
+          "fields": {
+            "_record_prep_duration_ns": 6833
+          },
+          "sequence_id": "seq_1788554292950118000_1788554292",
+          "sequence_pos": 25
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "client_1788554645411711000_1788554645",
+          "timestamp": "2026-09-04T13:44:05.429429-07:00",
+          "duration": 11099292,
+          "fields": {
+            "_record_prep_duration_ns": 917,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788554292950118000_1788554292",
+          "sequence_pos": 26
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "client_1788554645411711000_1788554645",
+          "timestamp": "2026-09-04T14:08:27.711082-07:00",
+          "duration": 1462287757208,
+          "fields": {
+            "_record_prep_duration_ns": 2250,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788554292950118000_1788554292",
+          "sequence_pos": 27
+        },
+        {
+          "event_type": "initialize",
+          "client_id": "client_1788556407958775000_1788556407",
+          "timestamp": "2026-09-04T14:13:27.972615-07:00",
+          "duration": 300264745000,
+          "fields": {
+            "client_name": "ide-ide-proxy",
+            "client_version": "ide-adapter",
+            "tools_count": 14
+          },
+          "sequence_id": "seq_1788554292950118000_1788554292",
+          "sequence_pos": 28
+        },
+        {
+          "event_type": "notification_initialized",
+          "client_id": "client_1788556407958775000_1788556407",
+          "timestamp": "2026-09-04T14:13:27.977268-07:00",
+          "duration": 4652833,
+          "sequence_id": "seq_1788554292950118000_1788554292",
+          "sequence_pos": 29
+        },
+        {
+          "event_type": "events_subscribe",
+          "client_id": "admin_client_1788556407958775000_1788556407",
+          "timestamp": "2026-09-04T14:13:27.981244-07:00",
+          "duration": 3976709,
+          "fields": {
+            "_record_prep_duration_ns": 917,
+            "event_types": [
+              "action.required"
+            ]
+          },
+          "sequence_id": "seq_1788554292950118000_1788554292",
+          "sequence_pos": 30
+        },
+        {
+          "event_type": "notification_sent",
+          "client_id": "admin_client_1788556407958775000_1788556407",
+          "timestamp": "2026-09-04T14:13:28.078373-07:00",
+          "duration": 97129416,
+          "fields": {
+            "message_len": 76,
+            "message_type": "welcome",
+            "priority": "medium"
+          },
+          "sequence_id": "seq_1788554292950118000_1788554292",
+          "sequence_pos": 31
+        }
+      ],
+      "event_types": {
+        "disconnect": 12,
+        "events_list": 6,
+        "events_subscribe": 2,
+        "initialize": 8,
+        "notification_initialized": 2,
+        "notification_sent": 2
+      },
+      "anomalies": [
+        "long_gap_before_disconnect: 24m22.287757208s",
+        "long_gap_before_initialize: 5m0.264745s"
+      ],
+      "total_duration": 2115046834375,
+      "initialized": true,
+      "tools_registered": 14
+    },
+    "seq_1788556501338192000_1788556501": {
+      "sequence_id": "seq_1788556501338192000_1788556501",
+      "client_id": "client_1788556501338190000_1788556501",
+      "first_event": "2026-09-04T14:15:01.469072-07:00",
+      "last_event": "2026-09-04T14:36:09.748786-07:00",
+      "total_events": 52,
+      "events": [
+        {
+          "event_type": "initialize",
+          "client_id": "client_1788556501338190000_1788556501",
+          "timestamp": "2026-09-04T14:15:01.469072-07:00",
+          "fields": {
+            "client_name": "ide-ide-proxy",
+            "client_version": "ide-adapter",
+            "tools_count": 14
+          },
+          "sequence_id": "seq_1788556501338192000_1788556501",
+          "sequence_pos": 0
+        },
+        {
+          "event_type": "notification_initialized",
+          "client_id": "client_1788556501338190000_1788556501",
+          "timestamp": "2026-09-04T14:15:01.46984-07:00",
+          "duration": 768000,
+          "sequence_id": "seq_1788556501338192000_1788556501",
+          "sequence_pos": 1
+        },
+        {
+          "event_type": "events_subscribe",
+          "client_id": "admin_client_1788556501338190000_1788556501",
+          "timestamp": "2026-09-04T14:15:01.477072-07:00",
+          "duration": 7231583,
+          "fields": {
+            "_record_prep_duration_ns": 1042,
+            "event_types": [
+              "action.required"
+            ]
+          },
+          "sequence_id": "seq_1788556501338192000_1788556501",
+          "sequence_pos": 2
+        },
+        {
+          "event_type": "notification_sent",
+          "client_id": "admin_client_1788556501338190000_1788556501",
+          "timestamp": "2026-09-04T14:15:01.570909-07:00",
+          "duration": 93837625,
+          "fields": {
+            "message_len": 76,
+            "message_type": "welcome",
+            "priority": "medium"
+          },
+          "sequence_id": "seq_1788556501338192000_1788556501",
+          "sequence_pos": 3
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "admin_client_1788556501338190000_1788556501",
+          "timestamp": "2026-09-04T14:16:03.564777-07:00",
+          "duration": 61994154834,
+          "fields": {
+            "_record_prep_duration_ns": 791,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788556501338192000_1788556501",
+          "sequence_pos": 4
+        },
+        {
+          "event_type": "initialize",
+          "client_id": "client_1788556564885581000_1788556564",
+          "timestamp": "2026-09-04T14:16:04.895827-07:00",
+          "duration": 1331055708,
+          "fields": {
+            "client_name": "zqk-feed-steer",
+            "client_version": "dev",
+            "tools_count": 14
+          },
+          "sequence_id": "seq_1788556501338192000_1788556501",
+          "sequence_pos": 5
+        },
+        {
+          "event_type": "events_list",
+          "client_id": "client_1788556564885581000_1788556564",
+          "timestamp": "2026-09-04T14:16:04.896222-07:00",
+          "duration": 395417,
+          "fields": {
+            "_record_prep_duration_ns": 6458
+          },
+          "sequence_id": "seq_1788556501338192000_1788556501",
+          "sequence_pos": 6
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "client_1788556564885581000_1788556564",
+          "timestamp": "2026-09-04T14:16:04.906929-07:00",
+          "duration": 10706750,
+          "fields": {
+            "_record_prep_duration_ns": 2042,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788556501338192000_1788556501",
+          "sequence_pos": 7
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "client_1788556564885581000_1788556564",
+          "timestamp": "2026-09-04T14:16:33.276929-07:00",
+          "duration": 28370131541,
+          "fields": {
+            "_record_prep_duration_ns": 708,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788556501338192000_1788556501",
+          "sequence_pos": 8
+        },
+        {
+          "event_type": "initialize",
+          "client_id": "client_1788556593297643000_1788556593",
+          "timestamp": "2026-09-04T14:16:33.303312-07:00",
+          "duration": 26382875,
+          "fields": {
+            "client_name": "zqk-feed-steer",
+            "client_version": "dev",
+            "tools_count": 14
+          },
+          "sequence_id": "seq_1788556501338192000_1788556501",
+          "sequence_pos": 9
+        },
+        {
+          "event_type": "events_list",
+          "client_id": "client_1788556593297643000_1788556593",
+          "timestamp": "2026-09-04T14:16:33.303696-07:00",
+          "duration": 383500,
+          "fields": {
+            "_record_prep_duration_ns": 5250
+          },
+          "sequence_id": "seq_1788556501338192000_1788556501",
+          "sequence_pos": 10
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "client_1788556593297643000_1788556593",
+          "timestamp": "2026-09-04T14:16:33.314125-07:00",
+          "duration": 10429125,
+          "fields": {
+            "_record_prep_duration_ns": 708,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788556501338192000_1788556501",
+          "sequence_pos": 11
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "client_1788556593297643000_1788556593",
+          "timestamp": "2026-09-04T14:18:03.344594-07:00",
+          "duration": 90030884750,
+          "fields": {
+            "_record_prep_duration_ns": 792,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788556501338192000_1788556501",
+          "sequence_pos": 12
+        },
+        {
+          "event_type": "initialize",
+          "client_id": "client_1788556685156810000_1788556685",
+          "timestamp": "2026-09-04T14:18:05.170661-07:00",
+          "duration": 1826075875,
+          "fields": {
+            "client_name": "zqk-feed-steer",
+            "client_version": "dev",
+            "tools_count": 14
+          },
+          "sequence_id": "seq_1788556501338192000_1788556501",
+          "sequence_pos": 13
+        },
+        {
+          "event_type": "events_list",
+          "client_id": "client_1788556685156810000_1788556685",
+          "timestamp": "2026-09-04T14:18:05.171029-07:00",
+          "duration": 367625,
+          "fields": {
+            "_record_prep_duration_ns": 875
+          },
+          "sequence_id": "seq_1788556501338192000_1788556501",
+          "sequence_pos": 14
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "client_1788556685156810000_1788556685",
+          "timestamp": "2026-09-04T14:18:05.182142-07:00",
+          "duration": 11113209,
+          "fields": {
+            "_record_prep_duration_ns": 750,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788556501338192000_1788556501",
+          "sequence_pos": 15
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "client_1788556685156810000_1788556685",
+          "timestamp": "2026-09-04T14:20:03.622245-07:00",
+          "duration": 118440650333,
+          "fields": {
+            "_record_prep_duration_ns": 2209,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788556501338192000_1788556501",
+          "sequence_pos": 16
+        },
+        {
+          "event_type": "initialize",
+          "client_id": "client_1788556805106783000_1788556805",
+          "timestamp": "2026-09-04T14:20:05.123912-07:00",
+          "duration": 1501674250,
+          "fields": {
+            "client_name": "zqk-feed-steer",
+            "client_version": "dev",
+            "tools_count": 14
+          },
+          "sequence_id": "seq_1788556501338192000_1788556501",
+          "sequence_pos": 17
+        },
+        {
+          "event_type": "events_list",
+          "client_id": "client_1788556805106783000_1788556805",
+          "timestamp": "2026-09-04T14:20:05.124244-07:00",
+          "duration": 331583,
+          "fields": {
+            "_record_prep_duration_ns": 1000
+          },
+          "sequence_id": "seq_1788556501338192000_1788556501",
+          "sequence_pos": 18
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "client_1788556805106783000_1788556805",
+          "timestamp": "2026-09-04T14:20:05.135103-07:00",
+          "duration": 10859542,
+          "fields": {
+            "_record_prep_duration_ns": 2167,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788556501338192000_1788556501",
+          "sequence_pos": 19
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "client_1788556805106783000_1788556805",
+          "timestamp": "2026-09-04T14:22:03.383503-07:00",
+          "duration": 118248945958,
+          "fields": {
+            "_record_prep_duration_ns": 625,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788556501338192000_1788556501",
+          "sequence_pos": 20
+        },
+        {
+          "event_type": "initialize",
+          "client_id": "client_1788556924943046000_1788556924",
+          "timestamp": "2026-09-04T14:22:04.954846-07:00",
+          "duration": 1571349667,
+          "fields": {
+            "client_name": "zqk-feed-steer",
+            "client_version": "dev",
+            "tools_count": 14
+          },
+          "sequence_id": "seq_1788556501338192000_1788556501",
+          "sequence_pos": 21
+        },
+        {
+          "event_type": "events_list",
+          "client_id": "client_1788556924943046000_1788556924",
+          "timestamp": "2026-09-04T14:22:04.955159-07:00",
+          "duration": 313417,
+          "fields": {
+            "_record_prep_duration_ns": 6208
+          },
+          "sequence_id": "seq_1788556501338192000_1788556501",
+          "sequence_pos": 22
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "client_1788556924943046000_1788556924",
+          "timestamp": "2026-09-04T14:22:04.968966-07:00",
+          "duration": 13806791,
+          "fields": {
+            "_record_prep_duration_ns": 625,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788556501338192000_1788556501",
+          "sequence_pos": 23
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "client_1788556924943046000_1788556924",
+          "timestamp": "2026-09-04T14:24:03.181796-07:00",
+          "duration": 118213376125,
+          "fields": {
+            "_record_prep_duration_ns": 875,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788556501338192000_1788556501",
+          "sequence_pos": 24
+        },
+        {
+          "event_type": "initialize",
+          "client_id": "client_1788557044485843000_1788557044",
+          "timestamp": "2026-09-04T14:24:04.493737-07:00",
+          "duration": 1311946792,
+          "fields": {
+            "client_name": "zqk-feed-steer",
+            "client_version": "dev",
+            "tools_count": 14
+          },
+          "sequence_id": "seq_1788556501338192000_1788556501",
+          "sequence_pos": 25
+        },
+        {
+          "event_type": "events_list",
+          "client_id": "client_1788557044485843000_1788557044",
+          "timestamp": "2026-09-04T14:24:04.493971-07:00",
+          "duration": 233875,
+          "fields": {
+            "_record_prep_duration_ns": 833
+          },
+          "sequence_id": "seq_1788556501338192000_1788556501",
+          "sequence_pos": 26
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "client_1788557044485843000_1788557044",
+          "timestamp": "2026-09-04T14:24:04.505321-07:00",
+          "duration": 11350583,
+          "fields": {
+            "_record_prep_duration_ns": 2125,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788556501338192000_1788556501",
+          "sequence_pos": 27
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "client_1788557044485843000_1788557044",
+          "timestamp": "2026-09-04T14:26:03.647067-07:00",
+          "duration": 119142295834,
+          "fields": {
+            "_record_prep_duration_ns": 791,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788556501338192000_1788556501",
+          "sequence_pos": 28
+        },
+        {
+          "event_type": "initialize",
+          "client_id": "client_1788557164836257000_1788557164",
+          "timestamp": "2026-09-04T14:26:04.844019-07:00",
+          "duration": 1196957500,
+          "fields": {
+            "client_name": "zqk-feed-steer",
+            "client_version": "dev",
+            "tools_count": 14
+          },
+          "sequence_id": "seq_1788556501338192000_1788556501",
+          "sequence_pos": 29
+        },
+        {
+          "event_type": "events_list",
+          "client_id": "client_1788557164836257000_1788557164",
+          "timestamp": "2026-09-04T14:26:04.844248-07:00",
+          "duration": 229708,
+          "fields": {
+            "_record_prep_duration_ns": 5625
+          },
+          "sequence_id": "seq_1788556501338192000_1788556501",
+          "sequence_pos": 30
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "client_1788557164836257000_1788557164",
+          "timestamp": "2026-09-04T14:26:04.855465-07:00",
+          "duration": 11216292,
+          "fields": {
+            "_record_prep_duration_ns": 833,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788556501338192000_1788556501",
+          "sequence_pos": 31
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "client_1788557164836257000_1788557164",
+          "timestamp": "2026-09-04T14:28:03.912803-07:00",
+          "duration": 119057888541,
+          "fields": {
+            "_record_prep_duration_ns": 2042,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788556501338192000_1788556501",
+          "sequence_pos": 32
+        },
+        {
+          "event_type": "initialize",
+          "client_id": "client_1788557285445521000_1788557285",
+          "timestamp": "2026-09-04T14:28:05.464647-07:00",
+          "duration": 1551851125,
+          "fields": {
+            "client_name": "zqk-feed-steer",
+            "client_version": "dev",
+            "tools_count": 14
+          },
+          "sequence_id": "seq_1788556501338192000_1788556501",
+          "sequence_pos": 33
+        },
+        {
+          "event_type": "events_list",
+          "client_id": "client_1788557285445521000_1788557285",
+          "timestamp": "2026-09-04T14:28:05.465197-07:00",
+          "duration": 549750,
+          "fields": {
+            "_record_prep_duration_ns": 5834
+          },
+          "sequence_id": "seq_1788556501338192000_1788556501",
+          "sequence_pos": 34
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "client_1788557285445521000_1788557285",
+          "timestamp": "2026-09-04T14:28:05.476898-07:00",
+          "duration": 11701500,
+          "fields": {
+            "_record_prep_duration_ns": 5500,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788556501338192000_1788556501",
+          "sequence_pos": 35
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "client_1788557285445521000_1788557285",
+          "timestamp": "2026-09-04T14:30:03.71882-07:00",
+          "duration": 118242467625,
+          "fields": {
+            "_record_prep_duration_ns": 833,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788556501338192000_1788556501",
+          "sequence_pos": 36
+        },
+        {
+          "event_type": "initialize",
+          "client_id": "client_1788557404846641000_1788557404",
+          "timestamp": "2026-09-04T14:30:04.852186-07:00",
+          "duration": 1133371834,
+          "fields": {
+            "client_name": "zqk-feed-steer",
+            "client_version": "dev",
+            "tools_count": 14
+          },
+          "sequence_id": "seq_1788556501338192000_1788556501",
+          "sequence_pos": 37
+        },
+        {
+          "event_type": "events_list",
+          "client_id": "client_1788557404846641000_1788557404",
+          "timestamp": "2026-09-04T14:30:04.852495-07:00",
+          "duration": 308916,
+          "fields": {
+            "_record_prep_duration_ns": 5083
+          },
+          "sequence_id": "seq_1788556501338192000_1788556501",
+          "sequence_pos": 38
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "client_1788557404846641000_1788557404",
+          "timestamp": "2026-09-04T14:30:04.863798-07:00",
+          "duration": 11303000,
+          "fields": {
+            "_record_prep_duration_ns": 709,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788556501338192000_1788556501",
+          "sequence_pos": 39
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "client_1788557404846641000_1788557404",
+          "timestamp": "2026-09-04T14:32:03.025189-07:00",
+          "duration": 118161936417,
+          "fields": {
+            "_record_prep_duration_ns": 750,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788556501338192000_1788556501",
+          "sequence_pos": 40
+        },
+        {
+          "event_type": "initialize",
+          "client_id": "client_1788557524540445000_1788557524",
+          "timestamp": "2026-09-04T14:32:04.555599-07:00",
+          "duration": 1530416833,
+          "fields": {
+            "client_name": "zqk-feed-steer",
+            "client_version": "dev",
+            "tools_count": 14
+          },
+          "sequence_id": "seq_1788556501338192000_1788556501",
+          "sequence_pos": 41
+        },
+        {
+          "event_type": "events_list",
+          "client_id": "client_1788557524540445000_1788557524",
+          "timestamp": "2026-09-04T14:32:04.555992-07:00",
+          "duration": 392917,
+          "fields": {
+            "_record_prep_duration_ns": 6084
+          },
+          "sequence_id": "seq_1788556501338192000_1788556501",
+          "sequence_pos": 42
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "client_1788557524540445000_1788557524",
+          "timestamp": "2026-09-04T14:32:04.567174-07:00",
+          "duration": 11182667,
+          "fields": {
+            "_record_prep_duration_ns": 1167,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788556501338192000_1788556501",
+          "sequence_pos": 43
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "client_1788557524540445000_1788557524",
+          "timestamp": "2026-09-04T14:34:03.286502-07:00",
+          "duration": 118696483291,
+          "fields": {
+            "_record_prep_duration_ns": 959,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788556501338192000_1788556501",
+          "sequence_pos": 44
+        },
+        {
+          "event_type": "initialize",
+          "client_id": "client_1788557644491216000_1788557644",
+          "timestamp": "2026-09-04T14:34:04.498043-07:00",
+          "duration": 1211538917,
+          "fields": {
+            "client_name": "zqk-feed-steer",
+            "client_version": "dev",
+            "tools_count": 14
+          },
+          "sequence_id": "seq_1788556501338192000_1788556501",
+          "sequence_pos": 45
+        },
+        {
+          "event_type": "events_list",
+          "client_id": "client_1788557644491216000_1788557644",
+          "timestamp": "2026-09-04T14:34:04.498322-07:00",
+          "duration": 279500,
+          "fields": {
+            "_record_prep_duration_ns": 5333
+          },
+          "sequence_id": "seq_1788556501338192000_1788556501",
+          "sequence_pos": 46
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "client_1788557644491216000_1788557644",
+          "timestamp": "2026-09-04T14:34:04.509429-07:00",
+          "duration": 11107000,
+          "fields": {
+            "_record_prep_duration_ns": 1042,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788556501338192000_1788556501",
+          "sequence_pos": 47
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "client_1788557644491216000_1788557644",
+          "timestamp": "2026-09-04T14:36:06.578601-07:00",
+          "duration": 122069043625,
+          "fields": {
+            "_record_prep_duration_ns": 833,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788556501338192000_1788556501",
+          "sequence_pos": 48
+        },
+        {
+          "event_type": "initialize",
+          "client_id": "client_1788557769708588000_1788557769",
+          "timestamp": "2026-09-04T14:36:09.726936-07:00",
+          "duration": 3148332417,
+          "fields": {
+            "client_name": "zqk-feed-steer",
+            "client_version": "dev",
+            "tools_count": 14
+          },
+          "sequence_id": "seq_1788556501338192000_1788556501",
+          "sequence_pos": 49
+        },
+        {
+          "event_type": "events_list",
+          "client_id": "client_1788557769708588000_1788557769",
+          "timestamp": "2026-09-04T14:36:09.733265-07:00",
+          "duration": 6328833,
+          "fields": {
+            "_record_prep_duration_ns": 10916
+          },
+          "sequence_id": "seq_1788556501338192000_1788556501",
+          "sequence_pos": 50
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "client_1788557769708588000_1788557769",
+          "timestamp": "2026-09-04T14:36:09.748786-07:00",
+          "duration": 15520458,
+          "fields": {
+            "_record_prep_duration_ns": 1291,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788556501338192000_1788556501",
+          "sequence_pos": 51
+        }
+      ],
+      "event_types": {
+        "disconnect": 24,
+        "events_list": 12,
+        "events_subscribe": 1,
+        "initialize": 13,
+        "notification_initialized": 1,
+        "notification_sent": 1
+      },
+      "total_duration": 1268261461833,
+      "initialized": true,
+      "tools_registered": 14
+    },
+    "seq_1788557862493055000_1788557862": {
+      "sequence_id": "seq_1788557862493055000_1788557862",
+      "client_id": "client_1788557862493053000_1788557862",
+      "first_event": "2026-09-04T14:37:42.520955-07:00",
+      "last_event": "2026-09-04T21:03:01.190733-07:00",
+      "total_events": 254,
+      "events": [
+        {
+          "event_type": "initialize",
+          "client_id": "client_1788557862493053000_1788557862",
+          "timestamp": "2026-09-04T14:37:42.520955-07:00",
+          "fields": {
+            "client_name": "ide-ide-proxy",
+            "client_version": "ide-adapter",
+            "tools_count": 14
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 0
+        },
+        {
+          "event_type": "notification_initialized",
+          "client_id": "client_1788557862493053000_1788557862",
+          "timestamp": "2026-09-04T14:37:42.521707-07:00",
+          "duration": 751834,
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 1
+        },
+        {
+          "event_type": "events_subscribe",
+          "client_id": "admin_client_1788557862493053000_1788557862",
+          "timestamp": "2026-09-04T14:37:42.526497-07:00",
+          "duration": 4789333,
+          "fields": {
+            "_record_prep_duration_ns": 1125,
+            "event_types": [
+              "action.required"
+            ]
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 2
+        },
+        {
+          "event_type": "notification_sent",
+          "client_id": "admin_client_1788557862493053000_1788557862",
+          "timestamp": "2026-09-04T14:37:42.623767-07:00",
+          "duration": 97270042,
+          "fields": {
+            "message_len": 76,
+            "message_type": "welcome",
+            "priority": "medium"
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 3
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "admin_client_1788557862493053000_1788557862",
+          "timestamp": "2026-09-04T14:38:08.599007-07:00",
+          "duration": 25975215375,
+          "fields": {
+            "_record_prep_duration_ns": 833,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 4
+        },
+        {
+          "event_type": "initialize",
+          "client_id": "client_1788557889940290000_1788557889",
+          "timestamp": "2026-09-04T14:38:09.948279-07:00",
+          "duration": 1349270416,
+          "fields": {
+            "client_name": "zqk-feed-steer",
+            "client_version": "dev",
+            "tools_count": 14
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 5
+        },
+        {
+          "event_type": "events_list",
+          "client_id": "client_1788557889940290000_1788557889",
+          "timestamp": "2026-09-04T14:38:09.948535-07:00",
+          "duration": 256792,
+          "fields": {
+            "_record_prep_duration_ns": 4583
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 6
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "client_1788557889940290000_1788557889",
+          "timestamp": "2026-09-04T14:38:09.960675-07:00",
+          "duration": 12139833,
+          "fields": {
+            "_record_prep_duration_ns": 708,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 7
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "client_1788557889940290000_1788557889",
+          "timestamp": "2026-09-04T14:40:16.351835-07:00",
+          "duration": 126391038292,
+          "fields": {
+            "_record_prep_duration_ns": 834,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 8
+        },
+        {
+          "event_type": "initialize",
+          "client_id": "client_1788558017522652000_1788558017",
+          "timestamp": "2026-09-04T14:40:17.528929-07:00",
+          "duration": 1177093208,
+          "fields": {
+            "client_name": "zqk-feed-steer",
+            "client_version": "dev",
+            "tools_count": 14
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 9
+        },
+        {
+          "event_type": "events_list",
+          "client_id": "client_1788558017522652000_1788558017",
+          "timestamp": "2026-09-04T14:40:17.529313-07:00",
+          "duration": 384084,
+          "fields": {
+            "_record_prep_duration_ns": 5209
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 10
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "client_1788558017522652000_1788558017",
+          "timestamp": "2026-09-04T14:40:17.54145-07:00",
+          "duration": 12137333,
+          "fields": {
+            "_record_prep_duration_ns": 833,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 11
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "client_1788558017522652000_1788558017",
+          "timestamp": "2026-09-04T14:42:14.828381-07:00",
+          "duration": 117286818333,
+          "fields": {
+            "_record_prep_duration_ns": 792,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 12
+        },
+        {
+          "event_type": "initialize",
+          "client_id": "client_1788558136273430000_1788558136",
+          "timestamp": "2026-09-04T14:42:16.28153-07:00",
+          "duration": 1453148250,
+          "fields": {
+            "client_name": "zqk-feed-steer",
+            "client_version": "dev",
+            "tools_count": 14
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 13
+        },
+        {
+          "event_type": "events_list",
+          "client_id": "client_1788558136273430000_1788558136",
+          "timestamp": "2026-09-04T14:42:16.281827-07:00",
+          "duration": 297042,
+          "fields": {
+            "_record_prep_duration_ns": 5792
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 14
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "client_1788558136273430000_1788558136",
+          "timestamp": "2026-09-04T14:42:16.293044-07:00",
+          "duration": 11216542,
+          "fields": {
+            "_record_prep_duration_ns": 750,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 15
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "client_1788558136273430000_1788558136",
+          "timestamp": "2026-09-04T14:45:02.154696-07:00",
+          "duration": 165861493208,
+          "fields": {
+            "_record_prep_duration_ns": 750,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 16
+        },
+        {
+          "event_type": "initialize",
+          "client_id": "client_1788558303424577000_1788558303",
+          "timestamp": "2026-09-04T14:45:03.43036-07:00",
+          "duration": 1275662458,
+          "fields": {
+            "client_name": "zqk-feed-steer",
+            "client_version": "dev",
+            "tools_count": 14
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 17
+        },
+        {
+          "event_type": "events_list",
+          "client_id": "client_1788558303424577000_1788558303",
+          "timestamp": "2026-09-04T14:45:03.430702-07:00",
+          "duration": 342250,
+          "fields": {
+            "_record_prep_duration_ns": 7250
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 18
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "client_1788558303424577000_1788558303",
+          "timestamp": "2026-09-04T14:45:03.440798-07:00",
+          "duration": 10096334,
+          "fields": {
+            "_record_prep_duration_ns": 792,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 19
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "client_1788558303424577000_1788558303",
+          "timestamp": "2026-09-04T14:47:30.105843-07:00",
+          "duration": 146664904500,
+          "fields": {
+            "_record_prep_duration_ns": 750,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 20
+        },
+        {
+          "event_type": "initialize",
+          "client_id": "client_1788558451351437000_1788558451",
+          "timestamp": "2026-09-04T14:47:31.362162-07:00",
+          "duration": 1256317958,
+          "fields": {
+            "client_name": "zqk-feed-steer",
+            "client_version": "dev",
+            "tools_count": 14
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 21
+        },
+        {
+          "event_type": "events_list",
+          "client_id": "client_1788558451351437000_1788558451",
+          "timestamp": "2026-09-04T14:47:31.366485-07:00",
+          "duration": 4322792,
+          "fields": {
+            "_record_prep_duration_ns": 8083
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 22
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "client_1788558451351437000_1788558451",
+          "timestamp": "2026-09-04T14:47:31.372927-07:00",
+          "duration": 6442083,
+          "fields": {
+            "_record_prep_duration_ns": 1875,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 23
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "client_1788558451351437000_1788558451",
+          "timestamp": "2026-09-04T14:54:31.307415-07:00",
+          "duration": 419930089208,
+          "fields": {
+            "_record_prep_duration_ns": 750,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 24
+        },
+        {
+          "event_type": "initialize",
+          "client_id": "client_1788558874431543000_1788558874",
+          "timestamp": "2026-09-04T14:54:34.437886-07:00",
+          "duration": 3129385417,
+          "fields": {
+            "client_name": "zqk-feed-steer",
+            "client_version": "dev",
+            "tools_count": 14
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 25
+        },
+        {
+          "event_type": "events_list",
+          "client_id": "client_1788558874431543000_1788558874",
+          "timestamp": "2026-09-04T14:54:34.438769-07:00",
+          "duration": 882625,
+          "fields": {
+            "_record_prep_duration_ns": 9292
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 26
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "client_1788558874431543000_1788558874",
+          "timestamp": "2026-09-04T14:54:34.450429-07:00",
+          "duration": 11656042,
+          "fields": {
+            "_record_prep_duration_ns": 875,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 27
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "client_1788558874431543000_1788558874",
+          "timestamp": "2026-09-04T15:01:49.568652-07:00",
+          "duration": 435111934125,
+          "fields": {
+            "_record_prep_duration_ns": 792,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 28
+        },
+        {
+          "event_type": "initialize",
+          "client_id": "client_1788559311077820000_1788559311",
+          "timestamp": "2026-09-04T15:01:51.08458-07:00",
+          "duration": 1515922625,
+          "fields": {
+            "client_name": "zqk-feed-steer",
+            "client_version": "dev",
+            "tools_count": 14
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 29
+        },
+        {
+          "event_type": "events_list",
+          "client_id": "client_1788559311077820000_1788559311",
+          "timestamp": "2026-09-04T15:01:51.084916-07:00",
+          "duration": 335833,
+          "fields": {
+            "_record_prep_duration_ns": 7375
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 30
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "client_1788559311077820000_1788559311",
+          "timestamp": "2026-09-04T15:01:51.095451-07:00",
+          "duration": 10535125,
+          "fields": {
+            "_record_prep_duration_ns": 875,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 31
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "client_1788559311077820000_1788559311",
+          "timestamp": "2026-09-04T15:07:50.542345-07:00",
+          "duration": 359445667667,
+          "fields": {
+            "_record_prep_duration_ns": 2416,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 32
+        },
+        {
+          "event_type": "initialize",
+          "client_id": "client_1788559970691401000_1788559970",
+          "timestamp": "2026-09-04T15:12:50.70385-07:00",
+          "duration": 300160481166,
+          "fields": {
+            "client_name": "ide-ide-proxy",
+            "client_version": "ide-adapter",
+            "tools_count": 14
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 33
+        },
+        {
+          "event_type": "notification_initialized",
+          "client_id": "client_1788559970691401000_1788559970",
+          "timestamp": "2026-09-04T15:12:50.71031-07:00",
+          "duration": 6460167,
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 34
+        },
+        {
+          "event_type": "events_subscribe",
+          "client_id": "admin_client_1788559970691401000_1788559970",
+          "timestamp": "2026-09-04T15:12:50.713841-07:00",
+          "duration": 3530958,
+          "fields": {
+            "_record_prep_duration_ns": 1167,
+            "event_types": [
+              "action.required"
+            ]
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 35
+        },
+        {
+          "event_type": "notification_sent",
+          "client_id": "admin_client_1788559970691401000_1788559970",
+          "timestamp": "2026-09-04T15:12:50.816263-07:00",
+          "duration": 102421875,
+          "fields": {
+            "message_len": 76,
+            "message_type": "welcome",
+            "priority": "medium"
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 36
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "admin_client_1788559970691401000_1788559970",
+          "timestamp": "2026-09-04T15:42:50.689632-07:00",
+          "duration": 1799884906875,
+          "fields": {
+            "_record_prep_duration_ns": 2041,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 37
+        },
+        {
+          "event_type": "initialize",
+          "client_id": "client_1788562071044913000_1788562071",
+          "timestamp": "2026-09-04T15:47:51.051547-07:00",
+          "duration": 300361932125,
+          "fields": {
+            "client_name": "ide-ide-proxy",
+            "client_version": "ide-adapter",
+            "tools_count": 14
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 38
+        },
+        {
+          "event_type": "notification_initialized",
+          "client_id": "client_1788562071044913000_1788562071",
+          "timestamp": "2026-09-04T15:47:51.05279-07:00",
+          "duration": 1243375,
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 39
+        },
+        {
+          "event_type": "events_subscribe",
+          "client_id": "admin_client_1788562071044913000_1788562071",
+          "timestamp": "2026-09-04T15:47:51.06636-07:00",
+          "duration": 13569667,
+          "fields": {
+            "_record_prep_duration_ns": 1125,
+            "event_types": [
+              "action.required"
+            ]
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 40
+        },
+        {
+          "event_type": "notification_sent",
+          "client_id": "admin_client_1788562071044913000_1788562071",
+          "timestamp": "2026-09-04T15:47:51.155927-07:00",
+          "duration": 89567375,
+          "fields": {
+            "message_len": 76,
+            "message_type": "welcome",
+            "priority": "medium"
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 41
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "admin_client_1788562071044913000_1788562071",
+          "timestamp": "2026-09-04T15:50:04.644531-07:00",
+          "duration": 133488611833,
+          "fields": {
+            "_record_prep_duration_ns": 2792,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 42
+        },
+        {
+          "event_type": "initialize",
+          "client_id": "client_1788562206666896000_1788562206",
+          "timestamp": "2026-09-04T15:50:06.674391-07:00",
+          "duration": 2029860084,
+          "fields": {
+            "client_name": "zqk-feed-steer",
+            "client_version": "dev",
+            "tools_count": 14
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 43
+        },
+        {
+          "event_type": "events_list",
+          "client_id": "client_1788562206666896000_1788562206",
+          "timestamp": "2026-09-04T15:50:06.675623-07:00",
+          "duration": 1232041,
+          "fields": {
+            "_record_prep_duration_ns": 1375
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 44
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "client_1788562206666896000_1788562206",
+          "timestamp": "2026-09-04T15:50:06.687533-07:00",
+          "duration": 11909375,
+          "fields": {
+            "_record_prep_duration_ns": 750,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 45
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "client_1788562206666896000_1788562206",
+          "timestamp": "2026-09-04T15:52:03.221969-07:00",
+          "duration": 116534443584,
+          "fields": {
+            "_record_prep_duration_ns": 708,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 46
+        },
+        {
+          "event_type": "initialize",
+          "client_id": "client_1788562324464992000_1788562324",
+          "timestamp": "2026-09-04T15:52:04.474164-07:00",
+          "duration": 1252195166,
+          "fields": {
+            "client_name": "zqk-feed-steer",
+            "client_version": "dev",
+            "tools_count": 14
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 47
+        },
+        {
+          "event_type": "events_list",
+          "client_id": "client_1788562324464992000_1788562324",
+          "timestamp": "2026-09-04T15:52:04.47443-07:00",
+          "duration": 265875,
+          "fields": {
+            "_record_prep_duration_ns": 5458
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 48
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "client_1788562324464992000_1788562324",
+          "timestamp": "2026-09-04T15:52:04.486094-07:00",
+          "duration": 11664042,
+          "fields": {
+            "_record_prep_duration_ns": 1166,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 49
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "client_1788562324464992000_1788562324",
+          "timestamp": "2026-09-04T15:54:02.889582-07:00",
+          "duration": 118403494875,
+          "fields": {
+            "_record_prep_duration_ns": 708,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 50
+        },
+        {
+          "event_type": "initialize",
+          "client_id": "client_1788562444138179000_1788562444",
+          "timestamp": "2026-09-04T15:54:04.146541-07:00",
+          "duration": 1256958333,
+          "fields": {
+            "client_name": "zqk-feed-steer",
+            "client_version": "dev",
+            "tools_count": 14
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 51
+        },
+        {
+          "event_type": "events_list",
+          "client_id": "client_1788562444138179000_1788562444",
+          "timestamp": "2026-09-04T15:54:04.147669-07:00",
+          "duration": 1128125,
+          "fields": {
+            "_record_prep_duration_ns": 5083
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 52
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "client_1788562444138179000_1788562444",
+          "timestamp": "2026-09-04T15:54:04.159333-07:00",
+          "duration": 11663875,
+          "fields": {
+            "_record_prep_duration_ns": 2042,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 53
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "client_1788562444138179000_1788562444",
+          "timestamp": "2026-09-04T15:56:03.567608-07:00",
+          "duration": 119408282459,
+          "fields": {
+            "_record_prep_duration_ns": 792,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 54
+        },
+        {
+          "event_type": "initialize",
+          "client_id": "client_1788562564761549000_1788562564",
+          "timestamp": "2026-09-04T15:56:04.770829-07:00",
+          "duration": 1203221166,
+          "fields": {
+            "client_name": "zqk-feed-steer",
+            "client_version": "dev",
+            "tools_count": 14
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 55
+        },
+        {
+          "event_type": "events_list",
+          "client_id": "client_1788562564761549000_1788562564",
+          "timestamp": "2026-09-04T15:56:04.771284-07:00",
+          "duration": 455250,
+          "fields": {
+            "_record_prep_duration_ns": 6500
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 56
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "client_1788562564761549000_1788562564",
+          "timestamp": "2026-09-04T15:56:04.783271-07:00",
+          "duration": 11986500,
+          "fields": {
+            "_record_prep_duration_ns": 1958,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 57
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "client_1788562564761549000_1788562564",
+          "timestamp": "2026-09-04T15:58:03.07105-07:00",
+          "duration": 118287785459,
+          "fields": {
+            "_record_prep_duration_ns": 792,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 58
+        },
+        {
+          "event_type": "initialize",
+          "client_id": "client_1788562684350664000_1788562684",
+          "timestamp": "2026-09-04T15:58:04.376578-07:00",
+          "duration": 1305528500,
+          "fields": {
+            "client_name": "zqk-feed-steer",
+            "client_version": "dev",
+            "tools_count": 14
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 59
+        },
+        {
+          "event_type": "events_list",
+          "client_id": "client_1788562684350664000_1788562684",
+          "timestamp": "2026-09-04T15:58:04.37692-07:00",
+          "duration": 341750,
+          "fields": {
+            "_record_prep_duration_ns": 6208
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 60
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "client_1788562684350664000_1788562684",
+          "timestamp": "2026-09-04T15:58:04.387063-07:00",
+          "duration": 10143750,
+          "fields": {
+            "_record_prep_duration_ns": 750,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 61
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "client_1788562684350664000_1788562684",
+          "timestamp": "2026-09-04T16:00:03.926095-07:00",
+          "duration": 119539038541,
+          "fields": {
+            "_record_prep_duration_ns": 875,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 62
+        },
+        {
+          "event_type": "initialize",
+          "client_id": "client_1788562805000247000_1788562805",
+          "timestamp": "2026-09-04T16:00:05.006621-07:00",
+          "duration": 1080526042,
+          "fields": {
+            "client_name": "zqk-feed-steer",
+            "client_version": "dev",
+            "tools_count": 14
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 63
+        },
+        {
+          "event_type": "events_list",
+          "client_id": "client_1788562805000247000_1788562805",
+          "timestamp": "2026-09-04T16:00:05.007019-07:00",
+          "duration": 398458,
+          "fields": {
+            "_record_prep_duration_ns": 6167
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 64
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "client_1788562805000247000_1788562805",
+          "timestamp": "2026-09-04T16:00:05.017053-07:00",
+          "duration": 10033875,
+          "fields": {
+            "_record_prep_duration_ns": 625,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 65
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "client_1788562873164057000_1788562873",
+          "timestamp": "2026-09-04T16:01:13.168362-07:00",
+          "duration": 68151313084,
+          "fields": {
+            "_record_prep_duration_ns": 791,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 66
+        },
+        {
+          "event_type": "initialize",
+          "client_id": "client_1788562873164057000_1788562873",
+          "timestamp": "2026-09-04T16:01:13.170191-07:00",
+          "duration": 1828416,
+          "fields": {
+            "client_name": "zqk-feed-steer",
+            "client_version": "dev",
+            "tools_count": 14
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 67
+        },
+        {
+          "event_type": "events_list",
+          "client_id": "client_1788562873164057000_1788562873",
+          "timestamp": "2026-09-04T16:01:13.170513-07:00",
+          "duration": 321834,
+          "fields": {
+            "_record_prep_duration_ns": 7375
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 68
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "client_1788562873164057000_1788562873",
+          "timestamp": "2026-09-04T16:01:13.181586-07:00",
+          "duration": 11073750,
+          "fields": {
+            "_record_prep_duration_ns": 917,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 69
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "client_1788562873164057000_1788562873",
+          "timestamp": "2026-09-04T16:02:02.802957-07:00",
+          "duration": 49621373125,
+          "fields": {
+            "_record_prep_duration_ns": 792,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 70
+        },
+        {
+          "event_type": "initialize",
+          "client_id": "client_1788562924033282000_1788562924",
+          "timestamp": "2026-09-04T16:02:04.054051-07:00",
+          "duration": 1251094416,
+          "fields": {
+            "client_name": "zqk-feed-steer",
+            "client_version": "dev",
+            "tools_count": 14
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 71
+        },
+        {
+          "event_type": "events_list",
+          "client_id": "client_1788562924033282000_1788562924",
+          "timestamp": "2026-09-04T16:02:04.054757-07:00",
+          "duration": 705750,
+          "fields": {
+            "_record_prep_duration_ns": 13708
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 72
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "client_1788562924033282000_1788562924",
+          "timestamp": "2026-09-04T16:02:04.071204-07:00",
+          "duration": 16447125,
+          "fields": {
+            "_record_prep_duration_ns": 1334,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 73
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "client_1788562924033282000_1788562924",
+          "timestamp": "2026-09-04T16:04:03.16952-07:00",
+          "duration": 119099321625,
+          "fields": {
+            "_record_prep_duration_ns": 916,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 74
+        },
+        {
+          "event_type": "initialize",
+          "client_id": "client_1788563044463768000_1788563044",
+          "timestamp": "2026-09-04T16:04:04.470689-07:00",
+          "duration": 1301170792,
+          "fields": {
+            "client_name": "zqk-feed-steer",
+            "client_version": "dev",
+            "tools_count": 14
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 75
+        },
+        {
+          "event_type": "events_list",
+          "client_id": "client_1788563044463768000_1788563044",
+          "timestamp": "2026-09-04T16:04:04.471839-07:00",
+          "duration": 1149833,
+          "fields": {
+            "_record_prep_duration_ns": 7709
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 76
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "client_1788563044463768000_1788563044",
+          "timestamp": "2026-09-04T16:04:04.482194-07:00",
+          "duration": 10354875,
+          "fields": {
+            "_record_prep_duration_ns": 1833,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 77
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "client_1788563044463768000_1788563044",
+          "timestamp": "2026-09-04T16:06:04.160146-07:00",
+          "duration": 119678002542,
+          "fields": {
+            "_record_prep_duration_ns": 791,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 78
+        },
+        {
+          "event_type": "initialize",
+          "client_id": "client_1788563165480220000_1788563165",
+          "timestamp": "2026-09-04T16:06:05.491458-07:00",
+          "duration": 1331312250,
+          "fields": {
+            "client_name": "zqk-feed-steer",
+            "client_version": "dev",
+            "tools_count": 14
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 79
+        },
+        {
+          "event_type": "events_list",
+          "client_id": "client_1788563165480220000_1788563165",
+          "timestamp": "2026-09-04T16:06:05.491774-07:00",
+          "duration": 315875,
+          "fields": {
+            "_record_prep_duration_ns": 5500
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 80
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "client_1788563165480220000_1788563165",
+          "timestamp": "2026-09-04T16:06:05.501925-07:00",
+          "duration": 10150833,
+          "fields": {
+            "_record_prep_duration_ns": 875,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 81
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "client_1788563165480220000_1788563165",
+          "timestamp": "2026-09-04T16:09:10.071686-07:00",
+          "duration": 184569818375,
+          "fields": {
+            "_record_prep_duration_ns": 709,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 82
+        },
+        {
+          "event_type": "initialize",
+          "client_id": "client_1788563351282095000_1788563351",
+          "timestamp": "2026-09-04T16:09:11.288143-07:00",
+          "duration": 1216457584,
+          "fields": {
+            "client_name": "zqk-feed-steer",
+            "client_version": "dev",
+            "tools_count": 14
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 83
+        },
+        {
+          "event_type": "events_list",
+          "client_id": "client_1788563351282095000_1788563351",
+          "timestamp": "2026-09-04T16:09:11.288444-07:00",
+          "duration": 301291,
+          "fields": {
+            "_record_prep_duration_ns": 5709
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 84
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "client_1788563351282095000_1788563351",
+          "timestamp": "2026-09-04T16:09:11.298917-07:00",
+          "duration": 10473042,
+          "fields": {
+            "_record_prep_duration_ns": 709,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 85
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "client_1788563351282095000_1788563351",
+          "timestamp": "2026-09-04T16:10:06.945069-07:00",
+          "duration": 55646168708,
+          "fields": {
+            "_record_prep_duration_ns": 750,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 86
+        },
+        {
+          "event_type": "initialize",
+          "client_id": "client_1788563410686673000_1788563410",
+          "timestamp": "2026-09-04T16:10:10.697732-07:00",
+          "duration": 3752664125,
+          "fields": {
+            "client_name": "zqk-feed-steer",
+            "client_version": "dev",
+            "tools_count": 14
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 87
+        },
+        {
+          "event_type": "events_list",
+          "client_id": "client_1788563410686673000_1788563410",
+          "timestamp": "2026-09-04T16:10:10.698179-07:00",
+          "duration": 447292,
+          "fields": {
+            "_record_prep_duration_ns": 8417
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 88
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "client_1788563410686673000_1788563410",
+          "timestamp": "2026-09-04T16:10:10.754795-07:00",
+          "duration": 56616292,
+          "fields": {
+            "_record_prep_duration_ns": 1042,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 89
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "client_1788563714590336000_1788563714",
+          "timestamp": "2026-09-04T16:15:14.590544-07:00",
+          "duration": 303835843375,
+          "fields": {
+            "_record_prep_duration_ns": 958,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 90
+        },
+        {
+          "event_type": "initialize",
+          "client_id": "client_1788563714590336000_1788563714",
+          "timestamp": "2026-09-04T16:15:14.59395-07:00",
+          "duration": 3405375,
+          "fields": {
+            "client_name": "zqk-feed-steer",
+            "client_version": "dev",
+            "tools_count": 14
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 91
+        },
+        {
+          "event_type": "events_list",
+          "client_id": "client_1788563714590336000_1788563714",
+          "timestamp": "2026-09-04T16:15:14.594638-07:00",
+          "duration": 688291,
+          "fields": {
+            "_record_prep_duration_ns": 6250
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 92
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "client_1788563714590336000_1788563714",
+          "timestamp": "2026-09-04T16:15:14.605388-07:00",
+          "duration": 10749792,
+          "fields": {
+            "_record_prep_duration_ns": 875,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 93
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "client_1788563714590336000_1788563714",
+          "timestamp": "2026-09-04T16:15:16.254553-07:00",
+          "duration": 1649165625,
+          "fields": {
+            "_record_prep_duration_ns": 708,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 94
+        },
+        {
+          "event_type": "initialize",
+          "client_id": "client_1788563716268629000_1788563716",
+          "timestamp": "2026-09-04T16:15:16.292107-07:00",
+          "duration": 37554167,
+          "fields": {
+            "client_name": "zqk-feed-steer",
+            "client_version": "dev",
+            "tools_count": 14
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 95
+        },
+        {
+          "event_type": "events_list",
+          "client_id": "client_1788563716268629000_1788563716",
+          "timestamp": "2026-09-04T16:15:16.314709-07:00",
+          "duration": 22602000,
+          "fields": {
+            "_record_prep_duration_ns": 11334
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 96
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "client_1788563716268629000_1788563716",
+          "timestamp": "2026-09-04T16:15:16.31579-07:00",
+          "duration": 1080625,
+          "fields": {
+            "_record_prep_duration_ns": 2125,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 97
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "client_1788563716268629000_1788563716",
+          "timestamp": "2026-09-04T16:15:19.202482-07:00",
+          "duration": 2886693625,
+          "fields": {
+            "_record_prep_duration_ns": 833,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 98
+        },
+        {
+          "event_type": "initialize",
+          "client_id": "client_1788563721935833000_1788563721",
+          "timestamp": "2026-09-04T16:15:21.946592-07:00",
+          "duration": 2744110833,
+          "fields": {
+            "client_name": "zqk-feed-steer",
+            "client_version": "dev",
+            "tools_count": 14
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 99
+        },
+        {
+          "event_type": "events_list",
+          "client_id": "client_1788563721935833000_1788563721",
+          "timestamp": "2026-09-04T16:15:21.953056-07:00",
+          "duration": 6463458,
+          "fields": {
+            "_record_prep_duration_ns": 917
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 100
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "client_1788563721935833000_1788563721",
+          "timestamp": "2026-09-04T16:15:21.95726-07:00",
+          "duration": 4204334,
+          "fields": {
+            "_record_prep_duration_ns": 1000,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 101
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "client_1788563721935833000_1788563721",
+          "timestamp": "2026-09-04T16:17:58.957923-07:00",
+          "duration": 157000712000,
+          "fields": {
+            "_record_prep_duration_ns": 792,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 102
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "client_1788563721935833000_1788563721",
+          "timestamp": "2026-09-04T16:18:02.838141-07:00",
+          "duration": 3880219166,
+          "fields": {
+            "_record_prep_duration_ns": 709,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 103
+        },
+        {
+          "event_type": "initialize",
+          "client_id": "client_1788563884142777000_1788563884",
+          "timestamp": "2026-09-04T16:18:04.150145-07:00",
+          "duration": 1312004417,
+          "fields": {
+            "client_name": "zqk-feed-steer",
+            "client_version": "dev",
+            "tools_count": 14
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 104
+        },
+        {
+          "event_type": "events_list",
+          "client_id": "client_1788563884142777000_1788563884",
+          "timestamp": "2026-09-04T16:18:04.150465-07:00",
+          "duration": 319375,
+          "fields": {
+            "_record_prep_duration_ns": 6083
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 105
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "client_1788563884142777000_1788563884",
+          "timestamp": "2026-09-04T16:18:04.160685-07:00",
+          "duration": 10220958,
+          "fields": {
+            "_record_prep_duration_ns": 791,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 106
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "client_1788563884142777000_1788563884",
+          "timestamp": "2026-09-04T16:20:06.380876-07:00",
+          "duration": 122220228584,
+          "fields": {
+            "_record_prep_duration_ns": 750,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 107
+        },
+        {
+          "event_type": "initialize",
+          "client_id": "client_1788564008218042000_1788564008",
+          "timestamp": "2026-09-04T16:20:08.22745-07:00",
+          "duration": 1846574916,
+          "fields": {
+            "client_name": "zqk-feed-steer",
+            "client_version": "dev",
+            "tools_count": 14
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 108
+        },
+        {
+          "event_type": "events_list",
+          "client_id": "client_1788564008218042000_1788564008",
+          "timestamp": "2026-09-04T16:20:08.22773-07:00",
+          "duration": 279500,
+          "fields": {
+            "_record_prep_duration_ns": 7417
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 109
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "client_1788564008218042000_1788564008",
+          "timestamp": "2026-09-04T16:20:08.242362-07:00",
+          "duration": 14632084,
+          "fields": {
+            "_record_prep_duration_ns": 3000,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 110
+        },
+        {
+          "event_type": "initialize",
+          "client_id": "client_1788564179823343000_1788564179",
+          "timestamp": "2026-09-04T16:22:59.830272-07:00",
+          "duration": 171587963375,
+          "fields": {
+            "client_name": "ide-ide-proxy",
+            "client_version": "ide-adapter",
+            "tools_count": 14
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 111
+        },
+        {
+          "event_type": "notification_initialized",
+          "client_id": "client_1788564179823343000_1788564179",
+          "timestamp": "2026-09-04T16:22:59.831054-07:00",
+          "duration": 782166,
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 112
+        },
+        {
+          "event_type": "notification_sent",
+          "client_id": "admin_client_1788564179823343000_1788564179",
+          "timestamp": "2026-09-04T16:22:59.931295-07:00",
+          "duration": 100241417,
+          "fields": {
+            "message_len": 76,
+            "message_type": "welcome",
+            "priority": "medium"
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 113
+        },
+        {
+          "event_type": "events_subscribe",
+          "client_id": "admin_client_1788564179823343000_1788564179",
+          "timestamp": "2026-09-04T16:23:00.019209-07:00",
+          "duration": 87913625,
+          "fields": {
+            "_record_prep_duration_ns": 958,
+            "event_types": [
+              "action.required"
+            ]
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 114
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "admin_client_1788564179823343000_1788564179",
+          "timestamp": "2026-09-04T16:25:48.136312-07:00",
+          "duration": 168117155042,
+          "fields": {
+            "_record_prep_duration_ns": 709,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 115
+        },
+        {
+          "event_type": "initialize",
+          "client_id": "client_1788564349915278000_1788564349",
+          "timestamp": "2026-09-04T16:25:49.92736-07:00",
+          "duration": 1791048541,
+          "fields": {
+            "client_name": "zqk-feed-steer",
+            "client_version": "dev",
+            "tools_count": 14
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 116
+        },
+        {
+          "event_type": "events_list",
+          "client_id": "client_1788564349915278000_1788564349",
+          "timestamp": "2026-09-04T16:25:49.928724-07:00",
+          "duration": 1364459,
+          "fields": {
+            "_record_prep_duration_ns": 6875
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 117
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "client_1788564349915278000_1788564349",
+          "timestamp": "2026-09-04T16:25:49.939134-07:00",
+          "duration": 10409541,
+          "fields": {
+            "_record_prep_duration_ns": 2542,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 118
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "client_1788564349915278000_1788564349",
+          "timestamp": "2026-09-04T16:28:03.995371-07:00",
+          "duration": 134065164042,
+          "fields": {
+            "_record_prep_duration_ns": 1959,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 119
+        },
+        {
+          "event_type": "initialize",
+          "client_id": "client_1788564486996604000_1788564486",
+          "timestamp": "2026-09-04T16:28:07.011208-07:00",
+          "duration": 3015845542,
+          "fields": {
+            "client_name": "zqk-feed-steer",
+            "client_version": "dev",
+            "tools_count": 14
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 120
+        },
+        {
+          "event_type": "events_list",
+          "client_id": "client_1788564486996604000_1788564486",
+          "timestamp": "2026-09-04T16:28:07.01154-07:00",
+          "duration": 331958,
+          "fields": {
+            "_record_prep_duration_ns": 6917
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 121
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "client_1788564486996604000_1788564486",
+          "timestamp": "2026-09-04T16:28:07.036645-07:00",
+          "duration": 25104875,
+          "fields": {
+            "_record_prep_duration_ns": 750,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 122
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "client_1788564486996604000_1788564486",
+          "timestamp": "2026-09-04T16:30:36.389038-07:00",
+          "duration": 149352772458,
+          "fields": {
+            "_record_prep_duration_ns": 791,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 123
+        },
+        {
+          "event_type": "initialize",
+          "client_id": "client_1788564640061513000_1788564640",
+          "timestamp": "2026-09-04T16:30:40.09381-07:00",
+          "duration": 3704781792,
+          "fields": {
+            "client_name": "zqk-feed-steer",
+            "client_version": "dev",
+            "tools_count": 14
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 124
+        },
+        {
+          "event_type": "events_list",
+          "client_id": "client_1788564640061513000_1788564640",
+          "timestamp": "2026-09-04T16:30:40.096872-07:00",
+          "duration": 3061375,
+          "fields": {
+            "_record_prep_duration_ns": 10125
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 125
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "client_1788564640061513000_1788564640",
+          "timestamp": "2026-09-04T16:30:40.104268-07:00",
+          "duration": 7396333,
+          "fields": {
+            "_record_prep_duration_ns": 750,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 126
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "client_1788564640061513000_1788564640",
+          "timestamp": "2026-09-04T16:32:41.837777-07:00",
+          "duration": 121733816334,
+          "fields": {
+            "_record_prep_duration_ns": 2000,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 127
+        },
+        {
+          "event_type": "initialize",
+          "client_id": "client_1788564763270657000_1788564763",
+          "timestamp": "2026-09-04T16:32:43.280276-07:00",
+          "duration": 1442502791,
+          "fields": {
+            "client_name": "zqk-feed-steer",
+            "client_version": "dev",
+            "tools_count": 14
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 128
+        },
+        {
+          "event_type": "events_list",
+          "client_id": "client_1788564763270657000_1788564763",
+          "timestamp": "2026-09-04T16:32:43.280563-07:00",
+          "duration": 286334,
+          "fields": {
+            "_record_prep_duration_ns": 6167
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 129
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "client_1788564763270657000_1788564763",
+          "timestamp": "2026-09-04T16:32:43.291655-07:00",
+          "duration": 11092041,
+          "fields": {
+            "_record_prep_duration_ns": 834,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 130
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "client_1788564763270657000_1788564763",
+          "timestamp": "2026-09-04T16:34:02.658762-07:00",
+          "duration": 79367307625,
+          "fields": {
+            "_record_prep_duration_ns": 834,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 131
+        },
+        {
+          "event_type": "initialize",
+          "client_id": "client_1788564843827006000_1788564843",
+          "timestamp": "2026-09-04T16:34:03.837919-07:00",
+          "duration": 1179160292,
+          "fields": {
+            "client_name": "zqk-feed-steer",
+            "client_version": "dev",
+            "tools_count": 14
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 132
+        },
+        {
+          "event_type": "events_list",
+          "client_id": "client_1788564843827006000_1788564843",
+          "timestamp": "2026-09-04T16:34:03.838284-07:00",
+          "duration": 365083,
+          "fields": {
+            "_record_prep_duration_ns": 5958
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 133
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "client_1788564843827006000_1788564843",
+          "timestamp": "2026-09-04T16:34:03.848687-07:00",
+          "duration": 10402875,
+          "fields": {
+            "_record_prep_duration_ns": 875,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 134
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "client_1788564843827006000_1788564843",
+          "timestamp": "2026-09-04T16:36:02.600096-07:00",
+          "duration": 118751707917,
+          "fields": {
+            "_record_prep_duration_ns": 875,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 135
+        },
+        {
+          "event_type": "initialize",
+          "client_id": "client_1788564963709570000_1788564963",
+          "timestamp": "2026-09-04T16:36:03.718403-07:00",
+          "duration": 1118310083,
+          "fields": {
+            "client_name": "zqk-feed-steer",
+            "client_version": "dev",
+            "tools_count": 14
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 136
+        },
+        {
+          "event_type": "events_list",
+          "client_id": "client_1788564963709570000_1788564963",
+          "timestamp": "2026-09-04T16:36:03.718695-07:00",
+          "duration": 292375,
+          "fields": {
+            "_record_prep_duration_ns": 5708
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 137
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "client_1788564963709570000_1788564963",
+          "timestamp": "2026-09-04T16:36:03.732006-07:00",
+          "duration": 13311209,
+          "fields": {
+            "_record_prep_duration_ns": 2250,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 138
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "client_1788564963709570000_1788564963",
+          "timestamp": "2026-09-04T16:38:02.591567-07:00",
+          "duration": 118859860041,
+          "fields": {
+            "_record_prep_duration_ns": 2000,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 139
+        },
+        {
+          "event_type": "initialize",
+          "client_id": "client_1788565083792526000_1788565083",
+          "timestamp": "2026-09-04T16:38:03.804783-07:00",
+          "duration": 1213219875,
+          "fields": {
+            "client_name": "zqk-feed-steer",
+            "client_version": "dev",
+            "tools_count": 14
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 140
+        },
+        {
+          "event_type": "events_list",
+          "client_id": "client_1788565083792526000_1788565083",
+          "timestamp": "2026-09-04T16:38:03.805242-07:00",
+          "duration": 458542,
+          "fields": {
+            "_record_prep_duration_ns": 13708
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 141
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "client_1788565083792526000_1788565083",
+          "timestamp": "2026-09-04T16:38:03.816716-07:00",
+          "duration": 11474500,
+          "fields": {
+            "_record_prep_duration_ns": 2083,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 142
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "client_1788565083792526000_1788565083",
+          "timestamp": "2026-09-04T16:40:04.024114-07:00",
+          "duration": 120207700750,
+          "fields": {
+            "_record_prep_duration_ns": 708,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 143
+        },
+        {
+          "event_type": "initialize",
+          "client_id": "client_1788565205235098000_1788565205",
+          "timestamp": "2026-09-04T16:40:05.240988-07:00",
+          "duration": 1216877083,
+          "fields": {
+            "client_name": "zqk-feed-steer",
+            "client_version": "dev",
+            "tools_count": 14
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 144
+        },
+        {
+          "event_type": "events_list",
+          "client_id": "client_1788565205235098000_1788565205",
+          "timestamp": "2026-09-04T16:40:05.241257-07:00",
+          "duration": 268917,
+          "fields": {
+            "_record_prep_duration_ns": 5708
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 145
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "client_1788565205235098000_1788565205",
+          "timestamp": "2026-09-04T16:40:05.252497-07:00",
+          "duration": 11240667,
+          "fields": {
+            "_record_prep_duration_ns": 2167,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 146
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "client_1788565205235098000_1788565205",
+          "timestamp": "2026-09-04T16:42:03.179007-07:00",
+          "duration": 117926806791,
+          "fields": {
+            "_record_prep_duration_ns": 875,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 147
+        },
+        {
+          "event_type": "initialize",
+          "client_id": "client_1788565324499209000_1788565324",
+          "timestamp": "2026-09-04T16:42:04.50722-07:00",
+          "duration": 1328216417,
+          "fields": {
+            "client_name": "zqk-feed-steer",
+            "client_version": "dev",
+            "tools_count": 14
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 148
+        },
+        {
+          "event_type": "events_list",
+          "client_id": "client_1788565324499209000_1788565324",
+          "timestamp": "2026-09-04T16:42:04.507489-07:00",
+          "duration": 269083,
+          "fields": {
+            "_record_prep_duration_ns": 5917
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 149
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "client_1788565324499209000_1788565324",
+          "timestamp": "2026-09-04T16:42:04.518619-07:00",
+          "duration": 11130334,
+          "fields": {
+            "_record_prep_duration_ns": 666,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 150
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "client_1788565324499209000_1788565324",
+          "timestamp": "2026-09-04T16:44:02.849715-07:00",
+          "duration": 118331394000,
+          "fields": {
+            "_record_prep_duration_ns": 833,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 151
+        },
+        {
+          "event_type": "initialize",
+          "client_id": "client_1788565444128493000_1788565444",
+          "timestamp": "2026-09-04T16:44:04.137804-07:00",
+          "duration": 1288092291,
+          "fields": {
+            "client_name": "zqk-feed-steer",
+            "client_version": "dev",
+            "tools_count": 14
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 152
+        },
+        {
+          "event_type": "events_list",
+          "client_id": "client_1788565444128493000_1788565444",
+          "timestamp": "2026-09-04T16:44:04.138431-07:00",
+          "duration": 627500,
+          "fields": {
+            "_record_prep_duration_ns": 7792
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 153
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "client_1788565444128493000_1788565444",
+          "timestamp": "2026-09-04T16:44:04.149293-07:00",
+          "duration": 10861834,
+          "fields": {
+            "_record_prep_duration_ns": 875,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 154
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "client_1788565444128493000_1788565444",
+          "timestamp": "2026-09-04T16:46:02.906766-07:00",
+          "duration": 118757772750,
+          "fields": {
+            "_record_prep_duration_ns": 2042,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 155
+        },
+        {
+          "event_type": "initialize",
+          "client_id": "client_1788565564142918000_1788565564",
+          "timestamp": "2026-09-04T16:46:04.150495-07:00",
+          "duration": 1243732083,
+          "fields": {
+            "client_name": "zqk-feed-steer",
+            "client_version": "dev",
+            "tools_count": 14
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 156
+        },
+        {
+          "event_type": "events_list",
+          "client_id": "client_1788565564142918000_1788565564",
+          "timestamp": "2026-09-04T16:46:04.150818-07:00",
+          "duration": 322708,
+          "fields": {
+            "_record_prep_duration_ns": 6708
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 157
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "client_1788565564142918000_1788565564",
+          "timestamp": "2026-09-04T16:46:04.162071-07:00",
+          "duration": 11253834,
+          "fields": {
+            "_record_prep_duration_ns": 875,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 158
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "client_1788565564142918000_1788565564",
+          "timestamp": "2026-09-04T16:48:32.337009-07:00",
+          "duration": 148175311791,
+          "fields": {
+            "_record_prep_duration_ns": 916,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 159
+        },
+        {
+          "event_type": "initialize",
+          "client_id": "client_1788565713663046000_1788565713",
+          "timestamp": "2026-09-04T16:48:33.670638-07:00",
+          "duration": 1333631625,
+          "fields": {
+            "client_name": "zqk-feed-steer",
+            "client_version": "dev",
+            "tools_count": 14
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 160
+        },
+        {
+          "event_type": "events_list",
+          "client_id": "client_1788565713663046000_1788565713",
+          "timestamp": "2026-09-04T16:48:33.671643-07:00",
+          "duration": 1004875,
+          "fields": {
+            "_record_prep_duration_ns": 9125
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 161
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "client_1788565713663046000_1788565713",
+          "timestamp": "2026-09-04T16:48:33.682316-07:00",
+          "duration": 10673459,
+          "fields": {
+            "_record_prep_duration_ns": 917,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 162
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "client_1788565713663046000_1788565713",
+          "timestamp": "2026-09-04T16:50:03.505742-07:00",
+          "duration": 89795405541,
+          "fields": {
+            "_record_prep_duration_ns": 875,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 163
+        },
+        {
+          "event_type": "initialize",
+          "client_id": "client_1788565804674842000_1788565804",
+          "timestamp": "2026-09-04T16:50:04.682246-07:00",
+          "duration": 1176487875,
+          "fields": {
+            "client_name": "zqk-feed-steer",
+            "client_version": "dev",
+            "tools_count": 14
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 164
+        },
+        {
+          "event_type": "events_list",
+          "client_id": "client_1788565804674842000_1788565804",
+          "timestamp": "2026-09-04T16:50:04.682531-07:00",
+          "duration": 285459,
+          "fields": {
+            "_record_prep_duration_ns": 5708
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 165
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "client_1788565804674842000_1788565804",
+          "timestamp": "2026-09-04T16:50:04.693584-07:00",
+          "duration": 11051875,
+          "fields": {
+            "_record_prep_duration_ns": 1167,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 166
+        },
+        {
+          "event_type": "initialize",
+          "client_id": "client_1788565872180750000_1788565872",
+          "timestamp": "2026-09-04T16:51:12.190493-07:00",
+          "duration": 67496464166,
+          "fields": {
+            "client_name": "zqk-feed-steer",
+            "client_version": "dev",
+            "tools_count": 14
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 167
+        },
+        {
+          "event_type": "events_list",
+          "client_id": "client_1788565872180750000_1788565872",
+          "timestamp": "2026-09-04T16:51:12.190896-07:00",
+          "duration": 402750,
+          "fields": {
+            "_record_prep_duration_ns": 5917
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 168
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "client_1788565872180750000_1788565872",
+          "timestamp": "2026-09-04T16:51:12.201949-07:00",
+          "duration": 11053084,
+          "fields": {
+            "_record_prep_duration_ns": 708,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 169
+        },
+        {
+          "event_type": "initialize",
+          "client_id": "client_1788565919927746000_1788565919",
+          "timestamp": "2026-09-04T16:51:59.93386-07:00",
+          "duration": 47731691041,
+          "fields": {
+            "client_name": "zqk-feed-steer",
+            "client_version": "dev",
+            "tools_count": 14
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 170
+        },
+        {
+          "event_type": "events_list",
+          "client_id": "client_1788565919927746000_1788565919",
+          "timestamp": "2026-09-04T16:51:59.934121-07:00",
+          "duration": 261042,
+          "fields": {
+            "_record_prep_duration_ns": 6334
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 171
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "client_1788565919927746000_1788565919",
+          "timestamp": "2026-09-04T16:51:59.945003-07:00",
+          "duration": 10881875,
+          "fields": {
+            "_record_prep_duration_ns": 2333,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 172
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "client_1788565919927746000_1788565919",
+          "timestamp": "2026-09-04T16:52:59.518856-07:00",
+          "duration": 59573581417,
+          "fields": {
+            "_record_prep_duration_ns": 833,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 173
+        },
+        {
+          "event_type": "initialize",
+          "client_id": "client_1788566011254715000_1788566011",
+          "timestamp": "2026-09-04T16:53:31.263394-07:00",
+          "duration": 31744393375,
+          "fields": {
+            "client_name": "zqk-feed-steer",
+            "client_version": "dev",
+            "tools_count": 14
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 174
+        },
+        {
+          "event_type": "events_list",
+          "client_id": "client_1788566011254715000_1788566011",
+          "timestamp": "2026-09-04T16:53:31.263683-07:00",
+          "duration": 289000,
+          "fields": {
+            "_record_prep_duration_ns": 833
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 175
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "client_1788566011254715000_1788566011",
+          "timestamp": "2026-09-04T16:53:31.276669-07:00",
+          "duration": 12985625,
+          "fields": {
+            "_record_prep_duration_ns": 791,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 176
+        },
+        {
+          "event_type": "initialize",
+          "client_id": "client_1788566279724525000_1788566279",
+          "timestamp": "2026-09-04T16:57:59.729536-07:00",
+          "duration": 268451643375,
+          "fields": {
+            "client_name": "ide-ide-proxy",
+            "client_version": "ide-adapter",
+            "tools_count": 14
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 177
+        },
+        {
+          "event_type": "notification_initialized",
+          "client_id": "client_1788566279724525000_1788566279",
+          "timestamp": "2026-09-04T16:57:59.730744-07:00",
+          "duration": 1207666,
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 178
+        },
+        {
+          "event_type": "events_subscribe",
+          "client_id": "admin_client_1788566279724525000_1788566279",
+          "timestamp": "2026-09-04T16:57:59.734794-07:00",
+          "duration": 4050292,
+          "fields": {
+            "_record_prep_duration_ns": 959,
+            "event_types": [
+              "action.required"
+            ]
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 179
+        },
+        {
+          "event_type": "notification_sent",
+          "client_id": "admin_client_1788566279724525000_1788566279",
+          "timestamp": "2026-09-04T16:57:59.831882-07:00",
+          "duration": 97087500,
+          "fields": {
+            "message_len": 76,
+            "message_type": "welcome",
+            "priority": "medium"
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 180
+        },
+        {
+          "event_type": "initialize",
+          "client_id": "client_1788567543051130000_1788567543",
+          "timestamp": "2026-09-04T17:19:03.059813-07:00",
+          "duration": 1263220784333,
+          "fields": {
+            "client_name": "zqk-feed-steer",
+            "client_version": "dev",
+            "tools_count": 14
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 181
+        },
+        {
+          "event_type": "events_list",
+          "client_id": "client_1788567543051130000_1788567543",
+          "timestamp": "2026-09-04T17:19:03.060122-07:00",
+          "duration": 309084,
+          "fields": {
+            "_record_prep_duration_ns": 6042
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 182
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "client_1788567543051130000_1788567543",
+          "timestamp": "2026-09-04T17:19:03.071161-07:00",
+          "duration": 11038000,
+          "fields": {
+            "_record_prep_duration_ns": 708,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 183
+        },
+        {
+          "event_type": "initialize",
+          "client_id": "client_1788567550642326000_1788567550",
+          "timestamp": "2026-09-04T17:19:10.652788-07:00",
+          "duration": 7581590333,
+          "fields": {
+            "client_name": "zqk-feed-steer",
+            "client_version": "dev",
+            "tools_count": 14
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 184
+        },
+        {
+          "event_type": "events_list",
+          "client_id": "client_1788567550642326000_1788567550",
+          "timestamp": "2026-09-04T17:19:10.653025-07:00",
+          "duration": 236833,
+          "fields": {
+            "_record_prep_duration_ns": 5584
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 185
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "client_1788567550642326000_1788567550",
+          "timestamp": "2026-09-04T17:19:10.663277-07:00",
+          "duration": 10252334,
+          "fields": {
+            "_record_prep_duration_ns": 667,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 186
+        },
+        {
+          "event_type": "initialize",
+          "client_id": "client_1788567564054871000_1788567564",
+          "timestamp": "2026-09-04T17:19:24.05774-07:00",
+          "duration": 13394397916,
+          "fields": {
+            "client_name": "zqk-feed-steer",
+            "client_version": "dev",
+            "tools_count": 14
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 187
+        },
+        {
+          "event_type": "events_list",
+          "client_id": "client_1788567564054871000_1788567564",
+          "timestamp": "2026-09-04T17:19:24.062015-07:00",
+          "duration": 4274542,
+          "fields": {
+            "_record_prep_duration_ns": 8125
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 188
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "client_1788567564054871000_1788567564",
+          "timestamp": "2026-09-04T17:19:24.073277-07:00",
+          "duration": 11262833,
+          "fields": {
+            "_record_prep_duration_ns": 708,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 189
+        },
+        {
+          "event_type": "initialize",
+          "client_id": "client_1788567598155672000_1788567598",
+          "timestamp": "2026-09-04T17:19:58.162346-07:00",
+          "duration": 34088903000,
+          "fields": {
+            "client_name": "zqk-feed-steer",
+            "client_version": "dev",
+            "tools_count": 14
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 190
+        },
+        {
+          "event_type": "events_list",
+          "client_id": "client_1788567598155672000_1788567598",
+          "timestamp": "2026-09-04T17:19:58.162696-07:00",
+          "duration": 349792,
+          "fields": {
+            "_record_prep_duration_ns": 7292
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 191
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "client_1788567598155672000_1788567598",
+          "timestamp": "2026-09-04T17:19:58.173854-07:00",
+          "duration": 11157500,
+          "fields": {
+            "_record_prep_duration_ns": 666,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 192
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "client_1788567598155672000_1788567598",
+          "timestamp": "2026-09-04T17:27:59.735659-07:00",
+          "duration": 481559462292,
+          "fields": {
+            "_record_prep_duration_ns": 2167,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 193
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "client_1788568167087963000_1788568167",
+          "timestamp": "2026-09-04T17:29:27.087989-07:00",
+          "duration": 87351905416,
+          "fields": {
+            "_record_prep_duration_ns": 917,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 194
+        },
+        {
+          "event_type": "initialize",
+          "client_id": "client_1788568167087963000_1788568167",
+          "timestamp": "2026-09-04T17:29:27.091675-07:00",
+          "duration": 3685584,
+          "fields": {
+            "client_name": "zqk-feed-steer",
+            "client_version": "dev",
+            "tools_count": 14
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 195
+        },
+        {
+          "event_type": "events_list",
+          "client_id": "client_1788568167087963000_1788568167",
+          "timestamp": "2026-09-04T17:29:27.091923-07:00",
+          "duration": 248500,
+          "fields": {
+            "_record_prep_duration_ns": 6791
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 196
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "client_1788568167087963000_1788568167",
+          "timestamp": "2026-09-04T17:29:27.102886-07:00",
+          "duration": 10962541,
+          "fields": {
+            "_record_prep_duration_ns": 750,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 197
+        },
+        {
+          "event_type": "initialize",
+          "client_id": "client_1788568379920946000_1788568379",
+          "timestamp": "2026-09-04T17:32:59.924831-07:00",
+          "duration": 212820909875,
+          "fields": {
+            "client_name": "ide-ide-proxy",
+            "client_version": "ide-adapter",
+            "tools_count": 14
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 198
+        },
+        {
+          "event_type": "notification_initialized",
+          "client_id": "client_1788568379920946000_1788568379",
+          "timestamp": "2026-09-04T17:32:59.925433-07:00",
+          "duration": 601917,
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 199
+        },
+        {
+          "event_type": "events_subscribe",
+          "client_id": "admin_client_1788568379920946000_1788568379",
+          "timestamp": "2026-09-04T17:32:59.931234-07:00",
+          "duration": 5800375,
+          "fields": {
+            "_record_prep_duration_ns": 2917,
+            "event_types": [
+              "action.required"
+            ]
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 200
+        },
+        {
+          "event_type": "notification_sent",
+          "client_id": "admin_client_1788568379920946000_1788568379",
+          "timestamp": "2026-09-04T17:33:00.02768-07:00",
+          "duration": 96446125,
+          "fields": {
+            "message_len": 76,
+            "message_type": "welcome",
+            "priority": "medium"
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 201
+        },
+        {
+          "event_type": "initialize",
+          "client_id": "client_1788568411843135000_1788568411",
+          "timestamp": "2026-09-04T17:33:31.848824-07:00",
+          "duration": 31820988958,
+          "fields": {
+            "client_name": "zqk-feed-steer",
+            "client_version": "dev",
+            "tools_count": 14
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 202
+        },
+        {
+          "event_type": "events_list",
+          "client_id": "client_1788568411843135000_1788568411",
+          "timestamp": "2026-09-04T17:33:31.849102-07:00",
+          "duration": 278209,
+          "fields": {
+            "_record_prep_duration_ns": 5250
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 203
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "client_1788568411843135000_1788568411",
+          "timestamp": "2026-09-04T17:33:31.859414-07:00",
+          "duration": 10312041,
+          "fields": {
+            "_record_prep_duration_ns": 2917,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 204
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "client_1788568602610613000_1788568602",
+          "timestamp": "2026-09-04T17:36:42.610739-07:00",
+          "duration": 190748123709,
+          "fields": {
+            "_record_prep_duration_ns": 833,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 205
+        },
+        {
+          "event_type": "initialize",
+          "client_id": "client_1788568602610613000_1788568602",
+          "timestamp": "2026-09-04T17:36:42.619675-07:00",
+          "duration": 8935666,
+          "fields": {
+            "client_name": "zqk-feed-steer",
+            "client_version": "dev",
+            "tools_count": 14
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 206
+        },
+        {
+          "event_type": "events_list",
+          "client_id": "client_1788568602610613000_1788568602",
+          "timestamp": "2026-09-04T17:36:42.619937-07:00",
+          "duration": 261834,
+          "fields": {
+            "_record_prep_duration_ns": 5375
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 207
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "client_1788568602610613000_1788568602",
+          "timestamp": "2026-09-04T17:36:42.630217-07:00",
+          "duration": 10280083,
+          "fields": {
+            "_record_prep_duration_ns": 792,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 208
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "client_1788568602610613000_1788568602",
+          "timestamp": "2026-09-04T17:37:20.831515-07:00",
+          "duration": 38201090708,
+          "fields": {
+            "_record_prep_duration_ns": 792,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 209
+        },
+        {
+          "event_type": "initialize",
+          "client_id": "client_1788568640831610000_1788568640",
+          "timestamp": "2026-09-04T17:37:20.837365-07:00",
+          "duration": 5850750,
+          "fields": {
+            "client_name": "zqk-feed-steer",
+            "client_version": "dev",
+            "tools_count": 14
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 210
+        },
+        {
+          "event_type": "events_list",
+          "client_id": "client_1788568640831610000_1788568640",
+          "timestamp": "2026-09-04T17:37:20.837666-07:00",
+          "duration": 300834,
+          "fields": {
+            "_record_prep_duration_ns": 6083
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 211
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "client_1788568640831610000_1788568640",
+          "timestamp": "2026-09-04T17:37:20.849795-07:00",
+          "duration": 12128333,
+          "fields": {
+            "_record_prep_duration_ns": 709,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 212
+        },
+        {
+          "event_type": "initialize",
+          "client_id": "client_1788569281044312000_1788569281",
+          "timestamp": "2026-09-04T17:48:01.050576-07:00",
+          "duration": 640197313375,
+          "fields": {
+            "client_name": "zqk-feed-steer",
+            "client_version": "dev",
+            "tools_count": 14
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 213
+        },
+        {
+          "event_type": "events_list",
+          "client_id": "client_1788569281044312000_1788569281",
+          "timestamp": "2026-09-04T17:48:01.050853-07:00",
+          "duration": 277167,
+          "fields": {
+            "_record_prep_duration_ns": 5792
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 214
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "client_1788569281044312000_1788569281",
+          "timestamp": "2026-09-04T17:48:01.061135-07:00",
+          "duration": 10282250,
+          "fields": {
+            "_record_prep_duration_ns": 875,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 215
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "client_1788569472043040000_1788569472",
+          "timestamp": "2026-09-04T17:51:12.043163-07:00",
+          "duration": 190980993208,
+          "fields": {
+            "_record_prep_duration_ns": 833,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 216
+        },
+        {
+          "event_type": "initialize",
+          "client_id": "client_1788569472043040000_1788569472",
+          "timestamp": "2026-09-04T17:51:12.055347-07:00",
+          "duration": 12184333,
+          "fields": {
+            "client_name": "zqk-feed-steer",
+            "client_version": "dev",
+            "tools_count": 14
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 217
+        },
+        {
+          "event_type": "events_list",
+          "client_id": "client_1788569472043040000_1788569472",
+          "timestamp": "2026-09-04T17:51:12.05567-07:00",
+          "duration": 322209,
+          "fields": {
+            "_record_prep_duration_ns": 5792
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 218
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "client_1788569472043040000_1788569472",
+          "timestamp": "2026-09-04T17:51:12.066416-07:00",
+          "duration": 10746166,
+          "fields": {
+            "_record_prep_duration_ns": 750,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 219
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "client_1788569472043040000_1788569472",
+          "timestamp": "2026-09-04T18:02:59.921025-07:00",
+          "duration": 707871563417,
+          "fields": {
+            "_record_prep_duration_ns": 2750,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 220
+        },
+        {
+          "event_type": "initialize",
+          "client_id": "client_1788570480099762000_1788570480",
+          "timestamp": "2026-09-04T18:08:00.109888-07:00",
+          "duration": 300188682750,
+          "fields": {
+            "client_name": "ide-ide-proxy",
+            "client_version": "ide-adapter",
+            "tools_count": 14
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 221
+        },
+        {
+          "event_type": "notification_initialized",
+          "client_id": "client_1788570480099762000_1788570480",
+          "timestamp": "2026-09-04T18:08:00.111523-07:00",
+          "duration": 1635333,
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 222
+        },
+        {
+          "event_type": "events_subscribe",
+          "client_id": "admin_client_1788570480099762000_1788570480",
+          "timestamp": "2026-09-04T18:08:00.129699-07:00",
+          "duration": 18175584,
+          "fields": {
+            "_record_prep_duration_ns": 917,
+            "event_types": [
+              "action.required"
+            ]
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 223
+        },
+        {
+          "event_type": "notification_sent",
+          "client_id": "admin_client_1788570480099762000_1788570480",
+          "timestamp": "2026-09-04T18:08:00.216002-07:00",
+          "duration": 86303375,
+          "fields": {
+            "message_len": 76,
+            "message_type": "welcome",
+            "priority": "medium"
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 224
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "admin_client_1788570480099762000_1788570480",
+          "timestamp": "2026-09-04T18:38:00.14354-07:00",
+          "duration": 1799906880041,
+          "fields": {
+            "_record_prep_duration_ns": 1334,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 225
+        },
+        {
+          "event_type": "initialize",
+          "client_id": "client_1788572580317385000_1788572580",
+          "timestamp": "2026-09-04T18:43:00.333358-07:00",
+          "duration": 300166192000,
+          "fields": {
+            "client_name": "ide-ide-proxy",
+            "client_version": "ide-adapter",
+            "tools_count": 14
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 226
+        },
+        {
+          "event_type": "notification_initialized",
+          "client_id": "client_1788572580317385000_1788572580",
+          "timestamp": "2026-09-04T18:43:00.333967-07:00",
+          "duration": 608792,
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 227
+        },
+        {
+          "event_type": "events_subscribe",
+          "client_id": "admin_client_1788572580317385000_1788572580",
+          "timestamp": "2026-09-04T18:43:00.341276-07:00",
+          "duration": 7309083,
+          "fields": {
+            "_record_prep_duration_ns": 958,
+            "event_types": [
+              "action.required"
+            ]
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 228
+        },
+        {
+          "event_type": "notification_sent",
+          "client_id": "admin_client_1788572580317385000_1788572580",
+          "timestamp": "2026-09-04T18:43:00.438338-07:00",
+          "duration": 97060375,
+          "fields": {
+            "message_len": 76,
+            "message_type": "welcome",
+            "priority": "medium"
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 229
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "admin_client_1788572580317385000_1788572580",
+          "timestamp": "2026-09-04T19:13:00.341093-07:00",
+          "duration": 1799899481875,
+          "fields": {
+            "_record_prep_duration_ns": 791,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 230
+        },
+        {
+          "event_type": "initialize",
+          "client_id": "client_1788574680564860000_1788574680",
+          "timestamp": "2026-09-04T19:18:00.568408-07:00",
+          "duration": 300225293875,
+          "fields": {
+            "client_name": "ide-ide-proxy",
+            "client_version": "ide-adapter",
+            "tools_count": 14
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 231
+        },
+        {
+          "event_type": "notification_initialized",
+          "client_id": "client_1788574680564860000_1788574680",
+          "timestamp": "2026-09-04T19:18:00.569017-07:00",
+          "duration": 608167,
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 232
+        },
+        {
+          "event_type": "events_subscribe",
+          "client_id": "admin_client_1788574680564860000_1788574680",
+          "timestamp": "2026-09-04T19:18:00.572786-07:00",
+          "duration": 3769792,
+          "fields": {
+            "_record_prep_duration_ns": 1041,
+            "event_types": [
+              "action.required"
+            ]
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 233
+        },
+        {
+          "event_type": "notification_sent",
+          "client_id": "admin_client_1788574680564860000_1788574680",
+          "timestamp": "2026-09-04T19:18:00.686737-07:00",
+          "duration": 113950458,
+          "fields": {
+            "message_len": 76,
+            "message_type": "welcome",
+            "priority": "medium"
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 234
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "admin_client_1788574680564860000_1788574680",
+          "timestamp": "2026-09-04T19:48:00.477018-07:00",
+          "duration": 1799844876875,
+          "fields": {
+            "_record_prep_duration_ns": 1250,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 235
+        },
+        {
+          "event_type": "initialize",
+          "client_id": "client_1788576780631836000_1788576780",
+          "timestamp": "2026-09-04T19:53:00.639064-07:00",
+          "duration": 300164195667,
+          "fields": {
+            "client_name": "ide-ide-proxy",
+            "client_version": "ide-adapter",
+            "tools_count": 14
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 236
+        },
+        {
+          "event_type": "notification_initialized",
+          "client_id": "client_1788576780631836000_1788576780",
+          "timestamp": "2026-09-04T19:53:00.640025-07:00",
+          "duration": 961333,
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 237
+        },
+        {
+          "event_type": "events_subscribe",
+          "client_id": "admin_client_1788576780631836000_1788576780",
+          "timestamp": "2026-09-04T19:53:00.645119-07:00",
+          "duration": 5093750,
+          "fields": {
+            "_record_prep_duration_ns": 792,
+            "event_types": [
+              "action.required"
+            ]
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 238
+        },
+        {
+          "event_type": "notification_sent",
+          "client_id": "admin_client_1788576780631836000_1788576780",
+          "timestamp": "2026-09-04T19:53:00.744247-07:00",
+          "duration": 99129542,
+          "fields": {
+            "message_len": 76,
+            "message_type": "welcome",
+            "priority": "medium"
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 239
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "admin_client_1788576780631836000_1788576780",
+          "timestamp": "2026-09-04T20:23:00.644417-07:00",
+          "duration": 1799906591916,
+          "fields": {
+            "_record_prep_duration_ns": 667,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 240
+        },
+        {
+          "event_type": "initialize",
+          "client_id": "client_1788578880844196000_1788578880",
+          "timestamp": "2026-09-04T20:28:00.862297-07:00",
+          "duration": 300219604459,
+          "fields": {
+            "client_name": "ide-ide-proxy",
+            "client_version": "ide-adapter",
+            "tools_count": 14
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 241
+        },
+        {
+          "event_type": "notification_initialized",
+          "client_id": "client_1788578880844196000_1788578880",
+          "timestamp": "2026-09-04T20:28:00.878001-07:00",
+          "duration": 15704208,
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 242
+        },
+        {
+          "event_type": "events_subscribe",
+          "client_id": "admin_client_1788578880844196000_1788578880",
+          "timestamp": "2026-09-04T20:28:00.949019-07:00",
+          "duration": 71017875,
+          "fields": {
+            "_record_prep_duration_ns": 1083,
+            "event_types": [
+              "action.required"
+            ]
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 243
+        },
+        {
+          "event_type": "notification_sent",
+          "client_id": "admin_client_1788578880844196000_1788578880",
+          "timestamp": "2026-09-04T20:28:00.978327-07:00",
+          "duration": 29308250,
+          "fields": {
+            "message_len": 76,
+            "message_type": "welcome",
+            "priority": "medium"
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 244
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "client_1788579970586598000_1788579970",
+          "timestamp": "2026-09-04T20:46:10.586748-07:00",
+          "duration": 1089556834292,
+          "fields": {
+            "_record_prep_duration_ns": 1417,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 245
+        },
+        {
+          "event_type": "initialize",
+          "client_id": "client_1788579970586598000_1788579970",
+          "timestamp": "2026-09-04T20:46:10.595036-07:00",
+          "duration": 8287500,
+          "fields": {
+            "client_name": "zqk-feed-steer",
+            "client_version": "dev",
+            "tools_count": 14
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 246
+        },
+        {
+          "event_type": "events_list",
+          "client_id": "client_1788579970586598000_1788579970",
+          "timestamp": "2026-09-04T20:46:10.59537-07:00",
+          "duration": 334750,
+          "fields": {
+            "_record_prep_duration_ns": 5875
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 247
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "client_1788579970586598000_1788579970",
+          "timestamp": "2026-09-04T20:46:10.609948-07:00",
+          "duration": 14577666,
+          "fields": {
+            "_record_prep_duration_ns": 1333,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 248
+        },
+        {
+          "event_type": "disconnect",
+          "client_id": "client_1788579970586598000_1788579970",
+          "timestamp": "2026-09-04T20:58:00.913883-07:00",
+          "duration": 710276657667,
+          "fields": {
+            "_record_prep_duration_ns": 708,
+            "reason": "EOF"
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 249
+        },
+        {
+          "event_type": "initialize",
+          "client_id": "client_1788580981082356000_1788580981",
+          "timestamp": "2026-09-04T21:03:01.089304-07:00",
+          "duration": 300172041500,
+          "fields": {
+            "client_name": "ide-ide-proxy",
+            "client_version": "ide-adapter",
+            "tools_count": 14
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 250
+        },
+        {
+          "event_type": "notification_initialized",
+          "client_id": "client_1788580981082356000_1788580981",
+          "timestamp": "2026-09-04T21:03:01.090565-07:00",
+          "duration": 1261083,
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 251
+        },
+        {
+          "event_type": "events_subscribe",
+          "client_id": "admin_client_1788580981082356000_1788580981",
+          "timestamp": "2026-09-04T21:03:01.112316-07:00",
+          "duration": 21749959,
+          "fields": {
+            "_record_prep_duration_ns": 2083,
+            "event_types": [
+              "action.required"
+            ]
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 252
+        },
+        {
+          "event_type": "notification_sent",
+          "client_id": "admin_client_1788580981082356000_1788580981",
+          "timestamp": "2026-09-04T21:03:01.190733-07:00",
+          "duration": 78416083,
+          "fields": {
+            "message_len": 76,
+            "message_type": "welcome",
+            "priority": "medium"
+          },
+          "sequence_id": "seq_1788557862493055000_1788557862",
+          "sequence_pos": 253
+        }
+      ],
+      "event_types": {
+        "disconnect": 104,
+        "events_list": 51,
+        "events_subscribe": 12,
+        "initialize": 63,
+        "notification_initialized": 12,
+        "notification_sent": 12
+      },
+      "anomalies": [
+        "long_gap_before_disconnect: 6m59.930089208s",
+        "long_gap_before_initialize: 5m0.160481166s"
+      ],
+      "total_duration": 23118580459292,
+      "initialized": true,
+      "tools_registered": 14
+    },
+    "seq_1788581477818116000_1788581477": {
+      "sequence_id": "seq_1788581477818116000_1788581477",
+      "client_id": "client_1788581477818113000_1788581477",
+      "first_event": "2026-09-04T21:11:17.889899-07:00",
+      "last_event": "2026-09-04T21:12:36.330254-07:00",
+      "total_events": 10,
+      "events": [
+        {
+          "event_type": "initialize",
+          "client_id": "client_1788581477818113000_1788581477",
+          "timestamp": "2026-09-04T21:11:17.889899-07:00",
+          "fields": {
+            "client_name": "IDE",
+            "client_version": "1.0.0",
+            "tools_count": 14
+          },
+          "sequence_id": "seq_1788581477818116000_1788581477",
+          "sequence_pos": 0
+        },
+        {
+          "event_type": "notification_initialized",
+          "client_id": "client_1788581477818113000_1788581477",
+          "timestamp": "2026-09-04T21:11:17.890196-07:00",
+          "duration": 296667,
+          "sequence_id": "seq_1788581477818116000_1788581477",
+          "sequence_pos": 1
+        },
+        {
+          "event_type": "tools_list",
+          "client_id": "admin_client_1788581477818113000_1788581477",
+          "timestamp": "2026-09-04T21:11:17.890276-07:00",
+          "duration": 79583,
+          "fields": {
+            "initialized": true,
+            "tools_count": 14
+          },
+          "sequence_id": "seq_1788581477818116000_1788581477",
+          "sequence_pos": 2
+        },
+        {
+          "event_type": "notification_sent",
+          "client_id": "admin_client_1788581477818113000_1788581477",
+          "timestamp": "2026-09-04T21:11:17.990657-07:00",
+          "duration": 100380584,
+          "fields": {
+            "message_len": 76,
+            "message_type": "welcome",
+            "priority": "medium"
+          },
+          "sequence_id": "seq_1788581477818116000_1788581477",
+          "sequence_pos": 3
+        },
+        {
+          "event_type": "tools_call",
+          "client_id": "admin_client_1788581477818113000_1788581477",
+          "timestamp": "2026-09-04T21:12:18.479443-07:00",
+          "duration": 60488104666,
+          "fields": {
+            "_record_prep_duration_ns": 9375,
+            "duration": "396.927083ms",
+            "success": true,
+            "tool": "zqk_execute_bash"
+          },
+          "sequence_id": "seq_1788581477818116000_1788581477",
+          "sequence_pos": 4
+        },
+        {
+          "event_type": "tools_call",
+          "client_id": "admin_client_1788581477818113000_1788581477",
+          "timestamp": "2026-09-04T21:12:24.047456-07:00",
+          "duration": 5567950000,
+          "fields": {
+            "_record_prep_duration_ns": 5458,
+            "duration": "209.306416ms",
+            "success": true,
+            "tool": "zqk_observer_search"
+          },
+          "sequence_id": "seq_1788581477818116000_1788581477",
+          "sequence_pos": 5
+        },
+        {
+          "event_type": "tools_call",
+          "client_id": "admin_client_1788581477818113000_1788581477",
+          "timestamp": "2026-09-04T21:12:32.76528-07:00",
+          "duration": 8717725709,
+          "fields": {
+            "_record_prep_duration_ns": 7709,
+            "duration": "2.350375ms",
+            "success": true,
+            "tool": "zqk_read_file"
+          },
+          "sequence_id": "seq_1788581477818116000_1788581477",
+          "sequence_pos": 6
+        },
+        {
+          "event_type": "tools_call",
+          "client_id": "admin_client_1788581477818113000_1788581477",
+          "timestamp": "2026-09-04T21:12:32.766021-07:00",
+          "duration": 740958,
+          "fields": {
+            "_record_prep_duration_ns": 1417,
+            "duration": "390.791µs",
+            "success": true,
+            "tool": "zqk_read_file"
+          },
+          "sequence_id": "seq_1788581477818116000_1788581477",
+          "sequence_pos": 7
+        },
+        {
+          "event_type": "tools_call",
+          "client_id": "admin_client_1788581477818113000_1788581477",
+          "timestamp": "2026-09-04T21:12:36.129105-07:00",
+          "duration": 3363046792,
+          "fields": {
+            "_record_prep_duration_ns": 7500,
+            "duration": "13.5725ms",
+            "success": true,
+            "tool": "zqk_read_code"
+          },
+          "sequence_id": "seq_1788581477818116000_1788581477",
+          "sequence_pos": 8
+        },
+        {
+          "event_type": "tools_call",
+          "client_id": "admin_client_1788581477818113000_1788581477",
+          "timestamp": "2026-09-04T21:12:36.330254-07:00",
+          "duration": 201146208,
+          "fields": {
+            "_record_prep_duration_ns": 5417,
+            "duration": "198.937ms",
+            "success": true,
+            "tool": "zqk_observer_search"
+          },
+          "sequence_id": "seq_1788581477818116000_1788581477",
+          "sequence_pos": 9
+        }
+      ],
+      "event_types": {
+        "initialize": 1,
+        "notification_initialized": 1,
+        "notification_sent": 1,
+        "tools_call": 6,
+        "tools_list": 1
+      },
+      "total_duration": 78439471167,
+      "initialized": true,
+      "tools_registered": 14
+    },
+    "seq_1788581562591257000_1788581562": {
+      "sequence_id": "seq_1788581562591257000_1788581562",
+      "client_id": "client_1788581562591255000_1788581562",
+      "first_event": "2026-09-04T21:12:42.628482-07:00",
+      "last_event": "2026-09-04T21:12:42.729975-07:00",
+      "total_events": 4,
+      "events": [
+        {
+          "event_type": "initialize",
+          "client_id": "client_1788581562591255000_1788581562",
+          "timestamp": "2026-09-04T21:12:42.628482-07:00",
+          "fields": {
+            "client_name": "IDE",
+            "client_version": "1.0.0",
+            "tools_count": 14
+          },
+          "sequence_id": "seq_1788581562591257000_1788581562",
+          "sequence_pos": 0
+        },
+        {
+          "event_type": "notification_initialized",
+          "client_id": "client_1788581562591255000_1788581562",
+          "timestamp": "2026-09-04T21:12:42.628815-07:00",
+          "duration": 332583,
+          "sequence_id": "seq_1788581562591257000_1788581562",
+          "sequence_pos": 1
+        },
+        {
+          "event_type": "tools_list",
+          "client_id": "admin_client_1788581562591255000_1788581562",
+          "timestamp": "2026-09-04T21:12:42.628969-07:00",
+          "duration": 153875,
+          "fields": {
+            "initialized": true,
+            "tools_count": 14
+          },
+          "sequence_id": "seq_1788581562591257000_1788581562",
+          "sequence_pos": 2
+        },
+        {
+          "event_type": "notification_sent",
+          "client_id": "admin_client_1788581562591255000_1788581562",
+          "timestamp": "2026-09-04T21:12:42.729975-07:00",
+          "duration": 101005708,
+          "fields": {
+            "message_len": 76,
+            "message_type": "welcome",
+            "priority": "medium"
+          },
+          "sequence_id": "seq_1788581562591257000_1788581562",
+          "sequence_pos": 3
+        }
+      ],
+      "event_types": {
+        "initialize": 1,
+        "notification_initialized": 1,
+        "notification_sent": 1,
+        "tools_list": 1
+      },
+      "total_duration": 101492166,
+      "initialized": true,
+      "tools_registered": 14
+    },
+    "seq_1788581667863527000_1788581667": {
+      "sequence_id": "seq_1788581667863527000_1788581667",
+      "client_id": "client_1788581667863525000_1788581667",
+      "first_event": "2026-09-04T21:14:27.91562-07:00",
+      "last_event": "2026-09-04T21:14:28.017058-07:00",
+      "total_events": 4,
+      "events": [
+        {
+          "event_type": "initialize",
+          "client_id": "client_1788581667863525000_1788581667",
+          "timestamp": "2026-09-04T21:14:27.91562-07:00",
+          "fields": {
+            "client_name": "IDE",
+            "client_version": "1.0.0",
+            "tools_count": 14
+          },
+          "sequence_id": "seq_1788581667863527000_1788581667",
+          "sequence_pos": 0
+        },
+        {
+          "event_type": "notification_initialized",
+          "client_id": "client_1788581667863525000_1788581667",
+          "timestamp": "2026-09-04T21:14:27.915907-07:00",
+          "duration": 287417,
+          "sequence_id": "seq_1788581667863527000_1788581667",
+          "sequence_pos": 1
+        },
+        {
+          "event_type": "tools_list",
+          "client_id": "admin_client_1788581667863525000_1788581667",
+          "timestamp": "2026-09-04T21:14:27.916057-07:00",
+          "duration": 149583,
+          "fields": {
+            "initialized": true,
+            "tools_count": 14
+          },
+          "sequence_id": "seq_1788581667863527000_1788581667",
+          "sequence_pos": 2
+        },
+        {
+          "event_type": "notification_sent",
+          "client_id": "admin_client_1788581667863525000_1788581667",
+          "timestamp": "2026-09-04T21:14:28.017058-07:00",
+          "duration": 101000375,
+          "fields": {
+            "message_len": 76,
+            "message_type": "welcome",
+            "priority": "medium"
+          },
+          "sequence_id": "seq_1788581667863527000_1788581667",
+          "sequence_pos": 3
+        }
+      ],
+      "event_types": {
+        "initialize": 1,
+        "notification_initialized": 1,
+        "notification_sent": 1,
+        "tools_list": 1
+      },
+      "total_duration": 101437375,
+      "initialized": true,
+      "tools_registered": 14
+    },
+    "seq_1788582051437462000_1788582051": {
+      "sequence_id": "seq_1788582051437462000_1788582051",
+      "client_id": "client_1788582051437460000_1788582051",
+      "first_event": "2026-09-04T21:20:51.497872-07:00",
+      "last_event": "2026-09-04T21:22:28.268266-07:00",
+      "total_events": 14,
+      "events": [
+        {
+          "event_type": "initialize",
+          "client_id": "client_1788582051437460000_1788582051",
+          "timestamp": "2026-09-04T21:20:51.497872-07:00",
+          "fields": {
+            "client_name": "IDE",
+            "client_version": "1.0.0",
+            "tools_count": 14
+          },
+          "sequence_id": "seq_1788582051437462000_1788582051",
+          "sequence_pos": 0
+        },
+        {
+          "event_type": "notification_initialized",
+          "client_id": "client_1788582051437460000_1788582051",
+          "timestamp": "2026-09-04T21:20:51.49814-07:00",
+          "duration": 267583,
+          "sequence_id": "seq_1788582051437462000_1788582051",
+          "sequence_pos": 1
+        },
+        {
+          "event_type": "tools_list",
+          "client_id": "admin_client_1788582051437460000_1788582051",
+          "timestamp": "2026-09-04T21:20:51.498234-07:00",
+          "duration": 93750,
+          "fields": {
+            "initialized": true,
+            "tools_count": 14
+          },
+          "sequence_id": "seq_1788582051437462000_1788582051",
+          "sequence_pos": 2
+        },
+        {
+          "event_type": "notification_sent",
+          "client_id": "admin_client_1788582051437460000_1788582051",
+          "timestamp": "2026-09-04T21:20:51.600153-07:00",
+          "duration": 101918250,
+          "fields": {
+            "message_len": 76,
+            "message_type": "welcome",
+            "priority": "medium"
+          },
+          "sequence_id": "seq_1788582051437462000_1788582051",
+          "sequence_pos": 3
+        },
+        {
+          "event_type": "tools_call",
+          "client_id": "admin_client_1788582051437460000_1788582051",
+          "timestamp": "2026-09-04T21:21:50.944228-07:00",
+          "duration": 59343664208,
+          "fields": {
+            "_record_prep_duration_ns": 76959,
+            "duration": "481.587583ms",
+            "success": true,
+            "tool": "zqk_execute_bash"
+          },
+          "sequence_id": "seq_1788582051437462000_1788582051",
+          "sequence_pos": 4
+        },
+        {
+          "event_type": "tools_call",
+          "client_id": "admin_client_1788582051437460000_1788582051",
+          "timestamp": "2026-09-04T21:21:50.951953-07:00",
+          "duration": 7725417,
+          "fields": {
+            "_record_prep_duration_ns": 3917,
+            "duration": "7.314625ms",
+            "success": true,
+            "tool": "zqk_observer_search"
+          },
+          "sequence_id": "seq_1788582051437462000_1788582051",
+          "sequence_pos": 5
+        },
+        {
+          "event_type": "tools_call",
+          "client_id": "admin_client_1788582051437460000_1788582051",
+          "timestamp": "2026-09-04T21:22:01.681319-07:00",
+          "duration": 10729291917,
+          "fields": {
+            "_record_prep_duration_ns": 3709,
+            "duration": "11.639875ms",
+            "success": true,
+            "tool": "zqk_observer_search"
+          },
+          "sequence_id": "seq_1788582051437462000_1788582051",
+          "sequence_pos": 6
+        },
+        {
+          "event_type": "tools_call",
+          "client_id": "admin_client_1788582051437460000_1788582051",
+          "timestamp": "2026-09-04T21:22:11.778312-07:00",
+          "duration": 10096923083,
+          "fields": {
+            "_record_prep_duration_ns": 959,
+            "duration": "109.875µs",
+            "error": "ALLOWLIST DENY: \"1\" is not in the agent sandbox allowlist; use a dedicated zqk MCP tool instead",
+            "success": false,
+            "tool": "zqk_execute_bash"
+          },
+          "sequence_id": "seq_1788582051437462000_1788582051",
+          "sequence_pos": 7
+        },
+        {
+          "event_type": "tools_call",
+          "client_id": "admin_client_1788582051437460000_1788582051",
+          "timestamp": "2026-09-04T21:22:14.463825-07:00",
+          "duration": 2685494417,
+          "fields": {
+            "_record_prep_duration_ns": 2500,
+            "duration": "201.292µs",
+            "error": "ALLOWLIST DENY: \"1\" is not in the agent sandbox allowlist; use a dedicated zqk MCP tool instead",
+            "success": false,
+            "tool": "zqk_execute_bash"
+          },
+          "sequence_id": "seq_1788582051437462000_1788582051",
+          "sequence_pos": 8
+        },
+        {
+          "event_type": "tools_call",
+          "client_id": "admin_client_1788582051437460000_1788582051",
+          "timestamp": "2026-09-04T21:22:16.850449-07:00",
+          "duration": 2386607083,
+          "fields": {
+            "_record_prep_duration_ns": 3917,
+            "duration": "226.667µs",
+            "error": "ALLOWLIST DENY: \"1\" is not in the agent sandbox allowlist; use a dedicated zqk MCP tool instead",
+            "success": false,
+            "tool": "zqk_execute_bash"
+          },
+          "sequence_id": "seq_1788582051437462000_1788582051",
+          "sequence_pos": 9
+        },
+        {
+          "event_type": "tools_call",
+          "client_id": "admin_client_1788582051437460000_1788582051",
+          "timestamp": "2026-09-04T21:22:18.80587-07:00",
+          "duration": 1955407125,
+          "fields": {
+            "_record_prep_duration_ns": 958,
+            "duration": "79.25µs",
+            "error": "ALLOWLIST DENY: \"1\" is not in the agent sandbox allowlist; use a dedicated zqk MCP tool instead",
+            "success": false,
+            "tool": "zqk_execute_bash"
+          },
+          "sequence_id": "seq_1788582051437462000_1788582051",
+          "sequence_pos": 10
+        },
+        {
+          "event_type": "tools_call",
+          "client_id": "admin_client_1788582051437460000_1788582051",
+          "timestamp": "2026-09-04T21:22:22.514544-07:00",
+          "duration": 3708648375,
+          "fields": {
+            "_record_prep_duration_ns": 4541,
+            "duration": "562.166µs",
+            "success": true,
+            "tool": "zqk_read_file"
+          },
+          "sequence_id": "seq_1788582051437462000_1788582051",
+          "sequence_pos": 11
+        },
+        {
+          "event_type": "tools_call",
+          "client_id": "admin_client_1788582051437460000_1788582051",
+          "timestamp": "2026-09-04T21:22:22.515844-07:00",
+          "duration": 1300417,
+          "fields": {
+            "_record_prep_duration_ns": 6959,
+            "duration": "746.458µs",
+            "success": true,
+            "tool": "zqk_read_file"
+          },
+          "sequence_id": "seq_1788582051437462000_1788582051",
+          "sequence_pos": 12
+        },
+        {
+          "event_type": "tools_call",
+          "client_id": "admin_client_1788582051437460000_1788582051",
+          "timestamp": "2026-09-04T21:22:28.268266-07:00",
+          "duration": 5752381708,
+          "fields": {
+            "_record_prep_duration_ns": 5042,
+            "duration": "31.949458ms",
+            "success": true,
+            "tool": "zqk_observer_search"
+          },
+          "sequence_id": "seq_1788582051437462000_1788582051",
+          "sequence_pos": 13
+        }
+      ],
+      "event_types": {
+        "initialize": 1,
+        "notification_initialized": 1,
+        "notification_sent": 1,
+        "tools_call": 10,
+        "tools_list": 1
+      },
+      "total_duration": 96769723333,
+      "initialized": true,
+      "tools_registered": 14
+    },
+    "seq_1788582546087220000_1788582546": {
+      "sequence_id": "seq_1788582546087220000_1788582546",
+      "client_id": "client_1788582546087218000_1788582546",
+      "first_event": "2026-09-04T21:29:06.179628-07:00",
+      "last_event": "2026-09-04T21:39:24.601457-07:00",
+      "total_events": 14,
+      "events": [
+        {
+          "event_type": "initialize",
+          "client_id": "client_1788582546087218000_1788582546",
+          "timestamp": "2026-09-04T21:29:06.179628-07:00",
+          "fields": {
+            "client_name": "IDE",
+            "client_version": "1.0.0",
+            "tools_count": 14
+          },
+          "sequence_id": "seq_1788582546087220000_1788582546",
+          "sequence_pos": 0
+        },
+        {
+          "event_type": "notification_initialized",
+          "client_id": "client_1788582546087218000_1788582546",
+          "timestamp": "2026-09-04T21:29:06.179937-07:00",
+          "duration": 308792,
+          "sequence_id": "seq_1788582546087220000_1788582546",
+          "sequence_pos": 1
+        },
+        {
+          "event_type": "tools_list",
+          "client_id": "admin_client_1788582546087218000_1788582546",
+          "timestamp": "2026-09-04T21:29:06.180046-07:00",
+          "duration": 109083,
+          "fields": {
+            "initialized": true,
+            "tools_count": 14
+          },
+          "sequence_id": "seq_1788582546087220000_1788582546",
+          "sequence_pos": 2
+        },
+        {
+          "event_type": "notification_sent",
+          "client_id": "admin_client_1788582546087218000_1788582546",
+          "timestamp": "2026-09-04T21:29:06.281441-07:00",
+          "duration": 101394500,
+          "fields": {
+            "message_len": 76,
+            "message_type": "welcome",
+            "priority": "medium"
+          },
+          "sequence_id": "seq_1788582546087220000_1788582546",
+          "sequence_pos": 3
+        },
+        {
+          "event_type": "tools_call",
+          "client_id": "admin_client_1788582546087218000_1788582546",
+          "timestamp": "2026-09-04T21:30:32.094028-07:00",
+          "duration": 85811993083,
+          "fields": {
+            "_record_prep_duration_ns": 2542,
+            "duration": "366.521625ms",
+            "success": true,
+            "tool": "zqk_system_status"
+          },
+          "sequence_id": "seq_1788582546087220000_1788582546",
+          "sequence_pos": 4
+        },
+        {
+          "event_type": "tools_call",
+          "client_id": "admin_client_1788582546087218000_1788582546",
+          "timestamp": "2026-09-04T21:30:37.189526-07:00",
+          "duration": 5095462959,
+          "fields": {
+            "_record_prep_duration_ns": 2292,
+            "duration": "176.189291ms",
+            "success": true,
+            "tool": "zqk_system_status"
+          },
+          "sequence_id": "seq_1788582546087220000_1788582546",
+          "sequence_pos": 5
+        },
+        {
+          "event_type": "tools_call",
+          "client_id": "admin_client_1788582546087218000_1788582546",
+          "timestamp": "2026-09-04T21:30:46.859941-07:00",
+          "duration": 9670347500,
+          "fields": {
+            "_record_prep_duration_ns": 5917,
+            "duration": "8.106292ms",
+            "success": true,
+            "tool": "zqk_observer_search"
+          },
+          "sequence_id": "seq_1788582546087220000_1788582546",
+          "sequence_pos": 6
+        },
+        {
+          "event_type": "tools_call",
+          "client_id": "admin_client_1788582546087218000_1788582546",
+          "timestamp": "2026-09-04T21:30:46.860607-07:00",
+          "duration": 666458,
+          "fields": {
+            "_record_prep_duration_ns": 1917,
+            "duration": "171.125µs",
+            "error": "open /Users/lanceettl/zqk-restore-clone/pkg/scheduler/bundle_executor.go: no such file or directory",
+            "success": false,
+            "tool": "zqk_read_code"
+          },
+          "sequence_id": "seq_1788582546087220000_1788582546",
+          "sequence_pos": 7
+        },
+        {
+          "event_type": "tools_call",
+          "client_id": "admin_client_1788582546087218000_1788582546",
+          "timestamp": "2026-09-04T21:30:59.286937-07:00",
+          "duration": 12426244208,
+          "fields": {
+            "_record_prep_duration_ns": 4375,
+            "duration": "120.02225ms",
+            "success": true,
+            "tool": "zqk_observer_search"
+          },
+          "sequence_id": "seq_1788582546087220000_1788582546",
+          "sequence_pos": 8
+        },
+        {
+          "event_type": "tools_call",
+          "client_id": "admin_client_1788582546087218000_1788582546",
+          "timestamp": "2026-09-04T21:31:04.775786-07:00",
+          "duration": 5488810500,
+          "fields": {
+            "_record_prep_duration_ns": 3292,
+            "duration": "3.469875ms",
+            "success": true,
+            "tool": "zqk_observer_search"
+          },
+          "sequence_id": "seq_1788582546087220000_1788582546",
+          "sequence_pos": 9
+        },
+        {
+          "event_type": "tools_call",
+          "client_id": "admin_client_1788582546087218000_1788582546",
+          "timestamp": "2026-09-04T21:31:14.782933-07:00",
+          "duration": 10007077584,
+          "fields": {
+            "_record_prep_duration_ns": 4750,
+            "duration": "42.282834ms",
+            "success": true,
+            "tool": "zqk_observer_search"
+          },
+          "sequence_id": "seq_1788582546087220000_1788582546",
+          "sequence_pos": 10
+        },
+        {
+          "event_type": "tools_call",
+          "client_id": "admin_client_1788582546087218000_1788582546",
+          "timestamp": "2026-09-04T21:32:37.488873-07:00",
+          "duration": 82705367541,
+          "fields": {
+            "_record_prep_duration_ns": 4291,
+            "duration": "4.610041ms",
+            "success": true,
+            "tool": "zqk_observer_search"
+          },
+          "sequence_id": "seq_1788582546087220000_1788582546",
+          "sequence_pos": 11
+        },
+        {
+          "event_type": "tools_call",
+          "client_id": "admin_client_1788582546087218000_1788582546",
+          "timestamp": "2026-09-04T21:36:34.909661-07:00",
+          "duration": 237419145667,
+          "fields": {
+            "_record_prep_duration_ns": 1250,
+            "duration": "4.952926083s",
+            "success": true,
+            "tool": "zqk_object_list"
+          },
+          "sequence_id": "seq_1788582546087220000_1788582546",
+          "sequence_pos": 12
+        },
+        {
+          "event_type": "tools_call",
+          "client_id": "admin_client_1788582546087218000_1788582546",
+          "timestamp": "2026-09-04T21:39:24.601457-07:00",
+          "duration": 169704782958,
+          "fields": {
+            "_record_prep_duration_ns": 1167,
+            "duration": "110.042µs",
+            "error": "open /Users/lanceettl/zqk-restore-clone/pkg/scheduler/bundle_executor.go: no such file or directory",
+            "success": false,
+            "tool": "zqk_read_code"
+          },
+          "sequence_id": "seq_1788582546087220000_1788582546",
+          "sequence_pos": 13
+        }
+      ],
+      "event_types": {
+        "initialize": 1,
+        "notification_initialized": 1,
+        "notification_sent": 1,
+        "tools_call": 10,
+        "tools_list": 1
+      },
+      "total_duration": 618431710833,
+      "initialized": true,
+      "tools_registered": 14
+    }
+  }
+}

@@ -1,0 +1,177 @@
+{
+  "name": "make-verify-638",
+  "created_at": "2026-09-04T21:34:33.702319Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-638",
+    "Tests": [
+      {
+        "Name": "TestContextManager_LoadContext",
+        "Package": "context",
+        "PackagePath": "internal/cli/context",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/internal/cli/context/context_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestContextManager_Profile",
+        "Package": "context",
+        "PackagePath": "internal/cli/context",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/internal/cli/context/context_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestContextManager_Precedence",
+        "Package": "context",
+        "PackagePath": "internal/cli/context",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/internal/cli/context/context_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestGetContextFromCommand",
+        "Package": "context",
+        "PackagePath": "internal/cli/context",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/internal/cli/context/context_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestResolveProjectRoot",
+        "Package": "context",
+        "PackagePath": "internal/cli/context",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/internal/cli/context/context_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestGetErrorLogOutput",
+        "Package": "context",
+        "PackagePath": "internal/cli/context",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/internal/cli/context/context_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestErrorLogOutputFromConfig",
+        "Package": "context",
+        "PackagePath": "internal/cli/context",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/internal/cli/context/context_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestProfileLoader_ApplyNamedProfile_unknownProfile",
+        "Package": "context",
+        "PackagePath": "internal/cli/context",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/internal/cli/context/profile_loader_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestApplyProfileSpecToContext_storage",
+        "Package": "context",
+        "PackagePath": "internal/cli/context",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/internal/cli/context/profile_loader_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 270000000000,
+    "PackagePath": "internal/cli/context"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestContextManager_LoadContext",
+      "Package": "context",
+      "PackagePath": "internal/cli/context",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/internal/cli/context/context_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestContextManager_Profile",
+      "Package": "context",
+      "PackagePath": "internal/cli/context",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/internal/cli/context/context_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestContextManager_Precedence",
+      "Package": "context",
+      "PackagePath": "internal/cli/context",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/internal/cli/context/context_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestGetContextFromCommand",
+      "Package": "context",
+      "PackagePath": "internal/cli/context",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/internal/cli/context/context_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestResolveProjectRoot",
+      "Package": "context",
+      "PackagePath": "internal/cli/context",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/internal/cli/context/context_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestGetErrorLogOutput",
+      "Package": "context",
+      "PackagePath": "internal/cli/context",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/internal/cli/context/context_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestErrorLogOutputFromConfig",
+      "Package": "context",
+      "PackagePath": "internal/cli/context",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/internal/cli/context/context_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestProfileLoader_ApplyNamedProfile_unknownProfile",
+      "Package": "context",
+      "PackagePath": "internal/cli/context",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/internal/cli/context/profile_loader_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestApplyProfileSpecToContext_storage",
+      "Package": "context",
+      "PackagePath": "internal/cli/context",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/internal/cli/context/profile_loader_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

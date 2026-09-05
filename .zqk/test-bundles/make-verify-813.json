@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-813",
+  "created_at": "2026-09-04T21:34:35.385307Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-813",
+    "Tests": [
+      {
+        "Name": "TestModuleImportPath",
+        "Package": "paths",
+        "PackagePath": "pkg/paths",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/paths/module_root_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestSpecbuilderPackageImportPath",
+        "Package": "paths",
+        "PackagePath": "pkg/paths",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/paths/module_root_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestNewPathResolver_ResolveStrict_process",
+        "Package": "paths",
+        "PackagePath": "pkg/paths",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/paths/path_resolver_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestNewPathResolver_ResolveFromCacheOrConstant",
+        "Package": "paths",
+        "PackagePath": "pkg/paths",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/paths/path_resolver_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestNewPathResolver_ProjectRoot",
+        "Package": "paths",
+        "PackagePath": "pkg/paths",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/paths/path_resolver_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestPathRefFromRelPath",
+        "Package": "paths",
+        "PackagePath": "pkg/paths",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/paths/resolver_doc_entry_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestNormalizeDocEntryPathForKey",
+        "Package": "paths",
+        "PackagePath": "pkg/paths",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/paths/resolver_doc_entry_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestResolveDocEntryPath_LegacyRelative",
+        "Package": "paths",
+        "PackagePath": "pkg/paths",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/paths/resolver_doc_entry_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestResolveDocEntryPath_PrefixRequiresCache",
+        "Package": "paths",
+        "PackagePath": "pkg/paths",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/paths/resolver_doc_entry_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestResolveDocEntryPath_Empty",
+        "Package": "paths",
+        "PackagePath": "pkg/paths",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/paths/resolver_doc_entry_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": true,
+    "EstimatedDuration": 300000000000,
+    "PackagePath": "pkg/paths"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestModuleImportPath",
+      "Package": "paths",
+      "PackagePath": "pkg/paths",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/paths/module_root_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestSpecbuilderPackageImportPath",
+      "Package": "paths",
+      "PackagePath": "pkg/paths",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/paths/module_root_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestNewPathResolver_ResolveStrict_process",
+      "Package": "paths",
+      "PackagePath": "pkg/paths",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/paths/path_resolver_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestNewPathResolver_ResolveFromCacheOrConstant",
+      "Package": "paths",
+      "PackagePath": "pkg/paths",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/paths/path_resolver_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestNewPathResolver_ProjectRoot",
+      "Package": "paths",
+      "PackagePath": "pkg/paths",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/paths/path_resolver_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestPathRefFromRelPath",
+      "Package": "paths",
+      "PackagePath": "pkg/paths",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/paths/resolver_doc_entry_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestNormalizeDocEntryPathForKey",
+      "Package": "paths",
+      "PackagePath": "pkg/paths",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/paths/resolver_doc_entry_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestResolveDocEntryPath_LegacyRelative",
+      "Package": "paths",
+      "PackagePath": "pkg/paths",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/paths/resolver_doc_entry_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestResolveDocEntryPath_PrefixRequiresCache",
+      "Package": "paths",
+      "PackagePath": "pkg/paths",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/paths/resolver_doc_entry_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestResolveDocEntryPath_Empty",
+      "Package": "paths",
+      "PackagePath": "pkg/paths",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/paths/resolver_doc_entry_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

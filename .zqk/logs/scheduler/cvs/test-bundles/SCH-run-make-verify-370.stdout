@@ -1,0 +1,44 @@
+
+--- run 2026-09-04T22:12:39Z ---
+=== RUN   TestLifecycleMigrationHelper_NestedStatusPreconditions
+=== PAUSE TestLifecycleMigrationHelper_NestedStatusPreconditions
+=== RUN   TestLifecycleMigrationHelper_UnicodeCharacters
+=== PAUSE TestLifecycleMigrationHelper_UnicodeCharacters
+=== RUN   TestLifecycleMigrationHelper_YAMLWithComments
+=== PAUSE TestLifecycleMigrationHelper_YAMLWithComments
+=== RUN   TestLifecycleMigrationHelper_LifecycleToObject
+=== PAUSE TestLifecycleMigrationHelper_LifecycleToObject
+=== RUN   TestLifecycleMigrationHelper_LifecycleToObjectFromFile
+=== PAUSE TestLifecycleMigrationHelper_LifecycleToObjectFromFile
+=== RUN   TestLifecycleMigrationHelper_MigrateLifecycleFile
+=== PAUSE TestLifecycleMigrationHelper_MigrateLifecycleFile
+=== RUN   TestLifecycleMigrationHelper_MigrateLifecycleFile_SkipExisting
+=== PAUSE TestLifecycleMigrationHelper_MigrateLifecycleFile_SkipExisting
+=== RUN   TestLifecycleMigrationHelper_MigrateLifecycleFile_DryRun
+=== PAUSE TestLifecycleMigrationHelper_MigrateLifecycleFile_DryRun
+=== RUN   TestLifecycleMigrationHelper_LifecycleToObject_InvalidFile
+=== PAUSE TestLifecycleMigrationHelper_LifecycleToObject_InvalidFile
+=== RUN   TestLifecycleMigrationHelper_LifecycleToObject_MissingObjectType
+=== PAUSE TestLifecycleMigrationHelper_LifecycleToObject_MissingObjectType
+=== CONT  TestLifecycleMigrationHelper_NestedStatusPreconditions
+=== CONT  TestLifecycleMigrationHelper_MigrateLifecycleFile
+--- PASS: TestLifecycleMigrationHelper_NestedStatusPreconditions (0.40s)
+=== CONT  TestLifecycleMigrationHelper_LifecycleToObject_InvalidFile
+--- PASS: TestLifecycleMigrationHelper_LifecycleToObject_InvalidFile (0.20s)
+=== CONT  TestLifecycleMigrationHelper_LifecycleToObject_MissingObjectType
+--- PASS: TestLifecycleMigrationHelper_LifecycleToObject_MissingObjectType (0.26s)
+=== CONT  TestLifecycleMigrationHelper_MigrateLifecycleFile_DryRun
+--- PASS: TestLifecycleMigrationHelper_MigrateLifecycleFile_DryRun (0.35s)
+=== CONT  TestLifecycleMigrationHelper_LifecycleToObject
+--- PASS: TestLifecycleMigrationHelper_LifecycleToObject (0.29s)
+=== CONT  TestLifecycleMigrationHelper_LifecycleToObjectFromFile
+--- PASS: TestLifecycleMigrationHelper_MigrateLifecycleFile (1.65s)
+=== CONT  TestLifecycleMigrationHelper_YAMLWithComments
+--- PASS: TestLifecycleMigrationHelper_LifecycleToObjectFromFile (0.36s)
+=== CONT  TestLifecycleMigrationHelper_UnicodeCharacters
+--- PASS: TestLifecycleMigrationHelper_YAMLWithComments (0.30s)
+=== CONT  TestLifecycleMigrationHelper_MigrateLifecycleFile_SkipExisting
+--- PASS: TestLifecycleMigrationHelper_UnicodeCharacters (0.25s)
+--- PASS: TestLifecycleMigrationHelper_MigrateLifecycleFile_SkipExisting (0.89s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/migration	3.615s

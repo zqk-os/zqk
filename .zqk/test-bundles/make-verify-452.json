@@ -1,0 +1,141 @@
+{
+  "name": "make-verify-452",
+  "created_at": "2026-09-04T21:34:31.812985Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-452",
+    "Tests": [
+      {
+        "Name": "TestFormatOutput_JSONEmitsBraceForObject",
+        "Package": "cli",
+        "PackagePath": "internal/cli",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/internal/cli/format_output_contract_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestTableFormatHandler_UsesYAMLStyleNotJSONBrace",
+        "Package": "cli",
+        "PackagePath": "internal/cli",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/internal/cli/format_output_contract_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestYAMLFormatHandler_StreamWritesSameFamilyAsFormat",
+        "Package": "cli",
+        "PackagePath": "internal/cli",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/internal/cli/format_output_contract_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestValidateAnnotatedKind_noAnnotation_isNoOp",
+        "Package": "cli",
+        "PackagePath": "internal/cli",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/internal/cli/kind_validate_prerun_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestValidateBulkUpdateFileKind_skipsWithoutFileFlag",
+        "Package": "cli",
+        "PackagePath": "internal/cli",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/internal/cli/kind_validate_prerun_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestValidateSystemCompactStream_skipsWhenAll",
+        "Package": "cli",
+        "PackagePath": "internal/cli",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/internal/cli/kind_validate_prerun_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestValidateFieldsParentKind_storesCanonical",
+        "Package": "cli",
+        "PackagePath": "internal/cli",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/internal/cli/kind_validate_prerun_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": true,
+    "EstimatedDuration": 210000000000,
+    "PackagePath": "internal/cli"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestFormatOutput_JSONEmitsBraceForObject",
+      "Package": "cli",
+      "PackagePath": "internal/cli",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/internal/cli/format_output_contract_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestTableFormatHandler_UsesYAMLStyleNotJSONBrace",
+      "Package": "cli",
+      "PackagePath": "internal/cli",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/internal/cli/format_output_contract_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestYAMLFormatHandler_StreamWritesSameFamilyAsFormat",
+      "Package": "cli",
+      "PackagePath": "internal/cli",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/internal/cli/format_output_contract_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestValidateAnnotatedKind_noAnnotation_isNoOp",
+      "Package": "cli",
+      "PackagePath": "internal/cli",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/internal/cli/kind_validate_prerun_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestValidateBulkUpdateFileKind_skipsWithoutFileFlag",
+      "Package": "cli",
+      "PackagePath": "internal/cli",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/internal/cli/kind_validate_prerun_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestValidateSystemCompactStream_skipsWhenAll",
+      "Package": "cli",
+      "PackagePath": "internal/cli",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/internal/cli/kind_validate_prerun_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestValidateFieldsParentKind_storesCanonical",
+      "Package": "cli",
+      "PackagePath": "internal/cli",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/internal/cli/kind_validate_prerun_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

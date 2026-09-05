@@ -1,0 +1,159 @@
+{
+  "name": "make-verify-222",
+  "created_at": "2026-09-04T21:34:29.603285Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-222",
+    "Tests": [
+      {
+        "Name": "TestIsolated_selectBacklogNext_PrefersP0OverP1",
+        "Package": "workflow",
+        "PackagePath": "cmd/zqk/workflow",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/workflow/workflow_isolated_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestIsolated_selectBacklogNext_ExcludesTerminalStatuses",
+        "Package": "workflow",
+        "PackagePath": "cmd/zqk/workflow",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/workflow/workflow_isolated_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestIsolated_selectActiveConvergence_PicksMostRecentlyUpdated",
+        "Package": "workflow",
+        "PackagePath": "cmd/zqk/workflow",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/workflow/workflow_isolated_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestIsolated_enrichPriorityPlanBacklog_IncludesConvergenceSessionFields",
+        "Package": "workflow",
+        "PackagePath": "cmd/zqk/workflow",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/workflow/workflow_isolated_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestIsolated_countOpenQuestions",
+        "Package": "workflow",
+        "PackagePath": "cmd/zqk/workflow",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/workflow/workflow_isolated_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestIsolated_enrichPriorityPlanBacklog_FillsSummariesAndGoalRefs",
+        "Package": "workflow",
+        "PackagePath": "cmd/zqk/workflow",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/workflow/workflow_isolated_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestIsolated_selectBacklogNext_EndToEndWithEnrichment",
+        "Package": "workflow",
+        "PackagePath": "cmd/zqk/workflow",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/workflow/workflow_isolated_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestIsolated_workflowNextCyclesPlanAndBacklogToCompletion",
+        "Package": "workflow",
+        "PackagePath": "cmd/zqk/workflow",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/workflow/workflow_isolated_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": true,
+    "EstimatedDuration": 240000000000,
+    "PackagePath": "cmd/zqk/workflow"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestIsolated_selectBacklogNext_PrefersP0OverP1",
+      "Package": "workflow",
+      "PackagePath": "cmd/zqk/workflow",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/workflow/workflow_isolated_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestIsolated_selectBacklogNext_ExcludesTerminalStatuses",
+      "Package": "workflow",
+      "PackagePath": "cmd/zqk/workflow",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/workflow/workflow_isolated_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestIsolated_selectActiveConvergence_PicksMostRecentlyUpdated",
+      "Package": "workflow",
+      "PackagePath": "cmd/zqk/workflow",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/workflow/workflow_isolated_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestIsolated_enrichPriorityPlanBacklog_IncludesConvergenceSessionFields",
+      "Package": "workflow",
+      "PackagePath": "cmd/zqk/workflow",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/workflow/workflow_isolated_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestIsolated_countOpenQuestions",
+      "Package": "workflow",
+      "PackagePath": "cmd/zqk/workflow",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/workflow/workflow_isolated_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestIsolated_enrichPriorityPlanBacklog_FillsSummariesAndGoalRefs",
+      "Package": "workflow",
+      "PackagePath": "cmd/zqk/workflow",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/workflow/workflow_isolated_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestIsolated_selectBacklogNext_EndToEndWithEnrichment",
+      "Package": "workflow",
+      "PackagePath": "cmd/zqk/workflow",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/workflow/workflow_isolated_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestIsolated_workflowNextCyclesPlanAndBacklogToCompletion",
+      "Package": "workflow",
+      "PackagePath": "cmd/zqk/workflow",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/workflow/workflow_isolated_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

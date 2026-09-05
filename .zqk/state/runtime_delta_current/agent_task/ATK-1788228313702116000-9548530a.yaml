@@ -1,0 +1,73 @@
+assignee_persona_ref: PER-ORCH-ALPHA
+created_at: "2026-09-01T02:05:13Z"
+created_by: ACC-1785920548450214012-68b850c0
+description: |
+    # Agent Task Envelope
+    zqk_task_envelope_v1
+
+    Static context lives in kernel objects. Do not treat this description as a copy of policy or skill bodies.
+    Resolve at execute: `zqk object get <id>`, `zqk agent prepare-context --task-id <ATK>`, or `zqk workflow whats-next`.
+
+    ## Dynamic
+    - Plan: CEF R27 — dual-seat remesure after launch P0s (floor 4 / target 4.5) (PRI-CEF-R27-ENVELOPE-001)
+    - Target: orchestrator (capability: )
+    - Persona: PER-ORCH-ALPHA
+    - Task: Dual-seat CEF R27 remesure after launch P0s (floor 4 / target 4.5)
+
+    ## Standing refs (do not duplicate bodies)
+    - `POL-ONBOARD-001` — `zqk object get POL-ONBOARD-001`
+    - `POL-ONBOARD-002` — `zqk object get POL-ONBOARD-002`
+    - `POL-AGENT-INSTRUCTION-RUBRIC-001` — `zqk object get POL-AGENT-INSTRUCTION-RUBRIC-001`
+    - `POL-WORKFLOW-VDS` — `zqk object get POL-WORKFLOW-VDS`
+    - `POL-CODE-CAS-COMMIT-001` — `zqk object get POL-CODE-CAS-COMMIT-001`
+    - `POL-CODE-1784753087498298000-bedce972` — `zqk object get POL-CODE-1784753087498298000-bedce972`
+
+    ## Bound policies
+    - `POL-ONBOARD-001`
+    - `POL-ONBOARD-002`
+    - `POL-AGENT-INSTRUCTION-RUBRIC-001`
+    - `POL-WORKFLOW-VDS`
+    - `POL-CODE-CAS-COMMIT-001`
+    - `POL-CODE-1784753087498298000-bedce972`
+    - `POL-AGENT-ADMIN-MEMBRANE-001`
+    - `POL-AGENT-TPM-GROOM-AHEAD-001`
+
+    ## Bound skills
+    - `ASK-1782593752920560000-99708cd6` — `zqk object get ASK-1782593752920560000-99708cd6`
+    - `ASK-1785886320695053000-499835d8` — `zqk object get ASK-1785886320695053000-499835d8`
+    - `ASK-1785886324283087000-34320add` — `zqk object get ASK-1785886324283087000-34320add`
+    - `ASK-1786081148616665000-c78bdd4d` — `zqk object get ASK-1786081148616665000-c78bdd4d`
+
+    ## Observer
+    Do not persist an AST census. At execute time call observer_search, then read_code the returned path.
+estimated_effort: 1d
+id: ATK-1788228313702116000-9548530a
+kind: agent_task
+model_tier: tier_2_simple
+namespace_id: zqk:kernel
+outputs: []
+policy_refs:
+    - POL-ONBOARD-001
+    - POL-ONBOARD-002
+    - POL-AGENT-INSTRUCTION-RUBRIC-001
+    - POL-WORKFLOW-VDS
+    - POL-CODE-CAS-COMMIT-001
+    - POL-CODE-1784753087498298000-bedce972
+    - POL-AGENT-ADMIN-MEMBRANE-001
+    - POL-AGENT-TPM-GROOM-AHEAD-001
+priority_plan_ref: PRI-CEF-R27-ENVELOPE-001
+related_object_refs:
+    - ASK-1782593752920560000-99708cd6
+    - ASK-1785886320695053000-499835d8
+    - ASK-1785886324283087000-34320add
+    - ASK-1786081148616665000-c78bdd4d
+schema_version: 2.0.0
+started_at: "2026-09-01T02:05:22Z"
+status: archived
+task_steps:
+    "0":
+        status: implemented
+title: 'Execute Task: Dual-seat CEF R27 remesure after launch P0s (floor 4 / target 4.5)'
+updated_at: "2026-09-02T21:35:07Z"
+updated_by: ACC-1785920548450214006-2e52b3e7
+version_context: default

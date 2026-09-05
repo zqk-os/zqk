@@ -1,0 +1,14 @@
+created_at: "2026-08-20T08:38:56Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1787215134189899000-f5568988
+item_id: PRI-CEF-S18-TRANSITION-MATRIX-001
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 2857702ca28e4b64fb5782140b43c1400e68fdeab30ab0062f4119523ca97d466e5f13c72adcfa41b92eacf21fa7f0a79b8a8e3a8d7c581e5c9afe0e69cb31dc
+schema_version: 2.0.0
+signature: 304502203819c90ebe57008280a2dd54de6050693fae6d4b70e5d207cf5562059c0aa1e8022100c923529a7b5a506431b7340b1cba7e706c8c2296182e1094d1b41e3c1d90b236
+status: archived
+title: S18 redo — per-kind lifecycle transition test matrix
+updated_at: "2026-09-01T07:11:24Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

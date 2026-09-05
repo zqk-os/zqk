@@ -1,0 +1,44 @@
+
+--- run 2026-09-04T22:20:52Z ---
+=== RUN   TestEnsureExactlyOneLiveCASBlob_RemovesExtraAndKeepsHash
+=== PAUSE TestEnsureExactlyOneLiveCASBlob_RemovesExtraAndKeepsHash
+=== RUN   TestCASIndexWireConstants
+=== PAUSE TestCASIndexWireConstants
+=== RUN   TestDiscoverCASFilePathByScanning
+=== PAUSE TestDiscoverCASFilePathByScanning
+=== RUN   TestDiscoverCASFilePathsByScanning_bucketAndEmpty
+=== PAUSE TestDiscoverCASFilePathsByScanning_bucketAndEmpty
+=== RUN   TestCalculateSHA256Hash_empty
+=== PAUSE TestCalculateSHA256Hash_empty
+=== RUN   TestVerifyContentHash
+=== PAUSE TestVerifyContentHash
+=== RUN   TestProjectRootFromCASKindDir
+=== PAUSE TestProjectRootFromCASKindDir
+=== RUN   TestErrObjectNotFound
+=== PAUSE TestErrObjectNotFound
+=== RUN   TestIndexWriteQueueVarIsOptional
+=== PAUSE TestIndexWriteQueueVarIsOptional
+=== RUN   TestRemoveRetiredCASHashFileOnIDChange
+=== PAUSE TestRemoveRetiredCASHashFileOnIDChange
+=== CONT  TestEnsureExactlyOneLiveCASBlob_RemovesExtraAndKeepsHash
+=== CONT  TestVerifyContentHash
+--- PASS: TestVerifyContentHash (0.00s)
+=== CONT  TestIndexWriteQueueVarIsOptional
+--- PASS: TestIndexWriteQueueVarIsOptional (0.00s)
+=== CONT  TestRemoveRetiredCASHashFileOnIDChange
+--- PASS: TestRemoveRetiredCASHashFileOnIDChange (0.00s)
+=== CONT  TestErrObjectNotFound
+--- PASS: TestErrObjectNotFound (0.00s)
+=== CONT  TestProjectRootFromCASKindDir
+--- PASS: TestProjectRootFromCASKindDir (0.00s)
+=== CONT  TestDiscoverCASFilePathsByScanning_bucketAndEmpty
+--- PASS: TestDiscoverCASFilePathsByScanning_bucketAndEmpty (0.01s)
+=== CONT  TestCalculateSHA256Hash_empty
+--- PASS: TestCalculateSHA256Hash_empty (0.00s)
+=== CONT  TestDiscoverCASFilePathByScanning
+--- PASS: TestEnsureExactlyOneLiveCASBlob_RemovesExtraAndKeepsHash (0.02s)
+=== CONT  TestCASIndexWireConstants
+--- PASS: TestCASIndexWireConstants (0.00s)
+--- PASS: TestDiscoverCASFilePathByScanning (0.01s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/storage/filecas	0.284s

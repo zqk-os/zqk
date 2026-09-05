@@ -1,0 +1,483 @@
+{
+  "meta": {
+    "namespace_isolation_active": true,
+    "namespace_scope": "zqk:kernel",
+    "namespace_scope_mode": "default_kernel",
+    "returned_count": 91,
+    "total_count": 91
+  },
+  "objects": [
+    {
+      "id": "PRI-1786084814786868000-df9be3b3",
+      "status": "archived",
+      "title": "Swarm continuity runway — mesh CAP + roadmap buffer (post Skill-trust/MMORCH)"
+    },
+    {
+      "id": "PRI-1786121461227090000-f8c05f3c",
+      "status": "archived",
+      "title": "MMORCH Leak Remediation — Aug 7 overnight control-plane cracks"
+    },
+    {
+      "id": "PRI-1786387443811997000-3241eddd",
+      "status": "archived",
+      "title": "Kernel coherence — referential close + honest check taxonomy"
+    },
+    {
+      "active_order": null,
+      "id": "PRI-1786686563805309000-842068b2",
+      "status": "archived",
+      "title": "CLI DNA / command_spec SSOT \u0026 membrane"
+    },
+    {
+      "id": "PRI-1786686767402146000-26cee498",
+      "status": "archived",
+      "title": "CVS lifecycle membrane — status semantics \u0026 admission gates"
+    },
+    {
+      "id": "PRI-1786687873940250000-a6c3a985",
+      "status": "archived",
+      "title": "Kernel object-kind fitness — 7-lens rubric audit (public + internal)"
+    },
+    {
+      "active_order": null,
+      "id": "PRI-1787134521116401000-e9583d4d",
+      "status": "complete",
+      "title": "Grooming — community wedge + git-evidence steward (post EVIDENCE-REOPEN)"
+    },
+    {
+      "id": "PRI-1787135395798489000-fead9b65",
+      "status": "complete",
+      "title": "Grooming — post-wedge open-core ops (stable recycle, PR merge, stranger smoke)"
+    },
+    {
+      "id": "PRI-AGENT-IDLE-PR1522-REMEDIATE-001",
+      "status": "archived",
+      "title": "Remediate PR #1522 — lite-file + CLI spec + gates"
+    },
+    {
+      "id": "PRI-AGENT-IDLENESS-ACCUMULATOR-001",
+      "status": "archived",
+      "title": "Agent idleness accumulator — scoreboard + reduction CVS"
+    },
+    {
+      "id": "PRI-CAP-FAIL-CLOSED-ORCHESTRATION-001",
+      "status": "archived",
+      "title": "Fail-closed overnight CAP — reliable multi-agent orchestration"
+    },
+    {
+      "id": "PRI-CAS-MEMBRANE-ENFORCE-001",
+      "status": "archived",
+      "title": "CAS membrane enforce — PrivilegedWriter fail-closed + path deny"
+    },
+    {
+      "id": "PRI-CAS-MUTATION-SHOCKWAVE-001",
+      "status": "complete",
+      "title": "CAS mutation shockwave — delete/update ≡ promote/demote"
+    },
+    {
+      "active_order": 2,
+      "id": "PRI-CEF-ARCH-FOLLOWON-001",
+      "status": "grooming",
+      "title": "CEF architecture follow-on — shockwave families + qa_success spec"
+    },
+    {
+      "id": "PRI-CEF-FRICTION-GROOMING-001",
+      "status": "archived",
+      "title": "CEF friction grooming — lifecycle/CAS snags"
+    },
+    {
+      "active_order": 1,
+      "id": "PRI-CEF-LINGERING-INTAKE-001",
+      "status": "active",
+      "title": "CEF lingering intake — community launch lane (COMMS, TTV, CEF floor)"
+    },
+    {
+      "id": "PRI-CEF-PIP-KERNEL-DRIVE-001",
+      "status": "complete",
+      "title": "CEF — kernel pipeline objects drive pkg/pipeline (MMORCH step functions)"
+    },
+    {
+      "id": "PRI-CEF-R10-DIAMOND5-001",
+      "status": "complete",
+      "title": "CEF Round 10 — hater-challenge R9 fours then lift envelope to 5"
+    },
+    {
+      "id": "PRI-CEF-R11-LIFT-4S-001",
+      "status": "complete",
+      "title": "CEF Round 11 — lift OBS/REL/ROB from honest envelope-4 toward 5"
+    },
+    {
+      "id": "PRI-CEF-R12-GOD-PACKAGE-001",
+      "status": "complete",
+      "title": "CEF Round 12 — storage god-package breakup"
+    },
+    {
+      "id": "PRI-CEF-R13-TEST-ISOLATION-001",
+      "status": "complete",
+      "title": "CEF Round 13 — test isolation / TEST_ROOT lifecycle honesty"
+    },
+    {
+      "id": "PRI-CEF-R14-DIAMOND-CLOSE-001",
+      "status": "complete",
+      "title": "CEF Round 14 — remaining diamond axes to 5 after R11/R12"
+    },
+    {
+      "id": "PRI-CEF-R15-SEC-FAILCLOSED-001",
+      "status": "complete",
+      "title": "CEF Round 15 — security fail-closed requirement burn-down"
+    },
+    {
+      "id": "PRI-CEF-R16-REL-DURABLE-001",
+      "status": "complete",
+      "title": "CEF Round 16 — reliability and durability requirement burn-down"
+    },
+    {
+      "id": "PRI-CEF-R17-MNT-RDB-MEGAFILE-001",
+      "status": "complete",
+      "title": "CEF Round 17 — maintainability and readability: mega-file and globals burn-down"
+    },
+    {
+      "id": "PRI-CEF-R18-DOC-USA-SUPPLY-001",
+      "status": "complete",
+      "title": "CEF Round 18 — documentation honesty, first-run UX, and supply hygiene"
+    },
+    {
+      "id": "PRI-CEF-R19-EVIDENCE-DEFECTS-001",
+      "status": "complete",
+      "title": "CEF R19 - closure evidence gate and unmasked defects"
+    },
+    {
+      "id": "PRI-CEF-R2-S1-OBS",
+      "status": "complete",
+      "title": "CEF R2 S1 — Kill synthetic / false-green OBS"
+    },
+    {
+      "active_order": null,
+      "id": "PRI-CEF-R2-S2-ARCH",
+      "status": "complete",
+      "title": "CEF R2 S2 — Architecture navigability"
+    },
+    {
+      "active_order": null,
+      "id": "PRI-CEF-R2-S3-REL",
+      "status": "complete",
+      "title": "CEF R2 S3 — Durability fail-closed residuals"
+    },
+    {
+      "id": "PRI-CEF-R2-S4-SEC",
+      "status": "complete",
+      "title": "CEF R2 S4 — Security fail-closed residuals"
+    },
+    {
+      "id": "PRI-CEF-R2-S5-CON",
+      "status": "complete",
+      "title": "CEF R2 S5 — Concurrency correctness"
+    },
+    {
+      "id": "PRI-CEF-R2-S6-TST-SUP",
+      "status": "complete",
+      "title": "CEF R2 S6 — Test coverage + supply gates"
+    },
+    {
+      "id": "PRI-CEF-R2-S7-POLISH",
+      "status": "complete",
+      "title": "CEF R2 S7 — Perf/docs/CQ + grade re-eval"
+    },
+    {
+      "id": "PRI-CEF-R20-BRANCH-PROVENANCE-001",
+      "status": "complete",
+      "title": "CEF R20 - branch provenance and code-location gates"
+    },
+    {
+      "id": "PRI-CEF-R21-ENVELOPE-REMEASURE-001",
+      "status": "complete",
+      "title": "CEF R21 — dual-seat envelope remeasure after R18/R19/R20"
+    },
+    {
+      "id": "PRI-CEF-R23-PKG-LAYOUT-001",
+      "status": "complete",
+      "title": "CEF Round 23 — package directory names and leftover source trash"
+    },
+    {
+      "id": "PRI-CEF-R24-KERNEL-INTEGRITY-001",
+      "status": "complete",
+      "title": "CEF Round 24 — kernel integrity (GhostRef, validation planes, observer AST)"
+    },
+    {
+      "id": "PRI-CEF-R24-LOCAL-MODELS-001",
+      "status": "complete",
+      "title": "CEF Round 24 — local models bake-off (Qwen 7B Coder vs Instruct tool_calls)"
+    },
+    {
+      "id": "PRI-CEF-R25-ENVELOPE-REMEASURE-001",
+      "status": "complete",
+      "title": "CEF Round 25 — dual-seat envelope remesure after R24"
+    },
+    {
+      "id": "PRI-CEF-R26-LIFECYCLE-EXAM-001",
+      "status": "complete",
+      "title": "CEF Round 26 — kernel lifecycle exam and triage liaison"
+    },
+    {
+      "active_order": 4,
+      "id": "PRI-CEF-R27-ENVELOPE-001",
+      "status": "grooming",
+      "title": "CEF R27 — dual-seat remesure after launch P0s (floor 4 / target 4.5)"
+    },
+    {
+      "id": "PRI-CEF-R3-RESIDUALS-001",
+      "status": "complete",
+      "title": "CEF Round 3 Residuals — System Peel, Autonomy Health, Logging Obs \u0026 Stack Merge"
+    },
+    {
+      "id": "PRI-CEF-R4-REMEDIATION-001",
+      "status": "complete",
+      "title": "CEF Round 4 Remediation — Peel, OBS hygiene, WAL durability, SEC surface"
+    },
+    {
+      "id": "PRI-CEF-R5-MEASURE-001",
+      "status": "complete",
+      "title": "CEF Round 5 measure — dual-seat envelope toward 5 preferred"
+    },
+    {
+      "id": "PRI-CEF-R6-GRADE5-001",
+      "status": "complete",
+      "title": "CEF Round 6 — first Grade-5 push (RDB peel + REL ancillary WAL)"
+    },
+    {
+      "id": "PRI-CEF-R7-SCRUPULOUS-001",
+      "status": "complete",
+      "title": "CEF Round 7 — scrupulous dual-seat truth map (AGENT_K / AGENT_L)"
+    },
+    {
+      "id": "PRI-CEF-R8-REMEDIATE-001",
+      "status": "complete",
+      "title": "CEF Round 8 — first remediation wave from scrupulous K/L findings"
+    },
+    {
+      "id": "PRI-CEF-R9-MEASURE-001",
+      "status": "complete",
+      "title": "CEF Round 9 — dual-seat remeasure after R8/S18"
+    },
+    {
+      "active_order": null,
+      "id": "PRI-CEF-S1-SURFACE",
+      "status": "archived",
+      "title": "CEF S1 — Surface harden (network/auth/sandbox/auto-merge)"
+    },
+    {
+      "id": "PRI-CEF-S18-TRANSITION-MATRIX-001",
+      "status": "complete",
+      "title": "S18 redo — per-kind lifecycle transition test matrix"
+    },
+    {
+      "active_order": null,
+      "id": "PRI-CEF-S2-HONEST",
+      "status": "archived",
+      "title": "CEF S2 — Honest status and first-run docs"
+    },
+    {
+      "id": "PRI-CEF-S3-CI-SUPPLY",
+      "status": "archived",
+      "title": "CEF S3 — CI/supply reality (golangci/SBOM/checksum)"
+    },
+    {
+      "active_order": null,
+      "id": "PRI-CEF-S4-DURABILITY",
+      "status": "archived",
+      "title": "CEF S4 — Durability policy and concurrency P0"
+    },
+    {
+      "active_order": null,
+      "id": "PRI-CEF-S5-ARCH",
+      "status": "archived",
+      "title": "CEF S5 — Architecture tranche-1 and event path"
+    },
+    {
+      "active_order": null,
+      "id": "PRI-CEF-S6-TEST",
+      "status": "archived",
+      "title": "CEF S6 — Race CI and test isolation"
+    },
+    {
+      "id": "PRI-CEF-S7-POLISH",
+      "status": "archived",
+      "title": "CEF S7 — Pre-launch polish and remaining honesty"
+    },
+    {
+      "id": "PRI-CEF-SW-KERNELIZE-FAMILIES-001",
+      "status": "complete",
+      "title": "CEF — Kernelize lifecycle shockwave families"
+    },
+    {
+      "id": "PRI-CI-VERIFICATION-VALIDATION-001",
+      "status": "archived",
+      "title": "CI verification and reliability validation sprint"
+    },
+    {
+      "id": "PRI-COMMS-CURSOR-TPM-LIVE-WAKE-001",
+      "status": "archived",
+      "title": "Cursor TPM live wake — deterministic AGY→TPM interrupt"
+    },
+    {
+      "id": "PRI-COMMUNITY-FORK-PREPARE-001",
+      "status": "complete",
+      "title": "Community-fork prepare-only — GhostRef close, payload check, hold/ACK gates"
+    },
+    {
+      "id": "PRI-COMMUNITY-WEDGE-V1-001",
+      "status": "complete",
+      "title": "Community Wedge V1 — Packaging, Distribution \u0026 Verification"
+    },
+    {
+      "id": "PRI-COMMUNITY-WEDGE-V2-001",
+      "status": "complete",
+      "title": "Community Wedge V2 — Steward Automation \u0026 Stranger Clone Isolation"
+    },
+    {
+      "id": "PRI-DRAFT-PLANE-ORCHESTRATE-GHOST-001",
+      "status": "complete",
+      "title": "Draft-plane orchestrate ghost — success≠CAS"
+    },
+    {
+      "id": "PRI-ENV-SIGNED-LOGIN-001",
+      "status": "archived",
+      "title": "No privilege bleeding — kill env overrides + signed per-ACC login"
+    },
+    {
+      "id": "PRI-GIT-EVIDENCE-STEWARD-001",
+      "status": "complete",
+      "title": "Git Evidence Steward — Automated Provenance \u0026 Verification Hardening"
+    },
+    {
+      "id": "PRI-GROOM-CAS-DRAFT-001",
+      "status": "complete",
+      "title": "Grooming — CAS / draft-plane / dangling-ref residuals"
+    },
+    {
+      "id": "PRI-GROOM-CI-TEST-001",
+      "status": "complete",
+      "title": "Grooming — CI / test / QA residuals"
+    },
+    {
+      "id": "PRI-GROOM-CLI-DNA-001",
+      "status": "complete",
+      "title": "Grooming — CLI DNA / command_spec / session residuals"
+    },
+    {
+      "id": "PRI-GROOM-COMMS-MESH-001",
+      "status": "complete",
+      "title": "Grooming — COMMS/mesh/seat/MCP wake residuals"
+    },
+    {
+      "id": "PRI-GROOM-EVIDENCE-REOPEN-001",
+      "status": "complete",
+      "title": "Grooming — reopen false-COMPLETE OPENCORE + launch residuals (real commits/PR)"
+    },
+    {
+      "id": "PRI-GROOM-KERNEL-OPS-001",
+      "status": "complete",
+      "title": "Grooming — kernel ops / storage / policy / perf residuals"
+    },
+    {
+      "id": "PRI-GROOM-KERNEL-RELIABILITY-RESIDUAL-001",
+      "status": "archived",
+      "title": "Grooming — residual kernel reliability (cache/check honesty)"
+    },
+    {
+      "id": "PRI-GROOM-LAUNCH-RESIDUAL-001",
+      "status": "complete",
+      "title": "Grooming — launch-readiness residuals (orphaned REQs / lifecycle-fitness / CAP evidence)"
+    },
+    {
+      "id": "PRI-GROOM-LIFECYCLE-COHERENCE-001",
+      "status": "complete",
+      "title": "Grooming — lifecycle / PRI shockwave / coherence residuals"
+    },
+    {
+      "id": "PRI-GROOM-METRICS-AMBIENT-001",
+      "status": "complete",
+      "title": "Grooming — metrics / ambient / whats-next residuals"
+    },
+    {
+      "id": "PRI-GROOM-OPENCORE-001",
+      "status": "complete",
+      "title": "Grooming — open-core / community / release residuals"
+    },
+    {
+      "id": "PRI-HOLDING-POST-LAUNCH-001",
+      "status": "grooming",
+      "title": "Post-launch holding — deferred/roadmap not for this swarm"
+    },
+    {
+      "active_order": null,
+      "id": "PRI-KERNEL-COHERENCE-RESIDUAL-REHOME-001",
+      "status": "archived",
+      "title": "Kernel coherence residual — rehomed from stuck prioritizing CAP74"
+    },
+    {
+      "active_order": null,
+      "id": "PRI-KERNEL-HEALTH-SWARM-001",
+      "status": "complete",
+      "title": "Kernel health swarm — Tier-1 triage + ATK drain + COMMS CAS exit"
+    },
+    {
+      "id": "PRI-KERNEL-LF-DIAL-001",
+      "status": "archived",
+      "title": "Kernel lifecycle vs fitness dial — mid-flight column"
+    },
+    {
+      "id": "PRI-KERNEL-PACK-TRIM-001",
+      "status": "complete",
+      "title": "Kernel vs Pack Surface Trim — Default Binary Freeze"
+    },
+    {
+      "id": "PRI-KERNEL-WORK-ENVELOPE-001",
+      "status": "complete",
+      "title": "Kernel work envelope — completable + effort_aware mixins and autofill"
+    },
+    {
+      "id": "PRI-LIFECYCLE-TRANSITION-UX-001",
+      "status": "archived",
+      "title": "Lifecycle transition semantics and CLI diagnostics"
+    },
+    {
+      "active_order": null,
+      "id": "PRI-MCP-COMMS-RELIABILITY-001",
+      "status": "archived",
+      "title": "MCP spec kernelization and COMMS reliability closure"
+    },
+    {
+      "active_order": null,
+      "id": "PRI-METRICS-AMBIENT-SELF-IMPROVE-001",
+      "status": "complete",
+      "title": "Metrics/audit → ambient feeder — end pick-up-sticks kernel health"
+    },
+    {
+      "active_order": 3,
+      "id": "PRI-OPENCORE-PUBLISH-001",
+      "status": "grooming",
+      "title": "Open-core publish prep — payload check green, no public push"
+    },
+    {
+      "id": "PRI-OVERNIGHT-PERPETUAL-ITERATION-001",
+      "status": "archived",
+      "title": "Overnight perpetual iteration — CAP/scheduler/night-duty keep-alive"
+    },
+    {
+      "id": "PRI-STABILIZE-FAILCLOSED-READS-001",
+      "status": "complete",
+      "title": "Stabilization — absence must be representable (fail-closed reads)"
+    },
+    {
+      "id": "PRI-STUDIO-INTEGRATION-LAND-001",
+      "status": "complete",
+      "title": "Land studio integration — remaining CAS/docs and one PR to main"
+    },
+    {
+      "id": "PRI-SYM-003",
+      "status": "complete",
+      "title": "Phase 3 - Ambient Orchestration"
+    }
+  ]
+}

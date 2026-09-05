@@ -1,0 +1,14 @@
+created_at: "2026-09-03T09:16:03Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1788426963131970000-e5dadfd5
+item_id: BLI-CEF-CLI-DOCS-NAV-001
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 86b8ab3d574c004a61020b73c23f52b9055049e90c3d755c8bbb383e059e384028fdd8cd69e13123b644e5f3f7eb65596e73e2d57d719ea3dafcb01b84ce8dfb
+schema_version: 2.0.0
+signature: 3046022100e89ca9be5b571f5ae29cc0adc7d52d4ee3241e5e1a0bb158818bb8a054a22676022100c9dd251273599fda07033b4d1e80b7f5ebe572961789d28cbc3c346a328a420b
+status: success
+title: QA success for BLI-CEF-CLI-DOCS-NAV-001
+updated_at: "2026-09-03T09:16:05Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

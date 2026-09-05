@@ -1,0 +1,69 @@
+{
+  "name": "make-verify-762",
+  "created_at": "2026-09-04T21:34:34.87651Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-762",
+    "Tests": [
+      {
+        "Name": "TestCheckRegistration_missingID",
+        "Package": "systemcheck",
+        "PackagePath": "pkg/systemcheck",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/systemcheck/validators_registration_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestLooksHandCASMaterialized",
+        "Package": "systemcheck",
+        "PackagePath": "pkg/systemcheck",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/systemcheck/validators_registration_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestCheckLifecycle_missingStatus",
+        "Package": "systemcheck",
+        "PackagePath": "pkg/systemcheck",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/systemcheck/validators_registration_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 90000000000,
+    "PackagePath": "pkg/systemcheck"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestCheckRegistration_missingID",
+      "Package": "systemcheck",
+      "PackagePath": "pkg/systemcheck",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/systemcheck/validators_registration_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestLooksHandCASMaterialized",
+      "Package": "systemcheck",
+      "PackagePath": "pkg/systemcheck",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/systemcheck/validators_registration_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestCheckLifecycle_missingStatus",
+      "Package": "systemcheck",
+      "PackagePath": "pkg/systemcheck",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/systemcheck/validators_registration_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

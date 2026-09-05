@@ -1,0 +1,32 @@
+
+--- run 2026-09-04T21:39:51Z ---
+=== RUN   TestOntologyRegistry_GetSchemaOrgTypes_Error
+=== PAUSE TestOntologyRegistry_GetSchemaOrgTypes_Error
+=== RUN   TestOntologyRegistry_GetISO11179Type_Error
+=== PAUSE TestOntologyRegistry_GetISO11179Type_Error
+=== RUN   TestOntologyRegistry_GetBFOType_Error
+=== PAUSE TestOntologyRegistry_GetBFOType_Error
+=== RUN   TestOntologyRegistry_ValidateSemanticType_TimeTime
+=== PAUSE TestOntologyRegistry_ValidateSemanticType_TimeTime
+=== RUN   TestOntologyRegistry_ValidateSemanticType_StatementReflection
+=== PAUSE TestOntologyRegistry_ValidateSemanticType_StatementReflection
+=== RUN   TestOntologyRegistry_ValidateSemanticType_StatementObjectWithoutText
+=== PAUSE TestOntologyRegistry_ValidateSemanticType_StatementObjectWithoutText
+=== RUN   TestOntologyRegistry_NewOntologyRegistry_DefaultMappings
+=== PAUSE TestOntologyRegistry_NewOntologyRegistry_DefaultMappings
+=== CONT  TestOntologyRegistry_ValidateSemanticType_StatementObjectWithoutText
+--- PASS: TestOntologyRegistry_ValidateSemanticType_StatementObjectWithoutText (0.00s)
+=== CONT  TestOntologyRegistry_ValidateSemanticType_StatementReflection
+=== CONT  TestOntologyRegistry_GetSchemaOrgTypes_Error
+=== CONT  TestOntologyRegistry_GetBFOType_Error
+=== CONT  TestOntologyRegistry_GetISO11179Type_Error
+=== CONT  TestOntologyRegistry_NewOntologyRegistry_DefaultMappings
+--- PASS: TestOntologyRegistry_ValidateSemanticType_StatementReflection (0.00s)
+--- PASS: TestOntologyRegistry_GetSchemaOrgTypes_Error (0.00s)
+=== CONT  TestOntologyRegistry_ValidateSemanticType_TimeTime
+--- PASS: TestOntologyRegistry_GetBFOType_Error (0.00s)
+--- PASS: TestOntologyRegistry_GetISO11179Type_Error (0.00s)
+--- PASS: TestOntologyRegistry_NewOntologyRegistry_DefaultMappings (0.00s)
+--- PASS: TestOntologyRegistry_ValidateSemanticType_TimeTime (0.00s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/validation	0.713s

@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-713",
+  "created_at": "2026-09-04T21:34:34.431016Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-713",
+    "Tests": [
+      {
+        "Name": "TestEmitDependencyRefEventUsesSynchronousOperationalDelivery",
+        "Package": "lifecycle",
+        "PackagePath": "pkg/lifecycle",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/lifecycle/dependency_propagation_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestReserveDependencyEventRejectsDuplicateAndStale",
+        "Package": "lifecycle",
+        "PackagePath": "pkg/lifecycle",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/lifecycle/dependency_propagation_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestDependencyRefTargetIDsIncludesPriorityPlanParent",
+        "Package": "lifecycle",
+        "PackagePath": "pkg/lifecycle",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/lifecycle/dependency_propagation_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestDependencyHopMetaTagsMembership",
+        "Package": "lifecycle",
+        "PackagePath": "pkg/lifecycle",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/lifecycle/dependency_propagation_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestDependencyPropagationSubscriber_IDAndEventTypes",
+        "Package": "lifecycle",
+        "PackagePath": "pkg/lifecycle",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/lifecycle/dependency_propagation_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestPriorityPlanShockwaveUpdates_Table",
+        "Package": "lifecycle",
+        "PackagePath": "pkg/lifecycle",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/lifecycle/dependency_propagation_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestPriorityPlanShockwaveUpdates_GlobalLoader",
+        "Package": "lifecycle",
+        "PackagePath": "pkg/lifecycle",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/lifecycle/dependency_propagation_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestMilestoneShockwaveUpdates_LinkedBLIInProgress",
+        "Package": "lifecycle",
+        "PackagePath": "pkg/lifecycle",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/lifecycle/dependency_propagation_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestGoalShockwaveUpdates_LinkedBLIInProgress",
+        "Package": "lifecycle",
+        "PackagePath": "pkg/lifecycle",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/lifecycle/dependency_propagation_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestEffortStringUnset",
+        "Package": "lifecycle",
+        "PackagePath": "pkg/lifecycle",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/lifecycle/hooks_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": true,
+    "EstimatedDuration": 300000000000,
+    "PackagePath": "pkg/lifecycle"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestEmitDependencyRefEventUsesSynchronousOperationalDelivery",
+      "Package": "lifecycle",
+      "PackagePath": "pkg/lifecycle",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/lifecycle/dependency_propagation_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestReserveDependencyEventRejectsDuplicateAndStale",
+      "Package": "lifecycle",
+      "PackagePath": "pkg/lifecycle",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/lifecycle/dependency_propagation_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestDependencyRefTargetIDsIncludesPriorityPlanParent",
+      "Package": "lifecycle",
+      "PackagePath": "pkg/lifecycle",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/lifecycle/dependency_propagation_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestDependencyHopMetaTagsMembership",
+      "Package": "lifecycle",
+      "PackagePath": "pkg/lifecycle",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/lifecycle/dependency_propagation_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestDependencyPropagationSubscriber_IDAndEventTypes",
+      "Package": "lifecycle",
+      "PackagePath": "pkg/lifecycle",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/lifecycle/dependency_propagation_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestPriorityPlanShockwaveUpdates_Table",
+      "Package": "lifecycle",
+      "PackagePath": "pkg/lifecycle",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/lifecycle/dependency_propagation_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestPriorityPlanShockwaveUpdates_GlobalLoader",
+      "Package": "lifecycle",
+      "PackagePath": "pkg/lifecycle",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/lifecycle/dependency_propagation_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestMilestoneShockwaveUpdates_LinkedBLIInProgress",
+      "Package": "lifecycle",
+      "PackagePath": "pkg/lifecycle",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/lifecycle/dependency_propagation_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestGoalShockwaveUpdates_LinkedBLIInProgress",
+      "Package": "lifecycle",
+      "PackagePath": "pkg/lifecycle",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/lifecycle/dependency_propagation_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestEffortStringUnset",
+      "Package": "lifecycle",
+      "PackagePath": "pkg/lifecycle",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/lifecycle/hooks_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

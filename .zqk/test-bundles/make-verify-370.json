@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-370",
+  "created_at": "2026-09-04T21:34:31.020196Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-370",
+    "Tests": [
+      {
+        "Name": "TestLifecycleMigrationHelper_NestedStatusPreconditions",
+        "Package": "migration",
+        "PackagePath": "pkg/migration",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/migration/lifecycle_migration_edge_case_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestLifecycleMigrationHelper_UnicodeCharacters",
+        "Package": "migration",
+        "PackagePath": "pkg/migration",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/migration/lifecycle_migration_edge_case_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestLifecycleMigrationHelper_YAMLWithComments",
+        "Package": "migration",
+        "PackagePath": "pkg/migration",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/migration/lifecycle_migration_edge_case_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestLifecycleMigrationHelper_LifecycleToObject",
+        "Package": "migration",
+        "PackagePath": "pkg/migration",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/migration/lifecycle_migration_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestLifecycleMigrationHelper_LifecycleToObjectFromFile",
+        "Package": "migration",
+        "PackagePath": "pkg/migration",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/migration/lifecycle_migration_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestLifecycleMigrationHelper_MigrateLifecycleFile",
+        "Package": "migration",
+        "PackagePath": "pkg/migration",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/migration/lifecycle_migration_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestLifecycleMigrationHelper_MigrateLifecycleFile_SkipExisting",
+        "Package": "migration",
+        "PackagePath": "pkg/migration",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/migration/lifecycle_migration_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestLifecycleMigrationHelper_MigrateLifecycleFile_DryRun",
+        "Package": "migration",
+        "PackagePath": "pkg/migration",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/migration/lifecycle_migration_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestLifecycleMigrationHelper_LifecycleToObject_InvalidFile",
+        "Package": "migration",
+        "PackagePath": "pkg/migration",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/migration/lifecycle_migration_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestLifecycleMigrationHelper_LifecycleToObject_MissingObjectType",
+        "Package": "migration",
+        "PackagePath": "pkg/migration",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/migration/lifecycle_migration_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": true,
+    "EstimatedDuration": 300000000000,
+    "PackagePath": "pkg/migration"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestLifecycleMigrationHelper_NestedStatusPreconditions",
+      "Package": "migration",
+      "PackagePath": "pkg/migration",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/migration/lifecycle_migration_edge_case_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestLifecycleMigrationHelper_UnicodeCharacters",
+      "Package": "migration",
+      "PackagePath": "pkg/migration",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/migration/lifecycle_migration_edge_case_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestLifecycleMigrationHelper_YAMLWithComments",
+      "Package": "migration",
+      "PackagePath": "pkg/migration",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/migration/lifecycle_migration_edge_case_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestLifecycleMigrationHelper_LifecycleToObject",
+      "Package": "migration",
+      "PackagePath": "pkg/migration",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/migration/lifecycle_migration_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestLifecycleMigrationHelper_LifecycleToObjectFromFile",
+      "Package": "migration",
+      "PackagePath": "pkg/migration",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/migration/lifecycle_migration_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestLifecycleMigrationHelper_MigrateLifecycleFile",
+      "Package": "migration",
+      "PackagePath": "pkg/migration",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/migration/lifecycle_migration_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestLifecycleMigrationHelper_MigrateLifecycleFile_SkipExisting",
+      "Package": "migration",
+      "PackagePath": "pkg/migration",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/migration/lifecycle_migration_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestLifecycleMigrationHelper_MigrateLifecycleFile_DryRun",
+      "Package": "migration",
+      "PackagePath": "pkg/migration",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/migration/lifecycle_migration_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestLifecycleMigrationHelper_LifecycleToObject_InvalidFile",
+      "Package": "migration",
+      "PackagePath": "pkg/migration",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/migration/lifecycle_migration_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestLifecycleMigrationHelper_LifecycleToObject_MissingObjectType",
+      "Package": "migration",
+      "PackagePath": "pkg/migration",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/migration/lifecycle_migration_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

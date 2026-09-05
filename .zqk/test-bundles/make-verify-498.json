@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-498",
+  "created_at": "2026-09-04T21:34:32.299773Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-498",
+    "Tests": [
+      {
+        "Name": "TestConcurrencySpecGenerator",
+        "Package": "specbuilder_test",
+        "PackagePath": "pkg/specbuilder",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/specbuilder/concurrency_stress_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestConcurrencyAPIGenerator",
+        "Package": "specbuilder_test",
+        "PackagePath": "pkg/specbuilder",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/specbuilder/concurrency_stress_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestConcurrencyConfigGenerator",
+        "Package": "specbuilder_test",
+        "PackagePath": "pkg/specbuilder",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/specbuilder/concurrency_stress_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestConcurrencyLifecycleGenerator",
+        "Package": "specbuilder_test",
+        "PackagePath": "pkg/specbuilder",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/specbuilder/concurrency_stress_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestConcurrencyProfileGenerator",
+        "Package": "specbuilder_test",
+        "PackagePath": "pkg/specbuilder",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/specbuilder/concurrency_stress_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestConcurrencyRoutingRuleGenerator",
+        "Package": "specbuilder_test",
+        "PackagePath": "pkg/specbuilder",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/specbuilder/concurrency_stress_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestConcurrencyTraitGenerator",
+        "Package": "specbuilder_test",
+        "PackagePath": "pkg/specbuilder",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/specbuilder/concurrency_stress_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestConcurrencyScenarioGenerator",
+        "Package": "specbuilder_test",
+        "PackagePath": "pkg/specbuilder",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/specbuilder/concurrency_stress_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestConcurrencyBaseGenerator",
+        "Package": "specbuilder_test",
+        "PackagePath": "pkg/specbuilder",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/specbuilder/concurrency_stress_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestInstanceBuilderStatefulness",
+        "Package": "specbuilder_test",
+        "PackagePath": "pkg/specbuilder",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/specbuilder/concurrency_stress_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": true,
+    "EstimatedDuration": 300000000000,
+    "PackagePath": "pkg/specbuilder"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestConcurrencySpecGenerator",
+      "Package": "specbuilder_test",
+      "PackagePath": "pkg/specbuilder",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/specbuilder/concurrency_stress_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestConcurrencyAPIGenerator",
+      "Package": "specbuilder_test",
+      "PackagePath": "pkg/specbuilder",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/specbuilder/concurrency_stress_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestConcurrencyConfigGenerator",
+      "Package": "specbuilder_test",
+      "PackagePath": "pkg/specbuilder",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/specbuilder/concurrency_stress_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestConcurrencyLifecycleGenerator",
+      "Package": "specbuilder_test",
+      "PackagePath": "pkg/specbuilder",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/specbuilder/concurrency_stress_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestConcurrencyProfileGenerator",
+      "Package": "specbuilder_test",
+      "PackagePath": "pkg/specbuilder",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/specbuilder/concurrency_stress_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestConcurrencyRoutingRuleGenerator",
+      "Package": "specbuilder_test",
+      "PackagePath": "pkg/specbuilder",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/specbuilder/concurrency_stress_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestConcurrencyTraitGenerator",
+      "Package": "specbuilder_test",
+      "PackagePath": "pkg/specbuilder",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/specbuilder/concurrency_stress_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestConcurrencyScenarioGenerator",
+      "Package": "specbuilder_test",
+      "PackagePath": "pkg/specbuilder",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/specbuilder/concurrency_stress_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestConcurrencyBaseGenerator",
+      "Package": "specbuilder_test",
+      "PackagePath": "pkg/specbuilder",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/specbuilder/concurrency_stress_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestInstanceBuilderStatefulness",
+      "Package": "specbuilder_test",
+      "PackagePath": "pkg/specbuilder",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/specbuilder/concurrency_stress_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

@@ -1,0 +1,87 @@
+{
+  "name": "make-verify-242",
+  "created_at": "2026-09-04T21:34:29.806699Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-242",
+    "Tests": [
+      {
+        "Name": "TestContextHydrationPlugin_Validate_Fails",
+        "Package": "plugins",
+        "PackagePath": "pkg/pipeline/plugins",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/pipeline/plugins/plugin_context_hydration_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestValidationPlugin_Execute",
+        "Package": "plugins",
+        "PackagePath": "pkg/pipeline/plugins",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/pipeline/plugins/validation_plugin_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestValidationPlugin_Validate",
+        "Package": "plugins",
+        "PackagePath": "pkg/pipeline/plugins",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/pipeline/plugins/validation_plugin_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestValidationPlugin_Name",
+        "Package": "plugins",
+        "PackagePath": "pkg/pipeline/plugins",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/pipeline/plugins/validation_plugin_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 120000000000,
+    "PackagePath": "pkg/pipeline/plugins"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestContextHydrationPlugin_Validate_Fails",
+      "Package": "plugins",
+      "PackagePath": "pkg/pipeline/plugins",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/pipeline/plugins/plugin_context_hydration_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestValidationPlugin_Execute",
+      "Package": "plugins",
+      "PackagePath": "pkg/pipeline/plugins",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/pipeline/plugins/validation_plugin_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestValidationPlugin_Validate",
+      "Package": "plugins",
+      "PackagePath": "pkg/pipeline/plugins",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/pipeline/plugins/validation_plugin_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestValidationPlugin_Name",
+      "Package": "plugins",
+      "PackagePath": "pkg/pipeline/plugins",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/pipeline/plugins/validation_plugin_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-315",
+  "created_at": "2026-09-04T21:34:30.503364Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-315",
+    "Tests": [
+      {
+        "Name": "TestFeedbackProcessor_ContextCanceled",
+        "Package": "swarm_test",
+        "PackagePath": "pkg/swarm",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/swarm/feedback_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestWriteLLMTrace_optInWritesFile",
+        "Package": "swarm",
+        "PackagePath": "pkg/swarm",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/swarm/llm_trace_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestMCPExecutor",
+        "Package": "swarm",
+        "PackagePath": "pkg/swarm",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/swarm/mcp_client_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestNormalizeToolName",
+        "Package": "swarm",
+        "PackagePath": "pkg/swarm",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/swarm/mcp_client_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestRenderSystemPrompt",
+        "Package": "swarm",
+        "PackagePath": "pkg/swarm",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/swarm/prompts_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestRenderSystemPrompt_ContainsTacticalGuidance",
+        "Package": "swarm",
+        "PackagePath": "pkg/swarm",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/swarm/prompts_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestRenderSystemPrompt_UsesCustomToolPrefix",
+        "Package": "swarm",
+        "PackagePath": "pkg/swarm",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/swarm/prompts_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestRenderTaskPrompt",
+        "Package": "swarm",
+        "PackagePath": "pkg/swarm",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/swarm/prompts_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestRenderTaskPrompt_ContainsExampleWorkflow",
+        "Package": "swarm",
+        "PackagePath": "pkg/swarm",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/swarm/prompts_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestRenderTaskPrompt_UsesCustomToolPrefix",
+        "Package": "swarm",
+        "PackagePath": "pkg/swarm",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/swarm/prompts_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 300000000000,
+    "PackagePath": "pkg/swarm"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestFeedbackProcessor_ContextCanceled",
+      "Package": "swarm_test",
+      "PackagePath": "pkg/swarm",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/swarm/feedback_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestWriteLLMTrace_optInWritesFile",
+      "Package": "swarm",
+      "PackagePath": "pkg/swarm",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/swarm/llm_trace_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestMCPExecutor",
+      "Package": "swarm",
+      "PackagePath": "pkg/swarm",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/swarm/mcp_client_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestNormalizeToolName",
+      "Package": "swarm",
+      "PackagePath": "pkg/swarm",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/swarm/mcp_client_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestRenderSystemPrompt",
+      "Package": "swarm",
+      "PackagePath": "pkg/swarm",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/swarm/prompts_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestRenderSystemPrompt_ContainsTacticalGuidance",
+      "Package": "swarm",
+      "PackagePath": "pkg/swarm",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/swarm/prompts_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestRenderSystemPrompt_UsesCustomToolPrefix",
+      "Package": "swarm",
+      "PackagePath": "pkg/swarm",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/swarm/prompts_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestRenderTaskPrompt",
+      "Package": "swarm",
+      "PackagePath": "pkg/swarm",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/swarm/prompts_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestRenderTaskPrompt_ContainsExampleWorkflow",
+      "Package": "swarm",
+      "PackagePath": "pkg/swarm",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/swarm/prompts_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestRenderTaskPrompt_UsesCustomToolPrefix",
+      "Package": "swarm",
+      "PackagePath": "pkg/swarm",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/swarm/prompts_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

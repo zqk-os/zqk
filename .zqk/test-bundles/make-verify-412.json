@@ -1,0 +1,141 @@
+{
+  "name": "make-verify-412",
+  "created_at": "2026-09-04T21:34:31.395362Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-412",
+    "Tests": [
+      {
+        "Name": "TestStripeHandler_SubscriptionCreated",
+        "Package": "billing",
+        "PackagePath": "pkg/billing",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/billing/stripe_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestStripeHandler_SubscriptionDeleted",
+        "Package": "billing",
+        "PackagePath": "pkg/billing",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/billing/stripe_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestStripeHandler_SubscriptionDeleted_MissingCustomerID",
+        "Package": "billing",
+        "PackagePath": "pkg/billing",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/billing/stripe_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestStripeHandler_InvalidMethod",
+        "Package": "billing",
+        "PackagePath": "pkg/billing",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/billing/stripe_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestStripeHandler_InvalidBody",
+        "Package": "billing",
+        "PackagePath": "pkg/billing",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/billing/stripe_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestStripeHandler_MissingCustomerID",
+        "Package": "billing",
+        "PackagePath": "pkg/billing",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/billing/stripe_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestStripeHandler_OtherEvents",
+        "Package": "billing",
+        "PackagePath": "pkg/billing",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/billing/stripe_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 210000000000,
+    "PackagePath": "pkg/billing"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestStripeHandler_SubscriptionCreated",
+      "Package": "billing",
+      "PackagePath": "pkg/billing",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/billing/stripe_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestStripeHandler_SubscriptionDeleted",
+      "Package": "billing",
+      "PackagePath": "pkg/billing",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/billing/stripe_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestStripeHandler_SubscriptionDeleted_MissingCustomerID",
+      "Package": "billing",
+      "PackagePath": "pkg/billing",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/billing/stripe_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestStripeHandler_InvalidMethod",
+      "Package": "billing",
+      "PackagePath": "pkg/billing",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/billing/stripe_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestStripeHandler_InvalidBody",
+      "Package": "billing",
+      "PackagePath": "pkg/billing",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/billing/stripe_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestStripeHandler_MissingCustomerID",
+      "Package": "billing",
+      "PackagePath": "pkg/billing",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/billing/stripe_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestStripeHandler_OtherEvents",
+      "Package": "billing",
+      "PackagePath": "pkg/billing",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/billing/stripe_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

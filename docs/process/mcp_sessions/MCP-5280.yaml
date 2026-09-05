@@ -1,0 +1,15 @@
+id: MCP-5280
+kind: mcp_session
+namespace_id: zqk:kernel
+client_id: client-25
+client_name: client-25
+authentication_status: pending_authentication
+last_activity: 2026-08-24T04:03:31Z
+created_at: 2026-08-24T04:03:31Z
+created_by: ACC-1785920548450214012-68b850c0
+updated_at: 2026-08-24T04:03:31Z
+updated_by: ACC-1785920548450214012-68b850c0
+status: in_progress
+origin_project: zqk
+origin_system: zqk
+schema_version: 2.0.0

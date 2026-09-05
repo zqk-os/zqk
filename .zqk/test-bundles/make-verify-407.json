@@ -1,0 +1,159 @@
+{
+  "name": "make-verify-407",
+  "created_at": "2026-09-04T21:34:31.358538Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-407",
+    "Tests": [
+      {
+        "Name": "TestAppendRequest_writesV1Line",
+        "Package": "idebridge",
+        "PackagePath": "pkg/idebridge",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/idebridge/control_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAppendRequest_rejectsPrivateIDEIDs",
+        "Package": "idebridge",
+        "PackagePath": "pkg/idebridge",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/idebridge/control_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestControlJSONLPath",
+        "Package": "idebridge",
+        "PackagePath": "pkg/idebridge",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/idebridge/control_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestFormatProofOfLifeMessage",
+        "Package": "idebridge",
+        "PackagePath": "pkg/idebridge",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/idebridge/proof_of_life_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestQueueProofOfLife",
+        "Package": "idebridge",
+        "PackagePath": "pkg/idebridge",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/idebridge/proof_of_life_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestQueueWakeAttn",
+        "Package": "idebridge",
+        "PackagePath": "pkg/idebridge",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/idebridge/wake_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestQueueWakeAttn_disabled",
+        "Package": "idebridge",
+        "PackagePath": "pkg/idebridge",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/idebridge/wake_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestTruncateRunes",
+        "Package": "idebridge",
+        "PackagePath": "pkg/idebridge",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/idebridge/wake_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 240000000000,
+    "PackagePath": "pkg/idebridge"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestAppendRequest_writesV1Line",
+      "Package": "idebridge",
+      "PackagePath": "pkg/idebridge",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/idebridge/control_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestAppendRequest_rejectsPrivateIDEIDs",
+      "Package": "idebridge",
+      "PackagePath": "pkg/idebridge",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/idebridge/control_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestControlJSONLPath",
+      "Package": "idebridge",
+      "PackagePath": "pkg/idebridge",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/idebridge/control_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestFormatProofOfLifeMessage",
+      "Package": "idebridge",
+      "PackagePath": "pkg/idebridge",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/idebridge/proof_of_life_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestQueueProofOfLife",
+      "Package": "idebridge",
+      "PackagePath": "pkg/idebridge",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/idebridge/proof_of_life_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestQueueWakeAttn",
+      "Package": "idebridge",
+      "PackagePath": "pkg/idebridge",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/idebridge/wake_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestQueueWakeAttn_disabled",
+      "Package": "idebridge",
+      "PackagePath": "pkg/idebridge",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/idebridge/wake_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestTruncateRunes",
+      "Package": "idebridge",
+      "PackagePath": "pkg/idebridge",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/idebridge/wake_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

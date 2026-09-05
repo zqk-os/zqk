@@ -1,0 +1,14 @@
+created_at: "2026-08-19T04:24:03Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1787113441097714000-056c221d
+item_id: REDACTED
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 2857702ca28e4b64fb5782140b43c1400e68fdeab30ab0062f4119523ca97d466e5f13c72adcfa41b92eacf21fa7f0a79b8a8e3a8d7c581e5c9afe0e69cb31dc
+schema_version: 2.0.0
+signature: 30450220415bed5cda6f9ae558a2502054bfb61078421b063dd982763ca312971a4a999f022100b97b19e6d08528d4b3d7cd8ab359f808ee70faeaf513260c36c515c3de95996d
+status: archived
+title: A successful result is followed by object get returning not found and draft inventory excluding the IDs.
+updated_at: "2026-09-01T07:19:28Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

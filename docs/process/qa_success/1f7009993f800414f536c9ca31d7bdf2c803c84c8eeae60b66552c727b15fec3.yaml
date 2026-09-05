@@ -1,0 +1,14 @@
+created_at: "2026-08-19T07:46:10Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1787125567504839000-9ed0037f
+item_id: REDACTED
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 2857702ca28e4b64fb5782140b43c1400e68fdeab30ab0062f4119523ca97d466e5f13c72adcfa41b92eacf21fa7f0a79b8a8e3a8d7c581e5c9afe0e69cb31dc
+schema_version: 2.0.0
+signature: 3045022035f90d0a71ca0d8efa6a0875d8ab16eab1669238047baa40d8b8cce2649e8b79022100eea058827f4ec4b052540556d81d76b2ec7ebdb4e9de07ed8cdb2d9c81e151ff
+status: archived
+title: Restore command-spec parity gate for zqk and community command trees
+updated_at: "2026-09-01T07:37:31Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

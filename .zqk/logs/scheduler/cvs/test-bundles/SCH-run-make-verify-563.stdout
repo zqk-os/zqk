@@ -1,0 +1,44 @@
+
+--- run 2026-09-04T22:17:19Z ---
+=== RUN   TestJobLoader_RefreshEnvironmentVariablesFromRaw
+=== PAUSE TestJobLoader_RefreshEnvironmentVariablesFromRaw
+=== RUN   TestNewJobLock
+=== PAUSE TestNewJobLock
+=== RUN   TestLockFilenameForJobID_LongID_UsesHash
+=== PAUSE TestLockFilenameForJobID_LongID_UsesHash
+=== RUN   TestLockFilenameForJobID_ShortID_UsesID
+=== PAUSE TestLockFilenameForJobID_ShortID_UsesID
+=== RUN   TestJobLock_Acquire_Release
+=== PAUSE TestJobLock_Acquire_Release
+=== RUN   TestJobLock_TryAcquire
+=== PAUSE TestJobLock_TryAcquire
+=== RUN   TestJobLock_Acquire_WithTimeout
+=== PAUSE TestJobLock_Acquire_WithTimeout
+=== RUN   TestJobLock_StaleLockDetection
+=== PAUSE TestJobLock_StaleLockDetection
+=== RUN   TestJobLock_Close_ReleasesLock
+=== PAUSE TestJobLock_Close_ReleasesLock
+=== RUN   TestJobLock_DefaultConfig
+=== PAUSE TestJobLock_DefaultConfig
+=== CONT  TestJobLoader_RefreshEnvironmentVariablesFromRaw
+=== CONT  TestJobLock_TryAcquire
+=== CONT  TestJobLock_Close_ReleasesLock
+--- PASS: TestJobLoader_RefreshEnvironmentVariablesFromRaw (0.00s)
+--- PASS: TestJobLock_TryAcquire (0.01s)
+=== CONT  TestJobLock_DefaultConfig
+--- PASS: TestJobLock_Close_ReleasesLock (0.01s)
+=== CONT  TestJobLock_StaleLockDetection
+--- PASS: TestJobLock_DefaultConfig (0.00s)
+=== CONT  TestJobLock_Acquire_Release
+--- PASS: TestJobLock_StaleLockDetection (0.00s)
+=== CONT  TestLockFilenameForJobID_LongID_UsesHash
+--- PASS: TestLockFilenameForJobID_LongID_UsesHash (0.00s)
+=== CONT  TestNewJobLock
+--- PASS: TestJobLock_Acquire_Release (0.00s)
+=== CONT  TestLockFilenameForJobID_ShortID_UsesID
+--- PASS: TestLockFilenameForJobID_ShortID_UsesID (0.00s)
+=== CONT  TestJobLock_Acquire_WithTimeout
+--- PASS: TestNewJobLock (0.00s)
+--- PASS: TestJobLock_Acquire_WithTimeout (0.17s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/scheduler	0.961s

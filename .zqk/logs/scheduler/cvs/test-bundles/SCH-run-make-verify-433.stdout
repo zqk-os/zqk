@@ -1,0 +1,44 @@
+
+--- run 2026-09-04T22:13:16Z ---
+=== RUN   TestFluentUnlevelledPanics
+=== PAUSE TestFluentUnlevelledPanics
+=== RUN   TestLogger_ReflectionSafety
+=== PAUSE TestLogger_ReflectionSafety
+=== RUN   TestLogger_NonAddressableWriter
+=== PAUSE TestLogger_NonAddressableWriter
+=== RUN   TestTryCloseLoggerDestinations_Nil
+=== PAUSE TestTryCloseLoggerDestinations_Nil
+=== RUN   TestTryCloseLoggerDestinations_DefaultLogger_NoCloseMethod
+=== PAUSE TestTryCloseLoggerDestinations_DefaultLogger_NoCloseMethod
+=== RUN   TestLogger_LogLevels
+=== PAUSE TestLogger_LogLevels
+=== RUN   TestLogger_WithFields
+=== PAUSE TestLogger_WithFields
+=== RUN   TestLogger_JSONOutput
+=== PAUSE TestLogger_JSONOutput
+=== RUN   TestLogger_ContextIntegration
+=== PAUSE TestLogger_ContextIntegration
+=== RUN   TestLogger_ObjectRef
+=== PAUSE TestLogger_ObjectRef
+=== CONT  TestFluentUnlevelledPanics
+--- PASS: TestFluentUnlevelledPanics (0.00s)
+=== CONT  TestLogger_ObjectRef
+--- PASS: TestLogger_ObjectRef (0.00s)
+=== CONT  TestLogger_ContextIntegration
+--- PASS: TestLogger_ContextIntegration (0.00s)
+=== CONT  TestLogger_JSONOutput
+--- PASS: TestLogger_JSONOutput (0.00s)
+=== CONT  TestLogger_WithFields
+--- PASS: TestLogger_WithFields (0.00s)
+=== CONT  TestLogger_LogLevels
+--- PASS: TestLogger_LogLevels (0.00s)
+=== CONT  TestTryCloseLoggerDestinations_DefaultLogger_NoCloseMethod
+--- PASS: TestTryCloseLoggerDestinations_DefaultLogger_NoCloseMethod (0.00s)
+=== CONT  TestTryCloseLoggerDestinations_Nil
+--- PASS: TestTryCloseLoggerDestinations_Nil (0.00s)
+=== CONT  TestLogger_NonAddressableWriter
+--- PASS: TestLogger_NonAddressableWriter (0.00s)
+=== CONT  TestLogger_ReflectionSafety
+--- PASS: TestLogger_ReflectionSafety (0.00s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/logging	0.251s

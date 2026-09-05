@@ -1,0 +1,5 @@
+=== golangci-lint ./cmd/zqk/agent ./pkg/circuitbreaker (fast linters) ===
+level=warning msg="[runner/source_code] Failed to get line 1 for file /Users/lanceettl/zqk-restore-clone/pkg/cli/bldr_cli_cmd_v1/system_probe_topology_command_builder.go: failed to get file /Users/lanceettl/zqk-restore-clone/pkg/cli/bldr_cli_cmd_v1/system_probe_topology_command_builder.go lines cache: can't get file /Users/lanceettl/zqk-restore-clone/pkg/cli/bldr_cli_cmd_v1/system_probe_topology_command_builder.go bytes from cache: can't read file /Users/lanceettl/zqk-restore-clone/pkg/cli/bldr_cli_cmd_v1/system_probe_topology_command_builder.go: open /Users/lanceettl/zqk-restore-clone/pkg/cli/bldr_cli_cmd_v1/system_probe_topology_command_builder.go: no such file or directory"
+pkg/cli/bldr_cli_cmd_v1/system_probe_topology_command_builder.go:1: no such file or directory (typecheck)
+1 issues:
+* typecheck: 1

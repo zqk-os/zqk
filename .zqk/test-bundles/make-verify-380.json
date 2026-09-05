@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-380",
+  "created_at": "2026-09-04T21:34:31.121482Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-380",
+    "Tests": [
+      {
+        "Name": "TestAuthMiddleware_Authorized_Credentials",
+        "Package": "app",
+        "PackagePath": "cmd/zqk/app",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/app/auth_middleware_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAuthMiddleware_BypassInit",
+        "Package": "app",
+        "PackagePath": "cmd/zqk/app",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/app/auth_middleware_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAuthMiddleware_NoHardcodedSystemFallback",
+        "Package": "app",
+        "PackagePath": "cmd/zqk/app",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/app/auth_middleware_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestMCPCLISyncParity",
+        "Package": "app",
+        "PackagePath": "cmd/zqk/app",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/app/cli_mcp_sync_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestCommandSpecParity",
+        "Package": "app",
+        "PackagePath": "cmd/zqk/app",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/app/command_spec_parity_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestCheckDraftSweepEntitlement_VocabSchemeCaseInsensitive",
+        "Package": "app",
+        "PackagePath": "cmd/zqk/app",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/app/draft_sweep_auth_edge_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestCheckDraftSweepEntitlement_PermCaseSensitive",
+        "Package": "app",
+        "PackagePath": "cmd/zqk/app",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/app/draft_sweep_auth_edge_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestHasPermExactMatch",
+        "Package": "app",
+        "PackagePath": "cmd/zqk/app",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/app/draft_sweep_auth_edge_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestCheckDraftSweepEntitlement_EmptyAccountIDDenied",
+        "Package": "app",
+        "PackagePath": "cmd/zqk/app",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/app/draft_sweep_auth_edge_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestIsDraftSweepCommand_PrefixDetection",
+        "Package": "app",
+        "PackagePath": "cmd/zqk/app",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/app/draft_sweep_auth_edge_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 300000000000,
+    "PackagePath": "cmd/zqk/app"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestAuthMiddleware_Authorized_Credentials",
+      "Package": "app",
+      "PackagePath": "cmd/zqk/app",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/app/auth_middleware_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestAuthMiddleware_BypassInit",
+      "Package": "app",
+      "PackagePath": "cmd/zqk/app",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/app/auth_middleware_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestAuthMiddleware_NoHardcodedSystemFallback",
+      "Package": "app",
+      "PackagePath": "cmd/zqk/app",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/app/auth_middleware_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestMCPCLISyncParity",
+      "Package": "app",
+      "PackagePath": "cmd/zqk/app",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/app/cli_mcp_sync_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestCommandSpecParity",
+      "Package": "app",
+      "PackagePath": "cmd/zqk/app",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/app/command_spec_parity_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestCheckDraftSweepEntitlement_VocabSchemeCaseInsensitive",
+      "Package": "app",
+      "PackagePath": "cmd/zqk/app",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/app/draft_sweep_auth_edge_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestCheckDraftSweepEntitlement_PermCaseSensitive",
+      "Package": "app",
+      "PackagePath": "cmd/zqk/app",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/app/draft_sweep_auth_edge_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestHasPermExactMatch",
+      "Package": "app",
+      "PackagePath": "cmd/zqk/app",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/app/draft_sweep_auth_edge_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestCheckDraftSweepEntitlement_EmptyAccountIDDenied",
+      "Package": "app",
+      "PackagePath": "cmd/zqk/app",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/app/draft_sweep_auth_edge_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestIsDraftSweepCommand_PrefixDetection",
+      "Package": "app",
+      "PackagePath": "cmd/zqk/app",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/app/draft_sweep_auth_edge_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

@@ -1,0 +1,101 @@
+{
+  "metadata": {
+    "version": "2.0",
+    "build_time": "2026-09-04T21:49:26.203284Z",
+    "project_root": "/Users/lanceettl/zqk-restore-clone",
+    "entry_count": 21
+  },
+  "buckets": {
+    "audit_event": {
+      "hash_registry_batch_error": {
+        "AUD-4921": {
+          "created_at": "2026-09-04T21:49:09Z"
+        },
+        "AUD-5355": {
+          "created_at": "2026-09-04T21:49:20Z"
+        }
+      },
+      "hash_registry_batch_start": {
+        "AUD-4897": {
+          "created_at": "2026-09-04T21:49:09Z"
+        },
+        "AUD-5287": {
+          "created_at": "2026-09-04T21:49:18Z"
+        }
+      },
+      "integrity_recovery": {
+        "AUD-ik-ATK-1788499964586342000-003a2053-744661ee423163118d4fdb6f440cf04d6687affb23661e591d2c94b60de420e4": {
+          "created_at": "2026-09-04T21:49:21Z"
+        }
+      },
+      "listing_index_batch_start": {
+        "AUD-3754": {
+          "created_at": "2026-09-04T21:48:37Z"
+        },
+        "AUD-4797": {
+          "created_at": "2026-09-04T21:49:08Z"
+        }
+      },
+      "object_creation": {
+        "AUD-3687": {
+          "created_at": "2026-09-04T21:48:37Z"
+        },
+        "AUD-5519": {
+          "created_at": "2026-09-04T21:49:25Z"
+        }
+      },
+      "object_update": {
+        "AUD-4960": {
+          "created_at": "2026-09-04T21:49:09Z"
+        }
+      },
+      "system_config_change": {
+        "AUD-3358": {
+          "created_at": "2026-09-04T21:48:29Z"
+        },
+        "AUD-3704": {
+          "created_at": "2026-09-04T21:48:37Z"
+        },
+        "AUD-3710": {
+          "created_at": "2026-09-04T21:48:37Z"
+        },
+        "AUD-4853": {
+          "created_at": "2026-09-04T21:49:08Z"
+        },
+        "AUD-5230": {
+          "created_at": "2026-09-04T21:49:16Z"
+        },
+        "AUD-5398": {
+          "created_at": "2026-09-04T21:49:21Z"
+        },
+        "AUD-5417": {
+          "created_at": "2026-09-04T21:49:21Z"
+        },
+        "AUD-5446": {
+          "created_at": "2026-09-04T21:49:23Z"
+        }
+      }
+    },
+    "base_metric": {
+      "": {
+        "BAS-1788558561525707000-7c7e0720": {
+          "created_at": "2026-09-04T21:49:21Z"
+        }
+      }
+    },
+    "change_journal_entry": {
+      "": {
+        "CHA-15501": {
+          "created_at": "2026-09-04T21:49:10Z"
+        }
+      }
+    },
+    "zqk_session": {
+      "": {
+        "ZQK-6122": {
+          "created_at": "2026-09-04T21:48:36Z"
+        }
+      }
+    }
+  }
+}

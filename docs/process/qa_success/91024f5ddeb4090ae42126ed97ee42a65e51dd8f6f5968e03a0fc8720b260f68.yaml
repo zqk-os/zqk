@@ -1,0 +1,14 @@
+created_at: "2026-08-19T07:17:12Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1787123829764000000-79aec8e5
+item_id: REDACTED
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 2857702ca28e4b64fb5782140b43c1400e68fdeab30ab0062f4119523ca97d466e5f13c72adcfa41b92eacf21fa7f0a79b8a8e3a8d7c581e5c9afe0e69cb31dc
+schema_version: 2.0.0
+signature: 304402202e33c192d2a1e647fb0faa60b1114939903fd9810552683cf6cf846122a23b21022023a2bd11e55709e774309eb2f8631b0cc641018f13c64ab0f1d2cd27e1a0c8e7
+status: archived
+title: StageCrossMembrane applies id_prefix+kind_mappings+namespaces atomically; irregular plurals; fail-closed if incomplete
+updated_at: "2026-09-01T08:14:05Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

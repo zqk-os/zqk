@@ -1,0 +1,14 @@
+created_at: "2026-08-20T05:08:58Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1787202538091664000-7de772c3
+item_id: BLI-CEF-S18-TRANSITION-MATRIX-001
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 2857702ca28e4b64fb5782140b43c1400e68fdeab30ab0062f4119523ca97d466e5f13c72adcfa41b92eacf21fa7f0a79b8a8e3a8d7c581e5c9afe0e69cb31dc
+schema_version: 2.0.0
+signature: 304502207957f5fa206e24200e5a408b7f04765d1a21cdaf6dfa7551688acab0f5cf37930221009fbe1dc3527fd0a0fa070f6cafb5dff8f89d6cb6da6bc4311bb226c60a6d566f
+status: archived
+title: 'S18 redo: extensive per-kind lifecycle transition tests (not workstream exemplar)'
+updated_at: "2026-09-01T07:46:13Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

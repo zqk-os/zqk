@@ -1,0 +1,14 @@
+created_at: "2026-08-19T08:04:03Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1787126640938683000-8dd07aa9
+item_id: REDACTED
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 2857702ca28e4b64fb5782140b43c1400e68fdeab30ab0062f4119523ca97d466e5f13c72adcfa41b92eacf21fa7f0a79b8a8e3a8d7c581e5c9afe0e69cb31dc
+schema_version: 2.0.0
+signature: 30450221009ef31c279a5f1221278d628a32dd317e7770e7e1d80621d95ab93d58b9784e3a02206d8aa3b786dcd57f2d3b66f822cd7d787547b7cb99a32d9b4552adb817fa4daf
+status: archived
+title: Seat agent_id antigravity-1 infers ATTN AGY inbox without explicit RoleHints
+updated_at: "2026-09-01T07:31:43Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

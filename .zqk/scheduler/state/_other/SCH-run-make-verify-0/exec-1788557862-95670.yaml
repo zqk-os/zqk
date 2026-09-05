@@ -1,0 +1,7 @@
+job_id: SCH-run-make-verify-0
+execution_id: exec-1788557862-95670
+state: completed
+process_id: 95670
+started_at: 2026-09-04T21:37:42.604964Z
+completed_at: 2026-09-04T21:37:44.152926Z
+policy_decision: execute

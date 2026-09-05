@@ -1,0 +1,141 @@
+{
+  "name": "make-verify-318",
+  "created_at": "2026-09-04T21:34:30.533502Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-318",
+    "Tests": [
+      {
+        "Name": "TestEngine_toolChoiceRequiredWhenEvidenceOwed",
+        "Package": "swarm",
+        "PackagePath": "pkg/swarm",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/swarm/tool_choice_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestEngine_dropsRecoveredLookupWhileWritePinned",
+        "Package": "swarm",
+        "PackagePath": "pkg/swarm",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/swarm/tool_choice_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestEngine_RestrictTools_hidesLookup",
+        "Package": "swarm",
+        "PackagePath": "pkg/swarm",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/swarm/tool_choice_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestEngine_dropsNativeLookupAfterUnpaidBudget",
+        "Package": "swarm",
+        "PackagePath": "pkg/swarm",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/swarm/tool_choice_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestEngine_keepsWriteMenuAfterEvidence",
+        "Package": "swarm",
+        "PackagePath": "pkg/swarm",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/swarm/tool_choice_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestEngine_toolChoiceAutoAfterWriteEvidence",
+        "Package": "swarm",
+        "PackagePath": "pkg/swarm",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/swarm/tool_choice_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestEngine_pinsMutationToolWhileEvidenceOwed",
+        "Package": "swarm",
+        "PackagePath": "pkg/swarm",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/swarm/tool_choice_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 210000000000,
+    "PackagePath": "pkg/swarm"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestEngine_toolChoiceRequiredWhenEvidenceOwed",
+      "Package": "swarm",
+      "PackagePath": "pkg/swarm",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/swarm/tool_choice_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestEngine_dropsRecoveredLookupWhileWritePinned",
+      "Package": "swarm",
+      "PackagePath": "pkg/swarm",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/swarm/tool_choice_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestEngine_RestrictTools_hidesLookup",
+      "Package": "swarm",
+      "PackagePath": "pkg/swarm",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/swarm/tool_choice_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestEngine_dropsNativeLookupAfterUnpaidBudget",
+      "Package": "swarm",
+      "PackagePath": "pkg/swarm",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/swarm/tool_choice_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestEngine_keepsWriteMenuAfterEvidence",
+      "Package": "swarm",
+      "PackagePath": "pkg/swarm",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/swarm/tool_choice_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestEngine_toolChoiceAutoAfterWriteEvidence",
+      "Package": "swarm",
+      "PackagePath": "pkg/swarm",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/swarm/tool_choice_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestEngine_pinsMutationToolWhileEvidenceOwed",
+      "Package": "swarm",
+      "PackagePath": "pkg/swarm",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/swarm/tool_choice_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

@@ -1,0 +1,20 @@
+created_at: "2026-09-03T23:46:33Z"
+created_by: ACC-1785920548450214006-2e52b3e7
+csv_path_override: docs/quality/CEF_DIAMOND_SCORECARD_MATRIX.csv
+gate_policy_notes: 'CRIT-CEF-R27-DRIVERS-001 / CVS-CEF-UNTIL-45-001: for a freeze SHA, both seat rows package_complete=yes AND ENVELOPE envelope_min>=4 (target 4.5; prefer 5). Envelope=min(seats) per axis then min across axes. Empty drivers ≠ 5. docs/reports/dual-seat is not evidence. Do not complete PRI-CEF-R27-ENVELOPE-001 until this holds.'
+gated_object_kind: priority_plan
+gated_transition_to: complete
+id: VMX-1788479193601075000-cb49fcc9
+kind: verification_matrix
+matrix_role: custom
+namespace_id: zqk:kernel
+planning_notes: 'Remesure recipe: mint Wave 0-4 ATKs from AGI CEF templates; after Wave 4 zqk matrix update --name cef_diamond_scorecard; append CVS-CEF-UNTIL-45-001 activity.'
+primary_convergence_session_ref: CVS-CEF-UNTIL-45-001
+profile_path_override: docs/quality/cef_diamond_scorecard_matrix_profile.yaml
+registry_alias: cef_diamond_scorecard
+schema_version: 2.0.0
+status: active
+title: CEF diamond dual-seat scorecard (CVS-CEF-UNTIL-45-001)
+updated_at: "2026-09-03T23:48:23Z"
+updated_by: ACC-1785920548450214006-2e52b3e7
+version_context: default

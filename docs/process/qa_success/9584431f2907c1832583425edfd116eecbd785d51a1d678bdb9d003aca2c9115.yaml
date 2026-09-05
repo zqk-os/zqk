@@ -1,0 +1,14 @@
+created_at: "2026-08-19T05:54:30Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1787118864166687000-bbc7d297
+item_id: REDACTED
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 2857702ca28e4b64fb5782140b43c1400e68fdeab30ab0062f4119523ca97d466e5f13c72adcfa41b92eacf21fa7f0a79b8a8e3a8d7c581e5c9afe0e69cb31dc
+schema_version: 2.0.0
+signature: 3045022005efc9510193d039f21437ae97f5196e5cf771911397d8be4895569d7c7503a3022100f3cc3749fa23e8f77b6e0277c05932455eb9c5755be75e09767d98a54a9178c4
+status: archived
+title: Plan leaves preliminary draft plane
+updated_at: "2026-09-01T07:38:04Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

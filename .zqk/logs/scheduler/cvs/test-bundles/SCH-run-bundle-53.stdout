@@ -1,0 +1,44 @@
+
+--- run 2026-09-05T05:25:01Z ---
+=== RUN   TestKeepAlive_WriteReadRemove
+=== PAUSE TestKeepAlive_WriteReadRemove
+=== RUN   TestKeepAlive_ReadNonExistent
+=== PAUSE TestKeepAlive_ReadNonExistent
+=== RUN   TestIsSchedulerAlive_NotRunning
+=== PAUSE TestIsSchedulerAlive_NotRunning
+=== RUN   TestIsSchedulerAlive_RunningWithFreshKeepAlive
+=== PAUSE TestIsSchedulerAlive_RunningWithFreshKeepAlive
+=== RUN   TestIsSchedulerAlive_StaleKeepAlive
+=== PAUSE TestIsSchedulerAlive_StaleKeepAlive
+=== RUN   TestIsSchedulerAlive_StalePIDFile
+=== PAUSE TestIsSchedulerAlive_StalePIDFile
+=== RUN   TestRemoveKeepAlive_Exported
+=== PAUSE TestRemoveKeepAlive_Exported
+=== RUN   TestKeepAlive_UpdateInterval
+=== PAUSE TestKeepAlive_UpdateInterval
+=== RUN   TestRunLifecycleCheckViaPipeline_NilHandler
+=== PAUSE TestRunLifecycleCheckViaPipeline_NilHandler
+=== RUN   TestRunLifecycleCheckViaPipeline_NilJob
+=== PAUSE TestRunLifecycleCheckViaPipeline_NilJob
+=== CONT  TestKeepAlive_WriteReadRemove
+=== CONT  TestIsSchedulerAlive_StalePIDFile
+--- PASS: TestIsSchedulerAlive_StalePIDFile (0.01s)
+=== CONT  TestIsSchedulerAlive_RunningWithFreshKeepAlive
+--- PASS: TestKeepAlive_WriteReadRemove (0.01s)
+=== CONT  TestIsSchedulerAlive_StaleKeepAlive
+--- PASS: TestIsSchedulerAlive_RunningWithFreshKeepAlive (0.02s)
+=== CONT  TestRunLifecycleCheckViaPipeline_NilHandler
+--- PASS: TestRunLifecycleCheckViaPipeline_NilHandler (0.00s)
+=== CONT  TestRunLifecycleCheckViaPipeline_NilJob
+--- PASS: TestRunLifecycleCheckViaPipeline_NilJob (0.00s)
+=== CONT  TestKeepAlive_UpdateInterval
+--- PASS: TestIsSchedulerAlive_StaleKeepAlive (0.02s)
+=== CONT  TestRemoveKeepAlive_Exported
+--- PASS: TestRemoveKeepAlive_Exported (0.00s)
+=== CONT  TestIsSchedulerAlive_NotRunning
+--- PASS: TestIsSchedulerAlive_NotRunning (0.00s)
+=== CONT  TestKeepAlive_ReadNonExistent
+--- PASS: TestKeepAlive_ReadNonExistent (0.00s)
+--- PASS: TestKeepAlive_UpdateInterval (0.22s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/scheduler	0.957s

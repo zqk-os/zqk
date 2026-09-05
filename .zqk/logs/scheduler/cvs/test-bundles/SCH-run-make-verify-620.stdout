@@ -1,0 +1,45 @@
+
+--- run 2026-09-04T22:18:11Z ---
+=== RUN   TestAsyncRouter_OnDemandPattern
+=== PAUSE TestAsyncRouter_OnDemandPattern
+=== RUN   TestAsyncRouter_CoordinatorIntegration
+=== PAUSE TestAsyncRouter_CoordinatorIntegration
+=== RUN   TestAsyncRouter_ShutdownCoordination
+=== PAUSE TestAsyncRouter_ShutdownCoordination
+=== RUN   TestAsyncRouter_MultipleWorkers
+=== PAUSE TestAsyncRouter_MultipleWorkers
+=== RUN   TestAsyncRouter_ConcurrentOperations
+=== PAUSE TestAsyncRouter_ConcurrentOperations
+=== RUN   TestSchedulerTransceiverLogEvents_wirePrefix
+=== PAUSE TestSchedulerTransceiverLogEvents_wirePrefix
+=== RUN   TestRouter_RegisterAdapter
+=== PAUSE TestRouter_RegisterAdapter
+=== RUN   TestRouter_LoadRules
+=== PAUSE TestRouter_LoadRules
+=== RUN   TestRouter_Route
+=== PAUSE TestRouter_Route
+=== RUN   TestRouter_Route_NoMatch
+=== PAUSE TestRouter_Route_NoMatch
+=== CONT  TestAsyncRouter_OnDemandPattern
+=== CONT  TestAsyncRouter_MultipleWorkers
+--- PASS: TestAsyncRouter_MultipleWorkers (0.20s)
+=== CONT  TestSchedulerTransceiverLogEvents_wirePrefix
+--- PASS: TestSchedulerTransceiverLogEvents_wirePrefix (0.00s)
+=== CONT  TestRouter_Route_NoMatch
+--- PASS: TestRouter_Route_NoMatch (0.00s)
+=== CONT  TestRouter_Route
+--- PASS: TestRouter_Route (0.00s)
+=== CONT  TestRouter_LoadRules
+--- PASS: TestRouter_LoadRules (0.00s)
+=== CONT  TestRouter_RegisterAdapter
+--- PASS: TestRouter_RegisterAdapter (0.00s)
+=== CONT  TestAsyncRouter_ConcurrentOperations
+--- PASS: TestAsyncRouter_OnDemandPattern (0.20s)
+=== CONT  TestAsyncRouter_ShutdownCoordination
+    async_router_on_demand_test.go:186: Pending messages: 0
+--- PASS: TestAsyncRouter_ShutdownCoordination (0.10s)
+=== CONT  TestAsyncRouter_CoordinatorIntegration
+--- PASS: TestAsyncRouter_ConcurrentOperations (0.30s)
+--- PASS: TestAsyncRouter_CoordinatorIntegration (0.20s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/scheduler/transceiver	0.865s

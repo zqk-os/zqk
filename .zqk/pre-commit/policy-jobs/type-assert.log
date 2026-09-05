@@ -1,0 +1,2 @@
+=== check_type_assertion_switches (branch scope) ===
+check_type_assertion_switches: ok (no consecutive type assertion 'if' statements)

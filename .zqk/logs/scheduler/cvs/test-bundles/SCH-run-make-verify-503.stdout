@@ -1,0 +1,24 @@
+
+--- run 2026-09-04T22:14:18Z ---
+=== RUN   TestParseGoTestOutput_FailWithoutPackagePrefix
+=== PAUSE TestParseGoTestOutput_FailWithoutPackagePrefix
+=== RUN   TestParseGoTestOutput_NonVerbosePackageOkLine
+=== PAUSE TestParseGoTestOutput_NonVerbosePackageOkLine
+=== RUN   TestParseGoTestOutput_NonVerbosePackageCached
+=== PAUSE TestParseGoTestOutput_NonVerbosePackageCached
+=== RUN   TestParseGoTestOutput_NonVerbosePackageFailLine
+=== PAUSE TestParseGoTestOutput_NonVerbosePackageFailLine
+=== RUN   TestParseGoTestOutput_VerbosePassBareFunctionName
+=== PAUSE TestParseGoTestOutput_VerbosePassBareFunctionName
+=== CONT  TestParseGoTestOutput_FailWithoutPackagePrefix
+--- PASS: TestParseGoTestOutput_FailWithoutPackagePrefix (0.00s)
+=== CONT  TestParseGoTestOutput_VerbosePassBareFunctionName
+--- PASS: TestParseGoTestOutput_VerbosePassBareFunctionName (0.00s)
+=== CONT  TestParseGoTestOutput_NonVerbosePackageFailLine
+--- PASS: TestParseGoTestOutput_NonVerbosePackageFailLine (0.00s)
+=== CONT  TestParseGoTestOutput_NonVerbosePackageCached
+--- PASS: TestParseGoTestOutput_NonVerbosePackageCached (0.00s)
+=== CONT  TestParseGoTestOutput_NonVerbosePackageOkLine
+--- PASS: TestParseGoTestOutput_NonVerbosePackageOkLine (0.00s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/gotestparse	0.326s

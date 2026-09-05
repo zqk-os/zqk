@@ -1,0 +1,27 @@
+callback_on_completion: zqk pre-commit write-result-from-last --category=lint
+callback_type: command
+category: maintenance
+command: ./scripts/pre-commit-lint.sh
+created_at: "2026-08-21T11:09:18Z"
+created_by: ACC-1785920548450214012-68b850c0
+description: |
+    Runs pre-commit-lint.sh (golangci-lint or go vet), writes lint category and
+    runs pre-commit aggregate. Keeps .zqk/pre-commit/results.json updated for the hook.
+enabled: true
+execution_mode: reusable
+id: SCH-pre-commit-lint
+job_type: run_wrapper
+kind: scheduler_job
+last_run_at: "2026-09-05T04:00:00Z"
+max_runtime_seconds: 600
+namespace_id: zqk:kernel
+next_run_at: "2026-09-05T04:00:00Z"
+schedule_expression: '*/10 * * * *'
+schema_version: 2.0.0
+source_type: internal
+status: active
+title: Pre-commit lint (golangci-lint)
+trigger_type: timer
+updated_at: "2026-09-05T04:00:06Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

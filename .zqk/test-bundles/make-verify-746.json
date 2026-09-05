@@ -1,0 +1,51 @@
+{
+  "name": "make-verify-746",
+  "created_at": "2026-09-04T21:34:34.738922Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-746",
+    "Tests": [
+      {
+        "Name": "TestCommandSpecOutputPath",
+        "Package": "newcmd",
+        "PackagePath": "cmd/zqk/new",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/new/new_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestResolveCommandSpecsDir_staysWithinProjectRoot",
+        "Package": "newcmd",
+        "PackagePath": "cmd/zqk/new",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/new/new_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": true,
+    "EstimatedDuration": 60000000000,
+    "PackagePath": "cmd/zqk/new"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestCommandSpecOutputPath",
+      "Package": "newcmd",
+      "PackagePath": "cmd/zqk/new",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/new/new_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestResolveCommandSpecsDir_staysWithinProjectRoot",
+      "Package": "newcmd",
+      "PackagePath": "cmd/zqk/new",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/new/new_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

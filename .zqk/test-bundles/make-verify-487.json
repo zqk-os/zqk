@@ -1,0 +1,105 @@
+{
+  "name": "make-verify-487",
+  "created_at": "2026-09-04T21:34:32.192148Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-487",
+    "Tests": [
+      {
+        "Name": "TestFeatureFlags_AuditEventCreation",
+        "Package": "featureflags",
+        "PackagePath": "pkg/featureflags",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/featureflags/feature_flags_audit_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestFeatureFlags_EnableDisable",
+        "Package": "featureflags",
+        "PackagePath": "pkg/featureflags",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/featureflags/feature_flags_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestFeatureFlags_Save",
+        "Package": "featureflags",
+        "PackagePath": "pkg/featureflags",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/featureflags/feature_flags_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestFeatureFlags_Load",
+        "Package": "featureflags",
+        "PackagePath": "pkg/featureflags",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/featureflags/feature_flags_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestGetGlobalFeatureFlags",
+        "Package": "featureflags",
+        "PackagePath": "pkg/featureflags",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/featureflags/feature_flags_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 150000000000,
+    "PackagePath": "pkg/featureflags"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestFeatureFlags_AuditEventCreation",
+      "Package": "featureflags",
+      "PackagePath": "pkg/featureflags",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/featureflags/feature_flags_audit_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestFeatureFlags_EnableDisable",
+      "Package": "featureflags",
+      "PackagePath": "pkg/featureflags",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/featureflags/feature_flags_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestFeatureFlags_Save",
+      "Package": "featureflags",
+      "PackagePath": "pkg/featureflags",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/featureflags/feature_flags_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestFeatureFlags_Load",
+      "Package": "featureflags",
+      "PackagePath": "pkg/featureflags",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/featureflags/feature_flags_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestGetGlobalFeatureFlags",
+      "Package": "featureflags",
+      "PackagePath": "pkg/featureflags",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/featureflags/feature_flags_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

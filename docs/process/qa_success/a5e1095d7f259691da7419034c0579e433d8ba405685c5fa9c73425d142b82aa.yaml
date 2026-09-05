@@ -1,0 +1,14 @@
+created_at: "2026-08-19T06:51:23Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1787122264729902000-ce40d311
+item_id: REDACTED
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 2857702ca28e4b64fb5782140b43c1400e68fdeab30ab0062f4119523ca97d466e5f13c72adcfa41b92eacf21fa7f0a79b8a8e3a8d7c581e5c9afe0e69cb31dc
+schema_version: 2.0.0
+signature: 304502202baabfaef6680923d7e6f8c989845bfaca2894ff40f99b1123554217e8df35a6022100b1cc1d8fbb02c162c5625233369a3cc10c73a777820e56c7dca9e9a2199c4d0d
+status: archived
+title: Inventory duplicative and redundant logic (extract-to-util candidates)
+updated_at: "2026-09-01T07:48:03Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

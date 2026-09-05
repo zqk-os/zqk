@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-835",
+  "created_at": "2026-09-04T21:34:35.631011Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-835",
+    "Tests": [
+      {
+        "Name": "TestGetMilestoneCriteriaOverlay_AllComplete_UsesCriteriaStatuses",
+        "Package": "object",
+        "PackagePath": "cmd/zqk/object",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/object/get_milestone_overlay_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestGetMilestoneCriteriaOverlay_IncompleteWhenAnyCriteriaNotComplete",
+        "Package": "object",
+        "PackagePath": "cmd/zqk/object",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/object/get_milestone_overlay_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestGetMultipleArgs",
+        "Package": "object",
+        "PackagePath": "cmd/zqk/object",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/object/get_multiple_args_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestGetObjectView_MilestoneCompletionReport_BulkGet_ProjectsFields",
+        "Package": "object",
+        "PackagePath": "cmd/zqk/object",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/object/get_object_view_bulk_milestone_completion_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestGetObjectView_MilestoneCompletionReport_ProjectsFields",
+        "Package": "object",
+        "PackagePath": "cmd/zqk/object",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/object/get_object_view_milestone_completion_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestGetReferenceResolverOverlay_DefaultView_Depth2ResolvesNestedRefs",
+        "Package": "object",
+        "PackagePath": "cmd/zqk/object",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/object/get_reference_resolver_overlay_depth_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestGetReferenceResolverOverlay_UnspecifiedHydration_IsRaw",
+        "Package": "object",
+        "PackagePath": "cmd/zqk/object",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/object/get_reference_resolver_overlay_depth_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestGetReferenceResolverOverlay_RequirementResolvesGoalAndCriteriaRefs",
+        "Package": "object",
+        "PackagePath": "cmd/zqk/object",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/object/get_reference_resolver_overlay_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestCompleteGroupBy_UsesSpecIndex",
+        "Package": "object",
+        "PackagePath": "cmd/zqk/object",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/object/kind_completion_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestCompleteSortBy_UsesSpecIndex",
+        "Package": "object",
+        "PackagePath": "cmd/zqk/object",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/object/kind_completion_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 900000000000,
+    "PackagePath": "cmd/zqk/object"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestGetMilestoneCriteriaOverlay_AllComplete_UsesCriteriaStatuses",
+      "Package": "object",
+      "PackagePath": "cmd/zqk/object",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/object/get_milestone_overlay_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestGetMilestoneCriteriaOverlay_IncompleteWhenAnyCriteriaNotComplete",
+      "Package": "object",
+      "PackagePath": "cmd/zqk/object",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/object/get_milestone_overlay_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestGetMultipleArgs",
+      "Package": "object",
+      "PackagePath": "cmd/zqk/object",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/object/get_multiple_args_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestGetObjectView_MilestoneCompletionReport_BulkGet_ProjectsFields",
+      "Package": "object",
+      "PackagePath": "cmd/zqk/object",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/object/get_object_view_bulk_milestone_completion_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestGetObjectView_MilestoneCompletionReport_ProjectsFields",
+      "Package": "object",
+      "PackagePath": "cmd/zqk/object",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/object/get_object_view_milestone_completion_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestGetReferenceResolverOverlay_DefaultView_Depth2ResolvesNestedRefs",
+      "Package": "object",
+      "PackagePath": "cmd/zqk/object",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/object/get_reference_resolver_overlay_depth_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestGetReferenceResolverOverlay_UnspecifiedHydration_IsRaw",
+      "Package": "object",
+      "PackagePath": "cmd/zqk/object",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/object/get_reference_resolver_overlay_depth_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestGetReferenceResolverOverlay_RequirementResolvesGoalAndCriteriaRefs",
+      "Package": "object",
+      "PackagePath": "cmd/zqk/object",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/object/get_reference_resolver_overlay_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestCompleteGroupBy_UsesSpecIndex",
+      "Package": "object",
+      "PackagePath": "cmd/zqk/object",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/object/kind_completion_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestCompleteSortBy_UsesSpecIndex",
+      "Package": "object",
+      "PackagePath": "cmd/zqk/object",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/object/kind_completion_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    }
+  }
+}

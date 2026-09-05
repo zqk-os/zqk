@@ -1,0 +1,969 @@
+
+--- run 2026-09-04T21:46:24Z ---
+=== RUN   TestHelpMenuParity
+=== PAUSE TestHelpMenuParity
+=== RUN   TestCommandParity
+=== PAUSE TestCommandParity
+=== RUN   TestFlagParity
+=== PAUSE TestFlagParity
+=== RUN   TestBulkSubcommandParity
+=== PAUSE TestBulkSubcommandParity
+=== RUN   TestHelpTextParity
+=== PAUSE TestHelpTextParity
+=== CONT  TestHelpMenuParity
+=== CONT  TestBulkSubcommandParity
+=== RUN   TestBulkSubcommandParity/Bulk_create
+=== RUN   TestBulkSubcommandParity/Bulk_update
+=== RUN   TestBulkSubcommandParity/Bulk_get
+=== RUN   TestBulkSubcommandParity/Bulk_delete
+--- PASS: TestBulkSubcommandParity (0.00s)
+    --- PASS: TestBulkSubcommandParity/Bulk_create (0.00s)
+    --- PASS: TestBulkSubcommandParity/Bulk_update (0.00s)
+    --- PASS: TestBulkSubcommandParity/Bulk_get (0.00s)
+    --- PASS: TestBulkSubcommandParity/Bulk_delete (0.00s)
+=== CONT  TestHelpTextParity
+=== RUN   TestHelpTextParity/Help_list
+    parity_test.go:230: object list Long description missing Examples section (consider adding)
+    parity_test.go:233: internal list Long description missing Examples section (consider adding)
+=== RUN   TestHelpTextParity/Help_get
+    parity_test.go:230: object get Long description missing Examples section (consider adding)
+    parity_test.go:233: internal get Long description missing Examples section (consider adding)
+=== RUN   TestHelpTextParity/Help_create
+    parity_test.go:230: object create Long description missing Examples section (consider adding)
+    parity_test.go:233: internal create Long description missing Examples section (consider adding)
+=== RUN   TestHelpTextParity/Help_update
+    parity_test.go:230: object update Long description missing Examples section (consider adding)
+    parity_test.go:233: internal update Long description missing Examples section (consider adding)
+=== RUN   TestHelpTextParity/Help_delete
+    parity_test.go:230: object delete Long description missing Examples section (consider adding)
+    parity_test.go:233: internal delete Long description missing Examples section (consider adding)
+=== RUN   TestHelpTextParity/Help_fields
+--- PASS: TestHelpTextParity (0.00s)
+    --- PASS: TestHelpTextParity/Help_list (0.00s)
+    --- PASS: TestHelpTextParity/Help_get (0.00s)
+    --- PASS: TestHelpTextParity/Help_create (0.00s)
+    --- PASS: TestHelpTextParity/Help_update (0.00s)
+    --- PASS: TestHelpTextParity/Help_delete (0.00s)
+    --- PASS: TestHelpTextParity/Help_fields (0.00s)
+=== CONT  TestFlagParity
+=== RUN   TestFlagParity/Flags_list
+=== RUN   TestFlagParity/Flags_get
+=== RUN   TestFlagParity/Flags_create
+=== RUN   TestFlagParity/Flags_update
+=== RUN   TestFlagParity/Flags_delete
+=== RUN   TestFlagParity/Flags_fields
+--- PASS: TestFlagParity (0.00s)
+    --- PASS: TestFlagParity/Flags_list (0.00s)
+    --- PASS: TestFlagParity/Flags_get (0.00s)
+    --- PASS: TestFlagParity/Flags_create (0.00s)
+    --- PASS: TestFlagParity/Flags_update (0.00s)
+    --- PASS: TestFlagParity/Flags_delete (0.00s)
+    --- PASS: TestFlagParity/Flags_fields (0.00s)
+=== CONT  TestCommandParity
+=== RUN   TestCommandParity/Command_list
+=== RUN   TestCommandParity/Command_get
+=== RUN   TestCommandParity/Command_create
+=== RUN   TestCommandParity/Command_update
+=== RUN   TestCommandParity/Command_delete
+=== RUN   TestCommandParity/Command_fields
+=== RUN   TestCommandParity/Command_bulk
+=== RUN   TestCommandParity/Command_count
+--- PASS: TestCommandParity (0.00s)
+    --- PASS: TestCommandParity/Command_list (0.00s)
+    --- PASS: TestCommandParity/Command_get (0.00s)
+    --- PASS: TestCommandParity/Command_create (0.00s)
+    --- PASS: TestCommandParity/Command_update (0.00s)
+    --- PASS: TestCommandParity/Command_delete (0.00s)
+    --- PASS: TestCommandParity/Command_fields (0.00s)
+    --- PASS: TestCommandParity/Command_bulk (0.00s)
+    --- PASS: TestCommandParity/Command_count (0.00s)
+=== RUN   TestHelpMenuParity/FormattingQuality
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_system_metrics_file-lock_view
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_system_policy-interrupts_ack
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_system_status
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_utility_scenario-builder_[flags]
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_internal_lifecycle
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_object_neighbors
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_object_wstrans_list
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_utility_migrate
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_utility_validate-yaml_[file...]
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_object_fields_[flags]
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_internal_update_<id>_[flags]
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_object_count
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_system_improvement-report
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_system_snapshot-expand_[flags]_<csnap-file>
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_system_state-diff_<snapshot-a>_[snapshot-b]
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_object_<kind>_get
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_object_bulk_update_<kind>
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_object_get
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_object_pplan
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_object_pplan_add
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_system_auto-fix-process-pending
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_internal_object_spec_fields_[flags]
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_system_audit-report
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_system_kernel-integrity_backfill-work-envelope
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_internal_object_spec
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_object_<kind>_update_<id>[,id...]_[id...]
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_object_evoman_list
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_object_path
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_system_clean-branches
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_system_metrics_feed
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_system_rebuild-graph-projection
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_utility_version
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_internal_bulk_delete_--ids_<id1,id2,...>_|_--file_<file>_[--unlink-references]_[--cascade]
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_object_pplan_remove
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_system_dashboard
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_utility_fix-registration_[id...]
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_internal_bulk_get_--ids_<id1,id2,...>_|_--file_<file>
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_object_evoman_show
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_system_evolve
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_system_metrics_file-lock
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_object
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_object_bulk_get
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_object_export_[kind]
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_object_promote_<id>[,id...]_[id...]
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_system_ensure-retention-jobs
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_system_federate_initiate
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_system_seed-default-agent-seating
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_object_<kind>_list
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_internal_<kind>_fields_[flags]
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_system_kernel-integrity_report
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_system_migrate-cas
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_system_state-restore
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_system_whoami
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_version
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_internal_<kind>
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_internal_count_[kind|kinds...]_[flags]
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_internal_delete_<id>_[--unlink-references]_[--cascade]
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_system_audit-milestones
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_system_metrics
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_system_repair-cas-corruption
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_object_bulk
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_object_splan_list
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_object_move
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_object_splan_show
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_system_disk-usage
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_object_import
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_system_federate_handshake
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_system_policy-interrupts_pending
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_system_recover-cas_[object-id...]
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_system_snapshot-scenario_[flags]
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_system_compact-journal
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_system_config-get_[key]
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_system_validate_[object-id]
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_system_validate-command-specs
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_internal_bulk_update_--file_<file>
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_object_<kind>
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_system_check_[kind]_[id...]
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_system_seal-skill
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_utility_fix-hashes_[path...]
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_internal_list_[kind]_[flags]
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_internal_process_--file_<reference-file>
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_system_start-here
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_system_stream-gc
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_utility
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_object_evoman
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_object_pplan_prev
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_system_telemetry
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_object_delete_<id>_[id...]
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_object_pplan_next
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_object_splan
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_system_audit-stream
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_system_federate
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_system_kernel-integrity_compose
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_system_orchestrate-batch_[priority_plan_id]_[item_ids...]
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_system_semantic-bridge-daemon
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_internal_get_<id>
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_system_snapshot
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_system_metrics_scheduler-health_test
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_internal_bulk_create_<kind>_--file_<file>
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_object_create_<kind>
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_object_daemon
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_object_template
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_object_wstrans_show
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_system_ambient-daemon
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_system_policy-interrupts_emit
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_internal_bulk
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_object_pplan_current
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_system_init
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_system_spec-origination
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_system_validate-scenario
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_internal_fields_[flags]
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_system_agent-onboard
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_system_fswatcher-daemon
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_system_retention-tolerance
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_object_draft_sweep
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_system_cleanup-duplicates_[kind]
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_system_metrics_file-lock_flush
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_system_object-count-report
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_system_prompt-builder_[query]
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_object_<kind>_delete_<id>_[id...]
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_object_list
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_system_kernel-integrity_heal-dangling
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_system_metrics_scheduler-health
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_system_object-hygiene-scan
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_object_<kind>_fields_[flags]
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_internal
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_internal_lifecycle_fields_[flags]
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_object_update_<id>[,id...]_[id...]
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_system_sync-git-hooks
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_object_draft
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_system
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_object_<kind>_create_<kind>
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_system_align
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_system_emergency-manager
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_system_policy-interrupts
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_system_sync
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_system_truth-sentinel
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_system_validate-agent-rules
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_object_demote_<id>[,id...]_[id...]
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_object_draft_promote
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_object_rename
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_system_kernel-integrity
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_system_snapshot-verify_[flags]_<csnap-file>
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_system_state-commit
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_internal_create_<kind>_--file_<file>
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_object_park_<id>[,id...]_[id...]
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_object_related
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_system_sync-cas-index
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_system_update-specs
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_object_bulk_create_<kind>
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_object_wstrans
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_system_auto-fix-batch
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_system_cli-hooks_[command]_[args]
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_object_bulk_delete
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_system_federate_status
+=== RUN   TestHelpMenuParity/FormattingQuality/zqk.test_system_materialize-agent-chat-channel
+=== RUN   TestHelpMenuParity/HelpTextRequirements
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_system_sync-git-hooks
+    help_parity_test.go:694: zqk.test system sync-git-hooks: Long description does not contain Examples section (consider adding examples)
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_object_draft
+    help_parity_test.go:694: zqk.test object draft: Long description does not contain Examples section (consider adding examples)
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_system
+    help_parity_test.go:694: zqk.test system: Long description does not contain Examples section (consider adding examples)
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_object_<kind>_create_<kind>
+    help_parity_test.go:694: zqk.test object <kind> create <kind>: Long description does not contain Examples section (consider adding examples)
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_system_align
+    help_parity_test.go:694: zqk.test system align: Long description does not contain Examples section (consider adding examples)
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_system_emergency-manager
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_system_policy-interrupts
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_system_sync
+    help_parity_test.go:694: zqk.test system sync: Long description does not contain Examples section (consider adding examples)
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_system_truth-sentinel
+    help_parity_test.go:694: zqk.test system truth-sentinel: Long description does not contain Examples section (consider adding examples)
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_system_validate-agent-rules
+    help_parity_test.go:694: zqk.test system validate-agent-rules: Long description does not contain Examples section (consider adding examples)
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_object_demote_<id>[,id...]_[id...]
+    help_parity_test.go:694: zqk.test object demote <id>[,id...] [id...]: Long description does not contain Examples section (consider adding examples)
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_object_draft_promote
+    help_parity_test.go:694: zqk.test object draft promote: Long description does not contain Examples section (consider adding examples)
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_object_rename
+    help_parity_test.go:694: zqk.test object rename: Long description does not contain Examples section (consider adding examples)
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_system_kernel-integrity
+    help_parity_test.go:694: zqk.test system kernel-integrity: Long description does not contain Examples section (consider adding examples)
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_system_snapshot-verify_[flags]_<csnap-file>
+    help_parity_test.go:694: zqk.test system snapshot-verify [flags] <csnap-file>: Long description does not contain Examples section (consider adding examples)
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_system_state-commit
+    help_parity_test.go:694: zqk.test system state-commit: Long description does not contain Examples section (consider adding examples)
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_internal_create_<kind>_--file_<file>
+    help_parity_test.go:694: zqk.test internal create <kind> --file <file>: Long description does not contain Examples section (consider adding examples)
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_object_park_<id>[,id...]_[id...]
+    help_parity_test.go:694: zqk.test object park <id>[,id...] [id...]: Long description does not contain Examples section (consider adding examples)
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_object_related
+    help_parity_test.go:694: zqk.test object related: Long description does not contain Examples section (consider adding examples)
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_system_sync-cas-index
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_system_update-specs
+    help_parity_test.go:694: zqk.test system update-specs: Long description does not contain Examples section (consider adding examples)
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_object_bulk_create_<kind>
+    help_parity_test.go:694: zqk.test object bulk create <kind>: Long description does not contain Examples section (consider adding examples)
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_object_wstrans
+    help_parity_test.go:694: zqk.test object wstrans: Long description does not contain Examples section (consider adding examples)
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_system_auto-fix-batch
+    help_parity_test.go:694: zqk.test system auto-fix-batch: Long description does not contain Examples section (consider adding examples)
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_system_cli-hooks_[command]_[args]
+    help_parity_test.go:694: zqk.test system cli-hooks [command] [args]: Long description does not contain Examples section (consider adding examples)
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_object_bulk_delete
+    help_parity_test.go:694: zqk.test object bulk delete: Long description does not contain Examples section (consider adding examples)
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_system_federate_status
+    help_parity_test.go:694: zqk.test system federate status: Long description does not contain Examples section (consider adding examples)
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_system_materialize-agent-chat-channel
+    help_parity_test.go:694: zqk.test system materialize-agent-chat-channel: Long description does not contain Examples section (consider adding examples)
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_system_metrics_file-lock_view
+    help_parity_test.go:694: zqk.test system metrics file-lock view: Long description does not contain Examples section (consider adding examples)
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_system_policy-interrupts_ack
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_system_status
+    help_parity_test.go:694: zqk.test system status: Long description does not contain Examples section (consider adding examples)
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_utility_scenario-builder_[flags]
+    help_parity_test.go:694: zqk.test utility scenario-builder [flags]: Long description does not contain Examples section (consider adding examples)
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_internal_lifecycle
+    help_parity_test.go:694: zqk.test internal lifecycle: Long description does not contain Examples section (consider adding examples)
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_object_neighbors
+    help_parity_test.go:694: zqk.test object neighbors: Long description does not contain Examples section (consider adding examples)
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_object_wstrans_list
+    help_parity_test.go:694: zqk.test object wstrans list: Long description does not contain Examples section (consider adding examples)
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_utility_migrate
+    help_parity_test.go:694: zqk.test utility migrate: Long description does not contain Examples section (consider adding examples)
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_utility_validate-yaml_[file...]
+    help_parity_test.go:694: zqk.test utility validate-yaml [file...]: Long description does not contain Examples section (consider adding examples)
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_object_fields_[flags]
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_internal_update_<id>_[flags]
+    help_parity_test.go:694: zqk.test internal update <id> [flags]: Long description does not contain Examples section (consider adding examples)
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_object_count
+    help_parity_test.go:694: zqk.test object count: Long description does not contain Examples section (consider adding examples)
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_system_improvement-report
+    help_parity_test.go:694: zqk.test system improvement-report: Long description does not contain Examples section (consider adding examples)
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_system_snapshot-expand_[flags]_<csnap-file>
+    help_parity_test.go:694: zqk.test system snapshot-expand [flags] <csnap-file>: Long description does not contain Examples section (consider adding examples)
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_system_state-diff_<snapshot-a>_[snapshot-b]
+    help_parity_test.go:694: zqk.test system state-diff <snapshot-a> [snapshot-b]: Long description does not contain Examples section (consider adding examples)
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_object_<kind>_get
+    help_parity_test.go:694: zqk.test object <kind> get: Long description does not contain Examples section (consider adding examples)
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_object_bulk_update_<kind>
+    help_parity_test.go:694: zqk.test object bulk update <kind>: Long description does not contain Examples section (consider adding examples)
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_object_get
+    help_parity_test.go:694: zqk.test object get: Long description does not contain Examples section (consider adding examples)
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_object_pplan
+    help_parity_test.go:694: zqk.test object pplan: Long description does not contain Examples section (consider adding examples)
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_object_pplan_add
+    help_parity_test.go:694: zqk.test object pplan add: Long description does not contain Examples section (consider adding examples)
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_system_auto-fix-process-pending
+    help_parity_test.go:694: zqk.test system auto-fix-process-pending: Long description does not contain Examples section (consider adding examples)
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_internal_object_spec_fields_[flags]
+    help_parity_test.go:694: zqk.test internal object_spec fields [flags]: Long description does not contain Examples section (consider adding examples)
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_system_audit-report
+    help_parity_test.go:694: zqk.test system audit-report: Long description does not contain Examples section (consider adding examples)
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_system_kernel-integrity_backfill-work-envelope
+    help_parity_test.go:694: zqk.test system kernel-integrity backfill-work-envelope: Long description does not contain Examples section (consider adding examples)
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_internal_object_spec
+    help_parity_test.go:694: zqk.test internal object_spec: Long description does not contain Examples section (consider adding examples)
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_object_<kind>_update_<id>[,id...]_[id...]
+    help_parity_test.go:694: zqk.test object <kind> update <id>[,id...] [id...]: Long description does not contain Examples section (consider adding examples)
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_object_evoman_list
+    help_parity_test.go:694: zqk.test object evoman list: Long description does not contain Examples section (consider adding examples)
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_object_path
+    help_parity_test.go:694: zqk.test object path: Long description does not contain Examples section (consider adding examples)
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_system_clean-branches
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_system_metrics_feed
+    help_parity_test.go:694: zqk.test system metrics feed: Long description does not contain Examples section (consider adding examples)
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_system_rebuild-graph-projection
+    help_parity_test.go:694: zqk.test system rebuild-graph-projection: Long description does not contain Examples section (consider adding examples)
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_utility_version
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_internal_bulk_delete_--ids_<id1,id2,...>_|_--file_<file>_[--unlink-references]_[--cascade]
+    help_parity_test.go:694: zqk.test internal bulk delete --ids <id1,id2,...> | --file <file> [--unlink-references] [--cascade]: Long description does not contain Examples section (consider adding examples)
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_object_pplan_remove
+    help_parity_test.go:694: zqk.test object pplan remove: Long description does not contain Examples section (consider adding examples)
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_system_dashboard
+    help_parity_test.go:694: zqk.test system dashboard: Long description does not contain Examples section (consider adding examples)
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_utility_fix-registration_[id...]
+    help_parity_test.go:694: zqk.test utility fix-registration [id...]: Long description does not contain Examples section (consider adding examples)
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_internal_bulk_get_--ids_<id1,id2,...>_|_--file_<file>
+    help_parity_test.go:694: zqk.test internal bulk get --ids <id1,id2,...> | --file <file>: Long description does not contain Examples section (consider adding examples)
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_object_evoman_show
+    help_parity_test.go:694: zqk.test object evoman show: Long description does not contain Examples section (consider adding examples)
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_system_evolve
+    help_parity_test.go:694: zqk.test system evolve: Long description does not contain Examples section (consider adding examples)
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_system_metrics_file-lock
+    help_parity_test.go:694: zqk.test system metrics file-lock: Long description does not contain Examples section (consider adding examples)
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_object
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_object_bulk_get
+    help_parity_test.go:694: zqk.test object bulk get: Long description does not contain Examples section (consider adding examples)
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_object_export_[kind]
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_object_promote_<id>[,id...]_[id...]
+    help_parity_test.go:694: zqk.test object promote <id>[,id...] [id...]: Long description does not contain Examples section (consider adding examples)
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_system_ensure-retention-jobs
+    help_parity_test.go:694: zqk.test system ensure-retention-jobs: Long description does not contain Examples section (consider adding examples)
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_system_federate_initiate
+    help_parity_test.go:694: zqk.test system federate initiate: Long description does not contain Examples section (consider adding examples)
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_system_seed-default-agent-seating
+    help_parity_test.go:694: zqk.test system seed-default-agent-seating: Long description does not contain Examples section (consider adding examples)
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_object_<kind>_list
+    help_parity_test.go:694: zqk.test object <kind> list: Long description does not contain Examples section (consider adding examples)
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_internal_<kind>_fields_[flags]
+    help_parity_test.go:694: zqk.test internal <kind> fields [flags]: Long description does not contain Examples section (consider adding examples)
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_system_kernel-integrity_report
+    help_parity_test.go:694: zqk.test system kernel-integrity report: Long description does not contain Examples section (consider adding examples)
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_system_migrate-cas
+    help_parity_test.go:694: zqk.test system migrate-cas: Long description does not contain Examples section (consider adding examples)
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_system_state-restore
+    help_parity_test.go:694: zqk.test system state-restore: Long description does not contain Examples section (consider adding examples)
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_system_whoami
+    help_parity_test.go:694: zqk.test system whoami: Long description does not contain Examples section (consider adding examples)
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_version
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_internal_<kind>
+    help_parity_test.go:694: zqk.test internal <kind>: Long description does not contain Examples section (consider adding examples)
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_internal_count_[kind|kinds...]_[flags]
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_internal_delete_<id>_[--unlink-references]_[--cascade]
+    help_parity_test.go:694: zqk.test internal delete <id> [--unlink-references] [--cascade]: Long description does not contain Examples section (consider adding examples)
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_system_audit-milestones
+    help_parity_test.go:694: zqk.test system audit-milestones: Long description does not contain Examples section (consider adding examples)
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_system_metrics
+    help_parity_test.go:694: zqk.test system metrics: Long description does not contain Examples section (consider adding examples)
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_system_repair-cas-corruption
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_object_bulk
+    help_parity_test.go:694: zqk.test object bulk: Long description does not contain Examples section (consider adding examples)
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_object_splan_list
+    help_parity_test.go:694: zqk.test object splan list: Long description does not contain Examples section (consider adding examples)
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_object_move
+    help_parity_test.go:694: zqk.test object move: Long description does not contain Examples section (consider adding examples)
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_object_splan_show
+    help_parity_test.go:694: zqk.test object splan show: Long description does not contain Examples section (consider adding examples)
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_system_disk-usage
+    help_parity_test.go:694: zqk.test system disk-usage: Long description does not contain Examples section (consider adding examples)
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_object_import
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_system_federate_handshake
+    help_parity_test.go:694: zqk.test system federate handshake: Long description does not contain Examples section (consider adding examples)
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_system_policy-interrupts_pending
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_system_recover-cas_[object-id...]
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_system_snapshot-scenario_[flags]
+    help_parity_test.go:694: zqk.test system snapshot-scenario [flags]: Long description does not contain Examples section (consider adding examples)
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_system_compact-journal
+    help_parity_test.go:694: zqk.test system compact-journal: Long description does not contain Examples section (consider adding examples)
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_system_config-get_[key]
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_system_validate_[object-id]
+    help_parity_test.go:694: zqk.test system validate [object-id]: Long description does not contain Examples section (consider adding examples)
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_system_validate-command-specs
+    help_parity_test.go:694: zqk.test system validate-command-specs: Long description does not contain Examples section (consider adding examples)
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_internal_bulk_update_--file_<file>
+    help_parity_test.go:694: zqk.test internal bulk update --file <file>: Long description does not contain Examples section (consider adding examples)
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_object_<kind>
+    help_parity_test.go:694: zqk.test object <kind>: Long description does not contain Examples section (consider adding examples)
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_system_check_[kind]_[id...]
+    help_parity_test.go:694: zqk.test system check [kind] [id...]: Long description does not contain Examples section (consider adding examples)
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_system_seal-skill
+    help_parity_test.go:694: zqk.test system seal-skill: Long description does not contain Examples section (consider adding examples)
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_utility_fix-hashes_[path...]
+    help_parity_test.go:694: zqk.test utility fix-hashes [path...]: Long description does not contain Examples section (consider adding examples)
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_internal_list_[kind]_[flags]
+    help_parity_test.go:694: zqk.test internal list [kind] [flags]: Long description does not contain Examples section (consider adding examples)
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_internal_process_--file_<reference-file>
+    help_parity_test.go:694: zqk.test internal process --file <reference-file>: Long description does not contain Examples section (consider adding examples)
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_system_start-here
+    help_parity_test.go:694: zqk.test system start-here: Long description does not contain Examples section (consider adding examples)
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_system_stream-gc
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_utility
+    help_parity_test.go:694: zqk.test utility: Long description does not contain Examples section (consider adding examples)
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_object_evoman
+    help_parity_test.go:694: zqk.test object evoman: Long description does not contain Examples section (consider adding examples)
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_object_pplan_prev
+    help_parity_test.go:694: zqk.test object pplan prev: Long description does not contain Examples section (consider adding examples)
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_system_telemetry
+    help_parity_test.go:694: zqk.test system telemetry: Long description does not contain Examples section (consider adding examples)
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_object_delete_<id>_[id...]
+    help_parity_test.go:694: zqk.test object delete <id> [id...]: Long description does not contain Examples section (consider adding examples)
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_object_pplan_next
+    help_parity_test.go:694: zqk.test object pplan next: Long description does not contain Examples section (consider adding examples)
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_object_splan
+    help_parity_test.go:694: zqk.test object splan: Long description does not contain Examples section (consider adding examples)
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_system_audit-stream
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_system_federate
+    help_parity_test.go:694: zqk.test system federate: Long description does not contain Examples section (consider adding examples)
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_system_kernel-integrity_compose
+    help_parity_test.go:694: zqk.test system kernel-integrity compose: Long description does not contain Examples section (consider adding examples)
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_system_orchestrate-batch_[priority_plan_id]_[item_ids...]
+    help_parity_test.go:694: zqk.test system orchestrate-batch [priority_plan_id] [item_ids...]: Long description does not contain Examples section (consider adding examples)
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_system_semantic-bridge-daemon
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_internal_get_<id>
+    help_parity_test.go:694: zqk.test internal get <id>: Long description does not contain Examples section (consider adding examples)
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_system_snapshot
+    help_parity_test.go:694: zqk.test system snapshot: Long description does not contain Examples section (consider adding examples)
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_system_metrics_scheduler-health_test
+    help_parity_test.go:694: zqk.test system metrics scheduler-health test: Long description does not contain Examples section (consider adding examples)
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_internal_bulk_create_<kind>_--file_<file>
+    help_parity_test.go:694: zqk.test internal bulk create <kind> --file <file>: Long description does not contain Examples section (consider adding examples)
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_object_create_<kind>
+    help_parity_test.go:694: zqk.test object create <kind>: Long description does not contain Examples section (consider adding examples)
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_object_daemon
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_object_template
+    help_parity_test.go:694: zqk.test object template: Long description does not contain Examples section (consider adding examples)
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_object_wstrans_show
+    help_parity_test.go:694: zqk.test object wstrans show: Long description does not contain Examples section (consider adding examples)
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_system_ambient-daemon
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_system_policy-interrupts_emit
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_internal_bulk
+    help_parity_test.go:694: zqk.test internal bulk: Long description does not contain Examples section (consider adding examples)
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_object_pplan_current
+    help_parity_test.go:694: zqk.test object pplan current: Long description does not contain Examples section (consider adding examples)
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_system_init
+    help_parity_test.go:694: zqk.test system init: Long description does not contain Examples section (consider adding examples)
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_system_spec-origination
+    help_parity_test.go:694: zqk.test system spec-origination: Long description does not contain Examples section (consider adding examples)
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_system_validate-scenario
+    help_parity_test.go:694: zqk.test system validate-scenario: Long description does not contain Examples section (consider adding examples)
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_internal_fields_[flags]
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_system_agent-onboard
+    help_parity_test.go:694: zqk.test system agent-onboard: Long description does not contain Examples section (consider adding examples)
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_system_fswatcher-daemon
+    help_parity_test.go:694: zqk.test system fswatcher-daemon: Long description does not contain Examples section (consider adding examples)
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_system_retention-tolerance
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_object_draft_sweep
+    help_parity_test.go:694: zqk.test object draft sweep: Long description does not contain Examples section (consider adding examples)
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_system_cleanup-duplicates_[kind]
+    help_parity_test.go:694: zqk.test system cleanup-duplicates [kind]: Long description does not contain Examples section (consider adding examples)
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_system_metrics_file-lock_flush
+    help_parity_test.go:694: zqk.test system metrics file-lock flush: Long description does not contain Examples section (consider adding examples)
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_system_object-count-report
+    help_parity_test.go:694: zqk.test system object-count-report: Long description does not contain Examples section (consider adding examples)
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_system_prompt-builder_[query]
+    help_parity_test.go:694: zqk.test system prompt-builder [query]: Long description does not contain Examples section (consider adding examples)
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_object_<kind>_delete_<id>_[id...]
+    help_parity_test.go:694: zqk.test object <kind> delete <id> [id...]: Long description does not contain Examples section (consider adding examples)
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_object_list
+    help_parity_test.go:694: zqk.test object list: Long description does not contain Examples section (consider adding examples)
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_system_kernel-integrity_heal-dangling
+    help_parity_test.go:694: zqk.test system kernel-integrity heal-dangling: Long description does not contain Examples section (consider adding examples)
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_system_metrics_scheduler-health
+    help_parity_test.go:694: zqk.test system metrics scheduler-health: Long description does not contain Examples section (consider adding examples)
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_system_object-hygiene-scan
+    help_parity_test.go:694: zqk.test system object-hygiene-scan: Long description does not contain Examples section (consider adding examples)
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_object_<kind>_fields_[flags]
+    help_parity_test.go:694: zqk.test object <kind> fields [flags]: Long description does not contain Examples section (consider adding examples)
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_internal
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_internal_lifecycle_fields_[flags]
+    help_parity_test.go:694: zqk.test internal lifecycle fields [flags]: Long description does not contain Examples section (consider adding examples)
+=== RUN   TestHelpMenuParity/HelpTextRequirements/zqk.test_object_update_<id>[,id...]_[id...]
+    help_parity_test.go:694: zqk.test object update <id>[,id...] [id...]: Long description does not contain Examples section (consider adding examples)
+=== RUN   TestHelpMenuParity/GoldenFileComparison
+=== RUN   TestHelpMenuParity/GoldenFileComparison/zqk.test_object_pplan_next
+=== RUN   TestHelpMenuParity/GoldenFileComparison/zqk.test_object_splan
+=== RUN   TestHelpMenuParity/GoldenFileComparison/zqk.test_system_audit-stream
+=== RUN   TestHelpMenuParity/GoldenFileComparison/zqk.test_system_federate
+=== RUN   TestHelpMenuParity/GoldenFileComparison/zqk.test_system_kernel-integrity_compose
+=== RUN   TestHelpMenuParity/GoldenFileComparison/zqk.test_system_orchestrate-batch_[priority_plan_id]_[item_ids...]
+=== RUN   TestHelpMenuParity/GoldenFileComparison/zqk.test_system_semantic-bridge-daemon
+=== RUN   TestHelpMenuParity/GoldenFileComparison/zqk.test_internal_get_<id>
+=== RUN   TestHelpMenuParity/GoldenFileComparison/zqk.test_system_snapshot
+=== RUN   TestHelpMenuParity/GoldenFileComparison/zqk.test_system_metrics_scheduler-health_test
+=== RUN   TestHelpMenuParity/GoldenFileComparison/zqk.test_internal_bulk_create_<kind>_--file_<file>
+=== RUN   TestHelpMenuParity/GoldenFileComparison/zqk.test_object_create_<kind>
+=== RUN   TestHelpMenuParity/GoldenFileComparison/zqk.test_object_daemon
+=== RUN   TestHelpMenuParity/GoldenFileComparison/zqk.test_object_template
+=== RUN   TestHelpMenuParity/GoldenFileComparison/zqk.test_object_wstrans_show
+=== RUN   TestHelpMenuParity/GoldenFileComparison/zqk.test_system_ambient-daemon
+=== RUN   TestHelpMenuParity/GoldenFileComparison/zqk.test_system_policy-interrupts_emit
+=== RUN   TestHelpMenuParity/GoldenFileComparison/zqk.test_internal_bulk
+=== RUN   TestHelpMenuParity/GoldenFileComparison/zqk.test_object_pplan_current
+=== RUN   TestHelpMenuParity/GoldenFileComparison/zqk.test_system_init
+=== RUN   TestHelpMenuParity/GoldenFileComparison/zqk.test_system_spec-origination
+=== RUN   TestHelpMenuParity/GoldenFileComparison/zqk.test_system_validate-scenario
+=== RUN   TestHelpMenuParity/GoldenFileComparison/zqk.test_internal_fields_[flags]
+=== RUN   TestHelpMenuParity/GoldenFileComparison/zqk.test_system_agent-onboard
+=== RUN   TestHelpMenuParity/GoldenFileComparison/zqk.test_system_fswatcher-daemon
+=== RUN   TestHelpMenuParity/GoldenFileComparison/zqk.test_system_retention-tolerance
+=== RUN   TestHelpMenuParity/GoldenFileComparison/zqk.test_object_draft_sweep
+=== RUN   TestHelpMenuParity/GoldenFileComparison/zqk.test_system_cleanup-duplicates_[kind]
+=== RUN   TestHelpMenuParity/GoldenFileComparison/zqk.test_system_metrics_file-lock_flush
+=== RUN   TestHelpMenuParity/GoldenFileComparison/zqk.test_system_object-count-report
+=== RUN   TestHelpMenuParity/GoldenFileComparison/zqk.test_system_prompt-builder_[query]
+=== RUN   TestHelpMenuParity/GoldenFileComparison/zqk.test_object_<kind>_delete_<id>_[id...]
+=== RUN   TestHelpMenuParity/GoldenFileComparison/zqk.test_object_list
+=== RUN   TestHelpMenuParity/GoldenFileComparison/zqk.test_system_kernel-integrity_heal-dangling
+=== RUN   TestHelpMenuParity/GoldenFileComparison/zqk.test_system_metrics_scheduler-health
+=== RUN   TestHelpMenuParity/GoldenFileComparison/zqk.test_system_object-hygiene-scan
+=== RUN   TestHelpMenuParity/GoldenFileComparison/zqk.test_object_<kind>_fields_[flags]
+=== RUN   TestHelpMenuParity/GoldenFileComparison/zqk.test
+=== RUN   TestHelpMenuParity/GoldenFileComparison/zqk.test_internal
+=== RUN   TestHelpMenuParity/GoldenFileComparison/zqk.test_internal_lifecycle_fields_[flags]
+=== RUN   TestHelpMenuParity/GoldenFileComparison/zqk.test_object_update_<id>[,id...]_[id...]
+=== RUN   TestHelpMenuParity/GoldenFileComparison/zqk.test_system_sync-git-hooks
+=== RUN   TestHelpMenuParity/GoldenFileComparison/zqk.test_object_draft
+=== RUN   TestHelpMenuParity/GoldenFileComparison/zqk.test_system
+=== RUN   TestHelpMenuParity/GoldenFileComparison/zqk.test_object_<kind>_create_<kind>
+=== RUN   TestHelpMenuParity/GoldenFileComparison/zqk.test_system_align
+=== RUN   TestHelpMenuParity/GoldenFileComparison/zqk.test_system_emergency-manager
+=== RUN   TestHelpMenuParity/GoldenFileComparison/zqk.test_system_policy-interrupts
+=== RUN   TestHelpMenuParity/GoldenFileComparison/zqk.test_system_sync
+=== RUN   TestHelpMenuParity/GoldenFileComparison/zqk.test_system_truth-sentinel
+--- FAIL: TestHelpMenuParity (0.23s)
+    --- PASS: TestHelpMenuParity/FormattingQuality (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_system_metrics_file-lock_view (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_system_policy-interrupts_ack (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_system_status (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_utility_scenario-builder_[flags] (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_internal_lifecycle (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_object_neighbors (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_object_wstrans_list (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_utility_migrate (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_utility_validate-yaml_[file...] (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_object_fields_[flags] (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_internal_update_<id>_[flags] (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_object_count (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_system_improvement-report (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_system_snapshot-expand_[flags]_<csnap-file> (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_system_state-diff_<snapshot-a>_[snapshot-b] (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_object_<kind>_get (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_object_bulk_update_<kind> (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_object_get (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_object_pplan (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_object_pplan_add (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_system_auto-fix-process-pending (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_internal_object_spec_fields_[flags] (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_system_audit-report (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_system_kernel-integrity_backfill-work-envelope (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_internal_object_spec (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_object_<kind>_update_<id>[,id...]_[id...] (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_object_evoman_list (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_object_path (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_system_clean-branches (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_system_metrics_feed (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_system_rebuild-graph-projection (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_utility_version (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_internal_bulk_delete_--ids_<id1,id2,...>_|_--file_<file>_[--unlink-references]_[--cascade] (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_object_pplan_remove (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_system_dashboard (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_utility_fix-registration_[id...] (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_internal_bulk_get_--ids_<id1,id2,...>_|_--file_<file> (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_object_evoman_show (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_system_evolve (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_system_metrics_file-lock (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_object (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_object_bulk_get (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_object_export_[kind] (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_object_promote_<id>[,id...]_[id...] (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_system_ensure-retention-jobs (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_system_federate_initiate (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_system_seed-default-agent-seating (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_object_<kind>_list (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_internal_<kind>_fields_[flags] (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_system_kernel-integrity_report (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_system_migrate-cas (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_system_state-restore (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_system_whoami (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_version (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_internal_<kind> (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_internal_count_[kind|kinds...]_[flags] (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_internal_delete_<id>_[--unlink-references]_[--cascade] (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_system_audit-milestones (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_system_metrics (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_system_repair-cas-corruption (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_object_bulk (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_object_splan_list (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_object_move (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_object_splan_show (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_system_disk-usage (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_object_import (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_system_federate_handshake (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_system_policy-interrupts_pending (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_system_recover-cas_[object-id...] (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_system_snapshot-scenario_[flags] (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_system_compact-journal (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_system_config-get_[key] (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_system_validate_[object-id] (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_system_validate-command-specs (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_internal_bulk_update_--file_<file> (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_object_<kind> (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_system_check_[kind]_[id...] (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_system_seal-skill (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_utility_fix-hashes_[path...] (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_internal_list_[kind]_[flags] (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_internal_process_--file_<reference-file> (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_system_start-here (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_system_stream-gc (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_utility (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_object_evoman (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_object_pplan_prev (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_system_telemetry (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_object_delete_<id>_[id...] (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_object_pplan_next (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_object_splan (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_system_audit-stream (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_system_federate (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_system_kernel-integrity_compose (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_system_orchestrate-batch_[priority_plan_id]_[item_ids...] (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_system_semantic-bridge-daemon (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_internal_get_<id> (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_system_snapshot (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_system_metrics_scheduler-health_test (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_internal_bulk_create_<kind>_--file_<file> (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_object_create_<kind> (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_object_daemon (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_object_template (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_object_wstrans_show (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_system_ambient-daemon (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_system_policy-interrupts_emit (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_internal_bulk (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_object_pplan_current (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_system_init (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_system_spec-origination (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_system_validate-scenario (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_internal_fields_[flags] (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_system_agent-onboard (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_system_fswatcher-daemon (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_system_retention-tolerance (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_object_draft_sweep (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_system_cleanup-duplicates_[kind] (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_system_metrics_file-lock_flush (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_system_object-count-report (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_system_prompt-builder_[query] (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_object_<kind>_delete_<id>_[id...] (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_object_list (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_system_kernel-integrity_heal-dangling (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_system_metrics_scheduler-health (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_system_object-hygiene-scan (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_object_<kind>_fields_[flags] (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_internal (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_internal_lifecycle_fields_[flags] (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_object_update_<id>[,id...]_[id...] (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_system_sync-git-hooks (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_object_draft (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_system (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_object_<kind>_create_<kind> (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_system_align (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_system_emergency-manager (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_system_policy-interrupts (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_system_sync (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_system_truth-sentinel (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_system_validate-agent-rules (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_object_demote_<id>[,id...]_[id...] (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_object_draft_promote (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_object_rename (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_system_kernel-integrity (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_system_snapshot-verify_[flags]_<csnap-file> (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_system_state-commit (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_internal_create_<kind>_--file_<file> (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_object_park_<id>[,id...]_[id...] (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_object_related (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_system_sync-cas-index (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_system_update-specs (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_object_bulk_create_<kind> (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_object_wstrans (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_system_auto-fix-batch (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_system_cli-hooks_[command]_[args] (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_object_bulk_delete (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_system_federate_status (0.00s)
+        --- PASS: TestHelpMenuParity/FormattingQuality/zqk.test_system_materialize-agent-chat-channel (0.00s)
+    --- PASS: TestHelpMenuParity/HelpTextRequirements (0.02s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_system_sync-git-hooks (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_object_draft (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_system (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_object_<kind>_create_<kind> (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_system_align (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_system_emergency-manager (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_system_policy-interrupts (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_system_sync (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_system_truth-sentinel (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_system_validate-agent-rules (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_object_demote_<id>[,id...]_[id...] (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_object_draft_promote (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_object_rename (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_system_kernel-integrity (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_system_snapshot-verify_[flags]_<csnap-file> (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_system_state-commit (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_internal_create_<kind>_--file_<file> (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_object_park_<id>[,id...]_[id...] (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_object_related (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_system_sync-cas-index (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_system_update-specs (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_object_bulk_create_<kind> (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_object_wstrans (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_system_auto-fix-batch (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_system_cli-hooks_[command]_[args] (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_object_bulk_delete (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_system_federate_status (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_system_materialize-agent-chat-channel (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_system_metrics_file-lock_view (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_system_policy-interrupts_ack (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_system_status (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_utility_scenario-builder_[flags] (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_internal_lifecycle (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_object_neighbors (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_object_wstrans_list (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_utility_migrate (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_utility_validate-yaml_[file...] (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_object_fields_[flags] (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_internal_update_<id>_[flags] (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_object_count (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_system_improvement-report (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_system_snapshot-expand_[flags]_<csnap-file> (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_system_state-diff_<snapshot-a>_[snapshot-b] (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_object_<kind>_get (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_object_bulk_update_<kind> (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_object_get (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_object_pplan (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_object_pplan_add (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_system_auto-fix-process-pending (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_internal_object_spec_fields_[flags] (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_system_audit-report (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_system_kernel-integrity_backfill-work-envelope (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_internal_object_spec (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_object_<kind>_update_<id>[,id...]_[id...] (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_object_evoman_list (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_object_path (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_system_clean-branches (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_system_metrics_feed (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_system_rebuild-graph-projection (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_utility_version (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_internal_bulk_delete_--ids_<id1,id2,...>_|_--file_<file>_[--unlink-references]_[--cascade] (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_object_pplan_remove (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_system_dashboard (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_utility_fix-registration_[id...] (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_internal_bulk_get_--ids_<id1,id2,...>_|_--file_<file> (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_object_evoman_show (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_system_evolve (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_system_metrics_file-lock (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_object (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_object_bulk_get (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_object_export_[kind] (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_object_promote_<id>[,id...]_[id...] (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_system_ensure-retention-jobs (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_system_federate_initiate (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_system_seed-default-agent-seating (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_object_<kind>_list (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_internal_<kind>_fields_[flags] (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_system_kernel-integrity_report (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_system_migrate-cas (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_system_state-restore (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_system_whoami (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_version (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_internal_<kind> (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_internal_count_[kind|kinds...]_[flags] (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_internal_delete_<id>_[--unlink-references]_[--cascade] (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_system_audit-milestones (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_system_metrics (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_system_repair-cas-corruption (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_object_bulk (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_object_splan_list (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_object_move (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_object_splan_show (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_system_disk-usage (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_object_import (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_system_federate_handshake (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_system_policy-interrupts_pending (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_system_recover-cas_[object-id...] (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_system_snapshot-scenario_[flags] (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_system_compact-journal (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_system_config-get_[key] (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_system_validate_[object-id] (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_system_validate-command-specs (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_internal_bulk_update_--file_<file> (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_object_<kind> (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_system_check_[kind]_[id...] (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_system_seal-skill (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_utility_fix-hashes_[path...] (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_internal_list_[kind]_[flags] (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_internal_process_--file_<reference-file> (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_system_start-here (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_system_stream-gc (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_utility (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_object_evoman (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_object_pplan_prev (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_system_telemetry (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_object_delete_<id>_[id...] (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_object_pplan_next (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_object_splan (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_system_audit-stream (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_system_federate (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_system_kernel-integrity_compose (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_system_orchestrate-batch_[priority_plan_id]_[item_ids...] (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_system_semantic-bridge-daemon (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_internal_get_<id> (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_system_snapshot (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_system_metrics_scheduler-health_test (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_internal_bulk_create_<kind>_--file_<file> (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_object_create_<kind> (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_object_daemon (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_object_template (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_object_wstrans_show (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_system_ambient-daemon (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_system_policy-interrupts_emit (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_internal_bulk (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_object_pplan_current (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_system_init (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_system_spec-origination (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_system_validate-scenario (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_internal_fields_[flags] (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_system_agent-onboard (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_system_fswatcher-daemon (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_system_retention-tolerance (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_object_draft_sweep (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_system_cleanup-duplicates_[kind] (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_system_metrics_file-lock_flush (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_system_object-count-report (0.01s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_system_prompt-builder_[query] (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_object_<kind>_delete_<id>_[id...] (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_object_list (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_system_kernel-integrity_heal-dangling (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_system_metrics_scheduler-health (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_system_object-hygiene-scan (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_object_<kind>_fields_[flags] (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_internal (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_internal_lifecycle_fields_[flags] (0.00s)
+        --- PASS: TestHelpMenuParity/HelpTextRequirements/zqk.test_object_update_<id>[,id...]_[id...] (0.00s)
+    --- FAIL: TestHelpMenuParity/GoldenFileComparison (0.20s)
+        --- PASS: TestHelpMenuParity/GoldenFileComparison/zqk.test_object_pplan_next (0.00s)
+        --- PASS: TestHelpMenuParity/GoldenFileComparison/zqk.test_object_splan (0.00s)
+        --- PASS: TestHelpMenuParity/GoldenFileComparison/zqk.test_system_audit-stream (0.00s)
+        --- PASS: TestHelpMenuParity/GoldenFileComparison/zqk.test_system_federate (0.00s)
+        --- PASS: TestHelpMenuParity/GoldenFileComparison/zqk.test_system_kernel-integrity_compose (0.00s)
+        --- PASS: TestHelpMenuParity/GoldenFileComparison/zqk.test_system_orchestrate-batch_[priority_plan_id]_[item_ids...] (0.00s)
+        --- PASS: TestHelpMenuParity/GoldenFileComparison/zqk.test_system_semantic-bridge-daemon (0.00s)
+        --- PASS: TestHelpMenuParity/GoldenFileComparison/zqk.test_internal_get_<id> (0.00s)
+        --- PASS: TestHelpMenuParity/GoldenFileComparison/zqk.test_system_snapshot (0.00s)
+        --- PASS: TestHelpMenuParity/GoldenFileComparison/zqk.test_system_metrics_scheduler-health_test (0.00s)
+        --- PASS: TestHelpMenuParity/GoldenFileComparison/zqk.test_internal_bulk_create_<kind>_--file_<file> (0.00s)
+        --- PASS: TestHelpMenuParity/GoldenFileComparison/zqk.test_object_create_<kind> (0.00s)
+        --- PASS: TestHelpMenuParity/GoldenFileComparison/zqk.test_object_daemon (0.00s)
+        --- PASS: TestHelpMenuParity/GoldenFileComparison/zqk.test_object_template (0.00s)
+        --- PASS: TestHelpMenuParity/GoldenFileComparison/zqk.test_object_wstrans_show (0.00s)
+        --- PASS: TestHelpMenuParity/GoldenFileComparison/zqk.test_system_ambient-daemon (0.00s)
+        --- PASS: TestHelpMenuParity/GoldenFileComparison/zqk.test_system_policy-interrupts_emit (0.00s)
+        --- PASS: TestHelpMenuParity/GoldenFileComparison/zqk.test_internal_bulk (0.00s)
+        --- PASS: TestHelpMenuParity/GoldenFileComparison/zqk.test_object_pplan_current (0.00s)
+        --- PASS: TestHelpMenuParity/GoldenFileComparison/zqk.test_system_init (0.00s)
+        --- PASS: TestHelpMenuParity/GoldenFileComparison/zqk.test_system_spec-origination (0.01s)
+        --- PASS: TestHelpMenuParity/GoldenFileComparison/zqk.test_system_validate-scenario (0.01s)
+        --- PASS: TestHelpMenuParity/GoldenFileComparison/zqk.test_internal_fields_[flags] (0.00s)
+        --- PASS: TestHelpMenuParity/GoldenFileComparison/zqk.test_system_agent-onboard (0.02s)
+        --- PASS: TestHelpMenuParity/GoldenFileComparison/zqk.test_system_fswatcher-daemon (0.00s)
+        --- PASS: TestHelpMenuParity/GoldenFileComparison/zqk.test_system_retention-tolerance (0.00s)
+        --- PASS: TestHelpMenuParity/GoldenFileComparison/zqk.test_object_draft_sweep (0.00s)
+        --- PASS: TestHelpMenuParity/GoldenFileComparison/zqk.test_system_cleanup-duplicates_[kind] (0.01s)
+        --- PASS: TestHelpMenuParity/GoldenFileComparison/zqk.test_system_metrics_file-lock_flush (0.00s)
+        --- PASS: TestHelpMenuParity/GoldenFileComparison/zqk.test_system_object-count-report (0.00s)
+        --- PASS: TestHelpMenuParity/GoldenFileComparison/zqk.test_system_prompt-builder_[query] (0.00s)
+        --- PASS: TestHelpMenuParity/GoldenFileComparison/zqk.test_object_<kind>_delete_<id>_[id...] (0.00s)
+        --- PASS: TestHelpMenuParity/GoldenFileComparison/zqk.test_object_list (0.00s)
+        --- PASS: TestHelpMenuParity/GoldenFileComparison/zqk.test_system_kernel-integrity_heal-dangling (0.00s)
+        --- PASS: TestHelpMenuParity/GoldenFileComparison/zqk.test_system_metrics_scheduler-health (0.00s)
+        --- PASS: TestHelpMenuParity/GoldenFileComparison/zqk.test_system_object-hygiene-scan (0.00s)
+        --- PASS: TestHelpMenuParity/GoldenFileComparison/zqk.test_object_<kind>_fields_[flags] (0.00s)
+        --- PASS: TestHelpMenuParity/GoldenFileComparison/zqk.test (0.00s)
+        --- PASS: TestHelpMenuParity/GoldenFileComparison/zqk.test_internal (0.00s)
+        --- PASS: TestHelpMenuParity/GoldenFileComparison/zqk.test_internal_lifecycle_fields_[flags] (0.00s)
+        --- PASS: TestHelpMenuParity/GoldenFileComparison/zqk.test_object_update_<id>[,id...]_[id...] (0.00s)
+        --- PASS: TestHelpMenuParity/GoldenFileComparison/zqk.test_system_sync-git-hooks (0.00s)
+        --- PASS: TestHelpMenuParity/GoldenFileComparison/zqk.test_object_draft (0.00s)
+        --- PASS: TestHelpMenuParity/GoldenFileComparison/zqk.test_system (0.00s)
+        --- PASS: TestHelpMenuParity/GoldenFileComparison/zqk.test_object_<kind>_create_<kind> (0.01s)
+        --- PASS: TestHelpMenuParity/GoldenFileComparison/zqk.test_system_align (0.00s)
+        --- PASS: TestHelpMenuParity/GoldenFileComparison/zqk.test_system_emergency-manager (0.00s)
+        --- PASS: TestHelpMenuParity/GoldenFileComparison/zqk.test_system_policy-interrupts (0.01s)
+        --- PASS: TestHelpMenuParity/GoldenFileComparison/zqk.test_system_sync (0.01s)
+        --- FAIL: TestHelpMenuParity/GoldenFileComparison/zqk.test_system_truth-sentinel (0.00s)
+panic: test isolation violation: write target /Users/lanceettl/zqk-restore-clone/.zqk/logs falls inside protected repo state /Users/lanceettl/zqk-restore-clone/.zqk [recovered, repanicked]
+
+goroutine 49 [running]:
+testing.tRunner.func1.2({0x10518f480, 0x4597bfd04390})
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/testing/testing.go:1974 +0x1a0
+testing.tRunner.func1()
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/testing/testing.go:1977 +0x318
+panic({0x10518f480?, 0x4597bfd04390?})
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/panic.go:860 +0x12c
+github.com/lanceman/zqk/pkg/utils/fileutil.guardRepoMutation({0x4597bfb16480, 0x2c})
+	/Users/lanceettl/zqk-restore-clone/pkg/utils/fileutil/repo_write_guard.go:40 +0xa0
+github.com/lanceman/zqk/pkg/utils/fileutil.MkdirAll({0x4597bfb16480, 0x2c}, 0x1ed)
+	/Users/lanceettl/zqk-restore-clone/pkg/utils/fileutil/fs.go:75 +0x28
+github.com/lanceman/zqk/cmd/zqk.compareWithGolden(0x4597bf63a908, {0x4597bfd2f158, 0x14}, {0x4597bf91f020, 0x1e}, {0x4597bf516c00, 0x3f4})
+	/Users/lanceettl/zqk-restore-clone/cmd/zqk/help_parity_test.go:417 +0x3e0
+github.com/lanceman/zqk/cmd/zqk.TestHelpMenuParity.func3.1(0x4597bf63a908?)
+	/Users/lanceettl/zqk-restore-clone/cmd/zqk/help_parity_test.go:79 +0x28
+testing.tRunner(0x4597bf63a908, 0x4597bf440200)
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/testing/testing.go:2036 +0xc4
+created by testing.(*T).Run in goroutine 430
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/testing/testing.go:2101 +0x3a8
+FAIL	github.com/lanceman/zqk/cmd/zqk	1.107s
+FAIL
+
+
+--- run 2026-09-04T21:46:24Z ---

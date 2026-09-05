@@ -1,0 +1,44 @@
+
+--- run 2026-09-04T22:13:45Z ---
+=== RUN   TestConcurrencySpecGenerator
+=== PAUSE TestConcurrencySpecGenerator
+=== RUN   TestConcurrencyAPIGenerator
+=== PAUSE TestConcurrencyAPIGenerator
+=== RUN   TestConcurrencyConfigGenerator
+=== PAUSE TestConcurrencyConfigGenerator
+=== RUN   TestConcurrencyLifecycleGenerator
+=== PAUSE TestConcurrencyLifecycleGenerator
+=== RUN   TestConcurrencyProfileGenerator
+=== PAUSE TestConcurrencyProfileGenerator
+=== RUN   TestConcurrencyRoutingRuleGenerator
+=== PAUSE TestConcurrencyRoutingRuleGenerator
+=== RUN   TestConcurrencyTraitGenerator
+=== PAUSE TestConcurrencyTraitGenerator
+=== RUN   TestConcurrencyScenarioGenerator
+=== PAUSE TestConcurrencyScenarioGenerator
+=== RUN   TestConcurrencyBaseGenerator
+=== PAUSE TestConcurrencyBaseGenerator
+=== RUN   TestInstanceBuilderStatefulness
+=== PAUSE TestInstanceBuilderStatefulness
+=== CONT  TestConcurrencySpecGenerator
+=== CONT  TestConcurrencyLifecycleGenerator
+--- PASS: TestConcurrencyLifecycleGenerator (5.01s)
+=== CONT  TestConcurrencyConfigGenerator
+--- PASS: TestConcurrencyConfigGenerator (0.22s)
+=== CONT  TestConcurrencyAPIGenerator
+--- PASS: TestConcurrencyAPIGenerator (0.02s)
+=== CONT  TestInstanceBuilderStatefulness
+--- PASS: TestInstanceBuilderStatefulness (0.00s)
+=== CONT  TestConcurrencyBaseGenerator
+--- PASS: TestConcurrencyBaseGenerator (0.00s)
+=== CONT  TestConcurrencyRoutingRuleGenerator
+--- PASS: TestConcurrencyRoutingRuleGenerator (0.02s)
+=== CONT  TestConcurrencyTraitGenerator
+--- PASS: TestConcurrencyTraitGenerator (0.77s)
+=== CONT  TestConcurrencyScenarioGenerator
+--- PASS: TestConcurrencyScenarioGenerator (0.08s)
+=== CONT  TestConcurrencyProfileGenerator
+--- PASS: TestConcurrencyProfileGenerator (0.11s)
+--- PASS: TestConcurrencySpecGenerator (6.33s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/specbuilder	7.051s

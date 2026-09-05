@@ -1,0 +1,14 @@
+created_at: "2026-08-18T23:37:09Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1787096229703641000-0e5ed6da
+item_id: BLI-CEF-R2-ARCH-GLOBALS-DI
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 2857702ca28e4b64fb5782140b43c1400e68fdeab30ab0062f4119523ca97d466e5f13c72adcfa41b92eacf21fa7f0a79b8a8e3a8d7c581e5c9afe0e69cb31dc
+schema_version: 2.0.0
+signature: 3046022100d129ea941b61068dc7ef84894a3974b4e73eea4adc4bef1e230dec5e63cf7cfc022100babb62b71be430958c2006701c3c634b32e1d47dd411c97590da60ec5f8707a2
+status: archived
+title: Replace global scheduler/cache setter injection with explicit DI
+updated_at: "2026-09-01T07:27:56Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

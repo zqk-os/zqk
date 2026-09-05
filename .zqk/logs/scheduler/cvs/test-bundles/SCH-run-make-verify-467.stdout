@@ -1,0 +1,16 @@
+
+--- run 2026-09-04T22:13:35Z ---
+=== RUN   TestIsProbableGitWorktreeRoot
+=== PAUSE TestIsProbableGitWorktreeRoot
+=== RUN   TestRunIsolatedRootStrip_removesLayout
+=== PAUSE TestRunIsolatedRootStrip_removesLayout
+=== RUN   TestRunIsolatedRootStrip_skipsGitWorktree
+=== PAUSE TestRunIsolatedRootStrip_skipsGitWorktree
+=== CONT  TestIsProbableGitWorktreeRoot
+=== CONT  TestRunIsolatedRootStrip_skipsGitWorktree
+--- PASS: TestIsProbableGitWorktreeRoot (0.01s)
+=== CONT  TestRunIsolatedRootStrip_removesLayout
+--- PASS: TestRunIsolatedRootStrip_skipsGitWorktree (0.02s)
+--- PASS: TestRunIsolatedRootStrip_removesLayout (0.01s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/projecttemp	0.346s

@@ -1,0 +1,44 @@
+
+--- run 2026-09-04T22:18:18Z ---
+=== RUN   TestBulkStatusWriterError
+=== PAUSE TestBulkStatusWriterError
+=== RUN   TestBulkDeleteOutcomeAllFailed
+=== PAUSE TestBulkDeleteOutcomeAllFailed
+=== RUN   TestCompressEventIDs
+=== PAUSE TestCompressEventIDs
+=== RUN   TestExtractCompareConsecutive
+=== PAUSE TestExtractCompareConsecutive
+=== RUN   TestMonthlyDir
+=== PAUSE TestMonthlyDir
+=== RUN   TestSummaryFilePath
+=== PAUSE TestSummaryFilePath
+=== RUN   TestDispatchBuffers
+=== PAUSE TestDispatchBuffers
+=== RUN   TestDispatchBufferAddFailsPersists
+=== PAUSE TestDispatchBufferAddFailsPersists
+=== RUN   TestDispatchRetryClonesID
+=== PAUSE TestDispatchRetryClonesID
+=== RUN   TestDispatchPersistsWhenNotAggregated
+=== PAUSE TestDispatchPersistsWhenNotAggregated
+=== CONT  TestBulkStatusWriterError
+=== CONT  TestSummaryFilePath
+=== CONT  TestExtractCompareConsecutive
+=== CONT  TestCompressEventIDs
+=== CONT  TestBulkDeleteOutcomeAllFailed
+=== CONT  TestDispatchRetryClonesID
+--- PASS: TestBulkStatusWriterError (0.00s)
+=== CONT  TestMonthlyDir
+=== CONT  TestDispatchPersistsWhenNotAggregated
+--- PASS: TestSummaryFilePath (0.00s)
+--- PASS: TestExtractCompareConsecutive (0.00s)
+--- PASS: TestCompressEventIDs (0.00s)
+--- PASS: TestBulkDeleteOutcomeAllFailed (0.00s)
+--- PASS: TestMonthlyDir (0.00s)
+--- PASS: TestDispatchPersistsWhenNotAggregated (0.01s)
+--- PASS: TestDispatchRetryClonesID (0.01s)
+=== CONT  TestDispatchBuffers
+=== CONT  TestDispatchBufferAddFailsPersists
+--- PASS: TestDispatchBuffers (0.00s)
+--- PASS: TestDispatchBufferAddFailsPersists (0.00s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/storage/audit	0.513s

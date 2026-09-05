@@ -1,0 +1,20 @@
+actual_effort: 0.18h
+assignee_persona_ref: PER-ORCH-BETA
+backlog_item_ref: BLI-CEF-R27-TST-RCV-SEC-001
+branch_ref: integration/pri-cef-remediate-structure-001
+claimed_at: "2026-09-03T10:06:56Z"
+claimed_by: antigravity-2
+commit_hash: caf2a3294a89b413cca59438a4395f95e5ea0b3e
+completed_at: "2026-09-03T10:17:25Z"
+created_at: "2026-09-03T10:06:27Z"
+created_by: ACC-1785920548450214006-2e52b3e7
+id: ATK-1788429987963566000-f2f5183a
+kind: agent_task
+namespace_id: zqk:kernel
+schema_version: 2.0.0
+started_at: "2026-09-03T10:06:36Z"
+status: implemented
+title: Execute BLI-CEF-R27-TST-RCV-SEC-001
+updated_at: "2026-09-03T10:17:25Z"
+updated_by: ACC-1785920548450214006-2e52b3e7
+version_context: default

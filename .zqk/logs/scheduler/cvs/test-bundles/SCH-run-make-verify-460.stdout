@@ -1,0 +1,117 @@
+
+--- run 2026-09-04T22:13:38Z ---
+=== RUN   TestCommandSpec_ComparisonWithProgrammatic
+=== PAUSE TestCommandSpec_ComparisonWithProgrammatic
+=== RUN   TestApplyCommandSpecCoverageBaseline
+=== PAUSE TestApplyCommandSpecCoverageBaseline
+=== RUN   TestAnalyzeCommandSpecCoverageFindsUnspecifiedCommand
+=== PAUSE TestAnalyzeCommandSpecCoverageFindsUnspecifiedCommand
+=== RUN   TestCommandSpec_EndToEndScenario
+=== PAUSE TestCommandSpec_EndToEndScenario
+=== RUN   TestCommandSpec_GraphStorage
+=== PAUSE TestCommandSpec_GraphStorage
+=== RUN   TestCommandSpec_LoadFromYAML
+=== PAUSE TestCommandSpec_LoadFromYAML
+=== RUN   TestCRUDCommandSpec_LoadFromYAML
+=== PAUSE TestCRUDCommandSpec_LoadFromYAML
+=== RUN   TestCommandSpec_ExternalSpecReference
+=== PAUSE TestCommandSpec_ExternalSpecReference
+=== RUN   TestCommandSpec_Validation
+=== PAUSE TestCommandSpec_Validation
+=== RUN   TestCRUDCommandSpec_Validation
+=== PAUSE TestCRUDCommandSpec_Validation
+=== CONT  TestCommandSpec_ComparisonWithProgrammatic
+=== RUN   TestCommandSpec_ComparisonWithProgrammatic/get_command
+=== CONT  TestCommandSpec_LoadFromYAML
+=== RUN   TestCommandSpec_LoadFromYAML/get_command_spec
+=== RUN   TestCommandSpec_ComparisonWithProgrammatic/delete_command_(CRUD)
+=== RUN   TestCommandSpec_LoadFromYAML/delete_command_spec_(CRUD)
+--- PASS: TestCommandSpec_ComparisonWithProgrammatic (0.00s)
+    --- PASS: TestCommandSpec_ComparisonWithProgrammatic/get_command (0.00s)
+    --- PASS: TestCommandSpec_ComparisonWithProgrammatic/delete_command_(CRUD) (0.00s)
+=== CONT  TestCommandSpec_Validation
+=== RUN   TestCommandSpec_Validation/valid_spec
+=== RUN   TestCommandSpec_Validation/missing_name
+=== RUN   TestCommandSpec_Validation/missing_short_and_description
+=== RUN   TestCommandSpec_Validation/valid_with_description_only
+--- PASS: TestCommandSpec_Validation (0.00s)
+    --- PASS: TestCommandSpec_Validation/valid_spec (0.00s)
+    --- PASS: TestCommandSpec_Validation/missing_name (0.00s)
+    --- PASS: TestCommandSpec_Validation/missing_short_and_description (0.00s)
+    --- PASS: TestCommandSpec_Validation/valid_with_description_only (0.00s)
+=== CONT  TestCRUDCommandSpec_Validation
+=== RUN   TestCRUDCommandSpec_Validation/valid_CRUD_spec
+=== RUN   TestCRUDCommandSpec_Validation/missing_operation_type
+=== RUN   TestCRUDCommandSpec_Validation/invalid_operation_type
+--- PASS: TestCRUDCommandSpec_Validation (0.00s)
+    --- PASS: TestCRUDCommandSpec_Validation/valid_CRUD_spec (0.00s)
+    --- PASS: TestCRUDCommandSpec_Validation/missing_operation_type (0.00s)
+    --- PASS: TestCRUDCommandSpec_Validation/invalid_operation_type (0.00s)
+=== CONT  TestCommandSpec_EndToEndScenario
+--- PASS: TestCommandSpec_LoadFromYAML (0.00s)
+    --- PASS: TestCommandSpec_LoadFromYAML/get_command_spec (0.00s)
+    --- PASS: TestCommandSpec_LoadFromYAML/delete_command_spec_(CRUD) (0.00s)
+=== CONT  TestCommandSpec_GraphStorage
+=== RUN   TestCommandSpec_EndToEndScenario/CreateCommandSpecs
+=== NAME  TestCommandSpec_GraphStorage
+    command_spec_scenario_test.go:439: Created command specs: /var/folders/gb/31sgyvn551ld6l0zfk50yl8h0000gn/T/TestCommandSpec_GraphStorage271841238/001/.zqk/cli/specs/get_command.yaml, /var/folders/gb/31sgyvn551ld6l0zfk50yl8h0000gn/T/TestCommandSpec_GraphStorage271841238/001/.zqk/cli/specs/delete_command.yaml
+=== NAME  TestCommandSpec_EndToEndScenario/CreateCommandSpecs
+    command_spec_scenario_test.go:49: Created command specs: /var/folders/gb/31sgyvn551ld6l0zfk50yl8h0000gn/T/TestCommandSpec_EndToEndScenario3803679032/001/.zqk/cli/specs/get_command.yaml, /var/folders/gb/31sgyvn551ld6l0zfk50yl8h0000gn/T/TestCommandSpec_EndToEndScenario3803679032/001/.zqk/cli/specs/delete_command.yaml
+=== RUN   TestCommandSpec_EndToEndScenario/GenerateCommandBuilders
+    command_spec_scenario_test.go:54: Validated spec: delete_command.yaml (CRUD: true)
+=== NAME  TestCommandSpec_GraphStorage
+    command_spec_scenario_test.go:469: Command get <id> has 3 relationships
+    command_spec_scenario_test.go:469: Command delete <id> [flags] has 4 relationships
+    command_spec_scenario_test.go:513: Graph storage test passed: 2 nodes, 1 edges created
+=== NAME  TestCommandSpec_EndToEndScenario/GenerateCommandBuilders
+    command_spec_scenario_test.go:54: Validated spec: get_command.yaml (CRUD: false)
+    command_spec_scenario_test.go:54: Validated 2 command specs (codegen would generate builders from these)
+    command_spec_scenario_test.go:54: Note: Actual codegen would be done via: zqk system generate-command-builders --specs-dir /var/folders/gb/31sgyvn551ld6l0zfk50yl8h0000gn/T/TestCommandSpec_EndToEndScenario3803679032/001/.zqk/cli/specs
+=== RUN   TestCommandSpec_EndToEndScenario/BuildCommandSpecGraph
+    command_spec_scenario_test.go:59: Command delete <id> [flags] has 4 relationships
+    command_spec_scenario_test.go:59: Command get <id> has 3 relationships
+    command_spec_scenario_test.go:59: Graph built successfully with 2 command specs
+=== RUN   TestCommandSpec_EndToEndScenario/TestSemanticTraversal
+=== RUN   TestCommandSpec_EndToEndScenario/TestSemanticTraversal/ResolveAlias_tasks
+=== RUN   TestCommandSpec_EndToEndScenario/TestSemanticTraversal/ResolveAlias_add
+=== RUN   TestCommandSpec_EndToEndScenario/TestSemanticTraversal/ResolveAlias_get
+=== RUN   TestCommandSpec_EndToEndScenario/TestSemanticTraversal/ResolveAlias_remove
+=== NAME  TestCommandSpec_EndToEndScenario/TestSemanticTraversal
+    command_spec_scenario_test.go:64: Semantic traversal tests passed
+=== RUN   TestCommandSpec_EndToEndScenario/ValidateGeneratedCode
+    command_spec_scenario_test.go:69: Codegen validation: Specs are structured correctly for codegen
+    command_spec_scenario_test.go:69: To generate actual code, run: zqk system generate-command-builders
+    command_spec_scenario_test.go:69: Generated code would be in: pkg/cli/bldr_cli_cmd_v1/
+--- PASS: TestCommandSpec_GraphStorage (0.02s)
+=== CONT  TestCommandSpec_ExternalSpecReference
+--- PASS: TestCommandSpec_ExternalSpecReference (0.00s)
+=== CONT  TestCRUDCommandSpec_LoadFromYAML
+--- PASS: TestCRUDCommandSpec_LoadFromYAML (0.00s)
+=== CONT  TestAnalyzeCommandSpecCoverageFindsUnspecifiedCommand
+--- PASS: TestAnalyzeCommandSpecCoverageFindsUnspecifiedCommand (0.00s)
+=== CONT  TestApplyCommandSpecCoverageBaseline
+=== RUN   TestApplyCommandSpecCoverageBaseline/unchanged_historical_drift_passes
+=== PAUSE TestApplyCommandSpecCoverageBaseline/unchanged_historical_drift_passes
+=== RUN   TestApplyCommandSpecCoverageBaseline/new_unspecced_command_fails_closed
+=== PAUSE TestApplyCommandSpecCoverageBaseline/new_unspecced_command_fails_closed
+=== RUN   TestApplyCommandSpecCoverageBaseline/resolved_historical_drift_passes
+=== PAUSE TestApplyCommandSpecCoverageBaseline/resolved_historical_drift_passes
+=== CONT  TestApplyCommandSpecCoverageBaseline/unchanged_historical_drift_passes
+=== CONT  TestApplyCommandSpecCoverageBaseline/resolved_historical_drift_passes
+=== CONT  TestApplyCommandSpecCoverageBaseline/new_unspecced_command_fails_closed
+--- PASS: TestApplyCommandSpecCoverageBaseline (0.00s)
+    --- PASS: TestApplyCommandSpecCoverageBaseline/unchanged_historical_drift_passes (0.00s)
+    --- PASS: TestApplyCommandSpecCoverageBaseline/resolved_historical_drift_passes (0.00s)
+    --- PASS: TestApplyCommandSpecCoverageBaseline/new_unspecced_command_fails_closed (0.00s)
+--- PASS: TestCommandSpec_EndToEndScenario (0.03s)
+    --- PASS: TestCommandSpec_EndToEndScenario/CreateCommandSpecs (0.00s)
+    --- PASS: TestCommandSpec_EndToEndScenario/GenerateCommandBuilders (0.02s)
+    --- PASS: TestCommandSpec_EndToEndScenario/BuildCommandSpecGraph (0.00s)
+    --- PASS: TestCommandSpec_EndToEndScenario/TestSemanticTraversal (0.00s)
+        --- PASS: TestCommandSpec_EndToEndScenario/TestSemanticTraversal/ResolveAlias_tasks (0.00s)
+        --- PASS: TestCommandSpec_EndToEndScenario/TestSemanticTraversal/ResolveAlias_add (0.00s)
+        --- PASS: TestCommandSpec_EndToEndScenario/TestSemanticTraversal/ResolveAlias_get (0.00s)
+        --- PASS: TestCommandSpec_EndToEndScenario/TestSemanticTraversal/ResolveAlias_remove (0.00s)
+    --- PASS: TestCommandSpec_EndToEndScenario/ValidateGeneratedCode (0.00s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/cli	0.401s

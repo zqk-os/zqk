@@ -1,0 +1,141 @@
+{
+  "name": "make-verify-737",
+  "created_at": "2026-09-04T21:34:34.653447Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-737",
+    "Tests": [
+      {
+        "Name": "TestHighVolumeStreamStewardshipDrift_synthetic_aligned",
+        "Package": "datacellregistry",
+        "PackagePath": "pkg/datacellregistry",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/datacellregistry/registry_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestHighVolumeStreamStewardshipDrift_synthetic_missingKind",
+        "Package": "datacellregistry",
+        "PackagePath": "pkg/datacellregistry",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/datacellregistry/registry_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestHighVolumeStreamStewardshipDrift_synthetic_wrongProfile",
+        "Package": "datacellregistry",
+        "PackagePath": "pkg/datacellregistry",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/datacellregistry/registry_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestInvalidateDescriptorReadModelCache",
+        "Package": "datacellregistry",
+        "PackagePath": "pkg/datacellregistry",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/datacellregistry/registry_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestInvalidateDescriptorReadModelCache_equivalentProjectRoots",
+        "Package": "datacellregistry",
+        "PackagePath": "pkg/datacellregistry",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/datacellregistry/registry_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestDescriptorReadModelForProject_cacheHit",
+        "Package": "datacellregistry",
+        "PackagePath": "pkg/datacellregistry",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/datacellregistry/registry_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestDescriptorReadModelForProject_reloadsWhenSpecRevisionAdvances",
+        "Package": "datacellregistry",
+        "PackagePath": "pkg/datacellregistry",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/datacellregistry/registry_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 210000000000,
+    "PackagePath": "pkg/datacellregistry"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestHighVolumeStreamStewardshipDrift_synthetic_aligned",
+      "Package": "datacellregistry",
+      "PackagePath": "pkg/datacellregistry",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/datacellregistry/registry_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestHighVolumeStreamStewardshipDrift_synthetic_missingKind",
+      "Package": "datacellregistry",
+      "PackagePath": "pkg/datacellregistry",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/datacellregistry/registry_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestHighVolumeStreamStewardshipDrift_synthetic_wrongProfile",
+      "Package": "datacellregistry",
+      "PackagePath": "pkg/datacellregistry",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/datacellregistry/registry_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestInvalidateDescriptorReadModelCache",
+      "Package": "datacellregistry",
+      "PackagePath": "pkg/datacellregistry",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/datacellregistry/registry_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestInvalidateDescriptorReadModelCache_equivalentProjectRoots",
+      "Package": "datacellregistry",
+      "PackagePath": "pkg/datacellregistry",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/datacellregistry/registry_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestDescriptorReadModelForProject_cacheHit",
+      "Package": "datacellregistry",
+      "PackagePath": "pkg/datacellregistry",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/datacellregistry/registry_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestDescriptorReadModelForProject_reloadsWhenSpecRevisionAdvances",
+      "Package": "datacellregistry",
+      "PackagePath": "pkg/datacellregistry",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/datacellregistry/registry_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

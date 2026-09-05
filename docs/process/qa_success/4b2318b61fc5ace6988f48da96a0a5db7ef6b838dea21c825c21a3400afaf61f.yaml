@@ -1,0 +1,14 @@
+created_at: "2026-08-20T04:53:21Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1787201600737484000-94c0272c
+item_id: CRIT-CEF-R8K-ARCH-003
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 2857702ca28e4b64fb5782140b43c1400e68fdeab30ab0062f4119523ca97d466e5f13c72adcfa41b92eacf21fa7f0a79b8a8e3a8d7c581e5c9afe0e69cb31dc
+schema_version: 2.0.0
+signature: 3046022100b335364c11ed672f4522c589f3c6b11551f3b75a5205975bd15842bfa5b6b738022100e01a9c7f05f37020846963526668b36ee6ba6da365e67f6118dbcee21d6705d9
+status: archived
+title: Resolved CRIT-CEF-R8K-ARCH-003
+updated_at: "2026-09-01T07:47:47Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

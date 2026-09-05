@@ -1,0 +1,105 @@
+{
+  "name": "make-verify-310",
+  "created_at": "2026-09-04T21:34:30.462862Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-310",
+    "Tests": [
+      {
+        "Name": "TestSignalAggregator",
+        "Package": "ambience",
+        "PackagePath": "pkg/ambience",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/ambience/aggregator_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestInMemoryEventMesh",
+        "Package": "ambience",
+        "PackagePath": "pkg/ambience",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/ambience/eventmesh_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestInMemoryEventMesh_CancelSubscription",
+        "Package": "ambience",
+        "PackagePath": "pkg/ambience",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/ambience/eventmesh_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestFSEventsEngine_PredictIntent",
+        "Package": "ambience",
+        "PackagePath": "pkg/ambience",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/ambience/fsevents_engine_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestFSEventsEngine_StartStop",
+        "Package": "ambience",
+        "PackagePath": "pkg/ambience",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/ambience/fsevents_engine_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 150000000000,
+    "PackagePath": "pkg/ambience"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestSignalAggregator",
+      "Package": "ambience",
+      "PackagePath": "pkg/ambience",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/ambience/aggregator_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestInMemoryEventMesh",
+      "Package": "ambience",
+      "PackagePath": "pkg/ambience",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/ambience/eventmesh_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestInMemoryEventMesh_CancelSubscription",
+      "Package": "ambience",
+      "PackagePath": "pkg/ambience",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/ambience/eventmesh_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestFSEventsEngine_PredictIntent",
+      "Package": "ambience",
+      "PackagePath": "pkg/ambience",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/ambience/fsevents_engine_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestFSEventsEngine_StartStop",
+      "Package": "ambience",
+      "PackagePath": "pkg/ambience",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/ambience/fsevents_engine_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

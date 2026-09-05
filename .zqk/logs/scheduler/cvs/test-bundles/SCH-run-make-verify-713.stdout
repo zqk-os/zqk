@@ -1,0 +1,70 @@
+
+--- run 2026-09-04T22:20:36Z ---
+=== RUN   TestEmitDependencyRefEventUsesSynchronousOperationalDelivery
+=== PAUSE TestEmitDependencyRefEventUsesSynchronousOperationalDelivery
+=== RUN   TestReserveDependencyEventRejectsDuplicateAndStale
+=== PAUSE TestReserveDependencyEventRejectsDuplicateAndStale
+=== RUN   TestDependencyRefTargetIDsIncludesPriorityPlanParent
+=== PAUSE TestDependencyRefTargetIDsIncludesPriorityPlanParent
+=== RUN   TestDependencyHopMetaTagsMembership
+=== PAUSE TestDependencyHopMetaTagsMembership
+=== RUN   TestDependencyPropagationSubscriber_IDAndEventTypes
+=== PAUSE TestDependencyPropagationSubscriber_IDAndEventTypes
+=== RUN   TestPriorityPlanShockwaveUpdates_Table
+=== PAUSE TestPriorityPlanShockwaveUpdates_Table
+=== RUN   TestPriorityPlanShockwaveUpdates_GlobalLoader
+=== PAUSE TestPriorityPlanShockwaveUpdates_GlobalLoader
+=== RUN   TestMilestoneShockwaveUpdates_LinkedBLIInProgress
+=== PAUSE TestMilestoneShockwaveUpdates_LinkedBLIInProgress
+=== RUN   TestGoalShockwaveUpdates_LinkedBLIInProgress
+=== PAUSE TestGoalShockwaveUpdates_LinkedBLIInProgress
+=== RUN   TestEffortStringUnset
+=== PAUSE TestEffortStringUnset
+=== CONT  TestEmitDependencyRefEventUsesSynchronousOperationalDelivery
+--- PASS: TestEmitDependencyRefEventUsesSynchronousOperationalDelivery (0.00s)
+=== CONT  TestEffortStringUnset
+--- PASS: TestEffortStringUnset (0.00s)
+=== CONT  TestGoalShockwaveUpdates_LinkedBLIInProgress
+=== CONT  TestDependencyPropagationSubscriber_IDAndEventTypes
+--- PASS: TestDependencyPropagationSubscriber_IDAndEventTypes (0.00s)
+=== CONT  TestPriorityPlanShockwaveUpdates_GlobalLoader
+--- PASS: TestGoalShockwaveUpdates_LinkedBLIInProgress (0.01s)
+=== CONT  TestMilestoneShockwaveUpdates_LinkedBLIInProgress
+--- PASS: TestMilestoneShockwaveUpdates_LinkedBLIInProgress (0.00s)
+=== CONT  TestPriorityPlanShockwaveUpdates_Table
+--- PASS: TestPriorityPlanShockwaveUpdates_GlobalLoader (0.00s)
+=== CONT  TestDependencyRefTargetIDsIncludesPriorityPlanParent
+--- PASS: TestDependencyRefTargetIDsIncludesPriorityPlanParent (0.00s)
+=== CONT  TestDependencyHopMetaTagsMembership
+--- PASS: TestDependencyHopMetaTagsMembership (0.00s)
+=== CONT  TestReserveDependencyEventRejectsDuplicateAndStale
+--- PASS: TestReserveDependencyEventRejectsDuplicateAndStale (0.00s)
+=== RUN   TestPriorityPlanShockwaveUpdates_Table/active+in_progress
+=== RUN   TestPriorityPlanShockwaveUpdates_Table/grooming+in_progress
+=== RUN   TestPriorityPlanShockwaveUpdates_Table/paused+in_progress
+=== RUN   TestPriorityPlanShockwaveUpdates_Table/blocked+in_progress
+=== RUN   TestPriorityPlanShockwaveUpdates_Table/in_progress+in_progress
+=== RUN   TestPriorityPlanShockwaveUpdates_Table/active+planned
+=== RUN   TestPriorityPlanShockwaveUpdates_Table/active+complete
+=== RUN   TestPriorityPlanShockwaveUpdates_Table/grooming+planned
+=== RUN   TestPriorityPlanShockwaveUpdates_Table/in_progress+exploring
+=== RUN   TestPriorityPlanShockwaveUpdates_Table/active+validated
+=== RUN   TestPriorityPlanShockwaveUpdates_Table/active+exploring
+=== RUN   TestPriorityPlanShockwaveUpdates_Table/grooming+exploring
+=== RUN   TestPriorityPlanShockwaveUpdates_Table/non_bli_trigger
+--- PASS: TestPriorityPlanShockwaveUpdates_Table (0.00s)
+    --- PASS: TestPriorityPlanShockwaveUpdates_Table/active+in_progress (0.00s)
+    --- PASS: TestPriorityPlanShockwaveUpdates_Table/grooming+in_progress (0.00s)
+    --- PASS: TestPriorityPlanShockwaveUpdates_Table/paused+in_progress (0.00s)
+    --- PASS: TestPriorityPlanShockwaveUpdates_Table/blocked+in_progress (0.00s)
+    --- PASS: TestPriorityPlanShockwaveUpdates_Table/in_progress+in_progress (0.00s)
+    --- PASS: TestPriorityPlanShockwaveUpdates_Table/active+planned (0.00s)
+    --- PASS: TestPriorityPlanShockwaveUpdates_Table/active+complete (0.00s)
+    --- PASS: TestPriorityPlanShockwaveUpdates_Table/grooming+planned (0.00s)
+    --- PASS: TestPriorityPlanShockwaveUpdates_Table/in_progress+exploring (0.00s)
+    --- PASS: TestPriorityPlanShockwaveUpdates_Table/active+validated (0.00s)
+    --- PASS: TestPriorityPlanShockwaveUpdates_Table/active+exploring (0.00s)
+    --- PASS: TestPriorityPlanShockwaveUpdates_Table/grooming+exploring (0.00s)
+    --- PASS: TestPriorityPlanShockwaveUpdates_Table/non_bli_trigger (0.00s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/lifecycle	0.604s

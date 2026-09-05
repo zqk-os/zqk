@@ -1,0 +1,14 @@
+created_at: "2026-08-19T07:14:25Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1787123662542647000-4de4ef07
+item_id: BLI-MEGA-CHILD-051
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 2857702ca28e4b64fb5782140b43c1400e68fdeab30ab0062f4119523ca97d466e5f13c72adcfa41b92eacf21fa7f0a79b8a8e3a8d7c581e5c9afe0e69cb31dc
+schema_version: 2.0.0
+signature: 3045022100b85a33945aaf604be62a260f87c6419bfda1b9b6fd2c12cd30b6d8c8539f6df802200aa7906cb1441d85bf86d70547e229100d69ea22b9944f6c1808b8ab21c829fb
+status: archived
+title: PPlan CLI follow-ups positional fallback shockwave validation logger compliance and remove guard
+updated_at: "2026-09-01T07:42:24Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

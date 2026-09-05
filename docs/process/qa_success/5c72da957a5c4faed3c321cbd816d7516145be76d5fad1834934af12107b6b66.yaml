@@ -1,0 +1,14 @@
+created_at: "2026-08-19T00:28:49Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1787099329193949000-2668624b
+item_id: BLI-CEF-R2-SUP-SECRET-SCAN
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 2857702ca28e4b64fb5782140b43c1400e68fdeab30ab0062f4119523ca97d466e5f13c72adcfa41b92eacf21fa7f0a79b8a8e3a8d7c581e5c9afe0e69cb31dc
+schema_version: 2.0.0
+signature: 3046022100e4592f712291811626779df400c87078fa4ea5a5bfc4c66ecdcd894ebb3c6780022100a99d4140347c94830078b6dc439fd09f62a274b5c1b01c9dada1b2a71cb0ca60
+status: archived
+title: Add automated secret scanning to CI
+updated_at: "2026-09-01T07:21:16Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

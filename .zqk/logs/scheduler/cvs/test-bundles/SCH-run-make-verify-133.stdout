@@ -1,0 +1,110 @@
+
+--- run 2026-09-04T21:39:44Z ---
+=== RUN   TestNamespaceRegistry_LoadDefaultNamespaces
+=== PAUSE TestNamespaceRegistry_LoadDefaultNamespaces
+=== RUN   TestDiscoverSpecsDirForRegistry
+=== PAUSE TestDiscoverSpecsDirForRegistry
+=== RUN   TestNewNamespaceRegistry_WithSpecsDir
+=== PAUSE TestNewNamespaceRegistry_WithSpecsDir
+=== RUN   TestNewNamespaceRegistry_WithInvalidSpecsDir
+=== PAUSE TestNewNamespaceRegistry_WithInvalidSpecsDir
+=== RUN   TestNamespaceRegistry_LoadNamespaceFromSpec
+=== PAUSE TestNamespaceRegistry_LoadNamespaceFromSpec
+=== RUN   TestNamespaceRegistry_GetSubordinateNamespaces
+=== PAUSE TestNamespaceRegistry_GetSubordinateNamespaces
+=== RUN   TestNamespaceRegistry_IsSubordinateOf
+=== PAUSE TestNamespaceRegistry_IsSubordinateOf
+=== RUN   TestNamespaceRegistry_GetParentNamespace
+=== PAUSE TestNamespaceRegistry_GetParentNamespace
+=== RUN   TestNamespaceRegistry_LoadSubordinateNamespaces
+=== PAUSE TestNamespaceRegistry_LoadSubordinateNamespaces
+=== RUN   TestValidateCrossNamespaceReference
+=== PAUSE TestValidateCrossNamespaceReference
+=== CONT  TestNamespaceRegistry_LoadDefaultNamespaces
+=== CONT  TestNamespaceRegistry_GetSubordinateNamespaces
+=== RUN   TestNamespaceRegistry_GetSubordinateNamespaces/zqk:kernel
+=== RUN   TestNamespaceRegistry_GetSubordinateNamespaces/domain:organizational
+=== RUN   TestNamespaceRegistry_GetSubordinateNamespaces/nonexistent:namespace
+=== CONT  TestNamespaceRegistry_LoadSubordinateNamespaces
+--- PASS: TestNamespaceRegistry_GetSubordinateNamespaces (0.09s)
+    --- PASS: TestNamespaceRegistry_GetSubordinateNamespaces/zqk:kernel (0.00s)
+    --- PASS: TestNamespaceRegistry_GetSubordinateNamespaces/domain:organizational (0.00s)
+    --- PASS: TestNamespaceRegistry_GetSubordinateNamespaces/nonexistent:namespace (0.00s)
+--- PASS: TestNamespaceRegistry_LoadDefaultNamespaces (0.09s)
+=== CONT  TestValidateCrossNamespaceReference
+=== RUN   TestValidateCrossNamespaceReference/same_namespace_allowed
+=== RUN   TestValidateCrossNamespaceReference/allowed_cross-namespace_reference
+=== RUN   TestValidateCrossNamespaceReference/kernel_can_always_be_referenced
+=== RUN   TestValidateCrossNamespaceReference/missing_namespace_info_allows_by_default
+--- PASS: TestValidateCrossNamespaceReference (0.00s)
+    --- PASS: TestValidateCrossNamespaceReference/same_namespace_allowed (0.00s)
+    --- PASS: TestValidateCrossNamespaceReference/allowed_cross-namespace_reference (0.00s)
+    --- PASS: TestValidateCrossNamespaceReference/kernel_can_always_be_referenced (0.00s)
+    --- PASS: TestValidateCrossNamespaceReference/missing_namespace_info_allows_by_default (0.00s)
+=== CONT  TestNamespaceRegistry_GetParentNamespace
+=== RUN   TestNamespaceRegistry_GetParentNamespace/DefaultNamespaceKernel:cli_parent_is_DefaultNamespaceKernel
+=== RUN   TestNamespaceRegistry_GetParentNamespace/DefaultNamespaceKernel:metrics_parent_is_DefaultNamespaceKernel
+=== RUN   TestNamespaceRegistry_GetParentNamespace/DefaultNamespaceKernel:storage_parent_is_DefaultNamespaceKernel
+=== RUN   TestNamespaceRegistry_GetParentNamespace/Nested_subordinate_namespace_parent_extraction
+=== RUN   TestNamespaceRegistry_GetParentNamespace/DefaultNamespaceKernel_parent_is_zqk_(root_namespace)
+=== RUN   TestNamespaceRegistry_GetParentNamespace/domain:organizational_parent_is_domain_(root_namespace)
+=== RUN   TestNamespaceRegistry_GetParentNamespace/Invalid_format_returns_empty_string
+=== RUN   TestNamespaceRegistry_GetParentNamespace/Empty_string_returns_empty_string
+--- PASS: TestNamespaceRegistry_GetParentNamespace (0.00s)
+    --- PASS: TestNamespaceRegistry_GetParentNamespace/DefaultNamespaceKernel:cli_parent_is_DefaultNamespaceKernel (0.00s)
+    --- PASS: TestNamespaceRegistry_GetParentNamespace/DefaultNamespaceKernel:metrics_parent_is_DefaultNamespaceKernel (0.00s)
+    --- PASS: TestNamespaceRegistry_GetParentNamespace/DefaultNamespaceKernel:storage_parent_is_DefaultNamespaceKernel (0.00s)
+    --- PASS: TestNamespaceRegistry_GetParentNamespace/Nested_subordinate_namespace_parent_extraction (0.00s)
+    --- PASS: TestNamespaceRegistry_GetParentNamespace/DefaultNamespaceKernel_parent_is_zqk_(root_namespace) (0.00s)
+    --- PASS: TestNamespaceRegistry_GetParentNamespace/domain:organizational_parent_is_domain_(root_namespace) (0.00s)
+    --- PASS: TestNamespaceRegistry_GetParentNamespace/Invalid_format_returns_empty_string (0.00s)
+    --- PASS: TestNamespaceRegistry_GetParentNamespace/Empty_string_returns_empty_string (0.00s)
+=== CONT  TestNamespaceRegistry_IsSubordinateOf
+=== RUN   TestNamespaceRegistry_IsSubordinateOf/DefaultNamespaceKernel:cli_is_subordinate_to_DefaultNamespaceKernel
+=== RUN   TestNamespaceRegistry_IsSubordinateOf/DefaultNamespaceKernel:metrics_is_subordinate_to_DefaultNamespaceKernel
+=== RUN   TestNamespaceRegistry_IsSubordinateOf/DefaultNamespaceKernel:storage_is_subordinate_to_DefaultNamespaceKernel
+=== RUN   TestNamespaceRegistry_IsSubordinateOf/Namespace_is_not_subordinate_to_itself
+=== RUN   TestNamespaceRegistry_IsSubordinateOf/Sibling_namespaces_are_not_subordinate_to_each_other
+=== RUN   TestNamespaceRegistry_IsSubordinateOf/Domain_namespace_is_not_subordinate_to_kernel
+=== RUN   TestNamespaceRegistry_IsSubordinateOf/Nested_subordinate_namespace_(DefaultNamespaceKernel:cli:sub_is_subordinate_to_DefaultNamespaceKernel:cli)
+--- PASS: TestNamespaceRegistry_IsSubordinateOf (0.00s)
+    --- PASS: TestNamespaceRegistry_IsSubordinateOf/DefaultNamespaceKernel:cli_is_subordinate_to_DefaultNamespaceKernel (0.00s)
+    --- PASS: TestNamespaceRegistry_IsSubordinateOf/DefaultNamespaceKernel:metrics_is_subordinate_to_DefaultNamespaceKernel (0.00s)
+    --- PASS: TestNamespaceRegistry_IsSubordinateOf/DefaultNamespaceKernel:storage_is_subordinate_to_DefaultNamespaceKernel (0.00s)
+    --- PASS: TestNamespaceRegistry_IsSubordinateOf/Namespace_is_not_subordinate_to_itself (0.00s)
+    --- PASS: TestNamespaceRegistry_IsSubordinateOf/Sibling_namespaces_are_not_subordinate_to_each_other (0.00s)
+    --- PASS: TestNamespaceRegistry_IsSubordinateOf/Domain_namespace_is_not_subordinate_to_kernel (0.00s)
+    --- PASS: TestNamespaceRegistry_IsSubordinateOf/Nested_subordinate_namespace_(DefaultNamespaceKernel:cli:sub_is_subordinate_to_DefaultNamespaceKernel:cli) (0.00s)
+=== CONT  TestNewNamespaceRegistry_WithInvalidSpecsDir
+--- PASS: TestNewNamespaceRegistry_WithInvalidSpecsDir (0.00s)
+=== CONT  TestNamespaceRegistry_LoadNamespaceFromSpec
+=== RUN   TestNamespaceRegistry_LoadNamespaceFromSpec/explicit_namespace_id
+=== RUN   TestNamespaceRegistry_LoadNamespaceFromSpec/namespace_field
+=== RUN   TestNamespaceRegistry_LoadNamespaceFromSpec/fields.namespace_id.validation.default
+=== RUN   TestNamespaceRegistry_LoadNamespaceFromSpec/ontology_field_used_when_kind_missing
+=== RUN   TestNamespaceRegistry_LoadNamespaceFromSpec/infer_from_ontology
+=== RUN   TestNamespaceRegistry_LoadNamespaceFromSpec/infer_from_kind_parameter
+=== RUN   TestNamespaceRegistry_LoadNamespaceFromSpec/invalid_YAML
+=== RUN   TestNamespaceRegistry_LoadNamespaceFromSpec/missing_file
+=== RUN   TestNamespaceRegistry_LoadNamespaceFromSpec/empty_spec
+=== RUN   TestNamespaceRegistry_LoadNamespaceFromSpec/precedence:_namespace_id_over_namespace
+=== RUN   TestNamespaceRegistry_LoadNamespaceFromSpec/precedence:_namespace_over_fields_default
+--- PASS: TestNamespaceRegistry_LoadNamespaceFromSpec (0.04s)
+    --- PASS: TestNamespaceRegistry_LoadNamespaceFromSpec/explicit_namespace_id (0.00s)
+    --- PASS: TestNamespaceRegistry_LoadNamespaceFromSpec/namespace_field (0.01s)
+    --- PASS: TestNamespaceRegistry_LoadNamespaceFromSpec/fields.namespace_id.validation.default (0.00s)
+    --- PASS: TestNamespaceRegistry_LoadNamespaceFromSpec/ontology_field_used_when_kind_missing (0.00s)
+    --- PASS: TestNamespaceRegistry_LoadNamespaceFromSpec/infer_from_ontology (0.00s)
+    --- PASS: TestNamespaceRegistry_LoadNamespaceFromSpec/infer_from_kind_parameter (0.00s)
+    --- PASS: TestNamespaceRegistry_LoadNamespaceFromSpec/invalid_YAML (0.00s)
+    --- PASS: TestNamespaceRegistry_LoadNamespaceFromSpec/missing_file (0.00s)
+    --- PASS: TestNamespaceRegistry_LoadNamespaceFromSpec/empty_spec (0.00s)
+    --- PASS: TestNamespaceRegistry_LoadNamespaceFromSpec/precedence:_namespace_id_over_namespace (0.01s)
+    --- PASS: TestNamespaceRegistry_LoadNamespaceFromSpec/precedence:_namespace_over_fields_default (0.00s)
+=== CONT  TestNewNamespaceRegistry_WithSpecsDir
+--- PASS: TestNewNamespaceRegistry_WithSpecsDir (0.00s)
+=== CONT  TestDiscoverSpecsDirForRegistry
+--- PASS: TestNamespaceRegistry_LoadSubordinateNamespaces (0.10s)
+--- PASS: TestDiscoverSpecsDirForRegistry (0.09s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/validation	0.825s

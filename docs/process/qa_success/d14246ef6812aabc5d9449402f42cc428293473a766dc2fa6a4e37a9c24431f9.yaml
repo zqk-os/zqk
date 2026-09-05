@@ -1,0 +1,14 @@
+created_at: "2026-08-19T00:30:52Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1787099440484818000-89f79cc5
+item_id: BLI-CEF-R2-TST-RACE-GREEN-PROOF
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 2857702ca28e4b64fb5782140b43c1400e68fdeab30ab0062f4119523ca97d466e5f13c72adcfa41b92eacf21fa7f0a79b8a8e3a8d7c581e5c9afe0e69cb31dc
+schema_version: 2.0.0
+signature: 304402200857dfdc50336c4a80eaf98c84f50ba3169262f0fbd139b21bd3912644175089022073d4c2b179bf36756592e063c90855439d8b6e47e36ca29def871a132ea907d7
+status: archived
+title: Cite green race-hot-packages CI run on main
+updated_at: "2026-09-01T07:17:42Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

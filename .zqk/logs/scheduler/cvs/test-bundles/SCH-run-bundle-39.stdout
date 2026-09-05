@@ -1,0 +1,44 @@
+
+--- run 2026-09-05T05:23:36Z ---
+=== RUN   TestCapOrchestratorHandler_hasOpenTaskForPlan_DraftPlane
+=== PAUSE TestCapOrchestratorHandler_hasOpenTaskForPlan_DraftPlane
+=== RUN   TestDecodeCAPPlanOutputIgnoresTrailingLogs
+=== PAUSE TestDecodeCAPPlanOutputIgnoresTrailingLogs
+=== RUN   TestDecodeCAPPlanOutputRejectsMalformedModelOutput
+=== PAUSE TestDecodeCAPPlanOutputRejectsMalformedModelOutput
+=== RUN   TestCAPDispatchPlanIDsPrimaryFirst
+=== PAUSE TestCAPDispatchPlanIDsPrimaryFirst
+=== RUN   TestNestPlanWorkstreamsIncludesUnassignedBacklog
+=== PAUSE TestNestPlanWorkstreamsIncludesUnassignedBacklog
+=== RUN   TestExecuteDispatchStage_LeadEmptyColumnIgnoresCompleteShovelReady
+=== PAUSE TestExecuteDispatchStage_LeadEmptyColumnIgnoresCompleteShovelReady
+=== RUN   TestExecuteDispatchStage_LeadDorGapWhenOpenNotShovelReady
+=== PAUSE TestExecuteDispatchStage_LeadDorGapWhenOpenNotShovelReady
+=== RUN   TestCAPStageAttemptCeiling
+=== PAUSE TestCAPStageAttemptCeiling
+=== RUN   TestMarkStageEnteredResetsQuarantineAfterRetryWindow
+=== PAUSE TestMarkStageEnteredResetsQuarantineAfterRetryWindow
+=== RUN   TestMarkStageEnteredResetsQuarantineWhenCVSScopeChanges
+=== PAUSE TestMarkStageEnteredResetsQuarantineWhenCVSScopeChanges
+=== CONT  TestCapOrchestratorHandler_hasOpenTaskForPlan_DraftPlane
+=== CONT  TestExecuteDispatchStage_LeadEmptyColumnIgnoresCompleteShovelReady
+--- PASS: TestCapOrchestratorHandler_hasOpenTaskForPlan_DraftPlane (0.01s)
+=== CONT  TestCAPDispatchPlanIDsPrimaryFirst
+--- PASS: TestCAPDispatchPlanIDsPrimaryFirst (0.00s)
+=== CONT  TestNestPlanWorkstreamsIncludesUnassignedBacklog
+--- PASS: TestNestPlanWorkstreamsIncludesUnassignedBacklog (0.00s)
+=== CONT  TestDecodeCAPPlanOutputRejectsMalformedModelOutput
+--- PASS: TestDecodeCAPPlanOutputRejectsMalformedModelOutput (0.00s)
+=== CONT  TestDecodeCAPPlanOutputIgnoresTrailingLogs
+--- PASS: TestDecodeCAPPlanOutputIgnoresTrailingLogs (0.00s)
+=== CONT  TestMarkStageEnteredResetsQuarantineAfterRetryWindow
+--- PASS: TestMarkStageEnteredResetsQuarantineAfterRetryWindow (0.01s)
+=== CONT  TestMarkStageEnteredResetsQuarantineWhenCVSScopeChanges
+--- PASS: TestMarkStageEnteredResetsQuarantineWhenCVSScopeChanges (0.01s)
+=== CONT  TestCAPStageAttemptCeiling
+--- PASS: TestCAPStageAttemptCeiling (0.00s)
+=== CONT  TestExecuteDispatchStage_LeadDorGapWhenOpenNotShovelReady
+--- PASS: TestExecuteDispatchStage_LeadEmptyColumnIgnoresCompleteShovelReady (0.30s)
+--- PASS: TestExecuteDispatchStage_LeadDorGapWhenOpenNotShovelReady (0.55s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/scheduler	1.393s

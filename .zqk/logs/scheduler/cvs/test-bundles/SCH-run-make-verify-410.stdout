@@ -1,0 +1,32 @@
+
+--- run 2026-09-04T22:12:53Z ---
+=== RUN   TestRun_auditable_dryRun_softFinalize
+=== PAUSE TestRun_auditable_dryRun_softFinalize
+=== RUN   TestBuildSpecOriginationPipeline_invalidOptions
+=== PAUSE TestBuildSpecOriginationPipeline_invalidOptions
+=== RUN   TestYAMLConfigDocSchemaHeaderIsIdempotent
+=== PAUSE TestYAMLConfigDocSchemaHeaderIsIdempotent
+=== RUN   TestStageNames_unique
+=== PAUSE TestStageNames_unique
+=== RUN   TestTruncateRunes
+=== PAUSE TestTruncateRunes
+=== RUN   TestAdminTriggerBinaryPath
+=== PAUSE TestAdminTriggerBinaryPath
+=== RUN   TestValidateOptions
+=== PAUSE TestValidateOptions
+=== CONT  TestRun_auditable_dryRun_softFinalize
+=== CONT  TestTruncateRunes
+--- PASS: TestTruncateRunes (0.00s)
+=== CONT  TestValidateOptions
+--- PASS: TestValidateOptions (0.00s)
+=== CONT  TestAdminTriggerBinaryPath
+--- PASS: TestAdminTriggerBinaryPath (0.00s)
+=== CONT  TestYAMLConfigDocSchemaHeaderIsIdempotent
+--- PASS: TestYAMLConfigDocSchemaHeaderIsIdempotent (0.02s)
+=== CONT  TestStageNames_unique
+--- PASS: TestStageNames_unique (0.00s)
+=== CONT  TestBuildSpecOriginationPipeline_invalidOptions
+--- PASS: TestBuildSpecOriginationPipeline_invalidOptions (0.00s)
+--- PASS: TestRun_auditable_dryRun_softFinalize (0.02s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/specorigination	0.795s

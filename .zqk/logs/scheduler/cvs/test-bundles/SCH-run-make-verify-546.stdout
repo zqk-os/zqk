@@ -1,0 +1,68 @@
+
+--- run 2026-09-04T22:16:04Z ---
+=== RUN   TestAgentPromptPreferredNextAction_prefersPersistedOperatorText
+=== PAUSE TestAgentPromptPreferredNextAction_prefersPersistedOperatorText
+=== RUN   TestMergeObjectUpdateBodyPreservingOperatorNextAction_keepsHandoff
+=== PAUSE TestMergeObjectUpdateBodyPreservingOperatorNextAction_keepsHandoff
+=== RUN   TestMergeObjectUpdateBodyPreservingOperatorNextAction_replacesWhenSuggestedHasReruns
+=== PAUSE TestMergeObjectUpdateBodyPreservingOperatorNextAction_replacesWhenSuggestedHasReruns
+=== RUN   TestMergeObjectUpdateBodyPreservingOperatorNextAction_noPreserveShortExisting
+=== PAUSE TestMergeObjectUpdateBodyPreservingOperatorNextAction_noPreserveShortExisting
+=== RUN   TestMergeObjectUpdateBodyPreservingCurrentPhaseOnDegradedSnapshot_keepsLaterPhase
+=== PAUSE TestMergeObjectUpdateBodyPreservingCurrentPhaseOnDegradedSnapshot_keepsLaterPhase
+=== RUN   TestMergeObjectUpdateBodyPreservingCurrentPhaseOnDegradedSnapshot_patchesActivityLogPhase
+=== PAUSE TestMergeObjectUpdateBodyPreservingCurrentPhaseOnDegradedSnapshot_patchesActivityLogPhase
+=== RUN   TestMergeObjectUpdateBodyPreservingCurrentPhaseOnDegradedSnapshot_allowsMeasurementWhenHealthy
+=== PAUSE TestMergeObjectUpdateBodyPreservingCurrentPhaseOnDegradedSnapshot_allowsMeasurementWhenHealthy
+=== RUN   TestResolvePhaseRoutingProfile_customForArbitraryFlowVariant
+=== PAUSE TestResolvePhaseRoutingProfile_customForArbitraryFlowVariant
+=== RUN   TestResolvePhaseRoutingProfile_codeQualityVariants
+=== PAUSE TestResolvePhaseRoutingProfile_codeQualityVariants
+=== RUN   TestEvaluateConvergencePredicateReadiness
+=== PAUSE TestEvaluateConvergencePredicateReadiness
+=== CONT  TestAgentPromptPreferredNextAction_prefersPersistedOperatorText
+=== CONT  TestMergeObjectUpdateBodyPreservingCurrentPhaseOnDegradedSnapshot_patchesActivityLogPhase
+--- PASS: TestAgentPromptPreferredNextAction_prefersPersistedOperatorText (0.00s)
+=== CONT  TestMergeObjectUpdateBodyPreservingOperatorNextAction_noPreserveShortExisting
+--- PASS: TestMergeObjectUpdateBodyPreservingOperatorNextAction_noPreserveShortExisting (0.00s)
+=== CONT  TestMergeObjectUpdateBodyPreservingCurrentPhaseOnDegradedSnapshot_keepsLaterPhase
+=== CONT  TestResolvePhaseRoutingProfile_codeQualityVariants
+=== CONT  TestEvaluateConvergencePredicateReadiness
+=== RUN   TestResolvePhaseRoutingProfile_codeQualityVariants/code_quality_go_matrix
+--- PASS: TestMergeObjectUpdateBodyPreservingCurrentPhaseOnDegradedSnapshot_patchesActivityLogPhase (0.00s)
+--- PASS: TestMergeObjectUpdateBodyPreservingCurrentPhaseOnDegradedSnapshot_keepsLaterPhase (0.00s)
+--- PASS: TestEvaluateConvergencePredicateReadiness (0.00s)
+=== CONT  TestResolvePhaseRoutingProfile_customForArbitraryFlowVariant
+=== PAUSE TestResolvePhaseRoutingProfile_codeQualityVariants/code_quality_go_matrix
+--- PASS: TestResolvePhaseRoutingProfile_customForArbitraryFlowVariant (0.00s)
+=== CONT  TestMergeObjectUpdateBodyPreservingCurrentPhaseOnDegradedSnapshot_allowsMeasurementWhenHealthy
+--- PASS: TestMergeObjectUpdateBodyPreservingCurrentPhaseOnDegradedSnapshot_allowsMeasurementWhenHealthy (0.00s)
+=== RUN   TestResolvePhaseRoutingProfile_codeQualityVariants/code_quality_drift_and_standardization
+=== PAUSE TestResolvePhaseRoutingProfile_codeQualityVariants/code_quality_drift_and_standardization
+=== RUN   TestResolvePhaseRoutingProfile_codeQualityVariants/vetting_matrix_c6
+=== PAUSE TestResolvePhaseRoutingProfile_codeQualityVariants/vetting_matrix_c6
+=== RUN   TestResolvePhaseRoutingProfile_codeQualityVariants/expertise_docs_and_alpha_prep
+=== PAUSE TestResolvePhaseRoutingProfile_codeQualityVariants/expertise_docs_and_alpha_prep
+=== RUN   TestResolvePhaseRoutingProfile_codeQualityVariants/bli_documentation_delivery
+=== PAUSE TestResolvePhaseRoutingProfile_codeQualityVariants/bli_documentation_delivery
+=== RUN   TestResolvePhaseRoutingProfile_codeQualityVariants/product_delivery_datacell
+=== PAUSE TestResolvePhaseRoutingProfile_codeQualityVariants/product_delivery_datacell
+=== CONT  TestMergeObjectUpdateBodyPreservingOperatorNextAction_replacesWhenSuggestedHasReruns
+--- PASS: TestMergeObjectUpdateBodyPreservingOperatorNextAction_replacesWhenSuggestedHasReruns (0.00s)
+=== CONT  TestMergeObjectUpdateBodyPreservingOperatorNextAction_keepsHandoff
+--- PASS: TestMergeObjectUpdateBodyPreservingOperatorNextAction_keepsHandoff (0.00s)
+=== CONT  TestResolvePhaseRoutingProfile_codeQualityVariants/product_delivery_datacell
+=== CONT  TestResolvePhaseRoutingProfile_codeQualityVariants/bli_documentation_delivery
+=== CONT  TestResolvePhaseRoutingProfile_codeQualityVariants/expertise_docs_and_alpha_prep
+=== CONT  TestResolvePhaseRoutingProfile_codeQualityVariants/vetting_matrix_c6
+=== CONT  TestResolvePhaseRoutingProfile_codeQualityVariants/code_quality_drift_and_standardization
+=== CONT  TestResolvePhaseRoutingProfile_codeQualityVariants/code_quality_go_matrix
+--- PASS: TestResolvePhaseRoutingProfile_codeQualityVariants (0.00s)
+    --- PASS: TestResolvePhaseRoutingProfile_codeQualityVariants/product_delivery_datacell (0.00s)
+    --- PASS: TestResolvePhaseRoutingProfile_codeQualityVariants/bli_documentation_delivery (0.00s)
+    --- PASS: TestResolvePhaseRoutingProfile_codeQualityVariants/expertise_docs_and_alpha_prep (0.00s)
+    --- PASS: TestResolvePhaseRoutingProfile_codeQualityVariants/vetting_matrix_c6 (0.00s)
+    --- PASS: TestResolvePhaseRoutingProfile_codeQualityVariants/code_quality_drift_and_standardization (0.00s)
+    --- PASS: TestResolvePhaseRoutingProfile_codeQualityVariants/code_quality_go_matrix (0.00s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/scheduler	0.669s

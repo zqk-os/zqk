@@ -1,0 +1,54 @@
+
+--- run 2026-09-04T22:13:34Z ---
+=== RUN   TestCommandBuilder_WithSubcommands
+=== PAUSE TestCommandBuilder_WithSubcommands
+=== RUN   TestCommandBuilder_WithCommonFlags
+=== PAUSE TestCommandBuilder_WithCommonFlags
+=== RUN   TestCRUDCommandBuilder_Basic
+=== PAUSE TestCRUDCommandBuilder_Basic
+=== RUN   TestCRUDCommandBuilder_WithDataInputFlags
+=== PAUSE TestCRUDCommandBuilder_WithDataInputFlags
+=== RUN   TestCRUDCommandBuilder_WithUpdateFlags
+=== PAUSE TestCRUDCommandBuilder_WithUpdateFlags
+=== RUN   TestCRUDCommandBuilder_WithDryRunFlag
+=== PAUSE TestCRUDCommandBuilder_WithDryRunFlag
+=== RUN   TestCRUDCommandBuilder_WithCascadeFlag
+=== PAUSE TestCRUDCommandBuilder_WithCascadeFlag
+=== RUN   TestCRUDCommandBuilder_WithQueryFlags
+=== PAUSE TestCRUDCommandBuilder_WithQueryFlags
+=== RUN   TestCRUDCommandBuilder_MethodChaining
+=== PAUSE TestCRUDCommandBuilder_MethodChaining
+=== RUN   TestCommandBuilder_FlagTypes
+=== PAUSE TestCommandBuilder_FlagTypes
+=== CONT  TestCommandBuilder_WithSubcommands
+=== CONT  TestCRUDCommandBuilder_WithDryRunFlag
+--- PASS: TestCommandBuilder_WithSubcommands (0.00s)
+=== CONT  TestCRUDCommandBuilder_WithUpdateFlags
+--- PASS: TestCRUDCommandBuilder_WithUpdateFlags (0.00s)
+--- PASS: TestCRUDCommandBuilder_WithDryRunFlag (0.00s)
+=== CONT  TestCommandBuilder_FlagTypes
+=== RUN   TestCommandBuilder_FlagTypes/String_flag
+=== CONT  TestCRUDCommandBuilder_MethodChaining
+=== RUN   TestCommandBuilder_FlagTypes/Bool_flag
+--- PASS: TestCRUDCommandBuilder_MethodChaining (0.00s)
+=== CONT  TestCRUDCommandBuilder_Basic
+=== RUN   TestCommandBuilder_FlagTypes/Int_flag
+--- PASS: TestCRUDCommandBuilder_Basic (0.00s)
+=== CONT  TestCRUDCommandBuilder_WithDataInputFlags
+--- PASS: TestCRUDCommandBuilder_WithDataInputFlags (0.00s)
+=== CONT  TestCommandBuilder_WithCommonFlags
+--- PASS: TestCommandBuilder_WithCommonFlags (0.00s)
+=== CONT  TestCRUDCommandBuilder_WithQueryFlags
+=== RUN   TestCommandBuilder_FlagTypes/StringArray_flag
+--- PASS: TestCRUDCommandBuilder_WithQueryFlags (0.00s)
+=== CONT  TestCRUDCommandBuilder_WithCascadeFlag
+--- PASS: TestCRUDCommandBuilder_WithCascadeFlag (0.00s)
+=== RUN   TestCommandBuilder_FlagTypes/StringSlice_flag
+--- PASS: TestCommandBuilder_FlagTypes (0.00s)
+    --- PASS: TestCommandBuilder_FlagTypes/String_flag (0.00s)
+    --- PASS: TestCommandBuilder_FlagTypes/Bool_flag (0.00s)
+    --- PASS: TestCommandBuilder_FlagTypes/Int_flag (0.00s)
+    --- PASS: TestCommandBuilder_FlagTypes/StringArray_flag (0.00s)
+    --- PASS: TestCommandBuilder_FlagTypes/StringSlice_flag (0.00s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/cli	0.312s

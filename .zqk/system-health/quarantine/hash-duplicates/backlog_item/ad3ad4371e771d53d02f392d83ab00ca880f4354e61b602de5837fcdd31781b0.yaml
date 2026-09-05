@@ -1,0 +1,39 @@
+created_at: "2026-08-31T19:38:31Z"
+created_by: ACC-1785920548450214012-68b850c0
+criteria_refs:
+    - CRIT-LAUNCH-PUBLIC-PAYLOAD-001
+description: |
+    Rebuild public-candidate; run scripts/check-public-release-payload.sh until
+    exit 0. Do not push. Do not write public_push_ack.json. Tracked by
+    RIS-LAUNCH-PUBLIC-PAYLOAD-001.
+estimated_effort: 2d
+goal_refs:
+    - GOAL-OSS-CORE
+    - GOAL-LAUNCH-READINESS
+id: BLI-LAUNCH-PUBLIC-PAYLOAD-001
+kind: backlog_item
+milestone_refs:
+    - MIL-CEF-R2-M2-ARCH
+namespace_id: zqk:kernel
+persona_refs:
+    - PER-ORCH-ALPHA
+priority: high
+priority_plan_ref: PRI-OPENCORE-PUBLISH-001
+priority_tier: P0
+problem_statement: |
+    Fork-prepare payload BLI is complete but check-public-release-payload.sh
+    still FAILs. That is a launch blocker distinct from CEF diamond.
+related_object_refs:
+    - RIS-LAUNCH-PUBLIC-PAYLOAD-001
+    - BLI-COMMUNITY-FORK-PAYLOAD-001
+requirement_refs:
+    - REQ-1788578670920203000-85901500
+schema_version: 2.0.0
+started_at: "2026-09-05T03:24:43Z"
+status: in_progress
+title: Drive public-release payload check to green (no push)
+updated_at: "2026-09-05T03:35:32Z"
+updated_by: ACC-1785920548450214006-2e52b3e7
+version_context: default
+workstream_refs:
+    - WS-CEF-RELIABILITY

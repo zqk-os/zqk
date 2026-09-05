@@ -1,0 +1,44 @@
+
+--- run 2026-09-04T22:11:14Z ---
+=== RUN   TestSchedulerJobTypeForEnvelopeToken_examples
+=== PAUSE TestSchedulerJobTypeForEnvelopeToken_examples
+=== RUN   TestLoggingCellCoordinator_nilSafe
+=== PAUSE TestLoggingCellCoordinator_nilSafe
+=== RUN   TestLoggingCellCoordinator_InfoUsesMaintenanceEnqueueLogKey
+=== PAUSE TestLoggingCellCoordinator_InfoUsesMaintenanceEnqueueLogKey
+=== RUN   TestLoggingCellCoordinator_delegatesToInner
+=== PAUSE TestLoggingCellCoordinator_delegatesToInner
+=== RUN   TestReadRuntimeManifest_MissingOK
+=== PAUSE TestReadRuntimeManifest_MissingOK
+=== RUN   TestReadRuntimeManifest_WithFile
+=== PAUSE TestReadRuntimeManifest_WithFile
+=== RUN   TestReadRuntimeManifest_InvalidJSON
+=== PAUSE TestReadRuntimeManifest_InvalidJSON
+=== RUN   TestEffectiveProtocolVersion_EmptyStringUsesConstant
+=== PAUSE TestEffectiveProtocolVersion_EmptyStringUsesConstant
+=== RUN   TestReadModelIsStale
+=== PAUSE TestReadModelIsStale
+=== RUN   TestMaxSpecRevision
+=== PAUSE TestMaxSpecRevision
+=== CONT  TestSchedulerJobTypeForEnvelopeToken_examples
+--- PASS: TestSchedulerJobTypeForEnvelopeToken_examples (0.00s)
+=== CONT  TestMaxSpecRevision
+--- PASS: TestMaxSpecRevision (0.00s)
+=== CONT  TestReadModelIsStale
+--- PASS: TestReadModelIsStale (0.00s)
+=== CONT  TestLoggingCellCoordinator_delegatesToInner
+=== CONT  TestReadRuntimeManifest_MissingOK
+--- PASS: TestLoggingCellCoordinator_delegatesToInner (0.00s)
+=== CONT  TestLoggingCellCoordinator_InfoUsesMaintenanceEnqueueLogKey
+--- PASS: TestLoggingCellCoordinator_InfoUsesMaintenanceEnqueueLogKey (0.00s)
+=== CONT  TestLoggingCellCoordinator_nilSafe
+--- PASS: TestLoggingCellCoordinator_nilSafe (0.00s)
+=== CONT  TestReadRuntimeManifest_InvalidJSON
+--- PASS: TestReadRuntimeManifest_MissingOK (0.00s)
+=== CONT  TestEffectiveProtocolVersion_EmptyStringUsesConstant
+--- PASS: TestEffectiveProtocolVersion_EmptyStringUsesConstant (0.00s)
+=== CONT  TestReadRuntimeManifest_WithFile
+--- PASS: TestReadRuntimeManifest_InvalidJSON (0.01s)
+--- PASS: TestReadRuntimeManifest_WithFile (0.01s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/datacell	0.599s

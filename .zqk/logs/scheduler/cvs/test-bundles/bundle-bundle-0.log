@@ -1,0 +1,12 @@
+
+--- run 2026-09-04T22:23:26Z ---
+FAIL	github.com/lanceman/zqk/cmd/zqk/agent [build failed]
+FAIL
+
+
+--- run 2026-09-04T22:23:26Z ---
+# github.com/lanceman/zqk/cmd/zqk/agent [github.com/lanceman/zqk/cmd/zqk/agent.test]
+cmd/zqk/agent/docs_eval_evidence_test.go:23:12: undefined: countDocsEvalFindings
+cmd/zqk/agent/docs_eval_evidence_test.go:28:11: undefined: countDocsEvalFindings
+cmd/zqk/agent/docs_eval_evidence_test.go:40:12: undefined: countDocsEvalFindings
+cmd/zqk/agent/docs_eval_evidence_test.go:56:12: undefined: countDocsEvalFindings

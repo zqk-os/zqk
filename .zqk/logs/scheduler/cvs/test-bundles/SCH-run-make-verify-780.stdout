@@ -1,0 +1,116 @@
+
+--- run 2026-09-04T22:21:32Z ---
+=== RUN   TestDynamicKindMapper_GetKindFromDirectory
+=== PAUSE TestDynamicKindMapper_GetKindFromDirectory
+=== RUN   TestDynamicKindMapper_GetAllKinds
+=== PAUSE TestDynamicKindMapper_GetAllKinds
+=== RUN   TestGetKindFromDirectory
+=== PAUSE TestGetKindFromDirectory
+=== RUN   TestGetDirectoryFromKind
+=== PAUSE TestGetDirectoryFromKind
+=== RUN   TestMappingsAreBidirectional
+=== PAUSE TestMappingsAreBidirectional
+=== RUN   TestKindSynonymResolver_LoadFromStorage
+=== PAUSE TestKindSynonymResolver_LoadFromStorage
+=== RUN   TestKindSynonymResolver_DeduplicatePerTargetKind
+=== PAUSE TestKindSynonymResolver_DeduplicatePerTargetKind
+=== RUN   TestKindSynonymResolver_CrossKindConflictResolution
+=== PAUSE TestKindSynonymResolver_CrossKindConflictResolution
+=== RUN   TestKindSynonymResolver_SetSynonymLoader_ResetsState
+=== PAUSE TestKindSynonymResolver_SetSynonymLoader_ResetsState
+=== RUN   TestKindSynonymResolver_ValidateUniqueness
+=== PAUSE TestKindSynonymResolver_ValidateUniqueness
+=== CONT  TestDynamicKindMapper_GetKindFromDirectory
+=== CONT  TestKindSynonymResolver_LoadFromStorage
+=== RUN   TestKindSynonymResolver_LoadFromStorage/bi
+=== RUN   TestKindSynonymResolver_LoadFromStorage/BI
+=== RUN   TestKindSynonymResolver_LoadFromStorage/bli
+=== RUN   TestKindSynonymResolver_LoadFromStorage/pp
+=== RUN   TestKindSynonymResolver_LoadFromStorage/backlog_item
+=== RUN   TestKindSynonymResolver_LoadFromStorage/unknown
+--- PASS: TestKindSynonymResolver_LoadFromStorage (0.00s)
+    --- PASS: TestKindSynonymResolver_LoadFromStorage/bi (0.00s)
+    --- PASS: TestKindSynonymResolver_LoadFromStorage/BI (0.00s)
+    --- PASS: TestKindSynonymResolver_LoadFromStorage/bli (0.00s)
+    --- PASS: TestKindSynonymResolver_LoadFromStorage/pp (0.00s)
+    --- PASS: TestKindSynonymResolver_LoadFromStorage/backlog_item (0.00s)
+    --- PASS: TestKindSynonymResolver_LoadFromStorage/unknown (0.00s)
+=== CONT  TestGetDirectoryFromKind
+=== RUN   TestGetDirectoryFromKind/backlog_item
+=== RUN   TestGetDirectoryFromKind/goal
+=== RUN   TestGetDirectoryFromKind/milestone
+=== RUN   TestGetDirectoryFromKind/workstream
+=== RUN   TestGetDirectoryFromKind/priority_plan
+=== RUN   TestGetDirectoryFromKind/criteria
+=== RUN   TestGetDirectoryFromKind/requirement
+=== RUN   TestGetDirectoryFromKind/test_case
+=== RUN   TestGetDirectoryFromKind/roadmap
+=== RUN   TestGetDirectoryFromKind/decision
+=== RUN   TestGetDirectoryFromKind/account
+=== RUN   TestGetDirectoryFromKind/team_configuration
+=== RUN   TestGetDirectoryFromKind/maturation_report
+=== RUN   TestGetDirectoryFromKind/organizational_change
+=== RUN   TestGetDirectoryFromKind/impact_analysis
+=== RUN   TestGetDirectoryFromKind/unknown
+--- PASS: TestDynamicKindMapper_GetKindFromDirectory (0.34s)
+=== CONT  TestMappingsAreBidirectional
+--- PASS: TestGetDirectoryFromKind (0.33s)
+    --- PASS: TestGetDirectoryFromKind/backlog_item (0.00s)
+    --- PASS: TestGetDirectoryFromKind/goal (0.00s)
+    --- PASS: TestGetDirectoryFromKind/milestone (0.00s)
+    --- PASS: TestGetDirectoryFromKind/workstream (0.00s)
+    --- PASS: TestGetDirectoryFromKind/priority_plan (0.00s)
+    --- PASS: TestGetDirectoryFromKind/criteria (0.00s)
+    --- PASS: TestGetDirectoryFromKind/requirement (0.00s)
+    --- PASS: TestGetDirectoryFromKind/test_case (0.00s)
+    --- PASS: TestGetDirectoryFromKind/roadmap (0.00s)
+    --- PASS: TestGetDirectoryFromKind/decision (0.00s)
+    --- PASS: TestGetDirectoryFromKind/account (0.00s)
+    --- PASS: TestGetDirectoryFromKind/team_configuration (0.00s)
+    --- PASS: TestGetDirectoryFromKind/maturation_report (0.00s)
+    --- PASS: TestGetDirectoryFromKind/organizational_change (0.00s)
+    --- PASS: TestGetDirectoryFromKind/impact_analysis (0.00s)
+    --- PASS: TestGetDirectoryFromKind/unknown (0.33s)
+=== CONT  TestKindSynonymResolver_SetSynonymLoader_ResetsState
+--- PASS: TestKindSynonymResolver_SetSynonymLoader_ResetsState (0.00s)
+=== CONT  TestKindSynonymResolver_ValidateUniqueness
+--- PASS: TestKindSynonymResolver_ValidateUniqueness (0.00s)
+=== CONT  TestGetKindFromDirectory
+=== RUN   TestGetKindFromDirectory/backlog
+=== RUN   TestGetKindFromDirectory/goals
+=== RUN   TestGetKindFromDirectory/milestones
+=== RUN   TestGetKindFromDirectory/workstreams
+=== RUN   TestGetKindFromDirectory/priority_plans
+=== RUN   TestGetKindFromDirectory/criteria
+--- PASS: TestMappingsAreBidirectional (0.00s)
+=== CONT  TestKindSynonymResolver_CrossKindConflictResolution
+=== RUN   TestGetKindFromDirectory/requirements
+--- PASS: TestKindSynonymResolver_CrossKindConflictResolution (0.00s)
+=== CONT  TestDynamicKindMapper_GetAllKinds
+=== RUN   TestGetKindFromDirectory/tests
+=== RUN   TestGetKindFromDirectory/roadmaps
+=== RUN   TestGetKindFromDirectory/decisions
+=== RUN   TestGetKindFromDirectory/decision
+=== NAME  TestDynamicKindMapper_GetAllKinds
+    kind_mappings_dynamic_test.go:77: Discovered 90 kinds: [scheduler_handler_binding requirement organization workstream_transition code_reference rule scenario auto_fix_rule resolver backlog_item glossary_term agent_onboarding_preparation prompt_template audit_event goal kind_synonym certificate change_journal_entry technical_debt milestone agent_skill evolution_management test_case strategic_context command_metric code_quality_metric agent_architecture mcp_session criteria division kind_mapping_metric agent_instruction team_configuration test_audit_aggregation_metric bucketing_strategy department important_date extensible_object mcp_spec partnership account stakeholder_profile glossary_term_relation vision template roadmap priority_plan integrity_manifest release decision workstream watchdog_registration agent_feed audit_event_aggregation persona lifecycle rollback_report import_tracking keystore_entry organizational_change qa_success role test_command_rule impact_analysis mission risk_blocker agent_task display auth_strategy corporate_initiative vocabulary_scheme mcp_built_in_tool base_metric audit_aggregation_metric maturation_report team remote_kernel scheduler_job scheduler_health_metric component context_refresh_schedule doc_entry question policy metadata_package file_lock_metric workflow strategic_plan pipeline verification_matrix]
+--- PASS: TestDynamicKindMapper_GetAllKinds (0.00s)
+=== CONT  TestKindSynonymResolver_DeduplicatePerTargetKind
+--- PASS: TestKindSynonymResolver_DeduplicatePerTargetKind (0.00s)
+=== RUN   TestGetKindFromDirectory/accounts
+=== RUN   TestGetKindFromDirectory/unknown
+--- PASS: TestGetKindFromDirectory (0.00s)
+    --- PASS: TestGetKindFromDirectory/backlog (0.00s)
+    --- PASS: TestGetKindFromDirectory/goals (0.00s)
+    --- PASS: TestGetKindFromDirectory/milestones (0.00s)
+    --- PASS: TestGetKindFromDirectory/workstreams (0.00s)
+    --- PASS: TestGetKindFromDirectory/priority_plans (0.00s)
+    --- PASS: TestGetKindFromDirectory/criteria (0.00s)
+    --- PASS: TestGetKindFromDirectory/requirements (0.00s)
+    --- PASS: TestGetKindFromDirectory/tests (0.00s)
+    --- PASS: TestGetKindFromDirectory/roadmaps (0.00s)
+    --- PASS: TestGetKindFromDirectory/decisions (0.00s)
+    --- PASS: TestGetKindFromDirectory/decision (0.00s)
+    --- PASS: TestGetKindFromDirectory/accounts (0.00s)
+    --- PASS: TestGetKindFromDirectory/unknown (0.00s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/objects	0.887s

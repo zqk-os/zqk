@@ -1,0 +1,51 @@
+{
+  "name": "make-verify-101",
+  "created_at": "2026-09-04T21:34:28.360501Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-101",
+    "Tests": [
+      {
+        "Name": "TestDoc",
+        "Package": "loader_test",
+        "PackagePath": "pkg/loader",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/loader/doc_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestLoaderInit",
+        "Package": "loader",
+        "PackagePath": "pkg/loader",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/loader/loader_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 60000000000,
+    "PackagePath": "pkg/loader"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestDoc",
+      "Package": "loader_test",
+      "PackagePath": "pkg/loader",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/loader/doc_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestLoaderInit",
+      "Package": "loader",
+      "PackagePath": "pkg/loader",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/loader/loader_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

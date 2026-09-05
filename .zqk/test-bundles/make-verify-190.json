@@ -1,0 +1,141 @@
+{
+  "name": "make-verify-190",
+  "created_at": "2026-09-04T21:34:29.258926Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-190",
+    "Tests": [
+      {
+        "Name": "TestObjectWAL_ReplayLargeLine",
+        "Package": "wal",
+        "PackagePath": "pkg/storage/wal",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/wal/object_wal_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestObjectWAL_RejectLongID",
+        "Package": "wal",
+        "PackagePath": "pkg/storage/wal",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/wal/object_wal_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestObjectWAL_RejectOversizedLine",
+        "Package": "wal",
+        "PackagePath": "pkg/storage/wal",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/wal/object_wal_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestObjectWAL_MigrateEmptyCanonicalWithLegacyData",
+        "Package": "wal",
+        "PackagePath": "pkg/storage/wal",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/wal/object_wal_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestObjectWAL_CloseReturnsFlushError",
+        "Package": "wal",
+        "PackagePath": "pkg/storage/wal",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/wal/object_wal_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestObjectWAL_CrashRecoveryMidWriteReplay",
+        "Package": "wal",
+        "PackagePath": "pkg/storage/wal",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/wal/object_wal_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestWALLogging",
+        "Package": "wal_test",
+        "PackagePath": "pkg/storage/wal",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/wal/wal_logging_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 630000000000,
+    "PackagePath": "pkg/storage/wal"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestObjectWAL_ReplayLargeLine",
+      "Package": "wal",
+      "PackagePath": "pkg/storage/wal",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/wal/object_wal_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestObjectWAL_RejectLongID",
+      "Package": "wal",
+      "PackagePath": "pkg/storage/wal",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/wal/object_wal_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestObjectWAL_RejectOversizedLine",
+      "Package": "wal",
+      "PackagePath": "pkg/storage/wal",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/wal/object_wal_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestObjectWAL_MigrateEmptyCanonicalWithLegacyData",
+      "Package": "wal",
+      "PackagePath": "pkg/storage/wal",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/wal/object_wal_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestObjectWAL_CloseReturnsFlushError",
+      "Package": "wal",
+      "PackagePath": "pkg/storage/wal",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/wal/object_wal_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestObjectWAL_CrashRecoveryMidWriteReplay",
+      "Package": "wal",
+      "PackagePath": "pkg/storage/wal",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/wal/object_wal_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestWALLogging",
+      "Package": "wal_test",
+      "PackagePath": "pkg/storage/wal",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/wal/wal_logging_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    }
+  }
+}

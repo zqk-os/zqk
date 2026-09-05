@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-263",
+  "created_at": "2026-09-04T21:34:30.000407Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-263",
+    "Tests": [
+      {
+        "Name": "TestSubmitJobSetsHighPriority",
+        "Package": "scheduler",
+        "PackagePath": "cmd/zqk/scheduler",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/scheduler/submit_trigger_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestCLI_TestFailuresConvergence_JSON_Integration",
+        "Package": "scheduler",
+        "PackagePath": "cmd/zqk/scheduler",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/scheduler/test_failures_convergence_cli_integration_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestCLI_TestFailuresConvergence_JSON_Integration_FailingHealthYieldsDivergence",
+        "Package": "scheduler",
+        "PackagePath": "cmd/zqk/scheduler",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/scheduler/test_failures_convergence_cli_integration_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestBuildPredictionDebrief_DecreasingFingerprintMatched",
+        "Package": "scheduler",
+        "PackagePath": "cmd/zqk/scheduler",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/scheduler/test_failures_convergence_debrief_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestBuildPredictionDebrief_Mismatched",
+        "Package": "scheduler",
+        "PackagePath": "cmd/zqk/scheduler",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/scheduler/test_failures_convergence_debrief_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestMarshalConvergence_FinalizeDebriefIncludesPredictions",
+        "Package": "scheduler",
+        "PackagePath": "cmd/zqk/scheduler",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/scheduler/test_failures_convergence_debrief_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestMarshalConvergenceOutputJSON_WithoutSessionID",
+        "Package": "scheduler",
+        "PackagePath": "cmd/zqk/scheduler",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/scheduler/test_failures_convergence_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestMarshalConvergenceOutputJSON_IncludesRollupStatusCoreWhenProvided",
+        "Package": "scheduler",
+        "PackagePath": "cmd/zqk/scheduler",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/scheduler/test_failures_convergence_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestMarshalConvergenceOutputJSON_WithSessionID",
+        "Package": "scheduler",
+        "PackagePath": "cmd/zqk/scheduler",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/scheduler/test_failures_convergence_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestMarshalConvergenceOutputJSON_StampTombstone",
+        "Package": "scheduler",
+        "PackagePath": "cmd/zqk/scheduler",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/scheduler/test_failures_convergence_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 300000000000,
+    "PackagePath": "cmd/zqk/scheduler"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestSubmitJobSetsHighPriority",
+      "Package": "scheduler",
+      "PackagePath": "cmd/zqk/scheduler",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/scheduler/submit_trigger_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestCLI_TestFailuresConvergence_JSON_Integration",
+      "Package": "scheduler",
+      "PackagePath": "cmd/zqk/scheduler",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/scheduler/test_failures_convergence_cli_integration_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestCLI_TestFailuresConvergence_JSON_Integration_FailingHealthYieldsDivergence",
+      "Package": "scheduler",
+      "PackagePath": "cmd/zqk/scheduler",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/scheduler/test_failures_convergence_cli_integration_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestBuildPredictionDebrief_DecreasingFingerprintMatched",
+      "Package": "scheduler",
+      "PackagePath": "cmd/zqk/scheduler",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/scheduler/test_failures_convergence_debrief_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestBuildPredictionDebrief_Mismatched",
+      "Package": "scheduler",
+      "PackagePath": "cmd/zqk/scheduler",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/scheduler/test_failures_convergence_debrief_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestMarshalConvergence_FinalizeDebriefIncludesPredictions",
+      "Package": "scheduler",
+      "PackagePath": "cmd/zqk/scheduler",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/scheduler/test_failures_convergence_debrief_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestMarshalConvergenceOutputJSON_WithoutSessionID",
+      "Package": "scheduler",
+      "PackagePath": "cmd/zqk/scheduler",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/scheduler/test_failures_convergence_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestMarshalConvergenceOutputJSON_IncludesRollupStatusCoreWhenProvided",
+      "Package": "scheduler",
+      "PackagePath": "cmd/zqk/scheduler",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/scheduler/test_failures_convergence_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestMarshalConvergenceOutputJSON_WithSessionID",
+      "Package": "scheduler",
+      "PackagePath": "cmd/zqk/scheduler",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/scheduler/test_failures_convergence_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestMarshalConvergenceOutputJSON_StampTombstone",
+      "Package": "scheduler",
+      "PackagePath": "cmd/zqk/scheduler",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/scheduler/test_failures_convergence_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

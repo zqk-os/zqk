@@ -1,0 +1,14 @@
+created_at: "2026-08-19T06:48:34Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1787122110319611000-6a98c913
+item_id: REDACTED
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 2857702ca28e4b64fb5782140b43c1400e68fdeab30ab0062f4119523ca97d466e5f13c72adcfa41b92eacf21fa7f0a79b8a8e3a8d7c581e5c9afe0e69cb31dc
+schema_version: 2.0.0
+signature: 3045022037365e07d71037b9ef2042096f29ab0e4c543c3710e09ca6e73029babde585f6022100e10613edc38d8a117ed72862dc4eb44c52c090e843e25df2ac80ccb02c32a99c
+status: archived
+title: Kernel public-object crevice sweep — fixtures, AGI CAP mint, skill content gates
+updated_at: "2026-09-01T07:06:28Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

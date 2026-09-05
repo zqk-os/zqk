@@ -1,0 +1,14 @@
+created_at: "2026-08-19T01:31:57Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1787103116594170000-a92f3d67
+item_id: REDACTED
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 2857702ca28e4b64fb5782140b43c1400e68fdeab30ab0062f4119523ca97d466e5f13c72adcfa41b92eacf21fa7f0a79b8a8e3a8d7c581e5c9afe0e69cb31dc
+schema_version: 2.0.0
+signature: 304402201c995dcb1e6a0126874ba2184b5aa68b0bc3728d1fa120b40dfdc49e9cc6593202204a34ae5256d59f3d36aaaef436382d9280f0435175bd8321a6d8e593ed4a6927
+status: archived
+title: RUBRIC lists L6_duplicative_ids
+updated_at: "2026-09-01T07:47:19Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

@@ -1,0 +1,22 @@
+Migrate data between file-based and graph backends.
+
+This command requires the migration binary to be installed and verified.
+The binary must be code-signed and pass integrity verification.
+
+The migration tool is a separate binary that can be installed via:
+  - go install github.com/lanceman/zqk/cmd/zqk-migrate@latest
+  - Download from: https://github.com/lanceman/zqk/releases
+
+  Migrate from file to graph backend
+  zqk utility migrate --source . --target memgraph
+  Migrate specific phase
+  zqk utility migrate --source . --target memgraph --phase entity
+
+Usage:
+  zqk utility migrate [flags]
+
+Flags:
+      --phase string                Migration phase (document, entity, relationship, all)
+      --source string               Source path for migration
+      --target string               Target backend (memgraph, neo4j, file)
+      --version-constraint string   Version constraint (e.g., '>=1.0.0', '^1.0.0', '>=1.0.0 <2.0.0')

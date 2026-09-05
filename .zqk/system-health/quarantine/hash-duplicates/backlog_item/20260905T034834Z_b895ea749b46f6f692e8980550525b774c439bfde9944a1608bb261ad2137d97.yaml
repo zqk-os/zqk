@@ -1,0 +1,42 @@
+acceptance_considerations: Acceptance recorded as linked criteria; no narrative captured at migration time.
+actual_effort: 3h
+commit_refs:
+    - 376caa9c67
+created_at: "2026-08-05T05:45:36Z"
+created_by: ACC-1785920548450214012-68b850c0
+criteria_refs:
+    - CRIT-1785939733055006000-48037555
+    - CRIT-1785939734077802000-6e765e3b
+    - CRIT-1785939734964632000-3af9251a
+    - CRIT-1786697464558157000-0f464934
+description: |
+    Fix the flat object -h list that interleaves create/list/count/splan/<kind>/backlog_item. Partition help (and optionally machine-readable object kinds --format json) so operators can enumerate countable kinds without false positives. Pair with BLI splan alias resolve. Evidence: for x in $(object -h scrape); do object count $x; done fails on verbs and aliases.
+estimated_effort: 4h
+goal_refs:
+    - GOAL-1785885763755750000-6efcb274
+id: BLI-1785908736395909000-25c4884e
+kind: backlog_item
+milestone_refs:
+    - MIL-1785886016336815000-ad6784be
+namespace_id: zqk:kernel
+owner_ref: ACC-1785920548450214012-68b850c0
+percent_complete: 100
+persona_refs:
+    - PER-1781486416823404000-bce2c1ce
+    - PER-1781729127486291000-fc620920
+priority: high
+priority_tier: P1
+problem_statement: 'Fix the flat object -h list that interleaves create/list/count/splan/<kind>/backlog_item. Partition help (and optionally machine-readable object kinds --format json) so operators can enumerate countable kinds without false positives. Pair with BLI splan alias resolve. Evidence: for x in $(object -h scrape); do object count $x; done fails on verbs and aliases.'
+related_object_refs:
+    - REQ-1785908734512726000-0db5c98e
+    - CRIT-1785908735462279000-6d37037a
+    - BLI-1785907446155489000-2d7f745b
+    - BLI-1785903708509306000-a6d8dc5b
+requirement_refs:
+    - REQ-1785908734512726000-0db5c98e
+schema_version: 2.0.0
+status: archived
+title: 'MMORCH before-launch P1: Partition object help — verbs vs shortcuts vs kinds'
+updated_at: "2026-08-19T04:51:54Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

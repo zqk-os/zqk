@@ -1,0 +1,33 @@
+{
+  "name": "make-verify-294",
+  "created_at": "2026-09-04T21:34:30.286585Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-294",
+    "Tests": [
+      {
+        "Name": "TestIndustrialCortex_BattleLoad",
+        "Package": "integration",
+        "PackagePath": "integration",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/integration/cortex_battle_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 30000000000,
+    "PackagePath": "integration"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestIndustrialCortex_BattleLoad",
+      "Package": "integration",
+      "PackagePath": "integration",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/integration/cortex_battle_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

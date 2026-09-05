@@ -1,0 +1,14 @@
+created_at: "2026-08-20T01:38:35Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1787189914372203000-d05dec8d
+item_id: BLI-CEF-R8-P0-SUPPLY-REAL-001
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 2857702ca28e4b64fb5782140b43c1400e68fdeab30ab0062f4119523ca97d466e5f13c72adcfa41b92eacf21fa7f0a79b8a8e3a8d7c581e5c9afe0e69cb31dc
+schema_version: 2.0.0
+signature: 304502202669dc5ce6b62feb73e5237bd241fd22e01f77b448087abe9f92c76176252a1d022100e4b4cf89538c5e303392df317a7de0d46b9862c80e58773570d24b3534b87462
+status: archived
+title: QA success QAS-1787189914372203000-d05dec8d
+updated_at: "2026-09-01T07:24:33Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

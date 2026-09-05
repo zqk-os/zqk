@@ -1,0 +1,14 @@
+created_at: "2026-08-18T22:14:26Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1787091261163682000-bc57594e
+item_id: CRIT-CEF-R2-REL-OIDCACHE-SWALLOW-A
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 2857702ca28e4b64fb5782140b43c1400e68fdeab30ab0062f4119523ca97d466e5f13c72adcfa41b92eacf21fa7f0a79b8a8e3a8d7c581e5c9afe0e69cb31dc
+schema_version: 2.0.0
+signature: 3046022100c46f1b5d6da7c863bbd9993331d0d940d2b6fd8132ce3ef75f2ec834c3c023f3022100dcd7493be98cbb1b59c57206fdfe032e6c6417b9f1195cc244c5c502cdbfb1cf
+status: archived
+title: QA success QAS-1787091261163682000-bc57594e
+updated_at: "2026-09-01T07:25:55Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

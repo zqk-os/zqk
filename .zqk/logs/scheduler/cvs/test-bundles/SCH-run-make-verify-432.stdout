@@ -1,0 +1,44 @@
+
+--- run 2026-09-04T22:13:02Z ---
+=== RUN   TestEventLogger_LogSpecLoad
+=== PAUSE TestEventLogger_LogSpecLoad
+=== RUN   TestEventLogger_LogSpecValidation
+=== PAUSE TestEventLogger_LogSpecValidation
+=== RUN   TestEventLogger_LogCheckResult
+=== PAUSE TestEventLogger_LogCheckResult
+=== RUN   TestEventLogger_LogObjectCheck
+=== PAUSE TestEventLogger_LogObjectCheck
+=== RUN   TestEventLogger_LogFileOperation
+=== PAUSE TestEventLogger_LogFileOperation
+=== RUN   TestEventLogger_LogHashOperation
+=== PAUSE TestEventLogger_LogHashOperation
+=== RUN   TestEventLogger_WithObjectRef
+=== PAUSE TestEventLogger_WithObjectRef
+=== RUN   TestNewEventLogger
+=== PAUSE TestNewEventLogger
+=== RUN   TestFluentWarnChainsFields
+=== PAUSE TestFluentWarnChainsFields
+=== RUN   TestFluentCommonFieldHelpers
+=== PAUSE TestFluentCommonFieldHelpers
+=== CONT  TestEventLogger_LogSpecLoad
+=== CONT  TestEventLogger_LogHashOperation
+--- PASS: TestEventLogger_LogHashOperation (0.00s)
+=== CONT  TestEventLogger_LogFileOperation
+=== CONT  TestEventLogger_LogCheckResult
+=== CONT  TestEventLogger_LogObjectCheck
+=== CONT  TestEventLogger_LogSpecValidation
+=== CONT  TestFluentWarnChainsFields
+=== CONT  TestFluentCommonFieldHelpers
+=== CONT  TestEventLogger_WithObjectRef
+=== CONT  TestNewEventLogger
+--- PASS: TestEventLogger_LogSpecLoad (0.00s)
+--- PASS: TestEventLogger_LogFileOperation (0.00s)
+--- PASS: TestEventLogger_LogCheckResult (0.00s)
+--- PASS: TestEventLogger_LogSpecValidation (0.00s)
+--- PASS: TestEventLogger_LogObjectCheck (0.00s)
+--- PASS: TestFluentWarnChainsFields (0.00s)
+--- PASS: TestFluentCommonFieldHelpers (0.00s)
+--- PASS: TestNewEventLogger (0.00s)
+--- PASS: TestEventLogger_WithObjectRef (0.00s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/logging	0.332s

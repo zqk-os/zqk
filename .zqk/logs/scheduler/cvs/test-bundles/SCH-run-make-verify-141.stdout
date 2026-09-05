@@ -1,0 +1,60 @@
+
+--- run 2026-09-04T21:41:11Z ---
+=== RUN   TestValidationStateCache_Save_ErrorPaths
+=== PAUSE TestValidationStateCache_Save_ErrorPaths
+=== RUN   TestValidationStateCache_Save_Concurrent
+=== PAUSE TestValidationStateCache_Save_Concurrent
+=== RUN   TestValidationStateCache_CodeChangeInvalidation
+=== PAUSE TestValidationStateCache_CodeChangeInvalidation
+=== RUN   TestShouldCacheValidationState
+=== PAUSE TestShouldCacheValidationState
+=== RUN   TestValidationStateCache_LoadPrunesExcludedKinds
+=== PAUSE TestValidationStateCache_LoadPrunesExcludedKinds
+=== RUN   TestValidateType_NumberAcceptsIntsAndFloats
+=== PAUSE TestValidateType_NumberAcceptsIntsAndFloats
+=== RUN   TestDefaultValidationTierConfig
+=== PAUSE TestDefaultValidationTierConfig
+=== RUN   TestIsBlockingTier
+=== PAUSE TestIsBlockingTier
+=== RUN   TestGetBlockingErrors
+=== PAUSE TestGetBlockingErrors
+=== RUN   TestLoadValidationTierConfig
+=== PAUSE TestLoadValidationTierConfig
+=== CONT  TestValidationStateCache_Save_ErrorPaths
+=== CONT  TestLoadValidationTierConfig
+--- PASS: TestLoadValidationTierConfig (0.02s)
+=== CONT  TestValidateType_NumberAcceptsIntsAndFloats
+=== RUN   TestValidateType_NumberAcceptsIntsAndFloats/int
+=== RUN   TestValidateType_NumberAcceptsIntsAndFloats/int64
+=== RUN   TestValidateType_NumberAcceptsIntsAndFloats/uint
+=== RUN   TestValidateType_NumberAcceptsIntsAndFloats/float64
+=== RUN   TestValidateType_NumberAcceptsIntsAndFloats/float32
+=== RUN   TestValidateType_NumberAcceptsIntsAndFloats/bool
+=== RUN   TestValidateType_NumberAcceptsIntsAndFloats/string
+=== RUN   TestValidateType_NumberAcceptsIntsAndFloats/nil
+--- PASS: TestValidateType_NumberAcceptsIntsAndFloats (0.00s)
+    --- PASS: TestValidateType_NumberAcceptsIntsAndFloats/int (0.00s)
+    --- PASS: TestValidateType_NumberAcceptsIntsAndFloats/int64 (0.00s)
+    --- PASS: TestValidateType_NumberAcceptsIntsAndFloats/uint (0.00s)
+    --- PASS: TestValidateType_NumberAcceptsIntsAndFloats/float64 (0.00s)
+    --- PASS: TestValidateType_NumberAcceptsIntsAndFloats/float32 (0.00s)
+    --- PASS: TestValidateType_NumberAcceptsIntsAndFloats/bool (0.00s)
+    --- PASS: TestValidateType_NumberAcceptsIntsAndFloats/string (0.00s)
+    --- PASS: TestValidateType_NumberAcceptsIntsAndFloats/nil (0.00s)
+=== CONT  TestGetBlockingErrors
+--- PASS: TestGetBlockingErrors (0.00s)
+=== CONT  TestIsBlockingTier
+--- PASS: TestIsBlockingTier (0.00s)
+=== CONT  TestDefaultValidationTierConfig
+--- PASS: TestDefaultValidationTierConfig (0.00s)
+=== CONT  TestShouldCacheValidationState
+--- PASS: TestShouldCacheValidationState (0.00s)
+=== CONT  TestValidationStateCache_LoadPrunesExcludedKinds
+--- PASS: TestValidationStateCache_Save_ErrorPaths (0.03s)
+=== CONT  TestValidationStateCache_CodeChangeInvalidation
+--- PASS: TestValidationStateCache_LoadPrunesExcludedKinds (0.01s)
+=== CONT  TestValidationStateCache_Save_Concurrent
+--- PASS: TestValidationStateCache_Save_Concurrent (0.02s)
+--- PASS: TestValidationStateCache_CodeChangeInvalidation (0.04s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/validation	0.754s

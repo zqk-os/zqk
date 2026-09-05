@@ -1,0 +1,19 @@
+cell_type: muscle
+context: Execution muscle for PRI-GROOM-CI-TEST-001 (trustworthy CI/supply gates under MIS-CEF-PRELAUNCH-001). Not a stratplan neuron.
+created_at: "2026-08-19T03:22:09Z"
+created_by: ACC-1785920548450214012-68b850c0
+focus_area: engineering
+id: TCFG-1787109729444855000-935d5774
+kind: team_configuration
+namespace_id: zqk:kernel
+persona_allocations:
+    - PER-1781248465963671000-281a3996
+    - PER-1781248465963697000-193ae541
+    - PER-1781486391201872000-779baf38
+    - PER-1781248465963709000-9925efbe
+schema_version: 2.0.0
+status: approved
+title: CEF CI / test execution cell
+updated_at: "2026-08-19T03:22:25Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

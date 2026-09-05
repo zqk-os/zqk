@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-260",
+  "created_at": "2026-09-04T21:34:29.967862Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-260",
+    "Tests": [
+      {
+        "Name": "TestSchedulerStatus_CrossProcessDetection",
+        "Package": "scheduler",
+        "PackagePath": "cmd/zqk/scheduler",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/scheduler/scheduler_cross_process_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestSchedulerStatus_CrossProcessDetection_StatusCommand",
+        "Package": "scheduler",
+        "PackagePath": "cmd/zqk/scheduler",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/scheduler/scheduler_cross_process_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestSchedulerStop_CrossProcess",
+        "Package": "scheduler",
+        "PackagePath": "cmd/zqk/scheduler",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/scheduler/scheduler_cross_process_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestSchedulerStart_PreventDuplicateCrossProcess",
+        "Package": "scheduler",
+        "PackagePath": "cmd/zqk/scheduler",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/scheduler/scheduler_cross_process_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestRejectHostServiceOwnedBackgroundStart",
+        "Package": "scheduler",
+        "PackagePath": "cmd/zqk/scheduler",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/scheduler/scheduler_helpers_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestGetSchedulerStatus_ThreadSafety",
+        "Package": "scheduler",
+        "PackagePath": "cmd/zqk/scheduler",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/scheduler/scheduler_helpers_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestGetSchedulerStatus_WithPIDFile",
+        "Package": "scheduler",
+        "PackagePath": "cmd/zqk/scheduler",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/scheduler/scheduler_helpers_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestRequireSchedulerRunning_Concurrent",
+        "Package": "scheduler",
+        "PackagePath": "cmd/zqk/scheduler",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/scheduler/scheduler_helpers_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestGetSchedulerInstance_Concurrent",
+        "Package": "scheduler",
+        "PackagePath": "cmd/zqk/scheduler",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/scheduler/scheduler_helpers_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestQueryAuditEvents_Success",
+        "Package": "scheduler",
+        "PackagePath": "cmd/zqk/scheduler",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/scheduler/scheduler_history_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 300000000000,
+    "PackagePath": "cmd/zqk/scheduler"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestSchedulerStatus_CrossProcessDetection",
+      "Package": "scheduler",
+      "PackagePath": "cmd/zqk/scheduler",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/scheduler/scheduler_cross_process_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestSchedulerStatus_CrossProcessDetection_StatusCommand",
+      "Package": "scheduler",
+      "PackagePath": "cmd/zqk/scheduler",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/scheduler/scheduler_cross_process_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestSchedulerStop_CrossProcess",
+      "Package": "scheduler",
+      "PackagePath": "cmd/zqk/scheduler",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/scheduler/scheduler_cross_process_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestSchedulerStart_PreventDuplicateCrossProcess",
+      "Package": "scheduler",
+      "PackagePath": "cmd/zqk/scheduler",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/scheduler/scheduler_cross_process_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestRejectHostServiceOwnedBackgroundStart",
+      "Package": "scheduler",
+      "PackagePath": "cmd/zqk/scheduler",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/scheduler/scheduler_helpers_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestGetSchedulerStatus_ThreadSafety",
+      "Package": "scheduler",
+      "PackagePath": "cmd/zqk/scheduler",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/scheduler/scheduler_helpers_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestGetSchedulerStatus_WithPIDFile",
+      "Package": "scheduler",
+      "PackagePath": "cmd/zqk/scheduler",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/scheduler/scheduler_helpers_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestRequireSchedulerRunning_Concurrent",
+      "Package": "scheduler",
+      "PackagePath": "cmd/zqk/scheduler",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/scheduler/scheduler_helpers_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestGetSchedulerInstance_Concurrent",
+      "Package": "scheduler",
+      "PackagePath": "cmd/zqk/scheduler",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/scheduler/scheduler_helpers_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestQueryAuditEvents_Success",
+      "Package": "scheduler",
+      "PackagePath": "cmd/zqk/scheduler",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/scheduler/scheduler_history_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

@@ -1,0 +1,14 @@
+created_at: "2026-08-19T09:37:35Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1787132254775276000-92f9002a
+item_id: REDACTED
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 2857702ca28e4b64fb5782140b43c1400e68fdeab30ab0062f4119523ca97d466e5f13c72adcfa41b92eacf21fa7f0a79b8a8e3a8d7c581e5c9afe0e69cb31dc
+schema_version: 2.0.0
+signature: 3044022071680aa45858bdf0661f7ecf05b7473070a65d845af69e1e63fccec95022d9d5022020a3e97aee57d11964ee1ff983d8dfc9b519cf68c4f0afbd49b2965f551e559b
+status: archived
+title: P0-4 MCP configuration guide (docs/QUICKSTART.md)
+updated_at: "2026-09-01T07:43:35Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

@@ -1,0 +1,26 @@
+
+--- run 2026-09-04T22:18:02Z ---
+=== RUN   TestBaseObjectBuilder
+=== PAUSE TestBaseObjectBuilder
+=== RUN   TestVersionedBuilderRegistry
+=== PAUSE TestVersionedBuilderRegistry
+=== RUN   TestGlobalRegistry
+=== PAUSE TestGlobalRegistry
+=== RUN   TestSpecGenerator
+=== PAUSE TestSpecGenerator
+=== RUN   TestSpecGeneratorGenerateAll
+=== PAUSE TestSpecGeneratorGenerateAll
+=== CONT  TestBaseObjectBuilder
+--- PASS: TestBaseObjectBuilder (0.00s)
+=== CONT  TestSpecGeneratorGenerateAll
+=== CONT  TestGlobalRegistry
+--- PASS: TestGlobalRegistry (0.00s)
+=== CONT  TestSpecGenerator
+=== CONT  TestVersionedBuilderRegistry
+--- PASS: TestVersionedBuilderRegistry (0.00s)
+--- PASS: TestSpecGenerator (0.04s)
+=== NAME  TestSpecGeneratorGenerateAll
+    generator_test.go:215: Generated 129 specs
+--- PASS: TestSpecGeneratorGenerateAll (0.32s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/specbuilder/builders	1.451s

@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-84",
+  "created_at": "2026-09-04T21:34:28.186375Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-84",
+    "Tests": [
+      {
+        "Name": "TestCalculateProjectMetrics_BaseMetrics",
+        "Package": "metrics",
+        "PackagePath": "pkg/metrics",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/metrics/ai_metrics_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestCalculateProjectMetrics_WithCommitData",
+        "Package": "metrics",
+        "PackagePath": "pkg/metrics",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/metrics/ai_metrics_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestCalculateCommitMetrics",
+        "Package": "metrics",
+        "PackagePath": "pkg/metrics",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/metrics/ai_metrics_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestDetectCommitBasedDependencies",
+        "Package": "metrics",
+        "PackagePath": "pkg/metrics",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/metrics/ai_metrics_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestDummy",
+        "Package": "metrics_test",
+        "PackagePath": "pkg/metrics",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/metrics/dummy_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestMetricPipelineForProject_SingletonPerRoot",
+        "Package": "metrics",
+        "PackagePath": "pkg/metrics",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/metrics/metric_pipeline_singleton_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAppendProcessLifecycleJSONL_WritesLine",
+        "Package": "metrics",
+        "PackagePath": "pkg/metrics",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/metrics/process_lifecycle_jsonl_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestTruncateProcessLifecycleDetail",
+        "Package": "metrics",
+        "PackagePath": "pkg/metrics",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/metrics/process_lifecycle_jsonl_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAppendProcessLifecycleJSONL_EmptyArgs",
+        "Package": "metrics",
+        "PackagePath": "pkg/metrics",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/metrics/process_lifecycle_jsonl_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestPrometheusHistogram",
+        "Package": "metrics",
+        "PackagePath": "pkg/metrics",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/metrics/prometheus_histogram_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 300000000000,
+    "PackagePath": "pkg/metrics"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestCalculateProjectMetrics_BaseMetrics",
+      "Package": "metrics",
+      "PackagePath": "pkg/metrics",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/metrics/ai_metrics_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestCalculateProjectMetrics_WithCommitData",
+      "Package": "metrics",
+      "PackagePath": "pkg/metrics",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/metrics/ai_metrics_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestCalculateCommitMetrics",
+      "Package": "metrics",
+      "PackagePath": "pkg/metrics",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/metrics/ai_metrics_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestDetectCommitBasedDependencies",
+      "Package": "metrics",
+      "PackagePath": "pkg/metrics",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/metrics/ai_metrics_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestDummy",
+      "Package": "metrics_test",
+      "PackagePath": "pkg/metrics",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/metrics/dummy_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestMetricPipelineForProject_SingletonPerRoot",
+      "Package": "metrics",
+      "PackagePath": "pkg/metrics",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/metrics/metric_pipeline_singleton_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestAppendProcessLifecycleJSONL_WritesLine",
+      "Package": "metrics",
+      "PackagePath": "pkg/metrics",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/metrics/process_lifecycle_jsonl_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestTruncateProcessLifecycleDetail",
+      "Package": "metrics",
+      "PackagePath": "pkg/metrics",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/metrics/process_lifecycle_jsonl_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestAppendProcessLifecycleJSONL_EmptyArgs",
+      "Package": "metrics",
+      "PackagePath": "pkg/metrics",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/metrics/process_lifecycle_jsonl_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestPrometheusHistogram",
+      "Package": "metrics",
+      "PackagePath": "pkg/metrics",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/metrics/prometheus_histogram_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

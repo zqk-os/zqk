@@ -1,0 +1,25 @@
+category: maintenance
+created_at: "2026-08-10T23:22:12Z"
+created_by: ACC-1785920548450214012-68b850c0
+description: |
+    Prunes stale .zqk/worktrees/ATK-* (terminal/missing ATK or age > 6h) and legacy
+    worktrees > 24h via idle_cleanup handler. Prevents disk overflow from orphan swarms.
+    Manual: ./scripts/cleanup-agent-worktrees.sh
+enabled: true
+execution_mode: reusable
+id: SCH-IDLE-WORKTREE-CLEANUP
+job_type: idle_cleanup
+kind: scheduler_job
+last_run_at: "2026-09-05T06:00:00Z"
+log_level: default
+namespace_id: zqk:kernel
+next_run_at: "2026-09-05T07:00:00Z"
+priority: normal
+schedule_expression: 0 * * * *
+schema_version: 2.0.0
+status: active
+title: Idle agent worktree cleanup
+trigger_type: timer
+updated_at: "2026-09-05T06:00:01Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

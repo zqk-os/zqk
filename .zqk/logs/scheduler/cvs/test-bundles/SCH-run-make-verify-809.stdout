@@ -1,0 +1,58 @@
+
+--- run 2026-09-04T22:22:15Z ---
+=== RUN   TestMemGraphConnectionPool_GetConnection
+=== PAUSE TestMemGraphConnectionPool_GetConnection
+=== RUN   TestMemGraphConnectionPool_ReturnConnection_WithOpenTransaction
+=== PAUSE TestMemGraphConnectionPool_ReturnConnection_WithOpenTransaction
+=== RUN   TestMemGraphConnectionPool_Execute
+=== PAUSE TestMemGraphConnectionPool_Execute
+=== RUN   TestMemGraphConnectionPool_Stats
+=== PAUSE TestMemGraphConnectionPool_Stats
+=== RUN   TestMemGraphConnectionPool_Close
+=== PAUSE TestMemGraphConnectionPool_Close
+=== RUN   TestNewMemGraphProvider
+=== PAUSE TestNewMemGraphProvider
+=== RUN   TestMemGraphProvider_SupportsFeature
+=== PAUSE TestMemGraphProvider_SupportsFeature
+=== RUN   TestMemGraphProvider_GetCapabilities
+=== PAUSE TestMemGraphProvider_GetCapabilities
+=== RUN   TestMemGraphProvider_GetProviderInfo
+=== PAUSE TestMemGraphProvider_GetProviderInfo
+=== RUN   TestMemGraphProvider_CreatePool
+=== PAUSE TestMemGraphProvider_CreatePool
+=== CONT  TestMemGraphConnectionPool_GetConnection
+=== CONT  TestNewMemGraphProvider
+--- PASS: TestNewMemGraphProvider (0.00s)
+=== CONT  TestMemGraphConnectionPool_Stats
+--- PASS: TestMemGraphConnectionPool_Stats (0.00s)
+=== CONT  TestMemGraphConnectionPool_Close
+--- PASS: TestMemGraphConnectionPool_Close (0.00s)
+=== CONT  TestMemGraphConnectionPool_Execute
+--- PASS: TestMemGraphConnectionPool_Execute (0.00s)
+=== CONT  TestMemGraphProvider_GetProviderInfo
+=== CONT  TestMemGraphProvider_CreatePool
+=== CONT  TestMemGraphProvider_GetCapabilities
+=== CONT  TestMemGraphProvider_SupportsFeature
+=== RUN   TestMemGraphProvider_SupportsFeature/CypherQuery
+--- PASS: TestMemGraphConnectionPool_GetConnection (0.00s)
+--- PASS: TestMemGraphProvider_GetProviderInfo (0.00s)
+--- PASS: TestMemGraphProvider_CreatePool (0.00s)
+=== RUN   TestMemGraphProvider_SupportsFeature/VectorSearch
+--- PASS: TestMemGraphProvider_GetCapabilities (0.00s)
+=== RUN   TestMemGraphProvider_SupportsFeature/MultiHopTraversal
+=== CONT  TestMemGraphConnectionPool_ReturnConnection_WithOpenTransaction
+=== RUN   TestMemGraphProvider_SupportsFeature/Transactions
+=== RUN   TestMemGraphProvider_SupportsFeature/BatchOperations
+=== RUN   TestMemGraphProvider_SupportsFeature/SPARQLQuery
+=== RUN   TestMemGraphProvider_SupportsFeature/StreamingQueries
+--- PASS: TestMemGraphProvider_SupportsFeature (0.00s)
+    --- PASS: TestMemGraphProvider_SupportsFeature/CypherQuery (0.00s)
+    --- PASS: TestMemGraphProvider_SupportsFeature/VectorSearch (0.00s)
+    --- PASS: TestMemGraphProvider_SupportsFeature/MultiHopTraversal (0.00s)
+    --- PASS: TestMemGraphProvider_SupportsFeature/Transactions (0.00s)
+    --- PASS: TestMemGraphProvider_SupportsFeature/BatchOperations (0.00s)
+    --- PASS: TestMemGraphProvider_SupportsFeature/SPARQLQuery (0.00s)
+    --- PASS: TestMemGraphProvider_SupportsFeature/StreamingQueries (0.00s)
+--- PASS: TestMemGraphConnectionPool_ReturnConnection_WithOpenTransaction (0.02s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/graph/memgraph	0.484s

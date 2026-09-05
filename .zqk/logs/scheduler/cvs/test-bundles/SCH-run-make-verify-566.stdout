@@ -1,0 +1,44 @@
+
+--- run 2026-09-04T22:17:31Z ---
+=== RUN   TestJobStateRegistry_scheduleFullRetentionCleanup_RateLimitedSingleFlight
+=== PAUSE TestJobStateRegistry_scheduleFullRetentionCleanup_RateLimitedSingleFlight
+=== RUN   TestJobStateRegistry_CompleteExecution_LocalCleanupOnlyHotPath
+=== PAUSE TestJobStateRegistry_CompleteExecution_LocalCleanupOnlyHotPath
+=== RUN   TestPrioritizeCachePrewarmTriggers
+=== PAUSE TestPrioritizeCachePrewarmTriggers
+=== RUN   TestJobIDLooksLikeCASInstanceSchedulerJobID
+=== PAUSE TestJobIDLooksLikeCASInstanceSchedulerJobID
+=== RUN   TestJobTriggerQueue_HasPendingTriggerWithOrigin
+=== PAUSE TestJobTriggerQueue_HasPendingTriggerWithOrigin
+=== RUN   TestJobTriggerQueue_EnqueueDequeue_SingleProcess
+=== PAUSE TestJobTriggerQueue_EnqueueDequeue_SingleProcess
+=== RUN   TestJobTriggerQueue_EnqueueMultiple
+=== PAUSE TestJobTriggerQueue_EnqueueMultiple
+=== RUN   TestJobTriggerQueue_EnqueueTriggerRequestsBatch
+=== PAUSE TestJobTriggerQueue_EnqueueTriggerRequestsBatch
+=== RUN   TestJobTriggerQueue_ConcurrentEnqueue
+=== PAUSE TestJobTriggerQueue_ConcurrentEnqueue
+=== RUN   TestJobTriggerQueue_ConcurrentEnqueueDequeue
+=== PAUSE TestJobTriggerQueue_ConcurrentEnqueueDequeue
+=== CONT  TestJobStateRegistry_scheduleFullRetentionCleanup_RateLimitedSingleFlight
+=== CONT  TestJobTriggerQueue_EnqueueDequeue_SingleProcess
+--- PASS: TestJobTriggerQueue_EnqueueDequeue_SingleProcess (0.02s)
+=== CONT  TestJobTriggerQueue_ConcurrentEnqueue
+--- PASS: TestJobStateRegistry_scheduleFullRetentionCleanup_RateLimitedSingleFlight (0.07s)
+=== CONT  TestJobTriggerQueue_ConcurrentEnqueueDequeue
+--- PASS: TestJobTriggerQueue_ConcurrentEnqueueDequeue (0.30s)
+=== CONT  TestJobTriggerQueue_EnqueueTriggerRequestsBatch
+--- PASS: TestJobTriggerQueue_EnqueueTriggerRequestsBatch (0.01s)
+=== CONT  TestJobIDLooksLikeCASInstanceSchedulerJobID
+--- PASS: TestJobIDLooksLikeCASInstanceSchedulerJobID (0.00s)
+=== CONT  TestJobTriggerQueue_HasPendingTriggerWithOrigin
+--- PASS: TestJobTriggerQueue_HasPendingTriggerWithOrigin (0.02s)
+=== CONT  TestPrioritizeCachePrewarmTriggers
+--- PASS: TestPrioritizeCachePrewarmTriggers (0.00s)
+=== CONT  TestJobStateRegistry_CompleteExecution_LocalCleanupOnlyHotPath
+--- PASS: TestJobStateRegistry_CompleteExecution_LocalCleanupOnlyHotPath (0.08s)
+=== CONT  TestJobTriggerQueue_EnqueueMultiple
+--- PASS: TestJobTriggerQueue_EnqueueMultiple (0.04s)
+--- PASS: TestJobTriggerQueue_ConcurrentEnqueue (0.64s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/scheduler	1.378s

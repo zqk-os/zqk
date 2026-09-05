@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-623",
+  "created_at": "2026-09-04T21:34:33.554065Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-623",
+    "Tests": [
+      {
+        "Name": "TestBulkStatusWriterError",
+        "Package": "audit",
+        "PackagePath": "pkg/storage/audit",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/audit/bulk_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestBulkDeleteOutcomeAllFailed",
+        "Package": "audit",
+        "PackagePath": "pkg/storage/audit",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/audit/bulk_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestCompressEventIDs",
+        "Package": "audit",
+        "PackagePath": "pkg/storage/audit",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/audit/compress_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestExtractCompareConsecutive",
+        "Package": "audit",
+        "PackagePath": "pkg/storage/audit",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/audit/compress_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestMonthlyDir",
+        "Package": "audit",
+        "PackagePath": "pkg/storage/audit",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/audit/dir_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestSummaryFilePath",
+        "Package": "audit",
+        "PackagePath": "pkg/storage/audit",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/audit/dir_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestDispatchBuffers",
+        "Package": "audit",
+        "PackagePath": "pkg/storage/audit",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/audit/dispatch_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestDispatchBufferAddFailsPersists",
+        "Package": "audit",
+        "PackagePath": "pkg/storage/audit",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/audit/dispatch_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestDispatchRetryClonesID",
+        "Package": "audit",
+        "PackagePath": "pkg/storage/audit",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/audit/dispatch_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestDispatchPersistsWhenNotAggregated",
+        "Package": "audit",
+        "PackagePath": "pkg/storage/audit",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/audit/dispatch_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": true,
+    "EstimatedDuration": 900000000000,
+    "PackagePath": "pkg/storage/audit"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestBulkStatusWriterError",
+      "Package": "audit",
+      "PackagePath": "pkg/storage/audit",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/audit/bulk_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestBulkDeleteOutcomeAllFailed",
+      "Package": "audit",
+      "PackagePath": "pkg/storage/audit",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/audit/bulk_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestCompressEventIDs",
+      "Package": "audit",
+      "PackagePath": "pkg/storage/audit",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/audit/compress_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestExtractCompareConsecutive",
+      "Package": "audit",
+      "PackagePath": "pkg/storage/audit",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/audit/compress_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestMonthlyDir",
+      "Package": "audit",
+      "PackagePath": "pkg/storage/audit",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/audit/dir_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestSummaryFilePath",
+      "Package": "audit",
+      "PackagePath": "pkg/storage/audit",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/audit/dir_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestDispatchBuffers",
+      "Package": "audit",
+      "PackagePath": "pkg/storage/audit",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/audit/dispatch_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestDispatchBufferAddFailsPersists",
+      "Package": "audit",
+      "PackagePath": "pkg/storage/audit",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/audit/dispatch_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestDispatchRetryClonesID",
+      "Package": "audit",
+      "PackagePath": "pkg/storage/audit",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/audit/dispatch_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestDispatchPersistsWhenNotAggregated",
+      "Package": "audit",
+      "PackagePath": "pkg/storage/audit",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/audit/dispatch_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    }
+  }
+}

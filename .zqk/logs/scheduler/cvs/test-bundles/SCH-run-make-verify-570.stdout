@@ -1,0 +1,44 @@
+
+--- run 2026-09-04T22:17:48Z ---
+=== RUN   TestDefaultSchedulerMetricsCollector_GetMetrics
+=== PAUSE TestDefaultSchedulerMetricsCollector_GetMetrics
+=== RUN   TestDefaultSchedulerMetricsCollector_AllMetrics
+=== PAUSE TestDefaultSchedulerMetricsCollector_AllMetrics
+=== RUN   TestDefaultSchedulerMetricsCollector_DispatchPressureDropped
+=== PAUSE TestDefaultSchedulerMetricsCollector_DispatchPressureDropped
+=== RUN   TestDefaultSchedulerMetricsCollector_RecentJobOutcomes
+=== PAUSE TestDefaultSchedulerMetricsCollector_RecentJobOutcomes
+=== RUN   TestSchedulerMetricsConfig_Presets
+=== PAUSE TestSchedulerMetricsConfig_Presets
+=== RUN   TestNotificationContext_ShouldNotify
+=== PAUSE TestNotificationContext_ShouldNotify
+=== RUN   TestNotificationContext_CategoryFilter
+=== PAUSE TestNotificationContext_CategoryFilter
+=== RUN   TestNotificationContext_Suppression
+=== PAUSE TestNotificationContext_Suppression
+=== RUN   TestNotificationContext_History
+=== PAUSE TestNotificationContext_History
+=== RUN   TestNotificationContext_Unacknowledged
+=== PAUSE TestNotificationContext_Unacknowledged
+=== CONT  TestDefaultSchedulerMetricsCollector_GetMetrics
+=== CONT  TestNotificationContext_ShouldNotify
+--- PASS: TestDefaultSchedulerMetricsCollector_GetMetrics (0.00s)
+=== CONT  TestDefaultSchedulerMetricsCollector_RecentJobOutcomes
+--- PASS: TestDefaultSchedulerMetricsCollector_RecentJobOutcomes (0.00s)
+=== CONT  TestSchedulerMetricsConfig_Presets
+--- PASS: TestSchedulerMetricsConfig_Presets (0.00s)
+=== CONT  TestNotificationContext_History
+--- PASS: TestNotificationContext_ShouldNotify (0.00s)
+=== CONT  TestNotificationContext_Unacknowledged
+--- PASS: TestNotificationContext_Unacknowledged (0.00s)
+=== CONT  TestDefaultSchedulerMetricsCollector_DispatchPressureDropped
+--- PASS: TestDefaultSchedulerMetricsCollector_DispatchPressureDropped (0.00s)
+=== CONT  TestDefaultSchedulerMetricsCollector_AllMetrics
+--- PASS: TestDefaultSchedulerMetricsCollector_AllMetrics (0.00s)
+=== CONT  TestNotificationContext_Suppression
+--- PASS: TestNotificationContext_Suppression (0.00s)
+=== CONT  TestNotificationContext_CategoryFilter
+--- PASS: TestNotificationContext_CategoryFilter (0.00s)
+--- PASS: TestNotificationContext_History (0.20s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/scheduler	1.000s

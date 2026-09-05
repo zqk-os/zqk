@@ -1,0 +1,29 @@
+=== field-key literal check ===
+Field key literal violations detected:
+
+--- key: kind ---
+17:cmd/zqk/agent/docs_eval_evidence_test.go:	okLine := `{"finding_id":"F-OK","evidence_grade":"E1","evidence":[{"kind":"path_line","path":"pkg/mcp/server.go"}]}`
+18:cmd/zqk/agent/docs_eval_evidence_test.go:	badLine := `{"finding_id":"F-BAD","evidence_grade":"E1","evidence":[{"kind":"path_line","path":"cmd/svc/config.go"}]}`
+48:cmd/zqk/agent/docs_eval_evidence_test.go:	line := `{"finding_id":"F-SEC-STUB-AUTH-HOOK-001","evidence_grade":"E2","evidence":[{"kind":"path_line","path":"pkg/scheduler/auth_hook.go","detail":"StubAuthHook always allows"}]}`
+
+--- key: note ---
+172:cmd/zqk/system/probe_topology.go:      "note": "Primary TPM"
+178:cmd/zqk/system/probe_topology.go:      "note": "Secondary TPM"
+183:cmd/zqk/system/probe_topology.go:      "note": "Local Qwen Daemon 1"
+188:cmd/zqk/system/probe_topology.go:      "note": "Local Qwen Daemon 2"
+
+--- key: path ---
+17:cmd/zqk/agent/docs_eval_evidence_test.go:	okLine := `{"finding_id":"F-OK","evidence_grade":"E1","evidence":[{"kind":"path_line","path":"pkg/mcp/server.go"}]}`
+18:cmd/zqk/agent/docs_eval_evidence_test.go:	badLine := `{"finding_id":"F-BAD","evidence_grade":"E1","evidence":[{"kind":"path_line","path":"cmd/svc/config.go"}]}`
+48:cmd/zqk/agent/docs_eval_evidence_test.go:	line := `{"finding_id":"F-SEC-STUB-AUTH-HOOK-001","evidence_grade":"E2","evidence":[{"kind":"path_line","path":"pkg/scheduler/auth_hook.go","detail":"StubAuthHook always allows"}]}`
+
+--- key: persona_ref ---
+171:cmd/zqk/system/probe_topology.go:      "persona_ref": "PER-ORCH-ALPHA",
+177:cmd/zqk/system/probe_topology.go:      "persona_ref": "PER-ORCH-BETA",
+182:cmd/zqk/system/probe_topology.go:      "persona_ref": "PER-WORKER-ALPHA",
+187:cmd/zqk/system/probe_topology.go:      "persona_ref": "PER-WORKER-BETA",
+
+--- key: schema_version ---
+166:cmd/zqk/system/probe_topology.go:  "schema_version": "1",
+
+Use objects.FieldKey* constants for field-name keys.

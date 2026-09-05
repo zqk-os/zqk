@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-221",
+  "created_at": "2026-09-04T21:34:29.585688Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-221",
+    "Tests": [
+      {
+        "Name": "TestWorkflowAddCommand",
+        "Package": "workflow",
+        "PackagePath": "cmd/zqk/workflow",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/workflow/add_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestApplyDecision_PolicyInterruptPrecedence",
+        "Package": "workflow",
+        "PackagePath": "cmd/zqk/workflow",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/workflow/next_selection_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestApplyDecision_ConvergencePrecedenceOverBacklog",
+        "Package": "workflow",
+        "PackagePath": "cmd/zqk/workflow",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/workflow/next_selection_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestApplyDecision_BacklogFallback",
+        "Package": "workflow",
+        "PackagePath": "cmd/zqk/workflow",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/workflow/next_selection_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestTruncateWorkflowText",
+        "Package": "workflow",
+        "PackagePath": "cmd/zqk/workflow",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/workflow/next_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestStringSliceFromAnyField",
+        "Package": "workflow",
+        "PackagePath": "cmd/zqk/workflow",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/workflow/next_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestPriorityRank",
+        "Package": "workflow",
+        "PackagePath": "cmd/zqk/workflow",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/workflow/next_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestPriorityPlanLooksShaped_UsesInheritedTitleAndWorkstream",
+        "Package": "workflow",
+        "PackagePath": "cmd/zqk/workflow",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/workflow/whats_next_drive_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestIsolated_resolveCurrentPlanID_PrefersLowerActiveOrder",
+        "Package": "workflow",
+        "PackagePath": "cmd/zqk/workflow",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/workflow/workflow_isolated_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestIsolated_resolveCurrentPlanID_FallbackRecencyWhenNoActiveOrder",
+        "Package": "workflow",
+        "PackagePath": "cmd/zqk/workflow",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/workflow/workflow_isolated_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": true,
+    "EstimatedDuration": 300000000000,
+    "PackagePath": "cmd/zqk/workflow"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestWorkflowAddCommand",
+      "Package": "workflow",
+      "PackagePath": "cmd/zqk/workflow",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/workflow/add_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestApplyDecision_PolicyInterruptPrecedence",
+      "Package": "workflow",
+      "PackagePath": "cmd/zqk/workflow",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/workflow/next_selection_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestApplyDecision_ConvergencePrecedenceOverBacklog",
+      "Package": "workflow",
+      "PackagePath": "cmd/zqk/workflow",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/workflow/next_selection_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestApplyDecision_BacklogFallback",
+      "Package": "workflow",
+      "PackagePath": "cmd/zqk/workflow",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/workflow/next_selection_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestTruncateWorkflowText",
+      "Package": "workflow",
+      "PackagePath": "cmd/zqk/workflow",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/workflow/next_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestStringSliceFromAnyField",
+      "Package": "workflow",
+      "PackagePath": "cmd/zqk/workflow",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/workflow/next_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestPriorityRank",
+      "Package": "workflow",
+      "PackagePath": "cmd/zqk/workflow",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/workflow/next_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestPriorityPlanLooksShaped_UsesInheritedTitleAndWorkstream",
+      "Package": "workflow",
+      "PackagePath": "cmd/zqk/workflow",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/workflow/whats_next_drive_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestIsolated_resolveCurrentPlanID_PrefersLowerActiveOrder",
+      "Package": "workflow",
+      "PackagePath": "cmd/zqk/workflow",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/workflow/workflow_isolated_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestIsolated_resolveCurrentPlanID_FallbackRecencyWhenNoActiveOrder",
+      "Package": "workflow",
+      "PackagePath": "cmd/zqk/workflow",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/workflow/workflow_isolated_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

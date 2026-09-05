@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-352",
+  "created_at": "2026-09-04T21:34:30.8445Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-352",
+    "Tests": [
+      {
+        "Name": "TestComputePrimaryMeasurementOutcome_ambiguousPartial",
+        "Package": "convergerollup",
+        "PackagePath": "pkg/convergerollup",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/convergerollup/primary_measurement_outcome_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestComputePrimaryMeasurementOutcome_skipGatesNoHalt",
+        "Package": "convergerollup",
+        "PackagePath": "pkg/convergerollup",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/convergerollup/primary_measurement_outcome_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestDetectCVSRefCycle_none",
+        "Package": "convergerollup",
+        "PackagePath": "pkg/convergerollup",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/convergerollup/ref_cycle_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestDetectCVSRefCycle_direct",
+        "Package": "convergerollup",
+        "PackagePath": "pkg/convergerollup",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/convergerollup/ref_cycle_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestDetectCVSRefCycle_maxDepthStops",
+        "Package": "convergerollup",
+        "PackagePath": "pkg/convergerollup",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/convergerollup/ref_cycle_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestDetectCVSRefCycle_readErr",
+        "Package": "convergerollup",
+        "PackagePath": "pkg/convergerollup",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/convergerollup/ref_cycle_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestComputeRollupStatus_satisfied",
+        "Package": "convergerollup",
+        "PackagePath": "pkg/convergerollup",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/convergerollup/rollup_status_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestComputeRollupStatus_blockedFingerprints",
+        "Package": "convergerollup",
+        "PackagePath": "pkg/convergerollup",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/convergerollup/rollup_status_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestComputeRollupStatus_readyForReviewMatrix",
+        "Package": "convergerollup",
+        "PackagePath": "pkg/convergerollup",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/convergerollup/rollup_status_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestComputeRollupStatus_readyForReviewChild",
+        "Package": "convergerollup",
+        "PackagePath": "pkg/convergerollup",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/convergerollup/rollup_status_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 300000000000,
+    "PackagePath": "pkg/convergerollup"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestComputePrimaryMeasurementOutcome_ambiguousPartial",
+      "Package": "convergerollup",
+      "PackagePath": "pkg/convergerollup",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/convergerollup/primary_measurement_outcome_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestComputePrimaryMeasurementOutcome_skipGatesNoHalt",
+      "Package": "convergerollup",
+      "PackagePath": "pkg/convergerollup",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/convergerollup/primary_measurement_outcome_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestDetectCVSRefCycle_none",
+      "Package": "convergerollup",
+      "PackagePath": "pkg/convergerollup",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/convergerollup/ref_cycle_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestDetectCVSRefCycle_direct",
+      "Package": "convergerollup",
+      "PackagePath": "pkg/convergerollup",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/convergerollup/ref_cycle_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestDetectCVSRefCycle_maxDepthStops",
+      "Package": "convergerollup",
+      "PackagePath": "pkg/convergerollup",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/convergerollup/ref_cycle_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestDetectCVSRefCycle_readErr",
+      "Package": "convergerollup",
+      "PackagePath": "pkg/convergerollup",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/convergerollup/ref_cycle_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestComputeRollupStatus_satisfied",
+      "Package": "convergerollup",
+      "PackagePath": "pkg/convergerollup",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/convergerollup/rollup_status_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestComputeRollupStatus_blockedFingerprints",
+      "Package": "convergerollup",
+      "PackagePath": "pkg/convergerollup",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/convergerollup/rollup_status_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestComputeRollupStatus_readyForReviewMatrix",
+      "Package": "convergerollup",
+      "PackagePath": "pkg/convergerollup",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/convergerollup/rollup_status_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestComputeRollupStatus_readyForReviewChild",
+      "Package": "convergerollup",
+      "PackagePath": "pkg/convergerollup",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/convergerollup/rollup_status_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

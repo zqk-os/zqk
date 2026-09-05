@@ -1,0 +1,36 @@
+
+--- run 2026-09-04T22:00:54Z ---
+=== RUN   TestLifecycleBuilder_SpecStructure
+=== PAUSE TestLifecycleBuilder_SpecStructure
+=== RUN   TestLifecycleBuilder_TransitionsField
+=== PAUSE TestLifecycleBuilder_TransitionsField
+=== RUN   TestLifecycleBuilder_PercentCompleteField
+=== PAUSE TestLifecycleBuilder_PercentCompleteField
+=== RUN   TestOccupancyBuilderExtendsWorkInterval
+=== PAUSE TestOccupancyBuilderExtendsWorkInterval
+=== RUN   TestAgentTaskBuilderComposesOccupancy
+=== PAUSE TestAgentTaskBuilderComposesOccupancy
+=== RUN   TestOccupancyFieldConstantsMatchFieldKeys
+=== PAUSE TestOccupancyFieldConstantsMatchFieldKeys
+=== RUN   TestRemainingOpenBuilderExtendsWorkInterval
+=== PAUSE TestRemainingOpenBuilderExtendsWorkInterval
+=== RUN   TestPriorityPlanBuilderComposesRemainingOpen
+=== PAUSE TestPriorityPlanBuilderComposesRemainingOpen
+=== CONT  TestLifecycleBuilder_SpecStructure
+--- PASS: TestLifecycleBuilder_SpecStructure (0.00s)
+=== CONT  TestPriorityPlanBuilderComposesRemainingOpen
+--- PASS: TestPriorityPlanBuilderComposesRemainingOpen (0.00s)
+=== CONT  TestRemainingOpenBuilderExtendsWorkInterval
+--- PASS: TestRemainingOpenBuilderExtendsWorkInterval (0.00s)
+=== CONT  TestOccupancyFieldConstantsMatchFieldKeys
+--- PASS: TestOccupancyFieldConstantsMatchFieldKeys (0.00s)
+=== CONT  TestAgentTaskBuilderComposesOccupancy
+--- PASS: TestAgentTaskBuilderComposesOccupancy (0.00s)
+=== CONT  TestLifecycleBuilder_PercentCompleteField
+=== CONT  TestLifecycleBuilder_TransitionsField
+--- PASS: TestLifecycleBuilder_PercentCompleteField (0.00s)
+=== CONT  TestOccupancyBuilderExtendsWorkInterval
+--- PASS: TestOccupancyBuilderExtendsWorkInterval (0.00s)
+--- PASS: TestLifecycleBuilder_TransitionsField (0.00s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/specbuilder/bldr_v2	0.412s

@@ -1,0 +1,32 @@
+agent_heartbeat: "2026-09-04T16:12:37-07:00"
+agent_pid: 39353
+assignee_persona_ref: PER-ORCH-ALPHA
+backlog_item_ref: BLI-CEF-R27-DUAL-SEAT-REMEASURE-001
+branch_ref: integration/pri-cef-r27-envelope-001
+created_at: "2026-09-04T05:31:54Z"
+created_by: ACC-1785920548450214006-2e52b3e7
+description: |
+    pipeline_ref=PIP-CEF-DIAMOND-REMEASURE-001 stage=W2_obs_specialist
+    PRIOR: bite-sized CEF remesure under docs/quality/cef-runs/2026-09-03-AGENT_AC.
+    Overwrite findings/L-OBSERVABILITY.jsonl. evidence.path must exist.
+    READ: docs/quality/codebase_evaluation/rubrics/L-OBSERVABILITY.md; docs/quality/codebase_evaluation/prompts/L-OBSERVABILITY/specialist.md; docs/quality/codebase_evaluation/schemas/finding.schema.json; docs/quality/cef-runs/2026-09-03-AGENT_AC/run_scope.yaml
+    STEPS:
+    1) Overwrite docs/quality/cef-runs/2026-09-03-AGENT_AC/findings/L-OBSERVABILITY.jsonl with real findings (schema finding.schema.json).
+    2) Every evidence.path MUST exist on disk (stat). No invented packages.
+    3) Append <=5 lines to docs/quality/cef-runs/2026-09-03-AGENT_AC/run_log.md.
+    4) Feed ack as qwen-1: finding_count + finding_ids.
+    SUCCESS_GATE: >=1 finding_id in docs/quality/cef-runs/2026-09-03-AGENT_AC/findings/L-OBSERVABILITY.jsonl; valid JSONL; E2+ evidence.path exists; no REPLACE_ME/STUB.
+    FORBID: source edits; process mint; dual-seat GPA; sibling package before COMPARE.
+hourglass_on: true
+id: ATK-1788499914651067000-c9c14c54
+kind: agent_task
+namespace_id: zqk:kernel
+pipeline_ref: PIP-CEF-DIAMOND-REMEASURE-001
+priority_plan_ref: PRI-CEF-R27-ENVELOPE-001
+schema_version: 2.0.0
+started_at: "2026-09-04T05:53:32Z"
+status: implemented
+title: CEF AGENT_AC W2_obs_specialist — L-OBSERVABILITY
+updated_at: "2026-09-04T23:12:37Z"
+updated_by: ACC-1785920548450214006-2e52b3e7
+version_context: default

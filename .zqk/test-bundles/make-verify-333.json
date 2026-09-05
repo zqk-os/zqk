@@ -1,0 +1,105 @@
+{
+  "name": "make-verify-333",
+  "created_at": "2026-09-04T21:34:30.66332Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-333",
+    "Tests": [
+      {
+        "Name": "TestPrivilegedWriterDaemonRole_Neither",
+        "Package": "zqkenv",
+        "PackagePath": "pkg/zqkenv",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/zqkenv/privileged_writer_role_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestSubprocessEnvironWithTestRoot_stripsProjectRootAndTestDataDir",
+        "Package": "zqkenv",
+        "PackagePath": "pkg/zqkenv",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/zqkenv/subprocess_environ_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestSubprocessEnvironWithTestRoot_stripsInheritedZQKProjectRootAndTestDataDir",
+        "Package": "zqkenv",
+        "PackagePath": "pkg/zqkenv",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/zqkenv/subprocess_environ_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestSubprocessEnvironWithTestRootAndExtras_replacesSameKey",
+        "Package": "zqkenv",
+        "PackagePath": "pkg/zqkenv",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/zqkenv/subprocess_environ_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestVars",
+        "Package": "zqkenv",
+        "PackagePath": "pkg/zqkenv",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/zqkenv/vars_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 150000000000,
+    "PackagePath": "pkg/zqkenv"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestPrivilegedWriterDaemonRole_Neither",
+      "Package": "zqkenv",
+      "PackagePath": "pkg/zqkenv",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/zqkenv/privileged_writer_role_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestSubprocessEnvironWithTestRoot_stripsProjectRootAndTestDataDir",
+      "Package": "zqkenv",
+      "PackagePath": "pkg/zqkenv",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/zqkenv/subprocess_environ_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestSubprocessEnvironWithTestRoot_stripsInheritedZQKProjectRootAndTestDataDir",
+      "Package": "zqkenv",
+      "PackagePath": "pkg/zqkenv",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/zqkenv/subprocess_environ_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestSubprocessEnvironWithTestRootAndExtras_replacesSameKey",
+      "Package": "zqkenv",
+      "PackagePath": "pkg/zqkenv",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/zqkenv/subprocess_environ_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestVars",
+      "Package": "zqkenv",
+      "PackagePath": "pkg/zqkenv",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/zqkenv/vars_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

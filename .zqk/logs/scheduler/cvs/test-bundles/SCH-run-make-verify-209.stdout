@@ -1,0 +1,44 @@
+
+--- run 2026-09-04T21:42:08Z ---
+=== RUN   TestCompileFillItem_rank
+=== PAUSE TestCompileFillItem_rank
+=== RUN   TestApplyFillToInstruction
+=== PAUSE TestApplyFillToInstruction
+=== RUN   TestParseHumanLogClusters
+=== PAUSE TestParseHumanLogClusters
+=== RUN   TestProjectStewardFocus_HumanLogClusters
+=== PAUSE TestProjectStewardFocus_HumanLogClusters
+=== RUN   TestProjectStewardFocus_branchAhead
+=== PAUSE TestProjectStewardFocus_branchAhead
+=== RUN   TestProjectStewardFocus_GhostRefSignal
+=== PAUSE TestProjectStewardFocus_GhostRefSignal
+=== RUN   TestProjectStewardFocus_blockingAndDrafts
+=== PAUSE TestProjectStewardFocus_blockingAndDrafts
+=== RUN   TestProjectStewardFocus_peerDraftNoSweep
+=== PAUSE TestProjectStewardFocus_peerDraftNoSweep
+=== RUN   TestProjectStewardFocus_clean
+=== PAUSE TestProjectStewardFocus_clean
+=== RUN   TestPrependStewardProjection_idempotent
+=== PAUSE TestPrependStewardProjection_idempotent
+=== CONT  TestCompileFillItem_rank
+=== CONT  TestProjectStewardFocus_GhostRefSignal
+--- PASS: TestCompileFillItem_rank (0.00s)
+=== CONT  TestProjectStewardFocus_clean
+--- PASS: TestProjectStewardFocus_clean (0.00s)
+=== CONT  TestProjectStewardFocus_HumanLogClusters
+=== CONT  TestPrependStewardProjection_idempotent
+=== CONT  TestProjectStewardFocus_branchAhead
+=== CONT  TestParseHumanLogClusters
+=== CONT  TestApplyFillToInstruction
+=== CONT  TestProjectStewardFocus_peerDraftNoSweep
+=== CONT  TestProjectStewardFocus_blockingAndDrafts
+--- PASS: TestProjectStewardFocus_GhostRefSignal (0.00s)
+--- PASS: TestProjectStewardFocus_HumanLogClusters (0.00s)
+--- PASS: TestPrependStewardProjection_idempotent (0.00s)
+--- PASS: TestProjectStewardFocus_branchAhead (0.00s)
+--- PASS: TestApplyFillToInstruction (0.00s)
+--- PASS: TestProjectStewardFocus_peerDraftNoSweep (0.00s)
+--- PASS: TestProjectStewardFocus_blockingAndDrafts (0.00s)
+--- PASS: TestParseHumanLogClusters (0.01s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/workflow/whatsnext	0.683s

@@ -1,0 +1,33 @@
+
+--- run 2026-09-04T22:14:27Z ---
+=== RUN   TestInstanceGeneratorIsSequential
+=== PAUSE TestInstanceGeneratorIsSequential
+=== RUN   TestSpecBuilderIntegration
+=== PAUSE TestSpecBuilderIntegration
+=== RUN   TestSpecBuilderWithExistingScenarios
+=== PAUSE TestSpecBuilderWithExistingScenarios
+=== RUN   TestBaseGeneratorFunctionality
+=== PAUSE TestBaseGeneratorFunctionality
+=== RUN   TestSpecValidation
+=== PAUSE TestSpecValidation
+=== RUN   TestYAMLLoader
+=== PAUSE TestYAMLLoader
+=== RUN   TestYAMLWriter
+=== PAUSE TestYAMLWriter
+=== CONT  TestInstanceGeneratorIsSequential
+=== CONT  TestSpecValidation
+--- PASS: TestSpecValidation (0.00s)
+=== CONT  TestYAMLWriter
+--- PASS: TestYAMLWriter (0.00s)
+=== CONT  TestSpecBuilderWithExistingScenarios
+    integration_test.go:205: Scenarios file not found: /Users/lanceettl/test-scenarios/scenarios.yaml
+--- SKIP: TestSpecBuilderWithExistingScenarios (0.00s)
+=== CONT  TestBaseGeneratorFunctionality
+--- PASS: TestInstanceGeneratorIsSequential (0.01s)
+=== CONT  TestYAMLLoader
+--- PASS: TestBaseGeneratorFunctionality (0.01s)
+=== CONT  TestSpecBuilderIntegration
+--- PASS: TestYAMLLoader (0.03s)
+--- PASS: TestSpecBuilderIntegration (0.03s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/specbuilder	0.699s

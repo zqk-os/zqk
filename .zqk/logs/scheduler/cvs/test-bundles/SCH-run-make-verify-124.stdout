@@ -1,0 +1,121 @@
+
+--- run 2026-09-04T21:39:05Z ---
+=== RUN   TestCascadeDeletion_SingleReferenceSetNull
+=== PAUSE TestCascadeDeletion_SingleReferenceSetNull
+=== RUN   TestCascadeDeletion_MultiLevelCascade
+=== PAUSE TestCascadeDeletion_MultiLevelCascade
+=== RUN   TestCascadeDeletion_ConcurrentCascade
+=== PAUSE TestCascadeDeletion_ConcurrentCascade
+=== RUN   TestAsyncValidator_CascadeDependencies
+=== PAUSE TestAsyncValidator_CascadeDependencies
+=== RUN   TestAsyncValidator_MissingDependencies
+=== PAUSE TestAsyncValidator_MissingDependencies
+=== RUN   TestAsyncValidator_DeepDependencyChain
+=== PAUSE TestAsyncValidator_DeepDependencyChain
+=== RUN   TestAsyncValidator_ConcurrentCascadeValidation
+=== PAUSE TestAsyncValidator_ConcurrentCascadeValidation
+=== RUN   TestAsyncValidator_DependencyUpdateCascade
+=== PAUSE TestAsyncValidator_DependencyUpdateCascade
+=== RUN   TestAsyncValidator_ConcurrentAccess
+=== PAUSE TestAsyncValidator_ConcurrentAccess
+=== RUN   TestValidationStateCache_ConcurrentReadWrite
+=== PAUSE TestValidationStateCache_ConcurrentReadWrite
+=== CONT  TestCascadeDeletion_SingleReferenceSetNull
+=== CONT  TestAsyncValidator_DeepDependencyChain
+=== NAME  TestCascadeDeletion_SingleReferenceSetNull
+    cascade_deletion_test.go:227: Initial milestone.strategic_plan_ref: created_at: "2026-09-04T14:39:08-07:00"
+        created_by: ACC-1785920548450214012-68b850c0
+        id: MIL-003
+        kind: milestone
+        schema_version: 2.0.0
+        status: active
+        strategic_plan_ref: STRAT-PLAN-003
+        title: Milestone with Strategic Plan
+        updated_at: "2026-09-04T14:39:08-07:00"
+        updated_by: ACC-1785920548450214012-68b850c0
+    cascade_deletion_test.go:232: Cascade set null not yet implemented - this test documents expected behavior
+--- PASS: TestCascadeDeletion_SingleReferenceSetNull (0.03s)
+=== CONT  TestAsyncValidator_CascadeDependencies
+=== NAME  TestAsyncValidator_DeepDependencyChain
+    cascade_test.go:351: BLI-003: 0 issues
+    cascade_test.go:351: REQ-002: 0 issues
+    cascade_test.go:351: GOAL-002: 0 issues
+    cascade_test.go:351: MIL-002: 0 issues
+    cascade_test.go:351: STRAT-PLAN-002: 0 issues
+=== NAME  TestAsyncValidator_CascadeDependencies
+    cascade_test.go:154: Validated STRAT-PLAN-001 (strategic_plan): 0 issues
+    cascade_test.go:154: Validated MIL-001 (milestone): 0 issues
+    cascade_test.go:154: Validated GOAL-001 (goal): 0 issues
+    cascade_test.go:154: Validated BLI-001 (backlog_item): 0 issues
+--- PASS: TestAsyncValidator_DeepDependencyChain (0.58s)
+=== CONT  TestAsyncValidator_MissingDependencies
+--- PASS: TestAsyncValidator_CascadeDependencies (0.55s)
+=== CONT  TestCascadeDeletion_ConcurrentCascade
+=== NAME  TestAsyncValidator_MissingDependencies
+    cascade_test.go:211: No reference issues found (may be expected depending on validation implementation)
+=== NAME  TestCascadeDeletion_ConcurrentCascade
+    cascade_deletion_test.go:432: Concurrent cascade deletion not yet implemented - this test documents expected behavior
+--- PASS: TestAsyncValidator_MissingDependencies (0.03s)
+=== CONT  TestAsyncValidator_ConcurrentAccess
+--- PASS: TestCascadeDeletion_ConcurrentCascade (0.03s)
+=== CONT  TestValidationStateCache_ConcurrentReadWrite
+--- PASS: TestValidationStateCache_ConcurrentReadWrite (0.05s)
+=== CONT  TestCascadeDeletion_MultiLevelCascade
+    cascade_deletion_test.go:358: Initial state:
+    cascade_deletion_test.go:359:   MIL-004.strategic_plan_ref: created_at: "2026-09-04T14:39:08-07:00"
+        created_by: ACC-1785920548450214012-68b850c0
+        goal_refs:
+            - GOAL-004
+        id: MIL-004
+        kind: milestone
+        schema_version: 2.0.0
+        status: active
+        strategic_plan_ref: STRAT-PLAN-004
+        title: Multi-Level Milestone
+        updated_at: "2026-09-04T14:39:08-07:00"
+        updated_by: ACC-1785920548450214012-68b850c0
+    cascade_deletion_test.go:360:   GOAL-004.milestone_refs: created_at: "2026-09-04T14:39:08-07:00"
+        created_by: ACC-1785920548450214012-68b850c0
+        id: GOAL-004
+        kind: goal
+        schema_version: 2.0.0
+        status: active
+        title: Multi-Level Goal
+        updated_at: "2026-09-04T14:39:08-07:00"
+        updated_by: ACC-1785920548450214012-68b850c0
+    cascade_deletion_test.go:361:   REQ-004.goal_refs: created_at: "2026-09-04T14:39:08-07:00"
+        created_by: ACC-1785920548450214012-68b850c0
+        criteria_refs:
+            - CRIT-001
+        goal_refs:
+            - GOAL-004
+        id: REQ-004
+        kind: requirement
+        schema_version: 2.0.0
+        status: planned
+        title: Multi-Level Requirement
+        updated_at: "2026-09-04T14:39:08-07:00"
+        updated_by: ACC-1785920548450214012-68b850c0
+    cascade_deletion_test.go:362:   BLI-005.requirement_refs: created_at: "2026-09-04T14:39:08-07:00"
+        created_by: ACC-1785920548450214012-68b850c0
+        id: BLI-005
+        kind: backlog_item
+        requirement_refs:
+            - REQ-004
+        schema_version: 2.0.0
+        status: planned
+        title: Multi-Level Backlog Item
+        updated_at: "2026-09-04T14:39:08-07:00"
+        updated_by: ACC-1785920548450214012-68b850c0
+    cascade_deletion_test.go:364: Multi-level cascade deletion not yet implemented - test documents expected behavior for future implementation
+--- SKIP: TestCascadeDeletion_MultiLevelCascade (0.02s)
+=== CONT  TestAsyncValidator_DependencyUpdateCascade
+    cascade_test.go:594: Goal updated: checksum changed from 061b5886 to 9cb96d3f
+    cascade_test.go:595: Backlog item re-validated: 0 issues
+--- PASS: TestAsyncValidator_DependencyUpdateCascade (0.02s)
+=== CONT  TestAsyncValidator_ConcurrentCascadeValidation
+    cascade_test.go:494: Successfully validated 30 objects across 10 dependency chains
+--- PASS: TestAsyncValidator_ConcurrentCascadeValidation (1.08s)
+--- PASS: TestAsyncValidator_ConcurrentAccess (1.66s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/validation	2.966s

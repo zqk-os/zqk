@@ -1,0 +1,40 @@
+
+--- run 2026-09-04T22:11:43Z ---
+=== RUN   TestNestSpawnLinkStatus
+=== PAUSE TestNestSpawnLinkStatus
+=== RUN   TestNestRejectsDepthAndCycle
+=== PAUSE TestNestRejectsDepthAndCycle
+=== RUN   TestRollupStatusParityJSON
+=== PAUSE TestRollupStatusParityJSON
+=== CONT  TestNestSpawnLinkStatus
+--- PASS: TestNestSpawnLinkStatus (0.00s)
+=== CONT  TestRollupStatusParityJSON
+=== CONT  TestNestRejectsDepthAndCycle
+--- PASS: TestNestRejectsDepthAndCycle (0.00s)
+=== RUN   TestRollupStatusParityJSON/satisfied
+=== PAUSE TestRollupStatusParityJSON/satisfied
+=== RUN   TestRollupStatusParityJSON/blocked_fingerprints
+=== PAUSE TestRollupStatusParityJSON/blocked_fingerprints
+=== RUN   TestRollupStatusParityJSON/ready_for_review_matrix_only
+=== PAUSE TestRollupStatusParityJSON/ready_for_review_matrix_only
+=== RUN   TestRollupStatusParityJSON/ready_for_review_child_only
+=== PAUSE TestRollupStatusParityJSON/ready_for_review_child_only
+=== RUN   TestRollupStatusParityJSON/partial_bundle_gate
+=== PAUSE TestRollupStatusParityJSON/partial_bundle_gate
+=== RUN   TestRollupStatusParityJSON/blocked_field_key_gate
+=== PAUSE TestRollupStatusParityJSON/blocked_field_key_gate
+=== CONT  TestRollupStatusParityJSON/satisfied
+=== CONT  TestRollupStatusParityJSON/blocked_field_key_gate
+=== CONT  TestRollupStatusParityJSON/partial_bundle_gate
+=== CONT  TestRollupStatusParityJSON/ready_for_review_child_only
+=== CONT  TestRollupStatusParityJSON/ready_for_review_matrix_only
+=== CONT  TestRollupStatusParityJSON/blocked_fingerprints
+--- PASS: TestRollupStatusParityJSON (0.00s)
+    --- PASS: TestRollupStatusParityJSON/satisfied (0.00s)
+    --- PASS: TestRollupStatusParityJSON/blocked_field_key_gate (0.00s)
+    --- PASS: TestRollupStatusParityJSON/partial_bundle_gate (0.00s)
+    --- PASS: TestRollupStatusParityJSON/ready_for_review_child_only (0.00s)
+    --- PASS: TestRollupStatusParityJSON/ready_for_review_matrix_only (0.00s)
+    --- PASS: TestRollupStatusParityJSON/blocked_fingerprints (0.00s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/convergerollup	0.329s

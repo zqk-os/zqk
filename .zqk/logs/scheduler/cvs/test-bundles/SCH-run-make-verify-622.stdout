@@ -1,0 +1,44 @@
+
+--- run 2026-09-04T22:18:15Z ---
+=== RUN   TestDefaultRules
+=== PAUSE TestDefaultRules
+=== RUN   TestAwaitCreateID
+=== PAUSE TestAwaitCreateID
+=== RUN   TestAwaitCreateError
+=== PAUSE TestAwaitCreateError
+=== RUN   TestAwaitCreateTimeout
+=== PAUSE TestAwaitCreateTimeout
+=== RUN   TestAwaitCreateCanceled
+=== PAUSE TestAwaitCreateCanceled
+=== RUN   TestCloneAndExtractGroup
+=== PAUSE TestCloneAndExtractGroup
+=== RUN   TestResolveActor
+=== PAUSE TestResolveActor
+=== RUN   TestBufferCheckMap
+=== PAUSE TestBufferCheckMap
+=== RUN   TestPopulateEvent
+=== PAUSE TestPopulateEvent
+=== RUN   TestBulkStatusWriterRecords
+=== PAUSE TestBulkStatusWriterRecords
+=== CONT  TestDefaultRules
+--- PASS: TestDefaultRules (0.00s)
+=== CONT  TestAwaitCreateCanceled
+--- PASS: TestAwaitCreateCanceled (0.00s)
+=== CONT  TestBulkStatusWriterRecords
+=== CONT  TestCloneAndExtractGroup
+=== CONT  TestBufferCheckMap
+=== CONT  TestResolveActor
+=== CONT  TestAwaitCreateError
+=== CONT  TestAwaitCreateTimeout
+--- PASS: TestBulkStatusWriterRecords (0.00s)
+--- PASS: TestCloneAndExtractGroup (0.00s)
+--- PASS: TestBufferCheckMap (0.00s)
+--- PASS: TestResolveActor (0.00s)
+--- PASS: TestAwaitCreateError (0.00s)
+=== CONT  TestPopulateEvent
+--- PASS: TestAwaitCreateTimeout (0.00s)
+=== CONT  TestAwaitCreateID
+--- PASS: TestAwaitCreateID (0.00s)
+--- PASS: TestPopulateEvent (0.01s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/storage/audit	0.671s

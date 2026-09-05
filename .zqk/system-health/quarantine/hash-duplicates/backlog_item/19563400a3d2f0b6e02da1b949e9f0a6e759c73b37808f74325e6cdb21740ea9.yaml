@@ -1,0 +1,49 @@
+acceptance_considerations: Acceptance recorded as linked criteria; no narrative captured at migration time.
+actual_effort: 4h
+commit_refs:
+    - 245cdfab97
+created_at: "2026-08-05T04:48:12Z"
+created_by: ACC-1785920548450214012-68b850c0
+criteria_refs:
+    - CRIT-1785939715427940000-d74c25c8
+    - CRIT-1785939716263768000-578040da
+    - CRIT-1785939717160710000-93a5a7a1
+    - CRIT-1785939718123037000-fc020573
+    - CRIT-1786697464558137000-29e73621
+description: |
+    Implement credential issuance for each agent ACC-*, store fingerprints on account
+    tokens/keystore, generate seating env (ZQK_API_KEY) per seat/swarm_worker_N, and
+    stop defaulting wrappers to account:system or inherited human keys except break-glass.
+    Enforce POL-AGENT-API-KEY-001 + CRI-ACCOUNT-KEY-BOUND. Depends on ACC-* migration BLI.
+estimated_effort: 8h
+goal_refs:
+    - GOAL-1785885763755750000-6efcb274
+id: BLI-1785905292370531000-b758a11c
+kind: backlog_item
+milestone_refs:
+    - MIL-1785886016336815000-ad6784be
+namespace_id: zqk:kernel
+next_action: Verified seating inject + keystore seat map; promote with commit/effort
+owner_ref: ACC-1785920548450214012-68b850c0
+persona_refs:
+    - PER-1781486429759398000-a79939a1
+priority: high
+priority_tier: P0
+problem_statement: |-
+    Implement credential issuance for each agent ACC-*, store fingerprints on account
+    tokens/keystore, generate seating env (ZQK_API_KEY) per seat/swarm_worker_N, and
+    stop defaulting wrappers to account:system or inherited human keys except break-glass.
+    Enforce POL-AGENT-API-KEY-001 + CRI-ACCOUNT-KEY-BOUND. Depends on ACC-* migration BLI.
+related_object_refs:
+    - REQ-1785905287974978000-85b10c21
+    - CRIT-1785905289396259000-bc92146d
+    - POL-CODE-1785905290647508000-4ec5400e
+requirement_refs:
+    - REQ-1785905287974978000-85b10c21
+    - REQ-1785905117601841000-468539c3
+schema_version: 2.0.0
+status: complete
+title: 'MMORCH P0: Issue unique ZQK_API_KEY per ACC account and inject at seating'
+updated_at: "2026-08-19T04:52:21Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

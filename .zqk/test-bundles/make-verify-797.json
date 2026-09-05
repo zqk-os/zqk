@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-797",
+  "created_at": "2026-09-04T21:34:35.228541Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-797",
+    "Tests": [
+      {
+        "Name": "TestFieldKeyConstName",
+        "Package": "objects",
+        "PackagePath": "pkg/objects",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/objects/field_keys_generate_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestFieldKeysStub",
+        "Package": "objects_test",
+        "PackagePath": "pkg/objects",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/objects/field_keys_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestKernelCritical_indexAndLoaderAgreeForEveryKind",
+        "Package": "objects",
+        "PackagePath": "pkg/objects",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/objects/kernel_critical_agreement_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestKernelCritical_durableKindsAreProtectedOnBothRoutes",
+        "Package": "objects",
+        "PackagePath": "pkg/objects",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/objects/kernel_critical_agreement_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestResolveAndValidateKindForProject_EmptyArg",
+        "Package": "objects",
+        "PackagePath": "pkg/objects",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/objects/kind_cli_resolve_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestFindKindMappingsConfig_resolvesCanonicalPath",
+        "Package": "objects",
+        "PackagePath": "pkg/objects",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/objects/kind_mappings_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestFoundationalKindsDirectoryMappings",
+        "Package": "objects",
+        "PackagePath": "pkg/objects",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/objects/kind_mappings_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestLifecycleContract_AutoOnlyNeverPromoteTarget",
+        "Package": "objects",
+        "PackagePath": "pkg/objects",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/objects/lifecycle_contract_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestLifecycleContract_StrictAutoEdgesHaveTrigger",
+        "Package": "objects",
+        "PackagePath": "pkg/objects",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/objects/lifecycle_contract_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestLifecycleContract_RoleInvariants",
+        "Package": "objects",
+        "PackagePath": "pkg/objects",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/objects/lifecycle_contract_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 300000000000,
+    "PackagePath": "pkg/objects"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestFieldKeyConstName",
+      "Package": "objects",
+      "PackagePath": "pkg/objects",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/objects/field_keys_generate_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestFieldKeysStub",
+      "Package": "objects_test",
+      "PackagePath": "pkg/objects",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/objects/field_keys_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestKernelCritical_indexAndLoaderAgreeForEveryKind",
+      "Package": "objects",
+      "PackagePath": "pkg/objects",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/objects/kernel_critical_agreement_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestKernelCritical_durableKindsAreProtectedOnBothRoutes",
+      "Package": "objects",
+      "PackagePath": "pkg/objects",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/objects/kernel_critical_agreement_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestResolveAndValidateKindForProject_EmptyArg",
+      "Package": "objects",
+      "PackagePath": "pkg/objects",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/objects/kind_cli_resolve_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestFindKindMappingsConfig_resolvesCanonicalPath",
+      "Package": "objects",
+      "PackagePath": "pkg/objects",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/objects/kind_mappings_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestFoundationalKindsDirectoryMappings",
+      "Package": "objects",
+      "PackagePath": "pkg/objects",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/objects/kind_mappings_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestLifecycleContract_AutoOnlyNeverPromoteTarget",
+      "Package": "objects",
+      "PackagePath": "pkg/objects",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/objects/lifecycle_contract_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestLifecycleContract_StrictAutoEdgesHaveTrigger",
+      "Package": "objects",
+      "PackagePath": "pkg/objects",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/objects/lifecycle_contract_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestLifecycleContract_RoleInvariants",
+      "Package": "objects",
+      "PackagePath": "pkg/objects",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/objects/lifecycle_contract_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

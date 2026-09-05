@@ -1,0 +1,14 @@
+created_at: "2026-08-19T02:59:39Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1787108377806034000-84fb36bb
+item_id: REDACTED
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 2857702ca28e4b64fb5782140b43c1400e68fdeab30ab0062f4119523ca97d466e5f13c72adcfa41b92eacf21fa7f0a79b8a8e3a8d7c581e5c9afe0e69cb31dc
+schema_version: 2.0.0
+signature: 3046022100cc1381b0933878cdfc14fc99bd8acaca3bdb2bfa3cce3952947aca3e49760f15022100ac919fc4def407d9b4ad91d8484b47b22804ce1e90e8390a734521c7f524e3db
+status: archived
+title: 'Acceptance: Local CI / test-bundle ops: sticky fingerprints, cache reload, AllKindsCRUD fixtures'
+updated_at: "2026-09-01T07:11:00Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

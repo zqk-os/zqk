@@ -1,0 +1,48 @@
+
+--- run 2026-09-04T22:22:17Z ---
+=== RUN   TestSpecValidator_AllFieldsValidated
+=== PAUSE TestSpecValidator_AllFieldsValidated
+=== RUN   TestSpecValidator_InheritedFieldsValidated
+=== PAUSE TestSpecValidator_InheritedFieldsValidated
+=== RUN   TestSpecValidator_CriteriaTraceability
+=== PAUSE TestSpecValidator_CriteriaTraceability
+=== RUN   TestSpecValidator_WithoutStorageProvider
+=== PAUSE TestSpecValidator_WithoutStorageProvider
+=== RUN   TestSpecValidator_getCriteriaRef
+=== PAUSE TestSpecValidator_getCriteriaRef
+=== RUN   TestLoadSpecAndValidate_SingleLoad
+=== PAUSE TestLoadSpecAndValidate_SingleLoad
+=== RUN   TestValidateLoadedSpec_MatchesNewSpecValidator
+=== PAUSE TestValidateLoadedSpec_MatchesNewSpecValidator
+=== RUN   TestSpecValidator_ValidateTraits
+=== PAUSE TestSpecValidator_ValidateTraits
+=== RUN   TestSpecValidator_ValidateFieldTraits
+=== PAUSE TestSpecValidator_ValidateFieldTraits
+=== RUN   TestSpecValidator_InvalidTrait
+=== PAUSE TestSpecValidator_InvalidTrait
+=== CONT  TestSpecValidator_AllFieldsValidated
+=== CONT  TestLoadSpecAndValidate_SingleLoad
+=== CONT  TestSpecValidator_WithoutStorageProvider
+--- PASS: TestSpecValidator_AllFieldsValidated (0.02s)
+--- PASS: TestLoadSpecAndValidate_SingleLoad (0.03s)
+=== CONT  TestSpecValidator_getCriteriaRef
+--- PASS: TestSpecValidator_getCriteriaRef (0.00s)
+=== CONT  TestSpecValidator_CriteriaTraceability
+--- PASS: TestSpecValidator_WithoutStorageProvider (0.01s)
+=== CONT  TestSpecValidator_ValidateFieldTraits
+=== NAME  TestSpecValidator_CriteriaTraceability
+    spec_validator_test.go:168: Note: No criteria references found - criteria may not exist in test environment
+--- PASS: TestSpecValidator_CriteriaTraceability (0.01s)
+=== CONT  TestSpecValidator_InvalidTrait
+--- PASS: TestSpecValidator_ValidateFieldTraits (0.01s)
+=== CONT  TestSpecValidator_InheritedFieldsValidated
+=== NAME  TestSpecValidator_InvalidTrait
+    spec_validator_trait_test.go:91: Found trait validation error: Trait validation error: unknown trait: invalid_trait
+--- PASS: TestSpecValidator_InvalidTrait (0.01s)
+=== CONT  TestSpecValidator_ValidateTraits
+--- PASS: TestSpecValidator_InheritedFieldsValidated (0.01s)
+=== CONT  TestValidateLoadedSpec_MatchesNewSpecValidator
+--- PASS: TestSpecValidator_ValidateTraits (0.02s)
+--- PASS: TestValidateLoadedSpec_MatchesNewSpecValidator (0.02s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/objects	0.612s

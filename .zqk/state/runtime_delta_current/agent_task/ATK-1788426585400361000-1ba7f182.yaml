@@ -1,0 +1,19 @@
+assignee_persona_ref: PER-ORCH-ALPHA
+backlog_item_ref: BLI-CEF-PKG-CONSOLIDATE-001
+branch_ref: integration/pri-cef-remediate-structure-001
+commit_refs:
+    - 7bda1808e6
+created_at: "2026-09-03T09:09:45Z"
+created_by: ACC-1785920548450214006-2e52b3e7
+description: Merge testpackageconcurrency and syscallutil
+id: ATK-1788426585400361000-1ba7f182
+kind: agent_task
+namespace_id: zqk:kernel
+priority_plan_ref: PRI-CEF-REMEDIATE-STRUCTURE-001
+schema_version: 2.0.0
+started_at: "2026-09-03T09:09:51Z"
+status: error
+title: Merge micro-packages
+updated_at: "2026-09-03T09:17:11Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

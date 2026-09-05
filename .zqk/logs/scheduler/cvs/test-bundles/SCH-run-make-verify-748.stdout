@@ -1,0 +1,44 @@
+
+--- run 2026-09-04T22:21:04Z ---
+=== RUN   TestRunWithMaxWait_ReturnsAfterTimeoutWhenBlocked
+=== PAUSE TestRunWithMaxWait_ReturnsAfterTimeoutWhenBlocked
+=== RUN   TestWithLockTimeout_SameGoroutineLockUnlock
+=== PAUSE TestWithLockTimeout_SameGoroutineLockUnlock
+=== RUN   TestWithLockTimeout_ConcurrentAccess
+=== PAUSE TestWithLockTimeout_ConcurrentAccess
+=== RUN   TestWithLockTimeout_NestedUnlockReLock
+=== PAUSE TestWithLockTimeout_NestedUnlockReLock
+=== RUN   TestWithLockTimeout_Timeout
+=== PAUSE TestWithLockTimeout_Timeout
+=== RUN   TestWithRLockTimeout_SameGoroutineLockUnlock
+=== PAUSE TestWithRLockTimeout_SameGoroutineLockUnlock
+=== RUN   TestWithLockTimeout_StressTest
+=== PAUSE TestWithLockTimeout_StressTest
+=== RUN   TestWithLockTimeout_ReproducesOriginalBug
+=== PAUSE TestWithLockTimeout_ReproducesOriginalBug
+=== RUN   TestWithLockTimeout_ScanDirectoryScenario
+=== PAUSE TestWithLockTimeout_ScanDirectoryScenario
+=== RUN   TestWithLockTimeout_ContextCancellation
+=== PAUSE TestWithLockTimeout_ContextCancellation
+=== CONT  TestRunWithMaxWait_ReturnsAfterTimeoutWhenBlocked
+=== CONT  TestWithRLockTimeout_SameGoroutineLockUnlock
+--- PASS: TestWithRLockTimeout_SameGoroutineLockUnlock (0.00s)
+=== CONT  TestWithLockTimeout_NestedUnlockReLock
+--- PASS: TestWithLockTimeout_NestedUnlockReLock (0.00s)
+=== CONT  TestWithLockTimeout_Timeout
+--- PASS: TestRunWithMaxWait_ReturnsAfterTimeoutWhenBlocked (0.05s)
+=== CONT  TestWithLockTimeout_ScanDirectoryScenario
+--- PASS: TestWithLockTimeout_ScanDirectoryScenario (0.00s)
+=== CONT  TestWithLockTimeout_ContextCancellation
+--- PASS: TestWithLockTimeout_Timeout (0.05s)
+=== CONT  TestWithLockTimeout_ReproducesOriginalBug
+--- PASS: TestWithLockTimeout_ReproducesOriginalBug (0.00s)
+=== CONT  TestWithLockTimeout_StressTest
+--- PASS: TestWithLockTimeout_StressTest (0.01s)
+=== CONT  TestWithLockTimeout_ConcurrentAccess
+--- PASS: TestWithLockTimeout_ConcurrentAccess (0.01s)
+=== CONT  TestWithLockTimeout_SameGoroutineLockUnlock
+--- PASS: TestWithLockTimeout_SameGoroutineLockUnlock (0.00s)
+--- PASS: TestWithLockTimeout_ContextCancellation (0.02s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/concurrency	0.529s

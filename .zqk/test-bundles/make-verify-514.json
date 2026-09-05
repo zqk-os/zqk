@@ -1,0 +1,123 @@
+{
+  "name": "make-verify-514",
+  "created_at": "2026-09-04T21:34:32.462994Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-514",
+    "Tests": [
+      {
+        "Name": "TestCellularHandshake",
+        "Package": "specialization_test",
+        "PackagePath": "pkg/specialization",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/specialization/cellular_handshake_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestHeartHandler_PCSCalculation",
+        "Package": "specialization_test",
+        "PackagePath": "pkg/specialization",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/specialization/heart_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestShieldedHandler_Isolation",
+        "Package": "specialization",
+        "PackagePath": "pkg/specialization",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/specialization/shielded_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestShieldedHandler_SubscriptionPassThrough",
+        "Package": "specialization",
+        "PackagePath": "pkg/specialization",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/specialization/shielded_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestGetCurrentTier",
+        "Package": "specialization",
+        "PackagePath": "pkg/specialization",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/specialization/specialization_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestTier_ShouldRun",
+        "Package": "specialization",
+        "PackagePath": "pkg/specialization",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/specialization/specialization_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 180000000000,
+    "PackagePath": "pkg/specialization"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestCellularHandshake",
+      "Package": "specialization_test",
+      "PackagePath": "pkg/specialization",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/specialization/cellular_handshake_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestHeartHandler_PCSCalculation",
+      "Package": "specialization_test",
+      "PackagePath": "pkg/specialization",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/specialization/heart_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestShieldedHandler_Isolation",
+      "Package": "specialization",
+      "PackagePath": "pkg/specialization",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/specialization/shielded_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestShieldedHandler_SubscriptionPassThrough",
+      "Package": "specialization",
+      "PackagePath": "pkg/specialization",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/specialization/shielded_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestGetCurrentTier",
+      "Package": "specialization",
+      "PackagePath": "pkg/specialization",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/specialization/specialization_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestTier_ShouldRun",
+      "Package": "specialization",
+      "PackagePath": "pkg/specialization",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/specialization/specialization_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

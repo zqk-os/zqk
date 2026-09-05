@@ -1,0 +1,12 @@
+=== live command tree vs CLI file DNA ===
+valid: false
+parity: false
+loaded_command_count: 1225
+command_spec_count: 108
+commands_without_spec_count: 196
+specs_without_command_count: 8
+new_drift_count: 1
+resolved_drift_count: 0
+baseline_path: /Users/lanceettl/zqk-restore-clone/.zqk/cli/command_spec_coverage_baseline.json
+Error: command-spec parity failed: 196 commands lack specs; 8 specs lack commands
+2026-09-05T00:40:21Z [error] Command execution failed error=command-spec parity failed: 196 commands lack specs; 8 specs lack commands

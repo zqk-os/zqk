@@ -1,0 +1,141 @@
+{
+  "name": "make-verify-422",
+  "created_at": "2026-09-04T21:34:31.51525Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-422",
+    "Tests": [
+      {
+        "Name": "TestOrDefault",
+        "Package": "strutil",
+        "PackagePath": "pkg/strutil",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/strutil/default_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestDefaultWhenNonEmpty",
+        "Package": "strutil",
+        "PackagePath": "pkg/strutil",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/strutil/default_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestPtrOrDefault",
+        "Package": "strutil",
+        "PackagePath": "pkg/strutil",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/strutil/default_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestFirstNonNil",
+        "Package": "strutil",
+        "PackagePath": "pkg/strutil",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/strutil/default_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestSplitLines",
+        "Package": "strutil",
+        "PackagePath": "pkg/strutil",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/strutil/default_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestExtractFirstPrefixedValue",
+        "Package": "strutil",
+        "PackagePath": "pkg/strutil",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/strutil/extraction_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestFindLineWithPrefix",
+        "Package": "strutil",
+        "PackagePath": "pkg/strutil",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/strutil/extraction_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 210000000000,
+    "PackagePath": "pkg/strutil"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestOrDefault",
+      "Package": "strutil",
+      "PackagePath": "pkg/strutil",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/strutil/default_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestDefaultWhenNonEmpty",
+      "Package": "strutil",
+      "PackagePath": "pkg/strutil",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/strutil/default_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestPtrOrDefault",
+      "Package": "strutil",
+      "PackagePath": "pkg/strutil",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/strutil/default_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestFirstNonNil",
+      "Package": "strutil",
+      "PackagePath": "pkg/strutil",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/strutil/default_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestSplitLines",
+      "Package": "strutil",
+      "PackagePath": "pkg/strutil",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/strutil/default_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestExtractFirstPrefixedValue",
+      "Package": "strutil",
+      "PackagePath": "pkg/strutil",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/strutil/extraction_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestFindLineWithPrefix",
+      "Package": "strutil",
+      "PackagePath": "pkg/strutil",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/strutil/extraction_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

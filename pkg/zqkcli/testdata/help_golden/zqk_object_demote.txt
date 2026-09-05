@@ -1,0 +1,8 @@
+Demote one or more objects to a lower lifecycle status
+
+Usage:
+  zqk object demote [flags]
+
+Global Flags:
+      --allow-degraded   Allow scheduler-dependent commands to run when scheduler daemon is not running
+      --internal         Elevated access mode for built-in and internal kinds (requires Enterprise license or zqk-admin)

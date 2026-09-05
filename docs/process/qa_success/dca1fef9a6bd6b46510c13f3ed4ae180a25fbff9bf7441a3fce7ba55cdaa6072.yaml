@@ -1,0 +1,14 @@
+created_at: "2026-08-19T00:19:30Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1787098769172329000-d116ce68
+item_id: BLI-CEF-R2-TST-SLEEP-FLAKE
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 2857702ca28e4b64fb5782140b43c1400e68fdeab30ab0062f4119523ca97d466e5f13c72adcfa41b92eacf21fa7f0a79b8a8e3a8d7c581e5c9afe0e69cb31dc
+schema_version: 2.0.0
+signature: 30450220350cde3572f9d86cd94e45ad38556da916f5dc97b4b013b1289c4379793040de022100be695e7a33c7f53f245cc0fe5c775efe40f6da099eebcea0401407cb113b393b
+status: archived
+title: QA success QAS-1787098769172329000-d116ce68
+updated_at: "2026-09-01T07:26:32Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

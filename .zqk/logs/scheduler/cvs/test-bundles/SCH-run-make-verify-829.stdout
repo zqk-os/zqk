@@ -1,0 +1,60 @@
+
+--- run 2026-09-04T22:22:56Z ---
+=== RUN   TestEvaluateSchedulerGuard
+=== PAUSE TestEvaluateSchedulerGuard
+=== RUN   TestSpawnSitesCarryHarnessIdentity
+=== PAUSE TestSpawnSitesCarryHarnessIdentity
+=== RUN   TestSPlanCommandsExist
+=== PAUSE TestSPlanCommandsExist
+=== RUN   TestSPlanShowHasRunE
+=== PAUSE TestSPlanShowHasRunE
+=== RUN   TestSPlanListHasRunE
+=== PAUSE TestSPlanListHasRunE
+=== RUN   TestStringSliceToAny
+=== PAUSE TestStringSliceToAny
+=== RUN   TestExpandDottedFieldKeys
+=== PAUSE TestExpandDottedFieldKeys
+=== RUN   TestDeriveNextLifecycleStatus_Criteria
+=== PAUSE TestDeriveNextLifecycleStatus_Criteria
+=== RUN   TestDeriveNextLifecycleStatus_BacklogSkipsNonProgressStates
+=== PAUSE TestDeriveNextLifecycleStatus_BacklogSkipsNonProgressStates
+=== RUN   TestApplyAutoStatusFlag_RequiresTrait
+=== PAUSE TestApplyAutoStatusFlag_RequiresTrait
+=== CONT  TestEvaluateSchedulerGuard
+--- PASS: TestEvaluateSchedulerGuard (0.00s)
+=== CONT  TestSPlanListHasRunE
+=== CONT  TestStringSliceToAny
+=== RUN   TestStringSliceToAny/empty
+=== RUN   TestStringSliceToAny/single
+=== CONT  TestSPlanCommandsExist
+--- PASS: TestSPlanListHasRunE (0.00s)
+=== RUN   TestStringSliceToAny/multiple
+--- PASS: TestStringSliceToAny (0.00s)
+    --- PASS: TestStringSliceToAny/empty (0.00s)
+    --- PASS: TestStringSliceToAny/single (0.00s)
+    --- PASS: TestStringSliceToAny/multiple (0.00s)
+=== CONT  TestSPlanShowHasRunE
+--- PASS: TestSPlanShowHasRunE (0.00s)
+=== CONT  TestDeriveNextLifecycleStatus_BacklogSkipsNonProgressStates
+--- PASS: TestSPlanCommandsExist (0.00s)
+=== CONT  TestApplyAutoStatusFlag_RequiresTrait
+--- PASS: TestDeriveNextLifecycleStatus_BacklogSkipsNonProgressStates (0.00s)
+=== CONT  TestSpawnSitesCarryHarnessIdentity
+--- PASS: TestApplyAutoStatusFlag_RequiresTrait (0.01s)
+=== CONT  TestDeriveNextLifecycleStatus_Criteria
+--- PASS: TestDeriveNextLifecycleStatus_Criteria (0.00s)
+=== CONT  TestExpandDottedFieldKeys
+=== RUN   TestExpandDottedFieldKeys/no_dots_unchanged
+=== RUN   TestExpandDottedFieldKeys/single_dotted_key
+=== RUN   TestExpandDottedFieldKeys/two_dotted_keys_same_prefix
+=== RUN   TestExpandDottedFieldKeys/three_levels
+=== RUN   TestExpandDottedFieldKeys/mixed_dotted_and_flat
+--- PASS: TestExpandDottedFieldKeys (0.00s)
+    --- PASS: TestExpandDottedFieldKeys/no_dots_unchanged (0.00s)
+    --- PASS: TestExpandDottedFieldKeys/single_dotted_key (0.00s)
+    --- PASS: TestExpandDottedFieldKeys/two_dotted_keys_same_prefix (0.00s)
+    --- PASS: TestExpandDottedFieldKeys/three_levels (0.00s)
+    --- PASS: TestExpandDottedFieldKeys/mixed_dotted_and_flat (0.00s)
+--- PASS: TestSpawnSitesCarryHarnessIdentity (0.01s)
+PASS
+ok  	github.com/lanceman/zqk/cmd/zqk/object	0.770s

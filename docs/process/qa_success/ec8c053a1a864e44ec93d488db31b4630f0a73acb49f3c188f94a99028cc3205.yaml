@@ -1,0 +1,14 @@
+created_at: "2026-08-20T00:22:59Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1787185377139409000-e4e5131c
+item_id: BLI-CEF-R6-REL-WAL-ANCILLARY-001
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 2857702ca28e4b64fb5782140b43c1400e68fdeab30ab0062f4119523ca97d466e5f13c72adcfa41b92eacf21fa7f0a79b8a8e3a8d7c581e5c9afe0e69cb31dc
+schema_version: 2.0.0
+signature: 30450220631bb7f6d6d17c8ac4617958136d8f7985ffc3366b80fd50e42d0f50e8ec2a23022100b2752547623ea55027707276ae445b8aa1ddd64d4a56ea25d2e990f3d2915a1b
+status: archived
+title: Extend WAL fsync durability to non-CAS ancillary caches (REL toward 5)
+updated_at: "2026-09-01T07:06:55Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

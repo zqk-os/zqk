@@ -1,0 +1,44 @@
+
+--- run 2026-09-04T22:12:28Z ---
+=== RUN   TestRegistry_unknownExecutorFailClosed
+=== PAUSE TestRegistry_unknownExecutorFailClosed
+=== RUN   TestDefaultRegistry_hasV1Executors
+=== PAUSE TestDefaultRegistry_hasV1Executors
+=== RUN   TestRun_unknownExecutorFailClosed
+=== PAUSE TestRun_unknownExecutorFailClosed
+=== RUN   TestRun_dryRunDoesNotWriteSeatsOrInstall
+=== PAUSE TestRun_dryRunDoesNotWriteSeatsOrInstall
+=== RUN   TestRun_fromStageSkipsPrefix
+=== PAUSE TestRun_fromStageSkipsPrefix
+=== RUN   TestRun_workflowResolvesPipelineRef
+=== PAUSE TestRun_workflowResolvesPipelineRef
+=== RUN   TestParseRecipe_missingExecutorFailClosed
+=== PAUSE TestParseRecipe_missingExecutorFailClosed
+=== RUN   TestParseRecipe_unknownOnFailFailClosed
+=== PAUSE TestParseRecipe_unknownOnFailFailClosed
+=== RUN   TestParseRecipe_ok
+=== PAUSE TestParseRecipe_ok
+=== RUN   TestPipelineRefFromWorkflow
+=== PAUSE TestPipelineRefFromWorkflow
+=== CONT  TestRegistry_unknownExecutorFailClosed
+--- PASS: TestRegistry_unknownExecutorFailClosed (0.00s)
+=== CONT  TestRun_fromStageSkipsPrefix
+=== CONT  TestRun_workflowResolvesPipelineRef
+--- PASS: TestRun_workflowResolvesPipelineRef (0.01s)
+=== CONT  TestPipelineRefFromWorkflow
+--- PASS: TestRun_fromStageSkipsPrefix (0.01s)
+=== CONT  TestParseRecipe_ok
+--- PASS: TestPipelineRefFromWorkflow (0.00s)
+=== CONT  TestRun_unknownExecutorFailClosed
+=== CONT  TestParseRecipe_unknownOnFailFailClosed
+--- PASS: TestParseRecipe_ok (0.00s)
+--- PASS: TestParseRecipe_unknownOnFailFailClosed (0.00s)
+=== CONT  TestRun_dryRunDoesNotWriteSeatsOrInstall
+--- PASS: TestRun_unknownExecutorFailClosed (0.01s)
+=== CONT  TestDefaultRegistry_hasV1Executors
+--- PASS: TestDefaultRegistry_hasV1Executors (0.00s)
+=== CONT  TestParseRecipe_missingExecutorFailClosed
+--- PASS: TestParseRecipe_missingExecutorFailClosed (0.00s)
+--- PASS: TestRun_dryRunDoesNotWriteSeatsOrInstall (0.01s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/swarminit	0.306s

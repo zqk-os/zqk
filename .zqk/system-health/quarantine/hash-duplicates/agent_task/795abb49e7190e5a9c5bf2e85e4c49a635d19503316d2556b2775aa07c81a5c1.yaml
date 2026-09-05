@@ -1,0 +1,17 @@
+assignee_persona_ref: PER-ORCH-ALPHA
+backlog_item_ref: BLI-CEF-R27-DUAL-SEAT-REMEASURE-001
+branch_ref: integration/pri-cef-remediate-structure-001
+claimed_at: ""
+created_at: "2026-09-03T10:06:20Z"
+created_by: ACC-1785920548450214006-2e52b3e7
+id: ATK-1788429980944413000-64d67e14
+kind: agent_task
+namespace_id: zqk:kernel
+priority_plan_ref: PRI-CEF-R27-ENVELOPE-001
+schema_version: 2.0.0
+started_at: "2026-09-03T10:06:26Z"
+status: pending_verification
+title: Execute BLI-CEF-R27-DUAL-SEAT-REMEASURE-001
+updated_at: "2026-09-04T07:34:01Z"
+updated_by: ACC-1785920548450214006-2e52b3e7
+version_context: default

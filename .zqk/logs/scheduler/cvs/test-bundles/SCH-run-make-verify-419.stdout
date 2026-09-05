@@ -1,0 +1,20 @@
+
+--- run 2026-09-04T22:12:58Z ---
+=== RUN   TestCaptureAndRestore
+=== PAUSE TestCaptureAndRestore
+=== RUN   TestInitializeFromBootstrap
+=== PAUSE TestInitializeFromBootstrap
+=== RUN   TestBootstrapVersionAwareSpecLoading
+=== PAUSE TestBootstrapVersionAwareSpecLoading
+=== RUN   TestBootstrapRoundTripWithVersionAware
+=== PAUSE TestBootstrapRoundTripWithVersionAware
+=== CONT  TestCaptureAndRestore
+=== CONT  TestBootstrapVersionAwareSpecLoading
+=== CONT  TestBootstrapRoundTripWithVersionAware
+--- PASS: TestBootstrapVersionAwareSpecLoading (0.03s)
+--- PASS: TestCaptureAndRestore (0.03s)
+=== CONT  TestInitializeFromBootstrap
+--- PASS: TestInitializeFromBootstrap (0.02s)
+--- PASS: TestBootstrapRoundTripWithVersionAware (0.03s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/specbuilder/bootstrap	0.368s

@@ -1,0 +1,14 @@
+created_at: "2026-08-20T01:41:59Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1787190119478417000-1250d3ae
+item_id: CRIT-CEF-R8L-CON-01
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 2857702ca28e4b64fb5782140b43c1400e68fdeab30ab0062f4119523ca97d466e5f13c72adcfa41b92eacf21fa7f0a79b8a8e3a8d7c581e5c9afe0e69cb31dc
+schema_version: 2.0.0
+signature: 304402200b13da7896feaf85670c8e7e966ea09ebc64ab0beee9cc4696d43b18d4624c3102204896ea041a8b1b0707a298b851c6e0b70505f6074bcdd75eb66013e1770e894f
+status: archived
+title: Systematic goroutine leak detection via goleak
+updated_at: "2026-09-01T07:21:41Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

@@ -1,0 +1,44 @@
+
+--- run 2026-09-04T21:41:07Z ---
+=== RUN   TestLoggerEventAdapter
+=== PAUSE TestLoggerEventAdapter
+=== RUN   TestLoggerEventAdapter_Disabled
+=== PAUSE TestLoggerEventAdapter_Disabled
+=== RUN   TestEventEmitter_MultipleSubscribers
+=== PAUSE TestEventEmitter_MultipleSubscribers
+=== RUN   TestEventEmitter_ConcurrentAccess
+=== PAUSE TestEventEmitter_ConcurrentAccess
+=== RUN   TestEventEmitter_EmptyEvent
+=== PAUSE TestEventEmitter_EmptyEvent
+=== RUN   TestEventEmitter_Timestamp
+=== PAUSE TestEventEmitter_Timestamp
+=== RUN   TestMCPEventSubscriber_JSONRPCFormat
+=== PAUSE TestMCPEventSubscriber_JSONRPCFormat
+=== RUN   TestMCPEventSubscriber_UpdateEventTypes
+=== PAUSE TestMCPEventSubscriber_UpdateEventTypes
+=== RUN   TestMCPEventSubscriber_Deactivate
+=== PAUSE TestMCPEventSubscriber_Deactivate
+=== RUN   TestEventEmitter_LifetimeCounters
+=== PAUSE TestEventEmitter_LifetimeCounters
+=== CONT  TestLoggerEventAdapter
+=== CONT  TestEventEmitter_Timestamp
+--- PASS: TestEventEmitter_Timestamp (0.00s)
+=== CONT  TestEventEmitter_LifetimeCounters
+--- PASS: TestLoggerEventAdapter (0.00s)
+=== CONT  TestMCPEventSubscriber_Deactivate
+=== CONT  TestMCPEventSubscriber_UpdateEventTypes
+=== CONT  TestEventEmitter_ConcurrentAccess
+=== CONT  TestEventEmitter_EmptyEvent
+--- PASS: TestEventEmitter_LifetimeCounters (0.00s)
+--- PASS: TestMCPEventSubscriber_Deactivate (0.00s)
+--- PASS: TestMCPEventSubscriber_UpdateEventTypes (0.00s)
+=== CONT  TestEventEmitter_MultipleSubscribers
+--- PASS: TestEventEmitter_MultipleSubscribers (0.00s)
+=== CONT  TestMCPEventSubscriber_JSONRPCFormat
+--- PASS: TestEventEmitter_EmptyEvent (0.01s)
+--- PASS: TestEventEmitter_ConcurrentAccess (0.01s)
+=== CONT  TestLoggerEventAdapter_Disabled
+--- PASS: TestLoggerEventAdapter_Disabled (0.00s)
+--- PASS: TestMCPEventSubscriber_JSONRPCFormat (0.00s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/mcp	0.615s

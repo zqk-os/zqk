@@ -1,0 +1,14 @@
+created_at: "2026-09-03T05:19:44Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1788412784829111000-cb92e377
+item_id: CRIT-CEF-R23-DIR-CENSUS-001
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 86b8ab3d574c004a61020b73c23f52b9055049e90c3d755c8bbb383e059e384028fdd8cd69e13123b644e5f3f7eb65596e73e2d57d719ea3dafcb01b84ce8dfb
+schema_version: 2.0.0
+signature: 3046022100da2cf7eddefbab73f22b20b2305632b89941962d66173c42f712494ae9f3039e02210082c85575f2adb1fee377a9a8e181b4f7049c74b5a723b6bfa60ae15989a15f88
+status: success
+title: QA success for CRIT-CEF-R23-DIR-CENSUS-001
+updated_at: "2026-09-03T05:19:45Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

@@ -1,0 +1,105 @@
+{
+  "name": "make-verify-254",
+  "created_at": "2026-09-04T21:34:29.905418Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-254",
+    "Tests": [
+      {
+        "Name": "TestBacklogItemBuilder_CodeLocation",
+        "Package": "bldr_v2_test",
+        "PackagePath": "pkg/specbuilder/bldr_v2",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/specbuilder/bldr_v2/backlog_item_builder_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestPriorityPlanBuilder_CodeLocation",
+        "Package": "bldr_v2_test",
+        "PackagePath": "pkg/specbuilder/bldr_v2",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/specbuilder/bldr_v2/priority_plan_builder_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestTestCaseBuilderStub",
+        "Package": "bldr_v2_test",
+        "PackagePath": "pkg/specbuilder/bldr_v2",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/specbuilder/bldr_v2/test_case_builder_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestWorkIntervalBuilderStub",
+        "Package": "bldr_v2_test",
+        "PackagePath": "pkg/specbuilder/bldr_v2",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/specbuilder/bldr_v2/work_interval_builder_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestWorkUnitBuilderStub",
+        "Package": "bldr_v2_test",
+        "PackagePath": "pkg/specbuilder/bldr_v2",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/specbuilder/bldr_v2/work_unit_builder_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 150000000000,
+    "PackagePath": "pkg/specbuilder/bldr_v2"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestBacklogItemBuilder_CodeLocation",
+      "Package": "bldr_v2_test",
+      "PackagePath": "pkg/specbuilder/bldr_v2",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/specbuilder/bldr_v2/backlog_item_builder_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestPriorityPlanBuilder_CodeLocation",
+      "Package": "bldr_v2_test",
+      "PackagePath": "pkg/specbuilder/bldr_v2",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/specbuilder/bldr_v2/priority_plan_builder_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestTestCaseBuilderStub",
+      "Package": "bldr_v2_test",
+      "PackagePath": "pkg/specbuilder/bldr_v2",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/specbuilder/bldr_v2/test_case_builder_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestWorkIntervalBuilderStub",
+      "Package": "bldr_v2_test",
+      "PackagePath": "pkg/specbuilder/bldr_v2",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/specbuilder/bldr_v2/work_interval_builder_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestWorkUnitBuilderStub",
+      "Package": "bldr_v2_test",
+      "PackagePath": "pkg/specbuilder/bldr_v2",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/specbuilder/bldr_v2/work_unit_builder_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

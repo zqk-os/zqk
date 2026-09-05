@@ -1,0 +1,67 @@
+acceptance_considerations: Acceptance recorded as linked criteria; no narrative captured at migration time.
+actual_effort: 4h
+commit_refs:
+    - a183887ad4
+created_at: "2026-08-05T04:21:48Z"
+created_by: ACC-1785920548450214012-68b850c0
+criteria_refs:
+    - CRIT-1785939694236763000-e9389fd3
+    - CRIT-1785939695062291000-c4e09be4
+    - CRIT-1785939695872829000-4bc72363
+    - CRIT-1785939696679187000-01989573
+    - CRIT-1786697464558104000-739fb314
+description: |
+    Make namespace segregation observable on inventory commands.
+    1) object list always emits meta.namespace_scope (default zqk:kernel) and
+       meta.hidden_outside_scope (or equivalent) when scope hides objects;
+       human table must print an explicit Namespace line — never bare Total: 0
+       without saying why.
+    2) Wire --namespace and --federated/--all-namespaces through CLI specs +
+       codegen onto object list (and count); document in help.
+    3) applyNamespaceBoundaries must run for object count the same as list
+       (or both document get-by-id as global and refuse silent divergence).
+    4) Acceptance: list team without flags shows scope + hidden count for
+       TEA-001 in domain:organizational; --federated or explicit namespace
+       filter returns the team; count matches list under the same flags.
+estimated_effort: 4h
+goal_refs:
+    - GOAL-1785885763755750000-6efcb274
+    - GOAL-OSS-CORE
+id: BLI-1785903708509306000-a6d8dc5b
+kind: backlog_item
+milestone_refs:
+    - MIL-1785886016336815000-ad6784be
+namespace_id: zqk:kernel
+owner_ref: ACC-1785920548450214012-68b850c0
+persona_refs:
+    - PER-1781486429759398000-a79939a1
+    - PER-1781248465963680000-4bef46bb
+priority: high
+priority_tier: P0
+problem_statement: |-
+    Make namespace segregation observable on inventory commands.
+    1) object list always emits meta.namespace_scope (default zqk:kernel) and
+       meta.hidden_outside_scope (or equivalent) when scope hides objects;
+       human table must print an explicit Namespace line — never bare Total: 0
+       without saying why.
+    2) Wire --namespace and --federated/--all-namespaces through CLI specs +
+       codegen onto object list (and count); document in help.
+    3) applyNamespaceBoundaries must run for object count the same as list
+       (or both document get-by-id as global and refuse silent divergence).
+    4) Acceptance: list team without flags shows scope + hidden count for
+       TEA-001 in domain:organizational; --federated or explicit namespace
+       filter returns the team; count matches list under the same flags.
+related_object_refs:
+    - REQ-1785903690847761000-a5449df3
+    - REQ-1785895564241296000-bf266adb
+    - GOAL-1785885763755750000-6efcb274
+requirement_refs:
+    - REQ-1785903690847761000-a5449df3
+schema_version: 2.0.0
+stakeholder_refs:
+    - PER-1781486429759398000-a79939a1
+status: complete
+title: 'MMORCH P0: Namespace demarcation on object list/count (visible scope + parity)'
+updated_at: "2026-08-19T04:51:58Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-773",
+  "created_at": "2026-09-04T21:34:34.99096Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-773",
+    "Tests": [
+      {
+        "Name": "TestExtractPackagePathFromRunWrapperCommand",
+        "Package": "circuitbreaker",
+        "PackagePath": "pkg/circuitbreaker",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/circuitbreaker/concurrency_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestPackageConcurrencyLimiter_AcquireRelease",
+        "Package": "circuitbreaker",
+        "PackagePath": "pkg/circuitbreaker",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/circuitbreaker/concurrency_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestPackageConcurrencyLimiter_Snapshot",
+        "Package": "circuitbreaker",
+        "PackagePath": "pkg/circuitbreaker",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/circuitbreaker/concurrency_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestPackageConcurrencyLimiter_ShouldLimit",
+        "Package": "circuitbreaker",
+        "PackagePath": "pkg/circuitbreaker",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/circuitbreaker/concurrency_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestPackageConcurrencyLimiter_MergeLimitsZeroRemoves",
+        "Package": "circuitbreaker",
+        "PackagePath": "pkg/circuitbreaker",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/circuitbreaker/concurrency_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestPackageConcurrencyLimiter_MergeLimitsIncreases",
+        "Package": "circuitbreaker",
+        "PackagePath": "pkg/circuitbreaker",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/circuitbreaker/concurrency_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestPackageConcurrencyLimiter_TrimDotSlashPrefix",
+        "Package": "circuitbreaker",
+        "PackagePath": "pkg/circuitbreaker",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/circuitbreaker/concurrency_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestPackageConcurrencyLimiter_EmptyPackagePath",
+        "Package": "circuitbreaker",
+        "PackagePath": "pkg/circuitbreaker",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/circuitbreaker/concurrency_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestPackageConcurrencyLimiter_MergeLimitsNilNoOp",
+        "Package": "circuitbreaker",
+        "PackagePath": "pkg/circuitbreaker",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/circuitbreaker/concurrency_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestTPMRateLimiter_Wait",
+        "Package": "circuitbreaker",
+        "PackagePath": "pkg/circuitbreaker",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/circuitbreaker/tpm_ratelimiter_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 300000000000,
+    "PackagePath": "pkg/circuitbreaker"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestExtractPackagePathFromRunWrapperCommand",
+      "Package": "circuitbreaker",
+      "PackagePath": "pkg/circuitbreaker",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/circuitbreaker/concurrency_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestPackageConcurrencyLimiter_AcquireRelease",
+      "Package": "circuitbreaker",
+      "PackagePath": "pkg/circuitbreaker",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/circuitbreaker/concurrency_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestPackageConcurrencyLimiter_Snapshot",
+      "Package": "circuitbreaker",
+      "PackagePath": "pkg/circuitbreaker",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/circuitbreaker/concurrency_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestPackageConcurrencyLimiter_ShouldLimit",
+      "Package": "circuitbreaker",
+      "PackagePath": "pkg/circuitbreaker",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/circuitbreaker/concurrency_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestPackageConcurrencyLimiter_MergeLimitsZeroRemoves",
+      "Package": "circuitbreaker",
+      "PackagePath": "pkg/circuitbreaker",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/circuitbreaker/concurrency_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestPackageConcurrencyLimiter_MergeLimitsIncreases",
+      "Package": "circuitbreaker",
+      "PackagePath": "pkg/circuitbreaker",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/circuitbreaker/concurrency_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestPackageConcurrencyLimiter_TrimDotSlashPrefix",
+      "Package": "circuitbreaker",
+      "PackagePath": "pkg/circuitbreaker",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/circuitbreaker/concurrency_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestPackageConcurrencyLimiter_EmptyPackagePath",
+      "Package": "circuitbreaker",
+      "PackagePath": "pkg/circuitbreaker",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/circuitbreaker/concurrency_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestPackageConcurrencyLimiter_MergeLimitsNilNoOp",
+      "Package": "circuitbreaker",
+      "PackagePath": "pkg/circuitbreaker",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/circuitbreaker/concurrency_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestTPMRateLimiter_Wait",
+      "Package": "circuitbreaker",
+      "PackagePath": "pkg/circuitbreaker",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/circuitbreaker/tpm_ratelimiter_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

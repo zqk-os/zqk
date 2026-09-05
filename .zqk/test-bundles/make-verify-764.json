@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-764",
+  "created_at": "2026-09-04T21:34:34.892265Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-764",
+    "Tests": [
+      {
+        "Name": "TestResolveGlossary_pinBeatsTitle",
+        "Package": "vds",
+        "PackagePath": "pkg/vds",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/vds/glossary_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestCultureGlossaryLine_unresolved",
+        "Package": "vds",
+        "PackagePath": "pkg/vds",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/vds/glossary_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestLookupProvider_default",
+        "Package": "vds",
+        "PackagePath": "pkg/vds",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/vds/project_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestRenderProviderBody_markerUsesProviderID",
+        "Package": "vds",
+        "PackagePath": "pkg/vds",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/vds/project_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestWriteOrCheckProvider_roundTrip",
+        "Package": "vds",
+        "PackagePath": "pkg/vds",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/vds/project_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestRenderProviderBody_unsupportedFormat",
+        "Package": "vds",
+        "PackagePath": "pkg/vds",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/vds/project_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestWriteOrCheckAllProviders",
+        "Package": "vds",
+        "PackagePath": "pkg/vds",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/vds/project_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestWriteOrCheckAllProviders_requiresWriteOrCheck",
+        "Package": "vds",
+        "PackagePath": "pkg/vds",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/vds/project_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestLookupProvider_unknown",
+        "Package": "vds",
+        "PackagePath": "pkg/vds",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/vds/providers_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestLookupProvider_disabled",
+        "Package": "vds",
+        "PackagePath": "pkg/vds",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/vds/providers_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 300000000000,
+    "PackagePath": "pkg/vds"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestResolveGlossary_pinBeatsTitle",
+      "Package": "vds",
+      "PackagePath": "pkg/vds",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/vds/glossary_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestCultureGlossaryLine_unresolved",
+      "Package": "vds",
+      "PackagePath": "pkg/vds",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/vds/glossary_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestLookupProvider_default",
+      "Package": "vds",
+      "PackagePath": "pkg/vds",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/vds/project_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestRenderProviderBody_markerUsesProviderID",
+      "Package": "vds",
+      "PackagePath": "pkg/vds",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/vds/project_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestWriteOrCheckProvider_roundTrip",
+      "Package": "vds",
+      "PackagePath": "pkg/vds",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/vds/project_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestRenderProviderBody_unsupportedFormat",
+      "Package": "vds",
+      "PackagePath": "pkg/vds",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/vds/project_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestWriteOrCheckAllProviders",
+      "Package": "vds",
+      "PackagePath": "pkg/vds",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/vds/project_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestWriteOrCheckAllProviders_requiresWriteOrCheck",
+      "Package": "vds",
+      "PackagePath": "pkg/vds",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/vds/project_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestLookupProvider_unknown",
+      "Package": "vds",
+      "PackagePath": "pkg/vds",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/vds/providers_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestLookupProvider_disabled",
+      "Package": "vds",
+      "PackagePath": "pkg/vds",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/vds/providers_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

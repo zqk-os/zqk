@@ -1,0 +1,52 @@
+
+--- run 2026-09-04T22:21:36Z ---
+=== RUN   TestKindSynonymResolver_EmptyLoader
+=== PAUSE TestKindSynonymResolver_EmptyLoader
+=== RUN   TestKindSynonymResolver_CaseInsensitive
+=== PAUSE TestKindSynonymResolver_CaseInsensitive
+=== RUN   TestKindSynonymResolver_GeneratedSynonyms_IncludeDefaultAliases
+=== PAUSE TestKindSynonymResolver_GeneratedSynonyms_IncludeDefaultAliases
+=== RUN   TestLifecycleLoader_ExtendsBaseLifecycle
+=== PAUSE TestLifecycleLoader_ExtendsBaseLifecycle
+=== RUN   TestLifecycleLoader_StatusMapping
+=== PAUSE TestLifecycleLoader_StatusMapping
+=== RUN   TestLifecycleLoader_CircularDependency
+=== PAUSE TestLifecycleLoader_CircularDependency
+=== RUN   TestLifecycleLoader_MergeLifecycles
+=== PAUSE TestLifecycleLoader_MergeLifecycles
+=== RUN   TestLifecycleLoader_DefaultLifecycle
+=== PAUSE TestLifecycleLoader_DefaultLifecycle
+=== RUN   TestLifecycleLoader_FileMtimeDetection
+=== PAUSE TestLifecycleLoader_FileMtimeDetection
+=== RUN   TestLifecycleLoader_CVSDraftToActiveAdmissionContract
+=== PAUSE TestLifecycleLoader_CVSDraftToActiveAdmissionContract
+=== CONT  TestKindSynonymResolver_EmptyLoader
+=== CONT  TestLifecycleLoader_CircularDependency
+--- PASS: TestLifecycleLoader_CircularDependency (0.04s)
+=== CONT  TestLifecycleLoader_ExtendsBaseLifecycle
+--- PASS: TestLifecycleLoader_ExtendsBaseLifecycle (0.00s)
+=== CONT  TestLifecycleLoader_StatusMapping
+--- PASS: TestLifecycleLoader_StatusMapping (0.00s)
+=== CONT  TestKindSynonymResolver_GeneratedSynonyms_IncludeDefaultAliases
+--- PASS: TestKindSynonymResolver_GeneratedSynonyms_IncludeDefaultAliases (0.00s)
+=== CONT  TestKindSynonymResolver_CaseInsensitive
+=== RUN   TestKindSynonymResolver_CaseInsensitive/bi
+=== RUN   TestKindSynonymResolver_CaseInsensitive/BI
+=== RUN   TestKindSynonymResolver_CaseInsensitive/Bi
+=== RUN   TestKindSynonymResolver_CaseInsensitive/bI
+--- PASS: TestKindSynonymResolver_CaseInsensitive (0.00s)
+    --- PASS: TestKindSynonymResolver_CaseInsensitive/bi (0.00s)
+    --- PASS: TestKindSynonymResolver_CaseInsensitive/BI (0.00s)
+    --- PASS: TestKindSynonymResolver_CaseInsensitive/Bi (0.00s)
+    --- PASS: TestKindSynonymResolver_CaseInsensitive/bI (0.00s)
+=== CONT  TestLifecycleLoader_FileMtimeDetection
+--- PASS: TestLifecycleLoader_FileMtimeDetection (0.05s)
+=== CONT  TestLifecycleLoader_CVSDraftToActiveAdmissionContract
+--- PASS: TestLifecycleLoader_CVSDraftToActiveAdmissionContract (0.00s)
+=== CONT  TestLifecycleLoader_DefaultLifecycle
+--- PASS: TestLifecycleLoader_DefaultLifecycle (0.00s)
+=== CONT  TestLifecycleLoader_MergeLifecycles
+--- PASS: TestLifecycleLoader_MergeLifecycles (0.00s)
+--- PASS: TestKindSynonymResolver_EmptyLoader (0.38s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/objects	0.954s

@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-435",
+  "created_at": "2026-09-04T21:34:31.634597Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-435",
+    "Tests": [
+      {
+        "Name": "TestProgressLogger_OverwriteBehavior",
+        "Package": "logging",
+        "PackagePath": "pkg/logging",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/logging/progress_logger_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestProgressLogger_ContextAware",
+        "Package": "logging",
+        "PackagePath": "pkg/logging",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/logging/progress_logger_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestProgressLogger_WithFields",
+        "Package": "logging",
+        "PackagePath": "pkg/logging",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/logging/progress_logger_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestProgressRouting_SeparateFromLogs",
+        "Package": "logging",
+        "PackagePath": "pkg/logging",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/logging/progress_routing_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestProgressRouting_ContextAwareFormatter",
+        "Package": "logging",
+        "PackagePath": "pkg/logging",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/logging/progress_routing_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestProgressRouting_OverwriteBehavior",
+        "Package": "logging",
+        "PackagePath": "pkg/logging",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/logging/progress_routing_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestProgressRouting_StatusChanges",
+        "Package": "logging",
+        "PackagePath": "pkg/logging",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/logging/progress_routing_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestProgressRouting_StreamEvents",
+        "Package": "logging",
+        "PackagePath": "pkg/logging",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/logging/progress_routing_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestLogRouter_MultipleDestinations",
+        "Package": "logging",
+        "PackagePath": "pkg/logging",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/logging/router_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestLogRouter_LevelFiltering",
+        "Package": "logging",
+        "PackagePath": "pkg/logging",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/logging/router_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": true,
+    "EstimatedDuration": 300000000000,
+    "PackagePath": "pkg/logging"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestProgressLogger_OverwriteBehavior",
+      "Package": "logging",
+      "PackagePath": "pkg/logging",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/logging/progress_logger_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestProgressLogger_ContextAware",
+      "Package": "logging",
+      "PackagePath": "pkg/logging",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/logging/progress_logger_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestProgressLogger_WithFields",
+      "Package": "logging",
+      "PackagePath": "pkg/logging",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/logging/progress_logger_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestProgressRouting_SeparateFromLogs",
+      "Package": "logging",
+      "PackagePath": "pkg/logging",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/logging/progress_routing_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestProgressRouting_ContextAwareFormatter",
+      "Package": "logging",
+      "PackagePath": "pkg/logging",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/logging/progress_routing_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestProgressRouting_OverwriteBehavior",
+      "Package": "logging",
+      "PackagePath": "pkg/logging",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/logging/progress_routing_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestProgressRouting_StatusChanges",
+      "Package": "logging",
+      "PackagePath": "pkg/logging",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/logging/progress_routing_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestProgressRouting_StreamEvents",
+      "Package": "logging",
+      "PackagePath": "pkg/logging",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/logging/progress_routing_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestLogRouter_MultipleDestinations",
+      "Package": "logging",
+      "PackagePath": "pkg/logging",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/logging/router_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestLogRouter_LevelFiltering",
+      "Package": "logging",
+      "PackagePath": "pkg/logging",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/logging/router_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

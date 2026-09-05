@@ -1,0 +1,44 @@
+
+--- run 2026-09-04T22:15:56Z ---
+=== RUN   TestRunSchedulerJobRetentionViaPipeline_NilJob
+=== PAUSE TestRunSchedulerJobRetentionViaPipeline_NilJob
+=== RUN   TestRunAutofixBatchCleanupViaPipeline_NilHandler
+=== PAUSE TestRunAutofixBatchCleanupViaPipeline_NilHandler
+=== RUN   TestRunAutofixBatchCleanupViaPipeline_NilJob
+=== PAUSE TestRunAutofixBatchCleanupViaPipeline_NilJob
+=== RUN   TestConflictManager_HasRunningJob
+=== PAUSE TestConflictManager_HasRunningJob
+=== RUN   TestConflictManager_CanRun_SameJobIDBlocked
+=== PAUSE TestConflictManager_CanRun_SameJobIDBlocked
+=== RUN   TestConflictManager_CanRun_ConcurrentAllowedDifferentIDs
+=== PAUSE TestConflictManager_CanRun_ConcurrentAllowedDifferentIDs
+=== RUN   TestConflictManager_AuditAggregationNotConcurrent
+=== PAUSE TestConflictManager_AuditAggregationNotConcurrent
+=== RUN   TestConflictManager_CanRun_RunWrapperDifferentIDsAllowed
+=== PAUSE TestConflictManager_CanRun_RunWrapperDifferentIDsAllowed
+=== RUN   TestConflictManager_TestBundleRunWrappersConcurrent
+=== PAUSE TestConflictManager_TestBundleRunWrappersConcurrent
+=== RUN   TestConflictManager_MaintenanceRunWrapperNotBlockedByTestingBundles
+=== PAUSE TestConflictManager_MaintenanceRunWrapperNotBlockedByTestingBundles
+=== CONT  TestRunSchedulerJobRetentionViaPipeline_NilJob
+--- PASS: TestRunSchedulerJobRetentionViaPipeline_NilJob (0.00s)
+=== CONT  TestConflictManager_MaintenanceRunWrapperNotBlockedByTestingBundles
+=== CONT  TestConflictManager_CanRun_ConcurrentAllowedDifferentIDs
+--- PASS: TestConflictManager_MaintenanceRunWrapperNotBlockedByTestingBundles (0.00s)
+=== CONT  TestConflictManager_CanRun_SameJobIDBlocked
+--- PASS: TestConflictManager_CanRun_ConcurrentAllowedDifferentIDs (0.00s)
+=== CONT  TestConflictManager_HasRunningJob
+--- PASS: TestConflictManager_CanRun_SameJobIDBlocked (0.00s)
+=== CONT  TestConflictManager_CanRun_RunWrapperDifferentIDsAllowed
+=== CONT  TestConflictManager_AuditAggregationNotConcurrent
+=== CONT  TestRunAutofixBatchCleanupViaPipeline_NilJob
+--- PASS: TestConflictManager_HasRunningJob (0.00s)
+--- PASS: TestRunAutofixBatchCleanupViaPipeline_NilJob (0.00s)
+--- PASS: TestConflictManager_CanRun_RunWrapperDifferentIDsAllowed (0.00s)
+--- PASS: TestConflictManager_AuditAggregationNotConcurrent (0.00s)
+=== CONT  TestConflictManager_TestBundleRunWrappersConcurrent
+--- PASS: TestConflictManager_TestBundleRunWrappersConcurrent (0.00s)
+=== CONT  TestRunAutofixBatchCleanupViaPipeline_NilHandler
+--- PASS: TestRunAutofixBatchCleanupViaPipeline_NilHandler (0.00s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/scheduler	0.916s

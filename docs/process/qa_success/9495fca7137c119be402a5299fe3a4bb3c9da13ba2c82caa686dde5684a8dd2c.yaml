@@ -1,0 +1,14 @@
+created_at: "2026-09-02T02:59:58Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1788317998858487000-ba07a8e7
+item_id: BLI-CEF-CONTAINER-REMAINING-OPEN-001
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 86b8ab3d574c004a61020b73c23f52b9055049e90c3d755c8bbb383e059e384028fdd8cd69e13123b644e5f3f7eb65596e73e2d57d719ea3dafcb01b84ce8dfb
+schema_version: 2.0.0
+signature: 30450221008d73296884ac09dc05cc8846d21033b23a3afc3564b915b3eae606d0509d86b70220345094db4296b82d516d4140c9e096b6dedc2c05a834bbe78b31fada35b60c5b
+status: success
+title: QA success for BLI-CEF-CONTAINER-REMAINING-OPEN-001
+updated_at: "2026-09-02T07:44:35Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

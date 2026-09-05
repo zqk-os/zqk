@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-710",
+  "created_at": "2026-09-04T21:34:34.400909Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-710",
+    "Tests": [
+      {
+        "Name": "TestApplyDependencyRefEvent_LockedBLIDoesNotWalkMilestone",
+        "Package": "lifecycle",
+        "PackagePath": "pkg/lifecycle",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/lifecycle/dependency_propagation_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestApplyComputeHooks_BacklogItem_Complete",
+        "Package": "lifecycle",
+        "PackagePath": "pkg/lifecycle",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/lifecycle/hooks_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestApplyComputeHooks_NotComplete",
+        "Package": "lifecycle",
+        "PackagePath": "pkg/lifecycle",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/lifecycle/hooks_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestApplyComputeHooks_BacklogItem_Complete_AutoFillActualEffort",
+        "Package": "lifecycle",
+        "PackagePath": "pkg/lifecycle",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/lifecycle/hooks_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestLifecycleMatrix_AllKinds",
+        "Package": "lifecycle_test",
+        "PackagePath": "pkg/lifecycle",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/lifecycle/matrix_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestLifecycleMatrix_IdentityAndCreateValidation",
+        "Package": "lifecycle_test",
+        "PackagePath": "pkg/lifecycle",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/lifecycle/matrix_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestLifecycleMatrix_EdgesPromoteDemoteArchive",
+        "Package": "lifecycle_test",
+        "PackagePath": "pkg/lifecycle",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/lifecycle/matrix_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestApplyPlanLastChildComplete_NonLastDoesNotComplete",
+        "Package": "lifecycle",
+        "PackagePath": "pkg/lifecycle",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/lifecycle/remaining_open_count_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestApplyPlanLastChildComplete_UnsetFieldDoesNotComplete",
+        "Package": "lifecycle",
+        "PackagePath": "pkg/lifecycle",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/lifecycle/remaining_open_count_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestApplyPlanLastChildComplete_ZeroCompletesWithoutMemberList",
+        "Package": "lifecycle",
+        "PackagePath": "pkg/lifecycle",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/lifecycle/remaining_open_count_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 300000000000,
+    "PackagePath": "pkg/lifecycle"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestApplyDependencyRefEvent_LockedBLIDoesNotWalkMilestone",
+      "Package": "lifecycle",
+      "PackagePath": "pkg/lifecycle",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/lifecycle/dependency_propagation_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestApplyComputeHooks_BacklogItem_Complete",
+      "Package": "lifecycle",
+      "PackagePath": "pkg/lifecycle",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/lifecycle/hooks_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestApplyComputeHooks_NotComplete",
+      "Package": "lifecycle",
+      "PackagePath": "pkg/lifecycle",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/lifecycle/hooks_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestApplyComputeHooks_BacklogItem_Complete_AutoFillActualEffort",
+      "Package": "lifecycle",
+      "PackagePath": "pkg/lifecycle",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/lifecycle/hooks_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestLifecycleMatrix_AllKinds",
+      "Package": "lifecycle_test",
+      "PackagePath": "pkg/lifecycle",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/lifecycle/matrix_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestLifecycleMatrix_IdentityAndCreateValidation",
+      "Package": "lifecycle_test",
+      "PackagePath": "pkg/lifecycle",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/lifecycle/matrix_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestLifecycleMatrix_EdgesPromoteDemoteArchive",
+      "Package": "lifecycle_test",
+      "PackagePath": "pkg/lifecycle",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/lifecycle/matrix_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestApplyPlanLastChildComplete_NonLastDoesNotComplete",
+      "Package": "lifecycle",
+      "PackagePath": "pkg/lifecycle",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/lifecycle/remaining_open_count_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestApplyPlanLastChildComplete_UnsetFieldDoesNotComplete",
+      "Package": "lifecycle",
+      "PackagePath": "pkg/lifecycle",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/lifecycle/remaining_open_count_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestApplyPlanLastChildComplete_ZeroCompletesWithoutMemberList",
+      "Package": "lifecycle",
+      "PackagePath": "pkg/lifecycle",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/lifecycle/remaining_open_count_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

@@ -1,0 +1,30 @@
+assignee_persona_ref: PER-ORCH-ALPHA
+backlog_item_ref: BLI-CEF-R27-DUAL-SEAT-REMEASURE-001
+branch_ref: integration/pri-cef-r27-envelope-001
+claimed_at: ""
+created_at: "2026-09-04T04:43:51Z"
+created_by: ACC-1785920548450214006-2e52b3e7
+description: |-
+    pipeline_ref=PIP-CEF-DIAMOND-REMEASURE-001 stage=W1_arch_specialist
+    PRIOR: skeleton+preflight under docs/quality/cef-runs/2026-09-03-AGENT_AC. ONLY L-ARCHITECTURE specialist (~2 interactions).
+    READ: rubrics/L-ARCHITECTURE.md; prompts/L-ARCHITECTURE/specialist.md; schemas/finding.schema.json (under docs/quality/codebase_evaluation/).
+    STEPS:
+    1) Overwrite docs/quality/cef-runs/2026-09-03-AGENT_AC/findings/L-ARCHITECTURE.jsonl with real findings (delete STUB).
+    2) Cite paths; E2+ preferred.
+    3) Append <=5 lines to docs/quality/cef-runs/2026-09-03-AGENT_AC/run_log.md.
+    4) Feed ack as qwen-1: finding_count + ids + success_gate.
+    SUCCESS_GATE: >=1 real finding_id in that file; no REPLACE_ME.
+    FORBID: source edits; process mint; dual-seat GPA; sibling package; scorecard grades.
+hourglass_on: true
+id: ATK-1788497031842355000-12119b9d
+kind: agent_task
+namespace_id: zqk:kernel
+pipeline_ref: PIP-CEF-DIAMOND-REMEASURE-001
+priority_plan_ref: PRI-CEF-R27-ENVELOPE-001
+schema_version: 2.0.0
+started_at: "2026-09-04T04:44:00Z"
+status: pending_verification
+title: CEF AGENT_AC W1_arch_specialist — L-ARCHITECTURE
+updated_at: "2026-09-04T07:34:04Z"
+updated_by: ACC-1785920548450214006-2e52b3e7
+version_context: default

@@ -1,0 +1,52 @@
+
+--- run 2026-09-04T22:22:24Z ---
+=== RUN   TestObjectCommandAliases
+=== PAUSE TestObjectCommandAliases
+=== RUN   TestBuildAllKindsCountMeta_DocumentsExclusions
+=== PAUSE TestBuildAllKindsCountMeta_DocumentsExclusions
+=== RUN   TestAllKindsCountScopeNote
+=== PAUSE TestAllKindsCountScopeNote
+=== RUN   TestRequireElevatedInternal_FlagUnset
+=== PAUSE TestRequireElevatedInternal_FlagUnset
+=== RUN   TestShouldSkipInternalKind
+=== PAUSE TestShouldSkipInternalKind
+=== RUN   TestEvomanCommandsExist
+=== PAUSE TestEvomanCommandsExist
+=== RUN   TestEvomanShowHasRunE
+=== PAUSE TestEvomanShowHasRunE
+=== RUN   TestEvomanListHasRunE
+=== PAUSE TestEvomanListHasRunE
+=== RUN   TestFieldsCommand
+=== PAUSE TestFieldsCommand
+=== RUN   TestIsNonProgressLifecycleProbeCandidate_AllowsSuccessTerminals
+=== PAUSE TestIsNonProgressLifecycleProbeCandidate_AllowsSuccessTerminals
+=== CONT  TestObjectCommandAliases
+=== CONT  TestEvomanCommandsExist
+--- PASS: TestObjectCommandAliases (0.00s)
+=== CONT  TestRequireElevatedInternal_FlagUnset
+--- PASS: TestRequireElevatedInternal_FlagUnset (0.00s)
+=== CONT  TestShouldSkipInternalKind
+--- PASS: TestEvomanCommandsExist (0.00s)
+=== CONT  TestFieldsCommand
+--- PASS: TestShouldSkipInternalKind (0.01s)
+=== CONT  TestIsNonProgressLifecycleProbeCandidate_AllowsSuccessTerminals
+--- PASS: TestIsNonProgressLifecycleProbeCandidate_AllowsSuccessTerminals (0.00s)
+=== CONT  TestAllKindsCountScopeNote
+--- PASS: TestAllKindsCountScopeNote (0.00s)
+=== CONT  TestEvomanListHasRunE
+--- PASS: TestEvomanListHasRunE (0.00s)
+=== CONT  TestEvomanShowHasRunE
+--- PASS: TestEvomanShowHasRunE (0.00s)
+=== CONT  TestBuildAllKindsCountMeta_DocumentsExclusions
+--- PASS: TestBuildAllKindsCountMeta_DocumentsExclusions (0.00s)
+=== RUN   TestFieldsCommand/List_kinds_via_list_command
+=== RUN   TestFieldsCommand/List_fields_for_kind
+=== RUN   TestFieldsCommand/List_filterable_fields
+=== RUN   TestFieldsCommand/JSON_output
+--- PASS: TestFieldsCommand (16.24s)
+    --- PASS: TestFieldsCommand/List_kinds_via_list_command (2.99s)
+    --- PASS: TestFieldsCommand/List_fields_for_kind (0.90s)
+    --- PASS: TestFieldsCommand/List_filterable_fields (0.88s)
+    --- PASS: TestFieldsCommand/JSON_output (0.84s)
+PASS
+ok  	github.com/lanceman/zqk/cmd/zqk/object	17.146s

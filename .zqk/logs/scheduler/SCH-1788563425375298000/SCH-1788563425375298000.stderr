@@ -1,0 +1,17 @@
+
+--- run 2026-09-04T23:15:11Z ---
+committing as: zqk-cursor-agent <zqk-cursor-agent@users.noreply.github.com>
+⚠️  ZQK_ALLOW_UNSTAGED_PROCESS_CAS set — skipping CAS-with-work commit gate
+
+❌ UNDECLARED CHANGES: 4 staged path(s) are absent from scripts/fixtures/change_intents/2026-09-04-cef-qwen2-sec-correction.json
+
+     docs/process/backlog/ce2e7b93babaa8e54d4da07d94adb40c8f3de442a56ac41baaec406e5a94327e.yaml
+     docs/process/backlog/f5db106ab0d8b93227e257c452f6accf6a32b09a18165f30bb584e50d5295cda.yaml
+     docs/process/priority_plans/e9044eb180221f4031bd6116ff278b5d9c88f3f6725a87a3746e7d666a5b7f86.yaml
+     scripts/fixtures/objectify_claims/2026-09-04-tpm-ackonly-r29-membership.json
+
+   Either unstage them, or add them to changes[] with a reason that would
+   still make sense to someone investigating this commit months from now.
+   Break-glass (human, this commit only): ZQK_ALLOW_UNDECLARED_CHANGES=1
+ℹ️  declared but not staged: 'docs/quality/cef-runs/2026-09-04-QWEN2/findings/L-SECURITY-STUBAUTH-CORRECTION.md'
+ℹ️  declared but not staged: 'scripts/fixtures/change_intents/2026-09-04-cef-qwen2-sec-correction.json'

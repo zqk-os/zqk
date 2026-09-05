@@ -1,0 +1,86 @@
+
+--- run 2026-09-04T22:20:41Z ---
+=== RUN   TestOutputStream_AsyncValidation
+=== PAUSE TestOutputStream_AsyncValidation
+=== RUN   TestOutputStream_RealScenario
+=== PAUSE TestOutputStream_RealScenario
+=== RUN   TestNewRunAutonomyInboxCmd
+=== PAUSE TestNewRunAutonomyInboxCmd
+=== RUN   TestEvaluatePendingPullRequests
+=== PAUSE TestEvaluatePendingPullRequests
+=== RUN   TestEvaluateSchedulerGuard
+=== PAUSE TestEvaluateSchedulerGuard
+=== RUN   TestRequirementForSystemCommand
+=== PAUSE TestRequirementForSystemCommand
+=== RUN   TestRunSystemSchedulerGuard_BlockAndOverride
+=== PAUSE TestRunSystemSchedulerGuard_BlockAndOverride
+=== RUN   TestShouldUseCachedState_RejectsTier1InstanceValidation
+=== PAUSE TestShouldUseCachedState_RejectsTier1InstanceValidation
+=== RUN   TestGetValidationMap
+=== PAUSE TestGetValidationMap
+=== RUN   TestExtractLengthConstraint
+=== PAUSE TestExtractLengthConstraint
+=== CONT  TestOutputStream_AsyncValidation
+=== RUN   TestOutputStream_AsyncValidation/FileBasedOutput
+=== CONT  TestRequirementForSystemCommand
+--- PASS: TestRequirementForSystemCommand (0.00s)
+=== CONT  TestExtractLengthConstraint
+=== RUN   TestExtractLengthConstraint/int_value
+=== RUN   TestExtractLengthConstraint/float64_value
+=== RUN   TestExtractLengthConstraint/missing_constraint
+=== RUN   TestExtractLengthConstraint/wrong_type
+--- PASS: TestExtractLengthConstraint (0.00s)
+    --- PASS: TestExtractLengthConstraint/int_value (0.00s)
+    --- PASS: TestExtractLengthConstraint/float64_value (0.00s)
+    --- PASS: TestExtractLengthConstraint/missing_constraint (0.00s)
+    --- PASS: TestExtractLengthConstraint/wrong_type (0.00s)
+=== CONT  TestEvaluatePendingPullRequests
+--- PASS: TestEvaluatePendingPullRequests (0.00s)
+=== CONT  TestEvaluateSchedulerGuard
+=== RUN   TestEvaluateSchedulerGuard/required_blocks_when_scheduler_down_and_no_override
+=== PAUSE TestEvaluateSchedulerGuard/required_blocks_when_scheduler_down_and_no_override
+=== RUN   TestEvaluateSchedulerGuard/required_warns_with_override
+=== PAUSE TestEvaluateSchedulerGuard/required_warns_with_override
+=== RUN   TestEvaluateSchedulerGuard/optional_warns_when_down
+=== PAUSE TestEvaluateSchedulerGuard/optional_warns_when_down
+=== RUN   TestEvaluateSchedulerGuard/no_action_when_running
+=== PAUSE TestEvaluateSchedulerGuard/no_action_when_running
+=== RUN   TestEvaluateSchedulerGuard/no_action_for_non_dependent_command
+=== PAUSE TestEvaluateSchedulerGuard/no_action_for_non_dependent_command
+=== CONT  TestShouldUseCachedState_RejectsTier1InstanceValidation
+=== RUN   TestOutputStream_AsyncValidation/FileBasedOutputFromGoroutine
+=== RUN   TestOutputStream_AsyncValidation/ConcurrentFileWrites
+=== RUN   TestOutputStream_AsyncValidation/AsyncValidationScenario
+--- PASS: TestShouldUseCachedState_RejectsTier1InstanceValidation (0.09s)
+=== CONT  TestGetValidationMap
+=== RUN   TestGetValidationMap/validation_map_exists
+=== RUN   TestGetValidationMap/validation_map_missing
+=== RUN   TestGetValidationMap/validation_is_not_a_map
+--- PASS: TestGetValidationMap (0.00s)
+    --- PASS: TestGetValidationMap/validation_map_exists (0.00s)
+    --- PASS: TestGetValidationMap/validation_map_missing (0.00s)
+    --- PASS: TestGetValidationMap/validation_is_not_a_map (0.00s)
+=== CONT  TestNewRunAutonomyInboxCmd
+--- PASS: TestNewRunAutonomyInboxCmd (0.00s)
+=== CONT  TestOutputStream_RealScenario
+--- PASS: TestOutputStream_AsyncValidation (0.16s)
+    --- PASS: TestOutputStream_AsyncValidation/FileBasedOutput (0.01s)
+    --- PASS: TestOutputStream_AsyncValidation/FileBasedOutputFromGoroutine (0.02s)
+    --- PASS: TestOutputStream_AsyncValidation/ConcurrentFileWrites (0.06s)
+    --- PASS: TestOutputStream_AsyncValidation/AsyncValidationScenario (0.07s)
+=== CONT  TestRunSystemSchedulerGuard_BlockAndOverride
+--- PASS: TestOutputStream_RealScenario (0.07s)
+=== CONT  TestEvaluateSchedulerGuard/required_blocks_when_scheduler_down_and_no_override
+=== CONT  TestEvaluateSchedulerGuard/no_action_when_running
+=== CONT  TestEvaluateSchedulerGuard/no_action_for_non_dependent_command
+=== CONT  TestEvaluateSchedulerGuard/optional_warns_when_down
+=== CONT  TestEvaluateSchedulerGuard/required_warns_with_override
+--- PASS: TestEvaluateSchedulerGuard (0.00s)
+    --- PASS: TestEvaluateSchedulerGuard/required_blocks_when_scheduler_down_and_no_override (0.00s)
+    --- PASS: TestEvaluateSchedulerGuard/no_action_when_running (0.00s)
+    --- PASS: TestEvaluateSchedulerGuard/no_action_for_non_dependent_command (0.00s)
+    --- PASS: TestEvaluateSchedulerGuard/optional_warns_when_down (0.00s)
+    --- PASS: TestEvaluateSchedulerGuard/required_warns_with_override (0.00s)
+--- PASS: TestRunSystemSchedulerGuard_BlockAndOverride (0.00s)
+PASS
+ok  	github.com/lanceman/zqk/cmd/zqk/system	0.874s

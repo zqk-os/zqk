@@ -1,0 +1,14 @@
+created_at: "2026-08-19T05:09:35Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1787116163773199000-53da35d4
+item_id: REDACTED
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 2857702ca28e4b64fb5782140b43c1400e68fdeab30ab0062f4119523ca97d466e5f13c72adcfa41b92eacf21fa7f0a79b8a8e3a8d7c581e5c9afe0e69cb31dc
+schema_version: 2.0.0
+signature: 3045022100fae22e6c895b6cb312060307d12595bcdf1c868a99a05fc0e484ca870e4f3ca702205ae46e7be9f10917d8b57fb7838a49ffdb70b00ea111271c705770746e4ed9ef
+status: archived
+title: 'P0: Objectify pipeline stage metrics into kernel'
+updated_at: "2026-09-01T07:15:14Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

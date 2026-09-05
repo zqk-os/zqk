@@ -1,0 +1,87 @@
+{
+  "name": "make-verify-414",
+  "created_at": "2026-09-04T21:34:31.445297Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-414",
+    "Tests": [
+      {
+        "Name": "TestActivityLog_SignedPulse",
+        "Package": "hivemind_test",
+        "PackagePath": "pkg/hivemind",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/hivemind/activity_log_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestMemoryStoreInterface",
+        "Package": "hivemind",
+        "PackagePath": "pkg/hivemind",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/hivemind/interface_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestDynamicQueryRouter_HighSelectivity",
+        "Package": "hivemind_test",
+        "PackagePath": "pkg/hivemind",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/hivemind/router_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestDynamicQueryRouter_BroadConstraints",
+        "Package": "hivemind_test",
+        "PackagePath": "pkg/hivemind",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/hivemind/router_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 120000000000,
+    "PackagePath": "pkg/hivemind"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestActivityLog_SignedPulse",
+      "Package": "hivemind_test",
+      "PackagePath": "pkg/hivemind",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/hivemind/activity_log_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestMemoryStoreInterface",
+      "Package": "hivemind",
+      "PackagePath": "pkg/hivemind",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/hivemind/interface_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestDynamicQueryRouter_HighSelectivity",
+      "Package": "hivemind_test",
+      "PackagePath": "pkg/hivemind",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/hivemind/router_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestDynamicQueryRouter_BroadConstraints",
+      "Package": "hivemind_test",
+      "PackagePath": "pkg/hivemind",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/hivemind/router_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

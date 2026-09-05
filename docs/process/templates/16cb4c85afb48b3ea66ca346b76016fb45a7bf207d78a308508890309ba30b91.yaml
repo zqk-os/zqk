@@ -1,0 +1,15 @@
+category: structure
+context: When asserting completion of a refactor or extraction BLI, the criteria must assert measured deltas (e.g., file count down by N, specific symbol absent from the old package), not merely that the new package exists.
+created_at: "2026-08-27T21:45:48Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: TEM-1787867148990726000-6bb908ab
+kind: template
+namespace_id: zqk:kernel
+outputs:
+    - metric_delta
+schema_version: 2.0.0
+status: approved
+title: 'Criteria Template: Measured Deltas for Refactoring'
+updated_at: "2026-08-28T03:11:39Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

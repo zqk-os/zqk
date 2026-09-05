@@ -1,0 +1,105 @@
+{
+  "name": "make-verify-493",
+  "created_at": "2026-09-04T21:34:32.244767Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-493",
+    "Tests": [
+      {
+        "Name": "TestProductNamespacePrefix_stripsChannelSuffixes",
+        "Package": "brand",
+        "PackagePath": "pkg/brand",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/brand/env_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestSetNamespacePrefix_canonicalizesStableChannel",
+        "Package": "brand",
+        "PackagePath": "pkg/brand",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/brand/env_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestEnvPrefixForExecutable_stripsChannelSuffixes",
+        "Package": "brand",
+        "PackagePath": "pkg/brand",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/brand/env_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestSetExecutableName_RejectsGoTestBinary",
+        "Package": "brand",
+        "PackagePath": "pkg/brand",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/brand/runtime_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestDefaultExecutableName_IgnoresGoTestArg0",
+        "Package": "brand",
+        "PackagePath": "pkg/brand",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/brand/runtime_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 150000000000,
+    "PackagePath": "pkg/brand"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestProductNamespacePrefix_stripsChannelSuffixes",
+      "Package": "brand",
+      "PackagePath": "pkg/brand",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/brand/env_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestSetNamespacePrefix_canonicalizesStableChannel",
+      "Package": "brand",
+      "PackagePath": "pkg/brand",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/brand/env_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestEnvPrefixForExecutable_stripsChannelSuffixes",
+      "Package": "brand",
+      "PackagePath": "pkg/brand",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/brand/env_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestSetExecutableName_RejectsGoTestBinary",
+      "Package": "brand",
+      "PackagePath": "pkg/brand",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/brand/runtime_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestDefaultExecutableName_IgnoresGoTestArg0",
+      "Package": "brand",
+      "PackagePath": "pkg/brand",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/brand/runtime_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

@@ -1,0 +1,44 @@
+
+--- run 2026-09-04T22:16:00Z ---
+=== RUN   TestConflictManager_GetRunningJobIDs
+=== PAUSE TestConflictManager_GetRunningJobIDs
+=== RUN   TestRunContextRefreshViaPipeline_NilHandler
+=== PAUSE TestRunContextRefreshViaPipeline_NilHandler
+=== RUN   TestRunContextRefreshViaPipeline_NilJob
+=== PAUSE TestRunContextRefreshViaPipeline_NilJob
+=== RUN   TestCEFMeasureFromRows_envelopeBelowFloor
+=== PAUSE TestCEFMeasureFromRows_envelopeBelowFloor
+=== RUN   TestBuildCEFDiamondMeasureResult_fixture
+=== PAUSE TestBuildCEFDiamondMeasureResult_fixture
+=== RUN   TestStringKeyedAnyMap_anyAny
+=== PAUSE TestStringKeyedAnyMap_anyAny
+=== RUN   TestResolveTestBundleHealthLinesForTick_MissingSkip
+=== PAUSE TestResolveTestBundleHealthLinesForTick_MissingSkip
+=== RUN   TestResolveTestBundleHealthLinesForTick_MissingFailDefault
+=== PAUSE TestResolveTestBundleHealthLinesForTick_MissingFailDefault
+=== RUN   TestResolveTestBundleHealthLinesForTick_MissingSkipBudget
+=== PAUSE TestResolveTestBundleHealthLinesForTick_MissingSkipBudget
+=== RUN   TestResolveTestBundleHealthLinesForTick_ResetsStreakWhenHealthExists
+=== PAUSE TestResolveTestBundleHealthLinesForTick_ResetsStreakWhenHealthExists
+=== CONT  TestConflictManager_GetRunningJobIDs
+=== CONT  TestStringKeyedAnyMap_anyAny
+--- PASS: TestStringKeyedAnyMap_anyAny (0.00s)
+=== CONT  TestResolveTestBundleHealthLinesForTick_MissingSkipBudget
+--- PASS: TestConflictManager_GetRunningJobIDs (0.00s)
+=== CONT  TestResolveTestBundleHealthLinesForTick_MissingFailDefault
+--- PASS: TestResolveTestBundleHealthLinesForTick_MissingFailDefault (0.00s)
+=== CONT  TestResolveTestBundleHealthLinesForTick_MissingSkip
+--- PASS: TestResolveTestBundleHealthLinesForTick_MissingSkipBudget (0.04s)
+=== CONT  TestCEFMeasureFromRows_envelopeBelowFloor
+--- PASS: TestCEFMeasureFromRows_envelopeBelowFloor (0.00s)
+=== CONT  TestBuildCEFDiamondMeasureResult_fixture
+--- PASS: TestResolveTestBundleHealthLinesForTick_MissingSkip (0.04s)
+=== CONT  TestRunContextRefreshViaPipeline_NilJob
+--- PASS: TestRunContextRefreshViaPipeline_NilJob (0.00s)
+=== CONT  TestRunContextRefreshViaPipeline_NilHandler
+--- PASS: TestRunContextRefreshViaPipeline_NilHandler (0.00s)
+=== CONT  TestResolveTestBundleHealthLinesForTick_ResetsStreakWhenHealthExists
+--- PASS: TestBuildCEFDiamondMeasureResult_fixture (0.02s)
+--- PASS: TestResolveTestBundleHealthLinesForTick_ResetsStreakWhenHealthExists (0.03s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/scheduler	0.795s

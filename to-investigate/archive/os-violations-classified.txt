@@ -1,0 +1,34 @@
+# os-violations.txt is every `os.` identifier, not just filesystem.
+
+Regex dump: 7146 lines, 7535 hits, 88 identifiers.
+Do not convert process/env/stdio. Those stay on `os`.
+
+## Convert → pkg/utils/fileutil (already wrapped in fs.go)
+
+Stat 1051, ReadFile 847, WriteFile 768, MkdirAll 730, IsNotExist 520,
+ReadDir 273, Getwd 222, Remove 193, RemoveAll 158, Chdir 115, MkdirTemp 112,
+Open 105, OpenFile 104, O_CREATE 92, O_WRONLY 89, FileInfo 83, O_APPEND 77,
+Rename 56, File 55, Create 44, FileMode 34, DirEntry 30, Executable 29,
+Chtimes 24, ErrNotExist 18, Chmod 17, TempDir 17, CreateTemp 14, O_RDWR 14,
+UserHomeDir 13, PathSeparator 12, Lstat 11, O_TRUNC 10, PathListSeparator 9,
+Symlink 9, ModeSymlink 9, DevNull 8, ModeCharDevice 6, Mkdir 4, IsExist 3,
+O_RDONLY 3, Truncate 3, IsPermission 2, Readlink 2, O_EXCL 1, O_SYNC 1,
+Mode* 1 each, ErrExist 1, ErrPermission 1, Link 1
+
+## Keep on os (not filesystem)
+
+Getenv 399, Stderr 253, Args 198, Exit 187, Setenv 95, Stdout 95, Getpid 65,
+Environ 57, Unsetenv 52, Stdin 40, Pipe 16, Interrupt 12, FindProcess 11,
+Signal 9, Getppid 8, DirFS 5, ErrInvalid 3, StartProcess 3, ErrProcessDone 3,
+Hostname 3, LookupEnv 2, Getuid 2, ProcAttr 1, SyscallError 1, SEEK_SET 1
+
+## Intentional leftovers after AST rewrite
+
+- pkg/utils/fileutil — the wrappers call os
+- pkg/paths — fileutil already imports paths; rewriting paths would cycle
+- pkg/zqkenv — fileutil already imports zqkenv; rewriting zqkenv would cycle
+- comments / log strings that mention os.ReadFile etc.
+
+Mechanical rewrite branch: chore/fileutil-os-sweep
+Worktree: $TMPDIR/zqk-worktrees/34803c054d12/fileutil-sweep
+TRACK: BLI-CEF-R12-FILE-CAS-EXTRACT-001

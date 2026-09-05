@@ -1,0 +1,14 @@
+created_at: "2026-08-19T20:28:30Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1787171309901363000-edc39215
+item_id: BLI-OPENCORE-STRANGER-VALIDATE-001
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 2857702ca28e4b64fb5782140b43c1400e68fdeab30ab0062f4119523ca97d466e5f13c72adcfa41b92eacf21fa7f0a79b8a8e3a8d7c581e5c9afe0e69cb31dc
+schema_version: 2.0.0
+signature: 3046022100fd1b141701926068cb1ff2c20046d9b9ac5d8c1e582ee8b06a41f4b977ea0470022100b5d4a3f8eb0ce94f8895cdf563d717dcee08720a720f21431587112eebda2f9a
+status: archived
+title: Stranger path open-core release validation suite
+updated_at: "2026-09-01T07:47:03Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

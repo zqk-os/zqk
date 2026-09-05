@@ -1,0 +1,89 @@
+
+--- run 2026-09-04T21:38:59Z ---
+=== RUN   TestAsyncValidator_ComputeChecksumFromData
+=== PAUSE TestAsyncValidator_ComputeChecksumFromData
+=== RUN   TestAsyncValidator_ValidateObject
+=== PAUSE TestAsyncValidator_ValidateObject
+=== RUN   TestAsyncValidator_ValidateObjectWithData
+=== PAUSE TestAsyncValidator_ValidateObjectWithData
+=== RUN   TestAsyncValidator_Enqueue_ProgressChannelFull
+=== PAUSE TestAsyncValidator_Enqueue_ProgressChannelFull
+=== RUN   TestAsyncValidator_ComputeChecksum
+=== PAUSE TestAsyncValidator_ComputeChecksum
+=== RUN   TestAsyncValidator_ValidateNow
+=== PAUSE TestAsyncValidator_ValidateNow
+=== RUN   TestAsyncValidator_NoProgressUpdatesDroppedUnderLoad
+=== PAUSE TestAsyncValidator_NoProgressUpdatesDroppedUnderLoad
+=== RUN   TestValidateBucketingStrategy_ArchiveStrategy
+=== PAUSE TestValidateBucketingStrategy_ArchiveStrategy
+=== RUN   TestCascadeDeletion_CriteriaNullify
+=== PAUSE TestCascadeDeletion_CriteriaNullify
+=== RUN   TestCascadeDeletion_RequiredReferenceRestrict
+=== PAUSE TestCascadeDeletion_RequiredReferenceRestrict
+=== CONT  TestAsyncValidator_ComputeChecksumFromData
+=== CONT  TestAsyncValidator_ValidateNow
+--- PASS: TestAsyncValidator_ComputeChecksumFromData (0.01s)
+=== CONT  TestCascadeDeletion_CriteriaNullify
+    cascade_deletion_test.go:99: Initial test_case.criteria_refs: created_at: "2026-09-04T14:39:02-07:00"
+        created_by: ACC-1785920548450214012-68b850c0
+        criteria_refs:
+            - CRIT-001
+            - CRIT-002
+        id: TEST-001
+        kind: test_case
+        schema_version: 2.0.0
+        status: active
+        title: Test Case
+        updated_at: "2026-09-04T14:39:02-07:00"
+        updated_by: ACC-1785920548450214012-68b850c0
+    cascade_deletion_test.go:100: Initial requirement.criteria_refs: created_at: "2026-09-04T14:39:02-07:00"
+        created_by: ACC-1785920548450214012-68b850c0
+        criteria_refs:
+            - CRIT-001
+        goal_refs:
+            - GOAL-001
+        id: REQ-001
+        kind: requirement
+        schema_version: 2.0.0
+        status: planned
+        title: Test Requirement
+        updated_at: "2026-09-04T14:39:02-07:00"
+        updated_by: ACC-1785920548450214012-68b850c0
+    cascade_deletion_test.go:108: Cascade deletion not yet implemented - test documents expected behavior for future implementation
+--- PASS: TestAsyncValidator_ValidateNow (0.03s)
+=== CONT  TestCascadeDeletion_RequiredReferenceRestrict
+    cascade_deletion_test.go:178: Cascade restrict not yet implemented - this test documents expected behavior
+--- PASS: TestCascadeDeletion_RequiredReferenceRestrict (0.03s)
+--- SKIP: TestCascadeDeletion_CriteriaNullify (0.04s)
+=== CONT  TestAsyncValidator_Enqueue_ProgressChannelFull
+=== CONT  TestAsyncValidator_ComputeChecksum
+--- PASS: TestAsyncValidator_ComputeChecksum (0.02s)
+=== CONT  TestValidateBucketingStrategy_ArchiveStrategy
+=== RUN   TestValidateBucketingStrategy_ArchiveStrategy/valid_simple_archive_strategy
+--- PASS: TestAsyncValidator_Enqueue_ProgressChannelFull (0.12s)
+=== CONT  TestAsyncValidator_NoProgressUpdatesDroppedUnderLoad
+=== RUN   TestValidateBucketingStrategy_ArchiveStrategy/valid_multi-tier_archive_strategy
+=== RUN   TestValidateBucketingStrategy_ArchiveStrategy/enabled_archive_strategy_without_archive_after_or_tier_progression
+=== RUN   TestValidateBucketingStrategy_ArchiveStrategy/invalid_archive_after_duration_format
+=== RUN   TestValidateBucketingStrategy_ArchiveStrategy/invalid_tier_in_tier_progression
+=== RUN   TestValidateBucketingStrategy_ArchiveStrategy/missing_duration_in_tier_progression
+=== RUN   TestValidateBucketingStrategy_ArchiveStrategy/archive_strategy_disabled_(no_validation_needed)
+=== RUN   TestValidateBucketingStrategy_ArchiveStrategy/no_archive_strategy_(optional_field)
+--- PASS: TestValidateBucketingStrategy_ArchiveStrategy (0.47s)
+    --- PASS: TestValidateBucketingStrategy_ArchiveStrategy/valid_simple_archive_strategy (0.47s)
+    --- PASS: TestValidateBucketingStrategy_ArchiveStrategy/valid_multi-tier_archive_strategy (0.00s)
+    --- PASS: TestValidateBucketingStrategy_ArchiveStrategy/enabled_archive_strategy_without_archive_after_or_tier_progression (0.00s)
+    --- PASS: TestValidateBucketingStrategy_ArchiveStrategy/invalid_archive_after_duration_format (0.00s)
+    --- PASS: TestValidateBucketingStrategy_ArchiveStrategy/invalid_tier_in_tier_progression (0.00s)
+    --- PASS: TestValidateBucketingStrategy_ArchiveStrategy/missing_duration_in_tier_progression (0.00s)
+    --- PASS: TestValidateBucketingStrategy_ArchiveStrategy/archive_strategy_disabled_(no_validation_needed) (0.00s)
+    --- PASS: TestValidateBucketingStrategy_ArchiveStrategy/no_archive_strategy_(optional_field) (0.00s)
+=== CONT  TestAsyncValidator_ValidateObjectWithData
+--- PASS: TestAsyncValidator_ValidateObjectWithData (0.03s)
+=== CONT  TestAsyncValidator_ValidateObject
+--- PASS: TestAsyncValidator_ValidateObject (0.01s)
+=== NAME  TestAsyncValidator_NoProgressUpdatesDroppedUnderLoad
+    async_validator_test.go:938: Successfully received all 150 progress updates under channel pressure without drops!
+--- PASS: TestAsyncValidator_NoProgressUpdatesDroppedUnderLoad (2.04s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/validation	2.871s

@@ -1,0 +1,54 @@
+
+--- run 2026-09-05T05:23:46Z ---
+=== RUN   TestContextRefreshHandler_Execute_WithPolicies
+=== PAUSE TestContextRefreshHandler_Execute_WithPolicies
+=== RUN   TestContextRefreshHandler_Execute_StorageError
+=== PAUSE TestContextRefreshHandler_Execute_StorageError
+=== RUN   TestContextRefreshHandler_Execute_PolicyWithoutID
+=== PAUSE TestContextRefreshHandler_Execute_PolicyWithoutID
+=== RUN   TestHandlerFactory_CreateHandler_ContextRefresh
+=== PAUSE TestHandlerFactory_CreateHandler_ContextRefresh
+=== RUN   TestWithZQKJobIDEnv_IncludesJobID
+=== PAUSE TestWithZQKJobIDEnv_IncludesJobID
+=== RUN   TestRetentionArchiveCandidate
+=== PAUSE TestRetentionArchiveCandidate
+=== RUN   TestRetentionCleanup_Smoke
+=== PAUSE TestRetentionCleanup_Smoke
+=== RUN   TestSkipArchiveForOldestIDsPath
+=== PAUSE TestSkipArchiveForOldestIDsPath
+=== RUN   TestGetBatchConfig
+=== PAUSE TestGetBatchConfig
+=== RUN   TestErrObjectOverfill
+=== PAUSE TestErrObjectOverfill
+=== CONT  TestContextRefreshHandler_Execute_WithPolicies
+=== CONT  TestRetentionArchiveCandidate
+=== RUN   TestRetentionArchiveCandidate/complete_plan_eligible
+=== RUN   TestRetentionArchiveCandidate/active_plan_not_eligible
+=== RUN   TestRetentionArchiveCandidate/orphan_BLI_eligible
+=== RUN   TestRetentionArchiveCandidate/BLI_under_complete_plan_skipped
+=== RUN   TestRetentionArchiveCandidate/BLI_under_archived_plan_eligible
+--- PASS: TestRetentionArchiveCandidate (0.00s)
+    --- PASS: TestRetentionArchiveCandidate/complete_plan_eligible (0.00s)
+    --- PASS: TestRetentionArchiveCandidate/active_plan_not_eligible (0.00s)
+    --- PASS: TestRetentionArchiveCandidate/orphan_BLI_eligible (0.00s)
+    --- PASS: TestRetentionArchiveCandidate/BLI_under_complete_plan_skipped (0.00s)
+    --- PASS: TestRetentionArchiveCandidate/BLI_under_archived_plan_eligible (0.00s)
+=== CONT  TestGetBatchConfig
+--- PASS: TestGetBatchConfig (0.00s)
+=== CONT  TestErrObjectOverfill
+--- PASS: TestErrObjectOverfill (0.00s)
+=== CONT  TestSkipArchiveForOldestIDsPath
+--- PASS: TestSkipArchiveForOldestIDsPath (0.00s)
+=== CONT  TestHandlerFactory_CreateHandler_ContextRefresh
+=== CONT  TestWithZQKJobIDEnv_IncludesJobID
+--- PASS: TestContextRefreshHandler_Execute_WithPolicies (0.45s)
+=== CONT  TestContextRefreshHandler_Execute_PolicyWithoutID
+--- PASS: TestHandlerFactory_CreateHandler_ContextRefresh (0.45s)
+--- PASS: TestWithZQKJobIDEnv_IncludesJobID (0.00s)
+=== CONT  TestRetentionCleanup_Smoke
+--- PASS: TestRetentionCleanup_Smoke (0.00s)
+=== CONT  TestContextRefreshHandler_Execute_StorageError
+--- PASS: TestContextRefreshHandler_Execute_StorageError (0.42s)
+--- PASS: TestContextRefreshHandler_Execute_PolicyWithoutID (0.42s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/scheduler	1.645s

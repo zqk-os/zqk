@@ -1,0 +1,14 @@
+created_at: "2026-08-19T20:56:54Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1787173013750536000-2f683b14
+item_id: BLI-CEF-R4-SEC-SURFACE-001
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 2857702ca28e4b64fb5782140b43c1400e68fdeab30ab0062f4119523ca97d466e5f13c72adcfa41b92eacf21fa7f0a79b8a8e3a8d7c581e5c9afe0e69cb31dc
+schema_version: 2.0.0
+signature: 30440220113fe4eceab148b247429287056ceab748c94ba80180cf40815c2ab476f5ef100220553d9466266d659eaee5007cf06c0179eb92fe6fa5aef255fd050e292fe7f8c6
+status: archived
+title: MCP TCP bind hardening and brew-primary onboarding path
+updated_at: "2026-09-01T07:20:36Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

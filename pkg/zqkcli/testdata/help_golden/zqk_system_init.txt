@@ -1,0 +1,51 @@
+Initialize a new ZQK project in the current directory.
+
+Supports three initialization scenarios:
+  1. Greenfield: Brand new project (default)
+  2. Legacy: Existing project being brought under ZQK management
+  3. Snapshot: Initialize from snapshot data (test scenarios)
+
+This command creates the necessary directory structure and configuration files
+for a new ZQK project. It sets up:
+  - .zqk/ directory for configuration and state
+  - docs/process/ directory structure for object storage
+  - Initial configuration files
+
+  Greenfield: Initialize in current directory
+  zqk system init
+  Declarative Seed: Initialize with answer file
+  zqk system init --answer-file seed.yaml
+  Legacy: Initialize existing project
+  zqk system init --legacy
+  Snapshot: Initialize from snapshot (test scenario)
+  ZQK_TEST_ROOT=test-scenarios/my-scenario zqk system init --from-snapshot snapshot.csnap --wipe
+  Snapshot: Merge with existing data
+  zqk system init --from-snapshot snapshot.csnap --merge
+  Legacy + discover: Initialize and report existing objects
+  zqk system init --legacy --discover
+  Greenfield with maintenance jobs
+  zqk system init --with-maintenance-jobs
+  Greenfield with onboarding curriculum
+  zqk system init --with-onboarding-roadmap
+
+Usage:
+  zqk system init [flags]
+
+Flags:
+      --advanced                  Initialize with an advanced, ontology-aware interface (Semantic Bridge Phase 1)
+      --answer-file string        Declarative kernel seed answer file (.yaml or .json) for non-interactive swarm spawn
+      --discover                  Run the interactive Project Discovery Wizard to capture strategic context, stakeholders, and important dates. If --legacy is provided, it will instead scan and report existing objects.
+      --force                     Overwrite existing files
+      --from-snapshot string      Initialize from snapshot file (.csnap or .json)
+      --import-ontology string    Import an external ontology during initialization (requires --advanced)
+      --legacy                    Legacy project mode (preserve existing files)
+      --merge                     Merge snapshot data with existing (snapshot mode only)
+      --project-name string       Project name (defaults to directory name)
+      --simple                    Initialize with a simple, guided interface (Semantic Bridge Phase 1)
+      --template string           Template to use (standard, minimal) (default "standard")
+      --wipe                      Wipe existing data before restoring snapshot (requires --force)
+      --with-maintenance-jobs     After init, ensure retention and audit-aggregation scheduler jobs exist (same as running 'zqk system ensure-retention-jobs'). Puts the project in optimal maintenance configuration.
+      --with-onboarding-roadmap   After init, create the onboarding roadmap seed scheduler job. Start the scheduler to run it once and create the priority plan, workstream, and backlog items.
+
+Global Flags:
+      --allow-degraded   Allow scheduler-dependent commands to run when scheduler daemon is not running

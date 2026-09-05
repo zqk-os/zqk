@@ -1,0 +1,7 @@
+job_id: SCH-CANCEL-A
+execution_id: exec-1788562201-28864
+state: completed
+process_id: 28864
+started_at: 2026-09-04T22:50:01.936873Z
+completed_at: 2026-09-04T22:50:02.049435Z
+policy_decision: execute

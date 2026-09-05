@@ -1,0 +1,51 @@
+{
+  "name": "make-verify-83",
+  "created_at": "2026-09-04T21:34:28.179299Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-83",
+    "Tests": [
+      {
+        "Name": "TestValidator_Verify",
+        "Package": "license",
+        "PackagePath": "pkg/license",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/license/validator_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestValidator_RequireFeature",
+        "Package": "license",
+        "PackagePath": "pkg/license",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/license/validator_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 60000000000,
+    "PackagePath": "pkg/license"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestValidator_Verify",
+      "Package": "license",
+      "PackagePath": "pkg/license",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/license/validator_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestValidator_RequireFeature",
+      "Package": "license",
+      "PackagePath": "pkg/license",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/license/validator_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

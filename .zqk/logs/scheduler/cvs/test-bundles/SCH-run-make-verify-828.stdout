@@ -1,0 +1,52 @@
+
+--- run 2026-09-04T22:22:50Z ---
+=== RUN   TestPromoteProbeOrderSkipsCurrentStatus
+=== PAUSE TestPromoteProbeOrderSkipsCurrentStatus
+=== RUN   TestPromoteProbeOrderForwardOnlyFromActive
+=== PAUSE TestPromoteProbeOrderForwardOnlyFromActive
+=== RUN   TestPriorityPlanPercentCompleteOrdersExecutionLockedAfterActive
+=== PAUSE TestPriorityPlanPercentCompleteOrdersExecutionLockedAfterActive
+=== RUN   TestParseTableColumns_usesProjectionFieldOrder
+=== PAUSE TestParseTableColumns_usesProjectionFieldOrder
+=== RUN   TestParseTableColumns_columnsFlagDefinesColumnsWithoutProjection
+=== PAUSE TestParseTableColumns_columnsFlagDefinesColumnsWithoutProjection
+=== RUN   TestParseTableColumns_projectionMergesColumnsFlagWidths
+=== PAUSE TestParseTableColumns_projectionMergesColumnsFlagWidths
+=== RUN   TestParseTableColumns_projectionMergesFieldsFlagWidths
+=== PAUSE TestParseTableColumns_projectionMergesFieldsFlagWidths
+=== RUN   TestObjectHelpGroups_PartitionVerbsAndShortcuts
+=== PAUSE TestObjectHelpGroups_PartitionVerbsAndShortcuts
+=== RUN   TestExpandObjectIDArgs
+=== PAUSE TestExpandObjectIDArgs
+=== RUN   TestRequirementForObjectCommand
+=== PAUSE TestRequirementForObjectCommand
+=== CONT  TestPromoteProbeOrderSkipsCurrentStatus
+--- PASS: TestPromoteProbeOrderSkipsCurrentStatus (0.00s)
+=== CONT  TestParseTableColumns_columnsFlagDefinesColumnsWithoutProjection
+=== CONT  TestParseTableColumns_projectionMergesColumnsFlagWidths
+--- PASS: TestParseTableColumns_columnsFlagDefinesColumnsWithoutProjection (0.00s)
+=== CONT  TestPriorityPlanPercentCompleteOrdersExecutionLockedAfterActive
+--- PASS: TestParseTableColumns_projectionMergesColumnsFlagWidths (0.00s)
+=== CONT  TestParseTableColumns_usesProjectionFieldOrder
+--- PASS: TestPriorityPlanPercentCompleteOrdersExecutionLockedAfterActive (0.00s)
+=== CONT  TestExpandObjectIDArgs
+--- PASS: TestParseTableColumns_usesProjectionFieldOrder (0.00s)
+=== CONT  TestRequirementForObjectCommand
+=== RUN   TestExpandObjectIDArgs/comma_positional
+--- PASS: TestRequirementForObjectCommand (0.00s)
+=== CONT  TestObjectHelpGroups_PartitionVerbsAndShortcuts
+=== PAUSE TestExpandObjectIDArgs/comma_positional
+=== RUN   TestExpandObjectIDArgs/ids_flag
+=== PAUSE TestExpandObjectIDArgs/ids_flag
+=== CONT  TestParseTableColumns_projectionMergesFieldsFlagWidths
+--- PASS: TestParseTableColumns_projectionMergesFieldsFlagWidths (0.00s)
+=== CONT  TestPromoteProbeOrderForwardOnlyFromActive
+--- PASS: TestPromoteProbeOrderForwardOnlyFromActive (0.00s)
+=== CONT  TestExpandObjectIDArgs/comma_positional
+=== CONT  TestExpandObjectIDArgs/ids_flag
+--- PASS: TestExpandObjectIDArgs (0.00s)
+    --- PASS: TestExpandObjectIDArgs/comma_positional (0.00s)
+    --- PASS: TestExpandObjectIDArgs/ids_flag (0.00s)
+--- PASS: TestObjectHelpGroups_PartitionVerbsAndShortcuts (0.00s)
+PASS
+ok  	github.com/lanceman/zqk/cmd/zqk/object	0.687s

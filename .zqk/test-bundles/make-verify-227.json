@@ -1,0 +1,51 @@
+{
+  "name": "make-verify-227",
+  "created_at": "2026-09-04T21:34:29.648518Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-227",
+    "Tests": [
+      {
+        "Name": "TestDoc",
+        "Package": "mutation_test",
+        "PackagePath": "pkg/mutation",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mutation/doc_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestMutationInit",
+        "Package": "mutation",
+        "PackagePath": "pkg/mutation",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mutation/mutation_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 60000000000,
+    "PackagePath": "pkg/mutation"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestDoc",
+      "Package": "mutation_test",
+      "PackagePath": "pkg/mutation",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mutation/doc_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestMutationInit",
+      "Package": "mutation",
+      "PackagePath": "pkg/mutation",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/mutation/mutation_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

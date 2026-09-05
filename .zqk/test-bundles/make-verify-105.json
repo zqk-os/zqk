@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-105",
+  "created_at": "2026-09-04T21:34:28.409284Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-105",
+    "Tests": [
+      {
+        "Name": "TestAggregate_Count",
+        "Package": "crud_test",
+        "PackagePath": "pkg/storage/crud",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/crud/file_aggregate_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAggregate_GroupBy",
+        "Package": "crud_test",
+        "PackagePath": "pkg/storage/crud",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/crud/file_aggregate_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAggregate_MinMax",
+        "Package": "crud_test",
+        "PackagePath": "pkg/storage/crud",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/crud/file_aggregate_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAggregate_SumAvg",
+        "Package": "crud_test",
+        "PackagePath": "pkg/storage/crud",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/crud/file_aggregate_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAggregate_EmptyResult",
+        "Package": "crud_test",
+        "PackagePath": "pkg/storage/crud",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/crud/file_aggregate_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAggregate_EmptyAggregations",
+        "Package": "crud_test",
+        "PackagePath": "pkg/storage/crud",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/crud/file_aggregate_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAggregate_SumAvg_RealNumeric",
+        "Package": "crud_test",
+        "PackagePath": "pkg/storage/crud",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/crud/file_aggregate_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAggregate_MinMax_RealNumeric",
+        "Package": "crud_test",
+        "PackagePath": "pkg/storage/crud",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/crud/file_aggregate_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAggregate_MultipleAggregations",
+        "Package": "crud_test",
+        "PackagePath": "pkg/storage/crud",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/crud/file_aggregate_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAggregate_GroupByWithSum",
+        "Package": "crud_test",
+        "PackagePath": "pkg/storage/crud",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/crud/file_aggregate_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 900000000000,
+    "PackagePath": "pkg/storage/crud"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestAggregate_Count",
+      "Package": "crud_test",
+      "PackagePath": "pkg/storage/crud",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/crud/file_aggregate_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestAggregate_GroupBy",
+      "Package": "crud_test",
+      "PackagePath": "pkg/storage/crud",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/crud/file_aggregate_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestAggregate_MinMax",
+      "Package": "crud_test",
+      "PackagePath": "pkg/storage/crud",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/crud/file_aggregate_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestAggregate_SumAvg",
+      "Package": "crud_test",
+      "PackagePath": "pkg/storage/crud",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/crud/file_aggregate_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestAggregate_EmptyResult",
+      "Package": "crud_test",
+      "PackagePath": "pkg/storage/crud",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/crud/file_aggregate_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestAggregate_EmptyAggregations",
+      "Package": "crud_test",
+      "PackagePath": "pkg/storage/crud",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/crud/file_aggregate_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestAggregate_SumAvg_RealNumeric",
+      "Package": "crud_test",
+      "PackagePath": "pkg/storage/crud",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/crud/file_aggregate_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestAggregate_MinMax_RealNumeric",
+      "Package": "crud_test",
+      "PackagePath": "pkg/storage/crud",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/crud/file_aggregate_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestAggregate_MultipleAggregations",
+      "Package": "crud_test",
+      "PackagePath": "pkg/storage/crud",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/crud/file_aggregate_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestAggregate_GroupByWithSum",
+      "Package": "crud_test",
+      "PackagePath": "pkg/storage/crud",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/crud/file_aggregate_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    }
+  }
+}

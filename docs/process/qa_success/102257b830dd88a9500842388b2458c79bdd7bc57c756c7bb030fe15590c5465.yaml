@@ -1,0 +1,14 @@
+created_at: "2026-08-18T23:37:32Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1787096252546336000-9a595342
+item_id: CRIT-CEF-R2-SEC-HTTP-TIMEOUTS-A
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 2857702ca28e4b64fb5782140b43c1400e68fdeab30ab0062f4119523ca97d466e5f13c72adcfa41b92eacf21fa7f0a79b8a8e3a8d7c581e5c9afe0e69cb31dc
+schema_version: 2.0.0
+signature: 3046022100afbdcc8947861b5bb17e0b8f3ac6e1551b248d25f8bb190d9f3cce878a554775022100c51be93555068a527b3d222011b65ac661d9cc5e3f111779b053c514e1f7f2ad
+status: archived
+title: 'Accept: HTTP listeners set ReadHeaderTimeout/WriteTimeout'
+updated_at: "2026-09-01T07:22:30Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

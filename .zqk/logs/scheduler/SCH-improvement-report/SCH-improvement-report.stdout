@@ -1,0 +1,240 @@
+
+--- run 2026-09-04T20:40:46Z ---
+=== System Improvement Report ===
+
+System improvement report at 2026-09-04T20:40:47Z.
+Prioritized work items: 0 total (P0=0 P1=0 P2=0 P3=0).
+
+--- Prioritized Work Items ---
+
+--- Snapshot summary ---
+
+--- run 2026-09-04T21:16:42Z ---
+=== System Improvement Report ===
+
+System improvement report at 2026-09-04T21:16:43Z.
+Comparative vs 2026-09-04T20:40:56Z: object_count_delta=-70, retention_over_kinds=0, blocking_delta=0.
+Prioritized work items: 0 total (P0=0 P1=0 P2=0 P3=0).
+
+--- Prioritized Work Items ---
+
+--- Snapshot summary ---
+  Previous report: 2026-09-04T20:40:56Z
+  Object count delta: -70
+
+--- run 2026-09-04T22:02:42Z ---
+=== System Improvement Report ===
+
+System improvement report at 2026-09-04T22:02:46Z.
+Comparative vs 2026-09-04T21:16:52Z: object_count_delta=110, retention_over_kinds=0, blocking_delta=0.
+Prioritized work items: 3 total (P0=0 P1=0 P2=2 P3=1).
+
+--- Prioritized Work Items ---
+
+[P2] Optimize slow commands (performance)
+  1 command(s) flagged as slow.
+  Action: Run 'zqk system audit-report' for details; consider caching or batching.
+
+[P2] Review object count growth (accuracy)
+  Object count increased by 110 since last report.
+  Action: Run 'zqk system object-count-report' to confirm congruence; run retention if internal kinds grew.
+
+[P3] Review quarantine folder (quality)
+  58 file(s) in quarantine.
+  Action: Run 'zqk system quarantine-report' and 'zqk system cleanup-quarantine' if appropriate.
+
+--- Snapshot summary ---
+  Previous report: 2026-09-04T21:16:52Z
+  Object count delta: 110
+
+--- run 2026-09-04T23:00:35Z ---
+=== System Improvement Report ===
+
+System improvement report at 2026-09-04T23:00:37Z.
+Comparative vs 2026-09-04T22:02:56Z: object_count_delta=59, retention_over_kinds=0, blocking_delta=0.
+Prioritized work items: 2 total (P0=0 P1=0 P2=1 P3=1).
+
+--- Prioritized Work Items ---
+
+[P2] Optimize slow commands (performance)
+  1 command(s) flagged as slow.
+  Action: Run 'zqk system audit-report' for details; consider caching or batching.
+
+[P3] Review quarantine folder (quality)
+  58 file(s) in quarantine.
+  Action: Run 'zqk system quarantine-report' and 'zqk system cleanup-quarantine' if appropriate.
+
+--- Snapshot summary ---
+  Previous report: 2026-09-04T22:02:56Z
+  Object count delta: 59
+
+--- run 2026-09-05T00:00:00Z ---
+=== System Improvement Report ===
+
+System improvement report at 2026-09-05T00:00:02Z.
+Comparative vs 2026-09-04T23:10:15Z: object_count_delta=-7, retention_over_kinds=0, blocking_delta=0.
+Prioritized work items: 2 total (P0=0 P1=0 P2=1 P3=1).
+
+--- Prioritized Work Items ---
+
+[P2] Optimize slow commands (performance)
+  2 command(s) flagged as slow.
+  Action: Run 'zqk system audit-report' for details; consider caching or batching.
+
+[P3] Review quarantine folder (quality)
+  97 file(s) in quarantine.
+  Action: Run 'zqk system quarantine-report' and 'zqk system cleanup-quarantine' if appropriate.
+
+--- Snapshot summary ---
+  Previous report: 2026-09-04T23:10:15Z
+  Object count delta: -7
+
+--- run 2026-09-05T01:00:02Z ---
+=== System Improvement Report ===
+
+System improvement report at 2026-09-05T01:00:03Z.
+Comparative vs 2026-09-05T00:00:21Z: object_count_delta=2, retention_over_kinds=0, blocking_delta=0.
+Prioritized work items: 2 total (P0=0 P1=0 P2=1 P3=1).
+
+--- Prioritized Work Items ---
+
+[P2] Optimize slow commands (performance)
+  2 command(s) flagged as slow.
+  Action: Run 'zqk system audit-report' for details; consider caching or batching.
+
+[P3] Review quarantine folder (quality)
+  105 file(s) in quarantine.
+  Action: Run 'zqk system quarantine-report' and 'zqk system cleanup-quarantine' if appropriate.
+
+--- Snapshot summary ---
+  Previous report: 2026-09-05T00:00:21Z
+  Object count delta: 2
+
+--- run 2026-09-05T02:00:00Z ---
+=== System Improvement Report ===
+
+System improvement report at 2026-09-05T02:00:02Z.
+Comparative vs 2026-09-05T01:00:12Z: object_count_delta=2, retention_over_kinds=0, blocking_delta=0.
+Prioritized work items: 2 total (P0=0 P1=0 P2=1 P3=1).
+
+--- Prioritized Work Items ---
+
+[P2] Optimize slow commands (performance)
+  1 command(s) flagged as slow.
+  Action: Run 'zqk system audit-report' for details; consider caching or batching.
+
+[P3] Review quarantine folder (quality)
+  105 file(s) in quarantine.
+  Action: Run 'zqk system quarantine-report' and 'zqk system cleanup-quarantine' if appropriate.
+
+--- Snapshot summary ---
+  Previous report: 2026-09-05T01:00:12Z
+  Object count delta: 2
+
+--- run 2026-09-05T03:00:03Z ---
+=== System Improvement Report ===
+
+System improvement report at 2026-09-05T03:00:05Z.
+Comparative vs 2026-09-05T02:00:16Z: object_count_delta=-2, retention_over_kinds=0, blocking_delta=0.
+Prioritized work items: 2 total (P0=0 P1=0 P2=1 P3=1).
+
+--- Prioritized Work Items ---
+
+[P2] Optimize slow commands (performance)
+  1 command(s) flagged as slow.
+  Action: Run 'zqk system audit-report' for details; consider caching or batching.
+
+[P3] Review quarantine folder (quality)
+  105 file(s) in quarantine.
+  Action: Run 'zqk system quarantine-report' and 'zqk system cleanup-quarantine' if appropriate.
+
+--- Snapshot summary ---
+  Previous report: 2026-09-05T02:00:16Z
+  Object count delta: -2
+
+--- run 2026-09-05T04:00:23Z ---
+=== System Improvement Report ===
+
+System improvement report at 2026-09-05T04:00:24Z.
+Comparative vs 2026-09-05T03:00:21Z: object_count_delta=42, retention_over_kinds=0, blocking_delta=0.
+Prioritized work items: 4 total (P0=0 P1=1 P2=1 P3=2).
+
+--- Prioritized Work Items ---
+
+[P1] Address high-failure or timeout-prone commands (behavior)
+  1 command(s) with high failure rate.
+  Action: Run 'zqk system audit-report --format json' to list commands; fix or extend timeouts.
+
+[P2] Optimize slow commands (performance)
+  3 command(s) flagged as slow.
+  Action: Run 'zqk system audit-report' for details; consider caching or batching.
+
+[P3] Reduce CLI churn and user confusion (behavior)
+  1 churn indicator(s) in command metrics.
+  Action: Run 'zqk system audit-report' and improve docs or UX for frequently failed command patterns.
+
+[P3] Review quarantine folder (quality)
+  187 file(s) in quarantine.
+  Action: Run 'zqk system quarantine-report' and 'zqk system cleanup-quarantine' if appropriate.
+
+--- Snapshot summary ---
+  Previous report: 2026-09-05T03:00:21Z
+  Object count delta: 42
+
+--- run 2026-09-05T05:08:47Z ---
+=== System Improvement Report ===
+
+System improvement report at 2026-09-05T05:08:48Z.
+Comparative vs 2026-09-05T04:00:33Z: object_count_delta=61, retention_over_kinds=0, blocking_delta=0.
+Prioritized work items: 4 total (P0=0 P1=1 P2=1 P3=2).
+
+--- Prioritized Work Items ---
+
+[P1] Address high-failure or timeout-prone commands (behavior)
+  1 command(s) with high failure rate.
+  Action: Run 'zqk system audit-report --format json' to list commands; fix or extend timeouts.
+
+[P2] Optimize slow commands (performance)
+  3 command(s) flagged as slow.
+  Action: Run 'zqk system audit-report' for details; consider caching or batching.
+
+[P3] Reduce CLI churn and user confusion (behavior)
+  1 churn indicator(s) in command metrics.
+  Action: Run 'zqk system audit-report' and improve docs or UX for frequently failed command patterns.
+
+[P3] Review quarantine folder (quality)
+  187 file(s) in quarantine.
+  Action: Run 'zqk system quarantine-report' and 'zqk system cleanup-quarantine' if appropriate.
+
+--- Snapshot summary ---
+  Previous report: 2026-09-05T04:00:33Z
+  Object count delta: 61
+
+--- run 2026-09-05T05:08:57Z ---
+=== System Improvement Report ===
+
+System improvement report at 2026-09-05T05:08:58Z.
+Comparative vs 2026-09-05T05:08:57Z: object_count_delta=0, retention_over_kinds=0, blocking_delta=0.
+Prioritized work items: 4 total (P0=0 P1=1 P2=1 P3=2).
+
+--- Prioritized Work Items ---
+
+[P1] Address high-failure or timeout-prone commands (behavior)
+  1 command(s) with high failure rate.
+  Action: Run 'zqk system audit-report --format json' to list commands; fix or extend timeouts.
+
+[P2] Optimize slow commands (performance)
+  3 command(s) flagged as slow.
+  Action: Run 'zqk system audit-report' for details; consider caching or batching.
+
+[P3] Reduce CLI churn and user confusion (behavior)
+  1 churn indicator(s) in command metrics.
+  Action: Run 'zqk system audit-report' and improve docs or UX for frequently failed command patterns.
+
+[P3] Review quarantine folder (quality)
+  187 file(s) in quarantine.
+  Action: Run 'zqk system quarantine-report' and 'zqk system cleanup-quarantine' if appropriate.
+
+--- Snapshot summary ---
+  Previous report: 2026-09-05T05:08:57Z
+  Object count delta: 0

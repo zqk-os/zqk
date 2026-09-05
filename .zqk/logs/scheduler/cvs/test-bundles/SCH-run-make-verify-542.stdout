@@ -1,0 +1,44 @@
+
+--- run 2026-09-04T22:14:58Z ---
+=== RUN   TestRunCacheInvalidationViaPipeline_NilHandler
+=== PAUSE TestRunCacheInvalidationViaPipeline_NilHandler
+=== RUN   TestRunCacheInvalidationViaPipeline_NilJob
+=== PAUSE TestRunCacheInvalidationViaPipeline_NilJob
+=== RUN   TestRunCachePrewarmViaPipeline_NilHandler
+=== PAUSE TestRunCachePrewarmViaPipeline_NilHandler
+=== RUN   TestRunCachePrewarmViaPipeline_NilJob
+=== PAUSE TestRunCachePrewarmViaPipeline_NilJob
+=== RUN   TestRunCallbackListenerViaPipeline_NilHandler
+=== PAUSE TestRunCallbackListenerViaPipeline_NilHandler
+=== RUN   TestRunCallbackListenerViaPipeline_NilJob
+=== PAUSE TestRunCallbackListenerViaPipeline_NilJob
+=== RUN   TestCallbackListenerHandler_Timeouts
+=== PAUSE TestCallbackListenerHandler_Timeouts
+=== RUN   TestRunCascadeUpdateViaPipeline_NilHandler
+=== PAUSE TestRunCascadeUpdateViaPipeline_NilHandler
+=== RUN   TestRunCascadeUpdateViaPipeline_NilJob
+=== PAUSE TestRunCascadeUpdateViaPipeline_NilJob
+=== RUN   TestRunChangeJournalAggregationViaPipeline_NilHandler
+=== PAUSE TestRunChangeJournalAggregationViaPipeline_NilHandler
+=== CONT  TestRunCacheInvalidationViaPipeline_NilHandler
+=== CONT  TestRunCallbackListenerViaPipeline_NilJob
+=== CONT  TestRunCachePrewarmViaPipeline_NilJob
+--- PASS: TestRunCacheInvalidationViaPipeline_NilHandler (0.00s)
+=== CONT  TestRunCallbackListenerViaPipeline_NilHandler
+--- PASS: TestRunCallbackListenerViaPipeline_NilHandler (0.00s)
+=== CONT  TestRunCacheInvalidationViaPipeline_NilJob
+--- PASS: TestRunCacheInvalidationViaPipeline_NilJob (0.00s)
+=== CONT  TestRunCachePrewarmViaPipeline_NilHandler
+=== CONT  TestRunCascadeUpdateViaPipeline_NilJob
+--- PASS: TestRunCallbackListenerViaPipeline_NilJob (0.00s)
+--- PASS: TestRunCascadeUpdateViaPipeline_NilJob (0.00s)
+--- PASS: TestRunCachePrewarmViaPipeline_NilJob (0.00s)
+--- PASS: TestRunCachePrewarmViaPipeline_NilHandler (0.00s)
+=== CONT  TestRunCascadeUpdateViaPipeline_NilHandler
+--- PASS: TestRunCascadeUpdateViaPipeline_NilHandler (0.00s)
+=== CONT  TestCallbackListenerHandler_Timeouts
+--- PASS: TestCallbackListenerHandler_Timeouts (0.00s)
+=== CONT  TestRunChangeJournalAggregationViaPipeline_NilHandler
+--- PASS: TestRunChangeJournalAggregationViaPipeline_NilHandler (0.00s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/scheduler	0.736s

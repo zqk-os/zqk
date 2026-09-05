@@ -1,0 +1,14 @@
+created_at: "2026-09-03T21:30:56Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1788471056564519000-91714317
+item_id: BLI-STABLE-IDENTITY-STORAGE-003
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 86b8ab3d574c004a61020b73c23f52b9055049e90c3d755c8bbb383e059e384028fdd8cd69e13123b644e5f3f7eb65596e73e2d57d719ea3dafcb01b84ce8dfb
+schema_version: 2.0.0
+signature: 30460221009cbe60502e0056ac90c403e4a03f390ead1b98689c3863b42a0fb9f33f9d3e42022100b0a30876143997df1eed046acb2f8f841c150f864306a8491c850e432cf0ed86
+status: success
+title: QA success for BLI-STABLE-IDENTITY-STORAGE-003
+updated_at: "2026-09-03T21:30:56Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

@@ -1,0 +1,56 @@
+
+--- run 2026-09-04T22:13:21Z ---
+=== RUN   TestLogger_ErrorLogging
+=== PAUSE TestLogger_ErrorLogging
+=== RUN   TestProgressFormatterInterface
+=== PAUSE TestProgressFormatterInterface
+=== RUN   TestTextProgressFormatter
+=== PAUSE TestTextProgressFormatter
+=== RUN   TestJSONProgressFormatter
+=== PAUSE TestJSONProgressFormatter
+=== RUN   TestCompactProgressFormatter
+=== PAUSE TestCompactProgressFormatter
+=== RUN   TestProgressFormatterLineOverwrite
+=== PAUSE TestProgressFormatterLineOverwrite
+=== RUN   TestProgressFormatterContextAware
+=== PAUSE TestProgressFormatterContextAware
+=== RUN   TestLogger_Progress
+=== PAUSE TestLogger_Progress
+=== RUN   TestLogger_Status
+=== PAUSE TestLogger_Status
+=== RUN   TestLogger_Stream
+=== PAUSE TestLogger_Stream
+=== CONT  TestLogger_ErrorLogging
+--- PASS: TestLogger_ErrorLogging (0.00s)
+=== CONT  TestLogger_Stream
+--- PASS: TestLogger_Stream (0.00s)
+=== CONT  TestLogger_Status
+--- PASS: TestLogger_Status (0.00s)
+=== CONT  TestLogger_Progress
+=== RUN   TestLogger_Progress/TextProgressFormatter
+=== CONT  TestCompactProgressFormatter
+=== RUN   TestLogger_Progress/JSONProgressFormatter
+--- PASS: TestCompactProgressFormatter (0.00s)
+=== CONT  TestProgressFormatterContextAware
+--- PASS: TestProgressFormatterContextAware (0.00s)
+=== CONT  TestProgressFormatterLineOverwrite
+=== RUN   TestLogger_Progress/CompactProgressFormatter
+--- PASS: TestProgressFormatterLineOverwrite (0.00s)
+=== CONT  TestTextProgressFormatter
+--- PASS: TestTextProgressFormatter (0.00s)
+=== CONT  TestJSONProgressFormatter
+--- PASS: TestLogger_Progress (0.00s)
+    --- PASS: TestLogger_Progress/TextProgressFormatter (0.00s)
+    --- PASS: TestLogger_Progress/JSONProgressFormatter (0.00s)
+    --- PASS: TestLogger_Progress/CompactProgressFormatter (0.00s)
+=== CONT  TestProgressFormatterInterface
+=== RUN   TestProgressFormatterInterface/TextProgressFormatter
+=== RUN   TestProgressFormatterInterface/JSONProgressFormatter
+--- PASS: TestJSONProgressFormatter (0.00s)
+=== RUN   TestProgressFormatterInterface/CompactProgressFormatter
+--- PASS: TestProgressFormatterInterface (0.00s)
+    --- PASS: TestProgressFormatterInterface/TextProgressFormatter (0.00s)
+    --- PASS: TestProgressFormatterInterface/JSONProgressFormatter (0.00s)
+    --- PASS: TestProgressFormatterInterface/CompactProgressFormatter (0.00s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/logging	0.261s

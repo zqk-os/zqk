@@ -1,0 +1,44 @@
+
+--- run 2026-09-05T05:22:37Z ---
+=== RUN   TestJWTAuthHook_Authenticate_WrongSecret
+=== PAUSE TestJWTAuthHook_Authenticate_WrongSecret
+=== RUN   TestJWTAuthHook_Authenticate_ExpiredToken
+=== PAUSE TestJWTAuthHook_Authenticate_ExpiredToken
+=== RUN   TestJWTAuthHook_Authenticate_WrongIssuer
+=== PAUSE TestJWTAuthHook_Authenticate_WrongIssuer
+=== RUN   TestJWTAuthHook_Authenticate_PermissionsFromClaims
+=== PAUSE TestJWTAuthHook_Authenticate_PermissionsFromClaims
+=== RUN   TestX509AuthHook_Authenticate_NoTLS
+=== PAUSE TestX509AuthHook_Authenticate_NoTLS
+=== RUN   TestX509AuthHook_Authenticate_EmptyCaCertPath
+=== PAUSE TestX509AuthHook_Authenticate_EmptyCaCertPath
+=== RUN   TestX509AuthHook_Authenticate_ValidCert
+=== PAUSE TestX509AuthHook_Authenticate_ValidCert
+=== RUN   TestX509AuthHook_Authenticate_InvalidCAFile
+=== PAUSE TestX509AuthHook_Authenticate_InvalidCAFile
+=== RUN   TestOAuth2AuthHook_Authenticate_NotImplemented
+=== PAUSE TestOAuth2AuthHook_Authenticate_NotImplemented
+=== RUN   TestShouldSkipBackgroundValidationBatchForKind
+=== PAUSE TestShouldSkipBackgroundValidationBatchForKind
+=== CONT  TestJWTAuthHook_Authenticate_WrongSecret
+=== CONT  TestX509AuthHook_Authenticate_EmptyCaCertPath
+--- PASS: TestX509AuthHook_Authenticate_EmptyCaCertPath (0.00s)
+=== CONT  TestJWTAuthHook_Authenticate_PermissionsFromClaims
+--- PASS: TestJWTAuthHook_Authenticate_PermissionsFromClaims (0.00s)
+=== CONT  TestX509AuthHook_Authenticate_NoTLS
+--- PASS: TestJWTAuthHook_Authenticate_WrongSecret (0.00s)
+=== CONT  TestJWTAuthHook_Authenticate_WrongIssuer
+--- PASS: TestJWTAuthHook_Authenticate_WrongIssuer (0.00s)
+=== CONT  TestJWTAuthHook_Authenticate_ExpiredToken
+--- PASS: TestJWTAuthHook_Authenticate_ExpiredToken (0.00s)
+=== CONT  TestOAuth2AuthHook_Authenticate_NotImplemented
+--- PASS: TestOAuth2AuthHook_Authenticate_NotImplemented (0.00s)
+=== CONT  TestShouldSkipBackgroundValidationBatchForKind
+--- PASS: TestShouldSkipBackgroundValidationBatchForKind (0.00s)
+=== CONT  TestX509AuthHook_Authenticate_InvalidCAFile
+--- PASS: TestX509AuthHook_Authenticate_InvalidCAFile (0.00s)
+=== CONT  TestX509AuthHook_Authenticate_ValidCert
+--- PASS: TestX509AuthHook_Authenticate_NoTLS (0.00s)
+--- PASS: TestX509AuthHook_Authenticate_ValidCert (0.01s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/scheduler	0.776s

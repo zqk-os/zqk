@@ -1,0 +1,73 @@
+{
+  "name": "storage-decompose-crit",
+  "created_at": "2026-09-02T06:41:57.555513Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "storage-decompose-crit",
+    "Tests": [
+      {
+        "Name": "TestCRITStorageFileSizeNamedFiles",
+        "Package": "storage",
+        "PackagePath": "pkg/storage",
+        "FilePath": "/private/var/folders/gb/31sgyvn551ld6l0zfk50yl8h0000gn/T/zqk-worktrees/zqk-restore-clone/integration-cef-r27-failclosed-structure/pkg/storage/decompose_crit_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestCRITStorageSubpackageInterfaces",
+        "Package": "storage",
+        "PackagePath": "pkg/storage",
+        "FilePath": "/private/var/folders/gb/31sgyvn551ld6l0zfk50yl8h0000gn/T/zqk-worktrees/zqk-restore-clone/integration-cef-r27-failclosed-structure/pkg/storage/decompose_crit_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestCRITOrchestrateOver800HasTRACK",
+        "Package": "storage",
+        "PackagePath": "pkg/storage",
+        "FilePath": "/private/var/folders/gb/31sgyvn551ld6l0zfk50yl8h0000gn/T/zqk-worktrees/zqk-restore-clone/integration-cef-r27-failclosed-structure/pkg/storage/decompose_crit_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": true,
+    "EstimatedDuration": 270000000000,
+    "PackagePath": "pkg/storage",
+    "criteria_refs": [
+      "CRIT-CEF-STORAGE-SUBPACKAGES-001",
+      "CRIT-CEF-STORAGE-FILE-SIZE-001"
+    ]
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestCRITStorageFileSizeNamedFiles",
+      "Package": "storage",
+      "PackagePath": "pkg/storage",
+      "FilePath": "/private/var/folders/gb/31sgyvn551ld6l0zfk50yl8h0000gn/T/zqk-worktrees/zqk-restore-clone/integration-cef-r27-failclosed-structure/pkg/storage/decompose_crit_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestCRITStorageSubpackageInterfaces",
+      "Package": "storage",
+      "PackagePath": "pkg/storage",
+      "FilePath": "/private/var/folders/gb/31sgyvn551ld6l0zfk50yl8h0000gn/T/zqk-worktrees/zqk-restore-clone/integration-cef-r27-failclosed-structure/pkg/storage/decompose_crit_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestCRITOrchestrateOver800HasTRACK",
+      "Package": "storage",
+      "PackagePath": "pkg/storage",
+      "FilePath": "/private/var/folders/gb/31sgyvn551ld6l0zfk50yl8h0000gn/T/zqk-worktrees/zqk-restore-clone/integration-cef-r27-failclosed-structure/pkg/storage/decompose_crit_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    }
+  }
+}

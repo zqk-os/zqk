@@ -1,0 +1,80 @@
+
+--- run 2026-09-04T21:42:03Z ---
+=== RUN   TestClientIDUniqueness
+=== PAUSE TestClientIDUniqueness
+=== RUN   TestClientIDClearingOnDisconnect
+=== PAUSE TestClientIDClearingOnDisconnect
+=== RUN   TestClientIDInSubscriptionID
+=== PAUSE TestClientIDInSubscriptionID
+=== RUN   TestServerLoopResilience
+=== PAUSE TestServerLoopResilience
+=== RUN   TestStatusDisconnected
+=== PAUSE TestStatusDisconnected
+=== RUN   TestServer_GetSetClearCurrentSessionID
+=== PAUSE TestServer_GetSetClearCurrentSessionID
+=== RUN   TestMarkSessionDisconnected_emptySessionID
+=== PAUSE TestMarkSessionDisconnected_emptySessionID
+=== RUN   TestMarkSessionDisconnected_buildsCorrectStatusValue
+=== PAUSE TestMarkSessionDisconnected_buildsCorrectStatusValue
+=== RUN   TestSessionLeaseExpired
+=== PAUSE TestSessionLeaseExpired
+=== RUN   TestTouchSessionLastActivity_noSessionID
+=== PAUSE TestTouchSessionLastActivity_noSessionID
+=== CONT  TestClientIDUniqueness
+=== CONT  TestServer_GetSetClearCurrentSessionID
+--- PASS: TestServer_GetSetClearCurrentSessionID (0.00s)
+=== CONT  TestSessionLeaseExpired
+=== RUN   TestSessionLeaseExpired/fresh
+=== PAUSE TestSessionLeaseExpired/fresh
+=== RUN   TestSessionLeaseExpired/exactly_at_ttl_not_expired
+=== PAUSE TestSessionLeaseExpired/exactly_at_ttl_not_expired
+=== RUN   TestSessionLeaseExpired/past_ttl
+=== PAUSE TestSessionLeaseExpired/past_ttl
+=== RUN   TestSessionLeaseExpired/empty_activity
+=== PAUSE TestSessionLeaseExpired/empty_activity
+=== RUN   TestSessionLeaseExpired/bad_timestamp
+=== PAUSE TestSessionLeaseExpired/bad_timestamp
+=== RUN   TestSessionLeaseExpired/ttl_disabled
+=== PAUSE TestSessionLeaseExpired/ttl_disabled
+=== CONT  TestTouchSessionLastActivity_noSessionID
+--- PASS: TestTouchSessionLastActivity_noSessionID (0.00s)
+=== CONT  TestServerLoopResilience
+=== RUN   TestServerLoopResilience/handles_concurrent_shutdown_requests
+=== RUN   TestServerLoopResilience/handles_panic_in_read_goroutine
+=== RUN   TestServerLoopResilience/handles_write_errors_gracefully
+--- PASS: TestClientIDUniqueness (0.01s)
+=== CONT  TestStatusDisconnected
+--- PASS: TestStatusDisconnected (0.00s)
+=== CONT  TestClientIDInSubscriptionID
+--- PASS: TestClientIDInSubscriptionID (0.00s)
+=== CONT  TestClientIDClearingOnDisconnect
+--- PASS: TestClientIDClearingOnDisconnect (0.00s)
+=== CONT  TestMarkSessionDisconnected_buildsCorrectStatusValue
+--- PASS: TestMarkSessionDisconnected_buildsCorrectStatusValue (0.00s)
+=== CONT  TestMarkSessionDisconnected_emptySessionID
+--- PASS: TestMarkSessionDisconnected_emptySessionID (0.00s)
+=== CONT  TestSessionLeaseExpired/fresh
+=== CONT  TestSessionLeaseExpired/empty_activity
+=== CONT  TestSessionLeaseExpired/ttl_disabled
+=== CONT  TestSessionLeaseExpired/bad_timestamp
+=== CONT  TestSessionLeaseExpired/past_ttl
+=== CONT  TestSessionLeaseExpired/exactly_at_ttl_not_expired
+--- PASS: TestSessionLeaseExpired (0.00s)
+    --- PASS: TestSessionLeaseExpired/fresh (0.00s)
+    --- PASS: TestSessionLeaseExpired/empty_activity (0.00s)
+    --- PASS: TestSessionLeaseExpired/ttl_disabled (0.00s)
+    --- PASS: TestSessionLeaseExpired/bad_timestamp (0.00s)
+    --- PASS: TestSessionLeaseExpired/past_ttl (0.00s)
+    --- PASS: TestSessionLeaseExpired/exactly_at_ttl_not_expired (0.00s)
+=== RUN   TestServerLoopResilience/handles_concurrent_message_sends
+=== RUN   TestServerLoopResilience/handles_malformed_requests
+=== RUN   TestServerLoopResilience/handles_rapid_initialize_requests
+--- PASS: TestServerLoopResilience (1.14s)
+    --- PASS: TestServerLoopResilience/handles_concurrent_shutdown_requests (0.00s)
+    --- PASS: TestServerLoopResilience/handles_panic_in_read_goroutine (0.00s)
+    --- PASS: TestServerLoopResilience/handles_write_errors_gracefully (0.21s)
+    --- PASS: TestServerLoopResilience/handles_concurrent_message_sends (0.01s)
+    --- PASS: TestServerLoopResilience/handles_malformed_requests (0.00s)
+    --- PASS: TestServerLoopResilience/handles_rapid_initialize_requests (0.92s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/mcp	1.760s

@@ -1,0 +1,4 @@
+off
+# TPM verification window 2026-09-01: ambient stop-hunger / guiding-step
+# followups are not useful while reproducing AGY-2 storage-split bars.
+# Re-enable: rm this file (gitignored sentinel).

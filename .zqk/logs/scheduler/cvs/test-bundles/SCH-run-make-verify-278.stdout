@@ -1,0 +1,32 @@
+
+--- run 2026-09-04T22:01:05Z ---
+=== RUN   TestHTTPDeliverer_URLTrimSpace
+=== PAUSE TestHTTPDeliverer_URLTrimSpace
+=== RUN   TestHTTPDeliverer_ContextCancel
+=== PAUSE TestHTTPDeliverer_ContextCancel
+=== RUN   TestHTTPDeliverer_Bearer
+=== PAUSE TestHTTPDeliverer_Bearer
+=== RUN   TestAppendDeliveryAuditJSONL
+=== PAUSE TestAppendDeliveryAuditJSONL
+=== RUN   TestAppendDeliveryAuditJSONL_NilRecord
+=== PAUSE TestAppendDeliveryAuditJSONL_NilRecord
+=== RUN   TestAppendDeliveryAuditJSONL_AppendsSecondLine
+=== PAUSE TestAppendDeliveryAuditJSONL_AppendsSecondLine
+=== RUN   TestAgentPromptDeliveriesJSONLPath_EmptyRoot
+=== PAUSE TestAgentPromptDeliveriesJSONLPath_EmptyRoot
+=== CONT  TestHTTPDeliverer_URLTrimSpace
+=== CONT  TestAppendDeliveryAuditJSONL_NilRecord
+--- PASS: TestHTTPDeliverer_URLTrimSpace (0.00s)
+=== CONT  TestHTTPDeliverer_Bearer
+--- PASS: TestHTTPDeliverer_Bearer (0.00s)
+=== CONT  TestAppendDeliveryAuditJSONL
+--- PASS: TestAppendDeliveryAuditJSONL_NilRecord (0.00s)
+=== CONT  TestAgentPromptDeliveriesJSONLPath_EmptyRoot
+--- PASS: TestAgentPromptDeliveriesJSONLPath_EmptyRoot (0.00s)
+=== CONT  TestAppendDeliveryAuditJSONL_AppendsSecondLine
+--- PASS: TestAppendDeliveryAuditJSONL (0.01s)
+=== CONT  TestHTTPDeliverer_ContextCancel
+--- PASS: TestHTTPDeliverer_ContextCancel (0.00s)
+--- PASS: TestAppendDeliveryAuditJSONL_AppendsSecondLine (0.01s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/agentdelivery	0.744s

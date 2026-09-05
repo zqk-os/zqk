@@ -1,0 +1,142 @@
+
+--- run 2026-09-04T21:41:43Z ---
+=== RUN   TestSecurityModel_PrivilegeEscalation
+=== PAUSE TestSecurityModel_PrivilegeEscalation
+=== RUN   TestSecurityModel_FieldPermissionCombinations
+=== PAUSE TestSecurityModel_FieldPermissionCombinations
+=== RUN   TestSecurityModel_RequirementCombinations
+=== PAUSE TestSecurityModel_RequirementCombinations
+=== RUN   TestSecurityModel_BruteForce
+=== PAUSE TestSecurityModel_BruteForce
+=== RUN   TestSecurityModel_EdgeCases
+=== PAUSE TestSecurityModel_EdgeCases
+=== RUN   TestSecurityModel_Filtering
+=== PAUSE TestSecurityModel_Filtering
+=== RUN   TestSecurityModel_Grouping
+=== PAUSE TestSecurityModel_Grouping
+=== RUN   TestSecurityModel_QueryLogic
+=== PAUSE TestSecurityModel_QueryLogic
+=== RUN   TestSecurityModel_CascadingAccess
+=== PAUSE TestSecurityModel_CascadingAccess
+=== RUN   TestSecurityModel_PermissionCycles
+=== PAUSE TestSecurityModel_PermissionCycles
+=== CONT  TestSecurityModel_PrivilegeEscalation
+=== CONT  TestSecurityModel_Filtering
+--- PASS: TestSecurityModel_Filtering (0.00s)
+=== CONT  TestSecurityModel_CascadingAccess
+--- PASS: TestSecurityModel_PrivilegeEscalation (0.00s)
+=== CONT  TestSecurityModel_BruteForce
+--- PASS: TestSecurityModel_CascadingAccess (0.00s)
+=== CONT  TestSecurityModel_PermissionCycles
+--- PASS: TestSecurityModel_PermissionCycles (0.00s)
+=== CONT  TestSecurityModel_EdgeCases
+=== RUN   TestSecurityModel_EdgeCases/nil_security_context
+=== RUN   TestSecurityModel_EdgeCases/missing_kind
+=== RUN   TestSecurityModel_EdgeCases/empty_permissions
+=== RUN   TestSecurityModel_EdgeCases/wildcard_read_permission
+=== RUN   TestSecurityModel_EdgeCases/field_not_in_spec
+=== RUN   TestSecurityModel_EdgeCases/multiple_requires,_all_match
+=== RUN   TestSecurityModel_EdgeCases/deactivated_user
+=== RUN   TestSecurityModel_BruteForce/deny_no_kind_read,_confidential_field
+--- PASS: TestSecurityModel_EdgeCases (0.00s)
+    --- PASS: TestSecurityModel_EdgeCases/nil_security_context (0.00s)
+    --- PASS: TestSecurityModel_EdgeCases/missing_kind (0.00s)
+    --- PASS: TestSecurityModel_EdgeCases/empty_permissions (0.00s)
+    --- PASS: TestSecurityModel_EdgeCases/wildcard_read_permission (0.00s)
+    --- PASS: TestSecurityModel_EdgeCases/field_not_in_spec (0.00s)
+    --- PASS: TestSecurityModel_EdgeCases/multiple_requires,_all_match (0.00s)
+    --- PASS: TestSecurityModel_EdgeCases/deactivated_user (0.00s)
+=== CONT  TestSecurityModel_QueryLogic
+=== RUN   TestSecurityModel_BruteForce/deny_kind_read,_admin-only_field
+--- PASS: TestSecurityModel_QueryLogic (0.00s)
+=== RUN   TestSecurityModel_BruteForce/deny_kind_read,_confidential_field,_no_access
+=== CONT  TestSecurityModel_RequirementCombinations
+=== RUN   TestSecurityModel_RequirementCombinations/single_requirement,_matches
+=== RUN   TestSecurityModel_RequirementCombinations/single_requirement,_no_match
+=== RUN   TestSecurityModel_BruteForce/deny_write_on_r-x_field
+=== RUN   TestSecurityModel_BruteForce/deny_execute_on_r--_field
+=== RUN   TestSecurityModel_RequirementCombinations/multiple_requirements,_all_match
+=== RUN   TestSecurityModel_RequirementCombinations/multiple_requirements,_one_missing
+=== RUN   TestSecurityModel_RequirementCombinations/wildcard_access,_single_requirement
+=== RUN   TestSecurityModel_RequirementCombinations/wildcard_access,_multiple_requirements
+=== RUN   TestSecurityModel_BruteForce/allow_kind_read,_unrestricted_field
+=== RUN   TestSecurityModel_RequirementCombinations/no_requirements
+=== RUN   TestSecurityModel_BruteForce/allow_kind_read,_confidential_field,_has_access
+--- PASS: TestSecurityModel_RequirementCombinations (0.00s)
+    --- PASS: TestSecurityModel_RequirementCombinations/single_requirement,_matches (0.00s)
+    --- PASS: TestSecurityModel_RequirementCombinations/single_requirement,_no_match (0.00s)
+    --- PASS: TestSecurityModel_RequirementCombinations/multiple_requirements,_all_match (0.00s)
+    --- PASS: TestSecurityModel_RequirementCombinations/multiple_requirements,_one_missing (0.00s)
+    --- PASS: TestSecurityModel_RequirementCombinations/wildcard_access,_single_requirement (0.00s)
+    --- PASS: TestSecurityModel_RequirementCombinations/wildcard_access,_multiple_requirements (0.00s)
+    --- PASS: TestSecurityModel_RequirementCombinations/no_requirements (0.00s)
+=== CONT  TestSecurityModel_Grouping
+=== RUN   TestSecurityModel_BruteForce/allow_admin_role,_all_fields
+--- PASS: TestSecurityModel_Grouping (0.00s)
+=== CONT  TestSecurityModel_FieldPermissionCombinations
+=== RUN   TestSecurityModel_BruteForce/allow_wildcard_access,_confidential_field
+=== RUN   TestSecurityModel_FieldPermissionCombinations/perm_---_op_read
+=== RUN   TestSecurityModel_BruteForce/allow_read_on_r-x_field
+=== RUN   TestSecurityModel_FieldPermissionCombinations/perm_---_op_write
+=== RUN   TestSecurityModel_BruteForce/allow_execute_on_r-x_field
+=== RUN   TestSecurityModel_FieldPermissionCombinations/perm_---_op_execute
+--- PASS: TestSecurityModel_BruteForce (0.00s)
+    --- PASS: TestSecurityModel_BruteForce/deny_no_kind_read,_confidential_field (0.00s)
+    --- PASS: TestSecurityModel_BruteForce/deny_kind_read,_admin-only_field (0.00s)
+    --- PASS: TestSecurityModel_BruteForce/deny_kind_read,_confidential_field,_no_access (0.00s)
+    --- PASS: TestSecurityModel_BruteForce/deny_write_on_r-x_field (0.00s)
+    --- PASS: TestSecurityModel_BruteForce/deny_execute_on_r--_field (0.00s)
+    --- PASS: TestSecurityModel_BruteForce/allow_kind_read,_unrestricted_field (0.00s)
+    --- PASS: TestSecurityModel_BruteForce/allow_kind_read,_confidential_field,_has_access (0.00s)
+    --- PASS: TestSecurityModel_BruteForce/allow_admin_role,_all_fields (0.00s)
+    --- PASS: TestSecurityModel_BruteForce/allow_wildcard_access,_confidential_field (0.00s)
+    --- PASS: TestSecurityModel_BruteForce/allow_read_on_r-x_field (0.00s)
+    --- PASS: TestSecurityModel_BruteForce/allow_execute_on_r-x_field (0.00s)
+=== RUN   TestSecurityModel_FieldPermissionCombinations/perm_r--_op_read
+=== RUN   TestSecurityModel_FieldPermissionCombinations/perm_r--_op_write
+=== RUN   TestSecurityModel_FieldPermissionCombinations/perm_r--_op_execute
+=== RUN   TestSecurityModel_FieldPermissionCombinations/perm_-w-_op_read
+=== RUN   TestSecurityModel_FieldPermissionCombinations/perm_-w-_op_write
+=== RUN   TestSecurityModel_FieldPermissionCombinations/perm_-w-_op_execute
+=== RUN   TestSecurityModel_FieldPermissionCombinations/perm_--x_op_read
+=== RUN   TestSecurityModel_FieldPermissionCombinations/perm_--x_op_write
+=== RUN   TestSecurityModel_FieldPermissionCombinations/perm_--x_op_execute
+=== RUN   TestSecurityModel_FieldPermissionCombinations/perm_rw-_op_read
+=== RUN   TestSecurityModel_FieldPermissionCombinations/perm_rw-_op_write
+=== RUN   TestSecurityModel_FieldPermissionCombinations/perm_rw-_op_execute
+=== RUN   TestSecurityModel_FieldPermissionCombinations/perm_r-x_op_read
+=== RUN   TestSecurityModel_FieldPermissionCombinations/perm_r-x_op_write
+=== RUN   TestSecurityModel_FieldPermissionCombinations/perm_r-x_op_execute
+=== RUN   TestSecurityModel_FieldPermissionCombinations/perm_-wx_op_read
+=== RUN   TestSecurityModel_FieldPermissionCombinations/perm_-wx_op_write
+=== RUN   TestSecurityModel_FieldPermissionCombinations/perm_-wx_op_execute
+=== RUN   TestSecurityModel_FieldPermissionCombinations/perm_rwx_op_read
+=== RUN   TestSecurityModel_FieldPermissionCombinations/perm_rwx_op_write
+=== RUN   TestSecurityModel_FieldPermissionCombinations/perm_rwx_op_execute
+--- PASS: TestSecurityModel_FieldPermissionCombinations (0.00s)
+    --- PASS: TestSecurityModel_FieldPermissionCombinations/perm_---_op_read (0.00s)
+    --- PASS: TestSecurityModel_FieldPermissionCombinations/perm_---_op_write (0.00s)
+    --- PASS: TestSecurityModel_FieldPermissionCombinations/perm_---_op_execute (0.00s)
+    --- PASS: TestSecurityModel_FieldPermissionCombinations/perm_r--_op_read (0.00s)
+    --- PASS: TestSecurityModel_FieldPermissionCombinations/perm_r--_op_write (0.00s)
+    --- PASS: TestSecurityModel_FieldPermissionCombinations/perm_r--_op_execute (0.00s)
+    --- PASS: TestSecurityModel_FieldPermissionCombinations/perm_-w-_op_read (0.00s)
+    --- PASS: TestSecurityModel_FieldPermissionCombinations/perm_-w-_op_write (0.00s)
+    --- PASS: TestSecurityModel_FieldPermissionCombinations/perm_-w-_op_execute (0.00s)
+    --- PASS: TestSecurityModel_FieldPermissionCombinations/perm_--x_op_read (0.00s)
+    --- PASS: TestSecurityModel_FieldPermissionCombinations/perm_--x_op_write (0.00s)
+    --- PASS: TestSecurityModel_FieldPermissionCombinations/perm_--x_op_execute (0.00s)
+    --- PASS: TestSecurityModel_FieldPermissionCombinations/perm_rw-_op_read (0.00s)
+    --- PASS: TestSecurityModel_FieldPermissionCombinations/perm_rw-_op_write (0.00s)
+    --- PASS: TestSecurityModel_FieldPermissionCombinations/perm_rw-_op_execute (0.00s)
+    --- PASS: TestSecurityModel_FieldPermissionCombinations/perm_r-x_op_read (0.00s)
+    --- PASS: TestSecurityModel_FieldPermissionCombinations/perm_r-x_op_write (0.00s)
+    --- PASS: TestSecurityModel_FieldPermissionCombinations/perm_r-x_op_execute (0.00s)
+    --- PASS: TestSecurityModel_FieldPermissionCombinations/perm_-wx_op_read (0.00s)
+    --- PASS: TestSecurityModel_FieldPermissionCombinations/perm_-wx_op_write (0.00s)
+    --- PASS: TestSecurityModel_FieldPermissionCombinations/perm_-wx_op_execute (0.00s)
+    --- PASS: TestSecurityModel_FieldPermissionCombinations/perm_rwx_op_read (0.00s)
+    --- PASS: TestSecurityModel_FieldPermissionCombinations/perm_rwx_op_write (0.00s)
+    --- PASS: TestSecurityModel_FieldPermissionCombinations/perm_rwx_op_execute (0.00s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/mcp	0.693s

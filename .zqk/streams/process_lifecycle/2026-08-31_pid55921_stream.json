@@ -1,0 +1,2 @@
+{"effort_variance":0,"event_type":"lifecycle_transition_applied","id":"PRI-CEF-PIP-KERNEL-DRIVE-001","kind":"process_lifecycle","to_status":"complete","ts_rfc3339nano":"2026-08-31T11:00:05.154514Z"}
+{"effort_variance":0,"event_type":"lifecycle_transition_applied","id":"PRI-CEF-R23-PKG-LAYOUT-001","kind":"process_lifecycle","to_status":"complete","ts_rfc3339nano":"2026-08-31T13:30:49.047655Z"}

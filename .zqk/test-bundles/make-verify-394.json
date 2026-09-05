@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-394",
+  "created_at": "2026-09-04T21:34:31.228648Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-394",
+    "Tests": [
+      {
+        "Name": "TestFuncExample",
+        "Package": "testkit_test",
+        "PackagePath": "pkg/testkit",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/testkit/anticipatory_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestArchitectureDocIndexIntegrity",
+        "Package": "testkit_test",
+        "PackagePath": "pkg/testkit",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/testkit/doc_sync_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestSeedSchemaPlanePopulatesEveryPlaneDir",
+        "Package": "testkit",
+        "PackagePath": "pkg/testkit",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/testkit/isolated_temp_project_seed_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestSeedSchemaPlaneAllowsObjectCreate",
+        "Package": "testkit",
+        "PackagePath": "pkg/testkit",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/testkit/isolated_temp_project_seed_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestSeedSchemaPlaneRunsBeforeCallerStages",
+        "Package": "testkit",
+        "PackagePath": "pkg/testkit",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/testkit/isolated_temp_project_seed_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestDefaultRootSeedsOnlyHalfThePlane",
+        "Package": "testkit",
+        "PackagePath": "pkg/testkit",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/testkit/isolated_temp_project_seed_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestPrepareIsolatedTempProject_DefaultLayout",
+        "Package": "testkit",
+        "PackagePath": "pkg/testkit",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/testkit/isolated_temp_project_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestVerifyNoGoroutineLeaks",
+        "Package": "testkit",
+        "PackagePath": "pkg/testkit",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/testkit/leak_detector_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestEventually",
+        "Package": "testkit_test",
+        "PackagePath": "pkg/testkit",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/testkit/poll_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestEventuallyWithContext",
+        "Package": "testkit_test",
+        "PackagePath": "pkg/testkit",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/testkit/poll_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 300000000000,
+    "PackagePath": "pkg/testkit"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestFuncExample",
+      "Package": "testkit_test",
+      "PackagePath": "pkg/testkit",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/testkit/anticipatory_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestArchitectureDocIndexIntegrity",
+      "Package": "testkit_test",
+      "PackagePath": "pkg/testkit",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/testkit/doc_sync_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestSeedSchemaPlanePopulatesEveryPlaneDir",
+      "Package": "testkit",
+      "PackagePath": "pkg/testkit",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/testkit/isolated_temp_project_seed_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestSeedSchemaPlaneAllowsObjectCreate",
+      "Package": "testkit",
+      "PackagePath": "pkg/testkit",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/testkit/isolated_temp_project_seed_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestSeedSchemaPlaneRunsBeforeCallerStages",
+      "Package": "testkit",
+      "PackagePath": "pkg/testkit",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/testkit/isolated_temp_project_seed_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestDefaultRootSeedsOnlyHalfThePlane",
+      "Package": "testkit",
+      "PackagePath": "pkg/testkit",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/testkit/isolated_temp_project_seed_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestPrepareIsolatedTempProject_DefaultLayout",
+      "Package": "testkit",
+      "PackagePath": "pkg/testkit",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/testkit/isolated_temp_project_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestVerifyNoGoroutineLeaks",
+      "Package": "testkit",
+      "PackagePath": "pkg/testkit",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/testkit/leak_detector_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestEventually",
+      "Package": "testkit_test",
+      "PackagePath": "pkg/testkit",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/testkit/poll_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestEventuallyWithContext",
+      "Package": "testkit_test",
+      "PackagePath": "pkg/testkit",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/testkit/poll_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

@@ -1,0 +1,56 @@
+
+--- run 2026-09-04T22:22:21Z ---
+=== RUN   TestParseJSONLDClasses
+=== PAUSE TestParseJSONLDClasses
+=== RUN   TestRDFOWLTranslator_Translate_JSONLD_ProducesDomainRegistry
+=== PAUSE TestRDFOWLTranslator_Translate_JSONLD_ProducesDomainRegistry
+=== RUN   TestParseJSONLDClasses_Empty
+=== PAUSE TestParseJSONLDClasses_Empty
+=== RUN   TestLocalNameFromJSONLDID
+=== PAUSE TestLocalNameFromJSONLDID
+=== RUN   TestParseRDFXMLClasses
+=== PAUSE TestParseRDFXMLClasses
+=== RUN   TestRDFOWLTranslator_Translate_RDFXML_ProducesDomainRegistry
+=== PAUSE TestRDFOWLTranslator_Translate_RDFXML_ProducesDomainRegistry
+=== RUN   TestLocalNameFromRDFAbout
+=== PAUSE TestLocalNameFromRDFAbout
+=== RUN   TestRegistry_GetAndTranslate
+=== PAUSE TestRegistry_GetAndTranslate
+=== RUN   TestParseTurtleClasses
+=== PAUSE TestParseTurtleClasses
+=== RUN   TestRDFOWLTranslator_Translate_ProducesDomainRegistry
+=== PAUSE TestRDFOWLTranslator_Translate_ProducesDomainRegistry
+=== CONT  TestParseJSONLDClasses
+=== CONT  TestRDFOWLTranslator_Translate_RDFXML_ProducesDomainRegistry
+--- PASS: TestParseJSONLDClasses (0.00s)
+=== CONT  TestRegistry_GetAndTranslate
+=== RUN   TestRegistry_GetAndTranslate/rdf_owl
+--- PASS: TestRDFOWLTranslator_Translate_RDFXML_ProducesDomainRegistry (0.00s)
+=== RUN   TestRegistry_GetAndTranslate/turtle
+=== RUN   TestRegistry_GetAndTranslate/cypher
+=== CONT  TestLocalNameFromRDFAbout
+=== RUN   TestRegistry_GetAndTranslate/json_schema
+--- PASS: TestLocalNameFromRDFAbout (0.00s)
+=== CONT  TestRDFOWLTranslator_Translate_ProducesDomainRegistry
+--- PASS: TestRDFOWLTranslator_Translate_ProducesDomainRegistry (0.00s)
+=== CONT  TestLocalNameFromJSONLDID
+--- PASS: TestLocalNameFromJSONLDID (0.00s)
+=== CONT  TestParseRDFXMLClasses
+--- PASS: TestParseRDFXMLClasses (0.00s)
+=== RUN   TestRegistry_GetAndTranslate/openapi
+=== CONT  TestParseJSONLDClasses_Empty
+--- PASS: TestParseJSONLDClasses_Empty (0.00s)
+=== CONT  TestRDFOWLTranslator_Translate_JSONLD_ProducesDomainRegistry
+--- PASS: TestRDFOWLTranslator_Translate_JSONLD_ProducesDomainRegistry (0.00s)
+=== CONT  TestParseTurtleClasses
+--- PASS: TestParseTurtleClasses (0.00s)
+=== RUN   TestRegistry_GetAndTranslate/unknown_format
+--- PASS: TestRegistry_GetAndTranslate (0.00s)
+    --- PASS: TestRegistry_GetAndTranslate/rdf_owl (0.00s)
+    --- PASS: TestRegistry_GetAndTranslate/turtle (0.00s)
+    --- PASS: TestRegistry_GetAndTranslate/cypher (0.00s)
+    --- PASS: TestRegistry_GetAndTranslate/json_schema (0.00s)
+    --- PASS: TestRegistry_GetAndTranslate/openapi (0.00s)
+    --- PASS: TestRegistry_GetAndTranslate/unknown_format (0.00s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/translation	0.283s

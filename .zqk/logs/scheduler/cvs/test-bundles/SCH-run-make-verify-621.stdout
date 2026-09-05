@@ -1,0 +1,44 @@
+
+--- run 2026-09-04T22:18:14Z ---
+=== RUN   TestRouter_Route_DisabledRule
+=== PAUSE TestRouter_Route_DisabledRule
+=== RUN   TestRouter_Matches
+=== PAUSE TestRouter_Matches
+=== RUN   TestRoutingRuleLoader_LoadRulesFromFile
+=== PAUSE TestRoutingRuleLoader_LoadRulesFromFile
+=== RUN   TestRoutingRuleLoader_LoadAllRules
+=== PAUSE TestRoutingRuleLoader_LoadAllRules
+=== RUN   TestRoutingRuleLoader_LoadAllRules_EmptyDirectory
+=== PAUSE TestRoutingRuleLoader_LoadAllRules_EmptyDirectory
+=== RUN   TestRoutingRuleLoader_LoadAllRules_NonexistentDirectory
+=== PAUSE TestRoutingRuleLoader_LoadAllRules_NonexistentDirectory
+=== RUN   TestRoutingRuleLoader_LoadRulesFromFile_InvalidYAML
+=== PAUSE TestRoutingRuleLoader_LoadRulesFromFile_InvalidYAML
+=== RUN   TestLoadDefaultRules
+=== PAUSE TestLoadDefaultRules
+=== CONT  TestRouter_Route_DisabledRule
+=== CONT  TestRoutingRuleLoader_LoadRulesFromFile_InvalidYAML
+--- PASS: TestRouter_Route_DisabledRule (0.00s)
+=== CONT  TestRoutingRuleLoader_LoadAllRules_EmptyDirectory
+--- PASS: TestRoutingRuleLoader_LoadAllRules_EmptyDirectory (0.00s)
+=== CONT  TestRoutingRuleLoader_LoadAllRules_NonexistentDirectory
+--- PASS: TestRoutingRuleLoader_LoadAllRules_NonexistentDirectory (0.00s)
+=== CONT  TestLoadDefaultRules
+--- PASS: TestLoadDefaultRules (0.00s)
+=== CONT  TestRoutingRuleLoader_LoadRulesFromFile
+--- PASS: TestRoutingRuleLoader_LoadRulesFromFile_InvalidYAML (0.01s)
+=== CONT  TestRoutingRuleLoader_LoadAllRules
+--- PASS: TestRoutingRuleLoader_LoadRulesFromFile (0.01s)
+=== CONT  TestRouter_Matches
+=== RUN   TestRouter_Matches/event_type_match
+=== RUN   TestRouter_Matches/event_type_mismatch
+=== RUN   TestRouter_Matches/job_ID_match
+=== RUN   TestRouter_Matches/job_ID_mismatch
+--- PASS: TestRouter_Matches (0.00s)
+    --- PASS: TestRouter_Matches/event_type_match (0.00s)
+    --- PASS: TestRouter_Matches/event_type_mismatch (0.00s)
+    --- PASS: TestRouter_Matches/job_ID_match (0.00s)
+    --- PASS: TestRouter_Matches/job_ID_mismatch (0.00s)
+--- PASS: TestRoutingRuleLoader_LoadAllRules (0.01s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/scheduler/transceiver	0.268s

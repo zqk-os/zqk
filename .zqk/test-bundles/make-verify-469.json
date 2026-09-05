@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-469",
+  "created_at": "2026-09-04T21:34:31.976795Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-469",
+    "Tests": [
+      {
+        "Name": "TestGuidanceEngine_Recommend",
+        "Package": "qa",
+        "PackagePath": "pkg/validation/qa",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/validation/qa/guidance_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestInterruptEmitter_EmitDisparityInterrupt",
+        "Package": "qa",
+        "PackagePath": "pkg/validation/qa",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/validation/qa/hitl_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestInterruptEmitter_AckDisparityOnPass",
+        "Package": "qa",
+        "PackagePath": "pkg/validation/qa",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/validation/qa/hitl_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAuditorGate_FullLoop",
+        "Package": "qa",
+        "PackagePath": "pkg/validation/qa",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/validation/qa/integration_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAuditorService_PerformAudit_CompleteUsesSupportedEvidence",
+        "Package": "qa",
+        "PackagePath": "pkg/validation/qa",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/validation/qa/service_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAuditorService_PerformAudit_Success",
+        "Package": "qa",
+        "PackagePath": "pkg/validation/qa",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/validation/qa/service_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAuditorService_PerformAudit_HITLTrigger",
+        "Package": "qa",
+        "PackagePath": "pkg/validation/qa",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/validation/qa/service_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAuditorService_PerformAudit_ASTViolation",
+        "Package": "qa",
+        "PackagePath": "pkg/validation/qa",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/validation/qa/service_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAuditorSigner_Sign",
+        "Package": "qa",
+        "PackagePath": "pkg/validation/qa",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/validation/qa/signing_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestQASuccessTitle",
+        "Package": "qa",
+        "PackagePath": "pkg/validation/qa",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/validation/qa/success_token_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 300000000000,
+    "PackagePath": "pkg/validation/qa"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestGuidanceEngine_Recommend",
+      "Package": "qa",
+      "PackagePath": "pkg/validation/qa",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/validation/qa/guidance_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestInterruptEmitter_EmitDisparityInterrupt",
+      "Package": "qa",
+      "PackagePath": "pkg/validation/qa",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/validation/qa/hitl_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestInterruptEmitter_AckDisparityOnPass",
+      "Package": "qa",
+      "PackagePath": "pkg/validation/qa",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/validation/qa/hitl_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestAuditorGate_FullLoop",
+      "Package": "qa",
+      "PackagePath": "pkg/validation/qa",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/validation/qa/integration_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestAuditorService_PerformAudit_CompleteUsesSupportedEvidence",
+      "Package": "qa",
+      "PackagePath": "pkg/validation/qa",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/validation/qa/service_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestAuditorService_PerformAudit_Success",
+      "Package": "qa",
+      "PackagePath": "pkg/validation/qa",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/validation/qa/service_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestAuditorService_PerformAudit_HITLTrigger",
+      "Package": "qa",
+      "PackagePath": "pkg/validation/qa",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/validation/qa/service_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestAuditorService_PerformAudit_ASTViolation",
+      "Package": "qa",
+      "PackagePath": "pkg/validation/qa",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/validation/qa/service_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestAuditorSigner_Sign",
+      "Package": "qa",
+      "PackagePath": "pkg/validation/qa",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/validation/qa/signing_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestQASuccessTitle",
+      "Package": "qa",
+      "PackagePath": "pkg/validation/qa",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/validation/qa/success_token_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

@@ -1,0 +1,51 @@
+{
+  "name": "make-verify-216",
+  "created_at": "2026-09-04T21:34:29.546129Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-216",
+    "Tests": [
+      {
+        "Name": "TestLoadBinding_DefaultWhenMissing",
+        "Package": "primaryorch",
+        "PackagePath": "pkg/primaryorch",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/primaryorch/primaryorch_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestDefaultBinding_UsesEnvAgentID",
+        "Package": "primaryorch",
+        "PackagePath": "pkg/primaryorch",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/primaryorch/primaryorch_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 60000000000,
+    "PackagePath": "pkg/primaryorch"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestLoadBinding_DefaultWhenMissing",
+      "Package": "primaryorch",
+      "PackagePath": "pkg/primaryorch",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/primaryorch/primaryorch_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestDefaultBinding_UsesEnvAgentID",
+      "Package": "primaryorch",
+      "PackagePath": "pkg/primaryorch",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/primaryorch/primaryorch_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-803",
+  "created_at": "2026-09-04T21:34:35.293709Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-803",
+    "Tests": [
+      {
+        "Name": "TestDocmanSyncCmd_Integration",
+        "Package": "automation",
+        "PackagePath": "cmd/zqk/automation",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/automation/docman_sync_integration_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestDocmanSyncCmd_DryRun",
+        "Package": "automation",
+        "PackagePath": "cmd/zqk/automation",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/automation/docman_sync_integration_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestDocmanSyncCmd_CheckOnly",
+        "Package": "automation",
+        "PackagePath": "cmd/zqk/automation",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/automation/docman_sync_integration_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestDocmanSync_BasicRegistration",
+        "Package": "automation",
+        "PackagePath": "cmd/zqk/automation",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/automation/docman_sync_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestDocmanSync_SkipsExisting",
+        "Package": "automation",
+        "PackagePath": "cmd/zqk/automation",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/automation/docman_sync_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestDocmanSync_DryRun",
+        "Package": "automation",
+        "PackagePath": "cmd/zqk/automation",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/automation/docman_sync_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestDocmanSync_DetectMarkdownFiles",
+        "Package": "automation",
+        "PackagePath": "cmd/zqk/automation",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/automation/docman_sync_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestDocmanSync_CheckOnlyMode",
+        "Package": "automation",
+        "PackagePath": "cmd/zqk/automation",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/automation/docman_sync_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestDocmanSync_GitAware_DetectsStagedMarkdown",
+        "Package": "automation",
+        "PackagePath": "cmd/zqk/automation",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/automation/docman_sync_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestDocmanSync_GitAware_NoStagedMarkdown",
+        "Package": "automation",
+        "PackagePath": "cmd/zqk/automation",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/automation/docman_sync_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 300000000000,
+    "PackagePath": "cmd/zqk/automation"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestDocmanSyncCmd_Integration",
+      "Package": "automation",
+      "PackagePath": "cmd/zqk/automation",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/automation/docman_sync_integration_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestDocmanSyncCmd_DryRun",
+      "Package": "automation",
+      "PackagePath": "cmd/zqk/automation",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/automation/docman_sync_integration_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestDocmanSyncCmd_CheckOnly",
+      "Package": "automation",
+      "PackagePath": "cmd/zqk/automation",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/automation/docman_sync_integration_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestDocmanSync_BasicRegistration",
+      "Package": "automation",
+      "PackagePath": "cmd/zqk/automation",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/automation/docman_sync_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestDocmanSync_SkipsExisting",
+      "Package": "automation",
+      "PackagePath": "cmd/zqk/automation",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/automation/docman_sync_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestDocmanSync_DryRun",
+      "Package": "automation",
+      "PackagePath": "cmd/zqk/automation",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/automation/docman_sync_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestDocmanSync_DetectMarkdownFiles",
+      "Package": "automation",
+      "PackagePath": "cmd/zqk/automation",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/automation/docman_sync_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestDocmanSync_CheckOnlyMode",
+      "Package": "automation",
+      "PackagePath": "cmd/zqk/automation",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/automation/docman_sync_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestDocmanSync_GitAware_DetectsStagedMarkdown",
+      "Package": "automation",
+      "PackagePath": "cmd/zqk/automation",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/automation/docman_sync_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestDocmanSync_GitAware_NoStagedMarkdown",
+      "Package": "automation",
+      "PackagePath": "cmd/zqk/automation",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/automation/docman_sync_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

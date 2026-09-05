@@ -1,0 +1,14 @@
+created_at: "2026-08-19T10:24:26Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1787135062340137000-5e5268e7
+item_id: BLI-COMMUNITY-QUICKSTART-VERIFY-001
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 2857702ca28e4b64fb5782140b43c1400e68fdeab30ab0062f4119523ca97d466e5f13c72adcfa41b92eacf21fa7f0a79b8a8e3a8d7c581e5c9afe0e69cb31dc
+schema_version: 2.0.0
+signature: 30440220074c25b0db57db162992f79aaa6c5971e7d91c83f8af5e300fbb24e5cc7ee07c022050a761b8d416d608a0371081e32313416d54fdf966c84919f43304f148f52719
+status: archived
+title: End-to-end verification of zero-config quickstart onboarding
+updated_at: "2026-09-01T07:10:42Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

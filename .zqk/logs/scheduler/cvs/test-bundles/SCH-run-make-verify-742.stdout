@@ -1,0 +1,40 @@
+
+--- run 2026-09-04T22:20:58Z ---
+=== RUN   TestClassifyIssue_processFailureVsCompleteness
+=== PAUSE TestClassifyIssue_processFailureVsCompleteness
+=== RUN   TestShouldDemoteToError_onlyProcessFailure
+=== PAUSE TestShouldDemoteToError_onlyProcessFailure
+=== RUN   TestVisibleOnSurface
+=== PAUSE TestVisibleOnSurface
+=== RUN   TestFamilyOfKind
+=== PAUSE TestFamilyOfKind
+=== CONT  TestClassifyIssue_processFailureVsCompleteness
+=== RUN   TestClassifyIssue_processFailureVsCompleteness/invalid_lifecycle
+=== PAUSE TestClassifyIssue_processFailureVsCompleteness/invalid_lifecycle
+=== RUN   TestClassifyIssue_processFailureVsCompleteness/precondition
+=== PAUSE TestClassifyIssue_processFailureVsCompleteness/precondition
+=== RUN   TestClassifyIssue_processFailureVsCompleteness/title_required
+=== PAUSE TestClassifyIssue_processFailureVsCompleteness/title_required
+=== RUN   TestClassifyIssue_processFailureVsCompleteness/rbac
+=== PAUSE TestClassifyIssue_processFailureVsCompleteness/rbac
+=== RUN   TestClassifyIssue_processFailureVsCompleteness/orphan
+=== PAUSE TestClassifyIssue_processFailureVsCompleteness/orphan
+=== CONT  TestClassifyIssue_processFailureVsCompleteness/invalid_lifecycle
+=== CONT  TestFamilyOfKind
+--- PASS: TestFamilyOfKind (0.00s)
+=== CONT  TestClassifyIssue_processFailureVsCompleteness/rbac
+=== CONT  TestClassifyIssue_processFailureVsCompleteness/orphan
+=== CONT  TestClassifyIssue_processFailureVsCompleteness/precondition
+=== CONT  TestClassifyIssue_processFailureVsCompleteness/title_required
+--- PASS: TestClassifyIssue_processFailureVsCompleteness (0.00s)
+    --- PASS: TestClassifyIssue_processFailureVsCompleteness/invalid_lifecycle (0.00s)
+    --- PASS: TestClassifyIssue_processFailureVsCompleteness/rbac (0.00s)
+    --- PASS: TestClassifyIssue_processFailureVsCompleteness/orphan (0.00s)
+    --- PASS: TestClassifyIssue_processFailureVsCompleteness/precondition (0.00s)
+    --- PASS: TestClassifyIssue_processFailureVsCompleteness/title_required (0.00s)
+=== CONT  TestVisibleOnSurface
+--- PASS: TestVisibleOnSurface (0.00s)
+=== CONT  TestShouldDemoteToError_onlyProcessFailure
+--- PASS: TestShouldDemoteToError_onlyProcessFailure (0.00s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/fitness	0.295s

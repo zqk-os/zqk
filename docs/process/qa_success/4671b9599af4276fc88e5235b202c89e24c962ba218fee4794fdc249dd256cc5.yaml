@@ -1,0 +1,14 @@
+created_at: "2026-08-19T09:57:35Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1787133454751636000-6a06ba6a
+item_id: REDACTED
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 2857702ca28e4b64fb5782140b43c1400e68fdeab30ab0062f4119523ca97d466e5f13c72adcfa41b92eacf21fa7f0a79b8a8e3a8d7c581e5c9afe0e69cb31dc
+schema_version: 2.0.0
+signature: 30460221009d686ce0c07d89dbbdcaf249878b2350494b3999c7b16be1ffa4a861f9162c70022100878ba53180c817ad0ef6edf4a28c3cfd8064830de2e9550d6d0f3f51900b5bfd
+status: archived
+title: Catalog zqk-specific logging and comments for agnostic remediation
+updated_at: "2026-09-01T06:53:36Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

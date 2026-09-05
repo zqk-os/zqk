@@ -1,0 +1,39 @@
+
+--- run 2026-09-04T22:23:26Z ---
+FAIL	github.com/lanceman/zqk/cmd/zqk/agent [build failed]
+FAIL
+
+--- run 2026-09-05T05:25:53Z ---
+=== RUN   TestCapOrchestrator_Integration
+--- PASS: TestCapOrchestrator_Integration (1.31s)
+=== RUN   TestCleanupDuplicatesJob
+--- PASS: TestCleanupDuplicatesJob (1.00s)
+=== RUN   TestResolveSchedulerDaemonBinary_prefersStableOverZqk
+--- PASS: TestResolveSchedulerDaemonBinary_prefersStableOverZqk (0.00s)
+=== RUN   TestResolveSchedulerDaemonBinary_schedulerDaemonBinOverride
+--- PASS: TestResolveSchedulerDaemonBinary_schedulerDaemonBinOverride (0.00s)
+=== RUN   TestResolveSchedulerDaemonBinary_zqkBinOverridesStable
+--- PASS: TestResolveSchedulerDaemonBinary_zqkBinOverridesStable (0.00s)
+=== RUN   TestResolveSchedulerDaemonBinary_prefersZqkStable
+--- PASS: TestResolveSchedulerDaemonBinary_prefersZqkStable (0.00s)
+=== RUN   TestGoroutineConcurrencyFrameworkUsage
+--- PASS: TestGoroutineConcurrencyFrameworkUsage (0.00s)
+=== RUN   TestCvsPerTestLedgerMaxFailuresFromEnv
+=== RUN   TestCvsPerTestLedgerMaxFailuresFromEnv/default
+=== RUN   TestCvsPerTestLedgerMaxFailuresFromEnv/zero_unlimited
+=== RUN   TestCvsPerTestLedgerMaxFailuresFromEnv/explicit_cap
+=== RUN   TestCvsPerTestLedgerMaxFailuresFromEnv/invalid_falls_back
+=== RUN   TestCvsPerTestLedgerMaxFailuresFromEnv/negative_falls_back
+--- PASS: TestCvsPerTestLedgerMaxFailuresFromEnv (0.00s)
+    --- PASS: TestCvsPerTestLedgerMaxFailuresFromEnv/default (0.00s)
+    --- PASS: TestCvsPerTestLedgerMaxFailuresFromEnv/zero_unlimited (0.00s)
+    --- PASS: TestCvsPerTestLedgerMaxFailuresFromEnv/explicit_cap (0.00s)
+    --- PASS: TestCvsPerTestLedgerMaxFailuresFromEnv/invalid_falls_back (0.00s)
+    --- PASS: TestCvsPerTestLedgerMaxFailuresFromEnv/negative_falls_back (0.00s)
+=== RUN   TestConvergenceEngine_StartStop
+--- PASS: TestConvergenceEngine_StartStop (1.10s)
+=== RUN   TestConvergenceEngine_evaluateActiveConvergenceSessions
+    convergence_engine_test.go:154: Updated session: map[created_at:2026-09-05T05:26:01Z created_by:ACC-1785920548450214012-68b850c0 current_phase:c1_scope desired_end_state:engine fixture end state hypothesis:engine fixture hypothesis id:CVS-ACTIVE kind:convergence_session namespace_id:zqk:kernel outcome_character:pending schema_version:2.0.0 started_at:2026-09-05T05:26:01Z status:paused title:test session CVS-ACTIVE updated_at:2026-09-05T05:26:01Z updated_by:ACC-1785920548450214012-68b850c0 version_context:default]
+--- PASS: TestConvergenceEngine_evaluateActiveConvergenceSessions (1.27s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/scheduler	5.448s

@@ -1,0 +1,33 @@
+{
+  "name": "make-verify-720",
+  "created_at": "2026-09-04T21:34:34.50197Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-720",
+    "Tests": [
+      {
+        "Name": "TestOSWrappersPanicOnRepoWrite",
+        "Package": "testenvroot",
+        "PackagePath": "pkg/testenvroot",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/testenvroot/os_wrappers_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 30000000000,
+    "PackagePath": "pkg/testenvroot"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestOSWrappersPanicOnRepoWrite",
+      "Package": "testenvroot",
+      "PackagePath": "pkg/testenvroot",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/testenvroot/os_wrappers_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

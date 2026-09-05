@@ -1,0 +1,14 @@
+created_at: "2026-08-19T09:01:28Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1787130084372389000-716b3ef0
+item_id: REDACTED
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 2857702ca28e4b64fb5782140b43c1400e68fdeab30ab0062f4119523ca97d466e5f13c72adcfa41b92eacf21fa7f0a79b8a8e3a8d7c581e5c9afe0e69cb31dc
+schema_version: 2.0.0
+signature: 304502205ce07dc5ede406500066d9d6dca4d6be381a626a0c2412bd3fbd36b3b64c1518022100f30ca5e7debfc0ad2e21c7291e54ccf05ee2871a6338a329fe821cc59c44e230
+status: archived
+title: Artifact objectified
+updated_at: "2026-09-01T08:04:18Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

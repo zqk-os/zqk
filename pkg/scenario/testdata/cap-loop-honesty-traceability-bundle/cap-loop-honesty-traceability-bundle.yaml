@@ -1,0 +1,231 @@
+# Traceability bundle: CAP loop honesty + nested CVS (kernel-objectified design).
+# Apply from repo root:
+#   go run ./scripts/apply-scenario-bundle -f pkg/scenario/testdata/cap-loop-honesty-traceability-bundle/cap-loop-honesty-traceability-bundle.yaml -R .
+# After apply: set priority_plan_ref / milestone_refs / CVS related_object_refs via zqk CLI
+# (do not hand-edit YAML under docs/process/).
+#
+# See docs/architecture/SCENARIO_BUNDLES_AND_TRACEABILITY.md and CAP_LOOP_CONTRACT.md.
+api_version: v1
+kind: scenario_bundle
+metadata:
+  name: cap-loop-honesty-traceability-bundle
+  description: |
+    GOAL/REQ/CRIT/BLI/TEST/DOC for CAP stage advances gated on verified outcomes against a
+    bound parent convergence_session tree, trivial nested CVS veneer, fail-closed review,
+    and agent overnight contract (SCH-cap is the CAP loop).
+objects:
+  goals:
+    - id_hint: GOAL-CAPH-001
+      title: CAP stages advance only on verified outcomes vs nested CVS contracts
+      status: active
+      authority: owner
+      target: "1"
+      description: |
+        Empty CAP stage cycling, forgeable receipts, open-ATK theater, and unsupervised Cursor
+        CAP wakes are eliminated. Progress is judged against a bound parent CVS tree.
+  criteria:
+    - id_hint: CRIT-CAPH-001
+      title: Unbound parent CVS causes CAP to hold without stage advance
+      status: not_started
+      category: acceptance
+      validation_method: automated_test
+      requirement_ref: REQ-CAPH-001
+      description: When no parent convergence_session is bound for the primary plan, CapOrchestrator holds and does not AdvanceCAPStage.
+    - id_hint: CRIT-CAPH-002
+      title: Manual cap_cycle or unverified receipt does not advance; journal tamper detected
+      status: not_started
+      category: acceptance
+      validation_method: automated_test
+      requirement_ref: REQ-CAPH-001
+      description: |
+        Advances only via maybeAdvanceCAPStage with journal entry citing cvs_id and verified artifact_ids.
+        Empty explicit receipts and cap_cycle writes without journal are treated as tamper/hold.
+    - id_hint: CRIT-CAPH-003
+      title: Open or proposed ATK alone does not complete planning design or orchestrating
+      status: not_started
+      category: acceptance
+      validation_method: automated_test
+      requirement_ref: REQ-CAPH-001
+      description: dispatchDeliveryComplete requires net outcome evidence (completed ATK with acceptance or BLI lifecycle advance), not mere open ATKs.
+    - id_hint: CRIT-CAPH-004
+      title: Nest spawn creates child CVS and appends parent related_object_refs; depth and cycles enforced
+      status: not_started
+      category: acceptance
+      validation_method: automated_test
+      requirement_ref: REQ-CAPH-002
+      description: One command/API creates child with contract fields, links parent→child, rejects depth>3 or cycles.
+    - id_hint: CRIT-CAPH-005
+      title: Nest status returns BFS tree via CollectCVSTreeBFS
+      status: not_started
+      category: acceptance
+      validation_method: automated_test
+      requirement_ref: REQ-CAPH-002
+      description: status operation returns parent plus children with depth, status, and current_phase.
+    - id_hint: CRIT-CAPH-006
+      title: Metrics with children runs measure plus rollup path and records parent cvs_id
+      status: not_started
+      category: functional
+      validation_method: automated_test
+      requirement_ref: REQ-CAPH-003
+      description: Metrics stage artifacts include cvs_id; nested parents invoke measure+rollup evidence path.
+    - id_hint: CRIT-CAPH-007
+      title: Zero critical test jobs yields tests_passed false
+      status: not_started
+      category: acceptance
+      validation_method: automated_test
+      requirement_ref: REQ-CAPH-003
+      description: verifyCriticalPackagesHealth fails closed when no pkg/scheduler or pkg/storage critical jobs exist.
+    - id_hint: CRIT-CAPH-008
+      title: Public system-check blockers fail review even if process exit is 0
+      status: not_started
+      category: acceptance
+      validation_method: automated_test
+      requirement_ref: REQ-CAPH-003
+      description: executeReviewStage parses system check JSON and sets system_check false when public blockers > 0.
+    - id_hint: CRIT-CAPH-009
+      title: Review outcomes require scheduler history or result not orphan health.jsonl alone
+      status: not_started
+      category: acceptance
+      validation_method: automated_test
+      requirement_ref: REQ-CAPH-003
+      description: Lone health.jsonl lines without matching job history/result are insufficient for tests_passed.
+    - id_hint: CRIT-CAPH-010
+      title: Parent completion distinct from bundle-only ready_for_session_completion in review payload
+      status: not_started
+      category: functional
+      validation_method: code_review
+      requirement_ref: REQ-CAPH-003
+      description: cap_review_result records child/parent rollup signals separately from bundle ready_for_session_completion.
+    - id_hint: CRIT-CAPH-011
+      title: CAP_LOOP_CONTRACT and wake template ban unsupervised CAP Cursor loops and health bridges
+      status: not_started
+      category: compliance
+      validation_method: manual_check
+      requirement_ref: REQ-CAPH-004
+      description: docs/architecture/CAP_LOOP_CONTRACT.md and scripts/cap-agent-wake-contract.txt exist with abort rules and CVS citation.
+    - id_hint: CRIT-CAPH-012
+      title: Parent CVS contract fields set; CAP activity cites session on hold or advance
+      status: not_started
+      category: functional
+      validation_method: manual_check
+      requirement_ref: REQ-CAPH-001
+      description: Parent CVS has hypothesis, predictions, desired_end_state; holds/advances log cvs_id.
+  requirements:
+    - id_hint: REQ-CAPH-001
+      title: CAP orchestrator binds parent CVS and advances only via verified delivery and journal
+      status: proposed
+      priority: p0
+      goal_refs: [GOAL-CAPH-001]
+      criteria_refs: [CRIT-CAPH-001, CRIT-CAPH-002, CRIT-CAPH-003, CRIT-CAPH-012]
+      body: |
+        CapOrchestratorHandler resolves a parent convergence_session for the primary priority_plan.
+        Unbound sessions hold. Stage delivery requires verified object-store artifacts and alignment
+        with the CVS contract. AdvanceCAPStage is the sole writer path; journal records evidence.
+    - id_hint: REQ-CAPH-002
+      title: Nested CVS trivial veneer spawn link status with depth cap and cycle safety
+      status: proposed
+      priority: p0
+      goal_refs: [GOAL-CAPH-001]
+      criteria_refs: [CRIT-CAPH-004, CRIT-CAPH-005]
+      body: |
+        Operators and CAP use one CLI/API surface to spawn/link/status nested CVS trees via
+        related_object_refs and CollectCVSTreeBFS (max depth 3). No manual ref stitching required.
+    - id_hint: REQ-CAPH-003
+      title: Review and metrics fail closed with nested rollup and no forgeable health bridges
+      status: proposed
+      priority: p0
+      goal_refs: [GOAL-CAPH-001]
+      criteria_refs: [CRIT-CAPH-006, CRIT-CAPH-007, CRIT-CAPH-008, CRIT-CAPH-009, CRIT-CAPH-010]
+      body: |
+        Review fails when critical jobs missing, public blockers present, or outcomes lack history-backed
+        evidence. Nested parents use measure+rollup; parent completion is not bundle-only green.
+    - id_hint: REQ-CAPH-004
+      title: Agent overnight contract SCH-cap is CAP loop wakes cite parent CVS
+      status: proposed
+      priority: p0
+      goal_refs: [GOAL-CAPH-001]
+      criteria_refs: [CRIT-CAPH-011]
+      body: |
+        Cursor AGENT_LOOP wakes are optional human wakes only. Documented contract requires parent CVS id,
+        artifact gates, abort after repeated holds, ban on health bridges and manual cap_cycle.
+  test_cases:
+    - id_hint: TEST-CAPH-001
+      title: CAP stage gate unit tests unbound hold forge receipt open ATK journal tamper
+      status: draft
+      requirement_refs: [REQ-CAPH-001]
+      criteria_refs: [CRIT-CAPH-001, CRIT-CAPH-002, CRIT-CAPH-003]
+      test_functions:
+        - github.com/lanceman/zqk/pkg/scheduler.TestMaybeAdvanceCAPStage_UnboundCVSHolds
+        - github.com/lanceman/zqk/pkg/scheduler.TestMaybeAdvanceCAPStage_ForgeReceiptRejected
+        - github.com/lanceman/zqk/pkg/scheduler.TestDispatchDeliveryComplete_OpenATKInsufficient
+        - github.com/lanceman/zqk/pkg/scheduler.TestCapCycleTamperDetected
+    - id_hint: TEST-CAPH-002
+      title: Nested CVS veneer spawn link status depth and cycle tests
+      status: draft
+      requirement_refs: [REQ-CAPH-002]
+      criteria_refs: [CRIT-CAPH-004, CRIT-CAPH-005]
+      test_functions:
+        - github.com/lanceman/zqk/pkg/convergerollup.TestNestSpawnLinkStatus
+        - github.com/lanceman/zqk/pkg/convergerollup.TestNestRejectsDepthAndCycle
+    - id_hint: TEST-CAPH-003
+      title: CAP review fail-closed zero jobs blockers history-backed outcomes
+      status: draft
+      requirement_refs: [REQ-CAPH-003]
+      criteria_refs: [CRIT-CAPH-007, CRIT-CAPH-008, CRIT-CAPH-009]
+      test_functions:
+        - github.com/lanceman/zqk/pkg/scheduler.TestVerifyCriticalPackagesHealth_ZeroJobsFails
+        - github.com/lanceman/zqk/pkg/scheduler.TestReviewSystemCheck_PublicBlockersFail
+  backlog_items:
+    - id_hint: BLI-CAPH-001
+      title: CAP bind parent CVS journal tamper and hardened delivery predicates
+      status: planned
+      requirement_refs: [REQ-CAPH-001]
+      criteria_refs: [CRIT-CAPH-001, CRIT-CAPH-002, CRIT-CAPH-003, CRIT-CAPH-012]
+      test_case_refs: [TEST-CAPH-001]
+    - id_hint: BLI-CAPH-002
+      title: Nested CVS nest veneer CLI and shared helper
+      status: planned
+      requirement_refs: [REQ-CAPH-002]
+      criteria_refs: [CRIT-CAPH-004, CRIT-CAPH-005]
+      test_case_refs: [TEST-CAPH-002]
+    - id_hint: BLI-CAPH-003
+      title: CAP review and metrics fail-closed nested rollup
+      status: planned
+      requirement_refs: [REQ-CAPH-003]
+      criteria_refs: [CRIT-CAPH-006, CRIT-CAPH-007, CRIT-CAPH-008, CRIT-CAPH-009, CRIT-CAPH-010]
+      test_case_refs: [TEST-CAPH-003]
+    - id_hint: BLI-CAPH-004
+      title: CAP_LOOP_CONTRACT and agent wake template
+      status: planned
+      requirement_refs: [REQ-CAPH-004]
+      criteria_refs: [CRIT-CAPH-011]
+  doc_entries:
+    - id_hint: DOC-CAPH-001
+      title: CAP loop contract (SCH-cap CVS tree agent wakes)
+      summary: |
+        Canonical contract: SCH-cap-orchestrator is the CAP loop; parent CVS is the outcome contract;
+        nest veneer for children; bans unsupervised CAP Cursor loops and health bridges.
+      path: docs/architecture/CAP_LOOP_CONTRACT.md
+      group: architecture
+      category: process
+      status: published
+      content_searchable: true
+      requirement_refs: [REQ-CAPH-001, REQ-CAPH-002, REQ-CAPH-003, REQ-CAPH-004]
+    - id_hint: DOC-CAPH-002
+      title: Nested CVS orchestration and rollup (Appendix C linking)
+      summary: Parent related_object_refs to child CVS; CollectCVSTreeBFS max depth 3; rollup vs bundle completion.
+      path: docs/architecture/CONVERGENCE_ORCHESTRATION_AND_NESTED_CVS.md
+      group: architecture
+      category: process
+      status: published
+      content_searchable: true
+      requirement_refs: [REQ-CAPH-002, REQ-CAPH-003]
+    - id_hint: DOC-CAPH-003
+      title: Scenario bundles and traceability apply workflow
+      summary: Pattern for GOAL→REQ→CRIT→BLI→TEST→DOC objectification used by this bundle.
+      path: docs/architecture/SCENARIO_BUNDLES_AND_TRACEABILITY.md
+      group: architecture
+      category: process
+      status: published
+      content_searchable: true
+      requirement_refs: [REQ-CAPH-001]

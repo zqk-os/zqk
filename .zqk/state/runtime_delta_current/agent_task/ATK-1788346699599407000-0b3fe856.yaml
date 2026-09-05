@@ -1,0 +1,95 @@
+assignee_persona_ref: PER-ORCH-BETA
+claimed_at: "2026-09-02T12:13:49Z"
+claimed_by: ACC-1785920548450214006-2e52b3e7
+commit_refs:
+    - 023cc261e293be506614e828b5128d7fac646d31
+created_at: "2026-09-02T10:58:19Z"
+created_by: ACC-1785920548450214012-68b850c0
+description: |
+    # Agent Task Envelope
+    zqk_task_envelope_v1
+
+    Static context lives in kernel objects. Do not treat this description as a copy of policy or skill bodies.
+    Resolve at execute: `zqk object get <id>`, `zqk agent prepare-context --task-id <ATK>`, or `zqk workflow whats-next`.
+
+    ## Dynamic
+    - Plan: CEF AA/AB structure — storage, packages, logging, tests, docs (PRI-CEF-REMEDIATE-STRUCTURE-001)
+    - Target: coder-agent (capability: )
+    - Persona: PER-ORCH-BETA
+    - Task: Group CLI help; add Divio docs index and dated architecture
+
+    ## Standing refs (do not duplicate bodies)
+    - `POL-ONBOARD-001` — `zqk object get POL-ONBOARD-001`
+    - `POL-ONBOARD-002` — `zqk object get POL-ONBOARD-002`
+    - `POL-AGENT-INSTRUCTION-RUBRIC-001` — `zqk object get POL-AGENT-INSTRUCTION-RUBRIC-001`
+    - `POL-WORKFLOW-VDS` — `zqk object get POL-WORKFLOW-VDS`
+    - `POL-CODE-CAS-COMMIT-001` — `zqk object get POL-CODE-CAS-COMMIT-001`
+    - `POL-CODE-1784753087498298000-bedce972` — `zqk object get POL-CODE-1784753087498298000-bedce972`
+
+    ## Bound policies
+    - `POL-ONBOARD-001`
+    - `POL-ONBOARD-002`
+    - `POL-AGENT-INSTRUCTION-RUBRIC-001`
+    - `POL-WORKFLOW-VDS`
+    - `POL-CODE-CAS-COMMIT-001`
+    - `POL-CODE-1784753087498298000-bedce972`
+    - `POL-AGENT-ADMIN-MEMBRANE-001`
+    - `POL-AGENT-TPM-GROOM-AHEAD-001`
+
+    ## Bound skills
+    - `ASK-1780953769438962000-6b8c340b` — `zqk object get ASK-1780953769438962000-6b8c340b`
+    - `ASK-1780954297002944000-a4689f7b` — `zqk object get ASK-1780954297002944000-a4689f7b`
+    - `ASK-1781037416510742000-284d1135` — `zqk object get ASK-1781037416510742000-284d1135`
+    - `ASK-1781254038424911000-66ce2ee4` — `zqk object get ASK-1781254038424911000-66ce2ee4`
+    - `ASK-1782259937447396000-fb005beb` — `zqk object get ASK-1782259937447396000-fb005beb`
+    - `ASK-1782593752920560000-99708cd6` — `zqk object get ASK-1782593752920560000-99708cd6`
+    - `ASK-1785642074896778000-83af9fd2` — `zqk object get ASK-1785642074896778000-83af9fd2`
+    - `ASK-1785886324283087000-34320add` — `zqk object get ASK-1785886324283087000-34320add`
+    - `ASK-1786081148616665000-c78bdd4d` — `zqk object get ASK-1786081148616665000-c78bdd4d`
+    - `ASK-DEFAULT-FEED-CORRESPONDENCE` — `zqk object get ASK-DEFAULT-FEED-CORRESPONDENCE`
+
+    ## Observer
+    Do not persist an AST census. At execute time call observer_search, then read_code the returned path.
+estimated_effort: 1d
+id: ATK-1788346699599407000-0b3fe856
+kind: agent_task
+model_tier: tier_2_simple
+namespace_id: zqk:kernel
+outputs: []
+policy_refs:
+    - POL-ONBOARD-001
+    - POL-ONBOARD-002
+    - POL-AGENT-INSTRUCTION-RUBRIC-001
+    - POL-WORKFLOW-VDS
+    - POL-CODE-CAS-COMMIT-001
+    - POL-CODE-1784753087498298000-bedce972
+    - POL-AGENT-ADMIN-MEMBRANE-001
+    - POL-AGENT-TPM-GROOM-AHEAD-001
+priority_plan_ref: PRI-CEF-REMEDIATE-STRUCTURE-001
+related_object_refs:
+    - ASK-1780953769438962000-6b8c340b
+    - ASK-1780954297002944000-a4689f7b
+    - ASK-1781037416510742000-284d1135
+    - ASK-1781254038424911000-66ce2ee4
+    - ASK-1782259937447396000-fb005beb
+    - ASK-1782593752920560000-99708cd6
+    - ASK-1785642074896778000-83af9fd2
+    - ASK-1785886324283087000-34320add
+    - ASK-1786081148616665000-c78bdd4d
+    - ASK-DEFAULT-FEED-CORRESPONDENCE
+schema_version: 2.0.0
+started_at: "2026-09-02T10:58:25Z"
+status: archived
+task_steps:
+    - description: Resolve the task envelope refs (`zqk object get`, `zqk agent prepare-context`) and execute the dynamic task. Do not copy policy or skill bodies onto the task object.
+      status: pending_implementation
+      title: Implementation Phase
+    - command: ./bin/zqk agent validate
+      description: Must pass targeted validation script.
+      status: pending
+      title: Validation Phase
+      verification_strategy: command_exit_code
+title: 'Execute Task: Group CLI help; add Divio docs index and dated architecture'
+updated_at: "2026-09-02T21:35:07Z"
+updated_by: ACC-1785920548450214006-2e52b3e7
+version_context: default

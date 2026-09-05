@@ -1,0 +1,59 @@
+
+--- run 2026-09-04T22:18:48Z ---
+=== RUN   TestAsyncValidation_ValidationFunctionErrors
+=== PAUSE TestAsyncValidation_ValidationFunctionErrors
+=== RUN   TestAsyncValidation_RetryLogic
+=== PAUSE TestAsyncValidation_RetryLogic
+=== RUN   TestAsyncValidation_MaxRetriesExceeded
+=== PAUSE TestAsyncValidation_MaxRetriesExceeded
+=== RUN   TestAsyncValidation_ProgressReporting
+=== PAUSE TestAsyncValidation_ProgressReporting
+=== RUN   TestAsyncValidation_CompletionDetection
+=== PAUSE TestAsyncValidation_CompletionDetection
+=== RUN   TestAsyncValidation_ResultConversion
+=== PAUSE TestAsyncValidation_ResultConversion
+=== RUN   TestAsyncValidation_EmptyQueue
+=== PAUSE TestAsyncValidation_EmptyQueue
+=== RUN   TestAsyncValidation_ValidationFunctionNotSet
+=== PAUSE TestAsyncValidation_ValidationFunctionNotSet
+=== RUN   TestAsyncValidation_ConcurrentValidation
+=== PAUSE TestAsyncValidation_ConcurrentValidation
+=== RUN   TestAsyncValidation_ProgressChannelFull
+=== PAUSE TestAsyncValidation_ProgressChannelFull
+=== CONT  TestAsyncValidation_ValidationFunctionErrors
+=== CONT  TestAsyncValidation_ResultConversion
+--- PASS: TestAsyncValidation_ResultConversion (0.00s)
+=== CONT  TestAsyncValidation_ProgressReporting
+=== RUN   TestAsyncValidation_ValidationFunctionErrors/FileReadError
+=== NAME  TestAsyncValidation_ProgressReporting
+    async_check_test.go:368: Progress: TEST-001 completed (1/5)
+    async_check_test.go:368: Progress: TEST-002 completed (2/5)
+    async_check_test.go:368: Progress: TEST-003 completed (3/5)
+    async_check_test.go:368: Progress: TEST-004 completed (4/5)
+    async_check_test.go:368: Progress: TEST-005 completed (5/5)
+--- PASS: TestAsyncValidation_ProgressReporting (0.09s)
+=== CONT  TestAsyncValidation_CompletionDetection
+    async_check_test.go:436: All 10 tasks completed, 10 states cached
+--- PASS: TestAsyncValidation_CompletionDetection (0.29s)
+=== CONT  TestAsyncValidation_ConcurrentValidation
+    async_check_test.go:634: All 20 concurrent tasks completed
+--- PASS: TestAsyncValidation_ConcurrentValidation (0.62s)
+=== CONT  TestAsyncValidation_ProgressChannelFull
+=== RUN   TestAsyncValidation_ValidationFunctionErrors/ParseError
+    async_check_test.go:115: After parse error: queueSize=0
+=== RUN   TestAsyncValidation_ValidationFunctionErrors/ValidationError
+--- PASS: TestAsyncValidation_ValidationFunctionErrors (3.19s)
+    --- PASS: TestAsyncValidation_ValidationFunctionErrors/FileReadError (2.51s)
+    --- PASS: TestAsyncValidation_ValidationFunctionErrors/ParseError (0.54s)
+    --- PASS: TestAsyncValidation_ValidationFunctionErrors/ValidationError (0.13s)
+=== CONT  TestAsyncValidation_MaxRetriesExceeded
+--- PASS: TestAsyncValidation_ProgressChannelFull (3.20s)
+=== CONT  TestAsyncValidation_ValidationFunctionNotSet
+--- PASS: TestAsyncValidation_ValidationFunctionNotSet (0.09s)
+=== CONT  TestAsyncValidation_RetryLogic
+--- PASS: TestAsyncValidation_RetryLogic (0.26s)
+=== CONT  TestAsyncValidation_EmptyQueue
+--- PASS: TestAsyncValidation_EmptyQueue (0.02s)
+--- PASS: TestAsyncValidation_MaxRetriesExceeded (3.01s)
+PASS
+ok  	github.com/lanceman/zqk/cmd/zqk/system	6.990s

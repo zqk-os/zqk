@@ -1,0 +1,16 @@
+
+--- run 2026-09-04T22:14:39Z ---
+=== RUN   TestReporter
+=== PAUSE TestReporter
+=== RUN   TestGenerateJSON
+=== PAUSE TestGenerateJSON
+=== RUN   TestGenerateMarkdown
+=== PAUSE TestGenerateMarkdown
+=== CONT  TestReporter
+--- PASS: TestReporter (0.00s)
+=== CONT  TestGenerateMarkdown
+=== CONT  TestGenerateJSON
+--- PASS: TestGenerateJSON (0.00s)
+--- PASS: TestGenerateMarkdown (0.00s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/migration/reporter	0.304s

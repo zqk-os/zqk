@@ -1,0 +1,59 @@
+
+--- run 2026-09-04T21:41:59Z ---
+=== RUN   TestInventoryCASDuplicateIDs_FindsDualBlob
+=== PAUSE TestInventoryCASDuplicateIDs_FindsDualBlob
+=== RUN   TestQuarantineCASDuplicateLosers_MovesOlder
+=== PAUSE TestQuarantineCASDuplicateLosers_MovesOlder
+=== RUN   TestCAS_DuplicateID_SameContent
+=== PAUSE TestCAS_DuplicateID_SameContent
+=== RUN   TestCAS_DuplicateID_DifferentContent
+=== PAUSE TestCAS_DuplicateID_DifferentContent
+=== RUN   TestCAS_RapidSuccessiveWrites_LeavesExactlyOneBlob_BLI_CEF_R19_CAS_INTERMEDIATE_LEAK_001
+=== PAUSE TestCAS_RapidSuccessiveWrites_LeavesExactlyOneBlob_BLI_CEF_R19_CAS_INTERMEDIATE_LEAK_001
+=== RUN   TestMergeCASIndexMaps_StaleMemoryDoesNotClobberHealedDisk
+=== PAUSE TestMergeCASIndexMaps_StaleMemoryDoesNotClobberHealedDisk
+=== RUN   TestMergeCASIndexMaps_MemoryWinsWhenDiskHashFileMissing
+=== PAUSE TestMergeCASIndexMaps_MemoryWinsWhenDiskHashFileMissing
+=== RUN   TestSetMapping_DoesNotRevertForeignHeal
+=== PAUSE TestSetMapping_DoesNotRevertForeignHeal
+=== RUN   TestStringMapsEqual
+=== PAUSE TestStringMapsEqual
+=== RUN   TestSetMappings_NoOpSkipsRewrite
+=== PAUSE TestSetMappings_NoOpSkipsRewrite
+=== CONT  TestInventoryCASDuplicateIDs_FindsDualBlob
+=== CONT  TestMergeCASIndexMaps_StaleMemoryDoesNotClobberHealedDisk
+--- PASS: TestMergeCASIndexMaps_StaleMemoryDoesNotClobberHealedDisk (0.00s)
+=== CONT  TestStringMapsEqual
+--- PASS: TestStringMapsEqual (0.00s)
+=== CONT  TestSetMappings_NoOpSkipsRewrite
+--- PASS: TestSetMappings_NoOpSkipsRewrite (0.02s)
+=== CONT  TestCAS_DuplicateID_DifferentContent
+    cas_duplicate_id_test.go:191: ✓ Duplicate ID with different content:
+    cas_duplicate_id_test.go:192:   Original hash: 8b2f987d1d94f86c4c705331e8a29f8e6e654aa37b0b9266e27792305f8a693b
+    cas_duplicate_id_test.go:193:   New hash: b47ad736883644baa4487f5ab0243af0bca51ddc00845bcceb756adb32536a38
+    cas_duplicate_id_test.go:194:   Read hash: 1784ce76a80b5f966f1341430b7bd5b88ea81557672ae8a27a6f9511f0391e84
+    cas_duplicate_id_test.go:195:   Hashes match: false
+    cas_duplicate_id_test.go:196:   Read hash matches original: false
+    cas_duplicate_id_test.go:197:   Read hash matches new: false
+    cas_duplicate_id_test.go:198:   Behavior: unexpected state (YAML normalization may have occurred)
+--- PASS: TestCAS_DuplicateID_DifferentContent (0.10s)
+=== CONT  TestCAS_RapidSuccessiveWrites_LeavesExactlyOneBlob_BLI_CEF_R19_CAS_INTERMEDIATE_LEAK_001
+--- PASS: TestCAS_RapidSuccessiveWrites_LeavesExactlyOneBlob_BLI_CEF_R19_CAS_INTERMEDIATE_LEAK_001 (0.15s)
+=== CONT  TestCAS_DuplicateID_SameContent
+    cas_duplicate_id_test.go:94: ✓ Duplicate ID with same content:
+    cas_duplicate_id_test.go:95:   Original hash (stored): cfa3173a40924627c71cfb90fd312e254851c7e289730820351664aa20f3d7b4
+    cas_duplicate_id_test.go:96:   Index hash after duplicate: cfa3173a40924627c71cfb90fd312e254851c7e289730820351664aa20f3d7b4
+    cas_duplicate_id_test.go:97:   Read hash (normalized): 27a550ea0e80320379ffe08b100a1246aed4d46d3a8fd0bfec490b82283dfff5
+    cas_duplicate_id_test.go:98:   Index hash matches original: true
+    cas_duplicate_id_test.go:99:   Behavior: index unchanged (deduplicated - same hash file)
+    cas_duplicate_id_test.go:109: ✓ Duplicate ID with same content: hash=cfa3173a40924627c71cfb90fd312e254851c7e289730820351664aa20f3d7b4, behavior=no error (overwrote or deduplicated)
+--- PASS: TestCAS_DuplicateID_SameContent (0.08s)
+=== CONT  TestQuarantineCASDuplicateLosers_MovesOlder
+--- PASS: TestQuarantineCASDuplicateLosers_MovesOlder (0.02s)
+=== CONT  TestSetMapping_DoesNotRevertForeignHeal
+--- PASS: TestSetMapping_DoesNotRevertForeignHeal (0.03s)
+=== CONT  TestMergeCASIndexMaps_MemoryWinsWhenDiskHashFileMissing
+--- PASS: TestMergeCASIndexMaps_MemoryWinsWhenDiskHashFileMissing (0.00s)
+--- PASS: TestInventoryCASDuplicateIDs_FindsDualBlob (0.43s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/storage/cas	1.206s

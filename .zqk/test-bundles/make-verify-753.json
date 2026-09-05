@@ -1,0 +1,51 @@
+{
+  "name": "make-verify-753",
+  "created_at": "2026-09-04T21:34:34.801955Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-753",
+    "Tests": [
+      {
+        "Name": "TestHiveMindSynchronizer_SyncNow",
+        "Package": "sync",
+        "PackagePath": "pkg/hivemind/sync",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/hivemind/sync/synchronizer_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestHiveMindSynchronizer_SyncNow_FindError",
+        "Package": "sync",
+        "PackagePath": "pkg/hivemind/sync",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/hivemind/sync/synchronizer_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 60000000000,
+    "PackagePath": "pkg/hivemind/sync"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestHiveMindSynchronizer_SyncNow",
+      "Package": "sync",
+      "PackagePath": "pkg/hivemind/sync",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/hivemind/sync/synchronizer_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestHiveMindSynchronizer_SyncNow_FindError",
+      "Package": "sync",
+      "PackagePath": "pkg/hivemind/sync",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/hivemind/sync/synchronizer_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

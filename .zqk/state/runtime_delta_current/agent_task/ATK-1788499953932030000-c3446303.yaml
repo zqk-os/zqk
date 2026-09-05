@@ -1,0 +1,32 @@
+agent_heartbeat: "2026-09-04T16:14:12-07:00"
+agent_pid: 40106
+assignee_persona_ref: PER-ORCH-BETA
+backlog_item_ref: BLI-CEF-R27-DUAL-SEAT-REMEASURE-001
+branch_ref: integration/pri-cef-r27-envelope-001
+created_at: "2026-09-04T05:32:33Z"
+created_by: ACC-1785920548450214006-2e52b3e7
+description: |
+    pipeline_ref=PIP-CEF-DIAMOND-REMEASURE-001 stage=W3_usa_adversarial
+    PRIOR: bite-sized CEF remesure under docs/quality/cef-runs/2026-09-03-AGENT_AD.
+    Attack L-USABILITY. Overwrite adversarial/L-USABILITY.jsonl.
+    READ: docs/quality/codebase_evaluation/prompts/L-USABILITY/adversarial.md; docs/quality/cef-runs/2026-09-03-AGENT_AD/findings/L-USABILITY.jsonl
+    STEPS:
+    1) Read docs/quality/cef-runs/2026-09-03-AGENT_AD/findings/L-USABILITY.jsonl then overwrite docs/quality/cef-runs/2026-09-03-AGENT_AD/adversarial/L-USABILITY.jsonl.
+    2) Attack false-green / hallucinated paths / weak evidence.
+    3) Append <=5 lines to docs/quality/cef-runs/2026-09-03-AGENT_AD/run_log.md.
+    4) Feed ack as qwen-2: attacks_filed.
+    SUCCESS_GATE: docs/quality/cef-runs/2026-09-03-AGENT_AD/adversarial/L-USABILITY.jsonl overwritten with >=1 finding_id attack rows; not STUB.
+    FORBID: source edits; process mint; dual-seat GPA; sibling package before COMPARE.
+hourglass_on: true
+id: ATK-1788499953932030000-c3446303
+kind: agent_task
+namespace_id: zqk:kernel
+pipeline_ref: PIP-CEF-DIAMOND-REMEASURE-001
+priority_plan_ref: PRI-CEF-R27-ENVELOPE-001
+schema_version: 2.0.0
+started_at: "2026-09-04T05:56:27Z"
+status: implemented
+title: CEF AGENT_AD W3_usa_adversarial — L-USABILITY
+updated_at: "2026-09-04T23:14:12Z"
+updated_by: ACC-1785920548450214006-2e52b3e7
+version_context: default

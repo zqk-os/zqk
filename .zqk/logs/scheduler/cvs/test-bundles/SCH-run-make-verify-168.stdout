@@ -1,0 +1,45 @@
+
+--- run 2026-09-04T21:40:50Z ---
+=== RUN   TestInitializeSecurityContextFromMCP_Defaults
+=== PAUSE TestInitializeSecurityContextFromMCP_Defaults
+=== RUN   TestExtractFlags_Resiliency
+=== PAUSE TestExtractFlags_Resiliency
+=== RUN   TestIsUnsafeCLIBridgeBinary
+=== PAUSE TestIsUnsafeCLIBridgeBinary
+=== RUN   TestFindFullZqkBinary_NeverReturnsTestBinary
+=== PAUSE TestFindFullZqkBinary_NeverReturnsTestBinary
+=== RUN   TestCommonBuiltInToolsMapToCLICommands
+=== PAUSE TestCommonBuiltInToolsMapToCLICommands
+=== RUN   TestClient_DisconnectDeadlock
+=== PAUSE TestClient_DisconnectDeadlock
+=== RUN   TestClient_ConcurrentCallTool
+=== PAUSE TestClient_ConcurrentCallTool
+=== RUN   TestDeadlockIsolation
+=== PAUSE TestDeadlockIsolation
+=== RUN   TestEventEmitter_Subscribe
+=== PAUSE TestEventEmitter_Subscribe
+=== RUN   TestEventEmitter_Unsubscribe
+=== PAUSE TestEventEmitter_Unsubscribe
+=== CONT  TestInitializeSecurityContextFromMCP_Defaults
+=== CONT  TestClient_DisconnectDeadlock
+--- PASS: TestInitializeSecurityContextFromMCP_Defaults (0.00s)
+=== CONT  TestEventEmitter_Subscribe
+--- PASS: TestEventEmitter_Subscribe (0.00s)
+=== CONT  TestEventEmitter_Unsubscribe
+--- PASS: TestEventEmitter_Unsubscribe (0.00s)
+=== CONT  TestCommonBuiltInToolsMapToCLICommands
+--- PASS: TestCommonBuiltInToolsMapToCLICommands (0.00s)
+=== CONT  TestExtractFlags_Resiliency
+--- PASS: TestExtractFlags_Resiliency (0.00s)
+=== CONT  TestFindFullZqkBinary_NeverReturnsTestBinary
+--- PASS: TestFindFullZqkBinary_NeverReturnsTestBinary (0.00s)
+=== CONT  TestDeadlockIsolation
+    deadlock_isolation_test.go:24: skipping isolation test unless MCP_RUN_DEADLOCK_REPRODUCTION=1 (timing-sensitive)
+--- SKIP: TestDeadlockIsolation (0.00s)
+=== CONT  TestClient_ConcurrentCallTool
+--- PASS: TestClient_DisconnectDeadlock (0.10s)
+=== CONT  TestIsUnsafeCLIBridgeBinary
+--- PASS: TestIsUnsafeCLIBridgeBinary (0.00s)
+--- PASS: TestClient_ConcurrentCallTool (2.00s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/mcp	2.691s

@@ -1,0 +1,19 @@
+cell_type: muscle
+context: Execution muscle for PRI-GROOM-KERNEL-OPS-001 (navigable kernel / mutation pipeline under MIS-CEF-PRELAUNCH-001). Ranked behind PRI-GROOM-COMMS-MESH-001 (active_order 2).
+created_at: "2026-08-19T03:37:07Z"
+created_by: ACC-1785920548450214012-68b850c0
+focus_area: engineering
+id: TCFG-1787110627273108000-09f898c8
+kind: team_configuration
+namespace_id: zqk:kernel
+persona_allocations:
+    - PER-1781486391201872000-779baf38
+    - PER-1781248465963709000-9925efbe
+    - PER-1781248465963671000-281a3996
+    - PER-1781248465963697000-193ae541
+schema_version: 2.0.0
+status: approved
+title: CEF kernel-ops execution cell
+updated_at: "2026-08-19T03:37:17Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

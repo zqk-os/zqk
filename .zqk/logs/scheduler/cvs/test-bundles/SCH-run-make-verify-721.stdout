@@ -1,0 +1,44 @@
+
+--- run 2026-09-04T22:20:50Z ---
+=== RUN   TestDetectVendors_IDE
+=== PAUSE TestDetectVendors_IDE
+=== RUN   TestDetectVendors_BareAgentsDirNotDetected
+=== PAUSE TestDetectVendors_BareAgentsDirNotDetected
+=== RUN   TestDetectVendors_EmptyIsVectorB
+=== PAUSE TestDetectVendors_EmptyIsVectorB
+=== RUN   TestRun_DetectOnly
+=== PAUSE TestRun_DetectOnly
+=== RUN   TestRun_DryRunDoesNotSeatOrWrite
+=== PAUSE TestRun_DryRunDoesNotSeatOrWrite
+=== RUN   TestRun_PrimeAndSmoke
+=== PAUSE TestRun_PrimeAndSmoke
+=== RUN   TestRun_HeadlessSkipsIDERulesEvenIfIDEPresent
+=== PAUSE TestRun_HeadlessSkipsIDERulesEvenIfIDEPresent
+=== RUN   TestMarketProbeChecklist_NonEmpty
+=== PAUSE TestMarketProbeChecklist_NonEmpty
+=== RUN   TestWriteVendorConfigs_SkipsExistingUnlessForce
+=== PAUSE TestWriteVendorConfigs_SkipsExistingUnlessForce
+=== RUN   TestBootPayloadFor_IncludesVendorAddendum
+=== PAUSE TestBootPayloadFor_IncludesVendorAddendum
+=== CONT  TestDetectVendors_IDE
+=== CONT  TestRun_PrimeAndSmoke
+--- PASS: TestDetectVendors_IDE (0.01s)
+=== CONT  TestRun_DetectOnly
+--- PASS: TestRun_DetectOnly (0.00s)
+=== CONT  TestRun_DryRunDoesNotSeatOrWrite
+--- PASS: TestRun_DryRunDoesNotSeatOrWrite (0.00s)
+=== CONT  TestDetectVendors_EmptyIsVectorB
+--- PASS: TestRun_PrimeAndSmoke (0.01s)
+=== CONT  TestDetectVendors_BareAgentsDirNotDetected
+--- PASS: TestDetectVendors_EmptyIsVectorB (0.00s)
+=== CONT  TestWriteVendorConfigs_SkipsExistingUnlessForce
+--- PASS: TestDetectVendors_BareAgentsDirNotDetected (0.01s)
+=== CONT  TestBootPayloadFor_IncludesVendorAddendum
+--- PASS: TestBootPayloadFor_IncludesVendorAddendum (0.00s)
+=== CONT  TestMarketProbeChecklist_NonEmpty
+--- PASS: TestMarketProbeChecklist_NonEmpty (0.00s)
+=== CONT  TestRun_HeadlessSkipsIDERulesEvenIfIDEPresent
+--- PASS: TestWriteVendorConfigs_SkipsExistingUnlessForce (0.01s)
+--- PASS: TestRun_HeadlessSkipsIDERulesEvenIfIDEPresent (0.01s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/agentonboard	0.592s

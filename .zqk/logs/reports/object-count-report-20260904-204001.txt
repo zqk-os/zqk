@@ -1,0 +1,397 @@
+=== Object count report ===
+generated: 2026-09-04T20:39:57Z
+project_root: /Users/lanceettl/zqk-restore-clone
+output: /Users/lanceettl/zqk-restore-clone/.zqk/logs/reports/object-count-report-20260904-204001.txt
+
+--- Cache status ---
+  object_id_cache: path=/Users/lanceettl/zqk-restore-clone/.zqk/cache/object-id-cache.json loaded=true total=8857 count_by_kind=map[account:53 agent_architecture:0 agent_feed:0 agent_onboarding_preparation:1 agent_skill:39 agent_task:101 api_spec:0 auth_strategy:0 backlog_item:1141 base_sampler:0 brand:0 bucketing_strategy:0 capability:0 capacity_advertisement:0 certificate:0 command_spec:0 component:0 compute_advertisement:0 context_refresh_schedule:0 convergence_session:14 corporate_initiative:0 criteria:1320 decision:15 department:0 digital_asset:0 division:5 doc_entry:2053 domain_registry:7 evolution_management:0 field_registry:0 fission_event:0 glossary_term:1746 glossary_term_relation:30 goal:83 import_tracking:0 important_date:0 inference_heuristic:0 keystore_entry:0 kind_synonym:0 library:1 list_metric_sampler:0 mcp_spec:3 metadata_package:0 metrics_feedback:0 milestone:130 mission:2 namespace:4 namespace_registry:1 object_spec:122 ordered_list_metric_sampler:0 organization:7 organizational_change:0 partnership:1 persona:56 pipeline:3 pipeline_definition:0 pipeline_execution:0 pipeline_stage:0 policy:136 priority_plan:100 process_hygiene_rule:0 prompt_template:39 provider_profile:0 qa_success:1027 question:16 release:0 remote_kernel:0 requirement:243 resolver:0 risk_blocker:151 roadmap:12 role:18 rollback_report:0 rule:9 sampler_profile:0 scalar_metric_sampler:0 scenario:1 scheduler_handler_binding:0 shockwave_router:0 stakeholder_profile:1 status_history_metric_sampler:0 strategic_context:10 strategic_plan:1 team:0 team_configuration:4 technical_debt:39 technical_spec:0 template:1 test_case:55 test_command_rule:0 translation_manifest:0 validation_rule:0 vision:0 visual_plan:0 vitality_report:0 vocabulary_scheme:9 watchdog_registration:0 workflow:10 workstream:37 workstream_transition:0]
+  reverse_reference_index: path=/Users/lanceettl/zqk-restore-clone/.zqk/cache/reverse-reference-index.json loaded=true referenced_id_count=10
+
+--- Totals ---
+total_disk: 9306
+total_object: 8884
+total_internal: 52747
+
+--- Interpretation ---
+  total_disk:   count of .yaml files under docs/process (one file per object or legacy).
+  total_object: sum of per-kind counts (CAS index or stream registry for stream-backed kinds).
+  total_internal: sum of per-kind counts from 'zqk internal count' (in-memory view).
+  Stream-backed kinds (audit_event, change_journal_entry, scheduler_job, metrics, etc.): object count
+  comes from stream storage; disk count is legacy YAML in docs/process/<dir>. Negative disparity for those
+  dirs is expected (more in stream than legacy files). Legacy files can be pruned or left as-is; stream is source of truth.
+  Small gap between total_object and total_disk is normal (e.g. _internal, multi-object YAML, stream-backed legacy dirs).
+
+--- Disk count by dir ---
+  accounts: 53
+  agent_architectures: 0
+  agent_feeds: 0
+  agent_instructions: 0
+  agent_onboarding_preparations: 1
+  agent_skills: 39
+  agent_tasks: 101
+  api_specs: 0
+  architecture: 0
+  assessment_ratings: 0
+  audit: 0
+  auth_strategies: 0
+  backlog: 1141
+  brands: 0
+  bucketing_strategies: 0
+  certificates: 0
+  change_journal: 0
+  components: 0
+  compression_policies: 0
+  context_refresh_schedules: 0
+  convergence_sessions: 14
+  corporate_initiatives: 0
+  criteria: 1320
+  decisions: 15
+  departments: 0
+  divisions: 5
+  doc_entries: 2053
+  domain_registries: 7
+  enforcement: 0
+  evolution_managements: 0
+  execution: 0
+  glossary_term_relations: 30
+  glossary_terms: 1746
+  goals: 83
+  import_trackings: 0
+  important_dates: 0
+  keystore: 0
+  kind_synonyms: 0
+  libraries: 1
+  mcp_sessions: 0
+  mcp_specs: 3
+  metadata_packages: 0
+  milestones: 130
+  missions: 2
+  namespace_registries: 1
+  namespaces: 4
+  object_specs: 122
+  oc_proof: 0
+  organizational_changes: 0
+  organizations: 7
+  partnerships: 1
+  personas: 56
+  pipeline_definitions: 0
+  pipeline_executions: 0
+  pipelines: 3
+  policies: 136
+  priority_plans: 100
+  prompt_templates: 39
+  qa_success: 1027
+  questions: 16
+  releases: 0
+  requirements: 243
+  resolvers: 0
+  risk_blockers: 151
+  roadmaps: 12
+  roles: 18
+  rollback_reports: 0
+  rules: 9
+  scenarios: 1
+  scheduler_handler_bindings: 0
+  scheduler_jobs: 449
+  shockwave_routers: 0
+  stakeholder_profiles: 1
+  strategic_contexts: 10
+  strategic_plans: 1
+  team_configurations: 4
+  teams: 0
+  technical_debts: 39
+  technical_specs: 0
+  templates: 1
+  test_command_rules: 0
+  tests: 55
+  validation_rules: 0
+  verification_matrices: 0
+  visions: 0
+  vocabulary_schemes: 9
+  watchdog_registrations: 0
+  workflows: 10
+  workstream_transitions: 0
+  workstreams: 37
+  zqk_sessions: 0
+
+--- Object count by kind ---
+  account: 53
+  agent_architecture: 0
+  agent_feed: 0
+  agent_instruction: 0
+  agent_onboarding_preparation: 1
+  agent_skill: 39
+  agent_task: 101
+  api_spec: 0
+  audit_aggregation_metric: 0
+  audit_event: 19
+  auth_strategy: 0
+  backlog_item: 1141
+  base_metric: 1
+  base_sampler: 0
+  brand: 0
+  bucketing_strategy: 0
+  capability: 0
+  capacity_advertisement: 0
+  certificate: 0
+  change_journal_entry: 6
+  code_quality_metric: 0
+  command_metric: 0
+  command_spec: 0
+  component: 0
+  compute_advertisement: 0
+  context_refresh_schedule: 0
+  convergence_session: 14
+  corporate_initiative: 0
+  criteria: 1320
+  decision: 15
+  department: 0
+  digital_asset: 0
+  division: 5
+  doc_entry: 2053
+  domain_registry: 7
+  evolution_management: 0
+  field_registry: 0
+  file_lock_metric: 0
+  fission_event: 0
+  glossary_term: 1746
+  glossary_term_relation: 30
+  goal: 83
+  import_tracking: 0
+  important_date: 0
+  inference_heuristic: 0
+  keystore_entry: 0
+  kind_mapping_metric: 0
+  kind_synonym: 0
+  library: 1
+  list_metric_sampler: 0
+  mcp_session: 0
+  mcp_spec: 3
+  metadata_package: 0
+  metrics_feedback: 0
+  milestone: 130
+  mission: 2
+  namespace: 4
+  namespace_registry: 1
+  object_spec: 122
+  ordered_list_metric_sampler: 0
+  organization: 7
+  organizational_change: 0
+  partnership: 1
+  persona: 56
+  pipeline: 3
+  pipeline_definition: 0
+  pipeline_execution: 0
+  pipeline_stage: 0
+  policy: 136
+  priority_plan: 100
+  process_hygiene_rule: 0
+  prompt_template: 39
+  provider_profile: 0
+  qa_success: 1027
+  question: 16
+  release: 0
+  remote_kernel: 0
+  requirement: 243
+  resolver: 0
+  risk_blocker: 151
+  roadmap: 12
+  role: 18
+  rollback_report: 0
+  rule: 9
+  sampler_profile: 0
+  scalar_metric_sampler: 0
+  scenario: 1
+  scheduler_handler_binding: 0
+  scheduler_health_metric: 1
+  shockwave_router: 0
+  stakeholder_profile: 1
+  status_history_metric_sampler: 0
+  strategic_context: 10
+  strategic_plan: 1
+  team: 0
+  team_configuration: 4
+  technical_debt: 39
+  technical_spec: 0
+  template: 1
+  test_case: 55
+  test_command_rule: 0
+  translation_manifest: 0
+  validation_rule: 0
+  verification_matrix: 0
+  vision: 0
+  visual_plan: 0
+  vitality_report: 0
+  vocabulary_scheme: 9
+  watchdog_registration: 0
+  workflow: 10
+  workstream: 37
+  workstream_transition: 0
+  zqk_session: 0
+
+--- Internal count by kind ---
+  agent_feed: 1
+  agent_task: 385
+  audit_event: 20603
+  auth_strategy: 4
+  base_metric: 7689
+  bucketing_strategy: 1
+  glossary_term: 1060
+  glossary_term_relation: 25
+  keystore_entry: 11
+  object_spec: 135
+  pipeline_definition: 1
+  pipeline_execution: 1
+  process_hygiene_rule: 1
+  qa_success: 351
+  resolver: 1
+  scheduler_health_metric: 7513
+  scheduler_job: 13226
+  technical_debt: 1474
+  vocabulary_scheme: 4
+  watchdog_registration: 5
+  zqk_session: 256
+
+--- Disparity by dir (disk - object) ---
+  accounts: 0
+  agent_architectures: 0
+  agent_feeds: 0
+  agent_instructions: 0
+  agent_onboarding_preparations: 0
+  agent_skills: 0
+  agent_tasks: 0
+  api_specs: 0
+  architecture: 0
+  assessment_ratings: 0
+  audit: -19
+  auth_strategies: 0
+  backlog: 0
+  brands: 0
+  bucketing_strategies: 0
+  certificates: 0
+  change_journal: -6
+  components: 0
+  compression_policies: 0
+  context_refresh_schedules: 0
+  convergence_sessions: 0
+  corporate_initiatives: 0
+  criteria: 0
+  decisions: 0
+  departments: 0
+  divisions: 0
+  doc_entries: 0
+  domain_registries: 0
+  enforcement: 0
+  evolution_managements: 0
+  execution: 0
+  glossary_term_relations: 0
+  glossary_terms: 0
+  goals: 0
+  import_trackings: 0
+  important_dates: 0
+  keystore: 0
+  kind_synonyms: 0
+  libraries: 0
+  mcp_sessions: 0
+  mcp_specs: 0
+  metadata_packages: 0
+  milestones: 0
+  missions: 0
+  namespace_registries: 0
+  namespaces: 0
+  object_specs: 0
+  oc_proof: 0
+  organizational_changes: 0
+  organizations: 0
+  partnerships: 0
+  personas: 0
+  pipeline_definitions: 0
+  pipeline_executions: 0
+  pipelines: 0
+  policies: 0
+  priority_plans: 0
+  prompt_templates: 0
+  qa_success: 0
+  questions: 0
+  releases: 0
+  requirements: 0
+  resolvers: 0
+  risk_blockers: 0
+  roadmaps: 0
+  roles: 0
+  rollback_reports: 0
+  rules: 0
+  scenarios: 0
+  scheduler_handler_bindings: 0
+  scheduler_jobs: 449
+  shockwave_routers: 0
+  stakeholder_profiles: 0
+  strategic_contexts: 0
+  strategic_plans: 0
+  team_configurations: 0
+  teams: 0
+  technical_debts: 0
+  technical_specs: 0
+  templates: 0
+  test_command_rules: 0
+  tests: 0
+  validation_rules: 0
+  verification_matrices: 0
+  visions: 0
+  vocabulary_schemes: 0
+  watchdog_registrations: 0
+  workflows: 0
+  workstream_transitions: 0
+  workstreams: 0
+  zqk_sessions: 0
+  (Stream-backed dirs: object count from stream storage; disk = legacy YAML in docs/process/<dir>. Negative disparity there means more objects in stream than legacy files.)
+
+--- Legacy pre-migration files (stream-backed dirs) ---
+  4688 total legacy YAML file(s) remain in stream-backed directories.
+  These predate stream-storage migration; stream is authoritative; disk files can be removed.
+  mcp_sessions: 4688 file(s)
+  Cleanup: zqk system migrate-legacy-to-stream --kind <kind> --remove-legacy
+           scripts/delete_unmanaged_audit_yaml.py --execute  (audit/metrics)
+
+--- Alerts ---
+  dir scheduler_jobs: disk=449 object=0 disparity=449 (scheduler maintenance keeps counts in policy when running; if daemon not started, run 'zqk system ensure-retention-jobs' and start scheduler)
+  legacy pre-migration YAML files in stream-backed dirs: 4688 total (run 'zqk system migrate-legacy-to-stream --kind <kind> --remove-legacy' or 'scripts/delete_unmanaged_audit_yaml.py --execute')
+
+--- Filesystem snapshot ---
+snapshot_scope: zqk
+generated: 2026-09-04T20:40:04.73038Z
+total_files: 4672
+total_bytes: 118712706
+volume (statfs): filesystem total_bytes=994662584320 available_bytes=427629867008 free_bytes=427629867008
+top-level buckets by file count (sample):
+  .zqk: 4672 files, 118712706 bytes
+.zqk immediate children:
+  .zqk/state: 3287 files, 3251492 bytes
+  .zqk/test-bundles: 846 files, 4301545 bytes
+  .zqk/streams: 184 files, 34183242 bytes
+  .zqk/cli: 126 files, 213570 bytes
+  .zqk/scheduler: 79 files, 7343476 bytes
+  .zqk/logs: 57 files, 2644062 bytes
+  .zqk/skills: 31 files, 140803 bytes
+  .zqk/mcp: 11 files, 34277 bytes
+  .zqk/wal: 8 files, 454251 bytes
+  .zqk/agent_packs: 7 files, 11260 bytes
+  .zqk/cache: 7 files, 1885792 bytes
+  .zqk/config: 7 files, 5000 bytes
+  .zqk/scenarios: 5 files, 5710 bytes
+  .zqk/pre-commit: 4 files, 6969 bytes
+  .zqk/metrics: 2 files, 5249 bytes
+  .zqk/ontologies: 2 files, 1084 bytes
+  .zqk/scripts: 2 files, 4605 bytes
+  .zqk/agents: 1 files, 223 bytes
+  .zqk/bin: 1 files, 64218546 bytes
+  .zqk/cleanup: 1 files, 634 bytes
+  .zqk/ides: 1 files, 28 bytes
+  .zqk/inbox: 1 files, 661 bytes
+  .zqk/keystore: 1 files, 227 bytes
+  .zqk/lock: 1 files, 0 bytes
+
+--- When counts are off: investigate ---
+  See docs/process/observability/RETENTION_TARGET_VISIBILITY_GAP.md and run zqk system retention-status.
+  Stream-backed dirs (object count from stream): legacy YAML in docs/process/<dir> is not the source of truth;
+  you may prune legacy files or leave them; see docs/architecture/HIGH_VOLUME_STORAGE_DEPRECATION.md.

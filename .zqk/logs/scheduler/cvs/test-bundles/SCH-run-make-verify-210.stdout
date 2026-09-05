@@ -1,0 +1,72 @@
+
+--- run 2026-09-04T21:43:44Z ---
+=== RUN   TestProjectStewardFocus_employedWorkflows
+=== PAUSE TestProjectStewardFocus_employedWorkflows
+=== RUN   TestTruncateAndFixtureHelpers
+=== PAUSE TestTruncateAndFixtureHelpers
+=== RUN   TestEnrichStrategicAlignment_andSeatMode
+=== PAUSE TestEnrichStrategicAlignment_andSeatMode
+=== RUN   TestLoadKernelAmbience_fromCacheAndDrafts
+=== PAUSE TestLoadKernelAmbience_fromCacheAndDrafts
+=== RUN   TestPriorityPlanPackagingCue
+=== PAUSE TestPriorityPlanPackagingCue
+=== RUN   TestPlanStatusEligible
+=== PAUSE TestPlanStatusEligible
+=== RUN   TestPriorityPlanScoreBonusConstant
+=== PAUSE TestPriorityPlanScoreBonusConstant
+=== RUN   TestPlanStatusExecutionReady
+=== PAUSE TestPlanStatusExecutionReady
+=== RUN   TestActiveOrderPenalty
+=== PAUSE TestActiveOrderPenalty
+=== RUN   TestInProgressPlanRanksAboveShovelReadyActive
+=== PAUSE TestInProgressPlanRanksAboveShovelReadyActive
+=== CONT  TestProjectStewardFocus_employedWorkflows
+=== CONT  TestPlanStatusEligible
+=== CONT  TestActiveOrderPenalty
+--- PASS: TestProjectStewardFocus_employedWorkflows (0.00s)
+--- PASS: TestActiveOrderPenalty (0.00s)
+=== CONT  TestInProgressPlanRanksAboveShovelReadyActive
+--- PASS: TestInProgressPlanRanksAboveShovelReadyActive (0.00s)
+=== CONT  TestLoadKernelAmbience_fromCacheAndDrafts
+--- PASS: TestPlanStatusEligible (0.00s)
+=== CONT  TestPriorityPlanPackagingCue
+=== RUN   TestPriorityPlanPackagingCue/wrap_when_active_and_all_complete
+=== PAUSE TestPriorityPlanPackagingCue/wrap_when_active_and_all_complete
+=== RUN   TestPriorityPlanPackagingCue/wrap_when_in_progress_and_all_complete
+=== PAUSE TestPriorityPlanPackagingCue/wrap_when_in_progress_and_all_complete
+=== RUN   TestPriorityPlanPackagingCue/no_spam_with_open_planned_children
+=== PAUSE TestPriorityPlanPackagingCue/no_spam_with_open_planned_children
+=== RUN   TestPriorityPlanPackagingCue/no_spam_with_in_progress_children
+=== PAUSE TestPriorityPlanPackagingCue/no_spam_with_in_progress_children
+=== RUN   TestPriorityPlanPackagingCue/skip_grooming_plans
+=== PAUSE TestPriorityPlanPackagingCue/skip_grooming_plans
+=== RUN   TestPriorityPlanPackagingCue/skip_empty_plan
+=== PAUSE TestPriorityPlanPackagingCue/skip_empty_plan
+=== RUN   TestPriorityPlanPackagingCue/cue_after_promote_to_complete
+=== PAUSE TestPriorityPlanPackagingCue/cue_after_promote_to_complete
+=== CONT  TestEnrichStrategicAlignment_andSeatMode
+--- PASS: TestEnrichStrategicAlignment_andSeatMode (0.01s)
+=== CONT  TestTruncateAndFixtureHelpers
+--- PASS: TestTruncateAndFixtureHelpers (0.00s)
+=== CONT  TestPlanStatusExecutionReady
+--- PASS: TestPlanStatusExecutionReady (0.00s)
+=== CONT  TestPriorityPlanScoreBonusConstant
+--- PASS: TestPriorityPlanScoreBonusConstant (0.00s)
+=== CONT  TestPriorityPlanPackagingCue/wrap_when_active_and_all_complete
+=== CONT  TestPriorityPlanPackagingCue/skip_grooming_plans
+=== CONT  TestPriorityPlanPackagingCue/cue_after_promote_to_complete
+=== CONT  TestPriorityPlanPackagingCue/skip_empty_plan
+=== CONT  TestPriorityPlanPackagingCue/no_spam_with_open_planned_children
+=== CONT  TestPriorityPlanPackagingCue/no_spam_with_in_progress_children
+=== CONT  TestPriorityPlanPackagingCue/wrap_when_in_progress_and_all_complete
+--- PASS: TestPriorityPlanPackagingCue (0.00s)
+    --- PASS: TestPriorityPlanPackagingCue/wrap_when_active_and_all_complete (0.00s)
+    --- PASS: TestPriorityPlanPackagingCue/skip_grooming_plans (0.00s)
+    --- PASS: TestPriorityPlanPackagingCue/cue_after_promote_to_complete (0.00s)
+    --- PASS: TestPriorityPlanPackagingCue/skip_empty_plan (0.00s)
+    --- PASS: TestPriorityPlanPackagingCue/no_spam_with_open_planned_children (0.00s)
+    --- PASS: TestPriorityPlanPackagingCue/no_spam_with_in_progress_children (0.00s)
+    --- PASS: TestPriorityPlanPackagingCue/wrap_when_in_progress_and_all_complete (0.00s)
+--- PASS: TestLoadKernelAmbience_fromCacheAndDrafts (0.04s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/workflow/whatsnext	0.630s

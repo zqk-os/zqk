@@ -1,0 +1,69 @@
+{
+  "name": "make-verify-203",
+  "created_at": "2026-09-04T21:34:29.418668Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-203",
+    "Tests": [
+      {
+        "Name": "TestCAS_TamperDetection_IndexTampering",
+        "Package": "cas_test",
+        "PackagePath": "pkg/storage/cas",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/cas/cas_tamper_detection_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestCAS_TamperDetection_FileDeletion",
+        "Package": "cas_test",
+        "PackagePath": "pkg/storage/cas",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/cas/cas_tamper_detection_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestCAS_TamperDetection_YAMLCorruption",
+        "Package": "cas_test",
+        "PackagePath": "pkg/storage/cas",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/cas/cas_tamper_detection_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 270000000000,
+    "PackagePath": "pkg/storage/cas"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestCAS_TamperDetection_IndexTampering",
+      "Package": "cas_test",
+      "PackagePath": "pkg/storage/cas",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/cas/cas_tamper_detection_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestCAS_TamperDetection_FileDeletion",
+      "Package": "cas_test",
+      "PackagePath": "pkg/storage/cas",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/cas/cas_tamper_detection_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestCAS_TamperDetection_YAMLCorruption",
+      "Package": "cas_test",
+      "PackagePath": "pkg/storage/cas",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/cas/cas_tamper_detection_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    }
+  }
+}

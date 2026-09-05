@@ -1,0 +1,105 @@
+{
+  "name": "make-verify-841",
+  "created_at": "2026-09-04T21:34:35.693509Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-841",
+    "Tests": [
+      {
+        "Name": "TestDaemon_ProcessExpired",
+        "Package": "tde",
+        "PackagePath": "pkg/tde",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/tde/daemon_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestDaemon_ProcessExpired_MutatorError",
+        "Package": "tde",
+        "PackagePath": "pkg/tde",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/tde/daemon_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestDaemon_ProcessExpired_HardBlock",
+        "Package": "tde",
+        "PackagePath": "pkg/tde",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/tde/daemon_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestStagingWAL_StageAndLoadActive",
+        "Package": "tde",
+        "PackagePath": "pkg/tde",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/tde/wal_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestStagingWAL_RevokeAndCommit",
+        "Package": "tde",
+        "PackagePath": "pkg/tde",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/tde/wal_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 150000000000,
+    "PackagePath": "pkg/tde"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestDaemon_ProcessExpired",
+      "Package": "tde",
+      "PackagePath": "pkg/tde",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/tde/daemon_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestDaemon_ProcessExpired_MutatorError",
+      "Package": "tde",
+      "PackagePath": "pkg/tde",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/tde/daemon_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestDaemon_ProcessExpired_HardBlock",
+      "Package": "tde",
+      "PackagePath": "pkg/tde",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/tde/daemon_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestStagingWAL_StageAndLoadActive",
+      "Package": "tde",
+      "PackagePath": "pkg/tde",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/tde/wal_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestStagingWAL_RevokeAndCommit",
+      "Package": "tde",
+      "PackagePath": "pkg/tde",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/tde/wal_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

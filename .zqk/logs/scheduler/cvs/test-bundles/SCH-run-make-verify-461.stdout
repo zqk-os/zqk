@@ -1,0 +1,44 @@
+
+--- run 2026-09-04T22:13:42Z ---
+=== RUN   TestCommandExecutionTracker
+=== PAUSE TestCommandExecutionTracker
+=== RUN   TestCommandExecutionTracker_Context
+=== PAUSE TestCommandExecutionTracker_Context
+=== RUN   TestCommandExecutionTracker_Concurrent
+=== PAUSE TestCommandExecutionTracker_Concurrent
+=== RUN   TestCommandExecutionTracker_Timing
+=== PAUSE TestCommandExecutionTracker_Timing
+=== RUN   TestValidateCommandTraits
+=== PAUSE TestValidateCommandTraits
+=== RUN   TestValidateCommandTraitsWithFlags
+=== PAUSE TestValidateCommandTraitsWithFlags
+=== RUN   TestGetCommandTraitRequirements
+=== PAUSE TestGetCommandTraitRequirements
+=== RUN   TestTraitRegistryIntegration
+=== PAUSE TestTraitRegistryIntegration
+=== RUN   TestAddFieldsFlags_WithListKinds
+=== PAUSE TestAddFieldsFlags_WithListKinds
+=== RUN   TestAddFieldsFlags_WithoutListKinds
+=== PAUSE TestAddFieldsFlags_WithoutListKinds
+=== CONT  TestCommandExecutionTracker
+--- PASS: TestCommandExecutionTracker (0.00s)
+=== CONT  TestValidateCommandTraits
+=== CONT  TestValidateCommandTraitsWithFlags
+--- PASS: TestValidateCommandTraits (0.08s)
+=== CONT  TestAddFieldsFlags_WithListKinds
+--- PASS: TestAddFieldsFlags_WithListKinds (0.00s)
+=== CONT  TestAddFieldsFlags_WithoutListKinds
+--- PASS: TestAddFieldsFlags_WithoutListKinds (0.00s)
+=== CONT  TestCommandExecutionTracker_Concurrent
+--- PASS: TestCommandExecutionTracker_Concurrent (0.00s)
+=== CONT  TestCommandExecutionTracker_Timing
+--- PASS: TestCommandExecutionTracker_Timing (0.01s)
+=== CONT  TestTraitRegistryIntegration
+--- PASS: TestTraitRegistryIntegration (0.02s)
+=== CONT  TestCommandExecutionTracker_Context
+--- PASS: TestCommandExecutionTracker_Context (0.00s)
+=== CONT  TestGetCommandTraitRequirements
+--- PASS: TestGetCommandTraitRequirements (0.00s)
+--- PASS: TestValidateCommandTraitsWithFlags (0.12s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/cli	0.445s

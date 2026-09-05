@@ -1,0 +1,9 @@
+=== check-logging-compliance.sh (branch scope) ===
+🔍 Checking for POL-CODE-007 violations (direct fmt.Print* calls)...
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+[0;32m✅ No violations found[0m
+   Checked 3 files
+
+   All output is correctly routed through the logging framework.

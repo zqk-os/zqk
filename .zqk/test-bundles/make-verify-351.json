@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-351",
+  "created_at": "2026-09-04T21:34:30.833891Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-351",
+    "Tests": [
+      {
+        "Name": "TestCollectCVSTreeBFS_respectsMaxDepth",
+        "Package": "convergerollup",
+        "PackagePath": "pkg/convergerollup",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/convergerollup/cvs_tree_bfs_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestCollectCVSTreeBFS_cycleDoesNotLoop",
+        "Package": "convergerollup",
+        "PackagePath": "pkg/convergerollup",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/convergerollup/cvs_tree_bfs_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestCollectCVSTreeBFS_diamondDeduplicates",
+        "Package": "convergerollup",
+        "PackagePath": "pkg/convergerollup",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/convergerollup/cvs_tree_bfs_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestCollectCVSTreeBFS_ignoresNonCVSPrefix",
+        "Package": "convergerollup",
+        "PackagePath": "pkg/convergerollup",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/convergerollup/cvs_tree_bfs_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestBuildArbitratedParentMessage_blocksWhenActiveChildren",
+        "Package": "convergerollup",
+        "PackagePath": "pkg/convergerollup",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/convergerollup/overseer_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestActiveChildIDsUnderCoordinator",
+        "Package": "convergerollup",
+        "PackagePath": "pkg/convergerollup",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/convergerollup/overseer_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestComputePrimaryMeasurementOutcome_satisfied",
+        "Package": "convergerollup",
+        "PackagePath": "pkg/convergerollup",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/convergerollup/primary_measurement_outcome_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestComputePrimaryMeasurementOutcome_haltGate",
+        "Package": "convergerollup",
+        "PackagePath": "pkg/convergerollup",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/convergerollup/primary_measurement_outcome_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestComputePrimaryMeasurementOutcome_haltMatrixErr",
+        "Package": "convergerollup",
+        "PackagePath": "pkg/convergerollup",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/convergerollup/primary_measurement_outcome_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestComputePrimaryMeasurementOutcome_divergenceFingerprints",
+        "Package": "convergerollup",
+        "PackagePath": "pkg/convergerollup",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/convergerollup/primary_measurement_outcome_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 300000000000,
+    "PackagePath": "pkg/convergerollup"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestCollectCVSTreeBFS_respectsMaxDepth",
+      "Package": "convergerollup",
+      "PackagePath": "pkg/convergerollup",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/convergerollup/cvs_tree_bfs_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestCollectCVSTreeBFS_cycleDoesNotLoop",
+      "Package": "convergerollup",
+      "PackagePath": "pkg/convergerollup",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/convergerollup/cvs_tree_bfs_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestCollectCVSTreeBFS_diamondDeduplicates",
+      "Package": "convergerollup",
+      "PackagePath": "pkg/convergerollup",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/convergerollup/cvs_tree_bfs_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestCollectCVSTreeBFS_ignoresNonCVSPrefix",
+      "Package": "convergerollup",
+      "PackagePath": "pkg/convergerollup",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/convergerollup/cvs_tree_bfs_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestBuildArbitratedParentMessage_blocksWhenActiveChildren",
+      "Package": "convergerollup",
+      "PackagePath": "pkg/convergerollup",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/convergerollup/overseer_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestActiveChildIDsUnderCoordinator",
+      "Package": "convergerollup",
+      "PackagePath": "pkg/convergerollup",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/convergerollup/overseer_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestComputePrimaryMeasurementOutcome_satisfied",
+      "Package": "convergerollup",
+      "PackagePath": "pkg/convergerollup",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/convergerollup/primary_measurement_outcome_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestComputePrimaryMeasurementOutcome_haltGate",
+      "Package": "convergerollup",
+      "PackagePath": "pkg/convergerollup",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/convergerollup/primary_measurement_outcome_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestComputePrimaryMeasurementOutcome_haltMatrixErr",
+      "Package": "convergerollup",
+      "PackagePath": "pkg/convergerollup",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/convergerollup/primary_measurement_outcome_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestComputePrimaryMeasurementOutcome_divergenceFingerprints",
+      "Package": "convergerollup",
+      "PackagePath": "pkg/convergerollup",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/convergerollup/primary_measurement_outcome_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

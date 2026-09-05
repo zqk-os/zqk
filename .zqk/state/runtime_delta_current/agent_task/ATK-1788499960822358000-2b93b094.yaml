@@ -1,0 +1,32 @@
+agent_heartbeat: "2026-09-04T16:14:22-07:00"
+agent_pid: 40190
+assignee_persona_ref: PER-ORCH-BETA
+backlog_item_ref: BLI-CEF-R27-DUAL-SEAT-REMEASURE-001
+branch_ref: integration/pri-cef-r27-envelope-001
+created_at: "2026-09-04T05:32:40Z"
+created_by: ACC-1785920548450214006-2e52b3e7
+description: |
+    pipeline_ref=PIP-CEF-DIAMOND-REMEASURE-001 stage=W3_doc_adversarial
+    PRIOR: bite-sized CEF remesure under docs/quality/cef-runs/2026-09-03-AGENT_AD.
+    Attack L-DOCS-MODEL. Overwrite adversarial/L-DOCS-MODEL.jsonl.
+    READ: docs/quality/codebase_evaluation/prompts/L-DOCS-MODEL/adversarial.md; docs/quality/cef-runs/2026-09-03-AGENT_AD/findings/L-DOCS-MODEL.jsonl
+    STEPS:
+    1) Read docs/quality/cef-runs/2026-09-03-AGENT_AD/findings/L-DOCS-MODEL.jsonl then overwrite docs/quality/cef-runs/2026-09-03-AGENT_AD/adversarial/L-DOCS-MODEL.jsonl.
+    2) Attack false-green / hallucinated paths / weak evidence.
+    3) Append <=5 lines to docs/quality/cef-runs/2026-09-03-AGENT_AD/run_log.md.
+    4) Feed ack as qwen-2: attacks_filed.
+    SUCCESS_GATE: docs/quality/cef-runs/2026-09-03-AGENT_AD/adversarial/L-DOCS-MODEL.jsonl overwritten with >=1 finding_id attack rows; not STUB.
+    FORBID: source edits; process mint; dual-seat GPA; sibling package before COMPARE.
+hourglass_on: true
+id: ATK-1788499960822358000-2b93b094
+kind: agent_task
+namespace_id: zqk:kernel
+pipeline_ref: PIP-CEF-DIAMOND-REMEASURE-001
+priority_plan_ref: PRI-CEF-R27-ENVELOPE-001
+schema_version: 2.0.0
+started_at: "2026-09-04T05:56:57Z"
+status: implemented
+title: CEF AGENT_AD W3_doc_adversarial — L-DOCS-MODEL
+updated_at: "2026-09-04T23:14:22Z"
+updated_by: ACC-1785920548450214006-2e52b3e7
+version_context: default

@@ -1,0 +1,42 @@
+
+--- run 2026-09-04T21:39:55Z ---
+=== RUN   TestOutputQueue_EnqueueDequeue
+=== PAUSE TestOutputQueue_EnqueueDequeue
+=== RUN   TestOutputQueue_FIFO
+=== PAUSE TestOutputQueue_FIFO
+=== RUN   TestOutputQueue_BlockingDequeue
+=== PAUSE TestOutputQueue_BlockingDequeue
+=== RUN   TestOutputQueue_NonBlockingDequeue
+=== PAUSE TestOutputQueue_NonBlockingDequeue
+=== RUN   TestOutputQueue_DequeueBatch
+=== PAUSE TestOutputQueue_DequeueBatch
+=== RUN   TestOutputQueue_SizeLimit
+=== PAUSE TestOutputQueue_SizeLimit
+=== RUN   TestOutputQueue_ConcurrentEnqueue
+=== PAUSE TestOutputQueue_ConcurrentEnqueue
+=== RUN   TestOutputQueue_ConcurrentEnqueueDequeue
+=== PAUSE TestOutputQueue_ConcurrentEnqueueDequeue
+=== RUN   TestOutputWriter_Routing
+=== PAUSE TestOutputWriter_Routing
+=== CONT  TestOutputQueue_EnqueueDequeue
+--- PASS: TestOutputQueue_EnqueueDequeue (0.00s)
+=== CONT  TestOutputQueue_SizeLimit
+--- PASS: TestOutputQueue_SizeLimit (0.00s)
+=== CONT  TestOutputQueue_ConcurrentEnqueueDequeue
+=== CONT  TestOutputWriter_Routing
+=== NAME  TestOutputQueue_ConcurrentEnqueueDequeue
+    output_queue_test.go:264: Skipping: concurrent enqueue/dequeue test has dequeuer exit race (BLI-953)
+--- SKIP: TestOutputQueue_ConcurrentEnqueueDequeue (0.00s)
+=== CONT  TestOutputQueue_ConcurrentEnqueue
+=== CONT  TestOutputQueue_NonBlockingDequeue
+=== CONT  TestOutputQueue_DequeueBatch
+--- PASS: TestOutputQueue_ConcurrentEnqueue (0.01s)
+--- PASS: TestOutputQueue_NonBlockingDequeue (0.00s)
+--- PASS: TestOutputQueue_DequeueBatch (0.00s)
+=== CONT  TestOutputQueue_FIFO
+--- PASS: TestOutputQueue_FIFO (0.00s)
+=== CONT  TestOutputQueue_BlockingDequeue
+--- PASS: TestOutputWriter_Routing (0.01s)
+--- PASS: TestOutputQueue_BlockingDequeue (0.01s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/validation	0.683s

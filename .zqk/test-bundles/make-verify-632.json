@@ -1,0 +1,33 @@
+{
+  "name": "make-verify-632",
+  "created_at": "2026-09-04T21:34:33.644364Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-632",
+    "Tests": [
+      {
+        "Name": "TestCrypto",
+        "Package": "agent",
+        "PackagePath": "pkg/agent",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agent/crypto_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 30000000000,
+    "PackagePath": "pkg/agent"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestCrypto",
+      "Package": "agent",
+      "PackagePath": "pkg/agent",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agent/crypto_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

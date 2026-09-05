@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-332",
+  "created_at": "2026-09-04T21:34:30.658046Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-332",
+    "Tests": [
+      {
+        "Name": "TestForegroundGoTestAllowed_MakeFlags",
+        "Package": "zqkenv",
+        "PackagePath": "pkg/zqkenv",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/zqkenv/agent_guard_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestForegroundGoTestAllowed_JobID",
+        "Package": "zqkenv",
+        "PackagePath": "pkg/zqkenv",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/zqkenv/agent_guard_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestForegroundGoTestAllowed_AllowForegroundGoTest",
+        "Package": "zqkenv",
+        "PackagePath": "pkg/zqkenv",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/zqkenv/agent_guard_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestForegroundGoTestPanicRecommendsAPermissionNotAPath",
+        "Package": "zqkenv",
+        "PackagePath": "pkg/zqkenv",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/zqkenv/agent_guard_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestIsGoTestBinary",
+        "Package": "zqkenv",
+        "PackagePath": "pkg/zqkenv",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/zqkenv/agent_guard_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestApplyIsolatedStorageEnv_RequiresTestRootForFallthrough",
+        "Package": "zqkenv",
+        "PackagePath": "pkg/zqkenv",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/zqkenv/helpers_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestDaemonProcess",
+        "Package": "zqkenv",
+        "PackagePath": "pkg/zqkenv",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/zqkenv/helpers_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestMaskSensitiveValue",
+        "Package": "zqkenv_test",
+        "PackagePath": "pkg/zqkenv",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/zqkenv/masking_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestSanitizeEnvironment",
+        "Package": "zqkenv_test",
+        "PackagePath": "pkg/zqkenv",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/zqkenv/masking_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestPrivilegedWriterDaemonRole_ArgvWithoutEnv",
+        "Package": "zqkenv",
+        "PackagePath": "pkg/zqkenv",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/zqkenv/privileged_writer_role_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 300000000000,
+    "PackagePath": "pkg/zqkenv"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestForegroundGoTestAllowed_MakeFlags",
+      "Package": "zqkenv",
+      "PackagePath": "pkg/zqkenv",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/zqkenv/agent_guard_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestForegroundGoTestAllowed_JobID",
+      "Package": "zqkenv",
+      "PackagePath": "pkg/zqkenv",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/zqkenv/agent_guard_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestForegroundGoTestAllowed_AllowForegroundGoTest",
+      "Package": "zqkenv",
+      "PackagePath": "pkg/zqkenv",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/zqkenv/agent_guard_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestForegroundGoTestPanicRecommendsAPermissionNotAPath",
+      "Package": "zqkenv",
+      "PackagePath": "pkg/zqkenv",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/zqkenv/agent_guard_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestIsGoTestBinary",
+      "Package": "zqkenv",
+      "PackagePath": "pkg/zqkenv",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/zqkenv/agent_guard_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestApplyIsolatedStorageEnv_RequiresTestRootForFallthrough",
+      "Package": "zqkenv",
+      "PackagePath": "pkg/zqkenv",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/zqkenv/helpers_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestDaemonProcess",
+      "Package": "zqkenv",
+      "PackagePath": "pkg/zqkenv",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/zqkenv/helpers_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestMaskSensitiveValue",
+      "Package": "zqkenv_test",
+      "PackagePath": "pkg/zqkenv",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/zqkenv/masking_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestSanitizeEnvironment",
+      "Package": "zqkenv_test",
+      "PackagePath": "pkg/zqkenv",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/zqkenv/masking_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestPrivilegedWriterDaemonRole_ArgvWithoutEnv",
+      "Package": "zqkenv",
+      "PackagePath": "pkg/zqkenv",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/zqkenv/privileged_writer_role_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

@@ -1,0 +1,141 @@
+{
+  "name": "make-verify-366",
+  "created_at": "2026-09-04T21:34:30.986825Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-366",
+    "Tests": [
+      {
+        "Name": "TestDeleteObjectsStep_BasicDelete",
+        "Package": "migration",
+        "PackagePath": "pkg/migration",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/migration/delete_objects_step_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestDeleteObjectsStep_CascadeDelete",
+        "Package": "migration",
+        "PackagePath": "pkg/migration",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/migration/delete_objects_step_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestDeleteObjectsStep_NonCascadeDeleteWithDependents",
+        "Package": "migration",
+        "PackagePath": "pkg/migration",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/migration/delete_objects_step_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestDeleteObjectsStep_DryRun",
+        "Package": "migration",
+        "PackagePath": "pkg/migration",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/migration/delete_objects_step_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestDeleteObjectsStep_ObjectNotFound",
+        "Package": "migration",
+        "PackagePath": "pkg/migration",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/migration/delete_objects_step_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestDeleteObjectsStep_InputFromItems",
+        "Package": "migration",
+        "PackagePath": "pkg/migration",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/migration/delete_objects_step_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestDeleteObjectsStep_MultipleObjects",
+        "Package": "migration",
+        "PackagePath": "pkg/migration",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/migration/delete_objects_step_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 210000000000,
+    "PackagePath": "pkg/migration"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestDeleteObjectsStep_BasicDelete",
+      "Package": "migration",
+      "PackagePath": "pkg/migration",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/migration/delete_objects_step_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestDeleteObjectsStep_CascadeDelete",
+      "Package": "migration",
+      "PackagePath": "pkg/migration",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/migration/delete_objects_step_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestDeleteObjectsStep_NonCascadeDeleteWithDependents",
+      "Package": "migration",
+      "PackagePath": "pkg/migration",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/migration/delete_objects_step_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestDeleteObjectsStep_DryRun",
+      "Package": "migration",
+      "PackagePath": "pkg/migration",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/migration/delete_objects_step_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestDeleteObjectsStep_ObjectNotFound",
+      "Package": "migration",
+      "PackagePath": "pkg/migration",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/migration/delete_objects_step_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestDeleteObjectsStep_InputFromItems",
+      "Package": "migration",
+      "PackagePath": "pkg/migration",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/migration/delete_objects_step_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestDeleteObjectsStep_MultipleObjects",
+      "Package": "migration",
+      "PackagePath": "pkg/migration",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/migration/delete_objects_step_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

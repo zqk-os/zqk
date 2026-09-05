@@ -1,0 +1,16 @@
+
+--- run 2026-09-04T22:22:13Z ---
+=== RUN   TestScanYAMLFiles
+=== PAUSE TestScanYAMLFiles
+=== RUN   TestScanYAMLFiles_ExcludePatterns
+=== PAUSE TestScanYAMLFiles_ExcludePatterns
+=== RUN   TestScanYAMLFiles_EmptyDirectory
+=== PAUSE TestScanYAMLFiles_EmptyDirectory
+=== CONT  TestScanYAMLFiles
+=== CONT  TestScanYAMLFiles_EmptyDirectory
+--- PASS: TestScanYAMLFiles_EmptyDirectory (0.00s)
+=== CONT  TestScanYAMLFiles_ExcludePatterns
+--- PASS: TestScanYAMLFiles_ExcludePatterns (0.01s)
+--- PASS: TestScanYAMLFiles (0.45s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/migration/scanner	0.739s

@@ -1,0 +1,27 @@
+=== System Improvement Report ===
+
+System improvement report at 2026-09-05T04:00:24Z.
+Comparative vs 2026-09-05T03:00:21Z: object_count_delta=42, retention_over_kinds=0, blocking_delta=0.
+Prioritized work items: 4 total (P0=0 P1=1 P2=1 P3=2).
+
+--- Prioritized Work Items ---
+
+[P1] Address high-failure or timeout-prone commands (behavior)
+  1 command(s) with high failure rate.
+  Action: Run 'zqk system audit-report --format json' to list commands; fix or extend timeouts.
+
+[P2] Optimize slow commands (performance)
+  3 command(s) flagged as slow.
+  Action: Run 'zqk system audit-report' for details; consider caching or batching.
+
+[P3] Reduce CLI churn and user confusion (behavior)
+  1 churn indicator(s) in command metrics.
+  Action: Run 'zqk system audit-report' and improve docs or UX for frequently failed command patterns.
+
+[P3] Review quarantine folder (quality)
+  187 file(s) in quarantine.
+  Action: Run 'zqk system quarantine-report' and 'zqk system cleanup-quarantine' if appropriate.
+
+--- Snapshot summary ---
+  Previous report: 2026-09-05T03:00:21Z
+  Object count delta: 42

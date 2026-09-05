@@ -1,0 +1,123 @@
+{
+  "name": "make-verify-218",
+  "created_at": "2026-09-04T21:34:29.557804Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-218",
+    "Tests": [
+      {
+        "Name": "TestHandleCallback",
+        "Package": "callback",
+        "PackagePath": "cmd/zqk/callback",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/callback/callback_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestHandleCallback_InvalidJSON",
+        "Package": "callback",
+        "PackagePath": "cmd/zqk/callback",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/callback/callback_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestHandleCallback_MissingProjectRoot",
+        "Package": "callback",
+        "PackagePath": "cmd/zqk/callback",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/callback/callback_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestHandleCallback_AppendMode",
+        "Package": "callback",
+        "PackagePath": "cmd/zqk/callback",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/callback/callback_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestHandleCallback_TruncateMode",
+        "Package": "callback",
+        "PackagePath": "cmd/zqk/callback",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/callback/callback_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestProcessor_ConcurrentEnqueue",
+        "Package": "callback",
+        "PackagePath": "cmd/zqk/callback",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/callback/processor_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 180000000000,
+    "PackagePath": "cmd/zqk/callback"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestHandleCallback",
+      "Package": "callback",
+      "PackagePath": "cmd/zqk/callback",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/callback/callback_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestHandleCallback_InvalidJSON",
+      "Package": "callback",
+      "PackagePath": "cmd/zqk/callback",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/callback/callback_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestHandleCallback_MissingProjectRoot",
+      "Package": "callback",
+      "PackagePath": "cmd/zqk/callback",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/callback/callback_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestHandleCallback_AppendMode",
+      "Package": "callback",
+      "PackagePath": "cmd/zqk/callback",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/callback/callback_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestHandleCallback_TruncateMode",
+      "Package": "callback",
+      "PackagePath": "cmd/zqk/callback",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/callback/callback_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestProcessor_ConcurrentEnqueue",
+      "Package": "callback",
+      "PackagePath": "cmd/zqk/callback",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/callback/processor_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

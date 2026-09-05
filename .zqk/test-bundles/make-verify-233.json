@@ -1,0 +1,177 @@
+{
+  "name": "make-verify-233",
+  "created_at": "2026-09-04T21:34:29.72455Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-233",
+    "Tests": [
+      {
+        "Name": "TestValidateBacklogCommitRefs_RejectsMergeAndUnrelated",
+        "Package": "gitevidence_test",
+        "PackagePath": "pkg/gitevidence",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/gitevidence/commit_refs_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestValidateBacklogCommitRefs_EdgeCases",
+        "Package": "gitevidence_test",
+        "PackagePath": "pkg/gitevidence",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/gitevidence/commit_refs_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestValidateBacklogCommitRefs_RejectsDuplicateImplementations",
+        "Package": "gitevidence_test",
+        "PackagePath": "pkg/gitevidence",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/gitevidence/commit_refs_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestGoMod_NoRedundantReplaces",
+        "Package": "gitevidence_test",
+        "PackagePath": "pkg/gitevidence",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/gitevidence/commit_refs_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestReadmePrefersCommunityFirstRunOverStudioPack",
+        "Package": "gitevidence_test",
+        "PackagePath": "pkg/gitevidence",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/gitevidence/commit_refs_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestValidateBranchAncestorOfTrunk",
+        "Package": "gitevidence_test",
+        "PackagePath": "pkg/gitevidence",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/gitevidence/commit_refs_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestReadmeLeadsWithStrangerUsablePath",
+        "Package": "gitevidence_test",
+        "PackagePath": "pkg/gitevidence",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/gitevidence/commit_refs_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestDegradedAndStubResultsAreExplicitlyLabeled",
+        "Package": "gitevidence_test",
+        "PackagePath": "pkg/gitevidence",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/gitevidence/commit_refs_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestSBOMGenerationAndDependencyReviewPath",
+        "Package": "gitevidence_test",
+        "PackagePath": "pkg/gitevidence",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/gitevidence/commit_refs_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 270000000000,
+    "PackagePath": "pkg/gitevidence"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestValidateBacklogCommitRefs_RejectsMergeAndUnrelated",
+      "Package": "gitevidence_test",
+      "PackagePath": "pkg/gitevidence",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/gitevidence/commit_refs_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestValidateBacklogCommitRefs_EdgeCases",
+      "Package": "gitevidence_test",
+      "PackagePath": "pkg/gitevidence",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/gitevidence/commit_refs_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestValidateBacklogCommitRefs_RejectsDuplicateImplementations",
+      "Package": "gitevidence_test",
+      "PackagePath": "pkg/gitevidence",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/gitevidence/commit_refs_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestGoMod_NoRedundantReplaces",
+      "Package": "gitevidence_test",
+      "PackagePath": "pkg/gitevidence",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/gitevidence/commit_refs_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestReadmePrefersCommunityFirstRunOverStudioPack",
+      "Package": "gitevidence_test",
+      "PackagePath": "pkg/gitevidence",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/gitevidence/commit_refs_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestValidateBranchAncestorOfTrunk",
+      "Package": "gitevidence_test",
+      "PackagePath": "pkg/gitevidence",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/gitevidence/commit_refs_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestReadmeLeadsWithStrangerUsablePath",
+      "Package": "gitevidence_test",
+      "PackagePath": "pkg/gitevidence",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/gitevidence/commit_refs_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestDegradedAndStubResultsAreExplicitlyLabeled",
+      "Package": "gitevidence_test",
+      "PackagePath": "pkg/gitevidence",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/gitevidence/commit_refs_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestSBOMGenerationAndDependencyReviewPath",
+      "Package": "gitevidence_test",
+      "PackagePath": "pkg/gitevidence",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/gitevidence/commit_refs_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

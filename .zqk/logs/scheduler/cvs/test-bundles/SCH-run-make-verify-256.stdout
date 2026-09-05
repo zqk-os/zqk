@@ -1,0 +1,44 @@
+
+--- run 2026-09-04T21:50:02Z ---
+=== RUN   TestLifecycleBuilder_InvalidVersion
+=== PAUSE TestLifecycleBuilder_InvalidVersion
+=== RUN   TestLifecycleBuilder_InvalidOntology
+=== PAUSE TestLifecycleBuilder_InvalidOntology
+=== RUN   TestLifecycleBuilder_Registration
+=== PAUSE TestLifecycleBuilder_Registration
+=== RUN   TestLifecycleBuilder_Build
+=== PAUSE TestLifecycleBuilder_Build
+=== RUN   TestLifecycleBuilder_RequiredFields
+=== PAUSE TestLifecycleBuilder_RequiredFields
+=== RUN   TestLifecycleBuilder_ObjectTypeField
+=== PAUSE TestLifecycleBuilder_ObjectTypeField
+=== RUN   TestLifecycleBuilder_StatusesField
+=== PAUSE TestLifecycleBuilder_StatusesField
+=== RUN   TestLifecycleBuilder_SourceTypeField
+=== PAUSE TestLifecycleBuilder_SourceTypeField
+=== RUN   TestLifecycleBuilder_GetVersion
+=== PAUSE TestLifecycleBuilder_GetVersion
+=== RUN   TestLifecycleBuilder_GetOntology
+=== PAUSE TestLifecycleBuilder_GetOntology
+=== CONT  TestLifecycleBuilder_InvalidVersion
+--- PASS: TestLifecycleBuilder_InvalidVersion (0.00s)
+=== CONT  TestLifecycleBuilder_RequiredFields
+=== CONT  TestLifecycleBuilder_ObjectTypeField
+--- PASS: TestLifecycleBuilder_RequiredFields (0.00s)
+=== CONT  TestLifecycleBuilder_Registration
+--- PASS: TestLifecycleBuilder_Registration (0.00s)
+=== CONT  TestLifecycleBuilder_Build
+--- PASS: TestLifecycleBuilder_ObjectTypeField (0.00s)
+=== CONT  TestLifecycleBuilder_GetOntology
+=== CONT  TestLifecycleBuilder_GetVersion
+=== CONT  TestLifecycleBuilder_SourceTypeField
+=== CONT  TestLifecycleBuilder_InvalidOntology
+=== CONT  TestLifecycleBuilder_StatusesField
+--- PASS: TestLifecycleBuilder_Build (0.00s)
+--- PASS: TestLifecycleBuilder_GetOntology (0.00s)
+--- PASS: TestLifecycleBuilder_GetVersion (0.00s)
+--- PASS: TestLifecycleBuilder_InvalidOntology (0.00s)
+--- PASS: TestLifecycleBuilder_SourceTypeField (0.00s)
+--- PASS: TestLifecycleBuilder_StatusesField (0.00s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/specbuilder/bldr_v2	0.382s

@@ -1,0 +1,24 @@
+
+--- run 2026-09-04T22:12:48Z ---
+=== RUN   TestTryClaim_RefusesProposed
+=== PAUSE TestTryClaim_RefusesProposed
+=== RUN   TestTryClaim_ApprovedHopsInProgress
+=== PAUSE TestTryClaim_ApprovedHopsInProgress
+=== RUN   TestTryClaim_RefusesWhenParentBacklogComplete
+=== PAUSE TestTryClaim_RefusesWhenParentBacklogComplete
+=== RUN   TestTryClaim_stampsBranchRefAndBaseSha
+=== PAUSE TestTryClaim_stampsBranchRefAndBaseSha
+=== RUN   TestClaimTargetIDs_fromForRefAndLists
+=== PAUSE TestClaimTargetIDs_fromForRefAndLists
+=== CONT  TestTryClaim_RefusesProposed
+=== CONT  TestTryClaim_stampsBranchRefAndBaseSha
+--- PASS: TestTryClaim_RefusesProposed (0.01s)
+=== CONT  TestClaimTargetIDs_fromForRefAndLists
+--- PASS: TestClaimTargetIDs_fromForRefAndLists (0.00s)
+=== CONT  TestTryClaim_RefusesWhenParentBacklogComplete
+--- PASS: TestTryClaim_RefusesWhenParentBacklogComplete (0.00s)
+=== CONT  TestTryClaim_ApprovedHopsInProgress
+--- PASS: TestTryClaim_ApprovedHopsInProgress (0.00s)
+--- PASS: TestTryClaim_stampsBranchRefAndBaseSha (0.02s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/agentclaim	0.625s

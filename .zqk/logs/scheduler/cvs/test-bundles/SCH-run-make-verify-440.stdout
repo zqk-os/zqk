@@ -1,0 +1,44 @@
+
+--- run 2026-09-04T22:13:19Z ---
+=== RUN   TestBudget_Reserve_Release
+=== PAUSE TestBudget_Reserve_Release
+=== RUN   TestBudget_Reserve_Exceeded
+=== PAUSE TestBudget_Reserve_Exceeded
+=== RUN   TestBudget_Reserve_ExactThenExceed
+=== PAUSE TestBudget_Reserve_ExactThenExceed
+=== RUN   TestBudget_Unbounded
+=== PAUSE TestBudget_Unbounded
+=== RUN   TestBudget_Release_Idempotent
+=== PAUSE TestBudget_Release_Idempotent
+=== RUN   TestBudget_Reserve_ZeroOrNegative
+=== PAUSE TestBudget_Reserve_ZeroOrNegative
+=== RUN   TestBudget_MaxTotal
+=== PAUSE TestBudget_MaxTotal
+=== RUN   TestBudget_ConcurrentReserveRelease
+=== PAUSE TestBudget_ConcurrentReserveRelease
+=== RUN   TestGoroutineBuilder_StartSimple
+=== PAUSE TestGoroutineBuilder_StartSimple
+=== RUN   TestGoroutineBuilder_StartWithError
+=== PAUSE TestGoroutineBuilder_StartWithError
+=== CONT  TestBudget_Reserve_Release
+--- PASS: TestBudget_Reserve_Release (0.00s)
+=== CONT  TestGoroutineBuilder_StartWithError
+=== CONT  TestBudget_Reserve_ZeroOrNegative
+--- PASS: TestBudget_Reserve_ZeroOrNegative (0.00s)
+=== CONT  TestBudget_MaxTotal
+--- PASS: TestBudget_MaxTotal (0.00s)
+=== CONT  TestBudget_Unbounded
+--- PASS: TestBudget_Unbounded (0.00s)
+=== CONT  TestBudget_Release_Idempotent
+--- PASS: TestBudget_Release_Idempotent (0.00s)
+=== CONT  TestBudget_Reserve_ExactThenExceed
+--- PASS: TestBudget_Reserve_ExactThenExceed (0.00s)
+=== CONT  TestBudget_Reserve_Exceeded
+--- PASS: TestBudget_Reserve_Exceeded (0.00s)
+=== CONT  TestGoroutineBuilder_StartSimple
+--- PASS: TestGoroutineBuilder_StartSimple (0.01s)
+--- PASS: TestGoroutineBuilder_StartWithError (0.01s)
+=== CONT  TestBudget_ConcurrentReserveRelease
+--- PASS: TestBudget_ConcurrentReserveRelease (0.00s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/goroutinelabels	0.326s

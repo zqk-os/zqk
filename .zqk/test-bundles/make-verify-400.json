@@ -1,0 +1,123 @@
+{
+  "name": "make-verify-400",
+  "created_at": "2026-09-04T21:34:31.28833Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-400",
+    "Tests": [
+      {
+        "Name": "TestNewFeedCmd_wiresSteerAndEmitStatus",
+        "Package": "feed",
+        "PackagePath": "cmd/zqk/feed",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/feed/feed_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestFeedResult_conciseByDefault",
+        "Package": "feed",
+        "PackagePath": "cmd/zqk/feed",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/feed/result_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestFeedResult_verboseAddsPath",
+        "Package": "feed",
+        "PackagePath": "cmd/zqk/feed",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/feed/result_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestFeedResult_mcpLiveWake",
+        "Package": "feed",
+        "PackagePath": "cmd/zqk/feed",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/feed/result_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestFeedResult_unrepairedFlagOnFailedWake",
+        "Package": "feed",
+        "PackagePath": "cmd/zqk/feed",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/feed/result_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestProcessFeed_RendersFullMessageAndLabelsWakeStubs",
+        "Package": "feed",
+        "PackagePath": "cmd/zqk/feed",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/feed/watch_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 180000000000,
+    "PackagePath": "cmd/zqk/feed"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestNewFeedCmd_wiresSteerAndEmitStatus",
+      "Package": "feed",
+      "PackagePath": "cmd/zqk/feed",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/feed/feed_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestFeedResult_conciseByDefault",
+      "Package": "feed",
+      "PackagePath": "cmd/zqk/feed",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/feed/result_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestFeedResult_verboseAddsPath",
+      "Package": "feed",
+      "PackagePath": "cmd/zqk/feed",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/feed/result_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestFeedResult_mcpLiveWake",
+      "Package": "feed",
+      "PackagePath": "cmd/zqk/feed",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/feed/result_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestFeedResult_unrepairedFlagOnFailedWake",
+      "Package": "feed",
+      "PackagePath": "cmd/zqk/feed",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/feed/result_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestProcessFeed_RendersFullMessageAndLabelsWakeStubs",
+      "Package": "feed",
+      "PackagePath": "cmd/zqk/feed",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/feed/watch_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

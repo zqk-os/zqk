@@ -1,0 +1,3 @@
+⚠️  Swarm engine execution failed (execution_id=exec-1788587672): minimum successful tool calls not met: got 0, want 1
+Error: swarm engine execution failed: minimum successful tool calls not met: got 0, want 1
+2026-09-05T05:54:38Z [error] Command execution failed error=swarm engine execution failed: minimum successful tool calls not met: got 0, want 1

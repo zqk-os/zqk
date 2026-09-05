@@ -1,0 +1,69 @@
+{
+  "name": "make-verify-88",
+  "created_at": "2026-09-04T21:34:28.238053Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-88",
+    "Tests": [
+      {
+        "Name": "TestEngine_MutateSkill",
+        "Package": "mutation",
+        "PackagePath": "pkg/skills/mutation",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/skills/mutation/engine_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestRealLLMClient_GenerateCode",
+        "Package": "mutation",
+        "PackagePath": "pkg/skills/mutation",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/skills/mutation/llm_client_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestRealLLMClient_GenerateDocs",
+        "Package": "mutation",
+        "PackagePath": "pkg/skills/mutation",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/skills/mutation/llm_client_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 90000000000,
+    "PackagePath": "pkg/skills/mutation"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestEngine_MutateSkill",
+      "Package": "mutation",
+      "PackagePath": "pkg/skills/mutation",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/skills/mutation/engine_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestRealLLMClient_GenerateCode",
+      "Package": "mutation",
+      "PackagePath": "pkg/skills/mutation",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/skills/mutation/llm_client_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestRealLLMClient_GenerateDocs",
+      "Package": "mutation",
+      "PackagePath": "pkg/skills/mutation",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/skills/mutation/llm_client_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

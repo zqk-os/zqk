@@ -1,0 +1,14 @@
+created_at: "2026-08-19T10:23:35Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1787135009035356000-0eabe828
+item_id: BLI-COMMUNITY-INSTALL-HARNESS-001
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 2857702ca28e4b64fb5782140b43c1400e68fdeab30ab0062f4119523ca97d466e5f13c72adcfa41b92eacf21fa7f0a79b8a8e3a8d7c581e5c9afe0e69cb31dc
+schema_version: 2.0.0
+signature: 3046022100ac6ca575667d9d8ca4982d5b50f7e7986c1dda6d5798e7945bf1c9fb82647252022100c025a8205d66c41820f2aefc8daeb039331720bb6ae2d08ed91d8e8c46ce6245
+status: archived
+title: Automated test harness for community curl|sh and binary distribution
+updated_at: "2026-09-01T07:23:13Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

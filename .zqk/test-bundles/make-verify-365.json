@@ -1,0 +1,105 @@
+{
+  "name": "make-verify-365",
+  "created_at": "2026-09-04T21:34:30.979041Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-365",
+    "Tests": [
+      {
+        "Name": "TestFileTSDB_WriteAndRead",
+        "Package": "tsdb",
+        "PackagePath": "pkg/metrics/tsdb",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/metrics/tsdb/file_tsdb_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestOpen_MemoryAndFile",
+        "Package": "tsdb",
+        "PackagePath": "pkg/metrics/tsdb",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/metrics/tsdb/file_tsdb_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestMemoryTSDB_ContextCanceled",
+        "Package": "tsdb",
+        "PackagePath": "pkg/metrics/tsdb",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/metrics/tsdb/file_tsdb_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestMemoryTSDB_WriteAndRead",
+        "Package": "tsdb",
+        "PackagePath": "pkg/metrics/tsdb",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/metrics/tsdb/tsdb_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestMemoryTSDB_ReadNotFound",
+        "Package": "tsdb",
+        "PackagePath": "pkg/metrics/tsdb",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/metrics/tsdb/tsdb_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 150000000000,
+    "PackagePath": "pkg/metrics/tsdb"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestFileTSDB_WriteAndRead",
+      "Package": "tsdb",
+      "PackagePath": "pkg/metrics/tsdb",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/metrics/tsdb/file_tsdb_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestOpen_MemoryAndFile",
+      "Package": "tsdb",
+      "PackagePath": "pkg/metrics/tsdb",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/metrics/tsdb/file_tsdb_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestMemoryTSDB_ContextCanceled",
+      "Package": "tsdb",
+      "PackagePath": "pkg/metrics/tsdb",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/metrics/tsdb/file_tsdb_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestMemoryTSDB_WriteAndRead",
+      "Package": "tsdb",
+      "PackagePath": "pkg/metrics/tsdb",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/metrics/tsdb/tsdb_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestMemoryTSDB_ReadNotFound",
+      "Package": "tsdb",
+      "PackagePath": "pkg/metrics/tsdb",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/metrics/tsdb/tsdb_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

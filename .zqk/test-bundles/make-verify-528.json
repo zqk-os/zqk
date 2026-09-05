@@ -1,0 +1,33 @@
+{
+  "name": "make-verify-528",
+  "created_at": "2026-09-04T21:34:32.603252Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-528",
+    "Tests": [
+      {
+        "Name": "TestInfrastructureEngagement",
+        "Package": "infrastructure_test",
+        "PackagePath": "pkg/infrastructure",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/infrastructure/infrastructure_bridge_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 30000000000,
+    "PackagePath": "pkg/infrastructure"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestInfrastructureEngagement",
+      "Package": "infrastructure_test",
+      "PackagePath": "pkg/infrastructure",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/infrastructure/infrastructure_bridge_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

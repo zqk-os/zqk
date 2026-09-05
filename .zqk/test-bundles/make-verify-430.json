@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-430",
+  "created_at": "2026-09-04T21:34:31.596033Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-430",
+    "Tests": [
+      {
+        "Name": "TestBufferedFlushRegistry",
+        "Package": "logging",
+        "PackagePath": "pkg/logging",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/logging/buffered_flush_registry_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestBufferedWriter_SharedFlusherDoesNotSpawnPerWriter",
+        "Package": "logging",
+        "PackagePath": "pkg/logging",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/logging/buffered_writer_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestBufferedWriter_WriteThenCloseFlushes",
+        "Package": "logging",
+        "PackagePath": "pkg/logging",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/logging/buffered_writer_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestDestinationCacheKey_sameFilePathDedupesLogicalNames",
+        "Package": "logging",
+        "PackagePath": "pkg/logging",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/logging/decision_context_logger_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestDedupeWriter",
+        "Package": "logging",
+        "PackagePath": "pkg/logging",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/logging/decision_context_logger_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestDestinationCacheKey_nonFileUsesLogicalName",
+        "Package": "logging",
+        "PackagePath": "pkg/logging",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/logging/decision_context_logger_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestMCPCompatibility_ProgressOutputToStderr",
+        "Package": "logging",
+        "PackagePath": "pkg/logging",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/logging/mcp_compatibility_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestMCPCompatibility_JSONFormatterInMCPMode",
+        "Package": "logging",
+        "PackagePath": "pkg/logging",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/logging/mcp_compatibility_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestMCPCompatibility_StreamEvents",
+        "Package": "logging",
+        "PackagePath": "pkg/logging",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/logging/mcp_compatibility_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestMCPCompatibility_StatusChanges",
+        "Package": "logging",
+        "PackagePath": "pkg/logging",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/logging/mcp_compatibility_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 300000000000,
+    "PackagePath": "pkg/logging"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestBufferedFlushRegistry",
+      "Package": "logging",
+      "PackagePath": "pkg/logging",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/logging/buffered_flush_registry_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestBufferedWriter_SharedFlusherDoesNotSpawnPerWriter",
+      "Package": "logging",
+      "PackagePath": "pkg/logging",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/logging/buffered_writer_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestBufferedWriter_WriteThenCloseFlushes",
+      "Package": "logging",
+      "PackagePath": "pkg/logging",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/logging/buffered_writer_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestDestinationCacheKey_sameFilePathDedupesLogicalNames",
+      "Package": "logging",
+      "PackagePath": "pkg/logging",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/logging/decision_context_logger_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestDedupeWriter",
+      "Package": "logging",
+      "PackagePath": "pkg/logging",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/logging/decision_context_logger_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestDestinationCacheKey_nonFileUsesLogicalName",
+      "Package": "logging",
+      "PackagePath": "pkg/logging",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/logging/decision_context_logger_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestMCPCompatibility_ProgressOutputToStderr",
+      "Package": "logging",
+      "PackagePath": "pkg/logging",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/logging/mcp_compatibility_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestMCPCompatibility_JSONFormatterInMCPMode",
+      "Package": "logging",
+      "PackagePath": "pkg/logging",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/logging/mcp_compatibility_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestMCPCompatibility_StreamEvents",
+      "Package": "logging",
+      "PackagePath": "pkg/logging",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/logging/mcp_compatibility_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestMCPCompatibility_StatusChanges",
+      "Package": "logging",
+      "PackagePath": "pkg/logging",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/logging/mcp_compatibility_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

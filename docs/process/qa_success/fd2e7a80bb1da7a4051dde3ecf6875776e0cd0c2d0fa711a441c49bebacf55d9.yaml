@@ -1,0 +1,14 @@
+created_at: "2026-08-20T04:42:08Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1787200927947108000-1f25dbd3
+item_id: CRIT-CEF-R8K-SEC-005
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 2857702ca28e4b64fb5782140b43c1400e68fdeab30ab0062f4119523ca97d466e5f13c72adcfa41b92eacf21fa7f0a79b8a8e3a8d7c581e5c9afe0e69cb31dc
+schema_version: 2.0.0
+signature: 3046022100b7cba942ac3ff5c4f678dbb47150541707401f7f81832c707584c172fd585df7022100a2ce2292e915bc5f42d5bf147c1a587cb0b869e9b0ae4444e7e1fd451258ede5
+status: archived
+title: HTTP server timeout enforcement verified via AST
+updated_at: "2026-09-01T07:50:04Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

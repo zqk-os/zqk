@@ -1,0 +1,105 @@
+{
+  "name": "make-verify-244",
+  "created_at": "2026-09-04T21:34:29.814205Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-244",
+    "Tests": [
+      {
+        "Name": "TestEvaluate_defaults",
+        "Package": "systemcheckwake",
+        "PackagePath": "pkg/systemcheckwake",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/systemcheckwake/wake_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestEvaluate_recommendations_opt_in",
+        "Package": "systemcheckwake",
+        "PackagePath": "pkg/systemcheckwake",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/systemcheckwake/wake_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestEvaluate_min_zero_disables",
+        "Package": "systemcheckwake",
+        "PackagePath": "pkg/systemcheckwake",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/systemcheckwake/wake_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestResolveNotifyAgent_sentinel",
+        "Package": "systemcheckwake",
+        "PackagePath": "pkg/systemcheckwake",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/systemcheckwake/wake_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestLoadConfig_missing",
+        "Package": "systemcheckwake",
+        "PackagePath": "pkg/systemcheckwake",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/systemcheckwake/wake_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 150000000000,
+    "PackagePath": "pkg/systemcheckwake"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestEvaluate_defaults",
+      "Package": "systemcheckwake",
+      "PackagePath": "pkg/systemcheckwake",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/systemcheckwake/wake_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestEvaluate_recommendations_opt_in",
+      "Package": "systemcheckwake",
+      "PackagePath": "pkg/systemcheckwake",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/systemcheckwake/wake_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestEvaluate_min_zero_disables",
+      "Package": "systemcheckwake",
+      "PackagePath": "pkg/systemcheckwake",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/systemcheckwake/wake_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestResolveNotifyAgent_sentinel",
+      "Package": "systemcheckwake",
+      "PackagePath": "pkg/systemcheckwake",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/systemcheckwake/wake_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestLoadConfig_missing",
+      "Package": "systemcheckwake",
+      "PackagePath": "pkg/systemcheckwake",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/systemcheckwake/wake_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

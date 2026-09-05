@@ -1,0 +1,14 @@
+created_at: "2026-08-19T06:40:07Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1787121600787048000-3f24c608
+item_id: REDACTED
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 2857702ca28e4b64fb5782140b43c1400e68fdeab30ab0062f4119523ca97d466e5f13c72adcfa41b92eacf21fa7f0a79b8a8e3a8d7c581e5c9afe0e69cb31dc
+schema_version: 2.0.0
+signature: 3044022037e6655bd9dc2907f06c114973c14fa927c486a5b2e2e1753d98cf868ef5bbdd022063128b71ea2e3d57f7fc450b14d890b033c49bc3c0d7df18454bca1869f7eab1
+status: archived
+title: Kernel object-kind fitness — 7-lens rubric audit (public + internal)
+updated_at: "2026-09-01T07:22:33Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

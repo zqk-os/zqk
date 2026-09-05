@@ -1,0 +1,44 @@
+
+--- run 2026-09-04T22:18:07Z ---
+=== RUN   TestIsSchedulerRunning_Running
+=== PAUSE TestIsSchedulerRunning_Running
+=== RUN   TestIsSchedulerRunning_StalePIDFile
+=== PAUSE TestIsSchedulerRunning_StalePIDFile
+=== RUN   TestStopSchedulerByPID_NotRunning
+=== PAUSE TestStopSchedulerByPID_NotRunning
+=== RUN   TestSignalSchedulerByPID_NotRunning
+=== PAUSE TestSignalSchedulerByPID_NotRunning
+=== RUN   TestWaitForSchedulerDaemonExit_RemovesPIDWhenProcessGone
+=== PAUSE TestWaitForSchedulerDaemonExit_RemovesPIDWhenProcessGone
+=== RUN   TestForceKillSchedulerByPID_NotRunning
+=== PAUSE TestForceKillSchedulerByPID_NotRunning
+=== RUN   TestGetPIDFilePath
+=== PAUSE TestGetPIDFilePath
+=== RUN   TestIsZombieProcess_InvalidPID
+=== PAUSE TestIsZombieProcess_InvalidPID
+=== RUN   TestFindSchedulerProcessesByCommand_Completes
+=== PAUSE TestFindSchedulerProcessesByCommand_Completes
+=== RUN   TestCRIT9038_PolicyEngine_EvaluateExecutesWhenNoState
+=== PAUSE TestCRIT9038_PolicyEngine_EvaluateExecutesWhenNoState
+=== CONT  TestIsSchedulerRunning_Running
+=== CONT  TestForceKillSchedulerByPID_NotRunning
+--- PASS: TestForceKillSchedulerByPID_NotRunning (0.00s)
+=== CONT  TestSignalSchedulerByPID_NotRunning
+--- PASS: TestSignalSchedulerByPID_NotRunning (0.00s)
+=== CONT  TestWaitForSchedulerDaemonExit_RemovesPIDWhenProcessGone
+--- PASS: TestWaitForSchedulerDaemonExit_RemovesPIDWhenProcessGone (0.00s)
+=== CONT  TestFindSchedulerProcessesByCommand_Completes
+--- PASS: TestFindSchedulerProcessesByCommand_Completes (0.00s)
+=== CONT  TestCRIT9038_PolicyEngine_EvaluateExecutesWhenNoState
+--- PASS: TestCRIT9038_PolicyEngine_EvaluateExecutesWhenNoState (0.00s)
+=== CONT  TestIsZombieProcess_InvalidPID
+--- PASS: TestIsSchedulerRunning_Running (0.01s)
+=== CONT  TestGetPIDFilePath
+--- PASS: TestGetPIDFilePath (0.00s)
+=== CONT  TestStopSchedulerByPID_NotRunning
+--- PASS: TestStopSchedulerByPID_NotRunning (0.00s)
+=== CONT  TestIsSchedulerRunning_StalePIDFile
+--- PASS: TestIsZombieProcess_InvalidPID (0.01s)
+--- PASS: TestIsSchedulerRunning_StalePIDFile (0.01s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/scheduler	0.776s

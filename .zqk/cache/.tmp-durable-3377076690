@@ -1,0 +1,159 @@
+{
+  "metadata": {
+    "version": "2.0",
+    "build_time": "2026-09-04T23:13:07.492807Z",
+    "project_root": "/Users/lanceettl/zqk-restore-clone",
+    "entry_count": 41
+  },
+  "buckets": {
+    "audit_event": {
+      "cache_update": {
+        "AUD-2260": {
+          "created_at": "2026-09-04T23:12:57Z"
+        },
+        "AUD-2347": {
+          "created_at": "2026-09-04T23:13:03Z"
+        }
+      },
+      "integrity_recovery": {
+        "AUD-ik-ATK-1788499921657193000-98febcad-9bf05531a3acf551c6565e72fd6e27a5e8f29b7b37bcbdef549bcabfb977f5a8": {
+          "created_at": "2026-09-04T23:13:03Z"
+        },
+        "AUD-ik-ATK-1788499921657193000-98febcad-da5fc222303b3b821a0844905ab886db384592fdaed3af3c98f0e93b3cdb3064": {
+          "created_at": "2026-09-04T23:13:03Z"
+        }
+      },
+      "listing_index_batch_complete": {
+        "AUD-2241": {
+          "created_at": "2026-09-04T23:12:56Z"
+        },
+        "AUD-2246": {
+          "created_at": "2026-09-04T23:12:56Z"
+        },
+        "AUD-2286": {
+          "created_at": "2026-09-04T23:12:58Z"
+        }
+      },
+      "listing_index_batch_start": {
+        "AUD-2238": {
+          "created_at": "2026-09-04T23:12:56Z"
+        },
+        "AUD-2265": {
+          "created_at": "2026-09-04T23:12:57Z"
+        }
+      },
+      "object_creation": {
+        "AUD-2232": {
+          "created_at": "2026-09-04T23:12:55Z"
+        },
+        "AUD-2271": {
+          "created_at": "2026-09-04T23:12:57Z"
+        },
+        "AUD-2338": {
+          "created_at": "2026-09-04T23:13:03Z"
+        }
+      },
+      "system_config_change": {
+        "AUD-2202": {
+          "created_at": "2026-09-04T23:12:54Z"
+        },
+        "AUD-2233": {
+          "created_at": "2026-09-04T23:12:55Z"
+        },
+        "AUD-2234": {
+          "created_at": "2026-09-04T23:12:55Z"
+        },
+        "AUD-2235": {
+          "created_at": "2026-09-04T23:12:55Z"
+        },
+        "AUD-2268": {
+          "created_at": "2026-09-04T23:12:57Z"
+        },
+        "AUD-2288": {
+          "created_at": "2026-09-04T23:12:58Z"
+        },
+        "AUD-2291": {
+          "created_at": "2026-09-04T23:12:58Z"
+        },
+        "AUD-2293": {
+          "created_at": "2026-09-04T23:12:58Z"
+        },
+        "AUD-2294": {
+          "created_at": "2026-09-04T23:12:58Z"
+        },
+        "AUD-2297": {
+          "created_at": "2026-09-04T23:12:59Z"
+        },
+        "AUD-2300": {
+          "created_at": "2026-09-04T23:12:59Z"
+        },
+        "AUD-2301": {
+          "created_at": "2026-09-04T23:12:59Z"
+        },
+        "AUD-2305": {
+          "created_at": "2026-09-04T23:12:59Z"
+        },
+        "AUD-2309": {
+          "created_at": "2026-09-04T23:12:59Z"
+        },
+        "AUD-2336": {
+          "created_at": "2026-09-04T23:13:03Z"
+        },
+        "AUD-2342": {
+          "created_at": "2026-09-04T23:13:03Z"
+        },
+        "AUD-2345": {
+          "created_at": "2026-09-04T23:13:03Z"
+        },
+        "AUD-2359": {
+          "created_at": "2026-09-04T23:13:04Z"
+        },
+        "AUD-2368": {
+          "created_at": "2026-09-04T23:13:04Z"
+        },
+        "AUD-2378": {
+          "created_at": "2026-09-04T23:13:04Z"
+        },
+        "AUD-2387": {
+          "created_at": "2026-09-04T23:13:06Z"
+        },
+        "AUD-2394": {
+          "created_at": "2026-09-04T23:13:07Z"
+        },
+        "AUD-2395": {
+          "created_at": "2026-09-04T23:13:07Z"
+        }
+      }
+    },
+    "base_metric": {
+      "": {
+        "BAS-1788563578752728000-43022acc": {
+          "created_at": "2026-09-04T23:12:58Z"
+        },
+        "BAS-1788563579225116000-09eaa187": {
+          "created_at": "2026-09-04T23:12:59Z"
+        },
+        "BAS-1788563583025180000-309f2fda": {
+          "created_at": "2026-09-04T23:13:03Z"
+        }
+      }
+    },
+    "change_journal_entry": {
+      "": {
+        "CHA-25601": {
+          "created_at": "2026-09-04T23:12:57Z"
+        },
+        "CHA-25602": {
+          "created_at": "2026-09-04T23:13:03Z"
+        }
+      }
+    },
+    "zqk_session": {
+      "": {
+        "ZQK-6333": {
+          "created_at": "2026-09-04T23:12:55Z"
+        }
+      }
+    }
+  }
+}

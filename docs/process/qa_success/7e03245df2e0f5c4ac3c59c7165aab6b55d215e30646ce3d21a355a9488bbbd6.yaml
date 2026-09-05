@@ -1,0 +1,14 @@
+created_at: "2026-08-19T04:11:37Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1787112693929057000-9c3f3cf9
+item_id: REDACTED
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 2857702ca28e4b64fb5782140b43c1400e68fdeab30ab0062f4119523ca97d466e5f13c72adcfa41b92eacf21fa7f0a79b8a8e3a8d7c581e5c9afe0e69cb31dc
+schema_version: 2.0.0
+signature: 304402205b786e2463d8731941c1f816357464d6660b9b79523c5d5ab00165f2fd6ea7db022077591e1c8e83831d43029d49d6ccb271bcead8fa36888cb3905edee27502c7a0
+status: archived
+title: 'P0: Wire object mutations through named pipeline kinds'
+updated_at: "2026-09-01T07:43:47Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

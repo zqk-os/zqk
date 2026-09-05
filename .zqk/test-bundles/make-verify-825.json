@@ -1,0 +1,51 @@
+{
+  "name": "make-verify-825",
+  "created_at": "2026-09-04T21:34:35.522226Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-825",
+    "Tests": [
+      {
+        "Name": "TestExecutor_Run",
+        "Package": "scenario",
+        "PackagePath": "pkg/validation/scenario",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/validation/scenario/executor_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestExecutor_Run_Failure",
+        "Package": "scenario",
+        "PackagePath": "pkg/validation/scenario",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/validation/scenario/executor_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 60000000000,
+    "PackagePath": "pkg/validation/scenario"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestExecutor_Run",
+      "Package": "scenario",
+      "PackagePath": "pkg/validation/scenario",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/validation/scenario/executor_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestExecutor_Run_Failure",
+      "Package": "scenario",
+      "PackagePath": "pkg/validation/scenario",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/validation/scenario/executor_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

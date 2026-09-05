@@ -1,0 +1,15 @@
+[3J[H[2J=== ZQK Swarm Execution Dashboard ===
+Time: Fri Sep  4 16:14:02 PDT 2026
+-------------------------------------
+Running Tasks:
+ ▶ [REDACTED] CEF AGENT_AC W3_tst_adversarial — L-TESTING
+ ▶ [REDACTED] CEF AGENT_AD W3_tst_adversarial — L-TESTING
+-------------------------------------
+Overall Queue Status:
+│ d by status                  │
+│ STATUS               │ COUNT │
+│ approved             │ 31    │
+│ archived             │ 31    │
+│ implemented          │ 53    │
+│ in_progress          │ 9     │
+│ pending_verification │ 2     │

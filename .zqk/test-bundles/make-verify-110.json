@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-110",
+  "created_at": "2026-09-04T21:34:28.445328Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-110",
+    "Tests": [
+      {
+        "Name": "TestLifecycleHooks",
+        "Package": "internal",
+        "PackagePath": "pkg/zqkcli",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/zqkcli/graph_lifecycle_hooks_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAutoTransitionEvaluation",
+        "Package": "internal",
+        "PackagePath": "pkg/zqkcli",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/zqkcli/graph_lifecycle_hooks_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestGraphBackendOutputFormats",
+        "Package": "internal",
+        "PackagePath": "pkg/zqkcli",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/zqkcli/graph_output_format_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestGraphBackendOutputConsistency",
+        "Package": "internal",
+        "PackagePath": "pkg/zqkcli",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/zqkcli/graph_output_format_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestGraphBackendStorageProvider",
+        "Package": "internal",
+        "PackagePath": "pkg/zqkcli",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/zqkcli/graph_output_format_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestGraphBackendQueryCapabilities",
+        "Package": "internal",
+        "PackagePath": "pkg/zqkcli",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/zqkcli/graph_query_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestGraphBackendAggregation",
+        "Package": "internal",
+        "PackagePath": "pkg/zqkcli",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/zqkcli/graph_query_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestHelpOutputFormats",
+        "Package": "internal",
+        "PackagePath": "pkg/zqkcli",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/zqkcli/help_output_format_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestCommandOutputJSONYAML",
+        "Package": "internal",
+        "PackagePath": "pkg/zqkcli",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/zqkcli/help_output_format_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestOutputFormatConsistency",
+        "Package": "internal",
+        "PackagePath": "pkg/zqkcli",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/zqkcli/help_output_format_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 300000000000,
+    "PackagePath": "pkg/zqkcli"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestLifecycleHooks",
+      "Package": "internal",
+      "PackagePath": "pkg/zqkcli",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/zqkcli/graph_lifecycle_hooks_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestAutoTransitionEvaluation",
+      "Package": "internal",
+      "PackagePath": "pkg/zqkcli",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/zqkcli/graph_lifecycle_hooks_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestGraphBackendOutputFormats",
+      "Package": "internal",
+      "PackagePath": "pkg/zqkcli",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/zqkcli/graph_output_format_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestGraphBackendOutputConsistency",
+      "Package": "internal",
+      "PackagePath": "pkg/zqkcli",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/zqkcli/graph_output_format_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestGraphBackendStorageProvider",
+      "Package": "internal",
+      "PackagePath": "pkg/zqkcli",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/zqkcli/graph_output_format_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestGraphBackendQueryCapabilities",
+      "Package": "internal",
+      "PackagePath": "pkg/zqkcli",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/zqkcli/graph_query_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestGraphBackendAggregation",
+      "Package": "internal",
+      "PackagePath": "pkg/zqkcli",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/zqkcli/graph_query_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestHelpOutputFormats",
+      "Package": "internal",
+      "PackagePath": "pkg/zqkcli",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/zqkcli/help_output_format_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestCommandOutputJSONYAML",
+      "Package": "internal",
+      "PackagePath": "pkg/zqkcli",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/zqkcli/help_output_format_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestOutputFormatConsistency",
+      "Package": "internal",
+      "PackagePath": "pkg/zqkcli",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/zqkcli/help_output_format_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

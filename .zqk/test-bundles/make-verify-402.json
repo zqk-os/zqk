@@ -1,0 +1,177 @@
+{
+  "name": "make-verify-402",
+  "created_at": "2026-09-04T21:34:31.301283Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-402",
+    "Tests": [
+      {
+        "Name": "TestBucketStrategyRegistry_BlocksOnParallelAccess",
+        "Package": "utility",
+        "PackagePath": "cmd/zqk/utility",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/utility/scenario_builder_bucket_strategy_blocking_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestCacheCheckerTiming_RaceCondition",
+        "Package": "utility",
+        "PackagePath": "cmd/zqk/utility",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/utility/scenario_builder_cache_checker_timing_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestCacheCheckerTiming_CorrectBehavior",
+        "Package": "utility",
+        "PackagePath": "cmd/zqk/utility",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/utility/scenario_builder_cache_checker_timing_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestFullCommandFlow_DataFileLoadAndBuild",
+        "Package": "utility",
+        "PackagePath": "cmd/zqk/utility",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/utility/scenario_builder_data_loader_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestBuildDependencyGraphAndSort_ExternalReferences",
+        "Package": "utility",
+        "PackagePath": "cmd/zqk/utility",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/utility/scenario_builder_dependency_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestScenarioBuilderEventSubscriber_ProfileLoading",
+        "Package": "utility",
+        "PackagePath": "cmd/zqk/utility",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/utility/scenario_builder_event_subscriber_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestCopyBootstrapConfigFiles_Idempotent",
+        "Package": "utility",
+        "PackagePath": "cmd/zqk/utility",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/utility/scenario_builder_id_stream_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestParallelCreate_ReproducesIssue",
+        "Package": "utility",
+        "PackagePath": "cmd/zqk/utility",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/utility/scenario_builder_parallel_create_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestParallelCreate_WithValidation",
+        "Package": "utility",
+        "PackagePath": "cmd/zqk/utility",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/utility/scenario_builder_parallel_create_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 270000000000,
+    "PackagePath": "cmd/zqk/utility"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestBucketStrategyRegistry_BlocksOnParallelAccess",
+      "Package": "utility",
+      "PackagePath": "cmd/zqk/utility",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/utility/scenario_builder_bucket_strategy_blocking_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestCacheCheckerTiming_RaceCondition",
+      "Package": "utility",
+      "PackagePath": "cmd/zqk/utility",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/utility/scenario_builder_cache_checker_timing_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestCacheCheckerTiming_CorrectBehavior",
+      "Package": "utility",
+      "PackagePath": "cmd/zqk/utility",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/utility/scenario_builder_cache_checker_timing_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestFullCommandFlow_DataFileLoadAndBuild",
+      "Package": "utility",
+      "PackagePath": "cmd/zqk/utility",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/utility/scenario_builder_data_loader_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestBuildDependencyGraphAndSort_ExternalReferences",
+      "Package": "utility",
+      "PackagePath": "cmd/zqk/utility",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/utility/scenario_builder_dependency_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestScenarioBuilderEventSubscriber_ProfileLoading",
+      "Package": "utility",
+      "PackagePath": "cmd/zqk/utility",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/utility/scenario_builder_event_subscriber_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestCopyBootstrapConfigFiles_Idempotent",
+      "Package": "utility",
+      "PackagePath": "cmd/zqk/utility",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/utility/scenario_builder_id_stream_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestParallelCreate_ReproducesIssue",
+      "Package": "utility",
+      "PackagePath": "cmd/zqk/utility",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/utility/scenario_builder_parallel_create_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestParallelCreate_WithValidation",
+      "Package": "utility",
+      "PackagePath": "cmd/zqk/utility",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/utility/scenario_builder_parallel_create_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

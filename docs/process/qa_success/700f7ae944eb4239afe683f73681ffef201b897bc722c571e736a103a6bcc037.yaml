@@ -1,0 +1,14 @@
+created_at: "2026-08-18T23:36:48Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1787096207908138000-216a2e3e
+item_id: CRIT-CEF-R2-SUP-SECRET-SCAN-A
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 2857702ca28e4b64fb5782140b43c1400e68fdeab30ab0062f4119523ca97d466e5f13c72adcfa41b92eacf21fa7f0a79b8a8e3a8d7c581e5c9afe0e69cb31dc
+schema_version: 2.0.0
+signature: 3045022100cad9e66f34420871549b063bf82fc563da56bfe2b0fa9e6b81b93296c840d94b02203d3d361dcf9e189b89a13c2f552b434201f9e0a25d0a2c1670399f29a40fe155
+status: archived
+title: 'Accept: Add automated secret scanning to CI'
+updated_at: "2026-09-01T07:17:35Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

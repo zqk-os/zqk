@@ -1,0 +1,105 @@
+{
+  "name": "make-verify-724",
+  "created_at": "2026-09-04T21:34:34.546831Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-724",
+    "Tests": [
+      {
+        "Name": "TestOntologyImporter_Import",
+        "Package": "semantic",
+        "PackagePath": "pkg/semantic",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/semantic/importer_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestInferenceEngine_DynamicHeuristics",
+        "Package": "semantic",
+        "PackagePath": "pkg/semantic",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/semantic/inference_engine_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestMaturityAssessor_Assess",
+        "Package": "semantic",
+        "PackagePath": "pkg/semantic",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/semantic/maturity_assessor_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestSemanticReconciler_CheckConvergenceDrift",
+        "Package": "semantic",
+        "PackagePath": "pkg/semantic",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/semantic/reconciler_convergence_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestSemanticReconciler_CheckDrift_MTime",
+        "Package": "semantic",
+        "PackagePath": "pkg/semantic",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/semantic/reconciler_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 150000000000,
+    "PackagePath": "pkg/semantic"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestOntologyImporter_Import",
+      "Package": "semantic",
+      "PackagePath": "pkg/semantic",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/semantic/importer_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestInferenceEngine_DynamicHeuristics",
+      "Package": "semantic",
+      "PackagePath": "pkg/semantic",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/semantic/inference_engine_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestMaturityAssessor_Assess",
+      "Package": "semantic",
+      "PackagePath": "pkg/semantic",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/semantic/maturity_assessor_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestSemanticReconciler_CheckConvergenceDrift",
+      "Package": "semantic",
+      "PackagePath": "pkg/semantic",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/semantic/reconciler_convergence_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestSemanticReconciler_CheckDrift_MTime",
+      "Package": "semantic",
+      "PackagePath": "pkg/semantic",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/semantic/reconciler_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

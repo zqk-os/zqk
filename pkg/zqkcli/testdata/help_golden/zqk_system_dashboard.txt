@@ -1,0 +1,7 @@
+dashboard command
+
+Usage:
+  zqk system dashboard [flags]
+
+Global Flags:
+      --allow-degraded   Allow scheduler-dependent commands to run when scheduler daemon is not running

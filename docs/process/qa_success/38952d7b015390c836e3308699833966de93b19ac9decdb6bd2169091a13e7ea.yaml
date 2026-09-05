@@ -1,0 +1,14 @@
+created_at: "2026-08-19T22:47:28Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1787179641142608000-5cb74e1c
+item_id: BLI-COMMUNITY-FORK-GHOSTREF-001
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 2857702ca28e4b64fb5782140b43c1400e68fdeab30ab0062f4119523ca97d466e5f13c72adcfa41b92eacf21fa7f0a79b8a8e3a8d7c581e5c9afe0e69cb31dc
+schema_version: 2.0.0
+signature: 304502201ef5ec404dadc557298fe05fab331e1d79c56a5e59e9da912ced741be5c4ae960221009f889799d7594c6fca38711ce2821bcb65741c2cf6e312f9a618355dd809076a
+status: archived
+title: Close GhostRef CAS residue and keep unpaired-delete gate fail-closed
+updated_at: "2026-09-01T07:27:40Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

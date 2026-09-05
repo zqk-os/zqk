@@ -1,0 +1,14 @@
+{
+  "coverage_gaps": null,
+  "cvs_id": "CVS-CEF-UNTIL-45-001",
+  "errors": [],
+  "focus_child_cvs_id": "",
+  "public_blockers": 0,
+  "ready_for_parent_completion": false,
+  "ready_for_session_completion": false,
+  "scheduler_health": true,
+  "source": "cap_orchestrator.executeReviewStage",
+  "system_check": true,
+  "tests_passed": true,
+  "timestamp": "2026-09-04T22:50:22Z"
+}

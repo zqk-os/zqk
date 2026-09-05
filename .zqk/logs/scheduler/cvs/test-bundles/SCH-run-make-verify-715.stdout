@@ -1,0 +1,44 @@
+
+--- run 2026-09-04T22:20:43Z ---
+=== RUN   TestDependencyHopMetaTagsCriteriaComposition
+=== PAUSE TestDependencyHopMetaTagsCriteriaComposition
+=== RUN   TestSharedFailClosed_blocksWhenDependentCannotBeRead
+=== PAUSE TestSharedFailClosed_blocksWhenDependentCannotBeRead
+=== RUN   TestSharedFailClosed_blocksWhenDependentHasNoStatus
+=== PAUSE TestSharedFailClosed_blocksWhenDependentHasNoStatus
+=== RUN   TestSharedFailClosed_stillAdmitsGenuinelyDormantDependents
+=== PAUSE TestSharedFailClosed_stillAdmitsGenuinelyDormantDependents
+=== RUN   TestSharedFailOpen_stillAdmitsUnreadableDependent
+=== PAUSE TestSharedFailOpen_stillAdmitsUnreadableDependent
+=== RUN   TestTransitionAllowed_WildcardAndExact
+=== PAUSE TestTransitionAllowed_WildcardAndExact
+=== RUN   TestTransitionAllowed_UnknownFromRepairsToPark
+=== PAUSE TestTransitionAllowed_UnknownFromRepairsToPark
+=== RUN   TestPlanStageMembraneHop_ParksCRITBLIREQCluster
+=== PAUSE TestPlanStageMembraneHop_ParksCRITBLIREQCluster
+=== RUN   TestPlanStageMembraneHop_RefusesArchiveBLIWhenPlanNotArchived
+=== PAUSE TestPlanStageMembraneHop_RefusesArchiveBLIWhenPlanNotArchived
+=== RUN   TestPlanStageMembraneHop_AllowsArchiveBLIWhenPlanArchived
+=== PAUSE TestPlanStageMembraneHop_AllowsArchiveBLIWhenPlanArchived
+=== CONT  TestDependencyHopMetaTagsCriteriaComposition
+=== CONT  TestTransitionAllowed_WildcardAndExact
+--- PASS: TestTransitionAllowed_WildcardAndExact (0.00s)
+=== CONT  TestSharedFailClosed_stillAdmitsGenuinelyDormantDependents
+--- PASS: TestDependencyHopMetaTagsCriteriaComposition (0.00s)
+=== CONT  TestSharedFailOpen_stillAdmitsUnreadableDependent
+--- PASS: TestSharedFailOpen_stillAdmitsUnreadableDependent (0.00s)
+--- PASS: TestSharedFailClosed_stillAdmitsGenuinelyDormantDependents (0.00s)
+=== CONT  TestPlanStageMembraneHop_AllowsArchiveBLIWhenPlanArchived
+=== CONT  TestPlanStageMembraneHop_RefusesArchiveBLIWhenPlanNotArchived
+--- PASS: TestPlanStageMembraneHop_AllowsArchiveBLIWhenPlanArchived (0.00s)
+=== CONT  TestSharedFailClosed_blocksWhenDependentHasNoStatus
+--- PASS: TestSharedFailClosed_blocksWhenDependentHasNoStatus (0.00s)
+=== CONT  TestSharedFailClosed_blocksWhenDependentCannotBeRead
+--- PASS: TestSharedFailClosed_blocksWhenDependentCannotBeRead (0.00s)
+=== CONT  TestPlanStageMembraneHop_ParksCRITBLIREQCluster
+--- PASS: TestPlanStageMembraneHop_ParksCRITBLIREQCluster (0.00s)
+=== CONT  TestTransitionAllowed_UnknownFromRepairsToPark
+--- PASS: TestPlanStageMembraneHop_RefusesArchiveBLIWhenPlanNotArchived (0.00s)
+--- PASS: TestTransitionAllowed_UnknownFromRepairsToPark (0.00s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/lifecycle	0.522s

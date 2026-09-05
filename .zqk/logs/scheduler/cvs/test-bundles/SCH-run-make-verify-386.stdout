@@ -1,0 +1,110 @@
+
+--- run 2026-09-04T22:12:18Z ---
+=== RUN   TestBinaryDetector_GetPath
+=== PAUSE TestBinaryDetector_GetPath
+=== RUN   TestGetBinaryHash
+=== PAUSE TestGetBinaryHash
+=== RUN   TestVerifyBinaryIntegrity
+=== PAUSE TestVerifyBinaryIntegrity
+=== RUN   TestBinaryDetector_GetVersion
+=== PAUSE TestBinaryDetector_GetVersion
+=== RUN   TestBinaryDetector_IsTrustedSigner
+=== PAUSE TestBinaryDetector_IsTrustedSigner
+=== RUN   TestSupportsMigration
+=== PAUSE TestSupportsMigration
+=== RUN   TestGetModuleVersion
+=== PAUSE TestGetModuleVersion
+=== RUN   TestParseVersion
+=== PAUSE TestParseVersion
+=== RUN   TestVersionCompare
+=== PAUSE TestVersionCompare
+=== RUN   TestVersionConstraint
+=== PAUSE TestVersionConstraint
+=== CONT  TestBinaryDetector_GetPath
+=== CONT  TestSupportsMigration
+    detector_test.go:171: Migration support available: false
+--- PASS: TestSupportsMigration (0.00s)
+=== CONT  TestBinaryDetector_GetVersion
+    detector_test.go:113: Binary not available - skipping version test
+--- SKIP: TestBinaryDetector_GetVersion (0.00s)
+=== CONT  TestBinaryDetector_IsTrustedSigner
+=== RUN   TestBinaryDetector_IsTrustedSigner/Trusted_signer
+=== RUN   TestBinaryDetector_IsTrustedSigner/Another_trusted_signer
+=== RUN   TestBinaryDetector_IsTrustedSigner/Untrusted_signer
+--- PASS: TestBinaryDetector_IsTrustedSigner (0.00s)
+    --- PASS: TestBinaryDetector_IsTrustedSigner/Trusted_signer (0.00s)
+    --- PASS: TestBinaryDetector_IsTrustedSigner/Another_trusted_signer (0.00s)
+    --- PASS: TestBinaryDetector_IsTrustedSigner/Untrusted_signer (0.00s)
+=== CONT  TestVersionCompare
+=== RUN   TestVersionCompare/1.0.0_vs_1.0.0
+=== RUN   TestVersionCompare/1.0.0_vs_1.0.1
+=== RUN   TestVersionCompare/1.0.1_vs_1.0.0
+=== RUN   TestVersionCompare/1.0.0_vs_2.0.0
+=== RUN   TestVersionCompare/2.0.0_vs_1.0.0
+=== RUN   TestVersionCompare/1.0.0-alpha_vs_1.0.0
+=== RUN   TestVersionCompare/1.0.0_vs_1.0.0-alpha
+--- PASS: TestVersionCompare (0.00s)
+    --- PASS: TestVersionCompare/1.0.0_vs_1.0.0 (0.00s)
+    --- PASS: TestVersionCompare/1.0.0_vs_1.0.1 (0.00s)
+    --- PASS: TestVersionCompare/1.0.1_vs_1.0.0 (0.00s)
+    --- PASS: TestVersionCompare/1.0.0_vs_2.0.0 (0.00s)
+    --- PASS: TestVersionCompare/2.0.0_vs_1.0.0 (0.00s)
+    --- PASS: TestVersionCompare/1.0.0-alpha_vs_1.0.0 (0.00s)
+    --- PASS: TestVersionCompare/1.0.0_vs_1.0.0-alpha (0.00s)
+=== CONT  TestVersionConstraint
+=== RUN   TestVersionConstraint/>=1.0.0_1.0.0
+=== RUN   TestVersionConstraint/>=1.0.0_1.0.1
+=== RUN   TestVersionConstraint/>=1.0.0_0.9.9
+=== RUN   TestVersionConstraint/^1.0.0_1.0.0
+=== RUN   TestVersionConstraint/^1.0.0_1.9.9
+=== RUN   TestVersionConstraint/^1.0.0_2.0.0
+=== RUN   TestVersionConstraint/1.0.0_1.0.0
+=== RUN   TestVersionConstraint/1.0.0_1.0.1
+=== RUN   TestVersionConstraint/>=1.0.0_<2.0.0_1.5.0
+=== RUN   TestVersionConstraint/>=1.0.0_<2.0.0_2.0.0
+--- PASS: TestVersionConstraint (0.00s)
+    --- PASS: TestVersionConstraint/>=1.0.0_1.0.0 (0.00s)
+    --- PASS: TestVersionConstraint/>=1.0.0_1.0.1 (0.00s)
+    --- PASS: TestVersionConstraint/>=1.0.0_0.9.9 (0.00s)
+    --- PASS: TestVersionConstraint/^1.0.0_1.0.0 (0.00s)
+    --- PASS: TestVersionConstraint/^1.0.0_1.9.9 (0.00s)
+    --- PASS: TestVersionConstraint/^1.0.0_2.0.0 (0.00s)
+    --- PASS: TestVersionConstraint/1.0.0_1.0.0 (0.00s)
+    --- PASS: TestVersionConstraint/1.0.0_1.0.1 (0.00s)
+    --- PASS: TestVersionConstraint/>=1.0.0_<2.0.0_1.5.0 (0.00s)
+    --- PASS: TestVersionConstraint/>=1.0.0_<2.0.0_2.0.0 (0.00s)
+=== CONT  TestParseVersion
+=== RUN   TestParseVersion/1.0.0
+=== RUN   TestParseVersion/v1.0.0
+=== RUN   TestParseVersion/1.2.3
+=== RUN   TestParseVersion/1.2.3-alpha
+=== RUN   TestParseVersion/1.2.3+build
+=== RUN   TestParseVersion/1.2.3-alpha+build
+=== RUN   TestParseVersion/invalid
+=== RUN   TestParseVersion/1
+--- PASS: TestParseVersion (0.01s)
+    --- PASS: TestParseVersion/1.0.0 (0.00s)
+    --- PASS: TestParseVersion/v1.0.0 (0.00s)
+    --- PASS: TestParseVersion/1.2.3 (0.00s)
+    --- PASS: TestParseVersion/1.2.3-alpha (0.00s)
+    --- PASS: TestParseVersion/1.2.3+build (0.00s)
+    --- PASS: TestParseVersion/1.2.3-alpha+build (0.00s)
+    --- PASS: TestParseVersion/invalid (0.00s)
+    --- PASS: TestParseVersion/1 (0.00s)
+=== CONT  TestGetModuleVersion
+=== RUN   TestGetModuleVersion/Direct_dependency
+--- PASS: TestBinaryDetector_GetPath (0.04s)
+=== CONT  TestVerifyBinaryIntegrity
+=== RUN   TestGetModuleVersion/Another_direct_dependency
+=== RUN   TestGetModuleVersion/Indirect_dependency
+=== RUN   TestGetModuleVersion/Module_not_found
+--- PASS: TestVerifyBinaryIntegrity (0.01s)
+=== CONT  TestGetBinaryHash
+--- PASS: TestGetModuleVersion (0.04s)
+    --- PASS: TestGetModuleVersion/Direct_dependency (0.03s)
+    --- PASS: TestGetModuleVersion/Another_direct_dependency (0.00s)
+    --- PASS: TestGetModuleVersion/Indirect_dependency (0.00s)
+    --- PASS: TestGetModuleVersion/Module_not_found (0.00s)
+--- PASS: TestGetBinaryHash (0.01s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/migration/detector	0.411s

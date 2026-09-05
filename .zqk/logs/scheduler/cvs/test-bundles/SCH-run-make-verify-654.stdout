@@ -1,0 +1,54 @@
+
+--- run 2026-09-04T22:18:48Z ---
+=== RUN   TestSeatEventAttemptLedger_newAFEDoesNotInheritATKBudget
+=== PAUSE TestSeatEventAttemptLedger_newAFEDoesNotInheritATKBudget
+=== RUN   TestPrioritizeSeatInbox_newestNamedATKFirst
+=== PAUSE TestPrioritizeSeatInbox_newestNamedATKFirst
+=== RUN   TestPrioritizeSeatInbox_orchestrateBeforeAttn
+=== PAUSE TestPrioritizeSeatInbox_orchestrateBeforeAttn
+=== RUN   TestSeatEventAttemptLedger_requiresEventID
+=== PAUSE TestSeatEventAttemptLedger_requiresEventID
+=== RUN   TestIsAckTheatreInboxItem
+=== PAUSE TestIsAckTheatreInboxItem
+=== RUN   TestFirstComposerHourglassItem_skipsTheatre
+=== PAUSE TestFirstComposerHourglassItem_skipsTheatre
+=== RUN   TestTPMComposerAttnCue_hourglassOnlyForLiveATKOrComms
+=== PAUSE TestTPMComposerAttnCue_hourglassOnlyForLiveATKOrComms
+=== RUN   TestIsUnrepairedWake
+=== PAUSE TestIsUnrepairedWake
+=== RUN   TestDefaultVendorBrainMarkers_coverKnownVendors
+=== PAUSE TestDefaultVendorBrainMarkers_coverKnownVendors
+=== RUN   TestShellPeerWakeAdapter_scriptPathBySeatKind
+=== PAUSE TestShellPeerWakeAdapter_scriptPathBySeatKind
+=== CONT  TestSeatEventAttemptLedger_newAFEDoesNotInheritATKBudget
+=== CONT  TestFirstComposerHourglassItem_skipsTheatre
+--- PASS: TestFirstComposerHourglassItem_skipsTheatre (0.00s)
+=== CONT  TestShellPeerWakeAdapter_scriptPathBySeatKind
+--- PASS: TestShellPeerWakeAdapter_scriptPathBySeatKind (0.00s)
+=== CONT  TestSeatEventAttemptLedger_requiresEventID
+--- PASS: TestSeatEventAttemptLedger_requiresEventID (0.00s)
+=== CONT  TestIsAckTheatreInboxItem
+=== RUN   TestIsAckTheatreInboxItem/peer_ack_is_theatre
+=== RUN   TestIsAckTheatreInboxItem/hourglass_callback_mesh_status_is_theatre
+=== RUN   TestIsAckTheatreInboxItem/parked_wake_is_theatre
+=== RUN   TestIsAckTheatreInboxItem/scheduler_callback_is_theatre
+=== RUN   TestIsAckTheatreInboxItem/directed_steer_is_work
+--- PASS: TestIsAckTheatreInboxItem (0.00s)
+    --- PASS: TestIsAckTheatreInboxItem/peer_ack_is_theatre (0.00s)
+    --- PASS: TestIsAckTheatreInboxItem/hourglass_callback_mesh_status_is_theatre (0.00s)
+    --- PASS: TestIsAckTheatreInboxItem/parked_wake_is_theatre (0.00s)
+    --- PASS: TestIsAckTheatreInboxItem/scheduler_callback_is_theatre (0.00s)
+    --- PASS: TestIsAckTheatreInboxItem/directed_steer_is_work (0.00s)
+=== CONT  TestIsUnrepairedWake
+--- PASS: TestIsUnrepairedWake (0.00s)
+=== CONT  TestDefaultVendorBrainMarkers_coverKnownVendors
+--- PASS: TestDefaultVendorBrainMarkers_coverKnownVendors (0.00s)
+=== CONT  TestTPMComposerAttnCue_hourglassOnlyForLiveATKOrComms
+--- PASS: TestTPMComposerAttnCue_hourglassOnlyForLiveATKOrComms (0.00s)
+=== CONT  TestPrioritizeSeatInbox_orchestrateBeforeAttn
+--- PASS: TestPrioritizeSeatInbox_orchestrateBeforeAttn (0.00s)
+=== CONT  TestPrioritizeSeatInbox_newestNamedATKFirst
+--- PASS: TestPrioritizeSeatInbox_newestNamedATKFirst (0.00s)
+--- PASS: TestSeatEventAttemptLedger_newAFEDoesNotInheritATKBudget (0.02s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/agentfeed	0.263s

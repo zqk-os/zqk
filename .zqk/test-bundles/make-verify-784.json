@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-784",
+  "created_at": "2026-09-04T21:34:35.110759Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-784",
+    "Tests": [
+      {
+        "Name": "TestNormalizeStatusForKind_UnknownFailsClosed",
+        "Package": "objects",
+        "PackagePath": "pkg/objects",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/objects/lifecycle_resolve_status_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestPlanWhatsNextCandidateStatuses_IncludesGrooming",
+        "Package": "objects",
+        "PackagePath": "pkg/objects",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/objects/lifecycle_whatsnext_rank_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestPlanHasWrittenIdentity_PrefersInheritedTitle",
+        "Package": "objects",
+        "PackagePath": "pkg/objects",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/objects/lifecycle_whatsnext_rank_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestPlanHasWorkstreamLane_PluralOrSingular",
+        "Package": "objects",
+        "PackagePath": "pkg/objects",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/objects/lifecycle_whatsnext_rank_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestBacklogCountsAsExecutionFuel",
+        "Package": "objects",
+        "PackagePath": "pkg/objects",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/objects/lifecycle_whatsnext_rank_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestPlanSeatedPersonaBonus",
+        "Package": "objects",
+        "PackagePath": "pkg/objects",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/objects/lifecycle_whatsnext_rank_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestParseLifecycleYAMLDir_RepoParses",
+        "Package": "objects",
+        "PackagePath": "pkg/objects",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/objects/lifecycle_yaml_parse_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestParseConfigYAMLDir_RepoParses",
+        "Package": "objects",
+        "PackagePath": "pkg/objects",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/objects/lifecycle_yaml_parse_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestParseLifecycleYAMLDir_SmashedBoolFlag",
+        "Package": "objects",
+        "PackagePath": "pkg/objects",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/objects/lifecycle_yaml_parse_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestParseLifecycleYAMLDir_UnquotedColonPostcondition",
+        "Package": "objects",
+        "PackagePath": "pkg/objects",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/objects/lifecycle_yaml_parse_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": true,
+    "EstimatedDuration": 300000000000,
+    "PackagePath": "pkg/objects"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestNormalizeStatusForKind_UnknownFailsClosed",
+      "Package": "objects",
+      "PackagePath": "pkg/objects",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/objects/lifecycle_resolve_status_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestPlanWhatsNextCandidateStatuses_IncludesGrooming",
+      "Package": "objects",
+      "PackagePath": "pkg/objects",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/objects/lifecycle_whatsnext_rank_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestPlanHasWrittenIdentity_PrefersInheritedTitle",
+      "Package": "objects",
+      "PackagePath": "pkg/objects",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/objects/lifecycle_whatsnext_rank_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestPlanHasWorkstreamLane_PluralOrSingular",
+      "Package": "objects",
+      "PackagePath": "pkg/objects",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/objects/lifecycle_whatsnext_rank_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestBacklogCountsAsExecutionFuel",
+      "Package": "objects",
+      "PackagePath": "pkg/objects",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/objects/lifecycle_whatsnext_rank_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestPlanSeatedPersonaBonus",
+      "Package": "objects",
+      "PackagePath": "pkg/objects",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/objects/lifecycle_whatsnext_rank_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestParseLifecycleYAMLDir_RepoParses",
+      "Package": "objects",
+      "PackagePath": "pkg/objects",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/objects/lifecycle_yaml_parse_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestParseConfigYAMLDir_RepoParses",
+      "Package": "objects",
+      "PackagePath": "pkg/objects",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/objects/lifecycle_yaml_parse_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestParseLifecycleYAMLDir_SmashedBoolFlag",
+      "Package": "objects",
+      "PackagePath": "pkg/objects",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/objects/lifecycle_yaml_parse_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestParseLifecycleYAMLDir_UnquotedColonPostcondition",
+      "Package": "objects",
+      "PackagePath": "pkg/objects",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/objects/lifecycle_yaml_parse_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

@@ -1,0 +1,105 @@
+{
+  "name": "make-verify-87",
+  "created_at": "2026-09-04T21:34:28.221956Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-87",
+    "Tests": [
+      {
+        "Name": "TestSamplerRegistry_RegisterSampler_NonSystem_ReturnsErrorAtCap",
+        "Package": "metrics",
+        "PackagePath": "pkg/metrics",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/metrics/sampler_registry_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestSamplerRegistry_PipelineSampleSampler_DoesNotGroupByObjectID",
+        "Package": "metrics",
+        "PackagePath": "pkg/metrics",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/metrics/sampler_registry_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestBuildAsyncValidationBaseMetricInstance",
+        "Package": "metrics",
+        "PackagePath": "pkg/metrics",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/metrics/validation_base_metric_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestBuildAsyncValidationBaseMetricInstance_TruncatesLargeJSON",
+        "Package": "metrics",
+        "PackagePath": "pkg/metrics",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/metrics/validation_base_metric_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAsyncValidationMetricTitle",
+        "Package": "metrics",
+        "PackagePath": "pkg/metrics",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/metrics/validation_base_metric_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": true,
+    "EstimatedDuration": 150000000000,
+    "PackagePath": "pkg/metrics"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestSamplerRegistry_RegisterSampler_NonSystem_ReturnsErrorAtCap",
+      "Package": "metrics",
+      "PackagePath": "pkg/metrics",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/metrics/sampler_registry_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestSamplerRegistry_PipelineSampleSampler_DoesNotGroupByObjectID",
+      "Package": "metrics",
+      "PackagePath": "pkg/metrics",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/metrics/sampler_registry_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestBuildAsyncValidationBaseMetricInstance",
+      "Package": "metrics",
+      "PackagePath": "pkg/metrics",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/metrics/validation_base_metric_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestBuildAsyncValidationBaseMetricInstance_TruncatesLargeJSON",
+      "Package": "metrics",
+      "PackagePath": "pkg/metrics",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/metrics/validation_base_metric_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestAsyncValidationMetricTitle",
+      "Package": "metrics",
+      "PackagePath": "pkg/metrics",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/metrics/validation_base_metric_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

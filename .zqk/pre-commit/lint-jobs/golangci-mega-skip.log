@@ -1,0 +1,1 @@
+=== golangci-lint (skipped mega-package typecheck: ./cmd/zqk/system ./pkg/cli/bldr_cli_cmd_v1; go build already ran; PRECOMMIT_FULL=1 to force) ===

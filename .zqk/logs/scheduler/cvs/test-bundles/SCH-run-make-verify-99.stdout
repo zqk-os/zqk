@@ -1,0 +1,20 @@
+
+--- run 2026-09-04T22:22:52Z ---
+=== RUN   TestListSpecsFromFiles_NoDir
+=== PAUSE TestListSpecsFromFiles_NoDir
+=== RUN   TestListSpecsFromFiles_EmptyDir
+=== PAUSE TestListSpecsFromFiles_EmptyDir
+=== RUN   TestListSpecsFromFiles_WithValidYaml
+=== PAUSE TestListSpecsFromFiles_WithValidYaml
+=== RUN   TestListSpecsFromFiles_SkipsNonYamlAndUnderscore
+=== PAUSE TestListSpecsFromFiles_SkipsNonYamlAndUnderscore
+=== CONT  TestListSpecsFromFiles_NoDir
+=== CONT  TestListSpecsFromFiles_WithValidYaml
+--- PASS: TestListSpecsFromFiles_NoDir (0.00s)
+=== CONT  TestListSpecsFromFiles_SkipsNonYamlAndUnderscore
+--- PASS: TestListSpecsFromFiles_WithValidYaml (0.01s)
+=== CONT  TestListSpecsFromFiles_EmptyDir
+--- PASS: TestListSpecsFromFiles_EmptyDir (0.00s)
+--- PASS: TestListSpecsFromFiles_SkipsNonYamlAndUnderscore (0.01s)
+PASS
+ok  	github.com/lanceman/zqk/cmd/zqk/spec	0.598s

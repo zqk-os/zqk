@@ -1,0 +1,44 @@
+
+--- run 2026-09-04T21:48:05Z ---
+=== RUN   TestAutonomyLiveTelemetryJSON
+=== PAUSE TestAutonomyLiveTelemetryJSON
+=== RUN   TestBacklogItemRefsFromCVS
+=== PAUSE TestBacklogItemRefsFromCVS
+=== RUN   TestIsCriteriaRefToken
+=== PAUSE TestIsCriteriaRefToken
+=== RUN   TestExtractVerificationHintLines
+=== PAUSE TestExtractVerificationHintLines
+=== RUN   TestRunConvergenceAgentPromptPipeline_requiresProjectRoot
+=== PAUSE TestRunConvergenceAgentPromptPipeline_requiresProjectRoot
+=== RUN   TestAgentPromptValidateIngestConstraints
+=== PAUSE TestAgentPromptValidateIngestConstraints
+=== RUN   TestAgentPromptIngestBlockedReasonCode
+=== PAUSE TestAgentPromptIngestBlockedReasonCode
+=== RUN   TestNormalizeAgentPromptAttentionMode
+=== PAUSE TestNormalizeAgentPromptAttentionMode
+=== RUN   TestFormatAgentMarkdown_AttentionMode
+=== PAUSE TestFormatAgentMarkdown_AttentionMode
+=== RUN   TestAgentPromptMetricsBucketing
+=== PAUSE TestAgentPromptMetricsBucketing
+=== CONT  TestAutonomyLiveTelemetryJSON
+--- PASS: TestAutonomyLiveTelemetryJSON (0.00s)
+=== CONT  TestAgentPromptValidateIngestConstraints
+--- PASS: TestAgentPromptValidateIngestConstraints (0.00s)
+=== CONT  TestAgentPromptMetricsBucketing
+--- PASS: TestAgentPromptMetricsBucketing (0.00s)
+=== CONT  TestFormatAgentMarkdown_AttentionMode
+--- PASS: TestFormatAgentMarkdown_AttentionMode (0.00s)
+=== CONT  TestNormalizeAgentPromptAttentionMode
+--- PASS: TestNormalizeAgentPromptAttentionMode (0.00s)
+=== CONT  TestAgentPromptIngestBlockedReasonCode
+--- PASS: TestAgentPromptIngestBlockedReasonCode (0.00s)
+=== CONT  TestExtractVerificationHintLines
+--- PASS: TestExtractVerificationHintLines (0.00s)
+=== CONT  TestRunConvergenceAgentPromptPipeline_requiresProjectRoot
+--- PASS: TestRunConvergenceAgentPromptPipeline_requiresProjectRoot (0.00s)
+=== CONT  TestIsCriteriaRefToken
+--- PASS: TestIsCriteriaRefToken (0.00s)
+=== CONT  TestBacklogItemRefsFromCVS
+--- PASS: TestBacklogItemRefsFromCVS (0.00s)
+PASS
+ok  	github.com/lanceman/zqk/cmd/zqk/scheduler	4.172s

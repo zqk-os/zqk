@@ -1,0 +1,31 @@
+package bldr_trait_v1
+
+import (
+	"github.com/lanceman/zqk/pkg/specbuilder/trait_builders"
+)
+
+// SearchableBuilder builds the searchable trait at version v1_0_0
+// File: bldr_trait_v1/searchable_builder.go - version is encoded in package/directory name
+type SearchableBuilder struct {
+	*trait_builders.BaseTraitBuilder
+}
+
+// NewSearchableBuilder creates a new builder for searchable trait version v1_0_0
+func NewSearchableBuilder() *SearchableBuilder {
+	builder := &SearchableBuilder{
+		BaseTraitBuilder: trait_builders.NewBaseTraitBuilder("searchable", "v1_0_0"),
+	}
+
+	// Configure the trait
+	builder.
+		SetDescription("Object/field can be searched").
+		SetCategory("standard").
+		SetObjectLevel(false).
+		SetFieldLevel(false)
+
+	return builder
+}
+
+func init() {
+	trait_builders.RegisterBuilder(NewSearchableBuilder())
+}

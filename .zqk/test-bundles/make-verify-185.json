@@ -1,0 +1,141 @@
+{
+  "name": "make-verify-185",
+  "created_at": "2026-09-04T21:34:29.167134Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-185",
+    "Tests": [
+      {
+        "Name": "TestBrandSubstitutionScenarios",
+        "Package": "substitution",
+        "PackagePath": "pkg/brand/substitution",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/brand/substitution/substitution_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestSubstitutionExclusions",
+        "Package": "substitution",
+        "PackagePath": "pkg/brand/substitution",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/brand/substitution/substitution_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestContentTypeAnnotationPatterns",
+        "Package": "substitution",
+        "PackagePath": "pkg/brand/substitution",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/brand/substitution/substitution_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestDryRunMode",
+        "Package": "substitution",
+        "PackagePath": "pkg/brand/substitution",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/brand/substitution/substitution_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestBackupCreation",
+        "Package": "substitution",
+        "PackagePath": "pkg/brand/substitution",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/brand/substitution/substitution_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestEdgeCases",
+        "Package": "substitution",
+        "PackagePath": "pkg/brand/substitution",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/brand/substitution/substitution_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestMultiFileSubstitution",
+        "Package": "substitution",
+        "PackagePath": "pkg/brand/substitution",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/brand/substitution/substitution_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": true,
+    "EstimatedDuration": 210000000000,
+    "PackagePath": "pkg/brand/substitution"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestBrandSubstitutionScenarios",
+      "Package": "substitution",
+      "PackagePath": "pkg/brand/substitution",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/brand/substitution/substitution_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestSubstitutionExclusions",
+      "Package": "substitution",
+      "PackagePath": "pkg/brand/substitution",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/brand/substitution/substitution_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestContentTypeAnnotationPatterns",
+      "Package": "substitution",
+      "PackagePath": "pkg/brand/substitution",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/brand/substitution/substitution_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestDryRunMode",
+      "Package": "substitution",
+      "PackagePath": "pkg/brand/substitution",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/brand/substitution/substitution_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestBackupCreation",
+      "Package": "substitution",
+      "PackagePath": "pkg/brand/substitution",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/brand/substitution/substitution_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestEdgeCases",
+      "Package": "substitution",
+      "PackagePath": "pkg/brand/substitution",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/brand/substitution/substitution_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestMultiFileSubstitution",
+      "Package": "substitution",
+      "PackagePath": "pkg/brand/substitution",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/brand/substitution/substitution_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

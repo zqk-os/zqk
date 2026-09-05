@@ -1,0 +1,59 @@
+
+--- run 2026-09-04T21:41:19Z ---
+=== RUN   TestIsIDEStdioAdapterConfig
+=== PAUSE TestIsIDEStdioAdapterConfig
+=== RUN   TestFindMCPConfigsIncludesCursorPaths
+=== PAUSE TestFindMCPConfigsIncludesCursorPaths
+=== RUN   TestInstallToIDE_CursorMcpJSONIncludesStdioType
+=== PAUSE TestInstallToIDE_CursorMcpJSONIncludesStdioType
+=== RUN   TestJSONInterleavingWithCallback
+=== PAUSE TestJSONInterleavingWithCallback
+=== RUN   TestJSONInterleavingOfferings
+=== PAUSE TestJSONInterleavingOfferings
+=== RUN   TestJSONInterleavingReproduction
+=== PAUSE TestJSONInterleavingReproduction
+=== RUN   TestJSONInterleaving
+=== PAUSE TestJSONInterleaving
+=== RUN   TestJSONInterleavingConcurrent
+=== PAUSE TestJSONInterleavingConcurrent
+=== RUN   TestHasCredentials
+=== PAUSE TestHasCredentials
+=== RUN   TestLockingPattern_NormalOperation
+=== PAUSE TestLockingPattern_NormalOperation
+=== CONT  TestIsIDEStdioAdapterConfig
+--- PASS: TestIsIDEStdioAdapterConfig (0.00s)
+=== CONT  TestJSONInterleavingOfferings
+=== CONT  TestJSONInterleavingReproduction
+=== CONT  TestInstallToIDE_CursorMcpJSONIncludesStdioType
+--- PASS: TestJSONInterleavingOfferings (0.11s)
+--- PASS: TestInstallToIDE_CursorMcpJSONIncludesStdioType (0.01s)
+=== CONT  TestJSONInterleavingWithCallback
+=== NAME  TestJSONInterleavingReproduction
+    json_interleaving_reproduction_test.go:234: Test PASSED: All 3 messages were valid JSON
+--- PASS: TestJSONInterleavingReproduction (0.21s)
+=== CONT  TestHasCredentials
+=== RUN   TestHasCredentials/keystore_key_id
+=== RUN   TestHasCredentials/username_password
+=== RUN   TestHasCredentials/oauth_token
+=== RUN   TestHasCredentials/personal_access_token
+=== RUN   TestHasCredentials/no_credentials
+--- PASS: TestHasCredentials (0.00s)
+    --- PASS: TestHasCredentials/keystore_key_id (0.00s)
+    --- PASS: TestHasCredentials/username_password (0.00s)
+    --- PASS: TestHasCredentials/oauth_token (0.00s)
+    --- PASS: TestHasCredentials/personal_access_token (0.00s)
+    --- PASS: TestHasCredentials/no_credentials (0.00s)
+=== CONT  TestLockingPattern_NormalOperation
+--- PASS: TestLockingPattern_NormalOperation (0.00s)
+=== CONT  TestFindMCPConfigsIncludesCursorPaths
+--- PASS: TestFindMCPConfigsIncludesCursorPaths (0.01s)
+=== CONT  TestJSONInterleavingConcurrent
+--- PASS: TestJSONInterleavingConcurrent (0.00s)
+=== CONT  TestJSONInterleaving
+--- PASS: TestJSONInterleaving (0.00s)
+=== NAME  TestJSONInterleavingWithCallback
+    json_interleaving_callback_test.go:316: Test PASSED: All 4 messages were valid JSON
+    json_interleaving_callback_test.go:348: Found 4 responses and 0 log notifications
+--- PASS: TestJSONInterleavingWithCallback (0.55s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/mcp	1.288s

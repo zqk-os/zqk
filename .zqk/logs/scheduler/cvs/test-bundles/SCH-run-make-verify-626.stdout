@@ -1,0 +1,44 @@
+
+--- run 2026-09-04T22:18:28Z ---
+=== RUN   TestMergeMetricsEventTypeCounts
+=== PAUSE TestMergeMetricsEventTypeCounts
+=== RUN   TestMergeAnyMetrics
+=== PAUSE TestMergeAnyMetrics
+=== RUN   TestNormalizeEventTypeAllowed
+=== PAUSE TestNormalizeEventTypeAllowed
+=== RUN   TestNormalizeEventTypeFallback
+=== PAUSE TestNormalizeEventTypeFallback
+=== RUN   TestNormalizeEventTypeNoFallback
+=== PAUSE TestNormalizeEventTypeNoFallback
+=== RUN   TestPersistWithIDRetrySuccess
+=== PAUSE TestPersistWithIDRetrySuccess
+=== RUN   TestPersistWithIDRetryDuplicateThenOK
+=== PAUSE TestPersistWithIDRetryDuplicateThenOK
+=== RUN   TestPersistWithIDRetryDuplicateRetryAlsoExists
+=== PAUSE TestPersistWithIDRetryDuplicateRetryAlsoExists
+=== RUN   TestPersistWithIDRetryOtherErrorSkipsRetry
+=== PAUSE TestPersistWithIDRetryOtherErrorSkipsRetry
+=== RUN   TestPersistWithIDRetryNilRetryKeepsOriginal
+=== PAUSE TestPersistWithIDRetryNilRetryKeepsOriginal
+=== CONT  TestMergeMetricsEventTypeCounts
+=== CONT  TestPersistWithIDRetrySuccess
+--- PASS: TestPersistWithIDRetrySuccess (0.00s)
+=== CONT  TestPersistWithIDRetryNilRetryKeepsOriginal
+--- PASS: TestPersistWithIDRetryNilRetryKeepsOriginal (0.00s)
+=== CONT  TestNormalizeEventTypeFallback
+--- PASS: TestNormalizeEventTypeFallback (0.00s)
+=== CONT  TestNormalizeEventTypeNoFallback
+--- PASS: TestNormalizeEventTypeNoFallback (0.00s)
+=== CONT  TestNormalizeEventTypeAllowed
+--- PASS: TestNormalizeEventTypeAllowed (0.00s)
+=== CONT  TestPersistWithIDRetryDuplicateRetryAlsoExists
+--- PASS: TestPersistWithIDRetryDuplicateRetryAlsoExists (0.00s)
+=== CONT  TestPersistWithIDRetryOtherErrorSkipsRetry
+--- PASS: TestPersistWithIDRetryOtherErrorSkipsRetry (0.00s)
+=== CONT  TestPersistWithIDRetryDuplicateThenOK
+--- PASS: TestPersistWithIDRetryDuplicateThenOK (0.00s)
+=== CONT  TestMergeAnyMetrics
+--- PASS: TestMergeAnyMetrics (0.00s)
+--- PASS: TestMergeMetricsEventTypeCounts (0.00s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/storage/audit	0.439s

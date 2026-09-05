@@ -1,0 +1,46 @@
+
+--- run 2026-09-05T05:23:26Z ---
+=== RUN   TestEnvelopeTickTokenPolicyFromEnv_invalidJSON
+=== PAUSE TestEnvelopeTickTokenPolicyFromEnv_invalidJSON
+=== RUN   TestEnvelopeTickParseTokenJSONArray_emptyRaw
+=== PAUSE TestEnvelopeTickParseTokenJSONArray_emptyRaw
+=== RUN   TestEnvelopeTickTokenPolicyFromEnv_invalidDenySkipsAllowParse
+=== PAUSE TestEnvelopeTickTokenPolicyFromEnv_invalidDenySkipsAllowParse
+=== RUN   TestEvaluationSurfaceIDFromMaps
+=== PAUSE TestEvaluationSurfaceIDFromMaps
+=== RUN   TestEvaluationSurfaceRegistry
+=== PAUSE TestEvaluationSurfaceRegistry
+=== RUN   TestAggregateEventsFromFile_SkipsOversizedNonJobLines
+=== PAUSE TestAggregateEventsFromFile_SkipsOversizedNonJobLines
+=== RUN   TestRunAggregationViaPipeline_EmptyFile
+=== PAUSE TestRunAggregationViaPipeline_EmptyFile
+=== RUN   TestRunAggregationViaPipeline_NoEventsFile
+=== PAUSE TestRunAggregationViaPipeline_NoEventsFile
+=== RUN   TestGlobalTestJobLimit_derivesFromHostAndStaysInBounds
+=== PAUSE TestGlobalTestJobLimit_derivesFromHostAndStaysInBounds
+=== RUN   TestAcquireGlobalTestJobSlot_noLimiterDoesNotBlockDispatch
+=== PAUSE TestAcquireGlobalTestJobSlot_noLimiterDoesNotBlockDispatch
+=== CONT  TestEnvelopeTickTokenPolicyFromEnv_invalidJSON
+--- PASS: TestEnvelopeTickTokenPolicyFromEnv_invalidJSON (0.00s)
+=== CONT  TestEvaluationSurfaceRegistry
+--- PASS: TestEvaluationSurfaceRegistry (0.00s)
+=== CONT  TestAcquireGlobalTestJobSlot_noLimiterDoesNotBlockDispatch
+--- PASS: TestAcquireGlobalTestJobSlot_noLimiterDoesNotBlockDispatch (0.00s)
+=== CONT  TestAggregateEventsFromFile_SkipsOversizedNonJobLines
+=== CONT  TestRunAggregationViaPipeline_NoEventsFile
+=== CONT  TestGlobalTestJobLimit_derivesFromHostAndStaysInBounds
+--- PASS: TestRunAggregationViaPipeline_NoEventsFile (0.00s)
+=== NAME  TestGlobalTestJobLimit_derivesFromHostAndStaysInBounds
+    global_test_concurrency_test.go:32: host has 10 logical CPUs -> global test job limit 4, per-job parallelism 2
+--- PASS: TestGlobalTestJobLimit_derivesFromHostAndStaysInBounds (0.00s)
+=== CONT  TestRunAggregationViaPipeline_EmptyFile
+--- PASS: TestRunAggregationViaPipeline_EmptyFile (0.00s)
+=== CONT  TestEnvelopeTickTokenPolicyFromEnv_invalidDenySkipsAllowParse
+--- PASS: TestEnvelopeTickTokenPolicyFromEnv_invalidDenySkipsAllowParse (0.00s)
+=== CONT  TestEvaluationSurfaceIDFromMaps
+--- PASS: TestEvaluationSurfaceIDFromMaps (0.00s)
+=== CONT  TestEnvelopeTickParseTokenJSONArray_emptyRaw
+--- PASS: TestEnvelopeTickParseTokenJSONArray_emptyRaw (0.00s)
+--- PASS: TestAggregateEventsFromFile_SkipsOversizedNonJobLines (0.01s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/scheduler	0.758s

@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-653",
+  "created_at": "2026-09-04T21:34:33.836934Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-653",
+    "Tests": [
+      {
+        "Name": "TestCorrespondenceHasOrchestratePlan",
+        "Package": "agentfeed",
+        "PackagePath": "pkg/agentfeed",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentfeed/orchestrate_plan_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestFirstPersonaRef",
+        "Package": "agentfeed",
+        "PackagePath": "pkg/agentfeed",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentfeed/orchestrate_plan_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestCoordinatorSeatID_dutyThenMCP",
+        "Package": "agentfeed",
+        "PackagePath": "pkg/agentfeed",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentfeed/peer_seats_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestCoordinatorSeatID_emptyWithoutSeating",
+        "Package": "agentfeed",
+        "PackagePath": "pkg/agentfeed",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentfeed/peer_seats_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestWorkerSeatID_dutyThenAgentAPI",
+        "Package": "agentfeed",
+        "PackagePath": "pkg/agentfeed",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentfeed/peer_seats_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestSeatPersonaRef",
+        "Package": "agentfeed",
+        "PackagePath": "pkg/agentfeed",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentfeed/peer_seats_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestParseCommsCheckChallenge",
+        "Package": "agentfeed",
+        "PackagePath": "pkg/agentfeed",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentfeed/seat_worker_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestSeatWorkerAlive_failClosedWhenMissing",
+        "Package": "agentfeed",
+        "PackagePath": "pkg/agentfeed",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentfeed/seat_worker_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestSeatEventAttemptLedger",
+        "Package": "agentfeed",
+        "PackagePath": "pkg/agentfeed",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentfeed/seat_worker_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestSeatAttemptKey_prefersEventOverATK",
+        "Package": "agentfeed",
+        "PackagePath": "pkg/agentfeed",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentfeed/seat_worker_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": true,
+    "EstimatedDuration": 300000000000,
+    "PackagePath": "pkg/agentfeed"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestCorrespondenceHasOrchestratePlan",
+      "Package": "agentfeed",
+      "PackagePath": "pkg/agentfeed",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentfeed/orchestrate_plan_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestFirstPersonaRef",
+      "Package": "agentfeed",
+      "PackagePath": "pkg/agentfeed",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentfeed/orchestrate_plan_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestCoordinatorSeatID_dutyThenMCP",
+      "Package": "agentfeed",
+      "PackagePath": "pkg/agentfeed",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentfeed/peer_seats_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestCoordinatorSeatID_emptyWithoutSeating",
+      "Package": "agentfeed",
+      "PackagePath": "pkg/agentfeed",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentfeed/peer_seats_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestWorkerSeatID_dutyThenAgentAPI",
+      "Package": "agentfeed",
+      "PackagePath": "pkg/agentfeed",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentfeed/peer_seats_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestSeatPersonaRef",
+      "Package": "agentfeed",
+      "PackagePath": "pkg/agentfeed",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentfeed/peer_seats_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestParseCommsCheckChallenge",
+      "Package": "agentfeed",
+      "PackagePath": "pkg/agentfeed",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentfeed/seat_worker_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestSeatWorkerAlive_failClosedWhenMissing",
+      "Package": "agentfeed",
+      "PackagePath": "pkg/agentfeed",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentfeed/seat_worker_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestSeatEventAttemptLedger",
+      "Package": "agentfeed",
+      "PackagePath": "pkg/agentfeed",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentfeed/seat_worker_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestSeatAttemptKey_prefersEventOverATK",
+      "Package": "agentfeed",
+      "PackagePath": "pkg/agentfeed",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentfeed/seat_worker_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

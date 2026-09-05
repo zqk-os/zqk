@@ -1,0 +1,45 @@
+acceptance_considerations: Acceptance recorded as linked criteria; no narrative captured at migration time.
+actual_effort: 4h
+commit_refs:
+    - 7addbc88b1
+    - 916b27c72f
+created_at: "2026-08-05T05:45:39Z"
+created_by: ACC-1785920548450214012-68b850c0
+criteria_refs:
+    - CRIT-1785939740320130000-e8371583
+    - CRIT-1785939741246580000-1db6088f
+    - CRIT-1785939742131454000-469f3ece
+    - CRIT-1785939743052214000-fc380faa
+    - CRIT-1786697484446058000-720ae3ac
+description: |
+    When a doer/swarm seat runs object list (or help kinds), default surface is assignment-relevant kinds (agent_task primary) — not the full ontology. Planners see strategic/project kernel kinds. Implements discoverability side of POL-AGENT-PLANNER-DOER-001 + ACC login triad. Optional --all-kinds / elevated break-glass for admins. Ties help organization to RBAC matrix.
+estimated_effort: 4h
+goal_refs:
+    - GOAL-1785885763755750000-6efcb274
+id: BLI-1785908739114727000-9a7cc2bd
+kind: backlog_item
+milestone_refs:
+    - MIL-1785886016336815000-ad6784be
+namespace_id: zqk:kernel
+owner_ref: ACC-1785920548450214012-68b850c0
+percent_complete: 100
+persona_refs:
+    - PER-1781486416823404000-bce2c1ce
+    - PER-1781486429759398000-a79939a1
+priority: high
+priority_tier: P1
+problem_statement: When a doer/swarm seat runs object list (or help kinds), default surface is assignment-relevant kinds (agent_task primary) — not the full ontology. Planners see strategic/project kernel kinds. Implements discoverability side of POL-AGENT-PLANNER-DOER-001 + ACC login triad. Optional --all-kinds / elevated break-glass for admins. Ties help organization to RBAC matrix.
+related_object_refs:
+    - REQ-1785908734512726000-0db5c98e
+    - CRIT-1785908735462279000-6d37037a
+    - BLI-1785905540598640000-12d5118e
+    - POL-CODE-1785905539682847000-37bb6e60
+requirement_refs:
+    - REQ-1785908734512726000-0db5c98e
+    - REQ-1785905520527169000-4fb88f5d
+schema_version: 2.0.0
+status: archived
+title: 'MMORCH before-launch P1: Persona/RBAC-scoped object discovery membrane'
+updated_at: "2026-08-19T04:52:23Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

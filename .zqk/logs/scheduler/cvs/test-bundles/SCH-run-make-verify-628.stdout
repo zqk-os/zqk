@@ -1,0 +1,44 @@
+
+--- run 2026-09-04T22:18:40Z ---
+=== RUN   TestRecordPersistOutcomeRetryOK
+=== PAUSE TestRecordPersistOutcomeRetryOK
+=== RUN   TestRecordBuffered
+=== PAUSE TestRecordBuffered
+=== RUN   TestAggregationResultConstructors
+=== PAUSE TestAggregationResultConstructors
+=== RUN   TestWriteFlushRecords
+=== PAUSE TestWriteFlushRecords
+=== RUN   TestWriteFlushNilSink
+=== PAUSE TestWriteFlushNilSink
+=== RUN   TestWriteFlushError
+=== PAUSE TestWriteFlushError
+=== RUN   TestMetricsSnapshotRates
+=== PAUSE TestMetricsSnapshotRates
+=== RUN   TestClassifyEventType
+=== PAUSE TestClassifyEventType
+=== RUN   TestCommandMetricMetadata
+=== PAUSE TestCommandMetricMetadata
+=== RUN   TestTallyEvents
+=== PAUSE TestTallyEvents
+=== CONT  TestRecordPersistOutcomeRetryOK
+=== CONT  TestWriteFlushError
+--- PASS: TestRecordPersistOutcomeRetryOK (0.00s)
+=== CONT  TestTallyEvents
+=== CONT  TestClassifyEventType
+=== CONT  TestMetricsSnapshotRates
+=== CONT  TestWriteFlushRecords
+=== CONT  TestWriteFlushNilSink
+=== CONT  TestRecordBuffered
+=== CONT  TestAggregationResultConstructors
+=== CONT  TestCommandMetricMetadata
+--- PASS: TestWriteFlushError (0.00s)
+--- PASS: TestTallyEvents (0.00s)
+--- PASS: TestClassifyEventType (0.00s)
+--- PASS: TestMetricsSnapshotRates (0.00s)
+--- PASS: TestWriteFlushRecords (0.00s)
+--- PASS: TestWriteFlushNilSink (0.00s)
+--- PASS: TestRecordBuffered (0.00s)
+--- PASS: TestAggregationResultConstructors (0.00s)
+--- PASS: TestCommandMetricMetadata (0.00s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/storage/audit	0.449s

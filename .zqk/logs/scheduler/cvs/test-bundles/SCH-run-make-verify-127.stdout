@@ -1,0 +1,126 @@
+
+--- run 2026-09-04T21:39:23Z ---
+=== RUN   TestEvaluatePrecondition_WorkflowConstraintsIfSet
+=== PAUSE TestEvaluatePrecondition_WorkflowConstraintsIfSet
+=== RUN   TestPreconditionPipeline_ExplicitRulesBeforeActiveHeuristic
+=== PAUSE TestPreconditionPipeline_ExplicitRulesBeforeActiveHeuristic
+=== RUN   TestLifecyclePreconditionPipeline_CanonicalStageOrder
+=== PAUSE TestLifecyclePreconditionPipeline_CanonicalStageOrder
+=== RUN   TestDispatchPrecondition_RecordsPipelineOutcome
+=== PAUSE TestDispatchPrecondition_RecordsPipelineOutcome
+=== RUN   TestPreconditionPipeline_UnrecognizedStillFailOpen
+=== PAUSE TestPreconditionPipeline_UnrecognizedStillFailOpen
+=== RUN   TestGoValidator_ValidateSemanticType
+=== PAUSE TestGoValidator_ValidateSemanticType
+=== RUN   TestGoValidator_ValidateSemanticTypeItem
+=== PAUSE TestGoValidator_ValidateSemanticTypeItem
+=== RUN   TestGoValidator_ValidatePattern
+=== PAUSE TestGoValidator_ValidatePattern
+=== RUN   TestGoValidator_ValidateIn
+=== PAUSE TestGoValidator_ValidateIn
+=== RUN   TestGoValidator_ValidateLifecycleState
+=== PAUSE TestGoValidator_ValidateLifecycleState
+=== CONT  TestEvaluatePrecondition_WorkflowConstraintsIfSet
+=== CONT  TestGoValidator_ValidateSemanticType
+=== RUN   TestGoValidator_ValidateSemanticType/list_with_valid_items
+--- PASS: TestEvaluatePrecondition_WorkflowConstraintsIfSet (0.00s)
+=== CONT  TestDispatchPrecondition_RecordsPipelineOutcome
+=== RUN   TestGoValidator_ValidateSemanticType/empty_list
+=== RUN   TestGoValidator_ValidateSemanticType/list_with_invalid_items
+--- PASS: TestDispatchPrecondition_RecordsPipelineOutcome (0.00s)
+=== CONT  TestPreconditionPipeline_UnrecognizedStillFailOpen
+=== RUN   TestGoValidator_ValidateSemanticType/non-list_value_with_list_fieldType
+--- PASS: TestPreconditionPipeline_UnrecognizedStillFailOpen (0.00s)
+=== CONT  TestGoValidator_ValidateIn
+=== RUN   TestGoValidator_ValidateIn/exact_match_string
+=== RUN   TestGoValidator_ValidateIn/case_insensitive_match
+=== RUN   TestGoValidator_ValidateSemanticType/string_field_with_valid_reference
+=== RUN   TestGoValidator_ValidateIn/case_insensitive_match_lowercase
+=== RUN   TestGoValidator_ValidateSemanticType/string_field_with_invalid_reference
+=== RUN   TestGoValidator_ValidateIn/no_match_string
+=== RUN   TestGoValidator_ValidateIn/exact_match_int
+=== RUN   TestGoValidator_ValidateSemanticType/string_field_with_statement
+--- PASS: TestGoValidator_ValidateSemanticType (0.00s)
+    --- PASS: TestGoValidator_ValidateSemanticType/list_with_valid_items (0.00s)
+    --- PASS: TestGoValidator_ValidateSemanticType/empty_list (0.00s)
+    --- PASS: TestGoValidator_ValidateSemanticType/list_with_invalid_items (0.00s)
+    --- PASS: TestGoValidator_ValidateSemanticType/non-list_value_with_list_fieldType (0.00s)
+    --- PASS: TestGoValidator_ValidateSemanticType/string_field_with_valid_reference (0.00s)
+    --- PASS: TestGoValidator_ValidateSemanticType/string_field_with_invalid_reference (0.00s)
+    --- PASS: TestGoValidator_ValidateSemanticType/string_field_with_statement (0.00s)
+=== CONT  TestGoValidator_ValidateLifecycleState
+=== RUN   TestGoValidator_ValidateLifecycleState/no_lifecycle_loader
+=== RUN   TestGoValidator_ValidateIn/no_match_int
+=== RUN   TestGoValidator_ValidateIn/exact_match_bool
+=== RUN   TestGoValidator_ValidateLifecycleState/valid_status_no_transition
+=== RUN   TestGoValidator_ValidateIn/no_match_bool
+=== RUN   TestGoValidator_ValidateIn/empty_allowed_values
+=== RUN   TestGoValidator_ValidateIn/mixed_types_in_allowed_values
+=== RUN   TestGoValidator_ValidateIn/mixed_types_no_match
+=== RUN   TestGoValidator_ValidateIn/nil_value
+=== RUN   TestGoValidator_ValidateIn/nil_value_no_match
+--- PASS: TestGoValidator_ValidateIn (0.00s)
+    --- PASS: TestGoValidator_ValidateIn/exact_match_string (0.00s)
+    --- PASS: TestGoValidator_ValidateIn/case_insensitive_match (0.00s)
+    --- PASS: TestGoValidator_ValidateIn/case_insensitive_match_lowercase (0.00s)
+    --- PASS: TestGoValidator_ValidateIn/no_match_string (0.00s)
+    --- PASS: TestGoValidator_ValidateIn/exact_match_int (0.00s)
+    --- PASS: TestGoValidator_ValidateIn/no_match_int (0.00s)
+    --- PASS: TestGoValidator_ValidateIn/exact_match_bool (0.00s)
+    --- PASS: TestGoValidator_ValidateIn/no_match_bool (0.00s)
+    --- PASS: TestGoValidator_ValidateIn/empty_allowed_values (0.00s)
+    --- PASS: TestGoValidator_ValidateIn/mixed_types_in_allowed_values (0.00s)
+    --- PASS: TestGoValidator_ValidateIn/mixed_types_no_match (0.00s)
+    --- PASS: TestGoValidator_ValidateIn/nil_value (0.00s)
+    --- PASS: TestGoValidator_ValidateIn/nil_value_no_match (0.00s)
+=== CONT  TestGoValidator_ValidatePattern
+=== RUN   TestGoValidator_ValidatePattern/valid_pattern_match
+=== RUN   TestGoValidator_ValidatePattern/pattern_mismatch
+=== RUN   TestGoValidator_ValidatePattern/empty_value_with_pattern
+=== RUN   TestGoValidator_ValidatePattern/empty_pattern_(matches_everything)
+=== RUN   TestGoValidator_ValidatePattern/complex_pattern_match
+=== RUN   TestGoValidator_ValidatePattern/invalid_regex_pattern
+=== RUN   TestGoValidator_ValidatePattern/case_sensitive_pattern
+=== RUN   TestGoValidator_ValidatePattern/case_insensitive_pattern
+--- PASS: TestGoValidator_ValidatePattern (0.00s)
+    --- PASS: TestGoValidator_ValidatePattern/valid_pattern_match (0.00s)
+    --- PASS: TestGoValidator_ValidatePattern/pattern_mismatch (0.00s)
+    --- PASS: TestGoValidator_ValidatePattern/empty_value_with_pattern (0.00s)
+    --- PASS: TestGoValidator_ValidatePattern/empty_pattern_(matches_everything) (0.00s)
+    --- PASS: TestGoValidator_ValidatePattern/complex_pattern_match (0.00s)
+    --- PASS: TestGoValidator_ValidatePattern/invalid_regex_pattern (0.00s)
+    --- PASS: TestGoValidator_ValidatePattern/case_sensitive_pattern (0.00s)
+    --- PASS: TestGoValidator_ValidatePattern/case_insensitive_pattern (0.00s)
+=== CONT  TestLifecyclePreconditionPipeline_CanonicalStageOrder
+--- PASS: TestLifecyclePreconditionPipeline_CanonicalStageOrder (0.00s)
+=== CONT  TestPreconditionPipeline_ExplicitRulesBeforeActiveHeuristic
+--- PASS: TestPreconditionPipeline_ExplicitRulesBeforeActiveHeuristic (0.00s)
+=== CONT  TestGoValidator_ValidateSemanticTypeItem
+=== RUN   TestGoValidator_ValidateSemanticTypeItem/valid_reference
+=== RUN   TestGoValidator_ValidateSemanticTypeItem/invalid_reference
+=== RUN   TestGoValidator_ValidateSemanticTypeItem/valid_statement
+=== RUN   TestGoValidator_ValidateSemanticTypeItem/empty_statement
+=== RUN   TestGoValidator_ValidateSemanticTypeItem/unknown_semantic_type
+--- PASS: TestGoValidator_ValidateSemanticTypeItem (0.00s)
+    --- PASS: TestGoValidator_ValidateSemanticTypeItem/valid_reference (0.00s)
+    --- PASS: TestGoValidator_ValidateSemanticTypeItem/invalid_reference (0.00s)
+    --- PASS: TestGoValidator_ValidateSemanticTypeItem/valid_statement (0.00s)
+    --- PASS: TestGoValidator_ValidateSemanticTypeItem/empty_statement (0.00s)
+    --- PASS: TestGoValidator_ValidateSemanticTypeItem/unknown_semantic_type (0.00s)
+=== RUN   TestGoValidator_ValidateLifecycleState/invalid_status
+=== RUN   TestGoValidator_ValidateLifecycleState/valid_transition
+=== RUN   TestGoValidator_ValidateLifecycleState/invalid_transition
+=== RUN   TestGoValidator_ValidateLifecycleState/transition_with_unmet_precondition
+=== RUN   TestGoValidator_ValidateLifecycleState/transition_with_met_precondition
+=== RUN   TestGoValidator_ValidateLifecycleState/lifecycle_file_not_found
+--- PASS: TestGoValidator_ValidateLifecycleState (0.08s)
+    --- PASS: TestGoValidator_ValidateLifecycleState/no_lifecycle_loader (0.00s)
+    --- PASS: TestGoValidator_ValidateLifecycleState/valid_status_no_transition (0.03s)
+    --- PASS: TestGoValidator_ValidateLifecycleState/invalid_status (0.01s)
+    --- PASS: TestGoValidator_ValidateLifecycleState/valid_transition (0.01s)
+    --- PASS: TestGoValidator_ValidateLifecycleState/invalid_transition (0.01s)
+    --- PASS: TestGoValidator_ValidateLifecycleState/transition_with_unmet_precondition (0.01s)
+    --- PASS: TestGoValidator_ValidateLifecycleState/transition_with_met_precondition (0.01s)
+    --- PASS: TestGoValidator_ValidateLifecycleState/lifecycle_file_not_found (0.00s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/validation	0.734s

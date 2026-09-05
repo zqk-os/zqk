@@ -1,0 +1,44 @@
+
+--- run 2026-09-04T22:09:51Z ---
+=== RUN   TestMembraneReadPathsForProfile_cas
+=== PAUSE TestMembraneReadPathsForProfile_cas
+=== RUN   TestValidateV1Identity
+=== PAUSE TestValidateV1Identity
+=== RUN   TestFilterDescriptorsByStorageProfile
+=== PAUSE TestFilterDescriptorsByStorageProfile
+=== RUN   TestMapDescriptorsByKind
+=== PAUSE TestMapDescriptorsByKind
+=== RUN   TestNewDescriptorReadModel
+=== PAUSE TestNewDescriptorReadModel
+=== RUN   TestDescriptorReadModel_nil
+=== PAUSE TestDescriptorReadModel_nil
+=== RUN   TestEnqueueStewardMaintenance_appendsJSONL
+=== PAUSE TestEnqueueStewardMaintenance_appendsJSONL
+=== RUN   TestEnqueueStewardMaintenance_streamStewardKind_appendsJSONL
+=== PAUSE TestEnqueueStewardMaintenance_streamStewardKind_appendsJSONL
+=== RUN   TestEnqueueStewardMaintenance_unknownProfile
+=== PAUSE TestEnqueueStewardMaintenance_unknownProfile
+=== RUN   TestNewStewardMaintenanceCoordinator_unknownProfile
+=== PAUSE TestNewStewardMaintenanceCoordinator_unknownProfile
+=== CONT  TestMembraneReadPathsForProfile_cas
+=== CONT  TestDescriptorReadModel_nil
+--- PASS: TestDescriptorReadModel_nil (0.00s)
+=== CONT  TestMapDescriptorsByKind
+--- PASS: TestMapDescriptorsByKind (0.00s)
+=== CONT  TestNewDescriptorReadModel
+--- PASS: TestNewDescriptorReadModel (0.00s)
+=== CONT  TestFilterDescriptorsByStorageProfile
+--- PASS: TestFilterDescriptorsByStorageProfile (0.00s)
+=== CONT  TestEnqueueStewardMaintenance_unknownProfile
+--- PASS: TestMembraneReadPathsForProfile_cas (0.00s)
+--- PASS: TestEnqueueStewardMaintenance_unknownProfile (0.00s)
+=== CONT  TestNewStewardMaintenanceCoordinator_unknownProfile
+=== CONT  TestValidateV1Identity
+--- PASS: TestValidateV1Identity (0.00s)
+=== CONT  TestEnqueueStewardMaintenance_streamStewardKind_appendsJSONL
+--- PASS: TestNewStewardMaintenanceCoordinator_unknownProfile (0.00s)
+=== CONT  TestEnqueueStewardMaintenance_appendsJSONL
+--- PASS: TestEnqueueStewardMaintenance_streamStewardKind_appendsJSONL (0.01s)
+--- PASS: TestEnqueueStewardMaintenance_appendsJSONL (0.01s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/datacell	1.051s

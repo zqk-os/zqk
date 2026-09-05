@@ -1,0 +1,14 @@
+created_at: "2026-08-19T09:26:01Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1787131559588234000-b7738c60
+item_id: REDACTED
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 2857702ca28e4b64fb5782140b43c1400e68fdeab30ab0062f4119523ca97d466e5f13c72adcfa41b92eacf21fa7f0a79b8a8e3a8d7c581e5c9afe0e69cb31dc
+schema_version: 2.0.0
+signature: 3046022100f5255fdb267d806e448b95fdafe0f055a8d072e17f808d09c2b703ee37cc3f70022100a6c9c8711957bb7021aa03b7db4357929bef5515411f8864e859eaa6c2bd9f0c
+status: archived
+title: CAP overnight attempt yields commit+verification evidence or bounded terminal failure
+updated_at: "2026-09-01T07:47:37Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

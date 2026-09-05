@@ -1,0 +1,33 @@
+category: testing
+command: go
+command_args:
+    - test
+    - ./cmd/zqk/utility
+    - -run
+    - '^(TestWaitGroupPanic_WithActiveValidations (job: SCH-run-bundle-149)|TestWaitGroupPanic_Reproduce (job: SCH-run-bundle-149)|TestWaitGroupPanic_ConcurrentDuplicateCreates (job: SCH-run-bundle-149)|TestWaitGroupPanic_Reproduce (job: SCH-run-make-verify-406)|TestWaitGroupPanic_WithActiveValidations (job: SCH-run-make-verify-406)|TestWaitGroupPanic_ConcurrentDuplicateCreates (job: SCH-run-make-verify-406))$'
+    - -v
+    - -count=1
+    - -timeout
+    - 1740s
+created_at: "2026-09-05T05:26:22Z"
+created_by: ACC-1785920548450214012-68b850c0
+description: Re-running 6 failing test(s) from ./cmd/zqk/utility
+enabled: false
+execution_mode: one_time
+id: SCH-1788585982681077000
+job_type: run_wrapper
+kind: scheduler_job
+last_run_at: "2026-09-05T05:57:22Z"
+max_runtime_seconds: 1800
+namespace_id: zqk:kernel
+origin_project: zqk
+origin_system: zqk
+retry_count: 0
+retry_delay_seconds: 5
+schema_version: 2.0.0
+status: active
+title: 'Re-run failing tests: ./cmd/zqk/utility'
+trigger_type: immediate
+updated_at: "2026-09-05T05:57:27Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

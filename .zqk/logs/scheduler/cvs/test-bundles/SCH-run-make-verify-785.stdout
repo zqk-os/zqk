@@ -1,0 +1,72 @@
+
+--- run 2026-09-04T22:21:48Z ---
+=== RUN   TestLifecycleLoader_EnsureReady_WarnsInvalidYAML
+=== PAUSE TestLifecycleLoader_EnsureReady_WarnsInvalidYAML
+=== RUN   TestLoaderOrderError_Error
+=== PAUSE TestLoaderOrderError_Error
+=== RUN   TestNewLoadingOrder
+=== PAUSE TestNewLoadingOrder
+=== RUN   TestLoadingOrder_MarkSpecLoaded
+=== PAUSE TestLoadingOrder_MarkSpecLoaded
+=== RUN   TestLoadingOrder_RequireSpecLoaded
+=== PAUSE TestLoadingOrder_RequireSpecLoaded
+=== RUN   TestGetRequiredSpecs
+=== PAUSE TestGetRequiredSpecs
+=== RUN   TestParseObject
+=== PAUSE TestParseObject
+=== RUN   TestParseObject_ToMap
+=== PAUSE TestParseObject_ToMap
+=== RUN   TestParseObject_GetField
+=== PAUSE TestParseObject_GetField
+=== RUN   TestExtractStringList
+=== PAUSE TestExtractStringList
+=== CONT  TestLifecycleLoader_EnsureReady_WarnsInvalidYAML
+=== CONT  TestGetRequiredSpecs
+--- PASS: TestGetRequiredSpecs (0.00s)
+=== CONT  TestExtractStringList
+--- PASS: TestExtractStringList (0.00s)
+=== CONT  TestLoadingOrder_MarkSpecLoaded
+--- PASS: TestLoadingOrder_MarkSpecLoaded (0.00s)
+=== CONT  TestLoadingOrder_RequireSpecLoaded
+--- PASS: TestLoadingOrder_RequireSpecLoaded (0.00s)
+=== CONT  TestParseObject_ToMap
+--- PASS: TestParseObject_ToMap (0.00s)
+=== CONT  TestParseObject_GetField
+=== RUN   TestParseObject_GetField/id
+=== RUN   TestParseObject_GetField/kind
+=== RUN   TestParseObject_GetField/status
+=== RUN   TestParseObject_GetField/title
+=== RUN   TestParseObject_GetField/category
+=== RUN   TestParseObject_GetField/priority
+=== RUN   TestParseObject_GetField/schema_version
+=== RUN   TestParseObject_GetField/goal_refs
+=== RUN   TestParseObject_GetField/milestone_refs
+=== RUN   TestParseObject_GetField/requirement_refs
+=== RUN   TestParseObject_GetField/workstream_refs
+=== RUN   TestParseObject_GetField/backlog_item_refs
+=== RUN   TestParseObject_GetField/status_history
+=== RUN   TestParseObject_GetField/change_log
+--- PASS: TestParseObject_GetField (0.00s)
+    --- PASS: TestParseObject_GetField/id (0.00s)
+    --- PASS: TestParseObject_GetField/kind (0.00s)
+    --- PASS: TestParseObject_GetField/status (0.00s)
+    --- PASS: TestParseObject_GetField/title (0.00s)
+    --- PASS: TestParseObject_GetField/category (0.00s)
+    --- PASS: TestParseObject_GetField/priority (0.00s)
+    --- PASS: TestParseObject_GetField/schema_version (0.00s)
+    --- PASS: TestParseObject_GetField/goal_refs (0.00s)
+    --- PASS: TestParseObject_GetField/milestone_refs (0.00s)
+    --- PASS: TestParseObject_GetField/requirement_refs (0.00s)
+    --- PASS: TestParseObject_GetField/workstream_refs (0.00s)
+    --- PASS: TestParseObject_GetField/backlog_item_refs (0.00s)
+    --- PASS: TestParseObject_GetField/status_history (0.00s)
+    --- PASS: TestParseObject_GetField/change_log (0.00s)
+=== CONT  TestNewLoadingOrder
+--- PASS: TestNewLoadingOrder (0.00s)
+=== CONT  TestParseObject
+--- PASS: TestParseObject (0.00s)
+=== CONT  TestLoaderOrderError_Error
+--- PASS: TestLoaderOrderError_Error (0.00s)
+--- PASS: TestLifecycleLoader_EnsureReady_WarnsInvalidYAML (0.03s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/objects	0.693s

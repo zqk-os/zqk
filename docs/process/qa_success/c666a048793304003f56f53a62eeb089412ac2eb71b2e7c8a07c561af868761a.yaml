@@ -1,0 +1,14 @@
+created_at: "2026-09-03T10:13:51Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1788430431110889000-43816748
+item_id: BLI-CEF-R27-TST-RCV-SEC-001
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 86b8ab3d574c004a61020b73c23f52b9055049e90c3d755c8bbb383e059e384028fdd8cd69e13123b644e5f3f7eb65596e73e2d57d719ea3dafcb01b84ce8dfb
+schema_version: 2.0.0
+signature: 30460221008f9fb31a7cd5640c9dbafa88a3ca2690b194c56f31064cfc0b5e3367c8312ecb0221008f02d45b9da00c907ff842c231cd1e1e66f93b091d989c35c6560cf60437c873
+status: success
+title: QA success for BLI-CEF-R27-TST-RCV-SEC-001
+updated_at: "2026-09-03T10:14:07Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

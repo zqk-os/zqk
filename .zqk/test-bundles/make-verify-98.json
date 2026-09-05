@@ -1,0 +1,51 @@
+{
+  "name": "make-verify-98",
+  "created_at": "2026-09-04T21:34:28.327496Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-98",
+    "Tests": [
+      {
+        "Name": "TestRuntimeWranglerStatus",
+        "Package": "hostservice",
+        "PackagePath": "pkg/scheduler/hostservice",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/scheduler/hostservice/wrangler_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestRuntimeWranglerStopSticky",
+        "Package": "hostservice",
+        "PackagePath": "pkg/scheduler/hostservice",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/scheduler/hostservice/wrangler_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 60000000000,
+    "PackagePath": "pkg/scheduler/hostservice"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestRuntimeWranglerStatus",
+      "Package": "hostservice",
+      "PackagePath": "pkg/scheduler/hostservice",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/scheduler/hostservice/wrangler_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestRuntimeWranglerStopSticky",
+      "Package": "hostservice",
+      "PackagePath": "pkg/scheduler/hostservice",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/scheduler/hostservice/wrangler_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

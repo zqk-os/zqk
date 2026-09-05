@@ -1,0 +1,160 @@
+
+--- run 2026-09-04T22:12:59Z ---
+=== RUN   TestResolveDiscoveryLane
+=== PAUSE TestResolveDiscoveryLane
+=== RUN   TestFilterKindsForDiscovery
+=== PAUSE TestFilterKindsForDiscovery
+=== RUN   TestPrototypeRejection_KnownHashesComprehensive
+=== PAUSE TestPrototypeRejection_KnownHashesComprehensive
+=== RUN   TestPrototypeRejection_ErrorFormatDeterministic
+=== PAUSE TestPrototypeRejection_ErrorFormatDeterministic
+=== RUN   TestPrototypeRejection_EmptyAndWhitespace
+=== PAUSE TestPrototypeRejection_EmptyAndWhitespace
+=== RUN   TestPrototypeRejection_CaseInsensitiveACC
+=== PAUSE TestPrototypeRejection_CaseInsensitiveACC
+=== RUN   TestPrototypeRejection_BoundaryCases
+=== PAUSE TestPrototypeRejection_BoundaryCases
+=== RUN   TestIsPrototypeAccount_KnownHashes
+=== PAUSE TestIsPrototypeAccount_KnownHashes
+=== RUN   TestIsPrototypeAccount_SuffixDetection
+=== PAUSE TestIsPrototypeAccount_SuffixDetection
+=== RUN   TestIsPrototypeAccount_EmptyEdgeCases
+=== PAUSE TestIsPrototypeAccount_EmptyEdgeCases
+=== CONT  TestResolveDiscoveryLane
+--- PASS: TestResolveDiscoveryLane (0.00s)
+=== CONT  TestPrototypeRejection_EmptyAndWhitespace
+--- PASS: TestPrototypeRejection_EmptyAndWhitespace (0.00s)
+=== CONT  TestPrototypeRejection_ErrorFormatDeterministic
+=== RUN   TestPrototypeRejection_ErrorFormatDeterministic/ACC-1785920548450214015-3df55bd1
+=== CONT  TestPrototypeRejection_CaseInsensitiveACC
+=== RUN   TestPrototypeRejection_CaseInsensitiveACC/acc-1785920548450214016-x-proto-y
+=== RUN   TestPrototypeRejection_CaseInsensitiveACC/ACC-1785920548450214016-z-test-user
+=== RUN   TestPrototypeRejection_ErrorFormatDeterministic/ACC-1785920548450214016-ace2aae1
+=== RUN   TestPrototypeRejection_CaseInsensitiveACC/Acc-1785920548450214016-x-Prototype-y
+=== RUN   TestPrototypeRejection_CaseInsensitiveACC/acc-1785920548450214015-deadbeef1234
+=== RUN   TestPrototypeRejection_CaseInsensitiveACC/Acc-999
+--- PASS: TestPrototypeRejection_CaseInsensitiveACC (0.00s)
+    --- PASS: TestPrototypeRejection_CaseInsensitiveACC/acc-1785920548450214016-x-proto-y (0.00s)
+    --- PASS: TestPrototypeRejection_CaseInsensitiveACC/ACC-1785920548450214016-z-test-user (0.00s)
+    --- PASS: TestPrototypeRejection_CaseInsensitiveACC/Acc-1785920548450214016-x-Prototype-y (0.00s)
+    --- PASS: TestPrototypeRejection_CaseInsensitiveACC/acc-1785920548450214015-deadbeef1234 (0.00s)
+    --- PASS: TestPrototypeRejection_CaseInsensitiveACC/Acc-999 (0.00s)
+=== RUN   TestPrototypeRejection_ErrorFormatDeterministic/ACC-abcd-proto-env
+=== CONT  TestFilterKindsForDiscovery
+=== CONT  TestIsPrototypeAccount_EmptyEdgeCases
+=== RUN   TestIsPrototypeAccount_EmptyEdgeCases/empty_string
+--- PASS: TestPrototypeRejection_ErrorFormatDeterministic (0.00s)
+    --- PASS: TestPrototypeRejection_ErrorFormatDeterministic/ACC-1785920548450214015-3df55bd1 (0.00s)
+    --- PASS: TestPrototypeRejection_ErrorFormatDeterministic/ACC-1785920548450214016-ace2aae1 (0.00s)
+    --- PASS: TestPrototypeRejection_ErrorFormatDeterministic/ACC-abcd-proto-env (0.00s)
+--- PASS: TestFilterKindsForDiscovery (0.00s)
+=== CONT  TestIsPrototypeAccount_SuffixDetection
+=== RUN   TestIsPrototypeAccount_SuffixDetection/lowercase_proto
+=== PAUSE TestIsPrototypeAccount_SuffixDetection/lowercase_proto
+=== RUN   TestIsPrototypeAccount_SuffixDetection/uppercase_TEST
+=== PAUSE TestIsPrototypeAccount_EmptyEdgeCases/empty_string
+=== RUN   TestIsPrototypeAccount_EmptyEdgeCases/whitespace_only
+=== PAUSE TestIsPrototypeAccount_EmptyEdgeCases/whitespace_only
+=== PAUSE TestIsPrototypeAccount_SuffixDetection/uppercase_TEST
+=== RUN   TestIsPrototypeAccount_SuffixDetection/mixed_PROTOTYPE-test
+=== PAUSE TestIsPrototypeAccount_SuffixDetection/mixed_PROTOTYPE-test
+=== RUN   TestIsPrototypeAccount_SuffixDetection/valid_hex_suffix
+=== CONT  TestIsPrototypeAccount_KnownHashes
+=== PAUSE TestIsPrototypeAccount_SuffixDetection/valid_hex_suffix
+=== RUN   TestIsPrototypeAccount_SuffixDetection/standard_ACC_no_hint
+=== PAUSE TestIsPrototypeAccount_SuffixDetection/standard_ACC_no_hint
+=== RUN   TestIsPrototypeAccount_KnownHashes/known_hash_test-user_lowercase
+=== PAUSE TestIsPrototypeAccount_KnownHashes/known_hash_test-user_lowercase
+=== RUN   TestIsPrototypeAccount_KnownHashes/known_hash_test-agent_uppercase
+=== PAUSE TestIsPrototypeAccount_KnownHashes/known_hash_test-agent_uppercase
+=== CONT  TestPrototypeRejection_BoundaryCases
+=== RUN   TestIsPrototypeAccount_KnownHashes/valid_non-prototype_account
+=== RUN   TestPrototypeRejection_BoundaryCases/ACC-1234-
+=== RUN   TestPrototypeRejection_BoundaryCases/ACC-5
+=== RUN   TestPrototypeRejection_BoundaryCases/1785920548450214015-proto
+=== PAUSE TestIsPrototypeAccount_KnownHashes/valid_non-prototype_account
+=== CONT  TestPrototypeRejection_KnownHashesComprehensive
+=== RUN   TestPrototypeRejection_BoundaryCases/acc-abcd-proto-env
+--- PASS: TestPrototypeRejection_BoundaryCases (0.00s)
+    --- PASS: TestPrototypeRejection_BoundaryCases/ACC-1234- (0.00s)
+    --- PASS: TestPrototypeRejection_BoundaryCases/ACC-5 (0.00s)
+    --- PASS: TestPrototypeRejection_BoundaryCases/1785920548450214015-proto (0.00s)
+    --- PASS: TestPrototypeRejection_BoundaryCases/acc-abcd-proto-env (0.00s)
+=== CONT  TestIsPrototypeAccount_EmptyEdgeCases/empty_string
+=== RUN   TestPrototypeRejection_KnownHashesComprehensive/known_test-user_exact
+=== PAUSE TestPrototypeRejection_KnownHashesComprehensive/known_test-user_exact
+=== RUN   TestPrototypeRejection_KnownHashesComprehensive/known_test-agent_exact
+=== PAUSE TestPrototypeRejection_KnownHashesComprehensive/known_test-agent_exact
+=== RUN   TestPrototypeRejection_KnownHashesComprehensive/known_test-user_uppercase
+=== PAUSE TestPrototypeRejection_KnownHashesComprehensive/known_test-user_uppercase
+=== CONT  TestIsPrototypeAccount_EmptyEdgeCases/whitespace_only
+=== RUN   TestPrototypeRejection_KnownHashesComprehensive/known_test-agent_uppercase
+=== PAUSE TestPrototypeRejection_KnownHashesComprehensive/known_test-agent_uppercase
+=== RUN   TestPrototypeRejection_KnownHashesComprehensive/proto_in_suffix
+--- PASS: TestIsPrototypeAccount_EmptyEdgeCases (0.00s)
+    --- PASS: TestIsPrototypeAccount_EmptyEdgeCases/empty_string (0.00s)
+    --- PASS: TestIsPrototypeAccount_EmptyEdgeCases/whitespace_only (0.00s)
+=== CONT  TestIsPrototypeAccount_SuffixDetection/lowercase_proto
+=== PAUSE TestPrototypeRejection_KnownHashesComprehensive/proto_in_suffix
+=== RUN   TestPrototypeRejection_KnownHashesComprehensive/test_in_suffix
+=== CONT  TestIsPrototypeAccount_SuffixDetection/valid_hex_suffix
+=== PAUSE TestPrototypeRejection_KnownHashesComprehensive/test_in_suffix
+=== CONT  TestIsPrototypeAccount_SuffixDetection/standard_ACC_no_hint
+=== RUN   TestPrototypeRejection_KnownHashesComprehensive/PROTOTYPE_uppercase
+=== PAUSE TestPrototypeRejection_KnownHashesComprehensive/PROTOTYPE_uppercase
+=== CONT  TestIsPrototypeAccount_SuffixDetection/mixed_PROTOTYPE-test
+=== CONT  TestIsPrototypeAccount_SuffixDetection/uppercase_TEST
+--- PASS: TestIsPrototypeAccount_SuffixDetection (0.00s)
+    --- PASS: TestIsPrototypeAccount_SuffixDetection/lowercase_proto (0.00s)
+    --- PASS: TestIsPrototypeAccount_SuffixDetection/valid_hex_suffix (0.00s)
+    --- PASS: TestIsPrototypeAccount_SuffixDetection/standard_ACC_no_hint (0.00s)
+    --- PASS: TestIsPrototypeAccount_SuffixDetection/mixed_PROTOTYPE-test (0.00s)
+    --- PASS: TestIsPrototypeAccount_SuffixDetection/uppercase_TEST (0.00s)
+=== RUN   TestPrototypeRejection_KnownHashesComprehensive/Proto_mixed_case
+=== PAUSE TestPrototypeRejection_KnownHashesComprehensive/Proto_mixed_case
+=== RUN   TestPrototypeRejection_KnownHashesComprehensive/valid_hex_suffix
+=== PAUSE TestPrototypeRejection_KnownHashesComprehensive/valid_hex_suffix
+=== RUN   TestPrototypeRejection_KnownHashesComprehensive/valid_standard_ID
+=== PAUSE TestPrototypeRejection_KnownHashesComprehensive/valid_standard_ID
+=== RUN   TestPrototypeRejection_KnownHashesComprehensive/valid_numeric
+=== PAUSE TestPrototypeRejection_KnownHashesComprehensive/valid_numeric
+=== CONT  TestIsPrototypeAccount_KnownHashes/known_hash_test-user_lowercase
+=== CONT  TestIsPrototypeAccount_KnownHashes/valid_non-prototype_account
+=== CONT  TestIsPrototypeAccount_KnownHashes/known_hash_test-agent_uppercase
+=== RUN   TestPrototypeRejection_KnownHashesComprehensive/no_prefix
+--- PASS: TestIsPrototypeAccount_KnownHashes (0.00s)
+    --- PASS: TestIsPrototypeAccount_KnownHashes/known_hash_test-user_lowercase (0.00s)
+    --- PASS: TestIsPrototypeAccount_KnownHashes/valid_non-prototype_account (0.00s)
+    --- PASS: TestIsPrototypeAccount_KnownHashes/known_hash_test-agent_uppercase (0.00s)
+=== PAUSE TestPrototypeRejection_KnownHashesComprehensive/no_prefix
+=== RUN   TestPrototypeRejection_KnownHashesComprehensive/human
+=== PAUSE TestPrototypeRejection_KnownHashesComprehensive/human
+=== CONT  TestPrototypeRejection_KnownHashesComprehensive/known_test-user_exact
+=== CONT  TestPrototypeRejection_KnownHashesComprehensive/human
+=== CONT  TestPrototypeRejection_KnownHashesComprehensive/test_in_suffix
+=== CONT  TestPrototypeRejection_KnownHashesComprehensive/PROTOTYPE_uppercase
+=== CONT  TestPrototypeRejection_KnownHashesComprehensive/proto_in_suffix
+=== CONT  TestPrototypeRejection_KnownHashesComprehensive/known_test-agent_uppercase
+=== CONT  TestPrototypeRejection_KnownHashesComprehensive/known_test-user_uppercase
+=== CONT  TestPrototypeRejection_KnownHashesComprehensive/known_test-agent_exact
+=== CONT  TestPrototypeRejection_KnownHashesComprehensive/no_prefix
+=== CONT  TestPrototypeRejection_KnownHashesComprehensive/valid_standard_ID
+=== CONT  TestPrototypeRejection_KnownHashesComprehensive/valid_numeric
+=== CONT  TestPrototypeRejection_KnownHashesComprehensive/Proto_mixed_case
+=== CONT  TestPrototypeRejection_KnownHashesComprehensive/valid_hex_suffix
+--- PASS: TestPrototypeRejection_KnownHashesComprehensive (0.00s)
+    --- PASS: TestPrototypeRejection_KnownHashesComprehensive/known_test-user_exact (0.00s)
+    --- PASS: TestPrototypeRejection_KnownHashesComprehensive/human (0.00s)
+    --- PASS: TestPrototypeRejection_KnownHashesComprehensive/test_in_suffix (0.00s)
+    --- PASS: TestPrototypeRejection_KnownHashesComprehensive/proto_in_suffix (0.00s)
+    --- PASS: TestPrototypeRejection_KnownHashesComprehensive/PROTOTYPE_uppercase (0.00s)
+    --- PASS: TestPrototypeRejection_KnownHashesComprehensive/known_test-user_uppercase (0.00s)
+    --- PASS: TestPrototypeRejection_KnownHashesComprehensive/known_test-agent_uppercase (0.00s)
+    --- PASS: TestPrototypeRejection_KnownHashesComprehensive/known_test-agent_exact (0.00s)
+    --- PASS: TestPrototypeRejection_KnownHashesComprehensive/no_prefix (0.00s)
+    --- PASS: TestPrototypeRejection_KnownHashesComprehensive/valid_standard_ID (0.00s)
+    --- PASS: TestPrototypeRejection_KnownHashesComprehensive/valid_numeric (0.00s)
+    --- PASS: TestPrototypeRejection_KnownHashesComprehensive/Proto_mixed_case (0.00s)
+    --- PASS: TestPrototypeRejection_KnownHashesComprehensive/valid_hex_suffix (0.00s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/authcred	0.333s

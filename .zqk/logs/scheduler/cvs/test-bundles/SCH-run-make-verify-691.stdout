@@ -1,0 +1,79 @@
+
+--- run 2026-09-04T22:19:21Z ---
+=== RUN   TestCheckCommand_JSONLOutput_FileCreation
+=== PAUSE TestCheckCommand_JSONLOutput_FileCreation
+=== RUN   TestCheckCommand_JSONLOutput_Stdout
+=== PAUSE TestCheckCommand_JSONLOutput_Stdout
+=== RUN   TestRefuseReducedSurfaceWithMutatingFlags
+=== PAUSE TestRefuseReducedSurfaceWithMutatingFlags
+=== RUN   TestPrepareCompactCheckOutputData_partialCheck
+=== PAUSE TestPrepareCompactCheckOutputData_partialCheck
+=== RUN   TestPrepareCompactCheckOutputData_partialCheckViaCheckRefsFalse
+=== PAUSE TestPrepareCompactCheckOutputData_partialCheckViaCheckRefsFalse
+=== RUN   TestFilterIssuesForSurface
+=== PAUSE TestFilterIssuesForSurface
+=== RUN   TestTerminalProgressSubscriber_DiscoveryPhase
+=== PAUSE TestTerminalProgressSubscriber_DiscoveryPhase
+=== RUN   TestTerminalProgressSubscriber_DiscoveryHeartbeat_OverallZeroFiles
+=== PAUSE TestTerminalProgressSubscriber_DiscoveryHeartbeat_OverallZeroFiles
+=== RUN   TestTerminalProgressSubscriber_DiscoverySkipUnknownCount
+=== PAUSE TestTerminalProgressSubscriber_DiscoverySkipUnknownCount
+=== RUN   TestTerminalProgressSubscriber_DiscoveryStart
+=== PAUSE TestTerminalProgressSubscriber_DiscoveryStart
+=== CONT  TestCheckCommand_JSONLOutput_FileCreation
+=== CONT  TestFilterIssuesForSurface
+--- PASS: TestFilterIssuesForSurface (0.00s)
+=== CONT  TestTerminalProgressSubscriber_DiscoverySkipUnknownCount
+--- PASS: TestTerminalProgressSubscriber_DiscoverySkipUnknownCount (0.00s)
+=== CONT  TestTerminalProgressSubscriber_DiscoveryStart
+--- PASS: TestTerminalProgressSubscriber_DiscoveryStart (0.00s)
+=== CONT  TestTerminalProgressSubscriber_DiscoveryHeartbeat_OverallZeroFiles
+--- PASS: TestTerminalProgressSubscriber_DiscoveryHeartbeat_OverallZeroFiles (0.00s)
+=== CONT  TestTerminalProgressSubscriber_DiscoveryPhase
+--- PASS: TestTerminalProgressSubscriber_DiscoveryPhase (0.00s)
+=== CONT  TestPrepareCompactCheckOutputData_partialCheck
+--- PASS: TestPrepareCompactCheckOutputData_partialCheck (0.01s)
+=== CONT  TestPrepareCompactCheckOutputData_partialCheckViaCheckRefsFalse
+System check starting...
+Preparing loaders and cache...
+--- PASS: TestPrepareCompactCheckOutputData_partialCheckViaCheckRefsFalse (0.01s)
+=== CONT  TestRefuseReducedSurfaceWithMutatingFlags
+=== RUN   TestRefuseReducedSurfaceWithMutatingFlags/allows_fast_alone
+=== PAUSE TestRefuseReducedSurfaceWithMutatingFlags/allows_fast_alone
+=== RUN   TestRefuseReducedSurfaceWithMutatingFlags/allows_autofix_alone
+=== PAUSE TestRefuseReducedSurfaceWithMutatingFlags/allows_autofix_alone
+=== RUN   TestRefuseReducedSurfaceWithMutatingFlags/coerces_fast_plus_autofix_to_full_surface
+=== PAUSE TestRefuseReducedSurfaceWithMutatingFlags/coerces_fast_plus_autofix_to_full_surface
+=== RUN   TestRefuseReducedSurfaceWithMutatingFlags/coerces_fast_plus_force_to_full_surface
+=== PAUSE TestRefuseReducedSurfaceWithMutatingFlags/coerces_fast_plus_force_to_full_surface
+=== RUN   TestRefuseReducedSurfaceWithMutatingFlags/coerces_check_refs_false_plus_autofix
+=== PAUSE TestRefuseReducedSurfaceWithMutatingFlags/coerces_check_refs_false_plus_autofix
+=== RUN   TestRefuseReducedSurfaceWithMutatingFlags/allows_check_refs_true_plus_autofix
+=== PAUSE TestRefuseReducedSurfaceWithMutatingFlags/allows_check_refs_true_plus_autofix
+=== CONT  TestCheckCommand_JSONLOutput_Stdout
+    check_cli_output_test.go:256: Stdout capture test - to be implemented
+--- SKIP: TestCheckCommand_JSONLOutput_Stdout (0.00s)
+=== CONT  TestRefuseReducedSurfaceWithMutatingFlags/allows_fast_alone
+=== CONT  TestRefuseReducedSurfaceWithMutatingFlags/coerces_fast_plus_force_to_full_surface
+=== CONT  TestRefuseReducedSurfaceWithMutatingFlags/allows_check_refs_true_plus_autofix
+=== CONT  TestRefuseReducedSurfaceWithMutatingFlags/coerces_check_refs_false_plus_autofix
+=== CONT  TestRefuseReducedSurfaceWithMutatingFlags/coerces_fast_plus_autofix_to_full_surface
+=== CONT  TestRefuseReducedSurfaceWithMutatingFlags/allows_autofix_alone
+--- PASS: TestRefuseReducedSurfaceWithMutatingFlags (0.00s)
+    --- PASS: TestRefuseReducedSurfaceWithMutatingFlags/allows_fast_alone (0.00s)
+    --- PASS: TestRefuseReducedSurfaceWithMutatingFlags/coerces_fast_plus_force_to_full_surface (0.00s)
+    --- PASS: TestRefuseReducedSurfaceWithMutatingFlags/allows_check_refs_true_plus_autofix (0.00s)
+    --- PASS: TestRefuseReducedSurfaceWithMutatingFlags/coerces_check_refs_false_plus_autofix (0.00s)
+    --- PASS: TestRefuseReducedSurfaceWithMutatingFlags/coerces_fast_plus_autofix_to_full_surface (0.00s)
+    --- PASS: TestRefuseReducedSurfaceWithMutatingFlags/allows_autofix_alone (0.00s)
+Loaders starting...
+Loaders ready.
+Loading object ID cache...
+Cache ready, starting validator...
+Discovery starting...
+Starting discovery across 22 kinds...
+=== NAME  TestCheckCommand_JSONLOutput_FileCreation
+    check_cli_output_test.go:204: Output file is empty (minimal project has no objects)
+--- SKIP: TestCheckCommand_JSONLOutput_FileCreation (3.20s)
+PASS
+ok  	github.com/lanceman/zqk/cmd/zqk/system	3.923s

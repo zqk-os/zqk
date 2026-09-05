@@ -1,0 +1,32 @@
+created_at: "2026-09-04T00:15:00Z"
+created_by: ACC-1785920548450214006-2e52b3e7
+id: AGI-1788480855200082000-e5fe493d
+instruction: |
+    Source of truth: zqk object get PIP-CEF-DIAMOND-REMEASURE-001
+
+    For each seat (AGENT_AC/antigravity-1, AGENT_AD/antigravity-2) and each stage in order:
+    1. Skip stage if success_gate already met in output_home (do not remint).
+    2. Create agent_task:
+       - title: "CEF <AGENT> <stage.id> — <stage.title>"
+       - assignee_persona_ref: PER-ORCH-ALPHA (AC) or PER-ORCH-BETA (AD)
+       - backlog_item_ref: BLI-CEF-R27-DUAL-SEAT-REMEASURE-001
+       - priority_plan_ref: PRI-CEF-R27-ENVELOPE-001
+       - pipeline_ref: PIP-CEF-DIAMOND-REMEASURE-001
+       - branch_ref: integration/pri-cef-r27-envelope-001
+       - description: paste stage.config.prior_context, read_first, numbered steps, success_gate, artifacts, forbid. Cap ~25 lines.
+       - status: approved then shockwave/in_progress when steered
+    3. Steer with --await-peer-ack naming the ATK. Do not batch multiple stages into one ATK.
+    4. After peer_ack, verify success_gate on disk before minting the next stage.
+    5. Package stubs: docs/quality/codebase_evaluation/templates/package_skeleton + scripts/cef/materialize-package.sh
+
+    Prefer lens specialist and adversarial as separate ATKs (two interactions each max).
+kind: agent_instruction
+namespace_id: zqk:kernel
+persona_id: orch
+plan_id: PRI-CEF-R27-ENVELOPE-001
+schema_version: 2.0.0
+status: approved
+title: CEF stage executor — mint bite-sized ATKs from PIP stages
+updated_at: "2026-09-04T00:14:33Z"
+updated_by: ACC-1785920548450214006-2e52b3e7
+version_context: default

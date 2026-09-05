@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-200",
+  "created_at": "2026-09-04T21:34:29.370291Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-200",
+    "Tests": [
+      {
+        "Name": "TestCASOrphanCleanupQueue_LifetimeCounters",
+        "Package": "cas_test",
+        "PackagePath": "pkg/storage/cas",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/cas/cas_orphan_cleanup_queue_lifetime_counters_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestCASOrphanCleanupQueue_BasicOperations",
+        "Package": "cas_test",
+        "PackagePath": "pkg/storage/cas",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/cas/cas_orphan_cleanup_queue_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestCASOrphanCleanupQueue_CoordinatorIntegration",
+        "Package": "cas_test",
+        "PackagePath": "pkg/storage/cas",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/cas/cas_orphan_cleanup_queue_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestCASOrphanCleanupQueue_WorkerLifecycle",
+        "Package": "cas_test",
+        "PackagePath": "pkg/storage/cas",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/cas/cas_orphan_cleanup_queue_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestCASOrphanCleanupQueue_ProcessQueueIfIdle",
+        "Package": "cas_test",
+        "PackagePath": "pkg/storage/cas",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/cas/cas_orphan_cleanup_queue_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestCASOrphanCleanupQueue_NoCallback",
+        "Package": "cas_test",
+        "PackagePath": "pkg/storage/cas",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/cas/cas_orphan_cleanup_queue_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestCASOrphanCleanupQueue_BatchProcessing",
+        "Package": "cas_test",
+        "PackagePath": "pkg/storage/cas",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/cas/cas_orphan_cleanup_queue_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestCASOrphanCleanupQueue_RetryLogic",
+        "Package": "cas_test",
+        "PackagePath": "pkg/storage/cas",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/cas/cas_orphan_cleanup_queue_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestCASOrphanCleanupQueue_ConcurrentEnqueue",
+        "Package": "cas_test",
+        "PackagePath": "pkg/storage/cas",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/cas/cas_orphan_cleanup_queue_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestCASOrphanCleanupQueue_GetQueueStats",
+        "Package": "cas_test",
+        "PackagePath": "pkg/storage/cas",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/cas/cas_orphan_cleanup_queue_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 90000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 900000000000,
+    "PackagePath": "pkg/storage/cas"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestCASOrphanCleanupQueue_LifetimeCounters",
+      "Package": "cas_test",
+      "PackagePath": "pkg/storage/cas",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/cas/cas_orphan_cleanup_queue_lifetime_counters_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestCASOrphanCleanupQueue_BasicOperations",
+      "Package": "cas_test",
+      "PackagePath": "pkg/storage/cas",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/cas/cas_orphan_cleanup_queue_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestCASOrphanCleanupQueue_CoordinatorIntegration",
+      "Package": "cas_test",
+      "PackagePath": "pkg/storage/cas",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/cas/cas_orphan_cleanup_queue_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestCASOrphanCleanupQueue_WorkerLifecycle",
+      "Package": "cas_test",
+      "PackagePath": "pkg/storage/cas",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/cas/cas_orphan_cleanup_queue_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestCASOrphanCleanupQueue_ProcessQueueIfIdle",
+      "Package": "cas_test",
+      "PackagePath": "pkg/storage/cas",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/cas/cas_orphan_cleanup_queue_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestCASOrphanCleanupQueue_NoCallback",
+      "Package": "cas_test",
+      "PackagePath": "pkg/storage/cas",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/cas/cas_orphan_cleanup_queue_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestCASOrphanCleanupQueue_BatchProcessing",
+      "Package": "cas_test",
+      "PackagePath": "pkg/storage/cas",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/cas/cas_orphan_cleanup_queue_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestCASOrphanCleanupQueue_RetryLogic",
+      "Package": "cas_test",
+      "PackagePath": "pkg/storage/cas",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/cas/cas_orphan_cleanup_queue_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestCASOrphanCleanupQueue_ConcurrentEnqueue",
+      "Package": "cas_test",
+      "PackagePath": "pkg/storage/cas",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/cas/cas_orphan_cleanup_queue_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestCASOrphanCleanupQueue_GetQueueStats",
+      "Package": "cas_test",
+      "PackagePath": "pkg/storage/cas",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/storage/cas/cas_orphan_cleanup_queue_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 90000000000,
+      "RunCount": 0
+    }
+  }
+}

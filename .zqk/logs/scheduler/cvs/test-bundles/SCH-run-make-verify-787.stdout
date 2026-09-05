@@ -1,0 +1,66 @@
+
+--- run 2026-09-04T22:21:54Z ---
+=== RUN   TestGetSnapableFieldHandlers
+=== PAUSE TestGetSnapableFieldHandlers
+=== RUN   TestGetSnapableFieldHandlers_NoConfig
+=== PAUSE TestGetSnapableFieldHandlers_NoConfig
+=== RUN   TestApplyFieldHandler
+=== PAUSE TestApplyFieldHandler
+=== RUN   TestApplyFieldHandler_WithCondition
+=== PAUSE TestApplyFieldHandler_WithCondition
+=== RUN   TestEvaluateCondition
+=== PAUSE TestEvaluateCondition
+=== RUN   TestSpecCacheUpdateBuffer_Batching
+=== PAUSE TestSpecCacheUpdateBuffer_Batching
+=== RUN   TestSpecCacheUpdateBuffer_TimeBasedFlush
+=== PAUSE TestSpecCacheUpdateBuffer_TimeBasedFlush
+=== RUN   TestSpecCacheUpdateBuffer_HighContention
+=== PAUSE TestSpecCacheUpdateBuffer_HighContention
+=== RUN   TestSpecCacheUpdateBuffer_ShardGrouping
+=== PAUSE TestSpecCacheUpdateBuffer_ShardGrouping
+=== RUN   TestSpecCacheUpdateBuffer_ConcurrentEnqueue
+=== PAUSE TestSpecCacheUpdateBuffer_ConcurrentEnqueue
+=== CONT  TestGetSnapableFieldHandlers
+=== CONT  TestSpecCacheUpdateBuffer_Batching
+--- PASS: TestGetSnapableFieldHandlers (0.00s)
+=== CONT  TestEvaluateCondition
+=== RUN   TestEvaluateCondition/field_tags_$has_matches
+=== RUN   TestEvaluateCondition/field_tags_$has_doesn't_match
+=== RUN   TestEvaluateCondition/security_matches
+=== RUN   TestEvaluateCondition/security_doesn't_match
+--- PASS: TestEvaluateCondition (0.00s)
+    --- PASS: TestEvaluateCondition/field_tags_$has_matches (0.00s)
+    --- PASS: TestEvaluateCondition/field_tags_$has_doesn't_match (0.00s)
+    --- PASS: TestEvaluateCondition/security_matches (0.00s)
+    --- PASS: TestEvaluateCondition/security_doesn't_match (0.00s)
+=== CONT  TestSpecCacheUpdateBuffer_ShardGrouping
+--- PASS: TestSpecCacheUpdateBuffer_ShardGrouping (0.10s)
+=== CONT  TestSpecCacheUpdateBuffer_ConcurrentEnqueue
+--- PASS: TestSpecCacheUpdateBuffer_Batching (0.21s)
+=== CONT  TestSpecCacheUpdateBuffer_HighContention
+--- PASS: TestSpecCacheUpdateBuffer_ConcurrentEnqueue (0.21s)
+=== CONT  TestApplyFieldHandler
+=== RUN   TestApplyFieldHandler/include_handler
+=== RUN   TestApplyFieldHandler/exclude_handler
+=== RUN   TestApplyFieldHandler/null_handler
+=== RUN   TestApplyFieldHandler/hash_handler
+=== RUN   TestApplyFieldHandler/redact_handler
+=== RUN   TestApplyFieldHandler/unknown_handler
+--- PASS: TestApplyFieldHandler (0.00s)
+    --- PASS: TestApplyFieldHandler/include_handler (0.00s)
+    --- PASS: TestApplyFieldHandler/exclude_handler (0.00s)
+    --- PASS: TestApplyFieldHandler/null_handler (0.00s)
+    --- PASS: TestApplyFieldHandler/hash_handler (0.00s)
+    --- PASS: TestApplyFieldHandler/redact_handler (0.00s)
+    --- PASS: TestApplyFieldHandler/unknown_handler (0.00s)
+=== CONT  TestApplyFieldHandler_WithCondition
+--- PASS: TestApplyFieldHandler_WithCondition (0.00s)
+=== CONT  TestGetSnapableFieldHandlers_NoConfig
+--- PASS: TestGetSnapableFieldHandlers_NoConfig (0.00s)
+=== CONT  TestSpecCacheUpdateBuffer_TimeBasedFlush
+--- PASS: TestSpecCacheUpdateBuffer_TimeBasedFlush (0.10s)
+=== NAME  TestSpecCacheUpdateBuffer_HighContention
+    spec_cache_update_buffer_test.go:179: Enqueued 5000 updates in 24.309375ms, all applied successfully
+--- PASS: TestSpecCacheUpdateBuffer_HighContention (0.53s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/objects	1.304s

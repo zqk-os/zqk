@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-517",
+  "created_at": "2026-09-04T21:34:32.493309Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-517",
+    "Tests": [
+      {
+        "Name": "TestAutonomyInbox_C10_DrainBatchRetrieval",
+        "Package": "ambient",
+        "PackagePath": "pkg/ambient",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/ambient/inbox_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAutonomyInbox_C11_DrainEmpty",
+        "Package": "ambient",
+        "PackagePath": "pkg/ambient",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/ambient/inbox_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAutonomyInbox_C12_ConcurrentMultiProducer",
+        "Package": "ambient",
+        "PackagePath": "pkg/ambient",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/ambient/inbox_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAutonomyInbox_C13_MetricsAccuracy",
+        "Package": "ambient",
+        "PackagePath": "pkg/ambient",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/ambient/inbox_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAutonomyInbox_C14_GCSafety",
+        "Package": "ambient",
+        "PackagePath": "pkg/ambient",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/ambient/inbox_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAutonomyInbox_C15_ContextCancellation",
+        "Package": "ambient",
+        "PackagePath": "pkg/ambient",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/ambient/inbox_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAutonomyInbox_C19_TransceiverUsesInboxPusher",
+        "Package": "ambient",
+        "PackagePath": "pkg/ambient",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/ambient/inbox_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestTransceiver_EmitEnvelope",
+        "Package": "ambient",
+        "PackagePath": "pkg/ambient",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/ambient/inbox_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestNoopService",
+        "Package": "ambient",
+        "PackagePath": "pkg/ambient",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/ambient/noop_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestPredictiveTaskSpawner_CreatesTestStub",
+        "Package": "ambient",
+        "PackagePath": "pkg/ambient",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/ambient/predictive_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 300000000000,
+    "PackagePath": "pkg/ambient"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestAutonomyInbox_C10_DrainBatchRetrieval",
+      "Package": "ambient",
+      "PackagePath": "pkg/ambient",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/ambient/inbox_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestAutonomyInbox_C11_DrainEmpty",
+      "Package": "ambient",
+      "PackagePath": "pkg/ambient",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/ambient/inbox_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestAutonomyInbox_C12_ConcurrentMultiProducer",
+      "Package": "ambient",
+      "PackagePath": "pkg/ambient",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/ambient/inbox_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestAutonomyInbox_C13_MetricsAccuracy",
+      "Package": "ambient",
+      "PackagePath": "pkg/ambient",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/ambient/inbox_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestAutonomyInbox_C14_GCSafety",
+      "Package": "ambient",
+      "PackagePath": "pkg/ambient",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/ambient/inbox_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestAutonomyInbox_C15_ContextCancellation",
+      "Package": "ambient",
+      "PackagePath": "pkg/ambient",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/ambient/inbox_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestAutonomyInbox_C19_TransceiverUsesInboxPusher",
+      "Package": "ambient",
+      "PackagePath": "pkg/ambient",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/ambient/inbox_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestTransceiver_EmitEnvelope",
+      "Package": "ambient",
+      "PackagePath": "pkg/ambient",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/ambient/inbox_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestNoopService",
+      "Package": "ambient",
+      "PackagePath": "pkg/ambient",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/ambient/noop_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestPredictiveTaskSpawner_CreatesTestStub",
+      "Package": "ambient",
+      "PackagePath": "pkg/ambient",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/ambient/predictive_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

@@ -1,0 +1,64 @@
+
+--- run 2026-09-04T22:16:08Z ---
+=== RUN   TestCompletionGateObservabilityNote
+=== PAUSE TestCompletionGateObservabilityNote
+=== RUN   TestThresholdsCompletionGateRequiresReadyForSessionCompletion
+=== PAUSE TestThresholdsCompletionGateRequiresReadyForSessionCompletion
+=== RUN   TestMergeObjectFieldsIntoRoutingMeta_flagsOverrideObject
+=== PAUSE TestMergeObjectFieldsIntoRoutingMeta_flagsOverrideObject
+=== RUN   TestMergeObjectFieldsIntoRoutingMeta_objectOnly
+=== PAUSE TestMergeObjectFieldsIntoRoutingMeta_objectOnly
+=== RUN   TestValidateConvergenceSessionTickTargetID
+=== PAUSE TestValidateConvergenceSessionTickTargetID
+=== RUN   TestBuildAfterStateSnapshotMap_alwaysEmitsSessionCompletionBlockedReasons
+=== PAUSE TestBuildAfterStateSnapshotMap_alwaysEmitsSessionCompletionBlockedReasons
+=== RUN   TestBuildAfterStateSnapshotMap_preservesNonEmptyBlockedReasons
+=== PAUSE TestBuildAfterStateSnapshotMap_preservesNonEmptyBlockedReasons
+=== RUN   TestConvergenceTerminalFollowUpNeeded
+=== PAUSE TestConvergenceTerminalFollowUpNeeded
+=== RUN   TestBuildFollowupDraftConvergenceSessionObject
+=== PAUSE TestBuildFollowupDraftConvergenceSessionObject
+=== RUN   TestReadTestBundleHealthTailLines_AlreadyCanceled
+=== PAUSE TestReadTestBundleHealthTailLines_AlreadyCanceled
+=== CONT  TestCompletionGateObservabilityNote
+=== CONT  TestBuildAfterStateSnapshotMap_alwaysEmitsSessionCompletionBlockedReasons
+=== CONT  TestValidateConvergenceSessionTickTargetID
+=== RUN   TestValidateConvergenceSessionTickTargetID/valid
+=== PAUSE TestValidateConvergenceSessionTickTargetID/valid
+=== RUN   TestValidateConvergenceSessionTickTargetID/reject_wrong_prefix
+=== PAUSE TestValidateConvergenceSessionTickTargetID/reject_wrong_prefix
+=== RUN   TestValidateConvergenceSessionTickTargetID/reject_uppercase_hex
+=== PAUSE TestValidateConvergenceSessionTickTargetID/reject_uppercase_hex
+=== RUN   TestValidateConvergenceSessionTickTargetID/reject_empty
+=== PAUSE TestValidateConvergenceSessionTickTargetID/reject_empty
+=== RUN   TestValidateConvergenceSessionTickTargetID/reject_pathy
+=== PAUSE TestValidateConvergenceSessionTickTargetID/reject_pathy
+=== CONT  TestBuildFollowupDraftConvergenceSessionObject
+=== CONT  TestReadTestBundleHealthTailLines_AlreadyCanceled
+--- PASS: TestCompletionGateObservabilityNote (0.00s)
+--- PASS: TestBuildAfterStateSnapshotMap_alwaysEmitsSessionCompletionBlockedReasons (0.00s)
+--- PASS: TestBuildFollowupDraftConvergenceSessionObject (0.01s)
+=== CONT  TestConvergenceTerminalFollowUpNeeded
+--- PASS: TestConvergenceTerminalFollowUpNeeded (0.00s)
+=== CONT  TestMergeObjectFieldsIntoRoutingMeta_flagsOverrideObject
+--- PASS: TestMergeObjectFieldsIntoRoutingMeta_flagsOverrideObject (0.00s)
+=== CONT  TestMergeObjectFieldsIntoRoutingMeta_objectOnly
+--- PASS: TestMergeObjectFieldsIntoRoutingMeta_objectOnly (0.00s)
+=== CONT  TestThresholdsCompletionGateRequiresReadyForSessionCompletion
+--- PASS: TestThresholdsCompletionGateRequiresReadyForSessionCompletion (0.00s)
+=== CONT  TestBuildAfterStateSnapshotMap_preservesNonEmptyBlockedReasons
+--- PASS: TestBuildAfterStateSnapshotMap_preservesNonEmptyBlockedReasons (0.00s)
+=== CONT  TestValidateConvergenceSessionTickTargetID/valid
+=== CONT  TestValidateConvergenceSessionTickTargetID/reject_empty
+=== CONT  TestValidateConvergenceSessionTickTargetID/reject_pathy
+=== CONT  TestValidateConvergenceSessionTickTargetID/reject_uppercase_hex
+=== CONT  TestValidateConvergenceSessionTickTargetID/reject_wrong_prefix
+--- PASS: TestValidateConvergenceSessionTickTargetID (0.00s)
+    --- PASS: TestValidateConvergenceSessionTickTargetID/valid (0.00s)
+    --- PASS: TestValidateConvergenceSessionTickTargetID/reject_empty (0.00s)
+    --- PASS: TestValidateConvergenceSessionTickTargetID/reject_pathy (0.00s)
+    --- PASS: TestValidateConvergenceSessionTickTargetID/reject_uppercase_hex (0.00s)
+    --- PASS: TestValidateConvergenceSessionTickTargetID/reject_wrong_prefix (0.00s)
+--- PASS: TestReadTestBundleHealthTailLines_AlreadyCanceled (0.01s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/scheduler	0.750s

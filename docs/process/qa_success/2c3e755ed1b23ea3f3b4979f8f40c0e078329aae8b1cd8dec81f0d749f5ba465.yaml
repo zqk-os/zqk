@@ -1,0 +1,14 @@
+created_at: "2026-08-18T23:36:48Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1787096208640951000-9d305ba0
+item_id: BLI-CEF-R2-OBS-HEALTHCHECK-FALSEGREEN
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 2857702ca28e4b64fb5782140b43c1400e68fdeab30ab0062f4119523ca97d466e5f13c72adcfa41b92eacf21fa7f0a79b8a8e3a8d7c581e5c9afe0e69cb31dc
+schema_version: 2.0.0
+signature: 3046022100fac288a4bb183bfcaadb0f7c8d7af2132c4ddcaacd8d302022a2a5889e051125022100fbe3ca6aeef7745154c85ce7681027b2d32117171ea9c4c301b8083b26dda641
+status: archived
+title: Healthcheck registry must not false-green on empty/nil monitor results
+updated_at: "2026-09-01T06:53:37Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

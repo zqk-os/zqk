@@ -1,0 +1,14 @@
+created_at: "2026-08-19T06:42:41Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1787121755457589000-527c00a2
+item_id: REDACTED
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 2857702ca28e4b64fb5782140b43c1400e68fdeab30ab0062f4119523ca97d466e5f13c72adcfa41b92eacf21fa7f0a79b8a8e3a8d7c581e5c9afe0e69cb31dc
+schema_version: 2.0.0
+signature: 3046022100b7b8e636cf91f43d9073b33949ce420c15b0a3a8b3e73dfa2bac92f9e24f0bfb022100d32bb6f1316dc427a322343a0f28cabc73e12286e6c13efa6413326a16dbdc1a
+status: archived
+title: agent next registers wake callback by default
+updated_at: "2026-09-01T07:23:09Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

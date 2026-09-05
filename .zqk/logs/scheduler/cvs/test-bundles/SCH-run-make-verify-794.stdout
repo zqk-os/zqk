@@ -1,0 +1,66 @@
+
+--- run 2026-09-04T22:22:23Z ---
+=== RUN   TestSpecValidator_AuthoredRedundantIncludes
+=== PAUSE TestSpecValidator_AuthoredRedundantIncludes
+=== RUN   TestSpecValidator_InheritedResolvedTraitsNotRedundantInclude
+=== PAUSE TestSpecValidator_InheritedResolvedTraitsNotRedundantInclude
+=== RUN   TestNormalizeStatus
+=== PAUSE TestNormalizeStatus
+=== RUN   TestApplyAliasesForStatus
+=== PAUSE TestApplyAliasesForStatus
+=== RUN   TestEveryStatusDeclaresAKnownRole
+=== PAUSE TestEveryStatusDeclaresAKnownRole
+=== RUN   TestRoleProgressRank_coversTheOnLadderRolesOnly
+=== PAUSE TestRoleProgressRank_coversTheOnLadderRolesOnly
+=== RUN   TestEveryWorkLifecycleReachesTerminalAndHasAnOrigin
+=== PAUSE TestEveryWorkLifecycleReachesTerminalAndHasAnOrigin
+=== RUN   TestTaskStepIsClosed
+=== PAUSE TestTaskStepIsClosed
+=== RUN   TestKindHasTrait_AutoStatusTransitionable
+=== PAUSE TestKindHasTrait_AutoStatusTransitionable
+=== RUN   TestKindHasTrait_ExcludedAutoStatusTransitionable
+=== PAUSE TestKindHasTrait_ExcludedAutoStatusTransitionable
+=== CONT  TestSpecValidator_AuthoredRedundantIncludes
+=== CONT  TestRoleProgressRank_coversTheOnLadderRolesOnly
+--- PASS: TestRoleProgressRank_coversTheOnLadderRolesOnly (0.00s)
+=== CONT  TestKindHasTrait_AutoStatusTransitionable
+--- PASS: TestSpecValidator_AuthoredRedundantIncludes (0.01s)
+=== CONT  TestKindHasTrait_ExcludedAutoStatusTransitionable
+--- PASS: TestKindHasTrait_AutoStatusTransitionable (0.01s)
+=== CONT  TestTaskStepIsClosed
+--- PASS: TestTaskStepIsClosed (0.00s)
+=== CONT  TestApplyAliasesForStatus
+--- PASS: TestApplyAliasesForStatus (0.00s)
+=== CONT  TestEveryStatusDeclaresAKnownRole
+--- PASS: TestKindHasTrait_ExcludedAutoStatusTransitionable (0.01s)
+=== CONT  TestNormalizeStatus
+=== RUN   TestNormalizeStatus/#00
+=== RUN   TestNormalizeStatus/complete
+=== RUN   TestNormalizeStatus/completed
+=== RUN   TestNormalizeStatus/archived
+=== RUN   TestNormalizeStatus/archive
+=== RUN   TestNormalizeStatus/canceled
+=== RUN   TestNormalizeStatus/cancelled
+=== RUN   TestNormalizeStatus/exploring
+=== RUN   TestNormalizeStatus/in_progress
+--- PASS: TestNormalizeStatus (0.00s)
+    --- PASS: TestNormalizeStatus/#00 (0.00s)
+    --- PASS: TestNormalizeStatus/complete (0.00s)
+    --- PASS: TestNormalizeStatus/completed (0.00s)
+    --- PASS: TestNormalizeStatus/archived (0.00s)
+    --- PASS: TestNormalizeStatus/archive (0.00s)
+    --- PASS: TestNormalizeStatus/canceled (0.00s)
+    --- PASS: TestNormalizeStatus/cancelled (0.00s)
+    --- PASS: TestNormalizeStatus/exploring (0.00s)
+    --- PASS: TestNormalizeStatus/in_progress (0.00s)
+=== CONT  TestSpecValidator_InheritedResolvedTraitsNotRedundantInclude
+--- PASS: TestSpecValidator_InheritedResolvedTraitsNotRedundantInclude (0.02s)
+=== CONT  TestEveryWorkLifecycleReachesTerminalAndHasAnOrigin
+=== NAME  TestEveryStatusDeclaresAKnownRole
+    status_role_correspondence_test.go:109: verified role on 321 statuses
+--- PASS: TestEveryStatusDeclaresAKnownRole (0.03s)
+=== NAME  TestEveryWorkLifecycleReachesTerminalAndHasAnOrigin
+    status_role_correspondence_test.go:287: verified ladder endpoints on 65 lifecycles
+--- PASS: TestEveryWorkLifecycleReachesTerminalAndHasAnOrigin (0.05s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/objects	0.595s

@@ -1,0 +1,105 @@
+{
+  "name": "make-verify-418",
+  "created_at": "2026-09-04T21:34:31.484982Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-418",
+    "Tests": [
+      {
+        "Name": "TestDriftAuditor",
+        "Package": "skill",
+        "PackagePath": "pkg/skill",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/skill/drift_audit_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestVerifySeal_Valid",
+        "Package": "skill",
+        "PackagePath": "pkg/skill",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/skill/seal_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestVerifySeal_Tampered",
+        "Package": "skill",
+        "PackagePath": "pkg/skill",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/skill/seal_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestVerifySeal_MissingFrontmatter",
+        "Package": "skill",
+        "PackagePath": "pkg/skill",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/skill/seal_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestVerifySeal_MissingVersionIssuerDate",
+        "Package": "skill",
+        "PackagePath": "pkg/skill",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/skill/seal_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 150000000000,
+    "PackagePath": "pkg/skill"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestDriftAuditor",
+      "Package": "skill",
+      "PackagePath": "pkg/skill",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/skill/drift_audit_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestVerifySeal_Valid",
+      "Package": "skill",
+      "PackagePath": "pkg/skill",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/skill/seal_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestVerifySeal_Tampered",
+      "Package": "skill",
+      "PackagePath": "pkg/skill",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/skill/seal_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestVerifySeal_MissingFrontmatter",
+      "Package": "skill",
+      "PackagePath": "pkg/skill",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/skill/seal_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestVerifySeal_MissingVersionIssuerDate",
+      "Package": "skill",
+      "PackagePath": "pkg/skill",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/skill/seal_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

@@ -1,0 +1,28 @@
+
+--- run 2026-09-04T22:23:33Z ---
+FAIL	github.com/lanceman/zqk/cmd/zqk/agent [build failed]
+FAIL
+
+--- run 2026-09-05T05:26:02Z ---
+=== RUN   TestConvergenceEngine_evaluateStaleConvergenceSessions
+--- PASS: TestConvergenceEngine_evaluateStaleConvergenceSessions (2.04s)
+=== RUN   TestMaybeSpawnTerminalFollowupDraft_CreateIntegration
+--- PASS: TestMaybeSpawnTerminalFollowupDraft_CreateIntegration (0.77s)
+=== RUN   TestReadTestBundleHealthTailLines_CanceledMidScan
+--- PASS: TestReadTestBundleHealthTailLines_CanceledMidScan (0.01s)
+=== RUN   TestMaybeRunOrchestrateRollupAfterTick_WriteJobOutcome_success
+--- PASS: TestMaybeRunOrchestrateRollupAfterTick_WriteJobOutcome_success (0.01s)
+=== RUN   TestMaybeRunOrchestrateRollupAfterTick_WriteJobOutcome_failure
+--- PASS: TestMaybeRunOrchestrateRollupAfterTick_WriteJobOutcome_failure (0.02s)
+=== RUN   TestScopeFingerprintSHA256FromFingerprintMap_Deterministic
+--- PASS: TestScopeFingerprintSHA256FromFingerprintMap_Deterministic (0.00s)
+=== RUN   TestComputeTombstoneDisparity_NoBefore
+--- PASS: TestComputeTombstoneDisparity_NoBefore (0.00s)
+=== RUN   TestComputeTombstoneDisparity_Match
+--- PASS: TestComputeTombstoneDisparity_Match (0.00s)
+=== RUN   TestComputeTombstoneDisparity_ScopeDrift
+--- PASS: TestComputeTombstoneDisparity_ScopeDrift (0.00s)
+=== RUN   TestShouldSkipConvergencePersistForDuplicateWatermark
+--- PASS: TestShouldSkipConvergencePersistForDuplicateWatermark (0.00s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/scheduler	3.666s

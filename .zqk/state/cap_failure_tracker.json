@@ -1,0 +1,7 @@
+{
+  "consecutive_failures": 24,
+  "last_failure": "2026-09-05T03:30:01Z",
+  "last_stage": "cap_native_continuation",
+  "last_error": "pending verification task ATK-1788429980944413000-64d67e14 has no durable commit evidence",
+  "agent_escalations": 0
+}

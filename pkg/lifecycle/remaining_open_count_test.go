@@ -1,0 +1,200 @@
+package lifecycle
+
+import (
+	"context"
+	"path/filepath"
+	"testing"
+
+	pkgctx "github.com/lanceman/zqk/pkg/context"
+	"github.com/lanceman/zqk/pkg/logging"
+	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/lanceman/zqk/pkg/storage"
+	"github.com/lanceman/zqk/pkg/testkit"
+)
+
+func TestCoerceNonNegInt(t *testing.T) {
+	t.Parallel()
+	cases := []struct {
+		in   any
+		want int
+		ok   bool
+	}{
+		{3, 3, true},
+		{int64(0), 0, true},
+		{float64(2), 2, true},
+		{float64(2.5), 0, false},
+		{-1, 0, false},
+		{"3", 0, false},
+		{nil, 0, false},
+	}
+	for _, tc := range cases {
+		got, ok := coerceNonNegInt(tc.in)
+		if got != tc.want || ok != tc.ok {
+			t.Fatalf("in=%v got=(%d,%v) want=(%d,%v)", tc.in, got, ok, tc.want, tc.ok)
+		}
+	}
+}
+
+func TestApplyPlanLastChildComplete_NonLastDoesNotComplete(t *testing.T) {
+	projectRoot := t.TempDir()
+	ctx := context.Background()
+	pool := testkit.PrepareGraphConnectionForTest(t)
+	realStorage := storage.NewPoolAwareGraphStorage(pool, projectRoot)
+	sysCtx := pkgctx.NewSystemContext()
+	secCtx := pkgctx.NewSystemSecurityContext()
+
+	planID := fixtureID(t, "PRI-non-last")
+	bliID := fixtureID(t, "BLI-non-last")
+	mustCreateCASVisible(t, realStorage, sysCtx, secCtx, map[string]any{
+		objects.FieldKeyID:                 planID,
+		objects.FieldKeyKind:               objects.KindPriorityPlan,
+		objects.FieldKeyStatus:             statusInProgress,
+		objects.FieldKeyTitle:              "two open",
+		objects.FieldKeyRemainingOpenCount: 2,
+	})
+	mustCreateCASVisible(t, realStorage, sysCtx, secCtx, map[string]any{
+		objects.FieldKeyID:              bliID,
+		objects.FieldKeyKind:            objects.KindBacklogItem,
+		objects.FieldKeyStatus:          statusInProgress,
+		objects.FieldKeyPriorityPlanRef: planID,
+		objects.FieldKeyTitle:           "one of two",
+	})
+
+	logger := logging.NewEventLogger(ctx)
+	ApplyPlanChildMembershipRemoved(ctx, logger, realStorage, projectRoot, planID, bliID)
+
+	plan, err := realStorage.Read(ctx, secCtx, planID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if st, _ := plan[objects.FieldKeyStatus].(string); st != statusInProgress {
+		t.Fatalf("plan status=%q want in_progress (non-last)", st)
+	}
+	n, ok := remainingOpenCountFrom(plan)
+	if !ok || n != 1 {
+		t.Fatalf("remaining_open_count=%d ok=%v want 1", n, ok)
+	}
+}
+
+func TestApplyPlanLastChildComplete_UnsetFieldDoesNotComplete(t *testing.T) {
+	projectRoot := t.TempDir()
+	ctx := context.Background()
+	pool := testkit.PrepareGraphConnectionForTest(t)
+	realStorage := storage.NewPoolAwareGraphStorage(pool, projectRoot)
+	sysCtx := pkgctx.NewSystemContext()
+	secCtx := pkgctx.NewSystemSecurityContext()
+
+	planID := fixtureID(t, "PRI-unseeded")
+	bliID := fixtureID(t, "BLI-unseeded")
+	mustCreateCASVisible(t, realStorage, sysCtx, secCtx, map[string]any{
+		objects.FieldKeyID:     planID,
+		objects.FieldKeyKind:   objects.KindPriorityPlan,
+		objects.FieldKeyStatus: statusInProgress,
+		objects.FieldKeyTitle:  "unseeded",
+	})
+	mustCreateCASVisible(t, realStorage, sysCtx, secCtx, map[string]any{
+		objects.FieldKeyID:              bliID,
+		objects.FieldKeyKind:            objects.KindBacklogItem,
+		objects.FieldKeyStatus:          statusInProgress,
+		objects.FieldKeyPriorityPlanRef: planID,
+		objects.FieldKeyTitle:           "unseeded child",
+	})
+
+	logger := logging.NewEventLogger(ctx)
+	ApplyPlanChildMembershipRemoved(ctx, logger, realStorage, projectRoot, planID, bliID)
+
+	plan, err := realStorage.Read(ctx, secCtx, planID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if st, _ := plan[objects.FieldKeyStatus].(string); st == statusComplete {
+		t.Fatal("unseeded remaining_open_count must not complete (fail closed, no List)")
+	}
+}
+
+func TestApplyPlanLastChildComplete_ZeroCompletesWithoutMemberList(t *testing.T) {
+	projectRoot := t.TempDir()
+	ctx := context.Background()
+	pool := testkit.PrepareGraphConnectionForTest(t)
+	realStorage := storage.NewPoolAwareGraphStorage(pool, projectRoot)
+	sysCtx := pkgctx.NewSystemContext()
+	secCtx := pkgctx.NewSystemSecurityContext()
+
+	planID := fixtureID(t, "PRI-last-child-complete")
+	bliID := fixtureID(t, "BLI-last-child-only")
+	mustCreateCASVisible(t, realStorage, sysCtx, secCtx, map[string]any{
+		objects.FieldKeyID:                 planID,
+		objects.FieldKeyKind:               objects.KindPriorityPlan,
+		objects.FieldKeyStatus:             statusInProgress,
+		objects.FieldKeyTitle:              "last child plan",
+		objects.FieldKeyActiveOrder:        1,
+		objects.FieldKeyRemainingOpenCount: 1,
+	})
+	mustCreateCASVisible(t, realStorage, sysCtx, secCtx, map[string]any{
+		objects.FieldKeyID:              bliID,
+		objects.FieldKeyKind:            objects.KindBacklogItem,
+		objects.FieldKeyStatus:          statusInProgress,
+		objects.FieldKeyPriorityPlanRef: planID,
+		objects.FieldKeyTitle:           "only child",
+	})
+
+	logger := logging.NewEventLogger(ctx)
+	ApplyPlanChildMembershipRemoved(ctx, logger, realStorage, projectRoot, planID, bliID)
+
+	plan, err := realStorage.Read(ctx, secCtx, planID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if st, _ := plan[objects.FieldKeyStatus].(string); st != statusComplete {
+		t.Fatalf("plan status=%q want complete (path=%s)", st, filepath.Join(projectRoot, ".zqk"))
+	}
+	if _, ok := plan[objects.FieldKeyActiveOrder]; ok {
+		t.Fatalf("active_order must unset on last-child complete, got %v", plan[objects.FieldKeyActiveOrder])
+	}
+	if n, ok := remainingOpenCountFrom(plan); !ok || n != 0 {
+		t.Fatalf("remaining_open_count=%d ok=%v want 0", n, ok)
+	}
+}
+
+func TestSeedRemainingOpenCountFromMembers_CountsNonTerminal(t *testing.T) {
+	projectRoot := t.TempDir()
+	ctx := context.Background()
+	pool := testkit.PrepareGraphConnectionForTest(t)
+	realStorage := storage.NewPoolAwareGraphStorage(pool, projectRoot)
+	sysCtx := pkgctx.NewSystemContext()
+	secCtx := pkgctx.NewSystemSecurityContext()
+
+	planID := fixtureID(t, "PRI-seed-count")
+	mustCreateCASVisible(t, realStorage, sysCtx, secCtx, map[string]any{
+		objects.FieldKeyID:     planID,
+		objects.FieldKeyKind:   objects.KindPriorityPlan,
+		objects.FieldKeyStatus: statusInProgress,
+		objects.FieldKeyTitle:  "seed me",
+	})
+	mustCreateCASVisible(t, realStorage, sysCtx, secCtx, map[string]any{
+		objects.FieldKeyID:              fixtureID(t, "BLI-seed-open"),
+		objects.FieldKeyKind:            objects.KindBacklogItem,
+		objects.FieldKeyStatus:          statusInProgress,
+		objects.FieldKeyPriorityPlanRef: planID,
+		objects.FieldKeyTitle:           "open",
+	})
+	mustCreateCASVisible(t, realStorage, sysCtx, secCtx, map[string]any{
+		objects.FieldKeyID:              fixtureID(t, "BLI-seed-done"),
+		objects.FieldKeyKind:            objects.KindBacklogItem,
+		objects.FieldKeyStatus:          statusComplete,
+		objects.FieldKeyPriorityPlanRef: planID,
+		objects.FieldKeyTitle:           "done",
+	})
+
+	if err := SeedRemainingOpenCountFromMembers(ctx, realStorage, planID, true); err != nil {
+		t.Fatal(err)
+	}
+	plan, err := realStorage.Read(ctx, secCtx, planID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	n, ok := remainingOpenCountFrom(plan)
+	if !ok || n != 1 {
+		t.Fatalf("remaining_open_count=%d ok=%v want 1", n, ok)
+	}
+}

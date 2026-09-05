@@ -1,0 +1,87 @@
+{
+  "name": "make-verify-534",
+  "created_at": "2026-09-04T21:34:32.669268Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-534",
+    "Tests": [
+      {
+        "Name": "TestUpdateMatrixCSVByFilter_limit",
+        "Package": "quality",
+        "PackagePath": "pkg/quality",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/quality/matrix_update_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestUpdateMatrixCSVRow_invalidGate",
+        "Package": "quality",
+        "PackagePath": "pkg/quality",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/quality/matrix_update_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestValidateMatrixRegistry_ok",
+        "Package": "quality",
+        "PackagePath": "pkg/quality",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/quality/matrix_validate_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestValidateMatrixRegistry_missingSessionColumn",
+        "Package": "quality",
+        "PackagePath": "pkg/quality",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/quality/matrix_validate_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": true,
+    "EstimatedDuration": 120000000000,
+    "PackagePath": "pkg/quality"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestUpdateMatrixCSVByFilter_limit",
+      "Package": "quality",
+      "PackagePath": "pkg/quality",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/quality/matrix_update_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestUpdateMatrixCSVRow_invalidGate",
+      "Package": "quality",
+      "PackagePath": "pkg/quality",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/quality/matrix_update_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestValidateMatrixRegistry_ok",
+      "Package": "quality",
+      "PackagePath": "pkg/quality",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/quality/matrix_validate_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestValidateMatrixRegistry_missingSessionColumn",
+      "Package": "quality",
+      "PackagePath": "pkg/quality",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/quality/matrix_validate_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

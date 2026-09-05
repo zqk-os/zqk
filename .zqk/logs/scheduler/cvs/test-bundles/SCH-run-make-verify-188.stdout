@@ -1,0 +1,20 @@
+
+--- run 2026-09-04T21:41:47Z ---
+=== RUN   TestCoreInterfaces
+=== PAUSE TestCoreInterfaces
+=== RUN   TestSpecValidation
+=== PAUSE TestSpecValidation
+=== RUN   TestConstantsInterface
+=== PAUSE TestConstantsInterface
+=== RUN   TestConstantsGeneratorIntegration
+=== PAUSE TestConstantsGeneratorIntegration
+=== CONT  TestCoreInterfaces
+--- PASS: TestCoreInterfaces (0.00s)
+=== CONT  TestConstantsGeneratorIntegration
+--- PASS: TestConstantsGeneratorIntegration (0.00s)
+=== CONT  TestConstantsInterface
+--- PASS: TestConstantsInterface (0.00s)
+=== CONT  TestSpecValidation
+--- PASS: TestSpecValidation (0.00s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/specbuilder/core	0.340s

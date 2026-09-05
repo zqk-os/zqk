@@ -1,0 +1,36 @@
+
+--- run 2026-09-04T21:43:42Z ---
+=== RUN   TestSlackAdapter_ParseEvent
+=== PAUSE TestSlackAdapter_ParseEvent
+=== RUN   TestSlackAdapter_ParseSlash
+=== PAUSE TestSlackAdapter_ParseSlash
+=== RUN   TestToSteerInput_mapsSteeringSchema
+=== PAUSE TestToSteerInput_mapsSteeringSchema
+=== RUN   TestGenericAdapter_andLookup
+=== PAUSE TestGenericAdapter_andLookup
+=== RUN   TestTeamsAdapter_Parse
+=== PAUSE TestTeamsAdapter_Parse
+=== RUN   TestTelegramAdapter_ParseUpdate
+=== PAUSE TestTelegramAdapter_ParseUpdate
+=== RUN   TestSignalAdapter_ParseEnvelope
+=== PAUSE TestSignalAdapter_ParseEnvelope
+=== RUN   TestToSteerInput_requiresText
+=== PAUSE TestToSteerInput_requiresText
+=== CONT  TestSlackAdapter_ParseEvent
+=== CONT  TestTeamsAdapter_Parse
+--- PASS: TestSlackAdapter_ParseEvent (0.00s)
+=== CONT  TestGenericAdapter_andLookup
+--- PASS: TestTeamsAdapter_Parse (0.00s)
+=== CONT  TestToSteerInput_requiresText
+--- PASS: TestToSteerInput_requiresText (0.00s)
+=== CONT  TestSignalAdapter_ParseEnvelope
+--- PASS: TestGenericAdapter_andLookup (0.00s)
+=== CONT  TestToSteerInput_mapsSteeringSchema
+--- PASS: TestToSteerInput_mapsSteeringSchema (0.00s)
+=== CONT  TestSlackAdapter_ParseSlash
+--- PASS: TestSlackAdapter_ParseSlash (0.00s)
+=== CONT  TestTelegramAdapter_ParseUpdate
+--- PASS: TestSignalAdapter_ParseEnvelope (0.00s)
+--- PASS: TestTelegramAdapter_ParseUpdate (0.00s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/agentfeed/bridge	0.328s

@@ -1,0 +1,45 @@
+
+--- run 2026-09-04T22:11:27Z ---
+=== RUN   TestIgnoreErrorsProcessor
+=== PAUSE TestIgnoreErrorsProcessor
+=== RUN   TestProcessorRegistry
+=== PAUSE TestProcessorRegistry
+=== RUN   TestBuildAllKindsScenario
+=== PAUSE TestBuildAllKindsScenario
+=== RUN   TestBuildAllKindsScenario_Structure
+=== PAUSE TestBuildAllKindsScenario_Structure
+=== RUN   TestBuildAllKindsScenario_YAMLOutput
+=== PAUSE TestBuildAllKindsScenario_YAMLOutput
+=== RUN   TestScenarioBuilder_Basic
+=== PAUSE TestScenarioBuilder_Basic
+=== RUN   TestScenarioBuilder_WithSteps
+=== PAUSE TestScenarioBuilder_WithSteps
+=== RUN   TestStepBuilder_Complex
+=== PAUSE TestStepBuilder_Complex
+=== RUN   TestExpectationBuilder_Complete
+=== PAUSE TestExpectationBuilder_Complete
+=== RUN   TestErrorExpectationBuilder
+=== PAUSE TestErrorExpectationBuilder
+=== CONT  TestIgnoreErrorsProcessor
+--- PASS: TestIgnoreErrorsProcessor (0.00s)
+=== CONT  TestScenarioBuilder_Basic
+--- PASS: TestScenarioBuilder_Basic (0.00s)
+=== CONT  TestExpectationBuilder_Complete
+--- PASS: TestExpectationBuilder_Complete (0.00s)
+=== CONT  TestStepBuilder_Complex
+=== CONT  TestErrorExpectationBuilder
+--- PASS: TestErrorExpectationBuilder (0.00s)
+=== CONT  TestScenarioBuilder_WithSteps
+--- PASS: TestScenarioBuilder_WithSteps (0.00s)
+=== CONT  TestBuildAllKindsScenario_Structure
+--- PASS: TestStepBuilder_Complex (0.00s)
+=== CONT  TestBuildAllKindsScenario_YAMLOutput
+--- PASS: TestBuildAllKindsScenario_Structure (0.00s)
+=== CONT  TestBuildAllKindsScenario
+    scenario_builder_integration_test.go:30: Existing scenario file not found: /Users/lanceettl/zqk-restore-clone/test-scenarios/interactive/all-kinds.yaml
+--- PASS: TestBuildAllKindsScenario_YAMLOutput (0.00s)
+--- SKIP: TestBuildAllKindsScenario (0.00s)
+=== CONT  TestProcessorRegistry
+--- PASS: TestProcessorRegistry (0.00s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/mcp/testing	0.611s

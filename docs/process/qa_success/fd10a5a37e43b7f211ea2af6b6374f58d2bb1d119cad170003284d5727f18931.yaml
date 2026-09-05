@@ -1,0 +1,14 @@
+created_at: "2026-08-19T09:41:02Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1787132460390747000-df6a4a10
+item_id: PRI-GROOM-EVIDENCE-REOPEN-001
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 2857702ca28e4b64fb5782140b43c1400e68fdeab30ab0062f4119523ca97d466e5f13c72adcfa41b92eacf21fa7f0a79b8a8e3a8d7c581e5c9afe0e69cb31dc
+schema_version: 2.0.0
+signature: 304402201c3b30aa9d737892eacd30c87a47ca7652248da76d9a960114b133870911b7960220261499f3dffd08a9625c31d638fc444d0289d9fc0bd766dd41ce46b4b5de128a
+status: archived
+title: QA success QAS-1787132460390747000-df6a4a10
+updated_at: "2026-09-01T07:23:53Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

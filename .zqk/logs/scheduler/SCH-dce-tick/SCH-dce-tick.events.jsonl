@@ -1,0 +1,4 @@
+{"event_type":"started","job_id":"SCH-dce-tick","job_type":"data_cell_envelope_tick","timestamp":"2026-09-05T00:00:03Z"}
+{"duration":"44.303458ms","event_type":"completed","job_id":"SCH-dce-tick","job_type":"data_cell_envelope_tick","timestamp":"2026-09-05T00:00:03Z"}
+{"event_type":"started","job_id":"SCH-dce-tick","job_type":"data_cell_envelope_tick","timestamp":"2026-09-05T06:00:00Z"}
+{"duration":"103.395042ms","event_type":"completed","job_id":"SCH-dce-tick","job_type":"data_cell_envelope_tick","timestamp":"2026-09-05T06:00:00Z"}

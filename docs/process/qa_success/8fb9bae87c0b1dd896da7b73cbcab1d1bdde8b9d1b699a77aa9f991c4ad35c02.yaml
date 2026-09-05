@@ -1,0 +1,14 @@
+created_at: "2026-08-20T01:00:34Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1787187629790566000-acf54f10
+item_id: BLI-CEF-R8-LANE-OBS-001
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 2857702ca28e4b64fb5782140b43c1400e68fdeab30ab0062f4119523ca97d466e5f13c72adcfa41b92eacf21fa7f0a79b8a8e3a8d7c581e5c9afe0e69cb31dc
+schema_version: 2.0.0
+signature: 3045022100f87a87c0af9105bcf54611147cd11f778a3fef192db969a73e27926c4e689d9602201ff751aff6f0e34fc9414e42d0fb4f0e657ecb20d347972f47871cf04ec37971
+status: archived
+title: R8 observability bundle — F-OBS-STRUCTURED-LOG-FIELD-CONSISTENCY-001
+updated_at: "2026-09-01T07:46:53Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

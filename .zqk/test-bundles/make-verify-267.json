@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-267",
+  "created_at": "2026-09-04T21:34:30.043074Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-267",
+    "Tests": [
+      {
+        "Name": "TestMissedTriggerAssessmentParts",
+        "Package": "scheduler",
+        "PackagePath": "cmd/zqk/scheduler",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/scheduler/detect_missed_triggers_helpers_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAggregateEventsFromFile_MissingFile",
+        "Package": "scheduler",
+        "PackagePath": "cmd/zqk/scheduler",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/scheduler/events_aggregate_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAggregateEventsFromFile_EmptyFile",
+        "Package": "scheduler",
+        "PackagePath": "cmd/zqk/scheduler",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/scheduler/events_aggregate_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAggregateEventsFromFile_ValidJSONL",
+        "Package": "scheduler",
+        "PackagePath": "cmd/zqk/scheduler",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/scheduler/events_aggregate_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAggregateEventsFromFile_InvalidLineSkipped",
+        "Package": "scheduler",
+        "PackagePath": "cmd/zqk/scheduler",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/scheduler/events_aggregate_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestFlagDuration_StringAndDuration",
+        "Package": "scheduler",
+        "PackagePath": "cmd/zqk/scheduler",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/scheduler/flag_duration_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestParsePackageList",
+        "Package": "scheduler",
+        "PackagePath": "cmd/zqk/scheduler",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/scheduler/scan_tests_helpers_unit_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestDedupeTests",
+        "Package": "scheduler",
+        "PackagePath": "cmd/zqk/scheduler",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/scheduler/scan_tests_helpers_unit_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestParseEventMetadata",
+        "Package": "scheduler",
+        "PackagePath": "cmd/zqk/scheduler",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/scheduler/scheduler_activity_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestParseSchedulerStatusDaemonPID",
+        "Package": "scheduler",
+        "PackagePath": "cmd/zqk/scheduler",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/scheduler/scheduler_start_integration_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": true,
+    "EstimatedDuration": 300000000000,
+    "PackagePath": "cmd/zqk/scheduler"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestMissedTriggerAssessmentParts",
+      "Package": "scheduler",
+      "PackagePath": "cmd/zqk/scheduler",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/scheduler/detect_missed_triggers_helpers_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestAggregateEventsFromFile_MissingFile",
+      "Package": "scheduler",
+      "PackagePath": "cmd/zqk/scheduler",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/scheduler/events_aggregate_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestAggregateEventsFromFile_EmptyFile",
+      "Package": "scheduler",
+      "PackagePath": "cmd/zqk/scheduler",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/scheduler/events_aggregate_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestAggregateEventsFromFile_ValidJSONL",
+      "Package": "scheduler",
+      "PackagePath": "cmd/zqk/scheduler",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/scheduler/events_aggregate_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestAggregateEventsFromFile_InvalidLineSkipped",
+      "Package": "scheduler",
+      "PackagePath": "cmd/zqk/scheduler",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/scheduler/events_aggregate_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestFlagDuration_StringAndDuration",
+      "Package": "scheduler",
+      "PackagePath": "cmd/zqk/scheduler",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/scheduler/flag_duration_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestParsePackageList",
+      "Package": "scheduler",
+      "PackagePath": "cmd/zqk/scheduler",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/scheduler/scan_tests_helpers_unit_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestDedupeTests",
+      "Package": "scheduler",
+      "PackagePath": "cmd/zqk/scheduler",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/scheduler/scan_tests_helpers_unit_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestParseEventMetadata",
+      "Package": "scheduler",
+      "PackagePath": "cmd/zqk/scheduler",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/scheduler/scheduler_activity_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestParseSchedulerStatusDaemonPID",
+      "Package": "scheduler",
+      "PackagePath": "cmd/zqk/scheduler",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/scheduler/scheduler_start_integration_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

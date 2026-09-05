@@ -1,0 +1,33 @@
+{
+  "name": "make-verify-502",
+  "created_at": "2026-09-04T21:34:32.335138Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-502",
+    "Tests": [
+      {
+        "Name": "TestConvergenceNestVeneer_CliParity",
+        "Package": "convergence_test",
+        "PackagePath": "cmd/zqk/convergence",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/convergence/convergence_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 30000000000,
+    "PackagePath": "cmd/zqk/convergence"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestConvergenceNestVeneer_CliParity",
+      "Package": "convergence_test",
+      "PackagePath": "cmd/zqk/convergence",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/convergence/convergence_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

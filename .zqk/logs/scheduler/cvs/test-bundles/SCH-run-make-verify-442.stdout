@@ -1,0 +1,44 @@
+
+--- run 2026-09-04T22:13:30Z ---
+=== RUN   TestPool_Stop_WithoutStart_ReleasesBudget
+=== PAUSE TestPool_Stop_WithoutStart_ReleasesBudget
+=== RUN   TestPool_Start_Submit_Stop
+=== PAUSE TestPool_Start_Submit_Stop
+=== RUN   TestPool_Submit_BeforeStart_ReturnsCanceled
+=== PAUSE TestPool_Submit_BeforeStart_ReturnsCanceled
+=== RUN   TestPool_Submit_AfterStop_ReturnsCanceled
+=== PAUSE TestPool_Submit_AfterStop_ReturnsCanceled
+=== RUN   TestPool_SubmitNonBlocking_Full
+=== PAUSE TestPool_SubmitNonBlocking_Full
+=== RUN   TestPool_Submit_DeadlineExceededWhenWorkerHeldByLongTask
+=== PAUSE TestPool_Submit_DeadlineExceededWhenWorkerHeldByLongTask
+=== RUN   TestPool_QueuePressureSnapshot
+=== PAUSE TestPool_QueuePressureSnapshot
+=== RUN   TestPool_Stop_ReleasesBudget
+=== PAUSE TestPool_Stop_ReleasesBudget
+=== RUN   TestPool_Start_Idempotent
+=== PAUSE TestPool_Start_Idempotent
+=== RUN   TestPool_NewPool_InvalidWorkerCount_ReturnsFallback
+=== PAUSE TestPool_NewPool_InvalidWorkerCount_ReturnsFallback
+=== CONT  TestPool_Stop_WithoutStart_ReleasesBudget
+=== CONT  TestPool_Start_Idempotent
+--- PASS: TestPool_Stop_WithoutStart_ReleasesBudget (0.00s)
+=== CONT  TestPool_Stop_ReleasesBudget
+--- PASS: TestPool_Stop_ReleasesBudget (0.00s)
+=== CONT  TestPool_Submit_AfterStop_ReturnsCanceled
+--- PASS: TestPool_Submit_AfterStop_ReturnsCanceled (0.00s)
+=== CONT  TestPool_QueuePressureSnapshot
+--- PASS: TestPool_QueuePressureSnapshot (0.00s)
+=== CONT  TestPool_Submit_DeadlineExceededWhenWorkerHeldByLongTask
+--- PASS: TestPool_Start_Idempotent (0.05s)
+=== CONT  TestPool_SubmitNonBlocking_Full
+--- PASS: TestPool_SubmitNonBlocking_Full (0.00s)
+=== CONT  TestPool_Start_Submit_Stop
+--- PASS: TestPool_Start_Submit_Stop (0.05s)
+=== CONT  TestPool_Submit_BeforeStart_ReturnsCanceled
+--- PASS: TestPool_Submit_BeforeStart_ReturnsCanceled (0.00s)
+=== CONT  TestPool_NewPool_InvalidWorkerCount_ReturnsFallback
+--- PASS: TestPool_NewPool_InvalidWorkerCount_ReturnsFallback (0.00s)
+--- PASS: TestPool_Submit_DeadlineExceededWhenWorkerHeldByLongTask (0.15s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/goroutinelabels	0.424s

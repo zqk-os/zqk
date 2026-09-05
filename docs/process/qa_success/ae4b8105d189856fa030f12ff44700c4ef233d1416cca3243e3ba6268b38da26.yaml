@@ -1,0 +1,14 @@
+created_at: "2026-08-18T23:37:03Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1787096222930952000-bc2624c8
+item_id: PRI-CEF-R2-S1-OBS
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 2857702ca28e4b64fb5782140b43c1400e68fdeab30ab0062f4119523ca97d466e5f13c72adcfa41b92eacf21fa7f0a79b8a8e3a8d7c581e5c9afe0e69cb31dc
+schema_version: 2.0.0
+signature: 304402207a9da28ffc2ee04d56d8e19743d683c45003bc14e87d9b643640a85c2d16f05f02200ec93db5bfcaeb7e6e729bbb1cd21f7372c0bb80444cb9903e495510bad6bc0f
+status: archived
+title: CEF R2 S1 — Kill synthetic / false-green OBS
+updated_at: "2026-09-01T07:13:31Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

@@ -1,0 +1,52 @@
+
+--- run 2026-09-04T22:22:41Z ---
+=== RUN   TestTraitRegistry_StripRedundantIncludedTraits
+=== PAUSE TestTraitRegistry_StripRedundantIncludedTraits
+=== RUN   TestGetStatusHistory
+=== PAUSE TestGetStatusHistory
+=== RUN   TestGetStatusHistory_Empty
+=== PAUSE TestGetStatusHistory_Empty
+=== RUN   TestSetStatusHistory
+=== PAUSE TestSetStatusHistory
+=== RUN   TestAddStatusHistoryEntry
+=== PAUSE TestAddStatusHistoryEntry
+=== RUN   TestGetChangeLog
+=== PAUSE TestGetChangeLog
+=== RUN   TestAddChangeLogEntry
+=== PAUSE TestAddChangeLogEntry
+=== RUN   TestExtractIDAndKindFromYAMLPrefix
+=== PAUSE TestExtractIDAndKindFromYAMLPrefix
+=== RUN   TestReadIDAndKindFromYAMLFile
+=== PAUSE TestReadIDAndKindFromYAMLFile
+=== CONT  TestTraitRegistry_StripRedundantIncludedTraits
+=== CONT  TestGetChangeLog
+--- PASS: TestGetChangeLog (0.00s)
+=== CONT  TestSetStatusHistory
+--- PASS: TestSetStatusHistory (0.00s)
+=== CONT  TestAddStatusHistoryEntry
+--- PASS: TestAddStatusHistoryEntry (0.00s)
+=== CONT  TestGetStatusHistory_Empty
+--- PASS: TestGetStatusHistory_Empty (0.00s)
+=== CONT  TestExtractIDAndKindFromYAMLPrefix
+=== RUN   TestExtractIDAndKindFromYAMLPrefix/simple
+=== RUN   TestExtractIDAndKindFromYAMLPrefix/quoted_id
+=== RUN   TestExtractIDAndKindFromYAMLPrefix/single_quote
+=== RUN   TestExtractIDAndKindFromYAMLPrefix/id_only
+=== RUN   TestExtractIDAndKindFromYAMLPrefix/with_comment
+=== RUN   TestExtractIDAndKindFromYAMLPrefix/empty
+--- PASS: TestExtractIDAndKindFromYAMLPrefix (0.00s)
+    --- PASS: TestExtractIDAndKindFromYAMLPrefix/simple (0.00s)
+    --- PASS: TestExtractIDAndKindFromYAMLPrefix/quoted_id (0.00s)
+    --- PASS: TestExtractIDAndKindFromYAMLPrefix/single_quote (0.00s)
+    --- PASS: TestExtractIDAndKindFromYAMLPrefix/id_only (0.00s)
+    --- PASS: TestExtractIDAndKindFromYAMLPrefix/with_comment (0.00s)
+    --- PASS: TestExtractIDAndKindFromYAMLPrefix/empty (0.00s)
+=== CONT  TestReadIDAndKindFromYAMLFile
+--- PASS: TestReadIDAndKindFromYAMLFile (0.03s)
+=== CONT  TestGetStatusHistory
+--- PASS: TestGetStatusHistory (0.00s)
+=== CONT  TestAddChangeLogEntry
+--- PASS: TestAddChangeLogEntry (0.00s)
+--- PASS: TestTraitRegistry_StripRedundantIncludedTraits (0.04s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/objects	0.603s

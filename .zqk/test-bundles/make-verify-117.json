@@ -1,0 +1,51 @@
+{
+  "name": "make-verify-117",
+  "created_at": "2026-09-04T21:34:28.50909Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-117",
+    "Tests": [
+      {
+        "Name": "TestDoc",
+        "Package": "observability_test",
+        "PackagePath": "pkg/observability",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/observability/doc_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestObservabilityInit",
+        "Package": "observability",
+        "PackagePath": "pkg/observability",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/observability/observability_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 60000000000,
+    "PackagePath": "pkg/observability"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestDoc",
+      "Package": "observability_test",
+      "PackagePath": "pkg/observability",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/observability/doc_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestObservabilityInit",
+      "Package": "observability",
+      "PackagePath": "pkg/observability",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/observability/observability_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

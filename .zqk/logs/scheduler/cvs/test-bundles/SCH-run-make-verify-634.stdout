@@ -1,0 +1,20 @@
+
+--- run 2026-09-04T22:18:27Z ---
+=== RUN   TestFormatRFC3339UTC_usesZForUTCInstant
+=== PAUSE TestFormatRFC3339UTC_usesZForUTCInstant
+=== RUN   TestNowRFC3339UTC_parsesAsRFC3339
+=== PAUSE TestNowRFC3339UTC_parsesAsRFC3339
+=== RUN   TestFormatRFC3339UTCPtr
+=== PAUSE TestFormatRFC3339UTCPtr
+=== RUN   TestFormatLayoutUTC
+=== PAUSE TestFormatLayoutUTC
+=== CONT  TestFormatRFC3339UTC_usesZForUTCInstant
+=== CONT  TestFormatRFC3339UTCPtr
+--- PASS: TestFormatRFC3339UTCPtr (0.00s)
+=== CONT  TestNowRFC3339UTC_parsesAsRFC3339
+--- PASS: TestNowRFC3339UTC_parsesAsRFC3339 (0.00s)
+=== CONT  TestFormatLayoutUTC
+--- PASS: TestFormatLayoutUTC (0.00s)
+--- PASS: TestFormatRFC3339UTC_usesZForUTCInstant (0.01s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/zqktime	0.285s

@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-455",
+  "created_at": "2026-09-04T21:34:31.832876Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-455",
+    "Tests": [
+      {
+        "Name": "TestExpectedLocalFlagNamesFromCommandSpec_commonExcluded",
+        "Package": "cli",
+        "PackagePath": "pkg/cli",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/cli/command_spec_expected_local_flags_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestExpectedLocalFlagNamesFromCommandSpec_fieldsHarness",
+        "Package": "cli",
+        "PackagePath": "pkg/cli",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/cli/command_spec_expected_local_flags_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestExpectedLocalFlagNamesFromCommandSpec_queryFlags",
+        "Package": "cli",
+        "PackagePath": "pkg/cli",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/cli/command_spec_expected_local_flags_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestExpectedLocalFlagNamesFromCommandSpec_withListHarness",
+        "Package": "cli",
+        "PackagePath": "pkg/cli",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/cli/command_spec_expected_local_flags_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestCommandTimeouts_generalFallbackIsNotStricterThanTheSpecificRuleItCatches",
+        "Package": "cli",
+        "PackagePath": "pkg/cli",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/cli/command_timeouts_config_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestCommandTimeouts_scanTestsRulesAgreeOnScale",
+        "Package": "cli",
+        "PackagePath": "pkg/cli",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/cli/command_timeouts_config_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestBuildFieldCompletionCandidates_GroupableFilter",
+        "Package": "cli",
+        "PackagePath": "pkg/cli",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/cli/completions_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestFormatFieldSummary_ConstraintsAreSummarized",
+        "Package": "cli",
+        "PackagePath": "pkg/cli",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/cli/completions_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestBuildEnumValueCompletions_FiltersByPrefix",
+        "Package": "cli",
+        "PackagePath": "pkg/cli",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/cli/completions_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestEnforceOverrideFriction",
+        "Package": "cli",
+        "PackagePath": "pkg/cli",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/cli/override_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 300000000000,
+    "PackagePath": "pkg/cli"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestExpectedLocalFlagNamesFromCommandSpec_commonExcluded",
+      "Package": "cli",
+      "PackagePath": "pkg/cli",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/cli/command_spec_expected_local_flags_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestExpectedLocalFlagNamesFromCommandSpec_fieldsHarness",
+      "Package": "cli",
+      "PackagePath": "pkg/cli",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/cli/command_spec_expected_local_flags_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestExpectedLocalFlagNamesFromCommandSpec_queryFlags",
+      "Package": "cli",
+      "PackagePath": "pkg/cli",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/cli/command_spec_expected_local_flags_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestExpectedLocalFlagNamesFromCommandSpec_withListHarness",
+      "Package": "cli",
+      "PackagePath": "pkg/cli",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/cli/command_spec_expected_local_flags_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestCommandTimeouts_generalFallbackIsNotStricterThanTheSpecificRuleItCatches",
+      "Package": "cli",
+      "PackagePath": "pkg/cli",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/cli/command_timeouts_config_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestCommandTimeouts_scanTestsRulesAgreeOnScale",
+      "Package": "cli",
+      "PackagePath": "pkg/cli",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/cli/command_timeouts_config_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestBuildFieldCompletionCandidates_GroupableFilter",
+      "Package": "cli",
+      "PackagePath": "pkg/cli",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/cli/completions_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestFormatFieldSummary_ConstraintsAreSummarized",
+      "Package": "cli",
+      "PackagePath": "pkg/cli",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/cli/completions_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestBuildEnumValueCompletions_FiltersByPrefix",
+      "Package": "cli",
+      "PackagePath": "pkg/cli",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/cli/completions_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestEnforceOverrideFriction",
+      "Package": "cli",
+      "PackagePath": "pkg/cli",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/cli/override_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

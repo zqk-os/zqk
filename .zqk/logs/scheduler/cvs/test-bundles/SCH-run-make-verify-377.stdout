@@ -1,0 +1,24 @@
+
+--- run 2026-09-04T22:11:53Z ---
+=== RUN   TestQueueManager_OnDemandPattern
+=== PAUSE TestQueueManager_OnDemandPattern
+=== RUN   TestQueueManager_CoordinatorIntegration
+=== PAUSE TestQueueManager_CoordinatorIntegration
+=== RUN   TestQueueManager_IdleShutdown
+=== PAUSE TestQueueManager_IdleShutdown
+=== RUN   TestQueueManager_NoCallback
+=== PAUSE TestQueueManager_NoCallback
+=== RUN   TestQueueManager_ConcurrentQueueCreation
+=== PAUSE TestQueueManager_ConcurrentQueueCreation
+=== CONT  TestQueueManager_OnDemandPattern
+=== CONT  TestQueueManager_NoCallback
+--- PASS: TestQueueManager_OnDemandPattern (0.01s)
+=== CONT  TestQueueManager_ConcurrentQueueCreation
+--- PASS: TestQueueManager_NoCallback (0.01s)
+=== CONT  TestQueueManager_IdleShutdown
+--- PASS: TestQueueManager_IdleShutdown (0.04s)
+=== CONT  TestQueueManager_CoordinatorIntegration
+--- PASS: TestQueueManager_CoordinatorIntegration (0.02s)
+--- PASS: TestQueueManager_ConcurrentQueueCreation (0.12s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/storage/id_generation	0.477s

@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-461",
+  "created_at": "2026-09-04T21:34:31.905084Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-461",
+    "Tests": [
+      {
+        "Name": "TestCommandExecutionTracker",
+        "Package": "cli",
+        "PackagePath": "pkg/cli",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/cli/command_tracker_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestCommandExecutionTracker_Context",
+        "Package": "cli",
+        "PackagePath": "pkg/cli",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/cli/command_tracker_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestCommandExecutionTracker_Concurrent",
+        "Package": "cli",
+        "PackagePath": "pkg/cli",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/cli/command_tracker_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestCommandExecutionTracker_Timing",
+        "Package": "cli",
+        "PackagePath": "pkg/cli",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/cli/command_tracker_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestValidateCommandTraits",
+        "Package": "cli",
+        "PackagePath": "pkg/cli",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/cli/command_trait_validation_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestValidateCommandTraitsWithFlags",
+        "Package": "cli",
+        "PackagePath": "pkg/cli",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/cli/command_trait_validation_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestGetCommandTraitRequirements",
+        "Package": "cli",
+        "PackagePath": "pkg/cli",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/cli/command_trait_validation_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestTraitRegistryIntegration",
+        "Package": "cli",
+        "PackagePath": "pkg/cli",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/cli/command_trait_validation_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAddFieldsFlags_WithListKinds",
+        "Package": "cli",
+        "PackagePath": "pkg/cli",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/cli/fields_flags_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAddFieldsFlags_WithoutListKinds",
+        "Package": "cli",
+        "PackagePath": "pkg/cli",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/cli/fields_flags_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": true,
+    "EstimatedDuration": 300000000000,
+    "PackagePath": "pkg/cli"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestCommandExecutionTracker",
+      "Package": "cli",
+      "PackagePath": "pkg/cli",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/cli/command_tracker_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestCommandExecutionTracker_Context",
+      "Package": "cli",
+      "PackagePath": "pkg/cli",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/cli/command_tracker_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestCommandExecutionTracker_Concurrent",
+      "Package": "cli",
+      "PackagePath": "pkg/cli",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/cli/command_tracker_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestCommandExecutionTracker_Timing",
+      "Package": "cli",
+      "PackagePath": "pkg/cli",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/cli/command_tracker_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestValidateCommandTraits",
+      "Package": "cli",
+      "PackagePath": "pkg/cli",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/cli/command_trait_validation_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestValidateCommandTraitsWithFlags",
+      "Package": "cli",
+      "PackagePath": "pkg/cli",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/cli/command_trait_validation_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestGetCommandTraitRequirements",
+      "Package": "cli",
+      "PackagePath": "pkg/cli",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/cli/command_trait_validation_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestTraitRegistryIntegration",
+      "Package": "cli",
+      "PackagePath": "pkg/cli",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/cli/command_trait_validation_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestAddFieldsFlags_WithListKinds",
+      "Package": "cli",
+      "PackagePath": "pkg/cli",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/cli/fields_flags_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestAddFieldsFlags_WithoutListKinds",
+      "Package": "cli",
+      "PackagePath": "pkg/cli",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/cli/fields_flags_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

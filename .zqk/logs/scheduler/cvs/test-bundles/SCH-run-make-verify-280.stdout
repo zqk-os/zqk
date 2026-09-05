@@ -1,0 +1,44 @@
+
+--- run 2026-09-04T21:59:59Z ---
+=== RUN   TestEffectiveAgentChatChannelEventsJSONLPath_overrideRelative
+=== PAUSE TestEffectiveAgentChatChannelEventsJSONLPath_overrideRelative
+=== RUN   TestEffectiveAgentChatChannelEventsJSONLPath_default
+=== PAUSE TestEffectiveAgentChatChannelEventsJSONLPath_default
+=== RUN   TestReadAgentChatChannelConfig_missingFile_defaults
+=== PAUSE TestReadAgentChatChannelConfig_missingFile_defaults
+=== RUN   TestEnsureAgentChatChannelEventsDir
+=== PAUSE TestEnsureAgentChatChannelEventsDir
+=== RUN   TestNewCellHandle_validation
+=== PAUSE TestNewCellHandle_validation
+=== RUN   TestCellHandle_EnqueueMaintenance_stewardCoordinatorPersistsJSONL
+=== PAUSE TestCellHandle_EnqueueMaintenance_stewardCoordinatorPersistsJSONL
+=== RUN   TestCellHandle_MembraneReadPaths_streamUsesCoordinator
+=== PAUSE TestCellHandle_MembraneReadPaths_streamUsesCoordinator
+=== RUN   TestMembraneReadPathsForProfile_lightFile
+=== PAUSE TestMembraneReadPathsForProfile_lightFile
+=== RUN   TestReadAgentChatChannelConfig_validFile
+=== PAUSE TestReadAgentChatChannelConfig_validFile
+=== RUN   TestReadAgentChatChannelConfig_deliveryMode
+=== PAUSE TestReadAgentChatChannelConfig_deliveryMode
+=== CONT  TestEffectiveAgentChatChannelEventsJSONLPath_overrideRelative
+=== CONT  TestCellHandle_EnqueueMaintenance_stewardCoordinatorPersistsJSONL
+--- PASS: TestEffectiveAgentChatChannelEventsJSONLPath_overrideRelative (0.00s)
+=== CONT  TestReadAgentChatChannelConfig_validFile
+--- PASS: TestReadAgentChatChannelConfig_validFile (0.06s)
+=== CONT  TestReadAgentChatChannelConfig_deliveryMode
+--- PASS: TestCellHandle_EnqueueMaintenance_stewardCoordinatorPersistsJSONL (0.06s)
+=== CONT  TestEnsureAgentChatChannelEventsDir
+--- PASS: TestEnsureAgentChatChannelEventsDir (0.00s)
+=== CONT  TestNewCellHandle_validation
+--- PASS: TestNewCellHandle_validation (0.00s)
+=== CONT  TestMembraneReadPathsForProfile_lightFile
+--- PASS: TestMembraneReadPathsForProfile_lightFile (0.00s)
+=== CONT  TestCellHandle_MembraneReadPaths_streamUsesCoordinator
+--- PASS: TestCellHandle_MembraneReadPaths_streamUsesCoordinator (0.00s)
+=== CONT  TestReadAgentChatChannelConfig_missingFile_defaults
+--- PASS: TestReadAgentChatChannelConfig_deliveryMode (0.01s)
+=== CONT  TestEffectiveAgentChatChannelEventsJSONLPath_default
+--- PASS: TestReadAgentChatChannelConfig_missingFile_defaults (0.00s)
+--- PASS: TestEffectiveAgentChatChannelEventsJSONLPath_default (0.00s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/datacell	2.690s

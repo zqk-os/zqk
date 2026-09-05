@@ -1,0 +1,51 @@
+{
+  "name": "make-verify-411",
+  "created_at": "2026-09-04T21:34:31.393992Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-411",
+    "Tests": [
+      {
+        "Name": "TestGenerateSpecBuilder",
+        "Package": "specorigination",
+        "PackagePath": "pkg/specorigination",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/specorigination/trigger_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAuthoredFieldValidationSpecScopesInheritedFields",
+        "Package": "specorigination",
+        "PackagePath": "pkg/specorigination",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/specorigination/validate_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 60000000000,
+    "PackagePath": "pkg/specorigination"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestGenerateSpecBuilder",
+      "Package": "specorigination",
+      "PackagePath": "pkg/specorigination",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/specorigination/trigger_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestAuthoredFieldValidationSpecScopesInheritedFields",
+      "Package": "specorigination",
+      "PackagePath": "pkg/specorigination",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/specorigination/validate_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

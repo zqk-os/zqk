@@ -1,0 +1,45 @@
+acceptance_considerations: Acceptance recorded as linked criteria; no narrative captured at migration time.
+actual_effort: 4h
+commit_refs:
+    - 601dd6190d
+    - 8540a905d8
+created_at: "2026-08-05T05:45:37Z"
+created_by: ACC-1785920548450214012-68b850c0
+criteria_refs:
+    - CRIT-1785939736829238000-29c73ada
+    - CRIT-1785939737746538000-228af600
+    - CRIT-1785939738606402000-126dd9ea
+    - CRIT-1786697484446037000-bd7ca92e
+description: |
+    IA-led pass over registered kinds: document purpose; mark one-off/mystery kinds as archive-candidate or deprecate; mark unused-but-should-use kinds with adoption owners; align help/docs so nothing is a mystery. Output inventory artifact (kernel objects or documented matrix) linked to this BLI. Not a mass delete without lineage.
+estimated_effort: 4h
+goal_refs:
+    - GOAL-1785885763755750000-6efcb274
+id: BLI-1785908737683715000-dd37d570
+kind: backlog_item
+milestone_refs:
+    - MIL-1785886016336815000-ad6784be
+namespace_id: zqk:kernel
+owner_ref: ACC-1785920548450214012-68b850c0
+percent_complete: 100
+persona_refs:
+    - PER-1781486416823404000-bce2c1ce
+    - PER-1781729127486291000-fc620920
+    - PER-1781486429759398000-a79939a1
+priority: high
+priority_plan_ref: PRI-GROOM-KERNEL-RELIABILITY-RESIDUAL-001
+priority_tier: P1
+problem_statement: 'IA-led pass over registered kinds: document purpose; mark one-off/mystery kinds as archive-candidate or deprecate; mark unused-but-should-use kinds with adoption owners; align help/docs so nothing is a mystery. Output inventory artifact (kernel objects or documented matrix) linked to this BLI. Not a mass delete without lineage.'
+related_object_refs:
+    - REQ-1785908734512726000-0db5c98e
+    - CRIT-1785908735462279000-6d37037a
+    - BLI-1785903708509306000-a6d8dc5b
+    - DOC-1785943693778332000-9931e6e4
+requirement_refs:
+    - REQ-1785908734512726000-0db5c98e
+schema_version: 2.0.0
+status: archived
+title: 'MMORCH before-launch P1: Kind ontology triage — active vs adopt vs archive-candidate'
+updated_at: "2026-08-19T04:53:17Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

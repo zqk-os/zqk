@@ -1,0 +1,32 @@
+
+--- run 2026-09-04T21:41:49Z ---
+=== RUN   TestOrganizationalSync_Integration
+=== PAUSE TestOrganizationalSync_Integration
+=== RUN   TestOrganizationalAnalyzeImpact_Integration
+=== PAUSE TestOrganizationalAnalyzeImpact_Integration
+=== RUN   TestOrganizationalRecordChange_Integration
+=== PAUSE TestOrganizationalRecordChange_Integration
+=== RUN   TestOrgSyncAllowedKinds
+=== PAUSE TestOrgSyncAllowedKinds
+=== RUN   TestUnmarshalOrgSync_validYAML
+=== PAUSE TestUnmarshalOrgSync_validYAML
+=== RUN   TestMarshalOrgSync_roundTrip
+=== PAUSE TestMarshalOrgSync_roundTrip
+=== RUN   TestAllowedKindsList_nonEmpty
+=== PAUSE TestAllowedKindsList_nonEmpty
+=== CONT  TestOrganizationalSync_Integration
+=== CONT  TestUnmarshalOrgSync_validYAML
+--- PASS: TestUnmarshalOrgSync_validYAML (0.00s)
+=== CONT  TestAllowedKindsList_nonEmpty
+--- PASS: TestAllowedKindsList_nonEmpty (0.00s)
+=== CONT  TestMarshalOrgSync_roundTrip
+--- PASS: TestMarshalOrgSync_roundTrip (0.00s)
+=== CONT  TestOrganizationalRecordChange_Integration
+--- PASS: TestOrganizationalRecordChange_Integration (1.36s)
+=== CONT  TestOrgSyncAllowedKinds
+--- PASS: TestOrgSyncAllowedKinds (0.00s)
+=== CONT  TestOrganizationalAnalyzeImpact_Integration
+--- PASS: TestOrganizationalSync_Integration (1.39s)
+--- PASS: TestOrganizationalAnalyzeImpact_Integration (1.12s)
+PASS
+ok  	github.com/lanceman/zqk/cmd/zqk/organizational	3.205s

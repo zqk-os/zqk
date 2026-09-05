@@ -1,0 +1,18 @@
+Display an evolution_management object. If id is provided, show that object; otherwise list
+evolution_management and show the first.
+
+Respects field-level read permissions (BLI-642). Output format via --format.
+
+
+  Show first evolution management
+  zqk object evoman show
+  Show by ID
+  zqk object evoman show EVOL-001
+  Show in JSON format
+  zqk object evoman show --format json
+
+Usage:
+  zqk object evoman show [id] [flags]
+
+Global Flags:
+      --allow-degraded   Allow scheduler-dependent commands to run when scheduler daemon is not running

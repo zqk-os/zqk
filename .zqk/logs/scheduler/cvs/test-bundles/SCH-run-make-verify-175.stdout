@@ -1,0 +1,50 @@
+
+--- run 2026-09-04T21:41:31Z ---
+=== RUN   TestBuildPermissionCache_PrivilegeTagPerms
+=== PAUSE TestBuildPermissionCache_PrivilegeTagPerms
+=== RUN   TestBuildPermissionCache_InactiveUser
+=== PAUSE TestBuildPermissionCache_InactiveUser
+=== RUN   TestRefreshUserPermissions
+=== PAUSE TestRefreshUserPermissions
+=== RUN   TestClearCache
+=== PAUSE TestClearCache
+=== RUN   TestPermissionCache_LifetimeCounters
+=== PAUSE TestPermissionCache_LifetimeCounters
+=== RUN   TestQuerySecurity_FilterRestrictedFields
+=== PAUSE TestQuerySecurity_FilterRestrictedFields
+=== RUN   TestQuerySecurity_GroupByRestrictedFields
+=== PAUSE TestQuerySecurity_GroupByRestrictedFields
+=== RUN   TestQuerySecurity_SortByRestrictedFields
+=== PAUSE TestQuerySecurity_SortByRestrictedFields
+=== RUN   TestQuerySecurity_ValidateFilterFields
+=== PAUSE TestQuerySecurity_ValidateFilterFields
+=== RUN   TestQuerySecurity_ValidateGroupByField
+=== PAUSE TestQuerySecurity_ValidateGroupByField
+=== CONT  TestBuildPermissionCache_PrivilegeTagPerms
+=== RUN   TestBuildPermissionCache_PrivilegeTagPerms/wildcard_access
+=== CONT  TestQuerySecurity_FilterRestrictedFields
+=== RUN   TestBuildPermissionCache_PrivilegeTagPerms/specific_access_tags
+=== RUN   TestBuildPermissionCache_PrivilegeTagPerms/no_access_permissions
+--- PASS: TestBuildPermissionCache_PrivilegeTagPerms (0.00s)
+    --- PASS: TestBuildPermissionCache_PrivilegeTagPerms/wildcard_access (0.00s)
+    --- PASS: TestBuildPermissionCache_PrivilegeTagPerms/specific_access_tags (0.00s)
+    --- PASS: TestBuildPermissionCache_PrivilegeTagPerms/no_access_permissions (0.00s)
+=== CONT  TestClearCache
+--- PASS: TestClearCache (0.00s)
+=== CONT  TestPermissionCache_LifetimeCounters
+--- PASS: TestPermissionCache_LifetimeCounters (0.00s)
+=== CONT  TestQuerySecurity_ValidateFilterFields
+--- PASS: TestQuerySecurity_ValidateFilterFields (0.00s)
+=== CONT  TestQuerySecurity_ValidateGroupByField
+--- PASS: TestQuerySecurity_ValidateGroupByField (0.00s)
+=== CONT  TestQuerySecurity_SortByRestrictedFields
+--- PASS: TestQuerySecurity_FilterRestrictedFields (0.00s)
+=== CONT  TestBuildPermissionCache_InactiveUser
+--- PASS: TestBuildPermissionCache_InactiveUser (0.00s)
+=== CONT  TestQuerySecurity_GroupByRestrictedFields
+--- PASS: TestQuerySecurity_SortByRestrictedFields (0.00s)
+=== CONT  TestRefreshUserPermissions
+--- PASS: TestQuerySecurity_GroupByRestrictedFields (0.00s)
+--- PASS: TestRefreshUserPermissions (0.00s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/mcp	0.728s

@@ -1,0 +1,62 @@
+
+--- run 2026-09-04T22:17:07Z ---
+=== RUN   TestLogEventChangeJournalAggregation_constantsDerivedFromJobType
+=== PAUSE TestLogEventChangeJournalAggregation_constantsDerivedFromJobType
+=== RUN   TestLogEventAggregationMetricsCleanup_constantsDerivedFromJobType
+=== PAUSE TestLogEventAggregationMetricsCleanup_constantsDerivedFromJobType
+=== RUN   TestLogEventGenericMetricsCleanup_constantsDerivedFromJobType
+=== PAUSE TestLogEventGenericMetricsCleanup_constantsDerivedFromJobType
+=== RUN   TestValidationJobIDWouldExceedMaxLength
+=== PAUSE TestValidationJobIDWouldExceedMaxLength
+=== RUN   TestTestIOHandler_Execute
+=== PAUSE TestTestIOHandler_Execute
+=== RUN   TestTestIOHandler_Execute_WithCustomMessages
+=== PAUSE TestTestIOHandler_Execute_WithCustomMessages
+=== RUN   TestTestIOHandler_Execute_NoAsyncRouter
+=== PAUSE TestTestIOHandler_Execute_NoAsyncRouter
+=== RUN   TestTestIOHandler_LogLevels
+=== PAUSE TestTestIOHandler_LogLevels
+=== RUN   TestActionForExpiredTimer_checkinNeverKills
+=== PAUSE TestActionForExpiredTimer_checkinNeverKills
+=== RUN   TestActionForExpiredTimer_routing
+=== PAUSE TestActionForExpiredTimer_routing
+=== CONT  TestLogEventChangeJournalAggregation_constantsDerivedFromJobType
+--- PASS: TestLogEventChangeJournalAggregation_constantsDerivedFromJobType (0.00s)
+=== CONT  TestTestIOHandler_Execute
+=== CONT  TestTestIOHandler_Execute_WithCustomMessages
+--- PASS: TestTestIOHandler_Execute (0.86s)
+=== CONT  TestLogEventGenericMetricsCleanup_constantsDerivedFromJobType
+--- PASS: TestLogEventGenericMetricsCleanup_constantsDerivedFromJobType (0.00s)
+=== CONT  TestValidationJobIDWouldExceedMaxLength
+--- PASS: TestValidationJobIDWouldExceedMaxLength (0.00s)
+=== CONT  TestLogEventAggregationMetricsCleanup_constantsDerivedFromJobType
+--- PASS: TestLogEventAggregationMetricsCleanup_constantsDerivedFromJobType (0.00s)
+=== CONT  TestActionForExpiredTimer_checkinNeverKills
+--- PASS: TestActionForExpiredTimer_checkinNeverKills (0.00s)
+=== CONT  TestActionForExpiredTimer_routing
+=== RUN   TestActionForExpiredTimer_routing/deadline
+=== PAUSE TestActionForExpiredTimer_routing/deadline
+=== RUN   TestActionForExpiredTimer_routing/sync_loop
+=== PAUSE TestActionForExpiredTimer_routing/sync_loop
+=== RUN   TestActionForExpiredTimer_routing/unknown
+=== PAUSE TestActionForExpiredTimer_routing/unknown
+=== CONT  TestTestIOHandler_LogLevels
+--- PASS: TestTestIOHandler_Execute_WithCustomMessages (0.87s)
+=== CONT  TestTestIOHandler_Execute_NoAsyncRouter
+=== RUN   TestTestIOHandler_LogLevels/default
+--- PASS: TestTestIOHandler_Execute_NoAsyncRouter (0.27s)
+=== CONT  TestActionForExpiredTimer_routing/deadline
+=== CONT  TestActionForExpiredTimer_routing/unknown
+=== CONT  TestActionForExpiredTimer_routing/sync_loop
+--- PASS: TestActionForExpiredTimer_routing (0.00s)
+    --- PASS: TestActionForExpiredTimer_routing/deadline (0.00s)
+    --- PASS: TestActionForExpiredTimer_routing/unknown (0.00s)
+    --- PASS: TestActionForExpiredTimer_routing/sync_loop (0.00s)
+=== RUN   TestTestIOHandler_LogLevels/verbose
+=== RUN   TestTestIOHandler_LogLevels/debug
+--- PASS: TestTestIOHandler_LogLevels (1.41s)
+    --- PASS: TestTestIOHandler_LogLevels/default (0.36s)
+    --- PASS: TestTestIOHandler_LogLevels/verbose (0.36s)
+    --- PASS: TestTestIOHandler_LogLevels/debug (0.37s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/scheduler	3.035s

@@ -1,0 +1,16 @@
+
+--- run 2026-09-04T22:22:23Z ---
+=== RUN   TestLocalNameFromSubject
+=== PAUSE TestLocalNameFromSubject
+=== RUN   TestParseTurtleClasses_Empty
+=== PAUSE TestParseTurtleClasses_Empty
+=== RUN   TestParseTurtleClasses_NoClass
+=== PAUSE TestParseTurtleClasses_NoClass
+=== CONT  TestLocalNameFromSubject
+--- PASS: TestLocalNameFromSubject (0.00s)
+=== CONT  TestParseTurtleClasses_Empty
+--- PASS: TestParseTurtleClasses_Empty (0.00s)
+=== CONT  TestParseTurtleClasses_NoClass
+--- PASS: TestParseTurtleClasses_NoClass (0.00s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/translation	0.220s

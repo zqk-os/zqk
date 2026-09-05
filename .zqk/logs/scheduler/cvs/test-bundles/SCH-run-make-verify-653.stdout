@@ -1,0 +1,44 @@
+
+--- run 2026-09-04T22:18:42Z ---
+=== RUN   TestCorrespondenceHasOrchestratePlan
+=== PAUSE TestCorrespondenceHasOrchestratePlan
+=== RUN   TestFirstPersonaRef
+=== PAUSE TestFirstPersonaRef
+=== RUN   TestCoordinatorSeatID_dutyThenMCP
+=== PAUSE TestCoordinatorSeatID_dutyThenMCP
+=== RUN   TestCoordinatorSeatID_emptyWithoutSeating
+=== PAUSE TestCoordinatorSeatID_emptyWithoutSeating
+=== RUN   TestWorkerSeatID_dutyThenAgentAPI
+=== PAUSE TestWorkerSeatID_dutyThenAgentAPI
+=== RUN   TestSeatPersonaRef
+=== PAUSE TestSeatPersonaRef
+=== RUN   TestParseCommsCheckChallenge
+=== PAUSE TestParseCommsCheckChallenge
+=== RUN   TestSeatWorkerAlive_failClosedWhenMissing
+=== PAUSE TestSeatWorkerAlive_failClosedWhenMissing
+=== RUN   TestSeatEventAttemptLedger
+=== PAUSE TestSeatEventAttemptLedger
+=== RUN   TestSeatAttemptKey_prefersEventOverATK
+=== PAUSE TestSeatAttemptKey_prefersEventOverATK
+=== CONT  TestCorrespondenceHasOrchestratePlan
+--- PASS: TestCorrespondenceHasOrchestratePlan (0.00s)
+=== CONT  TestSeatAttemptKey_prefersEventOverATK
+--- PASS: TestSeatAttemptKey_prefersEventOverATK (0.00s)
+=== CONT  TestSeatEventAttemptLedger
+=== CONT  TestWorkerSeatID_dutyThenAgentAPI
+=== CONT  TestParseCommsCheckChallenge
+--- PASS: TestWorkerSeatID_dutyThenAgentAPI (0.02s)
+--- PASS: TestParseCommsCheckChallenge (0.00s)
+=== CONT  TestSeatWorkerAlive_failClosedWhenMissing
+--- PASS: TestSeatWorkerAlive_failClosedWhenMissing (0.00s)
+=== CONT  TestSeatPersonaRef
+--- PASS: TestSeatPersonaRef (0.02s)
+=== CONT  TestCoordinatorSeatID_dutyThenMCP
+--- PASS: TestSeatEventAttemptLedger (0.05s)
+=== CONT  TestCoordinatorSeatID_emptyWithoutSeating
+--- PASS: TestCoordinatorSeatID_emptyWithoutSeating (0.02s)
+=== CONT  TestFirstPersonaRef
+--- PASS: TestFirstPersonaRef (0.00s)
+--- PASS: TestCoordinatorSeatID_dutyThenMCP (0.03s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/agentfeed	0.349s

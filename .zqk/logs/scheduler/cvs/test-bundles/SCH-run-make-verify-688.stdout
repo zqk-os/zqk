@@ -1,0 +1,56 @@
+
+--- run 2026-09-04T22:19:05Z ---
+=== RUN   TestNormalizeAutoFixBatchIssues_GroupedObjects
+=== PAUSE TestNormalizeAutoFixBatchIssues_GroupedObjects
+=== RUN   TestNewAutoFixBatchProcessor_SharedProvider_StoredOnStruct
+=== PAUSE TestNewAutoFixBatchProcessor_SharedProvider_StoredOnStruct
+=== RUN   TestAutoFixBatchProcessor_ProcessBatch_NilProvider_FailsGracefully
+=== PAUSE TestAutoFixBatchProcessor_ProcessBatch_NilProvider_FailsGracefully
+=== RUN   TestRunAutoFixIssuesViaPipeline_NilCtx
+=== PAUSE TestRunAutoFixIssuesViaPipeline_NilCtx
+=== RUN   TestRunAutoFixIssuesViaPipeline_NilCmd
+=== PAUSE TestRunAutoFixIssuesViaPipeline_NilCmd
+=== RUN   TestRunAutoFixIssuesViaPipeline_NilObj
+=== PAUSE TestRunAutoFixIssuesViaPipeline_NilObj
+=== RUN   TestSortIssuesByDependency
+=== PAUSE TestSortIssuesByDependency
+=== RUN   TestAutoFixSchedulerBatcher_CreateBatches_GroupsByObject
+=== PAUSE TestAutoFixSchedulerBatcher_CreateBatches_GroupsByObject
+=== RUN   TestRemoveUnsubmittedAutoFixBatchFile
+=== PAUSE TestRemoveUnsubmittedAutoFixBatchFile
+=== RUN   TestIssueStillAppliesToObject_InvalidLifecycle
+=== PAUSE TestIssueStillAppliesToObject_InvalidLifecycle
+=== CONT  TestNormalizeAutoFixBatchIssues_GroupedObjects
+=== CONT  TestRunAutoFixIssuesViaPipeline_NilObj
+--- PASS: TestNormalizeAutoFixBatchIssues_GroupedObjects (0.00s)
+=== CONT  TestRunAutoFixIssuesViaPipeline_NilCmd
+--- PASS: TestRunAutoFixIssuesViaPipeline_NilObj (0.00s)
+=== CONT  TestRunAutoFixIssuesViaPipeline_NilCtx
+--- PASS: TestRunAutoFixIssuesViaPipeline_NilCtx (0.00s)
+=== CONT  TestAutoFixBatchProcessor_ProcessBatch_NilProvider_FailsGracefully
+=== CONT  TestNewAutoFixBatchProcessor_SharedProvider_StoredOnStruct
+=== CONT  TestRemoveUnsubmittedAutoFixBatchFile
+=== RUN   TestRemoveUnsubmittedAutoFixBatchFile/removes_orphan_when_submission_did_not_persist
+--- PASS: TestRunAutoFixIssuesViaPipeline_NilCmd (0.00s)
+--- PASS: TestNewAutoFixBatchProcessor_SharedProvider_StoredOnStruct (0.00s)
+--- PASS: TestAutoFixBatchProcessor_ProcessBatch_NilProvider_FailsGracefully (0.00s)
+=== CONT  TestIssueStillAppliesToObject_InvalidLifecycle
+--- PASS: TestIssueStillAppliesToObject_InvalidLifecycle (0.00s)
+=== CONT  TestSortIssuesByDependency
+=== RUN   TestSortIssuesByDependency/goal_refs_before_milestone_refs_before_backlog_item_refs
+=== RUN   TestSortIssuesByDependency/priority_plan_ref_before_milestone_refs
+=== RUN   TestSortIssuesByDependency/same_dependency_level:_sort_by_Tier
+=== RUN   TestSortIssuesByDependency/unknown_fields_maintain_relative_order
+--- PASS: TestSortIssuesByDependency (0.00s)
+    --- PASS: TestSortIssuesByDependency/goal_refs_before_milestone_refs_before_backlog_item_refs (0.00s)
+    --- PASS: TestSortIssuesByDependency/priority_plan_ref_before_milestone_refs (0.00s)
+    --- PASS: TestSortIssuesByDependency/same_dependency_level:_sort_by_Tier (0.00s)
+    --- PASS: TestSortIssuesByDependency/unknown_fields_maintain_relative_order (0.00s)
+=== CONT  TestAutoFixSchedulerBatcher_CreateBatches_GroupsByObject
+--- PASS: TestAutoFixSchedulerBatcher_CreateBatches_GroupsByObject (0.00s)
+=== RUN   TestRemoveUnsubmittedAutoFixBatchFile/retains_batch_after_scheduler_persistence
+--- PASS: TestRemoveUnsubmittedAutoFixBatchFile (0.02s)
+    --- PASS: TestRemoveUnsubmittedAutoFixBatchFile/removes_orphan_when_submission_did_not_persist (0.01s)
+    --- PASS: TestRemoveUnsubmittedAutoFixBatchFile/retains_batch_after_scheduler_persistence (0.02s)
+PASS
+ok  	github.com/lanceman/zqk/cmd/zqk/system	0.843s

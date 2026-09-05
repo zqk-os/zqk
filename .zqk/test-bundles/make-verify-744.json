@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-744",
+  "created_at": "2026-09-04T21:34:34.725485Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-744",
+    "Tests": [
+      {
+        "Name": "TestEnqueueMintPromoteJob_requiresArgs",
+        "Package": "newcmd",
+        "PackagePath": "cmd/zqk/new",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/new/mint_promote_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestNewObject_mintRequiresTitle",
+        "Package": "newcmd",
+        "PackagePath": "cmd/zqk/new",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/new/new_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestNewObject_unknown_kind_errors",
+        "Package": "newcmd",
+        "PackagePath": "cmd/zqk/new",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/new/new_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestNewObject_commandSpecRejectsCASAuthoring",
+        "Package": "newcmd",
+        "PackagePath": "cmd/zqk/new",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/new/new_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestNewInternal_subcommandRemoved",
+        "Package": "newcmd",
+        "PackagePath": "cmd/zqk/new",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/new/new_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestNewRootHelp_prefersObjectInternal",
+        "Package": "newcmd",
+        "PackagePath": "cmd/zqk/new",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/new/new_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestNewBundle_stdout_contains_scenario_bundle",
+        "Package": "newcmd",
+        "PackagePath": "cmd/zqk/new",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/new/new_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestNewBundle_stdout_matches_NEW_COMMAND_contract",
+        "Package": "newcmd",
+        "PackagePath": "cmd/zqk/new",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/new/new_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestNewBundle_defaultOutput_createsDraftAndLastDraftPointer",
+        "Package": "newcmd",
+        "PackagePath": "cmd/zqk/new",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/new/new_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestNewObjectSpecKind_stdout_contains_inheritance_and_storage_profile",
+        "Package": "newcmd",
+        "PackagePath": "cmd/zqk/new",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/new/new_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 300000000000,
+    "PackagePath": "cmd/zqk/new"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestEnqueueMintPromoteJob_requiresArgs",
+      "Package": "newcmd",
+      "PackagePath": "cmd/zqk/new",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/new/mint_promote_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestNewObject_mintRequiresTitle",
+      "Package": "newcmd",
+      "PackagePath": "cmd/zqk/new",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/new/new_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestNewObject_unknown_kind_errors",
+      "Package": "newcmd",
+      "PackagePath": "cmd/zqk/new",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/new/new_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestNewObject_commandSpecRejectsCASAuthoring",
+      "Package": "newcmd",
+      "PackagePath": "cmd/zqk/new",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/new/new_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestNewInternal_subcommandRemoved",
+      "Package": "newcmd",
+      "PackagePath": "cmd/zqk/new",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/new/new_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestNewRootHelp_prefersObjectInternal",
+      "Package": "newcmd",
+      "PackagePath": "cmd/zqk/new",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/new/new_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestNewBundle_stdout_contains_scenario_bundle",
+      "Package": "newcmd",
+      "PackagePath": "cmd/zqk/new",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/new/new_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestNewBundle_stdout_matches_NEW_COMMAND_contract",
+      "Package": "newcmd",
+      "PackagePath": "cmd/zqk/new",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/new/new_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestNewBundle_defaultOutput_createsDraftAndLastDraftPointer",
+      "Package": "newcmd",
+      "PackagePath": "cmd/zqk/new",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/new/new_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestNewObjectSpecKind_stdout_contains_inheritance_and_storage_profile",
+      "Package": "newcmd",
+      "PackagePath": "cmd/zqk/new",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/new/new_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

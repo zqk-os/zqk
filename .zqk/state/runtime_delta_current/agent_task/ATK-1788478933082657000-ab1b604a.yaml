@@ -1,0 +1,26 @@
+assignee_persona_ref: PER-ORCH-ALPHA
+backlog_item_ref: BLI-CEF-R27-DUAL-SEAT-REMEASURE-001
+branch_ref: integration/pri-cef-r27-envelope-001
+created_at: "2026-09-03T23:42:13Z"
+created_by: ACC-1785920548450214006-2e52b3e7
+description: |-
+    SOLO CEF Wave 2 for AGENT_AC (antigravity-1).
+    HARD REQUIREMENT: This is a Codebase Evaluation Framework (CEF) v0.1.0 wave ATK, not a checklist.
+    Follow docs/quality/cef-runs/2026-09-03-KICKOFF-AGENT_AC.md + CONSTITUTION/DIAMOND_SCALE/OPERATOR/WAVE_PLAN/DIAGRAM_CONTRACT/HANDOFF_SCHEMA + per-lens rubrics/prompts (specialist THEN adversarial).
+    output_home=docs/quality/cef-runs/2026-09-03-AGENT_AC freeze SHA=c5f525fcc4163142e7978da9dd80e2fb09759718.
+    REQUIRED package pieces as they apply to this wave must land under output_home only. Findings must validate against schemas/finding.schema.json; scorecard only at Wave 4 against schemas/scorecard.schema.json.
+    Score ONLY diamond axes RDB MNT TST REL OBS RCV SEC ROB — never invent axes, never GPA, never docs/reports/dual-seat.
+    Do NOT mint process/backlog objects. Do NOT modify application source. Do NOT read AGENT_AD package until Wave 4 complete.
+    Evidence E0-E3; accepted findings E3 (or E2 with waive in run_log.md). Append commands/skips/waives to run_log.md every wave.
+    Lenses (specialist THEN adversarial): L-RELIABILITY, L-OBSERVABILITY, L-CONCURRENCY, L-PERFORMANCE.
+    REQUIRED: findings + adversarial JSONL per lens; fail-path sequences for top REL/concurrency hotspots; false-green OBS flagged; run_log.md updated.
+id: ATK-1788478933082657000-ab1b604a
+kind: agent_task
+namespace_id: zqk:kernel
+schema_version: 2.0.0
+started_at: "2026-09-03T23:42:18Z"
+status: error
+title: CEF R27 AGENT_AC Wave 2 production qualities
+updated_at: "2026-09-04T00:58:49Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

@@ -1,0 +1,15 @@
+id: MCP-2214
+kind: mcp_session
+namespace_id: zqk:kernel
+client_id: client-29
+client_name: client-29
+authentication_status: pending_authentication
+last_activity: 2026-08-12T02:42:35Z
+created_at: 2026-08-12T02:42:35Z
+created_by: ACC-1785920548450214012-68b850c0
+updated_at: 2026-08-12T02:42:35Z
+updated_by: ACC-1785920548450214012-68b850c0
+status: in_progress
+origin_project: zqk
+origin_system: zqk
+schema_version: 2.0.0

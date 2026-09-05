@@ -1,0 +1,7 @@
+job_id: SCH-TEST-002
+execution_id: exec-1788581700-28864
+state: completed
+process_id: 28864
+started_at: 2026-09-05T04:15:00.070469Z
+completed_at: 2026-09-05T04:15:07.446858Z
+policy_decision: execute

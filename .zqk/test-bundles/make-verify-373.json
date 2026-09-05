@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-373",
+  "created_at": "2026-09-04T21:34:31.048708Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-373",
+    "Tests": [
+      {
+        "Name": "TestCommandSpecSSOTDecisionRecorded",
+        "Package": "processhygiene_test",
+        "PackagePath": "pkg/processhygiene",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/processhygiene/command_spec_ssot_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestCommandSpecFileDNADirectoryExists",
+        "Package": "processhygiene_test",
+        "PackagePath": "pkg/processhygiene",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/processhygiene/command_spec_ssot_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestDeadTwinsRemoved",
+        "Package": "processhygiene",
+        "PackagePath": "pkg/processhygiene",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/processhygiene/dead_twins_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestDraftPlaneHonestyZeroDraftOnCAS",
+        "Package": "processhygiene",
+        "PackagePath": "pkg/processhygiene",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/processhygiene/draft_plane_honesty_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestDraftPlaneHonestyRubricDocumentation",
+        "Package": "processhygiene",
+        "PackagePath": "pkg/processhygiene",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/processhygiene/draft_plane_honesty_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestHandCASMateDetection",
+        "Package": "processhygiene",
+        "PackagePath": "pkg/processhygiene",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/processhygiene/handcas_dupdup_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestDuplicateIDDetection",
+        "Package": "processhygiene",
+        "PackagePath": "pkg/processhygiene",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/processhygiene/handcas_dupdup_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestScanObjectsIntegration",
+        "Package": "processhygiene",
+        "PackagePath": "pkg/processhygiene",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/processhygiene/handcas_dupdup_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestCompileWithRegex",
+        "Package": "processhygiene",
+        "PackagePath": "pkg/processhygiene",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/processhygiene/handcas_dupdup_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestScanObjectsForDupIDsEdgeCases",
+        "Package": "processhygiene",
+        "PackagePath": "pkg/processhygiene",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/processhygiene/handcas_dupdup_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 300000000000,
+    "PackagePath": "pkg/processhygiene"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestCommandSpecSSOTDecisionRecorded",
+      "Package": "processhygiene_test",
+      "PackagePath": "pkg/processhygiene",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/processhygiene/command_spec_ssot_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestCommandSpecFileDNADirectoryExists",
+      "Package": "processhygiene_test",
+      "PackagePath": "pkg/processhygiene",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/processhygiene/command_spec_ssot_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestDeadTwinsRemoved",
+      "Package": "processhygiene",
+      "PackagePath": "pkg/processhygiene",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/processhygiene/dead_twins_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestDraftPlaneHonestyZeroDraftOnCAS",
+      "Package": "processhygiene",
+      "PackagePath": "pkg/processhygiene",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/processhygiene/draft_plane_honesty_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestDraftPlaneHonestyRubricDocumentation",
+      "Package": "processhygiene",
+      "PackagePath": "pkg/processhygiene",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/processhygiene/draft_plane_honesty_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestHandCASMateDetection",
+      "Package": "processhygiene",
+      "PackagePath": "pkg/processhygiene",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/processhygiene/handcas_dupdup_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestDuplicateIDDetection",
+      "Package": "processhygiene",
+      "PackagePath": "pkg/processhygiene",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/processhygiene/handcas_dupdup_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestScanObjectsIntegration",
+      "Package": "processhygiene",
+      "PackagePath": "pkg/processhygiene",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/processhygiene/handcas_dupdup_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestCompileWithRegex",
+      "Package": "processhygiene",
+      "PackagePath": "pkg/processhygiene",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/processhygiene/handcas_dupdup_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestScanObjectsForDupIDsEdgeCases",
+      "Package": "processhygiene",
+      "PackagePath": "pkg/processhygiene",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/processhygiene/handcas_dupdup_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

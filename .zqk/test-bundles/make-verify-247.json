@@ -1,0 +1,123 @@
+{
+  "name": "make-verify-247",
+  "created_at": "2026-09-04T21:34:29.845677Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-247",
+    "Tests": [
+      {
+        "Name": "TestScanner_Scan",
+        "Package": "testscan",
+        "PackagePath": "pkg/testscan",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/testscan/scanner_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestScanner_BundleTests",
+        "Package": "testscan",
+        "PackagePath": "pkg/testscan",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/testscan/scanner_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestScanner_ScheduleBundles",
+        "Package": "testscan",
+        "PackagePath": "pkg/testscan",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/testscan/scanner_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestTimingDataAccessor",
+        "Package": "testscan",
+        "PackagePath": "pkg/testscan",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/testscan/scanner_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestSuggestedTimeoutForPackage",
+        "Package": "testscan",
+        "PackagePath": "pkg/testscan",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/testscan/scanner_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestNewScanner_ResolvesSymlinkRoot",
+        "Package": "testscan",
+        "PackagePath": "pkg/testscan",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/testscan/scanner_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 180000000000,
+    "PackagePath": "pkg/testscan"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestScanner_Scan",
+      "Package": "testscan",
+      "PackagePath": "pkg/testscan",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/testscan/scanner_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestScanner_BundleTests",
+      "Package": "testscan",
+      "PackagePath": "pkg/testscan",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/testscan/scanner_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestScanner_ScheduleBundles",
+      "Package": "testscan",
+      "PackagePath": "pkg/testscan",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/testscan/scanner_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestTimingDataAccessor",
+      "Package": "testscan",
+      "PackagePath": "pkg/testscan",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/testscan/scanner_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestSuggestedTimeoutForPackage",
+      "Package": "testscan",
+      "PackagePath": "pkg/testscan",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/testscan/scanner_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestNewScanner_ResolvesSymlinkRoot",
+      "Package": "testscan",
+      "PackagePath": "pkg/testscan",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/testscan/scanner_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

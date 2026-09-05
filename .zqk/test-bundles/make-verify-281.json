@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-281",
+  "created_at": "2026-09-04T21:34:30.161836Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-281",
+    "Tests": [
+      {
+        "Name": "TestMembraneReadPathsForProfile_cas",
+        "Package": "datacell",
+        "PackagePath": "pkg/datacell",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/datacell/cell_handle_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestValidateV1Identity",
+        "Package": "datacell",
+        "PackagePath": "pkg/datacell",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/datacell/cell_kind_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestFilterDescriptorsByStorageProfile",
+        "Package": "datacell",
+        "PackagePath": "pkg/datacell",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/datacell/cell_kind_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestMapDescriptorsByKind",
+        "Package": "datacell",
+        "PackagePath": "pkg/datacell",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/datacell/cell_kind_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestNewDescriptorReadModel",
+        "Package": "datacell",
+        "PackagePath": "pkg/datacell",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/datacell/descriptor_read_model_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestDescriptorReadModel_nil",
+        "Package": "datacell",
+        "PackagePath": "pkg/datacell",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/datacell/descriptor_read_model_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestEnqueueStewardMaintenance_appendsJSONL",
+        "Package": "datacell",
+        "PackagePath": "pkg/datacell",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/datacell/enqueue_maintenance_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestEnqueueStewardMaintenance_streamStewardKind_appendsJSONL",
+        "Package": "datacell",
+        "PackagePath": "pkg/datacell",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/datacell/enqueue_maintenance_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestEnqueueStewardMaintenance_unknownProfile",
+        "Package": "datacell",
+        "PackagePath": "pkg/datacell",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/datacell/enqueue_maintenance_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestNewStewardMaintenanceCoordinator_unknownProfile",
+        "Package": "datacell",
+        "PackagePath": "pkg/datacell",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/datacell/enqueue_maintenance_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": true,
+    "EstimatedDuration": 300000000000,
+    "PackagePath": "pkg/datacell"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestMembraneReadPathsForProfile_cas",
+      "Package": "datacell",
+      "PackagePath": "pkg/datacell",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/datacell/cell_handle_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestValidateV1Identity",
+      "Package": "datacell",
+      "PackagePath": "pkg/datacell",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/datacell/cell_kind_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestFilterDescriptorsByStorageProfile",
+      "Package": "datacell",
+      "PackagePath": "pkg/datacell",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/datacell/cell_kind_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestMapDescriptorsByKind",
+      "Package": "datacell",
+      "PackagePath": "pkg/datacell",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/datacell/cell_kind_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestNewDescriptorReadModel",
+      "Package": "datacell",
+      "PackagePath": "pkg/datacell",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/datacell/descriptor_read_model_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestDescriptorReadModel_nil",
+      "Package": "datacell",
+      "PackagePath": "pkg/datacell",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/datacell/descriptor_read_model_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestEnqueueStewardMaintenance_appendsJSONL",
+      "Package": "datacell",
+      "PackagePath": "pkg/datacell",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/datacell/enqueue_maintenance_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestEnqueueStewardMaintenance_streamStewardKind_appendsJSONL",
+      "Package": "datacell",
+      "PackagePath": "pkg/datacell",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/datacell/enqueue_maintenance_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestEnqueueStewardMaintenance_unknownProfile",
+      "Package": "datacell",
+      "PackagePath": "pkg/datacell",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/datacell/enqueue_maintenance_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestNewStewardMaintenanceCoordinator_unknownProfile",
+      "Package": "datacell",
+      "PackagePath": "pkg/datacell",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/datacell/enqueue_maintenance_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

@@ -1,0 +1,44 @@
+
+--- run 2026-09-04T22:22:54Z ---
+=== RUN   TestLifecycleInstanceBuilder_WriteToYAML
+=== PAUSE TestLifecycleInstanceBuilder_WriteToYAML
+=== RUN   TestLifecycleInstanceBuilder_ComplexLifecycle
+=== PAUSE TestLifecycleInstanceBuilder_ComplexLifecycle
+=== RUN   TestLifecycleInstanceBuilder_Registry
+=== PAUSE TestLifecycleInstanceBuilder_Registry
+=== RUN   TestLifecycleInstanceBuilder_RequiredFields
+=== PAUSE TestLifecycleInstanceBuilder_RequiredFields
+=== RUN   TestLifecycleInstanceBuilder_OptionalFields
+=== PAUSE TestLifecycleInstanceBuilder_OptionalFields
+=== RUN   TestLifecycleInstanceBuilder_SetField
+=== PAUSE TestLifecycleInstanceBuilder_SetField
+=== RUN   TestLifecycleInstanceBuilder_SetID
+=== PAUSE TestLifecycleInstanceBuilder_SetID
+=== RUN   TestLifecycleInstanceBuilder_SystemFields
+=== PAUSE TestLifecycleInstanceBuilder_SystemFields
+=== RUN   TestLifecycleInstanceBuilder_FluentAPI
+=== PAUSE TestLifecycleInstanceBuilder_FluentAPI
+=== RUN   TestLifecycleInstanceBuilder_EmptyStatuses
+=== PAUSE TestLifecycleInstanceBuilder_EmptyStatuses
+=== CONT  TestLifecycleInstanceBuilder_WriteToYAML
+=== CONT  TestLifecycleInstanceBuilder_EmptyStatuses
+--- PASS: TestLifecycleInstanceBuilder_EmptyStatuses (0.00s)
+=== CONT  TestLifecycleInstanceBuilder_SetField
+--- PASS: TestLifecycleInstanceBuilder_SetField (0.00s)
+=== CONT  TestLifecycleInstanceBuilder_FluentAPI
+--- PASS: TestLifecycleInstanceBuilder_FluentAPI (0.00s)
+=== CONT  TestLifecycleInstanceBuilder_SystemFields
+--- PASS: TestLifecycleInstanceBuilder_SystemFields (0.00s)
+=== CONT  TestLifecycleInstanceBuilder_SetID
+--- PASS: TestLifecycleInstanceBuilder_SetID (0.00s)
+=== CONT  TestLifecycleInstanceBuilder_RequiredFields
+--- PASS: TestLifecycleInstanceBuilder_RequiredFields (0.00s)
+=== CONT  TestLifecycleInstanceBuilder_OptionalFields
+--- PASS: TestLifecycleInstanceBuilder_OptionalFields (0.00s)
+=== CONT  TestLifecycleInstanceBuilder_Registry
+--- PASS: TestLifecycleInstanceBuilder_Registry (0.00s)
+=== CONT  TestLifecycleInstanceBuilder_ComplexLifecycle
+--- PASS: TestLifecycleInstanceBuilder_ComplexLifecycle (0.00s)
+--- PASS: TestLifecycleInstanceBuilder_WriteToYAML (0.01s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/specbuilder/bldr_instance_v1	0.463s

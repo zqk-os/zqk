@@ -1,0 +1,1463 @@
+2026/09/04 12:30:35 rpc.Serve: accept:accept unix /tmp/zqk-privileged-writer.sock: use of closed network connection
+2026/09/04 13:37:34 rpc.Serve: accept:accept unix /tmp/zqk-privileged-writer.sock: use of closed network connection
+SIGQUIT: quit
+PC=0x1879ec918 m=0 sigcode=0
+
+goroutine 0 gp=0x1079dbca0 m=0 mp=0x1079dcea0 [idle]:
+runtime.sigNoteSleep(0x0?)
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/os_darwin.go:138 +0x20 fp=0x75f0fd388790 sp=0x75f0fd388750 pc=0x105019b90
+os/signal.signal_recv()
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/sigqueue.go:149 +0x108 fp=0x75f0fd3887b0 sp=0x75f0fd388790 pc=0x105057518
+os/signal.loop()
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/os/signal/signal_unix.go:23 +0x1c fp=0x75f0fd3887d0 sp=0x75f0fd3887b0 pc=0x1053cd5fc
+runtime.goexit({})
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/asm_arm64.s:1447 +0x4 fp=0x75f0fd3887d0 sp=0x75f0fd3887d0 pc=0x10505cda4
+created by os/signal.Notify.func1.1 in goroutine 1
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/os/signal/signal.go:152 +0x28
+
+goroutine 186 gp=0x75f0fd40d4a0 m=0 mp=0x1079dcea0 [syscall, 6 minutes]:
+runtime.sigNoteSleep(0x0?)
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/os_darwin.go:138 +0x20 fp=0x75f0fd388790 sp=0x75f0fd388750 pc=0x105019b90
+os/signal.signal_recv()
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/sigqueue.go:149 +0x108 fp=0x75f0fd3887b0 sp=0x75f0fd388790 pc=0x105057518
+os/signal.loop()
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/os/signal/signal_unix.go:23 +0x1c fp=0x75f0fd3887d0 sp=0x75f0fd3887b0 pc=0x1053cd5fc
+runtime.goexit({})
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/asm_arm64.s:1447 +0x4 fp=0x75f0fd3887d0 sp=0x75f0fd3887d0 pc=0x10505cda4
+created by os/signal.Notify.func1.1 in goroutine 1
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/os/signal/signal.go:152 +0x28
+
+goroutine 1 gp=0x75f0fcede1e0 m=nil [chan receive, 6 minutes]:
+runtime.gopark(0x75f0fcf212f8?, 0x1053cc4d8?, 0x1?, 0x76?, 0x10?)
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/proc.go:462 +0xbc fp=0x75f0fcf212d0 sp=0x75f0fcf212b0 pc=0x105054e6c
+runtime.chanrecv(0x75f0fd1a42a0, 0x0, 0x1)
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/chan.go:667 +0x470 fp=0x75f0fcf21350 sp=0x75f0fcf212d0 pc=0x104fe7f70
+runtime.chanrecv1(0x75f0fd1a42a0?, 0x75f0fcf21420?)
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/chan.go:509 +0x14 fp=0x75f0fcf21380 sp=0x75f0fcf21350 pc=0x104fe7ac4
+github.com/lanceman/zqk/cmd/zqk/object.NewObjectCmd.NewDaemonCmd.func2.1(0x75f0fdd11508?, {0x0?, 0x75f0fcf214a8?, 0x105ad8388?}, 0x75f0ff37bb80)
+	/Users/lanceettl/zqk-restore-clone/cmd/zqk/object/daemon.go:92 +0x1cc fp=0x75f0fcf21460 sp=0x75f0fcf21380 pc=0x1060ed4fc
+github.com/lanceman/zqk/internal/cli.WithProcessor.func1(0x75f0fdd11508, {0x107a03a20, 0x0, 0x0})
+	/Users/lanceettl/zqk-restore-clone/internal/cli/processor.go:840 +0x90 fp=0x75f0fcf214e0 sp=0x75f0fcf21460 pc=0x105ad8470
+github.com/lanceman/zqk/cmd/zqk/object.NewObjectCmd.NewDaemonCmd.func2(0x75f0fdd11508, {0x107a03a20, 0x0, 0x0})
+	/Users/lanceettl/zqk-restore-clone/cmd/zqk/object/daemon.go:96 +0xa4 fp=0x75f0fcf21530 sp=0x75f0fcf214e0 pc=0x1060ed304
+github.com/spf13/cobra.(*Command).execute(0x75f0fdd11508, {0x107a03a20, 0x0, 0x0})
+	/Users/lanceettl/go/pkg/mod/github.com/spf13/cobra@v1.10.2/command.go:1015 +0x814 fp=0x75f0fcf216e0 sp=0x75f0fcf21530 pc=0x1051ae054
+github.com/spf13/cobra.(*Command).ExecuteC(0x75f0fd44bb08)
+	/Users/lanceettl/go/pkg/mod/github.com/spf13/cobra@v1.10.2/command.go:1148 +0x350 fp=0x75f0fcf217d0 sp=0x75f0fcf216e0 pc=0x1051ae7b0
+github.com/spf13/cobra.(*Command).Execute(...)
+	/Users/lanceettl/go/pkg/mod/github.com/spf13/cobra@v1.10.2/command.go:1071
+github.com/spf13/cobra.(*Command).ExecuteContext(...)
+	/Users/lanceettl/go/pkg/mod/github.com/spf13/cobra@v1.10.2/command.go:1064
+github.com/lanceman/zqk/cmd/zqk/app.Execute.func1.1({0x107926830?, 0x75f0fe7eda40?})
+	/Users/lanceettl/zqk-restore-clone/cmd/zqk/app/root.go:440 +0xb0 fp=0x75f0fcf217f0 sp=0x75f0fcf217d0 pc=0x106297e80
+github.com/lanceman/zqk/pkg/dispatch.runWithProgress({0x107926830?, 0x75f0fe5f9a70?}, 0x75f0fda919c0, 0x75f0fcf21a78)
+	/Users/lanceettl/zqk-restore-clone/pkg/dispatch/run_with_progress.go:121 +0x368 fp=0x75f0fcf219b0 sp=0x75f0fcf217f0 pc=0x106125778
+github.com/lanceman/zqk/pkg/dispatch.Run({0x107926830?, 0x75f0fe5f9a70?}, 0x75f0fda919c0?, 0x75f0fcf21a78?)
+	/Users/lanceettl/zqk-restore-clone/pkg/dispatch/dispatch.go:42 +0x110 fp=0x75f0fcf21a20 sp=0x75f0fcf219b0 pc=0x106124480
+github.com/lanceman/zqk/cmd/zqk/app.Execute.func1({0x107926830, 0x75f0fe5f9a70})
+	/Users/lanceettl/zqk-restore-clone/cmd/zqk/app/root.go:444 +0xdc fp=0x75f0fcf21aa0 sp=0x75f0fcf21a20 pc=0x106297dac
+github.com/lanceman/zqk/pkg/cli.(*TimeoutHook).handleDaemonCommandTimeout(0x75f0fd342120, {0x107926830, 0x75f0fe5f9a70}, {0x1062f488d, 0x3}, {0x75f0fef88618, 0x11}, {0x75f0fcf10190, 0x2, 0x2}, ...)
+	/Users/lanceettl/zqk-restore-clone/pkg/cli/timeout_hook_execution.go:195 +0xc4 fp=0x75f0fcf21b50 sp=0x75f0fcf21aa0 pc=0x1053f34c4
+github.com/lanceman/zqk/pkg/cli.(*TimeoutHook).WrapCommandWithContext(0x75f0fd342120, {0x107926830, 0x75f0fe5f9a70}, {0x1062f488d, 0x3}, {0x75f0fcf10190, 0x2, 0x2}, 0x0, 0x75f0fe164580)
+	/Users/lanceettl/zqk-restore-clone/pkg/cli/timeout_hook_execution.go:414 +0x1c4 fp=0x75f0fcf21d20 sp=0x75f0fcf21b50 pc=0x1053f4de4
+github.com/lanceman/zqk/pkg/cli.(*TimeoutHook).WrapCommand(...)
+	/Users/lanceettl/zqk-restore-clone/pkg/cli/timeout_hook_execution.go:47
+github.com/lanceman/zqk/cmd/zqk/app.Execute()
+	/Users/lanceettl/zqk-restore-clone/cmd/zqk/app/root.go:430 +0x3d4 fp=0x75f0fcf21f20 sp=0x75f0fcf21d20 pc=0x1062976f4
+main.main()
+	/Users/lanceettl/zqk-restore-clone/cmd/zqk/main.go:38 +0x1c fp=0x75f0fcf21f30 sp=0x75f0fcf21f20 pc=0x1062a30dc
+runtime.main()
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/proc.go:290 +0x2b4 fp=0x75f0fcf21fd0 sp=0x75f0fcf21f30 pc=0x10501f364
+runtime.goexit({})
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/asm_arm64.s:1447 +0x4 fp=0x75f0fcf21fd0 sp=0x75f0fcf21fd0 pc=0x10505cda4
+
+goroutine 2 gp=0x75f0fceded20 m=nil [force gc (idle), 2 minutes]:
+runtime.gopark(0xd44c3bff56d?, 0x0?, 0x0?, 0x0?, 0x0?)
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/proc.go:462 +0xbc fp=0x75f0fcf56f90 sp=0x75f0fcf56f70 pc=0x105054e6c
+runtime.goparkunlock(...)
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/proc.go:468
+runtime.forcegchelper()
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/proc.go:375 +0xb4 fp=0x75f0fcf56fd0 sp=0x75f0fcf56f90 pc=0x10501f684
+runtime.goexit({})
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/asm_arm64.s:1447 +0x4 fp=0x75f0fcf56fd0 sp=0x75f0fcf56fd0 pc=0x10505cda4
+created by runtime.init.7 in goroutine 1
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/proc.go:363 +0x24
+
+goroutine 3 gp=0x75f0fcedf2c0 m=nil [GC sweep wait]:
+runtime.gopark(0x1079d9901?, 0x0?, 0x0?, 0x0?, 0x0?)
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/proc.go:462 +0xbc fp=0x75f0fcf57770 sp=0x75f0fcf57750 pc=0x105054e6c
+runtime.goparkunlock(...)
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/proc.go:468
+runtime.bgsweep(0x75f0fcf80000)
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/mgcsweep.go:324 +0x178 fp=0x75f0fcf577b0 sp=0x75f0fcf57770 pc=0x105008118
+runtime.gcenable.gowrap1()
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/mgc.go:214 +0x20 fp=0x75f0fcf577d0 sp=0x75f0fcf577b0 pc=0x104ff9550
+runtime.goexit({})
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/asm_arm64.s:1447 +0x4 fp=0x75f0fcf577d0 sp=0x75f0fcf577d0 pc=0x10505cda4
+created by runtime.gcenable in goroutine 1
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/mgc.go:214 +0x6c
+
+goroutine 4 gp=0x75f0fcedf4a0 m=nil [GC scavenge wait]:
+runtime.gopark(0x10000?, 0xd32e555?, 0x0?, 0x0?, 0x0?)
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/proc.go:462 +0xbc fp=0x75f0fcf57f60 sp=0x75f0fcf57f40 pc=0x105054e6c
+runtime.goparkunlock(...)
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/proc.go:468
+runtime.(*scavengerState).park(0x1079db180)
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/mgcscavenge.go:425 +0x5c fp=0x75f0fcf57f90 sp=0x75f0fcf57f60 pc=0x105005c2c
+runtime.bgscavenge(0x75f0fcf80000)
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/mgcscavenge.go:658 +0xac fp=0x75f0fcf57fb0 sp=0x75f0fcf57f90 pc=0x1050061cc
+runtime.gcenable.gowrap2()
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/mgc.go:215 +0x20 fp=0x75f0fcf57fd0 sp=0x75f0fcf57fb0 pc=0x104ff9510
+runtime.goexit({})
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/asm_arm64.s:1447 +0x4 fp=0x75f0fcf57fd0 sp=0x75f0fcf57fd0 pc=0x10505cda4
+created by runtime.gcenable in goroutine 1
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/mgc.go:215 +0xac
+
+goroutine 5 gp=0x75f0fcedfa40 m=nil [GOMAXPROCS updater (idle), 6 minutes]:
+runtime.gopark(0x0?, 0x0?, 0x0?, 0x0?, 0x0?)
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/proc.go:462 +0xbc fp=0x75f0fcf58770 sp=0x75f0fcf58750 pc=0x105054e6c
+runtime.goparkunlock(...)
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/proc.go:468
+runtime.updateMaxProcsGoroutine()
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/proc.go:7095 +0xf4 fp=0x75f0fcf587d0 sp=0x75f0fcf58770 pc=0x10502dfb4
+runtime.goexit({})
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/asm_arm64.s:1447 +0x4 fp=0x75f0fcf587d0 sp=0x75f0fcf587d0 pc=0x10505cda4
+created by runtime.defaultGOMAXPROCSUpdateEnable in goroutine 1
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/proc.go:7083 +0x48
+
+goroutine 6 gp=0x75f0fcf9c1e0 m=nil [finalizer wait, 6 minutes]:
+runtime.gopark(0x75f0fcf565b8?, 0x105b58c9c?, 0xe0?, 0x94?, 0x32?)
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/proc.go:462 +0xbc fp=0x75f0fcf56580 sp=0x75f0fcf56560 pc=0x105054e6c
+runtime.runFinalizers()
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/mfinal.go:210 +0x100 fp=0x75f0fcf567d0 sp=0x75f0fcf56580 pc=0x104ff8570
+runtime.goexit({})
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/asm_arm64.s:1447 +0x4 fp=0x75f0fcf567d0 sp=0x75f0fcf567d0 pc=0x10505cda4
+created by runtime.createfing in goroutine 1
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/mfinal.go:172 +0x78
+
+goroutine 7 gp=0x75f0fcf9c3c0 m=nil [cleanup wait, 6 minutes]:
+runtime.gopark(0x0?, 0x0?, 0x0?, 0x0?, 0x0?)
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/proc.go:462 +0xbc fp=0x75f0fcf58f50 sp=0x75f0fcf58f30 pc=0x105054e6c
+runtime.goparkunlock(...)
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/proc.go:468
+runtime.(*cleanupQueue).dequeue(0x1079dbae0)
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/mcleanup.go:522 +0x160 fp=0x75f0fcf58f90 sp=0x75f0fcf58f50 pc=0x104ff5500
+runtime.runCleanups()
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/mcleanup.go:718 +0x40 fp=0x75f0fcf58fd0 sp=0x75f0fcf58f90 pc=0x104ff5c50
+runtime.goexit({})
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/asm_arm64.s:1447 +0x4 fp=0x75f0fcf58fd0 sp=0x75f0fcf58fd0 pc=0x10505cda4
+created by runtime.(*cleanupQueue).createGs in goroutine 1
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/mcleanup.go:672 +0x108
+
+goroutine 8 gp=0x75f0fcf9c5a0 m=nil [GC worker (idle), 6 minutes]:
+runtime.gopark(0x0?, 0x0?, 0x0?, 0x0?, 0x0?)
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/proc.go:462 +0xbc fp=0x75f0fcf59720 sp=0x75f0fcf59700 pc=0x105054e6c
+runtime.gcBgMarkWorker(0x75f0fcf90ee0)
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/mgc.go:1791 +0xe0 fp=0x75f0fcf597b0 sp=0x75f0fcf59720 pc=0x104ffbfb0
+runtime.gcBgMarkStartWorkers.gowrap1()
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/mgc.go:1695 +0x20 fp=0x75f0fcf597d0 sp=0x75f0fcf597b0 pc=0x104ffbeb0
+runtime.goexit({})
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/asm_arm64.s:1447 +0x4 fp=0x75f0fcf597d0 sp=0x75f0fcf597d0 pc=0x10505cda4
+created by runtime.gcBgMarkStartWorkers in goroutine 1
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/mgc.go:1695 +0x134
+
+goroutine 9 gp=0x75f0fcf9c780 m=nil [GC worker (idle)]:
+runtime.gopark(0xd44c6e15d18?, 0x1?, 0x68?, 0xc4?, 0x0?)
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/proc.go:462 +0xbc fp=0x75f0fcf59f20 sp=0x75f0fcf59f00 pc=0x105054e6c
+runtime.gcBgMarkWorker(0x75f0fcf90ee0)
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/mgc.go:1791 +0xe0 fp=0x75f0fcf59fb0 sp=0x75f0fcf59f20 pc=0x104ffbfb0
+runtime.gcBgMarkStartWorkers.gowrap1()
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/mgc.go:1695 +0x20 fp=0x75f0fcf59fd0 sp=0x75f0fcf59fb0 pc=0x104ffbeb0
+runtime.goexit({})
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/asm_arm64.s:1447 +0x4 fp=0x75f0fcf59fd0 sp=0x75f0fcf59fd0 pc=0x10505cda4
+created by runtime.gcBgMarkStartWorkers in goroutine 1
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/mgc.go:1695 +0x134
+
+goroutine 10 gp=0x75f0fcf9c960 m=nil [GC worker (idle), 6 minutes]:
+runtime.gopark(0xcf0d63d00e4?, 0x3?, 0xdc?, 0x74?, 0x0?)
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/proc.go:462 +0xbc fp=0x75f0fcf52720 sp=0x75f0fcf52700 pc=0x105054e6c
+runtime.gcBgMarkWorker(0x75f0fcf90ee0)
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/mgc.go:1791 +0xe0 fp=0x75f0fcf527b0 sp=0x75f0fcf52720 pc=0x104ffbfb0
+runtime.gcBgMarkStartWorkers.gowrap1()
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/mgc.go:1695 +0x20 fp=0x75f0fcf527d0 sp=0x75f0fcf527b0 pc=0x104ffbeb0
+runtime.goexit({})
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/asm_arm64.s:1447 +0x4 fp=0x75f0fcf527d0 sp=0x75f0fcf527d0 pc=0x10505cda4
+created by runtime.gcBgMarkStartWorkers in goroutine 1
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/mgc.go:1695 +0x134
+
+goroutine 18 gp=0x75f0fd384000 m=nil [GC worker (idle), 6 minutes]:
+runtime.gopark(0xcf0dd3e925f?, 0x3?, 0xdb?, 0x89?, 0x0?)
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/proc.go:462 +0xbc fp=0x75f0fd38a720 sp=0x75f0fd38a700 pc=0x105054e6c
+runtime.gcBgMarkWorker(0x75f0fcf90ee0)
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/mgc.go:1791 +0xe0 fp=0x75f0fd38a7b0 sp=0x75f0fd38a720 pc=0x104ffbfb0
+runtime.gcBgMarkStartWorkers.gowrap1()
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/mgc.go:1695 +0x20 fp=0x75f0fd38a7d0 sp=0x75f0fd38a7b0 pc=0x104ffbeb0
+runtime.goexit({})
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/asm_arm64.s:1447 +0x4 fp=0x75f0fd38a7d0 sp=0x75f0fd38a7d0 pc=0x10505cda4
+created by runtime.gcBgMarkStartWorkers in goroutine 1
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/mgc.go:1695 +0x134
+
+goroutine 34 gp=0x75f0fd0043c0 m=nil [GC worker (idle)]:
+runtime.gopark(0x107a05ca0?, 0x1?, 0x1e?, 0x15?, 0x0?)
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/proc.go:462 +0xbc fp=0x75f0fd386720 sp=0x75f0fd386700 pc=0x105054e6c
+runtime.gcBgMarkWorker(0x75f0fcf90ee0)
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/mgc.go:1791 +0xe0 fp=0x75f0fd3867b0 sp=0x75f0fd386720 pc=0x104ffbfb0
+runtime.gcBgMarkStartWorkers.gowrap1()
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/mgc.go:1695 +0x20 fp=0x75f0fd3867d0 sp=0x75f0fd3867b0 pc=0x104ffbeb0
+runtime.goexit({})
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/asm_arm64.s:1447 +0x4 fp=0x75f0fd3867d0 sp=0x75f0fd3867d0 pc=0x10505cda4
+created by runtime.gcBgMarkStartWorkers in goroutine 1
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/mgc.go:1695 +0x134
+
+goroutine 11 gp=0x75f0fcf9cb40 m=nil [GC worker (idle), 6 minutes]:
+runtime.gopark(0xcf0d63d010d?, 0x3?, 0x7b?, 0xa2?, 0x0?)
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/proc.go:462 +0xbc fp=0x75f0fcf52f20 sp=0x75f0fcf52f00 pc=0x105054e6c
+runtime.gcBgMarkWorker(0x75f0fcf90ee0)
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/mgc.go:1791 +0xe0 fp=0x75f0fcf52fb0 sp=0x75f0fcf52f20 pc=0x104ffbfb0
+runtime.gcBgMarkStartWorkers.gowrap1()
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/mgc.go:1695 +0x20 fp=0x75f0fcf52fd0 sp=0x75f0fcf52fb0 pc=0x104ffbeb0
+runtime.goexit({})
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/asm_arm64.s:1447 +0x4 fp=0x75f0fcf52fd0 sp=0x75f0fcf52fd0 pc=0x10505cda4
+created by runtime.gcBgMarkStartWorkers in goroutine 1
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/mgc.go:1695 +0x134
+
+goroutine 19 gp=0x75f0fd3841e0 m=nil [GC worker (idle)]:
+runtime.gopark(0xd44c6e208a5?, 0x1?, 0x84?, 0xc3?, 0x0?)
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/proc.go:462 +0xbc fp=0x75f0fd38af20 sp=0x75f0fd38af00 pc=0x105054e6c
+runtime.gcBgMarkWorker(0x75f0fcf90ee0)
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/mgc.go:1791 +0xe0 fp=0x75f0fd38afb0 sp=0x75f0fd38af20 pc=0x104ffbfb0
+runtime.gcBgMarkStartWorkers.gowrap1()
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/mgc.go:1695 +0x20 fp=0x75f0fd38afd0 sp=0x75f0fd38afb0 pc=0x104ffbeb0
+runtime.goexit({})
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/asm_arm64.s:1447 +0x4 fp=0x75f0fd38afd0 sp=0x75f0fd38afd0 pc=0x10505cda4
+created by runtime.gcBgMarkStartWorkers in goroutine 1
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/mgc.go:1695 +0x134
+
+goroutine 35 gp=0x75f0fd0045a0 m=nil [GC worker (idle), 6 minutes]:
+runtime.gopark(0xcf0dd423439?, 0x1?, 0xf5?, 0x69?, 0x0?)
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/proc.go:462 +0xbc fp=0x75f0fd386f20 sp=0x75f0fd386f00 pc=0x105054e6c
+runtime.gcBgMarkWorker(0x75f0fcf90ee0)
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/mgc.go:1791 +0xe0 fp=0x75f0fd386fb0 sp=0x75f0fd386f20 pc=0x104ffbfb0
+runtime.gcBgMarkStartWorkers.gowrap1()
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/mgc.go:1695 +0x20 fp=0x75f0fd386fd0 sp=0x75f0fd386fb0 pc=0x104ffbeb0
+runtime.goexit({})
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/asm_arm64.s:1447 +0x4 fp=0x75f0fd386fd0 sp=0x75f0fd386fd0 pc=0x10505cda4
+created by runtime.gcBgMarkStartWorkers in goroutine 1
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/mgc.go:1695 +0x134
+
+goroutine 12 gp=0x75f0fcf9cd20 m=nil [GC worker (idle), 6 minutes]:
+runtime.gopark(0xcf0dd3e68b5?, 0x3?, 0x2e?, 0x6f?, 0x0?)
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/proc.go:462 +0xbc fp=0x75f0fcf53720 sp=0x75f0fcf53700 pc=0x105054e6c
+runtime.gcBgMarkWorker(0x75f0fcf90ee0)
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/mgc.go:1791 +0xe0 fp=0x75f0fcf537b0 sp=0x75f0fcf53720 pc=0x104ffbfb0
+runtime.gcBgMarkStartWorkers.gowrap1()
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/mgc.go:1695 +0x20 fp=0x75f0fcf537d0 sp=0x75f0fcf537b0 pc=0x104ffbeb0
+runtime.goexit({})
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/asm_arm64.s:1447 +0x4 fp=0x75f0fcf537d0 sp=0x75f0fcf537d0 pc=0x10505cda4
+created by runtime.gcBgMarkStartWorkers in goroutine 1
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/mgc.go:1695 +0x134
+
+goroutine 13 gp=0x75f0fcf9cf00 m=nil [GC worker (idle), 6 minutes]:
+runtime.gopark(0xcf0dd3e579e?, 0x3?, 0x1?, 0x83?, 0x0?)
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/proc.go:462 +0xbc fp=0x75f0fcf53f20 sp=0x75f0fcf53f00 pc=0x105054e6c
+runtime.gcBgMarkWorker(0x75f0fcf90ee0)
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/mgc.go:1791 +0xe0 fp=0x75f0fcf53fb0 sp=0x75f0fcf53f20 pc=0x104ffbfb0
+runtime.gcBgMarkStartWorkers.gowrap1()
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/mgc.go:1695 +0x20 fp=0x75f0fcf53fd0 sp=0x75f0fcf53fb0 pc=0x104ffbeb0
+runtime.goexit({})
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/asm_arm64.s:1447 +0x4 fp=0x75f0fcf53fd0 sp=0x75f0fcf53fd0 pc=0x10505cda4
+created by runtime.gcBgMarkStartWorkers in goroutine 1
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/mgc.go:1695 +0x134
+
+goroutine 277 gp=0x75f0fd3850e0 m=nil [chan receive, 6 minutes]:
+runtime.gopark(0x75f0fd38ce08?, 0x1050f5984?, 0x8?, 0xce?, 0x1051f95a0?)
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/proc.go:462 +0xbc fp=0x75f0fd38cdc0 sp=0x75f0fd38cda0 pc=0x105054e6c
+runtime.chanrecv(0x75f0fdf56bd0, 0x75f0fd38ce98, 0x1)
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/chan.go:667 +0x470 fp=0x75f0fd38ce40 sp=0x75f0fd38cdc0 pc=0x104fe7f70
+runtime.chanrecv2(0x107926830?, 0x75f0fe794060?)
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/chan.go:514 +0x14 fp=0x75f0fd38ce70 sp=0x75f0fd38ce40 pc=0x104fe7ae4
+github.com/lanceman/zqk/pkg/diagnostics.StartCPUProfileOnSIGUSR2.func1.1()
+	/Users/lanceettl/zqk-restore-clone/pkg/diagnostics/cpu_profile_signal.go:57 +0x3c fp=0x75f0fd38ceb0 sp=0x75f0fd38ce70 pc=0x105a959bc
+github.com/lanceman/zqk/pkg/goroutinelabels.(*GoroutineBuilder).StartSimple.func1.4(0x10630396d?, 0x0?)
+	/Users/lanceettl/zqk-restore-clone/pkg/goroutinelabels/builder.go:525 +0x48 fp=0x75f0fd38cee0 sp=0x75f0fd38ceb0 pc=0x1052131f8
+github.com/lanceman/zqk/pkg/goroutinelabels.(*GoroutineBuilder).StartSimple.func1()
+	/Users/lanceettl/zqk-restore-clone/pkg/goroutinelabels/builder.go:526 +0x2b0 fp=0x75f0fd38cfd0 sp=0x75f0fd38cee0 pc=0x1052130d0
+runtime.goexit({})
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/asm_arm64.s:1447 +0x4 fp=0x75f0fd38cfd0 sp=0x75f0fd38cfd0 pc=0x10505cda4
+created by github.com/lanceman/zqk/pkg/goroutinelabels.(*GoroutineBuilder).StartSimple in goroutine 1
+	/Users/lanceettl/zqk-restore-clone/pkg/goroutinelabels/builder.go:460 +0x1d4
+
+goroutine 185 gp=0x75f0fd3852c0 m=nil [select, 6 minutes, locked to thread]:
+runtime.gopark(0x75f0fd38d7a0?, 0x2?, 0xa8?, 0xd6?, 0x75f0fd38d790?)
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/proc.go:462 +0xbc fp=0x75f0fd38d610 sp=0x75f0fd38d5f0 pc=0x105054e6c
+runtime.selectgo(0x75f0fd38d7a0, 0x75f0fd38d78c, 0x0?, 0x0, 0x0?, 0x1)
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/select.go:351 +0x83c fp=0x75f0fd38d750 sp=0x75f0fd38d610 pc=0x10503306c
+runtime.ensureSigM.func1()
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/signal_unix.go:1091 +0x148 fp=0x75f0fd38d7d0 sp=0x75f0fd38d750 pc=0x10504f088
+runtime.goexit({})
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/asm_arm64.s:1447 +0x4 fp=0x75f0fd38d7d0 sp=0x75f0fd38d7d0 pc=0x10505cda4
+created by runtime.ensureSigM in goroutine 1
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/signal_unix.go:1074 +0xcc
+
+goroutine 184 gp=0x75f0fd40cf00 m=nil [select]:
+runtime.gopark(0x75f0fcf6bdc0?, 0x2?, 0x68?, 0xbc?, 0x75f0fcf6bd94?)
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/proc.go:462 +0xbc fp=0x75f0fcf6bbf0 sp=0x75f0fcf6bbd0 pc=0x105054e6c
+runtime.selectgo(0x75f0fcf6bdc0, 0x75f0fcf6bd90, 0x75f0fd14c7d0?, 0x0, 0x7?, 0x1)
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/select.go:351 +0x83c fp=0x75f0fcf6bd30 sp=0x75f0fcf6bbf0 pc=0x10503306c
+github.com/lanceman/zqk/pkg/dispatch.runProgressHeartbeat({0x107926868, 0x75f0fd14c7d0}, 0x75f0fdf56af0, {0x1062f4887, 0x3}, 0x75f0fe7ed980, 0x75f0fd38cea8?)
+	/Users/lanceettl/zqk-restore-clone/pkg/dispatch/run_with_progress.go:62 +0xe8 fp=0x75f0fcf6be60 sp=0x75f0fcf6bd30 pc=0x1061251c8
+github.com/lanceman/zqk/pkg/dispatch.runWithProgress.func2()
+	/Users/lanceettl/zqk-restore-clone/pkg/dispatch/run_with_progress.go:115 +0x38 fp=0x75f0fcf6beb0 sp=0x75f0fcf6be60 pc=0x1061258b8
+github.com/lanceman/zqk/pkg/goroutinelabels.(*GoroutineBuilder).StartSimple.func1.4(0x106340ff8?, 0x0?)
+	/Users/lanceettl/zqk-restore-clone/pkg/goroutinelabels/builder.go:525 +0x48 fp=0x75f0fcf6bee0 sp=0x75f0fcf6beb0 pc=0x1052131f8
+github.com/lanceman/zqk/pkg/goroutinelabels.(*GoroutineBuilder).StartSimple.func1()
+	/Users/lanceettl/zqk-restore-clone/pkg/goroutinelabels/builder.go:526 +0x2b0 fp=0x75f0fcf6bfd0 sp=0x75f0fcf6bee0 pc=0x1052130d0
+runtime.goexit({})
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/asm_arm64.s:1447 +0x4 fp=0x75f0fcf6bfd0 sp=0x75f0fcf6bfd0 pc=0x10505cda4
+created by github.com/lanceman/zqk/pkg/goroutinelabels.(*GoroutineBuilder).StartSimple in goroutine 1
+	/Users/lanceettl/zqk-restore-clone/pkg/goroutinelabels/builder.go:460 +0x1d4
+
+goroutine 216 gp=0x75f0fd40d0e0 m=nil [select, 2 minutes]:
+runtime.gopark(0x75f0feef5e68?, 0x2?, 0xd8?, 0x5b?, 0x75f0feef5e64?)
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/proc.go:462 +0xbc fp=0x75f0fffe9ce0 sp=0x75f0fffe9cc0 pc=0x105054e6c
+runtime.selectgo(0x75f0fffe9e68, 0x75f0feef5e60, 0x75f0fe26c6b8?, 0x0, 0x75f0fe26c668?, 0x1)
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/select.go:351 +0x83c fp=0x75f0fffe9e20 sp=0x75f0fffe9ce0 pc=0x10503306c
+github.com/lanceman/zqk/pkg/metrics.(*Sampler).flushTickerLoop(0x75f0fe906180)
+	/Users/lanceettl/zqk-restore-clone/pkg/metrics/sampler.go:461 +0x74 fp=0x75f0fffe9e90 sp=0x75f0fffe9e20 pc=0x105a69e44
+github.com/lanceman/zqk/pkg/metrics.NewSampler.func2({0x75f0fe26c6e8?, 0x1052128cc?})
+	/Users/lanceettl/zqk-restore-clone/pkg/metrics/sampler.go:160 +0x20 fp=0x75f0fffe9eb0 sp=0x75f0fffe9e90 pc=0x105a680e0
+github.com/lanceman/zqk/pkg/goroutinelabels.(*GoroutineBuilder).StartWithContext.func1.3(0x75f0fcf26960?, 0x75f0fffe9f60, 0x10636f865?, {0x107926868?, 0x75f0fcf26960?})
+	/Users/lanceettl/zqk-restore-clone/pkg/goroutinelabels/builder.go:407 +0x5c fp=0x75f0fffe9ef0 sp=0x75f0fffe9eb0 pc=0x105212aac
+github.com/lanceman/zqk/pkg/goroutinelabels.(*GoroutineBuilder).StartWithContext.func1()
+	/Users/lanceettl/zqk-restore-clone/pkg/goroutinelabels/builder.go:408 +0x1a4 fp=0x75f0fffe9fd0 sp=0x75f0fffe9ef0 pc=0x105212974
+runtime.goexit({})
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/asm_arm64.s:1447 +0x4 fp=0x75f0fffe9fd0 sp=0x75f0fffe9fd0 pc=0x10505cda4
+created by github.com/lanceman/zqk/pkg/goroutinelabels.(*GoroutineBuilder).StartWithContext in goroutine 215
+	/Users/lanceettl/zqk-restore-clone/pkg/goroutinelabels/builder.go:358 +0x1bc
+
+goroutine 187 gp=0x75f0fd40d680 m=nil [select, 6 minutes]:
+runtime.gopark(0x75f0ff026e68?, 0x2?, 0x98?, 0x6c?, 0x75f0ff026da4?)
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/proc.go:462 +0xbc fp=0x75f0ff026c20 sp=0x75f0ff026c00 pc=0x105054e6c
+runtime.selectgo(0x75f0ff026e68, 0x75f0ff026da0, 0x30?, 0x0, 0x109ff52f8?, 0x1)
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/select.go:351 +0x83c fp=0x75f0ff026d60 sp=0x75f0ff026c20 pc=0x10503306c
+github.com/lanceman/zqk/pkg/diagnostics.SetupSignalHandler.func1()
+	/Users/lanceettl/zqk-restore-clone/pkg/diagnostics/signal_handler.go:52 +0xa0 fp=0x75f0ff026eb0 sp=0x75f0ff026d60 pc=0x105a95190
+github.com/lanceman/zqk/pkg/goroutinelabels.(*GoroutineBuilder).StartSimple.func1.4(0x10633c10b?, 0x0?)
+	/Users/lanceettl/zqk-restore-clone/pkg/goroutinelabels/builder.go:525 +0x48 fp=0x75f0ff026ee0 sp=0x75f0ff026eb0 pc=0x1052131f8
+github.com/lanceman/zqk/pkg/goroutinelabels.(*GoroutineBuilder).StartSimple.func1()
+	/Users/lanceettl/zqk-restore-clone/pkg/goroutinelabels/builder.go:526 +0x2b0 fp=0x75f0ff026fd0 sp=0x75f0ff026ee0 pc=0x1052130d0
+runtime.goexit({})
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/asm_arm64.s:1447 +0x4 fp=0x75f0ff026fd0 sp=0x75f0ff026fd0 pc=0x10505cda4
+created by github.com/lanceman/zqk/pkg/goroutinelabels.(*GoroutineBuilder).StartSimple in goroutine 1
+	/Users/lanceettl/zqk-restore-clone/pkg/goroutinelabels/builder.go:460 +0x1d4
+
+goroutine 279 gp=0x75f0fd385a40 m=nil [chan receive]:
+runtime.gopark(0x75f0fe00e0f0?, 0x75f0fe00e070?, 0x8?, 0x3e?, 0x10528322c?)
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/proc.go:462 +0xbc fp=0x75f0ff023d60 sp=0x75f0ff023d40 pc=0x105054e6c
+runtime.chanrecv(0x75f0fe00e070, 0x75f0ff023e48, 0x1)
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/chan.go:667 +0x470 fp=0x75f0ff023de0 sp=0x75f0ff023d60 pc=0x104fe7f70
+runtime.chanrecv2(0x75f0fe5541e0?, 0x1052057a8?)
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/chan.go:514 +0x14 fp=0x75f0ff023e10 sp=0x75f0ff023de0 pc=0x104fe7ae4
+github.com/lanceman/zqk/pkg/logging.(*sharedBufferedFlusher).loop(0x1079d9a20)
+	/Users/lanceettl/zqk-restore-clone/pkg/logging/buffered_flush_registry.go:62 +0x6c fp=0x75f0ff023e90 sp=0x75f0ff023e10 pc=0x1052831fc
+github.com/lanceman/zqk/pkg/logging.(*sharedBufferedFlusher).loop-fm()
+	<autogenerated>:1 +0x20 fp=0x75f0ff023eb0 sp=0x75f0ff023e90 pc=0x1052a4570
+github.com/lanceman/zqk/pkg/goroutinelabels.(*GoroutineBuilder).StartSimple.func1.4(0x1063444e3?, 0x0?)
+	/Users/lanceettl/zqk-restore-clone/pkg/goroutinelabels/builder.go:525 +0x48 fp=0x75f0ff023ee0 sp=0x75f0ff023eb0 pc=0x1052131f8
+github.com/lanceman/zqk/pkg/goroutinelabels.(*GoroutineBuilder).StartSimple.func1()
+	/Users/lanceettl/zqk-restore-clone/pkg/goroutinelabels/builder.go:526 +0x2b0 fp=0x75f0ff023fd0 sp=0x75f0ff023ee0 pc=0x1052130d0
+runtime.goexit({})
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/asm_arm64.s:1447 +0x4 fp=0x75f0ff023fd0 sp=0x75f0ff023fd0 pc=0x10505cda4
+created by github.com/lanceman/zqk/pkg/goroutinelabels.(*GoroutineBuilder).StartSimple in goroutine 1
+	/Users/lanceettl/zqk-restore-clone/pkg/goroutinelabels/builder.go:460 +0x1d4
+
+goroutine 190 gp=0x75f0fd4843c0 m=nil [select]:
+runtime.gopark(0x75f0fcf69e38?, 0x2?, 0xe8?, 0x9c?, 0x75f0fcf69e0c?)
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/proc.go:462 +0xbc fp=0x75f0fcf69c80 sp=0x75f0fcf69c60 pc=0x105054e6c
+runtime.selectgo(0x75f0fcf69e38, 0x75f0fcf69e08, 0x0?, 0x0, 0x2?, 0x1)
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/select.go:351 +0x83c fp=0x75f0fcf69dc0 sp=0x75f0fcf69c80 pc=0x10503306c
+github.com/lanceman/zqk/pkg/storage.(*AsyncCacheValidationStrategy).scannerLoop(0x75f0fe1e5710)
+	/Users/lanceettl/zqk-restore-clone/pkg/storage/validation_strategy_async.go:297 +0xb4 fp=0x75f0fcf69e90 sp=0x75f0fcf69dc0 pc=0x105a3dda4
+github.com/lanceman/zqk/pkg/storage.(*AsyncCacheValidationStrategy).Start.func1.1({0x75f0fcf54ee8?, 0x1052128cc?})
+	/Users/lanceettl/zqk-restore-clone/pkg/storage/validation_strategy_async.go:237 +0x20 fp=0x75f0fcf69eb0 sp=0x75f0fcf69e90 pc=0x105a3db10
+github.com/lanceman/zqk/pkg/goroutinelabels.(*GoroutineBuilder).StartWithContext.func1.3(0x10633fe25?, 0x75f0fcf69f60, 0x106349e26?, {0x1079267c0?, 0x107a03a20?})
+	/Users/lanceettl/zqk-restore-clone/pkg/goroutinelabels/builder.go:407 +0x5c fp=0x75f0fcf69ef0 sp=0x75f0fcf69eb0 pc=0x105212aac
+github.com/lanceman/zqk/pkg/goroutinelabels.(*GoroutineBuilder).StartWithContext.func1()
+	/Users/lanceettl/zqk-restore-clone/pkg/goroutinelabels/builder.go:408 +0x1a4 fp=0x75f0fcf69fd0 sp=0x75f0fcf69ef0 pc=0x105212974
+runtime.goexit({})
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/asm_arm64.s:1447 +0x4 fp=0x75f0fcf69fd0 sp=0x75f0fcf69fd0 pc=0x10505cda4
+created by github.com/lanceman/zqk/pkg/goroutinelabels.(*GoroutineBuilder).StartWithContext in goroutine 278
+	/Users/lanceettl/zqk-restore-clone/pkg/goroutinelabels/builder.go:358 +0x1bc
+
+goroutine 191 gp=0x75f0fd4845a0 m=nil [select]:
+runtime.gopark(0x75f0fcf6ae38?, 0x2?, 0xe8?, 0xac?, 0x75f0fcf6ae0c?)
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/proc.go:462 +0xbc fp=0x75f0fcf6ac80 sp=0x75f0fcf6ac60 pc=0x105054e6c
+runtime.selectgo(0x75f0fcf6ae38, 0x75f0fcf6ae08, 0x75f0fcf55618?, 0x0, 0x75f0fcf55618?, 0x1)
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/select.go:351 +0x83c fp=0x75f0fcf6adc0 sp=0x75f0fcf6ac80 pc=0x10503306c
+github.com/lanceman/zqk/pkg/storage.(*AsyncCacheValidationStrategy).scannerLoop(0x75f0fe1e57a0)
+	/Users/lanceettl/zqk-restore-clone/pkg/storage/validation_strategy_async.go:297 +0xb4 fp=0x75f0fcf6ae90 sp=0x75f0fcf6adc0 pc=0x105a3dda4
+github.com/lanceman/zqk/pkg/storage.(*AsyncCacheValidationStrategy).Start.func1.1({0x75f0fcf556e8?, 0x1052128cc?})
+	/Users/lanceettl/zqk-restore-clone/pkg/storage/validation_strategy_async.go:237 +0x20 fp=0x75f0fcf6aeb0 sp=0x75f0fcf6ae90 pc=0x105a3db10
+github.com/lanceman/zqk/pkg/goroutinelabels.(*GoroutineBuilder).StartWithContext.func1.3(0x10633fe25?, 0x75f0fcf6af60, 0x106349e26?, {0x1079267c0?, 0x107a03a20?})
+	/Users/lanceettl/zqk-restore-clone/pkg/goroutinelabels/builder.go:407 +0x5c fp=0x75f0fcf6aef0 sp=0x75f0fcf6aeb0 pc=0x105212aac
+github.com/lanceman/zqk/pkg/goroutinelabels.(*GoroutineBuilder).StartWithContext.func1()
+	/Users/lanceettl/zqk-restore-clone/pkg/goroutinelabels/builder.go:408 +0x1a4 fp=0x75f0fcf6afd0 sp=0x75f0fcf6aef0 pc=0x105212974
+runtime.goexit({})
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/asm_arm64.s:1447 +0x4 fp=0x75f0fcf6afd0 sp=0x75f0fcf6afd0 pc=0x10505cda4
+created by github.com/lanceman/zqk/pkg/goroutinelabels.(*GoroutineBuilder).StartWithContext in goroutine 278
+	/Users/lanceettl/zqk-restore-clone/pkg/goroutinelabels/builder.go:358 +0x1bc
+
+goroutine 192 gp=0x75f0fd484780 m=nil [select]:
+runtime.gopark(0x75f0fe218e38?, 0x2?, 0xe8?, 0x8c?, 0x75f0fe218e0c?)
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/proc.go:462 +0xbc fp=0x75f0fe218c80 sp=0x75f0fe218c60 pc=0x105054e6c
+runtime.selectgo(0x75f0fe218e38, 0x75f0fe218e08, 0x0?, 0x0, 0x2?, 0x1)
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/select.go:351 +0x83c fp=0x75f0fe218dc0 sp=0x75f0fe218c80 pc=0x10503306c
+github.com/lanceman/zqk/pkg/storage.(*AsyncCacheValidationStrategy).scannerLoop(0x75f0fe1e59e0)
+	/Users/lanceettl/zqk-restore-clone/pkg/storage/validation_strategy_async.go:297 +0xb4 fp=0x75f0fe218e90 sp=0x75f0fe218dc0 pc=0x105a3dda4
+github.com/lanceman/zqk/pkg/storage.(*AsyncCacheValidationStrategy).Start.func1.1({0x75f0fcf55ee8?, 0x1052128cc?})
+	/Users/lanceettl/zqk-restore-clone/pkg/storage/validation_strategy_async.go:237 +0x20 fp=0x75f0fe218eb0 sp=0x75f0fe218e90 pc=0x105a3db10
+github.com/lanceman/zqk/pkg/goroutinelabels.(*GoroutineBuilder).StartWithContext.func1.3(0x10633fe25?, 0x75f0fe218f60, 0x106349e26?, {0x1079267c0?, 0x107a03a20?})
+	/Users/lanceettl/zqk-restore-clone/pkg/goroutinelabels/builder.go:407 +0x5c fp=0x75f0fe218ef0 sp=0x75f0fe218eb0 pc=0x105212aac
+github.com/lanceman/zqk/pkg/goroutinelabels.(*GoroutineBuilder).StartWithContext.func1()
+	/Users/lanceettl/zqk-restore-clone/pkg/goroutinelabels/builder.go:408 +0x1a4 fp=0x75f0fe218fd0 sp=0x75f0fe218ef0 pc=0x105212974
+runtime.goexit({})
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/asm_arm64.s:1447 +0x4 fp=0x75f0fe218fd0 sp=0x75f0fe218fd0 pc=0x10505cda4
+created by github.com/lanceman/zqk/pkg/goroutinelabels.(*GoroutineBuilder).StartWithContext in goroutine 278
+	/Users/lanceettl/zqk-restore-clone/pkg/goroutinelabels/builder.go:358 +0x1bc
+
+goroutine 193 gp=0x75f0fd484960 m=nil [select]:
+runtime.gopark(0x75f0ff02ee38?, 0x2?, 0xe8?, 0xec?, 0x75f0ff02ee0c?)
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/proc.go:462 +0xbc fp=0x75f0ff02ec80 sp=0x75f0ff02ec60 pc=0x105054e6c
+runtime.selectgo(0x75f0ff02ee38, 0x75f0ff02ee08, 0x0?, 0x0, 0x2?, 0x1)
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/select.go:351 +0x83c fp=0x75f0ff02edc0 sp=0x75f0ff02ec80 pc=0x10503306c
+github.com/lanceman/zqk/pkg/storage.(*AsyncCacheValidationStrategy).scannerLoop(0x75f0fe1e5a70)
+	/Users/lanceettl/zqk-restore-clone/pkg/storage/validation_strategy_async.go:297 +0xb4 fp=0x75f0ff02ee90 sp=0x75f0ff02edc0 pc=0x105a3dda4
+github.com/lanceman/zqk/pkg/storage.(*AsyncCacheValidationStrategy).Start.func1.1({0x75f0fe2686e8?, 0x1052128cc?})
+	/Users/lanceettl/zqk-restore-clone/pkg/storage/validation_strategy_async.go:237 +0x20 fp=0x75f0ff02eeb0 sp=0x75f0ff02ee90 pc=0x105a3db10
+github.com/lanceman/zqk/pkg/goroutinelabels.(*GoroutineBuilder).StartWithContext.func1.3(0x10633fe25?, 0x75f0ff02ef60, 0x106349e26?, {0x1079267c0?, 0x107a03a20?})
+	/Users/lanceettl/zqk-restore-clone/pkg/goroutinelabels/builder.go:407 +0x5c fp=0x75f0ff02eef0 sp=0x75f0ff02eeb0 pc=0x105212aac
+github.com/lanceman/zqk/pkg/goroutinelabels.(*GoroutineBuilder).StartWithContext.func1()
+	/Users/lanceettl/zqk-restore-clone/pkg/goroutinelabels/builder.go:408 +0x1a4 fp=0x75f0ff02efd0 sp=0x75f0ff02eef0 pc=0x105212974
+runtime.goexit({})
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/asm_arm64.s:1447 +0x4 fp=0x75f0ff02efd0 sp=0x75f0ff02efd0 pc=0x10505cda4
+created by github.com/lanceman/zqk/pkg/goroutinelabels.(*GoroutineBuilder).StartWithContext in goroutine 278
+	/Users/lanceettl/zqk-restore-clone/pkg/goroutinelabels/builder.go:358 +0x1bc
+
+goroutine 306 gp=0x75f0fd484b40 m=nil [select]:
+runtime.gopark(0x75f0fe219e38?, 0x2?, 0xe8?, 0x9c?, 0x75f0fe219e0c?)
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/proc.go:462 +0xbc fp=0x75f0fe219c80 sp=0x75f0fe219c60 pc=0x105054e6c
+runtime.selectgo(0x75f0fe219e38, 0x75f0fe219e08, 0x0?, 0x0, 0x2?, 0x1)
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/select.go:351 +0x83c fp=0x75f0fe219dc0 sp=0x75f0fe219c80 pc=0x10503306c
+github.com/lanceman/zqk/pkg/storage.(*AsyncCacheValidationStrategy).scannerLoop(0x75f0fe1e5b00)
+	/Users/lanceettl/zqk-restore-clone/pkg/storage/validation_strategy_async.go:297 +0xb4 fp=0x75f0fe219e90 sp=0x75f0fe219dc0 pc=0x105a3dda4
+github.com/lanceman/zqk/pkg/storage.(*AsyncCacheValidationStrategy).Start.func1.1({0x75f0fe268ee8?, 0x1052128cc?})
+	/Users/lanceettl/zqk-restore-clone/pkg/storage/validation_strategy_async.go:237 +0x20 fp=0x75f0fe219eb0 sp=0x75f0fe219e90 pc=0x105a3db10
+github.com/lanceman/zqk/pkg/goroutinelabels.(*GoroutineBuilder).StartWithContext.func1.3(0x10633fe25?, 0x75f0fe219f60, 0x106349e26?, {0x1079267c0?, 0x107a03a20?})
+	/Users/lanceettl/zqk-restore-clone/pkg/goroutinelabels/builder.go:407 +0x5c fp=0x75f0fe219ef0 sp=0x75f0fe219eb0 pc=0x105212aac
+github.com/lanceman/zqk/pkg/goroutinelabels.(*GoroutineBuilder).StartWithContext.func1()
+	/Users/lanceettl/zqk-restore-clone/pkg/goroutinelabels/builder.go:408 +0x1a4 fp=0x75f0fe219fd0 sp=0x75f0fe219ef0 pc=0x105212974
+runtime.goexit({})
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/asm_arm64.s:1447 +0x4 fp=0x75f0fe219fd0 sp=0x75f0fe219fd0 pc=0x10505cda4
+created by github.com/lanceman/zqk/pkg/goroutinelabels.(*GoroutineBuilder).StartWithContext in goroutine 278
+	/Users/lanceettl/zqk-restore-clone/pkg/goroutinelabels/builder.go:358 +0x1bc
+
+goroutine 322 gp=0x75f0fcf9d0e0 m=nil [select, 6 minutes]:
+runtime.gopark(0x75f0fcf54658?, 0x3?, 0x8?, 0xe0?, 0x75f0fcf54622?)
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/proc.go:462 +0xbc fp=0x75f0ff02fc80 sp=0x75f0ff02fc60 pc=0x105054e6c
+runtime.selectgo(0x75f0ff02fe58, 0x75f0fcf5461c, 0x109ff52f8?, 0x0, 0x75f0fd38e008?, 0x1)
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/select.go:351 +0x83c fp=0x75f0ff02fdc0 sp=0x75f0ff02fc80 pc=0x10503306c
+github.com/lanceman/zqk/pkg/storage.(*AuditEventBuffer).periodicFlush(0x75f0fe34d5f0)
+	/Users/lanceettl/zqk-restore-clone/pkg/storage/audit_event_buffer_flush.go:25 +0x78 fp=0x75f0ff02fe90 sp=0x75f0ff02fdc0 pc=0x10593e4f8
+github.com/lanceman/zqk/pkg/storage.NewAuditEventBufferWithConfig.func2({0x75f0fcf546e8?, 0x1052128cc?})
+	/Users/lanceettl/zqk-restore-clone/pkg/storage/audit_event_buffer_initialization.go:157 +0x20 fp=0x75f0ff02feb0 sp=0x75f0ff02fe90 pc=0x105941010
+github.com/lanceman/zqk/pkg/goroutinelabels.(*GoroutineBuilder).StartWithContext.func1.3(0x75f0fd3b6dc0?, 0x75f0ff02ff60, 0x1063825ba?, {0x107926868?, 0x75f0fd3b6dc0?})
+	/Users/lanceettl/zqk-restore-clone/pkg/goroutinelabels/builder.go:407 +0x5c fp=0x75f0ff02fef0 sp=0x75f0ff02feb0 pc=0x105212aac
+github.com/lanceman/zqk/pkg/goroutinelabels.(*GoroutineBuilder).StartWithContext.func1()
+	/Users/lanceettl/zqk-restore-clone/pkg/goroutinelabels/builder.go:408 +0x1a4 fp=0x75f0ff02ffd0 sp=0x75f0ff02fef0 pc=0x105212974
+runtime.goexit({})
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/asm_arm64.s:1447 +0x4 fp=0x75f0ff02ffd0 sp=0x75f0ff02ffd0 pc=0x10505cda4
+created by github.com/lanceman/zqk/pkg/goroutinelabels.(*GoroutineBuilder).StartWithContext in goroutine 214
+	/Users/lanceettl/zqk-restore-clone/pkg/goroutinelabels/builder.go:358 +0x1bc
+
+goroutine 323 gp=0x75f0fcf9d2c0 m=nil [select, 6 minutes]:
+runtime.gopark(0x75f0feb9c658?, 0x3?, 0x8?, 0xe0?, 0x75f0feb9c622?)
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/proc.go:462 +0xbc fp=0x75f0fe212c80 sp=0x75f0fe212c60 pc=0x105054e6c
+runtime.selectgo(0x75f0fe212e58, 0x75f0feb9c61c, 0x109ff52f8?, 0x0, 0x75f0fd38e008?, 0x1)
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/select.go:351 +0x83c fp=0x75f0fe212dc0 sp=0x75f0fe212c80 pc=0x10503306c
+github.com/lanceman/zqk/pkg/storage.(*AuditEventBuffer).periodicFlush(0x75f0fe34dba0)
+	/Users/lanceettl/zqk-restore-clone/pkg/storage/audit_event_buffer_flush.go:25 +0x78 fp=0x75f0fe212e90 sp=0x75f0fe212dc0 pc=0x10593e4f8
+github.com/lanceman/zqk/pkg/storage.NewAuditEventBufferWithConfig.func2({0x75f0feb9c6e8?, 0x1052128cc?})
+	/Users/lanceettl/zqk-restore-clone/pkg/storage/audit_event_buffer_initialization.go:157 +0x20 fp=0x75f0fe212eb0 sp=0x75f0fe212e90 pc=0x105941010
+github.com/lanceman/zqk/pkg/goroutinelabels.(*GoroutineBuilder).StartWithContext.func1.3(0x75f0fd3b6e10?, 0x75f0fe212f60, 0x1063825ba?, {0x107926868?, 0x75f0fd3b6e10?})
+	/Users/lanceettl/zqk-restore-clone/pkg/goroutinelabels/builder.go:407 +0x5c fp=0x75f0fe212ef0 sp=0x75f0fe212eb0 pc=0x105212aac
+github.com/lanceman/zqk/pkg/goroutinelabels.(*GoroutineBuilder).StartWithContext.func1()
+	/Users/lanceettl/zqk-restore-clone/pkg/goroutinelabels/builder.go:408 +0x1a4 fp=0x75f0fe212fd0 sp=0x75f0fe212ef0 pc=0x105212974
+runtime.goexit({})
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/asm_arm64.s:1447 +0x4 fp=0x75f0fe212fd0 sp=0x75f0fe212fd0 pc=0x10505cda4
+created by github.com/lanceman/zqk/pkg/goroutinelabels.(*GoroutineBuilder).StartWithContext in goroutine 214
+	/Users/lanceettl/zqk-restore-clone/pkg/goroutinelabels/builder.go:358 +0x1bc
+
+goroutine 335 gp=0x75f0fd005680 m=nil [IO wait, 6 minutes]:
+runtime.gopark(0x0?, 0x0?, 0x0?, 0x0?, 0x75f0fcf77d20?)
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/proc.go:462 +0xbc fp=0x75f0fd389ca0 sp=0x75f0fd389c80 pc=0x105054e6c
+runtime.netpollblock(0x75f0fd389d38?, 0x509a3cc?, 0x1?)
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/netpoll.go:575 +0x150 fp=0x75f0fd389ce0 sp=0x75f0fd389ca0 pc=0x105018b50
+internal/poll.runtime_pollWait(0x135a52200, 0x72)
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/netpoll.go:351 +0xa0 fp=0x75f0fd389d10 sp=0x75f0fd389ce0 pc=0x105054080
+internal/poll.(*pollDesc).wait(0x75f0fd8d5b00?, 0x30?, 0x0)
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/internal/poll/fd_poll_runtime.go:84 +0x28 fp=0x75f0fd389d40 sp=0x75f0fd389d10 pc=0x1050962f8
+internal/poll.(*pollDesc).waitRead(...)
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/internal/poll/fd_poll_runtime.go:89
+internal/poll.(*FD).Accept(0x75f0fd8d5b00)
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/internal/poll/fd_unix.go:613 +0x214 fp=0x75f0fd389df0 sp=0x75f0fd389d40 pc=0x10509a4a4
+net.(*netFD).accept(0x75f0fd8d5b00)
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/net/fd_unix.go:150 +0x28 fp=0x75f0fd389eb0 sp=0x75f0fd389df0 pc=0x105145a68
+net.(*UnixListener).accept(0x10636c751?)
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/net/unixsock_posix.go:172 +0x20 fp=0x75f0fd389ee0 sp=0x75f0fd389eb0 pc=0x10515c370
+net.(*UnixListener).Accept(0x75f0ff75cb10)
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/net/unixsock.go:267 +0x2c fp=0x75f0fd389f20 sp=0x75f0fd389ee0 pc=0x10515b09c
+net/rpc.(*Server).Accept(0x75f0ff37bc20, {0x1079250a8, 0x75f0ff75cb10})
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/net/rpc/server.go:631 +0x4c fp=0x75f0fd389fa0 sp=0x75f0fd389f20 pc=0x105911e0c
+github.com/lanceman/zqk/pkg/storage.StartIPCServer.gowrap1()
+	/Users/lanceettl/zqk-restore-clone/pkg/storage/ipc_server.go:64 +0x24 fp=0x75f0fd389fd0 sp=0x75f0fd389fa0 pc=0x10598e2d4
+runtime.goexit({})
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/asm_arm64.s:1447 +0x4 fp=0x75f0fd389fd0 sp=0x75f0fd389fd0 pc=0x10505cda4
+created by github.com/lanceman/zqk/pkg/storage.StartIPCServer in goroutine 1
+	/Users/lanceettl/zqk-restore-clone/pkg/storage/ipc_server.go:64 +0x1f8
+
+goroutine 1692 gp=0x75f0ff0303c0 m=nil [select, 2 minutes]:
+runtime.gopark(0x75f0feec5e58?, 0x2?, 0xa8?, 0x5c?, 0x75f0feec5dfc?)
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/proc.go:462 +0xbc fp=0x75f0ff020c60 sp=0x75f0ff020c40 pc=0x105054e6c
+runtime.selectgo(0x75f0ff020e58, 0x75f0feec5df8, 0x0?, 0x0, 0x75f0fd38b608?, 0x1)
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/select.go:351 +0x83c fp=0x75f0ff020da0 sp=0x75f0ff020c60 pc=0x10503306c
+github.com/lanceman/zqk/pkg/validation.(*sharedValidationCache).runFlusher(0x75f100c20d40, {0x1079267c0, 0x107a03a20})
+	/Users/lanceettl/zqk-restore-clone/pkg/validation/state_cache_shared.go:106 +0x94 fp=0x75f0ff020e80 sp=0x75f0ff020da0 pc=0x1053aaa64
+github.com/lanceman/zqk/pkg/validation.getSharedValidationCache.func1()
+	/Users/lanceettl/zqk-restore-clone/pkg/validation/state_cache_shared.go:85 +0x30 fp=0x75f0ff020eb0 sp=0x75f0ff020e80 pc=0x1053aa930
+github.com/lanceman/zqk/pkg/goroutinelabels.(*GoroutineBuilder).StartSimple.func1.4(0x106355f99?, 0x10505cda4?)
+	/Users/lanceettl/zqk-restore-clone/pkg/goroutinelabels/builder.go:525 +0x48 fp=0x75f0ff020ee0 sp=0x75f0ff020eb0 pc=0x1052131f8
+github.com/lanceman/zqk/pkg/goroutinelabels.(*GoroutineBuilder).StartSimple.func1()
+	/Users/lanceettl/zqk-restore-clone/pkg/goroutinelabels/builder.go:526 +0x2b0 fp=0x75f0ff020fd0 sp=0x75f0ff020ee0 pc=0x1052130d0
+runtime.goexit({})
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/asm_arm64.s:1447 +0x4 fp=0x75f0ff020fd0 sp=0x75f0ff020fd0 pc=0x10505cda4
+created by github.com/lanceman/zqk/pkg/goroutinelabels.(*GoroutineBuilder).StartSimple in goroutine 1690
+	/Users/lanceettl/zqk-restore-clone/pkg/goroutinelabels/builder.go:460 +0x1d4
+
+r0      0x4
+r1      0x75f0fd388783
+r2      0x1
+r3      0x1079dbca0
+r4      0x110
+r5      0x75f0fd40d530
+r6      0x1
+r7      0x0
+r8      0x1079dcea0
+r9      0x75f0fd388758
+r10     0x40000000400
+r11     0x40000000402
+r12     0x100
+r13     0x16ae2f420
+r14     0xd400
+r15     0xd300
+r16     0x3
+r17     0xd3000000d400
+r18     0x0
+r19     0x16ae2f3a8
+r20     0x7d
+r21     0x3
+r22     0x0
+r23     0x65
+r24     0x201
+r25     0x75f0fcf315a8
+r26     0x75f0fd388708
+r27     0x820
+r28     0x1079dbca0
+r29     0x16ae2f408
+lr      0x10505d6dc
+sp      0x16ae2f410
+pc      0x1879ec918
+fault   0x1879ec918
+2026/09/04 14:14:19 rpc.Serve: accept:accept unix /tmp/zqk-privileged-writer.sock: use of closed network connection
+2026/09/04 14:36:56 rpc.Serve: accept:accept unix /tmp/zqk-privileged-writer.sock: use of closed network connection
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:05:03Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:05:13Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:05:23Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:05:34Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:05:43Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:05:54Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:06:04Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:06:15Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:06:26Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:06:37Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:06:48Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:06:59Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:07:09Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:07:20Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:07:30Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:07:41Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:07:52Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:08:03Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:08:14Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:08:25Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:08:36Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:08:45Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:08:56Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:09:07Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:09:17Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:09:28Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:09:39Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:09:50Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:10:00Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:10:11Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:10:21Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:10:32Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:10:43Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:10:54Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:11:05Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:11:16Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:11:27Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:11:38Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:11:48Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:11:59Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:12:10Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:12:21Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:12:31Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:12:42Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:12:53Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:13:04Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:13:14Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:13:25Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:13:35Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:13:51Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:13:57Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:14:07Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:14:18Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:14:29Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:14:40Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:14:51Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:15:02Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:15:13Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:15:23Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:15:33Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:15:43Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:15:55Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:16:04Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:16:15Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:16:26Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:16:37Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:16:48Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:16:59Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:17:09Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:17:20Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:17:31Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:17:42Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:17:53Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:18:03Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:18:14Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:18:25Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:18:36Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:18:47Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:18:58Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:19:09Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:19:19Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:19:30Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:19:41Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:19:52Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:20:03Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:20:14Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:20:25Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:20:35Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:20:46Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:20:57Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:21:08Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:21:19Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:21:30Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:21:41Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:21:51Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:22:02Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:22:13Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:22:22Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:22:33Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:22:44Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:22:55Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:23:06Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:23:16Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:23:27Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:23:38Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:23:49Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:23:59Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:24:10Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:24:21Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:24:32Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:24:43Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:24:54Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:25:05Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:25:16Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:25:27Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:25:37Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:25:48Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:25:59Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:26:10Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:26:21Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:26:31Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:26:42Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:26:53Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:27:04Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:27:15Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:27:26Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:27:36Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:27:47Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:27:58Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:28:09Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:28:20Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:28:31Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:28:42Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:28:53Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:29:03Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:29:13Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:29:25Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:29:35Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:29:45Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:29:55Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:30:06Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:30:17Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:30:28Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:30:39Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:30:50Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:31:01Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:31:11Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:31:21Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:31:32Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:31:43Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:31:53Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:32:04Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:32:15Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:32:25Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:32:35Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:32:46Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:32:56Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:33:07Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:33:17Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:33:28Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:33:38Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:33:50Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:34:00Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:34:10Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:34:20Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:34:30Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:34:40Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:34:51Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:35:02Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:35:13Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:35:24Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:35:34Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:35:44Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:35:54Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:36:04Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:36:14Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:36:24Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:36:34Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:36:44Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:36:55Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:37:06Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:37:17Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:37:27Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:37:38Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:37:49Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:38:00Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:38:10Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:38:21Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:38:31Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:38:41Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:38:52Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:39:02Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:39:12Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:39:22Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:39:33Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:39:43Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:39:54Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:40:05Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:40:16Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:40:27Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:40:38Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:40:48Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:40:58Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:41:08Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:41:18Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:41:28Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:41:39Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:41:49Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:42:00Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:42:10Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:42:21Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:42:33Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:42:43Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:42:53Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:43:04Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:43:14Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:43:25Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:43:35Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:43:46Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:43:56Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:44:06Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:44:16Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:44:26Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:44:36Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:44:47Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:44:57Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:45:07Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:45:18Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:45:28Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:45:38Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:45:49Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:45:58Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:46:09Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:46:20Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:46:30Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:46:40Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:46:51Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:47:01Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:47:11Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:47:22Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:47:34Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:47:44Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:47:54Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:48:05Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:48:15Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:48:25Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:48:36Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:48:47Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:48:57Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:49:08Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:49:19Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:49:30Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:49:41Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:49:51Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:50:01Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:50:12Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:50:22Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:50:33Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:50:45Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:50:55Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:51:05Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:51:15Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:51:26Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:51:36Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:51:48Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:51:58Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:52:08Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:52:19Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:52:31Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:52:40Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:52:51Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:53:03Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:53:13Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:53:23Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:53:33Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:53:44Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:53:55Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:54:06Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:54:16Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:54:26Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:54:37Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:54:47Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:54:57Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:55:08Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:55:18Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:55:29Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:55:39Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:55:49Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:56:00Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:56:10Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:56:20Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:56:31Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:56:41Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:56:52Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:57:02Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:57:12Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:57:22Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:57:33Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:57:43Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:57:53Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:58:03Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:58:13Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:58:23Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:58:34Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:58:44Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:58:55Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:59:06Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:59:17Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:59:27Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:59:38Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:59:48Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T06:59:58Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T07:00:09Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T07:00:20Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T07:00:31Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T07:00:41Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T07:00:52Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T07:01:03Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T07:01:14Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T07:01:25Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T07:01:36Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T07:01:47Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T07:01:57Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T07:02:08Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T07:02:19Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T07:02:30Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T07:02:40Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T07:02:51Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T07:03:02Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T07:03:13Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T07:03:24Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T07:03:35Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T07:03:45Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T07:03:56Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T07:04:07Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T07:04:18Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T07:04:29Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T07:04:39Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T07:04:50Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T07:05:01Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T07:05:12Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T07:05:23Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T07:05:33Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T07:05:44Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T07:05:55Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T07:06:06Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T07:06:17Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T07:06:27Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T07:06:38Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T07:06:49Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T07:07:00Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T07:07:10Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T07:07:21Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T07:07:32Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T07:07:43Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T07:07:53Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T07:08:04Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T07:08:15Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T07:08:26Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T07:08:37Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T07:08:47Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T07:08:58Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T07:09:09Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T07:09:20Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T07:09:31Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T07:09:42Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T07:09:52Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T07:10:02Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T07:10:13Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T07:10:24Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T07:10:35Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T07:10:46Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T07:10:57Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T07:11:08Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T07:11:19Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T07:11:30Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T07:11:41Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T07:11:51Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T07:12:02Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T07:12:13Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T07:12:24Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T07:12:35Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T07:12:46Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T07:12:57Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T07:13:06Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T07:13:17Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T07:13:28Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T07:13:39Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T07:13:50Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T07:14:01Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T07:14:12Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T07:14:22Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T07:14:32Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T07:14:43Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T07:14:54Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T07:15:04Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T07:15:15Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T07:15:26Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T07:15:37Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T07:15:48Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T07:15:59Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T07:16:09Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T07:16:20Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T07:16:31Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T07:16:42Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T07:16:52Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T07:17:03Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T07:17:14Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T07:17:25Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T07:17:36Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T07:17:47Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T07:17:58Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T07:18:09Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T07:18:19Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T07:18:30Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T07:18:41Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T07:18:52Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T07:19:03Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T07:19:13Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T07:19:24Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T07:19:34Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T07:19:45Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T07:19:56Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T07:20:07Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T07:20:18Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+2026-09-05T07:20:29Z [error] Command execution failed error=unauthorized: account index missing; cannot verify role+persona binding for ACC-1785920548450214006-2e52b3e7 (CRI-ACCOUNT-RBAC-READY)
+Error: unauthorized: failed to load account schema: stat /Users/lanceettl/zqk-restore-clone/docs/process/_internal/object_specs/account.yaml: no such file or directory
+2026-09-05T07:20:39Z [error] Command execution failed error=unauthorized: failed to load account schema: stat /Users/lanceettl/zqk-restore-clone/docs/process/_internal/object_specs/account.yaml: no such file or directory
+Error: unauthorized: failed to load account schema: stat /Users/lanceettl/zqk-restore-clone/docs/process/_internal/object_specs/account.yaml: no such file or directory
+2026-09-05T07:20:49Z [error] Command execution failed error=unauthorized: failed to load account schema: stat /Users/lanceettl/zqk-restore-clone/docs/process/_internal/object_specs/account.yaml: no such file or directory
+Error: unauthorized: failed to load account schema: stat /Users/lanceettl/zqk-restore-clone/docs/process/_internal/object_specs/account.yaml: no such file or directory
+2026-09-05T07:21:04Z [error] Command execution failed error=unauthorized: failed to load account schema: stat /Users/lanceettl/zqk-restore-clone/docs/process/_internal/object_specs/account.yaml: no such file or directory
+Error: unauthorized: failed to load account schema: stat /Users/lanceettl/zqk-restore-clone/docs/process/_internal/object_specs/account.yaml: no such file or directory
+2026-09-05T07:21:09Z [error] Command execution failed error=unauthorized: failed to load account schema: stat /Users/lanceettl/zqk-restore-clone/docs/process/_internal/object_specs/account.yaml: no such file or directory
+Error: unauthorized: failed to load account schema: stat /Users/lanceettl/zqk-restore-clone/docs/process/_internal/object_specs/account.yaml: no such file or directory
+2026-09-05T07:21:19Z [error] Command execution failed error=unauthorized: failed to load account schema: stat /Users/lanceettl/zqk-restore-clone/docs/process/_internal/object_specs/account.yaml: no such file or directory
+Error: unauthorized: failed to load account schema: stat /Users/lanceettl/zqk-restore-clone/docs/process/_internal/object_specs/account.yaml: no such file or directory
+2026-09-05T07:21:30Z [error] Command execution failed error=unauthorized: failed to load account schema: stat /Users/lanceettl/zqk-restore-clone/docs/process/_internal/object_specs/account.yaml: no such file or directory
+Error: unauthorized: failed to load account schema: stat /Users/lanceettl/zqk-restore-clone/docs/process/_internal/object_specs/account.yaml: no such file or directory
+2026-09-05T07:21:40Z [error] Command execution failed error=unauthorized: failed to load account schema: stat /Users/lanceettl/zqk-restore-clone/docs/process/_internal/object_specs/account.yaml: no such file or directory
+Error: unauthorized: failed to load account schema: stat /Users/lanceettl/zqk-restore-clone/docs/process/_internal/object_specs/account.yaml: no such file or directory
+2026-09-05T07:21:50Z [error] Command execution failed error=unauthorized: failed to load account schema: stat /Users/lanceettl/zqk-restore-clone/docs/process/_internal/object_specs/account.yaml: no such file or directory
+Error: unauthorized: failed to load account schema: stat /Users/lanceettl/zqk-restore-clone/docs/process/_internal/object_specs/account.yaml: no such file or directory
+2026-09-05T07:22:00Z [error] Command execution failed error=unauthorized: failed to load account schema: stat /Users/lanceettl/zqk-restore-clone/docs/process/_internal/object_specs/account.yaml: no such file or directory
+Error: unauthorized: failed to load account schema: stat /Users/lanceettl/zqk-restore-clone/docs/process/_internal/object_specs/account.yaml: no such file or directory
+2026-09-05T07:22:10Z [error] Command execution failed error=unauthorized: failed to load account schema: stat /Users/lanceettl/zqk-restore-clone/docs/process/_internal/object_specs/account.yaml: no such file or directory
+Error: unauthorized: failed to load account schema: stat /Users/lanceettl/zqk-restore-clone/docs/process/_internal/object_specs/account.yaml: no such file or directory
+2026-09-05T07:22:20Z [error] Command execution failed error=unauthorized: failed to load account schema: stat /Users/lanceettl/zqk-restore-clone/docs/process/_internal/object_specs/account.yaml: no such file or directory
+Error: unauthorized: failed to load account schema: stat /Users/lanceettl/zqk-restore-clone/docs/process/_internal/object_specs/account.yaml: no such file or directory
+2026-09-05T07:22:30Z [error] Command execution failed error=unauthorized: failed to load account schema: stat /Users/lanceettl/zqk-restore-clone/docs/process/_internal/object_specs/account.yaml: no such file or directory
+Error: unauthorized: failed to load account schema: stat /Users/lanceettl/zqk-restore-clone/docs/process/_internal/object_specs/account.yaml: no such file or directory
+2026-09-05T07:22:40Z [error] Command execution failed error=unauthorized: failed to load account schema: stat /Users/lanceettl/zqk-restore-clone/docs/process/_internal/object_specs/account.yaml: no such file or directory
+Error: unauthorized: failed to load account schema: stat /Users/lanceettl/zqk-restore-clone/docs/process/_internal/object_specs/account.yaml: no such file or directory
+2026-09-05T07:22:50Z [error] Command execution failed error=unauthorized: failed to load account schema: stat /Users/lanceettl/zqk-restore-clone/docs/process/_internal/object_specs/account.yaml: no such file or directory
+Error: unauthorized: failed to load account schema: stat /Users/lanceettl/zqk-restore-clone/docs/process/_internal/object_specs/account.yaml: no such file or directory
+2026-09-05T07:23:00Z [error] Command execution failed error=unauthorized: failed to load account schema: stat /Users/lanceettl/zqk-restore-clone/docs/process/_internal/object_specs/account.yaml: no such file or directory

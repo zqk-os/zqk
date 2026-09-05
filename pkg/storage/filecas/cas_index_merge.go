@@ -1,0 +1,66 @@
+package filecas
+
+import (
+	"maps"
+	"path/filepath"
+
+	"github.com/lanceman/zqk/pkg/utils/fileutil"
+)
+
+// mergeCASIndexMaps merges a durable on-disk mapping snapshot with a same-process
+// in-memory view. Disk wins when its hash file exists and memory's does not (stale
+// process cache). Memory wins when its hash file exists and disk's does not (index
+// lag after update / sync-cas-index). When both or neither exist, prefer disk so
+// short-lived CLI caches cannot clobber a healed index; callers must re-apply the
+// in-flight batch/explicit mapping afterward.
+//
+// TRACK: REDACTED — remove when: CAS index writers never
+// overlay a full stale process map onto a fresher disk snapshot.
+func MergeCASIndexMaps(kindDir string, disk, memory map[string]string) map[string]string {
+	out := make(map[string]string, len(disk)+len(memory))
+	if disk != nil {
+		maps.Copy(out, disk)
+	}
+	for id, memHash := range memory {
+		if id == "" || memHash == "" {
+			continue
+		}
+		diskHash, onDisk := out[id]
+		if !onDisk || diskHash == "" {
+			out[id] = memHash
+			continue
+		}
+		if diskHash == memHash {
+			continue
+		}
+		out[id] = pickCASIndexHash(kindDir, diskHash, memHash)
+	}
+	return out
+}
+
+func pickCASIndexHash(kindDir, diskHash, memHash string) string {
+	memExists := CasHashYAMLExists(kindDir, memHash)
+	diskExists := CasHashYAMLExists(kindDir, diskHash)
+	switch {
+	case memExists && !diskExists:
+		return memHash
+	case diskExists && !memExists:
+		return diskHash
+	case memExists && diskExists:
+		// Both blobs present (rare mid-update). Prefer disk so other processes'
+		// sync-cas-index / heal is not reverted; in-flight batch re-apply restores
+		// this process's authoritative updates.
+		return diskHash
+	default:
+		// Neither file on disk — keep disk index value (may be pending delete).
+		return diskHash
+	}
+}
+
+func CasHashYAMLExists(kindDir, hash string) bool {
+	if kindDir == "" || hash == "" {
+		return false
+	}
+	_, err := fileutil.Stat(filepath.Join(kindDir, hash+".yaml"))
+	return err == nil
+}

@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-755",
+  "created_at": "2026-09-04T21:34:34.817609Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-755",
+    "Tests": [
+      {
+        "Name": "TestGoExtractor_Imports",
+        "Package": "observer",
+        "PackagePath": "pkg/observer",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/observer/go_extractor_structural_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestGoExtractor_ExtractFile",
+        "Package": "observer",
+        "PackagePath": "pkg/observer",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/observer/go_extractor_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestGoExtractor_ExtractFile_InvalidGo",
+        "Package": "observer",
+        "PackagePath": "pkg/observer",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/observer/go_extractor_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestGoExtractor_LanguageAndSuffix",
+        "Package": "observer",
+        "PackagePath": "pkg/observer",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/observer/go_extractor_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestEntityID",
+        "Package": "observer",
+        "PackagePath": "pkg/observer",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/observer/graph_populate_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestFileID",
+        "Package": "observer",
+        "PackagePath": "pkg/observer",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/observer/graph_populate_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestEntityToNode",
+        "Package": "observer",
+        "PackagePath": "pkg/observer",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/observer/graph_populate_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestPopulate_RecordsNodesAndEdges",
+        "Package": "observer",
+        "PackagePath": "pkg/observer",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/observer/graph_populate_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestPopulate_NilConn",
+        "Package": "observer",
+        "PackagePath": "pkg/observer",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/observer/graph_populate_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestSemanticEnhancer_Enhance",
+        "Package": "observer",
+        "PackagePath": "pkg/observer",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/observer/semantic_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 300000000000,
+    "PackagePath": "pkg/observer"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestGoExtractor_Imports",
+      "Package": "observer",
+      "PackagePath": "pkg/observer",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/observer/go_extractor_structural_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestGoExtractor_ExtractFile",
+      "Package": "observer",
+      "PackagePath": "pkg/observer",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/observer/go_extractor_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestGoExtractor_ExtractFile_InvalidGo",
+      "Package": "observer",
+      "PackagePath": "pkg/observer",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/observer/go_extractor_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestGoExtractor_LanguageAndSuffix",
+      "Package": "observer",
+      "PackagePath": "pkg/observer",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/observer/go_extractor_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestEntityID",
+      "Package": "observer",
+      "PackagePath": "pkg/observer",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/observer/graph_populate_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestFileID",
+      "Package": "observer",
+      "PackagePath": "pkg/observer",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/observer/graph_populate_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestEntityToNode",
+      "Package": "observer",
+      "PackagePath": "pkg/observer",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/observer/graph_populate_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestPopulate_RecordsNodesAndEdges",
+      "Package": "observer",
+      "PackagePath": "pkg/observer",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/observer/graph_populate_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestPopulate_NilConn",
+      "Package": "observer",
+      "PackagePath": "pkg/observer",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/observer/graph_populate_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestSemanticEnhancer_Enhance",
+      "Package": "observer",
+      "PackagePath": "pkg/observer",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/observer/semantic_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

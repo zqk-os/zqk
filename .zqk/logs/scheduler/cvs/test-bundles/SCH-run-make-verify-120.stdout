@@ -1,0 +1,54 @@
+
+--- run 2026-09-04T21:37:44Z ---
+=== RUN   TestAsyncValidator_CoordinatorIntegration
+=== PAUSE TestAsyncValidator_CoordinatorIntegration
+=== RUN   TestAsyncValidator_ShutdownCoordination
+=== PAUSE TestAsyncValidator_ShutdownCoordination
+=== RUN   TestAsyncValidator_MultipleWorkers
+=== PAUSE TestAsyncValidator_MultipleWorkers
+=== RUN   TestAsyncValidator_ConcurrentOperations
+=== PAUSE TestAsyncValidator_ConcurrentOperations
+=== RUN   TestAsyncValidator_GetMaxWorkers
+=== PAUSE TestAsyncValidator_GetMaxWorkers
+=== RUN   TestAsyncValidator_GetWorkerCount
+=== PAUSE TestAsyncValidator_GetWorkerCount
+=== RUN   TestAsyncValidator_WorkerCountOptimization
+=== PAUSE TestAsyncValidator_WorkerCountOptimization
+=== RUN   TestAsyncValidator_ShouldEnqueue
+=== PAUSE TestAsyncValidator_ShouldEnqueue
+=== RUN   TestAsyncValidator_EnqueueBatchOptimization
+=== PAUSE TestAsyncValidator_EnqueueBatchOptimization
+=== RUN   TestAsyncValidator_BatchEnqueueOptimization
+=== PAUSE TestAsyncValidator_BatchEnqueueOptimization
+=== CONT  TestAsyncValidator_CoordinatorIntegration
+=== CONT  TestAsyncValidator_GetWorkerCount
+--- PASS: TestAsyncValidator_GetWorkerCount (0.25s)
+=== CONT  TestAsyncValidator_ConcurrentOperations
+--- PASS: TestAsyncValidator_CoordinatorIntegration (0.32s)
+=== CONT  TestAsyncValidator_GetMaxWorkers
+=== RUN   TestAsyncValidator_GetMaxWorkers/low
+=== RUN   TestAsyncValidator_GetMaxWorkers/medium
+=== RUN   TestAsyncValidator_GetMaxWorkers/high
+--- PASS: TestAsyncValidator_GetMaxWorkers (0.01s)
+    --- PASS: TestAsyncValidator_GetMaxWorkers/low (0.00s)
+    --- PASS: TestAsyncValidator_GetMaxWorkers/medium (0.00s)
+    --- PASS: TestAsyncValidator_GetMaxWorkers/high (0.00s)
+=== CONT  TestAsyncValidator_EnqueueBatchOptimization
+=== NAME  TestAsyncValidator_ConcurrentOperations
+    async_validator_on_demand_test.go:279: Active workers after concurrent operations: 1
+--- PASS: TestAsyncValidator_ConcurrentOperations (0.52s)
+=== CONT  TestAsyncValidator_BatchEnqueueOptimization
+--- PASS: TestAsyncValidator_EnqueueBatchOptimization (1.06s)
+=== CONT  TestAsyncValidator_ShouldEnqueue
+--- PASS: TestAsyncValidator_ShouldEnqueue (0.52s)
+=== CONT  TestAsyncValidator_WorkerCountOptimization
+--- PASS: TestAsyncValidator_WorkerCountOptimization (0.01s)
+=== CONT  TestAsyncValidator_MultipleWorkers
+    async_validator_on_demand_test.go:239: Active workers: 1, Max workers: 5
+--- PASS: TestAsyncValidator_MultipleWorkers (0.33s)
+=== CONT  TestAsyncValidator_ShutdownCoordination
+    async_validator_on_demand_test.go:167: Pending tasks: 0
+--- PASS: TestAsyncValidator_BatchEnqueueOptimization (2.12s)
+--- PASS: TestAsyncValidator_ShutdownCoordination (0.68s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/validation	3.659s

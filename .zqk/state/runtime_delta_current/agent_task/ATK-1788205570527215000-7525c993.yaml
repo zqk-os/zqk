@@ -1,0 +1,21 @@
+actual_effort: 0h
+assignee_persona_ref: PER-ORCH-ALPHA
+backlog_item_ref: BLI-LAUNCH-TTV-5MIN-001
+branch_ref: integration/pri-PRI-CEF-LINGERING-INTAKE-001
+claimed_at: "2026-08-31T19:46:26Z"
+claimed_by: antigravity-1
+commit_hash: 91a723917b32a8252df064e4a8307c2a1f4fe915
+completed_at: "2026-08-31T20:04:41Z"
+created_at: "2026-08-31T19:46:10Z"
+created_by: ACC-1785920548450214012-68b850c0
+description: Execute BLI-LAUNCH-TTV-5MIN-001
+id: ATK-1788205570527215000-7525c993
+kind: agent_task
+namespace_id: zqk:kernel
+schema_version: 2.0.0
+started_at: "2026-08-31T20:04:26Z"
+status: implemented
+title: Execute BLI-LAUNCH-TTV-5MIN-001
+updated_at: "2026-08-31T20:04:41Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

@@ -1,0 +1,120 @@
+
+--- run 2026-09-04T22:14:32Z ---
+=== RUN   TestRun_Filter
+=== PAUSE TestRun_Filter
+=== RUN   TestExpandCommaSeparatedIDs
+=== PAUSE TestExpandCommaSeparatedIDs
+=== RUN   TestProfileLoader_LoadProfile_NamespaceIDValidation
+=== PAUSE TestProfileLoader_LoadProfile_NamespaceIDValidation
+=== RUN   TestProfileLoader_LoadProfile_InheritanceWithNamespaceID
+=== PAUSE TestProfileLoader_LoadProfile_InheritanceWithNamespaceID
+=== RUN   TestProfileLoader_LoadProfile_CircularInheritance
+=== PAUSE TestProfileLoader_LoadProfile_CircularInheritance
+=== RUN   TestFieldsFromCmd
+=== PAUSE TestFieldsFromCmd
+=== RUN   TestTableFormatter_Regression_ColumnsFlagParsing
+=== PAUSE TestTableFormatter_Regression_ColumnsFlagParsing
+=== RUN   TestTableFormatter_Regression_ColumnWidthPriority
+=== PAUSE TestTableFormatter_Regression_ColumnWidthPriority
+=== RUN   TestTableFormatter_Regression_Truncation
+=== PAUSE TestTableFormatter_Regression_Truncation
+=== RUN   TestTableFormatter_Regression_RenderTable
+=== PAUSE TestTableFormatter_Regression_RenderTable
+=== CONT  TestRun_Filter
+--- PASS: TestRun_Filter (0.00s)
+=== CONT  TestTableFormatter_Regression_RenderTable
+=== RUN   TestTableFormatter_Regression_RenderTable/basic_formatting
+=== RUN   TestTableFormatter_Regression_RenderTable/multiple_rows
+--- PASS: TestTableFormatter_Regression_RenderTable (0.00s)
+    --- PASS: TestTableFormatter_Regression_RenderTable/basic_formatting (0.00s)
+    --- PASS: TestTableFormatter_Regression_RenderTable/multiple_rows (0.00s)
+=== CONT  TestTableFormatter_Regression_Truncation
+=== RUN   TestTableFormatter_Regression_Truncation/no_truncation
+=== RUN   TestTableFormatter_Regression_Truncation/truncation_with_ellipsis
+=== RUN   TestTableFormatter_Regression_Truncation/exact_length
+=== RUN   TestTableFormatter_Regression_Truncation/very_short_maxLen
+=== RUN   TestTableFormatter_Regression_Truncation/maxLen_1
+=== RUN   TestTableFormatter_Regression_Truncation/empty_string
+=== RUN   TestTableFormatter_Regression_Truncation/maxLen_2_(edge_case)
+--- PASS: TestTableFormatter_Regression_Truncation (0.00s)
+    --- PASS: TestTableFormatter_Regression_Truncation/no_truncation (0.00s)
+    --- PASS: TestTableFormatter_Regression_Truncation/truncation_with_ellipsis (0.00s)
+    --- PASS: TestTableFormatter_Regression_Truncation/exact_length (0.00s)
+    --- PASS: TestTableFormatter_Regression_Truncation/very_short_maxLen (0.00s)
+    --- PASS: TestTableFormatter_Regression_Truncation/maxLen_1 (0.00s)
+    --- PASS: TestTableFormatter_Regression_Truncation/empty_string (0.00s)
+    --- PASS: TestTableFormatter_Regression_Truncation/maxLen_2_(edge_case) (0.00s)
+=== CONT  TestTableFormatter_Regression_ColumnWidthPriority
+=== RUN   TestTableFormatter_Regression_ColumnWidthPriority/columns_flag_overrides_spec
+=== RUN   TestTableFormatter_Regression_ColumnWidthPriority/spec_display_length_when_no_flag
+=== RUN   TestTableFormatter_Regression_ColumnWidthPriority/default_when_no_spec_or_flag
+=== RUN   TestTableFormatter_Regression_ColumnWidthPriority/columns_flag_for_different_field_doesn't_affect_others
+=== RUN   TestTableFormatter_Regression_ColumnWidthPriority/columns_flag_overrides_spec_even_for_different_field
+--- PASS: TestTableFormatter_Regression_ColumnWidthPriority (0.00s)
+    --- PASS: TestTableFormatter_Regression_ColumnWidthPriority/columns_flag_overrides_spec (0.00s)
+    --- PASS: TestTableFormatter_Regression_ColumnWidthPriority/spec_display_length_when_no_flag (0.00s)
+    --- PASS: TestTableFormatter_Regression_ColumnWidthPriority/default_when_no_spec_or_flag (0.00s)
+    --- PASS: TestTableFormatter_Regression_ColumnWidthPriority/columns_flag_for_different_field_doesn't_affect_others (0.00s)
+    --- PASS: TestTableFormatter_Regression_ColumnWidthPriority/columns_flag_overrides_spec_even_for_different_field (0.00s)
+=== CONT  TestTableFormatter_Regression_ColumnsFlagParsing
+=== RUN   TestTableFormatter_Regression_ColumnsFlagParsing/standard_format
+=== RUN   TestTableFormatter_Regression_ColumnsFlagParsing/single_column
+=== RUN   TestTableFormatter_Regression_ColumnsFlagParsing/with_spaces
+=== RUN   TestTableFormatter_Regression_ColumnsFlagParsing/invalid_-_no_colon
+=== RUN   TestTableFormatter_Regression_ColumnsFlagParsing/invalid_-_non-integer
+=== RUN   TestTableFormatter_Regression_ColumnsFlagParsing/invalid_-_zero_width
+=== RUN   TestTableFormatter_Regression_ColumnsFlagParsing/invalid_-_negative_width
+=== RUN   TestTableFormatter_Regression_ColumnsFlagParsing/empty_string
+=== RUN   TestTableFormatter_Regression_ColumnsFlagParsing/large_width
+=== RUN   TestTableFormatter_Regression_ColumnsFlagParsing/very_small_width
+--- PASS: TestTableFormatter_Regression_ColumnsFlagParsing (0.00s)
+    --- PASS: TestTableFormatter_Regression_ColumnsFlagParsing/standard_format (0.00s)
+    --- PASS: TestTableFormatter_Regression_ColumnsFlagParsing/single_column (0.00s)
+    --- PASS: TestTableFormatter_Regression_ColumnsFlagParsing/with_spaces (0.00s)
+    --- PASS: TestTableFormatter_Regression_ColumnsFlagParsing/invalid_-_no_colon (0.00s)
+    --- PASS: TestTableFormatter_Regression_ColumnsFlagParsing/invalid_-_non-integer (0.00s)
+    --- PASS: TestTableFormatter_Regression_ColumnsFlagParsing/invalid_-_zero_width (0.00s)
+    --- PASS: TestTableFormatter_Regression_ColumnsFlagParsing/invalid_-_negative_width (0.00s)
+    --- PASS: TestTableFormatter_Regression_ColumnsFlagParsing/empty_string (0.00s)
+    --- PASS: TestTableFormatter_Regression_ColumnsFlagParsing/large_width (0.00s)
+    --- PASS: TestTableFormatter_Regression_ColumnsFlagParsing/very_small_width (0.00s)
+=== CONT  TestFieldsFromCmd
+--- PASS: TestFieldsFromCmd (0.00s)
+=== CONT  TestProfileLoader_LoadProfile_CircularInheritance
+=== CONT  TestProfileLoader_LoadProfile_NamespaceIDValidation
+=== RUN   TestProfileLoader_LoadProfile_NamespaceIDValidation/valid_namespace_id
+=== RUN   TestProfileLoader_LoadProfile_NamespaceIDValidation/missing_namespace_id
+=== RUN   TestProfileLoader_LoadProfile_NamespaceIDValidation/wrong_namespace_id
+--- PASS: TestProfileLoader_LoadProfile_CircularInheritance (0.01s)
+=== CONT  TestExpandCommaSeparatedIDs
+=== RUN   TestExpandCommaSeparatedIDs/nil
+=== PAUSE TestExpandCommaSeparatedIDs/nil
+=== RUN   TestExpandCommaSeparatedIDs/single
+=== PAUSE TestExpandCommaSeparatedIDs/single
+=== RUN   TestExpandCommaSeparatedIDs/comma_joined_positional
+=== PAUSE TestExpandCommaSeparatedIDs/comma_joined_positional
+=== RUN   TestExpandCommaSeparatedIDs/mixed_space_and_commas
+=== PAUSE TestExpandCommaSeparatedIDs/mixed_space_and_commas
+=== RUN   TestExpandCommaSeparatedIDs/empty_segments_dropped
+=== PAUSE TestExpandCommaSeparatedIDs/empty_segments_dropped
+=== CONT  TestProfileLoader_LoadProfile_InheritanceWithNamespaceID
+=== RUN   TestProfileLoader_LoadProfile_NamespaceIDValidation/empty_namespace_id
+--- PASS: TestProfileLoader_LoadProfile_NamespaceIDValidation (0.02s)
+    --- PASS: TestProfileLoader_LoadProfile_NamespaceIDValidation/valid_namespace_id (0.00s)
+    --- PASS: TestProfileLoader_LoadProfile_NamespaceIDValidation/missing_namespace_id (0.00s)
+    --- PASS: TestProfileLoader_LoadProfile_NamespaceIDValidation/wrong_namespace_id (0.01s)
+    --- PASS: TestProfileLoader_LoadProfile_NamespaceIDValidation/empty_namespace_id (0.00s)
+=== CONT  TestExpandCommaSeparatedIDs/nil
+=== CONT  TestExpandCommaSeparatedIDs/mixed_space_and_commas
+=== CONT  TestExpandCommaSeparatedIDs/empty_segments_dropped
+=== CONT  TestExpandCommaSeparatedIDs/comma_joined_positional
+=== CONT  TestExpandCommaSeparatedIDs/single
+--- PASS: TestExpandCommaSeparatedIDs (0.00s)
+    --- PASS: TestExpandCommaSeparatedIDs/nil (0.00s)
+    --- PASS: TestExpandCommaSeparatedIDs/mixed_space_and_commas (0.00s)
+    --- PASS: TestExpandCommaSeparatedIDs/empty_segments_dropped (0.00s)
+    --- PASS: TestExpandCommaSeparatedIDs/comma_joined_positional (0.00s)
+    --- PASS: TestExpandCommaSeparatedIDs/single (0.00s)
+--- PASS: TestProfileLoader_LoadProfile_InheritanceWithNamespaceID (0.01s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/cli	0.336s

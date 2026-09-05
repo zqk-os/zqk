@@ -1,0 +1,51 @@
+{
+  "name": "make-verify-187",
+  "created_at": "2026-09-04T21:34:29.223812Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-187",
+    "Tests": [
+      {
+        "Name": "TestEnabled_OptInRefCount",
+        "Package": "metricsrecording",
+        "PackagePath": "pkg/metricsrecording",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/metricsrecording/policy_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestEnabled_HotPathNoPersist",
+        "Package": "metricsrecording",
+        "PackagePath": "pkg/metricsrecording",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/metricsrecording/policy_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 60000000000,
+    "PackagePath": "pkg/metricsrecording"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestEnabled_OptInRefCount",
+      "Package": "metricsrecording",
+      "PackagePath": "pkg/metricsrecording",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/metricsrecording/policy_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestEnabled_HotPathNoPersist",
+      "Package": "metricsrecording",
+      "PackagePath": "pkg/metricsrecording",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/metricsrecording/policy_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

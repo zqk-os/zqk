@@ -1,0 +1,166 @@
+# Orchestration Context
+Target Agent/Pod: PER-DEFAULT-OPERATOR (Capability: )
+
+## Standing mandates
+Resolve bodies with `zqk object get`. Do not copy them into the task object.
+- TDD: `POL-ONBOARD-002`
+- Flywheel: `POL-CODE-1784753087498298000-bedce972`
+
+## Delegated Task
+- Process task: Pluggable CVS evaluation_surface adapters (CEF diamond + test-bundle)
+
+### Context
+{
+  "Task": {
+    "acceptance_considerations": "Adapter registry; cef_diamond_scorecard measure works without --persist-session refuse",
+    "created_at": "2026-09-04T07:32:12Z",
+    "created_by": "ACC-1785920548450214006-2e52b3e7",
+    "description": "Pluggable CVS evaluation_surface adapters (CEF diamond + test-bundle)",
+    "goal_refs": [
+      "GOAL-CEF-OBS-HONEST"
+    ],
+    "id": "BLI-CVS-EVAL-SURFACE-ADAPTER-001",
+    "kind": "backlog_item",
+    "milestone_refs": [
+      "MIL-001"
+    ],
+    "namespace_id": "zqk:kernel",
+    "priority": "high",
+    "priority_plan_ref": "PRI-CVS-EVAL-SURFACE-001",
+    "priority_tier": "P0",
+    "problem_statement": "One convergence measure path; evaluation_surface selects adapter. CEF must not twin health.jsonl CVS ticks.",
+    "requirement_refs": [
+      "REQ-CEF-R19-EVIDENCE-001"
+    ],
+    "schema_version": "2.0.0",
+    "status": "planned",
+    "title": "Pluggable CVS evaluation_surface adapters (CEF diamond + test-bundle)",
+    "updated_at": "2026-09-04T19:20:23Z",
+    "updated_by": "ACC-1785920548450214006-2e52b3e7",
+    "version_context": "default"
+  },
+  "Dependencies": [
+    {
+      "active_order": 1,
+      "branch_ref": "integration/pri-cvs-eval-surface-001",
+      "created_at": "2026-09-04T06:35:54Z",
+      "created_by": "ACC-1785920548450214006-2e52b3e7",
+      "description": "Unlocked grooming column. Refactor convergence measure/orchestrate so\nevaluation_surface is pluggable (test-bundle health is one adapter;\ncef_diamond_scorecard is another). Do NOT invent a CEF-only twin of\nSCH-cvs-*-tick. Do NOT mint onto sealed PRI-CEF-R27-ENVELOPE-001.\nParent CVS-CEF-UNTIL-45-001 needs CEF-aware measure before\n--persist-session is honest. TRACK posture: POL-AGENT-THREE-PLAN-RUNWAY-001 /\nPOL-AGENT-TPM-GROOM-AHEAD-001.\n",
+      "id": "PRI-CVS-EVAL-SURFACE-001",
+      "kind": "priority_plan",
+      "namespace_id": "zqk:kernel",
+      "persona_refs": [
+        "PER-DEFAULT-OPERATOR"
+      ],
+      "related_object_refs": [
+        "CVS-CEF-UNTIL-45-001",
+        "PRI-CEF-R27-ENVELOPE-001"
+      ],
+      "schema_version": "2.0.0",
+      "shaped": true,
+      "status": "active",
+      "title": "CVS evaluation-surface adapters — one orchestrator, pluggable measure",
+      "updated_at": "2026-09-04T19:20:29Z",
+      "updated_by": "ACC-1785920548450214006-2e52b3e7",
+      "version_context": "default",
+      "workstream_refs": [
+        "WS-CEF-TESTING"
+      ]
+    },
+    {
+      "created_at": "2026-08-12T03:27:34Z",
+      "created_by": "ACC-1785920548450214012-68b850c0",
+      "id": "MIL-001",
+      "kind": "milestone",
+      "namespace_id": "zqk:kernel",
+      "schema_version": "2.0.0",
+      "status": "archived",
+      "title": "Fixture: milestone #1",
+      "updated_at": "2026-08-14T07:16:07Z",
+      "updated_by": "ACC-1785920548450214006-2e52b3e7",
+      "version_context": "default"
+    },
+    {
+      "created_at": "2026-08-25T21:58:56Z",
+      "created_by": "ACC-1785920548450214006-2e52b3e7",
+      "description": "CEF R19 requirement: promotion to complete must cite a scheduler job id, bundle log path, and a green fingerprint the gate re-reads. Overlay writes after structural update must not leave stale runtime-delta. Latent MCP ZQK- clientID exemptions must be removed. Unmasked defects discovered in isolation/auth/validation belong on this commitment until gated.\n",
+      "goal_refs": [
+        "GOAL-OSS-CORE"
+      ],
+      "id": "REQ-CEF-R19-EVIDENCE-001",
+      "kind": "requirement",
+      "namespace_id": "zqk:kernel",
+      "priority_tier": "P0",
+      "schema_version": "2.0.0",
+      "status": "active",
+      "title": "Closure evidence must be machine-checkable",
+      "updated_at": "2026-08-25T21:59:16Z",
+      "updated_by": "ACC-1785920548450214006-2e52b3e7",
+      "version_context": "default"
+    },
+    {
+      "created_at": "2026-08-13T22:30:31Z",
+      "created_by": "ACC-1785920548450214012-68b850c0",
+      "description": "Honest health and status surfaces under ROAD-CEF-PRELAUNCH-001.",
+      "id": "GOAL-CEF-OBS-HONEST",
+      "kind": "goal",
+      "metric": "unmarked_synthetic_health_score_count",
+      "namespace_id": "zqk:kernel",
+      "related_object_refs": [
+        "ROAD-CEF-PRELAUNCH-001",
+        "MIS-CEF-PRELAUNCH-001"
+      ],
+      "schema_version": "2.0.0",
+      "status": "active",
+      "target": "0",
+      "title": "Honest health and status surfaces",
+      "updated_at": "2026-08-17T01:44:40Z",
+      "updated_by": "ACC-1785920548450214012-68b850c0",
+      "version_context": "default"
+    }
+  ]
+}
+## Relevant Agent Skills
+Resolve mandates with `zqk object get <ASK-id>` or the listed `file_path`. Do not persist instruction bodies on the task object.
+
+- `ASK-1782259937447396000-fb005beb` — Test Debugging Engine
+- `ASK-1785886324283087000-34320add` — ASK-PROCESS-AUDIT-PROTOCOL — OHTV + quantitative MMORCH audit
+  - summary: Standardized MMORCH process audit: observe metrics, hypothesize gaps, test smallest probe, verify persistence of findings as kernel objects.
+- `ASK-1786081148616665000-c78bdd4d` — ZQK Orchestration — Plan Primary Protocol
+  - summary: Plan-primary altitude: assigned PRI + workstream lanes (feature vs tech-debt), subagent swarm to plan completion, plan-branch merges; below TPM Gantt altitude.
+- `ASK-DEFAULT-FEED-CORRESPONDENCE` — Agent Feed Correspondence (Community Default)
+  - summary: MCP zqk_chat_send + zqk feed ack/steer/emit-status; legacy wake scripts are fallback only.
+
+
+## Policy Compliance
+You are bound by these policies. Resolve bodies with `zqk object get <POL-id>`. Do not treat this list as a copy of policy text.
+
+- `POL-ONBOARD-001` — CLI for Object Operations
+- `POL-ONBOARD-002` — Test-Driven Development (TDD) Required
+- `POL-AGENT-INSTRUCTION-RUBRIC-001` — Agent instruction processing rubric
+- `POL-WORKFLOW-VDS` — Verifiable Decomposition Spine (VDS) — Mandatory Chunked Verification
+- `POL-CODE-CAS-COMMIT-001` — Commit process CAS renames in the same commit as the work
+- `POL-CODE-1784753087498298000-bedce972` — Knowledge Kernel Flywheel (Anti-Idle)
+- `POL-AGENT-TPM-GROOM-AHEAD-001` — TPM interaction: forward planning when planned is empty
+- `POL-AGENT-COMMS-REMEDY-WAKE-001` — Comms-remedy wake (specialized persona, not idle-coder)
+- `POL-AGENT-TPM-PROCESS-ADMIN-001` — TPM process administration only — peers execute whats-next
+
+
+## Codebase Structural Context
+Do not persist an AST census on the task object. Before inventing a file or package, call `zqk_observer_search` with name= (symbol) and/or path= (pkg/... or cmd/...). Then `zqk_read_code` the returned path. Never invent src/ or a new package.
+
+### Task-relevant AST hits (live, not persisted)
+- `EvaluationSurfaceIDFromMaps` (function) `pkg/scheduler/evaluation_surface.go:23` — `func EvaluationSurfaceIDFromMaps (map[string]any, map[string]any) (string)`
+- `EvaluationSurfaceIDFromSessionObject` (function) `pkg/scheduler/evaluation_surface.go:34` — `func EvaluationSurfaceIDFromSessionObject (map[string]any) (string)`
+- `EvaluationSurfaceIDFromRoutingMeta` (function) `pkg/scheduler/evaluation_surface.go:39` — `func EvaluationSurfaceIDFromRoutingMeta (map[string]any) (string)`
+- `evaluationSurfaceIDFromMap` (function) `pkg/scheduler/evaluation_surface.go:49` — `func evaluationSurfaceIDFromMap (map[string]any) (string)`
+- `extractAfterStateSnapshot` (function) `pkg/scheduler/evaluation_surface.go:61` — `func extractAfterStateSnapshot (map[string]any) (map[string]any)`
+- `TestEvaluationSurfaceIDFromMaps` (function) `pkg/scheduler/evaluation_surface_test.go:7` — `func TestEvaluationSurfaceIDFromMaps (*testing.T)`
+- `AgentIngestor` (interface) `pkg/ingestion/adapters/gemini.go:14` — `interface{}`
+- `GeminiAdapter` (struct) `pkg/ingestion/adapters/gemini.go:18` — `struct{...}`
+- `NewGeminiAdapter` (function) `pkg/ingestion/adapters/gemini.go:22` — `func NewGeminiAdapter (logging.Logger) (*GeminiAdapter)`
+- `Ingest` (method) `pkg/ingestion/adapters/gemini.go:26` — `func (*GeminiAdapter) Ingest (context.Context, string) (error)`
+- `TestGeminiAdapter_Ingest` (function) `pkg/ingestion/adapters/gemini_test.go:16` — `func TestGeminiAdapter_Ingest (*testing.T)`
+- `TestGeminiAdapter_Ingest_NoDir` (function) `pkg/ingestion/adapters/gemini_test.go:34` — `func TestGeminiAdapter_Ingest_NoDir (*testing.T)`
+
+

@@ -1,0 +1,185 @@
+
+--- run 2026-09-04T21:41:42Z ---
+=== RUN   TestBrandSubstitutionScenarios
+=== PAUSE TestBrandSubstitutionScenarios
+=== RUN   TestSubstitutionExclusions
+=== PAUSE TestSubstitutionExclusions
+=== RUN   TestContentTypeAnnotationPatterns
+=== PAUSE TestContentTypeAnnotationPatterns
+=== RUN   TestDryRunMode
+=== PAUSE TestDryRunMode
+=== RUN   TestBackupCreation
+=== PAUSE TestBackupCreation
+=== RUN   TestEdgeCases
+=== PAUSE TestEdgeCases
+=== RUN   TestMultiFileSubstitution
+=== PAUSE TestMultiFileSubstitution
+=== CONT  TestBrandSubstitutionScenarios
+=== CONT  TestBackupCreation
+=== RUN   TestBrandSubstitutionScenarios/source_code_comment
+    substitution_test.go:93: Test: Replace ZQK in Go comment
+    substitution_test.go:94: Content Type: source_code
+    substitution_test.go:95: Input: // Brand: ZQK
+        package main
+    substitution_test.go:96: Expected: // Brand: ZQK
+        package main
+=== RUN   TestBrandSubstitutionScenarios/source_code_string_literal
+    substitution_test.go:93: Test: Replace ZQK in Go string literal
+    substitution_test.go:94: Content Type: source_code
+    substitution_test.go:95: Input: const BrandName = "ZQK"
+    substitution_test.go:96: Expected: const BrandName = "ZQK"
+=== RUN   TestBrandSubstitutionScenarios/documentation_inline
+    substitution_test.go:93: Test: Replace ZQK in markdown headers and text
+    substitution_test.go:94: Content Type: documentation
+    substitution_test.go:95: Input: # ZQK Documentation
+        
+        ZQK is a system...
+    substitution_test.go:96: Expected: # ZQK Documentation
+        
+        ZQK is a system...
+=== RUN   TestBrandSubstitutionScenarios/documentation_frontmatter
+    substitution_test.go:93: Test: Replace ZQK in YAML frontmatter
+    substitution_test.go:94: Content Type: documentation
+    substitution_test.go:95: Input: ---
+        brand: ZQK
+        title: ZQK Guide
+        ---
+        
+        Content
+    substitution_test.go:96: Expected: ---
+        brand: ZQK
+        title: ZQK Guide
+        ---
+        
+        Content
+=== RUN   TestBrandSubstitutionScenarios/configuration_value
+    substitution_test.go:93: Test: Replace ZQK in YAML config values
+    substitution_test.go:94: Content Type: configuration
+    substitution_test.go:95: Input: application:
+          name: ZQK
+          brand: ZQK
+    substitution_test.go:96: Expected: application:
+          name: ZQK
+          brand: ZQK
+=== RUN   TestBrandSubstitutionScenarios/case_insensitive
+    substitution_test.go:93: Test: Case-insensitive replacement (note: case preservation may vary)
+    substitution_test.go:94: Content Type: source_code
+    substitution_test.go:95: Input: // zqk system
+        // NEXOS system
+        // ZQK system
+    substitution_test.go:96: Expected: // zqk system
+        // ZQK system
+        // ZQK system
+=== RUN   TestBrandSubstitutionScenarios/partial_match
+    substitution_test.go:93: Test: Replace ZQK in compound identifiers
+    substitution_test.go:94: Content Type: source_code
+    substitution_test.go:95: Input: ZQKConfig
+        ZQKSystem
+    substitution_test.go:96: Expected: ZQKConfig
+        ZQKSystem
+=== RUN   TestBrandSubstitutionScenarios/multiple_occurrences
+    substitution_test.go:93: Test: Replace multiple occurrences in same file
+    substitution_test.go:94: Content Type: documentation
+    substitution_test.go:95: Input: ZQK is great. ZQK rocks. Use ZQK today!
+    substitution_test.go:96: Expected: ZQK is great. ZQK rocks. Use ZQK today!
+=== RUN   TestBrandSubstitutionScenarios/preserve_other_text
+    substitution_test.go:93: Test: Preserve text that doesn't match pattern
+    substitution_test.go:94: Content Type: documentation
+    substitution_test.go:95: Input: This is about ZQK. Other text remains unchanged.
+    substitution_test.go:96: Expected: This is about ZQK. Other text remains unchanged.
+--- PASS: TestBrandSubstitutionScenarios (0.00s)
+    --- PASS: TestBrandSubstitutionScenarios/source_code_comment (0.00s)
+    --- PASS: TestBrandSubstitutionScenarios/source_code_string_literal (0.00s)
+    --- PASS: TestBrandSubstitutionScenarios/documentation_inline (0.00s)
+    --- PASS: TestBrandSubstitutionScenarios/documentation_frontmatter (0.00s)
+    --- PASS: TestBrandSubstitutionScenarios/configuration_value (0.00s)
+    --- PASS: TestBrandSubstitutionScenarios/case_insensitive (0.00s)
+    --- PASS: TestBrandSubstitutionScenarios/partial_match (0.00s)
+    --- PASS: TestBrandSubstitutionScenarios/multiple_occurrences (0.00s)
+    --- PASS: TestBrandSubstitutionScenarios/preserve_other_text (0.00s)
+=== CONT  TestMultiFileSubstitution
+=== NAME  TestBackupCreation
+    substitution_test.go:272: Backup file should be created at: /var/folders/gb/31sgyvn551ld6l0zfk50yl8h0000gn/T/TestBackupCreation3199172707/001/test.go.bak
+    substitution_test.go:273: Original file: /var/folders/gb/31sgyvn551ld6l0zfk50yl8h0000gn/T/TestBackupCreation3199172707/001/test.go
+=== NAME  TestMultiFileSubstitution
+    substitution_test.go:348: Created 3 test files in /var/folders/gb/31sgyvn551ld6l0zfk50yl8h0000gn/T/TestMultiFileSubstitution3543460049/001
+    substitution_test.go:349: Substitution should process all matching files
+--- PASS: TestBackupCreation (0.01s)
+=== CONT  TestContentTypeAnnotationPatterns
+=== RUN   TestContentTypeAnnotationPatterns/source_code
+    substitution_test.go:211: Content Type: source_code
+    substitution_test.go:212: Pattern: Comments in code
+    substitution_test.go:213: Example: // Brand: ZQK
+=== RUN   TestContentTypeAnnotationPatterns/documentation
+    substitution_test.go:211: Content Type: documentation
+    substitution_test.go:212: Pattern: Inline text or frontmatter
+    substitution_test.go:213: Example: [Brand: ZQK] or brand: ZQK in frontmatter
+=== RUN   TestContentTypeAnnotationPatterns/configuration
+    substitution_test.go:211: Content Type: configuration
+    substitution_test.go:212: Pattern: Config values
+    substitution_test.go:213: Example: brand: ZQK in YAML/JSON
+=== RUN   TestContentTypeAnnotationPatterns/tests
+    substitution_test.go:211: Content Type: tests
+    substitution_test.go:212: Pattern: Test data or names
+    substitution_test.go:213: Example: TestZQKFeature
+--- PASS: TestContentTypeAnnotationPatterns (0.00s)
+    --- PASS: TestContentTypeAnnotationPatterns/source_code (0.00s)
+    --- PASS: TestContentTypeAnnotationPatterns/documentation (0.00s)
+    --- PASS: TestContentTypeAnnotationPatterns/configuration (0.00s)
+    --- PASS: TestContentTypeAnnotationPatterns/tests (0.00s)
+=== CONT  TestDryRunMode
+--- PASS: TestMultiFileSubstitution (0.05s)
+=== CONT  TestSubstitutionExclusions
+=== RUN   TestSubstitutionExclusions/excluded_file.go
+    substitution_test.go:149: Path vendor/package/file.go might not match exclusion patterns exactly
+=== RUN   TestSubstitutionExclusions/excluded_config
+    substitution_test.go:149: Path .git/config might not match exclusion patterns exactly
+=== RUN   TestSubstitutionExclusions/excluded_file.yaml
+    substitution_test.go:149: Path .zqk/cache/file.yaml might not match exclusion patterns exactly
+=== RUN   TestSubstitutionExclusions/excluded_file.js
+    substitution_test.go:149: Path node_modules/pkg/file.js might not match exclusion patterns exactly
+=== RUN   TestSubstitutionExclusions/excluded_BRD-001.yaml
+    substitution_test.go:149: Path docs/process/system-health/brands/BRD-001.yaml might not match exclusion patterns exactly
+=== RUN   TestSubstitutionExclusions/excluded_SUB-001.yaml
+    substitution_test.go:149: Path docs/process/system-health/substitutions/SUB-001.yaml might not match exclusion patterns exactly
+=== RUN   TestSubstitutionExclusions/included_main.go
+=== RUN   TestSubstitutionExclusions/included_README.md
+=== RUN   TestSubstitutionExclusions/included_app.yaml
+=== RUN   TestSubstitutionExclusions/included_util.go
+--- PASS: TestSubstitutionExclusions (0.00s)
+    --- PASS: TestSubstitutionExclusions/excluded_file.go (0.00s)
+    --- PASS: TestSubstitutionExclusions/excluded_config (0.00s)
+    --- PASS: TestSubstitutionExclusions/excluded_file.yaml (0.00s)
+    --- PASS: TestSubstitutionExclusions/excluded_file.js (0.00s)
+    --- PASS: TestSubstitutionExclusions/excluded_BRD-001.yaml (0.00s)
+    --- PASS: TestSubstitutionExclusions/excluded_SUB-001.yaml (0.00s)
+    --- PASS: TestSubstitutionExclusions/included_main.go (0.00s)
+    --- PASS: TestSubstitutionExclusions/included_README.md (0.00s)
+    --- PASS: TestSubstitutionExclusions/included_app.yaml (0.00s)
+    --- PASS: TestSubstitutionExclusions/included_util.go (0.00s)
+=== CONT  TestEdgeCases
+=== RUN   TestEdgeCases/empty_file
+    substitution_test.go:318: Test: Empty file should be handled gracefully
+    substitution_test.go:319: Input length: 0
+=== RUN   TestEdgeCases/no_matches
+    substitution_test.go:318: Test: File with no matches should not error
+    substitution_test.go:319: Input length: 34
+=== RUN   TestEdgeCases/only_brand
+    substitution_test.go:318: Test: File containing only the brand name
+    substitution_test.go:319: Input length: 3
+=== RUN   TestEdgeCases/unicode_content
+    substitution_test.go:318: Test: Files with Unicode characters
+    substitution_test.go:319: Input length: 22
+=== RUN   TestEdgeCases/binary_like_content
+    substitution_test.go:318: Test: Files with binary-like content (should be skipped)
+    substitution_test.go:319: Input length: 6
+    substitution_test.go:323: Binary-like files should be detected and skipped
+--- PASS: TestEdgeCases (0.00s)
+    --- PASS: TestEdgeCases/empty_file (0.00s)
+    --- PASS: TestEdgeCases/no_matches (0.00s)
+    --- PASS: TestEdgeCases/only_brand (0.00s)
+    --- PASS: TestEdgeCases/unicode_content (0.00s)
+    --- PASS: TestEdgeCases/binary_like_content (0.00s)
+--- PASS: TestDryRunMode (0.05s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/brand/substitution	0.412s

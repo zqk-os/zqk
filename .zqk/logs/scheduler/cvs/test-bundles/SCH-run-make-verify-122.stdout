@@ -1,0 +1,44 @@
+
+--- run 2026-09-04T21:38:56Z ---
+=== RUN   TestAsyncValidator_EnqueueBatch
+=== PAUSE TestAsyncValidator_EnqueueBatch
+=== RUN   TestAsyncValidator_EnqueueBatch_DedupesByObjectID
+=== PAUSE TestAsyncValidator_EnqueueBatch_DedupesByObjectID
+=== RUN   TestAsyncValidator_EnqueueBatch_QueueOwnsTaskCopies
+=== PAUSE TestAsyncValidator_EnqueueBatch_QueueOwnsTaskCopies
+=== RUN   TestAsyncValidator_GetProgress
+=== PAUSE TestAsyncValidator_GetProgress
+=== RUN   TestAsyncValidator_GetCachedState
+=== PAUSE TestAsyncValidator_GetCachedState
+=== RUN   TestAsyncValidator_GetAllCachedStates
+=== PAUSE TestAsyncValidator_GetAllCachedStates
+=== RUN   TestAsyncValidator_Start
+=== PAUSE TestAsyncValidator_Start
+=== RUN   TestAsyncValidator_Stop
+=== PAUSE TestAsyncValidator_Stop
+=== RUN   TestAsyncValidator_SetValidationFunc
+=== PAUSE TestAsyncValidator_SetValidationFunc
+=== RUN   TestAsyncValidator_GetValidationStats
+=== PAUSE TestAsyncValidator_GetValidationStats
+=== CONT  TestAsyncValidator_EnqueueBatch
+=== CONT  TestAsyncValidator_GetAllCachedStates
+--- PASS: TestAsyncValidator_GetAllCachedStates (0.04s)
+=== CONT  TestAsyncValidator_SetValidationFunc
+--- PASS: TestAsyncValidator_SetValidationFunc (0.07s)
+=== CONT  TestAsyncValidator_GetValidationStats
+--- PASS: TestAsyncValidator_EnqueueBatch (0.11s)
+=== CONT  TestAsyncValidator_Stop
+--- PASS: TestAsyncValidator_Stop (0.02s)
+=== CONT  TestAsyncValidator_Start
+--- PASS: TestAsyncValidator_GetValidationStats (0.02s)
+=== CONT  TestAsyncValidator_GetProgress
+--- PASS: TestAsyncValidator_GetProgress (0.01s)
+=== CONT  TestAsyncValidator_GetCachedState
+--- PASS: TestAsyncValidator_Start (0.01s)
+=== CONT  TestAsyncValidator_EnqueueBatch_QueueOwnsTaskCopies
+--- PASS: TestAsyncValidator_GetCachedState (0.01s)
+=== CONT  TestAsyncValidator_EnqueueBatch_DedupesByObjectID
+--- PASS: TestAsyncValidator_EnqueueBatch_DedupesByObjectID (0.01s)
+--- PASS: TestAsyncValidator_EnqueueBatch_QueueOwnsTaskCopies (0.03s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/validation	0.886s

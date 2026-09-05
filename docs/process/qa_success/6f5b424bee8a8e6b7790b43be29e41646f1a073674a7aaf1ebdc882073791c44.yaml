@@ -1,0 +1,14 @@
+created_at: "2026-08-19T00:23:05Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1787098984833293000-a56d3f01
+item_id: CRIT-CEF-R2-TST-SLEEP-FLAKE-A
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 2857702ca28e4b64fb5782140b43c1400e68fdeab30ab0062f4119523ca97d466e5f13c72adcfa41b92eacf21fa7f0a79b8a8e3a8d7c581e5c9afe0e69cb31dc
+schema_version: 2.0.0
+signature: 3046022100b30f50d9ad4552c174a1c0987c942c90bd54cdd4001243bca238bcfb5bde3594022100ff0f68b4b082eaa19d2c6d9ec5ae042356f3ad66ca7b522cb56e6cfd0f6416fc
+status: archived
+title: 'Accept: Reduce systemic time.Sleep flakiness in tests (Top offenders)'
+updated_at: "2026-09-01T07:04:15Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

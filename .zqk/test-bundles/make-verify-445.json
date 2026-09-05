@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-445",
+  "created_at": "2026-09-04T21:34:31.72593Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-445",
+    "Tests": [
+      {
+        "Name": "TestRunQuick_UnknownPreset",
+        "Package": "reports",
+        "PackagePath": "cmd/zqk/reports",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/reports/quick_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestRunQuickQuestions_Empty",
+        "Package": "reports",
+        "PackagePath": "cmd/zqk/reports",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/reports/quick_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestRunQuickQuestions_WithData",
+        "Package": "reports",
+        "PackagePath": "cmd/zqk/reports",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/reports/quick_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestRunQuickQuestions_StrictWithP0_ReturnsError",
+        "Package": "reports",
+        "PackagePath": "cmd/zqk/reports",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/reports/quick_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestRunQuickMilestonesOverdue_Empty",
+        "Package": "reports",
+        "PackagePath": "cmd/zqk/reports",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/reports/quick_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestRunQuickMilestonesOverdue_WithData",
+        "Package": "reports",
+        "PackagePath": "cmd/zqk/reports",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/reports/quick_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestReportsPCS_BaseMetrics",
+        "Package": "reports",
+        "PackagePath": "cmd/zqk/reports",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/reports/reports_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestReportsPCS_WithCommitData",
+        "Package": "reports",
+        "PackagePath": "cmd/zqk/reports",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/reports/reports_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestReportsEDD_Calculation",
+        "Package": "reports",
+        "PackagePath": "cmd/zqk/reports",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/reports/reports_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestReportsBlockers_DependencyDetection",
+        "Package": "reports",
+        "PackagePath": "cmd/zqk/reports",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/reports/reports_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 300000000000,
+    "PackagePath": "cmd/zqk/reports"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestRunQuick_UnknownPreset",
+      "Package": "reports",
+      "PackagePath": "cmd/zqk/reports",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/reports/quick_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestRunQuickQuestions_Empty",
+      "Package": "reports",
+      "PackagePath": "cmd/zqk/reports",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/reports/quick_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestRunQuickQuestions_WithData",
+      "Package": "reports",
+      "PackagePath": "cmd/zqk/reports",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/reports/quick_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestRunQuickQuestions_StrictWithP0_ReturnsError",
+      "Package": "reports",
+      "PackagePath": "cmd/zqk/reports",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/reports/quick_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestRunQuickMilestonesOverdue_Empty",
+      "Package": "reports",
+      "PackagePath": "cmd/zqk/reports",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/reports/quick_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestRunQuickMilestonesOverdue_WithData",
+      "Package": "reports",
+      "PackagePath": "cmd/zqk/reports",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/reports/quick_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestReportsPCS_BaseMetrics",
+      "Package": "reports",
+      "PackagePath": "cmd/zqk/reports",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/reports/reports_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestReportsPCS_WithCommitData",
+      "Package": "reports",
+      "PackagePath": "cmd/zqk/reports",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/reports/reports_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestReportsEDD_Calculation",
+      "Package": "reports",
+      "PackagePath": "cmd/zqk/reports",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/reports/reports_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestReportsBlockers_DependencyDetection",
+      "Package": "reports",
+      "PackagePath": "cmd/zqk/reports",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/reports/reports_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

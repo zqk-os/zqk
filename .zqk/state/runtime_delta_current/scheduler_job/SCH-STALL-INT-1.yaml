@@ -1,0 +1,20 @@
+allow_parallel_execution: true
+category: testing
+created_at: "2026-08-11T12:29:02Z"
+created_by: ACC-1785920548450214012-68b850c0
+enabled: true
+execution_mode: reusable
+id: SCH-STALL-INT-1
+job_type: lifecycle_check
+kind: scheduler_job
+max_runtime_seconds: 600
+namespace_id: zqk:kernel
+origin_project: zqk
+origin_system: zqk
+schema_version: 2.0.0
+status: active
+title: stall integration
+trigger_type: manual
+updated_at: "2026-08-11T12:29:02Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

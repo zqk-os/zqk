@@ -1,0 +1,3 @@
+=== ZQK env literal (getenv/setenv) check (in-scope files) ===
+check_zqk_env_literals: 6 candidate Go files (stderr progress every 75 files + heartbeat every 25s; set CHECK_ZQK_ENV_QUIET=1 to suppress)
+check_zqk_env_literals: ok (no hardcoded brand-prefixed env keys in getenv/setenv call sites)

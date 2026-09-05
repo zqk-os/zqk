@@ -1,0 +1,27 @@
+--- pkg/validation/go_validator.go
++++ pkg/validation/go_validator.go
+@@ -212,6 +212,23 @@
+ 			result.Errors = append(result.Errors, dynamicErrors...)
+ 		}
+ 	}
++
++	// Ensure active personas have skills and policies bound
++	if kind == "persona" {
++		status := objects.GetString(obj, objects.FieldKeyStatus)
++		if status == "approved" || status == "implemented" || status == "active" {
++			if len(objects.CollectPersonaASKRefs(obj)) == 0 {
++				result.Errors = append(result.Errors, ValidationError{
++					Field:   objects.FieldKeyAgentSkillRefs,
++					Message: "persona must have at least one agent_skill_refs or related_object_refs pointing to an ASK when approved/implemented",
++				})
++			}
++			if !gv.hasNonEmptyField(obj, objects.FieldKeyPolicyRefs) && len(objects.CollectPersonaInteractionPolicyRefs(obj)) == 0 {
++				result.Errors = append(result.Errors, ValidationError{
++					Field:   objects.FieldKeyPolicyRefs,
++					Message: "persona must have at least one policy_refs or interaction_policy_refs pointing to a POL when approved/implemented",
++				})
++			}
++		}
++	}
+ 
+ 	// If there are errors, mark as invalid

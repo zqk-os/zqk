@@ -1,0 +1,44 @@
+
+--- run 2026-09-04T22:20:59Z ---
+=== RUN   TestConcurrencyConfig_CPUAware
+=== PAUSE TestConcurrencyConfig_CPUAware
+=== RUN   TestRunInLock_SameGoroutine
+=== PAUSE TestRunInLock_SameGoroutine
+=== RUN   TestRunInLock_ReturnsError
+=== PAUSE TestRunInLock_ReturnsError
+=== RUN   TestRunInRLock_SameGoroutine
+=== PAUSE TestRunInRLock_SameGoroutine
+=== RUN   TestRunInLock_Concurrent
+=== PAUSE TestRunInLock_Concurrent
+=== RUN   TestRunWithMaxWait_CompletesBeforeTimeout
+=== PAUSE TestRunWithMaxWait_CompletesBeforeTimeout
+=== RUN   TestPollUntil_SuccessImmediate
+=== PAUSE TestPollUntil_SuccessImmediate
+=== RUN   TestPollUntil_SuccessAfterRetries
+=== PAUSE TestPollUntil_SuccessAfterRetries
+=== RUN   TestPollUntil_Timeout
+=== PAUSE TestPollUntil_Timeout
+=== RUN   TestPollTimeout_Helper
+=== PAUSE TestPollTimeout_Helper
+=== CONT  TestConcurrencyConfig_CPUAware
+=== CONT  TestRunWithMaxWait_CompletesBeforeTimeout
+--- PASS: TestConcurrencyConfig_CPUAware (0.00s)
+=== CONT  TestRunInLock_Concurrent
+--- PASS: TestRunWithMaxWait_CompletesBeforeTimeout (0.00s)
+=== CONT  TestRunInRLock_SameGoroutine
+--- PASS: TestRunInRLock_SameGoroutine (0.00s)
+=== CONT  TestRunInLock_ReturnsError
+--- PASS: TestRunInLock_ReturnsError (0.00s)
+=== CONT  TestRunInLock_SameGoroutine
+--- PASS: TestRunInLock_SameGoroutine (0.00s)
+=== CONT  TestPollUntil_Timeout
+--- PASS: TestRunInLock_Concurrent (0.00s)
+=== CONT  TestPollTimeout_Helper
+--- PASS: TestPollTimeout_Helper (0.03s)
+=== CONT  TestPollUntil_SuccessAfterRetries
+--- PASS: TestPollUntil_Timeout (0.03s)
+=== CONT  TestPollUntil_SuccessImmediate
+--- PASS: TestPollUntil_SuccessImmediate (0.00s)
+--- PASS: TestPollUntil_SuccessAfterRetries (0.01s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/concurrency	0.324s

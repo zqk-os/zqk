@@ -1,0 +1,44 @@
+
+--- run 2026-09-04T22:22:17Z ---
+=== RUN   TestModuleImportPath
+=== PAUSE TestModuleImportPath
+=== RUN   TestSpecbuilderPackageImportPath
+=== PAUSE TestSpecbuilderPackageImportPath
+=== RUN   TestNewPathResolver_ResolveStrict_process
+=== PAUSE TestNewPathResolver_ResolveStrict_process
+=== RUN   TestNewPathResolver_ResolveFromCacheOrConstant
+=== PAUSE TestNewPathResolver_ResolveFromCacheOrConstant
+=== RUN   TestNewPathResolver_ProjectRoot
+=== PAUSE TestNewPathResolver_ProjectRoot
+=== RUN   TestPathRefFromRelPath
+=== PAUSE TestPathRefFromRelPath
+=== RUN   TestNormalizeDocEntryPathForKey
+=== PAUSE TestNormalizeDocEntryPathForKey
+=== RUN   TestResolveDocEntryPath_LegacyRelative
+=== PAUSE TestResolveDocEntryPath_LegacyRelative
+=== RUN   TestResolveDocEntryPath_PrefixRequiresCache
+=== PAUSE TestResolveDocEntryPath_PrefixRequiresCache
+=== RUN   TestResolveDocEntryPath_Empty
+=== PAUSE TestResolveDocEntryPath_Empty
+=== CONT  TestModuleImportPath
+=== CONT  TestPathRefFromRelPath
+--- PASS: TestPathRefFromRelPath (0.00s)
+=== CONT  TestResolveDocEntryPath_Empty
+--- PASS: TestResolveDocEntryPath_Empty (0.00s)
+=== CONT  TestResolveDocEntryPath_PrefixRequiresCache
+--- PASS: TestResolveDocEntryPath_PrefixRequiresCache (0.00s)
+=== CONT  TestNewPathResolver_ResolveFromCacheOrConstant
+--- PASS: TestNewPathResolver_ResolveFromCacheOrConstant (0.00s)
+=== CONT  TestNewPathResolver_ProjectRoot
+--- PASS: TestNewPathResolver_ProjectRoot (0.00s)
+=== CONT  TestNewPathResolver_ResolveStrict_process
+--- PASS: TestNewPathResolver_ResolveStrict_process (0.00s)
+=== CONT  TestSpecbuilderPackageImportPath
+--- PASS: TestSpecbuilderPackageImportPath (0.00s)
+=== CONT  TestResolveDocEntryPath_LegacyRelative
+--- PASS: TestResolveDocEntryPath_LegacyRelative (0.00s)
+=== CONT  TestNormalizeDocEntryPathForKey
+--- PASS: TestNormalizeDocEntryPathForKey (0.00s)
+--- PASS: TestModuleImportPath (0.01s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/paths	0.214s

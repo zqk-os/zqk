@@ -1,0 +1,44 @@
+
+--- run 2026-09-04T22:20:53Z ---
+=== RUN   TestRunStaleCASCleanupForResults_NoStaleCASMessage
+=== PAUSE TestRunStaleCASCleanupForResults_NoStaleCASMessage
+=== RUN   TestRunStaleCASCleanupForResults_CollectsKinds
+=== PAUSE TestRunStaleCASCleanupForResults_CollectsKinds
+=== RUN   TestRunHashDuplicatesCleanupForKinds_EmptyInputs
+=== PAUSE TestRunHashDuplicatesCleanupForKinds_EmptyInputs
+=== RUN   TestCleanupHashDuplicatesForKind_SkipsMissingPaths_NoError
+=== PAUSE TestCleanupHashDuplicatesForKind_SkipsMissingPaths_NoError
+=== RUN   TestRejectThinStateCommit
+=== PAUSE TestRejectThinStateCommit
+=== RUN   TestRotateCSnapBackups
+=== PAUSE TestRotateCSnapBackups
+=== RUN   TestArchivePriorCSnapExternal
+=== PAUSE TestArchivePriorCSnapExternal
+=== RUN   TestDefaultExternalCSnapBackupDir
+=== PAUSE TestDefaultExternalCSnapBackupDir
+=== RUN   TestResolveStateCommitBackup_defaultsWithoutSettings
+=== PAUSE TestResolveStateCommitBackup_defaultsWithoutSettings
+=== RUN   TestNewStateCommitCmd_flags
+=== PAUSE TestNewStateCommitCmd_flags
+=== CONT  TestRunStaleCASCleanupForResults_NoStaleCASMessage
+=== CONT  TestRotateCSnapBackups
+=== CONT  TestResolveStateCommitBackup_defaultsWithoutSettings
+--- PASS: TestRunStaleCASCleanupForResults_NoStaleCASMessage (0.00s)
+--- PASS: TestResolveStateCommitBackup_defaultsWithoutSettings (0.00s)
+=== CONT  TestRejectThinStateCommit
+--- PASS: TestRejectThinStateCommit (0.00s)
+=== CONT  TestCleanupHashDuplicatesForKind_SkipsMissingPaths_NoError
+--- PASS: TestRotateCSnapBackups (0.01s)
+=== CONT  TestRunHashDuplicatesCleanupForKinds_EmptyInputs
+--- PASS: TestRunHashDuplicatesCleanupForKinds_EmptyInputs (0.00s)
+=== CONT  TestRunStaleCASCleanupForResults_CollectsKinds
+--- PASS: TestRunStaleCASCleanupForResults_CollectsKinds (0.00s)
+=== CONT  TestNewStateCommitCmd_flags
+--- PASS: TestNewStateCommitCmd_flags (0.00s)
+=== CONT  TestDefaultExternalCSnapBackupDir
+--- PASS: TestDefaultExternalCSnapBackupDir (0.00s)
+=== CONT  TestArchivePriorCSnapExternal
+--- PASS: TestArchivePriorCSnapExternal (0.03s)
+--- PASS: TestCleanupHashDuplicatesForKind_SkipsMissingPaths_NoError (0.04s)
+PASS
+ok  	github.com/lanceman/zqk/cmd/zqk/system	0.733s

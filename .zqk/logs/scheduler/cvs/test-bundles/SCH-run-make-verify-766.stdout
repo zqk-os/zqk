@@ -1,0 +1,28 @@
+
+--- run 2026-09-04T22:21:11Z ---
+=== RUN   TestParseMarkdownOrText_Empty
+=== PAUSE TestParseMarkdownOrText_Empty
+=== RUN   TestParseMarkdownOrText_FirstLineHeading
+=== PAUSE TestParseMarkdownOrText_FirstLineHeading
+=== RUN   TestParseMarkdownOrText_FirstLinePlain
+=== PAUSE TestParseMarkdownOrText_FirstLinePlain
+=== RUN   TestParseMarkdownOrText_HeadingWithExtraHash
+=== PAUSE TestParseMarkdownOrText_HeadingWithExtraHash
+=== RUN   TestParseMarkdownOrText_TitleOverrideFromContent
+=== PAUSE TestParseMarkdownOrText_TitleOverrideFromContent
+=== RUN   TestParseFileContent
+=== PAUSE TestParseFileContent
+=== CONT  TestParseMarkdownOrText_Empty
+--- PASS: TestParseMarkdownOrText_Empty (0.00s)
+=== CONT  TestParseFileContent
+--- PASS: TestParseFileContent (0.00s)
+=== CONT  TestParseMarkdownOrText_FirstLinePlain
+--- PASS: TestParseMarkdownOrText_FirstLinePlain (0.00s)
+=== CONT  TestParseMarkdownOrText_FirstLineHeading
+=== CONT  TestParseMarkdownOrText_HeadingWithExtraHash
+--- PASS: TestParseMarkdownOrText_FirstLineHeading (0.00s)
+--- PASS: TestParseMarkdownOrText_HeadingWithExtraHash (0.00s)
+=== CONT  TestParseMarkdownOrText_TitleOverrideFromContent
+--- PASS: TestParseMarkdownOrText_TitleOverrideFromContent (0.00s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/quick	0.291s

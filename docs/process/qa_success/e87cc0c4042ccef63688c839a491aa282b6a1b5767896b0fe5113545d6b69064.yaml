@@ -1,0 +1,14 @@
+created_at: "2026-08-19T03:39:56Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1787110795836941000-ff801ed8
+item_id: REDACTED
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 2857702ca28e4b64fb5782140b43c1400e68fdeab30ab0062f4119523ca97d466e5f13c72adcfa41b92eacf21fa7f0a79b8a8e3a8d7c581e5c9afe0e69cb31dc
+schema_version: 2.0.0
+signature: 3045022045689909e3934133661d63210960ea6bea68c2f5ad0d37f54cb157630ebc4edc022100cdecfe5331b11e0ea2d11e0d810af27d359abbeb1ceeacb0ded57898f84babd8
+status: archived
+title: Each gap either gains verified test assets/traceability or is deliberately deferred with rationale.
+updated_at: "2026-09-01T07:47:10Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

@@ -1,0 +1,33 @@
+{
+  "name": "make-verify-102",
+  "created_at": "2026-09-04T21:34:28.374789Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-102",
+    "Tests": [
+      {
+        "Name": "TestPruneQuarantinedRefs",
+        "Package": "maintenance",
+        "PackagePath": "pkg/maintenance",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/maintenance/git_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 30000000000,
+    "PackagePath": "pkg/maintenance"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestPruneQuarantinedRefs",
+      "Package": "maintenance",
+      "PackagePath": "pkg/maintenance",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/maintenance/git_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

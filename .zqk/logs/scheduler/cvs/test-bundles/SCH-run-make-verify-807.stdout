@@ -1,0 +1,59 @@
+
+--- run 2026-09-04T22:22:09Z ---
+=== RUN   TestMemGraphConnection_CreateNode
+=== PAUSE TestMemGraphConnection_CreateNode
+=== RUN   TestMemGraphConnection_GetNode
+=== PAUSE TestMemGraphConnection_GetNode
+=== RUN   TestMemGraphConnection_UpdateNode
+=== PAUSE TestMemGraphConnection_UpdateNode
+=== RUN   TestMemGraphConnection_DeleteNode
+=== PAUSE TestMemGraphConnection_DeleteNode
+=== RUN   TestMemGraphConnection_CreateEdge
+=== PAUSE TestMemGraphConnection_CreateEdge
+=== RUN   TestMemGraphConnection_BeginTransaction
+=== PAUSE TestMemGraphConnection_BeginTransaction
+=== RUN   TestMemGraphConnection_HealthCheck
+=== PAUSE TestMemGraphConnection_HealthCheck
+=== RUN   TestMemGraphConnection_Reset
+=== PAUSE TestMemGraphConnection_Reset
+=== RUN   TestMemGraphConnection_ExecuteTraversal
+=== PAUSE TestMemGraphConnection_ExecuteTraversal
+=== RUN   TestMemGraphConnection_ExecuteVectorQuery
+=== PAUSE TestMemGraphConnection_ExecuteVectorQuery
+=== CONT  TestMemGraphConnection_CreateNode
+=== CONT  TestMemGraphConnection_DeleteNode
+=== NAME  TestMemGraphConnection_CreateNode
+    connection_test.go:38: CreateNode failed (expected until implementation): bolt client not initialized
+--- PASS: TestMemGraphConnection_CreateNode (0.00s)
+=== CONT  TestMemGraphConnection_BeginTransaction
+=== NAME  TestMemGraphConnection_DeleteNode
+    connection_test.go:121: DeleteNode failed (expected until implementation): bolt client not initialized
+=== NAME  TestMemGraphConnection_BeginTransaction
+    connection_test.go:170: BeginTransaction failed (expected until implementation): bolt client not initialized
+--- PASS: TestMemGraphConnection_BeginTransaction (0.00s)
+=== CONT  TestMemGraphConnection_ExecuteTraversal
+    connection_test.go:252: ExecuteTraversal failed (expected until implementation): bolt client not initialized
+--- PASS: TestMemGraphConnection_ExecuteTraversal (0.00s)
+=== CONT  TestMemGraphConnection_Reset
+--- PASS: TestMemGraphConnection_DeleteNode (0.00s)
+=== CONT  TestMemGraphConnection_ExecuteVectorQuery
+--- PASS: TestMemGraphConnection_Reset (0.00s)
+=== CONT  TestMemGraphConnection_HealthCheck
+=== NAME  TestMemGraphConnection_ExecuteVectorQuery
+    connection_test.go:293: ExecuteVectorQuery failed (expected until implementation): bolt client not initialized
+--- PASS: TestMemGraphConnection_ExecuteVectorQuery (0.00s)
+=== CONT  TestMemGraphConnection_CreateEdge
+=== NAME  TestMemGraphConnection_HealthCheck
+    connection_test.go:204: HealthCheck failed (expected until implementation): bolt client not initialized
+--- PASS: TestMemGraphConnection_HealthCheck (0.00s)
+=== CONT  TestMemGraphConnection_UpdateNode
+    connection_test.go:101: UpdateNode failed (expected until implementation): bolt client not initialized
+--- PASS: TestMemGraphConnection_UpdateNode (0.00s)
+=== CONT  TestMemGraphConnection_GetNode
+    connection_test.go:70: GetNode failed (expected until implementation): bolt client not initialized
+--- PASS: TestMemGraphConnection_GetNode (0.00s)
+=== NAME  TestMemGraphConnection_CreateEdge
+    connection_test.go:150: CreateEdge failed (expected until implementation): bolt client not initialized
+--- PASS: TestMemGraphConnection_CreateEdge (0.00s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/graph/memgraph	0.321s

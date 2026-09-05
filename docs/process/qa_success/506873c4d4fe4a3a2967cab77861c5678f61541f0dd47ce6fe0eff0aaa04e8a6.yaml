@@ -1,0 +1,14 @@
+created_at: "2026-08-19T08:24:58Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1787127889348707000-b64d5eb4
+item_id: CRIT-COMMS-RUNTIME-SEAT-NAME-NEUTRAL-001
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 2857702ca28e4b64fb5782140b43c1400e68fdeab30ab0062f4119523ca97d466e5f13c72adcfa41b92eacf21fa7f0a79b8a8e3a8d7c581e5c9afe0e69cb31dc
+schema_version: 2.0.0
+signature: 304502210086849de9e5916f9ebe7a777fb51c3e10924451c5fc32d2e041861b499d47fd5802200f3336f86927cd30dfc2da317d866efac7ea1a79d3c17789dc2af7343ed9a8df
+status: archived
+title: 'Acceptance: Runtime comms seat name neutral'
+updated_at: "2026-09-01T07:31:12Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

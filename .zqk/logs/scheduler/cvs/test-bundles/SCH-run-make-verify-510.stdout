@@ -1,0 +1,44 @@
+
+--- run 2026-09-04T22:14:34Z ---
+=== RUN   TestCapture_Disabled
+=== PAUSE TestCapture_Disabled
+=== RUN   TestCapture_Apply_List
+=== PAUSE TestCapture_Apply_List
+=== RUN   TestSnapshotObjectStates_EmptyRefs
+=== PAUSE TestSnapshotObjectStates_EmptyRefs
+=== RUN   TestSnapshotObjectStates_MockStorage
+=== PAUSE TestSnapshotObjectStates_MockStorage
+=== RUN   TestApplyReconstruct_NoJournalEntries
+=== PAUSE TestApplyReconstruct_NoJournalEntries
+=== RUN   TestNewStore_EmptyProjectRoot
+=== PAUSE TestNewStore_EmptyProjectRoot
+=== RUN   TestStore_AppendListGet
+=== PAUSE TestStore_AppendListGet
+=== RUN   TestStore_Get_NotFound
+=== PAUSE TestStore_Get_NotFound
+=== RUN   TestStore_List_EmptyFile
+=== PAUSE TestStore_List_EmptyFile
+=== RUN   TestStore_Retain
+=== PAUSE TestStore_Retain
+=== CONT  TestCapture_Disabled
+=== CONT  TestStore_AppendListGet
+--- PASS: TestCapture_Disabled (0.00s)
+=== CONT  TestStore_List_EmptyFile
+--- PASS: TestStore_List_EmptyFile (0.01s)
+=== CONT  TestStore_Retain
+--- PASS: TestStore_AppendListGet (0.02s)
+=== CONT  TestStore_Get_NotFound
+--- PASS: TestStore_Get_NotFound (0.00s)
+=== CONT  TestSnapshotObjectStates_MockStorage
+--- PASS: TestSnapshotObjectStates_MockStorage (0.00s)
+=== CONT  TestNewStore_EmptyProjectRoot
+--- PASS: TestNewStore_EmptyProjectRoot (0.00s)
+=== CONT  TestApplyReconstruct_NoJournalEntries
+--- PASS: TestApplyReconstruct_NoJournalEntries (0.00s)
+=== CONT  TestSnapshotObjectStates_EmptyRefs
+--- PASS: TestSnapshotObjectStates_EmptyRefs (0.00s)
+=== CONT  TestCapture_Apply_List
+--- PASS: TestCapture_Apply_List (0.01s)
+--- PASS: TestStore_Retain (0.04s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/rollback	0.631s

@@ -1,0 +1,7 @@
+job_id: SCH-CHUNK-A
+execution_id: exec-1788560672-95670
+state: completed
+process_id: 95670
+started_at: 2026-09-04T22:24:32.612375Z
+completed_at: 2026-09-04T22:24:32.721076Z
+policy_decision: execute

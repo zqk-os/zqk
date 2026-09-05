@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-368",
+  "created_at": "2026-09-04T21:34:31.009431Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-368",
+    "Tests": [
+      {
+        "Name": "TestRunValidation_ObjectCount",
+        "Package": "migration",
+        "PackagePath": "pkg/migration",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/migration/executor_prerequisite_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestLoadHistory_NoFile",
+        "Package": "migration",
+        "PackagePath": "pkg/migration",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/migration/history_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestHasRun_NoHistory",
+        "Package": "migration",
+        "PackagePath": "pkg/migration",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/migration/history_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestRecordSuccess_AndLoadHistory",
+        "Package": "migration",
+        "PackagePath": "pkg/migration",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/migration/history_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestRecordSuccess_CreatesStateDir",
+        "Package": "migration",
+        "PackagePath": "pkg/migration",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/migration/history_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestHasRun_AfterRecordSuccess",
+        "Package": "migration",
+        "PackagePath": "pkg/migration",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/migration/history_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestRecordSuccess_RejectsEmpty",
+        "Package": "migration",
+        "PackagePath": "pkg/migration",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/migration/history_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestLifecycleMigrationHelper_EmptyLifecycleFile",
+        "Package": "migration",
+        "PackagePath": "pkg/migration",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/migration/lifecycle_migration_edge_case_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestLifecycleMigrationHelper_InvalidYAML",
+        "Package": "migration",
+        "PackagePath": "pkg/migration",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/migration/lifecycle_migration_edge_case_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestLifecycleMigrationHelper_MissingRequiredFields",
+        "Package": "migration",
+        "PackagePath": "pkg/migration",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/migration/lifecycle_migration_edge_case_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": true,
+    "EstimatedDuration": 300000000000,
+    "PackagePath": "pkg/migration"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestRunValidation_ObjectCount",
+      "Package": "migration",
+      "PackagePath": "pkg/migration",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/migration/executor_prerequisite_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestLoadHistory_NoFile",
+      "Package": "migration",
+      "PackagePath": "pkg/migration",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/migration/history_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestHasRun_NoHistory",
+      "Package": "migration",
+      "PackagePath": "pkg/migration",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/migration/history_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestRecordSuccess_AndLoadHistory",
+      "Package": "migration",
+      "PackagePath": "pkg/migration",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/migration/history_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestRecordSuccess_CreatesStateDir",
+      "Package": "migration",
+      "PackagePath": "pkg/migration",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/migration/history_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestHasRun_AfterRecordSuccess",
+      "Package": "migration",
+      "PackagePath": "pkg/migration",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/migration/history_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestRecordSuccess_RejectsEmpty",
+      "Package": "migration",
+      "PackagePath": "pkg/migration",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/migration/history_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestLifecycleMigrationHelper_EmptyLifecycleFile",
+      "Package": "migration",
+      "PackagePath": "pkg/migration",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/migration/lifecycle_migration_edge_case_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestLifecycleMigrationHelper_InvalidYAML",
+      "Package": "migration",
+      "PackagePath": "pkg/migration",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/migration/lifecycle_migration_edge_case_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestLifecycleMigrationHelper_MissingRequiredFields",
+      "Package": "migration",
+      "PackagePath": "pkg/migration",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/migration/lifecycle_migration_edge_case_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

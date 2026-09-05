@@ -1,0 +1,80 @@
+
+--- run 2026-09-04T21:39:20Z ---
+=== RUN   TestResolveStringForPatternValidation
+=== PAUSE TestResolveStringForPatternValidation
+=== RUN   TestResolveStringForPatternValidationWithField
+=== PAUSE TestResolveStringForPatternValidationWithField
+=== RUN   TestGoValidator_BreakGlassStillEnforcesCriteriaOnComplete
+=== PAUSE TestGoValidator_BreakGlassStillEnforcesCriteriaOnComplete
+=== RUN   TestGoValidator_TrustedShockwaveStillEnforcesPlanChildrenHold
+=== PAUSE TestGoValidator_TrustedShockwaveStillEnforcesPlanChildrenHold
+=== RUN   TestGoValidator_ShippedBacklogCompleteRefusesInProgressCriteria
+=== PAUSE TestGoValidator_ShippedBacklogCompleteRefusesInProgressCriteria
+=== RUN   TestGoValidator_CriteriaRefactorMeasuredDeltas
+=== PAUSE TestGoValidator_CriteriaRefactorMeasuredDeltas
+=== RUN   TestGoValidator_PriorityPlanSealRequiresPlannedChild
+=== PAUSE TestGoValidator_PriorityPlanSealRequiresPlannedChild
+=== RUN   TestEvaluatePrecondition_ReadyBacklogTokenIsRecognized
+=== PAUSE TestEvaluatePrecondition_ReadyBacklogTokenIsRecognized
+=== RUN   TestEvaluatePrecondition_UnrecognizedStillFailOpen
+=== PAUSE TestEvaluatePrecondition_UnrecognizedStillFailOpen
+=== RUN   TestEvaluatePrecondition_PriorityPlanValidated
+=== PAUSE TestEvaluatePrecondition_PriorityPlanValidated
+=== CONT  TestResolveStringForPatternValidation
+=== CONT  TestGoValidator_CriteriaRefactorMeasuredDeltas
+=== RUN   TestResolveStringForPatternValidation/string_value
+=== RUN   TestResolveStringForPatternValidation/empty_string
+=== RUN   TestResolveStringForPatternValidation/time.Time
+=== RUN   TestResolveStringForPatternValidation/nil
+=== RUN   TestResolveStringForPatternValidation/int_small
+=== RUN   TestResolveStringForPatternValidation/float_non-Unix
+=== RUN   TestResolveStringForPatternValidation/slice
+--- PASS: TestResolveStringForPatternValidation (0.00s)
+    --- PASS: TestResolveStringForPatternValidation/string_value (0.00s)
+    --- PASS: TestResolveStringForPatternValidation/empty_string (0.00s)
+    --- PASS: TestResolveStringForPatternValidation/time.Time (0.00s)
+    --- PASS: TestResolveStringForPatternValidation/nil (0.00s)
+    --- PASS: TestResolveStringForPatternValidation/int_small (0.00s)
+    --- PASS: TestResolveStringForPatternValidation/float_non-Unix (0.00s)
+    --- PASS: TestResolveStringForPatternValidation/slice (0.00s)
+=== CONT  TestEvaluatePrecondition_UnrecognizedStillFailOpen
+--- PASS: TestEvaluatePrecondition_UnrecognizedStillFailOpen (0.00s)
+=== CONT  TestEvaluatePrecondition_PriorityPlanValidated
+--- PASS: TestEvaluatePrecondition_PriorityPlanValidated (0.00s)
+=== CONT  TestGoValidator_TrustedShockwaveStillEnforcesPlanChildrenHold
+--- PASS: TestGoValidator_CriteriaRefactorMeasuredDeltas (0.02s)
+=== CONT  TestGoValidator_ShippedBacklogCompleteRefusesInProgressCriteria
+--- PASS: TestGoValidator_TrustedShockwaveStillEnforcesPlanChildrenHold (0.08s)
+=== CONT  TestGoValidator_BreakGlassStillEnforcesCriteriaOnComplete
+--- PASS: TestGoValidator_BreakGlassStillEnforcesCriteriaOnComplete (0.01s)
+=== CONT  TestResolveStringForPatternValidationWithField
+=== RUN   TestResolveStringForPatternValidationWithField/schema_version_float_2.0
+=== RUN   TestResolveStringForPatternValidationWithField/schema_version_float_1.5
+=== RUN   TestResolveStringForPatternValidationWithField/schema_version_string
+=== RUN   TestResolveStringForPatternValidationWithField/schema_version_string_2.0
+=== RUN   TestResolveStringForPatternValidationWithField/schema_version_string_2
+=== RUN   TestResolveStringForPatternValidationWithField/created_at_float_Unix
+=== RUN   TestResolveStringForPatternValidationWithField/created_at_int64_Unix
+=== RUN   TestResolveStringForPatternValidationWithField/created_at_string_Unix_seconds
+=== RUN   TestResolveStringForPatternValidationWithField/created_at_string_Unix_millis
+=== RUN   TestResolveStringForPatternValidationWithField/created_at_string_Unix_seconds_.0
+=== RUN   TestResolveStringForPatternValidationWithField/other_field_float_2.0_not_Unix
+--- PASS: TestResolveStringForPatternValidationWithField (0.00s)
+    --- PASS: TestResolveStringForPatternValidationWithField/schema_version_float_2.0 (0.00s)
+    --- PASS: TestResolveStringForPatternValidationWithField/schema_version_float_1.5 (0.00s)
+    --- PASS: TestResolveStringForPatternValidationWithField/schema_version_string (0.00s)
+    --- PASS: TestResolveStringForPatternValidationWithField/schema_version_string_2.0 (0.00s)
+    --- PASS: TestResolveStringForPatternValidationWithField/schema_version_string_2 (0.00s)
+    --- PASS: TestResolveStringForPatternValidationWithField/created_at_float_Unix (0.00s)
+    --- PASS: TestResolveStringForPatternValidationWithField/created_at_int64_Unix (0.00s)
+    --- PASS: TestResolveStringForPatternValidationWithField/created_at_string_Unix_seconds (0.00s)
+    --- PASS: TestResolveStringForPatternValidationWithField/created_at_string_Unix_millis (0.00s)
+    --- PASS: TestResolveStringForPatternValidationWithField/created_at_string_Unix_seconds_.0 (0.00s)
+    --- PASS: TestResolveStringForPatternValidationWithField/other_field_float_2.0_not_Unix (0.00s)
+=== CONT  TestEvaluatePrecondition_ReadyBacklogTokenIsRecognized
+--- PASS: TestEvaluatePrecondition_ReadyBacklogTokenIsRecognized (0.00s)
+=== CONT  TestGoValidator_PriorityPlanSealRequiresPlannedChild
+--- PASS: TestGoValidator_PriorityPlanSealRequiresPlannedChild (0.01s)
+--- PASS: TestGoValidator_ShippedBacklogCompleteRefusesInProgressCriteria (0.13s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/validation	0.888s

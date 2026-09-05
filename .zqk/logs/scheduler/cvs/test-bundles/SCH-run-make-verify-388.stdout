@@ -1,0 +1,26 @@
+
+--- run 2026-09-04T22:12:19Z ---
+=== RUN   TestHyperScaleOrchestrator_Orchestrate
+=== PAUSE TestHyperScaleOrchestrator_Orchestrate
+=== RUN   TestOrchestrator
+=== PAUSE TestOrchestrator
+=== RUN   TestLoadOutcomeKeyNamesFromYAML_duplicate
+=== PAUSE TestLoadOutcomeKeyNamesFromYAML_duplicate
+=== RUN   TestGenerateOutcomeKeysGoSource_roundTrip
+=== PAUSE TestGenerateOutcomeKeysGoSource_roundTrip
+=== CONT  TestHyperScaleOrchestrator_Orchestrate
+=== RUN   TestHyperScaleOrchestrator_Orchestrate/success
+=== CONT  TestLoadOutcomeKeyNamesFromYAML_duplicate
+--- PASS: TestLoadOutcomeKeyNamesFromYAML_duplicate (0.01s)
+=== CONT  TestOrchestrator
+--- PASS: TestOrchestrator (0.00s)
+=== CONT  TestGenerateOutcomeKeysGoSource_roundTrip
+--- PASS: TestGenerateOutcomeKeysGoSource_roundTrip (0.00s)
+=== RUN   TestHyperScaleOrchestrator_Orchestrate/error
+=== RUN   TestHyperScaleOrchestrator_Orchestrate/context_cancel_while_worker_busy
+--- PASS: TestHyperScaleOrchestrator_Orchestrate (0.02s)
+    --- PASS: TestHyperScaleOrchestrator_Orchestrate/success (0.02s)
+    --- PASS: TestHyperScaleOrchestrator_Orchestrate/error (0.00s)
+    --- PASS: TestHyperScaleOrchestrator_Orchestrate/context_cancel_while_worker_busy (0.00s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/pipeline	0.498s

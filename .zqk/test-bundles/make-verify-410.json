@@ -1,0 +1,141 @@
+{
+  "name": "make-verify-410",
+  "created_at": "2026-09-04T21:34:31.388384Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-410",
+    "Tests": [
+      {
+        "Name": "TestRun_auditable_dryRun_softFinalize",
+        "Package": "specorigination",
+        "PackagePath": "pkg/specorigination",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/specorigination/pipeline_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestBuildSpecOriginationPipeline_invalidOptions",
+        "Package": "specorigination",
+        "PackagePath": "pkg/specorigination",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/specorigination/pipeline_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestYAMLConfigDocSchemaHeaderIsIdempotent",
+        "Package": "specorigination",
+        "PackagePath": "pkg/specorigination",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/specorigination/pipeline_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestStageNames_unique",
+        "Package": "specorigination",
+        "PackagePath": "pkg/specorigination",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/specorigination/stage_names_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestTruncateRunes",
+        "Package": "specorigination",
+        "PackagePath": "pkg/specorigination",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/specorigination/trigger_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAdminTriggerBinaryPath",
+        "Package": "specorigination",
+        "PackagePath": "pkg/specorigination",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/specorigination/trigger_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestValidateOptions",
+        "Package": "specorigination",
+        "PackagePath": "pkg/specorigination",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/specorigination/validate_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": true,
+    "EstimatedDuration": 210000000000,
+    "PackagePath": "pkg/specorigination"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestRun_auditable_dryRun_softFinalize",
+      "Package": "specorigination",
+      "PackagePath": "pkg/specorigination",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/specorigination/pipeline_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestBuildSpecOriginationPipeline_invalidOptions",
+      "Package": "specorigination",
+      "PackagePath": "pkg/specorigination",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/specorigination/pipeline_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestYAMLConfigDocSchemaHeaderIsIdempotent",
+      "Package": "specorigination",
+      "PackagePath": "pkg/specorigination",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/specorigination/pipeline_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestStageNames_unique",
+      "Package": "specorigination",
+      "PackagePath": "pkg/specorigination",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/specorigination/stage_names_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestTruncateRunes",
+      "Package": "specorigination",
+      "PackagePath": "pkg/specorigination",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/specorigination/trigger_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestAdminTriggerBinaryPath",
+      "Package": "specorigination",
+      "PackagePath": "pkg/specorigination",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/specorigination/trigger_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestValidateOptions",
+      "Package": "specorigination",
+      "PackagePath": "pkg/specorigination",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/specorigination/validate_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

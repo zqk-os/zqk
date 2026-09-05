@@ -1,0 +1,8 @@
+
+--- run 2026-09-04T23:26:36Z ---
+Error: open /Users/lanceettl/zqk-restore-clone/.zqk/autofix/AUTOFIX-1788564331125826000.json: no such file or directory
+2026-09-04T23:26:38Z [error] Command execution failed error=open /Users/lanceettl/zqk-restore-clone/.zqk/autofix/AUTOFIX-1788564331125826000.json: no such file or directory
+
+--- retry 2 2026-09-04T23:27:08Z ---
+Error: open /Users/lanceettl/zqk-restore-clone/.zqk/autofix/AUTOFIX-1788564331125826000.json: no such file or directory
+2026-09-04T23:27:09Z [error] Command execution failed error=open /Users/lanceettl/zqk-restore-clone/.zqk/autofix/AUTOFIX-1788564331125826000.json: no such file or directory

@@ -1,0 +1,74 @@
+
+--- run 2026-09-04T22:20:59Z ---
+=== RUN   TestNewStateCommitCmd
+=== PAUSE TestNewStateCommitCmd
+=== RUN   TestResolveStatusCheckBinary_PrefersProjectStable
+=== PAUSE TestResolveStatusCheckBinary_PrefersProjectStable
+=== RUN   TestNewStatusCmd
+=== PAUSE TestNewStatusCmd
+=== RUN   TestStatusCommandFlags
+=== PAUSE TestStatusCommandFlags
+=== RUN   TestFormatStatusTablePlan_WithBacklogItems
+=== PAUSE TestFormatStatusTablePlan_WithBacklogItems
+=== RUN   TestFormatStatusTablePlan_WithoutBacklogItems
+=== PAUSE TestFormatStatusTablePlan_WithoutBacklogItems
+=== RUN   TestDetectTokensInTemplate
+=== PAUSE TestDetectTokensInTemplate
+=== RUN   TestReplaceTokensInTemplate
+=== PAUSE TestReplaceTokensInTemplate
+=== RUN   TestUpdateFieldFilter_IsFieldImmutable
+=== PAUSE TestUpdateFieldFilter_IsFieldImmutable
+=== RUN   TestUpdateFieldFilter_IsFieldAutoManaged
+=== PAUSE TestUpdateFieldFilter_IsFieldAutoManaged
+=== CONT  TestNewStateCommitCmd
+=== CONT  TestFormatStatusTablePlan_WithoutBacklogItems
+--- PASS: TestFormatStatusTablePlan_WithoutBacklogItems (0.00s)
+=== CONT  TestStatusCommandFlags
+--- PASS: TestNewStateCommitCmd (0.00s)
+=== CONT  TestFormatStatusTablePlan_WithBacklogItems
+=== CONT  TestUpdateFieldFilter_IsFieldImmutable
+--- PASS: TestFormatStatusTablePlan_WithBacklogItems (0.00s)
+=== RUN   TestUpdateFieldFilter_IsFieldImmutable/id_is_immutable
+--- PASS: TestStatusCommandFlags (0.00s)
+=== CONT  TestUpdateFieldFilter_IsFieldAutoManaged
+=== RUN   TestUpdateFieldFilter_IsFieldAutoManaged/updated_at_is_auto-managed
+=== RUN   TestUpdateFieldFilter_IsFieldImmutable/kind_is_immutable
+=== RUN   TestUpdateFieldFilter_IsFieldImmutable/created_at_is_immutable
+=== RUN   TestUpdateFieldFilter_IsFieldAutoManaged/updated_by_is_auto-managed
+=== RUN   TestUpdateFieldFilter_IsFieldAutoManaged/created_at_is_not_auto-managed
+=== RUN   TestUpdateFieldFilter_IsFieldImmutable/created_by_is_immutable
+=== RUN   TestUpdateFieldFilter_IsFieldImmutable/schema_version_is_immutable
+=== RUN   TestUpdateFieldFilter_IsFieldImmutable/title_is_not_immutable
+=== RUN   TestUpdateFieldFilter_IsFieldImmutable/status_is_not_immutable
+=== RUN   TestUpdateFieldFilter_IsFieldAutoManaged/title_is_not_auto-managed
+--- PASS: TestUpdateFieldFilter_IsFieldAutoManaged (0.00s)
+    --- PASS: TestUpdateFieldFilter_IsFieldAutoManaged/updated_at_is_auto-managed (0.00s)
+    --- PASS: TestUpdateFieldFilter_IsFieldAutoManaged/updated_by_is_auto-managed (0.00s)
+    --- PASS: TestUpdateFieldFilter_IsFieldAutoManaged/created_at_is_not_auto-managed (0.00s)
+    --- PASS: TestUpdateFieldFilter_IsFieldAutoManaged/title_is_not_auto-managed (0.00s)
+=== CONT  TestReplaceTokensInTemplate
+=== RUN   TestUpdateFieldFilter_IsFieldImmutable/description_is_not_immutable
+--- PASS: TestUpdateFieldFilter_IsFieldImmutable (0.00s)
+    --- PASS: TestUpdateFieldFilter_IsFieldImmutable/id_is_immutable (0.00s)
+    --- PASS: TestUpdateFieldFilter_IsFieldImmutable/kind_is_immutable (0.00s)
+    --- PASS: TestUpdateFieldFilter_IsFieldImmutable/created_at_is_immutable (0.00s)
+    --- PASS: TestUpdateFieldFilter_IsFieldImmutable/created_by_is_immutable (0.00s)
+    --- PASS: TestUpdateFieldFilter_IsFieldImmutable/schema_version_is_immutable (0.00s)
+    --- PASS: TestUpdateFieldFilter_IsFieldImmutable/title_is_not_immutable (0.00s)
+    --- PASS: TestUpdateFieldFilter_IsFieldImmutable/status_is_not_immutable (0.00s)
+    --- PASS: TestUpdateFieldFilter_IsFieldImmutable/description_is_not_immutable (0.00s)
+=== CONT  TestNewStatusCmd
+--- PASS: TestNewStatusCmd (0.00s)
+=== CONT  TestResolveStatusCheckBinary_PrefersProjectStable
+=== NAME  TestReplaceTokensInTemplate
+    streaming_template_test.go:143: Replaced template:
+        kind: criteria
+        title: "Test Criteria"
+        category: "acceptance"
+        description: "A test criteria"
+--- PASS: TestReplaceTokensInTemplate (0.00s)
+=== CONT  TestDetectTokensInTemplate
+--- PASS: TestDetectTokensInTemplate (0.00s)
+--- PASS: TestResolveStatusCheckBinary_PrefersProjectStable (0.00s)
+PASS
+ok  	github.com/lanceman/zqk/cmd/zqk/system	0.703s

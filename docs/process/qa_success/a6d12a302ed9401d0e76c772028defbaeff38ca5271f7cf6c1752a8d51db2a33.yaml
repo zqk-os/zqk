@@ -1,0 +1,14 @@
+created_at: "2026-08-19T08:03:05Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1787126583787557000-baf70b90
+item_id: REDACTED
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 2857702ca28e4b64fb5782140b43c1400e68fdeab30ab0062f4119523ca97d466e5f13c72adcfa41b92eacf21fa7f0a79b8a8e3a8d7c581e5c9afe0e69cb31dc
+schema_version: 2.0.0
+signature: 304502204ce220d536cee7f32f9874ed4942b2f100f3eb791beadb34f1491371e28c9964022100aa29f402b7cb7a3f79142b70ae9a2ce12f7fc29302c0de3aace1c18f755b0603
+status: archived
+title: 'Acceptance: Add author_session_id to audit events from MCP'
+updated_at: "2026-09-01T07:47:28Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

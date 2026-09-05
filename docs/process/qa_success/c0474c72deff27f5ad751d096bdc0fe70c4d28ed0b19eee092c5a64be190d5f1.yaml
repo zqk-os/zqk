@@ -1,0 +1,14 @@
+created_at: "2026-08-18T23:37:29Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1787096248874404000-3b0fb1c3
+item_id: BLI-CEF-R2-SEC-PATH-TRAVERSAL
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 2857702ca28e4b64fb5782140b43c1400e68fdeab30ab0062f4119523ca97d466e5f13c72adcfa41b92eacf21fa7f0a79b8a8e3a8d7c581e5c9afe0e69cb31dc
+schema_version: 2.0.0
+signature: 3045022016966cbcbeeeab5a2e442d89967603cfac63b6775e5e1d52908d17aae7301a55022100cb181ae3ccc59cd61a6d1111a9be5893e04f2e357c2953436eb8b2dfb6a311f0
+status: archived
+title: MCP workspace write guard must contain path traversal
+updated_at: "2026-09-01T07:29:30Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

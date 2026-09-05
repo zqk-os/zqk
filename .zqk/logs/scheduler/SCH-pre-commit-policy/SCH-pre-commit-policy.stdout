@@ -1,0 +1,120 @@
+
+--- run 2026-09-04T20:40:46Z ---
+Policy scope: branch (22 go files)
+→ parallel policy gates (wall clock = max of jobs, not the sum)
+  [logging 0s exit=0]
+  [architecture 0s exit=0]
+  [type-assert 3s exit=0]
+
+--- run 2026-09-04T21:15:00Z ---
+Policy scope: branch (1 go files)
+→ parallel policy gates (wall clock = max of jobs, not the sum)
+  [logging 0s exit=0]
+  [architecture 0s exit=0]
+  [type-assert 1s exit=0]
+
+--- run 2026-09-04T21:30:40Z ---
+No Go changes staged or on this branch. Skipping policy checks.
+
+--- run 2026-09-04T21:46:33Z ---
+No Go changes staged or on this branch. Skipping policy checks.
+
+--- run 2026-09-04T22:02:37Z ---
+Policy scope: branch (3 go files)
+→ parallel policy gates (wall clock = max of jobs, not the sum)
+  [logging 1s exit=0]
+  [architecture 1s exit=0]
+  [type-assert 1s exit=0]
+
+--- run 2026-09-04T22:15:00Z ---
+Policy scope: branch (3 go files)
+→ parallel policy gates (wall clock = max of jobs, not the sum)
+  [logging 0s exit=0]
+  [architecture 0s exit=0]
+  [type-assert 1s exit=0]
+
+--- run 2026-09-04T22:30:00Z ---
+Policy scope: branch (3 go files)
+→ parallel policy gates (wall clock = max of jobs, not the sum)
+  [logging 0s exit=0]
+  [architecture 0s exit=0]
+  [type-assert 0s exit=0]
+
+--- run 2026-09-04T22:45:00Z ---
+Policy scope: branch (3 go files)
+→ parallel policy gates (wall clock = max of jobs, not the sum)
+  [logging 0s exit=0]
+  [architecture 0s exit=0]
+  [type-assert 1s exit=0]
+
+--- run 2026-09-04T23:00:00Z ---
+No Go changes staged or on this branch. Skipping policy checks.
+
+--- run 2026-09-04T23:16:03Z ---
+No Go changes staged or on this branch. Skipping policy checks.
+
+--- run 2026-09-04T23:31:23Z ---
+No Go changes staged or on this branch. Skipping policy checks.
+
+--- run 2026-09-04T23:45:00Z ---
+No Go changes staged or on this branch. Skipping policy checks.
+
+--- run 2026-09-05T00:00:10Z ---
+No Go changes staged or on this branch. Skipping policy checks.
+
+--- run 2026-09-05T00:15:00Z ---
+No Go changes staged or on this branch. Skipping policy checks.
+
+--- run 2026-09-05T00:30:00Z ---
+No Go changes staged or on this branch. Skipping policy checks.
+
+--- run 2026-09-05T00:45:00Z ---
+No Go changes staged or on this branch. Skipping policy checks.
+
+--- run 2026-09-05T01:00:00Z ---
+No Go changes staged or on this branch. Skipping policy checks.
+
+--- run 2026-09-05T01:15:00Z ---
+No Go changes staged or on this branch. Skipping policy checks.
+
+--- run 2026-09-05T01:30:00Z ---
+No Go changes staged or on this branch. Skipping policy checks.
+
+--- run 2026-09-05T01:45:00Z ---
+No Go changes staged or on this branch. Skipping policy checks.
+
+--- run 2026-09-05T02:00:00Z ---
+No Go changes staged or on this branch. Skipping policy checks.
+
+--- run 2026-09-05T02:15:00Z ---
+No Go changes staged or on this branch. Skipping policy checks.
+
+--- run 2026-09-05T02:30:00Z ---
+No Go changes staged or on this branch. Skipping policy checks.
+
+--- run 2026-09-05T02:45:00Z ---
+No Go changes staged or on this branch. Skipping policy checks.
+
+--- run 2026-09-05T03:00:00Z ---
+No Go changes staged or on this branch. Skipping policy checks.
+
+--- run 2026-09-05T03:15:00Z ---
+No Go changes staged or on this branch. Skipping policy checks.
+
+--- run 2026-09-05T03:30:00Z ---
+No Go changes staged or on this branch. Skipping policy checks.
+
+--- run 2026-09-05T03:45:01Z ---
+No Go changes staged or on this branch. Skipping policy checks.
+
+--- run 2026-09-05T04:00:00Z ---
+No Go changes staged or on this branch. Skipping policy checks.
+
+--- run 2026-09-05T04:15:00Z ---
+No Go changes staged or on this branch. Skipping policy checks.
+
+--- run 2026-09-05T04:30:00Z ---
+No Go changes staged or on this branch. Skipping policy checks.
+
+--- run 2026-09-05T05:08:21Z ---
+No Go changes staged or on this branch. Skipping policy checks.

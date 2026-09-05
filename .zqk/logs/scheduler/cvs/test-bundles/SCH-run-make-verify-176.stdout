@@ -1,0 +1,219 @@
+
+--- run 2026-09-04T21:41:34Z ---
+=== RUN   TestQuerySecurity_ValidateSortByField
+=== PAUSE TestQuerySecurity_ValidateSortByField
+=== RUN   TestQuerySecurity_ComplexQueryOperations
+=== PAUSE TestQuerySecurity_ComplexQueryOperations
+=== RUN   TestRBAC_EdgeCases_Comprehensive
+=== PAUSE TestRBAC_EdgeCases_Comprehensive
+=== RUN   TestRBAC_MultiAgentScenarios
+=== PAUSE TestRBAC_MultiAgentScenarios
+=== RUN   TestRBAC_AccountRoleEnforcement
+=== PAUSE TestRBAC_AccountRoleEnforcement
+=== RUN   TestRBAC_RoleBasedCommandFiltering
+=== PAUSE TestRBAC_RoleBasedCommandFiltering
+=== RUN   TestRBAC_PermissionBasedFiltering
+=== PAUSE TestRBAC_PermissionBasedFiltering
+=== RUN   TestRBAC_MCPToolRegistration
+=== PAUSE TestRBAC_MCPToolRegistration
+=== RUN   TestRBAC_SecurityContextInitialization
+=== PAUSE TestRBAC_SecurityContextInitialization
+=== RUN   TestRBAC_ConfigBasedFiltering
+=== PAUSE TestRBAC_ConfigBasedFiltering
+=== CONT  TestQuerySecurity_ValidateSortByField
+=== CONT  TestRBAC_RoleBasedCommandFiltering
+--- PASS: TestQuerySecurity_ValidateSortByField (0.00s)
+=== CONT  TestRBAC_MultiAgentScenarios
+=== RUN   TestRBAC_MultiAgentScenarios/agent_with_account_id
+=== RUN   TestRBAC_RoleBasedCommandFiltering/admin_role_sees_all
+=== NAME  TestRBAC_MultiAgentScenarios/agent_with_account_id
+    rbac_edge_cases_test.go:186: Agent with developer role should see 'object list'
+=== RUN   TestRBAC_MultiAgentScenarios/agent_without_account_id
+=== NAME  TestRBAC_RoleBasedCommandFiltering/admin_role_sees_all
+    rbac_test.go:131: All discovered commands: [zqk object zqk reports zqk system zqk]
+    rbac_test.go:132: Filtered commands: [zqk object zqk reports zqk system zqk]
+    rbac_test.go:139: Admin role should see all commands regardless of permissions: Expected to see 'object list'
+    rbac_test.go:139: Admin role should see all commands regardless of permissions: Expected to see 'object create'
+    rbac_test.go:139: Admin role should see all commands regardless of permissions: Expected to see 'object delete'
+    rbac_test.go:139: Admin role should see all commands regardless of permissions: Expected to see 'system admin'
+=== RUN   TestRBAC_MultiAgentScenarios/agent_with_wildcard_permission
+=== NAME  TestRBAC_RoleBasedCommandFiltering/admin_role_sees_all
+    rbac_test.go:139: Admin role should see all commands regardless of permissions: Expected to see 'system status'
+=== RUN   TestRBAC_RoleBasedCommandFiltering/developer_role_sees_development_commands
+--- FAIL: TestRBAC_MultiAgentScenarios (0.00s)
+    --- FAIL: TestRBAC_MultiAgentScenarios/agent_with_account_id (0.00s)
+    --- PASS: TestRBAC_MultiAgentScenarios/agent_without_account_id (0.00s)
+    --- PASS: TestRBAC_MultiAgentScenarios/agent_with_wildcard_permission (0.00s)
+=== CONT  TestRBAC_AccountRoleEnforcement
+=== NAME  TestRBAC_RoleBasedCommandFiltering/developer_role_sees_development_commands
+    rbac_test.go:131: All discovered commands: [zqk object zqk reports zqk system zqk]
+    rbac_test.go:132: Filtered commands: []
+    rbac_test.go:139: Developer role should see development commands but not admin commands: Expected to see 'object list'
+    rbac_test.go:139: Developer role should see development commands but not admin commands: Expected to see 'object create'
+    rbac_test.go:139: Developer role should see development commands but not admin commands: Expected to see 'object update'
+=== RUN   TestRBAC_RoleBasedCommandFiltering/viewer_role_read_only
+    rbac_test.go:131: All discovered commands: [zqk object zqk reports zqk system zqk]
+    rbac_test.go:132: Filtered commands: []
+    rbac_test.go:139: Viewer role should only see read commands: Expected to see 'object list'
+=== RUN   TestRBAC_AccountRoleEnforcement/enforce_account_roles_enabled
+=== NAME  TestRBAC_RoleBasedCommandFiltering/viewer_role_read_only
+    rbac_test.go:139: Viewer role should only see read commands: Expected to see 'object get'
+    rbac_test.go:139: Viewer role should only see read commands: Expected to see 'system status'
+=== RUN   TestRBAC_RoleBasedCommandFiltering/executive_role_sees_reports
+=== RUN   TestRBAC_AccountRoleEnforcement/enforce_account_roles_disabled
+--- PASS: TestRBAC_AccountRoleEnforcement (0.00s)
+    --- PASS: TestRBAC_AccountRoleEnforcement/enforce_account_roles_enabled (0.00s)
+    --- PASS: TestRBAC_AccountRoleEnforcement/enforce_account_roles_disabled (0.00s)
+=== NAME  TestRBAC_RoleBasedCommandFiltering/executive_role_sees_reports
+    rbac_test.go:131: All discovered commands: [zqk object zqk reports zqk system zqk]
+    rbac_test.go:132: Filtered commands: []
+    rbac_test.go:139: Executive role should see reports but not write commands: Expected to see 'object list'
+    rbac_test.go:139: Executive role should see reports but not write commands: Expected to see 'reports pcs'
+    rbac_test.go:139: Executive role should see reports but not write commands: Expected to see 'reports edd'
+=== CONT  TestRBAC_SecurityContextInitialization
+=== RUN   TestRBAC_RoleBasedCommandFiltering/no_permissions_sees_nothing
+=== RUN   TestRBAC_SecurityContextInitialization/full_client_info
+=== RUN   TestRBAC_RoleBasedCommandFiltering/multiple_roles_union
+    rbac_test.go:131: All discovered commands: [zqk object zqk reports zqk system zqk]
+    rbac_test.go:132: Filtered commands: []
+    rbac_test.go:139: User with multiple roles should see union of allowed commands: Expected to see 'object list'
+    rbac_test.go:139: User with multiple roles should see union of allowed commands: Expected to see 'object create'
+    rbac_test.go:139: User with multiple roles should see union of allowed commands: Expected to see 'reports pcs'
+=== RUN   TestRBAC_SecurityContextInitialization/no_account_id_defaults_to_viewer
+=== RUN   TestRBAC_RoleBasedCommandFiltering/system_context_sees_all
+=== RUN   TestRBAC_SecurityContextInitialization/no_roles_defaults_to_viewer
+=== RUN   TestRBAC_SecurityContextInitialization/admin_role_auto_grants_permissions
+=== RUN   TestRBAC_SecurityContextInitialization/comma_separated_roles
+=== RUN   TestRBAC_SecurityContextInitialization/comma_separated_permissions
+--- PASS: TestRBAC_SecurityContextInitialization (0.00s)
+    --- PASS: TestRBAC_SecurityContextInitialization/full_client_info (0.00s)
+    --- PASS: TestRBAC_SecurityContextInitialization/no_account_id_defaults_to_viewer (0.00s)
+    --- PASS: TestRBAC_SecurityContextInitialization/no_roles_defaults_to_viewer (0.00s)
+    --- PASS: TestRBAC_SecurityContextInitialization/admin_role_auto_grants_permissions (0.00s)
+    --- PASS: TestRBAC_SecurityContextInitialization/comma_separated_roles (0.00s)
+    --- PASS: TestRBAC_SecurityContextInitialization/comma_separated_permissions (0.00s)
+=== CONT  TestRBAC_ConfigBasedFiltering
+=== NAME  TestRBAC_RoleBasedCommandFiltering/system_context_sees_all
+    rbac_test.go:131: All discovered commands: [zqk object zqk reports zqk system zqk]
+    rbac_test.go:132: Filtered commands: [zqk object zqk reports zqk system zqk]
+    rbac_test.go:139: System context should see all commands: Expected to see 'object list'
+    rbac_test.go:139: System context should see all commands: Expected to see 'object create'
+    rbac_test.go:139: System context should see all commands: Expected to see 'object delete'
+    rbac_test.go:139: System context should see all commands: Expected to see 'system admin'
+--- FAIL: TestRBAC_RoleBasedCommandFiltering (0.00s)
+    --- FAIL: TestRBAC_RoleBasedCommandFiltering/admin_role_sees_all (0.00s)
+    --- FAIL: TestRBAC_RoleBasedCommandFiltering/developer_role_sees_development_commands (0.00s)
+    --- FAIL: TestRBAC_RoleBasedCommandFiltering/viewer_role_read_only (0.00s)
+    --- FAIL: TestRBAC_RoleBasedCommandFiltering/executive_role_sees_reports (0.00s)
+    --- PASS: TestRBAC_RoleBasedCommandFiltering/no_permissions_sees_nothing (0.00s)
+    --- FAIL: TestRBAC_RoleBasedCommandFiltering/multiple_roles_union (0.00s)
+    --- FAIL: TestRBAC_RoleBasedCommandFiltering/system_context_sees_all (0.00s)
+=== CONT  TestRBAC_EdgeCases_Comprehensive
+=== RUN   TestRBAC_ConfigBasedFiltering/exposed_commands_whitelist
+=== RUN   TestRBAC_EdgeCases_Comprehensive/nil_security_context_graceful
+=== NAME  TestRBAC_ConfigBasedFiltering/exposed_commands_whitelist
+    rbac_test.go:560: After permission filter (0): []
+    rbac_test.go:561: After config filter (0): []
+    rbac_test.go:562: Config exposed_commands: [object list object get]
+    rbac_test.go:567: Only exposed commands should be visible: Expected to see 'object list'
+    rbac_test.go:567: Only exposed commands should be visible: Expected to see 'object get'
+=== RUN   TestRBAC_ConfigBasedFiltering/blocked_commands_blacklist
+=== RUN   TestRBAC_EdgeCases_Comprehensive/empty_account_id
+=== NAME  TestRBAC_ConfigBasedFiltering/blocked_commands_blacklist
+    rbac_test.go:560: After permission filter (0): []
+    rbac_test.go:561: After config filter (0): []
+    rbac_test.go:562: Config exposed_commands: [object list object create object delete]
+    rbac_test.go:567: Blocked commands should not be visible even if exposed: Expected to see 'object list'
+    rbac_test.go:567: Blocked commands should not be visible even if exposed: Expected to see 'object create'
+=== RUN   TestRBAC_ConfigBasedFiltering/write_operations_requires_permission
+=== NAME  TestRBAC_EdgeCases_Comprehensive/empty_account_id
+    rbac_edge_cases_test.go:52: Should see 'object list' with viewer role even with empty account ID
+=== RUN   TestRBAC_EdgeCases_Comprehensive/wildcard_permission_all_operations
+=== NAME  TestRBAC_ConfigBasedFiltering/write_operations_requires_permission
+    rbac_test.go:560: After permission filter (0): []
+    rbac_test.go:561: After config filter (0): []
+    rbac_test.go:562: Config exposed_commands: [object list object create]
+    rbac_test.go:567: Write operations should be visible if user has write permission: Expected to see 'object list'
+    rbac_test.go:567: Write operations should be visible if user has write permission: Expected to see 'object create'
+=== RUN   TestRBAC_ConfigBasedFiltering/write_operations_no_permission
+=== RUN   TestRBAC_EdgeCases_Comprehensive/partial_permission_match
+=== NAME  TestRBAC_ConfigBasedFiltering/write_operations_no_permission
+    rbac_test.go:560: After permission filter (0): []
+    rbac_test.go:561: After config filter (0): []
+    rbac_test.go:562: Config exposed_commands: [object list object create]
+    rbac_test.go:567: Write operations should not be visible if user lacks write permission: Expected to see 'object list'
+=== RUN   TestRBAC_EdgeCases_Comprehensive/multiple_roles_intersection
+=== RUN   TestRBAC_ConfigBasedFiltering/write_operations_with_permission
+    rbac_test.go:560: After permission filter (0): []
+    rbac_test.go:561: After config filter (0): []
+    rbac_test.go:562: Config exposed_commands: [object list object create]
+    rbac_test.go:567: Write operations should be visible if user has write permission: Expected to see 'object list'
+    rbac_test.go:567: Write operations should be visible if user has write permission: Expected to see 'object create'
+=== RUN   TestRBAC_EdgeCases_Comprehensive/permission_pattern_matching
+--- FAIL: TestRBAC_ConfigBasedFiltering (0.00s)
+    --- FAIL: TestRBAC_ConfigBasedFiltering/exposed_commands_whitelist (0.00s)
+    --- FAIL: TestRBAC_ConfigBasedFiltering/blocked_commands_blacklist (0.00s)
+    --- FAIL: TestRBAC_ConfigBasedFiltering/write_operations_requires_permission (0.00s)
+    --- FAIL: TestRBAC_ConfigBasedFiltering/write_operations_no_permission (0.00s)
+    --- FAIL: TestRBAC_ConfigBasedFiltering/write_operations_with_permission (0.00s)
+=== CONT  TestRBAC_MCPToolRegistration
+=== RUN   TestRBAC_EdgeCases_Comprehensive/role_without_permissions
+=== RUN   TestRBAC_EdgeCases_Comprehensive/permissions_without_roles
+=== RUN   TestRBAC_EdgeCases_Comprehensive/case_sensitive_roles
+=== RUN   TestRBAC_EdgeCases_Comprehensive/case_sensitive_permissions
+--- FAIL: TestRBAC_EdgeCases_Comprehensive (0.00s)
+    --- PASS: TestRBAC_EdgeCases_Comprehensive/nil_security_context_graceful (0.00s)
+    --- FAIL: TestRBAC_EdgeCases_Comprehensive/empty_account_id (0.00s)
+    --- PASS: TestRBAC_EdgeCases_Comprehensive/wildcard_permission_all_operations (0.00s)
+    --- PASS: TestRBAC_EdgeCases_Comprehensive/partial_permission_match (0.00s)
+    --- PASS: TestRBAC_EdgeCases_Comprehensive/multiple_roles_intersection (0.00s)
+    --- PASS: TestRBAC_EdgeCases_Comprehensive/permission_pattern_matching (0.00s)
+    --- PASS: TestRBAC_EdgeCases_Comprehensive/role_without_permissions (0.00s)
+    --- PASS: TestRBAC_EdgeCases_Comprehensive/permissions_without_roles (0.00s)
+    --- PASS: TestRBAC_EdgeCases_Comprehensive/case_sensitive_roles (0.00s)
+    --- PASS: TestRBAC_EdgeCases_Comprehensive/case_sensitive_permissions (0.00s)
+=== CONT  TestRBAC_PermissionBasedFiltering
+=== RUN   TestRBAC_PermissionBasedFiltering/wildcard_read_sees_read_commands
+    rbac_test.go:229: Wildcard read permission should see all read commands: Expected to see 'object list'
+    rbac_test.go:229: Wildcard read permission should see all read commands: Expected to see 'object get'
+=== RUN   TestRBAC_PermissionBasedFiltering/specific_write_permission
+    rbac_test.go:229: Specific write permission should see write commands for that kind: Expected to see 'object list'
+    rbac_test.go:229: Specific write permission should see write commands for that kind: Expected to see 'object create'
+=== RUN   TestRBAC_MCPToolRegistration/admin_sees_all_tools
+=== RUN   TestRBAC_PermissionBasedFiltering/wildcard_write_sees_all_write
+    rbac_test.go:229: Wildcard write permission should see all write commands: Expected to see 'object list'
+    rbac_test.go:229: Wildcard write permission should see all write commands: Expected to see 'object create'
+    rbac_test.go:229: Wildcard write permission should see all write commands: Expected to see 'object update'
+=== RUN   TestRBAC_PermissionBasedFiltering/delete_permission_required
+    rbac_test.go:229: Delete permission required to see delete commands: Expected to see 'object list'
+    rbac_test.go:229: Delete permission required to see delete commands: Expected to see 'object create'
+    rbac_test.go:229: Delete permission required to see delete commands: Expected to see 'object delete'
+=== RUN   TestRBAC_PermissionBasedFiltering/no_permissions_no_write
+--- FAIL: TestRBAC_PermissionBasedFiltering (0.00s)
+    --- FAIL: TestRBAC_PermissionBasedFiltering/wildcard_read_sees_read_commands (0.00s)
+    --- FAIL: TestRBAC_PermissionBasedFiltering/specific_write_permission (0.00s)
+    --- FAIL: TestRBAC_PermissionBasedFiltering/wildcard_write_sees_all_write (0.00s)
+    --- FAIL: TestRBAC_PermissionBasedFiltering/delete_permission_required (0.00s)
+    --- PASS: TestRBAC_PermissionBasedFiltering/no_permissions_no_write (0.00s)
+=== CONT  TestQuerySecurity_ComplexQueryOperations
+--- PASS: TestQuerySecurity_ComplexQueryOperations (0.00s)
+=== NAME  TestRBAC_MCPToolRegistration/admin_sees_all_tools
+    rbac_test.go:300: All registered tools: []
+    rbac_test.go:319: Admin should see all MCP tools: Expected tool matching 'mcp.test_object_list' to be registered
+    rbac_test.go:319: Admin should see all MCP tools: Expected tool matching 'mcp.test_object_create' to be registered
+    rbac_test.go:319: Admin should see all MCP tools: Expected tool matching 'mcp.test_object_delete' to be registered
+=== RUN   TestRBAC_MCPToolRegistration/viewer_sees_read_tools_only
+    rbac_test.go:300: All registered tools: []
+    rbac_test.go:319: Viewer should only see read tools: Expected tool matching 'mcp.test_object_list' to be registered
+    rbac_test.go:319: Viewer should only see read tools: Expected tool matching 'mcp.test_object_get' to be registered
+=== RUN   TestRBAC_MCPToolRegistration/developer_sees_write_tools
+    rbac_test.go:300: All registered tools: []
+    rbac_test.go:319: Developer should see write tools but not delete: Expected tool matching 'mcp.test_object_list' to be registered
+    rbac_test.go:319: Developer should see write tools but not delete: Expected tool matching 'mcp.test_object_create' to be registered
+--- FAIL: TestRBAC_MCPToolRegistration (0.00s)
+    --- FAIL: TestRBAC_MCPToolRegistration/admin_sees_all_tools (0.00s)
+    --- FAIL: TestRBAC_MCPToolRegistration/viewer_sees_read_tools_only (0.00s)
+    --- FAIL: TestRBAC_MCPToolRegistration/developer_sees_write_tools (0.00s)
+FAIL
+FAIL	github.com/lanceman/zqk/pkg/mcp	0.641s
+FAIL

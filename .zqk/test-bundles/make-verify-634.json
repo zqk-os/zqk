@@ -1,0 +1,87 @@
+{
+  "name": "make-verify-634",
+  "created_at": "2026-09-04T21:34:33.662993Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-634",
+    "Tests": [
+      {
+        "Name": "TestFormatRFC3339UTC_usesZForUTCInstant",
+        "Package": "zqktime",
+        "PackagePath": "pkg/zqktime",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/zqktime/zqktime_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestNowRFC3339UTC_parsesAsRFC3339",
+        "Package": "zqktime",
+        "PackagePath": "pkg/zqktime",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/zqktime/zqktime_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestFormatRFC3339UTCPtr",
+        "Package": "zqktime",
+        "PackagePath": "pkg/zqktime",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/zqktime/zqktime_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestFormatLayoutUTC",
+        "Package": "zqktime",
+        "PackagePath": "pkg/zqktime",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/zqktime/zqktime_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": true,
+    "EstimatedDuration": 120000000000,
+    "PackagePath": "pkg/zqktime"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestFormatRFC3339UTC_usesZForUTCInstant",
+      "Package": "zqktime",
+      "PackagePath": "pkg/zqktime",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/zqktime/zqktime_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestNowRFC3339UTC_parsesAsRFC3339",
+      "Package": "zqktime",
+      "PackagePath": "pkg/zqktime",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/zqktime/zqktime_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestFormatRFC3339UTCPtr",
+      "Package": "zqktime",
+      "PackagePath": "pkg/zqktime",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/zqktime/zqktime_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestFormatLayoutUTC",
+      "Package": "zqktime",
+      "PackagePath": "pkg/zqktime",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/zqktime/zqktime_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

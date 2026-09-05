@@ -1,0 +1,73 @@
+
+--- run 2026-09-04T21:39:11Z ---
+=== RUN   TestValidationStateCache_MultipleProcesses
+=== PAUSE TestValidationStateCache_MultipleProcesses
+=== RUN   TestAsyncValidator_StressTest
+=== PAUSE TestAsyncValidator_StressTest
+=== RUN   TestAsyncValidator_ConcurrentValidators
+=== PAUSE TestAsyncValidator_ConcurrentValidators
+=== RUN   TestValidationStateCache_FileLocking
+=== PAUSE TestValidationStateCache_FileLocking
+=== RUN   TestAsyncValidator_ValidateNow_Concurrent
+=== PAUSE TestAsyncValidator_ValidateNow_Concurrent
+=== RUN   TestGoValidator_CVSDraftToActiveAdmission
+=== PAUSE TestGoValidator_CVSDraftToActiveAdmission
+=== RUN   TestGoValidator_DisplayLength_Warnings
+=== PAUSE TestGoValidator_DisplayLength_Warnings
+=== RUN   TestBaseObjectTitleUsesDisplayLengthWithoutStorageLimit
+=== PAUSE TestBaseObjectTitleUsesDisplayLengthWithoutStorageLimit
+=== RUN   TestGoValidator_DisplayLength_Integration
+=== PAUSE TestGoValidator_DisplayLength_Integration
+=== RUN   TestGoValidator_ValidateChecksum
+=== PAUSE TestGoValidator_ValidateChecksum
+=== CONT  TestValidationStateCache_MultipleProcesses
+=== CONT  TestGoValidator_CVSDraftToActiveAdmission
+--- PASS: TestGoValidator_CVSDraftToActiveAdmission (0.00s)
+=== CONT  TestValidationStateCache_FileLocking
+=== CONT  TestAsyncValidator_ValidateNow_Concurrent
+--- PASS: TestValidationStateCache_MultipleProcesses (0.44s)
+--- PASS: TestAsyncValidator_ValidateNow_Concurrent (0.07s)
+=== CONT  TestAsyncValidator_ConcurrentValidators
+--- PASS: TestValidationStateCache_FileLocking (1.18s)
+=== CONT  TestAsyncValidator_StressTest
+    concurrent_test.go:293: Creating 1000 test objects...
+=== NAME  TestAsyncValidator_ConcurrentValidators
+    concurrent_test.go:420: All validators completed
+=== NAME  TestAsyncValidator_StressTest
+    concurrent_test.go:303: Enqueuing 1000 validation tasks...
+--- PASS: TestAsyncValidator_ConcurrentValidators (1.26s)
+=== CONT  TestGoValidator_DisplayLength_Integration
+    display_length_test.go:178: job_type display_length: 28 (may be default)
+    display_length_test.go:205: Display length warning: Field job_type value length (72) exceeds display_length constraint (50) - may be truncated in table displays
+--- PASS: TestGoValidator_DisplayLength_Integration (0.68s)
+=== CONT  TestGoValidator_ValidateChecksum
+=== RUN   TestGoValidator_ValidateChecksum/no_checksum_field
+=== RUN   TestGoValidator_ValidateChecksum/valid_checksum
+=== RUN   TestGoValidator_ValidateChecksum/invalid_checksum
+--- PASS: TestGoValidator_ValidateChecksum (0.00s)
+    --- PASS: TestGoValidator_ValidateChecksum/no_checksum_field (0.00s)
+    --- PASS: TestGoValidator_ValidateChecksum/valid_checksum (0.00s)
+    --- PASS: TestGoValidator_ValidateChecksum/invalid_checksum (0.00s)
+=== CONT  TestBaseObjectTitleUsesDisplayLengthWithoutStorageLimit
+--- PASS: TestBaseObjectTitleUsesDisplayLengthWithoutStorageLimit (0.00s)
+=== CONT  TestGoValidator_DisplayLength_Warnings
+=== RUN   TestGoValidator_DisplayLength_Warnings/value_within_display_length_generates_no_warning
+=== RUN   TestGoValidator_DisplayLength_Warnings/value_exactly_at_display_length_generates_no_warning
+=== RUN   TestGoValidator_DisplayLength_Warnings/value_exceeding_display_length_generates_warning
+=== RUN   TestGoValidator_DisplayLength_Warnings/non-string_value_generates_no_warning
+=== RUN   TestGoValidator_DisplayLength_Warnings/empty_string_generates_no_warning
+=== RUN   TestGoValidator_DisplayLength_Warnings/value_one_character_over_display_length_generates_warning
+--- PASS: TestGoValidator_DisplayLength_Warnings (0.00s)
+    --- PASS: TestGoValidator_DisplayLength_Warnings/value_within_display_length_generates_no_warning (0.00s)
+    --- PASS: TestGoValidator_DisplayLength_Warnings/value_exactly_at_display_length_generates_no_warning (0.00s)
+    --- PASS: TestGoValidator_DisplayLength_Warnings/value_exceeding_display_length_generates_warning (0.00s)
+    --- PASS: TestGoValidator_DisplayLength_Warnings/non-string_value_generates_no_warning (0.00s)
+    --- PASS: TestGoValidator_DisplayLength_Warnings/empty_string_generates_no_warning (0.00s)
+    --- PASS: TestGoValidator_DisplayLength_Warnings/value_one_character_over_display_length_generates_warning (0.00s)
+=== NAME  TestAsyncValidator_StressTest
+    concurrent_test.go:328: Progress: 540/1000 processed, queue: 452, stale: 0, withIssues: 0 (elapsed: 2.001007s)
+    concurrent_test.go:328: Progress: 1000/1000 processed, queue: 0, stale: 0, withIssues: 0 (elapsed: 4.001131334s)
+    concurrent_test.go:333: Completed validation of 1000 objects in 4.001217834s
+--- PASS: TestAsyncValidator_StressTest (4.71s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/validation	6.702s

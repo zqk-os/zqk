@@ -1,0 +1,328 @@
+
+--- run 2026-09-04T22:20:53Z ---
+=== RUN   TestContextPropagation_AllProfiles
+=== PAUSE TestContextPropagation_AllProfiles
+=== RUN   TestContextPropagation_AllSecurityContexts
+=== PAUSE TestContextPropagation_AllSecurityContexts
+=== RUN   TestContextPropagation_AllCommandPaths
+=== PAUSE TestContextPropagation_AllCommandPaths
+=== RUN   TestContextPropagation_ProfileSecurityCombinations
+=== PAUSE TestContextPropagation_ProfileSecurityCombinations
+=== RUN   TestContextPropagation_NoBackgroundContext
+=== PAUSE TestContextPropagation_NoBackgroundContext
+=== RUN   TestContextPropagation_Cancellation
+=== PAUSE TestContextPropagation_Cancellation
+=== RUN   TestContextPropagation_Timeout
+=== PAUSE TestContextPropagation_Timeout
+=== RUN   TestContextPropagation_ContextValues
+=== PAUSE TestContextPropagation_ContextValues
+=== RUN   TestContextPropagation_ContextImmutable
+=== PAUSE TestContextPropagation_ContextImmutable
+=== RUN   TestContextPropagation_AllPermutations
+=== PAUSE TestContextPropagation_AllPermutations
+=== CONT  TestContextPropagation_AllProfiles
+=== RUN   TestContextPropagation_AllProfiles/mcp
+=== CONT  TestContextPropagation_Cancellation
+=== RUN   TestContextPropagation_Cancellation/system
+=== RUN   TestContextPropagation_Cancellation/human
+=== RUN   TestContextPropagation_Cancellation/debug
+--- PASS: TestContextPropagation_Cancellation (0.01s)
+    --- PASS: TestContextPropagation_Cancellation/system (0.00s)
+    --- PASS: TestContextPropagation_Cancellation/human (0.00s)
+    --- PASS: TestContextPropagation_Cancellation/debug (0.00s)
+=== CONT  TestContextPropagation_ContextImmutable
+=== RUN   TestContextPropagation_AllProfiles/system
+--- PASS: TestContextPropagation_ContextImmutable (0.00s)
+=== CONT  TestContextPropagation_AllPermutations
+=== RUN   TestContextPropagation_AllPermutations/profile_mcp_security_ACC-1785920548450214012-68b850c0_cmd_system_check
+=== RUN   TestContextPropagation_AllProfiles/ai-agent
+=== RUN   TestContextPropagation_AllPermutations/profile_mcp_security_ACC-1785920548450214012-68b850c0_cmd_object_list
+=== RUN   TestContextPropagation_AllProfiles/debug
+=== RUN   TestContextPropagation_AllPermutations/profile_mcp_security_ACC-1785920548450214012-68b850c0_cmd_utility_validate-yaml
+=== RUN   TestContextPropagation_AllProfiles/human
+=== RUN   TestContextPropagation_AllPermutations/profile_mcp_security_ACC-1785920548450214005-60837d47_cmd_system_check
+--- PASS: TestContextPropagation_AllProfiles (0.03s)
+    --- PASS: TestContextPropagation_AllProfiles/mcp (0.01s)
+    --- PASS: TestContextPropagation_AllProfiles/system (0.01s)
+    --- PASS: TestContextPropagation_AllProfiles/ai-agent (0.01s)
+    --- PASS: TestContextPropagation_AllProfiles/debug (0.00s)
+    --- PASS: TestContextPropagation_AllProfiles/human (0.00s)
+=== CONT  TestContextPropagation_ProfileSecurityCombinations
+=== RUN   TestContextPropagation_ProfileSecurityCombinations/mcp_ACC-1785920548450214012-68b850c0
+=== RUN   TestContextPropagation_AllPermutations/profile_mcp_security_ACC-1785920548450214005-60837d47_cmd_object_list
+=== RUN   TestContextPropagation_ProfileSecurityCombinations/mcp_ACC-1785920548450214005-60837d47
+=== RUN   TestContextPropagation_ProfileSecurityCombinations/mcp_ACC-1785920548450214003-23d25bd5
+=== RUN   TestContextPropagation_AllPermutations/profile_mcp_security_ACC-1785920548450214005-60837d47_cmd_utility_validate-yaml
+=== RUN   TestContextPropagation_ProfileSecurityCombinations/system_ACC-1785920548450214012-68b850c0
+=== RUN   TestContextPropagation_AllPermutations/profile_mcp_security_ACC-1785920548450214003-23d25bd5_cmd_system_check
+=== RUN   TestContextPropagation_ProfileSecurityCombinations/system_ACC-1785920548450214005-60837d47
+=== RUN   TestContextPropagation_AllPermutations/profile_mcp_security_ACC-1785920548450214003-23d25bd5_cmd_object_list
+=== RUN   TestContextPropagation_ProfileSecurityCombinations/system_ACC-1785920548450214003-23d25bd5
+=== RUN   TestContextPropagation_AllPermutations/profile_mcp_security_ACC-1785920548450214003-23d25bd5_cmd_utility_validate-yaml
+=== RUN   TestContextPropagation_ProfileSecurityCombinations/ai-agent_ACC-1785920548450214012-68b850c0
+=== RUN   TestContextPropagation_AllPermutations/profile_mcp_security_ACC-1785920548450214017-87f10a62_cmd_system_check
+=== RUN   TestContextPropagation_AllPermutations/profile_mcp_security_ACC-1785920548450214017-87f10a62_cmd_object_list
+=== RUN   TestContextPropagation_ProfileSecurityCombinations/ai-agent_ACC-1785920548450214005-60837d47
+=== RUN   TestContextPropagation_ProfileSecurityCombinations/ai-agent_ACC-1785920548450214003-23d25bd5
+=== RUN   TestContextPropagation_AllPermutations/profile_mcp_security_ACC-1785920548450214017-87f10a62_cmd_utility_validate-yaml
+=== RUN   TestContextPropagation_ProfileSecurityCombinations/debug_ACC-1785920548450214012-68b850c0
+=== RUN   TestContextPropagation_AllPermutations/profile_system_security_ACC-1785920548450214012-68b850c0_cmd_system_check
+=== RUN   TestContextPropagation_ProfileSecurityCombinations/debug_ACC-1785920548450214005-60837d47
+=== RUN   TestContextPropagation_AllPermutations/profile_system_security_ACC-1785920548450214012-68b850c0_cmd_object_list
+=== RUN   TestContextPropagation_ProfileSecurityCombinations/debug_ACC-1785920548450214003-23d25bd5
+=== RUN   TestContextPropagation_AllPermutations/profile_system_security_ACC-1785920548450214012-68b850c0_cmd_utility_validate-yaml
+=== RUN   TestContextPropagation_ProfileSecurityCombinations/human_ACC-1785920548450214012-68b850c0
+=== RUN   TestContextPropagation_AllPermutations/profile_system_security_ACC-1785920548450214005-60837d47_cmd_system_check
+=== RUN   TestContextPropagation_ProfileSecurityCombinations/human_ACC-1785920548450214005-60837d47
+=== RUN   TestContextPropagation_AllPermutations/profile_system_security_ACC-1785920548450214005-60837d47_cmd_object_list
+=== RUN   TestContextPropagation_ProfileSecurityCombinations/human_ACC-1785920548450214003-23d25bd5
+=== RUN   TestContextPropagation_AllPermutations/profile_system_security_ACC-1785920548450214005-60837d47_cmd_utility_validate-yaml
+=== RUN   TestContextPropagation_AllPermutations/profile_system_security_ACC-1785920548450214003-23d25bd5_cmd_system_check
+--- PASS: TestContextPropagation_ProfileSecurityCombinations (0.04s)
+    --- PASS: TestContextPropagation_ProfileSecurityCombinations/mcp_ACC-1785920548450214012-68b850c0 (0.00s)
+    --- PASS: TestContextPropagation_ProfileSecurityCombinations/mcp_ACC-1785920548450214005-60837d47 (0.00s)
+    --- PASS: TestContextPropagation_ProfileSecurityCombinations/mcp_ACC-1785920548450214003-23d25bd5 (0.00s)
+    --- PASS: TestContextPropagation_ProfileSecurityCombinations/system_ACC-1785920548450214012-68b850c0 (0.00s)
+    --- PASS: TestContextPropagation_ProfileSecurityCombinations/system_ACC-1785920548450214005-60837d47 (0.00s)
+    --- PASS: TestContextPropagation_ProfileSecurityCombinations/system_ACC-1785920548450214003-23d25bd5 (0.00s)
+    --- PASS: TestContextPropagation_ProfileSecurityCombinations/ai-agent_ACC-1785920548450214012-68b850c0 (0.00s)
+    --- PASS: TestContextPropagation_ProfileSecurityCombinations/ai-agent_ACC-1785920548450214005-60837d47 (0.00s)
+    --- PASS: TestContextPropagation_ProfileSecurityCombinations/ai-agent_ACC-1785920548450214003-23d25bd5 (0.00s)
+    --- PASS: TestContextPropagation_ProfileSecurityCombinations/debug_ACC-1785920548450214012-68b850c0 (0.00s)
+    --- PASS: TestContextPropagation_ProfileSecurityCombinations/debug_ACC-1785920548450214005-60837d47 (0.00s)
+    --- PASS: TestContextPropagation_ProfileSecurityCombinations/debug_ACC-1785920548450214003-23d25bd5 (0.00s)
+    --- PASS: TestContextPropagation_ProfileSecurityCombinations/human_ACC-1785920548450214012-68b850c0 (0.00s)
+    --- PASS: TestContextPropagation_ProfileSecurityCombinations/human_ACC-1785920548450214005-60837d47 (0.00s)
+    --- PASS: TestContextPropagation_ProfileSecurityCombinations/human_ACC-1785920548450214003-23d25bd5 (0.00s)
+=== CONT  TestContextPropagation_NoBackgroundContext
+=== RUN   TestContextPropagation_NoBackgroundContext/mcp
+=== RUN   TestContextPropagation_NoBackgroundContext/system
+=== RUN   TestContextPropagation_NoBackgroundContext/ai-agent
+=== RUN   TestContextPropagation_NoBackgroundContext/debug
+=== RUN   TestContextPropagation_NoBackgroundContext/human
+=== RUN   TestContextPropagation_AllPermutations/profile_system_security_ACC-1785920548450214003-23d25bd5_cmd_object_list
+--- PASS: TestContextPropagation_NoBackgroundContext (0.00s)
+    --- PASS: TestContextPropagation_NoBackgroundContext/mcp (0.00s)
+    --- PASS: TestContextPropagation_NoBackgroundContext/system (0.00s)
+    --- PASS: TestContextPropagation_NoBackgroundContext/ai-agent (0.00s)
+    --- PASS: TestContextPropagation_NoBackgroundContext/debug (0.00s)
+    --- PASS: TestContextPropagation_NoBackgroundContext/human (0.00s)
+=== CONT  TestContextPropagation_ContextValues
+=== RUN   TestContextPropagation_ContextValues/mcp
+=== RUN   TestContextPropagation_ContextValues/system
+=== RUN   TestContextPropagation_ContextValues/ai-agent
+=== RUN   TestContextPropagation_ContextValues/debug
+=== RUN   TestContextPropagation_ContextValues/human
+=== RUN   TestContextPropagation_AllPermutations/profile_system_security_ACC-1785920548450214003-23d25bd5_cmd_utility_validate-yaml
+--- PASS: TestContextPropagation_ContextValues (0.00s)
+    --- PASS: TestContextPropagation_ContextValues/mcp (0.00s)
+    --- PASS: TestContextPropagation_ContextValues/system (0.00s)
+    --- PASS: TestContextPropagation_ContextValues/ai-agent (0.00s)
+    --- PASS: TestContextPropagation_ContextValues/debug (0.00s)
+    --- PASS: TestContextPropagation_ContextValues/human (0.00s)
+=== CONT  TestContextPropagation_AllCommandPaths
+=== RUN   TestContextPropagation_AllCommandPaths/system_check
+=== RUN   TestContextPropagation_AllCommandPaths/system_check/system
+    context_propagation_test.go:447: Command path [system check] does not exist
+=== RUN   TestContextPropagation_AllCommandPaths/system_check/human
+    context_propagation_test.go:447: Command path [system check] does not exist
+=== RUN   TestContextPropagation_AllPermutations/profile_system_security_ACC-1785920548450214017-87f10a62_cmd_system_check
+=== RUN   TestContextPropagation_AllCommandPaths/system_fix
+=== RUN   TestContextPropagation_AllCommandPaths/system_fix/system
+    context_propagation_test.go:447: Command path [system fix] does not exist
+=== RUN   TestContextPropagation_AllCommandPaths/system_fix/human
+    context_propagation_test.go:447: Command path [system fix] does not exist
+=== RUN   TestContextPropagation_AllPermutations/profile_system_security_ACC-1785920548450214017-87f10a62_cmd_object_list
+=== RUN   TestContextPropagation_AllCommandPaths/system_init
+=== RUN   TestContextPropagation_AllCommandPaths/system_init/system
+    context_propagation_test.go:447: Command path [system init] does not exist
+=== RUN   TestContextPropagation_AllCommandPaths/system_init/human
+    context_propagation_test.go:447: Command path [system init] does not exist
+=== RUN   TestContextPropagation_AllPermutations/profile_system_security_ACC-1785920548450214017-87f10a62_cmd_utility_validate-yaml
+=== RUN   TestContextPropagation_AllCommandPaths/object_create
+=== RUN   TestContextPropagation_AllCommandPaths/object_create/system
+    context_propagation_test.go:447: Command path [object create] does not exist
+=== RUN   TestContextPropagation_AllCommandPaths/object_create/human
+    context_propagation_test.go:447: Command path [object create] does not exist
+=== RUN   TestContextPropagation_AllPermutations/profile_ai-agent_security_ACC-1785920548450214012-68b850c0_cmd_system_check
+=== RUN   TestContextPropagation_AllCommandPaths/object_list
+=== RUN   TestContextPropagation_AllCommandPaths/object_list/system
+    context_propagation_test.go:447: Command path [object list] does not exist
+=== RUN   TestContextPropagation_AllCommandPaths/object_list/human
+    context_propagation_test.go:447: Command path [object list] does not exist
+=== RUN   TestContextPropagation_AllPermutations/profile_ai-agent_security_ACC-1785920548450214012-68b850c0_cmd_object_list
+=== RUN   TestContextPropagation_AllCommandPaths/object_get
+=== RUN   TestContextPropagation_AllCommandPaths/object_get/system
+    context_propagation_test.go:447: Command path [object get] does not exist
+=== RUN   TestContextPropagation_AllCommandPaths/object_get/human
+    context_propagation_test.go:447: Command path [object get] does not exist
+=== RUN   TestContextPropagation_AllPermutations/profile_ai-agent_security_ACC-1785920548450214012-68b850c0_cmd_utility_validate-yaml
+=== RUN   TestContextPropagation_AllCommandPaths/scheduler_submit
+=== RUN   TestContextPropagation_AllCommandPaths/scheduler_submit/system
+    context_propagation_test.go:447: Command path [scheduler submit] does not exist
+=== RUN   TestContextPropagation_AllCommandPaths/scheduler_submit/human
+    context_propagation_test.go:447: Command path [scheduler submit] does not exist
+=== RUN   TestContextPropagation_AllPermutations/profile_ai-agent_security_ACC-1785920548450214005-60837d47_cmd_system_check
+=== RUN   TestContextPropagation_AllCommandPaths/mcp
+=== RUN   TestContextPropagation_AllCommandPaths/mcp/system
+    context_propagation_test.go:447: Command path [mcp] does not exist
+=== RUN   TestContextPropagation_AllCommandPaths/mcp/human
+    context_propagation_test.go:447: Command path [mcp] does not exist
+=== RUN   TestContextPropagation_AllPermutations/profile_ai-agent_security_ACC-1785920548450214005-60837d47_cmd_object_list
+=== RUN   TestContextPropagation_AllCommandPaths/utility_validate-yaml
+=== RUN   TestContextPropagation_AllCommandPaths/utility_validate-yaml/system
+    context_propagation_test.go:447: Command path [utility validate-yaml] does not exist
+=== RUN   TestContextPropagation_AllCommandPaths/utility_validate-yaml/human
+    context_propagation_test.go:447: Command path [utility validate-yaml] does not exist
+=== RUN   TestContextPropagation_AllPermutations/profile_ai-agent_security_ACC-1785920548450214005-60837d47_cmd_utility_validate-yaml
+=== RUN   TestContextPropagation_AllCommandPaths/utility_fix-hashes
+=== RUN   TestContextPropagation_AllCommandPaths/utility_fix-hashes/system
+    context_propagation_test.go:447: Command path [utility fix-hashes] does not exist
+=== RUN   TestContextPropagation_AllCommandPaths/utility_fix-hashes/human
+    context_propagation_test.go:447: Command path [utility fix-hashes] does not exist
+=== RUN   TestContextPropagation_AllPermutations/profile_ai-agent_security_ACC-1785920548450214003-23d25bd5_cmd_system_check
+--- PASS: TestContextPropagation_AllCommandPaths (0.03s)
+    --- PASS: TestContextPropagation_AllCommandPaths/system_check (0.00s)
+        --- SKIP: TestContextPropagation_AllCommandPaths/system_check/system (0.00s)
+        --- SKIP: TestContextPropagation_AllCommandPaths/system_check/human (0.00s)
+    --- PASS: TestContextPropagation_AllCommandPaths/system_fix (0.00s)
+        --- SKIP: TestContextPropagation_AllCommandPaths/system_fix/system (0.00s)
+        --- SKIP: TestContextPropagation_AllCommandPaths/system_fix/human (0.00s)
+    --- PASS: TestContextPropagation_AllCommandPaths/system_init (0.00s)
+        --- SKIP: TestContextPropagation_AllCommandPaths/system_init/system (0.00s)
+        --- SKIP: TestContextPropagation_AllCommandPaths/system_init/human (0.00s)
+    --- PASS: TestContextPropagation_AllCommandPaths/object_create (0.00s)
+        --- SKIP: TestContextPropagation_AllCommandPaths/object_create/system (0.00s)
+        --- SKIP: TestContextPropagation_AllCommandPaths/object_create/human (0.00s)
+    --- PASS: TestContextPropagation_AllCommandPaths/object_list (0.00s)
+        --- SKIP: TestContextPropagation_AllCommandPaths/object_list/system (0.00s)
+        --- SKIP: TestContextPropagation_AllCommandPaths/object_list/human (0.00s)
+    --- PASS: TestContextPropagation_AllCommandPaths/object_get (0.00s)
+        --- SKIP: TestContextPropagation_AllCommandPaths/object_get/system (0.00s)
+        --- SKIP: TestContextPropagation_AllCommandPaths/object_get/human (0.00s)
+    --- PASS: TestContextPropagation_AllCommandPaths/scheduler_submit (0.00s)
+        --- SKIP: TestContextPropagation_AllCommandPaths/scheduler_submit/system (0.00s)
+        --- SKIP: TestContextPropagation_AllCommandPaths/scheduler_submit/human (0.00s)
+    --- PASS: TestContextPropagation_AllCommandPaths/mcp (0.00s)
+        --- SKIP: TestContextPropagation_AllCommandPaths/mcp/system (0.00s)
+        --- SKIP: TestContextPropagation_AllCommandPaths/mcp/human (0.00s)
+    --- PASS: TestContextPropagation_AllCommandPaths/utility_validate-yaml (0.00s)
+        --- SKIP: TestContextPropagation_AllCommandPaths/utility_validate-yaml/system (0.00s)
+        --- SKIP: TestContextPropagation_AllCommandPaths/utility_validate-yaml/human (0.00s)
+    --- PASS: TestContextPropagation_AllCommandPaths/utility_fix-hashes (0.00s)
+        --- SKIP: TestContextPropagation_AllCommandPaths/utility_fix-hashes/system (0.00s)
+        --- SKIP: TestContextPropagation_AllCommandPaths/utility_fix-hashes/human (0.00s)
+=== CONT  TestContextPropagation_Timeout
+=== RUN   TestContextPropagation_Timeout/system
+=== RUN   TestContextPropagation_AllPermutations/profile_ai-agent_security_ACC-1785920548450214003-23d25bd5_cmd_object_list
+=== RUN   TestContextPropagation_AllPermutations/profile_ai-agent_security_ACC-1785920548450214003-23d25bd5_cmd_utility_validate-yaml
+=== RUN   TestContextPropagation_AllPermutations/profile_ai-agent_security_ACC-1785920548450214017-87f10a62_cmd_system_check
+=== RUN   TestContextPropagation_AllPermutations/profile_ai-agent_security_ACC-1785920548450214017-87f10a62_cmd_object_list
+=== RUN   TestContextPropagation_AllPermutations/profile_ai-agent_security_ACC-1785920548450214017-87f10a62_cmd_utility_validate-yaml
+=== RUN   TestContextPropagation_AllPermutations/profile_debug_security_ACC-1785920548450214012-68b850c0_cmd_system_check
+=== RUN   TestContextPropagation_AllPermutations/profile_debug_security_ACC-1785920548450214012-68b850c0_cmd_object_list
+=== RUN   TestContextPropagation_AllPermutations/profile_debug_security_ACC-1785920548450214012-68b850c0_cmd_utility_validate-yaml
+=== RUN   TestContextPropagation_AllPermutations/profile_debug_security_ACC-1785920548450214005-60837d47_cmd_system_check
+=== RUN   TestContextPropagation_AllPermutations/profile_debug_security_ACC-1785920548450214005-60837d47_cmd_object_list
+=== RUN   TestContextPropagation_AllPermutations/profile_debug_security_ACC-1785920548450214005-60837d47_cmd_utility_validate-yaml
+=== RUN   TestContextPropagation_AllPermutations/profile_debug_security_ACC-1785920548450214003-23d25bd5_cmd_system_check
+=== RUN   TestContextPropagation_AllPermutations/profile_debug_security_ACC-1785920548450214003-23d25bd5_cmd_object_list
+=== RUN   TestContextPropagation_AllPermutations/profile_debug_security_ACC-1785920548450214003-23d25bd5_cmd_utility_validate-yaml
+=== RUN   TestContextPropagation_AllPermutations/profile_debug_security_ACC-1785920548450214017-87f10a62_cmd_system_check
+=== RUN   TestContextPropagation_AllPermutations/profile_debug_security_ACC-1785920548450214017-87f10a62_cmd_object_list
+=== RUN   TestContextPropagation_AllPermutations/profile_debug_security_ACC-1785920548450214017-87f10a62_cmd_utility_validate-yaml
+=== RUN   TestContextPropagation_AllPermutations/profile_human_security_ACC-1785920548450214012-68b850c0_cmd_system_check
+=== RUN   TestContextPropagation_AllPermutations/profile_human_security_ACC-1785920548450214012-68b850c0_cmd_object_list
+=== RUN   TestContextPropagation_AllPermutations/profile_human_security_ACC-1785920548450214012-68b850c0_cmd_utility_validate-yaml
+=== RUN   TestContextPropagation_AllPermutations/profile_human_security_ACC-1785920548450214005-60837d47_cmd_system_check
+=== RUN   TestContextPropagation_AllPermutations/profile_human_security_ACC-1785920548450214005-60837d47_cmd_object_list
+=== RUN   TestContextPropagation_Timeout/human
+=== RUN   TestContextPropagation_AllPermutations/profile_human_security_ACC-1785920548450214005-60837d47_cmd_utility_validate-yaml
+=== RUN   TestContextPropagation_AllPermutations/profile_human_security_ACC-1785920548450214003-23d25bd5_cmd_system_check
+=== RUN   TestContextPropagation_AllPermutations/profile_human_security_ACC-1785920548450214003-23d25bd5_cmd_object_list
+=== RUN   TestContextPropagation_AllPermutations/profile_human_security_ACC-1785920548450214003-23d25bd5_cmd_utility_validate-yaml
+=== RUN   TestContextPropagation_AllPermutations/profile_human_security_ACC-1785920548450214017-87f10a62_cmd_system_check
+=== RUN   TestContextPropagation_AllPermutations/profile_human_security_ACC-1785920548450214017-87f10a62_cmd_object_list
+=== RUN   TestContextPropagation_AllPermutations/profile_human_security_ACC-1785920548450214017-87f10a62_cmd_utility_validate-yaml
+=== NAME  TestContextPropagation_AllPermutations
+    context_propagation_test.go:573: Tested 60 context propagation permutations
+--- PASS: TestContextPropagation_AllPermutations (0.17s)
+    --- PASS: TestContextPropagation_AllPermutations/profile_mcp_security_ACC-1785920548450214012-68b850c0_cmd_system_check (0.01s)
+    --- PASS: TestContextPropagation_AllPermutations/profile_mcp_security_ACC-1785920548450214012-68b850c0_cmd_object_list (0.01s)
+    --- PASS: TestContextPropagation_AllPermutations/profile_mcp_security_ACC-1785920548450214012-68b850c0_cmd_utility_validate-yaml (0.00s)
+    --- PASS: TestContextPropagation_AllPermutations/profile_mcp_security_ACC-1785920548450214005-60837d47_cmd_system_check (0.00s)
+    --- PASS: TestContextPropagation_AllPermutations/profile_mcp_security_ACC-1785920548450214005-60837d47_cmd_object_list (0.00s)
+    --- PASS: TestContextPropagation_AllPermutations/profile_mcp_security_ACC-1785920548450214005-60837d47_cmd_utility_validate-yaml (0.00s)
+    --- PASS: TestContextPropagation_AllPermutations/profile_mcp_security_ACC-1785920548450214003-23d25bd5_cmd_system_check (0.00s)
+    --- PASS: TestContextPropagation_AllPermutations/profile_mcp_security_ACC-1785920548450214003-23d25bd5_cmd_object_list (0.00s)
+    --- PASS: TestContextPropagation_AllPermutations/profile_mcp_security_ACC-1785920548450214003-23d25bd5_cmd_utility_validate-yaml (0.00s)
+    --- PASS: TestContextPropagation_AllPermutations/profile_mcp_security_ACC-1785920548450214017-87f10a62_cmd_system_check (0.00s)
+    --- PASS: TestContextPropagation_AllPermutations/profile_mcp_security_ACC-1785920548450214017-87f10a62_cmd_object_list (0.00s)
+    --- PASS: TestContextPropagation_AllPermutations/profile_mcp_security_ACC-1785920548450214017-87f10a62_cmd_utility_validate-yaml (0.00s)
+    --- PASS: TestContextPropagation_AllPermutations/profile_system_security_ACC-1785920548450214012-68b850c0_cmd_system_check (0.00s)
+    --- PASS: TestContextPropagation_AllPermutations/profile_system_security_ACC-1785920548450214012-68b850c0_cmd_object_list (0.00s)
+    --- PASS: TestContextPropagation_AllPermutations/profile_system_security_ACC-1785920548450214012-68b850c0_cmd_utility_validate-yaml (0.00s)
+    --- PASS: TestContextPropagation_AllPermutations/profile_system_security_ACC-1785920548450214005-60837d47_cmd_system_check (0.00s)
+    --- PASS: TestContextPropagation_AllPermutations/profile_system_security_ACC-1785920548450214005-60837d47_cmd_object_list (0.00s)
+    --- PASS: TestContextPropagation_AllPermutations/profile_system_security_ACC-1785920548450214005-60837d47_cmd_utility_validate-yaml (0.00s)
+    --- PASS: TestContextPropagation_AllPermutations/profile_system_security_ACC-1785920548450214003-23d25bd5_cmd_system_check (0.00s)
+    --- PASS: TestContextPropagation_AllPermutations/profile_system_security_ACC-1785920548450214003-23d25bd5_cmd_object_list (0.00s)
+    --- PASS: TestContextPropagation_AllPermutations/profile_system_security_ACC-1785920548450214003-23d25bd5_cmd_utility_validate-yaml (0.00s)
+    --- PASS: TestContextPropagation_AllPermutations/profile_system_security_ACC-1785920548450214017-87f10a62_cmd_system_check (0.00s)
+    --- PASS: TestContextPropagation_AllPermutations/profile_system_security_ACC-1785920548450214017-87f10a62_cmd_object_list (0.00s)
+    --- PASS: TestContextPropagation_AllPermutations/profile_system_security_ACC-1785920548450214017-87f10a62_cmd_utility_validate-yaml (0.00s)
+    --- PASS: TestContextPropagation_AllPermutations/profile_ai-agent_security_ACC-1785920548450214012-68b850c0_cmd_system_check (0.00s)
+    --- PASS: TestContextPropagation_AllPermutations/profile_ai-agent_security_ACC-1785920548450214012-68b850c0_cmd_object_list (0.00s)
+    --- PASS: TestContextPropagation_AllPermutations/profile_ai-agent_security_ACC-1785920548450214012-68b850c0_cmd_utility_validate-yaml (0.00s)
+    --- PASS: TestContextPropagation_AllPermutations/profile_ai-agent_security_ACC-1785920548450214005-60837d47_cmd_system_check (0.00s)
+    --- PASS: TestContextPropagation_AllPermutations/profile_ai-agent_security_ACC-1785920548450214005-60837d47_cmd_object_list (0.00s)
+    --- PASS: TestContextPropagation_AllPermutations/profile_ai-agent_security_ACC-1785920548450214005-60837d47_cmd_utility_validate-yaml (0.00s)
+    --- PASS: TestContextPropagation_AllPermutations/profile_ai-agent_security_ACC-1785920548450214003-23d25bd5_cmd_system_check (0.00s)
+    --- PASS: TestContextPropagation_AllPermutations/profile_ai-agent_security_ACC-1785920548450214003-23d25bd5_cmd_object_list (0.00s)
+    --- PASS: TestContextPropagation_AllPermutations/profile_ai-agent_security_ACC-1785920548450214003-23d25bd5_cmd_utility_validate-yaml (0.00s)
+    --- PASS: TestContextPropagation_AllPermutations/profile_ai-agent_security_ACC-1785920548450214017-87f10a62_cmd_system_check (0.00s)
+    --- PASS: TestContextPropagation_AllPermutations/profile_ai-agent_security_ACC-1785920548450214017-87f10a62_cmd_object_list (0.00s)
+    --- PASS: TestContextPropagation_AllPermutations/profile_ai-agent_security_ACC-1785920548450214017-87f10a62_cmd_utility_validate-yaml (0.00s)
+    --- PASS: TestContextPropagation_AllPermutations/profile_debug_security_ACC-1785920548450214012-68b850c0_cmd_system_check (0.00s)
+    --- PASS: TestContextPropagation_AllPermutations/profile_debug_security_ACC-1785920548450214012-68b850c0_cmd_object_list (0.00s)
+    --- PASS: TestContextPropagation_AllPermutations/profile_debug_security_ACC-1785920548450214012-68b850c0_cmd_utility_validate-yaml (0.00s)
+    --- PASS: TestContextPropagation_AllPermutations/profile_debug_security_ACC-1785920548450214005-60837d47_cmd_system_check (0.00s)
+    --- PASS: TestContextPropagation_AllPermutations/profile_debug_security_ACC-1785920548450214005-60837d47_cmd_object_list (0.00s)
+    --- PASS: TestContextPropagation_AllPermutations/profile_debug_security_ACC-1785920548450214005-60837d47_cmd_utility_validate-yaml (0.00s)
+    --- PASS: TestContextPropagation_AllPermutations/profile_debug_security_ACC-1785920548450214003-23d25bd5_cmd_system_check (0.00s)
+    --- PASS: TestContextPropagation_AllPermutations/profile_debug_security_ACC-1785920548450214003-23d25bd5_cmd_object_list (0.00s)
+    --- PASS: TestContextPropagation_AllPermutations/profile_debug_security_ACC-1785920548450214003-23d25bd5_cmd_utility_validate-yaml (0.00s)
+    --- PASS: TestContextPropagation_AllPermutations/profile_debug_security_ACC-1785920548450214017-87f10a62_cmd_system_check (0.00s)
+    --- PASS: TestContextPropagation_AllPermutations/profile_debug_security_ACC-1785920548450214017-87f10a62_cmd_object_list (0.00s)
+    --- PASS: TestContextPropagation_AllPermutations/profile_debug_security_ACC-1785920548450214017-87f10a62_cmd_utility_validate-yaml (0.00s)
+    --- PASS: TestContextPropagation_AllPermutations/profile_human_security_ACC-1785920548450214012-68b850c0_cmd_system_check (0.00s)
+    --- PASS: TestContextPropagation_AllPermutations/profile_human_security_ACC-1785920548450214012-68b850c0_cmd_object_list (0.00s)
+    --- PASS: TestContextPropagation_AllPermutations/profile_human_security_ACC-1785920548450214012-68b850c0_cmd_utility_validate-yaml (0.00s)
+    --- PASS: TestContextPropagation_AllPermutations/profile_human_security_ACC-1785920548450214005-60837d47_cmd_system_check (0.00s)
+    --- PASS: TestContextPropagation_AllPermutations/profile_human_security_ACC-1785920548450214005-60837d47_cmd_object_list (0.00s)
+    --- PASS: TestContextPropagation_AllPermutations/profile_human_security_ACC-1785920548450214005-60837d47_cmd_utility_validate-yaml (0.00s)
+    --- PASS: TestContextPropagation_AllPermutations/profile_human_security_ACC-1785920548450214003-23d25bd5_cmd_system_check (0.00s)
+    --- PASS: TestContextPropagation_AllPermutations/profile_human_security_ACC-1785920548450214003-23d25bd5_cmd_object_list (0.00s)
+    --- PASS: TestContextPropagation_AllPermutations/profile_human_security_ACC-1785920548450214003-23d25bd5_cmd_utility_validate-yaml (0.00s)
+    --- PASS: TestContextPropagation_AllPermutations/profile_human_security_ACC-1785920548450214017-87f10a62_cmd_system_check (0.00s)
+    --- PASS: TestContextPropagation_AllPermutations/profile_human_security_ACC-1785920548450214017-87f10a62_cmd_object_list (0.01s)
+    --- PASS: TestContextPropagation_AllPermutations/profile_human_security_ACC-1785920548450214017-87f10a62_cmd_utility_validate-yaml (0.00s)
+=== CONT  TestContextPropagation_AllSecurityContexts
+=== RUN   TestContextPropagation_AllSecurityContexts/system
+=== RUN   TestContextPropagation_AllSecurityContexts/founder
+=== RUN   TestContextPropagation_AllSecurityContexts/admin
+=== RUN   TestContextPropagation_AllSecurityContexts/developer
+=== RUN   TestContextPropagation_AllSecurityContexts/viewer
+=== RUN   TestContextPropagation_AllSecurityContexts/custom
+--- PASS: TestContextPropagation_AllSecurityContexts (0.01s)
+    --- PASS: TestContextPropagation_AllSecurityContexts/system (0.00s)
+    --- PASS: TestContextPropagation_AllSecurityContexts/founder (0.00s)
+    --- PASS: TestContextPropagation_AllSecurityContexts/admin (0.00s)
+    --- PASS: TestContextPropagation_AllSecurityContexts/developer (0.00s)
+    --- PASS: TestContextPropagation_AllSecurityContexts/viewer (0.00s)
+    --- PASS: TestContextPropagation_AllSecurityContexts/custom (0.00s)
+--- PASS: TestContextPropagation_Timeout (0.10s)
+    --- PASS: TestContextPropagation_Timeout/system (0.05s)
+    --- PASS: TestContextPropagation_Timeout/human (0.05s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/context	0.498s

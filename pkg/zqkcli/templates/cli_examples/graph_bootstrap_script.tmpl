@@ -1,0 +1,39 @@
+#!/bin/bash
+# Bootstrap script for initializing {kind} objects with graph backend
+
+set -e
+
+# Enable graph backend
+export {cli_env_prefix}_GRAPH_ENABLED=true
+
+# Start MemGraph if not running
+if ! {cli} system service status memgraph > /dev/null 2>&1; then
+  echo "Starting MemGraph..."
+  {cli} system service start memgraph
+  sleep 2  # Wait for MemGraph to be ready
+fi
+
+PROJECT_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || pwd)
+
+# Create root {kind}
+cat > /tmp/root.yaml <<EOF
+{root_yaml}
+EOF
+
+{cli} object create {kind} --file /tmp/root.yaml
+
+# Create {count} child {kind} objects
+for i in {1..{count}}; do
+  cat > /tmp/{kind}-$i.yaml <<EOF
+{child_yaml_template}
+EOF
+  {cli} object create {kind} --file /tmp/{kind}-$i.yaml
+done
+
+# Verify creation (queries graph backend)
+{cli} object list {kind} --format json
+
+# Show graph statistics
+echo "Graph backend statistics:"
+{cli} system service status memgraph
+

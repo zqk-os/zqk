@@ -1,0 +1,77 @@
+
+--- run 2026-09-04T22:19:33Z ---
+=== RUN   TestHashRegistryLocationForNonBucketedObjects
+=== PAUSE TestHashRegistryLocationForNonBucketedObjects
+=== RUN   TestHashRegistryCacheStaleness
+=== PAUSE TestHashRegistryCacheStaleness
+=== RUN   TestCheckIntegrity_skipsObjectDraftPlane
+=== PAUSE TestCheckIntegrity_skipsObjectDraftPlane
+=== RUN   TestAutoFixMissingHash_BucketedObject
+=== PAUSE TestAutoFixMissingHash_BucketedObject
+=== RUN   TestCheckIntegrity_HashRegistryIntegration
+=== PAUSE TestCheckIntegrity_HashRegistryIntegration
+=== RUN   TestCheckIntegrity_MissingHash
+=== PAUSE TestCheckIntegrity_MissingHash
+=== RUN   TestCheckIntegrity_UnhashedFileAgeWarning
+=== PAUSE TestCheckIntegrity_UnhashedFileAgeWarning
+=== RUN   TestCheckRegistration
+=== PAUSE TestCheckRegistration
+=== RUN   TestCheckLifecycle
+=== PAUSE TestCheckLifecycle
+=== RUN   TestCheckReferences
+=== PAUSE TestCheckReferences
+=== CONT  TestHashRegistryLocationForNonBucketedObjects
+=== CONT  TestCheckIntegrity_MissingHash
+=== NAME  TestHashRegistryLocationForNonBucketedObjects
+    check_impl_bucketed_registry_test.go:171: ✅ Hash registry correctly located in kind directory for non-bucketed object
+--- PASS: TestCheckIntegrity_MissingHash (0.01s)
+=== CONT  TestAutoFixMissingHash_BucketedObject
+--- PASS: TestHashRegistryLocationForNonBucketedObjects (0.01s)
+=== CONT  TestCheckIntegrity_HashRegistryIntegration
+=== NAME  TestAutoFixMissingHash_BucketedObject
+    check_impl_missing_hash_test.go:101: Calling autoFixIssues with:
+    check_impl_missing_hash_test.go:102:   testFile: /var/folders/gb/31sgyvn551ld6l0zfk50yl8h0000gn/T/TestAutoFixMissingHash_BucketedObject872992616/001/project/docs/process/audit/2026-01/AUD-TEST-001.yaml
+    check_impl_missing_hash_test.go:103:   kind: audit_event
+    check_impl_missing_hash_test.go:104:   registry: &{audit_event /var/folders/gb/31sgyvn551ld6l0zfk50yl8h0000gn/T/TestAutoFixMissingHash_BucketedObject872992616/001/project/docs/process/audit/2026-01 map[] {{{} {0 0}} 0 0 {{} 0} {{} 0}} /var/folders/gb/31sgyvn551ld6l0zfk50yl8h0000gn/T/TestAutoFixMissingHash_BucketedObject872992616/001/project/docs/process/audit/2026-01/.audit_event.hashes {0 0 <nil>} {0 0 <nil>} 0x4950e2f16700 {{} 0} 0x4950e1e95b30 0x102f306a0 0x4950e2b37d70 {<nil>} {<nil>} {{} 0}} (nil=false)
+    check_impl_missing_hash_test.go:105:   issues: [{Tier:2 Category:integrity Message:No integrity hash recorded for this file AutoFixable:true FixCommand: IssueClass:}]
+--- PASS: TestCheckIntegrity_HashRegistryIntegration (0.03s)
+=== CONT  TestCheckIntegrity_skipsObjectDraftPlane
+--- PASS: TestCheckIntegrity_skipsObjectDraftPlane (0.00s)
+=== CONT  TestCheckLifecycle
+=== RUN   TestCheckLifecycle/valid_status
+=== NAME  TestAutoFixMissingHash_BucketedObject
+    check_impl_missing_hash_test.go:109: Fixed messages: []
+    check_impl_missing_hash_test.go:113: Expected auto-fix to resolve missing hash, but no fixes were applied
+    check_impl_missing_hash_test.go:114: Issues: [{Tier:2 Category:integrity Message:No integrity hash recorded for this file AutoFixable:true FixCommand: IssueClass:}]
+--- FAIL: TestAutoFixMissingHash_BucketedObject (0.13s)
+=== CONT  TestCheckReferences
+=== RUN   TestCheckLifecycle/missing_status
+=== RUN   TestCheckLifecycle/empty_status
+--- PASS: TestCheckLifecycle (0.44s)
+    --- PASS: TestCheckLifecycle/valid_status (0.44s)
+    --- PASS: TestCheckLifecycle/missing_status (0.00s)
+    --- PASS: TestCheckLifecycle/empty_status (0.00s)
+=== CONT  TestHashRegistryCacheStaleness
+    check_impl_cache_staleness_test.go:149: ✅ Cache reload works correctly: hash matches after reload (hash=ce427de776950664)
+--- PASS: TestHashRegistryCacheStaleness (0.05s)
+=== CONT  TestCheckRegistration
+=== RUN   TestCheckRegistration/valid_object
+=== RUN   TestCheckRegistration/missing_ID
+=== RUN   TestCheckRegistration/missing_kind
+=== RUN   TestCheckRegistration/kind_mismatch
+=== RUN   TestCheckRegistration/invalid_ID_format
+--- PASS: TestCheckRegistration (0.00s)
+    --- PASS: TestCheckRegistration/valid_object (0.00s)
+    --- PASS: TestCheckRegistration/missing_ID (0.00s)
+    --- PASS: TestCheckRegistration/missing_kind (0.00s)
+    --- PASS: TestCheckRegistration/kind_mismatch (0.00s)
+    --- PASS: TestCheckRegistration/invalid_ID_format (0.00s)
+=== CONT  TestCheckIntegrity_UnhashedFileAgeWarning
+--- PASS: TestCheckIntegrity_UnhashedFileAgeWarning (0.01s)
+--- PASS: TestCheckReferences (0.42s)
+FAIL
+FAIL	github.com/lanceman/zqk/cmd/zqk/system	1.254s
+FAIL
+
+
+--- run 2026-09-04T22:19:33Z ---

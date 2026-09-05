@@ -1,0 +1,44 @@
+
+--- run 2026-09-05T05:23:53Z ---
+=== RUN   TestNewRetentionToleranceHandler
+=== PAUSE TestNewRetentionToleranceHandler
+=== RUN   TestRetentionToleranceHandler_Execute_NoConfigKinds
+=== PAUSE TestRetentionToleranceHandler_Execute_NoConfigKinds
+=== RUN   TestIsHighVolumeKind
+=== PAUSE TestIsHighVolumeKind
+=== RUN   TestMcpSessionDisconnectedNotProtected
+=== PAUSE TestMcpSessionDisconnectedNotProtected
+=== RUN   TestInvokeJobCallbackCommandExecutesWithHealthyAsyncRouter
+=== PAUSE TestInvokeJobCallbackCommandExecutesWithHealthyAsyncRouter
+=== RUN   TestRunWrapperHandler_CallbackRouting
+=== PAUSE TestRunWrapperHandler_CallbackRouting
+=== RUN   TestRunWrapperHandler_CallbackRouting_ErrorCallback
+=== PAUSE TestRunWrapperHandler_CallbackRouting_ErrorCallback
+=== RUN   TestRunWrapperHandler_CallbackRouting_NoRouter
+=== PAUSE TestRunWrapperHandler_CallbackRouting_NoRouter
+=== RUN   TestRunWrapperHandler_CallbackRouting_RouteFailure
+=== PAUSE TestRunWrapperHandler_CallbackRouting_RouteFailure
+=== RUN   TestCreateCallbackMessage
+=== PAUSE TestCreateCallbackMessage
+=== CONT  TestNewRetentionToleranceHandler
+=== CONT  TestRunWrapperHandler_CallbackRouting
+--- PASS: TestNewRetentionToleranceHandler (0.00s)
+=== CONT  TestRunWrapperHandler_CallbackRouting_RouteFailure
+=== CONT  TestInvokeJobCallbackCommandExecutesWithHealthyAsyncRouter
+=== CONT  TestMcpSessionDisconnectedNotProtected
+=== CONT  TestIsHighVolumeKind
+=== CONT  TestRetentionToleranceHandler_Execute_NoConfigKinds
+--- PASS: TestRunWrapperHandler_CallbackRouting (0.41s)
+--- PASS: TestRunWrapperHandler_CallbackRouting_RouteFailure (0.41s)
+--- PASS: TestMcpSessionDisconnectedNotProtected (0.00s)
+--- PASS: TestIsHighVolumeKind (0.00s)
+--- PASS: TestRetentionToleranceHandler_Execute_NoConfigKinds (0.00s)
+=== CONT  TestCreateCallbackMessage
+--- PASS: TestCreateCallbackMessage (0.00s)
+=== CONT  TestRunWrapperHandler_CallbackRouting_NoRouter
+--- PASS: TestInvokeJobCallbackCommandExecutesWithHealthyAsyncRouter (0.01s)
+=== CONT  TestRunWrapperHandler_CallbackRouting_ErrorCallback
+--- PASS: TestRunWrapperHandler_CallbackRouting_ErrorCallback (0.29s)
+--- PASS: TestRunWrapperHandler_CallbackRouting_NoRouter (0.44s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/scheduler	1.576s

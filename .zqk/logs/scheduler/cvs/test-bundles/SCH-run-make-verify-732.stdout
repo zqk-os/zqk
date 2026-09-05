@@ -1,0 +1,44 @@
+
+--- run 2026-09-04T22:20:58Z ---
+=== RUN   TestNewSecurityContext
+=== PAUSE TestNewSecurityContext
+=== RUN   TestActorIDForAttribution
+=== PAUSE TestActorIDForAttribution
+=== RUN   TestNewSystemSecurityContext
+=== PAUSE TestNewSystemSecurityContext
+=== RUN   TestNewStorageContext
+=== PAUSE TestNewStorageContext
+=== RUN   TestNewPaginationStorageContext
+=== PAUSE TestNewPaginationStorageContext
+=== RUN   TestNewGroupingStorageContext
+=== PAUSE TestNewGroupingStorageContext
+=== RUN   TestNewGroupingStorageContext_ZeroMaxGroupSize
+=== PAUSE TestNewGroupingStorageContext_ZeroMaxGroupSize
+=== RUN   TestLoggingContext_ChainableContext
+=== PAUSE TestLoggingContext_ChainableContext
+=== RUN   TestLoggingContext_ChainIntegration
+=== PAUSE TestLoggingContext_ChainIntegration
+=== RUN   TestLoggingContext_Merge
+=== PAUSE TestLoggingContext_Merge
+=== CONT  TestNewSecurityContext
+--- PASS: TestNewSecurityContext (0.00s)
+=== CONT  TestLoggingContext_Merge
+--- PASS: TestLoggingContext_Merge (0.00s)
+=== CONT  TestLoggingContext_ChainIntegration
+--- PASS: TestLoggingContext_ChainIntegration (0.00s)
+=== CONT  TestNewStorageContext
+--- PASS: TestNewStorageContext (0.00s)
+=== CONT  TestNewSystemSecurityContext
+--- PASS: TestNewSystemSecurityContext (0.00s)
+=== CONT  TestActorIDForAttribution
+--- PASS: TestActorIDForAttribution (0.00s)
+=== CONT  TestNewGroupingStorageContext_ZeroMaxGroupSize
+--- PASS: TestNewGroupingStorageContext_ZeroMaxGroupSize (0.00s)
+=== CONT  TestLoggingContext_ChainableContext
+--- PASS: TestLoggingContext_ChainableContext (0.00s)
+=== CONT  TestNewPaginationStorageContext
+--- PASS: TestNewPaginationStorageContext (0.00s)
+=== CONT  TestNewGroupingStorageContext
+--- PASS: TestNewGroupingStorageContext (0.00s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/context	0.459s

@@ -1,0 +1,172 @@
+{
+  "meta": {
+    "namespace_isolation_active": true,
+    "namespace_scope": "zqk:kernel",
+    "namespace_scope_mode": "default_kernel",
+    "returned_count": 32,
+    "total_count": 32
+  },
+  "objects": [
+    {
+      "id": "TDE-1786082720359745000-fee4145f",
+      "status": "archived",
+      "title": "CAS index lag after batch create/orchestrate clogs system check"
+    },
+    {
+      "id": "TDE-1786082721402730000-0d13f822",
+      "status": "archived",
+      "title": "Empty-title agent_instruction proposed pile (swarm dashboard noise)"
+    },
+    {
+      "id": "TDE-1786082722731283000-d9767c9b",
+      "status": "archived",
+      "title": "Draft-plane bench/warmup BLI+PRI pollution after orchestration tests"
+    },
+    {
+      "id": "TDE-1786411507231159000-ba0fab3a",
+      "status": "archived",
+      "title": "team_configuration: spec/list-kinds without kind_mappings GetKindDir"
+    },
+    {
+      "id": "TDE-1786411675790215000-c95ba1f3",
+      "status": "archived",
+      "title": "system-check kinds_count unbound to ontology (cache-driven N flake)"
+    },
+    {
+      "id": "TDE-1787220819800775000-9b43d107",
+      "status": "planned",
+      "title": "MNT circular import waiver"
+    },
+    {
+      "id": "TDE-1787220825356721000-c61e5311",
+      "status": "planned",
+      "title": "OBS OpenTelemetry waiver"
+    },
+    {
+      "id": "TDE-1787604876830855000-97932015",
+      "status": "planned",
+      "title": "System check goes silent for seconds at a time, so a working command looks hung"
+    },
+    {
+      "id": "TDE-1787604878092294000-debe585a",
+      "status": "planned",
+      "title": "Object create admits enum and datatype violations that update can never repair"
+    },
+    {
+      "id": "TDE-1787620546632583000-37916db4",
+      "status": "planned",
+      "title": "Eight kinds assume an \"active\" status their schema never granted (base_object work ladder)"
+    },
+    {
+      "id": "TDE-1788055417417068000-9460820d",
+      "status": "planned",
+      "title": "Hot-path CLI missing CPU and goroutine pprof"
+    },
+    {
+      "id": "TDE-1788055418678191000-32664603",
+      "status": "planned",
+      "title": "Default object count YAML-parses every CAS file"
+    },
+    {
+      "id": "TDE-AGENT-IDLENESS-NO-ACCUMULATOR-001",
+      "status": "archived",
+      "title": "No per-agent/per-task idle accumulator — anti-idle is ping theater"
+    },
+    {
+      "id": "TDE-CAS-MEMBRANE-FAIL-OPEN-001",
+      "status": "archived",
+      "title": "CAS membrane PrivilegedWriter fail-open + MCP unrestricted write"
+    },
+    {
+      "id": "TDE-CEF-BASE-OBJECT-FIELD-EMPLOY-001",
+      "status": "planned",
+      "title": "Employ unused auditable and base_object fields in validation overlays"
+    },
+    {
+      "id": "TDE-CEF-BLI-COMPLETE-COMMIT-REFS-001",
+      "status": "planned",
+      "title": "BLI complete is fail-open; no trigger stamps commit_refs or promotes after merge"
+    },
+    {
+      "id": "TDE-CEF-CAS-IDENTITY-TXN-001",
+      "status": "planned",
+      "title": "Identity index is object-id-cache; List filters drafts, Get does not dual-read"
+    },
+    {
+      "id": "TDE-CEF-CAS-SPEC-FIELD-DIFF-001",
+      "status": "planned",
+      "title": "Diff CAS instances against resolved spec and strip keys that do not belong"
+    },
+    {
+      "id": "TDE-CEF-HOST-CPU-BACKPRESSURE-001",
+      "status": "planned",
+      "title": "Shed ZQK fan-out when the host is already CPU-starved"
+    },
+    {
+      "id": "TDE-CEF-IN-PROGRESS-REQUIRES-CLAIM-001",
+      "status": "planned",
+      "title": "Membrane must require occupancy on occupiable kinds when transitioning into in_progress"
+    },
+    {
+      "id": "TDE-CEF-KIND-MAP-SPEC-DISCOVERY-001",
+      "status": "planned",
+      "title": "Spec-filename kind discovery bypasses kind_mappings_config"
+    },
+    {
+      "id": "TDE-CEF-LOG-SIGNAL-VS-NOISE-001",
+      "status": "planned",
+      "title": "Info logs mix live Progress bars with coordinator Milestone checkpoints"
+    },
+    {
+      "id": "TDE-CEF-PKG-DEAD-TWINS-001",
+      "status": "deferred",
+      "title": "Unused twin packages beside the live import path"
+    },
+    {
+      "id": "TDE-CEF-PROMOTE-PLAN-SNOWFLAKE-001",
+      "status": "planned",
+      "title": "Generic object promote must not special-case priority_plan occupancy lock"
+    },
+    {
+      "id": "TDE-CEF-SCHEDULER-CALLBACK-HOURGLASS-001",
+      "status": "planned",
+      "title": "Scheduler command callbacks must wake the seat, not only tee a log"
+    },
+    {
+      "id": "TDE-CEF-ZQKENV-AGENT-GUARD-SPLIT-001",
+      "status": "planned",
+      "title": "Split zqkenv agent_guard init from the env-name catalog"
+    },
+    {
+      "id": "TDE-HOSTSERVICE-KEEPALIVE-CRASH-ONLY-001",
+      "status": "archived",
+      "title": "LaunchAgent KeepAlive must be crash-only (SuccessfulExit=false)"
+    },
+    {
+      "id": "TDE-IDE-KERNEL-SKILL-SYNC-001",
+      "status": "archived",
+      "title": "Cursor project skills not registered from kernel .zqk/skills packs"
+    },
+    {
+      "id": "TDE-KERNEL-HARDCODED-ENV-IDS-001",
+      "status": "planned",
+      "title": "Scan repo for hardcoded IDs that are not durable across environments or nodes"
+    },
+    {
+      "id": "TDE-MESH-DEFAULT-SEAT-PEER-AGENT-01-001",
+      "status": "archived",
+      "title": "DefaultPeerSeatIDs and wake stubs still hardcode peer-agent-01"
+    },
+    {
+      "id": "TDE-OBS-OPENTELEMETRY-WAIVER-001",
+      "status": "deferred",
+      "title": "Waiver for OBS OpenTelemetry Tracing"
+    },
+    {
+      "id": "TDE-RUNTIME-HOST-SERVICES-SCATTER-001",
+      "priority_plan_ref": "PRI-1786387443811997000-3241eddd",
+      "status": "archived",
+      "title": "Tech debt: workshop host processes lack unified stop/start/status control plane"
+    }
+  ]
+}

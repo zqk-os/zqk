@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-448",
+  "created_at": "2026-09-04T21:34:31.75326Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-448",
+    "Tests": [
+      {
+        "Name": "TestRunWithAsyncProgress_success",
+        "Package": "cli",
+        "PackagePath": "internal/cli",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/internal/cli/async_progress_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestRunWithAsyncProgress_validation_progress_callback",
+        "Package": "cli",
+        "PackagePath": "internal/cli",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/internal/cli/async_progress_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestRunWithAsyncProgress_global_coordinator_assert",
+        "Package": "cli",
+        "PackagePath": "internal/cli",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/internal/cli/async_progress_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestRunWithAsyncProgress_emits_error_on_failure",
+        "Package": "cli",
+        "PackagePath": "internal/cli",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/internal/cli/async_progress_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestOperationTypeFromCommand",
+        "Package": "cli",
+        "PackagePath": "internal/cli",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/internal/cli/async_progress_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestBindAsyncProgress",
+        "Package": "cli",
+        "PackagePath": "internal/cli",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/internal/cli/async_progress_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestNewAsyncCommand",
+        "Package": "cli",
+        "PackagePath": "internal/cli",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/internal/cli/async_progress_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestTraversePersistentPreRunOrder",
+        "Package": "cli",
+        "PackagePath": "internal/cli",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/internal/cli/cobra_traverse_hooks_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestFormatAndContextSwitching",
+        "Package": "cli",
+        "PackagePath": "internal/cli",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/internal/cli/format_context_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestFormatRoutingPrecedence",
+        "Package": "cli",
+        "PackagePath": "internal/cli",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/internal/cli/format_context_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 300000000000,
+    "PackagePath": "internal/cli"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestRunWithAsyncProgress_success",
+      "Package": "cli",
+      "PackagePath": "internal/cli",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/internal/cli/async_progress_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestRunWithAsyncProgress_validation_progress_callback",
+      "Package": "cli",
+      "PackagePath": "internal/cli",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/internal/cli/async_progress_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestRunWithAsyncProgress_global_coordinator_assert",
+      "Package": "cli",
+      "PackagePath": "internal/cli",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/internal/cli/async_progress_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestRunWithAsyncProgress_emits_error_on_failure",
+      "Package": "cli",
+      "PackagePath": "internal/cli",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/internal/cli/async_progress_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestOperationTypeFromCommand",
+      "Package": "cli",
+      "PackagePath": "internal/cli",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/internal/cli/async_progress_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestBindAsyncProgress",
+      "Package": "cli",
+      "PackagePath": "internal/cli",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/internal/cli/async_progress_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestNewAsyncCommand",
+      "Package": "cli",
+      "PackagePath": "internal/cli",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/internal/cli/async_progress_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestTraversePersistentPreRunOrder",
+      "Package": "cli",
+      "PackagePath": "internal/cli",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/internal/cli/cobra_traverse_hooks_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestFormatAndContextSwitching",
+      "Package": "cli",
+      "PackagePath": "internal/cli",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/internal/cli/format_context_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestFormatRoutingPrecedence",
+      "Package": "cli",
+      "PackagePath": "internal/cli",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/internal/cli/format_context_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

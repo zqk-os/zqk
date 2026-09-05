@@ -1,0 +1,43 @@
+{
+  "schema": "zqk_tpm_away_handoff_v1",
+  "written_at": "2026-08-29T00:26:53Z",
+  "wake_at_utc": "2026-08-29T03:26:53Z",
+  "wake_delay_seconds": 10800,
+  "human": "away a few hours; TPM keeps kernel; no swarm until COMMS",
+  "comms": {
+    "result": "FAIL",
+    "reason": "peer_seats only peer-agent-01; no antigravity-1/2"
+  },
+  "cap": {
+    "loop": "SCH-cap-orchestrator",
+    "enabled": true,
+    "schedule": "0 */10 * * * *",
+    "last_run_at": "2026-08-29T00:20:00Z",
+    "keeps_cursor_tpm": false,
+    "why_not": "CAP ticks kernel stages; it does not wake an idle Cursor session. Night-duty stays enabled=false (RIS mint). COMMS FAIL so orch/swarm must not start."
+  },
+  "night_duty": {
+    "id": "SCH-cap-night-duty",
+    "enabled": false
+  },
+  "do_not": [
+    "start swarm",
+    "mint onto PRI-CEF-R24-KERNEL-INTEGRITY-001",
+    "heal-dangling restore of ATKs",
+    "re-enable night-duty"
+  ],
+  "next_on_wake": [
+    "Read this file and .zqk/state/ambient/comms-check-latest.json",
+    "Confirm SCH-1787963007146243000 landed; include apply.sh park fix if still dirty",
+    "GLS-CEF-R26-CHECK-CLASSIFY-001 machine_hints must be non-empty",
+    "Continue R26 lifecycle exam (BLI-CEF-R26-POLICY-PRI-EXAM-001) as TPM; do not ORCHESTRATE_PLAN until COMMS life\u2227work"
+  ],
+  "commit_inflight": "SCH-1787963007146243000",
+  "post_repair_check": ".zqk/logs/system-check/kernel-health-post-repair-20260829T002045Z.json",
+  "wake_jobs": {
+    "durable_sleeper": "SCH-1787963249650311000",
+    "accidental_immediate_stamp": "SCH-1787963214741091000",
+    "note": "Immediate submit of wake.sh was cancelled-by-completion; real delay is the sleeper."
+  },
+  "gls_machine_hints": "set (non-empty string; CLI must not JSON-decode to map)"
+}

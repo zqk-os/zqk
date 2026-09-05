@@ -1,0 +1,14 @@
+created_at: "2026-08-19T20:28:29Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1787171309504927000-4c7708ec
+item_id: CRIT-OPENCORE-STRANGER-E2E-001
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 2857702ca28e4b64fb5782140b43c1400e68fdeab30ab0062f4119523ca97d466e5f13c72adcfa41b92eacf21fa7f0a79b8a8e3a8d7c581e5c9afe0e69cb31dc
+schema_version: 2.0.0
+signature: 304602210086a346bc57100f5a2ab65d3ce9de24bbd76468d8cf57d8d26a3db1b6db347980022100840d09627e996e60358063d371c701e4358adcacdba0be061f43f0616519e9ad
+status: archived
+title: Stranger open-core clone bootstraps and runs validation with zero studio assumptions
+updated_at: "2026-09-01T07:50:35Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

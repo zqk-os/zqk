@@ -1,0 +1,32 @@
+agent_heartbeat: "2026-09-04T14:48:33-07:00"
+agent_pid: 1911
+assignee_persona_ref: PER-ORCH-ALPHA
+backlog_item_ref: BLI-CEF-R27-DUAL-SEAT-REMEASURE-001
+branch_ref: integration/pri-cef-r27-envelope-001
+created_at: "2026-09-04T05:32:25Z"
+created_by: ACC-1785920548450214006-2e52b3e7
+description: |
+    pipeline_ref=PIP-CEF-DIAMOND-REMEASURE-001 stage=W3_tst_adversarial
+    PRIOR: bite-sized CEF remesure under docs/quality/cef-runs/2026-09-03-AGENT_AC.
+    Attack L-TESTING. Overwrite adversarial/L-TESTING.jsonl.
+    READ: docs/quality/codebase_evaluation/prompts/L-TESTING/adversarial.md; docs/quality/cef-runs/2026-09-03-AGENT_AC/findings/L-TESTING.jsonl
+    STEPS:
+    1) Read docs/quality/cef-runs/2026-09-03-AGENT_AC/findings/L-TESTING.jsonl then overwrite docs/quality/cef-runs/2026-09-03-AGENT_AC/adversarial/L-TESTING.jsonl.
+    2) Attack false-green / hallucinated paths / weak evidence.
+    3) Append <=5 lines to docs/quality/cef-runs/2026-09-03-AGENT_AC/run_log.md.
+    4) Feed ack as qwen-1: attacks_filed.
+    SUCCESS_GATE: docs/quality/cef-runs/2026-09-03-AGENT_AC/adversarial/L-TESTING.jsonl overwritten with >=1 finding_id attack rows; not STUB.
+    FORBID: source edits; process mint; dual-seat GPA; sibling package before COMPARE.
+hourglass_on: true
+id: ATK-1788499945311386000-75aa65bc
+kind: agent_task
+namespace_id: zqk:kernel
+pipeline_ref: PIP-CEF-DIAMOND-REMEASURE-001
+priority_plan_ref: PRI-CEF-R27-ENVELOPE-001
+schema_version: 2.0.0
+started_at: "2026-09-04T05:55:47Z"
+status: pending_verification
+title: CEF AGENT_AC W3_tst_adversarial — L-TESTING
+updated_at: "2026-09-04T21:48:33Z"
+updated_by: ACC-1785920548450214006-2e52b3e7
+version_context: default

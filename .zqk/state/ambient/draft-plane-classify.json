@@ -1,0 +1,44 @@
+{
+  "schema": "zqk_draft_plane_classify_v1",
+  "classified_at": "2026-08-31T23:47:10Z",
+  "lead_priority_plan": "PRI-CEF-LINGERING-INTAKE-001",
+  "policy": "POL-AGENT-TPM-GROOM-AHEAD-001",
+  "align_cache": "fresh_skip_rerun",
+  "items": [
+    {
+      "id": "POL-DEFAULT-37173b5595dc3bad",
+      "kind": "policy",
+      "action": "sweep_draft_only",
+      "reason": "dual-plane shadow; CAS Get is under_review SSOT. Do not object delete this id. Sweep apply needs human ACC (not unbound system).",
+      "blocked_by": "POL-AGENT-DRAFT-SWEEP-TPM-001 unbound SystemAccountID"
+    },
+    {
+      "id": "BLI-OBS-DATALAKE-EXPORT-001",
+      "kind": "backlog_item",
+      "action": "keep",
+      "reason": "intentional exploring horizon on PRI-HOLDING-POST-LAUNCH-001; not lingering restuff"
+    },
+    {
+      "id": "BLI-REQ-ENTERPRISE-HORIZON-001",
+      "kind": "backlog_item",
+      "action": "keep",
+      "reason": "intentional exploring horizon on PRI-HOLDING-POST-LAUNCH-001; not lingering restuff"
+    }
+  ],
+  "do_not_sweep_apply_horizon": true,
+  "next_column": {
+    "id": "PRI-CEF-ARCH-FOLLOWON-001",
+    "status": "grooming",
+    "already_shaped": true,
+    "note": "4 planned BLIs; attached GOAL-CEF-ARCH-NAVIGABLE on god-packages + concurrency-ctx. Do not orch."
+  },
+  "lead_hourglass": {
+    "bli": "BLI-LAUNCH-REQ-HONESTY-001",
+    "status": "in_progress",
+    "percent_complete": 100,
+    "claimed_by": null,
+    "atk_count": 0,
+    "crit": "CRIT-LAUNCH-REQ-HONESTY-001 awaiting_verification",
+    "outbox": "await_peer_ack_keep_working \u2014 did not remint steer"
+  }
+}

@@ -1,0 +1,16 @@
+
+--- run 2026-09-04T22:20:46Z ---
+=== RUN   TestBootstrapRootCopiesLifecycles
+=== PAUSE TestBootstrapRootCopiesLifecycles
+=== RUN   TestValidateNoRepoStateMutation
+=== PAUSE TestValidateNoRepoStateMutation
+=== RUN   TestSnapshotRepoState_DetectsDeliberateViolation
+=== PAUSE TestSnapshotRepoState_DetectsDeliberateViolation
+=== CONT  TestBootstrapRootCopiesLifecycles
+=== CONT  TestSnapshotRepoState_DetectsDeliberateViolation
+--- PASS: TestSnapshotRepoState_DetectsDeliberateViolation (0.01s)
+=== CONT  TestValidateNoRepoStateMutation
+--- PASS: TestValidateNoRepoStateMutation (0.01s)
+--- PASS: TestBootstrapRootCopiesLifecycles (0.24s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/testenvroot	0.549s

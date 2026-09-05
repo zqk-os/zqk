@@ -1,0 +1,76 @@
+
+--- run 2026-09-04T22:11:23Z ---
+=== RUN   TestOperationalEnvelopeForKind_auditEventAugment
+=== PAUSE TestOperationalEnvelopeForKind_auditEventAugment
+=== RUN   TestOperationalEnvelopeSummary_CompactSummary
+=== PAUSE TestOperationalEnvelopeSummary_CompactSummary
+=== RUN   TestOperationalEnvelopeForKind_changeJournalStreamAugment
+=== PAUSE TestOperationalEnvelopeForKind_changeJournalStreamAugment
+=== RUN   TestOperationalEnvelopeForKind_auditAggregationMetric_extraCategories
+=== PAUSE TestOperationalEnvelopeForKind_auditAggregationMetric_extraCategories
+=== RUN   TestOperationalEnvelopeForKind_baseMetricAndSchedulerHealthStreamAugments
+=== PAUSE TestOperationalEnvelopeForKind_baseMetricAndSchedulerHealthStreamAugments
+=== RUN   TestOperationalEnvelopeForKind_schedulerJobAugments
+=== PAUSE TestOperationalEnvelopeForKind_schedulerJobAugments
+=== RUN   TestAllOperationalEnvelopeCompactSummaries_coversKnownProfiles
+=== PAUSE TestAllOperationalEnvelopeCompactSummaries_coversKnownProfiles
+=== RUN   TestEnvelopeTickKindAugmentSummaries_nonEmpty
+=== PAUSE TestEnvelopeTickKindAugmentSummaries_nonEmpty
+=== RUN   TestOperationalEnvelopeForKind_additionalStreamKindsAugmented
+=== PAUSE TestOperationalEnvelopeForKind_additionalStreamKindsAugmented
+=== RUN   TestOperationalEnvelopeHasKindAugment
+=== PAUSE TestOperationalEnvelopeHasKindAugment
+=== CONT  TestOperationalEnvelopeForKind_auditEventAugment
+=== CONT  TestOperationalEnvelopeForKind_schedulerJobAugments
+--- PASS: TestOperationalEnvelopeForKind_auditEventAugment (0.00s)
+--- PASS: TestOperationalEnvelopeForKind_schedulerJobAugments (0.00s)
+=== CONT  TestOperationalEnvelopeForKind_additionalStreamKindsAugmented
+=== RUN   TestOperationalEnvelopeForKind_additionalStreamKindsAugmented/code_quality_metric
+=== CONT  TestOperationalEnvelopeHasKindAugment
+--- PASS: TestOperationalEnvelopeHasKindAugment (0.00s)
+=== CONT  TestEnvelopeTickKindAugmentSummaries_nonEmpty
+=== PAUSE TestOperationalEnvelopeForKind_additionalStreamKindsAugmented/code_quality_metric
+=== RUN   TestOperationalEnvelopeForKind_additionalStreamKindsAugmented/command_metric
+--- PASS: TestEnvelopeTickKindAugmentSummaries_nonEmpty (0.00s)
+=== CONT  TestAllOperationalEnvelopeCompactSummaries_coversKnownProfiles
+--- PASS: TestAllOperationalEnvelopeCompactSummaries_coversKnownProfiles (0.00s)
+=== CONT  TestOperationalEnvelopeForKind_auditAggregationMetric_extraCategories
+--- PASS: TestOperationalEnvelopeForKind_auditAggregationMetric_extraCategories (0.00s)
+=== CONT  TestOperationalEnvelopeForKind_baseMetricAndSchedulerHealthStreamAugments
+=== PAUSE TestOperationalEnvelopeForKind_additionalStreamKindsAugmented/command_metric
+--- PASS: TestOperationalEnvelopeForKind_baseMetricAndSchedulerHealthStreamAugments (0.00s)
+=== CONT  TestOperationalEnvelopeForKind_changeJournalStreamAugment
+=== RUN   TestOperationalEnvelopeForKind_additionalStreamKindsAugmented/file_lock_metric
+--- PASS: TestOperationalEnvelopeForKind_changeJournalStreamAugment (0.00s)
+=== CONT  TestOperationalEnvelopeSummary_CompactSummary
+--- PASS: TestOperationalEnvelopeSummary_CompactSummary (0.00s)
+=== PAUSE TestOperationalEnvelopeForKind_additionalStreamKindsAugmented/file_lock_metric
+=== RUN   TestOperationalEnvelopeForKind_additionalStreamKindsAugmented/kind_mapping_metric
+=== PAUSE TestOperationalEnvelopeForKind_additionalStreamKindsAugmented/kind_mapping_metric
+=== RUN   TestOperationalEnvelopeForKind_additionalStreamKindsAugmented/mcp_session
+=== PAUSE TestOperationalEnvelopeForKind_additionalStreamKindsAugmented/mcp_session
+=== RUN   TestOperationalEnvelopeForKind_additionalStreamKindsAugmented/test_audit_aggregation_metric
+=== PAUSE TestOperationalEnvelopeForKind_additionalStreamKindsAugmented/test_audit_aggregation_metric
+=== RUN   TestOperationalEnvelopeForKind_additionalStreamKindsAugmented/verification_matrix
+=== PAUSE TestOperationalEnvelopeForKind_additionalStreamKindsAugmented/verification_matrix
+=== RUN   TestOperationalEnvelopeForKind_additionalStreamKindsAugmented/zqk_session
+=== PAUSE TestOperationalEnvelopeForKind_additionalStreamKindsAugmented/zqk_session
+=== CONT  TestOperationalEnvelopeForKind_additionalStreamKindsAugmented/code_quality_metric
+=== CONT  TestOperationalEnvelopeForKind_additionalStreamKindsAugmented/mcp_session
+=== CONT  TestOperationalEnvelopeForKind_additionalStreamKindsAugmented/kind_mapping_metric
+=== CONT  TestOperationalEnvelopeForKind_additionalStreamKindsAugmented/zqk_session
+=== CONT  TestOperationalEnvelopeForKind_additionalStreamKindsAugmented/verification_matrix
+=== CONT  TestOperationalEnvelopeForKind_additionalStreamKindsAugmented/file_lock_metric
+=== CONT  TestOperationalEnvelopeForKind_additionalStreamKindsAugmented/command_metric
+=== CONT  TestOperationalEnvelopeForKind_additionalStreamKindsAugmented/test_audit_aggregation_metric
+--- PASS: TestOperationalEnvelopeForKind_additionalStreamKindsAugmented (0.00s)
+    --- PASS: TestOperationalEnvelopeForKind_additionalStreamKindsAugmented/code_quality_metric (0.00s)
+    --- PASS: TestOperationalEnvelopeForKind_additionalStreamKindsAugmented/mcp_session (0.00s)
+    --- PASS: TestOperationalEnvelopeForKind_additionalStreamKindsAugmented/kind_mapping_metric (0.00s)
+    --- PASS: TestOperationalEnvelopeForKind_additionalStreamKindsAugmented/file_lock_metric (0.00s)
+    --- PASS: TestOperationalEnvelopeForKind_additionalStreamKindsAugmented/zqk_session (0.00s)
+    --- PASS: TestOperationalEnvelopeForKind_additionalStreamKindsAugmented/verification_matrix (0.00s)
+    --- PASS: TestOperationalEnvelopeForKind_additionalStreamKindsAugmented/command_metric (0.00s)
+    --- PASS: TestOperationalEnvelopeForKind_additionalStreamKindsAugmented/test_audit_aggregation_metric (0.00s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/datacell	0.618s

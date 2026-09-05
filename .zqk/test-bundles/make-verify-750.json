@@ -1,0 +1,159 @@
+{
+  "name": "make-verify-750",
+  "created_at": "2026-09-04T21:34:34.776863Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-750",
+    "Tests": [
+      {
+        "Name": "TestGetGlobalConcurrencyConfig",
+        "Package": "concurrency",
+        "PackagePath": "pkg/concurrency",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/concurrency/config_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestSetGlobalConcurrencyConfig",
+        "Package": "concurrency",
+        "PackagePath": "pkg/concurrency",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/concurrency/config_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestSetGlobalConcurrencyConfig_Nil",
+        "Package": "concurrency",
+        "PackagePath": "pkg/concurrency",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/concurrency/config_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestLockOrderLint_CatchesKnownInvertedPair",
+        "Package": "concurrency_test",
+        "PackagePath": "pkg/concurrency",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/concurrency/lock_order_lint_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestLockOrderLint_Project",
+        "Package": "concurrency_test",
+        "PackagePath": "pkg/concurrency",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/concurrency/lock_order_lint_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestWaitCondContext_AlreadyReady",
+        "Package": "concurrency",
+        "PackagePath": "pkg/concurrency",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/concurrency/wait_cond_context_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestWaitCondContext_CompletesWhenPredicateTrueAfterBroadcast",
+        "Package": "concurrency",
+        "PackagePath": "pkg/concurrency",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/concurrency/wait_cond_context_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestWaitCondContext_CancelUnblocks",
+        "Package": "concurrency",
+        "PackagePath": "pkg/concurrency",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/concurrency/wait_cond_context_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 240000000000,
+    "PackagePath": "pkg/concurrency"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestGetGlobalConcurrencyConfig",
+      "Package": "concurrency",
+      "PackagePath": "pkg/concurrency",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/concurrency/config_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestSetGlobalConcurrencyConfig",
+      "Package": "concurrency",
+      "PackagePath": "pkg/concurrency",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/concurrency/config_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestSetGlobalConcurrencyConfig_Nil",
+      "Package": "concurrency",
+      "PackagePath": "pkg/concurrency",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/concurrency/config_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestLockOrderLint_CatchesKnownInvertedPair",
+      "Package": "concurrency_test",
+      "PackagePath": "pkg/concurrency",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/concurrency/lock_order_lint_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestLockOrderLint_Project",
+      "Package": "concurrency_test",
+      "PackagePath": "pkg/concurrency",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/concurrency/lock_order_lint_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestWaitCondContext_AlreadyReady",
+      "Package": "concurrency",
+      "PackagePath": "pkg/concurrency",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/concurrency/wait_cond_context_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestWaitCondContext_CompletesWhenPredicateTrueAfterBroadcast",
+      "Package": "concurrency",
+      "PackagePath": "pkg/concurrency",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/concurrency/wait_cond_context_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestWaitCondContext_CancelUnblocks",
+      "Package": "concurrency",
+      "PackagePath": "pkg/concurrency",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/concurrency/wait_cond_context_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

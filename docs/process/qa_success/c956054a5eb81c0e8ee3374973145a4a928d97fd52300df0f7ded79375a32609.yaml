@@ -1,0 +1,14 @@
+created_at: "2026-08-19T06:02:17Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1787119336807303000-62925b59
+item_id: REDACTED
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 2857702ca28e4b64fb5782140b43c1400e68fdeab30ab0062f4119523ca97d466e5f13c72adcfa41b92eacf21fa7f0a79b8a8e3a8d7c581e5c9afe0e69cb31dc
+schema_version: 2.0.0
+signature: 3045022012251e87ed6ca3ef5aa092875f43af3f65b7f90e3a032fd00b58437380dc5ad7022100cb18e28b4dd46337486fa0657438734cb5d20ed29ec453bf4f12be0d70c47e0a
+status: archived
+title: Groomed Batch AD
+updated_at: "2026-09-01T07:19:45Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

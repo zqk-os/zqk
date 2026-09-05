@@ -1,0 +1,47 @@
+acceptance_considerations: Acceptance recorded as linked criteria; no narrative captured at migration time.
+actual_effort: 4h
+commit_refs:
+    - ab9f6ba028
+    - d61d63b6d9
+created_at: "2026-08-05T08:34:02Z"
+created_by: ACC-1785920548450214012-68b850c0
+criteria_refs:
+    - CRIT-1785939751144431000-d989f354
+    - CRIT-1785939752101739000-45b1302a
+    - CRIT-1785939753069834000-748e0eb2
+    - CRIT-1785939753987945000-46ca60b7
+    - CRIT-1786697484446071000-59a4215f
+description: |-
+    CONTRACT-CHANGE SHOCKWAVE (async compile → kernel propagate).
+    Build/codegen time (SPEC_ORIGIN_TRIGGER / generate-lifecycle|instance-builders): when lifecycle or object_spec contract deltas (e.g. new stay-in-status / transition preconditions), append a durable outbox event (kind-scoped fingerprint of changed invariants) — do NOT demote instances mid-build.
+    Kernel start / scheduler start: load pending contract-change events → revalidate shovel_ready|execution_locked instances → lifecycle demote (PRI→grooming) for failures — same demote path as manual #1373 cleanup.
+    Why async: specs compile via codegen; runtime graph is not available/safe to mutate during build.
+    Relates BLI-1785915238591238000-619a2f9e; CascadeOnObjectChange TRACK. TRACK this BLI.
+estimated_effort: 4h
+goal_refs:
+    - GOAL-1785885763755750000-6efcb274
+id: BLI-1785918841712163000-f128dc79
+kind: backlog_item
+milestone_refs:
+    - MIL-1785886016336815000-ad6784be
+namespace_id: zqk:kernel
+owner_ref: ACC-1785920548450214012-68b850c0
+percent_complete: 100
+persona_refs:
+    - PER-1781486429759398000-a79939a1
+priority: high
+priority_tier: P1
+problem_statement: |-
+    CONTRACT-CHANGE SHOCKWAVE (async compile → kernel propagate).
+    Build/codegen time (SPEC_ORIGIN_TRIGGER / generate-lifecycle|instance-builders): when lifecycle or object_spec contract deltas (e.g. new stay-in-status / transition preconditions), append a durable outbox event (kind-scoped fingerprint of changed invariants) — do NOT demote instances mid-build.
+    Kernel start / scheduler start: load pending contract-change events → revalidate shovel_ready|execution_locked instances → lifecycle demote (PRI→grooming) for failures — same demote path as manual #1373 cleanup.
+    Why async: specs compile via codegen; runtime graph is not available/safe to mutate during build.
+    Relates BLI-1785915238591238000-619a2f9e; CascadeOnObjectChange TRACK. TRACK this BLI.
+related_object_refs:
+    - GLS-1785919198508273000-81429ca0
+schema_version: 2.0.0
+status: complete
+title: 'MMORCH: Spec/lifecycle change shockwave demotes ineligible shovel-ready objects'
+updated_at: "2026-08-19T04:51:25Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

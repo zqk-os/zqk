@@ -1,0 +1,51 @@
+{
+  "name": "make-verify-398",
+  "created_at": "2026-09-04T21:34:31.257832Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-398",
+    "Tests": [
+      {
+        "Name": "TestEnforceTrunkTipFreshness_FailClosed",
+        "Package": "agentclaim",
+        "PackagePath": "pkg/agentclaim",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentclaim/claim_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestTryClaim_RecordsBranchRef",
+        "Package": "agentclaim",
+        "PackagePath": "pkg/agentclaim",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentclaim/claim_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 60000000000,
+    "PackagePath": "pkg/agentclaim"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestEnforceTrunkTipFreshness_FailClosed",
+      "Package": "agentclaim",
+      "PackagePath": "pkg/agentclaim",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentclaim/claim_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestTryClaim_RecordsBranchRef",
+      "Package": "agentclaim",
+      "PackagePath": "pkg/agentclaim",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/agentclaim/claim_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

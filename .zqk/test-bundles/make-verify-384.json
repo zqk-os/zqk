@@ -1,0 +1,87 @@
+{
+  "name": "make-verify-384",
+  "created_at": "2026-09-04T21:34:31.153159Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-384",
+    "Tests": [
+      {
+        "Name": "TestObjectCreateDeleteFlow_UpdatesValidationCache",
+        "Package": "app_test",
+        "PackagePath": "cmd/zqk/app",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/app/root_object_flow_integration_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestSystemCheckAutoFix_E2E",
+        "Package": "app_test",
+        "PackagePath": "cmd/zqk/app",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/app/root_object_flow_integration_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestValidationTriggerBatch_FlushOnSize",
+        "Package": "app",
+        "PackagePath": "cmd/zqk/app",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/app/validation_trigger_batch_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestValidationTriggerBatch_NoTriggerWhenEmptyProjectRoot",
+        "Package": "app",
+        "PackagePath": "cmd/zqk/app",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/app/validation_trigger_batch_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 120000000000,
+    "PackagePath": "cmd/zqk/app"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestObjectCreateDeleteFlow_UpdatesValidationCache",
+      "Package": "app_test",
+      "PackagePath": "cmd/zqk/app",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/app/root_object_flow_integration_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestSystemCheckAutoFix_E2E",
+      "Package": "app_test",
+      "PackagePath": "cmd/zqk/app",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/app/root_object_flow_integration_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestValidationTriggerBatch_FlushOnSize",
+      "Package": "app",
+      "PackagePath": "cmd/zqk/app",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/app/validation_trigger_batch_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestValidationTriggerBatch_NoTriggerWhenEmptyProjectRoot",
+      "Package": "app",
+      "PackagePath": "cmd/zqk/app",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/cmd/zqk/app/validation_trigger_batch_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

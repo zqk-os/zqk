@@ -1,0 +1,14 @@
+created_at: "2026-08-20T01:01:25Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1787187681302670000-c44af557
+item_id: BLI-CEF-R8-LANE-ARCH-001
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 2857702ca28e4b64fb5782140b43c1400e68fdeab30ab0062f4119523ca97d466e5f13c72adcfa41b92eacf21fa7f0a79b8a8e3a8d7c581e5c9afe0e69cb31dc
+schema_version: 2.0.0
+signature: 3044022058e1234ed98ed8dde3f44fbdfb915435e6d7260c5d5714c08b077eb733476aa40220184b14904e4a93ce9b1cad04c47b4ca12b0e5488770c2843140f77ccae0a3312
+status: archived
+title: R8 architecture bundle — F-ARCH-PACKAGE-BOUNDARY-001 +
+updated_at: "2026-09-01T07:27:37Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

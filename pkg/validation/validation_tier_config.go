@@ -1,0 +1,204 @@
+package validation
+
+import (
+	"fmt"
+	"path/filepath"
+	"sync"
+
+	"gopkg.in/yaml.v3"
+
+	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/lanceman/zqk/pkg/paths"
+	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+)
+
+// ValidationTierConfig represents configuration for validation tier blocking
+type ValidationTierConfig struct {
+	// BlockingTiers specifies which tiers should block object persistence
+	// Default: [1, 2] (blocking and warning tiers)
+	BlockingTiers []int `yaml:"blocking_tiers"`
+
+	// RuleToTierMapping maps validation rules to tiers
+	// This allows custom tier assignment for different validation rules
+	RuleToTierMapping map[string]int `yaml:"rule_to_tier_mapping"`
+}
+
+var (
+	globalTierConfig     *ValidationTierConfig
+	globalTierConfigOnce sync.Once
+)
+
+// DefaultValidationTierConfig returns the default tier configuration
+func DefaultValidationTierConfig() *ValidationTierConfig {
+	return &ValidationTierConfig{
+		BlockingTiers: []int{1, 2}, // Block tiers 1 (blocking) and 2 (warning)
+		RuleToTierMapping: map[string]int{
+			// Tier 1: Critical blocking errors
+			"minCount":           1, // Required field missing
+			"required":           1, // Required field missing (alias)
+			"datatype":           1, // Type mismatch
+			objects.FieldKeyType: 1, // Type mismatch (alias)
+			"reference":          1, // Reference validation failed
+			"partial_data":       1, // Partial/incomplete data
+			// validated/exploring×active|in_progress plan — was tier-2 warning and invisible to
+			// pristine glances that only read blocking_issues / error_status_objects.
+			// TRACK: BLI-KERNEL-CHECK-UNBLIND-MEMBERSHIP-001
+			"execution_facing_membership": 1,
+
+			// Tier 2: Warnings that should block saves
+			"pattern":         2, // Pattern mismatch
+			"in":              2, // Enum value invalid
+			"enum":            2, // Enum value invalid (alias)
+			"scope_integrity": 2, // Discourage scope changes in active plans
+
+			// Tier 3: Informational (allowed)
+			"min_length":    3,
+			"max_length":    3,
+			"semantic_type": 3, ConstMagicExtracted_69: // Tier 4: Recommendations (allowed)
+			4,
+		},
+	}
+}
+
+// LoadValidationTierConfig loads tier configuration from file
+func LoadValidationTierConfig(configPath string) (*ValidationTierConfig, error) {
+	if configPath == emptyValue {
+		configPath = findValidationTierConfig()
+		if configPath == emptyValue {
+			// Return default config if file not found
+			return DefaultValidationTierConfig(), nil
+		}
+	}
+
+	data, err := fileutil.ReadFile(configPath)
+	if err != nil {
+		// Return default config if file can't be read
+		return DefaultValidationTierConfig(), nil
+	}
+
+	var config struct {
+		Validation struct {
+			TierConfig *ValidationTierConfig `yaml:"tier_config"`
+		} `yaml:"validation"`
+	}
+
+	if err := yaml.Unmarshal(data, &config); err != nil {
+		// Return default config if file can't be parsed
+		return DefaultValidationTierConfig(), nil
+	}
+
+	if config.Validation.TierConfig == nil {
+		return DefaultValidationTierConfig(), nil
+	}
+
+	// Merge with defaults for missing fields
+	tierConfig := config.Validation.TierConfig
+	if len(tierConfig.BlockingTiers) == 0 {
+		tierConfig.BlockingTiers = DefaultValidationTierConfig().BlockingTiers
+	}
+	if len(tierConfig.RuleToTierMapping) == 0 {
+		tierConfig.RuleToTierMapping = DefaultValidationTierConfig().RuleToTierMapping
+	} else {
+		// Merge with defaults
+		defaultMapping := DefaultValidationTierConfig().RuleToTierMapping
+		for rule, tier := range defaultMapping {
+			if _, exists := tierConfig.RuleToTierMapping[rule]; !exists {
+				tierConfig.RuleToTierMapping[rule] = tier
+			}
+		}
+	}
+
+	return tierConfig, nil
+}
+
+// GetGlobalValidationTierConfig returns the singleton instance of the tier config
+func GetGlobalValidationTierConfig() *ValidationTierConfig {
+	globalTierConfigOnce.Do(func() {
+		config, err := LoadValidationTierConfig("")
+		if err != nil {
+			globalTierConfig = DefaultValidationTierConfig()
+		} else {
+			globalTierConfig = config
+		}
+	})
+	return globalTierConfig
+}
+
+// findValidationTierConfig searches for validation tier config file
+func findValidationTierConfig() string {
+	// Look for .zqk/config/config.yaml
+	cwd, err := fileutil.Getwd()
+	if err != nil {
+		return ""
+	}
+
+	// Check current directory and parent directories
+	current := cwd
+	for {
+		configPath := filepath.Join(current, paths.ProjectDataDir, paths.ConfigDir, paths.ProjectConfigFile)
+		if _, err := fileutil.Stat(configPath); err == nil {
+			return configPath
+		}
+
+		parent := filepath.Dir(current)
+		if parent == current {
+			break
+		}
+		current = parent
+	}
+
+	return ""
+}
+
+// GetTierForRule returns the tier for a validation rule
+func (c *ValidationTierConfig) GetTierForRule(rule string) int {
+	if tier, ok := c.RuleToTierMapping[rule]; ok {
+		return tier
+	}
+	// Default to tier 2 (warning) for unknown rules
+	return 2
+}
+
+// IsBlockingTier checks if a tier should block object persistence
+func (c *ValidationTierConfig) IsBlockingTier(tier int) bool {
+	for _, blockingTier := range c.BlockingTiers {
+		if blockingTier == tier {
+			return true
+		}
+	}
+	return false
+}
+
+// GetBlockingErrors filters validation errors to only those that should block saves
+func (c *ValidationTierConfig) GetBlockingErrors(errors []ValidationError) []ValidationError {
+	var blockingErrors []ValidationError
+	for _, err := range errors {
+		tier := c.GetTierForRule(err.Rule)
+		if c.IsBlockingTier(tier) {
+			blockingErrors = append(blockingErrors, err)
+		}
+	}
+	return blockingErrors
+}
+
+// GetNonBlockingErrors filters validation errors to only those that should NOT block saves
+func (c *ValidationTierConfig) GetNonBlockingErrors(errors []ValidationError) []ValidationError {
+	var nonBlockingErrors []ValidationError
+	for _, err := range errors {
+		tier := c.GetTierForRule(err.Rule)
+		if !c.IsBlockingTier(tier) {
+			nonBlockingErrors = append(nonBlockingErrors, err)
+		}
+	}
+	return nonBlockingErrors
+}
+
+// FormatBlockingErrors formats blocking errors with tier information
+func (c *ValidationTierConfig) FormatBlockingErrors(errors []ValidationError) string {
+	var messages []string
+	for _, err := range errors {
+		tier := c.GetTierForRule(err.Rule)
+		messages = append(messages, fmt.Sprintf(ConstMagic1ac9633d, err.Field, tier, err.Message))
+	}
+	return fmt.Sprintf(ConstMagic51a3accc, fmt.Sprintf("%v", messages))
+}

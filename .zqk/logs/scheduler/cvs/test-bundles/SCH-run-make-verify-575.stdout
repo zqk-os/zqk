@@ -1,0 +1,44 @@
+
+--- run 2026-09-04T22:18:18Z ---
+=== RUN   TestSchedulerBucketRules_invariants
+=== PAUSE TestSchedulerBucketRules_invariants
+=== RUN   TestSchedulerStateBucket_examplesMatchRulesTable
+=== PAUSE TestSchedulerStateBucket_examplesMatchRulesTable
+=== RUN   TestSchedulerStateBucket_READMELegendCoversAllBucketNames
+=== PAUSE TestSchedulerStateBucket_READMELegendCoversAllBucketNames
+=== RUN   TestPriorityDispatchJob_TimerMaintenance
+=== PAUSE TestPriorityDispatchJob_TimerMaintenance
+=== RUN   TestScheduler_EmitTriggerQueueEvent
+=== PAUSE TestScheduler_EmitTriggerQueueEvent
+=== RUN   TestScheduler_JobInCache
+=== PAUSE TestScheduler_JobInCache
+=== RUN   TestScheduler_TriggerJob
+=== PAUSE TestScheduler_TriggerJob
+=== RUN   TestTimeoutFieldsAppendCombine
+=== PAUSE TestTimeoutFieldsAppendCombine
+=== RUN   TestJobMatchesSchedulerSkipWindow
+=== PAUSE TestJobMatchesSchedulerSkipWindow
+=== RUN   TestLoadSchedulerSkipWindow_Expired
+=== PAUSE TestLoadSchedulerSkipWindow_Expired
+=== CONT  TestSchedulerBucketRules_invariants
+--- PASS: TestSchedulerBucketRules_invariants (0.00s)
+=== CONT  TestScheduler_EmitTriggerQueueEvent
+=== CONT  TestScheduler_JobInCache
+--- PASS: TestScheduler_EmitTriggerQueueEvent (0.44s)
+=== CONT  TestJobMatchesSchedulerSkipWindow
+--- PASS: TestJobMatchesSchedulerSkipWindow (0.00s)
+=== CONT  TestLoadSchedulerSkipWindow_Expired
+--- PASS: TestLoadSchedulerSkipWindow_Expired (0.00s)
+=== CONT  TestTimeoutFieldsAppendCombine
+--- PASS: TestTimeoutFieldsAppendCombine (0.00s)
+=== CONT  TestScheduler_TriggerJob
+--- PASS: TestScheduler_JobInCache (1.35s)
+=== CONT  TestSchedulerStateBucket_READMELegendCoversAllBucketNames
+--- PASS: TestSchedulerStateBucket_READMELegendCoversAllBucketNames (0.00s)
+=== CONT  TestPriorityDispatchJob_TimerMaintenance
+--- PASS: TestPriorityDispatchJob_TimerMaintenance (0.00s)
+=== CONT  TestSchedulerStateBucket_examplesMatchRulesTable
+--- PASS: TestSchedulerStateBucket_examplesMatchRulesTable (0.00s)
+--- PASS: TestScheduler_TriggerJob (1.07s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/scheduler	2.178s

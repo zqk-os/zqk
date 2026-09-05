@@ -1,0 +1,195 @@
+{
+  "name": "make-verify-231",
+  "created_at": "2026-09-04T21:34:29.703622Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-231",
+    "Tests": [
+      {
+        "Name": "TestAnalyze_SyntheticKindsAndSystemKeys",
+        "Package": "drifthotspots",
+        "PackagePath": "pkg/drifthotspots",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/drifthotspots/analyzer_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAnalyze_MinRiskFiltersLow",
+        "Package": "drifthotspots",
+        "PackagePath": "pkg/drifthotspots",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/drifthotspots/analyzer_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAnalyze_SkipsKindLiteralsInObjectsConstants",
+        "Package": "drifthotspots",
+        "PackagePath": "pkg/drifthotspots",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/drifthotspots/analyzer_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAnalyze_SkipsKindLiteralsInKindnamesKinds",
+        "Package": "drifthotspots",
+        "PackagePath": "pkg/drifthotspots",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/drifthotspots/analyzer_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAnalyze_SkipsKindAssignInSpecbuilderBuilders",
+        "Package": "drifthotspots",
+        "PackagePath": "pkg/drifthotspots",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/drifthotspots/analyzer_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAnalyze_ObjectStatusLiteralCompare",
+        "Package": "drifthotspots",
+        "PackagePath": "pkg/drifthotspots",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/drifthotspots/analyzer_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAnalyze_RepeatedStringAndMagicNumberLiterals",
+        "Package": "drifthotspots",
+        "PackagePath": "pkg/drifthotspots",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/drifthotspots/analyzer_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAnalyze_RepeatedStringSkipsLoggingKeysAndCosmeticSuffix",
+        "Package": "drifthotspots",
+        "PackagePath": "pkg/drifthotspots",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/drifthotspots/analyzer_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAnalyze_RegistryRunMonitorIDLiteral",
+        "Package": "drifthotspots",
+        "PackagePath": "pkg/drifthotspots",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/drifthotspots/analyzer_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAnalyze_ReportedLiteralPatterns",
+        "Package": "drifthotspots",
+        "PackagePath": "pkg/drifthotspots",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/drifthotspots/analyzer_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 300000000000,
+    "PackagePath": "pkg/drifthotspots"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestAnalyze_SyntheticKindsAndSystemKeys",
+      "Package": "drifthotspots",
+      "PackagePath": "pkg/drifthotspots",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/drifthotspots/analyzer_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestAnalyze_MinRiskFiltersLow",
+      "Package": "drifthotspots",
+      "PackagePath": "pkg/drifthotspots",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/drifthotspots/analyzer_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestAnalyze_SkipsKindLiteralsInObjectsConstants",
+      "Package": "drifthotspots",
+      "PackagePath": "pkg/drifthotspots",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/drifthotspots/analyzer_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestAnalyze_SkipsKindLiteralsInKindnamesKinds",
+      "Package": "drifthotspots",
+      "PackagePath": "pkg/drifthotspots",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/drifthotspots/analyzer_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestAnalyze_SkipsKindAssignInSpecbuilderBuilders",
+      "Package": "drifthotspots",
+      "PackagePath": "pkg/drifthotspots",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/drifthotspots/analyzer_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestAnalyze_ObjectStatusLiteralCompare",
+      "Package": "drifthotspots",
+      "PackagePath": "pkg/drifthotspots",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/drifthotspots/analyzer_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestAnalyze_RepeatedStringAndMagicNumberLiterals",
+      "Package": "drifthotspots",
+      "PackagePath": "pkg/drifthotspots",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/drifthotspots/analyzer_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "7": {
+      "Name": "TestAnalyze_RepeatedStringSkipsLoggingKeysAndCosmeticSuffix",
+      "Package": "drifthotspots",
+      "PackagePath": "pkg/drifthotspots",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/drifthotspots/analyzer_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "8": {
+      "Name": "TestAnalyze_RegistryRunMonitorIDLiteral",
+      "Package": "drifthotspots",
+      "PackagePath": "pkg/drifthotspots",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/drifthotspots/analyzer_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "9": {
+      "Name": "TestAnalyze_ReportedLiteralPatterns",
+      "Package": "drifthotspots",
+      "PackagePath": "pkg/drifthotspots",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/drifthotspots/analyzer_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

@@ -1,0 +1,14 @@
+created_at: "2026-08-19T08:25:15Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1787127902609398000-48501a9e
+item_id: REDACTED
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 2857702ca28e4b64fb5782140b43c1400e68fdeab30ab0062f4119523ca97d466e5f13c72adcfa41b92eacf21fa7f0a79b8a8e3a8d7c581e5c9afe0e69cb31dc
+schema_version: 2.0.0
+signature: 3045022100a545b646606c34f819ec6d9a9a2c4b840af9fe81f25a42c3f802c8e4ec3c513b022044fe59cd9a5253f4e6e2cd318186a7878a38ac3683b9e1987fe980b60d89f5fe
+status: archived
+title: Wire CAP idle/wait path to refresh directive digest (no empty ping)
+updated_at: "2026-09-01T07:29:26Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

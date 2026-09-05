@@ -1,0 +1,7 @@
+job_id: SCH-autofix-run
+execution_id: exec-1788566100-28864
+state: completed
+process_id: 28864
+started_at: 2026-09-04T23:55:00.092793Z
+completed_at: 2026-09-04T23:55:19.268976Z
+policy_decision: execute

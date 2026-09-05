@@ -1,0 +1,21 @@
+zqk_read_code path="pkg/cli/bldr_cli_cmd_v1/scheduler_builders.go"
+⚠️  Swarm engine execution failed (execution_id=exec-1788580329): generation failed: API error: status=401 body={
+  "error": {
+    "message": "Incorrect API key provided: sk-local***********-key. You can find your API key at https://platform.openai.com/account/api-keys.",
+    "type": "invalid_request_error",
+    "code": "invalid_api_key",
+    "param": null
+  },
+  "status": 401
+}
+Error: swarm engine execution failed: generation failed: API error: status=401 body={
+  "error": {
+    "message": "Incorrect API key provided: sk-local***********-key. You can find your API key at https://platform.openai.com/account/api-keys.",
+    "type": "invalid_request_error",
+    "code": "invalid_api_key",
+    "param": null
+  },
+  "status": 401
+}
+  Check field names and values; try --dry-run or --relaxed.
+2026-09-05T03:52:10Z [error] Command execution failed error=swarm engine execution failed: generation failed: API error: status=401 body={   "error": {     "message": "Incorrect API key provided: sk-local***********-key. You can find your API key at https://platform.openai.com/account/api-keys.",     "type": "invalid_request_error",     "code": "invalid_api_key",     "param": null   },   "status": 401 }   Check field names and values; try --dry-run or --relaxed.

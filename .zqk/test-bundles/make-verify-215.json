@@ -1,0 +1,141 @@
+{
+  "name": "make-verify-215",
+  "created_at": "2026-09-04T21:34:29.530777Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-215",
+    "Tests": [
+      {
+        "Name": "TestMaybeWakeOnPlanBacklogError_Wakes",
+        "Package": "primaryorch",
+        "PackagePath": "pkg/primaryorch",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/primaryorch/plan_error_wake_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestMaybeWakeOnPlanBacklogError_SkipsNonError",
+        "Package": "primaryorch",
+        "PackagePath": "pkg/primaryorch",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/primaryorch/plan_error_wake_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestWakePrimary_AgentChat",
+        "Package": "primaryorch",
+        "PackagePath": "pkg/primaryorch",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/primaryorch/primaryorch_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestWakePrimary_ScriptAdapter",
+        "Package": "primaryorch",
+        "PackagePath": "pkg/primaryorch",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/primaryorch/primaryorch_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestWakePrimary_UnknownAdapter",
+        "Package": "primaryorch",
+        "PackagePath": "pkg/primaryorch",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/primaryorch/primaryorch_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestAppendAttentivenessContext_IncludesPRIAndTopBLIs",
+        "Package": "primaryorch",
+        "PackagePath": "pkg/primaryorch",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/primaryorch/wake_message_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestComposeWakeMessage_UsesRequestFields",
+        "Package": "primaryorch",
+        "PackagePath": "pkg/primaryorch",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/primaryorch/wake_message_test.go",
+        "IsParallel": true,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": true,
+    "EstimatedDuration": 210000000000,
+    "PackagePath": "pkg/primaryorch"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestMaybeWakeOnPlanBacklogError_Wakes",
+      "Package": "primaryorch",
+      "PackagePath": "pkg/primaryorch",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/primaryorch/plan_error_wake_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestMaybeWakeOnPlanBacklogError_SkipsNonError",
+      "Package": "primaryorch",
+      "PackagePath": "pkg/primaryorch",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/primaryorch/plan_error_wake_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "2": {
+      "Name": "TestWakePrimary_AgentChat",
+      "Package": "primaryorch",
+      "PackagePath": "pkg/primaryorch",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/primaryorch/primaryorch_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "3": {
+      "Name": "TestWakePrimary_ScriptAdapter",
+      "Package": "primaryorch",
+      "PackagePath": "pkg/primaryorch",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/primaryorch/primaryorch_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "4": {
+      "Name": "TestWakePrimary_UnknownAdapter",
+      "Package": "primaryorch",
+      "PackagePath": "pkg/primaryorch",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/primaryorch/primaryorch_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "5": {
+      "Name": "TestAppendAttentivenessContext_IncludesPRIAndTopBLIs",
+      "Package": "primaryorch",
+      "PackagePath": "pkg/primaryorch",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/primaryorch/wake_message_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "6": {
+      "Name": "TestComposeWakeMessage_UsesRequestFields",
+      "Package": "primaryorch",
+      "PackagePath": "pkg/primaryorch",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/primaryorch/wake_message_test.go",
+      "IsParallel": true,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

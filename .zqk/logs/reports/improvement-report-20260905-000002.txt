@@ -1,0 +1,19 @@
+=== System Improvement Report ===
+
+System improvement report at 2026-09-05T00:00:02Z.
+Comparative vs 2026-09-04T23:10:15Z: object_count_delta=-7, retention_over_kinds=0, blocking_delta=0.
+Prioritized work items: 2 total (P0=0 P1=0 P2=1 P3=1).
+
+--- Prioritized Work Items ---
+
+[P2] Optimize slow commands (performance)
+  2 command(s) flagged as slow.
+  Action: Run 'zqk system audit-report' for details; consider caching or batching.
+
+[P3] Review quarantine folder (quality)
+  97 file(s) in quarantine.
+  Action: Run 'zqk system quarantine-report' and 'zqk system cleanup-quarantine' if appropriate.
+
+--- Snapshot summary ---
+  Previous report: 2026-09-04T23:10:15Z
+  Object count delta: -7

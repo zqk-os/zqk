@@ -1,0 +1,44 @@
+
+--- run 2026-09-04T22:22:57Z ---
+=== RUN   TestLifecycleInstanceBuilder_WriteToSequence
+=== PAUSE TestLifecycleInstanceBuilder_WriteToSequence
+=== RUN   TestLifecycleInstanceBuilder_LoadFromSequence
+=== PAUSE TestLifecycleInstanceBuilder_LoadFromSequence
+=== RUN   TestLifecycleInstanceBuilder_StatusesWithPreconditions
+=== PAUSE TestLifecycleInstanceBuilder_StatusesWithPreconditions
+=== RUN   TestLifecycleInstanceBuilder_TransitionsWithPreconditions
+=== PAUSE TestLifecycleInstanceBuilder_TransitionsWithPreconditions
+=== RUN   TestLifecycleInstanceBuilder_TypeAssertions
+=== PAUSE TestLifecycleInstanceBuilder_TypeAssertions
+=== RUN   TestPolicyInstanceBuilder_Build
+=== PAUSE TestPolicyInstanceBuilder_Build
+=== RUN   TestPolicyInstanceBuilder_LoadFromYAML
+=== PAUSE TestPolicyInstanceBuilder_LoadFromYAML
+=== RUN   TestPolicyInstanceBuilder_WriteToYAML
+=== PAUSE TestPolicyInstanceBuilder_WriteToYAML
+=== RUN   TestPolicyInstanceBuilder_WriteToSequence_RawFormat
+=== PAUSE TestPolicyInstanceBuilder_WriteToSequence_RawFormat
+=== RUN   TestPolicyInstanceBuilder_SequenceFormat
+=== PAUSE TestPolicyInstanceBuilder_SequenceFormat
+=== CONT  TestLifecycleInstanceBuilder_WriteToSequence
+=== CONT  TestPolicyInstanceBuilder_Build
+--- PASS: TestPolicyInstanceBuilder_Build (0.00s)
+=== CONT  TestPolicyInstanceBuilder_WriteToSequence_RawFormat
+--- PASS: TestPolicyInstanceBuilder_WriteToSequence_RawFormat (0.01s)
+=== CONT  TestPolicyInstanceBuilder_SequenceFormat
+--- PASS: TestLifecycleInstanceBuilder_WriteToSequence (0.01s)
+=== CONT  TestLifecycleInstanceBuilder_TransitionsWithPreconditions
+--- PASS: TestLifecycleInstanceBuilder_TransitionsWithPreconditions (0.00s)
+=== CONT  TestLifecycleInstanceBuilder_TypeAssertions
+--- PASS: TestLifecycleInstanceBuilder_TypeAssertions (0.00s)
+=== CONT  TestLifecycleInstanceBuilder_StatusesWithPreconditions
+--- PASS: TestLifecycleInstanceBuilder_StatusesWithPreconditions (0.00s)
+=== CONT  TestLifecycleInstanceBuilder_LoadFromSequence
+--- PASS: TestPolicyInstanceBuilder_SequenceFormat (0.00s)
+=== CONT  TestPolicyInstanceBuilder_WriteToYAML
+--- PASS: TestLifecycleInstanceBuilder_LoadFromSequence (0.00s)
+=== CONT  TestPolicyInstanceBuilder_LoadFromYAML
+--- PASS: TestPolicyInstanceBuilder_WriteToYAML (0.00s)
+--- PASS: TestPolicyInstanceBuilder_LoadFromYAML (0.00s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/specbuilder/bldr_instance_v1	0.398s

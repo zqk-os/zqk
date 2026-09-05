@@ -1,0 +1,152 @@
+
+--- run 2026-09-04T22:21:39Z ---
+=== RUN   TestLifecycleLoader_InvalidateLifecycle
+=== PAUSE TestLifecycleLoader_InvalidateLifecycle
+=== RUN   TestLifecycleLoader_ConcurrentAccess
+=== PAUSE TestLifecycleLoader_ConcurrentAccess
+=== RUN   TestLifecycleLoader_DoubleCheckedLocking
+=== PAUSE TestLifecycleLoader_DoubleCheckedLocking
+=== RUN   TestLifecycleLoader_LoadLifecycle
+=== PAUSE TestLifecycleLoader_LoadLifecycle
+=== RUN   TestLifecycleLoader_LoadLifecycle_mcp_session
+=== PAUSE TestLifecycleLoader_LoadLifecycle_mcp_session
+=== RUN   TestLifecycleLoader_LoadLifecycle_mcp_spec
+=== PAUSE TestLifecycleLoader_LoadLifecycle_mcp_spec
+=== RUN   TestLifecycleLoader_LoadLifecycle_verification_matrix
+=== PAUSE TestLifecycleLoader_LoadLifecycle_verification_matrix
+=== RUN   TestLifecycleLoader_IsValidStatus
+=== PAUSE TestLifecycleLoader_IsValidStatus
+=== RUN   TestLifecycleLoader_IsValidTransition
+=== PAUSE TestLifecycleLoader_IsValidTransition
+=== RUN   TestLifecycleLoader_GetOriginStatus
+=== PAUSE TestLifecycleLoader_GetOriginStatus
+=== CONT  TestLifecycleLoader_InvalidateLifecycle
+=== CONT  TestLifecycleLoader_LoadLifecycle_mcp_spec
+--- PASS: TestLifecycleLoader_LoadLifecycle_mcp_spec (0.00s)
+=== CONT  TestLifecycleLoader_IsValidTransition
+=== RUN   TestLifecycleLoader_IsValidTransition/backlog_item/exploring->validated
+=== RUN   TestLifecycleLoader_IsValidTransition/backlog_item/validated->planned
+=== RUN   TestLifecycleLoader_IsValidTransition/backlog_item/planned->in_progress
+=== RUN   TestLifecycleLoader_IsValidTransition/backlog_item/in_progress->complete
+=== RUN   TestLifecycleLoader_IsValidTransition/backlog_item/in_progress->completed
+=== RUN   TestLifecycleLoader_IsValidTransition/backlog_item/complete->archived
+=== RUN   TestLifecycleLoader_IsValidTransition/backlog_item/complete->planned
+=== RUN   TestLifecycleLoader_IsValidTransition/backlog_item/complete->in_progress
+=== RUN   TestLifecycleLoader_IsValidTransition/backlog_item/complete->archive
+=== RUN   TestLifecycleLoader_IsValidTransition/backlog_item/exploring->complete
+=== RUN   TestLifecycleLoader_IsValidTransition/backlog_item/complete->exploring
+=== RUN   TestLifecycleLoader_IsValidTransition/verification_matrix/draft->active
+=== RUN   TestLifecycleLoader_IsValidTransition/verification_matrix/draft->archived
+=== RUN   TestLifecycleLoader_IsValidTransition/verification_matrix/active->archived
+=== RUN   TestLifecycleLoader_IsValidTransition/verification_matrix/active->draft
+=== RUN   TestLifecycleLoader_IsValidTransition/verification_matrix/archived->active
+=== RUN   TestLifecycleLoader_IsValidTransition/priority_plan/active->grooming
+=== RUN   TestLifecycleLoader_IsValidTransition/priority_plan/in_progress->grooming
+=== RUN   TestLifecycleLoader_IsValidTransition/priority_plan/grooming->active
+=== RUN   TestLifecycleLoader_IsValidTransition/priority_plan/complete->grooming
+=== RUN   TestLifecycleLoader_IsValidTransition/priority_plan/complete->active
+=== RUN   TestLifecycleLoader_IsValidTransition/agent_task/in_progress->pending_verification
+=== RUN   TestLifecycleLoader_IsValidTransition/agent_task/pending_verification->implemented
+=== RUN   TestLifecycleLoader_IsValidTransition/agent_task/in_progress->implemented
+=== RUN   TestLifecycleLoader_IsValidTransition/agent_task/pending_verification->completed
+=== RUN   TestLifecycleLoader_IsValidTransition/agent_task/in_progress->completed
+=== RUN   TestLifecycleLoader_IsValidTransition/agent_task/proposed->in_progress
+=== RUN   TestLifecycleLoader_IsValidTransition/agent_task/proposed->approved
+=== RUN   TestLifecycleLoader_IsValidTransition/agent_task/approved->in_progress
+--- PASS: TestLifecycleLoader_IsValidTransition (0.02s)
+    --- PASS: TestLifecycleLoader_IsValidTransition/backlog_item/exploring->validated (0.00s)
+    --- PASS: TestLifecycleLoader_IsValidTransition/backlog_item/validated->planned (0.00s)
+    --- PASS: TestLifecycleLoader_IsValidTransition/backlog_item/planned->in_progress (0.00s)
+    --- PASS: TestLifecycleLoader_IsValidTransition/backlog_item/in_progress->complete (0.00s)
+    --- PASS: TestLifecycleLoader_IsValidTransition/backlog_item/in_progress->completed (0.00s)
+    --- PASS: TestLifecycleLoader_IsValidTransition/backlog_item/complete->archived (0.00s)
+    --- PASS: TestLifecycleLoader_IsValidTransition/backlog_item/complete->planned (0.00s)
+    --- PASS: TestLifecycleLoader_IsValidTransition/backlog_item/complete->in_progress (0.00s)
+    --- PASS: TestLifecycleLoader_IsValidTransition/backlog_item/complete->archive (0.00s)
+    --- PASS: TestLifecycleLoader_IsValidTransition/backlog_item/exploring->complete (0.00s)
+    --- PASS: TestLifecycleLoader_IsValidTransition/backlog_item/complete->exploring (0.00s)
+    --- PASS: TestLifecycleLoader_IsValidTransition/verification_matrix/draft->active (0.00s)
+    --- PASS: TestLifecycleLoader_IsValidTransition/verification_matrix/draft->archived (0.00s)
+    --- PASS: TestLifecycleLoader_IsValidTransition/verification_matrix/active->archived (0.00s)
+    --- PASS: TestLifecycleLoader_IsValidTransition/verification_matrix/active->draft (0.00s)
+    --- PASS: TestLifecycleLoader_IsValidTransition/verification_matrix/archived->active (0.00s)
+    --- PASS: TestLifecycleLoader_IsValidTransition/priority_plan/active->grooming (0.00s)
+    --- PASS: TestLifecycleLoader_IsValidTransition/priority_plan/in_progress->grooming (0.00s)
+    --- PASS: TestLifecycleLoader_IsValidTransition/priority_plan/grooming->active (0.00s)
+    --- PASS: TestLifecycleLoader_IsValidTransition/priority_plan/complete->grooming (0.00s)
+    --- PASS: TestLifecycleLoader_IsValidTransition/priority_plan/complete->active (0.00s)
+    --- PASS: TestLifecycleLoader_IsValidTransition/agent_task/in_progress->pending_verification (0.01s)
+    --- PASS: TestLifecycleLoader_IsValidTransition/agent_task/pending_verification->implemented (0.00s)
+    --- PASS: TestLifecycleLoader_IsValidTransition/agent_task/in_progress->implemented (0.00s)
+    --- PASS: TestLifecycleLoader_IsValidTransition/agent_task/pending_verification->completed (0.00s)
+    --- PASS: TestLifecycleLoader_IsValidTransition/agent_task/in_progress->completed (0.00s)
+    --- PASS: TestLifecycleLoader_IsValidTransition/agent_task/proposed->in_progress (0.00s)
+    --- PASS: TestLifecycleLoader_IsValidTransition/agent_task/proposed->approved (0.00s)
+    --- PASS: TestLifecycleLoader_IsValidTransition/agent_task/approved->in_progress (0.00s)
+=== CONT  TestLifecycleLoader_GetOriginStatus
+--- PASS: TestLifecycleLoader_GetOriginStatus (0.01s)
+=== CONT  TestLifecycleLoader_LoadLifecycle
+--- PASS: TestLifecycleLoader_LoadLifecycle (0.01s)
+=== CONT  TestLifecycleLoader_LoadLifecycle_mcp_session
+--- PASS: TestLifecycleLoader_LoadLifecycle_mcp_session (0.00s)
+=== CONT  TestLifecycleLoader_IsValidStatus
+=== RUN   TestLifecycleLoader_IsValidStatus/backlog_item/exploring
+=== RUN   TestLifecycleLoader_IsValidStatus/backlog_item/validated
+=== RUN   TestLifecycleLoader_IsValidStatus/backlog_item/planned
+=== RUN   TestLifecycleLoader_IsValidStatus/backlog_item/in_progress
+=== RUN   TestLifecycleLoader_IsValidStatus/backlog_item/complete
+=== RUN   TestLifecycleLoader_IsValidStatus/backlog_item/completed
+=== RUN   TestLifecycleLoader_IsValidStatus/backlog_item/archive
+=== RUN   TestLifecycleLoader_IsValidStatus/backlog_item/invalid_status
+=== RUN   TestLifecycleLoader_IsValidStatus/mcp_session/in_progress
+=== RUN   TestLifecycleLoader_IsValidStatus/mcp_session/disconnected
+=== RUN   TestLifecycleLoader_IsValidStatus/mcp_session/archived
+=== RUN   TestLifecycleLoader_IsValidStatus/mcp_session/error
+=== RUN   TestLifecycleLoader_IsValidStatus/mcp_session/invalid_status
+=== RUN   TestLifecycleLoader_IsValidStatus/verification_matrix/draft
+=== RUN   TestLifecycleLoader_IsValidStatus/verification_matrix/active
+=== RUN   TestLifecycleLoader_IsValidStatus/verification_matrix/archived
+=== RUN   TestLifecycleLoader_IsValidStatus/verification_matrix/invalid_status
+=== RUN   TestLifecycleLoader_IsValidStatus/audit_event/completed
+=== RUN   TestLifecycleLoader_IsValidStatus/audit_event/complete
+=== RUN   TestLifecycleLoader_IsValidStatus/priority_plan/canceled
+=== RUN   TestLifecycleLoader_IsValidStatus/priority_plan/cancelled
+=== RUN   TestLifecycleLoader_IsValidStatus/agent_task/implemented
+=== RUN   TestLifecycleLoader_IsValidStatus/agent_task/pending_verification
+=== RUN   TestLifecycleLoader_IsValidStatus/agent_task/completed
+=== RUN   TestLifecycleLoader_IsValidStatus/agent_task/complete
+--- PASS: TestLifecycleLoader_IsValidStatus (0.01s)
+    --- PASS: TestLifecycleLoader_IsValidStatus/backlog_item/exploring (0.00s)
+    --- PASS: TestLifecycleLoader_IsValidStatus/backlog_item/validated (0.00s)
+    --- PASS: TestLifecycleLoader_IsValidStatus/backlog_item/planned (0.00s)
+    --- PASS: TestLifecycleLoader_IsValidStatus/backlog_item/in_progress (0.00s)
+    --- PASS: TestLifecycleLoader_IsValidStatus/backlog_item/complete (0.00s)
+    --- PASS: TestLifecycleLoader_IsValidStatus/backlog_item/completed (0.00s)
+    --- PASS: TestLifecycleLoader_IsValidStatus/backlog_item/archive (0.00s)
+    --- PASS: TestLifecycleLoader_IsValidStatus/backlog_item/invalid_status (0.00s)
+    --- PASS: TestLifecycleLoader_IsValidStatus/mcp_session/in_progress (0.00s)
+    --- PASS: TestLifecycleLoader_IsValidStatus/mcp_session/disconnected (0.00s)
+    --- PASS: TestLifecycleLoader_IsValidStatus/mcp_session/archived (0.00s)
+    --- PASS: TestLifecycleLoader_IsValidStatus/mcp_session/error (0.00s)
+    --- PASS: TestLifecycleLoader_IsValidStatus/mcp_session/invalid_status (0.00s)
+    --- PASS: TestLifecycleLoader_IsValidStatus/verification_matrix/draft (0.00s)
+    --- PASS: TestLifecycleLoader_IsValidStatus/verification_matrix/active (0.00s)
+    --- PASS: TestLifecycleLoader_IsValidStatus/verification_matrix/archived (0.00s)
+    --- PASS: TestLifecycleLoader_IsValidStatus/verification_matrix/invalid_status (0.00s)
+    --- PASS: TestLifecycleLoader_IsValidStatus/audit_event/completed (0.00s)
+    --- PASS: TestLifecycleLoader_IsValidStatus/audit_event/complete (0.00s)
+    --- PASS: TestLifecycleLoader_IsValidStatus/priority_plan/canceled (0.00s)
+    --- PASS: TestLifecycleLoader_IsValidStatus/priority_plan/cancelled (0.00s)
+    --- PASS: TestLifecycleLoader_IsValidStatus/agent_task/implemented (0.00s)
+    --- PASS: TestLifecycleLoader_IsValidStatus/agent_task/pending_verification (0.00s)
+    --- PASS: TestLifecycleLoader_IsValidStatus/agent_task/completed (0.00s)
+    --- PASS: TestLifecycleLoader_IsValidStatus/agent_task/complete (0.00s)
+=== CONT  TestLifecycleLoader_LoadLifecycle_verification_matrix
+--- PASS: TestLifecycleLoader_LoadLifecycle_verification_matrix (0.00s)
+=== CONT  TestLifecycleLoader_DoubleCheckedLocking
+--- PASS: TestLifecycleLoader_InvalidateLifecycle (0.05s)
+=== CONT  TestLifecycleLoader_ConcurrentAccess
+--- PASS: TestLifecycleLoader_DoubleCheckedLocking (0.01s)
+--- PASS: TestLifecycleLoader_ConcurrentAccess (0.02s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/objects	0.708s

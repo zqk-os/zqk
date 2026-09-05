@@ -1,0 +1,44 @@
+
+--- run 2026-09-04T22:22:45Z ---
+=== RUN   TestCanonicalizePersistedLifecycleStatus_UnknownFailsClosed
+=== PAUSE TestCanonicalizePersistedLifecycleStatus_UnknownFailsClosed
+=== RUN   TestCanonicalizePersistedLifecycleStatus_AliasOK
+=== PAUSE TestCanonicalizePersistedLifecycleStatus_AliasOK
+=== RUN   TestPrivilegedWriterInterfaceExists
+=== PAUSE TestPrivilegedWriterInterfaceExists
+=== RUN   TestResourceCache_LifetimeCounters
+=== PAUSE TestResourceCache_LifetimeCounters
+=== RUN   TestStorageProviderCache_LifetimeCounters
+=== PAUSE TestStorageProviderCache_LifetimeCounters
+=== RUN   TestSignificantChangePreservesValidationCache
+=== PAUSE TestSignificantChangePreservesValidationCache
+=== RUN   TestEnsureObjectMetadata_legacySystemActorBecomesACC
+=== PAUSE TestEnsureObjectMetadata_legacySystemActorBecomesACC
+=== RUN   TestCheckPermission_legacySystemAlias
+=== PAUSE TestCheckPermission_legacySystemAlias
+=== RUN   TestStorageFactory_LifetimeCounters
+=== PAUSE TestStorageFactory_LifetimeCounters
+=== RUN   TestStreamRegistrySnapshot_ConcurrentRefreshDoesNotDeadlock
+=== PAUSE TestStreamRegistrySnapshot_ConcurrentRefreshDoesNotDeadlock
+=== CONT  TestCanonicalizePersistedLifecycleStatus_UnknownFailsClosed
+=== CONT  TestSignificantChangePreservesValidationCache
+=== CONT  TestStorageFactory_LifetimeCounters
+--- PASS: TestSignificantChangePreservesValidationCache (0.00s)
+--- PASS: TestCanonicalizePersistedLifecycleStatus_UnknownFailsClosed (0.00s)
+=== CONT  TestCheckPermission_legacySystemAlias
+--- PASS: TestCheckPermission_legacySystemAlias (0.00s)
+=== CONT  TestEnsureObjectMetadata_legacySystemActorBecomesACC
+--- PASS: TestEnsureObjectMetadata_legacySystemActorBecomesACC (0.00s)
+=== CONT  TestResourceCache_LifetimeCounters
+--- PASS: TestResourceCache_LifetimeCounters (0.00s)
+=== CONT  TestStorageProviderCache_LifetimeCounters
+--- PASS: TestStorageProviderCache_LifetimeCounters (0.00s)
+=== CONT  TestPrivilegedWriterInterfaceExists
+--- PASS: TestPrivilegedWriterInterfaceExists (0.00s)
+=== CONT  TestCanonicalizePersistedLifecycleStatus_AliasOK
+--- PASS: TestCanonicalizePersistedLifecycleStatus_AliasOK (0.00s)
+=== CONT  TestStreamRegistrySnapshot_ConcurrentRefreshDoesNotDeadlock
+--- PASS: TestStreamRegistrySnapshot_ConcurrentRefreshDoesNotDeadlock (0.00s)
+--- PASS: TestStorageFactory_LifetimeCounters (0.01s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/storage	0.537s

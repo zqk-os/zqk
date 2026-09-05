@@ -1,0 +1,24 @@
+
+--- run 2026-09-04T22:22:47Z ---
+=== RUN   TestSamplerRegistry_RegisterSampler_NonSystem_ReturnsErrorAtCap
+=== PAUSE TestSamplerRegistry_RegisterSampler_NonSystem_ReturnsErrorAtCap
+=== RUN   TestSamplerRegistry_PipelineSampleSampler_DoesNotGroupByObjectID
+=== PAUSE TestSamplerRegistry_PipelineSampleSampler_DoesNotGroupByObjectID
+=== RUN   TestBuildAsyncValidationBaseMetricInstance
+=== PAUSE TestBuildAsyncValidationBaseMetricInstance
+=== RUN   TestBuildAsyncValidationBaseMetricInstance_TruncatesLargeJSON
+=== PAUSE TestBuildAsyncValidationBaseMetricInstance_TruncatesLargeJSON
+=== RUN   TestAsyncValidationMetricTitle
+=== PAUSE TestAsyncValidationMetricTitle
+=== CONT  TestSamplerRegistry_RegisterSampler_NonSystem_ReturnsErrorAtCap
+=== CONT  TestBuildAsyncValidationBaseMetricInstance_TruncatesLargeJSON
+--- PASS: TestSamplerRegistry_RegisterSampler_NonSystem_ReturnsErrorAtCap (0.00s)
+=== CONT  TestAsyncValidationMetricTitle
+--- PASS: TestAsyncValidationMetricTitle (0.00s)
+=== CONT  TestBuildAsyncValidationBaseMetricInstance
+--- PASS: TestBuildAsyncValidationBaseMetricInstance_TruncatesLargeJSON (0.01s)
+=== CONT  TestSamplerRegistry_PipelineSampleSampler_DoesNotGroupByObjectID
+--- PASS: TestSamplerRegistry_PipelineSampleSampler_DoesNotGroupByObjectID (0.00s)
+--- PASS: TestBuildAsyncValidationBaseMetricInstance (0.01s)
+PASS
+ok  	github.com/lanceman/zqk/pkg/metrics	0.522s

@@ -1,0 +1,51 @@
+{
+  "name": "make-verify-299",
+  "created_at": "2026-09-04T21:34:30.333337Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "bundle": {
+    "ID": "make-verify-299",
+    "Tests": [
+      {
+        "Name": "TestContextualizer_Contextualize",
+        "Package": "ontology",
+        "PackagePath": "pkg/ontology",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/ontology/contextualizer_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      },
+      {
+        "Name": "TestOntologyManager_RegisterAndValidate",
+        "Package": "ontology_test",
+        "PackagePath": "pkg/ontology",
+        "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/ontology/manager_test.go",
+        "IsParallel": false,
+        "EstimatedDuration": 30000000000,
+        "RunCount": 0
+      }
+    ],
+    "IsParallel": false,
+    "EstimatedDuration": 60000000000,
+    "PackagePath": "pkg/ontology"
+  },
+  "test_indexes": {
+    "0": {
+      "Name": "TestContextualizer_Contextualize",
+      "Package": "ontology",
+      "PackagePath": "pkg/ontology",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/ontology/contextualizer_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    },
+    "1": {
+      "Name": "TestOntologyManager_RegisterAndValidate",
+      "Package": "ontology_test",
+      "PackagePath": "pkg/ontology",
+      "FilePath": "/Users/lanceettl/zqk-restore-clone/pkg/ontology/manager_test.go",
+      "IsParallel": false,
+      "EstimatedDuration": 30000000000,
+      "RunCount": 0
+    }
+  }
+}

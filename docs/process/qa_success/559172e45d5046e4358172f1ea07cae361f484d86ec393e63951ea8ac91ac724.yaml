@@ -1,0 +1,14 @@
+created_at: "2026-09-03T05:19:31Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1788412771236781000-12268b00
+item_id: CRIT-CEF-LOCK-ORDER-DOC-001
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 86b8ab3d574c004a61020b73c23f52b9055049e90c3d755c8bbb383e059e384028fdd8cd69e13123b644e5f3f7eb65596e73e2d57d719ea3dafcb01b84ce8dfb
+schema_version: 2.0.0
+signature: 304402202ea10b7ba2f7f35e5d0118c069c041e778a94f6f7986c9858cc45301950c3f00022018315e8ba180c14a39853f8332c2aebce1c33b172cda4de4c2187133325b8368
+status: success
+title: QA success for CRIT-CEF-LOCK-ORDER-DOC-001
+updated_at: "2026-09-03T05:19:31Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

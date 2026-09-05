@@ -1,0 +1,7 @@
+job_id: SCH-cap-orchestrator
+execution_id: exec-1788565800-28864
+state: failed
+process_id: 28864
+started_at: 2026-09-04T23:50:00.056589Z
+completed_at: 2026-09-04T23:50:01.85999Z
+policy_decision: execute
