@@ -45,12 +45,13 @@ scripts/open-core/community-bounded-includes
 scripts/open-core/prune-community-tree.sh
 scripts/open-core/police-community-tree.sh
 scripts/open-core/verify-bootstrap-portable.sh
+scripts/open-core/Makefile.community
+scripts/open-core/install-community-makefile.sh
 .zqk/specs
 .zqk/cli/specs
 .goreleaser.yaml
 .gitignore
 NOTICE
-Makefile
 go.mod
 go.sum
 LICENSE
