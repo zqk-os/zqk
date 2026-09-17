@@ -3,7 +3,7 @@
 **Doc entry:** `DOC-1775197432882643000-89463915` — `zqk object get DOC-1775197432882643000-89463915` (or `zqk object list doc_entry --filter group=onboarding`).
 
 **As of:** 2026-08-11
-**Replaces:** Rolling “latest dated summary” in `docs/onboarding/` (see [`AGENT_ONBOARDING_SUMMARIES_DIGEST.md`](./AGENT_ONBOARDING_SUMMARIES_DIGEST.md) and [`archive/`](./archive/)).
+**Replaces:** Rolling “latest dated summary” in `docs/onboarding/` (see [`AGENT_ONBOARDING_SUMMARIES_DIGEST.md`](./AGENT_ONBOARDING_SUMMARIES_DIGEST.md)).
 
 **Purpose:** Short, **re-verify**-friendly view of plan + convergence + what to run before acting. Numbers below are **examples from the last explicit review** — always confirm with **`zqk object …`**.
 
@@ -62,6 +62,5 @@ tail -20 .zqk/logs/cursor-hooks/agent_chat_channel.jsonl
 
 ## Related
 
-- **Historical dated files:** [`archive/`](./archive/)
 - **Compressed timeline:** [`AGENT_ONBOARDING_SUMMARIES_DIGEST.md`](./AGENT_ONBOARDING_SUMMARIES_DIGEST.md)
 - **Assessment (one-off, 2026-03-21):** [`AGENT_ONBOARDING_ASSESSMENT_2026-03-21.md`](./AGENT_ONBOARDING_ASSESSMENT_2026-03-21.md)

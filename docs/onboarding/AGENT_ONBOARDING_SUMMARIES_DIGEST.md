@@ -2,7 +2,7 @@
 
 **Doc entry:** `DOC-1775197433691153000-acbe23e3` — `zqk object get DOC-1775197433691153000-acbe23e3` (or `zqk object list doc_entry --filter group=onboarding`).
 
-**Purpose:** Preserve **direction and context** from the dated snapshot series (**2026-03-19 → 2026-04-04**) without maintaining a long list of peer files in `docs/onboarding/`. Full originals: [`archive/`](./archive/).
+**Purpose:** Preserve **direction and context** from the dated snapshot series (**2026-03-19 → 2026-04-04**) without shipping those dated files in the community tree.
 
 **How to use:** Read this for **themes and evolution**. For **what to do now**, use [`AGENT_ONBOARDING_SNAPSHOT.md`](./AGENT_ONBOARDING_SNAPSHOT.md) and live `zqk object …` commands.
 
