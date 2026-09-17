@@ -1,0 +1,22 @@
+category: architecture
+content_hash: 66a5d8c1bb98c0588af7bc032e80cc017a537a3288a4773c3f692ff5d8d6901b
+content_searchable: true
+content_size: 11231
+created_at: "2026-09-17T08:44:19Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-336
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/ZQK_DOT_MD_CLEANUP_PLAN.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: '--- - POL-DOC-001 (Documentation Structure, Location, and Preferences): All documentation must live in the docs/ tree and be registered with the system (e.g'
+title: '.zqk/ Markdown Cleanup: Analysis and Remedial Action Plan'
+updated_at: "2026-09-17T08:44:19Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

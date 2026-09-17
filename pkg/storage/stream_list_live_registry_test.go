@@ -17,7 +17,7 @@ import (
 // TestListStreamSegmentsIgnoresGhostsAfterDeletedTruncated pins the retention compact
 // contract: stream_deleted is truncated while segment files still contain deleted lines.
 // List/count must intersect with the live registry or total_count inflates past max_count.
-// TRACK: BLI-REDACTED
+// TRACK: BLI-1785905541906569000-074e24d7
 func TestListStreamSegmentsIgnoresGhostsAfterDeletedTruncated(t *testing.T) {
 	root := t.TempDir()
 	MustEnsureProcessSpecsLayoutForTest(t, root)

@@ -1,0 +1,22 @@
+category: graph-backend
+content_hash: 1046d2e0b5eb4ffa626405ce876574d5fb756d20c69d397d8baa102eada7d3cc
+content_searchable: true
+content_size: 6747
+created_at: "2026-09-17T08:44:30Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-422
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/graph-backend/ARCHITECTURE_DECISIONS.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: '- GraphProvider.CreatePool() returns a ConnectionPool - Pool manages connections internally - Users acquire connections from pool, use them, then return them - Convenience method Execute() handles ...'
+title: Graph Backend Architecture Decisions
+updated_at: "2026-09-17T08:44:30Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

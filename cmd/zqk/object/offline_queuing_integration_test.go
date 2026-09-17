@@ -33,7 +33,7 @@ func TestOfflineQueuingForLifecycleEvents(t *testing.T) {
 	secCtx := pkgctx.NewSystemSecurityContext()
 	cliCtx := storage.WithCLIOperation(ctx)
 	storage.CreateCASVisible(t, fs, cliCtx, secCtx, map[string]any{
-		objects.FieldKeyID:          "GOAL-REDACTED",
+		objects.FieldKeyID:          "GOAL-1234567890123456000-abcdef12",
 		objects.FieldKeyKind:        objects.KindGoal,
 		objects.FieldKeyTitle:       "Test Goal",
 		objects.FieldKeyDescription: "A test goal description that is long enough to pass validation checks",
@@ -43,7 +43,7 @@ func TestOfflineQueuingForLifecycleEvents(t *testing.T) {
 	}, objects.ObjectStatusActive)
 
 	// 2. Create the backlog item in exploring status (draft plane; List filters will not see it).
-	bliYAML := `id: BLI-REDACTED
+	bliYAML := `id: BLI-1234567890123456000-abcdef12
 kind: backlog_item
 title: Test Backlog Item
 description: A test backlog item description that is long enough to pass CAS boundary validation.
@@ -51,7 +51,7 @@ status: exploring
 problem_statement: This is a valid problem statement of sufficient length for validation.
 acceptance_considerations: Narrative only; gates are criteria_refs.
 goal_refs:
-  - GOAL-REDACTED
+  - GOAL-1234567890123456000-abcdef12
 `
 	bliFile := filepath.Join(tmpDir, "backlog_item.yaml")
 	if err := fileutil.WriteFile(bliFile, []byte(bliYAML), paths.FilePerm644); err != nil {
@@ -69,7 +69,7 @@ goal_refs:
 
 	// 3. Promote exploring → validated by ID (draft-plane objects are not List-filterable).
 	// This must succeed even when the scheduler daemon is stopped.
-	cmdPromote := execwrap.Command(cliBinary, "object", "promote", "BLI-REDACTED",
+	cmdPromote := execwrap.Command(cliBinary, "object", "promote", "BLI-1234567890123456000-abcdef12",
 		"--allow-degraded",
 	)
 	wireExecForTest(cmdPromote, tmpDir)
@@ -145,8 +145,8 @@ goal_refs:
 			req.LifecycleTo == "validated" {
 			found = true
 			bliID, _ := req.LifecycleData[objects.FieldKeyID].(string)
-			if bliID != "BLI-REDACTED" {
-				t.Errorf("LifecycleData ID mismatch: got %s, want BLI-REDACTED", bliID)
+			if bliID != "BLI-1234567890123456000-abcdef12" {
+				t.Errorf("LifecycleData ID mismatch: got %s, want BLI-1234567890123456000-abcdef12", bliID)
 			}
 			break
 		}

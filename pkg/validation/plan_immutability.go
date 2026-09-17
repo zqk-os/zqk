@@ -7,7 +7,7 @@ import (
 	"github.com/lanceman/zqk/pkg/objects"
 )
 
-// TRACK: BLI-REDACTED — plan immutability / execution-facing gate for BLI in_progress.
+// TRACK: BLI-1783845980884549000-014a1c61 — plan immutability / execution-facing gate for BLI in_progress.
 
 // PlanStatusAllowsBacklogInProgress reports whether a priority_plan status may host
 // backlog_item work (shovel-ready active or execution-locked in_progress).

@@ -1,0 +1,22 @@
+category: architecture
+content_hash: 4ec074cda9aabec3ec9ac16a92c08eb60e7c22aaa2e7cf4d7bf64e88fdf1019d
+content_searchable: true
+content_size: 6895
+created_at: "2026-09-17T08:44:36Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-496
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/mcp-binary-stability-v1.0.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: This document defines the architecture for managing MCP server binary stability, ensuring that the MCP server uses a stable, versioned binary that remains compatible with project artifacts even as ...
+title: MCP Binary Stability and Compatibility Architecture
+updated_at: "2026-09-17T08:44:36Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

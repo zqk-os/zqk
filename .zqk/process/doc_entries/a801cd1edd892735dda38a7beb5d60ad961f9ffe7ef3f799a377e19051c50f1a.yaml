@@ -1,0 +1,22 @@
+category: audit
+content_hash: 91d5aabc0529fd2df8c8801e4088c9cb6a04d6cbf27aa66ed0d66ea391f4c89f
+content_searchable: true
+content_size: 3760
+created_at: "2026-09-17T08:44:45Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-546
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/resilience_and_audit.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: This document specifies the Circuit Breaker pattern for Neo4j/Memgraph partitions and the Event Bus / WAL tailer architecture for real-time audit streaming in ZQK
+title: Resilience and Audit Streaming Architecture
+updated_at: "2026-09-17T08:44:45Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

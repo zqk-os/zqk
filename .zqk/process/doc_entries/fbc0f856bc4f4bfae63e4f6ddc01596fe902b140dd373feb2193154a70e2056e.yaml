@@ -1,0 +1,22 @@
+category: architecture
+content_hash: d6bce9d35a97c601ef15f45dbd574e4a6944fcdaec060450a8c68fce06f3c900
+content_searchable: true
+content_size: 12555
+created_at: "2026-09-17T08:44:25Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-408
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/distributed-kernel-architecture-v1.0.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: This document defines the distributed knowledge kernel architecture using PKI for authority verification and git-based distribution
+title: Distributed Knowledge Kernel Architecture
+updated_at: "2026-09-17T08:44:25Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

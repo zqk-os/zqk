@@ -1,0 +1,22 @@
+category: architecture
+content_hash: 910b77ca0233aa65d5e76ed3651936925f74fab1a7e051bfc85b59006df65a42
+content_searchable: true
+content_size: 1229
+created_at: "2026-09-17T08:44:13Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-316
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/TOOL_POD_MESH.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: To maintain the core ZQK binary as a pristine, zero-dependency, lightweight orchestrator, all heavy computing operations (e.g., FFmpeg video rendering, ML inference, massive AST migrations) are off...
+title: ZQK Tool Pod Mesh Architecture
+updated_at: "2026-09-17T08:44:13Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

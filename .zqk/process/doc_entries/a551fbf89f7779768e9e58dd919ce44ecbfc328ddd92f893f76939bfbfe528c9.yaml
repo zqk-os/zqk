@@ -1,0 +1,22 @@
+category: cli
+content_hash: d046e04f2a7d809aaca1bf8c09eb64ebfdf5134d6a37a0fb825e18ad2a85a8de
+content_searchable: true
+content_size: 7752
+created_at: "2026-09-17T08:39:31Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-037
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/BUILT_IN_VS_CLI_TOOLS.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: Built-in tools are hardcoded directly in the MCP server code
+title: Built-In MCP Tools vs. CLI Bridge Tools
+updated_at: "2026-09-17T08:39:31Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

@@ -1,0 +1,22 @@
+category: architecture
+content_hash: 08d5cbbd8fb65baeb50a25bd16866f900ff63ebbe7ec94fe241b3b84824094f2
+content_searchable: true
+content_size: 20323
+created_at: "2026-09-17T08:44:10Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-288
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/SPEC_ORIGIN_PLANE.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: 'Object specs (.zqk/specs/objects/*.yaml) are the declarative definition of the persisted data model: kinds, fields, traits, validation, inheritance (extends), and lifecycle-related metadata'
+title: 'Spec origin plane: canonical model, derived indexes, and traceability'
+updated_at: "2026-09-17T08:44:10Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

@@ -1,0 +1,22 @@
+category: cli
+content_hash: f1b8604b2d182c36f78af288ac88db2eb662cfe72350338bf92eb4c8b103084e
+content_searchable: true
+content_size: 6643
+created_at: "2026-09-17T08:44:36Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-497
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/mcp-cli-bridge-v1.0.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: This document describes the context-driven, security-aware CLI bridge that automatically exposes CLI commands as MCP tools
+title: MCP CLI Bridge Architecture
+updated_at: "2026-09-17T08:44:36Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

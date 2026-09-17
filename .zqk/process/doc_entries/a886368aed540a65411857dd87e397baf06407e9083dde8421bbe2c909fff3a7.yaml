@@ -1,0 +1,22 @@
+category: architecture
+content_hash: 338b564f7ddfeddb48277ef0edd4fc80dd5b75fe12fbc592621d00ac35442eb0
+content_searchable: true
+content_size: 9681
+created_at: "2026-09-17T08:43:30Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-155
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/LIFECYCLE_STATE_MACHINE_RUBRIC.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: This is the design exam for every *_lifecycle.yaml
+title: Lifecycle state-machine rubric
+updated_at: "2026-09-17T08:43:30Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

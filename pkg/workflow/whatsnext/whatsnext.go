@@ -121,7 +121,7 @@ func resolvePriorityPlanForWhatsNext(ctx context.Context, sp storage.ObjectStora
 
 	// 3. Collect all candidate plans (operational + strategic).
 	// Shared with CLI whats-next so grooming next-columns appear in ambient.
-	// TRACK: BLI-REDACTED
+	// TRACK: BLI-1787035087372193000-c022117d
 	planStatuses := objects.PlanWhatsNextCandidateStatuses()
 	var candidates []map[string]any
 	for _, st := range planStatuses {

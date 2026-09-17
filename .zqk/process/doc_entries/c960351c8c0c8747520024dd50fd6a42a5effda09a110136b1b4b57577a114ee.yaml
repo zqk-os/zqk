@@ -1,0 +1,22 @@
+category: storage
+content_hash: c56e5fd7d204438ed5f6cfb376b8fab3672128a7cb202e0ead9237f8cfa2e8fc
+content_searchable: true
+content_size: 5131
+created_at: "2026-09-17T08:42:09Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-092
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/DATA_STORAGE_PRODUCTION_ROADMAP.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: '--- - Goal: Ensure list/count and retention use the high-volume event cache and stream index for all high-volume kinds, with correct fallback when cache is empty or stale (per FAST_PATH_AND_CACHE_F...'
+title: Data Storage Production-Readiness Roadmap
+updated_at: "2026-09-17T08:42:09Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

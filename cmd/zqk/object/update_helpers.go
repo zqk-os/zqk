@@ -442,7 +442,7 @@ func buildUpdatesMap(cmd *cobra.Command, proc *cli.Processor, currentObj map[str
 	applyUnsetFieldFlags(cmd, updates)
 
 	// Drop get-time hydration keys so CAS stays sealed.
-	// TRACK: BLI-REDACTED
+	// TRACK: BLI-1785909672838827000-9fca84f5
 	_ = objectget.StripReferenceResolverOverlayFields(updates)
 
 	if len(updates) == 0 {
@@ -668,7 +668,7 @@ func refuseManualStatusUnlessOverride(cmd *cobra.Command, proc *cli.Processor, i
 
 // guardManualRefFieldUpdates refuses direct mutation of *_ref and *_refs fields via --field,
 // requiring first-class 'object ref add/remove' commands or audited break-glass --override.
-// TRACK: BLI-REDACTED
+// TRACK: BLI-1789167099165682000-a2d974a4
 func guardManualRefFieldUpdates(cmd *cobra.Command, proc *cli.Processor, id, objKind string, updates map[string]any) error {
 	var refFields []string
 	for k := range updates {
@@ -739,7 +739,7 @@ func guardManualRefFieldUpdates(cmd *cobra.Command, proc *cli.Processor, id, obj
 }
 
 // withUpdateBreakGlass arms DECIDE break_glass for --force/--override. Critical kinds
-// require --reason-code. TRACK: BLI-REDACTED
+// require --reason-code. TRACK: BLI-1785784867143912000-635942fb
 func withUpdateBreakGlass(cmd *cobra.Command, ctx stdcontext.Context, objKind string) (stdcontext.Context, error) {
 	force, _ := cmd.Flags().GetBool("force")
 	override, _ := cmd.Flags().GetBool("override")

@@ -4,7 +4,7 @@
 
 
 **Glossary:** `kernel_object_kind_fitness_rubric` (`GLS-1786687875188966000-0ed1e9a6`)  
-**Plan:** `PRI-REDACTED`  
+**Plan:** `PRI-1786687873940250000-a6c3a985`  
 **Audience:** operators and agents auditing kinds under `.zqk/process/` (CAS) and elevated/internal kinds.
 
 This rubric turns recurring inspection findings into a **repeatable scorecard** per object kind (and, when useful, per high-volume instance cohort). It applies to **visibility:public** and **visibility:internal** — RBAC may hide the internal bucket from default list/MCP; inspection still uses `zqk-admin` / `object … --internal` (or an entitled elevated session). Neglecting internal kinds is out of scope for “pristine kernel.”
@@ -144,11 +144,11 @@ evidence: [paths, commands, object ids]
 
 ## Related work
 
-- Crevice sweep: `BLI-REDACTED`
-- Lifecycle TDD matrix: `BLI-REDACTED`
-- CVS status matrix Option A: `DEC-REDACTED`
-- CLI DNA / command_spec dual-source: `PRI-REDACTED`
-- Dual-CAS fail-closed / quarantine: `BLI-REDACTED` (and POL-CODE-004 family)
-- Draft-on-CAS eradication (status=draft must not be listable): `BLI-REDACTED`
+- Crevice sweep: `BLI-1786684969399550000-5dd4674c`
+- Lifecycle TDD matrix: `BLI-1786414109434901000-9920709a`
+- CVS status matrix Option A: `DEC-1786686986572580000-54124993`
+- CLI DNA / command_spec dual-source: `PRI-1786686563805309000-842068b2`
+- Dual-CAS fail-closed / quarantine: `BLI-1786358681981576000-66f07f6c` (and POL-CODE-004 family)
+- Draft-on-CAS eradication (status=draft must not be listable): `BLI-1786689721908382000-6402a858`
 - `zqk system object-hygiene-scan` — operational prefix/regex rules (complement, not a substitute for this rubric)
-- Preliminary-on-CAS invariant and L7 population migration: `BLI-REDACTED`
+- Preliminary-on-CAS invariant and L7 population migration: `BLI-1786689387653105000-3bc9507f`

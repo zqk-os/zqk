@@ -1,0 +1,22 @@
+category: architecture
+content_hash: 02f12c62f1de55416af9ba5f6231f847c47384dec370ac1646e5f7b45efda7e2
+content_searchable: true
+content_size: 11855
+created_at: "2026-09-17T08:44:48Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-593
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/system-sync-command-v1.0.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: The zqk system sync command provides a simple wrapper around Git operations to synchronize the local zqk project state with remote repositories
+title: System Sync Command Architecture
+updated_at: "2026-09-17T08:44:48Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

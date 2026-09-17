@@ -438,7 +438,7 @@ func TestValidateObjectIntent_transitionRequiresShovelReady(t *testing.T) {
 	if err := WarmDefaultRegistry(""); err != nil {
 		t.Fatal(err)
 	}
-	// Hold overlays satisfied; CRI-SHOVEL-READY refs missing. TRACK: CRIT-REDACTED
+	// Hold overlays satisfied; CRI-SHOVEL-READY refs missing. TRACK: CRIT-1785885889228395000-15c56d02
 	obj := map[string]any{
 		objects.FieldKeyKind:            objects.KindBacklogItem,
 		objects.FieldKeyStatus:          objects.ObjectStatusInProgress,
@@ -487,7 +487,7 @@ func TestValidateObjectIntent_occupiableRequiresClaimedByOnInProgress(t *testing
 	objWithoutClaim := map[string]any{
 		objects.FieldKeyKind:   objects.KindAgentTask,
 		objects.FieldKeyStatus: objects.ObjectStatusInProgress,
-		objects.FieldKeyID:     "ATK-REDACTED",
+		objects.FieldKeyID:     "ATK-1786411312347141000-abcd1234",
 	}
 	errs := ValidateObjectIntent(t.Context(), Default(), objects.KindAgentTask, KindTransition, IntentTransition, objWithoutClaim, nil)
 	if len(errs) == 0 {
@@ -497,7 +497,7 @@ func TestValidateObjectIntent_occupiableRequiresClaimedByOnInProgress(t *testing
 	objWithClaim := map[string]any{
 		objects.FieldKeyKind:      objects.KindAgentTask,
 		objects.FieldKeyStatus:    objects.ObjectStatusInProgress,
-		objects.FieldKeyID:        "ATK-REDACTED",
+		objects.FieldKeyID:        "ATK-1786411312347141000-abcd1234",
 		objects.FieldKeyClaimedBy: "agent-1",
 	}
 	errs = ValidateObjectIntent(t.Context(), Default(), objects.KindAgentTask, KindTransition, IntentTransition, objWithClaim, nil)
@@ -521,7 +521,7 @@ func TestValidateObjectIntent_BLI_TDE_LifecyclePromoteClaim(t *testing.T) {
 	bliObj := map[string]any{
 		objects.FieldKeyKind:   objects.KindBacklogItem,
 		objects.FieldKeyStatus: objects.ObjectStatusInProgress,
-		objects.FieldKeyID:     "BLI-REDACTED",
+		objects.FieldKeyID:     "BLI-1786411312347141000-abcd1234",
 	}
 	errs := ValidateObjectIntent(t.Context(), Default(), objects.KindBacklogItem, KindTransition, IntentTransition, bliObj, nil)
 	for _, e := range errs {
@@ -650,10 +650,10 @@ func TestValidateObject_RefuseUnknownFieldsAllowsCompositionFields(t *testing.T)
 	// 1. Backlog item with legitimate composition fields (claimed_by, claimed_at, effort_variance, percent_complete, tags)
 	validObj := map[string]any{
 		objects.FieldKeyKind:            objects.KindBacklogItem,
-		objects.FieldKeyID:              "BLI-REDACTED",
+		objects.FieldKeyID:              "BLI-1785008248438506000-22976ac6",
 		objects.FieldKeyTitle:           "Valid Title For BLI",
 		objects.FieldKeyStatus:          objects.ObjectStatusPlanned,
-		objects.FieldKeyPriorityPlanRef: "PRI-REDACTED",
+		objects.FieldKeyPriorityPlanRef: "PRI-1786084814786868000-df9be3b3",
 		objects.FieldKeyMilestoneRefs:   []any{"MIL-001"},
 		objects.FieldKeyPriorityTier:    "P1",
 		objects.FieldKeyClaimedBy:       "agent-42",
@@ -672,10 +672,10 @@ func TestValidateObject_RefuseUnknownFieldsAllowsCompositionFields(t *testing.T)
 	// 2. Backlog item with truly unknown field
 	bogusObj := map[string]any{
 		objects.FieldKeyKind:            objects.KindBacklogItem,
-		objects.FieldKeyID:              "BLI-REDACTED",
+		objects.FieldKeyID:              "BLI-1785008248438506000-22976ac6",
 		objects.FieldKeyTitle:           "Valid Title For BLI",
 		objects.FieldKeyStatus:          objects.ObjectStatusPlanned,
-		objects.FieldKeyPriorityPlanRef: "PRI-REDACTED",
+		objects.FieldKeyPriorityPlanRef: "PRI-1786084814786868000-df9be3b3",
 		objects.FieldKeyMilestoneRefs:   []any{"MIL-001"},
 		objects.FieldKeyPriorityTier:    "P1",
 		"totally_bogus_field_xyz":       "bad",
@@ -697,10 +697,10 @@ func TestValidateObject_BacklogItemPriorityPairingAndValidation(t *testing.T) {
 	baseBLI := func() map[string]any {
 		return map[string]any{
 			objects.FieldKeyKind:            objects.KindBacklogItem,
-			objects.FieldKeyID:              "BLI-REDACTED",
+			objects.FieldKeyID:              "BLI-1785008248438506000-22976ac6",
 			objects.FieldKeyTitle:           "Valid Title For BLI",
 			objects.FieldKeyStatus:          objects.ObjectStatusPlanned,
-			objects.FieldKeyPriorityPlanRef: "PRI-REDACTED",
+			objects.FieldKeyPriorityPlanRef: "PRI-1786084814786868000-df9be3b3",
 			objects.FieldKeyDescription:     "A valid description for testing",
 			objects.FieldKeyGoalRefs:        []any{"GOAL-001"},
 		}

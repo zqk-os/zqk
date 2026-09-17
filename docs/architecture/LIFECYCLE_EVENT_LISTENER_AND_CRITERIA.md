@@ -41,7 +41,7 @@ Events are appended to a **lifecycle event WAL** (`.zqk/wal/lifecycle_events.wal
   1. **Cache first**: So that the next Read/List sees the new status immediately. When write-behind is enabled, this is achieved by enqueueing the update to the **object write buffer** + object WAL (same path as normal updates). The buffer is the "cache" that Read merges with disk.  
   2. **Disk in background**: The existing write-behind worker drains the buffer and persists to disk. So the updater calls an API that enqueues the update (e.g. `EnqueueStatusUpdate` on `FileObjectStorage`) rather than calling synchronous `Update()` when write-behind is available.
 - **Fallback**: If write-behind is not available (e.g. graph backend or write-behind disabled), the updater calls `storage.Update()` (sync). No unbounded goroutines: transitions are processed by the bounded pool.
-- **Break-glass / holds:** auto-complete may arm DECIDE break_glass for critical-kind elevation. Storage still validates lifecycle; complete preconditions (plan children terminal; BLI CRITs) are not skipped. Prefer dual `manual+auto` edges so `zqk object promote` can take the same hop — see [LIFECYCLE_STATUS_ROLES.md](./LIFECYCLE_STATUS_ROLES.md) § First-class promote. TRACK: `BLI-REDACTED`.
+- **Break-glass / holds:** auto-complete may arm DECIDE break_glass for critical-kind elevation. Storage still validates lifecycle; complete preconditions (plan children terminal; BLI CRITs) are not skipped. Prefer dual `manual+auto` edges so `zqk object promote` can take the same hop — see [LIFECYCLE_STATUS_ROLES.md](./LIFECYCLE_STATUS_ROLES.md) § First-class promote. TRACK: `BLI-1785784867143912000-635942fb`.
 
 ### 5. Parallel / sequential / categorical / prioritized handling
 

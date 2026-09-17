@@ -1,0 +1,22 @@
+category: architecture
+content_hash: c86873c515ccee4b3ddd1b42c641762cf384e08a53c59dfd6f097ba4bb4417fd
+content_searchable: true
+content_size: 20350
+created_at: "2026-09-17T08:44:37Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-509
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/modular-scalable-architecture-v1.0.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: This document defines a modular, scalable architecture for zqk that supports growth and contraction, avoids bloat, and enables managing zqk state in separate repositories from code repositories
+title: Modular and Scalable Architecture
+updated_at: "2026-09-17T08:44:37Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

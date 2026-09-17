@@ -1,0 +1,22 @@
+category: architecture
+content_hash: 930507f4fe0cce7d867af188472b269594cf31d1d9d0870e1abf470f2cf9c799
+content_searchable: true
+content_size: 8720
+created_at: "2026-09-17T08:44:48Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-591
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/system-object-discovery-guide-v1.0.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: This guide demonstrates how to use the zqk knowledge kernel to discover, explore, and understand the system through queries and relationship traversal
+title: System Object Discovery Guide
+updated_at: "2026-09-17T08:44:48Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

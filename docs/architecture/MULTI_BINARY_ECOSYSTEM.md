@@ -51,7 +51,7 @@ Use **`zqk-admin`** when:
 
 You do **not** need `zqk-admin` for ordinary `object …` CRUD; both binaries share that surface.
 
-Elevated access (`object … --internal`) requires an Enterprise license **or** the `zqk-admin` binary (transitional carrier). The legacy `internal …` tree is **admin-binary-only**, deprecated in favor of `object … --internal` (DEC-REDACTED).
+Elevated access (`object … --internal`) requires an Enterprise license **or** the `zqk-admin` binary (transitional carrier). The legacy `internal …` tree is **admin-binary-only**, deprecated in favor of `object … --internal` (DEC-1785930071988960000-364a5796).
 
 ## Command execution model (unchanged)
 

@@ -310,7 +310,7 @@ func processIssueForAutoFix(fixCtx *AutoFixContext, issue Issue, registry storag
 		// unlink and wipes sole CAS objects when the object-id cache/index is wrong
 		// (00dd9c269e; 2026-08-18 GhostRef cohort). Quarantine via cleanup-duplicates
 		// or `zqk object delete --unlink-references` — never silent unlink of the file.
-		// TRACK: BLI-REDACTED
+		// TRACK: BLI-1785723654802038000-b14064bc
 		if strings.Contains(issue.Message, "Duplicate object ID") && issue.AutoFixable {
 			if fixCtx.AutoFix || fixCtx.Force {
 				return fmt.Sprintf("refused to auto-delete purported duplicate %s (%s); use cleanup-duplicates quarantine or zqk object delete --unlink-references", filepath.Base(fixCtx.FilePath), fixCtx.Kind)
@@ -335,7 +335,7 @@ func processIssueForAutoFix(fixCtx *AutoFixContext, issue Issue, registry storag
 // processReferenceIssue processes reference validation issues.
 // Prefer re-adding the target to the object-id cache when the file exists.
 // When the target is truly gone, unlink it from the referring object (do not invent a replacement).
-// TRACK: BLI-REDACTED
+// TRACK: BLI-1785786997399161000-76ea6811
 func processReferenceIssue(fixCtx *AutoFixContext, issue Issue) string {
 	message := strings.ReplaceAll(issue.Message, "\n", " ")
 	if !strings.Contains(message, "does not exist") {
@@ -379,7 +379,7 @@ func processReferenceIssue(fixCtx *AutoFixContext, issue Issue) string {
 
 	// Target missing on disk: do not strip referrers from --auto-fix / SCH-AUTOFIX.
 	// Graph close is explicit: `zqk system kernel-integrity heal-dangling --apply` or --force.
-	// TRACK: BLI-REDACTED
+	// TRACK: BLI-1785723654802038000-b14064bc
 	if !fixCtx.Force {
 		return ""
 	}
@@ -472,7 +472,7 @@ func processDocumentationPolicyIssue(fixCtx *AutoFixContext, issue Issue) string
 }
 
 // processEmptyReferenceFieldIssue unsets empty *_ref / *_refs left after prior coerce/unlink.
-// TRACK: BLI-REDACTED
+// TRACK: BLI-1785786997399161000-76ea6811
 func processEmptyReferenceFieldIssue(fixCtx *AutoFixContext, issue Issue) string {
 	if !(fixCtx.AutoFix || fixCtx.Force) || fixCtx.Obj == nil || fixCtx.Obj.Properties == nil {
 		return ""
@@ -576,7 +576,7 @@ var (
 // processDuplicateReferenceIssue eliminates duplicate intra-object references.
 // For cross-field duplicates, it removes the reference from the less specific / redundant field.
 // For within-field duplicates, it deduplicates the list preserving the first occurrence.
-// TRACK: BLI-REDACTED
+// TRACK: BLI-1786121565703984000-627fbbdd
 func processDuplicateReferenceIssue(fixCtx *AutoFixContext, issue Issue) string {
 	if !(fixCtx.AutoFix || fixCtx.Force) || fixCtx.Obj == nil || fixCtx.Obj.Properties == nil {
 		return ""
@@ -880,7 +880,7 @@ func processInstanceValidationIssue(fixCtx *AutoFixContext, issue Issue, specFix
 	}
 	// Wall-clock clamp: apply in-memory (then cumulative applySpecFix). Do not use
 	// executeFixCommand — literal field=value commands are not supported there.
-	// TRACK: PRI-REDACTED
+	// TRACK: PRI-1785885772223315000-0649f401
 	if isWallClockClampIssue(issue) {
 		if msg := applyWallClockClampAutoFix(fixCtx, issue); msg != emptyValue {
 			return msg

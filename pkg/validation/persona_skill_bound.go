@@ -7,8 +7,8 @@ import (
 )
 
 // Canonical criteria id for CRI-PERSONA-SKILL-BOUND (MMORCH).
-// TRACK: BLI-REDACTED — keep in sync with kernel criteria object.
-const CriteriaIDPersonaSkillBound = "CRIT-REDACTED"
+// TRACK: BLI-1785904242062561000-ec024787 — keep in sync with kernel criteria object.
+const CriteriaIDPersonaSkillBound = "CRIT-1785904241054969000-a088a7d9"
 
 // PersonaSkillBoundResult is the CRI-PERSONA-SKILL-BOUND gate outcome for one persona.
 type PersonaSkillBoundResult struct {
@@ -23,7 +23,7 @@ type ASKResolver func(askID string) (obj map[string]any, err error)
 
 // EvaluatePersonaSkillBound checks CRI-PERSONA-SKILL-BOUND against a persona map.
 // Dual-reads agent_skill_refs and related_object_refs ASK-* until migration completes.
-// TRACK: BLI-REDACTED
+// TRACK: BLI-1785904242062561000-ec024787
 func EvaluatePersonaSkillBound(persona map[string]any, resolve ASKResolver) PersonaSkillBoundResult {
 	if persona == nil {
 		return PersonaSkillBoundResult{Bound: false, Missing: []string{"object"}}

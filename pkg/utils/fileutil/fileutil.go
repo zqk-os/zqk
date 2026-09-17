@@ -56,7 +56,11 @@ func WriteDurableFile(path string, data []byte, mode FileMode) error {
 	if err := Chmod(tmpPath, mode); err != nil {
 		return err
 	}
-	return RenameFile(tmpPath, path)
+	if err := RenameFile(tmpPath, path); err != nil {
+		return err
+	}
+	_ = SyncDir(dir)
+	return nil
 }
 
 // WriteDurableStandardFile writes data to a file with standard permissions (0644) and synchronous fsync.

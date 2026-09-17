@@ -9,6 +9,7 @@ import (
 	"github.com/lanceman/zqk/pkg/objects"
 	"github.com/lanceman/zqk/pkg/storage"
 	"github.com/lanceman/zqk/pkg/validation"
+	"github.com/lanceman/zqk/pkg/zqkenv"
 	"github.com/spf13/cobra"
 )
 
@@ -76,6 +77,13 @@ func applyNamespaceBoundaries(cmd *cobra.Command, filters map[string]any) Namesp
 		return scope
 	}
 
+	if zqkenv.IsCommunityEdition {
+		scope.Mode = namespaceScopeModeFederated
+		scope.IsolationActive = false
+		scope.NamespaceScope = ""
+		return scope
+	}
+
 	filters[objects.FieldKeyNamespaceID] = validation.DefaultNamespaceKernel
 	return scope
 }
@@ -99,7 +107,15 @@ func attachNamespaceScopeMeta(meta map[string]any, scope NamespaceQueryScope) ma
 // enrichHiddenOutsideScope counts objects outside the applied namespace filter
 // when isolation is active. Best-effort; errors leave HiddenOutsideScope unset.
 func enrichHiddenOutsideScope(proc *cli.Processor, kind string, filters map[string]any, scopedCount int, scope *NamespaceQueryScope) {
-	if proc == nil || scope == nil || !scope.IsolationActive || kind == "" {
+	if scope == nil || kind == "" {
+		return
+	}
+	zero := 0
+	if !scope.IsolationActive {
+		scope.HiddenOutsideScope = &zero
+		return
+	}
+	if proc == nil {
 		return
 	}
 	unscoped := maps.Clone(filters)
@@ -111,10 +127,13 @@ func enrichHiddenOutsideScope(proc *cli.Processor, kind string, filters map[stri
 		Kind:    kind,
 		Filters: unscoped,
 	})
-	if err != nil || total <= scopedCount {
+	if err != nil {
 		return
 	}
 	hidden := total - scopedCount
+	if hidden < 0 {
+		hidden = 0
+	}
 	scope.HiddenOutsideScope = &hidden
 }
 

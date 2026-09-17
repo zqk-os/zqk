@@ -1,6 +1,7 @@
 package swarm
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/lanceman/zqk/pkg/llm"
@@ -68,9 +69,56 @@ func ShouldNarrowToWriteMenu(needEvidence bool, history []ToolCallRecord) bool {
 	return needEvidence && UnpaidLookupStreak(history) >= unpaidLookupBudget
 }
 
+// ReadLoopWatchdogThreshold is the maximum consecutive non-mutation tool calls
+// before the Technical Lead watchdog intervenes to force code mutation.
+const ReadLoopWatchdogThreshold = 10
+
+// RepeatedPathReadThreshold is the number of consecutive reads of the same target
+// with identical arguments before the Technical Lead watchdog trips.
+const RepeatedPathReadThreshold = 3
+
+// CheckReadLoopWatchdog inspects recent tool call records for repetitive read looping
+// or mutation starvation. Returns (tripped bool, reason string).
+func CheckReadLoopWatchdog(history []ToolCallRecord) (bool, string) {
+	if len(history) == 0 {
+		return false, ""
+	}
+
+	lastRec := history[len(history)-1]
+	// Check identical consecutive argument calls (e.g. repeated read_code on same file)
+	args := strings.TrimSpace(lastRec.Arguments)
+	if !IsMutationEvidenceTool(lastRec.Name) && args != "" && args != "{}" {
+		consecutiveSameArgs := 1
+		for i := len(history) - 2; i >= 0; i-- {
+			if history[i].Name == lastRec.Name && strings.TrimSpace(history[i].Arguments) == args {
+				consecutiveSameArgs++
+				if consecutiveSameArgs >= RepeatedPathReadThreshold {
+					return true, fmt.Sprintf("Technical Lead Watchdog: detected %d repeated calls to %s with identical arguments. Code exploration loop blocked; proceed directly to code mutation (write_code / write_file).", consecutiveSameArgs, lastRec.Name)
+				}
+			} else {
+				break
+			}
+		}
+	}
+
+	streak := UnpaidLookupStreak(history)
+	if streak >= ReadLoopWatchdogThreshold {
+		return true, fmt.Sprintf("Technical Lead Watchdog: consecutive non-mutation tool streak reached %d (limit %d). Further reading blocked; implement changes immediately via write_code or write_file.", streak, ReadLoopWatchdogThreshold)
+	}
+
+	return false, ""
+}
+
 // ShouldForceWriteOnly reports that only write_code/write_file stay on the wire.
 func ShouldForceWriteOnly(needEvidence bool, history []ToolCallRecord) bool {
-	return needEvidence && UnpaidLookupStreak(history) >= unpaidLookupForceWrite
+	if !needEvidence {
+		return false
+	}
+	if UnpaidLookupStreak(history) >= unpaidLookupForceWrite {
+		return true
+	}
+	tripped, _ := CheckReadLoopWatchdog(history)
+	return tripped
 }
 
 func unpaidLookupNudge() string {

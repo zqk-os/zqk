@@ -4,7 +4,7 @@
 
 
 **Policy / decision:** `GLS-ENV-BREAKGLASS-ANTIPATTERN-001`, `DEC-ENV-BREAKGLASS-TO-SIGNED-LOGIN-001`  
-**Tech-debt CVS:** `CVS-REDACTED`  
+**Tech-debt CVS:** `CVS-1786418656116005000-2e9337d4`  
 **BLI:** `BLI-ENV-BREAKGLASS-INVENTORY-001` → removal `BLI-ENV-BREAKGLASS-REMOVE-001`  
 **Target:** signed per-ACC login — `BLI-SIGNED-ACC-LOGIN-NO-BLEED-001`  
 **Snapshot date:** 2026-08-11 (repo scan of `pkg/zqkenv` + call sites)

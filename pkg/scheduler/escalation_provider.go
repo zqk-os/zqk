@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"os"
 	"path/filepath"
 	"runtime"
 	"sort"
@@ -16,6 +17,7 @@ import (
 	"github.com/lanceman/zqk/pkg/execwrap"
 	"github.com/lanceman/zqk/pkg/paths"
 	"github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/lanceman/zqk/pkg/zqkenv"
 )
 
 // Compile-time interface checks
@@ -207,6 +209,78 @@ func (p *WebhookEscalationProvider) Escalate(ctx context.Context, notice Escalat
 		return fmt.Errorf("webhook rejected with status %d: %s", resp.StatusCode, string(respBody))
 	}
 	return nil
+}
+
+// ResolveSlackWebhookURL resolves the Slack incoming webhook URL for CAP escalations and scheduler alerts.
+// It checks environment variables (ZQK_AGENT_WEBHOOK_SLACK_ALL_AGENT_FARM, SLACK_WEBHOOK_URL, ESCALATION_SLACK_WEBHOOK_URL),
+// .zqk/config/escalation.json, .zqk/config/agent_git_identity.env, and the project root .env,
+// stripping surrounding whitespace and quotes.
+func ResolveSlackWebhookURL(projectRoot string) string {
+	// 1. Check environment variables
+	if url := zqkenv.AgentWebhookSlackAllAgentFarm().Get(); strings.TrimSpace(url) != "" {
+		return strings.Trim(strings.TrimSpace(url), "\"'")
+	}
+	if url := os.Getenv("SLACK_WEBHOOK_URL"); strings.TrimSpace(url) != "" {
+		return strings.Trim(strings.TrimSpace(url), "\"'")
+	}
+	if url := os.Getenv("ESCALATION_SLACK_WEBHOOK_URL"); strings.TrimSpace(url) != "" {
+		return strings.Trim(strings.TrimSpace(url), "\"'")
+	}
+
+	// 2. Check .zqk/config/escalation.json
+	if projectRoot != "" {
+		configPath := filepath.Join(projectRoot, paths.ProjectDataDir, "config", "escalation.json")
+		if data, err := fileutil.ReadFile(configPath); err == nil {
+			var config struct {
+				SlackWebhookURL string `json:"slack_webhook_url"`
+			}
+			if json.Unmarshal(data, &config) == nil && strings.TrimSpace(config.SlackWebhookURL) != "" {
+				return strings.Trim(strings.TrimSpace(config.SlackWebhookURL), "\"'")
+			}
+		}
+
+		// 3. Check .zqk/config/agent_git_identity.env
+		identityPath := filepath.Join(projectRoot, paths.ProjectDataDir, "config", "agent_git_identity.env")
+		if data, err := fileutil.ReadFile(identityPath); err == nil {
+			for _, line := range strings.Split(string(data), "\n") {
+				line = strings.TrimSpace(line)
+				if strings.HasPrefix(line, "ZQK_AGENT_WEBHOOK_SLACK_ALL_AGENT_FARM=") {
+					val := strings.TrimSpace(strings.TrimPrefix(line, "ZQK_AGENT_WEBHOOK_SLACK_ALL_AGENT_FARM="))
+					if val != "" {
+						return strings.Trim(val, "\"'")
+					}
+				}
+				if strings.HasPrefix(line, "SLACK_WEBHOOK_URL=") {
+					val := strings.TrimSpace(strings.TrimPrefix(line, "SLACK_WEBHOOK_URL="))
+					if val != "" {
+						return strings.Trim(val, "\"'")
+					}
+				}
+			}
+		}
+
+		// 4. Check projectRoot .env
+		envPath := filepath.Join(projectRoot, ".env")
+		if data, err := fileutil.ReadFile(envPath); err == nil {
+			for _, line := range strings.Split(string(data), "\n") {
+				line = strings.TrimSpace(line)
+				if strings.HasPrefix(line, "ZQK_AGENT_WEBHOOK_SLACK_ALL_AGENT_FARM=") {
+					val := strings.TrimSpace(strings.TrimPrefix(line, "ZQK_AGENT_WEBHOOK_SLACK_ALL_AGENT_FARM="))
+					if val != "" {
+						return strings.Trim(val, "\"'")
+					}
+				}
+				if strings.HasPrefix(line, "SLACK_WEBHOOK_URL=") {
+					val := strings.TrimSpace(strings.TrimPrefix(line, "SLACK_WEBHOOK_URL="))
+					if val != "" {
+						return strings.Trim(val, "\"'")
+					}
+				}
+			}
+		}
+	}
+
+	return ""
 }
 
 // MacOSNotificationProvider displays a native macOS desktop notification banner with sound.

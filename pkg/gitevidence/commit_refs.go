@@ -1,7 +1,7 @@
 // Package gitevidence fail-closes backlog complete claims that cite empty or
 // unrelated git SHAs (merge theater, .zqk/process-only CAS renames).
 //
-// TRACK: BLI-REDACTED — reopen false-COMPLETE OPENCORE evidence lane.
+// TRACK: BLI-1787131824765736000-312b6c71 — reopen false-COMPLETE OPENCORE evidence lane.
 package gitevidence
 
 import (

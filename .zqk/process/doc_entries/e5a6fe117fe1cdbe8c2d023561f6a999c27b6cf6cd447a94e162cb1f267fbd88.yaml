@@ -1,0 +1,22 @@
+category: graph-backend
+content_hash: 29a2be13f4add3258436717a69a5508692f004d0d9fbe6ba9c1e2bbf35434b40
+content_searchable: true
+content_size: 1733
+created_at: "2026-09-17T08:42:12Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-126
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/GRAPH_SPEC_DERIVED_INDEXES.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: Object specs under .zqk/specs/objects/ are the single schema plane
+title: Graph indexes derived from object specs
+updated_at: "2026-09-17T08:42:12Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

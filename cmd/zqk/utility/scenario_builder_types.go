@@ -30,7 +30,7 @@ const (
 	scenarioBuilderSourceBuiltIn   = "built-in"
 	scenarioBuilderKindScenario    = objects.KindScenario
 	scenarioBuilderKindBacklogItem = objects.KindBacklogItem
-	scenarioBuilderAccountSystem   = "ACC-1785920548450214012-68b850c0"
+	scenarioBuilderAccountSystem   = objects.DefaultSystemAccountID
 	scenarioBuilderOriginZQK       = "zqk"
 )
 

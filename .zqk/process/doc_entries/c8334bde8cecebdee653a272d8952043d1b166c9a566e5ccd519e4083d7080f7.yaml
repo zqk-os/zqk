@@ -1,0 +1,22 @@
+category: architecture
+content_hash: 7591e7753b6c3de5f02220a5b8892a18c6b46b35a00699edc66c23aee91b2cf3
+content_searchable: true
+content_size: 5033
+created_at: "2026-09-17T08:44:14Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-329
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/WAL_AND_STATE_FILES.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: '--- | File (on disk) | Checkpoint | Purpose | |----------------|------------|---------| | object.wal | object.wal.checkpoint | Object write-behind: create/update/delete records before background pe...'
+title: 'WAL and State Files: Naming and Cleanup'
+updated_at: "2026-09-17T08:44:14Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

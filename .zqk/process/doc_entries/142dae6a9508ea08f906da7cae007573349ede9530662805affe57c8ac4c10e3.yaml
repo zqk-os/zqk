@@ -1,0 +1,22 @@
+category: architecture
+content_hash: 1fcba50b420c2fa2b0a38aa26b6fce5f377ea5dc715f5d3764cc85c527f607c3
+content_searchable: true
+content_size: 10898
+created_at: "2026-09-17T08:39:35Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-077
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/CONSTANTS_AND_DRY_INVENTORY_PLAN.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: '--- | Location | Contents | |----------|----------| | pkg/paths/constants.go | ProjectDataDir, CacheDir, file names (ValidationCacheFile, etc.), LockFileSuffix, TmpFileSuffix, extensions, DirPerm75...'
+title: Constants and DRY Inventory Plan
+updated_at: "2026-09-17T08:39:35Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

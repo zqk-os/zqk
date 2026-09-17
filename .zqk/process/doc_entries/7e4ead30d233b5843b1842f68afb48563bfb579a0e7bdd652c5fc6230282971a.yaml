@@ -1,0 +1,22 @@
+category: architecture
+content_hash: cc095380b158e7396d1e49268bdcc33109dfb3695462449713a1b763f4e90d8a
+content_searchable: true
+content_size: 6936
+created_at: "2026-09-17T08:44:07Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-280
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/SNAPSHOT_SEQUENCE_FORMAT_ENHANCEMENT.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: The compressed snapshot format currently uses dictionary compression with field references
+title: Snapshot Sequence Format Enhancement
+updated_at: "2026-09-17T08:44:07Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

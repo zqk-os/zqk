@@ -18,7 +18,7 @@ import (
 )
 
 // NewRefCmd creates the top-level 'object ref' command.
-// TRACK: REQ-REDACTED / BLI-REDACTED
+// TRACK: REQ-1789166976332116000-7fb91b3a / BLI-1789167120582788000-84acf011
 func NewRefCmd() *cobra.Command {
 	cmd := bldr_cli_cmd_v1.NewObjectRefCommandBuilder()
 	cmd.AddCommand(NewRefAddCmd())
@@ -67,210 +67,239 @@ func runRefAdd(cmd *cobra.Command, args []string) error {
 			updates := make(map[string]any)
 			var associatedLivePlanID string
 
-		for _, rawTarget := range targetRawIDs {
-			targetID, err := proc.ResolveSemanticArgument(proc.OperationContext(), "", rawTarget)
-			if err != nil {
-				return cli.Guard(cmd).Err(errfmt.Errorf("failed to resolve target ID %s: %w", rawTarget, err)).Return()
-			}
+			for _, rawTarget := range targetRawIDs {
+				targetID, err := proc.ResolveSemanticArgument(proc.OperationContext(), "", rawTarget)
+				if err != nil {
+					return cli.Guard(cmd).Err(errfmt.Errorf("failed to resolve target ID %s: %w", rawTarget, err)).Return()
+				}
 
-			// Self-reference check
-			if sourceID == targetID {
-				return cli.Guard(cmd).Err(errfmt.Errorf("cannot reference self (%s)", sourceID)).Return()
-			}
+				// Self-reference check
+				if sourceID == targetID {
+					return cli.Guard(cmd).Err(errfmt.Errorf("cannot reference self (%s)", sourceID)).Return()
+				}
 
-			// Read target object to verify existence and kind
-			targetObj, err := proc.Storage().Read(proc.OperationContext(), proc.SecurityContext(), targetID)
-			if err != nil {
-				return cli.Guard(cmd).Err(errfmt.Errorf("target object %s not found: %w", targetID, err)).Return()
-			}
-			targetKind, _ := targetObj[objects.FieldKeyKind].(string)
+				// Read target object to verify existence and kind
+				targetObj, err := proc.Storage().Read(proc.OperationContext(), proc.SecurityContext(), targetID)
+				if err != nil {
+					return cli.Guard(cmd).Err(errfmt.Errorf("target object %s not found: %w", targetID, err)).Return()
+				}
+				targetKind, _ := targetObj[objects.FieldKeyKind].(string)
 
-			// Check if this is an inverted relationship where target owns ref to source
-			// e.g. source is priority_plan, target is backlog_item (which has priority_plan_ref)
-			if explicitField == "" && !hasSpecificRefField(sourceSpec, sourceObj, targetKind) {
-				targetSpec := loadSpecForKind(targetKind)
-				if hasSpecificRefField(targetSpec, targetObj, sourceKind) {
-					invField, invIsSlice := resolveSpecificRefField(targetSpec, targetObj, sourceKind)
+				// Check if this is an inverted relationship where target owns ref to source
+				// e.g. source is priority_plan, target is backlog_item (which has priority_plan_ref)
+				if explicitField == "" && !hasSpecificRefField(sourceSpec, sourceObj, targetKind) {
+					targetSpec := loadSpecForKind(targetKind)
+					if hasSpecificRefField(targetSpec, targetObj, sourceKind) {
+						invField, invIsSlice := resolveSpecificRefField(targetSpec, targetObj, sourceKind)
 
-					// Cross-plane validation: CAS target cannot reference draft-plane source
-					targetIsDraftOnly := storage.IsDraftPlaneOnly(proc.ProjectRoot(), targetKind, targetID)
-					sourceIsDraftOnly := storage.IsDraftPlaneOnly(proc.ProjectRoot(), sourceKind, sourceID)
-					if !targetIsDraftOnly && sourceIsDraftOnly {
-						return cli.Guard(cmd).Err(errfmt.Errorf("association denied: CAS object %s (%s) cannot reference draft-plane object %s (%s); cross-plane references prohibited", targetID, targetKind, sourceID, sourceKind)).Return()
+						// Cross-plane validation: CAS target cannot reference draft-plane source
+						targetIsDraftOnly := storage.IsDraftPlaneOnly(proc.ProjectRoot(), targetKind, targetID)
+						sourceIsDraftOnly := storage.IsDraftPlaneOnly(proc.ProjectRoot(), sourceKind, sourceID)
+						if !targetIsDraftOnly && sourceIsDraftOnly {
+							return cli.Guard(cmd).Err(errfmt.Errorf("association denied: CAS object %s (%s) cannot reference draft-plane object %s (%s); cross-plane references prohibited", targetID, targetKind, sourceID, sourceKind)).Return()
+						}
+
+						// Scope-lock and terminal checks on source (plan)
+						statusRole := objects.GetGlobalStatusChecker()
+						targetStatus, _ := targetObj[objects.FieldKeyStatus].(string)
+						if statusRole.Role(targetKind, targetStatus) == objects.LifecycleRoleTerminal {
+							return cli.Guard(cmd).Err(errfmt.Errorf("association denied: %s %s is in terminal status %s", targetKind, targetID, targetStatus)).Return()
+						}
+						sourceStatus, _ := sourceObj[objects.FieldKeyStatus].(string)
+						if statusRole.Role(sourceKind, sourceStatus) == objects.LifecycleRoleTerminal {
+							return cli.Guard(cmd).Err(errfmt.Errorf("association denied: %s %s is in terminal status %s", sourceKind, sourceID, sourceStatus)).Return()
+						}
+						if sourceKind == objects.KindPriorityPlan && (sourceStatus == objects.ObjectStatusInProgress || sourceStatus == objects.ObjectStatusActive) {
+							if !override {
+								return cli.Guard(cmd).Err(errfmt.Errorf("association denied: priority plan %s is '%s' (sealed / execution-facing); open a grooming plan for new work instead of stuffing the locked column", sourceID, sourceStatus)).Return()
+							}
+							if reasonCode == "" {
+								return cli.Guard(cmd).Require(false, "--reason-code is required when using --override on sealed priority plans").Return()
+							}
+							associatedLivePlanID = sourceID
+						}
+
+						targetUpdates := make(map[string]any)
+						if invIsSlice {
+							currentSlice := getRefSlice(targetObj, nil, invField)
+							alreadyPresent := false
+							for _, item := range currentSlice {
+								if item == sourceID {
+									alreadyPresent = true
+									break
+								}
+							}
+							if !alreadyPresent {
+								currentSlice = append(currentSlice, sourceID)
+								targetUpdates[invField] = stringSliceToAny(currentSlice)
+							}
+						} else {
+							currentVal := getRefScalar(targetObj, nil, invField)
+							if currentVal != "" && currentVal != sourceID {
+								return cli.Guard(cmd).Err(errfmt.Errorf("cannot overwrite scalar reference '%s' on %s (currently pointing to %s); remove existing reference first", invField, targetID, currentVal)).Return()
+							}
+							targetUpdates[invField] = sourceID
+						}
+
+						if len(targetUpdates) > 0 {
+							cleanLegacyKeys(targetObj, targetUpdates)
+							updateCtx := proc.OperationContext()
+							if override {
+								rc := reasonCode
+								if rc == "" {
+									rc = "cli object ref add --override"
+								}
+								updateCtx = pkgctx.WithLifecycleBreakGlass(updateCtx, rc)
+								if storage.IsCoreKernelKind(targetKind) {
+									coreCtx, coreErr := withCoreDeleteReasonFromFlags(cmd, updateCtx)
+									if coreErr != nil {
+										return cli.Guard(cmd).Err(coreErr).Return()
+									}
+									updateCtx = coreCtx
+								}
+							}
+							if err := proc.Storage().Update(updateCtx, proc.SecurityContext(), targetID, targetUpdates); err != nil {
+								return cli.Guard(cmd).Err(errfmt.Errorf("failed to link %s to %s: %w", targetID, sourceID, err)).Return()
+							}
+							if sourceKind == objects.KindPriorityPlan {
+								lifecycle.NoteOpenCountableMemberEntered(proc.OperationContext(), proc.Storage(), sourceID)
+							}
+							_ = storage.FlushListingIndexForProjectRoot(proc.ProjectRoot(), targetKind)
+							_ = storage.FlushListingIndexForProjectRoot(proc.ProjectRoot(), sourceKind)
+							proc.TriggerCacheFreshnessCheck("ref_add", []string{targetKind, sourceKind})
+
+							msg := fmt.Sprintf("✓ Successfully linked %s %s to %s %s", targetKind, targetID, sourceKind, sourceID)
+							logging.FluentEvent(proc.Logger()).Info(msg).Log()
+							cmd.Println(msg)
+						} else {
+							cmd.Printf("Reference %s -> %s is already up to date (idempotent).\n", targetID, sourceID)
+						}
+						continue
 					}
+				}
 
-					// Scope-lock and terminal checks on source (plan)
+				// Resolve reference field and whether it is a slice or scalar
+				targetField := explicitField
+				isSlice := false
+				if targetField != "" {
+					isSlice = isSliceField(sourceSpec, sourceObj, targetField)
+				} else {
+					var resolveErr error
+					targetField, isSlice, resolveErr = resolveRefFieldForTarget(sourceSpec, sourceObj, targetKind, targetID)
+					if resolveErr != nil {
+						return cli.Guard(cmd).Err(resolveErr).Return()
+					}
+				}
+
+				// Cross-plane validation: CAS source cannot reference draft-plane target
+				sourceIsDraftOnly := storage.IsDraftPlaneOnly(proc.ProjectRoot(), sourceKind, sourceID)
+				targetIsDraftOnly := storage.IsDraftPlaneOnly(proc.ProjectRoot(), targetKind, targetID)
+				if !sourceIsDraftOnly && targetIsDraftOnly {
+					return cli.Guard(cmd).Err(errfmt.Errorf("association denied: CAS object %s (%s) cannot reference draft-plane object %s (%s); cross-plane references prohibited", sourceID, sourceKind, targetID, targetKind)).Return()
+				}
+
+				// Sealed Priority Plan Scope-Lock Gate (BLI-1789167113049711000-359f8a8c)
+				if targetField == objects.FieldKeyPriorityPlanRef || targetKind == objects.KindPriorityPlan {
 					statusRole := objects.GetGlobalStatusChecker()
-					targetStatus, _ := targetObj[objects.FieldKeyStatus].(string)
-					if statusRole.Role(targetKind, targetStatus) == objects.LifecycleRoleTerminal {
-						return cli.Guard(cmd).Err(errfmt.Errorf("association denied: %s %s is in terminal status %s", targetKind, targetID, targetStatus)).Return()
-					}
 					sourceStatus, _ := sourceObj[objects.FieldKeyStatus].(string)
 					if statusRole.Role(sourceKind, sourceStatus) == objects.LifecycleRoleTerminal {
 						return cli.Guard(cmd).Err(errfmt.Errorf("association denied: %s %s is in terminal status %s", sourceKind, sourceID, sourceStatus)).Return()
 					}
-					if sourceKind == objects.KindPriorityPlan && (sourceStatus == objects.ObjectStatusInProgress || sourceStatus == objects.ObjectStatusActive) {
+					targetStatus, _ := targetObj[objects.FieldKeyStatus].(string)
+					if statusRole.Role(objects.KindPriorityPlan, targetStatus) == objects.LifecycleRoleTerminal {
+						return cli.Guard(cmd).Err(errfmt.Errorf("association denied: priority plan %s is in terminal status %s", targetID, targetStatus)).Return()
+					}
+					if targetStatus == objects.ObjectStatusInProgress || targetStatus == objects.ObjectStatusActive {
 						if !override {
-							return cli.Guard(cmd).Err(errfmt.Errorf("association denied: priority plan %s is '%s' (sealed / execution-facing); open a grooming plan for new work instead of stuffing the locked column", sourceID, sourceStatus)).Return()
+							return cli.Guard(cmd).Err(errfmt.Errorf("association denied: priority plan %s is '%s' (sealed / execution-facing); open a grooming plan for new work instead of stuffing the locked column", targetID, targetStatus)).Return()
 						}
 						if reasonCode == "" {
 							return cli.Guard(cmd).Require(false, "--reason-code is required when using --override on sealed priority plans").Return()
 						}
-						associatedLivePlanID = sourceID
+						associatedLivePlanID = targetID
+					}
+				}
+
+				// Traversal and Cycle Prevention for related_object_refs (BLI-1789167127826190000-f5e59d20)
+				if targetField == objects.FieldKeyRelatedObjectRefs {
+					// 1. Redundancy check: target must not already be present in typed reference fields
+					if typedField := findInTypedRefFields(sourceObj, updates, targetID); typedField != "" {
+						return cli.Guard(cmd).Err(errfmt.Errorf("association denied: target %s is already referenced in typed field '%s'; redundant reference in related_object_refs prohibited", targetID, typedField)).Return()
 					}
 
-					targetUpdates := make(map[string]any)
-					if invIsSlice {
-						currentSlice := getRefSlice(targetObj, nil, invField)
-						alreadyPresent := false
-						for _, item := range currentSlice {
-							if item == sourceID {
-								alreadyPresent = true
-								break
+					// 2. Direct cycle check: target must not already reference source
+					if targetRelated, ok := targetObj[objects.FieldKeyRelatedObjectRefs].([]any); ok {
+						for _, r := range targetRelated {
+							if rs, ok := r.(string); ok && rs == sourceID {
+								return cli.Guard(cmd).Err(errfmt.Errorf("cycle detected: target %s already references %s in related_object_refs; bidirectional cycle prohibited", targetID, sourceID)).Return()
 							}
 						}
-						if !alreadyPresent {
-							currentSlice = append(currentSlice, sourceID)
-							targetUpdates[invField] = stringSliceToAny(currentSlice)
-						}
-					} else {
-						currentVal := getRefScalar(targetObj, nil, invField)
-						if currentVal != "" && currentVal != sourceID {
-							return cli.Guard(cmd).Err(errfmt.Errorf("cannot overwrite scalar reference '%s' on %s (currently pointing to %s); remove existing reference first", invField, targetID, currentVal)).Return()
-						}
-						targetUpdates[invField] = sourceID
 					}
 
-					if len(targetUpdates) > 0 {
-						cleanLegacyKeys(targetObj, targetUpdates)
-						updateCtx := proc.OperationContext()
-						if err := proc.Storage().Update(updateCtx, proc.SecurityContext(), targetID, targetUpdates); err != nil {
-							return cli.Guard(cmd).Err(errfmt.Errorf("failed to link %s to %s: %w", targetID, sourceID, err)).Return()
-						}
-						if sourceKind == objects.KindPriorityPlan {
-							lifecycle.NoteOpenCountableMemberEntered(proc.OperationContext(), proc.Storage(), sourceID)
-						}
-						_ = storage.FlushListingIndexForProjectRoot(proc.ProjectRoot(), targetKind)
-						_ = storage.FlushListingIndexForProjectRoot(proc.ProjectRoot(), sourceKind)
-						proc.TriggerCacheFreshnessCheck("ref_add", []string{targetKind, sourceKind})
-
-						msg := fmt.Sprintf("✓ Successfully linked %s %s to %s %s", targetKind, targetID, sourceKind, sourceID)
-						logging.FluentEvent(proc.Logger()).Info(msg).Log()
-						cmd.Println(msg)
-					} else {
-						cmd.Printf("Reference %s -> %s is already up to date (idempotent).\n", targetID, sourceID)
+					// 3. Transitive cycle detection up to depth 5
+					if hasTransitiveCycle(proc.OperationContext(), proc.SecurityContext(), proc.Storage(), targetID, sourceID, 5) {
+						return cli.Guard(cmd).Err(errfmt.Errorf("cycle detected: adding %s to %s.related_object_refs creates a cycle across transitive links", targetID, sourceID)).Return()
 					}
-					continue
-				}
-			}
-
-			// Resolve reference field and whether it is a slice or scalar
-			targetField := explicitField
-			isSlice := false
-			if targetField != "" {
-				isSlice = isSliceField(sourceSpec, sourceObj, targetField)
-			} else {
-				var resolveErr error
-				targetField, isSlice, resolveErr = resolveRefFieldForTarget(sourceSpec, sourceObj, targetKind, targetID)
-				if resolveErr != nil {
-					return cli.Guard(cmd).Err(resolveErr).Return()
-				}
-			}
-
-			// Cross-plane validation: CAS source cannot reference draft-plane target
-			sourceIsDraftOnly := storage.IsDraftPlaneOnly(proc.ProjectRoot(), sourceKind, sourceID)
-			targetIsDraftOnly := storage.IsDraftPlaneOnly(proc.ProjectRoot(), targetKind, targetID)
-			if !sourceIsDraftOnly && targetIsDraftOnly {
-				return cli.Guard(cmd).Err(errfmt.Errorf("association denied: CAS object %s (%s) cannot reference draft-plane object %s (%s); cross-plane references prohibited", sourceID, sourceKind, targetID, targetKind)).Return()
-			}
-
-			// Sealed Priority Plan Scope-Lock Gate (BLI-REDACTED)
-			if targetField == objects.FieldKeyPriorityPlanRef || targetKind == objects.KindPriorityPlan {
-				statusRole := objects.GetGlobalStatusChecker()
-				sourceStatus, _ := sourceObj[objects.FieldKeyStatus].(string)
-				if statusRole.Role(sourceKind, sourceStatus) == objects.LifecycleRoleTerminal {
-					return cli.Guard(cmd).Err(errfmt.Errorf("association denied: %s %s is in terminal status %s", sourceKind, sourceID, sourceStatus)).Return()
-				}
-				targetStatus, _ := targetObj[objects.FieldKeyStatus].(string)
-				if statusRole.Role(objects.KindPriorityPlan, targetStatus) == objects.LifecycleRoleTerminal {
-					return cli.Guard(cmd).Err(errfmt.Errorf("association denied: priority plan %s is in terminal status %s", targetID, targetStatus)).Return()
-				}
-				if targetStatus == objects.ObjectStatusInProgress || targetStatus == objects.ObjectStatusActive {
-					if !override {
-						return cli.Guard(cmd).Err(errfmt.Errorf("association denied: priority plan %s is '%s' (sealed / execution-facing); open a grooming plan for new work instead of stuffing the locked column", targetID, targetStatus)).Return()
-					}
-					if reasonCode == "" {
-						return cli.Guard(cmd).Require(false, "--reason-code is required when using --override on sealed priority plans").Return()
-					}
-					associatedLivePlanID = targetID
-				}
-			}
-
-			// Traversal and Cycle Prevention for related_object_refs (BLI-REDACTED)
-			if targetField == objects.FieldKeyRelatedObjectRefs {
-				// 1. Redundancy check: target must not already be present in typed reference fields
-				if typedField := findInTypedRefFields(sourceObj, updates, targetID); typedField != "" {
-					return cli.Guard(cmd).Err(errfmt.Errorf("association denied: target %s is already referenced in typed field '%s'; redundant reference in related_object_refs prohibited", targetID, typedField)).Return()
 				}
 
-				// 2. Direct cycle check: target must not already reference source
-				if targetRelated, ok := targetObj[objects.FieldKeyRelatedObjectRefs].([]any); ok {
-					for _, r := range targetRelated {
-						if rs, ok := r.(string); ok && rs == sourceID {
-							return cli.Guard(cmd).Err(errfmt.Errorf("cycle detected: target %s already references %s in related_object_refs; bidirectional cycle prohibited", targetID, sourceID)).Return()
+				// Apply reference
+				if isSlice {
+					currentSlice := getRefSlice(sourceObj, updates, targetField)
+					alreadyPresent := false
+					for _, item := range currentSlice {
+						if item == targetID {
+							alreadyPresent = true
+							break
 						}
 					}
-				}
-
-				// 3. Transitive cycle detection up to depth 5
-				if hasTransitiveCycle(proc.OperationContext(), proc.SecurityContext(), proc.Storage(), targetID, sourceID, 5) {
-					return cli.Guard(cmd).Err(errfmt.Errorf("cycle detected: adding %s to %s.related_object_refs creates a cycle across transitive links", targetID, sourceID)).Return()
-				}
-			}
-
-			// Apply reference
-			if isSlice {
-				currentSlice := getRefSlice(sourceObj, updates, targetField)
-				alreadyPresent := false
-				for _, item := range currentSlice {
-					if item == targetID {
-						alreadyPresent = true
-						break
+					if !alreadyPresent {
+						currentSlice = append(currentSlice, targetID)
+						updates[targetField] = stringSliceToAny(currentSlice)
 					}
+				} else {
+					currentVal := getRefScalar(sourceObj, updates, targetField)
+					if currentVal != "" && currentVal != targetID {
+						return cli.Guard(cmd).Err(errfmt.Errorf("cannot overwrite scalar reference '%s' (currently pointing to %s); remove existing reference first", targetField, currentVal)).Return()
+					}
+					updates[targetField] = targetID
 				}
-				if !alreadyPresent {
-					currentSlice = append(currentSlice, targetID)
-					updates[targetField] = stringSliceToAny(currentSlice)
-				}
-			} else {
-				currentVal := getRefScalar(sourceObj, updates, targetField)
-				if currentVal != "" && currentVal != targetID {
-					return cli.Guard(cmd).Err(errfmt.Errorf("cannot overwrite scalar reference '%s' (currently pointing to %s); remove existing reference first", targetField, currentVal)).Return()
-				}
-				updates[targetField] = targetID
 			}
+
+			if len(updates) == 0 {
+				cmd.Println("No reference changes required (idempotent).")
+				continue
+			}
+
+			cleanLegacyKeys(sourceObj, updates)
+			updateCtx := proc.OperationContext()
+			if override {
+				rc := reasonCode
+				if rc == "" {
+					rc = "cli object ref add --override"
+				}
+				updateCtx = pkgctx.WithLifecycleBreakGlass(updateCtx, rc)
+				if storage.IsCoreKernelKind(sourceKind) {
+					coreCtx, coreErr := withCoreDeleteReasonFromFlags(cmd, updateCtx)
+					if coreErr != nil {
+						return cli.Guard(cmd).Err(coreErr).Return()
+					}
+					updateCtx = coreCtx
+				}
+			}
+			err = proc.Storage().Update(updateCtx, proc.SecurityContext(), sourceID, updates)
+			if err != nil {
+				return cli.Guard(cmd).Err(errfmt.Errorf("failed to update references on %s: %w", sourceID, err)).Return()
+			}
+
+			if associatedLivePlanID != "" {
+				lifecycle.NoteOpenCountableMemberEntered(proc.OperationContext(), proc.Storage(), associatedLivePlanID)
+			}
+
+			msg := fmt.Sprintf("✓ Successfully added reference(s) to %s", sourceID)
+			logging.FluentEvent(proc.Logger()).Info(msg).Log()
+			cmd.Println(msg)
 		}
-
-		if len(updates) == 0 {
-			cmd.Println("No reference changes required (idempotent).")
-			continue
-		}
-
-		cleanLegacyKeys(sourceObj, updates)
-		err = proc.Storage().Update(proc.OperationContext(), proc.SecurityContext(), sourceID, updates)
-		if err != nil {
-			return cli.Guard(cmd).Err(errfmt.Errorf("failed to update references on %s: %w", sourceID, err)).Return()
-		}
-
-		if associatedLivePlanID != "" {
-			lifecycle.NoteOpenCountableMemberEntered(proc.OperationContext(), proc.Storage(), associatedLivePlanID)
-		}
-
-		msg := fmt.Sprintf("✓ Successfully added reference(s) to %s", sourceID)
-		logging.FluentEvent(proc.Logger()).Info(msg).Log()
-		cmd.Println(msg)
-	}
-	return nil
+		return nil
 	})(cmd, args)
 }
 
@@ -871,4 +900,3 @@ func cleanLegacyKeys(existingObj map[string]any, updates map[string]any) {
 		}
 	}
 }
-

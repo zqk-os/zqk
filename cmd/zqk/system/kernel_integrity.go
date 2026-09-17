@@ -23,7 +23,7 @@ import (
 
 // NewKernelIntegrityCmd reports Kernel Mutation Pipeline coverage and optional dangling-ref heal.
 // Command structure from .zqk/cli/specs/system/kernel_integrity_command.yaml (+ subcommands).
-// TRACK: BLI-REDACTED / BLI-REDACTED
+// TRACK: BLI-1785784868493840000-a8a0b4fc / BLI-1785786991961752000-a9d2f142
 func NewKernelIntegrityCmd() *cobra.Command {
 	cmd := bldr_cli_cmd_v1.NewKernelIntegrityCommandBuilder()
 	cmd.AddCommand(newKernelIntegrityReportCmd())
@@ -105,10 +105,10 @@ func runKernelIntegrityReport(cmd *cobra.Command, args []string) error {
 			CompositionOK:           compose.Default().Len() >= expected,
 			Docs:                    filepath.Join(paths.DocsDir, "architecture", "KERNEL_MUTATION_PIPELINE.md"),
 			ConvergenceSessions: []string{
-				"CVS-REDACTED",
-				"CVS-REDACTED",
+				"CVS-1785785017436434000-69ba5b9f",
+				"CVS-1785787008426153000-dcbc3e9f",
 			},
-			ConvergenceSession: "CVS-REDACTED",
+			ConvergenceSession: "CVS-1785787008426153000-dcbc3e9f",
 		}
 
 		lcDir := filepath.Join(proc.ProjectRoot(), paths.ProcessDir, "_internal", "lifecycles")

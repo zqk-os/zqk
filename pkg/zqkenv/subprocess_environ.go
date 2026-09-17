@@ -51,7 +51,9 @@ func SubprocessEnvironWithTestRoot(testRoot string) []string {
 		if strings.HasPrefix(e, childTR) {
 			continue
 		}
-		if strings.HasPrefix(e, "ZQK_SESSION=") || strings.HasPrefix(e, "ZQK_TEST_SESSION=") {
+		pfx := brand.EnvPrefix()
+		if strings.HasPrefix(e, "ZQK_SESSION=") || strings.HasPrefix(e, "ZQK_TEST_SESSION=") ||
+			(pfx != brand.DefaultEnvPrefix && (strings.HasPrefix(e, pfx+"_SESSION=") || strings.HasPrefix(e, pfx+"_TEST_SESSION="))) {
 			continue
 		}
 		out = append(out, e)

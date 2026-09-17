@@ -371,7 +371,7 @@ func stageTrigger(pctx *pipeline.Context, pl any) (any, error) {
 		}
 	}
 	// Durable contract-change outbox (async demote on kernel/scheduler start).
-	// TRACK: BLI-REDACTED
+	// TRACK: BLI-1785918841712163000-f128dc79
 	if !s.Opts.DryRun {
 		if err := contractchange.EmitForKind(s.Opts.ProjectRoot, s.Opts.Ontology, "spec_origin_trigger"); err != nil {
 			return nil, errfmt.Errorf("SPEC_ORIGIN_TRIGGER: contract-change emit: %w", err)

@@ -7,7 +7,7 @@ import (
 
 // StaticMockClient returns deterministic offline responses when the local/primary
 // LLM is unreachable and no secondary endpoint is configured.
-// TRACK: BLI-REDACTED
+// TRACK: BLI-1783631888120135000-843bc301
 type StaticMockClient struct{}
 
 const mockUnavailablePrefix = "[mock-fallback] "

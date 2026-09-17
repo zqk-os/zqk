@@ -1,0 +1,22 @@
+category: architecture
+content_hash: af0f114b819a9825a3727963b195278b03645600bcefbfc76779c76011027578
+content_searchable: true
+content_size: 6435
+created_at: "2026-09-17T08:44:25Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-407
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/display-length-constraints-v1.0.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: The display_length constraint specifies the recommended maximum character width for displaying field values in table formats
+title: Display Length Constraints
+updated_at: "2026-09-17T08:44:25Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

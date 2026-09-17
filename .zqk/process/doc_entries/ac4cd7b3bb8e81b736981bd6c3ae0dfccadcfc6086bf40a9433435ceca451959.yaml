@@ -1,0 +1,22 @@
+category: architecture
+content_hash: 4a62a03fcb62f3952d628337181c1ac2c8a1597af08c8df3a8fb1d75c740e6af
+content_searchable: true
+content_size: 2754
+created_at: "2026-09-17T08:44:34Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-478
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/mcp/RESOURCE_URI_SCHEMES.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: Resource URI scheme rules determine which URI scheme (e.g., file://, docs://, internal://) is used for resources based on their location
+title: Resource URI Scheme Configuration
+updated_at: "2026-09-17T08:44:34Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

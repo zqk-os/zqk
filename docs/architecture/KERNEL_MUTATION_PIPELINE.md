@@ -4,12 +4,12 @@
 
 
 **Status:** Active (v1 membrane complete; v2 composition in progress)  
-**Program (v1 membrane):** `PRI-REDACTED` — complete  
-**Program (v2 composition):** `PRI-REDACTED` (Kind-composed mutation pipelines)  
-**CVS (v2):** `CVS-REDACTED`  
+**Program (v1 membrane):** `PRI-1785784837719634000-c9473ae7` — complete  
+**Program (v2 composition):** `PRI-1785786954937568000-f7178275` (Kind-composed mutation pipelines)  
+**CVS (v2):** `CVS-1785787008426153000-dcbc3e9f`  
 **Glossary:** `GLS-1785787009880656000-b83ceca2` (Kind-Composed Mutation Pipeline); v1 `GLS-1785785028277485000-b6abe94b`  
 **Strategic context:** `SC-1785787009159086000-39210507`  
-**TRACK:** KMP2 BLIs under v2 PRI (`BLI-REDACTED` … `BLI-REDACTED`)
+**TRACK:** KMP2 BLIs under v2 PRI (`BLI-1785786990698372000-990e4f0f` … `BLI-1785786998830969000-3420af64`)
 
 ## Purpose
 
@@ -80,7 +80,7 @@ Go registry: [`pkg/kernelcas/kinds.go`](../../pkg/kernelcas/kinds.go). These **i
 
 `WithLifecycleBreakGlass` / DECIDE `plan=break_glass` with audited reason. Silent lifecycle skip for critical kinds is refused. Composed integrity overlays skip only when `pkgctx.IsLifecycleBreakGlass` (force **and** non-empty reason)—bare `WithForceLifecycleOverride` is not a policy bypass.
 
-**Hold invariant (fail-closed):** break-glass and trusted shockwave may skip auto-only *edge admission* (`IsValidTransition`), but storage always runs `ValidateLifecycle`, and the validator **still enforces** complete-status / transition **preconditions** for `backlog_item` and `priority_plan` (linked CRITs validated/complete; plan children terminal). Break-glass is not a second way to ignore the shockwave. TRACK: `BLI-REDACTED`.
+**Hold invariant (fail-closed):** break-glass and trusted shockwave may skip auto-only *edge admission* (`IsValidTransition`), but storage always runs `ValidateLifecycle`, and the validator **still enforces** complete-status / transition **preconditions** for `backlog_item` and `priority_plan` (linked CRITs validated/complete; plan children terminal). Break-glass is not a second way to ignore the shockwave. TRACK: `BLI-1785784867143912000-635942fb`.
 
 **When break-glass is still needed:** critical-kind DECIDE elevation (lifecycle updater auto-complete), audited CLI `--force`/`--override`, promote recover of undefined statuses. It is **not** required merely because an edge was formerly auto-only — dual `manual: true` + `auto: true` makes promote first-class (see `LIFECYCLE_STATUS_ROLES.md` § First-class promote).
 
@@ -135,4 +135,4 @@ Do **not** leave shims, wrappers, or “until migration” branches. Prefer brea
 
 **Membrane note:** File CUD, Graph CUD, and tx critical deletes enter `kernelcas` or `denyCoreKernelHardDelete`. Write-behind WAL for non-critical leaf kinds remains an intentional fast path. Critical-kind `--force` requires `--reason-code` (break_glass).
 - After KMP2-5: no `customRuleValidators` registrations for covered kinds  
-- CVS measure vs `desired_end_state` on `CVS-REDACTED`  
+- CVS measure vs `desired_end_state` on `CVS-1785787008426153000-dcbc3e9f`  

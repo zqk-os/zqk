@@ -10,7 +10,7 @@ current results. Pair it with **`./scripts/check-cli-spec-consistency.sh`**
 **Canonical source:** `.zqk/cli/specs/` is the sole authoring source. Generated
 builders are projections. `command_spec` (`CSPEC-*`) process objects are not a
 second authoring tree; the former `.zqk/process/command_specs/` directory has been
-removed. Create DNA with `zqk new command-spec`. See `DEC-REDACTED`.
+removed. Create DNA with `zqk new command-spec`. See `DEC-1786732826125502000-ef80a104`.
 
 **Baseline measured 2026-08-14:**
 - Loaded Cobra paths: 1,261 (includes dynamic kind commands excluded from the static gate)

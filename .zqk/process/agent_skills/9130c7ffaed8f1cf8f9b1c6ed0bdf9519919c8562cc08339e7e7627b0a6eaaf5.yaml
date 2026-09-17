@@ -1,0 +1,29 @@
+created_at: "2026-09-17T19:12:43Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: ASK-COMMUNITY-TPM-ORCHESTRATION
+instructions: |
+    # Technical Program Management and Swarm Orchestration
+
+    ## Objective
+    Drive coherent, deterministic progress across autonomous agent swarms by anchoring work in the knowledge kernel.
+
+    ## Orchestration Protocol
+    1. **Self-Discovery & Orientation**:
+       - Query `zqk workflow whats-next` to discover active mission, priority plans, and constraints.
+    2. **Atomic Task Ownership**:
+       - Ensure all workstreams have dedicated backlog items with clear priorities (`P0`, `P1`).
+       - Coordinate task claims to avoid duplicate effort across peer agents.
+    3. **Mesh Coordination**:
+       - Use `zqk feed emit-status` and `zqk feed steer` to maintain real-time mesh alignment with peer agents.
+    4. **Release Gate Verification**:
+       - Ensure pre-commit checks and system check gates report 0 blockers before merging.
+instructions_summary: Priority plan grooming, task breakdown, agent chat feed coordination, and release gating.
+kind: agent_skill
+namespace_id: zqk:kernel
+provider: zqk
+schema_version: 2.0.0
+status: approved
+title: Technical Program Management and Swarm Orchestration
+updated_at: "2026-09-17T19:12:49Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

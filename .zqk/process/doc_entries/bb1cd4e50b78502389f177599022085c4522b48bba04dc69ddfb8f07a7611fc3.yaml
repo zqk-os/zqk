@@ -1,0 +1,22 @@
+category: architecture
+content_hash: e412bf0bf3a28ba29e6ffce90a66335147c054c8477f91f1a2da1e1db8a72931
+content_searchable: true
+content_size: 4394
+created_at: "2026-09-17T08:44:46Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-566
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/spec-loading-order-v1.0.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: 'The current spec loading system loads specs recursively on-demand, but this approach has several issues: 1'
+title: Spec Loading Order and Trait Validation
+updated_at: "2026-09-17T08:44:46Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

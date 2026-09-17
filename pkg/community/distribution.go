@@ -3,10 +3,11 @@ package community
 import (
 	"crypto/sha256"
 	"encoding/hex"
+	"errors"
 	"fmt"
 	"io"
-	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
 
 	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
@@ -110,11 +111,11 @@ end
 
 // ComputeFileSHA256 returns the lowercase hex sha256 of the given file path.
 func ComputeFileSHA256(filePath string) (string, error) {
-	f, err := os.Open(filePath)
+	f, err := fileutil.OpenRead(filePath)
 	if err != nil {
 		return "", err
 	}
-	defer f.Close()
+	defer func() { _ = f.Close() }()
 
 	hasher := sha256.New()
 	if _, err := io.Copy(hasher, f); err != nil {
@@ -194,5 +195,21 @@ func VerifyHomebrewFormula(formulaPath, manifestPath string) error {
 		return fmt.Errorf("formula missing binary alias installation for zqk-community")
 	}
 
+	return nil
+}
+
+var releaseTagRegex = regexp.MustCompile(`^v(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-[0-9A-Za-z.-]+)?(?:\+[0-9A-Za-z.-]+)?$`)
+
+// ValidateReleaseTag asserts that a given release tag strictly conforms to standard SemVer with mandatory leading 'v'.
+func ValidateReleaseTag(tag string) error {
+	if tag == "" {
+		return errors.New("release tag cannot be empty")
+	}
+	if !strings.HasPrefix(tag, "v") {
+		return fmt.Errorf("release tag %q must start with 'v' prefix", tag)
+	}
+	if !releaseTagRegex.MatchString(tag) {
+		return fmt.Errorf("release tag %q is not a valid semantic version tag (expected format e.g. v2.9.4-rc1)", tag)
+	}
 	return nil
 }

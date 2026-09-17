@@ -1,0 +1,22 @@
+category: architecture
+content_hash: fd9066053333f352456db79b54a093aea6990a3bca1bf1386269a27e6eec3332
+content_searchable: true
+content_size: 5907
+created_at: "2026-09-17T08:44:31Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-436
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/high-volume-event-cache-concurrency.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: The HighVolumeEventCache follows established concurrency patterns from ObjectIDCache and the pkg/concurrency package
+title: High-Volume Event Cache Concurrency Pattern
+updated_at: "2026-09-17T08:44:31Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

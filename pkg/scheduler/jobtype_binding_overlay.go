@@ -92,7 +92,7 @@ func buildOverlayFromBindingObjects(bindingObjs []map[string]any, keys map[strin
 		// Fail closed: only active lifecycle bindings remaps dispatch. Proposed/draft/test
 		// fixtures (status=proposed) previously remapped all cache_prewarm → cache_invalidation
 		// and spammed desktop "no event data provided" failures.
-		// TRACK: BLI-REDACTED — CreateCASVisible must not leak fixtures into live kernel.
+		// TRACK: BLI-1785443942668406000-1ec5c811 — CreateCASVisible must not leak fixtures into live kernel.
 		status := strings.TrimSpace(fieldString(obj[objects.FieldKeyStatus]))
 		if status != objects.ObjectStatusActive && status != objects.ObjectStatusApproved && status != objects.ObjectStatusImplemented {
 			continue

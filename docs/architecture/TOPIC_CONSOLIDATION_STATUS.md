@@ -4,7 +4,7 @@
 **Status**: Active  
 **Last Updated**: 2026-09-10  
 **Phase**: Phase 3 (Topic Clusters Consolidation)  
-**Priority Plan**: PRI-REDACTED  
+**Priority Plan**: PRI-1788939347775008000-fe4ed80b  
 
 ---
 
@@ -18,7 +18,7 @@ Phase 3 establishes canonical topic specifications across the six primary archit
 
 ### 1. Content Addressable Storage (CAS) Architecture
 - **Canonical Specification**: `docs/architecture/CONTENT_ADDRESSABLE_STORAGE.md`
-- **Backlog Binding**: `BLI-REDACTED`
+- **Backlog Binding**: `BLI-1788939609823381000-a0ad4415`
 - **Criteria**: `CRIT-DOC-008`
 - **Consolidated Elements**:
   - File-based CAS SSOT with sha256 payload integrity hashing
@@ -31,7 +31,7 @@ Phase 3 establishes canonical topic specifications across the six primary archit
 
 ### 2. Command Line Interface (CLI) Architecture
 - **Canonical Specification**: `docs/architecture/CLI_ARCHITECTURE.md`
-- **Backlog Binding**: `BLI-REDACTED`
+- **Backlog Binding**: `BLI-1788939617735781000-0dd49235`
 - **Criteria**: `CRIT-DOC-008`
 - **Consolidated Elements**:
   - Cobra CLI framework integration
@@ -44,7 +44,7 @@ Phase 3 establishes canonical topic specifications across the six primary archit
 
 ### 3. Scheduler Architecture
 - **Canonical Specification**: `docs/architecture/SCHEDULER_ARCHITECTURE.md`
-- **Backlog Binding**: `BLI-REDACTED`
+- **Backlog Binding**: `BLI-1788939626928736000-20eb4bca`
 - **Criteria**: `CRIT-DOC-008`
 - **Consolidated Elements**:
   - Distributed job awareness and cron/daemon scheduling
@@ -55,7 +55,7 @@ Phase 3 establishes canonical topic specifications across the six primary archit
 
 ### 4. Goroutine Manager & Concurrency Patterns
 - **Canonical Specification**: `docs/architecture/GOROUTINE_MANAGER.md` & `CONCURRENCY_PATTERNS.md`
-- **Backlog Binding**: `BLI-REDACTED`
+- **Backlog Binding**: `BLI-1788939632023938000-635548ee`
 - **Criteria**: `CRIT-DOC-008`
 - **Consolidated Elements**:
   - Goroutine pool lifecycle management
@@ -66,7 +66,7 @@ Phase 3 establishes canonical topic specifications across the six primary archit
 
 ### 5. Object Taxonomy & System Objects Guide
 - **Canonical Specification**: `docs/onboarding/SYSTEM_OBJECTS_GUIDE.md`
-- **Backlog Binding**: `BLI-REDACTED`
+- **Backlog Binding**: `BLI-1788939636150033000-9901a160`
 - **Criteria**: `CRIT-DOC-008`
 - **Consolidated Elements**:
   - 8-tier object taxonomy framework (Foundation, Planning, Execution, Verification, Governance, Agentic, Operational, Observation)
@@ -77,7 +77,7 @@ Phase 3 establishes canonical topic specifications across the six primary archit
 
 ### 6. Test Coverage Policy & L-TESTING Rubric Alignment
 - **Canonical Specification**: `docs/testing/TEST_COVERAGE_POLICY.md`
-- **Backlog Binding**: `BLI-REDACTED`
+- **Backlog Binding**: `BLI-1788939640013182000-312e2d48`
 - **Criteria**: `CRIT-DOC-009`
 - **Consolidated Elements**:
   - Diagnostic signal posture aligned with L-TESTING 7-lens rubric
@@ -92,9 +92,9 @@ Phase 3 establishes canonical topic specifications across the six primary archit
 
 | Topic Cluster | Canonical Path | Backlog Item | Verification Status |
 |---|---|---|:---:|
-| CAS Architecture | `docs/architecture/CONTENT_ADDRESSABLE_STORAGE.md` | `BLI-REDACTED` | **Verified** |
-| CLI Architecture | `docs/architecture/CLI_ARCHITECTURE.md` | `BLI-REDACTED` | **Verified** |
-| Scheduler Architecture | `docs/architecture/SCHEDULER_ARCHITECTURE.md` | `BLI-REDACTED` | **Verified** |
-| Goroutine Manager | `docs/architecture/GOROUTINE_MANAGER.md` | `BLI-REDACTED` | **Verified** |
-| System Objects Guide | `docs/onboarding/SYSTEM_OBJECTS_GUIDE.md` | `BLI-REDACTED` | **Verified** |
-| Test Coverage Policy | `docs/testing/TEST_COVERAGE_POLICY.md` | `BLI-REDACTED` | **Verified** |
+| CAS Architecture | `docs/architecture/CONTENT_ADDRESSABLE_STORAGE.md` | `BLI-1788939609823381000-a0ad4415` | **Verified** |
+| CLI Architecture | `docs/architecture/CLI_ARCHITECTURE.md` | `BLI-1788939617735781000-0dd49235` | **Verified** |
+| Scheduler Architecture | `docs/architecture/SCHEDULER_ARCHITECTURE.md` | `BLI-1788939626928736000-20eb4bca` | **Verified** |
+| Goroutine Manager | `docs/architecture/GOROUTINE_MANAGER.md` | `BLI-1788939632023938000-635548ee` | **Verified** |
+| System Objects Guide | `docs/onboarding/SYSTEM_OBJECTS_GUIDE.md` | `BLI-1788939636150033000-9901a160` | **Verified** |
+| Test Coverage Policy | `docs/testing/TEST_COVERAGE_POLICY.md` | `BLI-1788939640013182000-312e2d48` | **Verified** |

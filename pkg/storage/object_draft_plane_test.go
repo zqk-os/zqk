@@ -13,7 +13,7 @@ import (
 	"github.com/lanceman/zqk/pkg/zqktime"
 )
 
-// TRACK: REQ-REDACTED
+// TRACK: REQ-1785895564241296000-bf266adb
 
 const objectStatusReview = "review"
 
@@ -161,7 +161,7 @@ func TestObjectDraftPlane_GetByID_ListOmitsDrafts(t *testing.T) {
 		t.Fatalf("Create draft: %v", err)
 	}
 	// Draft-first membrane coerces create status to origin; promote via Update for CAS-visible peer.
-	// TRACK: BLI-REDACTED — draft-plane create / promote membrane.
+	// TRACK: BLI-1785443942668406000-1ec5c811 — draft-plane create / promote membrane.
 	CreateCASVisible(t, fileStorage, ctx, secCtx, draftPlaneDocEntry(casID, "Already review", "review"), "review")
 
 	// Dual-read: draft is gettable by id even though it is not in CAS.
@@ -226,7 +226,7 @@ func TestObjectDraftPlane_GetByID_ListOmitsDrafts(t *testing.T) {
 func TestObjectDraftPlane_ListOmitsConceptualEvenWithStatusDraftFilter(t *testing.T) {
 	// `zqk object list --filter status=draft` (and status=conceptual) must never
 	// return conceptual objects that exist only on the draft plane.
-	// TRACK: BLI-REDACTED
+	// TRACK: BLI-1786689721908382000-6402a858
 	_, fileStorage, _ := SetupTestingFactoryCompleteTestEnvironmentForTest(t)
 	secCtx := pkgctx.NewSystemSecurityContext()
 	ctx := WithCLIOperation(pkgctx.NewSystemContext())
@@ -363,7 +363,7 @@ func TestShouldUseObjectDraftPlane_glossaryActiveUsesCAS(t *testing.T) {
 }
 
 func TestCreate_policyActiveCoercedToDraftPlane(t *testing.T) {
-	// TRACK: REQ-REDACTED
+	// TRACK: REQ-1785895564241296000-bf266adb
 	tmpDir, fileStorage, _ := SetupTestingFactoryCompleteTestEnvironmentForTest(t)
 	secCtx := pkgctx.NewSystemSecurityContext()
 	ctx := WithCLIOperation(pkgctx.NewSystemContext())

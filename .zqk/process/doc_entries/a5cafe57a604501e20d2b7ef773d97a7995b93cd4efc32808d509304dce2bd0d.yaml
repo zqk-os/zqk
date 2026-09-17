@@ -1,0 +1,22 @@
+category: architecture
+content_hash: 4b682e09062a7cf0e17122487c18d8d5ca8e552a80c6c70c0f5023542345d258
+content_searchable: true
+content_size: 7708
+created_at: "2026-09-17T08:44:24Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-398
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/data-management-optimization-plan.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: '- Total Objects: 84,825 - Target: ~3,000 - Over Target: 28x - audit_event: 29,102 - change_journal_entry: 3,504 - Status: Jobs exist (SCH-002, SCH-003) but may not be running frequently enough'
+title: Data Management Optimization Plan
+updated_at: "2026-09-17T08:44:24Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

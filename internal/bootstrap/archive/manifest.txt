@@ -89,6 +89,7 @@
 ./cli_specs/scheduler/convergence/promotion_readiness_command.yaml
 ./cli_specs/scheduler/convergence/record_overseer_run_command.yaml
 ./cli_specs/scheduler/dump_command.yaml
+./cli_specs/scheduler/escalate_command.yaml
 ./cli_specs/scheduler/events_command.yaml
 ./cli_specs/scheduler/events/
 ./cli_specs/scheduler/events/aggregate_command.yaml
@@ -425,6 +426,7 @@
 ./scripts/default_agent_skills/arch_design.yaml
 ./scripts/default_agent_skills/code_craftsman.yaml
 ./scripts/default_agent_skills/feed_correspondence.yaml
+./scripts/default_agent_skills/object_steward.yaml
 ./scripts/default_agent_skills/qa_verification.yaml
 ./scripts/default_agent_skills/tpm_orchestration.yaml
 ./scripts/default_personas/

@@ -73,7 +73,7 @@ func extractDefaultValue(fieldMap map[string]any) any {
 
 // resolveRequiredFieldDefault picks a fill value for a missing required field and names the source
 // for operator-facing autofix messages (lifecycle vs field checklist vs enum — not a vague "from spec").
-// TRACK: BLI-REDACTED
+// TRACK: BLI-1785786997399161000-76ea6811
 func resolveRequiredFieldDefault(kind, fieldName string, fieldMap map[string]any) (value any, source, detail string) {
 	// status is owned by the kind lifecycle origin, not object_spec field defaults/enums.
 	if fieldName == objects.FieldKeyStatus {
@@ -86,7 +86,7 @@ func resolveRequiredFieldDefault(kind, fieldName string, fieldMap map[string]any
 	if checklist, ok := fieldMap["checklist"].(map[string]any); ok {
 		if defaultValue, exists := checklist["default"]; exists && defaultValue != nil && defaultValue != "" && defaultValue != "null" {
 			// checklist.default is often human prose ("required at creation"), not a machine fill value.
-			// TRACK: BLI-REDACTED — refuse documentation placeholders as autofill.
+			// TRACK: BLI-1786416746751313000-51f73731 — refuse documentation placeholders as autofill.
 			if isDocumentationDefaultProse(defaultValue) {
 				// skip — do not materialize prose into instances
 			} else {

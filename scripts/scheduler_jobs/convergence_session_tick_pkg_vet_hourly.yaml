@@ -1,0 +1,61 @@
+# Hourly convergence_session_tick: applies test-bundle health measure to a designated active CVS.
+# Lifecycle hook (SyncCVSPipelineTickJobOnLifecycle) updates CONVERGENCE_SESSION_ID when that session
+# completes or when a new session activates; PIPELINE_TICK_TITLE_SUBSTRING disambiguates replacements.
+# Same contract as: zqk scheduler convergence measure --session-id <CVS> (measure → object update).
+#
+# Wired by .zqk/specs/configs/scheduler_maintenance_config.yaml (ensure-retention-jobs /
+# scheduler daemon startup). To point at a different session, update CONVERGENCE_SESSION_ID here and
+# zqk object update SCH-cvs-pipeline-tick --file … or run ensure after template edit.
+#
+# Default template is disabled (CAP/ghost-tick hygiene): ensure-retention must not resurrect
+# SCH-cvs-pipeline-tick. Live job is also kept enabled=false until intentionally re-enabled.
+# Suspend / re-enable live job:
+#   zqk object update SCH-cvs-pipeline-tick --field enabled=false
+#   zqk object update SCH-cvs-pipeline-tick --field enabled=true
+# (Alternatively: scheduler config jobs_paused pauses timer jobs globally — see scheduler config docs.)
+#
+# Create manually:
+#   zqk object create scheduler_job --file scripts/scheduler_jobs/convergence_session_tick_pkg_vet_hourly.yaml
+#
+# Related: promotion gate + overseer record — scripts/README.md (Convergence promotion and overseer helpers).
+
+kind: scheduler_job
+schema_version: "2.0.0"
+id: SCH-cvs-pipeline-tick
+title: Convergence — test-bundle health tick (pipeline CVS)
+description: |
+  Reads .zqk/logs/scheduler/cvs/test-bundles/health.jsonl and updates the configured convergence_session
+  when the health watermark advances. Respects thresholds.max_ticks_per_hour on the session.
+  Use alongside targeted zqk scheduler scan-tests; does not replace bundle runs.
+  With CONVERGENCE_TICK_ROLLUP, after a successful tick runs orchestrate rollup-only (skip persist) and
+  records rollup outcome on the job events JSONL (see pkg/scheduler handlers_convergence_session_tick).
+job_type: convergence_session_tick
+trigger_type: timer
+schedule_expression: "5 * * * *"
+category: maintenance
+execution_mode: reusable
+max_runtime_seconds: 300
+enabled: false
+status: pending
+namespace_id: zqk:kernel
+environment_variables:
+  CONVERGENCE_SESSION_ID: CVS-1776058539101059000-ffbcee8f
+  # Case-insensitive title substring for picking a replacement active CVS when the current target completes.
+  PIPELINE_TICK_TITLE_SUBSTRING: tutorial
+  HEALTH_LIMIT: "500"
+  # When test-bundles/health.jsonl is absent (fresh clone / logs cleared), skip the tick instead of failing.
+  HEALTH_FILE_MISSING: skip
+  # Optional: cap consecutive skips before failing (0 = unlimited).
+  HEALTH_FILE_MISSING_SKIP_BUDGET: "0"
+  # Optional: when the CVS is terminal but health.jsonl still shows follow-up work, create a draft follow-up session (idempotent per watermark).
+  # CONVERGENCE_TICK_SPAWN_FOLLOWUP_DRAFT: "true"
+  # After a successful tick: orchestrate rollup-only (skip persist); outcome lines on job events JSONL.
+  CONVERGENCE_TICK_ROLLUP: "1"
+  # If rollup JSON is not at the default under project-data logs (see pkg/paths), set the same path the shell uses:
+  # CVS_ORCH_ROLLUP_OUT: ".zqk/logs/drift/cvs_rollup_latest.json"
+created_at: "2026-04-04T21:35:00Z"
+updated_at: "2026-04-04T21:35:00Z"
+created_by: account:system
+updated_by: account:system
+origin_project: zqk
+origin_system: zqk

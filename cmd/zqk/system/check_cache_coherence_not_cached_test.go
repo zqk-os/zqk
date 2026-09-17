@@ -11,7 +11,7 @@ import (
 // Tier-3 cache-coherence issues describe the object-id-cache at validation time, not the object.
 // Persisting them made every later run replay stale "CacheLag" for objects that were otherwise
 // cache hits, so the noise survived --refresh-cache and only --clear-cache cleared it.
-// TRACK: BLI-REDACTED
+// TRACK: BLI-1786387465409533000-45bd780c
 func TestConvertCheckResultToValidationState_DropsCacheCoherenceIssues(t *testing.T) {
 	t.Parallel()
 	result := &CheckResult{

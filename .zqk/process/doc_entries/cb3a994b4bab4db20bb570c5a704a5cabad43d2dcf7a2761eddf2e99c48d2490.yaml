@@ -1,0 +1,22 @@
+category: architecture
+content_hash: 45b5c655910aeb9cdeaf70be95b97700519bf2cd3b8dac7f5dafaa3abb7f7eb8
+content_searchable: true
+content_size: 21940
+created_at: "2026-09-17T08:42:06Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-080
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/CONVERGENCE_PHASE_ROUTER_AND_COORDINATOR_DESIGN.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: '| Layer | What it covers | |-------|----------------| | pkg/scenario TestApplyScenarioBundle_ConvergenceLifecycleBundle | Applies convergence-lifecycle-bundle.yaml; asserts created goal, criteria, ...'
+title: Convergence phase router, tombstones, and coordinator-backed routing
+updated_at: "2026-09-17T08:42:06Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

@@ -1,0 +1,22 @@
+category: architecture
+content_hash: 0024dacdb2f0f7eec8a04aef139e205f16547343de611fa54371f36c57fc6e28
+content_searchable: true
+content_size: 7086
+created_at: "2026-09-17T08:43:42Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-196
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/MCP_SECURITY_TESTING.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: Comprehensive security testing suite for the MCP permission system, including brute-force attack attempts, edge cases, and query operation validation.
+title: MCP Security Testing
+updated_at: "2026-09-17T08:43:42Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

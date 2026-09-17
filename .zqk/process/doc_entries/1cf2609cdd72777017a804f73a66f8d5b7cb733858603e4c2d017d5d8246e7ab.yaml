@@ -1,0 +1,22 @@
+category: audit
+content_hash: 4182886fa69048e693e29463d6ae0cb021bfd134561fef9621b78a3539900d7d
+content_searchable: true
+content_size: 2529
+created_at: "2026-09-17T08:44:31Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-441
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/ia_audit_report.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: An extensive information architecture audit was performed on the ZQK Knowledge Kernel (Requirements, Specs, Priority Plans) to ensure semantic purity, conciseness, and deduplication
+title: IA Audit Report
+updated_at: "2026-09-17T08:44:31Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

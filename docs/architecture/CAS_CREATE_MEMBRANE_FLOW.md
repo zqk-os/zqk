@@ -64,9 +64,9 @@ zqk object draft promote --kind agent_task --all --dry-run=false
 | **`draft promote`** | One lifecycle hop + re-validate; on success → CAS materialize + remove draft file | Default path for intentional drafts. If promote **sticks**, read reject reasons → `object update` fix fields/refs → re-promote. Stick is not failure of the plane — it is unpaid validation debt. |
 | **`draft sweep`** | Delete draft-plane YAML only (never CAS) | **RBAC** `delete:object_draft_plane` on authenticated ACC (owner/steward/admin). Not a substitute for promote. Peers/doers: dry-run/classify + promote/fix only. Seat nicknames are not auth. |
 
-**Forbidden:** applying sweep without RBAC grant; sweeping to clean counts; sweeping because promote failed; seat-string allowlists; env privilege overrides (`ZQK_ALLOW_*`). Glossary: `GLS-1786417022441021000-78a4f453` + `GLS-DRAFT-SWEEP-RBAC-PERM-001`. Policy: `POL-AGENT-DRAFT-SWEEP-TPM-001`. Decision: `DEC-DRAFT-SWEEP-RBAC-001`. Env-override removal: tech-debt CVS `CVS-REDACTED` / `BLI-ENV-BREAKGLASS-REMOVE-001`.
+**Forbidden:** applying sweep without RBAC grant; sweeping to clean counts; sweeping because promote failed; seat-string allowlists; env privilege overrides (`ZQK_ALLOW_*`). Glossary: `GLS-1786417022441021000-78a4f453` + `GLS-DRAFT-SWEEP-RBAC-PERM-001`. Policy: `POL-AGENT-DRAFT-SWEEP-TPM-001`. Decision: `DEC-DRAFT-SWEEP-RBAC-001`. Env-override removal: tech-debt CVS `CVS-1786418656116005000-2e9337d4` / `BLI-ENV-BREAKGLASS-REMOVE-001`.
 
-Implementation: `pkg/storage/object_draft_plane_match.go` + sweep/promote; CLI `zqk object draft sweep|promote` (TRACK `BLI-REDACTED` / `BLI-REDACTED`).
+Implementation: `pkg/storage/object_draft_plane_match.go` + sweep/promote; CLI `zqk object draft sweep|promote` (TRACK `BLI-1785827957031623000-b08b9791` / `BLI-1785827958281378000-c0366ecd`).
 
 Also indexed in `scripts/mesh/README.md` (ops).
 

@@ -473,7 +473,7 @@ func createAsyncValidationFunc(asyncCtx *AsyncValidationContext) validation.Vali
 		// HashRegistry is unused for CAS integrity (checkIntegrity ignores it). Skip load/cache
 		// unless --auto-fix may need it — loading .doc_entry.hashes (~180KB) under fan-out
 		// contended with the 5s fail-fast budget.
-		// TRACK: BLI-REDACTED
+		// TRACK: BLI-1785895580100186000-c5539372
 		var registry storage.HashRegistryProvider
 		if shouldAutoFix(asyncCtx.Cmd) {
 			registry = getHashRegistryForValidation(stdCtx, asyncCtx, objectKind, filePath)

@@ -104,7 +104,7 @@ func executeLifecycleHook(ctx context.Context, kind, fromState, toState string, 
 // executeCacheOperationWithID executes cache operations with optional ID update
 // This allows the storage layer to update the cache context with the actual ID if it was auto-generated.
 // Always notes object-id-cache pending for CAS paths (never draft-plane), even when handler is nil.
-// TRACK: BLI-REDACTED
+// TRACK: BLI-1785895580100186000-c5539372
 
 // coupleObjectIDCacheLivePath inserts or swaps object-id-cache for the live file path.
 // Draft-plane create has no CAS blob; the id still belongs in the cache (path is the

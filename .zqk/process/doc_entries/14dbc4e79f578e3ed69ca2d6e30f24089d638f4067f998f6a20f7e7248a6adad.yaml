@@ -1,0 +1,22 @@
+category: architecture
+content_hash: 6527277b1be0805a0d4a6001e45c07cb6b5e77c62b07af65421fbb7e573a7c6a
+content_searchable: true
+content_size: 2408
+created_at: "2026-09-17T08:44:49Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-594
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/tde_envelope_inbox.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: The Autonomy Inbox is the Human-in-the-Loop (HITL) gateway for the Symbiotic Mesh
+title: Autonomy Inbox & TDE Envelopes
+updated_at: "2026-09-17T08:44:49Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

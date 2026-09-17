@@ -1,0 +1,22 @@
+category: architecture
+content_hash: cc1963474a72745752559a262772291500a7d9ef2cc2f8004fb69c5d4a2f4ef0
+content_searchable: true
+content_size: 7880
+created_at: "2026-09-17T08:43:28Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-140
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/INTERACTIVE_CREATION_ARCHITECTURE_ANALYSIS.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: 'We need to integrate MCP elicitation with streaming template loops, but we''re hitting an import cycle: - pkg/mcp (protocol layer) wants to use cmd/zqk/system (command layer) - This creates a depend...'
+title: Interactive Creation Architecture Analysis
+updated_at: "2026-09-17T08:43:28Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

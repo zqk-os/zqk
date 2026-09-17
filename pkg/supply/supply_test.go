@@ -47,8 +47,8 @@ func TestSupplyChainReleaseIntegrity(t *testing.T) {
 	}
 }
 
-// TestFailClosedCIGates_DeterministicAndVerified verifies REQ-REDACTED
-// and CRIT-REDACTED / CRIT-REDACTED / CRIT-REDACTED:
+// TestFailClosedCIGates_DeterministicAndVerified verifies REQ-1789592457454400000-21efcfe8
+// and CRIT-1789592457619132000-f71dcb62 / CRIT-1789592457619133000-34452aa8 / CRIT-1789592457619134000-f1dd7d5f:
 // local and CI golangci runs are deterministic, and the pipeline fails closed on missing/inconsistent lint, checksum, or SBOM evidence.
 func TestFailClosedCIGates_DeterministicAndVerified(t *testing.T) {
 	// 1. Verify .golangci.yml has adequate timeout for deterministic completion on large monorepo

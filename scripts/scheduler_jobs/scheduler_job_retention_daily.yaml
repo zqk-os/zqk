@@ -1,0 +1,23 @@
+# One-time scheduler_job churn cleanup. Used by: zqk system ensure-retention-jobs
+# Create: zqk object create scheduler_job --file scripts/scheduler_jobs/scheduler_job_retention_daily.yaml
+id: SCH-scheduler-job-retention
+title: Scheduler job store retention (one_time)
+description: |
+  Deletes one_time scheduler jobs that have already run (enabled=false) older than
+  RETENTION_DAYS, plus their log dirs. Reusable timer jobs are never touched.
+  Without this job, .zqk/process/scheduler_jobs/ grows without bound from
+  `scheduler submit` (object-count-report disk vs index disparity).
+job_type: scheduler_job_retention
+trigger_type: timer
+schedule_expression: "0 4 * * *"
+environment_variables:
+  RETENTION_DAYS: "7"
+  BATCH_SIZE: "100"
+  MAX_BATCHES: "50"
+category: maintenance
+execution_mode: reusable
+max_runtime_seconds: 600
+enabled: true
+status: active
+namespace_id: zqk:kernel
+schema_version: "2.0.0"

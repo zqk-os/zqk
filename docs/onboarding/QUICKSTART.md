@@ -1,24 +1,47 @@
 # ZQK Quickstart & MCP Configuration Guide
 
-Your AI agents are coding blind. ZQK gives them project awareness and guardrails.
+Your AI agents are coding blind. ZQK gives them project awareness, architecture decisions, and guardrails.
 
-This guide explains how to connect your AI agent (Claude, Cursor, VS Code, etc.) to your ZQK project so it can check policies, read architecture decisions, and stay aligned with your goals.
+This guide explains how to connect your AI agent (Cursor, Claude Desktop, VS Code, etc.) to your ZQK project so it can verify policies, query the knowledge kernel, and stay aligned with your goals.
 
 ## 1. Setup ZQK
 
-Run the quickstart command in your project directory. This creates starter policies and prepares the MCP server configuration.
+Run the quickstart command in your project directory. This guides you through project initialization, kernel inspection, starter policies, and workflow discovery:
 
 ```sh
 zqk quickstart
+```
+
+For automated agent workspace priming and seating:
+```sh
+zqk system agent-onboard
+```
+See [`COMMUNITY_FIRST_RUN.md`](./COMMUNITY_FIRST_RUN.md) for full agent host detection details.
+
+For greenfield initialization in a fresh directory:
+```sh
+zqk system init --project-name my-project
 ```
 
 ## 2. Connect Your AI Agent
 
 ZQK uses the [Model Context Protocol (MCP)](https://modelcontextprotocol.io/) to securely expose your project context to AI agents.
 
-Copy the appropriate configuration snippet below and paste it into your AI tool's MCP configuration file.
+### Automated Setup (Recommended)
 
-### Cursor
+Run the automated MCP installer from your project root:
+
+```sh
+zqk mcp install
+```
+
+This automatically writes the proper configuration to `.cursor/mcp.json` or other detected IDE directories. Restart your IDE after installation for changes to take effect.
+
+### Manual Configuration
+
+If you prefer manual configuration, use the snippets below for your AI tool:
+
+#### Cursor
 
 Add this to `.cursor/mcp.json` in your project root:
 
@@ -26,14 +49,14 @@ Add this to `.cursor/mcp.json` in your project root:
 {
   "mcpServers": {
     "zqk": {
-      "command": "zqk-mcp",
-      "args": ["stdio"]
+      "command": "zqk",
+      "args": ["mcp", "cursor-adapter"]
     }
   }
 }
 ```
 
-### Claude Desktop
+#### Claude Desktop
 
 Add this to your `claude_desktop_config.json` (located at `~/Library/Application Support/Claude/claude_desktop_config.json` on macOS):
 
@@ -41,14 +64,14 @@ Add this to your `claude_desktop_config.json` (located at `~/Library/Application
 {
   "mcpServers": {
     "zqk": {
-      "command": "zqk-mcp",
-      "args": ["stdio"]
+      "command": "zqk",
+      "args": ["mcp", "serve"]
     }
   }
 }
 ```
 
-### VS Code (Continue)
+#### VS Code (Continue)
 
 Add this to your `~/.continue/config.json`:
 
@@ -59,8 +82,8 @@ Add this to your `~/.continue/config.json`:
       {
         "transport": {
           "type": "stdio",
-          "command": "zqk-mcp",
-          "args": ["stdio"]
+          "command": "zqk",
+          "args": ["mcp", "serve"]
         }
       }
     ]
@@ -70,10 +93,16 @@ Add this to your `~/.continue/config.json`:
 
 ## 3. Verify Connection
 
-Once connected, ask your AI agent a question that requires project context. For example:
+Once connected, verify the MCP connection from the terminal:
+
+```sh
+zqk mcp list-tools
+```
+
+Then ask your AI agent a question in your IDE that requires project context, for example:
 
 - *"Check if adding a function without tests complies with project policies."*
 - *"What are the active goals for this project?"*
 - *"Summarize our project context."*
 
-The agent will automatically use the `get_project_context` tool to read your policies and goals and respond accurately.
+The agent will automatically invoke the `get_project_context` tool to read your policies and goals and respond accurately.

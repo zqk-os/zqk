@@ -64,7 +64,7 @@ func runIDEAdapter(cmd *cobra.Command, _ []string) error {
 	// Do not derive from cmd.Context(): IDE cancels it after tools/call, which
 	// used to exit the adapter process and mark MCP red. Lifetime is stdin EOF;
 	// SIGINT/SIGTERM close stdin to unblock the read loop. TRACK:
-	// BLI-REDACTED — hourglass/context-refresh soft drain.
+	// BLI-1784969955962654000-dc689643 — hourglass/context-refresh soft drain.
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM) // Background: request-or-shutdown derived
 	defer stop()
 	goroutinelabels.NewGoroutine("mcp_ide_adapter_stdin_close", "close stdin on SIGINT/SIGTERM soft drain").StartSimple(func() {

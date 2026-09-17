@@ -1,0 +1,22 @@
+category: architecture
+content_hash: c6a0a8f37ff8856227d8eb3684bf378886f3a068a7643eb25f84261764963ff2
+content_searchable: true
+content_size: 3671
+created_at: "2026-09-17T08:44:33Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-458
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/lifecycle_shockwave/family_work_unit.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: 'Executable work items and the base_object five-role template they extend: backlog_item, agent_task, technical_debt, milestone, test_case, agent_instruction, agent_skill, agent_onboarding_preparatio...'
+title: 'Family: work_unit'
+updated_at: "2026-09-17T08:44:33Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

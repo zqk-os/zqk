@@ -476,7 +476,7 @@ func runSystemCheckPipelineWithOutcome(
 		AddStage("CAP_PROBE", func(stageCtx *pipeline.Context, payload any) (any, error) {
 			plLoad := payload.(*systemCheckPipelinePayload)
 			if plLoad.checkCtx != nil && plLoad.checkCtx.ProjectRoot != emptyValue {
-				journalPath := filepath.Join(plLoad.checkCtx.ProjectRoot, ".zqk", "logs", "scheduler", "SCH-cap-orchestrator", "SCH-cap-orchestrator.events.jsonl")
+				journalPath := filepath.Join(plLoad.checkCtx.ProjectRoot, ".zqk", "logs", "scheduler", objects.JobIDCapOrchestrator, objects.JobIDCapOrchestrator+".events.jsonl")
 				stat, err := fileutil.Stat(journalPath)
 				if err == nil {
 					if time.Since(stat.ModTime()) > 4*time.Hour {
@@ -490,6 +490,10 @@ func runSystemCheckPipelineWithOutcome(
 		}).
 		AddStage("FINALIZE", func(stageCtx *pipeline.Context, payload any) (any, error) {
 			stageCtx.Outcome[pipeline.OutcomeKeyFinalizeDone] = true
+			plLoad := payload.(*systemCheckPipelinePayload)
+			if plLoad.cmd != nil {
+				fmt.Fprintln(plLoad.cmd.ErrOrStderr(), "Finalizing caches and storage queues...")
+			}
 			return payload, nil
 		}).
 		Build()

@@ -1,0 +1,22 @@
+category: architecture
+content_hash: edbf02e21b6e13d636f8f6fafb1525f764f2c620fb659f1cbae789d9492b1b38
+content_searchable: true
+content_size: 1580
+created_at: "2026-09-17T08:44:30Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-420
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/gantt_export.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: This document describes the export pipeline for converting rendered Gantt chart SVG artifacts into PNG and PDF formats for enterprise users
+title: Gantt Chart Export Pipeline
+updated_at: "2026-09-17T08:44:30Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

@@ -10,7 +10,7 @@ import (
 // (PrecondReadyBacklogReferencesPlan, airtight lock). Child-owned link refuse for
 // execution-facing plans is composed: OpRefuseExecutionFacingMembership in
 // pkg/kernelcas/compose (no Go customRuleValidators wrap).
-// TRACK: BLI-REDACTED — deleted membership init wrap.
+// TRACK: BLI-1785786997399161000-76ea6811 — deleted membership init wrap.
 
 func statusRole(kind, status string) string {
 	return objects.GetGlobalStatusChecker().Role(kind, status)
@@ -49,7 +49,7 @@ func BacklogItemStatusReadyOrLater(status string) bool {
 
 // backlogItemAllowedOnExecutionFacingPlan is membership (not lock): realign roles are scope creep;
 // halted is allowed so D11 recovery (error→planned) is not deadlocked.
-// TRACK: BLI-REDACTED — remove status=error snowflake once roles land (this file).
+// TRACK: BLI-1785288057156414000-ac7dce26 — remove status=error snowflake once roles land (this file).
 func backlogItemAllowedOnExecutionFacingPlan(status string) bool {
 	role := statusRole(objects.KindBacklogItem, status)
 	if role != "" {
@@ -79,7 +79,7 @@ func BacklogItemStatusTerminalForPlanCompletion(status string) bool {
 // backlogDependentStillReferencesPlan reports whether depID still points at planID.
 // When ObjectLookup is set, stale reverse-index entries (unlinked BLIs, CHA-nested
 // snapshots) are ignored. When ObjectLookup is nil, trust DependentsLookup.
-// TRACK: BLI-REDACTED — pair with reverse-ref persist rebuild.
+// TRACK: BLI-1786358681981576000-66f07f6c — pair with reverse-ref persist rebuild.
 func backlogDependentStillReferencesPlan(planID, depID string, options *ValidationOptions) bool {
 	if options == nil || options.ObjectLookup == nil {
 		return true
@@ -126,7 +126,7 @@ func LinkedBacklogItemsAllTerminal(planID string, options *ValidationOptions, in
 		if err != nil {
 			// Ghost reverse-index entries (deleted BLIs) must not block plan-complete.
 			// Fail-closed remains when DependentsLookup/ObjectStatusLookup are nil.
-			// TRACK: BLI-REDACTED
+			// TRACK: BLI-1786358329127691000-588933f1
 			continue
 		}
 		if !BacklogItemStatusTerminalForPlanCompletion(st) {

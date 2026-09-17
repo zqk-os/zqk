@@ -1,0 +1,22 @@
+category: graph-backend
+content_hash: 4b0a896aa1c4fdb8a0308db00367c10514f08fc21b9087d8079e529f0c6392e2
+content_searchable: true
+content_size: 2310
+created_at: "2026-09-17T08:42:10Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-103
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/DOC_ENTRY_CRYPTOGRAPHIC_INTEGRITY.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: '--- To prevent documentation sprawl and target drift, doc_entry objects are bound to their target physical documents via cryptographic SHA-256 hashes and measured byte sizes'
+title: doc_entry Cryptographic Verification & Drift Detection Specification
+updated_at: "2026-09-17T08:42:10Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

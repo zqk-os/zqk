@@ -1,5 +1,5 @@
 // Package authcred — persona/RBAC-scoped object kind discovery (command membrane).
-// TRACK: BLI-REDACTED — POL-AGENT-PLANNER-DOER-001 discoverability.
+// TRACK: BLI-1785908739114727000-9a7cc2bd — POL-AGENT-PLANNER-DOER-001 discoverability.
 package authcred
 
 import (

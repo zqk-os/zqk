@@ -11,6 +11,7 @@ import (
 	"github.com/lanceman/zqk/pkg/logging"
 	"github.com/lanceman/zqk/pkg/objects"
 	"github.com/lanceman/zqk/pkg/paths"
+	"github.com/lanceman/zqk/pkg/process"
 	"github.com/lanceman/zqk/pkg/storage"
 	"gopkg.in/yaml.v3"
 )
@@ -57,7 +58,7 @@ func (r *Registry) GetExistingEntries(ctx context.Context, profile string) (exis
 				// Extract max ID
 				if strings.HasPrefix(id, "DOC-") {
 					var idNum int
-					_ , _ = fmt.Sscanf(id, "DOC-%d", &idNum)
+					_, _ = fmt.Sscanf(id, "DOC-%d", &idNum)
 					if idNum > maxID {
 						maxID = idNum
 					}
@@ -124,7 +125,7 @@ func (r *Registry) CreateDocEntry(ctx context.Context, profile string, file *Mar
 
 	// Promote off draft plane so List/registry discovery see the entry (origin is preliminary).
 	// Prefer review (shovel_ready) over terminal active when metadata asked for active.
-	// TRACK: BLI-REDACTED — draft-plane create / promote membrane.
+	// TRACK: BLI-1785443942668406000-1ec5c811 — draft-plane create / promote membrane.
 	leaveStatus := objects.GetString(entry, objects.FieldKeyStatus)
 	if leaveStatus == "" || leaveStatus == objects.ObjectStatusDraft || leaveStatus == objects.ObjectStatusActive {
 		leaveStatus = "review"
@@ -142,16 +143,29 @@ func (r *Registry) CreateDocEntry(ctx context.Context, profile string, file *Mar
 
 	// Incremental update: add this path to the path alias cache so prefix:file.RelPath resolves immediately
 	paths.AddPathAlias(r.projectRoot, file.RelPath, file.RelPath)
+	process.TouchMeaningfulActivity()
 
 	return nil
 }
 
 // RegisterAll discovers and registers all documentation files
 func (r *Registry) RegisterAll(ctx context.Context, profile string, dryRun bool) (registered, skipped int, err error) {
+	return r.RegisterSubtrees(ctx, profile, nil, dryRun)
+}
+
+// RegisterSubtrees discovers and registers documentation files in the specified subtrees.
+// If subtrees is empty or nil, it discovers all markdown files under docs/.
+func (r *Registry) RegisterSubtrees(ctx context.Context, profile string, subtrees []string, dryRun bool) (registered, skipped int, err error) {
 	logger := logging.GetLoggerFromProfile(profile)
 
 	// Discover markdown files
-	discoverer := NewDiscoverer(r.projectRoot)
+	var discoverer *Discoverer
+	if len(subtrees) > 0 {
+		discoverer = NewDiscovererWithSubtrees(r.projectRoot, subtrees)
+	} else {
+		discoverer = NewDiscoverer(r.projectRoot)
+	}
+
 	files, err := discoverer.Discover()
 	if err != nil {
 		return 0, 0, errfmt.Newf("failed to discover markdown files").Wrap(err)
@@ -179,7 +193,17 @@ func (r *Registry) RegisterAll(ctx context.Context, profile string, dryRun bool)
 	nextID := maxID + 1
 
 	for _, file := range files {
+		if ctxErr := ctx.Err(); ctxErr != nil {
+			return created, skipped, ctxErr
+		}
+		process.TouchMeaningfulActivity()
+
 		// Skip if already exists
+		key := paths.NormalizeDocEntryPathForKey(file.RelPath)
+		if _, exists := existing[key]; exists {
+			skipped++
+			continue
+		}
 		if _, exists := existing[file.RelPath]; exists {
 			skipped++
 			continue
@@ -212,6 +236,9 @@ func (r *Registry) RegisterAll(ctx context.Context, profile string, dryRun bool)
 		// Create doc_entry
 		err = r.CreateDocEntry(ctx, profile, file, metadata, docID)
 		if err != nil {
+			if ctxErr := ctx.Err(); ctxErr != nil {
+				return created, skipped, ctxErr
+			}
 			logging.Fluent(logger).Warn("Failed to create doc_entry").
 				ObjectID(docID).
 				Path(file.RelPath).
@@ -221,10 +248,57 @@ func (r *Registry) RegisterAll(ctx context.Context, profile string, dryRun bool)
 		}
 
 		created++
+		existing[key] = docID
+		process.TouchMeaningfulActivity()
 	}
 
 	registered = created
 	return registered, skipped, nil
+}
+
+// RegisterShippedDocs registers shipped documentation (architecture, best-practices, onboarding)
+// during system init into the kernel doc_entry graph, skipping archive trees.
+// Fails closed if any shipped markdown file in those trees fails to register or lacks a doc_entry.
+func RegisterShippedDocs(ctx context.Context, projectRoot string, logger logging.Logger) (registered, skipped int, err error) {
+	if projectRoot == emptyValue {
+		return 0, 0, errfmt.Errorf("project root cannot be empty")
+	}
+
+	factory, err := storage.NewStorageFactory(ctx, projectRoot)
+	if err != nil {
+		return 0, 0, errfmt.Errorf("failed to initialize storage factory for docman: %w", err)
+	}
+	storageProvider := factory.GetStorageForKind(objects.KindDocEntry)
+	registry := NewRegistry(storageProvider, projectRoot)
+
+	profile := string(pkgctx.ProfileHuman)
+	reg, skip, err := registry.RegisterSubtrees(ctx, profile, ShippedInitDocSubtrees, false)
+	if err != nil {
+		return reg, skip, errfmt.Errorf("failed to register shipped documentation: %w", err)
+	}
+
+	// Fail-closed verification: ensure every discovered markdown file in ShippedInitDocSubtrees has a doc_entry
+	discoverer := NewDiscovererWithSubtrees(projectRoot, ShippedInitDocSubtrees)
+	files, err := discoverer.Discover()
+	if err != nil {
+		return reg, skip, errfmt.Errorf("failed to scan shipped docs during post-init verification: %w", err)
+	}
+	if len(files) > 0 {
+		existing, _, err := registry.GetExistingEntries(ctx, profile)
+		if err != nil {
+			return reg, skip, errfmt.Errorf("failed to list doc_entries during post-init verification: %w", err)
+		}
+		for _, f := range files {
+			key := paths.NormalizeDocEntryPathForKey(f.RelPath)
+			if _, ok := existing[key]; !ok {
+				if _, ok2 := existing[paths.PathRefFromRelPath(f.RelPath)]; !ok2 && existing[f.RelPath] == "" {
+					return reg, skip, errfmt.Errorf("fail-closed: shipped doc %q has no registered doc_entry in kernel graph", f.RelPath)
+				}
+			}
+		}
+	}
+
+	return reg, skip, nil
 }
 
 // Helper function to validate YAML structure (for testing)

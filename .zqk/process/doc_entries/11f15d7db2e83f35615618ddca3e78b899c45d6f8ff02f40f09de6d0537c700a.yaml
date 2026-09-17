@@ -1,0 +1,22 @@
+category: audit
+content_hash: fd2f1167c90f7ba64eb8f04716cd32024d0f65b480ed601f6153d9b6fae3b68d
+content_searchable: true
+content_size: 5439
+created_at: "2026-09-17T08:43:59Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-258
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/SCHEDULER_CONCURRENCY_AUDIT.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: '--- | Component | Default / cap | CPU-aware'
+title: Scheduler and Storage Concurrency Audit
+updated_at: "2026-09-17T08:43:59Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

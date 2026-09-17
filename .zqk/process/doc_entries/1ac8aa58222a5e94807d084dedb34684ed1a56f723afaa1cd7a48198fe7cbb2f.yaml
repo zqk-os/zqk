@@ -1,0 +1,22 @@
+category: architecture
+content_hash: 10d7b019f21b585bcc7e55205f98bebfa22dfef9ed9bd81e2a9faf598218cef6
+content_searchable: true
+content_size: 10721
+created_at: "2026-09-17T08:42:09Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-096
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/DECISION_LIFECYCLE.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: The decision lifecycle establishes appropriate levels of system awareness and recurring considerations to ensure decisions (including Architecture Decision Records) remain current, relevant, and pr...
+title: 'Decision Lifecycle: System Awareness and Recurring Considerations'
+updated_at: "2026-09-17T08:42:09Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

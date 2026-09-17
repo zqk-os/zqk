@@ -11,6 +11,7 @@ import (
 	pkgctx "github.com/lanceman/zqk/pkg/context"
 	"github.com/lanceman/zqk/pkg/coordination"
 	"github.com/lanceman/zqk/pkg/errfmt"
+	"github.com/lanceman/zqk/pkg/goroutinelabels"
 	"github.com/lanceman/zqk/pkg/logging"
 	"github.com/lanceman/zqk/pkg/objects"
 	"github.com/lanceman/zqk/pkg/paths"
@@ -126,7 +127,9 @@ func (w *ConfigFileWatcher) Start(ctx context.Context) error {
 	}
 
 	// Start watching in background goroutine
-	go w.watchLoop(ctx)
+	goroutinelabels.NewGoroutine("config_watcher.loop", "watching config file changes").StartSimple(func() {
+		w.watchLoop(ctx)
+	})
 
 	return nil
 }

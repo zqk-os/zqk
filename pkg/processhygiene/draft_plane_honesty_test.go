@@ -12,7 +12,7 @@ import (
 )
 
 // TestDraftPlaneHonestyZeroDraftOnCAS enforces that no objects on CAS (paths.ProcessDir)
-// have status=draft (BLI-REDACTED / CRIT-REDACTED).
+// have status=draft (BLI-1786689721908382000-6402a858 / CRIT-1786695439226651000-a8288b0d).
 // Draft objects belong exclusively on the draft plane (.zqk/object_drafts/).
 func TestDraftPlaneHonestyZeroDraftOnCAS(t *testing.T) {
 	repoRoot := findRepoRoot(t)
@@ -67,7 +67,7 @@ func TestDraftPlaneHonestyZeroDraftOnCAS(t *testing.T) {
 }
 
 // TestDraftPlaneHonestyRubricDocumentation verifies that KERNEL_OBJECT_KIND_EVALUATION_RUBRIC.md
-// explicitly documents draft plane honesty under Lens 2 & Lens 7 (CRIT-REDACTED).
+// explicitly documents draft plane honesty under Lens 2 & Lens 7 (CRIT-1786695439226667000-82701ce2).
 func TestDraftPlaneHonestyRubricDocumentation(t *testing.T) {
 	repoRoot := findRepoRoot(t)
 	rubricPath := filepath.Join(repoRoot, "docs", "architecture", "KERNEL_OBJECT_KIND_EVALUATION_RUBRIC.md")

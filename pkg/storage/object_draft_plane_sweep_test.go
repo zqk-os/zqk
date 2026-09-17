@@ -10,7 +10,7 @@ import (
 	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
 )
 
-// TRACK: BLI-REDACTED
+// TRACK: BLI-1785827957031623000-b08b9791
 
 func TestSweepObjectDraftPlane_dryRunAndDelete(t *testing.T) {
 	tmpDir, fileStorage, _ := SetupTestingFactoryCompleteTestEnvironmentForTest(t)

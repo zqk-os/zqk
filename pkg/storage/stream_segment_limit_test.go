@@ -16,7 +16,7 @@ import (
 
 // TestStreamSegment_LimitZeroEnforcesDefaultCap verifies that limit=0 bounds
 // stream segment list scans to DefaultMaxStreamListLimit rather than loading
-// history unbounded (REQ-CEF-R2-PERF-LIMIT0 / CRIT-CEF-R2-PERF-LIMIT0-A / BLI-REDACTED).
+// history unbounded (REQ-CEF-R2-PERF-LIMIT0 / CRIT-CEF-R2-PERF-LIMIT0-A / BLI-1788842333083792000-e944c80b).
 func TestStreamSegment_LimitZeroEnforcesDefaultCap(t *testing.T) {
 	tmpDir := t.TempDir()
 	t.Setenv(zqkenv.TestRoot().Name(), tmpDir)

@@ -30,15 +30,25 @@ func WorkshopBinDirPath(projectRoot string) string {
 	return ResolvePathFromCacheOrConstant(projectRoot, PathAliasWorkshopBin, fallback)
 }
 
+// StableBinaryName returns the binary name for stable execution.
+// If brand.ExecutableName() is "zcom", it uses "zcom", preserving ps distinctiveness
+// for community edition rather than collapsing to zqk-stable.
+func StableBinaryName() string {
+	if brand.ExecutableName() == "zcom" {
+		return "zcom"
+	}
+	return brand.ZqkStableName
+}
+
 // StableBinaryPath returns the preferred workshop stable CLI path for projectRoot.
 func StableBinaryPath(projectRoot string) string {
-	return filepath.Join(WorkshopBinDirPath(projectRoot), brand.ZqkStableName)
+	return filepath.Join(WorkshopBinDirPath(projectRoot), StableBinaryName())
 }
 
 // RepoStableBinaryPath returns bin/<brand>-stable (install-zqk-stable.sh dual dest).
 func RepoStableBinaryPath(projectRoot string) string {
 	binDir := ResolvePathFromCacheOrConstant(projectRoot, PathAliasRepoBin, RepoBinDir)
-	return filepath.Join(binDir, brand.ZqkStableName)
+	return filepath.Join(binDir, StableBinaryName())
 }
 
 // StableBinaryCandidates returns workshop then repo stable paths (same inode after promote).

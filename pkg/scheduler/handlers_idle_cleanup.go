@@ -146,7 +146,7 @@ func (h *IdleCleanupHandler) shouldDropAgentWorktree(
 		return "terminal_status:" + status, true
 	}
 	if age > agentWorktreeStaleAfter {
-		// TRACK: BLI-REDACTED — tighten once swarm teardown is reliable end-to-end
+		// TRACK: BLI-1785886134649966000-7732876c — tighten once swarm teardown is reliable end-to-end
 		return "stale_active_mtime", true
 	}
 	return "", false

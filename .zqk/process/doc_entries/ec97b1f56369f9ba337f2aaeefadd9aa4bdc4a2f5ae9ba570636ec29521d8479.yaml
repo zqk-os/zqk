@@ -1,0 +1,22 @@
+category: architecture
+content_hash: 4e4944b0e7bfda863cf020783abf21d87d26cb14d4180aba4352abfd88d9765f
+content_searchable: true
+content_size: 11564
+created_at: "2026-09-17T08:39:35Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-076
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/CONCURRENCY_LESSONS_LEARNED_AND_MULTI_TIER_DESIGN.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: '--- During a full repository health validation (system check --details --verbose), PID 33048 entered an unrecoverable deadlock at 11:21:31 PDT immediately following the validation of policy POL-DEB...'
+title: Architectural Post-Mortem & Multi-Tier Concurrency Design
+updated_at: "2026-09-17T08:39:35Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

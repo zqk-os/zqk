@@ -1,0 +1,22 @@
+category: architecture
+content_hash: 514fb65a57d6cb68741e5343fbbc38fd1ffd26ee0b953fd30704d07b38e89276
+content_searchable: true
+content_size: 4906
+created_at: "2026-09-17T08:44:34Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-472
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/mcp/MCP_INTERFACE.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: This package provides explicit, type-safe interfaces for the MCP (Model Context Protocol) specification
+title: MCP Protocol Interface
+updated_at: "2026-09-17T08:44:34Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

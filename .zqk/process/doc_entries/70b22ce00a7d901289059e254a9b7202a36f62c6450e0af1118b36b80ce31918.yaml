@@ -1,0 +1,21 @@
+content_hash: ae9ba5bd8c311567079630078170bb69a93c795e5b259e34b9acf15862d3ff73
+content_searchable: true
+content_size: 165181
+created_at: "2026-09-17T08:44:58Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: onboarding
+id: DOC-650
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/onboarding/SYSTEM_OBJECTS_GUIDE.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: Welcome to the ZQK Knowledge Kernel
+title: ZQK System Objects & Lifecycles Guide
+updated_at: "2026-09-17T08:44:58Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

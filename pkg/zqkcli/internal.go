@@ -18,7 +18,7 @@ func NewInternalCmd() *cobra.Command {
 	internalCmdLong := fmt.Sprintf(`Manage internal and built-in objects with privileged access.
 
 Deprecated: use '%s object … --internal' (license-gated elevated mode; zqk-admin allowed as transitional carrier).
-See DEC-REDACTED / docs/strategy/open-core/OBJECT_PLANE_INTERNAL_FLAG.md.
+See DEC-1785930071988960000-364a5796 / docs/strategy/open-core/OBJECT_PLANE_INTERNAL_FLAG.md.
 
 This command provides admin-only access to:
   - Built-in objects (e.g., COMP-TYPE-* component types) - normally immutable
@@ -40,12 +40,12 @@ Examples:
   # Legacy (deprecated)
   %s internal list component --built-in
   %s internal get COMP-TYPE-001`, paths.CLICommandName, paths.CLICommandName, paths.CLICommandName, paths.CLICommandName, paths.CLICommandName)
-	// TRACK: BLI-REDACTED — retire this tree; prefer object … --internal.
+	// TRACK: BLI-1785930106857898000-94b9a5bc — retire this tree; prefer object … --internal.
 	internalCmd := clipkg.NewCommandBuilder("internal").
 		WithShort("Deprecated: use object … --internal").
 		WithLong(internalCmdLong).
 		Build()
-	internalCmd.Deprecated = fmt.Sprintf("use '%s object … --internal' instead (DEC-REDACTED)", paths.CLICommandName)
+	internalCmd.Deprecated = fmt.Sprintf("use '%s object … --internal' instead (DEC-1785930071988960000-364a5796)", paths.CLICommandName)
 	internalCmd.PersistentPreRunE = runInternalPersistentPreRunE
 	internalCmd.PersistentFlags().Bool("allow-degraded", false, "Allow scheduler-dependent commands to run when scheduler daemon is not running")
 

@@ -1,0 +1,22 @@
+category: architecture
+content_hash: 6c6deeb3ff776d9f9b577f36302d2cc3b0d0d2663286610cc01ba394a127d0d0
+content_searchable: true
+content_size: 6220
+created_at: "2026-09-17T08:42:11Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-115
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/FILE_LOCK_STRATEGY_AND_TRANSACTION_COORDINATOR.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: 'This architecture provides:'
+title: File Lock Strategy and Transaction Coordinator Architecture
+updated_at: "2026-09-17T08:42:11Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

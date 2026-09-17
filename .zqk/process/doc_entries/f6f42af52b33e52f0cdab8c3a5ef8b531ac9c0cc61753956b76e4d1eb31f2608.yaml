@@ -1,0 +1,22 @@
+category: architecture
+content_hash: 4c3c5bb6f05923190b2f3b20d2eb24371377ce073f4b7643fb750855032b87f0
+content_searchable: true
+content_size: 6867
+created_at: "2026-09-17T08:43:57Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-236
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/PRE_COMMIT_INTEGRITY_TRIGGER_DESIGN.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: 'Lint, policy, and integrity checks all use the same pattern: one persistent scheduler job per category; timer runs = system operation only; when triggered from pre-commit, a callback runs that writ...'
+title: 'Pre-Commit Checks: Persistent Jobs + Trigger-Only Callback'
+updated_at: "2026-09-17T08:43:57Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

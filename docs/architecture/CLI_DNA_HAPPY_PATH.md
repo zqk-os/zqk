@@ -3,10 +3,10 @@
 **Last Verified:** 2026-08-31
 
 
-**Backlog Item:** `BLI-REDACTED`  
-**Requirement:** `REQ-REDACTED`  
-**Priority Plan:** `PRI-REDACTED`  
-**Criteria:** `CRIT-REDACTED`
+**Backlog Item:** `BLI-1786686487292065000-d623ad8e`  
+**Requirement:** `REQ-1786686474136979000-d3cfc737`  
+**Priority Plan:** `PRI-1786686563805309000-842068b2`  
+**Criteria:** `CRIT-1786696710475127000-3ffcbf14`
 
 ---
 
@@ -17,7 +17,7 @@ All `zqk` subcommands follow the **Spec-Driven CLI DNA Pattern**. Adding or modi
 Every command originates from declarative YAML DNA under `.zqk/cli/specs/`, projects into generated Go builders in `pkg/cli/bldr_cli_cmd_v1/`, and binds to execution handlers (`RunE`) in `cmd/zqk/`.
 
 ### Invariants:
-1. **Single Authoring Source:** `.zqk/cli/specs/` is the sole source of truth for CLI definitions (DEC-REDACTED).
+1. **Single Authoring Source:** `.zqk/cli/specs/` is the sole source of truth for CLI definitions (DEC-1786732826125502000-ef80a104).
 2. **Fail-Closed Before Ship:** New subcommands without corresponding YAML DNA or with un-generated builder drift are caught and rejected by native validation gates.
 3. **Traceability:** Command flags, documentation, examples, and options stay synchronized across code, help output, and documentation.
 

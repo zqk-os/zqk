@@ -274,7 +274,7 @@ func runBulkUpdate(cmd *cobra.Command, args []string) error {
 
 		pruneUnknownFields(objectData, kind)
 
-		// TRACK: BLI-REDACTED
+		// TRACK: BLI-1785909672838827000-9fca84f5
 		_ = objectget.StripReferenceResolverOverlayFields(objectData)
 
 		if dryRun {

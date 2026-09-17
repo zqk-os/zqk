@@ -3,7 +3,7 @@
 // scheduler/kernel start, demote shovel_ready|execution_locked instances that
 // fail stay-in-status invariants (lifecycle demote, not autofix→error).
 //
-// TRACK: BLI-REDACTED
+// TRACK: BLI-1785918841712163000-f128dc79
 package contractchange
 
 import (

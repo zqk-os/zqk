@@ -1,0 +1,21 @@
+content_hash: 9e06ada148c46fa5558d8869100f475a9f61c56d65500fc90a92e0c5298ea2a8
+content_searchable: true
+content_size: 7882
+created_at: "2026-09-17T08:44:54Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: other
+id: DOC-613
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/best-practices/coding/discovery-early-completion-pattern.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: The Discovery Early Completion Pattern provides a robust mechanism for detecting when a discovery operation has stabilized (no new items found for a period) and completing early rather than waiting...
+title: Discovery Early Completion Pattern
+updated_at: "2026-09-17T08:44:54Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

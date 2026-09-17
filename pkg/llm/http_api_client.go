@@ -6,7 +6,7 @@ import (
 	"github.com/lanceman/zqk/pkg/specbuilder"
 )
 
-// TRACK: BLI-REDACTED — shared APISpec-backed HTTP client for LLM providers.
+// TRACK: BLI-1783761336286408000-ca1625db — shared APISpec-backed HTTP client for LLM providers.
 func newLLMAPIClient(name, baseURL string) specbuilder.APIClient {
 	spec := specbuilder.APISpec{
 		Name:    name,

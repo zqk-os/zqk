@@ -1,0 +1,22 @@
+category: architecture
+content_hash: 65c31c2b3af2e2bb344827126b307af216c42bfe96d0038ec882ab89a0d9fc60
+content_searchable: true
+content_size: 37411
+created_at: "2026-09-17T08:43:58Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-252
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/RESOLVER_ARCHITECTURE_DESIGN.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: This document designs a comprehensive resolver architecture that can automatically resolve system integrity violations while maintaining safety, auditability, and user awareness
+title: Comprehensive Resolver Architecture Design
+updated_at: "2026-09-17T08:43:58Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

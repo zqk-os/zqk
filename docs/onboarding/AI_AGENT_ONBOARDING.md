@@ -133,7 +133,7 @@ Phase semantics (C1–C6) and vocabulary are tied to glossary terms (for example
 
 **Architecture cross-links (avoid conflating signals):** **`docs/architecture/CONVERGENCE_PREDICATES_AND_GATES.md`** — bundle **`ready_for_session_completion`** vs full **`desired_end_state`**. **`docs/architecture/CONVERGENCE_PHASE_ROUTER_AND_COORDINATOR_DESIGN.md`** (section *Parity and convergence target*) — single-session measure/phase contracts across CLI, tick, and hook. **`docs/architecture/CONVERGENCE_ORCHESTRATION_AND_NESTED_CVS.md`** — rollup, orchestrator, nested **`CVS-*`**, **Appendix F** (multiple active sessions and **shared** `health.jsonl` / fingerprints). **`docs/architecture/EVENT_PIPELINE_AND_CONVERGENCE_INTEGRATION.md`** — when to use hook vs tick vs other pipelines.
 
-**Documentation topology (indices today; ontology-backed linking deferred):** **[ASSESSMENT_AND_ONBOARDING_INDEX.md](../architecture/ASSESSMENT_AND_ONBOARDING_INDEX.md)** — central map; doc-graph backlog **`BLI-REDACTED`** (**deferred**) with **`related_object_refs`** to glossary **`GLS-1776207925199440000-aa236125`** and **`doc_entry`** anchors. **Data-cell program** on **`PRI-REDACTED`** is the active alpha-track persistence work (see also **[EXPERTISE_ARCHITECTURE_AND_CODE_QUALITY.md](../architecture/EXPERTISE_ARCHITECTURE_AND_CODE_QUALITY.md)**). **Do not re-derive on every session:** **`agent_feed`** (delivery policy), CVS **`measure`/tick** (measurement), and **Cursor hooks** (IDE) are **different layers** — canonical one-page narrative: **[DATA_CELL_RUNTIME_ORGANISM.md](../architecture/DATA_CELL_RUNTIME_ORGANISM.md#data-cell-narrative)**.
+**Documentation topology (indices today; ontology-backed linking deferred):** **[ASSESSMENT_AND_ONBOARDING_INDEX.md](../architecture/ASSESSMENT_AND_ONBOARDING_INDEX.md)** — central map; doc-graph backlog **`BLI-1776206564557363000-b402d9f5`** (**deferred**) with **`related_object_refs`** to glossary **`GLS-1776207925199440000-aa236125`** and **`doc_entry`** anchors. **Data-cell program** on **`PRI-1775858342094121000-73af1f15`** is the active alpha-track persistence work (see also **[EXPERTISE_ARCHITECTURE_AND_CODE_QUALITY.md](../architecture/EXPERTISE_ARCHITECTURE_AND_CODE_QUALITY.md)**). **Do not re-derive on every session:** **`agent_feed`** (delivery policy), CVS **`measure`/tick** (measurement), and **Cursor hooks** (IDE) are **different layers** — canonical one-page narrative: **[DATA_CELL_RUNTIME_ORGANISM.md](../architecture/DATA_CELL_RUNTIME_ORGANISM.md#data-cell-narrative)**.
 
 **Post-retention stream stewardship:** the maintenance runner calls **`storage.PostRetentionStreamStewardship`**, which appends **`stream_steward_kind`** lines to **`datacell_steward_enqueue`** JSONL (per stream-backed kind / phase), drained by **`data_cell_envelope_tick`** — see **[STREAM_KIND_STEWARDSHIP.md](../architecture/STREAM_KIND_STEWARDSHIP.md)** (not the same layer as CVS **`measure`** or **`agent_feed`**).
 
@@ -141,7 +141,7 @@ Phase semantics (C1–C6) and vocabulary are tied to glossary terms (for example
 
 #### Journey C (alpha gate): non-interactive JSON scripting
 
-**Backlog:** `BLI-REDACTED`  
+**Backlog:** `BLI-1776036642181883000-995c49ab`  
 **Plan:** [CLI_ALPHA_LAUNCH_PLAN.md](../architecture/CLI_ALPHA_LAUNCH_PLAN.md) — Journey C (section 3).
 
 Agents and automation should drive **`zqk`** without prompts. Use **`--context ai-agent`** (defaults many commands to JSON) and/or **`--format json`** explicitly. Exit code **`0`** means success; non-zero means failure (parse stderr / structured output as needed). Some commands emit **progress lines** before the final JSON object on stdout; for strict pipelines, parse the **last** complete JSON value or use **`zqk query`** on the combined output.
@@ -153,7 +153,7 @@ Agents and automation should drive **`zqk`** without prompts. Use **`--context a
 set -euo pipefail
 # Core read paths — stable top-level keys in JSON: "objects", "count", "success", etc. (see command help for each)
 zqk object list backlog_item --limit 3 --format json --context ai-agent
-zqk object get BLI-REDACTED --format json --context ai-agent
+zqk object get BLI-1776036642181883000-995c49ab --format json --context ai-agent
 # Partial check only (refs skipped; NOT authoritative kernel health — see docs/architecture/check-fast-mode.md)
 zqk system check --fast --format json --context ai-agent
 ```

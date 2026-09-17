@@ -582,7 +582,7 @@ func (c *ObjectIDCache) Get(id string) (*ObjectIDCacheEntry, bool) {
 	// Plain RLock: WithRLockTimeout used a 5s parent context matching the validation
 	// fail-fast budget, so brief write-lock waits burned the entire object timeout.
 	// Get is O(1) under the lock; prefer not to compete with validationCtx.
-	// TRACK: BLI-REDACTED
+	// TRACK: BLI-1785895580100186000-c5539372
 	c.mu.RLock()
 	if c.byKind != nil && c.idToKind != nil {
 		kind, ok := c.idToKind[id]
@@ -850,7 +850,7 @@ func (c *ObjectIDCache) ValidateAndCleanStale() int {
 					if err != nil {
 						// Prefer re-pointing to the live CAS hash over dropping the
 						// entry (update/promote deletes the old hash file first).
-						// TRACK: BLI-REDACTED
+						// TRACK: BLI-1785895580100186000-c5539372
 						var kindDirPath string
 						if kindDir != emptyValue && base != emptyValue {
 							kindDirPath = filepath.Join(base, kindDir)

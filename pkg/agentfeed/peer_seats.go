@@ -172,7 +172,7 @@ func WorkerSeatID(projectRoot string) string {
 
 // SeatPersonaRef returns peer_seats[agentID].persona_ref. Empty if unset or unknown.
 // whats-next plan selection uses this so --agent-id is seat-scoped, not the
-// caller's security-context personas. TRACK: BLI-REDACTED
+// caller's security-context personas. TRACK: BLI-1787035087372193000-c022117d
 func SeatPersonaRef(projectRoot, agentID string) string {
 	id := strings.TrimSpace(agentID)
 	if id == "" || strings.TrimSpace(projectRoot) == "" {

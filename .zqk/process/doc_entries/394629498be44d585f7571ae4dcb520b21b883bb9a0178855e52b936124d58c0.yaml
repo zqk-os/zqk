@@ -1,0 +1,21 @@
+content_hash: 53095fd67793d34234a87f2c8e72112518e58ff7e9fd47e74512734121c74481
+content_searchable: true
+content_size: 10032
+created_at: "2026-09-17T08:44:54Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: onboarding
+id: DOC-622
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/onboarding/AGENT_ONBOARDING_ASSESSMENT_2026-03-21.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: '--- The project operates as a single Go CLI (zqk) backed by content-addressed object storage, scheduler jobs, MCP exposure of CLI commands, and policy/process objects under .zqk/process/'
+title: Agent Onboarding Assessment — 2026-03-21
+updated_at: "2026-09-17T08:44:54Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

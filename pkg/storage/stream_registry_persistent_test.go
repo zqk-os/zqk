@@ -357,7 +357,7 @@ func TestCompactStreamRegistryForKind_MergesDailySegments(t *testing.T) {
 }
 
 // TestOldestStreamIDsFromPersistentRegistry_ordersAndLimits locks retention max_count's
-// stream-registry path (BLI-REDACTED): oldest-first by ID, capped.
+// stream-registry path (BLI-1785905541906569000-074e24d7): oldest-first by ID, capped.
 func TestOldestStreamIDsFromPersistentRegistry_ordersAndLimits(t *testing.T) {
 	tmpDir := t.TempDir()
 	kind := "agent_instruction"

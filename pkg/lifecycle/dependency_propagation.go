@@ -2,7 +2,7 @@
 // A catalyst status save publishes one event to each outbound ref (listener stubs).
 // status_reactive kinds interpret the event from their own lifecycle (and any local
 // ledger). The listener updates only itself; a self-update is a new catalyst.
-// TRACK: BLI-REDACTED
+// TRACK: BLI-1786411312347141000-5f3d9063
 package lifecycle
 
 import (
@@ -160,7 +160,7 @@ func (s *DependencyPropagationSubscriber) HandleEvent(event *coordination.Operat
 //   - last linked backlog_item → terminal: plan in_progress|active → complete (trusted open-children
 //     ledger; no List on this hot path — TRACK: BLI-CEF-ARCH-EVENTS-GLOBALS)
 //
-// planning/prioritizing collapsed into grooming (BLI-REDACTED).
+// planning/prioritizing collapsed into grooming (BLI-1787013084570039000-86fbc2a5).
 //
 // Semantics: plan status in_progress ≡ execution-locked "top of stack". Numeric active_order
 // is unset (FieldUnset) so other shovel-ready plans can occupy 1+. Ranking (whats-next) must
@@ -239,14 +239,14 @@ func applyPriorityPlanDependencyRef(ctx context.Context, logger *logging.EventLo
 	if !ok || len(updates) == 0 {
 		// Child hop was not the lock catalyst (e.g. validated→planned). Re-evaluate occupancy:
 		// if work is already in flight and membership is now ready-or-later, lock.
-		// TRACK: BLI-REDACTED
+		// TRACK: BLI-1786411312347141000-5f3d9063
 		applyOccupancyExecutionLock(ctx, logger, provider, secCtx, ev, currentStatus)
 		return
 	}
-	// Airtight ready-or-later (priority_plan_lifecycle.yaml precondition + BLI-REDACTED):
+	// Airtight ready-or-later (priority_plan_lifecycle.yaml precondition + BLI-1785443681414554000-071a4b71):
 	// YAML on_dependent_status alone must not lock execution while exploring/validated siblings remain —
 	// that is exactly execution_facing_membership. Shockwave used to ignore the precondition.
-	// TRACK: BLI-REDACTED — PRI active→in_progress shockwave miss
+	// TRACK: BLI-1786411312347141000-5f3d9063 — PRI active→in_progress shockwave miss
 	if newStatus, _ := updates[objects.FieldKeyStatus].(string); newStatus == statusInProgress {
 		ready, checkErr := planLinkedBacklogReadyOrLater(ctx, provider, ev.TargetID)
 		if checkErr != nil {
@@ -334,7 +334,7 @@ func commitStatusReactive(ctx context.Context, logger *logging.EventLogger, prov
 // MaybeExecutionLockPlan locks an active/grooming/halted plan when all linked
 // backlog_items are ready-or-later and at least one is already in_progress.
 // Used after promoting a plan to shovel-ready when children started during grooming.
-// TRACK: BLI-REDACTED
+// TRACK: BLI-1786411312347141000-5f3d9063
 func MaybeExecutionLockPlan(ctx context.Context, logger *logging.EventLogger, provider storage.ObjectStorageProvider, projectRoot, planID string) bool {
 	if provider == nil || strings.TrimSpace(planID) == emptyValue {
 		return false
@@ -442,7 +442,7 @@ func commitPriorityPlanShockwave(ctx context.Context, logger *logging.EventLogge
 		}
 	}
 	// Shockwave is in-process side effect of BLI promote; flush plan CAS index so the next
-	// CLI process can Read the plan. TRACK: BLI-REDACTED
+	// CLI process can Read the plan. TRACK: BLI-1785439367722386000-7bd43e71
 	if ev.ProjectRoot != emptyValue {
 		if flushErr := storage.FlushListingIndexForProjectRoot(ev.ProjectRoot, objects.KindPriorityPlan); flushErr != nil {
 			logging.FluentEvent(logger).Debug("dependency propagation: flush priority_plan CAS index failed").
@@ -896,7 +896,7 @@ func releaseDependencyEvent(ev DependencyRefEvent) {
 // planLinkedBacklogReadyOrLater mirrors validation.PrecondAllLinkedBacklogReadyOrLater using
 // a storage List (same cold path as SeedRemainingOpenCountFromMembers). Vacuous true when no
 // linked backlog_items exist. Fail-closed (false, err) on List failure.
-// TRACK: BLI-REDACTED
+// TRACK: BLI-1786411312347141000-5f3d9063
 func planLinkedBacklogReadyOrLater(ctx context.Context, provider storage.ObjectStorageProvider, planID string) (bool, error) {
 	allReady, _, err := planLinkedBacklogLockScan(ctx, provider, planID)
 	return allReady, err
@@ -945,7 +945,7 @@ func backlogItemStatusReadyOrLaterForLock(status string) bool {
 
 // priorityPlanShockwaveUpdates returns status (and optional side-effect) updates for a
 // priority_plan after a linked child's status change. Rules come from lifecycle YAML
-// transitions with on_dependent_status (TRACK: BLI-REDACTED).
+// transitions with on_dependent_status (TRACK: BLI-1785439367722386000-7bd43e71).
 func priorityPlanShockwaveUpdates(planStatus, triggerKind, fromState, toState string) (map[string]any, bool) {
 	return statusReactiveUpdates(objects.KindPriorityPlan, planStatus, triggerKind, fromState, toState)
 }
@@ -1091,7 +1091,7 @@ func dependencyHopMeta(kind, targetID string, objectData map[string]any) (string
 
 func dependencyRefTargetIDs(id string, objectData map[string]any) []string {
 	// Catalyst outbound refs are listener stubs. Reverse-index dependents are not
-	// a walk of the graph in this event. TRACK: BLI-REDACTED
+	// a walk of the graph in this event. TRACK: BLI-1786411312347141000-5f3d9063
 	refs := storage.GetReferencedObjectIDs(objectData)
 	seen := make(map[string]bool)
 	targetIDs := make([]string, 0, len(refs))

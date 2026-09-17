@@ -16,7 +16,7 @@ type SemanticStorageDecorator struct {
 }
 
 // UnderlyingObjectStorageProvider returns the wrapped provider for file/CAS unwrap
-// (state-restore WriteObjectRaw). TRACK: BLI-REDACTED
+// (state-restore WriteObjectRaw). TRACK: BLI-1785723654802038000-b14064bc
 func (d *SemanticStorageDecorator) UnderlyingObjectStorageProvider() storage.ObjectStorageProvider {
 	if d == nil {
 		return nil

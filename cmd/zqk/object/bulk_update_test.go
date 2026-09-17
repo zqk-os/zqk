@@ -374,7 +374,7 @@ func TestBulkUpdateCmd(t *testing.T) {
 			seedBulkUpdateSupportObjects(t, provider)
 			// Create parks non-preliminary statuses on the draft plane (origin exploring);
 			// promote to the intended status so List/bulk filters see the objects.
-			// TRACK: BLI-REDACTED — draft-plane create / promote membrane.
+			// TRACK: BLI-1785443942668406000-1ec5c811 — draft-plane create / promote membrane.
 			for _, objData := range tc.setupObjects {
 				leave := objects.GetString(objData, objects.FieldKeyStatus)
 				if leave == emptyValue {

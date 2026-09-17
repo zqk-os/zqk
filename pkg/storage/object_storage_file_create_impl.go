@@ -9,6 +9,7 @@ import (
 	"github.com/lanceman/zqk/pkg/kernelcas"
 	"github.com/lanceman/zqk/pkg/logging"
 	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/lanceman/zqk/pkg/process"
 	caspkg "github.com/lanceman/zqk/pkg/storage/cas"
 	"github.com/lanceman/zqk/pkg/storage/crud"
 	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
@@ -17,7 +18,7 @@ import (
 //nolint:gocyclo
 func (f *FileObjectStorage) Create(ctx context.Context, secCtx *pkgctx.SecurityContext, obj map[string]any) error {
 	// Kernel Mutation Pipeline entry (COMMIT re-enters with kernelcas.WithCommit).
-	// TRACK: BLI-REDACTED
+	// TRACK: BLI-1785784864671436000-071adcbe
 	if !kernelcas.IsCommit(ctx) {
 		kind, _ := obj[objects.FieldKeyKind].(string)
 		id, _ := obj[objects.FieldKeyID].(string)
@@ -285,6 +286,7 @@ func (f *FileObjectStorage) Create(ctx context.Context, secCtx *pkgctx.SecurityC
 	if objects.GetString(obj, objects.FieldKeyStatus) == emptyValue {
 		return errfmt.Errorf("create invariant violated: status empty after persist for %s", id)
 	}
+	process.TouchMeaningfulActivity()
 	return nil
 }
 

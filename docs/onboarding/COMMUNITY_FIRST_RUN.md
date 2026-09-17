@@ -66,10 +66,11 @@ zqk grep --ast "func Test*" .
 
 ## After green
 
-1. `zqk workflow whats-next --format json` — next work from the kernel (not chat memory).  
-2. `zqk system start-here` — short Community tutorial.  
-3. MCP (optional): Configure IDE to run `zqk mcp serve` (see `zqk system start-here`) — confirm with `zqk feed doctor --format json` (`mcp_subscribers >= 1`).  
-4. Studio / process dogfood only if that is your job: [`AI_AGENT_ONBOARDING.md`](./AI_AGENT_ONBOARDING.md).
+1. `zqk quickstart` or [`QUICKSTART.md`](./QUICKSTART.md) — 5-minute interactive onboarding walkthrough.  
+2. `zqk mcp install` — automatically configure detected IDEs (Cursor, Claude Desktop, VS Code) to pair with the ZQK Knowledge Kernel.  
+3. `zqk workflow whats-next --format json` — next work from the kernel (not chat memory).  
+4. `zqk system start-here` — short Community tutorial.  
+5. Studio / process dogfood only if that is your job: [`AI_AGENT_ONBOARDING.md`](./AI_AGENT_ONBOARDING.md).  
 
 ## Kernel vs pack
 

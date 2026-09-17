@@ -53,12 +53,12 @@ func execControlPlane(ctx context.Context, env *Env, stage Stage) (Result, error
 		}
 	}
 	if env != nil && env.GetObject != nil {
-		job, err := env.GetObject(ctx, "SCH-cap-night-duty")
+		job, err := env.GetObject(ctx, objects.JobIDCapNightDuty)
 		if err == nil {
 			enabled := boolFromAny(job[objects.FieldKeyEnabled])
 			ev["night_duty_enabled"] = enabled
 			if enabled {
-				return Result{OK: false, Evidence: ev}, errfmt.Errorf("SCH-cap-night-duty is enabled; swarm-init will not turn it on and refuses to continue")
+				return Result{OK: false, Evidence: ev}, errfmt.Errorf("%s is enabled; swarm-init will not turn it on and refuses to continue", objects.JobIDCapNightDuty)
 			}
 		}
 	}

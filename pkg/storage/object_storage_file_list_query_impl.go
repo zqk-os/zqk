@@ -389,11 +389,27 @@ func (f *FileObjectStorage) Count(ctx context.Context, secCtx *pkgctx.SecurityCo
 	// When that is the only filter, all standard process objects belong to this namespace.
 	// Route to fast index count instead of forcing an O(N) YAML parse across thousands of files.
 	if len(filter.Filters) == 1 {
-		if ns, ok := filter.Filters[objects.FieldKeyNamespaceID].(string); ok && (ns == "zqk:kernel" || ns == "") {
-			if f.usesContentAddressableStorage(filter.Kind) {
-				return f.countFromCASIndex(ctx, filter.Kind, kindDir)
+		if ns, ok := filter.Filters[objects.FieldKeyNamespaceID].(string); ok {
+			switch filter.Kind {
+			case objects.KindOrganization, objects.KindDivision, objects.KindDepartment, objects.KindTeam, objects.KindPartnership:
+				// Organizational kinds belong strictly to domain:organizational, never zqk:kernel.
+				if ns == "domain:organizational" {
+					if f.usesContentAddressableStorage(filter.Kind) {
+						return f.countFromCASIndex(ctx, filter.Kind, kindDir)
+					}
+					return f.countFiles(ctx, kindDir, usesBucketing)
+				}
+				if ns == "zqk:kernel" || ns == "" {
+					return 0, nil
+				}
+			default:
+				if ns == "zqk:kernel" || ns == "" {
+					if f.usesContentAddressableStorage(filter.Kind) {
+						return f.countFromCASIndex(ctx, filter.Kind, kindDir)
+					}
+					return f.countFiles(ctx, kindDir, usesBucketing)
+				}
 			}
-			return f.countFiles(ctx, kindDir, usesBucketing)
 		}
 	}
 

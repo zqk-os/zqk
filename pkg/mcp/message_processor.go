@@ -172,7 +172,7 @@ func (mp *MessageProcessor) updateClientConnection(writer *bufio.Writer, format 
 				// connection currently processing a message so reconnect after EOF works.
 				// Responses still route only when queue.Writer matches this connection
 				// (queueForConnectionWriter) so a brief ephemeral dial cannot enqueue onto
-				// IDE's socket. TRACK: BLI-REDACTED — remove when:
+				// IDE's socket. TRACK: BLI-1784969955962654000-dc689643 — remove when:
 				// per-connection Server isolates client identity.
 				if mp.server.multiClient.Load() && client.Writer != nil && client.Writer != writer {
 					mp.server.traceLogf("[MCP_DEBUG] multi-client: rebinding Writer for client_id=%s (reconnect or peer dial)", currentClientID)
@@ -526,7 +526,7 @@ func (mp *MessageProcessor) buildResponse(req *JSONRPCRequest, result any, err e
 
 // queueForConnectionWriter returns the queue that may serialize writes for this
 // connection. Multi-client TCP uses a per-writer queue (not shared clientID state).
-// TRACK: BLI-REDACTED — remove when: per-connection Server is default.
+// TRACK: BLI-1784969955962654000-dc689643 — remove when: per-connection Server is default.
 func (mp *MessageProcessor) queueForConnectionWriter(writer *bufio.Writer, format *MessageFormat) *MessageQueue {
 	if mp == nil || mp.server == nil || writer == nil {
 		return nil

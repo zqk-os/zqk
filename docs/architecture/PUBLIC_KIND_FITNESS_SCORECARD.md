@@ -5,7 +5,7 @@
 
 **Audit Scope:** All registered `visibility:public` object kinds in `zqk:kernel`.  
 **Governing Standard:** [`docs/architecture/KERNEL_OBJECT_KIND_EVALUATION_RUBRIC.md`](./KERNEL_OBJECT_KIND_EVALUATION_RUBRIC.md)  
-**Plan:** `PRI-REDACTED` / `BLI-REDACTED`  
+**Plan:** `PRI-1786687873940250000-a6c3a985` / `BLI-1786687905507390000-ae011ea2`  
 **Auditor Seat:** `antigravity-1` (`PER-ORCH-ALPHA`)  
 
 ---
@@ -24,17 +24,17 @@
 | `risk_blocker` (`risk_blockers`) | 93 | Operational/architectural risk tracking | `keep_enforce` | `WS-CEF-STABILITY` |
 | `goal` (`goals`) | 83 | High-level project objectives | `keep_enforce` | `GOAL-OSS-CORE` |
 | `persona` (`personas`) | 55 | Agent & operator seat definitions | `keep_enforce` | `PER-ORCH-ALPHA` |
-| `priority_plan` (`priority_plans`) | 50 | TPM Gantt matrix active execution columns | `keep_enforce` | `PRI-REDACTED` |
+| `priority_plan` (`priority_plans`) | 50 | TPM Gantt matrix active execution columns | `keep_enforce` | `PRI-1786687873940250000-a6c3a985` |
 | `test_case` (`tests`) | 55 | Traceable test definitions | `keep_enforce` | `WS-CEF-TESTING` |
 | `agent_task` (`agent_tasks`) | 38 | In-flight execution tasks for agents | `keep_enforce` | `WS-CEF-ARCHITECTURE` |
 | `agent_skill` (`agent_skills`) | 38 | Autonomous agent capabilities | `keep_enforce` | `docs/onboarding/SYSTEM_OBJECTS_GUIDE.md` |
 | `prompt_template` (`prompt_templates`) | 39 | Structured prompt contracts | `keep_enforce` | `WS-CEF-DOCS-UX` |
 | `workstream` (`workstreams`) | 37 | Long-lived functional tracks | `keep_enforce` | `ROAD-CEF-R2-GRADE-UPLIFT` |
-| `account` (`accounts`) | 51 | Actor & agent IDs; contains fixture IDs | `quarantine_fixtures` | `BLI-REDACTED` |
+| `account` (`accounts`) | 51 | Actor & agent IDs; contains fixture IDs | `quarantine_fixtures` | `BLI-1786684969399550000-5dd4674c` |
 | `glossary_term_relation` | 30 | Cross-term graph edges | `keep_enforce` | `GLS-1786687875188966000-0ed1e9a6` |
 | `role` (`roles`) | 17 | Organizational & runtime roles | `keep_enforce` | `WS-CEF-ARCHITECTURE` |
 | `decision` (`decisions`) | 15 | Architectural decision records (ADRs) | `keep_enforce` | `WS-CEF-ARCHITECTURE` |
-| `convergence_session` | 14 | Session synchronization markers | `keep_enforce` | `DEC-REDACTED` |
+| `convergence_session` | 14 | Session synchronization markers | `keep_enforce` | `DEC-1786686986572580000-54124993` |
 | `technical_debt` (`technical_debts`) | 11 | Explicit debt items | `keep_enforce` | `WS-CEF-ARCHITECTURE` |
 | `roadmap` (`roadmaps`) | 11 | Multi-quarter strategic roadmaps | `keep_enforce` | `ROAD-CEF-R2-GRADE-UPLIFT` |
 | `vocabulary_scheme` | 9 | Ontology classification schemes | `keep_enforce` | `.zqk/process/vocabulary_schemes` |
@@ -43,8 +43,8 @@
 | `workflow` (`workflows`) | 6 | Reusable pipeline blueprints | `keep_enforce` | `pkg/pipeline` |
 | `strategic_context` | 5 | Mission/strategic boundary objects | `keep_enforce` | `GOAL-OSS-CORE` |
 | `question` (`questions`) | 12 | Community first-run onboarding tutorial kind | `keep_enforce` | `FIRST_RUN_OBJECT_TUTORIAL.md` |
-| `command_spec` | 0 | Dual-source CLI DNA (AST vs Spec) | `remediate` | `PRI-REDACTED` |
-| `agent_onboarding_preparation` | 0 | Low utilization on CAS (draft plane only) | `quarantine_fixtures` | `BLI-REDACTED` |
+| `command_spec` | 0 | Dual-source CLI DNA (AST vs Spec) | `remediate` | `PRI-1786686563805309000-842068b2` |
+| `agent_onboarding_preparation` | 0 | Low utilization on CAS (draft plane only) | `quarantine_fixtures` | `BLI-1786684969399550000-5dd4674c` |
 | `strategic_plan` | 1 | Strategic executive direction | `keep_enforce` | `ROAD-CEF-R2-GRADE-UPLIFT` |
 | `probe_spec` | 1 | Inquiry probe specification | `keep_enforce` | `pkg/probe` |
 | `library` (`libraries`) | 1 | Shared module references | `keep_enforce` | `pkg/storage` |
@@ -104,7 +104,7 @@ lenses:
   L6_duplicative_ids: pass — unique ID validation verified
   L7_status_vocabulary: pass — planned -> in_progress -> complete -> archived
 disposition: keep_enforce
-follow_ups: [PRI-REDACTED]
+follow_ups: [PRI-1786687873940250000-a6c3a985]
 evidence: [.zqk/process/priority_plans/]
 ```
 
@@ -165,12 +165,12 @@ evidence: [.zqk/process/agent_tasks/]
 
 ### A. Account Fixture Quarantine (Crevice-Sweep Cross-Link)
 - **Finding**: Several legacy test accounts (e.g. `ACC-TEST-*`) remain stored in `.zqk/process/accounts/`.
-- **Cross-Link**: Explicitly linked to Crevice-Sweep [`BLI-REDACTED`](file:///tmp/zqk-worktrees/pri-fitness/.zqk/process/backlog/02b260ae84fcf71f9f8a76e19b6bc1e7a44f0bec0b3c7d939b1d297964b1ba9b.yaml) to archive or relocate fixture accounts outside the `zqk:kernel` production namespace (`CRIT-REDACTED`).
+- **Cross-Link**: Explicitly linked to Crevice-Sweep [`BLI-1786684969399550000-5dd4674c`](file:///tmp/zqk-worktrees/pri-fitness/.zqk/process/backlog/02b260ae84fcf71f9f8a76e19b6bc1e7a44f0bec0b3c7d939b1d297964b1ba9b.yaml) to archive or relocate fixture accounts outside the `zqk:kernel` production namespace (`CRIT-1786695439226524000-6011092c`).
 
 ### B. Command Spec Dual-Source
 - **Finding**: `command_spec` currently has 0 instances on CAS because CLI commands are declared directly in Go code (`cmd/zqk/`).
-- **Disposition**: `remediate` — tracked under [`PRI-REDACTED`](file:///tmp/zqk-worktrees/pri-fitness/.zqk/process/priority_plans/1747311079e8d890f36226b35a5daae07c4fb823d2ab9725e7502ae06eeebad8.yaml) to generate `command_spec` directly from CLI AST to preserve single-source-of-truth.
+- **Disposition**: `remediate` — tracked under [`PRI-1786686563805309000-842068b2`](file:///tmp/zqk-worktrees/pri-fitness/.zqk/process/priority_plans/1747311079e8d890f36226b35a5daae07c4fb823d2ab9725e7502ae06eeebad8.yaml) to generate `command_spec` directly from CLI AST to preserve single-source-of-truth.
 
 ### C. Draft Plane Honesty
 - **Finding**: Draft objects with `status=draft` must remain on the `.zqk/object_drafts/` draft plane and never be directly committed to CAS.
-- **Disposition**: `keep_enforce` — enforced by [`BLI-REDACTED`](file:///tmp/zqk-worktrees/pri-fitness/.zqk/process/backlog/1a8394fe716ad516e4179c1f66ff32aa68a0320821d50b1a0297f91b280e9339.yaml) and `zqk system check` Layer-0 integrity rules.
+- **Disposition**: `keep_enforce` — enforced by [`BLI-1786689721908382000-6402a858`](file:///tmp/zqk-worktrees/pri-fitness/.zqk/process/backlog/1a8394fe716ad516e4179c1f66ff32aa68a0320821d50b1a0297f91b280e9339.yaml) and `zqk system check` Layer-0 integrity rules.

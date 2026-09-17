@@ -19,7 +19,7 @@ import (
 	"github.com/lanceman/zqk/pkg/utils/fileutil"
 )
 
-// TRACK: BLI-REDACTED — out-of-band CAP / steward emergency monitor.
+// TRACK: BLI-1783831583919580000-8b543560 — out-of-band CAP / steward emergency monitor.
 
 const (
 	emergencyManagerStateFile   = "emergency_manager_last.json"
@@ -181,7 +181,7 @@ func (h *EmergencyManagerHandler) readCAPFailureTracker() (capFailureSnapshot, e
 }
 
 func (h *EmergencyManagerHandler) readLastCAPSuccessFromEvents() (time.Time, bool) {
-	p := filepath.Join(h.projectRoot, paths.ProjectDataDir, "logs", "scheduler", "SCH-cap-orchestrator", "SCH-cap-orchestrator.events.jsonl")
+	p := filepath.Join(h.projectRoot, paths.ProjectDataDir, "logs", "scheduler", CapOrchestratorJobID, CapOrchestratorJobID+".events.jsonl")
 	b, err := fileutil.ReadFile(p)
 	if err != nil {
 		return time.Time{}, false
@@ -251,8 +251,8 @@ func (h *EmergencyManagerHandler) appendEmergencyChat(reason string, snap capFai
 		return
 	}
 	defer f.Close()
-	msg := fmt.Sprintf("EMERGENCY MANAGER: CAP unhealthy — %s. consecutive_failures=%d last_stage=%s. Review SCH-cap-orchestrator; stash gated (metadata.allow_stash).",
-		reason, snap.ConsecutiveFailures, snap.LastStage)
+	msg := fmt.Sprintf("EMERGENCY MANAGER: CAP unhealthy — %s. consecutive_failures=%d last_stage=%s. Review %s; stash gated (metadata.allow_stash).",
+		reason, snap.ConsecutiveFailures, snap.LastStage, CapOrchestratorJobID)
 	_ = json.NewEncoder(f).Encode(map[string]any{
 		"timestamp": h.now().Format(time.RFC3339),
 		"sender":    "emergency_manager",

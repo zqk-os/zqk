@@ -1,0 +1,22 @@
+category: architecture
+content_hash: e8f223f22b7013762720da43ca7e2e632607caf34bd752e1136ceffd995227bc
+content_searchable: true
+content_size: 5399
+created_at: "2026-09-17T08:44:35Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-480
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/mcp/ROLE_PROMPT_TEMPLATES.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: The role prompt templates system allows all MCP prompts to be externalized and customized per role
+title: Role Prompt Templates System
+updated_at: "2026-09-17T08:44:35Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

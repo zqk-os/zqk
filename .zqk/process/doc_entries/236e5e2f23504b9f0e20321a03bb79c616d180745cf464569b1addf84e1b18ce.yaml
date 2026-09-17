@@ -1,0 +1,22 @@
+category: cli
+content_hash: 8b47a7761bd467d4f78f37e1b56407b57cb14ad255339c555fc3f8a34bd5b00a
+content_searchable: true
+content_size: 2882
+created_at: "2026-09-17T08:44:01Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-274
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/SEMANTIC_KERNEL_AND_CLI_FACADE.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: A traditional OS kernel mediates hardware and processes
+title: Semantic kernel and the CLI façade
+updated_at: "2026-09-17T08:44:01Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

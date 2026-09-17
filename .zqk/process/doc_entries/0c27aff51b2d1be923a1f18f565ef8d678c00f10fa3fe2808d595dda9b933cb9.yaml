@@ -1,0 +1,22 @@
+category: cli
+content_hash: c1072d9cfb249bf2162350941569fca79bf6bf111c7c1f72d6e14d937de7e41d
+content_searchable: true
+content_size: 6975
+created_at: "2026-09-17T08:39:29Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-010
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/AI_AGENT_CLI_FIRST_WORKFLOW.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: ALL object operations MUST use CLI/MCP tools
+title: AI Agent CLI-First Workflow
+updated_at: "2026-09-17T08:39:29Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

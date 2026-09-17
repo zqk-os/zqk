@@ -1,0 +1,22 @@
+category: architecture
+content_hash: 32fd9ebc500b6c9194a41c1582ca384e7b501e2160675d9d4d3c536544d75b21
+content_searchable: true
+content_size: 19734
+created_at: "2026-09-17T08:42:08Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-089
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/DATA_CELL_RUNTIME_ORGANISM.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: 'Microbenchmarks (foreground go test; use -run ''^$'' so only benchmarks run—especially in ./pkg/scheduler, where a full package test run includes slow integration tests): | Area | Command | Order o...'
+title: Data cell — runtime organism (protocol v1)
+updated_at: "2026-09-17T08:42:08Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

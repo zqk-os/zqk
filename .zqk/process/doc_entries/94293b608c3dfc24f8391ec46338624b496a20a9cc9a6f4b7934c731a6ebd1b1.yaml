@@ -1,0 +1,22 @@
+category: architecture
+content_hash: b5f3839d61cc768a6a65be80a34ce65d52033aeab39e6cb51f1413dee189b8d3
+content_searchable: true
+content_size: 12293
+created_at: "2026-09-17T08:39:30Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-020
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/ARCHITECTURE_PATTERNS.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: This document serves as the authoritative source for architecture patterns in zqk
+title: Architecture Patterns Library
+updated_at: "2026-09-17T08:39:30Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

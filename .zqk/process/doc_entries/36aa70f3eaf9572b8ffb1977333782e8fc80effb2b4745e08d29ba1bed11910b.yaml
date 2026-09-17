@@ -1,0 +1,22 @@
+category: architecture
+content_hash: 5af573879f9a0a656b890c6681875b6800cdc4182f161b68905d77ca2867dbbf
+content_searchable: true
+content_size: 205230
+created_at: "2026-09-17T08:44:13Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-309
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/SYSTEM_SPECIFICATION.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: '> Target Audience: Technical Program Manager (TPM) Agents, Lead Architects, and Implementation Agents'
+title: ZQK (Zen Quantum Kernel) Master Specification & Schema Blueprint
+updated_at: "2026-09-17T08:44:13Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

@@ -30,7 +30,7 @@ Workstream maps `in_progress → active` (no separate lock status). Goal maps `i
 |-----|--------|--------|
 | `halted → shovel_ready` | **Yes** | **B** (workstream `paused → active`); **auto** (goal `blocked → active` when blockers clear) |
 | `shovel_ready → execution_locked` | No (no lock status) | — |
-| `shovel_ready → terminal` | Yes (often auto-only rollup) | **A** should bind; today often fail-open English. TRACK: `BLI-REDACTED` |
+| `shovel_ready → terminal` | Yes (often auto-only rollup) | **A** should bind; today often fail-open English. TRACK: `BLI-1785784867143912000-635942fb` |
 
 ## Shockwave vs PRI
 

@@ -13,7 +13,7 @@ import (
 	"github.com/lanceman/zqk/pkg/testkit"
 )
 
-// TestWatchdogSubagent_Conformance verifies CRIT-REDACTED:
+// TestWatchdogSubagent_Conformance verifies CRIT-1789273452649989000-52bedd55:
 // System integration, contract conformance, observability, and regression verification.
 func TestWatchdogSubagent_Conformance(t *testing.T) {
 	ctx := context.Background()

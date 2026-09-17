@@ -6,7 +6,7 @@ import (
 
 // CollectPersonaASKRefs returns ASK-* ids linked on a persona via canonical
 // agent_skill_refs and/or related_object_refs (CRI-PERSONA-SKILL-BOUND dual-read).
-// TRACK: BLI-REDACTED
+// TRACK: BLI-1785904242062561000-ec024787
 func CollectPersonaASKRefs(persona map[string]any) []string {
 	if persona == nil {
 		return nil

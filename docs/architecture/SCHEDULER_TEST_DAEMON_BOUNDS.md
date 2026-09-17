@@ -48,7 +48,7 @@ go sched.Start(ctx)
 
 ## Tracking
 
-- `BLI-REDACTED` — ephemeral teardown + bound helper adoption.
+- `BLI-1786385524943190000-f8f9dab5` — ephemeral teardown + bound helper adoption.
 - `TRACK:` on `pkg/testkit/scheduler_daemon_bound.go` for remaining ad-hoc start/stop call sites.
 
 ## Checklist

@@ -1,0 +1,22 @@
+category: architecture
+content_hash: 707e4b0712898d5709e56f1f06edd110c50722a4d441e43ffbd88309fe92ada7
+content_searchable: true
+content_size: 1151
+created_at: "2026-09-17T08:44:08Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-282
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/SOURCE_CONTROL_STEWARD_SPEC.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: '- Rigor & Correctness: The agent must never force-push to main'
+title: Source Control Steward Spec
+updated_at: "2026-09-17T08:44:08Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

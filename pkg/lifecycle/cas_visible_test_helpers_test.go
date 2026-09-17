@@ -17,7 +17,7 @@ var fixtureSeq atomic.Uint64
 
 // fixtureID returns a per-call graph id so shared Memgraph rows do not collide
 // across tests *and* across process runs (monotonic seq alone resets and reclaims PRI-1).
-// TRACK: BLI-REDACTED — Local CI Memgraph pollution on reused fixture IDs.
+// TRACK: BLI-1785443942668406000-1ec5c811 — Local CI Memgraph pollution on reused fixture IDs.
 func fixtureID(t *testing.T, prefix string) string {
 	t.Helper()
 	return fmt.Sprintf("%s-%d-%d", prefix, time.Now().UnixNano(), fixtureSeq.Add(1))
@@ -26,7 +26,7 @@ func fixtureID(t *testing.T, prefix string) string {
 // mustCreateCASVisible creates obj then force-promotes to the intended status.
 // Create coerces non-origin statuses to lifecycle origin (e.g. priority_plan → planning);
 // tests need shovel-ready / in_progress fixtures without walking full template preconditions.
-// TRACK: BLI-REDACTED — draft-plane create / promote membrane.
+// TRACK: BLI-1785443942668406000-1ec5c811 — draft-plane create / promote membrane.
 func mustCreateCASVisible(t *testing.T, store storage.ObjectStorageProvider, ctx context.Context, secCtx *pkgctx.SecurityContext, obj map[string]any) {
 	t.Helper()
 	id, _ := obj[objects.FieldKeyID].(string)

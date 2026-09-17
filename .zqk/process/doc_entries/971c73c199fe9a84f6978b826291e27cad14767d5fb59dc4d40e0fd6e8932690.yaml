@@ -1,0 +1,22 @@
+category: architecture
+content_hash: 04d5ff210e1c44648bcbbb3bd233bb6d7ea9dc612487ee7cf0e1cc6a21c06683
+content_searchable: true
+content_size: 3724
+created_at: "2026-09-17T08:44:31Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-437
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/high-volume-event-cache-proposal.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: 'High-volume events (audit_event, metrics) are stored in .zqk/ directories and currently require expensive real-time scans: - 17,591 audit events require directory scans + YAML parsing for queries'
+title: High-Volume Event Cache Proposal
+updated_at: "2026-09-17T08:44:31Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

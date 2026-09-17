@@ -16,7 +16,7 @@ import (
 // batches under .zqk/autofix/. Empty batches are deleted. Best-effort sync for shockwave /
 // CascadeOnObjectChange so deferred apply cannot replay issues already resolved by promote
 // or other mutations.
-// TRACK: BLI-REDACTED — remove when: pending autofix is always
+// TRACK: BLI-1785723654802038000-b14064bc — remove when: pending autofix is always
 // revalidated against live state and batches are id-indexed (no full-dir scan needed).
 func PrunePendingAutofixBatchesForObjectID(projectRoot, objectID string) (rewritten, deleted int) {
 	if projectRoot == "" || objectID == "" {
@@ -120,7 +120,7 @@ func checkResultsHaveTierIssues(results []CheckResult, maxTier int) bool {
 // kernel check found no tier-1/2/3 issues. Those batches are stale snapshots; leaving them
 // blocked "healthy" and invited deferred churn. Scoped checks never clear (other kinds may
 // still need their batches).
-// TRACK: BLI-REDACTED
+// TRACK: BLI-1785723654802038000-b14064bc
 func maybeClearStaleAutofixBatchesAfterLiveGreen(cmd *cobra.Command, projectRoot string, results []CheckResult) int {
 	if projectRoot == "" || !systemCheckIsFullKernelScan(cmd) {
 		return 0
@@ -138,7 +138,7 @@ func maybeClearStaleAutofixBatchesAfterLiveGreen(cmd *cobra.Command, projectRoot
 
 // issueStillAppliesToObject reports whether a snapshotted autofix issue is still relevant
 // for the live object. Cheap predicates only — fail closed (return true) when unsure.
-// TRACK: BLI-REDACTED
+// TRACK: BLI-1785723654802038000-b14064bc
 func issueStillAppliesToObject(kind string, props map[string]any, issue Issue) bool {
 	if props == nil {
 		return false

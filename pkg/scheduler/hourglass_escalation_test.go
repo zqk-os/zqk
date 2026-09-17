@@ -23,7 +23,7 @@ func TestHourglassSourcePresent(t *testing.T) {
 	if !hourglassSourcePresent(ctx, store, nil, "ATK-live") {
 		t.Fatal("live ATK must be allowed to mint")
 	}
-	if hourglassSourcePresent(ctx, store, nil, "ATK-REDACTED") {
+	if hourglassSourcePresent(ctx, store, nil, "ATK-1788162502382684000-c631eb40") {
 		t.Fatal("absent ATK must not mint GhostRef RIS")
 	}
 	if hourglassSourcePresent(ctx, nil, nil, "ATK-live") {

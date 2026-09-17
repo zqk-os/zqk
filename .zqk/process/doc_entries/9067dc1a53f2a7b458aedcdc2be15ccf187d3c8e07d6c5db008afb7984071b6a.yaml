@@ -1,0 +1,22 @@
+category: architecture
+content_hash: 4b629cfbeaad1c1ff794b97034d606742b3d4b8597b950f4c5220bc6855435ee
+content_searchable: true
+content_size: 3483
+created_at: "2026-09-17T08:42:13Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-129
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/HARDCODED_LITERAL_REPETITION_PHASES.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: This complements CONSTANTS_AND_DRY_INVENTORY_PLAN.md (existing A–E phases) with an execution loop that does not require picking ad hoc “slices.” --- - JSON / struct tags and other schema-boun...
+title: Hardcoded literal repetition — drift phases
+updated_at: "2026-09-17T08:42:13Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

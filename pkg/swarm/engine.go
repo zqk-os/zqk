@@ -160,7 +160,7 @@ func (e *Engine) VerifyCompletionWith(verify CompletionVerifier, maxRepairs int)
 // tool prefix — interim ATK completion evidence for seat-worker coding seats.
 // A successful write is not proof of work: it accepts code that does not
 // compile, and seats have looped rewriting a broken file to satisfy it.
-// TRACK: BLI-REDACTED — remove when the compile + test
+// TRACK: BLI-1786948736717976000-a0522aac — remove when the compile + test
 // completion gate replaces tool-name evidence (POL-AGENT-COMMS-CHECK-001).
 func MutationEvidenceTools() []string {
 	return mutationEvidenceNames(DefaultToolPrefix(), brand.ProductNamespacePrefix(brand.NamespacePrefix())+"_")
@@ -627,7 +627,11 @@ func (e *Engine) Run(ctx context.Context, systemPrompt, userPrompt string) (stri
 
 			// Force-write guidance: if code exploration budget is spent and the call is not mutation evidence
 			if ShouldForceWriteOnly(needEvidence, toolCallHistory) && !IsMutationEvidenceTool(call.Name) {
-				result = "Code exploration budget spent. You must invoke write_code or write_file to implement the solution."
+				if tripped, reason := CheckReadLoopWatchdog(toolCallHistory); tripped && reason != "" {
+					result = reason
+				} else {
+					result = "Code exploration budget spent. You must invoke write_code or write_file to implement the solution."
+				}
 				logging.FluentEvent(logger).Warn("Non-mutation tool called during force-write mode (guidance injected)").
 					WithFields(e.fields(ctx, logging.ToolNameField(call.Name))...).
 					Log()

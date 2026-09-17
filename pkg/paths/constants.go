@@ -54,7 +54,7 @@ const (
 	ZqkTestConfigFileName  = "zqk-test.yaml"
 	ZqkEnvConfigFilePrefix = "zqk-"
 
-	MCPDir    = "mcp"
+	MCPDir = "mcp"
 	// WorkshopBinDir holds the workshop stable CLI binary under ProjectDataDir (e.g. .zqk/bin/<exe>-stable).
 	WorkshopBinDir = "bin"
 	// RepoBinDir is the repository-root bin/ directory (compiled CLI for local ops).
@@ -86,6 +86,8 @@ const (
 	MetricsStreamVolumeSubdir = "stream_volume"
 	// MetricsFilesystemSnapshotSubdir: full-tree file/byte counts by bucket (from object-count-report --include-filesystem-snapshot).
 	MetricsFilesystemSnapshotSubdir = "filesystem_snapshot"
+	// MetricsCommandMetricsSubdir: day-rolled and timeseries chunks for command execution metrics.
+	MetricsCommandMetricsSubdir = "command_metrics"
 
 	// Common file names
 	ProjectConfigFile = configYAMLFileName

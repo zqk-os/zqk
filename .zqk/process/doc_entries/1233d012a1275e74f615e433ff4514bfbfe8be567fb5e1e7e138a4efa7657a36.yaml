@@ -1,0 +1,22 @@
+category: architecture
+content_hash: dc42f104a6ed09370d9cfc12cc73d6919bf62fd78bef184edbc0f9ab994b191f
+content_searchable: true
+content_size: 3647
+created_at: "2026-09-17T08:44:35Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-489
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/mcp/observer-agent-privileges-update-v1.0.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: '- write:account - Allows observer agent to create account objects - Added mention of "dynamic agent registration (creating account objects for new agents)" - updated_at: "2026-01-01T00:00:00Z" The ...'
+title: Observer Agent Privileges Update
+updated_at: "2026-09-17T08:44:35Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

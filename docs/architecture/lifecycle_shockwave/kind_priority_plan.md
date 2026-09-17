@@ -8,7 +8,7 @@
 **Family:** [gantt_column](./family_gantt_column.md)  
 **Class catalog (planes, listeners, overlay ops):** [LIFECYCLE_SHOCKWAVE_MAP.md](../LIFECYCLE_SHOCKWAVE_MAP.md)  
 **SSOT YAML:** `.zqk/specs/lifecycles/priority_plan_lifecycle.yaml`  
-**TRACK:** `BLI-REDACTED` (check valve), `BLI-REDACTED` (YAML matcher), `BLI-REDACTED` (`on_all_dependents_status`)
+**TRACK:** `BLI-1785439369431933000-f0cccd6c` (check valve), `BLI-1785439367722386000-7bd43e71` (YAML matcher), `BLI-1785784867143912000-635942fb` (`on_all_dependents_status`)
 
 ## Overview
 

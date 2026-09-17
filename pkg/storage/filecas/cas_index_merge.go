@@ -18,7 +18,7 @@ var casDateBucketNameRe = regexp.MustCompile(`^\d{4}-\d{2}(-\d{2})?$`)
 // short-lived CLI caches cannot clobber a healed index; callers must re-apply the
 // in-flight batch/explicit mapping afterward.
 //
-// TRACK: BLI-REDACTED — remove when: CAS index writers never
+// TRACK: BLI-1785723654802038000-b14064bc — remove when: CAS index writers never
 // overlay a full stale process map onto a fresher disk snapshot.
 func MergeCASIndexMaps(kindDir string, disk, memory map[string]string) map[string]string {
 	out := make(map[string]string, len(disk)+len(memory))

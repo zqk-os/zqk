@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"os"
 	"path/filepath"
 	"sort"
 	"strings"
@@ -220,6 +219,9 @@ func EvaluatePhiLead(plans []*PlanNode, targetPersonaIDs []string) (*PlanNode, [
 
 	var matched []*PlanNode
 	for _, p := range plans {
+		if !objects.PlanStatusEligibleForWhatsNext(objects.KindPriorityPlan, p.Status) {
+			continue
+		}
 		if hasPersonaMatch(p) {
 			matched = append(matched, p)
 		}
@@ -675,7 +677,7 @@ func (v *WhatsNextMaterializedView) SaveToLiteFile() error {
 	v.mu.RUnlock()
 
 	targetPath := WhatsNextLiteFilePath(v.projectRoot)
-	if err := os.MkdirAll(filepath.Dir(targetPath), 0755); err != nil {
+	if err := fileutil.EnsureDir(filepath.Dir(targetPath)); err != nil {
 		return fmt.Errorf("mkdir .zqk/state: %w", err)
 	}
 
@@ -689,8 +691,8 @@ func (v *WhatsNextMaterializedView) SaveToLiteFile() error {
 		return fmt.Errorf("write temp whats_next_lite: %w", err)
 	}
 
-	if err := os.Rename(tmpFile, targetPath); err != nil {
-		_ = os.Remove(tmpFile)
+	if err := fileutil.Rename(tmpFile, targetPath); err != nil {
+		_ = fileutil.Remove(tmpFile)
 		return fmt.Errorf("rename whats_next_lite: %w", err)
 	}
 
@@ -743,7 +745,7 @@ func (v *WhatsNextMaterializedView) LoadFromLiteFile() (*WhatsNextLitePayload, e
 		payload = &flat
 		matAt = flat.MaterializedAt
 		if matAt.IsZero() {
-			if fi, err := os.Stat(targetPath); err == nil {
+			if fi, err := fileutil.Stat(targetPath); err == nil {
 				matAt = fi.ModTime().UTC()
 			}
 		}

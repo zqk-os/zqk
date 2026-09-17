@@ -1,0 +1,21 @@
+content_hash: 8436d5050a5db3b2798f22e6a8754bfbd7d5a3156e0cd1e4752360a067282bf3
+content_searchable: true
+content_size: 11492
+created_at: "2026-09-17T08:44:56Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: onboarding
+id: DOC-636
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/onboarding/IMPORT_CYCLE_RESOLUTION.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: Import cycles are not just compilation errors - they are symptoms of architectural issues
+title: 'Import Cycle Resolution: Architectural Evaluation Best Practices'
+updated_at: "2026-09-17T08:44:56Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

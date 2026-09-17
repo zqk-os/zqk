@@ -2,16 +2,19 @@ package system
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
 	"testing"
 
+	pkgctx "github.com/lanceman/zqk/pkg/context"
 	"github.com/lanceman/zqk/pkg/datacell"
 	"github.com/lanceman/zqk/pkg/goroutinelabels"
 	"github.com/lanceman/zqk/pkg/objects"
 	"github.com/lanceman/zqk/pkg/paths"
 	"github.com/lanceman/zqk/pkg/storage"
+	"github.com/lanceman/zqk/pkg/storage/filecas"
 	"github.com/lanceman/zqk/pkg/testkit"
 	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
 	"github.com/lanceman/zqk/pkg/zqkenv"
@@ -583,5 +586,241 @@ func TestInit_GreenfieldAnchorsToCWD(t *testing.T) {
 			liveObjectSpecDraftsBefore,
 			liveObjectSpecDraftsAfter,
 		)
+	}
+}
+
+func TestWriteSystemAccount_UsesCASFilename(t *testing.T) {
+	dir := t.TempDir()
+	if err := writeSystemAccount(dir); err != nil {
+		t.Fatalf("writeSystemAccount: %v", err)
+	}
+	accounts := filepath.Join(dir, paths.ProcessDir, "accounts")
+	entries, err := fileutil.ReadDir(accounts)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var yamlNames []string
+	for _, e := range entries {
+		name := e.Name()
+		if strings.HasSuffix(name, ".yaml") && !strings.HasPrefix(name, ".") {
+			yamlNames = append(yamlNames, name)
+		}
+	}
+	if len(yamlNames) != 1 {
+		t.Fatalf("want one CAS yaml, got %v", yamlNames)
+	}
+	stem := strings.TrimSuffix(yamlNames[0], ".yaml")
+	if stem == "system" || strings.HasPrefix(stem, "ACC-") {
+		t.Fatalf("want content-addressed filename, got %s", yamlNames[0])
+	}
+	if len(stem) != 64 {
+		t.Fatalf("want 64-hex CAS basename, got %s", yamlNames[0])
+	}
+}
+
+func TestWriteSystemAccount_MigratesLegacyFiles(t *testing.T) {
+	dir := t.TempDir()
+	accounts := filepath.Join(dir, paths.ProcessDir, "accounts")
+	if err := fileutil.MkdirAll(accounts, paths.DirPerm755); err != nil {
+		t.Fatal(err)
+	}
+
+	accID := pkgctx.SystemAccountID
+	legacyContent := fmt.Sprintf("id: %s\nkind: account\nschema_version: 2.0.0\n", accID)
+	// Write legacy system.yaml and {accID}.yaml
+	if err := fileutil.WriteFile(filepath.Join(accounts, "system.yaml"), []byte(legacyContent), paths.FilePerm644); err != nil {
+		t.Fatal(err)
+	}
+	if err := fileutil.WriteFile(filepath.Join(accounts, accID+".yaml"), []byte(legacyContent), paths.FilePerm644); err != nil {
+		t.Fatal(err)
+	}
+
+	if err := writeSystemAccount(dir); err != nil {
+		t.Fatalf("writeSystemAccount: %v", err)
+	}
+
+	// Verify legacy files were cleaned up
+	if fileutil.Exists(filepath.Join(accounts, "system.yaml")) {
+		t.Errorf("system.yaml should have been migrated and removed")
+	}
+	if fileutil.Exists(filepath.Join(accounts, accID+".yaml")) {
+		t.Errorf("%s.yaml should have been migrated and removed", accID)
+	}
+
+	// Verify CAS index and hash-named blob exist
+	cas := filecas.NewContentAddressableStorage(accounts, objects.KindAccount)
+	hash, err := cas.GetIndex().GetHash(accID)
+	if err != nil || hash == "" {
+		t.Fatalf("expected hash in index for %s, got %s (err: %v)", accID, hash, err)
+	}
+	if len(hash) != 64 {
+		t.Errorf("expected 64-hex hash, got %s", hash)
+	}
+	if !fileutil.Exists(filepath.Join(accounts, hash+".yaml")) {
+		t.Errorf("expected blob %s.yaml to exist in CAS", hash)
+	}
+}
+
+func TestInit_RegistersShippedDocs(t *testing.T) {
+	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{SkipSetupTestEnvironment: true, SkipFileStorage: true})
+	tmpDir := proj.Root
+
+	// Set up documentation subtrees in tmpDir:
+	// - docs/architecture/sample.md (should be registered)
+	// - docs/best-practices/guidelines.md (should be registered)
+	// - docs/onboarding/first_run.md (should be registered)
+	// - docs/onboarding/archive/ignored.md (should be SKIPPED)
+	// - docs/launch/notes.md (should be SKIPPED per TDE-1789629835679972000-dc60b78d)
+	testDocs := map[string]string{
+		"docs/architecture/sample.md":        "# Sample Architecture\n\nHigh-level system design.",
+		"docs/best-practices/guidelines.md":  "# Best Practices\n\nGuidelines for development.",
+		"docs/onboarding/first_run.md":       "# Onboarding\n\nGetting started guide.",
+		"docs/onboarding/archive/ignored.md": "# Archived Doc\n\nOld deprecated manual.",
+		"docs/onboarding/_archive/legacy.md": "# Legacy Doc\n\nLegacy onboarding doc.",
+		"docs/launch/notes.md":               "# Launch Notes\n\nGTM launch notes.",
+	}
+
+	for relPath, content := range testDocs {
+		fullPath := filepath.Join(tmpDir, relPath)
+		if err := fileutil.MkdirAll(filepath.Dir(fullPath), 0755); err != nil {
+			t.Fatalf("mkdir failed: %v", err)
+		}
+		if err := fileutil.WriteFile(fullPath, []byte(content), 0644); err != nil {
+			t.Fatalf("write file failed: %v", err)
+		}
+	}
+
+	originalDir, err := fileutil.Getwd()
+	if err != nil {
+		t.Fatalf("Failed to get current directory: %v", err)
+	}
+	defer fileutil.Chdir(originalDir)
+
+	if err := fileutil.Chdir(tmpDir); err != nil {
+		t.Fatalf("Failed to change to temp directory: %v", err)
+	}
+
+	cmd := NewInitCmd()
+	cmd.SetArgs([]string{"--force"})
+	if err := cmd.Execute(); err != nil {
+		t.Fatalf("Greenfield init failed: %v", err)
+	}
+
+	// Verify doc_entry objects in the initialized project
+	factory, err := storage.NewStorageFactory(context.Background(), tmpDir)
+	if err != nil {
+		t.Fatalf("failed to create storage factory: %v", err)
+	}
+	sp := factory.GetStorageForKind(objects.KindDocEntry)
+	secCtx := pkgctx.NewSystemSecurityContext()
+	storageCtx := pkgctx.NewStorageContext()
+
+	res, err := sp.List(context.Background(), secCtx, storageCtx, storage.ListFilter{Kind: objects.KindDocEntry})
+	if err != nil {
+		t.Fatalf("failed to list doc_entries: %v", err)
+	}
+
+	registeredPaths := make(map[string]bool)
+	for _, obj := range res.Objects {
+		p, _ := obj[objects.FieldKeyPath].(string)
+		cleanP := paths.NormalizeDocEntryPathForKey(p)
+		registeredPaths[cleanP] = true
+	}
+
+	// Ensure shipped canonical docs were registered
+	expectedDocs := []string{
+		"docs/architecture/sample.md",
+		"docs/best-practices/guidelines.md",
+		"docs/onboarding/first_run.md",
+	}
+	for _, exp := range expectedDocs {
+		if !registeredPaths[exp] {
+			t.Errorf("expected doc_entry for %s to be registered, registered=%v", exp, registeredPaths)
+		}
+	}
+
+	// Ensure excluded docs (archive, launch) were NOT registered
+	excludedDocs := []string{
+		"docs/onboarding/archive/ignored.md",
+		"docs/onboarding/_archive/legacy.md",
+		"docs/launch/notes.md",
+	}
+	for _, excl := range excludedDocs {
+		if registeredPaths[excl] {
+			t.Errorf("archive/launch doc %s must NOT be registered in doc_entry graph", excl)
+		}
+	}
+}
+
+func TestInit_RegistersShippedDocs_Legacy(t *testing.T) {
+	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{SkipSetupTestEnvironment: true, SkipFileStorage: true})
+	tmpDir := proj.Root
+
+	// Set up documentation subtrees in tmpDir:
+	testDocs := map[string]string{
+		"docs/architecture/sample.md":        "# Sample Architecture\n\nHigh-level system design.",
+		"docs/best-practices/guidelines.md":  "# Best Practices\n\nGuidelines for development.",
+		"docs/onboarding/first_run.md":       "# Onboarding\n\nGetting started guide.",
+		"docs/onboarding/archive/ignored.md": "# Archived Doc\n\nOld deprecated manual.",
+		"docs/launch/notes.md":               "# Launch Notes\n\nGTM launch notes.",
+	}
+
+	for relPath, content := range testDocs {
+		fullPath := filepath.Join(tmpDir, relPath)
+		if err := fileutil.MkdirAll(filepath.Dir(fullPath), 0755); err != nil {
+			t.Fatalf("mkdir failed: %v", err)
+		}
+		if err := fileutil.WriteFile(fullPath, []byte(content), 0644); err != nil {
+			t.Fatalf("write file failed: %v", err)
+		}
+	}
+
+	originalDir, err := fileutil.Getwd()
+	if err != nil {
+		t.Fatalf("Failed to get current directory: %v", err)
+	}
+	defer fileutil.Chdir(originalDir)
+
+	if err := fileutil.Chdir(tmpDir); err != nil {
+		t.Fatalf("Failed to change to temp directory: %v", err)
+	}
+
+	cmd := NewInitCmd()
+	cmd.SetArgs([]string{"--legacy", "--force"})
+	if err := cmd.Execute(); err != nil {
+		t.Fatalf("Legacy init failed: %v", err)
+	}
+
+	// Verify doc_entry objects in the initialized project
+	factory, err := storage.NewStorageFactory(context.Background(), tmpDir)
+	if err != nil {
+		t.Fatalf("failed to create storage factory: %v", err)
+	}
+	sp := factory.GetStorageForKind(objects.KindDocEntry)
+	secCtx := pkgctx.NewSystemSecurityContext()
+	storageCtx := pkgctx.NewStorageContext()
+
+	res, err := sp.List(context.Background(), secCtx, storageCtx, storage.ListFilter{Kind: objects.KindDocEntry})
+	if err != nil {
+		t.Fatalf("failed to list doc_entries: %v", err)
+	}
+
+	registeredPaths := make(map[string]bool)
+	for _, obj := range res.Objects {
+		p, _ := obj[objects.FieldKeyPath].(string)
+		cleanP := paths.NormalizeDocEntryPathForKey(p)
+		registeredPaths[cleanP] = true
+	}
+
+	for _, exp := range []string{"docs/architecture/sample.md", "docs/best-practices/guidelines.md", "docs/onboarding/first_run.md"} {
+		if !registeredPaths[exp] {
+			t.Errorf("expected doc_entry for %s to be registered, registered=%v", exp, registeredPaths)
+		}
+	}
+
+	for _, excl := range []string{"docs/onboarding/archive/ignored.md", "docs/launch/notes.md"} {
+		if registeredPaths[excl] {
+			t.Errorf("archive/launch doc %s must NOT be registered in doc_entry graph", excl)
+		}
 	}
 }

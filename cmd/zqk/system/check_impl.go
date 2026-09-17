@@ -340,17 +340,7 @@ func runCheck(cmd *cobra.Command, args []string) error {
 		// to the async "follow" path so the check actually runs to completion inside the
 		// scheduler job budget (instead of returning immediately and doing nothing).
 		if shouldUseAsyncFollowForBackground() {
-			timeout := 30 * time.Minute // Default 30 minutes (reasonable for large checks)
-			if cmdTimeout := cli.GetTimeout(cmd); cmdTimeout > 0 {
-				timeout = cmdTimeout
-			} else if cmd.Context() != nil {
-				if deadline, ok := cmd.Context().Deadline(); ok {
-					calculatedTimeout := time.Until(deadline)
-					if calculatedTimeout > 0 {
-						timeout = calculatedTimeout
-					}
-				}
-			}
+			timeout := CalculateCheckProgressiveTimeout(cmd, args)
 			return runCheckAsyncWithFollow(cmd, args, timeout)
 		}
 		return runCheckAsyncNonBlocking(cmd, args)
@@ -392,17 +382,7 @@ func runCheck(cmd *cobra.Command, args []string) error {
 	}
 
 	// Default: wait for async check; progress is shown via TerminalProgressSubscriber (heartbeat every 5s)
-	timeout := 30 * time.Minute // Default 30 minutes (reasonable for large checks)
-	if cmdTimeout := cli.GetTimeout(cmd); cmdTimeout > 0 {
-		timeout = cmdTimeout
-	} else if cmd.Context() != nil {
-		if deadline, ok := cmd.Context().Deadline(); ok {
-			calculatedTimeout := time.Until(deadline)
-			if calculatedTimeout > 0 {
-				timeout = calculatedTimeout
-			}
-		}
-	}
+	timeout := CalculateCheckProgressiveTimeout(cmd, args)
 	return runCheckAsyncWithFollow(cmd, args, timeout)
 }
 

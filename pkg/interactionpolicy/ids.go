@@ -1,7 +1,7 @@
 package interactionpolicy
 
 // Event class names for agent↔kernel ping-pong.
-// TRACK: BLI-REDACTED
+// TRACK: BLI-1787035087372193000-c022117d
 const (
 	EventGoTest           = "go_test"
 	EventGitCommit        = "git_commit"

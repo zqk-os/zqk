@@ -1,0 +1,24 @@
+# Pre-commit integrity: runs scripts/pre-commit-integrity.sh on a timer;
+# writes .zqk/pre-commit/.last-integrity.json. Callback runs when triggered with --pre-commit.
+#
+# Ensured by: zqk system ensure-retention-jobs (scheduler_maintenance_config.yaml)
+# See: docs/architecture/PRE_COMMIT_BACKGROUND_RESULTS.md
+
+id: SCH-pre-commit-integrity
+kind: scheduler_job
+schema_version: "2.0.0"
+status: active
+job_type: run_wrapper
+trigger_type: timer
+schedule_expression: "0 */2 * * *"
+category: maintenance
+execution_mode: reusable
+max_runtime_seconds: 1320
+enabled: true
+callback_type: command
+callback_on_completion: zqk pre-commit write-result-from-last --category=integrity
+title: Pre-commit integrity (system check)
+description: |
+  Runs pre-commit-integrity.sh (writes .last-integrity.json). Callback runs only when triggered with --pre-commit.
+command: ./scripts/pre-commit-integrity.sh
+namespace_id: zqk:kernel

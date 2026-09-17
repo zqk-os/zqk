@@ -21,7 +21,7 @@ func TestSignTestCaseCompletion(t *testing.T) {
 	secCtx := pkgctx.NewSystemSecurityContext()
 
 	// test_case has no planned; origin is draft, CAS-visible hop is active
-	// (needs path_or_id + scope). TRACK: BLI-REDACTED
+	// (needs path_or_id + scope). TRACK: BLI-1785443942668406000-1ec5c811
 	testCase := map[string]any{
 		objects.FieldKeyKind:     objects.KindTestCase,
 		objects.FieldKeyID:       "TEST-001",

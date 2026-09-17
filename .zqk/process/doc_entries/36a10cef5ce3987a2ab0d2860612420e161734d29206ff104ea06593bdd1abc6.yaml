@@ -1,0 +1,21 @@
+content_hash: 05cda840a02dc4fb6bd70526fddfd4ff107d4eaad226e5742f46335626b4b986
+content_searchable: true
+content_size: 1172
+created_at: "2026-09-17T08:44:58Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: onboarding
+id: DOC-653
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/onboarding/ZQK_Features.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: ZQK provides a robust, self-updating semantic organization of features designed to scale from individual hobbyists to enterprise organizations
+title: ZQK Semantic Features Inventory
+updated_at: "2026-09-17T08:44:58Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

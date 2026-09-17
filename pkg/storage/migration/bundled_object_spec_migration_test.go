@@ -57,15 +57,22 @@ visibility: internal
 	}
 
 	secCtx := pkgctx.NewSystemSecurityContext()
-	obj, err := store.Read(ctx, secCtx, "OBJ-migration_test_kind")
+	expectedID := ObjectSpecIDForStem("migration_test_kind")
+	obj, err := store.Read(ctx, secCtx, expectedID)
 	if err != nil {
-		t.Fatalf("read: %v", err)
+		t.Fatalf("read %s: %v", expectedID, err)
 	}
 	if obj[objects.FieldKeyKind] != "object_spec" {
 		t.Fatalf("kind: %v", obj[objects.FieldKeyKind])
 	}
 	if obj[objects.FieldKeyOntology] != "migration_test_kind" {
 		t.Fatalf("ontology: %v", obj[objects.FieldKeyOntology])
+	}
+	if desc, ok := obj[objects.FieldKeyDescription].(string); !ok || len(desc) < 10 {
+		t.Fatalf("description: %v", obj[objects.FieldKeyDescription])
+	}
+	if fp, ok := obj[objects.FieldKeyFilePath].(string); !ok || filepath.IsAbs(fp) {
+		t.Fatalf("expected project-relative file_path, got %v", fp)
 	}
 
 	stats2, err := EnsureBundledObjectSpecsMigrated(ctx, root, logger)

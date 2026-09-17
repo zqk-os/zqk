@@ -592,8 +592,15 @@ func outputTable(cmd *cobra.Command, ctx *cli.Context, results []CheckResult, bu
 	tierFilterActive := tierFilter > 0
 	terminalWidth := getTerminalWidth()
 
+	if !checkFastModeEnabled(cmd) && cmd != nil {
+		fmt.Fprintln(cmd.ErrOrStderr(), "Verifying CAS duplicate IDs across index...")
+	}
 	casDupInv := inventoryCASDuplicateIDsForOutput(cmd, projectRoot)
 	results = appendCASDuplicateIDCheckResults(results, casDupInv)
+
+	if cmd != nil {
+		fmt.Fprintln(cmd.ErrOrStderr(), "Formatting compliance summary...")
+	}
 
 	// Group results by tier
 	tier1, tier2, tier3, tier4, clean := groupResultsByTier(results)
@@ -804,10 +811,11 @@ func preliminaryCASIssue(r CheckResult) (Issue, bool) {
 
 // SystemCheckError is returned when system check completes but the system is not pristine.
 // It implements interface{ ExitCode() int } to map violations to specific exit codes:
-//   Exit Code 2: Layer 0 CAS & Integrity Blockers (registry, parse, membrane violations)
-//   Exit Code 1: Layer 1 / Tier 1 Blocking Violations (preconditions, broken references, error status)
-//   Exit Code 3: Non-blocking Warnings (Tier 2/3/4 issues)
-//   Exit Code 4: System Run Issues (timeouts, force completion, unapplied autofix batches)
+//
+//	Exit Code 2: Layer 0 CAS & Integrity Blockers (registry, parse, membrane violations)
+//	Exit Code 1: Layer 1 / Tier 1 Blocking Violations (preconditions, broken references, error status)
+//	Exit Code 3: Non-blocking Warnings (Tier 2/3/4 issues)
+//	Exit Code 4: System Run Issues (timeouts, force completion, unapplied autofix batches)
 type SystemCheckError struct {
 	ExitCodeVal   int
 	Message       string

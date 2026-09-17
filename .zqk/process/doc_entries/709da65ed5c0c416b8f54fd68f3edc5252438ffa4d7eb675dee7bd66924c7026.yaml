@@ -1,0 +1,22 @@
+category: architecture
+content_hash: 34b2fb2df31edbfb3d655c60c6bb921baf14cc21b3d4726c771938385a17bf46
+content_searchable: true
+content_size: 1529
+created_at: "2026-09-17T08:44:49Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-597
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/translation_manifest.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: To avoid hardcoding translation logic for every external schema (OpenAPI, CRD, JSON Schema), ZQK utilizes a declarative TranslationManifest
+title: Translation Manifest Architecture
+updated_at: "2026-09-17T08:44:49Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

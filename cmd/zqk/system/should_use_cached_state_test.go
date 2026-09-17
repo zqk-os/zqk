@@ -9,7 +9,7 @@ import (
 )
 
 // Tier-1 instance_validation must not be a permanent cache hit (fail-closed
-// DependentsLookup poison). TRACK: BLI-REDACTED
+// DependentsLookup poison). TRACK: BLI-1785723654802038000-b14064bc
 func TestShouldUseCachedState_RejectsTier1InstanceValidation(t *testing.T) {
 	t.Parallel()
 	dir := t.TempDir()

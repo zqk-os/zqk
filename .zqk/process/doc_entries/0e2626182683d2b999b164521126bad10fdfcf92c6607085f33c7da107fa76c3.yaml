@@ -1,0 +1,22 @@
+category: migration
+content_hash: 4999f908fcf7a9db4f4792b684cfd6db8fa9c4da8bd11e43292fefa5e5c24098
+content_searchable: true
+content_size: 23872
+created_at: "2026-09-17T08:43:44Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-211
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/MIGRATION_SPEC_DESIGN.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: Migrations should be spec-driven rather than individual commands
+title: Migration Spec Design
+updated_at: "2026-09-17T08:43:44Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

@@ -12,7 +12,7 @@ const maxDriveRunes = 600
 
 // SkipCASOverlay is true when catalog text must win over the shared POL body.
 // Idle, push-ahead, and inbox share PROCESS-ADMIN; overlay would replace them
-// with empty-column or "ack then hourglass" prose. TRACK: BLI-REDACTED
+// with empty-column or "ack then hourglass" prose. TRACK: BLI-1787035087372193000-c022117d
 func SkipCASOverlay(event string) bool {
 	switch event {
 	case EventIdle, EventPushAhead, EventInboxUnacked:
@@ -24,7 +24,7 @@ func SkipCASOverlay(event string) bool {
 
 // OverlayFromPolicy replaces catalog GuidingStep with drive extracted from a
 // CAS policy body. Returns false when the body yields nothing useful — keep
-// the catalog reflex. TRACK: BLI-REDACTED
+// the catalog reflex. TRACK: BLI-1787035087372193000-c022117d
 func OverlayFromPolicy(step *Step, policy map[string]any) bool {
 	if step == nil || policy == nil {
 		return false

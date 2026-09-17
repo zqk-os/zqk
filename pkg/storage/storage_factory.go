@@ -247,7 +247,7 @@ func UnwrapToFileObjectStorage(p ObjectStorageProvider) *FileObjectStorage {
 		return fs
 	}
 	// Generic decorator unwrap (CLI SemanticStorageDecorator, future wrappers).
-	// TRACK: BLI-REDACTED — state-restore broke when Processor
+	// TRACK: BLI-1785723654802038000-b14064bc — state-restore broke when Processor
 	// wrapped storage in SemanticStorageDecorator without an Unwrap path.
 	if u, ok := p.(UnderlyingObjectStorageProvider); ok && u != nil {
 		if inner := u.UnderlyingObjectStorageProvider(); inner != nil && inner != p {

@@ -1,0 +1,22 @@
+category: architecture
+content_hash: f9bd9d8655817091cbf1d883c443988926ef95642100955e2afb7b17b6163a00
+content_searchable: true
+content_size: 12877
+created_at: "2026-09-17T08:44:02Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-278
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/SIMPLIFIED_OUTPUT_ARCHITECTURE.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: 'Documentation: # Simplified Output Architecture'
+title: Simplified Output Architecture
+updated_at: "2026-09-17T08:44:02Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

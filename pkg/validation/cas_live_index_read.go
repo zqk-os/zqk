@@ -11,7 +11,7 @@ import (
 // discovery path still names a deleted hash (object-id-cache lag). Avoids
 // importing pkg/storage (cycle).
 //
-// TRACK: BLI-REDACTED
+// TRACK: BLI-1785723654802038000-b14064bc
 func readLiveCASBlobFromIndex(kindDir, kind, objectID string) (path string, data []byte, ok bool) {
 	if kindDir == emptyValue || kind == emptyValue || objectID == emptyValue {
 		return "", nil, false

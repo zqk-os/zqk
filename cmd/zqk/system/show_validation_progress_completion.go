@@ -15,7 +15,7 @@ import (
 )
 
 const (
-	validationCompletionDelay           = 100 * time.Millisecond
+	validationCompletionDelay           = 10 * time.Millisecond
 	validationCompletionLineFmt         = "\nValidation completed: %d/%d objects (%d succeeded, %d failed)\n"
 	validationPercentFmt                = "%.1f%%"
 	validationFlagVerbose               = "verbose"
@@ -269,7 +269,7 @@ func collectResultsForCompletion(vpc *ValidationProgressContext, failedCopy map[
 				} else {
 					// Summary-time miss is cache coherence, not CAS. Category integrity
 					// is counted as Layer 0 and made SCH-autofix-run look like hash mismatch.
-					// TRACK: BLI-REDACTED
+					// TRACK: BLI-1786387465409533000-45bd780c
 					result.Issues = append(result.Issues, Issue{
 						Tier:     3,
 						Category: categoryCacheCoherence,
@@ -288,7 +288,7 @@ func collectResultsForCompletion(vpc *ValidationProgressContext, failedCopy map[
 			tier := 1
 			// Per-object budget expiry is infrastructure under fan-out, not an object
 			// defect. Do not block system check; re-run or rely on prior cache retention.
-			// TRACK: BLI-REDACTED
+			// TRACK: BLI-1785723654802038000-b14064bc
 			if strings.Contains(errMsg, "validation timeout after") {
 				tier = 3
 				category = "validation_timeout"

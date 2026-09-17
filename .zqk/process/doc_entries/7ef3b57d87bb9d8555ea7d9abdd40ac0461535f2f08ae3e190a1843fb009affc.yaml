@@ -1,0 +1,22 @@
+category: architecture
+content_hash: c830527e1cb40b642fc5f105da5a1bac18b3eeb7c2ccc7e1ffa28f1ec5162a80
+content_searchable: true
+content_size: 9295
+created_at: "2026-09-17T08:44:41Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-516
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/object-creation-requirements-v1.0.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: '- Object IDs are unique identifiers within a kind - Creating duplicates would cause ambiguity and data integrity issues - Prevents accidental overwrites of existing objects - For CAS-enabled kinds:...'
+title: Object Creation Requirements
+updated_at: "2026-09-17T08:44:41Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

@@ -101,7 +101,7 @@ func TestCacheCheckerTiming_RaceCondition(t *testing.T) {
 		// Also cache account username format
 		if kind, ok := obj[objects.FieldKeyKind].(string); ok && kind == "account" {
 			if username, ok := obj[objects.FieldKeyUsername].(string); ok && username != emptyValue {
-				accountID := "" // ACC-* from storage; TRACK: BLI-REDACTED
+				accountID := "" // ACC-* from storage; TRACK: BLI-1785905134201010000-07393484
 				referenceCacheMu.Lock()
 				referenceCache[accountID] = true
 				referenceCacheMu.Unlock()
@@ -227,7 +227,7 @@ func TestCacheCheckerTiming_CorrectBehavior(t *testing.T) {
 		}
 		if kind, ok := obj[objects.FieldKeyKind].(string); ok && kind == "account" {
 			if username, ok := obj[objects.FieldKeyUsername].(string); ok && username != emptyValue {
-				accountID := "" // ACC-* from storage; TRACK: BLI-REDACTED
+				accountID := "" // ACC-* from storage; TRACK: BLI-1785905134201010000-07393484
 				referenceCacheMu.Lock()
 				referenceCache[accountID] = true
 				referenceCacheMu.Unlock()

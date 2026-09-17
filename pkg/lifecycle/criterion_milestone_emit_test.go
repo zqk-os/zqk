@@ -11,7 +11,7 @@ import (
 )
 
 func TestTryEmitAllCriteriaCompleteForMilestone_AppendsCriterionSatisfied(t *testing.T) {
-	// TRACK: BLI-REDACTED — no t.Parallel: shared Memgraph + fixed fixture IDs.
+	// TRACK: BLI-1785443942668406000-1ec5c811 — no t.Parallel: shared Memgraph + fixed fixture IDs.
 
 	projectRoot := t.TempDir()
 	ctx := context.Background()
@@ -64,7 +64,7 @@ func TestTryEmitAllCriteriaCompleteForMilestone_AppendsCriterionSatisfied(t *tes
 }
 
 func TestTryEmitForMilestonesContainingCriterion_OnlySatisfiedMilestonesEmit(t *testing.T) {
-	// TRACK: BLI-REDACTED — no t.Parallel: shared Memgraph + fixed fixture IDs.
+	// TRACK: BLI-1785443942668406000-1ec5c811 — no t.Parallel: shared Memgraph + fixed fixture IDs.
 
 	projectRoot := t.TempDir()
 	ctx := context.Background()
@@ -130,7 +130,7 @@ func TestTryEmitForMilestonesContainingCriterion_OnlySatisfiedMilestonesEmit(t *
 }
 
 func TestTryEmitAllBacklogItemsCompleteForMilestone_AppendsCriterionSatisfied(t *testing.T) {
-	// TRACK: BLI-REDACTED — no t.Parallel: shared Memgraph + fixed fixture IDs.
+	// TRACK: BLI-1785443942668406000-1ec5c811 — no t.Parallel: shared Memgraph + fixed fixture IDs.
 
 	projectRoot := t.TempDir()
 	ctx := context.Background()

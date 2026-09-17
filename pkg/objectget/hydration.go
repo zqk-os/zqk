@@ -89,7 +89,7 @@ func ReferenceOverlayConfigForView(viewName string) ReferenceResolverOverlayConf
 		}
 	case ViewDefault, "":
 		// Default get is raw CAS (hash seal). Opt in via --link-hydration lazy|default|eager.
-		// TRACK: BLI-REDACTED — sidecar index replaces inline opt-in later.
+		// TRACK: BLI-1785909672838827000-9fca84f5 — sidecar index replaces inline opt-in later.
 		return ReferenceOverlayConfigForHydration(HydrationNone)
 	default:
 		return ReferenceResolverOverlayConfig{Disabled: true}

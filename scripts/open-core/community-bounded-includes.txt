@@ -1,0 +1,56 @@
+# Community-bounded source overlay (KERNEL vs PACK / OPEN_CORE allowlist).
+# One repo-relative path per line. Comments start with #.
+# TRACK: TDE-1789678536875854000-47240146 — keep in sync with apply-community-source.sh
+# and sync-public-candidate.sh. Do not list .zqk/process.
+
+cmd/zqk-community
+cmd/zqk-shim
+cmd/zqk/docman
+cmd/zqk/grep
+cmd/zqk/healthchk
+cmd/zqk/inbox
+cmd/zqk/learn
+cmd/zqk/mcp
+cmd/zqk/new
+cmd/zqk/object
+cmd/zqk/system
+cmd/zqk/tray
+cmd/zqk/utility
+cmd/zqk/workflow
+pkg
+internal
+ext
+docs/architecture
+docs/best-practices
+docs/onboarding
+docs/tutorials
+docs/howto
+docs/reference
+docs/explanation
+docs/INDEX.md
+docs/getting-started.md
+docs/cli-reference.md
+CONTRIBUTING.md
+CODE_OF_CONDUCT.md
+scripts/package-community.sh
+scripts/install.sh
+scripts/default_policies
+scripts/default_personas
+scripts/default_agent_skills
+scripts/build-bootstrap-archive.sh
+scripts/starter_kernel_graph
+scripts/scheduler_jobs
+scripts/open-core/community-bounded-includes.txt
+scripts/open-core/prune-community-tree.sh
+scripts/open-core/police-community-tree.sh
+scripts/open-core/verify-bootstrap-portable.sh
+.zqk/specs
+.zqk/cli/specs
+.goreleaser.yaml
+.gitignore
+NOTICE
+Makefile
+go.mod
+go.sum
+LICENSE
+README.md

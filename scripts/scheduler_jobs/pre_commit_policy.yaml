@@ -1,0 +1,25 @@
+# Pre-commit policy: runs scripts/pre-commit-policy.sh (logging + architecture compliance);
+# writes .zqk/pre-commit/policy.json and runs aggregate.
+#
+# Ensured by: zqk system ensure-retention-jobs (scheduler_maintenance_config.yaml)
+# See: docs/architecture/PRE_COMMIT_BACKGROUND_RESULTS.md
+
+id: SCH-pre-commit-policy
+kind: scheduler_job
+schema_version: "2.0.0"
+status: active
+job_type: run_wrapper
+trigger_type: timer
+schedule_expression: "*/15 * * * *"
+category: maintenance
+execution_mode: reusable
+max_runtime_seconds: 600
+enabled: true
+callback_type: command
+callback_on_completion: zqk pre-commit write-result-from-last --category=policy
+title: Pre-commit policy (logging + architecture)
+description: |
+  Runs pre-commit-policy.sh (check-logging-compliance, check-architecture-compliance),
+  writes policy category and runs pre-commit aggregate.
+command: ./scripts/pre-commit-policy.sh
+namespace_id: zqk:kernel

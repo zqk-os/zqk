@@ -1,0 +1,22 @@
+category: architecture
+content_hash: 1febad932d7c9b232af3c6f75d1a440a517c314826352b3538f16286c5ca9814
+content_searchable: true
+content_size: 2619
+created_at: "2026-09-17T08:44:20Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-355
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/cache_tiger_team_strategy.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: This addendum details the impact of introducing an asynchronous Semantic Cache in pkg/storage on the ZQK Scheduler (pkg/scheduler/)
+title: 'Concurrency Guardrail Addendum: High-Speed Object Caching (PRI-17807959)'
+updated_at: "2026-09-17T08:44:20Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

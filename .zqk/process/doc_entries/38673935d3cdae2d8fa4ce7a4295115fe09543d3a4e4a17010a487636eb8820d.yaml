@@ -1,0 +1,22 @@
+category: architecture
+content_hash: a92db23728113503a745823a48e6ea0d061b77744168fea7cf830fd334fe8e47
+content_searchable: true
+content_size: 6541
+created_at: "2026-09-17T08:39:32Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-042
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/CAP_LOOP_CONTRACT.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: SCH-cap-orchestrator is the CAP loop
+title: CAP loop contract
+updated_at: "2026-09-17T08:39:32Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

@@ -1,0 +1,22 @@
+category: architecture
+content_hash: 5bc8b05ff80c0db96ac33d9a1b651658fb66b8c33360700b3b3463d2408cd94d
+content_searchable: true
+content_size: 2602
+created_at: "2026-09-17T08:44:14Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-324
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/VECTORIZATION_ENGINE_ARCHITECTURE.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: Documents are broken down into discrete semantic units (Chunks) and injected with structural metadata (Kind, Domain, Goal) prior to vectorization
+title: Vectorization Engine Architecture Blueprint
+updated_at: "2026-09-17T08:44:14Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

@@ -1,0 +1,15 @@
+category: feature
+created_at: "2026-09-17T07:56:38Z"
+created_by: ACC-1785920548450214012-68b850c0
+description: 'Execution lane for community launch vetting: isolation, documentation graph, starter kernel objects, and installer/quickstart.'
+entry_point: scripts/starter_kernel_graph/seed.sh
+id: WS-1789631797993326000-f9951fe8
+kind: workstream
+namespace_id: zqk:kernel
+owner_ref: ACC-1785920548450214012-68b850c0
+schema_version: 2.0.0
+status: active
+title: Community launch and first-run kernel
+updated_at: "2026-09-17T19:29:52Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

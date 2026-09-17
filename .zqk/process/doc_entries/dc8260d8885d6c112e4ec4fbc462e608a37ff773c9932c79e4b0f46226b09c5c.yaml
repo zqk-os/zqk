@@ -1,0 +1,22 @@
+category: architecture
+content_hash: a6bdf944f4fefce0a89bbaadd941412a2c91e18f438424f4fed3f1ac809918a2
+content_searchable: true
+content_size: 41419
+created_at: "2026-09-17T08:39:35Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-079
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/CONVERGENCE_ORCHESTRATION_AND_NESTED_CVS.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: '| Entrypoint | Typical use | Pointer | |------------|-------------|---------| | zqk scheduler convergence measure | Single-shot bundle snapshot → JSON / --persist-session update | CONVERGENCE_PHA...'
+title: Convergence orchestration, outcome aggregation, and nested CVS
+updated_at: "2026-09-17T08:39:35Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

@@ -66,7 +66,7 @@ func (h *CapOrchestratorHandler) executeReviewStage(ctx context.Context, exe str
 
 	// 3. Verify latest test bundle outcomes for critical packages in the background stream (health.jsonl).
 	// Coverage gaps (missing jobs / no outcome yet) stay fail-closed for readiness but must not
-	// fail the CAP job every 15m (desktop notification spam). TRACK: BLI-REDACTED / MMORCH CAP ops.
+	// fail the CAP job every 15m (desktop notification spam). TRACK: BLI-1785905541906569000-074e24d7 / MMORCH CAP ops.
 	secCtx := pkgctx.GetSecurityContext(ctx)
 	testsPassed, hardTestErrs, softTestErrs := h.verifyCriticalPackagesHealth(ctx, secCtx)
 	if len(hardTestErrs) > 0 {
@@ -256,8 +256,8 @@ func (h *CapOrchestratorHandler) executeMetricsStage(ctx context.Context, exe st
 	// 5. Stamp agent_feed digest to TPM seat
 	if metricsBytes, err := json.Marshal(metrics); err == nil {
 		tpmSeat := agentfeed.CoordinatorSeatID(h.projectRoot)
-		if tpmSeat == "" {
-			tpmSeat = "peer-agent-1"
+		if tpmSeat == "" && len(agentfeed.DefaultPeerSeatIDs) > 0 {
+			tpmSeat = agentfeed.DefaultPeerSeatIDs[0]
 		}
 		steerCmd := execwrap.CommandContext(ctx, exe, "feed", "steer",
 			"--agent-id", "cap-orchestrator",
@@ -415,7 +415,7 @@ func (h *CapOrchestratorHandler) executeGroomingStage(ctx context.Context, exe s
 
 	// Stay ahead of the swarm: still wake TPM even when whats-next has no plan
 	// (starvation case). Stage advance remains gated on delivery evidence.
-	// TRACK: BLI-REDACTED / BLI-ATK-MERGE-UP-HYGIENE-001 — kernel stage prompts.
+	// TRACK: BLI-1786390039711686000-e718d458 / BLI-ATK-MERGE-UP-HYGIENE-001 — kernel stage prompts.
 	ambientCtx := h.capStageAGIInstruction(ctx, "cap_stage_grooming", planID)
 
 	// Anticipatory Runway Replenishment: evaluate delta_runway <= 1 watermark and feed shovel-ready bundles to TPM

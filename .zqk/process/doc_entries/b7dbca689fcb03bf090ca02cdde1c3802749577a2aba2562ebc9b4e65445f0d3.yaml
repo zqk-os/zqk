@@ -1,0 +1,22 @@
+category: architecture
+content_hash: 176621685f9aa7f92ec509a16acf2fd01ac57c1cffd21da84b55a603d03cfa6d
+content_searchable: true
+content_size: 2229
+created_at: "2026-09-17T08:39:32Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-045
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/CAS_DURABILITY_POLICY.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: '(prior: BLI-CEF-REL-CAS-DURABILITY / REQ-CEF-REL-001 / CRIT-CEF-REL-001A / CRIT-CEF-REL-001B) Filesystem CAS object publishes (writeFileWithSync) use platform-specific durability: | Platform | Poli...'
+title: CAS durability policy (per-OS)
+updated_at: "2026-09-17T08:39:32Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

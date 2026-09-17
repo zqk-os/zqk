@@ -4,8 +4,8 @@
 
 
 **Policy:** `POL-AGENT-ACCOUNT-LOGIN-001` (`POL-CODE-1785905132115717000-81ab632e`)  
-**Criterion:** `CRI-ACCOUNT-RBAC-READY` (`CRIT-REDACTED`)  
-**TRACK:** `BLI-REDACTED`
+**Criterion:** `CRI-ACCOUNT-RBAC-READY` (`CRIT-1785905131008420000-d90a0622`)  
+**TRACK:** `BLI-1785905136581480000-1f317f44`
 
 ## Rules
 
@@ -57,7 +57,7 @@ Admin / codegen binary: `ZQK_ADMIN_API_KEY=<ACC-*>` or an issued secret for that
 
 ## Planner vs doer (POL-AGENT-PLANNER-DOER-001)
 
-**TRACK:** `BLI-REDACTED` · criterion `CRI-PLANNER-DOER-SPLIT`
+**TRACK:** `BLI-1785905540598640000-12d5118e` · criterion `CRI-PLANNER-DOER-SPLIT`
 
 | Lane | Typical ACC roles | May | Must not |
 |------|-------------------|-----|----------|
@@ -68,7 +68,7 @@ ACC `roles` labels are matched to immutable `role.role_id` via `authcred.RoleMat
 
 ## Object discovery membrane (list / count / fields --list-kinds)
 
-**TRACK:** `BLI-REDACTED` · POL-AGENT-PLANNER-DOER-001 discoverability
+**TRACK:** `BLI-1785908739114727000-9a7cc2bd` · POL-AGENT-PLANNER-DOER-001 discoverability
 
 Bare `object list`, `object count`, and `object fields --list-kinds` default to a **seat-scoped kind catalog** (not the full ontology):
 
@@ -82,6 +82,6 @@ Break-glass: **`--all-kinds`**. Explicit `object <kind> …` is unchanged. Helpe
 
 ## Resolved link hydration sidecar
 
-**TRACK:** `BLI-REDACTED`
+**TRACK:** `BLI-1785909672838827000-9fca84f5`
 
 Default `object get` is raw CAS. Opt-in hydration can write joinable metadata under **`.zqk/resolved/<kind>/<2hex>/<id>.json`** (`--write-resolved-sidecar` or `--resolved-sidecar-only`) so overlays never enter hashed CAS bytes. See `pkg/objectget/resolved_sidecar.go`.

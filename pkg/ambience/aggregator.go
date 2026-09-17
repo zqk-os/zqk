@@ -4,6 +4,8 @@ import (
 	"context"
 	"sync"
 	"time"
+
+	"github.com/lanceman/zqk/pkg/goroutinelabels"
 )
 
 // SignalAggregator implements AnticipatoryEngine but aggregates multiple events
@@ -47,7 +49,9 @@ func (s *SignalAggregator) Start(ctx context.Context) error {
 		return err
 	}
 
-	go s.loop(ctx, ch)
+	goroutinelabels.NewGoroutine("ambience.aggregator_loop", "aggregating ambient signals").StartSimple(func() {
+		s.loop(ctx, ch)
+	})
 	return nil
 }
 

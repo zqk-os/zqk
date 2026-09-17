@@ -56,7 +56,7 @@ func runObjectSchedulerGuard(cmd *cobra.Command, args []string) error {
 		return nil
 	}
 	// License-gate elevated mode for all object verbs (get/update/delete included).
-	// TRACK: BLI-REDACTED / ATK-REDACTED
+	// TRACK: BLI-1785930106857898000-94b9a5bc / ATK-1785931170239058000-69b53308
 	if err := RequireElevatedInternal(cmd); err != nil {
 		return err
 	}

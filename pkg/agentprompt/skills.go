@@ -146,7 +146,7 @@ func LoadRelevantSkillsOpts(ctx context.Context, sp storage.ObjectStorageProvide
 			if err != nil {
 				logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
 				logger.Error("Failed to read skill file for verification", err, logging.String("skill", id), logging.String("path", skillMdPath))
-				// TRACK: BLI-REDACTED — fail-closed when file_path is set.
+				// TRACK: BLI-1785643580218036000-30ecf93f — fail-closed when file_path is set.
 				return fmt.Errorf("skill %s failed seal verification: cannot read %s: %w", id, skillMdPath, err)
 			}
 			verifyRes := skill.VerifySeal(string(content))

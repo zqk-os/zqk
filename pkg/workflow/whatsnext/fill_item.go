@@ -21,7 +21,7 @@ const (
 // Draft plane is a location (.zqk/object_drafts), not lifecycle status=draft.
 // Never hint `zqk object list --filter status=draft` — List omits conceptual
 // objects that exist only on the draft plane.
-// TRACK: BLI-REDACTED
+// TRACK: BLI-1786689721908382000-6402a858
 const (
 	FillCmdAutofixDangling    = "zqk system check autofix dangling"
 	FillCmdRefreshCheckCache  = "zqk scheduler submit \"zqk system check --format json -o .zqk/logs/system-check.json\" --title \"refresh system-check cache\""

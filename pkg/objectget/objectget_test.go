@@ -94,7 +94,7 @@ func TestOverlayPlanForDefaultViewIsRaw(t *testing.T) {
 }
 
 func TestInferKindFromObjectID_withProjectRoot(t *testing.T) {
-	k := InferKindFromObjectID(".", "CVS-REDACTED")
+	k := InferKindFromObjectID(".", "CVS-1234567890123456000-abcdef12")
 	if k != objects.KindConvergenceSession {
 		t.Fatalf("want convergence_session, got %q", k)
 	}

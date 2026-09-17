@@ -22,7 +22,7 @@ var schemaPlaneDirs = []string{
 
 // TestSeedSchemaPlanePopulatesEveryPlaneDir is also the guard against reversed copy arguments.
 // The helpers take (destination, source); swapping them copies the empty temp root over the
-// real repository's specs, which is the defect recorded in BLI-REDACTED.
+// real repository's specs, which is the defect recorded in BLI-1787555794519027000-8ba84e8a.
 // Asserting that the temp root actually received files fails in that case, because a reversed
 // copy leaves the temp root empty.
 func TestSeedSchemaPlanePopulatesEveryPlaneDir(t *testing.T) {

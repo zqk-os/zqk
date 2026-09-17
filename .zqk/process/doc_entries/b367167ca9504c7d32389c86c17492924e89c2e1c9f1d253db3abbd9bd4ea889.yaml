@@ -1,0 +1,21 @@
+content_hash: be568b80a3bd0f5b2c1b3f9764dc7eeb5f759a459d7161b6a8425fd5feabe4c7
+content_searchable: true
+content_size: 7775
+created_at: "2026-09-17T08:44:56Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: onboarding
+id: DOC-638
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/onboarding/MESH_COMMS_E2E_SETUP.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: Living runbook
+title: Mesh COMMS E2E setup & troubleshooting (TPM↔AGY)
+updated_at: "2026-09-17T08:44:56Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

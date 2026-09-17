@@ -1,0 +1,22 @@
+category: audit
+content_hash: f2110c815d30af47f9abc8d868b698fc385612ce2e7db10b6df84dd3eeff25b4
+content_searchable: true
+content_size: 14535
+created_at: "2026-09-17T08:44:20Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-348
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/audit-event-bulk-buffering-v1.0.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: During bulk operations (e.g., zqk check all --force), the system creates individual audit events for each operation
+title: Audit Event Bulk Operation Buffering
+updated_at: "2026-09-17T08:44:20Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

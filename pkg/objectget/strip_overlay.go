@@ -16,7 +16,7 @@ const (
 // IsReferenceResolverOverlayFieldKey reports whether k is get-time hydration metadata
 // (reference_resolver_overlay_* or resolved_*_ref(s)), not durable spec fields like resolved_at.
 //
-// TRACK: BLI-REDACTED — remove when: resolved sidecar is the only hydrate path
+// TRACK: BLI-1785909672838827000-9fca84f5 — remove when: resolved sidecar is the only hydrate path
 // and write paths no longer accept get-output round-trips.
 func IsReferenceResolverOverlayFieldKey(k string) bool {
 	if k == overlayKeyApplied || strings.HasPrefix(k, overlayKeyPrefix) {

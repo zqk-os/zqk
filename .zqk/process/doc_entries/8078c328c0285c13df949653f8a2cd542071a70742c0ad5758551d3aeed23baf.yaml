@@ -1,0 +1,22 @@
+category: architecture
+content_hash: 33895e785ca16e0c472a380a98463da4db3cc2cd1f4c38dd4447c95dcb7c8c3b
+content_searchable: true
+content_size: 4640
+created_at: "2026-09-17T08:43:33Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-176
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/MCP_BUILT_IN_TOOLS_ARCHITECTURE.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: '- Built-in tools: Always available, bypass config whitelisting - Registered CLI tools: Filtered by RBAC + config whitelisting The current architecture doesn''t distinguish between: - Workflow/contex...'
+title: MCP Built-In Tools Architecture
+updated_at: "2026-09-17T08:43:33Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

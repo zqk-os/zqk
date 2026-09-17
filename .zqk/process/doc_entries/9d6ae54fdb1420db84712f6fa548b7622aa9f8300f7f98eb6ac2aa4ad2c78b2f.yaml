@@ -1,0 +1,22 @@
+category: architecture
+content_hash: 198f551283802c70736be150a8b6d6b26d4209a249ad356da520bd693bd27c66
+content_searchable: true
+content_size: 796
+created_at: "2026-09-17T08:42:11Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-118
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/GANTT_EXPORT_DEFERRED.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: 'Documentation: # Gantt export (PNG, PDF)'
+title: Gantt export (PNG, PDF)
+updated_at: "2026-09-17T08:42:11Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

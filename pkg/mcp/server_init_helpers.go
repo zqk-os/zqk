@@ -105,7 +105,7 @@ func (s *Server) resolveAccountIDFromRegistry(clientName string, clientInfo map[
 	}
 
 	// Try common patterns. Prefer ACC-* / canonicalized legacy account:username.
-	// TRACK: BLI-REDACTED
+	// TRACK: BLI-1785905136581480000-1f317f44
 	possibleAccountIDs := []string{
 		clientName,
 		strings.ToLower(clientName),
@@ -427,7 +427,7 @@ func (s *Server) eliciteAccountID(ctx context.Context, clientID string, clientIn
 	elicitationParams := []ElicitationParam{
 		ElicitParamWithChoices(
 			clientInfoAccountID,
-			"Your account ID (e.g., ACC-1785920548450214000-80bb9c63, ACC-1785920548450214016-ace2aae1). This determines your role and permissions.",
+			"Your account ID (e.g., ACC-…). This determines your role and permissions.",
 			"string",
 			true,
 			availableAccountIDs,

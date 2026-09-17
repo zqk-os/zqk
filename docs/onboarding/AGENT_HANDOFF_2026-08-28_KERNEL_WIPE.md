@@ -89,8 +89,8 @@ When blocking=0, commit CAS as a restore snapshot (`scripts/README.md` — Kerne
 | `PRI-CEF-R23-PKG-LAYOUT-001` | **exists** `grooming`. BLIs SRC-TRASH + DIR-CENSUS **planned**. |
 | `PRI-CEF-R24-KERNEL-INTEGRITY-001` | **restored from rescue** — `active` `active_order=1` (collides with R20 ao=1). Not a new lead until children are planned and local-models ship-exits. |
 | `PRI-CEF-R25-ENVELOPE-REMEASURE-001` | **restored from rescue** — `grooming` `active_order=5` |
-| `BLI-REDACTED` | MCP get missed; **live YAML exists** as `complete` (`4c089f…`). Rescue is older `validated` (`07a74e…`) — do not overlay. |
-| `BLI-REDACTED` / `…6e1ae4f0` | **complete**, still `priority_plan_ref=PRI-CEF-R24-LOCAL-MODELS-001` |
+| `BLI-1787823835447254000-255d29d7` | MCP get missed; **live YAML exists** as `complete` (`4c089f…`). Rescue is older `validated` (`07a74e…`) — do not overlay. |
+| `BLI-1787823836830521000-c90fb1b7` / `…6e1ae4f0` | **complete**, still `priority_plan_ref=PRI-CEF-R24-LOCAL-MODELS-001` |
 | `BLI-KERNEL-UNPAIRED-DELETE-INBOUND-001` | **validated**, plan ref gone (parent plan missing) |
 | `object count backlog_item` | **1017** |
 | `object count priority_plan` | **81** (grooming count=2, active count=1) |

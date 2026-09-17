@@ -1,0 +1,22 @@
+category: architecture
+content_hash: 287f8f4af41e75639eb334a3a6c51cabd71f656c6cf83e5003fa7f2bc70536b4
+content_searchable: true
+content_size: 5766
+created_at: "2026-09-17T08:44:32Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-446
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/io-queue-architecture.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: All I/O operations (inbound and outbound) MUST flow through queues to prevent deadlocks
+title: I/O Queue Architecture
+updated_at: "2026-09-17T08:44:32Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

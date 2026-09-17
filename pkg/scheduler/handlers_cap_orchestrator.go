@@ -7,6 +7,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"runtime"
 	"sort"
 	"strings"
 	"sync"
@@ -247,12 +248,10 @@ func NewCapOrchestratorHandlerWithEscalation(storage storagepkg.ObjectStoragePro
 
 // defaultEscalationChain builds the standard two-tier escalation:
 // Tier 1 (3 failures): Agent recovery via configurable command
-// Tier 2 (6 failures): Human inbox as last resort
+// Tier 2 (6 failures): Human notifications (Slack, macOS banner, bounded inbox)
 func defaultEscalationChain(projectRoot string) *EscalationChain {
 	agentProvider := buildAgentProvider(projectRoot)
-	humanProvider := &InboxEscalationProvider{
-		InboxDir: filepath.Join(projectRoot, paths.ProjectDataDir, "inbox", "human"),
-	}
+	humanProvider := buildHumanProvider(projectRoot)
 
 	return &EscalationChain{
 		Tiers: []EscalationTier{
@@ -260,6 +259,52 @@ func defaultEscalationChain(projectRoot string) *EscalationChain {
 			{Threshold: capHumanEscalationThreshold, Provider: humanProvider, Name: "human"},
 		},
 	}
+}
+
+// buildHumanProvider constructs the human escalation provider.
+// Supports Slack webhook, native macOS desktop notification, and a bounded inbox.
+func buildHumanProvider(projectRoot string) EscalationProvider {
+	var providers []EscalationProvider
+
+	// 1. Resolve Slack webhook from env, config, or identity
+	slackURL := ResolveSlackWebhookURL(projectRoot)
+	if slackURL != "" {
+		providers = append(providers, &WebhookEscalationProvider{
+			WebhookURL: slackURL,
+		})
+	}
+
+	// Custom human command from escalation.json if configured
+	configPath := filepath.Join(projectRoot, paths.ProjectDataDir, "config", "escalation.json")
+	if data, err := fileutil.ReadFile(configPath); err == nil {
+		var config struct {
+			HumanCommand string   `json:"human_command"`
+			HumanArgs    []string `json:"human_args"`
+		}
+		if json.Unmarshal(data, &config) == nil && config.HumanCommand != "" {
+			providers = append(providers, &CommandEscalationProvider{
+				Command:     config.HumanCommand,
+				Args:        config.HumanArgs,
+				ProjectRoot: projectRoot,
+			})
+		}
+	}
+
+	// 2. On macOS, add native desktop banner notification with sound
+	if runtime.GOOS == "darwin" {
+		providers = append(providers, &MacOSNotificationProvider{})
+	}
+
+	// 3. Maintain bounded inbox directory with auto-pruning to prevent file clutter
+	providers = append(providers, &InboxEscalationProvider{
+		InboxDir:   filepath.Join(projectRoot, paths.ProjectDataDir, "inbox", "human"),
+		MaxHistory: 3,
+	})
+
+	if len(providers) == 1 {
+		return providers[0]
+	}
+	return &MultiEscalationProvider{Providers: providers}
 }
 
 // buildAgentProvider constructs the agent escalation provider from config.
@@ -307,7 +352,7 @@ func (h *CapOrchestratorHandler) prepareCmd(cmd *exec.Cmd) *exec.Cmd {
 		env = append(env, e)
 	}
 	cmd.Env = append(env,
-		apiKey+"=ACC-1785920548450214012-68b850c0",
+		apiKey+"="+objects.DefaultSystemAccountID,
 		graphKey.Name()+"=false",
 		adminGraphKey.Name()+"=false",
 	)
@@ -446,9 +491,20 @@ func (h *CapOrchestratorHandler) Execute(ctx context.Context, job *ScheduledJob)
 		}
 	}
 
-	// Step 3: Failures escalate; successful handler work only advances when
-	// stage-specific delivery evidence exists (grooming ≠ AGI create alone).
 	if stageErr != nil {
+		if strings.Contains(stageErr.Error(), "planned=0 exhausted") ||
+			strings.Contains(stageErr.Error(), "ATTN empty-column") ||
+			strings.Contains(stageErr.Error(), "ATTN dor-gap") {
+			// Anticipatory grooming hold: empty-column, dor-gap, or planned=0
+			// indicates the queue is waiting on TPM shaping or wrapping, not an infrastructure/daemon crash.
+			// Wake TPM and hold stage without incrementing fatal failure tracker.
+			h.logger.Info("cap_stage_tpm_hold",
+				logging.PlanIDField(planID),
+				logging.ErrorTextField(stageErr.Error()),
+			)
+			h.wakeAgentAndScheduleHourglass(planID, "tpm")
+			return nil
+		}
 		h.recordFailure(instruction, stageErr)
 		h.recordCAPStageFailureAttempt(instruction)
 		if pending, err := h.readPendingStage(); err == nil && capStageAttemptExhausted(pending) {
@@ -475,14 +531,14 @@ func (h *CapOrchestratorHandler) Execute(ctx context.Context, job *ScheduledJob)
 }
 
 // capDispatchShared is tick-scoped state shared across parallel plan dispatchers.
-// TRACK: BLI-REDACTED
+// TRACK: BLI-1785915238591238000-619a2f9e
 type capDispatchShared struct {
 	openAGI *openAgentInstructionIndex
 	openATK *openAgentTaskIndex
 }
 
 // openAgentInstructionIndex is a one-shot snapshot of open AGIs for CAP fan-out.
-// TRACK: BLI-REDACTED
+// TRACK: BLI-1785915238591238000-619a2f9e
 type openAgentInstructionIndex struct {
 	mu sync.RWMutex
 	// key: lower(plan)\0lower(persona) → uppercased instruction texts
@@ -578,7 +634,7 @@ func (h *CapOrchestratorHandler) buildOpenAgentInstructionIndex(ctx context.Cont
 // already exists for the persona+plan with a matching instruction token.
 // instructionMatch is matched case-insensitively as a substring so stage keys
 // (cap_stage_design) and free-text grooming prompts both reuse.
-// TRACK: BLI-REDACTED
+// TRACK: BLI-1785915238591238000-619a2f9e
 func (h *CapOrchestratorHandler) hasOpenAgentInstruction(ctx context.Context, planID, personaID, instructionMatch string) bool {
 	return h.buildOpenAgentInstructionIndex(ctx).has(planID, personaID, instructionMatch)
 }
@@ -740,6 +796,25 @@ func (h *CapOrchestratorHandler) recordFailure(stage string, err error) {
 	if tracker.ConsecutiveFailures >= capHumanEscalationThreshold {
 		notice.Severity = EscalationSeverityCritical
 		notice.Title = "CAP Loop Stuck — Agent Recovery Failed"
+
+		// Rate-limit human escalation: avoid spamming identical failures on every scheduler tick.
+		shouldEscalateHuman := false
+		if tracker.LastHumanEscalation == "" {
+			shouldEscalateHuman = true
+		} else if lastTime, parseErr := time.Parse(time.RFC3339, tracker.LastHumanEscalation); parseErr == nil && time.Since(lastTime) > time.Hour {
+			shouldEscalateHuman = true
+		} else if tracker.ConsecutiveFailures == 25 || tracker.ConsecutiveFailures == 50 || tracker.ConsecutiveFailures == 100 || tracker.ConsecutiveFailures == 200 {
+			shouldEscalateHuman = true
+		}
+
+		if shouldEscalateHuman {
+			tracker.LastHumanEscalation = time.Now().UTC().Format(time.RFC3339)
+			h.writeStateFile(capFailureTrackerFile, tracker)
+			if escalateErr := h.escalation.Evaluate(context.Background(), tracker.ConsecutiveFailures, notice); escalateErr != nil {
+				h.logger.Error("cap_escalation_failed", escalateErr)
+			}
+		}
+		return
 	}
 
 	if escalateErr := h.escalation.Evaluate(context.Background(), tracker.ConsecutiveFailures, notice); escalateErr != nil { // Background: request-or-shutdown derived

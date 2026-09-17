@@ -389,3 +389,71 @@ func TestEngine_pinsMutationToolWhileEvidenceOwed(t *testing.T) {
 		t.Fatalf("first pin = %#v, want test_tool on the first owed turn", client.fns)
 	}
 }
+
+func TestCheckReadLoopWatchdog(t *testing.T) {
+	t.Parallel()
+
+	t.Run("empty history", func(t *testing.T) {
+		t.Parallel()
+		tripped, reason := CheckReadLoopWatchdog(nil)
+		if tripped || reason != "" {
+			t.Fatalf("expected false on empty history, got %v (%s)", tripped, reason)
+		}
+	})
+
+	t.Run("repeated identical arguments trip watchdog", func(t *testing.T) {
+		t.Parallel()
+		history := []ToolCallRecord{
+			{Name: "zqk_read_code", Arguments: `{"path":"pkg/swarm/engine.go"}`},
+			{Name: "zqk_read_code", Arguments: `{"path":"pkg/swarm/engine.go"}`},
+			{Name: "zqk_read_code", Arguments: `{"path":"pkg/swarm/engine.go"}`},
+		}
+		tripped, reason := CheckReadLoopWatchdog(history)
+		if !tripped {
+			t.Fatal("expected watchdog to trip on 3 repeated identical calls")
+		}
+		if !strings.Contains(reason, "Technical Lead Watchdog") {
+			t.Fatalf("expected Technical Lead Watchdog in reason, got: %s", reason)
+		}
+		if !ShouldForceWriteOnly(true, history) {
+			t.Fatal("expected ShouldForceWriteOnly to return true when watchdog trips")
+		}
+	})
+
+	t.Run("non-mutation streak threshold trips watchdog", func(t *testing.T) {
+		t.Parallel()
+		var history []ToolCallRecord
+		for i := 0; i < ReadLoopWatchdogThreshold; i++ {
+			history = append(history, ToolCallRecord{
+				Name:      "zqk_read_code",
+				Arguments: fmt.Sprintf(`{"path":"file_%d.go"}`, i),
+			})
+		}
+		tripped, reason := CheckReadLoopWatchdog(history)
+		if !tripped {
+			t.Fatalf("expected watchdog to trip after %d non-mutation calls", ReadLoopWatchdogThreshold)
+		}
+		if !strings.Contains(reason, "streak reached") {
+			t.Fatalf("expected streak reached in reason, got: %s", reason)
+		}
+		if !ShouldForceWriteOnly(true, history) {
+			t.Fatal("expected ShouldForceWriteOnly to return true on streak threshold")
+		}
+	})
+
+	t.Run("mutation tool resets streak", func(t *testing.T) {
+		t.Parallel()
+		history := []ToolCallRecord{
+			{Name: "zqk_read_code", Arguments: `{"path":"pkg/swarm/engine.go"}`},
+			{Name: "zqk_read_code", Arguments: `{"path":"pkg/swarm/engine.go"}`},
+			{Name: "zqk_write_code", Arguments: `{"path":"pkg/swarm/engine.go","content":"package swarm"}`},
+		}
+		tripped, _ := CheckReadLoopWatchdog(history)
+		if tripped {
+			t.Fatal("expected watchdog not to trip after mutation tool")
+		}
+		if ShouldForceWriteOnly(true, history) {
+			t.Fatal("expected ShouldForceWriteOnly false after mutation tool")
+		}
+	})
+}

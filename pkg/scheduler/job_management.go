@@ -340,6 +340,9 @@ var criticalJobTypesForSubmission = map[string]bool{
 // Explicit scheduler_job.priority high/critical also uses the priority pool so process-evidence test
 // bundles (criteria_refs / test_case_refs) and other urgent run_wrapper work is not starved behind
 // bulk SCH-run-bundle-* immediate jobs on the default pool.
+// CategoryManual immediate jobs (and callback-bearing one-shots) use priority dispatch so CLI
+// one-shot submissions, agent-exec commits, and hourglass callback workflows are never starved
+// behind goroutine storms or bulk test runners. TRACK: TDE-1789630460110488000-1f2e7aa3
 func priorityDispatchJob(job *ScheduledJob) bool {
 	if job == nil {
 		return false
@@ -349,6 +352,14 @@ func priorityDispatchJob(job *ScheduledJob) bool {
 	}
 	if job.Priority == JobPriorityHigh || job.Priority == JobPriorityCritical {
 		return true
+	}
+	if job.TriggerType == TriggerTypeImmediate && (job.Category == CategoryManual || job.Category == CategoryUser) {
+		return true
+	}
+	if job.TriggerType == TriggerTypeImmediate && (job.CallbackOnError != emptyValue || job.CallbackOnCompletion != emptyValue) {
+		if !IsTestBundleJob(job.ID) && job.Category != CategoryTesting {
+			return true
+		}
 	}
 	return job.TriggerType == "timer" && job.Category == CategoryMaintenance
 }

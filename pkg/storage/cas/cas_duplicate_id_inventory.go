@@ -4,17 +4,19 @@ import (
 	"context"
 	"path/filepath"
 	"sort"
+	"strings"
 	"time"
 
 	"github.com/lanceman/zqk/pkg/datacell"
 	"github.com/lanceman/zqk/pkg/errfmt"
 	"github.com/lanceman/zqk/pkg/objects"
 	"github.com/lanceman/zqk/pkg/paths"
+	"github.com/lanceman/zqk/pkg/storage/filecas"
 	"github.com/lanceman/zqk/pkg/storage/systemcheck"
 	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
 )
 
-// TRACK: BLI-REDACTED — fail-closed against dual CAS blobs (POL-CODE-004).
+// TRACK: BLI-1786358681981576000-66f07f6c — fail-closed against dual CAS blobs (POL-CODE-004).
 // ObjectIDCache / index keep one path per id, so per-object checkDuplicateIDs is blind to
 // multiple hash-named YAML files that embed the same id. Filesystem scan is authoritative.
 
@@ -156,6 +158,25 @@ func QuarantineCASDuplicateLosers(ctx context.Context, kind, kindDir, quarantine
 				continue
 			}
 			quarantined++
+		}
+		if !dryRun {
+			keepBase := filepath.Base(keep)
+			keepHash := strings.TrimSuffix(keepBase, filepath.Ext(keepBase))
+			if len(keepHash) == 64 {
+				cas := filecas.NewContentAddressableStorage(kindDir, kind)
+				if idx := cas.GetIndex(); idx != nil {
+					relDir, relErr := filepath.Rel(kindDir, filepath.Dir(keep))
+					var bucketKey string
+					if relErr == nil && relDir != "." && relDir != "" {
+						bucketKey = relDir
+					}
+					if bucketKey != "" {
+						_ = idx.SetMapping(dup.ObjectID, keepHash, bucketKey)
+					} else {
+						_ = idx.SetMapping(dup.ObjectID, keepHash)
+					}
+				}
+			}
 		}
 	}
 	return quarantined, errs

@@ -19,6 +19,7 @@ const _sfxAgentPromptDeliveryHTTPBearer = "AGENT_PROMPT_DELIVERY_HTTP_BEARER" //
 const _sfxAgentPromptDeliveryHTTPURL = "AGENT_PROMPT_DELIVERY_HTTP_URL"
 const _sfxAgentPromptKeystrokeLog = "AGENT_PROMPT_KEYSTROKE_LOG"
 const _sfxAgentRulesDir = "AGENT_RULES_DIR"
+const _sfxAgentWebhookSlackAllAgentFarm = "AGENT_WEBHOOK_SLACK_ALL_AGENT_FARM"
 const _sfxAgentWorktreeRoot = "AGENT_WORKTREE_ROOT"
 const _sfxAgentID = "AGENT_ID"
 const _sfxAgentPubKey = "AGENT_PUB_KEY"
@@ -191,18 +192,18 @@ func AgentWorktreeRoot() EnvVar { return EnvVar{Key: brand.EnvVar(_sfxAgentWorkt
 func AgentID() EnvVar { return EnvVar{Key: brand.EnvVar(_sfxAgentID)} }
 
 // AgentSyncMaxLoops returns the env var for AGENT_SYNC_MAX_LOOPS (brand-prefixed).
-// Sync-loop outer poll guard; default 100. TRACK: BLI-REDACTED
+// Sync-loop outer poll guard; default 100. TRACK: BLI-1783631896775129000-de3fef87
 func AgentSyncMaxLoops() EnvVar { return EnvVar{Key: brand.EnvVar(_sfxAgentSyncMaxLoops)} }
 
 // AgentMaxVerificationAttempts returns AGENT_MAX_VERIFICATION_ATTEMPTS (brand-prefixed).
-// Per-step verification retry cap; default 3. TRACK: BLI-REDACTED
+// Per-step verification retry cap; default 3. TRACK: BLI-1783631896775129000-de3fef87
 func AgentMaxVerificationAttempts() EnvVar {
 	return EnvVar{Key: brand.EnvVar(_sfxAgentMaxVerificationAttempts)}
 }
 
 // AgentSyncMaxStagnantTicks returns AGENT_SYNC_MAX_STAGNANT_TICKS (brand-prefixed).
 // Abort when task progress fingerprint is unchanged this many ticks; default 10.
-// TRACK: BLI-REDACTED
+// TRACK: BLI-1783631896775129000-de3fef87
 func AgentSyncMaxStagnantTicks() EnvVar {
 	return EnvVar{Key: brand.EnvVar(_sfxAgentSyncMaxStagnantTicks)}
 }
@@ -332,12 +333,17 @@ func EnablePublicCandidateTest() EnvVar {
 }
 
 // PublicCandidateDir is the disposable export dest for sync-public-candidate.sh.
-// Never the live TPM checkout (zqk-public-candidate). TRACK: BLI-REDACTED
+// Never the live TPM checkout (zqk-public-candidate). TRACK: BLI-1789619419231762000-7f87694b
 func PublicCandidateDir() EnvVar { return EnvVar{Key: brand.EnvVar(_sfxPublicCandidateDir)} }
 
 // PublicCandidateAllowClobber is human break-glass to rm -rf the well-known product sibling.
 func PublicCandidateAllowClobber() EnvVar {
 	return EnvVar{Key: brand.EnvVar(_sfxPublicCandidateAllowClobber)}
+}
+
+// AgentWebhookSlackAllAgentFarm returns the environment variable for AGENT_WEBHOOK_SLACK_ALL_AGENT_FARM (brand-prefixed).
+func AgentWebhookSlackAllAgentFarm() EnvVar {
+	return EnvVar{Key: brand.EnvVar(_sfxAgentWebhookSlackAllAgentFarm)}
 }
 
 // EnableMigrateLegacyToStreamIntegrationTest returns the environment variable name for ENABLE_MIGRATE_LEGACY_TO_STREAM_INTEGRATION_TEST (brand-prefixed).
@@ -895,3 +901,5 @@ func MCPRunDeadlockReproduction() EnvVar { return EnvVar{Key: "MCP_RUN_DEADLOCK_
 func ZQKCLITestUpdateHelpGolden() EnvVar { return EnvVar{Key: "ZQKCLI_TEST_UPDATE_HELP_GOLDEN"} }
 func ZQKAllowForegroundGoTest() EnvVar   { return EnvVar{Key: "ZQK_ALLOW_FOREGROUND_GO_TEST"} }
 func ZqkEnv() EnvVar                     { return EnvVar{Key: "ZQK_ENV"} }
+func ZQKProjectRoot() EnvVar             { return EnvVar{Key: brand.DefaultEnvPrefix + "_PROJECT_ROOT"} }
+func ZQKTestRoot() EnvVar                { return EnvVar{Key: brand.DefaultEnvPrefix + "_TEST_ROOT"} }

@@ -1,0 +1,21 @@
+content_hash: fe8ca0de2962265a0956e0b4ce9da8a3f34c6dc65c259293790c0100a98e6aad
+content_searchable: true
+content_size: 2720
+created_at: "2026-09-17T08:44:56Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: onboarding
+id: DOC-637
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/onboarding/MCP_CONFIGURATION.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: This guide explains how to configure the MCP server to use a stable binary and manage command exposure
+title: MCP Configuration Guide
+updated_at: "2026-09-17T08:44:56Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

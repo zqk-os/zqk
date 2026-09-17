@@ -113,7 +113,7 @@ func (f *FileObjectStorage) EnsureCASIndexFromPath(id, kind, filePath string) bo
 		return false
 	}
 	// Skip stale cache paths whose CAS blob was already replaced (see EnsureCASIndexFromPaths).
-	// TRACK: BLI-REDACTED
+	// TRACK: BLI-1785723654802038000-b14064bc
 	if !casHashFileExistsAt(kindDir, filePath, hash) {
 		return false
 	}
@@ -160,7 +160,7 @@ func (f *FileObjectStorage) EnsureCASIndexFromPaths(kind string, idToFilePath ma
 
 	// Prefer in-memory/disk index when it already matches cache paths so warm does not
 	// Stat+rewrite every blob on every system check (multi-second stall).
-	// TRACK: BLI-REDACTED
+	// TRACK: BLI-1785895580100186000-c5539372
 	current := cas.GetIndex().SnapshotMappings()
 	currentBuckets := cas.GetIndex().SnapshotBucketKeys()
 
@@ -197,7 +197,7 @@ func (f *FileObjectStorage) EnsureCASIndexFromPaths(kind string, idToFilePath ma
 		// Object-id-cache often lags CAS updates (path still names the deleted hash).
 		// Warming those mappings via SetMappings (explicit-wins) was reverting healed
 		// indexes and making system check flap 0↔hundreds of "orphans".
-		// TRACK: BLI-REDACTED — remove when: object-id-cache
+		// TRACK: BLI-1785895580100186000-c5539372 — remove when: object-id-cache
 		// always updates CAS paths on write and warm refuses stale paths.
 		if !casHashFileExistsAt(kindDir, filePath, hash) {
 			continue

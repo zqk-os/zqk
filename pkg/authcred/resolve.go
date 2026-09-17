@@ -1,5 +1,5 @@
 // Package authcred resolves CLI/MCP credentials to ACC-* accounts.
-// TRACK: BLI-REDACTED — unique issued ZQK_API_KEY + seating inject.
+// TRACK: BLI-1785905292370531000-b758a11c — unique issued ZQK_API_KEY + seating inject.
 package authcred
 
 import (

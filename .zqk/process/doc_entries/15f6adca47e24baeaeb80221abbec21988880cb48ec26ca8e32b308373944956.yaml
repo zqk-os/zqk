@@ -1,0 +1,22 @@
+category: architecture
+content_hash: 028661d82c4700bcd5ae4d94a8f5519cfff6e3305ebb8161bb496153fab46173
+content_searchable: true
+content_size: 4364
+created_at: "2026-09-17T08:43:40Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-184
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/MCP_FORMAT_RESTRICTIONS.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: The MCP server supports restricting clients to specific output formats
+title: MCP Format Restrictions
+updated_at: "2026-09-17T08:43:40Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

@@ -258,7 +258,7 @@ func TestB(t *testing.T) {}
 }
 
 func TestNewScanner_ResolvesSymlinkRoot(t *testing.T) {
-	// TRACK: BLI-REDACTED — Local CI workdir is a symlink; Walk must see the tree.
+	// TRACK: BLI-1785723654802038000-b14064bc — Local CI workdir is a symlink; Walk must see the tree.
 	tmpDir := t.TempDir()
 	realRoot := filepath.Join(tmpDir, "trees", "abc123")
 	pkgDir := filepath.Join(realRoot, "pkg", "example")

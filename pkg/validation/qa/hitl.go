@@ -6,6 +6,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/lanceman/zqk/pkg/objects"
 	"github.com/lanceman/zqk/pkg/policyinterrupt"
 	"github.com/lanceman/zqk/pkg/validation"
 )
@@ -46,7 +47,7 @@ func (e *InterruptEmitter) AckDisparityOnPass(itemID string) {
 	_ = policyinterrupt.AppendAck(e.projectRoot, policyinterrupt.AckRecord{
 		Profile:        "policy",
 		DedupeKey:      DisparityDedupeKey(itemID),
-		AckedBy:        "ACC-1785920548450214012-68b850c0",
+		AckedBy:        objects.DefaultSystemAccountID,
 		Reason:         "qa_auditor_pass",
 		SteeringAction: "auto_ack_on_audit_pass",
 	})

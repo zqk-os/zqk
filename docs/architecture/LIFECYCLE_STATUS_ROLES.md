@@ -57,7 +57,7 @@ parents (`active` → `shovel_ready`) vs sessions/jobs (`active` → `execution_
 
 For priority plans, **ranking** treats `in_progress` as top-of-stack (≡ `active_order` 0) so other shovel-ready plans occupy unique 1+ slots. Role for `in_progress` is `execution_locked`; role for `active` is `shovel_ready`.
 
-**Check valve:** `active` means ready to act (not parked). Once the plan is `in_progress`, the only exits are `paused`, `blocked` (halt), `complete`, or `cancelled`. There is **no** demotion to `active` or `grooming`. Halt resume is `paused|blocked → in_progress` (re-lock), **not** `→ active` (`in_progress → paused → active` is the same leak). `status_mapping` must not map `in_progress` → `active` (sibling statuses). Design exam: [LIFECYCLE_STATE_MACHINE_RUBRIC.md](./LIFECYCLE_STATE_MACHINE_RUBRIC.md). TRACK: `BLI-REDACTED`.
+**Check valve:** `active` means ready to act (not parked). Once the plan is `in_progress`, the only exits are `paused`, `blocked` (halt), `complete`, or `cancelled`. There is **no** demotion to `active` or `grooming`. Halt resume is `paused|blocked → in_progress` (re-lock), **not** `→ active` (`in_progress → paused → active` is the same leak). `status_mapping` must not map `in_progress` → `active` (sibling statuses). Design exam: [LIFECYCLE_STATE_MACHINE_RUBRIC.md](./LIFECYCLE_STATE_MACHINE_RUBRIC.md). TRACK: `BLI-1785439369431933000-f0cccd6c`.
 
 Complete children on an `active` plan mean **closeout failed** (promote to `complete`), not a valid parked state.
 
@@ -84,7 +84,7 @@ Whats-next plan ranking consults **roles** via `pkg/objects` helpers
 
 ## Contract tests (YAML properties)
 
-`pkg/objects/lifecycle_contract_test.go` (TRACK: `BLI-REDACTED`):
+`pkg/objects/lifecycle_contract_test.go` (TRACK: `BLI-1785784867143912000-635942fb`):
 
 1. **Auto-only ≠ promote** — every `auto: true` / `manual: false` edge is excluded
    from `PromoteTransitionTargets` (no combinatorial status matrix).
@@ -106,7 +106,7 @@ break-glass and (until fixed) skipped lifecycle validation — a false-complete 
 
 **Filled hole (storage + validator):** break-glass / trusted shockwave no longer
 disable `ValidateLifecycle`. Complete **holds** (CRITs; plan children terminal)
-always run. TRACK: `BLI-REDACTED`. Multi-ID / bulk
+always run. TRACK: `BLI-1785784867143912000-635942fb`. Multi-ID / bulk
 `--field status=` uses the same promote-or-override door as single-ID update
 (`BLI-CEF-CLI-MULTI-ID-UPDATE`).
 

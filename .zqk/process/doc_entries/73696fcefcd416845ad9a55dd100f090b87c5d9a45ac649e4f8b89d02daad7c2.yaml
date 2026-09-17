@@ -1,0 +1,22 @@
+category: validation
+content_hash: 39937a7b8103183875783660273ce19c2b32c862b0a93fcb24d2f471040f25cc
+content_searchable: true
+content_size: 5038
+created_at: "2026-09-17T08:44:19Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-342
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/async-cli-retrofit-and-validation-cache.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: 'Documentation: # Async CLI retrofit and incremental validation cache'
+title: Async CLI retrofit and incremental validation cache
+updated_at: "2026-09-17T08:44:19Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

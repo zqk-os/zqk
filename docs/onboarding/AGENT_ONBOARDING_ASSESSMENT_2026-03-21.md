@@ -24,7 +24,7 @@ The project operates as a **single Go CLI (`zqk`)** backed by **content-addresse
 |----------|------|
 | [README.md](./README.md) | Entry point; points to AI Agent Onboarding and quick commands |
 | [AI_AGENT_ONBOARDING.md](./AI_AGENT_ONBOARDING.md) | Canonical agent guide: strategic plan, CLI routines, process integrity, git workflow, OHTV, policies, architecture patterns |
-| [AGENT_ONBOARDING_SUMMARIES_DIGEST.md](./AGENT_ONBOARDING_SUMMARIES_DIGEST.md) | Compressed history of the dated onboarding snapshots (dated files are not shipped) |
+| [AGENT_ONBOARDING_SUMMARY_2026-03-19.md](./archive/AGENT_ONBOARDING_SUMMARY_2026-03-19.md) | Snapshot of CLI groups, policies, sample git log, PRI-218 backlog notes, glossary seeds |
 | [../process/ai-assistant/CLI_FIRST_COMMITMENT.md](../process/ai-assistant/CLI_FIRST_COMMITMENT.md) | CLI-first, no `cd` in automation, background long runs |
 
 ### Strengths
@@ -81,7 +81,7 @@ This is a coherent model: **the CLI is the API** for persisted process state; **
 3. **Cross-linking** — Use **`alias_refs`** (per spec) to point to **policy** or **doc_entry** IDs where a term is the short form of a longer policy (e.g. POL-CODE-002 ↔ “process data”).
 4. **Convergence vocabulary** — Recent commit `c319b25d2d` added **convergence_session** and **remedy-oriented** glossary terms. Ensure onboarding or a single **architecture note** explains *when* to read `glossary_term` vs `convergence_session` vs `scheduler test-failures` (one paragraph avoids duplication).
 5. **Periodic export (optional)** — If markdown-only consumers need a glossary, consider a **generated** doc from `zqk object list glossary_term` in a script (similar to other reports) — avoid hand-maintaining two sources of truth.
-6. **Overlap with AGENT_ONBOARDING_SUMMARY “Glossary Seeds”** — Dated snapshot files are not shipped; remaining glossary rows belong in `glossary_term` objects so one source wins.
+6. **Overlap with AGENT_ONBOARDING_SUMMARY “Glossary Seeds”** — The table in `archive/AGENT_ONBOARDING_SUMMARY_2026-03-19.md` overlaps with formal `glossary_term` objects. Either **migrate** remaining rows into objects or **link** the summary to the CLI list so one source wins.
 
 ---
 
@@ -125,8 +125,8 @@ Work is concentrated on **reliability of background execution** (scheduler state
 1. Refresh **one short paragraph** in onboarding linking **glossary_term**, **convergence_session**, and **scheduler test-failures** after the convergence work.
 2. **CLI:** fix any **placeholder glossary titles** and expand **`alias_refs`** where terms duplicate policies.
 3. Align **Cursor/workspace rules** that reference PRI-219 with **PRI-221** or the object-based rule.
-4. Optionally add **`docs/reports/README.md`** or onboarding cross-link listing **this**, **[`AGENT_ONBOARDING_SNAPSHOT.md`](./AGENT_ONBOARDING_SNAPSHOT.md)**, and **[`AGENT_ONBOARDING_SUMMARIES_DIGEST.md`](./AGENT_ONBOARDING_SUMMARIES_DIGEST.md)** as the agent assessment series.
+4. Optionally add **`docs/reports/README.md`** or onboarding cross-link listing **this**, **[`AGENT_ONBOARDING_SNAPSHOT.md`](./AGENT_ONBOARDING_SNAPSHOT.md)**, **[`AGENT_ONBOARDING_SUMMARIES_DIGEST.md`](./AGENT_ONBOARDING_SUMMARIES_DIGEST.md)**, and **[`archive/`](./archive/)** dated summaries as the agent assessment series.
 
 ---
 
-*End of assessment. Dated onboarding summaries are compressed in [`AGENT_ONBOARDING_SUMMARIES_DIGEST.md`](./AGENT_ONBOARDING_SUMMARIES_DIGEST.md).*
+*End of assessment. Previous related file: [AGENT_ONBOARDING_SUMMARY_2026-03-19.md](./archive/AGENT_ONBOARDING_SUMMARY_2026-03-19.md).*

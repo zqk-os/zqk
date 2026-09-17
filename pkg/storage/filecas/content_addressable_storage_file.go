@@ -193,7 +193,7 @@ func (cas *ContentAddressableStorage) GetHashForID(objectID string) (string, err
 	// imply this ID is absent — Create can write a bucketed blob after a
 	// kind scan (scheduler_job / qa_success), then proveCreateVisibility
 	// would fail with "not found in index" while the YAML is on disk.
-	// TRACK: BLI-REDACTED
+	// TRACK: BLI-1785723654802038000-b14064bc
 	if cas.isNegativeMiss(objectID) {
 		return "", err
 	}
@@ -294,7 +294,7 @@ func (cas *ContentAddressableStorage) scanForObjectID(targetID string) (string, 
 // GetFilePathForID returns the file path for an object ID using the bucket key from the index (bucket strategy).
 // When the index has a bucket key for this ID, path is kindDir/bucketKey/hash.yaml; otherwise kindDir/hash.yaml.
 // If the index maps to a missing blob, the ghost mapping is dropped durably and a miss is returned.
-// TRACK: BLI-REDACTED
+// TRACK: BLI-1785895580100186000-c5539372
 func (cas *ContentAddressableStorage) GetFilePathForID(objectID string) (string, error) {
 	hash, err := cas.GetHashForID(objectID)
 	if err != nil {

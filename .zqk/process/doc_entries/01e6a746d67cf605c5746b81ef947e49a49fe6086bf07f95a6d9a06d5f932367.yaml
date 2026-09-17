@@ -1,0 +1,22 @@
+category: architecture
+content_hash: 21d6276584ac7beb412d5d064925f080b89f9282116fd0c705cbc8e3e1f8e7ea
+content_searchable: true
+content_size: 12760
+created_at: "2026-09-17T08:42:09Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-091
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/DATA_ORIGINATION_PIPELINE_VISION.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: Provide a conceptual pipeline — aligned with data-pipeline-lifecycle.md stage vocabulary — that describes how zqk could originate a full data surface from a kind (or family of kinds) declared i...
+title: Data origination from specs — pipeline vision (target)
+updated_at: "2026-09-17T08:42:09Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

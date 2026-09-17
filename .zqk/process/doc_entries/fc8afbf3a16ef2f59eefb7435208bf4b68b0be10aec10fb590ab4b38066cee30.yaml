@@ -1,0 +1,22 @@
+category: architecture
+content_hash: 8b22264340faaa8dfe4e980c057d4e4b382d4d769b24b410230cf3b670d933d7
+content_searchable: true
+content_size: 10294
+created_at: "2026-09-17T08:43:58Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-247
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/PUBLIC_KIND_FITNESS_SCORECARD.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: '--- | Kind (Singular / Plural) | Instance Count (CAS) | Primary Lens Finding | Explicit Disposition | Follow-Up Tracking | | :--- | :--- | :--- | :--- | :--- | | backlog_item (backlog) | 879 | High...'
+title: Public-Kind Fitness Scorecard (7-Lens Rubric)
+updated_at: "2026-09-17T08:43:58Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

@@ -23,7 +23,7 @@ import (
 // convergenceTerminalFollowUpNeeded reports whether test-bundle health still shows work worth tracking
 // after a convergence_session has stopped persisting measurements (lifecycle-terminal completed/abandoned,
 // or Option A halted statuses such as escalated/paused/error).
-// TRACK: BLI-REDACTED — escalated is not lifecycle-terminal.
+// TRACK: BLI-1786686768606200000-31133cc3 — escalated is not lifecycle-terminal.
 func convergenceTerminalFollowUpNeeded(snap *TestBundleConvergenceSnapshot) (bool, []string) {
 	if snap == nil {
 		return false, nil
@@ -198,7 +198,7 @@ func buildFollowupDraftConvergenceSessionObject(priorSessionID string, prior map
 	}
 
 	// Build() applies spec defaults (timestamps, origin, etc.); ID is stripped for storage Create.
-	b.SetID("CVS-REDACTED")
+	b.SetID("CVS-1776000000000000999-aabbccdd")
 	obj, err := b.Build()
 	if err != nil {
 		out := b.ToEventMap()

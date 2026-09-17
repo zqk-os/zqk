@@ -1,0 +1,22 @@
+category: architecture
+content_hash: 84b473d894f1c5c1b40907b92dc9728b226e6372804534e88a13e4da13d75d24
+content_searchable: true
+content_size: 1842
+created_at: "2026-09-17T08:44:24Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-391
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/convergence/CAPABILITY_SYNTHESIS.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: To unify Phase A (Cognitive Alignment & Policy Negotiation) and Phase B (Total Recall & Semantic Memory) into a cohesive operating framework for ZQK
+title: Autonomous Capability Synthesis
+updated_at: "2026-09-17T08:44:24Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

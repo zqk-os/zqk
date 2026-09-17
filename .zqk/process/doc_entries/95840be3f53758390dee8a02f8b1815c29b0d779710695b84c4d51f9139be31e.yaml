@@ -1,0 +1,22 @@
+category: architecture
+content_hash: aeb997111c847a40bd53cad0bc9a5585846f1b3eef6878c9cdbc6d3d4ddff5a5
+content_searchable: true
+content_size: 8553
+created_at: "2026-09-17T08:44:08Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-281
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/SNAPSHOT_TO_AUTOFIXER_WORKFLOW.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: The end-goal is to validate snapshot data transfer and restoration of check violations via a spec-driven auto-fixer
+title: Snapshot to Auto-Fixer Workflow Design
+updated_at: "2026-09-17T08:44:08Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

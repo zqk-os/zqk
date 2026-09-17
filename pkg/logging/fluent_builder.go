@@ -100,7 +100,7 @@ type fluentEntry struct {
 
 // FluentEntry is the exported fluent chain. STRUCTURE unexported the concrete type;
 // failclosed validation-cache logging passes entries into helpers.
-// TRACK: BLI-REDACTED — keep in sync with pkg/validation semaphore_full logs.
+// TRACK: BLI-1785895580100186000-c5539372 — keep in sync with pkg/validation semaphore_full logs.
 type FluentEntry = fluentEntry
 
 func (e *fluentEntry) JobID(id string) *fluentEntry {

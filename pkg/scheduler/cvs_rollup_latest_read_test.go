@@ -10,7 +10,7 @@ import (
 func TestReadCVSRollupLatestSummary(t *testing.T) {
 	t.Parallel()
 	tmp := t.TempDir()
-	sid := "CVS-REDACTED"
+	sid := "CVS-1776080007703030000-a726d525"
 	body := `{"schema_version":"rollup_v1","parent_convergence_session_id":"` + sid + `","rollup_status":"satisfied","ready_for_parent_completion":true}` + "\n"
 	path := ResolveCVSRollupLatestJSONPath(tmp, "")
 	if err := fileutil.EnsureDir(filepath.Dir(path)); err != nil {
@@ -26,7 +26,7 @@ func TestReadCVSRollupLatestSummary(t *testing.T) {
 	if !matched || status != "satisfied" || !ready {
 		t.Fatalf("got matched=%v status=%q ready=%v", matched, status, ready)
 	}
-	other, _, matchedOther, err := ReadCVSRollupLatestSummary("CVS-REDACTED", path)
+	other, _, matchedOther, err := ReadCVSRollupLatestSummary("CVS-1776080007703030000-a726d526", path)
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -1,17 +1,17 @@
 package community
 
 import (
-	"os/exec"
 	"path/filepath"
 	"strings"
 	"testing"
 
+	"github.com/lanceman/zqk/pkg/execwrap"
 	"github.com/lanceman/zqk/pkg/paths"
 	"github.com/lanceman/zqk/pkg/utils/fileutil"
 )
 
 // TestReleaseGate_FunctionalAcceptance verifies cross-platform binary builds (darwin/amd64, darwin/arm64, linux/amd64, linux/arm64)
-// and dry-run community packaging pipeline (CRIT-REDACTED).
+// and dry-run community packaging pipeline (CRIT-1789615346258145000-5ef0c763).
 func TestReleaseGate_FunctionalAcceptance(t *testing.T) {
 	root := paths.ResolveProjectRoot(".")
 	pkgScript := filepath.Join(root, "scripts", "package-community.sh")
@@ -20,7 +20,7 @@ func TestReleaseGate_FunctionalAcceptance(t *testing.T) {
 	}
 
 	distDir := t.TempDir()
-	cmd := exec.Command("bash", pkgScript, "v2.8.0", "--dry")
+	cmd := execwrap.Command("bash", pkgScript, "v2.8.0", "--dry")
 	cmd.Dir = root
 	cmd.Env = append(cmd.Environ(), "ZQK_DIST_DIR="+distDir)
 	out, err := cmd.CombinedOutput()
@@ -43,12 +43,12 @@ func TestReleaseGate_FunctionalAcceptance(t *testing.T) {
 	}
 }
 
-// TestReleaseGate_BoundaryAndErrorHandling verifies zero ghost references and invalid target rejection (CRIT-REDACTED).
+// TestReleaseGate_BoundaryAndErrorHandling verifies zero ghost references and invalid target rejection (CRIT-1789615346258146000-4b5a8c21).
 func TestReleaseGate_BoundaryAndErrorHandling(t *testing.T) {
 	root := paths.ResolveProjectRoot(".")
 
 	// Verify package-community.sh rejects invalid or missing version arguments
-	cmd := exec.Command("bash", filepath.Join(root, "scripts", "package-community.sh"))
+	cmd := execwrap.Command("bash", filepath.Join(root, "scripts", "package-community.sh"))
 	cmd.Dir = root
 	out, err := cmd.CombinedOutput()
 	if err == nil {
@@ -58,21 +58,21 @@ func TestReleaseGate_BoundaryAndErrorHandling(t *testing.T) {
 	// Verify verify-bootstrap-portable.sh exists and is executable/valid
 	portableScript := filepath.Join(root, "scripts", "verify-bootstrap-portable.sh")
 	if fileutil.Exists(portableScript) {
-		cmdPortable := exec.Command("bash", "-n", portableScript)
+		cmdPortable := execwrap.Command("bash", "-n", portableScript)
 		if outP, errP := cmdPortable.CombinedOutput(); errP != nil {
 			t.Errorf("verify-bootstrap-portable.sh syntax check failed: %v\n%s", errP, string(outP))
 		}
 	}
 }
 
-// TestReleaseGate_IntegrationAndConformance verifies command spec baseline and release packaging integrity (CRIT-REDACTED).
+// TestReleaseGate_IntegrationAndConformance verifies command spec baseline and release packaging integrity (CRIT-1789615346258147000-d8f2f258).
 func TestReleaseGate_IntegrationAndConformance(t *testing.T) {
 	root := paths.ResolveProjectRoot(".")
 
 	// Verify dist-community packaging artifacts can be created and checksums verified
 	pkgScript := filepath.Join(root, "scripts", "package-community.sh")
 	distDir := t.TempDir()
-	cmd := exec.Command("bash", pkgScript, "v2.8.0-rc1", "--dry")
+	cmd := execwrap.Command("bash", pkgScript, "v2.8.0-rc1", "--dry")
 	cmd.Dir = root
 	cmd.Env = append(cmd.Environ(), "ZQK_DIST_DIR="+distDir)
 	out, err := cmd.CombinedOutput()

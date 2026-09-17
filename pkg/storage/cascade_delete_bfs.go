@@ -9,7 +9,7 @@ import (
 	"github.com/lanceman/zqk/pkg/objects"
 )
 
-// TRACK: BLI-REDACTED — iterative BFS cascade delete (no recursive Delete; cycle-safe).
+// TRACK: BLI-1783796263496783000-dd863823 — iterative BFS cascade delete (no recursive Delete; cycle-safe).
 
 func filterBlockingDependents(dependents []string) []string {
 	if len(dependents) == 0 {

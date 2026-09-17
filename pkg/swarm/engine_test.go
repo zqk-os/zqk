@@ -568,7 +568,7 @@ func TestEngine_RepeatingCycleHardAbort(t *testing.T) {
 	}
 }
 
-// TST-1789075163388619000-6e05e113 / CRIT-REDACTED: Verify 3-Strikes Tool Denial Guard
+// TST-1789075163388619000-6e05e113 / CRIT-1789074570765033000-e786997c: Verify 3-Strikes Tool Denial Guard
 func TestEngine_VerifyThreeStrikesToolDenialGuard(t *testing.T) {
 	p := DefaultToolPrefix()
 	tools := []llm.ToolDefinition{
@@ -661,7 +661,7 @@ func TestEngine_VerifyThreeStrikesToolDenialGuard(t *testing.T) {
 	})
 }
 
-// TST-1789075168791184000-fd8b6784 / CRIT-REDACTED: Verify Hallucination Steering Post-Hook
+// TST-1789075168791184000-fd8b6784 / CRIT-1789074573786400000-3483af38: Verify Hallucination Steering Post-Hook
 func TestEngine_VerifyHallucinationSteeringPostHook(t *testing.T) {
 	p := DefaultToolPrefix()
 	tools := []llm.ToolDefinition{

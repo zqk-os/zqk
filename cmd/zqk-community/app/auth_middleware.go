@@ -25,7 +25,7 @@ import (
 func AuthMiddleware(cmd *cobra.Command, projectRoot string) error {
 	// Builtins that may lack annotations. Session-optional commands walk ancestors.
 	switch cmd.Name() {
-	case "help", "version", "completion", "quickstart", "login", "logout", "auth":
+	case "help", "version", "completion", "quickstart", "login", "logout", "auth", "grep", "zgrep":
 		return nil
 	}
 	if cli.SessionOptional(cmd) {
@@ -71,6 +71,11 @@ func AuthMiddleware(cmd *cobra.Command, projectRoot string) error {
 	}
 
 	if apiKey == "" && credentialsToken == "" {
+		if zqkenv.IsCommunityEdition {
+			secCtx := pkgctx.NewSystemSecurityContext()
+			cmd.SetContext(pkgctx.WithSecurityContext(ctx, secCtx))
+			return nil
+		}
 		return errfmt.Errorf("unauthorized: missing token in ~/.zqk/credentials or %s", zqkenv.APIKey())
 	}
 

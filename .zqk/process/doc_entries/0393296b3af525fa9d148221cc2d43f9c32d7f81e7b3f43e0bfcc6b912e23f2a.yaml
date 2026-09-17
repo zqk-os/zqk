@@ -1,0 +1,22 @@
+category: architecture
+content_hash: d1fb7a4716eaacbca545aabb9414fce67ced00f9f023bca7f7b4a90506d81d89
+content_searchable: true
+content_size: 2074
+created_at: "2026-09-17T08:42:10Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-109
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/EXTERNAL_DATA_AND_MCP_SECURITY.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: As the ZQK OS federates outward, the Model Context Protocol (MCP) will increasingly route I/O to external compute nodes and third-party APIs (e.g., Video Generation, Cloud Storage)
+title: 'Non-Functional Requirements: External Data & MCP Security Boundaries'
+updated_at: "2026-09-17T08:42:10Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

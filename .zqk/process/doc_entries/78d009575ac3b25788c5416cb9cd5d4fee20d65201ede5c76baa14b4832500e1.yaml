@@ -1,0 +1,22 @@
+category: architecture
+content_hash: 289398aa020750cd6dcf604ccd82ed90a2afbbf1b5a435ee480b86edc78164da
+content_searchable: true
+content_size: 10086
+created_at: "2026-09-17T08:43:57Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-233
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/POLICY_LIFECYCLE.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: The policy lifecycle establishes appropriate levels of system awareness and recurring considerations to ensure policies remain current, effective, and properly enforced throughout the project deliv...
+title: 'Policy Lifecycle: System Awareness and Recurring Considerations'
+updated_at: "2026-09-17T08:43:57Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

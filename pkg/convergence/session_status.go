@@ -3,7 +3,7 @@ package convergence
 import "strings"
 
 // Session status behavior matrix (DEC Option A — park-but-CAP-bound for escalated).
-// TRACK: BLI-REDACTED — keep callers on these helpers, not ad-hoc switches.
+// TRACK: BLI-1786686768606200000-31133cc3 — keep callers on these helpers, not ad-hoc switches.
 //
 //	status      | draft_plane | CAP bind | measure persist | whats-next measure | auto-stale→escalated
 //	------------|------------|----------|-----------------|--------------------|---------------------

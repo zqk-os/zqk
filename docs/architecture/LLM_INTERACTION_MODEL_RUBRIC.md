@@ -89,9 +89,9 @@ Already on this studio — **do not re-pull:** `qwen3.6:latest`, `zqk-qwen:lates
 
 | When | Ollama tag | Job | BLI | Status |
 |---|---|---|---|---|
-| After Phase 0 write lands | `qwen2.5:7b-instruct` | Hermes control: same size as Coder-7B, Instruct template. Optional follow `qwen2.5:14b-instruct` if 7B Instruct is also `toolCalls=0` (`BLI-REDACTED`, still exploring). | `BLI-REDACTED` | validated (P2) |
-| After Phase 0, if 3.6 is weak | `qwen3-coder` | AgentX doer candidate (`qwen3_*` parser, not Hermes) | `BLI-REDACTED` | validated (P2) |
-| Phase 1 prose split | `qwen3.5:9b` | Intake / coach / chat-responder — **not** AgentX | `BLI-REDACTED` | validated (P3) |
-| When a 64GB+ host exists | `qwen3-coder-next` | Long-ATK doer; card `temp=1.0` | `BLI-REDACTED` | **deferred** (P3) |
+| After Phase 0 write lands | `qwen2.5:7b-instruct` | Hermes control: same size as Coder-7B, Instruct template. Optional follow `qwen2.5:14b-instruct` if 7B Instruct is also `toolCalls=0` (`BLI-1787824086124576000-c8d68aff`, still exploring). | `BLI-1787823835447254000-255d29d7` | validated (P2) |
+| After Phase 0, if 3.6 is weak | `qwen3-coder` | AgentX doer candidate (`qwen3_*` parser, not Hermes) | `BLI-1787823836830521000-c90fb1b7` | validated (P2) |
+| Phase 1 prose split | `qwen3.5:9b` | Intake / coach / chat-responder — **not** AgentX | `BLI-1787823838145269000-6e1ae4f0` | validated (P3) |
+| When a 64GB+ host exists | `qwen3-coder-next` | Long-ATK doer; card `temp=1.0` | `BLI-1787823839546074000-3d025dfb` | **deferred** (P3) |
 
-Do not `ollama pull` these until the matching BLI is in progress. Do not park those BLIs while they still share `REQ-REDACTED` — `object park` cluster-deferred that shared REQ on 2026-08-27; revive edge is `requirement` `deferred→active`.
+Do not `ollama pull` these until the matching BLI is in progress. Do not park those BLIs while they still share `REQ-1785885786383550000-cd8e26b6` — `object park` cluster-deferred that shared REQ on 2026-08-27; revive edge is `requirement` `deferred→active`.

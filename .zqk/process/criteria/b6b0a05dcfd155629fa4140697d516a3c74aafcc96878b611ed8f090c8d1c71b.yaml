@@ -1,0 +1,14 @@
+category: acceptance
+created_at: "2026-09-17T19:34:44Z"
+created_by: ACC-1785920548450214012-68b850c0
+description: docs/architecture, best-practices, and onboarding are registered as doc_entry objects in this kernel.
+id: CRIT-1789673684713711000-344a7b09
+kind: criteria
+namespace_id: zqk:kernel
+schema_version: 2.0.0
+status: awaiting_verification
+title: Live architecture, best-practices, and onboarding have doc_entry rows
+updated_at: "2026-09-17T19:34:50Z"
+updated_by: ACC-1785920548450214012-68b850c0
+validation_method: automated_test
+version_context: default

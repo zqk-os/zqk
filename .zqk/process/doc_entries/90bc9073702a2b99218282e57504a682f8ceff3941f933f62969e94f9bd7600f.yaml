@@ -1,0 +1,22 @@
+category: storage
+content_hash: 4b24c2d8333420b9ba055d3ccb55667b25ff32d87c7f237d59a8c314644dd74c
+content_searchable: true
+content_size: 6775
+created_at: "2026-09-17T08:44:00Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-269
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/SCHEDULER_STORAGE_RCA.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: '--- | Cause | Mechanism | Evidence | |-------|-----------|----------| | HashRegistry per call | Every create/update/delete/move (and CAS verify) created a new HashRegistry and, on first Save(), sta...'
+title: 'Scheduler and Storage: Root Cause Analysis and Performance Baselines'
+updated_at: "2026-09-17T08:44:00Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

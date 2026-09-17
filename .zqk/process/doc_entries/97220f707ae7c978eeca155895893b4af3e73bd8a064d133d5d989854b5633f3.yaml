@@ -1,0 +1,22 @@
+category: architecture
+content_hash: f57aa80f52ef7ae8cca1273af99df97abcaa00effd55774e656194395c3a271b
+content_searchable: true
+content_size: 1710
+created_at: "2026-09-17T08:39:31Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-032
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/BINARIES.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: ZQK compiles into dedicated operational binaries tailored for specific runtimes, execution boundaries, and daemon roles
+title: ZQK Binary Directory & CLI Entry Points (K:F-USA-003 / CRIT-CEF-R8K-USA-003)
+updated_at: "2026-09-17T08:39:31Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

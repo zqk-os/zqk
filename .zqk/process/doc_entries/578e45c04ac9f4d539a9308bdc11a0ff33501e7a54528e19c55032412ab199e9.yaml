@@ -1,0 +1,22 @@
+category: architecture
+content_hash: 62dc7631ab755b5c177e5c13f6f5d7cd1d84360ae10736eefaf1f24f2100ed5e
+content_searchable: true
+content_size: 5670
+created_at: "2026-09-17T08:42:09Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-097
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/DECLARATIVE_LAUNCH_AND_MATRIX_LOOP.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: '--- Public URLs, forum products, and utility entrypoints may not be final until late in alpha'
+title: Declarative product launch as a matrix-shaped pipeline
+updated_at: "2026-09-17T08:42:09Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

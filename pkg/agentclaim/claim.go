@@ -210,7 +210,7 @@ func armCheckin(opts []ClaimOptions, taskID, claimant, kind string) {
 // projectRoot is variadic so existing callers compile unchanged; when supplied, the
 // cadence check-in timer is removed with the claim. A timer outliving its claim would
 // wake the orchestrator about a task nobody holds.
-// TRACK: BLI-REDACTED
+// TRACK: BLI-1785886173393325000-d0690a02
 func Release(ctx context.Context, sp storage.ObjectStorageProvider, sec *pkgctx.SecurityContext, taskID, claimant string, force bool, projectRoot ...string) (Result, error) {
 	defer func() {
 		if len(projectRoot) > 0 && projectRoot[0] != "" {

@@ -1,0 +1,22 @@
+category: cli
+content_hash: 3eb5103be80d4922e42fc6e3444e8817c0bb4b8f4db7e6bed7363afc7b268930
+content_searchable: true
+content_size: 1772
+created_at: "2026-09-17T08:39:33Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-061
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/CLI_LATENCY_DRIFT_GATE.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: This document defines the CLI latency baselines, verb-path performance budgets, and drift gate policy for ZQK commands
+title: CLI Latency Baselines & Performance Drift Gate Architecture
+updated_at: "2026-09-17T08:39:33Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

@@ -35,7 +35,7 @@ Do **not** invent a hollow `WS-AGENT-IDLENESS-ACCUMULATOR-001` — human rejecte
 3. Process mutations **only** via `zqk object …` / promote / demote (not editor/MCP `write_file` on CAS).
 4. Directed feed steers **require** `--await-peer-ack`; workers use `agent next --on-validation-failure wake` (`POL-AGENT-ORCH-HOURGLASS-001`).
 5. COMMS-CHECK = seat-authored **nonce echo + kernel probe** — toast/`delivery_receipt` alone is fail (`POL-AGENT-COMMS-CHECK-001`).
-6. **Never** mark BLI `complete` with forged `commit_refs` (e.g. `0000000`) or fake `actual_effort`. Cleared forge residue on archived `BLI-REDACTED` (`commit_refs` unset).
+6. **Never** mark BLI `complete` with forged `commit_refs` (e.g. `0000000`) or fake `actual_effort`. Cleared forge residue on archived `BLI-1782677464493428000-7f49f27e` (`commit_refs` unset).
 7. Draft-sweep apply needs RBAC `delete:object_draft_plane` — not seat-string / env break-glass.
 
 ## Root cause still open (membrane)
@@ -70,7 +70,7 @@ Commit only when human asks (agent git identity via `scripts/git-commit-as-agent
 
 ## Active research CVS (still live)
 
-`CVS-REDACTED` — multi-plane CAS/ghost/draft RCA. Align membrane work with this session; do not orphan it again by sweeping PRIs without `priority_plan_ref`.
+`CVS-1786411200923740000-e509e46f` — multi-plane CAS/ghost/draft RCA. Align membrane work with this session; do not orphan it again by sweeping PRIs without `priority_plan_ref`.
 
 ## Transcript
 

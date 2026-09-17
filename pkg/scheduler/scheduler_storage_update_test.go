@@ -875,7 +875,7 @@ func TestScheduler_ExecuteJob_OneTimeDisabledOnFailure(t *testing.T) {
 		t.Errorf("expected storage enabled to be false after failure, got true")
 	}
 
-	// BLI-REDACTED: one-time jobs must hop off execution_locked (status: active) to disabled
+	// BLI-1789596734933367000-8611b899: one-time jobs must hop off execution_locked (status: active) to disabled
 	if job.Status != StatusDisabled {
 		t.Errorf("expected in-memory job.Status to be %q after failure, got %q", StatusDisabled, job.Status)
 	}

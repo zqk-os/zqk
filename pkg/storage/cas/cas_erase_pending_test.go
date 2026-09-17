@@ -22,7 +22,7 @@ func TestCASErasePendingTombstoneLinger(t *testing.T) {
 	require.NoError(t, fileutil.EnsureDir(kindDir))
 
 	cas := filecas.NewContentAddressableStorage(kindDir, "criteria")
-	testID := "CRIT-REDACTED"
+	testID := "CRIT-1785784848555610000-7a0f9370"
 
 	// Initially, ID does not exist and is not erase_pending
 	assert.False(t, cas.IsErasePending(testID))

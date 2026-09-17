@@ -13,7 +13,7 @@ import (
 	"github.com/lanceman/zqk/pkg/testkit"
 )
 
-// TestWatchdogSubagent_Functional verifies CRIT-REDACTED:
+// TestWatchdogSubagent_Functional verifies CRIT-1789273452649987000-0e3234b4:
 // Watchdog emits a kernel object (metric or audit) when a tech-lead subagent is idle without an ATK/BLI claim;
 // unclaimed orch is refused.
 func TestWatchdogSubagent_Functional(t *testing.T) {

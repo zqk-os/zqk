@@ -1,0 +1,22 @@
+category: architecture
+content_hash: 1cf46896e442bffe8b2680978f56b6e8854bb063b9b4dfe770e31e8aa491366b
+content_searchable: true
+content_size: 8072
+created_at: "2026-09-17T08:44:45Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-545
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/requirements-traceability-system-v1.0.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: This document defines the requirements traceability system that ensures all requirements can be traced upward to strategic objectives (mission, vision, goals, milestones) and downward to tactical e...
+title: Requirements Traceability System
+updated_at: "2026-09-17T08:44:45Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

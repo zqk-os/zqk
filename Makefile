@@ -1,6 +1,7 @@
-.PHONY: bench lint help build-all zqk zqk-admin zqk-community zqk-mcp generate-spec-builders clean scheduler-stop scheduler-restart install-scheduler-service release-snapshot promote-stable test-cases
+.PHONY: bench lint help build-all zqk zqk-admin zqk-community zcom zqk-mcp generate-spec-builders clean scheduler-stop scheduler-restart install-scheduler-service release-snapshot promote-stable test-cases
 
 ZQK_BIN = bin/zqk
+ZCOM_BIN = bin/zcom
 ZQK_ADMIN_BIN = bin/zqk-admin
 ZQK_MCP_BIN = bin/zqk-mcp
 ZQK_MCP_FAL_BIN = bin/zqk-mcp-fal
@@ -14,6 +15,16 @@ BUILD_DATE ?= $(shell date -u '+%Y-%m-%dT%H:%M:%SZ')
 LDFLAGS     = -X github.com/lanceman/zqk/cmd/zqk/app.version=$(VERSION) \
               -X github.com/lanceman/zqk/cmd/zqk/app.buildDate=$(BUILD_DATE) \
               -X github.com/lanceman/zqk/cmd/zqk/app.gitCommit=$(GIT_COMMIT)
+COMMUNITY_LDFLAGS = -X github.com/lanceman/zqk/cmd/zqk-community/app.version=$(VERSION) \
+              -X github.com/lanceman/zqk/cmd/zqk-community/app.buildDate=$(BUILD_DATE) \
+              -X github.com/lanceman/zqk/cmd/zqk-community/app.gitCommit=$(GIT_COMMIT)
+
+# Seated community product has cmd/zqk-community and no studio main.
+ifneq ($(wildcard cmd/zqk-community/main.go),)
+ifeq ($(wildcard cmd/zqk/main.go),)
+.DEFAULT_GOAL := zcom
+endif
+endif
 
 # POL-AGENT-ACCOUNT-LOGIN-001: AuthMiddleware rejects legacy account:* keys.
 # Prefer ACC-* / issued secrets from the environment or .env; do not fall back to hardcoded system account.
@@ -87,8 +98,12 @@ zqk-lung:
 # Community binary embeds scrubbed bootstrap (REQ-9009). Never treat this monorepo
 # as the user's project root — verify extract only into a temp project.
 zqk-community: bootstrap-archive
-	go build -ldflags '$(LDFLAGS)' -o bin/zqk-community ./cmd/zqk-community
+	go build -ldflags '$(COMMUNITY_LDFLAGS)' -o bin/zqk-community ./cmd/zqk-community
 	@$(SHELL) scripts/open-core/verify-bootstrap-portable.sh "$$(pwd)" bin/zqk-community
+
+# Community product binary. Same SKU as zqk-community; name is zcom.
+zcom: bootstrap-archive
+	go build -ldflags '$(COMMUNITY_LDFLAGS)' -o $(ZCOM_BIN) ./cmd/zqk-community
 
 zqk-admin:
 	go build -ldflags '$(LDFLAGS)' -o $(ZQK_ADMIN_BIN) ./cmd/zqk-admin

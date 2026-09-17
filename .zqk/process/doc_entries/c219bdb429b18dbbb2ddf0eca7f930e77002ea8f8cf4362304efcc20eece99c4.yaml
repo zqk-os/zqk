@@ -1,0 +1,22 @@
+category: architecture
+content_hash: 6c732fa9a3880b8415552f0589b2b181d8daa943f1a00b5da5d0727506b31c01
+content_searchable: true
+content_size: 9104
+created_at: "2026-09-17T08:43:31Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-160
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/LLM_INTERACTION_MODEL_RUBRIC.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: This is a selection rubric, not a second object store
+title: LLM interaction model rubric
+updated_at: "2026-09-17T08:43:31Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

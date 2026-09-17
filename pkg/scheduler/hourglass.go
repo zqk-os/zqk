@@ -338,7 +338,7 @@ func (s *Scheduler) recordSilentClaimBlocker(ctx context.Context, secCtx *pkgctx
 //
 // Uses WithPromoteOnCreate (same intent as `zqk new object … --promote`): the payload is
 // already shovel-ready, so Create keeps status=open and writes CAS instead of parking
-// on the draft plane. List/dedupe then see the escalation. TRACK: BLI-REDACTED
+// on the draft plane. List/dedupe then see the escalation. TRACK: BLI-1785723654802038000-b14064bc
 func (s *Scheduler) escalateMissedDeadline(ctx context.Context, secCtx *pkgctx.SecurityContext, taskID, kind, title string) {
 	if s.storage == nil || taskID == "" {
 		return

@@ -1,0 +1,22 @@
+category: check
+content_hash: 5242e1e68c17f37b6bcdc9bc338cba6fb1bf4961bf3eaad3a01f1808e0b2e483
+content_searchable: true
+content_size: 2084
+created_at: "2026-09-17T08:44:00Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-268
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/SCHEDULER_STATUS_AND_HEALTH_CHECK_ALIGNMENT.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: 'The scheduler can appear "disconnected" from the status check: health check may not correctly fail when zqk scheduler status would report that the process is not running'
+title: Scheduler status and health-check alignment
+updated_at: "2026-09-17T08:44:00Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

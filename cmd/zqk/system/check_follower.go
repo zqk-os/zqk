@@ -2,6 +2,7 @@ package system
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os"
 	"os/signal"
@@ -48,6 +49,7 @@ type TerminalProgressSubscriber struct {
 	lastPct           float64
 	lastDiscoveryMsg  string
 	lastDiscoveryTime time.Time
+	hasShownStart     bool
 }
 
 // NewTerminalProgressSubscriber creates a new terminal progress subscriber.
@@ -86,7 +88,31 @@ func (s *TerminalProgressSubscriber) HandleEvent(event *coordination.Operational
 
 		// Phase "start": system check starting (emitted by follower before background run)
 		if hasPhase && phase == eventStatusStart {
-			fmt.Fprintf(s.cmd.ErrOrStderr(), "System check starting...\n")
+			s.mu.Lock()
+			defer s.mu.Unlock()
+			if !s.active.Load() {
+				return nil
+			}
+			if !s.hasShownStart {
+				s.hasShownStart = true
+				fmt.Fprintf(s.cmd.ErrOrStderr(), "System check starting...\n")
+			}
+			return nil
+		}
+
+		// Teardown / finalization phase
+		if hasPhase && (phase == "teardown" || phase == "finalizing" || phase == "shutdown") {
+			msgAny := event.Metadata["message"]
+			msg := "Finalizing caches and storage queues..."
+			if m, ok := msgAny.(string); ok && m != emptyValue {
+				msg = m
+			}
+			s.mu.Lock()
+			defer s.mu.Unlock()
+			if !s.active.Load() {
+				return nil
+			}
+			fmt.Fprintf(s.cmd.ErrOrStderr(), "%s\n", msg)
 			return nil
 		}
 
@@ -190,8 +216,8 @@ func (s *TerminalProgressSubscriber) HandleEvent(event *coordination.Operational
 			if msg != s.lastDiscoveryMsg {
 				shouldPrint = true
 				s.lastDiscoveryMsg = msg
-			} else if time.Since(s.lastDiscoveryTime) >= 2*time.Second {
-				// Print heartbeat every 2 seconds even if count hasn't changed
+			} else if time.Since(s.lastDiscoveryTime) >= 1*time.Second {
+				// Print heartbeat every 1 second even if count hasn't changed
 				shouldPrint = true
 			}
 
@@ -356,6 +382,9 @@ func waitForCheckCompletion(operationID string, timeout time.Duration) error {
 // runCheckAsyncWithFollow runs check in background and follows/wait for completion
 func runCheckAsyncWithFollow(cmd *cobra.Command, args []string, timeout time.Duration) error {
 	cli.TouchMeaningfulActivity() // idle watchdog: check follow started (avoids cancel during storage/coordinator setup when parent is not zqk)
+	if cmd != nil {
+		fmt.Fprintf(cmd.ErrOrStderr(), "System check starting...\n")
+	}
 	// Prefer pre-set context (e.g. from tests or callers) so deprecated --sync is not required
 	var ctx *cli.Context
 	if cliCtx := cli.GetContext(cmd); cliCtx != nil && cliCtx.Context != nil {
@@ -406,6 +435,7 @@ func runCheckAsyncWithFollow(cmd *cobra.Command, args []string, timeout time.Dur
 		// Terminal progress subscriber for real-time UX when waiting for completion (default).
 		// Subscribe BEFORE emitting start event to ensure we catch discovery start.
 		progressSubscriber := NewTerminalProgressSubscriber(operationID, cmd)
+		progressSubscriber.hasShownStart = true
 		progressSubscriberID = coordinator.Subscribe(progressSubscriber)
 		defer coordinator.Unsubscribe(progressSubscriberID)
 	}
@@ -462,10 +492,19 @@ func runCheckAsyncWithFollow(cmd *cobra.Command, args []string, timeout time.Dur
 	// Wait for check completion, timeout, or interrupt (runCtx cancelled on SIGINT)
 	select {
 	case err := <-checkDone:
-		return err
+		if err != nil {
+			return FormatCheckExecutionError(cmd, args, err)
+		}
+		if cmd != nil {
+			fmt.Fprintln(cmd.ErrOrStderr(), "System check complete.")
+		}
+		return nil
 	case <-runCtx.Done():
+		if errors.Is(runCtx.Err(), context.DeadlineExceeded) {
+			return FormatCheckTimeoutError(cmd, args, timeout)
+		}
 		return runCtx.Err() // e.g. context.Canceled when user pressed Ctrl+C
 	case <-time.After(timeout):
-		return errfmt.Errorf("timeout waiting for check completion after %v", timeout)
+		return FormatCheckTimeoutError(cmd, args, timeout)
 	}
 }

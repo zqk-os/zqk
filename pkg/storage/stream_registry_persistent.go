@@ -302,7 +302,7 @@ func ListStreamIDsFromPersistentRegistry(projectRoot, kind string) []string {
 // CompactStreamRegistryForKind rewrites the registry and truncates stream_deleted; segment
 // files may still contain lines for deleted IDs. List/count segment scans must intersect
 // with this set or total_count drifts above Count()/max_count.
-// TRACK: BLI-REDACTED
+// TRACK: BLI-1785905541906569000-074e24d7
 func LiveStreamIDSet(projectRoot, kind string) map[string]bool {
 	ids := ListStreamIDsFromPersistentRegistry(projectRoot, kind)
 	m := make(map[string]bool, len(ids))
@@ -315,7 +315,7 @@ func LiveStreamIDSet(projectRoot, kind string) map[string]bool {
 // OldestStreamIDsFromPersistentRegistry returns up to limit live stream registry IDs in
 // oldest-first order for retention max_count. Prefixed IDs with embedded nanosecond
 // timestamps (e.g. AGI-<ns>-…) sort chronologically via lexicographic order.
-// TRACK: BLI-REDACTED — stream max_count must not rely on CAS OldestIDs / segment List.
+// TRACK: BLI-1785905541906569000-074e24d7 — stream max_count must not rely on CAS OldestIDs / segment List.
 func OldestStreamIDsFromPersistentRegistry(projectRoot, kind string, limit int) []string {
 	ids := ListStreamIDsFromPersistentRegistry(projectRoot, kind)
 	if len(ids) == 0 {

@@ -1,6 +1,6 @@
 # Dynamic Mesh Topology Configuration
 
-To ensure ZQK can scale from local dual-agent instances up to entire fleets of TPMs and DGX-hosted local models, we need to decouple the seat logic from hardcoded assumptions. I have captured this as a formal requirement in the kernel (`REQ-REDACTED`).
+To ensure ZQK can scale from local dual-agent instances up to entire fleets of TPMs and DGX-hosted local models, we need to decouple the seat logic from hardcoded assumptions. I have captured this as a formal requirement in the kernel (`REQ-1788577958898090000-36483a7c`).
 
 Below is a proposed architectural direction for making the mesh completely configurable.
 

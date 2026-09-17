@@ -1,0 +1,22 @@
+category: cli
+content_hash: c97c056871fce4b17587bf6c67d90a3eabc7584f898a02d5efa5e1a119589696
+content_searchable: true
+content_size: 21375
+created_at: "2026-09-17T08:44:22Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-375
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/cli-ontology-v1.0.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: This document establishes a formal CLI ontology specification that enables both AI agents and humans to interpret CLI structure, commands, and outputs
+title: CLI Ontology Specification
+updated_at: "2026-09-17T08:44:22Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

@@ -41,7 +41,7 @@ func TestBacklogItemPriorityPairing(t *testing.T) {
 	ctx := context.Background()
 
 	// 1. Create BLI with only priority="high" -> should auto-populate priority_tier="P1"
-	bliID := "BLI-REDACTED"
+	bliID := "BLI-1785008248438506000-11111111"
 	bli := map[string]any{
 		objects.FieldKeyID:            bliID,
 		objects.FieldKeyKind:          objects.KindBacklogItem,

@@ -1,0 +1,22 @@
+category: architecture
+content_hash: 57c3a348c35cb3ff84d370c1af6e10340c2ce7636b85ab11b40ca43ecab2ac3d
+content_searchable: true
+content_size: 9084
+created_at: "2026-09-17T08:43:29Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-146
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/KERNEL_OBJECT_KIND_EVALUATION_RUBRIC.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: This rubric turns recurring inspection findings into a repeatable scorecard per object kind (and, when useful, per high-volume instance cohort)
+title: Kernel object-kind fitness rubric (7 lenses)
+updated_at: "2026-09-17T08:43:29Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

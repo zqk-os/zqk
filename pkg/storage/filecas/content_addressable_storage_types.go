@@ -121,7 +121,7 @@ func (cas *ContentAddressableStorage) SetIndexMappingInMemory(objectID, hash str
 // HealIndexMappingAsync applies an id→hash mapping in memory and enqueues durable index
 // persistence. Use on validation / integrity hot paths instead of SetMapping/Save (those
 // take a cross-process file lock with a 5s budget that collides with fail-fast validation).
-// TRACK: BLI-REDACTED — keep when: integrity never sync-saves on check.
+// TRACK: BLI-1785895580100186000-c5539372 — keep when: integrity never sync-saves on check.
 func (cas *ContentAddressableStorage) HealIndexMappingAsync(objectID, hash string, bucketKey ...string) {
 	if cas == nil || objectID == emptyValue || hash == emptyValue {
 		return

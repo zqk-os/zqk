@@ -1,0 +1,22 @@
+category: architecture
+content_hash: 5bb51b4f9fdd9483942300c2e1c586e7a811cbed6671afcbb15958dea0dabc9f
+content_searchable: true
+content_size: 3404
+created_at: "2026-09-17T08:44:19Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-341
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/apispec_builder.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: The APISpec Builder pattern provides a standardized, thread-safe approach to constructing API clients and configurations within ZQK
+title: APISpec Builder Pattern Architecture
+updated_at: "2026-09-17T08:44:19Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

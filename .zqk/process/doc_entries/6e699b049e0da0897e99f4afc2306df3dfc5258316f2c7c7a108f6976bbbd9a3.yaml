@@ -1,0 +1,21 @@
+content_hash: f56624c2133e793be43d091a88d0156cddac845d10af9ec33518043a2dd4ff9b
+content_searchable: true
+content_size: 14826
+created_at: "2026-09-17T08:44:53Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: other
+id: DOC-606
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/best-practices/atomic-shutdown-flags.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: When implementing graceful shutdown in concurrent Go applications, use atomic boolean flags instead of mutex-protected booleans for shutdown detection
+title: Atomic Shutdown Flags - Best Practice
+updated_at: "2026-09-17T08:44:53Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

@@ -24,7 +24,7 @@ func TestGuardSwarmToolCall_hourglassAndStatus(t *testing.T) {
 		{"status assign", "zqk_object_update", `{"id":"ATK-1","fields":["status=complete"]}`, true, "promote"},
 		{"plain update", "zqk_object_update", `{"id":"ATK-1","title":"x"}`, false, ""},
 		{"placeholder id", "zqk_object_get", `{"id":"<ID>"}`, true, "placeholder"},
-		{"real id", "zqk_object_get", `{"id":"ATK-REDACTED"}`, false, ""},
+		{"real id", "zqk_object_get", `{"id":"ATK-1787738919414925000-41b3c9d7"}`, false, ""},
 		{"unscoped list", "zqk_object_list", `{}`, true, "requires kind"},
 		{"priority plan verb", "zqk_get_current_priority_plan", `{}`, true, "not a swarm MCP tool"},
 		{"invented kind", "zqk_object_list", fmt.Sprintf("{%q:%q}", objects.FieldKeyKind, "source_file"), true, "not kernel object kinds"},

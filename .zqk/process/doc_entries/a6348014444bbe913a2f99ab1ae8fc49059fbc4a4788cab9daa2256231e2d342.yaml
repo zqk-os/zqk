@@ -1,0 +1,22 @@
+category: architecture
+content_hash: 02b108d5a84316e4b135a5e538e022f3320e459f706a51a921375dd4302cd204
+content_searchable: true
+content_size: 3745
+created_at: "2026-09-17T08:43:31Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-159
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/LINT_RULE_INVENTORY.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: '--- | Source | Rule / intent | Mechanism | Notes | |--------|----------------|-----------|--------| | POL-CODE-007, AGENT_GUIDELINES | No fmt.Print / Printf / Println to implicit stdout in producti...'
+title: Lint and code-quality rule inventory
+updated_at: "2026-09-17T08:43:31Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

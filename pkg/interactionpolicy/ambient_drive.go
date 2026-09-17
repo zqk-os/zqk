@@ -29,7 +29,7 @@ const MaxAmbientPlans = 3
 
 // AlignFreshMax is how long TPM may trust align-latest.json before the gland
 // asks for a refresh. Fresh cache must not re-issue the align CommandHint.
-// TRACK: BLI-REDACTED
+// TRACK: BLI-1787035087372193000-c022117d
 const AlignFreshMax = 30 * time.Minute
 
 const (

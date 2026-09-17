@@ -1,0 +1,22 @@
+category: architecture
+content_hash: d36d429b9a552e255eb6fc8379e191bae39a8a0728429479db85aeb301bcc44c
+content_searchable: true
+content_size: 8354
+created_at: "2026-09-17T08:44:24Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-387
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/concurrent-operations-v1.0.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: 'The system must handle multiple concurrent operations (create, update, delete) on objects while ensuring:'
+title: Concurrent Operations System
+updated_at: "2026-09-17T08:44:24Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

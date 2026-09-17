@@ -1,0 +1,22 @@
+category: architecture
+content_hash: 3a244bbff0041a639f77e573e7241c27bb0b1c5354e1aee3bed1fe50f2458d2b
+content_searchable: true
+content_size: 6337
+created_at: "2026-09-17T08:43:25Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-137
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/INIT_SCENARIOS.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: 'The zqk system init command must support three distinct initialization scenarios:'
+title: Init Command Scenarios
+updated_at: "2026-09-17T08:43:25Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

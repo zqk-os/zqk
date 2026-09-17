@@ -1,0 +1,22 @@
+category: check
+content_hash: 1e42fc59d5371dcdb02b85fd78b0c310cb313af46b1c768be7f4bcac76440006
+content_searchable: true
+content_size: 5117
+created_at: "2026-09-17T08:44:21Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-367
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/check-optimization-final.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: '- Pre-builds cache of all object IDs at start of check - Cache includes: ID, kind, file path, mtime - Invalidates entries when file mtime changes (checked on lookup) - Thread-safe with sync.RWMutex...'
+title: Check Command Optimization - Final Results
+updated_at: "2026-09-17T08:44:21Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

@@ -66,7 +66,7 @@ func (a *Adapter) WithStdio(in io.Reader, out io.Writer) *Adapter {
 // ctx drives heartbeat/notify/keepalive only — IDE cancels cmd.Context after tools/call;
 // exiting the process on that cancel marks MCP red. Hard stop: stdin EOF (IDE
 // disconnect) or SIGTERM closing stdin (see ide_adapter cmd). TRACK:
-// BLI-REDACTED — hourglass/context-refresh for soft drain.
+// BLI-1784969955962654000-dc689643 — hourglass/context-refresh for soft drain.
 func (a *Adapter) Run(ctx context.Context) error {
 	diagf("run start daemon_tcp=%s request_timeout=%s heartbeat=%s stdio_keepalive=%s",
 		a.cfg.DaemonTCP, a.cfg.RequestTimeout, a.cfg.HeartbeatInterval, a.cfg.StdioKeepaliveInterval)

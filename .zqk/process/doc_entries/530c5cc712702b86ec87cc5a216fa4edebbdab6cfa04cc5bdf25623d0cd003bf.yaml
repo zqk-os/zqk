@@ -1,0 +1,22 @@
+category: architecture
+content_hash: 37090e14dbe4e827a394cffcada5fa914a485222b1b457252671794e8180468c
+content_searchable: true
+content_size: 9025
+created_at: "2026-09-17T08:44:35Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-487
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/mcp/mcp-troubleshooting-analysis-v1.0.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: 'Documentation: # MCP Server Troubleshooting Analysis v1.0'
+title: MCP Server Troubleshooting Analysis
+updated_at: "2026-09-17T08:44:35Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

@@ -1,0 +1,22 @@
+category: architecture
+content_hash: 8779781b49ea54c16ff515d19de29e000fb3620fcdd51c9daba006f8cadd5d5a
+content_searchable: true
+content_size: 1813
+created_at: "2026-09-17T08:43:58Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-249
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/QUICK_CREATE_OBJECTS.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: The zqk new object command allows you to rapidly create system objects (backlog items, decisions, questions, etc.) from markdown, text files, or inline content so you can capture ideas without writ...
+title: 'Quick Create: Rapid System Objects from Text or Files'
+updated_at: "2026-09-17T08:43:58Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

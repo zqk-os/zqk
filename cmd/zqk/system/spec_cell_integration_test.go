@@ -205,7 +205,7 @@ func TestSpecCell_Suite(t *testing.T) {
 
 	t.Run("object_template_object_spec_draft", func(t *testing.T) {
 		// Origination slice: CLI materializes a draft from the object_spec spec (object template), not a net-new ontology file.
-		// TRACK: BLI-REDACTED — replace retired `new internal`.
+		// TRACK: BLI-1785930106857898000-94b9a5bc — replace retired `new internal`.
 		ctx, cancel := context.WithTimeout(context.Background(), cliCommandTimeout)
 		defer cancel()
 		cmd := execwrap.CommandContext(ctx, cliBinary, "object", "template", "object_spec", "--output", "-")

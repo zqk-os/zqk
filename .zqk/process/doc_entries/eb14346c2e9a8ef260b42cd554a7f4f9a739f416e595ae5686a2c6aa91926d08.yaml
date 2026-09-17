@@ -1,0 +1,22 @@
+category: audit
+content_hash: 1b0d722e2509d3b74a227ea53cd6e4e06f8053c93fcdb4d48ea89be9c349c7c4
+content_searchable: true
+content_size: 4032
+created_at: "2026-09-17T08:44:20Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-350
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/audit_historical_query.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: This document outlines the zero-buffering stream fetcher and terminal pager routing logic for querying historical audits via Cypher
+title: Audit Historical Query Architecture
+updated_at: "2026-09-17T08:44:20Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

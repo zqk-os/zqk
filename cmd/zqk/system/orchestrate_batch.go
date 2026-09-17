@@ -91,7 +91,7 @@ func NewOrchestrateBatchCmd() *cobra.Command {
 						objects.FieldKeyRequirementRefs: []string{reqID},
 						objects.FieldKeyWorkstreamRefs:  []string{wsID},
 						objects.FieldKeyCriteriaRefs:    []string{critID},
-						objects.FieldKeyOwnerRef:        "ACC-1785920548450214012-68b850c0",
+						objects.FieldKeyOwnerRef:        objects.DefaultSystemAccountID,
 					}
 					err = sp.Create(proc.OperationContext(), proc.SecurityContext(), tcData)
 					if err != nil {

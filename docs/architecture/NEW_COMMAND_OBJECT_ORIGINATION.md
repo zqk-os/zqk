@@ -26,7 +26,7 @@ See [CAS_CREATE_MEMBRANE_FLOW.md](./CAS_CREATE_MEMBRANE_FLOW.md).
 
 - **`zqk object template <kind>`** — printable YAML from specs (edit offline; then create/mint as appropriate).
 - **`zqk new object-spec` / `new bundle`** — write under **`.zqk/drafts/`** (scaffolds / bundles, not instance draft-plane mint).
-- Elevated apply after scaffold: **`zqk object create <kind> --internal --file …`** (Enterprise license or `zqk-admin`). Legacy `zqk new internal` removed (DEC-REDACTED).
+- Elevated apply after scaffold: **`zqk object create <kind> --internal --file …`** (Enterprise license or `zqk-admin`). Legacy `zqk new internal` removed (DEC-1785930071988960000-364a5796).
 
 ## Commands
 
@@ -68,8 +68,8 @@ Kernel vocabulary: `GLS-1786412212882748000-cace1a24` (Kind Registration Membran
 
 While formalizing system objects we keep hitting the same classes of incoherence. They are
 catalogued as **`GLS-1786413953213934000-1c0fb3ff`** (*System Object Formalization Snag Catalog*)
-and **must** be folded into the registration / origination process (`REQ-REDACTED`,
-`BLI-REDACTED`, `CRIT-REDACTED`) — not left as chat residue.
+and **must** be folded into the registration / origination process (`REQ-1786413954834811000-333bbae3`,
+`BLI-1786413957132800000-37d36f53`, `CRIT-1786413955973808000-6748e712`) — not left as chat residue.
 
 | ID | Snag | Process implication |
 |----|------|---------------------|
@@ -90,7 +90,7 @@ and **must** be folded into the registration / origination process (`REQ-REDACTE
 | S15 | CLI `--field` list coercion bugs | Typed create/update |
 | S16 | Objectify claims to ghost IDs | Claim verify + CAS plane proof |
 | S17 | Dump many BLIs on one PRI | Workstream research lane + sprint-sized PRIs |
-| S18 | No per-kind promote/demote/archive TDD | **Required outcome:** lifecycle edge matrix under test so S07/S08/S12/S13-class disparities are uncommon (`GLS-1786414163511129000-9a389a59`, `BLI-REDACTED`) |
+| S18 | No per-kind promote/demote/archive TDD | **Required outcome:** lifecycle edge matrix under test so S07/S08/S12/S13-class disparities are uncommon (`GLS-1786414163511129000-9a389a59`, `BLI-1786414109434901000-9920709a`) |
 
 **Required outcome — lifecycle TDD:** If promote/demote (and archive / leave-preliminary) were tested per object kind against its lifecycle YAML, many of the disparities above would fail closed in CI instead of in ops. Net-new / Kind Registration Membrane should require a matrix row (or generated tests) before a kind is treated as formalized/creatable.
 

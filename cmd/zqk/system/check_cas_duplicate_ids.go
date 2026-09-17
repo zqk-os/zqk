@@ -12,7 +12,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// TRACK: BLI-REDACTED — Tier-1 dual-CAS detection in system check output.
+// TRACK: BLI-1786358681981576000-66f07f6c — Tier-1 dual-CAS detection in system check output.
 // TRACK: TDE-CEF-CHECK-CAS-DUP-SCAN-ON-PRINT-001 — print-time peek of every CAS blob; skip in
 // --fast and memoize per process+root so JSON/YAML/table siblings do not rescan.
 
@@ -34,6 +34,21 @@ func inventoryCASDuplicateIDsCached(projectRoot string) caspkg.CASDuplicateIDInv
 	inv := inventoryCASDuplicateIDs(projectRoot)
 	casDupInvMemo[projectRoot] = inv
 	return inv
+}
+
+// ClearCASDuplicateIDInventoryCache clears the memoized inventory for a project root,
+// forcing subsequent checks to rescan after CAS duplicate reconciliation.
+func ClearCASDuplicateIDInventoryCache(projectRoot string) {
+	casDupInvMemoMu.Lock()
+	defer casDupInvMemoMu.Unlock()
+	delete(casDupInvMemo, projectRoot)
+}
+
+// ClearAllCASDuplicateIDInventoryCaches clears all memoized inventories.
+func ClearAllCASDuplicateIDInventoryCaches() {
+	casDupInvMemoMu.Lock()
+	defer casDupInvMemoMu.Unlock()
+	casDupInvMemo = map[string]caspkg.CASDuplicateIDInventory{}
 }
 
 // inventoryCASDuplicateIDsForOutput is the print-path entry. Reduced-surface (--fast /
@@ -62,7 +77,7 @@ func casDuplicateQuarantineCommand(kind string) string {
 
 // appendCASDuplicateIDCheckResults adds one Tier-1 registration issue per duplicated object id
 // so summary + results_by_kind surface POL-CODE-004 dual blobs (cache-blind otherwise).
-// It ensures finding rows are deduplicated by object ID (CRIT-REDACTED).
+// It ensures finding rows are deduplicated by object ID (CRIT-1786695439226552000-f1a93ee6).
 func appendCASDuplicateIDCheckResults(results []CheckResult, inv caspkg.CASDuplicateIDInventory) []CheckResult {
 	if inv.DuplicateCount == 0 {
 		return results
@@ -119,8 +134,8 @@ func appendCASDuplicateIDCheckResults(results []CheckResult, inv caspkg.CASDupli
 				Tier:        1,
 				Category:    "registration",
 				Message:     fmt.Sprintf("%d additional object id(s) with dual CAS blobs omitted from sample. Run: zqk system cleanup-duplicates --hash-duplicates", rem),
-				AutoFixable: false,
-				FixCommand:  "",
+				AutoFixable: true,
+				FixCommand:  "zqk system cleanup-duplicates --hash-duplicates",
 			}},
 		})
 	}

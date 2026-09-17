@@ -1,0 +1,21 @@
+content_hash: a2b457a6cb427d23190c812e395bd2f945d6a72cba2ed943bb1a2d1b89b60267
+content_searchable: true
+content_size: 4965
+created_at: "2026-09-17T08:44:53Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: other
+id: DOC-608
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/best-practices/coding/DRY_PATTERN_EXTRACTION.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: 'Secondary topics: when to extract helpers, why we skip “% unique code” KPIs, and where shared pieces live'
+title: Semantic density and pattern extraction
+updated_at: "2026-09-17T08:44:53Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

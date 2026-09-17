@@ -10,11 +10,12 @@
 2a. **[Agent onboarding sequence (product)](../strategy/open-core/AGENT_ONBOARDING_SEQUENCE.md)** — Dual vector × SKUs.
 2b. **[SKU onboarding surfaces](../strategy/open-core/SKU_ONBOARDING_SURFACES.md)** — What ships per `zqk` / admin / EE / organ roles.
 3. **[Agent onboarding snapshot](./AGENT_ONBOARDING_SNAPSHOT.md)** — **Current** priority plan + active `convergence_session` pointers and commands to re-verify (refresh periodically; IDs are not magic).
-4. **[Agent onboarding summaries digest](./AGENT_ONBOARDING_SUMMARIES_DIGEST.md)** — **Compressed history** of themes and plan/CVS evolution (March–April 2026). Dated session snapshots are not shipped in the community tree.
+4. **[Agent onboarding summaries digest](./AGENT_ONBOARDING_SUMMARIES_DIGEST.md)** — **Compressed history** of themes and plan/CVS evolution (March–April 2026) when dated snapshots lived alongside this README.
+5. **[`archive/`](./archive/)** — Original **dated** `AGENT_ONBOARDING_SUMMARY_YYYY-MM-DD.md` files (audit trail; do not use as primary navigation).
 
 **`doc_entry` IDs (snapshot + digest):** `DOC-1775197432882643000-89463915` (snapshot), `DOC-1775197433691153000-acbe23e3` (digest). `zqk object get <id>`.
 
-**Process index:** `doc_entry` objects with `group=onboarding` — `zqk object list doc_entry --filter group=onboarding`.
+**Process index:** `doc_entry` objects with `group=onboarding` — `zqk object list doc_entry --filter group=onboarding`. Archived summary paths under `docs/onboarding/archive/` match registered entries where applicable.
 
 ---
 
@@ -64,4 +65,4 @@ zqk system check --fast
 
 ---
 
-*Last updated: 2026-09-17 — dated onboarding summaries are not shipped; use the digest.*
+*Last updated: 2026-04-03 — onboarding index tightened; dated summaries moved to `archive/` with digest.*

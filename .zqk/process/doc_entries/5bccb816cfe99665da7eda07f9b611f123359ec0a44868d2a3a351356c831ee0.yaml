@@ -1,0 +1,21 @@
+content_hash: a7332336c2c906b39f85384f48be2e837d2e1b85c9e28ec8bebc04f8a525ec4d
+content_searchable: true
+content_size: 9379
+created_at: "2026-09-17T08:44:56Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: onboarding
+id: DOC-639
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/onboarding/MMORCH_PEER_SESSION_BOOTSTRAP.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: '| Layer | What it is | Example | |-------|------------|---------| | Logical seat | Stable mailbox / routing address in peer_seats.json | peer-agent-1 | | Runtime session | One zqk_session per live ...'
+title: MMORCH peer session bootstrap (two-phase — mandatory)
+updated_at: "2026-09-17T08:44:56Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

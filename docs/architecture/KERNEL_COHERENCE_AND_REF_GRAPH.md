@@ -4,7 +4,7 @@
 
 
 **Status:** Active diagnosis + shovel-ready program  
-**PRI:** `PRI-REDACTED` (Kernel coherence — referential close + honest check taxonomy)  
+**PRI:** `PRI-1786387443811997000-3241eddd` (Kernel coherence — referential close + honest check taxonomy)  
 **Glossary:** `GLS-1786387587046059000-857ed54a` (`kernel_coherence_ref_graph`)  
 **Baseline classifier:** `scripts/classify-system-check-coherence.py`
 
@@ -12,7 +12,7 @@
 
 Flakes that look like “ghost refs / out-of-sync / cache refresh required” are usually **not** random cache bugs. They come from a **missing referential-coherence control plane**: mutations can leave the object graph open, health is reported through a **cache-shaped lens**, and process truth spans **overlapping planes** (CAS, git, caches, long-lived scheduler) that only loosely converge.
 
-Live baseline (example from 2026-08-10 `system-check.json`): ~48 blocking issues split roughly into **GhostRef** (target absent — refresh cannot help) vs **CasDrift** (hash/index mismatch). Spot-checks of hot “missing in cache” IDs (`PRI-KERNEL-SYSCHECK-GREEN-001`, `PRI-REDACTED`, …) returned **object not found**.
+Live baseline (example from 2026-08-10 `system-check.json`): ~48 blocking issues split roughly into **GhostRef** (target absent — refresh cannot help) vs **CasDrift** (hash/index mismatch). Spot-checks of hot “missing in cache” IDs (`PRI-KERNEL-SYSCHECK-GREEN-001`, `PRI-1785784837719634000-c9473ae7`, …) returned **object not found**.
 
 ## Issue taxonomy (required)
 
@@ -77,11 +77,11 @@ flowchart LR
 
 | Tier | ID | Title |
 |------|-----|--------|
-| P0 | `BLI-REDACTED` | Check issue codes: GhostRef vs CacheLag (no refresh for ghosts) |
-| P0 | `BLI-REDACTED` | Agent/CAP delete path: unlink-references or fail-closed |
-| P1 | `BLI-REDACTED` | Heal hot GhostRefs to zero |
-| P1 | `BLI-REDACTED` | Daemon/CLI cache coherence epoch |
-| P2 | `BLI-REDACTED` | Cache-first system check: outstanding ≠ ghosts |
+| P0 | `BLI-1786387465409533000-45bd780c` | Check issue codes: GhostRef vs CacheLag (no refresh for ghosts) |
+| P0 | `BLI-1786387471491126000-4ac428ca` | Agent/CAP delete path: unlink-references or fail-closed |
+| P1 | `BLI-1786387476749704000-923a3f3c` | Heal hot GhostRefs to zero |
+| P1 | `BLI-1786387482116958000-16970248` | Daemon/CLI cache coherence epoch |
+| P2 | `BLI-1786387490126670000-a197312e` | Cache-first system check: outstanding ≠ ghosts |
 
 ## Ops posture (now)
 
@@ -108,7 +108,7 @@ python3 scripts/classify-system-check-coherence.py
 python3 scripts/classify-system-check-coherence.py --probe
 ```
 
-Historical snapshot (pre-heal fan-in, 2026-08-10 morning check): ~48 blocking ≈ **~34 GhostRef-worded** + **~14 CasDrift/hash**; hottest absences included `PRI-KERNEL-SYSCHECK-GREEN-001`, `PRI-REDACTED`. Fixture: [`scripts/fixtures/coherence_baseline_2026-08-10.json`](../scripts/fixtures/coherence_baseline_2026-08-10.json). Later same-day check JSON may show lower counts after unrelated churn — always re-run the classifier on current `.zqk/pre-commit/system-check.json`.
+Historical snapshot (pre-heal fan-in, 2026-08-10 morning check): ~48 blocking ≈ **~34 GhostRef-worded** + **~14 CasDrift/hash**; hottest absences included `PRI-KERNEL-SYSCHECK-GREEN-001`, `PRI-1785784837719634000-c9473ae7`. Fixture: [`scripts/fixtures/coherence_baseline_2026-08-10.json`](../scripts/fixtures/coherence_baseline_2026-08-10.json). Later same-day check JSON may show lower counts after unrelated churn — always re-run the classifier on current `.zqk/pre-commit/system-check.json`.
 
 ## Related
 

@@ -12,9 +12,9 @@ import (
 )
 
 // TestPublicRepoSanitation verifies REQ-OSS-REPO-CLEAN-001:
-// - CRIT-REDACTED (Functional Acceptance)
-// - CRIT-REDACTED (Boundary & Error Handling)
-// - CRIT-REDACTED (Integration & Conformance)
+// - CRIT-1789539697287303000-f4d8799c (Functional Acceptance)
+// - CRIT-1789539697287304000-07e1a333 (Boundary & Error Handling)
+// - CRIT-1789539697287305000-4e46f10c (Integration & Conformance)
 func TestPublicRepoSanitation(t *testing.T) {
 	projectRoot, err := findRepoRoot()
 	if err != nil {
@@ -83,9 +83,9 @@ func TestPublicRepoSanitation(t *testing.T) {
 }
 
 // TestPublicPushLeakPrevention verifies REQ-OSS-LEAK-PREVENTION-001:
-// - CRIT-REDACTED (Functional Acceptance)
-// - CRIT-REDACTED (Boundary & Error Handling)
-// - CRIT-REDACTED (Integration & Conformance)
+// - CRIT-1789539707439122000-0b84e18a (Functional Acceptance)
+// - CRIT-1789539707439123000-176ec4f6 (Boundary & Error Handling)
+// - CRIT-1789539707439124000-be881638 (Integration & Conformance)
 func TestPublicPushLeakPrevention(t *testing.T) {
 	projectRoot, err := findRepoRoot()
 	if err != nil {
@@ -146,9 +146,9 @@ func TestPublicPushLeakPrevention(t *testing.T) {
 }
 
 // TestStandaloneCleanBuild verifies REQ-OSS-CLEAN-BUILD-001:
-// - CRIT-REDACTED (Functional Acceptance)
-// - CRIT-REDACTED (Boundary & Error Handling)
-// - CRIT-REDACTED (Integration & Conformance)
+// - CRIT-1789539720548531000-589b232e (Functional Acceptance)
+// - CRIT-1789539720548532000-a026f896 (Boundary & Error Handling)
+// - CRIT-1789539720548533000-747e7ae7 (Integration & Conformance)
 func TestStandaloneCleanBuild(t *testing.T) {
 	projectRoot, err := findRepoRoot()
 	if err != nil {

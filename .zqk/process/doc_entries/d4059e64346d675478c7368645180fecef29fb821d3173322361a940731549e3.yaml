@@ -1,0 +1,21 @@
+content_hash: 129aac8bf281401ecaddd36c9c0dd7da309e434a486ed9962c2881110b4fed01
+content_searchable: true
+content_size: 2725
+created_at: "2026-09-17T08:44:57Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: onboarding
+id: DOC-640
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/onboarding/NEW_AGENT_PROTOCOL.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: To avoid "split-brain" syndrome and ensure that all intelligent agents operating within the ZQK ecosystem are fully integrated, we adhere to the "Kernel First" principle
+title: New Agent Protocol
+updated_at: "2026-09-17T08:44:57Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

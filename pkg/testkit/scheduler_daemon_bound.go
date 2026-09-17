@@ -51,7 +51,7 @@ type BoundCLISchedulerHandle struct {
 // running, a watchdog still force-stops; callers should also select on BoundCtx.Done()
 // (or use [WaitChanOrBound] / [WaitChanOrBoundWithCap]) so the test fails fast instead of hanging.
 //
-// TRACK: BLI-REDACTED — remove ad-hoc start/stop pairs once call sites use this helper.
+// TRACK: BLI-1786385524943190000-f8f9dab5 — remove ad-hoc start/stop pairs once call sites use this helper.
 func StartBoundCLIScheduler(t testing.TB, opts BoundCLISchedulerOpts) *BoundCLISchedulerHandle {
 	t.Helper()
 	if opts.CLIBinary == "" {

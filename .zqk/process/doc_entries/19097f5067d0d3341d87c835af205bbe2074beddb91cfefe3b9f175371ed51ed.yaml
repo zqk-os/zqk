@@ -1,0 +1,22 @@
+category: architecture
+content_hash: 7cc50433f584d335c63f28bb3cb83c2b93b10ced2bfca33e51f19e524b89f074
+content_searchable: true
+content_size: 13414
+created_at: "2026-09-17T08:43:33Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-175
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/MCP_BUILT_IN_TOOLS.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: Built-in tools are MCP tools that are hardcoded directly in the MCP server rather than being discovered from CLI commands
+title: MCP Built-In Tools
+updated_at: "2026-09-17T08:43:33Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

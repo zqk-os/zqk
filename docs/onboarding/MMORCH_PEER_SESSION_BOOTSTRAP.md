@@ -84,7 +84,7 @@ Manual equivalent (human opt-in only):
 - Notify = doorbell; substance = feed + `whats-next`
 - Subagents only via `zqk agent prepare-context` then orchestrate (`WFL-SUBAGENT-DISPATCH`)
 - Hourglass on every directed steer / `agent next --on-validation-failure wake`
-- **Done-claim gate:** before any COMPLETE steer, `zqk object get` the BLI **and** every `criteria_ref`. Do not stamp if any CRIT is not `complete` or any recommendation sentence lacks a code path + test. `validated` ≠ fulfilled. Feed COMPLETE is not kernel complete (`POL-CODE-CAS-TPM-GET-001`). Anti-idle does not license a 100% stamp. Until `object get <BLI> --view backlog-completion-report` exists, this N-get join **is** the gate (TRACK `REQ-REDACTED`).
+- **Done-claim gate:** before any COMPLETE steer, `zqk object get` the BLI **and** every `criteria_ref`. Do not stamp if any CRIT is not `complete` or any recommendation sentence lacks a code path + test. `validated` ≠ fulfilled. Feed COMPLETE is not kernel complete (`POL-CODE-CAS-TPM-GET-001`). Anti-idle does not license a 100% stamp. Until `object get <BLI> --view backlog-completion-report` exists, this N-get join **is** the gate (TRACK `REQ-1785908734512726000-0db5c98e`).
 
 ---
 

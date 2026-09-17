@@ -1,0 +1,16 @@
+category: acceptance
+created_at: "2026-09-17T19:18:20Z"
+created_by: ACC-1785920548450214012-68b850c0
+description: Primary functional acceptance criteria and core capability deliverables.
+id: CRIT-1789672700728883000-4b841700
+kind: criteria
+namespace_id: zqk:kernel
+origin_project: zqk
+origin_system: zqk
+schema_version: 2.0.0
+status: archived
+title: 'Verify: Community launch vetting is executable from this checkout - Functional Acceptance'
+updated_at: "2026-09-17T19:31:21Z"
+updated_by: ACC-1785920548450214012-68b850c0
+validation_method: automated_test
+version_context: default

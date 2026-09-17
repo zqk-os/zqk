@@ -3,7 +3,7 @@
 **Doc entry:** `DOC-1775197432882643000-89463915` — `zqk object get DOC-1775197432882643000-89463915` (or `zqk object list doc_entry --filter group=onboarding`).
 
 **As of:** 2026-08-11
-**Replaces:** Rolling “latest dated summary” in `docs/onboarding/` (see [`AGENT_ONBOARDING_SUMMARIES_DIGEST.md`](./AGENT_ONBOARDING_SUMMARIES_DIGEST.md)).
+**Replaces:** Rolling “latest dated summary” in `docs/onboarding/` (see [`AGENT_ONBOARDING_SUMMARIES_DIGEST.md`](./AGENT_ONBOARDING_SUMMARIES_DIGEST.md) and [`archive/`](./archive/)).
 
 **Purpose:** Short, **re-verify**-friendly view of plan + convergence + what to run before acting. Numbers below are **examples from the last explicit review** — always confirm with **`zqk object …`**.
 
@@ -25,7 +25,7 @@ CLI-first, object-first, **PRE_CHANGE_CHECKLIST** before substantive code, **AGE
 | **Mission (active)** | `MIS-1786213402170185000-8d36a3c8` — *Reliable kernel control plane (MMORCH + CAP)* |
 | **Priority plan (whats-next primary)** | `PRI-CAS-MEMBRANE-ENFORCE-001` — *CAS membrane enforce — PrivilegedWriter fail-closed + path deny* — **`status=active`** |
 | **Priority plan (parallel)** | `PRI-AGENT-IDLENESS-ACCUMULATOR-001` — *Agent idleness accumulator — scoreboard + reduction CVS* — `status=active` |
-| **Active convergence** | `CVS-REDACTED`, `CVS-REDACTED`, `CVS-REDACTED`, `CVS-REDACTED`, `CVS-AGENT-IDLENESS-REDUCTION-001` |
+| **Active convergence** | `CVS-1786411200923740000-e509e46f`, `CVS-1786411610614197000-4ffa7a7e`, `CVS-1786418440627390000-e3550f2e`, `CVS-1786418656116005000-2e9337d4`, `CVS-AGENT-IDLENESS-REDUCTION-001` |
 | **Onboarding prep (this Cursor session)** | `AGENT-PREP-1786432697035375000-1f95dc6a` — complete |
 | **Agent chat feed (lite)** | Materialize from live `agent_feed` (`zqk system materialize-agent-chat-channel --feed-id AGF-…`); expect `delivery_mode: notify`. Ghost AGF ids in lite file are a defect — rematerialize. |
 | **Test health JSONL** | `.zqk/logs/scheduler/cvs/test-bundles/health.jsonl` (not the older `test-bundles/` path without `cvs/`) |
@@ -62,5 +62,6 @@ tail -20 .zqk/logs/cursor-hooks/agent_chat_channel.jsonl
 
 ## Related
 
+- **Historical dated files:** [`archive/`](./archive/)
 - **Compressed timeline:** [`AGENT_ONBOARDING_SUMMARIES_DIGEST.md`](./AGENT_ONBOARDING_SUMMARIES_DIGEST.md)
 - **Assessment (one-off, 2026-03-21):** [`AGENT_ONBOARDING_ASSESSMENT_2026-03-21.md`](./AGENT_ONBOARDING_ASSESSMENT_2026-03-21.md)

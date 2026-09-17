@@ -1,0 +1,22 @@
+category: architecture
+content_hash: 20c2be9b91f076543b6a7edd91933ca5010c0945535b68d8b3fc7b5c4dadff18
+content_searchable: true
+content_size: 2299
+created_at: "2026-09-17T08:39:32Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-051
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/CEF_SYSTEM_TRANCHE1.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: 'Bounded decomposition of the cmd/zqk/system God package (F-ARCH-001): move domain logic out of the CLI package into a library home that already owns the concern'
+title: CEF S5 — System tranche-1 (bootstrap + systemcheck extracts)
+updated_at: "2026-09-17T08:39:32Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

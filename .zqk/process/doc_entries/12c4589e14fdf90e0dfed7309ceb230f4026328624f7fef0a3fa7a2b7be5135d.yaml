@@ -1,0 +1,22 @@
+category: architecture
+content_hash: e9491c208786594346aa2b5d57055efdf74a7a646f712b5b78c1fdcd89e2541d
+content_searchable: true
+content_size: 10917
+created_at: "2026-09-17T08:44:32Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-445
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/integrated-lifecycle-policy-enforcement-v1.0.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: This document describes the architecture for integrated lifecycle and policy enforcement that eliminates the need for external scripts and triggers
+title: Integrated Lifecycle and Policy Enforcement Architecture
+updated_at: "2026-09-17T08:44:32Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

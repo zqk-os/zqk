@@ -1,0 +1,22 @@
+category: architecture
+content_hash: ebd789a80116b5528053b7821cbc6c6cc6306701cceef179422bc0dd5509d6f1
+content_searchable: true
+content_size: 7939
+created_at: "2026-09-17T08:44:46Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-556
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/semantic-types-ontology-v1.0.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: This document describes the formal ontology integration for semantic type validation in the zqk system
+title: Semantic Types and Formal Ontology Integration
+updated_at: "2026-09-17T08:44:46Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

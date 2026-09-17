@@ -1,0 +1,22 @@
+category: architecture
+content_hash: 0eeeb1b9f7f3cc0f23f16bc749ecef48e3122c018ce4b3e3966baa1678cc2072
+content_searchable: true
+content_size: 4190
+created_at: "2026-09-17T08:44:34Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-477
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/mcp/RESOURCE_MIME_ADAPTERS.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: The resource MIME type adapter system allows the MCP server to extract metadata (descriptions, titles, etc.) from resources based on their content type, not just markdown
+title: Resource MIME Type Adapters
+updated_at: "2026-09-17T08:44:34Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

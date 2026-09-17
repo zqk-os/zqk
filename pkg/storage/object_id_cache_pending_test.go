@@ -13,7 +13,7 @@ import (
 	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
 )
 
-// TRACK: BLI-REDACTED
+// TRACK: BLI-1785895580100186000-c5539372
 func TestObjectIDCachePending_NoteClearIs(t *testing.T) {
 	root := t.TempDir()
 	ResetObjectIDCachePendingForTest()

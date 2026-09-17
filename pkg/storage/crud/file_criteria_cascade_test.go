@@ -55,7 +55,7 @@ func TestCriteriaCascadeDeletionDirection(t *testing.T) {
 		objects.FieldKeyStatus:        objects.ObjectStatusActive,
 		objects.FieldKeySchemaVersion: objects.DefaultSchemaVersion,
 	}
-	// TRACK: BLI-REDACTED — draft-plane create / promote membrane.
+	// TRACK: BLI-1785443942668406000-1ec5c811 — draft-plane create / promote membrane.
 	storage.CreateCASVisible(t, fos, ctx, secCtx, goal, "active")
 
 	// Create criteria
@@ -100,7 +100,7 @@ func TestCriteriaCascadeDeletionDirection(t *testing.T) {
 	storage.CreateCASVisible(t, fos, ctx, secCtx, req, objects.ObjectStatusActive)
 
 	// CUD reverse-ref + flush (no processDir scan fallback).
-	// TRACK: BLI-REDACTED
+	// TRACK: BLI-1785351629281373000-752ddc48
 	storage.FlushReverseReferenceIndexPersist()
 
 	// Delete criteria with cascade=true

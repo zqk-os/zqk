@@ -118,6 +118,7 @@ type TaskPromptOptions struct {
 	// IncludeObserver adds a live, task-scoped AST hint. Default is the tool-access
 	// pointer only. Never persist the hint on agent_task.
 	IncludeObserver bool
+	TaskSteps       string // Pre-formatted task steps section (or synthesized mutation steps)
 }
 
 // BuildTaskPrompt creates a unified markdown prompt for an agent task, incorporating
@@ -251,6 +252,11 @@ func BuildTaskPrompt(ctx context.Context, sp storage.ObjectStorageProvider, secC
 	if opts.TaskContext != "" {
 		footerSb.WriteString("\n### Context\n")
 		footerSb.WriteString(opts.TaskContext)
+		footerSb.WriteString("\n")
+	}
+	if opts.TaskSteps != "" {
+		footerSb.WriteString("\n")
+		footerSb.WriteString(opts.TaskSteps)
 		footerSb.WriteString("\n")
 	}
 

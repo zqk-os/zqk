@@ -1,0 +1,22 @@
+category: architecture
+content_hash: 8ece472d9cbfc84913d2d4768cef85faa7a0cbb44f8ef7c90bad0faaad5109ec
+content_searchable: true
+content_size: 7123
+created_at: "2026-09-17T08:42:08Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-083
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/CRUD_BUCKETING_ARCHIVING_REQUIREMENTS.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: All CRUD operations (Create, Read, Update, Delete, List) must always consider bucketing and archiving strategies, and the directory (bucket) configuration must be reconstructible from the spec alon...
+title: CRUD Operations Must Consider Bucketing and Archiving Strategies
+updated_at: "2026-09-17T08:42:08Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

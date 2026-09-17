@@ -3,7 +3,6 @@ package whatsnext
 import (
 	"context"
 	"encoding/json"
-	"os"
 	"path/filepath"
 	"sync"
 	"sync/atomic"
@@ -15,6 +14,7 @@ import (
 	"github.com/lanceman/zqk/pkg/lifecycle"
 	"github.com/lanceman/zqk/pkg/objects"
 	"github.com/lanceman/zqk/pkg/storage"
+	"github.com/lanceman/zqk/pkg/utils/fileutil"
 )
 
 // mockStorageProvider implements storage.ObjectStorageProvider for testing.
@@ -290,8 +290,8 @@ func TestWhatsNextMaterializedViewAsyncRecoveryCircuitBreaker(t *testing.T) {
 		t.Fatalf("save lite file failed: %v", err)
 	}
 	// Ensure file timestamp matches mutated timestamp
-	data, _ := os.ReadFile(WhatsNextLiteFilePath(tempDir))
-	_ = os.WriteFile(WhatsNextLiteFilePath(tempDir), data, 0644)
+	data, _ := fileutil.ReadFile(WhatsNextLiteFilePath(tempDir))
+	_ = fileutil.WriteFile(WhatsNextLiteFilePath(tempDir), data, 0644)
 
 	// Hot path call on stale file: must return immediately (<25ms vs 200ms scan), marked stale/recovering, and kick off async rebuild
 	startStale := time.Now()
@@ -374,8 +374,8 @@ func BenchmarkWhatsNextMaterializedViewHotPath(b *testing.B) {
 	}
 }
 
-// TestReactiveViewsAccumulatorConformance validates BLI-REDACTED,
-// BLI-REDACTED, and BLI-REDACTED:
+// TestReactiveViewsAccumulatorConformance validates BLI-1789553219333200000-e3783d6a,
+// BLI-1789553222342866000-1043e052, and BLI-1789553224732980000-5f25ee03:
 // Reactive view projections adhere to the non-blocking zero-scan contract and sub-5ms SLA.
 func TestReactiveViewsAccumulatorConformance(t *testing.T) {
 	t.Parallel()
@@ -413,7 +413,7 @@ func TestWhatsNextMaterializedView_DualFormatDeserialization(t *testing.T) {
 	tempDir := t.TempDir()
 
 	litePath := WhatsNextLiteFilePath(tempDir)
-	if err := os.MkdirAll(filepath.Dir(litePath), 0755); err != nil {
+	if err := fileutil.MkdirAll(filepath.Dir(litePath), 0755); err != nil {
 		t.Fatalf("mkdir state: %v", err)
 	}
 
@@ -438,7 +438,7 @@ func TestWhatsNextMaterializedView_DualFormatDeserialization(t *testing.T) {
 		t.Fatalf("marshal legacy flat: %v", err)
 	}
 
-	if err := os.WriteFile(litePath, legacyFlatJSON, 0644); err != nil {
+	if err := fileutil.WriteFile(litePath, legacyFlatJSON, 0644); err != nil {
 		t.Fatalf("write legacy flat file: %v", err)
 	}
 
@@ -495,7 +495,7 @@ func TestWhatsNextMaterializedView_DualFormatDeserialization(t *testing.T) {
 		t.Fatalf("marshal envelope: %v", err)
 	}
 
-	if err := os.WriteFile(litePath, envelopeJSON, 0644); err != nil {
+	if err := fileutil.WriteFile(litePath, envelopeJSON, 0644); err != nil {
 		t.Fatalf("write envelope file: %v", err)
 	}
 

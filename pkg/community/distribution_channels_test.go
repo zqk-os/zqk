@@ -1,18 +1,17 @@
 package community
 
 import (
-	"os"
-	"os/exec"
 	"path/filepath"
 	"strings"
 	"testing"
 
+	"github.com/lanceman/zqk/pkg/execwrap"
 	"github.com/lanceman/zqk/pkg/paths"
 	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
 )
 
 // TestDistributionChannels_FunctionalAcceptance verifies that package-community.sh
-// generates cross-platform release archives, sha256 checksums, and a matching Homebrew formula (CRIT-REDACTED).
+// generates cross-platform release archives, sha256 checksums, and a matching Homebrew formula (CRIT-1789615270860117000-06b5c31a).
 func TestDistributionChannels_FunctionalAcceptance(t *testing.T) {
 	if testing.Short() {
 		t.Skip("skipping multi-platform package test in short mode")
@@ -25,7 +24,7 @@ func TestDistributionChannels_FunctionalAcceptance(t *testing.T) {
 	}
 
 	distDir := t.TempDir()
-	cmd := exec.Command("bash", pkgScript, "v2.9.4", "--dry")
+	cmd := execwrap.Command("bash", pkgScript, "v2.9.4", "--dry")
 	cmd.Dir = root
 	cmd.Env = append(cmd.Environ(), "ZQK_DIST_DIR="+distDir)
 	out, err := cmd.CombinedOutput()
@@ -62,7 +61,7 @@ func TestDistributionChannels_FunctionalAcceptance(t *testing.T) {
 }
 
 // TestDistributionChannels_BoundaryAndErrorHandling verifies corrupted asset rejection,
-// checksum mismatch detection, and formula validation error handling (CRIT-REDACTED).
+// checksum mismatch detection, and formula validation error handling (CRIT-1789615270860118000-fbcc198b).
 func TestDistributionChannels_BoundaryAndErrorHandling(t *testing.T) {
 	tmpDir := t.TempDir()
 
@@ -72,7 +71,7 @@ func TestDistributionChannels_BoundaryAndErrorHandling(t *testing.T) {
 		archive := FormatArchiveName("2.9.4", p.OS, p.Arch)
 		archivePath := filepath.Join(tmpDir, archive)
 		content := []byte("mock binary archive content for " + p.OS + "/" + p.Arch)
-		if err := os.WriteFile(archivePath, content, 0644); err != nil {
+		if err := fileutil.WriteFile(archivePath, content, 0644); err != nil {
 			t.Fatalf("failed to write mock archive: %v", err)
 		}
 		hash, err := ComputeFileSHA256(archivePath)
@@ -88,7 +87,7 @@ func TestDistributionChannels_BoundaryAndErrorHandling(t *testing.T) {
 		manifestLines = append(manifestLines, hash+"  "+archive)
 	}
 	manifestPath := filepath.Join(tmpDir, "checksums.txt")
-	if err := os.WriteFile(manifestPath, []byte(strings.Join(manifestLines, "\n")), 0644); err != nil {
+	if err := fileutil.WriteFile(manifestPath, []byte(strings.Join(manifestLines, "\n")), 0644); err != nil {
 		t.Fatalf("failed to write manifest: %v", err)
 	}
 
@@ -100,7 +99,7 @@ func TestDistributionChannels_BoundaryAndErrorHandling(t *testing.T) {
 	// 3. Test corrupted archive detection
 	firstArchive := FormatArchiveName("2.9.4", SupportedPlatforms[0].OS, SupportedPlatforms[0].Arch)
 	firstArchivePath := filepath.Join(tmpDir, firstArchive)
-	if err := os.WriteFile(firstArchivePath, []byte("tampered content"), 0644); err != nil {
+	if err := fileutil.WriteFile(firstArchivePath, []byte("tampered content"), 0644); err != nil {
 		t.Fatalf("failed to corrupt archive: %v", err)
 	}
 	if err := VerifyChecksumManifest(tmpDir); err == nil {
@@ -108,7 +107,7 @@ func TestDistributionChannels_BoundaryAndErrorHandling(t *testing.T) {
 	}
 
 	// 4. Test missing archive detection
-	if err := os.Remove(firstArchivePath); err != nil {
+	if err := fileutil.Remove(firstArchivePath); err != nil {
 		t.Fatalf("failed to remove archive: %v", err)
 	}
 	if err := VerifyChecksumManifest(tmpDir); err == nil {
@@ -121,14 +120,14 @@ func TestDistributionChannels_BoundaryAndErrorHandling(t *testing.T) {
 		t.Fatalf("GenerateHomebrewFormula failed: %v", err)
 	}
 	formulaPath := filepath.Join(tmpDir, "zqk.rb")
-	if err := os.WriteFile(formulaPath, []byte(formulaContent), 0644); err != nil {
+	if err := fileutil.WriteFile(formulaPath, []byte(formulaContent), 0644); err != nil {
 		t.Fatalf("failed to write formula: %v", err)
 	}
 
 	// Corrupt formula sha256
 	corruptedFormula := strings.Replace(formulaContent, mockChecksums[FormatArchiveName("2.9.4", "darwin", "arm64")], "0000000000000000000000000000000000000000000000000000000000000000", 1)
 	corruptedFormulaPath := filepath.Join(tmpDir, "zqk_corrupt.rb")
-	if err := os.WriteFile(corruptedFormulaPath, []byte(corruptedFormula), 0644); err != nil {
+	if err := fileutil.WriteFile(corruptedFormulaPath, []byte(corruptedFormula), 0644); err != nil {
 		t.Fatalf("failed to write corrupted formula: %v", err)
 	}
 	if err := VerifyHomebrewFormula(corruptedFormulaPath, manifestPath); err == nil {
@@ -137,7 +136,7 @@ func TestDistributionChannels_BoundaryAndErrorHandling(t *testing.T) {
 }
 
 // TestDistributionChannels_IntegrationAndConformance verifies Homebrew formula syntax,
-// repo-level formula integrity, and release asset contract conformance (CRIT-REDACTED).
+// repo-level formula integrity, and release asset contract conformance (CRIT-1789615270860119000-d8fa7d23).
 func TestDistributionChannels_IntegrationAndConformance(t *testing.T) {
 	root := paths.ResolveProjectRoot(".")
 
@@ -147,7 +146,7 @@ func TestDistributionChannels_IntegrationAndConformance(t *testing.T) {
 		t.Fatalf("Formula/zqk.rb not found at %s", repoFormula)
 	}
 
-	bytes, err := os.ReadFile(repoFormula)
+	bytes, err := fileutil.ReadFile(repoFormula)
 	if err != nil {
 		t.Fatalf("failed to read Formula/zqk.rb: %v", err)
 	}

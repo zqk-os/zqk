@@ -25,7 +25,7 @@ import (
 // (OpRequireFieldWhenStatus), and the refuse-form of this same constraint exists there as
 // OpRefuseChildStatus. Unifying those two planes changes which path enforces what on the
 // storage save path, so it needs a decision rather than a refactor.
-// TRACK: BLI-REDACTED — remove this note when lifecycle preconditions are
+// TRACK: BLI-1787565256503969000-f5604378 — remove this note when lifecycle preconditions are
 // sourced from one plane; it carries the triage of the 56 barriers still authored as prose.
 type refStatusRule struct {
 	// Precondition is the lifecycle token this row answers. Matched as a substring so a

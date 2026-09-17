@@ -1,0 +1,22 @@
+category: architecture
+content_hash: 4b932c0f5acdb64347b18c22a58c14528380f2e5693f35c301e6464e32ce5226
+content_searchable: true
+content_size: 5106
+created_at: "2026-09-17T08:42:11Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-116
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/FILE_LOCK_STRATEGY_INTEGRATION.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: '- Uses AutoCleanupStrategy for all CAS index file locks - Automatically cleans up stale locks before acquiring - Removes lock files after release to prevent git confusion - Collects metrics on lock...'
+title: File Lock Strategy Integration Summary
+updated_at: "2026-09-17T08:42:11Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

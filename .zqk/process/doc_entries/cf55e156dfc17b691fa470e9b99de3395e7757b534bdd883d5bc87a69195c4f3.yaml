@@ -1,0 +1,22 @@
+category: architecture
+content_hash: 18e05c4aad9f08c2d48f95f47c917b43b40d60474e04c0f04fecbe619cf6a7a7
+content_searchable: true
+content_size: 15157
+created_at: "2026-09-17T08:44:14Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-320
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/TRANSCEIVER_IMPLEMENTATION_PLAN.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: This document outlines the implementation plan for the transceiver router architecture, showing how to evolve the current callback system into a protocol-agnostic message routing system.
+title: Transceiver Router Implementation Plan
+updated_at: "2026-09-17T08:44:14Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

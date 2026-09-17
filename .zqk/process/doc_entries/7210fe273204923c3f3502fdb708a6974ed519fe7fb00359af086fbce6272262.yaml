@@ -1,0 +1,22 @@
+category: architecture
+content_hash: 112244d0eb7194074a404e9f3b1962370032b8cd18730120a46e55cab8c20a35
+content_searchable: true
+content_size: 24248
+created_at: "2026-09-17T08:43:29Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-149
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/LESSONS_LEARNED.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: This document captures critical lessons learned from system degradation cycles to prevent similar recursive failures
+title: 'Lessons Learned: Avoiding Recursive Degradation'
+updated_at: "2026-09-17T08:43:29Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

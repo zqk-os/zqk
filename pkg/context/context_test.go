@@ -3,6 +3,8 @@ package context
 import (
 	"slices"
 	"testing"
+
+	"github.com/lanceman/zqk/pkg/zqkenv"
 )
 
 func TestNewSecurityContext(t *testing.T) {
@@ -191,4 +193,79 @@ func TestNewGroupingStorageContext_ZeroMaxGroupSize(t *testing.T) {
 	if storageCtx.MaxGroupSize != 0 {
 		t.Errorf("expected MaxGroupSize 0, got %d", storageCtx.MaxGroupSize)
 	}
+}
+
+func TestSecurityContext_GetLLMAPIKey_UnprefixedEnv(t *testing.T) {
+	secCtx := NewSecurityContext("account:test", []string{"developer"}, []string{"read:*"})
+
+	t.Run("LLM_API_KEY fallback", func(t *testing.T) {
+		t.Setenv(zqkenv.LLMAPIKey().Name(), "")
+		t.Setenv("LLM_API_KEY", "sk-generic-test-123")
+		t.Setenv("OPENAI_API_KEY", "")
+
+		if got := secCtx.GetLLMAPIKey("openai"); got != "sk-generic-test-123" {
+			t.Fatalf("GetLLMAPIKey(openai) = %q, want %q", got, "sk-generic-test-123")
+		}
+	})
+
+	t.Run("OPENAI_API_KEY fallback", func(t *testing.T) {
+		t.Setenv(zqkenv.LLMAPIKey().Name(), "")
+		t.Setenv("LLM_API_KEY", "")
+		t.Setenv("OPENAI_API_KEY", "sk-openai-test-456")
+
+		if got := secCtx.GetLLMAPIKey("openai"); got != "sk-openai-test-456" {
+			t.Fatalf("GetLLMAPIKey(openai) = %q, want %q", got, "sk-openai-test-456")
+		}
+	})
+
+	t.Run("GEMINI_API_KEY fallback", func(t *testing.T) {
+		t.Setenv(zqkenv.GeminiAPIKey().Name(), "")
+		t.Setenv("GEMINI_API_KEY", "gemini-test-789")
+
+		if got := secCtx.GetLLMAPIKey("gemini"); got != "gemini-test-789" {
+			t.Fatalf("GetLLMAPIKey(gemini) = %q, want %q", got, "gemini-test-789")
+		}
+	})
+
+	t.Run("QWEN_API_KEY fallback", func(t *testing.T) {
+		t.Setenv(zqkenv.QwenAPIKey().Name(), "")
+		t.Setenv("QWEN_API_KEY", "qwen-test-abc")
+
+		if got := secCtx.GetLLMAPIKey("qwen"); got != "qwen-test-abc" {
+			t.Fatalf("GetLLMAPIKey(qwen) = %q, want %q", got, "qwen-test-abc")
+		}
+	})
+}
+
+func TestSecurityContext_GetLLMBaseURL_UnprefixedEnv(t *testing.T) {
+	secCtx := NewSecurityContext("account:test", []string{"developer"}, []string{"read:*"})
+
+	t.Run("LLM_BASE_URL fallback", func(t *testing.T) {
+		t.Setenv(zqkenv.LLMBaseURL().Name(), "")
+		t.Setenv("LLM_BASE_URL", "http://127.0.0.1:11434/v1")
+		t.Setenv("OPENAI_BASE_URL", "")
+
+		if got := secCtx.GetLLMBaseURL("openai"); got != "http://127.0.0.1:11434/v1" {
+			t.Fatalf("GetLLMBaseURL(openai) = %q, want http://127.0.0.1:11434/v1", got)
+		}
+	})
+
+	t.Run("OPENAI_BASE_URL fallback", func(t *testing.T) {
+		t.Setenv(zqkenv.LLMBaseURL().Name(), "")
+		t.Setenv("LLM_BASE_URL", "")
+		t.Setenv("OPENAI_BASE_URL", "https://api.custom-openai.com/v1")
+
+		if got := secCtx.GetLLMBaseURL("openai"); got != "https://api.custom-openai.com/v1" {
+			t.Fatalf("GetLLMBaseURL(openai) = %q, want https://api.custom-openai.com/v1", got)
+		}
+	})
+
+	t.Run("QWEN_BASE_URL fallback", func(t *testing.T) {
+		t.Setenv(zqkenv.QwenBaseURL().Name(), "")
+		t.Setenv("QWEN_BASE_URL", "https://dashscope.aliyuncs.com/compatible-mode/v1")
+
+		if got := secCtx.GetLLMBaseURL("qwen"); got != "https://dashscope.aliyuncs.com/compatible-mode/v1" {
+			t.Fatalf("GetLLMBaseURL(qwen) = %q, want https://dashscope.aliyuncs.com/compatible-mode/v1", got)
+		}
+	})
 }

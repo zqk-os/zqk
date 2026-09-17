@@ -13,7 +13,7 @@ import (
 	"github.com/lanceman/zqk/pkg/testkit"
 )
 
-// TestWatchdogSubagent_Boundary verifies CRIT-REDACTED:
+// TestWatchdogSubagent_Boundary verifies CRIT-1789273452649988000-84a64249:
 // Boundary condition validation, negative testing, invalid input rejection, and failure recovery.
 func TestWatchdogSubagent_Boundary(t *testing.T) {
 	ctx := context.Background()

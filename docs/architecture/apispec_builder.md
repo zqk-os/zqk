@@ -5,7 +5,7 @@
 
 **Status**: Active
 **Component**: `pkg/specbuilder/`
-**Related**: `BLI-REDACTED` (PRI-SYM-005), adopters in `pkg/llm` (OpenAI + Gemini) and `pkg/hive/media`
+**Related**: `BLI-1783761336286408000-ca1625db` (PRI-SYM-005), adopters in `pkg/llm` (OpenAI + Gemini) and `pkg/hive/media`
 
 ## Overview
 The APISpec Builder pattern provides a standardized, thread-safe approach to constructing API clients and configurations within ZQK. It ensures that all outbound API integrations consistently implement telemetry, resiliency (retries, timeouts, circuit breaking), and contextual awareness.

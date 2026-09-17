@@ -1,0 +1,22 @@
+category: validation
+content_hash: 8a88d094a2df3e15284eb7ea4d954878278c9c47764ad10b927870022ffadee6
+content_searchable: true
+content_size: 4037
+created_at: "2026-09-17T08:44:19Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-346
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/async-validation-testing-v1.0.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: The async validation system includes comprehensive tests that use isolated test data to prevent corruption of project data
+title: Async Validation Testing Guide
+updated_at: "2026-09-17T08:44:19Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

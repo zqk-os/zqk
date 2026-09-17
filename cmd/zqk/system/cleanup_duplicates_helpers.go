@@ -18,6 +18,7 @@ import (
 	"github.com/lanceman/zqk/internal/cli"
 	pkgctx "github.com/lanceman/zqk/pkg/context"
 	"github.com/lanceman/zqk/pkg/errfmt"
+	"github.com/lanceman/zqk/pkg/execwrap"
 	"github.com/lanceman/zqk/pkg/goroutinelabels"
 	"github.com/lanceman/zqk/pkg/logging"
 	"github.com/lanceman/zqk/pkg/objects"
@@ -31,7 +32,7 @@ var (
 	hashFilePattern = regexp.MustCompile(`^[a-f0-9]{64}\.yaml$`)
 	// Top-level object id only (column 0). Indented "id:" (nested maps) must not be
 	// treated as the object id — that false-grouped hash duplicates and let cleanup
-	// delete sole real objects. TRACK: BLI-REDACTED
+	// delete sole real objects. TRACK: BLI-1785723654802038000-b14064bc
 	idLineRegex = regexp.MustCompile(`(?m)^id\s*:\s*(.+)$`)
 )
 
@@ -90,7 +91,7 @@ func initializeCleanupContext(cmd *cobra.Command, args []string) (*CleanupDuplic
 
 	// Bypass/system-generated kinds delete by default (quarantine would grow forever).
 	// All other kinds quarantine unless --delete-hash-duplicates.
-	// TRACK: BLI-REDACTED
+	// TRACK: BLI-1786358681981576000-66f07f6c
 	var deleteForKindsMap map[string]bool
 	if hashDupes {
 		if cfg := storage.GetGlobalBlockingCheckConfig(); cfg != nil {
@@ -275,7 +276,7 @@ func scanHashFiles(dirPath string, verbose bool, logger logging.Logger) (primary
 }
 
 // quarantineOrDeleteDuplicateHashFile moves a hash-duplicate into QuarantineDir (default),
-// or deletes when --delete-hash-duplicates / bypass kind. TRACK: BLI-REDACTED
+// or deletes when --delete-hash-duplicates / bypass kind. TRACK: BLI-1786358681981576000-66f07f6c
 func quarantineOrDeleteDuplicateHashFile(ctx *CleanupDuplicatesContext, kind, objectID, filePath string) (bool, error) {
 	deleteIt := ctx.DeleteHashDuplicates ||
 		(ctx.DeleteHashDuplicatesForKinds != nil && ctx.DeleteHashDuplicatesForKinds[kind])
@@ -307,6 +308,179 @@ func quarantineOrDeleteDuplicateHashFile(ctx *CleanupDuplicatesContext, kind, ob
 	return true, nil
 }
 
+type gitFileState int
+
+const (
+	gitStateUnknown gitFileState = iota
+	gitStateCleanTracked
+	gitStateModifiedTracked
+	gitStateDeletedTracked
+	gitStateUntracked
+)
+
+// inspectGitStatusForPaths inspects the git tracking status of given file paths relative to projectRoot.
+func inspectGitStatusForPaths(projectRoot string, filePaths []string) map[string]gitFileState {
+	states := make(map[string]gitFileState, len(filePaths))
+	if projectRoot == emptyValue || len(filePaths) == 0 {
+		return states
+	}
+	gitDir := filepath.Join(projectRoot, ".git")
+	if _, err := fileutil.Stat(gitDir); err != nil {
+		return states
+	}
+
+	relPaths := make([]string, 0, len(filePaths))
+	pathToClean := make(map[string]string, len(filePaths))
+	for _, p := range filePaths {
+		clean := filepath.Clean(p)
+		rel, err := filepath.Rel(projectRoot, clean)
+		if err != nil {
+			rel = clean
+		}
+		relPaths = append(relPaths, rel)
+		pathToClean[rel] = clean
+	}
+
+	cmdLs := execwrap.Command("git", append([]string{"ls-files", "--"}, relPaths...)...)
+	cmdLs.Dir = projectRoot
+	outLs, err := cmdLs.Output()
+	if err != nil {
+		return states
+	}
+	trackedRels := make(map[string]bool)
+	for _, line := range strings.Split(string(outLs), "\n") {
+		trimmed := strings.TrimSpace(line)
+		if trimmed != emptyValue {
+			trackedRels[trimmed] = true
+		}
+	}
+
+	cmdSt := execwrap.Command("git", append([]string{"status", "--porcelain", "-uall", "--"}, relPaths...)...)
+	cmdSt.Dir = projectRoot
+	outSt, _ := cmdSt.Output()
+	statusMap := make(map[string]string)
+	for _, line := range strings.Split(string(outSt), "\n") {
+		if len(line) >= 4 {
+			code := line[:2]
+			p := strings.TrimSpace(line[3:])
+			statusMap[p] = code
+		}
+	}
+
+	for _, rel := range relPaths {
+		orig := pathToClean[rel]
+		if trackedRels[rel] {
+			if code, exists := statusMap[rel]; exists {
+				if strings.Contains(code, "D") {
+					states[orig] = gitStateDeletedTracked
+				} else {
+					states[orig] = gitStateModifiedTracked
+				}
+			} else {
+				states[orig] = gitStateCleanTracked
+			}
+		} else {
+			states[orig] = gitStateUntracked
+		}
+	}
+
+	return states
+}
+
+// selectKeeperCASPath chooses the authoritative keeper file among duplicate CAS paths for an object ID.
+//
+// Resolution Priority:
+//  1. Git-reconciled index alignment:
+//     If the CAS index maps objectID to an existing path, and projectRoot is a Git repository:
+//     - If the indexed path is tracked by Git and clean (unmodified in worktree), while sibling
+//     paths are untracked (e.g. branch transition remnants), the indexed path is chosen.
+//     - If the indexed path was deleted in the Git worktree and an untracked sibling exists,
+//     the untracked sibling is chosen as an active mutation in progress.
+//  2. Index alignment:
+//     If the CAS index maps to one of the surviving paths, prefer that path over unindexed duplicates.
+//  3. Fallback:
+//     Newest file modification time (mtime).
+func selectKeeperCASPath(paths []string, objectID string, cas *storage.ContentAddressableStorage, projectRoot string) string {
+	if len(paths) == 0 {
+		return emptyValue
+	}
+	if len(paths) == 1 {
+		return paths[0]
+	}
+
+	var indexedPath string
+	if cas != nil {
+		if idx := cas.GetIndex(); idx != nil && idx.Mappings != nil {
+			if h, ok := idx.Mappings[objectID]; ok && h != emptyValue {
+				for _, p := range paths {
+					base := filepath.Base(p)
+					if strings.TrimSuffix(base, filepath.Ext(base)) == h {
+						if _, err := fileutil.Stat(p); err == nil {
+							indexedPath = p
+							break
+						}
+					}
+				}
+			}
+		}
+	}
+
+	gitStates := inspectGitStatusForPaths(projectRoot, paths)
+	if len(gitStates) > 0 {
+		if indexedPath != emptyValue {
+			st := gitStates[indexedPath]
+			if st == gitStateCleanTracked {
+				return indexedPath
+			}
+			if st == gitStateDeletedTracked {
+				var bestNew string
+				var bestMTime time.Time
+				for _, p := range paths {
+					if gitStates[p] == gitStateUntracked {
+						if fi, err := fileutil.Stat(p); err == nil {
+							if bestNew == emptyValue || fi.ModTime().After(bestMTime) {
+								bestNew = p
+								bestMTime = fi.ModTime()
+							}
+						}
+					}
+				}
+				if bestNew != emptyValue {
+					return bestNew
+				}
+			}
+		}
+
+		var cleanTracked []string
+		for _, p := range paths {
+			if gitStates[p] == gitStateCleanTracked {
+				cleanTracked = append(cleanTracked, p)
+			}
+		}
+		if len(cleanTracked) == 1 {
+			return cleanTracked[0]
+		}
+	}
+
+	if indexedPath != emptyValue {
+		return indexedPath
+	}
+
+	keep := emptyValue
+	var keepMTime time.Time
+	for _, p := range paths {
+		fi, err := fileutil.Stat(p)
+		if err != nil {
+			continue
+		}
+		if keep == emptyValue || fi.ModTime().After(keepMTime) {
+			keepMTime = fi.ModTime()
+			keep = p
+		}
+	}
+	return keep
+}
+
 // reconcileCASIndexMapping updates the CAS index to point objectID at the keeper hash file.
 // Caller must pass the same cas instance used for this kind to avoid creating one per object.
 func reconcileCASIndexMapping(cas *storage.ContentAddressableStorage, kind, objectID, keepFilePath string) error {
@@ -315,6 +489,22 @@ func reconcileCASIndexMapping(cas *storage.ContentAddressableStorage, kind, obje
 		return errfmt.Errorf("cannot extract hash from filename: %s", base)
 	}
 	hash := base[:64]
+
+	if cas != nil {
+		if idx := cas.GetIndex(); idx != nil {
+			kindDir := filepath.Dir(idx.FilePath)
+			relDir, relErr := filepath.Rel(kindDir, filepath.Dir(keepFilePath))
+			var bucketKey string
+			if relErr == nil && relDir != "." && relDir != "" {
+				bucketKey = relDir
+			}
+			if bucketKey != "" {
+				_ = idx.SetMapping(objectID, hash, bucketKey)
+			} else {
+				_ = idx.SetMapping(objectID, hash)
+			}
+		}
+	}
 
 	writeQueue := caspkg.GetGlobalListingIndexWriteQueue()
 	done, err := writeQueue.EnqueueUpdateWithCallback(kind, objectID, hash, cas)
@@ -348,23 +538,7 @@ func cleanupHashDuplicatesForKind(ctx *CleanupDuplicatesContext, kind, kindDir s
 			continue
 		}
 
-		// Choose keeper: newest mtime wins. Skip paths that no longer exist (index/cache stale or already deleted).
-		keep := ""
-		var keepMTime time.Time
-		for _, p := range paths {
-			fi, err := fileutil.Stat(p)
-			if err != nil {
-				if fileutil.IsNotExist(err) {
-					continue // file already gone; no need to report
-				}
-				errors = append(errors, err)
-				continue
-			}
-			if keep == emptyValue || fi.ModTime().After(keepMTime) {
-				keepMTime = fi.ModTime()
-				keep = p
-			}
-		}
+		keep := selectKeeperCASPath(paths, objectID, cas, ctx.ProjectRoot)
 		if keep == emptyValue {
 			continue // all paths missing (e.g. object deleted); nothing to reconcile
 		}
@@ -616,6 +790,10 @@ func cleanupKindsInParallel(ctx *CleanupDuplicatesContext) (int, int, []error) {
 		if ctx.OnKindProgress != nil {
 			ctx.OnKindProgress(r.kindResult.Kind, completedIndex, totalKinds)
 		}
+	}
+
+	if ctx.ProjectRoot != emptyValue && totalDeleted > 0 {
+		ClearCASDuplicateIDInventoryCache(ctx.ProjectRoot)
 	}
 
 	return totalDeleted, totalSkipped, allErrors

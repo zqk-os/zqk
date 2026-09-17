@@ -1,0 +1,22 @@
+category: migration
+content_hash: 6a93681098a6e4b659b1a51d26da3b36ec38bf323cffc463309cdc6d877a3f08
+content_searchable: true
+content_size: 5236
+created_at: "2026-09-17T08:42:08Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-087
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/DATA_CELL_CROSS_PROFILE_MIGRATION_RUNBOOK.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: '--- Code: pkg/datacell.OperatorProfileMigrationChain matches profile contracts (profile_contracts.go): light_file → cas_entity → stream.'
+title: Cross-profile data cell migration — operator runbook
+updated_at: "2026-09-17T08:42:08Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

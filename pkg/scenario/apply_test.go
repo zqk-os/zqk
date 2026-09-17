@@ -442,7 +442,7 @@ func TestApplyScenarioBundle_ConvergenceLifecycleBundle(t *testing.T) {
 	if len(summary.CreatedDocEntryIDs) != 1 || summary.CreatedDocEntryIDs[0] != "DOC-CLF-001" {
 		t.Errorf("CreatedDocEntryIDs = %v, want [DOC-CLF-001]", summary.CreatedDocEntryIDs)
 	}
-	wantCVS := "CVS-REDACTED"
+	wantCVS := "CVS-1234567890123456789-abcdef12"
 	if len(summary.CreatedConvergenceSessionIDs) != 1 || summary.CreatedConvergenceSessionIDs[0] != wantCVS {
 		t.Errorf("CreatedConvergenceSessionIDs = %v, want [%s]", summary.CreatedConvergenceSessionIDs, wantCVS)
 	}
@@ -455,7 +455,7 @@ func TestApplyScenarioBundle_ConvergenceLifecycleBundle(t *testing.T) {
 		wantKind string
 	}{
 		{"DOC-CLF-001", "doc_entry"},
-		{"CVS-REDACTED", "convergence_session"},
+		{"CVS-1234567890123456789-abcdef12", "convergence_session"},
 	} {
 		obj, err := provider.Read(ctx, secCtx, tc.id)
 		if err != nil {

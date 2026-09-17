@@ -1,0 +1,22 @@
+category: architecture
+content_hash: 518ddc86c5d64e46e3811b63c66c8931d9d35c29ef3a959797e15e49419536fe
+content_searchable: true
+content_size: 3341
+created_at: "2026-09-17T08:44:02Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-276
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/SHUTDOWN_HANG_ANALYSIS.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: Shutdown hangs because the MCP serve loop blocks in a select waiting for the next stdin read to complete, while the reader goroutine is blocked in a syscall read(stdin) that is never interrupted or...
+title: Shutdown Hang Analysis (Process Sample)
+updated_at: "2026-09-17T08:44:02Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

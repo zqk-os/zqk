@@ -159,7 +159,7 @@ func (f *FileObjectStorage) ListImpl(ctx context.Context, secCtx *pkgctx.Securit
 	// exhaustion when listing many files. Each worker pulls paths from workCh and sends parseResult.
 	// Buffer workCh to len(filePaths) — enqueue-before-workers with a small buffer deadlocks
 	// when file count exceeds the buffer (same failure mode as countWithFilters).
-	// TRACK: BLI-REDACTED
+	// TRACK: BLI-1785903709847957000-8c7a991c
 	listMaxWorkers := getListReadWorkers()
 	results := make(chan parseResult, listMaxWorkers*2)
 	workCh := make(chan string, len(filePaths))

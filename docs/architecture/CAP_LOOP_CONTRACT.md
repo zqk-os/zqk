@@ -31,7 +31,7 @@ Do not hand-stitch `related_object_refs` or invent parallel nesting.
 
 ## Automatable facets (directive feeder — not CAP ping)
 
-**Posture:** `DEC-REDACTED` / `GLS-1786415578038417000-8ae29e70` — CAP ping is compensatory scaffolding. The durable fix is the kernel **feeding** seats from continuous ambient **metrics**, not agents remembering to self-tick.
+**Posture:** `DEC-1786415664283885000-a83df3fc` / `GLS-1786415578038417000-8ae29e70` — CAP ping is compensatory scaffolding. The durable fix is the kernel **feeding** seats from continuous ambient **metrics**, not agents remembering to self-tick.
 
 **Metrics vs verification (do not conflate):**
 
@@ -40,7 +40,7 @@ Do not hand-stitch `related_object_refs` or invent parallel nesting.
 | **Metrics (primary for feeder)** | `base_metric` + extensions; continuous collect/aggregate/summarize | `command_metric` timings/rates, `scheduler_health_metric`, `audit_aggregation_metric`, `file_lock_metric`, `zqk system metrics` / `--summary` |
 | **Verification/evidence (secondary)** | CVS / test-bundle health | fingerprints, `health.jsonl`, `convergence measure` delta — **not** metrics (`GLS-1786416152350033000-cf1e5999`) |
 
-**Glossary / REQ:** `GLS-1786416188034709000-292822ac` (metrics-plane feeder facets M1–M7), `REQ-REDACTED`.
+**Glossary / REQ:** `GLS-1786416188034709000-292822ac` (metrics-plane feeder facets M1–M7), `REQ-1786416190353555000-6e1b19e1`.
 
 | Facet | What to compute (metrics plane) | Where it must land |
 |-------|----------------------------------|--------------------|
@@ -56,7 +56,7 @@ Optional appendix only: CVS `measure_compressed` (labeled verification, not metr
 
 **Gap (today):** `cap_stage_metrics` / `executeMetricsStage` writes `.zqk/state/cap_metrics_latest.json` + object-count/`workflow convergence` — **not** a metrics-plane digest into `agent_feed`. Ambient/`whats-next` under-projects command/base metrics; seats still go idle.
 
-**Implement slices:** `BLI-REDACTED` (metrics-plane→feed), `BLI-REDACTED` (idle/wait → metrics digest), `BLI-REDACTED` (unify ambience projector with metrics vocabulary).
+**Implement slices:** `BLI-1786415906281667000-f13b5134` (metrics-plane→feed), `BLI-1786415907869645000-25128669` (idle/wait → metrics digest), `BLI-1786415909130258000-107836cb` (unify ambience projector with metrics vocabulary).
 
 Idle/`wait` CAP paths must still refresh M7 from metrics — never an empty CAP ping.
 
@@ -86,7 +86,7 @@ Each `CapStages` tick re-imprints posture via kernel `prompt_template` objects
 | `cap_stage_self_improvement` | `PROMPT-CAP-STAGE-SELF-IMPROVEMENT` |
 | `cap_stage_sentinel` | `PROMPT-CAP-STAGE-SENTINEL` (+ `BuildSentinelPrompt` / `PROMPT-1783091834904015000-066e0f7d`) |
 
-TRACK: `BLI-REDACTED` / `REQ-CAP-STAGE-PROMPTS-001` / `CRIT-CAP-STAGE-PROMPTS-001`.
+TRACK: `BLI-1786390039711686000-e718d458` / `REQ-CAP-STAGE-PROMPTS-001` / `CRIT-CAP-STAGE-PROMPTS-001`.
 
 ## Merge-up + branch yard (swarm cleanup)
 

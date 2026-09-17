@@ -1,0 +1,22 @@
+category: cli
+content_hash: 14f9c7d170aa6b62af59e4cd10245b512f060d802fd94fd8113a6bfae67e0b2b
+content_searchable: true
+content_size: 6134
+created_at: "2026-09-17T08:39:33Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-060
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/CLI_FIRST_ENFORCEMENT_SUMMARY.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: '- Hash registry sync issues (18 Tier 2 violations in recent incident) - Missing audit trails - Cache inconsistencies - Validation bypass - System integrity violations - Detects staged YAML files in...'
+title: CLI-First Enforcement Summary
+updated_at: "2026-09-17T08:39:33Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

@@ -4,7 +4,7 @@
 
 
 **Status:** Active  
-**TRACK:** `BLI-REDACTED` (priority_plan check valve)  
+**TRACK:** `BLI-1785439369431933000-f0cccd6c` (priority_plan check valve)  
 **Complements:** [LIFECYCLE_STATUS_ROLES.md](./LIFECYCLE_STATUS_ROLES.md), [lifecycle_taxonomy.md](../process/architecture/lifecycle_taxonomy.md), [POLICY_LIFECYCLE.md](./POLICY_LIFECYCLE.md), [LIFECYCLE_DEFINITIONS_EXPLAINED.md](./LIFECYCLE_DEFINITIONS_EXPLAINED.md), `.zqk/specs/lifecycles/README.md`
 
 This is the design exam for **every** `*_lifecycle.yaml`. Status names are local. **Roles** (`status.role`) are the class plane. Edges that look identical (`paused → active`) are legal on one kind and a membrane leak on another.

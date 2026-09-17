@@ -19,7 +19,7 @@ func (g *GraphObjectStorage) Create(ctx context.Context, secCtx *pkgctx.Security
 	ctx, cancel := pkgctx.EnforceTimeout(ctx, 30*time.Second)
 	defer cancel()
 	// Kernel Mutation Pipeline entry (COMMIT re-enters with kernelcas.WithCommit).
-	// TRACK: BLI-REDACTED — Graph was a membrane bypass.
+	// TRACK: BLI-1785784864671436000-071adcbe — Graph was a membrane bypass.
 	if !kernelcas.IsCommit(ctx) {
 		kind, _ := obj[objects.FieldKeyKind].(string)
 		id, _ := obj[objects.FieldKeyID].(string)
@@ -240,7 +240,7 @@ func (g *GraphObjectStorage) Update(ctx context.Context, secCtx *pkgctx.Security
 
 	// Same property prep as Create (compression) so Update cannot drift graph
 	// property keys from objectToNode / file SSOT projection.
-	// TRACK: BLI-REDACTED — GFS P0c Update via objectToNode.
+	// TRACK: BLI-1785825613639964000-ba487700 — GFS P0c Update via objectToNode.
 	node, err := g.objectToNode(existing)
 	if err != nil {
 		return err

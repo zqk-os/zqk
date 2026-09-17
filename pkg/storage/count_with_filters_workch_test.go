@@ -17,7 +17,7 @@ import (
 // TestCountWithFilters_NoDeadlockWhenFilesExceedWorkerBuffer reproduces the
 // enqueue-before-workers deadlock: workCh buffered to maxWorkers*2 blocked when
 // file count exceeded the buffer (default namespace-scoped object count).
-// TRACK: BLI-REDACTED
+// TRACK: BLI-1785903709847957000-8c7a991c
 func TestCountWithFilters_NoDeadlockWhenFilesExceedWorkerBuffer(t *testing.T) {
 	t.Setenv(zqkenv.ListReadWorkers().Name(), "4") // buffer would be 8 if sized to maxWorkers*2
 

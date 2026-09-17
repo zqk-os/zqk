@@ -42,7 +42,7 @@ func finalID(explicitID, idHint string) string {
 }
 
 // freshInstanceBuilder returns a new builder instance (registry builders are mutable singletons).
-// TRACK: BLI-REDACTED — parallel bundle apply must not share builder state.
+// TRACK: BLI-1785443942668406000-1ec5c811 — parallel bundle apply must not share builder state.
 func freshInstanceBuilder(kind string) (instance_builders.InstanceBuilder, error) {
 	schemaVersion := objects.DefaultSchemaVersion
 	switch kind {

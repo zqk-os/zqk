@@ -132,7 +132,7 @@ func ResolveSchedulerDaemonBinary(projectRoot string) (string, error) {
 		return "", errfmt.Newf("failed to get executable path").Wrap(err)
 	}
 	// Never spawn the test runner as the daemon; prefer real project/module binaries.
-	// TRACK: BLI-REDACTED — IsInTest early-return invented missing projectRoot/bin/zqk.
+	// TRACK: BLI-1785443942668406000-1ec5c811 — IsInTest early-return invented missing projectRoot/bin/zqk.
 	if zqkenv.IsInTest() || isTestBinary(exe) {
 		if path, ok := firstExistingDaemonBinary(projectRoot); ok {
 			return path, nil

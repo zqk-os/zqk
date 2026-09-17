@@ -1,0 +1,22 @@
+category: architecture
+content_hash: 9da1aaceb5fc8dfc7af5da8d63236bb37b04e836f273a81ce76c74af1482eb30
+content_searchable: true
+content_size: 4160
+created_at: "2026-09-17T08:44:41Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-517
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/object-directory-location-v1.0.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: This document describes the correct directory structure for object files and validation mechanisms to prevent files from being placed in incorrect directories
+title: Object Directory Location Validation
+updated_at: "2026-09-17T08:44:41Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

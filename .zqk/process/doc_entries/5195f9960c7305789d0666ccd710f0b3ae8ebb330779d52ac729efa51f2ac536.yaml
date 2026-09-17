@@ -1,0 +1,21 @@
+content_hash: 35904303efda37f937791ad4ba71c1d1ad2c41443aaeafc4c96c71d28628e07a
+content_searchable: true
+content_size: 2514
+created_at: "2026-09-17T08:44:53Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: other
+id: DOC-612
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/best-practices/coding/README.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: This directory contains coding standards, best practices, and guidelines for the codebase
+title: Coding Best Practices
+updated_at: "2026-09-17T08:44:53Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

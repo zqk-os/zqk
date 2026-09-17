@@ -59,7 +59,7 @@ func executePPlanAdd(cmd *cobra.Command, rawPlanID string, rawBliIDs ...string) 
 			return cli.Guard(cmd).Err(errfmt.Errorf("association denied: priority plan %s is in terminal status %s", planID, planStatus)).Return()
 		}
 
-		// Sealed-column immutability (BLI-REDACTED): active or in_progress plans are sealed against new work.
+		// Sealed-column immutability (BLI-1789167113049711000-359f8a8c): active or in_progress plans are sealed against new work.
 		override := false
 		if cmd.Flags().Lookup("override") != nil {
 			override, _ = cmd.Flags().GetBool("override")

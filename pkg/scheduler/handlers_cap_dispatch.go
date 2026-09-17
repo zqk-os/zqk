@@ -130,7 +130,7 @@ func (h *CapOrchestratorHandler) executeDispatchStage(ctx context.Context, exe, 
 	}
 	openAGI := shared.openAGI
 	// Stage label stays `instruction` for routing/reuse; AGI body is the kernel prompt template.
-	// TRACK: BLI-REDACTED / BLI-ATK-MERGE-UP-HYGIENE-001
+	// TRACK: BLI-1786390039711686000-e718d458 / BLI-ATK-MERGE-UP-HYGIENE-001
 	agiInstruction := h.capStageAGIInstruction(ctx, instruction, planID)
 
 	var activePersonas []string
@@ -148,6 +148,17 @@ func (h *CapOrchestratorHandler) executeDispatchStage(ctx context.Context, exe, 
 	if err := decodeCAPPlanOutput(planOut, &planObj); err != nil {
 		h.logger.Error("cap_orchestrator_plan_parse_failed", err)
 		return errfmt.Errorf("failed to parse priority plan: %w", err)
+	}
+
+	planStatus, _ := planObj[objects.FieldKeyStatus].(string)
+	planStatus = strings.ToLower(strings.TrimSpace(planStatus))
+	planComplete, _ := planObj["priority_plan_complete"].(bool)
+	if planStatus == objects.ObjectStatusComplete || planStatus == objects.ObjectStatusArchived || planComplete {
+		h.logger.Info("cap_orchestrator_plan_terminal_status",
+			logging.PlanIDField(planID),
+			logging.String("status", planStatus),
+		)
+		return nil
 	}
 
 	bliMap := h.nestPlanWorkstreams(ctx, planID, planObj)
@@ -320,7 +331,7 @@ func (h *CapOrchestratorHandler) executeDispatchStage(ctx context.Context, exe, 
 	// List(persona) across plans hung FileObjectStorage — dump 20260805-010604).
 	// Do not fan out to every persona when the plan lacks dispatch identity —
 	// lifecycle now requires team_configuration_ref or persona_refs before active.
-	// TRACK: BLI-REDACTED
+	// TRACK: BLI-1785915238591238000-619a2f9e
 	if len(activePersonas) == 0 {
 		h.logger.Info("cap_orchestrator_skip_no_team_or_personas",
 			logging.PlanIDField(planID),
@@ -329,7 +340,7 @@ func (h *CapOrchestratorHandler) executeDispatchStage(ctx context.Context, exe, 
 	}
 
 	// CRI-PERSONA-SKILL-BOUND: skip personas without resolving ASK links (fail-closed dispatch).
-	// TRACK: BLI-REDACTED
+	// TRACK: BLI-1785904242062561000-ec024787
 	secForPersona := pkgctx.NewSystemSecurityContext()
 	boundPersonas := make([]string, 0, len(activePersonas))
 	for _, pid := range activePersonas {
@@ -372,7 +383,7 @@ func (h *CapOrchestratorHandler) executeDispatchStage(ctx context.Context, exe, 
 		maxConcurrency = numPersonas
 	}
 
-	// Shared open-AGI index from Execute (one List per CAP tick). TRACK: BLI-REDACTED
+	// Shared open-AGI index from Execute (one List per CAP tick). TRACK: BLI-1785915238591238000-619a2f9e
 	var claimed sync.Map // plan\0persona\0instr → struct{} for same-tick races
 	var reuseCount atomic.Int64
 	var mintCount atomic.Int64
@@ -388,7 +399,7 @@ func (h *CapOrchestratorHandler) executeDispatchStage(ctx context.Context, exe, 
 			plan := req["planID"].(string)
 			instr := req[objects.FieldKeyInstruction].(string)
 			claimKey := strings.ToLower(plan) + "\x00" + strings.ToLower(pid) + "\x00" + strings.ToUpper(instr)
-			// TRACK: BLI-REDACTED — reuse open AGI before mint (steer fuel).
+			// TRACK: BLI-1785915238591238000-619a2f9e — reuse open AGI before mint (steer fuel).
 			// Reuse when an open AGI already carries this stage label (template body may differ).
 			if openAGI.has(plan, pid, instruction) {
 				reuseCount.Add(1)

@@ -1,0 +1,22 @@
+category: storage
+content_hash: b4142bcacfb5e9c480b5bfdd8b4b60214306439e67e4bef3209ee8fd8c1c0bc2
+content_searchable: true
+content_size: 6503
+created_at: "2026-09-17T08:44:11Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-294
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/STORAGE_BOUNDARY_MAP.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: '--- Prior to Round 12, pkg/storage functioned as a monolithic god-package containing over 567 files spanning core interfaces, content-addressable storage (CAS), write-ahead logging (WAL), Memgraph/...'
+title: 'Storage Architecture: Subpackage Boundary Map & One-Way Import Contract'
+updated_at: "2026-09-17T08:44:11Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

@@ -1,0 +1,22 @@
+category: architecture
+content_hash: 41ae6140b0de0b7ed334b18877a5fe0f3cf334138340ae3d3acccfa3d3c1e170
+content_searchable: true
+content_size: 4906
+created_at: "2026-09-17T08:39:30Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-028
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/AUTO_FIX_PATTERN.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: 'Documentation: # Auto-Fix Pattern Recommendation'
+title: Auto-Fix Pattern Recommendation
+updated_at: "2026-09-17T08:39:30Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

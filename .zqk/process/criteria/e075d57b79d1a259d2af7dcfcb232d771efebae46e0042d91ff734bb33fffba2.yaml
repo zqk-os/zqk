@@ -1,0 +1,14 @@
+category: acceptance
+created_at: "2026-09-17T19:34:52Z"
+created_by: ACC-1785920548450214012-68b850c0
+description: No docs/_archive or archived onboarding copies remain in the community product tree.
+id: CRIT-1789673692417549000-42d0da98
+kind: criteria
+namespace_id: zqk:kernel
+schema_version: 2.0.0
+status: awaiting_verification
+title: Copied archive markdown is gone from the community tree
+updated_at: "2026-09-17T19:34:57Z"
+updated_by: ACC-1785920548450214012-68b850c0
+validation_method: automated_test
+version_context: default

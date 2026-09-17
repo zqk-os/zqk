@@ -1,0 +1,22 @@
+category: architecture
+content_hash: 09ad3881604981112d9b1be016be2771de4180ddc4cb01e41cdc5952f2289701
+content_searchable: true
+content_size: 15221
+created_at: "2026-09-17T08:44:24Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-393
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/coordinator-integration-gaps.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: This document identifies operations and background workers that should integrate with the coordinator pattern for unified observability but currently don't
+title: Coordinator Integration Gaps
+updated_at: "2026-09-17T08:44:24Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

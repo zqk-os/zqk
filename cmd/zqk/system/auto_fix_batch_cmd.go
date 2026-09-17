@@ -484,7 +484,7 @@ func tryAcquireAutoFixProcessingLock(projectRoot string) (*storage.FileLock, boo
 
 // acquireExclusiveAutoFixCheckLock fail-closes overlapping `system check --auto-fix` processes.
 // Three concurrent checks (parent launchd) were observed at 227% CPU / 1000+ OS threads.
-// TRACK: BLI-REDACTED
+// TRACK: BLI-1785723654802038000-b14064bc
 func acquireExclusiveAutoFixCheckLock(cmd *cobra.Command) (unlock func(), err error) {
 	if cmd == nil {
 		return nil, nil

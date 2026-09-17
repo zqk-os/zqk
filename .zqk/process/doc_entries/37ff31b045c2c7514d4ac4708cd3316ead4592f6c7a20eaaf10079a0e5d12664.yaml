@@ -1,0 +1,22 @@
+category: architecture
+content_hash: 8eaa566e8f80d9784c0edb3354fdb753243b29a7b3bd35ba9be0509c8df19f90
+content_searchable: true
+content_size: 6836
+created_at: "2026-09-17T08:44:35Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-490
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/mcp/observer-agent-workflow-clarification-v1.0.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: 'Documentation: # Observer Agent Workflow Clarification v1.0'
+title: Observer Agent Workflow Clarification
+updated_at: "2026-09-17T08:44:35Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

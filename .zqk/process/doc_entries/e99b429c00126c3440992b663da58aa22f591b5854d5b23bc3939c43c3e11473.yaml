@@ -1,0 +1,22 @@
+category: check
+content_hash: fea32f7bd9b774598ef7f4c56dc73ab467137041a6f13a98c62d17bd4f957b79
+content_searchable: true
+content_size: 2978
+created_at: "2026-09-17T08:42:11Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-112
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/FAST_PATH_AND_CACHE_FALLBACK_CHECKLIST.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: '--- List/Count with filters must not return 0 solely because the cache returned 0'
+title: Fast Path and Cache Fallback Checklist
+updated_at: "2026-09-17T08:42:11Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

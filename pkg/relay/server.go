@@ -58,7 +58,9 @@ func NewServer(addr string) *RelayServer {
 	}
 
 	s.routes()
-	go s.cleanupLoop()
+	goroutinelabels.NewGoroutine("relay.cleanup_loop", "running relay payload cleanup loop").StartSimple(func() {
+		s.cleanupLoop()
+	})
 
 	return s
 }

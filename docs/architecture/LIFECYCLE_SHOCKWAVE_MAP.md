@@ -10,7 +10,7 @@
 **Kind index (all 65):** [lifecycle_shockwave/KIND_INDEX.md](./lifecycle_shockwave/KIND_INDEX.md)  
 **CUD shockwave:** [CAS_MUTATION_SHOCKWAVE.md](./CAS_MUTATION_SHOCKWAVE.md)  
 **WAL / criteria listener:** [LIFECYCLE_EVENT_LISTENER_AND_CRITERIA.md](./LIFECYCLE_EVENT_LISTENER_AND_CRITERIA.md)  
-**TRACK:** `BLI-CEF-R26-REMAINING-KINDS-001`, `BLI-REDACTED`, `BLI-REDACTED`
+**TRACK:** `BLI-CEF-R26-REMAINING-KINDS-001`, `BLI-1785439369431933000-f0cccd6c`, `BLI-1785784867143912000-635942fb`
 
 ## Overview
 
@@ -52,7 +52,7 @@ A hop has a catalyst. The catalyst picks the plane. Mixing planes is how prose p
 | **F. Occupancy lock** | Child hop did not match a lock trigger, but work is already in flight | Still lock | Compiled today only for `priority_plan` (`applyOccupancyExecutionLock` / `MaybeExecutionLockPlan`). |
 | **G. Hold auditor** | `system check`, instance validation | Status **holds** while occupying | `pkg/validation` — dispatch on save and holds. Unrecognized English still fail-open. |
 | **H. Cache / UX** | Any mutation | Invalidate caches, check progress | `CacheEventSubscriber`. **Not** occupancy policy. |
-| **I. CAP / dispatch** | After an object occupies `execution_locked` | Team cell / persona identity | YAML may claim it; **no listener evaluates it** on shockwave. TRACK: `BLI-REDACTED`. |
+| **I. CAP / dispatch** | After an object occupies `execution_locked` | Team cell / persona identity | YAML may claim it; **no listener evaluates it** on shockwave. TRACK: `BLI-1785915238591238000-619a2f9e`. |
 | **J. WAL criteria updater** | CriterionSatisfied → enqueue auto hop | Designed listener for “all children done” without a List | `pkg/lifecycle/listener.go` — parallel to E; do not invent a third complete path. |
 
 **Rule:** qualifying-exam hops (seal, complete, terminal re-entry, membrane activate) belong on **A + B**. Child-status hops belong on **C + D** (same YAML matcher). Rollup complete belongs on **E** (or J once DSL exists). Do not put seal exams on the shockwave subscriber.

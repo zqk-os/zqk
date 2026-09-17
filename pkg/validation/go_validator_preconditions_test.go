@@ -101,15 +101,15 @@ func TestEvaluatePrecondition_ReadyBacklogTokenIsRecognized(t *testing.T) {
 	}
 }
 
-func TestEvaluatePrecondition_UnrecognizedStillFailOpen(t *testing.T) {
+func TestEvaluatePrecondition_UnrecognizedFailsClosed(t *testing.T) {
 	t.Parallel()
 	gv := NewGoValidator()
 	met, recognized := gv.evaluatePrecondition("the overlay compiler has compiled this sentence", map[string]any{}, nil)
 	if recognized {
 		t.Fatal("prose without a token must be unrecognized")
 	}
-	if !met {
-		t.Fatal("unrecognized prose still fail-open until overlay DSL")
+	if met {
+		t.Fatal("unrecognized prose must fail closed under overlay DSL")
 	}
 }
 
@@ -260,17 +260,17 @@ func TestDispatchPrecondition_RecordsPipelineOutcome(t *testing.T) {
 	}
 }
 
-func TestPreconditionPipeline_UnrecognizedStillFailOpen(t *testing.T) {
+func TestPreconditionPipeline_UnrecognizedFailsClosed(t *testing.T) {
 	t.Parallel()
 	gv := NewGoValidator()
 	met := gv.dispatchPrecondition("the overlay compiler has compiled this sentence", map[string]any{}, nil, nil)
-	if !met {
-		t.Fatal("unrecognized prose still fail-open until overlay DSL")
+	if met {
+		t.Fatal("unrecognized prose must fail closed under overlay DSL")
 	}
 	recognized := true
 	met = gv.dispatchPrecondition("the overlay compiler has compiled this sentence", map[string]any{}, nil, &recognized)
-	if recognized || !met {
-		t.Fatalf("recognized=%v met=%v; want recognized=false met=true", recognized, met)
+	if recognized || met {
+		t.Fatalf("recognized=%v met=%v; want recognized=false met=false", recognized, met)
 	}
 }
 

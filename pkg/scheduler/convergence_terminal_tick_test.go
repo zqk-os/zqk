@@ -71,7 +71,7 @@ func TestMaybeSpawnTerminalFollowupDraft_CreateIntegration(t *testing.T) {
 	}
 	ctx := stdcontext.Background()
 	secCtx := env.SecurityContext
-	priorID := "CVS-REDACTED"
+	priorID := "CVS-1776000000000000001-c1f2e3a4"
 	prior := map[string]any{
 		objects.FieldKeyID:               priorID,
 		objects.FieldKeyKind:             objects.KindConvergenceSession,

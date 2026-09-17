@@ -4,7 +4,9 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"hash/fnv"
 	"path/filepath"
+	"regexp"
 	"strings"
 
 	"gopkg.in/yaml.v3"
@@ -89,7 +91,7 @@ func EnsureBundledObjectSpecsMigrated(ctx context.Context, projectRoot string, l
 			return nil
 		}
 
-		want, err := buildObjectSpecObjectFromBundledFile(path, data)
+		want, err := buildObjectSpecObjectFromBundledFile(projectRoot, path, data)
 
 		if err != nil {
 			stats.Errors++
@@ -120,7 +122,7 @@ func EnsureBundledObjectSpecsMigrated(ctx context.Context, projectRoot string, l
 				return nil
 			}
 			// Create mutates want's status to preliminary origin; capture leave status first.
-			// TRACK: BLI-REDACTED — draft-plane create / promote membrane.
+			// TRACK: BLI-1785443942668406000-1ec5c811 — draft-plane create / promote membrane.
 			leaveStatus := objects.GetString(want, objects.FieldKeyStatus)
 			if cerr := store.Create(migrateCtx, secCtx, want); cerr != nil {
 				stats.Errors++
@@ -248,7 +250,42 @@ func isNotFoundErr(err error) bool {
 	return strings.Contains(s, "not found") || strings.Contains(s, "ID not found")
 }
 
-func buildObjectSpecObjectFromBundledFile(absPath string, data []byte) (map[string]any, error) {
+var baseObjectIDRegex = regexp.MustCompile(`^[A-Z]+-\d{3,}$`)
+
+// ObjectSpecIDForStem computes a deterministic, spec-compliant ID (^[A-Z]+-\d{3,}$) for a bundled spec file stem.
+func ObjectSpecIDForStem(stem string) string {
+	h := fnv.New32a()
+	h.Write([]byte(stem))
+	num := (h.Sum32() % 900000) + 100000
+	return fmt.Sprintf("OBJ-%06d", num)
+}
+
+// ValidateObjectSpecInstance verifies that an object_spec meets base_object and object_spec schema rules.
+func ValidateObjectSpecInstance(obj map[string]any) error {
+	id, _ := obj[objects.FieldKeyID].(string)
+	if !baseObjectIDRegex.MatchString(id) {
+		return errfmt.Errorf("object_spec ID %q does not match ^[A-Z]+-\\d{3,}$", id)
+	}
+	desc, _ := obj[objects.FieldKeyDescription].(string)
+	if len(strings.TrimSpace(desc)) < 10 {
+		return errfmt.Errorf("object_spec description %q violates min_length 10", desc)
+	}
+	filePath, _ := obj[objects.FieldKeyFilePath].(string)
+	if filePath == "" {
+		return errfmt.Errorf("object_spec file_path is required")
+	}
+	ontology, _ := obj[objects.FieldKeyOntology].(string)
+	if ontology == "" {
+		return errfmt.Errorf("object_spec ontology is required")
+	}
+	sourceType, _ := obj[objects.FieldKeySourceType].(string)
+	if sourceType != "internal" && sourceType != "external" && sourceType != "imported" {
+		return errfmt.Errorf("object_spec source_type %q violates base_object enum", sourceType)
+	}
+	return nil
+}
+
+func buildObjectSpecObjectFromBundledFile(projectRoot, absPath string, data []byte) (map[string]any, error) {
 	var specDef map[string]any
 	if err := yaml.Unmarshal(data, &specDef); err != nil {
 		return nil, err
@@ -259,7 +296,7 @@ func buildObjectSpecObjectFromBundledFile(absPath string, data []byte) (map[stri
 	}
 
 	stem := strings.TrimSuffix(filepath.Base(absPath), filepath.Ext(absPath))
-	id := "OBJ-" + stem
+	id := ObjectSpecIDForStem(stem)
 
 	sv := objects.DefaultSchemaVersion
 	if v := objects.GetString(specDef, objects.FieldKeySchemaVersion); v != "" {
@@ -267,17 +304,37 @@ func buildObjectSpecObjectFromBundledFile(absPath string, data []byte) (map[stri
 	}
 
 	absPath = filepath.Clean(absPath)
+	relPath := absPath
+	if projectRoot != "" {
+		if r, err := filepath.Rel(projectRoot, absPath); err == nil && !strings.HasPrefix(r, "..") {
+			relPath = r
+		}
+	}
+	if filepath.IsAbs(relPath) {
+		if idx := strings.Index(absPath, paths.ProcessInternalObjectSpecsDir); idx >= 0 {
+			relPath = absPath[idx:]
+		}
+	}
+
 	title := titleFromBundledSpec(specDef, ontology)
 	if len(title) < 5 {
 		title = fmt.Sprintf(storage.ConstMiscSSpecification, ontology)
+	}
+
+	desc := objects.GetString(specDef, objects.FieldKeyDescription)
+	if desc == "" {
+		desc = fmt.Sprintf("Object specification definition for %s.", ontology)
+	} else if len(strings.TrimSpace(desc)) < 10 {
+		desc = desc + " specification"
 	}
 
 	b := bldr_instance_v1.NewObjectSpecInstanceBuilder(sv)
 	b.ID(id)
 	b.Status(objectSpecEnum.StatusImplemented)
 	b.SetField(objects.FieldKeyTitle, title)
+	b.SetField(objects.FieldKeyDescription, desc)
 	b.Ontology(ontology)
-	b.FilePath(absPath)
+	b.FilePath(relPath)
 	b.SourceType(objectSpecEnum.SourceTypeInternal)
 	b.SetField(objects.FieldKeyNamespaceID, "zqk:kernel")
 	b.SetField(objects.FieldKeyOriginProject, "zqk")
@@ -290,6 +347,11 @@ func buildObjectSpecObjectFromBundledFile(absPath string, data []byte) (map[stri
 	if err != nil {
 		return nil, err
 	}
+
+	if err := ValidateObjectSpecInstance(obj); err != nil {
+		return nil, err
+	}
+
 	return obj, nil
 }
 

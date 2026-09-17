@@ -204,7 +204,7 @@ func IsObjectDraftPlanePath(projectRoot, path string) bool {
 // shouldUseObjectDraftPlane is true for CAS (non-stream) kinds in a preliminary lifecycle status.
 // When the lifecycle loader errors, do not force draft solely because status equals origin —
 // kinds whose origin is a terminal/active status (e.g. glossary_term origin=active) must use CAS.
-// TRACK: REQ-REDACTED (draft-plane create path); VDS glossary materialization.
+// TRACK: REQ-1785895564241296000-bf266adb (draft-plane create path); VDS glossary materialization.
 func shouldUseObjectDraftPlane(kind, status string) bool {
 	if kind == emptyValue || status == emptyValue {
 		return false

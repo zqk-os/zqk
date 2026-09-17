@@ -1,0 +1,22 @@
+category: architecture
+content_hash: 02f7151b70dcea59d7c7a7a11e379a9377405b3aaa01ab8b83d4b16f69a2d6fa
+content_searchable: true
+content_size: 11981
+created_at: "2026-09-17T08:44:21Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-359
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/cascade-delete-requirements-v1.0.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: Cascade delete is the process of handling dependent objects when an object is deleted
+title: Cascade Delete Requirements
+updated_at: "2026-09-17T08:44:21Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

@@ -1,0 +1,21 @@
+content_hash: d675a4c43554b175f787a6efab731c389c9a2e911a88cce167f1ddf45521e919
+content_searchable: true
+content_size: 727
+created_at: "2026-09-17T08:44:57Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: onboarding
+id: DOC-641
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/onboarding/PACKAGE_CHECKLIST.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: 'Before finalizing any community or binary package of the ZQK Kernel, ensure the following fail-closed mechanisms are intact and verified: - [ ] Referential Integrity: The packaging scripts and Git ...'
+title: Package Checklist
+updated_at: "2026-09-17T08:44:57Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

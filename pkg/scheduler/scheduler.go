@@ -654,7 +654,7 @@ func (s *Scheduler) Start(ctx context.Context) error {
 	}
 
 	// Contract-change shockwave: demote shovel_ready|execution_locked that fail new invariants.
-	// TRACK: BLI-REDACTED
+	// TRACK: BLI-1785918841712163000-f128dc79
 	if s.projectRoot != emptyValue && s.storage != nil {
 		if res, err := contractchange.ApplyPending(ctx, s.projectRoot, s.storage); err != nil {
 			slog.Warn("contract-change apply failed on scheduler start", "error", err)

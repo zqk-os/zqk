@@ -21,7 +21,7 @@ const (
 )
 
 // ObjectIDCachePendingEntry records a CAS mutation that still needs object-id-cache true-up.
-// TRACK: BLI-REDACTED — remove when: CRIT pending+drain verified + claim fixture exits 0.
+// TRACK: BLI-1785895580100186000-c5539372 — remove when: CRIT pending+drain verified + claim fixture exits 0.
 type ObjectIDCachePendingEntry struct {
 	ID       string                 `json:"id"`
 	Kind     string                 `json:"kind,omitempty"`
@@ -172,7 +172,7 @@ func NoteObjectIDCachePending(projectRoot, op, id, kind, filePath, reason string
 	}
 	// Burst pending ⇒ next system check must refresh object-id-cache and
 	// invalidate those pending validation IDs (not wipe the whole validation cache).
-	// TRACK: BLI-REDACTED
+	// TRACK: BLI-1785895580100186000-c5539372
 	if pendingN >= SignificantCacheChangePendingThreshold {
 		NoteSignificantCacheChangeDetail(projectRoot, SignificantChangeReasonPendingBurst, pendingN, 0)
 	}

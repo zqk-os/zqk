@@ -12,7 +12,7 @@ import (
 
 // Dedicated adapter failure trail. Profile Fluent logs often never land on disk when
 // IDE owns stdio; this file is always inspectable next to mcp-trace.log.
-// TRACK: BLI-REDACTED — remove when: per-connection Server + shared MCP diag sink.
+// TRACK: BLI-1784969955962654000-dc689643 — remove when: per-connection Server + shared MCP diag sink.
 const ideAdapterDiagFile = "ide-adapter.log"
 
 var (

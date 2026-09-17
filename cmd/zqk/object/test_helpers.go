@@ -231,7 +231,7 @@ func SetupTestEnvironment(t *testing.T) *TestEnvironment {
 
 	// Always build/copy CLI from projectRoot. Scheduler-injected ZQK_TEST_CLI_BINARY can point at a
 	// daemon binary that predates the Local CI workdir checkout (e.g. template --output - semantics).
-	// TRACK: BLI-REDACTED — draft-plane / Local CI binary-SHA parity.
+	// TRACK: BLI-1785443942668406000-1ec5c811 — draft-plane / Local CI binary-SHA parity.
 	sharedBin := getSharedCLIBinary(t, projectRoot)
 	cliBinary := filepath.Join(tmpDir, "zqk-admin")
 	data, err := fileutil.ReadFile(sharedBin)
@@ -296,7 +296,7 @@ func (te *TestEnvironment) CreateCLICommand(args ...string) *exec.Cmd {
 	//
 	// Tests spell this as the single wireExecForTest call; this file is a non-test file and cannot
 	// reference it, so the two-line form stays here.
-	// TRACK: BLI-REDACTED — identity isolation belongs in zqkenv, but that
+	// TRACK: BLI-1787558884394841000-7dbc6d50 — identity isolation belongs in zqkenv, but that
 	// function is also on production spawn paths, so widening it needs its own pass.
 	zqkenv.WireExecForIsolatedProject(cmd, te.TestRoot)
 	cmd.Env = EnvWithTestRoot(te.TestRoot)

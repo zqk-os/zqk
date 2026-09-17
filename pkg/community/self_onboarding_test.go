@@ -1,13 +1,12 @@
 package community
 
 import (
-	"os"
-	"os/exec"
 	"path/filepath"
 	"strings"
 	"testing"
 
 	"github.com/lanceman/zqk/pkg/agentonboard"
+	"github.com/lanceman/zqk/pkg/execwrap"
 	"github.com/lanceman/zqk/pkg/logging"
 	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
 )
@@ -102,7 +101,7 @@ func TestCommunitySelfOnboarding_IntegrationAndConformance(t *testing.T) {
 
 	// 2. Verify candidate README references COMMUNITY_FIRST_RUN.md
 	readmePath := filepath.Join(candidateDir, "README.md")
-	readmeContent, err := os.ReadFile(readmePath)
+	readmeContent, err := fileutil.ReadFile(readmePath)
 	if err != nil {
 		t.Fatalf("failed to read candidate README.md: %v", err)
 	}
@@ -117,7 +116,7 @@ func TestCommunitySelfOnboarding_IntegrationAndConformance(t *testing.T) {
 	// 4. Verify candidate CLI help works if candidate binary is present
 	binPath := filepath.Join(candidateDir, "bin", "zqk-community")
 	if fileutil.Exists(binPath) {
-		cmd := exec.Command(binPath, "--help")
+		cmd := execwrap.Command(binPath, "--help")
 		out, errCmd := cmd.CombinedOutput()
 		if errCmd != nil {
 			t.Errorf("candidate binary failed --help: %v, output: %s", errCmd, string(out))

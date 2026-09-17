@@ -11,7 +11,7 @@ import (
 // Core kernel kinds must not be hard-deleted without an explicit allow context.
 // Archive → aggregate/compress with lineage is the durable path; raw Delete erases auditability.
 // Incident: 2026-08-03 worktree lost 49 workstreams + criteria/questions with no archive lineage.
-// TRACK: BLI-REDACTED — core hard-delete guard + archive-aggregate path.
+// TRACK: BLI-1785723654802038000-b14064bc — core hard-delete guard + archive-aggregate path.
 // IsCoreKernelKind reports whether kind is a core process object that must not be
 // silently erased (hard-delete, state-restore prune, etc.).
 // Delegates to kernelcas.IsCriticalKind (Kernel Mutation Pipeline DECIDE policy).
@@ -26,7 +26,7 @@ func isCoreKernelKind(kind string) bool {
 // WithTestHardDelete marks ctx as a CLI operation with explicit core hard-delete allow.
 // Use in unit tests that assert Delete/cascade semantics for kernel-critical kinds.
 // Production: CLI --reason-code → AllowCoreObjectDelete, or elevated delete:*/delete:core.
-// TRACK: BLI-REDACTED — core hard-delete guard + archive-aggregate path.
+// TRACK: BLI-1785723654802038000-b14064bc — core hard-delete guard + archive-aggregate path.
 func WithTestHardDelete(ctx context.Context) context.Context {
 	return pkgctx.WithAllowCoreObjectDelete(WithCLIOperation(ctx))
 }
@@ -49,7 +49,7 @@ func WithTestHardDelete(ctx context.Context) context.Context {
 // Do not bypass on ZQK_TEST_ROOT alone: Local CI and scheduler bundlers set TestRoot on an
 // already-initialized tree, which previously made these unit tests and CI falsely green.
 // Isolated tests that need hard-delete must use WithTestHardDelete or pkgctx.WithAllowCoreObjectDelete.
-// TRACK: BLI-REDACTED — core hard-delete guard + archive-aggregate path.
+// TRACK: BLI-1785723654802038000-b14064bc — core hard-delete guard + archive-aggregate path.
 func denyCoreKernelHardDelete(ctx context.Context, secCtx *pkgctx.SecurityContext, kind, id string) error {
 	if !isCoreKernelKind(kind) {
 		return nil

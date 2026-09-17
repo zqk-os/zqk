@@ -98,7 +98,7 @@ func GCOrphanedStreamSegmentsForKind(projectRoot, kind string) GCStreamSegmentRe
 
 		// Protect today's unified file and live-PID shards (writers still append).
 		// Dead-PID shards from today are eligible once unreferenced (merge relocates them).
-		// TRACK: BLI-REDACTED
+		// TRACK: BLI-1785905541906569000-074e24d7
 		if strings.HasPrefix(name, todayBase) {
 			if _, ok := streamSegmentWriterPID(name); !ok {
 				continue

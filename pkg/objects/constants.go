@@ -153,6 +153,11 @@ const (
 	ConstPersonaDefaultAgent      = "PER-DEFAULT-AGENT"
 	ConstPersonaDefaultOperator   = "PER-DEFAULT-OPERATOR"
 
+	DefaultSystemAccountID = "ACC-1785920548450214012-68b850c0"
+
+	JobIDCapOrchestrator = "SCH-cap-orchestrator"
+	JobIDCapNightDuty    = "SCH-cap-night-duty"
+
 	KindBaseObject             = kindnames.BaseObject
 	KindAuditable              = kindnames.Auditable
 	KindWorkInterval           = kindnames.WorkInterval
@@ -321,4 +326,3 @@ const ObjectStatusSkipped = "skip"
 const ObjectStatusDegraded = "degraded"
 const ObjectStatusFail = "fail"
 const ObjectStatusSkip = "skip"
-

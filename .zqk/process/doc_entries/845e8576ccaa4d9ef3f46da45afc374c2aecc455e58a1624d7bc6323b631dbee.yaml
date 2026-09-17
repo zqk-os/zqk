@@ -1,0 +1,22 @@
+category: cli
+content_hash: 1dd34a68309b2d8d342333076586351fc640874fec41cf4f50a9bccfb4cc88db
+content_searchable: true
+content_size: 2953
+created_at: "2026-09-17T08:39:34Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-063
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/CLI_OBJECT_MUTATION_LATENCY.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: 'object delete is classified as schedulerRequirementNone in cmd/zqk/object/scheduler_guard.go: the scheduler daemon is not required for delete to proceed'
+title: CLI object create / update / delete — why the command can pause (bounded)
+updated_at: "2026-09-17T08:39:34Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

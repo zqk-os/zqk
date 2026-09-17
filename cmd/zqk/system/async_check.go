@@ -1028,7 +1028,7 @@ func discoverFromCache(ctx stdcontext.Context, projectRoot, operationID string, 
 					// Object-id-cache often lags CAS hash renames (path still names the
 					// deleted blob). Re-resolve via listing index before enqueueing so
 					// validators do not emit false "stale index entry" Tier-1 blockers.
-					// TRACK: BLI-REDACTED
+					// TRACK: BLI-1785723654802038000-b14064bc
 					if caspkg.CachePathNeedsCASResolve(path) {
 						if live, ok := caspkg.ResolveLiveCASFilePath(projectRoot, kind, e.ID); ok {
 							path = live

@@ -1,0 +1,22 @@
+category: architecture
+content_hash: cb5bbdea1f1f58b01c5de723f97e09c35b99e06c667ee895c22e6d65449effa8
+content_searchable: true
+content_size: 8577
+created_at: "2026-09-17T08:42:12Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-120
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/GENERATE_BUILDERS_SAMPLE_ANALYSIS.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: '| Metric | Value | |--------|--------| | Physical footprint | 14.4 GB | | Samples | 2229 (1 ms sampling) | | Main thread | ~100% in _pthread_cond_wait (blocked) | | Other thread | 2219/2229 samples...'
+title: generate-builders Process Sample Analysis (PID 7937)
+updated_at: "2026-09-17T08:42:12Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

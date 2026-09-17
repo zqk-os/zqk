@@ -1,0 +1,22 @@
+category: architecture
+content_hash: 8b69eb7b73971f5bcf426064b1961095991047e87a38fa748ff4012e86b75d64
+content_searchable: true
+content_size: 2973
+created_at: "2026-09-17T08:44:32Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-451
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/lifecycle_shockwave/family_default_shovel.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: 'Thin machines whose active is shovel_ready and which are not Gantt columns, lanes, membranes, or sessions: identity registries, north-star statements, tooling specs, workflow contracts, and similar.'
+title: 'Family: default_shovel'
+updated_at: "2026-09-17T08:44:32Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

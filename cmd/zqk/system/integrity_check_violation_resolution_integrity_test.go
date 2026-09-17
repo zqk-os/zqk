@@ -165,7 +165,7 @@ func TestViolationResolution_Integrity_HashMismatch(t *testing.T) {
 	}
 
 	// Create + promote off draft plane (CAS-visible) so hash registry / --force CAS fix share one plane.
-	// TRACK: BLI-REDACTED — draft-plane create / promote membrane.
+	// TRACK: BLI-1785443942668406000-1ec5c811 — draft-plane create / promote membrane.
 	obj := map[string]any{
 		objects.FieldKeyID:            "BLI-309",
 		objects.FieldKeyKind:          "backlog_item",

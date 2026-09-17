@@ -1,0 +1,22 @@
+category: architecture
+content_hash: 6f8b1ef8876754f780d85c8edf13078fdb1f495abcc6c918deac109b39cd9293
+content_searchable: true
+content_size: 4044
+created_at: "2026-09-17T08:39:28Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-007
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/AGENT_ORCHESTRATION_AUDIBLE.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: '| Metaphor | Product anchor | |----------|----------------| | Circulatory system — blood carries signal and nutrients | Streams (append-only JSONL, health, audit) and summaries — see DATA_STREA...'
+title: Agent orchestration — priority audible (2026)
+updated_at: "2026-09-17T08:39:28Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

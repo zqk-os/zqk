@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"github.com/lanceman/zqk/cmd/zqk/docman"
+	"github.com/lanceman/zqk/cmd/zqk/grep"
 
 	"github.com/lanceman/zqk/cmd/zqk/healthchk"
 	"github.com/lanceman/zqk/cmd/zqk/inbox"
@@ -21,7 +22,6 @@ import (
 	"github.com/lanceman/zqk/cmd/zqk/mcp"
 	newcmd "github.com/lanceman/zqk/cmd/zqk/new"
 	"github.com/lanceman/zqk/cmd/zqk/object"
-	_ "github.com/lanceman/zqk/pkg/mcp"
 	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
 	"github.com/lanceman/zqk/pkg/zqkenv"
 
@@ -53,7 +53,6 @@ import (
 	"github.com/lanceman/zqk/pkg/paths"
 	"github.com/lanceman/zqk/pkg/policyinterrupt"
 	schedulerpkg "github.com/lanceman/zqk/pkg/scheduler"
-	_ "github.com/lanceman/zqk/pkg/specbuilder/bldr_v2"
 	"github.com/lanceman/zqk/pkg/specbuilder/builders"
 	"github.com/lanceman/zqk/pkg/storage"
 	"github.com/lanceman/zqk/pkg/when"
@@ -1293,11 +1292,7 @@ func registerCommands() {
 	rootCmd.AddGroup(&cobra.Group{ID: "advanced", Title: "Advanced Knowledge Kernel:"})
 	rootCmd.AddGroup(&cobra.Group{ID: "admin", Title: "Administration:"})
 
-	// Ensure field registry is loaded before adding object command so dynamic kind commands
-	// are available (e.g. when ZQK_TEST_ROOT was set by test before NewRootCommand()).
-	if reg := objects.GetGlobalFieldRegistry(); reg != nil {
-		_ = reg.LoadFields()
-	}
+	// TRACK: TDE-1789637124469147000-98c2f37f — do not LoadFields before every command.
 	// Object operations group (CRUD, query, and management)
 	objCmd := object.NewObjectCmd()
 	object.RegisterDynamicKindCommands(objCmd)
@@ -1308,6 +1303,11 @@ func registerCommands() {
 	systemCmdInst := system.NewSystemCmd()
 	systemCmdInst.GroupID = "everyday"
 	rootCmd.AddCommand(systemCmdInst)
+
+	// In-process code search engine (grep / zgrep)
+	grepCmdInst := grep.NewGrepCmd()
+	grepCmdInst.GroupID = "everyday"
+	rootCmd.AddCommand(grepCmdInst)
 
 	// Health check registry (list, enable/disable, run monitors)
 	healthchkCmdInst := healthchk.NewHealthchkCmd()

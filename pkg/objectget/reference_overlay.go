@@ -6,7 +6,7 @@ package objectget
 type ReferenceResolverOverlayConfig struct {
 	// Disabled skips the overlay entirely (raw CAS / spec fields only).
 	// Default object get uses Disabled so get output matches hashed bytes.
-	// TRACK: BLI-REDACTED — remove when: resolved sidecar replaces inline hydrate.
+	// TRACK: BLI-1785909672838827000-9fca84f5 — remove when: resolved sidecar replaces inline hydrate.
 	Disabled bool
 
 	// ResolveFieldKeys restricts which reference fields (e.g. criteria_refs, goal_refs)

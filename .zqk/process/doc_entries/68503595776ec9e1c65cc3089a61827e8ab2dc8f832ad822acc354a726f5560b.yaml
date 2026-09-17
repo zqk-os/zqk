@@ -1,0 +1,22 @@
+category: architecture
+content_hash: 6a6c2f3f2bc14a6b4ad1e4db2d4243760b3872cc00609a6b0a3864bf5bb1559e
+content_searchable: true
+content_size: 2425
+created_at: "2026-09-17T08:44:19Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-337
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/ZQK_SESSION_STREAM_BEHAVIOR.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: The zqk_session kind is stream-backed (see pkg/storage/stream_config.go)
+title: zqk_session Stream Behavior
+updated_at: "2026-09-17T08:44:19Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

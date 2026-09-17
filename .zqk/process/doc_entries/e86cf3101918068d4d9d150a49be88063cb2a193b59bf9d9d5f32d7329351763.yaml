@@ -1,0 +1,22 @@
+category: architecture
+content_hash: ba315ec6ed566025258ded89543e9da5076c26594dbb8ed0e2396686e2d88ca9
+content_searchable: true
+content_size: 5291
+created_at: "2026-09-17T08:39:29Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-016
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/ARCHITECTURE_DECISION_RECORDS.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: Architecture Decision Records (ADRs) document important architectural decisions and their rationale
+title: Architecture Decision Records (ADRs)
+updated_at: "2026-09-17T08:39:29Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

@@ -25,15 +25,11 @@ func ReadJSONFile(path string, out any) error {
 	return nil
 }
 
-// WriteJSONFileAtomic writes JSON to path using a temp file then rename.
+// WriteJSONFileAtomic writes JSON to path using a durable temp file with synchronous fsync before rename.
 func WriteJSONFileAtomic(path string, v any, perm fileutil.FileMode) error {
 	b, err := json.MarshalIndent(v, "", "  ")
 	if err != nil {
 		return err
 	}
-	tmp := path + ".tmp"
-	if err := fileutil.WriteFile(tmp, b, perm); err != nil {
-		return err
-	}
-	return fileutil.Rename(tmp, path)
+	return fileutil.WriteDurableFile(path, b, perm)
 }

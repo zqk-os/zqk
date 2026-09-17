@@ -1,0 +1,22 @@
+category: cli
+content_hash: 3aaac7e425ac6d103d9ee81109d7ab4ecba05e08995f35d4fc3638a9e16992e0
+content_searchable: true
+content_size: 5761
+created_at: "2026-09-17T08:44:47Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-579
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/system/CLI_OPERATION_NOTIFIER.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: 'Provide a standard, reusable pattern for surfacing long‑running CLI operations (like system check) to humans and agents: - Single operation spine via the coordination system (pkg/coordination).'
+title: CLI OPERATION NOTIFIER
+updated_at: "2026-09-17T08:44:47Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

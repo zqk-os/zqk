@@ -418,7 +418,7 @@ func TestEvaluateSystemCheckPristine(t *testing.T) {
 	}
 
 	// Case 6: summary-time cache miss is cache_coherence, not Layer 0 CAS.
-	// TRACK: BLI-REDACTED
+	// TRACK: BLI-1786387465409533000-45bd780c
 	cacheMissResults := []CheckResult{
 		{
 			ObjectID:   "CVS-001",

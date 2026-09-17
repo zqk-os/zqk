@@ -1,11 +1,13 @@
 package validation
 
 import (
+	"os"
 	"strings"
 )
 
 // evalPrecondDecideTable is the DECIDE first-match walk. Unrecognized strings
-// fail-open (handled=false, met=true). Overlay DSL remains the fail-closed path.
+// fail closed (handled=false, met=false) unless ZQK_PRECONDITIONS_FAIL_OPEN=1
+// is explicitly set for backwards compatibility. Overlay DSL provides the fail-closed path.
 func (gv *GoValidator) evalPrecondDecideTable(normalized string, obj map[string]any, options *ValidationOptions) (ruleName string, handled, met bool) {
 	for _, rule := range precondDecideRules {
 		matched, ruleMet := rule.eval(gv, normalized, obj, options)
@@ -13,12 +15,21 @@ func (gv *GoValidator) evalPrecondDecideTable(normalized string, obj map[string]
 			return rule.name, true, ruleMet
 		}
 	}
-	return "", false, true
+	if os.Getenv("ZQK_PRECONDITIONS_FAIL_OPEN") == "1" {
+		return "", false, true
+	}
+	return "", false, false
 }
 
 // dispatchPrecondition runs validation.lifecycle_precondition rules sequentially.
 func (gv *GoValidator) dispatchPrecondition(precondition string, obj map[string]any, options *ValidationOptions, recognized *bool) bool {
 	normalized := strings.ToLower(strings.TrimSpace(precondition))
+	if normalized == "" {
+		if recognized != nil {
+			*recognized = true
+		}
+		return true
+	}
 	_, handled, met := gv.evalPrecondDecideTable(normalized, obj, options)
 	if recognized != nil {
 		*recognized = handled

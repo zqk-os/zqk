@@ -9,6 +9,7 @@ import (
 	"io"
 	"net"
 	"net/http"
+	"net/url"
 	"os"
 	"strconv"
 	"strings"
@@ -101,22 +102,37 @@ func DefaultConfig(ctx context.Context) *Config {
 		if baseURL == "" {
 			if v := zqkenv.Get("LLM_BASE_URL").OrDefault(""); v != "" {
 				baseURL = v
+			} else if v := zqkenv.Get("OPENAI_BASE_URL").OrDefault(""); v != "" {
+				baseURL = v
 			} else if v := zqkenv.LLMBaseURL().Get(); v != "" {
 				baseURL = v
-			} else if !isTestingRuntime() && isLocalOllamaRunning() && secCtx.GetLLMAPIKey(provider) == "" {
-				baseURL = "http://127.0.0.1:11434/v1"
+			} else if shouldDetectLocalOllama() && isLocalOllamaRunning() && secCtx.GetLLMAPIKey(provider) == "" {
+				if host := zqkenv.Get("OLLAMA_HOST").OrDefault(""); host != "" {
+					baseURL = normalizeOllamaURL(host)
+				} else {
+					baseURL = "http://127.0.0.1:11434/v1"
+				}
 			} else {
 				baseURL = "https://api.openai.com/v1"
 			}
 		}
 	}
+	if isOllamaEndpoint(baseURL) && !strings.HasSuffix(baseURL, "/v1") && !strings.Contains(baseURL, "/v1") {
+		baseURL = strings.TrimRight(baseURL, "/") + "/v1"
+	}
 	chatModel := config.LLMChatModel().OrDefault("")
 	if chatModel == "" {
 		if v := zqkenv.Get("LLM_CHAT_MODEL").OrDefault(""); v != "" {
 			chatModel = v
-		} else if v := zqkenv.LLMChatModel().Get(); v != "" {
+		} else if v := zqkenv.Get("LLM_MODEL").OrDefault(""); v != "" {
 			chatModel = v
-		} else if strings.Contains(baseURL, "11434") {
+		} else if v := zqkenv.Get("OPENAI_MODEL").OrDefault(""); v != "" {
+			chatModel = v
+		} else if v := zqkenv.Get("OLLAMA_MODEL").OrDefault(""); v != "" {
+			chatModel = v
+		} else if zqkenv.LLMChatModel().Get() != "" {
+			chatModel = zqkenv.LLMChatModel().Get()
+		} else if isOllamaEndpoint(baseURL) {
 			chatModel = "qwen3.8:latest"
 		} else {
 			chatModel = "gpt-4o-mini"
@@ -128,9 +144,11 @@ func DefaultConfig(ctx context.Context) *Config {
 			embedModel = v
 		} else if v := zqkenv.Get("LLM_EMBED_MODEL").OrDefault(""); v != "" {
 			embedModel = v
+		} else if v := zqkenv.Get("OLLAMA_EMBED_MODEL").OrDefault(""); v != "" {
+			embedModel = v
 		} else if v := zqkenv.LLMEmbedModel().Get(); v != "" {
 			embedModel = v
-		} else if strings.Contains(baseURL, "11434") {
+		} else if isOllamaEndpoint(baseURL) {
 			embedModel = "nomic-embed-text"
 		} else {
 			embedModel = "text-embedding-3-small"
@@ -139,7 +157,7 @@ func DefaultConfig(ctx context.Context) *Config {
 	contextWindowSize := config.LLMContextWindowSize().OrDefault(32768)
 
 	defaultTimeout := 300
-	if strings.Contains(baseURL, "11434") {
+	if isOllamaEndpoint(baseURL) {
 		defaultTimeout = 900
 	}
 	timeoutSec := zqkenv.Get("LLM_TIMEOUT").IntOrDefault(defaultTimeout)
@@ -148,12 +166,24 @@ func DefaultConfig(ctx context.Context) *Config {
 	secondaryBaseURL := zqkenv.Get("LLM_SECONDARY_BASE_URL").OrDefault("")
 	secondaryAPIKey := zqkenv.Get("LLM_SECONDARY_API_KEY").OrDefault("")
 	secondaryChatModel := zqkenv.Get("LLM_SECONDARY_CHAT_MODEL").OrDefault("")
-	// TRACK: BLI-REDACTED — timeout / secondary / mock fallback via env.
+	// TRACK: BLI-1783631888120135000-843bc301 — timeout / secondary / mock fallback via env.
+
+	apiKey := ""
+	if secCtx != nil {
+		apiKey = secCtx.GetLLMAPIKey(provider)
+	}
+	if apiKey == "" {
+		if v := zqkenv.Get("LLM_API_KEY").OrDefault(""); v != "" {
+			apiKey = v
+		} else if v := zqkenv.Get("OPENAI_API_KEY").OrDefault(""); v != "" {
+			apiKey = v
+		}
+	}
 
 	return &Config{
 		Provider:           provider,
 		BaseURL:            baseURL,
-		APIKey:             secCtx.GetLLMAPIKey(provider),
+		APIKey:             apiKey,
 		ChatModel:          chatModel,
 		EmbedModel:         embedModel,
 		ContextWindowSize:  contextWindowSize,
@@ -177,9 +207,23 @@ func ensureConfigDefaults(ctx context.Context, config *Config) {
 		if config.Provider == "" {
 			config.Provider = def.Provider
 		}
+		if config.APIKey == "" {
+			config.APIKey = def.APIKey
+		}
+	}
+	if isOllamaEndpoint(config.BaseURL) && !strings.HasSuffix(config.BaseURL, "/v1") && !strings.Contains(config.BaseURL, "/v1") {
+		config.BaseURL = strings.TrimRight(config.BaseURL, "/") + "/v1"
 	}
 	if config.ChatModel == "" {
-		if strings.Contains(config.BaseURL, "11434") {
+		if v := zqkenv.Get("LLM_CHAT_MODEL").OrDefault(""); v != "" {
+			config.ChatModel = v
+		} else if v := zqkenv.Get("LLM_MODEL").OrDefault(""); v != "" {
+			config.ChatModel = v
+		} else if v := zqkenv.Get("OPENAI_MODEL").OrDefault(""); v != "" {
+			config.ChatModel = v
+		} else if v := zqkenv.Get("OLLAMA_MODEL").OrDefault(""); v != "" {
+			config.ChatModel = v
+		} else if isOllamaEndpoint(config.BaseURL) {
 			config.ChatModel = "qwen3.8:latest"
 		} else {
 			config.ChatModel = "gpt-4o-mini"
@@ -190,9 +234,11 @@ func ensureConfigDefaults(ctx context.Context, config *Config) {
 			config.EmbedModel = v
 		} else if v := zqkenv.Get("LLM_EMBED_MODEL").OrDefault(""); v != "" {
 			config.EmbedModel = v
+		} else if v := zqkenv.Get("OLLAMA_EMBED_MODEL").OrDefault(""); v != "" {
+			config.EmbedModel = v
 		} else if v := zqkenv.LLMEmbedModel().Get(); v != "" {
 			config.EmbedModel = v
-		} else if strings.Contains(config.BaseURL, "11434") {
+		} else if isOllamaEndpoint(config.BaseURL) {
 			config.EmbedModel = "nomic-embed-text"
 		} else {
 			config.EmbedModel = "text-embedding-3-small"
@@ -935,11 +981,104 @@ func isTestingRuntime() bool {
 	return zqkenv.InTest().Get() == "true" || strings.HasSuffix(os.Args[0], ".test")
 }
 
-func isLocalOllamaRunning() bool {
-	conn, err := net.DialTimeout("tcp", "127.0.0.1:11434", 50*time.Millisecond)
-	if err != nil {
+func isLocalOllamaDisabled() bool {
+	if v := zqkenv.Get("LLM_DISABLE_LOCAL_OLLAMA").OrDefault(""); v == "true" || v == "1" {
+		return true
+	}
+	if v := zqkenv.Get("ZQK_DISABLE_LOCAL_OLLAMA").OrDefault(""); v == "true" || v == "1" {
+		return true
+	}
+	return false
+}
+
+func isOllamaEndpoint(urlStr string) bool {
+	if urlStr == "" {
 		return false
 	}
-	_ = conn.Close()
-	return true
+	if strings.Contains(urlStr, "11434") {
+		return true
+	}
+	if host := zqkenv.Get("OLLAMA_HOST").OrDefault(""); host != "" {
+		cleanHost := host
+		if strings.Contains(cleanHost, "://") {
+			if u, err := url.Parse(cleanHost); err == nil && u.Host != "" {
+				cleanHost = u.Host
+			}
+		}
+		if strings.Contains(urlStr, cleanHost) {
+			return true
+		}
+	}
+	return false
+}
+
+func shouldDetectLocalOllama() bool {
+	if isLocalOllamaDisabled() {
+		return false
+	}
+	if v := zqkenv.Get("LLM_ENABLE_LOCAL_OLLAMA").OrDefault(""); v == "true" || v == "1" {
+		return true
+	}
+	if v := zqkenv.Get("ZQK_FORCE_LOCAL_OLLAMA").OrDefault(""); v == "true" || v == "1" {
+		return true
+	}
+	if v := zqkenv.Get("FORCE_LOCAL_OLLAMA").OrDefault(""); v == "true" || v == "1" {
+		return true
+	}
+	return !isTestingRuntime()
+}
+
+func normalizeOllamaURL(host string) string {
+	host = strings.TrimSpace(host)
+	if host == "" {
+		return "http://127.0.0.1:11434/v1"
+	}
+	if !strings.HasPrefix(host, "http://") && !strings.HasPrefix(host, "https://") {
+		host = "http://" + host
+	}
+	host = strings.TrimRight(host, "/")
+	if !strings.HasSuffix(host, "/v1") {
+		host = host + "/v1"
+	}
+	return host
+}
+
+func dialTargetFromHost(host string) string {
+	host = strings.TrimSpace(host)
+	if host == "" {
+		return ""
+	}
+	if strings.Contains(host, "://") {
+		if u, err := url.Parse(host); err == nil && u.Host != "" {
+			host = u.Host
+		}
+	}
+	if !strings.Contains(host, ":") {
+		host = net.JoinHostPort(host, "11434")
+	}
+	return host
+}
+
+func isLocalOllamaRunning() bool {
+	var targets []string
+	if host := zqkenv.Get("OLLAMA_HOST").OrDefault(""); host != "" {
+		if t := dialTargetFromHost(host); t != "" {
+			targets = append(targets, t)
+		}
+	}
+	targets = append(targets, "127.0.0.1:11434", "localhost:11434", "[::1]:11434")
+
+	seen := make(map[string]bool)
+	for _, target := range targets {
+		if target == "" || seen[target] {
+			continue
+		}
+		seen[target] = true
+		conn, err := net.DialTimeout("tcp", target, 50*time.Millisecond)
+		if err == nil {
+			_ = conn.Close()
+			return true
+		}
+	}
+	return false
 }

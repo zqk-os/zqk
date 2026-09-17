@@ -89,7 +89,7 @@ func runInternalDelete(cmd *cobra.Command, args []string) error {
 	if unlinkRefs && cascade {
 		return errfmt.Errorf("--unlink-references cannot be combined with --cascade")
 	}
-	// TRACK: BLI-REDACTED — fail-closed delete (parity with cmd/zqk/object).
+	// TRACK: BLI-1786390312940998000-1f101465 — fail-closed delete (parity with cmd/zqk/object).
 	if !unlinkRefs && !cascade {
 		return errfmt.Errorf("delete refused: pass --unlink-references or --cascade; refusing to leave GhostRefs")
 	}

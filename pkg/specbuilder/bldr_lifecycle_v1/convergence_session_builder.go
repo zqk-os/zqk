@@ -96,7 +96,7 @@ func (b *ConvergenceSessionLifecycleBuilder) addConvergenceSessionLifecycleData(
 	b.AddStatus(objects.Status{
 		Value:       "escalated",
 		Display:     "Escalated",
-		Description: "Option A (park-but-CAP-bound): recoverable handoff/parking hold. CAP may\\nstill bind; measure/tick must not persist session measurements; whats-next\\ndoes not auto-select for measure. Resume→active, or complete/abandon.\\nNOT lifecycle-terminal. See DEC-REDACTED /\\nBLI-REDACTED.\\n",
+		Description: "Option A (park-but-CAP-bound): recoverable handoff/parking hold. CAP may\\nstill bind; measure/tick must not persist session measurements; whats-next\\ndoes not auto-select for measure. Resume→active, or complete/abandon.\\nNOT lifecycle-terminal. See DEC-1786686986572580000-54124993 /\\nBLI-1786686768606200000-31133cc3.\\n",
 	})
 	b.AddStatus(objects.Status{
 		Value:       "error",

@@ -327,6 +327,22 @@ func TestPriorityDispatchJob_TimerMaintenance(t *testing.T) {
 	if !priorityDispatchJob(&ScheduledJob{TriggerType: "timer", Category: CategoryDataCellEnvelope, JobType: JobTypeDataCellEnvelopeTick}) {
 		t.Error("data_cell_envelope_tick + data_cell_envelope category should use priority dispatch via critical job types")
 	}
+	// Immediate manual/user one-shots and callback-bearing jobs use priority dispatch. TRACK: TDE-1789630460110488000-1f2e7aa3
+	if !priorityDispatchJob(&ScheduledJob{TriggerType: "immediate", Category: CategoryManual, JobType: "run_wrapper"}) {
+		t.Error("immediate + CategoryManual should use priority dispatch")
+	}
+	if !priorityDispatchJob(&ScheduledJob{TriggerType: "immediate", Category: CategoryUser, JobType: "run_wrapper"}) {
+		t.Error("immediate + CategoryUser should use priority dispatch")
+	}
+	if !priorityDispatchJob(&ScheduledJob{TriggerType: "immediate", Category: "custom", JobType: "run_wrapper", CallbackOnError: "echo err"}) {
+		t.Error("immediate + CallbackOnError should use priority dispatch")
+	}
+	if !priorityDispatchJob(&ScheduledJob{TriggerType: "immediate", Category: "custom", JobType: "run_wrapper", CallbackOnCompletion: "echo done"}) {
+		t.Error("immediate + CallbackOnCompletion should use priority dispatch")
+	}
+	if priorityDispatchJob(&ScheduledJob{TriggerType: "immediate", Category: CategoryTesting, JobType: "run_wrapper", ID: "SCH-run-bundle-test"}) {
+		t.Error("test bundle immediate job must not use priority dispatch without explicit priority")
+	}
 }
 
 func TestScheduler_EmitTriggerQueueEvent(t *testing.T) {
@@ -1121,7 +1137,7 @@ func TestScheduler_TriggerJobByLifecycle_MilestoneAutoComplete(t *testing.T) {
 	sched.SetSecurityContext(secCtx)
 	ctx := pkgctx.NewSystemContext()
 
-	// TRACK: BLI-REDACTED — draft-plane create / promote membrane.
+	// TRACK: BLI-1785443942668406000-1ec5c811 — draft-plane create / promote membrane.
 	milestoneID := "MIL-test-milestone"
 	milestoneData := map[string]any{
 		objects.FieldKeyID:              milestoneID,
@@ -1285,4 +1301,5 @@ func TestScheduleJob_ArchivedJobSkipped(t *testing.T) {
 		t.Fatalf("expected archived job to be skipped (scheduledJob=nil), got: %+v", scheduledJob)
 	}
 }
+
 // tdd refresh

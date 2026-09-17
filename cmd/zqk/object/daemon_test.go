@@ -30,7 +30,7 @@ func TestNewDaemonCmd(t *testing.T) {
 	}
 }
 
-// TestDaemon_AccumulatorSupervision verifies CRIT-REDACTED:
+// TestDaemon_AccumulatorSupervision verifies CRIT-1789599243366372000-5d3fefd1:
 // object daemon integrates and supervises registered accumulator WAL subscribers.
 func TestDaemon_AccumulatorSupervision(t *testing.T) {
 	tempDir := t.TempDir()

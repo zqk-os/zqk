@@ -1,0 +1,22 @@
+category: validation
+content_hash: 8baf275bb7f73ccb827703354628b2efa4b2fce3175b272de9e6e40ad6756573
+content_searchable: true
+content_size: 3479
+created_at: "2026-09-17T08:43:33Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-177
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/MCP_BUILT_IN_TOOLS_VALIDATION.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: 'Documentation: # MCP Built-In Tools Validation'
+title: MCP Built-In Tools Validation
+updated_at: "2026-09-17T08:43:33Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

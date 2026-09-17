@@ -241,7 +241,7 @@ func updateScenarioObject(ctx context.Context, sb *ScenarioBuilder, config *Scen
 		objects.FieldKeySnapshotHashes:  config.SnapshotHashes, // Object ID -> hash at snapshot time
 		objects.FieldKeyHashMappings:    config.HashMappings,   // Original hash -> new hash
 		objects.FieldKeyUpdatedAt:       "",
-		objects.FieldKeyUpdatedBy:       "ACC-1785920548450214012-68b850c0",
+		objects.FieldKeyUpdatedBy:       objects.DefaultSystemAccountID,
 	}
 	if err := sb.storage.Update(ctx, sb.secCtx, sb.scenarioID, updates); err != nil {
 		logging.FluentEvent(sb.logger).Warn("Failed to update scenario with source object IDs and hash mappings").

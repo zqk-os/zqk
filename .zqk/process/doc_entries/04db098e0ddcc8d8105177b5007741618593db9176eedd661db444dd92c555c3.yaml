@@ -1,0 +1,22 @@
+category: audit
+content_hash: c6c346df5bdeab9f22fc353a93c69dc2ca3a8a8aa3a42a6c74e6d6a783cf5293
+content_searchable: true
+content_size: 10704
+created_at: "2026-09-17T08:43:30Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-153
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/LIFECYCLE_ROLLBACK_SNAPSHOT_AND_AUDIT_CHAIN.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: 'Support rollback of lifecycle-driven state changes with: 1'
+title: 'Lifecycle Rollback: Status Snapshot and Audit-Chain Reconstruction'
+updated_at: "2026-09-17T08:43:30Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

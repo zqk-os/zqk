@@ -75,6 +75,12 @@ func runCount(cmd *cobra.Command, args []string) error {
 			return cli.Guard(cmd).Err(err).Return()
 		}
 
+		if singleKind != "" {
+			if err := clipkg.ValidateFilterFields(singleKind, filters); err != nil {
+				return cli.Guard(cmd).Err(err).Return()
+			}
+		}
+
 		includeZeroCount, _ := cmd.Flags().GetBool("include-zero-count") //nolint:errcheck
 
 		// If no kind specified or wildcard, count all discoverable kinds

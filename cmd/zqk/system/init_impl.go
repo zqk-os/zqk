@@ -20,6 +20,7 @@ import (
 	"github.com/lanceman/zqk/pkg/appledouble"
 	"github.com/lanceman/zqk/pkg/brand"
 	pkgctx "github.com/lanceman/zqk/pkg/context"
+	"github.com/lanceman/zqk/pkg/docman"
 	"github.com/lanceman/zqk/pkg/errfmt"
 	"github.com/lanceman/zqk/pkg/logging"
 	"github.com/lanceman/zqk/pkg/mcp"
@@ -75,7 +76,7 @@ func runInit(_ *cobra.Command, projectName, template string, force bool, snapsho
 	// Auto-detect legacy mode for existing codebases (Painless Drop-In)
 	if !legacy && snapshotPath == emptyValue {
 		if _, err := fileutil.Stat(filepath.Join(projectRoot, paths.ProjectDataDir)); fileutil.IsNotExist(err) {
-			entries, err := os.ReadDir(projectRoot)
+			entries, err := fileutil.ReadDir(projectRoot)
 			if err == nil {
 				for _, entry := range entries {
 					name := entry.Name()
@@ -319,6 +320,10 @@ func runGreenfieldInit(projectRoot, projectName, template string, force bool, lo
 		logging.Fluent(logger).Warn("Failed to create system account").WithError(err).Log()
 	}
 
+	if err := seedStarterKernelGraph(projectRoot, logger); err != nil {
+		logging.Fluent(logger).Warn("Failed to seed starter kernel graph").WithError(err).Log()
+	}
+
 	// Create project config in .zqk/config/config.yaml and .zqk/config.yaml
 	if err := writeProjectConfigFiles(projectDataDir, projectName, template, force); err != nil {
 		return errfmt.Errorf(initErrCreateConfigFileFmt, err)
@@ -334,11 +339,27 @@ func runGreenfieldInit(projectRoot, projectName, template string, force bool, lo
 		logging.Fluent(logger).Warn("Failed to write brand settings").WithError(err).Log()
 	}
 
+	// Write root isolation and kernel config files
+	if err := writeRootIsolationFiles(projectRoot, force, logger); err != nil {
+		logging.Fluent(logger).Warn("Failed to write root isolation files").WithError(err).Log()
+	}
+
 	// Persist bundled object_spec rows from .zqk/specs/objects (REQ-035 / CRIT-9035).
 	if _, err := migration.EnsureBundledObjectSpecsMigrated(context.Background(), projectRoot, logger); err != nil {
 		logging.Fluent(logger).Warn("Bundled object_spec migration did not complete").
 			WithError(err).
 			String("note", "Run from repo after fixing storage, or use zqk spec list (file fallback)").
+			Log()
+	}
+
+	// Register shipped documentation in doc_entry graph (architecture, best-practices, onboarding).
+	// Skips archive trees and docs/launch per TDE-1789629835679972000-dc60b78d / REQ-1789654891514127000-25cbd9d1.
+	if reg, skip, err := docman.RegisterShippedDocs(context.Background(), projectRoot, logger); err != nil {
+		return errfmt.Newf("failed to register shipped documentation in kernel graph").Wrap(err)
+	} else if reg > 0 || skip > 0 {
+		logging.Fluent(logger).Info("Shipped documentation registered in graph").
+			Int("registered", reg).
+			Int("skipped", skip).
 			Log()
 	}
 
@@ -456,6 +477,38 @@ func runLegacyInit(projectRoot, projectName, template string, force bool, logger
 			String("note", "Run from repo after fixing storage, or use zqk spec list (file fallback)").
 			Log()
 	}
+
+	// Register shipped documentation in doc_entry graph (architecture, best-practices, onboarding).
+	if reg, skip, err := docman.RegisterShippedDocs(context.Background(), projectRoot, logger); err != nil {
+		return errfmt.Newf("failed to register shipped documentation").Wrap(err)
+	} else if reg > 0 || skip > 0 {
+		logging.Fluent(logger).Info("Shipped documentation registered in graph").
+			Int("registered", reg).
+			Int("skipped", skip).
+			Log()
+	}
+	// Create system account if missing
+	if err := writeSystemAccount(projectRoot); err != nil {
+		logging.Fluent(logger).Warn("Failed to create system account").WithError(err).Log()
+	}
+
+	// Create zqk-settings.yaml in project root and config dir
+	if err := writeBrandSettings(projectRoot, force); err != nil {
+		logging.Fluent(logger).Warn("Failed to write brand settings").WithError(err).Log()
+	}
+
+	// Write root isolation and kernel config files
+	if err := writeRootIsolationFiles(projectRoot, force, logger); err != nil {
+		logging.Fluent(logger).Warn("Failed to write root isolation files").WithError(err).Log()
+	}
+
+	// Automatically configure MCP for supported IDEs and Agents
+	if err := mcp.AutoInstall(projectRoot, logger); err != nil {
+		logging.Fluent(logger).Warn("Failed to auto-install MCP server configuration").
+			WithError(err).
+			Log()
+	}
+
 	// Discovery wizard runs when --discover is set (see runInit); use "zqk system check --auto-fix" to register hashes for discovered objects.
 
 	logging.Fluent(logger).Info("Legacy project initialized successfully").

@@ -12,7 +12,7 @@ import (
 )
 
 // Cap stage prompt_template ids (kernel objects). Shared preamble is prepended
-// on every lap so agents re-imprint CAP posture — TRACK: BLI-REDACTED /
+// on every lap so agents re-imprint CAP posture — TRACK: BLI-1786390039711686000-e718d458 /
 // REQ-CAP-STAGE-PROMPTS-001 / CRIT-CAP-STAGE-PROMPTS-001.
 const (
 	CapStagePreambleTemplateID        = "PROMPT-CAP-STAGE-PREAMBLE"
@@ -104,8 +104,8 @@ func readPromptBody(ctx context.Context, sp storage.ObjectStorageProvider, secCt
 }
 
 func fallbackCapPreamble() string {
-	return "CAP loop posture: honor SCH-cap-orchestrator + CAP_LOOP_CONTRACT; no forged cap_cycle; " +
-		"zero-trust completes; notify hourglass; TPM does not cut peer ATKs."
+	return fmt.Sprintf("CAP loop posture: honor %s + CAP_LOOP_CONTRACT; no forged cap_cycle; "+
+		"zero-trust completes; notify hourglass; TPM does not cut peer ATKs.", objects.JobIDCapOrchestrator)
 }
 
 func fallbackCapStageBody(stage string) string {

@@ -1,0 +1,22 @@
+category: architecture
+content_hash: cb025ba01b1b3c8fa7339a1f62f9a7ea2d4fbe318c466ddca98fa2c57e109eec
+content_searchable: true
+content_size: 7957
+created_at: "2026-09-17T08:44:35Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-483
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/mcp/accounts-roles-permissions-hierarchy-v1.0.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: '- Permissions: read:*, write:*, delete:* - Description: System administrator with unrestricted access - Accounts: - account:founder (also has founder role) - account:lanceettl (also has developer r...'
+title: Accounts, Roles, and Permission Hierarchy
+updated_at: "2026-09-17T08:44:35Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

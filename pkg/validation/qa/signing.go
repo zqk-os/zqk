@@ -12,6 +12,7 @@ import (
 	"path/filepath"
 
 	"github.com/lanceman/zqk/pkg/logging"
+	"github.com/lanceman/zqk/pkg/objects"
 	"github.com/lanceman/zqk/pkg/utils/fileutil"
 	"github.com/lanceman/zqk/pkg/validation"
 )
@@ -29,7 +30,7 @@ type AuditorSigner struct {
 
 const (
 	AuditorKeyID     = "KEY-AUDITOR-001"
-	AuditorAccountID = "ACC-1785920548450214012-68b850c0-auditor"
+	AuditorAccountID = objects.DefaultSystemAccountID + "-auditor"
 )
 
 // NewAuditorSigner creates a new signer. It attempts to load the private key from the provided path,

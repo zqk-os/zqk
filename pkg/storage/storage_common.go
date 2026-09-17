@@ -49,7 +49,7 @@ func CheckPermission(secCtx *pkgctx.SecurityContext, operation, kind string) err
 			return nil
 		}
 		// delete:core → delete of kernel-critical kinds only (reason-code waived separately).
-		// TRACK: BLI-REDACTED
+		// TRACK: BLI-1785723654802038000-b14064bc
 		if operation == OpDelete && perm == pkgctx.PermissionDeleteCore && isCoreKernelKind(kind) {
 			return nil
 		}

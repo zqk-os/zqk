@@ -1,0 +1,22 @@
+category: architecture
+content_hash: 2468a6b8601629eb64dbcb8f8079405e665e5bb6c1d21d38dd567efd8872f9aa
+content_searchable: true
+content_size: 5079
+created_at: "2026-09-17T08:44:13Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-315
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/TEST_SERVICE_MANAGEMENT.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: The test service management system allows tests to automatically spin up required services (like MemGraph) before running tests and clean them up afterward.
+title: Test Service Management
+updated_at: "2026-09-17T08:44:13Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

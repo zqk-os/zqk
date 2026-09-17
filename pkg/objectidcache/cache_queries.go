@@ -261,7 +261,7 @@ func (c *ObjectIDCache) GetMetadata() *ObjectIDCacheMetadata {
 }
 
 // drainObjectIDCachePending trues object-id-cache from the storage pending journal.
-// TRACK: BLI-REDACTED
+// TRACK: BLI-1785895580100186000-c5539372
 func drainObjectIDCachePending(projectRoot string) {
 	pending := storage.ListObjectIDCachePending(projectRoot)
 	if len(pending) == 0 {

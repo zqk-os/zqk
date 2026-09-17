@@ -7,6 +7,7 @@ import (
 
 	pkgctx "github.com/lanceman/zqk/pkg/context"
 	"github.com/lanceman/zqk/pkg/errfmt"
+	"github.com/lanceman/zqk/pkg/goroutinelabels"
 	"github.com/lanceman/zqk/pkg/logging"
 )
 
@@ -37,7 +38,9 @@ func NewDaemon(projectRoot string, wal *StagingWAL, mutator Mutator, interval ti
 
 // Start begins the background loop.
 func (d *Daemon) Start() {
-	go d.loop()
+	goroutinelabels.NewGoroutine("tde.daemon_loop", "running TDE daemon commit loop").StartSimple(func() {
+		d.loop()
+	})
 }
 
 // Stop halts the background loop.

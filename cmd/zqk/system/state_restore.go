@@ -48,7 +48,7 @@ func NewStateRestoreCmd() *cobra.Command {
 	cmd.Flags().String("input", ".zqk-state/system-state.csnap", "Path to read the compressed snapshot")
 	// Default false: prune=true wiped core process YAML (workstreams/criteria/…) when the
 	// snapshot lagged the live tree. Prefer restore-merge; opt into prune explicitly.
-	// TRACK: BLI-REDACTED
+	// TRACK: BLI-1785723654802038000-b14064bc
 	cmd.Flags().Bool("prune", false, "Prune YAML under .zqk/process not present in the snapshot (skips core kernel kinds; default off)")
 	cmd.Flags().Bool("confirm-prune", false, "Required with --prune to actually delete non-core orphans (Kernel Mutation Pipeline)")
 
@@ -96,7 +96,7 @@ func runStateRestore(cmd *cobra.Command, args []string) error {
 		// StorageFactory-backed provider; unwrap for WriteObjectRaw + CAS.
 		// Processor wraps storage in SemanticStorageDecorator — Unwrap must pierce it
 		// (UnderlyingObjectStorageProvider); fall back to a fresh factory tip.
-		// TRACK: BLI-REDACTED
+		// TRACK: BLI-1785723654802038000-b14064bc
 		storageProvider := storage.UnwrapToFileObjectStorage(proc.Storage())
 		if storageProvider == nil {
 			if f := proc.StorageFactory(); f != nil {
@@ -182,7 +182,7 @@ func runStateRestore(cmd *cobra.Command, args []string) error {
 
 		// Serialize writes: parallel WriteObjectRaw races CAS IDIndex JSON encode
 		// (concurrent map iteration and map write under bulk restore).
-		// TRACK: BLI-REDACTED — restore throughput vs index race
+		// TRACK: BLI-1785723654802038000-b14064bc — restore throughput vs index race
 		const numWorkers = 16
 		jobs := make(chan writeJob, len(expanded))
 		for _, obj := range expanded {
@@ -226,7 +226,7 @@ func runStateRestore(cmd *cobra.Command, args []string) error {
 
 		cmd.Printf("✅ Restore complete. %d objects written, %d skipped.\n", written, skipped)
 		// Bulk CAS rewrite: next system check must not trust stale validation /
-		// object-id caches (Layer-1 false missing-ref). TRACK: BLI-REDACTED
+		// object-id caches (Layer-1 false missing-ref). TRACK: BLI-1785895580100186000-c5539372
 		if written > 0 {
 			storage.NoteSignificantCacheChangeDetail(projectRoot, "system_state_restore", 0, written)
 		}
@@ -269,7 +269,7 @@ func pruneOrphans(ctx context.Context, projectRoot string, expectedPaths map[str
 				return nil
 			}
 			// Non-core prune still enters kernel.cas_object_erase (COMMIT = os.Remove).
-			// TRACK: BLI-REDACTED
+			// TRACK: BLI-1785784865905766000-dded0895
 			id := strings.TrimSuffix(strings.TrimSuffix(info.Name(), ".yaml"), ".yml")
 			removePath := path
 			if err := kernelcas.RunErase(ctx, nil, &kernelcas.Mutation{

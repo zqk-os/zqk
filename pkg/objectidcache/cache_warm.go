@@ -182,7 +182,7 @@ func EnsureObjectIDCacheReady(ctx stdcontext.Context, projectRoot string, forceR
 			}
 
 			// Drain object-id-cache pending journal so mid-refresh check sees coherent entries.
-			// TRACK: BLI-REDACTED
+			// TRACK: BLI-1785895580100186000-c5539372
 			drainObjectIDCachePending(projectRoot)
 
 			return state, nil
@@ -223,7 +223,7 @@ func TryLoadObjectIDCacheOnly(projectRoot string) bool {
 	// Heal object-id-cache paths that still name deleted CAS hashes (update/promote
 	// lag). Without this, async system check discovery validates ghosts and emits
 	// false "stale index entry" Tier-1 blockers.
-	// TRACK: BLI-REDACTED
+	// TRACK: BLI-1785723654802038000-b14064bc
 	if n := cache.ValidateAndCleanStale(); n > 0 {
 		storage.InvalidateListCache()
 		persistCacheChanges(cache, projectRoot, "Failed to save object ID cache after stale-path heal")

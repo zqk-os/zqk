@@ -1,0 +1,22 @@
+category: cli
+content_hash: 15ccaa83524590eb37538834f60cc16f9fef2feef9522f7187f46021d689b9c8
+content_searchable: true
+content_size: 7449
+created_at: "2026-09-17T08:39:34Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-068
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/CMDV2_AND_CLI_SPLIT_RATIONALE.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: '--- A critical scheduler job (cache prewarm) disappeared from the system and was removed with no way to trace what happened'
+title: 'CMDv2 and CLI Split: Rationale and Plan'
+updated_at: "2026-09-17T08:39:34Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

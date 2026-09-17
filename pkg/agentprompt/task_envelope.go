@@ -12,7 +12,7 @@ import (
 
 // TaskEnvelopeMarker is the persist contract for agent_task.description.
 // Static policy/skill/AST bodies must not be copied into the CAS object.
-// TRACK: BLI-REDACTED — GLS-1787805412435495000-332acc7b
+// TRACK: BLI-1787805421435713000-3cf3884a — GLS-1787805412435495000-332acc7b
 const TaskEnvelopeMarker = "zqk_task_envelope_v1"
 
 // PromptLayer selects persist (CAS) vs execute (ephemeral) assembly.

@@ -1,0 +1,22 @@
+category: architecture
+content_hash: be66d74f9bd96e9523524721e158fe99e73a394cde574d3cf7c3a58c4f572bbe
+content_searchable: true
+content_size: 2363
+created_at: "2026-09-17T08:44:12Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-304
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/SUBORDINATE_NAMESPACES_IMPLEMENTATION.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: Extended the existing namespace_id system to support subordinate namespaces for modular organization
+title: Subordinate Namespaces Implementation
+updated_at: "2026-09-17T08:44:12Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

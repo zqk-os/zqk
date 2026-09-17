@@ -1,0 +1,22 @@
+category: architecture
+content_hash: 38b32031649215ad7e27d94ed89fece04eabbcf5fe5fed2bee74ed0ab501ddaf
+content_searchable: true
+content_size: 2094
+created_at: "2026-09-17T08:44:42Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-525
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/object_disambiguation.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: To ensure agents process context correctly and eliminate ontology confusion, we must strictly disambiguate the roles of a backlog_item and an agent_task
+title: 'Object Disambiguation: Backlog Item vs Agent Task'
+updated_at: "2026-09-17T08:44:42Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

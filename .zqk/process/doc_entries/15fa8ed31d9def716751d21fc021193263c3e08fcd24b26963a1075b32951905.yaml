@@ -1,0 +1,22 @@
+category: architecture
+content_hash: 5fb507352e20b9774dba38bcce09911d5a0b395920575f783975ac03a7b6bc5d
+content_searchable: true
+content_size: 6174
+created_at: "2026-09-17T08:42:10Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-108
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/EXPERTISE_ARCHITECTURE_AND_CODE_QUALITY.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: This note is an expert-level Good / Bad / Ugly read of the zqk codebase and product concept, plus a gap roadmap, priorities, and recommended process objects (IDs to create later via zqk CLI — not...
+title: Expertise in architecture and code quality (the non-functional side of the house)
+updated_at: "2026-09-17T08:42:10Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

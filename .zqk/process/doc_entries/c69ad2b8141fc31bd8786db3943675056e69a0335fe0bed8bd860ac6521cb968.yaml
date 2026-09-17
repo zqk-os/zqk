@@ -1,0 +1,21 @@
+content_hash: da23f9f4d43695a97825145444016da53317bdfea2f4b1f5716e78d10ce4bab5
+content_searchable: true
+content_size: 2038
+created_at: "2026-09-17T08:44:56Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: onboarding
+id: DOC-630
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/onboarding/CORPORATE_SETUP_GUIDE.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: This document captures the strategic execution plan for formally establishing ZQK as a corporate entity, securing its Intellectual Property (IP), and setting up the foundational infrastructure
+title: ZQK Corporate & Infrastructure Setup Guide
+updated_at: "2026-09-17T08:44:56Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

@@ -12,4 +12,4 @@ ZQK v2.8 introduces the foundational architecture for long-running, multi-stage 
 ## Technical Milestones & Fixes
 - Addressed legacy import cycle regressions between `pkg/pipeline`, `pkg/storage`, and `pkg/validation`.
 - CLI spec registry generated and synchronized with `PLX-` and `PLD-` object schemas.
-- Backlog items `BLI-REDACTED`, `BLI-REDACTED`, and `BLI-REDACTED` successfully completed and merged into the active feature branch.
+- Backlog items `BLI-1784788094705633000-10323987`, `BLI-1784788096046653000-fef8c764`, and `BLI-1784788097344620000-f82a92ad` successfully completed and merged into the active feature branch.

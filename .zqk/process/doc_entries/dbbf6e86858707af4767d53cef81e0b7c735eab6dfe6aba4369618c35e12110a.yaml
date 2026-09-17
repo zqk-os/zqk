@@ -1,0 +1,22 @@
+category: architecture
+content_hash: d116aaa8b0e1830cd9cec801d1b94e7530ec9e019c61ecfe79b933ac7741e4e8
+content_searchable: true
+content_size: 3116
+created_at: "2026-09-17T08:44:32Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-454
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/lifecycle_shockwave/family_gantt_lane.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: 'Gantt rows and commitments: workstream, roadmap, strategic_plan, requirement, goal, evolution_management'
+title: 'Family: gantt_lane'
+updated_at: "2026-09-17T08:44:32Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

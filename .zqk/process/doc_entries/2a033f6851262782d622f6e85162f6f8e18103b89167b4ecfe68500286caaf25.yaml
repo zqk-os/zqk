@@ -1,0 +1,22 @@
+category: architecture
+content_hash: 52c28e5d34ff485d1c5274ff0ede8e9cb3b7b6ea7a185181d05e6e22f631f222
+content_searchable: true
+content_size: 1285
+created_at: "2026-09-17T08:44:14Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-325
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/VENDOR_PROXY_OUTAGE.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: ZQK currently relies on go mod download with Go modules proxy caches (e.g., proxy.golang.org) instead of checking in a vendor/ directory
+title: Vendor & Proxy Outage Resilience
+updated_at: "2026-09-17T08:44:14Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

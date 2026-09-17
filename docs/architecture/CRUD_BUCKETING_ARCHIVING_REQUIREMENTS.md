@@ -20,7 +20,7 @@
 - Break-glass only via `zqk object delete … --reason-code "…" (≥30 chars)` → `WithAllowCoreObjectDelete`.
 - Proper retirement is **archive** (lifecycle) then **aggregate + compress** with **lineage preserved** for audit (see archive_strategy compression + change_journal / audit aggregation). Do not equate “archived status” with “erase the blob.”
 
-**TRACK:** `BLI-REDACTED` (guard); program **`PRI-REDACTED`** / [`KERNEL_MUTATION_PIPELINE.md`](./KERNEL_MUTATION_PIPELINE.md) — logical erase must enter `kernel.cas_object_erase` (pkg/pipeline); critical kinds include backlog_item, test_case, convergence_session. Delete-worthiness (archived + no live inbound refs) and linger-before-Exists-false: [`CAS_MUTATION_SHOCKWAVE.md`](./CAS_MUTATION_SHOCKWAVE.md).
+**TRACK:** `BLI-1785723654802038000-b14064bc` (guard); program **`PRI-1785784837719634000-c9473ae7`** / [`KERNEL_MUTATION_PIPELINE.md`](./KERNEL_MUTATION_PIPELINE.md) — logical erase must enter `kernel.cas_object_erase` (pkg/pipeline); critical kinds include backlog_item, test_case, convergence_session. Delete-worthiness (archived + no live inbound refs) and linger-before-Exists-false: [`CAS_MUTATION_SHOCKWAVE.md`](./CAS_MUTATION_SHOCKWAVE.md).
 
 ## Current State Analysis
 

@@ -78,7 +78,16 @@ func checkIntegrityCAS(ctx *cli.Context, obj *parser.ParsedObject, filePath, kin
 			if content, readErr := fileutil.ReadFile(filePath); readErr == nil {
 				if storage.CalculateSHA256Hash(content) == expectedHash {
 					if idx := cas.GetIndex(); idx != nil {
-						_ = idx.SetMapping(objectID, expectedHash)
+						relDir, relErr := filepath.Rel(kindDir, filepath.Dir(filePath))
+						var bucketKey string
+						if relErr == nil && relDir != "." && relDir != "" {
+							bucketKey = relDir
+						}
+						if bucketKey != "" {
+							_ = idx.SetMapping(objectID, expectedHash, bucketKey)
+						} else {
+							_ = idx.SetMapping(objectID, expectedHash)
+						}
 						_ = idx.Save()
 					}
 					autoFixed = append(autoFixed, "Silently auto-healed CAS index lag")
@@ -100,7 +109,8 @@ func checkIntegrityCAS(ctx *cli.Context, obj *parser.ParsedObject, filePath, kin
 			Tier:        1,
 			Category:    "integrity",
 			Message:     fmt.Sprintf("CAS index hash mismatch - filename has %s, index has %s (index may be corrupted)", expectedHash[:16], hash[:16]),
-			AutoFixable: false,
+			AutoFixable: true,
+			FixCommand:  fmt.Sprintf("zqk system cleanup-duplicates %s --hash-duplicates", kind),
 		})
 		return issues, autoFixed
 	}

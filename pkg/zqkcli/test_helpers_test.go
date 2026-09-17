@@ -30,7 +30,7 @@ func envForIsolatedCLIProject(tmpRoot string) []string {
 // authenticates as whichever developer is logged in. The suite then fails resolving that
 // session id against the empty temp store, which makes the outcome depend on the developer's
 // login state rather than on the code under test.
-// TRACK: BLI-REDACTED — identity isolation belongs in zqkenv, but that
+// TRACK: BLI-1787558884394841000-7dbc6d50 — identity isolation belongs in zqkenv, but that
 // function is also on 19 production spawn paths, so widening it needs its own pass.
 func wireIsolatedCLI(cmd *exec.Cmd, tmpRoot string) {
 	if cmd == nil {

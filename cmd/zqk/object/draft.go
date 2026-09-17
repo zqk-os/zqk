@@ -7,7 +7,7 @@ import (
 )
 
 // NewDraftCmd creates the object draft-plane command group.
-// TRACK: BLI-REDACTED
+// TRACK: BLI-1785827957031623000-b08b9791
 func NewDraftCmd() *cobra.Command {
 	cmd := clipkg.ApplyBuilder(bldr_cli_cmd_v1.NewDraftCommandBuilder(), &cobra.Command{
 		Use:   "draft",

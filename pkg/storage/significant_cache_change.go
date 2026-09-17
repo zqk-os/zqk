@@ -18,7 +18,7 @@ import (
 //
 // Single-object create/update must stay incremental (PRE_CHANGE_CHECKLIST §2–3).
 //
-// TRACK: BLI-REDACTED — remove when: claim fixture proves
+// TRACK: BLI-1785895580100186000-c5539372 — remove when: claim fixture proves
 // check auto refresh + pending-id invalidation after pending burst + state-restore.
 const SignificantCacheChangePendingThreshold = 5
 

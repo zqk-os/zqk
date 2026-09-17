@@ -1,6 +1,6 @@
 // Package kernelcas implements Kernel Mutation Pipeline kinds on top of pkg/pipeline.
 // See docs/architecture/KERNEL_MUTATION_PIPELINE.md.
-// TRACK: BLI-REDACTED — remove when: all process mutators enter these kinds.
+// TRACK: BLI-1785784863457357000-dda098ed — remove when: all process mutators enter these kinds.
 package kernelcas
 
 // Named pipeline kinds (v1 closed set).

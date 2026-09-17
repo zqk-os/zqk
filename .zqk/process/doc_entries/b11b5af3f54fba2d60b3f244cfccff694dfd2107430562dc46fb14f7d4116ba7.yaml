@@ -1,0 +1,22 @@
+category: architecture
+content_hash: a32ff0578cca73ef2c05894bef0702a2b97682d1b1b7d4a342517e69d77aa4e6
+content_searchable: true
+content_size: 6645
+created_at: "2026-09-17T08:44:12Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-299
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/STRATEGIC_PLANNING_MEETING_WIRING.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: '--- To automate ZQK roadmap planning with consistency and traceability, we wire the Strategic Planning Meeting directly into the native agent orchestrate loop'
+title: 'Strategic Planning Meeting: Agent Orchestration & Lifecycle Wiring'
+updated_at: "2026-09-17T08:44:12Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

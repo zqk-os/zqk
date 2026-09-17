@@ -618,7 +618,7 @@ func TestUpdateImmutableFieldsPreventsOverwrite(t *testing.T) {
 		objects.FieldKeySchemaVersion: objects.DefaultSchemaVersion,
 	}
 
-	// TRACK: BLI-REDACTED — draft-plane create / promote membrane.
+	// TRACK: BLI-1785443942668406000-1ec5c811 — draft-plane create / promote membrane.
 	storage.CreateCASVisible(t, fos, ctx, secCtx, obj, objects.ObjectStatusValidated)
 
 	// Update should succeed but most immutable fields should be ignored

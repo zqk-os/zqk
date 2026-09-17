@@ -1,0 +1,19 @@
+created_at: "2026-09-17T19:12:43Z"
+created_by: ACC-1785920548450214012-68b850c0
+description: |
+    Quality assurance and verification persona responsible for testing gates, requirements
+    traceability, invariant verification, and fail-closed validation audits.
+id: PER-COMMUNITY-QA-AUDITOR
+kind: persona
+namespace_id: zqk:kernel
+needs:
+    - Invariant gate verification before plane promotion
+    - Full requirements-to-criteria traceability
+    - Regression testing and automated test execution
+role: qa_auditor
+schema_version: 2.0.0
+status: approved
+title: QA Auditor
+updated_at: "2026-09-17T19:12:47Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

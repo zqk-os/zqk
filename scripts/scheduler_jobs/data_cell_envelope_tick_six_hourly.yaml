@@ -1,0 +1,44 @@
+# Timer job: logs stream-profile operational envelope summary (v1).
+# Ensured by .zqk/specs/configs/scheduler_maintenance_config.yaml (daemon start / ensure-retention-jobs).
+#
+# Create manually:
+#   zqk object create scheduler_job --file scripts/scheduler_jobs/data_cell_envelope_tick_six_hourly.yaml
+# Trigger once:
+#   zqk scheduler trigger SCH-dce-tick
+
+kind: scheduler_job
+schema_version: "2.0.0"
+id: SCH-dce-tick
+title: Data cell — operational envelope tick (stream profile)
+description: |
+  Structured log of the stream storage profile operational envelope (CompactSummary).
+  Category data_cell_envelope; extends later with per-profile actions.
+job_type: data_cell_envelope_tick
+trigger_type: timer
+schedule_expression: "0 */6 * * *"
+category: data_cell_envelope
+execution_mode: reusable
+max_runtime_seconds: 120
+# Follow-up dispatch: operational_envelope resolved job_types → TriggerJob allowlist (cheap jobs only).
+# shadow = log would_trigger only; on = trigger first enabled job per type; off = dispatch disabled.
+# ENVELOPE_TICK_DISPATCH_EXPAND=true adds object_validation + metrics_collection (heavier).
+# ENVELOPE_TICK_DISPATCH_ALLOWLIST_EXTRA=comma_list — optional extra job_types (still subject to hard deny).
+# ENVELOPE_TICK_DISPATCH_DENY_EXTRA=comma_list — operator deny list (wins over allowlists; after hard deny).
+# ENVELOPE_TICK_DISPATCH_DENY_TOKENS_JSON='["token_a"]' — JSON array of envelope discovery tokens to exclude from resolution.
+# ENVELOPE_TICK_DISPATCH_ALLOW_TOKENS_JSON='["token_b"]' — when set, only these tokens contribute (restrictive whitelist; [] suppresses all).
+# ENVELOPE_TICK_DISPATCH_MAX_TRIGGERS=N — cap shadow + real follow-up dispatches per tick after resolving targets (omit or invalid = unlimited).
+# Dispatch also skips when a second resolved job_type maps to the same concrete scheduler_job id in one tick (after prior successful shadow/trigger slot).
+# ENVELOPE_TICK_DISPATCH_SKIP_IF_TARGET_BUSY=false — disable skip when target scheduler_job is already running in-process (default true when unset).
+# ENVELOPE_TICK_DISPATCH_CHECK_TRIGGER_QUEUE=true — also skip when .zqk trigger queue has pending (job_id + trigger_origin=data_cell_envelope_tick).
+environment_variables:
+  ENVELOPE_TICK_DISPATCH_MODE: "shadow"
+  ENVELOPE_TICK_DISPATCH_EXPAND: "false"
+enabled: true
+status: active
+namespace_id: zqk:kernel
+created_at: "2026-04-14T12:00:00Z"
+updated_at: "2026-04-14T12:00:00Z"
+created_by: account:system
+updated_by: account:system
+origin_project: zqk
+origin_system: zqk

@@ -199,7 +199,7 @@ func (f *FileObjectStorage) applyUpdateFromBuffer(ctx context.Context, id, kind 
 // dispatchStatusGateway is kept on the update path for binary compatibility.
 // Status listeners are status_reactive kinds reached via executeLifecycleHook →
 // ApplyDependencyRefEvents (catalyst outbound stubs, one hop). Do not walk parents here.
-// TRACK: BLI-REDACTED
+// TRACK: BLI-1786411312347141000-5f3d9063
 func (f *FileObjectStorage) dispatchStatusGateway(ctx context.Context, secCtx *SecurityContext, obj map[string]any, kind, oldState string) error {
 	_ = ctx
 	_ = secCtx

@@ -161,7 +161,7 @@ func (s *Server) unsubscribeWriterSubscriptions(writer *bufio.Writer) {
 
 // releaseConnectionWriter clears client and transport writers that still point at a
 // closed TCP connection and abandons that connection's writer queue.
-// TRACK: BLI-REDACTED — remove when: per-connection Server isolates writers.
+// TRACK: BLI-1784969955962654000-dc689643 — remove when: per-connection Server isolates writers.
 func (s *Server) releaseConnectionWriter(writer *bufio.Writer) {
 	if s == nil || writer == nil {
 		return

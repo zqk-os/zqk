@@ -41,7 +41,7 @@ var (
 
 // DefaultValidationTimeoutConfig returns fail-fast timeout configuration.
 // Kind overrides stay empty: project config may add them; code must not re-inject
-// legacy 60s/90s budgets that hide hangs (TRACK: BLI-REDACTED).
+// legacy 60s/90s budgets that hide hangs (TRACK: BLI-1785723654802038000-b14064bc).
 func DefaultValidationTimeoutConfig() *ValidationTimeoutConfig {
 	return &ValidationTimeoutConfig{
 		DefaultSeconds:      5,

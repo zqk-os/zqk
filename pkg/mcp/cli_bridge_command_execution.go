@@ -121,7 +121,7 @@ func buildCommandEnvironment(secCtx *pkgctx.SecurityContext, projectRoot string,
 
 	// MCP tool children are spawned from zqk-mcp-daemon (role symlink), so IsParentZqk()
 	// name-equality fails and the idle watchdog cancels OperationContext mid-Count.
-	// TRACK: BLI-REDACTED — remove when IsParentZqk treats role binaries.
+	// TRACK: BLI-1784969955962654000-dc689643 — remove when IsParentZqk treats role binaries.
 	env = append(env, fmt.Sprintf("%s=1", zqkenv.IsParentZqk()))
 
 	// Disable interactive prompts and editors in MCP subprocesses

@@ -32,7 +32,9 @@ func StartServer(socketPath string, pool provider.ConnectionPool) error {
 					if err != nil {
 						return
 					}
-					go server.ServeCodec(jsonrpc.NewServerCodec(conn))
+					goroutinelabels.NewGoroutine("graph_rpc.serve_codec", "serving RPC codec connection").StartSimple(func() {
+						server.ServeCodec(jsonrpc.NewServerCodec(conn))
+					})
 				}
 			}()
 		})

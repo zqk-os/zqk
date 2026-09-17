@@ -1,0 +1,22 @@
+category: check
+content_hash: 5bff85163f61dadf018962e8f7ac6bfc3979ba00313989c73c48756b1b3bffc9
+content_searchable: true
+content_size: 6572
+created_at: "2026-09-17T08:44:21Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-363
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/check-command-performance-v1.0.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: '- Check command is noticeably slow for 600+ objects - No caching in SpecLoader (loads specs repeatedly) - Validator creates new loaders for each object - HashRegistry loaded per object (should be p...'
+title: Check Command Performance & Caching Strategy
+updated_at: "2026-09-17T08:44:21Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

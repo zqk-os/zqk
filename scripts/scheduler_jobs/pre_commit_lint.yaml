@@ -1,0 +1,25 @@
+# Pre-commit lint: runs scripts/pre-commit-lint.sh on a timer; writes .zqk/pre-commit/lint.json
+# and aggregate so the hook sees up-to-date results.
+#
+# Ensured by: zqk system ensure-retention-jobs (scheduler_maintenance_config.yaml)
+# See: docs/architecture/PRE_COMMIT_BACKGROUND_RESULTS.md
+
+id: SCH-pre-commit-lint
+kind: scheduler_job
+schema_version: "2.0.0"
+status: active
+job_type: run_wrapper
+trigger_type: timer
+schedule_expression: "*/10 * * * *"
+category: maintenance
+execution_mode: reusable
+max_runtime_seconds: 600
+enabled: true
+callback_type: command
+callback_on_completion: zqk pre-commit write-result-from-last --category=lint
+title: Pre-commit lint (golangci-lint)
+description: |
+  Runs pre-commit-lint.sh (golangci-lint or go vet), writes lint category and
+  runs pre-commit aggregate. Keeps .zqk/pre-commit/results.json updated for the hook.
+command: ./scripts/pre-commit-lint.sh
+namespace_id: zqk:kernel

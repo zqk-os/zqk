@@ -1,0 +1,22 @@
+category: architecture
+content_hash: 93493c7b002909eff7233fd5ee9c0ccb5f2279b80a2fe03bce09eafc9f8dfefd
+content_searchable: true
+content_size: 6087
+created_at: "2026-09-17T08:42:10Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-106
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/EPIC_ENCLAVE_SCOPE_GUIDE.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: '--- In the Cellular Knowledge OS architecture, autonomous swarms and human builders operate concurrently across high-velocity codebases'
+title: 'Epic Object Architecture: Cellular Objective & Enclave Scope Guide'
+updated_at: "2026-09-17T08:42:10Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

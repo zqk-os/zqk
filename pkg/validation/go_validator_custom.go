@@ -19,7 +19,7 @@ import (
 )
 
 // Empty: overlays live in pkg/kernelcas/compose. validateCustomRules calls compose for every kind.
-// TRACK: BLI-REDACTED — map registrations deleted (no Go custom rule bodies).
+// TRACK: BLI-1785786997399161000-76ea6811 — map registrations deleted (no Go custom rule bodies).
 
 type DynamicRuleEvaluator func(gv *GoValidator, rule map[string]any, obj map[string]any, options *ValidationOptions, ruleID string, params map[string]any) []ValidationError
 

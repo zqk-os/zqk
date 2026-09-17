@@ -155,7 +155,7 @@ func TestShockwaveCoverageMetric(t *testing.T) {
 	}
 }
 
-// TestAtomicClusterFreezeOnIllegalTransition verifies CRIT-REDACTED
+// TestAtomicClusterFreezeOnIllegalTransition verifies CRIT-1787077446494473000-d4278167
 // for BLI-MEMBRANE-CLUSTER-ATOMIC-FREEZE-001:
 // If any object in a shockwave cascade fails lifecycle validation, the whole tree mutation freezes atomically.
 func TestAtomicClusterFreezeOnIllegalTransition(t *testing.T) {
@@ -191,7 +191,7 @@ func TestAtomicClusterFreezeOnIllegalTransition(t *testing.T) {
 	}
 }
 
-// TestClusterPlaneAlignmentOnParkArchive verifies CRIT-REDACTED
+// TestClusterPlaneAlignmentOnParkArchive verifies CRIT-1787077444216854000-dd978c3c
 // for BLI-MEMBRANE-PLANE-PARK-ALIGN-002:
 // Archive and park shockwaves keep linked CRIT, BLI, and REQ objects synchronously aligned on the same plane.
 func TestClusterPlaneAlignmentOnParkArchive(t *testing.T) {

@@ -1,0 +1,22 @@
+category: architecture
+content_hash: d1555db825346cf4f6e735f1a349f22f69f383003e4e83fb7ed93c217ab06208
+content_searchable: true
+content_size: 5602
+created_at: "2026-09-17T08:43:58Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-242
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/PROJECT_INITIALIZATION.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: New projects must be initialized with a core set of policies that establish standards, expectations, and best practices
+title: Project Initialization Guide
+updated_at: "2026-09-17T08:43:58Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

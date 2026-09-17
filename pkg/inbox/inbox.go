@@ -44,8 +44,8 @@ func IngestProposal(ctx context.Context, secCtx *pkgctx.SecurityContext, store s
 		obj[objects.FieldKeyCreatedBy] = params.CreatedBy
 		obj[objects.FieldKeyUpdatedBy] = params.CreatedBy
 	} else {
-		obj[objects.FieldKeyCreatedBy] = "ACC-1785920548450214012-68b850c0"
-		obj[objects.FieldKeyUpdatedBy] = "ACC-1785920548450214012-68b850c0"
+		obj[objects.FieldKeyCreatedBy] = objects.DefaultSystemAccountID
+		obj[objects.FieldKeyUpdatedBy] = objects.DefaultSystemAccountID
 	}
 
 	// Create in storage

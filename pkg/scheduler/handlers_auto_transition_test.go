@@ -35,7 +35,7 @@ func TestCryptographicVerification(t *testing.T) {
 	}
 	storagepkg.CreateCASVisible(t, provider, ctx, secCtx, crit, "validated")
 
-	// TRACK: BLI-REDACTED — draft-plane create / promote membrane.
+	// TRACK: BLI-1785443942668406000-1ec5c811 — draft-plane create / promote membrane.
 	bli := map[string]any{
 		objects.FieldKeyID:           "BLI-TEST-1",
 		objects.FieldKeyKind:         "backlog_item",

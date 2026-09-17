@@ -1,0 +1,22 @@
+category: architecture
+content_hash: f4f9874d73cf844a3a1600c57e9bb8abf5d6cb276446be2ff9fd83acbf397742
+content_searchable: true
+content_size: 2558
+created_at: "2026-09-17T08:44:10Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-289
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/SPEC_RUNTIME_AND_PATH_CACHE_VISION.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: 'Once everything that touches disk flows through a path cache with a stable key, most of the application can ignore physical layout: change the key mapping, and callers keep using the same logical h...'
+title: 'Vision: path-keyed cache, migration-safe FS, spec-as-objects, “classloader” loading'
+updated_at: "2026-09-17T08:44:10Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

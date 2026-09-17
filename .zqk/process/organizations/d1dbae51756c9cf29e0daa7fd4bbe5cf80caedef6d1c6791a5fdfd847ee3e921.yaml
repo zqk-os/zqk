@@ -1,0 +1,18 @@
+created_at: "2026-09-17T07:53:15Z"
+created_by: ACC-1785920548450214012-68b850c0
+description: Public open-core kernel for strangers and agents. This organization owns the starter graph that init must materialize so first-run is not an empty Gantt.
+domain: custom
+id: ORG-1789631595101696000-90dc1473
+kind: organization
+namespace_id: domain:organizational
+organization_name: ZQK Open-Core Community
+related_object_refs:
+    - GOAL-1789631957245339000-008aac9f
+schema_version: 2.0.0
+spec_context_broker: org_broker
+spec_interpreter: org_interpreter
+status: active
+title: ZQK Open-Core Community
+updated_at: "2026-09-17T19:29:29Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

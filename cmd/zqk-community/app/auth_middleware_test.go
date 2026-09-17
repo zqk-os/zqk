@@ -6,6 +6,7 @@ import (
 
 	"github.com/lanceman/zqk/internal/cli"
 
+	pkgctx "github.com/lanceman/zqk/pkg/context"
 	"github.com/lanceman/zqk/pkg/paths"
 	"github.com/lanceman/zqk/pkg/utils/fileutil"
 	"github.com/lanceman/zqk/pkg/zqkenv"
@@ -72,6 +73,30 @@ func TestAuthMiddleware_Authorized_Credentials(t *testing.T) {
 	err := AuthMiddleware(cmd, projectRoot)
 	if err != nil {
 		t.Fatalf("expected no error, got %v", err)
+	}
+}
+
+func TestAuthMiddleware_CommunityEditionSeatsSystemAccount(t *testing.T) {
+	prev := zqkenv.IsCommunityEdition
+	zqkenv.IsCommunityEdition = true
+	t.Cleanup(func() { zqkenv.IsCommunityEdition = prev })
+
+	cmd := &cobra.Command{Use: "status"}
+	home := t.TempDir()
+	t.Setenv(zqkenv.OSHome().Name(), home)
+	t.Setenv(zqkenv.APIKey().Name(), "")
+	t.Setenv(zqkenv.TestRoot().Name(), "")
+	t.Setenv(zqkenv.TestBypassAuth().Name(), "0")
+
+	if err := AuthMiddleware(cmd, t.TempDir()); err != nil {
+		t.Fatalf("community edition with no token: %v", err)
+	}
+	sec := pkgctx.GetSecurityContext(cmd.Context())
+	if sec == nil {
+		t.Fatal("expected security context")
+	}
+	if sec.AccountID != pkgctx.SystemAccountID {
+		t.Fatalf("account_id=%s want %s", sec.AccountID, pkgctx.SystemAccountID)
 	}
 }
 

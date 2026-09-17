@@ -135,7 +135,7 @@ func TestDependencyHopMetaTagsCriteriaComposition(t *testing.T) {
 }
 
 func TestApplyDependencyRefEvent_CriteriaParentLockMatrix(t *testing.T) {
-	// TRACK: BLI-REDACTED — no t.Parallel: shared Memgraph.
+	// TRACK: BLI-1785443942668406000-1ec5c811 — no t.Parallel: shared Memgraph.
 	pool := testkit.PrepareGraphConnectionForTest(t)
 	realStorage := storage.NewPoolAwareGraphStorage(pool, t.TempDir())
 	ctx := pkgctx.NewSystemContext()
@@ -222,7 +222,7 @@ func TestApplyDependencyRefEvent_AgentTaskNotStatusReactive(t *testing.T) {
 }
 
 func TestApplyDependencyRefEvents_SelectiveCriteriaLock(t *testing.T) {
-	// Mixed list: only shovel-ready CRITs hop. TRACK: BLI-REDACTED.
+	// Mixed list: only shovel-ready CRITs hop. TRACK: BLI-1785443942668406000-1ec5c811.
 	pool := testkit.PrepareGraphConnectionForTest(t)
 	realStorage := storage.NewPoolAwareGraphStorage(pool, t.TempDir())
 	ctx := pkgctx.NewSystemContext()

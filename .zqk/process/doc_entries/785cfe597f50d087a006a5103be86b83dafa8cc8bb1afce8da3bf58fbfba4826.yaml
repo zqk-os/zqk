@@ -1,0 +1,22 @@
+category: architecture
+content_hash: 42e60514e75f494c503cc15b3c725a053fca3a486b88b4eb5182b97619a00f5d
+content_searchable: true
+content_size: 4218
+created_at: "2026-09-17T08:44:15Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-331
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/WAL_LONG_RECORD_SAFEGUARDS.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: The object WAL can grow a single line to hundreds of MB if either (1) an object ID is extremely long, or (2) a create/update writes a very large object payload (e.g
+title: 'WAL Long Record: Causes and Safeguards'
+updated_at: "2026-09-17T08:44:15Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

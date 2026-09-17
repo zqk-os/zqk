@@ -1,0 +1,22 @@
+category: architecture
+content_hash: 184824bcbe959767cbfb0f277d2fed6a159dedde64d99a1cdf531b8e44f59eec
+content_searchable: true
+content_size: 10550
+created_at: "2026-09-17T08:39:33Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-053
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/CLEANUP_MAINTENANCE_DESIGN.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: '--- Teams need to: - Delete or truncate files (e.g'
+title: 'Cleanup Maintenance: On-Demand Config-Driven Filesystem and CLI Tasks'
+updated_at: "2026-09-17T08:39:33Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

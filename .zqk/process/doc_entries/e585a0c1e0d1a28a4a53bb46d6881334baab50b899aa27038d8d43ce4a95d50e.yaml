@@ -1,0 +1,22 @@
+category: graph-backend
+content_hash: edf959bec12cfdcb3543a125a03e1fee1780a1054052f27d6d5dc9f5265947f4
+content_searchable: true
+content_size: 5313
+created_at: "2026-09-17T08:44:31Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-427
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/graph-backend/SHARED_IMPLEMENTATIONS.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: To keep code DRY across different graph backend providers, we've extracted common logic into shared base implementations.
+title: Shared Implementation Patterns
+updated_at: "2026-09-17T08:44:31Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

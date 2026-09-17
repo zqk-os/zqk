@@ -1,0 +1,22 @@
+category: architecture
+content_hash: 40c7ab049b6054dd42d98e8dad8d688b48fd14e68fa30c0a571bb20ad068098b
+content_searchable: true
+content_size: 4654
+created_at: "2026-09-17T08:44:14Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-317
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/TOPIC_CONSOLIDATION_STATUS.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: '--- Phase 3 establishes canonical topic specifications across the six primary architectural domains that experienced documentation sprawl and duplication'
+title: Topic Consolidation Status Specification
+updated_at: "2026-09-17T08:44:14Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

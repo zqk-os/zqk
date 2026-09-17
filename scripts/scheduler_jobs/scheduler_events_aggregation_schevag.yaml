@@ -1,0 +1,17 @@
+# Scheduler events aggregation job (SCH-evag). Used by: zqk system ensure-retention-jobs (config-driven).
+# Timer: aggregates diagnostics.jsonl into scheduler-metrics-summary.json every 15 minutes.
+# Create manually: zqk object create scheduler_job --file scripts/scheduler_jobs/scheduler_events_aggregation_schevag.yaml
+id: SCH-evag
+title: Scheduler Events Aggregation
+description: |
+  Timer job: aggregates diagnostics.jsonl into scheduler-metrics-summary.json every 15 minutes.
+job_type: scheduler_events_aggregation
+trigger_type: timer
+schedule_expression: "0 */15 * * * *"
+category: maintenance
+execution_mode: reusable
+max_runtime_seconds: 300
+enabled: true
+status: active
+namespace_id: zqk:kernel
+schema_version: "2.0.0"

@@ -47,7 +47,7 @@ func TestViolationResolution_Reference_MissingReference(t *testing.T) {
 	}
 
 	// Create without reference, then promote so checkKindObjects sees CAS (not draft-only).
-	// TRACK: BLI-REDACTED — draft-plane create / promote membrane.
+	// TRACK: BLI-1785443942668406000-1ec5c811 — draft-plane create / promote membrane.
 	obj := map[string]any{
 		objects.FieldKeyID:            "BLI-306",
 		objects.FieldKeyKind:          "backlog_item",

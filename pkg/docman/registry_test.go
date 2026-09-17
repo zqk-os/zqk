@@ -2,14 +2,17 @@ package docman
 
 import (
 	"context"
-	"os"
+	"fmt"
 	"path/filepath"
 	"sync"
 	"testing"
 
 	pkgctx "github.com/lanceman/zqk/pkg/context"
 	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/lanceman/zqk/pkg/paths"
+	"github.com/lanceman/zqk/pkg/process"
 	"github.com/lanceman/zqk/pkg/storage"
+	"github.com/lanceman/zqk/pkg/utils/fileutil"
 )
 
 type mockDocStorageProvider struct {
@@ -52,7 +55,7 @@ func (m *mockDocStorageProvider) Read(ctx context.Context, sec *pkgctx.SecurityC
 
 	obj, ok := m.objects[id]
 	if !ok {
-		return nil, os.ErrNotExist
+		return nil, fileutil.ErrNotExist
 	}
 	return obj, nil
 }
@@ -92,10 +95,10 @@ func TestRegistry_GetExistingEntriesAndCreate(t *testing.T) {
 	// Create a dummy markdown file
 	docRelPath := "docs/architecture/design.md"
 	docAbsPath := filepath.Join(tmpDir, docRelPath)
-	if err := os.MkdirAll(filepath.Dir(docAbsPath), 0755); err != nil {
+	if err := fileutil.MkdirAll(filepath.Dir(docAbsPath), 0755); err != nil {
 		t.Fatalf("mkdir failed: %v", err)
 	}
-	if err := os.WriteFile(docAbsPath, []byte("# System Design\n\n## Overview\n\nHigh level architecture."), 0644); err != nil {
+	if err := fileutil.WriteFile(docAbsPath, []byte("# System Design\n\n## Overview\n\nHigh level architecture."), 0644); err != nil {
 		t.Fatalf("write file failed: %v", err)
 	}
 
@@ -106,7 +109,7 @@ func TestRegistry_GetExistingEntriesAndCreate(t *testing.T) {
 	meta := &DocumentMetadata{
 		Title:    "System Design",
 		Summary:  "High level architecture.",
-		Status:   "active",
+		Status:   objects.ObjectStatusActive,
 		Group:    "architecture",
 		Category: "design",
 	}
@@ -136,10 +139,10 @@ func TestRegistry_UpdateExistingEntries(t *testing.T) {
 
 	docRelPath := "docs/guide.md"
 	docAbsPath := filepath.Join(tmpDir, docRelPath)
-	if err := os.MkdirAll(filepath.Dir(docAbsPath), 0755); err != nil {
+	if err := fileutil.MkdirAll(filepath.Dir(docAbsPath), 0755); err != nil {
 		t.Fatalf("mkdir failed: %v", err)
 	}
-	if err := os.WriteFile(docAbsPath, []byte("# Guide Content"), 0644); err != nil {
+	if err := fileutil.WriteFile(docAbsPath, []byte("# Guide Content"), 0644); err != nil {
 		t.Fatalf("write file failed: %v", err)
 	}
 
@@ -167,5 +170,137 @@ func TestRegistry_UpdateExistingEntries(t *testing.T) {
 	}
 	if _, ok := obj["content_hash"]; !ok {
 		t.Errorf("expected content_hash to be populated")
+	}
+}
+
+func TestRegistry_RegisterAll_ContextCancellation(t *testing.T) {
+	t.Parallel()
+	mockStore := newMockDocStorageProvider()
+	tmpDir := t.TempDir()
+
+	for i := 1; i <= 5; i++ {
+		docPath := filepath.Join(tmpDir, "docs", fmt.Sprintf("doc_%d.md", i))
+		if err := fileutil.MkdirAll(filepath.Dir(docPath), 0755); err != nil {
+			t.Fatalf("mkdir failed: %v", err)
+		}
+		if err := fileutil.WriteFile(docPath, []byte("# Title\nContent"), 0644); err != nil {
+			t.Fatalf("write file failed: %v", err)
+		}
+	}
+
+	reg := NewRegistry(mockStore, tmpDir)
+	ctx, cancel := context.WithCancel(context.Background())
+	cancel() // Cancel immediately
+
+	created, _, err := reg.RegisterAll(ctx, "test", false)
+	if err == nil {
+		t.Fatalf("expected context.Canceled error, got nil")
+	}
+	if created != 0 {
+		t.Errorf("expected 0 created on immediate cancel, got %d", created)
+	}
+}
+
+func TestDocmanRegisterMeaningfulActivity(t *testing.T) {
+	mockStore := newMockDocStorageProvider()
+	tmpDir := t.TempDir()
+
+	for i := 1; i <= 3; i++ {
+		docPath := filepath.Join(tmpDir, "docs", fmt.Sprintf("doc_%d.md", i))
+		if err := fileutil.MkdirAll(filepath.Dir(docPath), 0755); err != nil {
+			t.Fatalf("mkdir failed: %v", err)
+		}
+		if err := fileutil.WriteFile(docPath, []byte(fmt.Sprintf("# Title %d\nContent", i)), 0644); err != nil {
+			t.Fatalf("write file failed: %v", err)
+		}
+	}
+
+	reg := NewRegistry(mockStore, tmpDir)
+	created, skipped, err := reg.RegisterAll(context.Background(), "test", false)
+	if err != nil {
+		t.Fatalf("expected successful registration, got: %v", err)
+	}
+	if created != 3 {
+		t.Errorf("expected 3 created, got %d", created)
+	}
+	if skipped != 0 {
+		t.Errorf("expected 0 skipped, got %d", skipped)
+	}
+
+	// Verify meaningful activity was touched recently
+	lastActivity := process.GetLastMeaningfulActivity()
+	if lastActivity.IsZero() {
+		t.Errorf("expected non-zero meaningful activity timestamp")
+	}
+}
+
+func TestRegistry_RegisterSubtrees(t *testing.T) {
+	t.Parallel()
+	mockStore := newMockDocStorageProvider()
+	tmpDir := t.TempDir()
+
+	// Create shipped docs and non-shipped docs
+	files := map[string]string{
+		"docs/architecture/arch.md":      "# Architecture\nDesign",
+		"docs/best-practices/rules.md":   "# Best Practices\nRules",
+		"docs/onboarding/guide.md":       "# Onboarding\nGuide",
+		"docs/onboarding/archive/old.md": "# Old Guide\nDeprecated",
+		"docs/launch/launch.md":          "# Launch Notes\nGTM",
+	}
+
+	for relPath, content := range files {
+		fullPath := filepath.Join(tmpDir, relPath)
+		if err := fileutil.MkdirAll(filepath.Dir(fullPath), 0755); err != nil {
+			t.Fatalf("mkdir failed: %v", err)
+		}
+		if err := fileutil.WriteFile(fullPath, []byte(content), 0644); err != nil {
+			t.Fatalf("write file failed: %v", err)
+		}
+	}
+
+	reg := NewRegistry(mockStore, tmpDir)
+	created, skipped, err := reg.RegisterSubtrees(context.Background(), "test", ShippedInitDocSubtrees, false)
+	if err != nil {
+		t.Fatalf("RegisterSubtrees failed: %v", err)
+	}
+
+	if created != 3 {
+		t.Fatalf("expected 3 created doc_entries, got %d", created)
+	}
+	if skipped != 0 {
+		t.Fatalf("expected 0 skipped, got %d", skipped)
+	}
+
+	// Verify only the 3 shipped docs exist in store
+	if len(mockStore.objects) != 3 {
+		t.Fatalf("expected exactly 3 objects in storage, got %d", len(mockStore.objects))
+	}
+
+	registeredPaths := make(map[string]bool)
+	for _, obj := range mockStore.objects {
+		p := obj[objects.FieldKeyPath].(string)
+		registeredPaths[paths.NormalizeDocEntryPathForKey(p)] = true
+	}
+
+	for _, expected := range []string{"docs/architecture/arch.md", "docs/best-practices/rules.md", "docs/onboarding/guide.md"} {
+		if !registeredPaths[expected] {
+			t.Errorf("expected %s to be registered", expected)
+		}
+	}
+	if registeredPaths["docs/onboarding/archive/old.md"] {
+		t.Errorf("archive doc should NOT be registered")
+	}
+	if registeredPaths["docs/launch/launch.md"] {
+		t.Errorf("launch doc should NOT be registered")
+	}
+}
+
+func TestRegisterShippedDocs_FailClosed(t *testing.T) {
+	t.Parallel()
+
+	// Empty project root should fail immediately
+	_, _, err := RegisterShippedDocs(context.Background(), "", nil)
+	if err == nil {
+		t.Errorf("expected error on empty projectRoot, got nil")
 	}
 }

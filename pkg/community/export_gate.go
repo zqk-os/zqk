@@ -3,9 +3,10 @@ package community
 import (
 	"fmt"
 	"io/fs"
-	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/lanceman/zqk/pkg/utils/fileutil"
 )
 
 // Violation represents a prohibited path or content discovered in the community tree.
@@ -53,7 +54,7 @@ func RunExportGate(targetDir string, extraProhibited []string) (*ExportGateResul
 		return nil, fmt.Errorf("failed to resolve target directory: %w", err)
 	}
 
-	info, err := os.Stat(absDir)
+	info, err := fileutil.Stat(absDir)
 	if err != nil {
 		return nil, fmt.Errorf("target directory does not exist: %w", err)
 	}

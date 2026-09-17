@@ -30,11 +30,11 @@ Optional nested objects:
 | `start_gate` | When `status` is `draft`, `EvaluateConvergencePredicateReadiness` can require `min_lines_in_window` (int, default 1) against `TestBundleConvergenceSnapshot.LinesInWindow`. |
 | `completion_gate` | Optional `require_ready_for_session_completion` (bool, default true). When set to `false`, the completion predicate is treated as satisfied for planning signals only — **lifecycle transitions** (`draft`→`active`, `active`→`completed`) remain governed by `convergence_session_lifecycle.yaml` and operator/`zqk object update` unless extended elsewhere. |
 
-**Admission vs start_gate:** `thresholds.start_gate` is a **measure readiness hint**, not the membrane admission gate for leaving `draft`. Draft→active requires non-empty `hypothesis`, `desired_end_state`, and `current_phase` (`convergence_session_lifecycle.yaml` + lifecycle builder). TRACK: `BLI-REDACTED`.
+**Admission vs start_gate:** `thresholds.start_gate` is a **measure readiness hint**, not the membrane admission gate for leaving `draft`. Draft→active requires non-empty `hypothesis`, `desired_end_state`, and `current_phase` (`convergence_session_lifecycle.yaml` + lifecycle builder). TRACK: `BLI-1786686769839541000-f5a3260f`.
 
 ## Session status behavior matrix (Option A)
 
-Canonical helpers: `pkg/convergence` (`SessionStatusEligibleForCAP`, `SessionStatusPersistsMeasurement`, `SessionStatusListedForWhatsNextMeasure`, `SessionStatusEligibleForAutoStaleEscalate`). Decision: `DEC-REDACTED`. Semantics BLI: `BLI-REDACTED`.
+Canonical helpers: `pkg/convergence` (`SessionStatusEligibleForCAP`, `SessionStatusPersistsMeasurement`, `SessionStatusListedForWhatsNextMeasure`, `SessionStatusEligibleForAutoStaleEscalate`). Decision: `DEC-1786686986572580000-54124993`. Semantics BLI: `BLI-1786686768606200000-31133cc3`.
 
 | Status | CAP bind | Measure persist | whats-next measure | Auto-stale→escalated |
 |--------|----------|-----------------|--------------------|----------------------|

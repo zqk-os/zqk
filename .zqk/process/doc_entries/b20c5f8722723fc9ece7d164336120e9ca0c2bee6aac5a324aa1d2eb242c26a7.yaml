@@ -1,0 +1,22 @@
+category: architecture
+content_hash: d8b444a05bb130c18dddca95f43e39accd1d024055cb2b8ae9d27cc167a8d89e
+content_searchable: true
+content_size: 2427
+created_at: "2026-09-17T08:44:00Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-270
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/SCHEDULER_TEST_DAEMON_BOUNDS.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: '| Mode | Helper | Default ceiling | |------|--------|-----------------| | CLI scheduler start (detached) | testkit.StartBoundCLIScheduler | 3m (DefaultMaxCLISchedulerDaemonLifetime) | | In-process ...'
+title: Scheduler test daemon bounds
+updated_at: "2026-09-17T08:44:00Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

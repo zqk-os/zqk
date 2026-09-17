@@ -1,0 +1,22 @@
+category: architecture
+content_hash: 8a3edf29329bd645073634dc037cb86b7c7f4cb516d3556a77e3f29aabf029f2
+content_searchable: true
+content_size: 1567
+created_at: "2026-09-17T08:39:29Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-015
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/API_INTEGRATION_PATTERN.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: As ZQK scales, we will integrate with numerous third-party APIs (e.g., Fal.ai, Mubert, OpenAI)
+title: API Integration Pattern (Spec-Builder)
+updated_at: "2026-09-17T08:39:29Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

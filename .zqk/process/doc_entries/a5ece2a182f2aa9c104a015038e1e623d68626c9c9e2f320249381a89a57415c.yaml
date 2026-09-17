@@ -1,0 +1,22 @@
+category: architecture
+content_hash: 5756b96e91210eb92ee1d9ff4887b4b7fc80198ac3bcd93b9c1b63544093c947
+content_searchable: true
+content_size: 6715
+created_at: "2026-09-17T08:43:58Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-245
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/PROJECT_ROOT_RESOLUTION_LOCATIONS.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: All call sites that resolve project root from the current working directory now use ResolveProjectRoot(".") instead of FindProjectRoot(".") so that ZQK_PROJECT_ROOT and ZQK_TEST_ROOT are respected ...
+title: 'Project Root Resolution: Locations Updated to ResolveProjectRoot'
+updated_at: "2026-09-17T08:43:58Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

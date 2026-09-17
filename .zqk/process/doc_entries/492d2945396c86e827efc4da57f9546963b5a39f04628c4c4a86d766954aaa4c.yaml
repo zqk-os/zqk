@@ -1,0 +1,22 @@
+category: architecture
+content_hash: 6cf3537733d35b502ac74525df30bfeb6aa80bd729657766425168cc3a541173
+content_searchable: true
+content_size: 8258
+created_at: "2026-09-17T08:43:42Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-197
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/MCP_SERVER_FUNCTIONALITY.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: 'The MCP (Model Context Protocol) server provides comprehensive access to the ZQK knowledge kernel through:'
+title: MCP Server Functionality Overview
+updated_at: "2026-09-17T08:43:42Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

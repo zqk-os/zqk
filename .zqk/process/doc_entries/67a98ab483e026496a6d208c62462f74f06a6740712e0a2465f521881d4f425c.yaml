@@ -1,0 +1,22 @@
+category: architecture
+content_hash: fe99b1c310e548b000a41f756025af32eec8d17fbf21e381c9ab9b4716252baa
+content_searchable: true
+content_size: 16924
+created_at: "2026-09-17T08:44:01Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-271
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/SCHEDULER_TRANSCEIVER_ARCHITECTURE.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: A protocol-agnostic transceiver/router that handles all scheduler job communication patterns (job-to-job, external-to-internal, internal-to-external) with runtime-configurable routing rules
+title: Scheduler Transceiver Architecture
+updated_at: "2026-09-17T08:44:01Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

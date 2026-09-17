@@ -1,0 +1,22 @@
+category: architecture
+content_hash: c0f7f7bbe55c3a3ba75c3c693cbd4e326d7cec5a61ca33ed052fba5e9a743464
+content_searchable: true
+content_size: 8173
+created_at: "2026-09-17T08:39:32Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-047
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/CAS_MUTATION_SHOCKWAVE.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: 'system check GhostRef means: a referrer names an ID that Exists is false (CAS index-first, no directory scan)'
+title: CAS mutation shockwave (delete/update ≡ promote/demote)
+updated_at: "2026-09-17T08:39:32Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

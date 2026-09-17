@@ -1,0 +1,22 @@
+category: architecture
+content_hash: 0a5b2332d238829b3c6e7e60a1a8afde5481b718b99fee037550a29e404f35fe
+content_searchable: true
+content_size: 3637
+created_at: "2026-09-17T08:44:26Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-414
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/feature-flags-v1.0.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: Feature flags allow toggling experimental features on/off without code changes
+title: Feature Flags System
+updated_at: "2026-09-17T08:44:26Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

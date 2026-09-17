@@ -13,6 +13,7 @@ import (
 
 	"github.com/lanceman/zqk/pkg/agentclaim"
 	"github.com/lanceman/zqk/pkg/agentfeed"
+	"github.com/lanceman/zqk/pkg/authcred"
 	pkgctx "github.com/lanceman/zqk/pkg/context"
 	goroutinelabels "github.com/lanceman/zqk/pkg/goroutinelabels"
 	"github.com/lanceman/zqk/pkg/llm"
@@ -129,7 +130,7 @@ func (s *Scheduler) pollAndSpawnSwarmTasks(ctx context.Context) {
 
 		// Spawn worker via bounded pool to prevent DDOS
 		err = getSwarmWorkerPool().Submit(ctx, func(workerCtx context.Context) error {
-			secCtx := pkgctx.NewSecurityContext("ACC-1785920548450214011-dabd3692", []string{"swarm_worker"}, []string{"*"})
+			secCtx := pkgctx.NewSecurityContext(authcred.DefaultSwarmWorkerAccount, []string{"swarm_worker"}, []string{"*"})
 			workerCtx = pkgctx.WithSecurityContext(workerCtx, secCtx)
 			workerCtx, cancel := context.WithCancel(workerCtx)
 			defer cancel()

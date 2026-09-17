@@ -1,0 +1,22 @@
+category: architecture
+content_hash: d6c1c589b022c186c80924633f92012216dcad3ccf2e976b5b9ff4536501fc4a
+content_searchable: true
+content_size: 2447
+created_at: "2026-09-17T08:43:57Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-237
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/PRE_STAGE_FORMATTING.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: Git doesn't have a native "pre-stage" hook, so formatting happens at commit time
+title: Pre-Stage Formatting
+updated_at: "2026-09-17T08:43:57Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

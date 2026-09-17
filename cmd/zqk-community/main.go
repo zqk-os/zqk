@@ -31,10 +31,8 @@ func init() {
 		}
 	}
 
-	// COMMUNITY EDITION: Permanently bypass strict enterprise RBAC auth.
-	// This grants local users frictionless access to the sovereign local kernel
-	// without needing a cloud session.
-	_ = zqkenv.TestBypassAuth().Set("1")
+	// Community edition: frictionless local kernel. Auth middleware seats the
+	// system account when no token is present — not ACC-TEST-HARNESS.
 	zqkenv.IsCommunityEdition = true
 }
 

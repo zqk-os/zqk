@@ -1,0 +1,22 @@
+category: architecture
+content_hash: 2559a63d8e0fa2ffb5823e0ff37dce2b0997faab19f69416994c54f70a89dedd
+content_searchable: true
+content_size: 6792
+created_at: "2026-09-17T08:44:20Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-354
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/cache-staleness-detection.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: 'The object ID cache uses a two-tier staleness detection system to determine when the cache needs to be rebuilt:'
+title: Cache Staleness Detection
+updated_at: "2026-09-17T08:44:20Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

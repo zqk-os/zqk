@@ -1,0 +1,22 @@
+category: check
+content_hash: 7175b217b3c67588bb1672ec4c4e07242d2cb39f61066271d2289bcc4e043ff2
+content_searchable: true
+content_size: 5758
+created_at: "2026-09-17T08:44:48Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-584
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/system-check-cache-first-and-async.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: '- Thread 1: Update/invalidate ID cache — async, with callback when store completed'
+title: 'System check: cache-first, async population, quick CLI'
+updated_at: "2026-09-17T08:44:48Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

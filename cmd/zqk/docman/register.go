@@ -43,6 +43,8 @@ func NewRegisterCmd() *cobra.Command {
 	// Add flags
 	registerCmd.Flags().Bool("dry-run", false, "Show what would be registered without actually creating objects")
 	registerCmd.Flags().Bool("update-existing", false, "Update existing doc_entries to include missing reference fields per spec")
+	registerCmd.Flags().StringSlice("subtrees", nil, "Specific subtrees to scan and register (defaults to all docs/)")
+	registerCmd.Flags().Bool("shipped-only", false, "Only scan and register shipped documentation subtrees (architecture, best-practices, onboarding)")
 
 	// Add common flags
 	cli.AddCommonFlags(registerCmd)
@@ -58,12 +60,11 @@ func runRegister(cmd *cobra.Command, args []string) error {
 	}
 
 	// Get profile from command flags or default
-	profile, err := cmd.Flags().GetString("context")
-	if err != nil {
-		return errfmt.Newf("failed to get context flag").Wrap(err)
-	}
-	if profile == emptyValue {
-		profile = string(pkgctx.ProfileHuman) // Default profile
+	profile := string(pkgctx.ProfileHuman)
+	if f := cmd.Flags().Lookup("context"); f != nil {
+		if val, err := cmd.Flags().GetString("context"); err == nil && val != emptyValue {
+			profile = val
+		}
 	}
 
 	logger := logging.GetLoggerFromProfile(profile)
@@ -82,6 +83,17 @@ func runRegister(cmd *cobra.Command, args []string) error {
 	updateExisting, err := cmd.Flags().GetBool("update-existing")
 	if err != nil {
 		return errfmt.Newf("failed to get update-existing flag").Wrap(err)
+	}
+	subtrees, err := cmd.Flags().GetStringSlice("subtrees")
+	if err != nil {
+		return errfmt.Newf("failed to get subtrees flag").Wrap(err)
+	}
+	shippedOnly, err := cmd.Flags().GetBool("shipped-only")
+	if err != nil {
+		return errfmt.Newf("failed to get shipped-only flag").Wrap(err)
+	}
+	if shippedOnly && len(subtrees) == 0 {
+		subtrees = docman.ShippedInitDocSubtrees
 	}
 
 	// Initialize storage provider via StorageFactory for unified storage routing
@@ -109,14 +121,19 @@ func runRegister(cmd *cobra.Command, args []string) error {
 		}
 	}
 
-	// Register all documentation
+	// Register documentation
 	logging.Fluent(logger).Info("Starting documentation registration").
 		String("dry_run", fmt.Sprintf("%v", dryRun)).
 		Log()
 
-	created, skipped, err := registry.RegisterAll(cmdCtx, profile, dryRun)
+	created, skipped, err := registry.RegisterSubtrees(cmdCtx, profile, subtrees, dryRun)
 	if err != nil {
-		return errfmt.Newf("failed to register documentation").Wrap(err)
+		if !dryRun && created > 0 {
+			msg := fmt.Sprintf("Created %d doc_entry objects before interruption\nSkipped %d files (already registered)\n", created, skipped)
+			//nolint:errcheck // Output errors are non-critical
+			_ = cli.WriteOutput(cmd, []byte(msg))
+		}
+		return errfmt.Newf("failed to register documentation (created %d, skipped %d)", created, skipped).Wrap(err)
 	}
 
 	// Output results

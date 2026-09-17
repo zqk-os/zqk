@@ -105,7 +105,7 @@ func runStages(ctx context.Context, logger logging.Logger, pipelineKind string, 
 			case PlanBreakGlass:
 				// AllowCoreObjectDelete, elevated delete:*/delete:core, or isolated test root
 				// satisfies break-glass without Mutation.Reason.
-				// TRACK: BLI-REDACTED
+				// TRACK: BLI-1785723654802038000-b14064bc
 				if strings.TrimSpace(in.Reason) == "" &&
 					!pkgctx.GetAllowCoreObjectDelete(ctx) &&
 					!pkgctx.MayHardDeleteCoreWithoutReason(pkgctx.GetSecurityContext(ctx)) &&

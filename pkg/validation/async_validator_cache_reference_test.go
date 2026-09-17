@@ -2,7 +2,7 @@ package validation
 
 import "testing"
 
-// TRACK: BLI-REDACTED
+// TRACK: BLI-1785895580100186000-c5539372
 func TestHasBlockingReferenceIssues(t *testing.T) {
 	if hasBlockingReferenceIssues(nil) {
 		t.Fatal("nil issues")

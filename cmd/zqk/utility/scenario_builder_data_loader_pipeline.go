@@ -128,7 +128,7 @@ func stageScenarioPrepareCache(stageCtx *pipeline.Context, p any) (any, error) {
 		}
 		if kind, ok := obj[objects.FieldKeyKind].(string); ok && kind == objects.KindAccount {
 			if username, ok := obj[objects.FieldKeyUsername].(string); ok && username != emptyValue {
-				accountID := "" // ACC-* from storage; TRACK: BLI-REDACTED
+				accountID := "" // ACC-* from storage; TRACK: BLI-1785905134201010000-07393484
 				withLock(payload.referenceCacheMu, func() {
 					payload.referenceCache[accountID] = true
 				})

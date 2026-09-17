@@ -9,7 +9,7 @@
 **Archive ≠ erase:** [`CRUD_BUCKETING_ARCHIVING_REQUIREMENTS.md`](./CRUD_BUCKETING_ARCHIVING_REQUIREMENTS.md)  
 **Event rhythm:** [`EVENT_PIPELINE_AND_CONVERGENCE_INTEGRATION.md`](./EVENT_PIPELINE_AND_CONVERGENCE_INTEGRATION.md) (causality over clocks)
 
-**TRACK:** `PRI-CAS-MUTATION-SHOCKWAVE-001` (objectify this session). Related: `BLI-REDACTED` (do not delete archived criteria_refs to “heal” complete BLIs), `BLI-REDACTED` (GhostRef vs CacheLag).
+**TRACK:** `PRI-CAS-MUTATION-SHOCKWAVE-001` (objectify this session). Related: `BLI-1786698242916116000-e4b855ed` (do not delete archived criteria_refs to “heal” complete BLIs), `BLI-1786387465409533000-45bd780c` (GhostRef vs CacheLag).
 
 **Status-transition planes and which listener owns each catalyst:** [LIFECYCLE_SHOCKWAVE_MAP.md](./LIFECYCLE_SHOCKWAVE_MAP.md) (class catalog). **PRI hop tables:** [lifecycle_shockwave/kind_priority_plan.md](./lifecycle_shockwave/kind_priority_plan.md). This CUD contract is the erase/update plane; the catalog is the status-transition plane.
 

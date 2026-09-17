@@ -1,0 +1,22 @@
+category: graph-backend
+content_hash: f23cc232b3f65410485ed5736e6c66761c9e903e28f3d4a61b920e110a001c4f
+content_searchable: true
+content_size: 2234
+created_at: "2026-09-17T08:44:24Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-397
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/cryptographic_stamp_auto_merge.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: This architecture specification describes the sequence and paths for validating Cryptographic Agent Stamps in the ZQK kernel, including remote CI auto-merge and local offline fallback paths
+title: Cryptographic Agent Stamp Protocol
+updated_at: "2026-09-17T08:44:24Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

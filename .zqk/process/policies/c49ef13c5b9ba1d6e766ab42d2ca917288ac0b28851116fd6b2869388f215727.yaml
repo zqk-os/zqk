@@ -1,0 +1,50 @@
+body: |
+    **Tutorial for new agents and users**: Follow this order to align on operational philosophy and discover what matters. Everything below uses system objects so you stay in the indexable, auditable model.
+
+    **Step 1 – Operational philosophy**
+    - Read the policy "Operational Philosophy - Object-First, Discoverable, Auditable":
+      `zqk object list policy --filter "title=Operational Philosophy*"`
+      `zqk object get <POLICY_ID>`
+    - Principle: substantive things are objects; they are discoverable and auditable; work is shaped by mission, vision, and goals.
+
+    **Step 2 – Mission, vision, goals**
+    - List mission and vision objects (if any): `zqk object list mission`, `zqk object list vision`
+    - List goals: `zqk object list goal`
+    - These define the "why" and desired outcomes. Use them to judge relevance of work.
+
+    **Step 3 – Policy index**
+    - List all policies: `zqk object list policy`
+    - By category: `zqk object list policy --filter category=architecture`, `--filter category=workflow`, etc.
+    - Policies state standards and expectations. Consult before implementing.
+
+    **Step 4 – Current priorities**
+    - Current priority plan: `zqk object list priority_plan --filter status=in_progress` (or active)
+    - Backlog items on that plan: `zqk object list backlog_item --filter priority_plan_ref=<PLAN_ID>`
+    - Competing priorities are balanced via the active plan and backlog order; work in plan order when the project rules require it.
+
+    **Step 5 – System health (optional but recommended)**
+    - Retention and maintenance: `zqk system retention-status`, `zqk system ensure-retention-jobs`
+    - Object health: `zqk system check` (and reminders, including retention_drift when over target)
+
+    **Benefits**: You and other agents share the same object-first view, can query the same index, and collaborate on meaningful work aligned with mission, vision, and goals. When in doubt, query objects first; use docs as extended context.
+category: documentation
+created_at: "2026-02-23T00:00:00Z"
+created_by: ACC-1785920548450214012-68b850c0
+description: ""
+effective_date: "2026-02-23"
+enforcement:
+    automated: false
+    reminder_enabled: true
+    severity: low
+id: POL-CODE-1789672474616378000-f9f8ce31
+kind: policy
+namespace_id: zqk:kernel
+origin_project: zqk
+origin_system: zqk
+policy_type: guideline
+schema_version: 2.0.0
+status: active
+title: For New Agents and Users - Start Here (Tutorial)
+updated_at: "2026-09-17T19:28:57Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

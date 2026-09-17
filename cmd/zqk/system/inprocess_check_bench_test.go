@@ -41,7 +41,7 @@ func TestInProcessWarmCheckBenchmark(t *testing.T) {
 
 	// Benchmark warm CheckKindObjectsWithCache for single object validation
 	dummyCmd := &cobra.Command{}
-	targetID := "CVS-REDACTED"
+	targetID := "CVS-1234567890123456000-abcdef12"
 	var durMs []float64
 
 	// Warmup

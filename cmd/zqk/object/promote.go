@@ -68,7 +68,7 @@ func promoteObjectIDs(cmd *cobra.Command, proc *cli.Processor, args []string) er
 	gv := validation.NewGoValidatorWithLoaders(specLoader, lifecycleLoader)
 
 	var errors []string
-	// TRACK: BLI-REDACTED — flushKinds must be non-empty or CAS index
+	// TRACK: BLI-1785439452834271000-85e1c4e3 — flushKinds must be non-empty or CAS index
 	// queue is never flushed (nil skipped the listing-index write; next CLI process → object-not-found).
 	affectedKinds := make([]string, 0, len(args))
 	kindSet := make(map[string]bool, len(args))
@@ -81,6 +81,10 @@ func promoteObjectIDs(cmd *cobra.Command, proc *cli.Processor, args []string) er
 	}
 	for _, idArg := range args {
 		process.TouchMeaningfulActivity()
+		if ctx.Err() != nil {
+			errors = append(errors, fmt.Sprintf("%s: skipped due to context timeout: %v", idArg, ctx.Err()))
+			break
+		}
 		// Resolve natural language intents
 		id, err := proc.ResolveSemanticArgument(ctx, "", idArg)
 		if err != nil {
@@ -134,7 +138,7 @@ func promoteObjectIDs(cmd *cobra.Command, proc *cli.Processor, args []string) er
 		if currentIdx == -1 {
 			// Kernel repair: illegal/undefined status (e.g. legacy "proposed") cannot walk
 			// the graph. Recover onto an initial lifecycle status when validation allows.
-			// TRACK: BLI-REDACTED
+			// TRACK: BLI-1785723654802038000-b14064bc
 			var recoverOrder []string
 			for _, st := range lifecycle.Statuses {
 				if st.Origin || st.Preliminary {
@@ -192,7 +196,7 @@ func promoteObjectIDs(cmd *cobra.Command, proc *cli.Processor, args []string) er
 			}
 			updateMap := map[string]any{objects.FieldKeyStatus: recovered}
 			// Skip transition validation: source status is not in the lifecycle graph.
-			// TRACK: BLI-REDACTED
+			// TRACK: BLI-1785784867143912000-635942fb
 			promoteCtx := pkgctx.WithLifecycleBreakGlass(
 				pkgctx.WithCacheUpdate(ctx, id, kind, ""),
 				"promote recover undefined status to lifecycle initial",
@@ -287,13 +291,13 @@ func promoteObjectIDs(cmd *cobra.Command, proc *cli.Processor, args []string) er
 			// Apply YAML side_effects.clear before composed_integrity (e.g. drop
 			// active_order on priority_plan → complete). Probe used to copy status
 			// only, so promote active→complete failed while active_order was set.
-			// TRACK: BLI-REDACTED
+			// TRACK: BLI-1785439369431933000-f0cccd6c
 			for _, field := range objects.TransitionClearFields(lifecycle, currentStatus, candidate) {
 				delete(candidateObj, field)
 			}
 
 			// CRI-PERSONA-SKILL-BOUND: refuse shovel-ready+ promote without resolving ASK links.
-			// TRACK: BLI-REDACTED
+			// TRACK: BLI-1785904242062561000-ec024787
 			if kind == objects.KindPersona && personaPromoteRequiresSkillBound(candidate) {
 				resolve := func(askID string) (map[string]any, error) {
 					return proc.Storage().Read(ctx, secCtx, askID)
@@ -359,7 +363,6 @@ func promoteObjectIDs(cmd *cobra.Command, proc *cli.Processor, args []string) er
 				continue
 			}
 		}
-
 
 		finalStatus := bestStatus
 		promoteCtx := pkgctx.WithCacheUpdate(ctx, id, kind, "")
@@ -635,14 +638,14 @@ func probeHasExecutionHop(candidates []string) bool {
 // promoteTransitionTargets returns statuses reachable in one hop from current via lifecycle
 // transitions that promote may take (from == current or from == "*").
 // Auto-only edges (shockwave / "all children done") are excluded so promote cannot overshoot
-// shovel-ready active → complete. TRACK: BLI-REDACTED
+// shovel-ready active → complete. TRACK: BLI-1785439373392455000-d2dd4f41
 func promoteTransitionTargets(lifecycle *objects.Lifecycle, current string) map[string]struct{} {
-	// Shared with pkg/objects contract tests (TRACK: BLI-REDACTED).
+	// Shared with pkg/objects contract tests (TRACK: BLI-1785439373392455000-d2dd4f41).
 	return objects.PromoteTransitionTargets(lifecycle, current)
 }
 
 // personaPromoteRequiresSkillBound is true for shovel-ready and later persona statuses.
-// TRACK: BLI-REDACTED
+// TRACK: BLI-1785904242062561000-ec024787
 func personaPromoteRequiresSkillBound(status string) bool {
 	switch strings.ToLower(strings.TrimSpace(status)) {
 	case objects.ObjectStatusApproved, objects.ObjectStatusInProgress, objects.ObjectStatusImplemented:
@@ -653,7 +656,7 @@ func personaPromoteRequiresSkillBound(status string) bool {
 }
 
 // priorityPlanPromotePackagingCue surfaces PRI≈PR packaging when promoting a wrap-ready plan.
-// TRACK: BLI-REDACTED
+// TRACK: BLI-1785442973237212000-c8e47a18
 func priorityPlanPromotePackagingCue(ctx context.Context, sp storage.ObjectStorageProvider, secCtx *pkgctx.SecurityContext, planID string, current map[string]any, newStatus string) string {
 	title, _ := current[objects.FieldKeyTitle].(string)
 	counts := map[string]int{}

@@ -1,0 +1,22 @@
+category: storage
+content_hash: 8d2418206ef63ef740f845fed16fa9f5956ed25528984c6be5ab7e4e441c869d
+content_searchable: true
+content_size: 1431
+created_at: "2026-09-17T08:44:47Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-570
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/storage/TEST_SEPARATION.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: '- Time: ~1-2 seconds - Purpose: Quick validation of individual storage components - Characteristics: - Isolated components - No real file system operations (uses t.TempDir()) - No background workers'
+title: 'Test Separation: Unit vs Integration'
+updated_at: "2026-09-17T08:44:47Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

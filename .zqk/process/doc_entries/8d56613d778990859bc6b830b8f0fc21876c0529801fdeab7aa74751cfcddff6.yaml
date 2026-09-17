@@ -1,0 +1,22 @@
+category: architecture
+content_hash: 38dc6f45e5000692b98b9a69ca7c6e7ebf194ca89fb6e24414cdd190ad24bb7f
+content_searchable: true
+content_size: 4013
+created_at: "2026-09-17T08:44:33Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-466
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/mcp/BRAND_PREFIX.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: All MCP tool names now use a configurable brand prefix derived from the executable name, enabling white-labeling without hardcoded brand references.
+title: Configurable Brand Prefix for Tool Names
+updated_at: "2026-09-17T08:44:33Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

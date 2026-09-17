@@ -201,7 +201,7 @@ func TestProcessSeatInbox_namedATKWithoutOnNonComms(t *testing.T) {
 	root := t.TempDir()
 	mustWriteLiteFeed(t, root)
 	const seat = "peer-agent-1"
-	body := "COMMS+WORK ND-1: Execute ONLY ATK-REDACTED. Do NOT execute ATK-REDACTED."
+	body := "COMMS+WORK ND-1: Execute ONLY ATK-1787738919414925000-41b3c9d7. Do NOT execute ATK-1787739837478620000-7db4746e."
 	if _, err := AppendEvent(AppendEventInput{
 		ProjectRoot: root, Message: body, AgentID: "cursor-composer",
 		ToAgentID: seat, Sender: FeedSenderHumanSteer, EventType: FeedEventTypeSteering,
@@ -227,7 +227,7 @@ func TestProcessSeatInbox_namedATKWithoutOnNonComms(t *testing.T) {
 	if res.Skipped != 0 {
 		t.Fatalf("skipped=%d want 0 errors=%v", res.Skipped, res.Errors)
 	}
-	if got != "ATK-REDACTED" {
+	if got != "ATK-1787738919414925000-41b3c9d7" {
 		t.Fatalf("named=%q", got)
 	}
 }
@@ -246,7 +246,7 @@ func TestSeatEventAttemptLedger_newAFEDoesNotInheritATKBudget(t *testing.T) {
 	t.Parallel()
 	root := t.TempDir()
 	const seat = "peer-agent-1"
-	const atk = "ATK-REDACTED"
+	const atk = "ATK-1787738929491339000-57449893"
 	for i := 0; i < 3; i++ {
 		if _, err := RecordSeatEventAttempt(root, seat, SeatAttemptKey("AFE-old", atk)); err != nil {
 			t.Fatal(err)
@@ -281,8 +281,8 @@ func TestSeatEventAttemptCount(t *testing.T) {
 func TestPrioritizeSeatInbox_newestNamedATKFirst(t *testing.T) {
 	t.Parallel()
 	got := prioritizeSeatInbox([]CorrespondenceItem{
-		{EventID: "AFE-old", Timestamp: "2026-08-26T19:00:00Z", Message: "Execute ONLY ATK-REDACTED"},
-		{EventID: "AFE-new", Timestamp: "2026-08-26T20:08:00Z", Message: "Execute ONLY ATK-REDACTED"},
+		{EventID: "AFE-old", Timestamp: "2026-08-26T19:00:00Z", Message: "Execute ONLY ATK-1787738919414925000-41b3c9d7"},
+		{EventID: "AFE-new", Timestamp: "2026-08-26T20:08:00Z", Message: "Execute ONLY ATK-1787738919414925000-41b3c9d7"},
 		{EventID: "AFE-attn", Timestamp: "2026-08-26T20:09:00Z", Message: "ATTN peer: no ATK"},
 	})
 	if len(got) != 3 || got[0].EventID != "AFE-new" || got[1].EventID != "AFE-old" || got[2].EventID != "AFE-attn" {

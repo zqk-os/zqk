@@ -22,7 +22,7 @@ It is **not**:
 1. **Reduced refs + `--auto-fix` or `--force` is refused** (fail closed). Covers both `--fast` and `--check-refs=false`. Incident lesson: scheduled `check all --auto-fix --fast` demoted terminal objects while the rollup printed pass.
 2. A green reduced-surface result is labeled **PARTIAL CHECK** in table and JSON (`partial_check: true` + message). Do not equate it with full `system check` health.
 3. Mutating / release / pre-commit / kernel-health gates must use a **full** check (refs on).
-4. **Autofix must not demote `status` → `error`.** Persistence of that demotion is refused (no validation skip + break_glass). Tracked: **`BLI-REDACTED`**.
+4. **Autofix must not demote `status` → `error`.** Persistence of that demotion is refused (no validation skip + break_glass). Tracked: **`BLI-1785723654802038000-b14064bc`**.
 
 ## Intended use
 
@@ -31,7 +31,7 @@ It is **not**:
 
 ## Future (TRACK)
 
-Replace `--fast` with **CAS-hash attestation**: if content hash is unchanged since the last validated write, reuse that verdict; if changed, the writer owed validation. Tracked under autofix/status demote discipline **`BLI-REDACTED`**.
+Replace `--fast` with **CAS-hash attestation**: if content hash is unchanged since the last validated write, reuse that verdict; if changed, the writer owed validation. Tracked under autofix/status demote discipline **`BLI-1785723654802038000-b14064bc`**.
 
 ## See also
 

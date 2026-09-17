@@ -1,0 +1,22 @@
+category: migration
+content_hash: a9fe738cbf5d451a70c57d67b5fcb7829fb9fff9e260ef8a2e406105e879a889
+content_searchable: true
+content_size: 6552
+created_at: "2026-09-17T08:44:46Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-568
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/specbuilder-migration-guide-v1.0.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: 'Documentation: # SpecBuilder Migration Guide'
+title: SpecBuilder Migration Guide
+updated_at: "2026-09-17T08:44:46Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

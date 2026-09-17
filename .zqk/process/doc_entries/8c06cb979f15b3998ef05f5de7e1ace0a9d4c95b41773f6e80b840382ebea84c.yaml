@@ -1,0 +1,22 @@
+category: validation
+content_hash: 347ae465faa120806b2e3f4b225d84024f66bbe834d42444079ef52ad40fe4cf
+content_searchable: true
+content_size: 6113
+created_at: "2026-09-17T08:44:19Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-345
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/async-validation-system-v1.0.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: The async validation system transforms the system check command from a synchronous, blocking operation into an eventually consistent, priority-based validation system that leverages caching and bac...
+title: Async Validation System
+updated_at: "2026-09-17T08:44:19Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

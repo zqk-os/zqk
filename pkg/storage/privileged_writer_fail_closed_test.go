@@ -23,7 +23,7 @@ func TestPrivilegedWriterFailClosed_Create(t *testing.T) {
 	// Create an object
 	obj := map[string]any{
 		objects.FieldKeyKind:   "backlog_item",
-		objects.FieldKeyID:     "BLI-REDACTED",
+		objects.FieldKeyID:     "BLI-1234567890123456789-abcdef12",
 		objects.FieldKeyStatus: objects.ObjectStatusExploring,
 		objects.FieldKeyTitle:  "Test BLI",
 	}
@@ -52,7 +52,7 @@ func TestPrivilegedWriterFailClosed_Update(t *testing.T) {
 	// Create an object
 	obj := map[string]any{
 		objects.FieldKeyKind:        "backlog_item",
-		objects.FieldKeyID:          "BLI-REDACTED",
+		objects.FieldKeyID:          "BLI-1234567890123456789-abcdef13",
 		objects.FieldKeyStatus:      objects.ObjectStatusValidated,
 		objects.FieldKeyTitle:       "Test BLI",
 		objects.FieldKeyDescription: "Substantive description for privileged writer fail closed test.",
@@ -74,7 +74,7 @@ func TestPrivilegedWriterFailClosed_Update(t *testing.T) {
 	updates := map[string]any{
 		objects.FieldKeyTitle: "Updated BLI",
 	}
-	err = f.Update(ctx, secCtx, "BLI-REDACTED", updates)
+	err = f.Update(ctx, secCtx, "BLI-1234567890123456789-abcdef13", updates)
 	if err == nil {
 		t.Fatalf("Expected Update to fail-closed when PrivilegedWriter daemon is down, but it succeeded")
 	}
@@ -91,7 +91,7 @@ func TestPrivilegedWriterFailClosed_UpdateIDChange(t *testing.T) {
 
 	obj := map[string]any{
 		objects.FieldKeyKind:        "backlog_item",
-		objects.FieldKeyID:          "BLI-REDACTED",
+		objects.FieldKeyID:          "BLI-1234567890123456789-abcdef14",
 		objects.FieldKeyStatus:      objects.ObjectStatusValidated,
 		objects.FieldKeyTitle:       "Test BLI",
 		objects.FieldKeyDescription: "Substantive description for privileged writer fail closed test.",
@@ -111,9 +111,9 @@ func TestPrivilegedWriterFailClosed_UpdateIDChange(t *testing.T) {
 
 	// Update the object ID
 	updates := map[string]any{
-		objects.FieldKeyID: "BLI-REDACTED",
+		objects.FieldKeyID: "BLI-1234567890123456789-abcdef15",
 	}
-	err = f.Update(ctx, secCtx, "BLI-REDACTED", updates)
+	err = f.Update(ctx, secCtx, "BLI-1234567890123456789-abcdef14", updates)
 	if err == nil {
 		t.Fatalf("Expected Update (ID Change) to fail-closed when PrivilegedWriter daemon is down, but it succeeded")
 	}
@@ -130,7 +130,7 @@ func TestPrivilegedWriterFailClosed_Delete(t *testing.T) {
 
 	obj := map[string]any{
 		objects.FieldKeyKind:        "backlog_item",
-		objects.FieldKeyID:          "BLI-REDACTED",
+		objects.FieldKeyID:          "BLI-1234567890123456789-abcdef16",
 		objects.FieldKeyStatus:      objects.ObjectStatusValidated,
 		objects.FieldKeyTitle:       "Test BLI",
 		objects.FieldKeyDescription: "Substantive description for privileged writer fail closed test.",
@@ -150,7 +150,7 @@ func TestPrivilegedWriterFailClosed_Delete(t *testing.T) {
 
 	// Core-kind delete refuses first; satisfy that membrane so this test
 	// can observe the privileged-writer fail-closed (do not weaken core-delete).
-	err = f.Delete(WithTestHardDelete(ctx), secCtx, "BLI-REDACTED", false)
+	err = f.Delete(WithTestHardDelete(ctx), secCtx, "BLI-1234567890123456789-abcdef16", false)
 	if err == nil {
 		t.Fatalf("Expected Delete to fail-closed when PrivilegedWriter daemon is down, but it succeeded")
 	}

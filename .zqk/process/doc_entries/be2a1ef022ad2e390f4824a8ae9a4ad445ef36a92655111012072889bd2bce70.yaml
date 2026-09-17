@@ -1,0 +1,22 @@
+category: architecture
+content_hash: 17d9213228016afc8854ba6add1b0c403e4fe943a7c969d61331cc66ff114013
+content_searchable: true
+content_size: 4452
+created_at: "2026-09-17T08:44:30Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-421
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/git-workflow-enforcement-v1.0.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: This document describes the pre-commit hook implementation that enforces the git workflow policy, preventing direct commits to the main branch.
+title: Git Workflow Enforcement via Pre-commit Hook
+updated_at: "2026-09-17T08:44:30Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

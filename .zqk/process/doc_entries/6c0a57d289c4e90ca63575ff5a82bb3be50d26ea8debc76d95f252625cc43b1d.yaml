@@ -1,0 +1,22 @@
+category: architecture
+content_hash: 7e19900b61cec5a317f667019765d352ad87943cf1c8ce03d04b6b0e6bbffdfd
+content_searchable: true
+content_size: 2177
+created_at: "2026-09-17T08:44:12Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-298
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/STRATEGIC_OPTIONS_PHASE_14.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: '- Architectural Shift: Instead of building hardcoded Go clients in pkg/services, we will architect these as formal ZQK Skills (e.g., skill-veed-generator, skill-sonic-producer)'
+title: 'Strategic Options: Post-Beta Execution (Phase 14)'
+updated_at: "2026-09-17T08:44:12Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

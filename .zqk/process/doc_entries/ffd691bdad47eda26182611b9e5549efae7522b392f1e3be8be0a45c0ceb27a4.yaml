@@ -1,0 +1,22 @@
+category: architecture
+content_hash: b9cd4d8e19613f0ee298658bf4361dca51baed65b7d45fe663e6920106b45184
+content_searchable: true
+content_size: 3446
+created_at: "2026-09-17T08:43:57Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-232
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/POLICY_AND_CONTEXT_REFRESH.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: '| Aspect | policy | context_refresh_schedule | |--------|----------|----------------------------| | What it is | Project standards, guidelines, enforcement index | Scheduler config: when to refresh...'
+title: Policy vs Context Refresh Schedule
+updated_at: "2026-09-17T08:43:57Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

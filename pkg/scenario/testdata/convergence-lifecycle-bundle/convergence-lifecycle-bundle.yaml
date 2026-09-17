@@ -78,7 +78,7 @@ objects:
       requirement_refs: [REQ-CLF-001]
   convergence_sessions:
     # Canonical CVS id (digits + lowercase hex) so scheduler convergence_session_tick env validation accepts bundle-applied sessions.
-    - id: CVS-REDACTED
+    - id: CVS-1234567890123456789-abcdef12
       id_hint: CVS-CLF-001
       title: Convergence session scaffold (phase router + coordinator)
       status: draft

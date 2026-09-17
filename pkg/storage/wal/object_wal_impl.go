@@ -690,6 +690,7 @@ func CompactWAL(projectRoot string) error {
 		logging.LogSwallowedError(fileutil.RemoveFile(tempPath))
 		return errfmt.Newf(ConstStreamFailedToReplaceWalFile).Wrap(err)
 	}
+	_ = fileutil.SyncDir(filepath.Dir(walPath))
 
 	StorageLog(logger).Info(LogEventStorageObjectWALCompactionCompletedInfo).
 		Int("total_records", int(totalRecords)).

@@ -1,0 +1,22 @@
+category: check
+content_hash: 61195892739dd2a6c9e1fc231d21892addfc57f90e8f4b740033ef9f53721b61
+content_searchable: true
+content_size: 9259
+created_at: "2026-09-17T08:42:13Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-131
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/HEALTH_CHECK_REGISTRY_DESIGN.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: '- Abstract health checks into pluggable monitors that implement a common interface and are auto-registered'
+title: Health Check Registry (Monitor/Beacon) Design
+updated_at: "2026-09-17T08:42:13Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

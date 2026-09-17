@@ -1,0 +1,22 @@
+category: cli
+content_hash: cedf3c37924401de94d3b121191f80b6a46d9285afef2e9ba629545ed7e67dd1
+content_searchable: true
+content_size: 10488
+created_at: "2026-09-17T08:44:22Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: architecture
+id: DOC-376
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/architecture/cli-standardization-v1.0.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: The zqk CLI needs standardized command forms and a dry-run context system to improve usability and enable safe, impact-aware operations
+title: CLI Standardization and Dry-Run Context
+updated_at: "2026-09-17T08:44:22Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

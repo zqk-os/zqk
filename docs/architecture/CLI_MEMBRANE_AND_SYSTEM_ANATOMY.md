@@ -32,7 +32,7 @@ and help. Generated builders under `pkg/cli/bldr_cli_cmd_v1/` are projections;
 `cmd/zqk/` owns runtime behavior and wiring only. Process `command_spec` (`CSPEC-*`)
 objects are not an authoring peer and must not be a default code-generation input.
 They may become a generated discovery mirror later. This boundary is recorded by
-`DEC-REDACTED`.
+`DEC-1786732826125502000-ef80a104`.
 
 The committed command-coverage baseline is an enforcement debt inventory, not a
 second definition source. The native validator permits removal of baseline drift
