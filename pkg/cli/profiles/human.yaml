@@ -1,0 +1,17 @@
+# Human CLI Profile Specification
+# Version: 1.0.0
+
+schema_version: "1.0.0"
+namespace_id: "zqk:kernel:cli"
+name: "human"
+extends: "base"
+description: |
+  Human-friendly table output.
+  Optimized for terminal display with readable formatting.
+
+spec:
+  format: "table"
+  verbose: false
+  quiet: false
+  flags:
+    format: "table"

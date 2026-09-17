@@ -1,0 +1,23 @@
+kind: policy
+schema_version: "2.0.0"
+title: Multi-Agent Collaboration - Shared Kernel, Shared Constraints
+status: active
+category: agent_guidance
+policy_type: requirement
+body: |
+  All agents working this project share one knowledge kernel. Mission, vision, goals,
+  policies, and priority plans are the shared constraints — not chat memory.
+
+  **Requirements**
+  - Orient with `zqk workflow whats-next` (or MCP equivalent) at session start.
+  - Read active policies before implementing (`zqk object list policy`).
+  - Create and update work as objects (backlog items, agent tasks, requirements) — not only prose.
+  - Do not invent conflicting goals; align changes to mission/vision/goals or propose an explicit object change.
+  - Multi-agent work must be attributable (account/persona on objects) and reviewable via the graph.
+
+  **Why**: Two (or more) agents can collaborate only if constraints live in the kernel, not in private context.
+effective_date: "2026-07-25"
+enforcement:
+  automated: false
+  reminder_enabled: true
+  severity: high

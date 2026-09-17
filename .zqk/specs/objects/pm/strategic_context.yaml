@@ -1,0 +1,171 @@
+schema_version: 2.0.0
+ontology: strategic_context
+extends: base_object
+visibility: public
+description: 'Strategic context captures strategic information beyond policies (market conditions, important dates, goals).\nUsed by alignment and policy generation. See project-discovery-and-strategic-alignment-v1.0.md.\nLifecycle: strategic_context_lifecycle.yaml.\n'
+traits:
+  - base_object_traits
+fields:
+  content:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: used for goal discovery and reports.
+      cardinality: one
+      criticality: composition
+      default: null
+      dependencies: none.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Multiline description of the strategic context.
+      security: non-sensitive
+      system_usage:
+        - alignment
+        - discovery
+      validation: Free-form text.
+    field_profile_code: SC-002
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - field_mutable_group
+    type: string
+    validation:
+      required: false
+  context_type:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: used for alignment and filtering.
+      cardinality: one
+      criticality: composition
+      default: null
+      dependencies: none.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Type of context (e.g. market_condition, technical_constraint, business_constraint).
+      security: non-sensitive
+      system_usage:
+        - alignment
+        - reporting
+      validation: Free-form string.
+    field_profile_code: SC-001
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - field_mutable_group
+      - filterable
+      - listable
+    type: string
+    validation:
+      required: false
+  goal_refs:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: used for goal alignment (affects_goals in doc).
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: goal registry.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Goals this context affects (alias affects_goals in design).
+      security: non-sensitive
+      system_usage:
+        - alignment
+      validation: Must reference existing goal IDs.
+    field_profile_code: SC-005
+    permissions: r-x
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+      - field_reference_group
+    type: list
+    validation:
+      required: false
+  important_dates:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: used for timeline alignment.
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: none.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: List of {date, event, impact} entries.
+      security: non-sensitive
+      system_usage:
+        - alignment
+      validation: List of objects.
+    field_profile_code: SC-003
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - field_mutable_group
+    type: list
+    validation:
+      required: false
+  policy_refs:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: used for policy-context alignment (affects_policies in doc).
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: policy registry.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Policies this context affects.
+      security: non-sensitive
+      system_usage:
+        - alignment
+      validation: Must reference existing policy IDs.
+    field_profile_code: SC-006
+    permissions: r-x
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+      - field_reference_group
+    type: list
+    validation:
+      required: false
+  stakeholder_refs:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: used for stakeholder-work alignment.
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: stakeholder_profile or account registry.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: References to stakeholders (e.g. STK-001, account:executive-team).
+      security: non-sensitive
+      system_usage:
+        - alignment
+      validation: List of strings.
+    field_profile_code: SC-004
+    permissions: rwx
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+      - field_reference_group
+    type: list
+    validation:
+      required: false

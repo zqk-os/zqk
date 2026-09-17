@@ -1,0 +1,29 @@
+$schema: "../schemas/command_spec.schema.json"
+
+name: "seed-default-agent-seating"
+short: "Idempotent seed of PER-DEFAULT-* personas and feed correspondence skill"
+description: |
+  Creates community-default seating objects when missing: PER-DEFAULT-OPERATOR,
+  PER-DEFAULT-AGENT, and ASK-DEFAULT-FEED-CORRESPONDENCE (templates under
+  scripts/default_personas and scripts/default_agent_skills). Same pack as
+  greenfield system init. Idempotent: skips ids that already exist.
+  Writes promote-ready (approved) objects onto CAS (not draft plane) so
+  feed ack/steer --persona-ref resolves.
+
+args:
+  type: "no_args"
+
+flags: []
+
+help:
+  examples:
+    - comment: "Repair missing default seating after scrub / incomplete init"
+      command: "%s system seed-default-agent-seating"
+    - comment: "JSON result for agents"
+      command: "%s system seed-default-agent-seating --format json"
+  exclude_flags:
+    - "columns"
+    - "ignore-scheduler-down"
+
+run_e: "runSeedDefaultAgentSeating"
+common_flags: true

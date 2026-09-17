@@ -1,0 +1,136 @@
+schema_version: 2.0.0
+ontology: role
+extends: base_object
+visibility: public
+description: 'Defines roles/authorities in the system (executive, owner, automation, etc.) with permissions.\nLifecycle: role_lifecycle.yaml.\n'
+traits:
+  - base_object_traits
+fields:
+  description:
+    access:
+      requires:
+        - access:confidential
+        - role:admin
+    checklist:
+      authority: owner/admin.
+      automation_hooks: none.
+      cardinality: one
+      criticality: composition
+      default: required
+      dependencies: onboarding.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Explains responsibilities/influence.
+      security: non-sensitive
+      system_usage:
+        - documentation
+      validation: markdown.
+    field_profile_code: RLE-002
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - field_mutable_group
+    type: text
+    validation:
+      pattern: ^.+$
+      required: true
+  influence_level:
+    access:
+      requires:
+        - access:confidential
+        - role:admin
+    checklist:
+      authority: admin.
+      automation_hooks: determines permission level.
+      cardinality: one
+      criticality: composition
+      default: observer
+      dependencies: permission system.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Relative authority level (\\\"executive\\\", \\\"owner\\\", \\\"collective\\\", \\\"observer\\\", \\\"automation\\\", etc.).
+      security: non-sensitive
+      system_usage:
+        - permissions
+      validation: enum.
+    field_profile_code: RLE-003
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - listable
+      - readable
+      - writable
+      - modifiable
+      - groupable
+      - filterable
+      - sortable
+      - searchable
+    type: enum
+    validation:
+      enum:
+        - executive
+        - owner
+        - collective
+        - observer
+        - automation
+      required: false
+  permissions:
+    access:
+      requires:
+        - role:admin
+    checklist:
+      authority: admin.
+      automation_hooks: used for permission checks.
+      cardinality: many
+      criticality: composition
+      default: []
+      dependencies: permission system.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: List of specific permissions granted to this role.
+      security: non-sensitive
+      system_usage:
+        - authorization
+      validation: Controlled vocabulary of permission names.
+    field_profile_code: RLE-004
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - field_mutable_group
+    type: list
+    validation:
+      required: false
+  role_id:
+    access:
+      requires:
+        - access:confidential
+        - role:admin
+    checklist:
+      authority: automation/admin.
+      automation_hooks: used during role checks.
+      cardinality: one
+      criticality: composition
+      default: required
+      dependencies: profile configs.
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: Unique identifier for the role.
+      security: non-sensitive
+      system_usage:
+        - permissions
+        - profiles
+      validation: Username pattern.
+    field_profile_code: RLE-001
+    permissions: r-x
+    semantic_type: statement
+    traits:
+      - listable
+      - readable
+      - writable
+      - filterable
+      - sortable
+      - searchable
+    type: string
+    validation:
+      pattern: ^[a-z0-9_-]+$
+      required: true

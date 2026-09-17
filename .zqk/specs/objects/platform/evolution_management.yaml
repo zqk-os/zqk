@@ -1,0 +1,134 @@
+schema_version: 2.0.0
+ontology: evolution_management
+extends: base_object
+visibility: public
+description: 'Manages incremental, chaotic system evolution by tracking chaos indicators, adaptive adjustments, and evolution patterns. Ensures system stability during rapid growth.\nLifecycle: evolution_management_lifecycle.yaml.\n'
+traits:
+  - base_object_traits
+fields:
+  adaptive_adjustments:
+    access:
+      requires:
+        - access:confidential
+        - role:admin
+    checklist:
+      authority: automation/admin
+      automation_hooks: used for adjustment tracking
+      cardinality: many
+      criticality: composition
+      default: []
+      dependencies: none
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: List of adaptive adjustments made based on chaos indicators.
+      security: non-sensitive
+      system_usage:
+        - evolution_management
+        - adjustment_tracking
+      validation: List of adjustment objects
+    field_profile_code: EVOL-004
+    permissions: rwx
+    semantic_type: expression
+    traits:
+      - field_mutable_group
+    type: list
+    validation:
+      required: false
+  chaos_indicators:
+    access:
+      requires:
+        - access:confidential
+        - role:admin
+    checklist:
+      authority: automation/admin
+      automation_hooks: used for health monitoring
+      cardinality: many
+      criticality: composition
+      default: []
+      dependencies: none
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: List of chaos indicators being monitored (graph growth rate, agent onboarding velocity, etc.).
+      security: non-sensitive
+      system_usage:
+        - evolution_monitoring
+        - health_tracking
+      validation: List of indicator objects
+    field_profile_code: EVOL-003
+    permissions: rwx
+    semantic_type: expression
+    traits:
+      - readable
+      - writable
+      - modifiable
+    type: list
+    validation:
+      required: false
+  period:
+    access:
+      requires:
+        - access:confidential
+        - role:admin
+    checklist:
+      authority: automation/admin
+      automation_hooks: used for period validation
+      cardinality: one
+      criticality: composition
+      default: required
+      dependencies: none
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: Time period covered by this evolution management (e.g., \\\"2026-01-01 to 2026-03-31\\\").
+      security: non-sensitive
+      system_usage:
+        - evolution_tracking
+        - reporting
+      validation: Date range format
+    field_profile_code: EVOL-001
+    permissions: r-x
+    semantic_type: statement
+    traits:
+      - filterable
+      - readable
+      - searchable
+      - writable
+    type: string
+    validation:
+      required: true
+  strategy:
+    access:
+      requires:
+        - access:confidential
+        - role:admin
+    checklist:
+      authority: automation/admin
+      automation_hooks: determines management approach
+      cardinality: one
+      criticality: composition
+      default: adaptive
+      dependencies: none
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Strategy for managing evolution (adaptive, conservative, aggressive, balanced).
+      security: non-sensitive
+      system_usage:
+        - evolution_management
+        - strategy_application
+      validation: enum
+    field_profile_code: EVOL-002
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+      - filterable
+      - sortable
+      - searchable
+    type: enum
+    validation:
+      enum:
+        - adaptive
+        - conservative
+        - aggressive
+        - balanced
+      required: true

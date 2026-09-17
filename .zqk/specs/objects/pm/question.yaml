@@ -1,0 +1,205 @@
+schema_version: 2.0.0
+ontology: question
+extends: base_object
+visibility: public
+description: 'Questions represent unknowns, decisions that need to be made, or clarifications required before work can proceed. Questions have a distinct lifecycle focused on getting answers and tracking resolution, separate from feature work tracked in backlog items. Questions can block milestones, goals, and other work items.\nLifecycle: question_lifecycle.yaml.\n'
+traits:
+  - base_object_traits
+fields:
+  answer:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner/answerer.
+      automation_hooks: used for question resolution tracking, knowledge base.
+      cardinality: zero_or_one
+      criticality: composition
+      default: null
+      dependencies: none.
+      observability: "yes"
+      origin_lifecycle: mutable (can be updated as understanding evolves).
+      purpose: The answer to the question, once resolved.
+      security: may contain sensitive information.
+      system_usage:
+        - display
+        - search
+        - documentation
+      validation: Markdown allowed. Should be set when question is answered.
+    field_profile_code: QST-002
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - field_mutable_group
+    type: text
+    validation:
+      required: false
+  answer_due_by:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: question asker/owner
+      automation_hooks: triggers reminders for unanswered questions.
+      cardinality: one
+      criticality: association
+      default: null
+      dependencies: question tracking, notification system.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: ISO-8601 date for when a question needs an answer.
+      security: non-sensitive
+      system_usage:
+        - question tracking
+        - notifications
+        - accountability
+      validation: ISO-8601 date format.
+    field_profile_code: QST-004
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - field_mutable_group
+    type: string
+    validation:
+      pattern: ^\d{4}-\d{2}-\d{2}$
+      required: false
+  answer_ref:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner/answerer.
+      automation_hooks: used for traceability, linking answers to questions.
+      cardinality: zero_or_one
+      criticality: association
+      default: null
+      dependencies: object registry.
+      observability: "yes"
+      origin_lifecycle: mutable (set when question is answered).
+      purpose: Reference to the object that answers this question (e.g., decision ID, backlog item ID, document path).
+      security: non-sensitive
+      system_usage:
+        - traceability
+        - linking
+      validation: Should reference existing object ID or document path.
+    field_profile_code: QST-003
+    permissions: r-x
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+      - field_reference_group
+    type: string
+    validation:
+      required: false
+  blocking_goal_refs:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner/product.
+      automation_hooks: used for blocking analysis, goal dependency tracking.
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: goal registry.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Goals that are blocked by this unanswered question.
+      security: non-sensitive
+      system_usage:
+        - blocking analysis
+        - dependency tracking
+      validation: Must reference existing goal object IDs.
+    field_profile_code: QST-006
+    permissions: r-x
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+      - field_reference_group
+    type: list
+    validation:
+      required: false
+  blocking_milestone_refs:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner/product.
+      automation_hooks: used for blocking analysis, milestone dependency tracking.
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: milestone registry.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Milestones that are blocked by this unanswered question.
+      security: non-sensitive
+      system_usage:
+        - blocking analysis
+        - dependency tracking
+      validation: Must reference existing milestone object IDs.
+    field_profile_code: QST-005
+    permissions: r-x
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+      - field_reference_group
+    type: list
+    validation:
+      required: false
+  question_text:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: creator/owner.
+      automation_hooks: used for question search, filtering, reporting.
+      cardinality: one
+      criticality: composition
+      default: required
+      dependencies: none.
+      observability: "yes"
+      origin_lifecycle: mutable (can be refined/clarified).
+      purpose: The actual question being asked. Should be clear and specific.
+      security: non-sensitive
+      system_usage:
+        - display
+        - search
+        - filtering
+      validation: Required field. Should be a clear question statement.
+    field_profile_code: QST-001
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - field_mutable_group
+    type: text
+    validation:
+      required: true
+  related_question_refs:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: used for question grouping, traceability.
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: question registry.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: References to related questions (e.g., follow-up questions, related unknowns).
+      security: non-sensitive
+      system_usage:
+        - traceability
+        - question grouping
+      validation: Must reference existing question object IDs.
+    field_profile_code: QST-009
+    permissions: r-x
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+      - field_reference_group
+    type: list
+    validation:
+      required: false

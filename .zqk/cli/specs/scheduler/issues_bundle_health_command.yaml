@@ -1,0 +1,36 @@
+$schema: "../schemas/command_spec.schema.json"
+
+name: "issues-bundle-health"
+short: "Cross-check issues.json against test-bundle health.jsonl"
+description: |
+  When the scheduler is idle or issues.json still lists old SCH-run job failures, compare each
+  entry to lines in .zqk/logs/scheduler/cvs/test-bundles/health.jsonl. For each bundle
+  fingerprint, the last line in the scanned file wins — so a newer pass (possibly under a new
+  job id) shows as green even if issues.json was never cleared.
+
+  Use together with: zqk scheduler test-failures list, zqk scheduler test-failures health.
+
+help:
+  examples:
+    - comment: "Compare issues.json to bundle health"
+      command: "%s scheduler issues-bundle-health"
+  exclude_flags:
+    - "format"
+    - "output"
+    - "verbose"
+    - "quiet"
+    - "timeout"
+    - "columns"
+
+flags:
+  - name: "health-limit"
+    type: "int"
+    default: 100000
+    description: "Max successfully parsed JSON rows from health.jsonl (full scan from start; error if exceeded)"
+
+run_e: "runIssuesBundleHealthFromCmd"
+async: true
+common_flags: true
+requires_scheduler_check: false
+requires_session: false
+requires_storage: false

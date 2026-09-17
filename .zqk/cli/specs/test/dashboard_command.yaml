@@ -1,0 +1,55 @@
+$schema: "../schemas/command_spec.schema.json"
+
+name: "dashboard [flags]"
+short: "Interactive dashboard displaying test cases and real-time criteria status icons"
+description: |
+  Renders an interactive terminal dashboard displaying active and completed test cases
+  with an icon view of linked criteria. Subscribes in real-time to criteria-satisfied
+  events from the lifecycle event WAL, updating completion state and shockwave status dynamically.
+
+flags:
+  - name: "watch"
+    shorthand: "w"
+    type: "string"
+    default: "0"
+    description: "Stream criteria satisfied events and refresh display (e.g. '1s', '2s')"
+  - name: "view"
+    type: "string"
+    default: "active"
+    description: "Dashboard view mode: 'active' (lean in-flight working set), 'regression' (completed verification chains), 'all' (both)"
+  - name: "all"
+    shorthand: "a"
+    type: "bool"
+    default: false
+    description: "Display all test cases including archived items"
+  - name: "status"
+    shorthand: "s"
+    type: "string"
+    default: ""
+    description: "Filter test cases by status (e.g. 'active', 'complete', 'originated')"
+  - name: "test-case"
+    type: "string"
+    default: ""
+    description: "Filter to a specific test case ID"
+  - name: "refresh"
+    shorthand: "r"
+    type: "bool"
+    default: false
+    description: "Force full re-scan from storage and refresh the materialized lite-file cache"
+  - name: "check-dod"
+    type: "bool"
+    default: false
+    description: "TPM Definition of Done check: verify that 100% of active test case lineages are intact up to root"
+
+help:
+  examples:
+    - comment: "Display the active working set of test cases and lineage radar"
+      command: "%s test dashboard"
+    - comment: "Display completed regression testing chains"
+      command: "%s test dashboard --view regression"
+    - comment: "Watch test cases and stream criteria satisfied events in real time"
+      command: "%s test dashboard --watch 1s"
+    - comment: "Filter dashboard to active test cases only"
+      command: "%s test dashboard --status active"
+    - comment: "Display all test cases including completed and archived"
+      command: "%s test dashboard --all"

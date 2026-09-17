@@ -1,0 +1,22 @@
+kind: policy
+schema_version: "2.0.0"
+title: Fail-Closed Safety and Invariant Gate Enforcement
+status: active
+category: workflow
+policy_type: requirement
+body: |
+  All operational gates, security checks, and invariant validations must fail-closed.
+  If an invariant cannot be evaluated or yields an ambiguous result, execution must halt.
+
+  **Requirements**
+  - Validation failures must reject state mutation rather than proceeding with defaults.
+  - Invariant gates must block object promotion until all pre-conditions evaluate to true.
+  - Never suppress error checks or ignore returned error values (`_ = err` is strictly prohibited on state operations).
+  - Production branches and authoritative promotion planes require full gate attestation.
+
+  **Why**: A self-healing cellular kernel must isolate errors at the boundary before unvetted state corrupts the graph.
+effective_date: "2026-09-14"
+enforcement:
+  automated: true
+  reminder_enabled: true
+  severity: critical

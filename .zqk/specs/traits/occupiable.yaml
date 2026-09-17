@@ -1,0 +1,24 @@
+$schema: "../../../.zqk/cli/specs/schemas/trait_spec.schema.json"
+
+name: occupiable
+description: |
+  Object-level occupancy-slot trait (claimed_by, claimed_at). The slot exists;
+  it is either open or held. Empty claimed_by means unoccupied — including
+  in_progress, which is parked, not "someone is working." Filling the slot is
+  exclusive claim (`zqk agent claim` / execute). Assignment (`persona_refs`)
+  is routing and does not occupy. Occupancy is not a lifecycle status, not
+  Gantt rank (priority_plan.active_order), and not a timesheet (work_unit /
+  effort_aware). Fields live on the occupancy mixin.
+  TRACK: POL-KERNEL-GANTT-OCCUPANCY-001.
+category: behavior
+requires: []
+conflicts: []
+includes: []
+field_level: false
+object_level: true
+config: {}
+
+created_at: 2026-08-27T23:28:00Z
+updated_at: 2026-08-30T05:45:00Z
+created_by: ACC-1785920548450214012-68b850c0
+updated_by: ACC-1785920548450214012-68b850c0

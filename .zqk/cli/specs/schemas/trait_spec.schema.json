@@ -1,0 +1,77 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://zqk.dev/schemas/trait_spec.schema.json",
+  "title": "Trait Specification Schema",
+  "description": "Schema for trait specifications that define behavioral traits for objects and fields",
+  "type": "object",
+  "required": ["name", "description", "category"],
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "Reference to this schema file"
+    },
+    "name": {
+      "type": "string",
+      "description": "Trait name (e.g., 'listable', 'readable', 'writable')"
+    },
+    "category": {
+      "type": "string",
+      "enum": ["standard", "domain-specific", "system", "base-group", "specialized-group", "metric-type"],
+      "description": "Trait category: standard, domain-specific, system, base-group, specialized-group, or metric-type"
+    },
+    "description": {
+      "type": "string",
+      "description": "Human-readable description of what this trait means"
+    },
+    "requires": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "List of other traits that must be present when this trait is used"
+    },
+    "conflicts": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "List of traits that conflict with this trait"
+    },
+    "includes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "List of traits included in this trait group (for trait groups)"
+    },
+    "field_level": {
+      "type": "boolean",
+      "description": "Whether this trait can be used at field level"
+    },
+    "object_level": {
+      "type": "boolean",
+      "description": "Whether this trait can be used at object level"
+    },
+    "config": {
+      "type": "object",
+      "description": "Trait-specific configuration",
+      "additionalProperties": true
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "Trait version (semantic versioning, optional)"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["active", "draft", "deprecated"],
+      "description": "Trait status (optional)"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When trait was created (RFC3339, optional)"
+    }
+  },
+  "additionalProperties": false
+}

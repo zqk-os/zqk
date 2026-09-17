@@ -1,0 +1,30 @@
+$schema: "../schemas/command_spec.schema.json"
+
+name: "rebuild-graph-projection"
+short: "Rebuild MemGraph projection from file SSOT"
+description: |
+  When STORAGE_MODE=file+projection, upserts all file-backed objects into the
+  graph projection and deletes projection orphans not present in file SSOT.
+  Also ensures spec-derived id indexes. Use --dry-run to count without writes.
+
+args:
+  type: "no_args"
+
+flags:
+  - name: "dry-run"
+    type: "bool"
+    default: false
+    description: "Count rebuilds and orphans without writing to the projection"
+
+help:
+  examples:
+    - comment: "Rebuild projection from file durability store"
+      command: "%s system rebuild-graph-projection"
+    - comment: "Preview counts only"
+      command: "%s system rebuild-graph-projection --dry-run"
+  exclude_flags:
+    - "columns"
+    - "ignore-scheduler-down"
+
+run_e: "runRebuildGraphProjection"
+common_flags: true

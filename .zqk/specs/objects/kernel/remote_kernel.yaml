@@ -1,0 +1,55 @@
+schema_version: 2.0.0
+ontology: remote_kernel
+extends: base_object
+visibility: public
+description: Represents a remote ZQK kernel within the Federated Sovereign Mesh.\nStores connection details, security primitives, and shared capability metadata\nto enable cross-node collaboration and context exchange.\n
+traits:
+  - base_object_traits
+fields:
+  capabilities:
+    semantic_type: reference
+    traits:
+      - readable
+      - writable
+    type: list
+  endpoint:
+    semantic_type: location
+    traits:
+      - readable
+      - writable
+    type: string
+  infrastructure_adapter_refs:
+    semantic_type: reference
+    traits:
+      - field_reference_group
+      - writable
+    type: list
+  last_heartbeat:
+    semantic_type: time
+    traits:
+      - readable
+    type: timestamp
+  public_key:
+    semantic_type: credential
+    traits:
+      - readable
+      - writable
+    type: string
+  shared_namespaces:
+    semantic_type: reference
+    traits:
+      - readable
+      - writable
+    type: list
+  trust_level:
+    default: untrusted
+    traits:
+      - readable
+      - writable
+    type: string
+    validation:
+      enum:
+        - untrusted
+        - verified
+        - sovereign
+        - partner

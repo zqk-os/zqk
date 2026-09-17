@@ -1,0 +1,217 @@
+schema_version: 2.0.0
+ontology: account
+extends: base_object
+visibility: public
+description: 'Represents a human or automation account that interacts with Workstream OS.\nLifecycle: account_lifecycle.yaml.\n'
+traits:
+  - base_object_traits
+fields:
+  display_name:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: account owner.
+      automation_hooks: UI only.
+      cardinality: zero_or_one
+      criticality: association
+      default: null
+      dependencies: documentation.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Friendly name for UI/docs.
+      security: PII—treat as confidential.
+      system_usage:
+        - docs
+        - status
+      validation: <= 80 chars.
+    field_profile_code: ACC-003
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - field_mutable_group
+    type: string
+    validation:
+      max_length: 80
+      required: false
+  email:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: account owner/admin.
+      automation_hooks: used for notifications.
+      cardinality: zero_or_one
+      criticality: composition
+      default: null
+      dependencies: login flow.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Contact/authentication email.
+      security: PII—must be protected.
+      system_usage:
+        - login
+        - notifications
+      validation: RFC5322 email format.
+    field_profile_code: ACC-004
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+      - modifiable
+    type: string
+    validation:
+      pattern: ^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$
+      required: false
+  id:
+    access:
+      requires:
+        - access:confidential
+        - role:admin
+    checklist:
+      authority: automation/admin
+      automation_hooks: used for cross-file references.
+      cardinality: one
+      criticality: composition
+      default: auto-assigned per kind sequence
+      dependencies: linkage constraints, URN creation.
+      observability: logged + manifests.
+      origin_lifecycle: immutable
+      purpose: Stable identifier for the account. ACC-* form only (timestamp, short numeric, or subtype prefix).
+      security: non-sensitive
+      system_usage:
+        - linking
+        - reporting
+        - URIs
+      validation: Must match ACC-* pattern (no account:username legacy form).
+    field_profile_code: ACC-000
+    permissions: r-x
+    semantic_type: statement
+    traits:
+      - filterable
+      - listable
+      - readable
+      - searchable
+      - sortable
+      - writable
+    type: string
+    validation:
+      pattern: ^ACC-[A-Za-z0-9][A-Za-z0-9_-]*$
+      required: true
+  profile_metadata:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: account owner.
+      automation_hooks: apply CLI defaults at login.
+      cardinality: one
+      criticality: association
+      default: {}
+      dependencies: CLI preferences.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Additional preferences (default profile, context cadence).
+      security: may hold private preferences—treat accordingly.
+      system_usage:
+        - personalization
+      validation: JSON object with documented fields.
+    field_profile_code: ACC-007
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+      - modifiable
+    type: object
+    validation:
+      required: false
+  roles:
+    access:
+      requires:
+        - access:confidential
+        - role:admin
+    checklist:
+      authority: admin.
+      automation_hooks: used before mutations.
+      cardinality: many (>=1)
+      criticality: composition
+      default:
+        - observer
+      dependencies: permission checks.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Roles assigned to this account.
+      security: non-sensitive
+      system_usage:
+        - authorization
+      validation: IDs must exist in role specs.
+    field_profile_code: ACC-002
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - field_mutable_group
+    type: list
+    validation:
+      required: false
+  tokens:
+    access:
+      requires:
+        - role:admin
+    checklist:
+      authority: automation/auth service.
+      automation_hooks: used to invalidate sessions.
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: CLI login.
+      observability: yes (metadata only; never store raw secrets).
+      origin_lifecycle: mutable
+      purpose: References to active auth tokens/credentials (local keystore, JWT fingerprint, etc.).
+      security: sensitive metadata ensure hashed/fingerprint only.
+      system_usage:
+        - authentication
+      validation: each entry contains token_id, fingerprint, expiration.
+    field_profile_code: ACC-005
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+    type: list
+    validation:
+      required: false
+  username:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: admin.
+      automation_hooks: used to tag audit events.
+      cardinality: one
+      criticality: composition
+      default: required
+      dependencies: login flow.
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: Login/display name.
+      security: PII – treat as confidential.
+      system_usage:
+        - authentication
+        - auditing
+      validation: Username pattern or valid email address.
+    field_profile_code: ACC-001
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - filterable
+      - listable
+      - readable
+      - searchable
+      - sortable
+      - writable
+    type: string
+    validation:
+      pattern: ^[a-z0-9._-]{3,32}$|^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$
+      required: true

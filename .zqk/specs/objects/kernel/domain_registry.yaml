@@ -1,0 +1,50 @@
+schema_version: 2.0.0
+ontology: domain_registry
+extends: base_object
+visibility: public
+description: 'Registry that tracks all registered domain ontologies in the system. Enables domain discovery, validation, and integration of external domain models.\nLifecycle: domain_registry_lifecycle.yaml.\n'
+traits:
+  - listable
+  - readable
+  - writable
+  - modifiable
+  - formatable
+  - filterable
+  - sortable
+  - searchable
+fields:
+  domains:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: system
+      automation_hooks: used for domain discovery
+      cardinality: many
+      criticality: composition
+      default: []
+      dependencies: domain namespace objects
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: List of registered domain ontologies with their metadata.
+      security: non-sensitive
+      system_usage:
+        - domain_discovery
+        - validation
+        - integration
+      validation: List of domain registry entries
+    field_profile_code: DMR-001
+    permissions: rwx
+    semantic_type: expression
+    traits:
+      - readable
+      - writable
+      - modifiable
+    type: list
+    validation:
+      minCount: 0
+      required: true
+  id:
+    type: string
+    validation:
+      pattern: ^DOMAIN-REG-\d{3,}$

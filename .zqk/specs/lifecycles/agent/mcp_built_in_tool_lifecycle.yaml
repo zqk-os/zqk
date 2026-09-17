@@ -1,0 +1,125 @@
+$schema: ../../../.zqk/cli/specs/schemas/lifecycle_spec.schema.json
+object_type: mcp_built_in_tool
+statuses:
+  - value: conceptual
+    display: Conceptual
+    origin: true
+    preliminary: true
+    description: Draft plane status. Prior to CAS membrane crossing.
+    role: realign
+  - value: originated
+    display: Originated
+    description: CAS membrane crossed. Object officially originated.
+    role: realign
+  - value: draft
+    display: Draft
+    origin: false
+    preliminary: false
+    role: realign
+    description: 'mcp built in tool status ''draft'' (Draft): not yet committed for
+      execution; reshape before pickup.'
+  - value: proposed
+    display: Proposed
+    role: realign
+    description: 'mcp built in tool status ''proposed'' (Proposed): not yet committed
+      for execution; reshape before pickup.'
+  - value: under_review
+    display: Under Review
+    role: realign
+    description: 'mcp built in tool status ''under_review'' (Under Review): not yet
+      committed for execution; reshape before pickup.'
+  - value: active
+    display: Active
+    role: shovel_ready
+    description: 'mcp built in tool status ''active'' (Active): ready for pickup or
+      use; not locked mid-flight.'
+  - value: deprecated
+    display: Deprecated
+    role: realign
+    description: 'mcp built in tool status ''deprecated'' (Deprecated): not yet committed
+      for execution; reshape before pickup.'
+  - value: archived
+    display: Archived
+    terminal: true
+    role: terminal
+    description: 'mcp built in tool status ''archived'' (Archived): ended; no further
+      normal execution transitions expected. Flags: terminal.'
+transitions:
+  - from: conceptual
+    to: originated
+    description: Promote from draft plane to CAS membrane (CAS Qualification).
+    manual: true
+    auto: false
+    catalyst: System promotion
+  - from: originated
+    to: draft
+    description: Initial domain workflow transition to draft.
+    manual: true
+    auto: true
+    catalyst: System initialization
+  - from: draft
+    to: proposed
+    description: Propose tool for implementation
+    manual: true
+    auto: false
+    postconditions:
+      - role is realign
+  - from: proposed
+    to: under_review
+    description: Submit for review and approval
+    manual: true
+    auto: false
+    postconditions:
+      - role is realign
+  - from: under_review
+    to: active
+    description: Approve and activate tool
+    manual: true
+    auto: false
+    postconditions:
+      - role is shovel_ready
+  - from: active
+    to: under_review
+    description: Tool updated - return to review
+    manual: true
+    auto: false
+    postconditions:
+      - role is realign
+  - from: active
+    to: deprecated
+    description: Deprecate tool (replaced or no longer needed)
+    manual: true
+    auto: false
+    postconditions:
+      - role is realign
+  - from: active
+    to: under_review
+    description: Quarterly review reminder (POL-MCP-001)
+    manual: true
+    auto: false
+    postconditions:
+      - role is realign
+  - from: '*'
+    to: archived
+    description: Manual archival
+    manual: true
+    auto: false
+    postconditions:
+      - role is terminal
+      - hop from any occupancy to archived
+      - ended; no further normal execution hops expected
+percent_complete:
+  method: status_defaults
+  default_by_status:
+    conceptual: 0
+    originated: 5
+    draft: 10
+    proposed: 25
+    under_review: 50
+    active: 100
+    deprecated: 100
+    archived: 100
+created_at: 2026-07-01 18:00:00+00:00
+updated_at: 2026-07-01 18:00:00+00:00
+created_by: ACC-1785920548450214012-68b850c0
+updated_by: ACC-1785920548450214012-68b850c0

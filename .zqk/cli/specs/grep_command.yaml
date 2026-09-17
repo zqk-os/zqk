@@ -1,0 +1,4 @@
+$schema: schemas/command_spec.schema.json
+name: grep
+short: In-process trigram and AST code search
+description: Fast in-process pure-Go code search engine with trigram indexing, Go AST structural queries, and token-budgeted JSON output.

@@ -1,0 +1,39 @@
+$schema: "../schemas/command_spec.schema.json"
+
+name: "generate-agent-configs"
+short: "Write kernel boot directives into vendor agent config files"
+description: >
+  Regenerates AGENTS.md / .cursorrules / vendor rule files from the kernel boot
+  payload. Prefer system agent-onboard for detect→seat→prime. By default writes
+  files for detected vendors plus AGENTS.md; skips existing files unless --force;
+  --all-vendors restores write-everywhere targeting.
+
+args:
+  type: "no_args"
+
+flags:
+  - name: "all-vendors"
+    type: "bool"
+    default: false
+    description: "Write configs for every known vendor host"
+  - name: "force"
+    type: "bool"
+    default: false
+    description: "Overwrite existing vendor directive files (default skips)"
+  - name: "dry-run"
+    type: "bool"
+    default: false
+    description: "List target paths without writing"
+
+help:
+  examples:
+    - comment: "Prime detected vendor configs"
+      command: "%s system generate-agent-configs"
+    - comment: "Legacy: write all known vendor paths"
+      command: "%s system generate-agent-configs --all-vendors"
+  exclude_flags:
+    - "columns"
+    - "ignore-scheduler-down"
+
+run_e: "runGenerateAgentConfigs"
+common_flags: true

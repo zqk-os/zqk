@@ -1,0 +1,64 @@
+$schema: "../../schemas/command_spec.schema.json"
+
+name: "project"
+short: "Project VDS instruction packs from kernel (config-driven providers)"
+description: |
+  Exports kernel SSOT (POL-WORKFLOW-VDS, glossary, spine/customization) to vendor instruction
+  files listed in customization vendor_providers — no vendor names in the CLI surface.
+  See docs/architecture/KERNEL_VENDOR_INSTRUCTION_PROJECTION.md
+
+flags:
+  - name: "provider"
+    type: "string"
+    default: ""
+    description: "Provider id from vendor_providers; config default when unset"
+  - name: "all"
+    type: "bool"
+    default: false
+    description: "Project every enabled provider in config"
+  - name: "list"
+    type: "bool"
+    default: false
+    description: "List configured providers (no write/check)"
+  - name: "write"
+    type: "bool"
+    default: false
+    description: "Write export file(s) from kernel"
+  - name: "check"
+    type: "bool"
+    default: false
+    description: "Fail if on-disk export drifts from kernel"
+  - name: "out"
+    type: "string"
+    default: ""
+    description: "Override output path for a single --provider run"
+  - name: "spine"
+    type: "string"
+    default: ""
+    description: "Spine profile path relative to project root"
+  - name: "customization"
+    type: "string"
+    default: ""
+    description: "Customization profile path relative to project root"
+
+args:
+  type: "no_args"
+
+help:
+  examples:
+    - comment: "Write default provider"
+      command: "%s workflow vds project --write --format json"
+    - comment: "Write named provider"
+      command: "%s workflow vds project --provider cursor --write --format json"
+    - comment: "Drift check"
+      command: "%s workflow vds project --provider cursor --check --format json"
+    - comment: "All configured providers"
+      command: "%s workflow vds project --all --write --check --format json"
+    - comment: "List configured providers"
+      command: "%s workflow vds project --list --format json"
+  exclude_flags:
+    - "columns"
+    - "ignore-scheduler-down"
+
+run_e: "runVDSProject"
+common_flags: true

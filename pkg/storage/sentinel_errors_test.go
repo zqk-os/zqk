@@ -1,0 +1,51 @@
+package storage_test
+
+import (
+	"errors"
+	"fmt"
+	"testing"
+
+	"github.com/lanceman/zqk/pkg/storage"
+)
+
+func TestStorageSentinelErrors_ConformsToErrorsIs(t *testing.T) {
+	sentinels := []struct {
+		name string
+		err  error
+	}{
+		{"ErrInvalidID", storage.ErrInvalidID},
+		{"ErrPermissionDeniedStorage", storage.ErrPermissionDeniedStorage},
+		{"ErrInvalidSchema", storage.ErrInvalidSchema},
+		{"ErrTimeout", storage.ErrTimeout},
+		{"ErrOptimisticLockConflict", storage.ErrOptimisticLockConflict},
+		{"ErrIntegrityViolation", storage.ErrIntegrityViolation},
+		{"ErrCASCorrupted", storage.ErrCASCorrupted},
+		{"ErrInvalidObjectKind", storage.ErrInvalidObjectKind},
+		{"ErrStorageClosed", storage.ErrStorageClosed},
+		{"ErrNamespaceAccessDenied", storage.ErrNamespaceAccessDenied},
+		{"ErrObjectNotFound", storage.ErrObjectNotFound},
+	}
+
+	for _, tc := range sentinels {
+		t.Run(tc.name, func(t *testing.T) {
+			if tc.err == nil {
+				t.Fatalf("%s is nil", tc.name)
+			}
+			if tc.err.Error() == "" {
+				t.Fatalf("%s has empty error message", tc.name)
+			}
+
+			// Verify %w wrapping and errors.Is unwrap conformance
+			wrapped := fmt.Errorf("operation failed on resource: %w", tc.err)
+			if !errors.Is(wrapped, tc.err) {
+				t.Errorf("expected errors.Is to match wrapped sentinel for %s", tc.name)
+			}
+
+			// Multi-level wrapping
+			nested := fmt.Errorf("outer context: %w", wrapped)
+			if !errors.Is(nested, tc.err) {
+				t.Errorf("expected errors.Is to match nested wrapped sentinel for %s", tc.name)
+			}
+		})
+	}
+}

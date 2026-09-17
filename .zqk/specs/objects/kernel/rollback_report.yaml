@@ -1,0 +1,90 @@
+schema_version: 2.0.0
+ontology: rollback_report
+extends: base_object
+visibility: internal
+description: 'Summary of a rollback/reset operation describing which objects/docs were affected. '
+traits:
+  - base_object_traits
+fields:
+  affected_objects:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation.
+      automation_hooks: used to prompt re-entry/manual review.
+      cardinality: many
+      criticality: composition
+      default: []
+      dependencies: change journals.
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: References to objects/documents that were rolled back/removed.
+      security: may reveal sensitive docs—treat accordingly.
+      system_usage:
+        - audits
+        - notifications
+      validation: list of references or paths.
+    field_profile_code: RBR-002
+    permissions: r-x
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+    type: list
+    validation:
+      required: false
+  git_reference:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation.
+      automation_hooks: links to git history.
+      cardinality: one
+      criticality: association
+      default: required
+      dependencies: rollback tooling.
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: Git hash/tag involved in the rollback.
+      security: non-sensitive
+      system_usage:
+        - traceability
+      validation: git ref format.
+    field_profile_code: RBR-001
+    permissions: r-x
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+    type: string
+    validation:
+      required: true
+  summary:
+    access:
+      requires:
+        - access:confidential
+        - role:admin
+    checklist:
+      authority: owner/admin.
+      automation_hooks: used in rollback notifications.
+      cardinality: one
+      criticality: composition
+      default: null
+      dependencies: none.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Human-readable explanation of the rollback (why, what next).
+      security: non-sensitive
+      system_usage:
+        - communication
+      validation: markdown allowed.
+    field_profile_code: RBR-003
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - field_mutable_group
+    type: text
+    validation:
+      required: false

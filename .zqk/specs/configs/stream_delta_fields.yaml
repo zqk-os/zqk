@@ -1,0 +1,68 @@
+# Stream delta fields: which fields to persist per stream-backed kind.
+# Used by pkg/storage/stream_storage.go (recordForStream) so new kinds or field changes
+# can be configured without code edits. See DATA_STORAGE_PRODUCTION_ROADMAP.md §4.
+#
+# Keys: kind name (e.g. change_journal_entry) or "metric" for all metric kinds
+# (audit_aggregation_metric, base_metric, *_metric). audit_event uses full object (no entry here).
+# Override config path via ZQK_STREAM_DELTA_FIELDS_CONFIG (path to YAML file).
+
+change_journal_entry:
+  - id
+  - object_ref
+  - change_type
+  - diff_summary
+  - changed_paths
+  - created_at
+  - created_by
+  - title
+  - previous_state
+
+# Applied to all kinds matching isMetricKind (audit_aggregation_metric, base_metric, etc.)
+metric:
+  - id
+  - kind
+  - status
+  - created_at
+  - created_by
+  - window_start
+  - window_end
+  - aggregated_entry_count
+  - event_count
+  - title
+  - summary
+  - collection_count
+  - last_seen
+
+# command_metric needs identity + command keys so Create/Update tier-2 validation matches stream SSOT.
+# TRACK: BLI-1785443942668406000-1ec5c811 — stream delta vs draft/CAS visibility contracts.
+command_metric:
+  - id
+  - kind
+  - schema_version
+  - status
+  - created_at
+  - created_by
+  - updated_at
+  - updated_by
+  - title
+  - metric_type
+  - collection_count
+  - first_seen
+  - last_seen
+  - command
+  - normalized_cmd
+  - invocation_count
+  - success_count
+  - failure_count
+  - timeout_count
+  - error_rate
+  - timeout_rate
+  - avg_duration_seconds
+  - baseline_duration_seconds
+  - fastest_duration_seconds
+  - slowest_duration_seconds
+
+created_at: 2026-07-01T18:00:00Z
+updated_at: 2026-07-01T18:00:00Z
+created_by: ACC-1785920548450214012-68b850c0
+updated_by: ACC-1785920548450214012-68b850c0

@@ -1,0 +1,32 @@
+$schema: "schemas/command_spec.schema.json"
+
+name: "ambient"
+short: "Manage ambient event processing"
+description: |
+  Commands for observing and managing the ambient EventHub: status,
+  HTTP ingest, and autonomy-inbox auto-merge.
+
+help:
+  examples:
+    - comment: "EventHub status"
+      command: "%s ambient status --format json"
+    - comment: "HTTP ingest listener"
+      command: "%s ambient ingest --port 8089"
+    - comment: "Autonomy inbox auto-merge daemon"
+      command: "%s ambient automerge"
+  exclude_flags:
+    - "format"
+    - "output"
+    - "verbose"
+    - "quiet"
+    - "timeout"
+    - "columns"
+
+common_flags: false
+subcommands:
+  - name: status
+    spec_ref: ambient/status_command.yaml
+  - name: ingest
+    spec_ref: ambient/ingest_command.yaml
+  - name: automerge
+    spec_ref: ambient/automerge_command.yaml

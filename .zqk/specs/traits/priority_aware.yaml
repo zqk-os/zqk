@@ -1,0 +1,14 @@
+$schema: "../../../.zqk/cli/specs/schemas/trait_spec.schema.json"
+
+name: priority_aware
+description: |
+  Trait for objects that must be prioritized against each other using the priority_tier field.
+category: behavior
+requires: []
+conflicts: []
+includes: []
+field_level: false
+object_level: true
+config: {}
+status: active
+version: 1.0.0

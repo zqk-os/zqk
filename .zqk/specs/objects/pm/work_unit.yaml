@@ -1,0 +1,66 @@
+schema_version: 2.0.0
+ontology: work_unit
+urn: urn:zqk:spec:kernel:work_unit
+namespace: zqk:kernel
+extends: work_interval
+visibility: internal
+description: 'Mixin for timesheet kinds: estimated_effort (planner intent) plus actual_effort (membrane-autofilled against the work clock). Not instantiable (kind_mappings skip_specs). TRACK: BLI-KERNEL-WORK-ENVELOPE-001 / WORK_ENVELOPE_AND_EFFORT_FACETS.md / CRIT-KERNEL-WORK-ENVELOPE-BASE-LIFT-001. '
+traits:
+  - effort_aware
+fields:
+  actual_effort:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner/automation
+      automation_hooks: used for velocity calculations and estimation accuracy analysis.
+      cardinality: one
+      criticality: association
+      default: null
+      dependencies: time tracking, metrics collection.
+      observability: "yes"
+      origin_lifecycle: mutable (updated as work progresses)
+      purpose: Actual effort expended (e.g., \\\"5.2 days\\\", \\\"32 hours\\\").
+      security: non-sensitive
+      system_usage:
+        - reporting
+        - metrics
+        - retrospectives
+      validation: Free-form string describing actual effort.
+    field_profile_code: BSE-013
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - field_mutable_group
+    type: string
+    validation:
+      required: false
+  estimated_effort:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner/planner
+      automation_hooks: used for timeline projections and capacity planning.
+      cardinality: one
+      criticality: association
+      default: null
+      dependencies: scheduling, timeline generation.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Estimated effort required (e.g., \\\"4-6 weeks\\\", \\\"2 days\\\", \\\"8 hours\\\", \\\"5 story points\\\").
+      security: non-sensitive
+      system_usage:
+        - planning
+        - scheduling
+        - resource allocation
+      validation: Free-form string describing effort estimate.
+    field_profile_code: BSE-012
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - field_mutable_group
+    type: string
+    validation:
+      required: false

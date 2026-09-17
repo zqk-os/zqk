@@ -1,0 +1,29 @@
+Analyze Git commits and link them to work items (backlog items, milestones,
+goals).
+
+This command analyzes Git commits to:
+  - Extract work item references from commit messages (BLI-*, MIL-*, GOAL-*)
+  - Create code_reference objects for changed files
+  - Link commits to work items
+  - Enable queries like "What code changes support goal X?"
+
+Usage:
+  zqk system git [command]
+
+Available Commands:
+  analyze     Analyze Git commits and link to work items
+  query       Query code changes for a work item
+
+Flags:
+      --columns string          Override column widths for table output (format: field:width)
+  -f, --format string           Output format (table, json, jsonl, yaml, csv, json-rpc, stream, agent-prompt) (default "table")
+      --ignore-scheduler-down   Ignore scheduler down warning/lockdown
+  -o, --output string           Write output to file
+  -q, --quiet                   Suppress non-essential output
+      --timeout duration        Timeout for command execution (0 = auto-calculate)
+  -v, --verbose                 Verbose output
+
+Global Flags:
+      --allow-degraded   Allow scheduler-dependent commands to run when scheduler daemon is not running
+
+Use "zqk system git [command] --help" for more information about a command.

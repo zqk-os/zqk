@@ -1,0 +1,60 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://zqk.dev/schemas/scanner_config.schema.json",
+  "title": "Scanner Configuration Schema",
+  "description": "Schema for scanner configuration that defines file scanner exclusion patterns",
+  "type": "object",
+  "required": ["version"],
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "Reference to this schema file"
+    },
+    "description": {
+      "type": "string",
+      "description": "Human-readable description of this configuration"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "Configuration version (semantic versioning)"
+    },
+    "exclude_directories": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Directories to exclude during scanning"
+    },
+    "exclude_patterns": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "File patterns to exclude during scanning"
+    },
+    "scanners": {
+      "type": "object",
+      "description": "Scanner-specific configurations",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "exclude_directories": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "exclude_patterns": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "additionalProperties": true
+      }
+    }
+  },
+  "additionalProperties": false
+}

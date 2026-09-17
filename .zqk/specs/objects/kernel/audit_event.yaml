@@ -1,0 +1,694 @@
+schema_version: 2.0.0
+ontology: audit_event
+extends: base_object
+visibility: internal
+storage_profile: stream
+description: 'Audit events record security-sensitive operations and integrity-related actions for accountability, compliance, and security analysis. These events are immutable and provide a complete audit trail of who performed what operation, when, and why.\nLifecycle: audit_event_lifecycle.yaml (pending, completed, failed, reverted, archived, error). Status allowed values and transitions are defined there; do not duplicate in this spec.\n'
+traits:
+  - read_only_group
+fields:
+  aggregated_count:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation
+      automation_hooks: used to calculate aggregation efficiency and volume metrics.
+      cardinality: zero_or_one
+      criticality: association
+      default: null (only for aggregated_summary events)
+      dependencies: only present when event_type is "aggregated_summary"
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: Total number of individual events aggregated into this summary event.
+      security: non-sensitive
+      system_usage:
+        - aggregation reporting
+        - volume analysis
+      validation: Must be >= 1 if present.
+    field_profile_code: AUE-014
+    permissions: r-x
+    semantic_type: measurement
+    traits:
+      - filterable
+      - readable
+      - sortable
+      - writable
+    type: integer
+    validation:
+      required: false
+  aggregated_events:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation
+      automation_hooks: used to provide detailed breakdown of aggregated events.
+      cardinality: zero_or_one
+      criticality: association
+      default: null (only for aggregated_summary events)
+      dependencies: only present when event_type is "aggregated_summary"
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: Array of event summaries with counts for each event type/kind combination aggregated.
+      security: non-sensitive
+      system_usage:
+        - aggregation reporting
+        - detailed breakdown
+      validation: Array of objects with event_type, count, target_kind (optional), time_range.
+    field_profile_code: AUE-015
+    permissions: r-x
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+    type: array
+    validation:
+      required: false
+  aggregation_window:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation
+      automation_hooks: used to query aggregated events by time window.
+      cardinality: zero_or_one
+      criticality: association
+      default: null (only for aggregated_summary events)
+      dependencies: only present when event_type is "aggregated_summary"
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: Time range covered by aggregated events (ISO 8601 interval format, e.g., \\\"2025-12-25T14:00:00Z to 2025-12-25T15:00:00Z\\\").
+      security: non-sensitive
+      system_usage:
+        - aggregation reporting
+        - time range queries
+      validation: ISO 8601 interval format or custom \\\"from to\\\" format.
+    field_profile_code: AUE-013
+    permissions: r-x
+    semantic_type: statement
+    traits:
+      - filterable
+      - readable
+      - searchable
+      - writable
+    type: string
+    validation:
+      required: false
+  event_type:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation
+      automation_hooks: used for event routing, alerting, reporting.
+      cardinality: one
+      criticality: composition
+      default: required - must be specified
+      dependencies: event-specific fields may be required based on type.
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: Type of audit event (hash_mismatch_fix, hash_regeneration, integrity_recovery, etc.).
+      security: non-sensitive
+      system_usage:
+        - filtering
+        - grouping
+        - reporting
+        - security analysis
+      validation: Must be one of defined event types.
+    field_profile_code: AUE-001
+    permissions: r-x
+    semantic_type: statement
+    traits:
+      - listable
+      - readable
+      - writable
+      - groupable
+      - filterable
+      - sortable
+      - searchable
+    type: enum
+    validation:
+      enum:
+        - hash_mismatch_fix
+        - hash_regeneration
+        - integrity_recovery
+        - object_deletion
+        - object_quarantine
+        - object_unquarantine
+        - object_creation
+        - object_update
+        - object_move
+        - permission_change
+        - role_assignment
+        - security_alert
+        - system_config_change
+        - cache_invalidation
+        - cache_update
+        - cache_bulk_invalidation
+        - cache_operation
+        - cache_availability
+        - cache_cleanup
+        - aggregated_summary
+        - command_execution
+        - code_quality_bypass
+        - scheduler_job_started
+        - scheduler_job_completed
+        - scheduler_job_failed
+        - listing_index_batch_start
+        - listing_index_batch_complete
+        - listing_index_batch_error
+        - hash_registry_batch_start
+        - hash_registry_batch_complete
+        - hash_registry_batch_error
+        - validation_start
+        - validation_complete
+        - validation_error
+        - async_router_start
+        - async_router_complete
+        - async_router_error
+        - operation_executor_start
+        - operation_executor_complete
+        - operation_executor_error
+        - change_journal_created
+        - change_journal_error
+        - audit_buffer_flush_start
+        - audit_buffer_flush_complete
+        - audit_buffer_flush_error
+        - orphan_cleanup_start
+        - orphan_cleanup_complete
+        - orphan_cleanup_error
+        - service_start
+        - service_stop
+        - service_error
+        - migration_start
+        - migration_complete
+        - migration_error
+        - scenario_builder_start
+        - scenario_builder_progress
+        - scenario_builder_complete
+        - scenario_builder_error
+        - prompt_run_start
+        - prompt_run_complete
+        - prompt_run_error
+      required: true
+  id:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation (Generator)
+      automation_hooks: used for cross-file references in audit trail.
+      cardinality: one
+      criticality: composition
+      default: auto-assigned per sequence
+      dependencies: linkage constraints, audit trail.
+      observability: logged + manifests.
+      origin_lifecycle: immutable
+      purpose: Stable identifier for audit event (\\\"AUD-####\\\").
+      security: non-sensitive
+      system_usage:
+        - linking
+        - reporting
+        - audit trail
+      validation: regex ^AUD-\\\\d+$ (allows 1+ digits, unlike base_object which requires 3+)
+    field_profile_code: AUE-ID
+    permissions: r-x
+    semantic_type: statement
+    traits:
+      - field_queryable_group
+    type: string
+    validation:
+      pattern: ^AUD-\d+$
+      required: true
+  metadata:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation
+      automation_hooks: used for detailed forensic analysis.
+      cardinality: zero_or_one
+      criticality: association
+      default: null (optional)
+      dependencies: none
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: Additional structured metadata about the event (command flags, context, environment, etc.).
+      security: may contain sensitive data (user info, IP addresses, etc.) - respect masking rules
+      system_usage:
+        - forensics
+        - debugging
+        - audit reports
+      validation: Free-form object (key-value pairs).
+    field_profile_code: AUE-012
+    permissions: r-x
+    semantic_type: expression
+    traits:
+      - readable
+      - writable
+    type: object
+    validation:
+      required: false
+  new_value:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation
+      automation_hooks: used for verification and audit reports.
+      cardinality: zero_or_one
+      criticality: association
+      default: null if not applicable to event type
+      dependencies: event_type determines value format
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: New value after the operation (e.g., new hash, new status).
+      security: non-sensitive (but may contain sensitive data like hashes)
+      system_usage:
+        - audit reports
+        - verification
+      validation: Value depends on event_type.
+    field_profile_code: AUE-008
+    permissions: r-x
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+    type: string
+    validation:
+      required: false
+  occurrence_count:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation
+      automation_hooks: used to track repeated operations in bulk contexts, similar to status_history append pattern.
+      cardinality: zero_or_one
+      criticality: association
+      default: null (assumed to be 1 if not present)
+      dependencies: only present when event occurred multiple times in a bulk operation
+      observability: "yes"
+      origin_lifecycle: mutable (incremented during bulk operations, append-only pattern)
+      purpose: Number of times this event occurred (for bulk operations). Defaults to 1 if not present.
+      security: non-sensitive
+      system_usage:
+        - bulk operation tracking
+        - frequency analysis
+        - reporting
+      validation: Must be >= 1 if present.
+    field_profile_code: AUE-017
+    permissions: r-x
+    semantic_type: quantity
+    traits:
+      - readable
+      - writable
+      - filterable
+      - sortable
+    type: integer
+    validation:
+      required: false
+  occurrence_timestamps:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation
+      automation_hooks: used to track when repeated operations occurred, enables temporal analysis of bulk operations.
+      cardinality: zero_or_one
+      criticality: association
+      default: null (assumed to be [created_at] if not present)
+      dependencies: only present when occurrence_count > 1
+      observability: "yes"
+      origin_lifecycle: mutable (append-only, new timestamps added, never removed)
+      purpose: List of timestamps when this event occurred (for bulk operations). Append-only list similar to status_history.
+      security: non-sensitive
+      system_usage:
+        - temporal analysis
+        - bulk operation tracking
+        - audit trail
+      validation: List of ISO 8601 timestamps in UTC (YYYY-MM-DDTHH:MM:SSZ format).
+    field_profile_code: AUE-018
+    permissions: r-x
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+    type: list
+    validation:
+      required: false
+  operation:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation
+      automation_hooks: used in audit reports and summaries.
+      cardinality: one
+      criticality: composition
+      default: required - must be specified
+      dependencies: none
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: Human-readable description of the operation performed (e.g., \\\"Regenerated hash for BLI-626\\\", \\\"Recovered integrity for priority_plan\\\").
+      security: non-sensitive
+      system_usage:
+        - audit reports
+        - human-readable logs
+      validation: Free-form string describing the operation.
+    field_profile_code: AUE-002
+    permissions: r-x
+    semantic_type: statement
+    traits:
+      - listable
+      - readable
+      - writable
+      - filterable
+      - sortable
+      - searchable
+    type: string
+    validation:
+      min_length: 1
+      required: true
+  original_value:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation
+      automation_hooks: used for rollback and forensic analysis.
+      cardinality: zero_or_one
+      criticality: association
+      default: null if not applicable to event type
+      dependencies: event_type determines value format
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: Original value before the operation (e.g., original hash, original status).
+      security: non-sensitive (but may contain sensitive data like hashes)
+      system_usage:
+        - rollback
+        - audit reports
+        - forensics
+      validation: Value depends on event_type (hash for hash operations, status for status changes, etc.).
+    field_profile_code: AUE-007
+    permissions: r-x
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+    type: string
+    validation:
+      required: false
+  preserved_samples:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation
+      automation_hooks: used for forensic analysis of aggregated events.
+      cardinality: zero_or_one
+      criticality: association
+      default: null (samples only preserved if configured)
+      dependencies: only present when event_type is "aggregated_summary" and samples were preserved
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: Array of sample individual events preserved for forensics (if configured to preserve samples).
+      security: non-sensitive
+      system_usage:
+        - forensics
+        - detailed analysis
+      validation: Array of event objects (full or partial).
+    field_profile_code: AUE-016
+    permissions: r-x
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+    type: array
+    validation:
+      required: false
+  reason:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: user/automation
+      automation_hooks: used in audit reports to explain actions.
+      cardinality: zero_or_one
+      criticality: association
+      default: null (optional)
+      dependencies: none
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: Optional explanation of why the operation was performed (user-provided or system-generated).
+      security: non-sensitive
+      system_usage:
+        - audit reports
+        - justification
+      validation: Free-form text.
+    field_profile_code: AUE-006
+    permissions: r-x
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+    type: text
+    validation:
+      required: false
+  recovery_method:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation
+      automation_hooks: used to analyze recovery patterns and identify process gaps.
+      cardinality: zero_or_one
+      criticality: association
+      default: null if not applicable
+      dependencies: none
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: Method used to perform the operation (auto-fix, manual, force, interactive, scheduled).
+      security: non-sensitive
+      system_usage:
+        - audit reports
+        - pattern analysis
+      validation: Must be one of defined methods.
+    field_profile_code: AUE-009
+    permissions: r-x
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+      - filterable
+      - groupable
+    type: enum
+    validation:
+      enum:
+        - auto-fix
+        - manual
+        - force
+        - interactive
+        - scheduled
+      required: false
+  severity:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation
+      automation_hooks: used for alerting and security monitoring.
+      cardinality: zero_or_one
+      criticality: association
+      default: determined by event_type (hash_mismatch_fix = high, hash_regeneration = medium, etc.)
+      dependencies: event_type may determine default severity
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: Severity level of the event (low, medium, high, critical) for security analysis.
+      security: non-sensitive
+      system_usage:
+        - alerting
+        - prioritization
+        - reporting
+      validation: Must be one of defined severity levels.
+    field_profile_code: AUE-010
+    permissions: r-x
+    semantic_type: statement
+    traits:
+      - filterable
+      - groupable
+      - listable
+      - readable
+      - searchable
+      - sortable
+      - writable
+    type: enum
+    validation:
+      enum:
+        - low
+        - medium
+        - high
+        - critical
+      required: false
+  status:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation
+      automation_hooks: used for lifecycle tracking and reporting.
+      cardinality: one
+      criticality: composition
+      default: completed
+      dependencies: lifecycle registry (see audit_event_lifecycle.yaml)
+      observability: "yes"
+      origin_lifecycle: 'mutable (typically transitions: pending -> completed/failed, completed -> reverted)'
+      purpose: Status of the audit event operation; allowed values and transitions from audit_event_lifecycle.yaml.
+      security: non-sensitive
+      system_usage:
+        - lifecycle
+        - reporting
+      validation: Allowed values from lifecycle; do not duplicate enum here.
+    field_profile_code: AUE-011
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - listable
+      - readable
+      - writable
+      - groupable
+      - filterable
+      - sortable
+      - searchable
+    type: enum
+    validation:
+      required: true
+  target_id:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation
+      automation_hooks: used to link events to specific objects.
+      cardinality: zero_or_one
+      criticality: association
+      default: null if event doesn't target a specific object
+      dependencies: object registry
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: ID of the specific object that was affected (e.g., \\\"BLI-626\\\", \\\"PRI-208\\\").
+      security: non-sensitive
+      system_usage:
+        - traceability
+        - audit reports
+      validation: Must reference existing object if provided.
+    field_profile_code: AUE-004
+    permissions: r-x
+    semantic_type: reference
+    traits:
+      - filterable
+      - listable
+      - readable
+      - searchable
+      - sortable
+      - writable
+    type: string
+    validation:
+      required: false
+  target_kind:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation
+      automation_hooks: used for kind-based filtering and reporting.
+      cardinality: zero_or_one
+      criticality: association
+      default: null if event doesn't target a specific object kind
+      dependencies: object registry
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: Object kind that was affected (e.g., \\\"backlog_item\\\", \\\"priority_plan\\\", \\\"requirement\\\").
+      security: non-sensitive
+      system_usage:
+        - filtering
+        - grouping
+        - reporting
+      validation: Must match known object kind.
+    field_profile_code: AUE-003
+    permissions: r-x
+    semantic_type: statement
+    traits:
+      - listable
+      - readable
+      - writable
+      - groupable
+      - filterable
+      - sortable
+      - searchable
+    type: string
+    validation:
+      required: false
+  target_path:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation
+      automation_hooks: used for file-level audit reports.
+      cardinality: zero_or_one
+      criticality: association
+      default: null if event doesn't target a specific file
+      dependencies: file system
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: File path that was affected (e.g., \\\"\\.zqk/process/backlog_items/BLI-626.yaml\\\").
+      security: non-sensitive
+      system_usage:
+        - traceability
+        - file-level auditing
+      validation: Must be a valid file path relative to project root.
+    field_profile_code: AUE-005
+    permissions: r-x
+    semantic_type: statement
+    traits:
+      - filterable
+      - readable
+      - searchable
+      - writable
+    type: string
+    validation:
+      required: false
+  title:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation
+      automation_hooks: used for display purposes.
+      cardinality: zero_or_one
+      criticality: association
+      default: null (operation field is primary identifier)
+      dependencies: none
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: Optional human-readable title for the audit event (operation field is primary identifier).
+      security: non-sensitive
+      system_usage:
+        - display
+        - filtering
+      validation: Free-form string.
+    field_profile_code: AUE-000
+    permissions: r-x
+    semantic_type: statement
+    traits:
+      - listable
+      - readable
+      - writable
+      - filterable
+      - sortable
+      - searchable
+    type: string
+    validation:
+      required: false

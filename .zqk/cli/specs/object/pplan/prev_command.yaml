@@ -1,0 +1,38 @@
+$schema: "../../../schemas/command_spec.schema.json"
+
+name: "prev"
+short: "Navigate to the previous priority plan"
+description: |
+  Navigate to the previous priority plan in sequence.
+
+  The sequence includes all active and in_progress priority plans, sorted by:
+    1. in_progress plans first
+    2. Then active plans by active_order (lower first)
+    3. Then by plan_date (descending)
+
+args:
+  type: "exact"
+  n: 0
+
+flags:
+  - name: "filter"
+    type: "string_array"
+    default: []
+    description: "Filter by field (format: field=value or field:value, can be used multiple times)"
+  - name: "sort-by"
+    type: "string"
+    default: ""
+    description: "Field to sort by"
+  - name: "sort-asc"
+    type: "bool"
+    default: true
+    description: "Sort ascending (default: true)"
+
+help:
+  examples:
+    - comment: "View backlog items for previous plan"
+      command: "%s pplan prev"
+    - comment: "View in JSON format"
+      command: "%s pplan prev --format json"
+
+common_flags: true

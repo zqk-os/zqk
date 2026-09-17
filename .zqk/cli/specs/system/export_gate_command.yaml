@@ -1,0 +1,37 @@
+$schema: "../schemas/command_spec.schema.json"
+
+name: "export-gate"
+short: "Audit candidate directory or open-core distribution against export gates"
+description: >
+  Audit an open-core community target directory to ensure proprietary internal scripts,
+  vendor-specific state, credentials, and forbidden patterns are not leaked.
+
+aliases:
+  - "police-export"
+  - "verify-export"
+
+args:
+  type: "minimum"
+  min: 0
+
+flags:
+  - name: "target"
+    type: "string"
+    default: "."
+    description: "Target directory path to audit"
+  - name: "prohibited-pattern"
+    type: "stringSlice"
+    description: "Additional prohibited path patterns to check"
+
+help:
+  examples:
+    - comment: "Audit current repo as community export candidate"
+      command: "%s system export-gate"
+    - comment: "Audit specific distribution target directory"
+      command: "%s system export-gate --target=/tmp/community-export"
+
+run_e: "runExportGate"
+common_flags: true
+requires_storage: false
+requires_session: false
+requires_scheduler_check: false

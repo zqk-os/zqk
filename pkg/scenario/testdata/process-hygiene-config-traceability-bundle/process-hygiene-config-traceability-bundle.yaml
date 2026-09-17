@@ -1,0 +1,139 @@
+# Traceability bundle: process-object hygiene rules as first-class persisted configuration.
+# Tracked under pkg/scenario/testdata/ (like persistence-bundle and convergence-lifecycle-bundle).
+# Apply from repo root, e.g.:
+#   zqk bundle apply -f pkg/scenario/testdata/process-hygiene-config-traceability-bundle/process-hygiene-config-traceability-bundle.yaml -R .
+#
+# Replace *-PHC-* id_hints with a project-specific prefix before applying where collisions matter.
+# After apply: set requirement.priority_plan_ref and backlog_item.priority_plan_ref / milestone_refs via CLI
+# when you assign this work to a priority plan (do not hand-edit YAML under .zqk/process/).
+#
+# Distinct from ontology `rule` (governance markdown policy). This bundle tracks machine-executable
+# hygiene matchers, analogous to auto_fix_rule.
+api_version: v1
+kind: scenario_bundle
+metadata:
+  name: process-hygiene-config-traceability-bundle
+  description: |
+    Goal, requirement, criteria, backlog items, test case, and doc entry for storing process hygiene
+    scan rules as internal objects, CLI resolution order, and linkage to pkg/processhygiene and
+    object-hygiene-scan command spec.
+objects:
+  goals:
+    - id_hint: GOAL-PHC-001
+      title: Process data hygiene rules editable without code deploys
+      status: complete
+      authority: owner
+      target: "1"
+  criteria:
+    - id_hint: CRIT-PHC-001
+      title: Internal object spec defines machine-readable hygiene rule fields (id, description, field, one match mode)
+      status: complete
+      category: functional
+      validation_method: code_review
+      requirement_ref: REQ-PHC-001
+      description: |
+        New internal kind (or equivalent) lists: stable rule id, human description, object field to read,
+        and exactly one of prefix, suffix, equals, or regex. Supports enabled/priority consistent with auto_fix_rule patterns.
+    - id_hint: CRIT-PHC-002
+      title: Rule resolution order is explicit and documented (--rules-file, then storage, then embedded defaults)
+      status: complete
+      category: non-functional
+      validation_method: manual_check
+      requirement_ref: REQ-PHC-001
+      description: |
+        ResolveRules (or successor) documents and implements: explicit file flag wins; else list enabled rule objects
+        from process storage when present; else embedded defaults. Same compilation semantics for file vs storage.
+    - id_hint: CRIT-PHC-003
+      title: Declarative rule YAML compiles; invalid rules fail compile with error (no silent empty rule)
+      status: complete
+      category: acceptance
+      validation_method: automated_test
+      requirement_ref: REQ-PHC-001
+      description: |
+        compileRule / CompileRules reject configs with no match discriminator or conflicting matchers; unit tests lock behavior.
+    - id_hint: CRIT-PHC-004
+      title: ScanObjects returns findings with rule id, matched field, and object identity for each match
+      status: complete
+      category: acceptance
+      validation_method: automated_test
+      requirement_ref: REQ-PHC-001
+      description: |
+        Given compiled rules and a slice of object maps, scan produces findings tied to rule_id and field; CountByRule aggregates.
+    - id_hint: CRIT-PHC-005
+      title: zqk system object-hygiene-scan command spec defines flags, help, and structured output contracts
+      status: complete
+      category: compliance
+      validation_method: code_review
+      requirement_ref: REQ-PHC-001
+      description: |
+        Command spec YAML under .zqk/cli/specs/system/ documents --rules-file, --emit-events, format; help goldens stay in sync.
+  requirements:
+    - id_hint: REQ-PHC-001
+      title: Persisted process-hygiene rule objects and storage-backed resolution for object-hygiene-scan
+      status: complete
+      priority: p2
+      goal_refs: [GOAL-PHC-001]
+      criteria_refs:
+        - CRIT-PHC-001
+        - CRIT-PHC-002
+        - CRIT-PHC-003
+        - CRIT-PHC-004
+        - CRIT-PHC-005
+      body: |
+        Hygiene scans (titles/fields matching test or fixture patterns) must be configurable through the same object
+        store as the rest of process data: operators create/update/disable rules via zqk object flows, not only repo YAML.
+
+        Today: pkg/processhygiene supplies declarative rules (embed + optional file), and zqk system object-hygiene-scan
+        identifies matches only. Next: introduce an internal object kind for rule rows, load them with the same semantics
+        as the YAML bundle, and keep governance `rule` objects for human policy separate from this machine configuration.
+
+        Precedent: auto_fix_rule objects loaded by AutoFixRuleLoader. CLI and tests remain spec-driven; no ad-hoc system
+        subcommands without command specs.
+  test_cases:
+    - id_hint: TEST-PHC-001
+      title: Unit tests for pkg/processhygiene (compile, ResolveRules, storage path, ScanObjects, CountByRule)
+      status: complete
+      requirement_refs: [REQ-PHC-001]
+      criteria_refs: [CRIT-PHC-002, CRIT-PHC-003, CRIT-PHC-004]
+      test_functions:
+        - github.com/lanceman/zqk/pkg/processhygiene.TestLoadEmbeddedDefaultRules
+        - github.com/lanceman/zqk/pkg/processhygiene.TestScanObjects
+        - github.com/lanceman/zqk/pkg/processhygiene.TestCountByRule
+        - github.com/lanceman/zqk/pkg/processhygiene.TestCompileRuleInvalid
+        - github.com/lanceman/zqk/pkg/processhygiene.TestLoadRulesFromStorage_SkipDisabledAndSortOrder
+        - github.com/lanceman/zqk/pkg/processhygiene.TestResolveRulesWithOptions_StorageNonEmpty
+        - github.com/lanceman/zqk/pkg/processhygiene.TestResolveRulesWithOptions_StorageEmptyFallsBackToEmbedded
+        - github.com/lanceman/zqk/pkg/processhygiene.TestResolveRulesWithOptions_RulesFileOverrides
+  backlog_items:
+    - id_hint: BLI-PHC-001
+      title: Add internal object spec and instance builders for persisted process hygiene rule rows
+      status: complete
+      requirement_refs: [REQ-PHC-001]
+      criteria_refs: [CRIT-PHC-001, CRIT-PHC-005]
+    - id_hint: BLI-PHC-002
+      title: Resolve hygiene rules from object storage and wire zqk system object-hygiene-scan to prefer stored rules
+      status: complete
+      requirement_refs: [REQ-PHC-001]
+      criteria_refs: [CRIT-PHC-002, CRIT-PHC-003, CRIT-PHC-004]
+      test_case_refs: [TEST-PHC-001]
+  doc_entries:
+    - id_hint: DOC-PHC-001
+      title: Scenario bundles pattern (requirements, criteria, backlog, test_case) for traceability
+      summary: |
+        Reference for persistent bundle YAML layout, id_hint usage, and apply workflow; this hygiene bundle follows the same shape.
+      path: docs/architecture/SCENARIO_BUNDLES_AND_TRACEABILITY.md
+      group: architecture
+      category: process
+      status: published
+      content_searchable: true
+      requirement_refs: [REQ-PHC-001]
+    - id_hint: DOC-PHC-002
+      title: Command spec for zqk system object-hygiene-scan (flags, rules sources, output formats)
+      summary: |
+        Generated CLI builder source of truth: --rules-file, optional events, format; pairs with pkg/processhygiene evaluators.
+      path: .zqk/cli/specs/system/object_hygiene_scan_command.yaml
+      group: architecture
+      category: process
+      status: published
+      content_searchable: true
+      requirement_refs: [REQ-PHC-001]

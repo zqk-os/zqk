@@ -1,0 +1,6 @@
+name: ops
+use: ops
+short: Operations and utility commands
+long: Operations and utility commands for ZQK agents and orchestration loops.
+subcommands:
+  - level-up

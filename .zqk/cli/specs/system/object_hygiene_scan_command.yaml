@@ -1,0 +1,29 @@
+$schema: "../schemas/command_spec.schema.json"
+
+name: "object-hygiene-scan"
+short: "Scan process objects using configurable hygiene rules (identify only)"
+description: |
+  Loads declarative rules (embedded defaults, optional project override at
+  .zqk/specs/process_hygiene_rules.yaml, or --rules-file) and reports
+  matches. Does not modify objects. Reusable from scheduler jobs, callbacks, and
+  other tools via pkg/processhygiene.
+
+  Rule schema: version + rules[].id, description, match.field, and exactly one of
+  prefix, suffix, equals, regex. Extend by editing the YAML or adding new rules.
+
+flags:
+  - name: "rules-file"
+    type: "string"
+    description: "Path to a YAML rule file (overrides project internal default)"
+  - name: "emit-events"
+    type: "bool"
+    default: false
+    description: "When set and findings > 0, emit a coordinator operational event (best-effort)"
+
+help:
+  examples:
+    - comment: "JSON report using embedded defaults or project internal rules file"
+      command: "%s system object-hygiene-scan --format json"
+    - comment: "Custom rule file and coordinator notification"
+      command: "%s system object-hygiene-scan --format json --rules-file ./my-rules.yaml --emit-events"
+common_flags: true

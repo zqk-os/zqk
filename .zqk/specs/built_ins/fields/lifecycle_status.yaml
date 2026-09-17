@@ -1,0 +1,10 @@
+type: string
+semantic_type: lifecycle_status
+description: "Current metabolic lifecycle status of the entity."
+default: draft
+traits:
+  - readable
+  - filterable
+  - sortable
+validation:
+  required: true

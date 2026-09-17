@@ -1,0 +1,70 @@
+schema_version: 2.0.0
+ontology: audit_event_aggregation
+extends: base_object
+visibility: internal
+storage_profile: cas_entity
+id_prefixes:
+  - AEA-
+description: |
+  Durable record of an audit-event aggregation pass (pending → aggregating → aggregated).
+  Complements the scheduler job_type of the same name. Lifecycle: audit_event_aggregation_lifecycle.yaml.
+  TRACK: BLI-CEF-R26-REMAINING-KINDS-001 — was a census lifecycle_orphan (YAML without a spec).
+fields:
+  id:
+    checklist:
+      authority: system
+      automation_hooks: minted on create
+      cardinality: one
+      criticality: composition
+      default: required
+      dependencies: id_prefixes_config AEA-
+      lifecycle: immutable
+      observability: "yes"
+      purpose: Stable identifier for an aggregation pass
+      security: non-sensitive
+      system_usage:
+        - storage lookup
+        - scheduler correlation
+      validation: Must match AEA- prefix
+    field_profile_code: AEA-000
+    permissions: r-x
+    semantic_type: identifier
+    traits:
+      - readable
+      - filterable
+      - sortable
+    type: string
+    validation:
+      pattern: ^AEA-
+      required: true
+  aggregation_window:
+    checklist:
+      authority: automation
+      automation_hooks: set by the aggregation job from the configured window
+      cardinality: zero_or_one
+      criticality: association
+      default: null
+      dependencies: scheduler audit_event_aggregation job
+      lifecycle: mutable
+      observability: "yes"
+      purpose: Time window covered by this aggregation pass
+      security: non-sensitive
+      system_usage:
+        - aggregation reporting
+        - retention
+      validation: Optional ISO-8601 interval or window label
+    field_profile_code: AEA-001
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+      - filterable
+    type: string
+    validation:
+      required: false
+
+created_at: 2026-08-29T00:00:00Z
+updated_at: 2026-08-29T00:00:00Z
+created_by: ACC-1785920548450214012-68b850c0
+updated_by: ACC-1785920548450214012-68b850c0

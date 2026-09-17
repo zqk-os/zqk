@@ -1,0 +1,131 @@
+schema_version: 2.0.0
+ontology: organizational_change
+extends: base_object
+visibility: public
+description: 'Represents a specific organizational restructuring event such as division restructure, team reassignment, or organizational merge. Tracks the change event that can trigger impact analysis and change propagation. '
+traits:
+  - base_object_traits
+fields:
+  affected_objects:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation
+      automation_hooks: used for impact analysis and change propagation
+      cardinality: one
+      criticality: composition
+      default: {}
+      dependencies: organizational object registries
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: Map of affected organizational objects by type (divisions, teams, organizations, etc.)
+      security: non-sensitive
+      system_usage:
+        - impact analysis
+        - change propagation
+        - reporting
+      validation: Map with keys representing object types and values being lists of object references
+    field_profile_code: ORG-CHG-002
+    permissions: rwx
+    semantic_type: expression
+    traits:
+      - readable
+      - writable
+    type: map
+    validation:
+      required: false
+  change_date:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner
+      automation_hooks: used for chronological ordering and reporting
+      cardinality: one
+      criticality: composition
+      default: null
+      dependencies: none
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: Date/time when the organizational change occurred or is scheduled to occur
+      security: non-sensitive
+      system_usage:
+        - chronological ordering
+        - reporting
+        - impact analysis
+      validation: ISO-8601 datetime format
+    field_profile_code: ORG-CHG-004
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+      - filterable
+      - sortable
+    type: datetime
+    validation:
+      required: false
+  change_description:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner
+      automation_hooks: used for reporting and documentation
+      cardinality: one
+      criticality: composition
+      default: null
+      dependencies: none
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Human-readable description of the organizational change (e.g., \"Split Engineering division into Infrastructure and Product divisions\")
+      security: non-sensitive
+      system_usage:
+        - documentation
+        - reporting
+        - impact analysis
+      validation: Free-form text describing the change
+    field_profile_code: ORG-CHG-003
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+      - modifiable
+      - searchable
+    type: text
+    validation:
+      required: false
+  change_type:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner
+      automation_hooks: used for categorization and filtering
+      cardinality: one
+      criticality: composition
+      default: null
+      dependencies: none
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: Type of organizational change (e.g., division_restructure, team_reassignment, organization_merge, team_move)
+      security: non-sensitive
+      system_usage:
+        - categorization
+        - filtering
+        - reporting
+      validation: Must be a non-empty string describing the change type
+    field_profile_code: ORG-CHG-001
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+      - filterable
+      - searchable
+      - sortable
+    type: string
+    validation:
+      required: true

@@ -1,0 +1,237 @@
+schema_version: 2.0.0
+ontology: agent_onboarding_preparation
+extends: base_object
+visibility: public
+description: 'Tracks preparation work for onboarding specialized agents, including readiness criteria, infrastructure requirements, and preparation tasks. Ensures agents can onboard efficiently.\nLifecycle: agent_onboarding_preparation_lifecycle.yaml.\n'
+traits:
+  - base_object_traits
+fields:
+  agent_type:
+    access:
+      requires:
+        - access:confidential
+        - role:admin
+    checklist:
+      authority: automation/admin
+      automation_hooks: determines preparation requirements
+      cardinality: one
+      criticality: composition
+      default: required
+      dependencies: none
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: Type of agent being prepared for onboarding.
+      security: non-sensitive
+      system_usage:
+        - agent_management
+        - onboarding_tracking
+      validation: enum
+    field_profile_code: AGENT-PREP-001
+    permissions: r-x
+    semantic_type: statement
+    traits:
+      - filterable
+      - readable
+      - searchable
+      - sortable
+      - writable
+    type: enum
+    validation:
+      enum:
+        - observer
+        - test_agent
+        - coder_agent
+        - devops_agent
+        - documentation_agent
+        - optimization_agent
+      required: true
+  id:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation (Generator)
+      automation_hooks: used for cross-file references.
+      cardinality: one
+      criticality: composition
+      default: auto-assigned per kind sequence
+      dependencies: linkage constraints, URN creation.
+      observability: logged + manifests.
+      origin_lifecycle: immutable
+      purpose: Stable identifier used across the graph (\\\"AGENT-PREP-####\\\").
+      security: non-sensitive
+      system_usage:
+        - linking
+        - reporting
+        - URIs
+      validation: regex ^AGENT-PREP-\\\\d{3,}$; uniqueness enforced.
+    permissions: r-x
+    semantic_type: statement
+    traits:
+      - listable
+      - readable
+      - writable
+      - filterable
+      - sortable
+      - searchable
+    type: string
+    validation:
+      pattern: ^AGENT-PREP-\d{3,}$
+      required: true
+  preparation_status:
+    access:
+      requires:
+        - access:confidential
+        - role:admin
+    checklist:
+      authority: automation/admin
+      automation_hooks: used for status tracking
+      cardinality: one
+      criticality: composition
+      default: not_started
+      dependencies: none
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Current status of preparation work.
+      security: non-sensitive
+      system_usage:
+        - onboarding_tracking
+        - status_reporting
+      validation: enum
+    field_profile_code: AGENT-PREP-004
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - filterable
+      - readable
+      - searchable
+      - sortable
+      - writable
+    type: enum
+    validation:
+      enum:
+        - not_started
+        - in_progress
+        - ready
+        - complete
+        - blocked
+      required: true
+  preparation_tasks:
+    access:
+      requires:
+        - access:confidential
+        - role:admin
+    checklist:
+      authority: automation/admin
+      automation_hooks: used for task tracking
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: backlog items must exist
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Backlog items that represent preparation tasks.
+      security: non-sensitive
+      system_usage:
+        - task_tracking
+        - onboarding_management
+      validation: Must reference existing backlog items
+    field_profile_code: AGENT-PREP-006
+    permissions: r-x
+    semantic_type: reference
+    traits:
+      - readable
+      - writable
+      - filterable
+      - searchable
+    type: list
+    validation:
+      required: false
+  readiness_criteria:
+    access:
+      requires:
+        - access:confidential
+        - role:admin
+    checklist:
+      authority: automation/admin
+      automation_hooks: used for readiness validation
+      cardinality: many
+      criticality: composition
+      default: []
+      dependencies: none
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: List of criteria that must be met before agent can onboard.
+      security: non-sensitive
+      system_usage:
+        - readiness_validation
+      validation: List of criterion objects
+    field_profile_code: AGENT-PREP-005
+    permissions: rwx
+    semantic_type: expression
+    traits:
+      - field_mutable_group
+    type: list
+    validation:
+      required: false
+  target_date:
+    access:
+      requires:
+        - access:confidential
+        - role:admin
+    checklist:
+      authority: automation/admin
+      automation_hooks: used for onboarding scheduling
+      cardinality: one
+      criticality: association
+      default: optional
+      dependencies: none
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Target date for agent onboarding.
+      security: non-sensitive
+      system_usage:
+        - planning
+        - scheduling
+      validation: Valid date format
+    field_profile_code: AGENT-PREP-003
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+      - filterable
+      - sortable
+      - searchable
+    type: date
+    validation:
+      required: false
+  target_workstream_ref:
+    access:
+      requires:
+        - access:confidential
+        - role:admin
+    checklist:
+      authority: automation/admin
+      automation_hooks: used for workstream-agent linking
+      cardinality: one
+      criticality: composition
+      default: required
+      dependencies: workstream must exist
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Workstream where this agent will be activated.
+      security: non-sensitive
+      system_usage:
+        - workstream_management
+        - onboarding_tracking
+      validation: Must reference existing workstream
+    field_profile_code: AGENT-PREP-002
+    permissions: r-x
+    semantic_type: reference
+    traits:
+      - field_reference_group
+      - writable
+    type: string
+    validation:
+      required: true

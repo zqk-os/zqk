@@ -1,0 +1,42 @@
+$schema: "../schemas/command_spec.schema.json"
+
+name: "stream"
+short: "Run Go tests with real-time progress streaming and duration tracking"
+description: >
+  Executes Go tests with unbuffered progress streaming, per-package timing,
+  parallel process controls, and structured status logging to .zqk/logs.
+
+aliases:
+  - "run-progress"
+
+args:
+  type: "minimum"
+  min: 0
+
+flags:
+  - name: "parallel"
+    shorthand: "p"
+    type: "int"
+    default: 0
+    description: "Number of parallel test processes (defaults to 2x CPU cores)"
+  - name: "pkg"
+    type: "string"
+    default: "./..."
+    description: "Target package pattern to test"
+  - name: "test-timeout"
+    type: "duration"
+    default: 3600s
+    description: "Test execution timeout"
+
+help:
+  examples:
+    - comment: "Run all tests with progress streaming"
+      command: "%s test stream"
+    - comment: "Stream tests for a single package with 4 parallel runners"
+      command: "%s test stream --pkg=./pkg/storage -p 4"
+
+run_e: "runTestStream"
+common_flags: true
+requires_storage: false
+requires_session: false
+requires_scheduler_check: false

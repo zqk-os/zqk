@@ -1,0 +1,74 @@
+$schema: "../schemas/command_spec.schema.json"
+
+name: "convergence"
+short: "Convergence measurement (test bundles, rollup, agent handoff)"
+description: |
+  Test-bundle health timeline, rollup_status_core, coordinator overseer, and optional CVS/agent handoff.
+
+  measure              — Read health.jsonl and compute delta_assessment, rollup, suggested CVS fields (distinct from
+                         CVS object fields like before_state_snapshot / after_state_snapshot — those are persisted state).
+  overseer             — Coordinator/nested CVS rollup (tree walk + arbitrated parent line).
+  nest-spawn           — Create child CVS under parent (related_object_refs; depth/cycle safe).
+  nest-link            — Link existing child CVS under parent.
+  nest-status          — BFS nest tree status for a parent CVS.
+  promotion-readiness   — Optional promotion gate; delegates to scripts/check_convergence_promotion_readiness.sh (bash + jq).
+  record-overseer-run   — Append overseer_run_v1 JSONL; delegates to scripts/record_convergence_overseer_run.sh.
+
+  For agent markdown, use measure with --format agent-prompt. For JSON automation, use --format json.
+
+help:
+  examples:
+    - comment: "Convergence measure for automation (JSON)"
+      command: "%s scheduler convergence measure --format json"
+    - comment: "Convergence JSON without literal gate scripts (faster; full gates + matrix in cvs_outcome_rollup.py)"
+      command: "%s scheduler convergence measure --format json --skip-rollup-gates"
+    - comment: "Convergence measure with suggested CVS fields for object update"
+      command: "%s scheduler convergence measure --format json --session-id CVS-001"
+    - comment: "Convergence with phase router alignment (current CVS phase + flow variant)"
+      command: "%s scheduler convergence measure --format json --session-id CVS-001 --current-phase c5_verify --flow-variant scheduler_fast"
+    - comment: "Object update payload only (pipe to file for zqk object update --file)"
+      command: "%s scheduler convergence measure --format json --session-id CVS-001 | jq '.suggested_convergence_session_fields.object_update_body'"
+    - comment: "Agent prompt (markdown) for chat — same command as JSON, different --format"
+      command: "%s scheduler convergence measure --format agent-prompt --session-id CVS-001"
+    - comment: "Agent prompt to file only (no CVS write; omit --persist-session when health watermark unchanged)"
+      command: "%s scheduler convergence measure --format agent-prompt --session-id CVS-001 -o .zqk/logs/drift/cvs_agent_prompt_latest.md"
+    - comment: "Agent prompt copied to clipboard (macOS pbcopy)"
+      command: "%s scheduler convergence measure --format agent-prompt --session-id CVS-001 --copy"
+    - comment: "Agent prompt then AppleScript: activate Cursor, ⌘Y, ⌘V, Return (macOS; Accessibility)"
+      command: "%s scheduler convergence measure --format agent-prompt --session-id CVS-001 --paste-cursor"
+    - comment: "Persist CVS + log file + clipboard for chat (automated loop handoff; macOS)"
+      command: "%s scheduler convergence measure --format agent-prompt --session-id CVS-001 --persist-session -o .zqk/logs/drift/cvs_agent_prompt_latest.md --copy"
+    - comment: "Coordinator overseer: rollup + nested CVS tree + arbitrated prompt line"
+      command: "%s scheduler convergence overseer --coordinator-session-id CVS-001 --format json"
+    - comment: "Spawn nested child CVS under parent"
+      command: "%s scheduler convergence nest-spawn --parent-session-id CVS-001 --title \"Child\" --hypothesis \"h\" --desired-end-state \"done\""
+    - comment: "Nest status BFS tree"
+      command: "%s scheduler convergence nest-status --parent-session-id CVS-001 --format json"
+    - comment: "Promotion readiness gate (session id arg or env; same exit codes as shell script)"
+      command: "%s scheduler convergence promotion-readiness CVS-001"
+    - comment: "Record one overseer run JSONL line (coordinator id arg or COORDINATOR_SESSION_ID)"
+      command: "%s scheduler convergence record-overseer-run CVS-001"
+  exclude_flags:
+    - "format"
+    - "output"
+    - "verbose"
+    - "quiet"
+    - "timeout"
+    - "columns"
+
+common_flags: false
+subcommands:
+  - name: measure
+    spec_ref: scheduler/convergence/measure_command.yaml
+  - name: overseer
+    spec_ref: scheduler/convergence/overseer_command.yaml
+  - name: nest-spawn
+    spec_ref: scheduler/convergence/nest_spawn_command.yaml
+  - name: nest-link
+    spec_ref: scheduler/convergence/nest_link_command.yaml
+  - name: nest-status
+    spec_ref: scheduler/convergence/nest_status_command.yaml
+  - name: promotion-readiness
+    spec_ref: scheduler/convergence/promotion_readiness_command.yaml
+  - name: record-overseer-run
+    spec_ref: scheduler/convergence/record_overseer_run_command.yaml

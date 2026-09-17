@@ -1,0 +1,53 @@
+schema_version: "2.0.0"
+ontology: field_meta_spec
+urn: urn:zqk:spec:dna:field_meta_spec
+namespace: zqk:dna
+visibility: public
+storage_profile: cas_entity
+description: "Meta specification governing the structural, validation, and relational properties of an individual field within the Cellular Knowledge OS."
+traits:
+  - auditable
+fields:
+  name:
+    type: string
+    description: "Field name identifier."
+    validation:
+      required: true
+  type:
+    type: enum
+    description: "Data type: string, int, float, bool, datetime, list, map, urn, enum, object."
+    validation:
+      required: true
+      enum:
+        - string
+        - int
+        - float
+        - bool
+        - datetime
+        - list
+        - map
+        - urn
+        - enum
+        - object
+  semantic_type:
+    type: string
+    description: "High-level semantic classification of the field."
+  traits:
+    type: list
+    description: "Field-level traits (e.g. readable, writable, filterable, sortable)."
+    default: []
+  description:
+    type: string
+    description: "Semantic explanation and requirements for the field."
+  default:
+    type: any
+    description: "Default value assigned when field is omitted."
+  validation:
+    type: map
+    description: "Validation rules: required, pattern, enum, min_length, max_length."
+  enum_spec:
+    type: map
+    description: "Definitional enum specification when type is enum."
+  relation:
+    type: map
+    description: "Relational contract specifying target_kind, edge_type, and cascade semantics."

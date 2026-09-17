@@ -1,0 +1,142 @@
+schema_version: 2.0.0
+ontology: import_tracking
+extends: base_object
+visibility: public
+description: 'Tracks ontology and schema imports (RDF/OWL, JSON Schema, etc.). Records source file, format, and status for traceability and future translation (BLI-764).\nLifecycle: import_tracking_lifecycle.yaml.\n'
+traits:
+  - listable
+  - readable
+  - writable
+  - modifiable
+  - formatable
+  - filterable
+  - sortable
+  - searchable
+fields:
+  id:
+    type: string
+    validation:
+      pattern: ^IMPTRK-\d{3,}$
+  imported_at:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation
+      automation_hooks: used for import history and ordering
+      cardinality: one
+      criticality: composition
+      default: null
+      dependencies: system clock
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: ISO-8601 timestamp when the import was recorded
+      security: non-sensitive
+      system_usage:
+        - import history
+        - audit
+      validation: ISO-8601 datetime string
+    field_profile_code: IMPTRK-002
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+      - filterable
+      - sortable
+    type: string
+    validation:
+      required: false
+  source_file:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation
+      automation_hooks: used by ontology import and translation
+      cardinality: one
+      criticality: composition
+      default: null
+      dependencies: file system path
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: Path or identifier of the source file that was imported
+      security: non-sensitive
+      system_usage:
+        - import tracking
+        - translation engine
+      validation: Non-empty string
+    field_profile_code: IMPTRK-003
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+      - filterable
+      - searchable
+    type: string
+    validation:
+      required: false
+  source_format:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation
+      automation_hooks: used for format detection and translation routing
+      cardinality: one
+      criticality: association
+      default: null
+      dependencies: ontology import
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: Detected or specified format (e.g. turtle, rdf_owl, jsonld)
+      security: non-sensitive
+      system_usage:
+        - import tracking
+        - translation engine
+      validation: Format key string
+    field_profile_code: IMPTRK-004
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+      - filterable
+    type: string
+    validation:
+      required: false
+  status:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation
+      automation_hooks: used for import pipeline and translation (BLI-764)
+      cardinality: one
+      criticality: composition
+      default: ready
+      dependencies: ontology import, translation engine
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Import status (ready, translated, failed)
+      security: non-sensitive
+      system_usage:
+        - import tracking
+        - translation engine
+      validation: Enum
+    field_profile_code: IMPTRK-005
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+      - modifiable
+      - filterable
+    type: string
+    validation:
+      enum:
+        - ready
+        - translated
+        - failed
+      required: false

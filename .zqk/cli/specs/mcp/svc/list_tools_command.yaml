@@ -1,0 +1,32 @@
+$schema: "../../schemas/command_spec.schema.json"
+
+name: "list-tools"
+short: "List MCP tool names"
+description: |
+  List the exact MCP tool names the server would expose (after allowlist).
+  Use these names in mcp_server.tools.allowlist in .zqk/mcp/config.yaml.
+
+flags:
+  - name: "with-command"
+    type: "bool"
+    default: false
+    description: "Print the CLI command path for each tool when available (e.g. object list)"
+
+args:
+  type: "no_args"
+
+help:
+  examples:
+    - comment: "List exposed tool names"
+      command: "%s mcp list-tools"
+    - comment: "Include CLI command paths"
+      command: "%s mcp list-tools --with-command"
+  exclude_flags:
+    - "columns"
+    - "ignore-scheduler-down"
+    - "format"
+    - "output"
+
+run_e: "runListTools"
+common_flags: true
+requires_session: false

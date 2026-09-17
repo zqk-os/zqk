@@ -1,0 +1,409 @@
+$schema: ../../../.zqk/cli/specs/schemas/lifecycle_spec.schema.json
+object_type: priority_plan
+extends: base_lifecycle
+status_mapping:
+  approved: grooming
+  archived: archived
+  error: cancelled
+  implemented: complete
+  proposed: grooming
+  planning: grooming
+  prioritizing: grooming
+  grooming: grooming
+  paused: paused
+  blocked: blocked
+statuses:
+  - value: conceptual
+    display: Conceptual
+    origin: true
+    preliminary: true
+    description: Draft plane status. Prior to CAS membrane crossing.
+    role: realign
+  - value: originated
+    display: Originated
+    description: CAS membrane crossed. Object officially originated.
+    role: realign
+  - value: grooming
+    display: Grooming (intake)
+    origin: false
+    role: grooming
+    description: "Intake column: define scope, add/remove backlog items, estimate,
+      and order work. New membership is allowed. Promote to active only when the column
+      is sealed shovel-ready (≥1 planned child + persona/team)."
+  - value: active
+    display: Active (shovel-ready)
+    role: shovel_ready
+    description: "Shovel-ready: the column is sealed and ready to be acted on (ordered
+      by active_order; lower wins). Not parked/paused/deferred. New BLI membership
+      is refused (fill while grooming, then promote). Linked children may remain planned
+      awaiting pickup. Once the first child starts, shockwave locks the plan to in_progress
+      — that hop is one-way (check valve). Occupancy also locks when a later child
+      hop (or seal-to-active) finds work already in flight and all siblings ready-or-later
+      (draft-plane siblings skip the lock until they leave exploring/validated). Complete
+      children on an active plan mean closeout failed (promote to complete), not a
+      valid parked state. TRACK: BLI-1785439369431933000-f0cccd6c"
+    preconditions:
+      - at least one ready backlog_item references this plan via priority_plan_ref
+      - all linked backlog_items referencing this plan are ready or later
+      - no linked backlog_items referencing this plan are in progress or complete
+      - at least one team_configuration_ref or persona_refs
+      - priority plan validated
+      - workflow constraints validated (if workflow_ref is set)
+  - value: in_progress
+    display: In Progress (execution-locked)
+    role: execution_locked
+    description: "Execution-locked: work is in flight. Scope expansion/new BLIs refused.
+      Check valve: from in_progress the only exits are paused, blocked (halt/error),
+      complete, or cancelled. No demotion to active or grooming. Halt resume is paused|blocked
+      → in_progress (re-lock), never → active (that would launder the valve). Rubric:
+      docs/architecture/LIFECYCLE_STATE_MACHINE_RUBRIC.md. Shockwave unsets numeric
+      active_order so other shovel-ready plans occupy unique 1+ slots."
+    preconditions:
+      - all linked backlog_items referencing this plan are ready or later
+  - value: paused
+    display: Paused (halted)
+    role: halted
+    description: Temporarily halted without cancelling. Halt is not 
+      shovel-ready. Resume is only to in_progress (re-enter execution lock) or 
+      cancel; child realign may shockwave to grooming. No resume to active (that
+      would launder the check valve).
+  - value: blocked
+    display: Blocked (halted)
+    role: halted
+    description: 'Cannot advance until named dependencies clear. Halt class: resume
+      only to in_progress (or cancel / child-realign grooming). No unblock to active.'
+  - value: complete
+    display: Complete
+    terminal: true
+    work_done: true
+    role: terminal
+    description: Priority plan is complete - all items have been executed or 
+      moved to next plan
+    preconditions:
+      - all linked backlog_items referencing this plan are terminal
+  - value: cancelled
+    display: Cancelled
+    terminal: true
+    role: terminal
+    description: Priority plan was cancelled before completion
+  - value: archived
+    display: Archived
+    terminal: true
+    archive: true
+    role: terminal
+    description: Priority plan is archived for historical reference
+    shockwave:
+      mode: prune
+      fail: closed
+transitions:
+  - from: conceptual
+    to: originated
+    description: Promote from draft plane to CAS membrane (CAS Qualification).
+    manual: true
+    auto: false
+    catalyst: System promotion
+  - from: originated
+    to: grooming
+    description: Initial domain workflow transition to grooming.
+    manual: true
+    auto: true
+    catalyst: System initialization
+  - from: grooming
+    to: active
+    description: "Seal intake — activate priority plan as shovel-ready"
+    manual: true
+    auto: false
+    preconditions:
+      - at least one ready backlog_item references this plan via priority_plan_ref
+      - all linked backlog_items referencing this plan are ready or later
+      - no linked backlog_items referencing this plan are in progress or complete
+      - at least one team_configuration_ref or persona_refs
+      - priority plan validated
+      - workflow constraints validated (if workflow_ref is set)
+    postconditions:
+      - role is shovel_ready
+      - new backlog_item membership is refused
+  - from: grooming
+    to: complete
+    description: Close intake plan when all linked backlog items are already 
+      terminal
+    manual: true
+    auto: false
+    side_effects:
+      - clear: active_order
+    preconditions:
+      - all linked backlog_items referencing this plan are terminal
+    postconditions:
+      - role is terminal
+      - active_order is unset
+  - from: active
+    to: in_progress
+    description: Auto-transition from active to in_progress when the first 
+      linked backlog_item starts work (locks scope & clears active execution 
+      order position)
+    manual: false
+    auto: true
+    on_dependent_status:
+      kind: backlog_item
+      to: in_progress
+    side_effects:
+      - clear: active_order
+    preconditions:
+      - all linked backlog_items referencing this plan are ready or later
+    postconditions:
+      - role is execution_locked
+      - active_order is unset
+  - from: active
+    to: paused
+    description: Pause active priority plan
+    manual: true
+    auto: false
+    postconditions:
+      - role is halted
+  - from: in_progress
+    to: paused
+    description: Pause in_progress priority plan
+    manual: true
+    auto: false
+    postconditions:
+      - role is halted
+  - from: paused
+    to: in_progress
+    description: Resume paused priority plan to in_progress (manual or shockwave
+      lock). Not a resume to active.
+    manual: true
+    auto: true
+    on_dependent_status:
+      kind: backlog_item
+      to: in_progress
+    side_effects:
+      - clear: active_order
+    preconditions:
+      - all linked backlog_items referencing this plan are ready or later
+    postconditions:
+      - role is execution_locked
+      - active_order is unset
+  - from: active
+    to: blocked
+    description: Block active priority plan due to dependencies
+    manual: true
+    auto: false
+    postconditions:
+      - role is halted
+  - from: in_progress
+    to: blocked
+    description: Block in_progress priority plan due to dependencies
+    manual: true
+    auto: false
+    postconditions:
+      - role is halted
+  - from: blocked
+    to: in_progress
+    description: Resume blocked plan to in_progress (manual unblock when deps 
+      clear, or shockwave when a linked backlog_item starts). Not a resume to 
+      active.
+    manual: true
+    auto: true
+    on_dependent_status:
+      kind: backlog_item
+      to: in_progress
+    side_effects:
+      - clear: active_order
+    preconditions:
+      - all linked backlog_items referencing this plan are ready or later
+    postconditions:
+      - role is execution_locked
+      - active_order is unset
+  - from: active
+    to: grooming
+    description: "Dependency propagation — linked backlog work reopened; return plan
+      to grooming for alignment"
+    manual: true
+    auto: true
+    on_dependent_status:
+      kind: backlog_item
+      to:
+        - exploring
+        - validated
+    side_effects:
+      - clear: active_order
+    postconditions:
+      - role is grooming
+      - new backlog_item membership is allowed
+      - active_order is unset
+  - from: paused
+    to: grooming
+    description: "Dependency propagation — linked backlog work reopened; return plan
+      to grooming for alignment"
+    manual: false
+    auto: true
+    on_dependent_status:
+      kind: backlog_item
+      to:
+        - exploring
+        - validated
+    side_effects:
+      - clear: active_order
+    postconditions:
+      - role is grooming
+      - new backlog_item membership is allowed
+      - active_order is unset
+  - from: blocked
+    to: grooming
+    description: "Dependency propagation — linked backlog work reopened; return plan
+      to grooming for alignment"
+    manual: false
+    auto: true
+    on_dependent_status:
+      kind: backlog_item
+      to:
+        - exploring
+        - validated
+    side_effects:
+      - clear: active_order
+    postconditions:
+      - role is grooming
+      - new backlog_item membership is allowed
+      - active_order is unset
+  - from: in_progress
+    to: complete
+    description: "Complete when all linked backlog items are terminal. Dual edge (manual+auto):
+      promote may take this hop when holds pass; shockwave / lifecycle updater may
+      still auto-complete on last-child. Hot path auto: last linked member → terminal
+      CAS-decrements remaining_open_count on the remaining_open mixin (open_countable);
+      zero applies this YAML hop with no member List. Unset remaining_open_count fail-closes
+      (no member List). Override pplan remove of the last open child uses the same
+      path. TRACK: BLI-CEF-CONTAINER-REMAINING-OPEN-001 First-class promote recipe:
+      docs/architecture/LIFECYCLE_STATUS_ROLES.md § First-class promote."
+    manual: true
+    auto: true
+    side_effects:
+      - clear: active_order
+    preconditions:
+      - all linked backlog_items referencing this plan are terminal
+    postconditions:
+      - role is terminal
+      - active_order is unset
+  - from: active
+    to: complete
+    description: "Complete when all linked backlog items are terminal (dual manual+auto
+      — same as in_progress→complete). Promote may hop; auto shockwave may still fire.
+      First-class promote recipe: docs/architecture/LIFECYCLE_STATUS_ROLES.md § First-class
+      promote."
+    manual: true
+    auto: true
+    side_effects:
+      - clear: active_order
+    preconditions:
+      - all linked backlog_items referencing this plan are terminal
+    postconditions:
+      - role is terminal
+      - active_order is unset
+  - from: complete
+    to: active
+    description: Reopen a falsely completed plan so remaining 
+      planned/in-progress backlog can execute
+    manual: true
+    auto: false
+    side_effects:
+      - clear: active_order
+    postconditions:
+      - role is shovel_ready
+      - active_order is unset
+  - from: complete
+    to: grooming
+    description: Reopen a completed plan into intake when scope must grow again
+    manual: true
+    auto: false
+    side_effects:
+      - clear: active_order
+    postconditions:
+      - role is grooming
+      - new backlog_item membership is allowed
+      - active_order is unset
+  - from: active
+    to: cancelled
+    description: Cancel active priority plan
+    manual: true
+    auto: false
+    side_effects:
+      - clear: active_order
+    postconditions:
+      - role is terminal
+      - active_order is unset
+  - from: in_progress
+    to: cancelled
+    description: Cancel in_progress priority plan
+    manual: true
+    auto: false
+    side_effects:
+      - clear: active_order
+    postconditions:
+      - role is terminal
+      - active_order is unset
+  - from: paused
+    to: cancelled
+    description: Cancel paused priority plan
+    manual: true
+    auto: false
+    side_effects:
+      - clear: active_order
+    postconditions:
+      - role is terminal
+      - active_order is unset
+  - from: blocked
+    to: cancelled
+    description: Cancel blocked priority plan
+    manual: true
+    auto: false
+    side_effects:
+      - clear: active_order
+    postconditions:
+      - role is terminal
+      - active_order is unset
+  - from: grooming
+    to: cancelled
+    description: Cancel intake priority plan
+    manual: true
+    auto: false
+    side_effects:
+      - clear: active_order
+    postconditions:
+      - role is terminal
+      - active_order is unset
+  - from: '*'
+    to: archived
+    description: Manual archival from any status
+    manual: true
+    auto: false
+    side_effects:
+      - clear: active_order
+    postconditions:
+      - role is terminal
+      - active_order is unset
+  - from: archived
+    to: in_progress
+    description: Restore archived priority plan
+    manual: true
+    auto: false
+    postconditions:
+      - role is execution_locked
+percent_complete:
+  method: item_based
+  default_by_status:
+    conceptual: 0
+    originated: 5
+    active: calculated
+    archived: 100
+    blocked: calculated
+    cancelled: 0
+    complete: 100
+    grooming: 25
+    in_progress: 85
+    paused: calculated
+    planning: 25
+    prioritizing: 25
+created_at: 2026-07-01 18:00:00+00:00
+updated_at: 2026-08-31 00:50:00+00:00
+created_by: ACC-1785920548450214012-68b850c0
+updated_by: ACC-1785920548450214012-68b850c0

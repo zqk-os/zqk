@@ -1,0 +1,38 @@
+List all available fields for this internal object kind, grouped by:
+  - Common fields (inherited from base_object/auditable, available for all objects)
+  - Specialized fields (specific to this object kind)
+
+Fields are sorted alphabetically and include:
+  - Field name
+  - Type (string, integer, list, etc.)
+  - Semantic type (statement, reference, quantity, etc.)
+  - Traits (listable, readable, writable, filterable, sortable, etc.)
+  - Required status
+  - Description
+
+This command is accessed via the kind command group, making it convenient to explore
+internal object structure: '%s internal <kind> fields'
+
+  List all fields
+  zqk internal object_spec fields
+  List only filterable fields
+  zqk internal object_spec fields --filterable
+  List only sortable fields
+  zqk internal object_spec fields --sortable
+  List only groupable fields
+  zqk internal object_spec fields --groupable
+  List only specialized fields
+  zqk internal object_spec fields --specialized-only
+
+Usage:
+  zqk internal <kind> fields [flags]
+
+Flags:
+      --filterable         Show only filterable fields
+      --format string      Output format: table, json, yaml (default "table")
+      --groupable          Show only groupable fields
+      --sortable           Show only sortable fields
+      --specialized-only   Show only specialized fields (exclude common fields)
+
+Global Flags:
+      --allow-degraded   Allow scheduler-dependent commands to run when scheduler daemon is not running

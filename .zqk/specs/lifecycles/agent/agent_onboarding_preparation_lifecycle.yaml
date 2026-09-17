@@ -1,0 +1,119 @@
+$schema: "../../../.zqk/cli/specs/schemas/lifecycle_spec.schema.json"
+
+object_type: agent_onboarding_preparation
+# Five-question exam: docs/architecture/LIFECYCLE_STATE_MACHINE_RUBRIC.md
+# TRACK: BLI-CEF-R26-REMAINING-KINDS-001
+statuses:
+  - value: conceptual
+    display: Conceptual
+    origin: true
+    preliminary: true
+    description: Draft plane status. Prior to CAS membrane crossing.
+    role: realign
+  - value: originated
+    display: Originated
+    description: CAS membrane crossed. Object officially originated.
+    role: realign
+  - value: pending
+    display: Pending
+    origin: false
+    preliminary: false
+    role: realign
+    description: "agent onboarding preparation status 'pending' (Pending): not yet
+      committed for execution; reshape before pickup."
+  - value: in_progress
+    display: In Progress
+    role: execution_locked
+    description: "agent onboarding preparation status 'in_progress' (In Progress):
+      in flight; treat as scope-locked until it advances or halts."
+  - value: active
+    display: Active
+    role: shovel_ready
+    description: "agent onboarding preparation status 'active' (Active): ready for
+      pickup or use; not locked mid-flight."
+  - value: complete
+    display: Complete
+    terminal: true
+    role: terminal
+    description: "agent onboarding preparation status 'complete' (Complete): ended;
+      no further normal execution transitions expected. Flags: terminal."
+  - value: archived
+    display: Archived
+    terminal: true
+    archive: true
+    role: terminal
+    description: "agent onboarding preparation status 'archived' (Archived): ended;
+      no further normal execution transitions expected. Flags: archive, terminal."
+  - value: error
+    display: Error
+    system: true
+    role: halted
+    description: "agent onboarding preparation status 'error' (Error): paused or system-held
+      for repair; resolve before advancing. Flags: system-assigned."
+transitions:
+  - from: conceptual
+    to: originated
+    description: Promote from draft plane to CAS membrane (CAS Qualification).
+    manual: true
+    auto: false
+    catalyst: System promotion
+  - from: originated
+    to: pending
+    description: Initial domain workflow transition to pending.
+    manual: true
+    auto: true
+    catalyst: System initialization
+  - from: pending
+    to: in_progress
+    description: Start preparation work
+    manual: true
+    auto: false
+    postconditions:
+      - role is execution_locked
+  - from: in_progress
+    to: active
+    description: Mark preparation as active
+    manual: true
+    auto: false
+    postconditions:
+      - role is shovel_ready
+  - from: active
+    to: complete
+    description: Complete preparation
+    manual: true
+    auto: false
+    postconditions:
+      - role is terminal
+  - from: complete
+    to: archived
+    description: Archive preparation
+    manual: true
+    auto: false
+    postconditions:
+      - role is terminal
+      - ended; no further normal execution hops expected
+  - from: '*'
+    to: error
+    description: System error occurred
+    manual: false
+    auto: true
+    postconditions:
+      - role is halted
+      - hop from any occupancy to error
+      - system halt; repair before leaving halted
+percent_complete:
+  method: status_defaults
+  default_by_status:
+    conceptual: 0
+    originated: 5
+    active: 100
+    archived: 100
+    complete: 100
+    error: 0
+    in_progress: 50
+    pending: 20
+machine_hints: []
+created_at: 2026-07-01T18:00:00Z
+updated_at: 2026-07-01T18:00:00Z
+created_by: ACC-1785920548450214012-68b850c0
+updated_by: ACC-1785920548450214012-68b850c0

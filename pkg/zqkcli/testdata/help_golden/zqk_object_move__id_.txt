@@ -1,0 +1,25 @@
+Move an object to a different directory/kind while preserving history.
+
+This command allows reorganizing objects while maintaining system integrity:
+  - Preserves created_at, created_by, and other history fields
+  - Updates hash registry atomically
+  - Creates audit event for move operation
+  - Optionally updates references pointing to the moved object
+
+
+  Move a backlog item to goal kind
+  zqk object move BLI-001 --kind goal
+  Move and update references
+  zqk object move BLI-001 --kind goal --update-references
+  Dry-run to see what would happen
+  zqk object move BLI-001 --kind goal --dry-run
+
+Usage:
+  zqk object move <id> [flags]
+
+Flags:
+      --kind string         Target kind to move the object to
+      --update-references   Update references pointing to the moved object
+
+Global Flags:
+      --allow-degraded   Allow scheduler-dependent commands to run when scheduler daemon is not running

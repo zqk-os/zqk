@@ -1,0 +1,678 @@
+# Architecture Documentation
+
+**Status**: Active  
+**Last Verified**: 2026-09-15 (Auto-generated)
+
+This directory contains architecture documentation for the zqk system, organized by topic and versioned for clarity.
+
+**⚠️ This README is auto-generated. To update it, run:**
+```bash
+./scripts/generate-architecture-readme-index.sh
+```
+
+## Documentation Index
+
+### Core Architecture
+
+| Document | Version | Status | Description |
+|----------|---------|--------|-------------|
+| [Distributed Knowledge Kernel Architecture v1.0](./distributed-kernel-architecture-v1.0.md) | 1.0.0 | Design Complete | This document defines the distributed knowledge kernel architecture using PKI... |
+| [Kernel Mutation Pipeline](./KERNEL_MUTATION_PIPELINE.md) | 1.0.0 | Active (v1 membrane complete; v2 composition in progress) | Architecture documentation |
+| [Kernel object-kind fitness rubric (7 lenses)](./KERNEL_OBJECT_KIND_EVALUATION_RUBRIC.md) | 1.0.0 | Active | Architecture documentation |
+| [Kernel → vendor instruction projection](./KERNEL_VENDOR_INSTRUCTION_PROJECTION.md) | 1.0.0 | Active debt / MVP in progress | Architecture documentation |
+| [Knowledge Kernel Separation Architecture v1.0](./knowledge-kernel-separation-v1.0.md) | 1.0.0 | Design Complete | This document defines the architecture boundaries and separation of concerns ... |
+| [Managing Kernel State (Git-Efficient System Object Data)](./MANAGING_KERNEL_STATE.md) | 1.0.0 | Solution documented for future implementation | Architecture documentation |
+| [Scheduler Coordination Kernel - Distributed Job Awareness](./scheduler-coordination-kernel.md) | 1.0.0 | Active | Architecture documentation |
+| [ZQK Kernel Health Stewardship & Forensic Remediation Report](./KERNEL_REPAIR_STEWARD_AND_HEALTH_STRATEGY.md) | 1.0.0 | **100% RESOLVED & VERIFIED (0 VIOLATIONS FOUND ACROSS 9,090 OBJECTS) | Architecture documentation |
+
+### Lifecycle
+
+| Document | Version | Status | Description |
+|----------|---------|--------|-------------|
+| [Family: default_shovel](./lifecycle_shockwave/family_default_shovel.md) | 1.0.0 | Active | Thin machines whose `active` is **`shovel_ready`** and which are **not** Gant... |
+| [Family: execution_session](./lifecycle_shockwave/family_execution_session.md) | 1.0.0 | Active | Sessions and jobs whose live token is **`execution_locked`**: convergence_ses... |
+| [Family: gantt_column](./lifecycle_shockwave/family_gantt_column.md) | 1.0.0 | Active | One kind today: **`priority_plan`**. This is a Gantt **column**: intake (`gro... |
+| [Family: gantt_lane](./lifecycle_shockwave/family_gantt_lane.md) | 1.0.0 | Active | Gantt **rows and commitments**: workstream, roadmap, strategic_plan, requirem... |
+| [Family: membrane](./lifecycle_shockwave/family_membrane.md) | 1.0.0 | Active | Kinds whose `active` means **enforced / membrane-live**, role `enforced`: **p... |
+| [Family: predicate](./lifecycle_shockwave/family_predicate.md) | 1.0.0 | Active | Satisfiable predicates, not Gantt columns: **criteria**, **verification_matri... |
+| [Family: record](./lifecycle_shockwave/family_record.md) | 1.0.0 | Active | Linear append-mostly records: audit_event, audit_event_aggregation, audit_agg... |
+| [Family: work_unit](./lifecycle_shockwave/family_work_unit.md) | 1.0.0 | Active | Executable work items and the `base_object` five-role template they extend: b... |
+| [Kind exam: `priority_plan`](./lifecycle_shockwave/kind_priority_plan.md) | 1.0.0 | Active exam record (2026-08-30) | Filled five-question exam for **`priority_plan`** — occupancy lock, check v... |
+| [Lifecycle shockwave families](./lifecycle_shockwave/README.md) | 1.0.0 | Active | Occupancy physics for kernel objects, grouped so the PRI exam is not copied 6... |
+| [Lifecycle shockwave kind index](./lifecycle_shockwave/KIND_INDEX.md) | 1.0.0 | Active | One row per kernel lifecycle. Inherit the [family](./README.md); do not clone... |
+| [Lifecycle shockwave map (kernel catalog)](./LIFECYCLE_SHOCKWAVE_MAP.md) | 1.0.0 | Active (2026-08-30) | This is the **class catalog**. Planes, class hops, and listener assignment li... |
+
+### Graph Backend
+
+| Document | Version | Status | Description |
+|----------|---------|--------|-------------|
+| [ADR: File CAS as durability SSOT; Memgraph as optional projection](./decisions/ADR-STORAGE-FILE-SSOT-GRAPH-PROJECTION-v1.0.md) | 1.0.0 | Accepted | Architecture documentation |
+| [Commit and Timeout Semantics](./graph-backend/COMMIT_AND_TIMEOUT_SEMANTICS.md) | 1.0.0 | Active | Architecture documentation |
+| [Content-Addressable Storage for Graph Backend](./content-addressable-storage-graph-backend.md) | 1.0.0 | Active | Architecture documentation |
+| [Cryptographic Agent Stamp Protocol](./cryptographic_stamp_auto_merge.md) | 1.0.0 | Active | Architecture documentation |
+| [Enabling the Graph Backend](./graph-backend/ENABLING_GRAPH_BACKEND.md) | 1.0.0 | Active | Architecture documentation |
+| [Graph Backend Architecture Decisions](./graph-backend/ARCHITECTURE_DECISIONS.md) | 1.0.0 | Active | Architecture documentation |
+| [Graph Backend Pivot Specification](./graph_backend_pivot_spec.md) | 1.1.0 | Approved (SSOT clarified 2026-07-29) | Architecture documentation |
+| [Graph Mutation Cypher Architecture](./graph_mutation_cypher.md) | 1.0.0 | Active | This document specifies the Cypher implementation, index schemas, and transac... |
+| [Graph edge ownership (acyclic typed refs)](./GRAPH_EDGE_OWNERSHIP.md) | 1.0.0 | Design contract + runtime `edge_role` (2026-08-20). Typed A↔B mutual pairs are retired. SELF / untyped `related_object_refs` remain on `BLI-KERNEL-REF-GRAPH-ACYCLIC-001`. Do **not** mint onto `PRI-CEF-R9-MEASURE-001`. | Architecture documentation |
+| [Graph indexes derived from object specs](./GRAPH_SPEC_DERIVED_INDEXES.md) | 1.0.0 | Active (GFS P2a) | Architecture documentation |
+| [Graph-State Sync Loop Architecture](./graph_state_sync_loop.md) | 1.0.0 | Active | The "ReAct + MCP/Chat History" pattern is fundamentally broken for a Knowledg... |
+| [GraphRAG Schema Design v1.0 - Three-Layer Architecture](./graphrag-schema-design-v1.0.md) | 1.0.0 | Design Complete | This document defines the GraphRAG schema architecture for the zqk Knowledge ... |
+| [Kernel coherence and the reference graph](./KERNEL_COHERENCE_AND_REF_GRAPH.md) | 1.0.0 | Active diagnosis + shovel-ready program | Architecture documentation |
+| [MemGraph Dependencies and Integration Requirements v1.0](./memgraph-research-v1.0.md) | 1.0.0 | Research Complete | This document provides research on MemGraph dependencies, integration require... |
+| [Memgraph Bulk Operations: Performance & Best Practices](./MEMGRAPH_BULK_OPS_GUIDE.md) | 1.0.0 | Reference Guide for Studio & Open-Core Batch Operations | Architecture documentation |
+| [Metrics Configuration Guide](./graph-backend/CONFIGURATION.md) | 1.0.0 | Active | The observability system is fully configurable, adjustable, and non-blocking.... |
+| [Observability and Metrics](./graph-backend/OBSERVABILITY.md) | 1.0.0 | Active | The graph backend provides comprehensive observability for self-healing and c... |
+| [Pluggable Graph Backend Interface Architecture v1.0](./pluggable-graph-backend-interface-v1.0.md) | 1.0.0 | Design Complete | This document defines the pluggable graph backend interface architecture for ... |
+| [Pluggable Validator System Architecture](./pluggable-validators-v1.0.md) | 1.0.0 | Active | The validation system is designed to be pluggable, allowing users to specify ... |
+| [Semantic Graph Traversal Engine](./semantic_graph_traversal.md) | 1.0.0 | Active | Architecture documentation |
+| [Shared Implementation Patterns](./graph-backend/SHARED_IMPLEMENTATIONS.md) | 1.0.0 | Active | To keep code DRY across different graph backend providers, we've extracted co... |
+| [The Cryptographic Transceiver: Zero-Trust Mesh Routing](./CRYPTOGRAPHIC_TRANSCEIVER.md) | 1.0.0 | Active | Architecture documentation |
+| [Vocabulary schemes and glossary term relations](./VOCABULARY_GRAPH.md) | 1.0.0 | Active | Architecture documentation |
+| [doc_entry Cryptographic Verification & Drift Detection Specification](./DOC_ENTRY_CRYPTOGRAPHIC_INTEGRITY.md) | 1.0.0 | Active | Architecture documentation |
+
+### Storage & Integrity
+
+| Document | Version | Status | Description |
+|----------|---------|--------|-------------|
+| [Deferred Integrity Hash Updates](./deferred-hash-updates-v1.0.md) | 1.0.0 | Active | Integrity hashes are now computed and updated **only after all pending operat... |
+| [Domain Registry and Namespace System Integration](./DOMAIN_REGISTRY_NAMESPACE_INTEGRATION.md) | 1.0.0 | Active | This document describes how the **Domain Registry** system and the **Namespac... |
+| [Graph-Based Spec Storage v1.0](./graph-spec-storage-v1.0.md) | 1.0.0 | Design Complete | Object specifications can be stored in the graph backend as nodes, enabling d... |
+| [Hash Registry Cache Optimization](./system/hash_registry_cache_optimization.md) | 1.0.0 | Active | Architecture documentation |
+| [Hash Registry Design v1.0](./hash-registry-design-v1.0.md) | 1.0.0 | Design Complete | The Hash Registry provides consistent integrity verification across both file... |
+| [Hash Registry Location for Bucketed Storage](./hash-registry-bucketed-storage-v1.0.md) | 1.0 | Active | Architecture documentation |
+| [Hash Registry Sync Analysis and Prevention](./HASH_REGISTRY_SYNC_ANALYSIS.md) | 1.0.0 | Active | Architecture documentation |
+| [Health Check Registry (Monitor/Beacon) Design](./HEALTH_CHECK_REGISTRY_DESIGN.md) | 1.0.0 | Design + minimal implementation | Architecture documentation |
+| [MCP Agent Registry](./MCP_AGENT_REGISTRY.md) | 1.0.0 | Active | The agent registry allows you to **pre-register agents** with expected roles ... |
+
+### Migration
+
+| Document | Version | Status | Description |
+|----------|---------|--------|-------------|
+| [Cross-profile data cell migration — operator runbook](./DATA_CELL_CROSS_PROFILE_MIGRATION_RUNBOOK.md) | 1.0.0 | Active | Architecture documentation |
+| [Legacy Codebase Migration Strategy v1.0](./legacy-codebase-migration-v1.0.md) | 1.0.0 | Active | This document defines a comprehensive strategy for safely migrating legacy co... |
+| [Mandatory Coordinator Integration - Migration Complete](./coordinator-mandatory-migration-v1.0.md) | 1.0.0 | Active | All coordinator integration is now **mandatory** - legacy optional patterns h... |
+| [Migration Binary Detection Strategy](./migration-binary-detection-strategy.md) | 1.0.0 | Design | This document defines how the zqk orchestrator detects and handles the option... |
+| [Migration Binary Manifest Compatibility Constraints](./migration-manifest-compatibility.md) | 1.0.0 | Implemented | The migration binary manifest can specify compatibility constraints to ensure... |
+| [Migration Builder Architecture](./MIGRATION_BUILDER_ARCHITECTURE.md) | 1.0.0 | Design | Migrations should follow the specbuilder pattern: |
+| [Migration Snapshot Coherence](./MIGRATION_SNAPSHOT_COHERENCE.md) | 1.0.0 | Design | Architecture documentation |
+| [Migration Spec Design](./MIGRATION_SPEC_DESIGN.md) | 1.0.0 | Design | Migrations should be spec-driven rather than individual commands. A migration... |
+| [Migration Strategy: File-Based to Graph (v1.0)](./migration-strategy-file-to-graph-v1.0.md) | 1.0.0 | Active | This document outlines the strategy for migrating legacy file-based ontology ... |
+| [Path-cache migration scan](./PATH_CACHE_MIGRATION_SCAN.md) | 1.0.0 | Active | Architecture documentation |
+| [SpecBuilder Migration Guide](./specbuilder-migration-guide-v1.0.md) | 1.0.0 | Active | Architecture documentation |
+| [Stable log keys (POL-CODE-007) — migration status](./LOG_EVENT_KEYS_MIGRATION.md) | 1.0.0 | Active | Architecture documentation |
+
+### CLI & Interface
+
+| Document | Version | Status | Description |
+|----------|---------|--------|-------------|
+| [](./system/CLI_OPERATION_NOTIFIER.md) | 1.0.0 | Active | Architecture documentation |
+| [AI Agent CLI-First Workflow](./AI_AGENT_CLI_FIRST_WORKFLOW.md) | 1.0.0 | Active | Architecture documentation |
+| [Async CLI retrofit and incremental validation cache](./async-cli-retrofit-and-validation-cache.md) | 1.0.0 | Active | Architecture documentation |
+| [Audit CLI & WAL Streaming Architecture](./audit_cli_streaming.md) | 1.0.0 | Active | This document specifies the exact CLI implementation patterns for ZQK's audit... |
+| [Built-In MCP Tools vs. CLI Bridge Tools](./BUILT_IN_VS_CLI_TOOLS.md) | 1.0.0 | Active | Architecture documentation |
+| [CLI Architecture](./CLI_ARCHITECTURE.md) | 1.0.0 | Active | Architecture documentation |
+| [CLI Command Structure Consistency Review](./cli-command-consistency-review.md) | 1.0.0 | Active | This document reviews the consistency and clarity of CLI commands that manipu... |
+| [CLI DNA Happy Path & Fail-Closed Membrane Guide](./CLI_DNA_HAPPY_PATH.md) | 1.0.0 | Active | Architecture documentation |
+| [CLI Error Guard Options](./CLI_ERROR_GUARD_OPTIONS.md) | 1.0.0 | Active | Architecture documentation |
+| [CLI Latency Baselines & Performance Drift Gate Architecture](./CLI_LATENCY_DRIFT_GATE.md) | 1.0.0 | Active | This document defines the CLI latency baselines, verb-path performance budget... |
+| [CLI Ontology Specification v1.0](./cli-ontology-v1.0.md) | 1.0.0 | Design Complete | This document establishes a formal CLI ontology specification that enables bo... |
+| [CLI Session Reuse and Auth Integration v1.0](./CLI_SESSION_REUSE_AND_AUTH_V1.md) | 1.0 | Design | Architecture documentation |
+| [CLI Standardization and Dry-Run Context v1.0](./cli-standardization-v1.0.md) | 1.0.0 | Active | The zqk CLI needs standardized command forms and a dry-run context system to ... |
+| [CLI Terminal Guard & Multi-Workspace Multiplexing](./cli_guard_and_multiplex.md) | 1.0.0 | Active | This architecture ensures that the ZQK CLI never leaves a user's terminal in ... |
+| [CLI UX Overhaul Plan ([REDACTED-ID])](./cli_ux_overhaul.md) | 1.0.0 | Active | Architecture documentation |
+| [CLI Version Handling Strategy](./cli-version-handling.md) | 1.0.0 | Implemented | This document describes how the zqk CLI handles different versions of command... |
+| [CLI Wrapper Pattern](./CLI_WRAPPER_PATTERN.md) | 1.0.0 | Active | Architecture documentation |
+| [CLI alpha launch — technical plan](./CLI_ALPHA_LAUNCH_PLAN.md) | 1.0.0 | Plan (executable) | Architecture documentation |
+| [CLI as Normative Path for Object Operations v1.0](./cli-normative-path-v1.0.md) | 1.0.0 | Design Complete | All object operations (create, update, delete) **must** be performed through ... |
+| [CLI context patterns (tests and handlers)](./CLI_CONTEXT_TEST_PATTERNS.md) | 1.0.0 | Active | Architecture documentation |
+| [CLI external hook protocol (tray + cli-hooks)](./CLI_EXTERNAL_HOOK_PROTOCOL.md) | 1.0.0 | Active | Architecture documentation |
+| [CLI membrane and system anatomy (cells, organelles, systems)](./CLI_MEMBRANE_AND_SYSTEM_ANATOMY.md) | 1.0.0 | Architecture (vocabulary + current vs target) | Architecture documentation |
+| [CLI object create / update / delete — why the command can pause (bounded)](./CLI_OBJECT_MUTATION_LATENCY.md) | 1.0.0 | Operational reference | Architecture documentation |
+| [CLI performance and consistency](./CLI_PERFORMANCE_AND_CONSISTENCY.md) | 1.1 | Active | Architecture documentation |
+| [CLI vs Direct YAML Elicitation](./CLI_VS_DIRECT_YAML_ELICITATION.md) | 1.0.0 | Active | Architecture documentation |
+| [CLI-First Enforcement Summary](./CLI_FIRST_ENFORCEMENT_SUMMARY.md) | 1.0.0 | Active | Architecture documentation |
+| [CMDv2 and CLI Split: Rationale and Plan](./CMDV2_AND_CLI_SPLIT_RATIONALE.md) | 1.0.0 | Active | Architecture documentation |
+| [MCP CLI Bridge Architecture v1.0](./mcp-cli-bridge-v1.0.md) | 1.0.0 | Active | This document describes the context-driven, security-aware CLI bridge that au... |
+| [MCP Client Pattern for Programmatic Use](./MCP_CLIENT_PATTERN.md) | 1.0.0 | Active | The Model Context Protocol (MCP) is typically used by desktop clients (like C... |
+| [MCP/CLI-First Elicitation Prompt](./MCP_CLI_FIRST_ELICITATION.md) | 1.0.0 | Active | Architecture documentation |
+| [Native matrix CLI strategy (vetting & traceability)](./MATRIX_CLI_STRATEGY.md) | 1.0.0 | Active | Architecture documentation |
+| [Semantic kernel and the CLI façade](./SEMANTIC_KERNEL_AND_CLI_FACADE.md) | 1.0.0 | Concept (architecture). Process traceability: `doc_entry` **DOC-1774227494115025000-fc0404a6**; `glossary_term` **GLS-1774227544762902000-77ceeee1** (via `zqk object create`). | Architecture documentation |
+| [Stability for Multi-Agent Workflow and CLI Message Bus](./STABILITY_FOR_MULTI_AGENT_AND_CLI_MESSAGE_BUS.md) | 1.0.0 | Active | Architecture documentation |
+
+### Documentation & Tooling
+
+| Document | Version | Status | Description |
+|----------|---------|--------|-------------|
+| [Architecture Decision Records (ADR) Index (K:F-DOC-001 / CRIT-CEF-R8K-DOC-001)](./ADR_INDEX.md) | 1.0.0 | Active | Architecture documentation |
+| [Assessment, onboarding, and alpha launch — document index](./ASSESSMENT_AND_ONBOARDING_INDEX.md) | 1.0.0 | Active | Architecture documentation |
+| [Concurrency Architecture Documentation](./concurrency/README.md) | 1.0.0 | Active | Architecture documentation |
+| [High-Volume Event Indexes: Efficient Management and Bundled-Storage Alignment](./HIGH_VOLUME_EVENT_INDEXES.md) | 1.0.0 | Active | Architecture documentation |
+| [Index-First, Low-CPU Scan Strategy](./INDEX_FIRST_LOW_CPU_SCAN_DESIGN.md) | 1.0.0 | Active | Architecture documentation |
+| [README Index Auto-Generation System v1.0](./readme-index-generation-v1.0.md) | 1.0.0 | Active | The system automatically generates README index tables for all object directo... |
+| [Reverse Reference Index Design](./REVERSE_REFERENCE_INDEX_DESIGN.md) | 1.0.0 | Active | Architecture documentation |
+| [ZQK Architecture & Documentation Index (K:F-USA-002 / CRIT-CEF-R8K-USA-002)](./INDEX.md) | 1.0.0 | Active | Architecture documentation |
+
+### Other
+
+| Document | Version | Status | Description |
+|----------|---------|--------|-------------|
+| [](./SCENARIO_BUNDLES_AND_TRACEABILITY.md) | 1.0.0 | Active | Architecture documentation |
+| [.zqk/ Markdown Cleanup: Analysis and Remedial Action Plan](./ZQK_DOT_MD_CLEANUP_PLAN.md) | 1.0.0 | Draft | Architecture documentation |
+| [ADR: CAS pending visibility layer for cross-process read-your-writes](./decisions/ADR-CAS-PENDING-VISIBILITY-LAYER-v1.0.md) | 1.0.0 | Accepted | Architecture documentation |
+| [AI Agent Communication Channels](./ai-agent-communication-channels-v1.0.md) | 1.0.0 | Active | zqk supports multiple communication channels for AI agent coordination, enabl... |
+| [AI Agent YAML Edit Policy](./AI_AGENT_YAML_EDIT_POLICY.md) | 1.0.0 | Active | Architecture documentation |
+| [API Integration Pattern (Spec-Builder)](./API_INTEGRATION_PATTERN.md) | 1.0.0 | Active | As ZQK scales, we will integrate with numerous third-party APIs (e.g., Fal.ai... |
+| [APISpec Builder Pattern Architecture](./apispec_builder.md) | 1.0.0 | Active | The APISpec Builder pattern provides a standardized, thread-safe approach to ... |
+| [Accounts, Roles, and Permission Hierarchy v1.0](./mcp/accounts-roles-permissions-hierarchy-v1.0.md) | 1.0.0 | Active | Architecture documentation |
+| [Advanced Query Capabilities v1.0](./advanced-query-capabilities-v1.0.md) | 1.0.0 | Active | This document defines the advanced query capabilities for the zqk object stor... |
+| [Agent Context Injection and Semantic Filtering Architecture](./AGENT_CONTEXT_AND_SEMANTIC_FILTERING.md) | 1.0.0 | Active | Architecture documentation |
+| [Agent Context Refresh (Generated)](./AGENT_CONTEXT_REFRESH.md) | 1.0.0 | Active | Architecture documentation |
+| [Agent Correspondence Feed Standard](./AGENT_CORRESPONDENCE_FEED_STANDARD.md) | 1.0.0 | initiative (human steering, 2026-07-28); **Phase A Go-only ship path landed 2026-07-29 | Architecture documentation |
+| [Agent Tool Selection Analysis: Direct File Write vs CLI](./AGENT_TOOL_SELECTION_ANALYSIS.md) | 1.0.0 | Active | Architecture documentation |
+| [Agent account seating (ACC + role + persona)](./AGENT_ACCOUNT_SEATING.md) | 1.0.0 | Active | Architecture documentation |
+| [Agent orchestration — priority audible (2026)](./AGENT_ORCHESTRATION_AUDIBLE.md) | 1.0.0 | Active | Architecture documentation |
+| [Aggregate-audit CPU profile findings](./AGGREGATE_AUDIT_CPU_PROFILES.md) | 1.0.0 | Active | Architecture documentation |
+| [Alpha: Onboarding, Gating, and Progressive Access](./ALPHA_ONBOARDING_AND_GATING.md) | 1.0.0 | Active | Architecture documentation |
+| [Ambience Engine & Anticipatory Logic](./ambience_engine.md) | 1.0.0 | Active | Architecture documentation |
+| [Ambient Engine Architecture & Feature Gating](./AMBIENT_DAEMON_ARCHITECTURE.md) | 1.0.0 | Active | Architecture documentation |
+| [Ambient Orchestration: Omnipresent Context for the Swarm](./AMBIENT_ORCHESTRATION_SWARM.md) | 1.0.0 | Active | Architecture documentation |
+| [Architectural Health Review: STRAT-PLAN-006](./STRAT-PLAN-006-Review.md) | 1.0.0 | Red | This architectural review assesses the technical feasibility, pattern adheren... |
+| [Architectural Post-Mortem & Multi-Tier Concurrency Design](./CONCURRENCY_LESSONS_LEARNED_AND_MULTI_TIER_DESIGN.md) | 1.0.0 | PROPOSED ARCHITECTURAL BLUEPRINT | Architecture documentation |
+| [Architecture Blueprint: ZQK MCP Fal.ai Integration](./mcp_fal_integration.md) | 1.0.0 | Active | Architecture documentation |
+| [Architecture Decision Record: Graph Database Engine (QLever vs Neo4j)](./decisions/ADR-QLEVER-NEO4J.md) | 1.0.0 | Active | Architecture documentation |
+| [Architecture Decision Record: MCP Server Scalability](./ADR-MCP-SCALABILITY.md) | 1.0.0 | Active | Architecture documentation |
+| [Architecture Decision Record: Matrix Swarm Pattern](./MATRIX_SWARM_PATTERN.md) | 1.0.0 | Active | Architecture documentation |
+| [Architecture Decision Records (ADRs)](./ARCHITECTURE_DECISION_RECORDS.md) | 1.0.0 | Active | Architecture Decision Records (ADRs) document important architectural decisio... |
+| [Architecture Enforcement Mechanisms](./ARCHITECTURE_ENFORCEMENT.md) | 1.0.0 | Active | While pre-commit hooks provide immediate feedback, architecture enforcement s... |
+| [Architecture Governance Framework](./ARCHITECTURE_GOVERNANCE.md) | 1.0.0 | Active | This document defines the complete lifecycle and policy framework to ensure A... |
+| [Architecture Lifecycle Reminders](./ARCHITECTURE_LIFECYCLE_REMINDERS.md) | 1.0.0 | Active | The lifecycle reminder system (see [BLI-092](../../backlog/BLI-092.yaml)) can... |
+| [Architecture Patterns Library](./ARCHITECTURE_PATTERNS.md) | 1.0.0 | Active | This document serves as the authoritative source for architecture patterns in... |
+| [Architecture Review Process](./ARCHITECTURE_REVIEW_PROCESS.md) | 1.0.0 | Active | This process ensures that all architecture changes follow established pattern... |
+| [Architecture Review: Semantic Ingestion Pipeline (Intent Capture)](./semantic_intake.md) | 1.0.0 | Active | Architecture documentation |
+| [Architecture Review: ZQK: The Symbiotic Mesh (2026-2027)](./symbiotic_mesh_hater_review.md) | 1.0.0 | Active | Architecture documentation |
+| [Async Router and Validation Workers - Improvement Analysis](./async-router-validation-improvements.md) | 1.0.0 | ✅ **Implemented | Architecture documentation |
+| [Async Validation Architecture v1.0](./async-validation-architecture-v1.0.md) | 1.0.0 | Active | The async validation system transforms system check from a synchronous, block... |
+| [Async Validation Control Flow & Lock Analysis](./ASYNC_VALIDATION_FLOW_DIAGRAM.md) | 1.0.0 | Active | Architecture documentation |
+| [Async Validation Flow Analysis](./system/async_check_flow_analysis.md) | 1.0.0 | Active | Architecture documentation |
+| [Async Validation System v1.0](./async-validation-system-v1.0.md) | 1.0.0 | Active | Architecture documentation |
+| [Async Validation Testing Guide v1.0](./async-validation-testing-v1.0.md) | 1.0.0 | Active | The async validation system includes comprehensive tests that use isolated te... |
+| [Async retrofit and CLI status](./ASYNC_RETROFIT_STATUS.md) | 1.0.0 | Active | Architecture documentation |
+| [Atomic Shutdown Flag Implementation](./mcp/ATOMIC_SHUTDOWN_IMPLEMENTATION.md) | 1.0.0 | Active | Architecture documentation |
+| [Audit Event Aggregation](./AUDIT_EVENT_AGGREGATION.md) | 1.0.0 | Active | The audit event aggregation system compresses audit events into summary event... |
+| [Audit Event Aggregation Strategy v1.0](./audit-event-aggregation-v1.0.md) | 1.0.0 | ✅ Implemented | Architecture documentation |
+| [Audit Event Buffer Refactor: Singleton to Registry Pattern](./AUDIT_BUFFER_REFACTOR.md) | 1.0.0 | Active | To address cross-test resource contention and intermittent deadlocks identifi... |
+| [Audit Event Bulk Operation Buffering v1.0](./audit-event-bulk-buffering-v1.0.md) | 1.0.0 | Design | Architecture documentation |
+| [Audit Historical Query Architecture](./audit_historical_query.md) | 1.0.0 | Active | This document outlines the zero-buffering stream fetcher and terminal pager r... |
+| [Audit Stream File Format](./AUDIT_STREAM_FORMAT.md) | 1.0.0 | Design / implementation | Architecture documentation |
+| [Authority Resolution and Multi-User Collaboration v1.0](./authority-resolution-and-collaboration-v1.0.md) | 1.0.0 | Active | This document defines a comprehensive system for authority resolution, user c... |
+| [Auto-Fix Pattern Recommendation](./AUTO_FIX_PATTERN.md) | 1.0.0 | Active | Architecture documentation |
+| [Autonomous Capability Synthesis](./convergence/CAPABILITY_SYNTHESIS.md) | 1.0.0 | Active | Architecture documentation |
+| [Autonomous Capability Synthesis: OrchestrationManager Design](./autonomous-capability-synthesis/DESIGN.md) | 1.0.0 | Active | The `OrchestrationManager` (OM) is the core actor responsible for transformin... |
+| [Autonomy Inbox & TDE Envelopes](./tde_envelope_inbox.md) | 1.0.0 | Active | Architecture documentation |
+| [Backlog Exploration Lane ("Boneyard")](./BACKLOG_EXPLORATION_LANE.md) | 1.0.0 | Active | Architecture documentation |
+| [Backlog document references, auto-linking, and CLI creation veneers](./BACKLOG_REFS_AUTOLINK_AND_CREATE_VENEERS.md) | 1.0.0 | Roadmap / design memory (not a shipped feature checklist) | Architecture documentation |
+| [Backlog items: Cache-first system check architecture](./system-check-cache-first-backlog.md) | 1.0.0 | Active | Architecture documentation |
+| [Baseline Data Inventory — `.zqk` metrics, reports, and aggregations](./BASELINE_DATA_INVENTORY.md) | 1.0.0 | Active | Architecture documentation |
+| [Baseline Testing Results](./baseline-results-v1.0.md) | 1.0.0 | Active | Architecture documentation |
+| [Bootstrap Requirements for File Backend](./BOOTSTRAP_REQUIREMENTS.md) | 1.0.0 | Active | The `zqk system init` command must bootstrap a complete, ready-to-use project... |
+| [Bucketing Strategy Spec Design](./system/bucketing_strategy_spec_design.md) | 1.0.0 | Active | Architecture documentation |
+| [Build System Documentation](./BUILD_SYSTEM.md) | 1.0.0 | Active | The zqk build system provides a centralized configuration for building multip... |
+| [Builder vs Compressor Architecture](./BUILDER_VS_COMPRESSOR_ARCHITECTURE.md) | 1.0.0 | Active | The system has two distinct but complementary concepts: |
+| [Bulletproof Shutdown Implementation](./mcp/BULLETPROOF_SHUTDOWN.md) | 1.0.0 | Active | Architecture documentation |
+| [Bypass-Kind Storage: Avoiding CAS Overhead](./BYPASS_KIND_STORAGE.md) | 1.0.0 | Design | Architecture documentation |
+| [CAP loop contract](./CAP_LOOP_CONTRACT.md) | 1.0.0 | Binding for CAP honesty (`GOAL-CAPH-001` / `REQ-CAPH-001`–`004`). | Architecture documentation |
+| [CAS create → gettability flow (and object draft plane)](./CAS_CREATE_MEMBRANE_FLOW.md) | 1.0.0 | Active | Architecture documentation |
+| [CAS durability policy (per-OS)](./CAS_DURABILITY_POLICY.md) | 1.0.0 | Active | Architecture documentation |
+| [CAS list vs get consistency: one source of truth](./CAS_LIST_GET_CONSISTENCY.md) | 1.0.0 | Active | Architecture documentation |
+| [CAS mutation shockwave (delete/update ≡ promote/demote)](./CAS_MUTATION_SHOCKWAVE.md) | 1.0.0 | Design contract (2026-08-19). Implementation is the next unlocked column — do not mint onto `PRI-COMMUNITY-FORK-PREPARE-001` (execution-locked). | Architecture documentation |
+| [CEF AA/AB Structure Remediation Specification & Evidence](./CEF_REMEDIATE_STRUCTURE_VERIFICATION.md) | 1.0.0 | Active | Architecture documentation |
+| [CEF S5 — System tranche-1 (bootstrap + systemcheck extracts)](./CEF_SYSTEM_TRANCHE1.md) | 1.0.0 | Active | Architecture documentation |
+| [CEF S7 — Pre-launch polish (doc honesty)](./CEF_S7_POLISH.md) | 1.0.0 | Active | Architecture documentation |
+| [CEF: event path decision and globals inventory](./CEF_EVENT_PATH_AND_GLOBALS.md) | 1.0.0 | Accepted decision (2026-08-17) | Architecture documentation |
+| [CRIT-DATACELL-001 — Strict nucleus boundary](./CRIT_DATACELL_001_STRICT_BOUNDARY.md) | 1.0.0 | Active | Architecture documentation |
+| [CRUD Operations Must Consider Bucketing and Archiving Strategies](./CRUD_BUCKETING_ARCHIVING_REQUIREMENTS.md) | 1.0.0 | Active | Architecture documentation |
+| [CRUD Operations Standardization Guide](./CRUD_OPERATIONS_STANDARDIZATION.md) | 1.0.0 | Active | Architecture documentation |
+| [Cache Item Strategy Evolution Path](./system/CACHE_ITEM_STRATEGY_EVOLUTION.md) | 1.0.0 | Active | Architecture documentation |
+| [Cache Item Strategy Hook Usage](./system/CACHE_ITEM_STRATEGY_USAGE.md) | 1.0.0 | Active | The cache item strategy hook provides a configurable mechanism for special ha... |
+| [Cache Management Strategy](./CACHE_MANAGEMENT_STRATEGY.md) | 1.0.0 | Active | Architecture documentation |
+| [Cache Pre-Warming Dependency Chain](./CACHE_PREWARM_DEPENDENCIES.md) | 1.0.0 | Active | Architecture documentation |
+| [Cache Staleness Detection](./cache-staleness-detection.md) | 1.0.0 | Implemented | The object ID cache uses a two-tier staleness detection system to determine w... |
+| [Capability Maturity Ontology v1.0](./capability-maturity-ontology-v1.0.md) | 1.0.0 | Active | Architecture documentation |
+| [Capability Object Architecture](./capability_object.md) | 1.0.0 | Active | Architecture documentation |
+| [Cascade Delete Requirements](./cascade-delete-requirements-v1.0.md) | 1.0.0 | Active | Cascade delete is the process of handling dependent objects when an object is... |
+| [Cascade Deletion and Update Analysis](./cascade-analysis-v1.0.md) | 1.0.0 | Active | Architecture documentation |
+| [Cascade Rules for Object References](./cascade-rules-v1.0.md) | 1.0.0 | Active | When objects are deleted or updated, dependent objects that reference them ne... |
+| [Cellular Knowledge Operating System: Three-Layer Data Model & Primitives Specification](./CELLULAR_KNOWLEDGE_OS_3LAYER_DATA_MODEL.md) | 1.0.0 | Approved | Architecture documentation |
+| [Check Command Cache: Legacy vs Current Implementation](./check-cache-comparison.md) | 1.0.0 | Comparison Document | This document compares the legacy reference checking implementation with the ... |
+| [Check Command Fixes - Status](./check-fixes-status.md) | 1.0.0 | Partially Complete | Architecture documentation |
+| [Check Command Improvements Summary](./check-improvements-summary.md) | 1.0.0 | Implemented | Architecture documentation |
+| [Check Command Optimization - Final Results](./check-optimization-final.md) | 1.0.0 | ✅ Implemented and Working | Architecture documentation |
+| [Check Command Optimization Results](./check-optimization-results.md) | 1.0.0 | Implemented | Architecture documentation |
+| [Check Command Performance & Caching Strategy v1.0](./check-command-performance-v1.0.md) | 1.0.0 | Design | Architecture documentation |
+| [Check Command Test Results](./check-test-results.md) | 1.0.0 | Active | Architecture documentation |
+| [Check Command `--fast` / reduced refs (partial / non-authoritative)](./check-fast-mode.md) | 1.0.0 | Constrained — must not mutate; must not be treated as kernel health. | Architecture documentation |
+| [Check Command: Legacy zqk vs zqk](./check-command-legacy-vs-nexos.md) | 1.0.0 | Comparison Document | This document compares the legacy `zqk` CLI check command with the current `z... |
+| [Check Violations Resolution Plan](./check-violations-resolution-plan.md) | 1.0.0 | In Progress | Architecture documentation |
+| [Cleanup Maintenance: On-Demand Config-Driven Filesystem and CLI Tasks](./CLEANUP_MAINTENANCE_DESIGN.md) | 1.0.0 | Design | Architecture documentation |
+| [Code Evaluation and Refactoring Policy](./CODE_EVALUATION_POLICY.md) | 1.0.0 | Active | This policy establishes a systematic approach to evaluating code for refactor... |
+| [Command Organization and Hierarchy](./COMMAND_ORGANIZATION.md) | 1.0.0 | Active | Architecture documentation |
+| [Command Path Brand Prefix Update](./mcp/COMMAND_PATH_BRAND_PREFIX.md) | 1.0.0 | Active | All hardcoded command path references have been updated to use the configurab... |
+| [Command Result Builder](./mcp/COMMAND_RESULT_BUILDER.md) | 1.0.0 | Active | The `CommandResultBuilder` provides a fluent API for building standardized CL... |
+| [Command Spec Coverage Report](./COMMAND_SPEC_COVERAGE.md) | 1.0.0 | Active | Architecture documentation |
+| [Command Spec Pattern](./COMMAND_SPEC_PATTERN.md) | 1.0.0 | Active | The Command Spec pattern extends the CommandBuilder with a spec-driven approa... |
+| [Command orchestration (storage, session, scheduler check)](./COMMAND_ORCHESTRATION.md) | 1.0.0 | Active | Architecture documentation |
+| [Component Loader Pattern](./COMPONENT_LOADER_PATTERN.md) | 1.0.0 | Implemented | Architecture documentation |
+| [Comprehensive Resolver Architecture Design](./RESOLVER_ARCHITECTURE_DESIGN.md) | 1.0.0 | Design | Architecture documentation |
+| [Comprehensive Testing Status](./comprehensive-testing-status-v1.0.md) | 1.0.0 | Active | Architecture documentation |
+| [Compressed Snapshot Format Design](./COMPRESSED_SNAPSHOT_FORMAT.md) | 1.0.0 | Active | Snapshots should be stored in a compressed format that: |
+| [Concurrency Architecture & Patterns](./concurrency/CONCURRENCY_PATTERNS.md) | 1.0.0 | Active | This document serves as the canonical reference for concurrency patterns, syn... |
+| [Concurrency Budget Deadlock: Analysis, Lessons Learned & Multi-Tier Architecture](./concurrency/CONCURRENCY_BUDGET_DEADLOCK_LESSONS_LEARNED.md) | 1.0.0 | Canonical Kernel Concurrency Architecture & Standards | Architecture documentation |
+| [Concurrency Guardrail Addendum: High-Speed Object Caching (PRI-17807959)](./cache_tiger_team_strategy.md) | 1.0.0 | Active | This addendum details the impact of introducing an asynchronous Semantic Cach... |
+| [Concurrency Patterns](./concurrency-patterns-v1.0.md) | 1.0.0 | Active | Architecture documentation |
+| [Concurrent Operations System](./concurrent-operations-v1.0.md) | 1.0.0 | Active | The system must handle multiple concurrent operations (create, update, delete... |
+| [Concurrent Operations System - Enhancements](./concurrent-operations-enhancements-v1.0.md) | 1.0.0 | Active | Enhanced the concurrent operations system with: |
+| [Concurrent Operations System - Implementation Summary](./concurrent-operations-summary-v1.0.md) | 1.0.0 | Active | A comprehensive system for handling concurrent create/update/delete operation... |
+| [Configurable Brand Prefix for Tool Names](./mcp/BRAND_PREFIX.md) | 1.0.0 | Active | All MCP tool names now use a configurable brand prefix derived from the execu... |
+| [Configuration System Edge Cases](./config-edge-cases.md) | 1.0.0 | Active | Architecture documentation |
+| [Constants and DRY Inventory Plan](./CONSTANTS_AND_DRY_INVENTORY_PLAN.md) | 1.0.0 | Active | Architecture documentation |
+| [Content-Addressable Storage (CAS)](./CONTENT_ADDRESSABLE_STORAGE.md) | 1.0.0 | Active | The ZQK project implements a Git-style Content-Addressable Storage (CAS) syst... |
+| [Content-Addressable Storage: Duplicate ID Impact Analysis](./CAS_DUPLICATE_ID_IMPACT_ANALYSIS.md) | 1.0.0 | ✅ Should work correctly | Architecture documentation |
+| [Context Architecture: Single Context Principle](./cli-context/architecture-v1.0.md) | 1.0.0 | Active | The context system follows a **Single Context Principle**: everything should ... |
+| [Context Building Patterns](./cli-context/patterns-v1.0.md) | 1.0.0 | Active | The context system supports multiple patterns for building contexts: |
+| [Context-Aware vs Context-Agnostic Operations](./context-aware-vs-context-agnostic-operations.md) | 1.0.0 | Active | This document describes the critical distinction between **context-aware** an... |
+| [Convergence orchestration, outcome aggregation, and nested CVS](./CONVERGENCE_ORCHESTRATION_AND_NESTED_CVS.md) | 1.0.0 | MVP — **`pkg/convergerollup`**, **`rollup_status_core`** in **`zqk scheduler convergence measure`**, JSONL **`rollup_status_core.jsonl`**; **`scripts/cvs_outcome_rollup.py`** (full matrix/drift), **`cvs_convergence_orchestrate.sh`** (persist + rollup). | Architecture documentation |
+| [Convergence phase router, tombstones, and coordinator-backed routing](./CONVERGENCE_PHASE_ROUTER_AND_COORDINATOR_DESIGN.md) | 1.0.0 | Design with **implemented** pieces in-tree (phase router, session routing context, suggested CVS fields from `zqk scheduler convergence measure`); coordinator-backed async evaluation remains **partial / optional** per profile notes. Traceability via `doc_entry` + `requirement` + `criteria` in process data. | Architecture documentation |
+| [Convergence predicates and gates](./CONVERGENCE_PREDICATES_AND_GATES.md) | 1.0.0 | Active | Architecture documentation |
+| [Coordinator Integration Gaps](./coordinator-integration-gaps.md) | 1.1 | ✅ **Integrated | Architecture documentation |
+| [Coordinator Integration Test Coverage](./coordinator-integration-test-coverage.md) | 1.0 | ✅ **ALL TESTS PASSING | Architecture documentation |
+| [Critical Next Steps for Test and Scheduler Stability](./STABILITY_NEXT_STEPS.md) | 1.0.0 | Active | Architecture documentation |
+| [Cross-Process File Locking Pattern](./shared-resource-locking.md) | 1.0.0 | Active | When a resource is shared across processes (e.g., files, queues, registries),... |
+| [Cryptography and Key Management](./CRYPTO_KEY_MANAGEMENT.md) | 1.0.0 | Active | Architecture documentation |
+| [Data Management Optimization - Progress Report](./data-management-progress.md) | 1.0.0 | In Progress | Architecture documentation |
+| [Data Management Optimization Plan](./data-management-optimization-plan.md) | 1.0.0 | In Progress | Architecture documentation |
+| [Data Storage Production-Readiness Roadmap](./DATA_STORAGE_PRODUCTION_ROADMAP.md) | 1.0.0 | Active | Architecture documentation |
+| [Data cell model (logical unit + storage profiles)](./DATA_CELL_MODEL.md) | 1.0.0 | Architecture — **intent and vocabulary** (product direction). **Spec requirement + construction pipeline** are **decided** in [ADR-DATA-CELL-SPEC-PIPELINE-v1.0.md](../process/decisions/ADR-DATA-CELL-SPEC-PIPELINE-v1.0.md). **Reality check:** partial **membrane** read paths and **operational envelope** wiring exist in code (see table below); remaining gaps are **full** stewardship/coordinator execution, a **unified cell CRUD** product API, **migration** tooling, and **admin** surfaces — not “nothing implemented yet.” | Architecture documentation |
+| [Data cell — runtime organism (protocol v1)](./DATA_CELL_RUNTIME_ORGANISM.md) | 1.0.0 | Implemented layout + Go API (`pkg/datacell`). **Spec / mapping closure:** `[REDACTED-ID]` (formal mapping recorded in [DATA_CELL_MODEL.md](./DATA_CELL_MODEL.md) § *[REDACTED-ID] — Formal mapping and sequencing*). | Architecture documentation |
+| [Data origination from specs — pipeline vision (target)](./DATA_ORIGINATION_PIPELINE_VISION.md) | 1.0.0 | Stage names and order are **defined** in code (`pkg/specorigination` + `pipeline_kind` **`spec.origination`**). **Implementations** that call `zqk` subprocesses or storage APIs per stage are still **incremental**; this section is the contract to converge on. | Architecture documentation |
+| [Data pipeline pilot selection](./data-pipeline-pilot-selection.md) | 0.1 | Active | Architecture documentation |
+| [Data stream summary pilot (test-bundle health)](./DATA_STREAM_SUMMARY_PILOT.md) | 1.0.0 | Pilot implementation for REQ-DATASTREAM-001 (queryable summary per logical stream). | Architecture documentation |
+| [Data-Driven Decision Framework](./DATA_DRIVEN_DECISION_FRAMEWORK.md) | 1.0.0 | Active | Architecture documentation |
+| [Deadlock Analysis Checklist](./DEADLOCK_ANALYSIS_CHECKLIST.md) | 1.0.0 | Active | Architecture documentation |
+| [Deadlock Analysis Methodology](./DEADLOCK_ANALYSIS_METHODOLOGY.md) | 1.0.0 | Active | This document outlines the systematic methodology for analyzing potential dea... |
+| [Decision Lifecycle: System Awareness and Recurring Considerations](./DECISION_LIFECYCLE.md) | 1.0.0 | Active | The decision lifecycle establishes appropriate levels of system awareness and... |
+| [Declarative product launch as a matrix-shaped pipeline](./DECLARATIVE_LAUNCH_AND_MATRIX_LOOP.md) | 1.0.0 | Design note (pre-final URLs) | Architecture documentation |
+| [Default Configs and Bootstrap](./DEFAULT_CONFIG_AND_BOOTSTRAP.md) | 1.0.0 | Active | Architecture documentation |
+| [Design Improvements & Intuitive Features](./DESIGN_IMPROVEMENTS.md) | 1.0.0 | Complete | This document tracks design improvements, fluidity enhancements, and intuitiv... |
+| [Design Patterns Library](./DESIGN_PATTERNS.md) | 1.0.0 | Active | This document catalogs the design patterns used throughout zqk to solve commo... |
+| [Design Specification: Magic Onboarding (`zqk join`)](./magic-onboarding-design.md) | 1.0.0 | Active | Architecture documentation |
+| [Design Specification: The Federated Economy](./federated-economy-design.md) | 1.0.0 | Active | Architecture documentation |
+| [Diagnostic Report Mining](./DIAGNOSTIC_REPORT_MINING.md) | 1.0.0 | Active | Architecture documentation |
+| [Digital Asset Object Schema](./digital_asset_schema.md) | 1.0.0 | Active | Architecture documentation |
+| [Dispatch Loop: Outline and MCP Use](./DISPATCH_LOOP_AND_MCP.md) | 1.0.0 | Active | Architecture documentation |
+| [Display Length Constraints](./display-length-constraints-v1.0.md) | 1.0.0 | Active | The `display_length` constraint specifies the recommended maximum character w... |
+| [Document Query System v1.0](./document-query-system-v1.0.md) | 1.0.0 | Active | The document query system enables users to discover and search documentation ... |
+| [Dynamic Agent Registration Strategy v1.0](./mcp/dynamic-agent-registration-strategy-v1.0.md) | 1.0.0 | Active | Architecture documentation |
+| [Dynamic Mesh Topology Configuration](./mesh_topology.md) | 1.0.0 | Active | Architecture documentation |
+| [E2E Test Infra: CAP Strategy Iteration 2](./TEST_INFRA.md) | 1.0.0 | Active | Architecture documentation |
+| [Env privilege override inventory (`ZQK_ALLOW_*` / `BYPASS_*`)](./ENV_PRIVILEGE_OVERRIDE_INVENTORY.md) | 1.0.0 | Active | Architecture documentation |
+| [Epic Object Architecture: Cellular Objective & Enclave Scope Guide](./EPIC_ENCLAVE_SCOPE_GUIDE.md) | 1.0.0 | Active | Architecture documentation |
+| [Error Response Builder](./mcp/ERROR_RESPONSE_BUILDER.md) | 1.0.0 | Active | The `ErrorResponseBuilder` provides a standardized, fluent API for creating J... |
+| [Event pipelines, convergence, and integration choices](./EVENT_PIPELINE_AND_CONVERGENCE_INTEGRATION.md) | 1.0.0 | Vocabulary and direction only — no committed schema, object kind, or scheduler hook yet. The aim is to give the idea **bones**: **declarative configurations** that act like **custom automated test cases** over process reality (objects, CAS paths, log streams, external snapshots), producing **named pass/fail or scored indicators** that **measure**, **rollup**, and operator prompts can treat as **first-class signals** alongside test-bundle health. | Architecture documentation |
+| [Event-Driven Watchdog & Agent Pool Architecture](./event_driven_watchdog.md) | 1.0.0 | Active | The Event-Driven Watchdog is a specialized daemon process integrated into the... |
+| [Execution Convergence Controller: Architecture Design](./convergence/DESIGN.md) | 1.0.0 | Active | The `ConvergenceController` is an autonomous actor that ensures the ZQK syste... |
+| [Expertise in architecture and code quality (the non-functional side of the house)](./EXPERTISE_ARCHITECTURE_AND_CODE_QUALITY.md) | 1.0.0 | Assessment (living document) | Architecture documentation |
+| [Factory Instance Builder Refactor](./FACTORY_INSTANCE_BUILDER_REFACTOR.md) | 1.0.0 | Active | Update object creation factories and streaming elicitation logic to use insta... |
+| [Fast Path and Cache Fallback Checklist](./FAST_PATH_AND_CACHE_FALLBACK_CHECKLIST.md) | 1.0.0 | Active | Architecture documentation |
+| [Feature Flag Removal Plan - I/O Queue Routing](./feature-flag-removal-plan.md) | 1.0.0 | Ready for Implementation | Architecture documentation |
+| [Feature Flags Documentation](./feature-flags-documentation-v1.0.md) | 1.0.0 | Active | Feature flags allow toggling experimental and advanced features on/off withou... |
+| [Feature Flags System](./feature-flags-v1.0.md) | 1.0.0 | Active | Feature flags allow toggling experimental features on/off without code change... |
+| [Feature Flags Usage Guide](./feature-flags-usage-v1.0.md) | 1.0.0 | Active | Architecture documentation |
+| [Federated Economy Governance](./federation/FEDERATED_ECONOMY_GOVERNANCE.md) | 1.0.0 | Active | This document outlines the governance and security model for the Sovereign Me... |
+| [Field Discovery System v1.0](./field-discovery-v1.0.md) | 1.0.0 | Active | Architecture documentation |
+| [Field Versioning System](./FIELD_VERSIONING_SYSTEM.md) | 1.0.0 | Active | The field versioning system tracks the lifecycle and changes of fields in obj... |
+| [File Lock Metrics and Observability](./file-lock-metrics-and-observability.md) | 1.0.0 | Active | The `FileLock` implementation includes comprehensive metrics collection to un... |
+| [File Lock Strategy Integration Summary](./FILE_LOCK_STRATEGY_INTEGRATION.md) | 1.0.0 | Active | Architecture documentation |
+| [File Lock Strategy and Transaction Coordinator Architecture](./FILE_LOCK_STRATEGY_AND_TRANSACTION_COORDINATOR.md) | 1.0.0 | Active | This architecture provides: |
+| [Filesystem data layout (human-scannable “data cupboards”)](./FILESYSTEM_DATA_LAYOUT.md) | 1.0.0 | Active | Architecture documentation |
+| [Filter Operators Specification](./FILTER_OPERATORS_SPEC.md) | 1.0.0 | Active | This document defines the filter operators available for querying objects in ... |
+| [Full-Text Search v1.0](./full-text-search-v1.0.md) | 1.0.0 | Active | This document defines the full-text search implementation for the zqk object ... |
+| [Gantt Chart Export Pipeline](./gantt_export.md) | 1.0.0 | Active | Architecture documentation |
+| [Gantt SVG interaction contract (minimal)](./GANTT_SVG_INTERACTION_CONTRACT.md) | 1.0.0 | Contract and tests are in-tree; full renderer integration remains aligned with `docs/marketing/strategic-pivot/SVG_GANTT_WORK_PRESERVATION.md` (graph-backend pivot). | Architecture documentation |
+| [Gantt export (PNG, PDF)](./GANTT_EXPORT_DEFERRED.md) | 1.0.0 | Active | Architecture documentation |
+| [Git Workflow Enforcement via Pre-commit Hook](./git-workflow-enforcement-v1.0.md) | 1.0.0 | Active | This document describes the pre-commit hook implementation that enforces the ... |
+| [Git and GitHub Osmosis Interceptor Architecture](./GIT_GH_OSMOSIS_INTERCEPTOR.md) | 1.0.0 | Active | Architecture documentation |
+| [Git-native drift search patterns](./GIT_DRIFT_SEARCH_PATTERNS.md) | 1.0.0 | Active | Architecture documentation |
+| [Go-To-Market (GTM): Pricing & Revenue Engine](./GTM_PRICING_STRATEGY.md) | 1.0.0 | Active | Architecture documentation |
+| [Goroutine Manager Specification](./GOROUTINE_MANAGER.md) | 1.0.0 | Active | The GoroutineManager provides OS-level tracking and management of all gorouti... |
+| [Greenfield team operating plan — seed for a zqk-class system](./GREENFIELD_TEAM_OPERATING_PLAN.md) | 1.0.0 | Strategy / seed document | Architecture documentation |
+| [Guided Spec Management v1.0](./guided-spec-management-v1.0.md) | 1.0.0 | Active | Spec management should be **guided and interactive**, leveraging semantic lin... |
+| [Hardcoded literal repetition — drift phases](./HARDCODED_LITERAL_REPETITION_PHASES.md) | 1.0.0 | Active | Architecture documentation |
+| [Help Builder Documentation](./HELP_BUILDER.md) | 1.0.0 | Active | Architecture documentation |
+| [High-Speed Caching Architecture V2](./high_speed_caching.md) | 1.0.0 | Active | The previous implementation of Priority Plan PRI-17807959 (High-Speed Object ... |
+| [High-Volume Event Cache Concurrency Pattern](./high-volume-event-cache-concurrency.md) | 1.0.0 | Active | The `HighVolumeEventCache` follows established concurrency patterns from `Obj... |
+| [High-Volume Event Cache Proposal](./high-volume-event-cache-proposal.md) | 1.0.0 | Active | Architecture documentation |
+| [High-Volume Storage: Deprecation of Legacy Format and Move to Streaming](./HIGH_VOLUME_STORAGE_DEPRECATION.md) | 1.0.0 | Policy / direction | Architecture documentation |
+| [Hive Mind Memory Architecture](./hive-mind-memory/DESIGN.md) | 1.0.0 | Active | The 'Hive Mind Memory' component provides a unified storage layer for ZQK, me... |
+| [Hyper-Scale Orchestration](./hyper-scale-orchestration.md) | 1.0.0 | Active | Architecture documentation |
+| [I/O Queue Architecture](./io-queue-architecture.md) | 1.0 | Design | Architecture documentation |
+| [IA Audit Report](./ia_audit_report.md) | 1.0.0 | Active | Architecture documentation |
+| [Import Tracking Architecture](./types/import_tracking.md) | 1.0.0 | Active | Architecture documentation |
+| [Infrastructure Demarcation Strategy v1.0](./infrastructure-demarcation-v1.0.md) | 1.0.0 | Active | Architecture documentation |
+| [Init Command Scenarios](./INIT_SCENARIOS.md) | 1.0.0 | Active | The `zqk system init` command must support three distinct initialization scen... |
+| [Initialization Seed Questions v1.0](./initialization-seed-questions-v1.0.md) | 1.0.0 | Active | This document defines a comprehensive seed question system that must be answe... |
+| [Instance Builder Architecture](./INSTANCE_BUILDER_ARCHITECTURE.md) | 1.0.0 | Active | Instance builders extend the spec builder pattern to programmatically create ... |
+| [Instance Validation System Architecture](./instance-validation-v1.0.md) | 1.0.0 | Active | Architecture documentation |
+| [Integrated Lifecycle and Policy Enforcement Architecture](./integrated-lifecycle-policy-enforcement-v1.0.md) | 1.0.0 | Active | This document describes the architecture for integrated lifecycle and policy ... |
+| [Interactive Creation Architecture Analysis](./INTERACTIVE_CREATION_ARCHITECTURE_ANALYSIS.md) | 1.0.0 | Active | Architecture documentation |
+| [Interactive Object Creation Architecture](./INTERACTIVE_CREATION_ARCHITECTURE.md) | 1.0.0 | Active | Architecture documentation |
+| [Interactive Object Creation Tool Proposal](./INTERACTIVE_OBJECT_CREATION_TOOL.md) | 1.0.0 | Active | Architecture documentation |
+| [Internal Objects as Dedicated WALs](./INTERNAL_OBJECTS_AS_DEDICATED_WALS.md) | 1.0.0 | Design proposal | Architecture documentation |
+| [LLM interaction model rubric](./LLM_INTERACTION_MODEL_RUBRIC.md) | 1.0.0 | Active operator note (2026-08-27) | Architecture documentation |
+| [Lessons Learned: Avoiding Recursive Degradation](./LESSONS_LEARNED.md) | 1.0.0 | Active | Architecture documentation |
+| [Lifecycle Definitions as Internal Objects: Design](./LIFECYCLE_AS_OBJECTS_DESIGN.md) | 1.0.0 | Preferred Implementation | Architecture documentation |
+| [Lifecycle Definitions: Architecture and Management](./LIFECYCLE_DEFINITIONS_EXPLAINED.md) | 1.0.0 | Documentation | Architecture documentation |
+| [Lifecycle Event Listener and Transition Criteria](./LIFECYCLE_EVENT_LISTENER_AND_CRITERIA.md) | 1.0.0 | Design + implementation | Architecture documentation |
+| [Lifecycle Rollback: Status Snapshot and Audit-Chain Reconstruction](./LIFECYCLE_ROLLBACK_SNAPSHOT_AND_AUDIT_CHAIN.md) | 1.0.0 | Implemented | Architecture documentation |
+| [Lifecycle state-machine rubric](./LIFECYCLE_STATE_MACHINE_RUBRIC.md) | 1.0.0 | Active | Architecture documentation |
+| [Lifecycle status roles](./LIFECYCLE_STATUS_ROLES.md) | 1.0.0 | Active | Architecture documentation |
+| [Lifecycle vs fitness planes](./LIFECYCLE_VS_FITNESS_PLANES.md) | 1.0.0 | Active | Architecture documentation |
+| [Lint Error Prevention Strategy](./LINT_ERROR_PREVENTION.md) | 1.0.0 | Active | Architecture documentation |
+| [Lint and code-quality rule inventory](./LINT_RULE_INVENTORY.md) | 1.0.0 | Active | Architecture documentation |
+| [List Operations v1.0 - Common Query Patterns](./list-operations-v1.0.md) | 1.0.0 | Active | Architecture documentation |
+| [Local CI Contract & Remote Translation](./LOCAL_CI_CONTRACT.md) | 1.0.0 | Active | ZQK implements a Local CI capability (`zqk ci run`, `zqk ci checkout`, `zqk c... |
+| [Lock Ordering](./LOCK_ORDERING.md) | 1.0.0 | Active | Architecture documentation |
+| [Lock Timeout Implementation Plan](./LOCK_TIMEOUT_IMPLEMENTATION_PLAN.md) | 1.0.0 | Active | Architecture documentation |
+| [Log Naming Conventions and Patterns](./LOG_NAMING_CONVENTIONS.md) | 1.0.0 | Active | Architecture documentation |
+| [Logging Framework Enhancements for Complex Output Patterns](./LOGGING_FRAMEWORK_ENHANCEMENTS.md) | 1.0.0 | Active | Architecture documentation |
+| [Logging System Architecture](./logging-system-v1.0.md) | 1.0.0 | Active | Architecture documentation |
+| [Logging System Audit Report](./logging-audit-report.md) | 1.0.0 | Active | Architecture documentation |
+| [MCP Abstraction Layer Architecture](./MCP_ABSTRACTION_LAYER.md) | 1.0.0 | Active | The MCP (Model Context Protocol) abstraction layer provides a clean separatio... |
+| [MCP Account Identification and Role Enforcement](./MCP_ACCOUNT_IDENTIFICATION.md) | 1.0.0 | Active | The MCP server now proactively prompts agents to provide their `account_id` w... |
+| [MCP Binary Stability Decision Framework](./mcp-binary-stability-decision-framework.md) | 1.0.0 | Active | This document provides a decision framework for determining when the stable M... |
+| [MCP Binary Stability and Compatibility Architecture v1.0](./mcp-binary-stability-v1.0.md) | 1.0.0 | Active | This document defines the architecture for managing MCP server binary stabili... |
+| [MCP Built-In Tools](./MCP_BUILT_IN_TOOLS.md) | 1.0.0 | Active | Built-in tools are MCP tools that are **hardcoded directly in the MCP server*... |
+| [MCP Built-In Tools Architecture](./MCP_BUILT_IN_TOOLS_ARCHITECTURE.md) | 1.0.0 | Active | Architecture documentation |
+| [MCP Built-In Tools Validation](./MCP_BUILT_IN_TOOLS_VALIDATION.md) | 1.0.0 | Active | Architecture documentation |
+| [MCP Built-In Tools Validation Results](./MCP_BUILT_IN_TOOLS_VALIDATION_RESULTS.md) | 1.0.0 | ✅ **VALIDATION PASSED | Architecture documentation |
+| [MCP Dynamic Lookup Implementation v1.0](./mcp/mcp-dynamic-lookup-implementation-v1.0.md) | 1.0.0 | Active | Architecture documentation |
+| [MCP Error Code System](./mcp/ERROR_CODES.md) | 1.0.0 | Active | The MCP server uses a comprehensive, HTTP-like error code system that categor... |
+| [MCP Event Format as Output Format](./MCP_EVENT_FORMAT.md) | 1.0.0 | Active | The MCP event subscription system can be conceptualized as another output for... |
+| [MCP Event Subscription Quick Reference](./MCP_EVENT_SUBSCRIPTION_QUICK_REF.md) | 1.0.0 | Active | Architecture documentation |
+| [MCP Event Subscription System](./MCP_EVENT_SUBSCRIPTION.md) | 1.0.0 | Active | The MCP Event Subscription System provides a pub/sub mechanism for MCP client... |
+| [MCP Format Restrictions](./MCP_FORMAT_RESTRICTIONS.md) | 1.0.0 | Active | The MCP server supports restricting clients to specific output formats. This ... |
+| [MCP Integration Testing Guide](./MCP_INTEGRATION_TESTING.md) | 1.0.0 | Active | This guide provides instructions for testing the MCP event subscription syste... |
+| [MCP Metrics Instrumentation](./mcp/METRICS_INSTRUMENTATION.md) | 1.0.0 | Active | Comprehensive metrics instrumentation has been added to all MCP protocol oper... |
+| [MCP Multi-Agent Orchestration Foundation](./MCP_MULTI_AGENT_ORCHESTRATION.md) | 1.0.0 | Active | The MCP server architecture provides a foundational infrastructure for multi-... |
+| [MCP Object-Level Access Control via Semantic Tags](./MCP_OBJECT_ACCESS_CONTROL.md) | 1.0.0 | Active | The MCP server now enforces object-level access restrictions based on semanti... |
+| [MCP Output Routing Requirements](./MCP_OUTPUT_ROUTING.md) | 1.0.0 | Active | Architecture documentation |
+| [MCP Package Utilities Reference](./mcp/UTILS_REFERENCE.md) | 1.0.0 | Active | Parser and extractor functions have been consolidated into standardized utili... |
+| [MCP Privilege Validation Tests v1.0](./mcp-privilege-tests-v1.0.md) | 1.0.0 | Active | This document describes the comprehensive test suite that validates privilege... |
+| [MCP Protocol Interface](./mcp/MCP_INTERFACE.md) | 1.0.0 | Active | This package provides explicit, type-safe interfaces for the MCP (Model Conte... |
+| [MCP Protocol Metrics](./mcp/MCP_METRICS.md) | 1.0.0 | Active | Comprehensive metrics instrumentation for all MCP protocol operations, provid... |
+| [MCP Proxy Daemon Architecture](./mcp_proxy_daemon.md) | 1.0.0 | Active | Architecture documentation |
+| [MCP Role Elicitation](./MCP_ROLE_ELICITATION.md) | 1.0.0 | Active | When an agent connects to the MCP server without specifying roles or permissi... |
+| [MCP Role Elicitation Test Results](./MCP_ROLE_ELICITATION_TEST_RESULTS.md) | 1.0.0 | ✅ **ALL TESTS PASSING | Architecture documentation |
+| [MCP Role Elicitation Validation](./MCP_ROLE_ELICITATION_VALIDATION.md) | 1.0.0 | ✅ **IMPLEMENTATION COMPLETE | Architecture documentation |
+| [MCP Role Enforcement](./MCP_ROLE_ENFORCEMENT.md) | 1.0.0 | Active | Role enforcement ensures that AI agents can only use roles that are allowed o... |
+| [MCP Roles and Permissions](./MCP_ROLES_AND_PERMISSIONS.md) | 1.0.0 | Active | Architecture documentation |
+| [MCP Security Testing](./MCP_SECURITY_TESTING.md) | 1.0.0 | Active | Comprehensive security testing suite for the MCP permission system, including... |
+| [MCP Server Async Handling for Variable-Length Operations](./MCP_ASYNC_HANDLING.md) | 1.0.0 | Active | The MCP server now supports **async processing with synchronous responses** t... |
+| [MCP Server Functionality Overview](./MCP_SERVER_FUNCTIONALITY.md) | 1.0.0 | Active | The MCP (Model Context Protocol) server provides comprehensive access to the ... |
+| [MCP Server Refactoring - Fully Capable Implementation](./MCP_SERVER_REFACTOR.md) | 1.0.0 | Active | The MCP server has been fully refactored to use a clean, layered architecture... |
+| [MCP Server Scalability Considerations](./MCP_SCALABILITY.md) | 1.0.0 | Active | Architecture documentation |
+| [MCP Server Security Enforcement](./MCP_SECURITY_ENFORCEMENT.md) | 1.0.0 | Active | The MCP server enforces security at multiple levels: |
+| [MCP Server Troubleshooting Analysis v1.0](./mcp/mcp-troubleshooting-analysis-v1.0.md) | 1.0.0 | Active | Architecture documentation |
+| [MCP Spec Builder Pattern](./mcp/MCP_SPEC_BUILDER.md) | 1.0.0 | Active | The MCP Spec Builder Pattern externalizes MCP server configuration (prompts, ... |
+| [MCP Spec-Based Access Control](./MCP_SPEC_ACCESS_CONTROL.md) | 1.0.0 | Active | The MCP server now uses **spec-based access control** instead of object-level... |
+| [MCP Trace Analysis Report v1.0](./mcp/mcp-trace-analysis-v1.0.md) | 1.0.0 | Active | Architecture documentation |
+| [MCP Workflow Specialization](./MCP_WORKFLOW_SPECIALIZATION.md) | 1.0.0 | Active | MCP workflows are a specialization of the general `workflow` object that appl... |
+| [MCP Workflow Tools Validation](./MCP_WORKFLOW_TOOLS_VALIDATION.md) | 1.0.0 | ✅ **VALIDATION PASSED | Architecture documentation |
+| [Maintenance WAL and Runner](./MAINTENANCE_WAL_AND_RUNNER.md) | 1.0.0 | Implemented | Architecture documentation |
+| [Measurement outcome taxonomy (normative)](./MEASUREMENT_OUTCOME_TAXONOMY.md) | 1.0.0 | Adopted; **`primary_measurement_outcome`** / **`primary_measurement_outcome_detail`** / **`measurement_outcome_schema_version`** are emitted on **`rollup_v1`** and **`rollup_status_core`** (see § below). Tracking: **`[REDACTED-ID]`** (complete). | Architecture documentation |
+| [Memory Fixes Compliance Review](./memory-fixes-compliance-review.md) | 1.0.0 | Active | Architecture documentation |
+| [Memory and Goroutine Explosion Analysis](./memory-explosion-analysis.md) | 1.0.0 | Active | Architecture documentation |
+| [Message Queue Implementation for Backpressure Relief](./mcp/MESSAGE_QUEUE_IMPLEMENTATION.md) | 1.0.0 | Active | A message queue system has been implemented between the MCP server and client... |
+| [Metric Tier-1 Auto-Fix Design](./METRIC_TIER1_AUTOFIX_DESIGN.md) | 1.0.0 | Active | Architecture documentation |
+| [Metrics Pipeline System](./METRICS_PIPELINE_SYSTEM.md) | 1.0.0 | Active | The metrics pipeline system provides a trait-based, extensible framework for ... |
+| [Metrics Sampler System](./METRICS_SAMPLER_SYSTEM.md) | 1.0.0 | Active | The metrics sampler system provides in-memory batching for high-frequency, lo... |
+| [Metrics dashboard views, performance boundaries, and historical snapshot lake](./METRICS_DASHBOARD_AND_HISTORICAL_LAKE.md) | 1.0.0 | Design (implementation follows CLI and storage work) | Architecture documentation |
+| [Metrics treasure map, timeline, and alpha launch signals](./METRICS_TREASURE_MAP_AND_ALPHA_TIMELINE.md) | 1.0.0 | Observability reference + planning aid | Architecture documentation |
+| [Model Context Protocol (MCP): Control Plane vs Data Plane](./mcp_control_plane.md) | 1.0.0 | Active | Architecture documentation |
+| [Modular and Scalable Architecture v1.0](./modular-scalable-architecture-v1.0.md) | 1.0.0 | Active | This document defines a modular, scalable architecture for zqk that supports ... |
+| [Multi-Agent Orchestration Architecture](./multi_agent_orchestration.md) | 1.0.0 | Active | This document defines the architecture and schemas for multi-agent pipeline r... |
+| [Multi-Agent Permission Issue Analysis v1.0](./mcp/multi-agent-permission-issue-analysis-v1.0.md) | 1.0.0 | Active | Architecture documentation |
+| [Multi-Agent Validation Pipeline](./multi_agent_validation_pipeline.md) | 1.0.0 | Active | The Multi-Agent Validation Pipeline ensures that code mutations generated by ... |
+| [Multi-Binary CLI: Shared Runtime, Data Contract, and Integration Without Duplication](./MULTI_BINARY_SHARED_RUNTIME_AND_DATA.md) | 1.0.0 | Design / reference. Not all patterns are implemented today; this document defines the target. | Architecture documentation |
+| [Multi-Instance Policy Reconciliation and Techscape Alignment v1.0](./multi-instance-policy-reconciliation-v1.0.md) | 1.0.0 | Active | This document defines a comprehensive strategy for reconciling policies, goal... |
+| [Multi-Layered Ontology and Domain Integration v1.0](./multi-layered-ontology-and-domain-integration-v1.0.md) | 1.0.0 | Active | This document defines a multi-layered ontology system that distinguishes betw... |
+| [Multi-agent Orchestration Pipeline Architecture](./multi_agent_pipeline.md) | 1.0.0 | Grooming / Design Phase | Architecture documentation |
+| [Multi-binary ecosystem](./MULTI_BINARY_ECOSYSTEM.md) | 1.0.0 | Active | Architecture documentation |
+| [Namespace System Specification v1.0](./namespace-system-specification-v1.0.md) | 1.0.0 | Active | Architecture documentation |
+| [Namespace-Based Modular Architecture](./NAMESPACE_MODULAR_ARCHITECTURE.md) | 1.0.0 | Active | Organize by **namespace** where each namespace (`cli`, `metrics`, `storage`, ... |
+| [Native Agent Execution Loop](./NATIVE_AGENT_EXECUTION_LOOP.md) | 1.0.0 | Active | Architecture documentation |
+| [Non-Functional Requirements: External Data & MCP Security Boundaries](./EXTERNAL_DATA_AND_MCP_SECURITY.md) | 1.0.0 | Active | Architecture documentation |
+| [Object Count: Self-Maintaining Outcome (Mandatory Context)](./OBJECT_COUNT_SELF_MAINTENANCE.md) | 1.0.0 | Active | Architecture documentation |
+| [Object Creation Requirements](./object-creation-requirements-v1.0.md) | 1.0.0 | Active | Architecture documentation |
+| [Object Directory Location Validation v1.0](./object-directory-location-v1.0.md) | 1.0.0 | Active | Architecture documentation |
+| [Object Disambiguation: Backlog Item vs Agent Task](./object_disambiguation.md) | 1.0.0 | Active | Architecture documentation |
+| [Object Get Performance SLA & Hotpath Architecture](./OBJECT_GET_PERFORMANCE_SLA.md) | 1.0.0 | Active | This document defines the latency SLAs and architectural hotpaths for object ... |
+| [Object ID Cache Invalidation Strategy](./object-id-cache-invalidation.md) | 1.0.0 | ✅ Implemented | The `ObjectIDCache` is used by the `check` command to quickly validate refere... |
+| [Object ID Cache: Test Coverage Evaluation](./object-id-cache-test-coverage.md) | 1.0.0 | Active | Architecture documentation |
+| [Object Maintenance: Why It Underperforms and How to Redesign It](./OBJECT_MAINTENANCE_REDESIGN.md) | 1.0.0 | Active | Architecture documentation |
+| [Object Management API Gap Analysis](./object-management-api-gap-analysis.md) | 1.0.0 | Active | Architecture documentation |
+| [Object Parsing Optimization v1.0 - "Parse Once" Strategy](./object-parsing-optimization-v1.0.md) | 1.0.0 | Active | Architecture documentation |
+| [Object Storage Bucketing Strategy v1.0](./object-storage-bucketing-v1.0.md) | 1.0.0 | Active | Architecture documentation |
+| [Object Storage Provider Interface v1.0](./object-storage-provider-v1.0.md) | 1.0.0 | Active | Architecture documentation |
+| [Object Template System](./OBJECT_TEMPLATE_SYSTEM.md) | 1.0.0 | Active | The object template system supports creation of objects from spec-driven YAML... |
+| [Object Type Generation v1.0 - "Croptop" Approach](./object-type-generation-v1.0.md) | 1.0.0 | Active | Architecture documentation |
+| [Object WAL, file descriptors, and related anti-patterns](./OBJECT_WAL_FD_LIFECYCLE.md) | 1.0.0 | Active | Architecture documentation |
+| [Object operations performance (create / update / delete)](./OBJECT_OPERATIONS_PERFORMANCE.md) | 1.0.0 | Active | Architecture documentation |
+| [Observability receptacles and coordination](./OBSERVABILITY_RECEPTACLES_AND_COORDINATION.md) | 1.0.0 | Active | Architecture documentation |
+| [Observer Agent Architecture v1.0](./observer-agent-architecture-v1.0.md) | 1.0.0 | Active | This document defines the comprehensive architecture for the Observer Agent, ... |
+| [Observer Agent Onboarding Guide (BLI-812)](./observer-agent-onboarding.md) | 1.0.0 | Active | Architecture documentation |
+| [Observer Agent Privileges Update v1.0](./mcp/observer-agent-privileges-update-v1.0.md) | 1.0.0 | Active | Architecture documentation |
+| [Observer Agent Workflow Clarification v1.0](./mcp/observer-agent-workflow-clarification-v1.0.md) | 1.0.0 | Active | Architecture documentation |
+| [On-Demand Pattern - Consistency Analysis](./on-demand-pattern-consistency-analysis.md) | 1.0.0 | Analysis | Architecture documentation |
+| [On-Demand Pattern - Remaining Opportunities](./on-demand-pattern-remaining-opportunities.md) | 1.0.0 | Analysis | Architecture documentation |
+| [On-Demand Pattern Implementation - Completion Summary](./on-demand-pattern-completion-summary.md) | 1.0.0 | ✅ **Implementation Complete | Architecture documentation |
+| [On-Demand Worker Pattern](./on-demand-worker-pattern.md) | 1.0 | ✅ **Implemented On-Demand Pattern | Architecture documentation |
+| [Onboarding Roadmap and Certification](./ONBOARDING_ROADMAP_AND_CERTIFICATION.md) | 1.0.0 | Active | - **Onboarding as objects**: The onboarding curriculum is a first-class works... |
+| [Ontology Versioning Layer: Architecture Design](./ontology/VERSIONING_DESIGN.md) | 1.0.0 | Active | The Ontology Versioning Layer introduces context-awareness to the ZQK Knowled... |
+| [Ontology Versioning Manager](./ontology_versioning_manager.md) | 1.0.0 | Active | Architecture documentation |
+| [Osmosis Interceptor Architecture](./osmosis_interceptor.md) | 1.0.0 | Active | Architecture documentation |
+| [Output Queue Integration Guide](./OUTPUT_QUEUE_INTEGRATION.md) | 1.0.0 | Active | The new output queue system replaces the current mutex-heavy progress trackin... |
+| [PRI-211 Work Verification](./PRI-211-WORK-VERIFICATION.md) | 1.0.0 | Active | Architecture documentation |
+| [Package Test Concurrency Limits & Justification](./TEST_CONCURRENCY_LIMITS.md) | 1.0.0 | Active | Package test concurrency is governed dynamically and on-disk via `package_con... |
+| [Path alias resolution (any path, prefix scheme)](./PATH_ALIAS_RESOLUTION.md) | 1.0.0 | Implemented | Architecture documentation |
+| [Per-kind stream stewardship](./STREAM_KIND_STEWARDSHIP.md) | 1.0.0 | Implemented (enqueue + execution contract) | Architecture documentation |
+| [Performance Bottleneck Audit: Uncached / Per-Operation Heavy Resources](./PERFORMANCE_BOTTLENECK_AUDIT.md) | 1.0.0 | List/count use a bounded semaphore (`listCountMaxConcurrent` increased to 16); list workers use a fixed worker pool; context cancellation and closer patterns are in place. No uncached “per call” heavy resource; contention is bounded. | Architecture documentation |
+| [Performance Investigation and Recommendations](./PERFORMANCE_INVESTIGATION_AND_RECOMMENDATIONS.md) | 1.0.0 | Active | Architecture documentation |
+| [Persistency Layer Gap Analysis](./persistency-layer-gap-analysis.md) | 1.0.0 | No gaps identified | Architecture documentation |
+| [Phase 4: Autonomous Capabilities & Scale](./PHASE_4_OBJECTIVES_AND_ROADMAP.md) | 1.0.0 | Active | Architecture documentation |
+| [Policy Lifecycle: System Awareness and Recurring Considerations](./POLICY_LIFECYCLE.md) | 1.0.0 | Active | The policy lifecycle establishes appropriate levels of system awareness and r... |
+| [Policy vs Context Refresh Schedule](./POLICY_AND_CONTEXT_REFRESH.md) | 1.0.0 | Active | Architecture documentation |
+| [Pre-Change Checklist](./PRE_CHANGE_CHECKLIST.md) | 1.0.0 | Active | Architecture documentation |
+| [Pre-Commit Background Results](./PRE_COMMIT_BACKGROUND_RESULTS.md) | 1.0.0 | Active | Architecture documentation |
+| [Pre-Commit Checks: Persistent Jobs + Trigger-Only Callback](./PRE_COMMIT_INTEGRITY_TRIGGER_DESIGN.md) | 1.0.0 | Active | Architecture documentation |
+| [Pre-Stage Formatting](./PRE_STAGE_FORMATTING.md) | 1.0.0 | Active | Architecture documentation |
+| [Priority roadmap (current focus)](./PRIORITY_ROADMAP_CURRENT.md) | 1.0.0 | Active | Architecture documentation |
+| [Proactive Memory Explosion Detection Strategy](./proactive-memory-explosion-detection.md) | 1.0.0 | Active | Architecture documentation |
+| [Profile Storage Proposal](./PROFILE_STORAGE_PROPOSAL.md) | 1.0.0 | Active | Architecture documentation |
+| [Profile Systems Comparison](./PROFILE_SYSTEMS_COMPARISON.md) | 1.0.0 | Active | zqk has two profile systems serving different purposes: |
+| [Project Discovery and Strategic Alignment v1.0](./project-discovery-and-strategic-alignment-v1.0.md) | 1.0.0 | Active | This document defines a comprehensive strategy for discovering, configuring, ... |
+| [Project Initialization Guide](./PROJECT_INITIALIZATION.md) | 1.0.0 | Active | New projects must be initialized with a core set of policies that establish s... |
+| [Project Policy System](./PROJECT_POLICY_SYSTEM.md) | 1.0.0 | Active | The Project Policy System provides a generalized `policy` object that serves ... |
+| [Project Root Resolution: Locations Updated to ResolveProjectRoot](./PROJECT_ROOT_RESOLUTION_LOCATIONS.md) | 1.0.0 | Active | Architecture documentation |
+| [Project root orientation](./PROJECT_ROOT_ORIENTATION.md) | 1.0.0 | Active | Architecture documentation |
+| [Project root: one per instance, persistent "use", and scheduler alignment](./PROJECT_ROOT_USE_AND_SCHEDULER_ALIGNMENT.md) | 1.0.0 | Active | Architecture documentation |
+| [Public-Kind Fitness Scorecard (7-Lens Rubric)](./PUBLIC_KIND_FITNESS_SCORECARD.md) | 1.0.0 | Active | Architecture documentation |
+| [Quarantine as Safety Switch](./QUARANTINE_AS_SAFETY_SWITCH.md) | 1.0.0 | Design | Architecture documentation |
+| [Queue Shutdown Management](./queue-shutdown-management.md) | 1.0 | Design | Architecture documentation |
+| [Queue Shutdown Testing & Implementation Summary](./shutdown-testing-summary.md) | 1.0.0 | Unit tests complete, integration tests pending | Architecture documentation |
+| [Queue Shutdown Usage Guide](./shutdown-usage-guide.md) | 1.0 | Active | The `QueueShutdownCoordinator` provides graceful shutdown management for all ... |
+| [Quick Create: Rapid System Objects from Text or Files](./QUICK_CREATE_OBJECTS.md) | 1.0.0 | Active | Architecture documentation |
+| [Reliability and Efficiency Improvement Opportunities](./reliability-efficiency-improvements.md) | 1.1 | ✅ **Implemented | Architecture documentation |
+| [Requirements Traceability System v1.0](./requirements-traceability-system-v1.0.md) | 1.0.0 | Active | Architecture documentation |
+| [Resilience and Audit Streaming Architecture](./resilience_and_audit.md) | 1.0.0 | Active | This document specifies the Circuit Breaker pattern for Neo4j/Memgraph partit... |
+| [Resource Cache Abstraction](./storage/RESOURCE_CACHE_ABSTRACTION.md) | 1.0.0 | Implemented | Architecture documentation |
+| [Resource MIME Type Adapters](./mcp/RESOURCE_MIME_ADAPTERS.md) | 1.0.0 | Active | The resource MIME type adapter system allows the MCP server to extract metada... |
+| [Resource URI Scheme Configuration](./mcp/RESOURCE_URI_SCHEMES.md) | 1.0.0 | Active | Resource URI scheme rules determine which URI scheme (e.g., `file://`, `docs:... |
+| [Retention max_count Performance](./RETENTION_MAX_COUNT_PERFORMANCE.md) | 1.0.0 | Active | Architecture documentation |
+| [Role Discovery and Progressive Configuration v1.0](./role-discovery-and-progressive-configuration-v1.0.md) | 1.0.0 | Active | This document defines a comprehensive system for discovering roles and privil... |
+| [Role Guidance System](./mcp/ROLE_GUIDANCE_SYSTEM.md) | 1.0.0 | Active | The role guidance system externalizes role-specific responsibilities, duties,... |
+| [Role Prompt Templates System](./mcp/ROLE_PROMPT_TEMPLATES.md) | 1.0.0 | Active | The role prompt templates system allows all MCP prompts to be externalized an... |
+| [SCS facade metrics exchange contract](./SCS_FACADE_METRICS_EXCHANGE_CONTRACT.md) | 1.0.0 | Proposed pattern (architecture). | Architecture documentation |
+| [SHACL-Based Validation System Evaluation](./shacl-validation-evaluation-v1.0.md) | 1.0.0 | Active | SHACL (Shapes Constraint Language) is a W3C standard for validating RDF data ... |
+| [SHACL-Based Validation System Evaluation](./shacl-evaluation-v1.0.md) | 1.0.0 | Active | This document evaluates SHACL (Shapes Constraint Language) as a potential val... |
+| [Sample Analysis: Bulk Delete (pid 40505) and Scheduler (pid 20777)](./SAMPLE_ANALYSIS_BULK_DELETE_AND_SCHEDULER.md) | 1.0.0 | Active | Architecture documentation |
+| [Scheduler Architecture](./SCHEDULER_ARCHITECTURE.md) | 1.1.0 | Active Documentation | The scheduler system is a robust, event-driven job execution engine that supp... |
+| [Scheduler Concurrency & Access Control - Executive Summary](./scheduler-concurrency-summary.md) | 1.0.0 | Active | Architecture documentation |
+| [Scheduler Concurrency and Access Control Analysis](./scheduler-concurrency-analysis.md) | 1.0.0 | Active | Architecture documentation |
+| [Scheduler Degraded-Mode Guardrails](./SCHEDULER_DEGRADED_MODE_GUARDRAILS.md) | 1.0.0 | Active | Architecture documentation |
+| [Scheduler Execution Boundaries & Robustness](./SCHEDULER_EXECUTION_BOUNDARIES.md) | 1.0.0 | Architecture Documentation | The scheduler already provides comprehensive execution boundaries and retry m... |
+| [Scheduler Helpers Thread-Safety Analysis](./scheduler-helpers-thread-safety.md) | 1.0.0 | Active | The scheduler helper functions (`scheduler_helpers.go`) provide a unified int... |
+| [Scheduler Host Service and Cluster Status Plane](./SCHEDULER_HOST_SERVICE_AND_CLUSTER_STATUS.md) | 1.0.0 | active architecture (exemplar orchestration program) | Architecture documentation |
+| [Scheduler Maintenance: Semantic Type and Policy Alignment](./SCHEDULER_MAINTENANCE_SEMANTIC_TYPE_AND_POLICY.md) | 1.0.0 | Design | Architecture documentation |
+| [Scheduler Notification System v1.0](./scheduler-notifications-v1.0.md) | 1.0.0 | Active | The scheduler notification system provides attention-grabbing, user-facing no... |
+| [Scheduler Shutdown Orphan Findings (2026-02-25)](./SCHEDULER_SHUTDOWN_ORPHAN_FINDINGS.md) | 1.0.0 | Active | Architecture documentation |
+| [Scheduler Transceiver Architecture](./SCHEDULER_TRANSCEIVER_ARCHITECTURE.md) | 1.0.0 | Proposed Architecture | A protocol-agnostic transceiver/router that handles all scheduler job communi... |
+| [Scheduler and Storage Concurrency Audit](./SCHEDULER_CONCURRENCY_AUDIT.md) | 1.0.0 | Active | Architecture documentation |
+| [Scheduler and Storage: Root Cause Analysis and Performance Baselines](./SCHEDULER_STORAGE_RCA.md) | 1.0.0 | Active | Architecture documentation |
+| [Scheduler daemon: memory bloat and hang analysis](./SCHEDULER_MEMORY_AND_HANG_ANALYSIS.md) | 1.0.0 | Active | Architecture documentation |
+| [Scheduler diagnostics findings and fixes](./SCHEDULER_DIAGNOSTICS_FINDINGS.md) | 1.0.0 | Active | Architecture documentation |
+| [Scheduler job long ID and lock file](./SCHEDULER_JOB_LONG_ID_AND_LOCK.md) | 1.0.0 | Resolved | Architecture documentation |
+| [Scheduler overload and timeout](./SCHEDULER_OVERLOAD_AND_TIMEOUT.md) | 1.0.0 | Implemented and DRY. **All tiers** use a single pattern in `handlers_cache_prewarm.go`: `tierTimeoutFromJob(ctx, defaultTimeout, buffer)` for job-derived timeouts; `runSequentialTier` for Tier 1 (single task); `runParallelTier` for Tier 2 and Tier 3 (and any future Tier 4+). Each parallel tier creates its context *before* starting tasks and passes it to every task so the wait goroutine never blocks forever. Adding Tier 4 is a single `runParallelTier(ctx, job.ID, 4, "Tier 4", defaultTimeout, buffer, []tierTask{...})` call. | Architecture documentation |
+| [Scheduler status and health-check alignment](./SCHEDULER_STATUS_AND_HEALTH_CHECK_ALIGNMENT.md) | 1.0.0 | Follow-up to investigate | Architecture documentation |
+| [Scheduler test daemon bounds](./SCHEDULER_TEST_DAEMON_BOUNDS.md) | 1.0.0 | Active | Architecture documentation |
+| [Semantic Bridge System Architecture](./semantic-bridge/DESIGN.md) | 1.0.0 | Active | Architecture documentation |
+| [Semantic Translation Engine](./semantic_translation_engine.md) | 1.0.0 | Active | Architecture documentation |
+| [Semantic Types and Formal Ontology Integration](./semantic-types-ontology-v1.0.md) | 1.0.0 | Active | This document describes the formal ontology integration for semantic type val... |
+| [Server Resilience Tests](./mcp/SERVER_RESILIENCE_TESTS.md) | 1.0.0 | Active | Comprehensive unit tests that stress-test the MCP server to ensure it's "inde... |
+| [Service Management](./SERVICE_MANAGEMENT.md) | 1.0.0 | Active | The zqk CLI includes service management capabilities to start, stop, and moni... |
+| [Shutdown Hang Analysis (Process Sample)](./SHUTDOWN_HANG_ANALYSIS.md) | 1.0.0 | Active | Architecture documentation |
+| [Signal and Context Pattern](./SIGNAL_AND_CONTEXT.md) | 1.0.0 | Active | Architecture documentation |
+| [Simplified Output Architecture](./SIMPLIFIED_OUTPUT_ARCHITECTURE.md) | 1.0.0 | Active | Architecture documentation |
+| [Snapshot References and Template-Driven Growth](./SNAPSHOT_REFERENCE_AND_TEMPLATE_GROWTH.md) | 1.0.0 | Design | Architecture documentation |
+| [Snapshot Sequence Format Enhancement](./SNAPSHOT_SEQUENCE_FORMAT_ENHANCEMENT.md) | 1.0.0 | Active | The compressed snapshot format currently uses dictionary compression with fie... |
+| [Snapshot to Auto-Fixer Workflow Design](./SNAPSHOT_TO_AUTOFIXER_WORKFLOW.md) | 1.0.0 | Active | The end-goal is to validate snapshot data transfer and restoration of check v... |
+| [Source Control Steward Spec](./SOURCE_CONTROL_STEWARD_SPEC.md) | 1.0.0 | Active | Architecture documentation |
+| [Spec Loading Order and Trait Validation](./spec-loading-order-v1.0.md) | 1.0.0 | Active | Architecture documentation |
+| [Spec Persistence Gap Analysis](./spec-persistence-gap-analysis.md) | 1.0.0 | Active | Architecture documentation |
+| [Spec origin plane: canonical model, derived indexes, and traceability](./SPEC_ORIGIN_PLANE.md) | 1.0.0 | Architecture (normative direction + inventory of what exists today) | Architecture documentation |
+| [Spec plane, streams, and data cells — shared mental model](./SPEC_STREAM_CELL_PEDAGOGY.md) | 1.0.0 | Architecture (pedagogy + alignment with implementation) | Architecture documentation |
+| [Spec-Based Auto-Fixer Plan](./SPEC_BASED_AUTO_FIXER_PLAN.md) | 1.0.0 | Active | Extend the existing auto-fix functionality (currently only handles hash misma... |
+| [Spec-Driven Builder Pattern](./SPEC_DRIVEN_BUILDER_PATTERN.md) | 1.0.0 | Active | The **Spec-Driven Builder Pattern** combines declarative YAML specifications ... |
+| [SpecBuilder Architecture](./SPECBUILDER_ARCHITECTURE.md) | 1.0.0 | Active | The SpecBuilder package (`pkg/specbuilder`) provides a reusable foundation fo... |
+| [SpecBuilder Safety Plan](./SPECBUILDER_SAFETY_PLAN.md) | 1.0.0 | Active | This document outlines safety measures and migration strategies for introduci... |
+| [Specbuilder Generation & Build Performance (L:F-PERF-02 / CRIT-CEF-R8L-PERF-02)](./SPECBUILDER_PERFORMANCE.md) | 1.0.0 | Active | Architecture documentation |
+| [Standardized data pipeline lifecycle](./data-pipeline-lifecycle.md) | 0.2 | Active (canonical) | Architecture documentation |
+| [Storage & Scheduler Subsystems Architecture (K:F-DOC-003 / CRIT-CEF-R8K-DOC-003)](./SUBSYSTEM_STORAGE_AND_SCHEDULER.md) | 1.0.0 | Active | Architecture documentation |
+| [Storage Architecture: Subpackage Boundary Map & One-Way Import Contract](./STORAGE_BOUNDARY_MAP.md) | 1.0.0 | Approved Architectural Specification (2026-08-21) | Architecture documentation |
+| [Storage Backend Detection and Configuration v1.0](./storage-backend-detection-v1.0.md) | 1.1.0 | Active (aligned to ADR) | ZQK selects a **storage topology** at process start via `StorageFactory` (`pk... |
+| [Storage Layer Async Architecture Improvements](./STORAGE_ASYNC_ARCHITECTURE_IMPROVEMENTS.md) | 1.0.0 | Active | Architecture documentation |
+| [Storage Orchestration Integration Guide](./storage-orchestration-integration-v1.0.md) | 1.0.0 | Active | The storage orchestrator coordinates operations across multiple storage backe... |
+| [Storage Orchestration for Multi-Backend Support](./storage-orchestration-v1.0.md) | 1.0.0 | Active | The storage orchestrator coordinates operations across multiple storage backe... |
+| [Storage public API: neutral aliases (BLI-177484)](./STORAGE_PUBLIC_API_NEUTRAL_ALIASES.md) | 1.0.0 | Active | Architecture documentation |
+| [Strategic Alignment Analysis and Semantic Bridge v1.0](./strategic-alignment-analysis-and-semantic-bridge-v1.0.md) | 1.0.0 | Active | This document analyzes how recent architectural considerations align with zqk... |
+| [Strategic Options: Post-Beta Execution (Phase 14)](./STRATEGIC_OPTIONS_PHASE_14.md) | 1.0.0 | Active | Architecture documentation |
+| [Strategic Panel Evaluation: Cellular Knowledge Operating System (Cellular OS)](./strategic_counsel_cellular_os.md) | 1.0.0 | Active | Architecture documentation |
+| [Strategic Planning Meeting: Agent Orchestration & Lifecycle Wiring](./STRATEGIC_PLANNING_MEETING_WIRING.md) | 1.0.0 | Active | Architecture documentation |
+| [Strategic-Kind Status Vocabulary & Promotion Decision Table](./STRATEGIC_KIND_STATUS_DECISION_TABLE.md) | 1.0.0 | Active | Architecture documentation |
+| [Stream Storage: Append-Only Segments for High-Volume Kinds](./STREAM_STORAGE.md) | 1.0.0 | Implemented | Architecture documentation |
+| [Structural vs Runtime-Delta and Stream Storage: Implementation Investigation](./STRUCTURAL_VS_RUNTIME_DELTA_INVESTIGATION.md) | 1.0.0 | Active | Architecture documentation |
+| [Subordinate Namespaces Extension](./SUBORDINATE_NAMESPACES.md) | 1.0.0 | Active | Extend the existing `namespace_id` system to support **subordinate namespaces... |
+| [Subordinate Namespaces Implementation](./SUBORDINATE_NAMESPACES_IMPLEMENTATION.md) | 1.0.0 | Active | Extended the existing `namespace_id` system to support **subordinate namespac... |
+| [System Check Monitoring and Awareness](./SYSTEM_CHECK_MONITORING.md) | 1.0.0 | Active | System check violations must be proactively monitored and project resources m... |
+| [System Check: Architecture vs Implementation Alignment](./system-check-architecture-alignment.md) | 1.0.0 | Active | Architecture documentation |
+| [System Health Assessment - On-Demand Pattern Implementation](./system-health-assessment.md) | 1.0.0 | Unrelated to on-demand pattern work | Architecture documentation |
+| [System Object Discovery Guide v1.0](./system-object-discovery-guide-v1.0.md) | 1.0.0 | Active | Architecture documentation |
+| [System Object Leverage Strategy v1.0](./system-object-leverage-strategy-v1.0.md) | 1.0.0 | Active | Architecture documentation |
+| [System Sync Command Architecture](./system-sync-command-v1.0.md) | 1.0.0 | Active | The `zqk system sync` command provides a simple wrapper around Git operations... |
+| [System check CPU profiling and "Warming CAS indexes" slowness](./system-check-cpu-profile-notes.md) | 1.0.0 | Active | Architecture documentation |
+| [System check data flow and lock sequencing](./system-check-data-flow.md) | 1.0 | Active | Architecture documentation |
+| [System check performance targets](./system-check-performance-targets.md) | 1.0.0 | Active | Architecture documentation |
+| [System check pipeline architecture and specs](./system-check-pipeline.md) | 1.0.1 | Active | Architecture documentation |
+| [System check: cache-first, async population, quick CLI](./system-check-cache-first-and-async.md) | 1.0 | Target architecture | Architecture documentation |
+| [System-Managed Resources Container](./SYSTEM_MANAGED_RESOURCES.md) | 1.0.0 | Active | System-managed resources are files and directories that are: |
+| [System-check maladaptation remediation map](./SYSTEM_CHECK_MALADAPTATION_REMEDIATION.md) | 1.0.0 | Active | Architecture documentation |
+| [Template Cache Architecture](./TEMPLATE_CACHE_ARCHITECTURE.md) | 1.0.0 | Active | The template cache system uses a layered architecture that separates backend-... |
+| [Template Cache Defensive Tests](./TEMPLATE_CACHE_DEFENSIVE_TESTS.md) | 1.0.0 | Active | The template cache system includes 18 comprehensive defensive tests that anti... |
+| [Test Separation: Unit vs Integration](./storage/TEST_SEPARATION.md) | 1.0.0 | Active | Architecture documentation |
+| [Test Separation: Unit vs Integration](./scheduler-test-separation-v1.0.md) | 1.0.0 | Active | Architecture documentation |
+| [Test Service Management](./TEST_SERVICE_MANAGEMENT.md) | 1.0.0 | Active | The test service management system allows tests to automatically spin up requ... |
+| [Test baseline scope (storage, cache, reporting, scheduler, spec)](./TEST_BASELINE_SCOPE.md) | 1.0.0 | Active | Architecture documentation |
+| [Testing Plan for Storage Orchestration and Async Validation](./testing-plan-v1.0.md) | 1.0.0 | Active | This document outlines the testing strategy for: |
+| [Testing Summary - Storage Orchestration and Async Validation](./testing-summary-v1.0.md) | 1.0.0 | Active | Comprehensive testing infrastructure has been created for: |
+| [The Creative Media Division: Mesh Governance](./creative_media_division.md) | 1.0.0 | Active | Architecture documentation |
+| [The External Mesh Gateway: Asynchronous Agentic Architecture](./EXTERNAL_MESH_GATEWAY.md) | 1.0.0 | Active | Architecture documentation |
+| [The Zen Quantum Cortex: Swarm Strategy for Massive Semantic Graphs](./zen-quantum-cortex-swarm-strategy.md) | 1.0.0 | Active | Architecture documentation |
+| [Tool Pod Mesh: Automated Retries and Sentinel Rollbacks](./sentinel_mesh.md) | 1.0.0 | Active | This architectural spec defines the automated retry and rollback mechanism wi... |
+| [Topic Consolidation Status Specification](./TOPIC_CONSOLIDATION_STATUS.md) | 1.0.0 | Active | Architecture documentation |
+| [TraitHarness: Unified List-Manipulating Behavior for All Data](./TRAIT_HARNESS.md) | 1.0.0 | Implemented (harness in pkg/cli; healthchk list wired as first consumer) | Architecture documentation |
+| [Transceiver Async Architecture](./TRANSCEIVER_ASYNC_ARCHITECTURE.md) | 1.0.0 | Implemented | The transceiver router uses async execution with worker pools to prevent bloc... |
+| [Transceiver Router Implementation Plan](./TRANSCEIVER_IMPLEMENTATION_PLAN.md) | 1.0.0 | Implementation Plan | This document outlines the implementation plan for the transceiver router arc... |
+| [Translation Manifest Architecture](./translation_manifest.md) | 1.0.0 | Active | Architecture documentation |
+| [UPDATE Loop Design](./UPDATE_LOOP_DESIGN.md) | 1.0.0 | Active | The UPDATE loop is similar to the CREATE loop but has key differences: |
+| [Unbounded Concurrency Fixes (Thread Explosion)](./unbounded-concurrency-fixes.md) | 1.0.0 | Active | Architecture documentation |
+| [Unified Profile System](./UNIFIED_PROFILE_SYSTEM.md) | 1.0.0 | Active | The Unified Profile System provides a common schema core for all profile type... |
+| [Universal Verification DSL](./verification_dsl_proposal.md) | 1.0.0 | Active | As ZQK scales from task-level orchestration to full project governance, the v... |
+| [Validation Flow and Call Order v1.0](./validation-flow-v1.0.md) | 1.0.0 | Active | This document maps out the call order for object updates, change journal entr... |
+| [Validation Run Issues Investigation](./VALIDATION_RUN_ISSUES_INVESTIGATION.md) | 1.0.0 | Active | Architecture documentation |
+| [Validation Scenario Architecture](./scenario_architecture.md) | 1.0.0 | Active | Architecture documentation |
+| [Vectorization Engine Architecture Blueprint](./VECTORIZATION_ENGINE_ARCHITECTURE.md) | 1.0.0 | Active | Architecture documentation |
+| [Vendor & Proxy Outage Resilience](./VENDOR_PROXY_OUTAGE.md) | 1.0.0 | Active | Architecture documentation |
+| [Verifiable Decomposition Spine (VDS)](./VERIFIABLE_DECOMPOSITION_SPINE.md) | 1.0.0 | Binding when `POL-WORKFLOW-VDS` is active | Architecture documentation |
+| [Verification outcome authority (criteria and convergence_session)](./VERIFICATION_OUTCOME_AUTHORITY.md) | 1.0.0 | Active | Architecture documentation |
+| [Vision: path-keyed cache, migration-safe FS, spec-as-objects, “classloader” loading](./SPEC_RUNTIME_AND_PATH_CACHE_VISION.md) | 1.0.0 | Direction note (not an implementation plan) | Architecture documentation |
+| [Visual Plan Object Schema](./visual_plan_schema.md) | 1.0.0 | Active | Architecture documentation |
+| [WAL Long Record: Causes and Safeguards](./WAL_LONG_RECORD_SAFEGUARDS.md) | 1.0.0 | Active | Architecture documentation |
+| [WAL and State Files: Naming and Cleanup](./WAL_AND_STATE_FILES.md) | 1.0.0 | Active | Architecture documentation |
+| [WAL-Backed Bulk Transactions Design](./WAL_BULK_TRANSACTIONS_DESIGN.md) | 1.0.0 | Active | Architecture documentation |
+| [Why `git commit` Can Be Slow (Sample Analysis)](./GIT_COMMIT_HOOK_SLOW.md) | 1.0.0 | Active | Architecture documentation |
+| [Work envelope: completable, effort-aware, and satisfiable facets](./WORK_ENVELOPE_AND_EFFORT_FACETS.md) | 1.0.0 | Design contract (2026-08-20). Implementation is the next unlocked kernel column — do **not** mint onto `PRI-CEF-R9-MEASURE-001` (execution-locked) or other sealed Gantt columns. | Architecture documentation |
+| [Workflow Constraints vs MCP Config](./WORKFLOW_CONSTRAINTS_VS_MCP_CONFIG.md) | 1.0.0 | Active | Workflow constraints provide a more flexible, granular, and business-logic-fo... |
+| [Workstream Transition and Agent Onboarding Strategy v1.0](./workstream-transition-and-agent-onboarding-strategy-v1.0.md) | 1.0.0 | Active | This document defines policies and strategies for workstream transitions, mul... |
+| [Wrapper inner-context guard (pattern)](./WRAPPER_INNER_CONTEXT_GUARD_PATTERN.md) | 1.0.0 | Architecture (normative for CLI wrapper types) | Architecture documentation |
+| [Write Wrapper Tool Proposal](./WRITE_WRAPPER_TOOL_PROPOSAL.md) | 1.0.0 | Active | Architecture documentation |
+| [ZQK (Zen Quantum Kernel) Master Specification & Schema Blueprint](./SYSTEM_SPECIFICATION.md) | 1.0.0 | Active | Architecture documentation |
+| [ZQK Architectural Split: Open-Core vs Commercial Enterprise Tiers](./OPEN_CORE_PROPRIETARY_SPLIT.md) | 1.0.0 | Active | This document formalizes the architectural boundary and distribution separati... |
+| [ZQK Binary Directory & CLI Entry Points (K:F-USA-003 / CRIT-CEF-R8K-USA-003)](./BINARIES.md) | 1.0.0 | Active | ZQK compiles into dedicated operational binaries tailored for specific runtim... |
+| [ZQK Capability Security Model](./CAPABILITY_SECURITY_MODEL.md) | 1.0.0 | Active | Architecture documentation |
+| [ZQK Git Branching & Integration Strategy](./BRANCHING_STRATEGY.md) | 1.0.0 | Active | Architecture documentation |
+| [ZQK Object Lifecycle Taxonomy & State Transitions](./lifecycle_taxonomy.md) | 1.0.0 | Active | Architecture documentation |
+| [ZQK Persona Context Taxonomy](./persona_context_taxonomy.md) | 1.0.0 | Active | Architecture documentation |
+| [ZQK Semantic Bridge Phase 3: Reconciliation & Inference](./SEMANTIC_BRIDGE_PHASE_3_DESIGN.md) | 1.0.0 | Active | This document outlines the technical design, complexity breakdown, and implem... |
+| [ZQK Subsystem JWT Algorithm Specification (K:F-SEC-003 / CRIT-CEF-R8K-SEC-003)](./JWT_ALGORITHM_SPECIFICATION.md) | 1.0.0 | Active | Architecture documentation |
+| [ZQK Tool Pod Mesh Architecture](./TOOL_POD_MESH.md) | 1.0.0 | Active | To maintain the core ZQK binary as a pristine, zero-dependency, lightweight o... |
+| [ZQK v2.8 Release Notes: Multi-Agent Pipeline Orchestration](./zqk_release_notes_v2_8.md) | 1.0.0 | Active | ZQK v2.8 introduces the foundational architecture for long-running, multi-sta... |
+| [`zqk new` — standard object origination pipeline](./NEW_COMMAND_OBJECT_ORIGINATION.md) | 1.0.0 | Implemented (CLI). Process traceability: requirement + doc_entry + criteria in process data (via `zqk object create`). | Architecture documentation |
+| [generate-builders Process Sample Analysis (PID 7937)](./GENERATE_BUILDERS_SAMPLE_ANALYSIS.md) | 1.0.0 | Active | Architecture documentation |
+| [v2.8 Orchestrate Multi-Agent Pipeline Architecture](./pipeline_architecture_v2.md) | 1.0.0 | Active | Architecture documentation |
+| [zqk_session Stream Behavior](./ZQK_SESSION_STREAM_BEHAVIOR.md) | 1.0.0 | Active | Architecture documentation |
+
+**Graph Backend Details:**
+- [Commit and Timeout Semantics](./graph-backend/COMMIT_AND_TIMEOUT_SEMANTICS.md) - Architecture documentation
+- [Enabling the Graph Backend](./graph-backend/ENABLING_GRAPH_BACKEND.md) - Architecture documentation
+- [Graph Backend Architecture Decisions](./graph-backend/ARCHITECTURE_DECISIONS.md) - Architecture documentation
+- [Metrics Configuration Guide](./graph-backend/CONFIGURATION.md) - The observability system is fully configurable, adjustable, and non-blocking. You can:
+- [Observability and Metrics](./graph-backend/OBSERVABILITY.md) - The graph backend provides comprehensive observability for self-healing and continuous improvement. All metrics are collected automatically and can be exported to various backends.
+- [Shared Implementation Patterns](./graph-backend/SHARED_IMPLEMENTATIONS.md) - To keep code DRY across different graph backend providers, we've extracted common logic into shared base implementations.
+
+## Organization Principles
+
+1. **Versioning**: All architecture docs use semantic versioning (v1.0, v2.0, etc.)
+2. **Categorization**: Docs organized by topic (Core, Graph, Storage, Migration, CLI)
+3. **Subdirectories**: Related docs grouped (e.g., `graph-backend/` for implementation details)
+4. **Status Tracking**: Each doc has a status (Design Complete, Active, Research Complete, etc.)
+5. **Cross-References**: Related documents linked for easy navigation
+
+## Related Documentation
+
+- [System Ontology](../ontology/system-ontology-v1.0.md) - Object type definitions
+- [Object Specs](../_internal/object_specs/README.md) - Object specifications
+- [Process README](../README.md) - Process directory overview
+
+---
+
+*This README is auto-generated. Architecture documents are discovered dynamically from the file system.*

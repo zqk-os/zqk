@@ -1,0 +1,45 @@
+$schema: "../../../schemas/command_spec.schema.json"
+
+name: "add"
+short: "Add one or more references to an object"
+description: |
+  Adds references from a source object to one or more target objects.
+  Automatically resolves the appropriate reference field based on the target kind
+  (e.g., requirement_refs for requirements, priority_plan_ref for priority plans,
+  or related_object_refs for general relationships).
+
+  Supports scalar (*_ref) and slice (*_refs) reference fields with duplicate prevention,
+  cycle detection on related_object_refs, and scope-lock enforcement on sealed priority plans.
+
+args:
+  type: "minimum"
+  min: 2
+
+flags:
+  - name: "field"
+    type: "string"
+    default: ""
+    description: "Explicit reference field name on source object (e.g. priority_plan_ref, related_object_refs)"
+  - name: "override"
+    type: "bool"
+    default: false
+    description: "Override scope-lock on sealed (active/in-progress) priority plans"
+  - name: "force"
+    type: "bool"
+    default: false
+    description: "Force reference addition (alias for override)"
+  - name: "reason-code"
+    type: "string"
+    default: ""
+    description: "Reason code required when using --override"
+
+help:
+  examples:
+    - comment: "Add requirement to backlog item"
+      command: "%s object ref add BLI-001 REQ-001"
+    - comment: "Add multiple criteria to requirement"
+      command: "%s object ref add REQ-001 CRIT-001 CRIT-002"
+    - comment: "Add to specific field"
+      command: "%s object ref add BLI-001 PRI-001 --field priority_plan_ref"
+
+common_flags: true

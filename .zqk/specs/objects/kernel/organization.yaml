@@ -1,0 +1,97 @@
+schema_version: 2.0.0
+ontology: organization
+extends: extensible_object
+visibility: public
+description: 'Organizational entity representing a company, institution, or other organizational structure. Organizations can contain divisions and form partnerships with other organizations. '
+traits:
+  - base_object_traits
+fields:
+  division_refs:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner
+      automation_hooks: used for organizational hierarchy navigation
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: division registry
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: References to divisions that belong to this organization
+      security: non-sensitive
+      system_usage:
+        - organizational hierarchy
+        - navigation
+        - reporting
+      validation: Must reference existing division object IDs using domain:organizational:division:{id} format
+    field_profile_code: ORG-002
+    permissions: rwx
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+      - field_reference_group
+    type: list
+    validation:
+      required: false
+  kernel_goals_refs:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner
+      automation_hooks: used for strategic alignment tracking
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: goal registry
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: References to kernel goals that align with this organization
+      security: non-sensitive
+      system_usage:
+        - strategic alignment
+        - goal tracking
+      validation: Must reference existing goal object IDs using ZQK:kernel:goal:{id} format
+    field_profile_code: ORG-004
+    permissions: rwx
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+      - field_reference_group
+    type: list
+    validation:
+      required: false
+  organization_name:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner
+      automation_hooks: used for display and identification
+      cardinality: one
+      criticality: composition
+      default: null
+      dependencies: none
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: The official name of the organization
+      security: non-sensitive
+      system_usage:
+        - display
+        - identification
+        - search
+      validation: Must be a non-empty string
+    field_profile_code: ORG-001
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - filterable
+      - modifiable
+      - readable
+      - searchable
+      - writable
+    type: string
+    validation:
+      required: true

@@ -1,0 +1,146 @@
+schema_version: 2.0.0
+ontology: vision
+extends: base_object
+visibility: public
+description: 'Long-term vision statement describing the desired future state and success narrative for a project, workstream, or organization. Provides strategic direction and alignment.\nLifecycle: vision_lifecycle.yaml.\n'
+traits:
+  - base_object_traits
+fields:
+  goal_refs:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: used for vision-goal alignment.
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: goal registry.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Goals that support this vision.
+      security: non-sensitive
+      system_usage:
+        - traceability
+        - alignment
+      validation: Must reference existing goal IDs.
+    field_profile_code: VIS-004
+    permissions: r-x
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+      - field_reference_group
+    type: list
+    validation:
+      required: false
+  mission_refs:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: used for vision-mission alignment.
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: mission registry.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Mission statements this vision aligns with.
+      security: non-sensitive
+      system_usage:
+        - navigation
+        - reporting
+      validation: Must reference existing mission IDs.
+    field_profile_code: VIS-003
+    permissions: r-x
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+      - field_reference_group
+    type: list
+    validation:
+      required: false
+  narrative:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: executive/owner.
+      automation_hooks: can be referenced by templates for tone and direction.
+      cardinality: one
+      criticality: composition
+      default: required
+      dependencies: mission, goals.
+      observability: "yes"
+      origin_lifecycle: mutable (with history).
+      purpose: Core vision narrative describing the desired future state.
+      security: may contain strategic info—treat as confidential by default.
+      system_usage:
+        - strategy
+        - communication
+        - prompting
+      validation: markdown allowed; should align with mission and goals.
+    field_profile_code: VIS-001
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - field_mutable_group
+    type: text
+    validation:
+      required: true
+  pillars:
+    checklist:
+      authority: executive/owner.
+      automation_hooks: can be used for alignment checks.
+      cardinality: many
+      criticality: composition
+      default: []
+      dependencies: none.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Key pillars or principles that support the vision (e.g., \\\"Trustworthy automation\\\", \\\"Composable drivers\\\").
+      security: may contain strategic information.
+      system_usage:
+        - strategy
+        - communication
+      validation: list of strings describing pillars.
+    field_profile_code: VIS-002
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+      - modifiable
+    type: list
+    validation:
+      required: false
+  workstream_refs:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: used for vision-workstream alignment.
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: workstream registry.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Workstreams that support this vision.
+      security: non-sensitive
+      system_usage:
+        - traceability
+        - alignment
+      validation: Must reference existing workstream IDs.
+    field_profile_code: VIS-005
+    permissions: r-x
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+      - field_reference_group
+    type: list
+    validation:
+      required: false

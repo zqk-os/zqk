@@ -1,0 +1,16 @@
+kind: backlog_item
+schema_version: "2.0.0"
+# id omitted - system assigns. After creating workstream, set workstream_refs and priority_plan_ref.
+title: Read Operational Philosophy policy
+description: |
+  Get and read the policy "Operational Philosophy - Object-First, Discoverable, Auditable"
+  so you understand that everything substantive starts from a system object.
+priority_plan_ref: PRIO-onboarding
+workstream_refs: []   # Replace with [<WS-ID>] after creating workstream; or update via zqk object update <BLI-ID> --field "workstream_refs=[WS-XXX]"
+priority_tier: P0
+status: planned
+category: Developer Experience
+acceptance_criteria:
+  - "Run: zqk object list policy --filter \"title=Operational Philosophy*\""
+  - "Run: zqk object get <POLICY_ID> and read the body"
+  - "Able to state the three principles: object-first, discoverable, auditable"

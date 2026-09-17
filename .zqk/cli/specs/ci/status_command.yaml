@@ -1,0 +1,21 @@
+$schema: "../schemas/command_spec.schema.json"
+
+name: "status [flags]"
+short: "Show Local CI SOURCE_SHA and test-bundle health summary"
+description: |
+  Prints pinned SOURCE_SHA / workdir and runs scheduler test-failures health
+  against studio logs.
+
+flags: []
+
+help:
+  examples:
+    - comment: "Local CI status"
+      command: "%s ci status"
+  exclude_flags:
+    - "format"
+    - "output"
+    - "verbose"
+    - "quiet"
+    - "timeout"
+    - "columns"

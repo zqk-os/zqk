@@ -1,0 +1,39 @@
+$schema: "../schemas/command_spec.schema.json"
+
+name: "vds"
+short: "Verifiable Decomposition Spine — gates agents must respect"
+description: |
+  Project-agnostic culture tool for POL-WORKFLOW-VDS: checklist stages, scaffold chunks,
+  and evaluate dsl_checks with a fluent pass/fail report.
+
+  Subcommands: checklist, evaluate, project, init.
+  project uses customization vendor_providers (--provider / --all / --list); no vendor-named subcommands.
+
+help:
+  examples:
+    - comment: "Culture + stages"
+      command: "%s workflow vds checklist --format json"
+    - comment: "Evaluate chunks"
+      command: "%s workflow vds evaluate --format json"
+    - comment: "Agent markdown brief"
+      command: "%s workflow vds evaluate --format agent-prompt"
+    - comment: "Project configured provider"
+      command: "%s workflow vds project --provider cursor --write"
+  exclude_flags:
+    - "format"
+    - "output"
+    - "verbose"
+    - "quiet"
+    - "timeout"
+    - "columns"
+
+common_flags: false
+subcommands:
+  - name: checklist
+    spec_ref: workflow/vds/checklist_command.yaml
+  - name: evaluate
+    spec_ref: workflow/vds/evaluate_command.yaml
+  - name: project
+    spec_ref: workflow/vds/project_command.yaml
+  - name: init
+    spec_ref: workflow/vds/init_command.yaml

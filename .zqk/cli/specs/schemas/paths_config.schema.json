@@ -1,0 +1,76 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://zqk.dev/schemas/paths_config.schema.json",
+  "title": "Paths Configuration Schema",
+  "description": "Schema for paths configuration that defines standard directory paths used throughout the system",
+  "type": "object",
+  "required": ["paths", "version"],
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "Reference to this schema file"
+    },
+    "description": {
+      "type": "string",
+      "description": "Human-readable description of this configuration"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "Configuration version (semantic versioning)"
+    },
+    "paths": {
+      "type": "object",
+      "description": "Path mappings",
+      "properties": {
+        "command_specs": {
+          "type": "string",
+          "description": "Canonical directory for file-authored CLI command specifications"
+        },
+        "config_dir": {
+          "type": "string",
+          "description": "Base configuration directory path"
+        },
+        "id_prefixes_config": {
+          "type": "string",
+          "description": "Path to ID prefixes configuration file"
+        },
+        "kind_mappings_config": {
+          "type": "string",
+          "description": "Path to kind mappings configuration file"
+        },
+        "object_specs": {
+          "type": "string",
+          "description": "Path to object specs directory"
+        },
+        "paths_config": {
+          "type": "string",
+          "description": "Path to paths configuration file"
+        }
+      },
+      "additionalProperties": true
+    },
+    "search_strategy": {
+      "type": "object",
+      "description": "Search strategy configuration",
+      "properties": {
+        "markers": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Directory markers to search for"
+        },
+        "relative_paths": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Relative paths to search"
+        }
+      },
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": false
+}

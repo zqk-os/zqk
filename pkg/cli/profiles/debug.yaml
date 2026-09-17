@@ -1,0 +1,18 @@
+# Debug CLI Profile Specification
+# Version: 1.0.0
+
+schema_version: "1.0.0"
+namespace_id: "zqk:kernel:cli"
+name: "debug"
+extends: "base"
+description: |
+  Debugging with full details.
+  YAML format for structured output with verbose logging enabled.
+
+spec:
+  format: "yaml"
+  verbose: true
+  quiet: false
+  flags:
+    format: "yaml"
+    verbose: true

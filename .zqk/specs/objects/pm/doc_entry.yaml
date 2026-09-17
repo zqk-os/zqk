@@ -1,0 +1,359 @@
+schema_version: 2.0.0
+ontology: doc_entry
+extends: base_object
+visibility: public
+description: 'First-class representation of a document entry in the documentation index. Documents are core artifacts that link to goals, workstreams, and other objects. This enables traceability and discoverability via the docman CLI.\nLifecycle: doc_entry_lifecycle.yaml.\n'
+traits:
+  - base_object_traits
+fields:
+  category:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: used for advanced filtering and search queries.
+      cardinality: one
+      criticality: association
+      default: null
+      dependencies: doc index organization.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Fine-grained category for document classification (e.g., \\\"validation\\\", \\\"graph-backend\\\", \\\"semantic-types\\\").
+      security: non-sensitive
+      system_usage:
+        - filtering
+        - grouping
+        - search
+        - organization
+      validation: Lowercase alphanumeric with hyphens/underscores.
+    field_profile_code: DOC-008
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - filterable
+      - listable
+      - modifiable
+      - readable
+      - searchable
+      - sortable
+      - writable
+    type: string
+    validation:
+      pattern: ^[a-z][a-z0-9_-]*$
+      required: false
+  content_hash:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner/automation.
+      automation_hooks: used by system check and docman to verify cryptographic integrity and detect drift.
+      cardinality: one
+      criticality: association
+      default: null
+      dependencies: content hasher.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Cryptographic SHA-256 leash of the document target file.
+      security: non-sensitive
+      system_usage:
+        - verification
+        - drift-detection
+      validation: SHA-256 hexadecimal string.
+    field_profile_code: DOC-010
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - filterable
+      - listable
+      - modifiable
+      - readable
+      - searchable
+      - sortable
+      - writable
+    type: string
+    validation:
+      pattern: ^[a-f0-9]{64}$
+      required: false
+  content_searchable:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner/automation.
+      automation_hooks: used by search indexer to determine if content should be indexed.
+      cardinality: one
+      criticality: association
+      default: true
+      dependencies: search index, content extractor.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Flag indicating if document content should be indexed for full-text search.
+      security: non-sensitive
+      system_usage:
+        - search
+        - indexing
+      validation: boolean.
+    field_profile_code: DOC-009
+    permissions: rwx
+    semantic_type: flag
+    traits:
+      - readable
+      - writable
+      - modifiable
+    type: boolean
+    validation:
+      required: false
+  content_size:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner/automation.
+      automation_hooks: used by system check to verify file size integrity.
+      cardinality: one
+      criticality: association
+      default: null
+      dependencies: content hasher.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Byte size of the document target file.
+      security: non-sensitive
+      system_usage:
+        - verification
+        - metrics
+      validation: integer >= 0.
+    field_profile_code: DOC-011
+    permissions: rwx
+    semantic_type: quantity
+    traits:
+      - filterable
+      - listable
+      - modifiable
+      - readable
+      - sortable
+      - writable
+    type: integer
+    validation:
+      required: false
+  goal_refs:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: used for goal-document traceability.
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: goal registry.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Goals this document relates to.
+      security: non-sensitive
+      system_usage:
+        - traceability
+        - navigation
+      validation: Must reference existing goal IDs.
+    field_profile_code: DOC-004
+    permissions: r-x
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+      - field_reference_group
+    type: list
+    validation:
+      required: false
+  group:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: used for doc index organization.
+      cardinality: one
+      criticality: association
+      default: null
+      dependencies: doc index organization.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Category/group the document belongs to (project_goals, project_specific, tooling, architecture, etc.).
+      security: non-sensitive
+      system_usage:
+        - filtering
+        - grouping
+        - organization
+      validation: enum.
+    field_profile_code: DOC-003
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - listable
+      - readable
+      - writable
+      - modifiable
+      - groupable
+      - filterable
+      - sortable
+      - searchable
+    type: enum
+    validation:
+      enum:
+        - project_goals
+        - project_specific
+        - tooling
+        - process
+        - onboarding
+        - design
+        - architecture
+        - other
+      required: false
+  milestone_refs:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: used for milestone-document traceability.
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: milestone registry.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Milestones this document relates to.
+      security: non-sensitive
+      system_usage:
+        - traceability
+        - navigation
+      validation: Must reference existing milestone IDs.
+    field_profile_code: DOC-006
+    permissions: r-x
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+      - field_reference_group
+    type: list
+    validation:
+      required: false
+  path:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner/automation.
+      automation_hooks: used by docman view command, auto-registration.
+      cardinality: one
+      criticality: composition
+      default: required
+      dependencies: doc index, resolver.
+      observability: "yes"
+      origin_lifecycle: mutable (if document moves).
+      purpose: File system path or URL to the document.
+      security: non-sensitive (unless path reveals sensitive locations).
+      system_usage:
+        - navigation
+        - resolution
+      validation: Path must exist or be resolvable via resolver.
+    field_profile_code: DOC-001
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - listable
+      - readable
+      - writable
+      - modifiable
+      - filterable
+      - sortable
+      - searchable
+    type: string
+    validation:
+      required: true
+  requirement_refs:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: used for requirement-document traceability.
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: requirement registry.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Requirements this document relates to.
+      security: non-sensitive
+      system_usage:
+        - traceability
+        - navigation
+      validation: Must reference existing requirement IDs.
+    field_profile_code: DOC-007
+    permissions: r-x
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+      - field_reference_group
+    type: list
+    validation:
+      required: false
+  summary:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: used in docman list output.
+      cardinality: one
+      criticality: composition
+      default: required
+      dependencies: doc index display.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Brief description of the document's content and purpose.
+      security: non-sensitive
+      system_usage:
+        - search
+        - filtering
+        - previews
+      validation: <= 200 chars recommended.
+    field_profile_code: DOC-002
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+      - modifiable
+    type: string
+    validation:
+      max_length: 200
+      required: true
+  workstream_refs:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: used for workstream-document traceability.
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: workstream registry.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Workstreams this document relates to.
+      security: non-sensitive
+      system_usage:
+        - traceability
+        - navigation
+      validation: Must reference existing workstream IDs.
+    field_profile_code: DOC-005
+    permissions: r-x
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+      - field_reference_group
+    type: list
+    validation:
+      required: false

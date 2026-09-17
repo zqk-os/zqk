@@ -1,0 +1,21 @@
+$schema: "../../../.zqk/cli/specs/schemas/trait_spec.schema.json"
+
+name: base_metric_enabled_group
+description: Base trait group for objects and fields that participate in metrics collection.\nObjects/fields with this trait group can have their data automatically collected\nand aggregated into metric objects.\n\nThis trait group includes:\n- readable (must be readable to collect metrics)\n- listable (for querying metric-enabled objects)\n- filterable (for filtering metric data)\n- snapable (for snapshot-based metric collection)\n
+category: base-group
+requires:
+  - readable
+conflicts: []
+includes:
+  - readable
+  - listable
+  - filterable
+  - snapable
+field_level: true
+object_level: true
+config: {}
+
+created_at: 2026-07-01T18:00:00Z
+updated_at: 2026-07-01T18:00:00Z
+created_by: ACC-1785920548450214012-68b850c0
+updated_by: ACC-1785920548450214012-68b850c0

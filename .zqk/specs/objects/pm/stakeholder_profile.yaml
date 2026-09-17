@@ -1,0 +1,143 @@
+schema_version: 2.0.0
+ontology: stakeholder_profile
+extends: base_object
+visibility: public
+description: 'Stakeholder profile captures expectations and priorities for a stakeholder (e.g. executive, product owner).\nUsed by strategic alignment (zqk system align) and goal discovery. See project-discovery-and-strategic-alignment-v1.0.md.\nLifecycle: stakeholder_profile_lifecycle.yaml.\n'
+traits:
+  - base_object_traits
+fields:
+  alignment_metrics:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: used for alignment dashboard.
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: none.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Metrics and targets (e.g. metric, target) for stakeholder satisfaction.
+      security: non-sensitive
+      system_usage:
+        - alignment
+        - dashboard
+      validation: List of objects with metric, target.
+    field_profile_code: STK-005
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - field_mutable_group
+    type: list
+    validation:
+      required: false
+  communication_preferences:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: used for notification routing.
+      cardinality: one
+      criticality: association
+      default: null
+      dependencies: none.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Frequency, format, and channels (e.g. frequency, format, channels).
+      security: non-sensitive
+      system_usage:
+        - notifications
+      validation: Object with optional frequency, format (list), channels (list).
+    field_profile_code: STK-004
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - field_mutable_group
+    type: object
+    validation:
+      required: false
+  expectations:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: used for stakeholder-work alignment.
+      cardinality: many
+      criticality: composition
+      default: []
+      dependencies: none.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: List of stakeholder expectations (e.g. quarterly reports, budget adherence).
+      security: non-sensitive
+      system_usage:
+        - alignment
+        - reporting
+      validation: List of strings.
+    field_profile_code: STK-002
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - field_mutable_group
+    type: list
+    validation:
+      required: false
+  priorities:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: used for alignment scoring.
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: none.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Prioritized concerns with weights (priority, concern, weight).
+      security: non-sensitive
+      system_usage:
+        - alignment
+      validation: List of objects with priority, concern, weight.
+    field_profile_code: STK-003
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - field_mutable_group
+    type: list
+    validation:
+      required: false
+  stakeholder_type:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: used for alignment reporting and routing.
+      cardinality: one
+      criticality: composition
+      default: null
+      dependencies: none.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Type of stakeholder (e.g. decision_maker, contributor, reviewer).
+      security: non-sensitive
+      system_usage:
+        - alignment
+        - reporting
+      validation: Free-form string.
+    field_profile_code: STK-001
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - field_mutable_group
+      - filterable
+      - listable
+    type: string
+    validation:
+      required: false

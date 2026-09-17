@@ -1,0 +1,138 @@
+version: 2
+
+project_name: zqk
+
+before:
+  hooks:
+    - go mod tidy
+
+builds:
+  - id: zqk
+    main: ./cmd/zqk
+    binary: zqk
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+    goarch:
+      - amd64
+      - arm64
+    ldflags:
+      - -s -w
+      - -X github.com/lanceman/zqk/cmd/zqk/app.version={{.Version}}
+      - -X github.com/lanceman/zqk/cmd/zqk/app.buildDate={{.Date}}
+      - -X github.com/lanceman/zqk/cmd/zqk/app.gitCommit={{.Commit}}
+
+  - id: zqk-mcp
+    main: ./cmd/zqk/mcp-simple
+    binary: zqk-mcp
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+    goarch:
+      - amd64
+      - arm64
+    ldflags:
+      - -s -w
+      - -X github.com/lanceman/zqk/cmd/zqk/app.version={{.Version}}
+      - -X github.com/lanceman/zqk/cmd/zqk/app.buildDate={{.Date}}
+      - -X github.com/lanceman/zqk/cmd/zqk/app.gitCommit={{.Commit}}
+
+archives:
+  - id: default
+    format: tar.gz
+    name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+    # Use zip for Windows (if added later)
+    format_overrides:
+      - goos: windows
+        format: zip
+    files:
+      - LICENSE*
+      - NOTICE*
+      - README*
+      - SECURITY.md
+      - .zqk/specs/objects/**/*
+      - .zqk/specs/configs/**/*
+
+checksum:
+  name_template: "checksums.txt"
+  algorithm: sha256
+
+signs:
+  - id: cosign
+    artifacts: checksum
+    cmd: cosign
+    args:
+      - "sign-blob"
+      - "--output-signature=${signature}"
+      - "${artifact}"
+      - "--yes"
+
+sboms:
+  - id: default
+    artifacts: archive
+    documents:
+      - "${artifact}.spdx.json"
+
+snapshot:
+  version_template: "{{ incpatch .Version }}-next"
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"
+      - "^ci:"
+      - "^chore:"
+      - Merge pull request
+      - Merge branch
+
+release:
+  github:
+    owner: lanceman
+    name: zqk
+  prerelease: auto
+  draft: false
+  name_template: "v{{.Version}}"
+  header: |
+    ## ZQK v{{.Version}}
+
+    The Zen Quantum Kernel — an operating system for AI + human hybrid teams.
+
+    ### Installation
+
+    **macOS (Homebrew):**
+    ```bash
+    brew install lanceman/tap/zqk
+    ```
+
+    **macOS / Linux (curl):**
+    ```bash
+    curl -sSL https://raw.githubusercontent.com/lanceman/zqk/main/install.sh | sh
+    ```
+
+    **Manual download:** Choose your platform below.
+  footer: |
+    ---
+    Full changelog: https://github.com/lanceman/zqk/compare/{{ .PreviousTag }}...{{ .Tag }}
+
+brews:
+  - name: zqk
+    repository:
+      owner: lanceman
+      name: homebrew-tap
+      token: "{{ .Env.HOMEBREW_TAP_TOKEN }}"
+    directory: Formula
+    homepage: "https://github.com/lanceman/zqk"
+    description: "Operating system for AI + human hybrid teams"
+    license: "Apache-2.0"
+    install: |
+      bin.install "zqk"
+      bin.install "zqk-mcp"
+    test: |
+      system "#{bin}/zqk", "version"
+    extra_install: ""

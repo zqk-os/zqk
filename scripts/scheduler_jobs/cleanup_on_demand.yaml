@@ -1,0 +1,19 @@
+# Config-driven cleanup: runs steps from .zqk/cleanup/config.yaml (single input).
+# Create: zqk object create scheduler_job --file scripts/scheduler_jobs/cleanup_on_demand.yaml
+# Trigger: zqk scheduler trigger SCH-cleanup
+# See: docs/architecture/CLEANUP_MAINTENANCE_DESIGN.md
+
+id: SCH-cleanup
+kind: scheduler_job
+schema_version: "2.0.0"
+status: active
+job_type: cleanup
+trigger_type: manual
+category: maintenance
+execution_mode: reusable
+enabled: true
+title: Cleanup (config-driven)
+description: |
+  Runs cleanup steps from .zqk/cleanup/config.yaml: delete_files, truncate_files,
+  cli, build_target (make). On-demand only; trigger via zqk scheduler trigger SCH-cleanup.
+namespace_id: zqk:kernel

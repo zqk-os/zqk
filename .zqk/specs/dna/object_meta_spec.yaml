@@ -1,0 +1,55 @@
+schema_version: "2.0.0"
+ontology: object_meta_spec
+urn: urn:zqk:spec:dna:object_meta_spec
+namespace: zqk:dna
+visibility: public
+storage_profile: cas_entity
+description: "Meta specification governing the declaration, schema validation, and cellular membrane boundaries of object specifications in the Knowledge Kernel."
+traits:
+  - auditable
+fields:
+  schema_version:
+    type: string
+    description: "Semantic version of the specification schema."
+    validation:
+      required: true
+  ontology:
+    type: string
+    description: "Unique canonical name of the object kind."
+    validation:
+      required: true
+  urn:
+    $ref: "built_ins/fields/urn"
+    description: "Canonical URN of the specification."
+  extends:
+    type: string
+    description: "Parent ontology from which this specification inherits fields and traits."
+    default: "base_object"
+  composes:
+    type: list
+    description: "Mixin ontologies composed into this specification."
+    default: []
+  visibility:
+    type: enum
+    description: "Access visibility: public or internal."
+    default: internal
+    validation:
+      enum:
+        - public
+        - internal
+  storage_profile:
+    $ref: "built_ins/fields/storage_profile"
+  description:
+    type: string
+    description: "Human and machine description of the object purpose and invariants."
+    validation:
+      required: true
+  traits:
+    type: list
+    description: "Behavioral traits conferred to entities of this kind."
+    default: []
+  fields:
+    type: map
+    description: "Dictionary of field specifications mapping field name to FieldMetaSpec."
+    validation:
+      required: true

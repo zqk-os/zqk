@@ -1,0 +1,25 @@
+$schema: "../../../.zqk/cli/specs/schemas/trait_spec.schema.json"
+
+name: open_countable
+description: |
+  Object-level remaining-open capability. The container's behavior changes
+  when remaining_open_count hits zero (complete). The count field lives on
+  the remaining_open mixin, not on this trait and not on status_reactive.
+  Parallel: occupiable (capability) vs occupancy (claimed_by / claimed_at).
+  Interpreter CAS-decrements remaining_open_count on a member terminal hop.
+  Non-zero is a no-op (no status catalyst). Zero hops complete (new catalyst).
+  Do not List members on the hop. Not occupiable. Not status_reactive.
+  TRACK: POL-ARCH-20260901 / BLI-CEF-CONTAINER-REMAINING-OPEN-001.
+category: behavior
+requires: []
+conflicts: []
+includes: []
+field_level: false
+object_level: true
+config:
+  count_field: remaining_open_count
+
+created_at: 2026-09-02T01:20:00Z
+updated_at: 2026-09-02T01:20:00Z
+created_by: ACC-1785920548450214012-68b850c0
+updated_by: ACC-1785920548450214012-68b850c0

@@ -1,0 +1,23 @@
+$schema: "../../schemas/command_spec.schema.json"
+
+name: "status"
+short: "Show active skip window if any"
+description: |
+  Prints the active skip window (until time and filters) when the file exists and
+  `until` is still in the future.
+
+help:
+  exclude_flags:
+    - "format"
+    - "output"
+    - "verbose"
+    - "quiet"
+    - "timeout"
+    - "columns"
+
+common_flags: false
+requires_storage: false
+requires_session: false
+requires_scheduler_check: false
+
+run_e: "runSkipWindowStatus"

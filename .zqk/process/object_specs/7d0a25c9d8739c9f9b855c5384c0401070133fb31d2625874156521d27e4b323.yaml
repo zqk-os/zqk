@@ -1,0 +1,17 @@
+created_at: "2026-09-17T05:37:06Z"
+created_by: ACC-1785920548450214012-68b850c0
+file_path: /Users/lanceettl/zqk-public-candidate/.zqk/specs/objects/platform/pipeline_definition.yaml
+id: OBJ-pipeline_definition
+kind: object_spec
+namespace_id: zqk:kernel
+ontology: pipeline_definition
+origin_project: zqk
+origin_system: zqk
+schema_version: 2.0.0
+source_type: internal
+status: implemented
+title: Defines the template and structure of a pipeline.\n
+updated_at: "2026-09-17T05:37:06Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+visibility: internal

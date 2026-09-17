@@ -1,0 +1,14 @@
+# Intentionally empty name — codegen must fall back to file stem (empty-name).
+name: ""
+short: "Empty name fallback fixture"
+description: |
+  Fixture for TestGenerateCommandBuilderFromYAML empty-name fallback.
+
+help:
+  examples:
+    - comment: "fixture"
+      command: "%s empty-name"
+  exclude_flags:
+    - "format"
+
+common_flags: true

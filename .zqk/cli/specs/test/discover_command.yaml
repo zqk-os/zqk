@@ -1,0 +1,50 @@
+$schema: "../schemas/command_spec.schema.json"
+
+name: "discover [path...] [flags]"
+short: "Statically discover tests across Go, Python, and TypeScript into the Knowledge Kernel"
+description: |
+  Scans source trees statically using AST parsers and regex scanners without subprocess execution.
+  Extracts test functions, suites, build tags, and criteria references.
+  Optionally synchronizes discovered tests into the Knowledge Kernel as test_case (TST-*) objects.
+
+flags:
+  - name: "lang"
+    type: "string"
+    description: "Filter discovery to specific languages (go, python, typescript)"
+  - name: "format"
+    shorthand: "f"
+    type: "string"
+    default: "table"
+    description: "Output format (table, json, yaml)"
+  - name: "sync"
+    type: "bool"
+    default: false
+    description: "Persist discovered tests as test_case objects in Knowledge Kernel CAS"
+  - name: "dry-run"
+    type: "bool"
+    default: false
+    description: "Simulate discovery and persistence without writing objects"
+  - name: "incremental"
+    type: "bool"
+    default: true
+    description: "Use cache for incremental re-discovery (<100ms on unchanged trees)"
+  - name: "workers"
+    type: "int"
+    default: 0
+    description: "Number of concurrent file discovery workers (default NumCPU)"
+  - name: "verbose"
+    shorthand: "v"
+    type: "bool"
+    default: false
+    description: "Display detailed tags, criteria references, and execution commands"
+
+help:
+  examples:
+    - comment: "Discover all tests in current repository"
+      command: "%s test discover"
+    - comment: "Discover Go tests only"
+      command: "%s test discover --lang go"
+    - comment: "Discover and persist tests into Knowledge Kernel"
+      command: "%s test discover --sync"
+    - comment: "Output discovered tests as JSON"
+      command: "%s test discover --format json"

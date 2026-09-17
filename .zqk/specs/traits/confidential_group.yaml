@@ -1,0 +1,18 @@
+$schema: "../../../.zqk/cli/specs/schemas/trait_spec.schema.json"
+
+name: confidential_group
+description: Trait group for confidential objects that require access:confidential.\nExtends base_object_traits with the same trait set but indicates objects\nwith restricted access requirements. Use for objects containing sensitive data.\nThis is primarily a semantic marker - it includes all base_object_traits.\n
+category: specialized-group
+requires:
+  - base_object_traits
+conflicts: []
+includes:
+  - base_object_traits
+field_level: false
+object_level: true
+config: {}
+
+created_at: 2026-07-01T18:00:00Z
+updated_at: 2026-07-01T18:00:00Z
+created_by: ACC-1785920548450214012-68b850c0
+updated_by: ACC-1785920548450214012-68b850c0

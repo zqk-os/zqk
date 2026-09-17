@@ -1,0 +1,129 @@
+$schema: ../../schemas/command_spec.schema.json
+name: measure
+short: Convergence measure from test-bundle health
+description: "Reads the rolling health timeline and computes delta_assessment, failing bundle fingerprints,\nsuggested go\
+  \ test reruns, heartbeat staleness, trigger queue depth, and ready_for_session_completion.\nThis is a fresh measure from\
+  \ health.jsonl — not a persisted CVS state snapshot (see object fields\nbefore_state_snapshot / after_state_snapshot for\
+  \ those).\nEmpty failing_fingerprints_now is not sufficient to close a session: check trending_toward, trigger_queue_pending,\n\
+  and confirm scheduler activity (Executing / PendingInQueue) before claiming victory.\n\nEntry point: `zqk scheduler convergence\
+  \ measure`.\n\nLoop: (1) stamp traceability — zqk-scenario bundle apply -f pkg/scenario/testdata/convergence-lifecycle-bundle/convergence-lifecycle-bundle.yaml\
+  \ -R .\n(2) Measure — --format json. (3) Persist — zqk object update <CVS-id> with fields from\nsuggested_convergence_session_fields\
+  \ when using --session-id <CVS-id> (adds those keys to json/yaml output).\nphase_router uses measurement + effective current_phase\
+  \ / flow_variant (flags override values read from the CVS object when --session-id is set; use --skip-session-context to\
+  \ disable reads).\nPersist: suggested_convergence_session_fields.object_update_body is the field subset for `zqk object\
+  \ update <CVS-id> --file` (JSON or YAML).\nIt includes activity_log as a one-entry array; storage appends these entries\
+  \ to the existing log for convergence_session (does not replace the full history).\nTombstones: after_state_snapshot includes\
+  \ scope_fingerprint_sha256 and evaluation_surface_id; tombstone_disparity compares the session before_state_snapshot to\
+  \ the current measure. Use --stamp-tombstone to include before_state_snapshot in object_update_body (anchor this iteration).\n\
+  Finalize: --finalize-debrief merges session predictions with a retrospective block (predictions.retrospective)\ncomparing\
+  \ predicted vs measured signals; include in object_update_body when closing the session.\nHandoff: --debrief-notes or --debrief-notes-file\
+  \ persists operator analysis on the CVS as debrief_notes\n(for the next convergence_session). Requires --session-id; file\
+  \ wins if both are set.\n\nAgent prompt: --format agent-prompt --session-id CVS-* emits one markdown block (hypothesis,\
+  \ desired_end_state, bundle-health view,\nrollup_status_core-driven **Next measured action (rollup)**, suggested next_action,\
+  \ phase_router, autonomy hints) for pasting into an agent chat. Requires reading the CVS object (do not use --skip-session-context).\n\
+  Persist in one step: --persist-session with --session-id writes suggested object_update_body to storage (same as convergence_session_tick),\n\
+  then emits json/yaml or the agent prompt so measurement and directive stay aligned. Skips when health watermark matches\
+  \ CVS last_measurement_at.\n\nPersist vs repeating the agent prompt: you can run `measure --format agent-prompt` as often\
+  \ as you want.\nOmit --persist-session when you only need the markdown (file/chat). Use --persist-session after health.jsonl\
+  \ advances\n(new bundle completions) so the watermark differs from last_measurement_at; otherwise persist is skipped by\
+  \ design.\nOrchestration uses the data pipeline (INGEST → COMMIT → FINALIZE) with kind scheduler.convergence_agent_prompt\
+  \ for metrics and Outcome hooks.\nIf cvs/test-bundles/health.jsonl is missing, agent-prompt still emits markdown (measurement\
+  \ section reflects an empty window); json/yaml/table keep the reminder to run scheduler test bundles first.\nAgent chat\
+  \ is not automatic: -o / stdout only writes text; add --copy (macOS pbcopy) to put the same markdown on the clipboard for\
+  \ the chat, or --paste-cursor to paste+submit in Cursor (default AppleScript: ⌘Y, ⌘V+Return\
+  \ — focuses agent chat; override prefix with the value of ZQK_CURSOR_PASTE_PREFIX_STEPS, see pkg/zqkenv).\nOptional --copy (macOS) copies the markdown to the clipboard via pbcopy.\nOptional --paste-cursor\
+  \ (macOS) copies then runs AppleScript to activate Cursor, run the configured prefix keystrokes (default ⌘Y),\
+  \ then ⌘V and Return.\nPaste automation appends a keystroke trace to .zqk/logs/scheduler/agent_prompt_cursor_keystrokes.log\
+  \ (TSV) and logs the same steps via the system logger; AppleScript `log` lines also appear in unified logging (Console.app).\n\
+  Each successful agent-prompt pipeline completion appends one JSON line to .zqk/logs/scheduler/agent_prompt_runs.jsonl (timestamp,\
+  \ pipeline_kind, session id, deliver mode, attention_mode, sizes).\nPrimary markdown output (stdout, -o file, or -) uses\
+  \ pkg/agentdelivery for file paths; each completed write also appends one line to .zqk/logs/scheduler/agent_prompt_deliveries.jsonl.\n\
+  Optional --agent-prompt-delivery-http-url or ZQK_AGENT_PROMPT_DELIVERY_HTTP_URL POSTs the same markdown as JSON (best-effort;\
+  \ failures are logged; optional ZQK_AGENT_PROMPT_DELIVERY_HTTP_BEARER).\nOptional --attention-mode (with --format agent-prompt):\
+  \ prepend a machine-parseable <!-- zqk:agent_prompt {...} --> block and a visible banner so automation can treat the payload\
+  \ as non-directive (test_non_directive) or interrupt/queue plumbing dry-run (interrupt_plumbing).\n\nAutomated loop (persist\
+  \ CVS + write log + clipboard for chat paste):\n  zqk scheduler convergence measure --format agent-prompt --session-id CVS-001\
+  \ --persist-session \\\\\n    -o .zqk/logs/drift/cvs_agent_prompt_latest.md --copy\nOptional: use --paste-cursor instead\
+  \ of --copy to paste into Cursor and submit (macOS; scripts/cursor/README.md, ZQK_CURSOR_PASTE_PREFIX_STEPS; same script\
+  \ as `zqk scheduler print-cursor-paste-applescript`).\n\nUse --format json for scripts; default text summarizes the same\
+  \ fields.\n\nrollup_status_core: json/yaml include convergerollup.ComputeRollupStatus (bundle-health window + literal gate\
+  \ exit codes + optional child CVS from related_object_refs).\nGate scripts: scripts/check-field-key-literals-repo.sh and\
+  \ scripts/check-zqk-env-literals-repo.sh (same as cvs_outcome_rollup.py). Use --skip-rollup-gates for fast runs.\nEach json/yaml/table\
+  \ run appends one line to .zqk/logs/scheduler/rollup_status_core.jsonl (timestamp + session id + rollup map).\n"
+help:
+  exclude_flags:
+  - format
+  - verbose
+  - timeout
+  - columns
+run_e: schedulerConvergenceMeasure
+common_flags: true
+flags:
+- name: limit
+  type: int
+  default: 500
+  description: Max JSONL lines to read from the end of health.jsonl
+- name: session-id
+  type: string
+  default: ''
+  description: If set (e.g. CVS-*), json/yaml include suggested_convergence_session_fields; required for --format agent-prompt
+    (loads hypothesis, desired_end_state, predictions for the prompt)
+- name: current-phase
+  type: string
+  default: ''
+  description: Optional convergence_session.current_phase for phase_router alignment with --session-id
+- name: flow-variant
+  type: string
+  default: ''
+  description: Optional routing profile (convergence_session.flow_variant), e.g. scheduler_fast
+- name: skip-session-context
+  type: bool
+  default: false
+  description: With --session-id, do not read the CVS object; use only flags for phase routing
+- name: stamp-tombstone
+  type: bool
+  default: false
+  description: With --session-id, add before_state_snapshot to object_update_body from the current measure (iteration anchor)
+- name: finalize-debrief
+  type: bool
+  default: false
+  description: With --session-id, add predictions (merged with retrospective debrief) to object_update_body for session finalize
+- name: debrief-notes
+  type: string
+  default: ''
+  description: With --session-id, free-text operator analysis/handoff for debrief_notes on the CVS (next session); capped
+    length matches spec
+- name: debrief-notes-file
+  type: string
+  default: ''
+  description: Read debrief notes from file (UTF-8); if set, overrides --debrief-notes
+- name: copy
+  type: bool
+  default: false
+  description: With --format agent-prompt, copy markdown to clipboard (macOS pbcopy only)
+- name: paste-cursor
+  type: bool
+  default: false
+  description: With --format agent-prompt, copy then AppleScript (activate Cursor; default ⌘Y before ⌘V+Return; override via
+    ZQK_CURSOR_PASTE_PREFIX_STEPS if needed); macOS; Accessibility for System Events; see scripts/cursor/README.md
+- name: attention-mode
+  type: string
+  default: ''
+  description: 'With --format agent-prompt: none | test_non_directive | interrupt_plumbing (aliases test, interrupt, critical_interrupt_dry_run);
+    prepends banner + <!-- zqk:agent_prompt JSON --> for non-directive or interrupt-queue dry-run'
+- name: agent-prompt-delivery-http-url
+  type: string
+  default: ''
+  description: 'With --format agent-prompt: POST markdown JSON to this URL after primary output (optional; overrides ZQK_AGENT_PROMPT_DELIVERY_HTTP_URL;
+    optional ZQK_AGENT_PROMPT_DELIVERY_HTTP_BEARER)'
+- name: persist-session
+  type: bool
+  default: false
+  description: 'With --session-id, write to the CVS before emitting output (same as convergence_session_tick): full object_update_body
+    when health.jsonl watermark advanced vs last_measurement_at; otherwise append activity_log audit only. Omit flag to emit
+    agent-prompt/json without storage writes'
+- name: skip-rollup-gates
+  type: bool
+  default: false
+  description: Skip FieldKey/ZQK-env literal gate scripts when computing rollup_status_core (faster; omit gate exit codes
+    in output)

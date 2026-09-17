@@ -1,0 +1,22 @@
+$schema: "../../../.zqk/cli/specs/schemas/trait_spec.schema.json"
+
+name: field_queryable_group
+description: Trait group for fields that are commonly used in queries, filters, and sorting.\nIncludes all query-related traits for fields that are frequently searched or filtered.\nUse for identifier fields, timestamps, status fields, and other commonly queried fields.\n
+category: specialized-group
+requires:
+  - readable
+conflicts: []
+includes:
+  - readable
+  - listable
+  - filterable
+  - sortable
+  - searchable
+field_level: true
+object_level: false
+config: {}
+
+created_at: 2026-07-01T18:00:00Z
+updated_at: 2026-07-01T18:00:00Z
+created_by: ACC-1785920548450214012-68b850c0
+updated_by: ACC-1785920548450214012-68b850c0

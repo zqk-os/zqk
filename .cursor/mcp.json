@@ -1,0 +1,17 @@
+{
+  "mcpServers": {
+    "zcom": {
+      "type": "stdio",
+      "command": "${workspaceFolder}/bin/zcom",
+      "args": [
+        "mcp",
+        "serve"
+      ],
+      "env": {
+        "ZQK_MCP_CONFIG_PATH": "${workspaceFolder}/.zqk/mcp/config.yaml",
+        "ZQK_PROJECT_ROOT": "${workspaceFolder}"
+      },
+      "cwd": "${workspaceFolder}"
+    }
+  }
+}

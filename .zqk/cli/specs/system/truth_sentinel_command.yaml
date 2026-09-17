@@ -1,0 +1,16 @@
+$schema: "../schemas/command_spec.schema.json"
+
+name: "truth-sentinel"
+short: "Run the Truth Sentinel daemon or a one-shot audit"
+description: |
+  Monitor the Knowledge Kernel WAL and perform real-time QA audits.
+  --once --ids audits listed objects then exits (no WAL daemon).
+flags:
+  - name: once
+    type: bool
+    default: false
+    description: Audit --ids then exit (do not watch the WAL)
+  - name: ids
+    type: stringSlice
+    default: []
+    description: Object ids to audit when --once is set

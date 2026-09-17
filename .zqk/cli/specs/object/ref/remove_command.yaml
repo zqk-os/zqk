@@ -1,0 +1,41 @@
+$schema: "../../../schemas/command_spec.schema.json"
+
+name: "remove"
+short: "Remove references from an object"
+description: |
+  Removes one or more references from a source object.
+  Can remove specific target IDs across reference fields, remove all references of a specific kind
+  using --kind, or clear all references on the object using --all.
+
+args:
+  type: "minimum"
+  min: 1
+
+flags:
+  - name: "field"
+    type: "string"
+    default: ""
+    description: "Restrict removal to a specific reference field"
+  - name: "kind"
+    type: "string"
+    default: ""
+    description: "Remove all references pointing to objects of this kind"
+  - name: "all"
+    type: "bool"
+    default: false
+    description: "Remove all references across all reference fields on the object"
+  - name: "park"
+    type: "bool"
+    default: false
+    description: "Park parent execution plan (transition to paused) if remaining items reach zero instead of auto-completing"
+
+help:
+  examples:
+    - comment: "Remove specific requirement from backlog item"
+      command: "%s object ref remove BLI-001 REQ-001"
+    - comment: "Remove all criteria references"
+      command: "%s object ref remove REQ-001 --kind criteria"
+    - comment: "Purge all references on an object"
+      command: "%s object ref remove BLI-001 --all"
+
+common_flags: true

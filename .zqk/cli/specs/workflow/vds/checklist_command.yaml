@@ -1,0 +1,32 @@
+$schema: "../../schemas/command_spec.schema.json"
+
+name: "checklist"
+short: "Show VDS stages, chunk contract, and culture brief"
+description: |
+  Orientation only — does not evaluate chunks. Use evaluate before claiming done.
+
+flags:
+  - name: "spine"
+    type: "string"
+    default: ""
+    description: "Spine profile path relative to project root"
+  - name: "customization"
+    type: "string"
+    default: ""
+    description: "Customization profile path relative to project root"
+
+args:
+  type: "no_args"
+
+help:
+  examples:
+    - comment: "JSON checklist"
+      command: "%s workflow vds checklist --format json"
+    - comment: "Markdown brief"
+      command: "%s workflow vds checklist --format agent-prompt"
+  exclude_flags:
+    - "columns"
+    - "ignore-scheduler-down"
+
+run_e: "runVDSChecklist"
+common_flags: true

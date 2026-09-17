@@ -1,0 +1,122 @@
+$schema: "../schemas/command_spec.schema.json"
+
+name: "test-failures"
+short: "List and manage failing tests"
+description: |
+  List and manage failing tests from recent test runs.
+
+  Data sources:
+  - Callback logs under .zqk/callbacks (when callbacks are configured)
+  - Scheduler test-bundle shared events: .zqk/logs/scheduler/cvs/test-bundles/events.jsonl
+  - Rolling health timeline: .zqk/logs/scheduler/cvs/test-bundles/health.jsonl
+
+  Failed bundle event lines include test_failures and suggested_rerun_commands (copy-paste go test
+  lines). Subcommands list and rerun consider both callbacks and test-bundle events.
+
+  Convergence measurement (health rollup, CVS handoff) lives under `zqk scheduler convergence`
+  (measure, overseer), not under test-failures.
+
+help:
+  examples:
+    - comment: "List failing tests (callbacks + test-bundle events)"
+      command: "%s scheduler test-failures list"
+    - comment: "List failures for a specific package"
+      command: "%s scheduler test-failures list --package ./pkg/storage"
+    - comment: "Re-run only failing tests (creates scheduler jobs)"
+      command: "%s scheduler test-failures rerun"
+    - comment: "Summarize test-bundle health from health.jsonl"
+      command: "%s scheduler test-failures health"
+    - comment: "Convergence measure for automation (JSON)"
+      command: "%s scheduler convergence measure --format json"
+    - comment: "Convergence JSON without literal gate scripts (faster; full gates + matrix in cvs_outcome_rollup.py)"
+      command: "%s scheduler convergence measure --format json --skip-rollup-gates"
+    - comment: "Convergence measure with suggested CVS fields for object update"
+      command: "%s scheduler convergence measure --format json --session-id CVS-001"
+    - comment: "Convergence with phase router alignment (current CVS phase + flow variant)"
+      command: "%s scheduler convergence measure --format json --session-id CVS-001 --current-phase c5_verify --flow-variant scheduler_fast"
+    - comment: "Object update payload only (pipe to file for zqk object update --file)"
+      command: "%s scheduler convergence measure --format json --session-id CVS-001 | jq '.suggested_convergence_session_fields.object_update_body'"
+    - comment: "Include iteration tombstone (before_state_snapshot) in object update payload"
+      command: "%s scheduler convergence measure --format json --session-id CVS-001 --stamp-tombstone | jq '.suggested_convergence_session_fields.object_update_body'"
+    - comment: "Finalize: merge predictions with retrospective debrief into object update payload"
+      command: "%s scheduler convergence measure --format json --session-id CVS-001 --finalize-debrief | jq '.suggested_convergence_session_fields.object_update_body.predictions'"
+    - comment: "Handoff: operator debrief notes on the CVS for the next convergence session"
+      command: "%s scheduler convergence measure --format json --session-id CVS-001 --debrief-notes 'Next: focus pkg/scheduler first; watch retention bundle timeouts.' | jq '.suggested_convergence_session_fields.object_update_body.debrief_notes'"
+    - comment: "Agent prompt (markdown for chat) — same command with --format agent-prompt"
+      command: "%s scheduler convergence measure --format agent-prompt --session-id CVS-001"
+    - comment: "Agent prompt to file only (no CVS write; omit --persist-session)"
+      command: "%s scheduler convergence measure --format agent-prompt --session-id CVS-001 -o .zqk/logs/drift/cvs_agent_prompt_latest.md"
+    - comment: "Agent prompt copied to clipboard (macOS pbcopy)"
+      command: "%s scheduler convergence measure --format agent-prompt --session-id CVS-001 --copy"
+    - comment: "Agent prompt then AppleScript: activate Cursor, ⌘Y, ⌘V, Return (macOS; Accessibility)"
+      command: "%s scheduler convergence measure --format agent-prompt --session-id CVS-001 --paste-cursor"
+    - comment: "Agent prompt in test / non-directive mode (banner + machine-parseable comment for queue integration)"
+      command: "%s scheduler convergence measure --format agent-prompt --session-id CVS-001 --attention-mode test_non_directive"
+    - comment: "Persist CVS + log file + clipboard for chat (automated loop handoff; macOS)"
+      command: "%s scheduler convergence measure --format agent-prompt --session-id CVS-001 --persist-session -o .zqk/logs/drift/cvs_agent_prompt_latest.md --copy"
+    - comment: "Persist CVS measurement then emit agent prompt only (no clipboard; use --copy or --paste-cursor for chat)"
+      command: "%s scheduler convergence measure --format agent-prompt --session-id CVS-001 --persist-session"
+    - comment: "Coordinator overseer: rollup + nested CVS tree + arbitrated prompt line"
+      command: "%s scheduler convergence overseer --coordinator-session-id CVS-001 --format json"
+    - comment: "Analyze failure patterns (optional backlog items)"
+      command: "%s scheduler test-failures analyze"
+  exclude_flags:
+    - "format"
+    - "output"
+    - "verbose"
+    - "quiet"
+    - "timeout"
+    - "columns"
+
+common_flags: true
+subcommands:
+  - name: "list"
+    description: "List failing tests from recent runs"
+    flags:
+      - name: "package"
+        type: "string"
+        description: "Filter by package path (e.g., ./pkg/storage)"
+      - name: "limit"
+        type: "int"
+        default: 50
+        description: "Maximum number of failures to show"
+      - name: "since"
+        type: "string"
+        default: "24h"
+        description: "Time range to analyze (e.g., 24h, 7d, 1h)"
+  - name: "rerun"
+    description: "Re-run only failing tests"
+    flags:
+      - name: "package"
+        type: "string"
+        description: "Filter by package path (e.g., ./pkg/storage)"
+      - name: "since"
+        type: "string"
+        default: "24h"
+        description: "Time range to analyze (e.g., 24h, 7d, 1h)"
+  - name: "analyze"
+    description: "Analyze test failures and create backlog items for persistent issues"
+    flags:
+      - name: "since"
+        type: "string"
+        default: "7d"
+        description: "Time range to analyze (e.g., 24h, 7d, 30d)"
+      - name: "min-failures"
+        type: "int"
+        default: 3
+        description: "Minimum number of failures to create a backlog item"
+      - name: "failure-rate"
+        type: "float"
+        default: 0.5
+        description: "Minimum failure rate (0.0-1.0) to consider a test persistently failing"
+      - name: "create-backlog-items"
+        type: "bool"
+        default: false
+        description: "Actually create backlog items (default: dry-run)"
+  - name: "health"
+    description: "Summarize test-bundle pass/fail timeline from health.jsonl"
+    flags:
+      - name: "limit"
+        type: "int"
+        default: 500
+        description: "Max JSONL lines to read from the end of health.jsonl"

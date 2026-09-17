@@ -1,0 +1,27 @@
+# Base Profile Specification
+namespace_id: "zqk:kernel:cli"
+# This is the base profile that all other profiles extend
+# Version: 1.0.0
+
+# Shared Header
+schema_version: "1.0.0"
+kind: profile
+type: cli_context
+metadata:
+  name: "base_profile"
+  description: |
+    Base profile specification that defines the structure for all context profiles.
+    Profiles define flag bundles, command variants, and output preferences for different use cases.
+
+# Domain-Specific Spec (CLI Context)
+spec:
+  format: "table"
+  verbose: false
+  quiet: false
+  flags: {}
+  commands: {}
+  storage:
+    max_page_size: 0
+    default_page_size: 0
+    enable_grouping: false
+    max_group_size: 0

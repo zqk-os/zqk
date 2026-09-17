@@ -1,0 +1,45 @@
+$schema: "../schemas/command_spec.schema.json"
+
+name: "check-policy"
+short: "Check repository policy compliance"
+description: >
+  Check repository policy compliance against governance gates (secrets, doc links,
+  storage boundaries, goroutines, field keys).
+
+aliases:
+  - "policy-check"
+  - "check-repo-policy"
+
+args:
+  type: "minimum"
+  min: 0
+
+flags:
+  - name: "all"
+    type: "bool"
+    default: false
+    description: "Run all registered policy gates"
+  - name: "files"
+    type: "stringSlice"
+    description: "List of files to check (defaults to scanning scope or whole repo)"
+  - name: "scope"
+    type: "string"
+    default: "all"
+    description: "Scope of files to check: 'all', 'staged', or 'working'"
+
+help:
+  examples:
+    - comment: "Run all repository policy checks"
+      command: "%s system check-policy --all"
+    - comment: "Run specific policy check"
+      command: "%s system check-policy secrets"
+    - comment: "Run multiple policy checks"
+      command: "%s system check-policy doc-links storage-boundaries"
+    - comment: "Check specific staged files"
+      command: "%s system check-policy --files=cmd/zqk/main.go,pkg/storage/file.go"
+
+run_e: "runCheckPolicy"
+common_flags: true
+requires_storage: false
+requires_session: false
+requires_scheduler_check: false

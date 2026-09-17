@@ -1,0 +1,165 @@
+$schema: "../../../.zqk/cli/specs/schemas/lifecycle_spec.schema.json"
+
+object_type: agent_instruction
+# Five-question exam: docs/architecture/LIFECYCLE_STATE_MACHINE_RUBRIC.md
+# TRACK: BLI-CEF-R26-REMAINING-KINDS-001
+extends: base_lifecycle
+status_mapping:
+  approved: approved
+  archived: completed
+  error: error
+  implemented: completed
+  in_progress: in_progress
+  proposed: proposed
+statuses:
+  - value: conceptual
+    display: Conceptual
+    origin: true
+    preliminary: true
+    description: Draft plane status. Prior to CAS membrane crossing.
+    role: realign
+  - value: originated
+    display: Originated
+    description: CAS membrane crossed. Object officially originated.
+    role: realign
+  - value: proposed
+    display: Proposed
+    origin: false
+    preliminary: false
+    role: realign
+    description: "agent instruction status 'proposed' (Proposed): not yet committed
+      for execution; reshape before pickup."
+  - value: approved
+    display: Approved
+    description: "agent instruction status 'approved' (Approved): ready for pickup
+      or use; not locked mid-flight."
+    role: shovel_ready
+  - value: rejected
+    display: Rejected
+    terminal: true
+    role: terminal
+    description: "agent instruction status 'rejected' (Rejected): ended; no further
+      normal execution transitions expected. Flags: terminal."
+  - value: in_progress
+    display: In Progress
+    description: "agent instruction status 'in_progress' (In Progress): in flight;
+      treat as scope-locked until it advances or halts."
+    role: execution_locked
+  - value: completed
+    display: Completed
+    terminal: true
+    role: terminal
+    description: "agent instruction status 'completed' (Completed): ended; no further
+      normal execution transitions expected. Flags: terminal."
+  # TRACK: BLI-1785723654802038000-b14064bc — archived used by CAP/history; must be defined (maps to completed in status_mapping).
+  - value: archived
+    display: Archived
+    terminal: true
+    archive: true
+    role: terminal
+    description: "agent instruction status 'archived' (Archived): retained for history;
+      no further execution."
+  - value: error
+    display: Error
+    system: true
+    role: halted
+    description: "agent instruction status 'error' (Error): paused or system-held
+      for repair; resolve before advancing. Flags: system-assigned."
+transitions:
+  - from: conceptual
+    to: originated
+    description: Promote from draft plane to CAS membrane (CAS Qualification).
+    manual: true
+    auto: false
+    catalyst: System promotion
+  - from: originated
+    to: proposed
+    description: Initial domain workflow transition to proposed.
+    manual: true
+    auto: true
+    catalyst: System initialization
+  - from: proposed
+    to: approved
+    description: Human operator approves the instruction
+    manual: true
+    auto: false
+    postconditions:
+      - role is shovel_ready
+  - from: proposed
+    to: rejected
+    description: Human operator rejects the instruction
+    manual: true
+    auto: false
+    postconditions:
+      - role is terminal
+  - from: approved
+    to: in_progress
+    description: Agent begins executing the instruction
+    manual: true
+    auto: true
+    postconditions:
+      - role is execution_locked
+  - from: in_progress
+    to: completed
+    description: Agent completes the instruction successfully
+    manual: true
+    auto: true
+    postconditions:
+      - role is terminal
+  - from: in_progress
+    to: error
+    description: Agent encounters an error during execution
+    manual: true
+    auto: true
+    postconditions:
+      - role is halted
+      - system halt; repair before leaving halted
+  - from: error
+    to: in_progress
+    description: Retry the instruction after fixing the error
+    manual: true
+    auto: false
+    postconditions:
+      - role is execution_locked
+      - recover from system halt after repair
+  - from: '*'
+    to: error
+    description: System error occurred
+    manual: false
+    auto: true
+    postconditions:
+      - role is halted
+      - hop from any occupancy to error
+      - system halt; repair before leaving halted
+  - from: '*'
+    to: archived
+    description: Archive instruction from any status
+    manual: true
+    auto: false
+    postconditions:
+      - role is terminal
+      - hop from any occupancy to archived
+      - ended; no further normal execution hops expected
+  - from: archived
+    to: completed
+    description: Normalize archived historical instruction to completed
+    manual: true
+    auto: false
+    postconditions:
+      - role is terminal
+percent_complete:
+  method: status_defaults
+  default_by_status:
+    conceptual: 0
+    originated: 5
+    proposed: 15
+    approved: 10
+    rejected: 100
+    in_progress: 50
+    completed: 100
+    archived: 100
+    error: 0
+created_at: 2026-07-01T18:00:00Z
+updated_at: 2026-07-01T18:00:00Z
+created_by: ACC-1785920548450214012-68b850c0
+updated_by: ACC-1785920548450214012-68b850c0

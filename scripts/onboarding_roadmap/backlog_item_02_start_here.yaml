@@ -1,0 +1,15 @@
+kind: backlog_item
+schema_version: "2.0.0"
+title: Complete Start Here tutorial
+description: |
+  Follow the "For New Agents and Users - Start Here (Tutorial)" policy:
+  Steps 1–4 (philosophy, mission/vision/goals, policy index, current priority plan).
+priority_plan_ref: PRIO-onboarding
+workstream_refs: []   # Replace with [<WS-ID>] after creating workstream
+priority_tier: P0
+status: planned
+category: Developer Experience
+acceptance_criteria:
+  - "Get Start Here policy: zqk object list policy --filter \"title=For New Agents*\""
+  - "Execute Step 1 (Operational Philosophy), Step 2 (mission/vision/goals), Step 3 (policy index), Step 4 (current priority plan)"
+  - "List current backlog: zqk object list backlog_item --filter priority_plan_ref=<active_plan_id>"

@@ -1,0 +1,266 @@
+schema_version: 2.0.0
+ontology: component
+extends: extensible_object
+visibility: public
+description: 'Component objects represent visual elements in Gantt charts and other visualizations. Components are external domain objects that participate in the constraint system.\nComponents inherit all base_object traits via extensible_object: listable, readable, writable, modifiable, removable, formatable, groupable, filterable, sortable, searchable.\nLifecycle: component_lifecycle.yaml.\n'
+traits:
+  - base_object_traits
+  - constrainable
+fields:
+  component_type:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: system
+      automation_hooks: used for constraint system
+      cardinality: one
+      criticality: composition
+      default: null
+      dependencies: component_types.yaml
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: The type of component (maps to component_types.yaml)
+      security: non-sensitive
+      system_usage:
+        - identification
+        - grouping
+        - constraints
+      validation: |
+        Must match a component type defined in component_types.yaml. Validated dynamically at runtime via GetCachedComponentTypes(). This ensures new component types added to component_types.yaml are automatically valid without requiring spec updates.
+    field_profile_code: COMP-001
+    permissions: r-x
+    semantic_type: identifier
+    traits:
+      - readable
+      - filterable
+      - groupable
+    type: string
+    validation:
+      enum: []
+      required: true
+  constraint_contexts:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: system
+      automation_hooks: used for constraint loading
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: constraint system
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: List of constraint contexts where this component participates
+      security: non-sensitive
+      system_usage:
+        - constraint system
+        - validation
+      validation: Must reference valid constraint contexts
+    field_profile_code: COMP-009
+    permissions: r-x
+    semantic_type: statement
+    traits:
+      - field_read_only_group
+    type: list
+    validation:
+      required: false
+  dashboard_relationships:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: system
+      automation_hooks: used for dashboard rendering
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: display_type (dashboard)
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Dashboard-specific component relationships (widgets, panels, etc.)
+      security: non-sensitive
+      system_usage:
+        - dashboard rendering
+        - hierarchy
+      validation: Must be valid dashboard relationship structure
+    field_profile_code: COMP-006
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+      - modifiable
+    type: list
+    validation:
+      required: false
+  display_ref:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: system
+      automation_hooks: links component to display
+      cardinality: one
+      criticality: association
+      default: null
+      dependencies: display storage
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Reference to the display this component belongs to
+      security: non-sensitive
+      system_usage:
+        - rendering
+        - grouping
+        - validation
+      validation: Must reference valid display instance if provided
+    field_profile_code: COMP-010
+    permissions: r-x
+    semantic_type: reference
+    traits:
+      - field_reference_group
+    type: string
+    validation:
+      pattern: ^DSP-\d+$
+      required: false
+  gantt_relationships:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: system
+      automation_hooks: used for Gantt chart rendering
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: display_type (gantt_chart)
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Gantt-specific component relationships (contains, references, etc.)
+      security: non-sensitive
+      system_usage:
+        - gantt rendering
+        - hierarchy
+      validation: Must be valid Gantt relationship structure
+    field_profile_code: COMP-004
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+      - modifiable
+    type: list
+    validation:
+      required: false
+  kanban_relationships:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: system
+      automation_hooks: used for Kanban board rendering
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: display_type (kanban_board)
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Kanban-specific component relationships (columns, lanes, etc.)
+      security: non-sensitive
+      system_usage:
+        - kanban rendering
+        - hierarchy
+      validation: Must be valid Kanban relationship structure
+    field_profile_code: COMP-005
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - field_mutable_group
+    type: list
+    validation:
+      required: false
+  object_ref:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: system
+      automation_hooks: links component to object
+      cardinality: one
+      criticality: association
+      default: null
+      dependencies: object storage
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: Reference to the underlying object (if component maps to object)
+      security: non-sensitive
+      system_usage:
+        - traceability
+        - validation
+      validation: Must reference valid object if provided
+    field_profile_code: COMP-007
+    permissions: r-x
+    semantic_type: reference
+    traits:
+      - field_reference_group
+    type: string
+    validation:
+      pattern: ^[A-Z]+-\d+$
+      required: false
+  parent_component_refs:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: system
+      automation_hooks: used for component hierarchy
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: component storage, display_type
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: References to parent component instances (varies by display_type)
+      security: non-sensitive
+      system_usage:
+        - hierarchy
+        - rendering
+        - validation
+      validation: Must reference valid component instances if provided
+    field_profile_code: COMP-002
+    permissions: r-x
+    semantic_type: reference
+    traits:
+      - field_reference_group
+    type: list
+    validation:
+      pattern: ^COMP-\d+$
+      required: false
+  semantic_group_refs:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: system
+      automation_hooks: used for semantic grouping
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: semantic group system
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: References to semantic groups this component belongs to
+      security: non-sensitive
+      system_usage:
+        - grouping
+        - filtering
+      validation: Must reference valid semantic groups
+    field_profile_code: COMP-003
+    permissions: r-x
+    semantic_type: reference
+    traits:
+      - field_reference_group
+    type: list
+    validation:
+      required: false

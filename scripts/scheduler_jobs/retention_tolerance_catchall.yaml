@@ -1,0 +1,21 @@
+# Catch-all retention_tolerance job: processes ALL kinds in retention_tolerance.yaml.
+# Do not set KINDS so the handler runs archive/cleanup/max_count for every configured kind.
+# Create via: zqk object create scheduler_job --file scripts/scheduler_jobs/retention_tolerance_catchall.yaml
+id: SCH-retention-tolerance
+title: Retention Tolerance - All Kinds (catch-all)
+description: |
+  Runs retention tolerance for all kinds in retention_tolerance.yaml (no KINDS filter).
+  Enforces archive_after, cleanup_after, and max_count per kind. Complements specialized
+  retention jobs by covering remaining metric kinds (command_metric, base_metric,
+  scheduler_health_metric, etc.) and any future kinds added to the config.
+job_type: retention_tolerance
+trigger_type: timer
+# Every 4h (tighter than daily) so retention_tolerance sweeps archive/cleanup/max_count more often.
+schedule_expression: "0 */4 * * *"
+category: maintenance
+execution_mode: reusable
+max_runtime_seconds: 3600
+enabled: true
+status: active
+namespace_id: zqk:kernel
+schema_version: "2.0.0"

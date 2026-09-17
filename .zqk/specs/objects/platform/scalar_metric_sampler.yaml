@@ -1,0 +1,22 @@
+schema_version: 2.0.0
+ontology: scalar_metric_sampler
+extends: base_sampler
+visibility: internal
+description: 'Sampler configuration for scalar metric types. Specialized sampler for single numeric values (count, duration, size) that can be aggregated using sum, average, min, max operations. '
+traits:
+  - base_object_traits
+fields:
+  batch_size:
+    type: string
+  flush_interval:
+    type: string
+  group_by_object_id:
+    type: string
+  max_batch_size:
+    type: string
+  metric_type:
+    type: string
+    validation:
+      enum:
+        - scalar_metric
+      required: true

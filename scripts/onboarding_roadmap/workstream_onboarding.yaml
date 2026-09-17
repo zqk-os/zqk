@@ -1,0 +1,13 @@
+kind: workstream
+schema_version: "2.0.0"
+# id omitted - system assigns on create
+title: Agent & User Onboarding
+description: |
+  Workstream for onboarding new agents and users to the system. Contains the
+  curriculum (backlog items) that must be completed for adequate understanding
+  before engaging in project work. Completion is tracked per account via
+  certification; see docs/architecture/ONBOARDING_ROADMAP_AND_CERTIFICATION.md.
+category: system
+status: active
+entry_point: docs/enforcement/OBJECT_FIRST_ALIGNMENT.md
+owner_ref: account:system

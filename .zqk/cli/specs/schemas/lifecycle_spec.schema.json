@@ -1,0 +1,290 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://zqk.dev/schemas/lifecycle_spec.schema.json",
+  "title": "Lifecycle Specification Schema",
+  "description": "Schema for lifecycle definitions that define state machines for object kinds",
+  "type": "object",
+  "required": ["object_type", "statuses", "transitions"],
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "Reference to this schema file"
+    },
+    "object_type": {
+      "type": "string",
+      "pattern": "^[a-z_]+$",
+      "description": "The object kind this lifecycle defines states for (e.g., 'backlog_item', 'goal')"
+    },
+    "extends": {
+      "type": "string",
+      "description": "Parent lifecycle to extend (e.g., 'base_lifecycle')"
+    },
+    "status_mapping": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string"
+      },
+      "description": "Mapping from legacy status values to new status values"
+    },
+    "statuses": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/statusDefinition"
+      },
+      "minItems": 1,
+      "description": "List of valid statuses for this object type"
+    },
+    "transitions": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/transitionDefinition"
+      },
+      "minItems": 1,
+      "description": "List of valid transitions between statuses"
+    },
+    "percent_complete": {
+      "type": "object",
+      "properties": {
+        "method": {
+          "type": "string",
+          "enum": ["status_defaults", "metric_based", "custom"]
+        },
+        "default_by_status": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100
+          }
+        }
+      },
+      "description": "Configuration for percent complete calculation"
+    },
+    "metadata": {
+      "type": "object",
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "originating_preconditions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "archive_status": {
+          "type": "string"
+        },
+        "error_status": {
+          "type": "string"
+        }
+      },
+      "description": "Metadata about the lifecycle"
+    }
+  },
+  "definitions": {
+    "statusDefinition": {
+      "type": "object",
+      "required": ["value", "display"],
+      "properties": {
+        "value": {
+          "type": "string",
+          "pattern": "^[a-z_]+$",
+          "description": "Status value identifier (e.g., 'exploring', 'complete')"
+        },
+        "display": {
+          "type": "string",
+          "description": "Human-readable display label"
+        },
+        "origin": {
+          "type": "boolean",
+          "default": false,
+          "description": "Whether this is the origin (starting) status"
+        },
+        "terminal": {
+          "type": "boolean",
+          "default": false,
+          "description": "Whether this is a terminal (ending) status"
+        },
+        "archive": {
+          "type": "boolean",
+          "default": false,
+          "description": "Whether this status represents archival"
+        },
+        "work_done": {
+          "type": "boolean",
+          "default": false,
+          "description": "Whether entering this status means a work interval finished (completable completed_at). Not archive. Tokens differ by kind (complete, resolved, implemented, completed)."
+        },
+        "satisfied": {
+          "type": "boolean",
+          "default": false,
+          "description": "Whether this status means a satisfiable predicate holds (criteria validated/complete). Not a work clock."
+        },
+        "system": {
+          "type": "boolean",
+          "default": false,
+          "description": "Whether this is a system-only/error status"
+        },
+        "preliminary": {
+          "type": "boolean",
+          "default": false,
+          "description": "Whether this is a preliminary/draft status (not shovel-ready)"
+        },
+        "role": {
+          "type": "string",
+          "enum": [
+            "grooming",
+            "shovel_ready",
+            "execution_locked",
+            "enforced",
+            "realign",
+            "halted",
+            "terminal"
+          ],
+          "description": "Cross-kind semantic role for membership, lock, and ranking (TRACK: BLI-CEF-R26-POLICY-PRI-EXAM-001). shovel_ready = ready to execute; execution_locked = in flight / scope locked; enforced = membrane live (policy/role active, not Gantt); realign = not ready for execution-facing scope; halted = in-place repair without scope-creep ambiguity; terminal = done/archived; grooming = plan/backlog reshaping."
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of this status"
+        },
+        "preconditions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Preconditions that must be met for this status"
+        },
+        "shockwave": {
+          "$ref": "#/definitions/shockwavePolicy",
+          "description": "Membrane hop policy when entering this status (inherited via extends unless overridden)"
+        }
+      },
+      "additionalProperties": false
+    },
+    "shockwavePolicy": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "mode": {
+          "type": "string",
+          "enum": ["cluster", "prune", "shared", "none"],
+          "description": "cluster = peer story graph, stop at lineage trunks. prune = cascade reverse dependents (branch cut). shared = seed (+ exclusive_kinds) only; fan-in lanes/views. none = this object only (explicit; empty park defaults to cluster)."
+        },
+        "fail": {
+          "type": "string",
+          "enum": ["closed", "open"],
+          "description": "closed = blocked hop freezes the whole tree. open = skip members that cannot hop (not used for archive)."
+        },
+        "lineage_kinds": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Trunk kinds that cluster hops stop at (child→parent). Prune does not follow refs to these kinds except the seed."
+        },
+        "cluster_kinds": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Story kinds that cluster together (criteria, backlog_item, requirement)."
+        },
+        "cluster_ref_fields": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Reference fields that form the story cluster / downward prune edges."
+        },
+        "lineage_ref_fields": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Child→parent pointer fields. Cluster hops stop here; prune does not walk them (would cut the trunk)."
+        },
+        "exclusive_kinds": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Shared-mode only: edge kinds that may archive with the seed (e.g. workstream_transition). Sibling plans/views do not."
+        }
+      }
+    },
+    "transitionDefinition": {
+      "type": "object",
+      "required": ["from", "to", "description", "manual", "auto"],
+      "properties": {
+        "from": {
+          "type": "string",
+          "description": "Source status (use '*' for any status)"
+        },
+        "to": {
+          "type": "string",
+          "description": "Destination status"
+        },
+        "description": {
+          "type": "string",
+          "description": "Human-readable description of this transition"
+        },
+        "manual": {
+          "type": "boolean",
+          "description": "Whether this transition can be triggered manually"
+        },
+        "auto": {
+          "type": "boolean",
+          "description": "Whether this transition can be triggered automatically"
+        },
+        "preconditions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Qualifying exam before the hop (must be true to enter the transition)"
+        },
+        "postconditions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Hold-after-hop claims that must be true once the object occupies the destination (declarative until an evaluator exists). See docs/architecture/LIFECYCLE_STATE_MACHINE_RUBRIC.md"
+        },
+        "on_dependent_status": {
+          "type": "object",
+          "description": "Auto shockwave trigger: fire when a dependent object of kind reaches status to (TRACK: [REDACTED-ID])",
+          "required": ["kind", "to"],
+          "properties": {
+            "kind": {
+              "type": "string",
+              "description": "Dependent object kind (e.g. backlog_item)"
+            },
+            "to": {
+              "description": "Dependent status (or list of statuses) that triggers this transition",
+              "oneOf": [
+                { "type": "string" },
+                {
+                  "type": "array",
+                  "items": { "type": "string" },
+                  "minItems": 1
+                }
+              ]
+            }
+          },
+          "additionalProperties": false
+        },
+        "side_effects": {
+          "type": "array",
+          "description": "Field side effects applied when the transition fires (e.g. clear active_order)",
+          "items": {
+            "type": "object",
+            "properties": {
+              "clear": {
+                "type": "string",
+                "description": "Object field to clear (set null) when the transition applies"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "shockwave": {
+          "$ref": "#/definitions/shockwavePolicy",
+          "description": "Override membrane hop policy for this edge (merged onto the destination status policy)"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

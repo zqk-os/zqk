@@ -1,0 +1,463 @@
+schema_version: 2.0.0
+ontology: base_metric
+urn: urn:zqk:spec:kernel:base_metric
+namespace: zqk:kernel
+extends: base_object
+visibility: internal
+storage_profile: stream
+description: 'Base specification for all metric objects. Provides common fields and traits for tracking measurements, statistics, and performance data across the system. '
+traits:
+  - listable
+  - readable
+  - writable
+  - modifiable
+  - formatable
+  - groupable
+  - filterable
+  - sortable
+  - searchable
+fields:
+  batch_size:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation (metrics sampler)
+      automation_hooks: populated by metrics sampler to indicate the batch size used for sampling.
+      cardinality: zero_or_one
+      criticality: association
+      default: null
+      dependencies: metrics sampler system.
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: Batch size used when creating this metric from sampled events (only present if sampled=true).
+      security: non-sensitive
+      system_usage:
+        - analysis
+        - performance tracking
+      validation: Positive integer.
+    field_profile_code: BMT-014
+    permissions: r-x
+    semantic_type: measurement
+    traits:
+      - readable
+      - filterable
+    type: integer
+    validation:
+      required: false
+  collection_count:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation (metrics store)
+      automation_hooks: used for frequency analysis.
+      cardinality: one
+      criticality: composition
+      default: 0
+      dependencies: metrics collection system.
+      observability: "yes"
+      origin_lifecycle: mutable (incremented on each collection)
+      purpose: Total number of times this metric has been collected.
+      security: non-sensitive
+      system_usage:
+        - reporting
+        - analysis
+        - frequency tracking
+      validation: Non-negative integer.
+    field_profile_code: BMT-004
+    permissions: rwx
+    semantic_type: measurement
+    traits:
+      - filterable
+      - listable
+      - readable
+      - sortable
+      - writable
+    type: integer
+    validation:
+      required: true
+  context:
+    access:
+      requires:
+        - access:confidential
+    permissions: rwx
+    semantic_type: expression
+    traits:
+      - readable
+      - writable
+    type: object
+    validation:
+      required: false
+  field_name:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation (metrics pipeline)
+      automation_hooks: populated by metrics pipeline for field-level aggregation.
+      cardinality: zero_or_one
+      criticality: association
+      default: null
+      dependencies: metrics pipeline system.
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: Field name that was aggregated to create this metric (e.g., \\\"duration_seconds\\\", \\\"status_history\\\").
+      security: non-sensitive
+      system_usage:
+        - filtering
+        - grouping
+        - attribution
+      validation: Valid field name.
+    field_profile_code: BMT-008
+    permissions: r-x
+    semantic_type: identifier
+    traits:
+      - readable
+      - filterable
+    type: string
+    validation:
+      required: false
+  first_seen:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation (metrics store)
+      automation_hooks: used for temporal analysis.
+      cardinality: one
+      criticality: association
+      default: auto-populated on first collection
+      dependencies: metrics collection system.
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: ISO 8601 timestamp of first metric collection.
+      security: non-sensitive
+      system_usage:
+        - temporal analysis
+        - trend tracking
+      validation: ISO 8601 timestamp format.
+    field_profile_code: BMT-002
+    permissions: r-x
+    semantic_type: timestamp
+    traits:
+      - readable
+      - writable
+      - filterable
+      - sortable
+    type: string
+    validation:
+      pattern: ^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$
+      required: true
+  last_seen:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation (metrics store)
+      automation_hooks: used for detecting stale metrics.
+      cardinality: one
+      criticality: association
+      default: auto-populated on each collection
+      dependencies: metrics collection system.
+      observability: "yes"
+      origin_lifecycle: mutable (updated on each collection)
+      purpose: ISO 8601 timestamp of most recent metric collection.
+      security: non-sensitive
+      system_usage:
+        - temporal analysis
+        - staleness detection
+      validation: ISO 8601 timestamp format.
+    field_profile_code: BMT-003
+    permissions: rwx
+    semantic_type: timestamp
+    traits:
+      - filterable
+      - readable
+      - sortable
+      - writable
+    type: string
+    validation:
+      pattern: ^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$
+      required: true
+  metric_type:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation (metric collector)
+      automation_hooks: used for metric routing and aggregation.
+      cardinality: one
+      criticality: composition
+      default: required - must be specified
+      dependencies: metric collection system.
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: Type of metric (command, performance, system, application, custom).
+      security: non-sensitive
+      system_usage:
+        - filtering
+        - grouping
+        - reporting
+        - analysis
+      validation: Must be one of defined metric types.
+    field_profile_code: BMT-001
+    permissions: r-x
+    semantic_type: statement
+    traits:
+      - listable
+      - readable
+      - writable
+      - groupable
+      - filterable
+      - sortable
+      - searchable
+    type: enum
+    validation:
+      enum:
+        - command
+        - performance
+        - system
+        - application
+        - custom
+      required: true
+  metric_type_specific:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation (metrics pipeline)
+      automation_hooks: populated by metrics pipeline to indicate specific metric type (scalar_metric, list_metric, etc.).
+      cardinality: zero_or_one
+      criticality: association
+      default: null
+      dependencies: metrics pipeline system.
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: Specific metric type from metrics pipeline (e.g., \\\"scalar_metric\\\", \\\"list_metric\\\", \\\"status_history_metric\\\").
+      security: non-sensitive
+      system_usage:
+        - filtering
+        - grouping
+        - aggregation routing
+      validation: Valid metric type identifier.
+    field_profile_code: BMT-009
+    permissions: r-x
+    semantic_type: statement
+    traits:
+      - field_reference_group
+    type: string
+    validation:
+      required: false
+  object_count:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation (metrics pipeline)
+      automation_hooks: populated by metrics pipeline to indicate number of objects aggregated.
+      cardinality: zero_or_one
+      criticality: composition
+      default: null
+      dependencies: metrics pipeline system.
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: Number of objects that were aggregated to create this metric.
+      security: non-sensitive
+      system_usage:
+        - reporting
+        - analysis
+        - validation
+      validation: Non-negative integer.
+    field_profile_code: BMT-010
+    permissions: r-x
+    semantic_type: measurement
+    traits:
+      - readable
+      - filterable
+      - sortable
+    type: integer
+    validation:
+      required: false
+  object_kind:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation (metrics pipeline)
+      automation_hooks: populated by metrics pipeline for aggregation metadata.
+      cardinality: zero_or_one
+      criticality: association
+      default: null
+      dependencies: metrics pipeline system.
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: Object kind that was aggregated to create this metric (e.g., \\\"audit_event\\\", \\\"backlog_item\\\").
+      security: non-sensitive
+      system_usage:
+        - filtering
+        - grouping
+        - attribution
+      validation: Valid object kind identifier.
+    field_profile_code: BMT-007
+    permissions: r-x
+    semantic_type: identifier
+    traits:
+      - filterable
+      - groupable
+      - readable
+    type: string
+    validation:
+      required: false
+  sampled:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation (metrics sampler)
+      automation_hooks: populated by metrics sampler to indicate if this metric was created from sampled/batched events.
+      cardinality: zero_or_one
+      criticality: association
+      default: false
+      dependencies: metrics sampler system.
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: Boolean indicating if this metric was created from sampled/batched events (true) or direct aggregation (false).
+      security: non-sensitive
+      system_usage:
+        - filtering
+        - analysis
+        - performance tracking
+      validation: Boolean value.
+    field_profile_code: BMT-013
+    permissions: r-x
+    semantic_type: statement
+    traits:
+      - field_reference_group
+    type: boolean
+    validation:
+      required: false
+  source:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation (metric collector)
+      automation_hooks: used for source attribution.
+      cardinality: zero_or_one
+      criticality: association
+      default: null (optional)
+      dependencies: metric collection system.
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: Source or origin of the metric (e.g., \\\"cli\\\", \\\"api\\\", \\\"scheduler\\\", \\\"event\\\").
+      security: non-sensitive
+      system_usage:
+        - filtering
+        - grouping
+        - attribution
+      validation: Free-form string, max 200 chars.
+    field_profile_code: BMT-005
+    permissions: r-x
+    semantic_type: statement
+    traits:
+      - filterable
+      - readable
+      - searchable
+      - sortable
+      - writable
+    type: string
+    validation:
+      max_length: 200
+      required: false
+  tags:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation or user
+      automation_hooks: used for metric organization and discovery.
+      cardinality: zero_or_many
+      criticality: association
+      default: []
+      dependencies: none
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Optional tags for categorizing and filtering metrics.
+      security: non-sensitive
+      system_usage:
+        - filtering
+        - grouping
+        - organization
+      validation: Array of strings, each max 50 chars.
+    field_profile_code: BMT-006
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+      - filterable
+      - groupable
+    type: array
+    validation:
+      required: false
+  window_end:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation (metrics pipeline)
+      automation_hooks: populated by metrics pipeline to indicate aggregation window end.
+      cardinality: zero_or_one
+      criticality: association
+      default: null
+      dependencies: metrics pipeline system.
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: ISO 8601 timestamp of the end of the aggregation window.
+      security: non-sensitive
+      system_usage:
+        - temporal analysis
+        - window validation
+      validation: ISO 8601 timestamp format.
+    field_profile_code: BMT-012
+    permissions: r-x
+    semantic_type: timestamp
+    traits:
+      - readable
+      - filterable
+      - sortable
+    type: string
+    validation:
+      pattern: ^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$
+      required: false
+  window_start:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation (metrics pipeline)
+      automation_hooks: populated by metrics pipeline to indicate aggregation window start.
+      cardinality: zero_or_one
+      criticality: association
+      default: null
+      dependencies: metrics pipeline system.
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: ISO 8601 timestamp of the start of the aggregation window.
+      security: non-sensitive
+      system_usage:
+        - temporal analysis
+        - window validation
+      validation: ISO 8601 timestamp format.
+    field_profile_code: BMT-011
+    permissions: r-x
+    semantic_type: timestamp
+    traits:
+      - filterable
+      - readable
+      - sortable
+    type: string
+    validation:
+      pattern: ^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$
+      required: false

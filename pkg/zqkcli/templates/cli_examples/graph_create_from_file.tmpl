@@ -1,0 +1,8 @@
+# Create {kind} from file (using graph backend)
+# Ensure {cli_env_prefix}_GRAPH_ENABLED=true is set
+export {cli_env_prefix}_GRAPH_ENABLED=true
+{cli} object create {kind} --file {kind}.yaml
+
+# Example {kind}.yaml:
+{yaml_example_commented}
+

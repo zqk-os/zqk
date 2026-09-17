@@ -1,0 +1,224 @@
+schema_version: 2.0.0
+ontology: important_date
+extends: base_object
+visibility: public
+description: 'Important date tracks critical dates and their impact (deadlines, milestones, market windows).\nUsed by alignment and context validation. See project-discovery-and-strategic-alignment-v1.0.md.\nLifecycle: important_date_lifecycle.yaml.\n'
+traits:
+  - base_object_traits
+fields:
+  date:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: used for timeline alignment and reminders.
+      cardinality: one
+      criticality: composition
+      default: required at creation
+      dependencies: none.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: ISO-8601 date (e.g. 2026-03-31).
+      security: non-sensitive
+      system_usage:
+        - alignment
+        - reminders
+      validation: ISO-8601 date format.
+    field_profile_code: DATE-001
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - field_mutable_group
+      - filterable
+      - listable
+      - sortable
+    type: string
+    validation:
+      required: false
+  date_type:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: used for filtering (deadline vs milestone vs window).
+      cardinality: one
+      criticality: composition
+      default: null
+      dependencies: none.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Type of date (e.g. deadline, milestone, market_window).
+      security: non-sensitive
+      system_usage:
+        - alignment
+      validation: Free-form string.
+    field_profile_code: DATE-002
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - field_mutable_group
+      - filterable
+    type: string
+    validation:
+      required: false
+  dependencies:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: used for dependency analysis.
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: none.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Free-form dependency descriptions (e.g. MIL-010 must complete by 2026-03-15).
+      security: non-sensitive
+      system_usage:
+        - alignment
+      validation: List of strings.
+    field_profile_code: DATE-007
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - field_mutable_group
+    type: list
+    validation:
+      required: false
+  goal_refs:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: used for goal-date alignment (related_goals in doc).
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: goal registry.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Goals related to this date.
+      security: non-sensitive
+      system_usage:
+        - alignment
+      validation: Must reference existing goal IDs.
+    field_profile_code: DATE-005
+    permissions: r-x
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+      - field_reference_group
+    type: list
+    validation:
+      required: false
+  impact_scope:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: used for scope filtering.
+      cardinality: one
+      criticality: association
+      default: null
+      dependencies: none.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Scope of impact (e.g. project_wide, team, release).
+      security: non-sensitive
+      system_usage:
+        - alignment
+      validation: Free-form string.
+    field_profile_code: DATE-004
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - field_mutable_group
+    type: string
+    validation:
+      required: false
+  importance:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: used for prioritization in reports.
+      cardinality: one
+      criticality: association
+      default: null
+      dependencies: none.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Importance level (e.g. critical, high, medium).
+      security: non-sensitive
+      system_usage:
+        - alignment
+      validation: Free-form string.
+    field_profile_code: DATE-003
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - field_mutable_group
+      - filterable
+    type: string
+    validation:
+      required: false
+  milestone_refs:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: used for milestone-date alignment (related_milestones in doc).
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: milestone registry.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Milestones related to this date.
+      security: non-sensitive
+      system_usage:
+        - alignment
+      validation: Must reference existing milestone IDs.
+    field_profile_code: DATE-006
+    permissions: r-x
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+      - field_reference_group
+    type: list
+    validation:
+      required: false
+  stakeholder_notifications:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: used for reminder scheduling.
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: none.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: List of {stakeholder, notification_days_before} for reminders.
+      security: non-sensitive
+      system_usage:
+        - notifications
+      validation: List of objects.
+    field_profile_code: DATE-008
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - field_mutable_group
+    type: list
+    validation:
+      required: false

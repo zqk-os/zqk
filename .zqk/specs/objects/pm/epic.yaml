@@ -1,0 +1,185 @@
+schema_version: 2.0.0
+ontology: epic
+urn: urn:zqk:spec:project_mgmt:epic
+namespace: zqk:project_mgmt
+extends: base_object
+composes:
+  - work_interval
+visibility: public
+description: 'Epic (Cellular Objective / Enclave Scope) defines the bounding domain for compound goals and child work units. It establishes scope boundaries and invariant gate requirements that must clear before promotion to authoritative truth.\nLifecycle: epic_lifecycle.yaml.\n'
+traits:
+  - base_object_traits
+  - completable
+  - manipulatable
+fields:
+  enclave_scope:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: architect/owner.
+      automation_hooks: bounds child work unit permissions and blast radius.
+      cardinality: one
+      criticality: composition
+      default: null
+      dependencies: none.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Defines the architectural and operational boundary of what member work units can touch.
+      security: non-sensitive
+      system_usage:
+        - planning
+        - scope_boundary
+        - isolation
+      validation: markdown or text statement.
+    field_profile_code: EPC-001
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - field_mutable_group
+      - readable
+      - writable
+      - modifiable
+    type: text
+    validation:
+      required: false
+  goal_refs:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner/planner.
+      automation_hooks: maps epic to strategic goals.
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: goal registry.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Goals this epic directly supports.
+      security: non-sensitive
+      system_usage:
+        - traceability
+        - alignment
+      validation: valid goal IDs.
+    field_profile_code: EPC-002
+    permissions: rwx
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+      - field_reference_group
+    type: list
+    validation:
+      required: false
+  workstream_refs:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner/planner.
+      automation_hooks: associates epic with workstream execution tracks.
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: workstream registry.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Workstreams executing components of this epic.
+      security: non-sensitive
+      system_usage:
+        - planning
+        - reporting
+      validation: valid workstream IDs.
+    field_profile_code: EPC-003
+    permissions: rwx
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+      - field_reference_group
+    type: list
+    validation:
+      required: false
+  requirement_refs:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: architect/owner.
+      automation_hooks: links requirements under this epic umbrella.
+      cardinality: many
+      criticality: composition
+      default: []
+      dependencies: requirement registry.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Functional and architectural requirements governed by this epic.
+      security: non-sensitive
+      system_usage:
+        - traceability
+        - coverage
+      validation: valid requirement IDs.
+    field_profile_code: EPC-004
+    permissions: rwx
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+      - field_reference_group
+    type: list
+    validation:
+      required: false
+  backlog_item_refs:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner/planner.
+      automation_hooks: child work units belonging to this epic.
+      cardinality: many
+      criticality: composition
+      default: []
+      dependencies: backlog registry.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Atomic work units (BLIs) executing under this epic scope.
+      security: non-sensitive
+      system_usage:
+        - execution
+        - rollup
+      validation: valid backlog item IDs.
+    field_profile_code: EPC-005
+    permissions: rwx
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+      - field_reference_group
+    type: list
+    validation:
+      required: false
+  priority_plan_refs:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner/planner.
+      automation_hooks: links priority execution plans implementing this epic.
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: priority plan registry.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Priority plans driving execution of this epic.
+      security: non-sensitive
+      system_usage:
+        - execution
+        - scheduling
+      validation: valid priority plan IDs.
+    field_profile_code: EPC-006
+    permissions: rwx
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+      - field_reference_group
+    type: list
+    validation:
+      required: false

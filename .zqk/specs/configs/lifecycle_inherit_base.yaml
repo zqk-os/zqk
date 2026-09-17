@@ -1,0 +1,68 @@
+# Kinds that intentionally occupy base_object_lifecycle
+# (proposed → approved → in_progress → implemented). This IS the five-question
+# exam: same machine as base_object; do not mint a fake kind-owned graph.
+# Loader fallback: pkg/objects.LoadLifecycle already uses base_object when
+# KIND_lifecycle.yaml is absent. This list makes that decision census-visible.
+# TRACK: BLI-CEF-R26-REMAINING-KINDS-001
+inherit_base:
+  - api_spec
+  - auto_fix_rule
+  - base_metric
+  - base_sampler
+  - brand
+  - capability
+  - capacity_advertisement
+  - certificate
+  - code_reference
+  - command_metric
+  - command_spec
+  - compute_advertisement
+  - context_refresh_schedule
+  - corporate_initiative
+  - department
+  - digital_asset
+  - extensible_object
+  - field_registry
+  - file_lock_metric
+  - fission_event
+  - impact_analysis
+  - inference_heuristic
+  - integrity_manifest
+  - kind_mapping_metric
+  - library
+  - lifecycle
+  - list_metric_sampler
+  - maturation_report
+  - metadata_package
+  - metrics_feedback
+  - object_spec
+  - ordered_list_metric_sampler
+  - organizational_change
+  - partnership
+  - pipeline
+  - pipeline_definition
+  - pipeline_execution
+  - process_hygiene_rule
+  - provider_profile
+  - release
+  - remote_kernel
+  - resolver
+  - rollback_report
+  - rule
+  - sampler_profile
+  - scalar_metric_sampler
+  - scenario
+  - scheduler_handler_binding
+  - shockwave_router
+  - status_history_metric_sampler
+  - team
+  - team_configuration
+  - technical_spec
+  - template
+  - test_audit_aggregation_metric
+  - test_command_rule
+  - translation_manifest
+  - validation_rule
+  - visual_plan
+  - vitality_report
+  - watchdog_registration

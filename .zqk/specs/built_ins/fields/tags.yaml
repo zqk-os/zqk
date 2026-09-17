@@ -1,0 +1,9 @@
+type: list
+semantic_type: tags
+description: "Classification labels or tags associated with the entity."
+default: []
+traits:
+  - readable
+  - filterable
+validation:
+  required: false

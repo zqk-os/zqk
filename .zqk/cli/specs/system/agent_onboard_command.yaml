@@ -1,0 +1,64 @@
+$schema: "../schemas/command_spec.schema.json"
+
+name: "agent-onboard"
+short: "Detect agent hosts, seed seating, and sync workspace↔kernel directives"
+description: >
+  Fail-closed first-contact sequence for Vector A (existing IDE/agent hosts) and
+  a thin Vector B path (no public agent markers): detect → auth warn → seat →
+  prime regenerable vendor directives (+ .zqk/agent_packs) → write
+  .zqk/config/agent_workspace_sync.json → smoke. Does not expand studio ontology
+  into the community seed.
+
+args:
+  type: "no_args"
+
+flags:
+  - name: "dry-run"
+    type: "bool"
+    default: false
+    description: "Plan stages without seating or writing files"
+  - name: "detect-only"
+    type: "bool"
+    default: false
+    description: "Only scan workspace markers; skip seat/prime/smoke writes"
+  - name: "skip-seat"
+    type: "bool"
+    default: false
+    description: "Skip default seating seed"
+  - name: "skip-prime"
+    type: "bool"
+    default: false
+    description: "Skip writing vendor directive files"
+  - name: "all-vendors"
+    type: "bool"
+    default: false
+    description: "Write directive files for every known vendor (not only detected)"
+  - name: "headless"
+    type: "bool"
+    default: false
+    description: "Force Vector B path: prime AGENTS.md only (skip IDE rule forests unless --all-vendors)"
+  - name: "force"
+    type: "bool"
+    default: false
+    description: "Overwrite existing vendor directive files (default skips to avoid clobbering)"
+  - name: "vendors"
+    type: "string"
+    default: ""
+    description: "Comma-separated vendor ids to prime (cursor,claude_code,cline,…)"
+
+help:
+  examples:
+    - comment: "Full sync for the current workspace"
+      command: "%s system agent-onboard"
+    - comment: "Headless / appliance (Vector B)"
+      command: "%s system agent-onboard --headless --format json"
+    - comment: "Detect only (JSON)"
+      command: "%s system agent-onboard --detect-only --format json"
+    - comment: "Dry-run plan"
+      command: "%s system agent-onboard --dry-run --format json"
+  exclude_flags:
+    - "columns"
+    - "ignore-scheduler-down"
+
+run_e: "runAgentOnboard"
+common_flags: true

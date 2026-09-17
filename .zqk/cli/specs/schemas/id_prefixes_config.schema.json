@@ -1,0 +1,86 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://zqk.dev/schemas/id_prefixes_config.schema.json",
+  "title": "ID Prefixes Configuration Schema",
+  "description": "Schema for ID prefix configuration that maps object kinds to ID prefixes",
+  "type": "object",
+  "required": ["kind_to_prefixes"],
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "Reference to this schema file"
+    },
+    "description": {
+      "type": "string",
+      "description": "Human-readable description of this configuration"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "Configuration version"
+    },
+    "default_strategy": {
+      "type": "object",
+      "properties": {
+        "method": {
+          "type": "string",
+          "enum": ["first_part_upper_3", "base_upper_3", "first_3_upper"]
+        },
+        "example": {
+          "type": "string"
+        }
+      },
+      "description": "Default strategy for prefix inference"
+    },
+    "inference_rules": {
+      "type": "object",
+      "properties": {
+        "patterns": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["pattern", "prefix_template"],
+            "properties": {
+              "pattern": {
+                "type": "string",
+                "description": "Regex pattern to match kind names"
+              },
+              "prefix_template": {
+                "type": "string",
+                "description": "Template for generating prefix (e.g., '{base_upper_3}-')"
+              },
+              "example": {
+                "type": "string",
+                "description": "Example transformation"
+              }
+            }
+          }
+        }
+      },
+      "description": "Rules for inferring prefixes from kind names"
+    },
+    "kind_to_prefixes": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "minItems": 1,
+        "description": "List of valid prefixes for this kind (first is primary)"
+      },
+      "description": "Mapping from object kind to list of valid prefixes"
+    },
+    "kind_to_synonyms": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      },
+      "description": "Mapping from object kind to synonym aliases"
+    }
+  },
+  "additionalProperties": false
+}

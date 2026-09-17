@@ -1,0 +1,85 @@
+$schema: "../../schemas/command_spec.schema.json"
+
+name: "list"
+short: "List objects of a specific kind"
+description: |
+  List objects of a specific kind with filtering, sorting, pagination, grouping, and optional field projection.
+
+  Full objects are loaded from storage (including overlays), then projection keeps only the requested top-level keys,
+  reducing serialized output size. Use --fields with top-level YAML keys (repeat flag or comma-separated values).
+  --sort-by and --group-by columns are included in the projection automatically when those flags are set.
+
+  If no kind is specified, shows available object kinds.
+
+args:
+  type: "maximum"
+  max: 1
+
+flags:
+  - name: "allow-degraded"
+    type: "bool"
+    default: false
+    description: "Allow running when scheduler daemon is not running (results may be partial/stale)"
+  - name: "namespace"
+    type: "string"
+    default: ""
+    description: "Restrict results to this namespace_id (when omitted, default kernel isolation applies)"
+  - name: "federated"
+    type: "bool"
+    default: false
+    description: "Disable namespace isolation and query across all namespaces"
+  - name: "all-namespaces"
+    type: "bool"
+    default: false
+    description: "Alias for --federated"
+
+help:
+  examples:
+    - comment: "List all backlog items"
+      command: "%s list backlog_item"
+    - comment: "List with filtering"
+      command: "%s list backlog_item --filter status=exploring"
+    - comment: "List a specific namespace"
+      command: "%s list team --namespace tenant:acme"
+    - comment: "List across namespaces"
+      command: "%s list team --federated"
+    - comment: "List with sorting"
+      command: "%s list backlog_item --sort-by title --sort-asc"
+    - comment: "List id and updated_at only (projection)"
+      command: "%s list backlog_item --fields id,updated_at --sort-by updated_at"
+    - comment: "List with pagination"
+      command: "%s list backlog_item --offset 0 --limit 10"
+    - comment: "List with grouping"
+      command: "%s list backlog_item --group-by status"
+    - comment: "List with negation filter"
+      command: "%s list backlog_item --filter 'status!=\"complete|archived\"'"
+    - comment: "List with context-specific pagination (if configured)"
+      command: "%s list backlog_item --context pagination"
+    - comment: "List with multiple filters"
+      command: "%s list backlog_item --filter status=exploring --filter priority=high"
+    - comment: "Show available kinds"
+      command: "%s list"
+  exclude_flags:
+    - "format"
+    - "output"
+    - "verbose"
+    - "quiet"
+    - "timeout"
+    - "columns"
+
+run_e: "runList"
+common_flags: true
+query_flags: true
+
+# Trait requirements
+required_traits:
+  - listable  # Objects must be listable to be listed
+conditional_traits:
+  - flag: "group-by"
+    traits: ["groupable"]  # Requires groupable trait when --group-by is used
+  - flag: "filter"
+    traits: ["filterable"]  # Requires filterable trait when --filter is used
+  - flag: "sort-by"
+    traits: ["sortable"]    # Requires sortable trait when --sort-by is used
+  - flag: "fields"
+    traits: ["listable"]    # Same as list; projection is post-load only

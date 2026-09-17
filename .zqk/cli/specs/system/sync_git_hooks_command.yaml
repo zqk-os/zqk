@@ -1,0 +1,61 @@
+$schema: "../schemas/command_spec.schema.json"
+
+name: "sync-git-hooks"
+short: "Sync git hook templates to a git hooks directory"
+description: |
+  Synchronize git hook templates to a target git hooks directory.
+
+  Sync installs missing hooks, refreshes hooks whose content drifted from the
+  template, and repairs hooks that lost their executable bit. Git silently
+  ignores a hook it cannot execute, so a hook can look installed and still never
+  run; sync treats that as out of sync.
+
+  Use --disable to turn a hook off and --enable to turn it back on. Disabling
+  renames the hook to <hook>.disabled, which is the standard way to park a git
+  hook, and sync leaves disabled hooks alone instead of reinstalling them.
+
+args:
+  type: "exact"
+  count: 0
+
+flags:
+  - name: "dry-run"
+    type: "bool"
+    default: false
+    description: "Report only, exit with error if out of sync"
+  - name: "source"
+    type: "string"
+    default: "tools/git-hooks"
+    description: "Source directory containing git hook templates"
+  - name: "target"
+    type: "string"
+    default: ".git/hooks"
+    description: "Target directory to install git hooks"
+  - name: "list"
+    type: "bool"
+    default: false
+    description: "List installed hooks with their enabled or disabled state"
+  - name: "disable"
+    type: "string"
+    default: ""
+    description: "Turn off a hook by name (e.g. pre-commit)"
+  - name: "enable"
+    type: "string"
+    default: ""
+    description: "Turn a previously disabled hook back on"
+
+help:
+  examples:
+    - comment: "Sync git hooks from tools/git-hooks to .git/hooks"
+      command: "%s system sync-git-hooks"
+    - comment: "Run dry-run report without making modifications"
+      command: "%s system sync-git-hooks --dry-run"
+    - comment: "Show which hooks are installed and whether they are enabled"
+      command: "%s system sync-git-hooks --list"
+    - comment: "Turn off the pre-commit hook"
+      command: "%s system sync-git-hooks --disable pre-commit"
+    - comment: "Turn the pre-commit hook back on"
+      command: "%s system sync-git-hooks --enable pre-commit"
+
+run_e: "runSyncGitHooks"
+common_flags: false

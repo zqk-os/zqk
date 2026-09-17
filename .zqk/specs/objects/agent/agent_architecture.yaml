@@ -1,0 +1,169 @@
+schema_version: 2.0.0
+ontology: agent_architecture
+extends: base_object
+visibility: public
+description: 'Defines the architecture for a specialized agent, including components, integration points, and system requirements. Documents all \"tendrils\" (connections and impacts) of an agent.\nLifecycle: agent_architecture_lifecycle.yaml.\n'
+traits:
+  - base_object_traits
+fields:
+  agent_type:
+    access:
+      requires:
+        - access:confidential
+        - role:admin
+    checklist:
+      authority: automation/admin
+      automation_hooks: determines architecture requirements
+      cardinality: one
+      criticality: composition
+      default: required
+      dependencies: none
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: Type of agent this architecture defines.
+      security: non-sensitive
+      system_usage:
+        - agent_management
+        - architecture_documentation
+      validation: enum
+    field_profile_code: AGENT-ARCH-001
+    permissions: r-x
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+      - filterable
+      - sortable
+      - searchable
+    type: enum
+    validation:
+      enum:
+        - observer
+        - test_agent
+        - coder_agent
+        - devops_agent
+        - documentation_agent
+        - optimization_agent
+      required: true
+  components:
+    access:
+      requires:
+        - access:confidential
+        - role:admin
+    checklist:
+      authority: automation/admin
+      automation_hooks: used for component tracking
+      cardinality: many
+      criticality: composition
+      default: []
+      dependencies: none
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: List of components in this agent's architecture.
+      security: non-sensitive
+      system_usage:
+        - architecture_documentation
+        - implementation_planning
+      validation: List of component objects
+    field_profile_code: AGENT-ARCH-002
+    permissions: rwx
+    semantic_type: expression
+    traits:
+      - readable
+      - writable
+      - modifiable
+    type: list
+    validation:
+      required: false
+  id:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation (Generator)
+      automation_hooks: used for cross-file references.
+      cardinality: one
+      criticality: composition
+      default: auto-assigned per kind sequence
+      dependencies: linkage constraints, URN creation.
+      observability: logged + manifests.
+      origin_lifecycle: immutable
+      purpose: Stable identifier used across the graph (\\\"AGENT-ARCH-####\\\").
+      security: non-sensitive
+      system_usage:
+        - linking
+        - reporting
+        - URIs
+      validation: regex ^AGENT-ARCH-\\\\d{3,}$; uniqueness enforced.
+    permissions: r-x
+    semantic_type: statement
+    traits:
+      - listable
+      - readable
+      - writable
+      - filterable
+      - sortable
+      - searchable
+    type: string
+    validation:
+      pattern: ^AGENT-ARCH-\d{3,}$
+      required: true
+  integration_points:
+    access:
+      requires:
+        - access:confidential
+        - role:admin
+    checklist:
+      authority: automation/admin
+      automation_hooks: used for integration tracking
+      cardinality: many
+      criticality: composition
+      default: []
+      dependencies: none
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: List of integration points (tendrils) for this agent.
+      security: non-sensitive
+      system_usage:
+        - architecture_documentation
+        - integration_planning
+      validation: List of integration point objects
+    field_profile_code: AGENT-ARCH-003
+    permissions: rwx
+    semantic_type: expression
+    traits:
+      - readable
+      - writable
+      - modifiable
+    type: list
+    validation:
+      required: false
+  role_ref:
+    access:
+      requires:
+        - access:confidential
+        - role:admin
+    checklist:
+      authority: automation/admin
+      automation_hooks: used for role linking
+      cardinality: one
+      criticality: association
+      default: optional
+      dependencies: role must exist
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Reference to the role definition for this agent.
+      security: non-sensitive
+      system_usage:
+        - role_management
+        - permission_tracking
+      validation: Must reference existing role
+    field_profile_code: AGENT-ARCH-004
+    permissions: r-x
+    semantic_type: reference
+    traits:
+      - field_reference_group
+      - writable
+    type: string
+    validation:
+      required: false

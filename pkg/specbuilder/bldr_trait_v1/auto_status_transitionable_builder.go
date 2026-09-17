@@ -1,0 +1,31 @@
+package bldr_trait_v1
+
+import (
+	"github.com/lanceman/zqk/pkg/specbuilder/trait_builders"
+)
+
+// AutoStatusTransitionableBuilder builds the auto_status_transitionable trait at version v1_0_0
+// File: bldr_trait_v1/auto_status_transitionable_builder.go - version is encoded in package/directory name
+type AutoStatusTransitionableBuilder struct {
+	*trait_builders.BaseTraitBuilder
+}
+
+// NewAutoStatusTransitionableBuilder creates a new builder for auto_status_transitionable trait version v1_0_0
+func NewAutoStatusTransitionableBuilder() *AutoStatusTransitionableBuilder {
+	builder := &AutoStatusTransitionableBuilder{
+		BaseTraitBuilder: trait_builders.NewBaseTraitBuilder("auto_status_transitionable", "v1_0_0"),
+	}
+
+	// Configure the trait
+	builder.
+		SetDescription("Object-level trait for lifecycle-driven status advancement.\\nObjects with this trait can be advanced using `zqk object update <id> --auto-status`,\\nwhich derives the next status from lifecycle order and valid transitions.\\n").
+		SetCategory("behavior").
+		SetObjectLevel(false).
+		SetFieldLevel(false)
+
+	return builder
+}
+
+func init() {
+	trait_builders.RegisterBuilder(NewAutoStatusTransitionableBuilder())
+}

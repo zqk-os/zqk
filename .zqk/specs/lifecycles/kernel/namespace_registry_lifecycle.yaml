@@ -1,0 +1,69 @@
+$schema: "../../../.zqk/cli/specs/schemas/lifecycle_spec.schema.json"
+
+object_type: namespace_registry
+# Five-question exam: docs/architecture/LIFECYCLE_STATE_MACHINE_RUBRIC.md
+# TRACK: BLI-CEF-R26-REMAINING-KINDS-001
+statuses:
+  - value: conceptual
+    display: Conceptual
+    origin: true
+    preliminary: true
+    description: Draft plane status. Prior to CAS membrane crossing.
+    role: realign
+  - value: originated
+    display: Originated
+    description: CAS membrane crossed. Object officially originated.
+    role: realign
+  - value: active
+    display: Active
+    origin: false
+    role: shovel_ready
+    description: "namespace registry status 'active' (Active): ready for pickup or
+      use; not locked mid-flight. Flags: origin status."
+  - value: deprecated
+    display: Deprecated
+    role: realign
+    description: "namespace registry status 'deprecated' (Deprecated): not yet committed
+      for execution; reshape before pickup."
+  - value: archived
+    display: Archived
+    terminal: true
+    role: terminal
+    description: "namespace registry status 'archived' (Archived): ended; no further
+      normal execution transitions expected. Flags: terminal."
+transitions:
+  - from: conceptual
+    to: originated
+    description: Promote from draft plane to CAS membrane (CAS Qualification).
+    manual: true
+    auto: false
+    catalyst: System promotion
+  - from: originated
+    to: active
+    description: Initial domain workflow transition to active.
+    manual: true
+    auto: true
+    catalyst: System initialization
+  - from: active
+    to: deprecated
+    description: Deprecate namespace registry
+    manual: true
+    auto: false
+    postconditions:
+      - role is realign
+  - from: '*'
+    to: archived
+    description: Archive namespace registry
+    manual: true
+    auto: false
+    postconditions:
+      - role is terminal
+      - hop from any occupancy to archived
+      - ended; no further normal execution hops expected
+percent_complete:
+  method: ""
+
+created_at: 2026-07-01T18:00:00Z
+updated_at: 2026-07-01T18:00:00Z
+created_by: ACC-1785920548450214012-68b850c0
+updated_by: ACC-1785920548450214012-68b850c0

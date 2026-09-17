@@ -1,0 +1,38 @@
+$schema: "../../schemas/command_spec.schema.json"
+
+name: "heal-dangling"
+short: "Unlink dangling references on critical process kinds"
+description: |
+  Scans critical kinds for *_ref / *_refs targets that do not exist and removes
+  them via storage Update (kernel.cas_object_update). Does not mint fake
+  historical IDs. Defaults to dry-run; pass --apply to write.
+
+args:
+  type: "no_args"
+
+flags:
+  - name: "dry-run"
+    type: "bool"
+    default: true
+    description: "Report only; do not write"
+  - name: "apply"
+    type: "bool"
+    default: false
+    description: "Apply unlink updates (implies dry-run=false)"
+  - name: "limit"
+    type: "int"
+    default: 0
+    description: "Max dangling hits to consider (0 = unlimited)"
+
+help:
+  examples:
+    - comment: "Preview unlinks"
+      command: "%s system kernel-integrity heal-dangling"
+    - comment: "Apply unlinks"
+      command: "%s system kernel-integrity heal-dangling --apply"
+  exclude_flags:
+    - "columns"
+    - "ignore-scheduler-down"
+
+run_e: "runKernelIntegrityHealDangling"
+common_flags: true

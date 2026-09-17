@@ -1,0 +1,10 @@
+# Query {kind} objects using Cypher (graph backend only)
+# Ensure {cli_env_prefix}_GRAPH_ENABLED=true is set
+export {cli_env_prefix}_GRAPH_ENABLED=true
+
+# List {kind} objects (uses graph backend)
+{cli} object list {kind} --format json
+
+# Custom Cypher query (via internal query command)
+{cli} internal query --cypher "MATCH (n:{kind}) WHERE n.status = 'active' RETURN n LIMIT 10"
+

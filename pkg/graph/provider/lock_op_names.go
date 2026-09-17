@@ -1,0 +1,37 @@
+// Lock operation names for RunInLockWithLogger / RunInRLockWithLogger.
+// CONSTANTS_AND_DRY_INVENTORY_PLAN Phase A.
+package provider
+
+const (
+	LockNameBaseConnectionClearTx              = "base_connection_clear_tx"
+	LockNameBaseConnectionGetTx                = "base_connection_get_tx"
+	LockNameBaseConnectionHasTx                = "base_connection_has_tx"
+	LockNameBaseConnectionReset                = "base_connection_reset"
+	LockNameBaseConnectionSetTx                = "base_connection_set_tx"
+	LockNameBasePoolGetCheckActive             = "base_pool_get_check_active"
+	LockNameBasePoolGetNewConn                 = "base_pool_get_new_conn"
+	LockNameBasePoolGetUpdateStats             = "base_pool_get_update_stats"
+	LockNameBasePoolGetWaitInc                 = "base_pool_get_wait_inc"
+	LockNameBasePoolGetWaitUpdate              = "base_pool_get_wait_update"
+	LockNameBasePoolPrepopulate                = "base_pool_prepopulate"
+	LockNameBasePoolReturnUpdate               = "base_pool_return_update"
+	LockNameBasePoolStats                      = "base_pool_stats"
+	LockNameMetricsCollectorGetMetrics         = "metrics_collector_get_metrics"
+	LockNameMetricsCollectorRecordConnAcquired = "metrics_collector_record_conn_acquired"
+	LockNameMetricsCollectorRecordConnError    = "metrics_collector_record_conn_error"
+	LockNameMetricsCollectorRecordConnReleased = "metrics_collector_record_conn_released"
+	LockNameMetricsCollectorRecordHealth       = "metrics_collector_record_health"
+	LockNameMetricsCollectorRecordOperation    = "metrics_collector_record_operation"
+	LockNameMetricsCollectorRecordPoolSize     = "metrics_collector_record_pool_size"
+	LockNameMetricsCollectorRecordPoolWait     = "metrics_collector_record_pool_wait"
+	LockNameMetricsCollectorRecordQuery        = "metrics_collector_record_query"
+	LockNameMetricsCollectorRecordRetry        = "metrics_collector_record_retry"
+	LockNameMetricsCollectorRecordTxCommitted  = "metrics_collector_record_tx_committed"
+	LockNameMetricsCollectorRecordTxError      = "metrics_collector_record_tx_error"
+	LockNameMetricsCollectorRecordTxRolledBack = "metrics_collector_record_tx_rolled_back"
+	LockNameMetricsCollectorRecordTxStarted    = "metrics_collector_record_tx_started"
+	LockNameMetricsCollectorReset              = "metrics_collector_reset"
+	LockNameMetricsCollectorUpdateConfig       = "metrics_collector_update_config"
+	LockNameMockStoreRead                      = "mock_store_read"
+	LockNameMockStoreWrite                     = "mock_store_write"
+)

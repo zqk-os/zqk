@@ -1,0 +1,120 @@
+$schema: "../../../.zqk/cli/specs/schemas/lifecycle_spec.schema.json"
+
+object_type: workflow
+# Five-question exam: docs/architecture/LIFECYCLE_STATE_MACHINE_RUBRIC.md
+# TRACK: BLI-CEF-R26-REMAINING-KINDS-001
+extends: base_lifecycle
+status_mapping:
+  approved: active
+  archived: archived
+  error: error
+  implemented: active
+  in_progress: active
+  proposed: draft
+statuses:
+  - value: conceptual
+    display: Conceptual
+    origin: true
+    preliminary: true
+    description: Draft plane status. Prior to CAS membrane crossing.
+    role: realign
+  - value: originated
+    display: Originated
+    description: CAS membrane crossed. Object officially originated.
+    role: realign
+  - value: draft
+    display: Draft
+    origin: false
+    preliminary: false
+    role: realign
+    description: "workflow status 'draft' (Draft): not yet committed for execution;
+      reshape before pickup."
+  - value: active
+    display: Active
+    role: shovel_ready
+    description: "workflow status 'active' (Active): in force and ready for use; not
+      locked mid-flight. draft→active is the activate hop."
+  - value: deprecated
+    display: Deprecated
+    role: realign
+    description: "workflow status 'deprecated' (Deprecated): not yet committed for
+      execution; reshape before pickup."
+  - value: archived
+    display: Archived
+    terminal: true
+    archive: true
+    role: terminal
+    description: "workflow status 'archived' (Archived): ended; no further normal
+      execution transitions expected. Flags: archive, terminal."
+  - value: error
+    display: Error
+    system: true
+    role: halted
+    description: "workflow status 'error' (Error): paused or system-held for repair;
+      resolve before advancing. Flags: system-assigned."
+transitions:
+  - from: conceptual
+    to: originated
+    description: Promote from draft plane to CAS membrane (CAS Qualification).
+    manual: true
+    auto: false
+    catalyst: System promotion
+  - from: originated
+    to: draft
+    description: Initial domain workflow transition to draft.
+    manual: true
+    auto: true
+    catalyst: System initialization
+  - from: draft
+    to: active
+    description: Activate workflow
+    manual: true
+    auto: false
+    postconditions:
+      - role is shovel_ready
+  - from: active
+    to: deprecated
+    description: Deprecate workflow (keep for reference but mark as deprecated)
+    manual: true
+    auto: false
+    postconditions:
+      - role is realign
+  - from: deprecated
+    to: archived
+    description: Archive deprecated workflow
+    manual: true
+    auto: false
+    postconditions:
+      - role is terminal
+      - ended; no further normal execution hops expected
+  - from: active
+    to: archived
+    description: Archive active workflow
+    manual: true
+    auto: false
+    postconditions:
+      - role is terminal
+      - ended; no further normal execution hops expected
+  - from: '*'
+    to: error
+    description: System error occurred
+    manual: false
+    auto: true
+    postconditions:
+      - role is halted
+      - hop from any occupancy to error
+      - system halt; repair before leaving halted
+percent_complete:
+  method: status_defaults
+  default_by_status:
+    conceptual: 0
+    originated: 5
+    active: 100
+    archived: 100
+    deprecated: 100
+    draft: 10
+    error: 0
+created_at: 2026-07-01T18:00:00Z
+updated_at: 2026-08-25T22:30:00Z
+created_by: ACC-1785920548450214012-68b850c0
+updated_by: ACC-1785920548450214012-68b850c0

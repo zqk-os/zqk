@@ -1,0 +1,208 @@
+schema_version: 2.0.0
+ontology: persona
+extends: base_object
+visibility: public
+description: Personas describe representative users/stakeholders referenced by missions, requirements, and templates.\n
+traits:
+  - base_object_traits
+fields:
+  agent_skill_refs:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: CRI-PERSONA-SKILL-BOUND readiness / CAP dispatch gate.
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: agent_skill registry.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Canonical agent_skill (ASK-*) links required for persona dispatch readiness.
+      security: non-sensitive
+      system_usage:
+        - dispatch
+        - seating
+        - prompts
+      validation: Must reference existing agent_skill IDs.
+    field_profile_code: PER-007
+    permissions: rwx
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+      - field_reference_group
+    type: list
+    validation:
+      required: false
+  goal_refs:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: used for persona-goal alignment.
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: goal registry.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Goals this persona supports.
+      security: non-sensitive
+      system_usage:
+        - traceability
+        - alignment
+      validation: Must reference existing goal IDs.
+    field_profile_code: PER-004
+    permissions: r-x
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+      - field_reference_group
+    type: list
+    validation:
+      required: false
+  interaction_policy_refs:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: POL-AGENT-INTERACTION-POLICY-001 evaluator (guiding-step ping-pong).
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: policy registry (POL-AGENT-* interaction policies).
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Persona-bound interaction policies. Dual-read with related_object_refs until all personas are migrated.
+      security: non-sensitive
+      system_usage:
+        - dispatch
+        - seating
+        - prompts
+      validation: Must reference existing policy IDs (POL-*).
+    field_profile_code: PER-008
+    permissions: rwx
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+      - field_reference_group
+    type: list
+    validation:
+      required: false
+  mission_refs:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: used for persona-mission alignment.
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: mission registry.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Missions this persona supports.
+      security: non-sensitive
+      system_usage:
+        - traceability
+        - alignment
+      validation: Must reference existing mission IDs.
+    field_profile_code: PER-005
+    permissions: r-x
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+      - field_reference_group
+    type: list
+    validation:
+      required: false
+  needs:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: used in requirement generation.
+      cardinality: many
+      criticality: composition
+      default: []
+      dependencies: requirements.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Bullet list of needs/pain points.
+      security: non-sensitive
+      system_usage:
+        - requirements
+        - scenario design
+      validation: list of strings.
+    field_profile_code: PER-003
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+      - modifiable
+    type: list
+    validation:
+      required: false
+  role:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: none.
+      cardinality: one
+      criticality: composition
+      default: null
+      dependencies: scenario planning.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Persona's job/context.
+      security: may contain sensitive org info—mark accordingly.
+      system_usage:
+        - prompting
+      validation: 3–80 chars.
+    field_profile_code: PER-002
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - field_mutable_group
+    type: string
+    validation:
+      max_length: 80
+      min_length: 3
+      pattern: ^.+$
+      required: true
+  vocabulary_scheme_refs:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: Used by CLI to apply semantic filtering.
+      cardinality: many
+      criticality: composition
+      default: []
+      dependencies: vocabulary_scheme.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Semantic vocabularies bound to this persona.
+      security: non-sensitive
+      system_usage:
+        - filtering
+        - semantic resolution
+      validation: list of strings.
+    field_profile_code: PER-006
+    permissions: rwx
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+      - field_reference_group
+    type: list
+    validation:
+      required: false

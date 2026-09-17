@@ -1,0 +1,181 @@
+$schema: ../../../.zqk/cli/specs/schemas/lifecycle_spec.schema.json
+object_type: test_case
+statuses:
+  - value: conceptual
+    display: Conceptual
+    origin: true
+    preliminary: true
+    description: Draft plane status. Prior to CAS membrane crossing.
+    role: realign
+  - value: originated
+    display: Originated
+    description: CAS membrane crossed. Object officially originated.
+    role: realign
+  - value: draft
+    display: Draft
+    origin: false
+    preliminary: false
+    role: realign
+    description: 'test case status ''draft'' (Draft): not yet committed for execution;
+      reshape before pickup.'
+  - value: active
+    display: Active
+    role: shovel_ready
+    description: 'test case status ''active'' (Active): ready for pickup or use; not
+      locked mid-flight.'
+  - value: metrics_captured
+    display: Metrics Captured
+    role: execution_locked
+    description: 'test case status ''metrics_captured'' (Metrics Captured): in flight;
+      treat as scope-locked until it advances or halts.'
+  - value: complete
+    display: Complete
+    terminal: true
+    work_done: true
+    role: terminal
+    description: 'test case status ''complete'' (Complete): ended; no further normal
+      execution transitions expected. Flags: terminal.'
+  - value: archived
+    display: Archived
+    terminal: true
+    archive: true
+    role: terminal
+    description: 'test case status ''archived'' (Archived): ended; no further normal
+      execution transitions expected. Flags: archive, terminal.'
+  - value: error
+    display: Error
+    system: true
+    role: halted
+    description: 'test case status ''error'' (Error): paused or system-held for repair;
+      resolve before advancing. Flags: system-assigned.'
+transitions:
+  - from: conceptual
+    to: originated
+    description: Promote from draft plane to CAS membrane (CAS Qualification).
+    manual: true
+    auto: false
+    catalyst: System promotion
+  - from: originated
+    to: draft
+    description: Initial domain workflow transition to draft.
+    manual: true
+    auto: true
+    catalyst: System initialization
+  - from: originated
+    to: active
+    description: Test case is ready for execution and tracking
+    manual: true
+    auto: false
+    postconditions:
+      - role is shovel_ready
+  - from: draft
+    to: active
+    description: Test case is ready for tracking
+    manual: true
+    auto: false
+    postconditions:
+      - role is shovel_ready
+  - from: active
+    to: metrics_captured
+    description: Test metrics have been captured
+    manual: true
+    auto: false
+    postconditions:
+      - role is execution_locked
+  - from: metrics_captured
+    to: active
+    description: Return to active if metrics need updating
+    manual: true
+    auto: false
+    postconditions:
+      - role is shovel_ready
+  - from: metrics_captured
+    to: complete
+    description: Test suite is complete and metrics are stable
+    manual: true
+    auto: false
+    postconditions:
+      - role is terminal
+  - from: active
+    to: complete
+    description: Auto-transition when the physical test suite passes
+    manual: false
+    auto: true
+    postconditions:
+      - role is terminal
+    shockwave:
+      mode: propagate
+  - from: draft
+    to: complete
+    description: Auto-transition when all criteria are satisfied
+    manual: false
+    auto: true
+    postconditions:
+      - role is terminal
+    shockwave:
+      mode: propagate
+  - from: complete
+    to: archived
+    description: Manual archival after completion review
+    manual: true
+    auto: false
+    postconditions:
+      - role is terminal
+      - ended; no further normal execution hops expected
+  - from: '*'
+    to: archived
+    description: Manual archival from any status
+    manual: true
+    auto: false
+    postconditions:
+      - role is terminal
+      - hop from any occupancy to archived
+      - ended; no further normal execution hops expected
+  - from: '*'
+    to: draft
+    description: Manual recovery to draft state
+    manual: true
+    auto: false
+    postconditions:
+      - role is realign
+      - hop from any occupancy to draft
+  - from: '*'
+    to: error
+    description: System-assigned when lifecycle incoherency detected
+    manual: false
+    auto: false
+    postconditions:
+      - role is halted
+      - hop from any occupancy to error
+      - system halt; repair before leaving halted
+  - from: complete
+    to: error
+    description: Auto-transition when the physical test suite fails (Regression)
+    manual: false
+    auto: true
+    postconditions:
+      - role is halted
+      - system halt; repair before leaving halted
+  - from: error
+    to: complete
+    description: Auto-transition when the physical test suite is repaired and 
+      passes
+    manual: false
+    auto: true
+    postconditions:
+      - role is terminal
+percent_complete:
+  method: metric_based OR status_defaults
+  default_by_status:
+    conceptual: 0
+    originated: 5
+    active: 50
+    archived: 100
+    complete: 100
+    draft: 10
+    error: 0
+    metrics_captured: 75
+created_at: 2026-07-01 18:00:00+00:00
+updated_at: 2026-07-01 18:00:00+00:00
+created_by: ACC-1785920548450214012-68b850c0
+updated_by: ACC-1785920548450214012-68b850c0

@@ -1,0 +1,258 @@
+schema_version: 2.0.0
+ontology: base_sampler
+extends: base_object
+visibility: internal
+description: 'Base specification for metrics sampler configurations. Defines how high-frequency events are batched in memory before creating metric objects. Sampler configs can be defined per object kind, field, or metric type to optimize metric collection performance.  Specialized samplers (scalar_metric_sampler, list_metric_sampler, etc.) extend this base spec to provide default configurations for specific metric types. '
+traits:
+  - base_object_traits
+fields:
+  batch_size:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: system architect
+      automation_hooks: used by sampler to determine when to flush batches.
+      cardinality: one
+      criticality: composition
+      default: 50
+      dependencies: metrics sampler system.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Number of events to collect before creating a metric object. Must be between 1 and max_batch_size.
+      security: non-sensitive
+      system_usage:
+        - batch management
+        - performance optimization
+      validation: Integer between 1 and max_batch_size.
+    field_profile_code: SMC-005
+    permissions: rwx
+    semantic_type: measurement
+    traits:
+      - field_mutable_group
+    type: integer
+    validation:
+      required: true
+  description:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: system architect
+      automation_hooks: used for documentation and tooling.
+      cardinality: zero_or_one
+      criticality: association
+      default: null
+      dependencies: none
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Human-readable description of this sampler configuration and its purpose.
+      security: non-sensitive
+      system_usage:
+        - documentation
+        - tooling
+      validation: Free-form text, max 500 chars.
+    field_profile_code: SMC-009
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - field_mutable_group
+    type: string
+    validation:
+      max_length: 500
+      required: false
+  enabled:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: system architect
+      automation_hooks: controls whether sampling is active for this configuration.
+      cardinality: one
+      criticality: composition
+      default: true
+      dependencies: metrics sampler system.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Whether sampling is enabled for this configuration. If false, events are processed immediately without batching.
+      security: non-sensitive
+      system_usage:
+        - sampler activation
+        - performance tuning
+      validation: Boolean value.
+    field_profile_code: SMC-004
+    permissions: rwx
+    semantic_type: state
+    traits:
+      - field_mutable_group
+    type: boolean
+    validation:
+      required: true
+  field_name:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: system architect
+      automation_hooks: used by metrics pipeline for field-specific sampling.
+      cardinality: zero_or_one
+      criticality: association
+      default: null
+      dependencies: object spec.
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: Optional field name this sampler applies to. If null, applies to all fields of the object kind.
+      security: non-sensitive
+      system_usage:
+        - field-specific sampling
+      validation: Must be a valid field name for the object kind.
+    field_profile_code: SMC-002
+    permissions: r-x
+    semantic_type: identifier
+    traits:
+      - field_reference_group
+    type: string
+    validation:
+      required: false
+  flush_interval:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: system architect
+      automation_hooks: used by sampler to flush partial batches after timeout.
+      cardinality: one
+      criticality: composition
+      default: 5m
+      dependencies: metrics sampler system.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Maximum time to wait before flushing a partial batch (e.g., \\\"5m\\\", \\\"10m\\\", \\\"1h\\\"). Prevents data loss and memory buildup.
+      security: non-sensitive
+      system_usage:
+        - batch flushing
+        - memory management
+      validation: Duration string (e.g., \\\"5m\\\", \\\"10m\\\", \\\"1h\\\").
+    field_profile_code: SMC-007
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - field_mutable_group
+    type: string
+    validation:
+      pattern: ^\d+[smhd]|0$
+      required: true
+  group_by_object_id:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: system architect
+      automation_hooks: used by sampler to determine batching strategy.
+      cardinality: one
+      criticality: composition
+      default: true
+      dependencies: metrics sampler system.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: If true, batches are per-object (objectID -> batch). If false, batches are global (all objects combined).
+      security: non-sensitive
+      system_usage:
+        - batching strategy
+        - aggregation grouping
+      validation: Boolean value.
+    field_profile_code: SMC-008
+    permissions: rwx
+    semantic_type: state
+    traits:
+      - field_mutable_group
+    type: boolean
+    validation:
+      required: true
+  max_batch_size:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: system architect
+      automation_hooks: used by sampler to enforce safety limits.
+      cardinality: one
+      criticality: composition
+      default: 1000
+      dependencies: metrics sampler system.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Maximum allowed batch size (safety limit). Prevents excessive memory usage.
+      security: non-sensitive
+      system_usage:
+        - safety limits
+        - memory management
+      validation: Integer >= batch_size.
+    field_profile_code: SMC-006
+    permissions: rwx
+    semantic_type: measurement
+    traits:
+      - field_mutable_group
+    type: integer
+    validation:
+      required: true
+  metric_type:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: system architect
+      automation_hooks: used by metrics pipeline to select aggregator.
+      cardinality: one
+      criticality: composition
+      default: system
+      dependencies: metrics pipeline.
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: Metric type this sampler handles (e.g., \\\"system\\\", \\\"scalar_metric\\\", \\\"list_metric\\\", \\\"ordered_list_metric\\\", \\\"status_history_metric\\\").
+      security: non-sensitive
+      system_usage:
+        - aggregator selection
+        - metric routing
+      validation: Must be a valid metric type.
+    field_profile_code: SMC-003
+    permissions: r-x
+    semantic_type: statement
+    traits:
+      - field_reference_group
+    type: string
+    validation:
+      enum:
+        - system
+        - scalar_metric
+        - list_metric
+        - ordered_list_metric
+        - status_history_metric
+      required: true
+  object_kind:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: system architect
+      automation_hooks: used by metrics pipeline to route events to samplers.
+      cardinality: one
+      criticality: composition
+      default: null
+      dependencies: object registry.
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: Object kind this sampler configuration applies to (e.g., \\\"audit_event\\\", \\\"change_journal_entry\\\").
+      security: non-sensitive
+      system_usage:
+        - sampler routing
+        - configuration lookup
+      validation: Must be a valid object kind.
+    field_profile_code: SMC-001
+    permissions: r-x
+    semantic_type: identifier
+    traits:
+      - field_reference_group
+    type: string
+    validation:
+      required: true

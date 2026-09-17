@@ -1,0 +1,449 @@
+schema_version: 2.0.0
+ontology: workstream
+urn: urn:zqk:spec:project_mgmt:workstream
+namespace: zqk:project_mgmt
+extends: work_interval
+visibility: public
+description: 'Full workstream entries (mirrors \"docs/planning/workstreams.json\"). Tracks active and completed bodies of work with ordering, status history, and related artifacts.\nLifecycle: workstream_lifecycle.yaml.\n'
+traits:
+  - base_object_traits
+  - manipulatable
+  - completable
+fields:
+  application:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: filtering.
+      cardinality: zero_or_one
+      criticality: association
+      default: null
+      dependencies: dashboards.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Optional application/component tag.
+      security: non-sensitive
+      system_usage:
+        - distinguish tangential items
+      validation: <= 80 chars.
+    field_profile_code: WKS-003
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - field_mutable_group
+    type: string
+    validation:
+      max_length: 80
+      required: false
+  blockers:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: triggers alerts, prevents status transitions.
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: none.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Known blockers preventing progress on this workstream.
+      security: non-sensitive
+      system_usage:
+        - status tracking
+        - dependency management
+        - reporting
+      validation: list of strings describing blockers.
+    field_profile_code: WKS-011
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+      - modifiable
+    type: list
+    validation:
+      required: false
+  category:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: used to reorder/cluster.
+      cardinality: one
+      criticality: composition
+      default: feature
+      dependencies: dashboards.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Scope classification (application/system/feature/component/ops/tooling/etc.).
+      security: non-sensitive
+      system_usage:
+        - grouping
+        - filters
+      validation: enum; extend via config if needed.
+    field_profile_code: WKS-002
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - filterable
+      - groupable
+      - listable
+      - modifiable
+      - readable
+      - searchable
+      - sortable
+      - writable
+    type: enum
+    validation:
+      enum:
+        - application
+        - system
+        - feature
+        - component
+        - ops
+        - tooling
+      required: false
+  description:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: used in reports, documentation.
+      cardinality: one
+      criticality: association
+      default: none (optional, prefer context for brief description)
+      dependencies: none.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Detailed description of the workstream's purpose and scope.
+      security: non-sensitive
+      system_usage:
+        - documentation
+        - communication
+        - understanding
+      validation: free text or markdown.
+    field_profile_code: WKS-016
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+      - modifiable
+    type: text
+    validation:
+      required: false
+  entry_point:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: doc index regeneration.
+      cardinality: one
+      criticality: composition
+      default: null
+      dependencies: doc index.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Canonical doc or script describing the workstream.
+      security: non-sensitive
+      system_usage:
+        - navigation
+      validation: path/URL if specified.
+    field_profile_code: WKS-004
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - field_mutable_group
+    type: string
+    validation:
+      required: false
+  metadata:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner/automation.
+      automation_hooks: e.g., "has_deferred_items" used by CLI.
+      cardinality: one
+      criticality: association
+      default: {}
+      dependencies: CLI metadata filters.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Additional flags (has_deferred_items, clarifications, etc.).
+      security: non-sensitive
+      system_usage:
+        - filters
+      validation: JSON object with documented keys.
+    field_profile_code: WKS-009
+    permissions: rwx
+    semantic_type: expression
+    traits:
+      - readable
+      - writable
+      - modifiable
+    type: object
+    validation:
+      required: false
+  order:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner/executive.
+      automation_hooks: ensures consistent display.
+      cardinality: one
+      criticality: composition
+      default: sequential
+      dependencies: CLI reorder.
+      observability: "yes"
+      origin_lifecycle: mutable (only for active statuses).
+      purpose: Ordering among active workstreams.
+      security: non-sensitive
+      system_usage:
+        - prioritization
+      validation: positive integer.
+    field_profile_code: WKS-007
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+      - modifiable
+    type: integer
+    validation:
+      required: false
+  owner_display:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner/executive.
+      automation_hooks: none.
+      cardinality: zero_or_one
+      criticality: association
+      default: null
+      dependencies: dashboards.
+      observability: "yes"
+      origin_lifecycle: mutable (kept in sync with account).
+      purpose: Cached human-readable owner name.
+      security: PII—confidential.
+      system_usage:
+        - UI display
+      validation: <= 80 chars.
+    field_profile_code: WKS-010
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - field_mutable_group
+    type: string
+    validation:
+      max_length: 80
+      required: false
+  owner_ref:
+    access:
+      requires:
+        - access:confidential
+        - role:admin
+    checklist:
+      authority: executive/admin.
+      automation_hooks: ensures ownership is validated.
+      cardinality: one
+      criticality: composition
+      default: required
+      dependencies: authorization checks.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Reference to account/role representing the owner.
+      security: may contain PII—treat as confidential.
+      system_usage:
+        - permissions
+        - reporting
+      validation: URI or structured reference (\\\"account:{id}\\\") pointing to an existing account/role.
+    field_profile_code: WKS-001
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - field_mutable_group
+    type: reference
+    validation:
+      required: true
+  prerequisites:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: prevents progression until prerequisites complete.
+      cardinality: many
+      criticality: composition
+      default: []
+      dependencies: gating logic.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Other workstreams, milestones, or conditions that must be complete before this workstream can start.
+      security: non-sensitive
+      system_usage:
+        - dependency graph
+        - gating logic
+      validation: references to workstreams, milestones, or other objects.
+    field_profile_code: WKS-013
+    permissions: r-x
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+    type: list
+    validation:
+      required: false
+  related_docs:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: ensures doc index coverage.
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: doc index.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Supporting docs/information.
+      security: non-sensitive
+      system_usage:
+        - doc index
+      validation: paths must exist or be declared.
+    field_profile_code: WKS-005
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+      - modifiable
+    type: list
+    validation:
+      required: false
+  stage_type:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: used for filtering, stage-based reporting.
+      cardinality: one
+      criticality: association
+      default: none (optional)
+      dependencies: none.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Stage or phase classification for this workstream (e.g., \\\"planning\\\", \\\"execution\\\", \\\"validation\\\").
+      security: non-sensitive
+      system_usage:
+        - planning
+        - filtering
+        - reporting
+      validation: free text classification.
+    field_profile_code: WKS-012
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+      - modifiable
+      - groupable
+    type: string
+    validation:
+      required: false
+  workflow_ref:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner/admin.
+      automation_hooks: used for workflow constraint validation during workstream operations.
+      cardinality: zero_or_one
+      criticality: association
+      default: null
+      dependencies: workflow registry, priority plan workflow.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Reference to workflow object that defines constraints and rules for this workstream. If not set, inherits workflow from associated priority plan. Workflow constraints enforce role-based object creation/manipulation restrictions.
+      security: non-sensitive
+      system_usage:
+        - workflow validation
+        - constraint enforcement
+        - role-based access control
+      validation: Must reference existing workflow object ID (WFL-###).
+    field_profile_code: WKS-018
+    permissions: rwx
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+      - field_reference_group
+    type: string
+    validation:
+      required: false
+  workstream_refs:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: used for dependency graphs, related workstream discovery.
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: workstream registry.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: References to related or dependent workstreams.
+      security: non-sensitive
+      system_usage:
+        - dependency tracking
+        - navigation
+      validation: must reference existing workstream object IDs.
+    field_profile_code: WKS-014
+    permissions: r-x
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+      - field_reference_group
+    type: list
+    validation:
+      required: false
+  epic_refs:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner/planner.
+      automation_hooks: associates epic with workstream execution tracks.
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: epic registry.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Epics executing components of this workstream.
+      security: non-sensitive
+      system_usage:
+        - planning
+        - reporting
+      validation: must reference existing epic IDs.
+    field_profile_code: WKS-019
+    permissions: r-x
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+      - field_reference_group
+    type: list
+    validation:
+      required: false
+

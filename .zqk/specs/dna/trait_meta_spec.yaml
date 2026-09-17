@@ -1,0 +1,53 @@
+schema_version: "2.0.0"
+ontology: trait_meta_spec
+urn: urn:zqk:spec:dna:trait_meta_spec
+namespace: zqk:dna
+visibility: public
+storage_profile: cas_entity
+description: "Meta specification governing behavioral trait contracts, trait composition, requirements, and invariant checks."
+traits:
+  - auditable
+fields:
+  name:
+    type: string
+    description: "Canonical trait name."
+    validation:
+      required: true
+  description:
+    type: string
+    description: "Definition of the capability or invariant conferred by the trait."
+    validation:
+      required: true
+  category:
+    type: enum
+    description: "Trait classification: standard, domain-specific, base-group, system."
+    default: standard
+    validation:
+      enum:
+        - standard
+        - domain-specific
+        - base-group
+        - system
+  requires:
+    type: list
+    description: "Prerequisite traits that must be present on the entity."
+    default: []
+  conflicts:
+    type: list
+    description: "Traits that cannot coexist with this trait."
+    default: []
+  includes:
+    type: list
+    description: "Sub-traits automatically conferred when this trait is adopted."
+    default: []
+  object_level:
+    type: bool
+    description: "Whether the trait can be attached at the object level."
+    default: true
+  field_level:
+    type: bool
+    description: "Whether the trait can be attached at the field level."
+    default: false
+  config:
+    type: map
+    description: "Trait-specific operational configuration parameters."

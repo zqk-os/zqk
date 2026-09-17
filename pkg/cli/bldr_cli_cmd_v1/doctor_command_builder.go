@@ -1,0 +1,32 @@
+package bldr_cli_cmd_v1
+
+import (
+	"github.com/lanceman/zqk/internal/cli"
+	clipkg "github.com/lanceman/zqk/pkg/cli"
+	"github.com/spf13/cobra"
+)
+
+// NewDoctorCommandBuilder creates a new doctor command
+func NewDoctorCommandBuilder() *cobra.Command {
+	builder := clipkg.NewCommandBuilder("doctor")
+	builder.WithShort("Inspect feed health, MCP subscribers, and peer wake status")
+	help := clipkg.DynamicHelpBuilder("Inspect feed health, MCP subscribers, and peer wake status")
+	help.WithDescriptionLines("Diagnoses the agent correspondence feed: channel health, live MCP event")
+	help.WithDescriptionLines("subscribers, peer seat PID hygiene, peer-wake contract paths, and issues.")
+	help.WithDescriptionLines("Use --refresh-seats to rewrite .zqk/state/mesh/peer_seats.json from live")
+	help.WithDescriptionLines("peer worker processes. Reports missing community default seating")
+	help.WithDescriptionLines("(PER-DEFAULT-OPERATOR / PER-DEFAULT-AGENT). Structured result via FormatOutput.")
+	help.AddExample("Check feed / MCP subscriber health", "%s feed doctor")
+	help.AddExample("Refresh seat PIDs then diagnose", "%s feed doctor --refresh-seats --format json")
+	help.AddExample("If issues include missing_default_seating, repair with system seed", "%s system seed-default-agent-seating")
+	help.AddExample("JSON for agents", "%s feed doctor --format json")
+	help.ExcludeFlag("columns")
+	help.ExcludeFlag("ignore-scheduler-down")
+	builder.WithHelpBuilder(help)
+	builder.WithArgs(cobra.NoArgs)
+	builder.AddBoolFlag("refresh-seats", "", false, "Refresh peer_seats.json PIDs from live peer executables before diagnose")
+	builder.AddBoolFlag("dry-run", "", false, "With --refresh-seats, report assignments without writing peer_seats.json")
+	builder.WithCommonFlagsExcluding(cli.AddCommonFlagsExcluding, []string{"columns", "ignore-scheduler-down"})
+	cmd := builder.Build()
+	return cmd
+}

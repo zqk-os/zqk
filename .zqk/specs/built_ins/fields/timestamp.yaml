@@ -1,0 +1,10 @@
+type: datetime
+semantic_type: timestamp
+description: "ISO-8601 UTC timestamp."
+traits:
+  - readable
+  - filterable
+  - sortable
+validation:
+  required: false
+  pattern: "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})$"

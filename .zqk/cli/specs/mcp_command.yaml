@@ -1,0 +1,47 @@
+$schema: "./schemas/command_spec.schema.json"
+
+name: "mcp"
+short: "MCP server operations"
+description: |
+  Manage and run the Model Context Protocol (MCP) server: stdio serve, TCP daemon,
+  Cursor adapter, IDE proxy (legacy), tool listing, install helpers, and daemon
+  ensure/supervise.
+
+help:
+  examples:
+    - comment: "Ensure the TCP daemon is listening"
+      command: "%s mcp ensure --tcp 127.0.0.1:8443"
+    - comment: "Supervise the daemon (restart loop)"
+      command: "%s mcp supervise --tcp 127.0.0.1:8443"
+    - comment: "Cursor stdio adapter (preferred Cursor entrypoint)"
+      command: "%s mcp cursor-adapter --tcp 127.0.0.1:8443"
+    - comment: "Legacy transparent IDE proxy"
+      command: "%s mcp proxy --tcp 127.0.0.1:8443"
+    - comment: "List exposed MCP tool names"
+      command: "%s mcp list-tools"
+  exclude_flags:
+    - "format"
+    - "output"
+    - "verbose"
+    - "quiet"
+    - "timeout"
+    - "columns"
+
+common_flags: false
+subcommands:
+  - name: serve
+    spec_ref: mcp/svc/serve_command.yaml
+  - name: daemon
+    spec_ref: mcp/svc/daemon_command.yaml
+  - name: cursor-adapter
+    spec_ref: mcp/svc/cursor_adapter_command.yaml
+  - name: proxy
+    spec_ref: mcp/svc/proxy_command.yaml
+  - name: install
+    spec_ref: mcp/svc/install_command.yaml
+  - name: list-tools
+    spec_ref: mcp/svc/list_tools_command.yaml
+  - name: ensure
+    spec_ref: mcp/ensure_command.yaml
+  - name: supervise
+    spec_ref: mcp/supervise_command.yaml

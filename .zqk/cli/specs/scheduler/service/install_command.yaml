@@ -1,0 +1,33 @@
+$schema: "../../schemas/command_spec.schema.json"
+
+name: "install"
+short: "Install a per-root host OS unit for the scheduler daemon"
+description: |
+  Writes a launchd LaunchAgent (macOS) or systemd --user unit (Linux), updates the
+  host registry, and enables KeepAlive/Restart. Prefers workshop stable
+  (.zqk/bin/zqk-stable) when present so host units match MCP/scheduler daemons;
+  falls back to tip bin/zqk when stable is absent.
+
+flags:
+  - name: "root"
+    type: "string"
+    default: "."
+    description: "Project root to supervise"
+
+help:
+  examples:
+    - comment: "Install for current directory"
+      command: "%s scheduler service install --root ."
+  exclude_flags:
+    - "format"
+    - "output"
+    - "verbose"
+    - "quiet"
+    - "timeout"
+    - "columns"
+
+run_e: "runSchedulerServiceInstall"
+common_flags: false
+requires_storage: false
+requires_session: false
+requires_scheduler_check: false

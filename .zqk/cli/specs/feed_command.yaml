@@ -1,0 +1,53 @@
+$schema: "../schemas/command_spec.schema.json"
+
+name: "feed"
+short: "Agent correspondence feed (steer / status onto agent_feed JSONL)"
+description: |
+  Native Go operators for the single agent chat correspondence plane.
+  Writes typed events onto the materialized agent_chat_channel JSONL (same path as MCP chat_send).
+  Shell wake/emit scripts are non-ship legacy — use these commands instead.
+
+help:
+  examples:
+    - comment: "Human steer onto the feed (notify delivery)"
+      command: "%s feed steer --message \"ATTN peer: check BLI-123\""
+    - comment: "Mesh status stamp without scripts"
+      command: "%s feed emit-status --persona-ref PER-DEFAULT-OPERATOR --agent-id cursor-composer --summary \"Accepted CHILD-004\""
+    - comment: "Enterprise bridge ingest (Slack/Teams/Telegram/Signal/generic)"
+      command: "%s feed bridge-ingest --channel slack --payload-file /tmp/slack-event.json"
+    - comment: "Private HTTP API (IDE-optional)"
+      command: "%s feed serve --listen 127.0.0.1:8787"
+    - comment: "Doer-safe peer wake (notify-only)"
+      command: "%s feed wake --to-agent-id peer-agent-01 --message \"ATTN peer: wake for check\""
+    - comment: "Human-visible proof-of-life pulse"
+      command: "%s feed proof-of-life --persona-ref PER-DEFAULT-OPERATOR --agent-id cursor-composer --summary \"working\""
+  exclude_flags:
+    - "format"
+    - "output"
+    - "verbose"
+    - "quiet"
+    - "timeout"
+    - "columns"
+
+common_flags: false
+subcommands:
+  - name: steer
+    spec_ref: feed/steer_command.yaml
+  - name: emit-status
+    spec_ref: feed/emit_status_command.yaml
+  - name: ack
+    spec_ref: feed/ack_command.yaml
+  - name: pending
+    spec_ref: feed/pending_command.yaml
+  - name: doctor
+    spec_ref: feed/doctor_command.yaml
+  - name: bridge-ingest
+    spec_ref: feed/bridge_ingest_command.yaml
+  - name: serve
+    spec_ref: feed/serve_command.yaml
+  - name: watch
+    spec_ref: feed/watch_command.yaml
+  - name: wake
+    spec_ref: feed/wake_command.yaml
+  - name: proof-of-life
+    spec_ref: feed/proof_of_life_command.yaml

@@ -1,0 +1,96 @@
+schema_version: 2.0.0
+ontology: display
+extends: extensible_object
+visibility: public
+description: 'Display objects represent visualization contexts (Gantt charts, Kanban boards, dashboards, etc.). Displays are external domain objects that define how components are organized and rendered.\nDisplays inherit all base_object traits via extensible_object: listable, readable, writable, modifiable, removable, formatable, groupable, filterable, sortable, searchable.\nLifecycle: display_lifecycle.yaml.\n'
+traits:
+  - constrainable
+fields:
+  constraint_contexts:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: system
+      automation_hooks: used for constraint loading
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: constraint system
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: List of constraint contexts where this display participates
+      security: non-sensitive
+      system_usage:
+        - constraint system
+        - validation
+      validation: Must reference valid constraint contexts
+    field_profile_code: DSP-004
+    permissions: r-x
+    semantic_type: statement
+    traits:
+      - readable
+    type: list
+    validation:
+      required: false
+  display_type:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: system
+      automation_hooks: used for constraint system
+      cardinality: one
+      criticality: composition
+      default: null
+      dependencies: display_types.yaml
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: The type of display (maps to display_types.yaml)
+      security: non-sensitive
+      system_usage:
+        - identification
+        - grouping
+        - constraints
+      validation: |
+        Must match a display type defined in display_types.yaml. Validated dynamically at runtime via GetCachedDisplayTypes(). This ensures new display types added to display_types.yaml are automatically valid without requiring spec updates.
+    field_profile_code: DSP-001
+    permissions: r-x
+    semantic_type: identifier
+    traits:
+      - filterable
+      - groupable
+      - readable
+    type: string
+    validation:
+      enum: []
+      required: true
+  layout_config:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: user
+      automation_hooks: used for display rendering
+      cardinality: one
+      criticality: association
+      default: {}
+      dependencies: display_type
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Display-specific layout configuration (varies by display_type)
+      security: non-sensitive
+      system_usage:
+        - rendering
+        - layout
+      validation: Must be valid for display_type
+    field_profile_code: DSP-003
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+      - modifiable
+    type: object
+    validation:
+      required: false

@@ -1,0 +1,433 @@
+schema_version: 2.0.0
+ontology: technical_debt
+extends: work_unit
+visibility: internal
+description: 'Technical debt items represent system issues that are not directly related to product features but support improving overall quality, streamlining delivery, and implementing self-improvement routines. These include code quality issues, infrastructure improvements, tooling enhancements, and process optimizations.\nLifecycle: technical_debt_lifecycle.yaml.\n'
+traits:
+  - base_object_traits
+  - effort_aware
+fields:
+  backlog_ref:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: creator
+      automation_hooks: used for traceability, reporting
+      cardinality: zero_or_one
+      criticality: association
+      default: null
+      dependencies: backlog item registry
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Reference to backlog item tracking the resolution work (BLI-#### format)
+      security: non-sensitive
+      system_usage:
+        - traceability
+        - reporting
+        - workflow integration
+      validation: Must match backlog item ID pattern (BLI-####)
+    field_profile_code: TDE-008
+    permissions: rwx
+    semantic_type: reference
+    traits:
+      - field_reference_group
+      - writable
+    type: string
+    validation:
+      pattern: ^BLI-.*$
+      required: false
+  complexity_score:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation (linter)
+      automation_hooks: populated by linter for complexity-type debt
+      cardinality: zero_or_one
+      criticality: association
+      default: null
+      dependencies: linter analysis
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Cyclomatic complexity score (for complexity-type debt)
+      security: non-sensitive
+      system_usage:
+        - prioritization
+        - reporting
+        - trend analysis
+      validation: Positive integer
+    field_profile_code: TDE-004
+    permissions: r-x
+    semantic_type: measurement
+    traits:
+      - filterable
+      - readable
+      - sortable
+    type: integer
+    validation:
+      required: false
+  debt_type:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: creator
+      automation_hooks: used for filtering, reporting, prioritization
+      cardinality: one
+      criticality: composition
+      default: null
+      dependencies: none
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: Type of technical debt (complexity, performance, maintainability, infrastructure, tooling, process, documentation, testing, security, observability)
+      security: non-sensitive
+      system_usage:
+        - filtering
+        - grouping
+        - prioritization
+        - reporting
+      validation: Must be one of defined debt types
+    field_profile_code: TDE-001
+    permissions: r-x
+    semantic_type: statement
+    traits:
+      - filterable
+      - groupable
+      - listable
+      - readable
+      - searchable
+      - sortable
+    type: enum
+    validation:
+      enum:
+        - complexity
+        - performance
+        - maintainability
+        - infrastructure
+        - tooling
+        - process
+        - documentation
+        - testing
+        - security
+        - observability
+      required: true
+  description:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: creator
+      automation_hooks: used for documentation, reporting
+      cardinality: one
+      criticality: composition
+      default: null
+      dependencies: none
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Detailed description of the technical debt issue
+      security: non-sensitive
+      system_usage:
+        - documentation
+        - reporting
+        - communication
+      validation: Free-form text, max 2000 chars
+    field_profile_code: TDE-005
+    permissions: rwx
+    semantic_type: expression
+    traits:
+      - readable
+      - writable
+      - searchable
+    type: string
+    validation:
+      max_length: 2000
+      required: true
+  file_path:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: creator
+      automation_hooks: used for file-level tracking, automated fixes
+      cardinality: zero_or_one
+      criticality: association
+      default: null
+      dependencies: file system
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: File path where the technical debt exists (e.g., \\\"cmd/zqk/object/list.go\\\")
+      security: non-sensitive
+      system_usage:
+        - filtering
+        - grouping
+        - automated fixes
+        - reporting
+      validation: Valid file path relative to repository root
+    field_profile_code: TDE-002
+    permissions: rwx
+    semantic_type: identifier
+    traits:
+      - filterable
+      - readable
+      - searchable
+      - writable
+    type: string
+    validation:
+      max_length: 500
+      required: false
+  function_name:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: creator
+      automation_hooks: used for function-level tracking
+      cardinality: zero_or_one
+      criticality: association
+      default: null
+      dependencies: code analysis
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Function name where the technical debt exists (e.g., \\\"runList\\\")
+      security: non-sensitive
+      system_usage:
+        - filtering
+        - grouping
+        - reporting
+      validation: Valid function identifier
+    field_profile_code: TDE-003
+    permissions: rwx
+    semantic_type: identifier
+    traits:
+      - filterable
+      - readable
+      - searchable
+      - writable
+    type: string
+    validation:
+      max_length: 200
+      required: false
+  impact_assessment:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: creator/reviewer
+      automation_hooks: used for prioritization
+      cardinality: one
+      criticality: composition
+      default: low
+      dependencies: none
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Impact assessment of the technical debt (low, medium, high, critical)
+      security: non-sensitive
+      system_usage:
+        - prioritization
+        - reporting
+        - resource allocation
+      validation: Must be one of defined impact levels
+    field_profile_code: TDE-006
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - filterable
+      - groupable
+      - readable
+      - sortable
+      - writable
+    type: enum
+    validation:
+      enum:
+        - low
+        - medium
+        - high
+        - critical
+      required: true
+  linter_rule:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation (linter)
+      automation_hooks: populated by linter analysis
+      cardinality: zero_or_one
+      criticality: association
+      default: null
+      dependencies: linter system
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: Linter rule that identified this technical debt (e.g., \\\"gocyclo\\\", \\\"gocritic:hugeParam\\\")
+      security: non-sensitive
+      system_usage:
+        - filtering
+        - grouping
+        - reporting
+        - automated fixes
+      validation: Valid linter rule identifier
+    field_profile_code: TDE-010
+    permissions: r-x
+    semantic_type: identifier
+    traits:
+      - filterable
+      - groupable
+      - readable
+    type: string
+    validation:
+      max_length: 100
+      required: false
+  mitigation_plan:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner
+      automation_hooks: used for documentation, reporting
+      cardinality: zero_or_one
+      criticality: association
+      default: null
+      dependencies: none
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Plan for mitigating or resolving the technical debt
+      security: non-sensitive
+      system_usage:
+        - documentation
+        - reporting
+        - planning
+      validation: Free-form text, max 2000 chars
+    field_profile_code: TDE-011
+    permissions: rwx
+    semantic_type: expression
+    traits:
+      - readable
+      - writable
+    type: string
+    validation:
+      max_length: 2000
+      required: false
+  policy_ref:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: creator
+      automation_hooks: used for policy compliance tracking
+      cardinality: zero_or_one
+      criticality: association
+      default: null
+      dependencies: policy registry
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: Reference to policy that identifies this as technical debt (POL-#### format)
+      security: non-sensitive
+      system_usage:
+        - policy compliance
+        - reporting
+        - traceability
+      validation: Must match policy ID pattern (POL-####)
+    field_profile_code: TDE-009
+    permissions: r-x
+    semantic_type: reference
+    traits:
+      - field_reference_group
+    type: string
+    validation:
+      pattern: ^POL-[A-Z]+-\d{3}$
+      required: false
+  resolution_notes:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: resolver
+      automation_hooks: used for documentation, reporting
+      cardinality: zero_or_one
+      criticality: association
+      default: null
+      dependencies: none
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Notes about how the technical debt was resolved
+      security: non-sensitive
+      system_usage:
+        - documentation
+        - reporting
+        - learning
+      validation: Free-form text, max 2000 chars
+    field_profile_code: TDE-012
+    permissions: rwx
+    semantic_type: expression
+    traits:
+      - readable
+      - writable
+    type: string
+    validation:
+      max_length: 2000
+      required: false
+  tags:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: creator/owner
+      automation_hooks: used for filtering, grouping, discovery
+      cardinality: zero_or_many
+      criticality: association
+      default: []
+      dependencies: none
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Optional tags for categorizing technical debt (e.g., \\\"continuous_improvement\\\", \\\"refactoring\\\", \\\"performance\\\")
+      security: non-sensitive
+      system_usage:
+        - filtering
+        - grouping
+        - organization
+        - discovery
+      validation: Array of strings, each max 50 chars
+    field_profile_code: TDE-013
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - filterable
+      - groupable
+      - readable
+      - writable
+    type: array
+    validation:
+      required: false
+  target_resolution_date:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: creator/owner
+      automation_hooks: used for reminders, prioritization
+      cardinality: one
+      criticality: association
+      default: calculated from created_at + 30 days
+      dependencies: lifecycle system
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Target date for resolving the technical debt (ISO 8601 format)
+      security: non-sensitive
+      system_usage:
+        - reminders
+        - prioritization
+        - reporting
+        - SLA tracking
+      validation: ISO 8601 date format (YYYY-MM-DD)
+    field_profile_code: TDE-007
+    permissions: rwx
+    semantic_type: timestamp
+    traits:
+      - filterable
+      - readable
+      - sortable
+      - writable
+    type: string
+    validation:
+      pattern: ^\d{4}-\d{2}-\d{2}$
+      required: true
