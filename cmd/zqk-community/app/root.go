@@ -62,6 +62,13 @@ import (
 
 const EmptyValue = ""
 
+// Pressure-test SKU name. Public launch will rename this to zqk.
+// TRACK: TDE-1789678536875854000-47240146 — keep zcom until community ships as zqk.
+const (
+	PressureTestExecutableName = "zcom"
+	pressureTestProductName     = "ZQK Community"
+)
+
 // projectConfigBootstrapYAML matches a subset of .zqk/config/config.yaml read during init for branding.
 // Struct tags carry YAML keys so we avoid map index literals that collide with object kind names in drift scans.
 type projectConfigBootstrapYAML struct {
@@ -573,13 +580,17 @@ func init() {
 	// Priority:
 	// 1) brand.executable_name in project config (.zqk/config/config.yaml) if project root is discoverable
 	// 2) actual executable name (os.Args[0])
-	// 3) default ("zqk")
-	execName := "zqk"
+	// 3) default (zcom on this SKU — not studio zqk)
+	execName := PressureTestExecutableName
 	if len(os.Args) > 0 && os.Args[0] != EmptyValue {
 		execName = filepath.Base(os.Args[0])
 	}
+	if execName == "zqk" || execName == "zqk-stable" || execName == "zqk-community" {
+		execName = PressureTestExecutableName
+	}
+	brand.SetProductName(pressureTestProductName)
 	projectRoot := cli.ResolveProjectRoot(".")
-	namespacePrefix := strings.ToLower(execName)
+	namespacePrefix := "zqk"
 	if projectRoot != EmptyValue {
 		configPath := filepath.Join(projectRoot, paths.ProjectDataDir, paths.ConfigDir, paths.ProjectConfigFile)
 		if data, err := fileutil.ReadFile(configPath); err == nil {
@@ -624,7 +635,7 @@ func init() {
 	}
 
 	// Set version template (matches utility version command format)
-	rootCmd.SetVersionTemplate(fmt.Sprintf("Executable: %s\nVersion: %s\nBuild datetime: %s\nCommit hash: %s\n", brand.ExecutableName(), version, buildDate, gitCommit))
+	rootCmd.SetVersionTemplate(fmt.Sprintf("Edition: community (pressure-test SKU; not studio zqk)\nExecutable: %s\nProduct: %s\nVersion: %s\nBuild datetime: %s\nCommit hash: %s\n", brand.ExecutableName(), brand.ProductName(), version, buildDate, gitCommit))
 
 	// Add context flag for context profiles (e.g., --context ai-agent)
 	rootCmd.PersistentFlags().String("context", "", "Context profile (ai-agent, human, debug). Profiles set default output format and behavior.")
@@ -670,6 +681,16 @@ func init() {
 	rootCmd.PersistentPreRunE = rootPersistentPreRunE
 
 	rootCmd.PersistentPostRunE = rootPersistentPostRunE
+}
+
+// ApplyPressureTestBrand pins zcom after package init so this SKU cannot be
+// mistaken for studio zqk. TRACK: TDE-1789678536875854000-47240146 — drop at public launch.
+func ApplyPressureTestBrand() {
+	brand.SetExecutableName(PressureTestExecutableName)
+	brand.SetProductName(pressureTestProductName)
+	paths.CLICommandName = PressureTestExecutableName
+	rootCmd.Use = PressureTestExecutableName
+	rootCmd.SetVersionTemplate(fmt.Sprintf("Edition: community (pressure-test SKU; not studio zqk)\nExecutable: %s\nProduct: %s\nVersion: %s\nBuild datetime: %s\nCommit hash: %s\n", brand.ExecutableName(), brand.ProductName(), version, buildDate, gitCommit))
 }
 
 // rootPreRunInitFileLogging configures global file logging from profile/config (extracted to reduce gocyclo in rootPersistentPreRunE).

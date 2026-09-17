@@ -34,9 +34,12 @@ func init() {
 	// Community edition: frictionless local kernel. Auth middleware seats the
 	// system account when no token is present — not ACC-TEST-HARNESS.
 	zqkenv.IsCommunityEdition = true
+	// Keep this SKU visually distinct from studio zqk while pressure testing.
+	// TRACK: TDE-1789678536875854000-47240146 — rename executable to zqk at public launch.
+	app.ApplyPressureTestBrand()
 }
 
-// main is the entry point for the primary zqk CLI binary.
+// main is the entry point for the community pressure-test CLI (zcom).
 func main() {
 	app.Execute()
 }

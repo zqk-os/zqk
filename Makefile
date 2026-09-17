@@ -44,27 +44,39 @@ ADMIN_AUTH = set -a; [ -f .env ] && . ./.env; set +a; \
 
 # Default target
 help:
-	@echo "ZQK Build System"
-	@echo ""
-	@echo "  make build-all              - Full build (binaries + generate-spec-builders + promote-stable)"
-	@echo "  make zqk                    - Build bin/zqk (embeds bootstrap archive)"
-	@echo "  make zqk-community          - Build bin/zqk-community + portable bootstrap verify"
-	@echo "  make zqk-admin              - Build bin/zqk-admin"
-	@echo "  make zqk-mcp / zqk-mcp-fal  - Build MCP binaries"
-	@echo "  make zqk-neuron|muscle|heart|lung - Tier-specialized zqk binaries"
-	@echo "  make zqk-shim               - Build bin/zqk-shim (+ bin/shims links)"
-	@echo "  make generate-spec-builders - Regenerate builders via zqk-admin"
-	@echo "  make promote-stable         - Stop holders, install tip → zqk-stable, recycle ALL stable daemons"
-	@echo "  make verify                 - spec-driven test_case verification + golangci-lint + govulncheck"
-	@echo "  make test-cases             - Run all active kernel test_case objects"
-	@echo "  make govulncheck            - Run govulncheck on all packages"
-	@echo "  make gosec                  - Run gosec security scanner"
-	@echo "  make clean                  - Remove bin/* and .zqk/tmp/*"
-	@echo "  make scheduler-stop|restart - Stop/start local scheduler daemon"
-	@echo "  make install-scheduler-service - Host OS unit (launchd/systemd)"
-	@echo "  make release VERSION=vX.Y.Z - Release packaging (see scripts/release.sh)"
-	@echo "  make release-community VERSION=vX.Y.Z - Community package"
-	@echo ""
+	@if [ ! -f cmd/zqk/main.go ]; then \
+		echo "ZQK Community pressure-test (zcom) — not studio zqk"; \
+		echo ""; \
+		echo "  make / make zcom            - Build bin/zcom from ./cmd/zqk-community"; \
+		echo "  make zqk-community          - Same SKU as zcom plus portable bootstrap verify"; \
+		echo "  make clean                  - Remove bin/*"; \
+		echo ""; \
+		echo "Use ./bin/zcom with ZCOM_PROJECT_ROOT pointing at this checkout."; \
+		echo "Studio remains ./bin/zqk. Rename zcom → zqk only at public launch."; \
+	else \
+		echo "ZQK Build System"; \
+		echo ""; \
+		echo "  make build-all              - Full build (binaries + generate-spec-builders + promote-stable)"; \
+		echo "  make zqk                    - Build bin/zqk (embeds bootstrap archive)"; \
+		echo "  make zqk-community          - Build bin/zqk-community + portable bootstrap verify"; \
+		echo "  make zcom                    - Community SKU: bin/zcom from ./cmd/zqk-community"; \
+		echo "  make zqk-admin              - Build bin/zqk-admin"; \
+		echo "  make zqk-mcp / zqk-mcp-fal  - Build MCP binaries"; \
+		echo "  make zqk-neuron|muscle|heart|lung - Tier-specialized zqk binaries"; \
+		echo "  make zqk-shim               - Build bin/zqk-shim (+ bin/shims links)"; \
+		echo "  make generate-spec-builders - Regenerate builders via zqk-admin"; \
+		echo "  make promote-stable         - Stop holders, install tip → zqk-stable, recycle ALL stable daemons"; \
+		echo "  make verify                 - spec-driven test_case verification + golangci-lint + govulncheck"; \
+		echo "  make test-cases             - Run all active kernel test_case objects"; \
+		echo "  make govulncheck            - Run govulncheck on all packages"; \
+		echo "  make gosec                  - Run gosec security scanner"; \
+		echo "  make clean                  - Remove bin/* and .zqk/tmp/*"; \
+		echo "  make scheduler-stop|restart - Stop/start local scheduler daemon"; \
+		echo "  make install-scheduler-service - Host OS unit (launchd/systemd)"; \
+		echo "  make release VERSION=vX.Y.Z - Release packaging (see scripts/release.sh)"; \
+		echo "  make release-community VERSION=vX.Y.Z - Community package"; \
+		echo ""; \
+	fi
 
 build-all: zqk zqk-admin zqk-community zqk-mcp zqk-mcp-fal generate-spec-builders zqk-neuron zqk-muscle zqk-heart zqk-lung zqk-shim promote-stable
 
@@ -101,7 +113,9 @@ zqk-community: bootstrap-archive
 	go build -ldflags '$(COMMUNITY_LDFLAGS)' -o bin/zqk-community ./cmd/zqk-community
 	@$(SHELL) scripts/open-core/verify-bootstrap-portable.sh "$$(pwd)" bin/zqk-community
 
-# Community product binary. Same SKU as zqk-community; name is zcom.
+# Community binary embeds scrubbed bootstrap (REQ-9009). Never treat this monorepo
+# as the user's project root — verify extract only into a temp project.
+# Pressure-test name is zcom so it cannot be confused with studio zqk.
 zcom: bootstrap-archive
 	go build -ldflags '$(COMMUNITY_LDFLAGS)' -o $(ZCOM_BIN) ./cmd/zqk-community
 

@@ -8,8 +8,8 @@ import (
 )
 
 var (
-	// Replace standalone words only (avoid touching paths/identifiers unintentionally).
-	reExecLower = regexp.MustCompile(`\b(zqk)\b`)
+	// Standalone "zqk" token, but not the ".zqk" data-dir prefix.
+	reExecLower = regexp.MustCompile(`(^|[^.\w])(zqk)\b`)
 	reProdExact = regexp.MustCompile(`\b(ZQK|NEXOS)\b`)
 )
 
@@ -52,7 +52,7 @@ func applyBrandingToText(s, executableName, productName string) string {
 		return s
 	}
 
-	out := reExecLower.ReplaceAllString(s, executableName)
+	out := reExecLower.ReplaceAllString(s, "${1}"+executableName)
 
 	// Product replacement: preserve full-uppercase look when the original token is uppercase.
 	out = reProdExact.ReplaceAllStringFunc(out, func(match string) string {
