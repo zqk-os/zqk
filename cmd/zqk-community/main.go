@@ -15,7 +15,11 @@ import (
 // cgo DNS acquires libc pthread mutexes that deadlock with fork() in
 // multi-threaded processes (observed in scheduler daemon crashes).
 func init() {
-	// Load environment variables from .env file (if present) from project root.
+	zqkenv.IsCommunityEdition = true
+	app.ApplyPressureTestBrand()
+
+	// Load .env only after brand+community flags so studio ZQK_PROJECT_ROOT
+	// from an IDE shell cannot hijack this SKU's project root.
 	projectRoot := paths.ResolveProjectRoot(".")
 	envPath := filepath.Join(projectRoot, ".env")
 	if _, err := fileutil.Stat(envPath); err == nil {
@@ -30,13 +34,6 @@ func init() {
 			_ = zqkenv.GoDebug().Set(godebug + ",netdns=go")
 		}
 	}
-
-	// Community edition: frictionless local kernel. Auth middleware seats the
-	// system account when no token is present — not ACC-TEST-HARNESS.
-	zqkenv.IsCommunityEdition = true
-	// Keep this SKU visually distinct from studio zqk while pressure testing.
-	// TRACK: TDE-1789678536875854000-47240146 — rename executable to zqk at public launch.
-	app.ApplyPressureTestBrand()
 }
 
 // main is the entry point for the community pressure-test CLI (zcom).

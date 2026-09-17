@@ -66,7 +66,7 @@ const EmptyValue = ""
 // TRACK: TDE-1789678536875854000-47240146 — keep zcom until community ships as zqk.
 const (
 	PressureTestExecutableName = "zcom"
-	pressureTestProductName     = "ZQK Community"
+	pressureTestProductName    = "ZQK Community"
 )
 
 // projectConfigBootstrapYAML matches a subset of .zqk/config/config.yaml read during init for branding.
@@ -1324,6 +1324,12 @@ func registerCommands() {
 	systemCmdInst := system.NewSystemCmd()
 	systemCmdInst.GroupID = "everyday"
 	rootCmd.AddCommand(systemCmdInst)
+
+	// Top-level quickstart — docs and first-run tell strangers `zcom quickstart`.
+	// The same command also lives under `system` as start-here.
+	quickstartCmdInst := system.NewQuickstartCmd()
+	quickstartCmdInst.GroupID = "everyday"
+	rootCmd.AddCommand(quickstartCmdInst)
 
 	// In-process code search engine (grep / zgrep)
 	grepCmdInst := grep.NewGrepCmd()

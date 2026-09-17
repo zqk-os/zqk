@@ -10,6 +10,7 @@ import (
 
 	"github.com/lanceman/zqk/internal/cli"
 	"github.com/lanceman/zqk/pkg/authcred"
+	"github.com/lanceman/zqk/pkg/brand"
 	pkgctx "github.com/lanceman/zqk/pkg/context"
 	"github.com/lanceman/zqk/pkg/errfmt"
 	"github.com/lanceman/zqk/pkg/objects"
@@ -30,6 +31,10 @@ func AuthMiddleware(cmd *cobra.Command, projectRoot string) error {
 	}
 	if cli.SessionOptional(cmd) {
 		return nil
+	}
+
+	if zqkenv.IsCommunityEdition && !communityKernelReady(projectRoot) {
+		return communityUninitializedError(projectRoot)
 	}
 
 	ctx := cmd.Context()
@@ -90,6 +95,9 @@ func AuthMiddleware(cmd *cobra.Command, projectRoot string) error {
 	}
 
 	if _, statErr := fileutil.Stat(accountSchemaPath); statErr != nil {
+		if zqkenv.IsCommunityEdition {
+			return communityUninitializedError(projectRoot)
+		}
 		return errfmt.Errorf("unauthorized: failed to load account schema: %v", statErr)
 	}
 
@@ -318,4 +326,31 @@ func firstString(vals []string) string {
 		}
 	}
 	return ""
+}
+
+func communityKernelReady(projectRoot string) bool {
+	if strings.TrimSpace(projectRoot) == "" {
+		return false
+	}
+	kernel := filepath.Join(projectRoot, paths.ProcessInternalObjectSpecsDir, "kernel", "account.yaml")
+	if _, err := fileutil.Stat(kernel); err == nil {
+		return true
+	}
+	legacy := filepath.Join(projectRoot, paths.ProcessInternalObjectSpecsDir, "account.yaml")
+	_, err := fileutil.Stat(legacy)
+	return err == nil
+}
+
+func communityUninitializedError(projectRoot string) error {
+	exe := brand.ExecutableName()
+	if strings.TrimSpace(exe) == "" {
+		exe = "zcom"
+	}
+	where := strings.TrimSpace(projectRoot)
+	if where == "" {
+		where = "this directory"
+	} else if abs, err := filepath.Abs(where); err == nil {
+		where = abs
+	}
+	return errfmt.Errorf("no knowledge kernel at %s. Run `%s system init --project-name <name>` from the project directory. Do not export %s_PROJECT_ROOT (or ZQK_PROJECT_ROOT) in your shell profile — it silently attaches commands to another checkout. Kernel data lives under .zqk/, not .zcom/", where, exe, strings.ToUpper(exe))
 }

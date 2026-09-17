@@ -1,6 +1,6 @@
 # First-run object tutorial (template → create → get → update)
 
-**Audience:** New users after `zqk init` (Journey B in [CLI_ALPHA_LAUNCH_PLAN.md](../architecture/CLI_ALPHA_LAUNCH_PLAN.md)).  
+**Audience:** New users after `zcom system init` (Journey B in [CLI_ALPHA_LAUNCH_PLAN.md](../architecture/CLI_ALPHA_LAUNCH_PLAN.md)).  
 **Backlog:** Tracked as part of alpha CLI launch work (see priority plan *CLI alpha launch readiness*).
 
 This path uses the **`question`** kind as a **small** object: few required fields, suitable for learning `object template` / `object create` without editing large YAML. Adjust the kind if your org standardizes another “low-risk” kind.
@@ -8,7 +8,7 @@ This path uses the **`question`** kind as a **small** object: few required field
 ## Prerequisites
 
 - Shell at the **project root** (directory containing `go.mod` and `.zqk/` after init).
-- `zqk` on `PATH` (or invoke `./bin/zqk` from a built tree).
+- `zcom` on `PATH` (or invoke `./bin/zcom` from a built tree).
 
 ## 0. Orient (recommended)
 

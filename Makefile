@@ -21,7 +21,8 @@ help:
 	@echo "  make / make zcom   - Build bin/zcom from ./cmd/zqk-community"
 	@echo "  make clean          - Remove bin/*"
 	@echo ""
-	@echo "Use ./bin/zcom with ZCOM_PROJECT_ROOT pointing at this checkout."
+	@echo "Use ./bin/zcom from the project directory."
+	@echo "Do not export ZCOM_PROJECT_ROOT in your shell profile — it hijacks cwd."
 	@echo "Studio remains ./bin/zqk. Rename zcom → zqk only at public launch."
 
 bootstrap-archive:

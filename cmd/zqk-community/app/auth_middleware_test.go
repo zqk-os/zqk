@@ -2,6 +2,7 @@ package app
 
 import (
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/lanceman/zqk/internal/cli"
@@ -88,7 +89,15 @@ func TestAuthMiddleware_CommunityEditionSeatsSystemAccount(t *testing.T) {
 	t.Setenv(zqkenv.TestRoot().Name(), "")
 	t.Setenv(zqkenv.TestBypassAuth().Name(), "0")
 
-	if err := AuthMiddleware(cmd, t.TempDir()); err != nil {
+	if err := AuthMiddleware(cmd, t.TempDir()); err == nil {
+		t.Fatal("expected uninitialized-kernel error, got nil")
+	} else if !strings.Contains(err.Error(), "system init") {
+		t.Fatalf("want init hint, got %v", err)
+	}
+
+	projectRoot := t.TempDir()
+	createSchemas(t, projectRoot)
+	if err := AuthMiddleware(cmd, projectRoot); err != nil {
 		t.Fatalf("community edition with no token: %v", err)
 	}
 	sec := pkgctx.GetSecurityContext(cmd.Context())
@@ -115,6 +124,30 @@ func TestAuthMiddleware_BypassInit(t *testing.T) {
 	err := AuthMiddleware(cmd, projectRoot)
 	if err != nil {
 		t.Fatalf("expected no error for bypassed command, got %v", err)
+	}
+}
+
+func TestAuthMiddleware_CommunityLeftoverCredsUninitializedHintsInit(t *testing.T) {
+	prev := zqkenv.IsCommunityEdition
+	zqkenv.IsCommunityEdition = true
+	t.Cleanup(func() { zqkenv.IsCommunityEdition = prev })
+
+	cmd := &cobra.Command{Use: "list"}
+	home := t.TempDir()
+	t.Setenv(zqkenv.OSHome().Name(), home)
+	t.Setenv(zqkenv.APIKey().Name(), "ACC-leftover-studio")
+	t.Setenv(zqkenv.TestRoot().Name(), "")
+	t.Setenv(zqkenv.TestBypassAuth().Name(), "0")
+
+	err := AuthMiddleware(cmd, t.TempDir())
+	if err == nil {
+		t.Fatal("expected uninitialized hint, got nil")
+	}
+	if strings.Contains(err.Error(), "account schema") {
+		t.Fatalf("leftover creds must not look like unauthorized schema: %v", err)
+	}
+	if !strings.Contains(err.Error(), "system init") {
+		t.Fatalf("want init hint, got %v", err)
 	}
 }
 

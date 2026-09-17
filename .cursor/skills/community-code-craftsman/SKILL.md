@@ -11,7 +11,7 @@ Execute implementation tasks with high structural rigor, complete test coverage,
 ## Workflow Protocol
 1. **Pre-Implementation Verification**:
    - Run existing test suites (`go test -v ./...`) before writing new code.
-   - Inspect active policies (`zqk object list policy`).
+   - Inspect active policies (`./bin/zcom object list policy`).
 2. **Test-Driven Development (TDD)**:
    - Write unit tests demonstrating the desired behavior or defect reproduction before writing production code.
    - Verify tests fail as expected, then write minimal code to achieve a green state.

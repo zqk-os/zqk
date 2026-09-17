@@ -10,12 +10,12 @@ Drive coherent, deterministic progress across autonomous agent swarms by anchori
 
 ## Orchestration Protocol
 1. **Self-Discovery & Orientation**:
-   - Query `zqk workflow whats-next` to discover active mission, priority plans, and constraints.
+   - Query `./bin/zcom workflow whats-next` to discover active mission, priority plans, and constraints.
 2. **Atomic Task Ownership**:
    - Ensure all workstreams have dedicated backlog items with clear priorities (`P0`, `P1`).
    - Coordinate task claims to avoid duplicate effort across peer agents.
 3. **Mesh Coordination**:
-   - Use `zqk feed emit-status` and `zqk feed steer` to maintain real-time mesh alignment with peer agents.
+   - Use `./bin/zcom feed emit-status` and `./bin/zcom feed steer` to maintain real-time mesh alignment with peer agents.
 4. **Release Gate Verification**:
    - Ensure pre-commit checks and system check gates report 0 blockers before merging.
 
