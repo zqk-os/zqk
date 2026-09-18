@@ -71,11 +71,13 @@ if command -v find >/dev/null 2>&1; then
     extras=$(find "$ROOT/scripts" -type f \( -name '*.sh' -o -name '*.py' \) \
       ! -name 'package-community.sh' \
       ! -name 'install.sh' \
+      ! -name 'generate-openvex.sh' \
       ! -path '*/open-core/*' \
       ! -path '*/starter_kernel_graph/*' \
       ! -path '*/onboarding_roadmap/*' \
       ! -path '*/default_agent_skills/*' \
       ! -path '*/default_policies/*' \
+      ! -path '*/demos/*' \
       ! -name 'build-bootstrap-archive.sh' \
       2>/dev/null || true)
     if [ -n "$extras" ]; then

@@ -99,7 +99,9 @@ kind: goal
 schema_version: 2.0.0
 namespace_id: zqk:kernel
 title: Community kernel is launch-ready for strangers and agents
-description: "Measurable outcome: zcom in this checkout lists a linked org/mission/vision/goal/workstream/priority_plan, live docs have doc_entry rows, archive copies are gone, and identity is the system account."
+description: "Measurable outcome: zqk in this checkout lists a linked org/mission/vision/goal/workstream/priority_plan, live docs have doc_entry rows, archive copies are gone, and identity is the system account."
+metric: starter_graph objects at shovel-ready statuses
+target: "1"
 status: active
 created_by: %s
 updated_by: %s
@@ -118,6 +120,7 @@ schema_version: 2.0.0
 namespace_id: zqk:kernel
 title: Community launch and first-run kernel
 description: "Execution lane for community launch vetting: isolation, documentation graph, starter kernel objects, and installer/quickstart."
+entry_point: docs/onboarding/COMMUNITY_FIRST_RUN.md
 category: feature
 status: active
 owner_ref: %s

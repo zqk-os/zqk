@@ -36,15 +36,15 @@ func requireBootstrapPresent(t *testing.T, root string) {
 	canonicalConfig := filepath.Join(configDir, paths.ProjectConfigFile)
 	legacyConfig := filepath.Join(root, paths.ProjectDataDir, paths.ProjectConfigFile)
 
-	// _internal: at least one object spec
-	specs, _ := fileutil.ReadDir(objectSpecs)
+	// _internal: at least one object spec (may be in subdirs like kernel/, pm/, qa/)
 	var hasSpec bool
-	for _, e := range specs {
-		if !e.IsDir() && strings.HasSuffix(e.Name(), ".yaml") {
+	_ = filepath.Walk(objectSpecs, func(path string, info fileutil.FileInfo, err error) error {
+		if err == nil && !info.IsDir() && strings.HasSuffix(info.Name(), ".yaml") {
 			hasSpec = true
-			break
+			return filepath.SkipAll
 		}
-	}
+		return nil
+	})
 	if !hasSpec {
 		t.Errorf("bootstrap incomplete: %s has no .yaml files", objectSpecs)
 	}

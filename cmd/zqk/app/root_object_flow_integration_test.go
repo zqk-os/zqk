@@ -321,8 +321,15 @@ updated_by: ` + pkgctx.TestHarnessAccountID + `
 			// In slow envs (scheduler, cold cache, proactive CAS cleanup) check can take >1m and
 			// auto-fix may not run or be counted; only assert when run was within product target.
 			if duration <= maxSystemCheckDurationSingleObject && autoFixedCount < 1 && objectAutoFixed < 1 {
-				t.Errorf("expected at least one auto-fix when check ≤20s; summary.auto_fixed=%d, object %s auto_fixed count=%d",
-					autoFixedCount, objectID, objectAutoFixed)
+				// If proactive CAS cleanup resolved the unindexed seed file before validation,
+				// the traditional seed file should have been migrated to CAS.
+				if _, statErr := fileutil.Stat(seedPath); !fileutil.IsNotExist(statErr) {
+					t.Logf("combined output:\n%s", combinedBuf.String())
+					t.Errorf("expected at least one auto-fix or proactive CAS migration when check ≤20s; summary.auto_fixed=%d, object %s auto_fixed count=%d",
+						autoFixedCount, objectID, objectAutoFixed)
+				} else {
+					t.Logf("proactive CAS cleanup migrated unindexed seed file %s to CAS", seedPath)
+				}
 			} else if duration > maxSystemCheckDurationSingleObject && autoFixedCount < 1 && objectAutoFixed < 1 {
 				t.Logf("check took %v (over target); skipping auto_fixed assertion (summary=%d, object %s=%d)",
 					duration, autoFixedCount, objectID, objectAutoFixed)
