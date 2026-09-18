@@ -1101,13 +1101,6 @@ func GetGlobalSpecLoader() *SpecLoader {
 	return globalSpecLoader
 }
 
-// ResetGlobalSpecLoaderForTesting resets the root-bound singleton after a test
-// changes ZQK_TEST_ROOT. Call only from non-parallel tests.
-func ResetGlobalSpecLoaderForTesting() {
-	globalSpecLoader = nil
-	specLoaderOnce = sync.Once{}
-}
-
 // DiscoverOntologies returns all available ontologies in the specs directory and its subdirectories.
 func (sl *SpecLoader) DiscoverOntologies() ([]string, error) {
 	if sl == nil || sl.specsDir == emptyValue {

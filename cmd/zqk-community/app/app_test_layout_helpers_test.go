@@ -35,7 +35,6 @@ func bindIsolatedAppTestRoot(t *testing.T, projectRoot string) {
 	t.Setenv(zqkenv.ProjectRoot().Name(), "")
 	t.Setenv(zqkenv.InTest().Name(), "true")
 	zqkenv.ApplyIsolatedStorageEnv(t.Setenv)
-	objects.ResetGlobalSpecLoaderForTesting()
 	objects.ResetGlobalFieldRegistryForTesting()
 	objects.ResetGlobalKindMapperForTesting()
 	objects.GetGlobalLifecycleLoader().ClearCache()
