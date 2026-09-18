@@ -18,4 +18,4 @@ if [ ! -f "$SRC" ]; then
   exit 2
 fi
 cp "$SRC" "$DEST/Makefile"
-echo "Installed community Makefile (zcom) from $SRC"
+echo "Installed community Makefile from $SRC"

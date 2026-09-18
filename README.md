@@ -1,8 +1,8 @@
-# ZQK Community (pressure-test SKU: `zcom`)
+# ZQK Community
 
 **Your AI agents are coding blind. ZQK gives them project awareness, memory, and guardrails.**
 
-This tree is the **community pressure-test** product. The binary is **`zcom`** so it cannot be confused with studio `zqk`. Public launch will rename it to `zqk`. Kernel data stays under **`.zqk/`**.
+This tree is the **community** product. Command examples use the default executable token and are rewritten at install from `brand.executable_name`. Kernel data stays under **`.zqk/`**.
 
 ZQK is an operating system for AI + human hybrid engineering teams. It standardizes project goals, architecture, documentation, and task orchestration so multiple agents can collaborate safely and autonomously without losing context or drifting from requirements.
 
@@ -12,9 +12,9 @@ There is **no brew formula and no public GitHub release** yet. Build from this c
 
 👉 **[Community First-Run Guide (Human + Agent)](./docs/onboarding/COMMUNITY_FIRST_RUN.md)**
 
-**1. Build `zcom`**
+**1. Build the CLI**
 ```sh
-make          # → ./bin/zcom
+make          # → ./bin/zcom  (or ./bin/<brand.executable_name>)
 ./bin/zcom --version
 ```
 
@@ -24,7 +24,7 @@ make          # → ./bin/zcom
 # Greenfield:
 mkdir my-project && cd my-project
 /path/to/this-repo/bin/zcom system init --project-name my-project
-./path/to/this-repo/bin/zcom quickstart
+/path/to/this-repo/bin/zcom quickstart
 ```
 
 Do **not** `export ZCOM_PROJECT_ROOT` in your shell profile. It silently attaches later commands to that checkout instead of the directory you are in.
@@ -78,12 +78,12 @@ ZQK uses the [Model Context Protocol (MCP)](https://modelcontextprotocol.io/) to
 
 ### Getting started (clean machine golden path)
 
-From an empty project directory, using the `zcom` you built in this repo:
+From an empty project directory, using the binary you built in this repo:
 
 ```bash
-/path/to/zqk-public-candidate/bin/zcom system init --project-name my-project
-/path/to/zqk-public-candidate/bin/zcom object list
-./path/to/zqk-public-candidate/bin/zcom workflow whats-next --format json
+/path/to/this-repo/bin/zcom system init --project-name my-project
+/path/to/this-repo/bin/zcom object list
+/path/to/this-repo/bin/zcom workflow whats-next --format json
 ```
 
 Expected outcomes:
@@ -103,7 +103,7 @@ If you run init a second time in the same directory:
 - [Community first-run](./docs/onboarding/COMMUNITY_FIRST_RUN.md)
 - [Quickstart / MCP](./docs/onboarding/QUICKSTART.md)
 - [First-run object tutorial](./docs/onboarding/FIRST_RUN_OBJECT_TUTORIAL.md)
-- [Architecture](./docs/architecture/README.md) (some pages still mention studio `zqk`; prefer `zcom` on this SKU)
+- [Architecture](./docs/architecture/README.md)
 - [Contributing](./CONTRIBUTING.md)
 
 ### License

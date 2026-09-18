@@ -10,4 +10,4 @@
 ./bin/zcom workflow whats-next --format json
 ```
 
-`--headless` skips IDE rule forests. Do not `export ZCOM_PROJECT_ROOT`. There is no `zqk-neuron` / organ binary on this SKU.
+`--headless` skips IDE rule forests. Do not `export ZCOM_PROJECT_ROOT`. There is no organ binary on this SKU.

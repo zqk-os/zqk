@@ -1,6 +1,6 @@
 # ZQK Community Quickstart & MCP
 
-Pressure-test binary: **`zcom`** (`make` → `./bin/zcom`). Kernel data stays under **`.zqk/`**. There is no standalone `zqk-mcp`.
+Command examples use the default executable token. `make` writes `./bin/<brand.executable_name>`. Kernel data stays under **`.zqk/`**. There is no standalone `zqk-mcp`.
 
 ```sh
 ./bin/zcom quickstart
@@ -23,7 +23,7 @@ Manual Cursor config:
 ```json
 {
   "mcpServers": {
-    "zqk": {
+    "zcom": {
       "command": "/absolute/path/to/bin/zcom",
       "args": ["mcp", "cursor-adapter"]
     }
@@ -36,7 +36,7 @@ Claude Desktop / other stdio hosts:
 ```json
 {
   "mcpServers": {
-    "zqk": {
+    "zcom": {
       "command": "/absolute/path/to/bin/zcom",
       "args": ["mcp", "serve"]
     }

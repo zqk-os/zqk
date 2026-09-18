@@ -1,14 +1,14 @@
 # First-run object tutorial (template → create → get → update)
 
 **Audience:** After `./bin/zcom system init`.  
-**CLI:** `./bin/zcom` (pressure-test name; public launch will be `zqk`).
+**CLI:** default executable token; applybrand rewrites from `brand.executable_name`.
 
 This path uses the **`question`** kind as a small object.
 
 ## Prerequisites
 
 - Shell at the project root (directory containing `.zqk/` after init).
-- `./bin/zcom` from this tree (or `zcom` on `PATH`).
+- `./bin/zcom` from this tree (or the branded name on `PATH`).
 
 ## 0. Orient
 
@@ -20,9 +20,9 @@ This path uses the **`question`** kind as a small object.
 ## 1. Create
 
 ```bash
-./bin/zcom object template question --include-optional=false -o /tmp/zcom-first-question.yaml
+./bin/zcom object template question --include-optional=false -o /tmp/zqk-first-question.yaml
 # edit required fields, then:
-./bin/zcom object create question --file /tmp/zcom-first-question.yaml
+./bin/zcom object create question --file /tmp/zqk-first-question.yaml
 ```
 
 Or:

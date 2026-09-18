@@ -7,8 +7,8 @@ project:
   name: zqk-public-candidate
   template: standard
 
-# Pressure-test SKU: keep zcom so this checkout is not mistaken for studio zqk.
-# TRACK: TDE-1789678536875854000-47240146 — rename executable_name to zqk at public launch.
+# Pressure-test SKU: brand.executable_name is the live CLI (canonical token is zqk).
+# TRACK: TDE-1789678536875854000-47240146 — set executable_name: zqk at public launch.
 brand:
   executable_name: zcom
   product_name: ZQK Community

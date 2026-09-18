@@ -1,29 +1,19 @@
 package cli
 
 import (
-	"regexp"
-	"strings"
-
+	"github.com/lanceman/zqk/pkg/brand"
 	"github.com/spf13/cobra"
 )
 
-var (
-	// Replace standalone words only (avoid touching paths/identifiers unintentionally).
-	reExecLower = regexp.MustCompile(`\b(zqk)\b`)
-	reProdExact = regexp.MustCompile(`\b(ZQK|NEXOS)\b`)
-)
-
 // ApplyBrandingToCommandTree rewrites user-facing help text in the Cobra tree so it matches the
-// configured brand (product name) and executable name. This avoids hardcoding command names across
-// the codebase and supports white-labeling.
-//
-// This intentionally does NOT rewrite cmd.Use for non-root commands (those are subcommand tokens).
+// configured brand (product name) and executable name. Canonical source tokens are `zqk` / `ZQK`.
+// TRACK: TDE-1789678536875854000-47240146
 func ApplyBrandingToCommandTree(root *cobra.Command, executableName, productName string) {
 	if root == nil {
 		return
 	}
 	if executableName == emptyValue {
-		executableName = "zqk"
+		executableName = brand.CanonicalExecutableToken
 	}
 	if productName == emptyValue {
 		productName = "ZQK"
@@ -37,30 +27,11 @@ func applyBrandingRecursive(cmd *cobra.Command, executableName, productName stri
 		return
 	}
 
-	// Update user-facing strings.
-	cmd.Short = applyBrandingToText(cmd.Short, executableName, productName)
-	cmd.Long = applyBrandingToText(cmd.Long, executableName, productName)
-	cmd.Example = applyBrandingToText(cmd.Example, executableName, productName)
+	cmd.Short = brand.ApplyToUserText(cmd.Short, executableName, productName)
+	cmd.Long = brand.ApplyToUserText(cmd.Long, executableName, productName)
+	cmd.Example = brand.ApplyToUserText(cmd.Example, executableName, productName)
 
 	for _, child := range cmd.Commands() {
 		applyBrandingRecursive(child, executableName, productName)
 	}
-}
-
-func applyBrandingToText(s, executableName, productName string) string {
-	if s == emptyValue {
-		return s
-	}
-
-	out := reExecLower.ReplaceAllString(s, executableName)
-
-	// Product replacement: preserve full-uppercase look when the original token is uppercase.
-	out = reProdExact.ReplaceAllStringFunc(out, func(match string) string {
-		if match == strings.ToUpper(match) {
-			return strings.ToUpper(productName)
-		}
-		return productName
-	})
-
-	return out
 }

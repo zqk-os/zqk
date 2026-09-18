@@ -41,3 +41,6 @@ install_file "$SKU/EDGE_HEADLESS_FIRST_RUN.md" "$DEST/docs/onboarding/EDGE_HEADL
 install_file "$SKU/CONTRIBUTING.md" "$DEST/CONTRIBUTING.md"
 install_file "$SKU/README.md" "$DEST/README.md"
 echo "Installed community SKU overlay into $DEST"
+if [ -d "$DEST/scripts/open-core/applybrand" ]; then
+  (cd "$DEST" && go run ./scripts/open-core/applybrand --root "$DEST") || echo "applybrand skipped"
+fi

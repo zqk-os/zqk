@@ -1,6 +1,6 @@
 # Onboarding (ZQK Community)
 
-**CLI:** `./bin/zcom` until public launch (then `zqk`). Kernel data stays under `.zqk/`.
+**CLI:** default executable token. Live binary is `brand.executable_name` in `.zqk/config/config.yaml`. Kernel data stays under `.zqk/`.
 
 ## Read this, in order
 
@@ -12,7 +12,7 @@
 ## Not first-run
 
 - **[AI Agent Onboarding](./AI_AGENT_ONBOARDING.md)** is a studio-dense process pack. Do not treat it as the community golden path.
-- There is no `make alpha-help`, `zqk-admin`, `zcom-admin`, or public brew/GitHub release on this SKU.
+- There is no `make alpha-help`, `zqk-admin`, or public brew/GitHub release on this SKU.
 - Scheduler **is** shipped: `./bin/zcom scheduler start|stop|status`. CRUD works without it.
 
 ## Session start

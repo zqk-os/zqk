@@ -1,19 +1,19 @@
 # AI Agent Onboarding
 
 **Scope:** Studio / process-dense dogfood (convergence, policies, scheduler habits).  
-**Community strangers:** start with [`COMMUNITY_FIRST_RUN.md`](./COMMUNITY_FIRST_RUN.md) and `zqk system agent-onboard` — not this document.
+**Community strangers:** start with [`COMMUNITY_FIRST_RUN.md`](./COMMUNITY_FIRST_RUN.md) and `zcom system agent-onboard` — not this document.
 
-**Welcome to zqk!** The very beginning of what will become earth's first fully-agentic and distributed operating system for the emerging era of super-productivity that will enable effective, efficient, accurate, safe, reliable and observable AI and human collaboration.
+**Welcome to zcom!** The very beginning of what will become earth's first fully-agentic and distributed operating system for the emerging era of super-productivity that will enable effective, efficient, accurate, safe, reliable and observable AI and human collaboration.
 
 **Current plan and convergence:** After this document, read **[AGENT_ONBOARDING_SNAPSHOT.md](./AGENT_ONBOARDING_SNAPSHOT.md)** for live `priority_plan` / `convergence_session` pointers and verification commands. **Historical narrative:** [AGENT_ONBOARDING_SUMMARIES_DIGEST.md](./AGENT_ONBOARDING_SUMMARIES_DIGEST.md); **index:** [README.md](./README.md).
 
 ## Project Context
 
-zqk is built on a distributed knowledge kernel architecture that enables AI agents and humans to collaborate effectively. The system uses a stable, production-ready CLI (`zqk`) that provides comprehensive object management, system operations, and workflow automation.
+zcom is built on a distributed knowledge kernel architecture that enables AI agents and humans to collaborate effectively. The system uses a stable, production-ready CLI (`zcom`) that provides comprehensive object management, system operations, and workflow automation.
 
-**Mission**: The canonical mission statement lives in process objects (e.g. `zqk object list mission --format table`, `zqk object get <MIS-*>`). It is linked from **VIS-001** via `mission_refs` for vision–mission alignment.
+**Mission**: The canonical mission statement lives in process objects (e.g. `zcom object list mission --format table`, `zcom object get <MIS-*>`). It is linked from **VIS-001** via `mission_refs` for vision–mission alignment.
 
-**Strategic Plan**: All work is aligned with STRAT-PLAN-001 (zqk 3-Year Strategic Plan 2026-2028), which defines three phases:
+**Strategic Plan**: All work is aligned with STRAT-PLAN-001 (zcom 3-Year Strategic Plan 2026-2028), which defines three phases:
 - **Phase 1: Foundation (2026)**: Core ontology, semantic bridge, and system commands
 - **Phase 2: Advanced Features (2027)**: Organizational modeling, domain integration, strategic alignment
 - **Phase 3: Scale and Optimization (2028)**: Enterprise features, multi-instance management, optimization
@@ -24,37 +24,37 @@ zqk is built on a distributed knowledge kernel architecture that enables AI agen
 
 ### First orientation (before raw object list)
 
-1. **`zqk workflow whats-next --format json`** — self-discover current priority plan, active convergence, and next actions from the knowledge kernel.
-2. Prefer that over starting with `zqk object list backlog_item` / `object list goal` as orientation.
-3. Draft new objects with **`zqk object template <kind>`** (canonical); `zqk new object` is a shortcut.
+1. **`zcom workflow whats-next --format json`** — self-discover current priority plan, active convergence, and next actions from the knowledge kernel.
+2. Prefer that over starting with `zcom object list backlog_item` / `object list goal` as orientation.
+3. Draft new objects with **`zcom object template <kind>`** (canonical); `zcom new object` is a shortcut.
 4. **Operating skill:** load **`.zqk/skills/zqk-expert/SKILL.md`** (keep `skills/zqk-expert/` identical). Orchestration also loads the kernel twin **`agent_skill`** **`ASK-1785642072074959000-a1dfbde9`** (ZQK Expert Operating Protocol, `[orchestration-boot]`) via the prompt builder — keep ASK `instructions` and the filesystem pack in sync.
-5. **Done claims:** run **`zqk workflow vds evaluate`** (policy **POL-WORKFLOW-VDS**) before marking BLI/CVS/CAP progress complete; narrative alone is not a gate.
+5. **Done claims:** run **`zcom workflow vds evaluate`** (policy **POL-WORKFLOW-VDS**) before marking BLI/CVS/CAP progress complete; narrative alone is not a gate.
 
 ### Role-Based Access Control (RBAC) & Authentication
 
 - **RBAC is Active**: All CLI operations are subject to RBAC validation.
-- **Agent Identity**: Agents must establish their identity by specifying the `ZQK_API_KEY="account:<account_name>"` environment variable or using `--context <profile>` when executing `zqk` commands. 
+- **Agent Identity**: Agents must establish their identity by specifying the `ZCOM_API_KEY="account:<account_name>"` environment variable or using `--context <profile>` when executing `zcom` commands. 
 - **Setup Requirements**: Make sure that your specific persona account, role, and related `agent_skill` objects are properly configured in the Knowledge Kernel. If you run into permission errors, you may be missing required skills or executing commands without a properly authenticated context.
 
 ### Timestamp Management
 
-- **All timestamp related information** must use the utilities available with the CLI (`zqk`; see `timestamp` and `time` commands in Utilities)
+- **All timestamp related information** must use the utilities available with the CLI (`zcom`; see `timestamp` and `time` commands in Utilities)
 
 ### Terminal Operation Safety
 
 - **DESTRUCTIVE COMMANDS PROHIBITED**: You MUST NEVER execute destructive directory deletions (like `rm -rf`) without explicit, prior human authorization. This is a critical safety boundary to prevent accidental data loss.
-- **All terminal operations** that AI agents execute which do not flow through the CLI (`zqk`) must be wrapped in the `command-timings` command wrapper in order to prevent terminal operations from becoming hung indefinitely.
+- **All terminal operations** that AI agents execute which do not flow through the CLI (`zcom`) must be wrapped in the `command-timings` command wrapper in order to prevent terminal operations from becoming hung indefinitely.
 - We should **never allow an operation to run for longer than 1 minute**, unless we're certain it will take longer.
 - For processes that we anticipate taking longer than 1 minute, we will establish a reasonable timeout based on historical runtime information so as not to scope things substantially longer than reasonable.
 - All commands that flow through the CLI already have timeout protection and will dynamically adjust timeout based on `.zqk/config.yaml` settings, so there's no reason to 'double-wrap'
-- **NEVER launch background daemons (like `zqk scheduler start --foreground`) using asynchronous tasks to "fix" a locked-down CLI.** This orphans the process when your session ends and burns system resources.
-- **If the CLI reports the scheduler daemon is down:** start it properly (`zqk scheduler start`, or `./scripts/recycle-stable-daemons.sh` after a promote). Do **not** treat `--allow-degraded` as the default fix — that flag means **partial/stale output is acceptable**, not that the kernel is healthy (see `docs/architecture/SCHEDULER_DEGRADED_MODE_GUARDRAILS.md`). Use `--allow-degraded` only when you intentionally accept degraded results.
+- **NEVER launch background daemons (like `zcom scheduler start --foreground`) using asynchronous tasks to "fix" a locked-down CLI.** This orphans the process when your session ends and burns system resources.
+- **If the CLI reports the scheduler daemon is down:** start it properly (`zcom scheduler start`, or `./scripts/recycle-stable-daemons.sh` after a promote). Do **not** treat `--allow-degraded` as the default fix — that flag means **partial/stale output is acceptable**, not that the kernel is healthy (see `docs/architecture/SCHEDULER_DEGRADED_MODE_GUARDRAILS.md`). Use `--allow-degraded` only when you intentionally accept degraded results.
 
 ### Data Processing & Code Search
 
-- **The use of `jq` or `yq` for json/yaml post-processing is highly discouraged.** The CLI (`zqk`) provides a `query` command for json path-based post-processing; prefer `zqk query` over ad hoc `jq`/`yq` where possible.
+- **The use of `jq` or `yq` for json/yaml post-processing is highly discouraged.** The CLI (`zcom`) provides a `query` command for json path-based post-processing; prefer `zcom query` over ad hoc `jq`/`yq` where possible.
 - **The CLI has a `yaml` command** for formatting and validating yaml data; prefer it before custom python scripting.
-- **Native Code & AST Search (`zqk grep` / `zgrep`):** Use the in-process pure-Go search engine for fast sub-15ms codebase exploration. Support includes Go AST symbol queries (`--ast --kind struct|interface|func`, `--ast --recv <Type>`) and token-budgeted AI output (`--max-tokens 2000 -f json`). Avoid invoking slow external binaries or ad-hoc shell greps.
+- **Native Code & AST Search (`zcom grep` / `zgrep`):** Use the in-process pure-Go search engine for fast sub-15ms codebase exploration. Support includes Go AST symbol queries (`--ast --kind struct|interface|func`, `--ast --recv <Type>`) and token-budgeted AI output (`--max-tokens 2000 -f json`). Avoid invoking slow external binaries or ad-hoc shell greps.
 
 ### Workspace Data & Namespace Lockdown
 
@@ -74,11 +74,11 @@ zqk is built on a distributed knowledge kernel architecture that enables AI agen
 - **Utilize a TDD process** while implementing new logic.
 - **Ensure all tests are written first** prior to any functional code being written.
 - **Create Test Cases** to document and group related tests.
-- **Utilize zqk criteria objects** to achieve traceability between backlog items, goals, requirements, milestones, mission, vision, and other system objects.
+- **Utilize zcom criteria objects** to achieve traceability between backlog items, goals, requirements, milestones, mission, vision, and other system objects.
 
 #### System Integrity
 
-The zqk CLI maintains system integrity through automated mechanisms:
+The zcom CLI maintains system integrity through automated mechanisms:
 - Integrity hash validation
 - Object ID cache management
 - Audit event creation
@@ -99,7 +99,7 @@ Every agent operating within ZQK (via `orchestrate` or `evolve`) is strictly bou
 After **init** or when setting up a project for ongoing use, ensure the **maintenance bundle** scheduler jobs exist so the system stays healthy without ad-hoc runs:
 
 ```bash
-zqk system ensure-retention-jobs
+zcom system ensure-retention-jobs
 ```
 
 This ensures four jobs are present (creating from templates if missing):
@@ -121,12 +121,12 @@ Init supports `--with-maintenance-jobs` to run this automatically after init. Se
 Large, goal-directed pushes (for example **test bundles green**) are tracked in **`convergence_session`** objects (`CVS-*`), alongside backlog and priority plans. **At the start of a work session**, determine whether any convergence runs are active and how they should shape priorities:
 
 ```bash
-zqk object list convergence_session --filter status=active --format json
+zcom object list convergence_session --filter status=active --format json
 ```
 
-- **If one or more are active:** Read `title`, `desired_end_state`, `current_phase`, `next_action`, and `iteration_process` on each. Prefer work that moves the session toward its target (for example fixing failing bundle fingerprints and re-running verification). For the current test-bundle snapshot, use `zqk scheduler convergence measure` (see `thresholds.snapshot_command` on the session when set).
+- **If one or more are active:** Read `title`, `desired_end_state`, `current_phase`, `next_action`, and `iteration_process` on each. Prefer work that moves the session toward its target (for example fixing failing bundle fingerprints and re-running verification). For the current test-bundle snapshot, use `zcom scheduler convergence measure` (see `thresholds.snapshot_command` on the session when set).
 - **If none are active:** Use backlog and priority plans as the primary drivers; convergence sessions are optional focused campaigns.
-- **Do not edit** `.zqk/process/convergence_sessions/` YAML directly; use `zqk object get`, `zqk object list`, and `zqk object update` for `convergence_session` fields.
+- **Do not edit** `.zqk/process/convergence_sessions/` YAML directly; use `zcom object get`, `zcom object list`, and `zcom object update` for `convergence_session` fields.
 - **If active CVS objects “disappear” from `object list` but hash-named files still exist** under `.zqk/process/convergence_sessions/`, suspect **CAS index drift**—not necessarily deleted data.
 
 Phase semantics (C1–C6) and vocabulary are tied to glossary terms (for example *convergence lifecycle*); follow `glossary_term_ref` on the session when present.
@@ -137,14 +137,14 @@ Phase semantics (C1–C6) and vocabulary are tied to glossary terms (for example
 
 **Post-retention stream stewardship:** the maintenance runner calls **`storage.PostRetentionStreamStewardship`**, which appends **`stream_steward_kind`** lines to **`datacell_steward_enqueue`** JSONL (per stream-backed kind / phase), drained by **`data_cell_envelope_tick`** — see **[STREAM_KIND_STEWARDSHIP.md](../architecture/STREAM_KIND_STEWARDSHIP.md)** (not the same layer as CVS **`measure`** or **`agent_feed`**).
 
-**Test-bundle stream (even when no CVS is active):** Outcomes append to `.zqk/logs/scheduler/cvs/test-bundles/health.jsonl`. Use `zqk scheduler test-failures health` for a pass/fail timeline, and `zqk scheduler convergence measure` for fingerprints and **`suggested_rerun_commands`** on failures (refresh: `go run ./scripts/write_test_bundle_stream_summary`). See **`docs/architecture/DATA_STREAM_SUMMARY_PILOT.md`**.
+**Test-bundle stream (even when no CVS is active):** Outcomes append to `.zqk/logs/scheduler/cvs/test-bundles/health.jsonl`. Use `zcom scheduler test-failures health` for a pass/fail timeline, and `zcom scheduler convergence measure` for fingerprints and **`suggested_rerun_commands`** on failures (refresh: `go run ./scripts/write_test_bundle_stream_summary`). See **`docs/architecture/DATA_STREAM_SUMMARY_PILOT.md`**.
 
 #### Journey C (alpha gate): non-interactive JSON scripting
 
 **Backlog:** `BLI-1776036642181883000-995c49ab`  
 **Plan:** [CLI_ALPHA_LAUNCH_PLAN.md](../architecture/CLI_ALPHA_LAUNCH_PLAN.md) — Journey C (section 3).
 
-Agents and automation should drive **`zqk`** without prompts. Use **`--context ai-agent`** (defaults many commands to JSON) and/or **`--format json`** explicitly. Exit code **`0`** means success; non-zero means failure (parse stderr / structured output as needed). Some commands emit **progress lines** before the final JSON object on stdout; for strict pipelines, parse the **last** complete JSON value or use **`zqk query`** on the combined output.
+Agents and automation should drive **`zcom`** without prompts. Use **`--context ai-agent`** (defaults many commands to JSON) and/or **`--format json`** explicitly. Exit code **`0`** means success; non-zero means failure (parse stderr / structured output as needed). Some commands emit **progress lines** before the final JSON object on stdout; for strict pipelines, parse the **last** complete JSON value or use **`zcom query`** on the combined output.
 
 **Copy-paste smoke (no stdin; machine-readable):**
 
@@ -152,17 +152,17 @@ Agents and automation should drive **`zqk`** without prompts. Use **`--context a
 #!/usr/bin/env bash
 set -euo pipefail
 # Core read paths — stable top-level keys in JSON: "objects", "count", "success", etc. (see command help for each)
-zqk object list backlog_item --limit 3 --format json --context ai-agent
-zqk object get BLI-1776036642181883000-995c49ab --format json --context ai-agent
+zcom object list backlog_item --limit 3 --format json --context ai-agent
+zcom object get BLI-1776036642181883000-995c49ab --format json --context ai-agent
 # Partial check only (refs skipped; NOT authoritative kernel health — see docs/architecture/check-fast-mode.md)
-zqk system check --fast --format json --context ai-agent
+zcom system check --fast --format json --context ai-agent
 ```
 
-For command metrics and failure-only views: `zqk system metrics --filter failures --format json --context ai-agent`. Prefer **`zqk query`** over ad hoc `jq` when shaping JSON (see **Data Processing** above).
+For command metrics and failure-only views: `zcom system metrics --filter failures --format json --context ai-agent`. Prefer **`zcom query`** over ad hoc `jq` when shaping JSON (see **Data Processing** above).
 
-**Verification / tests:** Do not block scripts on multi-minute bare `go test`; use spec-driven universal verification via **`zqk test run --all`** (or `make test-cases`). For package-scoped compilation and unit tests, use narrow `go test -timeout ≤60s` probes. Legacy scheduler `scan-tests` is deprecated under `REQ-TEST-BUNDLE-DEPRECATION-001`.
+**Verification / tests:** Do not block scripts on multi-minute bare `go test`; use spec-driven universal verification via **`zcom test run --all`** (or `make test-cases`). For package-scoped compilation and unit tests, use narrow `go test -timeout ≤60s` probes. Legacy scheduler `scan-tests` is deprecated under `REQ-TEST-BUNDLE-DEPRECATION-001`.
 
-**Scheduler reliability (test jobs and timers):** Use **`zqk scheduler activity`** (and **`zqk scheduler history`**) to confirm bundles and timer jobs are dispatching. **`.zqk/scheduler/issues.json`** aggregates recent run_wrapper failures and timeouts; the daemon clears it to **`ok`** when problems age out and nothing new fails—if it stays in **`issues`**, investigate listed `job_id` entries. Missed triggers and health checks also surface via **`scheduler_health_metric`** objects and **`docs/archive/system_health/SCHEDULER_EVENTS_AND_METRICS.md`**.
+**Scheduler reliability (test jobs and timers):** Use **`zcom scheduler activity`** (and **`zcom scheduler history`**) to confirm bundles and timer jobs are dispatching. **`.zqk/scheduler/issues.json`** aggregates recent run_wrapper failures and timeouts; the daemon clears it to **`ok`** when problems age out and nothing new fails—if it stays in **`issues`**, investigate listed `job_id` entries. Missed triggers and health checks also surface via **`scheduler_health_metric`** objects and **`docs/archive/system_health/SCHEDULER_EVENTS_AND_METRICS.md`**.
 
 #### Object Modification Best Practices
 
@@ -171,7 +171,7 @@ For command metrics and failure-only views: `zqk system metrics --filter failure
 **MANDATORY WORKFLOW**: Before editing ANY YAML file, ask:
 1. **Is this an object file?** (in `.zqk/process/{kind}/`) → **YES**: ❌ **STOP** - Use CLI/MCP
 2. **Is this system metadata?** (specs, lifecycles, config) → **YES**: ✅ Direct YAML OK
-3. **Is this documentation?** (Markdown) → **YES**: Use `zqk automation docman-sync`
+3. **Is this documentation?** (Markdown) → **YES**: Use `zcom automation docman-sync`
 
 - **Use MCP Tools (PREFERRED)**: The MCP server exposes all CLI commands as tools:
   ```bash
@@ -191,24 +191,24 @@ For command metrics and failure-only views: `zqk system metrics --filter failure
 - **Use CLI Commands (ALTERNATIVE)**: If MCP tools unavailable:
   ```bash
   # Create a new draft object (Mints ID and initializes boilerplate)
-  zqk new object <kind> --title "My Object Title"
+  zcom new object <kind> --title "My Object Title"
   
   # Update the auto-generated object with required specifics
-  zqk object update <id> --field <field>=<value>
-  zqk object update <id> --file <updates.yaml>
+  zcom object update <id> --field <field>=<value>
+  zcom object update <id> --file <updates.yaml>
 
   # Promote the object to an active reviewable lifecycle status
-  zqk object promote <id>
+  zcom object promote <id>
   
   # Delete objects (Always use --unlink-references to prevent GhostRefs)
-  zqk object delete <id> --unlink-references
+  zcom object delete <id> --unlink-references
   
   # Bulk operations
-  zqk object bulk create <kind> --file <items.yaml>
-  zqk object bulk update --file <updates.yaml>
+  zcom object bulk create <kind> --file <items.yaml>
+  zcom object bulk update --file <updates.yaml>
   
   # Template generation
-  zqk object template <kind> --output template.yaml
+  zcom object template <kind> --output template.yaml
   ```
 
 - **NEVER edit object YAML files directly**: Direct file edits bypass the CLI's integrity mechanisms and will cause:
@@ -221,7 +221,7 @@ For command metrics and failure-only views: `zqk system metrics --filter failure
 - **Exception Process**: If CLI doesn't support an operation:
   1. Create backlog item for the gap
   2. Use direct YAML (if absolutely necessary)
-  3. Register hash: `zqk system check <id> --auto-fix --force`
+  3. Register hash: `zcom system check <id> --auto-fix --force`
   4. Document exception in commit message
 
 - **Why this matters**: The CLI/MCP ensures:
@@ -266,8 +266,8 @@ The preferred workflow should progress as follows:
 
 5. **Next Work Item Selection**
    - Once PR has been opened, the agent should identify the next workstream, priority plan, and backlog item to be worked.
-   - Use `zqk object list priority_plan --filter 'status=active'` to find the current priority plan
-   - Use `zqk object list backlog_item --filter 'priority_plan_ref=<plan_id>'` to find next items
+   - Use `zcom object list priority_plan --filter 'status=active'` to find the current priority plan
+   - Use `zcom object list backlog_item --filter 'priority_plan_ref=<plan_id>'` to find next items
    - A new local branch should be created and system objects should be transitioned to proper status if not automated by lifecycle triggers/constraints.
 
 6. **Human-in-the-Loop PR Merge**
@@ -310,15 +310,15 @@ Not every idea belongs in an active priority plan. When immediate value, integra
 The ZQK system has been enriched with the following core coordination and monitoring components. You MUST utilize these patterns instead of implementing custom polling or local state wrappers:
 
 *   **Asynchronous Callback Coordination**:
-    *   **Mechanism**: The scheduler coordinates cycles asynchronously via state-based triggers instead of polling. Whenever a `backlog_item` is completed, or a `convergence_session` changes status, lifecycle hooks in [lifecycle_coordination.go](file:///Users/lanceettl/ai-projects/zqk/pkg/scheduler/lifecycle_coordination.go) immediately fire to wake up the CAP orchestrator.
+    *   **Mechanism**: The scheduler coordinates cycles asynchronously via state-based triggers instead of polling. Whenever a `backlog_item` is completed, or a `convergence_session` changes status, lifecycle hooks in [lifecycle_coordination.go](file:///Users/lanceettl/ai-projects/zcom/pkg/scheduler/lifecycle_coordination.go) immediately fire to wake up the CAP orchestrator.
     *   **Implication**: Never write loops that poll for backlog status. Trust the event-driven scheduler.
 *   **Real-time Test Bundle Progress & Live Matrix**:
     *   **Mechanism**: A progress tracking engine calculates running tallies (completed, total, pass, fail, running, pending) from the scheduler's test stream and publishes progress updates to `progress.jsonl`.
-    *   **Use**: Run `zqk scheduler bundle-progress` to view live, per-bundle progress matrices of all test suites as they run.
+    *   **Use**: Run `zcom scheduler bundle-progress` to view live, per-bundle progress matrices of all test suites as they run.
 *   **Event Stream Router (Cascading Overlays)**:
-    *   **Mechanism**: High-performance, low-latency in-memory event bus in [pkg/events/](file:///Users/lanceettl/ai-projects/zqk/pkg/events/) routes object mutations. Local policy inspectors trap violations using bitmasks and propagate `Suspension_Triggered` cascades strictly via application-layer event routing, avoiding database bottlenecks.
+    *   **Mechanism**: High-performance, low-latency in-memory event bus in [pkg/events/](file:///Users/lanceettl/ai-projects/zcom/pkg/events/) routes object mutations. Local policy inspectors trap violations using bitmasks and propagate `Suspension_Triggered` cascades strictly via application-layer event routing, avoiding database bottlenecks.
 *   **Kernel Steward (Local LLM Sentinel)**:
-    *   **Mechanism**: A perpetual monitoring agent that executes during the `cap_stage_sentinel` stage. It reads a minimized high-signal `whats-next` json output, allocates its context window using a weighted budget allocator in [builder.go](file:///Users/lanceettl/ai-projects/zqk/pkg/agentprompt/builder.go), and queries the local LLM API (Ollama/Qwen/Gemini) to generate a precise two-sentence `AGENT DIRECTIVE` and `REASON`.
+    *   **Mechanism**: A perpetual monitoring agent that executes during the `cap_stage_sentinel` stage. It reads a minimized high-signal `whats-next` json output, allocates its context window using a weighted budget allocator in [builder.go](file:///Users/lanceettl/ai-projects/zcom/pkg/agentprompt/builder.go), and queries the local LLM API (Ollama/Qwen/Gemini) to generate a precise two-sentence `AGENT DIRECTIVE` and `REASON`.
 
 ## Project Policies
 
@@ -330,16 +330,16 @@ Project policies provide the central index for all project standards, expectatio
 
 ```bash
 # Query all policies
-zqk object list policy
+zcom object list policy
 
 # Query architecture policies
-zqk object list policy --filter category=architecture
+zcom object list policy --filter category=architecture
 
 # Query code quality policies
-zqk object list policy --filter category=code_quality
+zcom object list policy --filter category=code_quality
 
 # Query mandatory standards
-zqk object list policy --filter policy_type=standard
+zcom object list policy --filter policy_type=standard
 ```
 
 **Policies are organized by category**:
@@ -374,7 +374,7 @@ When reporting issues, explicitly name the category (for example, "Magic Literal
 1. **Query Architecture Patterns**:
    ```bash
    # List all architecture documents
-   zqk object list doc_entry --filter group=architecture
+   zcom object list doc_entry --filter group=architecture
    
    # Review Architecture Patterns Library
    cat docs/architecture/ARCHITECTURE_PATTERNS.md
@@ -459,33 +459,33 @@ Static copies of priorities go stale. After reading this guide, **re-query** cur
 
 1. **In-progress and active priority plans**
    ```bash
-   zqk object list priority_plan --filter 'status=in_progress' --format table
-   zqk object list priority_plan --filter 'status=active' --sort-by active_order --format table
+   zcom object list priority_plan --filter 'status=in_progress' --format table
+   zcom object list priority_plan --filter 'status=active' --sort-by active_order --format table
    ```
 
 2. **Backlog for a plan** (replace `<PLAN_ID>` from step 1)
    ```bash
-   zqk object list backlog_item --filter 'priority_plan_ref=<PLAN_ID>' --format table
+   zcom object list backlog_item --filter 'priority_plan_ref=<PLAN_ID>' --format table
    ```
 
 3. **Active convergence sessions** (goal-directed remediation)
    ```bash
-   zqk object list convergence_session --filter status=active --format json
+   zcom object list convergence_session --filter status=active --format json
    ```
 
-4. **Strategic plan and quick partial check** (not authoritative health; use full `zqk system check` / `kernel-health-snapshot-check.sh` for gates)
+4. **Strategic plan and quick partial check** (not authoritative health; use full `zcom system check` / `kernel-health-snapshot-check.sh` for gates)
    ```bash
-   zqk object get STRAT-PLAN-001
-   zqk system check --fast
+   zcom object get STRAT-PLAN-001
+   zcom system check --fast
    ```
 
 5. **Onboarding and glossary discovery**
    ```bash
-   zqk object list doc_entry --filter group=onboarding
-   zqk object list glossary_term --format table
+   zcom object list doc_entry --filter group=onboarding
+   zcom object list glossary_term --format table
    ```
 
-6. **Onboarding curriculum as data (templates and advanced-tutorial pattern)** — The repo ships YAML under [scripts/onboarding_roadmap/README.md](../../scripts/onboarding_roadmap/README.md) (priority plan, workstream, milestone, backlog items, seed job). Use that README’s *Reference pattern for advanced tutorials* when adding richer teachable tracks. To evaluate init + seed in isolation, see [ONBOARDING_EVALUATION_SCENARIO.md](../process/testing/ONBOARDING_EVALUATION_SCENARIO.md) (`zqk-ts`, `ZQK_TS_TEST_ROOT`).
+6. **Onboarding curriculum as data (templates and advanced-tutorial pattern)** — The repo ships YAML under [scripts/onboarding_roadmap/README.md](../../scripts/onboarding_roadmap/README.md) (priority plan, workstream, milestone, backlog items, seed job). Use that README’s *Reference pattern for advanced tutorials* when adding richer teachable tracks. To evaluate init + seed in isolation, see [ONBOARDING_EVALUATION_SCENARIO.md](../process/testing/ONBOARDING_EVALUATION_SCENARIO.md) (`zqk-ts`, `ZCOM_TS_TEST_ROOT`).
 
 For a condensed snapshot and links to supplementary guides, see [docs/onboarding/README.md](./README.md) (including dated **Agent Onboarding Summary** files).
 
@@ -493,7 +493,7 @@ For a condensed snapshot and links to supplementary guides, see [docs/onboarding
 
 When writing Go tests that execute subprocesses (especially CLI tools or MCP servers):
 
-1. **Explicit Binary Injection**: You MUST explicitly inject the path to the actively compiled workspace binary (e.g. `ZQK_BIN=bin/zqk`) into the test environment.
+1. **Explicit Binary Injection**: You MUST explicitly inject the path to the actively compiled workspace binary (e.g. `ZCOM_BIN=bin/zcom`) into the test environment.
 2. **Never Fallback to Test Runners**: When implementing path resolution (e.g., `os.Executable()`), include strict guards to prevent falling back to test binaries (e.g., `mcp.test`). If a test runner executes itself thinking it is a system CLI tool, it will execute the test suite recursively and cause an unrecoverable fork bomb.
 3. **Fail Fast**: If a required binary cannot be resolved during a test, fail the test loudly (`t.Fatal`) rather than defaulting to a silent, unsafe fallback.
 
@@ -502,7 +502,7 @@ When writing Go tests that execute subprocesses (especially CLI tools or MCP ser
 **⚠️ CRITICAL: Agents must strictly adhere to their assigned persona roles. The system orchestrator MUST conditionally inject validation gates based on persona capabilities.**
 
 When generating agent tasks or executing workflows, the definition of done and the required validation steps must match the persona's role:
-1. **Engineering Personas** (Coders, Fixers, Architects): Tasks MUST inject mandatory codebase validation steps (e.g., `Must pass targeted validation script: ./bin/zqk agent validate`). These agents are expected to write code and prove compliance.
+1. **Engineering Personas** (Coders, Fixers, Architects): Tasks MUST inject mandatory codebase validation steps (e.g., `Must pass targeted validation script: ./bin/zcom agent validate`). These agents are expected to write code and prove compliance.
 2. **Non-Technical Personas** (TPMs, Designers, Analysts, Strategy): Tasks MUST NOT inject codebase validation or compilation gates. Their definition of done revolves around outputting valid JSON/YAML, managing the kernel graph, organizing backlog items, or producing markdown documentation. Injecting code compilation gates into a TPM's task causes them to break character and write malformed Go scratch scripts to "satisfy" the gate, resulting in AST compliance failures and circuit breaker trips.
 
 *Actionable Rule for Orchestrators*: When dynamically building `agent_task` payloads (e.g., in `orchestrate.go`), explicitly check the assigned Persona. If the role does not contain `coder`, `engineer`, `developer`, or `fixer`, you MUST omit codebase compilation/validation steps from the task payload.
@@ -528,22 +528,22 @@ When an agent or orchestrator plans a new body of work, they must use this decis
    - *Requires:* A `technical_debt` or `bug` object (if schema allows) OR a single `criteria` documenting the fix condition, satisfied by a `backlog_item`.
 
 **The Golden Rule of Backlog Items:**
-A `backlog_item` is exclusively for an *atomic unit of execution* (e.g., "Implement the Persona filtering regex in zqk query"). It is NEVER used for an *initiative* (e.g., "Implement Persona-Aware Context Filtering"). If the task title implies a multi-step project or architectural shift, the agent MUST generate an `epic`, `technical_spec`, `requirements`, and a `priority_plan`.
+A `backlog_item` is exclusively for an *atomic unit of execution* (e.g., "Implement the Persona filtering regex in zcom query"). It is NEVER used for an *initiative* (e.g., "Implement Persona-Aware Context Filtering"). If the task title implies a multi-step project or architectural shift, the agent MUST generate an `epic`, `technical_spec`, `requirements`, and a `priority_plan`.
 
 ### Native Graph Composition Pipelines
 
-**⚠️ CRITICAL: NEVER write bash loops, awk scripts, or manual `zqk object create` chains to wire together an object cascade (like Spec -> Requirements -> Criteria).**
+**⚠️ CRITICAL: NEVER write bash loops, awk scripts, or manual `zcom object create` chains to wire together an object cascade (like Spec -> Requirements -> Criteria).**
 
 The kernel provides powerful native batch processing and LLM-ingestion pipelines for graph composition. When you need to scaffold an initiative, you must use one of these two methods:
 
-1. **`zqk intake` (For Natural Language Ingestion):**
-   Pipe unstructured text (e.g. "Create a Spec with two Requirements and active Criteria...") directly into `zqk intake`. The semantic engine will automatically parse the intent, validate against the ontology, create the objects, and construct the semantic links.
-2. **`zqk object import --relaxed` (For Declarative YAML Graphs):**
-   If you have a multi-document YAML array representing the objects, use `zqk object import --file <path.yaml> --relaxed`. The `--relaxed` flag explicitly tells the graph engine to resolve dependency links (`*_refs`) dynamically as the batch processes.
+1. **`zcom intake` (For Natural Language Ingestion):**
+   Pipe unstructured text (e.g. "Create a Spec with two Requirements and active Criteria...") directly into `zcom intake`. The semantic engine will automatically parse the intent, validate against the ontology, create the objects, and construct the semantic links.
+2. **`zcom object import --relaxed` (For Declarative YAML Graphs):**
+   If you have a multi-document YAML array representing the objects, use `zcom object import --file <path.yaml> --relaxed`. The `--relaxed` flag explicitly tells the graph engine to resolve dependency links (`*_refs`) dynamically as the batch processes.
 
 ---
 
-*This document should be the first reference point for any AI agent joining the zqk project. If you are reading this as a new agent, please review all sections carefully before beginning work.*
+*This document should be the first reference point for any AI agent joining the zcom project. If you are reading this as a new agent, please review all sections carefully before beginning work.*
 
 *Last Updated: 2026-03-27*
 
@@ -566,7 +566,7 @@ The kernel provides powerful native batch processing and LLM-ingestion pipelines
 
 To maximize throughput and speed to market without sacrificing quality and reliability, agents MUST operate with the following posture:
 1. **Zero Idle Time via CAP Protocol**: We are constantly in a self-improving posture. If foreground engineering work is wrapping up or waiting on tests, agents MUST concurrently spin up Strategic Planning swarms to build out the next phase of the roadmap (vision, mission, priority plans). There is never an idle moment.
-2. **Utilize System Capabilities**: Do not default to naive, monolithic processes (e.g., synchronous unbounded `go test ./...`). Prefer **`zqk test run --all`** (or `make test-cases`) for universal verification across the knowledge kernel DAG. Foreground `go test` only for narrow probes (`-timeout` ≤ 60s). See **zqk-expert** skill.
+2. **Utilize System Capabilities**: Do not default to naive, monolithic processes (e.g., synchronous unbounded `go test ./...`). Prefer **`zcom test run --all`** (or `make test-cases`) for universal verification across the knowledge kernel DAG. Foreground `go test` only for narrow probes (`-timeout` ≤ 60s). See **zqk-expert** skill.
 3. **Continuous Advancement**: We concurrently advance all strategic objectives to the fullest extent possible. If the tests pass, you push and PR. If they fail, you converge on stability immediately. 
 
 This is our universe-denting moment; seize the day and the moment by utilizing ZQK's full parallelization and orchestration capabilities.

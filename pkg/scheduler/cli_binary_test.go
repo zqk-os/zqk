@@ -25,7 +25,9 @@ func TestResolveSchedulerDaemonBinary_prefersStableOverZqk(t *testing.T) {
 	}
 
 	t.Setenv(zqkenv.SchedulerDaemonBin().Name(), "")
+	t.Setenv("ZQK_SCHEDULER_DAEMON_BIN", "")
 	t.Setenv(zqkenv.Bin().Name(), "")
+	t.Setenv("ZQK_BIN", "")
 
 	got, err := ResolveSchedulerDaemonBinary(root)
 	if err != nil {
@@ -52,6 +54,7 @@ func TestResolveSchedulerDaemonBinary_schedulerDaemonBinOverride(t *testing.T) {
 
 	t.Setenv(zqkenv.SchedulerDaemonBin().Name(), override)
 	t.Setenv(zqkenv.Bin().Name(), "")
+	t.Setenv("ZQK_BIN", "")
 
 	got, err := ResolveSchedulerDaemonBinary(root)
 	if err != nil {
@@ -108,7 +111,9 @@ func TestResolveSchedulerDaemonBinary_prefersZqkStable(t *testing.T) {
 	}
 
 	t.Setenv(zqkenv.SchedulerDaemonBin().Name(), "")
+	t.Setenv("ZQK_SCHEDULER_DAEMON_BIN", "")
 	t.Setenv(zqkenv.Bin().Name(), "")
+	t.Setenv("ZQK_BIN", "")
 
 	got, err := ResolveSchedulerDaemonBinary(root)
 	if err != nil {
@@ -119,24 +124,28 @@ func TestResolveSchedulerDaemonBinary_prefersZqkStable(t *testing.T) {
 	}
 }
 
-func TestResolveSchedulerCLIBinary_prefersZcomWhenPresent(t *testing.T) {
+func TestResolveSchedulerCLIBinary_prefersBrandExecutableWhenPresent(t *testing.T) {
+	prev := brand.ExecutableName()
+	brand.SetExecutableName("zcom")
+	t.Cleanup(func() { brand.SetExecutableName(prev) })
+
 	root := t.TempDir()
-	zcom := filepath.Join(root, binDirName, "zcom")
-	if err := fileutil.EnsureDir(filepath.Dir(zcom)); err != nil {
+	want := filepath.Join(root, binDirName, brand.ExecutableName())
+	if err := fileutil.EnsureDir(filepath.Dir(want)); err != nil {
 		t.Fatal(err)
 	}
-	if err := fileutil.WriteFile(zcom, []byte{0}, 0o755); err != nil {
+	if err := fileutil.WriteFile(want, []byte{0}, 0o755); err != nil {
 		t.Fatal(err)
 	}
 
 	t.Setenv(zqkenv.Bin().Name(), "")
+	t.Setenv("ZQK_BIN", "")
 
 	got := resolveSchedulerCLIBinary(root)
-	if got != zcom {
-		t.Fatalf("got %q, want community binary %q", got, zcom)
+	if got != want {
+		t.Fatalf("got %q, want brand binary %q", got, want)
 	}
 
-	// Test fallback when no root binary exists
 	emptyRoot := t.TempDir()
 	fallback := resolveSchedulerCLIBinary(emptyRoot)
 	wantFallback := fallbackCLIBinaryName()
@@ -145,24 +154,30 @@ func TestResolveSchedulerCLIBinary_prefersZcomWhenPresent(t *testing.T) {
 	}
 }
 
-func TestResolveSchedulerDaemonBinary_prefersZcomWhenPresent(t *testing.T) {
+func TestResolveSchedulerDaemonBinary_prefersBrandExecutableWhenPresent(t *testing.T) {
+	prev := brand.ExecutableName()
+	brand.SetExecutableName("zcom")
+	t.Cleanup(func() { brand.SetExecutableName(prev) })
+
 	root := t.TempDir()
-	zcom := filepath.Join(root, binDirName, "zcom")
-	if err := fileutil.EnsureDir(filepath.Dir(zcom)); err != nil {
+	want := filepath.Join(root, binDirName, brand.ExecutableName())
+	if err := fileutil.EnsureDir(filepath.Dir(want)); err != nil {
 		t.Fatal(err)
 	}
-	if err := fileutil.WriteFile(zcom, []byte{0}, 0o755); err != nil {
+	if err := fileutil.WriteFile(want, []byte{0}, 0o755); err != nil {
 		t.Fatal(err)
 	}
 
 	t.Setenv(zqkenv.SchedulerDaemonBin().Name(), "")
+	t.Setenv("ZQK_SCHEDULER_DAEMON_BIN", "")
 	t.Setenv(zqkenv.Bin().Name(), "")
+	t.Setenv("ZQK_BIN", "")
 
 	got, err := ResolveSchedulerDaemonBinary(root)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if got != zcom {
-		t.Fatalf("got daemon path %q, want %q", got, zcom)
+	if got != want {
+		t.Fatalf("got daemon path %q, want %q", got, want)
 	}
 }

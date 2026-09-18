@@ -141,28 +141,58 @@ func firstExistingDaemonBinary(root string) (string, bool) {
 
 func localCLIBinaryCandidates(root string) []string {
 	exe := brand.ExecutableName()
-	return []string{
-		filepath.Join(root, binDirName, communityBinaryName),
-		filepath.Join(root, communityBinaryName),
-		filepath.Join(root, paths.ProjectDataDir, binDirName, communityBinaryName),
+	cands := []string{
 		filepath.Join(root, binDirName, exe),
 		filepath.Join(root, exe),
+		filepath.Join(root, paths.ProjectDataDir, binDirName, exe),
+	}
+	if exe != zqkBinaryName {
+		cands = append(cands,
+			filepath.Join(root, binDirName, zqkBinaryName),
+			filepath.Join(root, zqkBinaryName),
+		)
+	}
+	cands = append(cands,
 		filepath.Join(root, paths.ProjectDataDir, binDirName, brand.ZqkStableName),
 		filepath.Join(root, binDirName, zqkBinaryName),
 		filepath.Join(root, zqkBinaryName),
-	}
+	)
+	return uniqueStrings(cands)
 }
 
 func localDaemonBinaryCandidates(root string) []string {
-	return []string{
-		filepath.Join(root, binDirName, communityBinaryName),
-		filepath.Join(root, communityBinaryName),
-		filepath.Join(root, paths.ProjectDataDir, binDirName, communityBinaryName),
+	exe := brand.ExecutableName()
+	var cands []string
+	if exe != zqkBinaryName {
+		cands = append(cands,
+			filepath.Join(root, binDirName, exe),
+			filepath.Join(root, exe),
+			filepath.Join(root, paths.ProjectDataDir, binDirName, exe),
+		)
+	}
+	cands = append(cands,
 		filepath.Join(root, paths.ProjectDataDir, binDirName, brand.ZqkStableName),
 		filepath.Join(root, binDirName, zqkSchedulerBinaryName),
 		filepath.Join(root, binDirName, zqkBinaryName),
 		filepath.Join(root, zqkBinaryName),
+	)
+	return uniqueStrings(cands)
+}
+
+func uniqueStrings(in []string) []string {
+	seen := make(map[string]struct{}, len(in))
+	out := make([]string, 0, len(in))
+	for _, s := range in {
+		if s == emptyValue {
+			continue
+		}
+		if _, ok := seen[s]; ok {
+			continue
+		}
+		seen[s] = struct{}{}
+		out = append(out, s)
 	}
+	return out
 }
 
 func firstExistingFile(candidates []string) string {
