@@ -62,6 +62,11 @@ func productDocPaths(root string) []string {
 	for _, p := range []string{
 		filepath.Join(root, "README.md"),
 		filepath.Join(root, "CONTRIBUTING.md"),
+		filepath.Join(root, "ZQK_GETTING_STARTED.md"),
+		filepath.Join(root, "docs", "getting-started.md"),
+		filepath.Join(root, ".iderules"),
+		filepath.Join(root, ".clinerules"),
+		filepath.Join(root, ".windsurfrules"),
 	} {
 		out = append(out, p)
 	}

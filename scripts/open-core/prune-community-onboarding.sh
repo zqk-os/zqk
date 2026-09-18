@@ -67,4 +67,28 @@ if [ -d "$ARCH" ]; then
   fi
 fi
 
+# Leftover studio Diataxis / coding dump. First-run lives in onboarding.
+for dir in \
+  "$DEST/docs/best-practices" \
+  "$DEST/docs/tutorials" \
+  "$DEST/docs/howto" \
+  "$DEST/docs/explanation" \
+  "$DEST/docs/reference" \
+  "$DEST/docs/manual"
+do
+  rm -rf "$dir"
+done
+rm -f "$DEST/docs/cli-reference.md"
+if [ -f "$HERE/sku-overlay/GETTING_STARTED.md" ]; then
+  cp "$HERE/sku-overlay/GETTING_STARTED.md" "$DEST/docs/getting-started.md"
+fi
+if [ -f "$HERE/sku-overlay/ZQK_GETTING_STARTED.md" ]; then
+  cp "$HERE/sku-overlay/ZQK_GETTING_STARTED.md" "$DEST/ZQK_GETTING_STARTED.md"
+fi
+if [ -f "$HERE/sku-overlay/AGENT_BOOT.md" ]; then
+  cp "$HERE/sku-overlay/AGENT_BOOT.md" "$DEST/.iderules"
+  cp "$HERE/sku-overlay/AGENT_BOOT.md" "$DEST/.clinerules"
+  cp "$HERE/sku-overlay/AGENT_BOOT.md" "$DEST/.windsurfrules"
+fi
+
 echo "Pruned studio-internal onboarding from $ONB"

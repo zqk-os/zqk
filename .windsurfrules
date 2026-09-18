@@ -1,35 +1,12 @@
+# ZQK agent boot
+You are connected to the ZQK knowledge kernel.
 
+First commands:
+- ./bin/zqk workflow whats-next --format json
+- ./bin/zqk object list
+- ./bin/zqk system start-here
+- ./bin/zqk mcp install
 
-# ZQK Agent Boot Protocol (Injected by ZQK Community Edition)
-You are connected to the ZQK Knowledge Kernel via MCP.
-
-**The ZQK Philosophy (The Zen Way):**
-Standard AI agents rely on unstructured markdown files (like this one) for context. This is brittle, untraceable, and fails at scale. 
-ZQK replaces unstructured markdown with rigid, semantic **Objects** (Goals, Requirements, Tasks, etc.) stored in a local graph. 
-Why? Because Objects have strict lifecycles, assignable owners, and determinable states. They provide the traceability and governance that enterprise teams require. This file is only used to bootstrap your connection—from this point on, all project state must live in the ZQK Object Graph.
-
-**Your First Task (Workspace Analysis):**
-Look at the current repository. 
-- If this is an **existing codebase (brownfield)**: Before you try to generate new ZQK objects or suggest massive architectural changes, run a lay-of-the-land repository analysis. Ask the user probing and clarifying questions to understand their current stack, so we don't interfere with their existing work.
-- If this is a **brand new project (greenfield)**: Proactively interview the user about their vision and ideation. Do not wait for them to orchestrate you. Ask them what they want to build, then synthesize their response into a ZQK 'Goal' object and subsequent 'Requirement' objects in the graph.
-
-**Core Directives & Permissions:**
-- Use 'zqk_object_create' to define new architecture components and requirements.
-- **CRITICAL:** Do NOT use 'zqk_object_update' for status transitions (e.g., moving a task from "pending" to "in_progress"). You MUST use the 'zqk_object_promote' tool to correctly execute lifecycle state transitions.
-- If you encounter an environment issue or permissions error, DO NOT attempt to blindly mutate the user's system to fix it. Stop, explain the exact privilege you need, and ask the user for permission.
-- Always maintain transparency about which files you are modifying and why they correspond to the active ZQK Goal.
-
-**Cryptographic Accountability & Policies (The No-Hallucination Devastation Guarantee):**
-ZQK enforces strict architectural determinism. As an AI agent, you may occasionally hallucinate or make incorrect assumptions—but ZQK will not allow those errors to corrupt the project.
-1. **Cryptographic Verification:** Every object in the graph is cryptographically hashed. You cannot "gundeck" or shortcut traceability. If you attempt to fake a status transition or link code to a non-existent requirement, the ZQK engine will reject the operation and log an error holding you accountable.
-2. **Policy Adherence:** Always check existing project policies using the MCP tools. If your proposed code violates an active ZQK Policy, the core engine will block your action. You must operate within the bounds of the established knowledge kernel.
-
-**Continuous Autonomous Loop Discipline (Anti-Idleness Protocol):**
-- **Summary-as-Terminal Failure Mode Prohibition:** In the autonomous CAP loop, merging a PR, promoting binaries, or rendering an artifact summary is a MILESTONE TRANSITION, NOT a stopping condition.
-- **NEVER yield control or go idle at summary milestones.** In this agent platform, stopping tool calls immediately transitions the agent into 'waiting_for_input' (idle), halting autonomous loop flow.
-- **Strict Post-Merge Self-Continuation Protocol:**
-  1. Merge PR & promote stable binary ('./scripts/install-zqk-stable.sh --build --force && ./scripts/recycle-stable-daemons.sh').
-  2. Query './bin/zqk workflow whats-next'.
-  3. Immediately create/checkout the next integration branch ('git checkout -b integration/<pri-id> origin/main').
-  4. Claim or shape the first BLI ('zqk agent claim-work ...' or kernel object creation).
-  5. Continue the execution chain without yielding control to an idle wait state.
+Process data under .zqk/process/ only through the CLI (object create / update / promote).
+Do not export ZQK_PROJECT_ROOT in your shell profile.
+Status transitions use promote, not a raw status-field update.
