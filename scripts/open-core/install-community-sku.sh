@@ -37,6 +37,7 @@ install_file "$SKU/COMMUNITY_FIRST_RUN.md" "$DEST/docs/onboarding/COMMUNITY_FIRS
 install_file "$SKU/FIRST_RUN_OBJECT_TUTORIAL.md" "$DEST/docs/onboarding/FIRST_RUN_OBJECT_TUTORIAL.md"
 install_file "$SKU/QUICKSTART.md" "$DEST/docs/onboarding/QUICKSTART.md"
 install_file "$SKU/ONBOARDING_README.md" "$DEST/docs/onboarding/README.md"
+install_file "$SKU/EDGE_HEADLESS_FIRST_RUN.md" "$DEST/docs/onboarding/EDGE_HEADLESS_FIRST_RUN.md"
 install_file "$SKU/CONTRIBUTING.md" "$DEST/CONTRIBUTING.md"
 install_file "$SKU/README.md" "$DEST/README.md"
 echo "Installed community SKU overlay into $DEST"
