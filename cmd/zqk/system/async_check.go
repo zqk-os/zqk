@@ -1025,6 +1025,12 @@ func discoverFromCache(ctx stdcontext.Context, projectRoot, operationID string, 
 						continue
 					}
 					path := e.FilePath
+					// Draft-plane objects reside outside the CAS membrane and belong to the
+					// object draft plane summary, not in-membrane Layer 0-3 validation.
+					// TRACK: TDE-CEF-CAS-IDENTITY-TXN-001
+					if storage.IsObjectDraftPlanePath(projectRoot, path) {
+						continue
+					}
 					// Object-id-cache often lags CAS hash renames (path still names the
 					// deleted blob). Re-resolve via listing index before enqueueing so
 					// validators do not emit false "stale index entry" Tier-1 blockers.

@@ -198,7 +198,14 @@ func IsObjectDraftPlanePath(projectRoot, path string) bool {
 	root := ObjectDraftPlaneRoot(projectRoot)
 	clean := filepath.Clean(path)
 	prefix := filepath.Clean(root) + string(fileutil.PathSeparator)
-	return clean == filepath.Clean(root) || strings.HasPrefix(clean, prefix)
+	if clean == filepath.Clean(root) || strings.HasPrefix(clean, prefix) {
+		return true
+	}
+	if !filepath.IsAbs(path) {
+		absPath := filepath.Clean(filepath.Join(projectRoot, path))
+		return absPath == filepath.Clean(root) || strings.HasPrefix(absPath, prefix)
+	}
+	return false
 }
 
 // shouldUseObjectDraftPlane is true for CAS (non-stream) kinds in a preliminary lifecycle status.
@@ -294,16 +301,16 @@ func (f *FileObjectStorage) objectDraftPlaneExists(kind, id string) bool {
 // on draft-plane land (BLI-DRAFT-LAND-TEMPLATE-FILL-001).
 var draftPlaneNextStatusFields = map[string]map[string]any{
 	objects.KindBacklogItem: {
-		objects.FieldKeyProblemStatement:        "",
+		objects.FieldKeyProblemStatement:         "",
 		objects.FieldKeyAcceptanceConsiderations: "",
-		objects.FieldKeyPriority:                "medium",
-		objects.FieldKeyPriorityTier:            "P2",
-		objects.FieldKeyPriorityPlanRef:         "",
-		objects.FieldKeyMilestoneRefs:           []any{},
-		objects.FieldKeyCriteriaRefs:            []any{},
-		objects.FieldKeyRequirementRefs:         []any{},
-		objects.FieldKeyStakeholders:            []any{},
-		objects.FieldKeyEstimatedEffort:         "",
+		objects.FieldKeyPriority:                 "medium",
+		objects.FieldKeyPriorityTier:             "P2",
+		objects.FieldKeyPriorityPlanRef:          "",
+		objects.FieldKeyMilestoneRefs:            []any{},
+		objects.FieldKeyCriteriaRefs:             []any{},
+		objects.FieldKeyRequirementRefs:          []any{},
+		objects.FieldKeyStakeholders:             []any{},
+		objects.FieldKeyEstimatedEffort:          "",
 	},
 	objects.KindCriteria: {
 		objects.FieldKeyCategory:         "",

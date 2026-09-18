@@ -13,6 +13,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/storage"
 )
 
 func TestScanObjectFilesWithContext_UsesCASIndexFastPath(t *testing.T) {
@@ -60,5 +61,41 @@ func TestScanObjectFilesWithContext_UsesCASIndexFastPath(t *testing.T) {
 	}
 	if files[0].Path != hashFile {
 		t.Fatalf("expected path %q, got %q", hashFile, files[0].Path)
+	}
+}
+
+func TestProcessKindForDiscovery_ExcludesDraftPlane(t *testing.T) {
+	tmpDir, fileStorage, _ := storage.SetupTestingFactoryCompleteTestEnvironmentForTest(t)
+	secCtx := pkgctx.NewSystemSecurityContext()
+	ctx := storage.WithCLIOperation(pkgctx.NewSystemContext())
+
+	draftID := "DOC-draft-disc-001"
+	draftDoc := map[string]any{
+		objects.FieldKeyID:            draftID,
+		objects.FieldKeyKind:          objects.KindDocEntry,
+		objects.FieldKeyTitle:         "Draft Doc",
+		objects.FieldKeyStatus:        objects.ObjectStatusDraft,
+		objects.FieldKeySchemaVersion: objects.DefaultSchemaVersion,
+	}
+	if err := fileStorage.Create(ctx, secCtx, draftDoc); err != nil {
+		t.Fatalf("Create draft doc: %v", err)
+	}
+
+	filesChan := make(chan []scannedFile, 1)
+	logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
+	err := processKindForDiscovery(tmpDir, objects.KindDocEntry, []string{draftID}, logger, filesChan, nil, ctx, fileStorage, string(pkgctx.ProfileSystem))
+	if err != nil {
+		t.Fatalf("processKindForDiscovery failed: %v", err)
+	}
+
+	select {
+	case files := <-filesChan:
+		for _, f := range files {
+			if f.ObjectID == draftID {
+				t.Fatalf("processKindForDiscovery should NOT return draft-plane object %s", draftID)
+			}
+		}
+	default:
+		// Channel empty is expected because the only targetID was draft-plane and got filtered out!
 	}
 }

@@ -3,6 +3,7 @@ package objectidcache
 import (
 	"path/filepath"
 	"testing"
+	"time"
 
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
@@ -69,5 +70,62 @@ func TestKindBucketPathToStore_DraftPlaneStaysAbsolute(t *testing.T) {
 	got := kindBucketPathToStore(processDir, "goal", draftPath)
 	if got != draftPath {
 		t.Fatalf("got %q want absolute draft path %q", got, draftPath)
+	}
+}
+
+func TestProjectRootFromProcessDir(t *testing.T) {
+	t.Parallel()
+	projectRoot := "/Users/test/workspace/repo"
+
+	// Canonical .zqk/process path
+	zqkProcess := filepath.Join(projectRoot, paths.ProjectDataDir, "process")
+	if got := projectRootFromProcessDir(zqkProcess); got != projectRoot {
+		t.Fatalf("zqkProcess: got %q, want %q", got, projectRoot)
+	}
+
+	// Legacy docs/process path
+	docsProcess := filepath.Join(projectRoot, "docs", "process")
+	if got := projectRootFromProcessDir(docsProcess); got != projectRoot {
+		t.Fatalf("docsProcess: got %q, want %q", got, projectRoot)
+	}
+
+	// Empty and invalid paths
+	if got := projectRootFromProcessDir(""); got != "" {
+		t.Fatalf("empty: got %q, want empty", got)
+	}
+	if got := projectRootFromProcessDir("/tmp/other/dir"); got != "" {
+		t.Fatalf("other dir: got %q, want empty", got)
+	}
+	if got := projectRootFromProcessDir("/tmp/other/process"); got != "" {
+		t.Fatalf("other/process: got %q, want empty", got)
+	}
+}
+
+func TestValidateAndCleanStale_DraftPlaneNotHealedToCAS(t *testing.T) {
+	t.Parallel()
+	projectRoot := t.TempDir()
+	processDir := filepath.Join(projectRoot, paths.ProcessDir)
+
+	cache := NewObjectIDCache()
+	cache.processDir = processDir
+
+	// Add a draft-plane entry for a deleted/non-existent draft file
+	draftPath := storage.ObjectDraftPlanePath(projectRoot, "goal", "GOAL-draft-missing")
+	cache.Set("GOAL-draft-missing", &ObjectIDCacheEntry{
+		ID:       "GOAL-draft-missing",
+		Kind:     "goal",
+		FilePath: draftPath,
+		MTime:    time.Now(),
+		Exists:   true,
+	})
+
+	// ValidateAndCleanStale should remove the draft entry as stale, without attempting to heal it into CAS
+	staleCount := cache.ValidateAndCleanStale()
+	if staleCount != 1 {
+		t.Fatalf("expected 1 stale entry, got %d", staleCount)
+	}
+
+	if _, ok := cache.Get("GOAL-draft-missing"); ok {
+		t.Fatal("expected GOAL-draft-missing to be removed from cache")
 	}
 }

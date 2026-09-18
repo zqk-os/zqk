@@ -173,6 +173,9 @@ func (f *FileObjectStorage) EnsureCASIndexFromPaths(kind string, idToFilePath ma
 		if !f.idBelongsToKind(id, kind) {
 			continue
 		}
+		if IsObjectDraftPlanePath(f.projectRoot, filePath) {
+			continue
+		}
 		base := filepath.Base(filePath)
 		if !crud.IsHashBasedFilename(base) {
 			continue

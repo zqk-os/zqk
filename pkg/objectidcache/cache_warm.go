@@ -522,6 +522,9 @@ func warmCASIndexesFromCache(ctx stdcontext.Context, projectRoot string, cache *
 		if entry == nil || entry.FilePath == emptyValue || entry.ID == emptyValue || entry.Kind == emptyValue {
 			continue
 		}
+		if storage.IsObjectDraftPlanePath(projectRoot, entry.FilePath) {
+			continue
+		}
 		if byKind[entry.Kind] == nil {
 			byKind[entry.Kind] = make(map[string]string)
 		}

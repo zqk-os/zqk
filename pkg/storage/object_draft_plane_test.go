@@ -582,3 +582,32 @@ func TestObjectDraftPlane_IsDraftPlaneOnly(t *testing.T) {
 	}
 }
 
+func TestEnsureCASIndexFromPaths_ExcludesDraftPlane(t *testing.T) {
+	tmpDir, fileStorage, _ := SetupTestingFactoryCompleteTestEnvironmentForTest(t)
+	secCtx := pkgctx.NewSystemSecurityContext()
+	ctx := WithCLIOperation(pkgctx.NewSystemContext())
+
+	draftID := "DOC-draft-excl-001"
+	draftDoc := draftPlaneDocEntry(draftID, "Draft Doc", "draft")
+	if err := fileStorage.Create(ctx, secCtx, draftDoc); err != nil {
+		t.Fatalf("Create draft doc: %v", err)
+	}
+
+	draftPath := ObjectDraftPlanePath(tmpDir, objects.KindDocEntry, draftID)
+	// Try to ensure CAS index with this draft path
+	err := fileStorage.EnsureCASIndexFromPaths(objects.KindDocEntry, map[string]string{
+		draftID: draftPath,
+	})
+	if err != nil {
+		t.Fatalf("EnsureCASIndexFromPaths returned error: %v", err)
+	}
+
+	// Verify that the CAS index does NOT contain this draft ID
+	cas, err := fileStorage.getContentAddressableStorage(objects.KindDocEntry)
+	if err != nil {
+		t.Fatalf("getContentAddressableStorage: %v", err)
+	}
+	if hash, err := cas.GetIndex().GetHash(draftID); err == nil && hash != "" {
+		t.Fatalf("CAS index should NOT map draft-plane ID %s, but got %s", draftID, hash)
+	}
+}
