@@ -4,7 +4,7 @@
 **CLI:** examples use the default executable token; `scripts/open-core/applybrand` rewrites them from `brand.executable_name` in `config/zqk-local.yaml` then `config/zqk.yaml`.  
 **Kernel directory:** `.zqk/` (never rewritten by branding).  
 **MCP pairing:** [`QUICKSTART.md`](./QUICKSTART.md).  
-**Not this SKU:** Studio process dogfood — [`AI_AGENT_ONBOARDING.md`](./AI_AGENT_ONBOARDING.md) (pack).
+**Not this SKU:** Studio process dogfood. [`AI_AGENT_ONBOARDING.md`](./AI_AGENT_ONBOARDING.md) is a pointer, not that pack.
 
 ## Install (this tree)
 
