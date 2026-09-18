@@ -1,0 +1,1871 @@
+diff --git a/cmd/zqk-community/app/auth_middleware.go b/cmd/zqk-community/app/auth_middleware.go
+index c69214f..9f46175 100644
+--- a/cmd/zqk-community/app/auth_middleware.go
++++ b/cmd/zqk-community/app/auth_middleware.go
+@@ -26,17 +26,13 @@ import (
+ func AuthMiddleware(cmd *cobra.Command, projectRoot string) error {
+ 	// Builtins that may lack annotations. Session-optional commands walk ancestors.
+ 	switch cmd.Name() {
+-	case "help", "version", "completion", "quickstart", "login", "logout", "auth", "grep", "zgrep":
++	case "help", "version", "completion", "quickstart", "start-here", "login", "logout", "auth", "grep", "zgrep":
+ 		return nil
+ 	}
+ 	if cli.SessionOptional(cmd) {
+ 		return nil
+ 	}
+ 
+-	if zqkenv.IsCommunityEdition && !communityKernelReady(projectRoot) {
+-		return communityUninitializedError(projectRoot)
+-	}
+-
+ 	ctx := cmd.Context()
+ 	if ctx == nil {
+ 		ctx = context.Background()
+@@ -76,12 +72,20 @@ func AuthMiddleware(cmd *cobra.Command, projectRoot string) error {
+ 	}
+ 
+ 	if apiKey == "" && credentialsToken == "" {
+-		if zqkenv.IsCommunityEdition {
+-			secCtx := pkgctx.NewSystemSecurityContext()
+-			cmd.SetContext(pkgctx.WithSecurityContext(ctx, secCtx))
+-			return nil
+-		}
+-		return errfmt.Errorf("unauthorized: missing token in ~/.zqk/credentials or %s", zqkenv.APIKey())
++		// Local kernel operator: no token required. Invalid tokens still fail closed below.
++		secCtx := pkgctx.NewSystemSecurityContext()
++		cmd.SetContext(pkgctx.WithSecurityContext(ctx, secCtx))
++		return nil
++	}
++
++	// Fail-closed uninitialized kernel hint: if projectRoot is empty or uninitialized,
++	// guide the user to run system init instead of failing with missing account schema.
++	exe := brand.ExecutableName()
++	if projectRoot == "" {
++		return errfmt.Errorf("kernel not initialized: run '%s system init' to initialize project kernel", exe)
++	}
++	if _, statErr := fileutil.Stat(filepath.Join(projectRoot, paths.ProjectDataDir)); statErr != nil {
++		return errfmt.Errorf("kernel not initialized: run '%s system init' to initialize project kernel", exe)
+ 	}
+ 
+ 	// Parse token/key, load Identity/Role schemas (account.yaml, role.yaml), and validate access
+@@ -95,14 +99,11 @@ func AuthMiddleware(cmd *cobra.Command, projectRoot string) error {
+ 	}
+ 
+ 	if _, statErr := fileutil.Stat(accountSchemaPath); statErr != nil {
+-		if zqkenv.IsCommunityEdition {
+-			return communityUninitializedError(projectRoot)
+-		}
+-		return errfmt.Errorf("unauthorized: failed to load account schema: %v", statErr)
++		return errfmt.Errorf("kernel not initialized: run '%s system init' to initialize project kernel (failed to load account schema: %v)", exe, statErr)
+ 	}
+ 
+ 	if _, statErr := fileutil.Stat(roleSchemaPath); statErr != nil {
+-		return errfmt.Errorf("unauthorized: failed to load role schema: %v", statErr)
++		return errfmt.Errorf("kernel not initialized: run '%s system init' to initialize project kernel (failed to load role schema: %v)", exe, statErr)
+ 	}
+ 
+ 	// Inject SecurityContext for the CLI processor
+@@ -327,30 +328,3 @@ func firstString(vals []string) string {
+ 	}
+ 	return ""
+ }
+-
+-func communityKernelReady(projectRoot string) bool {
+-	if strings.TrimSpace(projectRoot) == "" {
+-		return false
+-	}
+-	kernel := filepath.Join(projectRoot, paths.ProcessInternalObjectSpecsDir, "kernel", "account.yaml")
+-	if _, err := fileutil.Stat(kernel); err == nil {
+-		return true
+-	}
+-	legacy := filepath.Join(projectRoot, paths.ProcessInternalObjectSpecsDir, "account.yaml")
+-	_, err := fileutil.Stat(legacy)
+-	return err == nil
+-}
+-
+-func communityUninitializedError(projectRoot string) error {
+-	exe := brand.ExecutableName()
+-	if strings.TrimSpace(exe) == "" {
+-		exe = "zcom"
+-	}
+-	where := strings.TrimSpace(projectRoot)
+-	if where == "" {
+-		where = "this directory"
+-	} else if abs, err := filepath.Abs(where); err == nil {
+-		where = abs
+-	}
+-	return errfmt.Errorf("no knowledge kernel at %s. Run `%s system init --project-name <name>` from the project directory. Do not export %s_PROJECT_ROOT (or ZQK_PROJECT_ROOT) in your shell profile — it silently attaches commands to another checkout. Kernel data lives under .zqk/, not .zcom/", where, exe, strings.ToUpper(exe))
+-}
+diff --git a/cmd/zqk-community/app/auth_middleware_test.go b/cmd/zqk-community/app/auth_middleware_test.go
+index e8b00ee..37a3927 100644
+--- a/cmd/zqk-community/app/auth_middleware_test.go
++++ b/cmd/zqk-community/app/auth_middleware_test.go
+@@ -77,11 +77,7 @@ func TestAuthMiddleware_Authorized_Credentials(t *testing.T) {
+ 	}
+ }
+ 
+-func TestAuthMiddleware_CommunityEditionSeatsSystemAccount(t *testing.T) {
+-	prev := zqkenv.IsCommunityEdition
+-	zqkenv.IsCommunityEdition = true
+-	t.Cleanup(func() { zqkenv.IsCommunityEdition = prev })
+-
++func TestAuthMiddleware_NoTokenSeatsSystemAccount(t *testing.T) {
+ 	cmd := &cobra.Command{Use: "status"}
+ 	home := t.TempDir()
+ 	t.Setenv(zqkenv.OSHome().Name(), home)
+@@ -89,16 +85,8 @@ func TestAuthMiddleware_CommunityEditionSeatsSystemAccount(t *testing.T) {
+ 	t.Setenv(zqkenv.TestRoot().Name(), "")
+ 	t.Setenv(zqkenv.TestBypassAuth().Name(), "0")
+ 
+-	if err := AuthMiddleware(cmd, t.TempDir()); err == nil {
+-		t.Fatal("expected uninitialized-kernel error, got nil")
+-	} else if !strings.Contains(err.Error(), "system init") {
+-		t.Fatalf("want init hint, got %v", err)
+-	}
+-
+-	projectRoot := t.TempDir()
+-	createSchemas(t, projectRoot)
+-	if err := AuthMiddleware(cmd, projectRoot); err != nil {
+-		t.Fatalf("community edition with no token: %v", err)
++	if err := AuthMiddleware(cmd, t.TempDir()); err != nil {
++		t.Fatalf("local kernel with no token: %v", err)
+ 	}
+ 	sec := pkgctx.GetSecurityContext(cmd.Context())
+ 	if sec == nil {
+@@ -127,27 +115,23 @@ func TestAuthMiddleware_BypassInit(t *testing.T) {
+ 	}
+ }
+ 
+-func TestAuthMiddleware_CommunityLeftoverCredsUninitializedHintsInit(t *testing.T) {
+-	prev := zqkenv.IsCommunityEdition
+-	zqkenv.IsCommunityEdition = true
+-	t.Cleanup(func() { zqkenv.IsCommunityEdition = prev })
+-
+-	cmd := &cobra.Command{Use: "list"}
++func TestAuthMiddleware_UninitializedKernelHint(t *testing.T) {
++	cmd := &cobra.Command{Use: "object"}
+ 	home := t.TempDir()
+ 	t.Setenv(zqkenv.OSHome().Name(), home)
+-	t.Setenv(zqkenv.APIKey().Name(), "ACC-leftover-studio")
+-	t.Setenv(zqkenv.TestRoot().Name(), "")
++	const accID = "ACC-test-token"
++	t.Setenv(zqkenv.APIKey().Name(), accID)
+ 	t.Setenv(zqkenv.TestBypassAuth().Name(), "0")
+ 
+-	err := AuthMiddleware(cmd, t.TempDir())
++	// Empty dir with no .zqk directory
++	emptyProjectRoot := t.TempDir()
++
++	err := AuthMiddleware(cmd, emptyProjectRoot)
+ 	if err == nil {
+-		t.Fatal("expected uninitialized hint, got nil")
+-	}
+-	if strings.Contains(err.Error(), "account schema") {
+-		t.Fatalf("leftover creds must not look like unauthorized schema: %v", err)
++		t.Fatalf("expected error for uninitialized kernel, got nil")
+ 	}
+-	if !strings.Contains(err.Error(), "system init") {
+-		t.Fatalf("want init hint, got %v", err)
++	if !strings.Contains(err.Error(), "kernel not initialized: run") || !strings.Contains(err.Error(), "system init") {
++		t.Fatalf("expected fail-closed uninitialized kernel hint, got: %v", err)
+ 	}
+ }
+ 
+diff --git a/cmd/zqk-community/app/command_audit_community_test.go b/cmd/zqk-community/app/command_audit_community_test.go
+deleted file mode 100644
+index 48e956d..0000000
+--- a/cmd/zqk-community/app/command_audit_community_test.go
++++ /dev/null
+@@ -1,35 +0,0 @@
+-package app
+-
+-import (
+-	"context"
+-	"testing"
+-
+-	clitool "github.com/lanceman/zqk/pkg/cli"
+-	"github.com/lanceman/zqk/pkg/zqkenv"
+-)
+-
+-func TestEmitCommandExecutionEventViaCoordinator_CommunitySkips(t *testing.T) {
+-	prev := zqkenv.IsCommunityEdition
+-	zqkenv.IsCommunityEdition = true
+-	t.Cleanup(func() { zqkenv.IsCommunityEdition = prev })
+-
+-	// Nil storage would panic if the community skip did not return first.
+-	emitCommandExecutionEventViaCoordinator(
+-		context.Background(),
+-		"/tmp/zcom-community-audit-skip",
+-		nil,
+-		"Command execution: object list",
+-		auditSeverityLow,
+-		map[string]any{},
+-		&clitool.CommandMetric{Command: "object list"},
+-		profileHuman,
+-	)
+-}
+-
+-func TestCreateCommandAuditEvent_CommunitySkips(t *testing.T) {
+-	prev := zqkenv.IsCommunityEdition
+-	zqkenv.IsCommunityEdition = true
+-	t.Cleanup(func() { zqkenv.IsCommunityEdition = prev })
+-
+-	createCommandAuditEvent(nil, "/tmp/zcom-community-audit-skip", &clitool.CommandMetric{Command: "object list"}, profileHuman)
+-}
+diff --git a/cmd/zqk-community/app/scheduler_cmd.go b/cmd/zqk-community/app/scheduler_cmd.go
+new file mode 100644
+index 0000000..0ae11f0
+--- /dev/null
++++ b/cmd/zqk-community/app/scheduler_cmd.go
+@@ -0,0 +1,164 @@
++package app
++
++import (
++	"os"
++	"os/exec"
++	"os/signal"
++	"syscall"
++
++	"github.com/spf13/cobra"
++
++	"github.com/lanceman/zqk/cmd/zqk/system"
++	"github.com/lanceman/zqk/internal/cli"
++	pkgctx "github.com/lanceman/zqk/pkg/context"
++	"github.com/lanceman/zqk/pkg/errfmt"
++	"github.com/lanceman/zqk/pkg/logging"
++	"github.com/lanceman/zqk/pkg/objects"
++	"github.com/lanceman/zqk/pkg/scheduler"
++	storagepkg "github.com/lanceman/zqk/pkg/storage"
++	"github.com/lanceman/zqk/pkg/zqkenv"
++)
++
++// NewCommunitySchedulerCmd is the community-bounded daemon surface (start/stop/status).
++// Studio's cmd/zqk/scheduler tree is not compiled here (it imports cmd/zqk/agent).
++func NewCommunitySchedulerCmd() *cobra.Command {
++	cmd := &cobra.Command{
++		Use:   "scheduler",
++		Short: "Background job daemon (start, stop, status)",
++		Long:  "Runs retention, audit aggregation, and one-shot jobs already written to the kernel. Init seeds those jobs in-process. First-run object CRUD does not require the daemon.",
++	}
++	cmd.AddCommand(newCommunitySchedulerStartCmd())
++	cmd.AddCommand(newCommunitySchedulerStopCmd())
++	cmd.AddCommand(newCommunitySchedulerStatusCmd())
++	return cmd
++}
++
++func newCommunitySchedulerStartCmd() *cobra.Command {
++	var foreground bool
++	cmd := &cobra.Command{
++		Use:   "start",
++		Short: "Start the community scheduler daemon",
++		RunE: func(cmd *cobra.Command, _ []string) error {
++			logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
++			projectRoot := cli.ResolveProjectRoot(".")
++			if projectRoot == EmptyValue {
++				return errfmt.Errorf("project root not found; run from a directory with .zqk/ after zcom system init")
++			}
++			running, pid, err := scheduler.IsSchedulerRunning(projectRoot)
++			if err == nil && running {
++				logging.Fluent(logger).Info("Scheduler already running").
++					Int("pid", pid).
++					String("project_root", projectRoot).
++					Log()
++				return nil
++			}
++			if !foreground {
++				return startCommunitySchedulerDetached(projectRoot, logger)
++			}
++			return startCommunitySchedulerForeground(cmd, projectRoot, logger)
++		},
++	}
++	cmd.Flags().BoolVar(&foreground, "foreground", false, "Run in this terminal (used by detached start)")
++	return cmd
++}
++
++func startCommunitySchedulerDetached(projectRoot string, logger logging.Logger) error {
++	exe, err := os.Executable()
++	if err != nil {
++		return errfmt.Newf("resolve zcom binary").Wrap(err)
++	}
++	child := exec.Command(exe, "scheduler", "start", "--foreground")
++	child.Dir = projectRoot
++	child.Env = append(os.Environ(), zqkenv.ProjectRoot().Name()+"="+projectRoot)
++	child.SysProcAttr = &syscall.SysProcAttr{Setsid: true}
++	child.Stdout = nil
++	child.Stderr = nil
++	if err := child.Start(); err != nil {
++		return errfmt.Newf("start detached scheduler").Wrap(err)
++	}
++	logging.Fluent(logger).Info("Scheduler daemon starting").
++		Int("pid", child.Process.Pid).
++		String("project_root", projectRoot).
++		String("note", "zcom scheduler status").
++		Log()
++	_ = child.Process.Release()
++	return nil
++}
++
++func startCommunitySchedulerForeground(cmd *cobra.Command, projectRoot string, logger logging.Logger) error {
++	ctx, stop := signal.NotifyContext(cmd.Context(), os.Interrupt, syscall.SIGTERM)
++	defer stop()
++
++	storageFactory, err := storagepkg.NewStorageFactory(ctx, projectRoot)
++	if err != nil {
++		return errfmt.Newf("storage factory").Wrap(err)
++	}
++	var provider storagepkg.ObjectStorageProvider
++	if storageFactory != nil {
++		provider = storageFactory.GetStorage()
++	}
++	sched := scheduler.NewSchedulerWithProjectRoot(
++		provider,
++		objects.GetGlobalSpecLoader(),
++		objects.GetGlobalLifecycleLoader(),
++		projectRoot,
++		system.NewObjectIDCacheBuilderForScheduler(),
++	)
++	sched.SetSecurityContext(pkgctx.NewSystemSecurityContext())
++	if err := scheduler.WritePIDFile(projectRoot); err != nil {
++		logging.Fluent(logger).Warn("Could not write scheduler PID file").WithError(err).Log()
++	}
++	logging.Fluent(logger).Info("Scheduler running in foreground").
++		String("project_root", projectRoot).
++		Log()
++	return sched.Start(ctx)
++}
++
++func newCommunitySchedulerStopCmd() *cobra.Command {
++	return &cobra.Command{
++		Use:   "stop",
++		Short: "Stop the community scheduler daemon",
++		RunE: func(_ *cobra.Command, _ []string) error {
++			logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
++			projectRoot := cli.ResolveProjectRoot(".")
++			if projectRoot == EmptyValue {
++				return errfmt.Errorf("project root not found")
++			}
++			if err := scheduler.StopSchedulerByPID(projectRoot); err != nil {
++				return err
++			}
++			logging.Fluent(logger).Info("Scheduler stop signaled").
++				String("project_root", projectRoot).
++				Log()
++			return nil
++		},
++	}
++}
++
++func newCommunitySchedulerStatusCmd() *cobra.Command {
++	return &cobra.Command{
++		Use:   "status",
++		Short: "Show whether the community scheduler daemon is running",
++		RunE: func(_ *cobra.Command, _ []string) error {
++			logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
++			projectRoot := cli.ResolveProjectRoot(".")
++			if projectRoot == EmptyValue {
++				return errfmt.Errorf("project root not found")
++			}
++			running, pid, err := scheduler.IsSchedulerRunning(projectRoot)
++			if err != nil {
++				return err
++			}
++			status := "not running"
++			if running {
++				status = "running"
++			}
++			logging.Fluent(logger).Info("Scheduler status").
++				String("status", status).
++				Int("pid", pid).
++				String("project_root", projectRoot).
++				Log()
++			return nil
++		},
++	}
++}
+diff --git a/cmd/zqk-community/main.go b/cmd/zqk-community/main.go
+index 2682907..fc1af3b 100644
+--- a/cmd/zqk-community/main.go
++++ b/cmd/zqk-community/main.go
+@@ -15,11 +15,7 @@ import (
+ // cgo DNS acquires libc pthread mutexes that deadlock with fork() in
+ // multi-threaded processes (observed in scheduler daemon crashes).
+ func init() {
+-	zqkenv.IsCommunityEdition = true
+-	app.ApplyPressureTestBrand()
+-
+-	// Load .env only after brand+community flags so studio ZQK_PROJECT_ROOT
+-	// from an IDE shell cannot hijack this SKU's project root.
++	// Load environment variables from .env file (if present) from project root.
+ 	projectRoot := paths.ResolveProjectRoot(".")
+ 	envPath := filepath.Join(projectRoot, ".env")
+ 	if _, err := fileutil.Stat(envPath); err == nil {
+@@ -36,7 +32,7 @@ func init() {
+ 	}
+ }
+ 
+-// main is the entry point for the community pressure-test CLI (zcom).
++// main is the entry point for the primary zqk CLI binary.
+ func main() {
+ 	app.Execute()
+ }
+diff --git a/cmd/zqk/object/kind.go b/cmd/zqk/object/kind.go
+index 1d07ab9..f39e479 100644
+--- a/cmd/zqk/object/kind.go
++++ b/cmd/zqk/object/kind.go
+@@ -13,7 +13,6 @@ import (
+ 	"github.com/lanceman/zqk/pkg/objectget"
+ 	"github.com/lanceman/zqk/pkg/objects"
+ 	"github.com/lanceman/zqk/pkg/paths"
+-	"github.com/lanceman/zqk/pkg/zqkenv"
+ 	"github.com/spf13/cobra"
+ )
+ 
+@@ -204,28 +203,7 @@ func RegisterDynamicKindCommands(objectCmd *cobra.Command) {
+ 	}
+ 	// Use RegisterKindCommandsForKinds so we add by exact name; Find([]string{kind}) would
+ 	// return the generic <kind> command and we would skip adding (no per-kind subcommands).
+-
+-	if zqkenv.IsCommunityEdition {
+-		// COMMUNITY EDITION PRUNING
+-		// Only allow core semantic objects in the free tier
+-		allowedCommunityKinds := map[string]bool{
+-			"goal": true, "requirement": true, "task": true, "policy": true,
+-			"rule": true, "backlog_item": true, "milestone": true, "decision": true,
+-			"test_case": true, "prompt_template": true, "validation_rule": true,
+-			"agent_skill": true, "agent_instruction": true, objects.FieldKeyVision: true,
+-			"mission": true, "technical_spec": true, "technical_debt": true,
+-			"workflow": true, "workstream": true, "question": true, "criteria": true,
+-			"organization": true,
+-		}
+-		var filteredKinds []string
+-		for _, k := range kinds {
+-			if allowedCommunityKinds[k] {
+-				filteredKinds = append(filteredKinds, k)
+-			}
+-		}
+-		kinds = filteredKinds
+-	}
+-
++	// TRACK: TDE-1789694178347867000-a6099c29 — do not prune kinds by edition.
+ 	RegisterKindCommandsForKinds(objectCmd, kinds)
+ }
+ 
+diff --git a/cmd/zqk/object/list_namespace_test.go b/cmd/zqk/object/list_namespace_test.go
+index a4b447f..c6aee2b 100644
+--- a/cmd/zqk/object/list_namespace_test.go
++++ b/cmd/zqk/object/list_namespace_test.go
+@@ -5,7 +5,6 @@ import (
+ 
+ 	"github.com/lanceman/zqk/pkg/objects"
+ 	"github.com/lanceman/zqk/pkg/validation"
+-	"github.com/lanceman/zqk/pkg/zqkenv"
+ 	"github.com/spf13/cobra"
+ )
+ 
+@@ -21,13 +20,13 @@ func TestApplyNamespaceBoundaries(t *testing.T) {
+ 		wantIsolation bool
+ 	}{
+ 		{
+-			name:          "default adds local namespace",
++			name:          "default inventory is federated",
+ 			federated:     false,
+ 			namespace:     "",
+ 			filters:       make(map[string]any),
+-			wantFilter:    validation.DefaultNamespaceKernel,
+-			wantMode:      namespaceScopeModeDefault,
+-			wantIsolation: true,
++			wantFilter:    "",
++			wantMode:      namespaceScopeModeFederated,
++			wantIsolation: false,
+ 		},
+ 		{
+ 			name:          "federated skips isolation",
+@@ -133,12 +132,8 @@ func TestAttachNamespaceScopeMeta(t *testing.T) {
+ 	}
+ }
+ 
+-func TestCommunityOrganizationScope(t *testing.T) {
+-	orig := zqkenv.IsCommunityEdition
+-	defer func() { zqkenv.IsCommunityEdition = orig }()
+-	zqkenv.IsCommunityEdition = true
+-
+-	// 1. Default community scope (no --federated, no --namespace)
++func TestDefaultOrganizationScopeIsFederated(t *testing.T) {
++	// 1. Default scope (no --federated, no --namespace)
+ 	cmd := &cobra.Command{}
+ 	cmd.Flags().Bool("federated", false, "")
+ 	cmd.Flags().Bool("all-namespaces", false, "")
+diff --git a/cmd/zqk/object/namespace_scope.go b/cmd/zqk/object/namespace_scope.go
+index ee8ba6d..5e61c16 100644
+--- a/cmd/zqk/object/namespace_scope.go
++++ b/cmd/zqk/object/namespace_scope.go
+@@ -9,7 +9,6 @@ import (
+ 	"github.com/lanceman/zqk/pkg/objects"
+ 	"github.com/lanceman/zqk/pkg/storage"
+ 	"github.com/lanceman/zqk/pkg/validation"
+-	"github.com/lanceman/zqk/pkg/zqkenv"
+ 	"github.com/spf13/cobra"
+ )
+ 
+@@ -77,14 +76,10 @@ func applyNamespaceBoundaries(cmd *cobra.Command, filters map[string]any) Namesp
+ 		return scope
+ 	}
+ 
+-	if zqkenv.IsCommunityEdition {
+-		scope.Mode = namespaceScopeModeFederated
+-		scope.IsolationActive = false
+-		scope.NamespaceScope = ""
+-		return scope
+-	}
+-
+-	filters[objects.FieldKeyNamespaceID] = validation.DefaultNamespaceKernel
++	// Default inventory is federated: object list is the scoreboard. Pass --namespace to isolate.
++	scope.Mode = namespaceScopeModeFederated
++	scope.IsolationActive = false
++	scope.NamespaceScope = ""
+ 	return scope
+ }
+ 
+diff --git a/cmd/zqk/system/init_impl.go b/cmd/zqk/system/init_impl.go
+index 058e19b..99bc56f 100644
+--- a/cmd/zqk/system/init_impl.go
++++ b/cmd/zqk/system/init_impl.go
+@@ -75,12 +75,12 @@ func runInit(_ *cobra.Command, projectName, template string, force bool, snapsho
+ 
+ 	// Auto-detect legacy mode for existing codebases (Painless Drop-In)
+ 	if !legacy && snapshotPath == emptyValue {
+-		if !kernelScaffoldPresent(projectRoot) {
++		if _, err := fileutil.Stat(filepath.Join(projectRoot, paths.ProjectDataDir)); fileutil.IsNotExist(err) {
+ 			entries, err := fileutil.ReadDir(projectRoot)
+ 			if err == nil {
+ 				for _, entry := range entries {
+ 					name := entry.Name()
+-					if name != ".git" && name != ".zqk-test-settings.yaml" && name != "zqk-test-settings.yaml" && name != paths.ProjectDataDir {
++					if name != ".git" && name != ".zqk-test-settings.yaml" && name != "zqk-test-settings.yaml" {
+ 						legacy = true
+ 						logging.Fluent(logger).Info("Detected existing codebase; automatically enabling legacy mode for painless drop-in").Log()
+ 						break
+@@ -236,38 +236,26 @@ func runInit(_ *cobra.Command, projectName, template string, force bool, snapsho
+ 		}
+ 	}
+ 
+-	if zqkenv.IsCommunityEdition {
+-		// Inject Agent Boot Protocol rules for frictionless onboarding
+-		if err := injectAgentBootProtocol(projectRoot, legacy, logger); err != nil {
+-			logging.Fluent(logger).Warn("Failed to inject agent boot protocol").WithError(err).Log()
++	if !withMaintenanceJobs {
++		if _, err := EnsureRetentionJobsInProject(projectRoot, logger, nil); err != nil {
++			logging.Fluent(logger).Warn("Failed to ensure maintenance jobs on init").WithError(err).Log()
+ 		}
+-
+-		// Generate the human-facing Getting Started guide
+-		if err := generateGettingStartedGuide(projectRoot, logger); err != nil {
+-			logging.Fluent(logger).Warn("Failed to generate ZQK_GETTING_STARTED.md").WithError(err).Log()
+-		}
+-
+-		note := "Run '" + brand.ExecutableName() + " quickstart' (or system start-here) for the onboarding tutorial"
+-		logging.Fluent(logger).Info("Welcome to ZQK Community Edition; initialization complete").
+-			String(initLogFieldProject, projectRoot).
+-			String(initLogFieldNote, note).
+-			Log()
+ 	}
+ 
+-	return nil
+-}
+-
+-// kernelScaffoldPresent reports a real kernel, not a logger-created .zqk/logs tree.
+-func kernelScaffoldPresent(projectRoot string) bool {
+-	processDir := datacell.ProcessPrimaryDir(projectRoot)
+-	if _, err := fileutil.Stat(processDir); err == nil {
+-		return true
++	if err := injectAgentBootProtocol(projectRoot, legacy, logger); err != nil {
++		logging.Fluent(logger).Warn("Failed to inject agent boot protocol").WithError(err).Log()
+ 	}
+-	cfg := filepath.Join(projectRoot, paths.ProjectDataDir, paths.ConfigDir, "config.yaml")
+-	if _, err := fileutil.Stat(cfg); err == nil {
+-		return true
++	if err := generateGettingStartedGuide(projectRoot, logger); err != nil {
++		logging.Fluent(logger).Warn("Failed to generate getting-started guide").WithError(err).Log()
+ 	}
+-	return false
++
++	exe := brand.ExecutableName()
++	logging.Fluent(logger).Info("Initialization complete").
++		String(initLogFieldProject, projectRoot).
++		String(initLogFieldNote, "Run '"+exe+" system start-here'. Background loops: '"+exe+" scheduler start'.").
++		Log()
++
++	return nil
+ }
+ 
+ // determineProjectRoot determines project root from environment variables or auto-discovery.
+@@ -297,11 +285,13 @@ func runGreenfieldInit(projectRoot, projectName, template string, force bool, lo
+ 	projectDataDir := filepath.Join(projectRoot, paths.ProjectDataDir)
+ 	processDir := datacell.ProcessPrimaryDir(projectRoot)
+ 
+-	// Check if already initialized. A logger may have created .zqk/logs before
+-	// init runs — logs-only is not a kernel.
++	// Check if already initialized
+ 	if !force {
+-		if kernelScaffoldPresent(projectRoot) {
+-			return errfmt.Errorf("project already initialized (found kernel scaffold under %s). Use --force to overwrite or --legacy for existing project", paths.ProjectDataDir)
++		if _, err := fileutil.Stat(projectDataDir); err == nil {
++			return errfmt.Errorf("project already initialized (found %s directory). Use --force to overwrite or --legacy for existing project", paths.ProjectDataDir)
++		}
++		if _, err := fileutil.Stat(processDir); err == nil {
++			return errfmt.Errorf("project already initialized (found %s directory). Use --force to overwrite or --legacy for existing project", paths.ProcessDir)
+ 		}
+ 	}
+ 
+diff --git a/cmd/zqk/system/init_isolation_test.go b/cmd/zqk/system/init_isolation_test.go
+index d2ff5cd..5df750b 100644
+--- a/cmd/zqk/system/init_isolation_test.go
++++ b/cmd/zqk/system/init_isolation_test.go
+@@ -11,6 +11,7 @@ import (
+ 	"github.com/lanceman/zqk/pkg/config"
+ 	"github.com/lanceman/zqk/pkg/logging"
+ 	"github.com/lanceman/zqk/pkg/paths"
++	"github.com/lanceman/zqk/pkg/testkit"
+ 	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+ )
+ 
+@@ -283,5 +284,118 @@ func TestCommunitySourceOverlay_IntegrityAndProcessPreservation(t *testing.T) {
+ 			t.Errorf("expected overlaid file to exist: %s", ef)
+ 		}
+ 	}
++
++	// Verify the installed Makefile is the slim community version (TDE-1789690070487265000-ea5471f4)
++	installedMf, err := os.ReadFile(filepath.Join(tmpDest, "Makefile"))
++	if err != nil {
++		t.Fatalf("failed to read installed Makefile: %v", err)
++	}
++	mfStr := string(installedMf)
++	if !strings.Contains(mfStr, "zcom:") {
++		t.Errorf("expected installed Makefile to contain 'zcom:'")
++	}
++	if strings.Contains(mfStr, "zqk-admin:") || strings.Contains(mfStr, "promote-stable:") {
++		t.Errorf("installed Makefile contains studio-only targets: %s", mfStr)
++	}
++
++	// Verify apply-community-source.sh preserves destination-owned README.md
++	destReadmePath := filepath.Join(tmpDest, "README.md")
++	customReadme := []byte("# Custom Dest Community README\n")
++	if err := os.WriteFile(destReadmePath, customReadme, 0644); err != nil {
++		t.Fatal(err)
++	}
++	cmd2 := exec.Command(overlayScript, tmpDest)
++	if out2, err := cmd2.CombinedOutput(); err != nil {
++		t.Fatalf("second apply-community-source.sh run failed: %v, output: %s", err, string(out2))
++	}
++	preservedReadme, err := os.ReadFile(destReadmePath)
++	if err != nil || string(preservedReadme) != string(customReadme) {
++		t.Errorf("apply-community-source.sh clobbered destination README.md: got %s", string(preservedReadme))
++	}
++
++	// Verify apply-community-source.sh includes build-bootstrap-archive.sh and sync-public-candidate.sh includes specs
++	overlayData, err := os.ReadFile(overlayScript)
++	if err != nil {
++		t.Fatalf("failed to read apply-community-source.sh: %v", err)
++	}
++	overlayStr := string(overlayData)
++	if !strings.Contains(overlayStr, "scripts/build-bootstrap-archive.sh") {
++		t.Errorf("apply-community-source.sh must include scripts/build-bootstrap-archive.sh")
++	}
++	if strings.Contains(overlayStr, "\"Makefile\"") || strings.Contains(overlayStr, "\"README.md\"") {
++		t.Errorf("apply-community-source.sh OVERLAY_PATHS must not contain Makefile or README.md")
++	}
++	if !strings.Contains(overlayStr, "\"cmd/zqk/scheduler\"") {
++		t.Errorf("apply-community-source.sh OVERLAY_PATHS must contain cmd/zqk/scheduler")
++	}
++
++	syncScript := filepath.Join(root, "scripts", "open-core", "sync-public-candidate.sh")
++	syncData, err := os.ReadFile(syncScript)
++	if err != nil {
++		t.Fatalf("failed to read sync-public-candidate.sh: %v", err)
++	}
++	syncStr := string(syncData)
++	if !strings.Contains(syncStr, ".zqk/specs") {
++		t.Errorf("sync-public-candidate.sh must include .zqk/specs")
++	}
++	if strings.Contains(syncStr, "\"Makefile\"") {
++		t.Errorf("sync-public-candidate.sh INCLUDES must not contain Makefile")
++	}
++	if !strings.Contains(syncStr, "\"cmd/zqk/scheduler\"") {
++		t.Errorf("sync-public-candidate.sh INCLUDES must contain cmd/zqk/scheduler")
++	}
++
++	// Verify cmd/zqk/scheduler was copied to destination and studio-specific files were pruned
++	schedDest := filepath.Join(tmpDest, "cmd", "zqk", "scheduler")
++	if !fileutil.Exists(schedDest) {
++		t.Errorf("expected destination cmd/zqk/scheduler to exist")
++	}
++	for _, forbidden := range []string{"scan_tests.go", "convergence_agent_prompt.go", "ide_paste_automation.go"} {
++		if fileutil.Exists(filepath.Join(schedDest, forbidden)) {
++			t.Errorf("destination scheduler must not contain studio file: %s", forbidden)
++		}
++	}
++	// Verify register_studio_scheduler_commands.go is stubbed as a no-op
++	stubPath := filepath.Join(schedDest, "register_studio_scheduler_commands.go")
++	if !fileutil.Exists(stubPath) {
++		t.Errorf("expected register_studio_scheduler_commands.go stub to exist in destination")
++	} else {
++		stubData, _ := os.ReadFile(stubPath)
++		if !strings.Contains(string(stubData), "func registerStudioSchedulerCommands(_ *cobra.Command) {}") {
++			t.Errorf("expected no-op stub for registerStudioSchedulerCommands, got: %s", string(stubData))
++		}
++	}
+ }
+ 
++func TestCommunityInit_SeedsStarterGraphAndRetentionJobs(t *testing.T) {
++	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{SkipSetupTestEnvironment: true, SkipFileStorage: true})
++	tmpDir := proj.Root
++
++	originalDir, err := fileutil.Getwd()
++	if err != nil {
++		t.Fatalf("Failed to get current directory: %v", err)
++	}
++	defer fileutil.Chdir(originalDir)
++
++	if err := fileutil.Chdir(tmpDir); err != nil {
++		t.Fatalf("Failed to change to temp directory: %v", err)
++	}
++
++	cmd := NewInitCmd()
++	cmd.SetArgs([]string{"--force"})
++	if err := cmd.Execute(); err != nil {
++		t.Fatalf("Community init failed: %v", err)
++	}
++
++	// Verify starter organization graph exists (in-process starter graph)
++	orgsDir := filepath.Join(tmpDir, paths.ProcessDir, "organizations")
++	if !fileutil.Exists(orgsDir) {
++		t.Fatalf("expected organizations directory to exist at %s", orgsDir)
++	}
++
++	// Verify retention / maintenance scheduler jobs were seeded
++	jobsDir := filepath.Join(tmpDir, paths.ProcessDir, "scheduler_jobs")
++	if !fileutil.Exists(jobsDir) {
++		t.Fatalf("expected scheduler_jobs directory to exist at %s", jobsDir)
++	}
++}
+diff --git a/cmd/zqk/system/quickstart.go b/cmd/zqk/system/quickstart.go
+index 8dc94c3..474c4ef 100644
+--- a/cmd/zqk/system/quickstart.go
++++ b/cmd/zqk/system/quickstart.go
+@@ -2,131 +2,45 @@ package system
+ 
+ import (
+ 	"fmt"
+-	"strings"
+ 
+ 	"github.com/lanceman/zqk/internal/cli"
+ 	"github.com/lanceman/zqk/pkg/brand"
+ 	clipkg "github.com/lanceman/zqk/pkg/cli"
+ 	"github.com/lanceman/zqk/pkg/objects"
+-	"github.com/lanceman/zqk/pkg/zqkenv"
+ 	"github.com/spf13/cobra"
+ )
+ 
+-func quickstartExecutable() string {
++func renderQuickstartGuide() string {
+ 	exe := brand.ExecutableName()
+-	if exe == "" {
+-		return "zqk"
+-	}
+-	return exe
+-}
+-
+-func communityQuickstartGuide(exe string) string {
+-	envPrefix := strings.ToUpper(exe)
+-	return fmt.Sprintf(`🚀 ZQK Community 5-Minute Quickstart (pressure-test binary: %s)
+-
+-This SKU is not studio zqk. Kernel data stays under .zqk/ (not .zcom/).
+-Do not export %s_PROJECT_ROOT in your shell profile — it silently attaches every
+-later command to that checkout instead of the directory you are in.
+-
+-1. From the project directory, initialize (or skip if .zqk/ already exists):
+-   $ %s system init --project-name <your-project>
+-
+-2. Seat your IDE agent:
+-   $ %s system agent-onboard --format json
+-
+-3. Pair MCP (one binary — there is no zqk-mcp / %s-mcp):
+-   $ %s mcp install
+-   $ %s mcp ensure --tcp 127.0.0.1:8443
+-   Cursor stdio: %s mcp cursor-adapter
+-
+-4. Confirm the kernel answers:
+-   $ %s object list
+-   $ %s workflow whats-next --format json
+-
+-Docs: docs/onboarding/COMMUNITY_FIRST_RUN.md
+-`, exe, envPrefix, exe, exe, exe, exe, exe, exe, exe, exe)
+-}
+-
+-func studioQuickstartGuide(exe string) string {
+ 	return fmt.Sprintf(`🚀 ZQK 5-Minute Quickstart
+ 
+ Follow these 4 simple steps to get started:
+ 
+ 1. Initialize your project kernel:
+-   $ %s system init --project-name <your-project> --with-onboarding-roadmap
++   $ %s system init --project-name <your-project>
+ 
+ 2. Discover priority plan and next tasks:
+    $ %s workflow whats-next
+ 
+ 3. Pair with your IDE / AI agent mesh (MCP):
+-   $ %s mcp install
+-   Cursor stdio: %s mcp cursor-adapter
++   Add to claude_desktop_config.json:
++   {
++     "mcpServers": {
++       "%s": {
++         "%s": "%s",
++         "args": ["mcp", "serve"]
++       }
++     }
++   }
+ 
+ 4. Verify kernel compliance and system health:
+    $ %s system check
+ 
+-Docs: docs/onboarding/COMMUNITY_FIRST_RUN.md
+-`, exe, exe, exe, exe, exe)
+-}
+-
+-func quickstartJSONPayload(exe string) map[string]any {
+-	if zqkenv.IsCommunityEdition {
+-		return map[string]any{
+-			objects.FieldKeyTitle: "ZQK Community Quickstart Guide",
+-			"steps": []string{
+-				"1. Initialize: " + exe + " system init --project-name <name>",
+-				"2. Seat agent: " + exe + " system agent-onboard --format json",
+-				"3. Pair MCP: " + exe + " mcp install  (then " + exe + " mcp cursor-adapter)",
+-				"4. Discover work: " + exe + " workflow whats-next --format json",
+-			},
+-			"starter_policies": []string{
+-				"POL-CODE-001: Spec-driven architecture",
+-				"POL-CODE-007: Structured logging framework",
+-				"POL-AGENT-001: CLI-only process modifications",
+-			},
+-			objects.FieldKeyMcpConfig: map[string]any{
+-				"cursor": map[string]any{
+-					"mcpServers": map[string]any{
+-						"zqk": map[string]any{
+-							objects.FieldKeyCommand: exe,
+-							"args":                  []string{"mcp", "cursor-adapter"},
+-						},
+-					},
+-				},
+-			},
+-			"docs_url": "docs/onboarding/COMMUNITY_FIRST_RUN.md",
+-		}
+-	}
+-	return map[string]any{
+-		objects.FieldKeyTitle: "ZQK Quickstart Guide",
+-		"steps": []string{
+-			"1. Initialize: " + exe + " system init --project-name <name> --with-onboarding-roadmap",
+-			"2. Discover priority plan: " + exe + " workflow whats-next",
+-			"3. Pair MCP server: " + exe + " mcp install",
+-			"4. Verify health: " + exe + " system check",
+-		},
+-		"starter_policies": []string{
+-			"POL-CODE-001: Spec-driven architecture",
+-			"POL-CODE-007: Structured logging framework",
+-			"POL-CODE-009: Test-driven development (TDD)",
+-			"POL-AGENT-001: CLI-only process modifications",
+-			"POL-AGENT-TPM-001: Hourglass multi-seat delegation",
+-		},
+-		objects.FieldKeyMcpConfig: map[string]any{
+-			"claude_desktop": map[string]any{
+-				"mcpServers": map[string]any{
+-					"zqk": map[string]any{
+-						objects.FieldKeyCommand: exe,
+-						"args":                  []string{"mcp", "cursor-adapter"},
+-					},
+-				},
+-			},
+-		},
+-		"docs_url": "docs/onboarding/COMMUNITY_FIRST_RUN.md",
+-	}
++Docs & Architecture: docs/INDEX.md
++`, exe, exe, exe, objects.FieldKeyCommand, exe, exe)
+ }
+ 
+-// NewQuickstartCmd returns the 'quickstart' command which provides a zero-friction
++// NewQuickstartCmd returns the 'zqk quickstart' command which provides a zero-friction
+ // onboarding and bootstrap walkthrough for new projects and contributors.
+ func NewQuickstartCmd() *cobra.Command {
+ 	helpBuilder := clipkg.DynamicHelpBuilder(
+@@ -137,24 +51,47 @@ func NewQuickstartCmd() *cobra.Command {
+ 		"MCP pairing, starter policies, and session workflow discovery in under 2 minutes.",
+ 	).
+ 		AddExample("Run quickstart guide", "%s quickstart").
+-		AddExample("JSON format output", "%s quickstart --format json").
+-		AddExample("Same guide under system", "%s system start-here")
++		AddExample("JSON format output", "%s quickstart --format json")
+ 
+ 	cmd := &cobra.Command{
+ 		Use:     "quickstart",
+ 		Aliases: []string{"quick-start", "start-here"},
+ 		Short:   "Zero-friction project onboarding and quickstart guide",
+ 		RunE: func(cmd *cobra.Command, args []string) error {
+-			exe := quickstartExecutable()
+ 			format, _ := cmd.Flags().GetString("format")
+ 			if format == "json" {
+-				return cli.FormatOutputAs(cmd, cli.FormatJSON, quickstartJSONPayload(exe))
+-			}
+-			guide := studioQuickstartGuide(exe)
+-			if zqkenv.IsCommunityEdition {
+-				guide = communityQuickstartGuide(exe)
++				exe := brand.ExecutableName()
++				initStep := fmt.Sprintf("1. Initialize: %s system init --project-name <name>", exe)
++				payload := map[string]any{
++					objects.FieldKeyTitle: "ZQK Quickstart Guide",
++					"steps": []string{
++						initStep,
++						fmt.Sprintf("2. Discover priority plan: %s workflow whats-next", exe),
++						fmt.Sprintf("3. Pair MCP server: %s mcp serve", exe),
++						fmt.Sprintf("4. Verify health: %s system check", exe),
++					},
++					"starter_policies": []string{
++						"POL-CODE-001: Spec-driven architecture",
++						"POL-CODE-007: Structured logging framework",
++						"POL-CODE-009: Test-driven development (TDD)",
++						"POL-AGENT-001: CLI-only process modifications",
++						"POL-AGENT-TPM-001: Hourglass multi-seat delegation",
++					},
++					objects.FieldKeyMcpConfig: map[string]any{
++						"claude_desktop": map[string]any{
++							"mcpServers": map[string]any{
++								exe: map[string]any{
++									objects.FieldKeyCommand: exe,
++									"args":                  []string{"mcp", "serve"},
++								},
++							},
++						},
++					},
++					"docs_url": "docs/INDEX.md",
++				}
++				return cli.FormatOutputAs(cmd, cli.FormatJSON, payload)
+ 			}
+-			return cli.WriteOutput(cmd, []byte(guide))
++			return cli.WriteOutput(cmd, []byte(renderQuickstartGuide()))
+ 		},
+ 	}
+ 	helpBuilder.ApplyToCommand(cmd)
+diff --git a/cmd/zqk/system/quickstart_test.go b/cmd/zqk/system/quickstart_test.go
+index 59d46e9..8906ecc 100644
+--- a/cmd/zqk/system/quickstart_test.go
++++ b/cmd/zqk/system/quickstart_test.go
+@@ -8,7 +8,6 @@ import (
+ 
+ 	pkgctx "github.com/lanceman/zqk/pkg/context"
+ 	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+-	"github.com/lanceman/zqk/pkg/zqkenv"
+ )
+ 
+ func TestQuickstartCommand(t *testing.T) {
+@@ -30,30 +29,6 @@ func TestQuickstartCommand(t *testing.T) {
+ 	}
+ }
+ 
+-func TestQuickstartCommand_CommunityEditionOmitsZqkMcp(t *testing.T) {
+-	prev := zqkenv.IsCommunityEdition
+-	zqkenv.IsCommunityEdition = true
+-	t.Cleanup(func() { zqkenv.IsCommunityEdition = prev })
+-
+-	cmd := NewQuickstartCmd()
+-	var buf bytes.Buffer
+-	cmd.SetContext(pkgctx.WithCommandOutputWriter(pkgctx.NewSystemContext(), &buf))
+-	cmd.SetArgs([]string{"--format", "json"})
+-	if err := cmd.Execute(); err != nil {
+-		t.Fatalf("quickstart command failed: %v", err)
+-	}
+-	out := buf.String()
+-	if strings.Contains(out, "zqk-mcp") {
+-		t.Errorf("community quickstart must not advertise standalone zqk-mcp, got: %s", out)
+-	}
+-	if !strings.Contains(out, "mcp install") && !strings.Contains(out, "cursor-adapter") {
+-		t.Errorf("expected community quickstart to mention mcp install or cursor-adapter, got: %s", out)
+-	}
+-	if strings.Contains(out, "--with-onboarding-roadmap") {
+-		t.Errorf("community SKU has no scheduler; quickstart must not lead with --with-onboarding-roadmap: %s", out)
+-	}
+-}
+-
+ // BLI-1788987316012200000-5097aded: Deprecate 'quick' CLI command family in favor of 'new' / 'quickstart'
+ func TestQuickstartCommand_BLI_1788987316012200000_5097aded_DeprecateQuick(t *testing.T) {
+ 	cmd := NewQuickstartCmd()
+@@ -79,11 +54,11 @@ func TestQuickstartDocumentationCompleteness(t *testing.T) {
+ 	}
+ 
+ 	text := string(content)
+-	if !strings.Contains(text, "quickstart") {
+-		t.Errorf("QUICKSTART.md missing 'quickstart' command")
++	if !strings.Contains(text, "zqk quickstart") {
++		t.Errorf("QUICKSTART.md missing 'zqk quickstart' command")
+ 	}
+-	if !strings.Contains(text, "mcp install") {
+-		t.Errorf("QUICKSTART.md missing 'mcp install' automated setup command")
++	if !strings.Contains(text, "zqk mcp install") {
++		t.Errorf("QUICKSTART.md missing 'zqk mcp install' automated setup command")
+ 	}
+ 	if !strings.Contains(text, "cursor-adapter") {
+ 		t.Errorf("QUICKSTART.md missing 'cursor-adapter' manual config reference")
+@@ -101,24 +76,15 @@ func TestQuickstartDocumentationCompleteness(t *testing.T) {
+ 		t.Fatalf("failed to read %s: %v", communityPath, err)
+ 	}
+ 	commText := string(communityContent)
+-	if !strings.Contains(commText, "quickstart") {
+-		t.Errorf("COMMUNITY_FIRST_RUN.md missing 'quickstart' reference")
++	if !strings.Contains(commText, "zqk quickstart") {
++		t.Errorf("COMMUNITY_FIRST_RUN.md missing 'zqk quickstart' reference")
+ 	}
+-	if !strings.Contains(commText, "mcp install") {
+-		t.Errorf("COMMUNITY_FIRST_RUN.md missing 'mcp install' reference")
++	if !strings.Contains(commText, "zqk mcp install") {
++		t.Errorf("COMMUNITY_FIRST_RUN.md missing 'zqk mcp install' reference")
+ 	}
+ 	if !strings.Contains(commText, "QUICKSTART.md") {
+ 		t.Errorf("COMMUNITY_FIRST_RUN.md missing link to QUICKSTART.md")
+ 	}
+-	if strings.Contains(commText, "brew install zqk") {
+-		t.Errorf("COMMUNITY_FIRST_RUN.md must not tell pressure-test users to brew install zqk")
+-	}
+-	if strings.Contains(commText, "zqk auth login") {
+-		t.Errorf("COMMUNITY_FIRST_RUN.md must not tell community users to run missing `auth login`")
+-	}
+-	if strings.Contains(commText, "zqk agent new") {
+-		t.Errorf("COMMUNITY_FIRST_RUN.md must not tell community users to run missing `agent new`")
+-	}
+ }
+ 
+ func TestContributorGuideAndTemplateCompleteness(t *testing.T) {
+@@ -134,7 +100,7 @@ func TestContributorGuideAndTemplateCompleteness(t *testing.T) {
+ 	contribPath := filepath.Join(cwd, "CONTRIBUTING.md")
+ 	content, err := fileutil.ReadFile(contribPath)
+ 	if err != nil {
+-		t.Skip("CONTRIBUTING.md is studio-pack; not in the community tree")
++		t.Fatalf("failed to read %s: %v", contribPath, err)
+ 	}
+ 	text := string(content)
+ 
+@@ -197,7 +163,7 @@ func TestContributorGuide_IssueTemplates(t *testing.T) {
+ 		path := filepath.Join(cwd, ".github", "ISSUE_TEMPLATE", tmpl.filename)
+ 		content, err := fileutil.ReadFile(path)
+ 		if err != nil {
+-			t.Skipf("GitHub issue templates are studio-pack; missing %s", path)
++			t.Fatalf("failed to read template %s: %v", path, err)
+ 		}
+ 		text := string(content)
+ 		for _, req := range tmpl.required {
+diff --git a/internal/bootstrap/extract.go b/internal/bootstrap/extract.go
+index e9250d8..af59b5c 100644
+--- a/internal/bootstrap/extract.go
++++ b/internal/bootstrap/extract.go
+@@ -13,7 +13,6 @@ import (
+ 	"github.com/lanceman/zqk/pkg/logging"
+ 	"github.com/lanceman/zqk/pkg/paths"
+ 	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+-	"github.com/lanceman/zqk/pkg/zqkenv"
+ )
+ 
+ const (
+@@ -85,8 +84,8 @@ func ExtractTo(projectRoot string, logger logging.Logger, force bool) error {
+ 		} else if after, ok := strings.CutPrefix(name, ".\\"); ok {
+ 			name = after
+ 		}
+-		// Community edition: omit internal/dev-only command specs ([REDACTED-ID]).
+-		if zqkenv.IsCommunityEdition && strings.HasPrefix(name, archivePrefixCLISpecs) && shouldExcludeCommunityCommandSpec(name) {
++		// Studio cursor/paste command specs do not belong in a portable bootstrap extract.
++		if strings.HasPrefix(name, archivePrefixCLISpecs) && shouldExcludeCommunityCommandSpec(name) {
+ 			if hdr.Typeflag == tar.TypeReg && hdr.Size > 0 {
+ 				if _, err := io.CopyN(io.Discard, tr, hdr.Size); err != nil {
+ 					return errfmt.Errorf("failed to skip community-denied archive entry %s: %w", hdr.Name, err)
+diff --git a/pkg/agentonboard/run.go b/pkg/agentonboard/run.go
+index 66b642f..61aec14 100644
+--- a/pkg/agentonboard/run.go
++++ b/pkg/agentonboard/run.go
+@@ -93,8 +93,8 @@ func Run(opts Options) (*Result, error) {
+ 	authStatus := StageOK
+ 	authDetail := map[string]any{"session_ok": opts.SessionOK}
+ 	if !opts.SessionOK {
+-		authStatus = StageWarn
+-		authDetail[objects.FieldKeyNote] = "No active session observed; seating/object mutate may fail until auth login"
++		authStatus = StageOK
++		authDetail[objects.FieldKeyNote] = "Local kernel session (no token required)"
+ 	}
+ 	res.Stages[StageAuth] = StageResult{Status: authStatus, Detail: authDetail}
+ 
+diff --git a/pkg/scheduler/cli_binary.go b/pkg/scheduler/cli_binary.go
+index e76ca69..6d9eb23 100644
+--- a/pkg/scheduler/cli_binary.go
++++ b/pkg/scheduler/cli_binary.go
+@@ -36,31 +36,20 @@ func resolveSchedulerCLIBinary(projectRoot string) string {
+ 	}
+ 
+ 	if projectRoot != emptyValue {
+-		for _, candidate := range []string{
+-			filepath.Join(projectRoot, paths.ProjectDataDir, binDirName, brand.ZqkStableName),
+-			filepath.Join(projectRoot, binDirName, zqkBinaryName),
+-			filepath.Join(projectRoot, zqkBinaryName),
+-		} {
+-			if info, err := fileutil.Stat(candidate); err == nil && !info.IsDir() {
+-				return candidate
+-			}
++		if path := firstExistingFile(localCLIBinaryCandidates(projectRoot)); path != emptyValue {
++			return path
+ 		}
+ 	}
+ 
+ 	// In test mode, never fall back to the running process (which is the test runner)
+ 	if zqkenv.IsInTest() {
+-		return zqkBinaryName
++		return fallbackCLIBinaryName()
+ 	}
+ 	// Try climbing up to the module root to find the compiled binary in the repository
+ 	if wd, err := fileutil.Getwd(); err == nil {
+ 		if root, err := paths.ModuleRootFromPath(wd); err == nil {
+-			for _, candidate := range []string{
+-				filepath.Join(root, paths.ProjectDataDir, binDirName, brand.ZqkStableName),
+-				filepath.Join(root, binDirName, zqkBinaryName),
+-			} {
+-				if info, err := fileutil.Stat(candidate); err == nil && !info.IsDir() {
+-					return candidate
+-				}
++			if path := firstExistingFile(localCLIBinaryCandidates(root)); path != emptyValue {
++				return path
+ 			}
+ 		}
+ 	}
+@@ -72,7 +61,7 @@ func resolveSchedulerCLIBinary(projectRoot string) string {
+ 		return exe
+ 	}
+ 
+-	return zqkBinaryName
++	return fallbackCLIBinaryName()
+ }
+ 
+ // SchedulerCLIBinaryConfigWarning returns a warning when cli.binary_path is configured
+@@ -115,15 +104,8 @@ func ResolveSchedulerDaemonBinary(projectRoot string) (string, error) {
+ 	}
+ 
+ 	if projectRoot != emptyValue {
+-		for _, candidate := range []string{
+-			filepath.Join(projectRoot, paths.ProjectDataDir, binDirName, brand.ZqkStableName),
+-			filepath.Join(projectRoot, binDirName, zqkSchedulerBinaryName),
+-			filepath.Join(projectRoot, binDirName, zqkBinaryName),
+-			filepath.Join(projectRoot, zqkBinaryName),
+-		} {
+-			if info, err := fileutil.Stat(candidate); err == nil && !info.IsDir() {
+-				return candidate, nil
+-			}
++		if path := firstExistingFile(localDaemonBinaryCandidates(projectRoot)); path != emptyValue {
++			return path, nil
+ 		}
+ 	}
+ 
+@@ -153,17 +135,50 @@ func firstExistingDaemonBinary(root string) (string, bool) {
+ 	if root == emptyValue {
+ 		return "", false
+ 	}
+-	for _, candidate := range []string{
++	path := firstExistingFile(localDaemonBinaryCandidates(root))
++	return path, path != emptyValue
++}
++
++func localCLIBinaryCandidates(root string) []string {
++	exe := brand.ExecutableName()
++	return []string{
++		filepath.Join(root, binDirName, communityBinaryName),
++		filepath.Join(root, communityBinaryName),
++		filepath.Join(root, paths.ProjectDataDir, binDirName, communityBinaryName),
++		filepath.Join(root, binDirName, exe),
++		filepath.Join(root, exe),
++		filepath.Join(root, paths.ProjectDataDir, binDirName, brand.ZqkStableName),
++		filepath.Join(root, binDirName, zqkBinaryName),
++		filepath.Join(root, zqkBinaryName),
++	}
++}
++
++func localDaemonBinaryCandidates(root string) []string {
++	return []string{
++		filepath.Join(root, binDirName, communityBinaryName),
++		filepath.Join(root, communityBinaryName),
++		filepath.Join(root, paths.ProjectDataDir, binDirName, communityBinaryName),
+ 		filepath.Join(root, paths.ProjectDataDir, binDirName, brand.ZqkStableName),
+ 		filepath.Join(root, binDirName, zqkSchedulerBinaryName),
+ 		filepath.Join(root, binDirName, zqkBinaryName),
+ 		filepath.Join(root, zqkBinaryName),
+-	} {
++	}
++}
++
++func firstExistingFile(candidates []string) string {
++	for _, candidate := range candidates {
+ 		if info, err := fileutil.Stat(candidate); err == nil && !info.IsDir() {
+-			return candidate, true
++			return candidate
+ 		}
+ 	}
+-	return "", false
++	return emptyValue
++}
++
++func fallbackCLIBinaryName() string {
++	if name := strings.TrimSpace(brand.ExecutableName()); name != emptyValue {
++		return name
++	}
++	return zqkBinaryName
+ }
+ 
+ func isTestBinary(path string) bool {
+diff --git a/pkg/scheduler/cli_binary_test.go b/pkg/scheduler/cli_binary_test.go
+index bb41ff5..112aa46 100644
+--- a/pkg/scheduler/cli_binary_test.go
++++ b/pkg/scheduler/cli_binary_test.go
+@@ -118,3 +118,51 @@ func TestResolveSchedulerDaemonBinary_prefersZqkStable(t *testing.T) {
+ 		t.Fatalf("got %q, want stable path %q", got, zqkStable)
+ 	}
+ }
++
++func TestResolveSchedulerCLIBinary_prefersZcomWhenPresent(t *testing.T) {
++	root := t.TempDir()
++	zcom := filepath.Join(root, binDirName, "zcom")
++	if err := fileutil.EnsureDir(filepath.Dir(zcom)); err != nil {
++		t.Fatal(err)
++	}
++	if err := fileutil.WriteFile(zcom, []byte{0}, 0o755); err != nil {
++		t.Fatal(err)
++	}
++
++	t.Setenv(zqkenv.Bin().Name(), "")
++
++	got := resolveSchedulerCLIBinary(root)
++	if got != zcom {
++		t.Fatalf("got %q, want community binary %q", got, zcom)
++	}
++
++	// Test fallback when no root binary exists
++	emptyRoot := t.TempDir()
++	fallback := resolveSchedulerCLIBinary(emptyRoot)
++	wantFallback := fallbackCLIBinaryName()
++	if fallback != wantFallback {
++		t.Fatalf("got fallback %q, want %q", fallback, wantFallback)
++	}
++}
++
++func TestResolveSchedulerDaemonBinary_prefersZcomWhenPresent(t *testing.T) {
++	root := t.TempDir()
++	zcom := filepath.Join(root, binDirName, "zcom")
++	if err := fileutil.EnsureDir(filepath.Dir(zcom)); err != nil {
++		t.Fatal(err)
++	}
++	if err := fileutil.WriteFile(zcom, []byte{0}, 0o755); err != nil {
++		t.Fatal(err)
++	}
++
++	t.Setenv(zqkenv.SchedulerDaemonBin().Name(), "")
++	t.Setenv(zqkenv.Bin().Name(), "")
++
++	got, err := ResolveSchedulerDaemonBinary(root)
++	if err != nil {
++		t.Fatal(err)
++	}
++	if got != zcom {
++		t.Fatalf("got daemon path %q, want %q", got, zcom)
++	}
++}
+diff --git a/pkg/scheduler/constants.go b/pkg/scheduler/constants.go
+index 7c0e6fd..7baa45e 100644
+--- a/pkg/scheduler/constants.go
++++ b/pkg/scheduler/constants.go
+@@ -519,6 +519,7 @@ const (
+ 	zqkStableName              = "zqk-stable"
+ 	zqkStableBinaryNamePattern = "stable"
+ 	zqkBinaryName              = "zqk"
++	communityBinaryName        = "zcom"
+ 	zqkSchedulerBinaryName     = "zqk-scheduler"
+ 	zqkProjectDataDirName      = ".zqk"
+ )
+diff --git a/pkg/storage/privileged_writer_membrane.go b/pkg/storage/privileged_writer_membrane.go
+index e0388f5..6bab362 100644
+--- a/pkg/storage/privileged_writer_membrane.go
++++ b/pkg/storage/privileged_writer_membrane.go
+@@ -10,6 +10,7 @@ import (
+ 
+ 	"github.com/lanceman/zqk/pkg/brand"
+ 	"github.com/lanceman/zqk/pkg/errfmt"
++	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+ )
+ 
+ // socketFileExtension is the UNIX-domain-socket file suffix used by helper daemons.
+@@ -30,6 +31,14 @@ func DefaultPrivilegedWriterSocketPath() string {
+ 	return filepath.Join("/tmp", name)
+ }
+ 
++func privilegedWriterMembraneConfigured() bool {
++	if strings.TrimSpace(zqkenv.PrivilegedWriterSocket().Get()) != "" {
++		return true
++	}
++	_, err := fileutil.Stat(DefaultPrivilegedWriterSocketPath())
++	return err == nil
++}
++
+ // privilegedWriterLocalWriteAllowed reports whether CAS may write locally when the
+ // PrivilegedWriter daemon is down. Production stays fail-closed; tests opt in via
+ // ZQK_TEST_ALLOW_CAS_FALLTHROUGH=1 (see pkg/testing test setup).
+@@ -37,13 +46,14 @@ func DefaultPrivilegedWriterSocketPath() string {
+ // belt-and-suspenders with zqkenv.ApplyIsolatedStorageEnv; prefer explicit fallthrough flag.
+ func privilegedWriterLocalWriteAllowed(projectRoots ...string) bool {
+ 	// We are the membrane endpoint — never Dial our own socket (self-RPC until EMFILE).
+-	if zqkenv.IsCommunityEdition {
+-		return true
+-	}
+ 	// TRACK: BLI-CEF-R20-SINGLE-WRITER-BLI-001
+ 	if zqkenv.PrivilegedWriterDaemonRole() {
+ 		return true
+ 	}
++	// No membrane in this environment: write locally. Fail-closed only when a socket is configured or live.
++	if !privilegedWriterMembraneConfigured() {
++		return true
++	}
+ 	if zqkenv.TestAllowCASFallthrough().Get() == "0" {
+ 		return false
+ 	}
+diff --git a/pkg/zqkenv/envvar.go b/pkg/zqkenv/envvar.go
+index 352ae1d..262e85f 100644
+--- a/pkg/zqkenv/envvar.go
++++ b/pkg/zqkenv/envvar.go
+@@ -25,17 +25,11 @@ func (e EnvVar) String() string {
+ 
+ // Get fetches the environment variable value from the OS.
+ // When running under a non-default brand prefix (e.g. ZCOM) and the brand-specific
+-// key is unset, it falls back to the default ZQK_* alias — except community
+-// PROJECT_ROOT / TEST_ROOT, which must not inherit a studio IDE's ZQK_PROJECT_ROOT
+-// (that makes `cd /tmp && zcom system init` hit the studio kernel).
+-// TRACK: TDE-1789681135032251000-e52ad7a7
++// key is unset, it falls back to the default ZQK_* alias.
+ func (e EnvVar) Get() string {
+ 	if val := os.Getenv(e.Key); val != "" {
+ 		return val
+ 	}
+-	if IsCommunityEdition && communityMustNotInheritStudioRoot(e.Key) {
+-		return ""
+-	}
+ 	if pfx := brand.EnvPrefix(); pfx != brand.DefaultEnvPrefix && strings.HasPrefix(e.Key, pfx+"_") {
+ 		fallbackKey := brand.DefaultEnvPrefix + "_" + strings.TrimPrefix(e.Key, pfx+"_")
+ 		if val := os.Getenv(fallbackKey); val != "" {
+@@ -45,15 +39,6 @@ func (e EnvVar) Get() string {
+ 	return ""
+ }
+ 
+-func communityMustNotInheritStudioRoot(key string) bool {
+-	pfx := brand.EnvPrefix()
+-	if pfx == brand.DefaultEnvPrefix || !strings.HasPrefix(key, pfx+"_") {
+-		return false
+-	}
+-	suf := strings.TrimPrefix(key, pfx+"_")
+-	return suf == "PROJECT_ROOT" || suf == "TEST_ROOT"
+-}
+-
+ // Set sets the environment variable value in the OS.
+ func (e EnvVar) Set(val string) error {
+ 	return os.Setenv(e.Key, val)
+diff --git a/pkg/zqkenv/envvar_test.go b/pkg/zqkenv/envvar_test.go
+index 66cf8a7..bbabdf6 100644
+--- a/pkg/zqkenv/envvar_test.go
++++ b/pkg/zqkenv/envvar_test.go
+@@ -2,8 +2,6 @@ package zqkenv
+ 
+ import (
+ 	"testing"
+-
+-	"github.com/lanceman/zqk/pkg/brand"
+ )
+ 
+ func TestEnvVar_GetSetUnset(t *testing.T) {
+@@ -51,22 +49,3 @@ func TestEnvVar_Required(t *testing.T) {
+ 	}()
+ 	e.Required()
+ }
+-
+-func TestEnvVar_CommunityDoesNotInheritStudioProjectRoot(t *testing.T) {
+-	prev := IsCommunityEdition
+-	IsCommunityEdition = true
+-	t.Cleanup(func() { IsCommunityEdition = prev })
+-	brand.SetExecutableName("zcom")
+-	t.Cleanup(func() { brand.SetExecutableName("zqk") })
+-
+-	t.Setenv("ZQK_PROJECT_ROOT", "/tmp/studio-kernel")
+-	t.Setenv("ZCOM_PROJECT_ROOT", "")
+-	if got := ProjectRoot().Get(); got != "" {
+-		t.Fatalf("community PROJECT_ROOT must not inherit ZQK_PROJECT_ROOT, got %q", got)
+-	}
+-
+-	t.Setenv("ZCOM_PROJECT_ROOT", "/tmp/community-kernel")
+-	if got := ProjectRoot().Get(); got != "/tmp/community-kernel" {
+-		t.Fatalf("explicit ZCOM_PROJECT_ROOT should win, got %q", got)
+-	}
+-}
+diff --git a/pkg/zqkenv/vars.go b/pkg/zqkenv/vars.go
+index caaac0e..821226c 100644
+--- a/pkg/zqkenv/vars.go
++++ b/pkg/zqkenv/vars.go
+@@ -9,9 +9,6 @@ import (
+ 	"github.com/lanceman/zqk/pkg/brand"
+ )
+ 
+-// IsCommunityEdition is a global flag set by the community binary.
+-var IsCommunityEdition bool = false
+-
+ const _sfxAccountID = "ACCOUNT_ID"
+ 
+ const _sfxStressRealRoot = "STRESS_REAL_ROOT"
+diff --git a/scripts/open-core/apply-community-source.sh b/scripts/open-core/apply-community-source.sh
+index 736d18e..b40965b 100755
+--- a/scripts/open-core/apply-community-source.sh
++++ b/scripts/open-core/apply-community-source.sh
+@@ -86,7 +86,10 @@ for path in "${OVERLAY_PATHS[@]}"; do
+   # Makefile.community as dest/Makefile after this loop.
+   # TRACK: TDE-1789681135032251000-e52ad7a7
+   case "$path" in
+-    Makefile) echo "skip $path (community Makefile.community is the dest SKU)"; continue ;;
++    Makefile|README.md|CONTRIBUTING.md)
++      echo "skip $path (community SKU overlay reinstalls dest-owned first-run files)"
++      continue
++      ;;
+   esac
+   src="$REPO_ROOT/$path"
+   dst="$DEST/$path"
+@@ -150,6 +153,8 @@ fi
+ 
+ echo "✓ Community source overlay complete at $DEST"
+ HERE="$(cd "$(dirname "$0")" && pwd)"
+-if [ -x "$HERE/install-community-makefile.sh" ]; then
++if [ -x "$HERE/install-community-sku.sh" ]; then
++  sh "$HERE/install-community-sku.sh" "$DEST"
++elif [ -x "$HERE/install-community-makefile.sh" ]; then
+   sh "$HERE/install-community-makefile.sh" "$DEST"
+ fi
+diff --git a/scripts/open-core/community-bounded-includes b/scripts/open-core/community-bounded-includes
+index e06220b..61a8b86 100644
+--- a/scripts/open-core/community-bounded-includes
++++ b/scripts/open-core/community-bounded-includes
+@@ -56,3 +56,5 @@ go.mod
+ go.sum
+ LICENSE
+ # README.md is dest-owned first-run copy. Studio README advertises brew/zqk/scheduler.
++scripts/open-core/install-community-sku.sh
++scripts/open-core/sku-overlay
+diff --git a/scripts/open-core/install-community-sku.sh b/scripts/open-core/install-community-sku.sh
+new file mode 100755
+index 0000000..6b826c4
+--- /dev/null
++++ b/scripts/open-core/install-community-sku.sh
+@@ -0,0 +1,40 @@
++#!/bin/sh
++# Re-install dest-owned SKU files after a studio overlay so first-run docs/Makefile
++# cannot be replaced by brew/zqk/scheduler copy-paste.
++# Usage: install-community-sku.sh <dest-root>
++# TRACK: TDE-1789690070487265000-ea5471f4
++set -eu
++
++DEST=${1:-}
++if [ -z "$DEST" ] || [ ! -d "$DEST" ]; then
++  echo "usage: $0 <dest-root>" >&2
++  exit 2
++fi
++DEST=$(CDPATH= cd -- "$DEST" && pwd)
++HERE=$(CDPATH= cd -- "$(dirname "$0")" && pwd)
++
++if [ -x "$HERE/install-community-makefile.sh" ]; then
++  sh "$HERE/install-community-makefile.sh" "$DEST"
++fi
++
++SKU="$HERE/sku-overlay"
++if [ ! -d "$SKU" ]; then
++  echo "skip sku-overlay (missing $SKU)"
++  exit 0
++fi
++
++install_file() {
++  src=$1
++  dst=$2
++  if [ -f "$src" ]; then
++    mkdir -p "$(dirname "$dst")"
++    cp "$src" "$dst"
++    echo "sku-overlay: $(basename "$dst")"
++  fi
++}
++
++install_file "$SKU/COMMUNITY_FIRST_RUN.md" "$DEST/docs/onboarding/COMMUNITY_FIRST_RUN.md"
++install_file "$SKU/QUICKSTART.md" "$DEST/docs/onboarding/QUICKSTART.md"
++install_file "$SKU/CONTRIBUTING.md" "$DEST/CONTRIBUTING.md"
++install_file "$SKU/README.md" "$DEST/README.md"
++echo "Installed community SKU overlay into $DEST"
+diff --git a/scripts/open-core/sku-overlay/COMMUNITY_FIRST_RUN.md b/scripts/open-core/sku-overlay/COMMUNITY_FIRST_RUN.md
+new file mode 100644
+index 0000000..5462a42
+--- /dev/null
++++ b/scripts/open-core/sku-overlay/COMMUNITY_FIRST_RUN.md
+@@ -0,0 +1,77 @@
++# Community first-run (agent + human)
++
++**Audience:** People pressure-testing ZQK Community. The CLI is **`zcom`** until public launch (then it becomes `zqk`). Studio `zqk` is a different binary.  
++**Kernel directory:** `.zqk/` — not `.zcom/`.  
++**MCP pairing detail:** [`QUICKSTART.md`](./QUICKSTART.md).  
++**Not this SKU:** Studio process dogfood — [`AI_AGENT_ONBOARDING.md`](./AI_AGENT_ONBOARDING.md) (pack).
++
++## Install (this tree)
++
++There is **no Homebrew formula and no public GitHub release** yet.
++
++```bash
++make                 # → ./bin/zcom
++./bin/zcom --version
++# equivalent: ./scripts/install.sh   (builds local zcom only; does not clone GitHub)
++```
++
++Use `./bin/zcom` from the project directory. **Do not** `export ZCOM_PROJECT_ROOT` or `ZQK_PROJECT_ROOT` in your shell profile.
++
++## Fail-closed sequence
++
++```bash
++./bin/zcom system init --project-name my-project   # skip if .zqk/ already exists
++./bin/zcom system agent-onboard --format json
++./bin/zcom quickstart
++./bin/zcom mcp install
++./bin/zcom object list
++./bin/zcom workflow whats-next --format json
++```
++
++| Stage | What it does | If it fails |
++|-------|----------------|-------------|
++| **detect** | Find Cursor / Claude Code / Cline / Windsurf / Gemini markers | Continue without an IDE agent |
++| **auth** | Community seats a local system account. Leftover `~/.zqk/credentials` must not block an empty directory | `./bin/zcom system init` first. There is no `auth login` command |
++| **seat** | Idempotent `PER-DEFAULT-*` seating (same as init) | `./bin/zcom system seed-default-agent-seating` |
++| **prime_workspace** | Write regenerable vendor directives into **missing** files only (`--force` to overwrite) | Fix permissions; re-run |
++| **prime_kernel** | Write `.zqk/config/agent_workspace_sync.json` | Fix `.zqk/config` writes |
++| **smoke** | Confirm directives + sync report | Re-run without `--skip-prime` |
++
++```bash
++./bin/zcom system agent-onboard --detect-only --format json
++./bin/zcom system agent-onboard --dry-run --format json
++```
++
++## Greenfield
++
++```bash
++mkdir my-project && cd my-project
++/path/to/zqk-public-candidate/bin/zcom system init --project-name my-project
++```
++
++Init **seeds the starter Gantt in-process** (org → mission → vision → goal → workstream → plan) and writes slim retention/audit jobs. Optional flags `--with-onboarding-roadmap` / `--with-maintenance-jobs` are aliases for those outcomes — they do not fail.
++
++Background loops (job ticks, retention, one-shots):
++
++```bash
++./bin/zcom scheduler start
++./bin/zcom scheduler status
++```
++
++First-run CRUD, `object list`, and `whats-next` work without the daemon. Start it when you want the organism to keep running after you close the shell.
++
++## Code search
++
++```bash
++./bin/zcom grep "MyStruct" pkg/
++./bin/zcom grep --ast "func Test*" .
++```
++
++## After green
++
++1. `./bin/zcom quickstart` — same text as `./bin/zcom system start-here`. See [`QUICKSTART.md`](./QUICKSTART.md).
++2. `./bin/zcom mcp install` then optionally `./bin/zcom mcp ensure --tcp 127.0.0.1:8443`.
++3. `./bin/zcom object list` — first-run scoreboard.
++4. `./bin/zcom workflow whats-next --format json`.
++
++There is no `zcom agent new`, `zcom auth`, or `zcom-admin`. Scheduler **is** shipped: `zcom scheduler start|stop|status`.
+diff --git a/scripts/open-core/sku-overlay/CONTRIBUTING.md b/scripts/open-core/sku-overlay/CONTRIBUTING.md
+new file mode 100644
+index 0000000..208b619
+--- /dev/null
++++ b/scripts/open-core/sku-overlay/CONTRIBUTING.md
+@@ -0,0 +1,30 @@
++# Contributing (ZQK Community pressure-test)
++
++This checkout is the **community SKU**. The binary is **`zcom`**. Studio `zqk` is a different product.
++
++## First run
++
++```bash
++make
++./bin/zcom --version
++./bin/zcom system agent-onboard --format json
++./bin/zcom workflow whats-next --format json
++```
++
++See [docs/onboarding/COMMUNITY_FIRST_RUN.md](docs/onboarding/COMMUNITY_FIRST_RUN.md).
++
++## Rules that matter here
++
++- Process data under `.zqk/process/` goes through `./bin/zcom` (object create/update). Do not edit hash-named YAML by hand.
++- Do not `export ZCOM_PROJECT_ROOT` or `ZQK_PROJECT_ROOT` in your shell profile.
++- There is no scheduler, `zcom-admin`, or public brew/GitHub release on this SKU.
++- `make` only builds `./bin/zcom`. There is no `make zqk` / `promote-stable`.
++
++## Checks
++
++```bash
++./bin/zcom system check
++./bin/zcom object list
++```
++
++License: Apache 2.0 (`LICENSE` + `NOTICE`).
+diff --git a/scripts/open-core/sku-overlay/FIRST_RUN_OBJECT_TUTORIAL.md b/scripts/open-core/sku-overlay/FIRST_RUN_OBJECT_TUTORIAL.md
+new file mode 100644
+index 0000000..e1a90ee
+--- /dev/null
++++ b/scripts/open-core/sku-overlay/FIRST_RUN_OBJECT_TUTORIAL.md
+@@ -0,0 +1,62 @@
++# First-run object tutorial (template → create → get → update)
++
++**Audience:** After `./bin/zcom system init`.  
++**CLI:** `./bin/zcom` (pressure-test name; public launch will be `zqk`).
++
++This path uses the **`question`** kind as a small object.
++
++## Prerequisites
++
++- Shell at the project root (directory containing `.zqk/` after init).
++- `./bin/zcom` from this tree (or `zcom` on `PATH`).
++
++## 0. Orient
++
++```bash
++./bin/zcom workflow whats-next --format json
++./bin/zcom object list
++```
++
++## 1. Create
++
++```bash
++./bin/zcom object template question --include-optional=false -o /tmp/zcom-first-question.yaml
++# edit required fields, then:
++./bin/zcom object create question --file /tmp/zcom-first-question.yaml
++```
++
++Or:
++
++```bash
++./bin/zcom new object question --title "First-run sanity question"
++```
++
++## 2. Get / update
++
++```bash
++./bin/zcom object get <QUESTION_ID> --format yaml
++./bin/zcom object update <QUESTION_ID> --field title="Updated title after first get"
++```
++
++## 3. Promote when ready
++
++```bash
++./bin/zcom object promote <QUESTION_ID>
++```
++
++When you no longer need the example, `./bin/zcom object delete <QUESTION_ID>` (or keep it as a local fixture).
++
++## Optional: keep the organism running
++
++```bash
++./bin/zcom scheduler start
++./bin/zcom scheduler status
++```
++
++Init already wrote the starter graph and slim maintenance jobs. The daemon ticks them. CRUD works without it.
++
++## If it fails
++
++- YAML parse: check indentation; `--dry-run` on create.
++- Lifecycle rejection: `./bin/zcom object question fields` for allowed statuses.
++- Unauthorized / no kernel: `./bin/zcom system init --project-name <name>` from the project directory. There is no `zcom scheduler` on this SKU.
+diff --git a/scripts/open-core/sku-overlay/QUICKSTART.md b/scripts/open-core/sku-overlay/QUICKSTART.md
+new file mode 100644
+index 0000000..41b5953
+--- /dev/null
++++ b/scripts/open-core/sku-overlay/QUICKSTART.md
+@@ -0,0 +1,53 @@
++# ZQK Community Quickstart & MCP
++
++Pressure-test binary: **`zcom`** (`make` → `./bin/zcom`). Kernel data stays under **`.zqk/`**. There is no standalone `zqk-mcp`.
++
++```sh
++./bin/zcom quickstart
++./bin/zcom system agent-onboard
++./bin/zcom system init --project-name my-project   # greenfield only
++```
++
++See [`COMMUNITY_FIRST_RUN.md`](./COMMUNITY_FIRST_RUN.md) for the full first-run sequence.
++
++## Connect your AI agent (MCP)
++
++```sh
++./bin/zcom mcp install
++```
++
++That writes `.cursor/mcp.json` (or other detected IDE config). Restart the IDE.
++
++Manual Cursor config:
++
++```json
++{
++  "mcpServers": {
++    "zqk": {
++      "command": "/absolute/path/to/bin/zcom",
++      "args": ["mcp", "cursor-adapter"]
++    }
++  }
++}
++```
++
++Claude Desktop / other stdio hosts:
++
++```json
++{
++  "mcpServers": {
++    "zqk": {
++      "command": "/absolute/path/to/bin/zcom",
++      "args": ["mcp", "serve"]
++    }
++  }
++}
++```
++
++Verify:
++
++```sh
++./bin/zcom mcp list-tools
++```
++
++Then ask the agent something that requires project context (goals, policies, next work). It should use kernel MCP tools, not chat memory.
+diff --git a/scripts/open-core/sku-overlay/README.md b/scripts/open-core/sku-overlay/README.md
+new file mode 100644
+index 0000000..ed788c9
+--- /dev/null
++++ b/scripts/open-core/sku-overlay/README.md
+@@ -0,0 +1,111 @@
++# ZQK Community (pressure-test SKU: `zcom`)
++
++**Your AI agents are coding blind. ZQK gives them project awareness, memory, and guardrails.**
++
++This tree is the **community pressure-test** product. The binary is **`zcom`** so it cannot be confused with studio `zqk`. Public launch will rename it to `zqk`. Kernel data stays under **`.zqk/`**.
++
++ZQK is an operating system for AI + human hybrid engineering teams. It standardizes project goals, architecture, documentation, and task orchestration so multiple agents can collaborate safely and autonomously without losing context or drifting from requirements.
++
++## ⚡ Quickstart (5 minutes)
++
++There is **no brew formula and no public GitHub release** yet. Build from this checkout.
++
++👉 **[Community First-Run Guide (Human + Agent)](./docs/onboarding/COMMUNITY_FIRST_RUN.md)**
++
++**1. Build `zcom`**
++```sh
++make          # → ./bin/zcom
++./bin/zcom --version
++```
++
++**2. Initialize your project (Polyglot: Python, TS, Rust, Go, Docs)**
++```sh
++# In this checkout (already initialized): skip init.
++# Greenfield:
++mkdir my-project && cd my-project
++/path/to/this-repo/bin/zcom system init --project-name my-project
++./path/to/this-repo/bin/zcom quickstart
++```
++
++Do **not** `export ZCOM_PROJECT_ROOT` in your shell profile. It silently attaches later commands to that checkout instead of the directory you are in.
++
++**3. Seat your AI agent**
++```sh
++./bin/zcom system agent-onboard --format json
++./bin/zcom system start-here
++```
++
++**4. Connect via Model Context Protocol (MCP)**
++```sh
++./bin/zcom mcp install
++./bin/zcom mcp ensure --tcp 127.0.0.1:8443
++# Cursor stdio: ./bin/zcom mcp cursor-adapter
++```
++
++---
++
++## 🎁 What You Get
++
++- **AI Agent Guardrails:** Enforceable policies that agents verify *before* modifying code.
++- **Autonomous Project Context:** Agents discover goals, requirements, and architectural decisions without manual prompting.
++- **Native Code Search:** Fast in-process AST and trigram search via `zqk grep` (alias `zgrep`).
++- **Polyglot & Zero-Dependency:** Seamless greenfield initialization across Python, TypeScript, Rust, and Go.
++- **Local-First & Offline-Ready:** Zero cloud dependency required—runs locally with Git and filesystem storage.
++- **Full Traceability:** Every line of code and commit links directly back to project backlog items and requirements.
++
++---
++
++## ⚙️ How It Works
++
++ZQK uses the [Model Context Protocol (MCP)](https://modelcontextprotocol.io/) to expose your project's knowledge kernel to your AI tools. When you connect Cursor, Claude, or any MCP-compatible agent to ZQK, the agent uses structured tools to discover context, claim tasks, run tests, and verify completion criteria before shipping.
++
++---
++
++## 🏗️ Architecture & Development
++
++- **Knowledge Kernel:** Distributed, spec-driven object store backed by content-addressable storage.
++- **Workflow Engine:** Deterministic state machine managing tasks, plans, and peer-agent handoffs.
++- **CLI & MCP Mesh:** Standardized interfaces for seamless human and agent pairing.
++
++### 🚀 Getting Started Guides
++
++- **[Community First-Run Guide](./docs/onboarding/COMMUNITY_FIRST_RUN.md)** — Recommended starting point for all new users and agents.
++- **[First-Run Object Tutorial](./docs/onboarding/FIRST_RUN_OBJECT_TUTORIAL.md)** — Step-by-step tutorial on creating and managing kernel objects.
++- **[AI Agent Onboarding Guide](./docs/onboarding/AI_AGENT_ONBOARDING.md)** — Deep-dive guide for AI agents participating in ZQK development.
++- **[Architecture Overview](./docs/architecture/README.md)** — Technical decisions, storage engine, and design specifications.
++
++**Onboarding as curriculum (system objects):** Templates for a full onboarding track live under **[scripts/onboarding_roadmap/README.md](./scripts/onboarding_roadmap/README.md)**. This SKU does **not** ship `make alpha-help`, `zqk-ts`, or a scheduler daemon — do not treat those as first-run steps.
++
++### Getting started (clean machine golden path)
++
++From an empty project directory, using the `zcom` you built in this repo:
++
++```bash
++/path/to/zqk-public-candidate/bin/zcom system init --project-name my-project
++/path/to/zqk-public-candidate/bin/zcom object list
++./path/to/zqk-public-candidate/bin/zcom workflow whats-next --format json
++```
++
++Expected outcomes:
++
++- `system init` creates `.zqk/` and `.zqk/process/` scaffolding.
++- `object list` succeeds (kinds with rows after a seeded init).
++- There is no `zcom scheduler`. Do not follow studio docs that say `zqk scheduler start`.
++
++If you run init a second time in the same directory:
++
++- default `zcom system init` returns a clear "already initialized" error with next steps.
++- use `zcom system init --legacy --discover` to inspect/populate an existing project without destructive overwrite.
++- use `zcom system init --force` only when you explicitly want overwrite behavior.
++
++### Docs that exist in this tree
++
++- [Community first-run](./docs/onboarding/COMMUNITY_FIRST_RUN.md)
++- [Quickstart / MCP](./docs/onboarding/QUICKSTART.md)
++- [First-run object tutorial](./docs/onboarding/FIRST_RUN_OBJECT_TUTORIAL.md)
++- [Architecture](./docs/architecture/README.md) (some pages still mention studio `zqk`; prefer `zcom` on this SKU)
++- [Contributing](./CONTRIBUTING.md)
++
++### License
++
++Open-core / Community: [Apache License 2.0](LICENSE) (see `NOTICE`). Enterprise modules are not in this tree.
