@@ -58,3 +58,50 @@ chunks:
     gate_operate: yes
     independent_verify: yes
     notes: TestShippedFirstRunDocsExist fails if docs/_archive exists; dest police fails on archive dirs
+  - chunk_id: dest-module-path-functional
+    stage: integrate_verify
+    claim: The dest Go module is github.com/zqk-os/zqk
+    work_object_ref: CRIT-1789702444975811000-110ea11e
+    rubric_ref: CRIT-1789702444975811000-110ea11e
+    dsl_checks:
+      - object_exists:CRIT-1789702444975811000-110ea11e
+      - path_exists:go.mod
+      - tests_ok_per_customization
+    evidence_refs:
+      - CRIT-1789702444975811000-110ea11e
+      - go.mod
+      - go test ./cmd/zqk-community/app -run TestPublicModulePath -timeout 60s
+    gate_integrate: yes
+    independent_verify: yes
+  - chunk_id: dest-module-path-boundary
+    stage: integrate_verify
+    claim: Dest Go source contains no github.com/lanceman/zqk imports
+    work_object_ref: CRIT-1789702444975812000-cc92bc2c
+    rubric_ref: CRIT-1789702444975812000-cc92bc2c
+    dsl_checks:
+      - object_exists:CRIT-1789702444975812000-cc92bc2c
+      - path_exists:cmd/zqk-community/app/first_run_surface_test.go
+      - tests_ok_per_customization
+    evidence_refs:
+      - CRIT-1789702444975812000-cc92bc2c
+      - cmd/zqk-community/app/first_run_surface_test.go
+      - go test ./cmd/zqk-community/app -run TestPublicModulePath -timeout 60s
+    gate_integrate: yes
+    independent_verify: yes
+  - chunk_id: dest-module-path-integration
+    stage: integrate_verify
+    claim: The dest-owned community command compiles against github.com/zqk-os/zqk
+    work_object_ref: CRIT-1789702444975813000-f9d60639
+    rubric_ref: CRIT-1789702444975813000-f9d60639
+    dsl_checks:
+      - object_exists:CRIT-1789702444975813000-f9d60639
+      - object_exists:TST-1789702444975811001-79e00e2d
+      - path_exists:cmd/zqk-community
+      - tests_ok_per_customization
+    evidence_refs:
+      - CRIT-1789702444975813000-f9d60639
+      - TST-1789702444975811001-79e00e2d
+      - cmd/zqk-community
+      - go test ./cmd/zqk-community/app -run TestPublicModulePath -timeout 60s
+    gate_integrate: yes
+    independent_verify: yes

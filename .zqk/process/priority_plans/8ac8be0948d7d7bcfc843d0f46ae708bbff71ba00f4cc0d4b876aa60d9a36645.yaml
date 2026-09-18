@@ -6,9 +6,10 @@ kind: priority_plan
 namespace_id: zqk:kernel
 priority_tier: P0
 schema_version: 2.0.0
-status: grooming
+started_at: "2026-09-18T07:37:44Z"
+status: in_progress
 title: Publish-home module path
-updated_at: "2026-09-18T03:37:52Z"
+updated_at: "2026-09-18T07:37:44Z"
 updated_by: ACC-1785920548450214012-68b850c0
 version_context: default
 workstream_refs:
