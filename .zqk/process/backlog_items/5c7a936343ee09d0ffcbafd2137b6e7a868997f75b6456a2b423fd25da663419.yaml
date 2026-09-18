@@ -1,6 +1,10 @@
 acceptance_considerations: go.mod module is github.com/zqk-os/zqk; dest go build ./cmd/zqk-community succeeds; no leftover github.com/lanceman/zqk imports outside .zqk/process.
+actual_effort: 0.02h
 artifacts:
     - cmd/zqk-community/app/first_run_surface_test.go
+commit_hashes:
+    - 23e32e1705e59c1313939529f1116fbdd461d77c
+completed_at: "2026-09-18T07:41:57Z"
 created_at: "2026-09-18T03:34:05Z"
 created_by: ACC-1785920548450214012-68b850c0
 criteria_refs:
@@ -26,8 +30,8 @@ schema_version: 2.0.0
 stakeholders:
     - team-core
 started_at: "2026-09-18T07:40:39Z"
-status: testing
+status: complete
 title: 'Implement: Public Go module path is github.com/zqk-os/zqk (dest-local rewrite; no private-repo checkout)'
-updated_at: "2026-09-18T07:40:39Z"
+updated_at: "2026-09-18T07:41:57Z"
 updated_by: ACC-1785920548450214012-68b850c0
 version_context: default

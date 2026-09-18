@@ -1,3 +1,4 @@
+completed_at: "2026-09-18T07:42:22Z"
 created_at: "2026-09-18T03:34:13Z"
 created_by: ACC-1785920548450214012-68b850c0
 description: Column for the dest-local module-path rewrite to github.com/zqk-os/zqk.
@@ -7,9 +8,9 @@ namespace_id: zqk:kernel
 priority_tier: P0
 schema_version: 2.0.0
 started_at: "2026-09-18T07:37:44Z"
-status: in_progress
+status: complete
 title: Publish-home module path
-updated_at: "2026-09-18T07:37:44Z"
+updated_at: "2026-09-18T07:42:22Z"
 updated_by: ACC-1785920548450214012-68b850c0
 version_context: default
 workstream_refs:
