@@ -19,9 +19,8 @@ problem_statement: First-run skills, seed text, and leftover CRITs still named t
 requirement_refs:
     - REQ-1789702448467715000-c05a9ef4
 schema_version: 2.0.0
-stakeholders: []
-status: validated
+status: planned
 title: 'Implement: Shipped first-run docs, IDE boot text, and CLI examples match this SKU (no leftover studio dump, no hardcoded pressure-test executable name)'
-updated_at: "2026-09-18T03:46:02Z"
+updated_at: "2026-09-18T03:46:37Z"
 updated_by: ACC-1785920548450214012-68b850c0
 version_context: default

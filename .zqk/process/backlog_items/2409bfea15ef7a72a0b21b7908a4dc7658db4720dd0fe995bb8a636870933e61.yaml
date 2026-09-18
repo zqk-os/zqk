@@ -19,9 +19,8 @@ problem_statement: Public first-run and go.mod still advertised github.com/lance
 requirement_refs:
     - REQ-1789702443876068000-64de6f11
 schema_version: 2.0.0
-stakeholders: []
-status: validated
+status: planned
 title: 'Implement: Public Go module path is github.com/zqk-os/zqk (dest-local rewrite; no private-repo checkout)'
-updated_at: "2026-09-18T03:45:59Z"
+updated_at: "2026-09-18T03:46:33Z"
 updated_by: ACC-1785920548450214012-68b850c0
 version_context: default
