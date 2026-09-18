@@ -4,6 +4,7 @@
 # REQ-9009: Build process creates bootstrap archive.
 # REQ-9011: Manifest provides traceability for bundled files.
 set -e
+export LC_ALL=C
 REPO_ROOT="${1:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)}"
 REPO_ROOT="$(cd "$REPO_ROOT" && pwd)"
 if [ -d "${REPO_ROOT}/.zqk/specs" ]; then
