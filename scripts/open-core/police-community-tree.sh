@@ -13,7 +13,6 @@ FAIL=0
 echo "Police root: $ROOT"
 
 must_not_paths='
-.zqk/process
 docs/commercial
 docs/marketing
 docs/launch
@@ -123,9 +122,19 @@ if command -v find >/dev/null 2>&1; then
       FAIL=1
     fi
   fi
-  # Studio scripts budget (G11 Option B): only package-community.sh + install.sh
+  # Living dest kernel ships dest-owned overlay + first-run seed scripts.
+  # Studio export-era G11 (only package-community.sh + install.sh) does not apply here.
   if [ -d "$ROOT/scripts" ]; then
-    extras=$(find "$ROOT/scripts" -type f \( -name '*.sh' -o -name '*.py' \) ! -name 'package-community.sh' ! -name 'install.sh' 2>/dev/null || true)
+    extras=$(find "$ROOT/scripts" -type f \( -name '*.sh' -o -name '*.py' \) \
+      ! -name 'package-community.sh' \
+      ! -name 'install.sh' \
+      ! -path '*/open-core/*' \
+      ! -path '*/starter_kernel_graph/*' \
+      ! -path '*/onboarding_roadmap/*' \
+      ! -path '*/default_agent_skills/*' \
+      ! -path '*/default_policies/*' \
+      ! -name 'build-bootstrap-archive.sh' \
+      2>/dev/null || true)
     if [ -n "$extras" ]; then
       echo "MUST_NOT extra scripts (G11):"
       echo "$extras"

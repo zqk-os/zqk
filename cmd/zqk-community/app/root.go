@@ -19,9 +19,6 @@ import (
 	"github.com/zqk-os/zqk/cmd/zqk-community/scheduler"
 	commsystem "github.com/zqk-os/zqk/cmd/zqk-community/system"
 	commtest "github.com/zqk-os/zqk/cmd/zqk-community/test"
-	"github.com/zqk-os/zqk/cmd/zqk/healthchk"
-	"github.com/zqk-os/zqk/cmd/zqk/inbox"
-	"github.com/zqk-os/zqk/cmd/zqk/learn"
 	"github.com/zqk-os/zqk/cmd/zqk/mcp"
 	newcmd "github.com/zqk-os/zqk/cmd/zqk/new"
 	"github.com/zqk-os/zqk/cmd/zqk/object"
@@ -200,19 +197,16 @@ func NewRootCommand() *cobra.Command {
 func init() {
 	// Build help for root command
 	helpBuilder := clitool.NewHelpBuilder().
-		WithShort("ZQK - Zen Quantum Kernel for AI + human hybrid teams").
+		WithShort("Knowledge kernel for first-run project work").
 		WithDescriptionLines(
-			"ZQK (Zen Quantum Kernel) is an operating system for AI + human hybrid teams, built on a",
-			"distributed knowledge kernel architecture. It standardizes project goals,",
-			"documentation, automation, and workflow orchestration so multiple agents can",
-			"collaborate safely without losing context.",
+			"First-run CLI for a local knowledge kernel: objects, plans, docs, MCP, and a thin scheduler.",
+			"This SKU does not ship an admin codegen binary, mesh join, or studio origination verbs.",
 		).
 		AddSection("Command surfaces",
-			"Stable user and operator commands: object, system, scheduler, docman, quick, tray, healthchk, use.\n"+
-				"Automation: automation, precommit, callback, reports.\n"+
-				"Privileged / developer: internal (admin), keystore; use only when documented for your role.\n"+
-				"The zqk-admin binary (cmd/zqk-admin) shares this same command tree and bootstrap as zqk.\n"+
-				"See "+filepath.Join(paths.ProcessDir, "enforcement", "AGENT_GUIDELINES.md")+" (CLI command surfaces).",
+			"Everyday: object, system, test, workflow, new, grep, quickstart.\n"+
+				"Integrations: mcp, scheduler.\n"+
+				"Docs: docman. Shortcuts: tray.\n"+
+				"This binary does not ship admin codegen, monitor registry, or keystore.",
 		).
 		WithAutoDiscoverSubcommands(true)
 	helpBuilder.ApplyToCommand(rootCmd)
@@ -1280,20 +1274,10 @@ func registerCommands() {
 	grepCmdInst.GroupID = "everyday"
 	rootCmd.AddCommand(grepCmdInst)
 
-	// Health check registry (list, enable/disable, run monitors)
-	healthchkCmdInst := healthchk.NewHealthchkCmd()
-	healthchkCmdInst.GroupID = "admin"
-	rootCmd.AddCommand(healthchkCmdInst)
-
 	// Documentation management group
 	docmanCmdInst := docman.NewDocmanCmd()
 	docmanCmdInst.GroupID = "advanced"
 	rootCmd.AddCommand(docmanCmdInst)
-
-	// Learn curriculum group
-	learnCmdInst := learn.NewLearnCmd()
-	learnCmdInst.GroupID = "everyday"
-	rootCmd.AddCommand(learnCmdInst)
 
 	// Graph operations group (Enterprise Only)
 
@@ -1353,11 +1337,6 @@ func registerCommands() {
 	rootCmd.AddCommand(workflowCmdInst)
 
 	// Auth, Join, Mesh (Enterprise Only)
-
-	// Autonomy Inbox: human-in-the-loop proposal review
-	inboxCmdInst := inbox.NewInboxCmd()
-	inboxCmdInst.GroupID = "everyday"
-	rootCmd.AddCommand(inboxCmdInst)
 
 	// Policy management
 
