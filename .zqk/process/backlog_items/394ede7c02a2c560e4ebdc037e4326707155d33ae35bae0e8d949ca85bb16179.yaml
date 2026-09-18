@@ -1,4 +1,8 @@
 acceptance_considerations: The swarm emits cryptographically signed SBOM and OpenVEX attestation records capturing all Architect proposals and Reviewer approvals in an immutable causal chain.
+actual_effort: 0h
+commit_hashes:
+    - 32fadc6aee994f549988521a56e01bac0aff0c0d
+completed_at: "2026-09-18T23:42:22Z"
 created_at: "2026-09-18T23:04:57Z"
 created_by: ACC-1785920548450214012-68b850c0
 criteria_refs:
@@ -6,12 +10,14 @@ criteria_refs:
     - CRIT-1789772697159635000-b0c8c527
     - CRIT-1789772697159636000-84f60d83
 description: 'Implementation and verification pipeline for: Generate verifiable OpenVEX attestation and signed SBOM from multi-agent review'
-estimated_effort: ""
+estimated_effort: 4 hours
 id: BLI-1789772697159634000-58b1d844
 kind: backlog_item
 milestone_refs:
     - MIL-1789672699275510000-40c8cee7
 namespace_id: zqk:kernel
+persona_refs:
+    - PER-DEFAULT-OPERATOR
 priority: high
 priority_plan_ref: PRI-DEMO-SHOWCASE-001
 priority_tier: P1
@@ -19,8 +25,9 @@ problem_statement: Autonomous code generation lacks verifiable decision provenan
 requirement_refs:
     - REQ-1789772697022346000-9f3bec2a
 schema_version: 2.0.0
-status: planned
+started_at: "2026-09-18T23:42:12Z"
+status: complete
 title: 'Implement: Generate verifiable OpenVEX attestation and signed SBOM from multi-agent review'
-updated_at: "2026-09-18T23:07:37Z"
+updated_at: "2026-09-18T23:42:22Z"
 updated_by: ACC-1785920548450214012-68b850c0
 version_context: default
