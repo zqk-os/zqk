@@ -41,6 +41,8 @@ install_file "$SKU/ONBOARDING_README.md" "$DEST/docs/onboarding/README.md"
 install_file "$SKU/EDGE_HEADLESS_FIRST_RUN.md" "$DEST/docs/onboarding/EDGE_HEADLESS_FIRST_RUN.md"
 install_file "$SKU/CONTRIBUTING.md" "$DEST/CONTRIBUTING.md"
 install_file "$SKU/README.md" "$DEST/README.md"
+install_file "$SKU/ARCHITECTURE_README.md" "$DEST/docs/architecture/README.md"
+install_file "$SKU/ARCHITECTURE_INDEX.md" "$DEST/docs/architecture/INDEX.md"
 echo "Installed community SKU overlay into $DEST"
 # applybrand is local-only (reads config/zqk-local.yaml). Do not run it from
 # install-community-sku.sh or dest first-run docs get rewritten to a pressure-test name.

@@ -72,7 +72,7 @@ ZQK uses the [Model Context Protocol (MCP)](https://modelcontextprotocol.io/) to
 - **[Community First-Run Guide](./docs/onboarding/COMMUNITY_FIRST_RUN.md)** — Recommended starting point for all new users and agents.
 - **[First-Run Object Tutorial](./docs/onboarding/FIRST_RUN_OBJECT_TUTORIAL.md)** — Step-by-step tutorial on creating and managing kernel objects.
 - **[Agents on this SKU](./docs/onboarding/AI_AGENT_ONBOARDING.md)** — This tree does not ship the studio process pack.
-- **[Architecture Overview](./docs/architecture/README.md)** — Technical decisions, storage engine, and design specifications.
+- **[Architecture (this SKU)](./docs/architecture/README.md)** — Pointer only. Studio architecture dump is not shipped.
 
 **Onboarding as curriculum (system objects):** Templates live under **[scripts/onboarding_roadmap/README.md](./scripts/onboarding_roadmap/README.md)**. This SKU does **not** ship `make alpha-help` or `zqk-ts`. Scheduler **is** shipped: `./bin/zqk scheduler start|stop|status`.
 

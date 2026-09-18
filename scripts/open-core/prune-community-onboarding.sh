@@ -1,7 +1,7 @@
 #!/bin/sh
-# Remove studio-internal onboarding files that overlay copies onto dest.
-# First-run surface is sku-overlay last-wins (COMMUNITY_FIRST_RUN, QUICKSTART,
-# FIRST_RUN_OBJECT_TUTORIAL, onboarding README).
+# Remove studio-internal onboarding files and the leftover studio architecture
+# dump. First-run surface is sku-overlay last-wins (COMMUNITY_FIRST_RUN,
+# QUICKSTART, FIRST_RUN_OBJECT_TUTORIAL, onboarding README, architecture stubs).
 # Usage: prune-community-onboarding.sh <dest-root>
 # TRACK: TDE-1789690070487265000-ea5471f4
 set -eu
@@ -12,13 +12,12 @@ if [ -z "$DEST" ] || [ ! -d "$DEST" ]; then
   exit 2
 fi
 DEST=$(CDPATH= cd -- "$DEST" && pwd)
+HERE=$(CDPATH= cd -- "$(dirname "$0")" && pwd)
 ONB="$DEST/docs/onboarding"
-if [ ! -d "$ONB" ]; then
-  exit 0
-fi
 
 # Studio incident notes, mesh/MMORCH dogfood, dated handoffs, and brew/admin
 # promote runbooks. Strangers reading these as first-run will 1-star the SKU.
+if [ -d "$ONB" ]; then
 for name in \
   AGENT_HANDOFF_2026-08-11_POST_REBOOT.md \
   AGENT_HANDOFF_2026-08-12_POST_BASELINE_REBOOT.md \
@@ -54,7 +53,18 @@ for name in \
 do
   rm -f "$ONB/$name"
 done
+rm -rf "$ONB/archive"
+fi
+rm -rf "$DEST/docs/launch"
 
-rm -rf "$ONB/archive" "$DEST/docs/launch"
+ARCH="$DEST/docs/architecture"
+if [ -d "$ARCH" ]; then
+  rm -rf "$ARCH"
+  mkdir -p "$ARCH"
+  if [ -f "$HERE/sku-overlay/ARCHITECTURE_README.md" ]; then
+    cp "$HERE/sku-overlay/ARCHITECTURE_README.md" "$ARCH/README.md"
+    cp "$HERE/sku-overlay/ARCHITECTURE_INDEX.md" "$ARCH/INDEX.md"
+  fi
+fi
 
 echo "Pruned studio-internal onboarding from $ONB"
