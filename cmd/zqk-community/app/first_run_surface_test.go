@@ -59,6 +59,20 @@ func TestShippedFirstRunDocsExist(t *testing.T) {
 	if _, err := os.Stat(filepath.Join(root, "docs/_archive")); !os.IsNotExist(err) {
 		t.Fatal("docs/_archive must not ship")
 	}
+
+	architecture, err := os.ReadDir(filepath.Join(root, "docs/architecture"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	var markdown []string
+	for _, entry := range architecture {
+		if !entry.IsDir() && filepath.Ext(entry.Name()) == ".md" {
+			markdown = append(markdown, entry.Name())
+		}
+	}
+	if strings.Join(markdown, ",") != "INDEX.md,README.md" {
+		t.Fatalf("architecture SKU surface = %v; want pointer files only", markdown)
+	}
 }
 
 func TestPublicModulePath(t *testing.T) {
@@ -102,5 +116,67 @@ func TestPublicModulePath(t *testing.T) {
 	})
 	if err != nil {
 		t.Fatal(err)
+	}
+}
+
+func TestFirstRunTextUsesCanonicalBrandTokens(t *testing.T) {
+	t.Parallel()
+	cwd, err := fileutil.Getwd()
+	if err != nil {
+		t.Fatal(err)
+	}
+	root := filepath.Clean(filepath.Join(cwd, "../../.."))
+	banned := []string{
+		"zcom",
+		"zqk-community",
+	}
+	for _, relRoot := range []string{
+		"docs",
+		"scripts/open-core/sku-overlay",
+		"scripts/default_agent_skills",
+		"scripts/default_policies",
+	} {
+		absRoot := filepath.Join(root, relRoot)
+		err := filepath.WalkDir(absRoot, func(path string, entry os.DirEntry, walkErr error) error {
+			if walkErr != nil {
+				return walkErr
+			}
+			if entry.IsDir() {
+				if path == filepath.Join(root, "docs/quality") {
+					return filepath.SkipDir
+				}
+				return nil
+			}
+			switch filepath.Ext(path) {
+			case ".md", ".yaml", ".yml":
+			default:
+				return nil
+			}
+			data, readErr := fileutil.ReadFile(path)
+			if readErr != nil {
+				return readErr
+			}
+			for _, token := range banned {
+				if strings.Contains(string(data), token) {
+					t.Errorf("leftover %q in %s", token, strings.TrimPrefix(path, root+string(filepath.Separator)))
+				}
+			}
+			return nil
+		})
+		if err != nil {
+			t.Fatal(err)
+		}
+	}
+
+	shipped, err := fileutil.ReadFile(filepath.Join(root, "docs/onboarding/COMMUNITY_FIRST_RUN.md"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	overlay, err := fileutil.ReadFile(filepath.Join(root, "scripts/open-core/sku-overlay/COMMUNITY_FIRST_RUN.md"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if string(shipped) != string(overlay) {
+		t.Fatal("shipped community first-run drifted from its dest overlay source")
 	}
 }

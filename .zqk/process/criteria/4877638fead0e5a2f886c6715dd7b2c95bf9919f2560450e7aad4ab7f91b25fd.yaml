@@ -8,9 +8,9 @@ namespace_id: zqk:kernel
 origin_project: zqk
 origin_system: zqk
 schema_version: 2.0.0
-status: originated
+status: validated
 title: 'Verify: Shipped first-run docs, IDE boot text, and CLI examples match this SKU (no leftover studio dump, no hardcoded pressure-test executable name) - Boundary & Error Handling'
-updated_at: "2026-09-18T03:37:30Z"
+updated_at: "2026-09-18T07:46:40Z"
 updated_by: ACC-1785920548450214012-68b850c0
 validation_method: automated_test
 version_context: default

@@ -105,3 +105,52 @@ chunks:
       - go test ./cmd/zqk-community/app -run TestPublicModulePath -timeout 60s
     gate_integrate: yes
     independent_verify: yes
+  - chunk_id: dest-sku-text-functional
+    stage: integrate_verify
+    claim: Shipped first-run text uses canonical brand tokens rather than the local pressure-test name
+    work_object_ref: CRIT-1789702449225534000-91965c35
+    rubric_ref: CRIT-1789702449225534000-91965c35
+    dsl_checks:
+      - object_exists:CRIT-1789702449225534000-91965c35
+      - path_exists:scripts/open-core/applybrand
+      - tests_ok_per_customization
+    evidence_refs:
+      - CRIT-1789702449225534000-91965c35
+      - scripts/open-core/applybrand
+      - go test ./cmd/zqk-community/app -run TestFirstRunTextUsesCanonicalBrandTokens -timeout 60s
+    gate_integrate: yes
+    independent_verify: yes
+  - chunk_id: dest-sku-text-boundary
+    stage: integrate_verify
+    claim: Public architecture is pointer-only and archived documentation does not ship
+    work_object_ref: CRIT-1789702449225535000-21301407
+    rubric_ref: CRIT-1789702449225535000-21301407
+    dsl_checks:
+      - object_exists:CRIT-1789702449225535000-21301407
+      - path_exists:docs/architecture/INDEX.md
+      - path_exists:docs/architecture/README.md
+      - tests_ok_per_customization
+    evidence_refs:
+      - CRIT-1789702449225535000-21301407
+      - docs/architecture/INDEX.md
+      - docs/architecture/README.md
+      - go test ./cmd/zqk-community/app -run TestShippedFirstRunDocsExist -timeout 60s
+    gate_integrate: yes
+    independent_verify: yes
+  - chunk_id: dest-sku-text-integration
+    stage: integrate_verify
+    claim: The shipped community first-run doc equals its dest overlay source
+    work_object_ref: CRIT-1789702449225536000-1bd6c028
+    rubric_ref: CRIT-1789702449225536000-1bd6c028
+    dsl_checks:
+      - object_exists:CRIT-1789702449225536000-1bd6c028
+      - path_exists:docs/onboarding/COMMUNITY_FIRST_RUN.md
+      - path_exists:scripts/open-core/sku-overlay/COMMUNITY_FIRST_RUN.md
+      - tests_ok_per_customization
+    evidence_refs:
+      - CRIT-1789702449225536000-1bd6c028
+      - docs/onboarding/COMMUNITY_FIRST_RUN.md
+      - scripts/open-core/sku-overlay/COMMUNITY_FIRST_RUN.md
+      - go test ./cmd/zqk-community/app -run TestFirstRunTextUsesCanonicalBrandTokens -timeout 60s
+    gate_integrate: yes
+    independent_verify: yes
