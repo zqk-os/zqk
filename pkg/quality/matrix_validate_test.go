@@ -1,7 +1,11 @@
 package quality
 
 import (
+	"encoding/csv"
+	"io"
 	"path/filepath"
+	"regexp"
+	"strings"
 	"testing"
 
 	"github.com/lanceman/zqk/pkg/utils/fileutil"
@@ -82,5 +86,74 @@ matrices:
 	}
 	if res.AllOK() {
 		t.Fatal("expected failure")
+	}
+}
+
+func TestFeaturesTraceabilityMatrix100PercentDelivered(t *testing.T) {
+	root, err := filepath.Abs("../..")
+	if err != nil {
+		t.Fatalf("failed to determine repo root: %v", err)
+	}
+	csvPath := filepath.Join(root, "docs", "quality", "features_traceability.csv")
+	if _, err := fileutil.Stat(csvPath); err != nil {
+		t.Skipf("skipping test; features_traceability.csv not found at %s", csvPath)
+	}
+
+	f, err := fileutil.Open(csvPath)
+	if err != nil {
+		t.Fatalf("failed to open csv: %v", err)
+	}
+	defer f.Close()
+
+	r := csv.NewReader(f)
+	header, err := r.Read()
+	if err != nil {
+		t.Fatalf("failed to read header: %v", err)
+	}
+	colMap := make(map[string]int)
+	for i, h := range header {
+		colMap[strings.TrimSpace(h)] = i
+	}
+	for _, reqCol := range []string{"Requirement ID", "Delivered", "Test Cases", "Verification Hash"} {
+		if _, ok := colMap[reqCol]; !ok {
+			t.Fatalf("missing required column %q", reqCol)
+		}
+	}
+
+	reqIdx := colMap["Requirement ID"]
+	delivIdx := colMap["Delivered"]
+	testIdx := colMap["Test Cases"]
+	hashIdx := colMap["Verification Hash"]
+
+	rowCount := 0
+	hex64Regex := regexp.MustCompile(`^[a-fA-F0-9]{64}$`)
+
+	for {
+		rec, err := r.Read()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			t.Fatalf("row %d read error: %v", rowCount+1, err)
+		}
+		rowCount++
+		reqID := strings.TrimSpace(rec[reqIdx])
+		delivered := strings.ToLower(strings.TrimSpace(rec[delivIdx]))
+		testCases := strings.TrimSpace(rec[testIdx])
+		vHash := strings.TrimSpace(rec[hashIdx])
+
+		if delivered != "yes" && delivered != "y" {
+			t.Errorf("row %d (%s): Delivered is %q, expected 'yes'", rowCount, reqID, delivered)
+		}
+		if testCases == "" {
+			t.Errorf("row %d (%s): Test Cases is empty", rowCount, reqID)
+		}
+		if !hex64Regex.MatchString(vHash) {
+			t.Errorf("row %d (%s): Verification Hash %q is not a valid 64-character hex sha256", rowCount, reqID, vHash)
+		}
+	}
+
+	if rowCount == 0 {
+		t.Fatalf("features_traceability.csv has 0 data rows")
 	}
 }

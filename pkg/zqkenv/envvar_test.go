@@ -2,8 +2,6 @@ package zqkenv
 
 import (
 	"testing"
-
-	"github.com/lanceman/zqk/pkg/brand"
 )
 
 func TestEnvVar_GetSetUnset(t *testing.T) {
@@ -50,23 +48,4 @@ func TestEnvVar_Required(t *testing.T) {
 		}
 	}()
 	e.Required()
-}
-
-func TestEnvVar_CommunityDoesNotInheritStudioProjectRoot(t *testing.T) {
-	prev := IsCommunityEdition
-	IsCommunityEdition = true
-	t.Cleanup(func() { IsCommunityEdition = prev })
-	brand.SetExecutableName("zcom")
-	t.Cleanup(func() { brand.SetExecutableName("zqk") })
-
-	t.Setenv("ZQK_PROJECT_ROOT", "/tmp/studio-kernel")
-	t.Setenv("ZCOM_PROJECT_ROOT", "")
-	if got := ProjectRoot().Get(); got != "" {
-		t.Fatalf("community PROJECT_ROOT must not inherit ZQK_PROJECT_ROOT, got %q", got)
-	}
-
-	t.Setenv("ZCOM_PROJECT_ROOT", "/tmp/community-kernel")
-	if got := ProjectRoot().Get(); got != "/tmp/community-kernel" {
-		t.Fatalf("explicit ZCOM_PROJECT_ROOT should win, got %q", got)
-	}
 }

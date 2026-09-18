@@ -22,6 +22,7 @@ import (
 	"github.com/lanceman/zqk/cmd/zqk/mcp"
 	newcmd "github.com/lanceman/zqk/cmd/zqk/new"
 	"github.com/lanceman/zqk/cmd/zqk/object"
+	"github.com/lanceman/zqk/cmd/zqk/scheduler"
 	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
 	"github.com/lanceman/zqk/pkg/zqkenv"
 
@@ -61,13 +62,6 @@ import (
 )
 
 const EmptyValue = ""
-
-// Pressure-test SKU name. Public launch will rename this to zqk.
-// TRACK: TDE-1789678536875854000-47240146 — keep zcom until community ships as zqk.
-const (
-	PressureTestExecutableName = "zcom"
-	pressureTestProductName    = "ZQK Community"
-)
 
 // projectConfigBootstrapYAML matches a subset of .zqk/config/config.yaml read during init for branding.
 // Struct tags carry YAML keys so we avoid map index literals that collide with object kind names in drift scans.
@@ -227,9 +221,11 @@ func init() {
 			"collaborate safely without losing context.",
 		).
 		AddSection("Command surfaces",
-			"Community pressure-test (zcom): object, system, workflow, mcp, grep, new, inbox, learn, tray, quickstart, version.\n"+
-				"There is no scheduler, zqk-admin, keystore, or zcom-admin binary on this SKU.\n"+
-				"Kernel data lives under .zqk/ (not .zcom/). First-run: docs/onboarding/COMMUNITY_FIRST_RUN.md",
+			"Stable user and operator commands: object, system, scheduler, docman, quick, tray, healthchk, use.\n"+
+				"Automation: automation, precommit, callback, reports.\n"+
+				"Privileged / developer: internal (admin), keystore; use only when documented for your role.\n"+
+				"The zqk-admin binary (cmd/zqk-admin) shares this same command tree and bootstrap as zqk.\n"+
+				"See "+filepath.Join(paths.ProcessDir, "enforcement", "AGENT_GUIDELINES.md")+" (CLI command surfaces).",
 		).
 		WithAutoDiscoverSubcommands(true)
 	helpBuilder.ApplyToCommand(rootCmd)
@@ -578,17 +574,13 @@ func init() {
 	// Priority:
 	// 1) brand.executable_name in project config (.zqk/config/config.yaml) if project root is discoverable
 	// 2) actual executable name (os.Args[0])
-	// 3) default (zcom on this SKU — not studio zqk)
-	execName := PressureTestExecutableName
+	// 3) default ("zqk")
+	execName := "zqk"
 	if len(os.Args) > 0 && os.Args[0] != EmptyValue {
 		execName = filepath.Base(os.Args[0])
 	}
-	if execName == "zqk" || execName == "zqk-stable" || execName == "zqk-community" {
-		execName = PressureTestExecutableName
-	}
-	brand.SetProductName(pressureTestProductName)
 	projectRoot := cli.ResolveProjectRoot(".")
-	namespacePrefix := "zqk"
+	namespacePrefix := strings.ToLower(execName)
 	if projectRoot != EmptyValue {
 		configPath := filepath.Join(projectRoot, paths.ProjectDataDir, paths.ConfigDir, paths.ProjectConfigFile)
 		if data, err := fileutil.ReadFile(configPath); err == nil {
@@ -633,7 +625,7 @@ func init() {
 	}
 
 	// Set version template (matches utility version command format)
-	rootCmd.SetVersionTemplate(fmt.Sprintf("Edition: community (pressure-test SKU; not studio zqk)\nExecutable: %s\nProduct: %s\nVersion: %s\nBuild datetime: %s\nCommit hash: %s\n", brand.ExecutableName(), brand.ProductName(), version, buildDate, gitCommit))
+	rootCmd.SetVersionTemplate(fmt.Sprintf("Executable: %s\nVersion: %s\nBuild datetime: %s\nCommit hash: %s\n", brand.ExecutableName(), version, buildDate, gitCommit))
 
 	// Add context flag for context profiles (e.g., --context ai-agent)
 	rootCmd.PersistentFlags().String("context", "", "Context profile (ai-agent, human, debug). Profiles set default output format and behavior.")
@@ -679,16 +671,6 @@ func init() {
 	rootCmd.PersistentPreRunE = rootPersistentPreRunE
 
 	rootCmd.PersistentPostRunE = rootPersistentPostRunE
-}
-
-// ApplyPressureTestBrand pins zcom after package init so this SKU cannot be
-// mistaken for studio zqk. TRACK: TDE-1789678536875854000-47240146 — drop at public launch.
-func ApplyPressureTestBrand() {
-	brand.SetExecutableName(PressureTestExecutableName)
-	brand.SetProductName(pressureTestProductName)
-	paths.CLICommandName = PressureTestExecutableName
-	rootCmd.Use = PressureTestExecutableName
-	rootCmd.SetVersionTemplate(fmt.Sprintf("Edition: community (pressure-test SKU; not studio zqk)\nExecutable: %s\nProduct: %s\nVersion: %s\nBuild datetime: %s\nCommit hash: %s\n", brand.ExecutableName(), brand.ProductName(), version, buildDate, gitCommit))
 }
 
 // rootPreRunInitFileLogging configures global file logging from profile/config (extracted to reduce gocyclo in rootPersistentPreRunE).
@@ -1323,12 +1305,6 @@ func registerCommands() {
 	systemCmdInst.GroupID = "everyday"
 	rootCmd.AddCommand(systemCmdInst)
 
-	// Top-level quickstart — docs and first-run tell strangers `zcom quickstart`.
-	// The same command also lives under `system` as start-here.
-	quickstartCmdInst := system.NewQuickstartCmd()
-	quickstartCmdInst.GroupID = "everyday"
-	rootCmd.AddCommand(quickstartCmdInst)
-
 	// In-process code search engine (grep / zgrep)
 	grepCmdInst := grep.NewGrepCmd()
 	grepCmdInst.GroupID = "everyday"
@@ -1366,7 +1342,10 @@ func registerCommands() {
 	// Automation and integration group (Enterprise Only)
 	// Pre-commit background results (Enterprise Only)
 
-	// Quick create (backlog item, decision, question from file or content)
+	// Quickstart / start-here zero-friction onboarding guide
+	quickstartCmdInst := system.NewQuickstartCmd()
+	quickstartCmdInst.GroupID = "everyday"
+	rootCmd.AddCommand(quickstartCmdInst)
 
 	// Tray: named shortcuts to zqk argv (.zqk/tray.yaml over embedded defaults)
 	trayCmdInst := tray.NewTrayCmd()
@@ -1386,7 +1365,12 @@ func registerCommands() {
 	mcpCmdInst.GroupID = "integrations"
 	rootCmd.AddCommand(mcpCmdInst)
 
-	// Observer, Keystore, Scheduler, Callback, Rollback, Semantic, Spec, Org, Domain, Ontology (Enterprise Only)
+	// Scheduler daemon management (start, stop, status, trigger, service, etc.)
+	schedulerCmdInst := scheduler.NewSchedulerCmd()
+	schedulerCmdInst.GroupID = "integrations"
+	rootCmd.AddCommand(schedulerCmdInst)
+
+	// Observer, Keystore, Callback, Rollback, Semantic, Spec, Org, Domain, Ontology (Enterprise Only)
 
 	// Workflow guidance commands
 	workflowCmdInst := workflow.NewWorkflowCmd()

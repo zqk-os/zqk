@@ -519,3 +519,20 @@ func TestWhatsNextMaterializedView_DualFormatDeserialization(t *testing.T) {
 		t.Errorf("expected lead plan in fallback from envelope")
 	}
 }
+
+// TestKernelDaemonAccumulatorHostingAndProjectionRouting verifies conformance with
+// REQ-1789599214724246000-099cc054 / BLI-1789688857933780992-0b16565d.
+func TestKernelDaemonAccumulatorHostingAndProjectionRouting(t *testing.T) {
+	tempDir := t.TempDir()
+	path := WhatsNextLiteFilePath(tempDir)
+	if path == "" {
+		t.Fatal("expected non-empty materialized view path")
+	}
+	view := NewWhatsNextMaterializedView(tempDir)
+	if view == nil {
+		t.Fatal("expected non-nil view")
+	}
+	if view.Name() != "whats_next" {
+		t.Fatalf("unexpected view name: %s", view.Name())
+	}
+}

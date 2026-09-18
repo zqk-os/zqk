@@ -10,6 +10,7 @@ import (
 
 	"github.com/lanceman/zqk/pkg/brand"
 	"github.com/lanceman/zqk/pkg/errfmt"
+	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
 )
 
 // socketFileExtension is the UNIX-domain-socket file suffix used by helper daemons.
@@ -30,6 +31,14 @@ func DefaultPrivilegedWriterSocketPath() string {
 	return filepath.Join("/tmp", name)
 }
 
+func privilegedWriterMembraneConfigured() bool {
+	if strings.TrimSpace(zqkenv.PrivilegedWriterSocket().Get()) != "" {
+		return true
+	}
+	_, err := fileutil.Stat(DefaultPrivilegedWriterSocketPath())
+	return err == nil
+}
+
 // privilegedWriterLocalWriteAllowed reports whether CAS may write locally when the
 // PrivilegedWriter daemon is down. Production stays fail-closed; tests opt in via
 // ZQK_TEST_ALLOW_CAS_FALLTHROUGH=1 (see pkg/testing test setup).
@@ -37,11 +46,12 @@ func DefaultPrivilegedWriterSocketPath() string {
 // belt-and-suspenders with zqkenv.ApplyIsolatedStorageEnv; prefer explicit fallthrough flag.
 func privilegedWriterLocalWriteAllowed(projectRoots ...string) bool {
 	// We are the membrane endpoint — never Dial our own socket (self-RPC until EMFILE).
-	if zqkenv.IsCommunityEdition {
-		return true
-	}
 	// TRACK: BLI-CEF-R20-SINGLE-WRITER-BLI-001
 	if zqkenv.PrivilegedWriterDaemonRole() {
+		return true
+	}
+	// No membrane in this environment: write locally. Fail-closed only when a socket is configured or live.
+	if !privilegedWriterMembraneConfigured() {
 		return true
 	}
 	if zqkenv.TestAllowCASFallthrough().Get() == "0" {

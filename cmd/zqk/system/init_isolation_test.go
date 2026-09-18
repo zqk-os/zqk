@@ -11,6 +11,7 @@ import (
 	"github.com/lanceman/zqk/pkg/config"
 	"github.com/lanceman/zqk/pkg/logging"
 	"github.com/lanceman/zqk/pkg/paths"
+	"github.com/lanceman/zqk/pkg/testkit"
 	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
 )
 
@@ -283,5 +284,118 @@ func TestCommunitySourceOverlay_IntegrityAndProcessPreservation(t *testing.T) {
 			t.Errorf("expected overlaid file to exist: %s", ef)
 		}
 	}
+
+	// Verify the installed Makefile is the slim community version (TDE-1789690070487265000-ea5471f4)
+	installedMf, err := os.ReadFile(filepath.Join(tmpDest, "Makefile"))
+	if err != nil {
+		t.Fatalf("failed to read installed Makefile: %v", err)
+	}
+	mfStr := string(installedMf)
+	if !strings.Contains(mfStr, "zcom:") {
+		t.Errorf("expected installed Makefile to contain 'zcom:'")
+	}
+	if strings.Contains(mfStr, "zqk-admin:") || strings.Contains(mfStr, "promote-stable:") {
+		t.Errorf("installed Makefile contains studio-only targets: %s", mfStr)
+	}
+
+	// Verify apply-community-source.sh preserves destination-owned README.md
+	destReadmePath := filepath.Join(tmpDest, "README.md")
+	customReadme := []byte("# Custom Dest Community README\n")
+	if err := os.WriteFile(destReadmePath, customReadme, 0644); err != nil {
+		t.Fatal(err)
+	}
+	cmd2 := exec.Command(overlayScript, tmpDest)
+	if out2, err := cmd2.CombinedOutput(); err != nil {
+		t.Fatalf("second apply-community-source.sh run failed: %v, output: %s", err, string(out2))
+	}
+	preservedReadme, err := os.ReadFile(destReadmePath)
+	if err != nil || string(preservedReadme) != string(customReadme) {
+		t.Errorf("apply-community-source.sh clobbered destination README.md: got %s", string(preservedReadme))
+	}
+
+	// Verify apply-community-source.sh includes build-bootstrap-archive.sh and sync-public-candidate.sh includes specs
+	overlayData, err := os.ReadFile(overlayScript)
+	if err != nil {
+		t.Fatalf("failed to read apply-community-source.sh: %v", err)
+	}
+	overlayStr := string(overlayData)
+	if !strings.Contains(overlayStr, "scripts/build-bootstrap-archive.sh") {
+		t.Errorf("apply-community-source.sh must include scripts/build-bootstrap-archive.sh")
+	}
+	if strings.Contains(overlayStr, "\"Makefile\"") || strings.Contains(overlayStr, "\"README.md\"") {
+		t.Errorf("apply-community-source.sh OVERLAY_PATHS must not contain Makefile or README.md")
+	}
+	if !strings.Contains(overlayStr, "\"cmd/zqk/scheduler\"") {
+		t.Errorf("apply-community-source.sh OVERLAY_PATHS must contain cmd/zqk/scheduler")
+	}
+
+	syncScript := filepath.Join(root, "scripts", "open-core", "sync-public-candidate.sh")
+	syncData, err := os.ReadFile(syncScript)
+	if err != nil {
+		t.Fatalf("failed to read sync-public-candidate.sh: %v", err)
+	}
+	syncStr := string(syncData)
+	if !strings.Contains(syncStr, ".zqk/specs") {
+		t.Errorf("sync-public-candidate.sh must include .zqk/specs")
+	}
+	if strings.Contains(syncStr, "\"Makefile\"") {
+		t.Errorf("sync-public-candidate.sh INCLUDES must not contain Makefile")
+	}
+	if !strings.Contains(syncStr, "\"cmd/zqk/scheduler\"") {
+		t.Errorf("sync-public-candidate.sh INCLUDES must contain cmd/zqk/scheduler")
+	}
+
+	// Verify cmd/zqk/scheduler was copied to destination and studio-specific files were pruned
+	schedDest := filepath.Join(tmpDest, "cmd", "zqk", "scheduler")
+	if !fileutil.Exists(schedDest) {
+		t.Errorf("expected destination cmd/zqk/scheduler to exist")
+	}
+	for _, forbidden := range []string{"scan_tests.go", "convergence_agent_prompt.go", "ide_paste_automation.go"} {
+		if fileutil.Exists(filepath.Join(schedDest, forbidden)) {
+			t.Errorf("destination scheduler must not contain studio file: %s", forbidden)
+		}
+	}
+	// Verify register_studio_scheduler_commands.go is stubbed as a no-op
+	stubPath := filepath.Join(schedDest, "register_studio_scheduler_commands.go")
+	if !fileutil.Exists(stubPath) {
+		t.Errorf("expected register_studio_scheduler_commands.go stub to exist in destination")
+	} else {
+		stubData, _ := os.ReadFile(stubPath)
+		if !strings.Contains(string(stubData), "func registerStudioSchedulerCommands(_ *cobra.Command) {}") {
+			t.Errorf("expected no-op stub for registerStudioSchedulerCommands, got: %s", string(stubData))
+		}
+	}
 }
 
+func TestCommunityInit_SeedsStarterGraphAndRetentionJobs(t *testing.T) {
+	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{SkipSetupTestEnvironment: true, SkipFileStorage: true})
+	tmpDir := proj.Root
+
+	originalDir, err := fileutil.Getwd()
+	if err != nil {
+		t.Fatalf("Failed to get current directory: %v", err)
+	}
+	defer fileutil.Chdir(originalDir)
+
+	if err := fileutil.Chdir(tmpDir); err != nil {
+		t.Fatalf("Failed to change to temp directory: %v", err)
+	}
+
+	cmd := NewInitCmd()
+	cmd.SetArgs([]string{"--force"})
+	if err := cmd.Execute(); err != nil {
+		t.Fatalf("Community init failed: %v", err)
+	}
+
+	// Verify starter organization graph exists (in-process starter graph)
+	orgsDir := filepath.Join(tmpDir, paths.ProcessDir, "organizations")
+	if !fileutil.Exists(orgsDir) {
+		t.Fatalf("expected organizations directory to exist at %s", orgsDir)
+	}
+
+	// Verify retention / maintenance scheduler jobs were seeded
+	jobsDir := filepath.Join(tmpDir, paths.ProcessDir, "scheduler_jobs")
+	if !fileutil.Exists(jobsDir) {
+		t.Fatalf("expected scheduler_jobs directory to exist at %s", jobsDir)
+	}
+}

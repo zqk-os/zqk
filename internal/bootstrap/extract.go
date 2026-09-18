@@ -13,7 +13,6 @@ import (
 	"github.com/lanceman/zqk/pkg/logging"
 	"github.com/lanceman/zqk/pkg/paths"
 	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
-	"github.com/lanceman/zqk/pkg/zqkenv"
 )
 
 const (
@@ -85,8 +84,8 @@ func ExtractTo(projectRoot string, logger logging.Logger, force bool) error {
 		} else if after, ok := strings.CutPrefix(name, ".\\"); ok {
 			name = after
 		}
-		// Community edition: omit internal/dev-only command specs ([REDACTED-ID]).
-		if zqkenv.IsCommunityEdition && strings.HasPrefix(name, archivePrefixCLISpecs) && shouldExcludeCommunityCommandSpec(name) {
+		// Studio cursor/paste command specs do not belong in a portable bootstrap extract.
+		if strings.HasPrefix(name, archivePrefixCLISpecs) && shouldExcludeCommunityCommandSpec(name) {
 			if hdr.Typeflag == tar.TypeReg && hdr.Size > 0 {
 				if _, err := io.CopyN(io.Discard, tr, hdr.Size); err != nil {
 					return errfmt.Errorf("failed to skip community-denied archive entry %s: %w", hdr.Name, err)

@@ -9,9 +9,6 @@ import (
 	"github.com/lanceman/zqk/pkg/brand"
 )
 
-// IsCommunityEdition is a global flag set by the community binary.
-var IsCommunityEdition bool = false
-
 const _sfxAccountID = "ACCOUNT_ID"
 
 const _sfxStressRealRoot = "STRESS_REAL_ROOT"

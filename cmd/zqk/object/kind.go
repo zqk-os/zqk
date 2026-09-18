@@ -13,7 +13,6 @@ import (
 	"github.com/lanceman/zqk/pkg/objectget"
 	"github.com/lanceman/zqk/pkg/objects"
 	"github.com/lanceman/zqk/pkg/paths"
-	"github.com/lanceman/zqk/pkg/zqkenv"
 	"github.com/spf13/cobra"
 )
 
@@ -204,28 +203,7 @@ func RegisterDynamicKindCommands(objectCmd *cobra.Command) {
 	}
 	// Use RegisterKindCommandsForKinds so we add by exact name; Find([]string{kind}) would
 	// return the generic <kind> command and we would skip adding (no per-kind subcommands).
-
-	if zqkenv.IsCommunityEdition {
-		// COMMUNITY EDITION PRUNING
-		// Only allow core semantic objects in the free tier
-		allowedCommunityKinds := map[string]bool{
-			"goal": true, "requirement": true, "task": true, "policy": true,
-			"rule": true, "backlog_item": true, "milestone": true, "decision": true,
-			"test_case": true, "prompt_template": true, "validation_rule": true,
-			"agent_skill": true, "agent_instruction": true, objects.FieldKeyVision: true,
-			"mission": true, "technical_spec": true, "technical_debt": true,
-			"workflow": true, "workstream": true, "question": true, "criteria": true,
-			"organization": true,
-		}
-		var filteredKinds []string
-		for _, k := range kinds {
-			if allowedCommunityKinds[k] {
-				filteredKinds = append(filteredKinds, k)
-			}
-		}
-		kinds = filteredKinds
-	}
-
+	// TRACK: TDE-1789694178347867000-a6099c29 — do not prune kinds by edition.
 	RegisterKindCommandsForKinds(objectCmd, kinds)
 }
 

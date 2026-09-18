@@ -7,8 +7,8 @@
 #
 # Usage (community):
 #   unset ZQK_PROJECT_ROOT ZQK_TEST_ROOT
-#   export ZCOM_PROJECT_ROOT=/path/to/zqk-public-candidate
-#   sh scripts/starter_kernel_graph/seed.sh
+#   ZCOM_PROJECT_ROOT=/path/to/project sh scripts/starter_kernel_graph/seed.sh
+#   (Do not 'export ZCOM_PROJECT_ROOT'; an exported root hijacks CWD for later inits)
 #
 # Existing originated objects of each kind are reused (idempotent).
 

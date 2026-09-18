@@ -5,7 +5,6 @@ import (
 
 	"github.com/lanceman/zqk/pkg/objects"
 	"github.com/lanceman/zqk/pkg/validation"
-	"github.com/lanceman/zqk/pkg/zqkenv"
 	"github.com/spf13/cobra"
 )
 
@@ -21,13 +20,13 @@ func TestApplyNamespaceBoundaries(t *testing.T) {
 		wantIsolation bool
 	}{
 		{
-			name:          "default adds local namespace",
+			name:          "default inventory is federated",
 			federated:     false,
 			namespace:     "",
 			filters:       make(map[string]any),
-			wantFilter:    validation.DefaultNamespaceKernel,
-			wantMode:      namespaceScopeModeDefault,
-			wantIsolation: true,
+			wantFilter:    "",
+			wantMode:      namespaceScopeModeFederated,
+			wantIsolation: false,
 		},
 		{
 			name:          "federated skips isolation",
@@ -133,12 +132,8 @@ func TestAttachNamespaceScopeMeta(t *testing.T) {
 	}
 }
 
-func TestCommunityOrganizationScope(t *testing.T) {
-	orig := zqkenv.IsCommunityEdition
-	defer func() { zqkenv.IsCommunityEdition = orig }()
-	zqkenv.IsCommunityEdition = true
-
-	// 1. Default community scope (no --federated, no --namespace)
+func TestDefaultOrganizationScopeIsFederated(t *testing.T) {
+	// 1. Default scope (no --federated, no --namespace)
 	cmd := &cobra.Command{}
 	cmd.Flags().Bool("federated", false, "")
 	cmd.Flags().Bool("all-namespaces", false, "")

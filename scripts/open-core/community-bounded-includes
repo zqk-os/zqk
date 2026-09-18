@@ -56,3 +56,5 @@ go.mod
 go.sum
 LICENSE
 # README.md is dest-owned first-run copy. Studio README advertises brew/zqk/scheduler.
+scripts/open-core/install-community-sku.sh
+scripts/open-core/sku-overlay

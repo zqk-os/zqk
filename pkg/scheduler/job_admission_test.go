@@ -626,6 +626,93 @@ func TestOneTimeJobDisabledAfterExecutionFailure(t *testing.T) {
 	}
 }
 
+func TestOneTimeJobDisabledAfterExecutionSuccess(t *testing.T) {
+	sched, _, cleanup := setupTestScheduler(t)
+	t.Cleanup(cleanup)
+
+	ctx := pkgctx.NewSystemContext()
+	secCtx := pkgctx.NewSystemSecurityContext()
+	jobID := "SCH-1788059947969029999"
+	created := time.Now().UTC()
+	jobData := map[string]any{
+		objects.FieldKeyID:            jobID,
+		objects.FieldKeyKind:          objects.KindSchedulerJob,
+		objects.FieldKeyTitle:         "One-time success fixture",
+		objects.FieldKeyStatus:        objects.ObjectStatusActive,
+		objects.FieldKeyJobType:       JobTypeRunWrapper,
+		objects.FieldKeyTriggerType:   TriggerTypeImmediate,
+		objects.FieldKeyCategory:      CategoryManual,
+		objects.FieldKeyPriority:      JobPriorityHigh,
+		objects.FieldKeyExecutionMode: ExecutionModeOneTime,
+		objects.FieldKeyEnabled:       true,
+		objects.FieldKeyCreatedAt:     created.Format(time.RFC3339),
+		objects.FieldKeyCreatedBy:     "ACC-TEST",
+		objects.FieldKeyUpdatedAt:     created.Format(time.RFC3339),
+		objects.FieldKeyUpdatedBy:     "ACC-TEST",
+		objects.FieldKeyOriginProject: validation.DefaultOriginProject,
+		objects.FieldKeyOriginSystem:  validation.DefaultOriginSystem,
+		objects.FieldKeySchemaVersion: objects.DefaultSchemaVersion,
+	}
+	if err := sched.storage.Create(pkgctx.WithPromoteOnCreate(ctx), secCtx, jobData); err != nil {
+		t.Fatalf("create fixture job: %v", err)
+	}
+
+	job := &ScheduledJob{
+		ID:            jobID,
+		JobType:       JobTypeRunWrapper,
+		Category:      CategoryManual,
+		Priority:      JobPriorityHigh,
+		TriggerType:   TriggerTypeImmediate,
+		ExecutionMode: ExecutionModeOneTime,
+		Enabled:       true,
+		CreatedAt:     created,
+	}
+	sched.jobsMu.Lock()
+	sched.jobs[jobID] = job
+	sched.jobsMu.Unlock()
+
+	successHandler := &mockJobHandler{
+		executeFunc: func(context.Context, *ScheduledJob) error {
+			return nil
+		},
+	}
+
+	sched.executeJob(ctx, job, successHandler)
+
+	if job.Enabled {
+		t.Fatal("expected one-time job in-memory struct to be disabled after successful execution")
+	}
+
+	sched.jobsMu.RLock()
+	cachedJob := sched.jobs[jobID]
+	sched.jobsMu.RUnlock()
+	if cachedJob != nil && cachedJob.Enabled {
+		t.Fatal("expected cached job in s.jobs to be disabled after successful execution")
+	}
+
+	raw, err := sched.storage.Read(ctx, secCtx, jobID)
+	if err != nil {
+		t.Fatalf("read job from storage: %v", err)
+	}
+	if enabled, _ := raw[objects.FieldKeyEnabled].(bool); enabled {
+		t.Fatal("expected one-time job in storage to be enabled=false after successful execution")
+	}
+	if status, _ := raw[objects.FieldKeyStatus].(string); status != StatusDisabled {
+		t.Fatalf("expected one-time job in storage to have status=%q after successful execution, got %q", StatusDisabled, status)
+	}
+	if job.Status != StatusDisabled {
+		t.Fatalf("expected in-memory job.Status to be %q, got %q", StatusDisabled, job.Status)
+	}
+	if !IsSchedulerJobMarkedForDeletion(raw) {
+		t.Fatal("expected one-time job to be marked for deletion so LoadJobs excludes it")
+	}
+
+	// Recycle check: should reload/recycle re-fire?
+	if oneTimeImmediateShouldStartOnReload(job, false) {
+		t.Fatal("recycle must not re-fire disabled one_time job")
+	}
+}
+
 func TestOneTimeJobDisabledAfterFailJobAdmission(t *testing.T) {
 	sched, _, cleanup := setupTestScheduler(t)
 	t.Cleanup(cleanup)

@@ -75,12 +75,12 @@ func runInit(_ *cobra.Command, projectName, template string, force bool, snapsho
 
 	// Auto-detect legacy mode for existing codebases (Painless Drop-In)
 	if !legacy && snapshotPath == emptyValue {
-		if !kernelScaffoldPresent(projectRoot) {
+		if _, err := fileutil.Stat(filepath.Join(projectRoot, paths.ProjectDataDir)); fileutil.IsNotExist(err) {
 			entries, err := fileutil.ReadDir(projectRoot)
 			if err == nil {
 				for _, entry := range entries {
 					name := entry.Name()
-					if name != ".git" && name != ".zqk-test-settings.yaml" && name != "zqk-test-settings.yaml" && name != paths.ProjectDataDir {
+					if name != ".git" && name != ".zqk-test-settings.yaml" && name != "zqk-test-settings.yaml" {
 						legacy = true
 						logging.Fluent(logger).Info("Detected existing codebase; automatically enabling legacy mode for painless drop-in").Log()
 						break
@@ -236,38 +236,26 @@ func runInit(_ *cobra.Command, projectName, template string, force bool, snapsho
 		}
 	}
 
-	if zqkenv.IsCommunityEdition {
-		// Inject Agent Boot Protocol rules for frictionless onboarding
-		if err := injectAgentBootProtocol(projectRoot, legacy, logger); err != nil {
-			logging.Fluent(logger).Warn("Failed to inject agent boot protocol").WithError(err).Log()
+	if !withMaintenanceJobs {
+		if _, err := EnsureRetentionJobsInProject(projectRoot, logger, nil); err != nil {
+			logging.Fluent(logger).Warn("Failed to ensure maintenance jobs on init").WithError(err).Log()
 		}
-
-		// Generate the human-facing Getting Started guide
-		if err := generateGettingStartedGuide(projectRoot, logger); err != nil {
-			logging.Fluent(logger).Warn("Failed to generate ZQK_GETTING_STARTED.md").WithError(err).Log()
-		}
-
-		note := "Run '" + brand.ExecutableName() + " quickstart' (or system start-here) for the onboarding tutorial"
-		logging.Fluent(logger).Info("Welcome to ZQK Community Edition; initialization complete").
-			String(initLogFieldProject, projectRoot).
-			String(initLogFieldNote, note).
-			Log()
 	}
+
+	if err := injectAgentBootProtocol(projectRoot, legacy, logger); err != nil {
+		logging.Fluent(logger).Warn("Failed to inject agent boot protocol").WithError(err).Log()
+	}
+	if err := generateGettingStartedGuide(projectRoot, logger); err != nil {
+		logging.Fluent(logger).Warn("Failed to generate getting-started guide").WithError(err).Log()
+	}
+
+	exe := brand.ExecutableName()
+	logging.Fluent(logger).Info("Initialization complete").
+		String(initLogFieldProject, projectRoot).
+		String(initLogFieldNote, "Run '"+exe+" system start-here'. Background loops: '"+exe+" scheduler start'.").
+		Log()
 
 	return nil
-}
-
-// kernelScaffoldPresent reports a real kernel, not a logger-created .zqk/logs tree.
-func kernelScaffoldPresent(projectRoot string) bool {
-	processDir := datacell.ProcessPrimaryDir(projectRoot)
-	if _, err := fileutil.Stat(processDir); err == nil {
-		return true
-	}
-	cfg := filepath.Join(projectRoot, paths.ProjectDataDir, paths.ConfigDir, "config.yaml")
-	if _, err := fileutil.Stat(cfg); err == nil {
-		return true
-	}
-	return false
 }
 
 // determineProjectRoot determines project root from environment variables or auto-discovery.
@@ -297,11 +285,13 @@ func runGreenfieldInit(projectRoot, projectName, template string, force bool, lo
 	projectDataDir := filepath.Join(projectRoot, paths.ProjectDataDir)
 	processDir := datacell.ProcessPrimaryDir(projectRoot)
 
-	// Check if already initialized. A logger may have created .zqk/logs before
-	// init runs — logs-only is not a kernel.
+	// Check if already initialized
 	if !force {
-		if kernelScaffoldPresent(projectRoot) {
-			return errfmt.Errorf("project already initialized (found kernel scaffold under %s). Use --force to overwrite or --legacy for existing project", paths.ProjectDataDir)
+		if _, err := fileutil.Stat(projectDataDir); err == nil {
+			return errfmt.Errorf("project already initialized (found %s directory). Use --force to overwrite or --legacy for existing project", paths.ProjectDataDir)
+		}
+		if _, err := fileutil.Stat(processDir); err == nil {
+			return errfmt.Errorf("project already initialized (found %s directory). Use --force to overwrite or --legacy for existing project", paths.ProcessDir)
 		}
 	}
 

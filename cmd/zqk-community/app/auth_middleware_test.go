@@ -77,11 +77,7 @@ func TestAuthMiddleware_Authorized_Credentials(t *testing.T) {
 	}
 }
 
-func TestAuthMiddleware_CommunityEditionSeatsSystemAccount(t *testing.T) {
-	prev := zqkenv.IsCommunityEdition
-	zqkenv.IsCommunityEdition = true
-	t.Cleanup(func() { zqkenv.IsCommunityEdition = prev })
-
+func TestAuthMiddleware_NoTokenSeatsSystemAccount(t *testing.T) {
 	cmd := &cobra.Command{Use: "status"}
 	home := t.TempDir()
 	t.Setenv(zqkenv.OSHome().Name(), home)
@@ -89,16 +85,8 @@ func TestAuthMiddleware_CommunityEditionSeatsSystemAccount(t *testing.T) {
 	t.Setenv(zqkenv.TestRoot().Name(), "")
 	t.Setenv(zqkenv.TestBypassAuth().Name(), "0")
 
-	if err := AuthMiddleware(cmd, t.TempDir()); err == nil {
-		t.Fatal("expected uninitialized-kernel error, got nil")
-	} else if !strings.Contains(err.Error(), "system init") {
-		t.Fatalf("want init hint, got %v", err)
-	}
-
-	projectRoot := t.TempDir()
-	createSchemas(t, projectRoot)
-	if err := AuthMiddleware(cmd, projectRoot); err != nil {
-		t.Fatalf("community edition with no token: %v", err)
+	if err := AuthMiddleware(cmd, t.TempDir()); err != nil {
+		t.Fatalf("local kernel with no token: %v", err)
 	}
 	sec := pkgctx.GetSecurityContext(cmd.Context())
 	if sec == nil {
@@ -127,27 +115,23 @@ func TestAuthMiddleware_BypassInit(t *testing.T) {
 	}
 }
 
-func TestAuthMiddleware_CommunityLeftoverCredsUninitializedHintsInit(t *testing.T) {
-	prev := zqkenv.IsCommunityEdition
-	zqkenv.IsCommunityEdition = true
-	t.Cleanup(func() { zqkenv.IsCommunityEdition = prev })
-
-	cmd := &cobra.Command{Use: "list"}
+func TestAuthMiddleware_UninitializedKernelHint(t *testing.T) {
+	cmd := &cobra.Command{Use: "object"}
 	home := t.TempDir()
 	t.Setenv(zqkenv.OSHome().Name(), home)
-	t.Setenv(zqkenv.APIKey().Name(), "ACC-leftover-studio")
-	t.Setenv(zqkenv.TestRoot().Name(), "")
+	const accID = "ACC-test-token"
+	t.Setenv(zqkenv.APIKey().Name(), accID)
 	t.Setenv(zqkenv.TestBypassAuth().Name(), "0")
 
-	err := AuthMiddleware(cmd, t.TempDir())
+	// Empty dir with no .zqk directory
+	emptyProjectRoot := t.TempDir()
+
+	err := AuthMiddleware(cmd, emptyProjectRoot)
 	if err == nil {
-		t.Fatal("expected uninitialized hint, got nil")
+		t.Fatalf("expected error for uninitialized kernel, got nil")
 	}
-	if strings.Contains(err.Error(), "account schema") {
-		t.Fatalf("leftover creds must not look like unauthorized schema: %v", err)
-	}
-	if !strings.Contains(err.Error(), "system init") {
-		t.Fatalf("want init hint, got %v", err)
+	if !strings.Contains(err.Error(), "kernel not initialized: run") || !strings.Contains(err.Error(), "system init") {
+		t.Fatalf("expected fail-closed uninitialized kernel hint, got: %v", err)
 	}
 }
 

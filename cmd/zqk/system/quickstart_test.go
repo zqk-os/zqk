@@ -8,7 +8,6 @@ import (
 
 	pkgctx "github.com/lanceman/zqk/pkg/context"
 	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
-	"github.com/lanceman/zqk/pkg/zqkenv"
 )
 
 func TestQuickstartCommand(t *testing.T) {
@@ -27,30 +26,6 @@ func TestQuickstartCommand(t *testing.T) {
 
 	if !bytes.Contains(buf.Bytes(), []byte("--with-onboarding-roadmap")) {
 		t.Errorf("expected json output to include --with-onboarding-roadmap in system init step, got: %s", buf.String())
-	}
-}
-
-func TestQuickstartCommand_CommunityEditionOmitsZqkMcp(t *testing.T) {
-	prev := zqkenv.IsCommunityEdition
-	zqkenv.IsCommunityEdition = true
-	t.Cleanup(func() { zqkenv.IsCommunityEdition = prev })
-
-	cmd := NewQuickstartCmd()
-	var buf bytes.Buffer
-	cmd.SetContext(pkgctx.WithCommandOutputWriter(pkgctx.NewSystemContext(), &buf))
-	cmd.SetArgs([]string{"--format", "json"})
-	if err := cmd.Execute(); err != nil {
-		t.Fatalf("quickstart command failed: %v", err)
-	}
-	out := buf.String()
-	if strings.Contains(out, "zqk-mcp") {
-		t.Errorf("community quickstart must not advertise standalone zqk-mcp, got: %s", out)
-	}
-	if !strings.Contains(out, "mcp install") && !strings.Contains(out, "cursor-adapter") {
-		t.Errorf("expected community quickstart to mention mcp install or cursor-adapter, got: %s", out)
-	}
-	if strings.Contains(out, "--with-onboarding-roadmap") {
-		t.Errorf("community SKU has no scheduler; quickstart must not lead with --with-onboarding-roadmap: %s", out)
 	}
 }
 
@@ -79,11 +54,11 @@ func TestQuickstartDocumentationCompleteness(t *testing.T) {
 	}
 
 	text := string(content)
-	if !strings.Contains(text, "quickstart") {
-		t.Errorf("QUICKSTART.md missing 'quickstart' command")
+	if !strings.Contains(text, "zqk quickstart") {
+		t.Errorf("QUICKSTART.md missing 'zqk quickstart' command")
 	}
-	if !strings.Contains(text, "mcp install") {
-		t.Errorf("QUICKSTART.md missing 'mcp install' automated setup command")
+	if !strings.Contains(text, "zqk mcp install") {
+		t.Errorf("QUICKSTART.md missing 'zqk mcp install' automated setup command")
 	}
 	if !strings.Contains(text, "cursor-adapter") {
 		t.Errorf("QUICKSTART.md missing 'cursor-adapter' manual config reference")
@@ -101,23 +76,14 @@ func TestQuickstartDocumentationCompleteness(t *testing.T) {
 		t.Fatalf("failed to read %s: %v", communityPath, err)
 	}
 	commText := string(communityContent)
-	if !strings.Contains(commText, "quickstart") {
-		t.Errorf("COMMUNITY_FIRST_RUN.md missing 'quickstart' reference")
+	if !strings.Contains(commText, "zqk quickstart") {
+		t.Errorf("COMMUNITY_FIRST_RUN.md missing 'zqk quickstart' reference")
 	}
-	if !strings.Contains(commText, "mcp install") {
-		t.Errorf("COMMUNITY_FIRST_RUN.md missing 'mcp install' reference")
+	if !strings.Contains(commText, "zqk mcp install") {
+		t.Errorf("COMMUNITY_FIRST_RUN.md missing 'zqk mcp install' reference")
 	}
 	if !strings.Contains(commText, "QUICKSTART.md") {
 		t.Errorf("COMMUNITY_FIRST_RUN.md missing link to QUICKSTART.md")
-	}
-	if strings.Contains(commText, "brew install zqk") {
-		t.Errorf("COMMUNITY_FIRST_RUN.md must not tell pressure-test users to brew install zqk")
-	}
-	if strings.Contains(commText, "zqk auth login") {
-		t.Errorf("COMMUNITY_FIRST_RUN.md must not tell community users to run missing `auth login`")
-	}
-	if strings.Contains(commText, "zqk agent new") {
-		t.Errorf("COMMUNITY_FIRST_RUN.md must not tell community users to run missing `agent new`")
 	}
 }
 
@@ -134,7 +100,7 @@ func TestContributorGuideAndTemplateCompleteness(t *testing.T) {
 	contribPath := filepath.Join(cwd, "CONTRIBUTING.md")
 	content, err := fileutil.ReadFile(contribPath)
 	if err != nil {
-		t.Skip("CONTRIBUTING.md is studio-pack; not in the community tree")
+		t.Fatalf("failed to read %s: %v", contribPath, err)
 	}
 	text := string(content)
 
@@ -197,7 +163,7 @@ func TestContributorGuide_IssueTemplates(t *testing.T) {
 		path := filepath.Join(cwd, ".github", "ISSUE_TEMPLATE", tmpl.filename)
 		content, err := fileutil.ReadFile(path)
 		if err != nil {
-			t.Skipf("GitHub issue templates are studio-pack; missing %s", path)
+			t.Fatalf("failed to read template %s: %v", path, err)
 		}
 		text := string(content)
 		for _, req := range tmpl.required {

@@ -86,7 +86,10 @@ for path in "${OVERLAY_PATHS[@]}"; do
   # Makefile.community as dest/Makefile after this loop.
   # TRACK: TDE-1789681135032251000-e52ad7a7
   case "$path" in
-    Makefile) echo "skip $path (community Makefile.community is the dest SKU)"; continue ;;
+    Makefile|README.md|CONTRIBUTING.md)
+      echo "skip $path (community SKU overlay reinstalls dest-owned first-run files)"
+      continue
+      ;;
   esac
   src="$REPO_ROOT/$path"
   dst="$DEST/$path"
@@ -150,6 +153,8 @@ fi
 
 echo "✓ Community source overlay complete at $DEST"
 HERE="$(cd "$(dirname "$0")" && pwd)"
-if [ -x "$HERE/install-community-makefile.sh" ]; then
+if [ -x "$HERE/install-community-sku.sh" ]; then
+  sh "$HERE/install-community-sku.sh" "$DEST"
+elif [ -x "$HERE/install-community-makefile.sh" ]; then
   sh "$HERE/install-community-makefile.sh" "$DEST"
 fi

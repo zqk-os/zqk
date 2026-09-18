@@ -36,31 +36,20 @@ func resolveSchedulerCLIBinary(projectRoot string) string {
 	}
 
 	if projectRoot != emptyValue {
-		for _, candidate := range []string{
-			filepath.Join(projectRoot, paths.ProjectDataDir, binDirName, brand.ZqkStableName),
-			filepath.Join(projectRoot, binDirName, zqkBinaryName),
-			filepath.Join(projectRoot, zqkBinaryName),
-		} {
-			if info, err := fileutil.Stat(candidate); err == nil && !info.IsDir() {
-				return candidate
-			}
+		if path := firstExistingFile(localCLIBinaryCandidates(projectRoot)); path != emptyValue {
+			return path
 		}
 	}
 
 	// In test mode, never fall back to the running process (which is the test runner)
 	if zqkenv.IsInTest() {
-		return zqkBinaryName
+		return fallbackCLIBinaryName()
 	}
 	// Try climbing up to the module root to find the compiled binary in the repository
 	if wd, err := fileutil.Getwd(); err == nil {
 		if root, err := paths.ModuleRootFromPath(wd); err == nil {
-			for _, candidate := range []string{
-				filepath.Join(root, paths.ProjectDataDir, binDirName, brand.ZqkStableName),
-				filepath.Join(root, binDirName, zqkBinaryName),
-			} {
-				if info, err := fileutil.Stat(candidate); err == nil && !info.IsDir() {
-					return candidate
-				}
+			if path := firstExistingFile(localCLIBinaryCandidates(root)); path != emptyValue {
+				return path
 			}
 		}
 	}
@@ -72,7 +61,7 @@ func resolveSchedulerCLIBinary(projectRoot string) string {
 		return exe
 	}
 
-	return zqkBinaryName
+	return fallbackCLIBinaryName()
 }
 
 // SchedulerCLIBinaryConfigWarning returns a warning when cli.binary_path is configured
@@ -115,15 +104,8 @@ func ResolveSchedulerDaemonBinary(projectRoot string) (string, error) {
 	}
 
 	if projectRoot != emptyValue {
-		for _, candidate := range []string{
-			filepath.Join(projectRoot, paths.ProjectDataDir, binDirName, brand.ZqkStableName),
-			filepath.Join(projectRoot, binDirName, zqkSchedulerBinaryName),
-			filepath.Join(projectRoot, binDirName, zqkBinaryName),
-			filepath.Join(projectRoot, zqkBinaryName),
-		} {
-			if info, err := fileutil.Stat(candidate); err == nil && !info.IsDir() {
-				return candidate, nil
-			}
+		if path := firstExistingFile(localDaemonBinaryCandidates(projectRoot)); path != emptyValue {
+			return path, nil
 		}
 	}
 
@@ -153,17 +135,50 @@ func firstExistingDaemonBinary(root string) (string, bool) {
 	if root == emptyValue {
 		return "", false
 	}
-	for _, candidate := range []string{
+	path := firstExistingFile(localDaemonBinaryCandidates(root))
+	return path, path != emptyValue
+}
+
+func localCLIBinaryCandidates(root string) []string {
+	exe := brand.ExecutableName()
+	return []string{
+		filepath.Join(root, binDirName, communityBinaryName),
+		filepath.Join(root, communityBinaryName),
+		filepath.Join(root, paths.ProjectDataDir, binDirName, communityBinaryName),
+		filepath.Join(root, binDirName, exe),
+		filepath.Join(root, exe),
+		filepath.Join(root, paths.ProjectDataDir, binDirName, brand.ZqkStableName),
+		filepath.Join(root, binDirName, zqkBinaryName),
+		filepath.Join(root, zqkBinaryName),
+	}
+}
+
+func localDaemonBinaryCandidates(root string) []string {
+	return []string{
+		filepath.Join(root, binDirName, communityBinaryName),
+		filepath.Join(root, communityBinaryName),
+		filepath.Join(root, paths.ProjectDataDir, binDirName, communityBinaryName),
 		filepath.Join(root, paths.ProjectDataDir, binDirName, brand.ZqkStableName),
 		filepath.Join(root, binDirName, zqkSchedulerBinaryName),
 		filepath.Join(root, binDirName, zqkBinaryName),
 		filepath.Join(root, zqkBinaryName),
-	} {
+	}
+}
+
+func firstExistingFile(candidates []string) string {
+	for _, candidate := range candidates {
 		if info, err := fileutil.Stat(candidate); err == nil && !info.IsDir() {
-			return candidate, true
+			return candidate
 		}
 	}
-	return "", false
+	return emptyValue
+}
+
+func fallbackCLIBinaryName() string {
+	if name := strings.TrimSpace(brand.ExecutableName()); name != emptyValue {
+		return name
+	}
+	return zqkBinaryName
 }
 
 func isTestBinary(path string) bool {

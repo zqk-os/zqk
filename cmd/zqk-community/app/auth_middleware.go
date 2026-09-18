@@ -26,15 +26,11 @@ import (
 func AuthMiddleware(cmd *cobra.Command, projectRoot string) error {
 	// Builtins that may lack annotations. Session-optional commands walk ancestors.
 	switch cmd.Name() {
-	case "help", "version", "completion", "quickstart", "login", "logout", "auth", "grep", "zgrep":
+	case "help", "version", "completion", "quickstart", "start-here", "login", "logout", "auth", "grep", "zgrep":
 		return nil
 	}
 	if cli.SessionOptional(cmd) {
 		return nil
-	}
-
-	if zqkenv.IsCommunityEdition && !communityKernelReady(projectRoot) {
-		return communityUninitializedError(projectRoot)
 	}
 
 	ctx := cmd.Context()
@@ -76,12 +72,20 @@ func AuthMiddleware(cmd *cobra.Command, projectRoot string) error {
 	}
 
 	if apiKey == "" && credentialsToken == "" {
-		if zqkenv.IsCommunityEdition {
-			secCtx := pkgctx.NewSystemSecurityContext()
-			cmd.SetContext(pkgctx.WithSecurityContext(ctx, secCtx))
-			return nil
-		}
-		return errfmt.Errorf("unauthorized: missing token in ~/.zqk/credentials or %s", zqkenv.APIKey())
+		// Local kernel operator: no token required. Invalid tokens still fail closed below.
+		secCtx := pkgctx.NewSystemSecurityContext()
+		cmd.SetContext(pkgctx.WithSecurityContext(ctx, secCtx))
+		return nil
+	}
+
+	// Fail-closed uninitialized kernel hint: if projectRoot is empty or uninitialized,
+	// guide the user to run system init instead of failing with missing account schema.
+	exe := brand.ExecutableName()
+	if projectRoot == "" {
+		return errfmt.Errorf("kernel not initialized: run '%s system init' to initialize project kernel", exe)
+	}
+	if _, statErr := fileutil.Stat(filepath.Join(projectRoot, paths.ProjectDataDir)); statErr != nil {
+		return errfmt.Errorf("kernel not initialized: run '%s system init' to initialize project kernel", exe)
 	}
 
 	// Parse token/key, load Identity/Role schemas (account.yaml, role.yaml), and validate access
@@ -95,14 +99,11 @@ func AuthMiddleware(cmd *cobra.Command, projectRoot string) error {
 	}
 
 	if _, statErr := fileutil.Stat(accountSchemaPath); statErr != nil {
-		if zqkenv.IsCommunityEdition {
-			return communityUninitializedError(projectRoot)
-		}
-		return errfmt.Errorf("unauthorized: failed to load account schema: %v", statErr)
+		return errfmt.Errorf("kernel not initialized: run '%s system init' to initialize project kernel (failed to load account schema: %v)", exe, statErr)
 	}
 
 	if _, statErr := fileutil.Stat(roleSchemaPath); statErr != nil {
-		return errfmt.Errorf("unauthorized: failed to load role schema: %v", statErr)
+		return errfmt.Errorf("kernel not initialized: run '%s system init' to initialize project kernel (failed to load role schema: %v)", exe, statErr)
 	}
 
 	// Inject SecurityContext for the CLI processor
@@ -326,31 +327,4 @@ func firstString(vals []string) string {
 		}
 	}
 	return ""
-}
-
-func communityKernelReady(projectRoot string) bool {
-	if strings.TrimSpace(projectRoot) == "" {
-		return false
-	}
-	kernel := filepath.Join(projectRoot, paths.ProcessInternalObjectSpecsDir, "kernel", "account.yaml")
-	if _, err := fileutil.Stat(kernel); err == nil {
-		return true
-	}
-	legacy := filepath.Join(projectRoot, paths.ProcessInternalObjectSpecsDir, "account.yaml")
-	_, err := fileutil.Stat(legacy)
-	return err == nil
-}
-
-func communityUninitializedError(projectRoot string) error {
-	exe := brand.ExecutableName()
-	if strings.TrimSpace(exe) == "" {
-		exe = "zcom"
-	}
-	where := strings.TrimSpace(projectRoot)
-	if where == "" {
-		where = "this directory"
-	} else if abs, err := filepath.Abs(where); err == nil {
-		where = abs
-	}
-	return errfmt.Errorf("no knowledge kernel at %s. Run `%s system init --project-name <name>` from the project directory. Do not export %s_PROJECT_ROOT (or ZQK_PROJECT_ROOT) in your shell profile — it silently attaches commands to another checkout. Kernel data lives under .zqk/, not .zcom/", where, exe, strings.ToUpper(exe))
 }

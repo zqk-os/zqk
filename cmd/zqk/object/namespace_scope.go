@@ -9,7 +9,6 @@ import (
 	"github.com/lanceman/zqk/pkg/objects"
 	"github.com/lanceman/zqk/pkg/storage"
 	"github.com/lanceman/zqk/pkg/validation"
-	"github.com/lanceman/zqk/pkg/zqkenv"
 	"github.com/spf13/cobra"
 )
 
@@ -77,14 +76,10 @@ func applyNamespaceBoundaries(cmd *cobra.Command, filters map[string]any) Namesp
 		return scope
 	}
 
-	if zqkenv.IsCommunityEdition {
-		scope.Mode = namespaceScopeModeFederated
-		scope.IsolationActive = false
-		scope.NamespaceScope = ""
-		return scope
-	}
-
-	filters[objects.FieldKeyNamespaceID] = validation.DefaultNamespaceKernel
+	// Default inventory is federated: object list is the scoreboard. Pass --namespace to isolate.
+	scope.Mode = namespaceScopeModeFederated
+	scope.IsolationActive = false
+	scope.NamespaceScope = ""
 	return scope
 }
 

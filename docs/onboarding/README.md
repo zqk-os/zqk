@@ -7,7 +7,8 @@
 1. **[Community first-run](./COMMUNITY_FIRST_RUN.md)** — Fail-closed `agent-onboard` sequence (detect → seat → prime → smoke). Start here for strangers / open-core.
 1b. **[Edge / headless first-run](./EDGE_HEADLESS_FIRST_RUN.md)** — Vector B (appliances, DGX/Spark, local SLM hosts): `--headless`, edge signals, market probes.
 2. **[AI Agent Onboarding Guide](./AI_AGENT_ONBOARDING.md)** — Studio-dense process guide (routines, convergence, policies). **Pack**, not community default narrative.
-3. **[First-run object tutorial](./FIRST_RUN_OBJECT_TUTORIAL.md)** — `object template` → `create` → `get` → `update`.
+2a. **[Agent onboarding sequence (product)](../strategy/open-core/AGENT_ONBOARDING_SEQUENCE.md)** — Dual vector × SKUs.
+2b. **[SKU onboarding surfaces](../strategy/open-core/SKU_ONBOARDING_SURFACES.md)** — What ships per `zqk` / admin / EE / organ roles.
 3. **[Agent onboarding snapshot](./AGENT_ONBOARDING_SNAPSHOT.md)** — **Current** priority plan + active `convergence_session` pointers and commands to re-verify (refresh periodically; IDs are not magic).
 4. **[Agent onboarding summaries digest](./AGENT_ONBOARDING_SUMMARIES_DIGEST.md)** — **Compressed history** of themes and plan/CVS evolution (March–April 2026) when dated snapshots lived alongside this README.
 5. **[`archive/`](./archive/)** — Original **dated** `AGENT_ONBOARDING_SUMMARY_YYYY-MM-DD.md` files (audit trail; do not use as primary navigation).

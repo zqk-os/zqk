@@ -519,6 +519,7 @@ const (
 	zqkStableName              = "zqk-stable"
 	zqkStableBinaryNamePattern = "stable"
 	zqkBinaryName              = "zqk"
+	communityBinaryName        = "zcom"
 	zqkSchedulerBinaryName     = "zqk-scheduler"
 	zqkProjectDataDirName      = ".zqk"
 )

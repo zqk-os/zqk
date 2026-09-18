@@ -118,3 +118,51 @@ func TestResolveSchedulerDaemonBinary_prefersZqkStable(t *testing.T) {
 		t.Fatalf("got %q, want stable path %q", got, zqkStable)
 	}
 }
+
+func TestResolveSchedulerCLIBinary_prefersZcomWhenPresent(t *testing.T) {
+	root := t.TempDir()
+	zcom := filepath.Join(root, binDirName, "zcom")
+	if err := fileutil.EnsureDir(filepath.Dir(zcom)); err != nil {
+		t.Fatal(err)
+	}
+	if err := fileutil.WriteFile(zcom, []byte{0}, 0o755); err != nil {
+		t.Fatal(err)
+	}
+
+	t.Setenv(zqkenv.Bin().Name(), "")
+
+	got := resolveSchedulerCLIBinary(root)
+	if got != zcom {
+		t.Fatalf("got %q, want community binary %q", got, zcom)
+	}
+
+	// Test fallback when no root binary exists
+	emptyRoot := t.TempDir()
+	fallback := resolveSchedulerCLIBinary(emptyRoot)
+	wantFallback := fallbackCLIBinaryName()
+	if fallback != wantFallback {
+		t.Fatalf("got fallback %q, want %q", fallback, wantFallback)
+	}
+}
+
+func TestResolveSchedulerDaemonBinary_prefersZcomWhenPresent(t *testing.T) {
+	root := t.TempDir()
+	zcom := filepath.Join(root, binDirName, "zcom")
+	if err := fileutil.EnsureDir(filepath.Dir(zcom)); err != nil {
+		t.Fatal(err)
+	}
+	if err := fileutil.WriteFile(zcom, []byte{0}, 0o755); err != nil {
+		t.Fatal(err)
+	}
+
+	t.Setenv(zqkenv.SchedulerDaemonBin().Name(), "")
+	t.Setenv(zqkenv.Bin().Name(), "")
+
+	got, err := ResolveSchedulerDaemonBinary(root)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got != zcom {
+		t.Fatalf("got daemon path %q, want %q", got, zcom)
+	}
+}
