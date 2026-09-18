@@ -1,14 +1,14 @@
 category: acceptance
 created_at: "2026-09-17T19:34:36Z"
 created_by: ACC-1785920548450214012-68b850c0
-description: With cwd=~/zqk-public-candidate and ZCOM_PROJECT_ROOT set to that path, object list/get/count use this checkout, not studio.
+description: object list/count/get in this checkout resolve this kernel. Do not attach via an exported project-root override to another tree.
 id: CRIT-1789673676577796000-03fc29cf
 kind: criteria
 namespace_id: zqk:kernel
 schema_version: 2.0.0
 status: awaiting_verification
-title: Community zcom object list/count/get use this checkout, not studio
-updated_at: "2026-09-17T19:34:41Z"
+title: This checkout object list/count/get use this kernel, not studio
+updated_at: "2026-09-18T03:45:43Z"
 updated_by: ACC-1785920548450214012-68b850c0
 validation_method: automated_test
 version_context: default

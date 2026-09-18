@@ -1,6 +1,6 @@
 ---
 name: community-tpm-orchestration
-description: Technical program management, priority plans, and work claiming for community zcom.
+description: Technical program management, priority plans, and work claiming for this SKU.
 ---
 
 # Technical Program Management and Swarm Orchestration

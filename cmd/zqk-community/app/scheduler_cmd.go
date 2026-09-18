@@ -10,6 +10,7 @@ import (
 
 	"github.com/zqk-os/zqk/cmd/zqk/system"
 	"github.com/zqk-os/zqk/internal/cli"
+	"github.com/zqk-os/zqk/pkg/brand"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/logging"
@@ -42,7 +43,7 @@ func newCommunitySchedulerStartCmd() *cobra.Command {
 			logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
 			projectRoot := cli.ResolveProjectRoot(".")
 			if projectRoot == EmptyValue {
-				return errfmt.Errorf("project root not found; run from a directory with .zqk/ after zcom system init")
+				return errfmt.Errorf("project root not found; run from a directory with .zqk/ after %s system init", brand.ExecutableName())
 			}
 			running, pid, err := scheduler.IsSchedulerRunning(projectRoot)
 			if err == nil && running {
@@ -65,7 +66,7 @@ func newCommunitySchedulerStartCmd() *cobra.Command {
 func startCommunitySchedulerDetached(projectRoot string, logger logging.Logger) error {
 	exe, err := os.Executable()
 	if err != nil {
-		return errfmt.Newf("resolve zcom binary").Wrap(err)
+		return errfmt.Newf("resolve %s binary", brand.ExecutableName()).Wrap(err)
 	}
 	child := exec.Command(exe, "scheduler", "start", "--foreground")
 	child.Dir = projectRoot
@@ -79,7 +80,7 @@ func startCommunitySchedulerDetached(projectRoot string, logger logging.Logger) 
 	logging.Fluent(logger).Info("Scheduler daemon starting").
 		Int("pid", child.Process.Pid).
 		String("project_root", projectRoot).
-		String("note", "zcom scheduler status").
+		String("note", brand.ExecutableName()+" scheduler status").
 		Log()
 	_ = child.Process.Release()
 	return nil
