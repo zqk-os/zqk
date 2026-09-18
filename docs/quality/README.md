@@ -10,6 +10,11 @@ The chunks in [`vds_chunks.yaml`](./vds_chunks.yaml) verify the launch criteria
 for `BLI-1789630408733990000-0a2023fb`: kernel isolation, shipped documentation
 registration, and exclusion of archived documentation.
 
+They also provide the executable first-run acceptance surface for umbrella
+`BLI-1789681478369698000-263b989c`: the commands advertised to a new user must
+exist on the built SKU, and local pressure-test branding must not leak into the
+committed documentation.
+
 For executable test-to-criteria lineage, run:
 
 ```bash

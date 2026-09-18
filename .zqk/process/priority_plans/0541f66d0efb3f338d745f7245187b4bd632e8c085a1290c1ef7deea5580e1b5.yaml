@@ -6,9 +6,10 @@ kind: priority_plan
 namespace_id: zqk:kernel
 priority_tier: P1
 schema_version: 2.0.0
-status: grooming
+started_at: "2026-09-18T07:48:48Z"
+status: in_progress
 title: First-run SKU leftover closeout
-updated_at: "2026-09-18T03:37:54Z"
+updated_at: "2026-09-18T07:48:48Z"
 updated_by: ACC-1785920548450214012-68b850c0
 version_context: default
 workstream_refs:
