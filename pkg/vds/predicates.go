@@ -233,7 +233,6 @@ func predTests(pred string, chunk Chunk, opt EvalOptions) PredicateResult {
 	hasJob := false
 	hasLog := false
 	hasGoTest := false
-	hasShellTest := false
 	for _, r := range refs {
 		rl := strings.ToLower(r)
 		if strings.Contains(rl, "sch-") || strings.Contains(rl, "job") {
@@ -248,12 +247,6 @@ func predTests(pred string, chunk Chunk, opt EvalOptions) PredicateResult {
 		if strings.Contains(rl, "go test") || strings.Contains(rl, "ci://") {
 			hasGoTest = true
 		}
-		fields := strings.Fields(rl)
-		if len(fields) >= 2 &&
-			(fields[0] == "sh" || fields[0] == "bash") &&
-			strings.Contains(filepath.Base(fields[1]), "test") {
-			hasShellTest = true
-		}
 	}
 	switch mode {
 	case "scheduler":
@@ -266,20 +259,20 @@ func predTests(pred string, chunk Chunk, opt EvalOptions) PredicateResult {
 		}
 		return PredicateResult{Predicate: pred, OK: false, Detail: hint}
 	case "foreground":
-		if hasGoTest || hasShellTest || hasLog {
+		if hasGoTest || hasLog {
 			return PredicateResult{Predicate: pred, OK: true, Detail: "foreground/probe evidence present"}
 		}
-		return PredicateResult{Predicate: pred, OK: false, Detail: "need go test, shell test, or log evidence for foreground mode"}
+		return PredicateResult{Predicate: pred, OK: false, Detail: "need go test / log evidence for foreground mode"}
 	case "ci":
 		if hasGoTest || strings.Contains(strings.Join(refs, " "), "ci://") {
 			return PredicateResult{Predicate: pred, OK: true, Detail: "ci evidence present"}
 		}
 		return PredicateResult{Predicate: pred, OK: false, Detail: "need ci:// or CI check evidence_refs"}
 	default: // hybrid
-		if (hasJob && hasLog) || hasGoTest || hasShellTest {
+		if (hasJob && hasLog) || hasGoTest {
 			return PredicateResult{Predicate: pred, OK: true, Detail: "hybrid test evidence present"}
 		}
-		return PredicateResult{Predicate: pred, OK: false, Detail: "need scheduler job+log, go test, shell test, or ci evidence"}
+		return PredicateResult{Predicate: pred, OK: false, Detail: "need scheduler job+log or go test / ci evidence"}
 	}
 }
 

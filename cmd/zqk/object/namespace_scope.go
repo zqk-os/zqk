@@ -76,10 +76,7 @@ func applyNamespaceBoundaries(cmd *cobra.Command, filters map[string]any) Namesp
 		return scope
 	}
 
-	// Default inventory is federated: object list is the scoreboard. Pass --namespace to isolate.
-	scope.Mode = namespaceScopeModeFederated
-	scope.IsolationActive = false
-	scope.NamespaceScope = ""
+	filters[objects.FieldKeyNamespaceID] = validation.DefaultNamespaceKernel
 	return scope
 }
 

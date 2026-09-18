@@ -10,6 +10,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/specialization"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
 // SeatFunc seeds default agent seating; injected so CLI can call system.SeedDefaultAgentSeatingPack
@@ -93,8 +94,13 @@ func Run(opts Options) (*Result, error) {
 	authStatus := StageOK
 	authDetail := map[string]any{"session_ok": opts.SessionOK}
 	if !opts.SessionOK {
-		authStatus = StageOK
-		authDetail[objects.FieldKeyNote] = "Local kernel session (no token required)"
+		if zqkenv.IsCommunityEdition {
+			authStatus = StageOK
+			authDetail[objects.FieldKeyNote] = "Community edition local session active"
+		} else {
+			authStatus = StageWarn
+			authDetail[objects.FieldKeyNote] = "No active session observed; seating/object mutate may fail until auth login"
+		}
 	}
 	res.Stages[StageAuth] = StageResult{Status: authStatus, Detail: authDetail}
 

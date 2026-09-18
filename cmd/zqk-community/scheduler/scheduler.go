@@ -1,5 +1,5 @@
-// Package scheduler is the dest-owned start/stop/status surface.
-// Studio cmd/zqk/scheduler is MUST_NOT on this SKU.
+// Package scheduler is the community-only start/stop/status surface.
+// Studio cmd/zqk/scheduler retains the full scheduler command tree.
 // TRACK: TDE-1789699310016987000-5703b344
 package scheduler
 
@@ -13,8 +13,8 @@ import (
 
 	"github.com/zqk-os/zqk/cmd/zqk/system"
 	"github.com/zqk-os/zqk/internal/cli"
-	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/execwrap"
 	"github.com/zqk-os/zqk/pkg/logging"
@@ -24,7 +24,7 @@ import (
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
-// NewSchedulerCmd returns start/stop/status for this SKU.
+// NewSchedulerCmd returns start/stop/status for the community binary.
 func NewSchedulerCmd() *cobra.Command {
 	cmd := bldr_cli_cmd_v1.NewSchedulerCommandBuilder()
 	cli.RequireSession(cmd, false)
@@ -37,6 +37,7 @@ func NewSchedulerCmd() *cobra.Command {
 func newStartCmd() *cobra.Command {
 	cmd := bldr_cli_cmd_v1.NewSchedulerStartCommandBuilder()
 	cli.RequireSchedulerCheck(cmd, false)
+	// TRACK: TDE-1789699310016987000-5703b344 — remove when scheduler start flags live in command DNA.
 	cmd.Flags().Bool("background", true, "Run in background and return immediately (default)")
 	cmd.Flags().Bool("foreground", false, "Run in foreground (attach to terminal)")
 	cmd.RunE = runStart
@@ -139,9 +140,9 @@ func runStatus(cmd *cobra.Command, _ []string) error {
 		status = "running"
 	}
 	payload := map[string]any{
-		"status":       status,
-		"pid":          pid,
-		"project_root": root,
+		objects.FieldKeyStatus: status,
+		"pid":                  pid,
+		"project_root":         root,
 	}
 	return cli.FormatOutput(cmd, payload)
 }

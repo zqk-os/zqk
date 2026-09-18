@@ -137,6 +137,11 @@ const (
 	// under a plan that is itself executing. Bound to a row in refStatusRules, and matched as a
 	// substring so the lifecycle's "(execution-facing)" suffix still resolves to it.
 	PrecondPriorityPlanRefExecutionFacing = "priority_plan_ref target must be in active or in_progress status"
+	// PrecondPriorityPlanArchivedWhenSet gates backlog_item transitions to archived:
+	// when priority_plan_ref is set, the referenced priority_plan must be archived.
+	// Vacuous true when priority_plan_ref is unset.
+	// TRACK: BLI-COMMUNITY-ORG-SCOPE-001 / PRI-COMMUNITY-TDE-HARDENING-001
+	PrecondPriorityPlanArchivedWhenSet = "linked priority_plan is archived when priority_plan_ref is set"
 	// PrecondReadyBacklogReferencesPlan is child-owned priority_plan membership:
 	// ≥1 backlog_item with priority_plan_ref=this plan and status planned (conversational "ready").
 	// TRACK: [REDACTED-ID] — naming may rename planned→ready later.

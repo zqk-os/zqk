@@ -91,8 +91,8 @@ err := concurrency.RunInLockWithLogger(&buf.mu, "audit_buffer_flush_copy", loggi
 
 ```go
 import (
-    "github.com/zqk-os/zqk/pkg/concurrency"
-    "github.com/zqk-os/zqk/pkg/logging"
+    "github.com/lanceman/zqk/pkg/concurrency"
+    "github.com/lanceman/zqk/pkg/logging"
 )
 
 // Standard pattern: context + logger (no metrics boilerplate)
@@ -134,7 +134,7 @@ err := concurrency.WithRLockCtxLogger(
 **For packages that cannot import `pkg/logging`** (e.g., `pkg/context`, `pkg/logging` itself) - use `WithLockCtx` / `WithRLockCtx`:
 
 ```go
-import "github.com/zqk-os/zqk/pkg/concurrency"
+import "github.com/lanceman/zqk/pkg/concurrency"
 
 // No logger to avoid import cycles
 err := concurrency.WithLockCtx(
@@ -193,8 +193,8 @@ type OperationCallback interface {
 **Usage**:
 ```go
 import (
-    "github.com/zqk-os/zqk/pkg/concurrency"
-    "github.com/zqk-os/zqk/pkg/coordination"
+    "github.com/lanceman/zqk/pkg/concurrency"
+    "github.com/lanceman/zqk/pkg/coordination"
 )
 
 // Create callback (coordinator-integrated)
@@ -225,7 +225,7 @@ callback.OnComplete(operationID, result, duration)
 **Solution**: Use `WaitUnderGoroutineCeiling` at "gate" points (e.g. before submitting to the triggered-job pool, or before acquiring a list slot). When `runtime.NumGoroutine()` is already at or above the ceiling (default 2000), the call blocks until the count drops or the context is cancelled. This prevents adding more work when the process is already overloaded.
 
 ```go
-import "github.com/zqk-os/zqk/pkg/concurrency"
+import "github.com/lanceman/zqk/pkg/concurrency"
 
 // Before submitting work that would add goroutines
 if err := concurrency.WaitUnderGoroutineCeiling(ctx, concurrency.DefaultGoroutineCeiling, 200*time.Millisecond); err != nil {
@@ -247,7 +247,7 @@ if err := concurrency.WaitUnderGoroutineCeiling(ctx, concurrency.DefaultGoroutin
 **Solution**: CPU-aware defaults with global configuration.
 
 ```go
-import "github.com/zqk-os/zqk/pkg/concurrency"
+import "github.com/lanceman/zqk/pkg/concurrency"
 
 // Get smart defaults (CPU-aware)
 cfg := concurrency.GetGlobalConcurrencyConfig()
@@ -312,7 +312,7 @@ Implemented by `pkg/validation/ValidationMetrics` for validation operations.
 For tests that don't need coordinator/storage dependencies:
 
 ```go
-import "github.com/zqk-os/zqk/pkg/concurrency"
+import "github.com/lanceman/zqk/pkg/concurrency"
 
 recorder := concurrency.NewRecordingOperationCallback()
 

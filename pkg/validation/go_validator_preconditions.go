@@ -1,8 +1,9 @@
 package validation
 
 import (
-	"os"
 	"strings"
+
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
 // evalPrecondDecideTable is the DECIDE first-match walk. Unrecognized strings
@@ -15,7 +16,7 @@ func (gv *GoValidator) evalPrecondDecideTable(normalized string, obj map[string]
 			return rule.name, true, ruleMet
 		}
 	}
-	if os.Getenv("ZQK_PRECONDITIONS_FAIL_OPEN") == "1" {
+	if zqkenv.PreconditionsFailOpen().Get() == "1" {
 		return "", false, true
 	}
 	return "", false, false

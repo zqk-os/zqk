@@ -7,23 +7,32 @@ if [ -z "$ROOT" ]; then
 fi
 ROOT=$(CDPATH= cd -- "$ROOT" && pwd)
 TMP_DEST=$(mktemp -d "${TMPDIR:-/tmp}/zqk-community-sku.XXXXXX")
-trap 'rm -rf "$TMP_DEST"' EXIT HUP INT TERM
+EXPECTED_LICENSE=$(mktemp "${TMPDIR:-/tmp}/zqk-community-license.XXXXXX")
+trap 'rm -rf "$TMP_DEST"; rm -f "$EXPECTED_LICENSE"' EXIT HUP INT TERM
 
 sh -n "$ROOT/scripts/open-core/apply-community-source.sh"
 sh -n "$ROOT/scripts/open-core/sync-public-candidate.sh"
 sh -n "$ROOT/scripts/open-core/install-community-sku.sh"
 
+awk '
+	/^--------------------------------------------------------------------------------$/ { found_separator=1; exit }
+	{ lines[NR]=$0 }
+	END {
+		last=NR-found_separator
+		while (last > 0 && lines[last] == "") last--
+		for (i=1; i<=last; i++) print lines[i]
+	}
+' "$ROOT/LICENSE" >"$EXPECTED_LICENSE"
 sh "$ROOT/scripts/open-core/install-community-sku.sh" "$TMP_DEST" >/dev/null
 
-cmp "$ROOT/LICENSE" "$TMP_DEST/LICENSE"
-cmp "$ROOT/NOTICE" "$ROOT/scripts/open-core/sku-overlay/NOTICE"
+cmp "$EXPECTED_LICENSE" "$TMP_DEST/LICENSE"
 cmp "$ROOT/scripts/open-core/sku-overlay/NOTICE" "$TMP_DEST/NOTICE"
-cmp "$ROOT/SECURITY.md" "$ROOT/scripts/open-core/sku-overlay/SECURITY.md"
 cmp "$ROOT/scripts/open-core/sku-overlay/SECURITY.md" "$TMP_DEST/SECURITY.md"
-cmp "$ROOT/.github/workflows/ci.yml" "$ROOT/scripts/open-core/sku-overlay/CI.yml"
 cmp "$ROOT/scripts/open-core/sku-overlay/CI.yml" "$TMP_DEST/.github/workflows/ci.yml"
-cmp "$ROOT/README.md" "$ROOT/scripts/open-core/sku-overlay/README.md"
+cmp "$ROOT/scripts/open-core/sku-overlay/config/zqk.yaml" "$TMP_DEST/config/zqk.yaml"
 cmp "$ROOT/scripts/open-core/sku-overlay/README.md" "$TMP_DEST/README.md"
+cmp "$ROOT/scripts/open-core/sku-overlay/DOCS_INDEX.md" "$TMP_DEST/docs/INDEX.md"
+cmp "$ROOT/scripts/open-core/sku-overlay/COMMUNITY_FIRST_RUN.md" "$TMP_DEST/docs/onboarding/COMMUNITY_FIRST_RUN.md"
 
 for path in \
 	scripts/open-core/apply-community-source.sh \

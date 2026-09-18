@@ -236,23 +236,28 @@ func runInit(_ *cobra.Command, projectName, template string, force bool, snapsho
 		}
 	}
 
+	// Ensure maintenance retention jobs on init (TDE-1789692371040218000-2330de1d)
 	if !withMaintenanceJobs {
 		if _, err := EnsureRetentionJobsInProject(projectRoot, logger, nil); err != nil {
 			logging.Fluent(logger).Warn("Failed to ensure maintenance jobs on init").WithError(err).Log()
 		}
 	}
 
+	// Inject Agent Boot Protocol rules for frictionless onboarding
 	if err := injectAgentBootProtocol(projectRoot, legacy, logger); err != nil {
 		logging.Fluent(logger).Warn("Failed to inject agent boot protocol").WithError(err).Log()
 	}
+
+	// Generate the human-facing Getting Started guide
 	if err := generateGettingStartedGuide(projectRoot, logger); err != nil {
-		logging.Fluent(logger).Warn("Failed to generate getting-started guide").WithError(err).Log()
+		logging.Fluent(logger).Warn("Failed to generate ZQK_GETTING_STARTED.md").WithError(err).Log()
 	}
 
-	exe := brand.ExecutableName()
-	logging.Fluent(logger).Info("Initialization complete").
+	welcomeMsg := fmt.Sprintf("Welcome to %s; initialization complete", brand.ProductName())
+	tutorialNote := fmt.Sprintf("Run '%s system start-here' for the interactive onboarding tutorial", brand.ExecutableName())
+	logging.Fluent(logger).Info(welcomeMsg).
 		String(initLogFieldProject, projectRoot).
-		String(initLogFieldNote, "Run '"+exe+" system start-here'. Background loops: '"+exe+" scheduler start'.").
+		String(initLogFieldNote, tutorialNote).
 		Log()
 
 	return nil
@@ -336,9 +341,9 @@ func runGreenfieldInit(projectRoot, projectName, template string, force bool, lo
 		logging.Fluent(logger).Warn("Failed to create MCP config file").WithError(err).Log()
 	}
 
-	// Create config/zqk.yaml (committed defaults; local overrides in config/zqk-local.yaml)
+	// Create zqk-settings.yaml in project root and config dir
 	if err := writeBrandSettings(projectRoot, force); err != nil {
-		logging.Fluent(logger).Warn("Failed to write config/zqk.yaml").WithError(err).Log()
+		logging.Fluent(logger).Warn("Failed to write brand settings").WithError(err).Log()
 	}
 
 	// Write root isolation and kernel config files
@@ -494,9 +499,9 @@ func runLegacyInit(projectRoot, projectName, template string, force bool, logger
 		logging.Fluent(logger).Warn("Failed to create system account").WithError(err).Log()
 	}
 
-	// Create config/zqk.yaml (committed defaults; local overrides in config/zqk-local.yaml)
+	// Create zqk-settings.yaml in project root and config dir
 	if err := writeBrandSettings(projectRoot, force); err != nil {
-		logging.Fluent(logger).Warn("Failed to write config/zqk.yaml").WithError(err).Log()
+		logging.Fluent(logger).Warn("Failed to write brand settings").WithError(err).Log()
 	}
 
 	// Write root isolation and kernel config files
@@ -1163,24 +1168,41 @@ objects:
 	return nil
 }
 
-func agentBootProtocolText() string {
-	exe := brand.ExecutableName()
-	prod := brand.ProductName()
-	return fmt.Sprintf(`
-# %s agent boot
-You are connected to the %s knowledge kernel.
+const agentBootProtocolTemplate = `
+# ZQK Agent Boot Protocol (Injected by ZQK Community Edition)
+You are connected to the ZQK Knowledge Kernel via MCP.
 
-First commands:
-- %s workflow whats-next --format json
-- %s object list
-- %s system start-here
-- %s mcp install
+**The ZQK Philosophy (The Zen Way):**
+Standard AI agents rely on unstructured markdown files (like this one) for context. This is brittle, untraceable, and fails at scale.
+ZQK replaces unstructured markdown with rigid, semantic **Objects** (Goals, Requirements, Tasks, etc.) stored in a local graph.
+Why? Because Objects have strict lifecycles, assignable owners, and determinable states. They provide the traceability and governance that enterprise teams require. This file is only used to bootstrap your connection—from this point on, all project state must live in the ZQK Object Graph.
 
-Process data under .zqk/process/ only through the CLI (object create / update / promote).
-Do not export ZQK_PROJECT_ROOT in your shell profile.
-Status transitions use promote, not a raw status-field update.
-`, prod, prod, exe, exe, exe, exe)
-}
+**Your First Task (Workspace Analysis):**
+Look at the current repository.
+- If this is an **existing codebase (brownfield)**: Before you try to generate new ZQK objects or suggest massive architectural changes, run a lay-of-the-land repository analysis. Ask the user probing and clarifying questions to understand their current stack, so we don't interfere with their existing work.
+- If this is a **brand new project (greenfield)**: Proactively interview the user about their vision and ideation. Do not wait for them to orchestrate you. Ask them what they want to build, then synthesize their response into a ZQK 'Goal' object and subsequent 'Requirement' objects in the graph.
+
+**Core Directives & Permissions:**
+- Use 'zqk_object_create' to define new architecture components and requirements.
+- **CRITICAL:** Do NOT use 'zqk_object_update' for status transitions (e.g., moving a task from "pending" to "in_progress"). You MUST use the 'zqk_object_promote' tool to correctly execute lifecycle state transitions.
+- If you encounter an environment issue or permissions error, DO NOT attempt to blindly mutate the user's system to fix it. Stop, explain the exact privilege you need, and ask the user for permission.
+- Always maintain transparency about which files you are modifying and why they correspond to the active ZQK Goal.
+
+**Cryptographic Accountability & Policies (The No-Hallucination Devastation Guarantee):**
+ZQK enforces strict architectural determinism. As an AI agent, you may occasionally hallucinate or make incorrect assumptions—but ZQK will not allow those errors to corrupt the project.
+1. **Cryptographic Verification:** Every object in the graph is cryptographically hashed. You cannot "gundeck" or shortcut traceability. If you attempt to fake a status transition or link code to a non-existent requirement, the ZQK engine will reject the operation and log an error holding you accountable.
+2. **Policy Adherence:** Always check existing project policies using the MCP tools. If your proposed code violates an active ZQK Policy, the core engine will block your action. You must operate within the bounds of the established knowledge kernel.
+
+**Continuous Autonomous Loop Discipline (Anti-Idleness Protocol):**
+- **Summary-as-Terminal Failure Mode Prohibition:** In the autonomous CAP loop, merging a PR, promoting binaries, or rendering an artifact summary is a MILESTONE TRANSITION, NOT a stopping condition.
+- **NEVER yield control or go idle at summary milestones.** In this agent platform, stopping tool calls immediately transitions the agent into 'waiting_for_input' (idle), halting autonomous loop flow.
+- **Strict Post-Merge Self-Continuation Protocol:**
+  1. Merge PR & promote stable binary ('./scripts/install-zqk-stable.sh --build --force && ./scripts/recycle-stable-daemons.sh').
+  2. Query './bin/zqk workflow whats-next'.
+  3. Immediately create/checkout the next integration branch ('git checkout -b integration/<pri-id> origin/main').
+  4. Claim or shape the first BLI ('zqk agent claim-work ...' or kernel object creation).
+  5. Continue the execution chain without yielding control to an idle wait state.
+`
 
 func injectAgentBootProtocol(projectRoot string, isLegacy bool, logger logging.Logger) error {
 	ruleFiles := []string{".iderules", ".clinerules", ".windsurfrules"}
@@ -1192,7 +1214,7 @@ func injectAgentBootProtocol(projectRoot string, isLegacy bool, logger logging.L
 			continue
 		}
 
-		if _, err := f.WriteString(agentBootProtocolText()); err != nil {
+		if _, err := f.WriteString("\n" + agentBootProtocolTemplate); err != nil {
 			_ = f.Close()
 			return err
 		}
@@ -1211,21 +1233,37 @@ func generateGettingStartedGuide(projectRoot string, logger logging.Logger) erro
 	exe := brand.ExecutableName()
 	prod := brand.ProductName()
 
-	template := fmt.Sprintf(`# Welcome to %s
+	template := fmt.Sprintf(`# Welcome to %s (The Zen Way)
 
-Initialized. Next steps:
+You have successfully initialized %s Community Edition. This is not just another project management tool—it is a **Knowledge Kernel** designed to safely orchestrate AI agents.
 
-1. `+"`"+`%s system agent-onboard --format json`+"`"+`
-2. `+"`"+`%s system start-here`+"`"+`
-3. `+"`"+`%s mcp install`+"`"+`
-4. `+"`"+`%s object list`+"`"+`
-5. `+"`"+`%s workflow whats-next --format json`+"`"+`
+## The Zen Way: Objects over Markdown
+Most AI setups rely on chaotic markdown files (e.g., '.iderules' or 'prompt.txt'). Markdown is brittle and untraceable.
+%s uses **Objects**. Every goal, requirement, task, and policy in this project is a rigid, cryptographically-hashed object stored in the local '.csnap' graph. When an AI agent connects via MCP, it reads these objects directly. It cannot hallucinate requirements, because the core engine will reject any code that doesn't map to a valid object.
 
-Kernel data stays under `+"`.zqk/`"+`. Process YAML goes through the CLI, not a text editor.
-Do not export ZQK_PROJECT_ROOT in your shell profile.
+## Policies & The Validation DSL
+How do you stop an AI agent from going rogue? **Policies.**
 
-`+"`"+`%s --help`+"`"+` lists commands. If this checkout ships onboarding docs, start at docs/onboarding/COMMUNITY_FIRST_RUN.md.
-`, prod, exe, exe, exe, exe, exe, exe)
+A Policy is a programmable contract. When an agent attempts to mutate the system (e.g., merging code or promoting a task status), %s intercepts the action and evaluates it against your Policies using the **Validation DSL**.
+
+Example of a Validation DSL rule inside a Policy object:
+`+"```yaml"+`
+validation_rules:
+  - rule: "requires access:confidential"
+    enforcement: "block"
+    message: "Agents cannot touch this subsystem without explicit clearance."
+`+"```"+`
+
+If the agent doesn't have the required clearance, %s's core engine throws a cryptographic validation error and blocks the transaction. **No hallucinations, no devastation.**
+
+## Your First Steps
+1. **Interactive Tutorial:** Run `+"`"+`%s system start-here`+"`"+` to complete the interactive onboarding tutorial and understand the operational philosophy.
+2. **Connect your IDE:** Run `+"`"+`%s mcp serve`+"`"+` and point your AI assistant (IDE, Claude) to it.
+3. **Set the Goal:** Run `+"`"+`%s object create goal --field title="Build an awesome app"`+"`"+`
+4. **Let the Agent Work:** Just tell your AI to "Start working on the goal." It will read the graph, break the goal into requirements, and execute them under the strict governance of your policies.
+
+*For more CLI tools, type `+"`"+`%s --help`+"`"+`.*
+`, prod, prod, prod, prod, prod, exe, exe, exe, exe)
 
 	return fileutil.WriteSecureFile(path, []byte(template))
 }

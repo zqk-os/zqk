@@ -108,7 +108,7 @@ type ValidationStateCache struct {
 // NewValidationStateCache creates a new validation state cache
 func NewValidationStateCache(projectRoot string, maxAge time.Duration) *ValidationStateCache {
 	// Prefer brand-settings path alias ("cache") when the path cache is built, so cache location
-	// is driven by config/zqk.yaml. Fallback keeps the legacy .zqk/cache/validation_cache.json.
+	// is driven by zqk-settings.yaml. Fallback keeps the legacy .zqk/cache/validation_cache.json.
 	cacheDir := paths.ResolvePathFromCacheOrConstant(projectRoot, PathAliasCache, filepath.Join(paths.ProjectDataDir, paths.CacheDir))
 	cacheFile := filepath.Join(cacheDir, paths.ValidationCacheFile)
 	return &ValidationStateCache{

@@ -67,12 +67,12 @@ OVERLAY_PATHS=(
   "scripts/default_agent_skills"
   ".zqk/specs"
   ".zqk/cli/specs"
+  ".zqk/cli/command_spec_coverage_baseline.community.json"
   ".gitignore"
   "NOTICE"
   "go.mod"
   "go.sum"
   "LICENSE"
-  "README.md"
 )
 
 # Safety check: Guard .zqk/process and .env before copying
@@ -81,9 +81,7 @@ if [ -d "$DEST/.zqk/process" ]; then
 fi
 
 for path in "${OVERLAY_PATHS[@]}"; do
-  # Studio Makefile must never land on dest. Community SKU installs
-  # Makefile.community as dest/Makefile after this loop.
-  # TRACK: TDE-1789681135032251000-e52ad7a7
+  # Studio first-run copy must never replace the community-owned release files.
   case "$path" in
     Makefile|README.md|CONTRIBUTING.md)
       echo "skip $path (community SKU overlay reinstalls dest-owned first-run files)"
@@ -104,6 +102,8 @@ for path in "${OVERLAY_PATHS[@]}"; do
   fi
 done
 
+sh "$DEST/scripts/open-core/rewrite-community-module-path.sh" "$DEST"
+
 # Prune archived and launch doc trees per open-core governance
 rm -rf "$DEST/docs/launch"
 if [ -d "$DEST/docs" ]; then
@@ -113,6 +113,14 @@ fi
 # Prune excluded subpackages and builders per police-community-tree.sh
 rm -rf "$DEST/pkg/mesh"
 rm -rf "$DEST/pkg/agent"
+rm -f "$DEST/cmd/zqk-community/app/join.go"
+rm -f "$DEST/pkg/brand/apply.go" \
+      "$DEST/pkg/brand/apply_test.go" \
+      "$DEST/pkg/brand/project_config.go" \
+      "$DEST/pkg/brand/project_config_test.go"
+# TRACK: TDE-1789712164445942000-2f9cf61a — include Helm tests only after
+# the community distribution has a dest-owned design and public chart assets.
+rm -f "$DEST/pkg/community/container_helm_test.go"
 
 if [ -d "$DEST/pkg/cli" ]; then
   find "$DEST/pkg/cli" \( \
@@ -148,15 +156,20 @@ fi
 # Clean overly broad patterns from community .gitignore
 if [ -f "$DEST/.gitignore" ]; then
   grep -Ev '^\*-\*\.txt$|^\*test\*\.txt$|^\*_results\.txt$' "$DEST/.gitignore" > "$DEST/.gitignore.tmp" && mv "$DEST/.gitignore.tmp" "$DEST/.gitignore"
+  grep -Fqx '.zcom/' "$DEST/.gitignore" || printf '%s\n' '.zcom/' >> "$DEST/.gitignore"
+  grep -Fqx 'config/zqk-local.yaml' "$DEST/.gitignore" || printf '%s\n' 'config/zqk-local.yaml' >> "$DEST/.gitignore"
 fi
 
-HERE="$(cd "$(dirname "$0")" && pwd)"
-if [ -x "$HERE/prune-community-onboarding.sh" ]; then
-  sh "$HERE/prune-community-onboarding.sh" "$DEST"
+# Prune studio-internal onboarding files and docs noise
+if [ -x "$REPO_ROOT/scripts/open-core/prune-community-onboarding.sh" ]; then
+  "$REPO_ROOT/scripts/open-core/prune-community-onboarding.sh" "$DEST"
 fi
-if [ -x "$HERE/install-community-sku.sh" ]; then
-  sh "$HERE/install-community-sku.sh" "$DEST"
-elif [ -x "$HERE/install-community-makefile.sh" ]; then
-  sh "$HERE/install-community-makefile.sh" "$DEST"
+
+# Always install community SKU overlay (Makefile, README, first-run docs)
+if [ -x "$REPO_ROOT/scripts/open-core/install-community-sku.sh" ]; then
+  "$REPO_ROOT/scripts/open-core/install-community-sku.sh" "$DEST"
+else
+  "$REPO_ROOT/scripts/open-core/install-community-makefile.sh" "$DEST"
 fi
+
 echo "✓ Community source overlay complete at $DEST"

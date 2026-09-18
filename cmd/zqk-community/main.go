@@ -30,6 +30,10 @@ func init() {
 			_ = zqkenv.GoDebug().Set(godebug + ",netdns=go")
 		}
 	}
+
+	// Community edition: frictionless local kernel. Auth middleware seats the
+	// system account when no token is present — not ACC-TEST-HARNESS.
+	zqkenv.IsCommunityEdition = true
 }
 
 // main is the entry point for the primary zqk CLI binary.

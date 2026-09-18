@@ -31,7 +31,7 @@ const defaultHeartbeatInterval = 500 * time.Millisecond
 
 // BuildPathAliasMapForProject returns the full alias map for projectRoot.
 // Starts from [paths.DefaultPathAliases] (including datacell_* and operational roots), then merges
-// config/zqk.yaml paths.aliases on top so partial overrides do not drop defaults.
+// brand settings (zqk-settings.yaml) paths.aliases on top so partial overrides do not drop defaults.
 // Stream segment aliases (streams/<kind>) are always added using the "streams" base from the merged map.
 func BuildPathAliasMapForProject(projectRoot string) map[string]string {
 	if projectRoot == emptyValue {

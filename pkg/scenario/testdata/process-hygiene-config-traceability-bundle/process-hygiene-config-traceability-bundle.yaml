@@ -96,14 +96,14 @@ objects:
       requirement_refs: [REQ-PHC-001]
       criteria_refs: [CRIT-PHC-002, CRIT-PHC-003, CRIT-PHC-004]
       test_functions:
-        - github.com/zqk-os/zqk/pkg/processhygiene.TestLoadEmbeddedDefaultRules
-        - github.com/zqk-os/zqk/pkg/processhygiene.TestScanObjects
-        - github.com/zqk-os/zqk/pkg/processhygiene.TestCountByRule
-        - github.com/zqk-os/zqk/pkg/processhygiene.TestCompileRuleInvalid
-        - github.com/zqk-os/zqk/pkg/processhygiene.TestLoadRulesFromStorage_SkipDisabledAndSortOrder
-        - github.com/zqk-os/zqk/pkg/processhygiene.TestResolveRulesWithOptions_StorageNonEmpty
-        - github.com/zqk-os/zqk/pkg/processhygiene.TestResolveRulesWithOptions_StorageEmptyFallsBackToEmbedded
-        - github.com/zqk-os/zqk/pkg/processhygiene.TestResolveRulesWithOptions_RulesFileOverrides
+        - github.com/lanceman/zqk/pkg/processhygiene.TestLoadEmbeddedDefaultRules
+        - github.com/lanceman/zqk/pkg/processhygiene.TestScanObjects
+        - github.com/lanceman/zqk/pkg/processhygiene.TestCountByRule
+        - github.com/lanceman/zqk/pkg/processhygiene.TestCompileRuleInvalid
+        - github.com/lanceman/zqk/pkg/processhygiene.TestLoadRulesFromStorage_SkipDisabledAndSortOrder
+        - github.com/lanceman/zqk/pkg/processhygiene.TestResolveRulesWithOptions_StorageNonEmpty
+        - github.com/lanceman/zqk/pkg/processhygiene.TestResolveRulesWithOptions_StorageEmptyFallsBackToEmbedded
+        - github.com/lanceman/zqk/pkg/processhygiene.TestResolveRulesWithOptions_RulesFileOverrides
   backlog_items:
     - id_hint: BLI-PHC-001
       title: Add internal object spec and instance builders for persisted process hygiene rule rows

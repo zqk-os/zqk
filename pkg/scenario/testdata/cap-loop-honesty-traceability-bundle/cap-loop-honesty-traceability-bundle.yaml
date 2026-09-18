@@ -155,26 +155,26 @@ objects:
       requirement_refs: [REQ-CAPH-001]
       criteria_refs: [CRIT-CAPH-001, CRIT-CAPH-002, CRIT-CAPH-003]
       test_functions:
-        - github.com/zqk-os/zqk/pkg/scheduler.TestMaybeAdvanceCAPStage_UnboundCVSHolds
-        - github.com/zqk-os/zqk/pkg/scheduler.TestMaybeAdvanceCAPStage_ForgeReceiptRejected
-        - github.com/zqk-os/zqk/pkg/scheduler.TestDispatchDeliveryComplete_OpenATKInsufficient
-        - github.com/zqk-os/zqk/pkg/scheduler.TestCapCycleTamperDetected
+        - github.com/lanceman/zqk/pkg/scheduler.TestMaybeAdvanceCAPStage_UnboundCVSHolds
+        - github.com/lanceman/zqk/pkg/scheduler.TestMaybeAdvanceCAPStage_ForgeReceiptRejected
+        - github.com/lanceman/zqk/pkg/scheduler.TestDispatchDeliveryComplete_OpenATKInsufficient
+        - github.com/lanceman/zqk/pkg/scheduler.TestCapCycleTamperDetected
     - id_hint: TEST-CAPH-002
       title: Nested CVS veneer spawn link status depth and cycle tests
       status: draft
       requirement_refs: [REQ-CAPH-002]
       criteria_refs: [CRIT-CAPH-004, CRIT-CAPH-005]
       test_functions:
-        - github.com/zqk-os/zqk/pkg/convergerollup.TestNestSpawnLinkStatus
-        - github.com/zqk-os/zqk/pkg/convergerollup.TestNestRejectsDepthAndCycle
+        - github.com/lanceman/zqk/pkg/convergerollup.TestNestSpawnLinkStatus
+        - github.com/lanceman/zqk/pkg/convergerollup.TestNestRejectsDepthAndCycle
     - id_hint: TEST-CAPH-003
       title: CAP review fail-closed zero jobs blockers history-backed outcomes
       status: draft
       requirement_refs: [REQ-CAPH-003]
       criteria_refs: [CRIT-CAPH-007, CRIT-CAPH-008, CRIT-CAPH-009]
       test_functions:
-        - github.com/zqk-os/zqk/pkg/scheduler.TestVerifyCriticalPackagesHealth_ZeroJobsFails
-        - github.com/zqk-os/zqk/pkg/scheduler.TestReviewSystemCheck_PublicBlockersFail
+        - github.com/lanceman/zqk/pkg/scheduler.TestVerifyCriticalPackagesHealth_ZeroJobsFails
+        - github.com/lanceman/zqk/pkg/scheduler.TestReviewSystemCheck_PublicBlockersFail
   backlog_items:
     - id_hint: BLI-CAPH-001
       title: CAP bind parent CVS journal tamper and hardened delivery predicates

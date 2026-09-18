@@ -1,13 +1,55 @@
-# Edge / headless first-run
+# Edge / headless first-run (Vector B)
 
-**Audience:** SSH, appliances, or any host with no IDE agent.  
-**IDE path:** [`COMMUNITY_FIRST_RUN.md`](./COMMUNITY_FIRST_RUN.md).
+**Audience:** Operators on appliances, DGX/Spark-class boxes, SSH-only hosts, local SLM runtimes (Liquid-class, etc.) — **no** public IDE agent (or `--headless` forced).
+**Vector A (IDE agents):** [`COMMUNITY_FIRST_RUN.md`](./COMMUNITY_FIRST_RUN.md).
+**SKU map:** [`../strategy/open-core/SKU_ONBOARDING_SURFACES.md`](../strategy/open-core/SKU_ONBOARDING_SURFACES.md).
+**Strategy:** [`../strategy/open-core/AGENT_ONBOARDING_SEQUENCE.md`](../strategy/open-core/AGENT_ONBOARDING_SEQUENCE.md).
+
+## Goal
+
+Treat ZQK as the **control plane**: init → seat → thin `AGENTS.md` → sync report. Do **not** write IDE rule forests (`.cursorrules`, …) unless you pass `--all-vendors`. Do **not** invent organ binaries (`zqk-neuron`, …) into the community default seed until market probes close.
+
+## Sequence
 
 ```bash
-./bin/zqk system init --project-name my-project
-./bin/zqk system agent-onboard --headless --format json
-./bin/zqk object list
-./bin/zqk workflow whats-next --format json
+# After system init on the appliance / host
+zqk system agent-onboard --headless --format json
+
+# Or auto Vector B when no IDE markers are present:
+zqk system agent-onboard --format json
 ```
 
-`--headless` skips IDE rule forests. Do not `export ZQK_PROJECT_ROOT`. There is no organ binary on this SKU.
+| Stage | Vector B behavior |
+|-------|-------------------|
+| **detect** | Reports IDE markers (usually empty) + **edge_signals** (`SPECIALIZATION_TIER`, NVIDIA/DGX/SSH hints, optional `.zqk/config/headless_edge.json`) + open **market_probe** questions |
+| **seat** | Same default seating pack as community |
+| **prime_workspace** | **Only** `.agents/AGENTS.md` (unless `--all-vendors`) |
+| **prime_kernel** | `.zqk/config/agent_workspace_sync.json` |
+| **smoke** | AGENTS.md + sync report |
+
+Optional marker (operator-declared, not required):
+
+```bash
+mkdir -p .zqk/config
+echo '{"schema":"zqk_headless_edge_v1","note":"appliance control plane"}' > .zqk/config/headless_edge.json
+```
+
+Specialization (when meaningful on the node):
+
+```bash
+export ZQK_SPECIALIZATION_TIER=neuron   # or muscle|heart|lung — see pkg/specialization
+```
+
+## Market probes (open until evidence)
+
+Returned under `market_probe_open` in `agent-onboard` JSON. Canonical list also in the strategy doc. **Do not** ship organ-named community binaries until human ACK on these signals (`BLI-AGENT-ONBOARD-VEC-B-001`).
+
+## Wake / interrupt
+
+Prefer scheduler ticks and feed/`delivery_mode=notify` — not Terminal paste. See mesh wake policies when multi-agent seats exist.
+
+## After green
+
+1. `zqk workflow whats-next --format json`
+2. [`SKU_ONBOARDING_SURFACES.md`](../strategy/open-core/SKU_ONBOARDING_SURFACES.md) — which SKU you are actually running
+3. Studio process guide only if dogfooding ZQK Studio: [`AI_AGENT_ONBOARDING.md`](./AI_AGENT_ONBOARDING.md)

@@ -46,6 +46,7 @@ scripts/open-core/police-community-tree.sh
 scripts/open-core/verify-bootstrap-portable.sh
 .zqk/specs
 .zqk/cli/specs
+.zqk/cli/command_spec_coverage_baseline.community.json
 .github/workflows/ci.yml
 .gitignore
 NOTICE

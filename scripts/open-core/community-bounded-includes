@@ -49,6 +49,7 @@ scripts/open-core/Makefile.community
 scripts/open-core/install-community-makefile.sh
 .zqk/specs
 .zqk/cli/specs
+.zqk/cli/command_spec_coverage_baseline.community.json
 .github/workflows/ci.yml
 .gitignore
 NOTICE
@@ -56,6 +57,6 @@ SECURITY.md
 go.mod
 go.sum
 LICENSE
-# README.md is dest-owned first-run copy. Studio README advertises brew/zqk/scheduler.
+# README.md is community-owned first-run copy. Studio README advertises brew/zqk/scheduler.
 scripts/open-core/install-community-sku.sh
 scripts/open-core/sku-overlay

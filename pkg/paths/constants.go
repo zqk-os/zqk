@@ -7,10 +7,9 @@ import (
 )
 
 // Project data directory constants.
-// These are the default layout; the canonical source for "where are docs/zqk/cache" is
-// config/zqk.yaml / config/zqk-local.yaml (paths.aliases) and the path alias cache built from it.
-// Use paths.ResolvePathFromCacheOrConstant or paths.ResolvePath(projectRoot, "prefix:<alias>")
-// when building paths so moving folders only requires editing those config files.
+// These are the default layout; the canonical source for "where are docs/zqk/cache" is brand settings
+// (zqk-settings.yaml paths.aliases) and the path alias cache built from it. Use paths.ResolvePathFromCacheOrConstant
+// or paths.ResolvePath(projectRoot, "prefix:<alias>") when building paths so moving folders only requires editing the settings file.
 //
 // Usage when cache may be built (prefer so settings can override):
 //   paths.ResolvePathFromCacheOrConstant(projectRoot, "cache", filepath.Join(paths.ProjectDataDir, paths.CacheDir))
@@ -193,11 +192,12 @@ const (
 	// Contains one line: absolute path or path relative to workspace. See PROJECT_ROOT_USE_AND_SCHEDULER_ALIGNMENT.md.
 	CurrentRootFile = "current_root"
 
-	// BrandSettingsFilename is a leftover filename. Live settings are config/zqk.yaml
-	// and config/zqk-local.yaml. Do not write this file from init.
+	// BrandSettingsFilename is the per-project settings file (e.g. zqk-settings.yaml).
+	// Defines project_root, staleness_check_dirs, aliases, cli.default_context. Required for scheduler and orientation.
+	// See .zqk/cli/specs/schemas/brand_settings.schema.json and PATH_ALIAS_RESOLUTION.md §6.
 	BrandSettingsFilename = "zqk-settings.yaml"
 	// TestSettingsFilename is the settings file used when ZQK_TEST_ROOT is set. Tests load this file
-	// instead of config/zqk.yaml so project data is never touched. SetupTestEnvironment creates it.
+	// instead of zqk-settings.yaml so project data is never touched. SetupTestEnvironment creates it.
 	TestSettingsFilename = "test-settings.yaml"
 	// ZqkTestSettingsFilename is an alternate test-root settings file (same schema as brand_settings).
 	// Loaded when TestSettingsFilename is absent so isolated zqk-ts + ZQK_TS_TEST_ROOT projects can ship one file.

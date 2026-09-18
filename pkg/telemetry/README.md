@@ -12,7 +12,7 @@ This package provides telemetry tracking, diagnostics hooks, and daemon synchron
 ## Usage
 
 ```go
-import "github.com/zqk-os/zqk/pkg/telemetry"
+import "github.com/lanceman/zqk/pkg/telemetry"
 
 // Initialize tracker
 tracker := telemetry.NewTracker(logger)

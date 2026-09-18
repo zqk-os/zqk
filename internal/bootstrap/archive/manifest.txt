@@ -26,6 +26,8 @@
 ./cli_specs/ci/run_command.yaml
 ./cli_specs/ci/status_command.yaml
 ./cli_specs/ci_command.yaml
+./cli_specs/docman/
+./cli_specs/docman/verify_command.yaml
 ./cli_specs/feed/
 ./cli_specs/feed/ack_command.yaml
 ./cli_specs/feed/bridge_ingest_command.yaml
@@ -426,7 +428,6 @@
 ./scripts/default_agent_skills/arch_design.yaml
 ./scripts/default_agent_skills/code_craftsman.yaml
 ./scripts/default_agent_skills/feed_correspondence.yaml
-./scripts/default_agent_skills/object_steward.yaml
 ./scripts/default_agent_skills/qa_verification.yaml
 ./scripts/default_agent_skills/tpm_orchestration.yaml
 ./scripts/default_personas/

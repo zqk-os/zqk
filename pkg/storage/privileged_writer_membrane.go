@@ -31,11 +31,12 @@ func DefaultPrivilegedWriterSocketPath() string {
 	return filepath.Join("/tmp", name)
 }
 
-func privilegedWriterMembraneConfigured() bool {
-	if strings.TrimSpace(zqkenv.PrivilegedWriterSocket().Get()) != "" {
-		return true
+func privilegedWriterSocketExists() bool {
+	path := DefaultPrivilegedWriterSocketPath()
+	if v := strings.TrimSpace(zqkenv.PrivilegedWriterSocket().Get()); v != "" {
+		path = v
 	}
-	_, err := fileutil.Stat(DefaultPrivilegedWriterSocketPath())
+	_, err := fileutil.Stat(path)
 	return err == nil
 }
 
@@ -45,13 +46,8 @@ func privilegedWriterMembraneConfigured() bool {
 // TRACK: BLI-COMMS-CURSOR-TPM-DELIVER-ATTN-001 (test harness) — TestRoot auto-allow is
 // belt-and-suspenders with zqkenv.ApplyIsolatedStorageEnv; prefer explicit fallthrough flag.
 func privilegedWriterLocalWriteAllowed(projectRoots ...string) bool {
-	// We are the membrane endpoint — never Dial our own socket (self-RPC until EMFILE).
 	// TRACK: BLI-CEF-R20-SINGLE-WRITER-BLI-001
 	if zqkenv.PrivilegedWriterDaemonRole() {
-		return true
-	}
-	// No membrane in this environment: write locally. Fail-closed only when a socket is configured or live.
-	if !privilegedWriterMembraneConfigured() {
 		return true
 	}
 	if zqkenv.TestAllowCASFallthrough().Get() == "0" {
@@ -68,7 +64,14 @@ func privilegedWriterLocalWriteAllowed(projectRoots ...string) bool {
 			return true
 		}
 	}
-	return zqkenv.IsInTest()
+	if zqkenv.IsInTest() {
+		return true
+	}
+	// Socket-absent default: if PrivilegedWriter socket does not exist, write locally (open-core / standalone).
+	if !privilegedWriterSocketExists() {
+		return true
+	}
+	return false
 }
 
 func dialPrivilegedWriter() (*IPCWriter, error) {

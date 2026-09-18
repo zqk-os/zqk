@@ -5,28 +5,24 @@
 # This is the stranger/agent spine. Do not tell people to `object create goal
 # --field title=...` on an empty kernel.
 #
-# Usage:
+# Usage (community):
 #   unset ZQK_PROJECT_ROOT ZQK_TEST_ROOT
-#   sh scripts/starter_kernel_graph/seed.sh
-#   (Do not export ZQK_PROJECT_ROOT; an exported root hijacks CWD for later inits)
+#   ZCOM_PROJECT_ROOT=/path/to/project sh scripts/starter_kernel_graph/seed.sh
+#   (Do not 'export ZCOM_PROJECT_ROOT'; an exported root hijacks CWD for later inits)
 #
 # Existing originated objects of each kind are reused (idempotent).
 
 set -eu
 
-ROOT="${ZQK_PROJECT_ROOT:-$(pwd)}"
+ROOT="${ZCOM_PROJECT_ROOT:-${ZQK_PROJECT_ROOT:-$(pwd)}}"
 BIN="${ZQK_STARTER_BIN:-}"
 if [ -z "$BIN" ]; then
-  if [ -x "$ROOT/bin/zqk" ]; then
+  if [ -n "${ZCOM_PROJECT_ROOT:-}" ] && [ -x "$ROOT/bin/zcom" ]; then
+    BIN="$ROOT/bin/zcom"
+  elif [ -x "$ROOT/bin/zqk" ]; then
     BIN="$ROOT/bin/zqk"
   else
     BIN="zqk"
-    for cand in "$ROOT"/bin/*; do
-      if [ -x "$cand" ] && [ -f "$cand" ]; then
-        BIN="$cand"
-        break
-      fi
-    done
   fi
 fi
 
@@ -173,7 +169,7 @@ promote_id "$WS_ID"
 
 GOAL_ID="$(mint_json goal "Community kernel is launch-ready for strangers and agents")"
 cat > "$WORKDIR/goal.yaml" <<'EOF'
-description: "Measurable outcome: the branded CLI in this checkout lists a linked org/mission/vision/goal/workstream/priority_plan, shipped first-run docs have doc_entry rows, archive copies are gone, and identity is the system account."
+description: "Measurable outcome: zcom in this checkout lists a linked org/mission/vision/goal/workstream/priority_plan, live docs have doc_entry rows, archive copies are gone, and identity is the system account."
 EOF
 apply_file "$GOAL_ID" "$WORKDIR/goal.yaml"
 promote_id "$GOAL_ID"

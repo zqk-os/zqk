@@ -3,7 +3,6 @@
     "completion",
     "docman",
     "docman register",
-    "docman verify",
     "mcp cursor-adapter",
     "mcp daemon",
     "mcp ide-adapter",

@@ -1,5 +1,5 @@
-// Package test is the dest-owned verification surface (dashboard first).
-// Studio cmd/zqk/test is MUST_NOT on this SKU.
+// Package test is the community-only verification surface.
+// Studio cmd/zqk/test is not registered on the community binary.
 // TRACK: BLI-1789702449225534000-eca4a6bd
 package test
 
@@ -10,7 +10,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
 )
 
-// NewTestCmd returns test dashboard for this SKU.
+// NewTestCmd returns the community test dashboard.
 func NewTestCmd() *cobra.Command {
 	cmd := bldr_cli_cmd_v1.NewTestCommandBuilder()
 	cli.RequireSession(cmd, false)

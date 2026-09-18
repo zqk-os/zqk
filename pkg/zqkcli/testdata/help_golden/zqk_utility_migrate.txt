@@ -4,8 +4,8 @@ This command requires the migration binary to be installed and verified.
 The binary must be code-signed and pass integrity verification.
 
 The migration tool is a separate binary that can be installed via:
-  - go install github.com/zqk-os/zqk/cmd/zqk-migrate@latest
-  - Download from: https://github.com/zqk-os/zqk/releases
+  - go install github.com/lanceman/zqk/cmd/zqk-migrate@latest
+  - Download from: https://github.com/lanceman/zqk/releases
 
   Migrate from file to graph backend
   zqk utility migrate --source . --target memgraph

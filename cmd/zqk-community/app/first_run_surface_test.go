@@ -6,76 +6,43 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/spf13/cobra"
+
 	commsystem "github.com/zqk-os/zqk/cmd/zqk-community/system"
+	studiosystem "github.com/zqk-os/zqk/cmd/zqk/system"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
-func TestFirstRunRootHelpOmitsStudioAdminSurface(t *testing.T) {
+func TestFirstRunRootOmitsStudioAdminSurface(t *testing.T) {
 	cmd := NewRootCommand()
-	got := map[string]struct{}{}
-	for _, sub := range cmd.Commands() {
-		got[sub.Name()] = struct{}{}
-	}
+	got := commandNames(cmd)
 	for _, banned := range []string{"healthchk", "learn", "inbox", "keystore", "join", "internal", "automation"} {
 		if _, ok := got[banned]; ok {
-			t.Fatalf("first-run root still ships %q", banned)
+			t.Fatalf("community root still ships %q", banned)
 		}
 	}
 	for _, need := range []string{"object", "system", "test", "workflow", "scheduler", "mcp"} {
 		if _, ok := got[need]; !ok {
-			t.Fatalf("first-run root missing %q", need)
+			t.Fatalf("community root missing %q", need)
 		}
 	}
 }
 
-func TestFirstRunSystemOmitsSpecOrigination(t *testing.T) {
+func TestCommunitySystemFilterDoesNotChangeStudioSystem(t *testing.T) {
 	t.Parallel()
-	cmd := commsystem.NewSystemCmd()
-	for _, sub := range cmd.Commands() {
-		if sub.Name() == "spec-origination" || sub.Name() == "update-specs" || sub.Name() == "federate" {
-			t.Fatalf("open-core system still ships %q", sub.Name())
+	community := commandNames(commsystem.NewSystemCmd())
+	studio := commandNames(studiosystem.NewSystemCmd())
+	for _, name := range []string{"spec-origination", "update-specs", "federate"} {
+		if _, ok := community[name]; ok {
+			t.Fatalf("community system still ships %q", name)
+		}
+		if _, ok := studio[name]; !ok {
+			t.Fatalf("community filter removed %q from Studio system surface", name)
 		}
 	}
 }
 
-func TestShippedFirstRunDocsExist(t *testing.T) {
-	t.Parallel()
-	cwd, err := fileutil.Getwd()
-	if err != nil {
-		t.Fatal(err)
-	}
-	root := filepath.Clean(filepath.Join(cwd, "../../.."))
-	for _, rel := range []string{
-		"docs/onboarding/COMMUNITY_FIRST_RUN.md",
-		"docs/onboarding/QUICKSTART.md",
-		"docs/architecture/README.md",
-		"docs/architecture/INDEX.md",
-		"docs/INDEX.md",
-	} {
-		if _, err := os.Stat(filepath.Join(root, rel)); err != nil {
-			t.Fatalf("missing shipped first-run doc %s: %v", rel, err)
-		}
-	}
-	if _, err := os.Stat(filepath.Join(root, "docs/_archive")); !os.IsNotExist(err) {
-		t.Fatal("docs/_archive must not ship")
-	}
-
-	architecture, err := os.ReadDir(filepath.Join(root, "docs/architecture"))
-	if err != nil {
-		t.Fatal(err)
-	}
-	var markdown []string
-	for _, entry := range architecture {
-		if !entry.IsDir() && filepath.Ext(entry.Name()) == ".md" {
-			markdown = append(markdown, entry.Name())
-		}
-	}
-	if strings.Join(markdown, ",") != "INDEX.md,README.md" {
-		t.Fatalf("architecture SKU surface = %v; want pointer files only", markdown)
-	}
-}
-
-func TestPublicModulePath(t *testing.T) {
+func TestStudioModuleIdentityRemainsPrivateSourceIdentity(t *testing.T) {
 	t.Parallel()
 	cwd, err := fileutil.Getwd()
 	if err != nil {
@@ -87,96 +54,33 @@ func TestPublicModulePath(t *testing.T) {
 		t.Fatal(err)
 	}
 	if first, _, _ := strings.Cut(string(goMod), "\n"); first != "module github.com/zqk-os/zqk" {
-		t.Fatalf("go.mod module line = %q", first)
-	}
-	privateModule := strings.Join([]string{"github.com", "lanceman", "zqk"}, "/")
-
-	err = filepath.WalkDir(root, func(path string, entry os.DirEntry, walkErr error) error {
-		if walkErr != nil {
-			return walkErr
-		}
-		if entry.IsDir() {
-			switch entry.Name() {
-			case ".git", ".zqk", "vendor":
-				return filepath.SkipDir
-			}
-			return nil
-		}
-		if filepath.Ext(path) != ".go" {
-			return nil
-		}
-		data, readErr := fileutil.ReadFile(path)
-		if readErr != nil {
-			return readErr
-		}
-		if strings.Contains(string(data), privateModule) {
-			t.Errorf("leftover private module import: %s", strings.TrimPrefix(path, root+string(filepath.Separator)))
-		}
-		return nil
-	})
-	if err != nil {
-		t.Fatal(err)
+		t.Fatalf("Studio go.mod module line = %q", first)
 	}
 }
 
-func TestFirstRunTextUsesCanonicalBrandTokens(t *testing.T) {
+func TestCommunityReleaseTemplatesAreIsolatedUnderOverlay(t *testing.T) {
 	t.Parallel()
 	cwd, err := fileutil.Getwd()
 	if err != nil {
 		t.Fatal(err)
 	}
 	root := filepath.Clean(filepath.Join(cwd, "../../.."))
-	banned := []string{
-		"zcom",
-		"zqk-community",
-	}
-	for _, relRoot := range []string{
-		"docs",
-		"scripts/open-core/sku-overlay",
-		"scripts/default_agent_skills",
-		"scripts/default_policies",
+	for _, rel := range []string{
+		"scripts/open-core/sku-overlay/NOTICE",
+		"scripts/open-core/sku-overlay/SECURITY.md",
+		"scripts/open-core/sku-overlay/CI.yml",
+		"scripts/open-core/check-public-release-payload.sh",
 	} {
-		absRoot := filepath.Join(root, relRoot)
-		err := filepath.WalkDir(absRoot, func(path string, entry os.DirEntry, walkErr error) error {
-			if walkErr != nil {
-				return walkErr
-			}
-			if entry.IsDir() {
-				if path == filepath.Join(root, "docs/quality") {
-					return filepath.SkipDir
-				}
-				return nil
-			}
-			switch filepath.Ext(path) {
-			case ".md", ".yaml", ".yml":
-			default:
-				return nil
-			}
-			data, readErr := fileutil.ReadFile(path)
-			if readErr != nil {
-				return readErr
-			}
-			for _, token := range banned {
-				if strings.Contains(string(data), token) {
-					t.Errorf("leftover %q in %s", token, strings.TrimPrefix(path, root+string(filepath.Separator)))
-				}
-			}
-			return nil
-		})
-		if err != nil {
-			t.Fatal(err)
+		if _, err := os.Stat(filepath.Join(root, rel)); err != nil {
+			t.Fatalf("missing community release template %s: %v", rel, err)
 		}
 	}
+}
 
-	shipped, err := fileutil.ReadFile(filepath.Join(root, "docs/onboarding/COMMUNITY_FIRST_RUN.md"))
-	if err != nil {
-		t.Fatal(err)
+func commandNames(cmd *cobra.Command) map[string]struct{} {
+	got := map[string]struct{}{}
+	for _, sub := range cmd.Commands() {
+		got[sub.Name()] = struct{}{}
 	}
-	overlay, err := fileutil.ReadFile(filepath.Join(root, "scripts/open-core/sku-overlay/COMMUNITY_FIRST_RUN.md"))
-	if err != nil {
-		t.Fatal(err)
-	}
-	if string(shipped) != string(overlay) {
-		t.Fatal("shipped community first-run drifted from its dest overlay source")
-	}
+	return got
 }

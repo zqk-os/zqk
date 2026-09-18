@@ -87,20 +87,21 @@ func runUse(cmd *cobra.Command, args []string) error {
 		return errfmt.Newf("resolve path").Wrap(err)
 	}
 
-	// Interpret pathArg as either a config file or a directory containing config/zqk.yaml.
+	// Interpret pathArg as either a settings file or a directory containing zqk-settings.yaml.
 	settingsPath := absPath
 	info, err := fileutil.Stat(settingsPath)
 	if err != nil {
 		if fileutil.IsNotExist(err) {
-			return errfmt.Errorf("project config not found at %s (expected config/zqk.yaml or config/zqk-local.yaml)", settingsPath)
+			// If user passed a directory that does not exist, or a non-existent file path, fail with clear message.
+			return errfmt.Errorf("brand settings file not found at %s (expected %s or a directory containing it)", settingsPath, paths.BrandSettingsFilename)
 		}
 		return errfmt.Newf("stat path").Wrap(err)
 	}
 	if info.IsDir() {
-		settingsPath = clicontext.BrandSettingsPath(settingsPath)
+		settingsPath = filepath.Join(settingsPath, paths.BrandSettingsFilename)
 		if _, err := fileutil.Stat(settingsPath); err != nil {
 			if fileutil.IsNotExist(err) {
-				return errfmt.Errorf("project config not found at %s (expected config/zqk.yaml)", settingsPath)
+				return errfmt.Errorf("brand settings file not found at %s", settingsPath)
 			}
 			return errfmt.Newf("stat settings file").Wrap(err)
 		}

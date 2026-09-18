@@ -22,7 +22,7 @@ This package provides binary detection and integrity verification for the `zqk-m
 ### Basic Detection
 
 ```go
-import "github.com/zqk-os/zqk/pkg/migration/detector"
+import "github.com/lanceman/zqk/pkg/migration/detector"
 
 // Check if migration is available
 if detector.SupportsMigration() {

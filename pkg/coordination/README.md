@@ -31,7 +31,7 @@ Operation/Task/Job
 ### Basic Usage
 
 ```go
-import "github.com/zqk-os/zqk/pkg/coordination"
+import "github.com/lanceman/zqk/pkg/coordination"
 
 // Get the global coordinator
 coordinator := coordination.GetCoordinator()

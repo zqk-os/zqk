@@ -77,13 +77,13 @@ func TestWriteBrandSettings_ProjectRootExplicit(t *testing.T) {
 		t.Fatalf("writeBrandSettings failed: %v", err)
 	}
 
-	rootSettings := filepath.Join(tmpDir, paths.ConfigDir, paths.ZqkConfigFileName)
+	rootSettings := filepath.Join(tmpDir, paths.BrandSettingsFilename)
 	data, err := os.ReadFile(rootSettings)
 	if err != nil {
 		t.Fatalf("failed to read %s: %v", rootSettings, err)
 	}
 	if !strings.Contains(string(data), `project_root: "."`) {
-		t.Errorf("config/zqk.yaml should contain project_root: \".\", got: %s", string(data))
+		t.Errorf("brand settings should contain project_root: \".\", got: %s", string(data))
 	}
 }
 
@@ -145,8 +145,8 @@ func TestFirstRun_PolyglotWorkspaceErgonomics(t *testing.T) {
 	}
 
 	// Assert root isolation and account exist
-	if !fileutil.Exists(filepath.Join(tmpDir, paths.ConfigDir, paths.ZqkConfigFileName)) {
-		t.Errorf("expected config/zqk.yaml in polyglot root")
+	if !fileutil.Exists(filepath.Join(tmpDir, paths.BrandSettingsFilename)) {
+		t.Errorf("expected brand settings in polyglot root")
 	}
 	if !fileutil.Exists(filepath.Join(tmpDir, paths.ConfigDir, paths.ZqkConfigFileName)) {
 		t.Errorf("expected zqk.yaml in polyglot root config/")

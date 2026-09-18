@@ -12,12 +12,16 @@ import (
 
 func renderQuickstartGuide() string {
 	exe := brand.ExecutableName()
+	initFlag := ""
+	if exe == "zqk" {
+		initFlag = " --with-onboarding-roadmap"
+	}
 	return fmt.Sprintf(`🚀 ZQK 5-Minute Quickstart
 
 Follow these 4 simple steps to get started:
 
 1. Initialize your project kernel:
-   $ %s system init --project-name <your-project>
+   $ %s system init --project-name <your-project>%s
 
 2. Discover priority plan and next tasks:
    $ %s workflow whats-next
@@ -37,7 +41,7 @@ Follow these 4 simple steps to get started:
    $ %s system check
 
 Docs & Architecture: docs/INDEX.md
-`, exe, exe, exe, objects.FieldKeyCommand, exe, exe)
+`, exe, initFlag, exe, exe, objects.FieldKeyCommand, exe, exe)
 }
 
 // NewQuickstartCmd returns the 'zqk quickstart' command which provides a zero-friction
@@ -62,6 +66,9 @@ func NewQuickstartCmd() *cobra.Command {
 			if format == "json" {
 				exe := brand.ExecutableName()
 				initStep := fmt.Sprintf("1. Initialize: %s system init --project-name <name>", exe)
+				if exe == "zqk" {
+					initStep += " --with-onboarding-roadmap"
+				}
 				payload := map[string]any{
 					objects.FieldKeyTitle: "ZQK Quickstart Guide",
 					"steps": []string{

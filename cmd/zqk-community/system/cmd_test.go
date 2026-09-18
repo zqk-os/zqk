@@ -1,8 +1,6 @@
 package system
 
-import (
-	"testing"
-)
+import "testing"
 
 func TestFirstRunSystemCmdDropsCodegen(t *testing.T) {
 	t.Parallel()
@@ -13,12 +11,12 @@ func TestFirstRunSystemCmdDropsCodegen(t *testing.T) {
 	}
 	for _, name := range []string{"spec-origination", "update-specs", "federate", "snapshot", "align", "cli-hooks", "validate-command-specs"} {
 		if _, ok := got[name]; ok {
-			t.Fatalf("open-core system still ships %q", name)
+			t.Fatalf("community system still ships %q", name)
 		}
 	}
 	for _, name := range []string{"init", "dashboard", "check", "status", "truth-sentinel", "whoami", "validate"} {
 		if _, ok := got[name]; !ok {
-			t.Fatalf("open-core system missing first-run %q", name)
+			t.Fatalf("community system missing first-run %q", name)
 		}
 	}
 }

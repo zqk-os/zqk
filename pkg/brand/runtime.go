@@ -5,7 +5,12 @@ import (
 	"path/filepath"
 	"strings"
 	"sync/atomic"
+
+	"gopkg.in/yaml.v3"
 )
+
+// CanonicalExecutableToken is the standard upstream binary name ("zqk").
+const CanonicalExecutableToken = defaultExecutableNameValue
 
 // LegacyMCPToolPrefix is the legacy MCP tool name prefix recognized for normalization.
 // Tool names starting with this prefix are rewritten to use the current brand prefix
@@ -143,4 +148,57 @@ func ProductNamespacePrefix(prefix string) string {
 		return defaultNamespacePrefixValue
 	}
 	return stripped
+}
+
+// ProjectBrandConfig holds project-level brand overrides loaded from config files.
+type ProjectBrandConfig struct {
+	ExecutableName  string `yaml:"executable_name"`
+	ProductName     string `yaml:"product_name"`
+	NamespacePrefix string `yaml:"namespace_prefix"`
+}
+
+// LoadFromProject loads brand settings from config/zqk.yaml then config/zqk-local.yaml.
+func LoadFromProject(root string) ProjectBrandConfig {
+	cfg := ProjectBrandConfig{
+		ExecutableName:  defaultExecutableNameValue,
+		ProductName:     defaultProductNameValue,
+		NamespacePrefix: defaultNamespacePrefixValue,
+	}
+
+	loadConfigFile := func(p string) {
+		data, err := os.ReadFile(p)
+		if err != nil {
+			return
+		}
+		var parsed struct {
+			Brand struct {
+				ExecutableName  string `yaml:"executable_name"`
+				ProductName     string `yaml:"product_name"`
+				NamespacePrefix string `yaml:"namespace_prefix"`
+			} `yaml:"brand"`
+		}
+		if err := yaml.Unmarshal(data, &parsed); err == nil {
+			if parsed.Brand.ExecutableName != "" {
+				cfg.ExecutableName = parsed.Brand.ExecutableName
+			}
+			if parsed.Brand.ProductName != "" {
+				cfg.ProductName = parsed.Brand.ProductName
+			}
+			if parsed.Brand.NamespacePrefix != "" {
+				cfg.NamespacePrefix = parsed.Brand.NamespacePrefix
+			}
+		}
+	}
+
+	loadConfigFile(filepath.Join(root, "config", "zqk.yaml"))
+	loadConfigFile(filepath.Join(root, "config", "zqk-local.yaml"))
+	return cfg
+}
+
+// ApplyCanonicalExecutable substitutes the canonical executable token with the custom name.
+func ApplyCanonicalExecutable(content, exe string) string {
+	if exe == "" || exe == CanonicalExecutableToken {
+		return content
+	}
+	return strings.ReplaceAll(content, CanonicalExecutableToken, exe)
 }

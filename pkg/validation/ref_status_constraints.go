@@ -44,6 +44,8 @@ type refStatusRule struct {
 	// Without it, the cheapest way to clear the barrier would be to delete the archived
 	// history, which is the opposite of what the barrier is for.
 	ArchivedLineageSatisfies bool
+	// AllowEmptyRef satisfies the constraint vacuously when the ref field is empty or unset.
+	AllowEmptyRef bool
 }
 
 // refStatusRules is the matrix: one row per (precondition token → ref field, allowed statuses).
@@ -61,6 +63,14 @@ var refStatusRules = []refStatusRule{
 		Require:                  []string{objects.ObjectStatusValidated, objects.ObjectStatusComplete, objects.ObjectStatusCompleted},
 		Ignore:                   []string{objects.ObjectStatusRejected},
 		ArchivedLineageSatisfies: true,
+	},
+	{
+		Precondition:             PrecondPriorityPlanArchivedWhenSet,
+		Field:                    objects.FieldKeyPriorityPlanRef,
+		RefKind:                  objects.KindPriorityPlan,
+		Require:                  []string{objects.ObjectStatusArchived},
+		ArchivedLineageSatisfies: true,
+		AllowEmptyRef:            true,
 	},
 }
 
@@ -82,7 +92,7 @@ func lookupRefStatusRule(precondition string) (refStatusRule, bool) {
 func (gv *GoValidator) evalRefStatus(rule refStatusRule, obj map[string]any, options *ValidationOptions) bool {
 	ids := gv.extractIDsFromField(obj, rule.Field)
 	if len(ids) == 0 {
-		return false
+		return rule.AllowEmptyRef
 	}
 	if options == nil || options.ObjectStatusLookup == nil {
 		return false

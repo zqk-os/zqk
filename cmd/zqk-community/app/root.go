@@ -16,7 +16,7 @@ import (
 	"github.com/zqk-os/zqk/cmd/zqk/docman"
 	"github.com/zqk-os/zqk/cmd/zqk/grep"
 
-	"github.com/zqk-os/zqk/cmd/zqk-community/scheduler"
+	commscheduler "github.com/zqk-os/zqk/cmd/zqk-community/scheduler"
 	commsystem "github.com/zqk-os/zqk/cmd/zqk-community/system"
 	commtest "github.com/zqk-os/zqk/cmd/zqk-community/test"
 	"github.com/zqk-os/zqk/cmd/zqk/mcp"
@@ -195,6 +195,8 @@ func NewRootCommand() *cobra.Command {
 }
 
 func init() {
+	zqkenv.IsCommunityEdition = true
+
 	// Build help for root command
 	helpBuilder := clitool.NewHelpBuilder().
 		WithShort("Knowledge kernel for first-run project work").
@@ -1320,11 +1322,11 @@ func registerCommands() {
 	rootCmd.AddCommand(mcpCmdInst)
 
 	// Scheduler daemon management (start, stop, status, trigger, service, etc.)
-	schedulerCmdInst := scheduler.NewSchedulerCmd()
+	schedulerCmdInst := commscheduler.NewSchedulerCmd()
 	schedulerCmdInst.GroupID = "integrations"
 	rootCmd.AddCommand(schedulerCmdInst)
 
-	// Dest-owned test dashboard (studio cmd/zqk/test is not on this SKU).
+	// Community test dashboard (Studio cmd/zqk/test is not on this SKU).
 	testCmdInst := commtest.NewTestCmd()
 	testCmdInst.GroupID = "everyday"
 	rootCmd.AddCommand(testCmdInst)
@@ -1337,8 +1339,6 @@ func registerCommands() {
 	rootCmd.AddCommand(workflowCmdInst)
 
 	// Auth, Join, Mesh (Enterprise Only)
-
-	// Policy management
 
 	// Shell completion (bash, zsh, fish)
 	rootCmd.AddCommand(NewCompletionCmd(rootCmd))

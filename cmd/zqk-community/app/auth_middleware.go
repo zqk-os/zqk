@@ -72,7 +72,6 @@ func AuthMiddleware(cmd *cobra.Command, projectRoot string) error {
 	}
 
 	if apiKey == "" && credentialsToken == "" {
-		// Local kernel operator: no token required. Invalid tokens still fail closed below.
 		secCtx := pkgctx.NewSystemSecurityContext()
 		cmd.SetContext(pkgctx.WithSecurityContext(ctx, secCtx))
 		return nil

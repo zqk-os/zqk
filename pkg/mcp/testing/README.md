@@ -132,7 +132,7 @@ tests:
 package main
 
 import (
-    "github.com/zqk-os/zqk/pkg/mcp/testing"
+    "github.com/lanceman/zqk/pkg/mcp/testing"
 )
 
 func main() {

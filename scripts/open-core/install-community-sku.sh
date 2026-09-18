@@ -38,7 +38,15 @@ install_apache_license() {
   src=$1
   dst=$2
   if [ -f "$src" ]; then
-    awk '/^--------------------------------------------------------------------------------$/{exit} {print}' "$src" >"$dst"
+    awk '
+      /^--------------------------------------------------------------------------------$/ { found_separator=1; exit }
+      { lines[NR]=$0 }
+      END {
+        last=NR-found_separator
+        while (last > 0 && lines[last] == "") last--
+        for (i=1; i<=last; i++) print lines[i]
+      }
+    ' "$src" >"$dst"
     echo "sku-overlay: $(basename "$dst")"
   fi
 }
@@ -49,11 +57,13 @@ install_file "$SKU/FIRST_RUN_OBJECT_TUTORIAL.md" "$DEST/docs/onboarding/FIRST_RU
 install_file "$SKU/QUICKSTART.md" "$DEST/docs/onboarding/QUICKSTART.md"
 install_file "$SKU/ONBOARDING_README.md" "$DEST/docs/onboarding/README.md"
 install_file "$SKU/EDGE_HEADLESS_FIRST_RUN.md" "$DEST/docs/onboarding/EDGE_HEADLESS_FIRST_RUN.md"
+install_file "$SKU/DOCS_INDEX.md" "$DEST/docs/INDEX.md"
 install_file "$SKU/CONTRIBUTING.md" "$DEST/CONTRIBUTING.md"
 install_apache_license "$SOURCE_ROOT/LICENSE" "$DEST/LICENSE"
 install_file "$SKU/NOTICE" "$DEST/NOTICE"
 install_file "$SKU/SECURITY.md" "$DEST/SECURITY.md"
 install_file "$SKU/CI.yml" "$DEST/.github/workflows/ci.yml"
+install_file "$SKU/config/zqk.yaml" "$DEST/config/zqk.yaml"
 install_file "$SKU/README.md" "$DEST/README.md"
 install_file "$SKU/ARCHITECTURE_README.md" "$DEST/docs/architecture/README.md"
 install_file "$SKU/ARCHITECTURE_INDEX.md" "$DEST/docs/architecture/INDEX.md"

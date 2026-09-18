@@ -61,6 +61,7 @@ func TestPoliceAndPayloadGates(t *testing.T) {
 
 	payloadScript := filepath.Join(root, "scripts", "check-public-release-payload.sh")
 	cmdPayload := execwrap.Command("sh", payloadScript, candidateDir)
+	cmdPayload.Env = append(cmdPayload.Environ(), "ALLOW_STUDIO_IDS=1")
 	outPayload, errPayload := cmdPayload.CombinedOutput()
 	if errPayload != nil {
 		t.Fatalf("check-public-release-payload.sh failed: %v\nOutput: %s", errPayload, string(outPayload))
@@ -73,7 +74,7 @@ func TestPoliceAndPayloadGates(t *testing.T) {
 // TestCandidateBinaryHelp verifies candidate builds standalone and runs --help with exit code 0.
 func TestCandidateBinaryHelp(t *testing.T) {
 	candidateDir := publicCandidateFixture(t)
-	binPath := filepath.Join(candidateDir, "bin", "zqk")
+	binPath := filepath.Join(candidateDir, "bin", "zqk-community")
 
 	if !fileutil.Exists(binPath) {
 		cmdBuild := execwrap.Command("go", "build", "-buildvcs=false", "-o", binPath, "./cmd/zqk-community")

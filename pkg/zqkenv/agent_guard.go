@@ -13,7 +13,7 @@ func EnforceForegroundGoTestGuard() {
 	// foreground `go test` as a substitute for scheduler scan-tests.
 	//
 	// This must NEVER break Make, CI, or scripted verify steps that legitimately
-	// invoke `go test` (e.g. make → verify-bootstrap-portable.sh).
+	// invoke `go test` (e.g. make zqk-community → verify-bootstrap-portable.sh).
 	arg0 := os.Args[0]
 	if !isGoTestBinary(arg0) {
 		return

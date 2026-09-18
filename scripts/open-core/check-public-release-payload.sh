@@ -19,7 +19,7 @@ say "# public-release payload check"
 say "root=$ROOT"
 
 for path in README.md LICENSE NOTICE SECURITY.md CODE_OF_CONDUCT.md CONTRIBUTING.md \
-	go.mod cmd/zqk-community/main.go docs/onboarding/COMMUNITY_FIRST_RUN.md \
+	go.mod config/zqk.yaml cmd/zqk-community/main.go docs/INDEX.md docs/onboarding/COMMUNITY_FIRST_RUN.md \
 	scripts/open-core/police-community-tree.sh; do
 	if [ ! -f "$ROOT/$path" ]; then
 		fail "required public artifact missing: $path"
@@ -27,7 +27,8 @@ for path in README.md LICENSE NOTICE SECURITY.md CODE_OF_CONDUCT.md CONTRIBUTING
 done
 
 for path in .goreleaser.yaml docs/_archive cmd/zqk-admin cmd/codegen_runner \
-	cmd/pattern-cli docs/commercial docs/marketing docs/launch; do
+	cmd/pattern-cli cmd/zqk-community/app/join.go \
+	pkg/community/container_helm_test.go docs/commercial docs/marketing docs/launch; do
 	if [ -e "$ROOT/$path" ]; then
 		fail "forbidden or unconfigured public artifact present: $path"
 	fi

@@ -158,7 +158,7 @@ func TestDistributionChannels_IntegrationAndConformance(t *testing.T) {
 		"on_macos do",
 		"on_linux do",
 		"Hardware::CPU.arm?",
-		"bin.install \"zqk\"",
+		"bin.install \"zqk-community\" => \"zqk\"",
 		"system \"#{bin}/zqk\"",
 	}
 

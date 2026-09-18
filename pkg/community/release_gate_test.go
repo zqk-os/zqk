@@ -80,7 +80,7 @@ func TestReleaseGate_IntegrationAndConformance(t *testing.T) {
 		t.Fatalf("package-community.sh v2.8.0-rc1 --dry failed: %v\nOutput:\n%s", err, string(out))
 	}
 
-	if !strings.Contains(string(out), "zqk_2.8.0-rc1_darwin_arm64.tar.gz") {
+	if !strings.Contains(string(out), "zqk-community_2.8.0-rc1_darwin_arm64.tar.gz") {
 		t.Errorf("expected release tarball in output, got:\n%s", string(out))
 	}
 }

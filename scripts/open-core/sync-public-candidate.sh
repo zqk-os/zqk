@@ -85,6 +85,7 @@ INCLUDES=(
   "scripts/default_agent_skills"
   ".zqk/specs"
   ".zqk/cli/specs"
+  ".zqk/cli/command_spec_coverage_baseline.community.json"
   ".github/workflows/ci.yml"
   ".gitignore"
   "NOTICE"
@@ -104,6 +105,8 @@ for path in "${INCLUDES[@]}"; do
     echo "Warning: Source path $path does not exist in studio"
   fi
 done
+
+sh "$CANDIDATE_DIR/scripts/open-core/rewrite-community-module-path.sh" "$CANDIDATE_DIR"
 
 # Prune archived and launch doc trees from open-core candidate (TDE-1789629838711755000-bc3ed5d4)
 rm -rf "$CANDIDATE_DIR/docs/launch"
@@ -135,7 +138,8 @@ rm -f "$CANDIDATE_DIR/cmd/zqk/system/agent_lockdown.go" \
       "$CANDIDATE_DIR/cmd/zqk/system/ambient_daemon.go" \
       "$CANDIDATE_DIR/cmd/zqk/system/sync_agents.go" \
       "$CANDIDATE_DIR/cmd/zqk/system/evolve.go" \
-      "$CANDIDATE_DIR/cmd/zqk/system/materialize_agent_chat_channel.go"
+      "$CANDIDATE_DIR/cmd/zqk/system/materialize_agent_chat_channel.go" \
+      "$CANDIDATE_DIR/cmd/zqk/system/materialize_agent_chat_channel_test.go"
 
 # Stub studio command registration in candidate tree
 if [ -f "$CANDIDATE_DIR/cmd/zqk/system/register_studio_commands.go" ]; then
@@ -153,6 +157,8 @@ fi
 if [ -f "$CANDIDATE_DIR/.gitignore" ]; then
   grep -Ev '^\*-\*\.txt$|^\*test\*\.txt$|^\*_results\.txt$' "$CANDIDATE_DIR/.gitignore" > "$CANDIDATE_DIR/.gitignore.tmp" && mv "$CANDIDATE_DIR/.gitignore.tmp" "$CANDIDATE_DIR/.gitignore"
 fi
+
+sh "$CANDIDATE_DIR/scripts/open-core/prune-community-onboarding.sh" "$CANDIDATE_DIR"
 
 if [ -x "$CANDIDATE_DIR/scripts/open-core/install-community-sku.sh" ]; then
   sh "$CANDIDATE_DIR/scripts/open-core/install-community-sku.sh" "$CANDIDATE_DIR"
@@ -183,8 +189,7 @@ EOF
 
 echo "Initializing standalone git repository..."
 git -C "$CANDIDATE_DIR" init -b main >/dev/null
-git -C "$CANDIDATE_DIR" config user.name "ZQK Community Release"
-git -C "$CANDIDATE_DIR" config user.email "community@zqk.dev"
+git -C "$CANDIDATE_DIR" add .
 
 echo "Running police checks..."
 sh "$REPO_ROOT/scripts/open-core/police-community-tree.sh" "$CANDIDATE_DIR"

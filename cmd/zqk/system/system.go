@@ -4,9 +4,9 @@ import (
 	"os"
 	"strings"
 
-	"github.com/spf13/cobra"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
 	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
+	"github.com/spf13/cobra"
 )
 
 // NewSystemCmd creates a new system command group
@@ -68,9 +68,10 @@ func NewSystemCmd() *cobra.Command {
 	systemCmd.AddCommand(NewObjectCountReportCmd())
 	systemCmd.AddCommand(NewObjectHygieneScanCmd())
 	systemCmd.AddCommand(NewTruthSentinelCmd())
-	// Developer and Codegen commands (only available in zqk-admin).
-	// spec-origination / update-specs belong here: they write object specs and
-	// require generate-* follow-up. They are not first-run product verbs.
+	systemCmd.AddCommand(NewUpdateSpecsCmd())
+	systemCmd.AddCommand(NewSpecOriginationCmd())
+	systemCmd.AddCommand(NewCliHooksCmd())
+	// Developer and Codegen commands (only available in zqk-admin)
 	isAdminBinary := false
 	if len(os.Args) > 0 && (strings.HasSuffix(os.Args[0], "zqk-admin") || strings.HasSuffix(os.Args[0], "zqk-admin.exe")) {
 		isAdminBinary = true
@@ -78,11 +79,6 @@ func NewSystemCmd() *cobra.Command {
 
 	if isAdminBinary {
 		codegenCmds := []*cobra.Command{
-			NewUpdateSpecsCmd(),
-			NewSpecOriginationCmd(),
-			NewCliHooksCmd(),
-			NewValidateCommandSpecsCmd(),
-			NewValidateAgentRulesCmd(),
 			NewGenerateInstanceBuildersCmd(),
 			NewGenerateAgentConfigsCmd(),
 			NewGenerateLifecycleBuildersCmd(),
@@ -125,6 +121,8 @@ func NewSystemCmd() *cobra.Command {
 	systemCmd.AddCommand(NewStartCmd())
 	systemCmd.AddCommand(NewWhoamiCmd())
 	systemCmd.AddCommand(NewValidateCmd())
+	systemCmd.AddCommand(NewValidateCommandSpecsCmd())
+	systemCmd.AddCommand(NewValidateAgentRulesCmd())
 	systemCmd.AddCommand(NewAlignCmd())
 	systemCmd.AddCommand(NewAuditMilestonesCmd())
 	systemCmd.AddCommand(NewValidateScenarioCmd())

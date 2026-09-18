@@ -20,13 +20,13 @@ func TestApplyNamespaceBoundaries(t *testing.T) {
 		wantIsolation bool
 	}{
 		{
-			name:          "default inventory is federated",
+			name:          "default adds local namespace",
 			federated:     false,
 			namespace:     "",
 			filters:       make(map[string]any),
-			wantFilter:    "",
-			wantMode:      namespaceScopeModeFederated,
-			wantIsolation: false,
+			wantFilter:    validation.DefaultNamespaceKernel,
+			wantMode:      namespaceScopeModeDefault,
+			wantIsolation: true,
 		},
 		{
 			name:          "federated skips isolation",
@@ -129,53 +129,5 @@ func TestAttachNamespaceScopeMeta(t *testing.T) {
 	line := formatNamespaceScopeTableLine(scope)
 	if line == "" || line[:10] != "Namespace:" {
 		t.Fatalf("table line: %q", line)
-	}
-}
-
-func TestDefaultOrganizationScopeIsFederated(t *testing.T) {
-	// 1. Default scope (no --federated, no --namespace)
-	cmd := &cobra.Command{}
-	cmd.Flags().Bool("federated", false, "")
-	cmd.Flags().Bool("all-namespaces", false, "")
-	cmd.Flags().String("namespace", "", "")
-
-	filters := make(map[string]any)
-	scope := applyNamespaceBoundaries(cmd, filters)
-
-	if scope.IsolationActive {
-		t.Errorf("expected isolation inactive in community edition, got true")
-	}
-	if scope.Mode != namespaceScopeModeFederated {
-		t.Errorf("expected mode %q in community edition, got %q", namespaceScopeModeFederated, scope.Mode)
-	}
-	if _, hasNS := filters[objects.FieldKeyNamespaceID]; hasNS {
-		t.Errorf("expected no namespace filter injected in community edition, got %v", filters[objects.FieldKeyNamespaceID])
-	}
-
-	// 2. enrichHiddenOutsideScope sets hidden_outside_scope to 0 when isolation is inactive
-	enrichHiddenOutsideScope(nil, "organization", filters, 1, &scope)
-	if scope.HiddenOutsideScope == nil || *scope.HiddenOutsideScope != 0 {
-		t.Errorf("expected hidden_outside_scope to be 0 in community edition, got %v", scope.HiddenOutsideScope)
-	}
-
-	meta := attachNamespaceScopeMeta(map[string]any{"total_count": 1}, scope)
-	if h, ok := meta[metaKeyHiddenOutsideScope].(int); !ok || h != 0 {
-		t.Errorf("expected meta hidden_outside_scope to be 0, got %v", meta[metaKeyHiddenOutsideScope])
-	}
-
-	// 3. Explicit --namespace flag in community edition is still honored
-	cmdExplicit := &cobra.Command{}
-	cmdExplicit.Flags().Bool("federated", false, "")
-	cmdExplicit.Flags().Bool("all-namespaces", false, "")
-	cmdExplicit.Flags().String("namespace", "", "")
-	_ = cmdExplicit.Flags().Set("namespace", "domain:organizational")
-
-	filtersExplicit := make(map[string]any)
-	scopeExplicit := applyNamespaceBoundaries(cmdExplicit, filtersExplicit)
-	if !scopeExplicit.IsolationActive {
-		t.Errorf("expected isolation active with explicit namespace, got false")
-	}
-	if scopeExplicit.NamespaceScope != "domain:organizational" {
-		t.Errorf("expected namespace domain:organizational, got %q", scopeExplicit.NamespaceScope)
 	}
 }

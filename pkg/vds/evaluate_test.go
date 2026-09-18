@@ -76,25 +76,6 @@ func TestEvaluate_schedulerTestsNeedJobAndLog(t *testing.T) {
 	}
 }
 
-func TestEvaluate_foregroundTestsAcceptShellTestCommand(t *testing.T) {
-	chunks := []Chunk{{
-		ChunkID:           "shell-test",
-		Stage:             "integrate_verify",
-		Claim:             "payload gate passes",
-		RubricRef:         "CRIT-1",
-		DSLChecks:         []string{"tests_ok_per_customization"},
-		EvidenceRefs:      []string{"sh scripts/open-core/test-public-release-gates.sh --payload-only"},
-		GateIntegrate:     "yes",
-		IndependentVerify: "yes",
-	}}
-	rep := Evaluate(context.Background(), chunks, nil, &Customization{
-		TestExecution: TestExecutionPrefs{Mode: "foreground"},
-	}, EvalOptions{})
-	if !rep.Passed() {
-		t.Fatalf("expected pass, got %s preds=%+v", rep.Verdict, rep.Chunks[0].Predicates)
-	}
-}
-
 func TestLoadSpineFromRepo(t *testing.T) {
 	root := findRepoRoot(t)
 	spine, err := LoadSpine(root, DefaultSpineProfileRel)

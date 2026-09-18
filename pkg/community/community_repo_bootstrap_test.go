@@ -67,7 +67,7 @@ func TestStandaloneCleanCommunityRepo_BoundaryAndErrorHandling(t *testing.T) {
 func TestStandaloneCleanCommunityRepo_IntegrationAndConformance(t *testing.T) {
 	candidateDir := publicCandidateFixture(t)
 
-	binPath := filepath.Join(candidateDir, "bin", "zqk")
+	binPath := filepath.Join(candidateDir, "bin", "zqk-community")
 	if !fileutil.Exists(binPath) {
 		binPath = filepath.Join(candidateDir, "bin", "zqk")
 	}

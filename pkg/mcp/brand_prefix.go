@@ -42,8 +42,9 @@ func GetBrandPrefix() string {
 // stripBrandSuffixes removes process/channel suffixes from an executable basename.
 // Order matters: role names (-mcp-proxy/-mcp-daemon) before bare -mcp.
 func stripBrandSuffixes(execName string) string {
-	// Public product executable is "zqk". Leftover binaries named with a -community suffix
-	// still strip to zqk_* MCP tools.
+	// Public product executable is "zqk". Legacy/dev builds may still be named zqk-community;
+	// strip that so MCP tools stay zqk_* (allowlists / IDE configs). Enterprise tools use
+	// distinguishing names (e.g. zqk-admin) and keep their own prefixes.
 	// Role process names first (longest match), then bare -mcp.
 	suffixes := []string{"-mcp-ide-adapter", "-mcp-proxy", "-mcp-daemon", "-mcp", "-community", "-stable", "-dev", "-beta", "-alpha", "-rc"}
 	for _, suffix := range suffixes {

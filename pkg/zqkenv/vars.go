@@ -9,6 +9,9 @@ import (
 	"github.com/zqk-os/zqk/pkg/brand"
 )
 
+// IsCommunityEdition is a global flag set by the community binary.
+var IsCommunityEdition bool = false
+
 const _sfxAccountID = "ACCOUNT_ID"
 
 const _sfxStressRealRoot = "STRESS_REAL_ROOT"
@@ -108,6 +111,7 @@ const _sfxSession = "SESSION"
 const _sfxParentPID = "PARENT_PID"
 const _sfxPersona = "PERSONA"
 const _sfxPopulateScenarioTest = "POPULATE_SCENARIO_TEST"
+const _sfxPreconditionsFailOpen = "PRECONDITIONS_FAIL_OPEN"
 const _sfxPprof = "PPROF"
 const _sfxPprofPort = "PPROF_PORT"
 const _sfxProjectRoot = "PROJECT_ROOT"
@@ -539,6 +543,9 @@ func ParentPID() EnvVar { return EnvVar{Key: brand.EnvVar(_sfxParentPID)} }
 
 // PopulateScenarioTest returns the environment variable name for POPULATE_SCENARIO_TEST (brand-prefixed).
 func PopulateScenarioTest() EnvVar { return EnvVar{Key: brand.EnvVar(_sfxPopulateScenarioTest)} }
+
+// PreconditionsFailOpen returns the environment variable name for PRECONDITIONS_FAIL_OPEN (brand-prefixed).
+func PreconditionsFailOpen() EnvVar { return EnvVar{Key: brand.EnvVar(_sfxPreconditionsFailOpen)} }
 
 // Pprof returns the environment variable name for PPROF (brand-prefixed).
 func Pprof() EnvVar { return EnvVar{Key: brand.EnvVar(_sfxPprof)} }

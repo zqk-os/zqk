@@ -5,9 +5,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/spf13/pflag"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/mcp"
+	"github.com/spf13/pflag"
 )
 
 func TestMCPCLISyncParity(t *testing.T) {

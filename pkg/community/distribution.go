@@ -30,7 +30,7 @@ var SupportedPlatforms = []TargetPlatform{
 // FormatArchiveName returns the canonical tarball name for a platform and version.
 func FormatArchiveName(version, goos, goarch string) string {
 	verNum := strings.TrimPrefix(version, "v")
-	return fmt.Sprintf("zqk_%s_%s_%s.tar.gz", verNum, goos, goarch)
+	return fmt.Sprintf("zqk-community_%s_%s_%s.tar.gz", verNum, goos, goarch)
 }
 
 // ParseChecksumManifest parses a standard sha256 checksums.txt file content.
@@ -78,26 +78,26 @@ func GenerateHomebrewFormula(version string, checksums map[string]string) (strin
 
   on_macos do
     if Hardware::CPU.arm?
-      url "https://github.com/zqk-os/zqk/releases/download/v#{version}/zqk_#{version}_darwin_arm64.tar.gz"
+      url "https://github.com/zqk-os/zqk/releases/download/v#{version}/zqk-community_#{version}_darwin_arm64.tar.gz"
       sha256 "%s"
     else
-      url "https://github.com/zqk-os/zqk/releases/download/v#{version}/zqk_#{version}_darwin_amd64.tar.gz"
+      url "https://github.com/zqk-os/zqk/releases/download/v#{version}/zqk-community_#{version}_darwin_amd64.tar.gz"
       sha256 "%s"
     end
   end
 
   on_linux do
     if Hardware::CPU.arm?
-      url "https://github.com/zqk-os/zqk/releases/download/v#{version}/zqk_#{version}_linux_arm64.tar.gz"
+      url "https://github.com/zqk-os/zqk/releases/download/v#{version}/zqk-community_#{version}_linux_arm64.tar.gz"
       sha256 "%s"
     else
-      url "https://github.com/zqk-os/zqk/releases/download/v#{version}/zqk_#{version}_linux_amd64.tar.gz"
+      url "https://github.com/zqk-os/zqk/releases/download/v#{version}/zqk-community_#{version}_linux_amd64.tar.gz"
       sha256 "%s"
     end
   end
 
   def install
-    bin.install "zqk"
+    bin.install "zqk-community" => "zqk"
   end
 
   test do
@@ -191,8 +191,8 @@ func VerifyHomebrewFormula(formulaPath, manifestPath string) error {
 		}
 	}
 
-	if !strings.Contains(formulaContent, "bin.install \"zqk\"") {
-		return fmt.Errorf("formula missing binary installation for zqk")
+	if !strings.Contains(formulaContent, "bin.install \"zqk-community\" => \"zqk\"") {
+		return fmt.Errorf("formula missing binary alias installation for zqk-community")
 	}
 
 	return nil

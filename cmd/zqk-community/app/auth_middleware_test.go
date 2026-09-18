@@ -15,6 +15,23 @@ import (
 	"github.com/spf13/cobra"
 )
 
+func TestAuthMiddleware_Unauthorized(t *testing.T) {
+	cmd := &cobra.Command{Use: "test"}
+	home := t.TempDir()
+	t.Setenv(zqkenv.OSHome().Name(), home)
+	t.Setenv(zqkenv.APIKey().Name(), "ACC-invalid-token")
+	t.Setenv(zqkenv.TestRoot().Name(), "")
+	t.Setenv(zqkenv.TestBypassAuth().Name(), "0")
+
+	projectRoot := t.TempDir()
+	createSchemas(t, projectRoot)
+
+	err := AuthMiddleware(cmd, projectRoot)
+	if err == nil {
+		t.Fatalf("expected unauthorized error, got nil")
+	}
+}
+
 func TestAuthMiddleware_Authorized_APIKey(t *testing.T) {
 	cmd := &cobra.Command{Use: "test"}
 	home := t.TempDir()
@@ -61,7 +78,11 @@ func TestAuthMiddleware_Authorized_Credentials(t *testing.T) {
 	}
 }
 
-func TestAuthMiddleware_NoTokenSeatsSystemAccount(t *testing.T) {
+func TestAuthMiddleware_CommunityEditionSeatsSystemAccount(t *testing.T) {
+	prev := zqkenv.IsCommunityEdition
+	zqkenv.IsCommunityEdition = true
+	t.Cleanup(func() { zqkenv.IsCommunityEdition = prev })
+
 	cmd := &cobra.Command{Use: "status"}
 	home := t.TempDir()
 	t.Setenv(zqkenv.OSHome().Name(), home)
@@ -70,7 +91,7 @@ func TestAuthMiddleware_NoTokenSeatsSystemAccount(t *testing.T) {
 	t.Setenv(zqkenv.TestBypassAuth().Name(), "0")
 
 	if err := AuthMiddleware(cmd, t.TempDir()); err != nil {
-		t.Fatalf("local kernel with no token: %v", err)
+		t.Fatalf("community edition with no token: %v", err)
 	}
 	sec := pkgctx.GetSecurityContext(cmd.Context())
 	if sec == nil {

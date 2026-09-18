@@ -122,8 +122,7 @@ if command -v find >/dev/null 2>&1; then
       FAIL=1
     fi
   fi
-  # Living dest kernel ships dest-owned overlay + first-run seed scripts.
-  # Studio export-era G11 (only package-community.sh + install.sh) does not apply here.
+  # Living community kernel ships release overlays and first-run seed scripts.
   if [ -d "$ROOT/scripts" ]; then
     extras=$(find "$ROOT/scripts" -type f \( -name '*.sh' -o -name '*.py' \) \
       ! -name 'package-community.sh' \
