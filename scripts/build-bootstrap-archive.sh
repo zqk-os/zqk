@@ -22,10 +22,12 @@ ARCHIVE="${ARCHIVE_DIR}/bootstrap.tar.gz"
 MANIFEST="${ARCHIVE_DIR}/manifest.txt"
 
 mkdir -p "$ARCHIVE_DIR"
+ARCHIVE_TMP="$(mktemp "${ARCHIVE_DIR}/.bootstrap.tar.gz.XXXXXX")"
+MANIFEST_TMP="$(mktemp "${ARCHIVE_DIR}/.manifest.txt.XXXXXX")"
 # Staging: _internal at root, cli_specs under cli_specs/, scripts/scheduler_jobs under scripts/ for extract mapping
 STAGING="${TMPDIR:-/tmp}/zqk-bootstrap-staging.$$"
 mkdir -p "$STAGING"
-trap 'rm -rf "$STAGING"' EXIT
+trap 'rm -rf "$STAGING"; rm -f "$ARCHIVE_TMP" "$MANIFEST_TMP"' EXIT
 
 # macOS: avoid copying AppleDouble sidecars; COPYFILE_DISABLE also suppresses creating new ones during cp.
 export COPYFILE_DISABLE=1
@@ -100,7 +102,9 @@ TOUCH_TS="$(date -u -r "$SOURCE_DATE_EPOCH" '+%Y%m%d%H%M.%S' 2>/dev/null || date
 find "$STAGING" -exec touch -h -t "$TOUCH_TS" {} + 2>/dev/null || true
 
 export GZIP="-n"
-(cd "$STAGING" && find . | sort | tar -cf - -T - | gzip -n > "$ARCHIVE")
+(cd "$STAGING" && find . | sort | tar -cf - -T - | gzip -n > "$ARCHIVE_TMP")
 # Traceability: list all paths in the archive (REQ-9011)
-tar tzf "$ARCHIVE" | sort > "$MANIFEST"
+tar tzf "$ARCHIVE_TMP" | sort > "$MANIFEST_TMP"
+mv "$ARCHIVE_TMP" "$ARCHIVE"
+mv "$MANIFEST_TMP" "$MANIFEST"
 echo "Created $ARCHIVE ($(wc -l < "$MANIFEST") entries) and $MANIFEST"
