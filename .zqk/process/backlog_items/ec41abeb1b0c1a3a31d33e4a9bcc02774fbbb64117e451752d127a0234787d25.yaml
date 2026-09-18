@@ -1,6 +1,10 @@
 acceptance_considerations: SKU overlay owns LICENSE, NOTICE, SECURITY, CI, and public gate files; apply and scratch-sync paths install that overlay; include manifests omit .goreleaser.yaml; an isolated test proves installed files match canonical SKU sources and the payload gate passes.
+actual_effort: 0.03h
 artifacts:
     - scripts/open-core/install-community-sku.sh
+commit_hashes:
+    - dcc6132d8083e51800c3be3a8e84e3c4eaede33a
+completed_at: "2026-09-18T08:18:02Z"
 created_at: "2026-09-18T08:11:40Z"
 created_by: ACC-1785920548450214012-68b850c0
 criteria_refs:
@@ -26,9 +30,9 @@ schema_version: 2.0.0
 stakeholders:
     - team-core
 started_at: "2026-09-18T08:16:31Z"
-status: testing
+status: complete
 title: 'Implement: Community release-owned files survive source overlay and scratch export'
-updated_at: "2026-09-18T08:16:31Z"
+updated_at: "2026-09-18T08:18:02Z"
 updated_by: ACC-1785920548450214012-68b850c0
 version_context: default
 workstream_refs:
