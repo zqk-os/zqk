@@ -29,6 +29,7 @@ var firstRunSystemCommands = map[string]struct{}{
 	"status":                     {},
 	"sync-cas-index":             {},
 	"sync-git-hooks":             {},
+	"truth-sentinel":             {},
 	"validate":                   {},
 	"whoami":                     {},
 }

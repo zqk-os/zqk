@@ -16,7 +16,7 @@ func TestFirstRunSystemCmdDropsCodegen(t *testing.T) {
 			t.Fatalf("open-core system still ships %q", name)
 		}
 	}
-	for _, name := range []string{"init", "dashboard", "check", "status", "whoami", "validate"} {
+	for _, name := range []string{"init", "dashboard", "check", "status", "truth-sentinel", "whoami", "validate"} {
 		if _, ok := got[name]; !ok {
 			t.Fatalf("open-core system missing first-run %q", name)
 		}

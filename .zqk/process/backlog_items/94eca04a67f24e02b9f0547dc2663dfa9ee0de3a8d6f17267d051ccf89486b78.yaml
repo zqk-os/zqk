@@ -1,8 +1,10 @@
 acceptance_considerations: Launch PRI is grooming or later; zcom object list shows org and 653 doc_entries; personas/skills/policies list non-zero; a roadmap object exists; no public push. CRITs remain the VDS gates.
+actual_effort: 0.13h
 artifacts:
     - docs/quality/vds_chunks.yaml
 commit_hashes:
-    - b5cffdbf9b7155593ad8d73cefde4b36a739e6ae
+    - d6fc1b61a54e19e755a9fa9ef9fc3c57a191ab70
+completed_at: "2026-09-18T07:33:09Z"
 created_at: "2026-09-17T07:33:30Z"
 created_by: ACC-1785920548450214012-68b850c0
 criteria_refs:
@@ -28,9 +30,9 @@ schema_version: 2.0.0
 stakeholders:
     - team-core
 started_at: "2026-09-18T07:25:36Z"
-status: in_progress
+status: complete
 title: 'Implement: Community kernel must prove launch-ready testing and documentation vetting'
-updated_at: "2026-09-18T07:29:25Z"
+updated_at: "2026-09-18T07:33:09Z"
 updated_by: ACC-1785920548450214012-68b850c0
 version_context: default
 workstream_refs:
