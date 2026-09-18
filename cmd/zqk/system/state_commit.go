@@ -38,7 +38,7 @@ func NewStateCommitCmd() *cobra.Command {
 		"",
 		"Writes the tip to --snapshot-file (committed in git). Before overwrite, copies the",
 		"previous tip into an external backup directory and keeps only the newest N priors.",
-		"Backup location/keep: --backup-dir/--backup-keep, else zqk-settings.yaml kernel_state.snapshot_backup_*,",
+		"Backup location/keep: --backup-dir/--backup-keep, else config/zqk.yaml kernel_state.snapshot_backup_*,",
 		"else <parent>/<repo>-csnap-backups keep=3. Refuses a large shrink unless --allow-shrink.",
 	).
 		AddExample("Commit system state", "%s system state-commit").
@@ -53,7 +53,7 @@ func NewStateCommitCmd() *cobra.Command {
 	cli.AddCommonFlags(cmd)
 
 	cmd.Flags().String("snapshot-file", ".zqk-state/system-state.csnap", "Tip path written for git (single file)")
-	cmd.Flags().String("backup-dir", "", "External prior-tip backup dir (overrides zqk-settings.yaml kernel_state.snapshot_backup_dir)")
+	cmd.Flags().String("backup-dir", "", "External prior-tip backup dir (overrides config/zqk.yaml kernel_state.snapshot_backup_dir)")
 	cmd.Flags().Int("backup-keep", 0, "Prior tip copies to keep (0 = use settings or default 3)")
 	cmd.Flags().Bool("allow-shrink", false, "Allow writing a tip csnap with far fewer objects than the previous tip")
 	cmd.Flags().Bool("skip-archive", false, "Do not copy the previous tip into the external backup dir before overwrite")

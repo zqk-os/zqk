@@ -1,5 +1,6 @@
 #!/bin/bash
 # package-community.sh — Build cross-platform release binaries and create a GitHub release for Community Edition.
+# TRACK: TDE-1789699310016987000-5703b344 — homepage/URLs still github.com/lanceman/zqk until zqk-os module move.
 #
 # Usage:
 #   ./scripts/package-community.sh v2.7.0         # build + create GitHub release
@@ -19,9 +20,9 @@ GIT_COMMIT="$(git -C "$REPO_ROOT" rev-parse --short HEAD)"
 BUILD_DATE="$(date -u '+%Y-%m-%dT%H:%M:%SZ')"
 
 LDFLAGS="-s -w \
-  -X github.com/lanceman/zqk/cmd/zqk/app.version=${VERSION} \
-  -X github.com/lanceman/zqk/cmd/zqk/app.buildDate=${BUILD_DATE} \
-  -X github.com/lanceman/zqk/cmd/zqk/app.gitCommit=${GIT_COMMIT}"
+  -X github.com/lanceman/zqk/cmd/zqk-community/app.version=${VERSION} \
+  -X github.com/lanceman/zqk/cmd/zqk-community/app.buildDate=${BUILD_DATE} \
+  -X github.com/lanceman/zqk/cmd/zqk-community/app.gitCommit=${GIT_COMMIT}"
 
 PLATFORMS=(
   "darwin/amd64"
@@ -31,7 +32,7 @@ PLATFORMS=(
 )
 
 BINARIES=(
-  "zqk-community:./cmd/zqk-community"
+  "zqk:./cmd/zqk-community"
 )
 
 echo "🔨 Building ZQK Community Edition ${VERSION} (commit ${GIT_COMMIT})"
@@ -43,7 +44,7 @@ mkdir -p "$DIST_DIR"
 for platform in "${PLATFORMS[@]}"; do
   GOOS="${platform%/*}"
   GOARCH="${platform#*/}"
-  ARCHIVE_NAME="zqk-community_${VER_NUM}_${GOOS}_${GOARCH}"
+  ARCHIVE_NAME="zqk_${VER_NUM}_${GOOS}_${GOARCH}"
   STAGE_DIR="${DIST_DIR}/${ARCHIVE_NAME}"
   mkdir -p "$STAGE_DIR"
 
@@ -91,26 +92,26 @@ class Zqk < Formula
 
   on_macos do
     if Hardware::CPU.arm?
-      url "https://github.com/lanceman/zqk/releases/download/v#{version}/zqk-community_#{version}_darwin_arm64.tar.gz"
+      url "https://github.com/lanceman/zqk/releases/download/v#{version}/zqk_#{version}_darwin_arm64.tar.gz"
       sha256 "${DARWIN_ARM64_SHA}"
     else
-      url "https://github.com/lanceman/zqk/releases/download/v#{version}/zqk-community_#{version}_darwin_amd64.tar.gz"
+      url "https://github.com/lanceman/zqk/releases/download/v#{version}/zqk_#{version}_darwin_amd64.tar.gz"
       sha256 "${DARWIN_AMD64_SHA}"
     end
   end
 
   on_linux do
     if Hardware::CPU.arm?
-      url "https://github.com/lanceman/zqk/releases/download/v#{version}/zqk-community_#{version}_linux_arm64.tar.gz"
+      url "https://github.com/lanceman/zqk/releases/download/v#{version}/zqk_#{version}_linux_arm64.tar.gz"
       sha256 "${LINUX_ARM64_SHA}"
     else
-      url "https://github.com/lanceman/zqk/releases/download/v#{version}/zqk-community_#{version}_linux_amd64.tar.gz"
+      url "https://github.com/lanceman/zqk/releases/download/v#{version}/zqk_#{version}_linux_amd64.tar.gz"
       sha256 "${LINUX_AMD64_SHA}"
     end
   end
 
   def install
-    bin.install "zqk-community" => "zqk"
+    bin.install "zqk"
   end
 
   test do
@@ -174,7 +175,7 @@ curl -fsSL https://github.com/lanceman/zqk/releases/download/${TAG_NAME}/checksu
 
 **Build from source:**
 \`\`\`bash
-git clone https://github.com/lanceman/zqk && cd zqk && make zqk-community
+git clone https://github.com/lanceman/zqk && cd zqk && make
 \`\`\`
 "
 

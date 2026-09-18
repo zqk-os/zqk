@@ -7,11 +7,10 @@ project:
   name: zqk-public-candidate
   template: standard
 
-# Pressure-test SKU: brand.executable_name is the live CLI (canonical token is zqk).
-# TRACK: TDE-1789678536875854000-47240146 — set executable_name: zqk at public launch.
+# Pressure-test leftover. Brand SSOT is config/zqk.yaml + config/zqk-local.yaml.
 brand:
-  executable_name: zcom
-  product_name: ZQK Community
+  executable_name: zqk
+  product_name: ZQK
 
 storage:
   backend: file

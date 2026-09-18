@@ -17,7 +17,7 @@ import (
 // resolveSchedulerCLIBinary returns the preferred CLI binary path for scheduler-spawned subprocesses.
 // Priority:
 //  1. ZQK_BIN environment variable (explicit operator override)
-//  2. zqk-settings.yaml cli.binary_path (explicit project configuration)
+//  2. config/zqk.yaml / config/zqk-local.yaml cli.binary_path (explicit project configuration)
 //  3. project-local ./bin/zqk or ./zqk (canonical operational binary)
 //  4. current executable path
 //  5. bare "zqk" (PATH fallback)
@@ -72,14 +72,14 @@ func SchedulerCLIBinaryConfigWarning(projectRoot string) string {
 	if configured == emptyValue || valid {
 		return ""
 	}
-	return fmt.Sprintf("zqk-settings cli.binary_path is configured but not found: %s", configured)
+	return fmt.Sprintf("config cli.binary_path is configured but not found: %s", configured)
 }
 
 // ResolveSchedulerDaemonBinary returns the executable path for the detached scheduler daemon.
 // Priority:
 //  1. ZQK_SCHEDULER_DAEMON_BIN (daemon only; does not affect job subprocesses)
 //  2. ZQK_BIN
-//  3. zqk-settings.yaml cli.binary_path when it resolves to an existing file
+//  3. config/zqk.yaml / config/zqk-local.yaml cli.binary_path when it resolves to an existing file
 //  4. project-local bin/zqk-scheduler when present (avoids go build -o bin/zqk overwriting the running daemon)
 //  5. project-local bin/zqk or ./zqk
 //  6. os.Executable() (foreground-equivalent binary)

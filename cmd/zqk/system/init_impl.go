@@ -336,9 +336,9 @@ func runGreenfieldInit(projectRoot, projectName, template string, force bool, lo
 		logging.Fluent(logger).Warn("Failed to create MCP config file").WithError(err).Log()
 	}
 
-	// Create zqk-settings.yaml in project root and config dir
+	// Create config/zqk.yaml (committed defaults; local overrides in config/zqk-local.yaml)
 	if err := writeBrandSettings(projectRoot, force); err != nil {
-		logging.Fluent(logger).Warn("Failed to write brand settings").WithError(err).Log()
+		logging.Fluent(logger).Warn("Failed to write config/zqk.yaml").WithError(err).Log()
 	}
 
 	// Write root isolation and kernel config files
@@ -494,9 +494,9 @@ func runLegacyInit(projectRoot, projectName, template string, force bool, logger
 		logging.Fluent(logger).Warn("Failed to create system account").WithError(err).Log()
 	}
 
-	// Create zqk-settings.yaml in project root and config dir
+	// Create config/zqk.yaml (committed defaults; local overrides in config/zqk-local.yaml)
 	if err := writeBrandSettings(projectRoot, force); err != nil {
-		logging.Fluent(logger).Warn("Failed to write brand settings").WithError(err).Log()
+		logging.Fluent(logger).Warn("Failed to write config/zqk.yaml").WithError(err).Log()
 	}
 
 	// Write root isolation and kernel config files

@@ -1,5 +1,5 @@
-// Package context: brand settings ({brand}-settings.yaml) as the definitive resource for CLI orientation.
-// See .zqk/cli/specs/schemas/brand_settings.schema.json and PATH_ALIAS_RESOLUTION.md §6.
+// Package context: project configuration (config/zqk.yaml, config/zqk-local.yaml) as the
+// definitive resource for CLI orientation.
 package context
 
 import (
@@ -41,7 +41,7 @@ type BrandSettingsKernelState struct {
 	SnapshotBackupKeep int `yaml:"snapshot_backup_keep"`
 }
 
-// BrandSettings is the in-memory shape of {brand}-settings.yaml (e.g. zqk-settings.yaml).
+// BrandSettings is the in-memory shape of config/zqk.yaml / config/zqk-local.yaml.
 type BrandSettings struct {
 	Schema      string                   `yaml:"$schema"`
 	Description string                   `yaml:"description"`
@@ -120,8 +120,6 @@ func BrandSettingsPath(projectRoot string) string {
 	candidates := []string{
 		filepath.Join(projectRoot, paths.ConfigDir, paths.ZqkLocalConfigFileName),
 		filepath.Join(projectRoot, paths.ConfigDir, paths.ZqkConfigFileName),
-		filepath.Join(projectRoot, paths.ProjectDataDir, paths.ConfigDir, paths.BrandSettingsFilename),
-		filepath.Join(projectRoot, paths.BrandSettingsFilename),
 	}
 	for _, p := range candidates {
 		if _, err := fileutil.Stat(p); err == nil {
@@ -132,7 +130,7 @@ func BrandSettingsPath(projectRoot string) string {
 }
 
 // TestSettingsPath returns the path to the test settings file at projectRoot.
-// Used when ZQK_TEST_ROOT is set so tests never load or depend on zqk-settings.yaml.
+// Used when ZQK_TEST_ROOT is set so tests never load or depend on config/zqk.yaml.
 func TestSettingsPath(projectRoot string) string {
 	candidates := []string{
 		filepath.Join(projectRoot, paths.ConfigDir, paths.ZqkTestConfigFileName),
@@ -148,7 +146,7 @@ func TestSettingsPath(projectRoot string) string {
 }
 
 // settingsPathForRoot returns the path to the settings file to load for the given root.
-// When projectRoot is the same as ZQK_TEST_ROOT, returns test-settings.yaml path; otherwise zqk-settings.yaml.
+// When projectRoot is the same as ZQK_TEST_ROOT, returns test-settings.yaml path; otherwise config/zqk.yaml.
 func settingsPathForRoot(projectRoot string) string {
 	testRoot := zqkenv.TestRoot().Get()
 	if testRoot != emptyValue {
@@ -233,7 +231,7 @@ func EnsureTestRootBrandSettingsFiles(projectRoot string) error {
 }
 
 // LoadBrandSettings loads and parses the brand settings file from projectRoot.
-// When the branded TEST_ROOT env matches projectRoot, loads test-settings.yaml or zqk-test-settings.yaml; otherwise zqk-settings.yaml.
+// Live files are config/zqk.yaml / config/zqk-local.yaml.
 // Returns an error if the file is missing or invalid.
 func LoadBrandSettings(projectRoot string) (*BrandSettings, error) {
 	if projectRoot == emptyValue {
@@ -282,7 +280,7 @@ func LoadBrandSettingsFromFile(settingsPath string) (*BrandSettings, string, err
 // ResolveProjectRootFromSettings resolves project root by loading the brand settings file at the
 // path given by ResolveProjectRoot(startPath) (e.g. .zqk/current_root or ZQK_PROJECT_ROOT) and
 // returning the effective project root from settings (paths.project_root or the settings file dir).
-// Use this so project root is always defined by zqk-settings.yaml. Returns error if hint root is
+// Use this so project root is always defined by config/zqk.yaml / config/zqk-local.yaml. Returns error if hint root is
 // missing or brand settings file is missing/invalid.
 func ResolveProjectRootFromSettings(startPath string) (projectRoot string, settings *BrandSettings, err error) {
 	hint := ResolveProjectRoot(startPath)

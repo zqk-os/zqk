@@ -63,21 +63,6 @@ import (
 
 const EmptyValue = ""
 
-// projectConfigBootstrapYAML matches a subset of .zqk/config/config.yaml read during init for branding.
-// Struct tags carry YAML keys so we avoid map index literals that collide with object kind names in drift scans.
-type projectConfigBootstrapYAML struct {
-	Brand           *brandConfigBootstrapYAML `yaml:"brand,omitempty"`
-	ExecutableName  string                    `yaml:"executable_name,omitempty"`
-	ProductName     string                    `yaml:"product_name,omitempty"`
-	NamespacePrefix string                    `yaml:"namespace_prefix,omitempty"`
-}
-
-type brandConfigBootstrapYAML struct {
-	ExecutableName  string `yaml:"executable_name,omitempty"`
-	ProductName     string `yaml:"product_name,omitempty"`
-	NamespacePrefix string `yaml:"namespace_prefix,omitempty"`
-}
-
 // Version information - set at build time via ldflags
 var (
 	version   = "dev"
@@ -572,7 +557,7 @@ func init() {
 	// can use the configured executable name.
 	//
 	// Priority:
-	// 1) brand.executable_name in project config (.zqk/config/config.yaml) if project root is discoverable
+	// 1) brand.executable_name in config/zqk-local.yaml then config/zqk.yaml
 	// 2) actual executable name (os.Args[0])
 	// 3) default ("zqk")
 	execName := "zqk"
@@ -582,32 +567,15 @@ func init() {
 	projectRoot := cli.ResolveProjectRoot(".")
 	namespacePrefix := strings.ToLower(execName)
 	if projectRoot != EmptyValue {
-		configPath := filepath.Join(projectRoot, paths.ProjectDataDir, paths.ConfigDir, paths.ProjectConfigFile)
-		if data, err := fileutil.ReadFile(configPath); err == nil {
-			var cfg projectConfigBootstrapYAML
-			if err := yaml.Unmarshal(data, &cfg); err == nil {
-				if b := cfg.Brand; b != nil {
-					if b.ExecutableName != EmptyValue {
-						execName = b.ExecutableName
-					}
-					if b.ProductName != EmptyValue {
-						brand.SetProductName(b.ProductName)
-					}
-					if b.NamespacePrefix != EmptyValue {
-						namespacePrefix = b.NamespacePrefix
-					}
-				}
-				// Also support top-level keys for backward compatibility.
-				if cfg.ExecutableName != EmptyValue {
-					execName = cfg.ExecutableName
-				}
-				if cfg.ProductName != EmptyValue {
-					brand.SetProductName(cfg.ProductName)
-				}
-				if cfg.NamespacePrefix != EmptyValue {
-					namespacePrefix = cfg.NamespacePrefix
-				}
-			}
+		loaded := brand.LoadFromProject(projectRoot)
+		if loaded.ExecutableName != EmptyValue {
+			execName = loaded.ExecutableName
+		}
+		if loaded.ProductName != EmptyValue {
+			brand.SetProductName(loaded.ProductName)
+		}
+		if loaded.NamespacePrefix != EmptyValue {
+			namespacePrefix = loaded.NamespacePrefix
 		}
 	}
 

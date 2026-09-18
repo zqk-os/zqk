@@ -4,10 +4,10 @@
 **IDE path:** [`COMMUNITY_FIRST_RUN.md`](./COMMUNITY_FIRST_RUN.md).
 
 ```bash
-./bin/zcom system init --project-name my-project
-./bin/zcom system agent-onboard --headless --format json
-./bin/zcom object list
-./bin/zcom workflow whats-next --format json
+./bin/zqk system init --project-name my-project
+./bin/zqk system agent-onboard --headless --format json
+./bin/zqk object list
+./bin/zqk workflow whats-next --format json
 ```
 
-`--headless` skips IDE rule forests. Do not `export ZCOM_PROJECT_ROOT`. There is no organ binary on this SKU.
+`--headless` skips IDE rule forests. Do not `export ZQK_PROJECT_ROOT`. There is no organ binary on this SKU.

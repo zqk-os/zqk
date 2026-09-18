@@ -8,13 +8,12 @@ import (
 	"strings"
 
 	"github.com/lanceman/zqk/pkg/brand"
-	"github.com/lanceman/zqk/pkg/paths"
 	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
-	"gopkg.in/yaml.v3"
 )
 
 // applybrand rewrites dest first-run copy from canonical `zqk` tokens to
-// brand.executable_name. SKU overlay sources stay canonical.
+// brand.executable_name in config/zqk-local.yaml then config/zqk.yaml.
+// SKU overlay sources stay canonical.
 // TRACK: TDE-1789678536875854000-47240146
 func main() {
 	root := flag.String("root", ".", "project root whose brand.executable_name is applied")
@@ -25,21 +24,16 @@ func main() {
 	}
 }
 
-type brandYAML struct {
-	Brand struct {
-		ExecutableName string `yaml:"executable_name"`
-		ProductName    string `yaml:"product_name"`
-	} `yaml:"brand"`
-	ExecutableName string `yaml:"executable_name"`
-}
-
 func run(root string) error {
 	root, err := filepath.Abs(root)
 	if err != nil {
 		return err
 	}
-	exe := loadExecutable(root)
-	if exe == "" || exe == brand.CanonicalExecutableToken {
+	exe := brand.LoadFromProject(root).ExecutableName
+	if exe == "" {
+		exe = brand.CanonicalExecutableToken
+	}
+	if exe == brand.CanonicalExecutableToken {
 		fmt.Printf("applybrand: executable=%s (canonical; no rewrite)\n", brand.CanonicalExecutableToken)
 		return nil
 	}
@@ -61,30 +55,6 @@ func run(root string) error {
 	}
 	fmt.Printf("applybrand: executable=%s files=%d\n", exe, n)
 	return nil
-}
-
-func loadExecutable(root string) string {
-	candidates := []string{
-		filepath.Join(root, paths.ProjectDataDir, paths.ConfigDir, paths.ProjectConfigFile),
-		filepath.Join(root, paths.ProjectDataDir, paths.ProjectConfigFile),
-	}
-	for _, p := range candidates {
-		data, err := fileutil.ReadFile(p)
-		if err != nil {
-			continue
-		}
-		var cfg brandYAML
-		if err := yaml.Unmarshal(data, &cfg); err != nil {
-			continue
-		}
-		if v := strings.TrimSpace(cfg.Brand.ExecutableName); v != "" {
-			return v
-		}
-		if v := strings.TrimSpace(cfg.ExecutableName); v != "" {
-			return v
-		}
-	}
-	return brand.CanonicalExecutableToken
 }
 
 func productDocPaths(root string) []string {

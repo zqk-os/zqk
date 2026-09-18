@@ -317,8 +317,8 @@ func (c *ObjectIDCache) getCacheFilePath(projectRoot string) string {
 	if c.cacheDir != emptyValue {
 		return filepath.Join(c.cacheDir, paths.ObjectIDCacheFile)
 	}
-	// Prefer brand-settings path alias ("cache") when the path cache is built so location is driven
-	// by zqk-settings.yaml; fallback keeps the canonical .zqk/cache/object-id-cache.json.
+	// Prefer path alias ("cache") when the path cache is built so location is
+	// driven by config/zqk.yaml. Fallback keeps the canonical .zqk/cache/object-id-cache.json.
 	cacheDir := paths.ResolvePathFromCacheOrConstant(projectRoot, "cache", filepath.Join(paths.ProjectDataDir, paths.CacheDir))
 	return filepath.Join(cacheDir, paths.ObjectIDCacheFile)
 }

@@ -1,6 +1,6 @@
 # Onboarding (ZQK Community)
 
-**CLI:** default executable token. Live binary is `brand.executable_name` in `.zqk/config/config.yaml`. Kernel data stays under `.zqk/`.
+**CLI:** default executable token. Live binary is `brand.executable_name` in `config/zqk-local.yaml` (wins) then `config/zqk.yaml`. Kernel data stays under `.zqk/`.
 
 ## Read this, in order
 

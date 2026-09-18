@@ -62,7 +62,7 @@ func NewStatusCmd() *cobra.Command {
 
 ## MCP Integration (AI Tool Interop)
 
-`zqk-community` ships a full **MCP JSON-RPC 2.0** server — identical surface to the full `zqk` binary.
+`zqk` ships a full **MCP JSON-RPC 2.0** server.
 
 ### Connect to IDE
 
@@ -72,7 +72,7 @@ Add to `~/.cursor/mcp.json` (or `.cursor/mcp.json` in your project):
 {
   "mcpServers": {
     "zqk": {
-      "command": "zqk-community",
+      "command": "zqk",
       "args": ["mcp", "serve", "--stdio"]
     }
   }
@@ -87,7 +87,7 @@ Add to `~/Library/Application Support/Claude/claude_desktop_config.json`:
 {
   "mcpServers": {
     "zqk": {
-      "command": "zqk-community",
+      "command": "zqk",
       "args": ["mcp", "serve", "--stdio"]
     }
   }
@@ -97,14 +97,14 @@ Add to `~/Library/Application Support/Claude/claude_desktop_config.json`:
 ### Connect via local HTTP (any MCP client)
 
 ```sh
-zqk-community mcp proxy --tcp 0.0.0.0:7777
+zqk mcp proxy --tcp 0.0.0.0:7777
 # MCP endpoint: http://localhost:7777
 ```
 
 ### Smoke test (verify ≥1 tool exposed)
 
 ```sh
-zqk-community mcp list-tools   # should print tool names
+zqk mcp list-tools   # should print tool names
 ```
 
 ### Available MCP subcommands

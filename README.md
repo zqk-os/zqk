@@ -14,8 +14,8 @@ There is **no brew formula and no public GitHub release** yet. Build from this c
 
 **1. Build the CLI**
 ```sh
-make          # → ./bin/zcom  (or ./bin/<brand.executable_name>)
-./bin/zcom --version
+make          # → ./bin/zqk  (or ./bin/<brand.executable_name>)
+./bin/zqk --version
 ```
 
 **2. Initialize your project (Polyglot: Python, TS, Rust, Go, Docs)**
@@ -23,23 +23,23 @@ make          # → ./bin/zcom  (or ./bin/<brand.executable_name>)
 # In this checkout (already initialized): skip init.
 # Greenfield:
 mkdir my-project && cd my-project
-/path/to/this-repo/bin/zcom system init --project-name my-project
-/path/to/this-repo/bin/zcom quickstart
+/path/to/this-repo/bin/zqk system init --project-name my-project
+/path/to/this-repo/bin/zqk quickstart
 ```
 
-Do **not** `export ZCOM_PROJECT_ROOT` in your shell profile. It silently attaches later commands to that checkout instead of the directory you are in.
+Do **not** `export ZQK_PROJECT_ROOT` in your shell profile. It silently attaches later commands to that checkout instead of the directory you are in.
 
 **3. Seat your AI agent**
 ```sh
-./bin/zcom system agent-onboard --format json
-./bin/zcom system start-here
+./bin/zqk system agent-onboard --format json
+./bin/zqk system start-here
 ```
 
 **4. Connect via Model Context Protocol (MCP)**
 ```sh
-./bin/zcom mcp install
-./bin/zcom mcp ensure --tcp 127.0.0.1:8443
-# Cursor stdio: ./bin/zcom mcp cursor-adapter
+./bin/zqk mcp install
+./bin/zqk mcp ensure --tcp 127.0.0.1:8443
+# Cursor stdio: ./bin/zqk mcp cursor-adapter
 ```
 
 ---
@@ -48,7 +48,7 @@ Do **not** `export ZCOM_PROJECT_ROOT` in your shell profile. It silently attache
 
 - **AI Agent Guardrails:** Enforceable policies that agents verify *before* modifying code.
 - **Autonomous Project Context:** Agents discover goals, requirements, and architectural decisions without manual prompting.
-- **Native Code Search:** Fast in-process AST and trigram search via `./bin/zcom grep` (alias `zgrep`).
+- **Native Code Search:** Fast in-process AST and trigram search via `./bin/zqk grep` (alias `zgrep`).
 - **Polyglot & Zero-Dependency:** Seamless greenfield initialization across Python, TypeScript, Rust, and Go.
 - **Local-First & Offline-Ready:** Zero cloud dependency required—runs locally with Git and filesystem storage.
 - **Full Traceability:** Every line of code and commit links directly back to project backlog items and requirements.
@@ -74,29 +74,29 @@ ZQK uses the [Model Context Protocol (MCP)](https://modelcontextprotocol.io/) to
 - **[AI Agent Onboarding Guide](./docs/onboarding/AI_AGENT_ONBOARDING.md)** — Deep-dive guide for AI agents participating in ZQK development.
 - **[Architecture Overview](./docs/architecture/README.md)** — Technical decisions, storage engine, and design specifications.
 
-**Onboarding as curriculum (system objects):** Templates live under **[scripts/onboarding_roadmap/README.md](./scripts/onboarding_roadmap/README.md)**. This SKU does **not** ship `make alpha-help` or `zqk-ts`. Scheduler **is** shipped: `./bin/zcom scheduler start|stop|status`.
+**Onboarding as curriculum (system objects):** Templates live under **[scripts/onboarding_roadmap/README.md](./scripts/onboarding_roadmap/README.md)**. This SKU does **not** ship `make alpha-help` or `zqk-ts`. Scheduler **is** shipped: `./bin/zqk scheduler start|stop|status`.
 
 ### Getting started (clean machine golden path)
 
 From an empty project directory, using the binary you built in this repo:
 
 ```bash
-/path/to/this-repo/bin/zcom system init --project-name my-project
-/path/to/this-repo/bin/zcom object list
-/path/to/this-repo/bin/zcom workflow whats-next --format json
+/path/to/this-repo/bin/zqk system init --project-name my-project
+/path/to/this-repo/bin/zqk object list
+/path/to/this-repo/bin/zqk workflow whats-next --format json
 ```
 
 Expected outcomes:
 
 - `system init` creates `.zqk/` and `.zqk/process/` scaffolding.
 - `object list` succeeds (kinds with rows after a seeded init).
-- `./bin/zcom scheduler start` is optional. First-run CRUD does not require it.
+- `./bin/zqk scheduler start` is optional. First-run CRUD does not require it.
 
 If you run init a second time in the same directory:
 
-- default `zcom system init` returns a clear "already initialized" error with next steps.
-- use `zcom system init --legacy --discover` to inspect/populate an existing project without destructive overwrite.
-- use `zcom system init --force` only when you explicitly want overwrite behavior.
+- default `zqk system init` returns a clear "already initialized" error with next steps.
+- use `zqk system init --legacy --discover` to inspect/populate an existing project without destructive overwrite.
+- use `zqk system init --force` only when you explicitly want overwrite behavior.
 
 ### Docs that exist in this tree
 

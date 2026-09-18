@@ -11,8 +11,8 @@ const CanonicalExecutableToken = defaultExecutableNameValue
 
 var (
 	// Match a bare "zqk" command token. Do not rewrite:
-	//   .zqk          data dir
-	//   zqk-settings  zqk-community  zqk-stable  (hyphenated identifiers)
+	//   .zqk           data dir
+	//   zqk.yaml       zqk-local.yaml  zqk-stable  (hyphenated / dotted filenames)
 	// Go's regexp has no lookahead; consume the following delimiter and put it back.
 	reCanonicalExec = regexp.MustCompile(`(^|[^.\w-])zqk($|[^.\w-])`)
 	reProductExact  = regexp.MustCompile(`\b(ZQK|NEXOS)\b`)

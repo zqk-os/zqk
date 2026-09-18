@@ -97,7 +97,7 @@ func TestQuickstartSmoke_FunctionalAcceptance(t *testing.T) {
 		t.Fatalf("failed to unpack release tarball %s: %v", archivePath, err)
 	}
 
-	binName := "zqk-community"
+	binName := "zqk"
 	binPath := filepath.Join(unpackDir, binName)
 	if !fileutil.Exists(binPath) {
 		binPath = filepath.Join(unpackDir, strings.TrimSuffix(archiveName, ".tar.gz"), binName)

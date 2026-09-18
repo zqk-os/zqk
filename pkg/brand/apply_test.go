@@ -12,7 +12,7 @@ func TestApplyCanonicalExecutable_preservesDataDir(t *testing.T) {
 }
 
 func TestApplyCanonicalExecutable_preservesHyphenatedIdentifiers(t *testing.T) {
-	in := "cmd/zqk-community and zqk-settings.yaml stay"
+	in := "config/zqk.yaml and zqk-stable stay"
 	got := ApplyCanonicalExecutable(in, "zcom")
 	if got != in {
 		t.Fatalf("hyphenated identifiers rewritten: %q", got)
