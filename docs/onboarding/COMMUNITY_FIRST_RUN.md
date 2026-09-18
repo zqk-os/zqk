@@ -73,6 +73,8 @@ First-run CRUD, `object list`, and `whats-next` work without the daemon. Start i
 1. `./bin/zqk quickstart` — same text as `./bin/zqk system start-here`. See [`QUICKSTART.md`](./QUICKSTART.md).
 2. `./bin/zqk mcp install` then optionally `./bin/zqk mcp ensure --tcp 127.0.0.1:8443`.
 3. `./bin/zqk object list` — first-run scoreboard.
-4. `./bin/zqk workflow whats-next --format json`.
+4. `./bin/zqk system dashboard` — kernel pulse (plan + counts).
+5. `./bin/zqk test dashboard` — test_case ↔ criteria lineage.
+6. `./bin/zqk workflow whats-next --format json`.
 
-There is no `zqk agent new`, `zqk auth`, or `zqk-admin` on this SKU. Scheduler **is** shipped: `zqk scheduler start|stop|status`.
+There is no `zqk agent new`, `zqk auth`, `zqk-admin`, or `system spec-origination` on this SKU. Scheduler **is** shipped: `zqk scheduler start|stop|status`. Spec origination and command codegen stay on the admin binary.

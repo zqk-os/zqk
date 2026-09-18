@@ -16,13 +16,15 @@ import (
 	"github.com/zqk-os/zqk/cmd/zqk/docman"
 	"github.com/zqk-os/zqk/cmd/zqk/grep"
 
+	"github.com/zqk-os/zqk/cmd/zqk-community/scheduler"
+	commsystem "github.com/zqk-os/zqk/cmd/zqk-community/system"
+	commtest "github.com/zqk-os/zqk/cmd/zqk-community/test"
 	"github.com/zqk-os/zqk/cmd/zqk/healthchk"
 	"github.com/zqk-os/zqk/cmd/zqk/inbox"
 	"github.com/zqk-os/zqk/cmd/zqk/learn"
 	"github.com/zqk-os/zqk/cmd/zqk/mcp"
 	newcmd "github.com/zqk-os/zqk/cmd/zqk/new"
 	"github.com/zqk-os/zqk/cmd/zqk/object"
-	"github.com/zqk-os/zqk/cmd/zqk-community/scheduler"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"github.com/zqk-os/zqk/pkg/zqkenv"
 
@@ -1269,7 +1271,7 @@ func registerCommands() {
 	rootCmd.AddCommand(objCmd)
 
 	// System operations group (health, validation, and maintenance)
-	systemCmdInst := system.NewSystemCmd()
+	systemCmdInst := commsystem.NewSystemCmd()
 	systemCmdInst.GroupID = "everyday"
 	rootCmd.AddCommand(systemCmdInst)
 
@@ -1337,6 +1339,11 @@ func registerCommands() {
 	schedulerCmdInst := scheduler.NewSchedulerCmd()
 	schedulerCmdInst.GroupID = "integrations"
 	rootCmd.AddCommand(schedulerCmdInst)
+
+	// Dest-owned test dashboard (studio cmd/zqk/test is not on this SKU).
+	testCmdInst := commtest.NewTestCmd()
+	testCmdInst.GroupID = "everyday"
+	rootCmd.AddCommand(testCmdInst)
 
 	// Observer, Keystore, Callback, Rollback, Semantic, Spec, Org, Domain, Ontology (Enterprise Only)
 
