@@ -34,6 +34,7 @@ install_file() {
 }
 
 install_file "$SKU/COMMUNITY_FIRST_RUN.md" "$DEST/docs/onboarding/COMMUNITY_FIRST_RUN.md"
+install_file "$SKU/FIRST_RUN_OBJECT_TUTORIAL.md" "$DEST/docs/onboarding/FIRST_RUN_OBJECT_TUTORIAL.md"
 install_file "$SKU/QUICKSTART.md" "$DEST/docs/onboarding/QUICKSTART.md"
 install_file "$SKU/CONTRIBUTING.md" "$DEST/CONTRIBUTING.md"
 install_file "$SKU/README.md" "$DEST/README.md"
