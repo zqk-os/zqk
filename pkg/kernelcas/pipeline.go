@@ -5,13 +5,13 @@ import (
 	"strings"
 	"time"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/kernelcas/compose"
-	"github.com/lanceman/zqk/pkg/logging"
-	"github.com/lanceman/zqk/pkg/nildecode"
-	"github.com/lanceman/zqk/pkg/pipeline"
-	"github.com/lanceman/zqk/pkg/zqkenv"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/kernelcas/compose"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/nildecode"
+	"github.com/zqk-os/zqk/pkg/pipeline"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
 // Mutation is the envelope carried through pipeline stages.
@@ -105,7 +105,7 @@ func runStages(ctx context.Context, logger logging.Logger, pipelineKind string, 
 			case PlanBreakGlass:
 				// AllowCoreObjectDelete, elevated delete:*/delete:core, or isolated test root
 				// satisfies break-glass without Mutation.Reason.
-				// TRACK: BLI-REDACTED
+				// TRACK: BLI-1785723654802038000-b14064bc
 				if strings.TrimSpace(in.Reason) == "" &&
 					!pkgctx.GetAllowCoreObjectDelete(ctx) &&
 					!pkgctx.MayHardDeleteCoreWithoutReason(pkgctx.GetSecurityContext(ctx)) &&

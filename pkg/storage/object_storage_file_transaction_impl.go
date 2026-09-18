@@ -5,9 +5,9 @@ import (
 
 	"sync"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/objects"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/objects"
 	// BeginTransaction starts a transaction for atomic multi-object operations
 )
 
@@ -140,7 +140,7 @@ func (tx *FileObjectTransaction) Delete(ctx context.Context, secCtx *pkgctx.Secu
 // DeleteByIDAndKind appends a delete op without reading the object.
 // Use for bulk delete when (id, kind) are already known to avoid N reads.
 // Critical kinds are refused here — callers must use Delete → kernel.cas_object_erase.
-// TRACK: BLI-REDACTED
+// TRACK: BLI-1785784864671436000-071adcbe
 func (tx *FileObjectTransaction) DeleteByIDAndKind(ctx context.Context, id, kind string) error {
 	if tx.committed || tx.rolledBack {
 		return errfmt.Errorf(ConstStreamTransactionAlreadyCommittedOrRolledBack)

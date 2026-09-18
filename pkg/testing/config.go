@@ -1,17 +1,16 @@
 package testing
 
 import (
-	"github.com/lanceman/zqk/pkg/datacell"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
-	"github.com/lanceman/zqk/pkg/zqkenv"
+	"github.com/zqk-os/zqk/pkg/datacell"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 
 	"path/filepath"
 
 	"gopkg.in/yaml.v3"
 
-	clctx "github.com/lanceman/zqk/internal/cli/context"
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/paths"
 )
 
 const emptyValue = ""
@@ -124,7 +123,7 @@ type testSettingsShape struct {
 func writeTestSettingsFile(testRoot string) error {
 	path := filepath.Join(testRoot, paths.TestSettingsFilename)
 	body := testSettingsShape{
-		Version: clctx.DefaultBrandSettingsVersion,
+		Version: paths.DefaultBrandSettingsVersion,
 		Paths:   map[string]any{},
 	}
 	data, err := yaml.Marshal(body)

@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/lanceman/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/logging"
 
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/storage"
 )
 
 // EconomicBroker enforces economic policies on kernel-to-kernel interactions.

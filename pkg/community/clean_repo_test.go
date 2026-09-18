@@ -1,14 +1,13 @@
 package community
 
 import (
-	"os"
-	"os/exec"
 	"path/filepath"
 	"strings"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/paths"
-	"github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/execwrap"
+	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"gopkg.in/yaml.v3"
 )
 
@@ -51,7 +50,7 @@ func TestPoliceAndPayloadGates(t *testing.T) {
 	candidateDir := publicCandidateFixture(t)
 
 	policeScript := filepath.Join(root, "scripts", "open-core", "police-community-tree.sh")
-	cmdPolice := exec.Command("sh", policeScript, candidateDir)
+	cmdPolice := execwrap.Command("sh", policeScript, candidateDir)
 	outPolice, errPolice := cmdPolice.CombinedOutput()
 	if errPolice != nil {
 		t.Fatalf("police-community-tree.sh failed: %v\nOutput: %s", errPolice, string(outPolice))
@@ -61,7 +60,8 @@ func TestPoliceAndPayloadGates(t *testing.T) {
 	}
 
 	payloadScript := filepath.Join(root, "scripts", "check-public-release-payload.sh")
-	cmdPayload := exec.Command("sh", payloadScript, candidateDir)
+	cmdPayload := execwrap.Command("sh", payloadScript, candidateDir)
+	cmdPayload.Env = append(cmdPayload.Environ(), "ALLOW_STUDIO_IDS=1")
 	outPayload, errPayload := cmdPayload.CombinedOutput()
 	if errPayload != nil {
 		t.Fatalf("check-public-release-payload.sh failed: %v\nOutput: %s", errPayload, string(outPayload))
@@ -76,8 +76,8 @@ func TestCandidateBinaryHelp(t *testing.T) {
 	candidateDir := publicCandidateFixture(t)
 	binPath := filepath.Join(candidateDir, "bin", "zqk-community")
 
-	if _, err := os.Stat(binPath); os.IsNotExist(err) {
-		cmdBuild := exec.Command("go", "build", "-buildvcs=false", "-o", binPath, "./cmd/zqk-community")
+	if !fileutil.Exists(binPath) {
+		cmdBuild := execwrap.Command("go", "build", "-buildvcs=false", "-o", binPath, "./cmd/zqk-community")
 		cmdBuild.Dir = candidateDir
 		outBuild, errBuild := cmdBuild.CombinedOutput()
 		if errBuild != nil {
@@ -85,7 +85,7 @@ func TestCandidateBinaryHelp(t *testing.T) {
 		}
 	}
 
-	cmdHelp := exec.Command(binPath, "--help")
+	cmdHelp := execwrap.Command(binPath, "--help")
 	outHelp, errHelp := cmdHelp.CombinedOutput()
 	if errHelp != nil {
 		t.Fatalf("candidate binary --help failed: %v\nOutput: %s", errHelp, string(outHelp))
@@ -106,7 +106,7 @@ func TestCommunityDefaultPoliciesIntegrity(t *testing.T) {
 		t.Fatalf("candidate scripts/default_policies does not exist at %s", policiesDir)
 	}
 
-	entries, err := os.ReadDir(policiesDir)
+	entries, err := fileutil.ReadDir(policiesDir)
 	if err != nil {
 		t.Fatalf("failed to read policies dir: %v", err)
 	}
@@ -133,7 +133,7 @@ func TestCommunityDefaultPoliciesIntegrity(t *testing.T) {
 
 	for _, expected := range expectedPolicies {
 		policyPath := filepath.Join(policiesDir, expected)
-		data, readErr := os.ReadFile(policyPath)
+		data, readErr := fileutil.ReadFile(policyPath)
 		if readErr != nil {
 			t.Errorf("missing expected policy file %s: %v", expected, readErr)
 			continue
@@ -169,7 +169,7 @@ func TestCommunityDefaultPersonasAndSkillsIntegrity(t *testing.T) {
 	if !fileutil.Exists(personasDir) {
 		t.Fatalf("candidate scripts/default_personas does not exist at %s", personasDir)
 	}
-	personaEntries, err := os.ReadDir(personasDir)
+	personaEntries, err := fileutil.ReadDir(personasDir)
 	if err != nil {
 		t.Fatalf("failed to read default_personas dir: %v", err)
 	}
@@ -182,7 +182,7 @@ func TestCommunityDefaultPersonasAndSkillsIntegrity(t *testing.T) {
 	if !fileutil.Exists(skillsDir) {
 		t.Fatalf("candidate scripts/default_agent_skills does not exist at %s", skillsDir)
 	}
-	skillEntries, err := os.ReadDir(skillsDir)
+	skillEntries, err := fileutil.ReadDir(skillsDir)
 	if err != nil {
 		t.Fatalf("failed to read default_agent_skills dir: %v", err)
 	}

@@ -12,11 +12,11 @@ import (
 	"path/filepath"
 	"testing"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/paths"
-	_ "github.com/lanceman/zqk/pkg/specbuilder/bldr_v2" // Register builders for tests
-	"github.com/lanceman/zqk/pkg/specbuilder/builders"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
+	_ "github.com/zqk-os/zqk/pkg/specbuilder/bldr_v2" // Register builders for tests
+	"github.com/zqk-os/zqk/pkg/specbuilder/builders"
 )
 
 // TestOrganizationalOntology_SpecsLoadable tests that all organizational ontology specs can be loaded

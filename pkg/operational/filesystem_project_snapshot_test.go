@@ -6,8 +6,8 @@ import (
 	"runtime"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/paths"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/paths"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 func TestRunFilesystemProjectSnapshot_Buckets(t *testing.T) {

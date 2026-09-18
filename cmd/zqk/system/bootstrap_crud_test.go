@@ -15,19 +15,19 @@ import (
 	"testing"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/execwrap"
-	"github.com/lanceman/zqk/pkg/goroutinelabels"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
-	"github.com/lanceman/zqk/pkg/zqkenv"
+	"github.com/zqk-os/zqk/pkg/execwrap"
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 
-	"github.com/lanceman/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/paths"
 
 	"gopkg.in/yaml.v3"
 
-	"github.com/lanceman/zqk/pkg/testkit"
-	"github.com/lanceman/zqk/pkg/zqktime"
+	"github.com/zqk-os/zqk/pkg/testkit"
+	"github.com/zqk-os/zqk/pkg/zqktime"
 
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // Note: If the test hits -timeout, Go's test runner panics with "test timed out after Nm0s"

@@ -5,8 +5,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/zqkenv"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
 func TestFileSandboxRoot_prefersAgentWorktree(t *testing.T) {
@@ -128,6 +128,26 @@ func TestAgentShellGuard(t *testing.T) {
 			}
 		})
 
+		t.Run("read_file_"+path, func(t *testing.T) {
+			args := map[string]any{
+				objects.FieldKeyPath: path,
+			}
+			_, err := server.handleAgentReadFileTool(ctx, args)
+			if err == nil {
+				t.Errorf("expected error for forbidden read path %q", path)
+			}
+		})
+
+		t.Run("read_code_"+path, func(t *testing.T) {
+			args := map[string]any{
+				objects.FieldKeyPath: path,
+			}
+			_, err := server.handleAgentReadCodeTool(ctx, args)
+			if err == nil {
+				t.Errorf("expected error for forbidden read path %q", path)
+			}
+		})
+
 		t.Run("bash_command_"+path, func(t *testing.T) {
 			args := map[string]any{
 				objects.FieldKeyCommand: "echo 'test' > " + path,
@@ -136,6 +156,38 @@ func TestAgentShellGuard(t *testing.T) {
 			if err == nil {
 				t.Errorf("expected error for forbidden bash command %q", args[objects.FieldKeyCommand])
 			} else if !strings.Contains(err.Error(), "access denied") {
+				t.Errorf("expected 'access denied' error, got %q", err.Error())
+			}
+		})
+	}
+
+	escapedPaths := []string{
+		"/etc/passwd",
+		"../../../../etc/passwd",
+		"/tmp/outside_test.txt",
+	}
+	for _, p := range escapedPaths {
+		t.Run("read_file_escape_"+p, func(t *testing.T) {
+			args := map[string]any{
+				objects.FieldKeyPath: p,
+			}
+			_, err := server.handleAgentReadFileTool(ctx, args)
+			if err == nil {
+				t.Fatalf("expected sandbox jail escape error for %q, got nil", p)
+			}
+			if !strings.Contains(err.Error(), "access denied") {
+				t.Errorf("expected 'access denied' error, got %q", err.Error())
+			}
+		})
+		t.Run("read_code_escape_"+p, func(t *testing.T) {
+			args := map[string]any{
+				objects.FieldKeyPath: p,
+			}
+			_, err := server.handleAgentReadCodeTool(ctx, args)
+			if err == nil {
+				t.Fatalf("expected sandbox jail escape error for %q, got nil", p)
+			}
+			if !strings.Contains(err.Error(), "access denied") {
 				t.Errorf("expected 'access denied' error, got %q", err.Error())
 			}
 		})

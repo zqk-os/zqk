@@ -5,8 +5,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/objects"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/objects"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 func TestAppendCVSMeasurementEvent_roundTrip(t *testing.T) {

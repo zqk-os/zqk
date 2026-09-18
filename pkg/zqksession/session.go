@@ -10,18 +10,18 @@ import (
 
 	"gopkg.in/yaml.v3"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/logging"
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/paths"
-	enumzqksession "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/zqk_session"
-	"github.com/lanceman/zqk/pkg/specbuilder/bldr_instance_v1"
-	"github.com/lanceman/zqk/pkg/storage"
-	idgen "github.com/lanceman/zqk/pkg/storage/id_generation"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
-	"github.com/lanceman/zqk/pkg/validation"
-	"github.com/lanceman/zqk/pkg/zqkenv"
-	"github.com/lanceman/zqk/pkg/zqktime"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
+	enumzqksession "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/zqk_session"
+	"github.com/zqk-os/zqk/pkg/specbuilder/bldr_instance_v1"
+	"github.com/zqk-os/zqk/pkg/storage"
+	idgen "github.com/zqk-os/zqk/pkg/storage/id_generation"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/validation"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
+	"github.com/zqk-os/zqk/pkg/zqktime"
 )
 
 const (
@@ -49,7 +49,7 @@ const (
 )
 
 // sessionStorageSecCtx returns a SecurityContext authorized for zqk_session storage I/O.
-// TRACK: BLI-REDACTED — remove when authenticated account contexts
+// TRACK: BLI-1785905136581480000-1f317f44 — remove when authenticated account contexts
 // always carry the permissions needed for session lifecycle writes.
 func sessionStorageSecCtx(ctx context.Context) *pkgctx.SecurityContext {
 	if sec := pkgctx.GetSecurityContext(ctx); sec != nil {

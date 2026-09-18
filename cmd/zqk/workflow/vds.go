@@ -8,15 +8,15 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/lanceman/zqk/internal/cli"
-	clipkg "github.com/lanceman/zqk/pkg/cli"
-	"github.com/lanceman/zqk/pkg/cli/bldr_cli_cmd_v1"
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/logging"
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/storage"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
-	"github.com/lanceman/zqk/pkg/vds"
+	"github.com/zqk-os/zqk/internal/cli"
+	clipkg "github.com/zqk-os/zqk/pkg/cli"
+	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/storage"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/vds"
 )
 
 // NewVDSCmd returns the workflow vds group.

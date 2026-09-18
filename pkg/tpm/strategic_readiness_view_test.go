@@ -3,15 +3,15 @@ package tpm
 import (
 	"context"
 	"encoding/json"
-	"os"
 	"path/filepath"
 	"testing"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/accumulator"
-	"github.com/lanceman/zqk/pkg/lifecycle"
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/accumulator"
+	"github.com/zqk-os/zqk/pkg/lifecycle"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 func TestStrategicReadinessPredicates(t *testing.T) {
@@ -117,11 +117,7 @@ func TestStrategicReadinessRunwayWatermark(t *testing.T) {
 }
 
 func TestStrategicReadinessIncrementalDelta(t *testing.T) {
-	tempDir, err := os.MkdirTemp("", "zqk-tpm-view-test-*")
-	if err != nil {
-		t.Fatalf("create temp dir: %v", err)
-	}
-	defer os.RemoveAll(tempDir)
+	tempDir := t.TempDir()
 
 	view := NewStrategicReadinessView(tempDir)
 	reqNode := &RequirementReadinessNode{
@@ -194,11 +190,7 @@ func TestStrategicReadinessIncrementalDelta(t *testing.T) {
 }
 
 func TestStrategicReadinessDomainClusteringAndSynthesisTrigger(t *testing.T) {
-	tempDir, err := os.MkdirTemp("", "zqk-tpm-view-test-*")
-	if err != nil {
-		t.Fatalf("create temp dir: %v", err)
-	}
-	defer os.RemoveAll(tempDir)
+	tempDir := t.TempDir()
 
 	view := NewStrategicReadinessView(tempDir)
 	view.planStatuses["PRI-ACTIVE-001"] = objects.ObjectStatusInProgress
@@ -289,14 +281,10 @@ func TestStrategicReadinessScanFromStorage(t *testing.T) {
 		},
 	}
 
-	tempDir, err := os.MkdirTemp("", "zqk-tpm-scan-test-*")
-	if err != nil {
-		t.Fatalf("create temp dir: %v", err)
-	}
-	defer os.RemoveAll(tempDir)
+	tempDir := t.TempDir()
 
 	view := NewStrategicReadinessView(tempDir)
-	err = view.ScanFromStorage(context.Background(), mockSP)
+	err := view.ScanFromStorage(context.Background(), mockSP)
 	if err != nil {
 		t.Fatalf("ScanFromStorage failed: %v", err)
 	}
@@ -337,11 +325,7 @@ func TestStrategicReadinessEvaluateAndReplenishRunway(t *testing.T) {
 		},
 	}
 
-	tempDir, err := os.MkdirTemp("", "zqk-tpm-replenish-test-*")
-	if err != nil {
-		t.Fatalf("create temp dir: %v", err)
-	}
-	defer os.RemoveAll(tempDir)
+	tempDir := t.TempDir()
 
 	snap, candidates, err := EvaluateAndReplenishRunway(context.Background(), mockSP, tempDir)
 	if err != nil {
@@ -361,7 +345,7 @@ func TestStrategicReadinessEvaluateAndReplenishRunway(t *testing.T) {
 	}
 }
 
-// TestStrategicReadinessAccumulatorInterfaceAndCircuitBreaker validates BLI-REDACTED:
+// TestStrategicReadinessAccumulatorInterfaceAndCircuitBreaker validates BLI-1789553222342866000-1043e052:
 // StrategicReadinessView satisfies the generic accumulator.Accumulator interface with sub-5ms SLA.
 func TestStrategicReadinessAccumulatorInterfaceAndCircuitBreaker(t *testing.T) {
 	tempDir := t.TempDir()
@@ -401,14 +385,10 @@ func TestStrategicReadinessAccumulatorInterfaceAndCircuitBreaker(t *testing.T) {
 }
 
 func TestStrategicReadinessView_DualFormatDeserialization(t *testing.T) {
-	tempDir, err := os.MkdirTemp("", "zqk-tpm-dual-test-*")
-	if err != nil {
-		t.Fatalf("create temp dir: %v", err)
-	}
-	defer os.RemoveAll(tempDir)
+	tempDir := t.TempDir()
 
 	litePath := StrategicReadinessLiteFilePath(tempDir)
-	if err := os.MkdirAll(filepath.Dir(litePath), 0755); err != nil {
+	if err := fileutil.MkdirAll(filepath.Dir(litePath), 0755); err != nil {
 		t.Fatalf("mkdir state: %v", err)
 	}
 
@@ -442,7 +422,7 @@ func TestStrategicReadinessView_DualFormatDeserialization(t *testing.T) {
 		t.Fatalf("marshal legacy flat: %v", err)
 	}
 
-	if err := os.WriteFile(litePath, legacyFlatJSON, 0644); err != nil {
+	if err := fileutil.WriteFile(litePath, legacyFlatJSON, 0644); err != nil {
 		t.Fatalf("write legacy flat file: %v", err)
 	}
 

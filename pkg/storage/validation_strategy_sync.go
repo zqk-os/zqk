@@ -3,7 +3,7 @@ package storage
 import (
 	"path/filepath"
 
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // SyncValidationStrategy implements synchronous file existence validation.

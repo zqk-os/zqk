@@ -13,10 +13,10 @@ import (
 func TestPkgStorageMustNotImportCLI(t *testing.T) {
 	t.Parallel()
 	banned := []string{
-		"github.com/lanceman/zqk/internal/cli",
-		"github.com/lanceman/zqk/pkg/cli",
-		"github.com/lanceman/zqk/cmd/zqk",
-		"github.com/lanceman/zqk/cmd/zqk-community",
+		"github.com/zqk-os/zqk/internal/cli",
+		"github.com/zqk-os/zqk/pkg/cli",
+		"github.com/zqk-os/zqk/cmd/zqk",
+		"github.com/zqk-os/zqk/cmd/zqk-community",
 	}
 	_, thisFile, _, ok := runtime.Caller(0)
 	if !ok {

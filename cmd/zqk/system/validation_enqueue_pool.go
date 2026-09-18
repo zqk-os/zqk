@@ -4,8 +4,8 @@ import (
 	stdcontext "context"
 	"sync"
 
-	"github.com/lanceman/zqk/pkg/concurrency"
-	"github.com/lanceman/zqk/pkg/goroutinelabels"
+	"github.com/zqk-os/zqk/pkg/concurrency"
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 )
 
 // Incremental validation after CUD is syscall-heavy (os.ReadFile per compose lookup).

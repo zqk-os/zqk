@@ -9,11 +9,11 @@ import (
 	"path/filepath"
 	"sort"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/storage"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
-	"github.com/lanceman/zqk/pkg/zqkenv"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/storage"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
 // SignTestCaseCompletion computes SHA-256 hashes of the supplied artifacts/files

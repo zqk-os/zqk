@@ -3,7 +3,7 @@ package mcp
 import (
 	"context"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
 )
 
 // EnsureContext returns ctx if non-nil, otherwise a new system context.

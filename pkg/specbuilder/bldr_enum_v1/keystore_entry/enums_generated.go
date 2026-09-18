@@ -4,8 +4,8 @@
 package keystore_entry
 
 import (
-	base_objectenum "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
-	shared_keystore_entriesenum "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/shared_keystore_entries"
+	base_objectenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
+	shared_keystore_entriesenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/shared_keystore_entries"
 )
 
 type Plane = base_objectenum.Plane

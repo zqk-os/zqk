@@ -8,9 +8,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/paths"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/paths"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 const (
@@ -23,6 +23,7 @@ const (
 	errWALEmptyFilename   = "WAL requires non-empty filename"
 	errWALEmptyCheckpoint = "WAL requires non-empty checkpoint extension"
 	errCreateWALDirFmt    = "create WAL dir: %w"
+	errSyncWALDirFmt      = "sync WAL dir: %w"
 	errOpenWALFileFmt     = "open WAL file: %w"
 	errMarshalWALFmt      = "marshal WAL record: %w"
 	errWALLineTooLargeFmt = "WAL line too large: %d"
@@ -60,6 +61,22 @@ func OpenJSONLineWALWithNextSeqFunc[T any](
 	maxLineSize int,
 	nextSeqFn func(walPath, ckPath string) (int64, error),
 ) (*JSONLineWAL[T], error) {
+	return openJSONLineWALWithNextSeqAndSyncDir[T](
+		projectRoot,
+		filename,
+		checkpointExt,
+		maxLineSize,
+		nextSeqFn,
+		fileutil.SyncDir,
+	)
+}
+
+func openJSONLineWALWithNextSeqAndSyncDir[T any](
+	projectRoot, filename, checkpointExt string,
+	maxLineSize int,
+	nextSeqFn func(walPath, ckPath string) (int64, error),
+	syncDir func(string) error,
+) (*JSONLineWAL[T], error) {
 	if projectRoot == emptyValue {
 		return nil, errors.New(errWALEmptyProject)
 	}
@@ -69,16 +86,48 @@ func OpenJSONLineWALWithNextSeqFunc[T any](
 	if checkpointExt == emptyValue {
 		return nil, errors.New(errWALEmptyCheckpoint)
 	}
-	dir := filepath.Join(projectRoot, paths.ProjectDataDir, paths.WalDir)
+	dataDir := filepath.Join(projectRoot, paths.ProjectDataDir)
+	_, dataDirStatErr := fileutil.Stat(dataDir)
+	dataDirWasMissing := fileutil.IsNotExist(dataDirStatErr)
+	if dataDirStatErr != nil && !dataDirWasMissing {
+		return nil, errfmt.Errorf(errCreateWALDirFmt, dataDirStatErr)
+	}
+	dir := filepath.Join(dataDir, paths.WalDir)
+	_, dirStatErr := fileutil.Stat(dir)
+	dirWasMissing := fileutil.IsNotExist(dirStatErr)
+	if dirStatErr != nil && !dirWasMissing {
+		return nil, errfmt.Errorf(errCreateWALDirFmt, dirStatErr)
+	}
 	if err := fileutil.MkdirAll(dir, walDirPerm); err != nil {
 		return nil, errfmt.Errorf(errCreateWALDirFmt, err)
+	}
+	if dirWasMissing {
+		if err := syncDir(dataDir); err != nil {
+			return nil, errfmt.Errorf(errSyncWALDirFmt, err)
+		}
+	}
+	if dataDirWasMissing {
+		if err := syncDir(projectRoot); err != nil {
+			return nil, errfmt.Errorf(errSyncWALDirFmt, err)
+		}
 	}
 	path := filepath.Join(dir, filename)
 	ckPath := path + checkpointExt
 
+	_, pathStatErr := fileutil.Stat(path)
+	pathWasMissing := fileutil.IsNotExist(pathStatErr)
+	if pathStatErr != nil && !pathWasMissing {
+		return nil, errfmt.Errorf(errOpenWALFileFmt, pathStatErr)
+	}
 	f, err := fileutil.OpenFile(path, fileutil.O_CREATE|fileutil.O_WRONLY|fileutil.O_APPEND, walFilePerm)
 	if err != nil {
 		return nil, errfmt.Errorf(errOpenWALFileFmt, err)
+	}
+	if pathWasMissing {
+		if err := syncDir(dir); err != nil {
+			_ = f.Close()
+			return nil, errfmt.Errorf(errSyncWALDirFmt, err)
+		}
 	}
 
 	w := &JSONLineWAL[T]{file: f, bw: bufio.NewWriter(f), path: path, ckPath: ckPath}

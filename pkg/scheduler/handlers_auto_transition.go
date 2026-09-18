@@ -8,14 +8,14 @@ import (
 	"path/filepath"
 	"sort"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/logging"
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/quality"
-	storagepkg "github.com/lanceman/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/quality"
+	storagepkg "github.com/zqk-os/zqk/pkg/storage"
 )
 
 type AutoTransitionHandler struct {

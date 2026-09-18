@@ -4,8 +4,8 @@
 package context_refresh_schedule
 
 import (
-	base_objectenum "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
-	shared_context_refresh_schedulesenum "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/shared_context_refresh_schedules"
+	base_objectenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
+	shared_context_refresh_schedulesenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/shared_context_refresh_schedules"
 )
 
 type Plane = base_objectenum.Plane

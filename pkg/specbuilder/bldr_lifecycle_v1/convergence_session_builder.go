@@ -3,8 +3,8 @@
 package bldr_lifecycle_v1
 
 import (
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/specbuilder/lifecycle_builders"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/specbuilder/lifecycle_builders"
 )
 
 // ConvergenceSessionLifecycleBuilder builds the convergence_session lifecycle at version v1_0_0
@@ -96,7 +96,7 @@ func (b *ConvergenceSessionLifecycleBuilder) addConvergenceSessionLifecycleData(
 	b.AddStatus(objects.Status{
 		Value:       "escalated",
 		Display:     "Escalated",
-		Description: "Option A (park-but-CAP-bound): recoverable handoff/parking hold. CAP may\\nstill bind; measure/tick must not persist session measurements; whats-next\\ndoes not auto-select for measure. Resume→active, or complete/abandon.\\nNOT lifecycle-terminal. See DEC-REDACTED /\\nBLI-REDACTED.\\n",
+		Description: "Option A (park-but-CAP-bound): recoverable handoff/parking hold. CAP may\\nstill bind; measure/tick must not persist session measurements; whats-next\\ndoes not auto-select for measure. Resume→active, or complete/abandon.\\nNOT lifecycle-terminal. See DEC-1786686986572580000-54124993 /\\nBLI-1786686768606200000-31133cc3.\\n",
 	})
 	b.AddStatus(objects.Status{
 		Value:       "error",

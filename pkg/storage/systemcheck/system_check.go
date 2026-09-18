@@ -4,16 +4,16 @@ import (
 	"context"
 	"path/filepath"
 
-	"github.com/lanceman/zqk/pkg/storage/filecas"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/storage/filecas"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 
 	"sync"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/goroutinelabels"
-	"github.com/lanceman/zqk/pkg/logging"
-	"github.com/lanceman/zqk/pkg/pipeline"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/pipeline"
 )
 
 // HandCASSystemCheckResult captures results from a hand-CAS + duplicate-ID scan.

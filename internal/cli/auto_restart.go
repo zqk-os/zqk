@@ -5,9 +5,9 @@ import (
 	"os"
 	"strings"
 
-	"github.com/lanceman/zqk/pkg/execwrap"
+	"github.com/zqk-os/zqk/pkg/execwrap"
 
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // Confirm prompts the user for a yes/no confirmation.

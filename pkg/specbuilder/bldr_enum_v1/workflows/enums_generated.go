@@ -4,8 +4,8 @@
 package workflows
 
 import (
-	base_objectenum "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
-	shared_workflowsenum "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/shared_workflows"
+	base_objectenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
+	shared_workflowsenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/shared_workflows"
 )
 
 type Category string

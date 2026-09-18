@@ -4,7 +4,7 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/when"
+	"github.com/zqk-os/zqk/pkg/when"
 )
 
 func TestTry_UnlessErrPreservesError(t *testing.T) {

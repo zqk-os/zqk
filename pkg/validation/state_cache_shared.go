@@ -5,10 +5,10 @@ import (
 	"sync"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/goroutinelabels"
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/logging"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/logging"
 )
 
 // sharedValidationCacheFlushDebounce coalesces dirty signals before JSON-marshal

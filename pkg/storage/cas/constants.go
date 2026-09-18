@@ -1,8 +1,8 @@
 package cas
 
 import (
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/logging"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/logging"
 )
 
 const ConstStreamFailedToRecordContentAddressedPutMetricValN = `failed to record content_addressed_put metric: %v\n`

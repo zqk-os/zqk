@@ -6,7 +6,7 @@
 package bldr_config_v1
 
 import (
-	"github.com/lanceman/zqk/pkg/specbuilder/config_builders"
+	"github.com/zqk-os/zqk/pkg/specbuilder/config_builders"
 )
 
 // KindMappingsConfigBuilder builds the kind_mappings_config config at version v1_0_0

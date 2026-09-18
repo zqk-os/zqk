@@ -4,8 +4,8 @@ import (
 	"sync"
 	"sync/atomic"
 
-	"github.com/lanceman/zqk/pkg/concurrency"
-	"github.com/lanceman/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/concurrency"
+	"github.com/zqk-os/zqk/pkg/logging"
 )
 
 // ValidationStrategy defines the interface for validating CAS index mappings before save.

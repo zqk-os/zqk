@@ -7,12 +7,12 @@ package scheduler
 import (
 	"context"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/logging"
-	"github.com/lanceman/zqk/pkg/nildecode"
-	"github.com/lanceman/zqk/pkg/pipeline"
-	"github.com/lanceman/zqk/pkg/zqktime"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/nildecode"
+	"github.com/zqk-os/zqk/pkg/pipeline"
+	"github.com/zqk-os/zqk/pkg/zqktime"
 )
 
 const pipelineKindSchedulerEventsAgg = "scheduler_events_aggregation"

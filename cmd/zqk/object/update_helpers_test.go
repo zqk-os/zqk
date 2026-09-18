@@ -7,18 +7,18 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/execwrap"
-	"github.com/lanceman/zqk/pkg/paths"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/execwrap"
+	"github.com/zqk-os/zqk/pkg/paths"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v3"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/storage"
-	"github.com/lanceman/zqk/pkg/testkit"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/testkit"
 
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 func TestStringSliceToAny(t *testing.T) {

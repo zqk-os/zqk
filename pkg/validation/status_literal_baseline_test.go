@@ -39,7 +39,7 @@ package validation
 // lifecycles. All of it is unchanged from origin/main, so it is pre-existing debt this scan revealed
 // rather than anything the branch introduced.
 //
-// TRACK: BLI-REDACTED — validation plane unification covers the fixture sweep.
+// TRACK: BLI-1787565256503969000-f5604378 — validation plane unification covers the fixture sweep.
 // TRACK: TDE-1787620546632583000-37916db4 — remove when: base_object gains an active state, or the
 // kinds below it get registry lifecycles, or the code is corrected to the ladder they have.
 var statusLiteralBaseline = map[string]int{

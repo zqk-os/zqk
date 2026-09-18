@@ -5,7 +5,7 @@ import (
 	"maps"
 	"strings"
 
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // cmdResultKey* are JSON keys for MCP command result payloads (MCP wire shape).

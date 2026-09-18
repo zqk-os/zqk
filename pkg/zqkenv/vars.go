@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/lanceman/zqk/pkg/brand"
+	"github.com/zqk-os/zqk/pkg/brand"
 )
 
 // IsCommunityEdition is a global flag set by the community binary.
@@ -19,6 +19,7 @@ const _sfxAgentPromptDeliveryHTTPBearer = "AGENT_PROMPT_DELIVERY_HTTP_BEARER" //
 const _sfxAgentPromptDeliveryHTTPURL = "AGENT_PROMPT_DELIVERY_HTTP_URL"
 const _sfxAgentPromptKeystrokeLog = "AGENT_PROMPT_KEYSTROKE_LOG"
 const _sfxAgentRulesDir = "AGENT_RULES_DIR"
+const _sfxAgentWebhookSlackAllAgentFarm = "AGENT_WEBHOOK_SLACK_ALL_AGENT_FARM"
 const _sfxAgentWorktreeRoot = "AGENT_WORKTREE_ROOT"
 const _sfxAgentID = "AGENT_ID"
 const _sfxAgentPubKey = "AGENT_PUB_KEY"
@@ -40,6 +41,7 @@ const _sfxIDEPasteApp = "IDE_PASTE_APP"
 const _sfxCVSPerTestLedgerMaxFailures = "CVS_LEDGER_MAX_FAILURES"
 const _sfxCRUDBaselineCount = "CRUD_BASELINE_COUNT"
 const _sfxDisableCriteriaAutoValidate = "DISABLE_CRITERIA_AUTO_VALIDATE"
+const _sfxTelemetryOptIn = "TELEMETRY_OPT_IN"
 const _sfxHostloadDisable = "HOSTLOAD_DISABLE"
 const _sfxHostCPUBackpressure = "HOST_CPU_BACKPRESSURE"
 const _sfxCRUDHeapProfile = "CRUD_HEAP_PROFILE"
@@ -110,6 +112,7 @@ const _sfxSession = "SESSION"
 const _sfxParentPID = "PARENT_PID"
 const _sfxPersona = "PERSONA"
 const _sfxPopulateScenarioTest = "POPULATE_SCENARIO_TEST"
+const _sfxPreconditionsFailOpen = "PRECONDITIONS_FAIL_OPEN"
 const _sfxPprof = "PPROF"
 const _sfxPprofPort = "PPROF_PORT"
 const _sfxProjectRoot = "PROJECT_ROOT"
@@ -191,18 +194,18 @@ func AgentWorktreeRoot() EnvVar { return EnvVar{Key: brand.EnvVar(_sfxAgentWorkt
 func AgentID() EnvVar { return EnvVar{Key: brand.EnvVar(_sfxAgentID)} }
 
 // AgentSyncMaxLoops returns the env var for AGENT_SYNC_MAX_LOOPS (brand-prefixed).
-// Sync-loop outer poll guard; default 100. TRACK: BLI-REDACTED
+// Sync-loop outer poll guard; default 100. TRACK: BLI-1783631896775129000-de3fef87
 func AgentSyncMaxLoops() EnvVar { return EnvVar{Key: brand.EnvVar(_sfxAgentSyncMaxLoops)} }
 
 // AgentMaxVerificationAttempts returns AGENT_MAX_VERIFICATION_ATTEMPTS (brand-prefixed).
-// Per-step verification retry cap; default 3. TRACK: BLI-REDACTED
+// Per-step verification retry cap; default 3. TRACK: BLI-1783631896775129000-de3fef87
 func AgentMaxVerificationAttempts() EnvVar {
 	return EnvVar{Key: brand.EnvVar(_sfxAgentMaxVerificationAttempts)}
 }
 
 // AgentSyncMaxStagnantTicks returns AGENT_SYNC_MAX_STAGNANT_TICKS (brand-prefixed).
 // Abort when task progress fingerprint is unchanged this many ticks; default 10.
-// TRACK: BLI-REDACTED
+// TRACK: BLI-1783631896775129000-de3fef87
 func AgentSyncMaxStagnantTicks() EnvVar {
 	return EnvVar{Key: brand.EnvVar(_sfxAgentSyncMaxStagnantTicks)}
 }
@@ -257,6 +260,11 @@ func CRUDBaselineCount() EnvVar { return EnvVar{Key: brand.EnvVar(_sfxCRUDBaseli
 // (criteria_verification_satisfied). Unset: allow auto-apply (opt-out).
 func DisableCriteriaAutoValidate() EnvVar {
 	return EnvVar{Key: brand.EnvVar(_sfxDisableCriteriaAutoValidate)}
+}
+
+// TelemetryOptIn returns the environment variable name for TELEMETRY_OPT_IN (brand-prefixed).
+func TelemetryOptIn() EnvVar {
+	return EnvVar{Key: brand.EnvVar(_sfxTelemetryOptIn)}
 }
 
 // HostloadDisable returns the env name for HOSTLOAD_DISABLE (brand-prefixed).
@@ -332,12 +340,17 @@ func EnablePublicCandidateTest() EnvVar {
 }
 
 // PublicCandidateDir is the disposable export dest for sync-public-candidate.sh.
-// Never the live TPM checkout (zqk-public-candidate). TRACK: BLI-REDACTED
+// Never the live TPM checkout (zqk-public-candidate). TRACK: BLI-1789619419231762000-7f87694b
 func PublicCandidateDir() EnvVar { return EnvVar{Key: brand.EnvVar(_sfxPublicCandidateDir)} }
 
 // PublicCandidateAllowClobber is human break-glass to rm -rf the well-known product sibling.
 func PublicCandidateAllowClobber() EnvVar {
 	return EnvVar{Key: brand.EnvVar(_sfxPublicCandidateAllowClobber)}
+}
+
+// AgentWebhookSlackAllAgentFarm returns the environment variable for AGENT_WEBHOOK_SLACK_ALL_AGENT_FARM (brand-prefixed).
+func AgentWebhookSlackAllAgentFarm() EnvVar {
+	return EnvVar{Key: brand.EnvVar(_sfxAgentWebhookSlackAllAgentFarm)}
 }
 
 // EnableMigrateLegacyToStreamIntegrationTest returns the environment variable name for ENABLE_MIGRATE_LEGACY_TO_STREAM_INTEGRATION_TEST (brand-prefixed).
@@ -536,6 +549,9 @@ func ParentPID() EnvVar { return EnvVar{Key: brand.EnvVar(_sfxParentPID)} }
 
 // PopulateScenarioTest returns the environment variable name for POPULATE_SCENARIO_TEST (brand-prefixed).
 func PopulateScenarioTest() EnvVar { return EnvVar{Key: brand.EnvVar(_sfxPopulateScenarioTest)} }
+
+// PreconditionsFailOpen returns the environment variable name for PRECONDITIONS_FAIL_OPEN (brand-prefixed).
+func PreconditionsFailOpen() EnvVar { return EnvVar{Key: brand.EnvVar(_sfxPreconditionsFailOpen)} }
 
 // Pprof returns the environment variable name for PPROF (brand-prefixed).
 func Pprof() EnvVar { return EnvVar{Key: brand.EnvVar(_sfxPprof)} }
@@ -895,3 +911,5 @@ func MCPRunDeadlockReproduction() EnvVar { return EnvVar{Key: "MCP_RUN_DEADLOCK_
 func ZQKCLITestUpdateHelpGolden() EnvVar { return EnvVar{Key: "ZQKCLI_TEST_UPDATE_HELP_GOLDEN"} }
 func ZQKAllowForegroundGoTest() EnvVar   { return EnvVar{Key: "ZQK_ALLOW_FOREGROUND_GO_TEST"} }
 func ZqkEnv() EnvVar                     { return EnvVar{Key: "ZQK_ENV"} }
+func ZQKProjectRoot() EnvVar             { return EnvVar{Key: brand.DefaultEnvPrefix + "_PROJECT_ROOT"} }
+func ZQKTestRoot() EnvVar                { return EnvVar{Key: brand.DefaultEnvPrefix + "_TEST_ROOT"} }

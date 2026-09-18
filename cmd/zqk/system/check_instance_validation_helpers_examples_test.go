@@ -5,7 +5,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // TestFixCommandExamples demonstrates what the generated fix commands look like

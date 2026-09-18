@@ -4,9 +4,9 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/lanceman/zqk/pkg/appledouble"
-	"github.com/lanceman/zqk/pkg/errfmt"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/appledouble"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // validateSourceDirectory validates that the source directory exists and is a directory

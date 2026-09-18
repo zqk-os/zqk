@@ -11,12 +11,12 @@ import (
 	"strings"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/paths"
-	"github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 
-	"github.com/lanceman/zqk/pkg/appledouble"
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/testkit"
+	"github.com/zqk-os/zqk/pkg/appledouble"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/testkit"
 )
 
 // TestFunction represents a discovered test function
@@ -102,7 +102,7 @@ func (tda *TimingDataAccessor) GetTiming(testName, packageName string) *testkit.
 // NewScanner creates a new test scanner.
 // ProjectRoot is cleaned and symlink-resolved so filepath.Walk can descend into
 // Local CI workdirs that are symlinks (trees/<sha>); Walk does not follow symlinks.
-// TRACK: BLI-REDACTED
+// TRACK: BLI-1785723654802038000-b14064bc
 func NewScanner(projectRoot string) *Scanner {
 	root := projectRoot
 	if abs, err := filepath.Abs(projectRoot); err == nil {

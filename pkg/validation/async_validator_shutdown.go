@@ -3,9 +3,9 @@ package validation
 import (
 	"context"
 
-	"github.com/lanceman/zqk/pkg/concurrency"
-	"github.com/lanceman/zqk/pkg/goroutinelabels"
-	"github.com/lanceman/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/concurrency"
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
+	"github.com/zqk-os/zqk/pkg/logging"
 )
 
 // InitiateShutdown implements QueueShutdownHandler

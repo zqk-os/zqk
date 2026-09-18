@@ -6,7 +6,7 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/lanceman/zqk/pkg/execwrap"
+	"github.com/zqk-os/zqk/pkg/execwrap"
 )
 
 // UnrepairedWakeReason classifies why a peer wake did not succeed after feed append.

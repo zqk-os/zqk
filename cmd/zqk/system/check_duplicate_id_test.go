@@ -1,9 +1,9 @@
 package system
 
 import (
-	"github.com/lanceman/zqk/pkg/datacell"
-	caspkg "github.com/lanceman/zqk/pkg/storage/cas"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/datacell"
+	caspkg "github.com/zqk-os/zqk/pkg/storage/cas"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 
 	"context"
 	"fmt"
@@ -12,19 +12,19 @@ import (
 	"testing"
 	"time"
 
-	"github.com/lanceman/zqk/internal/cli"
-	"github.com/lanceman/zqk/pkg/migration/parser"
+	"github.com/zqk-os/zqk/internal/cli"
+	"github.com/zqk-os/zqk/pkg/migration/parser"
 
 	"github.com/spf13/cobra"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/paths"
-	"github.com/lanceman/zqk/pkg/scheduler"
-	"github.com/lanceman/zqk/pkg/storage"
-	testkit "github.com/lanceman/zqk/pkg/testkit"
-	"github.com/lanceman/zqk/pkg/validation"
-	"github.com/lanceman/zqk/pkg/zqktime"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/scheduler"
+	"github.com/zqk-os/zqk/pkg/storage"
+	testkit "github.com/zqk-os/zqk/pkg/testkit"
+	"github.com/zqk-os/zqk/pkg/validation"
+	"github.com/zqk-os/zqk/pkg/zqktime"
 )
 
 // TestDuplicateID_DetectionAndResolution tests the detection and resolution

@@ -5,10 +5,10 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/paths"
-	storagepkg "github.com/lanceman/zqk/pkg/storage"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
-	"github.com/lanceman/zqk/pkg/zqktime"
+	"github.com/zqk-os/zqk/pkg/paths"
+	storagepkg "github.com/zqk-os/zqk/pkg/storage"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/zqktime"
 )
 
 const (

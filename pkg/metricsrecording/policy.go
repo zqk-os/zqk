@@ -8,8 +8,8 @@ import (
 	"sync/atomic"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/config"
-	"github.com/lanceman/zqk/pkg/zqkenv"
+	"github.com/zqk-os/zqk/pkg/config"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
 const (

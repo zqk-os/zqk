@@ -1,8 +1,8 @@
 package cli
 
 import (
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // ValidateCommandTraits validates that an object kind has the required traits for a command

@@ -4,8 +4,8 @@ import (
 	"context"
 	"strings"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/objects"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // DependentsForID returns one-level reverse dependents for id.
@@ -17,7 +17,7 @@ import (
 //
 // TRACK: [REDACTED-ID] — list fallback is a safety net while
 // reverse-index SaveCache/load settles; prefer cache hits for hot path.
-// TRACK: BLI-REDACTED — merge list even when index non-empty
+// TRACK: BLI-1785723654802038000-b14064bc — merge list even when index non-empty
 // (partial index returned archived-only deps and blocked PRI-SYM-005 promote).
 func DependentsForID(ctx context.Context, sp ObjectStorageProvider, id string) []string {
 	if id == "" {

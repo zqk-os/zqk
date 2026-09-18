@@ -6,12 +6,12 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/lanceman/zqk/internal/cli"
-	"github.com/lanceman/zqk/pkg/appledouble"
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/logging"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/internal/cli"
+	"github.com/zqk-os/zqk/pkg/appledouble"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/logging"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // ValidateYAMLFlags contains parsed validate-yaml command flags

@@ -1,8 +1,8 @@
 package scheduler
 
 import (
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/observability"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/observability"
 )
 
 // buildJobLoadedMetric builds a metric for job loaded events

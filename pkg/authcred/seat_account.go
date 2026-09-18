@@ -5,20 +5,20 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/paths"
-	"github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"gopkg.in/yaml.v3"
 )
 
 // DefaultSwarmWorkerAccount is the transitional ACC used when orchestrate cannot
 // map a persona/role to a seated account.
-// TRACK: BLI-REDACTED — replace with seating registry object.
+// TRACK: BLI-1785905292370531000-b758a11c — replace with seating registry object.
 const DefaultSwarmWorkerAccount = "ACC-1785920548450214011-dabd3692"
 
 // legacyAccountColonToACC mirrors scripts/acc-migrate-map.json for offline
 // canonicalize of retired account:username ids (POL-AGENT-ACCOUNT-LOGIN-001).
-// TRACK: BLI-REDACTED — drop when no account: refs remain in CAS.
+// TRACK: BLI-1785905136581480000-1f317f44 — drop when no account: refs remain in CAS.
 var legacyAccountColonToACC = map[string]string{
 	"account:coder_agent":             "ACC-1785920548450214000-80bb9c63",
 	"account:ide-seat-01":             "ACC-1785920548450214001-7b3cc2de",
@@ -56,7 +56,7 @@ type accountPersonaFields struct {
 
 // CanonicalAccountID resolves ACC-* passthrough or legacy account:username → ACC-*.
 // Empty string means unresolved (caller keeps the original ref for diagnostics).
-// TRACK: BLI-REDACTED
+// TRACK: BLI-1785905136581480000-1f317f44
 func CanonicalAccountID(projectRoot, ref string) string {
 	raw := strings.TrimSpace(ref)
 	if raw == "" {
@@ -90,7 +90,7 @@ func CanonicalAccountID(projectRoot, ref string) string {
 
 // ResolveSeatAccount maps a persona id, role label, or ACC id to an ACC-* seat.
 // Preference: already ACC-* → account with matching persona_ref → default swarm worker.
-// TRACK: BLI-REDACTED
+// TRACK: BLI-1785905292370531000-b758a11c
 func ResolveSeatAccount(projectRoot, personaOrAccount string) string {
 	raw := strings.TrimSpace(personaOrAccount)
 	if strings.HasPrefix(raw, "ACC-") {
@@ -188,7 +188,7 @@ func findAccountForUsername(projectRoot, username string) string {
 }
 
 // AccountCASPath returns the on-disk CAS yaml path for an ACC-* id via .account.index.
-// TRACK: BLI-REDACTED
+// TRACK: BLI-1785905136581480000-1f317f44
 func AccountCASPath(projectRoot, accountID string) string {
 	accountID = strings.TrimSpace(accountID)
 	if projectRoot == "" || !strings.HasPrefix(accountID, "ACC-") {

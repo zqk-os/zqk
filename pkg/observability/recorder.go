@@ -4,7 +4,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/errfmt"
 )
 
 const emptyValue = ""

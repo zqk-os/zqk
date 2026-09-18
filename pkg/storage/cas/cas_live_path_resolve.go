@@ -1,10 +1,10 @@
 package cas
 
 import (
-	"github.com/lanceman/zqk/pkg/datacell"
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/storage/filecas"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/datacell"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/storage/filecas"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // ResolveLiveCASFilePath returns the on-disk hash YAML for objectID when the CAS
@@ -12,7 +12,7 @@ import (
 // points at a deleted hash after update/promote/delete (misreported as "stale
 // index entry" by system check).
 //
-// TRACK: BLI-REDACTED — remove when: object-id-cache always
+// TRACK: BLI-1785895580100186000-c5539372 — remove when: object-id-cache always
 // receives the new CAS path on write and drops entries on delete before check.
 func ResolveLiveCASFilePath(projectRoot, kind, objectID string) (string, bool) {
 	if projectRoot == "" || kind == "" || objectID == "" {

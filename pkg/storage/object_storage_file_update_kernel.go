@@ -3,14 +3,14 @@ package storage
 import (
 	"context"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/kernelcas"
-	"github.com/lanceman/zqk/pkg/objects"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/kernelcas"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 func (f *FileObjectStorage) updateViaKernelIfNeeded(ctx context.Context, secCtx *pkgctx.SecurityContext, id string, updates map[string]any) (bool, error) {
 	// Kernel Mutation Pipeline entry (COMMIT re-enters with kernelcas.WithCommit).
-	// TRACK: BLI-REDACTED
+	// TRACK: BLI-1785784864671436000-071adcbe
 	if !kernelcas.IsCommit(ctx) {
 		kind := ""
 		if f.idValidator != nil {

@@ -4,12 +4,12 @@ import (
 	"path/filepath"
 	"regexp"
 
-	"github.com/lanceman/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/paths"
 
-	"github.com/lanceman/zqk/internal/cli"
-	"github.com/lanceman/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/internal/cli"
+	"github.com/zqk-os/zqk/pkg/logging"
 
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 var (

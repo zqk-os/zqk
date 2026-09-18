@@ -6,9 +6,9 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/validation"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/validation"
 )
 
 // resolveReference resolves a single reference string using the ID stream

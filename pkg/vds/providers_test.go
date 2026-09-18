@@ -3,6 +3,9 @@ package vds
 import (
 	"path/filepath"
 	"testing"
+
+	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 func TestLookupProvider_unknown(t *testing.T) {
@@ -64,8 +67,19 @@ func TestResolveVendorProviders_defaultsWhenEmpty(t *testing.T) {
 }
 
 func TestLoadCustomization_parsesVendorProviders(t *testing.T) {
-	root := findRepoRoot(t)
-	cust, path, err := LoadCustomization(root, DefaultCustomizationProfileRel)
+	root := t.TempDir()
+	const rel = "customization.yaml"
+	body := []byte(`vendor_providers:
+  default: cursor
+  providers:
+    - id: cursor
+      format: ide_mdc
+      out: .cursor/rules/vds.mdc
+`)
+	if err := fileutil.WriteFile(filepath.Join(root, rel), body, paths.FilePerm644); err != nil {
+		t.Fatal(err)
+	}
+	cust, path, err := LoadCustomization(root, rel)
 	if err != nil {
 		t.Fatal(err)
 	}

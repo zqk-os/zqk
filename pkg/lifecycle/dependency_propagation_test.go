@@ -5,13 +5,13 @@ import (
 	"path/filepath"
 	"testing"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/coordination"
-	"github.com/lanceman/zqk/pkg/logging"
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/paths"
-	"github.com/lanceman/zqk/pkg/storage"
-	"github.com/lanceman/zqk/pkg/testkit"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/coordination"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/testkit"
 )
 
 type synchronousRecordingCoordinator struct {
@@ -125,7 +125,7 @@ func TestDependencyPropagationSubscriber_IDAndEventTypes(t *testing.T) {
 }
 
 func TestDependencyPropagationSubscriber_HandleEvent_NoUpdateWhenTerminal(t *testing.T) {
-	// TRACK: BLI-REDACTED — no t.Parallel: shared Memgraph + fixed fixture IDs.
+	// TRACK: BLI-1785443942668406000-1ec5c811 — no t.Parallel: shared Memgraph + fixed fixture IDs.
 	pool := testkit.PrepareGraphConnectionForTest(t)
 	realStorage := storage.NewPoolAwareGraphStorage(pool, t.TempDir())
 	ctx := pkgctx.NewSystemContext()
@@ -171,7 +171,7 @@ func TestDependencyPropagationSubscriber_HandleEvent_NoUpdateWhenTerminal(t *tes
 }
 
 func TestDependencyPropagationSubscriber_HandleEvent_SkipLockWhenSiblingNotReadyOrLater(t *testing.T) {
-	// TRACK: BLI-REDACTED — airtight lock; BLI-REDACTED — no t.Parallel.
+	// TRACK: BLI-1786411312347141000-5f3d9063 — airtight lock; BLI-1785443942668406000-1ec5c811 — no t.Parallel.
 	pool := testkit.PrepareGraphConnectionForTest(t)
 	realStorage := storage.NewPoolAwareGraphStorage(pool, t.TempDir())
 	ctx := pkgctx.NewSystemContext()
@@ -222,7 +222,7 @@ func TestDependencyPropagationSubscriber_HandleEvent_SkipLockWhenSiblingNotReady
 }
 
 func TestDependencyPropagationSubscriber_HandleEvent_OccupancyLockWhenLastDraftSiblingClears(t *testing.T) {
-	// TRACK: BLI-REDACTED — lock is skipped while a sibling is
+	// TRACK: BLI-1786411312347141000-5f3d9063 — lock is skipped while a sibling is
 	// validated; promoting that sibling to planned must re-evaluate occupancy.
 	pool := testkit.PrepareGraphConnectionForTest(t)
 	realStorage := storage.NewPoolAwareGraphStorage(pool, t.TempDir())
@@ -302,7 +302,7 @@ func TestMaybeExecutionLockPlan_LocksActiveWhenChildrenAlreadyInFlight(t *testin
 }
 
 func TestDependencyPropagationSubscriber_HandleEvent_LocksWhenAllSiblingsReadyOrLater(t *testing.T) {
-	// TRACK: BLI-REDACTED
+	// TRACK: BLI-1786411312347141000-5f3d9063
 	pool := testkit.PrepareGraphConnectionForTest(t)
 	realStorage := storage.NewPoolAwareGraphStorage(pool, t.TempDir())
 	ctx := pkgctx.NewSystemContext()
@@ -350,7 +350,7 @@ func TestDependencyPropagationSubscriber_HandleEvent_LocksWhenAllSiblingsReadyOr
 }
 
 func TestDependencyPropagationSubscriber_HandleEvent_BLIInProgressLocksActivePlan(t *testing.T) {
-	// TRACK: BLI-REDACTED — no t.Parallel: shared Memgraph + fixed fixture IDs.
+	// TRACK: BLI-1785443942668406000-1ec5c811 — no t.Parallel: shared Memgraph + fixed fixture IDs.
 	pool := testkit.PrepareGraphConnectionForTest(t)
 	realStorage := storage.NewPoolAwareGraphStorage(pool, t.TempDir())
 	ctx := pkgctx.NewSystemContext()
@@ -393,7 +393,7 @@ func TestDependencyPropagationSubscriber_HandleEvent_BLIInProgressLocksActivePla
 }
 
 func TestDependencyPropagationSubscriber_HandleEvent_BLIInProgressRepairsGroomingPlan(t *testing.T) {
-	// TRACK: BLI-REDACTED — no t.Parallel: shared Memgraph + fixed fixture IDs.
+	// TRACK: BLI-1785443942668406000-1ec5c811 — no t.Parallel: shared Memgraph + fixed fixture IDs.
 	pool := testkit.PrepareGraphConnectionForTest(t)
 	realStorage := storage.NewPoolAwareGraphStorage(pool, t.TempDir())
 	ctx := pkgctx.NewSystemContext()
@@ -432,7 +432,7 @@ func TestDependencyPropagationSubscriber_HandleEvent_BLIInProgressRepairsGroomin
 }
 
 func TestDependencyPropagationSubscriber_HandleEvent_ReopenedExploringReturnsToGrooming(t *testing.T) {
-	// TRACK: BLI-REDACTED — no t.Parallel: shared Memgraph + fixed fixture IDs.
+	// TRACK: BLI-1785443942668406000-1ec5c811 — no t.Parallel: shared Memgraph + fixed fixture IDs.
 	pool := testkit.PrepareGraphConnectionForTest(t)
 	realStorage := storage.NewPoolAwareGraphStorage(pool, t.TempDir())
 	ctx := pkgctx.NewSystemContext()
@@ -470,7 +470,7 @@ func TestDependencyPropagationSubscriber_HandleEvent_ReopenedExploringReturnsToG
 }
 
 func TestDependencyPropagationSubscriber_HandleEvent_PlannedChildDoesNotGroom(t *testing.T) {
-	// TRACK: BLI-REDACTED — no t.Parallel: shared Memgraph + fixed fixture IDs.
+	// TRACK: BLI-1785443942668406000-1ec5c811 — no t.Parallel: shared Memgraph + fixed fixture IDs.
 	pool := testkit.PrepareGraphConnectionForTest(t)
 	realStorage := storage.NewPoolAwareGraphStorage(pool, t.TempDir())
 	ctx := pkgctx.NewSystemContext()
@@ -509,7 +509,7 @@ func TestDependencyPropagationSubscriber_HandleEvent_PlannedChildDoesNotGroom(t 
 }
 
 func TestDependencyPropagationSubscriber_HandleEvent_SkipsWhenAlreadyInProgress(t *testing.T) {
-	// TRACK: BLI-REDACTED — no t.Parallel: shared Memgraph + fixed fixture IDs.
+	// TRACK: BLI-1785443942668406000-1ec5c811 — no t.Parallel: shared Memgraph + fixed fixture IDs.
 	pool := testkit.PrepareGraphConnectionForTest(t)
 	realStorage := storage.NewPoolAwareGraphStorage(pool, t.TempDir())
 	ctx := pkgctx.NewSystemContext()
@@ -545,7 +545,7 @@ func TestDependencyPropagationSubscriber_HandleEvent_SkipsWhenAlreadyInProgress(
 }
 
 func TestDependencyPropagationSubscriber_HandleEvent_SkipsTerminalPriorityPlan(t *testing.T) {
-	// TRACK: BLI-REDACTED — no t.Parallel: shared Memgraph + fixed fixture IDs.
+	// TRACK: BLI-1785443942668406000-1ec5c811 — no t.Parallel: shared Memgraph + fixed fixture IDs.
 	pool := testkit.PrepareGraphConnectionForTest(t)
 	realStorage := storage.NewPoolAwareGraphStorage(pool, t.TempDir())
 	ctx := pkgctx.NewSystemContext()

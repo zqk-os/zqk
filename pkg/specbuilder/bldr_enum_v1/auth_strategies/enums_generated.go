@@ -4,8 +4,8 @@
 package auth_strategies
 
 import (
-	base_objectenum "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
-	shared_auth_strategiesenum "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/shared_auth_strategies"
+	base_objectenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
+	shared_auth_strategiesenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/shared_auth_strategies"
 )
 
 type PriorityTier = base_objectenum.PriorityTier

@@ -5,9 +5,9 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/lanceman/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/storage"
 
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // groupResults groups objects by a specified field

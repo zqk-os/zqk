@@ -6,12 +6,12 @@ import (
 	"sync"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/metrics"
-	"github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/metrics"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
-// TRACK: BLI-REDACTED — FileTSDB wires chunked timeseries prototype for embedded telemetry.
+// TRACK: BLI-1783822950016030000-81da5812 — FileTSDB wires chunked timeseries prototype for embedded telemetry.
 
 const (
 	fileTSDBChunkDuration = time.Hour

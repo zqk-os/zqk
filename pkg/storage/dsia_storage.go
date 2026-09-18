@@ -2,20 +2,18 @@ package storage
 
 import (
 	"context"
-	"crypto/rand"
 	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
 	"path/filepath"
 	"sync"
-	"time"
 
 	"gopkg.in/yaml.v3"
 
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/paths"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 type DSIAStorageProvider struct {
@@ -35,21 +33,8 @@ func NewDSIAStorageProvider(baseDir ...string) *DSIAStorageProvider {
 // AtomicWriteFile writes data to a temporary file in the same directory as the target file
 // and then renames it atomically to the target file path.
 func (p *DSIAStorageProvider) AtomicWriteFile(filePath string, data []byte, perm fileutil.FileMode) error {
-	dir := filepath.Dir(filePath)
-	if err := fileutil.MkdirAll(dir, 0755); err != nil {
-		return errfmt.Newf("failed to create directory %s", dir).Wrap(err)
-	}
-	randBytes := make([]byte, 8)
-	if _, err := rand.Read(randBytes); err != nil {
-		return errfmt.Newf("failed to generate random suffix").Wrap(err)
-	}
-	tempFilePath := filepath.Join(dir, fmt.Sprintf(".%s.tmp.%s", filepath.Base(filePath), hex.EncodeToString(randBytes)))
-	if err := fileutil.WriteFile(tempFilePath, data, perm); err != nil {
-		return errfmt.Newf("failed to write temp file %s", tempFilePath).Wrap(err)
-	}
-	if err := fileutil.Rename(tempFilePath, filePath); err != nil {
-		_ = fileutil.Remove(tempFilePath)
-		return errfmt.Newf("failed to rename temp file to target %s", filePath).Wrap(err)
+	if err := fileutil.WriteDurableFile(filePath, data, perm); err != nil {
+		return errfmt.Newf("failed durable atomic write to %s", filePath).Wrap(err)
 	}
 	if _, statErr := fileutil.Stat(filePath); statErr != nil {
 		return fmt.Errorf("AtomicWriteFile: Rename succeeded but Stat failed! path=%s, err=%w", filePath, statErr)
@@ -82,22 +67,7 @@ func (p *DSIAStorageProvider) writeWithChecksumAndRename(targetPath string, obj 
 		return err
 	}
 
-	dir := filepath.Dir(targetPath)
-	if err := fileutil.MkdirAll(dir, 0755); err != nil {
-		return err
-	}
-
-	tmpPath := targetPath + fmt.Sprintf(".%d.tmp", time.Now().UnixNano())
-	if err := fileutil.WriteFile(tmpPath, finalData, 0644); err != nil {
-		return err
-	}
-
-	// Atomic rename
-	if err := fileutil.Rename(tmpPath, targetPath); err != nil {
-		_ = fileutil.Remove(tmpPath)
-		return err
-	}
-	return nil
+	return p.AtomicWriteFile(targetPath, finalData, fileutil.StandardFilePerm)
 }
 
 func (p *DSIAStorageProvider) Create(ctx context.Context, secCtx *SecurityContext, obj map[string]any) error {
@@ -262,18 +232,34 @@ func (tx *DSIATransaction) Commit(ctx context.Context) error {
 	if !tx.active {
 		return fmt.Errorf("transaction inactive")
 	}
+	// A failed commit may already have applied an earlier operation. Make the
+	// transaction terminal so callers cannot accidentally replay a partial
+	// commit and compound the inconsistency.
+	tx.active = false
 	for id := range tx.deleted {
-		_ = tx.provider.Delete(ctx, nil, id, false)
-	}
-	for _, obj := range tx.staged {
-		id, _ := obj[objects.FieldKeyID].(string)
-		if exists, _ := tx.provider.Exists(ctx, nil, id); exists {
-			_ = tx.provider.Update(ctx, nil, id, obj)
-		} else {
-			_ = tx.provider.Create(ctx, nil, obj)
+		if err := tx.provider.Delete(ctx, nil, id, false); err != nil {
+			return errfmt.Newf("commit delete %s", id).Wrap(err)
 		}
 	}
-	tx.active = false
+	for _, obj := range tx.staged {
+		id, ok := obj[objects.FieldKeyID].(string)
+		if !ok || id == "" {
+			return fmt.Errorf("commit staged object: id is required")
+		}
+		exists, err := tx.provider.Exists(ctx, nil, id)
+		if err != nil {
+			return errfmt.Newf("commit check existence %s", id).Wrap(err)
+		}
+		if exists {
+			if err := tx.provider.Update(ctx, nil, id, obj); err != nil {
+				return errfmt.Newf("commit update %s", id).Wrap(err)
+			}
+			continue
+		}
+		if err := tx.provider.Create(ctx, nil, obj); err != nil {
+			return errfmt.Newf("commit create %s", id).Wrap(err)
+		}
+	}
 	return nil
 }
 

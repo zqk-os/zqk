@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // TestGoValidator_ValidateChecksum tests the validateChecksum function for DSIA

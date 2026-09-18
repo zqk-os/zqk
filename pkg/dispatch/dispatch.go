@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/errfmt"
 )
 
 // WorkItem describes a single job for the dispatch loop: run one CLI command or tool

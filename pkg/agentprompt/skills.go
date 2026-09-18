@@ -6,13 +6,13 @@ import (
 	"path/filepath"
 	"strings"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/logging"
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/skill"
-	"github.com/lanceman/zqk/pkg/storage"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/skill"
+	"github.com/zqk-os/zqk/pkg/storage"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // SyncASKTwins scans the .zqk/skills/ directory and creates missing kernel agent_skill objects.
@@ -146,7 +146,7 @@ func LoadRelevantSkillsOpts(ctx context.Context, sp storage.ObjectStorageProvide
 			if err != nil {
 				logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
 				logger.Error("Failed to read skill file for verification", err, logging.String("skill", id), logging.String("path", skillMdPath))
-				// TRACK: BLI-REDACTED — fail-closed when file_path is set.
+				// TRACK: BLI-1785643580218036000-30ecf93f — fail-closed when file_path is set.
 				return fmt.Errorf("skill %s failed seal verification: cannot read %s: %w", id, skillMdPath, err)
 			}
 			verifyRes := skill.VerifySeal(string(content))

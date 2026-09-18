@@ -8,15 +8,15 @@ import (
 
 	"gopkg.in/yaml.v3"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/contractchange"
-	"github.com/lanceman/zqk/pkg/datacellregistry"
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/logging"
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/paths"
-	"github.com/lanceman/zqk/pkg/pipeline"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/contractchange"
+	"github.com/zqk-os/zqk/pkg/datacellregistry"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/pipeline"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // BuildSpecOriginationPipeline constructs the spec origination pipeline (see DATA_ORIGINATION_PIPELINE_VISION.md).
@@ -371,7 +371,7 @@ func stageTrigger(pctx *pipeline.Context, pl any) (any, error) {
 		}
 	}
 	// Durable contract-change outbox (async demote on kernel/scheduler start).
-	// TRACK: BLI-REDACTED
+	// TRACK: BLI-1785918841712163000-f128dc79
 	if !s.Opts.DryRun {
 		if err := contractchange.EmitForKind(s.Opts.ProjectRoot, s.Opts.Ontology, "spec_origin_trigger"); err != nil {
 			return nil, errfmt.Errorf("SPEC_ORIGIN_TRIGGER: contract-change emit: %w", err)

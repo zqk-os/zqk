@@ -3,9 +3,9 @@ package kernel
 import (
 	"context"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/mcp"
-	"github.com/lanceman/zqk/pkg/storage"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/mcp"
+	"github.com/zqk-os/zqk/pkg/storage"
 )
 
 // KnowledgeKernel defines the interface for the central knowledge base.

@@ -5,8 +5,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/graph/provider"
-	"github.com/lanceman/zqk/pkg/llm/semanticcache"
+	"github.com/zqk-os/zqk/pkg/graph/provider"
+	"github.com/zqk-os/zqk/pkg/llm/semanticcache"
 )
 
 func TestCognitiveLiquidityPool(t *testing.T) {

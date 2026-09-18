@@ -3,7 +3,7 @@ package audit
 import (
 	"time"
 
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // Group is a set of events that will be aggregated together.

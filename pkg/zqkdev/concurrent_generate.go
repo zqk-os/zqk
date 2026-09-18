@@ -6,7 +6,7 @@ import (
 	"sync"
 	"sync/atomic"
 
-	"github.com/lanceman/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/logging"
 	"golang.org/x/sync/errgroup"
 )
 

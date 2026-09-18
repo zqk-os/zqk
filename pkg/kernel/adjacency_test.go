@@ -6,8 +6,8 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/dna"
-	"github.com/lanceman/zqk/pkg/kernel"
+	"github.com/zqk-os/zqk/pkg/dna"
+	"github.com/zqk-os/zqk/pkg/kernel"
 )
 
 func TestAdjacencyEngine_BasicGraphOperations(t *testing.T) {

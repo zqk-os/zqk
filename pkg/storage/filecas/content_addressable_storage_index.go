@@ -6,20 +6,20 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 
-	"github.com/lanceman/zqk/pkg/concurrency"
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/logging"
-	"github.com/lanceman/zqk/pkg/paths"
-	"github.com/lanceman/zqk/pkg/storage/locknames"
+	"github.com/zqk-os/zqk/pkg/concurrency"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/storage/locknames"
 )
 
 // Save saves the ID index to disk.
 // Under the file lock, reload disk and merge so a stale in-memory snapshot cannot
 // clobber a fresher index written by another process (sync-cas-index / heal).
-// TRACK: BLI-REDACTED
+// TRACK: BLI-1785723654802038000-b14064bc
 func (idx *IDIndex) Save() error {
 	metrics := getSafeMetrics()
 	lockStart := time.Now()
@@ -146,7 +146,7 @@ func (idx *IDIndex) saveMappingsNoLock(mappings, bucketKeys, createdAts map[stri
 		return errfmt.Newf(ConstMiscFailedToRenameTempIndexIntoPlace).Wrap(err)
 	}
 	// Best-effort: remove abandoned sibling temps from killed mid-write processes.
-	// TRACK: BLI-REDACTED
+	// TRACK: BLI-1785723654802038000-b14064bc
 	cleanupStaleCASIndexTempFiles(dir, filepath.Base(idx.FilePath), tmpName)
 
 	// Best-effort directory sync to make rename durable on disk.
@@ -224,7 +224,7 @@ func (idx *IDIndex) SetMapping(objectID, hash string, bucketKey ...string) error
 	err := concurrency.RunInLockWithLogger(&idx.Mu, locknames.LockNameListingIndexSetMapping, logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)), func() error {
 		// Snapshot pre-load memory, then reload disk. Do NOT blanket-overlay memory onto
 		// disk — that reverted sync-cas-index / heal when system check held a stale CAS.
-		// TRACK: BLI-REDACTED
+		// TRACK: BLI-1785723654802038000-b14064bc
 		preservedMappings := make(map[string]string)
 		if idx.Mappings != nil {
 			maps.Copy(preservedMappings, idx.Mappings)
@@ -287,7 +287,7 @@ func (idx *IDIndex) SetMapping(objectID, hash string, bucketKey ...string) error
 // createdAts is optional: ID -> RFC3339 for high-volume kinds.
 // When the merged result matches the on-disk index already loaded, the durable save is skipped
 // (system check warm was rewriting every kind index every run — multi-second stall).
-// TRACK: BLI-REDACTED — warm no-op; keep when: check warm stays <1s on warm caches.
+// TRACK: BLI-1785895580100186000-c5539372 — warm no-op; keep when: check warm stays <1s on warm caches.
 func (idx *IDIndex) SetMappings(mappings, bucketKeys map[string]string, createdAts ...map[string]string) error {
 	if len(mappings) == 0 {
 		return nil
@@ -315,7 +315,7 @@ func (idx *IDIndex) SetMappings(mappings, bucketKeys map[string]string, createdA
 	unchanged := false
 	err := concurrency.RunInLockWithLogger(&idx.Mu, locknames.LockNameListingIndexSetMappings, logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)), func() error {
 		// Disk-preferred merge after reload (same as SetMapping). Explicit `mappings` win last.
-		// TRACK: BLI-REDACTED
+		// TRACK: BLI-1785723654802038000-b14064bc
 		preservedMappings := make(map[string]string)
 		if idx.Mappings != nil {
 			maps.Copy(preservedMappings, idx.Mappings)

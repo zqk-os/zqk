@@ -1,9 +1,9 @@
 package object
 
 import (
-	"github.com/lanceman/zqk/internal/cli"
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/rollup"
+	"github.com/zqk-os/zqk/internal/cli"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/rollup"
 )
 
 // applyChildRollupOverlay applies kind-agnostic child rollup summaries (counts, percent complete,

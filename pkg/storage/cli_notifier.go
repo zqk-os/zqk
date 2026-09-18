@@ -2,13 +2,14 @@ package storage
 
 import (
 	"context"
+	"fmt"
 	"sync"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/concurrency"
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/logging"
-	"github.com/lanceman/zqk/pkg/storage/locknames"
+	"github.com/zqk-os/zqk/pkg/concurrency"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/storage/locknames"
 	// ProgressEventEmitter is an interface for emitting progress events through coordinator
 	// This allows coordinator integration without creating import cycles
 )
@@ -45,10 +46,9 @@ type ProgressTracker struct {
 
 // NewCLINotifier creates a new CLI notifier
 // eventEmitter is required - all progress events are emitted through it via coordinator
-func NewCLINotifier(verbose, quiet bool, eventEmitter ProgressEventEmitter) *CLINotifier {
+func NewCLINotifier(verbose, quiet bool, eventEmitter ProgressEventEmitter) (*CLINotifier, error) {
 	if eventEmitter == nil {
-		// TRACK: [Notifier initialization prerequisite missing]
-		panic(ConstMiscClinotifierRequiresAProgresseventemitter)
+		return nil, fmt.Errorf("%s", ConstMiscClinotifierRequiresAProgresseventemitter)
 	}
 	// Use system context for CLI notifier initialization
 	ctx := pkgctx.NewSystemContext()
@@ -76,6 +76,7 @@ func NewCLINotifier(verbose, quiet bool, eventEmitter ProgressEventEmitter) *CLI
 		// Default to text formatter if no context
 		progressFormatter = logging.NewTextProgressFormatter()
 		profile = string(pkgctx.ProfileHuman)
+		loggingCtx = pkgctx.NewLoggingContext(pkgctx.ProfileHuman)
 	}
 
 	// Get logger from context to create progress logger
@@ -97,7 +98,7 @@ func NewCLINotifier(verbose, quiet bool, eventEmitter ProgressEventEmitter) *CLI
 		progress:       make(map[string]*ProgressTracker),
 		eventEmitter:   eventEmitter,
 		profile:        profile,
-	}
+	}, nil
 }
 
 // NotifyProgress sends a progress update

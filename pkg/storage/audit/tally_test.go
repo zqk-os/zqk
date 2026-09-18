@@ -3,7 +3,7 @@ package audit
 import (
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 func TestTallyEvents(t *testing.T) {

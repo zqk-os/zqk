@@ -47,3 +47,13 @@ func ClassifyWorkClass(parts ...string) WorkClass {
 func (c WorkClass) IsDocsEval() bool {
 	return c == WorkClassDocsEval
 }
+
+// IsCode reports whether class is source code engineering work.
+func (c WorkClass) IsCode() bool {
+	return c == WorkClassCoding
+}
+
+// IsCoding is an alias for IsCode.
+func (c WorkClass) IsCoding() bool {
+	return c.IsCode()
+}

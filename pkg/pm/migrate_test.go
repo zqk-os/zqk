@@ -5,7 +5,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/dna"
+	"github.com/zqk-os/zqk/pkg/dna"
 )
 
 func TestMigrateLegacyBacklogItemYAML(t *testing.T) {
@@ -15,8 +15,8 @@ created_by: ACC-1785920548450214012-68b850c0
 description: Core migration testing backlog item.
 estimated_effort: 2 days
 goal_refs:
-- GOAL-REDACTED
-id: BLI-REDACTED
+- GOAL-1782237534659420000-d8a7cdea
+id: BLI-1782225703572753000-7bfab85b
 kind: backlog_item
 namespace_id: zqk:kernel
 priority: high
@@ -35,7 +35,7 @@ version_context: default
 	}
 
 	// Verify URN synthesis
-	expectedURN := "urn:zqk:kernel:backlog_item:BLI-REDACTED"
+	expectedURN := "urn:zqk:kernel:backlog_item:BLI-1782225703572753000-7bfab85b"
 	if bli.URN.String() != expectedURN {
 		t.Errorf("URN mismatch: got %q, want %q", bli.URN.String(), expectedURN)
 	}
@@ -81,7 +81,7 @@ version_context: default
 	if bli.Description != "Core migration testing backlog item." {
 		t.Errorf("Description mismatch: got %q", bli.Description)
 	}
-	if len(bli.GoalRefs) != 1 || bli.GoalRefs[0] != "GOAL-REDACTED" {
+	if len(bli.GoalRefs) != 1 || bli.GoalRefs[0] != "GOAL-1782237534659420000-d8a7cdea" {
 		t.Errorf("GoalRefs mismatch: got %v", bli.GoalRefs)
 	}
 }
@@ -154,7 +154,7 @@ func TestMigrateActualCASBacklogFile(t *testing.T) {
 		t.Fatalf("failed to migrate real CAS backlog file: %v", err)
 	}
 
-	if bli.URN.ID != "BLI-REDACTED" {
+	if bli.URN.ID != "BLI-1782225703572753000-7bfab85b" {
 		t.Errorf("unexpected ID: %s", bli.URN.ID)
 	}
 	if bli.GetProvenance().ParentHash != DefaultGenesisParentHash {

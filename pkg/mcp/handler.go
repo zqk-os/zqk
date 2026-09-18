@@ -8,8 +8,8 @@ import (
 	"io"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/logging"
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // Handler handles a JSON-RPC method call

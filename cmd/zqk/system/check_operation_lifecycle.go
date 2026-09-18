@@ -3,10 +3,10 @@ package system
 import (
 	"time"
 
-	"github.com/lanceman/zqk/pkg/concurrency"
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/coordination"
-	"github.com/lanceman/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/concurrency"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/coordination"
+	"github.com/zqk-os/zqk/pkg/storage"
 )
 
 // reportSystemCheckCallback emits the high-level system_check complete or error

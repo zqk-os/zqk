@@ -9,13 +9,13 @@ import (
 	"testing"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/circuitbreaker"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/circuitbreaker"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 
-	"github.com/lanceman/zqk/pkg/goroutinelabels"
-	"github.com/lanceman/zqk/pkg/logging"
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 )
 
 func TestShouldReenqueueTriggerAfterDispatchDrop(t *testing.T) {

@@ -5,8 +5,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/paths"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/paths"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 func TestAnalyze_SyntheticKindsAndSystemKeys(t *testing.T) {
@@ -325,7 +325,7 @@ func TestAnalyze_RepeatedStringSkipsLoggingKeysAndCosmeticSuffix(t *testing.T) {
 		t.Fatal(err)
 	}
 	goSrc := `package p
-import "github.com/lanceman/zqk/pkg/logging"
+import "github.com/zqk-os/zqk/pkg/logging"
 func f() {
 	_ = logging.String("object_id", "x")
 	_ = logging.String("object_id", "y")

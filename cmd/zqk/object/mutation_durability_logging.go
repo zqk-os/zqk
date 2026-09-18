@@ -4,7 +4,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/logging"
 )
 
 // slowCLIObjectMutationFlushThreshold is when we log that post-mutation durability work took

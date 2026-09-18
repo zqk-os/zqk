@@ -5,14 +5,14 @@ import (
 	"strings"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // cleanupStaleCASIndexTempFiles removes abandoned CreateTemp siblings left when a
 // process is killed between CreateTemp and Rename (IDE runner timeouts are a
 // common cause). Never removes the just-renamed tmpName.
 //
-// TRACK: BLI-REDACTED
+// TRACK: BLI-1785723654802038000-b14064bc
 func cleanupStaleCASIndexTempFiles(dir, indexBase, justWroteTmp string) {
 	if dir == emptyValue || indexBase == emptyValue {
 		return

@@ -6,8 +6,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/concurrency"
-	pkgctx "github.com/lanceman/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/concurrency"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
 )
 
 // BufferedWriterConfig configures buffered writer behavior

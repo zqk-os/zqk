@@ -1,7 +1,7 @@
 package system
 
 import (
-	"github.com/lanceman/zqk/pkg/fitness"
+	"github.com/zqk-os/zqk/pkg/fitness"
 )
 
 // annotateIssueClasses fills Issue.IssueClass from fitness.ClassifyIssue when empty.

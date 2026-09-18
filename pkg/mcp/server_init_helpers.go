@@ -6,15 +6,15 @@ import (
 	"strings"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/authcred"
-	"github.com/lanceman/zqk/pkg/concurrency"
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/goroutinelabels"
-	"github.com/lanceman/zqk/pkg/logging"
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/observer"
-	"github.com/lanceman/zqk/pkg/zqkenv"
+	"github.com/zqk-os/zqk/pkg/authcred"
+	"github.com/zqk-os/zqk/pkg/concurrency"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/observer"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
 // prepareReinitialization handles re-initialization logic when server is already initialized
@@ -105,7 +105,7 @@ func (s *Server) resolveAccountIDFromRegistry(clientName string, clientInfo map[
 	}
 
 	// Try common patterns. Prefer ACC-* / canonicalized legacy account:username.
-	// TRACK: BLI-REDACTED
+	// TRACK: BLI-1785905136581480000-1f317f44
 	possibleAccountIDs := []string{
 		clientName,
 		strings.ToLower(clientName),
@@ -427,7 +427,7 @@ func (s *Server) eliciteAccountID(ctx context.Context, clientID string, clientIn
 	elicitationParams := []ElicitationParam{
 		ElicitParamWithChoices(
 			clientInfoAccountID,
-			"Your account ID (e.g., ACC-1785920548450214000-80bb9c63, ACC-1785920548450214016-ace2aae1). This determines your role and permissions.",
+			"Your account ID (e.g., ACC-…). This determines your role and permissions.",
 			"string",
 			true,
 			availableAccountIDs,

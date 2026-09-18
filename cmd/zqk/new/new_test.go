@@ -9,12 +9,12 @@ import (
 
 	"github.com/spf13/cobra"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/paths"
-	"github.com/lanceman/zqk/pkg/testenvroot"
-	"github.com/lanceman/zqk/pkg/utils/fileutil"
-	"github.com/lanceman/zqk/pkg/zqkenv"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/testenvroot"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
 func findModuleRoot() (string, error) {
@@ -263,7 +263,7 @@ func TestShouldAutoTracePipeline(t *testing.T) {
 
 // TestAutoTracePipeline_BLI1789335658105469000_Discipline tests the fail-closed mint discipline
 // where requirement, goal, and milestone mints must auto-run gen-trace-pipeline unless skipped or in test.
-// TRACK: BLI-REDACTED, PRI-REDACTED, POL-AGENT-TPM-TRACE-PIPELINE-001
+// TRACK: BLI-1789335658105469000-6a07dd3a, PRI-1789335690752634000-26ad932b, POL-AGENT-TPM-TRACE-PIPELINE-001
 func TestAutoTracePipeline_BLI1789335658105469000_Discipline(t *testing.T) {
 	cmd := NewNewCmd()
 	var leaf *cobra.Command

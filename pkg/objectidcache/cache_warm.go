@@ -8,18 +8,18 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/concurrency"
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/datacell"
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/goroutinelabels"
-	"github.com/lanceman/zqk/pkg/loader"
-	"github.com/lanceman/zqk/pkg/logging"
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/pipeline"
-	"github.com/lanceman/zqk/pkg/process"
-	"github.com/lanceman/zqk/pkg/storage"
-	caspkg "github.com/lanceman/zqk/pkg/storage/cas"
+	"github.com/zqk-os/zqk/pkg/concurrency"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/datacell"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
+	"github.com/zqk-os/zqk/pkg/loader"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/pipeline"
+	"github.com/zqk-os/zqk/pkg/process"
+	"github.com/zqk-os/zqk/pkg/storage"
+	caspkg "github.com/zqk-os/zqk/pkg/storage/cas"
 )
 
 // noOpCacheProgressNotifier is used when no progress emission is wanted; atomic.Value cannot store nil.
@@ -182,7 +182,7 @@ func EnsureObjectIDCacheReady(ctx stdcontext.Context, projectRoot string, forceR
 			}
 
 			// Drain object-id-cache pending journal so mid-refresh check sees coherent entries.
-			// TRACK: BLI-REDACTED
+			// TRACK: BLI-1785895580100186000-c5539372
 			drainObjectIDCachePending(projectRoot)
 
 			return state, nil
@@ -223,7 +223,7 @@ func TryLoadObjectIDCacheOnly(projectRoot string) bool {
 	// Heal object-id-cache paths that still name deleted CAS hashes (update/promote
 	// lag). Without this, async system check discovery validates ghosts and emits
 	// false "stale index entry" Tier-1 blockers.
-	// TRACK: BLI-REDACTED
+	// TRACK: BLI-1785723654802038000-b14064bc
 	if n := cache.ValidateAndCleanStale(); n > 0 {
 		storage.InvalidateListCache()
 		persistCacheChanges(cache, projectRoot, "Failed to save object ID cache after stale-path heal")
@@ -520,6 +520,9 @@ func warmCASIndexesFromCache(ctx stdcontext.Context, projectRoot string, cache *
 	byKind := make(map[string]map[string]string) // kind -> id -> filePath
 	for _, entry := range entries {
 		if entry == nil || entry.FilePath == emptyValue || entry.ID == emptyValue || entry.Kind == emptyValue {
+			continue
+		}
+		if storage.IsObjectDraftPlanePath(projectRoot, entry.FilePath) {
 			continue
 		}
 		if byKind[entry.Kind] == nil {

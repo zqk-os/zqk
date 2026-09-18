@@ -5,13 +5,127 @@ import (
 	"fmt"
 	"sort"
 	"strings"
+	"sync"
+	"sync/atomic"
 	"time"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/goroutinelabels"
-	"github.com/lanceman/zqk/pkg/logging"
-	"github.com/lanceman/zqk/pkg/objects"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
+
+type changeJournalTracker struct {
+	wg      sync.WaitGroup
+	pending atomic.Int64
+}
+
+var (
+	changeJournalTrackers   = make(map[string]*changeJournalTracker)
+	changeJournalTrackersMu sync.RWMutex
+)
+
+func getChangeJournalTracker(projectRoot string) *changeJournalTracker {
+	if projectRoot == emptyValue {
+		projectRoot = "global"
+	}
+	changeJournalTrackersMu.RLock()
+	t, ok := changeJournalTrackers[projectRoot]
+	changeJournalTrackersMu.RUnlock()
+	if ok {
+		return t
+	}
+	changeJournalTrackersMu.Lock()
+	defer changeJournalTrackersMu.Unlock()
+	if t, ok := changeJournalTrackers[projectRoot]; ok {
+		return t
+	}
+	t = &changeJournalTracker{}
+	changeJournalTrackers[projectRoot] = t
+	return t
+}
+
+// ChangeJournalShutdownHandler coordinates graceful drain of change journal writes during shutdown.
+type ChangeJournalShutdownHandler struct{}
+
+// InitiateShutdown implements QueueShutdownHandler
+func (h *ChangeJournalShutdownHandler) InitiateShutdown() error {
+	return nil
+}
+
+// Drain implements QueueShutdownHandler
+func (h *ChangeJournalShutdownHandler) Drain(ctx context.Context) error {
+	return DrainChangeJournal(ctx)
+}
+
+// IsDrained implements QueueShutdownHandler
+func (h *ChangeJournalShutdownHandler) IsDrained() bool {
+	return h.GetPendingCount() == 0
+}
+
+// GetPendingCount implements QueueShutdownHandler
+func (h *ChangeJournalShutdownHandler) GetPendingCount() int64 {
+	changeJournalTrackersMu.RLock()
+	defer changeJournalTrackersMu.RUnlock()
+	var total int64
+	for _, t := range changeJournalTrackers {
+		total += t.pending.Load()
+	}
+	return total
+}
+
+// GetName implements QueueShutdownHandler
+func (h *ChangeJournalShutdownHandler) GetName() string {
+	return "change_journal"
+}
+
+// IsCritical implements QueueShutdownHandler
+func (h *ChangeJournalShutdownHandler) IsCritical() bool {
+	return true
+}
+
+func init() {
+	GetGlobalShutdownCoordinator().RegisterQueue(&ChangeJournalShutdownHandler{})
+}
+
+// DrainChangeJournalForRoot blocks until all in-flight asynchronous change journal writes
+// for the given projectRoot complete, or until ctx is cancelled.
+func DrainChangeJournalForRoot(ctx context.Context, projectRoot string) error {
+	if projectRoot == emptyValue {
+		return nil
+	}
+	t := getChangeJournalTracker(projectRoot)
+	done := make(chan struct{})
+	goroutinelabels.NewGoroutine("storage-change-journal-drain", "wait for change journal writes").
+		StartSimple(func() {
+			t.wg.Wait()
+			close(done)
+		})
+	select {
+	case <-done:
+		return nil
+	case <-ctx.Done():
+		return ctx.Err()
+	}
+}
+
+// DrainChangeJournal blocks until all in-flight asynchronous change journal writes
+// across all project roots complete, or until ctx is cancelled.
+func DrainChangeJournal(ctx context.Context) error {
+	changeJournalTrackersMu.RLock()
+	roots := make([]string, 0, len(changeJournalTrackers))
+	for root := range changeJournalTrackers {
+		roots = append(roots, root)
+	}
+	changeJournalTrackersMu.RUnlock()
+
+	for _, root := range roots {
+		if err := DrainChangeJournalForRoot(ctx, root); err != nil {
+			return err
+		}
+	}
+	return nil
+}
 
 // findNextChangeJournalID finds the next available change journal entry ID.
 // When stream storage is enabled for change_journal_entry, uses a per-project batch cache
@@ -82,6 +196,10 @@ func createChangeJournalEntry(parentCtx context.Context, projectRoot, id, kind, 
 		}
 	}
 
+	tracker := getChangeJournalTracker(projectRoot)
+	tracker.pending.Add(1)
+	tracker.wg.Add(1)
+
 	// Use the same cached storage provider as the rest of the process (daemon, CLI).
 	// Creating a new FileObjectStorage per entry could use a spec loader that doesn't have
 	// the builder registry set (e.g. in daemon child process), causing "builder registry not set"
@@ -93,6 +211,10 @@ func createChangeJournalEntry(parentCtx context.Context, projectRoot, id, kind, 
 	bgCtx := context.WithoutCancel(baseCtx)
 	goroutinelabels.NewGoroutine("storage-change-journal", "async createChangeJournalEntry").
 		StartSimple(func() {
+			defer func() {
+				tracker.pending.Add(-1)
+				tracker.wg.Done()
+			}()
 			ctx, cancel := context.WithTimeout(bgCtx, 10*time.Second)
 			defer cancel()
 			var storageProvider ObjectStorageProvider

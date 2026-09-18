@@ -6,10 +6,10 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/healthcheck"
-	"github.com/lanceman/zqk/pkg/metrics"
-	"github.com/lanceman/zqk/pkg/paths"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/healthcheck"
+	"github.com/zqk-os/zqk/pkg/metrics"
+	"github.com/zqk-os/zqk/pkg/paths"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // objectVolumeMonitor checks recent object volume for high-volume kinds

@@ -6,7 +6,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/lanceman/zqk/pkg/execwrap"
+	"github.com/zqk-os/zqk/pkg/execwrap"
 )
 
 // Capturer defines the interface for taking screenshots.

@@ -1,0 +1,31 @@
+body: |
+    This project must maintain an active policy set covering at least these categories:
+    workflow, agent_guidance, documentation, and (when code exists) code_quality / testing.
+
+    **Near-term**: A default pack is seeded at init / demo bootstrap. Do not delete the last
+    policy in a required category without replacing it.
+
+    **Later evolution**: Shrink the baked-in pack; this meta-policy remains and demands that
+    agents/humans create additional category-specific policies as the project matures
+    (rather than shipping the full catalog forever).
+
+    **Check**: `zqk object list policy` and verify category coverage before major delivery.
+category: workflow
+created_at: "2026-09-17T19:14:21Z"
+created_by: ACC-1785920548450214012-68b850c0
+description: ""
+effective_date: "2026-07-25"
+enforcement:
+    automated: false
+    reminder_enabled: true
+    severity: medium
+id: POL-CODE-1789672461632098000-04c17aa2
+kind: policy
+namespace_id: zqk:kernel
+policy_type: requirement
+schema_version: 2.0.0
+status: active
+title: Policy Coverage Required (Meta)
+updated_at: "2026-09-17T19:28:27Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

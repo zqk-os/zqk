@@ -8,18 +8,18 @@ import (
 	"testing"
 	"time"
 
-	caspkg "github.com/lanceman/zqk/pkg/storage/cas"
+	caspkg "github.com/zqk-os/zqk/pkg/storage/cas"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/paths"
-	_ "github.com/lanceman/zqk/pkg/specbuilder/bldr_instance_v1" // Register instance builders
-	_ "github.com/lanceman/zqk/pkg/specbuilder/bldr_v2"          // Register spec builders
-	"github.com/lanceman/zqk/pkg/specbuilder/builders"
-	"github.com/lanceman/zqk/pkg/storage"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/paths"
+	_ "github.com/zqk-os/zqk/pkg/specbuilder/bldr_instance_v1" // Register instance builders
+	_ "github.com/zqk-os/zqk/pkg/specbuilder/bldr_v2"          // Register spec builders
+	"github.com/zqk-os/zqk/pkg/specbuilder/builders"
+	"github.com/zqk-os/zqk/pkg/storage"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/testkit"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/testkit"
 )
 
 // TestHashMismatchFixEventViaCoordinator tests that hash mismatch fix audit events are created via coordinator

@@ -5,9 +5,9 @@ import (
 
 	"gopkg.in/yaml.v3"
 
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/paths"
-	"github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // ReloadConfigRequestFile is the name of the file the CLI writes to signal the daemon to reload config.

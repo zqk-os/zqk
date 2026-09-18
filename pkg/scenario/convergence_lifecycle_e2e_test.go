@@ -13,13 +13,13 @@ import (
 	"testing"
 	"time"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/nildecode"
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/scheduler"
-	"github.com/lanceman/zqk/pkg/storage"
-	"github.com/lanceman/zqk/pkg/utils/fileutil"
-	"github.com/lanceman/zqk/pkg/zqktime"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/nildecode"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/scheduler"
+	"github.com/zqk-os/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/zqktime"
 )
 
 // setupAppliedConvergenceLifecycleBundle applies the convergence-lifecycle bundle into test storage
@@ -59,7 +59,7 @@ func setupAppliedConvergenceLifecycleBundle(t *testing.T) (
 	cvsID = summary.CreatedConvergenceSessionIDs[0]
 	// Bundle stamps draft (scaffold / draft plane). Ticks persist measurements
 	// only on active (DEC Option A). Hop here so e2e ticks exercise the persist path.
-	// TRACK: BLI-REDACTED
+	// TRACK: BLI-1786686768606200000-31133cc3
 	cvsObj, err := provider.Read(ctx, secCtx, cvsID)
 	if err != nil {
 		t.Fatalf("Read CVS after apply: %v", err)

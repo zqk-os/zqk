@@ -3,7 +3,7 @@ package bldr_v2
 import (
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 func TestRemainingOpenBuilderExtendsWorkInterval(t *testing.T) {

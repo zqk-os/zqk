@@ -8,13 +8,13 @@ import (
 	"testing"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/goroutinelabels"
-	"github.com/lanceman/zqk/pkg/paths"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
+	"github.com/zqk-os/zqk/pkg/paths"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 
-	"github.com/lanceman/zqk/pkg/datacell"
+	"github.com/zqk-os/zqk/pkg/datacell"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
 )
 
 // TestAsyncValidator_ConcurrentAccess tests that multiple goroutines can safely

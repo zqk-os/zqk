@@ -4,8 +4,8 @@
 package certificate
 
 import (
-	base_objectenum "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
-	shared_certificatesenum "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/shared_certificates"
+	base_objectenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
+	shared_certificatesenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/shared_certificates"
 )
 
 type Plane = base_objectenum.Plane

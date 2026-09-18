@@ -6,9 +6,9 @@ import (
 
 	"golang.org/x/sync/errgroup"
 
-	"github.com/lanceman/zqk/pkg/errfmt"
-	sbcore "github.com/lanceman/zqk/pkg/specbuilder/core"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	sbcore "github.com/zqk-os/zqk/pkg/specbuilder/core"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // ConfigGenerator generates config files from versioned builders

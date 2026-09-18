@@ -4,8 +4,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/lanceman/zqk/pkg/appledouble"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/appledouble"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // findFiles finds files with given extensions, respecting project ignores.

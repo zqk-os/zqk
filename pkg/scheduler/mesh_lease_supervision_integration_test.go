@@ -8,23 +8,23 @@ import (
 	"time"
 	__exec "os/exec"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/federation"
-	"github.com/lanceman/zqk/pkg/logging"
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/paths"
-	_ "github.com/lanceman/zqk/pkg/specbuilder/bldr_v2"
-	"github.com/lanceman/zqk/pkg/specbuilder/builders"
-	"github.com/lanceman/zqk/pkg/storage"
-	"github.com/lanceman/zqk/pkg/testenvroot"
-	"github.com/lanceman/zqk/pkg/testkit"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
-	"github.com/lanceman/zqk/pkg/zqkenv"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/federation"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
+	_ "github.com/zqk-os/zqk/pkg/specbuilder/bldr_v2"
+	"github.com/zqk-os/zqk/pkg/specbuilder/builders"
+	"github.com/zqk-os/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/testenvroot"
+	"github.com/zqk-os/zqk/pkg/testkit"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
 // writeMeshLeaseDaemonStub installs a long-lived stub at projectRoot/bin/zqk so
 // ResolveSchedulerDaemonBinary can Start without requiring a full CLI build.
-// TRACK: BLI-REDACTED — mesh lease supervision integration spawn.
+// TRACK: BLI-1785443942668406000-1ec5c811 — mesh lease supervision integration spawn.
 func writeMeshLeaseDaemonStub(t *testing.T, projectRoot string) {
 	t.Helper()
 	binDir := filepath.Join(projectRoot, binDirName)

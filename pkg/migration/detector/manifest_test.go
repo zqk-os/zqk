@@ -7,10 +7,10 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/paths"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/paths"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 func TestCompatibilityConstraints_CLIVersion(t *testing.T) {
@@ -211,7 +211,7 @@ algorithm: "sha256"
 compatibility:
   cli_version: ">=1.0.0"
   modules:
-    "github.com/lanceman/zqk/pkg/graph": "^1.0.0"
+    "github.com/zqk-os/zqk/pkg/graph": "^1.0.0"
   backends:
     "memgraph": ">=%s"
 entries:
@@ -245,8 +245,8 @@ entries:
 		t.Errorf("Expected 1 module constraint, got %d", len(manifest.Compatibility.Modules))
 	}
 
-	if manifest.Compatibility.Modules["github.com/lanceman/zqk/pkg/graph"] != "^1.0.0" {
-		t.Errorf("Expected module constraint '^1.0.0', got '%s'", manifest.Compatibility.Modules["github.com/lanceman/zqk/pkg/graph"])
+	if manifest.Compatibility.Modules["github.com/zqk-os/zqk/pkg/graph"] != "^1.0.0" {
+		t.Errorf("Expected module constraint '^1.0.0', got '%s'", manifest.Compatibility.Modules["github.com/zqk-os/zqk/pkg/graph"])
 	}
 
 	if len(manifest.Compatibility.Backends) != 1 {

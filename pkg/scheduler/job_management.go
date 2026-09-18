@@ -8,17 +8,17 @@ import (
 	"sync"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/concurrency"
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/goroutinelabels"
-	"github.com/lanceman/zqk/pkg/logging"
-	"github.com/lanceman/zqk/pkg/nildecode"
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/pipeline"
-	"github.com/lanceman/zqk/pkg/scheduler/transceiver"
-	storagepkg "github.com/lanceman/zqk/pkg/storage"
-	"github.com/lanceman/zqk/pkg/when"
+	"github.com/zqk-os/zqk/pkg/concurrency"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/nildecode"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/pipeline"
+	"github.com/zqk-os/zqk/pkg/scheduler/transceiver"
+	storagepkg "github.com/zqk-os/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/when"
 	"github.com/robfig/cron/v3"
 )
 
@@ -28,7 +28,10 @@ type hydratedJob struct {
 	err error
 }
 
-const pipelineKindLoadAndScheduleJobs = "job_management_load_and_schedule"
+const (
+	pipelineKindLoadAndScheduleJobs = "job_management_load_and_schedule"
+	hydrationWorkerWaitTimeout      = 35 * time.Second
+)
 
 // loadAndScheduleJobs loads all enabled scheduler_job objects and schedules them.
 // When reload is true (e.g. from watchJobChanges every 30s), one_time immediate jobs
@@ -340,6 +343,9 @@ var criticalJobTypesForSubmission = map[string]bool{
 // Explicit scheduler_job.priority high/critical also uses the priority pool so process-evidence test
 // bundles (criteria_refs / test_case_refs) and other urgent run_wrapper work is not starved behind
 // bulk SCH-run-bundle-* immediate jobs on the default pool.
+// CategoryManual immediate jobs (and callback-bearing one-shots) use priority dispatch so CLI
+// one-shot submissions, agent-exec commits, and hourglass callback workflows are never starved
+// behind goroutine storms or bulk test runners. TRACK: TDE-1789630460110488000-1f2e7aa3
 func priorityDispatchJob(job *ScheduledJob) bool {
 	if job == nil {
 		return false
@@ -349,6 +355,14 @@ func priorityDispatchJob(job *ScheduledJob) bool {
 	}
 	if job.Priority == JobPriorityHigh || job.Priority == JobPriorityCritical {
 		return true
+	}
+	if job.TriggerType == TriggerTypeImmediate && (job.Category == CategoryManual || job.Category == CategoryUser) {
+		return true
+	}
+	if job.TriggerType == TriggerTypeImmediate && (job.CallbackOnError != emptyValue || job.CallbackOnCompletion != emptyValue) {
+		if !IsTestBundleJob(job.ID) && job.Category != CategoryTesting {
+			return true
+		}
 	}
 	return job.TriggerType == "timer" && job.Category == CategoryMaintenance
 }
@@ -451,7 +465,8 @@ func (s *Scheduler) hydrateJobs(ctx context.Context, rawJobs []map[string]any) [
 	})
 	select {
 	case <-waitDone:
-	case <-time.After(35 * time.Second):
+	case <-time.After(hydrationWorkerWaitTimeout):
+		cancel()
 		SchedulerJobManagementLog(s.logger).Warn(LogEventSchedulerJobMgmtFailedToHydrateJob).
 			WithFields(jobLogFieldsByIDAndErr("", errfmt.Errorf("hydration worker wait timed out"))...).
 			Log()

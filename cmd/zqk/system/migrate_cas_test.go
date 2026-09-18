@@ -4,8 +4,8 @@ import (
 	"context"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/storage"
-	"github.com/lanceman/zqk/pkg/zqkenv"
+	"github.com/zqk-os/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
 func TestNewMigrateCasCmd_FlagsAndHelp(t *testing.T) {

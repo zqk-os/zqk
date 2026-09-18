@@ -6,10 +6,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/execwrap"
+	"github.com/zqk-os/zqk/pkg/execwrap"
 
-	"github.com/lanceman/zqk/pkg/objects"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/objects"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // ObjectLookup loads a kernel object by id (optional; nil skips object predicates).
@@ -233,6 +233,7 @@ func predTests(pred string, chunk Chunk, opt EvalOptions) PredicateResult {
 	hasJob := false
 	hasLog := false
 	hasGoTest := false
+	hasShellTest := false
 	for _, r := range refs {
 		rl := strings.ToLower(r)
 		if strings.Contains(rl, "sch-") || strings.Contains(rl, "job") {
@@ -247,6 +248,12 @@ func predTests(pred string, chunk Chunk, opt EvalOptions) PredicateResult {
 		if strings.Contains(rl, "go test") || strings.Contains(rl, "ci://") {
 			hasGoTest = true
 		}
+		fields := strings.Fields(rl)
+		if len(fields) >= 2 &&
+			(fields[0] == "sh" || fields[0] == "bash") &&
+			strings.Contains(filepath.Base(fields[1]), "test") {
+			hasShellTest = true
+		}
 	}
 	switch mode {
 	case "scheduler":
@@ -259,20 +266,20 @@ func predTests(pred string, chunk Chunk, opt EvalOptions) PredicateResult {
 		}
 		return PredicateResult{Predicate: pred, OK: false, Detail: hint}
 	case "foreground":
-		if hasGoTest || hasLog {
+		if hasGoTest || hasShellTest || hasLog {
 			return PredicateResult{Predicate: pred, OK: true, Detail: "foreground/probe evidence present"}
 		}
-		return PredicateResult{Predicate: pred, OK: false, Detail: "need go test / log evidence for foreground mode"}
+		return PredicateResult{Predicate: pred, OK: false, Detail: "need go test, shell test, or log evidence for foreground mode"}
 	case "ci":
 		if hasGoTest || strings.Contains(strings.Join(refs, " "), "ci://") {
 			return PredicateResult{Predicate: pred, OK: true, Detail: "ci evidence present"}
 		}
 		return PredicateResult{Predicate: pred, OK: false, Detail: "need ci:// or CI check evidence_refs"}
 	default: // hybrid
-		if (hasJob && hasLog) || hasGoTest {
+		if (hasJob && hasLog) || hasGoTest || hasShellTest {
 			return PredicateResult{Predicate: pred, OK: true, Detail: "hybrid test evidence present"}
 		}
-		return PredicateResult{Predicate: pred, OK: false, Detail: "need scheduler job+log or go test / ci evidence"}
+		return PredicateResult{Predicate: pred, OK: false, Detail: "need scheduler job+log, go test, shell test, or ci evidence"}
 	}
 }
 

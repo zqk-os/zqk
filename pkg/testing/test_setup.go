@@ -3,9 +3,9 @@ package testing
 import (
 	"os"
 
-	"github.com/lanceman/zqk/pkg/datacell"
-	"github.com/lanceman/zqk/pkg/utils/fileutil"
-	"github.com/lanceman/zqk/pkg/zqkenv"
+	"github.com/zqk-os/zqk/pkg/datacell"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 
 	"bytes"
 	"os/exec"
@@ -13,16 +13,16 @@ import (
 	"strings"
 	"testing"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/goroutinelabels"
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/paths"
-	_ "github.com/lanceman/zqk/pkg/specbuilder/bldr_instance_v1" // Register instance builders for tests
-	_ "github.com/lanceman/zqk/pkg/specbuilder/bldr_v2"          // Register spec builders for tests
-	"github.com/lanceman/zqk/pkg/specbuilder/builders"
-	"github.com/lanceman/zqk/pkg/storagetesting"
-	"github.com/lanceman/zqk/pkg/testenvroot"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
+	_ "github.com/zqk-os/zqk/pkg/specbuilder/bldr_instance_v1" // Register instance builders for tests
+	_ "github.com/zqk-os/zqk/pkg/specbuilder/bldr_v2"          // Register spec builders for tests
+	"github.com/zqk-os/zqk/pkg/specbuilder/builders"
+	"github.com/zqk-os/zqk/pkg/storagetesting"
+	"github.com/zqk-os/zqk/pkg/testenvroot"
 )
 
 // TestEnvironment provides a complete, isolated test environment
@@ -96,8 +96,8 @@ func DefaultTestEnvironmentOptions() *TestEnvironmentOptions {
 // Example:
 //
 //	import (
-//	    testconfig "github.com/lanceman/zqk/pkg/testing"
-//	    storagepkg "github.com/lanceman/zqk/pkg/storage"
+//	    testconfig "github.com/zqk-os/zqk/pkg/testing"
+//	    storagepkg "github.com/zqk-os/zqk/pkg/storage"
 //	)
 //
 //	func TestMyFeature(t *testing.T) {
@@ -112,7 +112,7 @@ func DefaultTestEnvironmentOptions() *TestEnvironmentOptions {
 //	    // ...
 //	}
 //
-// Factory must be non-nil (e.g. [github.com/lanceman/zqk/pkg/storage.NewTestingFactory]); it implements [storagetesting.IsolationFactory].
+// Factory must be non-nil (e.g. [github.com/zqk-os/zqk/pkg/storage.NewTestingFactory]); it implements [storagetesting.IsolationFactory].
 func SetupCompleteTestEnvironment(t *testing.T, options *TestEnvironmentOptions, factory StorageFactory) *TestEnvironment {
 	if options == nil {
 		options = DefaultTestEnvironmentOptions()
@@ -245,7 +245,7 @@ func SetupCompleteTestEnvironment(t *testing.T, options *TestEnvironmentOptions,
 // Note: This is a helper that can be used in scheduler package tests
 // Example usage in scheduler package:
 //
-//	import testconfig "github.com/lanceman/zqk/pkg/testing"
+//	import testconfig "github.com/zqk-os/zqk/pkg/testing"
 //
 //	func TestSchedulerFeature(t *testing.T) {
 //	    env := testconfig.SetupCompleteTestEnvironment(t, nil)

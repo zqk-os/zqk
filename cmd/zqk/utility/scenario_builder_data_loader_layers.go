@@ -6,11 +6,11 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/lanceman/zqk/cmd/zqk/system"
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/objects"
-	storagepkg "github.com/lanceman/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/cmd/zqk/system"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/objects"
+	storagepkg "github.com/zqk-os/zqk/pkg/storage"
 )
 
 // layerProcessingState holds the state needed for processing layers
@@ -253,7 +253,7 @@ func (sb *ScenarioBuilder) createObjectInLayer(
 			// For accounts, also map username to the full account ID
 			if kind == objects.KindAccount {
 				if username, ok := obj[objects.FieldKeyUsername].(string); ok && username != emptyValue {
-					accountID := "" // ACC-* from storage; TRACK: BLI-REDACTED
+					accountID := "" // ACC-* from storage; TRACK: BLI-1785905134201010000-07393484
 					if accountID == finalID {
 						state.idStream[username] = finalID
 					}
@@ -548,7 +548,7 @@ func (sb *ScenarioBuilder) processObjectsSequentially(ctx context.Context, state
 				// For accounts, also map username to the full account ID
 				if kind == objects.KindAccount {
 					if username, ok := obj[objects.FieldKeyUsername].(string); ok && username != emptyValue {
-						accountID := "" // ACC-* from storage; TRACK: BLI-REDACTED
+						accountID := "" // ACC-* from storage; TRACK: BLI-1785905134201010000-07393484
 						if accountID == finalID {
 							state.idStream[username] = finalID
 						}

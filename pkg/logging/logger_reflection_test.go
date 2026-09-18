@@ -5,7 +5,7 @@ import (
 	"os"
 	"testing"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
 )
 
 // TestLogger_ReflectionSafety tests that isStdout and isStderr don't panic

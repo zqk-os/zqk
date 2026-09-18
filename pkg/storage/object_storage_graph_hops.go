@@ -3,9 +3,9 @@ package storage
 import (
 	"context"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/migration/parser"
-	"github.com/lanceman/zqk/pkg/objects"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/migration/parser"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // OutboundGraphHops returns stored directed edges on obj (one owner per pair).

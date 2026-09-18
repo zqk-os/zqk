@@ -3,13 +3,13 @@ package object
 import (
 	"strings"
 
-	"github.com/lanceman/zqk/internal/cli"
-	"github.com/lanceman/zqk/pkg/cli/bldr_cli_cmd_v1"
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/lifecycle"
-	"github.com/lanceman/zqk/pkg/logging"
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/internal/cli"
+	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/lifecycle"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/storage"
 	"github.com/spf13/cobra"
 )
 
@@ -59,7 +59,7 @@ func executePPlanAdd(cmd *cobra.Command, rawPlanID string, rawBliIDs ...string) 
 			return cli.Guard(cmd).Err(errfmt.Errorf("association denied: priority plan %s is in terminal status %s", planID, planStatus)).Return()
 		}
 
-		// Sealed-column immutability (BLI-REDACTED): active or in_progress plans are sealed against new work.
+		// Sealed-column immutability (BLI-1789167113049711000-359f8a8c): active or in_progress plans are sealed against new work.
 		override := false
 		if cmd.Flags().Lookup("override") != nil {
 			override, _ = cmd.Flags().GetBool("override")

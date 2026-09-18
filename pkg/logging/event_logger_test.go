@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"testing"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
 )
 
 // contextKey is a custom type for context keys to avoid collisions

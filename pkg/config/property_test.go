@@ -3,7 +3,7 @@ package config
 import (
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/zqkenv"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
 func TestProperty_Safe(t *testing.T) {

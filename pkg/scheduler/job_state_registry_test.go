@@ -7,9 +7,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/paths"
-	storagepkg "github.com/lanceman/zqk/pkg/storage"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/paths"
+	storagepkg "github.com/zqk-os/zqk/pkg/storage"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 
 	"gopkg.in/yaml.v3"
 )

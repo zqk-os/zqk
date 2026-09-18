@@ -1,0 +1,17 @@
+id: SCH-semantic-bridge
+kind: scheduler_job
+title: Semantic Bridge Daemon
+description: Continuously monitors the lifecycle WAL for completed requirements and specifications, maintaining the Vector Index via LLM embeddings.
+job_type: daemon_exec
+trigger_type: daemon
+execution_mode: reusable
+status: active
+enabled: true
+command: ./bin/zqk
+command_args:
+  - system
+  - semantic-bridge-daemon
+max_runtime_seconds: 0
+category: system
+namespace_id: zqk:kernel
+schema_version: 2.0.0

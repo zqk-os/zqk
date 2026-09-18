@@ -4,8 +4,8 @@
 package metadata_packages
 
 import (
-	base_objectenum "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
-	shared_metadata_packagesenum "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/shared_metadata_packages"
+	base_objectenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
+	shared_metadata_packagesenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/shared_metadata_packages"
 )
 
 type PriorityTier = base_objectenum.PriorityTier

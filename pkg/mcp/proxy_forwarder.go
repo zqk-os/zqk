@@ -10,9 +10,9 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/goroutinelabels"
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 
-	"github.com/lanceman/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/logging"
 )
 
 // BackendDialer defines a function that establishes a connection to the backend server.
@@ -119,7 +119,9 @@ func (p *ProxyForwarder) Start(ctx context.Context) error {
 
 		// Start reading from backend
 		backendDone := make(chan struct{})
-		go p.readFromBackend(conn, backendDone)
+		goroutinelabels.NewGoroutine("mcp.read_backend", "reading from mcp backend").StartSimple(func() {
+			p.readFromBackend(conn, backendDone)
+		})
 
 		// Process client messages and send to backend
 		transport := NewDefaultTransport()

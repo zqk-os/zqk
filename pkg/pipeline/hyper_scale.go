@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 
-	"github.com/lanceman/zqk/pkg/goroutinelabels"
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 )
 
 // HyperScaleOrchestrator manages the execution of tasks across interconnected agent networks.

@@ -1,7 +1,7 @@
 package bldr_trait_v1
 
 import (
-	"github.com/lanceman/zqk/pkg/specbuilder/trait_builders"
+	"github.com/zqk-os/zqk/pkg/specbuilder/trait_builders"
 )
 
 // BaseObjectTraitsBuilder builds the base_object_traits trait at version v1_0_0

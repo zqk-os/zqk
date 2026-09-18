@@ -4,8 +4,8 @@ import (
 	"context"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/agentfeed"
-	"github.com/lanceman/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/agentfeed"
+	"github.com/zqk-os/zqk/pkg/logging"
 )
 
 // DefaultPeerAckAwaitMaxAge is how long an open peer-ack await may sit before expiry audit.

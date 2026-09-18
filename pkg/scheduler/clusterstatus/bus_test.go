@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/scheduler/clusterstatus"
+	"github.com/zqk-os/zqk/pkg/scheduler/clusterstatus"
 )
 
 func TestBusFailClosedOnStale(t *testing.T) {

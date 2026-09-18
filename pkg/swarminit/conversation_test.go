@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/agentfeed"
+	"github.com/zqk-os/zqk/pkg/agentfeed"
 )
 
 func TestNewConversationProbe_emptyConversation(t *testing.T) {

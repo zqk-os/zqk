@@ -4,8 +4,8 @@
 package workstream_transitions
 
 import (
-	base_objectenum "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
-	shared_workstream_transitionsenum "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/shared_workstream_transitions"
+	base_objectenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
+	shared_workstream_transitionsenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/shared_workstream_transitions"
 )
 
 type PriorityTier = base_objectenum.PriorityTier

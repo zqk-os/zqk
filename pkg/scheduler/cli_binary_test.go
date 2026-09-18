@@ -4,10 +4,10 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/brand"
-	"github.com/lanceman/zqk/pkg/paths"
-	"github.com/lanceman/zqk/pkg/utils/fileutil"
-	"github.com/lanceman/zqk/pkg/zqkenv"
+	"github.com/zqk-os/zqk/pkg/brand"
+	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
 func TestResolveSchedulerDaemonBinary_prefersStableOverZqk(t *testing.T) {
@@ -116,5 +116,67 @@ func TestResolveSchedulerDaemonBinary_prefersZqkStable(t *testing.T) {
 	}
 	if got != zqkStable {
 		t.Fatalf("got %q, want stable path %q", got, zqkStable)
+	}
+}
+
+func TestResolveSchedulerCLIBinary_communityEdition(t *testing.T) {
+	orig := zqkenv.IsCommunityEdition
+	t.Cleanup(func() { zqkenv.IsCommunityEdition = orig })
+	zqkenv.IsCommunityEdition = true
+
+	root := t.TempDir()
+	zcom := filepath.Join(root, binDirName, "zcom")
+	if err := fileutil.EnsureDir(filepath.Dir(zcom)); err != nil {
+		t.Fatal(err)
+	}
+	if err := fileutil.WriteFile(zcom, []byte{0}, 0o755); err != nil {
+		t.Fatal(err)
+	}
+
+	t.Setenv(zqkenv.Bin().Name(), "")
+
+	got := resolveSchedulerCLIBinary(root)
+	if got != zcom {
+		t.Fatalf("got %q, want community binary %q", got, zcom)
+	}
+
+	// Test fallback when no root binary exists
+	emptyRoot := t.TempDir()
+	fallback := resolveSchedulerCLIBinary(emptyRoot)
+	if fallback != "zcom" {
+		t.Fatalf("got fallback %q, want 'zcom'", fallback)
+	}
+}
+
+func TestResolveSchedulerDaemonBinary_communityEdition(t *testing.T) {
+	orig := zqkenv.IsCommunityEdition
+	t.Cleanup(func() { zqkenv.IsCommunityEdition = orig })
+	zqkenv.IsCommunityEdition = true
+
+	root := t.TempDir()
+	zcom := filepath.Join(root, binDirName, "zcom")
+	if err := fileutil.EnsureDir(filepath.Dir(zcom)); err != nil {
+		t.Fatal(err)
+	}
+	if err := fileutil.WriteFile(zcom, []byte{0}, 0o755); err != nil {
+		t.Fatal(err)
+	}
+
+	t.Setenv(zqkenv.SchedulerDaemonBin().Name(), "")
+	t.Setenv(zqkenv.Bin().Name(), "")
+
+	got, err := ResolveSchedulerDaemonBinary(root)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got != zcom {
+		t.Fatalf("got daemon path %q, want %q", got, zcom)
+	}
+}
+
+func TestResolveSchedulerCLIBinary_EmptyRoot(t *testing.T) {
+	got := resolveSchedulerCLIBinary("")
+	if got == "" {
+		t.Fatal("expected non-empty binary fallback")
 	}
 }

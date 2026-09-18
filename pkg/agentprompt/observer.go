@@ -6,9 +6,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/brand"
-	"github.com/lanceman/zqk/pkg/observer"
-	"github.com/lanceman/zqk/pkg/utils/sortutil"
+	"github.com/zqk-os/zqk/pkg/brand"
+	"github.com/zqk-os/zqk/pkg/observer"
+	"github.com/zqk-os/zqk/pkg/utils/sortutil"
 )
 
 const (

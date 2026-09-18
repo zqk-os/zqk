@@ -1,0 +1,17 @@
+# Sync external agents job
+# Periodically syncs external agent configurations (e.g., .zqk/ or cursor rules).
+# Create manually: zqk internal create scheduler_job --file scripts/scheduler_jobs/sync_external_agents.yaml
+id: SCH-agent-sync
+title: Sync External Agents
+description: |
+  Ingests external agent logic/configurations into ZQK.
+job_type: agent_sync
+trigger_type: timer
+schedule_expression: "*/5 * * * *"
+category: maintenance
+execution_mode: reusable
+max_runtime_seconds: 300
+enabled: true
+status: active
+namespace_id: zqk:kernel
+schema_version: "2.0.0"

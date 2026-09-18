@@ -3,19 +3,19 @@ package cas_test
 import (
 	"context"
 
-	"github.com/lanceman/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/storage"
 
-	"github.com/lanceman/zqk/pkg/datacell"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/datacell"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 
 	"path/filepath"
 	"testing"
 	"time"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/paths"
-	"github.com/lanceman/zqk/pkg/validation"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/validation"
 )
 
 // TestCAS_AuditAggregation tests that audit event aggregation works with CAS

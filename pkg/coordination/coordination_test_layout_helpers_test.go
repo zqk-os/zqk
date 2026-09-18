@@ -8,17 +8,16 @@ import (
 
 	"gopkg.in/yaml.v3"
 
-	clctx "github.com/lanceman/zqk/internal/cli/context"
-	"github.com/lanceman/zqk/pkg/paths"
-	"github.com/lanceman/zqk/pkg/specbuilder/builders"
-	"github.com/lanceman/zqk/pkg/storage"
-	"github.com/lanceman/zqk/pkg/storagetesting"
-	"github.com/lanceman/zqk/pkg/testenvroot"
-	"github.com/lanceman/zqk/pkg/utils/fileutil"
-	"github.com/lanceman/zqk/pkg/zqkenv"
+	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/specbuilder/builders"
+	"github.com/zqk-os/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/storagetesting"
+	"github.com/zqk-os/zqk/pkg/testenvroot"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 
-	_ "github.com/lanceman/zqk/pkg/specbuilder/bldr_instance_v1" // Register instance builders for GenerateAllSpecs
-	_ "github.com/lanceman/zqk/pkg/specbuilder/bldr_v2"          // Register spec builders for GenerateAllSpecs
+	_ "github.com/zqk-os/zqk/pkg/specbuilder/bldr_instance_v1" // Register instance builders for GenerateAllSpecs
+	_ "github.com/zqk-os/zqk/pkg/specbuilder/bldr_v2"          // Register spec builders for GenerateAllSpecs
 )
 
 type coordinationTestEnvOptions struct {
@@ -45,7 +44,7 @@ type testSettingsYAMLShapeCoord struct {
 func writeMinimalTestSettingsYAMLCoord(testRoot string) error {
 	p := filepath.Join(testRoot, paths.TestSettingsFilename)
 	body := testSettingsYAMLShapeCoord{
-		Version: clctx.DefaultBrandSettingsVersion,
+		Version: paths.DefaultBrandSettingsVersion,
 		Paths:   map[string]any{},
 	}
 	data, err := yaml.Marshal(body)
@@ -99,8 +98,6 @@ func moduleRootFromGoEnvCoord(t *testing.T) string {
 	}
 	return mod
 }
-
-
 
 func copyObjectSpecYAMLFilesToTestRootCoord(testRoot, projectRoot string) error {
 	return testenvroot.CopyObjectSpecsFromProject(testRoot, projectRoot)

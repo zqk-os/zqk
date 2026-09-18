@@ -3,7 +3,7 @@ package crud
 import (
 	"context"
 
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // bulkCreateCtxKey is the context key for deferring listing-index flush during bulk job creation.

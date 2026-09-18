@@ -4,10 +4,10 @@ import (
 	"context"
 	"testing"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/errfmt"
-	pkgobjects "github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/zqkenv"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	pkgobjects "github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -194,7 +194,7 @@ func TestFileFirstProjectionStorage_BasicLifecycle(t *testing.T) {
 
 // TestFileFirstProjectionStorage_CASMutateKeepsGraphLockstep documents that pending-journal
 // work must not bypass FileFirstProjectionStorage: Create/Update/Delete still project.
-// TRACK: BLI-REDACTED
+// TRACK: BLI-1785895580100186000-c5539372
 func TestFileFirstProjectionStorage_CASMutateKeepsGraphLockstep(t *testing.T) {
 	tempDir := t.TempDir()
 	CopyObjectSpecsFromModuleOrSkip(t, tempDir)
@@ -249,7 +249,7 @@ func TestFileFirstProjectionStorage_RebuildProjectionFromSSOT(t *testing.T) {
 		pkgobjects.FieldKeyTitle:  "Seeded File Goal",
 		pkgobjects.FieldKeyStatus: pkgobjects.ObjectStatusActive,
 	}
-	// TRACK: BLI-REDACTED — draft-plane create / promote membrane.
+	// TRACK: BLI-1785443942668406000-1ec5c811 — draft-plane create / promote membrane.
 	CreateCASVisible(t, fileStorage, ctx, secCtx, seedObj, pkgobjects.ObjectStatusActive)
 
 	// Projection does NOT have it yet (CreateCASVisible goes through file SSOT only)

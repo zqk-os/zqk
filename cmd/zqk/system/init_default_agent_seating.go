@@ -2,6 +2,7 @@ package system
 
 import (
 	"context"
+	"fmt"
 	"path/filepath"
 	"slices"
 	"strings"
@@ -9,13 +10,13 @@ import (
 
 	"gopkg.in/yaml.v3"
 
-	"github.com/lanceman/zqk/internal/bootstrap"
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/logging"
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/storage"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/internal/bootstrap"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/storage"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 const (
@@ -200,7 +201,7 @@ func loadYAMLTemplates(projectRoot, relDir string, embedded func() []map[string]
 func embeddedDefaultPersonaTemplates() []map[string]any {
 	return []map[string]any{
 		{
-			objects.FieldKeyID:          "PER-DEFAULT-OPERATOR",
+			objects.FieldKeyID:          objects.ConstPersonaDefaultOperator,
 			objects.FieldKeyName:        "Community Operator",
 			objects.FieldKeyTitle:       "Community Operator",
 			objects.FieldKeyRole:        "operator",
@@ -208,7 +209,7 @@ func embeddedDefaultPersonaTemplates() []map[string]any {
 			objects.FieldKeyDescription: "Default human/operator seating for agent correspondence after greenfield init.",
 		},
 		{
-			objects.FieldKeyID:          "PER-DEFAULT-AGENT",
+			objects.FieldKeyID:          objects.ConstPersonaDefaultAgent,
 			objects.FieldKeyName:        "Community Agent",
 			objects.FieldKeyTitle:       "Community Agent",
 			objects.FieldKeyRole:        "agent",
@@ -226,10 +227,10 @@ func embeddedDefaultAgentSkillTemplates() []map[string]any {
 			objects.FieldKeyStatus:              objects.ObjectStatusApproved,
 			objects.FieldKeyProvider:            "zqk",
 			objects.FieldKeyInstructionsSummary: "Use kernel personas and zqk feed for out-of-the-box multi-agent chat.",
-			objects.FieldKeyInstructions: `# Agent Feed Correspondence
+			objects.FieldKeyInstructions: fmt.Sprintf(`# Agent Feed Correspondence
 
-After init, use PER-DEFAULT-OPERATOR / PER-DEFAULT-AGENT with zqk feed steer and emit-status --persona-ref.
-Do not invent role enums; agent-id is the unique swarm seat.`,
+After init, use %s / %s with zqk feed steer and emit-status --persona-ref.
+Do not invent role enums; agent-id is the unique swarm seat.`, objects.ConstPersonaDefaultOperator, objects.ConstPersonaDefaultAgent),
 		},
 	}
 }
@@ -297,7 +298,7 @@ func SeedKernelFromAnswerFile(projectRoot, answerFilePath string, logger logging
 			lastCreateErr = err
 			continue
 		}
-		// TRACK: BLI-REDACTED — answer-file seed must promote off draft plane for CAS visibility.
+		// TRACK: BLI-1785443942668406000-1ec5c811 — answer-file seed must promote off draft plane for CAS visibility.
 		if leaveStatus != emptyValue && leaveStatus != createStatus {
 			if err := sp.Update(ctx, secCtx, id, map[string]any{objects.FieldKeyStatus: leaveStatus}); err != nil {
 				if _, readErr := sp.Read(ctx, secCtx, id); readErr != nil {

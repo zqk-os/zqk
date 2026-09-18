@@ -6,7 +6,7 @@ import (
 	"regexp"
 	"strconv"
 
-	"github.com/lanceman/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/errfmt"
 )
 
 // SequentialStrategy generates sequential IDs (e.g., BLI-001, BLI-002, BLI-003)

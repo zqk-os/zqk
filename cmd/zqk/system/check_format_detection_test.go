@@ -6,8 +6,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/lanceman/zqk/internal/cli"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/internal/cli"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // TestFormatDetection_RealCommandSimulation tests format detection

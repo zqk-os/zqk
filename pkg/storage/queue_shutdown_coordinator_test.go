@@ -8,9 +8,11 @@ import (
 	"testing"
 	"time"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/goroutinelabels"
-	"github.com/lanceman/zqk/pkg/storage"
+	"go.uber.org/goleak"
+
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
+	"github.com/zqk-os/zqk/pkg/storage"
 )
 
 func TestQueueShutdownCoordinator_InitiateShutdown(t *testing.T) {
@@ -48,6 +50,7 @@ func TestQueueShutdownCoordinator_InitiateShutdown(t *testing.T) {
 }
 
 func TestQueueShutdownCoordinator_DrainAll(t *testing.T) {
+	defer goleak.VerifyNone(t)
 	coordinator := storage.NewQueueShutdownCoordinatorForTest(nil, true)
 
 	queue1 := storage.NewMockQueueShutdownHandler("queue1", false)
@@ -82,8 +85,9 @@ func TestQueueShutdownCoordinator_DrainAll(t *testing.T) {
 }
 
 func TestQueueShutdownCoordinator_DrainAll_Timeout(t *testing.T) {
+	defer goleak.VerifyNone(t)
 	coordinator := storage.NewQueueShutdownCoordinatorForTest(&storage.ShutdownConfig{
-		Timeout:       100 * time.Millisecond,
+		Timeout:       50 * time.Millisecond,
 		ForceShutdown: true,
 		LogIncomplete: true,
 		CheckInterval: 10 * time.Millisecond,
@@ -91,11 +95,11 @@ func TestQueueShutdownCoordinator_DrainAll_Timeout(t *testing.T) {
 
 	slowQueue := storage.NewMockQueueShutdownHandler("slow_queue", false)
 	slowQueue.SetPendingCount(10)
-	slowQueue.DrainDelay = 500 * time.Millisecond
+	slowQueue.DrainDelay = 100 * time.Millisecond
 
 	coordinator.RegisterQueue(slowQueue)
 
-	ctx, cancel := context.WithTimeout(pkgctx.NewSystemContext(), 1*time.Second)
+	ctx, cancel := context.WithTimeout(pkgctx.NewSystemContext(), 500*time.Millisecond)
 	defer cancel()
 
 	err := coordinator.DrainAll(ctx)
@@ -105,6 +109,25 @@ func TestQueueShutdownCoordinator_DrainAll_Timeout(t *testing.T) {
 
 	if slowQueue.DrainCalled.Load() != 1 {
 		t.Error("Expected slowQueue.Drain to be called")
+	}
+}
+
+// TestQueueShutdownCoordinator_DrainAll_ContextCancelled verifies BLI-CEF-CON-002:
+// cancellation stops DrainAll immediately and does not leak goroutines.
+func TestQueueShutdownCoordinator_DrainAll_ContextCancelled(t *testing.T) {
+	defer goleak.VerifyNone(t)
+	coordinator := storage.NewQueueShutdownCoordinatorForTest(nil, true)
+
+	queue := storage.NewMockQueueShutdownHandler("cancelled_queue", false)
+	queue.SetPendingCount(1)
+	coordinator.RegisterQueue(queue)
+
+	ctx, cancel := context.WithCancel(pkgctx.NewSystemContext())
+	cancel() // Cancel before DrainAll starts
+
+	err := coordinator.DrainAll(ctx)
+	if err == nil {
+		t.Error("expected error when context is pre-cancelled")
 	}
 }
 
@@ -251,5 +274,14 @@ func TestQueueShutdownCoordinator_IsShutdownInitiated(t *testing.T) {
 
 	if !coordinator.IsShutdownInitiated() {
 		t.Error("Expected shutdown to be initiated")
+	}
+}
+
+func TestQueueShutdownCoordinator_EmptyDrain(t *testing.T) {
+	coord := storage.NewQueueShutdownCoordinatorForTest(storage.DefaultShutdownConfig(), true)
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	defer cancel()
+	if err := coord.DrainAll(ctx); err != nil {
+		t.Fatalf("DrainAll failed: %v", err)
 	}
 }

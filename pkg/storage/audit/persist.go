@@ -5,7 +5,7 @@ import (
 	"errors"
 	"strings"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
 )
 
 // PersistResult is the outcome of PersistWithIDRetry.

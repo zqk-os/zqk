@@ -1,8 +1,8 @@
 package transceiver
 
 import (
-	"github.com/lanceman/zqk/pkg/logging"
-	"github.com/lanceman/zqk/pkg/scheduler/transceiver/adapters"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/scheduler/transceiver/adapters"
 )
 
 // NewRouterWithDefaults creates a router with default adapters already registered

@@ -5,8 +5,8 @@ import (
 	"strings"
 	"testing"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/workflow/whatsnext"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/workflow/whatsnext"
 )
 
 func TestCapStageTemplateCoverage_complete(t *testing.T) {

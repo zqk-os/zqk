@@ -8,9 +8,9 @@ import (
 
 	"gopkg.in/yaml.v3"
 
-	"github.com/lanceman/zqk/pkg/paths"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
-	"github.com/lanceman/zqk/pkg/zqkenv"
+	"github.com/zqk-os/zqk/pkg/paths"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
 type ZqkConfig struct {
@@ -182,7 +182,7 @@ func loadConfig() *ZqkConfig {
 	}
 
 	root := wd
-	if !fileutil.Exists(filepath.Join(wd, "config", "zqk.yaml")) {
+	if !fileutil.Exists(filepath.Join(wd, "config", "zqk.yaml")) && !fileutil.Exists(filepath.Join(wd, "zqk.yaml")) {
 		if r := paths.ResolveProjectRoot(wd); r != "" {
 			root = r
 		} else if r := paths.FindNearestProjectRoot(wd); r != "" {
@@ -201,8 +201,14 @@ func LoadForRoot(root string) *ZqkConfig {
 		return cfg
 	}
 
-	// 1. Load committed defaults: config/zqk.yaml
+	// 1. Load committed defaults: config/zqk.yaml (fallback: zqk.yaml at root)
 	defaultPath := filepath.Join(root, paths.ConfigDir, paths.ZqkConfigFileName)
+	if !fileutil.Exists(defaultPath) {
+		rootDefault := filepath.Join(root, paths.ZqkConfigFileName)
+		if fileutil.Exists(rootDefault) {
+			defaultPath = rootDefault
+		}
+	}
 	if data, err := fileutil.ReadFile(defaultPath); err == nil {
 		_ = yaml.Unmarshal(data, cfg)
 	}
@@ -214,13 +220,25 @@ func LoadForRoot(root string) *ZqkConfig {
 	}
 	if envName != "" && envName != "local" {
 		envPath := filepath.Join(root, paths.ConfigDir, paths.ZqkEnvConfigFilePrefix+envName+paths.YAMLExtension)
+		if !fileutil.Exists(envPath) {
+			rootEnv := filepath.Join(root, paths.ZqkEnvConfigFilePrefix+envName+paths.YAMLExtension)
+			if fileutil.Exists(rootEnv) {
+				envPath = rootEnv
+			}
+		}
 		if data, err := fileutil.ReadFile(envPath); err == nil {
 			_ = yaml.Unmarshal(data, cfg)
 		}
 	}
 
-	// 3. Load local overrides: config/zqk-local.yaml
+	// 3. Load local overrides: config/zqk-local.yaml (fallback: zqk-local.yaml at root)
 	localPath := filepath.Join(root, paths.ConfigDir, paths.ZqkLocalConfigFileName)
+	if !fileutil.Exists(localPath) {
+		rootLocal := filepath.Join(root, paths.ZqkLocalConfigFileName)
+		if fileutil.Exists(rootLocal) {
+			localPath = rootLocal
+		}
+	}
 	if data, err := fileutil.ReadFile(localPath); err == nil {
 		_ = yaml.Unmarshal(data, cfg)
 	}

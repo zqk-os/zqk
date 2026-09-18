@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/lanceman/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/errfmt"
 )
 
 // TeamsAdapter parses a minimal Microsoft Teams Bot Framework / webhook JSON shape.

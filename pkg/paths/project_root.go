@@ -4,8 +4,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/lanceman/zqk/pkg/utils/fileutil"
-	"github.com/lanceman/zqk/pkg/zqkenv"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
 // ResolveProjectRoot returns the project root using a single, explicit precedence so callers
@@ -36,10 +36,17 @@ func ResolveProjectRoot(startPath string) string {
 		return abs
 	}
 	if v := zqkenv.TestRoot().Get(); v != emptyValue {
-		if abs, err := filepath.Abs(v); err == nil {
-			return abs
+		abs := v
+		if a, err := filepath.Abs(v); err == nil {
+			abs = a
 		}
-		return v
+		if IsAgentWorktreePath(abs) {
+			if settingsRoot := LoadBrandSettingsProjectRoot(abs); settingsRoot != "" && !IsAgentWorktreePath(settingsRoot) {
+				return settingsRoot
+			}
+			return ""
+		}
+		return abs
 	}
 	if workspaceRoot := FindWorkspaceRoot(startPath); workspaceRoot != emptyValue {
 		if r := ReadPersistedCurrentRoot(workspaceRoot); r != emptyValue {

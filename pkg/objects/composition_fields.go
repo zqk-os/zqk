@@ -206,6 +206,21 @@ func IsCompositionFieldAllowed(kind, field string, spec *Spec) bool {
 			return true
 		}
 	}
+	if kind == KindZqkSession {
+		switch field {
+		case FieldKeyAgreementMode,
+			FieldKeyConsumerKernelRef,
+			FieldKeyProviderKernelRef,
+			FieldKeyResourceRef,
+			FieldKeySessionMode,
+			FieldKeyTokenID,
+			FieldKeyConsumedUnits,
+			FieldKeyMaxUnits,
+			FieldKeyTermType,
+			FieldKeyRevokedAt:
+			return true
+		}
+	}
 	return false
 }
 

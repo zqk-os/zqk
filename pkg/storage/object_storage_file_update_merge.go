@@ -3,11 +3,11 @@ package storage
 import (
 	"strings"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/logging"
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/storage/crud"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/storage/crud"
 )
 
 func (f *FileObjectStorage) mergeFileObjectUpdate(p *fileObjectUpdatePrep) error {
@@ -144,7 +144,7 @@ func (f *FileObjectStorage) mergeFileObjectUpdate(p *fileObjectUpdatePrep) error
 		newState, _ = updates[objects.FieldKeyStatus].(string)
 	}
 	// Work-envelope autofill: started_at on execution-locked; completed_at/actual on work_done.
-	// TRACK: BLI-KERNEL-WORK-ENVELOPE-001 / PRI-REDACTED
+	// TRACK: BLI-KERNEL-WORK-ENVELOPE-001 / PRI-1785885772223315000-0649f401
 	_ = applyCompleteTransitionDefaults(kind, existing, oldState, newState)
 
 	// Validate workflow constraints for workstream operations

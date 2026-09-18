@@ -6,10 +6,10 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/lanceman/zqk/internal/cli"
-	"github.com/lanceman/zqk/pkg/appledouble"
-	"github.com/lanceman/zqk/pkg/errfmt"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/internal/cli"
+	"github.com/zqk-os/zqk/pkg/appledouble"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // FixHashesFlags contains parsed fix-hashes command flags

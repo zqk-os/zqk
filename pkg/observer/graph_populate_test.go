@@ -5,8 +5,8 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/graph/provider"
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/graph/provider"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // mockGraphConn records CreateNode/CreateEdge calls for testing.

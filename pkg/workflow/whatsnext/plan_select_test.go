@@ -4,8 +4,8 @@ import (
 	"context"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/objects"
-	storagepkg "github.com/lanceman/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/objects"
+	storagepkg "github.com/zqk-os/zqk/pkg/storage"
 )
 
 func TestPlanStatusEligible(t *testing.T) {

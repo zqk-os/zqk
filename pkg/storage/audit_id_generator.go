@@ -3,10 +3,10 @@ package storage
 import (
 	"context"
 
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/storage/audit"
-	"github.com/lanceman/zqk/pkg/storage/filecas"
-	idgen "github.com/lanceman/zqk/pkg/storage/id_generation"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/storage/audit"
+	"github.com/zqk-os/zqk/pkg/storage/filecas"
+	idgen "github.com/zqk-os/zqk/pkg/storage/id_generation"
 )
 
 var (

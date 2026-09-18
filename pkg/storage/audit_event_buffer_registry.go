@@ -4,7 +4,7 @@ import (
 	"sync"
 	"time"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
 )
 
 // AuditEventBufferRegistry manages scoped AuditEventBuffer instances.

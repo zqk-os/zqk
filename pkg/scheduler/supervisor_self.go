@@ -3,8 +3,8 @@ package scheduler
 import (
 	"os"
 
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/process"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/process"
 )
 
 // ErrSupervisorSelfStop is returned when a caller would signal the scheduler

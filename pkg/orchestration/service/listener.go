@@ -5,13 +5,13 @@ import (
 	"runtime"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/goroutinelabels"
-	"github.com/lanceman/zqk/pkg/lifecycle"
-	"github.com/lanceman/zqk/pkg/logging"
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/orchestration"
-	"github.com/lanceman/zqk/pkg/orchestration/ticker"
-	"github.com/lanceman/zqk/pkg/walutil"
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
+	"github.com/zqk-os/zqk/pkg/lifecycle"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/orchestration"
+	"github.com/zqk-os/zqk/pkg/orchestration/ticker"
+	"github.com/zqk-os/zqk/pkg/walutil"
 )
 
 // SynthesisService listens for intent events and triggers orchestration.

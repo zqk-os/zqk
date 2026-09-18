@@ -6,8 +6,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/paths"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/paths"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // SignificantCacheChangePendingThreshold is the outstanding object-id-cache pending
@@ -18,7 +18,7 @@ import (
 //
 // Single-object create/update must stay incremental (PRE_CHANGE_CHECKLIST §2–3).
 //
-// TRACK: BLI-REDACTED — remove when: claim fixture proves
+// TRACK: BLI-1785895580100186000-c5539372 — remove when: claim fixture proves
 // check auto refresh + pending-id invalidation after pending burst + state-restore.
 const SignificantCacheChangePendingThreshold = 5
 

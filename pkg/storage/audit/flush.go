@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"time"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/validation"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/validation"
 )
 
 // FlushPlan is the allocated aggregated_summary plus id. I/O stays in storage.

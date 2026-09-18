@@ -1,9 +1,9 @@
 package system
 
 import (
-	"github.com/lanceman/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/logging"
 
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // logSpecLoaderMetrics logs spec loader metrics for observability

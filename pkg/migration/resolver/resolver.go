@@ -3,9 +3,9 @@ package resolver
 import (
 	"context"
 
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/graph/provider"
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/graph/provider"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // ReferenceResolver resolves object references in the graph

@@ -3,7 +3,7 @@ package bldr_instance_v1
 import (
 	"sort"
 
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 const specFileExtYAML = ".yaml"

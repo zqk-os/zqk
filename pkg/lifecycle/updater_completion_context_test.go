@@ -3,15 +3,15 @@ package lifecycle
 import (
 	"testing"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/objects"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // The all_backlog_items_complete_for_plan criterion fired and the updater still could not close
 // the plan: DECIDE rejected break_glass on the critical kind because no elevation was stamped
 // ("break_glass requires --reason-code for critical kind priority_plan"). The storage guard is
 // inert under ZQK_TEST_ROOT, so the contract is asserted on the context the updater builds.
-// TRACK: BLI-REDACTED
+// TRACK: BLI-1785784867143912000-635942fb
 func TestCompletionOverrideContext(t *testing.T) {
 	t.Parallel()
 

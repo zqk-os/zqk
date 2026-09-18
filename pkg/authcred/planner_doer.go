@@ -1,14 +1,14 @@
 // Package authcred — planner vs doer lane helpers (POL-AGENT-PLANNER-DOER-001).
-// TRACK: BLI-REDACTED
+// TRACK: BLI-1785905540598640000-12d5118e
 package authcred
 
 import (
 	"slices"
 	"strings"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/objects"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // Permission strings used by planner/doer role matrix.

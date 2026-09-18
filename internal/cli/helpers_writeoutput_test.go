@@ -6,10 +6,10 @@ import (
 	"path/filepath"
 	"testing"
 
-	pkgcli "github.com/lanceman/zqk/pkg/cli"
+	pkgcli "github.com/zqk-os/zqk/pkg/cli"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 func TestWriteOutput_dash_uses_command_writer_not_file(t *testing.T) {

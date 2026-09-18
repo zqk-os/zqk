@@ -6,7 +6,7 @@ import (
 	"strings"
 	"unicode/utf8"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/spf13/cobra"
 )
 
@@ -17,7 +17,7 @@ const coreDeleteReasonMinRunes = 30
 //
 // No elevated shortcut: privilege answers "may you", not "did you mean to". Every daemon is
 // constructed elevated, so an elevation shortcut here would exempt exactly the automated callers
-// the guard exists to stop. TRACK: BLI-REDACTED.
+// the guard exists to stop. TRACK: BLI-1785723654802038000-b14064bc.
 func withCoreDeleteReasonFromFlags(cmd *cobra.Command, ctx context.Context) (context.Context, error) {
 	reason, _ := cmd.Flags().GetString("reason-code")
 	reason = strings.TrimSpace(reason)

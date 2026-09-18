@@ -3,8 +3,8 @@ package system
 import (
 	"fmt"
 
-	"github.com/lanceman/zqk/pkg/coordination"
-	"github.com/lanceman/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/coordination"
+	"github.com/zqk-os/zqk/pkg/logging"
 )
 
 // CacheEventSubscriber subscribes to cache-related operational events for debugging and monitoring

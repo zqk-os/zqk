@@ -12,12 +12,12 @@ import (
 	"path/filepath"
 	"testing"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/paths"
-	_ "github.com/lanceman/zqk/pkg/specbuilder/bldr_v2" // Register builders for tests
-	"github.com/lanceman/zqk/pkg/specbuilder/builders"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
+	_ "github.com/zqk-os/zqk/pkg/specbuilder/bldr_v2" // Register builders for tests
+	"github.com/zqk-os/zqk/pkg/specbuilder/builders"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // setupBacklogItemLifecycle creates a temporary lifecycle directory with backlog_item and milestone lifecycle files

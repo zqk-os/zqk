@@ -5,10 +5,10 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/datacell"
-	"github.com/lanceman/zqk/pkg/storage"
-	caspkg "github.com/lanceman/zqk/pkg/storage/cas"
-	"github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/datacell"
+	"github.com/zqk-os/zqk/pkg/storage"
+	caspkg "github.com/zqk-os/zqk/pkg/storage/cas"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 func TestRepairCASHFilenameMismatch_NoOpWhenFilenameMatchesContent(t *testing.T) {

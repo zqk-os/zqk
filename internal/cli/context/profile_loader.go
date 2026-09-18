@@ -4,8 +4,8 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/lanceman/zqk/pkg/cli" // ProfileLoader and Profile types
-	"github.com/lanceman/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/cli" // ProfileLoader and Profile types
+	"github.com/zqk-os/zqk/pkg/errfmt"
 )
 
 const profileFileExtYAML = ".yaml"

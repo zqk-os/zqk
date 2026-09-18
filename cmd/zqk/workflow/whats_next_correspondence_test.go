@@ -3,8 +3,8 @@ package workflow
 import (
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/agentfeed"
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/agentfeed"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 func TestBuildWhatsNextCorrespondence_requiresAgentID(t *testing.T) {

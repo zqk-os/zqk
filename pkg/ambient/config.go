@@ -1,6 +1,6 @@
 package ambient
 
-import "github.com/lanceman/zqk/pkg/zqkenv"
+import "github.com/zqk-os/zqk/pkg/zqkenv"
 
 // Config defines the configuration for the Ambience Engine.
 type Config struct {

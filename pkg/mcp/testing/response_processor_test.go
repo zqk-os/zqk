@@ -3,8 +3,8 @@ package testing
 import (
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/mcp"
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/mcp"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // TestElicitationToSuccessProcessor tests that elicitation errors are converted to success

@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/lanceman/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/errfmt"
 )
 
 // JSONRPCRequest is the standard JSON-RPC 2.0 request structure

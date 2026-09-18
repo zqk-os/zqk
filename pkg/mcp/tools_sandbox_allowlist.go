@@ -7,7 +7,7 @@ import (
 	"slices"
 	"strings"
 
-	"github.com/lanceman/zqk/pkg/brand"
+	"github.com/zqk-os/zqk/pkg/brand"
 )
 
 // sandboxDenyPrefix marks allowlist rejections. It deliberately avoids the "access denied"

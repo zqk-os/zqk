@@ -3,11 +3,11 @@ package system
 import (
 	"strings"
 
-	"github.com/lanceman/zqk/internal/cli"
-	clipkg "github.com/lanceman/zqk/pkg/cli"
-	"github.com/lanceman/zqk/pkg/cli/bldr_cli_cmd_v1"
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/internal/cli"
+	clipkg "github.com/zqk-os/zqk/pkg/cli"
+	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/spf13/cobra"
 )
 
@@ -35,7 +35,7 @@ func NewWhoamiCmd() *cobra.Command {
 		Use: "whoami",
 	})
 	// Spec short until generate-command-builders refreshes the empty-Use slop builder.
-	// TRACK: BLI-REDACTED
+	// TRACK: BLI-1787804771598596000-27599a81
 	whoamiCmd.Short = "Show the authenticated account, lane, roles, and permissions"
 	cli.BindAsyncProgress(whoamiCmd, func(cmd *cobra.Command, args []string) error {
 		return runWhoami(cmd)

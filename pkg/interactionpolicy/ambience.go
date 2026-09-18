@@ -4,7 +4,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // StaleInProgressItem records an in-progress work item that has stalled.
@@ -159,7 +159,7 @@ func stringSliceFromAny(val any) []string {
 }
 
 // Ambience is compiled micro-signals from whats-next (not a shell command).
-// TRACK: BLI-REDACTED
+// TRACK: BLI-1787035087372193000-c022117d
 type Ambience struct {
 	Planned        int
 	InProgress     int
@@ -189,7 +189,7 @@ func planExecutionLocked(s Ambience) bool {
 // Preemption (POL-AGENT-INTERACTION-POLICY-001): inbox > push-ahead >
 // planned execution (idle) > kernel fill (compiled onto idle, not a
 // separate event) > groom-ahead > align. Never silence.
-// TRACK: BLI-REDACTED
+// TRACK: BLI-1787035087372193000-c022117d
 //
 // Inbox unacked is the TPM swarm gland: MCP notify does not start a Cursor
 // turn, so hunger must compile a followup_message or the seat goes idle while

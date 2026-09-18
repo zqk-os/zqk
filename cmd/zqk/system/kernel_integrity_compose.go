@@ -6,14 +6,14 @@ import (
 	"encoding/hex"
 	"fmt"
 
-	"github.com/lanceman/zqk/internal/cli"
-	"github.com/lanceman/zqk/pkg/cli/bldr_cli_cmd_v1"
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/kernelcas/compose"
-	"github.com/lanceman/zqk/pkg/objects"
-	enumv "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/pipeline_definitions"
-	"github.com/lanceman/zqk/pkg/specbuilder/bldr_instance_v1"
-	"github.com/lanceman/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/internal/cli"
+	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/kernelcas/compose"
+	"github.com/zqk-os/zqk/pkg/objects"
+	enumv "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/pipeline_definitions"
+	"github.com/zqk-os/zqk/pkg/specbuilder/bldr_instance_v1"
+	"github.com/zqk-os/zqk/pkg/storage"
 	"github.com/spf13/cobra"
 )
 

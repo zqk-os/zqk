@@ -4,8 +4,8 @@ import (
 	"context"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/llm"
-	"github.com/lanceman/zqk/pkg/pipeline"
+	"github.com/zqk-os/zqk/pkg/llm"
+	"github.com/zqk-os/zqk/pkg/pipeline"
 )
 
 type mockAnalyzer struct {

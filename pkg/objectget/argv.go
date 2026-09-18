@@ -3,7 +3,7 @@ package objectget
 import (
 	"strings"
 
-	"github.com/lanceman/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/paths"
 )
 
 // Options configures argv construction for `object get`.

@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // rollup_status_parity.json is the shared contract with scripts/cvs_outcome_rollup_test.py (BLI parity).

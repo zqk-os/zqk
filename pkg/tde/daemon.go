@@ -5,9 +5,10 @@ import (
 	"fmt"
 	"time"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/logging"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
+	"github.com/zqk-os/zqk/pkg/logging"
 )
 
 // Mutator is the interface for applying high-risk mutations.
@@ -37,7 +38,9 @@ func NewDaemon(projectRoot string, wal *StagingWAL, mutator Mutator, interval ti
 
 // Start begins the background loop.
 func (d *Daemon) Start() {
-	go d.loop()
+	goroutinelabels.NewGoroutine("tde.daemon_loop", "running TDE daemon commit loop").StartSimple(func() {
+		d.loop()
+	})
 }
 
 // Stop halts the background loop.

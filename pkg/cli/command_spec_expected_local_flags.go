@@ -5,8 +5,8 @@ import (
 
 	"gopkg.in/yaml.v3"
 
-	"github.com/lanceman/zqk/pkg/errfmt"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // DefaultCommonFlagNamesForHelp are the logical names matched by internal/cli.AddCommonFlags and

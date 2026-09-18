@@ -1,8 +1,8 @@
 package system
 
 import (
-	"github.com/lanceman/zqk/pkg/datacell"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/datacell"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 
 	"context"
 	"encoding/json"
@@ -11,8 +11,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/lanceman/zqk/internal/cli"
-	"github.com/lanceman/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/internal/cli"
+	"github.com/zqk-os/zqk/pkg/paths"
 )
 
 // TestCheckCommand_JSONLOutput tests the full check command with JSONL output

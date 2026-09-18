@@ -4,8 +4,8 @@
 package stakeholder_profiles
 
 import (
-	base_objectenum "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
-	shared_stakeholder_profilesenum "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/shared_stakeholder_profiles"
+	base_objectenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
+	shared_stakeholder_profilesenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/shared_stakeholder_profiles"
 )
 
 type PriorityTier = base_objectenum.PriorityTier

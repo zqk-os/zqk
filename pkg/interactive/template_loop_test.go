@@ -3,7 +3,7 @@ package interactive
 import (
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 func TestStreamingTemplateLoop_ProcessLoop(t *testing.T) {

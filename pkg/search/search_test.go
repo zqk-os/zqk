@@ -2,9 +2,10 @@ package search
 
 import (
 	"context"
-	"os"
 	"path/filepath"
 	"testing"
+
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 func createTestWorkspace(t *testing.T) string {
@@ -40,7 +41,7 @@ func (s *Server) Stop() {
 	fmt.Println("Server stopped.")
 }
 `
-	if err := os.WriteFile(filepath.Join(dir, "server.go"), []byte(goCode), 0o644); err != nil {
+	if err := fileutil.WriteFile(filepath.Join(dir, "server.go"), []byte(goCode), 0o644); err != nil {
 		t.Fatalf("failed writing server.go: %v", err)
 	}
 
@@ -49,13 +50,13 @@ func (s *Server) Stop() {
 This is a test project demonstrating native in-process code search.
 Trigram indexing speeds up searches across millions of characters.
 `
-	if err := os.WriteFile(filepath.Join(dir, "README.md"), []byte(readme), 0o644); err != nil {
+	if err := fileutil.WriteFile(filepath.Join(dir, "README.md"), []byte(readme), 0o644); err != nil {
 		t.Fatalf("failed writing README.md: %v", err)
 	}
 
 	// Sample binary file (with null bytes)
 	binaryData := []byte{0x7f, 'E', 'L', 'F', 0x00, 0x01, 0x02, 0x00}
-	if err := os.WriteFile(filepath.Join(dir, "binary.bin"), binaryData, 0o644); err != nil {
+	if err := fileutil.WriteFile(filepath.Join(dir, "binary.bin"), binaryData, 0o644); err != nil {
 		t.Fatalf("failed writing binary.bin: %v", err)
 	}
 
@@ -256,5 +257,101 @@ func TestMaxMatchesCap(t *testing.T) {
 	}
 	if res.TruncateReason != "max_matches" {
 		t.Errorf("expected TruncateReason 'max_matches', got %s", res.TruncateReason)
+	}
+}
+
+func TestZqkProcessDirCollected(t *testing.T) {
+	ws := t.TempDir()
+	procDir := filepath.Join(ws, ".zqk", "process", "backlog_items")
+	if err := fileutil.EnsureDir(procDir); err != nil {
+		t.Fatal(err)
+	}
+	bliFile := filepath.Join(procDir, "BLI-1.yaml")
+	if err := fileutil.WriteFile(bliFile, []byte("id: BLI-1\ntitle: Test Item\n"), 0644); err != nil {
+		t.Fatal(err)
+	}
+	cacheDir := filepath.Join(ws, ".zqk", "cache")
+	if err := fileutil.EnsureDir(cacheDir); err != nil {
+		t.Fatal(err)
+	}
+	cacheFile := filepath.Join(cacheDir, "cache.json")
+	if err := fileutil.WriteFile(cacheFile, []byte("cached data"), 0644); err != nil {
+		t.Fatal(err)
+	}
+
+	files, err := CollectFiles(ws, SearchOptions{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	foundBLI := false
+	foundCache := false
+	for _, f := range files {
+		if filepath.Base(f) == "BLI-1.yaml" {
+			foundBLI = true
+		}
+		if filepath.Base(f) == "cache.json" {
+			foundCache = true
+		}
+	}
+	if !foundBLI {
+		t.Errorf("expected BLI-1.yaml to be collected, got %v", files)
+	}
+	if foundCache {
+		t.Errorf("expected cache.json to be ignored, got %v", files)
+	}
+}
+
+func TestTrigramIndexDiskCache(t *testing.T) {
+	ws := createTestWorkspace(t)
+	cacheFile := filepath.Join(ws, "cache", "trigram.idx")
+	if err := fileutil.EnsureDir(filepath.Dir(cacheFile)); err != nil {
+		t.Fatalf("failed ensuring dir: %v", err)
+	}
+
+	files, err := CollectFiles(ws, SearchOptions{})
+	if err != nil {
+		t.Fatalf("failed collecting files: %v", err)
+	}
+
+	idx, err := BuildIndex(files)
+	if err != nil {
+		t.Fatalf("failed building index: %v", err)
+	}
+
+	if err := idx.SaveToFile(cacheFile); err != nil {
+		t.Fatalf("failed saving index: %v", err)
+	}
+
+	loaded, err := LoadIndexFromFile(cacheFile)
+	if err != nil {
+		t.Fatalf("failed loading index: %v", err)
+	}
+
+	candidates := loaded.FilterCandidates("demonstrating")
+	if len(candidates) == 0 {
+		t.Fatalf("expected candidates for 'demonstrating' from loaded index")
+	}
+}
+
+func TestSearchUnder15ms(t *testing.T) {
+	ws := createTestWorkspace(t)
+	engine := NewEngine(ws)
+
+	if err := engine.BuildTrigramIndex(SearchOptions{}); err != nil {
+		t.Fatalf("failed building index: %v", err)
+	}
+
+	res, err := engine.Search(context.Background(), SearchOptions{
+		Query:    "demonstrating",
+		UseIndex: true,
+	})
+	if err != nil {
+		t.Fatalf("search failed: %v", err)
+	}
+	if len(res.Matches) == 0 {
+		t.Fatalf("expected matches, got 0")
+	}
+	if res.DurationMs > 15.0 {
+		t.Errorf("expected search duration <= 15ms, got %.2fms", res.DurationMs)
 	}
 }

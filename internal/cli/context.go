@@ -3,9 +3,9 @@ package cli
 import (
 	"github.com/spf13/cobra"
 
-	"github.com/lanceman/zqk/internal/cli/context"
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/internal/cli/context"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/paths"
 )
 
 // Context wraps the internal context with OutputFormat conversion

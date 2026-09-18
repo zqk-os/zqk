@@ -4,9 +4,9 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/paths"
-	"github.com/lanceman/zqk/pkg/utils/fileutil"
-	"github.com/lanceman/zqk/pkg/zqkenv"
+	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
 // Product checkout the community TPM owns. Studio sync must not target this.
@@ -16,7 +16,7 @@ const publicCandidateProductDirName = "zqk-public-candidate"
 const publicCandidateExportDirName = "zqk-public-candidate-export"
 
 // seatedCommunityKernel reports a dest that is a live kernel, not a disposable export.
-// TRACK: BLI-REDACTED — remove when: sync-public-candidate never targets a seated checkout.
+// TRACK: BLI-1789619419231762000-7f87694b — remove when: sync-public-candidate never targets a seated checkout.
 func seatedCommunityKernel(dir string) bool {
 	if dir == "" {
 		return false

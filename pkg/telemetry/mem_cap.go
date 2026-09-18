@@ -9,16 +9,18 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/shirou/gopsutil/v3/process"
 )
 
 // RSS Cap Constants
 const (
 	DefaultRSSLimitBytes = 300 * 1024 * 1024 // 300 MiB default cap
-	ReadInterval                  = 500 * time.Millisecond
+	ReadInterval         = 500 * time.Millisecond
 )
 
 const errRSSProcOpenWithPID = "%w for PID %d: %v"
+
 var (
 	errRSSMemInfo  = fmt.Errorf("rss cap: cannot read memory info")
 	errRSSProcOpen = fmt.Errorf("rss cap: cannot create process")
@@ -68,9 +70,11 @@ func NewMemoryCap(limitBytes int64, strict bool) *MemoryCap {
 		strict:   strict,
 		exceeded: make(chan struct{}, 1),
 		pid:      os.Getpid(),
-		cancel:     cancel,
+		cancel:   cancel,
 	}
-	go c.startMonitor(ctx)
+	goroutinelabels.NewGoroutine("telemetry.mem_cap_monitor", "monitoring memory cap RSS").StartSimple(func() {
+		c.startMonitor(ctx)
+	})
 	return c
 }
 
@@ -251,11 +255,11 @@ type TelemetryMetric struct {
 type SourceKind int
 
 const (
-	SourceUnknown  SourceKind = iota // invalid sentinel: means source field is unset
-	SourceRSS                        // resident set size reading from proc_mem_info/swap
-	SourceNet                        // network I/O counters from proc_net_stat/kernel
-	SourceCPU                        // CPU utilization from kernel scheduler accounting
-	SourceSwap                       // swap counter from proc_vmstat or equivalent
+	SourceUnknown SourceKind = iota // invalid sentinel: means source field is unset
+	SourceRSS                       // resident set size reading from proc_mem_info/swap
+	SourceNet                       // network I/O counters from proc_net_stat/kernel
+	SourceCPU                       // CPU utilization from kernel scheduler accounting
+	SourceSwap                      // swap counter from proc_vmstat or equivalent
 )
 
 func (s SourceKind) IsValid() bool { return s >= SourceRSS && s <= SourceSwap }

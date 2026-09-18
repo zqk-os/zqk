@@ -3,7 +3,7 @@ package llm
 import (
 	"context"
 
-	"github.com/lanceman/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/errfmt"
 )
 
 // OpenAI-compatible tool_choice values. Empty means omit the field (provider default).

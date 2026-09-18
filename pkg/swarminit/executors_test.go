@@ -6,7 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/agentfeed"
+	"github.com/zqk-os/zqk/pkg/agentfeed"
 )
 
 func TestBindSeats_trajectoryNotFoundFails(t *testing.T) {

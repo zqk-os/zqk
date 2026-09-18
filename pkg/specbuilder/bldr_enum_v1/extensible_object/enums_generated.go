@@ -4,8 +4,8 @@
 package extensible_object
 
 import (
-	base_objectenum "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
-	shared_extensible_objectsenum "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/shared_extensible_objects"
+	base_objectenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
+	shared_extensible_objectsenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/shared_extensible_objects"
 )
 
 type Plane = base_objectenum.Plane

@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/mcp"
+	"github.com/zqk-os/zqk/pkg/mcp"
 )
 
 func TestMCPSentinelErrors_ConformsToErrorsIs(t *testing.T) {

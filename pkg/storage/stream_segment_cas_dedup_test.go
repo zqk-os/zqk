@@ -8,16 +8,16 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/storage"
-	"github.com/lanceman/zqk/pkg/storage/filecas"
-	"github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/storage/filecas"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
-// TestFileObjectStorage_StreamSegmentIdenticalChunksShareOneBlob verifies CRIT-REDACTED:
+// TestFileObjectStorage_StreamSegmentIdenticalChunksShareOneBlob verifies CRIT-1789333114473875000-490ba391:
 // Two identical stream-segment payloads persist as one content-addressed blob (compression allowed)
 // and object get rehydrates the original bytes through FileObjectStorage.
-// Covering BLI-REDACTED and BLI-REDACTED.
+// Covering BLI-1789333140423696000-7ac580bb and BLI-1789333142411909000-c315d401.
 func TestFileObjectStorage_StreamSegmentIdenticalChunksShareOneBlob(t *testing.T) {
 	t.Parallel()
 	root := t.TempDir()

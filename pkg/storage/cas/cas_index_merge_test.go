@@ -1,14 +1,14 @@
 package cas_test
 
 import (
-	"github.com/lanceman/zqk/pkg/storage/filecas"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/storage/filecas"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 
 	"path/filepath"
 	"strings"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/paths"
 )
 
 func TestMergeCASIndexMaps_StaleMemoryDoesNotClobberHealedDisk(t *testing.T) {

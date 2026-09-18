@@ -10,12 +10,12 @@ import (
 	"strings"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/logging"
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/scheduler/transceiver"
-	"github.com/lanceman/zqk/pkg/shellcmd"
-	"github.com/lanceman/zqk/pkg/when"
-	"github.com/lanceman/zqk/pkg/zqktime"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/scheduler/transceiver"
+	"github.com/zqk-os/zqk/pkg/shellcmd"
+	"github.com/zqk-os/zqk/pkg/when"
+	"github.com/zqk-os/zqk/pkg/zqktime"
 )
 
 const (

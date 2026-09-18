@@ -5,7 +5,7 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/concurrency"
+	"github.com/zqk-os/zqk/pkg/concurrency"
 )
 
 // SpecLoaderMetrics tracks metrics for spec loader lock operations

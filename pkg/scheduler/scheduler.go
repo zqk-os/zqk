@@ -11,24 +11,24 @@ import (
 	"sync"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/ambience"
-	"github.com/lanceman/zqk/pkg/ambient"
-	"github.com/lanceman/zqk/pkg/circuitbreaker"
-	"github.com/lanceman/zqk/pkg/concurrency"
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/contractchange"
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/goroutinelabels"
-	"github.com/lanceman/zqk/pkg/logging"
-	"github.com/lanceman/zqk/pkg/metrics"
-	"github.com/lanceman/zqk/pkg/nildecode"
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/pipeline"
-	"github.com/lanceman/zqk/pkg/scheduler/transceiver"
-	storagepkg "github.com/lanceman/zqk/pkg/storage"
-	"github.com/lanceman/zqk/pkg/utils/fileutil"
-	"github.com/lanceman/zqk/pkg/zqkenv"
-	"github.com/lanceman/zqk/pkg/zqktime"
+	"github.com/zqk-os/zqk/pkg/ambience"
+	"github.com/zqk-os/zqk/pkg/ambient"
+	"github.com/zqk-os/zqk/pkg/circuitbreaker"
+	"github.com/zqk-os/zqk/pkg/concurrency"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/contractchange"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/metrics"
+	"github.com/zqk-os/zqk/pkg/nildecode"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/pipeline"
+	"github.com/zqk-os/zqk/pkg/scheduler/transceiver"
+	storagepkg "github.com/zqk-os/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
+	"github.com/zqk-os/zqk/pkg/zqktime"
 	"github.com/robfig/cron/v3"
 )
 
@@ -654,7 +654,7 @@ func (s *Scheduler) Start(ctx context.Context) error {
 	}
 
 	// Contract-change shockwave: demote shovel_ready|execution_locked that fail new invariants.
-	// TRACK: BLI-REDACTED
+	// TRACK: BLI-1785918841712163000-f128dc79
 	if s.projectRoot != emptyValue && s.storage != nil {
 		if res, err := contractchange.ApplyPending(ctx, s.projectRoot, s.storage); err != nil {
 			slog.Warn("contract-change apply failed on scheduler start", "error", err)

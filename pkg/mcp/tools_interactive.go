@@ -1,6 +1,6 @@
 package mcp
 
-import "github.com/lanceman/zqk/pkg/objects"
+import "github.com/zqk-os/zqk/pkg/objects"
 
 // RegisterInteractiveTools registers interactive object creation tools
 func RegisterInteractiveTools(server *Server) {

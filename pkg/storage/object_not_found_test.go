@@ -4,7 +4,7 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/errfmt"
 )
 
 func TestIsObjectNotFound(t *testing.T) {

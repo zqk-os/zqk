@@ -9,19 +9,19 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/lanceman/zqk/internal/cli"
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/goroutinelabels"
-	"github.com/lanceman/zqk/pkg/logging"
-	"github.com/lanceman/zqk/pkg/metricsrecording"
-	"github.com/lanceman/zqk/pkg/nildecode"
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/pipeline"
-	"github.com/lanceman/zqk/pkg/storage"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
-	"github.com/lanceman/zqk/pkg/validation"
-	"github.com/lanceman/zqk/pkg/when"
+	"github.com/zqk-os/zqk/internal/cli"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/metricsrecording"
+	"github.com/zqk-os/zqk/pkg/nildecode"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/pipeline"
+	"github.com/zqk-os/zqk/pkg/storage"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/validation"
+	"github.com/zqk-os/zqk/pkg/when"
 )
 
 const pipelineKindSystemCheck = "system_check_async"
@@ -476,7 +476,7 @@ func runSystemCheckPipelineWithOutcome(
 		AddStage("CAP_PROBE", func(stageCtx *pipeline.Context, payload any) (any, error) {
 			plLoad := payload.(*systemCheckPipelinePayload)
 			if plLoad.checkCtx != nil && plLoad.checkCtx.ProjectRoot != emptyValue {
-				journalPath := filepath.Join(plLoad.checkCtx.ProjectRoot, ".zqk", "logs", "scheduler", "SCH-cap-orchestrator", "SCH-cap-orchestrator.events.jsonl")
+				journalPath := filepath.Join(plLoad.checkCtx.ProjectRoot, ".zqk", "logs", "scheduler", objects.JobIDCapOrchestrator, objects.JobIDCapOrchestrator+".events.jsonl")
 				stat, err := fileutil.Stat(journalPath)
 				if err == nil {
 					if time.Since(stat.ModTime()) > 4*time.Hour {
@@ -490,6 +490,10 @@ func runSystemCheckPipelineWithOutcome(
 		}).
 		AddStage("FINALIZE", func(stageCtx *pipeline.Context, payload any) (any, error) {
 			stageCtx.Outcome[pipeline.OutcomeKeyFinalizeDone] = true
+			plLoad := payload.(*systemCheckPipelinePayload)
+			if plLoad.cmd != nil {
+				fmt.Fprintln(plLoad.cmd.ErrOrStderr(), "Finalizing caches and storage queues...")
+			}
 			return payload, nil
 		}).
 		Build()

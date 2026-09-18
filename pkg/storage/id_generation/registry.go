@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/lanceman/zqk/pkg/concurrency"
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/logging"
-	"github.com/lanceman/zqk/pkg/storage/locknames"
+	"github.com/zqk-os/zqk/pkg/concurrency"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/storage/locknames"
 )
 
 var (
@@ -17,21 +17,18 @@ var (
 
 // RegisterStrategy registers an ID generation strategy
 // Should be called during package initialization
-func RegisterStrategy(strategy Strategy) {
+func RegisterStrategy(strategy Strategy) error {
 	if strategy == nil {
-		// TRACK: [Registry initialization violation]
-		panic(ConstCannotRegisterNilStrategy)
+		return fmt.Errorf("%s", ConstCannotRegisterNilStrategy)
 	}
 	name := strategy.Name()
 	if name == emptyValue {
-		// TRACK: [Registry initialization violation]
-		panic(ConstStrategyMustHaveANonEmptyName)
+		return fmt.Errorf("%s", ConstStrategyMustHaveANonEmptyName)
 	}
 
-	_ = concurrency.RunInLockOrLog(&strategiesLock, locknames.LockNameIdGenerationRegisterStrategy, logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)), func() error {
+	return concurrency.RunInLockOrLog(&strategiesLock, locknames.LockNameIdGenerationRegisterStrategy, logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)), func() error {
 		if _, exists := strategies[name]; exists {
-			// TRACK: [Registry initialization violation]
-			panic(fmt.Sprintf(ConstStrategySAlreadyRegistered, name))
+			return fmt.Errorf(ConstStrategySAlreadyRegistered, name)
 		}
 		strategies[name] = strategy
 		return nil

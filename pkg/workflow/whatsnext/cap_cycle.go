@@ -6,8 +6,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/paths"
-	"github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // CapStages is the ordered CAP loop. Selection peeks; advance is explicit after

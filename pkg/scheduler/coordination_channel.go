@@ -9,13 +9,13 @@ import (
 	"sync"
 	"time"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/logging"
-	"github.com/lanceman/zqk/pkg/paths"
-	"github.com/lanceman/zqk/pkg/pipeline"
-	storagepkg "github.com/lanceman/zqk/pkg/storage"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/pipeline"
+	storagepkg "github.com/zqk-os/zqk/pkg/storage"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // Event is a JSON-Lines friendly job coordination event.
@@ -42,6 +42,9 @@ const (
 
 	// coordinationEventLogLockTimeout bounds wait when another process holds the events.jsonl flock.
 	coordinationEventLogLockTimeout = 5 * time.Second
+
+	// eventLogEOFRetryDelay bounds the polling backoff when the event log reader hits EOF.
+	eventLogEOFRetryDelay = 50 * time.Millisecond
 )
 
 // NewCoordinationChannel constructs a channel rooted at:
@@ -239,7 +242,7 @@ func (cc *CoordinationChannel) WatchEvents(ctx context.Context) error {
 		line, err := reader.ReadBytes('\n')
 		if err != nil {
 			if err == io.EOF {
-				time.Sleep(50 * time.Millisecond)
+				time.Sleep(eventLogEOFRetryDelay)
 				continue
 			}
 			return errfmt.Newf("read event log").Wrap(err)

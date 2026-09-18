@@ -1,9 +1,9 @@
 package internal
 
 import (
-	"github.com/lanceman/zqk/internal/cli"
-	clipkg "github.com/lanceman/zqk/pkg/cli"
-	"github.com/lanceman/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/internal/cli"
+	clipkg "github.com/zqk-os/zqk/pkg/cli"
+	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/spf13/cobra"
 )
 

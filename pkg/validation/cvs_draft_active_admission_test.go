@@ -5,11 +5,11 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 )
 
-// TRACK: BLI-REDACTED — draft→active fail-closed on the real lifecycle YAML.
+// TRACK: BLI-1786686769839541000-f5a3260f — draft→active fail-closed on the real lifecycle YAML.
 func TestGoValidator_CVSDraftToActiveAdmission(t *testing.T) {
 	t.Parallel()
 	lifecyclesDir := filepath.Join("..", "..", paths.ProcessInternalLifecyclesDir)

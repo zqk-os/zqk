@@ -4,8 +4,8 @@
 package vision
 
 import (
-	base_objectenum "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
-	shared_visionsenum "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/shared_visions"
+	base_objectenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
+	shared_visionsenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/shared_visions"
 )
 
 type Plane = base_objectenum.Plane

@@ -7,7 +7,7 @@ import (
 	"io"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // AuditLoggingPlugin securely logs all pipeline activities for compliance.

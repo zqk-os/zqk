@@ -3,7 +3,7 @@ package scheduler
 import (
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/agentclaim"
+	"github.com/zqk-os/zqk/pkg/agentclaim"
 )
 
 // TestActionForExpiredTimer_checkinNeverKills is the safety property behind the cadence

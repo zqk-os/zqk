@@ -1,25 +1,25 @@
 package utility
 
 import (
-	"github.com/lanceman/zqk/pkg/datacell"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/datacell"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 
 	"path/filepath"
 	"sync"
 	"testing"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/paths"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/coordination"
-	"github.com/lanceman/zqk/pkg/goroutinelabels"
-	"github.com/lanceman/zqk/pkg/logging"
-	"github.com/lanceman/zqk/pkg/metricsrecording"
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/storage"
-	caspkg "github.com/lanceman/zqk/pkg/storage/cas"
-	"github.com/lanceman/zqk/pkg/testkit"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/coordination"
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/metricsrecording"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/storage"
+	caspkg "github.com/zqk-os/zqk/pkg/storage/cas"
+	"github.com/zqk-os/zqk/pkg/testkit"
 )
 
 // TestParallelCreate_ReproducesIssue tests parallel object creation to reproduce the CAS metrics issue
@@ -257,7 +257,7 @@ func TestParallelCreate_WithValidation(t *testing.T) {
 
 	// Create objects sequentially first (to establish dependencies)
 	ctx := pkgctx.NewSystemContext()
-	// TRACK: BLI-REDACTED — draft-plane create / promote membrane.
+	// TRACK: BLI-1785443942668406000-1ec5c811 — draft-plane create / promote membrane.
 	for i, obj := range testObjects {
 		kind, _ := obj[objects.FieldKeyKind].(string)
 		objID, _ := obj[objects.FieldKeyID].(string)
@@ -311,7 +311,7 @@ func TestParallelCreate_WithValidation(t *testing.T) {
 
 				createCtx := pkgctx.WithCacheUpdate(ctx, objID, kind, "")
 				createErr := storageProvider.Create(createCtx, builder.secCtx, objCopy)
-				// TRACK: BLI-REDACTED — promote parallel creates off draft plane.
+				// TRACK: BLI-1785443942668406000-1ec5c811 — promote parallel creates off draft plane.
 				if createErr == nil {
 					createErr = storageProvider.Update(createCtx, builder.secCtx, objID, map[string]any{
 						objects.FieldKeyStatus: scenarioBuilderStatusActive,

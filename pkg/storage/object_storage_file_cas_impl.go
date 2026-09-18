@@ -1,20 +1,20 @@
 package storage
 
 import (
-	caspkg "github.com/lanceman/zqk/pkg/storage/cas"
+	caspkg "github.com/zqk-os/zqk/pkg/storage/cas"
 
 	"context"
 	"path/filepath"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/storage/filecas"
+	"github.com/zqk-os/zqk/pkg/storage/filecas"
 
 	"gopkg.in/yaml.v3"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/logging"
-	"github.com/lanceman/zqk/pkg/storage/crud"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/storage/crud"
 )
 
 // usesContentAddressableStorage checks if a kind uses content-addressable (hash-named) storage.
@@ -93,7 +93,7 @@ func (f *FileObjectStorage) getContentAddressableStorage(kind string) (*filecas.
 	ctx := pkgctx.NewSystemContext()
 	cas, err := f.casCache.GetOrCreate(ctx, kind, func(ctx context.Context, key string) (*filecas.ContentAddressableStorage, error) {
 		casInstance := filecas.NewContentAddressableStorage(kindDir, key, writeQueue)
-		// Wire per-kind CAS in-memory index to InvalidationShockwaveBus (BLI-REDACTED)
+		// Wire per-kind CAS in-memory index to InvalidationShockwaveBus (BLI-1789165691528268000-7bb48f71)
 		GetGlobalInvalidationBus().Subscribe(NewCASIndexInvalidationSubscriber(casInstance))
 		return casInstance, nil
 	})

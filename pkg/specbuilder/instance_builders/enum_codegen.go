@@ -10,14 +10,14 @@ import (
 
 	"gopkg.in/yaml.v3"
 
-	"github.com/lanceman/zqk/pkg/appledouble"
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/paths"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/appledouble"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
-const enumModuleBasePath = "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1"
+const enumModuleBasePath = "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1"
 
 const (
 	enumCodegenFieldTypeEnum      = "enum"

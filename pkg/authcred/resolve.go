@@ -1,5 +1,5 @@
 // Package authcred resolves CLI/MCP credentials to ACC-* accounts.
-// TRACK: BLI-REDACTED — unique issued ZQK_API_KEY + seating inject.
+// TRACK: BLI-1785905292370531000-b758a11c — unique issued ZQK_API_KEY + seating inject.
 package authcred
 
 import (
@@ -9,10 +9,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/paths"
-	"github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"gopkg.in/yaml.v3"
 )
 

@@ -3,7 +3,7 @@ package provider
 import (
 	"time"
 
-	"github.com/lanceman/zqk/pkg/observability"
+	"github.com/zqk-os/zqk/pkg/observability"
 )
 
 // getPoolMetricsRecorder gets a metrics recorder for pool operations

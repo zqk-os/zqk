@@ -5,13 +5,13 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/paths"
-	"github.com/lanceman/zqk/pkg/storage"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/storage"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/logging"
-	"github.com/lanceman/zqk/pkg/objects"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 func TestEnsureBundledObjectSpecsMigrated_CreatesObjectSpec(t *testing.T) {
@@ -57,15 +57,22 @@ visibility: internal
 	}
 
 	secCtx := pkgctx.NewSystemSecurityContext()
-	obj, err := store.Read(ctx, secCtx, "OBJ-migration_test_kind")
+	expectedID := ObjectSpecIDForStem("migration_test_kind")
+	obj, err := store.Read(ctx, secCtx, expectedID)
 	if err != nil {
-		t.Fatalf("read: %v", err)
+		t.Fatalf("read %s: %v", expectedID, err)
 	}
 	if obj[objects.FieldKeyKind] != "object_spec" {
 		t.Fatalf("kind: %v", obj[objects.FieldKeyKind])
 	}
 	if obj[objects.FieldKeyOntology] != "migration_test_kind" {
 		t.Fatalf("ontology: %v", obj[objects.FieldKeyOntology])
+	}
+	if desc, ok := obj[objects.FieldKeyDescription].(string); !ok || len(desc) < 10 {
+		t.Fatalf("description: %v", obj[objects.FieldKeyDescription])
+	}
+	if fp, ok := obj[objects.FieldKeyFilePath].(string); !ok || filepath.IsAbs(fp) {
+		t.Fatalf("expected project-relative file_path, got %v", fp)
 	}
 
 	stats2, err := EnsureBundledObjectSpecsMigrated(ctx, root, logger)

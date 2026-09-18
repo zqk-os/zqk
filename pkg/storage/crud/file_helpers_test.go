@@ -3,7 +3,7 @@ package crud_test
 import (
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/storage"
 )
 
 func TestVerifyEmbeddedChecksum(t *testing.T) {

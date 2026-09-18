@@ -1,9 +1,9 @@
 package validation
 
-import "github.com/lanceman/zqk/pkg/shovelready"
+import "github.com/zqk-os/zqk/pkg/shovelready"
 
 // Canonical criteria id for CRI-SHOVEL-READY (MMORCH audit F-002).
-// TRACK: CRIT-REDACTED — keep in sync with kernel criteria object.
+// TRACK: CRIT-1785885889228395000-15c56d02 — keep in sync with kernel criteria object.
 const CriteriaIDShovelReady = shovelready.CriteriaID
 
 // ShovelReadyResult is the CRI-SHOVEL-READY gate outcome for one backlog item.

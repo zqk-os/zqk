@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/lanceman/zqk/pkg/outputtypes"
+	"github.com/zqk-os/zqk/pkg/outputtypes"
 	"gopkg.in/yaml.v3"
 )
 

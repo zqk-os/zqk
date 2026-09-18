@@ -12,13 +12,13 @@ import (
 	"sync"
 	"sync/atomic"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/logging"
-	"github.com/lanceman/zqk/pkg/paths"
-	"github.com/lanceman/zqk/pkg/utils/fileutil"
-	"github.com/lanceman/zqk/pkg/validation"
-	"github.com/lanceman/zqk/pkg/walutil"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/validation"
+	"github.com/zqk-os/zqk/pkg/walutil"
 )
 
 const (
@@ -690,6 +690,7 @@ func CompactWAL(projectRoot string) error {
 		logging.LogSwallowedError(fileutil.RemoveFile(tempPath))
 		return errfmt.Newf(ConstStreamFailedToReplaceWalFile).Wrap(err)
 	}
+	_ = fileutil.SyncDir(filepath.Dir(walPath))
 
 	StorageLog(logger).Info(LogEventStorageObjectWALCompactionCompletedInfo).
 		Int("total_records", int(totalRecords)).

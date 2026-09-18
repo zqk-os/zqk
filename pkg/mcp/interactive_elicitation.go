@@ -2,7 +2,7 @@
 package mcp
 
 import (
-	"github.com/lanceman/zqk/pkg/interactive"
+	"github.com/zqk-os/zqk/pkg/interactive"
 )
 
 // ConvertFieldTokenInfoToElicitationParam converts a FieldTokenInfo to an MCP ElicitationParam

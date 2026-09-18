@@ -5,7 +5,7 @@ import (
 	"slices"
 	"strings"
 
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // Rule IDs emitted by the hand-CAS / duplicate-ID scans.

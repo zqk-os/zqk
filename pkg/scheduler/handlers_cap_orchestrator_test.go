@@ -8,15 +8,15 @@ import (
 	"sync"
 	"testing"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/logging"
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/primaryorch"
-	storagepkg "github.com/lanceman/zqk/pkg/storage"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
-	"github.com/lanceman/zqk/pkg/workflow/whatsnext"
-	"github.com/lanceman/zqk/pkg/zqkenv"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/primaryorch"
+	storagepkg "github.com/zqk-os/zqk/pkg/storage"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/workflow/whatsnext"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
 func TestHasOpenAgentInstruction_MatchesPersonaPlanStage(t *testing.T) {
@@ -208,7 +208,7 @@ func TestCapOrchestratorHandler_executeDispatchStage(t *testing.T) {
 	mockExe := filepath.Join(tempDir, "mock-zqk.sh")
 
 	// Plan must carry persona_refs (lifecycle / CAP dispatch identity) — no all-persona fallback.
-	// TRACK: BLI-REDACTED
+	// TRACK: BLI-1785915238591238000-619a2f9e
 	script := `#!/bin/bash
 echo "$@" >> ` + tempDir + `/calls.log
 
@@ -831,4 +831,38 @@ exit 0
 		t.Fatalf("expected ATTN dor-gap when open BLIs fail DoR, got %v", err)
 	}
 }
-// tdd refresh
+
+func TestExecuteDispatchStage_LeadTerminalStatusReturnsNil(t *testing.T) {
+	t.Parallel()
+	tempDir := t.TempDir()
+	mockExe := filepath.Join(tempDir, "mock-zqk.sh")
+	script := fmt.Sprintf(`#!/bin/bash
+if [[ "$1" == "object" && "$2" == "show" ]]; then
+	cat <<'EOF'
+{"%s":"PRI-DONE-PLAN","%s":"complete","%s":["PER-TPM"]}
+EOF
+	exit 0
+fi
+exit 0
+`, objects.FieldKeyID, objects.FieldKeyStatus, objects.FieldKeyPersonaRefs)
+	if err := fileutil.WriteFile(mockExe, []byte(script), 0755); err != nil {
+		t.Fatalf("write mock: %v", err)
+	}
+	mStorage := &mockCapStorage{
+		listed: map[string][]map[string]any{
+			objects.KindWorkstream: {},
+			objects.KindBacklogItem: {
+				{
+					objects.FieldKeyID:              "BLI-1",
+					objects.FieldKeyStatus:          objects.ObjectStatusComplete,
+					objects.FieldKeyPriorityPlanRef: "PRI-DONE-PLAN",
+				},
+			},
+		},
+	}
+	h := NewCapOrchestratorHandler(mStorage, tempDir, logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).(*CapOrchestratorHandler)
+	err := h.executeDispatchStage(context.Background(), mockExe, "PRI-DONE-PLAN", "cap_stage_dispatch", nil, true)
+	if err != nil {
+		t.Fatalf("expected nil error for complete priority plan, got: %v", err)
+	}
+}

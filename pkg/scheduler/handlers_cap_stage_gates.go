@@ -9,15 +9,15 @@ import (
 	"strings"
 	"time"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/convergence"
-	"github.com/lanceman/zqk/pkg/datacell"
-	"github.com/lanceman/zqk/pkg/logging"
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/paths"
-	storagepkg "github.com/lanceman/zqk/pkg/storage"
-	"github.com/lanceman/zqk/pkg/utils/fileutil"
-	"github.com/lanceman/zqk/pkg/workflow/whatsnext"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/convergence"
+	"github.com/zqk-os/zqk/pkg/datacell"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
+	storagepkg "github.com/zqk-os/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/workflow/whatsnext"
 )
 
 const (
@@ -41,7 +41,7 @@ const (
 	capStageQuarantineRetryAfter = 30 * time.Minute
 	// Hold longer than two CAP ticks (15m cron) before re-waking TPM so stuck
 	// orchestrating/grooming is visible in chat — not only in scheduler events.
-	// TRACK: PRI-REDACTED / F-001 CAP silent hold
+	// TRACK: PRI-1785885772223315000-0649f401 / F-001 CAP silent hold
 	capHoldWakeAfter  = 30 * time.Minute
 	capHoldWakePeriod = 30 * time.Minute
 )
@@ -251,7 +251,7 @@ func (h *CapOrchestratorHandler) readPendingStage() (capStagePending, error) {
 }
 
 // cvsStatusEligibleForCAP is true while the session can still receive CAP advances.
-// Option A (DEC / BLI-REDACTED): escalated stays CAP-bound.
+// Option A (DEC / BLI-1786686768606200000-31133cc3): escalated stays CAP-bound.
 func cvsStatusEligibleForCAP(status string) bool {
 	return convergence.SessionStatusEligibleForCAP(status)
 }
@@ -320,7 +320,7 @@ func (h *CapOrchestratorHandler) resolveBoundCVS(ctx context.Context, planID str
 
 // refreshPendingBoundCVS rebinds pending.CvsID when the stored id is missing or terminal
 // (completed/abandoned/…); otherwise CAP forever journals against a dead session.
-// TRACK: BLI-REDACTED — CAP ops / stale pending CVS.
+// TRACK: BLI-1785905541906569000-074e24d7 — CAP ops / stale pending CVS.
 func (h *CapOrchestratorHandler) refreshPendingBoundCVS(ctx context.Context, pending *capStagePending) (rewrote bool) {
 	if pending == nil {
 		return false
@@ -730,7 +730,7 @@ type capHoldWakeState struct {
 // holds for longer than capHoldWakeAfter (rate-limited by capHoldWakePeriod).
 // Without this, orchestrating reuses open AGIs and never interrupts chat — the
 // 15m job looks "dead" even though it is completing successfully.
-// TRACK: PRI-REDACTED
+// TRACK: PRI-1785885772223315000-0649f401
 func (h *CapOrchestratorHandler) maybeWakeOnStageHold(stage, reason string) {
 	if h == nil || h.projectRoot == "" {
 		return
@@ -764,8 +764,8 @@ func (h *CapOrchestratorHandler) maybeWakeOnStageHold(stage, reason string) {
 		planID = stage
 	}
 	msg := fmt.Sprintf(
-		"CAP stage HOLD (%s) for %s — %s. Job SCH-cap-orchestrator is ticking; delivery evidence missing. Advance ATKs to implemented or write cap_stage_receipt.json.",
-		stage, heldFor.Round(time.Minute), reason,
+		"CAP stage HOLD (%s) for %s — %s. Job %s is ticking; delivery evidence missing. Advance ATKs to implemented or write cap_stage_receipt.json.",
+		stage, heldFor.Round(time.Minute), reason, CapOrchestratorJobID,
 	)
 	h.logger.Info("cap_stage_hold_wake",
 		logging.StageField(stage),

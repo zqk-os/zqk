@@ -1,6 +1,6 @@
 package storage
 
-import "github.com/lanceman/zqk/pkg/graph/provider"
+import "github.com/zqk-os/zqk/pkg/graph/provider"
 
 // NewMockGraphConnectionForAggregateWithQueryResult returns a [provider.GraphConnection] backed by
 // the same mock as [newMockGraphConnectionForAggregate], with one query string pre-mapped to a result.

@@ -3,8 +3,8 @@ package agentfeed
 import (
 	"strconv"
 
-	"github.com/lanceman/zqk/pkg/datacell"
-	"github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/datacell"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 type DoctorResult struct {

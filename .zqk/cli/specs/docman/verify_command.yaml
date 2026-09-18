@@ -1,0 +1,38 @@
+$schema: "../schemas/command_spec.schema.json"
+
+name: "verify"
+short: "Cryptographically verify doc_entry objects against on-disk files and detect drift"
+description: >
+  Verify cryptographic integrity (SHA-256 and byte size) of registered doc_entry objects against on-disk documentation files.
+
+flags:
+  - name: "ids"
+    type: "stringSlice"
+    description: "Specific doc_entry IDs to verify"
+  - name: "subtrees"
+    type: "stringSlice"
+    description: "Specific subtrees to verify (defaults to all doc_entries)"
+  - name: "shipped-only"
+    type: "bool"
+    default: false
+    description: "Only verify shipped documentation subtrees (architecture, best-practices, onboarding)"
+  - name: "auto-seal"
+    type: "bool"
+    default: false
+    description: "Compute and update cryptographic content_hash and content_size in storage"
+  - name: "strict"
+    type: "bool"
+    default: true
+    description: "Fail closed (exit with non-zero code) if any verification violations occur"
+
+help:
+  examples:
+    - comment: "Verify all shipped documentation entries"
+      command: "%s docman verify --shipped-only"
+    - comment: "Verify specific doc_entry IDs"
+      command: "%s docman verify --ids DOC-001,DOC-002"
+    - comment: "Verify and auto-seal drifted or unsealed documents"
+      command: "%s docman verify --shipped-only --auto-seal"
+
+run_e: "runVerify"
+common_flags: true

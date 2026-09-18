@@ -8,12 +8,12 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/logging"
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/paths"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
-	"github.com/lanceman/zqk/pkg/zqktime"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/zqktime"
 )
 
 func CompactStreamRegistryForKind(projectRoot, kind string) error {
@@ -163,7 +163,7 @@ func CompactStreamRegistryForKind(projectRoot, kind string) error {
 // into unified YYYY-MM-DD_stream.json files. It only keeps records that are live according to the registry snapshot.
 // Today's live-PID shards are left in place (writers still append); dead-PID shards from today are merged.
 // It returns a map from ID to new location format (path::offset) for all updated entries.
-// TRACK: BLI-REDACTED
+// TRACK: BLI-1785905541906569000-074e24d7
 func MergeDailySegmentsForKind(projectRoot, kind string, snap *streamRegistrySnapshot) (map[string]string, error) {
 	relocations := make(map[string]string)
 	dir, err := GetStreamSegmentDir(projectRoot, kind)

@@ -4,7 +4,7 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
-	"github.com/lanceman/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/paths"
 )
 
 func TestCalculateSHA256Hash_empty(t *testing.T) {

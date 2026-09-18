@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 func TestDefaultEngine_Translate_JSON(t *testing.T) {

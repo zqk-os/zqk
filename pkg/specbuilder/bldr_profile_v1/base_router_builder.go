@@ -3,9 +3,9 @@
 package bldr_profile_v1
 
 import (
-	"github.com/lanceman/zqk/pkg/config"
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/specbuilder/profile_builders"
+	"github.com/zqk-os/zqk/pkg/config"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/specbuilder/profile_builders"
 )
 
 // BaseRouterBuilder builds the base_router profile at version v1_0_0

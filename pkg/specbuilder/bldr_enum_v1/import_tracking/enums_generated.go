@@ -4,8 +4,8 @@
 package import_tracking
 
 import (
-	base_objectenum "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
-	shared_import_trackingsenum "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/shared_import_trackings"
+	base_objectenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
+	shared_import_trackingsenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/shared_import_trackings"
 )
 
 type Plane = base_objectenum.Plane

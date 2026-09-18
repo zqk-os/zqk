@@ -6,7 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 func TestGenerateCommandBuilderFromYAML(t *testing.T) {
@@ -67,7 +67,7 @@ func TestGenerateCommandBuilderFromYAML(t *testing.T) {
 			if !strings.Contains(generatedStr, "package bldr_cli_cmd_v1") {
 				t.Error("generated code should contain 'package bldr_cli_cmd_v1'")
 			}
-			if !strings.Contains(generatedStr, "github.com/lanceman/zqk/pkg/cli") {
+			if !strings.Contains(generatedStr, "github.com/zqk-os/zqk/pkg/cli") {
 				t.Error("generated code should import pkg/cli")
 			}
 			if !strings.Contains(generatedStr, "func New") {

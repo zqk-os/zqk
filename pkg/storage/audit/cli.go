@@ -3,7 +3,7 @@ package audit
 import (
 	"context"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
 )
 
 // CLIMarkerKey is the context value key for CLI-privileged storage operations.

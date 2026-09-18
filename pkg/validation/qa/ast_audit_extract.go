@@ -3,7 +3,7 @@ package qa
 import (
 	"go/ast"
 
-	"github.com/lanceman/zqk/pkg/validation"
+	"github.com/zqk-os/zqk/pkg/validation"
 )
 
 // auditMapExtractionAntiPattern checks for the pattern:

@@ -6,15 +6,15 @@ import (
 	"sort"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/paths"
-	"github.com/lanceman/zqk/pkg/utils/fileutil"
-	"github.com/lanceman/zqk/pkg/zqktime"
+	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/zqktime"
 )
 
 // runningJobsSnapshotFile is the relative path under projectRoot for cross-process
 // visibility of jobs currently executing in the scheduler daemon.
 // CLI `scheduler activity` reads this when GetGlobalScheduler() is nil (out-of-process).
-// TRACK: BLI-REDACTED — avoid false Executing:0 while test bundles run.
+// TRACK: BLI-1785443942668406000-1ec5c811 — avoid false Executing:0 while test bundles run.
 const runningJobsSnapshotFile = "running_jobs.json"
 
 // RunningJobsSnapshot is the on-disk shape under .zqk/scheduler/state/.

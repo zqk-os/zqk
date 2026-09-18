@@ -3,8 +3,8 @@ package mcp
 import (
 	"strings"
 
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // validateAgentRegistrationWithClientInfo validates agent registration with client name for human client detection

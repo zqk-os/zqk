@@ -7,9 +7,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/config"
+	"github.com/zqk-os/zqk/pkg/config"
 
-	"github.com/lanceman/zqk/pkg/goroutinelabels"
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 )
 
 // runDeadlockReproductionTests enables the exact-reproduction deadlock tests.

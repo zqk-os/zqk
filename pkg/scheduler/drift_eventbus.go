@@ -3,8 +3,8 @@ package scheduler
 import (
 	"context"
 
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/telemetry"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/telemetry"
 )
 
 // CoordinationEventBusAdapter implements telemetry.EventBus and bridges to CoordinationChannel.

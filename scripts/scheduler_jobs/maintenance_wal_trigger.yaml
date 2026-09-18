@@ -1,0 +1,26 @@
+# Maintenance WAL trigger: requests one maintenance cycle (aggregate then retention) on a schedule.
+#
+# The scheduler runs this job on the given schedule; the handler appends cycle_requested to the
+# maintenance WAL. The maintenance runner (single goroutine) processes events in order, running
+# audit_event_aggregation then retention_tolerance. See docs/architecture/MAINTENANCE_WAL_AND_RUNNER.md.
+#
+# Create via:
+#   zqk object create scheduler_job --file scripts/scheduler_jobs/maintenance_wal_trigger.yaml
+# Or use: zqk system ensure-retention-jobs (ensures this job plus retention/aggregation/object-count).
+#
+# Schedule: every 10 min for tighter maintenance cycles (was */15).
+id: SCH-maintenance-wal
+title: Maintenance - WAL Cycle (Aggregate Then Retention)
+description: |
+  Timer job that requests one maintenance cycle via the maintenance WAL. The runner runs
+  audit_event_aggregation then retention_tolerance in order. No run_wrapper; single durable flow.
+job_type: maintenance
+trigger_type: timer
+schedule_expression: "*/10 * * * *"
+category: maintenance
+execution_mode: reusable
+max_runtime_seconds: 300
+enabled: true
+status: active
+namespace_id: zqk:kernel
+schema_version: "2.0.0"

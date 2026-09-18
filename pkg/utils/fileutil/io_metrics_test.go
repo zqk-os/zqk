@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-// TRACK: BLI-PERF-FILEUTIL-METRICS-001 / CRIT-REDACTED / REQ-REDACTED
+// TRACK: BLI-PERF-FILEUTIL-METRICS-001 / CRIT-1787075073743178000-853fbf8c / REQ-1787075085088349000-53c24a8e
 
 func TestClassifyPath(t *testing.T) {
 	tests := []struct {
@@ -244,14 +244,14 @@ func TestIOMetrics_LeafPackageBoundary(t *testing.T) {
 	}
 	src := string(content)
 	disallowed := []string{
-		"github.com/lanceman/zqk/pkg/scheduler",
-		"github.com/lanceman/zqk/pkg/storage",
-		"github.com/lanceman/zqk/pkg/cli",
-		"github.com/lanceman/zqk/cmd/zqk",
+		"github.com/zqk-os/zqk/pkg/scheduler",
+		"github.com/zqk-os/zqk/pkg/storage",
+		"github.com/zqk-os/zqk/pkg/cli",
+		"github.com/zqk-os/zqk/cmd/zqk",
 	}
 	for _, d := range disallowed {
 		if filepath.Base(d) != "" && (containsImport(src, d)) {
-			t.Fatalf("CRIT-REDACTED violation: io_metrics.go imports %s", d)
+			t.Fatalf("CRIT-1787075073743178000-853fbf8c violation: io_metrics.go imports %s", d)
 		}
 	}
 }

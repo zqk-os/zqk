@@ -7,13 +7,13 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/paths"
-	"github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
-// TestIdenticalStreamSegmentChunksShareOneCASBlob verifies CRIT-REDACTED:
+// TestIdenticalStreamSegmentChunksShareOneCASBlob verifies CRIT-1789333114473875000-490ba391:
 // Identical stream-segment chunks share one CAS blob; get rehydrates original bytes.
-// Covering BLI-REDACTED and BLI-REDACTED.
+// Covering BLI-1789333140423696000-7ac580bb and BLI-1789333142411909000-c315d401.
 func TestIdenticalStreamSegmentChunksShareOneCASBlob(t *testing.T) {
 	t.Parallel()
 	kindDir := t.TempDir()

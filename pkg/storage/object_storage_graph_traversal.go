@@ -7,11 +7,11 @@ import (
 	"strings"
 	"time"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/graph/provider"
-	"github.com/lanceman/zqk/pkg/logging"
-	"github.com/lanceman/zqk/pkg/objects"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/graph/provider"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // Exists checks if an object exists by ID
@@ -215,6 +215,11 @@ func (g *GraphObjectStorage) GetPath(ctx context.Context, secCtx *pkgctx.Securit
 	return g.findPathBFS(ctx, secCtx, fromID, toID)
 }
 
+const (
+	maxBFSDepth     = 32
+	maxBFSQueueSize = 5000
+)
+
 // findPathBFS finds a path between two nodes using BFS
 func (g *GraphObjectStorage) findPathBFS(ctx context.Context, secCtx *pkgctx.SecurityContext, fromID, toID string) ([]map[string]any, error) {
 	type pathNode struct {
@@ -229,6 +234,11 @@ func (g *GraphObjectStorage) findPathBFS(ctx context.Context, secCtx *pkgctx.Sec
 	for len(queue) > 0 {
 		current := queue[0]
 		queue = queue[1:]
+
+		// Enforce depth bounds to prevent unbounded queue growth on large or cyclical graphs (BLI-CEF-PERF-003)
+		if len(current.path) >= maxBFSDepth {
+			continue
+		}
 
 		// Get neighbors
 		neighbors, err := g.GetNeighbors(ctx, secCtx, current.id, "outgoing")
@@ -260,7 +270,7 @@ func (g *GraphObjectStorage) findPathBFS(ctx context.Context, secCtx *pkgctx.Sec
 				return result, nil
 			}
 
-			if !visited[neighborID] {
+			if !visited[neighborID] && len(queue) < maxBFSQueueSize {
 				visited[neighborID] = true
 				newPath := make([]string, len(current.path))
 				copy(newPath, current.path)
@@ -284,11 +294,50 @@ func (g *GraphObjectStorage) GetNeighbors(ctx context.Context, secCtx *pkgctx.Se
 		return nil, errfmt.Errorf(ConstStreamFailedToReadObjectStrErr, id, err)
 	}
 
+	// Attempt single bulk traversal query first to eliminate N+1 roundtrips (BLI-CEF-PERF-001)
+	var travDir provider.Direction
+	switch direction {
+	case "outgoing":
+		travDir = provider.DirectionOutgoing
+	case "incoming":
+		travDir = provider.DirectionIncoming
+	case "both":
+		travDir = provider.DirectionBoth
+	}
+
 	neighbors := make([]map[string]any, 0)
+	if travDir != "" {
+		traversal := provider.TraversalQuery{
+			StartNodeID: id,
+			Direction:   travDir,
+			MaxDepth:    1,
+			Filter:      provider.NodeFilter{},
+		}
+		if res, travErr := g.conn.ExecuteTraversal(ctx, traversal); travErr == nil && res != nil && len(res.Nodes) > 0 {
+			seen := make(map[string]bool)
+			for _, node := range res.Nodes {
+				if node == nil || node.ID == id || seen[node.ID] {
+					continue
+				}
+				seen[node.ID] = true
+				obj := g.nodeToObject(node)
+				if obj != nil {
+					objKind, _ := obj[objects.FieldKeyKind].(string)
+					if err := g.checkPermission(secCtx, "read", objKind); err == nil {
+						neighbors = append(neighbors, obj)
+					}
+				}
+			}
+			return neighbors, nil
+		}
+	}
+
+	// Fallback to edge listing with deduplicated node lookups
+	seenNodes := make(map[string]bool)
+	var targetIDs []string
 
 	// Handle outgoing (objects this references)
 	if direction == "outgoing" || direction == "both" {
-		// Get outgoing edges
 		edgeFilter := provider.EdgeFilter{
 			FromID: id,
 			Limit:  1000,
@@ -300,19 +349,9 @@ func (g *GraphObjectStorage) GetNeighbors(ctx context.Context, secCtx *pkgctx.Se
 		}
 		if err == nil {
 			for _, edge := range edges {
-				node, readErr := g.conn.GetNode(ctx, edge.ToID, nil)
-				if readErr != nil && isGraphRetryable(readErr) {
-					logging.FluentEvent(logging.GetLogger()).Error("Transient error in GraphObjectStorage.GetNeighbors GetNode", readErr).Log()
-				}
-				if readErr == nil && node != nil {
-					obj := g.nodeToObject(node)
-					if obj != nil {
-						// Check permissions
-						objKind, _ := obj[objects.FieldKeyKind].(string)
-						if err := g.checkPermission(secCtx, "read", objKind); err == nil {
-							neighbors = append(neighbors, obj)
-						}
-					}
+				if edge != nil && edge.ToID != "" && edge.ToID != id && !seenNodes[edge.ToID] {
+					seenNodes[edge.ToID] = true
+					targetIDs = append(targetIDs, edge.ToID)
 				}
 			}
 		}
@@ -320,7 +359,6 @@ func (g *GraphObjectStorage) GetNeighbors(ctx context.Context, secCtx *pkgctx.Se
 
 	// Handle incoming (objects that reference this)
 	if direction == "incoming" || direction == "both" {
-		// Get incoming edges
 		edgeFilter := provider.EdgeFilter{
 			ToID:  id,
 			Limit: 1000,
@@ -332,19 +370,25 @@ func (g *GraphObjectStorage) GetNeighbors(ctx context.Context, secCtx *pkgctx.Se
 		}
 		if err == nil {
 			for _, edge := range edges {
-				node, readErr := g.conn.GetNode(ctx, edge.FromID, nil)
-				if readErr != nil && isGraphRetryable(readErr) {
-					logging.FluentEvent(logging.GetLogger()).Error("Transient error in GraphObjectStorage.GetNeighbors GetNode", readErr).Log()
+				if edge != nil && edge.FromID != "" && edge.FromID != id && !seenNodes[edge.FromID] {
+					seenNodes[edge.FromID] = true
+					targetIDs = append(targetIDs, edge.FromID)
 				}
-				if readErr == nil && node != nil {
-					obj := g.nodeToObject(node)
-					if obj != nil {
-						// Check permissions
-						objKind, _ := obj[objects.FieldKeyKind].(string)
-						if err := g.checkPermission(secCtx, "read", objKind); err == nil {
-							neighbors = append(neighbors, obj)
-						}
-					}
+			}
+		}
+	}
+
+	for _, nodeID := range targetIDs {
+		node, readErr := g.conn.GetNode(ctx, nodeID, nil)
+		if readErr != nil && isGraphRetryable(readErr) {
+			logging.FluentEvent(logging.GetLogger()).Error("Transient error in GraphObjectStorage.GetNeighbors GetNode", readErr).Log()
+		}
+		if readErr == nil && node != nil {
+			obj := g.nodeToObject(node)
+			if obj != nil {
+				objKind, _ := obj[objects.FieldKeyKind].(string)
+				if err := g.checkPermission(secCtx, "read", objKind); err == nil {
+					neighbors = append(neighbors, obj)
 				}
 			}
 		}

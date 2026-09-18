@@ -6,12 +6,12 @@ import (
 	"testing"
 	"time"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/storage"
-	"github.com/lanceman/zqk/pkg/zqkenv"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 
-	"github.com/lanceman/zqk/pkg/validation"
+	"github.com/zqk-os/zqk/pkg/validation"
 )
 
 // TestAcceptanceCriteria_ParseMixedContent tests parsing acceptance_criteria that contains

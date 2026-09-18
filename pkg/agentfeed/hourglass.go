@@ -3,7 +3,7 @@ package agentfeed
 import (
 	"strings"
 
-	"github.com/lanceman/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/errfmt"
 )
 
 // EnforceDirectedHourglass rejects directed peer routing without an await-peer-ack

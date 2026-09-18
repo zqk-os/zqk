@@ -1,15 +1,15 @@
 package storage
 
 import (
-	caspkg "github.com/lanceman/zqk/pkg/storage/cas"
+	caspkg "github.com/zqk-os/zqk/pkg/storage/cas"
 
 	"context"
 	"fmt"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/logging"
-	"github.com/lanceman/zqk/pkg/objects"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // BulkCreate creates multiple objects atomically using a transaction
@@ -276,7 +276,7 @@ func (f *FileObjectStorage) BulkGet(ctx context.Context, secCtx *pkgctx.Security
 // BulkDeleteOptimized (batched WAL / leaf fast path). World-class local deletes
 // must not babysit N×sync round-trips.
 // Critical kinds always go through Delete → kernel.cas_object_erase (never batch CAS wipe).
-// TRACK: BLI-REDACTED
+// TRACK: BLI-1785784864671436000-071adcbe
 func (f *FileObjectStorage) BulkDelete(ctx context.Context, secCtx *pkgctx.SecurityContext, ids []string, cascade bool) (*BulkResult, error) {
 	if !IsCLIOperation(ctx, secCtx) {
 		return nil, errfmt.Errorf(ConstStreamDeleteOperationsMustBePerformedThroughCli)

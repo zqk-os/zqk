@@ -9,8 +9,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/infrastructure"
-	"github.com/lanceman/zqk/pkg/infrastructure/crypto"
+	"github.com/zqk-os/zqk/pkg/infrastructure"
+	"github.com/zqk-os/zqk/pkg/infrastructure/crypto"
 )
 
 // inMemSpine provides a simple in-memory broadcast for testing.

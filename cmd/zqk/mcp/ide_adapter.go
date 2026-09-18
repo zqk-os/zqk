@@ -6,13 +6,13 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/lanceman/zqk/internal/cli"
-	clipkg "github.com/lanceman/zqk/pkg/cli"
-	"github.com/lanceman/zqk/pkg/cli/bldr_cli_cmd_v1"
-	"github.com/lanceman/zqk/pkg/goroutinelabels"
-	"github.com/lanceman/zqk/pkg/logging"
-	"github.com/lanceman/zqk/pkg/mcp"
-	"github.com/lanceman/zqk/pkg/mcp/ideadapter"
+	"github.com/zqk-os/zqk/internal/cli"
+	clipkg "github.com/zqk-os/zqk/pkg/cli"
+	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/mcp"
+	"github.com/zqk-os/zqk/pkg/mcp/ideadapter"
 	"github.com/spf13/cobra"
 )
 
@@ -64,7 +64,7 @@ func runIDEAdapter(cmd *cobra.Command, _ []string) error {
 	// Do not derive from cmd.Context(): IDE cancels it after tools/call, which
 	// used to exit the adapter process and mark MCP red. Lifetime is stdin EOF;
 	// SIGINT/SIGTERM close stdin to unblock the read loop. TRACK:
-	// BLI-REDACTED — hourglass/context-refresh soft drain.
+	// BLI-1784969955962654000-dc689643 — hourglass/context-refresh soft drain.
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM) // Background: request-or-shutdown derived
 	defer stop()
 	goroutinelabels.NewGoroutine("mcp_ide_adapter_stdin_close", "close stdin on SIGINT/SIGTERM soft drain").StartSimple(func() {

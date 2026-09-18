@@ -4,9 +4,9 @@ package storage
 import (
 	"strings"
 
-	"github.com/lanceman/zqk/pkg/migration/parser"
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/validation"
+	"github.com/zqk-os/zqk/pkg/migration/parser"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/validation"
 )
 
 func GetReferencedObjectIDs(obj map[string]any) []string {
@@ -21,7 +21,7 @@ func extractReferenceIDsFromObject(obj map[string]any) []string {
 	}
 	yamlParser := parser.NewYAMLParser()
 	refFields := yamlParser.ExtractReferenceFields(obj)
-	// Attribution / keystore identity fields (not *_ref suffix) — TRACK: BLI-REDACTED
+	// Attribution / keystore identity fields (not *_ref suffix) — TRACK: BLI-1785905134201010000-07393484
 	for _, fieldName := range []string{objects.FieldKeyCreatedBy, objects.FieldKeyUpdatedBy, objects.FieldKeyAccountID} {
 		if v, ok := obj[fieldName]; ok && v != nil {
 			refFields[fieldName] = v

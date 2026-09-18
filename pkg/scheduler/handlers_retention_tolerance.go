@@ -10,17 +10,17 @@ import (
 	"strings"
 	"time"
 
-	caspkg "github.com/lanceman/zqk/pkg/storage/cas"
+	caspkg "github.com/zqk-os/zqk/pkg/storage/cas"
 
-	"github.com/lanceman/zqk/pkg/concurrency"
-	"github.com/lanceman/zqk/pkg/config"
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/datacell"
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/logging"
-	"github.com/lanceman/zqk/pkg/nildecode"
-	"github.com/lanceman/zqk/pkg/objects"
-	storagepkg "github.com/lanceman/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/concurrency"
+	"github.com/zqk-os/zqk/pkg/config"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/datacell"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/nildecode"
+	"github.com/zqk-os/zqk/pkg/objects"
+	storagepkg "github.com/zqk-os/zqk/pkg/storage"
 )
 
 // Default batch size and max batches when not set via job env (BATCH_SIZE, MAX_BATCHES).
@@ -264,7 +264,7 @@ func (h *RetentionToleranceHandler) executeRetentionToleranceCore(ctx context.Co
 		// 1) Archive: objects older than archive_after -> status = archived.
 		// High-volume kinds with empty protect_statuses use OldestIDs cleanup/enforce; BulkUpdate
 		// archive of thousands contends with audit aggregation WAL (stuck SCH-retention-* jobs).
-		// TRACK: BLI-REDACTED
+		// TRACK: BLI-1785905541906569000-074e24d7
 		if tol.ArchiveEnabled {
 			if skipArchiveForOldestIDsPath(kind, tol.ProtectStatuses) {
 				h.emitProgress(fmt.Sprintf("Skipping archive for %s (empty protect_statuses → OldestIDs cleanup/enforce)", kind))
@@ -397,7 +397,7 @@ func (h *RetentionToleranceHandler) executeRetentionToleranceCore(ctx context.Co
 		// Enforce STREAM_KIND_STEWARDSHIP.md contract: stream registries are compacted, and orphaned segments
 		// are GC'd, and runtime delta overlays are processed after a successful retention tolerance cycle.
 		// When KINDS is set, only steward those kinds (dedicated jobs must not walk every HV stream).
-		// TRACK: BLI-REDACTED
+		// TRACK: BLI-1785905541906569000-074e24d7
 		storagepkg.PostRetentionStreamStewardshipFiltered(h.projectRoot, job.ID, h.logger, kindFilter)
 	}
 
@@ -541,7 +541,7 @@ func isCatalogKind(kind string) bool {
 // archiveOldObjects lists objects of kind with created_at < cutoff and status != archiveStatus,
 // then bulk-updates to the kind's lifecycle archive status. Skips kinds with no archive:true
 // status (must not invent literal "archived" — that churned questions into Layer-1 error).
-// TRACK: BLI-REDACTED
+// TRACK: BLI-1785723654802038000-b14064bc
 func (h *RetentionToleranceHandler) archiveOldObjects(
 	ctx context.Context,
 	secCtx *pkgctx.SecurityContext,

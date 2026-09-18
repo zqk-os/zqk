@@ -5,12 +5,12 @@ import (
 	"path/filepath"
 	"sync"
 
-	"github.com/lanceman/zqk/pkg/concurrency"
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/paths"
-	"github.com/lanceman/zqk/pkg/strutil"
-	"github.com/lanceman/zqk/pkg/utils/fileutil"
-	"github.com/lanceman/zqk/pkg/when"
+	"github.com/zqk-os/zqk/pkg/concurrency"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/strutil"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/when"
 )
 
 var (

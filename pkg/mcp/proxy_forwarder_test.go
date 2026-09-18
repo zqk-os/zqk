@@ -10,7 +10,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/logging"
 )
 
 func TestProxyForwarder_Basic(t *testing.T) {

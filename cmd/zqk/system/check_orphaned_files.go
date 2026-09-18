@@ -7,16 +7,17 @@ import (
 	"fmt"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v3"
 
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/kernelcas"
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/paths"
-	"github.com/lanceman/zqk/pkg/storage"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/kernelcas"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/storage"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 func detectOrphanedFiles(cmd *cobra.Command, projectRoot string, results []CheckResult, autoFix bool) []CheckResult {
@@ -46,8 +47,9 @@ func detectOrphanedFiles(cmd *cobra.Command, projectRoot string, results []Check
 	processDir := filepath.Join(projectRoot, paths.ProcessDir)
 	var orphanedResults []CheckResult
 
-	// Get all registered kinds
+	// Get all registered kinds and pre-filter existing directories
 	kinds := objects.GetGlobalKindMapper().GetAllKinds()
+	var kindsToCheck []string
 	for _, kind := range kinds {
 		// Skip high-volume, stream-backed, or automated kinds that do not participate in CAS index registry
 		if kind == objects.KindAuditEvent || kind == objects.KindChangeJournalEntry || kind == objects.KindMcpSession || kind == objects.KindSchedulerJob || kind == "command_spec" || (len(kind) > 7 && kind[len(kind)-7:] == "_metric") {
@@ -64,6 +66,21 @@ func detectOrphanedFiles(cmd *cobra.Command, projectRoot string, results []Check
 		if _, err := fileutil.Stat(kindDir); err != nil {
 			continue
 		}
+		kindsToCheck = append(kindsToCheck, kind)
+	}
+
+	if cmd != nil && len(kindsToCheck) > 0 {
+		fmt.Fprintf(cmd.ErrOrStderr(), "Scanning CAS membrane for orphaned files across %d kinds...\n", len(kindsToCheck))
+	}
+	lastScanHeartbeat := time.Now()
+
+	for idx, kind := range kindsToCheck {
+		if cmd != nil && time.Since(lastScanHeartbeat) >= 1*time.Second {
+			lastScanHeartbeat = time.Now()
+			fmt.Fprintf(cmd.ErrOrStderr(), "Scanning CAS directories... (%d/%d kinds)\n", idx+1, len(kindsToCheck))
+		}
+		dirName := objects.GetDirectoryFromKind(kind)
+		kindDir := filepath.Join(processDir, dirName)
 
 		// Load CAS index mapping for this kind to prevent deleting valid CAS files
 		var indexMappings map[string]string
@@ -79,7 +96,7 @@ func detectOrphanedFiles(cmd *cobra.Command, projectRoot string, results []Check
 		indexCount := len(indexMappings)
 		// Incomplete/empty index + hash files on disk: do NOT treat unindexed files as
 		// disposable orphans. That is how sole criteria/workstreams were wiped.
-		// TRACK: BLI-REDACTED
+		// TRACK: BLI-1785723654802038000-b14064bc
 		sparseIndex := casIndexSparseVersusDisk(indexCount, diskHashCount)
 		if sparseIndex && diskHashCount > 0 {
 			orphanedResults = append(orphanedResults, CheckResult{
@@ -141,7 +158,7 @@ func detectOrphanedFiles(cmd *cobra.Command, projectRoot string, results []Check
 					// Index often lags updates: id still mapped to a deleted old hash while
 					// the new hash file exists on disk. That is drift, not an orphan — Tier 1
 					// "Orphaned file" made system check flap (0 ↔ hundreds) after bulk updates.
-					// TRACK: BLI-REDACTED — remove when: CAS update always
+					// TRACK: BLI-1785723654802038000-b14064bc — remove when: CAS update always
 					// durables the new hash before ACK and check discovery uses disk truth.
 					if oid, idErr := extractObjectIDFromYAMLHead(cleanPath, idHeadBytes); idErr == nil && oid != "" {
 						if indexedHash, ok := indexMappings[oid]; ok && indexedHash != nameWithoutExt {
@@ -193,7 +210,7 @@ func detectOrphanedFiles(cmd *cobra.Command, projectRoot string, results []Check
 					// Prefer re-registering parseable CAS objects over deleting them.
 					// Incomplete indexes falsely mark sole files as orphans; auto-delete wiped
 					// criteria/workstreams during kernel repair (restore from git required).
-					// TRACK: BLI-REDACTED — remove when: orphan auto-fix
+					// TRACK: BLI-1785723654802038000-b14064bc — remove when: orphan auto-fix
 					// always reindexes via a shared CAS reconcile API and never deletes sole files.
 					if isCASHashName {
 						if recoveredID, recoverErr := reindexOrphanCASHashFile(kind, kindDir, cleanPath, nameWithoutExt, cas); recoverErr == nil && recoveredID != "" {
@@ -242,7 +259,7 @@ func detectOrphanedFiles(cmd *cobra.Command, projectRoot string, results []Check
 					// Never fileutil.RemoveFile from orphan detection. IsCoreKernelKind is false when the
 					// spec index is not loaded, so a "non-core" branch previously wiped real
 					// process YAML. Reindex CAS hashes above; traditional files need CLI repair.
-					// TRACK: BLI-REDACTED
+					// TRACK: BLI-1785723654802038000-b14064bc
 					orphanedResults = append(orphanedResults, CheckResult{
 						ObjectID:   id,
 						ObjectKind: kind,
@@ -328,7 +345,7 @@ func truncateHashPrefix(hash string, n int) string {
 // reindexOrphanCASHashFile registers a hash-named YAML into the kind CAS index when it parses
 // as an object of that kind. Returns the object id on success.
 // Runs under kernel.cas_object_reconcile_index (reindex only; never sole-delete).
-// TRACK: BLI-REDACTED
+// TRACK: BLI-1785784865905766000-dded0895
 func reindexOrphanCASHashFile(kind, kindDir, filePath, hash string, cas *storage.ContentAddressableStorage) (string, error) {
 	var recoveredID string
 	err := kernelcas.RunReconcileIndex(context.Background(), nil, &kernelcas.Mutation{ // Background: request-or-shutdown derived
@@ -357,8 +374,19 @@ func reindexOrphanCASHashFile(kind, kindDir, filePath, hash string, cas *storage
 			if idx == nil {
 				return errfmt.Errorf("CAS index unavailable for kind %s", kind)
 			}
-			if err := idx.SetMapping(oid, hash); err != nil {
-				return err
+			relDir, relErr := filepath.Rel(kindDir, filepath.Dir(filePath))
+			var bucketKey string
+			if relErr == nil && relDir != "." && relDir != "" {
+				bucketKey = relDir
+			}
+			var setErr error
+			if bucketKey != "" {
+				setErr = idx.SetMapping(oid, hash, bucketKey)
+			} else {
+				setErr = idx.SetMapping(oid, hash)
+			}
+			if setErr != nil {
+				return setErr
 			}
 			recoveredID = oid
 			return nil

@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // mcpToolArgKey* are MCP tool schema / forwarded CLI argument map keys.
@@ -106,7 +106,7 @@ const objectListTimeout = 20 * time.Second
 // mcpFilterExprs normalizes MCP `filter` so list and count share one membrane.
 // JSON-schema arrays arrive as []any; some clients send []string or a single string.
 // Dropping a mistyped filter made list return a different set than count.
-// TRACK: BLI-REDACTED
+// TRACK: BLI-1785723654802038000-b14064bc
 func mcpFilterExprs(v any) []any {
 	switch x := v.(type) {
 	case []any:

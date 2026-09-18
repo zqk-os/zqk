@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"io"
 
-	"github.com/lanceman/zqk/pkg/observer"
+	"github.com/zqk-os/zqk/pkg/observer"
 )
 
 // SemanticLinkFormatHandler parses object references and outputs an execution map of zqk object get commands.

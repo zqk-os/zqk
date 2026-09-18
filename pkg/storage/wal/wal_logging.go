@@ -1,7 +1,7 @@
 package wal
 
 import (
-	"github.com/lanceman/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/logging"
 )
 
 func StorageLog(logger logging.Logger) *logging.FluentRoot {

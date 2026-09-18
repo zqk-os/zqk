@@ -11,24 +11,24 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/lanceman/zqk/internal/cli"
-	"github.com/lanceman/zqk/pkg/concurrency"
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/coordination"
-	"github.com/lanceman/zqk/pkg/datacell"
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/goroutinelabels"
-	"github.com/lanceman/zqk/pkg/logging"
-	"github.com/lanceman/zqk/pkg/metrics"
-	"github.com/lanceman/zqk/pkg/nildecode"
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/paths"
-	"github.com/lanceman/zqk/pkg/pipeline"
-	schedulerpkg "github.com/lanceman/zqk/pkg/scheduler"
-	storagepkg "github.com/lanceman/zqk/pkg/storage"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
-	"github.com/lanceman/zqk/pkg/validation"
-	"github.com/lanceman/zqk/pkg/when"
+	"github.com/zqk-os/zqk/internal/cli"
+	"github.com/zqk-os/zqk/pkg/concurrency"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/coordination"
+	"github.com/zqk-os/zqk/pkg/datacell"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/metrics"
+	"github.com/zqk-os/zqk/pkg/nildecode"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/pipeline"
+	schedulerpkg "github.com/zqk-os/zqk/pkg/scheduler"
+	storagepkg "github.com/zqk-os/zqk/pkg/storage"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/validation"
+	"github.com/zqk-os/zqk/pkg/when"
 )
 
 const pipelineKindDiscoverAndEnqueueObjects = "system.async_check_discover_and_enqueue_objects"
@@ -271,7 +271,7 @@ func (acc *AsyncCheckContext) getOperationCallback() concurrency.OperationCallba
 // significant CAS/cache change marker is present. Pending burst/drain refresh
 // object-id-cache and invalidate pending validation IDs only — they do not
 // wipe the validation cache.
-// TRACK: BLI-REDACTED
+// TRACK: BLI-1785895580100186000-c5539372
 func handleClearCache(checkCtx *AsyncCheckContext) error {
 	clearCache, err := checkCtx.Cmd.Flags().GetBool("clear-cache")
 	if err != nil {
@@ -621,6 +621,11 @@ func determineCheckTarget(checkCtx *AsyncCheckContext, args []string) error {
 			checkCtx.TargetIDs = args[1:]
 		}
 	} else {
+		if !strings.Contains(args[0], "-") && len(allKinds) > 0 {
+			if err := ValidateTargetKindOrSuggest(args[0], allKinds); err != nil {
+				return err
+			}
+		}
 		checkCtx.TargetKind = ""
 		checkCtx.TargetIDs = args
 	}
@@ -949,7 +954,7 @@ func discoverAndEnqueueObjectsImpl(checkCtx *AsyncCheckContext) error {
 // These must never be persisted in or trusted from the validation cache: once stored they replay
 // on every later run for objects that are otherwise cache hits, so the noise survives
 // --refresh-cache (which rebuilds the object-id cache, not validation state) and only
-// --clear-cache clears it. TRACK: BLI-REDACTED
+// --clear-cache clears it. TRACK: BLI-1786387465409533000-45bd780c
 func isTransientCacheCoherenceIssue(category string) bool {
 	return category == categoryCacheLag || category == categoryCacheCoherence
 }
@@ -980,7 +985,7 @@ func shouldUseCachedState(objectID, filePath string, state *validation.Validatio
 		// DependentsLookup nil → false "complete PRI children not terminal"). Never
 		// treat those as permanent hits; revalidate so a fixed binary self-heals
 		// without requiring --clear-cache every time.
-		// TRACK: BLI-REDACTED
+		// TRACK: BLI-1785723654802038000-b14064bc
 		if issue.Tier == 1 && issue.Category == "instance_validation" {
 			return false
 		}
@@ -992,7 +997,7 @@ func shouldUseCachedState(objectID, filePath string, state *validation.Validatio
 		// GhostRef is a cache-miss + Exists-false verdict at validation time, not a
 		// property of the referrer file. After object-id-cache refresh (or a peer
 		// restoring the target), the referrer mtime is unchanged so these must not
-		// replay as cache hits. TRACK: BLI-REDACTED
+		// replay as cache hits. TRACK: BLI-1786387465409533000-45bd780c
 		if issue.Tier == 1 && issue.Category == categoryGhostRef {
 			return false
 		}
@@ -1030,7 +1035,7 @@ func enqueueOrUseCache(
 		bypassCacheWithIssues = autoFix || force
 		// Explicit clear must revalidate even if Clear() raced with another writer
 		// that restored a poison on-disk snapshot.
-		// TRACK: BLI-REDACTED
+		// TRACK: BLI-1785723654802038000-b14064bc
 		forceMiss = clearCache
 	}
 	if !forceMiss && inCache && shouldUseCachedState(file.ObjectID, file.Path, state, bypassCacheWithIssues) {
@@ -1084,6 +1089,14 @@ func enqueueFilesAsDiscovered(checkCtx *AsyncCheckContext, filesStream <-chan []
 	pendingByID := make(map[string]scannedFile)
 	var tasksActuallyEnqueued int
 
+	enqueueStart := time.Now()
+	lastEnqueueProgress := time.Now()
+	lastReportedTasks := 0
+	profile := systemProfileHuman
+	if checkCtx.Ctx != nil && checkCtx.Ctx.Profile != emptyValue {
+		profile = checkCtx.Ctx.Profile
+	}
+
 	for files := range filesStream {
 		for _, file := range files {
 			if handledObjectIDs[file.ObjectID] {
@@ -1095,6 +1108,21 @@ func enqueueFilesAsDiscovered(checkCtx *AsyncCheckContext, filesStream <-chan []
 				continue
 			}
 			if enqueueOrUseCache(checkCtx, file, pendingByID, &tasksToEnqueue, batchSize, &tasksActuallyEnqueued, handledObjectIDs, &cacheHits) {
+				now := time.Now()
+				if checkCtx.TotalTasks-lastReportedTasks >= 500 || now.Sub(lastEnqueueProgress) >= 1*time.Second {
+					lastReportedTasks = checkCtx.TotalTasks
+					lastEnqueueProgress = now
+					emitDiscoveryProgressEventViaCoordinator(
+						checkCtx.Cmd.Context(),
+						checkCtx.ProjectRoot,
+						checkCtx.StorageProvider,
+						checkCtx.OperationID,
+						"",
+						checkCtx.TotalTasks,
+						now.Sub(enqueueStart),
+						profile,
+					)
+				}
 				if checkCtx.TotalTasks%100 == 0 {
 					logging.Fluent(checkCtx.Logger).Debug("Enqueuing objects...").
 						Int("enqueued", checkCtx.TotalTasks).

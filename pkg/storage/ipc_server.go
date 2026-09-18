@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"net"
 	"net/rpc"
+
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 )
 
 // IPCWriterArgs defines the arguments for daemon RPC calls.
@@ -61,6 +63,8 @@ func StartIPCServer(socketPath string, daemon *PrivilegedWriterDaemon) (net.List
 		return nil, fmt.Errorf("failed to listen on %s: %w", socketPath, err)
 	}
 
-	go server.Accept(listener)
+	goroutinelabels.NewGoroutine("storage.ipc_server_accept", "accepting IPC server connections").StartSimple(func() {
+		server.Accept(listener)
+	})
 	return listener, nil
 }

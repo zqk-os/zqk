@@ -1,21 +1,21 @@
 package utility
 
 import (
-	"github.com/lanceman/zqk/pkg/datacell"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
-	"github.com/lanceman/zqk/pkg/zqkenv"
+	"github.com/zqk-os/zqk/pkg/datacell"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 
 	"sync"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/paths"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/coordination"
-	"github.com/lanceman/zqk/pkg/logging"
-	"github.com/lanceman/zqk/pkg/objects"
-	storagepkg "github.com/lanceman/zqk/pkg/storage"
-	"github.com/lanceman/zqk/pkg/testkit"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/coordination"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/objects"
+	storagepkg "github.com/zqk-os/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/testkit"
 )
 
 // newTimingTestScenarioBuilder builds an isolated project root, storage, coordinator, and a
@@ -101,7 +101,7 @@ func TestCacheCheckerTiming_RaceCondition(t *testing.T) {
 		// Also cache account username format
 		if kind, ok := obj[objects.FieldKeyKind].(string); ok && kind == "account" {
 			if username, ok := obj[objects.FieldKeyUsername].(string); ok && username != emptyValue {
-				accountID := "" // ACC-* from storage; TRACK: BLI-REDACTED
+				accountID := "" // ACC-* from storage; TRACK: BLI-1785905134201010000-07393484
 				referenceCacheMu.Lock()
 				referenceCache[accountID] = true
 				referenceCacheMu.Unlock()
@@ -227,7 +227,7 @@ func TestCacheCheckerTiming_CorrectBehavior(t *testing.T) {
 		}
 		if kind, ok := obj[objects.FieldKeyKind].(string); ok && kind == "account" {
 			if username, ok := obj[objects.FieldKeyUsername].(string); ok && username != emptyValue {
-				accountID := "" // ACC-* from storage; TRACK: BLI-REDACTED
+				accountID := "" // ACC-* from storage; TRACK: BLI-1785905134201010000-07393484
 				referenceCacheMu.Lock()
 				referenceCache[accountID] = true
 				referenceCacheMu.Unlock()

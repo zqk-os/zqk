@@ -6,11 +6,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/agentfeed"
-	"github.com/lanceman/zqk/pkg/interactionpolicy"
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/workflow/whatsnext"
-	"github.com/lanceman/zqk/pkg/zqkenv"
+	"github.com/zqk-os/zqk/pkg/agentfeed"
+	"github.com/zqk-os/zqk/pkg/interactionpolicy"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/workflow/whatsnext"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
 func TestCompileWhatsNextDrive_emptyColumnIsStratplan(t *testing.T) {

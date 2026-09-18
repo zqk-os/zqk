@@ -1,9 +1,9 @@
 package object
 
 import (
-	"github.com/lanceman/zqk/pkg/datacell"
-	"github.com/lanceman/zqk/pkg/utils/fileutil"
-	"github.com/lanceman/zqk/pkg/zqkenv"
+	"github.com/zqk-os/zqk/pkg/datacell"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 
 	"context"
 	"fmt"
@@ -11,13 +11,13 @@ import (
 	"testing"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/paths"
-	"github.com/lanceman/zqk/pkg/specbuilder/builders"
-	"github.com/lanceman/zqk/pkg/storagetesting"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/specbuilder/builders"
+	"github.com/zqk-os/zqk/pkg/storagetesting"
 
-	_ "github.com/lanceman/zqk/pkg/specbuilder/bldr_instance_v1" // Register instance builders for tests
-	_ "github.com/lanceman/zqk/pkg/specbuilder/bldr_v2"          // Register spec builders for tests
+	_ "github.com/zqk-os/zqk/pkg/specbuilder/bldr_instance_v1" // Register instance builders for tests
+	_ "github.com/zqk-os/zqk/pkg/specbuilder/bldr_v2"          // Register spec builders for tests
 )
 
 // objectCompleteTestEnv mirrors pkg/testing.TestEnvironment fields used by move tests.

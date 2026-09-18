@@ -4,7 +4,7 @@ import (
 	"slices"
 	"strings"
 
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // Pointer-transitive lifecycle constraints, expressed as data.
@@ -25,7 +25,7 @@ import (
 // (OpRequireFieldWhenStatus), and the refuse-form of this same constraint exists there as
 // OpRefuseChildStatus. Unifying those two planes changes which path enforces what on the
 // storage save path, so it needs a decision rather than a refactor.
-// TRACK: BLI-REDACTED — remove this note when lifecycle preconditions are
+// TRACK: BLI-1787565256503969000-f5604378 — remove this note when lifecycle preconditions are
 // sourced from one plane; it carries the triage of the 56 barriers still authored as prose.
 type refStatusRule struct {
 	// Precondition is the lifecycle token this row answers. Matched as a substring so a
@@ -44,6 +44,8 @@ type refStatusRule struct {
 	// Without it, the cheapest way to clear the barrier would be to delete the archived
 	// history, which is the opposite of what the barrier is for.
 	ArchivedLineageSatisfies bool
+	// AllowEmptyRef satisfies the constraint vacuously when the ref field is empty or unset.
+	AllowEmptyRef bool
 }
 
 // refStatusRules is the matrix: one row per (precondition token → ref field, allowed statuses).
@@ -61,6 +63,14 @@ var refStatusRules = []refStatusRule{
 		Require:                  []string{objects.ObjectStatusValidated, objects.ObjectStatusComplete, objects.ObjectStatusCompleted},
 		Ignore:                   []string{objects.ObjectStatusRejected},
 		ArchivedLineageSatisfies: true,
+	},
+	{
+		Precondition:             PrecondPriorityPlanArchivedWhenSet,
+		Field:                    objects.FieldKeyPriorityPlanRef,
+		RefKind:                  objects.KindPriorityPlan,
+		Require:                  []string{objects.ObjectStatusArchived},
+		ArchivedLineageSatisfies: true,
+		AllowEmptyRef:            true,
 	},
 }
 
@@ -82,7 +92,7 @@ func lookupRefStatusRule(precondition string) (refStatusRule, bool) {
 func (gv *GoValidator) evalRefStatus(rule refStatusRule, obj map[string]any, options *ValidationOptions) bool {
 	ids := gv.extractIDsFromField(obj, rule.Field)
 	if len(ids) == 0 {
-		return false
+		return rule.AllowEmptyRef
 	}
 	if options == nil || options.ObjectStatusLookup == nil {
 		return false

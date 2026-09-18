@@ -3,8 +3,8 @@
 package bldr_lifecycle_v1
 
 import (
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/specbuilder/lifecycle_builders"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/specbuilder/lifecycle_builders"
 )
 
 // AuthStrategyLifecycleBuilder builds the auth_strategy lifecycle at version v1_0_0

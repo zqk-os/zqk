@@ -10,14 +10,14 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/lanceman/zqk/internal/cli"
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/migration/parser"
-	"github.com/lanceman/zqk/pkg/paths"
-	"github.com/lanceman/zqk/pkg/storage"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/internal/cli"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/migration/parser"
+	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/storage"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 func checkIntegrity(ctx *cli.Context, cmd *cobra.Command, _ *parser.ParsedObject, filePath, kind string) (issues []Issue, autoFixed []string) {
@@ -176,7 +176,7 @@ func checkIntegrityWithRegistryAndContent(ctx *cli.Context, obj *parser.ParsedOb
 	// Use cached CAS when available (async validation / scheduler) to avoid loading full index per object.
 	// Storage from system check is typically Batching(Routing(...)) — bare *FileObjectStorage asserts miss
 	// and reloaded .doc_entry.index (~170KB) on every object under concurrency → validation timeouts.
-	// TRACK: BLI-REDACTED — keep unwrap when: check uses factory/cache providers.
+	// TRACK: BLI-1785895580100186000-c5539372 — keep unwrap when: check uses factory/cache providers.
 	var cas *storage.ContentAddressableStorage
 	if fileStorage := extractFileStorage(storageProvider); fileStorage != nil {
 		if c, err := fileStorage.GetContentAddressableStorage(kind); err == nil && c != nil {

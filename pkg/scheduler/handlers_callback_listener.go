@@ -8,15 +8,15 @@ import (
 	"sync"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/concurrency"
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/goroutinelabels"
-	"github.com/lanceman/zqk/pkg/httpheaders"
-	"github.com/lanceman/zqk/pkg/logging"
-	"github.com/lanceman/zqk/pkg/objects"
-	storagepkg "github.com/lanceman/zqk/pkg/storage"
-	"github.com/lanceman/zqk/pkg/when"
+	"github.com/zqk-os/zqk/pkg/concurrency"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
+	"github.com/zqk-os/zqk/pkg/httpheaders"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/objects"
+	storagepkg "github.com/zqk-os/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/when"
 )
 
 // Context key types for avoiding collisions
@@ -27,6 +27,16 @@ type authSubjectKey struct{}
 //
 //nolint:unused // Reserved for future authentication features
 type authPermissionsKey struct{}
+
+const (
+	defaultCallbackListenerPort        = 8080
+	defaultCallbackListenerBasePath    = "/callbacks"
+	defaultCallbackListenerIdleTimeout = 5 * time.Minute
+	callbackServerReadHeaderTimeout    = 5 * time.Second
+	callbackServerReadTimeout          = 10 * time.Second
+	callbackServerWriteTimeout         = 10 * time.Second
+	callbackServerIdleTimeout          = 60 * time.Second
+)
 
 // CallbackListenerHandler runs a lightweight HTTP server to receive callbacks and route them
 type CallbackListenerHandler struct {
@@ -79,10 +89,10 @@ func (h *CallbackListenerHandler) BuildHTTPServer(addr string, handler http.Hand
 	return &http.Server{
 		Addr:              addr,
 		Handler:           handler,
-		ReadHeaderTimeout: 5 * time.Second, // Prevent Slowloris attacks
-		ReadTimeout:       10 * time.Second,
-		WriteTimeout:      10 * time.Second,
-		IdleTimeout:       60 * time.Second,
+		ReadHeaderTimeout: callbackServerReadHeaderTimeout, // Prevent Slowloris attacks
+		ReadTimeout:       callbackServerReadTimeout,
+		WriteTimeout:      callbackServerWriteTimeout,
+		IdleTimeout:       callbackServerIdleTimeout,
 	}
 }
 
@@ -92,15 +102,15 @@ func (h *CallbackListenerHandler) executeCallbackListenerCore(ctx context.Contex
 	// Get listener configuration
 	port := job.ListenerPort
 	if port == 0 {
-		port = 8080 // Default port
+		port = defaultCallbackListenerPort // Default port
 	}
 	basePath := job.ListenerPath
 	if basePath == emptyValue {
-		basePath = "/callbacks" // Default path
+		basePath = defaultCallbackListenerBasePath // Default path
 	}
 	idleTimeout := time.Duration(job.IdleShutdownSeconds) * time.Second
 	if idleTimeout == 0 {
-		idleTimeout = 5 * time.Minute // Default: 5 minutes
+		idleTimeout = defaultCallbackListenerIdleTimeout // Default: 5 minutes
 	}
 
 	// Default to loopback — never expose auth-free / lightly-auth'd callbacks

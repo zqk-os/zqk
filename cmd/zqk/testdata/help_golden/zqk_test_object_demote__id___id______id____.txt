@@ -1,0 +1,14 @@
+IDs may be positional args, comma-separated (ID1,ID2), and/or --ids.
+
+  Demote many (comma-separated)
+  zqk.test object demote ATK-001,ATK-002
+
+Usage:
+  zqk.test object demote <id>[,id...] [id...] [flags]
+
+Flags:
+      --ids string   Comma-separated list of object IDs (same as positional multi-ID / comma lists)
+
+Global Flags:
+      --allow-degraded   Allow scheduler-dependent commands to run when scheduler daemon is not running
+      --internal         Elevated access mode for built-in and internal kinds (requires Enterprise license or zqk-admin)

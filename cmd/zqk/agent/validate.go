@@ -1,0 +1,13 @@
+package agent
+
+import (
+	"github.com/zqk-os/zqk/cmd/zqk/validate"
+	"github.com/spf13/cobra"
+)
+
+func NewValidateCmd() *cobra.Command {
+	cmd := validate.NewValidateAgentCmd()
+	cmd.Use = "validate"
+	cmd.Short = "Validate codebase and optionally verify cryptographic stamp"
+	return cmd
+}

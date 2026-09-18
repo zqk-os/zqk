@@ -4,8 +4,8 @@
 package divisions
 
 import (
-	base_objectenum "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
-	shared_divisionsenum "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/shared_divisions"
+	base_objectenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
+	shared_divisionsenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/shared_divisions"
 )
 
 type PriorityTier = base_objectenum.PriorityTier

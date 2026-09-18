@@ -7,8 +7,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/goroutinelabels"
-	"github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 func writeMockCASYAML(t *testing.T, dir, id string) (string, string) {
@@ -240,8 +240,8 @@ func TestCasHashYAMLExists_FindsDateBucketedHash(t *testing.T) {
 	}
 }
 
-// TestStreamSegmentCASMembraneFederation verifies CRIT-REDACTED
-// for BLI-REDACTED:
+// TestStreamSegmentCASMembraneFederation verifies CRIT-1789285385225174000-60220498
+// for BLI-1789285463641928000-cca4794d:
 // After a kernel create persists a CAS YAML blob under a date bucket, object get by id
 // succeeds without a kind-root Stat miss or cooldown false-negative. Last-resort discover
 // on create miss locates the blob.
@@ -250,7 +250,7 @@ func TestStreamSegmentCASMembraneFederation(t *testing.T) {
 	kindDir := t.TempDir()
 	cas := NewContentAddressableStorage(kindDir, "backlog_item")
 
-	bliID := "BLI-REDACTED"
+	bliID := "BLI-1789285463641928000-cca4794d"
 	bucketDir := filepath.Join(kindDir, "2026-09")
 	_, wantHash := writeMockCASYAMLAt(t, bucketDir, bliID)
 

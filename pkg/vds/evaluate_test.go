@@ -5,8 +5,8 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/objects"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/objects"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 func TestEvaluate_passStructuralAndObjectExists(t *testing.T) {
@@ -70,6 +70,25 @@ func TestEvaluate_schedulerTestsNeedJobAndLog(t *testing.T) {
 	}}
 	rep := Evaluate(context.Background(), chunks, nil, &Customization{
 		TestExecution: TestExecutionPrefs{Mode: "scheduler"},
+	}, EvalOptions{})
+	if !rep.Passed() {
+		t.Fatalf("expected pass, got %s preds=%+v", rep.Verdict, rep.Chunks[0].Predicates)
+	}
+}
+
+func TestEvaluate_foregroundTestsAcceptShellTestCommand(t *testing.T) {
+	chunks := []Chunk{{
+		ChunkID:           "shell-test",
+		Stage:             "integrate_verify",
+		Claim:             "payload gate passes",
+		RubricRef:         "CRIT-1",
+		DSLChecks:         []string{"tests_ok_per_customization"},
+		EvidenceRefs:      []string{"sh scripts/open-core/test-public-release-gates.sh --payload-only"},
+		GateIntegrate:     "yes",
+		IndependentVerify: "yes",
+	}}
+	rep := Evaluate(context.Background(), chunks, nil, &Customization{
+		TestExecution: TestExecutionPrefs{Mode: "foreground"},
 	}, EvalOptions{})
 	if !rep.Passed() {
 		t.Fatalf("expected pass, got %s preds=%+v", rep.Verdict, rep.Chunks[0].Predicates)

@@ -9,7 +9,7 @@ import (
 	"io"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/bufferpool"
+	"github.com/zqk-os/zqk/pkg/bufferpool"
 )
 
 func TestBufferPool(t *testing.T) {

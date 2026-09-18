@@ -3,7 +3,7 @@ package objects
 import (
 	"regexp"
 
-	"github.com/lanceman/zqk/pkg/kindnames"
+	"github.com/zqk-os/zqk/pkg/kindnames"
 )
 
 // Schema version constants
@@ -152,6 +152,11 @@ const (
 	ConstPersonaOrchestratorGamma = "PER-ORCH-GAMMA"
 	ConstPersonaDefaultAgent      = "PER-DEFAULT-AGENT"
 	ConstPersonaDefaultOperator   = "PER-DEFAULT-OPERATOR"
+
+	DefaultSystemAccountID = "ACC-1785920548450214012-68b850c0"
+
+	JobIDCapOrchestrator = "SCH-cap-orchestrator"
+	JobIDCapNightDuty    = "SCH-cap-night-duty"
 
 	KindBaseObject             = kindnames.BaseObject
 	KindAuditable              = kindnames.Auditable
@@ -321,4 +326,3 @@ const ObjectStatusSkipped = "skip"
 const ObjectStatusDegraded = "degraded"
 const ObjectStatusFail = "fail"
 const ObjectStatusSkip = "skip"
-

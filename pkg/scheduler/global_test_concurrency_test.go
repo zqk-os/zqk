@@ -8,11 +8,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/circuitbreaker"
-	"github.com/lanceman/zqk/pkg/concurrency"
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/goroutinelabels"
-	"github.com/lanceman/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/circuitbreaker"
+	"github.com/zqk-os/zqk/pkg/concurrency"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
+	"github.com/zqk-os/zqk/pkg/logging"
 )
 
 // TRACK: BLI-SCHED-GOROUTINE-DISCIPLINE-001 / CRIT-SCHED-NO-UNMANAGED-GOROUTINES-001

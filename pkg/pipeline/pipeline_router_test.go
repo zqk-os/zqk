@@ -3,8 +3,8 @@ package pipeline_test
 import (
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/pipeline"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/pipeline"
 )
 
 func TestPipelineRouter(t *testing.T) {

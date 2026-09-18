@@ -5,8 +5,8 @@ import (
 	"testing"
 	"time"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/logging"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/logging"
 	// RegisterStorageCleanup registers t.Cleanup to call Shutdown on the given storage if it is
 	// *FileObjectStorage. Use with NewFileObjectStorageForTest so hash registry workers are drained
 	// and tests do not leak goroutines. No-op if storage is not *FileObjectStorage.

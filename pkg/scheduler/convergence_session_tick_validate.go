@@ -4,7 +4,7 @@ import (
 	"regexp"
 	"sync"
 
-	"github.com/lanceman/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/errfmt"
 )
 
 // Allowed convergence_session object id shape for scheduler-driven ticks (env CONVERGENCE_SESSION_ID).

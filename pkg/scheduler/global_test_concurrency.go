@@ -3,8 +3,8 @@ package scheduler
 import (
 	"context"
 
-	"github.com/lanceman/zqk/pkg/concurrency"
-	"github.com/lanceman/zqk/pkg/hostload"
+	"github.com/zqk-os/zqk/pkg/concurrency"
+	"github.com/zqk-os/zqk/pkg/hostload"
 )
 
 // globalTestJobSlotKey is the reserved key under which the global test budget is held in the same

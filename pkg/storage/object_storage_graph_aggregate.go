@@ -6,10 +6,10 @@ import (
 	"strings"
 	"time"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/graph/provider"
-	"github.com/lanceman/zqk/pkg/logging"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/graph/provider"
+	"github.com/zqk-os/zqk/pkg/logging"
 )
 
 // Aggregate performs aggregations on objects matching the filter using Cypher

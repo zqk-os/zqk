@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"go/ast"
 
-	"github.com/lanceman/zqk/pkg/validation"
+	"github.com/zqk-os/zqk/pkg/validation"
 )
 
 // auditFmtPrintAntiPattern checks for direct usage of fmt.Print, fmt.Println, fmt.Printf

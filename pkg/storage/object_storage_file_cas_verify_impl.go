@@ -5,9 +5,9 @@ import (
 	"path/filepath"
 	"strings"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/logging"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/logging"
 	// VerifyOrReconcileCASHash verifies that file content matches the expected CAS hash for the given path.
 	// It is the single canonical implementation for CAS integrity checks used by Read and any other
 	// code path that reads CAS-backed files (e.g. discovery fallback, list, future callers).

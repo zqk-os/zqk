@@ -7,12 +7,12 @@ import (
 	"strings"
 	"time"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/logging"
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/paths"
-	"github.com/lanceman/zqk/pkg/storage/audit"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/storage/audit"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // isFailClosedAuditEvent reports whether an audit event must be persisted fail-closed.
@@ -236,7 +236,7 @@ func CreateAuditEventWithBuilder(
 		// to increment occurrence_count: SortBy + Limit=1 still opens every
 		// stream segment (thousands of files / hundreds of MB) and pegs
 		// long-lived MCP/scheduler daemons at multi-core CPU.
-		// TRACK: BLI-REDACTED
+		// TRACK: BLI-1785905541906569000-074e24d7
 		StorageLog(logger).Debug(LogEventStorageAuditDuplicateMergeSkippedPerformance).
 			String(logKeyAuditID, auditID).
 			String(logKeyEventType, options.EventType).

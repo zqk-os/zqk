@@ -5,11 +5,11 @@ import (
 	"path/filepath"
 	"testing"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/datacell"
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/utils/fileutil"
-	"github.com/lanceman/zqk/pkg/zqkenv"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/datacell"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
 func TestBacklogItemPriorityPairing(t *testing.T) {
@@ -41,7 +41,7 @@ func TestBacklogItemPriorityPairing(t *testing.T) {
 	ctx := context.Background()
 
 	// 1. Create BLI with only priority="high" -> should auto-populate priority_tier="P1"
-	bliID := "BLI-REDACTED"
+	bliID := "BLI-1785008248438506000-11111111"
 	bli := map[string]any{
 		objects.FieldKeyID:            bliID,
 		objects.FieldKeyKind:          objects.KindBacklogItem,

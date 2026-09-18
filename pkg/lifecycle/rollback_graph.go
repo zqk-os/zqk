@@ -4,10 +4,10 @@ import (
 	"context"
 	"strings"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/rollback"
-	"github.com/lanceman/zqk/pkg/storage"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/rollback"
+	"github.com/zqk-os/zqk/pkg/storage"
 )
 
 // RecomputeRefsFromScope returns the status-relevant graph refs for the given scope.

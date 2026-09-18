@@ -4,9 +4,9 @@ import (
 	"context"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/graph/provider"
-	"github.com/lanceman/zqk/pkg/hivemind"
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/graph/provider"
+	"github.com/zqk-os/zqk/pkg/hivemind"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // MockGraphConnection implements provider.GraphConnection for testing

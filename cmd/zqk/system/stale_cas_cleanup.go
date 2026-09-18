@@ -1,13 +1,15 @@
 package system
 
 import (
+	"path/filepath"
 	"strings"
 
-	"github.com/lanceman/zqk/pkg/datacell"
-	"github.com/lanceman/zqk/pkg/logging"
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/storage"
-	"github.com/lanceman/zqk/pkg/storage/filecas"
+	"github.com/zqk-os/zqk/pkg/datacell"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/storage"
+	caspkg "github.com/zqk-os/zqk/pkg/storage/cas"
+	"github.com/zqk-os/zqk/pkg/storage/filecas"
 )
 
 // StaleCASCleanupResult holds the result of running Stale CAS cleanup for check results.
@@ -36,6 +38,21 @@ func RunStaleCASCleanupForResults(projectRoot string, results []CheckResult, log
 		}
 	}
 
+	// Also scan for any on-disk duplicate CAS blobs directly so auto-fix covers
+	// dual blobs regardless of whether results already had appendCASDuplicateIDCheckResults run.
+	if projectRoot != emptyValue {
+		casDupInv := caspkg.InventoryCASDuplicateIDs(nil, projectRoot)
+		for _, hit := range casDupInv.Hits {
+			if hit.Kind != emptyValue {
+				kindsSet[hit.Kind] = true
+			} else if hit.Dir != emptyValue {
+				if k := objects.GetKindFromDirectory(hit.Dir); k != emptyValue {
+					kindsSet[k] = true
+				}
+			}
+		}
+	}
+
 	// Also heal or prune any explicitly missing CAS file index entries or failed-to-read missing files
 	for _, r := range results {
 		for _, issue := range r.Issues {
@@ -53,11 +70,23 @@ func RunStaleCASCleanupForResults(projectRoot string, results []CheckResult, log
 						// Attempt to re-link to any live on-disk hash file for this object ID
 						discoveredPath, discoveredHash, scanErr := filecas.DiscoverCASFilePathByScanning(r.ObjectID, kindDir)
 						if scanErr == nil && discoveredHash != "" && discoveredPath != "" {
-							if err := index.SetMapping(r.ObjectID, discoveredHash); err == nil {
+							relDir, relErr := filepath.Rel(kindDir, filepath.Dir(discoveredPath))
+							var bucketKey string
+							if relErr == nil && relDir != "." && relDir != "" {
+								bucketKey = relDir
+							}
+							var setErr error
+							if bucketKey != "" {
+								setErr = index.SetMapping(r.ObjectID, discoveredHash, bucketKey)
+							} else {
+								setErr = index.SetMapping(r.ObjectID, discoveredHash)
+							}
+							if setErr == nil {
 								logging.Fluent(logger).Info("Re-linked stale CAS index mapping to discovered on-disk hash file").
 									String("object_id", r.ObjectID).
 									String("kind", r.ObjectKind).
 									String("discovered_hash", discoveredHash).
+									String("bucket_key", bucketKey).
 									Log()
 								continue
 							}
@@ -105,5 +134,31 @@ func RunStaleCASCleanupForResults(projectRoot string, results []CheckResult, log
 				Log()
 		}
 	}
+
+	if projectRoot != emptyValue && total > 0 {
+		ClearCASDuplicateIDInventoryCache(projectRoot)
+	}
+
+	// Reconcile and clear resolved duplicate issues from results so check output reflects auto-fix
+	cleanedKinds := make(map[string]bool, len(kinds))
+	for _, k := range kinds {
+		cleanedKinds[k] = true
+	}
+	for i := range results {
+		if cleanedKinds[results[i].ObjectKind] {
+			var remainingIssues []Issue
+			for _, iss := range results[i].Issues {
+				if strings.Contains(iss.Message, "Duplicate CAS blob") ||
+					strings.Contains(iss.Message, "dual CAS blobs") ||
+					strings.Contains(iss.Message, "Stale CAS version") {
+					results[i].AutoFixed = append(results[i].AutoFixed, "reconciled duplicate CAS blob and healed index")
+				} else {
+					remainingIssues = append(remainingIssues, iss)
+				}
+			}
+			results[i].Issues = remainingIssues
+		}
+	}
+
 	return StaleCASCleanupResult{KindsRun: kinds, FilesHandled: total}
 }

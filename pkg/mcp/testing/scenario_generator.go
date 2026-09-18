@@ -6,8 +6,8 @@ import (
 
 	"gopkg.in/yaml.v3"
 
-	"github.com/lanceman/zqk/pkg/errfmt"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 const emptyValue = ""
@@ -33,7 +33,7 @@ type ScenarioSpecList struct {
 // ScenarioGenerator generates test scenarios from YAML specifications using the builder API
 //
 // Deprecated: This implementation is being migrated to use the specbuilder infrastructure.
-// New code should use github.com/lanceman/zqk/pkg/specbuilder/generators.ScenarioGenerator instead.
+// New code should use github.com/zqk-os/zqk/pkg/specbuilder/generators.ScenarioGenerator instead.
 // This implementation remains available for backward compatibility during migration.
 // See pkg/specbuilder/MIGRATION_GUIDE.md for migration instructions.
 type ScenarioGenerator struct {
@@ -42,7 +42,7 @@ type ScenarioGenerator struct {
 
 // NewScenarioGenerator creates a new scenario generator
 //
-// Deprecated: Use github.com/lanceman/zqk/pkg/specbuilder/generators.NewScenarioGenerator instead.
+// Deprecated: Use github.com/zqk-os/zqk/pkg/specbuilder/generators.NewScenarioGenerator instead.
 // See pkg/specbuilder/MIGRATION_GUIDE.md for migration instructions.
 func NewScenarioGenerator(outputDir string) *ScenarioGenerator {
 	return &ScenarioGenerator{
@@ -153,7 +153,7 @@ func (sg *ScenarioGenerator) generateFilename(name string, index int) string {
 
 // GenerateScenariosFromSpecFile is a convenience function that generates scenarios from a spec file
 //
-// Deprecated: Use github.com/lanceman/zqk/pkg/specbuilder/generators.GenerateScenariosFromSpecFile instead.
+// Deprecated: Use github.com/zqk-os/zqk/pkg/specbuilder/generators.GenerateScenariosFromSpecFile instead.
 // See pkg/specbuilder/MIGRATION_GUIDE.md for migration instructions.
 func GenerateScenariosFromSpecFile(specFile, outputDir string) error {
 	generator := NewScenarioGenerator(outputDir)

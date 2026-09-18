@@ -3,7 +3,7 @@ package scheduler
 import (
 	"time"
 
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // ShouldSkipConvergencePersistForDuplicateWatermark returns true when applying the current

@@ -4,15 +4,15 @@ import (
 	"path/filepath"
 	"sort"
 
-	"github.com/lanceman/zqk/pkg/datacell"
-	"github.com/lanceman/zqk/pkg/paths"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/datacell"
+	"github.com/zqk-os/zqk/pkg/paths"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // applyKernelCriticalDefaults fills KernelCritical when still unset after inheritance.
 // Inference: stream/light_file → false (ephemeral); everything else → true (fail-closed).
 // Explicit YAML on this kind always wins.
-// TRACK: BLI-REDACTED
+// TRACK: BLI-1785784863457357000-dda098ed
 func applyKernelCriticalDefaults(spec *Spec) {
 	if spec == nil || spec.KernelCritical != nil {
 		return
@@ -51,7 +51,7 @@ func cloneBoolPtr(p *bool) *bool {
 }
 
 // EffectiveKernelCritical reports the resolved kernel-critical policy for a loaded spec.
-// TRACK: BLI-REDACTED
+// TRACK: BLI-1785784863457357000-dda098ed
 func EffectiveKernelCritical(spec *Spec) bool {
 	if spec == nil {
 		return false
@@ -70,7 +70,7 @@ func EffectiveKernelCritical(spec *Spec) bool {
 // narrower than it looks — a kind whose spec loads but leaves the profile unresolved is now
 // protected, per [defaultKernelCriticalForProfile]. Widen this only with a plan for the
 // synthetic kinds that unit tests create and delete.
-// TRACK: BLI-REDACTED
+// TRACK: BLI-1785784863457357000-dda098ed
 func IsKernelCriticalKind(kind string) bool {
 	if kind == "" {
 		return false
@@ -98,7 +98,7 @@ func IsKernelCriticalKind(kind string) bool {
 }
 
 // ListKernelCriticalKinds returns sorted ontology names with EffectiveKernelCritical true.
-// TRACK: BLI-REDACTED
+// TRACK: BLI-1785784863457357000-dda098ed
 func ListKernelCriticalKinds() []string {
 	idx := loadSpecIndexForKernelCritical()
 	if idx == nil {

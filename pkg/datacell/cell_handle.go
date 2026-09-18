@@ -3,7 +3,7 @@ package datacell
 import (
 	"context"
 
-	"github.com/lanceman/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/errfmt"
 )
 
 // CellHandle is a thin facade: one project root, storage profile, and [CellCoordinator] for stewardship

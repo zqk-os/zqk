@@ -3,7 +3,7 @@ package instance_builders
 import (
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // TestBaseInstanceBuilder_DefaultStatusForMetrics verifies that metric kinds get

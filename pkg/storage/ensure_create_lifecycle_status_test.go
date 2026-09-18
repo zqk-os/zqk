@@ -4,8 +4,8 @@ import (
 	"context"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/storage/audit"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/storage/audit"
 )
 
 func TestEnsureCreateLifecycleStatus_MissingUsesOrigin(t *testing.T) {

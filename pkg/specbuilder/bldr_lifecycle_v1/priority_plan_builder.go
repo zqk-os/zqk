@@ -3,8 +3,8 @@
 package bldr_lifecycle_v1
 
 import (
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/specbuilder/lifecycle_builders"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/specbuilder/lifecycle_builders"
 )
 
 // PriorityPlanLifecycleBuilder builds the priority_plan lifecycle at version v1_0_0
@@ -88,7 +88,7 @@ func (b *PriorityPlanLifecycleBuilder) addPriorityPlanLifecycleData() {
 			"priority plan validated",
 			"workflow constraints validated (if workflow_ref is set)",
 		},
-		Description: "Shovel-ready: the column is sealed and ready to be acted on (ordered by active_order; lower wins). Not parked/paused/deferred. New BLI membership is refused (fill while grooming, then promote). Linked children may remain planned awaiting pickup. Once the first child starts, shockwave locks the plan to in_progress — that hop is one-way (check valve). Occupancy also locks when a later child hop (or seal-to-active) finds work already in flight and all siblings ready-or-later (draft-plane siblings skip the lock until they leave exploring/validated). Complete children on an active plan mean closeout failed (promote to complete), not a valid parked state. TRACK: BLI-REDACTED",
+		Description: "Shovel-ready: the column is sealed and ready to be acted on (ordered by active_order; lower wins). Not parked/paused/deferred. New BLI membership is refused (fill while grooming, then promote). Linked children may remain planned awaiting pickup. Once the first child starts, shockwave locks the plan to in_progress — that hop is one-way (check valve). Occupancy also locks when a later child hop (or seal-to-active) finds work already in flight and all siblings ready-or-later (draft-plane siblings skip the lock until they leave exploring/validated). Complete children on an active plan mean closeout failed (promote to complete), not a valid parked state. TRACK: BLI-1785439369431933000-f0cccd6c",
 	})
 	b.AddStatus(objects.Status{
 		Value:   "in_progress",

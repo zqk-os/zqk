@@ -3,7 +3,7 @@ package objects
 import (
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/datacell"
+	"github.com/zqk-os/zqk/pkg/datacell"
 )
 
 func TestEffectiveKernelCritical_inference(t *testing.T) {

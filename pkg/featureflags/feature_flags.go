@@ -1,6 +1,6 @@
 // Package featureflags loads feature toggles from .zqk/config/feature_flags.json.
 //
-// On-disk path is defined by [github.com/lanceman/zqk/pkg/datacell.FeatureFlagsPath] (runtime organism layout).
+// On-disk path is defined by [github.com/zqk-os/zqk/pkg/datacell.FeatureFlagsPath] (runtime organism layout).
 // Broader data-cell work: docs/architecture/DATA_CELL_RUNTIME_ORGANISM.md, BLI-1775890418242630000.
 // Team vocabulary: a **lite file** is this style of bounded project-local JSON with CLI integration;
 // glossary_term GLS-1776253895684744000-7799fa3e.
@@ -11,13 +11,13 @@ import (
 	"path/filepath"
 	"sync"
 
-	"github.com/lanceman/zqk/pkg/concurrency"
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/datacell"
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/logging"
-	"github.com/lanceman/zqk/pkg/paths"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/concurrency"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/datacell"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/paths"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // FeatureFlag represents a feature flag configuration

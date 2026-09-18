@@ -1,7 +1,7 @@
 package mcp
 
 import (
-	"github.com/lanceman/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/errfmt"
 )
 
 // MCPSpec represents a declarative specification for MCP server configuration

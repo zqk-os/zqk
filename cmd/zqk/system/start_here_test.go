@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
 )
 
 func TestStartHereCmd(t *testing.T) {
@@ -33,5 +33,11 @@ func TestStartHereCmd(t *testing.T) {
 	}
 	if !strings.Contains(output, "workflow whats-next") {
 		t.Errorf("expected output to contain 'workflow whats-next', got: %s", output)
+	}
+	if !strings.Contains(output, "object list mission") {
+		t.Errorf("expected starter graph list commands, got: %s", output)
+	}
+	if !strings.Contains(output, "starter_kernel_graph") {
+		t.Errorf("expected seed.sh pointer, got: %s", output)
 	}
 }

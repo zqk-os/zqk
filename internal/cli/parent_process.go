@@ -4,7 +4,7 @@ package cli
 import (
 	"time"
 
-	"github.com/lanceman/zqk/pkg/process"
+	"github.com/zqk-os/zqk/pkg/process"
 )
 
 // ParentProcessName returns the executable/command name of the process with the given PID.

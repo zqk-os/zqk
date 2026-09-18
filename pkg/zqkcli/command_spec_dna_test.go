@@ -10,9 +10,9 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 
-	"github.com/lanceman/zqk/pkg/cli"
-	"github.com/lanceman/zqk/pkg/objects"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/cli"
+	"github.com/zqk-os/zqk/pkg/objects"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // TestInternalCommandSurfaceMatchesYAMLSpecs asserts that each fixed internal command's

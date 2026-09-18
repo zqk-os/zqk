@@ -3,8 +3,8 @@ package rollup
 import (
 	"strings"
 
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/validation"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/validation"
 )
 
 // Calculate aggregates status counts, effort totals, and distributions from a list of child objects.

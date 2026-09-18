@@ -3,7 +3,7 @@ package datacell
 import (
 	"slices"
 
-	"github.com/lanceman/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/errfmt"
 )
 
 // DescriptorReadModel is a spec-index–derived snapshot of cell descriptors correlated with the

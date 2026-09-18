@@ -10,13 +10,13 @@ import (
 	"strings"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/execwrap"
+	"github.com/zqk-os/zqk/pkg/execwrap"
 
-	"github.com/lanceman/zqk/pkg/cleanup"
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/logging"
-	"github.com/lanceman/zqk/pkg/paths"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/cleanup"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/paths"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // Log events for cleanup (config-driven) handler (POL-CODE-007 stable keys).

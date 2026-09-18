@@ -1,11 +1,13 @@
 package system
 
 import (
-	"github.com/lanceman/zqk/internal/cli"
-	"github.com/lanceman/zqk/pkg/cli/bldr_cli_cmd_v1"
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/logging"
-	"github.com/lanceman/zqk/pkg/objects"
+	"fmt"
+
+	"github.com/zqk-os/zqk/internal/cli"
+	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/spf13/cobra"
 )
 
@@ -32,7 +34,7 @@ func runSeedDefaultAgentSeating(cmd *cobra.Command, _ []string) error {
 		return cli.FormatOutput(cmd, map[string]any{
 			objects.FieldKeyStatus: objects.ObjectStatusSuccess,
 			"created":              created,
-			objects.FieldKeyNote:   "Idempotent; 0 created means PER-DEFAULT-* / ASK-DEFAULT-FEED-CORRESPONDENCE already present",
+			objects.FieldKeyNote:   fmt.Sprintf("Idempotent; 0 created means %s / %s / ASK-DEFAULT-FEED-CORRESPONDENCE already present", objects.ConstPersonaDefaultOperator, objects.ConstPersonaDefaultAgent),
 		})
 	})(cmd, nil)
 }

@@ -4,7 +4,7 @@ import (
 	"runtime"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/zqkenv"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
 func TestGetListReadWorkers_DefaultBounded(t *testing.T) {

@@ -1,9 +1,9 @@
 package internal
 
 import (
-	"github.com/lanceman/zqk/internal/cli"
-	"github.com/lanceman/zqk/pkg/errfmt"
-	schedulerpkg "github.com/lanceman/zqk/pkg/scheduler"
+	"github.com/zqk-os/zqk/internal/cli"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	schedulerpkg "github.com/zqk-os/zqk/pkg/scheduler"
 	"github.com/spf13/cobra"
 )
 

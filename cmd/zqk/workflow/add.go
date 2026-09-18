@@ -7,13 +7,13 @@ import (
 	"time"
 
 	"github.com/fatih/color"
-	"github.com/lanceman/zqk/internal/cli"
-	clipkg "github.com/lanceman/zqk/pkg/cli"
-	"github.com/lanceman/zqk/pkg/cli/bldr_cli_cmd_v1"
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/internal/cli"
+	clipkg "github.com/zqk-os/zqk/pkg/cli"
+	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/storage"
 	"github.com/spf13/cobra"
 )
 
@@ -354,9 +354,9 @@ func scaffoldPlanMilestoneGoal(ctx context.Context, proc *cli.Processor, activeO
 		objects.FieldKeyStatus:      objects.ObjectStatusActive,
 		objects.FieldKeyNamespaceID: "zqk:kernel",
 		objects.FieldKeyCreatedAt:   time.Now().Format(time.RFC3339),
-		objects.FieldKeyCreatedBy:   "ACC-1785920548450214012-68b850c0",
+		objects.FieldKeyCreatedBy:   objects.DefaultSystemAccountID,
 		objects.FieldKeyUpdatedAt:   time.Now().Format(time.RFC3339),
-		objects.FieldKeyUpdatedBy:   "ACC-1785920548450214012-68b850c0",
+		objects.FieldKeyUpdatedBy:   objects.DefaultSystemAccountID,
 	}
 	if err := proc.Storage().Create(ctx, secCtx, goal); err != nil {
 		return "", "", "", errfmt.Newf("failed to create auto goal").Wrap(err)
@@ -372,9 +372,9 @@ func scaffoldPlanMilestoneGoal(ctx context.Context, proc *cli.Processor, activeO
 		objects.FieldKeyActiveOrder: activeOrder,
 		objects.FieldKeyNamespaceID: "zqk:kernel",
 		objects.FieldKeyCreatedAt:   time.Now().Format(time.RFC3339),
-		objects.FieldKeyCreatedBy:   "ACC-1785920548450214012-68b850c0",
+		objects.FieldKeyCreatedBy:   objects.DefaultSystemAccountID,
 		objects.FieldKeyUpdatedAt:   time.Now().Format(time.RFC3339),
-		objects.FieldKeyUpdatedBy:   "ACC-1785920548450214012-68b850c0",
+		objects.FieldKeyUpdatedBy:   objects.DefaultSystemAccountID,
 	}
 	if err := proc.Storage().Create(ctx, secCtx, plan); err != nil {
 		return "", "", "", errfmt.Newf("failed to create auto priority plan").Wrap(err)
@@ -391,9 +391,9 @@ func scaffoldPlanMilestoneGoal(ctx context.Context, proc *cli.Processor, activeO
 		objects.FieldKeyGoalRefs:         []any{goalID},
 		objects.FieldKeyNamespaceID:      "zqk:kernel",
 		objects.FieldKeyCreatedAt:        time.Now().Format(time.RFC3339),
-		objects.FieldKeyCreatedBy:        "ACC-1785920548450214012-68b850c0",
+		objects.FieldKeyCreatedBy:        objects.DefaultSystemAccountID,
 		objects.FieldKeyUpdatedAt:        time.Now().Format(time.RFC3339),
-		objects.FieldKeyUpdatedBy:        "ACC-1785920548450214012-68b850c0",
+		objects.FieldKeyUpdatedBy:        objects.DefaultSystemAccountID,
 	}
 	if err := proc.Storage().Create(ctx, secCtx, milestone); err != nil {
 		return "", "", "", errfmt.Newf("failed to create auto milestone").Wrap(err)

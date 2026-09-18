@@ -5,7 +5,7 @@ import (
 	"slices"
 	"strings"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
 )
 
 // hasPermission checks if security context has permission for a command.

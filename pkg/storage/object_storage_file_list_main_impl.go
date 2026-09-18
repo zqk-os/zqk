@@ -6,16 +6,16 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/lanceman/zqk/pkg/storage/crud"
+	"github.com/zqk-os/zqk/pkg/storage/crud"
 
 	"gopkg.in/yaml.v3"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/goroutinelabels"
-	"github.com/lanceman/zqk/pkg/logging"
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/pipeline"
-	"github.com/lanceman/zqk/pkg/storage/filecas"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/pipeline"
+	"github.com/zqk-os/zqk/pkg/storage/filecas"
 )
 
 const pipelineKindObjectStorageFileList = "storage.object_storage_file_list_main"
@@ -63,7 +63,7 @@ func (f *FileObjectStorage) List(ctx context.Context, secCtx *pkgctx.SecurityCon
 func (f *FileObjectStorage) listStreamBackedOnly(ctx context.Context, secCtx *pkgctx.SecurityContext, _ *pkgctx.StorageContext, filter ListFilter, effectiveLimit int, cacheable bool, _ *logging.EventLogger) (*QueryResult, error) {
 	// Fail-closed: never scanLimit=0 (open every PID shard) for SortBy/Offset.
 	// HV streams are newest-segment-first and bounded; global sort of the whole
-	// stream pegs MCP/scheduler daemons. TRACK: BLI-REDACTED
+	// stream pegs MCP/scheduler daemons. TRACK: BLI-1785905541906569000-074e24d7
 	scanLimit := effectiveLimit
 	if scanLimit <= 0 {
 		scanLimit = DefaultMaxStreamListLimit

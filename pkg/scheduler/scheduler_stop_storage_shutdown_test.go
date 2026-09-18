@@ -5,8 +5,8 @@ import (
 	"sync/atomic"
 	"testing"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	storagepkg "github.com/lanceman/zqk/pkg/storage"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	storagepkg "github.com/zqk-os/zqk/pkg/storage"
 )
 
 type storageShutdownSpy struct {

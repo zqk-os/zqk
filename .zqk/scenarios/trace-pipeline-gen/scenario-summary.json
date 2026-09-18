@@ -1,0 +1,22 @@
+{
+  "project_root": "/Users/lanceettl/zqk-public-candidate",
+  "bundle_name": "trace-pipeline-gen",
+  "created_criteria_ids": [
+    "CRIT-1789772708081138000-deb6d47e",
+    "CRIT-1789772708081139000-69aff376",
+    "CRIT-1789772708081140000-3d54b457"
+  ],
+  "created_backlog_item_ids": [
+    "BLI-1789772708081138000-724a2422"
+  ],
+  "created_test_case_ids": [
+    "TST-1789772708081138001-ab50c965"
+  ],
+  "hint_to_id": {
+    "BLI-1789772708081138000-724a2422": "BLI-1789772708081138000-724a2422",
+    "CRIT-1789772708081138000-deb6d47e": "CRIT-1789772708081138000-deb6d47e",
+    "CRIT-1789772708081139000-69aff376": "CRIT-1789772708081139000-69aff376",
+    "CRIT-1789772708081140000-3d54b457": "CRIT-1789772708081140000-3d54b457",
+    "TST-1789772708081138001-ab50c965": "TST-1789772708081138001-ab50c965"
+  }
+}

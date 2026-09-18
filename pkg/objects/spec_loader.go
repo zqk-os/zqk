@@ -11,21 +11,21 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/config"
-	"github.com/lanceman/zqk/pkg/zqkenv"
+	"github.com/zqk-os/zqk/pkg/config"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 
 	"gopkg.in/yaml.v3"
 
-	"github.com/lanceman/zqk/pkg/concurrency"
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/datacell"
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/loader"
-	"github.com/lanceman/zqk/pkg/logging"
-	"github.com/lanceman/zqk/pkg/paths"
-	yamlspec "github.com/lanceman/zqk/pkg/specbuilder/yaml"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
-	"github.com/lanceman/zqk/pkg/when"
+	"github.com/zqk-os/zqk/pkg/concurrency"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/datacell"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/loader"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/paths"
+	yamlspec "github.com/zqk-os/zqk/pkg/specbuilder/yaml"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/when"
 )
 
 // Spec represents a loaded object specification with resolved inheritance.
@@ -54,7 +54,7 @@ type Spec struct {
 	StorageProfile string `yaml:"storage_profile,omitempty"`
 	// KernelCritical marks kinds that must not be silently hard-deleted and require break_glass for
 	// lifecycle Force. nil means inherit from parent; after resolve, EffectiveKernelCritical applies
-	// defaults (cas_entity → true, stream/light_file → false). TRACK: BLI-REDACTED
+	// defaults (cas_entity → true, stream/light_file → false). TRACK: BLI-1785784863457357000-dda098ed
 	KernelCritical *bool          `yaml:"kernel_critical,omitempty"`
 	Traits         []string       `yaml:"traits"`
 	ExcludeTraits  []string       `yaml:"exclude_traits,omitempty"`

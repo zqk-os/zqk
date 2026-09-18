@@ -5,13 +5,13 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/lanceman/zqk/pkg/graph/provider"
-	pkgobjects "github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/graph/provider"
+	pkgobjects "github.com/zqk-os/zqk/pkg/objects"
 )
 
 // EnsureSpecDerivedIndexes creates idempotent MemGraph indexes derived from the
 // object-spec index (kind labels + Entity.id). Safe to call repeatedly.
-// TRACK: BLI-REDACTED — GFS P2b.
+// TRACK: BLI-1785825621805072000-d4e0e08e — GFS P2b.
 func (g *GraphObjectStorage) EnsureSpecDerivedIndexes(ctx context.Context) error {
 	if g == nil || g.conn == nil {
 		return nil

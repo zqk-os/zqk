@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	storagepkg "github.com/lanceman/zqk/pkg/storage"
+	storagepkg "github.com/zqk-os/zqk/pkg/storage"
 )
 
 // oidBuildCacheDeadlineRecorder records the job context deadline when the object ID cache builder runs.

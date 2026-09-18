@@ -4,12 +4,12 @@ import (
 	"encoding/json"
 	"path/filepath"
 
-	"github.com/lanceman/zqk/pkg/paths"
-	"github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 
-	"github.com/lanceman/zqk/internal/testpackageconcurrency"
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/zqktime"
+	"github.com/zqk-os/zqk/internal/testpackageconcurrency"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/zqktime"
 )
 
 // PackageConcurrencyLimitsFileName is stored under .zqk/test-bundles/; scan-tests updates it so the

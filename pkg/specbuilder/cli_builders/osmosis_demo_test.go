@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/specbuilder/cli_builders"
+	"github.com/zqk-os/zqk/pkg/specbuilder/cli_builders"
 )
 
 func TestOsmosisDemo(t *testing.T) {

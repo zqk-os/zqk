@@ -4,9 +4,9 @@ import (
 	"context"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/storage"
 
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // GatherObjectCountByKindForReport returns a single source of truth for object counts by kind,

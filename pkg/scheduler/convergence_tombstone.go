@@ -6,7 +6,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // Tombstone / iteration-anchor identifiers for test-bundle health convergence (see

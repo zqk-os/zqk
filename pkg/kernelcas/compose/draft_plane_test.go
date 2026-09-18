@@ -3,7 +3,7 @@ package compose
 import (
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // TestBacklogItemHierarchyGateRespectsDraftPlane pins the draft-plane contract for the

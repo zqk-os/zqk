@@ -4,8 +4,8 @@ import (
 	"context"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/lifecycle"
-	"github.com/lanceman/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/lifecycle"
+	"github.com/zqk-os/zqk/pkg/storage"
 )
 
 // Default settings for Accumulators.

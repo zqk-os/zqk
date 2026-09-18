@@ -4,9 +4,9 @@ import (
 	"context"
 	"testing"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/objects"
-	storagepkg "github.com/lanceman/zqk/pkg/storage"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/objects"
+	storagepkg "github.com/zqk-os/zqk/pkg/storage"
 )
 
 func TestWatchdogEvaluationHandler(t *testing.T) {
@@ -42,4 +42,11 @@ func TestWatchdogEvaluationHandler(t *testing.T) {
 	// Since zqk query runs out of process, testing full end-to-end event emission
 	// inside unit tests will require the full graph environment to be present,
 	// which setupSchedulerCompleteTestEnvironment provides.
+}
+
+func TestWatchdogEvaluationHandler_NilJob(t *testing.T) {
+	handler := NewWatchdogEvaluationHandler(nil, nil, ".")
+	if err := handler.Execute(context.Background(), nil); err == nil {
+		t.Fatal("expected error for nil job")
+	}
 }

@@ -2,15 +2,19 @@ package storage
 
 import (
 	"context"
+	"fmt"
 	"sync"
+	"sync/atomic"
+	"time"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/goroutinelabels"
-	"github.com/lanceman/zqk/pkg/logging"
-	"github.com/lanceman/zqk/pkg/objects"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
-	"github.com/lanceman/zqk/pkg/when"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/process"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/when"
 )
 
 func (f *FileObjectStorage) countFromCASIndex(ctx context.Context, kind string, kindDir string) (int, error) {
@@ -163,7 +167,7 @@ func (f *FileObjectStorage) countWithFilters(ctx context.Context, kindDir string
 	// workCh must be buffered to len(filePaths): we enqueue before workers start (same pattern as
 	// CAS list). A small buffer (maxWorkers*2) deadlocks when file count exceeds the buffer —
 	// default namespace-scoped object count hit this for kinds with >128 YAML files.
-	// TRACK: BLI-REDACTED
+	// TRACK: BLI-1785903709847957000-8c7a991c
 	count := 0
 	maxWorkers := getListReadWorkers()
 	results := make(chan bool, maxWorkers*2)
@@ -188,6 +192,12 @@ func (f *FileObjectStorage) countWithFilters(ctx context.Context, kindDir string
 	var countWg sync.WaitGroup
 	countWg.Add(numWorkers)
 	countBud := goroutinelabels.DefaultBudget()
+	var processedFiles int64
+	progressFn := pkgctx.GetValidationProgress(listCtx)
+	lastProgressTime := time.Now()
+	var progressMu sync.Mutex
+	totalFiles := len(filePaths)
+
 	for w := 0; w < numWorkers; w++ {
 		countWorkerBuilder := goroutinelabels.NewGoroutine(ConstStreamFileStorageCountFile, ConstStreamCountFilterWorker)
 		if countBud != nil {
@@ -201,6 +211,20 @@ func (f *FileObjectStorage) countWithFilters(ctx context.Context, kindDir string
 					return
 				default:
 				}
+
+				curProcessed := atomic.AddInt64(&processedFiles, 1)
+				if curProcessed%100 == 0 {
+					process.TouchMeaningfulActivity()
+				}
+				if progressFn != nil && (curProcessed%250 == 0 || curProcessed == 1) {
+					progressMu.Lock()
+					if curProcessed == 1 || time.Since(lastProgressTime) >= 1*time.Second {
+						lastProgressTime = time.Now()
+						progressFn("storage.count", fmt.Sprintf("Filtering %s objects (%d/%d evaluated)...", filter.Kind, curProcessed, totalFiles))
+					}
+					progressMu.Unlock()
+				}
+
 				if IsObjectDraftPlanePath(f.projectRoot, filePath) {
 					select {
 					case <-listCtx.Done():

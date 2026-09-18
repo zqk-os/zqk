@@ -1,6 +1,6 @@
 package storage
 
-import "github.com/lanceman/zqk/pkg/storage/audit"
+import "github.com/zqk-os/zqk/pkg/storage/audit"
 
 // IsCreatingAuditEvent returns true if we're currently in the process of creating an audit event.
 func IsCreatingAuditEvent() bool {

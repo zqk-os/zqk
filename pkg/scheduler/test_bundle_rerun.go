@@ -9,13 +9,13 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/lanceman/zqk/pkg/circuitbreaker"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/circuitbreaker"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 
-	"github.com/lanceman/zqk/pkg/zqktime"
+	"github.com/zqk-os/zqk/pkg/zqktime"
 )
 
-const goModulePathPrefix = "github.com/lanceman/zqk/"
+const goModulePathPrefix = "github.com/zqk-os/zqk/"
 
 // testBundleRunDelimiter is written before each scheduler retry of the same job stdout/stderr (see handlers_run_wrapper_execution).
 // When the same file accumulates multiple runs, ParseGoTestOutput must see only the last run — otherwise --- FAIL lines from

@@ -4,6 +4,8 @@ import (
 	"context"
 	"strings"
 	"sync/atomic"
+
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 )
 
 // FSEventsEngine implements AnticipatoryEngine for file system events.
@@ -35,7 +37,9 @@ func (e *FSEventsEngine) Start(ctx context.Context) error {
 		return err
 	}
 
-	go e.loop(ctx, ch)
+	goroutinelabels.NewGoroutine("ambience.fsevents_loop", "listening for fsevents").StartSimple(func() {
+		e.loop(ctx, ch)
+	})
 	return nil
 }
 

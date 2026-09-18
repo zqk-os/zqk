@@ -8,12 +8,12 @@ import (
 
 	"gopkg.in/yaml.v3"
 
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/logging"
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/paths"
-	bldr_instance_v1 "github.com/lanceman/zqk/pkg/specbuilder/bldr_instance_v1"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
+	bldr_instance_v1 "github.com/zqk-os/zqk/pkg/specbuilder/bldr_instance_v1"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // createLifecycleObjects creates lifecycle objects from YAML files

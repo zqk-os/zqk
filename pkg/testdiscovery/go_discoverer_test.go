@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/testdiscovery"
+	"github.com/zqk-os/zqk/pkg/testdiscovery"
 )
 
 func TestGoDiscoverer_CanHandleAndDiscover(t *testing.T) {

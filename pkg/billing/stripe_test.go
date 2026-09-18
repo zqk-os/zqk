@@ -8,7 +8,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/license"
+	"github.com/zqk-os/zqk/pkg/license"
 )
 
 type mockBlocklist struct {

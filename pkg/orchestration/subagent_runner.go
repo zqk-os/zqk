@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/logging"
-	"github.com/lanceman/zqk/pkg/rollback"
-	"github.com/lanceman/zqk/pkg/storage"
-	"github.com/lanceman/zqk/pkg/validation/qa"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/rollback"
+	"github.com/zqk-os/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/validation/qa"
 )
 
 // SentinelConfig configures the sentinel checks and retry behavior.

@@ -1,0 +1,12 @@
+ZQK.TEST CLI
+
+Usage:
+  zqk.test [command]
+
+Available Commands:
+  object      Object operations (CRUD, query, and management)
+  system      System operations (health, validation, and maintenance)
+  utility     Utility operations (version, migration, and helpers)
+  version     Show ZQK version information
+
+Use "zqk.test [command] --help" for more information about a command.

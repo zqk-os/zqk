@@ -7,18 +7,18 @@ import (
 	"time"
 
 	"github.com/fatih/color"
-	"github.com/lanceman/zqk/internal/cli"
-	clipkg "github.com/lanceman/zqk/pkg/cli"
-	"github.com/lanceman/zqk/pkg/cli/bldr_cli_cmd_v1"
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/logging"
-	"github.com/lanceman/zqk/pkg/mcp"
-	"github.com/lanceman/zqk/pkg/storage"
-	"github.com/lanceman/zqk/pkg/validation"
-	"github.com/lanceman/zqk/pkg/when"
+	"github.com/zqk-os/zqk/internal/cli"
+	clipkg "github.com/zqk-os/zqk/pkg/cli"
+	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/mcp"
+	"github.com/zqk-os/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/validation"
+	"github.com/zqk-os/zqk/pkg/when"
 	"github.com/spf13/cobra"
 
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // NewUpdateCmd creates a new update command
@@ -213,7 +213,7 @@ func runUpdate(cmd *cobra.Command, args []string) error {
 		}
 
 		if len(updates) == 0 {
-			// TRACK: BLI-REDACTED — ACL strip previously looked like "no updates provided"
+			// TRACK: BLI-1785723654802038000-b14064bc — ACL strip previously looked like "no updates provided"
 			// and caused repeated TestAllKindsCRUD Update false-fails (e.g. role.description).
 			if requestedFieldCount > 0 && len(deniedFields) > 0 {
 				logging.FluentEvent(proc.Logger()).Warn("All requested field updates denied by field-level permissions").
@@ -408,7 +408,7 @@ func runUpdate(cmd *cobra.Command, args []string) error {
 func enforceActivePlanMembership(ctx context.Context, secCtx *pkgctx.SecurityContext, sp storage.ObjectStorageProvider, id string) error {
 	// Child-owned membership: BLI.priority_plan_ref must point at an execution-facing plan
 	// (active = shovel-ready, in_progress = scope locked). Parent backlog_item_refs is not required.
-	// TRACK: BLI-REDACTED
+	// TRACK: BLI-1783845980884549000-014a1c61
 	item, err := sp.Read(ctx, secCtx, id)
 	if err != nil || item == nil {
 		return fmt.Errorf("failed to read backlog item %s for plan membership check", id)

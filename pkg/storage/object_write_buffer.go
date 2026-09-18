@@ -10,12 +10,12 @@ import (
 	"sync"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/concurrency"
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/goroutinelabels"
-	"github.com/lanceman/zqk/pkg/logging"
-	"github.com/lanceman/zqk/pkg/storage/locknames"
+	"github.com/zqk-os/zqk/pkg/concurrency"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/storage/locknames"
 )
 
 // objectWriteBufferLockLogger returns the instrumented lock logger used for ObjectWriteBuffer
@@ -275,11 +275,13 @@ func AppendToWALAndBuffer(wal *ObjectWAL, buf *ObjectWriteBuffer, op, kind, id s
 	if err := wal.Append(rec); err != nil {
 		return err
 	}
+	if syncWAL {
+		if err := wal.Sync(); err != nil {
+			return err
+		}
+	}
 	seq := rec.Seq
 	buf.Enqueue(op, kind, id, seq, data)
-	if syncWAL {
-		return wal.Sync()
-	}
 	return nil
 }
 
@@ -308,11 +310,13 @@ func AppendBatchToWALAndBuffer(wal *ObjectWAL, buf *ObjectWriteBuffer, recs []*W
 	if err := wal.AppendBatch(recs); err != nil {
 		return err
 	}
+	if syncWAL {
+		if err := wal.Sync(); err != nil {
+			return err
+		}
+	}
 	for i, rec := range recs {
 		buf.Enqueue(rec.Op, rec.Kind, rec.ID, rec.Seq, decoded[i])
-	}
-	if syncWAL {
-		return wal.Sync()
 	}
 	return nil
 }

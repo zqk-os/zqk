@@ -7,7 +7,7 @@ import (
 
 	"gopkg.in/yaml.v3"
 
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 func TestSecretScanningWorkflowAndDocs(t *testing.T) {

@@ -13,7 +13,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/errfmt"
 )
 
 // StreamOptions controls execution parameters for test progress streaming.

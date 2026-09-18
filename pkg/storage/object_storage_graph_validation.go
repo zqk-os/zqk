@@ -5,22 +5,22 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/lanceman/zqk/pkg/config"
-	"github.com/lanceman/zqk/pkg/zqkenv"
+	"github.com/zqk-os/zqk/pkg/config"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/logging"
-	"github.com/lanceman/zqk/pkg/migration/parser"
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/validation"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/migration/parser"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/validation"
 )
 
 // validateObject validates an object against its spec, lifecycle, and references
 func (g *GraphObjectStorage) validateObject(ctx context.Context, obj map[string]any, kind, currentState string) error {
 	// 1. Spec validation using GoValidator
 	// BLI-621 / KMP: --force skips lifecycle only with audited break_glass reason for critical kinds.
-	// TRACK: BLI-REDACTED
+	// TRACK: BLI-1785784867143912000-635942fb
 	if pkgctx.IsLifecycleBreakGlass(ctx) && IsCoreKernelKind(kind) {
 		if !pkgctx.GetAllowCoreObjectDelete(ctx) && zqkenv.TestRoot().Get() == "" {
 			return errfmt.Errorf("break_glass requires --reason-code for critical kind %s (Kernel Mutation Pipeline DECIDE)", kind)
@@ -29,13 +29,13 @@ func (g *GraphObjectStorage) validateObject(ctx context.Context, obj map[string]
 	// Break-glass and trusted shockwave writes still validate lifecycle. The
 	// validator skips auto-only *edges* under those overrides; skipping here
 	// dropped criteria/complete holds and allowed false-complete BLIs.
-	// TRACK: BLI-REDACTED
+	// TRACK: BLI-1785784867143912000-635942fb
 	options := &validation.ValidationOptions{
 		CurrentState:          currentState,
 		ValidateLifecycle:     true,
 		ValidateSemanticTypes: true,
 		// Same contract as file validation: evidence checks this storage tree.
-		// TRACK: BLI-REDACTED
+		// TRACK: BLI-1787131824765736000-312b6c71
 		ProjectRoot: g.projectRoot,
 	}
 	options.ObjectLookup = func(id string) (map[string]any, error) {

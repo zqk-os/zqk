@@ -1,7 +1,7 @@
 package storage
 
 import (
-	caspkg "github.com/lanceman/zqk/pkg/storage/cas"
+	caspkg "github.com/zqk-os/zqk/pkg/storage/cas"
 
 	"context"
 	"encoding/json"
@@ -13,14 +13,14 @@ import (
 	"strings"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/appledouble"
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/datacell"
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/logging"
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/storage/filecas"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/appledouble"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/datacell"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/storage/filecas"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // Cross-process CLI durability on macOS: after WAL checkpoint and CAS index flush, another

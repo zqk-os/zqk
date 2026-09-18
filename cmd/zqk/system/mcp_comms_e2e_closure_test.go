@@ -8,10 +8,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/execwrap"
-	"github.com/lanceman/zqk/pkg/paths"
-	"github.com/lanceman/zqk/pkg/testkit"
-	"github.com/lanceman/zqk/pkg/zqkenv"
+	"github.com/zqk-os/zqk/pkg/execwrap"
+	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/testkit"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
 // TestMCPCommsE2EClosure implements the verification matrix for BLI-MCP-COMMS-E2E-CLOSURE-001.
@@ -69,7 +69,7 @@ func TestMCPCommsE2EClosure(t *testing.T) {
 	})
 
 	t.Run("MCPConfigRoundTrip", func(t *testing.T) {
-		cmd := exec.CommandContext(ctx, "go", "test", "github.com/lanceman/zqk/pkg/mcp", "-run", "TestMCPSpecConfigurationSurvivesSnapshotAndRecycle")
+		cmd := exec.CommandContext(ctx, "go", "test", "github.com/zqk-os/zqk/pkg/mcp", "-run", "TestMCPSpecConfigurationSurvivesSnapshotAndRecycle")
 		cmd.Dir = moduleRoot
 		if out, err := cmd.CombinedOutput(); err != nil {
 			t.Fatalf("MCPConfigRoundTrip failed: %v\nOutput: %s", err, string(out))
@@ -77,7 +77,7 @@ func TestMCPCommsE2EClosure(t *testing.T) {
 	})
 
 	t.Run("DualSeatSameNonce", func(t *testing.T) {
-		cmd := exec.CommandContext(ctx, "go", "test", "github.com/lanceman/zqk/pkg/agentfeed", "-run", "TestProcessSeatInbox_commsLifeAndWork")
+		cmd := exec.CommandContext(ctx, "go", "test", "github.com/zqk-os/zqk/pkg/agentfeed", "-run", "TestProcessSeatInbox_commsLifeAndWork")
 		cmd.Dir = moduleRoot
 		if out, err := cmd.CombinedOutput(); err != nil {
 			t.Fatalf("DualSeatSameNonce failed: %v\nOutput: %s", err, string(out))
@@ -85,7 +85,7 @@ func TestMCPCommsE2EClosure(t *testing.T) {
 	})
 
 	t.Run("WorkerDownFailClosed", func(t *testing.T) {
-		cmd := exec.CommandContext(ctx, "go", "test", "github.com/lanceman/zqk/pkg/agentfeed", "-run", "TestSeatWorkerAlive_failClosedWhenMissing")
+		cmd := exec.CommandContext(ctx, "go", "test", "github.com/zqk-os/zqk/pkg/agentfeed", "-run", "TestSeatWorkerAlive_failClosedWhenMissing")
 		cmd.Dir = moduleRoot
 		if out, err := cmd.CombinedOutput(); err != nil {
 			t.Fatalf("WorkerDownFailClosed failed: %v\nOutput: %s", err, string(out))

@@ -3,7 +3,7 @@
 // scheduler/kernel start, demote shovel_ready|execution_locked instances that
 // fail stay-in-status invariants (lifecycle demote, not autofix→error).
 //
-// TRACK: BLI-REDACTED
+// TRACK: BLI-1785918841712163000-f128dc79
 package contractchange
 
 import (
@@ -14,10 +14,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/paths"
-	"github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 const (

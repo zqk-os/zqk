@@ -3,9 +3,9 @@ package system
 // BLI-177483 inventory: ZQK_TEST_ROOT in comments only (scheduler bundler note); no RunProjectTestTeardown.
 
 import (
-	"github.com/lanceman/zqk/pkg/execwrap"
-	"github.com/lanceman/zqk/pkg/utils/fileutil"
-	"github.com/lanceman/zqk/pkg/zqkenv"
+	"github.com/zqk-os/zqk/pkg/execwrap"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 
 	"bufio"
 	"bytes"
@@ -18,9 +18,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/goroutinelabels"
-	"github.com/lanceman/zqk/pkg/paths"
-	"github.com/lanceman/zqk/pkg/testkit"
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
+	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/testkit"
 )
 
 // findModuleRoot returns the module root (directory containing go.mod) by walking up from cwd.

@@ -3,10 +3,10 @@ package mcp
 import (
 	"context"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	pkgmcp "github.com/lanceman/zqk/pkg/mcp"
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/storage"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	pkgmcp "github.com/zqk-os/zqk/pkg/mcp"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/storage"
 )
 
 // storageProviderAdapter adapts storage.ObjectStorageProvider to pkg/mcp.StorageProvider

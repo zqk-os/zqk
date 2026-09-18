@@ -9,18 +9,18 @@ import (
 	"strings"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/execwrap"
-	"github.com/lanceman/zqk/pkg/zqkenv"
+	"github.com/zqk-os/zqk/pkg/execwrap"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 
-	"github.com/lanceman/zqk/pkg/agentfeed"
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/convergence"
-	"github.com/lanceman/zqk/pkg/objects"
-	observerpkg "github.com/lanceman/zqk/pkg/observer"
-	"github.com/lanceman/zqk/pkg/storage"
-	"github.com/lanceman/zqk/pkg/tpm"
+	"github.com/zqk-os/zqk/pkg/agentfeed"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/convergence"
+	"github.com/zqk-os/zqk/pkg/objects"
+	observerpkg "github.com/zqk-os/zqk/pkg/observer"
+	"github.com/zqk-os/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/tpm"
 )
 
 // Default CLI alpha readiness plan (repo lane); still resolved when status is paused.
@@ -121,7 +121,7 @@ func resolvePriorityPlanForWhatsNext(ctx context.Context, sp storage.ObjectStora
 
 	// 3. Collect all candidate plans (operational + strategic).
 	// Shared with CLI whats-next so grooming next-columns appear in ambient.
-	// TRACK: BLI-REDACTED
+	// TRACK: BLI-1787035087372193000-c022117d
 	planStatuses := objects.PlanWhatsNextCandidateStatuses()
 	var candidates []map[string]any
 	for _, st := range planStatuses {

@@ -4,8 +4,8 @@
 package mcp_built_in_tool
 
 import (
-	base_objectenum "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
-	shared_mcp_built_in_toolsenum "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/shared_mcp_built_in_tools"
+	base_objectenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
+	shared_mcp_built_in_toolsenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/shared_mcp_built_in_tools"
 )
 
 type Plane = base_objectenum.Plane

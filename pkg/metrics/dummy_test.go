@@ -5,8 +5,8 @@ import (
 	"os"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/metrics"
-	"github.com/lanceman/zqk/pkg/validation"
+	"github.com/zqk-os/zqk/pkg/metrics"
+	"github.com/zqk-os/zqk/pkg/validation"
 )
 
 func TestDummy(t *testing.T) {

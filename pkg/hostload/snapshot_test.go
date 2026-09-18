@@ -3,7 +3,7 @@ package hostload
 import (
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/zqkenv"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
 func TestDisabled_ReadsBrandEnv(t *testing.T) {

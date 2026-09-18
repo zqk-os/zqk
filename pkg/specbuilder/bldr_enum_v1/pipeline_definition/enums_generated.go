@@ -4,8 +4,8 @@
 package pipeline_definition
 
 import (
-	base_objectenum "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
-	shared_pipeline_definitionsenum "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/shared_pipeline_definitions"
+	base_objectenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
+	shared_pipeline_definitionsenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/shared_pipeline_definitions"
 )
 
 type Plane = base_objectenum.Plane

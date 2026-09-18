@@ -5,10 +5,10 @@ import (
 	"maps"
 	"strconv"
 
-	"github.com/lanceman/zqk/internal/cli"
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/storage"
-	"github.com/lanceman/zqk/pkg/validation"
+	"github.com/zqk-os/zqk/internal/cli"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/validation"
 	"github.com/spf13/cobra"
 )
 
@@ -99,7 +99,15 @@ func attachNamespaceScopeMeta(meta map[string]any, scope NamespaceQueryScope) ma
 // enrichHiddenOutsideScope counts objects outside the applied namespace filter
 // when isolation is active. Best-effort; errors leave HiddenOutsideScope unset.
 func enrichHiddenOutsideScope(proc *cli.Processor, kind string, filters map[string]any, scopedCount int, scope *NamespaceQueryScope) {
-	if proc == nil || scope == nil || !scope.IsolationActive || kind == "" {
+	if scope == nil || kind == "" {
+		return
+	}
+	zero := 0
+	if !scope.IsolationActive {
+		scope.HiddenOutsideScope = &zero
+		return
+	}
+	if proc == nil {
 		return
 	}
 	unscoped := maps.Clone(filters)
@@ -111,10 +119,13 @@ func enrichHiddenOutsideScope(proc *cli.Processor, kind string, filters map[stri
 		Kind:    kind,
 		Filters: unscoped,
 	})
-	if err != nil || total <= scopedCount {
+	if err != nil {
 		return
 	}
 	hidden := total - scopedCount
+	if hidden < 0 {
+		hidden = 0
+	}
 	scope.HiddenOutsideScope = &hidden
 }
 

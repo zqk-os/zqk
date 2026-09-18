@@ -3,10 +3,10 @@ package mcp
 import (
 	"path/filepath"
 
-	"github.com/lanceman/zqk/pkg/brand"
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/paths"
-	"github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/brand"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // MCP role names used in process display symlinks (bin/<brand>-mcp-<role>).

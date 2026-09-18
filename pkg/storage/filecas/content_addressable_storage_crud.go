@@ -8,14 +8,14 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/goroutinelabels"
-	"github.com/lanceman/zqk/pkg/logging"
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/paths"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 	"gopkg.in/yaml.v3"
 )
 
@@ -444,7 +444,7 @@ func (cas *ContentAddressableStorage) Read(objectID string) ([]byte, error) {
 // Delete old file if hash changed. ID change retires oldID — do not use
 // RemoveOrphanCASHashFileSync: refuseOrphanCASHashDelete treats the old blob
 // as the sole survivor for the peeked old id (the new blob peeks as newID).
-// TRACK: BLI-REDACTED
+// TRACK: BLI-1785723654802038000-b14064bc
 
 //nolint:errcheck // best-effort cleanup
 
@@ -458,7 +458,7 @@ func (cas *ContentAddressableStorage) Read(objectID string) ([]byte, error) {
 // Invalidate old ID and register new ID→path so object-id-cache cannot keep the
 // deleted hash under the previous id. Prefer InvalidateAndUpdate when a handler
 // is wired; always fire post-sync for the new mapping.
-// TRACK: BLI-REDACTED
+// TRACK: BLI-1785723654802038000-b14064bc
 
 func (cas *ContentAddressableStorage) Delete(objectID string) error {
 	// Get hash and bucket key from index (bucket key from bucket strategy at create time)

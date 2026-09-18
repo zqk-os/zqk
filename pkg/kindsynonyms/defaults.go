@@ -1,6 +1,6 @@
 package kindsynonyms
 
-import "github.com/lanceman/zqk/pkg/kindnames"
+import "github.com/zqk-os/zqk/pkg/kindnames"
 
 var (
 	aliasesBacklogItem = []string{"task", "tasks", "item", "items", "backlog", "story", "stories", "work_item"}
@@ -18,7 +18,7 @@ var (
 	// prompt_template: avoid "template" — conflicts with kindnames.Template (CAS template objects).
 	aliasesPromptTemplate = []string{"prompt", "prompts", "prompt_tpl"}
 	// Object CLI shortcut groups (object splan/pplan/…) must also resolve as list/count kinds.
-	// TRACK: BLI-REDACTED
+	// TRACK: BLI-1785907446155489000-2d7f745b
 	aliasesStrategicPlan        = []string{"splan", "strat_plan", "strategic"}
 	aliasesWorkstreamTransition = []string{"wstrans", "ws_trans"}
 	aliasesEvolutionManagement  = []string{"evoman", "evo_man"}

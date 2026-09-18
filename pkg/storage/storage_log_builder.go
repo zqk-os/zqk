@@ -1,6 +1,6 @@
 package storage
 
-import "github.com/lanceman/zqk/pkg/logging"
+import "github.com/zqk-os/zqk/pkg/logging"
 
 // StorageLog starts a pooled fluent log builder for POL-CODE-007 storage runtime logs (same backing
 // type as [scheduler.SLog]). Prefer StorageLog(logger).Warn(msg).Field().Log() over variadic

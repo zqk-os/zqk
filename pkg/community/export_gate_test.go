@@ -1,17 +1,16 @@
 package community
 
 import (
-	"os"
 	"path/filepath"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/paths"
-	"github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 func TestRunExportGate_CleanDir(t *testing.T) {
 	tmp := t.TempDir()
-	if err := os.WriteFile(filepath.Join(tmp, "README.md"), []byte("# Community"), 0o644); err != nil {
+	if err := fileutil.WriteFile(filepath.Join(tmp, "README.md"), []byte("# Community"), 0o644); err != nil {
 		t.Fatalf("failed to write test file: %v", err)
 	}
 
@@ -30,10 +29,10 @@ func TestRunExportGate_CleanDir(t *testing.T) {
 func TestRunExportGate_DetectsProhibitedPattern(t *testing.T) {
 	tmp := t.TempDir()
 	internalDir := filepath.Join(tmp, "scripts", "zqk-internal")
-	if err := os.MkdirAll(internalDir, 0o755); err != nil {
+	if err := fileutil.MkdirAll(internalDir, 0o755); err != nil {
 		t.Fatalf("failed to mkdir: %v", err)
 	}
-	if err := os.WriteFile(filepath.Join(internalDir, "daemon.sh"), []byte("echo internal"), 0o755); err != nil {
+	if err := fileutil.WriteFile(filepath.Join(internalDir, "daemon.sh"), []byte("echo internal"), 0o755); err != nil {
 		t.Fatalf("failed to write test file: %v", err)
 	}
 
@@ -61,7 +60,7 @@ func TestRunExportGate_DetectsProhibitedPattern(t *testing.T) {
 
 func TestRunExportGate_DetectsProhibitedExtension(t *testing.T) {
 	tmp := t.TempDir()
-	if err := os.WriteFile(filepath.Join(tmp, "server.key"), []byte("SECRET"), 0o600); err != nil {
+	if err := fileutil.WriteFile(filepath.Join(tmp, "server.key"), []byte("SECRET"), 0o600); err != nil {
 		t.Fatalf("failed to write key file: %v", err)
 	}
 

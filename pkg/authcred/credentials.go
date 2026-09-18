@@ -4,9 +4,9 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/lanceman/zqk/pkg/paths"
-	"github.com/lanceman/zqk/pkg/utils/fileutil"
-	"github.com/lanceman/zqk/pkg/zqkenv"
+	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
 // ResolveCredentialPath picks the credentials file for AuthMiddleware.
@@ -15,7 +15,7 @@ import (
 // When TEST_ROOT equals the live projectRoot and that tree has no credentials
 // file, fall through to project-local then $HOME — leftover TEST_ROOT=repo
 // in IDE/agent shells must not look like a missing token.
-// TRACK: BLI-REDACTED — remove when: agent/MCP shells
+// TRACK: BLI-1787558884394841000-7dbc6d50 — remove when: agent/MCP shells
 // never export TEST_ROOT against the studio checkout.
 func ResolveCredentialPath(projectRoot string) string {
 	testRoot := strings.TrimSpace(zqkenv.TestRoot().Get())

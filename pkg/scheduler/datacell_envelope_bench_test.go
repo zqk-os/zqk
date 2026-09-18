@@ -9,7 +9,7 @@ package scheduler
 import (
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/datacell"
+	"github.com/zqk-os/zqk/pkg/datacell"
 )
 
 func BenchmarkStreamOrganism_DryRunDataCellEnvelopePolicy(b *testing.B) {

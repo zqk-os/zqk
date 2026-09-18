@@ -6,15 +6,15 @@ import (
 	"testing"
 	"time"
 
-	caspkg "github.com/lanceman/zqk/pkg/storage/cas"
+	caspkg "github.com/zqk-os/zqk/pkg/storage/cas"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/mcp"
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/storage"
-	"github.com/lanceman/zqk/pkg/testkit"
-	"github.com/lanceman/zqk/pkg/testservices"
-	"github.com/lanceman/zqk/pkg/zqktime"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/mcp"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/testkit"
+	"github.com/zqk-os/zqk/pkg/testservices"
+	"github.com/zqk-os/zqk/pkg/zqktime"
 )
 
 // TestFileBackendLifecycleHooks tests that lifecycle hooks are triggered correctly
@@ -309,7 +309,7 @@ func TestFileBackendAutoTransitionEvaluation(t *testing.T) {
 		milestone1 := completedMilestone(milestone1ID, "Test Milestone 1")
 		milestone2 := completedMilestone(milestone2ID, "Test Milestone 2")
 
-		// TRACK: BLI-REDACTED — draft-plane create / promote membrane.
+		// TRACK: BLI-1785443942668406000-1ec5c811 — draft-plane create / promote membrane.
 		storage.CreateCASVisible(t, fileStorage, ctx, secCtx, milestone1, objectStatusComplete)
 		storage.CreateCASVisible(t, fileStorage, ctx, secCtx, milestone2, objectStatusComplete)
 		// Flush CAS index so reference validation during backlog item create sees the new IDs.

@@ -4,8 +4,8 @@
 package zqk_session
 
 import (
-	base_objectenum "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
-	shared_zqk_sessionsenum "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/shared_zqk_sessions"
+	base_objectenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
+	shared_zqk_sessionsenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/shared_zqk_sessions"
 )
 
 type Plane = base_objectenum.Plane

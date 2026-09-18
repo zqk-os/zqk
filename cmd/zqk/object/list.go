@@ -6,15 +6,15 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/lanceman/zqk/internal/cli"
-	clipkg "github.com/lanceman/zqk/pkg/cli"
-	"github.com/lanceman/zqk/pkg/cli/bldr_cli_cmd_v1"
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/paths"
-	"github.com/lanceman/zqk/pkg/storage"
-	"github.com/lanceman/zqk/pkg/when"
+	"github.com/zqk-os/zqk/internal/cli"
+	clipkg "github.com/zqk-os/zqk/pkg/cli"
+	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/when"
 	"github.com/spf13/cobra"
 )
 
@@ -22,7 +22,7 @@ import (
 // Generated from command spec - DO NOT EDIT MANUALLY (use spec file as source of truth)
 func NewListCmd() *cobra.Command {
 	// Use generated builder from object/list DNA (path-qualified object_list stem).
-	// TRACK: BLI-REDACTED — shallow DNA must not share list_command_builder.go with scheduler/list.
+	// TRACK: BLI-1785903708509306000-a6d8dc5b — shallow DNA must not share list_command_builder.go with scheduler/list.
 	cmd := bldr_cli_cmd_v1.NewObjectListCommandBuilder()
 	cli.BindAsyncProgress(cmd, runList)
 
@@ -220,6 +220,10 @@ func runListSingleKind(cmd *cobra.Command, proc *cli.Processor, kind string) err
 	// Parse flags
 	flags, nsScope, err := parseListFlags(cmd, proc)
 	if err != nil {
+		return cli.Guard(cmd).Err(err).Return()
+	}
+
+	if err := clipkg.ValidateFilterFields(kind, flags.Filters); err != nil {
 		return cli.Guard(cmd).Err(err).Return()
 	}
 

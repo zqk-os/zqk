@@ -9,8 +9,8 @@ import (
 	"github.com/santhosh-tekuri/jsonschema/v5"
 	"gopkg.in/yaml.v3"
 
-	"github.com/lanceman/zqk/pkg/errfmt"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // SchemaValidator uses github.com/santhosh-tekuri/jsonschema/v5

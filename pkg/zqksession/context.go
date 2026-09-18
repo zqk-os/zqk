@@ -3,7 +3,7 @@ package zqksession
 import (
 	"context"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
 )
 
 type sessionIDKey struct{}

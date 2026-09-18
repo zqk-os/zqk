@@ -10,10 +10,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/lifecycle"
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/storage"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/lifecycle"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/storage"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // SamplePayload models test domain state.
@@ -147,7 +147,7 @@ func TestAccumulator_BuilderAndEngineConfig(t *testing.T) {
 	}
 }
 
-// TestAccumulator_AtomicPersistenceAndHotPathSLA satisfies CRIT-REDACTED.
+// TestAccumulator_AtomicPersistenceAndHotPathSLA satisfies CRIT-1789551839272714000-27a0ccc0.
 func TestAccumulator_AtomicPersistenceAndHotPathSLA(t *testing.T) {
 	tmpDir := t.TempDir()
 	acc := NewMockAccumulator("latency_test")
@@ -193,7 +193,7 @@ func TestAccumulator_AtomicPersistenceAndHotPathSLA(t *testing.T) {
 	}
 }
 
-// TestAccumulator_ColdBootAsyncRecovery satisfies CRIT-REDACTED.
+// TestAccumulator_ColdBootAsyncRecovery satisfies CRIT-1789551842110690000-ee7b440f.
 func TestAccumulator_ColdBootAsyncRecovery(t *testing.T) {
 	tmpDir := t.TempDir()
 	acc := NewMockAccumulator("cold_boot_test")
@@ -329,7 +329,7 @@ func TestAccumulator_DebounceConcurrency(t *testing.T) {
 	}
 }
 
-// TestAccumulator_WALSubscription satisfies CRIT-REDACTED incremental WAL ingestion.
+// TestAccumulator_WALSubscription satisfies CRIT-1789551839272714000-27a0ccc0 incremental WAL ingestion.
 func TestAccumulator_WALSubscription(t *testing.T) {
 	tmpDir := t.TempDir()
 	walDir := filepath.Join(tmpDir, ".zqk", "state")

@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 func TestErrSwallowNoiseReducedInStorage(t *testing.T) {

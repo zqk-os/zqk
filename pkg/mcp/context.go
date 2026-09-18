@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/json"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
 )
 
 // ExtractActorContext extracts actor information (SecurityContext) from MCP request parameters

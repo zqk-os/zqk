@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // Re-using MockStorageProvider defined in scalar_aggregator_test.go

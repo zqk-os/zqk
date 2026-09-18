@@ -6,9 +6,9 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/concurrency"
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/concurrency"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/logging"
 )
 
 // ValidationTask represents a validation task with priority
@@ -51,7 +51,7 @@ func (pq *PriorityQueue) Enqueue(task *ValidationTask) {
 		LockNamePriorityQueueEnqueue,
 		lockLoggerSystem(),
 		func() error {
-			// TRACK: BLI-REDACTED — O(1) fast path for chronological enqueues
+			// TRACK: BLI-1787554904533036000-fa71ce34 — O(1) fast path for chronological enqueues
 			n := len(pq.tasks[priority])
 			if n == 0 || !task.EnqueuedAt.Before(pq.tasks[priority][n-1].EnqueuedAt) {
 				pq.tasks[priority] = append(pq.tasks[priority], task)

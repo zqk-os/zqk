@@ -8,8 +8,8 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // This package provides chunked, base+delta encoded time series storage for numeric
@@ -136,7 +136,8 @@ func sameChunk(start time.Time, d time.Duration, ts time.Time) bool {
 	return ts.UTC().Truncate(d).Equal(start)
 }
 
-func sanitizeSeriesName(s string) string {
+// SanitizeSeriesName returns a filesystem-safe series name.
+func SanitizeSeriesName(s string) string {
 	// Simple filesystem-safe replacement; can be extended as needed.
 	res := make([]rune, 0, len(s))
 	for _, r := range s {
@@ -147,6 +148,10 @@ func sanitizeSeriesName(s string) string {
 		}
 	}
 	return string(res)
+}
+
+func sanitizeSeriesName(s string) string {
+	return SanitizeSeriesName(s)
 }
 
 // writeVarint encodes x as unsigned varint.

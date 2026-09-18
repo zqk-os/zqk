@@ -3,7 +3,7 @@ package objects
 import (
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/dna"
+	"github.com/zqk-os/zqk/pkg/dna"
 )
 
 func TestSpecToMetaSchema(t *testing.T) {

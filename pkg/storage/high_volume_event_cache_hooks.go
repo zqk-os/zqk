@@ -5,8 +5,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/logging"
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // TRACK: [REDACTED-ID] — memory CUD already happened; disk must follow

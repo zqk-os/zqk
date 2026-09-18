@@ -3,7 +3,7 @@ package agentonboard
 import (
 	"fmt"
 
-	"github.com/lanceman/zqk/pkg/brand"
+	"github.com/zqk-os/zqk/pkg/brand"
 )
 
 // BootPayload returns the regenerable directive written into vendor config files.

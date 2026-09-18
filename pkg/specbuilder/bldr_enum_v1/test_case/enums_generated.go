@@ -4,8 +4,8 @@
 package test_case
 
 import (
-	base_objectenum "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
-	shared_test_casesenum "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/shared_test_cases"
+	base_objectenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
+	shared_test_casesenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/shared_test_cases"
 )
 
 type Plane = base_objectenum.Plane

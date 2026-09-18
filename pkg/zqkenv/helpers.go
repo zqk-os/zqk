@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 	"strconv"
 
-	"github.com/lanceman/zqk/pkg/brand"
+	"github.com/zqk-os/zqk/pkg/brand"
 )
 
 // unreachableTestSocketBasename names a socket that is deliberately never created, so tests can

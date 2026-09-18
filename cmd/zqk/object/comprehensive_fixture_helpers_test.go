@@ -14,22 +14,22 @@ import (
 	"testing"
 	"time"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/datacell"
-	"github.com/lanceman/zqk/pkg/execwrap"
-	"github.com/lanceman/zqk/pkg/nildecode"
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/paths"
-	instancebuilders "github.com/lanceman/zqk/pkg/specbuilder/instance_builders"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
-	"github.com/lanceman/zqk/pkg/zqkenv"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/datacell"
+	"github.com/zqk-os/zqk/pkg/execwrap"
+	"github.com/zqk-os/zqk/pkg/nildecode"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
+	instancebuilders "github.com/zqk-os/zqk/pkg/specbuilder/instance_builders"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 
 	"gopkg.in/yaml.v3"
 
-	"github.com/lanceman/zqk/pkg/storage"
-	"github.com/lanceman/zqk/pkg/testkit"
-	"github.com/lanceman/zqk/pkg/validation"
-	"github.com/lanceman/zqk/pkg/zqktime"
+	"github.com/zqk-os/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/testkit"
+	"github.com/zqk-os/zqk/pkg/validation"
+	"github.com/zqk-os/zqk/pkg/zqktime"
 )
 
 // fixtureObjectTitle returns a title for synthetic objects in isolated test storage (same contract as pkg/testing.FixtureObjectTitle).
@@ -717,7 +717,7 @@ func testUpdateForKind(t *testing.T, testEnv *TestEnvironment, ctx context.Conte
 
 	// 1. Prefer title first — kinds like role put access-restricted `description` ahead of
 	// title in field iteration; updating description without admin/confidential yields
-	// "no updates provided" (TRACK: BLI-REDACTED).
+	// "no updates provided" (TRACK: BLI-1785723654802038000-b14064bc).
 	preferNames := []string{"title", "summary", "note", "content", "reason", "body", "description"}
 	byName := make(map[string]*objects.FieldInfo, len(kindFields.AllFields))
 	for i := range kindFields.AllFields {
@@ -874,7 +874,7 @@ func testUpdateForKind(t *testing.T, testEnv *TestEnvironment, ctx context.Conte
 			return
 		}
 		// Access-stripped or no-op field selection leaves the CLI with nothing to apply.
-		// TRACK: BLI-REDACTED — treat as skip, not hard fail.
+		// TRACK: BLI-1785723654802038000-b14064bc — treat as skip, not hard fail.
 		if strings.Contains(string(output), "no updates provided") ||
 			strings.Contains(string(output), "denied by field-level permissions") {
 			t.Logf("Skipping update for %s field %s (no writable updates): %v\nOutput: %s", kind, updateField, err, string(output))
@@ -1867,7 +1867,7 @@ func setKindSpecificFieldsForCLIExtended(obj map[string]any, kind string, index 
 		obj[objects.FieldKeyMachineHints] = `{"fixture":"comprehensive_vocabulary_scheme"}`
 	case objects.KindKeystoreEntry:
 		obj[objects.FieldKeyAccountID] = comprehensiveReferenceAccountID
-		// TRACK: BLI-REDACTED — do not set credential_hash here; only system may set it on create.
+		// TRACK: BLI-1785723654802038000-b14064bc — do not set credential_hash here; only system may set it on create.
 
 	case objects.KindLibrary:
 		// library_name must match ^[a-z][a-z0-9_-]*$

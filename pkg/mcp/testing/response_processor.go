@@ -3,8 +3,8 @@ package testing
 import (
 	"errors"
 
-	"github.com/lanceman/zqk/pkg/mcp"
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/mcp"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // ResponseProcessor transforms or filters tool call responses/errors before validation

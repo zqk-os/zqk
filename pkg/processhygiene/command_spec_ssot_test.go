@@ -5,8 +5,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/paths"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/paths"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 func findRepoRoot(t *testing.T) string {
@@ -28,9 +28,9 @@ func findRepoRoot(t *testing.T) string {
 	}
 }
 
-// TestCommandSpecSSOTDecisionRecorded verifies that DEC-REDACTED
+// TestCommandSpecSSOTDecisionRecorded verifies that DEC-1786732826125502000-ef80a104
 // is recorded in the kernel and adopts file DNA as the single source of truth for CLI commands
-// (BLI-REDACTED / CRIT-REDACTED).
+// (BLI-1786686475378466000-405c6afc / CRIT-1786696710475120000-ac5e4d34).
 func TestCommandSpecSSOTDecisionRecorded(t *testing.T) {
 	repoRoot := findRepoRoot(t)
 	decisionsDir := filepath.Join(repoRoot, paths.ProcessDir, "decisions")
@@ -50,7 +50,7 @@ func TestCommandSpecSSOTDecisionRecorded(t *testing.T) {
 			continue
 		}
 		text := string(data)
-		if strings.Contains(text, "DEC-REDACTED") {
+		if strings.Contains(text, "DEC-1786732826125502000-ef80a104") {
 			found = true
 			if !strings.Contains(text, ".zqk/cli/specs") {
 				t.Errorf("Decision does not cite .zqk/cli/specs as file DNA: %s", text)
@@ -63,7 +63,7 @@ func TestCommandSpecSSOTDecisionRecorded(t *testing.T) {
 	}
 
 	if !found {
-		t.Fatalf("DEC-REDACTED not found in %s", decisionsDir)
+		t.Fatalf("DEC-1786732826125502000-ef80a104 not found in %s", decisionsDir)
 	}
 }
 

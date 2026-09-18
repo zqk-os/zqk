@@ -3,9 +3,9 @@ package cas_test
 import (
 	"testing"
 
-	caspkg "github.com/lanceman/zqk/pkg/storage/cas"
+	caspkg "github.com/zqk-os/zqk/pkg/storage/cas"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
 )
 
 func TestCASOrphanCleanupQueue_LifetimeCounters(t *testing.T) {

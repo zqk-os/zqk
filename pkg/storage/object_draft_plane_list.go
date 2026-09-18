@@ -1,6 +1,6 @@
 package storage
 
-import "github.com/lanceman/zqk/pkg/objects"
+import "github.com/zqk-os/zqk/pkg/objects"
 
 // omitDraftPlaneOnlyFromList drops objects that exist only on the draft plane
 // (.zqk/object_drafts). Dual-plane CAS copies stay listable. Get/Exists still
@@ -9,7 +9,7 @@ import "github.com/lanceman/zqk/pkg/objects"
 // Draft plane is a location, not a lifecycle status. Filters such as
 // status=draft or status=conceptual must not surface conceptual/exploring
 // objects that have not left the draft plane.
-// TRACK: BLI-REDACTED
+// TRACK: BLI-1786689721908382000-6402a858
 func (f *FileObjectStorage) omitDraftPlaneOnlyFromList(result *QueryResult) {
 	if result == nil || len(result.Objects) == 0 {
 		return

@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // SwarmTask represents the task payload for the swarm engine.

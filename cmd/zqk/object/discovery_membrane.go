@@ -3,16 +3,16 @@ package object
 import (
 	"path/filepath"
 
-	"github.com/lanceman/zqk/internal/cli"
-	"github.com/lanceman/zqk/pkg/authcred"
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/internal/cli"
+	"github.com/zqk-os/zqk/pkg/authcred"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/spf13/cobra"
 )
 
 // FlagAllKinds break-glass for persona/RBAC discovery membrane (full kind catalog).
-// TRACK: BLI-REDACTED
+// TRACK: BLI-1785908739114727000-9a7cc2bd
 const FlagAllKinds = "all-kinds"
 
 const flagHelpAllKinds = "Show full registered kind catalog (bypass planner/doer discovery membrane)"

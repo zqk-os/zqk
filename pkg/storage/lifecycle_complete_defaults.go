@@ -4,9 +4,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/validation"
-	"github.com/lanceman/zqk/pkg/zqktime"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/validation"
+	"github.com/zqk-os/zqk/pkg/zqktime"
 )
 
 // TRACK: BLI-KERNEL-WORK-ENVELOPE-001 — work-envelope defaults key off

@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/concurrency"
+	"github.com/zqk-os/zqk/pkg/concurrency"
 )
 
 func TestPollUntil_SuccessImmediate(t *testing.T) {

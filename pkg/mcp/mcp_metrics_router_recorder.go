@@ -3,7 +3,7 @@ package mcp
 import (
 	"time"
 
-	"github.com/lanceman/zqk/pkg/observability"
+	"github.com/zqk-os/zqk/pkg/observability"
 )
 
 // getMCPMetricsRecorder gets a metrics recorder for MCP operations

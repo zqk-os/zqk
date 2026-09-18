@@ -4,8 +4,8 @@
 package audit_event
 
 import (
-	base_objectenum "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
-	shared_auditenum "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/shared_audit"
+	base_objectenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
+	shared_auditenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/shared_audit"
 )
 
 type EventType string

@@ -4,11 +4,11 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/paths"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/paths"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
-// TRACK: BLI-REDACTED
+// TRACK: BLI-1785895580100186000-c5539372
 func TestSignificantCacheChange_NotePeekConsume(t *testing.T) {
 	root := t.TempDir()
 	ResetSignificantCacheChangeForTest(root)
@@ -37,7 +37,7 @@ func TestSignificantCacheChange_NotePeekConsume(t *testing.T) {
 	}
 }
 
-// TRACK: BLI-REDACTED
+// TRACK: BLI-1785895580100186000-c5539372
 func TestNoteObjectIDCachePending_BurstNotesSignificantChange(t *testing.T) {
 	root := t.TempDir()
 	ResetObjectIDCachePendingForTest()

@@ -5,7 +5,7 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/lanceman/zqk/pkg/zqkenv"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
 // PrototypeAccountError is the sentinel error for prototype/test account rejection.
@@ -30,7 +30,7 @@ var prototypeAccountIDMarkers = []string{"proto", "test", "mock", "dev", "sbox",
 // *replaceable default*, not a fixed truth: deployments override or extend the set with
 // [RegisterPrototypeAccountRefs] or the PROTOTYPE_ACCOUNT_REFS env list.
 //
-// TRACK: BLI-REDACTED — the durable fix is resolving the ref against the
+// TRACK: BLI-1786387465409533000-45bd780c — the durable fix is resolving the ref against the
 // account index (a prototype or ghost account is one that does not resolve to a real, non-fixture
 // account object) instead of matching IDs the kernel has memorized.
 var defaultPrototypeAccountRefs = []string{

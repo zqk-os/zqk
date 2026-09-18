@@ -3,7 +3,7 @@ package testdiscovery_test
 import (
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/testdiscovery"
+	"github.com/zqk-os/zqk/pkg/testdiscovery"
 )
 
 func TestDiscoveredTarget_Fields(t *testing.T) {

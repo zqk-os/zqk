@@ -8,8 +8,8 @@ import (
 	"fmt"
 	"strings"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/errfmt"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/errfmt"
 )
 
 const emptyValue = ""
@@ -58,6 +58,8 @@ func (s *defaultService) Suggest(err error, opts Options) Suggestion {
 
 	msgLower := strings.ToLower(msg)
 	switch {
+	case strings.Contains(msgLower, "project root not found") || strings.Contains(msgLower, "no project root found") || strings.Contains(msgLower, "not a zqk project"):
+		out.Hint = suggestProjectRootNotFound(opts)
 	case strings.Contains(msgLower, "not found") || strings.Contains(msgLower, "no such"):
 		out.Hint = suggestNotFound(opts)
 	case strings.Contains(msgLower, "invalid") || strings.Contains(msgLower, "validation"):
@@ -80,6 +82,13 @@ func (s *defaultService) Suggest(err error, opts Options) Suggestion {
 	}
 
 	return out
+}
+
+func suggestProjectRootNotFound(opts Options) string {
+	if opts.ExperienceLevel == ExperienceBeginner || opts.Verbose {
+		return "Project root not found. Run 'zqk system init --project-name <name>' to initialize, navigate to a directory containing .zqk, or specify --project-root."
+	}
+	return "Project root not found. Run 'zqk system init' to initialize, or pass --project-root."
 }
 
 func suggestNotFound(opts Options) string {

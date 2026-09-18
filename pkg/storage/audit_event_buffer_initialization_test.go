@@ -4,7 +4,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
 )
 
 // TestInitializeGlobalBufferWithConfig_PreservesDisabledState verifies that when the global

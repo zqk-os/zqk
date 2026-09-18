@@ -4,11 +4,11 @@ import (
 	"context"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // TestParseCacheEvictionShockwave satisfies TST-1789165612728794000-93e85c38.
-// TRACK: BLI-REDACTED / REQ-CACHE-SHOCKWAVE-INVALIDATE-001 / CRIT-CACHE-SHOCKWAVE-DOWNSTREAM-EVICT-001
+// TRACK: BLI-1789165698795388000-64c0cbb6 / REQ-CACHE-SHOCKWAVE-INVALIDATE-001 / CRIT-CACHE-SHOCKWAVE-DOWNSTREAM-EVICT-001
 // Asserts that when an ObjectMutationEvent is dispatched through the InvalidationShockwaveBus,
 // the in-memory ParseCache immediately purges the entry for OldHash.
 func TestParseCacheEvictionShockwave(t *testing.T) {

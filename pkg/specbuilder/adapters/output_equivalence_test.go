@@ -5,11 +5,11 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/paths"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/paths"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 
-	mcptesting "github.com/lanceman/zqk/pkg/mcp/testing"
-	sbyaml "github.com/lanceman/zqk/pkg/specbuilder/yaml"
+	mcptesting "github.com/zqk-os/zqk/pkg/mcp/testing"
+	sbyaml "github.com/zqk-os/zqk/pkg/specbuilder/yaml"
 )
 
 // TestOutputEquivalence tests that the adapter produces equivalent output to the existing generator

@@ -12,7 +12,8 @@ import (
 	"sync/atomic"
 	"time"
 
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // Engine is the central in-process search orchestrator.
@@ -29,7 +30,12 @@ func NewEngine(projectRoot string) *Engine {
 	}
 }
 
-// BuildTrigramIndex explicitly builds and caches an in-memory trigram index for the project.
+// CachePath returns the persistent on-disk path for the cached trigram index.
+func (e *Engine) CachePath() string {
+	return filepath.Join(e.projectRoot, ".zqk", "cache", "trigram.idx")
+}
+
+// BuildTrigramIndex explicitly builds and caches an in-memory and on-disk trigram index.
 func (e *Engine) BuildTrigramIndex(opts SearchOptions) error {
 	root := e.projectRoot
 	if opts.Path != "" {
@@ -53,7 +59,45 @@ func (e *Engine) BuildTrigramIndex(opts SearchOptions) error {
 	e.indexMu.Lock()
 	e.cachedIndex = idx
 	e.indexMu.Unlock()
+
+	if e.projectRoot != "" {
+		cachePath := e.CachePath()
+		_ = fileutil.EnsureDir(filepath.Dir(cachePath))
+		_ = idx.SaveToFile(cachePath)
+	}
 	return nil
+}
+
+// LoadOrBuildIndex loads the index from memory or disk cache, or builds and saves it if absent.
+func (e *Engine) LoadOrBuildIndex(opts SearchOptions) (*TrigramIndex, error) {
+	e.indexMu.RLock()
+	idx := e.cachedIndex
+	e.indexMu.RUnlock()
+	if idx != nil {
+		return idx, nil
+	}
+
+	if e.projectRoot != "" {
+		cachePath := e.CachePath()
+		if fileutil.Exists(cachePath) {
+			loaded, err := LoadIndexFromFile(cachePath)
+			if err == nil && loaded != nil {
+				e.indexMu.Lock()
+				e.cachedIndex = loaded
+				e.indexMu.Unlock()
+				return loaded, nil
+			}
+		}
+	}
+
+	if err := e.BuildTrigramIndex(opts); err != nil {
+		return nil, err
+	}
+
+	e.indexMu.RLock()
+	idx = e.cachedIndex
+	e.indexMu.RUnlock()
+	return idx, nil
 }
 
 // Search executes an in-process search adhering to the provided options.
@@ -64,8 +108,8 @@ func (e *Engine) Search(ctx context.Context, opts SearchOptions) (*SearchResult,
 	if opts.MaxMatches <= 0 {
 		opts.MaxMatches = DefaultMaxMatches
 	}
-	if opts.MaxTokens <= 0 {
-		opts.MaxTokens = DefaultMaxTokens
+	if opts.MaxTokens < 0 {
+		opts.MaxTokens = 0
 	}
 
 	targetRoot := e.projectRoot
@@ -111,21 +155,23 @@ func (e *Engine) searchText(ctx context.Context, targetRoot string, opts SearchO
 		return nil, err
 	}
 
-	// If trigram index is enabled or cached, narrow candidate files
-	if opts.UseIndex && !opts.Regex && len(opts.Query) >= 3 {
-		e.indexMu.RLock()
-		idx := e.cachedIndex
-		e.indexMu.RUnlock()
-
+	// If trigram index is enabled or query is candidate-filterable (len >= 3 and not regex), narrow candidate files
+	if len(files) > 50 && (opts.UseIndex || len(opts.Query) >= 3) && !opts.Regex && len(opts.Query) >= 3 {
+		idx, _ := e.LoadOrBuildIndex(opts)
 		if idx != nil {
 			candidates := idx.FilterCandidates(opts.Query)
 			candidateMap := make(map[string]bool, len(candidates))
 			for _, c := range candidates {
-				candidateMap[c] = true
+				candidateMap[filepath.Clean(c)] = true
+				if abs, err := filepath.Abs(c); err == nil {
+					candidateMap[abs] = true
+				}
 			}
 			var filtered []string
 			for _, f := range files {
-				if candidateMap[f] {
+				cleanF := filepath.Clean(f)
+				absF, _ := filepath.Abs(f)
+				if candidateMap[cleanF] || candidateMap[absF] {
 					filtered = append(filtered, f)
 				}
 			}
@@ -217,7 +263,7 @@ func (e *Engine) searchText(ctx context.Context, targetRoot string, opts SearchO
 
 	for w := 0; w < numWorkers; w++ {
 		wg.Add(1)
-		go func() {
+		goroutinelabels.NewGoroutine("search_worker", "parallel trigram and text search").StartSimple(func() {
 			defer wg.Done()
 			for path := range fileCh {
 				if atomic.LoadInt32(&stopped) != 0 {
@@ -251,6 +297,9 @@ func (e *Engine) searchText(ctx context.Context, targetRoot string, opts SearchO
 
 				matchesMu.Lock()
 				for _, m := range fileMatches {
+					if len(m.LineContent) > 500 {
+						m.LineContent = m.LineContent[:500] + " ... [truncated]"
+					}
 					mTokens := EstimateMatchTokens(m)
 					curTokens := atomic.LoadInt32(&accumulatedTokens)
 					curCount := atomic.LoadInt32(&totalMatches)
@@ -275,7 +324,7 @@ func (e *Engine) searchText(ctx context.Context, targetRoot string, opts SearchO
 				}
 				matchesMu.Unlock()
 			}
-		}()
+		})
 	}
 
 	for _, f := range files {
@@ -289,7 +338,21 @@ func (e *Engine) searchText(ctx context.Context, targetRoot string, opts SearchO
 		}
 	}
 	close(fileCh)
-	wg.Wait()
+
+	waitDone := make(chan struct{})
+	goroutinelabels.NewGoroutine("search.wait", "wait for text search workers").StartSimple(func() {
+		wg.Wait()
+		close(waitDone)
+	})
+	select {
+	case <-waitDone:
+	case <-ctx.Done():
+		atomic.StoreInt32(&stopped, 1)
+		<-waitDone
+	case <-time.After(30 * time.Second):
+		atomic.StoreInt32(&stopped, 1)
+		<-waitDone
+	}
 
 	result.TotalMatches = len(result.Matches)
 	result.EstimatedTokens = int(atomic.LoadInt32(&accumulatedTokens))
@@ -327,7 +390,7 @@ func (e *Engine) searchAST(ctx context.Context, targetRoot string, opts SearchOp
 
 	for w := 0; w < numWorkers; w++ {
 		wg.Add(1)
-		go func() {
+		goroutinelabels.NewGoroutine("search_ast_worker", "parallel AST symbol search").StartSimple(func() {
 			defer wg.Done()
 			for path := range fileCh {
 				if atomic.LoadInt32(&stopped) != 0 {
@@ -365,6 +428,9 @@ func (e *Engine) searchAST(ctx context.Context, targetRoot string, opts SearchOp
 				matchesMu.Lock()
 				for _, m := range astMatches {
 					m.File = relPath
+					if len(m.LineContent) > 500 {
+						m.LineContent = m.LineContent[:500] + " ... [truncated]"
+					}
 					mTokens := EstimateMatchTokens(m)
 					curTokens := atomic.LoadInt32(&accumulatedTokens)
 					curCount := atomic.LoadInt32(&totalMatches)
@@ -389,7 +455,7 @@ func (e *Engine) searchAST(ctx context.Context, targetRoot string, opts SearchOp
 				}
 				matchesMu.Unlock()
 			}
-		}()
+		})
 	}
 
 	for _, f := range files {
@@ -403,7 +469,21 @@ func (e *Engine) searchAST(ctx context.Context, targetRoot string, opts SearchOp
 		}
 	}
 	close(fileCh)
-	wg.Wait()
+
+	waitDone := make(chan struct{})
+	goroutinelabels.NewGoroutine("search_ast.wait", "wait for AST search workers").StartSimple(func() {
+		wg.Wait()
+		close(waitDone)
+	})
+	select {
+	case <-waitDone:
+	case <-ctx.Done():
+		atomic.StoreInt32(&stopped, 1)
+		<-waitDone
+	case <-time.After(30 * time.Second):
+		atomic.StoreInt32(&stopped, 1)
+		<-waitDone
+	}
 
 	result.TotalMatches = len(result.Matches)
 	result.EstimatedTokens = int(atomic.LoadInt32(&accumulatedTokens))

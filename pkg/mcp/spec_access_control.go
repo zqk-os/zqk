@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"slices"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/objects"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // SpecLoader interface to avoid import cycle with pkg/objects

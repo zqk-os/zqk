@@ -5,11 +5,11 @@ import (
 	"strings"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/logging"
-	"github.com/lanceman/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/paths"
 )
 
 // findHashFile searches for a hash file using bucket key from index (bucket strategy) then base dir then scan.
@@ -115,7 +115,8 @@ func (cas *ContentAddressableStorage) WriteFileWithSync(filePath string, data []
 	if _, err := tmp.Write(data); err != nil {
 		return errfmt.Newf(ConstMiscFailedToWriteTempFile).Wrap(err)
 	}
-	// Per-OS durability: darwin no-ops (F_FULLFSYNC stalls); other GOOS fsync.
+	// Per-OS durability: Darwin queues file fsync to avoid blocking publication;
+	// other platforms fsync synchronously.
 	// TRACK: BLI-CEF-R2-REL-CAS-FSYNC
 	if err := CasPublishSyncFile(tmp); err != nil {
 		return err
@@ -150,7 +151,7 @@ func (cas *ContentAddressableStorage) WriteFileWithSync(filePath string, data []
 		break
 	}
 
-	// Per-OS directory durability after the hardlink (darwin no-op).
+	// Persist the published directory entry after the hardlink.
 	if err := CasPublishSyncDir(dir); err != nil {
 		return err
 	}
@@ -193,7 +194,7 @@ func (cas *ContentAddressableStorage) GetHashForID(objectID string) (string, err
 	// imply this ID is absent — Create can write a bucketed blob after a
 	// kind scan (scheduler_job / qa_success), then proveCreateVisibility
 	// would fail with "not found in index" while the YAML is on disk.
-	// TRACK: BLI-REDACTED
+	// TRACK: BLI-1785723654802038000-b14064bc
 	if cas.isNegativeMiss(objectID) {
 		return "", err
 	}
@@ -294,7 +295,7 @@ func (cas *ContentAddressableStorage) scanForObjectID(targetID string) (string, 
 // GetFilePathForID returns the file path for an object ID using the bucket key from the index (bucket strategy).
 // When the index has a bucket key for this ID, path is kindDir/bucketKey/hash.yaml; otherwise kindDir/hash.yaml.
 // If the index maps to a missing blob, the ghost mapping is dropped durably and a miss is returned.
-// TRACK: BLI-REDACTED
+// TRACK: BLI-1785895580100186000-c5539372
 func (cas *ContentAddressableStorage) GetFilePathForID(objectID string) (string, error) {
 	hash, err := cas.GetHashForID(objectID)
 	if err != nil {

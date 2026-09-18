@@ -4,8 +4,8 @@ import (
 	"context"
 	"sync/atomic"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/errfmt"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/errfmt"
 )
 
 // DefaultBatchSize is the default batch size for high-volume processing jobs

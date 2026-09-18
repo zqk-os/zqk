@@ -1,0 +1,7 @@
+Run garbage collector to prune orphaned JSONL stream segment files
+
+Usage:
+  zqk.test system stream-gc [flags]
+
+Global Flags:
+      --allow-degraded   Allow scheduler-dependent commands to run when scheduler daemon is not running

@@ -2,11 +2,14 @@ package search
 
 import (
 	"bytes"
+	"encoding/gob"
 	"strings"
 	"sync"
+	"time"
 	"unicode"
 
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // PackTrigram converts 3 bytes into a single uint32 for fast hashing and comparison.
@@ -101,29 +104,41 @@ func BuildIndex(files []string) (*TrigramIndex, error) {
 
 	for w := 0; w < numWorkers; w++ {
 		wg.Add(1)
-		go func() {
-			defer wg.Done()
-			for docID := range fileChan {
-				path := files[docID]
-				data, err := fileutil.ReadFile(path)
-				if err != nil || IsBinary(data) {
-					continue
+		goroutinelabels.NewGoroutine("search.trigram_worker", "extract trigrams from candidate files").
+			StartSimple(func() {
+				defer wg.Done()
+				for docID := range fileChan {
+					path := files[docID]
+					data, err := fileutil.ReadFile(path)
+					if err != nil || IsBinary(data) {
+						continue
+					}
+					// Always index in case-insensitive lowercase form for universal lookup
+					tgs := ExtractTrigrams(data, true)
+					results <- fileTrigrams{docID: docID, tgs: tgs}
 				}
-				// Always index in case-insensitive lowercase form for universal lookup
-				tgs := ExtractTrigrams(data, true)
-				results <- fileTrigrams{docID: docID, tgs: tgs}
-			}
-		}()
+			})
 	}
 
-	go func() {
-		for i := range files {
-			fileChan <- int32(i)
-		}
-		close(fileChan)
-		wg.Wait()
-		close(results)
-	}()
+	waitDone := make(chan struct{})
+	goroutinelabels.NewGoroutine("search.trigram_wait", "wait for trigram workers").
+		StartSimple(func() {
+			wg.Wait()
+			close(waitDone)
+		})
+
+	goroutinelabels.NewGoroutine("search.trigram_feed", "feed files to trigram workers").
+		StartSimple(func() {
+			for i := range files {
+				fileChan <- int32(i)
+			}
+			close(fileChan)
+			select {
+			case <-waitDone:
+			case <-time.After(60 * time.Second):
+			}
+			close(results)
+		})
 
 	for ft := range results {
 		for tg := range ft.tgs {
@@ -254,4 +269,46 @@ func LineSearch(filePath string, data []byte, matcher func(line []byte) (int, in
 	}
 
 	return matches
+}
+
+// SerializedTrigramIndex is the on-disk format for the cached trigram index.
+type SerializedTrigramIndex struct {
+	Files    []string
+	Postings map[uint32][]int32
+}
+
+// SaveToFile serializes the trigram index to disk using encoding/gob.
+func (idx *TrigramIndex) SaveToFile(path string) error {
+	idx.mu.RLock()
+	defer idx.mu.RUnlock()
+
+	var buf bytes.Buffer
+	enc := gob.NewEncoder(&buf)
+	payload := SerializedTrigramIndex{
+		Files:    idx.files,
+		Postings: idx.postings,
+	}
+	if err := enc.Encode(&payload); err != nil {
+		return err
+	}
+	return fileutil.WriteDurableFile(path, buf.Bytes(), 0o644)
+}
+
+// LoadIndexFromFile deserializes a cached trigram index from disk.
+func LoadIndexFromFile(path string) (*TrigramIndex, error) {
+	data, err := fileutil.ReadFile(path)
+	if err != nil {
+		return nil, err
+	}
+
+	var payload SerializedTrigramIndex
+	dec := gob.NewDecoder(bytes.NewReader(data))
+	if err := dec.Decode(&payload); err != nil {
+		return nil, err
+	}
+
+	return &TrigramIndex{
+		files:    payload.Files,
+		postings: payload.Postings,
+	}, nil
 }

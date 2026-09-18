@@ -10,7 +10,7 @@
 // Related: pkg/clihooks — built-in hook profile (JSON under .zqk/config/) with optional tray_entry per hook.
 // External automation contract: docs/architecture/CLI_EXTERNAL_HOOK_PROTOCOL.md
 //
-// Optional manifest path: [github.com/lanceman/zqk/pkg/datacell.TrayYAMLPath]. See docs/architecture/DATA_CELL_RUNTIME_ORGANISM.md.
+// Optional manifest path: [github.com/zqk-os/zqk/pkg/datacell.TrayYAMLPath]. See docs/architecture/DATA_CELL_RUNTIME_ORGANISM.md.
 package tray
 
 import (
@@ -21,9 +21,9 @@ import (
 
 	"gopkg.in/yaml.v3"
 
-	"github.com/lanceman/zqk/pkg/datacell"
-	"github.com/lanceman/zqk/pkg/errfmt"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/datacell"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 //go:embed default_tray.yaml

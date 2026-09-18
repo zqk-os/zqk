@@ -9,7 +9,7 @@ import (
 
 	"go.uber.org/goleak"
 
-	"github.com/lanceman/zqk/pkg/swarm"
+	"github.com/zqk-os/zqk/pkg/swarm"
 )
 
 func TestFeedbackProcessor_Retry(t *testing.T) {

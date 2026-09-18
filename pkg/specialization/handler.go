@@ -3,8 +3,8 @@ package specialization
 import (
 	"context"
 
-	"github.com/lanceman/zqk/pkg/infrastructure"
-	"github.com/lanceman/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/infrastructure"
+	"github.com/zqk-os/zqk/pkg/storage"
 )
 
 // Handler represents a specialized processing unit for a node.

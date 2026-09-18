@@ -15,7 +15,7 @@ import (
 func TestPkgDNAMustNotImportCodegen(t *testing.T) {
 	t.Parallel()
 	banned := []string{
-		"github.com/lanceman/zqk/internal/codegen",
+		"github.com/zqk-os/zqk/internal/codegen",
 	}
 
 	_, thisFile, _, ok := runtime.Caller(0)

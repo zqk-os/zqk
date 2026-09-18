@@ -8,7 +8,7 @@ import (
 	"regexp"
 	"strings"
 
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // receiverTypeName extracts clean receiver type name from AST FieldList.

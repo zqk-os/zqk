@@ -1,8 +1,8 @@
 package scheduler
 
 import (
-	"github.com/lanceman/zqk/pkg/datacell"
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/datacell"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 const emptyValue = ""
@@ -37,7 +37,7 @@ const (
 	JobTypeAutofixBatchCleanup        = "autofix_batch_cleanup"
 	JobTypeCleanup                    = "cleanup"
 	JobTypeCapOrchestrator            = "cap_orchestrator"
-	// JobTypeEmergencyManager is the out-of-band CAP health / recovery monitor (BLI-REDACTED).
+	// JobTypeEmergencyManager is the out-of-band CAP health / recovery monitor (BLI-1783831583919580000-8b543560).
 	JobTypeEmergencyManager = "emergency_manager"
 	// JobTypeConvergenceSessionTick applies test-bundle health → convergence_session updates (same payload as scheduler convergence measure --session-id).
 	JobTypeConvergenceSessionTick = "convergence_session_tick"

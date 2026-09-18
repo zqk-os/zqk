@@ -4,9 +4,9 @@
 package bldr_instance_v1
 
 import (
-	"github.com/lanceman/zqk/pkg/objects"
-	enumv "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/pipeline_definition"
-	"github.com/lanceman/zqk/pkg/specbuilder/instance_builders"
+	"github.com/zqk-os/zqk/pkg/objects"
+	enumv "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/pipeline_definition"
+	"github.com/zqk-os/zqk/pkg/specbuilder/instance_builders"
 )
 
 // PipelineDefinitionInstanceBuilder builds pipeline_definition instances

@@ -9,18 +9,18 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/execwrap"
-	"github.com/lanceman/zqk/pkg/zqkenv"
+	"github.com/zqk-os/zqk/pkg/execwrap"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/datacell"
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/paths"
-	_ "github.com/lanceman/zqk/pkg/specbuilder/bldr_instance_v1" // Register instance builders (was via pkg/testing)
-	_ "github.com/lanceman/zqk/pkg/specbuilder/bldr_v2"          // Register spec builders (was via pkg/testing)
-	"github.com/lanceman/zqk/pkg/storage"
-	"github.com/lanceman/zqk/pkg/testkit"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/datacell"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
+	_ "github.com/zqk-os/zqk/pkg/specbuilder/bldr_instance_v1" // Register instance builders (was via pkg/testing)
+	_ "github.com/zqk-os/zqk/pkg/specbuilder/bldr_v2"          // Register spec builders (was via pkg/testing)
+	"github.com/zqk-os/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/testkit"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // testEnvMu serializes tests that mutate process-wide env vars (notably ZQK_TEST_ROOT)
@@ -231,7 +231,7 @@ func SetupTestEnvironment(t *testing.T) *TestEnvironment {
 
 	// Always build/copy CLI from projectRoot. Scheduler-injected ZQK_TEST_CLI_BINARY can point at a
 	// daemon binary that predates the Local CI workdir checkout (e.g. template --output - semantics).
-	// TRACK: BLI-REDACTED — draft-plane / Local CI binary-SHA parity.
+	// TRACK: BLI-1785443942668406000-1ec5c811 — draft-plane / Local CI binary-SHA parity.
 	sharedBin := getSharedCLIBinary(t, projectRoot)
 	cliBinary := filepath.Join(tmpDir, "zqk-admin")
 	data, err := fileutil.ReadFile(sharedBin)
@@ -296,7 +296,7 @@ func (te *TestEnvironment) CreateCLICommand(args ...string) *exec.Cmd {
 	//
 	// Tests spell this as the single wireExecForTest call; this file is a non-test file and cannot
 	// reference it, so the two-line form stays here.
-	// TRACK: BLI-REDACTED — identity isolation belongs in zqkenv, but that
+	// TRACK: BLI-1787558884394841000-7dbc6d50 — identity isolation belongs in zqkenv, but that
 	// function is also on production spawn paths, so widening it needs its own pass.
 	zqkenv.WireExecForIsolatedProject(cmd, te.TestRoot)
 	cmd.Env = EnvWithTestRoot(te.TestRoot)

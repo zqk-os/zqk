@@ -4,10 +4,10 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/lanceman/zqk/pkg/convergerollup"
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/quality"
+	"github.com/zqk-os/zqk/pkg/convergerollup"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/quality"
 )
 
 // CEFDiamondMeasureResult is the CEF diamond evaluation-surface payload for convergence measure.

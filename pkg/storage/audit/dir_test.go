@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/paths"
 )
 
 func TestMonthlyDir(t *testing.T) {

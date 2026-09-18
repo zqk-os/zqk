@@ -4,7 +4,7 @@ import (
 	"crypto/sha256"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/integrity"
+	"github.com/zqk-os/zqk/pkg/integrity"
 )
 
 // Test identifiers reused across test cases.

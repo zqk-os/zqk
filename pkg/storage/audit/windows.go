@@ -3,7 +3,7 @@ package audit
 import (
 	"time"
 
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // WindowsOverlap reports whether [start1, end1) overlaps [start2, end2).

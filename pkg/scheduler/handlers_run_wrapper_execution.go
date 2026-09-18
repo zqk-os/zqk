@@ -11,19 +11,18 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/lanceman/zqk/internal/cli"
-	"github.com/lanceman/zqk/pkg/brand"
-	"github.com/lanceman/zqk/pkg/config"
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/logging"
-	"github.com/lanceman/zqk/pkg/paths"
-	storagepkg "github.com/lanceman/zqk/pkg/storage"
-	"github.com/lanceman/zqk/pkg/testkit"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
-	"github.com/lanceman/zqk/pkg/when"
-	"github.com/lanceman/zqk/pkg/zqkenv"
-	"github.com/lanceman/zqk/pkg/zqktime"
+	"github.com/zqk-os/zqk/pkg/brand"
+	"github.com/zqk-os/zqk/pkg/config"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/paths"
+	storagepkg "github.com/zqk-os/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/testkit"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/when"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
+	"github.com/zqk-os/zqk/pkg/zqktime"
 )
 
 // runWrapperExecPrep holds resolved command, retry tuning, and timeout for run_wrapper execution.
@@ -85,7 +84,7 @@ func (h *RunWrapperHandler) prepareRunWrapperExecution(job *ScheduledJob) runWra
 		}
 		if projectRoot == emptyValue {
 			if wd, err := fileutil.Getwd(); err == nil {
-				projectRoot = cli.ResolveProjectRoot(wd)
+				projectRoot = paths.ResolveProjectRoot(wd)
 			}
 		}
 		command = resolveSchedulerCLIBinary(projectRoot)

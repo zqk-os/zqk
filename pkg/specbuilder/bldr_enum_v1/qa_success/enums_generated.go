@@ -4,8 +4,8 @@
 package qa_success
 
 import (
-	base_objectenum "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
-	shared_qa_successenum "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/shared_qa_success"
+	base_objectenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
+	shared_qa_successenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/shared_qa_success"
 )
 
 type Plane = base_objectenum.Plane

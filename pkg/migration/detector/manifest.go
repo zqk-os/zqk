@@ -8,10 +8,10 @@ import (
 
 	"gopkg.in/yaml.v3"
 
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/paths"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
-	"github.com/lanceman/zqk/pkg/zqktime"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/paths"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/zqktime"
 )
 
 const emptyValue = ""
@@ -31,7 +31,7 @@ type CompatibilityConstraints struct {
 
 	// Module/dependency requirements
 	Modules map[string]string `yaml:"modules,omitempty"` // module -> version constraint
-	// Example: modules: { "github.com/lanceman/zqk/pkg/graph": ">=1.0.0" }
+	// Example: modules: { "github.com/zqk-os/zqk/pkg/graph": ">=1.0.0" }
 
 	// Backend requirements
 	Backends map[string]string `yaml:"backends,omitempty"` // backend -> version constraint

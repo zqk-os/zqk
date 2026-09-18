@@ -3,9 +3,9 @@ package system
 import (
 	"os"
 
-	"github.com/lanceman/zqk/pkg/datacell"
-	"github.com/lanceman/zqk/pkg/storage/migration"
-	"github.com/lanceman/zqk/pkg/zqkenv"
+	"github.com/zqk-os/zqk/pkg/datacell"
+	"github.com/zqk-os/zqk/pkg/storage/migration"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 
 	"bufio"
 	"context"
@@ -16,17 +16,18 @@ import (
 
 	"github.com/spf13/cobra"
 
-	clicontext "github.com/lanceman/zqk/internal/cli/context"
-	"github.com/lanceman/zqk/pkg/appledouble"
-	"github.com/lanceman/zqk/pkg/brand"
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/logging"
-	"github.com/lanceman/zqk/pkg/mcp"
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/paths"
-	"github.com/lanceman/zqk/pkg/storage"
-	"github.com/lanceman/zqk/pkg/utils/fileutil"
+	clicontext "github.com/zqk-os/zqk/internal/cli/context"
+	"github.com/zqk-os/zqk/pkg/appledouble"
+	"github.com/zqk-os/zqk/pkg/brand"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/docman"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/mcp"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // InitMode represents the type of initialization
@@ -75,7 +76,7 @@ func runInit(_ *cobra.Command, projectName, template string, force bool, snapsho
 	// Auto-detect legacy mode for existing codebases (Painless Drop-In)
 	if !legacy && snapshotPath == emptyValue {
 		if _, err := fileutil.Stat(filepath.Join(projectRoot, paths.ProjectDataDir)); fileutil.IsNotExist(err) {
-			entries, err := os.ReadDir(projectRoot)
+			entries, err := fileutil.ReadDir(projectRoot)
 			if err == nil {
 				for _, entry := range entries {
 					name := entry.Name()
@@ -235,22 +236,29 @@ func runInit(_ *cobra.Command, projectName, template string, force bool, snapsho
 		}
 	}
 
-	if zqkenv.IsCommunityEdition {
-		// Inject Agent Boot Protocol rules for frictionless onboarding
-		if err := injectAgentBootProtocol(projectRoot, legacy, logger); err != nil {
-			logging.Fluent(logger).Warn("Failed to inject agent boot protocol").WithError(err).Log()
+	// Ensure maintenance retention jobs on init (TDE-1789692371040218000-2330de1d)
+	if !withMaintenanceJobs {
+		if _, err := EnsureRetentionJobsInProject(projectRoot, logger, nil); err != nil {
+			logging.Fluent(logger).Warn("Failed to ensure maintenance jobs on init").WithError(err).Log()
 		}
-
-		// Generate the human-facing Getting Started guide
-		if err := generateGettingStartedGuide(projectRoot, logger); err != nil {
-			logging.Fluent(logger).Warn("Failed to generate ZQK_GETTING_STARTED.md").WithError(err).Log()
-		}
-
-		logging.Fluent(logger).Info("Welcome to ZQK Community Edition; initialization complete").
-			String(initLogFieldProject, projectRoot).
-			String(initLogFieldNote, "Run 'zqk-community system start-here' for the interactive onboarding tutorial").
-			Log()
 	}
+
+	// Inject Agent Boot Protocol rules for frictionless onboarding
+	if err := injectAgentBootProtocol(projectRoot, legacy, logger); err != nil {
+		logging.Fluent(logger).Warn("Failed to inject agent boot protocol").WithError(err).Log()
+	}
+
+	// Generate the human-facing Getting Started guide
+	if err := generateGettingStartedGuide(projectRoot, logger); err != nil {
+		logging.Fluent(logger).Warn("Failed to generate ZQK_GETTING_STARTED.md").WithError(err).Log()
+	}
+
+	welcomeMsg := fmt.Sprintf("Welcome to %s; initialization complete", brand.ProductName())
+	tutorialNote := fmt.Sprintf("Run '%s system start-here' for the interactive onboarding tutorial", brand.ExecutableName())
+	logging.Fluent(logger).Info(welcomeMsg).
+		String(initLogFieldProject, projectRoot).
+		String(initLogFieldNote, tutorialNote).
+		Log()
 
 	return nil
 }
@@ -319,6 +327,10 @@ func runGreenfieldInit(projectRoot, projectName, template string, force bool, lo
 		logging.Fluent(logger).Warn("Failed to create system account").WithError(err).Log()
 	}
 
+	if err := seedStarterKernelGraph(projectRoot, logger); err != nil {
+		logging.Fluent(logger).Warn("Failed to seed starter kernel graph").WithError(err).Log()
+	}
+
 	// Create project config in .zqk/config/config.yaml and .zqk/config.yaml
 	if err := writeProjectConfigFiles(projectDataDir, projectName, template, force); err != nil {
 		return errfmt.Errorf(initErrCreateConfigFileFmt, err)
@@ -334,11 +346,27 @@ func runGreenfieldInit(projectRoot, projectName, template string, force bool, lo
 		logging.Fluent(logger).Warn("Failed to write brand settings").WithError(err).Log()
 	}
 
+	// Write root isolation and kernel config files
+	if err := writeRootIsolationFiles(projectRoot, force, logger); err != nil {
+		logging.Fluent(logger).Warn("Failed to write root isolation files").WithError(err).Log()
+	}
+
 	// Persist bundled object_spec rows from .zqk/specs/objects (REQ-035 / CRIT-9035).
 	if _, err := migration.EnsureBundledObjectSpecsMigrated(context.Background(), projectRoot, logger); err != nil {
 		logging.Fluent(logger).Warn("Bundled object_spec migration did not complete").
 			WithError(err).
 			String("note", "Run from repo after fixing storage, or use zqk spec list (file fallback)").
+			Log()
+	}
+
+	// Register shipped documentation in doc_entry graph (architecture, best-practices, onboarding).
+	// Skips archive trees and docs/launch per TDE-1789629835679972000-dc60b78d / REQ-1789654891514127000-25cbd9d1.
+	if reg, skip, err := docman.RegisterShippedDocs(context.Background(), projectRoot, logger); err != nil {
+		return errfmt.Newf("failed to register shipped documentation in kernel graph").Wrap(err)
+	} else if reg > 0 || skip > 0 {
+		logging.Fluent(logger).Info("Shipped documentation registered in graph").
+			Int("registered", reg).
+			Int("skipped", skip).
 			Log()
 	}
 
@@ -456,6 +484,38 @@ func runLegacyInit(projectRoot, projectName, template string, force bool, logger
 			String("note", "Run from repo after fixing storage, or use zqk spec list (file fallback)").
 			Log()
 	}
+
+	// Register shipped documentation in doc_entry graph (architecture, best-practices, onboarding).
+	if reg, skip, err := docman.RegisterShippedDocs(context.Background(), projectRoot, logger); err != nil {
+		return errfmt.Newf("failed to register shipped documentation").Wrap(err)
+	} else if reg > 0 || skip > 0 {
+		logging.Fluent(logger).Info("Shipped documentation registered in graph").
+			Int("registered", reg).
+			Int("skipped", skip).
+			Log()
+	}
+	// Create system account if missing
+	if err := writeSystemAccount(projectRoot); err != nil {
+		logging.Fluent(logger).Warn("Failed to create system account").WithError(err).Log()
+	}
+
+	// Create zqk-settings.yaml in project root and config dir
+	if err := writeBrandSettings(projectRoot, force); err != nil {
+		logging.Fluent(logger).Warn("Failed to write brand settings").WithError(err).Log()
+	}
+
+	// Write root isolation and kernel config files
+	if err := writeRootIsolationFiles(projectRoot, force, logger); err != nil {
+		logging.Fluent(logger).Warn("Failed to write root isolation files").WithError(err).Log()
+	}
+
+	// Automatically configure MCP for supported IDEs and Agents
+	if err := mcp.AutoInstall(projectRoot, logger); err != nil {
+		logging.Fluent(logger).Warn("Failed to auto-install MCP server configuration").
+			WithError(err).
+			Log()
+	}
+
 	// Discovery wizard runs when --discover is set (see runInit); use "zqk system check --auto-fix" to register hashes for discovered objects.
 
 	logging.Fluent(logger).Info("Legacy project initialized successfully").
@@ -1113,12 +1173,12 @@ const agentBootProtocolTemplate = `
 You are connected to the ZQK Knowledge Kernel via MCP.
 
 **The ZQK Philosophy (The Zen Way):**
-Standard AI agents rely on unstructured markdown files (like this one) for context. This is brittle, untraceable, and fails at scale. 
-ZQK replaces unstructured markdown with rigid, semantic **Objects** (Goals, Requirements, Tasks, etc.) stored in a local graph. 
+Standard AI agents rely on unstructured markdown files (like this one) for context. This is brittle, untraceable, and fails at scale.
+ZQK replaces unstructured markdown with rigid, semantic **Objects** (Goals, Requirements, Tasks, etc.) stored in a local graph.
 Why? Because Objects have strict lifecycles, assignable owners, and determinable states. They provide the traceability and governance that enterprise teams require. This file is only used to bootstrap your connection—from this point on, all project state must live in the ZQK Object Graph.
 
 **Your First Task (Workspace Analysis):**
-Look at the current repository. 
+Look at the current repository.
 - If this is an **existing codebase (brownfield)**: Before you try to generate new ZQK objects or suggest massive architectural changes, run a lay-of-the-land repository analysis. Ask the user probing and clarifying questions to understand their current stack, so we don't interfere with their existing work.
 - If this is a **brand new project (greenfield)**: Proactively interview the user about their vision and ideation. Do not wait for them to orchestrate you. Ask them what they want to build, then synthesize their response into a ZQK 'Goal' object and subsequent 'Requirement' objects in the graph.
 
@@ -1178,7 +1238,7 @@ func generateGettingStartedGuide(projectRoot string, logger logging.Logger) erro
 You have successfully initialized %s Community Edition. This is not just another project management tool—it is a **Knowledge Kernel** designed to safely orchestrate AI agents.
 
 ## The Zen Way: Objects over Markdown
-Most AI setups rely on chaotic markdown files (e.g., '.iderules' or 'prompt.txt'). Markdown is brittle and untraceable. 
+Most AI setups rely on chaotic markdown files (e.g., '.iderules' or 'prompt.txt'). Markdown is brittle and untraceable.
 %s uses **Objects**. Every goal, requirement, task, and policy in this project is a rigid, cryptographically-hashed object stored in the local '.csnap' graph. When an AI agent connects via MCP, it reads these objects directly. It cannot hallucinate requirements, because the core engine will reject any code that doesn't map to a valid object.
 
 ## Policies & The Validation DSL

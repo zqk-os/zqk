@@ -4,8 +4,8 @@
 package lifecycles
 
 import (
-	base_objectenum "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
-	shared_lifecyclesenum "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/shared_lifecycles"
+	base_objectenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
+	shared_lifecyclesenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/shared_lifecycles"
 )
 
 type PriorityTier = base_objectenum.PriorityTier

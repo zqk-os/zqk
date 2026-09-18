@@ -1,8 +1,8 @@
 package mcp
 
 import (
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/objects"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // applyObjectAccessControl applies object-level access control to command results

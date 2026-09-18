@@ -5,7 +5,7 @@ import (
 	"errors"
 	"testing"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
 )
 
 type fakeBulk struct {

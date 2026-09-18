@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/hive/capability"
+	"github.com/zqk-os/zqk/pkg/hive/capability"
 	"github.com/stretchr/testify/assert"
 )
 

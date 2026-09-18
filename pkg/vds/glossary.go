@@ -4,7 +4,7 @@ import (
 	"context"
 	"strings"
 
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // Durable glossary identity (portable across projects). Instance GLS-* CAS ids are not.

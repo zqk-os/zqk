@@ -9,8 +9,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/paths"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/paths"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // moduleRootFromGoEnv returns the directory containing go.mod for the current module (`go env GOMOD`).

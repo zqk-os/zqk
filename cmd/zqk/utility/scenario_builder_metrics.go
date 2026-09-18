@@ -1,7 +1,7 @@
 package utility
 
 import (
-	"github.com/lanceman/zqk/pkg/observability"
+	"github.com/zqk-os/zqk/pkg/observability"
 )
 
 // MetricRecorder is an alias for the shared observability.Recorder interface

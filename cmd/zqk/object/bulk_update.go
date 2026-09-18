@@ -10,18 +10,18 @@ import (
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v3"
 
-	"github.com/lanceman/zqk/internal/cli"
-	clitool "github.com/lanceman/zqk/pkg/cli" // Re-add this import
-	"github.com/lanceman/zqk/pkg/cli/bldr_cli_cmd_v1"
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/goroutinelabels"
-	"github.com/lanceman/zqk/pkg/logging" // Keep for GetCanonicalKind
-	"github.com/lanceman/zqk/pkg/objectget"
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/process"
-	"github.com/lanceman/zqk/pkg/storage"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/internal/cli"
+	clitool "github.com/zqk-os/zqk/pkg/cli" // Re-add this import
+	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
+	"github.com/zqk-os/zqk/pkg/logging" // Keep for GetCanonicalKind
+	"github.com/zqk-os/zqk/pkg/objectget"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/process"
+	"github.com/zqk-os/zqk/pkg/storage"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // NewBulkUpdateCmd creates a new bulk update command (spec: .zqk/cli/specs/object/bulk/update_command.yaml).
@@ -274,7 +274,7 @@ func runBulkUpdate(cmd *cobra.Command, args []string) error {
 
 		pruneUnknownFields(objectData, kind)
 
-		// TRACK: BLI-REDACTED
+		// TRACK: BLI-1785909672838827000-9fca84f5
 		_ = objectget.StripReferenceResolverOverlayFields(objectData)
 
 		if dryRun {

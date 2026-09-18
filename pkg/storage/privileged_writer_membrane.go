@@ -1,15 +1,16 @@
 package storage
 
 import (
-	caspkg "github.com/lanceman/zqk/pkg/storage/cas"
-	"github.com/lanceman/zqk/pkg/zqkenv"
+	caspkg "github.com/zqk-os/zqk/pkg/storage/cas"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 
 	"context"
 	"path/filepath"
 	"strings"
 
-	"github.com/lanceman/zqk/pkg/brand"
-	"github.com/lanceman/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/brand"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // socketFileExtension is the UNIX-domain-socket file suffix used by helper daemons.
@@ -30,16 +31,21 @@ func DefaultPrivilegedWriterSocketPath() string {
 	return filepath.Join("/tmp", name)
 }
 
+func privilegedWriterSocketExists() bool {
+	path := DefaultPrivilegedWriterSocketPath()
+	if v := strings.TrimSpace(zqkenv.PrivilegedWriterSocket().Get()); v != "" {
+		path = v
+	}
+	_, err := fileutil.Stat(path)
+	return err == nil
+}
+
 // privilegedWriterLocalWriteAllowed reports whether CAS may write locally when the
 // PrivilegedWriter daemon is down. Production stays fail-closed; tests opt in via
 // ZQK_TEST_ALLOW_CAS_FALLTHROUGH=1 (see pkg/testing test setup).
 // TRACK: BLI-COMMS-CURSOR-TPM-DELIVER-ATTN-001 (test harness) — TestRoot auto-allow is
 // belt-and-suspenders with zqkenv.ApplyIsolatedStorageEnv; prefer explicit fallthrough flag.
 func privilegedWriterLocalWriteAllowed(projectRoots ...string) bool {
-	// We are the membrane endpoint — never Dial our own socket (self-RPC until EMFILE).
-	if zqkenv.IsCommunityEdition {
-		return true
-	}
 	// TRACK: BLI-CEF-R20-SINGLE-WRITER-BLI-001
 	if zqkenv.PrivilegedWriterDaemonRole() {
 		return true
@@ -58,7 +64,14 @@ func privilegedWriterLocalWriteAllowed(projectRoots ...string) bool {
 			return true
 		}
 	}
-	return zqkenv.IsInTest()
+	if zqkenv.IsInTest() {
+		return true
+	}
+	// Socket-absent default: if PrivilegedWriter socket does not exist, write locally (open-core / standalone).
+	if !privilegedWriterSocketExists() {
+		return true
+	}
+	return false
 }
 
 func dialPrivilegedWriter() (*IPCWriter, error) {
@@ -87,7 +100,7 @@ func writeObjectViaPrivilegedWriter(ctx context.Context, id, kind string, data [
 // When test local-write is allowed (ZQK_TEST_ROOT or ZQK_TEST_ALLOW_CAS_FALLTHROUGH=1 or IsTestOrTempProjectRoot),
 // always use localFn and skip the daemon — a live LaunchAgent would otherwise write into
 // the studio tree while the test asserts paths under an isolated root (ghost draft create).
-// TRACK: BLI-REDACTED — membrane must not leak test creates into live CAS.
+// TRACK: BLI-1785886134649966000-7732876c — membrane must not leak test creates into live CAS.
 func (f *FileObjectStorage) writeCASThroughMembrane(ctx context.Context, id, kind string, data []byte, isDraft bool, localFn func() error) error {
 	if err := caspkg.RefuseCriteriaCASWithoutCategory(kind, isDraft, data); err != nil {
 		return err

@@ -6,10 +6,10 @@ import (
 	"path/filepath"
 	"strings"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/logging"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/logging"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 func (f *FileObjectStorage) findDependents(ctx context.Context, id, _ string) ([]string, error) {
@@ -33,7 +33,7 @@ func (f *FileObjectStorage) findDependents(ctx context.Context, id, _ string) ([
 
 	// Index not ready: try disk cache once. Align with ensureReverseReferenceIndexLoaded:
 	// missing cache → ready-empty (incremental CUD populates); LoadCache I/O error → fail closed.
-	// Never processDir scan. TRACK: BLI-REDACTED / BLI-CEF-R2-REL-REVINDEX-FAILOPEN
+	// Never processDir scan. TRACK: BLI-1785351629281373000-752ddc48 / BLI-CEF-R2-REL-REVINDEX-FAILOPEN
 	if f.projectRoot != emptyValue {
 		loaded, err := index.LoadCache(f.projectRoot)
 		if err != nil {

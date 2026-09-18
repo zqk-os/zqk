@@ -4,7 +4,7 @@
 package bucketing_strategies
 
 import (
-	shared_bucketing_strategiesenum "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/shared_bucketing_strategies"
+	shared_bucketing_strategiesenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/shared_bucketing_strategies"
 )
 
 type Status = shared_bucketing_strategiesenum.Status

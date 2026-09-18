@@ -1,7 +1,7 @@
 package objects
 
 import (
-	"github.com/lanceman/zqk/pkg/datacell"
+	"github.com/zqk-os/zqk/pkg/datacell"
 )
 
 // StorageType represents the physical storage mechanism for a spec-backed kind.

@@ -5,15 +5,15 @@ import (
 	"strings"
 	"testing"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/paths"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
-	"github.com/lanceman/zqk/pkg/zqktime"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/zqktime"
 )
 
-// TRACK: REQ-REDACTED
+// TRACK: REQ-1785895564241296000-bf266adb
 
 const objectStatusReview = "review"
 
@@ -161,7 +161,7 @@ func TestObjectDraftPlane_GetByID_ListOmitsDrafts(t *testing.T) {
 		t.Fatalf("Create draft: %v", err)
 	}
 	// Draft-first membrane coerces create status to origin; promote via Update for CAS-visible peer.
-	// TRACK: BLI-REDACTED — draft-plane create / promote membrane.
+	// TRACK: BLI-1785443942668406000-1ec5c811 — draft-plane create / promote membrane.
 	CreateCASVisible(t, fileStorage, ctx, secCtx, draftPlaneDocEntry(casID, "Already review", "review"), "review")
 
 	// Dual-read: draft is gettable by id even though it is not in CAS.
@@ -226,7 +226,7 @@ func TestObjectDraftPlane_GetByID_ListOmitsDrafts(t *testing.T) {
 func TestObjectDraftPlane_ListOmitsConceptualEvenWithStatusDraftFilter(t *testing.T) {
 	// `zqk object list --filter status=draft` (and status=conceptual) must never
 	// return conceptual objects that exist only on the draft plane.
-	// TRACK: BLI-REDACTED
+	// TRACK: BLI-1786689721908382000-6402a858
 	_, fileStorage, _ := SetupTestingFactoryCompleteTestEnvironmentForTest(t)
 	secCtx := pkgctx.NewSystemSecurityContext()
 	ctx := WithCLIOperation(pkgctx.NewSystemContext())
@@ -363,7 +363,7 @@ func TestShouldUseObjectDraftPlane_glossaryActiveUsesCAS(t *testing.T) {
 }
 
 func TestCreate_policyActiveCoercedToDraftPlane(t *testing.T) {
-	// TRACK: REQ-REDACTED
+	// TRACK: REQ-1785895564241296000-bf266adb
 	tmpDir, fileStorage, _ := SetupTestingFactoryCompleteTestEnvironmentForTest(t)
 	secCtx := pkgctx.NewSystemSecurityContext()
 	ctx := WithCLIOperation(pkgctx.NewSystemContext())
@@ -582,3 +582,32 @@ func TestObjectDraftPlane_IsDraftPlaneOnly(t *testing.T) {
 	}
 }
 
+func TestEnsureCASIndexFromPaths_ExcludesDraftPlane(t *testing.T) {
+	tmpDir, fileStorage, _ := SetupTestingFactoryCompleteTestEnvironmentForTest(t)
+	secCtx := pkgctx.NewSystemSecurityContext()
+	ctx := WithCLIOperation(pkgctx.NewSystemContext())
+
+	draftID := "DOC-draft-excl-001"
+	draftDoc := draftPlaneDocEntry(draftID, "Draft Doc", "draft")
+	if err := fileStorage.Create(ctx, secCtx, draftDoc); err != nil {
+		t.Fatalf("Create draft doc: %v", err)
+	}
+
+	draftPath := ObjectDraftPlanePath(tmpDir, objects.KindDocEntry, draftID)
+	// Try to ensure CAS index with this draft path
+	err := fileStorage.EnsureCASIndexFromPaths(objects.KindDocEntry, map[string]string{
+		draftID: draftPath,
+	})
+	if err != nil {
+		t.Fatalf("EnsureCASIndexFromPaths returned error: %v", err)
+	}
+
+	// Verify that the CAS index does NOT contain this draft ID
+	cas, err := fileStorage.getContentAddressableStorage(objects.KindDocEntry)
+	if err != nil {
+		t.Fatalf("getContentAddressableStorage: %v", err)
+	}
+	if hash, err := cas.GetIndex().GetHash(draftID); err == nil && hash != "" {
+		t.Fatalf("CAS index should NOT map draft-plane ID %s, but got %s", draftID, hash)
+	}
+}

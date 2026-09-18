@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/goroutinelabels"
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 )
 
 // MockServer simulates the locking pattern without the full MCP server

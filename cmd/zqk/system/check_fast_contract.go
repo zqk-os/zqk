@@ -6,7 +6,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// TRACK: BLI-REDACTED — replace --fast with CAS-hash attestation
+// TRACK: BLI-1785723654802038000-b14064bc — replace --fast with CAS-hash attestation
 // (reuse last validated write when content hash unchanged). Until then, reduced
 // surfaces are partial, non-authoritative, and must never mutate. Also: autofix
 // must not demote lifecycle status to error without an explicit capability gate.
@@ -35,6 +35,9 @@ func refuseReducedSurfaceWithMutatingFlags(cmd *cobra.Command) error {
 	if !checkRefsReduced(cmd) {
 		return nil
 	}
+	// BLI-CEF-USE-004: Explicitly warn user/agent so the upgrade is visible and not silent.
+	fmt.Fprintf(cmd.ErrOrStderr(), "warning: --fast or --check-refs=false cannot be combined with mutation flags (--auto-fix/--force). Upgrading to full reference integrity check.\n")
+
 	if cmd.Flags().Lookup(checkFlagFast) != nil {
 		_ = cmd.Flags().Set(checkFlagFast, "false")
 	}

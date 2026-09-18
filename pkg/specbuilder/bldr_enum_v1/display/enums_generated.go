@@ -4,8 +4,8 @@
 package display
 
 import (
-	base_objectenum "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
-	shared_displaysenum "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/shared_displays"
+	base_objectenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
+	shared_displaysenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/shared_displays"
 )
 
 type Plane = base_objectenum.Plane

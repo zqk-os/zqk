@@ -3,10 +3,10 @@ package storage
 import (
 	"path/filepath"
 
-	caspkg "github.com/lanceman/zqk/pkg/storage/cas"
+	caspkg "github.com/zqk-os/zqk/pkg/storage/cas"
 
-	"github.com/lanceman/zqk/pkg/storage/filecas"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/storage/filecas"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 
 	"testing"
 )

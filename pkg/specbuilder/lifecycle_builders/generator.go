@@ -7,11 +7,11 @@ import (
 
 	"golang.org/x/sync/errgroup"
 
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/paths"
-	sbyaml "github.com/lanceman/zqk/pkg/specbuilder/yaml"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
+	sbyaml "github.com/zqk-os/zqk/pkg/specbuilder/yaml"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // LifecycleGenerator generates lifecycle files from versioned builders

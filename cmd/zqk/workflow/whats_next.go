@@ -9,31 +9,31 @@ import (
 	"strings"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/execwrap"
-	"github.com/lanceman/zqk/pkg/zqkenv"
+	"github.com/zqk-os/zqk/pkg/execwrap"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 
 	"github.com/spf13/cobra"
 
-	"github.com/lanceman/zqk/internal/cli"
-	"github.com/lanceman/zqk/pkg/agentfeed"
-	"github.com/lanceman/zqk/pkg/agentprompt"
-	clipkg "github.com/lanceman/zqk/pkg/cli"
-	"github.com/lanceman/zqk/pkg/cli/bldr_cli_cmd_v1"
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/interactionpolicy"
-	"github.com/lanceman/zqk/pkg/logging"
-	"github.com/lanceman/zqk/pkg/objects"
-	observerpkg "github.com/lanceman/zqk/pkg/observer"
-	"github.com/lanceman/zqk/pkg/storage"
-	"github.com/lanceman/zqk/pkg/tpm"
-	"github.com/lanceman/zqk/pkg/workflow/whatsnext"
+	"github.com/zqk-os/zqk/internal/cli"
+	"github.com/zqk-os/zqk/pkg/agentfeed"
+	"github.com/zqk-os/zqk/pkg/agentprompt"
+	clipkg "github.com/zqk-os/zqk/pkg/cli"
+	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/interactionpolicy"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/objects"
+	observerpkg "github.com/zqk-os/zqk/pkg/observer"
+	"github.com/zqk-os/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/tpm"
+	"github.com/zqk-os/zqk/pkg/workflow/whatsnext"
 )
 
 // Default CLI alpha readiness plan (repo lane); still resolved when status is paused.
-const defaultAlphaPriorityPlanID = "PRI-REDACTED"
+const defaultAlphaPriorityPlanID = "PRI-1785898223552319000-f7d266b5"
 
 const whatsNextSchema = "zqk_whats_next_v1"
 
@@ -65,7 +65,7 @@ type whatsNextOut struct {
 }
 
 // whatsNextGuidingStep is compiled hunger (POL-AGENT-INTERACTION-POLICY-001).
-// TRACK: BLI-REDACTED
+// TRACK: BLI-1787035087372193000-c022117d
 type whatsNextGuidingStep struct {
 	Event       string `json:"event"`
 	PolicyID    string `json:"policy_id"`
@@ -460,7 +460,7 @@ func runWhatsNextSyncSweep(cmd *cobra.Command, args []string, proc *cli.Processo
 
 	if taskPrompt != "" {
 		out.AgentInstruction = taskPrompt
-	} else if secCtx != nil && secCtx.AccountID == "ACC-1785920548450214012-68b850c0" {
+	} else if secCtx != nil && secCtx.AccountID == objects.DefaultSystemAccountID {
 		out.AgentInstruction = whatsnext.SelectCAPInstruction(projectRoot, out.BacklogCountsByStatus)
 	} else if out.AgentInstruction == "continue" || out.AgentInstruction == "" {
 		if promptData, err := agentprompt.BuildOnboardingPrompt(ctx, sp, 3000); err == nil {
@@ -625,7 +625,7 @@ func resolvePriorityPlanForWhatsNext(ctx context.Context, sp workflowStorage, ex
 
 	// 3. Collect all candidate plans (execution + grooming next-columns).
 	// Must stay in sync with pkg/workflow/whatsnext (PlanWhatsNextCandidateStatuses).
-	// TRACK: BLI-REDACTED
+	// TRACK: BLI-1787035087372193000-c022117d
 	var candidates []map[string]any
 	for _, st := range objects.PlanWhatsNextCandidateStatuses() {
 		for _, kind := range []string{objects.KindPriorityPlan, objects.KindStrategicPlan} {
@@ -964,7 +964,7 @@ func getAgentPersonaIDs(ctx context.Context, sp workflowStorage, explicitPersona
 
 // leadColumnPersonaIDs drops plan/BLI persona filters for operator/TPM seats so
 // hunger compiles from the lead Gantt. Evaluate still uses the original IDs.
-// TRACK: BLI-REDACTED
+// TRACK: BLI-1787035087372193000-c022117d
 func leadColumnPersonaIDs(ctx context.Context, sp workflowStorage, personaIDs []string) []string {
 	if len(personaIDs) == 0 || sp == nil {
 		return personaIDs
@@ -1292,7 +1292,7 @@ func compileWhatsNextDrive(out *whatsNextOut, ctx context.Context, sp workflowSt
 	}
 	hydrated := false
 	// Idle catalog text must not be replaced by a GROOM-AHEAD / process-admin
-	// policy body (those overlay as "column is empty"). TRACK: BLI-REDACTED
+	// policy body (those overlay as "column is empty"). TRACK: BLI-1787035087372193000-c022117d
 	if !interactionpolicy.SkipCASOverlay(event) && sp != nil && res.Step.PolicyID != "" {
 		if pol, err := sp.Read(ctx, sec, res.Step.PolicyID); err == nil && interactionpolicy.OverlayFromPolicy(res.Step, pol) {
 			hydrated = true

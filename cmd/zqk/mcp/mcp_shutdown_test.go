@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/mcp"
+	"github.com/zqk-os/zqk/pkg/mcp"
 	"github.com/stretchr/testify/assert"
 )
 

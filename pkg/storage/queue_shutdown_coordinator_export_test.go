@@ -1,8 +1,8 @@
 package storage
 
 import (
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/logging"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/logging"
 )
 
 // NewQueueShutdownCoordinatorForTest builds a coordinator for storage_test package tests.

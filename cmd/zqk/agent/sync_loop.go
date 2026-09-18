@@ -1,0 +1,956 @@
+package agent
+
+import (
+	"context"
+	"encoding/json"
+	"fmt"
+	"os"
+	"path/filepath"
+	"strings"
+	"time"
+
+	"github.com/zqk-os/zqk/pkg/execwrap"
+
+	"github.com/spf13/cobra"
+
+	"github.com/zqk-os/zqk/internal/cli"
+	"github.com/zqk-os/zqk/pkg/agentclaim"
+	"github.com/zqk-os/zqk/pkg/agentidle"
+	"github.com/zqk-os/zqk/pkg/audit"
+	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/datacell"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
+	"github.com/zqk-os/zqk/pkg/llm"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/maintenance"
+	"github.com/zqk-os/zqk/pkg/mutation"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/scheduler"
+	"github.com/zqk-os/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/swarm"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/verification"
+)
+
+// NewSyncLoopCmd creates the agent sync-loop command
+func NewSyncLoopCmd() *cobra.Command {
+	cmd := bldr_cli_cmd_v1.NewAgentSyncLoopCommandBuilder()
+	// TRACK: BLI-CAPH-001 — regenerate from CLI spec; builder currently emits empty Use.
+	cmd.Use = "sync-loop"
+	cmd.Short = "Run a native local-LLM (Ollama) sync-loop worker for an agent_task"
+	cmd.Long = "Spawns a graph-state sync-loop that executes an agent_task against the configured local LLM (ZQK_LLM_* / Ollama)."
+	cmd.Hidden = false
+	cmd.Args = cobra.ExactArgs(1)
+	cmd.RunE = func(cmd *cobra.Command, args []string) error {
+		taskID := ""
+		if len(args) > 0 {
+			taskID = strings.TrimSpace(args[0])
+		}
+		if taskID == "" {
+			return errfmt.Errorf("task ID is required. Usage: zqk agent sync-loop <task-id>")
+		}
+		return runSyncLoop(cmd, taskID)
+	}
+	return cmd
+}
+
+// ContextBundle represents the resolved state graph for the agent task
+type ContextBundle struct {
+	Task         map[string]any
+	Dependencies []map[string]any
+}
+
+// QuerySubgraph resolves the bounded context graph around a task
+func QuerySubgraph(ctx context.Context, secCtx *storage.SecurityContext, sp storage.ObjectStorageProvider, taskID string, depth int) ([]map[string]any, error) {
+	if depth <= 0 {
+		depth = 5 // enforce semantic traversal depth
+	}
+
+	hasSemanticPayload := func(obj map[string]any) bool {
+		if desc, ok := obj[objects.FieldKeyDescription].(string); ok && strings.TrimSpace(desc) != "" {
+			return true
+		}
+		if ac, ok := obj[objects.FieldKeyAcceptanceCriteria].([]any); ok && len(ac) > 0 {
+			return true
+		}
+		if ps, ok := obj["problem_statement"].(string); ok && strings.TrimSpace(ps) != "" {
+			return true
+		}
+		return false
+	}
+
+	visited := make(map[string]bool)
+	var deps []map[string]any
+
+	var traverse func(currentID string, currentDepth int)
+	traverse = func(currentID string, currentDepth int) {
+		if currentDepth > depth {
+			return
+		}
+		if visited[currentID] {
+			return
+		}
+		visited[currentID] = true
+
+		obj, err := sp.Read(ctx, secCtx, currentID)
+		if err != nil || obj == nil {
+			return
+		}
+
+		if currentID != taskID {
+			deps = append(deps, obj)
+		}
+
+		// Stop traversing upward if we found a concrete semantic payload, unless we're on the starting task.
+		if currentID != taskID && hasSemanticPayload(obj) {
+			return
+		}
+
+		var refsToExplore []string
+		extractRefs := func(key string) {
+			if raw, ok := obj[key]; ok {
+				if list, ok2 := raw.([]any); ok2 {
+					for _, ref := range list {
+						if str, ok3 := ref.(string); ok3 && str != "" {
+							refsToExplore = append(refsToExplore, str)
+						}
+					}
+				} else if listStr, ok2 := raw.([]string); ok2 {
+					refsToExplore = append(refsToExplore, listStr...)
+				}
+			}
+		}
+
+		// Follow pointers upward
+		extractRefs("context_refs")
+		extractRefs(objects.FieldKeyRelatedObjectRefs)
+		extractRefs(objects.FieldKeyRequirementRefs)
+		extractRefs("criteria_refs")
+
+		for _, ref := range refsToExplore {
+			traverse(ref, currentDepth+1)
+		}
+	}
+
+	traverse(taskID, 0)
+
+	for _, dep := range deps {
+		stripGraphBloat(dep)
+	}
+
+	return deps, nil
+}
+
+func stripGraphBloat(obj map[string]any) {
+	if obj == nil {
+		return
+	}
+	delete(obj, objects.FieldKeyResolvedRelatedObjectRefs)
+	delete(obj, objects.FieldKeyStatusHistory)
+	delete(obj, objects.FieldKeyChangeLog)
+	delete(obj, objects.FieldKeyArtifacts)
+
+	for k, v := range obj {
+		if strings.HasPrefix(k, "resolved_") {
+			delete(obj, k)
+		} else if m, ok := v.(map[string]any); ok {
+			stripGraphBloat(m)
+		} else if l, ok := v.([]any); ok {
+			for _, item := range l {
+				if m2, ok2 := item.(map[string]any); ok2 {
+					stripGraphBloat(m2)
+				}
+			}
+		}
+	}
+}
+
+func buildContextBundle(task map[string]any, deps []map[string]any) ContextBundle {
+	stripGraphBloat(task)
+	for _, dep := range deps {
+		stripGraphBloat(dep)
+	}
+	return ContextBundle{
+		Task:         task,
+		Dependencies: deps,
+	}
+}
+
+//nolint:gocyclo
+func runSyncLoop(cmd *cobra.Command, taskID string) (runErr error) {
+	proc, err := cli.NewProcessor(cmd)
+	if err != nil {
+		return err
+	}
+
+	if proc.ProjectRoot() == "" {
+		return errfmt.Errorf("project root is required")
+	}
+
+	// Create an execution context with an extended timeout to account for slow local CPU inference
+	// Must detach from proc.OperationContext() to avoid inheriting the 30s default CLI timeout.
+	ctx, cancel := context.WithTimeout(context.WithoutCancel(proc.OperationContext()), 4*time.Hour)
+	defer cancel()
+
+	secCtx := proc.SecurityContext()
+	sp := proc.Storage()
+
+	// Verify taskID is an agent_task
+	initTask, err := sp.Read(ctx, secCtx, taskID)
+	if err != nil {
+		return errfmt.Newf("failed to read task %s", taskID).Wrap(err)
+	}
+	if kind, _ := initTask[objects.FieldKeyKind].(string); kind != objects.KindAgentTask {
+		return errfmt.Errorf("agent sync-loop can only execute agent_task objects, received: %s", kind)
+	}
+
+	// Initialize hourglass via Graph
+	flipHourglass(ctx, secCtx, sp, taskID, proc.ProjectRoot())
+
+	// Create coordination channel and publish process_started event
+	cc := scheduler.NewCoordinationChannel(proc.ProjectRoot())
+	_ = cc.PublishEvent(scheduler.Event{
+		Type:      "process_started",
+		JobID:     taskID,
+		Timestamp: time.Now().UTC(),
+	})
+
+	defer func() {
+		removeHourglass(ctx, secCtx, sp, taskID, proc.ProjectRoot())
+		if runErr != nil {
+			_ = cc.PublishEvent(scheduler.Event{
+				Type:      "process_errored",
+				JobID:     taskID,
+				Timestamp: time.Now().UTC(),
+				Metadata: map[string]any{
+					"error": runErr.Error(),
+				},
+			})
+		} else {
+			// Read the task to see if it is implemented
+			currentTask, readErr := sp.Read(ctx, secCtx, taskID)
+			if readErr == nil {
+				st, _ := currentTask[objects.FieldKeyStatus].(string)
+				if st == objects.ObjectStatusImplemented {
+					_ = cc.PublishEvent(scheduler.Event{
+						Type:      "process_completed",
+						JobID:     taskID,
+						Timestamp: time.Now().UTC(),
+					})
+				}
+			}
+		}
+	}()
+
+	// Start background hourglass refresher
+	ctxHourglass, cancelHourglass := context.WithCancel(ctx)
+	defer cancelHourglass()
+	goroutinelabels.NewGoroutine("agent_sync_hourglass", "refresh agent_task hourglass while sync-loop runs").StartSimple(func() {
+		ticker := time.NewTicker(1 * time.Minute)
+		defer ticker.Stop()
+		for {
+			select {
+			case <-ctxHourglass.Done():
+				return
+			case <-ticker.C:
+				flipHourglass(ctxHourglass, secCtx, sp, taskID, proc.ProjectRoot())
+				// A live sync-loop is the strongest available liveness signal: the ticker
+				// stops when the agent's process does, so renewing here means a missed
+				// check-in reflects a dead or wedged seat rather than a quiet one.
+				if err := agentclaim.RenewCheckin(proc.ProjectRoot(), taskID); err != nil {
+					logging.FluentEvent(logging.GetLogger()).Error("checkin_renew_failed", err).
+						String("object_id", taskID).Log()
+				}
+			}
+		}
+	})
+
+	poller := time.NewTicker(2 * time.Second)
+	defer poller.Stop()
+
+	auditStream := audit.NewAuditStream(proc.ProjectRoot())
+	validator := mutation.NewValidator(nil)
+
+	var activeProfile map[string]any
+	profileFilter := storage.ListFilter{Kind: objects.KindProviderProfile}
+	if profiles, err := sp.List(ctx, secCtx, &storage.StorageContext{}, profileFilter); err == nil && len(profiles.Objects) > 0 {
+		activeProfile = profiles.Objects[0]
+	}
+
+	var llmClient llm.Client
+	llmCfg := llm.DefaultConfig(ctx)
+
+	if activeProfile != nil {
+		endpointType, _ := activeProfile[objects.FieldKeyEndpointType].(string)
+		baseURL, _ := activeProfile[objects.FieldKeyBaseURL].(string)
+		modelID, _ := activeProfile[objects.FieldKeyModelID].(string)
+
+		if baseURL != "" {
+			llmCfg.BaseURL = baseURL
+		}
+		if modelID != "" {
+			llmCfg.ChatModel = modelID
+		}
+		if endpointType != "" {
+			llmCfg.Provider = endpointType
+		}
+	}
+	llmClient = llm.NewClient(ctx, llmCfg)
+	tokenTracker := swarm.NewTokenTracker(llmCfg.ContextWindowSize, 0.9)
+
+	guardCfg := LoadLoopGuardConfig()
+	stagnation := newStagnationGuard(guardCfg.MaxStagnantProgressTicks)
+	loopCount := 0
+
+	if wErr := cli.WriteOutput(cmd, []byte(fmt.Sprintf("Starting Graph-State Sync Loop for task: %s\n", taskID))); wErr != nil {
+		logging.FluentEvent(logging.GetLogger()).Error("WriteOutput failed", wErr).Log()
+	}
+
+	for {
+		select {
+		case <-ctx.Done():
+			return fmt.Errorf("orchestrator timeout")
+		case <-poller.C:
+			loopCount++
+			if loopCount > guardCfg.MaxSyncLoops {
+				// Transition to error state before aborting
+				currentTask, rErr := sp.Read(ctx, secCtx, taskID)
+				if rErr == nil {
+					currentKind, _ := currentTask[objects.FieldKeyKind].(string)
+					_ = applyStateMutation(ctx, secCtx, sp, taskID, currentKind, validator, auditStream, objects.ObjectStatusFailed)
+				}
+				return fmt.Errorf("max sync loop limit reached (%d), aborting to prevent infinite cycle", guardCfg.MaxSyncLoops)
+			}
+			// 1. FRESH STATE READ EVERY TICK
+			bypassCtx := pkgctx.WithBypassCache(ctx)
+			currentTask, err := sp.Read(bypassCtx, secCtx, taskID)
+			if err != nil {
+				return errfmt.Newf("failed to read agent task: %s", taskID).Wrap(err)
+			}
+
+			fp := taskProgressFingerprint(currentTask)
+			isStagnant := stagnation.lastFP != "" && fp == stagnation.lastFP
+			if isStagnant {
+				storePath := datacell.AgentIdleStorePath(proc.ProjectRoot())
+				if store, err := agentidle.NewFileStore(storePath); err == nil {
+					// Hardcoded 2s since the poller is 2s
+					_ = store.Accumulate("sync-loop-agent", taskID, 2*time.Second)
+				}
+			}
+
+			if stagnation.Observe(fp) {
+				currentKind, _ := currentTask[objects.FieldKeyKind].(string)
+				_ = applyStateMutation(ctx, secCtx, sp, taskID, currentKind, validator, auditStream, objects.ObjectStatusFailed)
+				return fmt.Errorf("sync-loop stagnation: no progress for %d ticks (fingerprint unchanged), aborting", guardCfg.MaxStagnantProgressTicks)
+			}
+
+			// EXIT CONDITION
+			status, _ := currentTask[objects.FieldKeyStatus].(string)
+			if status == objects.ObjectStatusImplemented || status == objects.ObjectStatusFailed {
+				if wErr := cli.WriteOutput(cmd, []byte(fmt.Sprintf("Task complete, status: %s\n", status))); wErr != nil {
+					logging.FluentEvent(logging.GetLogger()).Error("WriteOutput failed", wErr).Log()
+				}
+				return nil
+			}
+
+			// Resolve Bounded Context via QuerySubgraph
+			// Reduced depth to 1 to prevent exploding context window with 2nd degree connections
+			deps, err := QuerySubgraph(bypassCtx, secCtx, sp, taskID, 1)
+			if err != nil {
+				logging.FluentEvent(logging.GetLogger()).Error("ERROR at QuerySubgraph", err).Log()
+				return errfmt.Newf("subgraph resolution failed").Wrap(err)
+			}
+
+			// Build aggregated payload of completeness_validation steps and policy validation_overlays
+			var aggregatedValidationSteps []map[string]any
+
+			// 1. Native completeness_validation steps
+			if cvRaw, ok := currentTask[objects.FieldKeyCompletenessValidation]; ok {
+				if cvList, ok2 := cvRaw.([]any); ok2 {
+					for _, stepRaw := range cvList {
+						if stepMap, ok3 := stepRaw.(map[string]any); ok3 {
+							aggregatedValidationSteps = append(aggregatedValidationSteps, stepMap)
+						}
+					}
+				}
+			} else if stepsRaw, ok := currentTask[objects.FieldKeyTaskSteps]; ok {
+				// Fallback to task_steps if completeness_validation is absent, preserving existing behavior
+				if stepsList, ok2 := stepsRaw.([]any); ok2 {
+					for _, stepRaw := range stepsList {
+						if stepMap, ok3 := stepRaw.(map[string]any); ok3 {
+							aggregatedValidationSteps = append(aggregatedValidationSteps, stepMap)
+						}
+					}
+				}
+			}
+
+			// 2. Query for applicable policies and extract validation_overlays
+			policyFilter := storage.ListFilter{Kind: objects.KindPolicy}
+			if policies, pErr := sp.List(ctx, secCtx, &storage.StorageContext{}, policyFilter); pErr == nil && policies != nil {
+				currentKind, _ := currentTask[objects.FieldKeyKind].(string)
+				for _, pol := range policies.Objects {
+					if applicability, ok := pol[objects.FieldKeyApplicability].(map[string]any); ok {
+						if objectTypesRaw, ok := applicability["object_types"].([]any); ok {
+							applies := false
+							for _, otRaw := range objectTypesRaw {
+								if ot, ok := otRaw.(string); ok && ot == currentKind {
+									applies = true
+									break
+								}
+							}
+							if applies {
+								if overlaysRaw, ok := pol[objects.FieldKeyValidationOverlays]; ok {
+									if overlaysList, ok2 := overlaysRaw.([]any); ok2 {
+										for _, overlayRaw := range overlaysList {
+											if overlayMap, ok3 := overlayRaw.(map[string]any); ok3 {
+												aggregatedValidationSteps = append(aggregatedValidationSteps, overlayMap)
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+
+			if status == objects.ObjectStatusPendingVerification {
+				// The Doer completed its implementation via zqk_agent_next and wants verification.
+				// 1. Mark any 'pending_implementation' step as 'verified' (since they are now done)
+				// 2. Transition the first 'pending' validation step to 'pending_verification'.
+				updated := false
+				for i, stepMap := range aggregatedValidationSteps {
+					st, _ := stepMap[objects.FieldKeyStatus].(string)
+					if st == objects.ObjectStatusPendingImplementation {
+						stepMap[objects.FieldKeyStatus] = objects.ObjectStatusVerified
+						aggregatedValidationSteps[i] = stepMap
+						updated = true
+					} else if st == objects.ObjectStatusPending || st == objects.ObjectStatusRejected || st == "" {
+						stepMap[objects.FieldKeyStatus] = objects.ObjectStatusPendingVerification
+						aggregatedValidationSteps[i] = stepMap
+						updated = true
+						break
+					}
+				}
+				if updated {
+					updates := map[string]any{}
+					if _, ok := currentTask[objects.FieldKeyCompletenessValidation]; ok {
+						updates[objects.FieldKeyCompletenessValidation] = aggregatedValidationSteps
+					} else {
+						updates[objects.FieldKeyTaskSteps] = aggregatedValidationSteps
+					}
+					_ = sp.Update(ctx, secCtx, taskID, updates)
+				}
+				currentKind, _ := currentTask[objects.FieldKeyKind].(string)
+				if err := applyStateMutation(ctx, secCtx, sp, taskID, currentKind, validator, auditStream, objects.ObjectStatusInProgress); err != nil {
+					if !strings.Contains(err.Error(), "already exists") {
+						logging.FluentEvent(logging.GetLogger()).Error("Failed to transition task to in_progress from pending_verification", err).Log()
+					}
+				}
+				status = objects.ObjectStatusInProgress
+			}
+
+			if status != objects.ObjectStatusInProgress {
+				currentTask[objects.FieldKeyStatus] = objects.ObjectStatusInProgress
+				currentKind, _ := currentTask[objects.FieldKeyKind].(string)
+				if err := applyStateMutation(ctx, secCtx, sp, taskID, currentKind, validator, auditStream, objects.ObjectStatusInProgress); err != nil {
+					if strings.Contains(err.Error(), "already exists") {
+						logging.FluentEvent(logging.GetLogger()).Warn("Audit event for state mutation already exists, skipping")
+					} else {
+						return errfmt.Newf("failed to transition task %s to in_progress", taskID).Wrap(err)
+					}
+				}
+			}
+
+			// ---> SYSTEM VERIFICATION LAYER (BLIND, OBJECTIVE, PROGRAMMATIC) <---
+			// The verifier does not understand or care about what was implemented. It only evaluates constraints.
+			verificationTriggered := false
+
+			// 3. Execute the aggregated payload
+			var updatedSteps []any
+			hasFailedSteps := false
+			allStepsCompleted := true
+			for i, stepMap := range aggregatedValidationSteps {
+				stepStatus, _ := stepMap[objects.FieldKeyStatus].(string)
+
+				if stepStatus == objects.ObjectStatusPending || stepStatus == objects.ObjectStatusPendingImplementation || stepStatus == objects.ObjectStatusPendingVerification || stepStatus == "" {
+					// We only process if it's pending OR pending_verification.
+					// if pending_implementation, we should have started it above. but just in case it falls through, we skip.
+					if stepStatus == objects.ObjectStatusPendingImplementation {
+						continue
+					}
+					allStepsCompleted = false
+				}
+
+				// If any step is pending, the system intercepts and executes the dumb programmatic algorithm
+				if stepStatus == objects.ObjectStatusPendingVerification {
+					verificationTriggered = true
+
+					// Track and check verification attempts
+					attempts := 0
+					if attRaw, ok := stepMap[objects.FieldKeyVerificationAttempts]; ok {
+						if attFloat, ok2 := attRaw.(float64); ok2 {
+							attempts = int(attFloat)
+						} else if attInt, ok2 := attRaw.(int); ok2 {
+							attempts = attInt
+						}
+					}
+					attempts++
+					stepMap[objects.FieldKeyVerificationAttempts] = attempts
+
+					maxAttempts := guardCfg.MaxVerificationAttempts
+
+					if attempts > maxAttempts {
+						stepMap[objects.FieldKeyStatus] = objects.ObjectStatusFailed
+						stepMap[objects.FieldKeyVerificationFeedback] = fmt.Sprintf("Max verification loop limit reached (%d/%d attempts). Aborting task.", attempts, maxAttempts)
+
+						// Update the steps slice
+						aggregatedValidationSteps[i] = stepMap
+						hasFailedSteps = true
+
+						stepFieldUpdates := map[string]any{}
+						if _, ok := currentTask[objects.FieldKeyCompletenessValidation]; ok {
+							stepFieldUpdates[objects.FieldKeyCompletenessValidation] = aggregatedValidationSteps
+						} else {
+							stepFieldUpdates[objects.FieldKeyTaskSteps] = aggregatedValidationSteps
+						}
+						// Persist steps + status in one mutation so a status-only write cannot
+						// race and leave steps stuck at pending_verification.
+						// TRACK: BLI-1785723654802038000-b14064bc
+						currentKind, _ := currentTask[objects.FieldKeyKind].(string)
+						if errMut := applyStateMutationWithFields(ctx, secCtx, sp, taskID, currentKind, validator, auditStream, objects.ObjectStatusFailed, stepFieldUpdates); errMut != nil {
+							if wErr := cli.WriteOutput(cmd, []byte(fmt.Sprintf("❌ Failed to apply state mutation: %v\n", errMut))); wErr != nil {
+								logging.FluentEvent(logging.GetLogger()).Error("WriteOutput failed", wErr).Log()
+							}
+						}
+
+						if wErr := cli.WriteOutput(cmd, []byte(fmt.Sprintf("❌ Max verification loop limit reached (%d/%d attempts). Transitioning task %s to error.\n", attempts, maxAttempts, taskID))); wErr != nil {
+							logging.FluentEvent(logging.GetLogger()).Error("WriteOutput failed", wErr).Log()
+						}
+						updatedSteps = append(updatedSteps, stepMap)
+						continue
+					}
+
+					// Inject task context into stepMap for verification engine
+					stepMap["task_id"] = taskID
+					if arts, ok := currentTask[objects.FieldKeyArtifacts]; ok {
+						stepMap[objects.FieldKeyArtifacts] = arts
+					}
+
+					// The system is blind to implementation details. Execute the Universal Verification DSL.
+					result, err := verification.RunVerification(ctx, secCtx, sp, stepMap)
+
+					if err != nil {
+						stepMap[objects.FieldKeyStatus] = objects.ObjectStatusFailed
+						stepMap[objects.FieldKeyVerificationFeedback] = fmt.Sprintf("Internal Verification Engine Error: %v", err)
+					} else if !result.Passed {
+						stepMap[objects.FieldKeyStatus] = objects.ObjectStatusRejected
+						stepMap[objects.FieldKeyVerificationFeedback] = fmt.Sprintf("Attempt %d/%d: %s", attempts, maxAttempts, result.Feedback)
+					} else {
+						stepMap[objects.FieldKeyStatus] = objects.ObjectStatusVerified
+						stepMap[objects.FieldKeyVerificationFeedback] = result.Feedback
+					}
+
+					stepName, _ := stepMap[objects.FieldKeyName].(string)
+					newStepStatus, _ := stepMap[objects.FieldKeyStatus].(string)
+					auditStream.Publish(ctx, audit.AuditRecord{
+						ID:        fmt.Sprintf("overlay-update-%s-%s", taskID, stepName),
+						Action:    "validation_overlay",
+						Target:    taskID,
+						Timestamp: time.Now().Format(time.RFC3339),
+						Status:    newStepStatus,
+						Overlay:   stepName,
+					})
+
+					if wErr := cli.WriteOutput(cmd, []byte(fmt.Sprintf("⚙️ System Verification Result: %v (Feedback: %s)\n", result.Passed, result.Feedback))); wErr != nil {
+						logging.FluentEvent(logging.GetLogger()).Error("WriteOutput failed", wErr).Log()
+					}
+
+					currentStepStatus, _ := stepMap[objects.FieldKeyStatus].(string)
+					if currentStepStatus == objects.ObjectStatusFailed || currentStepStatus == objects.ObjectStatusRejected {
+						hasFailedSteps = true
+					}
+
+					// Only evaluate one pending step at a time to maintain the rigid sequence
+					updatedSteps = append(updatedSteps, stepMap)
+					continue
+				}
+
+				currentStepStatus, _ := stepMap[objects.FieldKeyStatus].(string)
+				if currentStepStatus == objects.ObjectStatusFailed || currentStepStatus == objects.ObjectStatusRejected {
+					hasFailedSteps = true
+				}
+
+				updatedSteps = append(updatedSteps, stepMap)
+			}
+
+			// If the system intercepted a verification step, we persist the result and SKIP the LLM Doer phase
+			if verificationTriggered {
+				// We update whatever field we sourced from. To be safe, update task_steps and completeness_validation
+				updates := map[string]any{}
+				if _, ok := currentTask[objects.FieldKeyCompletenessValidation]; ok {
+					updates[objects.FieldKeyCompletenessValidation] = updatedSteps
+				} else {
+					updates[objects.FieldKeyTaskSteps] = updatedSteps
+				}
+
+				if uErr := sp.Update(ctx, secCtx, taskID, updates); uErr != nil {
+					if wErr := cli.WriteOutput(cmd, []byte(fmt.Sprintf("❌ System verification layer failed to persist update: %v\n", uErr))); wErr != nil {
+						logging.FluentEvent(logging.GetLogger()).Error("WriteOutput failed", wErr).Log()
+					}
+				}
+				// Continue the sync loop. The Doer will only be summoned if there are no pending_verification steps.
+				continue
+			}
+
+			if len(aggregatedValidationSteps) == 0 || allStepsCompleted {
+				finalStatus := objects.ObjectStatusImplemented
+				if hasFailedSteps {
+					finalStatus = objects.ObjectStatusFailed
+				} else if isAgentWorktree(proc.ProjectRoot()) {
+					// Swarm sync-loop: build-gate then commit worktree branch before teardown.
+					// TRACK: BLI-1783831585418122000-c57cd667
+					wtRoot := proc.ProjectRoot()
+					if bErr := worktreeBuildCheck(ctx, wtRoot); bErr != nil {
+						finalStatus = objects.ObjectStatusFailed
+						_ = cli.WriteOutput(cmd, []byte(fmt.Sprintf("❌ Worktree build gate failed for %s: %v\n", taskID, bErr)))
+					} else {
+						branchName := "agent/" + taskID
+						addCmd := execwrap.Command("git", "add", "-A")
+						addCmd.Dir = wtRoot
+						_ = addCmd.Run()
+						commitCmd := execwrap.Command("git", "commit", "-m", "Agent implementation for "+taskID)
+						commitCmd.Dir = wtRoot
+						_ = commitCmd.Run()
+
+						mainRepo := agentWorktreeMainRepo(wtRoot)
+						mergeCmd := execwrap.Command("git", "merge", branchName)
+						mergeCmd.Dir = mainRepo
+						if out, mErr := mergeCmd.CombinedOutput(); mErr != nil {
+							finalStatus = objects.ObjectStatusFailed
+							_ = cli.WriteOutput(cmd, []byte(fmt.Sprintf("❌ Worktree merge failed for %s: %v\n%s\n", taskID, mErr, string(out))))
+						}
+					}
+				}
+				// Always tear down agent worktrees on terminal (success or fail).
+				// TRACK: BLI-1785886134649966000-7732876c — previously only cleaned on success → orphan pile.
+				if isAgentWorktree(proc.ProjectRoot()) {
+					mainRepo := agentWorktreeMainRepo(proc.ProjectRoot())
+					maintenanceService := maintenance.NewGitMaintenanceService(mainRepo)
+					_ = maintenanceService.CleanupWorktreeAndBranchForID(ctx, taskID)
+				}
+				currentKind, _ := currentTask[objects.FieldKeyKind].(string)
+				if err := applyStateMutation(ctx, secCtx, sp, taskID, currentKind, validator, auditStream, finalStatus); err != nil {
+					if strings.Contains(err.Error(), "already exists") {
+						logging.FluentEvent(logging.GetLogger()).Warn("Audit event for state mutation already exists, skipping")
+					} else {
+						return errfmt.Newf("failed to apply state mutation for %s", taskID).Wrap(err)
+					}
+				}
+				continue
+			}
+			// ---> END SYSTEM VERIFICATION LAYER <---
+
+			bundle := buildContextBundle(currentTask, deps)
+
+			// Phase 2: Construct prompt and call LLM
+			bundleBytes, _ := json.MarshalIndent(bundle, "", "  ")
+
+			taskTitleObj, _ := currentTask[objects.FieldKeyTitle].(string)
+			taskDescObj, _ := currentTask[objects.FieldKeyDescription].(string)
+			displayTitle := taskTitleObj
+			if displayTitle == "" {
+				displayTitle = taskID
+			}
+			if taskDescObj != "" {
+				displayTitle += "\n\nDescription:\n" + taskDescObj
+			}
+
+			if stepsRaw, ok := currentTask[objects.FieldKeyTaskSteps]; ok {
+				if stepsJson, err := json.MarshalIndent(stepsRaw, "", "  "); err == nil {
+					displayTitle += "\n\nSteps:\n" + string(stepsJson)
+				}
+			}
+
+			// Process interjections
+			var hasNewInterjections bool
+			if rawInterjections, ok := currentTask[objects.FieldKeyInterjections]; ok {
+				if interjections, isArr := rawInterjections.([]any); isArr {
+					for i, rawInj := range interjections {
+						if inj, isMap := rawInj.(map[string]any); isMap {
+							if status, _ := inj[objects.FieldKeyStatus].(string); status == objects.ObjectStatusUnread {
+								hasNewInterjections = true
+								msg, _ := inj["message"].(string)
+								displayTitle += fmt.Sprintf("\n\nCRITICAL OVERRIDE (Interjection from %s at %s):\n%s\n", inj["from"], inj["timestamp"], msg)
+								inj[objects.FieldKeyStatus] = objects.ObjectStatusRead
+								interjections[i] = inj
+							}
+						}
+					}
+					if hasNewInterjections {
+						currentTask[objects.FieldKeyInterjections] = interjections
+						_ = sp.Update(ctx, secCtx, taskID, currentTask)
+					}
+				}
+			}
+
+			// 1. Construct Stateless Prompt
+			prompt := fmt.Sprintf("Task ID: %s\n\nTask Graph Bundle:\n```json\n%s\n```\n\nAnalyze the context and provide a single mutation to advance the state.", taskID, string(bundleBytes))
+
+			// 2. Invoke LLM with Strict Schema Contract
+			systemPrompt := "You are the ZQK Graph-State Sync Loop LLM node. Your goal is to consume the Task Graph Bundle and produce a single state transition mutation. You must strictly output ONLY valid JSON matching the schema.\nSchema:\n" + mutation.OutputSchema()
+
+			// Token budget gate (BLI-1783631892661332000-b2cd615e): fit prompt before call
+			fittedPrompt, estTokens, budgetOK := tokenTracker.FitUserPrompt(systemPrompt, prompt)
+			logging.FluentEvent(logging.GetLogger()).Info("Sync-loop token budget check").
+				WithFields(
+					logging.Int("estimatedTokens", estTokens),
+					logging.Int("budgetLimit", tokenTracker.BudgetLimit()),
+					logging.Int("contextWindow", tokenTracker.ContextWindow),
+					logging.Bool("fitted", budgetOK),
+					logging.Bool("truncated", fittedPrompt != prompt),
+				).
+				Log()
+			if !budgetOK {
+				budgetErr := fmt.Errorf("sync-loop prompt exceeds token budget after truncation: %d tokens (limit %d)", estTokens, tokenTracker.BudgetLimit())
+				if wErr := cli.WriteOutput(cmd, []byte(budgetErr.Error()+"\n")); wErr != nil {
+					logging.FluentEvent(logging.GetLogger()).Error("WriteOutput failed", wErr).Log()
+				}
+				currentKind, _ := currentTask[objects.FieldKeyKind].(string)
+				_ = applyStateMutation(ctx, secCtx, sp, taskID, currentKind, validator, auditStream, objects.ObjectStatusFailed)
+				return budgetErr
+			}
+			prompt = fittedPrompt
+
+			resp, err := llmClient.GenerateCompletion(ctx, prompt, systemPrompt)
+			if err != nil {
+				if wErr := cli.WriteOutput(cmd, []byte(fmt.Sprintf("LLM error: %v\n", err))); wErr != nil {
+					logging.FluentEvent(logging.GetLogger()).Error("WriteOutput failed", wErr).Log()
+				}
+				currentKind, _ := currentTask[objects.FieldKeyKind].(string)
+				_ = applyStateMutation(ctx, secCtx, sp, taskID, currentKind, validator, auditStream, objects.ObjectStatusFailed)
+				return err
+			}
+
+			// 3. Validate & Map to Mutation
+			var mut mutation.Mutation
+			cleanResp := strings.TrimPrefix(strings.TrimSpace(resp), "```json")
+			cleanResp = strings.TrimPrefix(cleanResp, "```")
+			cleanResp = strings.TrimSuffix(cleanResp, "```")
+			cleanResp = strings.TrimSpace(cleanResp)
+
+			if uErr := json.Unmarshal([]byte(cleanResp), &mut); uErr != nil {
+				if wErr := cli.WriteOutput(cmd, []byte(fmt.Sprintf("Failed to parse mutation: %v\nRAW:\n%s\n", uErr, cleanResp))); wErr != nil {
+					logging.FluentEvent(logging.GetLogger()).Error("WriteOutput failed", wErr).Log()
+				}
+				currentKind, _ := currentTask[objects.FieldKeyKind].(string)
+				_ = applyStateMutation(ctx, secCtx, sp, taskID, currentKind, validator, auditStream, objects.ObjectStatusFailed)
+				continue
+			}
+
+			// 4. Validation & Idempotency Key
+			ik := mutation.BuildIDKey(taskID, &mut)
+			safeIdempotencyKey := "AUD-" + strings.ReplaceAll(ik, "::", "-")
+			if _, rErr := sp.Read(ctx, secCtx, safeIdempotencyKey); rErr == nil {
+				if wErr := cli.WriteOutput(cmd, []byte(fmt.Sprintf("Mutation %s already committed, skipping.\n", ik))); wErr != nil {
+					logging.FluentEvent(logging.GetLogger()).Error("WriteOutput failed", wErr).Log()
+				}
+				continue
+			}
+
+			// 5. Audit Hook PreFlight
+			auditStream.Publish(ctx, audit.AuditRecord{
+				ID:        ik,
+				Action:    "pre_flight",
+				Target:    taskID,
+				Timestamp: time.Now().Format(time.RFC3339),
+			})
+
+			// 6. HIL Gate Safety Check
+			if vErr := validator.ValidateAndRoute(ctx, taskID, &mut); vErr != nil {
+				_ = sp.Update(ctx, secCtx, taskID, map[string]any{objects.FieldKeyStatus: objects.ObjectStatusBlocked})
+				if wErr := cli.WriteOutput(cmd, []byte(fmt.Sprintf("Mutation blocked by safety gate: %v\n", vErr))); wErr != nil {
+					logging.FluentEvent(logging.GetLogger()).Error("WriteOutput failed", wErr).Log()
+				}
+				continue
+			}
+
+			// 7. Commit Mutation to Graph Kernel
+			tx, txErr := sp.BeginTransaction(ctx)
+			if txErr != nil {
+				return errfmt.Newf("failed to begin tx").Wrap(txErr)
+			}
+
+			_ = createIdempotencyAuditStamp(ctx, secCtx, tx, ik, taskID, &mut)
+
+			switch mut.Action {
+			case mutation.ActionUpdateNode:
+				if len(mut.Fields) > 0 {
+					_ = tx.Update(ctx, secCtx, mut.TargetID, mut.Fields)
+				}
+			case mutation.ActionCreateNode:
+				_ = tx.Create(ctx, secCtx, mut.Fields)
+			}
+
+			if cErr := tx.Commit(ctx); cErr != nil {
+				return errfmt.Newf("failed to commit mutation").Wrap(cErr)
+			}
+
+			auditStream.Publish(ctx, audit.AuditRecord{
+				ID:        ik,
+				Action:    "applied",
+				Target:    taskID,
+				Timestamp: time.Now().Format(time.RFC3339),
+				Status:    objects.ObjectStatusSuccess,
+			})
+
+			if mut.StatusTransition != "" && mut.StatusTransition != currentTask[objects.FieldKeyStatus] {
+				_ = sp.Update(ctx, secCtx, taskID, map[string]any{objects.FieldKeyStatus: mut.StatusTransition})
+			}
+
+			if wErr := cli.WriteOutput(cmd, []byte(fmt.Sprintf("Committed mutation %s\n", ik))); wErr != nil {
+				logging.FluentEvent(logging.GetLogger()).Error("WriteOutput failed", wErr).Log()
+			}
+			continue
+
+		}
+	}
+}
+
+func applyStateMutation(ctx context.Context, secCtx *storage.SecurityContext, sp storage.ObjectStorageProvider, taskID string, kind string, validator *mutation.Validator, auditStream *audit.AuditStream, newStatus string) error {
+	return applyStateMutationWithFields(ctx, secCtx, sp, taskID, kind, validator, auditStream, newStatus, nil)
+}
+
+// applyStateMutationWithFields transitions status and optionally merges extra fields in the same Update
+// so callers do not lose nested writes (e.g. task_steps) to a status-only CAS race.
+// TRACK: BLI-1785723654802038000-b14064bc
+func applyStateMutationWithFields(ctx context.Context, secCtx *storage.SecurityContext, sp storage.ObjectStorageProvider, taskID string, kind string, validator *mutation.Validator, auditStream *audit.AuditStream, newStatus string, extraFields map[string]any) error {
+	mut := mutation.Mutation{
+		Action:           mutation.ActionUpdateNode,
+		TargetID:         taskID,
+		TargetKind:       kind,
+		StatusTransition: newStatus,
+		Fields: map[string]any{
+			objects.FieldKeyStatus: newStatus,
+		},
+		SafetyClass: mutation.SafetyWrite,
+	}
+	for k, v := range extraFields {
+		if k == objects.FieldKeyStatus || k == objects.FieldKeyID || k == objects.FieldKeyKind {
+			continue
+		}
+		mut.Fields[k] = v
+	}
+
+	// Auto-inject missing required assignee_persona_ref to avoid validation errors blocking transition
+	taskObj, err := sp.Read(ctx, secCtx, taskID)
+	if err == nil {
+		if val, ok := taskObj[objects.FieldKeyAssigneePersonaRef].(string); !ok || val == "" {
+			mut.Fields[objects.FieldKeyAssigneePersonaRef] = objects.ConstPersonaOrchestratorAlpha
+		}
+	}
+
+	if err := validator.ValidateAndRoute(ctx, taskID, &mut); err != nil {
+		return err
+	}
+
+	tx, err := sp.BeginTransaction(ctx)
+	if err != nil {
+		return err
+	}
+
+	ik := mutation.BuildIDKey(taskID, &mut)
+	auditStream.Publish(ctx, audit.AuditRecord{
+		ID:        ik,
+		Action:    string(mut.Action),
+		Target:    taskID,
+		Timestamp: time.Now().Format(time.RFC3339),
+	})
+
+	_ = createIdempotencyAuditStamp(ctx, secCtx, tx, ik, taskID, &mut)
+
+	mut.Fields[objects.FieldKeyID] = taskID
+	mut.Fields[objects.FieldKeyKind] = kind
+	if err := tx.Update(ctx, secCtx, taskID, mut.Fields); err != nil {
+		_ = tx.Rollback(ctx)
+		return err
+	}
+
+	if err := tx.Commit(ctx); err != nil {
+		return err
+	}
+
+	auditStream.Publish(ctx, audit.AuditRecord{
+		ID:        fmt.Sprintf("status-update-%s", taskID),
+		Action:    "status_transition",
+		Target:    taskID,
+		Timestamp: time.Now().Format(time.RFC3339),
+		Status:    newStatus,
+	})
+
+	return nil
+}
+
+func createIdempotencyAuditStamp(ctx context.Context, secCtx *storage.SecurityContext, tx storage.ObjectTransaction, ik string, taskID string, mut *mutation.Mutation) error {
+	safeIdempotencyKey := "AUD-" + strings.ReplaceAll(ik, "::", "-")
+	return tx.Create(ctx, secCtx, map[string]any{
+		objects.FieldKeyKind:          objects.KindAuditEvent,
+		objects.FieldKeySchemaVersion: objects.DefaultSchemaVersion,
+		objects.FieldKeyID:            safeIdempotencyKey,
+		objects.FieldKeyTitle:         fmt.Sprintf("Mutation Stamp: %s", string(mut.Action)),
+		objects.FieldKeyEventType:     "integrity_recovery",
+		objects.FieldKeyMetadata: map[string]any{
+			"task_id":              taskID,
+			"action":               string(mut.Action),
+			"safety_class":         string(mut.SafetyClass),
+			objects.FieldKeyStatus: objects.ObjectStatusApplied,
+			"timestamp":            time.Now().Format(time.RFC3339),
+		},
+	})
+}
+
+func transitionToError(ctx context.Context, secCtx *storage.SecurityContext, sp storage.ObjectStorageProvider, taskID string, currentTask map[string]any, validator *mutation.Validator, auditStream *audit.AuditStream) {
+	currentKind, _ := currentTask[objects.FieldKeyKind].(string)
+	if err := applyStateMutation(ctx, secCtx, sp, taskID, currentKind, validator, auditStream, objects.ObjectStatusFailed); err != nil {
+		logging.FluentEvent(logging.GetLogger()).Error("Failed to transition to error", err).Log()
+	}
+}
+
+func flipHourglass(ctx context.Context, secCtx *storage.SecurityContext, sp storage.ObjectStorageProvider, taskID string, projectRoot string) {
+	_ = sp.Update(ctx, secCtx, taskID, map[string]any{
+		"agent_heartbeat": time.Now().Format(time.RFC3339),
+		"agent_pid":       os.Getpid(),
+	})
+
+	if projectRoot != "" {
+		expiresAt := time.Now().Add(5 * time.Minute)
+		schedulerRoot := paths.ResolvePathFromCacheOrConstant(projectRoot, "scheduler", filepath.Join(paths.ProjectDataDir, paths.SchedulerDir))
+		hourglassDir := filepath.Join(schedulerRoot, "hourglass")
+		_ = fileutil.EnsureDir(hourglassDir)
+		filePath := filepath.Join(hourglassDir, taskID+".json")
+		data := map[string]any{
+			"task_id":                 taskID,
+			"pid":                     os.Getpid(),
+			objects.FieldKeyExpiresAt: expiresAt.Format(time.RFC3339),
+		}
+		b, _ := json.Marshal(data)
+		_ = fileutil.WriteStandardFile(filePath, b)
+	}
+}
+
+func removeHourglass(ctx context.Context, secCtx *storage.SecurityContext, sp storage.ObjectStorageProvider, taskID string, projectRoot string) {
+	// If sync-loop context is canceled (timeout or interrupt), sp.Update will fail. Use a detached context.
+	cleanupCtx := context.WithoutCancel(ctx)
+	_ = sp.Update(cleanupCtx, secCtx, taskID, map[string]any{
+		"agent_pid": nil,
+	})
+	if projectRoot != "" {
+		schedulerRoot := paths.ResolvePathFromCacheOrConstant(projectRoot, "scheduler", filepath.Join(paths.ProjectDataDir, paths.SchedulerDir))
+		hourglassDir := filepath.Join(schedulerRoot, "hourglass")
+		filePath := filepath.Join(hourglassDir, taskID+".json")
+		_ = fileutil.Remove(filePath)
+	}
+}

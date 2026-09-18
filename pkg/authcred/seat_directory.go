@@ -5,15 +5,15 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/paths"
-	"github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"gopkg.in/yaml.v3"
 )
 
 // SeatDirectory is the external data plane for seating and planner-lane decisions.
 // Behavior lives in RoleRecord / IsPlannerSeatRef; labels and permissions live here.
-// TRACK: BLI-REDACTED
+// TRACK: BLI-1787804771598596000-27599a81
 type SeatDirectory interface {
 	Roles() []RoleRecord
 	Accounts() []AccountRecord

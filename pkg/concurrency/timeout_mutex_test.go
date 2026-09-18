@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/goroutinelabels"
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 )
 
 // Lock operation names for WithLockTimeout / WithRLockTimeout in this package's tests (Phase E, CONSTANTS_AND_DRY_INVENTORY_PLAN).

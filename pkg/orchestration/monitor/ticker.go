@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/logging"
 )
 
 // OmniTicker renders agent status to the terminal using ANSI formatting.

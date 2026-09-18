@@ -4,7 +4,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/paths"
 )
 
 func TestResolveCVSRollupLatestJSONPath_defaultMatchesPathsLayout(t *testing.T) {

@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/specbuilder/registry"
+	"github.com/zqk-os/zqk/pkg/specbuilder/registry"
 )
 
 func TestBinaryStorageWrite(t *testing.T) {

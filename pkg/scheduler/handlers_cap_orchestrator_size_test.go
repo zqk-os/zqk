@@ -6,7 +6,7 @@ import (
 	"runtime"
 	"testing"
 
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // CEF R2 BLI-CEF-R2-ARCH-GOD-SCHEDULER: keep the former god file below 2k lines.

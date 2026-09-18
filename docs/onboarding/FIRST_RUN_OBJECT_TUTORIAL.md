@@ -1,6 +1,6 @@
 # First-run object tutorial (template → create → get → update)
 
-**Audience:** New users after `zqk init` (Journey B in [CLI_ALPHA_LAUNCH_PLAN.md](../architecture/CLI_ALPHA_LAUNCH_PLAN.md)).  
+**Audience:** New users after `zqk init` (Journey B in [CLI_ALPHA_LAUNCH_PLAN.md](../architecture/CLI_ALPHA_LAUNCH_PLAN.md)).
 **Backlog:** Tracked as part of alpha CLI launch work (see priority plan *CLI alpha launch readiness*).
 
 This path uses the **`question`** kind as a **small** object: few required fields, suitable for learning `object template` / `object create` without editing large YAML. Adjust the kind if your org standardizes another “low-risk” kind.

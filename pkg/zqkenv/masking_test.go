@@ -3,7 +3,7 @@ package zqkenv_test
 import (
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/zqkenv"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 	"github.com/stretchr/testify/assert"
 )
 

@@ -6,14 +6,14 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/storage/filecas"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/storage/filecas"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 
 	"time"
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/lanceman/zqk/pkg/goroutinelabels"
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 )
 
 // TestCASMutexLockHierarchyStress tests concurrent CAS reads, updates, and erase-tombstone

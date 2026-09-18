@@ -1,0 +1,18 @@
+id: SCH-cap-night-duty
+kind: scheduler_job
+schema_version: "2.0.0"
+status: active
+title: CAP Night Duty
+description: |
+  Overnight CAP integrity check and agent feeding loop. Runs scripts/mesh/night-duty-tick.sh
+  to ensure swarm never idles.
+job_type: run_wrapper
+trigger_type: timer
+schedule_expression: "*/2 * * * *"
+execution_mode: reusable
+category: maintenance
+priority: normal
+enabled: true
+log_level: default
+namespace_id: zqk:kernel
+command: ./scripts/mesh/night-duty-tick.sh

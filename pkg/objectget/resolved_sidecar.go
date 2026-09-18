@@ -7,14 +7,14 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/paths"
-	"github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // Resolved sidecar layout (not CAS): .zqk/resolved/<kind>/<2hex>/<id>.json
-// TRACK: BLI-REDACTED
+// TRACK: BLI-1785909672838827000-9fca84f5
 const (
 	ResolvedSidecarSchemaVersion = "1"
 	ResolvedDir                  = "resolved"

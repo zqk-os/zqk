@@ -3,7 +3,7 @@ package lifecycle_builders
 import (
 	"maps"
 
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // BaseLifecycleBuilder provides common functionality for lifecycle builders

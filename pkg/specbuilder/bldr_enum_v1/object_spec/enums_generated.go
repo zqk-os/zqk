@@ -4,8 +4,8 @@
 package object_spec
 
 import (
-	base_objectenum "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
-	shared_object_specsenum "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/shared_object_specs"
+	base_objectenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
+	shared_object_specsenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/shared_object_specs"
 )
 
 type Plane = base_objectenum.Plane

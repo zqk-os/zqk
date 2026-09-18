@@ -3,8 +3,8 @@ package bldr_v2
 import (
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/specbuilder/builders"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/specbuilder/builders"
 )
 
 // TestLifecycleBuilder_Registration tests that the lifecycle builder is registered

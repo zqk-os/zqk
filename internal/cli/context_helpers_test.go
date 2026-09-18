@@ -5,10 +5,10 @@ import (
 	"path/filepath"
 	"testing"
 
-	clicontext "github.com/lanceman/zqk/internal/cli/context"
-	pkgcli "github.com/lanceman/zqk/pkg/cli"
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/paths"
+	clicontext "github.com/zqk-os/zqk/internal/cli/context"
+	pkgcli "github.com/zqk-os/zqk/pkg/cli"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/paths"
 )
 
 func TestCommandContextOr(t *testing.T) {

@@ -6,10 +6,10 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/lanceman/zqk/pkg/brand"
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/license"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/brand"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/license"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 type Tier string
@@ -20,7 +20,7 @@ const (
 )
 
 // BundleElevatedObject is the entitlement bundle for object … --internal
-// elevated access (built-in / visibility-internal kinds). TRACK: BLI-REDACTED.
+// elevated access (built-in / visibility-internal kinds). TRACK: BLI-1785930106857898000-94b9a5bc.
 const BundleElevatedObject = "elevated_object"
 
 // EntitlementChecker defines the interface for verifying platform tier capabilities.

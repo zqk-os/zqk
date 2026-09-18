@@ -4,12 +4,12 @@ import (
 	"sync"
 	"time"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/coordination"
-	"github.com/lanceman/zqk/pkg/logging"
-	"github.com/lanceman/zqk/pkg/storage"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/coordination"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/storage"
 
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // ScenarioBuilderProfileName is the name of the CLI profile used by the scenario builder
@@ -30,7 +30,7 @@ const (
 	scenarioBuilderSourceBuiltIn   = "built-in"
 	scenarioBuilderKindScenario    = objects.KindScenario
 	scenarioBuilderKindBacklogItem = objects.KindBacklogItem
-	scenarioBuilderAccountSystem   = "ACC-1785920548450214012-68b850c0"
+	scenarioBuilderAccountSystem   = objects.DefaultSystemAccountID
 	scenarioBuilderOriginZQK       = "zqk"
 )
 

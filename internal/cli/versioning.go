@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"strings"
 
-	pkgcli "github.com/lanceman/zqk/pkg/cli"
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/logging"
+	pkgcli "github.com/zqk-os/zqk/pkg/cli"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/spf13/cobra"
 )
 

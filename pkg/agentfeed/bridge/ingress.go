@@ -3,8 +3,8 @@ package bridge
 import (
 	"strings"
 
-	"github.com/lanceman/zqk/pkg/agentfeed"
-	"github.com/lanceman/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/agentfeed"
+	"github.com/zqk-os/zqk/pkg/errfmt"
 )
 
 // Channel identifies an enterprise messaging ingress surface.

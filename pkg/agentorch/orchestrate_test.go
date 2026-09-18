@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/agentorch"
+	"github.com/zqk-os/zqk/pkg/agentorch"
 	"github.com/stretchr/testify/require"
 )
 

@@ -4,19 +4,19 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/lanceman/zqk/pkg/config"
+	"github.com/zqk-os/zqk/pkg/config"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/logging"
-	pkgobjects "github.com/lanceman/zqk/pkg/objects"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/logging"
+	pkgobjects "github.com/zqk-os/zqk/pkg/objects"
 )
 
 // FileFirstProjectionStorage writes file SSOT first, then projects to an optional graph backend.
 // Reads use the file SSOT. Enable via STORAGE_MODE=file+projection (brand-prefixed env).
 //
-// TRACK: BLI-REDACTED — audible projection errors.
-// TRACK: BLI-REDACTED — RebuildProjectionFromSSOT orphan purge.
+// TRACK: BLI-1785825614935615000-eca95c38 — audible projection errors.
+// TRACK: BLI-1785825616642637000-af0aec66 — RebuildProjectionFromSSOT orphan purge.
 type FileFirstProjectionStorage struct {
 	file       *FileObjectStorage
 	projection ObjectStorageProvider

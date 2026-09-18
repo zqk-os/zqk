@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/storage"
 )
 
 const storageInitBudget = 2 * time.Second

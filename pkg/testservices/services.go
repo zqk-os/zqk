@@ -10,12 +10,12 @@ import (
 	"sync"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/config"
-	"github.com/lanceman/zqk/pkg/execwrap"
+	"github.com/zqk-os/zqk/pkg/config"
+	"github.com/zqk-os/zqk/pkg/execwrap"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/logging"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/logging"
 )
 
 // startServiceLocks serializes docker run/rm per container name across parallel tests

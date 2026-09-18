@@ -1,7 +1,7 @@
 package instance_builders
 
 import (
-	"github.com/lanceman/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/errfmt"
 )
 
 // InstanceBuilder is an interface for builders that create and manage object instances

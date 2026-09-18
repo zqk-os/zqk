@@ -68,6 +68,106 @@ func TestDiscoverer_NoDocsDir(t *testing.T) {
 	}
 }
 
+func TestDiscoverer_ExcludeArchiveDirs(t *testing.T) {
+	t.Parallel()
+	tmpDir := t.TempDir()
+	docsDir := filepath.Join(tmpDir, "docs")
+	archiveDir := filepath.Join(docsDir, "archive")
+	underscoreArchiveDir := filepath.Join(docsDir, "_archive")
+	nestedArchiveDir := filepath.Join(docsDir, "onboarding", "archive")
+
+	for _, d := range []string{archiveDir, underscoreArchiveDir, nestedArchiveDir} {
+		if err := os.MkdirAll(d, 0755); err != nil {
+			t.Fatalf("mkdir failed: %v", err)
+		}
+	}
+
+	liveDoc := filepath.Join(docsDir, "live.md")
+	archiveDoc := filepath.Join(archiveDir, "old.md")
+	underscoreDoc := filepath.Join(underscoreArchiveDir, "ancient.md")
+	nestedDoc := filepath.Join(nestedArchiveDir, "summary.md")
+
+	for _, f := range []string{liveDoc, archiveDoc, underscoreDoc, nestedDoc} {
+		if err := os.WriteFile(f, []byte("# Note"), 0644); err != nil {
+			t.Fatal(err)
+		}
+	}
+
+	disc := NewDiscoverer(tmpDir)
+	files, err := disc.Discover()
+	if err != nil {
+		t.Fatalf("Discover failed: %v", err)
+	}
+
+	if len(files) != 1 {
+		t.Fatalf("expected exactly 1 discovered file, got %d", len(files))
+	}
+	if filepath.Base(files[0].Path) != "live.md" {
+		t.Fatalf("expected live.md, got %s", files[0].Path)
+	}
+}
+
+func TestDiscoverer_Subtrees(t *testing.T) {
+	t.Parallel()
+	tmpDir := t.TempDir()
+
+	// Create directory structure:
+	// docs/architecture/arch.md
+	// docs/architecture/_archive/ancient.md
+	// docs/best-practices/bp.md
+	// docs/onboarding/start.md
+	// docs/onboarding/archive/old.md
+	// docs/launch/launch.md
+	// docs/internal/secret.md
+	treeDirs := []string{
+		filepath.Join(tmpDir, "docs", "architecture"),
+		filepath.Join(tmpDir, "docs", "architecture", "_archive"),
+		filepath.Join(tmpDir, "docs", "best-practices"),
+		filepath.Join(tmpDir, "docs", "onboarding"),
+		filepath.Join(tmpDir, "docs", "onboarding", "archive"),
+		filepath.Join(tmpDir, "docs", "launch"),
+		filepath.Join(tmpDir, "docs", "internal"),
+	}
+	for _, d := range treeDirs {
+		if err := os.MkdirAll(d, 0755); err != nil {
+			t.Fatalf("mkdir failed: %v", err)
+		}
+	}
+
+	testFiles := map[string]bool{
+		filepath.Join(tmpDir, "docs", "architecture", "arch.md"):            true,  // should be included
+		filepath.Join(tmpDir, "docs", "architecture", "_archive", "old.md"): false, // archive excluded
+		filepath.Join(tmpDir, "docs", "best-practices", "bp.md"):            true,  // should be included
+		filepath.Join(tmpDir, "docs", "onboarding", "start.md"):             true,  // should be included
+		filepath.Join(tmpDir, "docs", "onboarding", "archive", "old.md"):    false, // archive excluded
+		filepath.Join(tmpDir, "docs", "launch", "launch.md"):                false, // not in shipped subtrees
+		filepath.Join(tmpDir, "docs", "internal", "secret.md"):              false, // not in shipped subtrees
+	}
+
+	for f := range testFiles {
+		if err := os.WriteFile(f, []byte("# Test Document"), 0644); err != nil {
+			t.Fatalf("failed to write %s: %v", f, err)
+		}
+	}
+
+	disc := NewDiscovererWithSubtrees(tmpDir, ShippedInitDocSubtrees)
+	files, err := disc.Discover()
+	if err != nil {
+		t.Fatalf("Discover failed: %v", err)
+	}
+
+	if len(files) != 3 {
+		t.Fatalf("expected exactly 3 discovered files, got %d: %v", len(files), files)
+	}
+
+	for _, f := range files {
+		expected, exists := testFiles[f.Path]
+		if !exists || !expected {
+			t.Errorf("unexpected file discovered: %s", f.RelPath)
+		}
+	}
+}
+
 func findRepoRoot(t *testing.T) string {
 	t.Helper()
 	dir, err := os.Getwd()
@@ -86,7 +186,7 @@ func findRepoRoot(t *testing.T) string {
 	}
 }
 
-// TestDivioQuadrant_FunctionalAcceptance validates CRIT-REDACTED:
+// TestDivioQuadrant_FunctionalAcceptance validates CRIT-1789619391641751000-b4da3bf0:
 //  1. All four Divio quadrant directories exist and are non-empty:
 //     Tutorials (docs/tutorials), How-To Guides (docs/howto), Reference (docs/manual or docs/reference), Explanation (docs/explanation).
 //  2. docs/INDEX.md exists and contains valid links pointing to existing files on disk.
@@ -152,7 +252,7 @@ func TestDivioQuadrant_FunctionalAcceptance(t *testing.T) {
 	}
 }
 
-// TestDivioQuadrant_BoundaryAndErrorHandling validates CRIT-REDACTED:
+// TestDivioQuadrant_BoundaryAndErrorHandling validates CRIT-1789619391641752000-2d2fea55:
 // Verifies boundary behaviors, empty markdown file handling, missing headings, and non-existent paths.
 func TestDivioQuadrant_BoundaryAndErrorHandling(t *testing.T) {
 	t.Parallel()
@@ -206,7 +306,7 @@ func TestDivioQuadrant_BoundaryAndErrorHandling(t *testing.T) {
 	}
 }
 
-// TestDivioQuadrant_IntegrationAndConformance validates CRIT-REDACTED:
+// TestDivioQuadrant_IntegrationAndConformance validates CRIT-1789619391641753000-e04ee562:
 // Verifies integration with live repository docs, zero broken titles, and conformance with POL-DOC-001/002.
 func TestDivioQuadrant_IntegrationAndConformance(t *testing.T) {
 	repoRoot := findRepoRoot(t)

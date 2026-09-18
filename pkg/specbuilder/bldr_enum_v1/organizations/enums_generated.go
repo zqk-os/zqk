@@ -4,8 +4,8 @@
 package organizations
 
 import (
-	base_objectenum "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
-	shared_organizationsenum "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/shared_organizations"
+	base_objectenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
+	shared_organizationsenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/shared_organizations"
 )
 
 type PriorityTier = base_objectenum.PriorityTier

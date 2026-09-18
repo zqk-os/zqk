@@ -5,7 +5,7 @@ package syscallutil
 import (
 	"errors"
 
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 const errFlockUnsupportedWindows = "syscallutil: flock not supported on Windows"

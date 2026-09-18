@@ -7,8 +7,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/logging"
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/objects"
 	"gopkg.in/yaml.v3"
 )
 

@@ -3,7 +3,7 @@ package vds
 import (
 	"strings"
 
-	"github.com/lanceman/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/errfmt"
 )
 
 // Durable instruction export formats (renderer keys — not CLI surface names).

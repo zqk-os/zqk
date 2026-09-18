@@ -4,8 +4,8 @@ import (
 	"context"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/policyinterrupt"
-	"github.com/lanceman/zqk/pkg/validation"
+	"github.com/zqk-os/zqk/pkg/policyinterrupt"
+	"github.com/zqk-os/zqk/pkg/validation"
 )
 
 func TestInterruptEmitter_EmitDisparityInterrupt(t *testing.T) {

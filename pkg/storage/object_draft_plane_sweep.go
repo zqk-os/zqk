@@ -4,11 +4,11 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/errfmt"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
-// TRACK: BLI-REDACTED — draft-plane sweeper easy button.
+// TRACK: BLI-1785827957031623000-b08b9791 — draft-plane sweeper easy button.
 
 // ObjectDraftPlaneSweepOptions filters draft-plane candidates for inventory/delete.
 type ObjectDraftPlaneSweepOptions struct {

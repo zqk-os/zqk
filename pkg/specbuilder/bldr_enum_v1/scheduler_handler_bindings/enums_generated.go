@@ -4,8 +4,8 @@
 package scheduler_handler_bindings
 
 import (
-	base_objectenum "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
-	shared_scheduler_handler_bindingsenum "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/shared_scheduler_handler_bindings"
+	base_objectenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
+	shared_scheduler_handler_bindingsenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/shared_scheduler_handler_bindings"
 )
 
 type HandlerKey string

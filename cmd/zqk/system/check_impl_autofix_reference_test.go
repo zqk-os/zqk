@@ -8,10 +8,10 @@ import (
 	"strings"
 	"testing"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/storage"
-	"github.com/lanceman/zqk/pkg/utils/fileutil"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 func TestParseReferenceIssueMessage(t *testing.T) {
@@ -337,7 +337,7 @@ func TestProcessDuplicateReferenceIssue_ThreeWayCascade(t *testing.T) {
 	fixCtx.AutoFix = true
 
 	// Object contains DEC-001 in technical_spec_refs, related_object_refs, and decision_refs
-	targetID := "DEC-REDACTED"
+	targetID := "DEC-1785930071988960000-364a5796"
 	fixCtx.Obj.Properties["technical_spec_refs"] = []string{targetID}
 	fixCtx.Obj.Properties["related_object_refs"] = []string{targetID, "DOC-001"}
 	fixCtx.Obj.Properties["decision_refs"] = []string{targetID}

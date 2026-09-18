@@ -5,10 +5,10 @@ import (
 	"path/filepath"
 	"time"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/lockhealth"
-	"github.com/lanceman/zqk/pkg/logging"
-	"github.com/lanceman/zqk/pkg/utils/fileutil"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/lockhealth"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // WatchdogInterceptor monitors worker heartbeats and orchestrates recovery for stalled daemons/workers.

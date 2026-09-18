@@ -1,8 +1,8 @@
 package bldr_v2
 
 import (
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/specbuilder/builders"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/specbuilder/builders"
 )
 
 // PriorityPlanBuilder builds the priority_plan spec at version v2_0_0
@@ -439,7 +439,7 @@ func (b *PriorityPlanBuilder) addPriorityPlanFields() {
 			Dependencies("team configuration registry").
 			Lifecycle("mutable").
 			Observability("yes").
-			Purpose("References a team configuration (cellular archetype) for the priority plan pod execution. Required (with persona_refs as alternate) before shovel-ready active / execution-locked — CAP dispatch identity (TRACK BLI-REDACTED).").
+			Purpose("References a team configuration (cellular archetype) for the priority plan pod execution. Required (with persona_refs as alternate) before shovel-ready active / execution-locked — CAP dispatch identity (TRACK BLI-1785915238591238000-619a2f9e).").
 			Security("non-sensitive").
 			SystemUsage([]any{
 				"orchestrator provisioning",

@@ -1,26 +1,26 @@
 package utility
 
 import (
-	"github.com/lanceman/zqk/pkg/datacell"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/datacell"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 
 	"fmt"
 	"strings"
 	"sync"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/paths"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/coordination"
-	"github.com/lanceman/zqk/pkg/goroutinelabels"
-	"github.com/lanceman/zqk/pkg/logging"
-	"github.com/lanceman/zqk/pkg/nildecode"
-	"github.com/lanceman/zqk/pkg/objects"
-	storagepkg "github.com/lanceman/zqk/pkg/storage"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/coordination"
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/nildecode"
+	"github.com/zqk-os/zqk/pkg/objects"
+	storagepkg "github.com/zqk-os/zqk/pkg/storage"
 
-	_ "github.com/lanceman/zqk/pkg/specbuilder/bldr_lifecycle_v1"
-	_ "github.com/lanceman/zqk/pkg/specbuilder/bldr_v2"
+	_ "github.com/zqk-os/zqk/pkg/specbuilder/bldr_lifecycle_v1"
+	_ "github.com/zqk-os/zqk/pkg/specbuilder/bldr_v2"
 )
 
 // cleanupStorageTestRoot registers the standard temp-project teardown pipeline (WAL, listing index,

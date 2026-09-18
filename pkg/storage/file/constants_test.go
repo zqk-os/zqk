@@ -3,7 +3,7 @@ package file_test
 import (
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/storage/file"
+	"github.com/zqk-os/zqk/pkg/storage/file"
 	"github.com/stretchr/testify/require"
 )
 

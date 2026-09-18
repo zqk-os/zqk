@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/spf13/cobra"
 )
 

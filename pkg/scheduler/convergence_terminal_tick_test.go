@@ -4,11 +4,11 @@ import (
 	stdcontext "context"
 	"testing"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/convergerollup"
-	"github.com/lanceman/zqk/pkg/logging"
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/storage"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/convergerollup"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/storage"
 )
 
 func TestConvergenceTerminalFollowUpNeeded(t *testing.T) {
@@ -71,7 +71,7 @@ func TestMaybeSpawnTerminalFollowupDraft_CreateIntegration(t *testing.T) {
 	}
 	ctx := stdcontext.Background()
 	secCtx := env.SecurityContext
-	priorID := "CVS-REDACTED"
+	priorID := "CVS-1776000000000000001-c1f2e3a4"
 	prior := map[string]any{
 		objects.FieldKeyID:               priorID,
 		objects.FieldKeyKind:             objects.KindConvergenceSession,

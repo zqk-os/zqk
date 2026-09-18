@@ -3,11 +3,11 @@ package object
 import (
 	"fmt"
 
-	"github.com/lanceman/zqk/cmd/zqk/system"
-	"github.com/lanceman/zqk/internal/cli"
-	clipkg "github.com/lanceman/zqk/pkg/cli"
-	"github.com/lanceman/zqk/pkg/objects"
-	storagepkg "github.com/lanceman/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/cmd/zqk/system"
+	"github.com/zqk-os/zqk/internal/cli"
+	clipkg "github.com/zqk-os/zqk/pkg/cli"
+	"github.com/zqk-os/zqk/pkg/objects"
+	storagepkg "github.com/zqk-os/zqk/pkg/storage"
 	"github.com/spf13/cobra"
 )
 

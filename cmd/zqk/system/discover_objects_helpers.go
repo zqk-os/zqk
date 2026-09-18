@@ -5,8 +5,8 @@ import (
 	"runtime"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/logging"
-	"github.com/lanceman/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/storage"
 )
 
 // fileStorageDiscovery is the interface used for strategy-based discovery (avoids importing storage in tests).
@@ -59,6 +59,9 @@ func processKindForDiscovery(projectRoot, kind string, targetIDs []string, logge
 		if listErr == nil {
 			files = make([]scannedFile, 0, len(paths))
 			for _, p := range paths {
+				if storage.IsObjectDraftPlanePath(projectRoot, p.Path) {
+					continue
+				}
 				files = append(files, scannedFile{ObjectID: p.ID, Kind: kind, Path: p.Path})
 			}
 		} else {
@@ -100,6 +103,9 @@ func processKindForDiscovery(projectRoot, kind string, targetIDs []string, logge
 				for _, id := range targetIDs {
 					path, err := fileStorage.GetFilePathForObject(id, kind)
 					if err == nil && path != emptyValue {
+						if storage.IsObjectDraftPlanePath(projectRoot, path) {
+							continue
+						}
 						files = append(files, scannedFile{ObjectID: id, Kind: kind, Path: path})
 					}
 				}

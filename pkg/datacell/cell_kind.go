@@ -1,6 +1,6 @@
 package datacell
 
-import "github.com/lanceman/zqk/pkg/errfmt"
+import "github.com/zqk-os/zqk/pkg/errfmt"
 
 // CellKindDescriptor is one spec-backed kind as seen by the data-cell identity layer (DATA_CELL_MODEL).
 //

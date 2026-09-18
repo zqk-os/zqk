@@ -1,20 +1,20 @@
 package storage
 
 import (
-	caspkg "github.com/lanceman/zqk/pkg/storage/cas"
+	caspkg "github.com/zqk-os/zqk/pkg/storage/cas"
 
-	"github.com/lanceman/zqk/pkg/objects"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/objects"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 
 	"context"
 	"io"
 	"path/filepath"
 	"time"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/logging"
-	"github.com/lanceman/zqk/pkg/pipeline"
-	"github.com/lanceman/zqk/pkg/projecttemp"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/pipeline"
+	"github.com/zqk-os/zqk/pkg/projecttemp"
 )
 
 // ProjectTestTeardownPipelineKind is the pipeline "kind" for metrics/logs.
@@ -82,8 +82,8 @@ func projectTeardownDiscardLogger() logging.Logger {
 }
 
 // IsProbableGitWorktreeRoot reports whether dir contains Git metadata at the repository worktree marker
-// (see [github.com/lanceman/zqk/pkg/paths.GitWorktreeMetadataEntry]).
-// Implementation lives in [github.com/lanceman/zqk/pkg/projecttemp] so packages that cannot import storage
+// (see [github.com/zqk-os/zqk/pkg/paths.GitWorktreeMetadataEntry]).
+// Implementation lives in [github.com/zqk-os/zqk/pkg/projecttemp] so packages that cannot import storage
 // (e.g. pkg/validation) still share the same guard.
 func IsProbableGitWorktreeRoot(dir string) bool {
 	return projecttemp.IsProbableGitWorktreeRoot(dir)

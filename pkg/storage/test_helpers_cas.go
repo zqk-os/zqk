@@ -1,17 +1,17 @@
 package storage
 
 import (
-	caspkg "github.com/lanceman/zqk/pkg/storage/cas"
+	caspkg "github.com/zqk-os/zqk/pkg/storage/cas"
 
 	"bufio"
 	"context"
 	"testing"
 	"time"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/objects"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/objects"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 const casFlushTimeout = 5 * time.Second
@@ -152,7 +152,7 @@ func FlushOrFail(t testing.TB, projectRoot, kind string) {
 
 // defaultLeavePreliminaryStatus picks a non-preliminary status for membrane promote in tests.
 // Create parks preliminary statuses on the draft plane; List/Count intentionally omit drafts.
-// TRACK: BLI-REDACTED — draft-plane create / promote membrane.
+// TRACK: BLI-1785443942668406000-1ec5c811 — draft-plane create / promote membrane.
 func defaultLeavePreliminaryStatus(kind string) string {
 	switch kind {
 	case objects.KindCriteria, objects.KindMilestone:
@@ -234,7 +234,7 @@ func CreateCASVisible(t testing.TB, fs ObjectStorageProvider, ctx context.Contex
 
 	// Promote may hit lifecycle transition preconditions (e.g. goal→active needs milestone_ref).
 	// Tests use audited break-glass so CreateCASVisible stays a reliable CAS-visibility helper.
-	// TRACK: BLI-REDACTED — draft-plane create / promote membrane.
+	// TRACK: BLI-1785443942668406000-1ec5c811 — draft-plane create / promote membrane.
 	promoteCtx := pkgctx.WithLifecycleBreakGlass(ctx, "CreateCASVisible test promote off draft plane")
 	promoteCtx = pkgctx.WithAllowCoreObjectDelete(promoteCtx)
 	if err := fs.Update(promoteCtx, secCtx, id, map[string]any{objects.FieldKeyStatus: leaveStatus}); err != nil {

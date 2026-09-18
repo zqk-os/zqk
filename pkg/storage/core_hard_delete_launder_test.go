@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
 )
 
 // TestElevationIsNotLaunderedIntoDeclaredIntent pins the invariant that privilege never becomes

@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/goroutinelabels"
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 )
 
 func TestEventPipeline_PublishSubscribe(t *testing.T) {

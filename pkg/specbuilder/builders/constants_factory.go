@@ -10,11 +10,11 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/objects"
-	sbcore "github.com/lanceman/zqk/pkg/specbuilder/core"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
-	"github.com/lanceman/zqk/pkg/when"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/objects"
+	sbcore "github.com/zqk-os/zqk/pkg/specbuilder/core"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/when"
 )
 
 // SpecConstants represents constants generated from an objects.Spec

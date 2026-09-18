@@ -11,18 +11,17 @@ import (
 
 	"gopkg.in/yaml.v3"
 
-	clctx "github.com/lanceman/zqk/internal/cli/context"
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/paths"
-	"github.com/lanceman/zqk/pkg/specbuilder/builders"
-	"github.com/lanceman/zqk/pkg/storage"
-	"github.com/lanceman/zqk/pkg/storagetesting"
-	"github.com/lanceman/zqk/pkg/utils/fileutil"
-	"github.com/lanceman/zqk/pkg/zqkenv"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/specbuilder/builders"
+	"github.com/zqk-os/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/storagetesting"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 
-	_ "github.com/lanceman/zqk/pkg/specbuilder/bldr_instance_v1"
-	_ "github.com/lanceman/zqk/pkg/specbuilder/bldr_v2"
+	_ "github.com/zqk-os/zqk/pkg/specbuilder/bldr_instance_v1"
+	_ "github.com/zqk-os/zqk/pkg/specbuilder/bldr_v2"
 )
 
 type scenarioTestEnvOptions struct {
@@ -49,7 +48,7 @@ type testSettingsYAMLShapeScenario struct {
 func writeMinimalTestSettingsYAMLScenario(testRoot string) error {
 	p := filepath.Join(testRoot, paths.TestSettingsFilename)
 	body := testSettingsYAMLShapeScenario{
-		Version: clctx.DefaultBrandSettingsVersion,
+		Version: paths.DefaultBrandSettingsVersion,
 		Paths:   map[string]any{},
 	}
 	data, err := yaml.Marshal(body)

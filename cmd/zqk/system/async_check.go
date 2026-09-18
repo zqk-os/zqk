@@ -11,24 +11,24 @@ import (
 	"sync/atomic"
 	"time"
 
-	caspkg "github.com/lanceman/zqk/pkg/storage/cas"
+	caspkg "github.com/zqk-os/zqk/pkg/storage/cas"
 
-	"github.com/lanceman/zqk/pkg/paths"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/paths"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 
 	"github.com/spf13/cobra"
 
-	"github.com/lanceman/zqk/internal/cli"
-	"github.com/lanceman/zqk/pkg/appledouble"
-	"github.com/lanceman/zqk/pkg/concurrency"
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/goroutinelabels"
-	"github.com/lanceman/zqk/pkg/logging"
-	"github.com/lanceman/zqk/pkg/storage"
-	"github.com/lanceman/zqk/pkg/validation"
-	"github.com/lanceman/zqk/pkg/when"
+	"github.com/zqk-os/zqk/internal/cli"
+	"github.com/zqk-os/zqk/pkg/appledouble"
+	"github.com/zqk-os/zqk/pkg/concurrency"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/validation"
+	"github.com/zqk-os/zqk/pkg/when"
 
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // Limit concurrent per-file content reads during discovery fallback.
@@ -1025,10 +1025,16 @@ func discoverFromCache(ctx stdcontext.Context, projectRoot, operationID string, 
 						continue
 					}
 					path := e.FilePath
+					// Draft-plane objects reside outside the CAS membrane and belong to the
+					// object draft plane summary, not in-membrane Layer 0-3 validation.
+					// TRACK: TDE-CEF-CAS-IDENTITY-TXN-001
+					if storage.IsObjectDraftPlanePath(projectRoot, path) {
+						continue
+					}
 					// Object-id-cache often lags CAS hash renames (path still names the
 					// deleted blob). Re-resolve via listing index before enqueueing so
 					// validators do not emit false "stale index entry" Tier-1 blockers.
-					// TRACK: BLI-REDACTED
+					// TRACK: BLI-1785723654802038000-b14064bc
 					if caspkg.CachePathNeedsCASResolve(path) {
 						if live, ok := caspkg.ResolveLiveCASFilePath(projectRoot, kind, e.ID); ok {
 							path = live

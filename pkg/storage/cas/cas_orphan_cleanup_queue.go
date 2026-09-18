@@ -5,17 +5,17 @@ import (
 	"fmt"
 	"path/filepath"
 
-	"github.com/lanceman/zqk/pkg/storage/filecas"
+	"github.com/zqk-os/zqk/pkg/storage/filecas"
 
 	"sync"
 	"sync/atomic"
 	"time"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/goroutinelabels"
-	"github.com/lanceman/zqk/pkg/logging"
-	"github.com/lanceman/zqk/pkg/utils/fileutil"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 const (
@@ -289,7 +289,7 @@ func (q *CASOrphanCleanupQueue) wakeWorkerIfNeeded() {
 // remaining hash-named YAML for that object id (failed CAS write + orphan enqueue,
 // or a sole blob misclassified as superseded). Replacement = another live hash
 // file in the same kind dir (or a sibling CAS bucket) whose top-level id matches.
-// TRACK: BLI-REDACTED
+// TRACK: BLI-1785723654802038000-b14064bc
 func refuseOrphanCASHashDelete(filePath string, keeperHash ...string) bool {
 	base := filepath.Base(filePath)
 	if !filecas.CasHashFilenameRe.MatchString(base) {
@@ -384,7 +384,7 @@ func anotherLiveCASHashHasObjectID(dir, oid, exceptPath string) bool {
 // removeRetiredCASHashFileOnIDChange deletes the old CAS blob after an ID rename.
 // refuseOrphanCASHashDelete would keep it: the new blob peeks as newID, so the old
 // file looks like the sole survivor for oldID.
-// TRACK: BLI-REDACTED
+// TRACK: BLI-1785723654802038000-b14064bc
 func removeRetiredCASHashFileOnIDChange(filePath string) error {
 	if filePath == emptyValue {
 		return nil

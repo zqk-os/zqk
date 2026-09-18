@@ -8,7 +8,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 func TestMaybeRunOrchestrateRollupAfterTick_WriteJobOutcome_success(t *testing.T) {

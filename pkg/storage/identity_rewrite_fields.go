@@ -3,12 +3,12 @@ package storage
 import (
 	"strings"
 
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // isIdentityRewriteField reports whether a field stores an account/object identity
 // that must be rewritten on rename in addition to *_ref / *_refs.
-// TRACK: BLI-REDACTED — ACC-* full cutover; keep in sync with rename.
+// TRACK: BLI-1785905134201010000-07393484 — ACC-* full cutover; keep in sync with rename.
 func isIdentityRewriteField(fieldName string) bool {
 	switch fieldName {
 	case objects.FieldKeyCreatedBy, objects.FieldKeyUpdatedBy, objects.FieldKeyAccountID:

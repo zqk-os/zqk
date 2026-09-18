@@ -3,7 +3,7 @@ package scheduler
 import (
 	"context"
 
-	"github.com/lanceman/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/errfmt"
 )
 
 // TriggerImmediate dispatches a job for immediate execution, bypassing background load cycles.

@@ -11,21 +11,21 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/lanceman/zqk/cmd/zqk/system"
-	"github.com/lanceman/zqk/internal/cli"
-	"github.com/lanceman/zqk/pkg/brand"
-	clipkg "github.com/lanceman/zqk/pkg/cli"
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/goroutinelabels"
-	"github.com/lanceman/zqk/pkg/kernelcas"
-	"github.com/lanceman/zqk/pkg/logging"
-	"github.com/lanceman/zqk/pkg/objectget"
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/storage"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
-	"github.com/lanceman/zqk/pkg/validation"
-	"github.com/lanceman/zqk/pkg/when"
+	"github.com/zqk-os/zqk/cmd/zqk/system"
+	"github.com/zqk-os/zqk/internal/cli"
+	"github.com/zqk-os/zqk/pkg/brand"
+	clipkg "github.com/zqk-os/zqk/pkg/cli"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
+	"github.com/zqk-os/zqk/pkg/kernelcas"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/objectget"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/storage"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/validation"
+	"github.com/zqk-os/zqk/pkg/when"
 )
 
 // buildUpdatesFromFieldFlags builds updates map from --field flags using internal/cli FieldParser.
@@ -442,7 +442,7 @@ func buildUpdatesMap(cmd *cobra.Command, proc *cli.Processor, currentObj map[str
 	applyUnsetFieldFlags(cmd, updates)
 
 	// Drop get-time hydration keys so CAS stays sealed.
-	// TRACK: BLI-REDACTED
+	// TRACK: BLI-1785909672838827000-9fca84f5
 	_ = objectget.StripReferenceResolverOverlayFields(updates)
 
 	if len(updates) == 0 {
@@ -668,7 +668,7 @@ func refuseManualStatusUnlessOverride(cmd *cobra.Command, proc *cli.Processor, i
 
 // guardManualRefFieldUpdates refuses direct mutation of *_ref and *_refs fields via --field,
 // requiring first-class 'object ref add/remove' commands or audited break-glass --override.
-// TRACK: BLI-REDACTED
+// TRACK: BLI-1789167099165682000-a2d974a4
 func guardManualRefFieldUpdates(cmd *cobra.Command, proc *cli.Processor, id, objKind string, updates map[string]any) error {
 	var refFields []string
 	for k := range updates {
@@ -739,7 +739,7 @@ func guardManualRefFieldUpdates(cmd *cobra.Command, proc *cli.Processor, id, obj
 }
 
 // withUpdateBreakGlass arms DECIDE break_glass for --force/--override. Critical kinds
-// require --reason-code. TRACK: BLI-REDACTED
+// require --reason-code. TRACK: BLI-1785784867143912000-635942fb
 func withUpdateBreakGlass(cmd *cobra.Command, ctx stdcontext.Context, objKind string) (stdcontext.Context, error) {
 	force, _ := cmd.Flags().GetBool("force")
 	override, _ := cmd.Flags().GetBool("override")

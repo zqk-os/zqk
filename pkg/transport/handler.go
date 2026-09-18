@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/logging"
 )
 
 // Request encapsulates a decoded payload along with the raw HTTP request context.

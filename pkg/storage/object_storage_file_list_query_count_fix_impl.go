@@ -13,13 +13,13 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/storage/crud"
+	"github.com/zqk-os/zqk/pkg/storage/crud"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/goroutinelabels"
-	"github.com/lanceman/zqk/pkg/objects"
-		fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
+	"github.com/zqk-os/zqk/pkg/objects"
+		fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 var streamMapPool = sync.Pool{
@@ -79,7 +79,7 @@ func (f *FileObjectStorage) listStreamSegmentsWithLimit(ctx context.Context, _ *
 	}
 
 	// Newest date/PID shards first so a bounded Limit can stop without opening history.
-	// TRACK: BLI-REDACTED
+	// TRACK: BLI-1785905541906569000-074e24d7
 	sort.Slice(segments, func(i, j int) bool {
 		return filepath.Base(segments[i]) > filepath.Base(segments[j])
 	})
@@ -131,7 +131,7 @@ func (f *FileObjectStorage) listStreamSegmentsWithLimit(ctx context.Context, _ *
 	// Load deleted set directly to bypass massive streamRegistrySnapshot allocations
 	deletedMap := crud.LoadStreamDeletedSetFast(f.projectRoot, filter.Kind)
 	// Live registry is authoritative after compact truncates stream_deleted (ghost segment lines).
-	// TRACK: BLI-REDACTED
+	// TRACK: BLI-1785905541906569000-074e24d7
 	liveSet := LiveStreamIDSet(f.projectRoot, filter.Kind)
 	var collected atomic.Int32
 
@@ -272,7 +272,7 @@ func (f *FileObjectStorage) listStreamSegmentsWithLimit(ctx context.Context, _ *
 
 	// Early-stop bounds the page; unfiltered total is the live registry so
 	// pagination still sees the universe (TestObjectStorage_ListBoundedReads).
-	// TRACK: BLI-REDACTED
+	// TRACK: BLI-1785905541906569000-074e24d7
 	if len(filter.Filters) == 0 {
 		universe := 0
 		for id := range liveSet {
@@ -374,7 +374,7 @@ func (f *FileObjectStorage) countStreamSegmentsWithFilters(ctx context.Context, 
 
 	// Load deleted set directly to bypass massive streamRegistrySnapshot allocations
 	deletedMap := crud.LoadStreamDeletedSetFast(f.projectRoot, filter.Kind)
-	// TRACK: BLI-REDACTED — same live-set gate as listStreamSegmentsWithLimit
+	// TRACK: BLI-1785905541906569000-074e24d7 — same live-set gate as listStreamSegmentsWithLimit
 	liveSet := LiveStreamIDSet(f.projectRoot, filter.Kind)
 
 	for i := 0; i < actualWorkers; i++ {

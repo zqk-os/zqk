@@ -5,9 +5,9 @@ import (
 	"testing"
 	"time"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/objects"
-	storagepkg "github.com/lanceman/zqk/pkg/storage"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/objects"
+	storagepkg "github.com/zqk-os/zqk/pkg/storage"
 )
 
 func TestConvergenceEngine_StartStop(t *testing.T) {
@@ -257,5 +257,11 @@ func TestConvergenceEngine_evaluateStaleConvergenceSessions(t *testing.T) {
 	}
 	if !foundPlan {
 		t.Errorf("expected priority_plan to be created for stale session")
+	}
+}
+
+func TestConvergenceEngineShutdownTimeout_Constant(t *testing.T) {
+	if convergenceEngineShutdownTimeout != 15*time.Second {
+		t.Errorf("expected 15s convergenceEngineShutdownTimeout, got %v", convergenceEngineShutdownTimeout)
 	}
 }

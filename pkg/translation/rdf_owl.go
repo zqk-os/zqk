@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/zqktime"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/zqktime"
 )
 
 // NewRDFOWLTranslator returns a translator for RDF/OWL (Turtle, RDF/XML, JSON-LD) input.

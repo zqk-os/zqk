@@ -1,0 +1,103 @@
+Update one or more existing objects by ID.
+
+
+
+IDs may be positional args, comma-separated (ID1,ID2), and/or --ids.
+
+Multiple IDs use the same storage BulkUpdate path.
+
+
+
+The update data can be provided via:
+
+- --file: Path to a YAML file containing the updates
+
+- --data: Inline YAML data
+
+- --field: Update one field (field=value or field:value). Parsed as JSON when
+valid (objects, arrays,
+
+quoted strings, numbers, booleans); otherwise kept as a literal string. For text
+with colons, use a JSON
+
+string (e.g. next_action="Done: shipped") or --data.
+
+- --add-ref: Add a reference (field=id); validates target exists. BLI-853.
+
+- --remove-ref: Remove a reference (field=id).
+
+- --unset-field: Remove a non-immutable field from the object (repeatable). Use
+to drop stray keys (e.g. invalid test fields) without editing CAS YAML by hand.
+
+- --auto-status: Advance to the next lifecycle-valid status based on current
+status and lifecycle order.
+
+- --all: Update all objects of a kind (requires --kind)
+
+- --add-missing-fields: Automatically add missing fields based on object spec
+
+- stdin: YAML data piped from another command
+
+  Update from file
+  zqk.test update BLI-626 --file updates.yaml
+  Update from inline data
+  zqk.test update BLI-626 --data 'title: "Updated Title"'
+  Update a single field
+  zqk.test update BLI-626 --field title="Updated Title"
+  Update multiple fields
+  zqk.test update BLI-626 --field title="New Title" --field status=validated
+  Update many IDs (comma-separated)
+  zqk.test update ATK-001,ATK-002 --field assignee_persona_ref=PER-DEFAULT-AGENT
+  Text with colons (JSON string value)
+  zqk.test update CVS-001 --field 'next_action="Closed: matrix updated"'
+  Update all objects of a kind
+  zqk.test object update --all --kind backlog_item --add-missing-fields
+  Update with optimistic locking
+  zqk.test update BLI-626 --field title="New Title" --expected-updated-at "2025-12-25T20:00:00Z"
+  Dry-run to see what would be updated
+  zqk.test update BLI-626 --field title="New Title" --dry-run
+  Add a reference (validates target exists)
+  zqk.test update BLI-626 --add-ref milestone_refs=MIL-001
+  Remove a reference
+  zqk.test update BLI-626 --remove-ref milestone_refs=MIL-001
+  Remove an invalid or stray field from the object
+  zqk.test update BLI-626 --unset-field stray_field
+  Advance to next lifecycle status automatically
+  zqk.test update CRIT-9037 --auto-status
+
+Usage:
+  zqk.test object update <id>[,id...] [id...] [flags]
+
+Aliases:
+  update, edit
+
+Flags:
+      --add-missing-fields           Automatically add missing fields based on object spec (e.g., namespace_id)
+      --add-ref stringArray          Add a reference (format: field=id, e.g. milestone_refs=MIL-001). Validates target exists. Can be repeated. BLI-853.
+      --all                          Update all objects of a kind (requires --kind flag)
+      --auto-status                  Advance status to the next lifecycle-valid status for this object kind. Cannot be combined with explicit status field.
+      --columns string               Override column widths for table output (format: field:width)
+      --data string                  Inline YAML data for updates
+      --dry-run                      Show what would be done without actually doing it
+      --expected-updated-at string   Expected updated_at timestamp for optimistic locking
+      --field stringArray            Update a field (field=value or field:value). Parses as JSON when valid, else literal string; use JSON quotes for colons (e.g. note="a: b"). Repeatable.
+      --file string                  Path to YAML file containing update data
+      --filter stringArray           Filter by field (format: field=value or field:value, can be used multiple times). Only applies when using --all
+      --force                        Force update even if object doesn't exist (create instead of fail)
+  -f, --format string                Output format (table, json, jsonl, yaml, csv, json-rpc, stream, agent-prompt, semantic-link) (default "table")
+      --ids string                   Comma-separated list of object IDs (same as positional multi-ID / comma lists)
+      --ignore-scheduler-down        Ignore scheduler down warning/lockdown
+      --kind string                  Object kind (required when using --all)
+  -o, --output string                Write output to file
+      --override                     Human interactive TTY snap-remedy only (blocked for non-TTY/agents). Prefer promote/demote. Records process debt.
+  -q, --quiet                        Suppress non-essential output
+      --reason-code string           Required descriptive reason (≥5 words) when using --override
+      --relaxed                      Relax integrity constraints during update (allow references to objects that will be created later in batch operations)
+      --remove-ref stringArray       Remove a reference (format: field=id). Can be repeated. BLI-853.
+      --timeout duration             Timeout for command execution (0 = auto-calculate)
+      --unset-field stringArray      Remove a field from the object (field name only; repeat flag per field). Cannot unset id, kind, created_at, created_by.
+  -v, --verbose                      Verbose output
+
+Global Flags:
+      --allow-degraded   Allow scheduler-dependent commands to run when scheduler daemon is not running
+      --internal         Elevated access mode for built-in and internal kinds (requires Enterprise license or zqk-admin)

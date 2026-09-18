@@ -4,7 +4,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/llm"
+	"github.com/zqk-os/zqk/pkg/llm"
 )
 
 func TestTokenTracker_EstimateTokens(t *testing.T) {

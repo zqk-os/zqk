@@ -5,8 +5,8 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/lanceman/zqk/pkg/nildecode"
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/nildecode"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // ConvergenceMeasureResult is the normalized output of an evaluation surface adapter.

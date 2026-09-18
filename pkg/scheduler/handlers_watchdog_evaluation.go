@@ -4,12 +4,12 @@ import (
 	"context"
 	"encoding/json"
 
-	"github.com/lanceman/zqk/pkg/cli"
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/logging"
-	"github.com/lanceman/zqk/pkg/objects"
-	storagepkg "github.com/lanceman/zqk/pkg/storage"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/filter"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/objects"
+	storagepkg "github.com/zqk-os/zqk/pkg/storage"
 )
 
 type WatchdogEvaluationHandler struct {
@@ -36,13 +36,13 @@ func (h *WatchdogEvaluationHandler) Execute(ctx context.Context, job *ScheduledJ
 func (h *WatchdogEvaluationHandler) executeWatchdogEvaluationCore(ctx context.Context, job *ScheduledJob) error {
 	secCtx := pkgctx.NewSystemSecurityContext()
 
-	filter := storagepkg.ListFilter{
+	regFilter := storagepkg.ListFilter{
 		Kind: "watchdog_registration",
 		Filters: map[string]any{
 			objects.FieldKeyStatus: objects.ObjectStatusApproved,
 		},
 	}
-	res, err := h.storage.List(ctx, secCtx, nil, filter)
+	res, err := h.storage.List(ctx, secCtx, nil, regFilter)
 	if err != nil {
 		return errfmt.Errorf("failed to list watchdog_registrations: %w", err)
 	}
@@ -56,7 +56,7 @@ func (h *WatchdogEvaluationHandler) executeWatchdogEvaluationCore(ctx context.Co
 			continue
 		}
 
-		field, value, err := cli.ParseFilterString(conditionQuery)
+		field, value, err := filter.ParseFilterString(conditionQuery)
 		if err != nil {
 			SLog(h.logger).Error("watchdog_query_parse_failed", err).
 				String("target_kind", targetKind).

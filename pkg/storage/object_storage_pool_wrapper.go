@@ -3,9 +3,9 @@ package storage
 import (
 	"context"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/graph/provider"
-	"github.com/lanceman/zqk/pkg/logging"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/graph/provider"
+	"github.com/zqk-os/zqk/pkg/logging"
 	// PoolAwareGraphStorage wraps GraphObjectStorage to use a connection pool
 	// for each operation. This allows GraphObjectStorage to work with
 	// the connection pool pattern used by the graph backend.

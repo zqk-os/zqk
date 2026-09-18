@@ -12,8 +12,8 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // ContaminationCheckOptions defines settings for guarding a directory plane during execution.

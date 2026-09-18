@@ -4,9 +4,9 @@ import (
 	"context"
 	"strings"
 
-	"github.com/lanceman/zqk/pkg/logging"
-	"github.com/lanceman/zqk/pkg/zqkenv"
-	"github.com/lanceman/zqk/pkg/zqksession"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
+	"github.com/zqk-os/zqk/pkg/zqksession"
 )
 
 // WithRunIdentity stamps session and task ids onto every run-loop log so concurrent

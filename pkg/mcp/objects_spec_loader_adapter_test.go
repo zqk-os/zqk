@@ -3,8 +3,8 @@ package mcp
 import (
 	"testing"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/objects"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // TestNewSpecAccessControlFromObjectsLoader verifies BLI-642 adapter: create SAC from objects.SpecLoader.

@@ -5,7 +5,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/lanceman/zqk/pkg/nildecode"
+	"github.com/zqk-os/zqk/pkg/nildecode"
 )
 
 // Rule evaluates one configured check against a whole object map.

@@ -9,12 +9,12 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/lanceman/zqk/internal/cli"
-	clipkg "github.com/lanceman/zqk/pkg/cli"
-	"github.com/lanceman/zqk/pkg/cli/bldr_cli_cmd_v1"
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/paths"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/internal/cli"
+	clipkg "github.com/zqk-os/zqk/pkg/cli"
+	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/paths"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // NewMetricsCmd creates a command to view command metrics
@@ -42,13 +42,16 @@ func NewMetricsCmd() *cobra.Command {
 		RunE: runMetrics,
 	})
 
-	// Apply help builder to command
-	helpBuilder.ApplyToCommand(cmd)
-
 	cmd.Flags().String("command", "", "Filter by specific command pattern")
 	cmd.Flags().String("filter", "", "Filter by type (failures, timeouts, slow)")
 	cmd.Flags().Int("limit", 0, "Limit number of results (0 = all)")
 	cmd.Flags().Bool("summary", false, "Generate detailed analysis summary report")
+	cmd.Flags().Bool("all-time", false, "Aggregate across current and all day-rolled historical chunks")
+	cmd.Flags().Duration("window", 0, "Window duration to look back across historical chunks (e.g. 24h, 72h, 168h)")
+	cmd.Flags().String("day", "", "View metrics for a specific date (YYYY-MM-DD or YYYYMMDD)")
+
+	// Apply help builder to command after flags are declared
+	helpBuilder.ApplyToCommand(cmd)
 
 	// Add subcommands
 	cmd.AddCommand(NewFileLockMetricsCmd())
@@ -66,6 +69,9 @@ type metricsOptions struct {
 	TypeFilter    string
 	Limit         int
 	Summary       bool
+	AllTime       bool
+	Window        time.Duration
+	Day           string
 }
 
 func runMetrics(cmd *cobra.Command, args []string) error {
@@ -90,6 +96,12 @@ func runMetrics(cmd *cobra.Command, args []string) error {
 	limit, _ := cmd.Flags().GetInt("limit")
 	//nolint:errcheck // Flag get - error indicates flag not set, default used
 	summary, _ := cmd.Flags().GetBool("summary")
+	//nolint:errcheck // Flag get - error indicates flag not set, default used
+	allTime, _ := cmd.Flags().GetBool("all-time")
+	//nolint:errcheck // Flag get - error indicates flag not set, default used
+	window, _ := cmd.Flags().GetDuration("window")
+	//nolint:errcheck // Flag get - error indicates flag not set, default used
+	day, _ := cmd.Flags().GetString("day")
 
 	// Create options struct with context and command-specific flags
 	opts := &metricsOptions{
@@ -98,6 +110,9 @@ func runMetrics(cmd *cobra.Command, args []string) error {
 		TypeFilter:    typeFilter,
 		Limit:         limit,
 		Summary:       summary,
+		AllTime:       allTime,
+		Window:        window,
+		Day:           day,
 	}
 
 	metricsPath := filepath.Join(projectRoot, paths.ProjectDataDir, paths.MetricsDir, paths.CommandMetricsFile)
@@ -113,7 +128,16 @@ func runMetrics(cmd *cobra.Command, args []string) error {
 		return errfmt.Newf("failed to load metrics store").Wrap(err)
 	}
 
-	allMetrics, err := store.GetAllMetrics()
+	var allMetrics map[string]*clipkg.CommandMetrics
+	if opts.Day != "" {
+		allMetrics, err = store.GetMetricsForDate(opts.Day)
+	} else if opts.AllTime {
+		allMetrics, err = store.GetAllTimeMetrics()
+	} else if opts.Window > 0 {
+		allMetrics, err = store.GetMetricsSince(opts.Window)
+	} else {
+		allMetrics, err = store.GetAllMetrics()
+	}
 	if err != nil {
 		return errfmt.Newf("failed to get metrics").Wrap(err)
 	}

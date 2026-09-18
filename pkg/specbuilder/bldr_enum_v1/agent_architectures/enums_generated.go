@@ -4,8 +4,8 @@
 package agent_architectures
 
 import (
-	base_objectenum "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
-	shared_agent_architecturesenum "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/shared_agent_architectures"
+	base_objectenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
+	shared_agent_architecturesenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/shared_agent_architectures"
 )
 
 type AgentType string

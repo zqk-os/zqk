@@ -4,10 +4,10 @@ import (
 	"path/filepath"
 	"sync"
 
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/paths"
-	"github.com/lanceman/zqk/pkg/pipeline"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/pipeline"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // Compiler builds Definition values from lifecycle + kind overlays.

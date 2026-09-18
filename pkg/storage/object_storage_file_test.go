@@ -14,13 +14,13 @@ import (
 	"testing"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/datacell"
-	"github.com/lanceman/zqk/pkg/paths"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/datacell"
+	"github.com/zqk-os/zqk/pkg/paths"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/goroutinelabels"
-	"github.com/lanceman/zqk/pkg/objects"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // ensureObjectDeleted deterministically waits for an object to be deleted by polling
@@ -108,7 +108,7 @@ func TestFileObjectStorage_List_ComplexListOperations(t *testing.T) {
 		{objects.FieldKeyID: "GOAL-003", objects.FieldKeyKind: "goal", objects.FieldKeyTitle: "Goal 3", objects.FieldKeyStatus: objects.ObjectStatusActive, objects.FieldKeySchemaVersion: objects.DefaultSchemaVersion, objects.FieldKeyTarget: "100", objects.FieldKeyMetric: "count"},
 		{objects.FieldKeyID: "MIL-001", objects.FieldKeyKind: "milestone", objects.FieldKeyTitle: "Milestone 1", objects.FieldKeyStatus: objects.ObjectStatusInProgress, objects.FieldKeySchemaVersion: objects.DefaultSchemaVersion},
 	}
-	// TRACK: BLI-REDACTED — draft-plane create / promote membrane.
+	// TRACK: BLI-1785443942668406000-1ec5c811 — draft-plane create / promote membrane.
 	for _, obj := range referencedObjects {
 		CreateCASVisible(t, storage, ctx, secCtx, obj, "")
 	}
@@ -172,7 +172,7 @@ func TestFileObjectStorage_List_ComplexListOperations(t *testing.T) {
 	}
 
 	// Create all test objects (promote exploring off draft so List/$has see CAS)
-	// TRACK: BLI-REDACTED — draft-plane create / promote membrane.
+	// TRACK: BLI-1785443942668406000-1ec5c811 — draft-plane create / promote membrane.
 	for _, obj := range testObjects {
 		CreateCASVisible(t, storage, ctx, secCtx, obj, objects.ObjectStatusValidated)
 	}
@@ -448,7 +448,7 @@ func TestFileObjectStorage_List_ParallelReads(t *testing.T) {
 			objects.FieldKeyMetric:        "Test metric",
 			objects.FieldKeySchemaVersion: objects.DefaultSchemaVersion,
 		}
-		// TRACK: BLI-REDACTED — draft-plane create / promote membrane.
+		// TRACK: BLI-1785443942668406000-1ec5c811 — draft-plane create / promote membrane.
 		CreateCASVisible(t, storage, ctx, secCtx, goal, "active")
 	}
 
@@ -466,7 +466,7 @@ func TestFileObjectStorage_List_ParallelReads(t *testing.T) {
 			objects.FieldKeyCategory:      "development",
 			objects.FieldKeyGoalRefs:      []string{fmt.Sprintf("GOAL-%03d", i%10)},
 		}
-		// TRACK: BLI-REDACTED — draft-plane create / promote membrane.
+		// TRACK: BLI-1785443942668406000-1ec5c811 — draft-plane create / promote membrane.
 		CreateCASVisible(t, storage, ctx, secCtx, obj, objects.ObjectStatusValidated)
 	}
 
@@ -573,7 +573,7 @@ func TestFileObjectStorage_List_GroupingAndCounting(t *testing.T) {
 	}
 
 	// Promote off draft plane; preliminary intents (exploring) map via DistinctLeaveStatusForTest.
-	// TRACK: BLI-REDACTED — draft-plane create / promote membrane.
+	// TRACK: BLI-1785443942668406000-1ec5c811 — draft-plane create / promote membrane.
 	for _, obj := range testObjects {
 		intended, _ := obj[objects.FieldKeyStatus].(string)
 		leave := DistinctLeaveStatusForTest("backlog_item", intended)
@@ -728,5 +728,19 @@ func TestFileObjectStorage_List_BudgetExhaustionDoesNotDeadlock(t *testing.T) {
 	defer cancel()
 	if _, err := storageProvider.List(ctx, secCtx, &pkgctx.StorageContext{}, ListFilter{Kind: objects.KindGoal}); err != nil {
 		t.Fatalf("list with exhausted optional worker budget: %v", err)
+	}
+}
+
+func TestFileObjectStorage_ShutdownDrain(t *testing.T) {
+	tmpDir := t.TempDir()
+	mustEnsureProcessSpecsLayout(t, tmpDir)
+	fs, err := NewFileObjectStorageForTest(tmpDir)
+	if err != nil {
+		t.Fatalf("NewFileObjectStorageForTest: %v", err)
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	defer cancel()
+	if err := fs.Shutdown(ctx); err != nil {
+		t.Fatalf("fs.Shutdown failed: %v", err)
 	}
 }

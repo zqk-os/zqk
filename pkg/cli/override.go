@@ -9,12 +9,12 @@ import (
 	"time"
 
 	"github.com/fatih/color"
-	"github.com/lanceman/zqk/pkg/brand"
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	goroutinelabels "github.com/lanceman/zqk/pkg/goroutinelabels"
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/process"
-	"github.com/lanceman/zqk/pkg/zqkenv"
+	"github.com/zqk-os/zqk/pkg/brand"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	goroutinelabels "github.com/zqk-os/zqk/pkg/goroutinelabels"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/process"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 	"github.com/spf13/cobra"
 	"golang.org/x/term"
 )
@@ -108,7 +108,7 @@ func EnforceOverrideFriction(
 	// storage refuses IsLifecycleBreakGlass ∧ critical ∧ !AllowCoreObjectDelete with a
 	// misleading "break_glass requires --reason-code" error (KMP DECIDE). Status
 	// identified is the preliminary origin (draft plane) — no lifecycle bypass needed.
-	// TRACK: BLI-REDACTED
+	// TRACK: BLI-1785784867143912000-635942fb
 	createCtx := pkgctx.WithCacheUpdate(createBase, "", "technical_debt", "")
 	if err := store.Create(createCtx, secCtx, debtObj); err != nil {
 		fmt.Fprintln(cmd.ErrOrStderr(), color.RedString(fmt.Sprintf("⚠️ WARNING: Failed to record technical debt in storage: %v", err)))

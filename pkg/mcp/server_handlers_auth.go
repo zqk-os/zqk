@@ -1,8 +1,8 @@
 package mcp
 
 import (
-	"github.com/lanceman/zqk/pkg/datacell"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/datacell"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 
 	"context"
 	"crypto/sha256"
@@ -16,15 +16,15 @@ import (
 	"golang.org/x/crypto/bcrypt"
 	"gopkg.in/yaml.v3"
 
-	"github.com/lanceman/zqk/pkg/authcred"
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/logging"
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/paths"
-	"github.com/lanceman/zqk/pkg/storage/id_generation"
-	"github.com/lanceman/zqk/pkg/validation"
-	"github.com/lanceman/zqk/pkg/zqktime"
+	"github.com/zqk-os/zqk/pkg/authcred"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/storage/id_generation"
+	"github.com/zqk-os/zqk/pkg/validation"
+	"github.com/zqk-os/zqk/pkg/zqktime"
 )
 
 // key_type values for keystore entries
@@ -253,7 +253,7 @@ func (s *Server) validateCredentialsAndResolveAccount(ctx context.Context, clien
 // "invalid username or password".
 func (s *Server) validateUsernamePassword(_ context.Context, username, password, projectRoot string) (accountID string, roles, permissions []string, err error) {
 	// Prefer ACC-* via migrate map / username index (account:username files are retired).
-	// TRACK: BLI-REDACTED / f021fe6f02
+	// TRACK: BLI-1785905136581480000-1f317f44 / f021fe6f02
 	accountID = authcred.CanonicalAccountID(projectRoot, "account:"+strings.ToLower(username))
 	var accountObj map[string]any
 	if accountID != emptyValue {
@@ -564,7 +564,7 @@ func (s *Server) validatePersonalAccessToken(_ context.Context, pat, projectRoot
 
 // loadAccountObject loads an account object by ACC-* id (CAS via .account.index).
 // Legacy account:username / account-username.yaml paths are retired.
-// TRACK: BLI-REDACTED
+// TRACK: BLI-1785905136581480000-1f317f44
 func (s *Server) loadAccountObject(accountID, projectRoot string) (map[string]any, error) {
 	accountID = strings.TrimSpace(accountID)
 	if canon := authcred.CanonicalAccountID(projectRoot, accountID); canon != "" {

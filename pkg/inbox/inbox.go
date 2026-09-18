@@ -4,10 +4,10 @@ import (
 	"context"
 	"time"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/storage"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/storage"
 )
 
 // IngestionParams holds the parameters for ingesting a new agent instruction proposal.
@@ -44,8 +44,8 @@ func IngestProposal(ctx context.Context, secCtx *pkgctx.SecurityContext, store s
 		obj[objects.FieldKeyCreatedBy] = params.CreatedBy
 		obj[objects.FieldKeyUpdatedBy] = params.CreatedBy
 	} else {
-		obj[objects.FieldKeyCreatedBy] = "ACC-1785920548450214012-68b850c0"
-		obj[objects.FieldKeyUpdatedBy] = "ACC-1785920548450214012-68b850c0"
+		obj[objects.FieldKeyCreatedBy] = objects.DefaultSystemAccountID
+		obj[objects.FieldKeyUpdatedBy] = objects.DefaultSystemAccountID
 	}
 
 	// Create in storage

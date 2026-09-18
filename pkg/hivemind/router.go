@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"sort"
 
-	"github.com/lanceman/zqk/pkg/graph/provider"
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/graph/provider"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // RouterConfig contains configuration for the dynamic query router.

@@ -3,7 +3,7 @@
 package mcp
 
 import (
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // ObjectsSpecLoaderAdapter adapts *objects.SpecLoader to the SpecLoader interface.

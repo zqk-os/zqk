@@ -4,7 +4,7 @@ package storage
 import (
 	"context"
 
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 func (p *DSIAStorageProvider) BulkCreate(ctx context.Context, secCtx *SecurityContext, objs []map[string]any) (*BulkResult, error) {

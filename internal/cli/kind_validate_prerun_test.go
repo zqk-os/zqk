@@ -3,8 +3,8 @@ package cli
 import (
 	"testing"
 
-	pkgcli "github.com/lanceman/zqk/pkg/cli"
-	"github.com/lanceman/zqk/pkg/objects"
+	pkgcli "github.com/zqk-os/zqk/pkg/cli"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 func TestValidateAnnotatedKind_noAnnotation_isNoOp(t *testing.T) {

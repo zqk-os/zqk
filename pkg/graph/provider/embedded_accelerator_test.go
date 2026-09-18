@@ -6,13 +6,13 @@ import (
 	"testing"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/graph/provider"
+	"github.com/zqk-os/zqk/pkg/graph/provider"
 )
 
-// TestCRIT_1789333118970585000_a2d88dd2 verifies CRIT-REDACTED:
+// TestCRIT_1789333118970585000_a2d88dd2 verifies CRIT-1789333118970585000-a2d88dd2:
 // Vertex-label index lookup and 1-hop traverse stay bound without a full graph scan.
-// Covering BLI-REDACTED (embedded vertex-label index cache) and
-// BLI-REDACTED (bound 1-hop edge traverser / Cypher-subset accelerator).
+// Covering BLI-1789333144505076000-af8eef2d (embedded vertex-label index cache) and
+// BLI-1789333146768031000-8c5d71b0 (bound 1-hop edge traverser / Cypher-subset accelerator).
 func TestCRIT_1789333118970585000_a2d88dd2(t *testing.T) {
 	t.Parallel()
 	ctx := context.Background()
@@ -53,7 +53,7 @@ func TestCRIT_1789333118970585000_a2d88dd2(t *testing.T) {
 		acc.IndexEdge(edge)
 	}
 
-	// Step 3: Vertex-label index lookup stays bound without full graph scan (BLI-REDACTED)
+	// Step 3: Vertex-label index lookup stays bound without full graph scan (BLI-1789333144505076000-af8eef2d)
 	startTime := time.Now()
 	nodes, err := acc.LookupByLabel(ctx, "BacklogItem", 50)
 	duration := time.Since(startTime)
@@ -74,7 +74,7 @@ func TestCRIT_1789333118970585000_a2d88dd2(t *testing.T) {
 		}
 	}
 
-	// Step 4: 1-hop edge traverse stays bound without full graph scan (BLI-REDACTED)
+	// Step 4: 1-hop edge traverse stays bound without full graph scan (BLI-1789333146768031000-8c5d71b0)
 	startNodeID := "NODE-0000"
 	tq := provider.TraversalQuery{
 		StartNodeID:  startNodeID,

@@ -1,0 +1,15 @@
+Outputs quarantine stats (file counts by source). Use --format json or --format
+yaml for structured data suitable for a dashboard or other consumers; default is
+a human-readable table.
+
+See docs/process/system-health/QUARANTINE_AND_ANALYSIS.md for what goes in
+quarantine and the dashboard data story.
+
+Usage:
+  zqk.test system quarantine-report [flags]
+
+Flags:
+      --verbose   Include per-kind breakdown under hash-duplicates (always included in JSON/YAML)
+
+Global Flags:
+      --allow-degraded   Allow scheduler-dependent commands to run when scheduler daemon is not running

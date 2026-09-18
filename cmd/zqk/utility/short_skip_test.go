@@ -5,7 +5,7 @@ import (
 	"os"
 	"testing"
 
-	caspkg "github.com/lanceman/zqk/pkg/storage/cas"
+	caspkg "github.com/zqk-os/zqk/pkg/storage/cas"
 )
 
 // TestMain skips the entire utility package when -short is set.

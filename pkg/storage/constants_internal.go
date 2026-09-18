@@ -3,7 +3,7 @@ package storage
 import (
 	"time"
 
-	"github.com/lanceman/zqk/pkg/storage/audit"
+	"github.com/zqk-os/zqk/pkg/storage/audit"
 )
 
 // Global Constants

@@ -9,11 +9,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/paths"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/paths"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 
-	"github.com/lanceman/zqk/pkg/storage"
-	caspkg "github.com/lanceman/zqk/pkg/storage/cas"
+	"github.com/zqk-os/zqk/pkg/storage"
+	caspkg "github.com/zqk-os/zqk/pkg/storage/cas"
 )
 
 // TestCASOrphanCleanupQueue_CoordinatorIntegration_NonExistentFile tests cleanup of non-existent files

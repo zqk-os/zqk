@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/graph/provider"
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/graph/provider"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // Message represents a message or backlog_item to be routed.

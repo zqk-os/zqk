@@ -3,13 +3,13 @@ package storage
 import (
 	"strings"
 
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // hierarchyParentRefKeys are the child→parent membership/composition fields the
 // status gateway and lifecycle occupancy fan-out walk. Singular "milestone_ref"
 // remains for ATK fixtures; production BLIs store FieldKeyMilestoneRefs.
-// TRACK: BLI-REDACTED — occupancy was PRI-only until hierarchy bubble.
+// TRACK: BLI-1786411312347141000-5f3d9063 — occupancy was PRI-only until hierarchy bubble.
 var hierarchyParentRefKeys = []string{
 	"parent_ref",
 	objects.FieldKeyPriorityPlanRef,

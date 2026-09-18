@@ -1,0 +1,15 @@
+category: feature
+created_at: "2026-09-18T23:00:00Z"
+created_by: ACC-1785920548450214012-68b850c0
+description: 'Zero-friction onboarding: clean zqk init scaffolding, pre-configured 2-agent starter pack, and visual TUI status dashboard.'
+entry_point: scripts/demos/day_zero_dx_demo.sh
+id: WS-DEMO-DAY-ZERO-DX
+kind: workstream
+namespace_id: zqk:kernel
+owner_ref: ACC-1785920548450214012-68b850c0
+schema_version: 2.0.0
+status: active
+title: The 5-Minute 'Aha' Moment & Day-0 Scaffolding
+updated_at: "2026-09-18T23:04:04Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

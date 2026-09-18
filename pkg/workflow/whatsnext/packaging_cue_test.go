@@ -4,7 +4,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 func TestPriorityPlanPackagingCue(t *testing.T) {

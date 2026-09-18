@@ -4,10 +4,10 @@ import (
 	"path/filepath"
 	"testing"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/paths"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // schemaPlaneDirs are the four directories SeedSchemaPlane must populate. Listing them here
@@ -22,7 +22,7 @@ var schemaPlaneDirs = []string{
 
 // TestSeedSchemaPlanePopulatesEveryPlaneDir is also the guard against reversed copy arguments.
 // The helpers take (destination, source); swapping them copies the empty temp root over the
-// real repository's specs, which is the defect recorded in BLI-REDACTED.
+// real repository's specs, which is the defect recorded in BLI-1787555794519027000-8ba84e8a.
 // Asserting that the temp root actually received files fails in that case, because a reversed
 // copy leaves the temp root empty.
 func TestSeedSchemaPlanePopulatesEveryPlaneDir(t *testing.T) {

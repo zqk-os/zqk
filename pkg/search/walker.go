@@ -7,13 +7,14 @@ import (
 	"path/filepath"
 	"strings"
 
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/objects"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // DefaultIgnoreDirs contains directory names excluded from search by default.
+// DefaultIgnoreDirs contains directory names excluded from search by default.
 var DefaultIgnoreDirs = map[string]bool{
 	".git":           true,
-	".zqk":           true,
 	".zqk-state":     true,
 	".gemini":        true,
 	"vendor":         true,
@@ -29,8 +30,24 @@ var DefaultIgnoreDirs = map[string]bool{
 	".cache":         true,
 	".cursor":        true,
 	".claude":        true,
-	".agent":         true,
-	".agents":        true,
+}
+
+// ZqkIgnoredSubdirs contains subdirectories under .zqk that should always be ignored (runtime caches/logs/builds).
+var ZqkIgnoredSubdirs = map[string]bool{
+	"cache":                 true,
+	"state":                 true,
+	"logs":                  true,
+	"wal":                   true,
+	"lock":                  true,
+	"autofix":               true,
+	objects.FieldKeyMetrics: true,
+	"cleanup":               true,
+	"test-bundles":          true,
+	"keystore":              true,
+	"credentials":           true,
+	"streams":               true,
+	"pre-commit":            true,
+	"system-health":         true,
 }
 
 // DefaultIgnoreExtensions contains binary and noise extensions excluded by default when no explicit extension filter is passed.
@@ -41,6 +58,7 @@ var DefaultIgnoreExtensions = map[string]bool{
 	".png": true, ".jpg": true, ".jpeg": true, ".gif": true, ".ico": true, ".webp": true, ".bmp": true,
 	".pdf": true, ".woff": true, ".woff2": true, ".ttf": true, ".eot": true,
 	".csnap": true, ".db": true, ".sqlite": true,
+	".hashes": true, ".index": true,
 	".log": true, ".tmp": true, ".bak": true, ".swp": true,
 }
 
@@ -90,11 +108,26 @@ func MatchExtension(path string, exts []string) bool {
 
 // ShouldSkipDir returns true if a directory should be skipped during walk.
 func ShouldSkipDir(name string, includeHidden bool, customExcludes []string) bool {
-	if !includeHidden && strings.HasPrefix(name, ".") && name != "." && name != ".." {
+	if name == ".git" {
 		return true
 	}
-	if DefaultIgnoreDirs[name] {
+	// Always skip heavy build / vendor dirs
+	if name == "vendor" || name == "node_modules" || name == "dist" || name == "dist-community" || name == "bin" || name == "target" || name == ".zqk-state" {
 		return true
+	}
+	if ZqkIgnoredSubdirs[name] {
+		return true
+	}
+	if !includeHidden {
+		if strings.HasPrefix(name, ".") && name != "." && name != ".." {
+			// Whitelist .agent, .agents, and .zqk for core project knowledge
+			if name != ".agent" && name != ".agents" && name != ".zqk" {
+				return true
+			}
+		}
+		if DefaultIgnoreDirs[name] {
+			return true
+		}
 	}
 	for _, exclude := range customExcludes {
 		if strings.EqualFold(name, exclude) {
@@ -143,6 +176,10 @@ func CollectFiles(root string, opts SearchOptions) ([]string, error) {
 		}
 
 		name := d.Name()
+		// Skip internal index and cache dump files
+		if strings.HasSuffix(name, "_cache.json") || strings.HasSuffix(name, ".cache.json") || strings.HasSuffix(name, ".idx") {
+			return nil
+		}
 		// Skip known root/intermediate compiled binaries with no extension
 		if name == "zqk" || name == "zqk-mcp" || name == "zqk_local" || name == "split-pri-214-by-theme" || name == "seed_brand_assets_to_glossary" {
 			return nil

@@ -3,10 +3,10 @@ package storage
 import (
 	"context"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/logging"
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/storage/audit"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/storage/audit"
 )
 
 // ensureCreateLifecycleStatus sets status on create when missing or invalid for the kind,
@@ -19,7 +19,7 @@ import (
 // CAS directly — system/agent payloads that are already shovel-ready must never land as
 // draft-plane ghosts.
 //
-// TRACK: BLI-REDACTED — draft-first create / promote membrane.
+// TRACK: BLI-1785639926306245000-cf2ac4b1 — draft-first create / promote membrane.
 func ensureCreateLifecycleStatus(ctx context.Context, obj map[string]any, promoteOnCreate bool) {
 	kind, _ := obj[objects.FieldKeyKind].(string)
 	if kind == "" {
@@ -77,7 +77,7 @@ func ensureCreateLifecycleStatus(ctx context.Context, obj map[string]any, promot
 	}
 	// Origin is already shovel_ready (glossary_term, scheduler_job, …). Status coerce cannot
 	// park on the draft plane until those lifecycles gain a preliminary origin.
-	// TRACK: BLI-REDACTED
+	// TRACK: BLI-1785639926306245000-cf2ac4b1
 	logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
 	StorageLog(logger).Warn("create at non-preliminary lifecycle origin; membrane park incomplete").
 		Kind(kind).

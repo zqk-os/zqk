@@ -3,7 +3,7 @@ package validation
 import (
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 func TestEvaluateShovelReady_complete(t *testing.T) {

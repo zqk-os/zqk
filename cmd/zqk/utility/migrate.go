@@ -3,15 +3,15 @@ package utility
 import (
 	"os"
 
-	"github.com/lanceman/zqk/pkg/execwrap"
+	"github.com/zqk-os/zqk/pkg/execwrap"
 
-	"github.com/lanceman/zqk/internal/cli"
-	clipkg "github.com/lanceman/zqk/pkg/cli"
-	"github.com/lanceman/zqk/pkg/cli/bldr_cli_cmd_v1"
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/logging"
-	"github.com/lanceman/zqk/pkg/migration/detector"
+	"github.com/zqk-os/zqk/internal/cli"
+	clipkg "github.com/zqk-os/zqk/pkg/cli"
+	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/migration/detector"
 	"github.com/spf13/cobra"
 )
 
@@ -25,8 +25,8 @@ func NewMigrateCmd() *cobra.Command {
 		"The binary must be code-signed and pass integrity verification.",
 		"",
 		"The migration tool is a separate binary that can be installed via:",
-		"  - go install github.com/lanceman/zqk/cmd/zqk-migrate@latest",
-		"  - Download from: https://github.com/lanceman/zqk/releases",
+		"  - go install github.com/zqk-os/zqk/cmd/zqk-migrate@latest",
+		"  - Download from: https://github.com/zqk-os/zqk/releases",
 	).
 		AddExample("Migrate from file to graph backend", "%s utility migrate --source . --target memgraph").
 		AddExample("Migrate specific phase", "%s utility migrate --source . --target memgraph --phase entity").
@@ -74,15 +74,15 @@ func runMigrate(cmd *cobra.Command, args []string) error {
 The migration tool (zqk-migrate) is not installed or not in PATH.
 
 Install with:
-  go install github.com/lanceman/zqk/cmd/zqk-migrate@latest
+  go install github.com/zqk-os/zqk/cmd/zqk-migrate@latest
 
 Or download from:
-  https://github.com/lanceman/zqk/releases`)
+  https://github.com/zqk-os/zqk/releases`)
 		}
 
 		// Binary found but verification failed
 		if err := d.VerifyIntegrity(path); err != nil {
-			return errfmt.Errorf("migration binary integrity check failed: %w. The migration binary was found but failed verification. This may indicate: the binary has been tampered with, the binary is not properly code-signed (REQUIRED), or the binary is from an untrusted source. Actions: 1. Re-download the binary from official release: https://github.com/lanceman/zqk/releases/latest. 2. Ensure you download both the binary AND signature file: zqk-migrate (binary), zqk-migrate.sig (GPG signature, Linux), or use signed installer (macOS/Windows). 3. Verify the download source is legitimate. Code signing is REQUIRED for security", err)
+			return errfmt.Errorf("migration binary integrity check failed: %w. The migration binary was found but failed verification. This may indicate: the binary has been tampered with, the binary is not properly code-signed (REQUIRED), or the binary is from an untrusted source. Actions: 1. Re-download the binary from official release: https://github.com/zqk-os/zqk/releases/latest. 2. Ensure you download both the binary AND signature file: zqk-migrate (binary), zqk-migrate.sig (GPG signature, Linux), or use signed installer (macOS/Windows). 3. Verify the download source is legitimate. Code signing is REQUIRED for security", err)
 		}
 	}
 

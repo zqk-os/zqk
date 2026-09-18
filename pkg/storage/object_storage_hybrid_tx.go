@@ -6,9 +6,9 @@ import (
 	"errors"
 	"strings"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/logging"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/logging"
 	// HybridObjectStorage wraps two providers: primary and secondary.
 	// Writes are performed on both (primary first), while reads are performed on primary only.
 )

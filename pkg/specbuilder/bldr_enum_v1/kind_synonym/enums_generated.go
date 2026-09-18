@@ -4,7 +4,7 @@
 package kind_synonym
 
 import (
-	shared_kind_synonymsenum "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/shared_kind_synonyms"
+	shared_kind_synonymsenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/shared_kind_synonyms"
 )
 
 type Status = shared_kind_synonymsenum.Status

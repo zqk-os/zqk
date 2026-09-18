@@ -1,17 +1,17 @@
 package storage_test
 
 import (
-	"github.com/lanceman/zqk/pkg/datacell"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/datacell"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 
 	"context"
 	"path/filepath"
 	"testing"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/paths"
-	"github.com/lanceman/zqk/pkg/storage"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/storage"
 )
 
 // TestFindDependents_Isolated tests findDependents in isolation
@@ -57,7 +57,7 @@ func TestFindDependents_Isolated(t *testing.T) {
 	}
 
 	// Draft-first create parks preliminary intents off CAS List; promote so reverse-ref scan sees them.
-	// TRACK: BLI-REDACTED — draft-plane create / promote membrane.
+	// TRACK: BLI-1785443942668406000-1ec5c811 — draft-plane create / promote membrane.
 	storage.CreateCASVisible(t, fos, ctx, secCtx, parentObj, "active")
 
 	// Flush CAS index to ensure parent is indexed
@@ -82,7 +82,7 @@ func TestFindDependents_Isolated(t *testing.T) {
 		t.Fatalf("Failed to flush CAS index: %v", err)
 	}
 	// findDependents uses the reverse-ref index (no processDir scan fallback).
-	// TRACK: BLI-REDACTED — do not Clear() here; CUD + flush is the contract.
+	// TRACK: BLI-1785351629281373000-752ddc48 — do not Clear() here; CUD + flush is the contract.
 	storage.FlushReverseReferenceIndexPersist()
 
 	// Call findDependents directly
@@ -145,7 +145,7 @@ func TestFindDependents_WithDelete(t *testing.T) {
 		objects.FieldKeySchemaVersion: objects.DefaultSchemaVersion,
 	}
 
-	// TRACK: BLI-REDACTED — draft-plane create / promote membrane.
+	// TRACK: BLI-1785443942668406000-1ec5c811 — draft-plane create / promote membrane.
 	storage.CreateCASVisible(t, fos, ctx, secCtx, parentObj, "active")
 
 	// Flush CAS index to ensure parent is indexed
@@ -169,7 +169,7 @@ func TestFindDependents_WithDelete(t *testing.T) {
 	if err := storage.FlushListingIndexForProjectRoot(tmpDir, "backlog_item"); err != nil {
 		t.Fatalf("Failed to flush CAS index: %v", err)
 	}
-	// TRACK: BLI-REDACTED — cascade delete needs CUD reverse-ref, not Clear()+scan.
+	// TRACK: BLI-1785351629281373000-752ddc48 — cascade delete needs CUD reverse-ref, not Clear()+scan.
 	storage.FlushReverseReferenceIndexPersist()
 
 	// CLI + core-delete allow: priority_plan/backlog_item are kernel-critical.

@@ -4,8 +4,8 @@
 package tde_envelope
 
 import (
-	base_objectenum "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
-	shared__internal_tde_envelopesenum "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/shared__internal_tde_envelopes"
+	base_objectenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
+	shared__internal_tde_envelopesenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/shared__internal_tde_envelopes"
 )
 
 type PriorityTier = base_objectenum.PriorityTier

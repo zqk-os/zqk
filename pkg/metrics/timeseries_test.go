@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 func TestTimeSeries_WriteAndReadRange(t *testing.T) {
@@ -72,5 +72,42 @@ func TestTimeSeries_SanitizeSeriesName(t *testing.T) {
 	}
 	if filepath.Base(name) != name {
 		t.Fatalf("sanitizeSeriesName should produce basename-safe string: %q", name)
+	}
+}
+
+func TestTimeSeries_CommandMetricsChunks(t *testing.T) {
+	dir := t.TempDir()
+	cfg := TimeSeriesConfig{
+		ChunkDuration: 24 * time.Hour,
+		Dir:           dir,
+		Series:        "total_invocations",
+	}
+
+	w, err := NewTimeSeriesWriter(cfg)
+	if err != nil {
+		t.Fatalf("NewTimeSeriesWriter error: %v", err)
+	}
+
+	d1 := time.Date(2026, 9, 10, 0, 0, 0, 0, time.UTC)
+	d2 := time.Date(2026, 9, 11, 0, 0, 0, 0, time.UTC)
+
+	_ = w.Append(TimeSeriesPoint{Ts: d1, Value: 42})
+	_ = w.Append(TimeSeriesPoint{Ts: d2, Value: 58})
+	_ = w.Close()
+
+	r := NewTimeSeriesReader(cfg)
+	var pts []TimeSeriesPoint
+	err = r.Range(d1.Add(-time.Hour), d2.Add(time.Hour), func(p TimeSeriesPoint) error {
+		pts = append(pts, p)
+		return nil
+	})
+	if err != nil {
+		t.Fatalf("Range error: %v", err)
+	}
+	if len(pts) != 2 {
+		t.Fatalf("expected 2 points, got %d", len(pts))
+	}
+	if pts[0].Value != 42 || pts[1].Value != 58 {
+		t.Errorf("unexpected values: %v", pts)
 	}
 }

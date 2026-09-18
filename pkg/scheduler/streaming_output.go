@@ -10,8 +10,8 @@ import (
 	"io"
 	"sync"
 
-	"github.com/lanceman/zqk/pkg/concurrency"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/concurrency"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // DefaultPreviewBytes is the max bytes kept in memory for stdout/stderr preview (logging, notifications).

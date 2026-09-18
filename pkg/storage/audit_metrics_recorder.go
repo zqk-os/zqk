@@ -1,8 +1,8 @@
 package storage
 
 import (
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/observability"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/observability"
 )
 
 // getAuditMetricsRecorder gets a metrics recorder for audit operations

@@ -7,19 +7,19 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/lanceman/zqk/cmd/zqk/system"
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/datacell"
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/goroutinelabels"
-	"github.com/lanceman/zqk/pkg/logging"
-	"github.com/lanceman/zqk/pkg/nildecode"
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/paths"
-	"github.com/lanceman/zqk/pkg/pipeline"
-	storagepkg "github.com/lanceman/zqk/pkg/storage"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
-	"github.com/lanceman/zqk/pkg/validation"
+	"github.com/zqk-os/zqk/cmd/zqk/system"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/datacell"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/nildecode"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/pipeline"
+	storagepkg "github.com/zqk-os/zqk/pkg/storage"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/validation"
 )
 
 const pipelineKindScenarioBuilder = "scenario_builder_data_file"
@@ -128,7 +128,7 @@ func stageScenarioPrepareCache(stageCtx *pipeline.Context, p any) (any, error) {
 		}
 		if kind, ok := obj[objects.FieldKeyKind].(string); ok && kind == objects.KindAccount {
 			if username, ok := obj[objects.FieldKeyUsername].(string); ok && username != emptyValue {
-				accountID := "" // ACC-* from storage; TRACK: BLI-REDACTED
+				accountID := "" // ACC-* from storage; TRACK: BLI-1785905134201010000-07393484
 				withLock(payload.referenceCacheMu, func() {
 					payload.referenceCache[accountID] = true
 				})

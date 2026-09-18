@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 func TestHandleNotificationEvent(t *testing.T) {

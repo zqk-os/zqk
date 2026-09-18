@@ -5,7 +5,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/concurrency"
+	"github.com/zqk-os/zqk/pkg/concurrency"
 )
 
 // ValidationContext groups all validation-related state and configuration

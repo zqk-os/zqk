@@ -7,12 +7,12 @@ import (
 	"sync"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/logging"
 
-	"github.com/lanceman/zqk/pkg/infrastructure"
-	"github.com/lanceman/zqk/pkg/infrastructure/crypto"
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/zqktime"
+	"github.com/zqk-os/zqk/pkg/infrastructure"
+	"github.com/zqk-os/zqk/pkg/infrastructure/crypto"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/zqktime"
 )
 
 // HiveEvent represents a signed, high-level signal of collective intelligence.

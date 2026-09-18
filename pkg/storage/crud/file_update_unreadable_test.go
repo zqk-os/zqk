@@ -3,7 +3,7 @@ package crud
 import (
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/errfmt"
 )
 
 func TestLiveCASBlobUnreadable(t *testing.T) {

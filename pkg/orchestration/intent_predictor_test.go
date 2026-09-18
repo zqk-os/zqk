@@ -5,8 +5,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/testkit"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/testkit"
 )
 
 func TestIntentPredictionHeuristicsEngine_PredictFromRecentMessages(t *testing.T) {

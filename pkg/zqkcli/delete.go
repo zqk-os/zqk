@@ -3,12 +3,12 @@ package internal
 import (
 	"fmt"
 
-	"github.com/lanceman/zqk/internal/cli"
-	clipkg "github.com/lanceman/zqk/pkg/cli"
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/logging"
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/internal/cli"
+	clipkg "github.com/zqk-os/zqk/pkg/cli"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/storage"
 	"github.com/spf13/cobra"
 )
 
@@ -89,7 +89,7 @@ func runInternalDelete(cmd *cobra.Command, args []string) error {
 	if unlinkRefs && cascade {
 		return errfmt.Errorf("--unlink-references cannot be combined with --cascade")
 	}
-	// TRACK: BLI-REDACTED — fail-closed delete (parity with cmd/zqk/object).
+	// TRACK: BLI-1786390312940998000-1f101465 — fail-closed delete (parity with cmd/zqk/object).
 	if !unlinkRefs && !cascade {
 		return errfmt.Errorf("delete refused: pass --unlink-references or --cascade; refusing to leave GhostRefs")
 	}

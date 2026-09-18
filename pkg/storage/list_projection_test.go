@@ -3,7 +3,7 @@ package storage
 import (
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 func TestListProjectionMask_includesGroupBy(t *testing.T) {

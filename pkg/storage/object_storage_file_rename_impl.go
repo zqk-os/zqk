@@ -6,11 +6,11 @@ import (
 	"path/filepath"
 	"strings"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/logging"
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/storage/crud"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/storage/crud"
 )
 
 func (f *FileObjectStorage) Rename(ctx context.Context, secCtx *pkgctx.SecurityContext, oldID, newID string, updateReferences bool) error {
@@ -142,7 +142,7 @@ func (f *FileObjectStorage) updateReferencesForRenamedObject(ctx context.Context
 			continue
 		}
 		// created_by is immutable unless force override — required for ACC-* attribution cutover.
-		// TRACK: BLI-REDACTED
+		// TRACK: BLI-1785905134201010000-07393484
 		updateCtx := pkgctx.WithLifecycleBreakGlass(ctx, "ACC account id cutover rewrite identity fields")
 		if err := f.Update(updateCtx, secCtx, dependentID, updates); err != nil {
 			logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))

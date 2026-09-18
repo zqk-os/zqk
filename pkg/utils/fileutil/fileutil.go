@@ -46,6 +46,10 @@ func WriteDurableFile(path string, data []byte, mode FileMode) error {
 		_ = tmpFile.Close()
 		return err
 	}
+	if err := tmpFile.Chmod(mode); err != nil {
+		_ = tmpFile.Close()
+		return err
+	}
 	if err := tmpFile.Sync(); err != nil {
 		_ = tmpFile.Close()
 		return err
@@ -53,10 +57,10 @@ func WriteDurableFile(path string, data []byte, mode FileMode) error {
 	if err := tmpFile.Close(); err != nil {
 		return err
 	}
-	if err := Chmod(tmpPath, mode); err != nil {
+	if err := RenameFile(tmpPath, path); err != nil {
 		return err
 	}
-	return RenameFile(tmpPath, path)
+	return SyncDir(dir)
 }
 
 // WriteDurableStandardFile writes data to a file with standard permissions (0644) and synchronous fsync.

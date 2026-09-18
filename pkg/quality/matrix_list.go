@@ -5,7 +5,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/lanceman/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/paths"
 )
 
 // MatrixListEntry is one row in a matrix list result.

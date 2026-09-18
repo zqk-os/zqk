@@ -15,7 +15,7 @@ type catalogEntry struct {
 
 // catalog is the fast ping-pong reflex when CAS is unavailable.
 // CLI overlays GuidingStep from the policy body (OverlayFromPolicy).
-// TRACK: BLI-REDACTED
+// TRACK: BLI-1787035087372193000-c022117d
 var catalog = []catalogEntry{
 	{
 		events: []string{EventGoTest},
@@ -59,7 +59,7 @@ var catalog = []catalogEntry{
 	{
 		// Idle with planned>0 is not an empty priority_plan. Do not share GROOM-AHEAD
 		// text — OverlayFromPolicy would tell TPM to groom when the PRI already has planned BLIs.
-		// TRACK: BLI-REDACTED
+		// TRACK: BLI-1787035087372193000-c022117d
 		events: []string{EventIdle},
 		step: Step{
 			PolicyID:    PolicyTPMProcessAdmin,

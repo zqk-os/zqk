@@ -6,8 +6,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/errfmt"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // SpecReadMeta is filesystem-oriented metadata returned with spec bytes.

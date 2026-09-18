@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // handleToolsCall handles the tools/call method

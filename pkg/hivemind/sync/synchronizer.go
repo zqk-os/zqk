@@ -4,10 +4,10 @@ import (
 	"context"
 	"time"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/goroutinelabels"
-	"github.com/lanceman/zqk/pkg/hivemind"
-	"github.com/lanceman/zqk/pkg/logging"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
+	"github.com/zqk-os/zqk/pkg/hivemind"
+	"github.com/zqk-os/zqk/pkg/logging"
 )
 
 // Indexer represents the dependency capable of indexing a document

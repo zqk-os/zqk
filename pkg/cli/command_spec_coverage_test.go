@@ -6,7 +6,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 func TestApplyCommandSpecCoverageBaseline(t *testing.T) {

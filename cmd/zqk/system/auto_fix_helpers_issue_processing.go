@@ -4,10 +4,10 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/lanceman/zqk/pkg/migration/parser"
-	"github.com/lanceman/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/migration/parser"
+	"github.com/zqk-os/zqk/pkg/storage"
 
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // IsIssueFixableForBatch returns true if the issue is fixable and should be included in scheduler batching.
@@ -26,7 +26,7 @@ func IsIssueFixableForBatch(issue Issue) bool {
 // isDestructiveGraphOrFileIssue is true for findings whose "fix" deletes process YAML
 // or unlinks kernel refs. Those stay human/CLI-gated (cleanup-duplicates, object delete,
 // heal-dangling --apply) — never SCH-AUTOFIX.
-// TRACK: BLI-REDACTED
+// TRACK: BLI-1785723654802038000-b14064bc
 func isDestructiveGraphOrFileIssue(issue Issue) bool {
 	if issue.Category == "GhostRef" {
 		return true
@@ -53,7 +53,7 @@ func shouldProcessIssue(issue Issue, fixCtx *AutoFixContext) bool {
 
 	// Advisory wall-clock FixCommand must not ride along with blanket tier-3 --auto-fix.
 	// Only process when safety-gated AutoFixable (completed_at present).
-	// TRACK: PRI-REDACTED
+	// TRACK: PRI-1785885772223315000-0649f401
 	if isWallClockClampIssue(issue) {
 		return issue.AutoFixable && (fixCtx.AutoFix || fixCtx.Force)
 	}

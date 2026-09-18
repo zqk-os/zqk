@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	storagepkg "github.com/lanceman/zqk/pkg/storage"
+	storagepkg "github.com/zqk-os/zqk/pkg/storage"
 )
 
 // TestDispatchEnvelopeTickResolvedJobs_onModeTriggersRegisteredJob verifies ENVELOPE_TICK_DISPATCH_MODE=on

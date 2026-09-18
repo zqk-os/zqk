@@ -7,10 +7,10 @@ import (
 	"strings"
 	"time"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/graph/provider"
-	"github.com/lanceman/zqk/pkg/objects"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/graph/provider"
+	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/neo4j/neo4j-go-driver/v5/neo4j"
 )
 
@@ -259,7 +259,7 @@ func (c *memgraphConnection) UpdateNode(ctx context.Context, id string, updates 
 	// For now, we'll skip label removal as it requires more complex Cypher
 
 	// FieldUnset: SET-merge cannot drop keys; REMOVE the property on the node.
-	// TRACK: BLI-REDACTED
+	// TRACK: BLI-1785439369431933000-f0cccd6c
 	for _, key := range updates.RemoveProperties {
 		query += safeCypher(memgraphRemoveNodePropFmt, key)
 	}

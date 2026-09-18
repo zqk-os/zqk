@@ -7,7 +7,7 @@ import (
 	"strings"
 	"text/template"
 
-	"github.com/lanceman/zqk/pkg/brand"
+	"github.com/zqk-os/zqk/pkg/brand"
 )
 
 // QwenSystemPromptTemplate defines the core persona and behavior for the Qwen worker.

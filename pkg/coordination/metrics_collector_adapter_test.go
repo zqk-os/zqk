@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
 )
 
 // mockEventCoordinator is a test implementation of EventCoordinator

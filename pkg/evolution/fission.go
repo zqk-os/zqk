@@ -6,13 +6,13 @@ import (
 	"sync"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/logging"
 
-	"github.com/lanceman/zqk/pkg/infrastructure"
-	"github.com/lanceman/zqk/pkg/infrastructure/crypto"
-	"github.com/lanceman/zqk/pkg/metrics"
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/infrastructure"
+	"github.com/zqk-os/zqk/pkg/infrastructure/crypto"
+	"github.com/zqk-os/zqk/pkg/metrics"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/storage"
 )
 
 // FissionController manages the autonomous division of a kernel node.

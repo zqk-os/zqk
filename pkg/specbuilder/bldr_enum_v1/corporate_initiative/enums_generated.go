@@ -4,8 +4,8 @@
 package corporate_initiative
 
 import (
-	base_objectenum "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
-	shared_corporate_initiativesenum "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/shared_corporate_initiatives"
+	base_objectenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
+	shared_corporate_initiativesenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/shared_corporate_initiatives"
 )
 
 type AggregationStatus string

@@ -8,7 +8,7 @@ import (
 	"strings"
 	"testing"
 
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // TestArchitectureDocIndexIntegrity verifies that documents listed in docs/architecture/INDEX.md exist (L:F-DOC-01 / CRIT-CEF-R8L-DOC-01).

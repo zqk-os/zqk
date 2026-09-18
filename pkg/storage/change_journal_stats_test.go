@@ -5,8 +5,8 @@ import (
 	"testing"
 	"time"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/objects"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 func TestChangeJournal_CallbackAtomicPointer(t *testing.T) {
@@ -73,16 +73,36 @@ func TestChangeJournal_LifetimeCounters(t *testing.T) {
 		t.Fatalf("createChangeJournalEntry unexpected error: %v", err)
 	}
 
-	deadline := time.Now().Add(2 * time.Second)
-	var cAfter, fAfter int64
-	for {
-		cAfter, fAfter = GetChangeJournalHelperStats()
-		if cAfter > cInit || fAfter > fInit {
-			break
-		}
-		if time.Now().After(deadline) {
-			t.Fatalf("expected created/failed counter to increment, got cInit=%d cAfter=%d fInit=%d fAfter=%d", cInit, cAfter, fInit, fAfter)
-		}
-		time.Sleep(20 * time.Millisecond)
+	drainCtx, cancel := context.WithTimeout(ctx, 15*time.Second)
+	defer cancel()
+	if err := DrainChangeJournalForRoot(drainCtx, tmpDir); err != nil {
+		t.Fatalf("DrainChangeJournalForRoot error: %v", err)
+	}
+
+	cAfter, fAfter := GetChangeJournalHelperStats()
+	t.Logf("After drain: cInit=%d cAfter=%d fInit=%d fAfter=%d", cInit, cAfter, fInit, fAfter)
+	if cAfter <= cInit && fAfter <= fInit {
+		t.Fatalf("expected created/failed counter to increment, got cInit=%d cAfter=%d fInit=%d fAfter=%d", cInit, cAfter, fInit, fAfter)
+	}
+}
+
+func TestChangeJournal_GracefulDrain(t *testing.T) {
+	ctx := context.Background()
+	handler := &ChangeJournalShutdownHandler{}
+
+	if handler.GetName() != "change_journal" {
+		t.Errorf("unexpected name %s", handler.GetName())
+	}
+	if !handler.IsCritical() {
+		t.Errorf("change journal must be critical queue")
+	}
+
+	drainCtx, cancel := context.WithTimeout(ctx, 2*time.Second)
+	defer cancel()
+	if err := handler.Drain(drainCtx); err != nil {
+		t.Fatalf("drain failed: %v", err)
+	}
+	if !handler.IsDrained() {
+		t.Fatalf("expected handler to be drained, got pending=%d", handler.GetPendingCount())
 	}
 }

@@ -1,16 +1,16 @@
 package storage
 
 import (
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/datacell"
-	"github.com/lanceman/zqk/pkg/logging"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/datacell"
+	"github.com/zqk-os/zqk/pkg/logging"
 
 	"context"
 	"sync"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/concurrency"
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/concurrency"
+	"github.com/zqk-os/zqk/pkg/objects"
 	// HighVolumeKinds lists the kinds that should use async validation due to high write frequency.
 	// These are registered with AsyncCacheValidationStrategy when InitializeAsyncValidationStrategies is called.
 	// Align with high_volume_kinds.yaml and streamStorageEnabledKinds where applicable.

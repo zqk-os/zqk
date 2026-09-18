@@ -6,8 +6,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/logging"
-	"github.com/lanceman/zqk/pkg/pipeline"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/pipeline"
 )
 
 const testPipelineKindPrefix = "test."

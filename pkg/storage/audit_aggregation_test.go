@@ -7,8 +7,8 @@ import (
 	"testing"
 	"time"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/objects"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 func TestAuditAggregationService_CompressEventIDs(t *testing.T) {
@@ -387,7 +387,7 @@ func TestAuditAggregationService_QueryAuditEventsInWindow(t *testing.T) {
 	for _, ev := range events {
 		leave := objects.GetString(ev, objects.FieldKeyStatus)
 		// Create parks completed/failed intents on draft (origin pending); promote for List.
-		// TRACK: BLI-REDACTED — draft-plane create / promote membrane.
+		// TRACK: BLI-1785443942668406000-1ec5c811 — draft-plane create / promote membrane.
 		CreateCASVisible(t, fileStorage, ctx, secCtx, ev, leave)
 	}
 

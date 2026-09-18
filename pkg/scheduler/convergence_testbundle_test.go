@@ -5,9 +5,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/convergerollup"
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/zqktime"
+	"github.com/zqk-os/zqk/pkg/convergerollup"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/zqktime"
 )
 
 func TestBuildTestBundleConvergenceSnapshot_Empty(t *testing.T) {

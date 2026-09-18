@@ -1,16 +1,15 @@
 package community
 
 import (
-	"os"
 	"path/filepath"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"gopkg.in/yaml.v3"
 )
 
 // TestStandaloneCleanCommunityRepo_FunctionalAcceptance verifies that candidate directory
-// exists, is a valid git repository, and excludes internal/proprietary studio paths (CRIT-REDACTED).
+// exists, is a valid git repository, and excludes internal/proprietary studio paths (CRIT-1789523093171072000-663f8aa9).
 func TestStandaloneCleanCommunityRepo_FunctionalAcceptance(t *testing.T) {
 	candidateDir := publicCandidateFixture(t)
 
@@ -44,13 +43,13 @@ func TestStandaloneCleanCommunityRepo_FunctionalAcceptance(t *testing.T) {
 }
 
 // TestStandaloneCleanCommunityRepo_BoundaryAndErrorHandling verifies that export gates
-// reject dirty trees or forbidden extensions and patterns (CRIT-REDACTED).
+// reject dirty trees or forbidden extensions and patterns (CRIT-1789523093171073000-206e684d).
 func TestStandaloneCleanCommunityRepo_BoundaryAndErrorHandling(t *testing.T) {
 	t.Parallel()
 
 	tmp := t.TempDir()
 	dirtyFile := filepath.Join(tmp, "secret.key")
-	if err := os.WriteFile(dirtyFile, []byte("PRIVATE_KEY"), 0600); err != nil {
+	if err := fileutil.WriteFile(dirtyFile, []byte("PRIVATE_KEY"), 0600); err != nil {
 		t.Fatalf("failed to write dirty file: %v", err)
 	}
 
@@ -59,12 +58,12 @@ func TestStandaloneCleanCommunityRepo_BoundaryAndErrorHandling(t *testing.T) {
 		t.Fatalf("RunExportGate failed: %v", err)
 	}
 	if gate.Passed {
-		t.Errorf("expected export gate to fail on dirty file with forbidden extension, passed")
+		t.Errorf("expected export gate to fail on dirty file, but passed")
 	}
 }
 
 // TestStandaloneCleanCommunityRepo_IntegrationAndConformance verifies candidate binary
-// executes clean and presents valid help text without private options (CRIT-REDACTED).
+// executes clean and presents valid help text without private options (CRIT-1789523093171074000-5e9dbba0).
 func TestStandaloneCleanCommunityRepo_IntegrationAndConformance(t *testing.T) {
 	candidateDir := publicCandidateFixture(t)
 
@@ -74,7 +73,7 @@ func TestStandaloneCleanCommunityRepo_IntegrationAndConformance(t *testing.T) {
 	}
 
 	if fileutil.Exists(binPath) {
-		stat, err := os.Stat(binPath)
+		stat, err := fileutil.Stat(binPath)
 		if err != nil {
 			t.Fatalf("cannot stat candidate binary: %v", err)
 		}
@@ -85,7 +84,7 @@ func TestStandaloneCleanCommunityRepo_IntegrationAndConformance(t *testing.T) {
 }
 
 // TestLeanBootstrapObjects_FunctionalAcceptance verifies the 13 minimal starter policies
-// exist and adhere to v2.0.0 schema in active status (CRIT-REDACTED).
+// exist and adhere to v2.0.0 schema in active status (CRIT-1789523106733295000-bc65e079).
 func TestLeanBootstrapObjects_FunctionalAcceptance(t *testing.T) {
 	candidateDir := publicCandidateFixture(t)
 	policiesDir := filepath.Join(candidateDir, "scripts", "default_policies")
@@ -112,7 +111,7 @@ func TestLeanBootstrapObjects_FunctionalAcceptance(t *testing.T) {
 
 	for _, expected := range expectedPolicies {
 		policyPath := filepath.Join(policiesDir, expected)
-		data, err := os.ReadFile(policyPath)
+		data, err := fileutil.ReadFile(policyPath)
 		if err != nil {
 			t.Errorf("missing expected policy file %s: %v", expected, err)
 			continue
@@ -133,7 +132,7 @@ func TestLeanBootstrapObjects_FunctionalAcceptance(t *testing.T) {
 }
 
 // TestLeanBootstrapObjects_BoundaryAndErrorHandling verifies missing/corrupt starter policies
-// are detected and rejected (CRIT-REDACTED).
+// are detected and rejected (CRIT-1789523106733296000-cb78970f).
 func TestLeanBootstrapObjects_BoundaryAndErrorHandling(t *testing.T) {
 	t.Parallel()
 
@@ -146,7 +145,7 @@ func TestLeanBootstrapObjects_BoundaryAndErrorHandling(t *testing.T) {
 }
 
 // TestLeanBootstrapObjects_IntegrationAndConformance verifies starter personas (6) and skills (5)
-// are present and intact in the candidate distribution (CRIT-REDACTED).
+// are present and intact in the candidate distribution (CRIT-1789523106733297000-a555900f).
 func TestLeanBootstrapObjects_IntegrationAndConformance(t *testing.T) {
 	candidateDir := publicCandidateFixture(t)
 
@@ -155,7 +154,7 @@ func TestLeanBootstrapObjects_IntegrationAndConformance(t *testing.T) {
 	if !fileutil.Exists(personasDir) {
 		t.Fatalf("candidate scripts/default_personas missing at %s", personasDir)
 	}
-	pEntries, err := os.ReadDir(personasDir)
+	pEntries, err := fileutil.ReadDir(personasDir)
 	if err != nil || len(pEntries) != 6 {
 		t.Errorf("expected 6 default personas, found %d (err: %v)", len(pEntries), err)
 	}
@@ -165,7 +164,7 @@ func TestLeanBootstrapObjects_IntegrationAndConformance(t *testing.T) {
 	if !fileutil.Exists(skillsDir) {
 		t.Fatalf("candidate scripts/default_agent_skills missing at %s", skillsDir)
 	}
-	sEntries, err := os.ReadDir(skillsDir)
+	sEntries, err := fileutil.ReadDir(skillsDir)
 	if err != nil || len(sEntries) != 5 {
 		t.Errorf("expected 5 default skills, found %d (err: %v)", len(sEntries), err)
 	}

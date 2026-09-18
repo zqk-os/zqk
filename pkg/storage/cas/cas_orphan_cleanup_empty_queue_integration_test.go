@@ -1,7 +1,7 @@
 package cas_test
 
 import (
-	caspkg "github.com/lanceman/zqk/pkg/storage/cas"
+	caspkg "github.com/zqk-os/zqk/pkg/storage/cas"
 
 	"context"
 	"testing"

@@ -4,8 +4,8 @@ import (
 	"context"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/objectidcache"
-	"github.com/lanceman/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/objectidcache"
+	"github.com/zqk-os/zqk/pkg/storage"
 )
 
 // Type aliases keep existing CLI call sites compiling after the ObjectIDCache extract.

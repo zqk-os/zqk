@@ -1,0 +1,7 @@
+Generated spec for ambient-daemon
+
+Usage:
+  zqk.test system ambient-daemon [flags]
+
+Global Flags:
+      --allow-degraded   Allow scheduler-dependent commands to run when scheduler daemon is not running

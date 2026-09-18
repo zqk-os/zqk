@@ -3,7 +3,7 @@ package objects
 import (
 	"testing"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
 )
 
 func TestSpecValidator_DisplayLength_ListableFields(t *testing.T) {

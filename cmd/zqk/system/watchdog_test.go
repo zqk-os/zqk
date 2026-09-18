@@ -4,16 +4,16 @@ import (
 	"context"
 	"testing"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/paths"
-	"github.com/lanceman/zqk/pkg/scheduler"
-	storagepkg "github.com/lanceman/zqk/pkg/storage"
-	"github.com/lanceman/zqk/pkg/testenvroot"
-	"github.com/lanceman/zqk/pkg/testkit"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/scheduler"
+	storagepkg "github.com/zqk-os/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/testenvroot"
+	"github.com/zqk-os/zqk/pkg/testkit"
 )
 
-// TestWatchdogSubagent_Functional verifies CRIT-REDACTED:
+// TestWatchdogSubagent_Functional verifies CRIT-1789273452649987000-0e3234b4:
 // Watchdog emits a kernel object (metric or audit) when a tech-lead subagent is idle without an ATK/BLI claim;
 // unclaimed orch is refused.
 func TestWatchdogSubagent_Functional(t *testing.T) {

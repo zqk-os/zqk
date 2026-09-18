@@ -1,37 +1,48 @@
 package system
 
 import (
-	"github.com/lanceman/zqk/internal/cli"
-	clipkg "github.com/lanceman/zqk/pkg/cli"
-	"github.com/lanceman/zqk/pkg/objects"
+	"fmt"
+
+	"github.com/zqk-os/zqk/internal/cli"
+	"github.com/zqk-os/zqk/pkg/brand"
+	clipkg "github.com/zqk-os/zqk/pkg/cli"
+	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/spf13/cobra"
 )
 
-const quickstartTextGuide = `🚀 ZQK 5-Minute Quickstart
+func renderQuickstartGuide() string {
+	exe := brand.ExecutableName()
+	initFlag := ""
+	if exe == "zqk" {
+		initFlag = " --with-onboarding-roadmap"
+	}
+	return fmt.Sprintf(`🚀 ZQK 5-Minute Quickstart
 
 Follow these 4 simple steps to get started:
 
 1. Initialize your project kernel:
-   $ zqk system init --project-name <your-project> --with-onboarding-roadmap
+   $ %s system init --project-name <your-project>%s
 
 2. Discover priority plan and next tasks:
-   $ zqk workflow whats-next
+   $ %s workflow whats-next
 
 3. Pair with your IDE / AI agent mesh (MCP):
    Add to claude_desktop_config.json:
    {
      "mcpServers": {
-       "zqk": {
-         "command": "zqk-mcp"
+       "%s": {
+         "%s": "%s",
+         "args": ["mcp", "serve"]
        }
      }
    }
 
 4. Verify kernel compliance and system health:
-   $ zqk system check
+   $ %s system check
 
-Docs & Architecture: https://github.com/lanceman/zqk#readme
-`
+Docs & Architecture: docs/INDEX.md
+`, exe, initFlag, exe, exe, objects.FieldKeyCommand, exe, exe)
+}
 
 // NewQuickstartCmd returns the 'zqk quickstart' command which provides a zero-friction
 // onboarding and bootstrap walkthrough for new projects and contributors.
@@ -53,13 +64,18 @@ func NewQuickstartCmd() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			format, _ := cmd.Flags().GetString("format")
 			if format == "json" {
+				exe := brand.ExecutableName()
+				initStep := fmt.Sprintf("1. Initialize: %s system init --project-name <name>", exe)
+				if exe == "zqk" {
+					initStep += " --with-onboarding-roadmap"
+				}
 				payload := map[string]any{
 					objects.FieldKeyTitle: "ZQK Quickstart Guide",
 					"steps": []string{
-						"1. Initialize: zqk system init --project-name <name> --with-onboarding-roadmap",
-						"2. Discover priority plan: zqk workflow whats-next",
-						"3. Pair MCP server: zqk mcp proxy --tcp 0.0.0.0:7777",
-						"4. Verify health: zqk system check",
+						initStep,
+						fmt.Sprintf("2. Discover priority plan: %s workflow whats-next", exe),
+						fmt.Sprintf("3. Pair MCP server: %s mcp serve", exe),
+						fmt.Sprintf("4. Verify health: %s system check", exe),
 					},
 					"starter_policies": []string{
 						"POL-CODE-001: Spec-driven architecture",
@@ -71,17 +87,18 @@ func NewQuickstartCmd() *cobra.Command {
 					objects.FieldKeyMcpConfig: map[string]any{
 						"claude_desktop": map[string]any{
 							"mcpServers": map[string]any{
-								"zqk": map[string]any{
-									objects.FieldKeyCommand: "zqk-mcp",
+								exe: map[string]any{
+									objects.FieldKeyCommand: exe,
+									"args":                  []string{"mcp", "serve"},
 								},
 							},
 						},
 					},
-					"docs_url": "https://github.com/lanceman/zqk#readme",
+					"docs_url": "docs/INDEX.md",
 				}
 				return cli.FormatOutputAs(cmd, cli.FormatJSON, payload)
 			}
-			return cli.WriteOutput(cmd, []byte(quickstartTextGuide))
+			return cli.WriteOutput(cmd, []byte(renderQuickstartGuide()))
 		},
 	}
 	helpBuilder.ApplyToCommand(cmd)

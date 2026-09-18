@@ -2,6 +2,7 @@ package scheduler
 
 import (
 	"testing"
+	"time"
 )
 
 func TestSchedulerLifecycle_IsRunning(t *testing.T) {
@@ -10,4 +11,12 @@ func TestSchedulerLifecycle_IsRunning(t *testing.T) {
 		t.Fatal("expected unstarted scheduler to not be running")
 	}
 }
-// tdd refresh
+
+func TestSchedulerLifecycle_ShutdownTimeouts(t *testing.T) {
+	if schedulerCronStopTimeout != 2*time.Second {
+		t.Errorf("expected 2s schedulerCronStopTimeout, got %v", schedulerCronStopTimeout)
+	}
+	if schedulerTriggeredPoolStopTimeout != 5*time.Second {
+		t.Errorf("expected 5s schedulerTriggeredPoolStopTimeout, got %v", schedulerTriggeredPoolStopTimeout)
+	}
+}

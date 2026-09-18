@@ -5,10 +5,10 @@ import (
 	"reflect"
 	"testing"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/logging"
-	"github.com/lanceman/zqk/pkg/objects"
-	storagepkg "github.com/lanceman/zqk/pkg/storage"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/objects"
+	storagepkg "github.com/zqk-os/zqk/pkg/storage"
 )
 
 func TestBuildOverlayFromBindingObjects_DeterministicPriority(t *testing.T) {
@@ -99,7 +99,7 @@ func TestPrewarmSchedulerHandlerBindingOverlay_UsesStoredBinding(t *testing.T) {
 		objects.FieldKeyPriority:      1,
 		objects.FieldKeyEnabled:       true,
 	}
-	// TRACK: BLI-REDACTED — draft-plane create / promote membrane.
+	// TRACK: BLI-1785443942668406000-1ec5c811 — draft-plane create / promote membrane.
 	storagepkg.CreateCASVisible(t, storage, ctx, sec, binding, objects.ObjectStatusApproved)
 
 	prewarmSchedulerHandlerBindingOverlay(ctx, storage, logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem)))

@@ -3,7 +3,7 @@ package indexer
 import (
 	"context"
 
-	"github.com/lanceman/zqk/pkg/llm"
+	"github.com/zqk-os/zqk/pkg/llm"
 )
 
 // LLMEmbeddingService implements EmbeddingService using pkg/llm.

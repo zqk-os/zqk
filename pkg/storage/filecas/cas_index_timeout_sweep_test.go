@@ -5,9 +5,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/concurrency"
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/concurrency"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // hangIndexQueue accepts index updates but never completes them, forcing Create/Update

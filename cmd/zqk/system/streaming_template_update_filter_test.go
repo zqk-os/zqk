@@ -3,7 +3,7 @@ package system
 import (
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/interactive"
+	"github.com/zqk-os/zqk/pkg/interactive"
 )
 
 func TestUpdateFieldFilter_IsFieldImmutable(t *testing.T) {

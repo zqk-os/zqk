@@ -12,15 +12,15 @@ import (
 	"testing"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/config"
-	"github.com/lanceman/zqk/pkg/zqkenv"
+	"github.com/zqk-os/zqk/pkg/config"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/goroutinelabels"
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/paths"
-	"github.com/lanceman/zqk/pkg/storage"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/storage"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // TestCreatePreventsOverwrite tests that Create fails when object already exists
@@ -618,7 +618,7 @@ func TestUpdateImmutableFieldsPreventsOverwrite(t *testing.T) {
 		objects.FieldKeySchemaVersion: objects.DefaultSchemaVersion,
 	}
 
-	// TRACK: BLI-REDACTED — draft-plane create / promote membrane.
+	// TRACK: BLI-1785443942668406000-1ec5c811 — draft-plane create / promote membrane.
 	storage.CreateCASVisible(t, fos, ctx, secCtx, obj, objects.ObjectStatusValidated)
 
 	// Update should succeed but most immutable fields should be ignored

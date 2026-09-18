@@ -190,7 +190,7 @@ percent_complete:
     blocked: calculated
     complete: 100
     error: 0
-    proposed: 5
+    proposed: 10
 created_at: 2026-07-01 18:00:00+00:00
 updated_at: 2026-07-01 18:00:00+00:00
 created_by: ACC-1785920548450214012-68b850c0

@@ -3,8 +3,8 @@ package crud
 import (
 	"time"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/objects"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 func EffectiveListLimit(filter *ListFilter, _ *pkgctx.StorageContext) int {

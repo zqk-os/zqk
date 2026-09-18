@@ -10,11 +10,11 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/concurrency"
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/goroutinelabels"
-	"github.com/lanceman/zqk/pkg/logging"
-	"github.com/lanceman/zqk/pkg/storage/locknames"
+	"github.com/zqk-os/zqk/pkg/concurrency"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/storage/locknames"
 )
 
 // HashRegistryEventCallback is a callback for emitting events via coordinator
@@ -100,6 +100,8 @@ type saveRequest struct {
 // Note: For cross-process locking, file-based locks would be needed, but that's not
 // currently implemented as hash registry operations are expected to be fast and
 // typically single-process.
+//
+// See docs/architecture/STORAGE_COORDINATION.md for lifecycle and synchronization sequence diagrams.
 type HashRegistry struct {
 	kind         string
 	dir          string

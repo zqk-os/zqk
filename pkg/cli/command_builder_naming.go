@@ -5,7 +5,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // numericCASCommandStem matches CSPEC stems that are object-id shaped
@@ -41,7 +41,7 @@ func IsProcessCommandSpecCAS(tempSpec map[string]any) bool {
 //
 // DNA under .zqk/cli/specs/<group>/…/<cmd>_command.yaml uses the full relative
 // path as the stem so e.g. object/list and scheduler/list do not clobber the
-// same list_command_builder.go (TRACK: BLI-REDACTED).
+// same list_command_builder.go (TRACK: BLI-1785903708509306000-a6d8dc5b).
 func ResolveCommandBuilderName(tempSpec map[string]any, yamlPath string) string {
 	if nested := nestedCommandBuilderNameFromPath(yamlPath); nested != "" {
 		return nested

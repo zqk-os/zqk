@@ -3,9 +3,9 @@ package system
 import (
 	"testing"
 
-	"github.com/lanceman/zqk/internal/cli"
+	"github.com/zqk-os/zqk/internal/cli"
 
-	schedulerpkg "github.com/lanceman/zqk/pkg/scheduler"
+	schedulerpkg "github.com/zqk-os/zqk/pkg/scheduler"
 	"github.com/spf13/cobra"
 )
 

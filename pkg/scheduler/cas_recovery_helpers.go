@@ -3,11 +3,11 @@ package scheduler
 import (
 	"context"
 
-	caspkg "github.com/lanceman/zqk/pkg/storage/cas"
+	caspkg "github.com/zqk-os/zqk/pkg/storage/cas"
 
-	"github.com/lanceman/zqk/pkg/logging"
-	storagepkg "github.com/lanceman/zqk/pkg/storage"
-	"github.com/lanceman/zqk/pkg/when"
+	"github.com/zqk-os/zqk/pkg/logging"
+	storagepkg "github.com/zqk-os/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/when"
 )
 
 // runCASRecoveryForKind runs CAS recovery for a single kind (stale index entries / missing hash files).

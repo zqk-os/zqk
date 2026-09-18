@@ -3,11 +3,11 @@ package scenario
 import (
 	stdcontext "context"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/objects"
-	_ "github.com/lanceman/zqk/pkg/specbuilder/bldr_instance_v1" // register doc_entry, convergence_session builders
-	"github.com/lanceman/zqk/pkg/storage"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/objects"
+	_ "github.com/zqk-os/zqk/pkg/specbuilder/bldr_instance_v1" // register doc_entry, convergence_session builders
+	"github.com/zqk-os/zqk/pkg/storage"
 )
 
 func applyDocEntries(

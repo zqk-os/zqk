@@ -4,8 +4,8 @@ import (
 	"maps"
 	"strconv"
 
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // normalizeValueForField converts a value to the appropriate type based on field definition

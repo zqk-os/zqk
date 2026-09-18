@@ -4,7 +4,7 @@
 package milestones
 
 import (
-	base_objectenum "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
+	base_objectenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
 )
 
 type PriorityTier = base_objectenum.PriorityTier

@@ -1,12 +1,12 @@
 package cas_test
 
 import (
-	caspkg "github.com/lanceman/zqk/pkg/storage/cas"
+	caspkg "github.com/zqk-os/zqk/pkg/storage/cas"
 
 	"path/filepath"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 func TestRemoveOrphanCASHashFileSync_renamesThenRemoves(t *testing.T) {

@@ -3,8 +3,8 @@ package scheduler
 import (
 	"testing"
 
-	storagepkg "github.com/lanceman/zqk/pkg/storage"
-	"github.com/lanceman/zqk/pkg/testkit"
+	storagepkg "github.com/zqk-os/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/testkit"
 )
 
 // prepareHandlersIsolatedTempProject runs the standard isolated temp-project pipeline for handler

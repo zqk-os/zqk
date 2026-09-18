@@ -4,8 +4,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 )
 
 // CVS id used only for prefix inference (need not exist in CAS).
@@ -94,7 +94,7 @@ func TestOverlayPlanForDefaultViewIsRaw(t *testing.T) {
 }
 
 func TestInferKindFromObjectID_withProjectRoot(t *testing.T) {
-	k := InferKindFromObjectID(".", "CVS-REDACTED")
+	k := InferKindFromObjectID(".", "CVS-1234567890123456000-abcdef12")
 	if k != objects.KindConvergenceSession {
 		t.Fatalf("want convergence_session, got %q", k)
 	}

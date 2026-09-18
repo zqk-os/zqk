@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"testing"
 
-	"github.com/lanceman/zqk/cmd/zqk/learn"
+	"github.com/zqk-os/zqk/cmd/zqk/learn"
 	"github.com/stretchr/testify/assert"
 )
 

@@ -5,8 +5,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/kindnames"
-	"github.com/lanceman/zqk/pkg/zqkenv"
+	"github.com/zqk-os/zqk/pkg/kindnames"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
 func TestSnapRemedyTelemetryCycle(t *testing.T) {

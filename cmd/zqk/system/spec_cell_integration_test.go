@@ -36,13 +36,13 @@ import (
 
 	"gopkg.in/yaml.v3"
 
-	"github.com/lanceman/zqk/pkg/appledouble"
-	"github.com/lanceman/zqk/pkg/execwrap"
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/paths"
-	"github.com/lanceman/zqk/pkg/testkit"
-	"github.com/lanceman/zqk/pkg/utils/fileutil"
-	"github.com/lanceman/zqk/pkg/zqkenv"
+	"github.com/zqk-os/zqk/pkg/appledouble"
+	"github.com/zqk-os/zqk/pkg/execwrap"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/testkit"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
 // specCellCheckCommandTimeout allows system check (object ID cache, stale CAS hygiene) to finish on a cold greenfield project.
@@ -205,7 +205,7 @@ func TestSpecCell_Suite(t *testing.T) {
 
 	t.Run("object_template_object_spec_draft", func(t *testing.T) {
 		// Origination slice: CLI materializes a draft from the object_spec spec (object template), not a net-new ontology file.
-		// TRACK: BLI-REDACTED — replace retired `new internal`.
+		// TRACK: BLI-1785930106857898000-94b9a5bc — replace retired `new internal`.
 		ctx, cancel := context.WithTimeout(context.Background(), cliCommandTimeout)
 		defer cancel()
 		cmd := execwrap.CommandContext(ctx, cliBinary, "object", "template", "object_spec", "--output", "-")

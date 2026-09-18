@@ -5,9 +5,9 @@ import (
 	"strings"
 	"testing"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/objects"
-	riskblockerenum "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/risk_blockers"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/objects"
+	riskblockerenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/risk_blockers"
 )
 
 type presentExister struct{ ids map[string]bool }
@@ -23,7 +23,7 @@ func TestHourglassSourcePresent(t *testing.T) {
 	if !hourglassSourcePresent(ctx, store, nil, "ATK-live") {
 		t.Fatal("live ATK must be allowed to mint")
 	}
-	if hourglassSourcePresent(ctx, store, nil, "ATK-REDACTED") {
+	if hourglassSourcePresent(ctx, store, nil, "ATK-1788162502382684000-c631eb40") {
 		t.Fatal("absent ATK must not mint GhostRef RIS")
 	}
 	if hourglassSourcePresent(ctx, nil, nil, "ATK-live") {

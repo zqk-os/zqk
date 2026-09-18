@@ -5,7 +5,7 @@
 #   zqk-scenario bundle apply -f pkg/scenario/testdata/cli-user-alias-macro-bundle/cli-user-alias-macro-bundle.yaml -R .
 #
 # Replace *-UAM-* id_hints with a project-specific prefix if applying where collisions matter.
-# Requirement is linked to priority plan PRI-REDACTED ("Agent workflow & unified next-step CLI").
+# Requirement is linked to priority plan PRI-1234567890123456789-abcdef12 ("Agent workflow & unified next-step CLI").
 #
 # Design intent (summary): config in ~/.zqk/config.yaml + .zqk/config.yaml merge; named entries mapping to
 # argv templates, optional external scripts, or pipes to go-based tools; dispatcher command (e.g. zqk do <alias>)
@@ -59,7 +59,7 @@ objects:
       title: User-configurable CLI aliases and macro dispatcher (project + user workflows)
       status: proposed
       priority: p2
-      priority_plan_ref: PRI-REDACTED
+      priority_plan_ref: PRI-1234567890123456789-abcdef12
       goal_refs: [GOAL-UAM-001]
       criteria_refs:
         - CRIT-UAM-001
@@ -76,7 +76,7 @@ objects:
         allowlist and documentation for safe defaults. (4) Integration with existing infrastructure: ~/.zqk/config.yaml,
         .zqk/config.yaml, profiles—so agents and humans share discoverable shortcuts.
 
-        Deferred from active CVS work: too large to split mid-session; tracked here for PRI-REDACTED.
+        Deferred from active CVS work: too large to split mid-session; tracked here for PRI-1234567890123456789-abcdef12.
   backlog_items:
     - id_hint: BLI-UAM-001
       title: Design + implement CLI alias config (merge), dispatcher command, and docs

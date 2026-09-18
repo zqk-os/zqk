@@ -83,7 +83,7 @@ func TestTPMComposerAttnCue_hourglassOnlyForLiveATKOrComms(t *testing.T) {
 	work := CorrespondenceItem{
 		EventID:     "AFE-atk",
 		FromAgentID: "antigravity-1",
-		Message:     "ATTN TPM: claim ONLY ATK-REDACTED",
+		Message:     "ATTN TPM: claim ONLY ATK-1787738919414925000-41b3c9d7",
 	}
 	got := TPMComposerAttnCue(work, "cursor-composer")
 	want := "ATTN TPM inbox: AFE-atk from antigravity-1 — whats-next --agent-id cursor-composer; ack then hourglass"

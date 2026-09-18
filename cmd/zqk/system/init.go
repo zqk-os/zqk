@@ -7,14 +7,15 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/lanceman/zqk/internal/cli"
-	clipkg "github.com/lanceman/zqk/pkg/cli"
-	"github.com/lanceman/zqk/pkg/cli/bldr_cli_cmd_v1"
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/paths"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
-
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/internal/cli"
+	clipkg "github.com/zqk-os/zqk/pkg/cli"
+	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/storage/filecas"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // NewInitCmd creates a new init command
@@ -216,11 +217,13 @@ func writeBrandSettings(projectRoot string, force bool) error {
 
 version: "1.0.0"
 paths:
+  project_root: "."
   aliases: {}
 cli:
   default_context: human
 # Knowledge Kernel tip priors (state-commit / pre-commit). Relative paths are from project root.
 kernel_state:
+  project_root: "."
   snapshot_backup_dir: ../%[1]s-csnap-backups
   snapshot_backup_keep: 3
 `, paths.CLICommandNameDefault)
@@ -246,29 +249,39 @@ kernel_state:
 
 func writeSystemAccount(projectRoot string) error {
 	now := time.Now().UTC().Format(time.RFC3339)
-	content := fmt.Sprintf(`id: ACC-1785920548450214012-68b850c0
+	accID := pkgctx.SystemAccountID
+	content := fmt.Sprintf(`id: %s
 kind: account
 schema_version: 2.0.0
 namespace_id: zqk:kernel
 title: System Account
 username: system
 status: active
-created_by: ACC-1785920548450214012-68b850c0
-updated_by: ACC-1785920548450214012-68b850c0
+created_by: %s
+updated_by: %s
 created_at: %s
 updated_at: %s
-`, now, now)
+`, accID, accID, accID, now, now)
 	accountsDir := filepath.Join(projectRoot, paths.ProcessDir, "accounts")
 	if err := fileutil.MkdirAll(accountsDir, paths.DirPerm755); err != nil {
 		return err
 	}
-	// We'll write it using the ID hash like other objects, or just a known filename.
-	// `ACC-1785920548450214012-68b850c0` usually hashes to `de28fd5cc03c8a6b1bcdd92cd902d0212e83346707ad8edba9e0fc77784eaf3c.yaml` but for bootstrap we can write to `system.yaml`.
-	path := filepath.Join(accountsDir, "system.yaml")
-	if _, err := fileutil.Stat(path); err == nil {
+	cas := filecas.NewContentAddressableStorage(accountsDir, objects.KindAccount)
+
+	// Clean up and migrate legacy unindexed files (system.yaml or {id}.yaml) if present.
+	legacyNames := []string{"system.yaml", accID + ".yaml"}
+	for _, legName := range legacyNames {
+		legPath := filepath.Join(accountsDir, legName)
+		if data, err := fileutil.ReadFile(legPath); err == nil {
+			_ = cas.Create(accID, data)
+			_ = fileutil.Remove(legPath)
+		}
+	}
+
+	if hash, err := cas.GetIndex().GetHash(accID); err == nil && hash != "" {
 		return nil
 	}
-	return fileutil.WriteFile(path, []byte(content), paths.FilePerm644)
+	return cas.Create(accID, []byte(content))
 }
 
 func buildProjectConfigContent(projectName, template string) string {

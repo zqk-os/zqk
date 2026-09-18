@@ -7,10 +7,10 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/concurrency"
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/concurrency"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/logging"
 )
 
 // NotificationSentinel is a special error type that indicates a notification
@@ -89,7 +89,7 @@ func (s *Server) handleEventsSubscribe(_ context.Context, _ string, params json.
 
 	// Create write function that serializes through this connection's message queue.
 	// Direct writes to transportWriter race bufio.Writer with RPC responses (IDE hang).
-	// TRACK: BLI-REDACTED — remove when: per-connection Server owns emit path.
+	// TRACK: BLI-1784969955962654000-dc689643 — remove when: per-connection Server owns emit path.
 	var bindWriter *bufio.Writer
 	_ = concurrency.RunInRLockWithLogger(
 		&s.clientsMu, LockNameMcpServerEventsTransport, logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)),

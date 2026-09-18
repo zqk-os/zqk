@@ -3,9 +3,9 @@ package mcp
 import (
 	"bufio"
 
-	"github.com/lanceman/zqk/pkg/concurrency"
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/concurrency"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/logging"
 )
 
 // withClientsReadLock safely acquires clientsMu.RLock() with shutdown checks using TryRLock
@@ -161,7 +161,7 @@ func (s *Server) unsubscribeWriterSubscriptions(writer *bufio.Writer) {
 
 // releaseConnectionWriter clears client and transport writers that still point at a
 // closed TCP connection and abandons that connection's writer queue.
-// TRACK: BLI-REDACTED — remove when: per-connection Server isolates writers.
+// TRACK: BLI-1784969955962654000-dc689643 — remove when: per-connection Server isolates writers.
 func (s *Server) releaseConnectionWriter(writer *bufio.Writer) {
 	if s == nil || writer == nil {
 		return

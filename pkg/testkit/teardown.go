@@ -3,9 +3,9 @@ package testkit
 import (
 	"time"
 
-	"github.com/lanceman/zqk/pkg/pipeline"
-	"github.com/lanceman/zqk/pkg/projecttemp"
-	"github.com/lanceman/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/pipeline"
+	"github.com/zqk-os/zqk/pkg/projecttemp"
+	"github.com/zqk-os/zqk/pkg/storage"
 )
 
 // TeardownOptions is an alias for [storage.ProjectTestTeardownOptions] (canonical implementation lives in storage to avoid import cycles).

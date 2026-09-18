@@ -7,12 +7,10 @@ import (
 	"sync"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/paths"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
-
-	clicontext "github.com/lanceman/zqk/internal/cli/context"
-	"github.com/lanceman/zqk/pkg/logging"
-	"github.com/lanceman/zqk/pkg/orchestration"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/orchestration"
+	"github.com/zqk-os/zqk/pkg/paths"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // ActiveAgent reports the current status of an agent persona.
@@ -61,7 +59,7 @@ func (t *ActivityTicker) Display(nextUpdate time.Duration) {
 	}
 
 	// Open or create the log file in .zqk/logs using resolved project root
-	root := clicontext.ResolveProjectRoot(".")
+	root := paths.ResolveProjectRoot(".")
 	logPath := filepath.Join(root, paths.ProjectDataDir, "logs", orchestration.LogKeyHiveActivity)
 
 	f, err := fileutil.OpenFile(logPath, fileutil.O_APPEND|fileutil.O_CREATE|fileutil.O_WRONLY, 0600)

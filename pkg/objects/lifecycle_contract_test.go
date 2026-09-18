@@ -8,8 +8,8 @@ import (
 
 	"gopkg.in/yaml.v3"
 
-	"github.com/lanceman/zqk/pkg/paths"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/paths"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // Lifecycle YAML contract tests (table-driven from disk — no combinatorial matrix).
@@ -25,7 +25,7 @@ var strictAutoTriggerKinds = map[string]struct{}{
 // "all children done". PRI active|in_progress→complete are dual (manual+auto) so they
 // are not auto-only and do not need this allowlist — see LIFECYCLE_STATUS_ROLES.md
 // § First-class promote. TRACK: replace remaining auto-only rollups with
-// on_all_dependents_status DSL (BLI-REDACTED).
+// on_all_dependents_status DSL (BLI-1785784867143912000-635942fb).
 var completionRollupAllowlist = map[string]struct{}{}
 
 type lifecycleYAMLDoc struct {
@@ -219,7 +219,7 @@ func TestLifecycleContract_PriorityPlanInProgressEquivActiveOrderZero(t *testing
 }
 
 func TestLifecycleContract_PriorityPlanExecutionCheckValve(t *testing.T) {
-	// TRACK: BLI-REDACTED — in_progress is a check valve.
+	// TRACK: BLI-1785439369431933000-f0cccd6c — in_progress is a check valve.
 	forbidden := map[string]struct{}{
 		ObjectStatusGrooming: {}, ObjectStatusActive: {},
 		"planning": {}, "prioritizing": {},
@@ -255,7 +255,7 @@ func TestLifecycleContract_PriorityPlanExecutionCheckValve(t *testing.T) {
 }
 
 func TestLifecycleContract_PriorityPlanHaltDoesNotResumeToShovelReady(t *testing.T) {
-	// TRACK: BLI-REDACTED — halt is not a launder back to active.
+	// TRACK: BLI-1785439369431933000-f0cccd6c — halt is not a launder back to active.
 	var doc lifecycleYAMLDoc
 	for _, d := range loadAllLifecycleDocs(t) {
 		if d.ObjectType == KindPriorityPlan {

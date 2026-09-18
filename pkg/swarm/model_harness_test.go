@@ -4,7 +4,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/llm"
+	"github.com/zqk-os/zqk/pkg/llm"
 )
 
 func TestCodeDraftToolNames_excludesLookup(t *testing.T) {

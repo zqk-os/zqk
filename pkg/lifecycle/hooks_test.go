@@ -3,10 +3,10 @@ package lifecycle
 import (
 	"testing"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/storage"
-	"github.com/lanceman/zqk/pkg/testkit"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/testkit"
 )
 
 func TestEffortStringUnset(t *testing.T) {
@@ -29,7 +29,7 @@ func TestEffortStringUnset(t *testing.T) {
 }
 
 func TestApplyComputeHooks_BacklogItem_Complete(t *testing.T) {
-	// TRACK: BLI-REDACTED — BL-123 is not a valid backlog_item id prefix.
+	// TRACK: BLI-1785443942668406000-1ec5c811 — BL-123 is not a valid backlog_item id prefix.
 	pool := testkit.PrepareGraphConnectionForTest(t)
 	realStorage := storage.NewPoolAwareGraphStorage(pool, t.TempDir())
 
@@ -72,7 +72,7 @@ func TestApplyComputeHooks_BacklogItem_Complete(t *testing.T) {
 }
 
 func TestApplyComputeHooks_NotComplete(t *testing.T) {
-	// TRACK: BLI-REDACTED — BL-123 is not a valid backlog_item id prefix.
+	// TRACK: BLI-1785443942668406000-1ec5c811 — BL-123 is not a valid backlog_item id prefix.
 	pool := testkit.PrepareGraphConnectionForTest(t)
 	realStorage := storage.NewPoolAwareGraphStorage(pool, t.TempDir())
 

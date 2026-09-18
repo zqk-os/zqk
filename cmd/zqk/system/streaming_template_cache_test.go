@@ -7,9 +7,9 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/goroutinelabels"
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 func TestStreamingTemplateCache_GetTemplateWithTokens(t *testing.T) {

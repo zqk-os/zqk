@@ -1,0 +1,24 @@
+id: SCH-chat-responder
+title: Agent - Chat Responder
+description: |
+  Runs the native chat responder to act as the kernel's voice in the IDE.
+  Kept alive by the scheduler via a 1-minute timer tick.
+job_type: run_wrapper
+trigger_type: timer
+schedule_expression: "*/1 * * * *"
+category: system
+execution_mode: reusable
+max_runtime_seconds: 3600
+enabled: true
+status: active
+namespace_id: zqk:kernel
+schema_version: "2.0.0"
+command: /bin/sh
+command_args:
+  - "-c"
+  - |
+    set -e
+    ROOT="${ZQK_PROJECT_ROOT:-.}"
+    cd "$ROOT"
+    export AG_TRANSCRIPT_PATH=$(ls -t "$HOME/.gemini/antigravity-cli/brain"/*/.system_generated/logs/transcript.jsonl | head -n 1)
+    exec ./bin/zqk agent chat-responder

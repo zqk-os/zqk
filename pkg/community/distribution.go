@@ -3,13 +3,14 @@ package community
 import (
 	"crypto/sha256"
 	"encoding/hex"
+	"errors"
 	"fmt"
 	"io"
-	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
 
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // TargetPlatform defines an operating system and architecture pair.
@@ -71,26 +72,26 @@ func GenerateHomebrewFormula(version string, checksums map[string]string) (strin
 
 	tmpl := fmt.Sprintf(`class Zqk < Formula
   desc "Kernel and orchestration CLI for AI-human hybrid software engineering"
-  homepage "https://github.com/lanceman/zqk"
+  homepage "https://github.com/zqk-os/zqk"
   version "%s"
   license "Apache-2.0"
 
   on_macos do
     if Hardware::CPU.arm?
-      url "https://github.com/lanceman/zqk/releases/download/v#{version}/zqk-community_#{version}_darwin_arm64.tar.gz"
+      url "https://github.com/zqk-os/zqk/releases/download/v#{version}/zqk-community_#{version}_darwin_arm64.tar.gz"
       sha256 "%s"
     else
-      url "https://github.com/lanceman/zqk/releases/download/v#{version}/zqk-community_#{version}_darwin_amd64.tar.gz"
+      url "https://github.com/zqk-os/zqk/releases/download/v#{version}/zqk-community_#{version}_darwin_amd64.tar.gz"
       sha256 "%s"
     end
   end
 
   on_linux do
     if Hardware::CPU.arm?
-      url "https://github.com/lanceman/zqk/releases/download/v#{version}/zqk-community_#{version}_linux_arm64.tar.gz"
+      url "https://github.com/zqk-os/zqk/releases/download/v#{version}/zqk-community_#{version}_linux_arm64.tar.gz"
       sha256 "%s"
     else
-      url "https://github.com/lanceman/zqk/releases/download/v#{version}/zqk-community_#{version}_linux_amd64.tar.gz"
+      url "https://github.com/zqk-os/zqk/releases/download/v#{version}/zqk-community_#{version}_linux_amd64.tar.gz"
       sha256 "%s"
     end
   end
@@ -110,11 +111,11 @@ end
 
 // ComputeFileSHA256 returns the lowercase hex sha256 of the given file path.
 func ComputeFileSHA256(filePath string) (string, error) {
-	f, err := os.Open(filePath)
+	f, err := fileutil.OpenRead(filePath)
 	if err != nil {
 		return "", err
 	}
-	defer f.Close()
+	defer func() { _ = f.Close() }()
 
 	hasher := sha256.New()
 	if _, err := io.Copy(hasher, f); err != nil {
@@ -194,5 +195,21 @@ func VerifyHomebrewFormula(formulaPath, manifestPath string) error {
 		return fmt.Errorf("formula missing binary alias installation for zqk-community")
 	}
 
+	return nil
+}
+
+var releaseTagRegex = regexp.MustCompile(`^v(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-[0-9A-Za-z.-]+)?(?:\+[0-9A-Za-z.-]+)?$`)
+
+// ValidateReleaseTag asserts that a given release tag strictly conforms to standard SemVer with mandatory leading 'v'.
+func ValidateReleaseTag(tag string) error {
+	if tag == "" {
+		return errors.New("release tag cannot be empty")
+	}
+	if !strings.HasPrefix(tag, "v") {
+		return fmt.Errorf("release tag %q must start with 'v' prefix", tag)
+	}
+	if !releaseTagRegex.MatchString(tag) {
+		return fmt.Errorf("release tag %q is not a valid semantic version tag (expected format e.g. v2.9.4-rc1)", tag)
+	}
 	return nil
 }

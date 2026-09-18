@@ -5,8 +5,8 @@ import (
 	"io"
 	"os"
 
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/zqkenv"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
 // progressLogger implements ProgressLogger interface

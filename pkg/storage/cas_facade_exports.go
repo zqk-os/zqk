@@ -1,12 +1,12 @@
 package storage
 
 import (
-	"github.com/lanceman/zqk/pkg/objects"
-	caspkg "github.com/lanceman/zqk/pkg/storage/cas"
+	"github.com/zqk-os/zqk/pkg/objects"
+	caspkg "github.com/zqk-os/zqk/pkg/storage/cas"
 
 	"context"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
 )
 
 func (f *FileObjectStorage) CASUsesContentAddressableStorage(kind string) bool {

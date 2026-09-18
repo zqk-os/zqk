@@ -5,17 +5,17 @@ import (
 	"path/filepath"
 	"testing"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/scheduler"
-	"github.com/lanceman/zqk/pkg/storage"
-	"github.com/lanceman/zqk/pkg/testkit"
-	"github.com/lanceman/zqk/pkg/utils/fileutil"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/scheduler"
+	"github.com/zqk-os/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/testkit"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	_ "github.com/lanceman/zqk/pkg/specbuilder/bldr_instance_v1"
-	_ "github.com/lanceman/zqk/pkg/specbuilder/bldr_v2"
+	_ "github.com/zqk-os/zqk/pkg/specbuilder/bldr_instance_v1"
+	_ "github.com/zqk-os/zqk/pkg/specbuilder/bldr_v2"
 )
 
 func TestVerifyCompletionIntegration(t *testing.T) {

@@ -5,9 +5,9 @@ import (
 	"runtime"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/concurrency"
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/concurrency"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/logging"
 )
 
 // NewAsyncValidator creates a new async validator.
@@ -56,7 +56,7 @@ func NewAsyncValidator(ctx context.Context, projectRoot string, workers int, max
 		// under the 5s fail-fast budget; 8 was a timeout workaround that made syschk ~6 min
 		// for 8k objects. Cap at 16; nested validate still holds the slot until done
 		// (no timeout thread leak). Hostload refuses extra slots under foreign pressure.
-		// TRACK: BLI-REDACTED
+		// TRACK: BLI-1785895580100186000-c5539372
 		validationSemaphore:        make(chan struct{}, validationSemaphoreCapacity(workers)),
 		lastQueueSize:              0,
 		lastSemaphoreFullQueueSize: 0,

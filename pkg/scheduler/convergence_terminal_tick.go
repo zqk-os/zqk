@@ -9,21 +9,21 @@ import (
 	"path/filepath"
 	"strings"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/convergerollup"
-	"github.com/lanceman/zqk/pkg/logging"
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/paths"
-	enumv "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/convergence_session"
-	"github.com/lanceman/zqk/pkg/specbuilder/bldr_instance_v1"
-	storagepkg "github.com/lanceman/zqk/pkg/storage"
-	"github.com/lanceman/zqk/pkg/utils/fileutil"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/convergerollup"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
+	enumv "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/convergence_session"
+	"github.com/zqk-os/zqk/pkg/specbuilder/bldr_instance_v1"
+	storagepkg "github.com/zqk-os/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // convergenceTerminalFollowUpNeeded reports whether test-bundle health still shows work worth tracking
 // after a convergence_session has stopped persisting measurements (lifecycle-terminal completed/abandoned,
 // or Option A halted statuses such as escalated/paused/error).
-// TRACK: BLI-REDACTED — escalated is not lifecycle-terminal.
+// TRACK: BLI-1786686768606200000-31133cc3 — escalated is not lifecycle-terminal.
 func convergenceTerminalFollowUpNeeded(snap *TestBundleConvergenceSnapshot) (bool, []string) {
 	if snap == nil {
 		return false, nil
@@ -198,7 +198,7 @@ func buildFollowupDraftConvergenceSessionObject(priorSessionID string, prior map
 	}
 
 	// Build() applies spec defaults (timestamps, origin, etc.); ID is stripped for storage Create.
-	b.SetID("CVS-REDACTED")
+	b.SetID("CVS-1776000000000000999-aabbccdd")
 	obj, err := b.Build()
 	if err != nil {
 		out := b.ToEventMap()

@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"regexp"
 
-	"github.com/lanceman/zqk/internal/cli"
-	"github.com/lanceman/zqk/pkg/objectget"
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/internal/cli"
+	"github.com/zqk-os/zqk/pkg/objectget"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 const maxReferenceResolverOverlayReads = 100

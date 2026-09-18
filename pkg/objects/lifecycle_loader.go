@@ -14,13 +14,13 @@ import (
 
 	"gopkg.in/yaml.v3"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/goroutinelabels"
-	"github.com/lanceman/zqk/pkg/loader"
-	"github.com/lanceman/zqk/pkg/paths"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
-	"github.com/lanceman/zqk/pkg/zqkenv"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
+	"github.com/zqk-os/zqk/pkg/loader"
+	"github.com/zqk-os/zqk/pkg/paths"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
 // ErrLifecycleStatusUnknown means the kind's lifecycle loaded but status (after
@@ -134,7 +134,7 @@ type Transition struct {
 	Preconditions    []string `yaml:"preconditions,omitempty"`
 	// Postconditions are declarative hold-after-hop claims (role, cleared fields).
 	// Evaluators are not required yet; contract tests and the state-machine rubric
-	// treat them as the exam the hop must leave true. TRACK: BLI-REDACTED
+	// treat them as the exam the hop must leave true. TRACK: BLI-1785439369431933000-f0cccd6c
 	Postconditions    []string                `yaml:"postconditions,omitempty"`
 	OnDependentStatus *DependentStatusTrigger `yaml:"on_dependent_status,omitempty"`
 	SideEffects       []TransitionSideEffect  `yaml:"side_effects,omitempty"`
@@ -624,7 +624,7 @@ func (ll *LifecycleLoader) IsTerminalStatusForKind(kind, status string) (bool, e
 // Trusts the lifecycle status `preliminary` flag only. Origin alone must not imply
 // draft (born-complete metrics use origin+terminal with preliminary:false; treating
 // origin as draft parked them forever with no leave path).
-// TRACK: BLI-REDACTED — draft-plane / promote membrane.
+// TRACK: BLI-1785443942668406000-1ec5c811 — draft-plane / promote membrane.
 func (ll *LifecycleLoader) IsPreliminaryStatusForKind(kind, status string) (bool, error) {
 	if status == emptyValue {
 		return false, nil

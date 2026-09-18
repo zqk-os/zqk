@@ -1,8 +1,8 @@
 package coordination
 
 import (
-	"github.com/lanceman/zqk/pkg/metrics"
-	"github.com/lanceman/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/metrics"
+	"github.com/zqk-os/zqk/pkg/storage"
 )
 
 // NewCLINotifierWithCoordinator creates a CLINotifier with mandatory coordinator integration
@@ -48,5 +48,9 @@ func NewCLINotifierWithCoordinator(
 	adapter := NewCLINotifierAdapter(helper)
 
 	// Create CLINotifier with adapter (mandatory)
-	return storage.NewCLINotifier(verbose, quiet, adapter)
+	notifier, err := storage.NewCLINotifier(verbose, quiet, adapter)
+	if err != nil {
+		return nil
+	}
+	return notifier
 }

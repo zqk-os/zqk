@@ -3,11 +3,11 @@ package swarm
 import (
 	"encoding/json"
 
-	"github.com/lanceman/zqk/pkg/llm"
+	"github.com/zqk-os/zqk/pkg/llm"
 )
 
 // TokenTracker tracks and validates the token budget per swarm step.
-// TRACK: BLI-REDACTED
+// TRACK: BLI-1783631892661332000-b2cd615e
 type TokenTracker struct {
 	ContextWindow int
 	Threshold     float64

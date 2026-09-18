@@ -6,9 +6,9 @@ import (
 	"net/rpc/jsonrpc"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/goroutinelabels"
-	"github.com/lanceman/zqk/pkg/graph/provider"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
+	"github.com/zqk-os/zqk/pkg/graph/provider"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 func StartServer(socketPath string, pool provider.ConnectionPool) error {
@@ -32,7 +32,9 @@ func StartServer(socketPath string, pool provider.ConnectionPool) error {
 					if err != nil {
 						return
 					}
-					go server.ServeCodec(jsonrpc.NewServerCodec(conn))
+					goroutinelabels.NewGoroutine("graph_rpc.serve_codec", "serving RPC codec connection").StartSimple(func() {
+						server.ServeCodec(jsonrpc.NewServerCodec(conn))
+					})
 				}
 			}()
 		})

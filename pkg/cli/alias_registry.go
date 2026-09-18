@@ -4,8 +4,8 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/kindsynonyms"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/kindsynonyms"
 )
 
 type operationAliasEntry struct {

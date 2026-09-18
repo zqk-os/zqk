@@ -5,11 +5,11 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/lanceman/zqk/internal/cli"
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/internal/cli"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 
-	"github.com/lanceman/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/logging"
 )
 
 func TestDecodeAutoFixBatchRecoversTrailingConcurrentWrite(t *testing.T) {

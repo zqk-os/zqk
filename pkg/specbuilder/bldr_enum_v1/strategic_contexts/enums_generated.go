@@ -4,8 +4,8 @@
 package strategic_contexts
 
 import (
-	base_objectenum "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
-	shared_strategic_contextsenum "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/shared_strategic_contexts"
+	base_objectenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
+	shared_strategic_contextsenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/shared_strategic_contexts"
 )
 
 type PriorityTier = base_objectenum.PriorityTier

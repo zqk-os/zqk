@@ -6,8 +6,9 @@ import (
 	"path/filepath"
 	"strings"
 
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
-	"github.com/lanceman/zqk/pkg/zqkenv"
+	"github.com/zqk-os/zqk/pkg/execwrap"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
 const agentWorktreeTempBucket = "zqk-worktrees"
@@ -16,7 +17,7 @@ const agentWorktreeTempBucket = "zqk-worktrees"
 // **not** under projectRoot. Default: $TMPDIR/zqk-worktrees/<repo-key>/<taskID>.
 // Override base with env AgentWorktreeRoot (brand-prefixed); in-project
 // overrides are ignored so Studio load cannot fork-bomb the kernel tree.
-// Kernel: POL-AGENT-WORKTREE-ISOLATION-001. TRACK: BLI-REDACTED
+// Kernel: POL-AGENT-WORKTREE-ISOLATION-001. TRACK: BLI-1783831585418122000-c57cd667
 // AgentWorktreeContainer is the parent directory that holds per-task worktrees.
 func AgentWorktreeContainer(projectRoot string) string {
 	absRoot, err := filepath.Abs(strings.TrimSpace(projectRoot))
@@ -118,7 +119,8 @@ func IsAgentWorktreePath(p string) bool {
 }
 
 // BootstrapWorktreeConfig writes config/zqk-local.yaml in worktreeDir
-// binding kernel_state.project_root and paths.project_root to the absolute seated kernel.
+// binding kernel_state.project_root and paths.project_root to the absolute seated kernel,
+// and marks config/zqk-local.yaml as assume-unchanged so it remains clean in porcelain status.
 func BootstrapWorktreeConfig(worktreeDir, seatedProjectRoot string) error {
 	seatedAbs, err := filepath.Abs(strings.TrimSpace(seatedProjectRoot))
 	if err != nil || seatedAbs == "" {
@@ -130,11 +132,23 @@ func BootstrapWorktreeConfig(worktreeDir, seatedProjectRoot string) error {
 	}
 	configPath := filepath.Join(cfgDir, ZqkLocalConfigFileName)
 	content := "# Worktree seated kernel configuration\nkernel_state:\n  project_root: " + seatedAbs + "\npaths:\n  project_root: " + seatedAbs + "\n"
-	return fileutil.WriteStandardFile(configPath, []byte(content))
+	if err := fileutil.WriteStandardFile(configPath, []byte(content)); err != nil {
+		return err
+	}
+	AssumeUnchangedWorktreeConfig(worktreeDir)
+	return nil
+}
+
+// AssumeUnchangedWorktreeConfig marks config/zqk-local.yaml as assume-unchanged in git
+// within worktreeDir so that local worktree configuration does not appear in git status --porcelain.
+func AssumeUnchangedWorktreeConfig(worktreeDir string) {
+	relConfig := filepath.ToSlash(filepath.Join(ConfigDir, ZqkLocalConfigFileName))
+	cmd := execwrap.Command("git", "update-index", "--assume-unchanged", relConfig)
+	cmd.Dir = worktreeDir
+	_ = cmd.Run()
 }
 
 // BootstrapWorktreeSettings binds worktreeDir to seatedProjectRoot by calling BootstrapWorktreeConfig.
 func BootstrapWorktreeSettings(worktreeDir, seatedProjectRoot string) error {
 	return BootstrapWorktreeConfig(worktreeDir, seatedProjectRoot)
 }
-

@@ -9,14 +9,14 @@ import (
 	"strings"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/agentfeed"
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/git"
-	"github.com/lanceman/zqk/pkg/interactionpolicy"
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/paths"
-	"github.com/lanceman/zqk/pkg/storage"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/agentfeed"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/git"
+	"github.com/zqk-os/zqk/pkg/interactionpolicy"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/storage"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // DraftPlaneStewardWarn matches system-check draft-plane backlog warning (≥50).
@@ -42,7 +42,7 @@ const AlignLatestRelativePath = "state/ambient/align-latest.json"
 // KernelAmbience is the cheap thought-projector slice for whats-next:
 // last compact system-check cache + live draft-plane inventory + employed workflows.
 // Does not run system check (too heavy for the composite hot path).
-// TRACK: CRIT-REDACTED — ambient verification on whats-next.
+// TRACK: CRIT-1785944166826206000-61c518e9 — ambient verification on whats-next.
 type KernelAmbience struct {
 	Available          bool                        `json:"available"`
 	BlockingIssues     int                         `json:"blocking_issues"`

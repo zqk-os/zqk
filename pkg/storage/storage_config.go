@@ -1,7 +1,7 @@
 package storage
 
 import (
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // StorageConfig holds configuration for file storage operations

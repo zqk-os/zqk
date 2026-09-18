@@ -3,8 +3,8 @@ package object
 import (
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/specbuilder/bldr_lifecycle_v1"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/specbuilder/bldr_lifecycle_v1"
 )
 
 func TestIsNonProgressLifecycleProbeCandidate_AllowsSuccessTerminals(t *testing.T) {

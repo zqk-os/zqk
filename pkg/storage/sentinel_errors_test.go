@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/storage"
 )
 
 func TestStorageSentinelErrors_ConformsToErrorsIs(t *testing.T) {

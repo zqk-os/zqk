@@ -3,7 +3,7 @@ package orchestration
 import (
 	"context"
 
-	"github.com/lanceman/zqk/pkg/graph/provider"
+	"github.com/zqk-os/zqk/pkg/graph/provider"
 )
 
 // IntentPrewarmer listens to the Intent Prediction engine and pre-warms the Neo4j/MemGraph cache

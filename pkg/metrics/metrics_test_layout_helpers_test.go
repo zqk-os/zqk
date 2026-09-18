@@ -8,10 +8,9 @@ import (
 
 	"gopkg.in/yaml.v3"
 
-	clctx "github.com/lanceman/zqk/internal/cli/context"
-	"github.com/lanceman/zqk/pkg/paths"
-	"github.com/lanceman/zqk/pkg/testenvroot"
-	"github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/testenvroot"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 type testSettingsYAMLShapeMetrics struct {
@@ -22,7 +21,7 @@ type testSettingsYAMLShapeMetrics struct {
 func writeMinimalTestSettingsYAMLMetrics(testRoot string) error {
 	p := filepath.Join(testRoot, paths.TestSettingsFilename)
 	body := testSettingsYAMLShapeMetrics{
-		Version: clctx.DefaultBrandSettingsVersion,
+		Version: paths.DefaultBrandSettingsVersion,
 		Paths:   map[string]any{},
 	}
 	data, err := yaml.Marshal(body)
@@ -73,8 +72,6 @@ func moduleRootFromGoEnvMetrics(t *testing.T) string {
 	}
 	return mod
 }
-
-
 
 func copyObjectSpecYAMLFilesToTestRootMetrics(testRoot, projectRoot string) error {
 	return testenvroot.CopyObjectSpecsFromProject(testRoot, projectRoot)

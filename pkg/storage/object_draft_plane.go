@@ -9,10 +9,10 @@ import (
 
 	"gopkg.in/yaml.v3"
 
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/paths"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // Object draft plane: id-keyed mutable YAML for lifecycle-preliminary objects.
@@ -198,13 +198,20 @@ func IsObjectDraftPlanePath(projectRoot, path string) bool {
 	root := ObjectDraftPlaneRoot(projectRoot)
 	clean := filepath.Clean(path)
 	prefix := filepath.Clean(root) + string(fileutil.PathSeparator)
-	return clean == filepath.Clean(root) || strings.HasPrefix(clean, prefix)
+	if clean == filepath.Clean(root) || strings.HasPrefix(clean, prefix) {
+		return true
+	}
+	if !filepath.IsAbs(path) {
+		absPath := filepath.Clean(filepath.Join(projectRoot, path))
+		return absPath == filepath.Clean(root) || strings.HasPrefix(absPath, prefix)
+	}
+	return false
 }
 
 // shouldUseObjectDraftPlane is true for CAS (non-stream) kinds in a preliminary lifecycle status.
 // When the lifecycle loader errors, do not force draft solely because status equals origin —
 // kinds whose origin is a terminal/active status (e.g. glossary_term origin=active) must use CAS.
-// TRACK: REQ-REDACTED (draft-plane create path); VDS glossary materialization.
+// TRACK: REQ-1785895564241296000-bf266adb (draft-plane create path); VDS glossary materialization.
 func shouldUseObjectDraftPlane(kind, status string) bool {
 	if kind == emptyValue || status == emptyValue {
 		return false
@@ -294,16 +301,16 @@ func (f *FileObjectStorage) objectDraftPlaneExists(kind, id string) bool {
 // on draft-plane land (BLI-DRAFT-LAND-TEMPLATE-FILL-001).
 var draftPlaneNextStatusFields = map[string]map[string]any{
 	objects.KindBacklogItem: {
-		objects.FieldKeyProblemStatement:        "",
+		objects.FieldKeyProblemStatement:         "",
 		objects.FieldKeyAcceptanceConsiderations: "",
-		objects.FieldKeyPriority:                "medium",
-		objects.FieldKeyPriorityTier:            "P2",
-		objects.FieldKeyPriorityPlanRef:         "",
-		objects.FieldKeyMilestoneRefs:           []any{},
-		objects.FieldKeyCriteriaRefs:            []any{},
-		objects.FieldKeyRequirementRefs:         []any{},
-		objects.FieldKeyStakeholders:            []any{},
-		objects.FieldKeyEstimatedEffort:         "",
+		objects.FieldKeyPriority:                 "medium",
+		objects.FieldKeyPriorityTier:             "P2",
+		objects.FieldKeyPriorityPlanRef:          "",
+		objects.FieldKeyMilestoneRefs:            []any{},
+		objects.FieldKeyCriteriaRefs:             []any{},
+		objects.FieldKeyRequirementRefs:          []any{},
+		objects.FieldKeyStakeholders:             []any{},
+		objects.FieldKeyEstimatedEffort:          "",
 	},
 	objects.KindCriteria: {
 		objects.FieldKeyCategory:         "",

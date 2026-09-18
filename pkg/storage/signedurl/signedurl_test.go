@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/zqkenv"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
 func TestSigner_GenerateAndValidate(t *testing.T) {

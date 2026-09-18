@@ -1,7 +1,7 @@
 package crud
 
 import (
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 func ApplyRuntimeDeltaOverlay(f FileStorageReadFacade, projectRoot, kind, id string, base map[string]any) map[string]any {

@@ -1,0 +1,45 @@
+# Object count report: periodic congruence snapshot + metrics chunk prune.
+#
+# Runs on a fixed cadence (default template: every 4h). Raw per-kind samples are compact chunks;
+# pruning removes .chunk files older than retention (see --metrics-chunk-retention-days / METRICS_CHUNK_RETENTION_DAYS).
+# Aggregation/compression of domain data is handled elsewhere (audit aggregation, retention_tolerance,
+# stream compaction); this job is for operational counts + landfill visibility under `.zqk/`.
+#
+# Override retention for this job only via environment_variables on the scheduler_job object, e.g.:
+#   METRICS_CHUNK_RETENTION_DAYS: "14"
+# (brand-prefixed; same name as zqkenv.MetricsChunkRetentionDays()).
+#
+# For whole-tree filesystem counts on a slower cadence, see
+# scripts/scheduler_jobs/object_count_report_weekly_full_fs.yaml (opt-in).
+#
+# Create via:
+#   zqk object create scheduler_job --file scripts/scheduler_jobs/object_count_report_hourly.yaml
+#
+# Higher frequency (e.g. hourly: "0 * * * *") if you need fresher time-series; prune still runs each time.
+
+id: SCH-objcount-report
+title: System Health - Object Count Report (every 4h)
+description: |
+  Runs `zqk system object-count-report` on schedule to capture disk vs object vs internal counts,
+  scoped filesystem snapshot under `.zqk/`, append object/stream volume samples, and prune old
+  metrics .chunk files per METRICS_CHUNK_RETENTION_DAYS (template default 7 days below; CLI default 14).
+job_type: run_wrapper
+trigger_type: timer
+schedule_expression: "0 */4 * * *"
+environment_variables:
+  ZQK_METRICS_CHUNK_RETENTION_DAYS: "7"
+category: maintenance
+execution_mode: reusable
+max_runtime_seconds: 900
+enabled: true
+status: active
+namespace_id: zqk:kernel
+schema_version: "2.0.0"
+command: /bin/sh
+command_args:
+  - "-c"
+  - |
+    set -e
+    ZQK="${ZQK_BIN:-zqk}"
+    "$ZQK" system object-count-report --emit-events \
+      --include-filesystem-snapshot --filesystem-snapshot-scope=zqk

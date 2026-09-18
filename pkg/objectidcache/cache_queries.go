@@ -7,12 +7,12 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/concurrency"
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/logging"
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/storage"
-	caspkg "github.com/lanceman/zqk/pkg/storage/cas"
+	"github.com/zqk-os/zqk/pkg/concurrency"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/storage"
+	caspkg "github.com/zqk-os/zqk/pkg/storage/cas"
 )
 
 // GetAll returns all cache entries (for duplicate ID detection).
@@ -261,7 +261,7 @@ func (c *ObjectIDCache) GetMetadata() *ObjectIDCacheMetadata {
 }
 
 // drainObjectIDCachePending trues object-id-cache from the storage pending journal.
-// TRACK: BLI-REDACTED
+// TRACK: BLI-1785895580100186000-c5539372
 func drainObjectIDCachePending(projectRoot string) {
 	pending := storage.ListObjectIDCachePending(projectRoot)
 	if len(pending) == 0 {

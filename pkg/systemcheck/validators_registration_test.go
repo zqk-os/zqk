@@ -3,8 +3,8 @@ package systemcheck
 import (
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/migration/parser"
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/migration/parser"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 func TestCheckRegistration_missingID(t *testing.T) {

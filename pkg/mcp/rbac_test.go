@@ -4,11 +4,11 @@ import (
 	"strings"
 	"testing"
 
-	pkgcli "github.com/lanceman/zqk/pkg/cli"
+	pkgcli "github.com/zqk-os/zqk/pkg/cli"
 	"github.com/spf13/cobra"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/objects"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // normalizeTestCommandPath normalizes a command path by removing the root command prefix

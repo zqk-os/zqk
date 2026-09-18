@@ -4,8 +4,8 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/lanceman/zqk/pkg/logging"
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // extractLengthConstraint extracts a length constraint (min_length or max_length) from validation

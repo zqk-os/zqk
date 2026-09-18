@@ -4,10 +4,10 @@ import (
 	"fmt"
 
 	"github.com/fatih/color"
-	"github.com/lanceman/zqk/internal/cli"
-	"github.com/lanceman/zqk/pkg/brand"
-	"github.com/lanceman/zqk/pkg/cli/bldr_cli_cmd_v1"
-	pkgctx "github.com/lanceman/zqk/pkg/context"
+	"github.com/zqk-os/zqk/internal/cli"
+	"github.com/zqk-os/zqk/pkg/brand"
+	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/spf13/cobra"
 )
 
@@ -39,14 +39,19 @@ func runStartHere(cmd *cobra.Command, _ []string) error {
 	write("Read the policy to understand the Object-First approach:")
 	write("  %s", yellow(fmt.Sprintf("%s object list policy --filter \"title~=Operational Philosophy\"", exe)))
 
-	write("%s", cyan("Step 2 - Mission, Vision, and Goals"))
-	write("Understand the 'why' by looking at the active goals:")
+	write("%s", cyan("Step 2 - Starter kernel graph (org → mission → vision → goal → workstream → plan)"))
+	write("Init should already have this spine. Confirm it, then follow the plan — do not hand-mint a lone goal:")
+	write("  %s", yellow(fmt.Sprintf("%s object list organization", exe)))
+	write("  %s", yellow(fmt.Sprintf("%s object list mission", exe)))
+	write("  %s", yellow(fmt.Sprintf("%s object list vision", exe)))
 	write("  %s", yellow(fmt.Sprintf("%s object list goal", exe)))
-	write("  %s", yellow(fmt.Sprintf("%s object create goal --field title=\"Build something awesome\"", exe)))
+	write("  %s", yellow(fmt.Sprintf("%s object list workstream", exe)))
+	write("  %s", yellow(fmt.Sprintf("%s object list priority_plan", exe)))
+	write("If those counts are 0, seed the pipeline: scripts/starter_kernel_graph/seed.sh")
 
 	write("%s", cyan("Step 3 - Current Priorities & Self-Discovery"))
 	write("Discover what work is planned and self-discover your next task:")
-	write("  %s", yellow(fmt.Sprintf("%s workflow whats-next", exe)))
+	write("  %s", yellow(fmt.Sprintf("%s workflow whats-next --format json", exe)))
 	write("  %s", yellow(fmt.Sprintf("%s object list backlog_item --filter priority_plan_ref=<PLAN_ID>", exe)))
 
 	write("%s", cyan("Step 4 - Agent host sync (workspace ↔ kernel)"))

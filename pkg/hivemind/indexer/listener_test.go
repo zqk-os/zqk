@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/lifecycle"
+	"github.com/zqk-os/zqk/pkg/lifecycle"
 )
 
 // Mock embedding service and store

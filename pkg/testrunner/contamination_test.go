@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/testrunner"
+	"github.com/zqk-os/zqk/pkg/testrunner"
 )
 
 func TestContaminationSnapshotAndDiff(t *testing.T) {

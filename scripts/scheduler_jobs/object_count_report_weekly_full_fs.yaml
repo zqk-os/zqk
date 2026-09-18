@@ -1,0 +1,35 @@
+# Object count report: weekly full-repo filesystem snapshot (optional).
+#
+# Complements SCH-objcount-report (hourly, `--filesystem-snapshot-scope=zqk`). This job
+# walks the whole project tree for landfill / I/O trends; expect longer runtime than the
+# hourly scoped run. Create only if you want whole-tree metrics in addition to `.zqk/`.
+#
+# Create via:
+#   zqk object create scheduler_job --file scripts/scheduler_jobs/object_count_report_weekly_full_fs.yaml
+#
+# Adjust schedule_expression (default: Sunday 04:00 UTC) or max_runtime_seconds as needed.
+
+id: SCH-objcount-report-full-fs
+title: System Health - Object Count Report (Weekly Full FS Snapshot)
+description: |
+  Runs `zqk system object-count-report` weekly with `--filesystem-snapshot-scope=full`
+  for whole-tree file/byte counts and filesystem_snapshot time series. Hourly
+  SCH-objcount-report remains scoped to `.zqk/` for fast cadence.
+job_type: run_wrapper
+trigger_type: timer
+schedule_expression: "0 4 * * 0"
+category: maintenance
+execution_mode: reusable
+max_runtime_seconds: 3600
+enabled: true
+status: active
+namespace_id: zqk:kernel
+schema_version: "2.0.0"
+command: /bin/sh
+command_args:
+  - "-c"
+  - |
+    set -e
+    ZQK="${ZQK_BIN:-zqk}"
+    "$ZQK" system object-count-report --emit-events \
+      --include-filesystem-snapshot --filesystem-snapshot-scope=full

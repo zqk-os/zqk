@@ -3,7 +3,7 @@ package mcp
 import (
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 func TestHandleGetToolMetrics_ErrorRateCalculation(t *testing.T) {

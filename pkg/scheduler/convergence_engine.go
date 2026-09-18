@@ -9,14 +9,14 @@ import (
 	"sync"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/paths"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/paths"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/convergence"
-	"github.com/lanceman/zqk/pkg/goroutinelabels"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/convergence"
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // ConvergenceEngine loop interval
@@ -28,7 +28,10 @@ type ConvergenceStorageProvider interface {
 	CreatePriorityPlanForTimeout(ctx context.Context, sessionID string) error
 }
 
-const convergenceEngineInterval = 30 * time.Second
+const (
+	convergenceEngineInterval        = 30 * time.Second
+	convergenceEngineShutdownTimeout = 15 * time.Second
+)
 
 // EventKindSynthesisRequired is emitted when the Convergence Engine detects a test failure.
 const EventKindSynthesisRequired = "synthesis_required"
@@ -86,7 +89,7 @@ func (s *Scheduler) StartConvergenceEngine(ctx context.Context) (stop func(conte
 		case <-done:
 		case <-ctx.Done():
 			SchedulerDaemonLog(s.logger).Warn("convergence_engine: shutdown canceled by context").Log()
-		case <-time.After(15 * time.Second):
+		case <-time.After(convergenceEngineShutdownTimeout):
 			SchedulerDaemonLog(s.logger).Warn("convergence_engine: shutdown timed out; forcing exit").Log()
 		}
 	}

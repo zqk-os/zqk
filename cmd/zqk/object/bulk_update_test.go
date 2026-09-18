@@ -3,8 +3,8 @@ package object
 import (
 	"os"
 
-	"github.com/lanceman/zqk/pkg/datacell"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/datacell"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 
 	stdctx "context" // Explicitly alias standard context package
 	"io"
@@ -14,13 +14,13 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/lanceman/zqk/internal/cli"
-	clitool "github.com/lanceman/zqk/pkg/cli"
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/paths"
-	"github.com/lanceman/zqk/pkg/storage"
-	"github.com/lanceman/zqk/pkg/testkit"
+	"github.com/zqk-os/zqk/internal/cli"
+	clitool "github.com/zqk-os/zqk/pkg/cli"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/testkit"
 )
 
 func initBulkUpdateTestProjectLayout(root string) error {
@@ -374,7 +374,7 @@ func TestBulkUpdateCmd(t *testing.T) {
 			seedBulkUpdateSupportObjects(t, provider)
 			// Create parks non-preliminary statuses on the draft plane (origin exploring);
 			// promote to the intended status so List/bulk filters see the objects.
-			// TRACK: BLI-REDACTED — draft-plane create / promote membrane.
+			// TRACK: BLI-1785443942668406000-1ec5c811 — draft-plane create / promote membrane.
 			for _, objData := range tc.setupObjects {
 				leave := objects.GetString(objData, objects.FieldKeyStatus)
 				if leave == emptyValue {

@@ -5,14 +5,14 @@ import (
 	"maps"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/concurrency"
-	file_pkg "github.com/lanceman/zqk/pkg/storage/file"
+	"github.com/zqk-os/zqk/pkg/concurrency"
+	file_pkg "github.com/zqk-os/zqk/pkg/storage/file"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/goroutinelabels"
-	"github.com/lanceman/zqk/pkg/logging"
-	"github.com/lanceman/zqk/pkg/storage/filecas"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/storage/filecas"
 )
 
 // wakeWorkerIfNeeded starts the worker if it's not already running
@@ -235,7 +235,7 @@ func (iq *indexQueue) startWorker() {
 // This is much more efficient than reloading/saving for each update
 // Thread-safe (called from single worker goroutine, CAS has its own locks)
 //
-//nolint:gocyclo // TRACK: BLI-REDACTED — split the existing transactional batch path after ghost-write convergence.
+//nolint:gocyclo // TRACK: BLI-1786091929993270000-fba34292 — split the existing transactional batch path after ghost-write convergence.
 func (iq *indexQueue) processBatch(batch []*indexUpdateRequest) error {
 	if len(batch) == 0 {
 		return nil
@@ -447,7 +447,7 @@ func (iq *indexQueue) processBatch(batch []*indexUpdateRequest) error {
 		reloaded = true
 		// Disk-preferred merge: a full process overlay clobbered healed indexes when a
 		// long-lived process (scheduler / system check) held stale in-memory mappings.
-		// TRACK: BLI-REDACTED
+		// TRACK: BLI-1785723654802038000-b14064bc
 		mergedMaps := filecas.MergeCASIndexMaps(cas.GetKindDir(), cas.GetIndex().Mappings, processMaps)
 		// Re-apply this batch after disk merge so ValidateMappings cache-lag drops cannot
 		// omit in-flight creates from the durable save (adds are authoritative for this batch).

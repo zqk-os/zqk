@@ -6,18 +6,18 @@ import (
 	"testing"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/execwrap"
-	caspkg "github.com/lanceman/zqk/pkg/storage/cas"
+	"github.com/zqk-os/zqk/pkg/execwrap"
+	caspkg "github.com/zqk-os/zqk/pkg/storage/cas"
 
-	"github.com/lanceman/zqk/pkg/paths"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/paths"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 
 	"gopkg.in/yaml.v3"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/storage"
-	"github.com/lanceman/zqk/pkg/testkit"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/testkit"
 )
 
 func TestCreateWithForce(t *testing.T) {
@@ -42,7 +42,7 @@ func TestCreateWithForce(t *testing.T) {
 	}
 
 	// Promote off draft plane so CAS index / List see the object.
-	// TRACK: BLI-REDACTED
+	// TRACK: BLI-1785443942668406000-1ec5c811
 	storage.CreateCASVisible(t, storageProvider, pkgctx.NewSystemContext(), secCtx, initialObj, objects.ObjectStatusValidated)
 
 	// Ensure the CAS index is persisted

@@ -7,10 +7,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/circuitbreaker"
+	"github.com/zqk-os/zqk/pkg/circuitbreaker"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/logging"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/logging"
 )
 
 func TestEnvelope_Fields(t *testing.T) {

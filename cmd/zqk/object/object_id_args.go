@@ -1,7 +1,7 @@
 package object
 
 import (
-	clipkg "github.com/lanceman/zqk/pkg/cli"
+	clipkg "github.com/zqk-os/zqk/pkg/cli"
 	"github.com/spf13/cobra"
 )
 

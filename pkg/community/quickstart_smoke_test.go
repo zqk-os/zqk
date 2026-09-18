@@ -4,20 +4,19 @@ import (
 	"archive/tar"
 	"compress/gzip"
 	"io"
-	"os"
-	"os/exec"
 	"path/filepath"
 	"runtime"
 	"strings"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/paths"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/execwrap"
+	"github.com/zqk-os/zqk/pkg/paths"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // extractTarGz unpacks a tar.gz archive into a destination directory.
 func extractTarGz(srcTarGz, destDir string) error {
-	f, err := os.Open(srcTarGz)
+	f, err := fileutil.Open(srcTarGz)
 	if err != nil {
 		return err
 	}
@@ -42,14 +41,14 @@ func extractTarGz(srcTarGz, destDir string) error {
 		target := filepath.Join(destDir, header.Name)
 		switch header.Typeflag {
 		case tar.TypeDir:
-			if err := os.MkdirAll(target, 0o755); err != nil {
+			if err := fileutil.MkdirAll(target, 0o755); err != nil {
 				return err
 			}
 		case tar.TypeReg:
-			if err := os.MkdirAll(filepath.Dir(target), 0o755); err != nil {
+			if err := fileutil.MkdirAll(filepath.Dir(target), 0o755); err != nil {
 				return err
 			}
-			outFile, err := os.OpenFile(target, os.O_CREATE|os.O_RDWR|os.O_TRUNC, os.FileMode(header.Mode))
+			outFile, err := fileutil.OpenFile(target, fileutil.O_CREATE|fileutil.O_RDWR|fileutil.O_TRUNC, fileutil.FileMode(header.Mode))
 			if err != nil {
 				return err
 			}
@@ -65,7 +64,7 @@ func extractTarGz(srcTarGz, destDir string) error {
 
 // TestQuickstartSmoke_FunctionalAcceptance verifies that a release tarball can be unpacked
 // into a clean, empty directory by a stranger, and successfully execute system init,
-// agent-onboard, and whats-next with zero monorepo dependencies (CRIT-REDACTED).
+// agent-onboard, and whats-next with zero monorepo dependencies (CRIT-1789616219409901000-13d41df4).
 func TestQuickstartSmoke_FunctionalAcceptance(t *testing.T) {
 	if testing.Short() {
 		t.Skip("skipping tarball generation in short mode")
@@ -78,7 +77,7 @@ func TestQuickstartSmoke_FunctionalAcceptance(t *testing.T) {
 	}
 
 	distDir := t.TempDir()
-	cmd := exec.Command("bash", pkgScript, "v2.9.5", "--dry")
+	cmd := execwrap.Command("bash", pkgScript, "v2.9.5", "--dry")
 	cmd.Dir = root
 	cmd.Env = append(cmd.Environ(), "ZQK_DIST_DIR="+distDir)
 	out, err := cmd.CombinedOutput()
@@ -111,7 +110,7 @@ func TestQuickstartSmoke_FunctionalAcceptance(t *testing.T) {
 	strangerWorkspace := t.TempDir()
 
 	// 1. Run 'system init'
-	initCmd := exec.Command(binPath, "system", "init", "--project-name", "stranger-quickstart")
+	initCmd := execwrap.Command(binPath, "system", "init", "--project-name", "stranger-quickstart")
 	initCmd.Dir = strangerWorkspace
 	initOut, initErr := initCmd.CombinedOutput()
 	if initErr != nil {
@@ -124,7 +123,7 @@ func TestQuickstartSmoke_FunctionalAcceptance(t *testing.T) {
 	}
 
 	// 2. Run 'system agent-onboard'
-	onboardCmd := exec.Command(binPath, "system", "agent-onboard", "--format", "json")
+	onboardCmd := execwrap.Command(binPath, "system", "agent-onboard", "--format", "json")
 	onboardCmd.Dir = strangerWorkspace
 	onboardOut, onboardErr := onboardCmd.CombinedOutput()
 	if onboardErr != nil {
@@ -142,7 +141,7 @@ func TestQuickstartSmoke_FunctionalAcceptance(t *testing.T) {
 	}
 
 	// 3. Run 'workflow whats-next'
-	wnCmd := exec.Command(binPath, "workflow", "whats-next", "--format", "json")
+	wnCmd := execwrap.Command(binPath, "workflow", "whats-next", "--format", "json")
 	wnCmd.Dir = strangerWorkspace
 	wnOut, wnErr := wnCmd.CombinedOutput()
 	if wnErr != nil {
@@ -155,7 +154,7 @@ func TestQuickstartSmoke_FunctionalAcceptance(t *testing.T) {
 }
 
 // TestQuickstartSmoke_BoundaryAndErrorHandling verifies error handling when stranger environment
-// lacks permissions, runs in non-existent directory, or runs quickstart help/walkthrough (CRIT-REDACTED).
+// lacks permissions, runs in non-existent directory, or runs quickstart help/walkthrough (CRIT-1789616219409902000-2ccc4d24).
 func TestQuickstartSmoke_BoundaryAndErrorHandling(t *testing.T) {
 	root := paths.ResolveProjectRoot(".")
 	binPath := filepath.Join(root, "bin", "zqk-stable")
@@ -164,7 +163,7 @@ func TestQuickstartSmoke_BoundaryAndErrorHandling(t *testing.T) {
 	}
 
 	// 1. Verify quickstart command walkthrough executes cleanly
-	quickCmd := exec.Command(binPath, "quickstart", "--format", "json")
+	quickCmd := execwrap.Command(binPath, "quickstart", "--format", "json")
 	quickCmd.Dir = root
 	quickOut, quickErr := quickCmd.CombinedOutput()
 	if quickErr != nil {
@@ -176,14 +175,14 @@ func TestQuickstartSmoke_BoundaryAndErrorHandling(t *testing.T) {
 
 	// 2. Verify agent-onboard fails cleanly with descriptive error if project root does not exist
 	badRoot := filepath.Join(t.TempDir(), "nonexistent_subfolder")
-	onboardCmd := exec.Command(binPath, "system", "agent-onboard", "--detect-only", "--format", "json")
+	onboardCmd := execwrap.Command(binPath, "system", "agent-onboard", "--detect-only", "--format", "json")
 	onboardCmd.Dir = badRoot
 	// Even if it runs or fails, it must not panic or crash
 	_ = onboardCmd.Run()
 }
 
 // TestQuickstartSmoke_IntegrationAndConformance verifies documentation and release packaging
-// conformance for first-contact stranger experience (CRIT-REDACTED).
+// conformance for first-contact stranger experience (CRIT-1789616219409903000-fffea071).
 func TestQuickstartSmoke_IntegrationAndConformance(t *testing.T) {
 	root := paths.ResolveProjectRoot(".")
 
@@ -192,7 +191,7 @@ func TestQuickstartSmoke_IntegrationAndConformance(t *testing.T) {
 	if !fileutil.Exists(guidePath) {
 		t.Fatalf("docs/onboarding/COMMUNITY_FIRST_RUN.md missing at %s", guidePath)
 	}
-	content, err := os.ReadFile(guidePath)
+	content, err := fileutil.ReadFile(guidePath)
 	if err != nil {
 		t.Fatalf("failed reading COMMUNITY_FIRST_RUN.md: %v", err)
 	}
@@ -214,7 +213,7 @@ func TestQuickstartSmoke_IntegrationAndConformance(t *testing.T) {
 	if !fileutil.Exists(formulaPath) {
 		t.Fatalf("Formula/zqk.rb missing at %s", formulaPath)
 	}
-	fBytes, err := os.ReadFile(formulaPath)
+	fBytes, err := fileutil.ReadFile(formulaPath)
 	if err != nil {
 		t.Fatalf("failed reading Formula/zqk.rb: %v", err)
 	}
@@ -222,7 +221,7 @@ func TestQuickstartSmoke_IntegrationAndConformance(t *testing.T) {
 	if !strings.Contains(fStr, "class Zqk < Formula") {
 		t.Errorf("Formula/zqk.rb missing class Zqk definition")
 	}
-	if !strings.Contains(fStr, "https://github.com/lanceman/zqk/releases/download/") {
+	if !strings.Contains(fStr, "https://github.com/zqk-os/zqk/releases/download/") {
 		t.Errorf("Formula/zqk.rb missing GitHub release download URL pattern")
 	}
 }

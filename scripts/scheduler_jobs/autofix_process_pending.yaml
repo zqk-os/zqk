@@ -1,0 +1,37 @@
+# Process all pending AUTOFIX-*.json in .zqk/autofix/ so autofix files don't build up.
+# Triggered automatically when check writes batch files; also runs every 10 min as backup.
+# Create: zqk system ensure-retention-jobs (includes this job)
+# Trigger once: zqk scheduler trigger SCH-autofix-process-pending
+# Optional glossary sync: command includes --sync-glossary; add --sync-glossary-apply to create
+# missing GLS terms (guarded by AUTOFIX_GLOSSARY_MAX_CREATE).
+kind: scheduler_job
+schema_version: "2.0.0"
+id: SCH-autofix-process-pending
+title: Process pending autofix batches
+description: |
+  Runs `zqk system auto-fix-process-pending` to process any AUTOFIX-*.json in .zqk/autofix/.
+  Ensures autofix files don't build up; triggered when batches are submitted and on a timer.
+status: active
+job_type: run_wrapper
+trigger_type: timer
+schedule_expression: "0 */10 * * * *"
+execution_mode: reusable
+enabled: true
+category: maintenance
+max_runtime_seconds: 3600
+created_at: "2026-03-17T00:00:00Z"
+updated_at: "2026-03-17T00:00:00Z"
+created_by: account:system
+updated_by: account:system
+origin_project: zqk
+origin_system: zqk
+command: /bin/sh
+command_args:
+  - "-c"
+  - |
+    set -e
+    ZQK="${ZQK_BIN:-zqk}"
+    # Scheduler runs with CWD = project root; resolve there
+    "$ZQK" system auto-fix-process-pending --sync-glossary --sync-glossary-apply --allow-degraded
+environment_variables:
+  AUTOFIX_GLOSSARY_MAX_CREATE: "1000"

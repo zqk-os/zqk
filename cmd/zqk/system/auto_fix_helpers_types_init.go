@@ -1,9 +1,9 @@
 package system
 
 import (
-	"github.com/lanceman/zqk/internal/cli"
-	"github.com/lanceman/zqk/pkg/logging"
-	"github.com/lanceman/zqk/pkg/migration/parser"
+	"github.com/zqk-os/zqk/internal/cli"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/migration/parser"
 	"github.com/spf13/cobra"
 )
 

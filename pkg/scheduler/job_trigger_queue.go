@@ -11,17 +11,17 @@ import (
 	"sync"
 	"time"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/goroutinelabels"
-	"github.com/lanceman/zqk/pkg/logging"
-	"github.com/lanceman/zqk/pkg/nildecode"
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/paths"
-	"github.com/lanceman/zqk/pkg/pipeline"
-	storagepkg "github.com/lanceman/zqk/pkg/storage"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
-	"github.com/lanceman/zqk/pkg/validation"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/nildecode"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/pipeline"
+	storagepkg "github.com/zqk-os/zqk/pkg/storage"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/validation"
 )
 
 const (
@@ -978,32 +978,45 @@ func (q *JobTriggerQueue) drainAndProcessTriggerBatch(ctx context.Context, sched
 
 		err := scheduler.TriggerJob(triggerCtx, request.JobID)
 		if err != nil {
-			if errors.Is(err, goroutinelabels.ErrPoolFull) {
+			if errors.Is(err, goroutinelabels.ErrPoolFull) || errors.Is(err, context.DeadlineExceeded) || errors.Is(err, context.Canceled) {
 				// Re-enqueue this request and the rest (deduplicated) so they are not lost; next poll will process them.
 				// Deduplicate to avoid re-enqueueing the same job_id multiple times and running heavy work twice.
 				seen := make(map[string]bool)
-				remaining := make([]string, 0, len(requests)-i)
+				remaining := make([]JobTriggerRequest, 0, len(requests)-i)
+				remainingIDs := make([]string, 0, len(requests)-i)
 				for j := i; j < len(requests); j++ {
-					id := requests[j].JobID
-					if !seen[id] {
-						seen[id] = true
-						remaining = append(remaining, id)
+					req := requests[j]
+					if !seen[req.JobID] {
+						seen[req.JobID] = true
+						remaining = append(remaining, req)
+						remainingIDs = append(remainingIDs, req.JobID)
 					}
 				}
-				if reEnqErr := q.EnqueueTriggerRequests(remaining, ""); reEnqErr != nil {
+				if reEnqErr := q.EnqueueTriggerRequestStructs(remaining); reEnqErr != nil {
 					SchedulerTriggerQueueLog(q.logger).Warn(LogEventSchedulerTriggerQueueFailedReenqueuePoolFull).
 						Int(triggerQueueKeyCount, len(remaining)).
 						WithError(reEnqErr).
 						Log()
 				}
+				eventType := "trigger_queue_pool_full"
+				reason := "pool_full"
+				if errors.Is(err, context.DeadlineExceeded) {
+					eventType = "trigger_queue_deadline_exceeded"
+					reason = "deadline_exceeded"
+				} else if errors.Is(err, context.Canceled) {
+					eventType = "trigger_queue_canceled"
+					reason = "canceled"
+				}
 				scheduler.EmitTriggerQueueEvent(map[string]any{
-					objects.FieldKeyEventType: "trigger_queue_pool_full",
-					triggerQueueKeyMessage:    "Pool full; re-enqueued remainder for next poll",
+					objects.FieldKeyEventType: eventType,
+					triggerQueueKeyMessage:    "Pool full, deadline exceeded, or canceled; re-enqueued remainder for next poll",
 					"re_enqueued":             len(remaining),
-					triggerQueueKeyJobIDs:     remaining,
+					triggerQueueKeyJobIDs:     remainingIDs,
+					objects.FieldKeyReason:    reason,
 				})
 				SchedulerTriggerQueueLog(q.logger).Info(LogEventSchedulerTriggerQueuePoolFullRequeuedForPoll).
 					Int(triggerQueueKeyCount, len(remaining)).
+					String("reason", reason).
 					Log()
 				break
 			}

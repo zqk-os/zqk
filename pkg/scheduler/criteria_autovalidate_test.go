@@ -4,7 +4,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/zqkenv"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
 func TestCriteriaAutoValidateDisabled(t *testing.T) {

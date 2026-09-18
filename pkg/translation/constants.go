@@ -1,6 +1,6 @@
 package translation
 
-import "github.com/lanceman/zqk/pkg/objects"
+import "github.com/zqk-os/zqk/pkg/objects"
 
 // Constants for translated domain_registry and object_spec-like output.
 // Used by all format translators (RDF/OWL, Cypher, JSON Schema, OpenAPI) so
@@ -60,10 +60,10 @@ const (
 	// DefaultStatus is the default status for translated domain_registry.
 	DefaultStatus = "active"
 	// CreatedBySystem is the created_by value for system-generated translated objects.
-	// TRACK: BLI-REDACTED — ACC-* cutover
+	// TRACK: BLI-1785905134201010000-07393484 — ACC-* cutover
 	CreatedBySystem = "ACC-1785920548450214012-68b850c0"
 	// UpdatedBySystem is the updated_by value for system-generated translated objects.
-	// TRACK: BLI-REDACTED — ACC-* cutover (do not persist bare "system").
+	// TRACK: BLI-1785905134201010000-07393484 — ACC-* cutover (do not persist bare "system").
 	UpdatedBySystem = CreatedBySystem
 )
 

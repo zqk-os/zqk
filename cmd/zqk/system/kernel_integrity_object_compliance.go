@@ -6,13 +6,13 @@ import (
 	"strings"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/paths"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/paths"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // objectComplianceSnapshot is the instance-validation health slice of kernel integrity.
 // Membrane green (composition / dangling / pipeline) is orthogonal — do not treat as "all objects healthy".
-// TRACK: BLI-REDACTED
+// TRACK: BLI-1785786997399161000-76ea6811
 type objectComplianceSnapshot struct {
 	Available             bool                   `json:"available"`
 	SourcePath            string                 `json:"source_path,omitempty"`

@@ -4,8 +4,8 @@
 package strategic_plan
 
 import (
-	base_objectenum "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
-	shared_strategic_plansenum "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/shared_strategic_plans"
+	base_objectenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
+	shared_strategic_plansenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/shared_strategic_plans"
 )
 
 type Plane = base_objectenum.Plane

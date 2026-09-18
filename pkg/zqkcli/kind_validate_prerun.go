@@ -3,7 +3,7 @@ package internal
 import (
 	"strings"
 
-	"github.com/lanceman/zqk/internal/cli"
+	"github.com/zqk-os/zqk/internal/cli"
 	"github.com/spf13/cobra"
 )
 

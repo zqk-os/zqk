@@ -4,7 +4,7 @@ import (
 	"context"
 	"sync"
 
-	"github.com/lanceman/zqk/pkg/concurrency"
+	"github.com/zqk-os/zqk/pkg/concurrency"
 )
 
 // CacheOperation represents the type of cache operation needed

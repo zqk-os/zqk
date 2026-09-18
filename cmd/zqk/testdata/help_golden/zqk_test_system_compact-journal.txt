@@ -1,0 +1,21 @@
+Scans change journal entries within a specified time window, compacts them using
+dictionary compression into a single artifact file, and removes original
+entries.
+
+This command reduces storage overhead and accelerates change journal historical
+reads.
+
+  Compact last 24 hours of journal entries
+  zqk.test system compact-journal --window-hours=24
+  Compact into custom output directory
+  zqk.test system compact-journal --output-dir=/tmp/journal-compact
+
+Usage:
+  zqk.test system compact-journal [flags]
+
+Flags:
+      --output-dir string   Directory to store compacted journal artifacts
+      --window-hours int    Time window in hours to compact (counting back from now) (default 24)
+
+Global Flags:
+      --allow-degraded   Allow scheduler-dependent commands to run when scheduler daemon is not running

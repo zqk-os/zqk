@@ -4,10 +4,10 @@ import (
 	"context"
 	"testing"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/storage"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/storage"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 func TestSession(t *testing.T) {
@@ -77,7 +77,7 @@ func TestSession_TruthSentinel(t *testing.T) {
 	s2 := NewSession(nil, mockStore)
 	err = s2.Start(ctx, "local_merge_pr", map[string]any{
 		"local_merge_to_main": true,
-		"pr_link":             "https://github.com/lanceman/zqk/pull/123",
+		"pr_link":             "https://github.com/zqk-os/zqk/pull/123",
 	})
 	if err != nil {
 		t.Errorf("expected no error for local merge with PR link, got %v", err)

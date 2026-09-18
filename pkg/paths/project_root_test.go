@@ -4,8 +4,8 @@ import (
 	"path/filepath"
 	"testing"
 
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
-	"github.com/lanceman/zqk/pkg/zqkenv"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
 func TestResolveProjectRoot_EnvPrecedence(t *testing.T) {

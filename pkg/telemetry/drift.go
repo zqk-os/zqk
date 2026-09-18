@@ -6,7 +6,7 @@ import (
 	"math"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/logging"
 )
 
 // EventBus represents an internal event bus for publishing system events.

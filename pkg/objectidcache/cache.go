@@ -13,19 +13,19 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/concurrency"
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/datacell"
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/loader"
-	"github.com/lanceman/zqk/pkg/logging"
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/paths"
-	"github.com/lanceman/zqk/pkg/process"
-	"github.com/lanceman/zqk/pkg/storage"
-	caspkg "github.com/lanceman/zqk/pkg/storage/cas"
-	"github.com/lanceman/zqk/pkg/utils/fileutil"
-	"github.com/lanceman/zqk/pkg/when"
+	"github.com/zqk-os/zqk/pkg/concurrency"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/datacell"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/loader"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/process"
+	"github.com/zqk-os/zqk/pkg/storage"
+	caspkg "github.com/zqk-os/zqk/pkg/storage/cas"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/when"
 )
 
 const pipelineKindEnsureObjectIDCacheReady = "system.ensure_object_id_cache_ready"
@@ -64,10 +64,12 @@ func projectRootFromProcessDir(processDir string) string {
 	if processDir == emptyValue {
 		return emptyValue
 	}
-	if filepath.Base(processDir) == "process" {
-		docs := filepath.Dir(processDir)
-		if filepath.Base(docs) == "docs" {
-			return filepath.Dir(docs)
+	clean := filepath.Clean(processDir)
+	if filepath.Base(clean) == "process" {
+		parent := filepath.Dir(clean)
+		parentBase := filepath.Base(parent)
+		if parentBase == "docs" || parentBase == paths.ProjectDataDir {
+			return filepath.Dir(parent)
 		}
 	}
 	return emptyValue
@@ -582,7 +584,7 @@ func (c *ObjectIDCache) Get(id string) (*ObjectIDCacheEntry, bool) {
 	// Plain RLock: WithRLockTimeout used a 5s parent context matching the validation
 	// fail-fast budget, so brief write-lock waits burned the entire object timeout.
 	// Get is O(1) under the lock; prefer not to compete with validationCtx.
-	// TRACK: BLI-REDACTED
+	// TRACK: BLI-1785895580100186000-c5539372
 	c.mu.RLock()
 	if c.byKind != nil && c.idToKind != nil {
 		kind, ok := c.idToKind[id]
@@ -841,16 +843,21 @@ func (c *ObjectIDCache) ValidateAndCleanStale() int {
 					fullPath := e.Path
 					if base != emptyValue && !filepath.IsAbs(e.Path) {
 						if kindDir != emptyValue {
-							fullPath = filepath.Join(base, kindDir, filepath.Base(e.Path))
+							fullPath = filepath.Join(base, kindDir, e.Path)
 						} else {
 							fullPath = filepath.Join(base, e.Path)
 						}
 					}
 					info, err := fileutil.Stat(fullPath)
 					if err != nil {
+						// If the object was on the draft plane, do not attempt CAS resolve.
+						if isObjectDraftPlaneFilePath(base, fullPath) || isObjectDraftPlaneFilePath(base, e.Path) {
+							staleIDs = append(staleIDs, e.ID)
+							continue
+						}
 						// Prefer re-pointing to the live CAS hash over dropping the
 						// entry (update/promote deletes the old hash file first).
-						// TRACK: BLI-REDACTED
+						// TRACK: BLI-1785895580100186000-c5539372
 						var kindDirPath string
 						if kindDir != emptyValue && base != emptyValue {
 							kindDirPath = filepath.Join(base, kindDir)
@@ -879,10 +886,12 @@ func (c *ObjectIDCache) ValidateAndCleanStale() int {
 					timeDiff := info.ModTime().Sub(e.MTime)
 					if timeDiff < -time.Second || timeDiff > time.Second {
 						c.byKind[kind][i].MTime = info.ModTime()
-						if hashRegistryUpdates[kind] == nil {
-							hashRegistryUpdates[kind] = make(map[string]string)
+						if !isObjectDraftPlaneFilePath(base, fullPath) && !isObjectDraftPlaneFilePath(base, e.Path) {
+							if hashRegistryUpdates[kind] == nil {
+								hashRegistryUpdates[kind] = make(map[string]string)
+							}
+							hashRegistryUpdates[kind][filepath.Base(fullPath)] = fullPath
 						}
-						hashRegistryUpdates[kind][filepath.Base(fullPath)] = fullPath
 					}
 				}
 			}

@@ -5,9 +5,9 @@ import (
 	"math/rand"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/circuitbreaker"
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/mutation"
+	"github.com/zqk-os/zqk/pkg/circuitbreaker"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/mutation"
 )
 
 func isTransientDBError(err error) bool {

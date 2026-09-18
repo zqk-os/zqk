@@ -7,17 +7,17 @@ import (
 	"strings"
 	"sync/atomic"
 
-	"github.com/lanceman/zqk/pkg/config"
-	"github.com/lanceman/zqk/pkg/zqkenv"
+	"github.com/zqk-os/zqk/pkg/config"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 
-	"github.com/lanceman/zqk/pkg/paths"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/paths"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/graph/provider"
-	"github.com/lanceman/zqk/pkg/logging"
-	"github.com/lanceman/zqk/pkg/objects"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/graph/provider"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 type GraphConnectionProvider interface {
@@ -247,7 +247,7 @@ func UnwrapToFileObjectStorage(p ObjectStorageProvider) *FileObjectStorage {
 		return fs
 	}
 	// Generic decorator unwrap (CLI SemanticStorageDecorator, future wrappers).
-	// TRACK: BLI-REDACTED — state-restore broke when Processor
+	// TRACK: BLI-1785723654802038000-b14064bc — state-restore broke when Processor
 	// wrapped storage in SemanticStorageDecorator without an Unwrap path.
 	if u, ok := p.(UnderlyingObjectStorageProvider); ok && u != nil {
 		if inner := u.UnderlyingObjectStorageProvider(); inner != nil && inner != p {

@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/pipeline"
+	"github.com/zqk-os/zqk/pkg/pipeline"
 )
 
 func TestRunTestBundleMatrixPipeline_nilOptions(t *testing.T) {

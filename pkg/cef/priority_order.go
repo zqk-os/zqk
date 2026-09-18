@@ -6,7 +6,7 @@ import (
 )
 
 // Priority Order Enforcement Requirement — CEF architecture follow-on part 2.
-// TRACK: BLI-REDACTED / REQ-CEF-ARCH-001
+// TRACK: BLI-1788841780579869000-b91c1891 / REQ-CEF-ARCH-001
 //
 // A priority plan must not execute work out of order: an item that is
 // execution-facing (active / in_progress) may not outrank a still-open

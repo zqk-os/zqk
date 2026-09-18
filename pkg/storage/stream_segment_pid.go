@@ -9,7 +9,7 @@ import (
 )
 
 // PID shards are named YYYY-MM-DD_pid<PID>_stream.json (see getSegmentPath).
-// TRACK: BLI-REDACTED
+// TRACK: BLI-1785905541906569000-074e24d7
 var streamPIDSegmentRe = regexp.MustCompile(`_pid(\d+)_`)
 
 func streamSegmentWriterPID(name string) (int, bool) {

@@ -10,10 +10,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/paths"
-	"github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 const (
@@ -218,7 +218,7 @@ func ProcessSeatInbox(ctx context.Context, opts SeatWorkerOptions) (SeatWorkerRe
 		return out, errfmt.Errorf("project root and agent-id are required")
 	}
 	if persona == "" {
-		persona = "PER-DEFAULT-OPERATOR"
+		persona = objects.ConstPersonaDefaultOperator
 	}
 
 	alivePath, aerr := WriteSeatWorkerAlive(root, agentID, opts.SessionID, opts.Now)
@@ -356,7 +356,7 @@ func handleNonCommsItem(
 func parkSupersededNonComms(opts SeatWorkerOptions, item CorrespondenceItem) error {
 	persona := strings.TrimSpace(opts.PersonaRef)
 	if persona == "" {
-		persona = "PER-DEFAULT-OPERATOR"
+		persona = objects.ConstPersonaDefaultOperator
 	}
 	summary := fmt.Sprintf("SEAT_WORKER_SUPERSEDED %s — ORCHESTRATE_PLAN present; ATTN parked", item.EventID)
 	_, err := AppendPeerAckWithSession(opts.ProjectRoot, opts.AgentID, persona, opts.SessionID, item.EventID, summary)
@@ -415,7 +415,7 @@ func handleCommsChallenge(ctx context.Context, opts SeatWorkerOptions, chal Comm
 	agentID := strings.TrimSpace(opts.AgentID)
 	persona := strings.TrimSpace(opts.PersonaRef)
 	if persona == "" {
-		persona = "PER-DEFAULT-OPERATOR"
+		persona = objects.ConstPersonaDefaultOperator
 	}
 	if chal.EventID == "" {
 		return errfmt.Errorf("COMMS challenge missing event_id")

@@ -3,7 +3,7 @@ package mcp
 import (
 	"strings"
 
-	"github.com/lanceman/zqk/pkg/outputtypes"
+	"github.com/zqk-os/zqk/pkg/outputtypes"
 )
 
 // FormatToMIMEType maps format strings to MIME types.

@@ -4,8 +4,8 @@ import (
 	"context"
 	"time"
 
-	schedulerpkg "github.com/lanceman/zqk/pkg/scheduler"
-	"github.com/lanceman/zqk/pkg/validation"
+	schedulerpkg "github.com/zqk-os/zqk/pkg/scheduler"
+	"github.com/zqk-os/zqk/pkg/validation"
 )
 
 // validationScannerForScheduler implements scheduler.ValidationScanner.

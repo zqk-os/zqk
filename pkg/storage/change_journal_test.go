@@ -7,10 +7,10 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/datacell"
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/paths"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/datacell"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 func TestFindNextChangeJournalID_NonStreamPath(t *testing.T) {
@@ -112,5 +112,12 @@ func TestFlattenUpdatePaths(t *testing.T) {
 				t.Errorf("flattenUpdatePaths() = %v, want %v", got, tt.want)
 			}
 		})
+	}
+}
+
+func TestDrainChangeJournalForRoot_Empty(t *testing.T) {
+	ctx := context.Background()
+	if err := DrainChangeJournalForRoot(ctx, ""); err != nil {
+		t.Fatalf("unexpected error for empty root: %v", err)
 	}
 }

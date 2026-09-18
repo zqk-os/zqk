@@ -4,10 +4,10 @@ import (
 	"encoding/json"
 	"testing"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/storage"
-	"github.com/lanceman/zqk/pkg/testkit"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/testkit"
 )
 
 // seedRequirementCriteriaMilestoneGraph creates goal → criteria(with milestone_refs) → requirement
@@ -135,7 +135,7 @@ func TestGetReferenceResolverOverlay_DefaultView_Depth2ResolvesNestedRefs(t *tes
 
 // TestGetReferenceResolverOverlay_UnspecifiedHydration_IsRaw locks ViewDefault product
 // contract: omit --link-hydration ⇒ no resolved_* embeds (CAS seal / raw get).
-// TRACK: BLI-REDACTED
+// TRACK: BLI-1785909672838827000-9fca84f5
 func TestGetReferenceResolverOverlay_UnspecifiedHydration_IsRaw(t *testing.T) {
 	testEnv := SetupTestEnvironment(t)
 	requirementID, _, _ := seedRequirementCriteriaMilestoneGraph(t, testEnv)

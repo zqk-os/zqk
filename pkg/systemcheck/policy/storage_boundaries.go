@@ -84,7 +84,7 @@ func (g *StorageBoundariesGate) Run(ctx context.Context, opts RunOptions) (*Resu
 
 		for _, imp := range imports {
 			// Rule 1: Subpackages in pkg/storage/* must never import root pkg/storage (except cas, crud, migration allowlisted during refactor)
-			if imp == "github.com/lanceman/zqk/pkg/storage" {
+			if imp == "github.com/zqk-os/zqk/pkg/storage" {
 				if subpkg != "cas" && subpkg != "crud" && subpkg != "migration" {
 					violations = append(violations, fmt.Sprintf("%s imports root pkg/storage (subpackages must use interfaces or lower layers)", rel))
 				}
@@ -92,33 +92,33 @@ func (g *StorageBoundariesGate) Run(ctx context.Context, opts RunOptions) (*Resu
 
 			// Rule 2: pkg/storage/core must not import sibling storage subpackages
 			if subpkg == "core" {
-				if strings.HasPrefix(imp, "github.com/lanceman/zqk/pkg/storage/file") ||
-					strings.HasPrefix(imp, "github.com/lanceman/zqk/pkg/storage/graph") ||
-					strings.HasPrefix(imp, "github.com/lanceman/zqk/pkg/storage/wal") ||
-					strings.HasPrefix(imp, "github.com/lanceman/zqk/pkg/storage/cache") {
+				if strings.HasPrefix(imp, "github.com/zqk-os/zqk/pkg/storage/file") ||
+					strings.HasPrefix(imp, "github.com/zqk-os/zqk/pkg/storage/graph") ||
+					strings.HasPrefix(imp, "github.com/zqk-os/zqk/pkg/storage/wal") ||
+					strings.HasPrefix(imp, "github.com/zqk-os/zqk/pkg/storage/cache") {
 					violations = append(violations, fmt.Sprintf("%s (core) imports higher engine %s", rel, imp))
 				}
 			}
 
 			// Rule 3: pkg/storage/wal must not import higher-level engines (file, graph, cache)
 			if subpkg == "wal" {
-				if strings.HasPrefix(imp, "github.com/lanceman/zqk/pkg/storage/file") ||
-					strings.HasPrefix(imp, "github.com/lanceman/zqk/pkg/storage/graph") ||
-					strings.HasPrefix(imp, "github.com/lanceman/zqk/pkg/storage/cache") {
+				if strings.HasPrefix(imp, "github.com/zqk-os/zqk/pkg/storage/file") ||
+					strings.HasPrefix(imp, "github.com/zqk-os/zqk/pkg/storage/graph") ||
+					strings.HasPrefix(imp, "github.com/zqk-os/zqk/pkg/storage/cache") {
 					violations = append(violations, fmt.Sprintf("%s (wal) imports sibling/higher engine %s", rel, imp))
 				}
 			}
 
 			// Rule 4: Engine isolation: file, graph, cache must not import each other
 			if subpkg == "file" {
-				if strings.HasPrefix(imp, "github.com/lanceman/zqk/pkg/storage/graph") ||
-					strings.HasPrefix(imp, "github.com/lanceman/zqk/pkg/storage/cache") {
+				if strings.HasPrefix(imp, "github.com/zqk-os/zqk/pkg/storage/graph") ||
+					strings.HasPrefix(imp, "github.com/zqk-os/zqk/pkg/storage/cache") {
 					violations = append(violations, fmt.Sprintf("%s (file) imports sibling engine %s", rel, imp))
 				}
 			}
 			if subpkg == "graph" {
-				if strings.HasPrefix(imp, "github.com/lanceman/zqk/pkg/storage/file") ||
-					strings.HasPrefix(imp, "github.com/lanceman/zqk/pkg/storage/cache") {
+				if strings.HasPrefix(imp, "github.com/zqk-os/zqk/pkg/storage/file") ||
+					strings.HasPrefix(imp, "github.com/zqk-os/zqk/pkg/storage/cache") {
 					violations = append(violations, fmt.Sprintf("%s (graph) imports sibling engine %s", rel, imp))
 				}
 			}

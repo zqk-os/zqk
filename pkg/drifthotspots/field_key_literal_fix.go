@@ -6,7 +6,7 @@
 // maps.Keys, maps.Values, slices.All / slices.Values. Same semantics as Split, but without allocating
 // the intermediate slice.
 //
-// Field-key rewrites use the identifier "objects" for github.com/lanceman/zqk/pkg/objects. If a file
+// Field-key rewrites use the identifier "objects" for github.com/zqk-os/zqk/pkg/objects. If a file
 // already declares a parameter or local named objects (common for []map[string]any), rename that binding
 // after a bulk fix so it does not shadow the package (e.g. testObjs, objSlice).
 package drifthotspots
@@ -23,14 +23,14 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/lanceman/zqk/pkg/execwrap"
+	"github.com/zqk-os/zqk/pkg/execwrap"
 
 	"golang.org/x/tools/go/ast/astutil"
 	"golang.org/x/tools/imports"
 
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/paths"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/paths"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 var fieldKeyConstLine = regexp.MustCompile(`^\s*(FieldKey[a-zA-Z0-9_]*)\s*=\s*"([^"]*)"\s*$`)

@@ -6,7 +6,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/zqkenv"
+	"github.com/zqk-os/zqk/pkg/execwrap"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
 func TestAgentWorktreeDir_defaultOutsideProject(t *testing.T) {
@@ -49,5 +50,67 @@ func TestAgentWorktreeDir_notNestedInProjectEvenIfEnvInside(t *testing.T) {
 	rel, err := filepath.Rel(proj, got)
 	if err == nil && rel != ".." && !strings.HasPrefix(rel, ".."+string(os.PathSeparator)) {
 		t.Fatalf("refused in-project override: still under project: %s", got)
+	}
+}
+
+func TestBootstrapWorktreeConfig_AssumeUnchanged(t *testing.T) {
+	t.Parallel()
+	repoDir := t.TempDir()
+	seatedRoot := t.TempDir()
+
+	cmd := execwrap.Command("git", "init")
+	cmd.Dir = repoDir
+	if out, err := cmd.CombinedOutput(); err != nil {
+		t.Fatalf("git init: %v (out: %s)", err, string(out))
+	}
+
+	cmd = execwrap.Command("git", "config", "user.name", "Test")
+	cmd.Dir = repoDir
+	_ = cmd.Run()
+	cmd = execwrap.Command("git", "config", "user.email", "test@test.local")
+	cmd.Dir = repoDir
+	_ = cmd.Run()
+
+	cfgDir := filepath.Join(repoDir, ConfigDir)
+	if err := os.MkdirAll(cfgDir, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	cfgFile := filepath.Join(cfgDir, ZqkLocalConfigFileName)
+	if err := os.WriteFile(cfgFile, []byte("initial: true\n"), 0o600); err != nil {
+		t.Fatal(err)
+	}
+
+	cmd = execwrap.Command("git", "add", "config/zqk-local.yaml")
+	cmd.Dir = repoDir
+	if out, err := cmd.CombinedOutput(); err != nil {
+		t.Fatalf("git add: %v (out: %s)", err, string(out))
+	}
+
+	cmd = execwrap.Command("git", "commit", "-m", "init")
+	cmd.Dir = repoDir
+	if out, err := cmd.CombinedOutput(); err != nil {
+		t.Fatalf("git commit: %v (out: %s)", err, string(out))
+	}
+
+	if err := BootstrapWorktreeConfig(repoDir, seatedRoot); err != nil {
+		t.Fatalf("BootstrapWorktreeConfig failed: %v", err)
+	}
+
+	data, err := os.ReadFile(cfgFile)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !strings.Contains(string(data), seatedRoot) {
+		t.Fatalf("expected config to contain seatedRoot %q, got: %s", seatedRoot, string(data))
+	}
+
+	cmd = execwrap.Command("git", "status", "--porcelain")
+	cmd.Dir = repoDir
+	out, err := cmd.CombinedOutput()
+	if err != nil {
+		t.Fatalf("git status: %v (out: %s)", err, string(out))
+	}
+	if strings.TrimSpace(string(out)) != "" {
+		t.Fatalf("expected clean porcelain due to assume-unchanged, got: %q", string(out))
 	}
 }

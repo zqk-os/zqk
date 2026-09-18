@@ -10,11 +10,11 @@ import (
 	"strings"
 	"time"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
-	"github.com/lanceman/zqk/pkg/when"
-	"github.com/lanceman/zqk/pkg/zqkenv"
-	"github.com/lanceman/zqk/pkg/zqktime"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/when"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
+	"github.com/zqk-os/zqk/pkg/zqktime"
 )
 
 const emptyValue = ""

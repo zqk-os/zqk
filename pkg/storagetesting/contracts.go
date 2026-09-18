@@ -1,6 +1,6 @@
 // Package storagetesting holds the minimal interfaces and option structs shared by
-// [github.com/lanceman/zqk/pkg/testing.SetupCompleteTestEnvironment] and
-// [github.com/lanceman/zqk/pkg/storage.TestingFactory].
+// [github.com/zqk-os/zqk/pkg/testing.SetupCompleteTestEnvironment] and
+// [github.com/zqk-os/zqk/pkg/storage.TestingFactory].
 //
 // This package exists because if pkg/testing imported pkg/storage directly, tests that use both
 // would risk an import cycle (tests → pkg/testing → pkg/storage). Defining the contracts here keeps
@@ -11,7 +11,7 @@
 // roots, test helpers under package storage (e.g. setupTestingFactoryCompleteTestEnvironment,
 // bootstrapTestRootFromProjectRoot, scenario helpers), and export_test symbols for storage_test.
 // pkg/testing still uses these contracts when other packages call SetupCompleteTestEnvironment with
-// [github.com/lanceman/zqk/pkg/storage.NewTestingFactory].
+// [github.com/zqk-os/zqk/pkg/storage.NewTestingFactory].
 //
 // # Retiring this package (optional future)
 //
@@ -22,7 +22,7 @@ package storagetesting
 import "testing"
 
 // IsolationFactory creates isolated file storage and exposes the global audit buffer for test setup.
-// Implemented by [github.com/lanceman/zqk/pkg/storage.TestingFactory].
+// Implemented by [github.com/zqk-os/zqk/pkg/storage.TestingFactory].
 type IsolationFactory interface {
 	CreateFileStorage(testRoot string) (any, error)
 	GetAuditBuffer() any

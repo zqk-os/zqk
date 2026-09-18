@@ -3,13 +3,13 @@ package object
 import (
 	"strings"
 
-	"github.com/lanceman/zqk/internal/cli"
-	clipkg "github.com/lanceman/zqk/pkg/cli"
-	"github.com/lanceman/zqk/pkg/cli/bldr_cli_cmd_v1"
-	"github.com/lanceman/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/internal/cli"
+	clipkg "github.com/zqk-os/zqk/pkg/cli"
+	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
+	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/spf13/cobra"
 
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // NewCountCmd creates a new count command
@@ -73,6 +73,12 @@ func runCount(cmd *cobra.Command, args []string) error {
 		filters, nsScope, err := parseCountFilters(cmd, proc)
 		if err != nil {
 			return cli.Guard(cmd).Err(err).Return()
+		}
+
+		if singleKind != "" {
+			if err := clipkg.ValidateFilterFields(singleKind, filters); err != nil {
+				return cli.Guard(cmd).Err(err).Return()
+			}
 		}
 
 		includeZeroCount, _ := cmd.Flags().GetBool("include-zero-count") //nolint:errcheck

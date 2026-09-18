@@ -4,9 +4,9 @@ import (
 	"os/exec"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/storage"
-	"github.com/lanceman/zqk/pkg/testkit"
-	"github.com/lanceman/zqk/pkg/zqkenv"
+	"github.com/zqk-os/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/testkit"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
 // harnessAccountID is the identity isolated child processes authenticate as. It is an ACC- id
@@ -30,7 +30,7 @@ func envForIsolatedCLIProject(tmpRoot string) []string {
 // authenticates as whichever developer is logged in. The suite then fails resolving that
 // session id against the empty temp store, which makes the outcome depend on the developer's
 // login state rather than on the code under test.
-// TRACK: BLI-REDACTED — identity isolation belongs in zqkenv, but that
+// TRACK: BLI-1787558884394841000-7dbc6d50 — identity isolation belongs in zqkenv, but that
 // function is also on 19 production spawn paths, so widening it needs its own pass.
 func wireIsolatedCLI(cmd *exec.Cmd, tmpRoot string) {
 	if cmd == nil {

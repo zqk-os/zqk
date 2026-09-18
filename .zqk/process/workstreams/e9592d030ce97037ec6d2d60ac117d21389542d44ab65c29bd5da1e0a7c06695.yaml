@@ -1,0 +1,15 @@
+category: feature
+created_at: "2026-09-18T23:00:00Z"
+created_by: ACC-1785920548450214012-68b850c0
+description: 'Crash-consistency demonstration: running a multi-step task, terminating the kernel with kill -9, recovering WAL on boot, and using zqk rollback to rewind and resume seamlessly without prompt re-seeding.'
+entry_point: scripts/demos/time_travel_demo.sh
+id: WS-DEMO-TIME-TRAVEL
+kind: workstream
+namespace_id: zqk:kernel
+owner_ref: ACC-1785920548450214012-68b850c0
+schema_version: 2.0.0
+status: active
+title: The Kill -9 Resurrection & State Rewind
+updated_at: "2026-09-18T23:03:57Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

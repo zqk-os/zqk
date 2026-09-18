@@ -1,7 +1,7 @@
 package system
 
 import (
-	clipkg "github.com/lanceman/zqk/pkg/cli"
+	clipkg "github.com/zqk-os/zqk/pkg/cli"
 )
 
 // Audit report --focus values. The CLI flag has always accepted a

@@ -10,17 +10,17 @@ import (
 	"testing"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/execwrap"
-	"github.com/lanceman/zqk/pkg/paths"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/execwrap"
+	"github.com/zqk-os/zqk/pkg/paths"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	"gopkg.in/yaml.v3"
 
-	"github.com/lanceman/zqk/internal/cli"
+	"github.com/zqk-os/zqk/internal/cli"
 
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // assertStructuredYAMLNotJSONBrace fails if stdout looks like JSON (top-level { or [).
@@ -511,9 +511,9 @@ func TestOutputFormatConsistency(t *testing.T) {
 	// redirect -- then looks that token up as a session id in the empty temp store and fails
 	// with "unauthorized: session <id> not found". So the outcome depends on whether the
 	// developer running the suite happens to be logged in, and it cannot be fixed from here.
-	// TRACK: BLI-REDACTED -- remove this skip once the middleware
+	// TRACK: BLI-1787558884394841000-7dbc6d50 -- remove this skip once the middleware
 	// resolves credentials through an isolation-aware path.
-	t.Skip("auth middleware reads $HOME credentials; isolated root has no matching session (BLI-REDACTED)")
+	t.Skip("auth middleware reads $HOME credentials; isolated root has no matching session (BLI-1787558884394841000-7dbc6d50)")
 	// Not t.Parallel(): setupCLITestEnvironmentForParity uses PrepareIsolatedTempProject (t.Setenv).
 	tmpDir, cliBinary := setupCLITestEnvironmentForParity(t)
 

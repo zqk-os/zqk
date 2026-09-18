@@ -6,15 +6,15 @@ import (
 	"strings"
 	"time"
 
-	caspkg "github.com/lanceman/zqk/pkg/storage/cas"
-	"github.com/lanceman/zqk/pkg/zqkenv"
+	caspkg "github.com/zqk-os/zqk/pkg/storage/cas"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/logging"
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/storage/crud"
-	"github.com/lanceman/zqk/pkg/validation"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/storage/crud"
+	"github.com/zqk-os/zqk/pkg/validation"
 )
 
 // ============================================================================
@@ -183,7 +183,7 @@ func (f *FileObjectStorage) validateObject(ctx context.Context, obj map[string]a
 
 	// 1. Spec validation using GoValidator
 	// BLI-621 / KMP: --force skips lifecycle only when DECIDE break_glass reason is present for critical kinds.
-	// TRACK: BLI-REDACTED
+	// TRACK: BLI-1785784867143912000-635942fb
 	if pkgctx.IsLifecycleBreakGlass(ctx) && IsCoreKernelKind(kind) {
 		if !pkgctx.GetAllowCoreObjectDelete(ctx) && zqkenv.TestRoot().Get() == "" {
 			return errfmt.Errorf("break_glass requires --reason-code for critical kind %s (Kernel Mutation Pipeline DECIDE)", kind)
@@ -192,7 +192,7 @@ func (f *FileObjectStorage) validateObject(ctx context.Context, obj map[string]a
 	// Break-glass and trusted shockwave writes still validate lifecycle. The
 	// validator skips auto-only *edges* under those overrides; skipping here
 	// dropped criteria/complete holds and allowed false-complete BLIs.
-	// TRACK: BLI-REDACTED
+	// TRACK: BLI-1785784867143912000-635942fb
 	options := &validation.ValidationOptions{
 		CurrentState:          currentState,
 		ValidateLifecycle:     true,
@@ -202,7 +202,7 @@ func (f *FileObjectStorage) validateObject(ctx context.Context, obj map[string]a
 		// Leaving ProjectRoot empty made FindNearestProjectRoot(".") use the
 		// caller's cwd (the real repo under `go test`), so isolated fixtures
 		// with a real product commit still failed the complete gate.
-		// TRACK: BLI-REDACTED
+		// TRACK: BLI-1787131824765736000-312b6c71
 		ProjectRoot: f.GetProjectRoot(),
 		IsDraftPlaneOnly: func(id string) bool {
 			return f.IsDraftPlaneOnly(id)
@@ -278,7 +278,7 @@ func (f *FileObjectStorage) validateObject(ctx context.Context, obj map[string]a
 			//
 			// Exception — sealed priority_plan membership: create must NOT soft-accept a priority_plan_ref onto an
 			// execution-facing plan (or draft-plane status onto one). Otherwise agents create exploring+active-plan,
-			// then promote with the same ref and bypass new_link_only. TRACK: GOAL-REDACTED
+			// then promote with the same ref and bypass new_link_only. TRACK: GOAL-1786331776059716000-96be46df
 			if currentState == "" {
 				var hard []validation.ValidationError
 				var soft []validation.ValidationError

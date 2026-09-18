@@ -4,7 +4,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 func TestBuildFieldCompletionCandidates_GroupableFilter(t *testing.T) {

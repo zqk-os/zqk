@@ -1,9 +1,9 @@
 package system
 
 import (
-	"github.com/lanceman/zqk/internal/cli"
-	clipkg "github.com/lanceman/zqk/pkg/cli"
-	"github.com/lanceman/zqk/pkg/systemcheckwake"
+	"github.com/zqk-os/zqk/internal/cli"
+	clipkg "github.com/zqk-os/zqk/pkg/cli"
+	"github.com/zqk-os/zqk/pkg/systemcheckwake"
 	"github.com/spf13/cobra"
 )
 
@@ -53,7 +53,7 @@ func NewCheckCmd() *cobra.Command {
 		AddExample("Run in background (return immediately; completion via coordinator)", "%s system check all --auto-fix --background").
 		AddExample("Full-project auto-fix with long timeout", "%s system check all --auto-fix --timeout 3600s --format json -o .zqk/logs/system-check.json").
 		AddExample("Wake primary agent if draft/error/blocking/warning/info thresholds trip", "%s system check all --notify").
-		AddExample("Wake a specific seat when thresholds trip", "%s system check all --notify antigravity-1").
+		AddExample("Wake a specific seat when thresholds trip", "%s system check all --notify <seat-agent-id>").
 		ExcludeCommonFlags()
 
 	// Use local cmd so parallel tests (t.Parallel()) each build their own command;

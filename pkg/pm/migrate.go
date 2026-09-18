@@ -6,8 +6,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/dna"
-	"github.com/lanceman/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/dna"
+	"github.com/zqk-os/zqk/pkg/errfmt"
 	"gopkg.in/yaml.v3"
 )
 

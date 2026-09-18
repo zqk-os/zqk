@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/lanceman/zqk/pkg/graph/provider"
+	"github.com/zqk-os/zqk/pkg/graph/provider"
 )
 
 // PredictiveSpawner is a heuristic engine that consumes ambient events

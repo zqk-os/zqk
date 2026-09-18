@@ -6,12 +6,12 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/lanceman/zqk/pkg/concurrency"
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/kindsynonyms"
-	"github.com/lanceman/zqk/pkg/loader"
-	"github.com/lanceman/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/concurrency"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/kindsynonyms"
+	"github.com/zqk-os/zqk/pkg/loader"
+	"github.com/zqk-os/zqk/pkg/logging"
 )
 
 // SynonymLoader is an interface for loading synonyms from storage

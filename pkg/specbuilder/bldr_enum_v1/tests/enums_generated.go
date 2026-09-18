@@ -4,8 +4,8 @@
 package tests
 
 import (
-	base_objectenum "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
-	shared_testsenum "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/shared_tests"
+	base_objectenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
+	shared_testsenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/shared_tests"
 )
 
 type Priority string

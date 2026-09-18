@@ -32,6 +32,7 @@ go.work
 *~
 nexos_*.txt
 tier*.txt
+COMMIT_MSG*
 
 # zqk
 # Prevent nested .zqk directories from test data pollution (POL-CODE-006).
@@ -255,8 +256,7 @@ docs/process/**/*.yaml
 .zqk/config/ambient_context.json*
 # Local agent git author/committer (see agent_git_identity.env.example + agent-git-attribution.mdc)
 .zqk/config/agent_git_identity.env
-# This checkout's kernel bind — do not commit an absolute path from another machine.
-config/zqk-local.yaml
+.zqk/config/escalation.json
 # Cursor stdio MCP spawn env (API key + session); never commit.
 .zqk/mcp/cursor-stdio.env
 .zqk/mcp/*.env.local
@@ -377,7 +377,7 @@ mcp.yaml
 *.tmp
 .zqk/*.log
 
-# Local CI worktree + archive drops (PRI-REDACTED)
+# Local CI worktree + archive drops (PRI-1785699924616992000-8000284f)
 .zqk/local-ci/
 
 *.test
@@ -398,3 +398,5 @@ mcp.yaml
 /patch_*.py
 /new_instructions*.txt
 /*.scratch.*
+.zcom/
+config/zqk-local.yaml

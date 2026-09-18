@@ -6,7 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // TestCheckCommand_JSONLOutput_Quick is a faster test that checks the actual output file

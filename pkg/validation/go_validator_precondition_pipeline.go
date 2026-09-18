@@ -5,10 +5,10 @@ import (
 	"os"
 	"strings"
 
-	"github.com/lanceman/zqk/pkg/config"
+	"github.com/zqk-os/zqk/pkg/config"
 
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/pipeline"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/pipeline"
 )
 
 const lifecyclePreconditionPipelineKind = "validation.lifecycle_precondition"
@@ -72,7 +72,7 @@ func lifecyclePrecondNormalize(_ *pipeline.Context, payload any) (any, error) {
 	if !ok {
 		return payload, nil
 	}
-	p.normalized = strings.ToLower(strings.TrimSpace(p.raw))
+	p.normalized = strings.Join(strings.Fields(strings.ToLower(p.raw)), " ")
 	return p, nil
 }
 
@@ -129,7 +129,7 @@ type precondDecideRule struct {
 //
 // Unrecognized strings still fail-open (legacy); overlay DSL remains the
 // fail-closed path for other English. See docs/architecture/LIFECYCLE_SHOCKWAVE_MAP.md Plane A.
-// TRACK: BLI-REDACTED — storage-save compose ops are a
+// TRACK: BLI-1787565256503969000-f5604378 — storage-save compose ops are a
 // second plane; do not silently unify YAML prose dispatch with kernelcas/compose.
 // TRACK: PRI-CEF-PIP-KERNEL-DRIVE-001 / BLI-CEF-PIP-TEAR-SNOWFLAKE-001 —
 // remove when: this DECIDE table is torn out with the snowflake; exams come
@@ -159,6 +159,9 @@ var precondDecideRules = []precondDecideRule{
 	}),
 	matchExact("priority_plan_validated", PrecondPriorityPlanValidated, func(gv *GoValidator, obj map[string]any, options *ValidationOptions) bool {
 		return gv.checkPriorityPlanValidated(obj)
+	}),
+	matchExact("team_or_persona_dispatch_refs", PrecondTeamOrPersonaDispatchRefs, func(gv *GoValidator, obj map[string]any, options *ValidationOptions) bool {
+		return gv.checkAtLeastPrecondition(PrecondTeamOrPersonaDispatchRefs, obj)
 	}),
 	{name: "parent_child_link_back", eval: evalLinkBackStage},
 	{name: "active_ref", eval: evalActiveRefStage},
@@ -190,6 +193,7 @@ var precondDecideRules = []precondDecideRule{
 	matchContains("at_least", SubprecondAtLeast, func(gv *GoValidator, p string, obj map[string]any, _ *ValidationOptions) bool {
 		return gv.checkAtLeastPrecondition(p, obj)
 	}),
+	{name: "overlay_dsl", eval: evalOverlayDSLStage},
 }
 
 func matchExact(name, token string, fn func(gv *GoValidator, obj map[string]any, options *ValidationOptions) bool) precondDecideRule {
@@ -206,7 +210,7 @@ func matchExact(name, token string, fn func(gv *GoValidator, obj map[string]any,
 }
 
 func matchContains(name, token string, fn func(gv *GoValidator, p string, obj map[string]any, options *ValidationOptions) bool) precondDecideRule {
-	needle := strings.ToLower(token)
+	needle := strings.Join(strings.Fields(strings.ToLower(token)), " ")
 	return precondDecideRule{
 		name: name,
 		eval: func(gv *GoValidator, p string, obj map[string]any, options *ValidationOptions) (bool, bool) {

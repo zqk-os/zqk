@@ -1,6 +1,6 @@
 package builders
 
-import "github.com/lanceman/zqk/pkg/objects"
+import "github.com/zqk-os/zqk/pkg/objects"
 
 // SpecLoaderAdapter adapts VersionedBuilderRegistry to objects.VersionedBuilderRegistryInterface
 // This allows pkg/objects to use builders without creating import cycles

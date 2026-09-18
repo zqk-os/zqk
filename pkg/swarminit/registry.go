@@ -4,7 +4,7 @@ import (
 	"context"
 	"strings"
 
-	"github.com/lanceman/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/errfmt"
 )
 
 // Result is the outcome of one executor invocation.

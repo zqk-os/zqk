@@ -101,7 +101,7 @@ func TestStorageBoundariesGate(t *testing.T) {
 	badFile := filepath.Join(coreDir, "bad.go")
 	_ = os.WriteFile(badFile, []byte(`package core
 
-import "github.com/lanceman/zqk/pkg/storage/file"
+import "github.com/zqk-os/zqk/pkg/storage/file"
 `), 0644)
 
 	resBad, _ := gate.Run(context.Background(), RunOptions{ProjectRoot: tempDir})

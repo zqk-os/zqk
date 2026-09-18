@@ -6,14 +6,14 @@ func TestValidateConvergenceSessionTickTargetID(t *testing.T) {
 	t.Parallel()
 	t.Run("valid", func(t *testing.T) {
 		t.Parallel()
-		id := "CVS-REDACTED"
+		id := "CVS-1776080007703030000-a726d525"
 		if err := validateConvergenceSessionTickTargetID(id); err != nil {
 			t.Fatal(err)
 		}
 	})
 	t.Run("reject wrong prefix", func(t *testing.T) {
 		t.Parallel()
-		if err := validateConvergenceSessionTickTargetID("BLI-REDACTED"); err == nil {
+		if err := validateConvergenceSessionTickTargetID("BLI-1776080007703030000-a726d525"); err == nil {
 			t.Fatal("expected error")
 		}
 	})

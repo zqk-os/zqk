@@ -5,8 +5,8 @@ import (
 	"slices"
 	"strings"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/mcp/mcp_helpers"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/mcp/mcp_helpers"
 )
 
 // isCommandAllowed checks if a command is allowed based on config security settings

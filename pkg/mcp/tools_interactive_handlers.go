@@ -5,12 +5,12 @@ import (
 	"fmt"
 	"maps"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/interactive"
-	"github.com/lanceman/zqk/pkg/objects"
-	instancebuilders "github.com/lanceman/zqk/pkg/specbuilder/instance_builders"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/interactive"
+	"github.com/zqk-os/zqk/pkg/objects"
+	instancebuilders "github.com/zqk-os/zqk/pkg/specbuilder/instance_builders"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // HandleCreateObjectInteractive handles the create_object_interactive built-in tool

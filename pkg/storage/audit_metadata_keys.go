@@ -1,6 +1,6 @@
 package storage
 
-import "github.com/lanceman/zqk/pkg/storage/audit"
+import "github.com/zqk-os/zqk/pkg/storage/audit"
 
 // Audit metadata keys and well-known values.
 // Canonical definitions live in pkg/storage/audit; these aliases keep root callers stable.

@@ -1,6 +1,6 @@
 package storage
 
-import "github.com/lanceman/zqk/pkg/objects"
+import "github.com/zqk-os/zqk/pkg/objects"
 
 // listProjectionMask builds the hybrid mask for a list query, unioning projected fields with sort and group-by columns.
 func listProjectionMask(kind string, filter ListFilter) objects.HybridProjectionMask {

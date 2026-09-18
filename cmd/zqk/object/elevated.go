@@ -3,15 +3,15 @@ package object
 import (
 	"strings"
 
-	"github.com/lanceman/zqk/pkg/brand"
-	"github.com/lanceman/zqk/pkg/entitlements"
-	"github.com/lanceman/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/brand"
+	"github.com/zqk-os/zqk/pkg/entitlements"
+	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/spf13/cobra"
 )
 
 // FlagElevatedInternal is the object-group elevated access mode flag.
 // It means privilege mode, not visibility: internal as a data filter.
-// TRACK: BLI-REDACTED — retire parallel zqk-admin internal tree.
+// TRACK: BLI-1785930106857898000-94b9a5bc — retire parallel zqk-admin internal tree.
 const FlagElevatedInternal = "internal"
 
 // ElevatedInternalRequested reports whether object … --internal was set.

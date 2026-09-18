@@ -6,10 +6,10 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/datacell"
-	"github.com/lanceman/zqk/pkg/paths"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
-	"github.com/lanceman/zqk/pkg/zqkenv"
+	"github.com/zqk-os/zqk/pkg/datacell"
+	"github.com/zqk-os/zqk/pkg/paths"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
 func TestGetTestConfig_NoEnv(t *testing.T) {
@@ -122,5 +122,10 @@ func TestSetupTestEnvironment(t *testing.T) {
 	specsDir := filepath.Join(testRoot, paths.ProcessInternalObjectSpecsDir)
 	if _, err := fileutil.Stat(specsDir); fileutil.IsNotExist(err) {
 		t.Error("specs directory was not created")
+	}
+
+	settingsPath := filepath.Join(testRoot, paths.TestSettingsFilename)
+	if _, err := fileutil.Stat(settingsPath); fileutil.IsNotExist(err) {
+		t.Error("test settings file was not created")
 	}
 }

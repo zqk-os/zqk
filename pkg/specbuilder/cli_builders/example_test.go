@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/lanceman/zqk/pkg/specbuilder/cli_builders"
+	"github.com/zqk-os/zqk/pkg/specbuilder/cli_builders"
 )
 
 // ExampleCLIBuilder demonstrates how the CLI wrapper can be used

@@ -6,8 +6,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/logging"
-	"github.com/lanceman/zqk/pkg/metrics"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/metrics"
 )
 
 // Tracker provides hooks to record execution telemetry and metrics.

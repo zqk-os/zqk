@@ -3,7 +3,7 @@ package audit
 import (
 	"strings"
 
-	"github.com/lanceman/zqk/pkg/zqkenv"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
 // EventOptions is the audit subpackage contract for creating an audit event.

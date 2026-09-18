@@ -5,11 +5,11 @@ import (
 	"path/filepath"
 	"testing"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/storage"
-	"github.com/lanceman/zqk/pkg/testenvroot"
-	"github.com/lanceman/zqk/pkg/utils/fileutil"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/testenvroot"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 func TestSignTestCaseCompletion(t *testing.T) {
@@ -21,7 +21,7 @@ func TestSignTestCaseCompletion(t *testing.T) {
 	secCtx := pkgctx.NewSystemSecurityContext()
 
 	// test_case has no planned; origin is draft, CAS-visible hop is active
-	// (needs path_or_id + scope). TRACK: BLI-REDACTED
+	// (needs path_or_id + scope). TRACK: BLI-1785443942668406000-1ec5c811
 	testCase := map[string]any{
 		objects.FieldKeyKind:     objects.KindTestCase,
 		objects.FieldKeyID:       "TEST-001",

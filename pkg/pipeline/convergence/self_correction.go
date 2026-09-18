@@ -3,8 +3,8 @@ package convergence
 import (
 	"fmt"
 
-	"github.com/lanceman/zqk/pkg/logging"
-	"github.com/lanceman/zqk/pkg/pipeline"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/pipeline"
 )
 
 // SelfCorrectionPayload represents the input for the Self-Correction pipeline.

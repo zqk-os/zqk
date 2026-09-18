@@ -4,7 +4,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 func TestRejectThinStateCommit(t *testing.T) {

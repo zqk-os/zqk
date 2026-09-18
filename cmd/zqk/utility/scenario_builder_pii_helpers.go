@@ -3,7 +3,7 @@ package utility
 import (
 	"strings"
 
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // identifyPIIFieldsFromSpec identifies PII fields from object spec

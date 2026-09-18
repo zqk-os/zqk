@@ -8,9 +8,9 @@ import (
 	"fmt"
 	"sort"
 
-	"github.com/lanceman/zqk/pkg/datacell"
-	"github.com/lanceman/zqk/pkg/datacellregistry"
-	"github.com/lanceman/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/datacell"
+	"github.com/zqk-os/zqk/pkg/datacellregistry"
+	"github.com/zqk-os/zqk/pkg/logging"
 )
 
 // streamStewardPhase* are detail tokens for steward enqueue JSONL (after c=…|k=…|p=…).
@@ -41,7 +41,7 @@ func PostRetentionStreamStewardship(projectRoot string, cycleID string, logger l
 
 // PostRetentionStreamStewardshipFiltered is like PostRetentionStreamStewardship but when kindFilter is
 // non-nil, only kinds present in the filter are stewarded (dedicated retention KINDS=… jobs).
-// TRACK: BLI-REDACTED
+// TRACK: BLI-1785905541906569000-074e24d7
 func PostRetentionStreamStewardshipFiltered(projectRoot string, cycleID string, logger logging.Logger, kindFilter map[string]bool) {
 	if projectRoot == emptyValue {
 		return

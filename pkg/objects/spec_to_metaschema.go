@@ -3,7 +3,7 @@ package objects
 import (
 	"strings"
 
-	"github.com/lanceman/zqk/pkg/dna"
+	"github.com/zqk-os/zqk/pkg/dna"
 )
 
 // ToMetaSchema converts an objects.Spec into a canonical dna.MetaSchema representing

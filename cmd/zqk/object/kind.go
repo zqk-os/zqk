@@ -5,15 +5,14 @@ import (
 	"os"
 	"strings"
 
-	"github.com/lanceman/zqk/internal/cli"
-	clipkg "github.com/lanceman/zqk/pkg/cli"
-	"github.com/lanceman/zqk/pkg/cli/bldr_cli_cmd_v1"
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/logging"
-	"github.com/lanceman/zqk/pkg/objectget"
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/paths"
-	"github.com/lanceman/zqk/pkg/zqkenv"
+	"github.com/zqk-os/zqk/internal/cli"
+	clipkg "github.com/zqk-os/zqk/pkg/cli"
+	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/objectget"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/spf13/cobra"
 )
 
@@ -27,7 +26,7 @@ func NewKindCmd() *cobra.Command {
 // kindCommandShort returns a cobra Short for a kind from the object_spec description
 // (first sentence/line, truncated). Falls back to a kind-qualified stub — never the
 // identical "Operations for a specific object kind" string for every kind.
-// TRACK: BLI-REDACTED — inventory membrane honesty / discoverability.
+// TRACK: BLI-1785903708509306000-a6d8dc5b — inventory membrane honesty / discoverability.
 func kindCommandShort(kind string) string {
 	const maxShort = 96
 	if kind == "" || kind == "<kind>" {
@@ -156,7 +155,7 @@ func RegisterKindCommandsForKinds(objectCmd *cobra.Command, kinds []string) {
 		kc := NewKindCmdForKind(kind)
 		kc.GroupID = objectHelpGroupKinds
 		// Keep kinds routable but out of the flat -h scrape surface; use fields --list-kinds.
-		// TRACK: BLI-REDACTED
+		// TRACK: BLI-1785908736395909000-25c4884e
 		kc.Hidden = true
 		objectCmd.AddCommand(kc)
 		have[kind] = true
@@ -204,26 +203,6 @@ func RegisterDynamicKindCommands(objectCmd *cobra.Command) {
 	}
 	// Use RegisterKindCommandsForKinds so we add by exact name; Find([]string{kind}) would
 	// return the generic <kind> command and we would skip adding (no per-kind subcommands).
-
-	if zqkenv.IsCommunityEdition {
-		// COMMUNITY EDITION PRUNING
-		// Only allow core semantic objects in the free tier
-		allowedCommunityKinds := map[string]bool{
-			"goal": true, "requirement": true, "task": true, "policy": true,
-			"rule": true, "backlog_item": true, "milestone": true, "decision": true,
-			"test_case": true, "prompt_template": true, "validation_rule": true,
-			"agent_skill": true, "agent_instruction": true, objects.FieldKeyVision: true,
-			"mission": true, "technical_spec": true, "technical_debt": true,
-			"workflow": true, "workstream": true, "question": true, "criteria": true,
-		}
-		var filteredKinds []string
-		for _, k := range kinds {
-			if allowedCommunityKinds[k] {
-				filteredKinds = append(filteredKinds, k)
-			}
-		}
-		kinds = filteredKinds
-	}
 
 	RegisterKindCommandsForKinds(objectCmd, kinds)
 }

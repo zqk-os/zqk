@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 func TestPublicKindFitnessScorecardIntegrity(t *testing.T) {
@@ -41,7 +41,7 @@ func TestPublicKindFitnessScorecardIntegrity(t *testing.T) {
 		"keep_enforce",
 		"quarantine_fixtures",
 		"remediate",
-		"BLI-REDACTED", // Crevice sweep cross-link
+		"BLI-1786684969399550000-5dd4674c", // Crevice sweep cross-link
 		"L1_lifecycle",
 		"L2_utilization",
 		"L3_test_pollution",

@@ -4,8 +4,8 @@
 package priority_plans
 
 import (
-	base_objectenum "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
-	shared_priority_plansenum "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/shared_priority_plans"
+	base_objectenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
+	shared_priority_plansenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/shared_priority_plans"
 )
 
 type PriorityTier = base_objectenum.PriorityTier

@@ -6,8 +6,8 @@ import (
 	"sync/atomic"
 	"time"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/storage/audit"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/storage/audit"
 )
 
 // AuditBufferFlushEventCallback is a callback for emitting events via coordinator

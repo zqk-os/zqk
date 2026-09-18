@@ -7,6 +7,11 @@ project:
   name: zqk-public-candidate
   template: standard
 
+# Pressure-test leftover. Brand SSOT is config/zqk.yaml + config/zqk-local.yaml.
+brand:
+  executable_name: zqk
+  product_name: ZQK
+
 storage:
   backend: file
   data_dir: .zqk/process

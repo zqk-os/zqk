@@ -1,7 +1,7 @@
 package workflow
 
 import (
-	"github.com/lanceman/zqk/pkg/cli/bldr_cli_cmd_v1"
+	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
 	"github.com/spf13/cobra"
 )
 

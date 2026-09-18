@@ -5,10 +5,9 @@ package testenvroot
 import (
 	"path/filepath"
 
-	clctx "github.com/lanceman/zqk/internal/cli/context"
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/paths"
-	"github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"gopkg.in/yaml.v3"
 )
 
@@ -47,7 +46,7 @@ func Setup(testRoot string) (string, error) {
 	}
 	p := filepath.Join(absRoot, paths.TestSettingsFilename)
 	body := testSettingsShape{
-		Version: clctx.DefaultBrandSettingsVersion,
+		Version: paths.DefaultBrandSettingsVersion,
 		Paths:   map[string]any{},
 	}
 	data, err := yaml.Marshal(body)

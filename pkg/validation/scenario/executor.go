@@ -8,11 +8,11 @@ import (
 	"regexp"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/execwrap"
+	"github.com/zqk-os/zqk/pkg/execwrap"
 
-	"github.com/lanceman/zqk/pkg/logging"
-	"github.com/lanceman/zqk/pkg/pipeline"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/pipeline"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // Executor runs validation scenarios.

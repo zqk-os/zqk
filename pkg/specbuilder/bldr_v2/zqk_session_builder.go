@@ -1,8 +1,8 @@
 package bldr_v2
 
 import (
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/specbuilder/builders"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/specbuilder/builders"
 )
 
 // ZqkSessionBuilder builds the zqk_session spec at version v2_0_0
@@ -20,7 +20,7 @@ func NewZqkSessionBuilder() *ZqkSessionBuilder {
 	// Configure the spec
 	builder.
 		SetExtends("base_object").
-		SetDescription("Represents a CLI or interactive session (e.g. a zqk invocation or agent session). Tracks session state and optional metadata.\\nAgent seat-workers bind runtime identity (executor/provider/model/persona/seat) on a child session with session_type=agent_worker; mesh agent_id remains a routing mailbox.\\nLifecycle: zqk_session_lifecycle.yaml.\\nTRACK: REQ-COMMS-RUNTIME-SESSION-001 / BLI-REDACTED\\n").
+		SetDescription("Represents a CLI or interactive session (e.g. a zqk invocation or agent session). Tracks session state and optional metadata.\\nAgent seat-workers bind runtime identity (executor/provider/model/persona/seat) on a child session with session_type=agent_worker; mesh agent_id remains a routing mailbox.\\nLifecycle: zqk_session_lifecycle.yaml.\\nTRACK: REQ-COMMS-RUNTIME-SESSION-001 / BLI-1786955190100310000-edcc34dd\\n").
 		SetVisibility("internal").
 		SetSchemaVersion(objects.DefaultSchemaVersion)
 

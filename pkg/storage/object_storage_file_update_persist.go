@@ -1,19 +1,19 @@
 package storage
 
 import (
-	caspkg "github.com/lanceman/zqk/pkg/storage/cas"
+	caspkg "github.com/zqk-os/zqk/pkg/storage/cas"
 
 	"fmt"
 	"path/filepath"
 	"strings"
 
-	"github.com/lanceman/zqk/pkg/concurrency"
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/logging"
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/storage/locknames"
-	"github.com/lanceman/zqk/pkg/when"
+	"github.com/zqk-os/zqk/pkg/concurrency"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/storage/locknames"
+	"github.com/zqk-os/zqk/pkg/when"
 )
 
 func (f *FileObjectStorage) persistFileObjectUpdate(p *fileObjectUpdatePrep) error {
@@ -326,7 +326,7 @@ func (f *FileObjectStorage) persistFileObjectUpdate(p *fileObjectUpdatePrep) err
 		// Prefer the live CAS path for CacheContext updates (promote/update set
 		// WithCacheUpdate with empty FilePath). Post-sync on cas.Update is primary;
 		// this covers callers that only rely on executeCacheOperation.
-		// TRACK: BLI-REDACTED
+		// TRACK: BLI-1785723654802038000-b14064bc
 		if filePath != emptyValue {
 			if cacheErr := executeCacheOperation(ctx, filePath); cacheErr != nil {
 				StorageLog(logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).

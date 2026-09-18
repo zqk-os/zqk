@@ -1,19 +1,19 @@
 package storage
 
 import (
-	caspkg "github.com/lanceman/zqk/pkg/storage/cas"
+	caspkg "github.com/zqk-os/zqk/pkg/storage/cas"
 
 	"sync"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/metricsrecording"
-	"github.com/lanceman/zqk/pkg/storagetesting"
+	"github.com/zqk-os/zqk/pkg/metricsrecording"
+	"github.com/zqk-os/zqk/pkg/storagetesting"
 )
 
 var testingFactoryOnce sync.Once
 
 // TestingFactory implements [storagetesting.IsolationFactory] for use with
-// [github.com/lanceman/zqk/pkg/testing.SetupCompleteTestEnvironment] or
+// [github.com/zqk-os/zqk/pkg/testing.SetupCompleteTestEnvironment] or
 // [SetupTestingFactoryCompleteTestEnvironmentForTest] from package storage_test (no pkg/testing import).
 type TestingFactory struct{}
 
@@ -23,8 +23,8 @@ type TestingFactory struct{}
 // Example with pkg/testing (callers that still import it):
 //
 //	import (
-//	    testconfig "github.com/lanceman/zqk/pkg/testing"
-//	    storagepkg "github.com/lanceman/zqk/pkg/storage"
+//	    testconfig "github.com/zqk-os/zqk/pkg/testing"
+//	    storagepkg "github.com/zqk-os/zqk/pkg/storage"
 //	)
 //
 //	func TestMyFeature(t *testing.T) {

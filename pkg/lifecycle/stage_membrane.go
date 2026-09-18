@@ -6,14 +6,14 @@ import (
 	"slices"
 	"strings"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/logging"
-	"github.com/lanceman/zqk/pkg/objects"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
-// TRACK: REQ-REDACTED / CRIT-REDACTED /
-// CRIT-REDACTED — archive promote (and park lateral exits)
+// TRACK: REQ-1787077442888310000-37c38636 / CRIT-1787077444216854000-dd978c3c /
+// CRIT-1787077446494473000-d4278167 — archive promote (and park lateral exits)
 // execute lifecycle shockwave policy (cluster vs prune). Raw status Update and
 // non-archive promote hops are not on this path.
 

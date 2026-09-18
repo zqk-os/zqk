@@ -1,19 +1,19 @@
 package cas_test
 
 import (
-	"github.com/lanceman/zqk/pkg/datacell"
-	"github.com/lanceman/zqk/pkg/storage"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/datacell"
+	"github.com/zqk-os/zqk/pkg/storage"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 
 	"context"
 	"path/filepath"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/paths"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/objects"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // TestCASPostSyncCallback_CacheUpdate tests that the CAS post-sync callback
@@ -68,7 +68,7 @@ func TestCASPostSyncCallback_CacheUpdate(t *testing.T) {
 
 	// Create a goal object (uses CAS). Draft-first create parks preliminary origin on draft;
 	// promote to active so CAS PostSyncCallback runs with the durable hash path.
-	// TRACK: BLI-REDACTED — draft-plane create / promote membrane.
+	// TRACK: BLI-1785443942668406000-1ec5c811 — draft-plane create / promote membrane.
 	secCtx := pkgctx.NewSecurityContext("ACC-TEST", []string{"admin"}, []string{"read:*", "write:*"})
 	ctx := context.Background()
 
@@ -131,7 +131,7 @@ func TestCASPostSyncCallback_CacheUpdate(t *testing.T) {
 
 // TestCASPostSyncCallback_UpdateRefreshesHashPath verifies Update fires post-sync
 // with the new hash path so object-id-cache cannot keep a deleted blob name.
-// TRACK: BLI-REDACTED
+// TRACK: BLI-1785895580100186000-c5539372
 func TestCASPostSyncCallback_UpdateRefreshesHashPath(t *testing.T) {
 	tmpDir := t.TempDir()
 	processDir := datacell.ProcessPrimaryDir(tmpDir)

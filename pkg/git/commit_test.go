@@ -8,11 +8,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/execwrap"
-	"github.com/lanceman/zqk/pkg/paths"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/execwrap"
+	"github.com/zqk-os/zqk/pkg/paths"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
 )
 
 func TestCommitAnalyzer_AnalyzeCommit(t *testing.T) {
@@ -360,5 +360,87 @@ func createTestCommit(t *testing.T, repoPath, message string) {
 		} else {
 			t.Fatalf("failed to create commit: %v\nOutput: %s", err, string(output))
 		}
+	}
+}
+
+func TestCommitInWorktree(t *testing.T) {
+	t.Parallel()
+	repoPath := setupTestRepo(t)
+	defer fileutil.RemoveAll(repoPath)
+
+	// Create initial commit in main repo
+	createTestCommit(t, repoPath, "initial commit in trunk")
+
+	// Create a linked worktree
+	worktreeDir := filepath.Join(fileutil.TempDir(), fmt.Sprintf("zqk-wt-test-%d", time.Now().UnixNano()))
+	defer fileutil.RemoveAll(worktreeDir)
+
+	cmd := execwrap.Command("git", "worktree", "add", "--detach", worktreeDir, "HEAD")
+	cmd.Dir = repoPath
+	if out, err := cmd.CombinedOutput(); err != nil {
+		t.Fatalf("failed to create worktree: %v, output: %s", err, string(out))
+	}
+	defer func() {
+		pruneCmd := execwrap.Command("git", "worktree", "remove", "--force", worktreeDir)
+		pruneCmd.Dir = repoPath
+		_ = pruneCmd.Run()
+	}()
+
+	// Verify .git in worktree is a file, not a directory
+	gitEntry := filepath.Join(worktreeDir, ".git")
+	st, err := fileutil.Stat(gitEntry)
+	if err != nil {
+		t.Fatalf("expected .git entry in worktree: %v", err)
+	}
+	if st.IsDir() {
+		t.Fatalf("expected .git in worktree to be a file pointing to gitdir, not a directory")
+	}
+
+	// Create a commit inside the worktree using -F with a message file in worktree root
+	msgFile := filepath.Join(worktreeDir, "COMMIT_MSG_WORKTREE")
+	if err := fileutil.WriteFile(msgFile, []byte("feat(worktree): worktree commit message with BLI-123 and GOAL-456"), paths.FilePerm644); err != nil {
+		t.Fatalf("failed to write commit msg file: %v", err)
+	}
+
+	testFile := filepath.Join(worktreeDir, "worktree_file.txt")
+	if err := fileutil.WriteFile(testFile, []byte("worktree file content"), paths.FilePerm644); err != nil {
+		t.Fatalf("failed to write worktree file: %v", err)
+	}
+
+	addCmd := execwrap.Command("git", "add", filepath.Base(testFile))
+	addCmd.Dir = worktreeDir
+	if out, err := addCmd.CombinedOutput(); err != nil {
+		t.Fatalf("failed to stage file in worktree: %v, output: %s", err, string(out))
+	}
+
+	commitCmd := execwrap.Command("git", "commit", "-F", msgFile, "--no-verify")
+	commitCmd.Dir = worktreeDir
+	if out, err := commitCmd.CombinedOutput(); err != nil {
+		t.Fatalf("failed to commit in worktree: %v, output: %s", err, string(out))
+	}
+
+	// Verify commit analyzer can analyze the worktree commit
+	analyzer := NewCommitAnalyzer(worktreeDir)
+	logCmd := execwrap.Command("git", "log", "-1", "--format=%H")
+	logCmd.Dir = worktreeDir
+	logOut, err := logCmd.Output()
+	if err != nil {
+		t.Fatalf("failed to get commit hash: %v", err)
+	}
+	hash := strings.TrimSpace(string(logOut))
+
+	ctx, cancel := context.WithTimeout(pkgctx.NewSystemContext(), 10*time.Second)
+	defer cancel()
+
+	commit, err := analyzer.AnalyzeCommit(ctx, hash)
+	if err != nil {
+		t.Fatalf("failed to analyze commit in worktree: %v", err)
+	}
+
+	if len(commit.BacklogItemRefs) != 1 || commit.BacklogItemRefs[0] != "BLI-123" {
+		t.Errorf("expected BacklogItemRefs ['BLI-123'], got %v", commit.BacklogItemRefs)
+	}
+	if len(commit.GoalRefs) != 1 || commit.GoalRefs[0] != "GOAL-456" {
+		t.Errorf("expected GoalRefs ['GOAL-456'], got %v", commit.GoalRefs)
 	}
 }

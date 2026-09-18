@@ -4,8 +4,8 @@
 package test_command_rule
 
 import (
-	base_objectenum "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
-	shared_test_command_rulesenum "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/shared_test_command_rules"
+	base_objectenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
+	shared_test_command_rulesenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/shared_test_command_rules"
 )
 
 type Plane = base_objectenum.Plane

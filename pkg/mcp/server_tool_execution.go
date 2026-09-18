@@ -5,11 +5,11 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/lanceman/zqk/pkg/concurrency"
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/logging"
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/concurrency"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // handleToolCallWithContext handles a tool call with context for cancellation
@@ -232,7 +232,7 @@ func (s *Server) handleToolCallWithContext(ctx context.Context, rawName string, 
 		})
 
 		// Detach from mid-flight request cancel (IDE). Already-cancelled ctx fails fast.
-		// Bound by shutdown + MaxToolCallDuration. TRACK: BLI-REDACTED
+		// Bound by shutdown + MaxToolCallDuration. TRACK: BLI-1784969955962654000-dc689643
 		var execCtx context.Context
 		var cancel context.CancelFunc
 		if ctx.Err() != nil {

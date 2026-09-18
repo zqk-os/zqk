@@ -1,7 +1,7 @@
 package pm
 
 import (
-	"github.com/lanceman/zqk/pkg/pm"
+	"github.com/zqk-os/zqk/pkg/pm"
 )
 
 // DefaultGenesisParentHash is the standard root genesis hash for legacy provenance blocks.

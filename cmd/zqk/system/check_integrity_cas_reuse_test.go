@@ -9,14 +9,14 @@ import (
 	"testing"
 	"time"
 
-	"github.com/lanceman/zqk/internal/cli"
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/migration/parser"
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/paths"
-	"github.com/lanceman/zqk/pkg/storage"
-	"github.com/lanceman/zqk/pkg/testkit"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/internal/cli"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/migration/parser"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/testkit"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 func mustProcessRoot(t *testing.T) string {
@@ -31,7 +31,7 @@ func mustProcessRoot(t *testing.T) string {
 // Regression: system check StorageProvider is Batching(Routing(...)). Integrity used to
 // type-assert only *FileObjectStorage, miss the cache, and NewContentAddressableStorage
 // (full index reload) per object — doc_entry (~2k, ~170KB index) blew the 5s validation budget.
-// TRACK: BLI-REDACTED
+// TRACK: BLI-1785895580100186000-c5539372
 func TestExtractFileStorage_UnwrapsBatchingRouting(t *testing.T) {
 	t.Parallel()
 	tmp := mustProcessRoot(t)

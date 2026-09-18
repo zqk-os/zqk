@@ -4,9 +4,9 @@ import (
 	"errors"
 	"strings"
 
-	"github.com/lanceman/zqk/pkg/datacell"
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/datacell"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // ErrPeerAckSeatMismatch is returned when --agent-id does not match the
@@ -16,7 +16,7 @@ var ErrPeerAckSeatMismatch = errors.New("peer_ack agent_id does not match parent
 // AuthorizePeerAck fails closed when the parent steer is directed
 // (to_agent_id set) and ackingAgentID is not that seat (aliases denied).
 // Undirected parents (no to_agent_id) remain ackable by any seat.
-// TRACK: BLI-REDACTED — harden further with session/PID binding (agent_id stamp alone is honor+gate).
+// TRACK: BLI-1785875899020621000-3792ae6b — harden further with session/PID binding (agent_id stamp alone is honor+gate).
 func AuthorizePeerAck(projectRoot, ackingAgentID, inReplyTo string) error {
 	acking := strings.TrimSpace(ackingAgentID)
 	parentID := strings.TrimSpace(inReplyTo)

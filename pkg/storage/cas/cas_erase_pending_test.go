@@ -4,13 +4,13 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/paths"
-	"github.com/lanceman/zqk/pkg/storage/filecas"
+	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/storage/filecas"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 func TestCASErasePendingTombstoneLinger(t *testing.T) {
@@ -22,7 +22,7 @@ func TestCASErasePendingTombstoneLinger(t *testing.T) {
 	require.NoError(t, fileutil.EnsureDir(kindDir))
 
 	cas := filecas.NewContentAddressableStorage(kindDir, "criteria")
-	testID := "CRIT-REDACTED"
+	testID := "CRIT-1785784848555610000-7a0f9370"
 
 	// Initially, ID does not exist and is not erase_pending
 	assert.False(t, cas.IsErasePending(testID))

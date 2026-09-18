@@ -7,16 +7,16 @@ import (
 	"time"
 
 	"github.com/fatih/color"
-	"github.com/lanceman/zqk/cmd/zqk/system"
-	"github.com/lanceman/zqk/internal/cli"
-	clipkg "github.com/lanceman/zqk/pkg/cli"
-	"github.com/lanceman/zqk/pkg/cli/bldr_cli_cmd_v1"
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/logging"
-	"github.com/lanceman/zqk/pkg/objects"
-	storagepkg "github.com/lanceman/zqk/pkg/storage"
-	"github.com/lanceman/zqk/pkg/validation"
-	"github.com/lanceman/zqk/pkg/when"
+	"github.com/zqk-os/zqk/cmd/zqk/system"
+	"github.com/zqk-os/zqk/internal/cli"
+	clipkg "github.com/zqk-os/zqk/pkg/cli"
+	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/objects"
+	storagepkg "github.com/zqk-os/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/validation"
+	"github.com/zqk-os/zqk/pkg/when"
 	"github.com/spf13/cobra"
 )
 
@@ -60,7 +60,7 @@ func executeBulkDelete(cmd *cobra.Command, ids []string, proc *cli.Processor) er
 	if unlinkRefs && cascade {
 		return cli.Guard(cmd).Err(errors.New("--unlink-references cannot be combined with --cascade")).Return()
 	}
-	// TRACK: BLI-REDACTED — fail-closed bulk delete (no silent GhostRef fan-in).
+	// TRACK: BLI-1786390312940998000-1f101465 — fail-closed bulk delete (no silent GhostRef fan-in).
 	if !unlinkRefs && !cascade {
 		return cli.Guard(cmd).Err(errors.New("bulk delete refused: pass --unlink-references or --cascade; refusing to leave GhostRefs")).Return()
 	}

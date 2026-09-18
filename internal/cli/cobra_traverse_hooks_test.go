@@ -5,7 +5,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	pkgcli "github.com/lanceman/zqk/pkg/cli"
+	pkgcli "github.com/zqk-os/zqk/pkg/cli"
 )
 
 // TestTraversePersistentPreRunOrder documents cobra behavior when EnableTraverseRunHooks is true:

@@ -3,7 +3,7 @@ package mcp
 import (
 	"slices"
 
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // MCPToolBuilder provides a fluent API for building MCP tool schemas
@@ -143,9 +143,13 @@ func (b *MCPToolBuilder) AddJSONYAMLFormatProperty() *MCPToolBuilder {
 
 // Build returns the complete input schema
 func (b *MCPToolBuilder) Build() map[string]any {
+	props := make(map[string]any, len(b.properties))
+	for k, v := range b.properties {
+		props[k] = v
+	}
 	schema := map[string]any{
 		objects.FieldKeyType: "object",
-		"properties":         b.properties,
+		"properties":         props,
 	}
 	if len(b.required) > 0 {
 		schema["required"] = b.required

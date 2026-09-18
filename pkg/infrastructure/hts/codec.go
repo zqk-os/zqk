@@ -3,8 +3,8 @@ package hts
 import (
 	"context"
 
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/storage"
 )
 
 // Codec implements the High-Throughput Semantic (HTS) compression logic.

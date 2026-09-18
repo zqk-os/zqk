@@ -4,16 +4,16 @@ import (
 	"context"
 	"testing"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/paths"
-	"github.com/lanceman/zqk/pkg/scheduler"
-	storagepkg "github.com/lanceman/zqk/pkg/storage"
-	"github.com/lanceman/zqk/pkg/testenvroot"
-	"github.com/lanceman/zqk/pkg/testkit"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/scheduler"
+	storagepkg "github.com/zqk-os/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/testenvroot"
+	"github.com/zqk-os/zqk/pkg/testkit"
 )
 
-// TestWatchdogSubagent_Boundary verifies CRIT-REDACTED:
+// TestWatchdogSubagent_Boundary verifies CRIT-1789273452649988000-84a64249:
 // Boundary condition validation, negative testing, invalid input rejection, and failure recovery.
 func TestWatchdogSubagent_Boundary(t *testing.T) {
 	ctx := context.Background()

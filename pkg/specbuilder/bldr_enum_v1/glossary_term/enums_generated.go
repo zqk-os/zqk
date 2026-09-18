@@ -4,8 +4,8 @@
 package glossary_term
 
 import (
-	base_objectenum "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
-	shared_glossary_termsenum "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/shared_glossary_terms"
+	base_objectenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
+	shared_glossary_termsenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/shared_glossary_terms"
 )
 
 type Plane = base_objectenum.Plane

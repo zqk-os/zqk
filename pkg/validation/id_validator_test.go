@@ -6,10 +6,10 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/paths"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/paths"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // getTestIDPrefixesConfig returns a test-specific IDPrefixesConfig (copy of default)
@@ -185,7 +185,7 @@ func TestIDValidator_InferKindFromID(t *testing.T) {
 	}{
 		{"BLI-001", "backlog_item"},
 		{"ASK-1785886324283087000-34320add", "agent_skill"},
-		{"ATK-REDACTED", "agent_task"},
+		{"ATK-1785886324283087000-12345678", "agent_task"},
 		{"MIL-001", "milestone"},
 		{"GOAL-123", "goal"},
 		{"PRI-208", "priority_plan"},

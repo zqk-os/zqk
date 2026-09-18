@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/lanceman/zqk/pkg/license"
+	"github.com/zqk-os/zqk/pkg/license"
 )
 
 // Blocklist defines the interface for revoking tokens.

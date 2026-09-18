@@ -8,12 +8,12 @@ import (
 	"runtime"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/objects"
-	_ "github.com/lanceman/zqk/pkg/specbuilder/bldr_instance_v1" // register goal builder for test
-	"github.com/lanceman/zqk/pkg/specbuilder/instance_builders"
-	"github.com/lanceman/zqk/pkg/storage"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
-	"github.com/lanceman/zqk/pkg/validation"
+	"github.com/zqk-os/zqk/pkg/objects"
+	_ "github.com/zqk-os/zqk/pkg/specbuilder/bldr_instance_v1" // register goal builder for test
+	"github.com/zqk-os/zqk/pkg/specbuilder/instance_builders"
+	"github.com/zqk-os/zqk/pkg/storage"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/validation"
 )
 
 // persistenceBundleYAMLPath returns the path to persistence-bundle.yaml: tracked testdata first,
@@ -442,7 +442,7 @@ func TestApplyScenarioBundle_ConvergenceLifecycleBundle(t *testing.T) {
 	if len(summary.CreatedDocEntryIDs) != 1 || summary.CreatedDocEntryIDs[0] != "DOC-CLF-001" {
 		t.Errorf("CreatedDocEntryIDs = %v, want [DOC-CLF-001]", summary.CreatedDocEntryIDs)
 	}
-	wantCVS := "CVS-REDACTED"
+	wantCVS := "CVS-1234567890123456789-abcdef12"
 	if len(summary.CreatedConvergenceSessionIDs) != 1 || summary.CreatedConvergenceSessionIDs[0] != wantCVS {
 		t.Errorf("CreatedConvergenceSessionIDs = %v, want [%s]", summary.CreatedConvergenceSessionIDs, wantCVS)
 	}
@@ -455,7 +455,7 @@ func TestApplyScenarioBundle_ConvergenceLifecycleBundle(t *testing.T) {
 		wantKind string
 	}{
 		{"DOC-CLF-001", "doc_entry"},
-		{"CVS-REDACTED", "convergence_session"},
+		{"CVS-1234567890123456789-abcdef12", "convergence_session"},
 	} {
 		obj, err := provider.Read(ctx, secCtx, tc.id)
 		if err != nil {

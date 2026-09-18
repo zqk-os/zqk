@@ -3,27 +3,27 @@ package newcmd
 import (
 	"path/filepath"
 	"strings"
-	"github.com/lanceman/zqk/pkg/quick"
+	"github.com/zqk-os/zqk/pkg/quick"
 
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v3"
 
-	"github.com/lanceman/zqk/cmd/zqk/object"
-	"github.com/lanceman/zqk/cmd/zqk/workflow"
-	"github.com/lanceman/zqk/internal/cli"
-	"github.com/lanceman/zqk/pkg/cli/bldr_cli_cmd_v1"
-	"github.com/lanceman/zqk/pkg/cliexamples"
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/logging"
-	"github.com/lanceman/zqk/pkg/paths"
-	"github.com/lanceman/zqk/pkg/scenario"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
-	"github.com/lanceman/zqk/pkg/validation"
+	"github.com/zqk-os/zqk/cmd/zqk/object"
+	"github.com/zqk-os/zqk/cmd/zqk/workflow"
+	"github.com/zqk-os/zqk/internal/cli"
+	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
+	"github.com/zqk-os/zqk/pkg/cliexamples"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/scenario"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/validation"
 
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/telemetry"
-	"github.com/lanceman/zqk/pkg/zqkenv"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/telemetry"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
 const (
@@ -37,7 +37,7 @@ const (
 // pkg/cli/bldr_cli_cmd_v1/new_*_command_builder.go (zqk system generate-command-builders --overwrite).
 func NewNewCmd() *cobra.Command {
 	root := bldr_cli_cmd_v1.NewNewRootCommandBuilder()
-	// TRACK: BLI-REDACTED — retire stale internal-create help until new_* builders regenerate from specs.
+	// TRACK: BLI-1785930106857898000-94b9a5bc — retire stale internal-create help until new_* builders regenerate from specs.
 	root.Long = strings.ReplaceAll(root.Long,
 		"zqk internal create <kind>",
 		"zqk object create <kind> --internal",

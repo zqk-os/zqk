@@ -8,12 +8,11 @@ import (
 	"runtime"
 	"strings"
 
-	cliContext "github.com/lanceman/zqk/internal/cli/context"
-	"github.com/lanceman/zqk/pkg/brand"
-	"github.com/lanceman/zqk/pkg/logging"
-	"github.com/lanceman/zqk/pkg/paths"
-	"github.com/lanceman/zqk/pkg/utils/fileutil"
-	"github.com/lanceman/zqk/pkg/zqkenv"
+	"github.com/zqk-os/zqk/pkg/brand"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
 type mcpConfig struct {
@@ -186,7 +185,7 @@ func InstallToIDE(ideName, configPath, execPath, projectRoot string, logger logg
 	var args []string
 
 	if projectRoot == "" {
-		projectRoot = cliContext.ResolveProjectRoot(".")
+		projectRoot = paths.ResolveProjectRoot(".")
 	}
 
 	if projectRoot != "" {

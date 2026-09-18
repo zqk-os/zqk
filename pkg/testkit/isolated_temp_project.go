@@ -6,13 +6,13 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/paths"
-	"github.com/lanceman/zqk/pkg/storage"
-	caspkg "github.com/lanceman/zqk/pkg/storage/cas"
-	"github.com/lanceman/zqk/pkg/testenvroot"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
-	"github.com/lanceman/zqk/pkg/zqkenv"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/storage"
+	caspkg "github.com/zqk-os/zqk/pkg/storage/cas"
+	"github.com/zqk-os/zqk/pkg/testenvroot"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
 var isolatedTempProjectOnce sync.Once
@@ -184,7 +184,7 @@ func seedSchemaPlaneStep(testRoot string) NamedTestStep {
 			//
 			// Argument order is (destination, source). Reversing it copies the empty temp
 			// root over the repository's real schema plane; see
-			// BLI-REDACTED for the patch that did exactly that.
+			// BLI-1787555794519027000-8ba84e8a for the patch that did exactly that.
 			return testenvroot.BootstrapRoot(testRoot, projectRoot)
 		},
 	}

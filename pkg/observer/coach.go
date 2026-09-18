@@ -7,10 +7,10 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/lanceman/zqk/pkg/paths"
-	"github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 
-	"github.com/lanceman/zqk/pkg/llm"
+	"github.com/zqk-os/zqk/pkg/llm"
 )
 
 // GenerateDynamicTips reads from the system state and uses the LLM to generate 3 dynamic efficiency tips.

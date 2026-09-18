@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/coordination"
+	"github.com/zqk-os/zqk/pkg/coordination"
 )
 
 const (

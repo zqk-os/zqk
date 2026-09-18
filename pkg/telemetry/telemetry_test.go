@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 func TestStreamCompaction(t *testing.T) {

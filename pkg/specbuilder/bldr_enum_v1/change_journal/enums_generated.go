@@ -4,8 +4,8 @@
 package change_journal
 
 import (
-	base_objectenum "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
-	shared_change_journalenum "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/shared_change_journal"
+	base_objectenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
+	shared_change_journalenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/shared_change_journal"
 )
 
 type ChangeType string

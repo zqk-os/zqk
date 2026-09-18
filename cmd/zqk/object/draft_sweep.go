@@ -4,14 +4,14 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/lanceman/zqk/internal/cli"
-	"github.com/lanceman/zqk/pkg/cli/bldr_cli_cmd_v1"
-	"github.com/lanceman/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/internal/cli"
+	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
+	"github.com/zqk-os/zqk/pkg/storage"
 	"github.com/spf13/cobra"
 )
 
 // NewDraftSweepCmd creates `object draft sweep`.
-// TRACK: BLI-REDACTED / POL-AGENT-DRAFT-SWEEP-TPM-001
+// TRACK: BLI-1785827957031623000-b08b9791 / POL-AGENT-DRAFT-SWEEP-TPM-001
 func NewDraftSweepCmd() *cobra.Command {
 	cmd := bldr_cli_cmd_v1.NewObjectDraftSweepCommandBuilder()
 	cli.BindAsyncProgress(cmd, runObjectDraftSweep)

@@ -7,17 +7,17 @@ import (
 	"testing"
 	"time"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/paths"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 
-	"github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // TestListStreamSegmentsIgnoresGhostsAfterDeletedTruncated pins the retention compact
 // contract: stream_deleted is truncated while segment files still contain deleted lines.
 // List/count must intersect with the live registry or total_count inflates past max_count.
-// TRACK: BLI-REDACTED
+// TRACK: BLI-1785905541906569000-074e24d7
 func TestListStreamSegmentsIgnoresGhostsAfterDeletedTruncated(t *testing.T) {
 	root := t.TempDir()
 	MustEnsureProcessSpecsLayoutForTest(t, root)

@@ -3,8 +3,8 @@ package ontology_test
 import (
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/ontology"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/ontology"
 )
 
 func TestSystemOntology(t *testing.T) {

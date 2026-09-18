@@ -4,7 +4,7 @@ import (
 	"context"
 	"sync"
 
-	"github.com/lanceman/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/errfmt"
 )
 
 // GoroutineBuilder provides a fluent API for creating goroutines with consistent patterns.

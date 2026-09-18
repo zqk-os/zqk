@@ -4,8 +4,8 @@
 package watchdog_registrations
 
 import (
-	base_objectenum "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
-	shared_watchdog_registrationsenum "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/shared_watchdog_registrations"
+	base_objectenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
+	shared_watchdog_registrationsenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/shared_watchdog_registrations"
 )
 
 type PriorityTier = base_objectenum.PriorityTier

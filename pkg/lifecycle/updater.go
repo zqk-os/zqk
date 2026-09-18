@@ -8,14 +8,14 @@ import (
 	"sync"
 	"time"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/goroutinelabels"
-	"github.com/lanceman/zqk/pkg/logging"
-	"github.com/lanceman/zqk/pkg/metrics"
-	"github.com/lanceman/zqk/pkg/nildecode"
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/rollback"
-	"github.com/lanceman/zqk/pkg/storage"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/metrics"
+	"github.com/zqk-os/zqk/pkg/nildecode"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/rollback"
+	"github.com/zqk-os/zqk/pkg/storage"
 )
 
 // StorageProvider returns storage for a project root (e.g. from CLI cache). Nil if not available.
@@ -140,7 +140,7 @@ func (u *Updater) apply(ctx context.Context, req TransitionRequest) error {
 //
 // Elevation is stamped with break_glass: DECIDE refuses break_glass on critical kinds
 // unless the actor is elevated. The updater runs as the system account.
-// TRACK: BLI-REDACTED
+// TRACK: BLI-1785784867143912000-635942fb
 // First-class promote recipe: docs/architecture/LIFECYCLE_STATUS_ROLES.md § First-class promote.
 func completionOverrideContext(ctx context.Context, secCtx *pkgctx.SecurityContext, req TransitionRequest) context.Context {
 	if req.ToStatus != statusComplete {

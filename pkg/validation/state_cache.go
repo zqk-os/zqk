@@ -9,14 +9,14 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/concurrency"
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/logging"
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/paths"
-	"github.com/lanceman/zqk/pkg/utils/fileutil"
-	syscallutil "github.com/lanceman/zqk/pkg/utils/syscallutil"
+	"github.com/zqk-os/zqk/pkg/concurrency"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
+	syscallutil "github.com/zqk-os/zqk/pkg/utils/syscallutil"
 )
 
 // ValidationState represents the validation state for an object
@@ -93,7 +93,7 @@ type ValidationStateCache struct {
 	projectRoot string
 	// loadedUpdated is the on-disk `updated` timestamp from the last Load.
 	// Save refuses to overwrite a file whose Updated is newer (another process
-	// already swapped in a fresher generation). TRACK: BLI-REDACTED
+	// already swapped in a fresher generation). TRACK: BLI-1786387465409533000-45bd780c
 	loadedUpdated time.Time
 	// replaceDiskOnNextSave is set by Clear so this instance's next Save wins
 	// even if a peer restored the old file between unlink and persist.
@@ -165,7 +165,7 @@ func (c *ValidationStateCache) Load() error {
 			if currentChecksum != NoSourceCodeAvailableChecksum && legacy.CodeChecksum != currentChecksum {
 				// Do not leave a poison on-disk file: empty Save() later can hit the
 				// empty-overwrite guard and preserve stale Tier-1 hits across processes.
-				// TRACK: BLI-REDACTED
+				// TRACK: BLI-1785723654802038000-b14064bc
 				c.cache = make(map[string]*ValidationState)
 				discardStaleFile = true
 				return nil
@@ -444,7 +444,7 @@ func (c *ValidationStateCache) Save() error {
 	defer file.Close()
 
 	// Bounded retry on LOCK_NB contention. Stale-lock break is attempted mid-loop.
-	// TRACK: BLI-REDACTED
+	// TRACK: BLI-1787822805586349000-ba64fe46
 	acquireStart := time.Now()
 	maxRetries := 50 // Increased maxRetries to 5 seconds to reduce warn-spam
 	lockAcquired := false
@@ -914,7 +914,7 @@ func shrinkGuardSkipSave(cacheFile string, byKind map[string]kindBucket) bool {
 // staleGenerationSkipSave returns true when another process already wrote a
 // newer validation_cache.json than this instance loaded. Without this, a
 // long-lived daemon Save of a GhostRef-era snapshot clobbers a CLI
-// --clear-cache persist. TRACK: BLI-REDACTED
+// --clear-cache persist. TRACK: BLI-1786387465409533000-45bd780c
 func staleGenerationSkipSave(c *ValidationStateCache) bool {
 	if c == nil {
 		return false

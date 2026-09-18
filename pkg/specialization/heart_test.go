@@ -5,9 +5,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/infrastructure"
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/specialization"
+	"github.com/zqk-os/zqk/pkg/infrastructure"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/specialization"
 )
 
 func TestHeartHandler_PCSCalculation(t *testing.T) {

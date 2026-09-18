@@ -5,8 +5,8 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/ontology"
-	"github.com/lanceman/zqk/pkg/semantic/graph"
+	"github.com/zqk-os/zqk/pkg/ontology"
+	"github.com/zqk-os/zqk/pkg/semantic/graph"
 )
 
 type mockGraphProvider struct {

@@ -4,11 +4,11 @@ import (
 	"path/filepath"
 	"time"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/audit_event"
-	"github.com/lanceman/zqk/pkg/specbuilder/bldr_instance_v1"
-	"github.com/lanceman/zqk/pkg/specbuilder/instance_builders"
-	"github.com/lanceman/zqk/pkg/validation"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/audit_event"
+	"github.com/zqk-os/zqk/pkg/specbuilder/bldr_instance_v1"
+	"github.com/zqk-os/zqk/pkg/specbuilder/instance_builders"
+	"github.com/zqk-os/zqk/pkg/validation"
 )
 
 // ResolveActor picks created_by from options, then the security context, then system.

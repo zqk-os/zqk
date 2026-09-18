@@ -7,7 +7,7 @@ import (
 	"strings"
 	"unicode"
 
-	"github.com/lanceman/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/errfmt"
 )
 
 // supplementalFieldKeyNames are map keys used across the codebase that may not appear

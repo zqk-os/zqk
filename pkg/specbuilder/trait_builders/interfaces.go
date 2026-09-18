@@ -3,8 +3,8 @@ package trait_builders
 import (
 	"fmt"
 
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // TraitBuilder is an interface for builders that generate trait definitions at a specific version

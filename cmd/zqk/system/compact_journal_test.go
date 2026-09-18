@@ -5,14 +5,14 @@ import (
 	"testing"
 	"time"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/storage"
-	"github.com/lanceman/zqk/pkg/testkit"
-	"github.com/lanceman/zqk/pkg/zqkenv"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/testkit"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
 func TestCompactChangeJournalWindow_Integration(t *testing.T) {
-	// TRACK: BLI-REDACTED — no t.Parallel with t.Setenv (Go 1.26+).
+	// TRACK: BLI-1785443942668406000-1ec5c811 — no t.Parallel with t.Setenv (Go 1.26+).
 	projectRoot := t.TempDir()
 	t.Setenv(zqkenv.ProjectRoot().Name(), projectRoot)
 	if _, err := setupSystemTestEnvironmentRoot(t, projectRoot); err != nil {

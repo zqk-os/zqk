@@ -1,6 +1,6 @@
 package scheduler
 
-import "github.com/lanceman/zqk/pkg/logging"
+import "github.com/zqk-os/zqk/pkg/logging"
 
 // Domain-scoped fluent roots reuse [SchedulerLogRoot] pooling ([SLog]); names document handler families.
 

@@ -3,8 +3,8 @@ package bldr_cli_cmd_v1
 import (
 	"fmt"
 
-	"github.com/lanceman/zqk/pkg/cli/bldr_cli_cmd_v1/check"
-	clipkg "github.com/lanceman/zqk/pkg/cli"
+	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1/check"
+	clipkg "github.com/zqk-os/zqk/pkg/cli"
 	"github.com/spf13/cobra"
 )
 
@@ -17,7 +17,7 @@ const (
 )
 
 // NewWorkflowCheckCommandBuilder creates a new workflow_check command
-// TRACK: BLI-REDACTED / REQ-CEF-ARCH-001
+// TRACK: BLI-1788841705527001000-d18ec5a6 / REQ-CEF-ARCH-001
 func NewWorkflowCheckCommandBuilder() *cobra.Command {
 	builder := clipkg.NewCommandBuilder("check")
 	builder.WithShort(checkShortDesc)

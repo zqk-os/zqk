@@ -6,11 +6,11 @@ import (
 
 	"github.com/spf13/cobra"
 
-	pkgcli "github.com/lanceman/zqk/pkg/cli"
+	pkgcli "github.com/zqk-os/zqk/pkg/cli"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/coordination"
-	"github.com/lanceman/zqk/pkg/objects"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/coordination"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // TestRunWithAsyncProgress_success verifies that RunWithAsyncProgress runs runE and returns nil when runE succeeds.

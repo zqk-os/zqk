@@ -3,7 +3,7 @@ package llm
 import (
 	"strings"
 
-	"github.com/lanceman/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/errfmt"
 )
 
 // SanitizeUntrustedText detects and escapes or rejects common prompt injection payloads.

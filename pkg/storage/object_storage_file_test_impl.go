@@ -1,7 +1,7 @@
 package storage
 
 import (
-	pkgctx "github.com/lanceman/zqk/pkg/context"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
 )
 
 // EnsureTestIdentityCacheHandler installs a succeeding no-op so hermetic tests ACK

@@ -11,14 +11,14 @@ import (
 	"sync"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/accumulator"
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/goroutinelabels"
-	"github.com/lanceman/zqk/pkg/lifecycle"
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/storage"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
-	"github.com/lanceman/zqk/pkg/walutil"
+	"github.com/zqk-os/zqk/pkg/accumulator"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
+	"github.com/zqk-os/zqk/pkg/lifecycle"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/storage"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/walutil"
 )
 
 // StrategicReadinessLiteFilePath returns the canonical path for the materialized strategic readiness view.
@@ -293,9 +293,9 @@ func (v *StrategicReadinessView) LoadFromLiteFile() (bool, error) {
 	defer v.mu.Unlock()
 
 	litePath := StrategicReadinessLiteFilePath(v.projectRoot)
-	data, err := os.ReadFile(litePath)
+	data, err := fileutil.ReadFile(litePath)
 	if err != nil {
-		if os.IsNotExist(err) {
+		if fileutil.IsNotExist(err) {
 			return false, nil
 		}
 		return false, fmt.Errorf("read strategic readiness lite file: %w", err)
@@ -325,7 +325,7 @@ func (v *StrategicReadinessView) LoadFromLiteFile() (bool, error) {
 		payload = &flat
 		matAt = flat.MaterializedAt
 		if matAt.IsZero() {
-			if fi, err := os.Stat(litePath); err == nil {
+			if fi, err := fileutil.Stat(litePath); err == nil {
 				matAt = fi.ModTime().UTC()
 			}
 		}
@@ -374,10 +374,10 @@ func (v *StrategicReadinessView) SaveToLiteFile() error {
 
 	litePath := StrategicReadinessLiteFilePath(v.projectRoot)
 	tmpPath := litePath + ".tmp"
-	if err := os.WriteFile(tmpPath, data, 0o644); err != nil {
+	if err := fileutil.WriteFile(tmpPath, data, 0o644); err != nil {
 		return fmt.Errorf("write tmp strategic readiness file: %w", err)
 	}
-	return os.Rename(tmpPath, litePath)
+	return fileutil.Rename(tmpPath, litePath)
 }
 
 func (v *StrategicReadinessView) buildPayloadLocked() *StrategicReadinessLitePayload {

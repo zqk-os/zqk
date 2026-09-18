@@ -4,8 +4,8 @@ import (
 	"context"
 	"strings"
 
-	"github.com/lanceman/zqk/pkg/datacell"
-	"github.com/lanceman/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/datacell"
+	"github.com/zqk-os/zqk/pkg/logging"
 )
 
 // Log events for data_cell_envelope_tick handler (POL-CODE-007 stable keys; dashboards may join on message).

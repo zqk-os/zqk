@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/zqkenv"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
 func TestGetSchedulerImmediateLoadBatchSize(t *testing.T) {

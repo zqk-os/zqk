@@ -4,7 +4,7 @@ import (
 	"slices"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 func TestDraftToActivePreconditions_MinimalContract(t *testing.T) {

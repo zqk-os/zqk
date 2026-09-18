@@ -4,7 +4,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/gotestparse"
+	"github.com/zqk-os/zqk/pkg/gotestparse"
 )
 
 func TestFingerprintBundleCommand_stripsLogPaths(t *testing.T) {
@@ -32,7 +32,7 @@ func TestBuildSuggestedGoTestRerunCommands(t *testing.T) {
 	got := BuildSuggestedGoTestRerunCommands(cmdStr, "go", []string{
 		"test", "./cmd/zqk/system", "-run", "^(TestA|TestB)$", "-v", "-count=1", "-timeout", "120s", "-p", "10",
 	}, []string{
-		"github.com/lanceman/zqk/cmd/zqk/system.TestA",
+		"github.com/zqk-os/zqk/cmd/zqk/system.TestA",
 		"cmd/zqk/system.TestB",
 	}, 600)
 	if len(got) != 1 {
@@ -50,7 +50,7 @@ func TestBuildSuggestedGoTestRerunCommands(t *testing.T) {
 }
 
 func TestSplitFailedTestName(t *testing.T) {
-	pkg, fn := splitFailedTestName("github.com/lanceman/zqk/pkg/storage.TestCAS", "pkg/storage")
+	pkg, fn := splitFailedTestName("github.com/zqk-os/zqk/pkg/storage.TestCAS", "pkg/storage")
 	if pkg != "pkg/storage" || fn != "TestCAS" {
 		t.Fatalf("got %q %q", pkg, fn)
 	}
@@ -66,13 +66,13 @@ func TestTrimToLastSchedulerTestRunForParsing_ParseGoTestOutput(t *testing.T) {
 --- run 2026-03-22T17:33:52Z ---
 --- FAIL: TestAllKindsCRUD (0.48s)
 FAIL
-FAIL	github.com/lanceman/zqk/pkg/storage	86.399s
+FAIL	github.com/zqk-os/zqk/pkg/storage	86.399s
 FAIL
 
 --- run 2026-03-22T18:07:20Z ---
---- PASS: github.com/lanceman/zqk/pkg/storage.TestOk (0.01s)
+--- PASS: github.com/zqk-os/zqk/pkg/storage.TestOk (0.01s)
 PASS
-ok  	github.com/lanceman/zqk/pkg/storage	1.725s
+ok  	github.com/zqk-os/zqk/pkg/storage	1.725s
 `
 	full := "\n" + strings.TrimSpace(multi)
 	sumFull, err := gotestparse.ParseGoTestOutput(full)
@@ -100,7 +100,7 @@ func TestTrimToLastSchedulerTestRunForParsing_skipsEmptyTrailingRunMarkers(t *te
 === RUN   TestHashMismatchFixEventViaCoordinator
 --- FAIL: TestHashMismatchFixEventViaCoordinator (1.00s)
 FAIL
-FAIL	github.com/lanceman/zqk/cmd/zqk/system	27.572s
+FAIL	github.com/zqk-os/zqk/cmd/zqk/system	27.572s
 FAIL
 
 --- run 2026-03-30T00:46:10Z ---

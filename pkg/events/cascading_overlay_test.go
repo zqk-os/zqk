@@ -5,8 +5,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/events"
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/events"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // TestRouter_BitmaskSubscription already exists — kept for regression coverage.

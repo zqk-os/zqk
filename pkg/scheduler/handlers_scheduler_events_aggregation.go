@@ -3,9 +3,9 @@ package scheduler
 import (
 	"context"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/logging"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/logging"
 )
 
 // SchedulerEventsAggregationHandler runs aggregation of diagnostics.jsonl into scheduler-metrics-summary.json.

@@ -3,7 +3,7 @@ package scheduler
 import (
 	"context"
 
-	"github.com/lanceman/zqk/pkg/entitlements"
+	"github.com/zqk-os/zqk/pkg/entitlements"
 )
 
 // ProposalType defines the category of policy adjustment.

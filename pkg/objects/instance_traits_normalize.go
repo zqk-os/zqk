@@ -4,7 +4,7 @@ import (
 	"slices"
 	"sort"
 
-	"github.com/lanceman/zqk/pkg/nildecode"
+	"github.com/zqk-os/zqk/pkg/nildecode"
 )
 
 // MaybeStripRedundantTopLevelTraits removes top-level obj["traits"] when its expanded trait set

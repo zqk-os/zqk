@@ -9,15 +9,15 @@ import (
 	"sync"
 	"syscall"
 
-	"github.com/lanceman/zqk/pkg/execwrap"
+	"github.com/zqk-os/zqk/pkg/execwrap"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/federation"
-	"github.com/lanceman/zqk/pkg/goroutinelabels"
-	"github.com/lanceman/zqk/pkg/logging"
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/storage"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/federation"
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/storage"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 var (
@@ -99,7 +99,7 @@ func (h *MeshLeaseSupervisionHandler) Execute(ctx context.Context, job *Schedule
 				SLog(h.logger).Info(fmt.Sprintf("Lease %s is revoked, terminating subprocess", leaseID)).Log()
 			}
 			// zqk_session lifecycle: active → archived (no "revoked" status).
-			// TRACK: BLI-REDACTED — align mesh lease terminal statuses with lifecycle.
+			// TRACK: BLI-1785443942668406000-1ec5c811 — align mesh lease terminal statuses with lifecycle.
 			lease[objects.FieldKeyStatus] = objects.ObjectStatusArchived
 			if err := h.storage.Update(ctx, secCtx, leaseID, lease); err != nil {
 				return fmt.Errorf("failed to update status to archived for lease %s: %w", leaseID, err)

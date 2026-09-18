@@ -6,8 +6,8 @@ import (
 
 	"github.com/briandowns/spinner"
 	"github.com/fatih/color"
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/logging"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/logging"
 	"golang.org/x/term"
 )
 

@@ -5,7 +5,7 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/metricsrecording"
+	"github.com/zqk-os/zqk/pkg/metricsrecording"
 )
 
 // FileLockMetrics tracks metrics for file lock operations

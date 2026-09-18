@@ -8,7 +8,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/goroutinelabels"
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 )
 
 func TestWatchdogInterceptor_StalledWorkerAborted(t *testing.T) {

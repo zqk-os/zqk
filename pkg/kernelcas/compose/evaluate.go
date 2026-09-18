@@ -8,12 +8,12 @@ import (
 
 	"gopkg.in/yaml.v3"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/paths"
-	"github.com/lanceman/zqk/pkg/pipeline"
-	"github.com/lanceman/zqk/pkg/shovelready"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/pipeline"
+	"github.com/zqk-os/zqk/pkg/shovelready"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // DecideOutcome is the result of evaluating DECIDE rules for a mutation.
@@ -91,7 +91,7 @@ func applyDecideRule(ctx context.Context, out *DecideOutcome, in MutationInput, 
 			// Fail closed without audited reason / AllowCoreObjectDelete / elevated delete.
 			// Do NOT treat ZQK_TEST_ROOT as a Decide bypass — that made
 			// TestDecide_eraseCriticalRefusesWithoutReason flake under scheduler
-			// (plan=break_glass instead of refuse). TRACK: BLI-REDACTED
+			// (plan=break_glass instead of refuse). TRACK: BLI-1785723654802038000-b14064bc
 			elevated := pkgctx.MayHardDeleteCoreWithoutReason(pkgctx.GetSecurityContext(ctx))
 			allowed := pkgctx.GetAllowCoreObjectDelete(ctx) || strings.TrimSpace(in.Reason) != "" || elevated
 			if !allowed {
@@ -123,7 +123,7 @@ func applyDecideRule(ctx context.Context, out *DecideOutcome, in MutationInput, 
 	case OpLifecyclePreconditions:
 		// Attached for observability / materialize. Transition and status-hold
 		// tokens are evaluated by GoValidator.dispatchPrecondition on the storage
-		// save path (Plane A). TRACK: BLI-REDACTED
+		// save path (Plane A). TRACK: BLI-1785439365092316000-2c09c364
 	default:
 		// Object-shape overlay rules are evaluated on the object during validation, not here.
 	}

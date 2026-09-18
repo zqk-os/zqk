@@ -15,8 +15,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/concurrency"
-	"github.com/lanceman/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/concurrency"
+	"github.com/zqk-os/zqk/pkg/errfmt"
 )
 
 // pathCacheSnapshot is an immutable snapshot of the alias map for one project root.

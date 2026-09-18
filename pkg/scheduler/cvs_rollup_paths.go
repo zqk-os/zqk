@@ -4,7 +4,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/lanceman/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/paths"
 )
 
 // ResolveCVSRollupLatestJSONPath returns the filesystem path to read rollup JSON after cvs_convergence_orchestrate.sh.

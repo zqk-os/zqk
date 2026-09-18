@@ -5,8 +5,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/lanceman/zqk/pkg/brand"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/brand"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // GetExecutableName returns the name of the current executable

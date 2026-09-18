@@ -1,10 +1,10 @@
 package system
 
 import (
-	"github.com/lanceman/zqk/pkg/datacell"
-	caspkg "github.com/lanceman/zqk/pkg/storage/cas"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
-	"github.com/lanceman/zqk/pkg/zqkenv"
+	"github.com/zqk-os/zqk/pkg/datacell"
+	caspkg "github.com/zqk-os/zqk/pkg/storage/cas"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 
 	stdcontext "context"
 	"fmt"
@@ -14,15 +14,15 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/lanceman/zqk/internal/cli"
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/goroutinelabels"
-	"github.com/lanceman/zqk/pkg/logging"
-	"github.com/lanceman/zqk/pkg/migration/parser"
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/storage"
-	"github.com/lanceman/zqk/pkg/validation"
+	"github.com/zqk-os/zqk/internal/cli"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/migration/parser"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/validation"
 )
 
 var cacheInvalidationHandler cli.CacheInvalidationHandler
@@ -340,17 +340,7 @@ func runCheck(cmd *cobra.Command, args []string) error {
 		// to the async "follow" path so the check actually runs to completion inside the
 		// scheduler job budget (instead of returning immediately and doing nothing).
 		if shouldUseAsyncFollowForBackground() {
-			timeout := 30 * time.Minute // Default 30 minutes (reasonable for large checks)
-			if cmdTimeout := cli.GetTimeout(cmd); cmdTimeout > 0 {
-				timeout = cmdTimeout
-			} else if cmd.Context() != nil {
-				if deadline, ok := cmd.Context().Deadline(); ok {
-					calculatedTimeout := time.Until(deadline)
-					if calculatedTimeout > 0 {
-						timeout = calculatedTimeout
-					}
-				}
-			}
+			timeout := CalculateCheckProgressiveTimeout(cmd, args)
 			return runCheckAsyncWithFollow(cmd, args, timeout)
 		}
 		return runCheckAsyncNonBlocking(cmd, args)
@@ -392,17 +382,7 @@ func runCheck(cmd *cobra.Command, args []string) error {
 	}
 
 	// Default: wait for async check; progress is shown via TerminalProgressSubscriber (heartbeat every 5s)
-	timeout := 30 * time.Minute // Default 30 minutes (reasonable for large checks)
-	if cmdTimeout := cli.GetTimeout(cmd); cmdTimeout > 0 {
-		timeout = cmdTimeout
-	} else if cmd.Context() != nil {
-		if deadline, ok := cmd.Context().Deadline(); ok {
-			calculatedTimeout := time.Until(deadline)
-			if calculatedTimeout > 0 {
-				timeout = calculatedTimeout
-			}
-		}
-	}
+	timeout := CalculateCheckProgressiveTimeout(cmd, args)
 	return runCheckAsyncWithFollow(cmd, args, timeout)
 }
 

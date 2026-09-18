@@ -5,13 +5,13 @@ import (
 	"strings"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/logging"
 )
 
 // ResilientClient wraps primary and secondary clients to handle request timeout and fallback.
 // When secondary is nil, StaticMockClient is used after retries (offline mock fallback).
-// TRACK: BLI-REDACTED
+// TRACK: BLI-1783631888120135000-843bc301
 type ResilientClient struct {
 	primary           Client
 	secondary         Client

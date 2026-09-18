@@ -5,7 +5,7 @@
 package cli
 
 import (
-	"github.com/lanceman/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/spf13/cobra"
 )
 

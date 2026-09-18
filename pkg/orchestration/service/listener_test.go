@@ -5,9 +5,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/lifecycle"
-	"github.com/lanceman/zqk/pkg/orchestration"
-	"github.com/lanceman/zqk/pkg/orchestration/ticker"
+	"github.com/zqk-os/zqk/pkg/lifecycle"
+	"github.com/zqk-os/zqk/pkg/orchestration"
+	"github.com/zqk-os/zqk/pkg/orchestration/ticker"
 )
 
 type mockOrchestrator struct{}

@@ -7,13 +7,13 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/lanceman/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/storage"
 
 	"gopkg.in/yaml.v3"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/objects"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/objects"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 func (m *DSIAMigrationUtility) MigrateObjectToDSIA(ctx context.Context, secCtx *pkgctx.SecurityContext, kind, hash, filePath string, removeOldFile bool) error {

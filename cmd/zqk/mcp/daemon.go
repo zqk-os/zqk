@@ -8,11 +8,11 @@ import (
 	"strings"
 	"syscall"
 
-	"github.com/lanceman/zqk/internal/cli"
-	clipkg "github.com/lanceman/zqk/pkg/cli"
-	"github.com/lanceman/zqk/pkg/cli/bldr_cli_cmd_v1"
-	"github.com/lanceman/zqk/pkg/logging"
-	"github.com/lanceman/zqk/pkg/zqkenv"
+	"github.com/zqk-os/zqk/internal/cli"
+	clipkg "github.com/zqk-os/zqk/pkg/cli"
+	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 	"github.com/spf13/cobra"
 )
 
@@ -43,7 +43,7 @@ func runDaemon(cmd *cobra.Command, args []string) error {
 
 	// Do not derive from cmd.Context(): agent/IDE shells often cancel it when stdin
 	// closes or the parent request ends, which exited ServeTCP immediately (no listen).
-	// Lifetime is SIGINT/SIGTERM. TRACK: BLI-REDACTED — hourglass.
+	// Lifetime is SIGINT/SIGTERM. TRACK: BLI-1784969955962654000-dc689643 — hourglass.
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM) // Background: request-or-shutdown derived
 	defer stop()
 	cmd.SetContext(ctx)

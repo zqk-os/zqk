@@ -5,9 +5,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/llm"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
-	"github.com/lanceman/zqk/pkg/zqkenv"
+	"github.com/zqk-os/zqk/pkg/llm"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
 func TestFormatLLMTrace_includesPromptAndResponse(t *testing.T) {

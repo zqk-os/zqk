@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/testrunner"
+	"github.com/zqk-os/zqk/pkg/testrunner"
 )
 
 func TestScanParallelSafety(t *testing.T) {

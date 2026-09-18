@@ -6,15 +6,15 @@ import (
 	"strings"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/execwrap"
+	"github.com/zqk-os/zqk/pkg/execwrap"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/logging"
-	"github.com/lanceman/zqk/pkg/maintenance"
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/paths"
-	storagepkg "github.com/lanceman/zqk/pkg/storage"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/maintenance"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
+	storagepkg "github.com/zqk-os/zqk/pkg/storage"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // Stale agent worktrees under .zqk/worktrees are wiped even if the ATK still looks "active"
@@ -146,7 +146,7 @@ func (h *IdleCleanupHandler) shouldDropAgentWorktree(
 		return "terminal_status:" + status, true
 	}
 	if age > agentWorktreeStaleAfter {
-		// TRACK: BLI-REDACTED — tighten once swarm teardown is reliable end-to-end
+		// TRACK: BLI-1785886134649966000-7732876c — tighten once swarm teardown is reliable end-to-end
 		return "stale_active_mtime", true
 	}
 	return "", false

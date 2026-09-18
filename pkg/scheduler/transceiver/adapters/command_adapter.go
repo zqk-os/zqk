@@ -6,13 +6,13 @@ import (
 	"encoding/json"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/execwrap"
+	"github.com/zqk-os/zqk/pkg/execwrap"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/logging"
-	"github.com/lanceman/zqk/pkg/scheduler/transceiver/types"
-	"github.com/lanceman/zqk/pkg/shellcmd"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/scheduler/transceiver/types"
+	"github.com/zqk-os/zqk/pkg/shellcmd"
 )
 
 // CommandAdapter implements the ProtocolAdapter interface for local command execution

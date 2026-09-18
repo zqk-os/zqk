@@ -5,8 +5,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/paths"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/paths"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 func TestLifecycleLoader_LoadLifecycle(t *testing.T) {
@@ -274,7 +274,7 @@ func TestLifecycleLoader_IsValidTransition(t *testing.T) {
 		{"verification_matrix", "active", "draft", false},
 		{"verification_matrix", "archived", "active", false},
 		{"priority_plan", "active", "grooming", true},
-		{"priority_plan", "in_progress", "grooming", false}, // check valve; TRACK: BLI-REDACTED
+		{"priority_plan", "in_progress", "grooming", false}, // check valve; TRACK: BLI-1785439369431933000-f0cccd6c
 		{"priority_plan", "grooming", "active", true},
 		{"priority_plan", "complete", "grooming", true},
 		{"priority_plan", "complete", "active", true},

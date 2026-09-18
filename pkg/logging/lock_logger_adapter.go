@@ -1,7 +1,7 @@
 package logging
 
 import (
-	"github.com/lanceman/zqk/pkg/concurrency"
+	"github.com/zqk-os/zqk/pkg/concurrency"
 )
 
 // LockLoggerAdapter adapts logging.Logger to concurrency.LockLogger

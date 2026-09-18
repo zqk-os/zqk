@@ -3,8 +3,8 @@ package context
 import (
 	"maps"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/errfmt"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/errfmt"
 )
 
 // sharedProfileLoader resolves CLI profiles during context merge (Derive, chain adapters) where no ContextManager is available.

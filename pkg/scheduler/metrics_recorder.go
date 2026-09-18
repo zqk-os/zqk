@@ -3,8 +3,8 @@ package scheduler
 import (
 	"time"
 
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/observability"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/observability"
 )
 
 // getSchedulerMetricsRecorder gets a metrics recorder for scheduler operations
