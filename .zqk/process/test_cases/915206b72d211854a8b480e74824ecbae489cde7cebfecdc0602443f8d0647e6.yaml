@@ -1,0 +1,19 @@
+created_at: "2026-09-18T23:04:52Z"
+created_by: ACC-1785920548450214012-68b850c0
+criteria_refs:
+    - CRIT-1789772691823583000-a0ed9d54
+    - CRIT-1789772691823584000-0ea7816a
+    - CRIT-1789772691823585000-914ffc4c
+description: ""
+id: TST-1789772691823583001-fa28a96d
+kind: test_case
+namespace_id: zqk:kernel
+origin_project: zqk
+origin_system: zqk
+path_or_id: pkg/dummy/path_test.go
+schema_version: 2.0.0
+status: originated
+title: 'Test Suite: Replay WAL and change journal via zqk rollback to survive kill -9'
+updated_at: "2026-09-18T23:06:13Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

@@ -1,0 +1,28 @@
+Monitor the Knowledge Kernel WAL and perform real-time QA audits.
+
+The Truth Sentinel is the autonomous guardian of ZQK's architectural integrity.
+It monitors every status transition in the WAL and performs: 
+  1. Structural AST Audits (Enforcing DRY, Abstraction, Error Handling)
+  2. Smoke-and-Mirrors Detection (Unimplemented TODOs, logic placeholders)
+  3. Cryptographic Sign-off (Issuing QASuccess tokens)
+
+Flags:
+    --ids <stringSlice> (default: [])
+      Object ids to audit when --once is set
+    --once
+      Audit --ids then exit (do not watch the WAL)
+
+  Run the sentinel
+  zqk.test system truth-sentinel
+  Audit listed ids then exit
+  zqk.test system truth-sentinel --once --ids BLI-EXAMPLE-001
+
+Usage:
+  zqk.test system truth-sentinel [flags]
+
+Flags:
+      --ids strings   Object ids to audit when --once is set
+      --once          Audit --ids then exit (do not watch the WAL)
+
+Global Flags:
+      --allow-degraded   Allow scheduler-dependent commands to run when scheduler daemon is not running

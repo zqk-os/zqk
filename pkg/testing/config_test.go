@@ -123,4 +123,9 @@ func TestSetupTestEnvironment(t *testing.T) {
 	if _, err := fileutil.Stat(specsDir); fileutil.IsNotExist(err) {
 		t.Error("specs directory was not created")
 	}
+
+	settingsPath := filepath.Join(testRoot, paths.TestSettingsFilename)
+	if _, err := fileutil.Stat(settingsPath); fileutil.IsNotExist(err) {
+		t.Error("test settings file was not created")
+	}
 }

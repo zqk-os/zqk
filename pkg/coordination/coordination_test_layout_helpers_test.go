@@ -8,7 +8,6 @@ import (
 
 	"gopkg.in/yaml.v3"
 
-	clctx "github.com/zqk-os/zqk/internal/cli/context"
 	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/specbuilder/builders"
 	"github.com/zqk-os/zqk/pkg/storage"
@@ -45,7 +44,7 @@ type testSettingsYAMLShapeCoord struct {
 func writeMinimalTestSettingsYAMLCoord(testRoot string) error {
 	p := filepath.Join(testRoot, paths.TestSettingsFilename)
 	body := testSettingsYAMLShapeCoord{
-		Version: clctx.DefaultBrandSettingsVersion,
+		Version: paths.DefaultBrandSettingsVersion,
 		Paths:   map[string]any{},
 	}
 	data, err := yaml.Marshal(body)
@@ -99,8 +98,6 @@ func moduleRootFromGoEnvCoord(t *testing.T) string {
 	}
 	return mod
 }
-
-
 
 func copyObjectSpecYAMLFilesToTestRootCoord(testRoot, projectRoot string) error {
 	return testenvroot.CopyObjectSpecsFromProject(testRoot, projectRoot)

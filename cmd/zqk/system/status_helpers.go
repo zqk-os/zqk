@@ -199,6 +199,14 @@ func getSystemHealthDataMCPFast(projectRoot string) map[string]any {
 func getSystemHealthData(projectRoot string) map[string]any {
 	healthData := map[string]any{}
 
+	if projectRoot == emptyValue || !paths.IsValidProjectRoot(projectRoot) {
+		healthData[objects.FieldKeyStatus] = "uninitialized"
+		healthData["error"] = "project root not found or uninitialized; run 'zqk system init'"
+		healthData["check_failed"] = true
+		healthData["scheduler"] = map[string]any{"running": false}
+		return healthData
+	}
+
 	// Check scheduler status
 	schedulerRunning, _, err := scheduler.IsSchedulerRunning(projectRoot)
 	if err != nil {

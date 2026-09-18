@@ -100,6 +100,8 @@ type saveRequest struct {
 // Note: For cross-process locking, file-based locks would be needed, but that's not
 // currently implemented as hash registry operations are expected to be fast and
 // typically single-process.
+//
+// See docs/architecture/STORAGE_COORDINATION.md for lifecycle and synchronization sequence diagrams.
 type HashRegistry struct {
 	kind         string
 	dir          string

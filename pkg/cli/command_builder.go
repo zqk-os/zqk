@@ -410,6 +410,9 @@ func (b *CommandBuilder) Build() *cobra.Command {
 
 	// Add custom flags
 	for _, flagConfig := range b.customFlags {
+		if cmd.Flags().Lookup(flagConfig.Name) != nil {
+			continue
+		}
 		switch flagConfig.Type {
 		case FlagTypeString:
 			defaultValue := ""

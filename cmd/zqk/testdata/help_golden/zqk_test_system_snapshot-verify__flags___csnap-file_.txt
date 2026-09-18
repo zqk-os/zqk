@@ -1,0 +1,21 @@
+Verify that a compressed snapshot's expanded data matches the current
+live objects in the system. This validates that the snapshot accurately
+captured the system state.
+
+  Verify snapshot against live objects
+  zqk.test system snapshot-verify test-scenarios/my-snapshot/snapshot.csnap
+  Verify with detailed comparison
+  zqk.test system snapshot-verify snapshot.csnap --verbose
+  Verify specific fields only
+  zqk.test system snapshot-verify snapshot.csnap --fields id,kind,status
+
+Usage:
+  zqk.test system snapshot-verify [flags] <csnap-file>
+
+Flags:
+      --fields strings    Specific fields to compare (default: all fields)
+      --max-objects int   Maximum number of objects to verify (0 = all) (default 10)
+      --strict            Fail on any mismatch (default: report all mismatches)
+
+Global Flags:
+      --allow-degraded   Allow scheduler-dependent commands to run when scheduler daemon is not running

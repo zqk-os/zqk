@@ -4,6 +4,6 @@ const emptyValue = ""
 
 func init() {
 	// Register default strategies
-	RegisterStrategy(NewSequentialStrategy())
-	RegisterStrategy(NewUUIDStrategy())
+	_ = RegisterStrategy(NewSequentialStrategy())
+	_ = RegisterStrategy(NewUUIDStrategy())
 }

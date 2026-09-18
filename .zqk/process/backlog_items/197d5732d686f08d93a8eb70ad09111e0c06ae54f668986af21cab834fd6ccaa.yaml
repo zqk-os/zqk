@@ -1,0 +1,26 @@
+acceptance_considerations: Kernel boots cleanly after kill -9, recovers the Write-Ahead Log (WAL), replays the change_journal, and allows zqk rollback to rewind and resume execution with zero context loss.
+created_at: "2026-09-18T23:04:52Z"
+created_by: ACC-1785920548450214012-68b850c0
+criteria_refs:
+    - CRIT-1789772691823583000-a0ed9d54
+    - CRIT-1789772691823584000-0ea7816a
+    - CRIT-1789772691823585000-914ffc4c
+description: 'Implementation and verification pipeline for: Replay WAL and change journal via zqk rollback to survive kill -9'
+estimated_effort: ""
+id: BLI-1789772691823583000-556a797f
+kind: backlog_item
+milestone_refs:
+    - MIL-1789672699275510000-40c8cee7
+namespace_id: zqk:kernel
+priority: high
+priority_plan_ref: PRI-DEMO-SHOWCASE-001
+priority_tier: P1
+problem_statement: Monolithic AI agent state collapses and loses all memory on process death or network failure, requiring expensive and non-deterministic full prompt re-runs.
+requirement_refs:
+    - REQ-1789772691731215000-a5ebbd62
+schema_version: 2.0.0
+status: planned
+title: 'Implement: Replay WAL and change journal via zqk rollback to survive kill -9'
+updated_at: "2026-09-18T23:07:34Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

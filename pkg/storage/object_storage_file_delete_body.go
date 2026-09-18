@@ -19,6 +19,20 @@ import (
 	"github.com/zqk-os/zqk/pkg/when"
 )
 
+func (f *FileObjectStorage) appendDeleteToWAL(kind, id string) error {
+	if f.wal == nil {
+		return nil
+	}
+	return concurrency.RunInLockWithLogger(
+		&f.walMu,
+		locknames.LockNameDeleteAppendWal,
+		logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)),
+		func() error {
+			return AppendToWALAndBuffer(f.wal, f.writeBuf, "delete", kind, id, nil, true)
+		},
+	)
+}
+
 func (f *FileObjectStorage) deleteImpl(ctx context.Context, secCtx *pkgctx.SecurityContext, id string, cascade bool) error {
 	// Require CLI authorization for deletions
 	// This prevents direct API calls from deleting objects without going through CLI
@@ -87,7 +101,9 @@ func (f *FileObjectStorage) deleteImpl(ctx context.Context, secCtx *pkgctx.Secur
 				return errfmt.Newf(ErrMsgUnlinkRefsFail).Wrap(err)
 			}
 			if f.projectRoot != emptyValue {
-				_ = caspkg.FlushAllListingIndexesForProjectRootWithTimeout(f.projectRoot, IndexFlushAfterCreateTimeout)
+				if err := caspkg.FlushAllListingIndexesForProjectRootWithTimeout(f.projectRoot, IndexFlushAfterCreateTimeout); err != nil {
+					logging.Fluent(logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).Error(ErrMsgSwallowedError, err).Log()
+				}
 			}
 			dependents, depErr = f.findDependents(ctx, id, kind)
 			if depErr != nil {
@@ -115,11 +131,8 @@ func (f *FileObjectStorage) deleteImpl(ctx context.Context, secCtx *pkgctx.Secur
 	if IsCLIOperation(ctx, secCtx) && f.writeBuf != nil && f.wal != nil {
 		// Enqueue the delete BEFORE waiting, so the worker will definitively process it
 		// even if the worker is currently writing an update.
-		if err := concurrency.RunInLockWithLogger(&f.walMu, locknames.LockNameDeleteAppendWal, logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)), func() error {
-			_ = AppendToWALAndBuffer(f.wal, f.writeBuf, "delete", kind, id, nil, true)
-			return nil
-		}); err != nil {
-			logging.Fluent(logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).Error(ErrMsgLockFailedGen, err).Log()
+		if err := f.appendDeleteToWAL(kind, id); err != nil {
+			return errfmt.Newf(ErrMsgEnqueueDeleteFail).Wrap(err)
 		}
 		f.writeBehindWorker.Notify()
 
@@ -144,20 +157,9 @@ func (f *FileObjectStorage) deleteImpl(ctx context.Context, secCtx *pkgctx.Secur
 	if audit.HasCLIMarker(ctx) {
 		skipWriteBehind = true
 	}
-	var appendErr error
-	var didAppend bool
 	if !skipWriteBehind && f.writeBuf != nil && f.wal != nil {
-		if err := concurrency.RunInLockWithLogger(&f.walMu, locknames.LockNameDeleteAppendWal, logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)), func() error {
-			didAppend = true
-			appendErr = AppendToWALAndBuffer(f.wal, f.writeBuf, "delete", kind, id, nil, true)
-			return nil
-		}); err != nil {
-			logging.Fluent(logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).Error(ErrMsgLockFailedGen, err).Log()
-		}
-	}
-	if didAppend {
-		if appendErr != nil {
-			return errfmt.Newf(ErrMsgEnqueueDeleteFail).Wrap(appendErr)
+		if err := f.appendDeleteToWAL(kind, id); err != nil {
+			return errfmt.Newf(ErrMsgEnqueueDeleteFail).Wrap(err)
 		}
 		f.writeBehindWorker.Notify()
 		executeChangeNotification(ctx, OpDelete, kind, id, existing)
@@ -199,7 +201,9 @@ func (f *FileObjectStorage) deleteImpl(ctx context.Context, secCtx *pkgctx.Secur
 		// Best-effort: drop any leftover CAS mapping for the same id (migration dual-write).
 		if f.usesContentAddressableStorage(kind) && !StreamStorageEnabledForKind(kind) {
 			if cas, casErr := f.getContentAddressableStorage(kind); casErr == nil && cas != nil {
-				_ = cas.Delete(id)
+				if err := cas.Delete(id); err != nil && !IsExpectedMissingErr(err) {
+					logging.Fluent(logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).Error(ErrMsgSwallowedError, err).Log()
+				}
 				if kindDir := f.GetKindDir(kind); kindDir != emptyValue {
 					removeOrphanCASFilesForObjectID(id, kindDir)
 				}

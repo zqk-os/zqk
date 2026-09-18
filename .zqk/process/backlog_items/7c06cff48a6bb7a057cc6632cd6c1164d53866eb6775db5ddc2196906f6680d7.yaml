@@ -1,0 +1,26 @@
+acceptance_considerations: The MCP sandbox jail actively intercepts illegal absolute path traversal (e.g. ~/.ssh or ~/.aws), fails closed gracefully, logs the attempt, and alerts the supervisor.
+created_at: "2026-09-18T23:05:03Z"
+created_by: ACC-1785920548450214012-68b850c0
+criteria_refs:
+    - CRIT-1789772702642672000-ffdea11b
+    - CRIT-1789772702642673000-b0f86b7d
+    - CRIT-1789772702642674000-f64df786
+description: 'Implementation and verification pipeline for: Fail-closed MCP sandbox directory jail actively traps prompt injection'
+estimated_effort: ""
+id: BLI-1789772702642672000-5552ff66
+kind: backlog_item
+milestone_refs:
+    - MIL-1789672699275510000-40c8cee7
+namespace_id: zqk:kernel
+priority: high
+priority_plan_ref: PRI-DEMO-SHOWCASE-001
+priority_tier: P1
+problem_statement: Traditional agent frameworks execute arbitrary shell instructions blindly, leaving host secrets and private keys vulnerable to prompt injection.
+requirement_refs:
+    - REQ-1789772702497411000-813b536e
+schema_version: 2.0.0
+status: planned
+title: 'Implement: Fail-closed MCP sandbox directory jail actively traps prompt injection'
+updated_at: "2026-09-18T23:07:40Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

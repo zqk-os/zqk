@@ -9,7 +9,6 @@ import (
 
 	"gopkg.in/yaml.v3"
 
-	clctx "github.com/zqk-os/zqk/internal/cli/context"
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/paths"
 )
@@ -124,7 +123,7 @@ type testSettingsShape struct {
 func writeTestSettingsFile(testRoot string) error {
 	path := filepath.Join(testRoot, paths.TestSettingsFilename)
 	body := testSettingsShape{
-		Version: clctx.DefaultBrandSettingsVersion,
+		Version: paths.DefaultBrandSettingsVersion,
 		Paths:   map[string]any{},
 	}
 	data, err := yaml.Marshal(body)

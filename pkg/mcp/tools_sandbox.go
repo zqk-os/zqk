@@ -37,11 +37,53 @@ func (s *Server) fileSandboxRoot() string {
 	return fileSandboxRoot(s.GetProjectRoot())
 }
 
-func resolveSandboxPath(root, path string) string {
-	if filepath.IsAbs(path) || root == "" || root == "." {
-		return path
+func resolveSandboxPath(root, path string) (string, error) {
+	if path == "" {
+		return "", fmt.Errorf("path is required")
 	}
-	return filepath.Join(root, path)
+	if root == "" || root == "." {
+		root = "."
+	}
+	absRoot, err := filepath.Abs(root)
+	if err != nil {
+		return "", fmt.Errorf("failed to resolve sandbox root: %w", err)
+	}
+	absRoot = filepath.Clean(absRoot)
+
+	var resolvedPath string
+	if filepath.IsAbs(path) {
+		if !paths.UnderProjectRoot(absRoot, path) {
+			return "", fmt.Errorf("access denied: path %q escapes sandbox root", path)
+		}
+		resolvedPath = filepath.Clean(path)
+	} else {
+		var err error
+		resolvedPath, err = paths.ProjectPath(absRoot, path)
+		if err != nil {
+			return "", fmt.Errorf("access denied: path %q escapes sandbox root: %w", path, err)
+		}
+	}
+
+	evalRoot := absRoot
+	if ev, err := filepath.EvalSymlinks(absRoot); err == nil {
+		evalRoot = ev
+	}
+
+	// If the target exists (or its directory exists), verify symlinks don't escape evalRoot
+	evalDir, evalErr := filepath.EvalSymlinks(filepath.Dir(resolvedPath))
+	if evalErr == nil {
+		if !paths.UnderProjectRoot(evalRoot, evalDir) {
+			return "", fmt.Errorf("access denied: directory symlink traversal outside sandbox root")
+		}
+	}
+	evalPath, evalErr := filepath.EvalSymlinks(resolvedPath)
+	if evalErr == nil {
+		if !paths.UnderProjectRoot(evalRoot, evalPath) {
+			return "", fmt.Errorf("access denied: file symlink traversal outside sandbox root")
+		}
+	}
+
+	return resolvedPath, nil
 }
 
 func (s *Server) isHighRiskBashCommand(ctx context.Context, cmdStr string) bool {
@@ -426,7 +468,10 @@ func (s *Server) handleAgentReadFileTool(ctx context.Context, args map[string]an
 	if !ok || path == "" {
 		return nil, fmt.Errorf("path is required")
 	}
-	targetPath := resolveSandboxPath(s.fileSandboxRoot(), path)
+	targetPath, err := resolveSandboxPath(s.fileSandboxRoot(), path)
+	if err != nil {
+		return nil, err
+	}
 	content, err := fileutil.ReadFile(targetPath)
 	if err != nil {
 		return nil, err
@@ -450,7 +495,10 @@ func (s *Server) handleAgentReadCodeTool(ctx context.Context, args map[string]an
 	if !ok || path == "" {
 		return nil, fmt.Errorf("path is required")
 	}
-	targetPath := resolveSandboxPath(s.fileSandboxRoot(), path)
+	targetPath, err := resolveSandboxPath(s.fileSandboxRoot(), path)
+	if err != nil {
+		return nil, err
+	}
 
 	content, err := fileutil.ReadFile(targetPath)
 	if err != nil {
@@ -486,19 +534,21 @@ func (s *Server) handleAgentWriteCodeTool(ctx context.Context, args map[string]a
 	result := fmt.Sprintf("Successfully wrote to %s\n", path)
 
 	if strings.HasSuffix(path, ".go") {
-		targetFile := resolveSandboxPath(s.fileSandboxRoot(), path)
-		auditor := qa.NewASTAuditor()
-		violations, err := auditor.AuditFile(targetFile)
-		if err != nil {
-			result += fmt.Sprintf("Warning: Failed to parse Go code for AST audit: %v\n", err)
-		} else if len(violations) > 0 {
-			result += "\n--- CRITICAL AST AUDIT VIOLATIONS DETECTED ---\n"
-			for _, v := range violations {
-				result += fmt.Sprintf("- [%s] %s (Line %d)\n", v.Severity, v.Message, v.Pos.Line)
+		targetFile, err := resolveSandboxPath(s.fileSandboxRoot(), path)
+		if err == nil {
+			auditor := qa.NewASTAuditor()
+			violations, err := auditor.AuditFile(targetFile)
+			if err != nil {
+				result += fmt.Sprintf("Warning: Failed to parse Go code for AST audit: %v\n", err)
+			} else if len(violations) > 0 {
+				result += "\n--- CRITICAL AST AUDIT VIOLATIONS DETECTED ---\n"
+				for _, v := range violations {
+					result += fmt.Sprintf("- [%s] %s (Line %d)\n", v.Severity, v.Message, v.Pos.Line)
+				}
+				result += "You MUST fix these architectural violations immediately.\n"
+			} else {
+				result += "AST Audit Passed: Code is structurally compliant with ZQK standards.\n"
 			}
-			result += "You MUST fix these architectural violations immediately.\n"
-		} else {
-			result += "AST Audit Passed: Code is structurally compliant with ZQK standards.\n"
 		}
 	}
 

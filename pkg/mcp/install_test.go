@@ -2,4 +2,12 @@ package mcp
 
 import "testing"
 
-func TestPlaceholder_install_test(t *testing.T) {}
+func TestMCPServerConfig_Basic(t *testing.T) {
+	cfg := mcpServerConfig{
+		Command: "zqk",
+		Args:    []string{"mcp", "serve"},
+	}
+	if cfg.Command != "zqk" {
+		t.Fatalf("expected command zqk, got %s", cfg.Command)
+	}
+}

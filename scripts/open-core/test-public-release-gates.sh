@@ -19,13 +19,13 @@ sh -n "$ROOT/scripts/open-core/check-public-release-payload.sh"
 sh "$ROOT/scripts/open-core/check-public-release-payload.sh" "$ROOT"
 
 # Prove the gate fails closed on an explicitly forbidden release file.
-mkdir -p "$TMP_REPO/cmd/zqk-community" "$TMP_REPO/config" "$TMP_REPO/docs/onboarding" "$TMP_REPO/scripts/open-core"
+mkdir -p "$TMP_REPO/cmd/zqk" "$TMP_REPO/config" "$TMP_REPO/docs/onboarding" "$TMP_REPO/scripts/open-core"
 for path in README.md LICENSE NOTICE SECURITY.md CODE_OF_CONDUCT.md CONTRIBUTING.md; do
 	printf '%s\n' "fixture" >"$TMP_REPO/$path"
 done
 printf '%s\n' 'module github.com/zqk-os/zqk' >"$TMP_REPO/go.mod"
 printf '%s\n' 'brand:' '  executable_name: zqk' >"$TMP_REPO/config/zqk.yaml"
-printf '%s\n' 'package main' >"$TMP_REPO/cmd/zqk-community/main.go"
+printf '%s\n' 'package main' >"$TMP_REPO/cmd/zqk/main.go"
 printf '%s\n' 'fixture' >"$TMP_REPO/docs/INDEX.md"
 printf '%s\n' 'fixture' >"$TMP_REPO/docs/onboarding/COMMUNITY_FIRST_RUN.md"
 cp "$ROOT/scripts/open-core/check-public-release-payload.sh" "$TMP_REPO/scripts/open-core/"
@@ -50,8 +50,8 @@ fi
 (
 	cd "$ROOT"
 	unset ZQK_PROJECT_ROOT
-	go test ./cmd/zqk-community/app ./cmd/zqk-community/system ./cmd/zqk-community/test -timeout 10m
-	CGO_ENABLED=0 go build -buildvcs=false -o "$TMP_BIN" ./cmd/zqk-community
+	go test ./cmd/zqk/app ./cmd/zqk/system ./cmd/zqk/test -timeout 10m
+	CGO_ENABLED=0 go build -buildvcs=false -o "$TMP_BIN" ./cmd/zqk
 	"$TMP_BIN" --help >/dev/null
 	"$TMP_BIN" system --help >/dev/null
 	"$TMP_BIN" test dashboard --help >/dev/null

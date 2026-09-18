@@ -1,0 +1,23 @@
+Manage file lock metrics that are accumulated in memory.
+
+File lock metrics track lock acquisition times, contention rates, wait times, and system busyness.
+Metrics are accumulated in memory and can be collected/flushed to create metric objects.
+
+  View current buffered metrics
+  zqk.test system metrics file-lock view
+  Flush metrics to create a metric object
+  zqk.test system metrics file-lock flush
+  Flush with custom time window
+  zqk.test system metrics file-lock flush --window 1h
+
+Usage:
+  zqk.test system metrics file-lock [command]
+
+Available Commands:
+  flush       Flush buffered metrics to create a metric object
+  view        View current buffered file lock metrics
+
+Global Flags:
+      --allow-degraded   Allow scheduler-dependent commands to run when scheduler daemon is not running
+
+Use "zqk.test system metrics file-lock [command] --help" for more information about a command.

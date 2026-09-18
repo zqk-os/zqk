@@ -11,7 +11,6 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/zqk-os/zqk/internal/cli"
 	"github.com/zqk-os/zqk/pkg/brand"
 	"github.com/zqk-os/zqk/pkg/config"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
@@ -85,7 +84,7 @@ func (h *RunWrapperHandler) prepareRunWrapperExecution(job *ScheduledJob) runWra
 		}
 		if projectRoot == emptyValue {
 			if wd, err := fileutil.Getwd(); err == nil {
-				projectRoot = cli.ResolveProjectRoot(wd)
+				projectRoot = paths.ResolveProjectRoot(wd)
 			}
 		}
 		command = resolveSchedulerCLIBinary(projectRoot)

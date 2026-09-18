@@ -75,8 +75,14 @@ func (c *FileTransactionCoordinator) AcquireLocks(ctx context.Context, filePaths
 		// Acquire lock using strategy (NO COORDINATOR LOCK HELD - prevents deadlock)
 		handle, err := c.lockStrategy.AcquireLock(lockPath, timeout)
 		if err != nil {
-			// Release all acquired locks on failure
-			c.releaseLocks(acquiredLocks)
+			// Release all acquired locks on failure under coordinator lock (BLI-CEF-CON-001)
+			_ = concurrency.RunInLockOrLog(
+				&c.mu, locknames.LockNameFileTransactionReleaseLocks, logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)),
+				func() error {
+					c.releaseLocks(acquiredLocks)
+					return nil
+				},
+			)
 			return errfmt.Errorf(ConstMiscFailedToAcquireLockForSW, filePath, err)
 		}
 

@@ -172,6 +172,9 @@ func GetLoggerFromProfile(profile string, parentCtx ...context.Context) Logger {
 // This is the new preferred way to create loggers
 // ctx: parent context for cancellation and context-aware formatting
 func GetLoggerFromLoggingContext(ctx context.Context, loggingCtx *pkgctx.LoggingContext) Logger {
+	if loggingCtx == nil {
+		loggingCtx = pkgctx.NewLoggingContext(pkgctx.ProfileHuman)
+	}
 	// Determine profile-specific settings
 	var formatter Formatter
 	var level LogLevel

@@ -259,3 +259,9 @@ func TestConvergenceEngine_evaluateStaleConvergenceSessions(t *testing.T) {
 		t.Errorf("expected priority_plan to be created for stale session")
 	}
 }
+
+func TestConvergenceEngineShutdownTimeout_Constant(t *testing.T) {
+	if convergenceEngineShutdownTimeout != 15*time.Second {
+		t.Errorf("expected 15s convergenceEngineShutdownTimeout, got %v", convergenceEngineShutdownTimeout)
+	}
+}

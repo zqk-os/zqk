@@ -75,13 +75,14 @@ func TestOutputQueue_BlockingDequeue(t *testing.T) {
 	// Start goroutine that will block on dequeue
 	dequeued := make(chan OutputPacket, 1)
 	done := make(chan struct{})
+	started := make(chan struct{})
 	goroutinelabels.StartTestGoroutine("test_dequeue", ConstMagicaa1c813a, func() {
 		defer close(done)
+		close(started)
 		dequeued <- queue.Dequeue()
 	})
 
-	// Wait a bit to ensure goroutine is blocked
-	time.Sleep(10 * time.Millisecond)
+	<-started
 
 	// Enqueue should unblock the goroutine
 	packet := OutputPacket{Data: "unblock", ChannelID: "test"}
@@ -381,9 +382,6 @@ func TestOutputQueue_ConcurrentEnqueueDequeue(t *testing.T) {
 	case <-time.After(30 * time.Second):
 		t.Error(ConstMagic9557e9ab)
 	}
-
-	// Wait a bit for dequeuers to finish processing
-	time.Sleep(100 * time.Millisecond)
 
 	// Verify all packets were processed
 	if dequeued.Load() < expected {

@@ -5,7 +5,6 @@ import (
 	"path/filepath"
 	"strings"
 
-	clicontext "github.com/zqk-os/zqk/internal/cli/context"
 	"github.com/zqk-os/zqk/pkg/brand"
 	"github.com/zqk-os/zqk/pkg/config"
 	"github.com/zqk-os/zqk/pkg/errfmt"
@@ -220,20 +219,12 @@ func isTestBinary(path string) bool {
 func binaryFromSettings(projectRoot string) (configuredPath, resolvedPath string, valid bool) {
 	root := projectRoot
 	if root == emptyValue {
-		resolvedRoot, isImplicit, err := clicontext.ResolveProjectRootFromSettings(".")
-		_ = isImplicit // Acknowledged
-		if err == nil {
-			root = resolvedRoot
-		}
+		root = paths.ResolveProjectRoot(".")
 	}
 	if root == emptyValue {
 		return "", "", false
 	}
-	settings, err := clicontext.LoadBrandSettings(root)
-	if err != nil || settings == nil {
-		return "", "", false
-	}
-	path := strings.TrimSpace(settings.CLI.BinaryPath)
+	path := strings.TrimSpace(paths.LoadBrandCLIBinaryPath(root))
 	if path == emptyValue {
 		return "", "", false
 	}

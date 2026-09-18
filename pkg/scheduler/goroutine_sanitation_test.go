@@ -13,6 +13,8 @@ import (
 	"testing"
 	"time"
 
+	"go.uber.org/goleak"
+
 	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/zqk-os/zqk/pkg/scheduler"
 )
@@ -75,6 +77,7 @@ func TestGoroutineSanitation_FunctionalAcceptance(t *testing.T) {
 // CRIT-1789663120758633000-25e89aa4: Boundary & Error Handling
 // Verifies that managed goroutines handle context cancellation, timeouts, and panic recovery without leaking goroutines.
 func TestGoroutineSanitation_BoundaryAndErrorHandling(t *testing.T) {
+	defer goleak.VerifyNone(t)
 	t.Run("ContextCancellation", func(t *testing.T) {
 		ctx, cancel := context.WithCancel(context.Background())
 		started := make(chan struct{})
@@ -136,6 +139,7 @@ func TestGoroutineSanitation_BoundaryAndErrorHandling(t *testing.T) {
 // CRIT-1789663120758634000-31382b55: Integration & Conformance
 // Verifies integration with scheduler concurrency primitives and job queue contracts.
 func TestGoroutineSanitation_IntegrationAndConformance(t *testing.T) {
+	defer goleak.VerifyNone(t)
 	// Verify that scheduler activity cache uses managed synchronization and goroutinelabels
 	activityCache := scheduler.NewActivityCache()
 	if activityCache == nil {

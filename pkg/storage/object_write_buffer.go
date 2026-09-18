@@ -275,11 +275,13 @@ func AppendToWALAndBuffer(wal *ObjectWAL, buf *ObjectWriteBuffer, op, kind, id s
 	if err := wal.Append(rec); err != nil {
 		return err
 	}
+	if syncWAL {
+		if err := wal.Sync(); err != nil {
+			return err
+		}
+	}
 	seq := rec.Seq
 	buf.Enqueue(op, kind, id, seq, data)
-	if syncWAL {
-		return wal.Sync()
-	}
 	return nil
 }
 
@@ -308,11 +310,13 @@ func AppendBatchToWALAndBuffer(wal *ObjectWAL, buf *ObjectWriteBuffer, recs []*W
 	if err := wal.AppendBatch(recs); err != nil {
 		return err
 	}
+	if syncWAL {
+		if err := wal.Sync(); err != nil {
+			return err
+		}
+	}
 	for i, rec := range recs {
 		buf.Enqueue(rec.Op, rec.Kind, rec.ID, rec.Seq, decoded[i])
-	}
-	if syncWAL {
-		return wal.Sync()
 	}
 	return nil
 }

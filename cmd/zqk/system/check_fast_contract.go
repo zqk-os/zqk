@@ -35,6 +35,9 @@ func refuseReducedSurfaceWithMutatingFlags(cmd *cobra.Command) error {
 	if !checkRefsReduced(cmd) {
 		return nil
 	}
+	// BLI-CEF-USE-004: Explicitly warn user/agent so the upgrade is visible and not silent.
+	fmt.Fprintf(cmd.ErrOrStderr(), "warning: --fast or --check-refs=false cannot be combined with mutation flags (--auto-fix/--force). Upgrading to full reference integrity check.\n")
+
 	if cmd.Flags().Lookup(checkFlagFast) != nil {
 		_ = cmd.Flags().Set(checkFlagFast, "false")
 	}

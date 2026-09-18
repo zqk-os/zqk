@@ -115,7 +115,8 @@ func (cas *ContentAddressableStorage) WriteFileWithSync(filePath string, data []
 	if _, err := tmp.Write(data); err != nil {
 		return errfmt.Newf(ConstMiscFailedToWriteTempFile).Wrap(err)
 	}
-	// Per-OS durability: darwin no-ops (F_FULLFSYNC stalls); other GOOS fsync.
+	// Per-OS durability: Darwin queues file fsync to avoid blocking publication;
+	// other platforms fsync synchronously.
 	// TRACK: BLI-CEF-R2-REL-CAS-FSYNC
 	if err := CasPublishSyncFile(tmp); err != nil {
 		return err
@@ -150,7 +151,7 @@ func (cas *ContentAddressableStorage) WriteFileWithSync(filePath string, data []
 		break
 	}
 
-	// Per-OS directory durability after the hardlink (darwin no-op).
+	// Persist the published directory entry after the hardlink.
 	if err := CasPublishSyncDir(dir); err != nil {
 		return err
 	}

@@ -1,0 +1,40 @@
+Validates that work items (e.g. backlog items) trace to goals. Outputs alignment
+score (0-100).
+
+Alignment checks:
+  - Goal alignment: work items with goal_refs vs goals
+  - Alignment score: 0-100 (goal coverage; BLI-781)
+  - Use --dashboard for a comprehensive alignment view (BLI-782)
+  - Use --gaps to list only items without goal alignment
+  - Use --goal to focus on a specific goal
+  - Use --score to output only the alignment score (for scripting)
+
+  Check alignment
+  zqk.test system align
+  Alignment dashboard
+  zqk.test system align --dashboard
+  Show alignment gaps only
+  zqk.test system align --gaps
+  Alignment for a specific goal
+  zqk.test system align --goal GOAL-001
+  Score only (scripting)
+  zqk.test system align --score
+
+Usage:
+  zqk.test system align [flags]
+
+Flags:
+      --columns string          Override column widths for table output (format: field:width)
+      --dashboard               Show comprehensive alignment dashboard (score, goal coverage, and metrics)
+  -f, --format string           Output format (table, json, jsonl, yaml, csv, json-rpc, stream, agent-prompt, semantic-link) (default "table")
+      --gaps                    Show only items without goal alignment
+      --goal string             Filter by goal ID (e.g. GOAL-001); show only work aligned to this goal
+      --ignore-scheduler-down   Ignore scheduler down warning/lockdown
+  -o, --output string           Write output to file
+  -q, --quiet                   Suppress non-essential output
+      --score                   Output only the alignment score (0-100) for scripting/dashboards
+      --timeout duration        Timeout for command execution (0 = auto-calculate)
+  -v, --verbose                 Verbose output
+
+Global Flags:
+      --allow-degraded   Allow scheduler-dependent commands to run when scheduler daemon is not running

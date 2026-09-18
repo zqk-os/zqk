@@ -28,7 +28,10 @@ type hydratedJob struct {
 	err error
 }
 
-const pipelineKindLoadAndScheduleJobs = "job_management_load_and_schedule"
+const (
+	pipelineKindLoadAndScheduleJobs = "job_management_load_and_schedule"
+	hydrationWorkerWaitTimeout      = 35 * time.Second
+)
 
 // loadAndScheduleJobs loads all enabled scheduler_job objects and schedules them.
 // When reload is true (e.g. from watchJobChanges every 30s), one_time immediate jobs
@@ -462,7 +465,8 @@ func (s *Scheduler) hydrateJobs(ctx context.Context, rawJobs []map[string]any) [
 	})
 	select {
 	case <-waitDone:
-	case <-time.After(35 * time.Second):
+	case <-time.After(hydrationWorkerWaitTimeout):
+		cancel()
 		SchedulerJobManagementLog(s.logger).Warn(LogEventSchedulerJobMgmtFailedToHydrateJob).
 			WithFields(jobLogFieldsByIDAndErr("", errfmt.Errorf("hydration worker wait timed out"))...).
 			Log()

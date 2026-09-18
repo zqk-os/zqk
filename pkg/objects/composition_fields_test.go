@@ -62,6 +62,14 @@ func TestIsCompositionFieldAllowed(t *testing.T) {
 		t.Errorf("expected bundle_command_fingerprint to be allowed on criteria")
 	}
 
+	// ZqkSession composition fields
+	if !IsCompositionFieldAllowed(KindZqkSession, FieldKeySessionMode, nil) {
+		t.Errorf("expected session_mode to be allowed on zqk_session")
+	}
+	if !IsCompositionFieldAllowed(KindZqkSession, FieldKeyTokenID, nil) {
+		t.Errorf("expected token_id to be allowed on zqk_session")
+	}
+
 	// Invented random field must NOT be allowed
 	if IsCompositionFieldAllowed(KindBacklogItem, "some_fake_field_123", nil) {
 		t.Errorf("did not expect some_fake_field_123 to be allowed")

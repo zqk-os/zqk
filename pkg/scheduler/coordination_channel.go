@@ -42,6 +42,9 @@ const (
 
 	// coordinationEventLogLockTimeout bounds wait when another process holds the events.jsonl flock.
 	coordinationEventLogLockTimeout = 5 * time.Second
+
+	// eventLogEOFRetryDelay bounds the polling backoff when the event log reader hits EOF.
+	eventLogEOFRetryDelay = 50 * time.Millisecond
 )
 
 // NewCoordinationChannel constructs a channel rooted at:
@@ -239,7 +242,7 @@ func (cc *CoordinationChannel) WatchEvents(ctx context.Context) error {
 		line, err := reader.ReadBytes('\n')
 		if err != nil {
 			if err == io.EOF {
-				time.Sleep(50 * time.Millisecond)
+				time.Sleep(eventLogEOFRetryDelay)
 				continue
 			}
 			return errfmt.Newf("read event log").Wrap(err)

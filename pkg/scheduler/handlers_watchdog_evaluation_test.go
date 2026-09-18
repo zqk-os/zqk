@@ -43,3 +43,10 @@ func TestWatchdogEvaluationHandler(t *testing.T) {
 	// inside unit tests will require the full graph environment to be present,
 	// which setupSchedulerCompleteTestEnvironment provides.
 }
+
+func TestWatchdogEvaluationHandler_NilJob(t *testing.T) {
+	handler := NewWatchdogEvaluationHandler(nil, nil, ".")
+	if err := handler.Execute(context.Background(), nil); err == nil {
+		t.Fatal("expected error for nil job")
+	}
+}

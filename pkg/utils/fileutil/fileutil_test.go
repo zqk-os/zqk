@@ -173,4 +173,25 @@ func TestFileUtil_DurableWrite(t *testing.T) {
 	if perm := secSt.Mode().Perm(); perm != secureFilePerm {
 		t.Errorf("WriteDurableSecureFile perm got %o, want %o", perm, secureFilePerm)
 	}
+
+	replacement := []byte("replacement payload")
+	if err := WriteDurableStandardFile(durablePath, replacement); err != nil {
+		t.Fatalf("overwrite durable file: %v", err)
+	}
+	got, err = ReadFile(durablePath)
+	if err != nil {
+		t.Fatalf("read overwritten durable file: %v", err)
+	}
+	if string(got) != string(replacement) {
+		t.Fatalf("overwritten content = %q, want %q", got, replacement)
+	}
+	entries, err := ReadDir(dir)
+	if err != nil {
+		t.Fatalf("read durable directory: %v", err)
+	}
+	for _, entry := range entries {
+		if entry.Name() != filepath.Base(durablePath) && entry.Name() != filepath.Base(secDurablePath) {
+			t.Fatalf("durable write left temporary entry %q", entry.Name())
+		}
+	}
 }

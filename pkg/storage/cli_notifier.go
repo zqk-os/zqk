@@ -2,6 +2,7 @@ package storage
 
 import (
 	"context"
+	"fmt"
 	"sync"
 	"time"
 
@@ -45,10 +46,9 @@ type ProgressTracker struct {
 
 // NewCLINotifier creates a new CLI notifier
 // eventEmitter is required - all progress events are emitted through it via coordinator
-func NewCLINotifier(verbose, quiet bool, eventEmitter ProgressEventEmitter) *CLINotifier {
+func NewCLINotifier(verbose, quiet bool, eventEmitter ProgressEventEmitter) (*CLINotifier, error) {
 	if eventEmitter == nil {
-		// TRACK: [Notifier initialization prerequisite missing]
-		panic(ConstMiscClinotifierRequiresAProgresseventemitter)
+		return nil, fmt.Errorf("%s", ConstMiscClinotifierRequiresAProgresseventemitter)
 	}
 	// Use system context for CLI notifier initialization
 	ctx := pkgctx.NewSystemContext()
@@ -76,6 +76,7 @@ func NewCLINotifier(verbose, quiet bool, eventEmitter ProgressEventEmitter) *CLI
 		// Default to text formatter if no context
 		progressFormatter = logging.NewTextProgressFormatter()
 		profile = string(pkgctx.ProfileHuman)
+		loggingCtx = pkgctx.NewLoggingContext(pkgctx.ProfileHuman)
 	}
 
 	// Get logger from context to create progress logger
@@ -97,7 +98,7 @@ func NewCLINotifier(verbose, quiet bool, eventEmitter ProgressEventEmitter) *CLI
 		progress:       make(map[string]*ProgressTracker),
 		eventEmitter:   eventEmitter,
 		profile:        profile,
-	}
+	}, nil
 }
 
 // NotifyProgress sends a progress update

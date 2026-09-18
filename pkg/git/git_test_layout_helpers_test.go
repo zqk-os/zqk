@@ -9,7 +9,6 @@ import (
 
 	"gopkg.in/yaml.v3"
 
-	clctx "github.com/zqk-os/zqk/internal/cli/context"
 	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
@@ -22,7 +21,7 @@ type testSettingsYAMLShapeGit struct {
 func writeMinimalTestSettingsYAMLGit(testRoot string) error {
 	p := filepath.Join(testRoot, paths.TestSettingsFilename)
 	body := testSettingsYAMLShapeGit{
-		Version: clctx.DefaultBrandSettingsVersion,
+		Version: paths.DefaultBrandSettingsVersion,
 		Paths:   map[string]any{},
 	}
 	data, err := yaml.Marshal(body)

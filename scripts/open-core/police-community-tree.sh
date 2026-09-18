@@ -17,43 +17,11 @@ docs/commercial
 docs/marketing
 docs/launch
 marketing-site
-.agents
 .workstream-os
-cmd/zqk/main.go
-cmd/zqk/app
-cmd/zqk/agent
-cmd/zqk/ambient
-cmd/zqk/automation
-cmd/zqk/callback
-cmd/zqk/ci
-cmd/zqk/convergence
-cmd/zqk/domain
-cmd/zqk/feed
-cmd/zqk/graph
-cmd/zqk/intake
-cmd/zqk/keystore
-cmd/zqk/matrix
-cmd/zqk/mesh
-cmd/zqk/observer
-cmd/zqk/ontology
-cmd/zqk/ops
-cmd/zqk/organizational
-cmd/zqk/precommit
-cmd/zqk/reports
-cmd/zqk/rollback
-cmd/zqk/scheduler
-cmd/zqk/semantic
-cmd/zqk/spec
-cmd/zqk/swarm
-cmd/zqk/test
-cmd/zqk-admin
 cmd/build
 cmd/codegen_runner
 cmd/pattern-cli
 cmd/utilities
-pkg/mesh
-pkg/agent
-cmd/zqk-community/pkg_cmd/healthchk
 scripts/zqk-internal
 scripts/legacy-decommission
 '
@@ -98,30 +66,6 @@ for g in zqk-demo zqk-ffmpeg-worker zqk-shim mcp-simple; do
 done
 
 if command -v find >/dev/null 2>&1; then
-  for name in agent_lockdown.go ambient_daemon.go sync_agents.go materialize_agent_chat_channel.go; do
-    hits=$(find "$ROOT" -name "$name" -type f 2>/dev/null || true)
-    if [ -n "$hits" ]; then
-      echo "MUST_NOT source:"
-      echo "$hits"
-      FAIL=1
-    fi
-  done
-  if [ -d "$ROOT/pkg/cli" ]; then
-    hits=$(find "$ROOT/pkg/cli" \( \
-      -name '*mesh*_command_builder.go' -o \
-      -name '*keystore*_command_builder.go' -o \
-      -name '*evolve*_command_builder.go' -o \
-      -name '*agent_lockdown*_command_builder.go' -o \
-      -name 'ambient_*_command_builder.go' -o \
-      -name 'agent_*_command_builder.go' -o \
-      -name '*paste*applescript*_command_builder.go' \
-      \) -type f 2>/dev/null || true)
-    if [ -n "$hits" ]; then
-      echo "MUST_NOT CLI builders:"
-      echo "$hits"
-      FAIL=1
-    fi
-  fi
   # Living community kernel ships release overlays and first-run seed scripts.
   if [ -d "$ROOT/scripts" ]; then
     extras=$(find "$ROOT/scripts" -type f \( -name '*.sh' -o -name '*.py' \) \

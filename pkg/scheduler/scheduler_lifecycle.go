@@ -13,6 +13,11 @@ import (
 	"github.com/zqk-os/zqk/pkg/zqktime"
 )
 
+const (
+	schedulerCronStopTimeout          = 2 * time.Second
+	schedulerTriggeredPoolStopTimeout = 5 * time.Second
+)
+
 // TRACK: BLI-CEF-LOGGING-POL007-001 / REQ-CEF-POL007-LOGGING-001: fluent logging compliance
 // Stop stops the scheduler daemon
 func (s *Scheduler) Stop() {
@@ -124,7 +129,7 @@ func (s *Scheduler) Stop() {
 	select {
 	case <-stopCtx.Done():
 		// Cron stopped successfully
-	case <-time.After(2 * time.Second):
+	case <-time.After(schedulerCronStopTimeout):
 		// Timeout - log warning but continue shutdown
 		SchedulerDaemonLog(s.logger).Warn(LogEventSchedulerDaemonCronStopTimedOut).Log()
 	}
@@ -145,7 +150,7 @@ func (s *Scheduler) Stop() {
 		poolStopBuilder.WithCleanup(func() { close(poolDone) }).StartSimple(func() { p.Stop() })
 		select {
 		case <-poolDone:
-		case <-time.After(5 * time.Second):
+		case <-time.After(schedulerTriggeredPoolStopTimeout):
 			SchedulerDaemonLog(s.logger).Warn(LogEventSchedulerDaemonTriggeredPoolStopTimedOut).Log()
 		}
 	}

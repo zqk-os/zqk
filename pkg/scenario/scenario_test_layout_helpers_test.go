@@ -11,7 +11,6 @@ import (
 
 	"gopkg.in/yaml.v3"
 
-	clctx "github.com/zqk-os/zqk/internal/cli/context"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
@@ -49,7 +48,7 @@ type testSettingsYAMLShapeScenario struct {
 func writeMinimalTestSettingsYAMLScenario(testRoot string) error {
 	p := filepath.Join(testRoot, paths.TestSettingsFilename)
 	body := testSettingsYAMLShapeScenario{
-		Version: clctx.DefaultBrandSettingsVersion,
+		Version: paths.DefaultBrandSettingsVersion,
 		Paths:   map[string]any{},
 	}
 	data, err := yaml.Marshal(body)

@@ -114,3 +114,10 @@ func TestFlattenUpdatePaths(t *testing.T) {
 		})
 	}
 }
+
+func TestDrainChangeJournalForRoot_Empty(t *testing.T) {
+	ctx := context.Background()
+	if err := DrainChangeJournalForRoot(ctx, ""); err != nil {
+		t.Fatalf("unexpected error for empty root: %v", err)
+	}
+}

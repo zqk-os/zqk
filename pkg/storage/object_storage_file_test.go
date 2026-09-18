@@ -730,3 +730,17 @@ func TestFileObjectStorage_List_BudgetExhaustionDoesNotDeadlock(t *testing.T) {
 		t.Fatalf("list with exhausted optional worker budget: %v", err)
 	}
 }
+
+func TestFileObjectStorage_ShutdownDrain(t *testing.T) {
+	tmpDir := t.TempDir()
+	mustEnsureProcessSpecsLayout(t, tmpDir)
+	fs, err := NewFileObjectStorageForTest(tmpDir)
+	if err != nil {
+		t.Fatalf("NewFileObjectStorageForTest: %v", err)
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	defer cancel()
+	if err := fs.Shutdown(ctx); err != nil {
+		t.Fatalf("fs.Shutdown failed: %v", err)
+	}
+}

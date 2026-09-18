@@ -247,4 +247,10 @@ func TestValidateFilterFields(t *testing.T) {
 			t.Fatalf("expected 'Did you mean \"status\"?', got: %v", err)
 		}
 	})
+
+	t.Run("empty filters valid", func(t *testing.T) {
+		if err := ValidateFilterFields("", nil); err != nil {
+			t.Fatalf("expected nil error for empty kind/filters: %v", err)
+		}
+	})
 }

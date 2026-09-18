@@ -8,7 +8,6 @@ import (
 	"runtime"
 	"strings"
 
-	cliContext "github.com/zqk-os/zqk/internal/cli/context"
 	"github.com/zqk-os/zqk/pkg/brand"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/paths"
@@ -186,7 +185,7 @@ func InstallToIDE(ideName, configPath, execPath, projectRoot string, logger logg
 	var args []string
 
 	if projectRoot == "" {
-		projectRoot = cliContext.ResolveProjectRoot(".")
+		projectRoot = paths.ResolveProjectRoot(".")
 	}
 
 	if projectRoot != "" {

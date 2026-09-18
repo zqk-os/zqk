@@ -95,7 +95,12 @@ func DefaultShutdownConfig() *ShutdownConfig {
 	}
 }
 
-// QueueShutdownCoordinator manages graceful shutdown of all storage queues
+// QueueShutdownCoordinator manages graceful shutdown of all storage queues.
+// It executes a two-phase drain process:
+//   - Phase 1: Critical queues (e.g. WAL, transactional persistence) drained sequentially.
+//   - Phase 2: Non-critical queues (e.g. audit aggregation, orphan cleanup) drained in parallel.
+//
+// See docs/architecture/STORAGE_COORDINATION.md for detailed Mermaid sequence and state machine diagrams.
 type QueueShutdownCoordinator struct {
 	shutdownInitiated int32 // Atomic flag: 1 if shutdown initiated, 0 otherwise
 	shutdownComplete  chan struct{}
@@ -288,9 +293,6 @@ func (c *QueueShutdownCoordinator) drainAllInner(ctx context.Context) error {
 		})
 	}
 
-	// Wait for all drains to complete or timeout
-	done := make(chan struct{})
-
 	// Check if context is already cancelled before starting wait
 	select {
 	case <-drainCtx.Done():
@@ -302,49 +304,16 @@ func (c *QueueShutdownCoordinator) drainAllInner(ctx context.Context) error {
 
 	waitDone := make(chan struct{})
 
-	// Start goroutine to wait for WaitGroup (this can't be cancelled, but we'll timeout)
+	// Start goroutine to wait for WaitGroup (BLI-CEF-CON-002)
 	goroutinelabels.NewGoroutine("storage", ConstMiscQueueShutdownWaitgroupWaiter).StartSimple(func() {
 		wg.Wait()
 		close(waitDone)
 	})
 
-	// Wait for either completion or timeout
-	shutdownWaitBud := goroutinelabels.DefaultBudget()
-	shutdownWaitBuilder := goroutinelabels.NewGoroutine(ConstMiscQueueShutdownWait, ConstMiscWaitingForAllQueueDrainsToComplete).
-		WithContext(drainCtx).
-		WithCleanup(func() {
-			select {
-			case <-done:
-				// Already closed
-			default:
-				close(done)
-			}
-		})
-	if shutdownWaitBud != nil {
-		shutdownWaitBuilder = shutdownWaitBuilder.WithBudget(shutdownWaitBud)
-	}
-	shutdownWaitBuilder.StartSimple(func() {
-		select {
-		case <-waitDone:
-			// Workers completed
-			select {
-			case <-done:
-			default:
-				close(done)
-			}
-		case <-drainCtx.Done():
-			// Timeout or context cancelled - exit without closing done
-			// Note: The waitDone goroutine will continue running until wg.Wait() completes,
-			// but we don't wait for it since we've timed out. This is acceptable as the
-			// WaitGroup will eventually complete and the goroutine will exit.
-			return
-		}
-	})
-
 	select {
-	case <-done:
+	case <-waitDone:
 		// All queues drained
-		StorageLog(c.logger.Logger()).Info("Queue drain complete").Log()
+		StorageLog(c.logger.Logger()).Info(LogEventStorageQueueShutdownAllDrainedSuccessInfo).Log()
 	case <-drainCtx.Done():
 		// Timeout exceeded
 		if c.config.ForceShutdown {

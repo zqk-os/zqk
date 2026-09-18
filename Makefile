@@ -24,9 +24,9 @@ VERSION    ?= $(shell git describe --tags --always --dirty 2>/dev/null || echo "
 GIT_COMMIT ?= $(shell git rev-parse --short HEAD 2>/dev/null || echo "unknown")
 BUILD_DATE ?= $(shell date -u '+%Y-%m-%dT%H:%M:%SZ')
 # Public module path after the bounded community rewrite.
-LDFLAGS = -X github.com/zqk-os/zqk/cmd/zqk-community/app.version=$(VERSION) \
-          -X github.com/zqk-os/zqk/cmd/zqk-community/app.buildDate=$(BUILD_DATE) \
-          -X github.com/zqk-os/zqk/cmd/zqk-community/app.gitCommit=$(GIT_COMMIT)
+LDFLAGS = -X github.com/zqk-os/zqk/cmd/zqk/app.version=$(VERSION) \
+          -X github.com/zqk-os/zqk/cmd/zqk/app.buildDate=$(BUILD_DATE) \
+          -X github.com/zqk-os/zqk/cmd/zqk/app.gitCommit=$(GIT_COMMIT)
 
 help:
 	@echo "ZQK — binary name is brand.executable_name ($(BRAND_EXE))"
@@ -34,7 +34,6 @@ help:
 	@echo "  make / make all    Build ./$(BIN)"
 	@echo "  make clean         Remove bin/*"
 	@echo ""
-	@echo "There is no make zqk-admin or promote-stable here."
 	@echo "Scheduler CLI: ./$(BIN) scheduler start|stop|status"
 	@echo "Run ./$(BIN) from this directory. Do not export a project-root environment variable."
 
@@ -48,7 +47,7 @@ bootstrap-archive:
 	fi
 
 all: bootstrap-archive
-	go build -ldflags '$(LDFLAGS)' -o $(BIN) ./cmd/zqk-community
+	go build -ldflags '$(LDFLAGS)' -o $(BIN) ./cmd/zqk
 
 clean:
 	rm -rf bin/*

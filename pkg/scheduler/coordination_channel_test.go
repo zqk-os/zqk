@@ -92,3 +92,9 @@ func TestCRIT9039_CoordinationChannel_PublishAndWatch(t *testing.T) {
 		t.Fatalf("WatchEvents returned error: %v", stopErr)
 	}
 }
+
+func TestEventLogEOFRetryDelay_Constant(t *testing.T) {
+	if eventLogEOFRetryDelay != 50*time.Millisecond {
+		t.Errorf("expected 50ms eventLogEOFRetryDelay, got %v", eventLogEOFRetryDelay)
+	}
+}

@@ -1,0 +1,18 @@
+Analyzes command metrics and pushes a digest to agent_feed so seats can
+self-direct.
+
+This command satisfies CAP metrics-plane directive feeder facets
+(GLS-1786416188034709000).
+
+  Push metrics digest
+  zqk.test system metrics feed
+
+Usage:
+  zqk.test system metrics feed [flags]
+
+Flags:
+      --agent-id string   Agent ID for the feed sender (default "kernel-metrics-feeder")
+      --notify            Queue IDE proof of life (notify) (default true)
+
+Global Flags:
+      --allow-degraded   Allow scheduler-dependent commands to run when scheduler daemon is not running

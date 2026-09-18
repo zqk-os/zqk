@@ -3,11 +3,12 @@
 package filecas
 
 import (
+	"errors"
 	"sync"
 
-	"github.com/zqk-os/zqk/pkg/utils/fileutil"
-
 	"github.com/zqk-os/zqk/pkg/goroutinelabels"
+	"github.com/zqk-os/zqk/pkg/logging"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 var (
@@ -21,11 +22,29 @@ func initDarwinSyncQueue() {
 		StartSimple(func() {
 			for f := range darwinSyncQueue {
 				if f != nil {
-					_ = f.Sync()
-					_ = f.Close()
+					if err := syncAndClose(f); err != nil {
+						logging.LogSwallowedError(err)
+					}
 				}
 			}
 		})
+}
+
+func syncAndClose(f *fileutil.File) error {
+	syncErr := f.Sync()
+	closeErr := f.Close()
+	return errors.Join(syncErr, closeErr)
+}
+
+func queueOrSync(queue chan<- *fileutil.File, f *fileutil.File) error {
+	select {
+	case queue <- f:
+		return nil
+	default:
+		// Queue pressure must not silently discard durability. Fall back to a
+		// synchronous fsync so a successful publish still has crash semantics.
+		return syncAndClose(f)
+	}
 }
 
 // casPublishSyncFileOS queues asynchronous background fsync on macOS to prevent
@@ -35,17 +54,14 @@ func CasPublishSyncFileOS(f *fileutil.File) error {
 		return nil
 	}
 	darwinSyncQueueOnce.Do(initDarwinSyncQueue)
-	if dupFD, err := fileutil.Open(f.Name()); err == nil {
-		select {
-		case darwinSyncQueue <- dupFD:
-		default:
-			_ = dupFD.Close()
-		}
+	dupFD, err := fileutil.Open(f.Name())
+	if err != nil {
+		return err
 	}
-	return nil
+	return queueOrSync(darwinSyncQueue, dupFD)
 }
 
-// casPublishSyncDirOS skips directory fsync on macOS for the same F_FULLFSYNC reason.
-func CasPublishSyncDirOS(string) error {
-	return nil
+// CasPublishSyncDirOS persists the rename's directory entry on macOS.
+func CasPublishSyncDirOS(dirPath string) error {
+	return fileutil.SyncDir(dirPath)
 }

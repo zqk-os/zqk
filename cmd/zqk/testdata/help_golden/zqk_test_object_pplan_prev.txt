@@ -1,0 +1,35 @@
+Navigate to the previous priority plan in sequence.
+
+
+
+The sequence includes all active and in_progress priority plans, sorted by:
+
+1. in_progress plans first
+
+2. Then active plans by active_order (lower first)
+
+3. Then by plan_date (descending)
+
+  View backlog items for previous plan
+  zqk.test pplan prev
+  View in JSON format
+  zqk.test pplan prev --format json
+
+Usage:
+  zqk.test object pplan prev [flags]
+
+Flags:
+      --columns string          Override column widths for table output (format: field:width)
+      --filter stringArray      Filter by field (format: field=value or field:value, can be used multiple times)
+  -f, --format string           Output format (table, json, jsonl, yaml, csv, json-rpc, stream, agent-prompt, semantic-link) (default "table")
+      --ignore-scheduler-down   Ignore scheduler down warning/lockdown
+  -o, --output string           Write output to file
+  -q, --quiet                   Suppress non-essential output
+      --sort-asc                Sort ascending (default: true) (default true)
+      --sort-by string          Field to sort by
+      --timeout duration        Timeout for command execution (0 = auto-calculate)
+  -v, --verbose                 Verbose output
+
+Global Flags:
+      --allow-degraded   Allow scheduler-dependent commands to run when scheduler daemon is not running
+      --internal         Elevated access mode for built-in and internal kinds (requires Enterprise license or zqk-admin)

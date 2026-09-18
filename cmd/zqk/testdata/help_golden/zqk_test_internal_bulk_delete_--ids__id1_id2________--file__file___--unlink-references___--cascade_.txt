@@ -1,0 +1,42 @@
+Delete multiple internal or built-in objects by their IDs.
+
+You can provide IDs either:
+  - Via --ids flag (comma-separated): --ids KSYN-001,KSYN-002,KSYN-003
+  - Via --file flag (YAML array of IDs): --file ids.yaml
+
+By default, deletion will fail if any object has dependents.
+Use --unlink-references to strip each ID from dependents' reference fields before deleting.
+Use --cascade to delete objects and all their dependents recursively (do not combine with --unlink-references).
+
+WARNING: Deleting built-in objects may break system functionality.
+
+  Delete multiple internal objects
+  zqk.test internal bulk delete --ids KSYN-001,KSYN-002,KSYN-003
+  Unlink references then delete multiple
+  zqk.test internal bulk delete --ids KSYN-001,KSYN-002 --unlink-references
+  Delete with cascade
+  zqk.test internal bulk delete --ids KSYN-001,KSYN-002 --cascade
+  Delete from file
+  zqk.test internal bulk delete --file ids.yaml --cascade
+  Dry-run to see what would be deleted
+  zqk.test internal bulk delete --ids KSYN-001,KSYN-002 --cascade --dry-run
+
+Usage:
+  zqk.test internal bulk delete --ids <id1,id2,...> | --file <file> [--unlink-references] [--cascade] [flags]
+
+Flags:
+      --cascade                 Delete objects and all objects that reference them
+      --columns string          Override column widths for table output (format: field:width)
+      --dry-run                 Show what would be deleted without actually deleting
+      --file string             Path to YAML file containing array of IDs
+  -f, --format string           Output format (table, json, jsonl, yaml, csv, json-rpc, stream, agent-prompt, semantic-link) (default "table")
+      --ids string              Comma-separated list of object IDs
+      --ignore-scheduler-down   Ignore scheduler down warning/lockdown
+  -o, --output string           Write output to file
+  -q, --quiet                   Suppress non-essential output
+      --timeout duration        Timeout for command execution (0 = auto-calculate)
+      --unlink-references       Strip this ID from dependents' reference fields, then delete (does not delete dependent objects)
+  -v, --verbose                 Verbose output
+
+Global Flags:
+      --allow-degraded   Allow scheduler-dependent commands to run when scheduler daemon is not running

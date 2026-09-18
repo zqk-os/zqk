@@ -22,6 +22,7 @@ func TestRegisterProjectContextTool(t *testing.T) {
 	for _, tool := range tools {
 		if tool.Name == name {
 			require.NotNil(t, tool.Handler)
+			assert.NotEmpty(t, tool.Description)
 			return
 		}
 	}

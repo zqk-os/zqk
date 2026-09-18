@@ -173,3 +173,10 @@ func TestResolveSchedulerDaemonBinary_communityEdition(t *testing.T) {
 		t.Fatalf("got daemon path %q, want %q", got, zcom)
 	}
 }
+
+func TestResolveSchedulerCLIBinary_EmptyRoot(t *testing.T) {
+	got := resolveSchedulerCLIBinary("")
+	if got == "" {
+		t.Fatal("expected non-empty binary fallback")
+	}
+}

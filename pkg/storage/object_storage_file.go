@@ -367,6 +367,9 @@ func (f *FileObjectStorage) Shutdown(ctx context.Context) error {
 			shutdownErr = err
 		}
 	}
+	if err := DrainChangeJournalForRoot(ctx, f.projectRoot); err != nil && shutdownErr == nil {
+		shutdownErr = err
+	}
 	return shutdownErr
 }
 

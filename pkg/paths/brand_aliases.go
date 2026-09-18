@@ -17,6 +17,9 @@ type brandSettingsAliasesFile struct {
 		ProjectRoot string            `yaml:"project_root"`
 		Aliases     map[string]string `yaml:"aliases"`
 	} `yaml:"paths"`
+	CLI struct {
+		BinaryPath string `yaml:"binary_path"`
+	} `yaml:"cli"`
 	KernelState struct {
 		ProjectRoot string `yaml:"project_root"`
 	} `yaml:"kernel_state"`
@@ -87,6 +90,37 @@ func LoadBrandSettingsProjectRoot(projectRoot string) string {
 				return filepath.Clean(p)
 			}
 			return filepath.Clean(filepath.Join(projectRoot, p))
+		}
+	}
+	return ""
+}
+
+// LoadBrandCLIBinaryPath reads cli.binary_path from configuration.
+func LoadBrandCLIBinaryPath(projectRoot string) string {
+	if projectRoot == emptyValue {
+		return ""
+	}
+	candidates := configCandidates(projectRoot)
+	testRoot := zqkenv.TestRoot().Get()
+	if testRoot != emptyValue {
+		absTest, err1 := filepath.Abs(testRoot)
+		absProject, err2 := filepath.Abs(projectRoot)
+		if err1 == nil && err2 == nil && absTest == absProject {
+			candidates = testCandidates(projectRoot)
+		}
+	}
+	for _, path := range candidates {
+		data, err := fileutil.ReadFile(path)
+		if err != nil {
+			continue
+		}
+		var s brandSettingsAliasesFile
+		if err := yaml.Unmarshal(data, &s); err != nil {
+			continue
+		}
+		p := strings.TrimSpace(s.CLI.BinaryPath)
+		if p != "" {
+			return p
 		}
 	}
 	return ""

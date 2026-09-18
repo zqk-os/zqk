@@ -9,10 +9,10 @@ import (
 	"github.com/zqk-os/zqk/pkg/execwrap"
 	"github.com/zqk-os/zqk/pkg/zqkenv"
 
-	"github.com/zqk-os/zqk/internal/cli"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/paths"
 	storagepkg "github.com/zqk-os/zqk/pkg/storage"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"github.com/zqk-os/zqk/pkg/when"
@@ -75,7 +75,7 @@ func (h *IntegrityCheckHandler) executeIntegrityCheckCore(ctx context.Context, j
 		if err != nil {
 			return errfmt.Newf("failed to get working directory").Wrap(err)
 		}
-		projectRoot = cli.ResolveProjectRoot(wd)
+		projectRoot = paths.ResolveProjectRoot(wd)
 		if projectRoot == emptyValue {
 			return errfmt.Errorf("project root not found - storage must be initialized with explicit project root")
 		}

@@ -1,0 +1,24 @@
+When STORAGE_MODE=file+projection, upserts all file-backed objects into the
+
+graph projection and deletes projection orphans not present in file SSOT.
+
+Also ensures spec-derived id indexes. Use --dry-run to count without writes.
+
+  Rebuild projection from file durability store
+  zqk.test system rebuild-graph-projection
+  Preview counts only
+  zqk.test system rebuild-graph-projection --dry-run
+
+Usage:
+  zqk.test system rebuild-graph-projection [flags]
+
+Flags:
+      --dry-run            Count rebuilds and orphans without writing to the projection
+  -f, --format string      Output format (table, json, jsonl, yaml, csv, json-rpc, stream, agent-prompt, semantic-link) (default "table")
+  -o, --output string      Write output to file
+  -q, --quiet              Suppress non-essential output
+      --timeout duration   Timeout for command execution (0 = auto-calculate)
+  -v, --verbose            Verbose output
+
+Global Flags:
+      --allow-degraded   Allow scheduler-dependent commands to run when scheduler daemon is not running

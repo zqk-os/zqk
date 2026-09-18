@@ -91,6 +91,25 @@ func TestAppendToWALAndBuffer(t *testing.T) {
 	}
 }
 
+func TestAppendDeleteToWAL_ReturnsClosedWALErrorWithoutBuffering(t *testing.T) {
+	wal, err := NewObjectWAL(t.TempDir())
+	if err != nil {
+		t.Fatalf("NewObjectWAL: %v", err)
+	}
+	if err := wal.Close(); err != nil {
+		t.Fatalf("Close: %v", err)
+	}
+	buf := NewObjectWriteBuffer()
+	storage := &FileObjectStorage{wal: wal, writeBuf: buf}
+
+	if err := storage.appendDeleteToWAL("backlog_item", "BLI-1"); err == nil {
+		t.Fatal("appendDeleteToWAL returned nil for a closed WAL")
+	}
+	if buf.Len() != 0 {
+		t.Fatalf("failed WAL append enqueued %d operation(s)", buf.Len())
+	}
+}
+
 func TestObjectWriteBuffer_EnqueueFromWALRecord(t *testing.T) {
 	buf := NewObjectWriteBuffer()
 	rec := &WALRecord{Op: "create", Kind: "backlog_item", ID: "bli-001", Seq: 1, DataB64: "eWRhdGE="}

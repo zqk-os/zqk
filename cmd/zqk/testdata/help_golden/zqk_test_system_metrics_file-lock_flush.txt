@@ -1,0 +1,21 @@
+Flush buffered file lock metrics by creating a file_lock_metric object and
+resetting counters.
+
+This collects all accumulated metrics, creates a metric object, and resets the counters
+for the next collection period.
+
+Usage:
+  zqk.test system metrics file-lock flush [flags]
+
+Flags:
+      --columns string          Override column widths for table output (format: field:width)
+  -f, --format string           Output format (table, json, jsonl, yaml, csv, json-rpc, stream, agent-prompt, semantic-link) (default "table")
+      --ignore-scheduler-down   Ignore scheduler down warning/lockdown
+  -o, --output string           Write output to file
+  -q, --quiet                   Suppress non-essential output
+      --timeout duration        Timeout for command execution (0 = auto-calculate)
+  -v, --verbose                 Verbose output
+      --window string           Time window for metrics (e.g., '1h', '6h', '24h'). Defaults to since last flush or 1 hour.
+
+Global Flags:
+      --allow-degraded   Allow scheduler-dependent commands to run when scheduler daemon is not running

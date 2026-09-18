@@ -48,5 +48,9 @@ func NewCLINotifierWithCoordinator(
 	adapter := NewCLINotifierAdapter(helper)
 
 	// Create CLINotifier with adapter (mandatory)
-	return storage.NewCLINotifier(verbose, quiet, adapter)
+	notifier, err := storage.NewCLINotifier(verbose, quiet, adapter)
+	if err != nil {
+		return nil
+	}
+	return notifier
 }

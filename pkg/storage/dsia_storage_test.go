@@ -497,6 +497,43 @@ func TestDSIAStorageProvider_Transaction(t *testing.T) {
 	}
 }
 
+func TestDSIATransaction_CommitReturnsDeleteErrorAndBecomesTerminal(t *testing.T) {
+	provider := NewDSIAStorageProvider(t.TempDir())
+	ctx := context.Background()
+	tx, err := provider.BeginTransaction(ctx)
+	if err != nil {
+		t.Fatalf("BeginTransaction: %v", err)
+	}
+	if err := tx.Delete(ctx, nil, "missing-object", false); err != nil {
+		t.Fatalf("stage delete: %v", err)
+	}
+
+	if err := tx.Commit(ctx); err == nil {
+		t.Fatal("Commit returned nil for a failed provider delete")
+	}
+	if err := tx.Commit(ctx); err == nil || err.Error() != "transaction inactive" {
+		t.Fatalf("second Commit = %v, want terminal transaction", err)
+	}
+}
+
+func TestDSIATransaction_CommitReturnsCreateError(t *testing.T) {
+	provider := NewDSIAStorageProvider(t.TempDir())
+	ctx := context.Background()
+	tx, err := provider.BeginTransaction(ctx)
+	if err != nil {
+		t.Fatalf("BeginTransaction: %v", err)
+	}
+	if err := tx.Create(ctx, nil, map[string]any{
+		objects.FieldKeyID: "missing-kind",
+	}); err != nil {
+		t.Fatalf("stage create: %v", err)
+	}
+
+	if err := tx.Commit(ctx); err == nil {
+		t.Fatal("Commit returned nil for a staged object without kind")
+	}
+}
+
 func TestDSIAStorageProvider_GraphAndRefactoring(t *testing.T) {
 	tempDir, err := fileutil.MkdirTemp("", "dsia_graph_test")
 	if err != nil {
@@ -545,4 +582,5 @@ func TestDSIAStorageProvider_GraphAndRefactoring(t *testing.T) {
 		t.Errorf("Expected kind 'goal', got '%v'", movedObj[objects.FieldKeyKind])
 	}
 }
+
 // tdd refresh
