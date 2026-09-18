@@ -1,7 +1,7 @@
 # ZQK Community pressure-test (zcom) — not studio zqk.
 # Overlay/export MUST install this file as dest/Makefile via
 # scripts/open-core/install-community-makefile.sh.
-# Do not copy studio Makefile into this tree.
+# Do not copy studio Makefile into the community tree.
 # TRACK: TDE-1789678536875854000-47240146 — rename zcom → zqk at public launch.
 
 .PHONY: help zcom bootstrap-archive clean
@@ -22,7 +22,8 @@ help:
 	@echo "  make / make zcom   Build ./bin/zcom from ./cmd/zqk-community"
 	@echo "  make clean         Remove bin/*"
 	@echo ""
-	@echo "There is no make zqk, zqk-admin, zqk-mcp, scheduler, or promote-stable here."
+	@echo "There is no make zqk, zqk-admin, zqk-mcp, or promote-stable here."
+	@echo "Scheduler CLI: ./bin/zcom scheduler start|stop|status"
 	@echo "Run ./bin/zcom from this directory. Do not export ZCOM_PROJECT_ROOT."
 	@echo "Rename zcom → zqk only at public launch."
 

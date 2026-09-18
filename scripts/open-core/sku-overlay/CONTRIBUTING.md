@@ -17,7 +17,7 @@ See [docs/onboarding/COMMUNITY_FIRST_RUN.md](docs/onboarding/COMMUNITY_FIRST_RUN
 
 - Process data under `.zqk/process/` goes through `./bin/zcom` (object create/update). Do not edit hash-named YAML by hand.
 - Do not `export ZCOM_PROJECT_ROOT` or `ZQK_PROJECT_ROOT` in your shell profile.
-- There is no scheduler, `zcom-admin`, or public brew/GitHub release on this SKU.
+- There is no `zcom-admin` or public brew/GitHub release on this SKU. Scheduler is `./bin/zcom scheduler start|stop|status`.
 - `make` only builds `./bin/zcom`. There is no `make zqk` / `promote-stable`.
 
 ## Checks

@@ -1,96 +1,77 @@
 # Community first-run (agent + human)
 
-**Audience:** Strangers and open-core operators after `zqk system init` who have (or will use) a public IDE agent.  
-**Headless / appliance:** [`EDGE_HEADLESS_FIRST_RUN.md`](./EDGE_HEADLESS_FIRST_RUN.md) (`--headless`).  
-**Not this doc:** Studio-dense process ontology (PRI/BLI/CAP dogfood) — see [`AI_AGENT_ONBOARDING.md`](./AI_AGENT_ONBOARDING.md) (**studio pack**).  
-**Product strategy:** [`../strategy/open-core/AGENT_ONBOARDING_SEQUENCE.md`](../strategy/open-core/AGENT_ONBOARDING_SEQUENCE.md) · [`../strategy/open-core/SKU_ONBOARDING_SURFACES.md`](../strategy/open-core/SKU_ONBOARDING_SURFACES.md).
+**Audience:** People pressure-testing ZQK Community. The CLI is **`zcom`** until public launch (then it becomes `zqk`). Studio `zqk` is a different binary.  
+**Kernel directory:** `.zqk/` — not `.zcom/`.  
+**MCP pairing detail:** [`QUICKSTART.md`](./QUICKSTART.md).  
+**Not this SKU:** Studio process dogfood — [`AI_AGENT_ONBOARDING.md`](./AI_AGENT_ONBOARDING.md) (pack).
 
-## Installation
+## Install (this tree)
 
-### Community Binary (Build from Source / Candidate)
-The community product runs as a standalone single binary (`zcom`):
+There is **no Homebrew formula and no public GitHub release** yet.
 
 ```bash
-# Build zcom from source:
-make zcom
-# Or run the install script in source mode:
-ZQK_INSTALL_METHOD=source ./scripts/install.sh
+make                 # → ./bin/zcom
+./bin/zcom --version
+# equivalent: ./scripts/install.sh   (builds local zcom only; does not clone GitHub)
 ```
 
-### Public Release Channels (Upcoming)
-Upon public release:
-```bash
-brew tap lanceman/zqk
-brew install zqk
-```
-
-Or verify release tarballs with checksum integrity:
-```bash
-curl -fsSL https://github.com/lanceman/zqk/releases/latest/download/checksums.txt | sha256sum -c
-```
-
-## Goal
-
-Finish first contact without cascading failures: missing seating, vendor markdown that drifts from the kernel, or guessing which IDE you are in.
+Use `./bin/zcom` from the project directory. **Do not** `export ZCOM_PROJECT_ROOT` or `ZQK_PROJECT_ROOT` in your shell profile.
 
 ## Fail-closed sequence
 
-Run from the project root:
-
 ```bash
-zqk system agent-onboard --format json
-# or with zcom:
-zcom system agent-onboard --format json
+./bin/zcom system init --project-name my-project   # skip if .zqk/ already exists
+./bin/zcom system agent-onboard --format json
+./bin/zcom quickstart
+./bin/zcom mcp install
+./bin/zcom object list
+./bin/zcom workflow whats-next --format json
 ```
 
 | Stage | What it does | If it fails |
 |-------|----------------|-------------|
-| **detect** | Find Cursor / Claude Code / Cline / Windsurf / Gemini / Antigravity / OpenClaw markers | Continue (Vector B = no public agent) |
-| **auth** | Local session profile | Automatic local system seating in community edition (`zcom`) |
-| **seat** | Idempotent `PER-DEFAULT-*` seating (same as init) | `zqk system seed-default-agent-seating` |
-| **prime_workspace** | Write regenerable kernel boot directives into **missing** detected vendor files (+ `.agents/AGENTS.md`). Existing files are **skipped** (use `--force` to overwrite). | Fix permissions; re-run |
-| **prime_kernel** | Write `.zqk/config/agent_workspace_sync.json` (workspace→kernel lite registration) | Fix `.zqk/config` writes |
-| **smoke** | Confirm directives present (written or intentionally skipped) and sync report write succeeded | Re-run without `--skip-prime` |
-
-Useful flags:
+| **detect** | Find Cursor / Claude Code / Cline / Windsurf / Gemini markers | Continue without an IDE agent |
+| **auth** | Community seats a local system account. Leftover `~/.zqk/credentials` must not block an empty directory | `./bin/zcom system init` first. There is no `auth login` command |
+| **seat** | Idempotent `PER-DEFAULT-*` seating (same as init) | `./bin/zcom system seed-default-agent-seating` |
+| **prime_workspace** | Write regenerable vendor directives into **missing** files only (`--force` to overwrite) | Fix permissions; re-run |
+| **prime_kernel** | Write `.zqk/config/agent_workspace_sync.json` | Fix `.zqk/config` writes |
+| **smoke** | Confirm directives + sync report | Re-run without `--skip-prime` |
 
 ```bash
-zqk system agent-onboard --detect-only --format json   # scan only
-zqk system agent-onboard --dry-run --format json       # plan, no writes
-zqk system agent-onboard --all-vendors                 # target every known vendor path
-zqk system agent-onboard --force                      # overwrite existing vendor directive files
+./bin/zcom system agent-onboard --detect-only --format json
+./bin/zcom system agent-onboard --dry-run --format json
 ```
 
-## Greenfield & Polyglot Project Initialization
+## Greenfield
 
-`zqk system init` initializes an embedded knowledge kernel in both empty directories and existing polyglot codebases:
 ```bash
-zqk system init --project-name my-project
+mkdir my-project && cd my-project
+/path/to/zqk-public-candidate/bin/zcom system init --project-name my-project
 ```
-- **Language-Agnostic:** Works seamlessly in Python (`pyproject.toml`), TypeScript (`package.json`), Rust (`Cargo.toml`), Go, or standalone documentation workspaces.
-- **Agent Context:** Pass `--context ai-agent` for non-interactive scripting.
 
-## Fast Code Navigation (Native Code Search)
+Init **seeds the starter Gantt in-process** (org → mission → vision → goal → workstream → plan) and writes slim retention/audit jobs. Optional flags `--with-onboarding-roadmap` / `--with-maintenance-jobs` are aliases for those outcomes — they do not fail.
 
-The kernel includes native in-process AST and trigram code search (`zqk grep` / `zgrep`):
+Background loops (job ticks, retention, one-shots):
+
 ```bash
-zqk grep "MyStruct" pkg/
-zqk grep --ast "func Test*" .
+./bin/zcom scheduler start
+./bin/zcom scheduler status
+```
+
+First-run CRUD, `object list`, and `whats-next` work without the daemon. Start it when you want the organism to keep running after you close the shell.
+
+## Code search
+
+```bash
+./bin/zcom grep "MyStruct" pkg/
+./bin/zcom grep --ast "func Test*" .
 ```
 
 ## After green
 
-1. `zqk quickstart` or [`QUICKSTART.md`](./QUICKSTART.md) — 5-minute interactive onboarding walkthrough.  
-2. `zqk mcp install` — automatically configure detected IDEs (Cursor, Claude Desktop, VS Code) to pair with the ZQK Knowledge Kernel.  
-3. `zqk workflow whats-next --format json` — next work from the kernel (not chat memory).  
-4. `zqk system start-here` — short Community tutorial.  
-5. Studio / process dogfood only if that is your job: [`AI_AGENT_ONBOARDING.md`](./AI_AGENT_ONBOARDING.md).  
+1. `./bin/zcom quickstart` — same text as `./bin/zcom system start-here`. See [`QUICKSTART.md`](./QUICKSTART.md).
+2. `./bin/zcom mcp install` then optionally `./bin/zcom mcp ensure --tcp 127.0.0.1:8443`.
+3. `./bin/zcom object list` — first-run scoreboard.
+4. `./bin/zcom workflow whats-next --format json`.
 
-## Kernel vs pack
-
-- **Kernel:** `agent-onboard`, seating seed, regenerable boot payload, sync report.  
-- **Pack:** Dense Cursor rules forests, MMORCH, priority-plan culture — do not treat as default stranger seed ([`KERNEL_VS_PACK_INVENTORY.md`](../strategy/open-core/KERNEL_VS_PACK_INVENTORY.md)).
-
-## New agent identity
-
-Creating custom personas in studio mode uses [`NEW_AGENT_PROTOCOL.md`](./NEW_AGENT_PROTOCOL.md) (`zqk agent new`). For community edition (`zcom`), **`agent-onboard`** seats `PER-DEFAULT-AGENT` automatically.
+There is no `zcom agent new`, `zcom auth`, or `zcom-admin`. Scheduler **is** shipped: `zcom scheduler start|stop|status`.

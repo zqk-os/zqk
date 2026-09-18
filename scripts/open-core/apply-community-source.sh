@@ -151,10 +151,13 @@ if [ -f "$DEST/.gitignore" ]; then
   grep -Ev '^\*-\*\.txt$|^\*test\*\.txt$|^\*_results\.txt$' "$DEST/.gitignore" > "$DEST/.gitignore.tmp" && mv "$DEST/.gitignore.tmp" "$DEST/.gitignore"
 fi
 
-echo "✓ Community source overlay complete at $DEST"
 HERE="$(cd "$(dirname "$0")" && pwd)"
+if [ -x "$HERE/prune-community-onboarding.sh" ]; then
+  sh "$HERE/prune-community-onboarding.sh" "$DEST"
+fi
 if [ -x "$HERE/install-community-sku.sh" ]; then
   sh "$HERE/install-community-sku.sh" "$DEST"
 elif [ -x "$HERE/install-community-makefile.sh" ]; then
   sh "$HERE/install-community-makefile.sh" "$DEST"
 fi
+echo "✓ Community source overlay complete at $DEST"

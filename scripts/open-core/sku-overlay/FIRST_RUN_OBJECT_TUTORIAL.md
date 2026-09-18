@@ -59,4 +59,5 @@ Init already wrote the starter graph and slim maintenance jobs. The daemon ticks
 
 - YAML parse: check indentation; `--dry-run` on create.
 - Lifecycle rejection: `./bin/zcom object question fields` for allowed statuses.
-- Unauthorized / no kernel: `./bin/zcom system init --project-name <name>` from the project directory. There is no `zcom scheduler` on this SKU.
+- Unauthorized / no kernel: `./bin/zcom system init --project-name <name>` from the project directory.
+- Optional daemon: `./bin/zcom scheduler start` then `./bin/zcom scheduler status`.

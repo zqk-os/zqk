@@ -48,7 +48,7 @@ Do **not** `export ZCOM_PROJECT_ROOT` in your shell profile. It silently attache
 
 - **AI Agent Guardrails:** Enforceable policies that agents verify *before* modifying code.
 - **Autonomous Project Context:** Agents discover goals, requirements, and architectural decisions without manual prompting.
-- **Native Code Search:** Fast in-process AST and trigram search via `zqk grep` (alias `zgrep`).
+- **Native Code Search:** Fast in-process AST and trigram search via `./bin/zcom grep` (alias `zgrep`).
 - **Polyglot & Zero-Dependency:** Seamless greenfield initialization across Python, TypeScript, Rust, and Go.
 - **Local-First & Offline-Ready:** Zero cloud dependency required—runs locally with Git and filesystem storage.
 - **Full Traceability:** Every line of code and commit links directly back to project backlog items and requirements.
@@ -74,7 +74,7 @@ ZQK uses the [Model Context Protocol (MCP)](https://modelcontextprotocol.io/) to
 - **[AI Agent Onboarding Guide](./docs/onboarding/AI_AGENT_ONBOARDING.md)** — Deep-dive guide for AI agents participating in ZQK development.
 - **[Architecture Overview](./docs/architecture/README.md)** — Technical decisions, storage engine, and design specifications.
 
-**Onboarding as curriculum (system objects):** Templates for a full onboarding track live under **[scripts/onboarding_roadmap/README.md](./scripts/onboarding_roadmap/README.md)**. This SKU does **not** ship `make alpha-help`, `zqk-ts`, or a scheduler daemon — do not treat those as first-run steps.
+**Onboarding as curriculum (system objects):** Templates live under **[scripts/onboarding_roadmap/README.md](./scripts/onboarding_roadmap/README.md)**. This SKU does **not** ship `make alpha-help` or `zqk-ts`. Scheduler **is** shipped: `./bin/zcom scheduler start|stop|status`.
 
 ### Getting started (clean machine golden path)
 
@@ -90,7 +90,7 @@ Expected outcomes:
 
 - `system init` creates `.zqk/` and `.zqk/process/` scaffolding.
 - `object list` succeeds (kinds with rows after a seeded init).
-- There is no `zcom scheduler`. Do not follow studio docs that say `zqk scheduler start`.
+- `./bin/zcom scheduler start` is optional. First-run CRUD does not require it.
 
 If you run init a second time in the same directory:
 
