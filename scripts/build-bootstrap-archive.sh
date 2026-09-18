@@ -97,7 +97,9 @@ find "$STAGING" \( \
 	-name 'ACC-*.yaml' \
 	\) -type f -delete 2>/dev/null || true
 
-SOURCE_DATE_EPOCH="${SOURCE_DATE_EPOCH:-$(git -C "$REPO_ROOT" log -1 --pretty=%ct 2>/dev/null || date +%s)}"
+# A commit-derived default makes committing the archive invalidate it immediately
+# when HEAD advances. Release builders may override this standard fixed epoch.
+SOURCE_DATE_EPOCH="${SOURCE_DATE_EPOCH:-946684800}"
 TOUCH_TS="$(date -u -r "$SOURCE_DATE_EPOCH" '+%Y%m%d%H%M.%S' 2>/dev/null || date -u '+%Y%m%d%H%M.%S')"
 find "$STAGING" -exec touch -h -t "$TOUCH_TS" {} + 2>/dev/null || true
 
