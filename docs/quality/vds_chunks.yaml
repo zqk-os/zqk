@@ -154,3 +154,58 @@ chunks:
       - go test ./cmd/zqk-community/app -run TestFirstRunTextUsesCanonicalBrandTokens -timeout 60s
     gate_integrate: yes
     independent_verify: yes
+  - chunk_id: dest-public-payload-functional
+    stage: operate_release
+    claim: The current dest source tree passes a fail-closed public payload gate
+    work_object_ref: CRIT-1789717939876745000-cf3ca409
+    rubric_ref: CRIT-1789717939876745000-cf3ca409
+    dsl_checks:
+      - object_exists:CRIT-1789717939876745000-cf3ca409
+      - path_exists:scripts/open-core/check-public-release-payload.sh
+      - path_exists:SECURITY.md
+      - tests_ok_per_customization
+    evidence_refs:
+      - CRIT-1789717939876745000-cf3ca409
+      - scripts/open-core/check-public-release-payload.sh
+      - SECURITY.md
+      - sh scripts/open-core/test-public-release-gates.sh --payload-only
+      - go test ./cmd/zqk-community/system ./cmd/zqk-community/test -timeout 60s
+      - SCH-1789718605088226000 success
+    gate_integrate: yes
+    independent_verify: yes
+  - chunk_id: dest-public-payload-boundary
+    stage: operate_release
+    claim: The payload test proves an unconfigured release file is rejected
+    work_object_ref: CRIT-1789717939876746000-f5bf8f34
+    rubric_ref: CRIT-1789717939876746000-f5bf8f34
+    dsl_checks:
+      - object_exists:CRIT-1789717939876746000-f5bf8f34
+      - path_exists:scripts/open-core/test-public-release-gates.sh
+      - tests_ok_per_customization
+    evidence_refs:
+      - CRIT-1789717939876746000-f5bf8f34
+      - scripts/open-core/test-public-release-gates.sh
+      - sh scripts/open-core/test-public-release-gates.sh --payload-only
+    gate_integrate: yes
+    independent_verify: yes
+  - chunk_id: dest-public-payload-integration
+    stage: operate_release
+    claim: CI runs the dest release-gate script and the community binary builds from this module
+    work_object_ref: CRIT-1789717939876747000-d17ced38
+    rubric_ref: CRIT-1789717939876747000-d17ced38
+    dsl_checks:
+      - object_exists:CRIT-1789717939876747000-d17ced38
+      - object_exists:TST-1789717939876745001-db183096
+      - path_exists:.github/workflows/ci.yml
+      - path_exists:cmd/zqk-community
+      - tests_ok_per_customization
+    evidence_refs:
+      - CRIT-1789717939876747000-d17ced38
+      - TST-1789717939876745001-db183096
+      - .github/workflows/ci.yml
+      - cmd/zqk-community
+      - go test ./cmd/zqk-community/system ./cmd/zqk-community/test -timeout 60s
+      - CGO_ENABLED=0 go build -buildvcs=false ./cmd/zqk-community
+      - SCH-1789718605088226000 success
+    gate_integrate: yes
+    independent_verify: yes

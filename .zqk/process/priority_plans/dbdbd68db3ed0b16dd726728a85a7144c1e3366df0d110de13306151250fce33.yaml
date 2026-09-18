@@ -1,0 +1,19 @@
+created_at: "2026-09-18T07:51:50Z"
+created_by: ACC-1785920548450214012-68b850c0
+description: 'Make the local source artifact independently publishable: CI build/test, fail-closed payload scan, license/NOTICE consistency, secret scan, and reproducible first-run checks. No public push and no Helm/container distribution in this plan.'
+id: PRI-1789717910279775000-51ccf0b2
+kind: priority_plan
+namespace_id: zqk:kernel
+persona_refs:
+    - PER-DEFAULT-OPERATOR
+priority_tier: P0
+rationale: Current audit found no CI or payload gate and a studio proprietary carve-out in public LICENSE/NOTICE.
+schema_version: 2.0.0
+started_at: "2026-09-18T08:05:31Z"
+status: in_progress
+title: Public source artifact release gates
+updated_at: "2026-09-18T08:05:31Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs:
+    - WS-1789631797993326000-f9951fe8

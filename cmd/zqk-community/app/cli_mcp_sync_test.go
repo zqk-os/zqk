@@ -1,12 +1,13 @@
 package app
 
 import (
+	"encoding/json"
 	"strings"
 	"testing"
 
+	"github.com/spf13/pflag"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/mcp"
-	"github.com/spf13/pflag"
 )
 
 func TestMCPCLISyncParity(t *testing.T) {
@@ -64,13 +65,18 @@ func TestMCPCLISyncParity(t *testing.T) {
 			}
 
 			// Get MCP schema properties
-			schema, ok := tool.InputSchema.(map[string]any)
-			if !ok {
-				t.Fatal("MCP tool schema is not a map")
+			wireSchema, err := json.Marshal(tool.InputSchema)
+			if err != nil {
+				t.Fatalf("marshal MCP tool schema: %v", err)
 			}
-			props, ok := schema["properties"].(map[string]any)
-			if !ok {
-				t.Fatal("MCP tool schema properties is not a map")
+			var schema struct {
+				Properties map[string]json.RawMessage `json:"properties"`
+			}
+			if err := json.Unmarshal(wireSchema, &schema); err != nil {
+				t.Fatalf("decode MCP tool schema: %v", err)
+			}
+			if schema.Properties == nil {
+				t.Fatal("MCP tool schema properties is missing")
 			}
 
 			// Get CLI flags
@@ -80,7 +86,7 @@ func TestMCPCLISyncParity(t *testing.T) {
 			})
 
 			// Compare MCP properties to CLI flags
-			for propName := range props {
+			for propName := range schema.Properties {
 				// Internal MCP parameters that don't map to CLI flags directly
 				if propName == "_command_path" || propName == "format" {
 					continue

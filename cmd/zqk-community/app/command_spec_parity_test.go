@@ -1,6 +1,7 @@
 package app
 
 import (
+	"os"
 	"path/filepath"
 	"testing"
 
@@ -24,6 +25,11 @@ func TestCommandSpecParity(t *testing.T) {
 	// exercise them; the shipped community binary strips them. Parity must match that surface.
 	coverage.CommandsWithoutSpecs = excludeAdminGroupCommands(rootCmd, coverage.CommandsWithoutSpecs)
 	baselinePath := filepath.Join(projectRoot, ".zqk/cli/command_spec_coverage_baseline.community.json")
+	if os.Getenv("UPDATE_COMMUNITY_COMMAND_SPEC_BASELINE") == "1" {
+		if err := clipkg.WriteCommandSpecCoverageBaseline(baselinePath, coverage); err != nil {
+			t.Fatalf("write command-spec baseline: %v", err)
+		}
+	}
 	baseline, err := clipkg.LoadCommandSpecCoverageBaseline(baselinePath)
 	if err != nil {
 		t.Fatalf("load command-spec baseline: %v", err)

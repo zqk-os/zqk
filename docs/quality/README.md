@@ -20,3 +20,19 @@ For executable test-to-criteria lineage, run:
 ```bash
 ./bin/zqk test dashboard
 ```
+
+Before preparing any public artifact, run the dest-owned payload gate:
+
+```bash
+sh scripts/open-core/check-public-release-payload.sh
+```
+
+The broader local/CI gate also proves the community build and help surfaces:
+
+```bash
+sh scripts/open-core/test-public-release-gates.sh
+```
+
+These release checks implement
+`BLI-1789717939876745000-1a629968`. A passing payload gate is not permission
+to push; publication still requires explicit human acknowledgment.

@@ -2,13 +2,9 @@ ZQK
 Copyright 2025–2026 ZQK Contributors
 
 This product includes software developed for the ZQK project.
-Open-Core components are licensed under the Apache License, Version 2.0.
+This source tree is licensed under the Apache License, Version 2.0.
 See the License for the specific language governing permissions and
 limitations under the License.
-
-Proprietary / Commercial Enterprise modules are identified in LICENSE
-Appendix A and docs/architecture/OPEN_CORE_PROPRIETARY_SPLIT.md and are
-not covered by the Apache 2.0 grant.
 
 ========================================================================
 Third-Party Software Licenses and Notices
