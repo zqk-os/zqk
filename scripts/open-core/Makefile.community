@@ -1,6 +1,7 @@
 # ZQK Community pressure-test (zcom) — not studio zqk.
-# Overlay/export install this file as the product Makefile via
+# Overlay/export MUST install this file as dest/Makefile via
 # scripts/open-core/install-community-makefile.sh.
+# Do not copy studio Makefile into the community tree.
 # TRACK: TDE-1789678536875854000-47240146 — rename zcom → zqk at public launch.
 
 .PHONY: help zcom bootstrap-archive clean
@@ -18,14 +19,21 @@ LDFLAGS = -X github.com/lanceman/zqk/cmd/zqk-community/app.version=$(VERSION) \
 help:
 	@echo "ZQK Community pressure-test (zcom) — not studio zqk"
 	@echo ""
-	@echo "  make / make zcom   - Build bin/zcom from ./cmd/zqk-community"
-	@echo "  make clean          - Remove bin/*"
+	@echo "  make / make zcom   Build ./bin/zcom from ./cmd/zqk-community"
+	@echo "  make clean         Remove bin/*"
 	@echo ""
-	@echo "Use ./bin/zcom with ZCOM_PROJECT_ROOT pointing at this checkout."
-	@echo "Studio remains ./bin/zqk. Rename zcom → zqk only at public launch."
+	@echo "There is no make zqk, zqk-admin, zqk-mcp, scheduler, or promote-stable here."
+	@echo "Run ./bin/zcom from this directory. Do not export ZCOM_PROJECT_ROOT."
+	@echo "Rename zcom → zqk only at public launch."
 
 bootstrap-archive:
-	@$(SHELL) scripts/build-bootstrap-archive.sh "$$(pwd)" && echo "✓ Bootstrap archive ready"
+	@if [ -f scripts/build-bootstrap-archive.sh ]; then \
+		$(SHELL) scripts/build-bootstrap-archive.sh "$$(pwd)" && echo "✓ Bootstrap archive ready"; \
+	elif [ -f internal/bootstrap/archive/bootstrap.tar.gz ]; then \
+		echo "✓ Pre-built bootstrap archive present"; \
+	else \
+		echo "Error: no bootstrap archive or builder found" >&2; exit 1; \
+	fi
 
 zcom: bootstrap-archive
 	go build -ldflags '$(LDFLAGS)' -o $(ZCOM_BIN) ./cmd/zqk-community

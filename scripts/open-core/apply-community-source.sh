@@ -82,6 +82,12 @@ if [ -d "$DEST/.zqk/process" ]; then
 fi
 
 for path in "${OVERLAY_PATHS[@]}"; do
+  # Studio Makefile must never land on dest. Community SKU installs
+  # Makefile.community as dest/Makefile after this loop.
+  # TRACK: TDE-1789681135032251000-e52ad7a7
+  case "$path" in
+    Makefile) echo "skip $path (community Makefile.community is the dest SKU)"; continue ;;
+  esac
   src="$REPO_ROOT/$path"
   dst="$DEST/$path"
   if [ -e "$src" ]; then

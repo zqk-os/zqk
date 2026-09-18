@@ -1,13 +1,15 @@
 acceptance_considerations: ""
 created_at: "2026-09-17T21:44:38Z"
 created_by: ACC-1785920548450214012-68b850c0
-criteria_refs: []
 description: |
-    Stranger first-run advertised brew install zqk, zqk-mcp, auth login, agent new, scheduler, and --with-onboarding-roadmap. The shipped SKU is zcom with none of those commands. Fix docs, register zcom quickstart at root, fail-closed uninitialized hint, do not inherit studio ZQK_PROJECT_ROOT, and do not treat logger-created .zqk/logs as an initialized kernel.
+    Slim dest Makefile to zcom-only (help/zcom/clean). Studio apply re-copied the full studio
+    Makefile (zqk-admin, neuron/muscle/heart/lung, promote-stable, scheduler). Also dest-own
+    install.sh (local zcom only), package-community.sh (no gh publish), goreleaser (zcom only),
+    and root help (no scheduler/zcom-admin). Studio TDE-1789690070487265000-ea5471f4 tracks
+    apply-community-source.sh OVERLAY Makefile/README clobber.
 estimated_effort: ""
 id: BLI-1789681478369698000-263b989c
 kind: backlog_item
-milestone_refs: []
 namespace_id: zqk:kernel
 priority: high
 priority_plan_ref: ""
@@ -16,10 +18,9 @@ problem_statement: Would-be users bounce when the first commands in README do no
 requirement_refs:
     - REQ-1789630346648087000-a61b7f27
 schema_version: 2.0.0
-stakeholders: []
 status: originated
 title: 'First-run MTTV: zcom docs/CLI must match the shipped SKU'
-updated_at: "2026-09-17T21:45:32Z"
+updated_at: "2026-09-18T00:09:12Z"
 updated_by: ACC-1785920548450214012-68b850c0
 version_context: default
 workstream_refs:

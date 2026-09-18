@@ -227,11 +227,9 @@ func init() {
 			"collaborate safely without losing context.",
 		).
 		AddSection("Command surfaces",
-			"Stable user and operator commands: object, system, scheduler, docman, quick, tray, healthchk, use.\n"+
-				"Automation: automation, precommit, callback, reports.\n"+
-				"Privileged / developer: internal (admin), keystore; use only when documented for your role.\n"+
-				"The zqk-admin binary (cmd/zqk-admin) shares this same command tree and bootstrap as zqk.\n"+
-				"See "+filepath.Join(paths.ProcessDir, "enforcement", "AGENT_GUIDELINES.md")+" (CLI command surfaces).",
+			"Community pressure-test (zcom): object, system, workflow, mcp, grep, new, inbox, learn, tray, quickstart, version.\n"+
+				"There is no scheduler, zqk-admin, keystore, or zcom-admin binary on this SKU.\n"+
+				"Kernel data lives under .zqk/ (not .zcom/). First-run: docs/onboarding/COMMUNITY_FIRST_RUN.md",
 		).
 		WithAutoDiscoverSubcommands(true)
 	helpBuilder.ApplyToCommand(rootCmd)
