@@ -41,6 +41,7 @@ const _sfxIDEPasteApp = "IDE_PASTE_APP"
 const _sfxCVSPerTestLedgerMaxFailures = "CVS_LEDGER_MAX_FAILURES"
 const _sfxCRUDBaselineCount = "CRUD_BASELINE_COUNT"
 const _sfxDisableCriteriaAutoValidate = "DISABLE_CRITERIA_AUTO_VALIDATE"
+const _sfxTelemetryOptIn = "TELEMETRY_OPT_IN"
 const _sfxHostloadDisable = "HOSTLOAD_DISABLE"
 const _sfxHostCPUBackpressure = "HOST_CPU_BACKPRESSURE"
 const _sfxCRUDHeapProfile = "CRUD_HEAP_PROFILE"
@@ -259,6 +260,11 @@ func CRUDBaselineCount() EnvVar { return EnvVar{Key: brand.EnvVar(_sfxCRUDBaseli
 // (criteria_verification_satisfied). Unset: allow auto-apply (opt-out).
 func DisableCriteriaAutoValidate() EnvVar {
 	return EnvVar{Key: brand.EnvVar(_sfxDisableCriteriaAutoValidate)}
+}
+
+// TelemetryOptIn returns the environment variable name for TELEMETRY_OPT_IN (brand-prefixed).
+func TelemetryOptIn() EnvVar {
+	return EnvVar{Key: brand.EnvVar(_sfxTelemetryOptIn)}
 }
 
 // HostloadDisable returns the env name for HOSTLOAD_DISABLE (brand-prefixed).

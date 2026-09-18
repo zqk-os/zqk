@@ -6,6 +6,8 @@ import (
 	"path/filepath"
 	"strings"
 	"time"
+
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // ShellType identifies a supported terminal shell family.
@@ -94,12 +96,12 @@ func InjectPath(profile ShellProfile) (*InjectionResult, error) {
 	}
 
 	configDir := filepath.Dir(profile.ConfigFile)
-	if err := os.MkdirAll(configDir, 0755); err != nil {
+	if err := fileutil.EnsureDir(configDir); err != nil {
 		return nil, fmt.Errorf("failed to create config directory %s: %w", configDir, err)
 	}
 
 	var existingContent string
-	data, err := os.ReadFile(profile.ConfigFile)
+	data, err := fileutil.ReadFile(profile.ConfigFile)
 	if err == nil {
 		existingContent = string(data)
 	} else if !os.IsNotExist(err) {
@@ -153,7 +155,7 @@ func RemovePathInjection(profile ShellProfile) (*InjectionResult, error) {
 		TargetFile: profile.ConfigFile,
 	}
 
-	data, err := os.ReadFile(profile.ConfigFile)
+	data, err := fileutil.ReadFile(profile.ConfigFile)
 	if err != nil {
 		if os.IsNotExist(err) {
 			result.Modified = false
@@ -194,7 +196,7 @@ func RemovePathInjection(profile ShellProfile) (*InjectionResult, error) {
 
 // VerifyPathInjected checks if the given configuration file contains an active zqk PATH injection block.
 func VerifyPathInjected(profile ShellProfile) (bool, error) {
-	data, err := os.ReadFile(profile.ConfigFile)
+	data, err := fileutil.ReadFile(profile.ConfigFile)
 	if err != nil {
 		if os.IsNotExist(err) {
 			return false, nil
@@ -220,19 +222,13 @@ func VerifyPathInjected(profile ShellProfile) (bool, error) {
 func writeWithBackup(targetPath, oldContent, newContent string, result *InjectionResult) (*InjectionResult, error) {
 	if len(oldContent) > 0 {
 		backupPath := fmt.Sprintf("%s.bak-%d", targetPath, time.Now().UnixNano())
-		if err := os.WriteFile(backupPath, []byte(oldContent), 0644); err != nil {
+		if err := fileutil.WriteStandardFile(backupPath, []byte(oldContent)); err != nil {
 			return nil, fmt.Errorf("failed to write backup file %s: %w", backupPath, err)
 		}
 		result.BackupFile = backupPath
 	}
 
-	tmpFile := fmt.Sprintf("%s.tmp-%d", targetPath, time.Now().UnixNano())
-	if err := os.WriteFile(tmpFile, []byte(newContent), 0644); err != nil {
-		return nil, fmt.Errorf("failed writing temporary config file: %w", err)
-	}
-
-	if err := os.Rename(tmpFile, targetPath); err != nil {
-		_ = os.Remove(tmpFile)
+	if err := fileutil.WriteDurableStandardFile(targetPath, []byte(newContent)); err != nil {
 		return nil, fmt.Errorf("failed to atomically update config file: %w", err)
 	}
 

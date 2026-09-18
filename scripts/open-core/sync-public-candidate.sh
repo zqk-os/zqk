@@ -107,56 +107,7 @@ for path in "${INCLUDES[@]}"; do
 done
 
 sh "$CANDIDATE_DIR/scripts/open-core/rewrite-community-module-path.sh" "$CANDIDATE_DIR"
-
-# Prune archived and launch doc trees from open-core candidate (TDE-1789629838711755000-bc3ed5d4)
-rm -rf "$CANDIDATE_DIR/docs/launch"
-if [ -d "$CANDIDATE_DIR/docs" ]; then
-  find "$CANDIDATE_DIR/docs" -depth -type d \( -name "archive" -o -name "_archive" \) -exec rm -rf {} + 2>/dev/null || true
-fi
-
-# Prune excluded subpackages and builders per police-community-tree.sh
-rm -rf "$CANDIDATE_DIR/pkg/mesh"
-rm -rf "$CANDIDATE_DIR/pkg/agent"
-
-if [ -d "$CANDIDATE_DIR/pkg/cli" ]; then
-  find "$CANDIDATE_DIR/pkg/cli" \( \
-    -name '*mesh*_command_builder.go' -o \
-    -name '*keystore*_command_builder.go' -o \
-    -name '*evolve*_command_builder.go' -o \
-    -name '*agent_lockdown*_command_builder.go' -o \
-    -name 'ambient_*_command_builder.go' -o \
-    -name 'agent_*_command_builder.go' -o \
-    -name '*paste*applescript*_command_builder.go' \
-    \) -type f -delete 2>/dev/null || true
-fi
-
-# Also remove cmd/zqk-community/pkg_cmd/healthchk if it exists
-rm -rf "$CANDIDATE_DIR/cmd/zqk-community/pkg_cmd/healthchk"
-
-# Prune studio-specific system commands per police-community-tree.sh
-rm -f "$CANDIDATE_DIR/cmd/zqk/system/agent_lockdown.go" \
-      "$CANDIDATE_DIR/cmd/zqk/system/ambient_daemon.go" \
-      "$CANDIDATE_DIR/cmd/zqk/system/sync_agents.go" \
-      "$CANDIDATE_DIR/cmd/zqk/system/evolve.go" \
-      "$CANDIDATE_DIR/cmd/zqk/system/materialize_agent_chat_channel.go" \
-      "$CANDIDATE_DIR/cmd/zqk/system/materialize_agent_chat_channel_test.go"
-
-# Stub studio command registration in candidate tree
-if [ -f "$CANDIDATE_DIR/cmd/zqk/system/register_studio_commands.go" ]; then
-  cat << 'EOF' > "$CANDIDATE_DIR/cmd/zqk/system/register_studio_commands.go"
-package system
-
-import "github.com/spf13/cobra"
-
-// registerStudioCommands is a no-op in the open-core community edition.
-func registerStudioCommands(_ *cobra.Command) {}
-EOF
-fi
-
-# Clean overly broad patterns from community .gitignore
-if [ -f "$CANDIDATE_DIR/.gitignore" ]; then
-  grep -Ev '^\*-\*\.txt$|^\*test\*\.txt$|^\*_results\.txt$' "$CANDIDATE_DIR/.gitignore" > "$CANDIDATE_DIR/.gitignore.tmp" && mv "$CANDIDATE_DIR/.gitignore.tmp" "$CANDIDATE_DIR/.gitignore"
-fi
+sh "$CANDIDATE_DIR/scripts/open-core/prune-community-source-boundary.sh" "$CANDIDATE_DIR"
 
 sh "$CANDIDATE_DIR/scripts/open-core/prune-community-onboarding.sh" "$CANDIDATE_DIR"
 

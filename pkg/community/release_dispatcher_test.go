@@ -1,7 +1,6 @@
 package community
 
 import (
-	"os"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -21,7 +20,7 @@ func TestReleaseDispatcher_FunctionalAcceptance(t *testing.T) {
 		t.Fatalf("expected release-community.yml workflow at %s", workflowPath)
 	}
 
-	contentBytes, err := os.ReadFile(workflowPath)
+	contentBytes, err := fileutil.ReadFile(workflowPath)
 	if err != nil {
 		t.Fatalf("failed reading workflow file: %v", err)
 	}
@@ -56,7 +55,7 @@ func TestReleaseDispatcher_FunctionalAcceptance(t *testing.T) {
 func TestReleaseDispatcher_BoundaryAndErrorHandling(t *testing.T) {
 	root := paths.ResolveProjectRoot(".")
 	workflowPath := filepath.Join(root, ".github", "workflows", "release-community.yml")
-	contentBytes, err := os.ReadFile(workflowPath)
+	contentBytes, err := fileutil.ReadFile(workflowPath)
 	if err != nil {
 		t.Fatalf("failed reading workflow file: %v", err)
 	}
@@ -88,7 +87,7 @@ func TestReleaseDispatcher_IntegrationAndConformance(t *testing.T) {
 		t.Fatalf("expected Dockerfile.community at %s", dockerfilePath)
 	}
 
-	dockerContentBytes, err := os.ReadFile(dockerfilePath)
+	dockerContentBytes, err := fileutil.ReadFile(dockerfilePath)
 	if err != nil {
 		t.Fatalf("failed reading Dockerfile.community: %v", err)
 	}

@@ -9,14 +9,13 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"os"
-	"path/filepath"
 	"strconv"
 	"strings"
 	"sync"
 	"time"
 
 	"github.com/zqk-os/zqk/pkg/goroutinelabels"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // ReleaseAsset describes a downloadable binary artifact and its cryptographic digest.
@@ -197,39 +196,7 @@ func (d *UpgradeDaemon) ApplyUpgrade(binaryData []byte, targetPath string) error
 		return fmt.Errorf("target binary path is required")
 	}
 
-	targetDir := filepath.Dir(targetPath)
-	if err := os.MkdirAll(targetDir, 0755); err != nil {
-		return fmt.Errorf("failed to create target directory %s: %w", targetDir, err)
-	}
-
-	tmpFile, err := os.CreateTemp(targetDir, "zqk-upgrade-*.tmp")
-	if err != nil {
-		return fmt.Errorf("failed to create temporary file for upgrade: %w", err)
-	}
-	tmpName := tmpFile.Name()
-
-	cleanUp := func() {
-		_ = tmpFile.Close()
-		_ = os.Remove(tmpName)
-	}
-
-	if _, err := tmpFile.Write(binaryData); err != nil {
-		cleanUp()
-		return fmt.Errorf("failed writing binary payload to temp file: %w", err)
-	}
-
-	if err := tmpFile.Chmod(0755); err != nil {
-		cleanUp()
-		return fmt.Errorf("failed to chmod temp binary: %w", err)
-	}
-
-	if err := tmpFile.Close(); err != nil {
-		_ = os.Remove(tmpName)
-		return fmt.Errorf("failed to flush temp binary: %w", err)
-	}
-
-	if err := os.Rename(tmpName, targetPath); err != nil {
-		_ = os.Remove(tmpName)
+	if err := fileutil.WriteDurableFile(targetPath, binaryData, fileutil.ExecutableFilePerm); err != nil {
 		return fmt.Errorf("failed to atomically replace %s: %w", targetPath, err)
 	}
 

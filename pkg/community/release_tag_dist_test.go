@@ -1,8 +1,6 @@
 package community
 
 import (
-	"os"
-	"os/exec"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -69,7 +67,7 @@ func TestReleaseTagDistribution_FunctionalAcceptance(t *testing.T) {
 	if !fileutil.Exists(formulaPath) {
 		t.Fatalf("Formula/zqk.rb missing in %s", distDir)
 	}
-	formulaBytes, err := os.ReadFile(formulaPath)
+	formulaBytes, err := fileutil.ReadFile(formulaPath)
 	if err != nil {
 		t.Fatalf("failed reading formula: %v", err)
 	}
@@ -100,12 +98,11 @@ func TestReleaseTagDistribution_BoundaryAndErrorHandling(t *testing.T) {
 	}
 
 	for _, invalid := range invalidVersions {
-		var cmd *exec.Cmd
-		if invalid == "" {
-			cmd = exec.Command("bash", scriptPath)
-		} else {
-			cmd = exec.Command("bash", scriptPath, invalid, "--dry")
+		args := []string{scriptPath}
+		if invalid != "" {
+			args = append(args, invalid, "--dry")
 		}
+		cmd := execwrap.Command("bash", args...)
 		cmd.Dir = root
 		out, err := cmd.CombinedOutput()
 		if err == nil {

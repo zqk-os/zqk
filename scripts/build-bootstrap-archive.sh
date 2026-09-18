@@ -5,6 +5,7 @@
 # REQ-9011: Manifest provides traceability for bundled files.
 set -e
 REPO_ROOT="${1:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)}"
+REPO_ROOT="$(cd "$REPO_ROOT" && pwd)"
 if [ -d "${REPO_ROOT}/.zqk/specs" ]; then
 	INTERNAL_DIR="${REPO_ROOT}/.zqk/specs"
 elif [ -d "${REPO_ROOT}/.zqk/specs" ]; then
@@ -93,7 +94,12 @@ find "$STAGING" \( \
 	-name 'ACC-*.yaml' \
 	\) -type f -delete 2>/dev/null || true
 
-tar czf "$ARCHIVE" -C "$STAGING" .
+SOURCE_DATE_EPOCH="${SOURCE_DATE_EPOCH:-$(git -C "$REPO_ROOT" log -1 --pretty=%ct 2>/dev/null || date +%s)}"
+TOUCH_TS="$(date -u -r "$SOURCE_DATE_EPOCH" '+%Y%m%d%H%M.%S' 2>/dev/null || date -u '+%Y%m%d%H%M.%S')"
+find "$STAGING" -exec touch -h -t "$TOUCH_TS" {} + 2>/dev/null || true
+
+export GZIP="-n"
+(cd "$STAGING" && find . | sort | tar -cf - -T - | gzip -n > "$ARCHIVE")
 # Traceability: list all paths in the archive (REQ-9011)
 tar tzf "$ARCHIVE" | sort > "$MANIFEST"
 echo "Created $ARCHIVE ($(wc -l < "$MANIFEST") entries) and $MANIFEST"

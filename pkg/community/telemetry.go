@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"os"
 	"path/filepath"
 	"sync"
 	"time"
@@ -187,7 +186,7 @@ func (c *TelemetryCollector) ExportToFile(destPath string, snapshot DiagnosticSn
 	}
 
 	dir := filepath.Dir(destPath)
-	if err := os.MkdirAll(dir, 0755); err != nil {
+	if err := fileutil.MkdirAll(dir, fileutil.StandardDirPerm); err != nil {
 		return fmt.Errorf("failed to create target export directory: %w", err)
 	}
 

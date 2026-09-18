@@ -1,7 +1,6 @@
 package community
 
 import (
-	"os"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -78,11 +77,11 @@ func TestAirgapReproBuild_BoundaryAndErrorHandling(t *testing.T) {
 		t.Fatalf("run 2 failed: %v\nOutput: %s", err, string(out))
 	}
 
-	chk1Bytes, err := os.ReadFile(filepath.Join(dist1, "checksums.txt"))
+	chk1Bytes, err := fileutil.ReadFile(filepath.Join(dist1, "checksums.txt"))
 	if err != nil {
 		t.Fatalf("failed reading dist1 checksums: %v", err)
 	}
-	chk2Bytes, err := os.ReadFile(filepath.Join(dist2, "checksums.txt"))
+	chk2Bytes, err := fileutil.ReadFile(filepath.Join(dist2, "checksums.txt"))
 	if err != nil {
 		t.Fatalf("failed reading dist2 checksums: %v", err)
 	}
@@ -93,10 +92,10 @@ func TestAirgapReproBuild_BoundaryAndErrorHandling(t *testing.T) {
 	}
 
 	// Verify Homebrew formula generated in both runs
-	f1, _ := os.ReadFile(filepath.Join(dist1, "Formula", "zqk.rb"))
-	f2, _ := os.ReadFile(filepath.Join(dist2, "Formula", "zqk.rb"))
+	f1, _ := fileutil.ReadFile(filepath.Join(dist1, "Formula", "zqk.rb"))
+	f2, _ := fileutil.ReadFile(filepath.Join(dist2, "Formula", "zqk.rb"))
 	if string(f1) != string(f2) {
-		t.Errorf("expected bit-for-bit identical Formula across reproducible runs with identical SOURCE_DATE_EPOCH")
+		t.Errorf("expected bit-for-bit identical Formula across reproducible runs with identical SOURCE_DATE_EPOCH\n--- dist1 Formula:\n%s\n--- dist2 Formula:\n%s\n--- dist1 checksums:\n%s\n--- dist2 checksums:\n%s", string(f1), string(f2), string(chk1Bytes), string(chk2Bytes))
 	}
 }
 

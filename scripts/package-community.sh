@@ -22,10 +22,11 @@ VER_NUM="${VERSION#v}"
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 DIST_DIR="${ZQK_DIST_DIR:-${REPO_ROOT}/dist-community}"
 GIT_COMMIT="$(git -C "$REPO_ROOT" rev-parse --short HEAD)"
-SOURCE_DATE_EPOCH="${SOURCE_DATE_EPOCH:-$(git -C "$REPO_ROOT" log -1 --pretty=%ct 2>/dev/null || date +%s)}"
+export SOURCE_DATE_EPOCH="${SOURCE_DATE_EPOCH:-$(git -C "$REPO_ROOT" log -1 --pretty=%ct 2>/dev/null || date +%s)}"
+export TOUCH_TS="$(date -u -r "$SOURCE_DATE_EPOCH" '+%Y%m%d%H%M.%S' 2>/dev/null || date -u '+%Y%m%d%H%M.%S')"
 BUILD_DATE="$(date -u -r "$SOURCE_DATE_EPOCH" '+%Y-%m-%dT%H:%M:%SZ' 2>/dev/null || date -u '+%Y-%m-%dT%H:%M:%SZ')"
 
-LDFLAGS="-s -w \
+LDFLAGS="-s -w -buildid= \
   -X github.com/lanceman/zqk/cmd/zqk/app.version=${VERSION} \
   -X github.com/lanceman/zqk/cmd/zqk/app.buildDate=${BUILD_DATE} \
   -X github.com/lanceman/zqk/cmd/zqk/app.gitCommit=${GIT_COMMIT} \
@@ -71,12 +72,16 @@ for platform in "${PLATFORMS[@]}"; do
     BIN_NAME="${entry%:*}"
     BIN_PATH="${entry#*:}"
     CGO_ENABLED=0 GOOS="$GOOS" GOARCH="$GOARCH" \
-      go build -ldflags "$LDFLAGS" -o "${STAGE_DIR}/${BIN_NAME}" "$BIN_PATH"
+      go build -trimpath -ldflags "$LDFLAGS" -o "${STAGE_DIR}/${BIN_NAME}" "$BIN_PATH"
   done
 
   # Include essential files
   [ -f "${REPO_ROOT}/LICENSE" ] && cp "${REPO_ROOT}/LICENSE" "$STAGE_DIR/"
   [ -f "${REPO_ROOT}/README.md" ] && cp "${REPO_ROOT}/README.md" "$STAGE_DIR/"
+
+  # Normalize file timestamps for reproducible builds
+  TOUCH_TS="$(date -u -r "$SOURCE_DATE_EPOCH" '+%Y%m%d%H%M.%S' 2>/dev/null || date -u '+%Y%m%d%H%M.%S')"
+  find "$STAGE_DIR" -exec touch -h -t "$TOUCH_TS" {} + 2>/dev/null || true
 
   # macOS Code Signing & Notarization Gate
   if [[ "$GOOS" == "darwin" && -f "${REPO_ROOT}/scripts/notarize-and-sign-darwin.sh" ]]; then
@@ -85,10 +90,11 @@ for platform in "${PLATFORMS[@]}"; do
       BIN_NAME="${entry%:*}"
       bash "${REPO_ROOT}/scripts/notarize-and-sign-darwin.sh" "${STAGE_DIR}/${BIN_NAME}"
     done
+    find "$STAGE_DIR" -exec touch -h -t "$TOUCH_TS" {} + 2>/dev/null || true
   fi
 
   # Create archive
-  (cd "$DIST_DIR" && tar -czf "${ARCHIVE_NAME}.tar.gz" "$ARCHIVE_NAME")
+  (cd "$DIST_DIR" && find "$ARCHIVE_NAME" | sort | tar -cf - -T - | gzip -n > "${ARCHIVE_NAME}.tar.gz")
   if [[ "$GOOS" == "darwin" && -f "${REPO_ROOT}/scripts/notarize-and-sign-darwin.sh" ]]; then
     bash "${REPO_ROOT}/scripts/notarize-and-sign-darwin.sh" "${DIST_DIR}/${ARCHIVE_NAME}.tar.gz"
     bash "${REPO_ROOT}/scripts/notarize-and-sign-darwin.sh" --verify "${DIST_DIR}/${ARCHIVE_NAME}.tar.gz"
@@ -126,7 +132,10 @@ if [ -f "${REPO_ROOT}/scripts/generate-openapi-clients.sh" ]; then
   echo "  📦 Generating multi-language OpenAPI client SDKs..."
   bash "${REPO_ROOT}/scripts/generate-openapi-clients.sh" "${DIST_DIR}/sdk"
   bash "${REPO_ROOT}/scripts/generate-openapi-clients.sh" --verify "${DIST_DIR}/sdk"
-  (cd "$DIST_DIR" && tar -czf "zqk-client-sdks.tar.gz" sdk)
+  if [ -n "${SOURCE_DATE_EPOCH:-}" ]; then
+    find "${DIST_DIR}/sdk" -exec touch -h -t "$TOUCH_TS" {} + 2>/dev/null || true
+  fi
+  (cd "$DIST_DIR" && find sdk | sort | tar -cf - -T - | gzip -n > "zqk-client-sdks.tar.gz")
 fi
 
 

@@ -103,62 +103,7 @@ for path in "${OVERLAY_PATHS[@]}"; do
 done
 
 sh "$DEST/scripts/open-core/rewrite-community-module-path.sh" "$DEST"
-
-# Prune archived and launch doc trees per open-core governance
-rm -rf "$DEST/docs/launch"
-if [ -d "$DEST/docs" ]; then
-  find "$DEST/docs" -depth -type d \( -name "archive" -o -name "_archive" \) -exec rm -rf {} + 2>/dev/null || true
-fi
-
-# Prune excluded subpackages and builders per police-community-tree.sh
-rm -rf "$DEST/pkg/mesh"
-rm -rf "$DEST/pkg/agent"
-rm -f "$DEST/cmd/zqk-community/app/join.go"
-rm -f "$DEST/pkg/brand/apply.go" \
-      "$DEST/pkg/brand/apply_test.go" \
-      "$DEST/pkg/brand/project_config.go" \
-      "$DEST/pkg/brand/project_config_test.go"
-# TRACK: TDE-1789712164445942000-2f9cf61a — include Helm tests only after
-# the community distribution has a dest-owned design and public chart assets.
-rm -f "$DEST/pkg/community/container_helm_test.go"
-
-if [ -d "$DEST/pkg/cli" ]; then
-  find "$DEST/pkg/cli" \( \
-    -name '*mesh*_command_builder.go' -o \
-    -name '*keystore*_command_builder.go' -o \
-    -name '*evolve*_command_builder.go' -o \
-    -name '*agent_lockdown*_command_builder.go' -o \
-    -name 'ambient_*_command_builder.go' -o \
-    -name 'agent_*_command_builder.go' -o \
-    -name '*paste*applescript*_command_builder.go' \
-  \) -exec rm -f {} + 2>/dev/null || true
-fi
-
-# Prune studio-specific system commands per police-community-tree.sh
-rm -f "$DEST/cmd/zqk/system/agent_lockdown.go" \
-      "$DEST/cmd/zqk/system/ambient_daemon.go" \
-      "$DEST/cmd/zqk/system/sync_agents.go" \
-      "$DEST/cmd/zqk/system/evolve.go" \
-      "$DEST/cmd/zqk/system/materialize_agent_chat_channel.go"
-
-# Stub studio command registration in candidate tree
-if [ -f "$DEST/cmd/zqk/system/register_studio_commands.go" ]; then
-  cat << 'EOF' > "$DEST/cmd/zqk/system/register_studio_commands.go"
-package system
-
-import "github.com/spf13/cobra"
-
-// registerStudioCommands is a no-op in the open-core community edition.
-func registerStudioCommands(_ *cobra.Command) {}
-EOF
-fi
-
-# Clean overly broad patterns from community .gitignore
-if [ -f "$DEST/.gitignore" ]; then
-  grep -Ev '^\*-\*\.txt$|^\*test\*\.txt$|^\*_results\.txt$' "$DEST/.gitignore" > "$DEST/.gitignore.tmp" && mv "$DEST/.gitignore.tmp" "$DEST/.gitignore"
-  grep -Fqx '.zcom/' "$DEST/.gitignore" || printf '%s\n' '.zcom/' >> "$DEST/.gitignore"
-  grep -Fqx 'config/zqk-local.yaml' "$DEST/.gitignore" || printf '%s\n' 'config/zqk-local.yaml' >> "$DEST/.gitignore"
-fi
+sh "$DEST/scripts/open-core/prune-community-source-boundary.sh" "$DEST"
 
 # Prune studio-internal onboarding files and docs noise
 if [ -x "$REPO_ROOT/scripts/open-core/prune-community-onboarding.sh" ]; then

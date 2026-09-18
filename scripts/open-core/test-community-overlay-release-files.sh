@@ -13,6 +13,27 @@ trap 'rm -rf "$TMP_DEST"; rm -f "$EXPECTED_LICENSE"' EXIT HUP INT TERM
 sh -n "$ROOT/scripts/open-core/apply-community-source.sh"
 sh -n "$ROOT/scripts/open-core/sync-public-candidate.sh"
 sh -n "$ROOT/scripts/open-core/install-community-sku.sh"
+sh -n "$ROOT/scripts/open-core/prune-community-source-boundary.sh"
+
+mkdir -p "$TMP_DEST/cmd/zqk-community/app" "$TMP_DEST/pkg/community" "$TMP_DEST/pkg/brand"
+for path in \
+	cmd/zqk-community/app/join.go \
+	pkg/community/container_helm_test.go \
+	pkg/brand/apply.go \
+	pkg/brand/project_config.go; do
+	: >"$TMP_DEST/$path"
+done
+sh "$ROOT/scripts/open-core/prune-community-source-boundary.sh" "$TMP_DEST"
+for path in \
+	cmd/zqk-community/app/join.go \
+	pkg/community/container_helm_test.go \
+	pkg/brand/apply.go \
+	pkg/brand/project_config.go; do
+	if [ -e "$TMP_DEST/$path" ]; then
+		printf 'source-boundary prune left %s\n' "$path" >&2
+		exit 1
+	fi
+done
 
 awk '
 	/^--------------------------------------------------------------------------------$/ { found_separator=1; exit }
@@ -37,8 +58,7 @@ cmp "$ROOT/scripts/open-core/sku-overlay/COMMUNITY_FIRST_RUN.md" "$TMP_DEST/docs
 for path in \
 	scripts/open-core/apply-community-source.sh \
 	scripts/open-core/sync-public-candidate.sh \
-	scripts/open-core/community-bounded-includes \
-	scripts/open-core/community-bounded-includes.txt; do
+	scripts/open-core/community-bounded-includes; do
 	if grep -F '.goreleaser.yaml' "$ROOT/$path" >/dev/null; then
 		printf 'stale release config remains in %s\n' "$path" >&2
 		exit 1

@@ -18,6 +18,7 @@ import (
 
 	"github.com/zqk-os/zqk/cmd/zqk-community/app"
 	clctx "github.com/zqk-os/zqk/internal/cli/context"
+	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
 )
 
@@ -34,6 +35,10 @@ func bindIsolatedAppTestRoot(t *testing.T, projectRoot string) {
 	t.Setenv(zqkenv.ProjectRoot().Name(), "")
 	t.Setenv(zqkenv.InTest().Name(), "true")
 	zqkenv.ApplyIsolatedStorageEnv(t.Setenv)
+	objects.ResetGlobalSpecLoaderForTesting()
+	objects.ResetGlobalFieldRegistryForTesting()
+	objects.ResetGlobalKindMapperForTesting()
+	objects.GetGlobalLifecycleLoader().ClearCache()
 }
 
 func writeMinimalTestSettingsYAMLApp(testRoot string) error {

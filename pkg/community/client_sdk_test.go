@@ -4,12 +4,11 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
-	"os"
-	"os/exec"
 	"path/filepath"
 	"strings"
 	"testing"
 
+	"github.com/zqk-os/zqk/pkg/execwrap"
 	"github.com/zqk-os/zqk/pkg/paths"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
@@ -31,7 +30,7 @@ func TestClientSDK_FunctionalAcceptance(t *testing.T) {
 
 	tmpOut := t.TempDir()
 
-	cmd := exec.Command("bash", scriptPath, "--spec", specPath, "--lang", "all", "--out-dir", tmpOut)
+	cmd := execwrap.Command("bash", scriptPath, "--spec", specPath, "--lang", "all", "--out-dir", tmpOut)
 	out, err := cmd.CombinedOutput()
 	if err != nil {
 		t.Fatalf("generate-client-sdk.sh failed: %v, output:\n%s", err, string(out))
@@ -46,7 +45,7 @@ func TestClientSDK_FunctionalAcceptance(t *testing.T) {
 			t.Errorf("expected TypeScript artifact at %s", p)
 		}
 	}
-	tsContent, err := os.ReadFile(tsTypesPath)
+	tsContent, err := fileutil.ReadFile(tsTypesPath)
 	if err != nil {
 		t.Fatalf("failed reading ts types: %v", err)
 	}
@@ -66,7 +65,7 @@ func TestClientSDK_FunctionalAcceptance(t *testing.T) {
 			t.Errorf("expected Python artifact at %s", p)
 		}
 	}
-	pyContent, err := os.ReadFile(pyModelsPath)
+	pyContent, err := fileutil.ReadFile(pyModelsPath)
 	if err != nil {
 		t.Fatalf("failed reading py models: %v", err)
 	}
@@ -85,7 +84,7 @@ func TestClientSDK_FunctionalAcceptance(t *testing.T) {
 			t.Errorf("expected Go artifact at %s", p)
 		}
 	}
-	goContent, err := os.ReadFile(goTypesPath)
+	goContent, err := fileutil.ReadFile(goTypesPath)
 	if err != nil {
 		t.Fatalf("failed reading go types: %v", err)
 	}
@@ -104,7 +103,7 @@ func TestClientSDK_BoundaryAndErrorHandling(t *testing.T) {
 	scriptPath := filepath.Join(root, "scripts", "generate-client-sdk.sh")
 
 	// 1. Nonexistent spec
-	cmdNonexistent := exec.Command("bash", scriptPath, "--spec", "/nonexistent/spec.yaml")
+	cmdNonexistent := execwrap.Command("bash", scriptPath, "--spec", "/nonexistent/spec.yaml")
 	if err := cmdNonexistent.Run(); err == nil {
 		t.Errorf("expected generator to fail on nonexistent spec")
 	}
@@ -112,17 +111,17 @@ func TestClientSDK_BoundaryAndErrorHandling(t *testing.T) {
 	// 2. Unsupported language
 	tmpDir := t.TempDir()
 	validSpec := filepath.Join(root, "api", "openapi", "zqk-openapi.yaml")
-	cmdBadLang := exec.Command("bash", scriptPath, "--spec", validSpec, "--lang", "rust", "--out-dir", tmpDir)
+	cmdBadLang := execwrap.Command("bash", scriptPath, "--spec", validSpec, "--lang", "rust", "--out-dir", tmpDir)
 	if err := cmdBadLang.Run(); err == nil {
 		t.Errorf("expected generator to fail on unsupported language 'rust'")
 	}
 
 	// 3. Malformed YAML
 	badYAML := filepath.Join(tmpDir, "bad.yaml")
-	if err := os.WriteFile(badYAML, []byte("openapi: 3.0.0\n[invalid yaml: {"), 0644); err != nil {
+	if err := fileutil.WriteFile(badYAML, []byte("openapi: 3.0.0\n[invalid yaml: {"), fileutil.StandardFilePerm); err != nil {
 		t.Fatalf("failed writing bad yaml: %v", err)
 	}
-	cmdBadYAML := exec.Command("bash", scriptPath, "--verify", badYAML)
+	cmdBadYAML := execwrap.Command("bash", scriptPath, "--verify", badYAML)
 	if err := cmdBadYAML.Run(); err == nil {
 		t.Errorf("expected verification to fail on corrupt YAML")
 	}
@@ -134,10 +133,10 @@ info:
   title: Incomplete
 paths: {}
 `
-	if err := os.WriteFile(incompleteSpec, []byte(incompleteContent), 0644); err != nil {
+	if err := fileutil.WriteFile(incompleteSpec, []byte(incompleteContent), fileutil.StandardFilePerm); err != nil {
 		t.Fatalf("failed writing incomplete yaml: %v", err)
 	}
-	cmdIncomplete := exec.Command("bash", scriptPath, "--verify", incompleteSpec)
+	cmdIncomplete := execwrap.Command("bash", scriptPath, "--verify", incompleteSpec)
 	if err := cmdIncomplete.Run(); err == nil {
 		t.Errorf("expected verification to fail on incomplete OpenAPI spec")
 	}
@@ -157,10 +156,10 @@ components:
     Test:
       type: object
 `
-	if err := os.WriteFile(missingOpIDSpec, []byte(missingOpContent), 0644); err != nil {
+	if err := fileutil.WriteFile(missingOpIDSpec, []byte(missingOpContent), fileutil.StandardFilePerm); err != nil {
 		t.Fatalf("failed writing missing op yaml: %v", err)
 	}
-	cmdMissingOp := exec.Command("bash", scriptPath, "--verify", missingOpIDSpec)
+	cmdMissingOp := execwrap.Command("bash", scriptPath, "--verify", missingOpIDSpec)
 	if err := cmdMissingOp.Run(); err == nil {
 		t.Errorf("expected verification to fail on operation missing operationId")
 	}
@@ -177,7 +176,7 @@ func TestClientSDK_IntegrationAndConformance(t *testing.T) {
 	tmpDir := t.TempDir()
 
 	// 1. Run generation
-	cmdGen := exec.Command("python3", genPy, "--spec", specPath, "--lang", "all", "--out-dir", tmpDir)
+	cmdGen := execwrap.Command("python3", genPy, "--spec", specPath, "--lang", "all", "--out-dir", tmpDir)
 	if out, err := cmdGen.CombinedOutput(); err != nil {
 		t.Fatalf("generation failed: %v, out:\n%s", err, string(out))
 	}
@@ -188,7 +187,7 @@ func TestClientSDK_IntegrationAndConformance(t *testing.T) {
 		filepath.Join(tmpDir, "python", "zqk_client", "client.py"),
 		filepath.Join(tmpDir, "python", "zqk_client", "__init__.py"),
 	}
-	cmdPyCompile := exec.Command("python3", append([]string{"-m", "py_compile"}, pyFiles...)...)
+	cmdPyCompile := execwrap.Command("python3", append([]string{"-m", "py_compile"}, pyFiles...)...)
 	if out, err := cmdPyCompile.CombinedOutput(); err != nil {
 		t.Errorf("Python compilation failed: %v, out:\n%s", err, string(out))
 	}
@@ -241,11 +240,11 @@ metrics = client.get_metrics()
 assert metrics["goroutines"] == 16, f"expected 16 goroutines, got {metrics}"
 print("PYTHON_CLIENT_CONFORMANCE_OK")
 `
-	if err := os.WriteFile(pyTestScript, []byte(pyTestCode), 0644); err != nil {
+	if err := fileutil.WriteFile(pyTestScript, []byte(pyTestCode), fileutil.StandardFilePerm); err != nil {
 		t.Fatalf("failed to write test_client.py: %v", err)
 	}
 
-	cmdPyRun := exec.Command("python3", pyTestScript)
+	cmdPyRun := execwrap.Command("python3", pyTestScript)
 	outPy, err := cmdPyRun.CombinedOutput()
 	if err != nil {
 		t.Errorf("Python client conformance test failed: %v, out:\n%s", err, string(outPy))
@@ -255,7 +254,7 @@ print("PYTHON_CLIENT_CONFORMANCE_OK")
 	}
 
 	// 4. Verify Go SDK compiles and passes tests
-	cmdGoBuild := exec.Command("go", "build", "./zqk")
+	cmdGoBuild := execwrap.Command("go", "build", "./zqk")
 	cmdGoBuild.Dir = filepath.Join(tmpDir, "go")
 	if out, err := cmdGoBuild.CombinedOutput(); err != nil {
 		t.Errorf("Go SDK build failed: %v, out:\n%s", err, string(out))
