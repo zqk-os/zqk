@@ -22,7 +22,8 @@ help:
 	@echo "  make / make zcom   Build ./bin/zcom from ./cmd/zqk-community"
 	@echo "  make clean         Remove bin/*"
 	@echo ""
-	@echo "There is no make zqk, zqk-admin, zqk-mcp, scheduler, or promote-stable here."
+	@echo "There is no make zqk, zqk-admin, zqk-mcp, or promote-stable here."
+	@echo "Scheduler CLI: ./bin/zcom scheduler start|stop|status"
 	@echo "Run ./bin/zcom from this directory. Do not export ZCOM_PROJECT_ROOT."
 	@echo "Rename zcom → zqk only at public launch."
 
