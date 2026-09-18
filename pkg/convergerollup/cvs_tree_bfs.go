@@ -3,7 +3,7 @@ package convergerollup
 import (
 	"strings"
 
-	"github.com/lanceman/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/errfmt"
 )
 
 // DefaultOverseerCVSTreeMaxDepth caps BFS expansion from the coordinator (nested CVS;

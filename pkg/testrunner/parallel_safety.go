@@ -9,7 +9,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/lanceman/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/errfmt"
 )
 
 // SafetyLevel classifies a test's readiness for t.Parallel().

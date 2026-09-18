@@ -3,9 +3,9 @@ package validation
 import (
 	"fmt"
 
-	"github.com/lanceman/zqk/pkg/when"
+	"github.com/zqk-os/zqk/pkg/when"
 
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // ValidateBucketingStrategy validates a bucketing strategy spec

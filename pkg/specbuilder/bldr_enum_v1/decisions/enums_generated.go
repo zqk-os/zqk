@@ -4,8 +4,8 @@
 package decisions
 
 import (
-	base_objectenum "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
-	shared_decisionsenum "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/shared_decisions"
+	base_objectenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
+	shared_decisionsenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/shared_decisions"
 )
 
 type ImpactLevel string

@@ -8,7 +8,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/testrunner"
+	"github.com/zqk-os/zqk/pkg/testrunner"
 )
 
 // TestStreamTests_EmptyOrSinglePkg verifies BLI-SCRIPT-PROD-TESTING-002 test progress streaming.

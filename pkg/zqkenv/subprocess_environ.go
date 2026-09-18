@@ -6,7 +6,7 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/lanceman/zqk/pkg/brand"
+	"github.com/zqk-os/zqk/pkg/brand"
 )
 
 // subprocessChildTestRootEnvKey is the TEST_ROOT variable name read by the default CLI binary

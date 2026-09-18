@@ -9,7 +9,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/goroutinelabels"
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/shirou/gopsutil/v3/process"
 )
 

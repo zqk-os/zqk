@@ -3,7 +3,7 @@ package objects
 import (
 	"fmt"
 
-	"github.com/lanceman/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/errfmt"
 )
 
 // SnapableObjectQuery represents the object query configuration for snapable objects

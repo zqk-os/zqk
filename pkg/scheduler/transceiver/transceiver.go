@@ -4,7 +4,7 @@
 package transceiver
 
 import (
-	"github.com/lanceman/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/logging"
 )
 
 const emptyValue = ""

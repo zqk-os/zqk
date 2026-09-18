@@ -3,8 +3,8 @@ package agentdelivery
 import (
 	"context"
 
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/policy"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/policy"
 )
 
 // Prompt is the payload to hand to an agent surface (IDE, API, queue).

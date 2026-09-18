@@ -1,6 +1,6 @@
 package kernelcas
 
-import "github.com/lanceman/zqk/pkg/objects"
+import "github.com/zqk-os/zqk/pkg/objects"
 
 // IsCriticalKind reports kinds that must not be silently hard-deleted and that require
 // break_glass for lifecycle Force. Policy is spec-driven (object_specs kernel_critical +

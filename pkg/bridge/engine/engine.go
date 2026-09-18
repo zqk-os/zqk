@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/lanceman/zqk/pkg/bridge"
+	"github.com/zqk-os/zqk/pkg/bridge"
 )
 
 // TranslationEngine orchestrates schema-to-ontology translation.

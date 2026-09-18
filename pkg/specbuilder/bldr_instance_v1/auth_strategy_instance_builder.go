@@ -4,9 +4,9 @@
 package bldr_instance_v1
 
 import (
-	"github.com/lanceman/zqk/pkg/objects"
-	enumv "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/auth_strategy"
-	"github.com/lanceman/zqk/pkg/specbuilder/instance_builders"
+	"github.com/zqk-os/zqk/pkg/objects"
+	enumv "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/auth_strategy"
+	"github.com/zqk-os/zqk/pkg/specbuilder/instance_builders"
 )
 
 // AuthStrategyInstanceBuilder builds auth_strategy instances

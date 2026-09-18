@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/brand"
+	"github.com/zqk-os/zqk/pkg/brand"
 )
 
 func TestScale(t *testing.T) {

@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // hasNestedSchedulerJobChurnID reports legacy recursive ids: SCH-<ts>-scheduler-job-<parent id>

@@ -7,9 +7,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/authcred"
-	"github.com/lanceman/zqk/pkg/crypto"
-	"github.com/lanceman/zqk/pkg/zqkenv"
+	"github.com/zqk-os/zqk/pkg/authcred"
+	"github.com/zqk-os/zqk/pkg/crypto"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
 func TestIsMutatingOperation(t *testing.T) {

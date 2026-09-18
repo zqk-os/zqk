@@ -4,7 +4,7 @@ import (
 	"errors"
 	"strings"
 
-	"github.com/lanceman/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/logging"
 )
 
 const (

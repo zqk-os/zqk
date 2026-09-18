@@ -1,6 +1,6 @@
 package interactive
 
-import "github.com/lanceman/zqk/pkg/objects"
+import "github.com/zqk-os/zqk/pkg/objects"
 
 // UpdateFieldFilter filters fields for UPDATE operations
 // Unlike CREATE, UPDATE allows modifying mutable fields but not immutable fields

@@ -6,8 +6,8 @@ import (
 	"bufio"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/errfmt"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 func waitForWALProcessingEventDriven(projectRoot string, timeout time.Duration) error {

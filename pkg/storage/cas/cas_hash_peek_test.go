@@ -3,14 +3,14 @@ package cas_test
 import (
 	"path/filepath"
 
-	"github.com/lanceman/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/storage"
 
-	"github.com/lanceman/zqk/pkg/storage/filecas"
+	"github.com/zqk-os/zqk/pkg/storage/filecas"
 
 	"strings"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 func TestCasHashFilePeekObjectID_IgnoresIndentedNestedID(t *testing.T) {

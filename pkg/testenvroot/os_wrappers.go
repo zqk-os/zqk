@@ -1,6 +1,6 @@
 package testenvroot
 
-import "github.com/lanceman/zqk/pkg/utils/fileutil"
+import "github.com/zqk-os/zqk/pkg/utils/fileutil"
 
 // WriteFile delegates to fileutil.WriteFile (includes the repo-write guard).
 func WriteFile(name string, data []byte, perm fileutil.FileMode) error {

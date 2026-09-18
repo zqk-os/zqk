@@ -3,7 +3,7 @@ package objects
 import (
 	"fmt"
 
-	"github.com/lanceman/zqk/pkg/zqktime"
+	"github.com/zqk-os/zqk/pkg/zqktime"
 )
 
 // FieldLifecycleState represents the lifecycle state of a field

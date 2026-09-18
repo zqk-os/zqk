@@ -3,7 +3,7 @@ package validation
 import (
 	"strings"
 
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // Canonical criteria id for CRI-PERSONA-SKILL-BOUND (MMORCH).

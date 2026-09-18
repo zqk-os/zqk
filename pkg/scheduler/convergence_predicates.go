@@ -3,9 +3,9 @@ package scheduler
 import (
 	"strings"
 
-	"github.com/lanceman/zqk/pkg/nildecode"
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/when"
+	"github.com/zqk-os/zqk/pkg/nildecode"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/when"
 )
 
 // EvaluateConvergencePredicateReadiness evaluates optional machine-readable hints in thresholds

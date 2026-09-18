@@ -8,7 +8,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/swarm"
+	"github.com/zqk-os/zqk/pkg/swarm"
 )
 
 func TestInMemoryTaskQueue(t *testing.T) {

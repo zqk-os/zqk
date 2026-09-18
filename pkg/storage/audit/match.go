@@ -1,6 +1,6 @@
 package audit
 
-import "github.com/lanceman/zqk/pkg/objects"
+import "github.com/zqk-os/zqk/pkg/objects"
 
 // RuleMatches reports whether event matches one aggregation rule.
 func RuleMatches(rule Rule, event map[string]any) bool {

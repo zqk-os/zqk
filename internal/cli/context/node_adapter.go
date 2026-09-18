@@ -1,7 +1,7 @@
 package context
 
 import (
-	pkgctx "github.com/lanceman/zqk/pkg/context"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
 )
 
 // ContextNodeAdapter adapts ContextNode to work with the chain system

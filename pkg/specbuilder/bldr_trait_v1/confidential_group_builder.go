@@ -1,7 +1,7 @@
 package bldr_trait_v1
 
 import (
-	"github.com/lanceman/zqk/pkg/specbuilder/trait_builders"
+	"github.com/zqk-os/zqk/pkg/specbuilder/trait_builders"
 )
 
 // ConfidentialGroupBuilder builds the confidential_group trait at version v1_0_0

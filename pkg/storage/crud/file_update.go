@@ -3,7 +3,7 @@ package crud
 import (
 	"reflect"
 
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 func ComputeUpdatesMap(previous, newObj map[string]any) map[string]any {

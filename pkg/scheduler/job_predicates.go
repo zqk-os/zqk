@@ -1,6 +1,6 @@
 package scheduler
 
-import "github.com/lanceman/zqk/pkg/objects"
+import "github.com/zqk-os/zqk/pkg/objects"
 
 // IsSchedulerJobMarkedForDeletion returns true when the raw scheduler_job object represents a one_time job
 // that is marked for deletion (enabled=false or status=disabled). Such jobs are excluded from LoadJobs

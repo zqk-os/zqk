@@ -3,7 +3,7 @@ package scheduler
 import (
 	"strings"
 
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // MergeConvergencePersistObjectUpdateBody applies operator-preserving merges before storage Update for

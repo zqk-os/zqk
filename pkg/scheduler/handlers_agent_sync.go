@@ -4,10 +4,10 @@ import (
 	"context"
 	"path/filepath"
 
-	"github.com/lanceman/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/paths"
 
-	"github.com/lanceman/zqk/pkg/ingestion/adapters"
-	"github.com/lanceman/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/ingestion/adapters"
+	"github.com/zqk-os/zqk/pkg/logging"
 )
 
 type AgentSyncHandler struct {

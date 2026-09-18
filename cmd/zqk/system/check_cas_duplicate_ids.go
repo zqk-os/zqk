@@ -7,7 +7,7 @@ import (
 	"strings"
 	"sync"
 
-	caspkg "github.com/lanceman/zqk/pkg/storage/cas"
+	caspkg "github.com/zqk-os/zqk/pkg/storage/cas"
 
 	"github.com/spf13/cobra"
 )

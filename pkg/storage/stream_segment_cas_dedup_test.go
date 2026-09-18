@@ -8,10 +8,10 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/storage"
-	"github.com/lanceman/zqk/pkg/storage/filecas"
-	"github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/storage/filecas"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // TestFileObjectStorage_StreamSegmentIdenticalChunksShareOneBlob verifies CRIT-1789333114473875000-490ba391:

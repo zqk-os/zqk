@@ -3,7 +3,7 @@ package scheduler
 import (
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/zqkenv"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
 func TestWithZQKJobIDEnv_IncludesJobID(t *testing.T) {

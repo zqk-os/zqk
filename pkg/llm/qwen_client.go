@@ -4,8 +4,8 @@ import (
 	"context"
 	"strings"
 
-	zqkctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/zqkenv"
+	zqkctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
 // NewQwenClient creates a new Qwen API client by wrapping the OpenAI-compatible client

@@ -3,7 +3,7 @@ package metrics
 import (
 	"time"
 
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // MetricObjectConfig configures how a metric object is created

@@ -7,7 +7,7 @@ import (
 	"context"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/zqkenv"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
 // UsesContentAddressableStorageForTest exposes usesContentAddressableStorage for tests.

@@ -3,8 +3,8 @@ package builders
 import (
 	"fmt"
 
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // SpecBuilder is an interface for builders that generate object specs at a specific version

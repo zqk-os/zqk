@@ -6,13 +6,13 @@ import (
 	"testing"
 	"time"
 
-	caspkg "github.com/lanceman/zqk/pkg/storage/cas"
+	caspkg "github.com/zqk-os/zqk/pkg/storage/cas"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/storage"
-	"github.com/lanceman/zqk/pkg/testkit"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/testkit"
 
-	"github.com/lanceman/zqk/cmd/zqk-community/app"
+	"github.com/zqk-os/zqk/cmd/zqk-community/app"
 )
 
 // updateCountingStorage wraps a storage and counts Update calls (used to assert

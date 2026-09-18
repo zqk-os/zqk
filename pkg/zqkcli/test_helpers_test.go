@@ -4,9 +4,9 @@ import (
 	"os/exec"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/storage"
-	"github.com/lanceman/zqk/pkg/testkit"
-	"github.com/lanceman/zqk/pkg/zqkenv"
+	"github.com/zqk-os/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/testkit"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
 // harnessAccountID is the identity isolated child processes authenticate as. It is an ACC- id

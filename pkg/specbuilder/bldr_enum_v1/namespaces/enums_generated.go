@@ -4,8 +4,8 @@
 package namespaces
 
 import (
-	base_objectenum "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
-	shared_namespacesenum "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/shared_namespaces"
+	base_objectenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
+	shared_namespacesenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/shared_namespaces"
 )
 
 type Layer string

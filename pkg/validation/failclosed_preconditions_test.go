@@ -4,8 +4,8 @@ import (
 	"os"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/pipeline"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/pipeline"
 )
 
 // TestFailClosedPreconditions_FunctionalAcceptance covers CRIT-1789669261063570000-7f136b3c:

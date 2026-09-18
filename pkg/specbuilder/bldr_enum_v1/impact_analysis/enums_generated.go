@@ -4,8 +4,8 @@
 package impact_analysis
 
 import (
-	base_objectenum "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
-	shared_impact_analysesenum "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/shared_impact_analyses"
+	base_objectenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
+	shared_impact_analysesenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/shared_impact_analyses"
 )
 
 type Plane = base_objectenum.Plane

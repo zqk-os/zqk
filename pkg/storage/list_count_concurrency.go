@@ -6,8 +6,8 @@ import (
 	"strconv"
 	"sync"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/zqkenv"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
 // listCountSlotLimiter limits how many file-heavy List or Count operations can run concurrently.

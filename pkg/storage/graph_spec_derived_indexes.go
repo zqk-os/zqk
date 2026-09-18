@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/lanceman/zqk/pkg/graph/provider"
-	pkgobjects "github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/graph/provider"
+	pkgobjects "github.com/zqk-os/zqk/pkg/objects"
 )
 
 // EnsureSpecDerivedIndexes creates idempotent MemGraph indexes derived from the

@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/graph/provider"
+	"github.com/zqk-os/zqk/pkg/graph/provider"
 )
 
 // TestCRIT_1789333118970585000_a2d88dd2 verifies CRIT-1789333118970585000-a2d88dd2:

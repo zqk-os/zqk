@@ -3,8 +3,8 @@ package validation
 import (
 	"time"
 
-	"github.com/lanceman/zqk/pkg/hostload"
-	"github.com/lanceman/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/hostload"
+	"github.com/zqk-os/zqk/pkg/logging"
 )
 
 const hostloadValidationYield = 50 * time.Millisecond

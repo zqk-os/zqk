@@ -1,9 +1,9 @@
 package system
 
 import (
-	"github.com/lanceman/zqk/pkg/logging"
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/systemcheck"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/systemcheck"
 )
 
 // Type aliases keep cmd/zqk/system call sites stable while check domain types

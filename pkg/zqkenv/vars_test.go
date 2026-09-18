@@ -3,7 +3,7 @@ package zqkenv
 import (
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/brand"
+	"github.com/zqk-os/zqk/pkg/brand"
 )
 
 func TestVars(t *testing.T) {

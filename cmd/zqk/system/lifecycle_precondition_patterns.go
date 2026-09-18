@@ -4,7 +4,7 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // LifecyclePreconditionPattern defines a pattern for matching lifecycle precondition violations

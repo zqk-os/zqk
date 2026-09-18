@@ -5,10 +5,10 @@ package system
 import (
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/interactive"
-	"github.com/lanceman/zqk/pkg/zqkenv"
+	"github.com/zqk-os/zqk/pkg/interactive"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // TestStreamingTemplateLoop_ProcessLoop uses GetGlobalFieldRegistry().Reload(); clear ZQK_TEST_ROOT so repo specs are used (t.Setenv restores after).

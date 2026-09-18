@@ -4,7 +4,7 @@
 package base_object
 
 import (
-	auditableenum "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/auditable"
+	auditableenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/auditable"
 )
 
 type Plane string

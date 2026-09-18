@@ -9,8 +9,8 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/lanceman/zqk/pkg/appledouble"
-	"github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/appledouble"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // runningExecutableFingerprint is the production identity mixed into the

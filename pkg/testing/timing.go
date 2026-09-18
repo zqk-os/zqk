@@ -1,6 +1,6 @@
 package testing
 
-import "github.com/lanceman/zqk/pkg/testkit"
+import "github.com/zqk-os/zqk/pkg/testkit"
 
 // Re-export test timing helpers from pkg/testkit for backward compatibility.
 

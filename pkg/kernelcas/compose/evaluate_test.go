@@ -3,7 +3,7 @@ package compose
 import (
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 func TestEvalRefuseUnknownFields_CompositionFieldsAllowed(t *testing.T) {

@@ -3,7 +3,7 @@ package object
 import (
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 func TestPromoteTransitionTargets_OneHopOnly(t *testing.T) {

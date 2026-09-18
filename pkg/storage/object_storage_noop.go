@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
 )
 
 // ErrNoopObjectStorage is returned by [NoopObjectStorage] methods other than Create.

@@ -7,15 +7,15 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/lanceman/zqk/pkg/config"
+	"github.com/zqk-os/zqk/pkg/config"
 
 	"gopkg.in/yaml.v3"
 
-	"github.com/lanceman/zqk/pkg/authcred"
-	"github.com/lanceman/zqk/pkg/kernelcas/compose"
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/paths"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/authcred"
+	"github.com/zqk-os/zqk/pkg/kernelcas/compose"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // Empty: overlays live in pkg/kernelcas/compose. validateCustomRules calls compose for every kind.

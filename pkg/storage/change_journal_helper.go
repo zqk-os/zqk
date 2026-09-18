@@ -9,20 +9,20 @@ import (
 	"sync/atomic"
 	"time"
 
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
-	"github.com/lanceman/zqk/pkg/when"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/when"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/goroutinelabels"
-	"github.com/lanceman/zqk/pkg/logging"
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/paths"
-	changeJournalEnum "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/change_journal_entry"
-	"github.com/lanceman/zqk/pkg/specbuilder/bldr_instance_v1"
-	bldraudit "github.com/lanceman/zqk/pkg/specbuilder/bldr_v2"
-	"github.com/lanceman/zqk/pkg/specbuilder/instance_builders"
-	"github.com/lanceman/zqk/pkg/validation"
-	"github.com/lanceman/zqk/pkg/zqktime"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
+	changeJournalEnum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/change_journal_entry"
+	"github.com/zqk-os/zqk/pkg/specbuilder/bldr_instance_v1"
+	bldraudit "github.com/zqk-os/zqk/pkg/specbuilder/bldr_v2"
+	"github.com/zqk-os/zqk/pkg/specbuilder/instance_builders"
+	"github.com/zqk-os/zqk/pkg/validation"
+	"github.com/zqk-os/zqk/pkg/zqktime"
 )
 
 var (

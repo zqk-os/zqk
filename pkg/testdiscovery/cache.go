@@ -8,7 +8,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 type CacheEntry struct {

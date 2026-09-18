@@ -6,8 +6,8 @@ import (
 	"context"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/storage"
-	"github.com/lanceman/zqk/pkg/zqksession"
+	"github.com/zqk-os/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/zqksession"
 )
 
 // Compatibility aliases for call sites that still use the pre-extraction names.

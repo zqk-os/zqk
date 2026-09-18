@@ -5,7 +5,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // cleanupStaleCASIndexTempFiles removes abandoned CreateTemp siblings left when a

@@ -9,9 +9,9 @@ import (
 
 	"gopkg.in/yaml.v3"
 
-	clctx "github.com/lanceman/zqk/internal/cli/context"
-	"github.com/lanceman/zqk/pkg/paths"
-	"github.com/lanceman/zqk/pkg/utils/fileutil"
+	clctx "github.com/zqk-os/zqk/internal/cli/context"
+	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 type testSettingsYAMLShapeGit struct {

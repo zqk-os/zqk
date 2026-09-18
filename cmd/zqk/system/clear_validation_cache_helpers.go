@@ -3,7 +3,7 @@ package system
 import (
 	stdcontext "context"
 
-	"github.com/lanceman/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/errfmt"
 )
 
 // clearValidationCacheForAutoFix clears the validation cache when auto-fix is enabled

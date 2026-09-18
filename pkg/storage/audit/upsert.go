@@ -1,6 +1,6 @@
 package audit
 
-import "github.com/lanceman/zqk/pkg/objects"
+import "github.com/zqk-os/zqk/pkg/objects"
 
 // MetricUpdateFields copies metric for an upsert, dropping id/created_at/created_by
 // and stamping updated_at / updated_by.

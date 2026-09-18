@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 func TestRefreshPeerSeatsFromLivePIDs_AssignsAndPersists(t *testing.T) {

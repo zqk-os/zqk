@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/lanceman/zqk/pkg/infrastructure/crypto"
+	"github.com/zqk-os/zqk/pkg/infrastructure/crypto"
 )
 
 // NeurologicalGovernance defines the cognitive state requirements for an execution.

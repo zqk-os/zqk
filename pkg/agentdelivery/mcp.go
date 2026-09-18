@@ -3,9 +3,9 @@ package agentdelivery
 import (
 	"context"
 
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/federation"
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/federation"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // MCPDeliverer delivers a prompt across the Sovereign Mesh to a remote kernel via MCP.

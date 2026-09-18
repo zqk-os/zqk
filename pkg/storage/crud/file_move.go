@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/lanceman/zqk/pkg/validation"
+	"github.com/zqk-os/zqk/pkg/validation"
 )
 
 func ObjectFieldReferencesID(fieldValue any, oldID, kind string) bool {

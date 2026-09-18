@@ -1,8 +1,8 @@
 package validation
 
 import (
-	"github.com/lanceman/zqk/pkg/concurrency"
-	"github.com/lanceman/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/concurrency"
+	"github.com/zqk-os/zqk/pkg/logging"
 )
 
 // SetValidationFunc sets the validation function to use for object validation

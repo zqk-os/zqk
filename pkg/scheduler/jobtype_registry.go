@@ -3,7 +3,7 @@ package scheduler
 import (
 	"sort"
 
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // jobTypeHandlerBuilder builds a handler for a given job type.

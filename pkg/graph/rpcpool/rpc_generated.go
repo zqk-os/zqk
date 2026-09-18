@@ -6,7 +6,7 @@ import (
 	"net/rpc"
 	"sync"
 
-	"github.com/lanceman/zqk/pkg/graph/provider"
+	"github.com/zqk-os/zqk/pkg/graph/provider"
 )
 
 // --- API ---

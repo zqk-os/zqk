@@ -8,12 +8,12 @@ import (
 	"runtime"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/objects"
-	_ "github.com/lanceman/zqk/pkg/specbuilder/bldr_instance_v1" // register goal builder for test
-	"github.com/lanceman/zqk/pkg/specbuilder/instance_builders"
-	"github.com/lanceman/zqk/pkg/storage"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
-	"github.com/lanceman/zqk/pkg/validation"
+	"github.com/zqk-os/zqk/pkg/objects"
+	_ "github.com/zqk-os/zqk/pkg/specbuilder/bldr_instance_v1" // register goal builder for test
+	"github.com/zqk-os/zqk/pkg/specbuilder/instance_builders"
+	"github.com/zqk-os/zqk/pkg/storage"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/validation"
 )
 
 // persistenceBundleYAMLPath returns the path to persistence-bundle.yaml: tracked testdata first,

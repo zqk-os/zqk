@@ -1,6 +1,6 @@
 package translation
 
-import "github.com/lanceman/zqk/pkg/objects"
+import "github.com/zqk-os/zqk/pkg/objects"
 
 // Constants for translated domain_registry and object_spec-like output.
 // Used by all format translators (RDF/OWL, Cypher, JSON Schema, OpenAPI) so

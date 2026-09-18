@@ -9,14 +9,14 @@ import (
 
 	"gopkg.in/yaml.v3"
 
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/objects"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/objects"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 const defaultVersion = "v1_0_0"
 const defaultVersionPackage = "bldr_api_v1"
-const apiBuildersImportPath = "github.com/lanceman/zqk/pkg/specbuilder/api_builders"
+const apiBuildersImportPath = "github.com/zqk-os/zqk/pkg/specbuilder/api_builders"
 
 // codegenSourcePath is this file; embedded in generated builder headers so editors and agents do not hand-edit outputs.
 const codegenSourcePath = "pkg/specbuilder/api_builders/codegen.go"
@@ -172,7 +172,7 @@ func writeImportBlock(buf *strings.Builder, includeObjects bool) {
 	buf.WriteString("import (\n")
 	fmt.Fprintf(buf, "\t%q\n", apiBuildersImportPath)
 	if includeObjects {
-		buf.WriteString("\t\"github.com/lanceman/zqk/pkg/objects\"\n")
+		buf.WriteString("\t\"github.com/zqk-os/zqk/pkg/objects\"\n")
 	}
 	buf.WriteString(")\n\n")
 }

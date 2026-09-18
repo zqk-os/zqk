@@ -3,8 +3,8 @@ package convergerollup
 import (
 	"strings"
 
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // NestSpawnRequest is the contract for creating a child convergence_session under a parent.

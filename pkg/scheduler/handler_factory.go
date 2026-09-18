@@ -4,10 +4,10 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/lanceman/zqk/pkg/logging"
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/scheduler/transceiver"
-	storagepkg "github.com/lanceman/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/scheduler/transceiver"
+	storagepkg "github.com/zqk-os/zqk/pkg/storage"
 )
 
 // HandlerFactory creates job handlers with proper dependency injection

@@ -1,6 +1,6 @@
 package bldr_instance_v1
 
-import "github.com/lanceman/zqk/pkg/objects"
+import "github.com/zqk-os/zqk/pkg/objects"
 
 // ValidationMetricsJSON sets the validation_metrics_json field.
 func (b *BaseMetricInstanceBuilder) ValidationMetricsJSON(value string) *BaseMetricInstanceBuilder {

@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	pkgcli "github.com/lanceman/zqk/pkg/cli"
+	pkgcli "github.com/zqk-os/zqk/pkg/cli"
 )
 
 func TestGuard_Return_nilError(t *testing.T) {

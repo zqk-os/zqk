@@ -7,8 +7,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/lanceman/zqk/pkg/brand"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/brand"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // applybrand rewrites dest first-run copy from canonical `zqk` tokens to

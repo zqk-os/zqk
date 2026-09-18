@@ -5,7 +5,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // StratplanAmbient is the kernel facts that make a planned==0 hunger

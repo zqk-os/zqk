@@ -8,7 +8,7 @@ import (
 	"sync"
 	"time"
 
-	schedulerpkg "github.com/lanceman/zqk/pkg/scheduler"
+	schedulerpkg "github.com/zqk-os/zqk/pkg/scheduler"
 )
 
 const (

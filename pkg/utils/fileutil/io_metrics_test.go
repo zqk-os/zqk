@@ -244,10 +244,10 @@ func TestIOMetrics_LeafPackageBoundary(t *testing.T) {
 	}
 	src := string(content)
 	disallowed := []string{
-		"github.com/lanceman/zqk/pkg/scheduler",
-		"github.com/lanceman/zqk/pkg/storage",
-		"github.com/lanceman/zqk/pkg/cli",
-		"github.com/lanceman/zqk/cmd/zqk",
+		"github.com/zqk-os/zqk/pkg/scheduler",
+		"github.com/zqk-os/zqk/pkg/storage",
+		"github.com/zqk-os/zqk/pkg/cli",
+		"github.com/zqk-os/zqk/cmd/zqk",
 	}
 	for _, d := range disallowed {
 		if filepath.Base(d) != "" && (containsImport(src, d)) {

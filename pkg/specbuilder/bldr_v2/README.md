@@ -2,7 +2,7 @@
 
 **Status:** Active  
 **Last Updated:** 2026-01-27  
-**Package:** `github.com/lanceman/zqk/pkg/specbuilder/bldr_v2`
+**Package:** `github.com/zqk-os/zqk/pkg/specbuilder/bldr_v2`
 
 ## Overview
 

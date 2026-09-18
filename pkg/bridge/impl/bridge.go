@@ -4,8 +4,8 @@ import (
 	"context"
 	"errors"
 
-	"github.com/lanceman/zqk/pkg/hivemind"
-	"github.com/lanceman/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/hivemind"
+	"github.com/zqk-os/zqk/pkg/storage"
 )
 
 // Bridge implements the bridge.Bridge interface.

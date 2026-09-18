@@ -3,10 +3,10 @@ package gantt
 import (
 	"os/exec"
 
-	"github.com/lanceman/zqk/pkg/execwrap"
+	"github.com/zqk-os/zqk/pkg/execwrap"
 
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // ExportPNGWithRsvgConvert renders SVG to PNG using the rsvg-convert binary (librsvg).

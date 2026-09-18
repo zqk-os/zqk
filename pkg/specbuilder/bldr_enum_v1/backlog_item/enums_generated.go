@@ -4,7 +4,7 @@
 package backlog_item
 
 import (
-	base_objectenum "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
+	base_objectenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
 )
 
 type Plane = base_objectenum.Plane

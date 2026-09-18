@@ -5,15 +5,15 @@ import (
 	"testing"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/config"
+	"github.com/zqk-os/zqk/pkg/config"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/graph/memgraph"
-	"github.com/lanceman/zqk/pkg/graph/provider"
-	"github.com/lanceman/zqk/pkg/hivemind"
-	"github.com/lanceman/zqk/pkg/hivemind/providers"
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/testservices"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/graph/memgraph"
+	"github.com/zqk-os/zqk/pkg/graph/provider"
+	"github.com/zqk-os/zqk/pkg/hivemind"
+	"github.com/zqk-os/zqk/pkg/hivemind/providers"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/testservices"
 )
 
 func TestMemGraphMemoryStore_Integration(t *testing.T) {

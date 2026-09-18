@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 func TestReadValidationInput_StreamLocation(t *testing.T) {

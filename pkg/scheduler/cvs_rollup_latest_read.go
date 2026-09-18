@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 type rollupLatestFileV1 struct {

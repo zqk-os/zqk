@@ -5,7 +5,7 @@ import (
 	"encoding/hex"
 	"fmt"
 
-	"github.com/lanceman/zqk/pkg/infrastructure/crypto"
+	"github.com/zqk-os/zqk/pkg/infrastructure/crypto"
 )
 
 // SkillBundle represents a Merkle-proofed package for an agent skill.

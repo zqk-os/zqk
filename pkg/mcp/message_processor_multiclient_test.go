@@ -11,7 +11,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 func TestMultiClient_ProcessMessageDoesNotStealTransportWriter(t *testing.T) {

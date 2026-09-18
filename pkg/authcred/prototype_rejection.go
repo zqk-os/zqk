@@ -5,7 +5,7 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/lanceman/zqk/pkg/zqkenv"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
 // PrototypeAccountError is the sentinel error for prototype/test account rejection.

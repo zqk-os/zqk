@@ -3,7 +3,7 @@ package shovelready
 import (
 	"strings"
 
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // CriteriaID is the canonical CRI-SHOVEL-READY criteria object (MMORCH F-002).

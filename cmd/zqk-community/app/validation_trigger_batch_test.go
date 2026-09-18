@@ -5,7 +5,7 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 func TestValidationTriggerBatch_FlushOnSize(t *testing.T) {

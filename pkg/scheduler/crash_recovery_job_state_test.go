@@ -5,8 +5,8 @@ import (
 	"testing"
 	"time"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/goroutinelabels"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 )
 
 // TRACK: BLI-CEF-R14-RCV-CRASH-REPLAY-001 / CRIT-CEF-R14-RCV-CRASH-REPLAY-001 / REQ-CEF-R14-RCV-SEC-001

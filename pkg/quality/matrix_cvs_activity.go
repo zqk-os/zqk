@@ -6,8 +6,8 @@ import (
 	"slices"
 	"strings"
 
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/zqktime"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/zqktime"
 )
 
 // BuildMatrixActivityLogEntry builds one convergence_session activity_log entry for a matrix update.

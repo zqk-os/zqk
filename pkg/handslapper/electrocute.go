@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/errfmt"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/errfmt"
 )
 
 // Electrocute generates a standardized punitive error message for any agent constraint violations.

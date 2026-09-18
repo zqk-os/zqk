@@ -1,6 +1,6 @@
 package storage
 
-import "github.com/lanceman/zqk/pkg/objects"
+import "github.com/zqk-os/zqk/pkg/objects"
 
 // Storage metric constants (defined here to avoid import cycle with pkg/metrics)
 // These constants standardize metric creation across storage package components

@@ -4,8 +4,8 @@
 package persona
 
 import (
-	base_objectenum "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
-	shared_personasenum "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/shared_personas"
+	base_objectenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
+	shared_personasenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/shared_personas"
 )
 
 type Plane = base_objectenum.Plane

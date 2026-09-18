@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/lanceman/zqk/pkg/logging"
-	"github.com/lanceman/zqk/pkg/orchestration"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/orchestration"
 )
 
 // ProgressReport represents a human-readable update synthesized from system events.

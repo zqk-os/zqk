@@ -1,6 +1,6 @@
 package pipeline
 
-import "github.com/lanceman/zqk/pkg/nildecode"
+import "github.com/zqk-os/zqk/pkg/nildecode"
 
 // DecodeNonNilPayload delegates to [nildecode.DecodeNonNilPayload] so pipeline call sites share the
 // same semantics; implementation lives in pkg/nildecode to avoid import cycles with pkg/objects.

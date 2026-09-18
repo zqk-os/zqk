@@ -1,8 +1,8 @@
 package context
 
 import (
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/errfmt"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/errfmt"
 )
 
 // ContextBuilder helps assemble contexts in different ways

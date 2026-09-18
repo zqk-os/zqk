@@ -4,8 +4,8 @@
 package account
 
 import (
-	base_objectenum "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
-	shared_accountsenum "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/shared_accounts"
+	base_objectenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
+	shared_accountsenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/shared_accounts"
 )
 
 type Plane = base_objectenum.Plane

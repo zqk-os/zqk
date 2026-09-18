@@ -4,7 +4,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/testenvroot"
+	"github.com/zqk-os/zqk/pkg/testenvroot"
 )
 
 // MustBenchmarkSetupTestRootWithLayoutAndSpecs mirrors pkg/testing SetupTestEnvironment plus

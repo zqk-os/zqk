@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/lanceman/zqk/pkg/specbuilder/registry"
+	"github.com/zqk-os/zqk/pkg/specbuilder/registry"
 )
 
 // BinaryStorageProvider implements positional binary storage using the Field ID Registry.

@@ -4,8 +4,8 @@
 package agent_tasks
 
 import (
-	base_objectenum "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
-	shared_agent_tasksenum "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/shared_agent_tasks"
+	base_objectenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
+	shared_agent_tasksenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/shared_agent_tasks"
 )
 
 type PriorityTier = base_objectenum.PriorityTier

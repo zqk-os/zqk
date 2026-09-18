@@ -1,7 +1,7 @@
 package mcp
 
 import (
-	pkgctx "github.com/lanceman/zqk/pkg/context"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
 )
 
 // ListExposedTools returns the list of tools that would be exposed by the MCP server

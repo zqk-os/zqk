@@ -3,7 +3,7 @@ package storage
 //nolint:errcheck // Test cleanup operations - errors are acceptable
 
 import (
-	caspkg "github.com/lanceman/zqk/pkg/storage/cas"
+	caspkg "github.com/zqk-os/zqk/pkg/storage/cas"
 
 	"context"
 	"encoding/json"
@@ -15,13 +15,13 @@ import (
 	"testing"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/paths"
 
-	"github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/objects"
-	instancebuilders "github.com/lanceman/zqk/pkg/specbuilder/instance_builders"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/objects"
+	instancebuilders "github.com/zqk-os/zqk/pkg/specbuilder/instance_builders"
 )
 
 // TestDynamicObjectDiscovery tests that we can discover all object types

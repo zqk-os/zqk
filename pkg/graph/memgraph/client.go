@@ -9,8 +9,8 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/httpheaders"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/httpheaders"
 )
 
 // memgraphClient handles HTTP communication with MemGraph REST API

@@ -4,9 +4,9 @@ import (
 	"context"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/infrastructure/crypto"
-	"github.com/lanceman/zqk/pkg/infrastructure/hts"
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/infrastructure/crypto"
+	"github.com/zqk-os/zqk/pkg/infrastructure/hts"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 func TestDataCell_SignedVerification(t *testing.T) {

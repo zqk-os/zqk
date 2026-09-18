@@ -3,7 +3,7 @@ package swarm
 import (
 	"encoding/json"
 
-	"github.com/lanceman/zqk/pkg/llm"
+	"github.com/zqk-os/zqk/pkg/llm"
 )
 
 // TokenTracker tracks and validates the token budget per swarm step.

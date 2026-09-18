@@ -1,7 +1,7 @@
 package datacell
 
 import (
-	"github.com/lanceman/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/errfmt"
 )
 
 // StorageProfile names the physical storage mechanism for a spec-backed kind (data cell model).

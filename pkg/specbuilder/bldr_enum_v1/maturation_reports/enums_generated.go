@@ -4,8 +4,8 @@
 package maturation_reports
 
 import (
-	base_objectenum "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
-	shared_maturation_reportsenum "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/shared_maturation_reports"
+	base_objectenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
+	shared_maturation_reportsenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/shared_maturation_reports"
 )
 
 type GraduationStatus string

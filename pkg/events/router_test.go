@@ -2,12 +2,12 @@ package events_test
 
 import (
 	"context"
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/objects"
 	"sync"
 	"testing"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/events"
+	"github.com/zqk-os/zqk/pkg/events"
 )
 
 func TestRouter_BitmaskSubscription(t *testing.T) {

@@ -4,8 +4,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/testkit"
-	"github.com/lanceman/zqk/pkg/validation"
+	"github.com/zqk-os/zqk/pkg/testkit"
+	"github.com/zqk-os/zqk/pkg/validation"
 )
 
 // Tier-1 instance_validation must not be a permanent cache hit (fail-closed

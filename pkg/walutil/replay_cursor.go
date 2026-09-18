@@ -7,7 +7,7 @@ import (
 	"io"
 	"strconv"
 
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // ReplayCursor is a durable (or in-memory) resume point for JSON-line WAL readers.

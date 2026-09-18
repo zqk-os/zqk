@@ -3,7 +3,7 @@ package mcp
 import (
 	"strings"
 
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // ExtractGroupFromPath extracts the command group from a command path.

@@ -6,9 +6,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/paths"
-	"github.com/lanceman/zqk/pkg/testscan"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/testscan"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // writeGuardScript creates a stand-in guard at root/scripts and returns its path.

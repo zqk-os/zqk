@@ -3,8 +3,8 @@ package objectget
 import (
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/storage"
 )
 
 func TestIsReferenceResolverOverlayFieldKey(t *testing.T) {

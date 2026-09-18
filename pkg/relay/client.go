@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"log/slog"
 
-	"github.com/lanceman/zqk/pkg/license"
+	"github.com/zqk-os/zqk/pkg/license"
 )
 
 var (

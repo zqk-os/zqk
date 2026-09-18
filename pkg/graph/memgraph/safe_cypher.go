@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/lanceman/zqk/pkg/graph"
+	"github.com/zqk-os/zqk/pkg/graph"
 )
 
 // safeCypher validates dynamic Cypher identifiers before formatting.

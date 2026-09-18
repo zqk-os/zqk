@@ -1,8 +1,8 @@
 package system
 
 import (
-	"github.com/lanceman/zqk/pkg/logging"
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // checkObjectHasSnapableTrait checks if an object spec has the snapable trait

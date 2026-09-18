@@ -9,7 +9,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/testkit"
+	"github.com/zqk-os/zqk/pkg/testkit"
 )
 
 func TestEventually(t *testing.T) {

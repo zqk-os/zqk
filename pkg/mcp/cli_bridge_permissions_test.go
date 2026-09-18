@@ -3,7 +3,7 @@ package mcp
 import (
 	"testing"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
 )
 
 // TRACK: BLI-CEF-R2-REL-MCP-PERMS-FAILOPEN

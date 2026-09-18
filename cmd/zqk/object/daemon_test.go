@@ -5,9 +5,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/lanceman/zqk/cmd/zqk/object"
-	"github.com/lanceman/zqk/pkg/accumulator"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/cmd/zqk/object"
+	"github.com/zqk-os/zqk/pkg/accumulator"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // TestDaemon_NoDirectFmtPrint verifies compliance with POL-CODE-007 (REQ-CEF-R2-OBS-FMT-PRINTF).

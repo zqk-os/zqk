@@ -3,9 +3,9 @@ package storage
 import (
 	"context"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/kernelcas"
-	"github.com/lanceman/zqk/pkg/objects"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/kernelcas"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 func (f *FileObjectStorage) updateViaKernelIfNeeded(ctx context.Context, secCtx *pkgctx.SecurityContext, id string, updates map[string]any) (bool, error) {

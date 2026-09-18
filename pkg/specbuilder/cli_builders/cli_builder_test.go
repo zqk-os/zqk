@@ -6,9 +6,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/testenvroot"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
-	"github.com/lanceman/zqk/pkg/zqkenv"
+	"github.com/zqk-os/zqk/pkg/testenvroot"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
 func TestCLIBuilder_WrapsZQK(t *testing.T) {

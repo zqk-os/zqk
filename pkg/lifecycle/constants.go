@@ -1,6 +1,6 @@
 package lifecycle
 
-import "github.com/lanceman/zqk/pkg/objects"
+import "github.com/zqk-os/zqk/pkg/objects"
 
 const (
 	criterionAllBacklogComplete                     = "all_backlog_items_complete_for_plan"

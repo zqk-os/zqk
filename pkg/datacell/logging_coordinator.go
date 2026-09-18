@@ -3,7 +3,7 @@ package datacell
 import (
 	"context"
 
-	"github.com/lanceman/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/logging"
 )
 
 // LoggingCellCoordinator implements [CellCoordinator] by emitting structured logs for each

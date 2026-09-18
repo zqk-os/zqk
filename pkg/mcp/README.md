@@ -66,7 +66,7 @@ Metrics tools (PCS, EDD, D&B) are exposed via the CLI bridge:
 ## Quick Start
 
 ```go
-import "github.com/lanceman/zqk/pkg/mcp"
+import "github.com/zqk-os/zqk/pkg/mcp"
 
 server := mcp.NewServer()
 mcp.RegisterGraphTools(server)

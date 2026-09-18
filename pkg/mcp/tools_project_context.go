@@ -3,7 +3,7 @@ package mcp
 import (
 	"context"
 
-	cliContext "github.com/lanceman/zqk/internal/cli/context"
+	cliContext "github.com/zqk-os/zqk/internal/cli/context"
 )
 
 // RegisterProjectContextTool registers the get_project_context tool

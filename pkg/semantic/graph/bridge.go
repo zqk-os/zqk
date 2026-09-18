@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 
-	"github.com/lanceman/zqk/pkg/ontology"
+	"github.com/zqk-os/zqk/pkg/ontology"
 )
 
 var (

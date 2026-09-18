@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/lanceman/zqk/pkg/graph/provider"
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/graph/provider"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // LLMClient defines the required LLM operations for the Generative Mutation Engine.

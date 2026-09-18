@@ -4,7 +4,7 @@ import (
 	"io/fs"
 	stdtesting "testing"
 
-	"github.com/lanceman/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/paths"
 )
 
 // MustMkdirAll calls [paths.EnsureDir] and fails the test on error. For several dirs under one root,

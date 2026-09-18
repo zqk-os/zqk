@@ -1,7 +1,7 @@
 package scheduler
 
 import (
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 func (j *ScheduledJob) ToMap() map[string]any {

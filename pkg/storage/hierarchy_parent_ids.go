@@ -3,7 +3,7 @@ package storage
 import (
 	"strings"
 
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // hierarchyParentRefKeys are the child→parent membership/composition fields the

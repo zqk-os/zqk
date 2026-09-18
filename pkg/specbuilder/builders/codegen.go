@@ -3,7 +3,7 @@ package builders
 import (
 	"bytes"
 	"fmt"
-	"github.com/lanceman/zqk/pkg/config"
+	"github.com/zqk-os/zqk/pkg/config"
 	"go/format"
 	"path/filepath"
 	"sort"
@@ -11,13 +11,13 @@ import (
 
 	"gopkg.in/yaml.v3"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/logging"
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/paths"
-	yamlspec "github.com/lanceman/zqk/pkg/specbuilder/yaml"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
+	yamlspec "github.com/zqk-os/zqk/pkg/specbuilder/yaml"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 const (
@@ -219,8 +219,8 @@ func generateBuilderCode(spec *objects.Spec, ontology, version, packageName stri
 
 	// Import parent builders package
 	buf.WriteString("import (\n")
-	buf.WriteString("\t\"github.com/lanceman/zqk/pkg/objects\"\n")
-	buf.WriteString("\t\"github.com/lanceman/zqk/pkg/specbuilder/builders\"\n")
+	buf.WriteString("\t\"github.com/zqk-os/zqk/pkg/objects\"\n")
+	buf.WriteString("\t\"github.com/zqk-os/zqk/pkg/specbuilder/builders\"\n")
 	buf.WriteString(")\n\n")
 
 	// Type definition

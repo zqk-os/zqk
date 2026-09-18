@@ -1,7 +1,7 @@
 package pipeline
 
 import (
-	"github.com/lanceman/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/logging"
 )
 
 const (

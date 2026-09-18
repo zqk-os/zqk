@@ -1,5 +1,5 @@
 // Package projecttemp hosts isolated temp-project teardown helpers that must not import pkg/storage
-// (storage imports pkg/validation and other consumers). Orchestration uses [github.com/lanceman/zqk/pkg/pipeline]
+// (storage imports pkg/validation and other consumers). Orchestration uses [github.com/zqk-os/zqk/pkg/pipeline]
 // so strip behavior stays consistent with the broader project test teardown story.
 package projecttemp
 
@@ -13,7 +13,7 @@ const (
 	StageStripZQKLayout = "STRIP_ZQK_LAYOUT"
 )
 
-// Outcome keys written to [github.com/lanceman/zqk/pkg/pipeline.Context].Outcome by the isolated-root strip pipeline.
+// Outcome keys written to [github.com/zqk-os/zqk/pkg/pipeline.Context].Outcome by the isolated-root strip pipeline.
 const (
 	OutcomeStripSkippedEmpty       = "strip_skipped_empty_root"
 	OutcomeStripSkippedGitWorktree = "strip_skipped_git_worktree"

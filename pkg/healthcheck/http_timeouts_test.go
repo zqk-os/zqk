@@ -8,7 +8,7 @@ import (
 	"strings"
 	"testing"
 
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // TestHTTPListeners_TimeoutsEnforced verifies REQ-CEF-R2-SEC-HTTP-TIMEOUTS and CRIT-CEF-R2-SEC-HTTP-TIMEOUTS-A:

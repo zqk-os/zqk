@@ -7,11 +7,11 @@ import (
 	"golang.org/x/sync/errgroup"
 	"gopkg.in/yaml.v3"
 
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/objects"
-	sbcore "github.com/lanceman/zqk/pkg/specbuilder/core"
-	sbyaml "github.com/lanceman/zqk/pkg/specbuilder/yaml"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/objects"
+	sbcore "github.com/zqk-os/zqk/pkg/specbuilder/core"
+	sbyaml "github.com/zqk-os/zqk/pkg/specbuilder/yaml"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // SpecGenerator generates spec files from versioned builders

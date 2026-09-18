@@ -4,8 +4,8 @@
 package scheduler_job
 
 import (
-	base_objectenum "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
-	shared_scheduler_jobsenum "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/shared_scheduler_jobs"
+	base_objectenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
+	shared_scheduler_jobsenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/shared_scheduler_jobs"
 )
 
 type AuthType string

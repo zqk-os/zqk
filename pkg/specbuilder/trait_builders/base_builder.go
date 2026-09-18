@@ -3,7 +3,7 @@ package trait_builders
 import (
 	"maps"
 
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // BaseTraitBuilder provides common functionality for trait builders

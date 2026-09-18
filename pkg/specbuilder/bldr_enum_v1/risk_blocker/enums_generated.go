@@ -4,8 +4,8 @@
 package risk_blocker
 
 import (
-	base_objectenum "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
-	shared_risk_blockersenum "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/shared_risk_blockers"
+	base_objectenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
+	shared_risk_blockersenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/shared_risk_blockers"
 )
 
 type Plane = base_objectenum.Plane

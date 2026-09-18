@@ -3,8 +3,8 @@ package profile_builders
 import (
 	"fmt"
 
-	"github.com/lanceman/zqk/pkg/config"
-	"github.com/lanceman/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/config"
+	"github.com/zqk-os/zqk/pkg/errfmt"
 )
 
 // ProfileBuilder is an interface for builders that generate profile definitions at a specific version

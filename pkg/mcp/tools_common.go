@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // mcpToolArgKey* are MCP tool schema / forwarded CLI argument map keys.

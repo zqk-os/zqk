@@ -6,9 +6,9 @@ import (
 
 	"sort"
 
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/specbuilder/builders"
-	"github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/specbuilder/builders"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // FieldRegistry maps unique profile codes to field metadata, including allocated ID.

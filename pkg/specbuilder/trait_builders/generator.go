@@ -6,11 +6,11 @@ import (
 
 	"golang.org/x/sync/errgroup"
 
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/objects"
-	sbcore "github.com/lanceman/zqk/pkg/specbuilder/core"
-	sbyaml "github.com/lanceman/zqk/pkg/specbuilder/yaml"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/objects"
+	sbcore "github.com/zqk-os/zqk/pkg/specbuilder/core"
+	sbyaml "github.com/zqk-os/zqk/pkg/specbuilder/yaml"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // TraitGenerator generates trait files from versioned builders

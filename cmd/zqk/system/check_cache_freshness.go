@@ -4,11 +4,11 @@ import (
 	stdcontext "context"
 	"fmt"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/goroutinelabels"
-	"github.com/lanceman/zqk/pkg/logging"
-	"github.com/lanceman/zqk/pkg/objectidcache"
-	"github.com/lanceman/zqk/pkg/storage"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/objectidcache"
+	"github.com/zqk-os/zqk/pkg/storage"
 )
 
 // CacheFreshnessHandler is a function type for performing cache freshness checks.

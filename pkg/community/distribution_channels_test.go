@@ -5,9 +5,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/execwrap"
-	"github.com/lanceman/zqk/pkg/paths"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/execwrap"
+	"github.com/zqk-os/zqk/pkg/paths"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // TestDistributionChannels_FunctionalAcceptance verifies that package-community.sh
@@ -154,7 +154,7 @@ func TestDistributionChannels_IntegrationAndConformance(t *testing.T) {
 
 	requiredTokens := []string{
 		"class Zqk < Formula",
-		"homepage \"https://github.com/lanceman/zqk\"",
+		"homepage \"https://github.com/zqk-os/zqk\"",
 		"on_macos do",
 		"on_linux do",
 		"Hardware::CPU.arm?",

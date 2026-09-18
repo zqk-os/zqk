@@ -3,7 +3,7 @@ package evolution
 import (
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/infrastructure/crypto"
+	"github.com/zqk-os/zqk/pkg/infrastructure/crypto"
 )
 
 func TestSkillBundle_BundleAndVerify(t *testing.T) {

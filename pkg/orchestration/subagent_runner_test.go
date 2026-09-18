@@ -5,7 +5,7 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/rollback"
+	"github.com/zqk-os/zqk/pkg/rollback"
 )
 
 // MockCAPLoop implements CAPLoop for testing

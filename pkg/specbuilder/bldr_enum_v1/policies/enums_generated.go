@@ -4,8 +4,8 @@
 package policies
 
 import (
-	base_objectenum "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
-	shared_policiesenum "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/shared_policies"
+	base_objectenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
+	shared_policiesenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/shared_policies"
 )
 
 type PolicyType string

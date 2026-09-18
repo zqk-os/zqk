@@ -5,10 +5,10 @@ import (
 	"os"
 	"strings"
 
-	"github.com/lanceman/zqk/pkg/config"
+	"github.com/zqk-os/zqk/pkg/config"
 
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/pipeline"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/pipeline"
 )
 
 const lifecyclePreconditionPipelineKind = "validation.lifecycle_precondition"

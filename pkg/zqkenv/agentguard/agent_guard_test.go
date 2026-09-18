@@ -3,7 +3,7 @@ package agentguard_test
 import (
 	"testing"
 
-	_ "github.com/lanceman/zqk/pkg/zqkenv/agentguard"
+	_ "github.com/zqk-os/zqk/pkg/zqkenv/agentguard"
 )
 
 func TestAgentGuardImport(t *testing.T) {

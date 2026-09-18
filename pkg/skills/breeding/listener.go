@@ -2,11 +2,11 @@ package breeding
 
 import (
 	"context"
-	"github.com/lanceman/zqk/pkg/goroutinelabels"
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 
-	"github.com/lanceman/zqk/pkg/events"
-	"github.com/lanceman/zqk/pkg/logging"
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/events"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // Listener watches the ZQK event mesh for ambient triggers to initiate breeding.

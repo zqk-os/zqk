@@ -6,8 +6,8 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/logging"
 )
 
 // HTTPClient is an interface that matches *http.Client and specbuilder.APIClient.

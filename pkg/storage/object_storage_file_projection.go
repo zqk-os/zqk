@@ -4,12 +4,12 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/lanceman/zqk/pkg/config"
+	"github.com/zqk-os/zqk/pkg/config"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/logging"
-	pkgobjects "github.com/lanceman/zqk/pkg/objects"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/logging"
+	pkgobjects "github.com/zqk-os/zqk/pkg/objects"
 )
 
 // FileFirstProjectionStorage writes file SSOT first, then projects to an optional graph backend.

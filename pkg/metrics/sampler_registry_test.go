@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/storage"
 )
 
 func TestSamplerRegistry_RegisterSampler_SystemMetrics_DistinctCapped(t *testing.T) {

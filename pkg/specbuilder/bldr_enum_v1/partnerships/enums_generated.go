@@ -4,8 +4,8 @@
 package partnerships
 
 import (
-	base_objectenum "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
-	shared_partnershipsenum "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/shared_partnerships"
+	base_objectenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
+	shared_partnershipsenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/shared_partnerships"
 )
 
 type PartnershipType string

@@ -7,17 +7,17 @@ import (
 	"testing"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/storage"
-	"github.com/lanceman/zqk/pkg/zqkenv"
+	"github.com/zqk-os/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/paths"
-	_ "github.com/lanceman/zqk/pkg/specbuilder/bldr_instance_v1" // Register instance builders for tests
-	_ "github.com/lanceman/zqk/pkg/specbuilder/bldr_v2"          // Register builders for tests
-	"github.com/lanceman/zqk/pkg/specbuilder/builders"
-	instancebuilders "github.com/lanceman/zqk/pkg/specbuilder/instance_builders"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
+	_ "github.com/zqk-os/zqk/pkg/specbuilder/bldr_instance_v1" // Register instance builders for tests
+	_ "github.com/zqk-os/zqk/pkg/specbuilder/bldr_v2"          // Register builders for tests
+	"github.com/zqk-os/zqk/pkg/specbuilder/builders"
+	instancebuilders "github.com/zqk-os/zqk/pkg/specbuilder/instance_builders"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // TestCAS_BaselineValidation tests that baseline validation works correctly with CAS objects

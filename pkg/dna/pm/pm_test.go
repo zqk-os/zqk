@@ -4,8 +4,8 @@ import (
 	"context"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/dna"
-	"github.com/lanceman/zqk/pkg/dna/pm"
+	"github.com/zqk-os/zqk/pkg/dna"
+	"github.com/zqk-os/zqk/pkg/dna/pm"
 )
 
 func TestDNAForwardedPMEntities(t *testing.T) {

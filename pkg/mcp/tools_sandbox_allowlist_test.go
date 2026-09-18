@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // TestAllowlistExecuteBash verifies that execute_bash uses allowlist gating.

@@ -3,8 +3,8 @@ package object
 import (
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/brand"
-	"github.com/lanceman/zqk/pkg/entitlements"
+	"github.com/zqk-os/zqk/pkg/brand"
+	"github.com/zqk-os/zqk/pkg/entitlements"
 )
 
 func TestRequirementForObjectCommand(t *testing.T) {

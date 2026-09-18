@@ -4,8 +4,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/authcred"
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/authcred"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // testACCs holds account constants shared across tests.

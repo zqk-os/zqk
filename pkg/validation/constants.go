@@ -1,6 +1,6 @@
 package validation
 
-import "github.com/lanceman/zqk/pkg/shovelready"
+import "github.com/zqk-os/zqk/pkg/shovelready"
 
 // Validation cache and state cache constants.
 // Use these instead of magic strings so updates and discovery are in one place.

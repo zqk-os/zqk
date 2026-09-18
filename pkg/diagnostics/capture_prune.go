@@ -6,7 +6,7 @@ import (
 	"sort"
 	"time"
 
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // diagnosticsRetentionMaxCaptureSets is how many complete timestamped capture groups to retain

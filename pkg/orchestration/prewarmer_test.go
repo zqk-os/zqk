@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/testkit"
+	"github.com/zqk-os/zqk/pkg/testkit"
 )
 
 func TestIntentPrewarmer_Prewarm(t *testing.T) {

@@ -8,10 +8,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/accumulator"
-	"github.com/lanceman/zqk/pkg/objects"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
-	"github.com/lanceman/zqk/pkg/workflow/whatsnext"
+	"github.com/zqk-os/zqk/pkg/accumulator"
+	"github.com/zqk-os/zqk/pkg/objects"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/workflow/whatsnext"
 )
 
 func TestWhatsNextCommand_SyncSweepFlagRegistered(t *testing.T) {

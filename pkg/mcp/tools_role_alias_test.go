@@ -3,7 +3,7 @@ package mcp
 import (
 	"testing"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
 )
 
 // TestAliasModeOnlyBuiltinTools verifies that when alias_mode is true, only built-in tools

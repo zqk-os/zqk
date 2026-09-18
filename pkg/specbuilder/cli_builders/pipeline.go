@@ -7,9 +7,9 @@ import (
 	"os/exec"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/execwrap"
+	"github.com/zqk-os/zqk/pkg/execwrap"
 
-	"github.com/lanceman/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/logging"
 )
 
 // CLISpec defines the configuration for a wrapped CLI tool execution.

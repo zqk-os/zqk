@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // TestVerificationShockwaveE2E validates the "Red TDD phase" constraint:

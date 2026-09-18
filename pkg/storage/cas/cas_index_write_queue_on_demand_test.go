@@ -8,8 +8,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/storage"
-	caspkg "github.com/lanceman/zqk/pkg/storage/cas"
+	"github.com/zqk-os/zqk/pkg/storage"
+	caspkg "github.com/zqk-os/zqk/pkg/storage/cas"
 )
 
 // TestListingIndexWriteQueue_OnDemandPattern tests the on-demand worker pattern

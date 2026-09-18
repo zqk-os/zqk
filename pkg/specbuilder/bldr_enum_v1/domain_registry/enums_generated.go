@@ -4,8 +4,8 @@
 package domain_registry
 
 import (
-	base_objectenum "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
-	shared_domain_registriesenum "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/shared_domain_registries"
+	base_objectenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
+	shared_domain_registriesenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/shared_domain_registries"
 )
 
 type Plane = base_objectenum.Plane

@@ -1,7 +1,7 @@
 package cli
 
 import (
-	"github.com/lanceman/zqk/pkg/brand"
+	"github.com/zqk-os/zqk/pkg/brand"
 	"github.com/spf13/cobra"
 )
 

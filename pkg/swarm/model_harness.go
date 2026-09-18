@@ -3,7 +3,7 @@ package swarm
 import (
 	"strings"
 
-	"github.com/lanceman/zqk/pkg/llm"
+	"github.com/zqk-os/zqk/pkg/llm"
 )
 
 // CodeDraftToolNames is the write-focused menu for models that cannot do

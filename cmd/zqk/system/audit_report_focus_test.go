@@ -3,7 +3,7 @@ package system
 import (
 	"testing"
 
-	clipkg "github.com/lanceman/zqk/pkg/cli"
+	clipkg "github.com/zqk-os/zqk/pkg/cli"
 )
 
 func newFocusFixture() *clipkg.AnalysisResult {

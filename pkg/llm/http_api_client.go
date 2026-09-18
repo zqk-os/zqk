@@ -3,7 +3,7 @@ package llm
 import (
 	"time"
 
-	"github.com/lanceman/zqk/pkg/specbuilder"
+	"github.com/zqk-os/zqk/pkg/specbuilder"
 )
 
 // TRACK: BLI-1783761336286408000-ca1625db — shared APISpec-backed HTTP client for LLM providers.

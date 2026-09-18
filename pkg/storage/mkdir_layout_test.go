@@ -3,7 +3,7 @@ package storage
 import (
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/testenvroot"
+	"github.com/zqk-os/zqk/pkg/testenvroot"
 )
 
 // mustEnsureProcessSpecsLayout creates .zqk/process and object_specs under root for tests that

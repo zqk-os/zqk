@@ -3,12 +3,12 @@ package utility
 import (
 	"strings"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/objects"
-	instancebuilders "github.com/lanceman/zqk/pkg/specbuilder/instance_builders"
-	storagepkg "github.com/lanceman/zqk/pkg/storage"
-	"github.com/lanceman/zqk/pkg/zqktime"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/objects"
+	instancebuilders "github.com/zqk-os/zqk/pkg/specbuilder/instance_builders"
+	storagepkg "github.com/zqk-os/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/zqktime"
 )
 
 // prepareObjectFromDataFile prepares an object from data file with required fields

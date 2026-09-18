@@ -9,13 +9,13 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/circuitbreaker"
-	"github.com/lanceman/zqk/pkg/logging"
-	"github.com/lanceman/zqk/pkg/metrics"
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/specbuilder"
-	"github.com/lanceman/zqk/pkg/specbuilder/api_builders"
-	"github.com/lanceman/zqk/pkg/specbuilder/bldr_v2"
+	"github.com/zqk-os/zqk/pkg/circuitbreaker"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/metrics"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/specbuilder"
+	"github.com/zqk-os/zqk/pkg/specbuilder/api_builders"
+	"github.com/zqk-os/zqk/pkg/specbuilder/bldr_v2"
 )
 
 // FalGenerator implements the MediaGenerator interface for the VEED/Fal.ai API.

@@ -3,8 +3,8 @@ package system
 import (
 	"time"
 
-	"github.com/lanceman/zqk/pkg/logging"
-	"github.com/lanceman/zqk/pkg/validation"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/validation"
 )
 
 // checkCacheForCompletion checks cache for objects that didn't send progress

@@ -9,7 +9,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/errfmt"
 )
 
 // TRACK: BLI-CELLULAR-DNA-MEMBRANE-012 / CRIT-CELLULAR-MEMBRANE-002

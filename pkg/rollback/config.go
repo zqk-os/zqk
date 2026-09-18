@@ -3,7 +3,7 @@ package rollback
 import (
 	"time"
 
-	"github.com/lanceman/zqk/pkg/config"
+	"github.com/zqk-os/zqk/pkg/config"
 )
 
 const (

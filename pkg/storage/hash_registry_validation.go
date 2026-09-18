@@ -3,7 +3,7 @@ package storage
 import (
 	"path/filepath"
 
-	"github.com/lanceman/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/errfmt"
 )
 
 // ValidateRegistryLocation ensures that a hash registry is located in the correct directory

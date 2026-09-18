@@ -5,9 +5,9 @@ import (
 	"strings"
 	"testing"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/objects"
-	riskblockerenum "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/risk_blockers"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/objects"
+	riskblockerenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/risk_blockers"
 )
 
 type presentExister struct{ ids map[string]bool }

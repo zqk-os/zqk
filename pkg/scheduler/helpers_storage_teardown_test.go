@@ -3,7 +3,7 @@ package scheduler
 import (
 	"testing"
 
-	storagepkg "github.com/lanceman/zqk/pkg/storage"
+	storagepkg "github.com/zqk-os/zqk/pkg/storage"
 )
 
 // registerFileStorageTestTeardown registers [storagepkg.RunProjectTestTeardown] with

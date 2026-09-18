@@ -5,8 +5,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/lanceman/zqk/internal/cli"
-	"github.com/lanceman/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/internal/cli"
+	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/spf13/cobra"
 )
 

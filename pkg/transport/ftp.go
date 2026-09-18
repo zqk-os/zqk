@@ -5,7 +5,7 @@ import (
 	"io"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/logging"
 )
 
 // FTPRequest encapsulates an FTP command and its arguments, along with a context.

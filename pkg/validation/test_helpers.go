@@ -3,8 +3,8 @@ package validation
 import (
 	"path/filepath"
 
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/paths"
 )
 
 // setupTestEnvironment creates the test directory structure

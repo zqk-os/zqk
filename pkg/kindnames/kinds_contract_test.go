@@ -3,8 +3,8 @@ package kindnames_test
 import (
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/kindnames"
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/kindnames"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // Lock the contract: pkg/objects Kind* aliases must match canonical kindnames values

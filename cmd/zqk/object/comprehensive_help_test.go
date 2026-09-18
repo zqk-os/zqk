@@ -4,8 +4,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/execwrap"
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/execwrap"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // TestHelpMenusAccuracy tests that help menus are accurate and complete for all command types

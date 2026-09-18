@@ -7,10 +7,10 @@ import (
 	"testing"
 	"time"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/goroutinelabels"
-	pkgmcp "github.com/lanceman/zqk/pkg/mcp"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
+	pkgmcp "github.com/zqk-os/zqk/pkg/mcp"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // waitForListener blocks until addr accepts a connection, so the test observes

@@ -1,6 +1,6 @@
 package testing
 
-import "github.com/lanceman/zqk/pkg/testscan"
+import "github.com/zqk-os/zqk/pkg/testscan"
 
 // Re-exports from pkg/testscan for backward compatibility (scanner, bundles, scan-tests policy).
 

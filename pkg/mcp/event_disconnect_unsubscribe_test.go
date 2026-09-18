@@ -6,7 +6,7 @@ import (
 	"io"
 	"testing"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
 )
 
 // Disconnect must Unsubscribe connection-bound events/subscribe entries so

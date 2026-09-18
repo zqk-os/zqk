@@ -3,7 +3,7 @@ package wal_test
 import (
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/storage/wal"
+	"github.com/zqk-os/zqk/pkg/storage/wal"
 	"github.com/stretchr/testify/require"
 )
 

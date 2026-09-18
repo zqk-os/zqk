@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // VendorID is a stable identifier for a detected public-facing agent host.

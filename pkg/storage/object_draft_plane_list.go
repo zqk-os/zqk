@@ -1,6 +1,6 @@
 package storage
 
-import "github.com/lanceman/zqk/pkg/objects"
+import "github.com/zqk-os/zqk/pkg/objects"
 
 // omitDraftPlaneOnlyFromList drops objects that exist only on the draft plane
 // (.zqk/object_drafts). Dual-plane CAS copies stay listable. Get/Exists still

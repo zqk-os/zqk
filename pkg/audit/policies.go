@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/lanceman/zqk/pkg/goroutinelabels"
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 
 	"golang.org/x/sync/errgroup"
 )

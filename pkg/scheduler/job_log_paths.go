@@ -8,8 +8,8 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/lanceman/zqk/pkg/paths"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/paths"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // maxSchedulerJobLogFilenameBytes caps a single path component length so logs work on common filesystems

@@ -6,7 +6,7 @@ package paths_test
 import (
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/paths"
 )
 
 func TestPathsResolver(t *testing.T) {

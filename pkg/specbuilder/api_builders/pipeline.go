@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/logging"
 )
 
 // APISpec defines the configuration for an external API integration.

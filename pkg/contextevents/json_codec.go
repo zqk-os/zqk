@@ -3,7 +3,7 @@ package contextevents
 import (
 	"encoding/json"
 
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // MarshalJSON emits object-map-aligned keys (objects.FieldKey* + wire-only constants).

@@ -3,7 +3,7 @@ package objectget
 import (
 	"strings"
 
-	"github.com/lanceman/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/storage"
 )
 
 // Overlay metadata keys injected by applyReferenceResolverOverlay / object get.

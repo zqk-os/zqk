@@ -3,8 +3,8 @@ package metricsrecording
 import (
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/config"
-	"github.com/lanceman/zqk/pkg/zqkenv"
+	"github.com/zqk-os/zqk/pkg/config"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
 const testSkipReasonEnvOptIn = "ZQK_TEST_METRICS_RECORDING opts in whole suite"

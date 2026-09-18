@@ -4,7 +4,7 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/datacell"
+	"github.com/zqk-os/zqk/pkg/datacell"
 )
 
 func TestAuthorizePeerAck_deniesCrossSeatImpersonation(t *testing.T) {

@@ -5,7 +5,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/goroutinelabels"
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 )
 
 // SignalAggregator implements AnticipatoryEngine but aggregates multiple events

@@ -3,7 +3,7 @@ package storage
 import (
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // TRACK: BLI-1786689721908382000-6402a858

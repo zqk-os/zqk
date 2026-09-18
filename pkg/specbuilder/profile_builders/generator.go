@@ -6,11 +6,11 @@ import (
 
 	"golang.org/x/sync/errgroup"
 
-	"github.com/lanceman/zqk/pkg/config"
-	"github.com/lanceman/zqk/pkg/errfmt"
-	sbcore "github.com/lanceman/zqk/pkg/specbuilder/core"
-	sbyaml "github.com/lanceman/zqk/pkg/specbuilder/yaml"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/config"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	sbcore "github.com/zqk-os/zqk/pkg/specbuilder/core"
+	sbyaml "github.com/zqk-os/zqk/pkg/specbuilder/yaml"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // ProfileGenerator generates profile files from versioned builders

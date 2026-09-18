@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"path/filepath"
 
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // readLiveCASBlobFromIndex loads objectID via the on-disk listing index when the

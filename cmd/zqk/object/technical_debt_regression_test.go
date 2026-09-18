@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/kindnames"
+	"github.com/zqk-os/zqk/pkg/kindnames"
 )
 
 func TestTechnicalDebtIDValidationRegression(t *testing.T) {

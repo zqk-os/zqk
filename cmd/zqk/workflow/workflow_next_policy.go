@@ -3,7 +3,7 @@ package workflow
 import (
 	"fmt"
 
-	"github.com/lanceman/zqk/pkg/nildecode"
+	"github.com/zqk-os/zqk/pkg/nildecode"
 )
 
 // workflow_next_policy holds the decision table for `workflow next`: stable decision IDs,

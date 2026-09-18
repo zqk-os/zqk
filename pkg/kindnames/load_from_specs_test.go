@@ -4,8 +4,8 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/kindnames"
-	"github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/kindnames"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 func TestLoadKindNamesFromSpecsDir(t *testing.T) {

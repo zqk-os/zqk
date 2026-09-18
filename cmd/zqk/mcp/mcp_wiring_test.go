@@ -3,7 +3,7 @@ package mcp
 import (
 	"testing"
 
-	pkgmcp "github.com/lanceman/zqk/pkg/mcp"
+	pkgmcp "github.com/zqk-os/zqk/pkg/mcp"
 )
 
 func TestNewMCPCmd_wiresEnsureSuperviseDaemonProxy(t *testing.T) {

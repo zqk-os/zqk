@@ -4,8 +4,8 @@ import (
 	"context"
 	"testing"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/storage"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/storage"
 )
 
 // TODO: Expand BenchmarkStorageRead beyond the NoopObjectStorage stub to establish real I/O baselines

@@ -4,7 +4,7 @@ import (
 	"strconv"
 	"sync"
 
-	"github.com/lanceman/zqk/pkg/zqkenv"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
 // Process-wide cap on concurrent object-YAML reads (open/read). List/CAS fast-paths

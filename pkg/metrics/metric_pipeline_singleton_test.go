@@ -3,7 +3,7 @@ package metrics
 import (
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/storage"
 )
 
 func TestMetricPipelineForProject_SingletonPerRoot(t *testing.T) {

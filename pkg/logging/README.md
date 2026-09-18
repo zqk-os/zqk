@@ -34,7 +34,7 @@ pkg/logging/
 Structured logger with field support and context awareness.
 
 ```go
-import "github.com/lanceman/zqk/pkg/logging"
+import "github.com/zqk-os/zqk/pkg/logging"
 
 // Create logger from context
 logger := logging.GetLoggerFromContext(ctx)
@@ -56,7 +56,7 @@ logger.LogError("Operation failed", err,
 Routes logs to multiple destinations with different formatters and levels.
 
 ```go
-import "github.com/lanceman/zqk/pkg/logging"
+import "github.com/zqk-os/zqk/pkg/logging"
 
 router := logging.NewLogRouter()
 

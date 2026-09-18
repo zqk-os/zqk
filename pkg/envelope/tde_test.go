@@ -3,7 +3,7 @@ package envelope_test
 import (
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/envelope"
+	"github.com/zqk-os/zqk/pkg/envelope"
 	"github.com/stretchr/testify/assert"
 )
 

@@ -3,7 +3,7 @@ package dispatch
 import (
 	"sync"
 
-	"github.com/lanceman/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/storage"
 )
 
 // Registry keys for the instance context. Use GetRegistry(key) and type-assert.

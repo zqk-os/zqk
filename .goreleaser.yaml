@@ -20,9 +20,9 @@ builds:
       - arm64
     ldflags:
       - -s -w
-      - -X github.com/lanceman/zqk/cmd/zqk/app.version={{.Version}}
-      - -X github.com/lanceman/zqk/cmd/zqk/app.buildDate={{.Date}}
-      - -X github.com/lanceman/zqk/cmd/zqk/app.gitCommit={{.Commit}}
+      - -X github.com/zqk-os/zqk/cmd/zqk/app.version={{.Version}}
+      - -X github.com/zqk-os/zqk/cmd/zqk/app.buildDate={{.Date}}
+      - -X github.com/zqk-os/zqk/cmd/zqk/app.gitCommit={{.Commit}}
 
   - id: zqk-mcp
     main: ./cmd/zqk/mcp-simple
@@ -37,9 +37,9 @@ builds:
       - arm64
     ldflags:
       - -s -w
-      - -X github.com/lanceman/zqk/cmd/zqk/app.version={{.Version}}
-      - -X github.com/lanceman/zqk/cmd/zqk/app.buildDate={{.Date}}
-      - -X github.com/lanceman/zqk/cmd/zqk/app.gitCommit={{.Commit}}
+      - -X github.com/zqk-os/zqk/cmd/zqk/app.version={{.Version}}
+      - -X github.com/zqk-os/zqk/cmd/zqk/app.buildDate={{.Date}}
+      - -X github.com/zqk-os/zqk/cmd/zqk/app.gitCommit={{.Commit}}
 
 archives:
   - id: default
@@ -118,7 +118,7 @@ release:
     **Manual download:** Choose your platform below.
   footer: |
     ---
-    Full changelog: https://github.com/lanceman/zqk/compare/{{ .PreviousTag }}...{{ .Tag }}
+    Full changelog: https://github.com/zqk-os/zqk/compare/{{ .PreviousTag }}...{{ .Tag }}
 
 brews:
   - name: zqk
@@ -127,7 +127,7 @@ brews:
       name: homebrew-tap
       token: "{{ .Env.HOMEBREW_TAP_TOKEN }}"
     directory: Formula
-    homepage: "https://github.com/lanceman/zqk"
+    homepage: "https://github.com/zqk-os/zqk"
     description: "Operating system for AI + human hybrid teams"
     license: "Apache-2.0"
     install: |

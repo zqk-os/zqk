@@ -4,7 +4,7 @@ import (
 	"slices"
 	"strings"
 
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // Pointer-transitive lifecycle constraints, expressed as data.

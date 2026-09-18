@@ -19,7 +19,7 @@ The **Budget** and **Pool** types provide a **thread-pool factory** that limits 
 ### Simple Goroutine
 
 ```go
-import "github.com/lanceman/zqk/pkg/goroutinelabels"
+import "github.com/zqk-os/zqk/pkg/goroutinelabels"
 
 // Fire-and-forget goroutine
 goroutinelabels.NewGoroutine("worker_1", "processing tasks").

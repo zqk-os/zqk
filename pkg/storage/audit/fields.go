@@ -1,6 +1,6 @@
 package audit
 
-import "github.com/lanceman/zqk/pkg/objects"
+import "github.com/zqk-os/zqk/pkg/objects"
 
 const (
 	Kind     = objects.KindAuditEvent

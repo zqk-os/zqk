@@ -1,6 +1,6 @@
 package system
 
-import "github.com/lanceman/zqk/pkg/aliases"
+import "github.com/zqk-os/zqk/pkg/aliases"
 
 // FieldOp* are canonical wire values for spec field lifecycle operations after alias
 // resolution (ResolveSpecFieldOperation). Use these for switches, metrics, and comparisons

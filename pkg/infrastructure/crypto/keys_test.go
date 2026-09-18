@@ -3,7 +3,7 @@ package crypto_test
 import (
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/infrastructure/crypto"
+	"github.com/zqk-os/zqk/pkg/infrastructure/crypto"
 )
 
 func TestEd25519Manager_SignAndVerify(t *testing.T) {

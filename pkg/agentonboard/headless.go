@@ -4,9 +4,9 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/specialization"
-	"github.com/lanceman/zqk/pkg/zqkenv"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/specialization"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
 // EdgeSignal is a lightweight environment hint for Vector B / appliance hosts.

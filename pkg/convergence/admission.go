@@ -1,6 +1,6 @@
 package convergence
 
-import "github.com/lanceman/zqk/pkg/objects"
+import "github.com/zqk-os/zqk/pkg/objects"
 
 // DraftToActivePreconditions is the fail-closed membrane contract for
 // convergence_session draft→active. Keep this set small: do not require

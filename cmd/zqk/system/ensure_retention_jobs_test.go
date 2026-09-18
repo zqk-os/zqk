@@ -3,7 +3,7 @@ package system
 import (
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/logging"
 )
 
 func TestNewEnsureRetentionJobsCmd(t *testing.T) {

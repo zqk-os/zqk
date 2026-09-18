@@ -1,6 +1,6 @@
 package interactive
 
-import "github.com/lanceman/zqk/pkg/errfmt"
+import "github.com/zqk-os/zqk/pkg/errfmt"
 
 const (
 	errGenerateTemplateFmt = "failed to generate template: %w"

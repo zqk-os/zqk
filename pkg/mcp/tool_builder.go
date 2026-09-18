@@ -3,7 +3,7 @@ package mcp
 import (
 	"slices"
 
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // MCPToolBuilder provides a fluent API for building MCP tool schemas

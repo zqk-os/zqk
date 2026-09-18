@@ -4,8 +4,8 @@
 package rollback_report
 
 import (
-	base_objectenum "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
-	shared_rollback_reportsenum "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/shared_rollback_reports"
+	base_objectenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
+	shared_rollback_reportsenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/shared_rollback_reports"
 )
 
 type Plane = base_objectenum.Plane

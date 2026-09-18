@@ -1,7 +1,7 @@
 package logging
 
 import (
-	pkgctx "github.com/lanceman/zqk/pkg/context"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
 )
 
 // LogSwallowedError logs an error that is intentionally swallowed to the system logger.

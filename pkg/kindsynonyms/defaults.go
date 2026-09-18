@@ -1,6 +1,6 @@
 package kindsynonyms
 
-import "github.com/lanceman/zqk/pkg/kindnames"
+import "github.com/zqk-os/zqk/pkg/kindnames"
 
 var (
 	aliasesBacklogItem = []string{"task", "tasks", "item", "items", "backlog", "story", "stories", "work_item"}

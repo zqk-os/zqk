@@ -1,7 +1,7 @@
 package specorigination
 
 import (
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // State carries state between stages and is returned from [Run] on success.

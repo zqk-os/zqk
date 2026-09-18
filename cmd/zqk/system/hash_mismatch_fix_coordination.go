@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/coordination"
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/coordination"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/storage"
 )
 
 // emitHashMismatchFixEventViaCoordinator emits hash mismatch fix events via the coordination system

@@ -5,7 +5,7 @@ import (
 	"strings"
 	"unicode"
 
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // getPermissionOperations returns the list of valid permission operations (BLI-958)

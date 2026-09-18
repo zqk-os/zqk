@@ -1,9 +1,9 @@
 package app_test
 
 import (
-	"github.com/lanceman/zqk/pkg/datacell"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
-	"github.com/lanceman/zqk/pkg/zqkenv"
+	"github.com/zqk-os/zqk/pkg/datacell"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 
 	"encoding/json"
 	"path/filepath"
@@ -11,12 +11,12 @@ import (
 	"testing"
 	"time"
 
-	"github.com/lanceman/zqk/cmd/zqk-community/app"
-	"github.com/lanceman/zqk/cmd/zqk/object"
-	testkit "github.com/lanceman/zqk/pkg/testkit"
+	"github.com/zqk-os/zqk/cmd/zqk-community/app"
+	"github.com/zqk-os/zqk/cmd/zqk/object"
+	testkit "github.com/zqk-os/zqk/pkg/testkit"
 
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 )
 
 func init() {

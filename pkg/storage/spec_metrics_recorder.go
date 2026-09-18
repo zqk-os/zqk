@@ -3,8 +3,8 @@ package storage
 import (
 	"time"
 
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/observability"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/observability"
 )
 
 // getSpecMetricsRecorder gets a metrics recorder for spec operations

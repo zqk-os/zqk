@@ -5,7 +5,7 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 type fakeSink struct {

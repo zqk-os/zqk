@@ -9,15 +9,15 @@ import (
 	"path/filepath"
 	"strings"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/convergerollup"
-	"github.com/lanceman/zqk/pkg/logging"
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/paths"
-	enumv "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/convergence_session"
-	"github.com/lanceman/zqk/pkg/specbuilder/bldr_instance_v1"
-	storagepkg "github.com/lanceman/zqk/pkg/storage"
-	"github.com/lanceman/zqk/pkg/utils/fileutil"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/convergerollup"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
+	enumv "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/convergence_session"
+	"github.com/zqk-os/zqk/pkg/specbuilder/bldr_instance_v1"
+	storagepkg "github.com/zqk-os/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // convergenceTerminalFollowUpNeeded reports whether test-bundle health still shows work worth tracking

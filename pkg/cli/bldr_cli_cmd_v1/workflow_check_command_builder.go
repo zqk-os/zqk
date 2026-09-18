@@ -3,8 +3,8 @@ package bldr_cli_cmd_v1
 import (
 	"fmt"
 
-	"github.com/lanceman/zqk/pkg/cli/bldr_cli_cmd_v1/check"
-	clipkg "github.com/lanceman/zqk/pkg/cli"
+	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1/check"
+	clipkg "github.com/zqk-os/zqk/pkg/cli"
 	"github.com/spf13/cobra"
 )
 

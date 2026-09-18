@@ -7,12 +7,12 @@ import (
 	"golang.org/x/sync/errgroup"
 	"gopkg.in/yaml.v3"
 
-	"github.com/lanceman/zqk/pkg/errfmt"
-	mcptesting "github.com/lanceman/zqk/pkg/mcp/testing"
-	"github.com/lanceman/zqk/pkg/specbuilder/adapters"
-	sbcore "github.com/lanceman/zqk/pkg/specbuilder/core"
-	sbyaml "github.com/lanceman/zqk/pkg/specbuilder/yaml"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	mcptesting "github.com/zqk-os/zqk/pkg/mcp/testing"
+	"github.com/zqk-os/zqk/pkg/specbuilder/adapters"
+	sbcore "github.com/zqk-os/zqk/pkg/specbuilder/core"
+	sbyaml "github.com/zqk-os/zqk/pkg/specbuilder/yaml"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 const scenarioGeneratorFileExtYAML = ".yaml"

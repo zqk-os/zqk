@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // Prediction represents an anticipated need based on a filesystem event.

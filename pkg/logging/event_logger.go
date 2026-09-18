@@ -8,8 +8,8 @@ import (
 	"runtime"
 	"strings"
 
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
-	"github.com/lanceman/zqk/pkg/when"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/when"
 )
 
 // EventLogger provides context-aware logging that automatically extracts

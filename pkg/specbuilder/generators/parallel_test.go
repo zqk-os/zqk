@@ -4,10 +4,10 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/paths"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/paths"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 
-	mcptesting "github.com/lanceman/zqk/pkg/mcp/testing"
+	mcptesting "github.com/zqk-os/zqk/pkg/mcp/testing"
 )
 
 // TestParallelImplementation tests that both old and new generators can coexist

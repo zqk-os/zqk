@@ -5,8 +5,8 @@ import (
 
 	"github.com/spf13/cobra"
 
-	pkgcli "github.com/lanceman/zqk/pkg/cli"
-	pkgctx "github.com/lanceman/zqk/pkg/context"
+	pkgcli "github.com/zqk-os/zqk/pkg/cli"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
 )
 
 // TestPrivilegeFiltering_ReadOnlyCommands tests that read-only users only see read commands

@@ -3,7 +3,7 @@ package profile_builders
 import (
 	"maps"
 
-	"github.com/lanceman/zqk/pkg/config"
+	"github.com/zqk-os/zqk/pkg/config"
 )
 
 // BaseProfileBuilder provides common functionality for profile builders

@@ -3,9 +3,9 @@ package storage
 import (
 	"os"
 
-	"github.com/lanceman/zqk/pkg/config"
-	caspkg "github.com/lanceman/zqk/pkg/storage/cas"
-	"github.com/lanceman/zqk/pkg/zqkenv"
+	"github.com/zqk-os/zqk/pkg/config"
+	caspkg "github.com/zqk-os/zqk/pkg/storage/cas"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 
 	"testing"
 )

@@ -3,7 +3,7 @@ package scheduler
 import (
 	"strings"
 
-	"github.com/lanceman/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/errfmt"
 )
 
 // IssueBundleHealthRow is one row comparing an issues.json entry to test-bundles/health.jsonl.

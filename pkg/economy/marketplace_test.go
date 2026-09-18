@@ -6,8 +6,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/economy"
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/economy"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 func TestAgentMarketplace_BroadcastAndGetSkills(t *testing.T) {

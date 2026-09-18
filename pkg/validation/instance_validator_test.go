@@ -4,12 +4,12 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/paths"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/paths"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 
-	"github.com/lanceman/zqk/pkg/objects"
-	_ "github.com/lanceman/zqk/pkg/specbuilder/bldr_v2" // Register builders for tests
-	"github.com/lanceman/zqk/pkg/specbuilder/builders"
+	"github.com/zqk-os/zqk/pkg/objects"
+	_ "github.com/zqk-os/zqk/pkg/specbuilder/bldr_v2" // Register builders for tests
+	"github.com/zqk-os/zqk/pkg/specbuilder/builders"
 )
 
 func TestInstanceValidator_ValidateInstance(t *testing.T) {

@@ -4,8 +4,8 @@ import (
 	"os"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/scheduler/clusterstatus"
-	"github.com/lanceman/zqk/pkg/scheduler/hostservice"
+	"github.com/zqk-os/zqk/pkg/scheduler/clusterstatus"
+	"github.com/zqk-os/zqk/pkg/scheduler/hostservice"
 )
 
 // emitClusterStatusAfterJob best-effort publishes terminal job phase to the local

@@ -3,8 +3,8 @@ package inbox_test
 import (
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/hive/inbox"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/hive/inbox"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 func TestPersistentInbox_Replay(t *testing.T) {

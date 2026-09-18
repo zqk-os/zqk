@@ -3,7 +3,7 @@ package inbox_test
 import (
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/hive/inbox"
+	"github.com/zqk-os/zqk/pkg/hive/inbox"
 )
 
 func TestMemoryInbox_Lifecycle(t *testing.T) {

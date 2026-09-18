@@ -6,9 +6,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/policyinterrupt"
-	"github.com/lanceman/zqk/pkg/validation"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/policyinterrupt"
+	"github.com/zqk-os/zqk/pkg/validation"
 )
 
 // InterruptEmitter handles the emission of policy interrupts for QA disparities.

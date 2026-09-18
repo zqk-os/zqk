@@ -45,7 +45,7 @@ Example:
 ### Creating Instances Programmatically
 
 ```go
-import "github.com/lanceman/zqk/pkg/objects"
+import "github.com/zqk-os/zqk/pkg/objects"
 
 // Create a policy instance builder (ONE builder for ALL policy instances)
 builder := NewPolicyInstanceBuilder(objects.DefaultSchemaVersion)
@@ -60,7 +60,7 @@ instance, err := builder.
 ### Loading from YAML
 
 ```go
-import "github.com/lanceman/zqk/pkg/objects"
+import "github.com/zqk-os/zqk/pkg/objects"
 
 builder := NewPolicyInstanceBuilder(objects.DefaultSchemaVersion)
 instance, err := builder.LoadFromYAML(".zqk/process/policies/POL-CODE-009.yaml")
@@ -69,7 +69,7 @@ instance, err := builder.LoadFromYAML(".zqk/process/policies/POL-CODE-009.yaml")
 ### Loading from Sequence File (Compact Format)
 
 ```go
-import "github.com/lanceman/zqk/pkg/objects"
+import "github.com/zqk-os/zqk/pkg/objects"
 
 builder := NewPolicyInstanceBuilder(objects.DefaultSchemaVersion)
 instance, err := builder.LoadFromSequence(".zqk/process/policies/POL-CODE-009.seq")
@@ -78,7 +78,7 @@ instance, err := builder.LoadFromSequence(".zqk/process/policies/POL-CODE-009.se
 ### Writing to Compact Format
 
 ```go
-import "github.com/lanceman/zqk/pkg/objects"
+import "github.com/zqk-os/zqk/pkg/objects"
 
 builder := NewPolicyInstanceBuilder(objects.DefaultSchemaVersion)
 instance := map[string]any{
@@ -92,7 +92,7 @@ err := builder.WriteToSequence(instance, "policies/POL-CODE-009.seq")
 ### Version-Aware Creation
 
 ```go
-import "github.com/lanceman/zqk/pkg/objects"
+import "github.com/zqk-os/zqk/pkg/objects"
 
 // Create instance for an older spec schema (example)
 builder1 := NewPolicyInstanceBuilder("1.0.0")
@@ -106,7 +106,7 @@ instance2, _ := builder2.SetID("POL-002").Build()
 ### Using Registry
 
 ```go
-import "github.com/lanceman/zqk/pkg/objects"
+import "github.com/zqk-os/zqk/pkg/objects"
 
 // Get builder from registry
 registry := GetGlobalRegistry()

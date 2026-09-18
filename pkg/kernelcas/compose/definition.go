@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/lanceman/zqk/pkg/pipeline"
+	"github.com/zqk-os/zqk/pkg/pipeline"
 )
 
 // CompositionKey uniquely identifies a composed mutation pipeline.

@@ -3,7 +3,7 @@ package specorigination
 import (
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 func TestValidateOptions(t *testing.T) {

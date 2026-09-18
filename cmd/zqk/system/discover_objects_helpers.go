@@ -5,8 +5,8 @@ import (
 	"runtime"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/logging"
-	"github.com/lanceman/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/storage"
 )
 
 // fileStorageDiscovery is the interface used for strategy-based discovery (avoids importing storage in tests).

@@ -3,7 +3,7 @@ package interactionpolicy
 import (
 	"strings"
 
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // Result is the ping-pong payload for CLI / hooks.

@@ -1,12 +1,12 @@
 package system
 
 import (
-	pkgctx "github.com/lanceman/zqk/pkg/context"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
 
-	"github.com/lanceman/zqk/internal/cli"
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/logging"
-	schedulerpkg "github.com/lanceman/zqk/pkg/scheduler"
+	"github.com/zqk-os/zqk/internal/cli"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/logging"
+	schedulerpkg "github.com/zqk-os/zqk/pkg/scheduler"
 	"github.com/spf13/cobra"
 )
 

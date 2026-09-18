@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/logging"
 )
 
 // Daemon represents the telemetry aggregation daemon

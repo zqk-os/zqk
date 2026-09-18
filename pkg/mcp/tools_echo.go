@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // HandleEcho handles the echo tool - simple test tool that echoes back a message

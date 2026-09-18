@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // TRACK: BLI-1783845980884549000-014a1c61 — plan immutability / execution-facing gate for BLI in_progress.

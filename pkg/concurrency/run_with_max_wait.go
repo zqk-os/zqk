@@ -3,7 +3,7 @@ package concurrency
 import (
 	"time"
 
-	"github.com/lanceman/zqk/pkg/goroutinelabels"
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 )
 
 // RunWithMaxWait runs fn in a new goroutine and returns when fn completes or maxWait elapses,

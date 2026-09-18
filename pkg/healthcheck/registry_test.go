@@ -5,9 +5,9 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/healthcheck"
-	"github.com/lanceman/zqk/pkg/objects"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/healthcheck"
+	"github.com/zqk-os/zqk/pkg/objects"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 type mockMonitor struct {

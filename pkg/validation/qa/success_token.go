@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/objects"
-	qasuccessenum "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/qa_success"
-	"github.com/lanceman/zqk/pkg/specbuilder/bldr_instance_v1"
+	"github.com/zqk-os/zqk/pkg/objects"
+	qasuccessenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/qa_success"
+	"github.com/zqk-os/zqk/pkg/specbuilder/bldr_instance_v1"
 )
 
 // qaSuccessTitlePrefix is the human-readable name for a minted token. base_object

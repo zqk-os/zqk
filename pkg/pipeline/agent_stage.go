@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/lanceman/zqk/pkg/pipeline/plugins"
+	"github.com/zqk-os/zqk/pkg/pipeline/plugins"
 )
 
 // AgentDispatcher defines the interface for dispatching a task to an autonomous agent.

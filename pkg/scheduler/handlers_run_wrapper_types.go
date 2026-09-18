@@ -4,11 +4,11 @@ import (
 	"context"
 	"time"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/logging"
-	"github.com/lanceman/zqk/pkg/scheduler/transceiver"
-	"github.com/lanceman/zqk/pkg/scheduler/transceiver/types"
-	storagepkg "github.com/lanceman/zqk/pkg/storage"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/scheduler/transceiver"
+	"github.com/zqk-os/zqk/pkg/scheduler/transceiver/types"
+	storagepkg "github.com/zqk-os/zqk/pkg/storage"
 )
 
 // RunWrapperHandler executes external commands with timeout and retry logic

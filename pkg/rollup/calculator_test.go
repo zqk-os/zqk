@@ -4,7 +4,7 @@ import (
 	"math"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 func TestCalculate_Empty(t *testing.T) {

@@ -3,7 +3,7 @@ package storage
 // Facade boundary for upcoming decomposition. TRACK: BLI-TRACK-STORAGE-SPLIT-001
 
 import (
-	"github.com/lanceman/zqk/pkg/storage/file"
+	"github.com/zqk-os/zqk/pkg/storage/file"
 )
 
 type FileLockConfig = file.FileLockConfig

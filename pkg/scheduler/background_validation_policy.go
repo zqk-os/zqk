@@ -1,8 +1,8 @@
 package scheduler
 
 import (
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/storage"
 )
 
 // ShouldSkipBackgroundValidationBatchForKind returns true for kinds that must not enqueue

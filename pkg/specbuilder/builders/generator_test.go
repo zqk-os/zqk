@@ -4,10 +4,10 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/objects"
-	_ "github.com/lanceman/zqk/pkg/specbuilder/bldr_v2" // Import to trigger builder registration (uses builders.CurrentBuilderPackage)
-	"github.com/lanceman/zqk/pkg/specbuilder/builders"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/objects"
+	_ "github.com/zqk-os/zqk/pkg/specbuilder/bldr_v2" // Import to trigger builder registration (uses builders.CurrentBuilderPackage)
+	"github.com/zqk-os/zqk/pkg/specbuilder/builders"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 const generatorTestSpecFileExtYAML = ".yaml"

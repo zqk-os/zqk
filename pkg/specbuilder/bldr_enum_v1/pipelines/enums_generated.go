@@ -4,8 +4,8 @@
 package pipelines
 
 import (
-	base_objectenum "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
-	shared_pipelinesenum "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/shared_pipelines"
+	base_objectenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
+	shared_pipelinesenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/shared_pipelines"
 )
 
 type PriorityTier = base_objectenum.PriorityTier

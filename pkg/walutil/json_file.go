@@ -3,8 +3,8 @@ package walutil
 import (
 	"encoding/json"
 
-	"github.com/lanceman/zqk/pkg/errfmt"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // ReadJSONFile reads JSON from path into out. Missing file returns nil.

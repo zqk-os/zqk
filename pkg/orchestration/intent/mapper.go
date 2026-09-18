@@ -3,7 +3,7 @@ package intent
 import (
 	"context"
 
-	"github.com/lanceman/zqk/pkg/orchestration"
+	"github.com/zqk-os/zqk/pkg/orchestration"
 )
 
 // IntentMapper defines the contract for translating events into actionable intents.

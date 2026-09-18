@@ -5,8 +5,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/graph"
-	"github.com/lanceman/zqk/pkg/graph/provider"
+	"github.com/zqk-os/zqk/pkg/graph"
+	"github.com/zqk-os/zqk/pkg/graph/provider"
 )
 
 func TestGraphStateLocker(t *testing.T) {

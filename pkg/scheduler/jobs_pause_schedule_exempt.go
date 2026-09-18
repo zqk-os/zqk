@@ -1,6 +1,6 @@
 package scheduler
 
-import "github.com/lanceman/zqk/pkg/config"
+import "github.com/zqk-os/zqk/pkg/config"
 
 // loadJobsPausedScheduleExemptIDs reads scheduler_maintenance_config.yaml (see ZQK_SCHEDULER_MAINTENANCE_CONFIG).
 // Returns nil when projectRoot is empty, load fails, or the config omits jobs_paused_schedule_exempt_job_ids —

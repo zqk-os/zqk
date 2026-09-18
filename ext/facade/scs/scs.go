@@ -1,6 +1,6 @@
 package scs
 
-import gitpkg "github.com/lanceman/zqk/pkg/git"
+import gitpkg "github.com/zqk-os/zqk/pkg/git"
 
 // Client defines source-control capabilities used by CLI workflows.
 // It is intentionally capability-focused so adapters can map vendor specifics internally.

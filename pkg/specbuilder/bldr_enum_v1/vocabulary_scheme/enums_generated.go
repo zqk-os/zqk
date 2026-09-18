@@ -4,8 +4,8 @@
 package vocabulary_scheme
 
 import (
-	base_objectenum "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
-	shared_vocabulary_schemesenum "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/shared_vocabulary_schemes"
+	base_objectenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
+	shared_vocabulary_schemesenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/shared_vocabulary_schemes"
 )
 
 type Plane = base_objectenum.Plane

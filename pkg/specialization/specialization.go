@@ -3,7 +3,7 @@ package specialization
 import (
 	"strings"
 
-	"github.com/lanceman/zqk/pkg/zqkenv"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
 // Tier represents a cellular specialization tier of a ZQK node.

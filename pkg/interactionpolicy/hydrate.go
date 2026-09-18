@@ -4,7 +4,7 @@ import (
 	"strings"
 	"unicode"
 
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // maxDriveRunes caps the compiled hunger signal so hooks stay short.

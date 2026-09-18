@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/agentfeed"
+	"github.com/zqk-os/zqk/pkg/agentfeed"
 )
 
 func TestPeerAckTimeoutAuditHandler_Execute(t *testing.T) {

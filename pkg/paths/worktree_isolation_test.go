@@ -6,7 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/zqkenv"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
 // TestWorktreeIsolation_FunctionalAcceptance verifies that AgentWorktreeDir assigns

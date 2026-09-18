@@ -5,7 +5,7 @@ import (
 	"regexp"
 	"strconv"
 
-	objkeys "github.com/lanceman/zqk/pkg/objects"
+	objkeys "github.com/zqk-os/zqk/pkg/objects"
 )
 
 // NextSequentialID returns the next sequential ID for a kind given existing objects.

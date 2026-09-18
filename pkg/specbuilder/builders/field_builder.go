@@ -1,6 +1,6 @@
 package builders
 
-import "github.com/lanceman/zqk/pkg/objects"
+import "github.com/zqk-os/zqk/pkg/objects"
 
 // fbSpecKey* are object-spec field-definition YAML keys for FieldBuilder and nested builders.
 const (

@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // createTestServerConfigForRegistry creates a ServerConfig for testing agent registry

@@ -5,7 +5,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/zqktime"
+	"github.com/zqk-os/zqk/pkg/zqktime"
 )
 
 func TestStreamSegmentWriterPID(t *testing.T) {

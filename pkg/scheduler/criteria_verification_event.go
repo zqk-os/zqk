@@ -3,8 +3,8 @@ package scheduler
 import (
 	"strings"
 
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/zqktime"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/zqktime"
 )
 
 // MaybeAppendTestBundleCriteriaVerificationEvidence writes one criteria_verification_evidence line to the shared

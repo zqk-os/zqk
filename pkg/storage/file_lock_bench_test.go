@@ -9,8 +9,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/goroutinelabels"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // BenchmarkFileLockContention benchmarks concurrent file lock acquisition and batching (L:F-CON-02 / CRIT-CEF-R8L-CON-02).

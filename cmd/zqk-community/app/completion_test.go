@@ -6,9 +6,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/lanceman/zqk/cmd/zqk-community/app"
-	"github.com/lanceman/zqk/pkg/execwrap"
-	"github.com/lanceman/zqk/pkg/zqkenv"
+	"github.com/zqk-os/zqk/cmd/zqk-community/app"
+	"github.com/zqk-os/zqk/pkg/execwrap"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 	"github.com/spf13/cobra"
 )
 

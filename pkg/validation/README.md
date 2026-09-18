@@ -15,7 +15,7 @@ This package provides object validation for zqk: instance validation (schema, li
 ## Usage
 
 ```go
-import "github.com/lanceman/zqk/pkg/validation"
+import "github.com/zqk-os/zqk/pkg/validation"
 
 // Sync validation via registry
 registry := validation.NewValidatorRegistry()

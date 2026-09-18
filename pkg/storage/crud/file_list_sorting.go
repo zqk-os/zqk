@@ -5,7 +5,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // Uses typed fields from parsed objects for faster access during sorting

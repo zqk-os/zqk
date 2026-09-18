@@ -6,11 +6,11 @@ import (
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 
-	"github.com/lanceman/zqk/internal/cli"
-	clicontext "github.com/lanceman/zqk/internal/cli/context"
-	clipkg "github.com/lanceman/zqk/pkg/cli"
-	"github.com/lanceman/zqk/pkg/cli/bldr_cli_cmd_v1"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/internal/cli"
+	clicontext "github.com/zqk-os/zqk/internal/cli/context"
+	clipkg "github.com/zqk-os/zqk/pkg/cli"
+	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // vetConfigCmd represents the vet-config command

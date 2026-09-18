@@ -1,7 +1,7 @@
 package mcp
 
 import (
-	"github.com/lanceman/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/storage"
 )
 
 func init() {

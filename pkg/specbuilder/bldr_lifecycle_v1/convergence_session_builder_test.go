@@ -4,7 +4,7 @@ import (
 	"slices"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/convergence"
+	"github.com/zqk-os/zqk/pkg/convergence"
 )
 
 func TestConvergenceSessionLifecycleBuilder_DraftToActiveAdmission(t *testing.T) {

@@ -1,10 +1,10 @@
 package storage
 
 import (
-	"github.com/lanceman/zqk/pkg/storage/audit"
-	caspkg "github.com/lanceman/zqk/pkg/storage/cas"
-	"github.com/lanceman/zqk/pkg/storage/crud"
-	"github.com/lanceman/zqk/pkg/storage/systemcheck"
+	"github.com/zqk-os/zqk/pkg/storage/audit"
+	caspkg "github.com/zqk-os/zqk/pkg/storage/cas"
+	"github.com/zqk-os/zqk/pkg/storage/crud"
+	"github.com/zqk-os/zqk/pkg/storage/systemcheck"
 )
 
 // RootFacade is the file-store facade for CRIT-CEF-STORAGE-SUBPACKAGES-001:

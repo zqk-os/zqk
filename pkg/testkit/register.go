@@ -3,7 +3,7 @@ package testkit
 import (
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/storage"
 )
 
 const emptyValue = ""

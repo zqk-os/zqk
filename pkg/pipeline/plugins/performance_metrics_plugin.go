@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // PerformanceMetricsPlugin tracks and reports on pipeline execution efficiency.

@@ -1,6 +1,6 @@
 package audit
 
-import "github.com/lanceman/zqk/pkg/objects"
+import "github.com/zqk-os/zqk/pkg/objects"
 
 // EventTally is the count rollup AggregateAuditEvents writes onto a metric.
 type EventTally struct {

@@ -3,7 +3,7 @@ package datacell
 import (
 	"path/filepath"
 
-	"github.com/lanceman/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/paths"
 )
 
 // ProtocolVersion is the contract version for the runtime organism layout (paths + future optional manifest).

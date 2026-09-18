@@ -5,7 +5,7 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/goroutinelabels"
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 )
 
 var errRunInLockTest = errors.New("run_in_lock_test")

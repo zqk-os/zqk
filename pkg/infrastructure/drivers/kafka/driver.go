@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/lanceman/zqk/pkg/infrastructure"
-	"github.com/lanceman/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/infrastructure"
+	"github.com/zqk-os/zqk/pkg/logging"
 )
 
 // KafkaSpine is a stub implementation of the SpinalSpine interface.

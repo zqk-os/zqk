@@ -3,7 +3,7 @@ package cli
 import (
 	"fmt"
 
-	"github.com/lanceman/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/spf13/cobra"
 )
 

@@ -8,7 +8,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/logging"
 )
 
 // TestShockwaveUpstreamCascade verifies CRIT-TEST-SHOCK-FUNC-UPSTREAM-001:

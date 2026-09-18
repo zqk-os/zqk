@@ -3,11 +3,11 @@ package testing
 import (
 	"sync"
 
-	"github.com/lanceman/zqk/pkg/concurrency"
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/logging"
-	pkgmcp "github.com/lanceman/zqk/pkg/mcp"
+	"github.com/zqk-os/zqk/pkg/concurrency"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/logging"
+	pkgmcp "github.com/zqk-os/zqk/pkg/mcp"
 )
 
 // ProcessorRegistry manages named response processors

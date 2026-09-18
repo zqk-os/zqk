@@ -2,12 +2,11 @@ acceptance_considerations: ""
 created_at: "2026-09-17T21:44:38Z"
 created_by: ACC-1785920548450214012-68b850c0
 description: '5-star first-run: dest-owned sku-overlay (COMMUNITY_FIRST_RUN/QUICKSTART/CONTRIBUTING). Slim Makefile. Init seeds starter Gantt in-process and always EnsureRetentionJobsInProject. Flags --with-onboarding-roadmap/--with-maintenance-jobs are aliases, not refuses. zcom scheduler start|stop|status is shipped (not studio cmd/zqk/scheduler). Studio: TDE-1789692371040218000-2330de1d (scheduler SKU cut) and TDE-1789690070487265000-ea5471f4 (overlay Makefile/README hose).'
-estimated_effort: ""
 id: BLI-1789681478369698000-263b989c
 kind: backlog_item
 namespace_id: zqk:kernel
 priority: high
-priority_plan_ref: ""
+priority_plan_ref: PRI-1789702455694482000-e7fdaf04
 priority_tier: P1
 problem_statement: Would-be users bounce when the first commands in README do not exist on the binary they just built.
 requirement_refs:
@@ -15,7 +14,7 @@ requirement_refs:
 schema_version: 2.0.0
 status: originated
 title: 'First-run MTTV: zcom docs/CLI must match the shipped SKU'
-updated_at: "2026-09-18T00:46:54Z"
+updated_at: "2026-09-18T03:41:12Z"
 updated_by: ACC-1785920548450214012-68b850c0
 version_context: default
 workstream_refs:

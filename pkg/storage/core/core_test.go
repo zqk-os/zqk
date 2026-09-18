@@ -3,7 +3,7 @@ package core_test
 import (
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/storage/core"
+	"github.com/zqk-os/zqk/pkg/storage/core"
 	"github.com/stretchr/testify/require"
 )
 

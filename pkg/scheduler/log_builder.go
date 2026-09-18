@@ -1,6 +1,6 @@
 package scheduler
 
-import "github.com/lanceman/zqk/pkg/logging"
+import "github.com/zqk-os/zqk/pkg/logging"
 
 // SchedulerLogRoot is the fluent log root (pooled entries, shared field helpers) from [logging.FluentRoot].
 type SchedulerLogRoot = logging.FluentRoot

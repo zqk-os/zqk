@@ -3,7 +3,7 @@ package testkit
 import (
 	"os/exec"
 
-	"github.com/lanceman/zqk/pkg/zqkenv"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
 // WireCLISubprocessForIsolatedProject configures cmd.Dir and cmd.Env for a child zqk process

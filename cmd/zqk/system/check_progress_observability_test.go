@@ -12,8 +12,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/coordination"
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/coordination"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // CRIT-1789663115490931000-3286aa9d: Functional Acceptance

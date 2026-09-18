@@ -4,8 +4,8 @@
 package agent_feeds
 
 import (
-	base_objectenum "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
-	shared_agent_feedsenum "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/shared_agent_feeds"
+	base_objectenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
+	shared_agent_feedsenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/shared_agent_feeds"
 )
 
 type DeliveryMode string

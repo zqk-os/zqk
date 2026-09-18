@@ -4,7 +4,7 @@ import (
 	"slices"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/errfmt"
 )
 
 func ParseTimestampForFilter(value any) (time.Time, error) {

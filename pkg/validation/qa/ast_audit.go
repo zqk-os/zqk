@@ -7,7 +7,7 @@ import (
 	"go/token"
 	"strings"
 
-	"github.com/lanceman/zqk/pkg/validation"
+	"github.com/zqk-os/zqk/pkg/validation"
 )
 
 // Violation represents a specific non-compliant code pattern.

@@ -3,7 +3,7 @@ package quality
 import (
 	"strings"
 
-	"github.com/lanceman/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/errfmt"
 )
 
 // ParseColumnValuePairs parses repeatable "column=value" or "column:value" flags (e.g. --filter, --set).

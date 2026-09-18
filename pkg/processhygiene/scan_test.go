@@ -3,7 +3,7 @@ package processhygiene
 import (
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 func TestLoadEmbeddedDefaultRules(t *testing.T) {

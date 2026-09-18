@@ -3,7 +3,7 @@ package bridge
 import (
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/agentfeed"
+	"github.com/zqk-os/zqk/pkg/agentfeed"
 )
 
 func TestSlackAdapter_ParseEvent(t *testing.T) {

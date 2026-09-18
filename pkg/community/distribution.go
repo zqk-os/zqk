@@ -10,7 +10,7 @@ import (
 	"regexp"
 	"strings"
 
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // TargetPlatform defines an operating system and architecture pair.
@@ -72,26 +72,26 @@ func GenerateHomebrewFormula(version string, checksums map[string]string) (strin
 
 	tmpl := fmt.Sprintf(`class Zqk < Formula
   desc "Kernel and orchestration CLI for AI-human hybrid software engineering"
-  homepage "https://github.com/lanceman/zqk"
+  homepage "https://github.com/zqk-os/zqk"
   version "%s"
   license "Apache-2.0"
 
   on_macos do
     if Hardware::CPU.arm?
-      url "https://github.com/lanceman/zqk/releases/download/v#{version}/zqk_#{version}_darwin_arm64.tar.gz"
+      url "https://github.com/zqk-os/zqk/releases/download/v#{version}/zqk_#{version}_darwin_arm64.tar.gz"
       sha256 "%s"
     else
-      url "https://github.com/lanceman/zqk/releases/download/v#{version}/zqk_#{version}_darwin_amd64.tar.gz"
+      url "https://github.com/zqk-os/zqk/releases/download/v#{version}/zqk_#{version}_darwin_amd64.tar.gz"
       sha256 "%s"
     end
   end
 
   on_linux do
     if Hardware::CPU.arm?
-      url "https://github.com/lanceman/zqk/releases/download/v#{version}/zqk_#{version}_linux_arm64.tar.gz"
+      url "https://github.com/zqk-os/zqk/releases/download/v#{version}/zqk_#{version}_linux_arm64.tar.gz"
       sha256 "%s"
     else
-      url "https://github.com/lanceman/zqk/releases/download/v#{version}/zqk_#{version}_linux_amd64.tar.gz"
+      url "https://github.com/zqk-os/zqk/releases/download/v#{version}/zqk_#{version}_linux_amd64.tar.gz"
       sha256 "%s"
     end
   end

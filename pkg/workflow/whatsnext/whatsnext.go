@@ -9,18 +9,18 @@ import (
 	"strings"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/execwrap"
-	"github.com/lanceman/zqk/pkg/zqkenv"
+	"github.com/zqk-os/zqk/pkg/execwrap"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 
-	"github.com/lanceman/zqk/pkg/agentfeed"
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/convergence"
-	"github.com/lanceman/zqk/pkg/objects"
-	observerpkg "github.com/lanceman/zqk/pkg/observer"
-	"github.com/lanceman/zqk/pkg/storage"
-	"github.com/lanceman/zqk/pkg/tpm"
+	"github.com/zqk-os/zqk/pkg/agentfeed"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/convergence"
+	"github.com/zqk-os/zqk/pkg/objects"
+	observerpkg "github.com/zqk-os/zqk/pkg/observer"
+	"github.com/zqk-os/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/tpm"
 )
 
 // Default CLI alpha readiness plan (repo lane); still resolved when status is paused.

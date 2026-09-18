@@ -4,7 +4,7 @@ import (
 	"slices"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/validation"
+	"github.com/zqk-os/zqk/pkg/validation"
 )
 
 // TestEnsurePrefixForKind verifies that ensurePrefixForKind adds a prefix once and ignores duplicates.

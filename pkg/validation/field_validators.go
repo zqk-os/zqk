@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // ResolveStringForPatternValidation returns a string suitable for pattern (e.g. datetime regex) validation.

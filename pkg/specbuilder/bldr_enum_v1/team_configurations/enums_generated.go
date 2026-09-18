@@ -4,8 +4,8 @@
 package team_configurations
 
 import (
-	base_objectenum "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
-	shared_team_configurationsenum "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/shared_team_configurations"
+	base_objectenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
+	shared_team_configurationsenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/shared_team_configurations"
 )
 
 type PriorityTier = base_objectenum.PriorityTier

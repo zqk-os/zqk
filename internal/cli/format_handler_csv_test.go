@@ -3,7 +3,7 @@ package cli
 import (
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/quality"
+	"github.com/zqk-os/zqk/pkg/quality"
 )
 
 func TestCSVFormatHandler_matrixGetOnly(t *testing.T) {

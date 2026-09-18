@@ -3,7 +3,7 @@ package ambient
 import (
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/zqkenv"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
 func TestLoadConfig(t *testing.T) {

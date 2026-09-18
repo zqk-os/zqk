@@ -6,10 +6,10 @@ import (
 	"sync"
 	"time"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/coordination"
-	"github.com/lanceman/zqk/pkg/diagnostics"
-	"github.com/lanceman/zqk/pkg/goroutinelabels"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/coordination"
+	"github.com/zqk-os/zqk/pkg/diagnostics"
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 )
 
 // ProgressHeartbeatInterval is the maximum time the user can go without a progress message.

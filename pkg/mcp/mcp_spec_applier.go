@@ -3,7 +3,7 @@ package mcp
 import (
 	"fmt"
 
-	"github.com/lanceman/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/errfmt"
 )
 
 // ApplyMCPSpec applies an MCP spec to the server

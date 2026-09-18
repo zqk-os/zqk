@@ -4,7 +4,7 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/goroutinelabels"
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 )
 
 func TestComputePackageConcurrencyLimitsFromBundles_AllParallelUsesMaxParallel(t *testing.T) {

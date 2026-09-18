@@ -4,7 +4,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/goroutinelabels"
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 )
 
 // sharedBufferedFlusher ticks once for every BufferedWriter in the process.

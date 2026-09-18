@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/lanceman/zqk/pkg/execwrap"
+	"github.com/zqk-os/zqk/pkg/execwrap"
 
-	"github.com/lanceman/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/logging"
 )
 
 // VitalityMonitor watches for scheduler daemon health.

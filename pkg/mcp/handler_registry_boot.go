@@ -3,7 +3,7 @@ package mcp
 import (
 	"context"
 
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 func init() {

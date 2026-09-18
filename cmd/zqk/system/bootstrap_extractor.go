@@ -1,8 +1,8 @@
 package system
 
 import (
-	"github.com/lanceman/zqk/internal/bootstrap"
-	"github.com/lanceman/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/internal/bootstrap"
+	"github.com/zqk-os/zqk/pkg/logging"
 )
 
 // ExtractBootstrapFiles extracts bootstrap files into the project: .zqk/specs and .zqk/cli/specs.

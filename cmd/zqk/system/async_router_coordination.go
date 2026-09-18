@@ -5,11 +5,11 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/coordination"
-	"github.com/lanceman/zqk/pkg/goroutinelabels"
-	"github.com/lanceman/zqk/pkg/metrics"
-	"github.com/lanceman/zqk/pkg/scheduler/transceiver"
-	"github.com/lanceman/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/coordination"
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
+	"github.com/zqk-os/zqk/pkg/metrics"
+	"github.com/zqk-os/zqk/pkg/scheduler/transceiver"
+	"github.com/zqk-os/zqk/pkg/storage"
 )
 
 // emitAsyncRouterEventViaCoordinator emits async router events via the coordination system

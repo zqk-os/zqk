@@ -3,7 +3,7 @@ package testscan
 import (
 	"strings"
 
-	"github.com/lanceman/zqk/internal/testpackageconcurrency"
+	"github.com/zqk-os/zqk/internal/testpackageconcurrency"
 )
 
 // PackageWantsGoTestParallelOne is true when bundled `go test` should pass -parallel 1

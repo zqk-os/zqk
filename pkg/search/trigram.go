@@ -8,8 +8,8 @@ import (
 	"time"
 	"unicode"
 
-	"github.com/lanceman/zqk/pkg/goroutinelabels"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // PackTrigram converts 3 bytes into a single uint32 for fast hashing and comparison.

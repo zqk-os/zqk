@@ -4,8 +4,8 @@
 package evolution_managements
 
 import (
-	base_objectenum "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
-	shared_evolution_managementsenum "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/shared_evolution_managements"
+	base_objectenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
+	shared_evolution_managementsenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/shared_evolution_managements"
 )
 
 type PriorityTier = base_objectenum.PriorityTier

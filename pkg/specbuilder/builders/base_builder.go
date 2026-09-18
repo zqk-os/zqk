@@ -3,7 +3,7 @@ package builders
 import (
 	"maps"
 
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // BaseSpecBuilder provides common functionality for spec builders

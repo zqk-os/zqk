@@ -6,8 +6,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/lanceman/zqk/pkg/agentprompt"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/agentprompt"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // gatherHealthSignals reads kernel health signals from the scheduler's health log

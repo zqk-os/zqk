@@ -8,10 +8,10 @@ import (
 
 	"gopkg.in/yaml.v3"
 
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/objects"
-	yamlspec "github.com/lanceman/zqk/pkg/specbuilder/yaml"
-	"github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/objects"
+	yamlspec "github.com/zqk-os/zqk/pkg/specbuilder/yaml"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 const (
@@ -74,9 +74,9 @@ func generateCommandBuilderCode(spec *CommandSpec, commandName, packageName stri
 	fmt.Fprintf(&buf, "import (\n\t\"github.com/spf13/cobra\"\n")
 	needsInternalCli := spec.CommonFlags || spec.RequiresStorage != nil || spec.RequiresSession != nil || spec.RequiresSchedulerCheck != nil
 	if needsInternalCli {
-		fmt.Fprintf(&buf, "\t\"github.com/lanceman/zqk/internal/cli\"\n")
+		fmt.Fprintf(&buf, "\t\"github.com/zqk-os/zqk/internal/cli\"\n")
 	}
-	fmt.Fprintf(&buf, "\tclipkg \"github.com/lanceman/zqk/pkg/cli\"\n)\n\n")
+	fmt.Fprintf(&buf, "\tclipkg \"github.com/zqk-os/zqk/pkg/cli\"\n)\n\n")
 
 	fmt.Fprintf(&buf, "// %s creates a new %s command\nfunc %s() *cobra.Command {\n", constructorName, commandName, constructorName)
 
@@ -187,9 +187,9 @@ func generateCRUDCommandBuilderCode(spec *CRUDCommandSpec, commandName, packageN
 	fmt.Fprintf(&buf, "import (\n\t\"github.com/spf13/cobra\"\n")
 	needsInternalCli := spec.CommonFlags || spec.RequiresStorage != nil || spec.RequiresSession != nil || spec.RequiresSchedulerCheck != nil
 	if needsInternalCli {
-		fmt.Fprintf(&buf, "\t\"github.com/lanceman/zqk/internal/cli\"\n")
+		fmt.Fprintf(&buf, "\t\"github.com/zqk-os/zqk/internal/cli\"\n")
 	}
-	fmt.Fprintf(&buf, "\tclipkg \"github.com/lanceman/zqk/pkg/cli\"\n)\n\n")
+	fmt.Fprintf(&buf, "\tclipkg \"github.com/zqk-os/zqk/pkg/cli\"\n)\n\n")
 
 	fmt.Fprintf(&buf, "// %s creates a new %s command\nfunc %s() *cobra.Command {\n", constructorName, commandName, constructorName)
 	useName := spec.Name

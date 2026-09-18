@@ -3,7 +3,7 @@ package objects
 import (
 	"strings"
 
-	"github.com/lanceman/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/errfmt"
 )
 
 // CanonicalizeCriteriaFieldKeys remaps kind-scoped synonyms onto category and

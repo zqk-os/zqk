@@ -5,10 +5,10 @@ import (
 	"strings"
 
 	"github.com/joho/godotenv"
-	"github.com/lanceman/zqk/cmd/zqk-community/app"
-	"github.com/lanceman/zqk/pkg/paths"
-	"github.com/lanceman/zqk/pkg/utils/fileutil"
-	"github.com/lanceman/zqk/pkg/zqkenv"
+	"github.com/zqk-os/zqk/cmd/zqk-community/app"
+	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
 // init ensures the pure-Go DNS resolver is used instead of cgo's getaddrinfo.

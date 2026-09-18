@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
 )
 
 func TestPendingAuditEvents_LifetimeCounters(t *testing.T) {

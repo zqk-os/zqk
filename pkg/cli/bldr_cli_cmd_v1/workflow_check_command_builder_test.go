@@ -3,7 +3,7 @@ package bldr_cli_cmd_v1_test
 import (
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/cli/bldr_cli_cmd_v1"
+	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
 )
 
 const (

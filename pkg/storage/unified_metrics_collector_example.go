@@ -8,9 +8,9 @@ Example: Using UnifiedMetricsCollector with Coordinator
 1. Set up coordinator with metrics router:
 ```go
 import (
-    "github.com/lanceman/zqk/pkg/coordination"
-    "github.com/lanceman/zqk/pkg/metrics"
-    "github.com/lanceman/zqk/pkg/storage"
+    "github.com/zqk-os/zqk/pkg/coordination"
+    "github.com/zqk-os/zqk/pkg/metrics"
+    "github.com/zqk-os/zqk/pkg/storage"
 )
 
 // Create metrics pipeline (shared per project in the real scheduler/CLI)

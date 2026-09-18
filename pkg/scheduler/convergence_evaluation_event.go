@@ -5,12 +5,12 @@ import (
 	"fmt"
 	"time"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/logging"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/logging"
 
-	"github.com/lanceman/zqk/pkg/coordination"
-	"github.com/lanceman/zqk/pkg/objects"
-	audit_event "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/audit"
+	"github.com/zqk-os/zqk/pkg/coordination"
+	"github.com/zqk-os/zqk/pkg/objects"
+	audit_event "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/audit"
 )
 
 // EmitConvergenceEvaluationEvent emits a telemetry event representing a convergence evaluation.

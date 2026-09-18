@@ -5,14 +5,14 @@ import (
 	"maps"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/concurrency"
-	file_pkg "github.com/lanceman/zqk/pkg/storage/file"
+	"github.com/zqk-os/zqk/pkg/concurrency"
+	file_pkg "github.com/zqk-os/zqk/pkg/storage/file"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/goroutinelabels"
-	"github.com/lanceman/zqk/pkg/logging"
-	"github.com/lanceman/zqk/pkg/storage/filecas"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/storage/filecas"
 )
 
 // wakeWorkerIfNeeded starts the worker if it's not already running

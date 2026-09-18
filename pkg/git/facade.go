@@ -6,7 +6,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/execwrap"
+	"github.com/zqk-os/zqk/pkg/execwrap"
 )
 
 // AheadProbeTimeout bounds whats-next git ahead count (hot path).

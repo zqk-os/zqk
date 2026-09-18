@@ -9,9 +9,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/execwrap"
-	"github.com/lanceman/zqk/pkg/paths"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/execwrap"
+	"github.com/zqk-os/zqk/pkg/paths"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // extractTarGz unpacks a tar.gz archive into a destination directory.
@@ -221,7 +221,7 @@ func TestQuickstartSmoke_IntegrationAndConformance(t *testing.T) {
 	if !strings.Contains(fStr, "class Zqk < Formula") {
 		t.Errorf("Formula/zqk.rb missing class Zqk definition")
 	}
-	if !strings.Contains(fStr, "https://github.com/lanceman/zqk/releases/download/") {
+	if !strings.Contains(fStr, "https://github.com/zqk-os/zqk/releases/download/") {
 		t.Errorf("Formula/zqk.rb missing GitHub release download URL pattern")
 	}
 }

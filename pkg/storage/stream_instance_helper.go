@@ -3,8 +3,8 @@ package storage
 import (
 	"time"
 
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // AppendInstanceToStream appends a spec-backed instance map to the stream for its kind

@@ -2,7 +2,7 @@
 
 **Status:** Active  
 **Last Updated:** 2026-04-03  
-**Package:** `github.com/lanceman/zqk/pkg/cli/bldr_cli_cmd_v1`
+**Package:** `github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1`
 
 ## Overview
 

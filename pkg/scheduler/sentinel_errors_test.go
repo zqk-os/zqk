@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/scheduler"
+	"github.com/zqk-os/zqk/pkg/scheduler"
 )
 
 func TestSchedulerSentinelErrors_ConformsToErrorsIs(t *testing.T) {

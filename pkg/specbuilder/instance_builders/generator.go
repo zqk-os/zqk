@@ -3,9 +3,9 @@ package instance_builders
 import (
 	"path/filepath"
 
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/objects"
-	sbyaml "github.com/lanceman/zqk/pkg/specbuilder/yaml"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/objects"
+	sbyaml "github.com/zqk-os/zqk/pkg/specbuilder/yaml"
 )
 
 const instanceFileExtYAML = ".yaml"

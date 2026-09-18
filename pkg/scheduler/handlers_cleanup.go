@@ -9,17 +9,17 @@ import (
 	"strings"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/paths"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/paths"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/logging"
-	"github.com/lanceman/zqk/pkg/objects"
-	baseMetricEnum "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/metrics"
-	"github.com/lanceman/zqk/pkg/specbuilder/bldr_instance_v1"
-	storagepkg "github.com/lanceman/zqk/pkg/storage"
-	"github.com/lanceman/zqk/pkg/when"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/objects"
+	baseMetricEnum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/metrics"
+	"github.com/zqk-os/zqk/pkg/specbuilder/bldr_instance_v1"
+	storagepkg "github.com/zqk-os/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/when"
 )
 
 // Log events for autofix_batch_cleanup handler (POL-CODE-007 stable keys).

@@ -3,7 +3,7 @@ package whatsnext
 import (
 	"testing"
 
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 func TestPeekCAPStage_DoesNotAdvance(t *testing.T) {

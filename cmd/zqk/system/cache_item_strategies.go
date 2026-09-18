@@ -3,7 +3,7 @@ package system
 import (
 	"strings"
 
-	"github.com/lanceman/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/logging"
 )
 
 // DiagnosticCacheItemStrategy is a strategy for tracking specific objects for diagnostic purposes

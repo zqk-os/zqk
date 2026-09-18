@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/policy"
+	"github.com/zqk-os/zqk/pkg/policy"
 )
 
 type mockDeliverer struct {

@@ -6,8 +6,8 @@ import (
 	"strings"
 	"testing"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/zqkenv"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
 // TestMCPCompatibility_ProgressOutputToStderr tests that progress output goes to stderr in MCP mode

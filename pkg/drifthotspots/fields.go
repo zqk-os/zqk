@@ -1,6 +1,6 @@
 package drifthotspots
 
-import "github.com/lanceman/zqk/pkg/objects"
+import "github.com/zqk-os/zqk/pkg/objects"
 
 // SystemObjectFieldKeys are map/JSON keys shared by object instances across kinds (system + common).
 // Drift risk: renames in specs or validation expect these exact spellings everywhere.

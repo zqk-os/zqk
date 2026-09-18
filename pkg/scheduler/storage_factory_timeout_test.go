@@ -8,11 +8,11 @@ import (
 	"testing"
 	"time"
 
-	caspkg "github.com/lanceman/zqk/pkg/storage/cas"
+	caspkg "github.com/zqk-os/zqk/pkg/storage/cas"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/goroutinelabels"
-	storagepkg "github.com/lanceman/zqk/pkg/storage"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
+	storagepkg "github.com/zqk-os/zqk/pkg/storage"
 )
 
 // TestStorageFactory_Create_DoesNotHang verifies that NewStorageFactory doesn't hang

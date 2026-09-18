@@ -3,7 +3,7 @@ package fitness_test
 import (
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/fitness"
+	"github.com/zqk-os/zqk/pkg/fitness"
 )
 
 func TestClassifyIssue_processFailureVsCompleteness(t *testing.T) {

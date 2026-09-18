@@ -3,7 +3,7 @@ package object
 import (
 	"strings"
 
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // lifecycleStatusByValue returns the status metadata for value, or a zero Status

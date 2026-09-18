@@ -4,7 +4,7 @@ import (
 	"sort"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/datacell"
+	"github.com/zqk-os/zqk/pkg/datacell"
 )
 
 // TestKernelCritical_indexAndLoaderAgreeForEveryKind pins the property that matters, rather

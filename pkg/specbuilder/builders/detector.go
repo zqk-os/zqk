@@ -7,9 +7,9 @@ import (
 
 	"gopkg.in/yaml.v3"
 
-	"github.com/lanceman/zqk/pkg/objects"
-	sbcore "github.com/lanceman/zqk/pkg/specbuilder/core"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/objects"
+	sbcore "github.com/zqk-os/zqk/pkg/specbuilder/core"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // SpecChange represents a detected change in a spec file

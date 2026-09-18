@@ -3,7 +3,7 @@ package tsdb
 import (
 	"strings"
 
-	"github.com/lanceman/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/errfmt"
 )
 
 // Open returns a MemoryTSDB when root is empty or ":memory:", otherwise a FileTSDB under root.

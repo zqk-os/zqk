@@ -8,8 +8,8 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/lanceman/zqk/pkg/paths"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/paths"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // MatrixValidateEntry is one matrix's validation outcome.

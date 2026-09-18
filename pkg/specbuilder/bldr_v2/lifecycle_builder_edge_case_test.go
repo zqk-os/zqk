@@ -3,7 +3,7 @@ package bldr_v2
 import (
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/specbuilder/builders"
+	"github.com/zqk-os/zqk/pkg/specbuilder/builders"
 )
 
 // TestLifecycleBuilder_InvalidFieldTypes tests handling of invalid field configurations

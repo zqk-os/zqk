@@ -1,8 +1,8 @@
 package scheduler
 
 import (
-	"github.com/lanceman/zqk/pkg/datacell"
-	"github.com/lanceman/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/datacell"
+	"github.com/zqk-os/zqk/pkg/errfmt"
 )
 
 // DataCellEnvelopeDryRunReport is the result of DryRunDataCellEnvelopePolicy — proves the policy engine

@@ -6,11 +6,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/infrastructure"
-	_ "github.com/lanceman/zqk/pkg/infrastructure/drivers/kafka"
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/specialization"
-	"github.com/lanceman/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/infrastructure"
+	_ "github.com/zqk-os/zqk/pkg/infrastructure/drivers/kafka"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/specialization"
+	"github.com/zqk-os/zqk/pkg/storage"
 )
 
 // mockSpine is a simple in-memory spine for testing handler interaction.

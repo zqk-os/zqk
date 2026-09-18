@@ -1,6 +1,6 @@
 #!/bin/bash
 # package-community.sh — Build cross-platform release binaries and create a GitHub release for Community Edition.
-# TRACK: TDE-1789699310016987000-5703b344 — homepage/URLs still github.com/lanceman/zqk until zqk-os module move.
+# TRACK: TDE-1789699310016987000-5703b344 — homepage/URLs still github.com/zqk-os/zqk until zqk-os module move.
 #
 # Usage:
 #   ./scripts/package-community.sh v2.7.0         # build + create GitHub release
@@ -20,9 +20,9 @@ GIT_COMMIT="$(git -C "$REPO_ROOT" rev-parse --short HEAD)"
 BUILD_DATE="$(date -u '+%Y-%m-%dT%H:%M:%SZ')"
 
 LDFLAGS="-s -w \
-  -X github.com/lanceman/zqk/cmd/zqk-community/app.version=${VERSION} \
-  -X github.com/lanceman/zqk/cmd/zqk-community/app.buildDate=${BUILD_DATE} \
-  -X github.com/lanceman/zqk/cmd/zqk-community/app.gitCommit=${GIT_COMMIT}"
+  -X github.com/zqk-os/zqk/cmd/zqk-community/app.version=${VERSION} \
+  -X github.com/zqk-os/zqk/cmd/zqk-community/app.buildDate=${BUILD_DATE} \
+  -X github.com/zqk-os/zqk/cmd/zqk-community/app.gitCommit=${GIT_COMMIT}"
 
 PLATFORMS=(
   "darwin/amd64"
@@ -86,26 +86,26 @@ mkdir -p "${DIST_DIR}/Formula"
 cat <<EOF > "${DIST_DIR}/Formula/zqk.rb"
 class Zqk < Formula
   desc "Kernel and orchestration CLI for AI-human hybrid software engineering"
-  homepage "https://github.com/lanceman/zqk"
+  homepage "https://github.com/zqk-os/zqk"
   version "${VER_NUM}"
   license "Apache-2.0"
 
   on_macos do
     if Hardware::CPU.arm?
-      url "https://github.com/lanceman/zqk/releases/download/v#{version}/zqk_#{version}_darwin_arm64.tar.gz"
+      url "https://github.com/zqk-os/zqk/releases/download/v#{version}/zqk_#{version}_darwin_arm64.tar.gz"
       sha256 "${DARWIN_ARM64_SHA}"
     else
-      url "https://github.com/lanceman/zqk/releases/download/v#{version}/zqk_#{version}_darwin_amd64.tar.gz"
+      url "https://github.com/zqk-os/zqk/releases/download/v#{version}/zqk_#{version}_darwin_amd64.tar.gz"
       sha256 "${DARWIN_AMD64_SHA}"
     end
   end
 
   on_linux do
     if Hardware::CPU.arm?
-      url "https://github.com/lanceman/zqk/releases/download/v#{version}/zqk_#{version}_linux_arm64.tar.gz"
+      url "https://github.com/zqk-os/zqk/releases/download/v#{version}/zqk_#{version}_linux_arm64.tar.gz"
       sha256 "${LINUX_ARM64_SHA}"
     else
-      url "https://github.com/lanceman/zqk/releases/download/v#{version}/zqk_#{version}_linux_amd64.tar.gz"
+      url "https://github.com/zqk-os/zqk/releases/download/v#{version}/zqk_#{version}_linux_amd64.tar.gz"
       sha256 "${LINUX_AMD64_SHA}"
     end
   end
@@ -170,14 +170,14 @@ brew install zqk
 
 **Manual:** Download the archive for your platform below and verify checksums:
 \`\`\`bash
-curl -fsSL https://github.com/lanceman/zqk/releases/download/${TAG_NAME}/checksums.txt | sha256sum -c
+curl -fsSL https://github.com/zqk-os/zqk/releases/download/${TAG_NAME}/checksums.txt | sha256sum -c
 \`\`\`
 
 **Build from source:**
 \`\`\`bash
-git clone https://github.com/lanceman/zqk && cd zqk && make
+git clone https://github.com/zqk-os/zqk && cd zqk && make
 \`\`\`
 "
 
 echo ""
-echo "✅ Release ${VERSION} published: https://github.com/lanceman/zqk/releases/tag/${TAG_NAME}"
+echo "✅ Release ${VERSION} published: https://github.com/zqk-os/zqk/releases/tag/${TAG_NAME}"

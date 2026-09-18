@@ -4,9 +4,9 @@ import (
 	"encoding/json"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/ontology"
-	"github.com/lanceman/zqk/pkg/semantic/translator"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/ontology"
+	"github.com/zqk-os/zqk/pkg/semantic/translator"
 )
 
 type dummyTranslator struct{}

@@ -10,8 +10,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/concurrency"
-	"github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/concurrency"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // TimingJSONRelativePath is written under the current working directory (typically project root).

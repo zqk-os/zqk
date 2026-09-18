@@ -4,8 +4,8 @@ import (
 	"path/filepath"
 	"testing"
 
-	clipkg "github.com/lanceman/zqk/pkg/cli"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	clipkg "github.com/zqk-os/zqk/pkg/cli"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 func TestCommandSpecParity(t *testing.T) {

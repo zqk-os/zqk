@@ -9,14 +9,14 @@ import (
 	"strings"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/agentfeed"
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/git"
-	"github.com/lanceman/zqk/pkg/interactionpolicy"
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/paths"
-	"github.com/lanceman/zqk/pkg/storage"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/agentfeed"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/git"
+	"github.com/zqk-os/zqk/pkg/interactionpolicy"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/storage"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // DraftPlaneStewardWarn matches system-check draft-plane backlog warning (≥50).

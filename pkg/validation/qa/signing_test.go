@@ -4,8 +4,8 @@ import (
 	"path/filepath"
 	"testing"
 
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
-	"github.com/lanceman/zqk/pkg/validation"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/validation"
 )
 
 func TestAuditorSigner_Sign(t *testing.T) {

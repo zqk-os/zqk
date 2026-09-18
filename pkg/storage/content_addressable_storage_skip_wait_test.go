@@ -3,7 +3,7 @@ package storage
 import (
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/storage/filecas"
+	"github.com/zqk-os/zqk/pkg/storage/filecas"
 )
 
 func TestCAS_SkipIndexUpdateWaitAtomic(t *testing.T) {

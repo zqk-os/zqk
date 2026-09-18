@@ -3,8 +3,8 @@ package context
 import (
 	"slices"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/outputtypes"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/outputtypes"
 )
 
 const emptyValue = ""

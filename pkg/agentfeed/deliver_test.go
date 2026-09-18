@@ -7,9 +7,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/datacell"
-	"github.com/lanceman/zqk/pkg/idebridge"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/datacell"
+	"github.com/zqk-os/zqk/pkg/idebridge"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // fakeWakeAdapter records wake requests without invoking shell membranes.

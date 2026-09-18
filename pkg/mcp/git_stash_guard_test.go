@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // TestGitStashGuardOverDocsProcess verifies that git stash operations targeting .zqk/process are forbidden.

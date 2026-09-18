@@ -1,8 +1,8 @@
 package coordination
 
 import (
-	"github.com/lanceman/zqk/pkg/metrics"
-	"github.com/lanceman/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/metrics"
+	"github.com/zqk-os/zqk/pkg/storage"
 )
 
 // NewCLINotifierWithCoordinator creates a CLINotifier with mandatory coordinator integration

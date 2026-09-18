@@ -9,9 +9,9 @@ import (
 
 	"gopkg.in/yaml.v3"
 
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/objects"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/objects"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // defaultInstanceVersion is the default schema version for instance builders
@@ -373,8 +373,8 @@ func generateInstanceBuilderCode(spec *objects.Spec, ontology, schemaVersion str
 		WithHeader(generatedHeaderLines("object spec YAML")...).
 		WithPackage("bldr_instance_v1").
 		WithImports(func(i *goImportBuilder) {
-			i.Include("github.com/lanceman/zqk/pkg/objects").
-				Include("github.com/lanceman/zqk/pkg/specbuilder/instance_builders")
+			i.Include("github.com/zqk-os/zqk/pkg/objects").
+				Include("github.com/zqk-os/zqk/pkg/specbuilder/instance_builders")
 			if len(enumFields) > 0 {
 				i.IncludeWithAlias(enumImportAlias, enumImportPath)
 			}

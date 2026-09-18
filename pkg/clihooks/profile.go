@@ -1,5 +1,5 @@
 // Package clihooks persists a built-in hook profile (like feature flags): enable/disable and optional tray entry.
-// Storage: .zqk/config/cli_hook_profile.json (see [github.com/lanceman/zqk/pkg/datacell.CLIHookProfilePath]).
+// Storage: .zqk/config/cli_hook_profile.json (see [github.com/zqk-os/zqk/pkg/datacell.CLIHookProfilePath]).
 //
 // External automation must use the zqk CLI only; see docs/architecture/CLI_EXTERNAL_HOOK_PROTOCOL.md — do not
 // treat this package as a stable import target for out-of-repo Go code; the contract is CLI + JSON schema + ProtocolVersion.
@@ -13,11 +13,11 @@ import (
 	"sort"
 	"sync"
 
-	"github.com/lanceman/zqk/pkg/datacell"
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/nildecode"
-	"github.com/lanceman/zqk/pkg/paths"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/datacell"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/nildecode"
+	"github.com/zqk-os/zqk/pkg/paths"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // Hook is one built-in automation hook the CLI and shell can agree on.

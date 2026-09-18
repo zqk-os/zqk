@@ -3,7 +3,7 @@ package object
 import (
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 func TestLifecycleAllowsTransition_WildcardAndExact(t *testing.T) {

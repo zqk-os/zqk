@@ -6,7 +6,7 @@ import (
 	"bytes"
 	"strconv"
 
-	"github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 func readLoadAvg() (float64, bool) {

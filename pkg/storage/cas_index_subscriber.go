@@ -4,7 +4,7 @@ import (
 	"context"
 	"strings"
 
-	"github.com/lanceman/zqk/pkg/storage/filecas"
+	"github.com/zqk-os/zqk/pkg/storage/filecas"
 )
 
 // CASIndexInvalidationSubscriber listens for mutation events on the InvalidationShockwaveBus

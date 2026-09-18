@@ -5,7 +5,7 @@ import (
 	"errors"
 	"testing"
 
-	pkgcli "github.com/lanceman/zqk/pkg/cli"
+	pkgcli "github.com/zqk-os/zqk/pkg/cli"
 )
 
 func TestStorageAvailableForOptionalUse(t *testing.T) {

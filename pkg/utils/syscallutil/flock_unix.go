@@ -5,7 +5,7 @@ package syscallutil
 import (
 	"syscall"
 
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // FileFlock calls syscall.Flock on an open *os.File. Wraps the uintptr→int conversion

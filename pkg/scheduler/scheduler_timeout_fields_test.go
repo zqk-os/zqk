@@ -3,8 +3,8 @@ package scheduler
 import (
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/logging"
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // TestTimeoutFieldsAppendCombine verifies that timeoutFields can be correctly

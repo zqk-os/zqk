@@ -12,10 +12,10 @@ import (
 	"context"
 	"testing"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/objects"
-	_ "github.com/lanceman/zqk/pkg/specbuilder/bldr_v2" // Register builders for tests
-	"github.com/lanceman/zqk/pkg/specbuilder/builders"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/objects"
+	_ "github.com/zqk-os/zqk/pkg/specbuilder/bldr_v2" // Register builders for tests
+	"github.com/zqk-os/zqk/pkg/specbuilder/builders"
 )
 
 func TestValidatorRegistry(t *testing.T) {

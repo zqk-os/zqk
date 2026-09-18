@@ -8,9 +8,9 @@ import (
 	"fmt"
 	"sort"
 
-	"github.com/lanceman/zqk/pkg/datacell"
-	"github.com/lanceman/zqk/pkg/datacellregistry"
-	"github.com/lanceman/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/datacell"
+	"github.com/zqk-os/zqk/pkg/datacellregistry"
+	"github.com/zqk-os/zqk/pkg/logging"
 )
 
 // streamStewardPhase* are detail tokens for steward enqueue JSONL (after c=…|k=…|p=…).

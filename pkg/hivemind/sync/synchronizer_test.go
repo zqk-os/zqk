@@ -5,7 +5,7 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/hivemind"
+	"github.com/zqk-os/zqk/pkg/hivemind"
 )
 
 type mockMemoryStore struct {

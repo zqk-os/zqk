@@ -4,8 +4,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/testkit"
-	"github.com/lanceman/zqk/pkg/validation"
+	"github.com/zqk-os/zqk/pkg/testkit"
+	"github.com/zqk-os/zqk/pkg/validation"
 )
 
 // Tier-3 cache-coherence issues describe the object-id-cache at validation time, not the object.

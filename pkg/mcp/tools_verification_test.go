@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 func TestHandleAgentTriggerVerificationTool_ExecutionAndCleanup(t *testing.T) {

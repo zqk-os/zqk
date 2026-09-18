@@ -1,9 +1,9 @@
 package zqkdev
 
 import (
-	"github.com/lanceman/zqk/internal/cli"
-	"github.com/lanceman/zqk/pkg/datacellregistry"
-	"github.com/lanceman/zqk/pkg/strutil"
+	"github.com/zqk-os/zqk/internal/cli"
+	"github.com/zqk-os/zqk/pkg/datacellregistry"
+	"github.com/zqk-os/zqk/pkg/strutil"
 )
 
 func ProjectRootOrResolve(path string) string {

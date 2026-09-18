@@ -4,8 +4,8 @@
 package integrity_manifests
 
 import (
-	base_objectenum "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
-	shared_integrity_manifestsenum "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/shared_integrity_manifests"
+	base_objectenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
+	shared_integrity_manifestsenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/shared_integrity_manifests"
 )
 
 type PriorityTier = base_objectenum.PriorityTier

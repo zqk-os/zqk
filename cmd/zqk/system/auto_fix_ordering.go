@@ -4,7 +4,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // fixDependencyOrder defines the dependency hierarchy for reference fields

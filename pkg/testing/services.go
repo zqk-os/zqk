@@ -1,7 +1,7 @@
 package testing
 
 import (
-	"github.com/lanceman/zqk/pkg/testservices"
+	"github.com/zqk-os/zqk/pkg/testservices"
 )
 
 // Re-export test service helpers from pkg/testservices for backward compatibility.

@@ -4,8 +4,8 @@ import (
 	"context"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/logging"
-	"github.com/lanceman/zqk/pkg/objectidcache"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/objectidcache"
 )
 
 func init() {

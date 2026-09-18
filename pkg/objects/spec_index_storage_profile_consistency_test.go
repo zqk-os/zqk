@@ -4,7 +4,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/paths"
 )
 
 // TestSpecIndexStorageProfileMatchesHighVolumeStreamKinds ensures the spec plane (object_specs

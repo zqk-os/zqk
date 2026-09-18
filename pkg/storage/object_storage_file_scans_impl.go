@@ -7,9 +7,9 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/storage/filecas"
-	"github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/storage/filecas"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 type legacyIDScanCacheEntry struct {

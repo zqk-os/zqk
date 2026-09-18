@@ -3,7 +3,7 @@ package objects
 import (
 	"strings"
 
-	"github.com/lanceman/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/errfmt"
 )
 
 // mergeResolvedOverlay copies src resolved fields, traits, and exclude_traits into dst.

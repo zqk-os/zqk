@@ -4,8 +4,8 @@ import (
 	"context"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/orchestration"
-	"github.com/lanceman/zqk/pkg/scheduler"
+	"github.com/zqk-os/zqk/pkg/orchestration"
+	"github.com/zqk-os/zqk/pkg/scheduler"
 )
 
 // Adversarial testing: Policy Violation Test

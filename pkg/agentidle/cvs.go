@@ -3,7 +3,7 @@ package agentidle
 import (
 	"time"
 
-	"github.com/lanceman/zqk/pkg/execwrap"
+	"github.com/zqk-os/zqk/pkg/execwrap"
 )
 
 // RecordCVSSnapshot writes the current total idle time to the convergence session's after_state_snapshot

@@ -3,10 +3,10 @@ package app_test
 import (
 	"os"
 
-	"github.com/lanceman/zqk/pkg/datacell"
-	"github.com/lanceman/zqk/pkg/goroutinelabels"
-	"github.com/lanceman/zqk/pkg/utils/fileutil"
-	"github.com/lanceman/zqk/pkg/zqkenv"
+	"github.com/zqk-os/zqk/pkg/datacell"
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 
 	"bytes"
 	"fmt"
@@ -16,9 +16,9 @@ import (
 
 	"gopkg.in/yaml.v3"
 
-	"github.com/lanceman/zqk/cmd/zqk-community/app"
-	clctx "github.com/lanceman/zqk/internal/cli/context"
-	"github.com/lanceman/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/cmd/zqk-community/app"
+	clctx "github.com/zqk-os/zqk/internal/cli/context"
+	"github.com/zqk-os/zqk/pkg/paths"
 )
 
 type testSettingsYAMLShapeApp struct {
@@ -49,7 +49,7 @@ func writeMinimalTestSettingsYAMLApp(testRoot string) error {
 	return fileutil.WriteSecureFile(p, data) //nolint:gosec // test file
 }
 
-// setupAppTestEnvironmentRoot mirrors [github.com/lanceman/zqk/pkg/testing.SetupTestEnvironment]:
+// setupAppTestEnvironmentRoot mirrors [github.com/zqk-os/zqk/pkg/testing.SetupTestEnvironment]:
 // project layout + test-settings.yaml only.
 func setupAppTestEnvironmentRoot(testRoot string) (string, error) {
 	absRoot, err := filepath.Abs(testRoot)

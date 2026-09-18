@@ -6,7 +6,7 @@ import (
 	"net"
 	"net/rpc"
 
-	"github.com/lanceman/zqk/pkg/goroutinelabels"
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 )
 
 // IPCWriterArgs defines the arguments for daemon RPC calls.

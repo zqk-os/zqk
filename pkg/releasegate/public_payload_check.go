@@ -11,8 +11,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/lanceman/zqk/pkg/community"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/community"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // PayloadVerificationOptions configures the public release payload verification.

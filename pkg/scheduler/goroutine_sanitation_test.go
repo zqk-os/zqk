@@ -13,8 +13,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/goroutinelabels"
-	"github.com/lanceman/zqk/pkg/scheduler"
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
+	"github.com/zqk-os/zqk/pkg/scheduler"
 )
 
 // CRIT-1789663120758632000-c8ed430e: Functional Acceptance

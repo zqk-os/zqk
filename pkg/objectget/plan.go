@@ -1,7 +1,7 @@
 package objectget
 
 import (
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // View names for object get (--view). Keep in sync with cmd/zqk/object projections.

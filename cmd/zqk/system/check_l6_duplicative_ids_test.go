@@ -3,7 +3,7 @@ package system
 import (
 	"testing"
 
-	caspkg "github.com/lanceman/zqk/pkg/storage/cas"
+	caspkg "github.com/zqk-os/zqk/pkg/storage/cas"
 )
 
 func TestDedupeCheckResultIssues(t *testing.T) {

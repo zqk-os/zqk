@@ -5,8 +5,8 @@ import (
 	"sort"
 	"strings"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/objects"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // WorkEnvelopeBackfillHit is one effort_aware work-done object missing completed_at.

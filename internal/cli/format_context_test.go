@@ -5,9 +5,9 @@ import (
 
 	"github.com/spf13/cobra"
 
-	pkgcli "github.com/lanceman/zqk/pkg/cli"
+	pkgcli "github.com/zqk-os/zqk/pkg/cli"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
 )
 
 // TestFormatAndContextSwitching tests format routing through GetFormat with different context profiles

@@ -25,8 +25,8 @@ pkg/graph/
 
 ```go
 import (
-    "github.com/lanceman/zqk/pkg/graph/memgraph"
-    "github.com/lanceman/zqk/pkg/graph/provider"
+    "github.com/zqk-os/zqk/pkg/graph/memgraph"
+    "github.com/zqk-os/zqk/pkg/graph/provider"
 )
 
 // Create provider

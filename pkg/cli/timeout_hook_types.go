@@ -4,7 +4,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/logging"
 )
 
 // CommandTimeoutConfig holds configuration for command timeout calculations

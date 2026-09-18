@@ -4,7 +4,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // StaleInProgressItem records an in-progress work item that has stalled.

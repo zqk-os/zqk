@@ -8,7 +8,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/systemcheck/policy"
+	"github.com/zqk-os/zqk/pkg/systemcheck/policy"
 )
 
 // TestPublicRepoSanitation verifies REQ-OSS-REPO-CLEAN-001:

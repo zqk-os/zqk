@@ -3,9 +3,9 @@ package macro
 import (
 	"strings"
 
-	"github.com/lanceman/zqk/internal/codegen/generators"
-	"github.com/lanceman/zqk/pkg/dna"
-	"github.com/lanceman/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/internal/codegen/generators"
+	"github.com/zqk-os/zqk/pkg/dna"
+	"github.com/zqk-os/zqk/pkg/errfmt"
 )
 
 // SchemaMacroExpander expands dynamic schema definitions into cellular entity specifications.

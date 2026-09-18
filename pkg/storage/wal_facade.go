@@ -5,7 +5,7 @@ package storage
 import (
 	"time"
 
-	"github.com/lanceman/zqk/pkg/storage/wal"
+	"github.com/zqk-os/zqk/pkg/storage/wal"
 )
 
 // WAL aliases forwarding to pkg/storage/wal

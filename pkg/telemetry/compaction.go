@@ -5,7 +5,7 @@ import (
 	"strings"
 	"time"
 
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // CompactOldSegments removes stream and metric segment files older than maxAge.

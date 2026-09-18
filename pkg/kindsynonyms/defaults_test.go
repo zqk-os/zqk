@@ -3,7 +3,7 @@ package kindsynonyms
 import (
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/kindnames"
+	"github.com/zqk-os/zqk/pkg/kindnames"
 )
 
 func TestCLIShortcutAliases(t *testing.T) {

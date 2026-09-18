@@ -3,7 +3,7 @@ package system
 import (
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/zqkenv"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
 func TestShouldUseAsyncFollowForBackground_WhenZQKJobIDSet(t *testing.T) {

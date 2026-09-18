@@ -183,8 +183,8 @@ index 48e956d..0000000
 -	"context"
 -	"testing"
 -
--	clitool "github.com/lanceman/zqk/pkg/cli"
--	"github.com/lanceman/zqk/pkg/zqkenv"
+-	clitool "github.com/zqk-os/zqk/pkg/cli"
+-	"github.com/zqk-os/zqk/pkg/zqkenv"
 -)
 -
 -func TestEmitCommandExecutionEventViaCoordinator_CommunitySkips(t *testing.T) {
@@ -228,15 +228,15 @@ index 0000000..0ae11f0
 +
 +	"github.com/spf13/cobra"
 +
-+	"github.com/lanceman/zqk/cmd/zqk/system"
-+	"github.com/lanceman/zqk/internal/cli"
-+	pkgctx "github.com/lanceman/zqk/pkg/context"
-+	"github.com/lanceman/zqk/pkg/errfmt"
-+	"github.com/lanceman/zqk/pkg/logging"
-+	"github.com/lanceman/zqk/pkg/objects"
-+	"github.com/lanceman/zqk/pkg/scheduler"
-+	storagepkg "github.com/lanceman/zqk/pkg/storage"
-+	"github.com/lanceman/zqk/pkg/zqkenv"
++	"github.com/zqk-os/zqk/cmd/zqk/system"
++	"github.com/zqk-os/zqk/internal/cli"
++	pkgctx "github.com/zqk-os/zqk/pkg/context"
++	"github.com/zqk-os/zqk/pkg/errfmt"
++	"github.com/zqk-os/zqk/pkg/logging"
++	"github.com/zqk-os/zqk/pkg/objects"
++	"github.com/zqk-os/zqk/pkg/scheduler"
++	storagepkg "github.com/zqk-os/zqk/pkg/storage"
++	"github.com/zqk-os/zqk/pkg/zqkenv"
 +)
 +
 +// NewCommunitySchedulerCmd is the community-bounded daemon surface (start/stop/status).
@@ -413,10 +413,10 @@ index 1d07ab9..f39e479 100644
 --- a/cmd/zqk/object/kind.go
 +++ b/cmd/zqk/object/kind.go
 @@ -13,7 +13,6 @@ import (
- 	"github.com/lanceman/zqk/pkg/objectget"
- 	"github.com/lanceman/zqk/pkg/objects"
- 	"github.com/lanceman/zqk/pkg/paths"
--	"github.com/lanceman/zqk/pkg/zqkenv"
+ 	"github.com/zqk-os/zqk/pkg/objectget"
+ 	"github.com/zqk-os/zqk/pkg/objects"
+ 	"github.com/zqk-os/zqk/pkg/paths"
+-	"github.com/zqk-os/zqk/pkg/zqkenv"
  	"github.com/spf13/cobra"
  )
  
@@ -456,9 +456,9 @@ index a4b447f..c6aee2b 100644
 +++ b/cmd/zqk/object/list_namespace_test.go
 @@ -5,7 +5,6 @@ import (
  
- 	"github.com/lanceman/zqk/pkg/objects"
- 	"github.com/lanceman/zqk/pkg/validation"
--	"github.com/lanceman/zqk/pkg/zqkenv"
+ 	"github.com/zqk-os/zqk/pkg/objects"
+ 	"github.com/zqk-os/zqk/pkg/validation"
+-	"github.com/zqk-os/zqk/pkg/zqkenv"
  	"github.com/spf13/cobra"
  )
  
@@ -500,10 +500,10 @@ index ee8ba6d..5e61c16 100644
 --- a/cmd/zqk/object/namespace_scope.go
 +++ b/cmd/zqk/object/namespace_scope.go
 @@ -9,7 +9,6 @@ import (
- 	"github.com/lanceman/zqk/pkg/objects"
- 	"github.com/lanceman/zqk/pkg/storage"
- 	"github.com/lanceman/zqk/pkg/validation"
--	"github.com/lanceman/zqk/pkg/zqkenv"
+ 	"github.com/zqk-os/zqk/pkg/objects"
+ 	"github.com/zqk-os/zqk/pkg/storage"
+ 	"github.com/zqk-os/zqk/pkg/validation"
+-	"github.com/zqk-os/zqk/pkg/zqkenv"
  	"github.com/spf13/cobra"
  )
  
@@ -622,11 +622,11 @@ index d2ff5cd..5df750b 100644
 --- a/cmd/zqk/system/init_isolation_test.go
 +++ b/cmd/zqk/system/init_isolation_test.go
 @@ -11,6 +11,7 @@ import (
- 	"github.com/lanceman/zqk/pkg/config"
- 	"github.com/lanceman/zqk/pkg/logging"
- 	"github.com/lanceman/zqk/pkg/paths"
-+	"github.com/lanceman/zqk/pkg/testkit"
- 	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+ 	"github.com/zqk-os/zqk/pkg/config"
+ 	"github.com/zqk-os/zqk/pkg/logging"
+ 	"github.com/zqk-os/zqk/pkg/paths"
++	"github.com/zqk-os/zqk/pkg/testkit"
+ 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
  )
  
 @@ -283,5 +284,118 @@ func TestCommunitySourceOverlay_IntegrityAndProcessPreservation(t *testing.T) {
@@ -758,11 +758,11 @@ index 8dc94c3..474c4ef 100644
  	"fmt"
 -	"strings"
  
- 	"github.com/lanceman/zqk/internal/cli"
- 	"github.com/lanceman/zqk/pkg/brand"
- 	clipkg "github.com/lanceman/zqk/pkg/cli"
- 	"github.com/lanceman/zqk/pkg/objects"
--	"github.com/lanceman/zqk/pkg/zqkenv"
+ 	"github.com/zqk-os/zqk/internal/cli"
+ 	"github.com/zqk-os/zqk/pkg/brand"
+ 	clipkg "github.com/zqk-os/zqk/pkg/cli"
+ 	"github.com/zqk-os/zqk/pkg/objects"
+-	"github.com/zqk-os/zqk/pkg/zqkenv"
  	"github.com/spf13/cobra"
  )
  
@@ -961,9 +961,9 @@ index 59d46e9..8906ecc 100644
 +++ b/cmd/zqk/system/quickstart_test.go
 @@ -8,7 +8,6 @@ import (
  
- 	pkgctx "github.com/lanceman/zqk/pkg/context"
- 	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
--	"github.com/lanceman/zqk/pkg/zqkenv"
+ 	pkgctx "github.com/zqk-os/zqk/pkg/context"
+ 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
+-	"github.com/zqk-os/zqk/pkg/zqkenv"
  )
  
  func TestQuickstartCommand(t *testing.T) {
@@ -1066,10 +1066,10 @@ index e9250d8..af59b5c 100644
 --- a/internal/bootstrap/extract.go
 +++ b/internal/bootstrap/extract.go
 @@ -13,7 +13,6 @@ import (
- 	"github.com/lanceman/zqk/pkg/logging"
- 	"github.com/lanceman/zqk/pkg/paths"
- 	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
--	"github.com/lanceman/zqk/pkg/zqkenv"
+ 	"github.com/zqk-os/zqk/pkg/logging"
+ 	"github.com/zqk-os/zqk/pkg/paths"
+ 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
+-	"github.com/zqk-os/zqk/pkg/zqkenv"
  )
  
  const (
@@ -1296,9 +1296,9 @@ index e0388f5..6bab362 100644
 +++ b/pkg/storage/privileged_writer_membrane.go
 @@ -10,6 +10,7 @@ import (
  
- 	"github.com/lanceman/zqk/pkg/brand"
- 	"github.com/lanceman/zqk/pkg/errfmt"
-+	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+ 	"github.com/zqk-os/zqk/pkg/brand"
+ 	"github.com/zqk-os/zqk/pkg/errfmt"
++	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
  )
  
  // socketFileExtension is the UNIX-domain-socket file suffix used by helper daemons.
@@ -1383,7 +1383,7 @@ index 66cf8a7..bbabdf6 100644
  import (
  	"testing"
 -
--	"github.com/lanceman/zqk/pkg/brand"
+-	"github.com/zqk-os/zqk/pkg/brand"
  )
  
  func TestEnvVar_GetSetUnset(t *testing.T) {
@@ -1415,7 +1415,7 @@ index caaac0e..821226c 100644
 --- a/pkg/zqkenv/vars.go
 +++ b/pkg/zqkenv/vars.go
 @@ -9,9 +9,6 @@ import (
- 	"github.com/lanceman/zqk/pkg/brand"
+ 	"github.com/zqk-os/zqk/pkg/brand"
  )
  
 -// IsCommunityEdition is a global flag set by the community binary.

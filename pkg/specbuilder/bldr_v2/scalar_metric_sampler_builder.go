@@ -1,8 +1,8 @@
 package bldr_v2
 
 import (
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/specbuilder/builders"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/specbuilder/builders"
 )
 
 // ScalarMetricSamplerBuilder builds the scalar_metric_sampler spec at version v2_0_0

@@ -6,10 +6,10 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/paths"
-	_ "github.com/lanceman/zqk/pkg/specbuilder/bldr_v2" // Register builders for tests
-	"github.com/lanceman/zqk/pkg/specbuilder/builders"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
+	_ "github.com/zqk-os/zqk/pkg/specbuilder/bldr_v2" // Register builders for tests
+	"github.com/zqk-os/zqk/pkg/specbuilder/builders"
 )
 
 // TestValidateOwnerRefPrototypeRejection tests that owner_ref pointing to prototype/test ACC objects is rejected

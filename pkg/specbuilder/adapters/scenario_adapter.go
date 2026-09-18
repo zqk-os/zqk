@@ -1,8 +1,8 @@
 package adapters
 
 import (
-	mcptesting "github.com/lanceman/zqk/pkg/mcp/testing"
-	sbcore "github.com/lanceman/zqk/pkg/specbuilder/core"
+	mcptesting "github.com/zqk-os/zqk/pkg/mcp/testing"
+	sbcore "github.com/zqk-os/zqk/pkg/specbuilder/core"
 )
 
 const emptyValue = ""

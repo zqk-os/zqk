@@ -4,9 +4,9 @@ import (
 	"testing"
 	"time"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/logging"
-	"github.com/lanceman/zqk/pkg/scheduler/transceiver"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/scheduler/transceiver"
 )
 
 // Async settle delays after TestIOHandler.Execute (Phase E, CONSTANTS_AND_DRY_INVENTORY_PLAN).

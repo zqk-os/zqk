@@ -3,7 +3,7 @@ package objects
 import (
 	"testing"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
 )
 
 // TestDisplayLength_Regression_SpecValidation tests that spec validation

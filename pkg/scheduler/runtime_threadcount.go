@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"strings"
 
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // GetRuntimeThreadCount returns the current process OS thread count when available.

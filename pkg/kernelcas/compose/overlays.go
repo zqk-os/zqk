@@ -1,7 +1,7 @@
 package compose
 
 import (
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // kindOverlayRules migrates former Go customRuleValidators into declarative rules.

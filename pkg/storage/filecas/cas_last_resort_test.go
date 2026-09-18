@@ -7,8 +7,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/goroutinelabels"
-	"github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 func writeMockCASYAML(t *testing.T, dir, id string) (string, string) {

@@ -3,7 +3,7 @@ package registry
 import (
 	"encoding/json"
 
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // LoadRegistry reads the registry from a file and returns a FieldRegistry.

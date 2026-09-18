@@ -6,7 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 func TestPruneDiagnosticsCaptures_keepsNewestTenSets(t *testing.T) {

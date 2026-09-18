@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/lanceman/zqk/pkg/healthcheck"
-	"github.com/lanceman/zqk/pkg/storage"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/healthcheck"
+	"github.com/zqk-os/zqk/pkg/storage"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // walBacklogMonitor reports the backlog between object WAL last seq and applied seq.

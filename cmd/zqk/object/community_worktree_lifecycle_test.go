@@ -7,8 +7,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 )
 
 // TestGoalAndMilestoneLifecycle_ForwardPercentCompleteDefaults validates TDE-1789674845502853000-3c3a7794.

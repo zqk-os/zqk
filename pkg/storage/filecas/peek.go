@@ -7,7 +7,7 @@ import (
 	"regexp"
 	"sync"
 
-	"github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 var CasHashFilenameRe = regexp.MustCompile(`^[a-f0-9]{64}\.yaml$`)

@@ -3,9 +3,9 @@ package bridge
 import (
 	"context"
 
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/hivemind"
-	"github.com/lanceman/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/hivemind"
+	"github.com/zqk-os/zqk/pkg/storage"
 )
 
 // Bridge defines the contract for connecting semantic memory to the graph ontology.

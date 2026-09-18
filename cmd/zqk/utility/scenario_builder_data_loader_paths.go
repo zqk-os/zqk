@@ -5,11 +5,11 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/lanceman/zqk/pkg/datacell"
+	"github.com/zqk-os/zqk/pkg/datacell"
 
-	"github.com/lanceman/zqk/cmd/zqk/system"
+	"github.com/zqk-os/zqk/cmd/zqk/system"
 
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // getObjectFilePath gets the file path for an object from storage

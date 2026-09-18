@@ -4,8 +4,8 @@
 package audit_aggregation_metric
 
 import (
-	base_objectenum "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
-	shared_metricsenum "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/shared_metrics"
+	base_objectenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
+	shared_metricsenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/shared_metrics"
 )
 
 type MetricType string

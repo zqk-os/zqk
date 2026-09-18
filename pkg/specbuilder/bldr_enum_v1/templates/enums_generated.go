@@ -4,8 +4,8 @@
 package templates
 
 import (
-	base_objectenum "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
-	shared_templatesenum "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/shared_templates"
+	base_objectenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
+	shared_templatesenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/shared_templates"
 )
 
 type Category string

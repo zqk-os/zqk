@@ -3,7 +3,7 @@ package metrics
 import (
 	"runtime"
 
-	"github.com/lanceman/zqk/pkg/concurrency"
+	"github.com/zqk-os/zqk/pkg/concurrency"
 )
 
 // ResourceAvailability represents the current available system resources.

@@ -9,14 +9,14 @@ import (
 
 	"gopkg.in/yaml.v3"
 
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/objects"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/objects"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 const defaultVersion = "v1_0_0"
 const defaultVersionPackage = "bldr_config_v1"
-const configBuildersImportPath = "github.com/lanceman/zqk/pkg/specbuilder/config_builders"
+const configBuildersImportPath = "github.com/zqk-os/zqk/pkg/specbuilder/config_builders"
 
 // codegenSourcePath is this file; embedded in generated builder headers so editors and agents do not hand-edit outputs.
 const codegenSourcePath = "pkg/specbuilder/config_builders/codegen.go"
@@ -171,7 +171,7 @@ func writeImportBlock(buf *strings.Builder, includeObjects bool) {
 	buf.WriteString("import (\n")
 	fmt.Fprintf(buf, "\t%q\n", configBuildersImportPath)
 	if includeObjects {
-		buf.WriteString("\t\"github.com/lanceman/zqk/pkg/objects\"\n")
+		buf.WriteString("\t\"github.com/zqk-os/zqk/pkg/objects\"\n")
 	}
 	buf.WriteString(")\n\n")
 }

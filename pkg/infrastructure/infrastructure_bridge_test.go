@@ -4,9 +4,9 @@ import (
 	"context"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/infrastructure"
-	_ "github.com/lanceman/zqk/pkg/infrastructure/drivers/kafka" // Register driver
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/infrastructure"
+	_ "github.com/zqk-os/zqk/pkg/infrastructure/drivers/kafka" // Register driver
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 func TestInfrastructureEngagement(t *testing.T) {

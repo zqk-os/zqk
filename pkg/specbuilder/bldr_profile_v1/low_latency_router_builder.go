@@ -3,8 +3,8 @@
 package bldr_profile_v1
 
 import (
-	"github.com/lanceman/zqk/pkg/config"
-	"github.com/lanceman/zqk/pkg/specbuilder/profile_builders"
+	"github.com/zqk-os/zqk/pkg/config"
+	"github.com/zqk-os/zqk/pkg/specbuilder/profile_builders"
 )
 
 // LowLatencyRouterBuilder builds the low_latency_router profile at version v1_0_0

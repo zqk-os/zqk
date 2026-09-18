@@ -3,7 +3,7 @@ package objectidcache
 import (
 	"time"
 
-	"github.com/lanceman/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/logging"
 )
 
 // CacheAuditFunc records cache mutation audit events. Optional; nil is a no-op.

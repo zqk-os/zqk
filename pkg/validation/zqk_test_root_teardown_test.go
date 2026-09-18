@@ -3,8 +3,8 @@ package validation
 import (
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/projecttemp"
-	"github.com/lanceman/zqk/pkg/zqkenv"
+	"github.com/zqk-os/zqk/pkg/projecttemp"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
 // runZQKTempTestRootTeardown runs the shared isolated-root strip pipeline. pkg/validation cannot import

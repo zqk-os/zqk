@@ -3,7 +3,7 @@ package validation
 import (
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // TestValidateBucketingStrategy_ArchiveStrategy tests archive strategy validation

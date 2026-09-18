@@ -5,7 +5,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/lanceman/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/errfmt"
 )
 
 // EnsureDir wraps [os.MkdirAll] with a stable error shape. Use with [DirPerm755], [DirPerm700], etc.
@@ -20,7 +20,7 @@ func EnsureDir(path string, mode fs.FileMode) error {
 // Layout creates project-relative directories under a single root via a fluent chain.
 // rel arguments are typically package constants (e.g. [ProjectDataDir], [ProcessInternalObjectSpecsDir]).
 //
-// Pipeline: safe to call from a [github.com/lanceman/zqk/pkg/pipeline] step—capture root in the closure
+// Pipeline: safe to call from a [github.com/zqk-os/zqk/pkg/pipeline] step—capture root in the closure
 // and return [Layout.Err] from the step func (no pipeline import required here).
 //
 // Example:

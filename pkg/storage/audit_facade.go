@@ -1,6 +1,6 @@
 package storage
 
-import "github.com/lanceman/zqk/pkg/storage/audit"
+import "github.com/zqk-os/zqk/pkg/storage/audit"
 
 // AuditFacade is the storage-root alias for the audit subpackage aggregator.
 // FileObjectStorage is not an Aggregator; AuditAggregationService is.

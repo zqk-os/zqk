@@ -6,8 +6,8 @@ import (
 	"sort"
 	"strings"
 
-	pkgcli "github.com/lanceman/zqk/pkg/cli"
-	"github.com/lanceman/zqk/pkg/objects"
+	pkgcli "github.com/zqk-os/zqk/pkg/cli"
+	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/spf13/cobra"
 )
 

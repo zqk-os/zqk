@@ -5,7 +5,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/dna"
+	"github.com/zqk-os/zqk/pkg/dna"
 )
 
 func TestMigrateLegacyBacklogItemYAML(t *testing.T) {

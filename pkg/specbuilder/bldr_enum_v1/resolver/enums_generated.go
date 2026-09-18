@@ -4,8 +4,8 @@
 package resolver
 
 import (
-	base_objectenum "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
-	shared_resolversenum "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/shared_resolvers"
+	base_objectenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
+	shared_resolversenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/shared_resolvers"
 )
 
 type Plane = base_objectenum.Plane

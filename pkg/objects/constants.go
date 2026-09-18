@@ -3,7 +3,7 @@ package objects
 import (
 	"regexp"
 
-	"github.com/lanceman/zqk/pkg/kindnames"
+	"github.com/zqk-os/zqk/pkg/kindnames"
 )
 
 // Schema version constants

@@ -4,8 +4,8 @@
 package list_metric_sampler
 
 import (
-	base_objectenum "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
-	base_samplerenum "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/base_sampler"
+	base_objectenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
+	base_samplerenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/base_sampler"
 )
 
 type Plane = base_objectenum.Plane

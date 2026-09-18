@@ -4,8 +4,8 @@
 package epic
 
 import (
-	base_objectenum "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
-	shared_epicsenum "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/shared_epics"
+	base_objectenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
+	shared_epicsenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/shared_epics"
 )
 
 type Plane = base_objectenum.Plane

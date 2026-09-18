@@ -4,9 +4,9 @@
 package scheduler_health_metric
 
 import (
-	base_metricenum "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/base_metric"
-	base_objectenum "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
-	shared_metricsenum "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/shared_metrics"
+	base_metricenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/base_metric"
+	base_objectenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
+	shared_metricsenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/shared_metrics"
 )
 
 type MetricType = base_metricenum.MetricType

@@ -4,7 +4,7 @@ import (
 	"slices"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/zqkenv"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
 func TestNewSecurityContext(t *testing.T) {

@@ -3,7 +3,7 @@ package paths
 import (
 	"path/filepath"
 
-	"github.com/lanceman/zqk/pkg/brand"
+	"github.com/zqk-os/zqk/pkg/brand"
 )
 
 // MCPDirPath returns the absolute MCP runtime directory under project data.

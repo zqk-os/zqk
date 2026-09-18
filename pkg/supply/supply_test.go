@@ -4,7 +4,7 @@ import (
 	"strings"
 	"testing"
 
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // TestSupplyChainReleaseIntegrity verifies that release configuration adheres to POL-WORKFLOW-CEF-RECO-COMPLETE-001

@@ -4,8 +4,8 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/agentprompt"
-	"github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/agentprompt"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // TestGatherHealthSignals verifies that gatherHealthSignals reads failing test count

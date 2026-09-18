@@ -3,8 +3,8 @@ package storage_test
 import (
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/graph/provider"
-	"github.com/lanceman/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/graph/provider"
+	"github.com/zqk-os/zqk/pkg/storage"
 	"github.com/stretchr/testify/require"
 )
 

@@ -3,7 +3,7 @@ package scheduler
 import (
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/convergence"
+	"github.com/zqk-os/zqk/pkg/convergence"
 )
 
 // TRACK: BLI-1786686768606200000-31133cc3 — CAP wrapper must track Option A matrix.

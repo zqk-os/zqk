@@ -7,9 +7,9 @@ import (
 	"fmt"
 	"sort"
 
-	"github.com/lanceman/zqk/pkg/infrastructure/crypto"
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/infrastructure/crypto"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // DataCell represents a cryptographically intact bundle of objects and assets.

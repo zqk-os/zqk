@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // RuleActualEffortWallClock is a detector for actual_effort above the work span.

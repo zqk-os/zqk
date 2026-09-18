@@ -4,9 +4,9 @@
 package bldr_instance_v1
 
 import (
-	"github.com/lanceman/zqk/pkg/objects"
-	enumv "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/mcp_built_in_tool"
-	"github.com/lanceman/zqk/pkg/specbuilder/instance_builders"
+	"github.com/zqk-os/zqk/pkg/objects"
+	enumv "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/mcp_built_in_tool"
+	"github.com/zqk-os/zqk/pkg/specbuilder/instance_builders"
 )
 
 // McpBuiltInToolInstanceBuilder builds mcp_built_in_tool instances

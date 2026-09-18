@@ -5,7 +5,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/lanceman/zqk/pkg/brand"
+	"github.com/zqk-os/zqk/pkg/brand"
 )
 
 // EnvVar represents a strongly typed environment variable binding.

@@ -11,9 +11,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/httpheaders"
-	"github.com/lanceman/zqk/pkg/specbuilder"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/httpheaders"
+	"github.com/zqk-os/zqk/pkg/specbuilder"
 )
 
 // httpDoer is satisfied by *http.Client and specbuilder.APIClient.

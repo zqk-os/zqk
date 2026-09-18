@@ -3,7 +3,7 @@ package kernelcas
 import (
 	"context"
 
-	"github.com/lanceman/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/logging"
 )
 
 // RunErase runs kernel.cas_object_erase (DECIDE erase policy → COMMIT).

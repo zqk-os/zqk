@@ -1,7 +1,7 @@
 package cli
 
 import (
-	"github.com/lanceman/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/errfmt"
 )
 
 // CommandSpec represents a declarative specification for a CLI command

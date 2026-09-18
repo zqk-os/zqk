@@ -4,8 +4,8 @@ import (
 	"context"
 	"errors"
 
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/when"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/when"
 )
 
 // Contextualizer maps external data to ZQK ontology layers.

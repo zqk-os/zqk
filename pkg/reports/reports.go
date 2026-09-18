@@ -3,7 +3,7 @@ package reports
 import (
 	"context"
 
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // GenerateMaturationReport generates a maturation report.

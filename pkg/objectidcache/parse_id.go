@@ -3,7 +3,7 @@ package objectidcache
 import (
 	"strings"
 
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // parseReferenceID extracts kind from a cache/pending id. Mirrors cmd/zqk/system.parseReferenceID

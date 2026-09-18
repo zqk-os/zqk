@@ -3,7 +3,7 @@ package paths
 import (
 	"io/fs"
 
-	"github.com/lanceman/zqk/pkg/brand"
+	"github.com/zqk-os/zqk/pkg/brand"
 )
 
 // Project data directory constants.

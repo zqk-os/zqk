@@ -3,7 +3,7 @@ package system
 import (
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 func TestNewAlignCmd(t *testing.T) {

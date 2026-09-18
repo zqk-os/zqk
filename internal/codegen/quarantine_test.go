@@ -12,16 +12,16 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/lanceman/zqk/internal/codegen/ast"
-	"github.com/lanceman/zqk/internal/codegen/generators"
-	"github.com/lanceman/zqk/internal/codegen/macro"
-	"github.com/lanceman/zqk/pkg/dna"
+	"github.com/zqk-os/zqk/internal/codegen/ast"
+	"github.com/zqk-os/zqk/internal/codegen/generators"
+	"github.com/zqk-os/zqk/internal/codegen/macro"
+	"github.com/zqk-os/zqk/pkg/dna"
 )
 
 func TestASTInspectionAndEmbedding(t *testing.T) {
 	sampleSource := `package sample
 
-import "github.com/lanceman/zqk/pkg/dna"
+import "github.com/zqk-os/zqk/pkg/dna"
 
 type SampleItem struct {
 	dna.BaseObject
@@ -114,7 +114,7 @@ func TestQuarantineImportBanForDNAAndKernel(t *testing.T) {
 	repoRoot := filepath.Clean(filepath.Join(filepath.Dir(thisFile), "../.."))
 
 	bannedImports := []string{
-		"github.com/lanceman/zqk/internal/codegen",
+		"github.com/zqk-os/zqk/internal/codegen",
 		"go/ast",
 		"go/parser",
 		"go/token",
@@ -151,7 +151,7 @@ func TestQuarantineImportBanForDNAAndKernel(t *testing.T) {
 				impPath := strings.Trim(imp.Path.Value, `"`)
 				for _, banned := range bannedImports {
 					// Pure runtime packages must NEVER import codegen
-					if strings.HasPrefix(impPath, "github.com/lanceman/zqk/internal/codegen") {
+					if strings.HasPrefix(impPath, "github.com/zqk-os/zqk/internal/codegen") {
 						t.Errorf("QUARANTINE VIOLATION: %s imports banned package %s", path, impPath)
 					}
 					// Non-test files must never import compiler internals

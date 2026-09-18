@@ -6,7 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 const orphanCleanupScript = "scripts/cleanup_orphan_test_processes.sh"

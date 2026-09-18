@@ -1,7 +1,7 @@
 package bldr_trait_v1
 
 import (
-	"github.com/lanceman/zqk/pkg/specbuilder/trait_builders"
+	"github.com/zqk-os/zqk/pkg/specbuilder/trait_builders"
 )
 
 // SummarizesChildrenBuilder builds the summarizes_children trait at version v1_0_0.

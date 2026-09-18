@@ -3,8 +3,8 @@ package datacell
 import (
 	"context"
 
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/logging"
 )
 
 // StewardEnqueueDetailMaxBytes caps optional MaintenanceOp.Detail on the steward JSONL queue (line size bound;

@@ -1,6 +1,6 @@
 package functional
 
-import "github.com/lanceman/zqk/pkg/when"
+import "github.com/zqk-os/zqk/pkg/when"
 
 // When starts a when.Chain: when cond() is true, the next Then(fn) will run that fn.
 // Re-exported from pkg/when so callers can use functional.When without importing when.

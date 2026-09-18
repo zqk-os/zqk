@@ -4,13 +4,13 @@ import (
 	"fmt"
 	"strings"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/logging"
-	"github.com/lanceman/zqk/pkg/objects"
-	specbuilders "github.com/lanceman/zqk/pkg/specbuilder/builders"
-	lifecyclebuilders "github.com/lanceman/zqk/pkg/specbuilder/lifecycle_builders"
-	fileutil "github.com/lanceman/zqk/pkg/utils/fileutil"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/objects"
+	specbuilders "github.com/zqk-os/zqk/pkg/specbuilder/builders"
+	lifecyclebuilders "github.com/zqk-os/zqk/pkg/specbuilder/lifecycle_builders"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // generateSpecs generates spec YAML files from built-in builders

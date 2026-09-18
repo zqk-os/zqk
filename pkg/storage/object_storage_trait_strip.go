@@ -3,10 +3,10 @@ package storage
 import (
 	"path/filepath"
 
-	pkgctx "github.com/lanceman/zqk/pkg/context"
-	"github.com/lanceman/zqk/pkg/logging"
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/paths"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 	"gopkg.in/yaml.v3"
 	// traitNormOnce/traitNormRegistry lazily load process traits for expanded-trait comparison (BLI-210).
 	// One registry per FileObjectStorage instance (correct projectRoot in tests and multi-project daemons).

@@ -1,7 +1,7 @@
 package storage
 
 import (
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // canonicalizePersistedLifecycleStatus maps aliases onto the kind's lifecycle

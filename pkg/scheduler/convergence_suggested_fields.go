@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // convSugKey* are convergence suggested-field / after_state_snapshot map keys without objects.FieldKey* constants.

@@ -4,8 +4,8 @@
 package agent_skill
 
 import (
-	base_objectenum "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
-	shared_agent_skillsenum "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/shared_agent_skills"
+	base_objectenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
+	shared_agent_skillsenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/shared_agent_skills"
 )
 
 type Plane = base_objectenum.Plane

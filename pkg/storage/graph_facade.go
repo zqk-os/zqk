@@ -3,8 +3,8 @@ package storage
 // Facade boundary for upcoming decomposition. TRACK: BLI-TRACK-STORAGE-SPLIT-001
 
 import (
-	"github.com/lanceman/zqk/pkg/graph/provider"
-	"github.com/lanceman/zqk/pkg/storage/graph"
+	"github.com/zqk-os/zqk/pkg/graph/provider"
+	"github.com/zqk-os/zqk/pkg/storage/graph"
 )
 
 type GraphLock = graph.GraphLock

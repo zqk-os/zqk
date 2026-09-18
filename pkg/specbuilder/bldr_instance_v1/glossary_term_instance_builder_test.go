@@ -3,7 +3,7 @@ package bldr_instance_v1
 import (
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 func TestGlossaryTermInstanceBuilder_Build(t *testing.T) {

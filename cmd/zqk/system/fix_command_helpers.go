@@ -4,8 +4,8 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/lanceman/zqk/pkg/objects"
-	"github.com/lanceman/zqk/pkg/when"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/when"
 )
 
 // parseQueryHintToMap converts a query hint string to a map

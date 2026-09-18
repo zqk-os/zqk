@@ -3,9 +3,9 @@ package storage
 import (
 	"fmt"
 
-	"github.com/lanceman/zqk/pkg/storage/crud"
+	"github.com/zqk-os/zqk/pkg/storage/crud"
 
-	"github.com/lanceman/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // matchesFiltersParsed checks if a parsed object matches the given filters

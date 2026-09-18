@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/goroutinelabels"
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 )
 
 const coordinatorRouterTimeout = 5 * time.Second

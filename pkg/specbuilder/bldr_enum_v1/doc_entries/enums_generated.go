@@ -4,8 +4,8 @@
 package doc_entries
 
 import (
-	base_objectenum "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
-	shared_doc_entriesenum "github.com/lanceman/zqk/pkg/specbuilder/bldr_enum_v1/shared_doc_entries"
+	base_objectenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
+	shared_doc_entriesenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/shared_doc_entries"
 )
 
 type Group string

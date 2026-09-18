@@ -3,7 +3,7 @@ package fileutil
 import (
 	"testing"
 
-	"github.com/lanceman/zqk/pkg/zqkenv"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
 func TestObjectYAMLIOLimit_Default(t *testing.T) {

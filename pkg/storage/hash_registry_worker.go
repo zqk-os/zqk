@@ -4,7 +4,7 @@ package storage
 import (
 	"fmt"
 
-	"github.com/lanceman/zqk/pkg/goroutinelabels"
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 )
 
 func (hr *HashRegistry) wakeWorkerIfNeeded() {

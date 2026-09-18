@@ -1,8 +1,8 @@
 package storage
 
 import (
-	"github.com/lanceman/zqk/pkg/errfmt"
-	"github.com/lanceman/zqk/pkg/zqkenv"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
 // ownsWriteBehind reports whether this storage instance claimed WAL / write-behind.

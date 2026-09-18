@@ -6,10 +6,10 @@ import (
 	"os/exec"
 	"time"
 
-	"github.com/lanceman/zqk/pkg/execwrap"
+	"github.com/zqk-os/zqk/pkg/execwrap"
 
-	"github.com/lanceman/zqk/pkg/circuitbreaker"
-	"github.com/lanceman/zqk/pkg/telemetry"
+	"github.com/zqk-os/zqk/pkg/circuitbreaker"
+	"github.com/zqk-os/zqk/pkg/telemetry"
 )
 
 var (

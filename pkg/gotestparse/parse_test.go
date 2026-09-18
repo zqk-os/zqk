@@ -99,11 +99,11 @@ func TestParseGoTestOutput_DataRaceDetection(t *testing.T) {
 ==================
 WARNING: DATA RACE
 Write at 0x00c00012e060 by goroutine 7:
-  github.com/lanceman/zqk/pkg/foo.BadFunc()
+  github.com/zqk-os/zqk/pkg/foo.BadFunc()
       /path/to/foo.go:42 +0x34
 
 Previous read at 0x00c00012e060 by goroutine 6:
-  github.com/lanceman/zqk/pkg/foo.ReadFunc()
+  github.com/zqk-os/zqk/pkg/foo.ReadFunc()
       /path/to/foo.go:30 +0x28
 ==================
 --- FAIL: TestConcurrentRaceCondition (0.05s)
