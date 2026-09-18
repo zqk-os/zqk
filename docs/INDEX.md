@@ -5,6 +5,7 @@ Start in **onboarding**.
 | Read | What it is |
 | :--- | :--- |
 | **[Community first-run](./onboarding/COMMUNITY_FIRST_RUN.md)** | Build, init, agent-onboard, MCP, `object list`, `system dashboard`, `test dashboard`, `whats-next` |
+| **[VDS](./quality/vds_chunks.yaml)** | First-run launch chunks (`zqk workflow vds evaluate`) |
 | **[Getting started](./getting-started.md)** | Pointer to first-run |
 | **[Quickstart](./onboarding/QUICKSTART.md)** | Same text as `./bin/zqk system start-here` |
 | **[First-run object tutorial](./onboarding/FIRST_RUN_OBJECT_TUTORIAL.md)** | Create / get / update a `question` |

@@ -1,0 +1,60 @@
+# Dest first-run VDS chunks. Chat is never evidence.
+# Evaluate: ./bin/zqk workflow vds evaluate --format json --persist
+schema: zqk_vds_chunks_v1
+chunks:
+  - chunk_id: dest-launch-kernel-isolation
+    stage: operate_release
+    claim: Dest object list/count/get resolve this checkout kernel, not studio
+    work_object_ref: CRIT-1789673676577796000-03fc29cf
+    rubric_ref: CRIT-1789673676577796000-03fc29cf
+    dsl_checks:
+      - object_exists:CRIT-1789673676577796000-03fc29cf
+      - object_exists:TST-1789708649546112000-ae5e1c28
+      - object_exists:BLI-1789630408733990000-0a2023fb
+      - path_exists:config/zqk.yaml
+      - path_exists:cmd/zqk-community/app/first_run_surface_test.go
+    evidence_refs:
+      - CRIT-1789673676577796000-03fc29cf
+      - TST-1789708649546112000-ae5e1c28
+      - cmd/zqk-community/app/first_run_surface_test.go
+      - config/zqk.yaml
+    gate_operate: yes
+    independent_verify: yes
+    notes: Isolation is dest cwd + dest config; do not export a project-root override to studio
+  - chunk_id: dest-launch-shipped-doc-entries
+    stage: operate_release
+    claim: First-run onboarding and architecture stubs are registered as doc_entry objects
+    work_object_ref: CRIT-1789673684713711000-344a7b09
+    rubric_ref: CRIT-1789673684713711000-344a7b09
+    dsl_checks:
+      - object_exists:CRIT-1789673684713711000-344a7b09
+      - object_exists:DOC-629
+      - object_exists:DOC-251
+      - object_exists:DOC-135
+      - path_exists:docs/onboarding/COMMUNITY_FIRST_RUN.md
+      - path_exists:docs/architecture/README.md
+      - path_exists:docs/architecture/INDEX.md
+      - path_exists:docs/INDEX.md
+    evidence_refs:
+      - DOC-629
+      - DOC-251
+      - DOC-135
+      - docs/onboarding/COMMUNITY_FIRST_RUN.md
+      - docs/architecture/README.md
+    gate_operate: yes
+    independent_verify: yes
+  - chunk_id: dest-launch-no-archive-markdown
+    stage: operate_release
+    claim: Copied archive markdown is gone from the dest product tree
+    work_object_ref: CRIT-1789673692417549000-42d0da98
+    rubric_ref: CRIT-1789673692417549000-42d0da98
+    dsl_checks:
+      - object_exists:CRIT-1789673692417549000-42d0da98
+      - path_exists:scripts/open-core/police-community-tree.sh
+      - path_exists:cmd/zqk-community/app/first_run_surface_test.go
+    evidence_refs:
+      - scripts/open-core/police-community-tree.sh
+      - cmd/zqk-community/app/first_run_surface_test.go
+    gate_operate: yes
+    independent_verify: yes
+    notes: TestShippedFirstRunDocsExist fails if docs/_archive exists; dest police fails on archive dirs

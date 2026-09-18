@@ -6,11 +6,14 @@ criteria_refs:
     - CRIT-1789673684713711000-344a7b09
     - CRIT-1789673692417549000-42d0da98
 description: 'Implementation and verification pipeline for: Community kernel must prove launch-ready testing and documentation vetting'
+estimated_effort: 4 hours
 id: BLI-1789630408733990000-0a2023fb
 kind: backlog_item
 milestone_refs:
     - MIL-1789672699275510000-40c8cee7
 namespace_id: zqk:kernel
+persona_refs:
+    - PER-DEFAULT-OPERATOR
 priority: high
 priority_plan_ref: PRI-1789630341114309000-f91952ee
 priority_tier: P1
@@ -18,9 +21,12 @@ problem_statement: 'Strangers and agents cannot execute a community checkout: in
 requirement_refs:
     - REQ-1789630346648087000-a61b7f27
 schema_version: 2.0.0
-status: planned
+stakeholders:
+    - '[team-core]'
+started_at: "2026-09-18T07:25:36Z"
+status: in_progress
 title: 'Implement: Community kernel must prove launch-ready testing and documentation vetting'
-updated_at: "2026-09-17T19:35:41Z"
+updated_at: "2026-09-18T07:27:51Z"
 updated_by: ACC-1785920548450214012-68b850c0
 version_context: default
 workstream_refs:
