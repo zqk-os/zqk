@@ -1,6 +1,10 @@
 acceptance_considerations: GitHub CI runs the community build and release-gate tests; a dest-owned public payload script fails on forbidden Studio paths, legacy branding/module imports, obvious key material, missing community docs, or proprietary carve-out text; LICENSE and NOTICE describe only this Apache-2.0 tree.
+actual_effort: 0.06h
 artifacts:
     - scripts/open-core/check-public-release-payload.sh
+commit_hashes:
+    - e7feb3d0d6292af468743d4aac88c8108ccd11d3
+completed_at: "2026-09-18T08:09:27Z"
 created_at: "2026-09-18T07:52:20Z"
 created_by: ACC-1785920548450214012-68b850c0
 criteria_refs:
@@ -26,9 +30,9 @@ schema_version: 2.0.0
 stakeholders:
     - team-core
 started_at: "2026-09-18T08:05:45Z"
-status: testing
+status: complete
 title: 'Implement: Public source artifact is CI-verifiable, license-clean, and fail-closed before publication'
-updated_at: "2026-09-18T08:05:45Z"
+updated_at: "2026-09-18T08:09:27Z"
 updated_by: ACC-1785920548450214012-68b850c0
 version_context: default
 workstream_refs:
