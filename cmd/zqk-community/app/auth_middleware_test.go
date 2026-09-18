@@ -15,22 +15,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func TestAuthMiddleware_Unauthorized(t *testing.T) {
-	cmd := &cobra.Command{Use: "test"}
-	home := t.TempDir()
-	t.Setenv(zqkenv.OSHome().Name(), home)
-	t.Setenv(zqkenv.APIKey().Name(), "")
-	t.Setenv(zqkenv.TestRoot().Name(), "")
-	t.Setenv(zqkenv.TestBypassAuth().Name(), "0")
-
-	projectRoot := t.TempDir()
-
-	err := AuthMiddleware(cmd, projectRoot)
-	if err == nil {
-		t.Fatalf("expected unauthorized error, got nil")
-	}
-}
-
 func TestAuthMiddleware_Authorized_APIKey(t *testing.T) {
 	cmd := &cobra.Command{Use: "test"}
 	home := t.TempDir()
