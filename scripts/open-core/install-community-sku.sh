@@ -12,6 +12,7 @@ if [ -z "$DEST" ] || [ ! -d "$DEST" ]; then
 fi
 DEST=$(CDPATH= cd -- "$DEST" && pwd)
 HERE=$(CDPATH= cd -- "$(dirname "$0")" && pwd)
+SOURCE_ROOT=$(CDPATH= cd -- "$HERE/../.." && pwd)
 
 if [ -x "$HERE/install-community-makefile.sh" ]; then
   sh "$HERE/install-community-makefile.sh" "$DEST"
@@ -33,6 +34,15 @@ install_file() {
   fi
 }
 
+install_apache_license() {
+  src=$1
+  dst=$2
+  if [ -f "$src" ]; then
+    awk '/^--------------------------------------------------------------------------------$/{exit} {print}' "$src" >"$dst"
+    echo "sku-overlay: $(basename "$dst")"
+  fi
+}
+
 install_file "$SKU/AI_AGENT_ONBOARDING.md" "$DEST/docs/onboarding/AI_AGENT_ONBOARDING.md"
 install_file "$SKU/COMMUNITY_FIRST_RUN.md" "$DEST/docs/onboarding/COMMUNITY_FIRST_RUN.md"
 install_file "$SKU/FIRST_RUN_OBJECT_TUTORIAL.md" "$DEST/docs/onboarding/FIRST_RUN_OBJECT_TUTORIAL.md"
@@ -40,6 +50,10 @@ install_file "$SKU/QUICKSTART.md" "$DEST/docs/onboarding/QUICKSTART.md"
 install_file "$SKU/ONBOARDING_README.md" "$DEST/docs/onboarding/README.md"
 install_file "$SKU/EDGE_HEADLESS_FIRST_RUN.md" "$DEST/docs/onboarding/EDGE_HEADLESS_FIRST_RUN.md"
 install_file "$SKU/CONTRIBUTING.md" "$DEST/CONTRIBUTING.md"
+install_apache_license "$SOURCE_ROOT/LICENSE" "$DEST/LICENSE"
+install_file "$SKU/NOTICE" "$DEST/NOTICE"
+install_file "$SKU/SECURITY.md" "$DEST/SECURITY.md"
+install_file "$SKU/CI.yml" "$DEST/.github/workflows/ci.yml"
 install_file "$SKU/README.md" "$DEST/README.md"
 install_file "$SKU/ARCHITECTURE_README.md" "$DEST/docs/architecture/README.md"
 install_file "$SKU/ARCHITECTURE_INDEX.md" "$DEST/docs/architecture/INDEX.md"

@@ -67,7 +67,6 @@ OVERLAY_PATHS=(
   "scripts/default_agent_skills"
   ".zqk/specs"
   ".zqk/cli/specs"
-  ".goreleaser.yaml"
   ".gitignore"
   "NOTICE"
   "go.mod"

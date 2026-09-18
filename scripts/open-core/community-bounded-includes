@@ -49,9 +49,10 @@ scripts/open-core/Makefile.community
 scripts/open-core/install-community-makefile.sh
 .zqk/specs
 .zqk/cli/specs
-.goreleaser.yaml
+.github/workflows/ci.yml
 .gitignore
 NOTICE
+SECURITY.md
 go.mod
 go.sum
 LICENSE

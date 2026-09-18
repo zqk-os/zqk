@@ -209,3 +209,52 @@ chunks:
       - SCH-1789718605088226000 success
     gate_integrate: yes
     independent_verify: yes
+  - chunk_id: dest-overlay-release-files-functional
+    stage: operate_release
+    claim: Community SKU installation reproduces dest-owned license, notice, security, CI, and README files
+    work_object_ref: CRIT-1789719098362564000-fd05f1e4
+    rubric_ref: CRIT-1789719098362564000-fd05f1e4
+    dsl_checks:
+      - object_exists:CRIT-1789719098362564000-fd05f1e4
+      - path_exists:scripts/open-core/install-community-sku.sh
+      - path_exists:scripts/open-core/test-community-overlay-release-files.sh
+      - tests_ok_per_customization
+    evidence_refs:
+      - CRIT-1789719098362564000-fd05f1e4
+      - scripts/open-core/install-community-sku.sh
+      - sh scripts/open-core/test-community-overlay-release-files.sh
+    gate_integrate: yes
+    independent_verify: yes
+  - chunk_id: dest-overlay-release-files-boundary
+    stage: operate_release
+    claim: Community overlay manifests cannot copy the unconfigured GoReleaser file
+    work_object_ref: CRIT-1789719098362565000-21b9314b
+    rubric_ref: CRIT-1789719098362565000-21b9314b
+    dsl_checks:
+      - object_exists:CRIT-1789719098362565000-21b9314b
+      - path_exists:scripts/open-core/community-bounded-includes
+      - tests_ok_per_customization
+    evidence_refs:
+      - CRIT-1789719098362565000-21b9314b
+      - scripts/open-core/community-bounded-includes
+      - scripts/open-core/community-bounded-includes.txt
+      - sh scripts/open-core/test-community-overlay-release-files.sh
+    gate_integrate: yes
+    independent_verify: yes
+  - chunk_id: dest-overlay-release-files-integration
+    stage: operate_release
+    claim: Scratch export installs the community SKU before running the dest payload gate
+    work_object_ref: CRIT-1789719098362566000-f65356cc
+    rubric_ref: CRIT-1789719098362566000-f65356cc
+    dsl_checks:
+      - object_exists:CRIT-1789719098362566000-f65356cc
+      - object_exists:TST-1789719098362564001-5bd2ed19
+      - path_exists:scripts/open-core/sync-public-candidate.sh
+      - tests_ok_per_customization
+    evidence_refs:
+      - CRIT-1789719098362566000-f65356cc
+      - TST-1789719098362564001-5bd2ed19
+      - scripts/open-core/sync-public-candidate.sh
+      - sh scripts/open-core/test-community-overlay-release-files.sh
+    gate_integrate: yes
+    independent_verify: yes

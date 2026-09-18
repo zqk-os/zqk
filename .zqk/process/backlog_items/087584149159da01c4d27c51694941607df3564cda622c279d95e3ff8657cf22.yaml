@@ -1,0 +1,35 @@
+acceptance_considerations: SKU overlay owns LICENSE, NOTICE, SECURITY, CI, and public gate files; apply and scratch-sync paths install that overlay; include manifests omit .goreleaser.yaml; an isolated test proves installed files match canonical SKU sources and the payload gate passes.
+artifacts:
+    - scripts/open-core/install-community-sku.sh
+created_at: "2026-09-18T08:11:40Z"
+created_by: ACC-1785920548450214012-68b850c0
+criteria_refs:
+    - CRIT-1789719098362564000-fd05f1e4
+    - CRIT-1789719098362565000-21b9314b
+    - CRIT-1789719098362566000-f65356cc
+description: 'Implementation and verification pipeline for: Community release-owned files survive source overlay and scratch export'
+estimated_effort: 4 hours
+id: BLI-1789719098362564000-5d642bab
+kind: backlog_item
+milestone_refs:
+    - MIL-1789672699275510000-40c8cee7
+namespace_id: zqk:kernel
+persona_refs:
+    - PER-DEFAULT-OPERATOR
+priority: high
+priority_plan_ref: PRI-1789719072200916000-6b682b97
+priority_tier: P0
+problem_statement: Current overlay manifests still copy .goreleaser.yaml and overwrite dest LICENSE/NOTICE from Studio, so the next refresh can undo the public release gate.
+requirement_refs:
+    - REQ-1789719098278011000-1e222c7b
+schema_version: 2.0.0
+stakeholders:
+    - team-core
+started_at: "2026-09-18T08:16:31Z"
+status: testing
+title: 'Implement: Community release-owned files survive source overlay and scratch export'
+updated_at: "2026-09-18T08:16:31Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs:
+    - WS-1789631797993326000-f9951fe8

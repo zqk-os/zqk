@@ -85,9 +85,10 @@ INCLUDES=(
   "scripts/default_agent_skills"
   ".zqk/specs"
   ".zqk/cli/specs"
-  ".goreleaser.yaml"
+  ".github/workflows/ci.yml"
   ".gitignore"
   "NOTICE"
+  "SECURITY.md"
   "Makefile"
   "go.mod"
   "go.sum"
@@ -153,6 +154,10 @@ if [ -f "$CANDIDATE_DIR/.gitignore" ]; then
   grep -Ev '^\*-\*\.txt$|^\*test\*\.txt$|^\*_results\.txt$' "$CANDIDATE_DIR/.gitignore" > "$CANDIDATE_DIR/.gitignore.tmp" && mv "$CANDIDATE_DIR/.gitignore.tmp" "$CANDIDATE_DIR/.gitignore"
 fi
 
+if [ -x "$CANDIDATE_DIR/scripts/open-core/install-community-sku.sh" ]; then
+  sh "$CANDIDATE_DIR/scripts/open-core/install-community-sku.sh" "$CANDIDATE_DIR"
+fi
+
 echo "Scrubbing internal studio kernel IDs (G15) from candidate tree..."
 python3 - "$CANDIDATE_DIR" << 'EOF'
 import sys, os, re
@@ -185,7 +190,7 @@ echo "Running police checks..."
 sh "$REPO_ROOT/scripts/open-core/police-community-tree.sh" "$CANDIDATE_DIR"
 
 echo "Verifying payload gate..."
-sh "$REPO_ROOT/scripts/check-public-release-payload.sh" "$CANDIDATE_DIR"
+sh "$CANDIDATE_DIR/scripts/open-core/check-public-release-payload.sh" "$CANDIDATE_DIR"
 
 echo "Candidate sync complete at $CANDIDATE_DIR"
 

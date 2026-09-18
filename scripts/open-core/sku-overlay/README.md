@@ -105,6 +105,7 @@ If you run init a second time in the same directory:
 - [First-run object tutorial](./docs/onboarding/FIRST_RUN_OBJECT_TUTORIAL.md)
 - [Architecture](./docs/architecture/README.md)
 - [Contributing](./CONTRIBUTING.md)
+- [Security policy](./SECURITY.md)
 
 ### License
 
