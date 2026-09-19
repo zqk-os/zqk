@@ -19,6 +19,7 @@ import (
 	"github.com/zqk-os/zqk/cmd/zqk/healthchk"
 	"github.com/zqk-os/zqk/cmd/zqk/inbox"
 	"github.com/zqk-os/zqk/cmd/zqk/intake"
+	"github.com/zqk-os/zqk/cmd/zqk/job"
 	"github.com/zqk-os/zqk/cmd/zqk/keystore"
 	"github.com/zqk-os/zqk/cmd/zqk/learn"
 	matrixcmd "github.com/zqk-os/zqk/cmd/zqk/matrix"
@@ -268,6 +269,16 @@ func registerCommands() {
 	opsCmdInst := ops.NewOpsCmd()
 	opsCmdInst.GroupID = "advanced"
 	rootCmd.AddCommand(opsCmdInst)
+
+	// Service management: background supervisor, host units, and daemon lifecycles
+	serviceCmdInst := scheduler.NewServiceCmd()
+	serviceCmdInst.GroupID = "advanced"
+	rootCmd.AddCommand(serviceCmdInst)
+
+	// Job management: background scheduler job triggers, queues, history, and status
+	jobCmdInst := job.NewJobCmd()
+	jobCmdInst.GroupID = "advanced"
+	rootCmd.AddCommand(jobCmdInst)
 
 	// Policy management
 

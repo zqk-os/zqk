@@ -1,0 +1,75 @@
+$schema: "../schemas/command_spec.schema.json"
+
+name: "activity"
+short: "Show recent job activity including started but not completed jobs"
+description: |
+  Show recent scheduler job activity: data freshness, missed triggers, stuck jobs, per-job summaries, and a flat recent event list.
+
+help:
+  short: "Show recent job activity including started but not completed jobs"
+  description:
+    - "Show recent scheduler job activity including:"
+    - "- Data freshness (oldest/newest loaded event) and busyness"
+    - "- Missed timer triggers with schedule, approximate interval, and severity hints"
+    - "- Jobs started but not completed (with running-duration and likely-health note)"
+    - "- Timer jobs: cron field breakdown and link to cron format docs"
+    - "- One row per job with latest started/completed/failed (relative times)"
+    - "- Flat recent event list (relative times)"
+    - ""
+    - "This helps validate cache refreshes, spot stuck runs, and interpret missed slots in context."
+  examples:
+    - comment: "Show recent activity"
+      command: "%s scheduler activity"
+    - comment: "Filter to one job and show more events"
+      command: "%s scheduler activity --job-id SCH-001 --limit 50"
+    - comment: "Re-print activity every 10 seconds until interrupted"
+      command: "%s scheduler activity --watch 10s"
+    - comment: "Only events from the last 24 hours (duration) or since an instant"
+      command: "%s scheduler activity --since 24h"
+    - comment: "Narrow table layout"
+      command: "%s scheduler activity --compact"
+    - comment: "Tune stuck-job labels (shorter run = likely healthy, longer = investigate)"
+      command: "%s scheduler activity --stuck-recent-after 5m --stuck-stale-after 1h"
+  exclude_flags:
+    - "format"
+    - "output"
+    - "verbose"
+    - "quiet"
+    - "timeout"
+    - "columns"
+
+flags:
+  - name: "limit"
+    type: "int"
+    default: 20
+    description: "Maximum number of recent events to show"
+  - name: "job-id"
+    type: "string"
+    description: "Filter by specific job ID (optional)"
+  - name: "bypass-cache"
+    type: "bool"
+    default: false
+    description: "Bypass cache and query audit events directly (slower, but more complete for small datasets)"
+  - name: "watch"
+    type: "duration"
+    default: "0"
+    description: "If greater than zero, re-print activity after this interval until interrupted (e.g. 10s)"
+  - name: "since"
+    type: "string"
+    description: "Only include events on or after this instant: RFC3339 timestamp, or a duration ago (e.g. 24h, 30m)"
+  - name: "stuck-recent-after"
+    type: "duration"
+    default: "2m"
+    description: "For started-but-not-completed: runs shorter than this are labeled likely healthy in-flight"
+  - name: "stuck-stale-after"
+    type: "duration"
+    default: "30m"
+    description: "For started-but-not-completed: runs longer than this are labeled investigate"
+  - name: "compact"
+    type: "bool"
+    default: false
+    description: "Use narrower job ID column and table width"
+
+run_e: "runActivity"
+async: true
+common_flags: true

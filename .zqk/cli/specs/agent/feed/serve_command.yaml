@@ -1,0 +1,36 @@
+$schema: "../schemas/command_spec.schema.json"
+
+name: "serve"
+short: "Serve private HTTP API for agent_feed (IDE-optional)"
+description: |
+  Starts a node-local HTTP listener for steer / ack / pending against the same
+  agent_feed contract as CLI and MCP. Default bind is loopback. Set --token for
+  Authorization: Bearer auth (recommended outside pure localhost).
+
+flags:
+  - name: "listen"
+    type: "string"
+    default: "127.0.0.1:8787"
+    description: "host:port to bind (prefer loopback for private API)"
+  - name: "token"
+    type: "string"
+    default: ""
+    description: "Optional bearer token required on feed routes (health stays open)"
+
+args:
+  type: "no_args"
+
+help:
+  examples:
+    - comment: "Private loopback feed API"
+      command: "%s feed serve --listen 127.0.0.1:8787"
+    - comment: "Require bearer token"
+      command: "%s feed serve --listen 127.0.0.1:8787 --token \"$FEED_TOKEN\""
+  exclude_flags:
+    - "columns"
+    - "ignore-scheduler-down"
+    - "format"
+    - "output"
+
+run_e: "runFeedServe"
+common_flags: true

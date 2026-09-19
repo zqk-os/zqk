@@ -52,5 +52,14 @@ func NewConvergenceCmd() *cobra.Command {
 	nestStatusCmd.Flags().Int("max-depth", 0, "Maximum tree depth")
 	cmd.AddCommand(nestStatusCmd)
 
+	// Add record-cvs-orchestrate-run subcommand
+	cmd.AddCommand(scheduler.NewRecordCvsOrchestrateRunCmd())
+
+	// Add convergence measure / overseer subcommands
+	schedConv := scheduler.NewSchedulerConvergenceCmd()
+	for _, sub := range schedConv.Commands() {
+		cmd.AddCommand(sub)
+	}
+
 	return cmd
 }

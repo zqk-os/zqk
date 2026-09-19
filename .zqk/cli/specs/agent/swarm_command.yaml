@@ -1,0 +1,27 @@
+$schema: "schemas/command_spec.schema.json"
+
+name: "swarm"
+short: "Multi-agent swarm observability and throughput"
+description: |
+  Operator surface for MMORCH-style swarm health: task/instruction inventory,
+  persona skill-binding readiness, and CAP dispatch posture.
+
+  Prefer this over ad-hoc object list greps when checking whether the swarm
+  is executing or idle.
+
+help:
+  examples:
+    - comment: "Swarm dashboard (JSON)"
+      command: "%s swarm status --format json"
+    - comment: "Table summary"
+      command: "%s swarm status"
+  exclude_flags:
+    - "output"
+    - "quiet"
+    - "timeout"
+    - "columns"
+
+common_flags: false
+subcommands:
+  - name: status
+    spec_ref: swarm/status_command.yaml

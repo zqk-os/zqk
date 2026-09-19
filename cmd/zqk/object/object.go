@@ -3,10 +3,11 @@ package object
 import (
 	"fmt"
 
+	"github.com/spf13/cobra"
+	"github.com/zqk-os/zqk/cmd/zqk/spec"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
 	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
 	"github.com/zqk-os/zqk/pkg/paths"
-	"github.com/spf13/cobra"
 )
 
 const emptyValue = ""
@@ -112,6 +113,7 @@ Examples:
 	add(NewSPlanCmd(), objectHelpGroupShortcuts)
 	add(NewWstransCmd(), objectHelpGroupShortcuts)
 	add(NewEvomanCmd(), objectHelpGroupShortcuts)
+	add(spec.NewSpecCmd(), objectHelpGroupShortcuts)
 
 	return objectCmd
 }

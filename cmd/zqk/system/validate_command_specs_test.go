@@ -1,8 +1,10 @@
 package system
 
 import (
+	"encoding/json"
 	"os/exec"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/zqk-os/zqk/internal/cli"
@@ -92,5 +94,97 @@ func TestRunValidateCommandSpecs_BinaryIntegration(t *testing.T) {
 	out, err := exec.Command(binPath, "system", "validate-command-specs").CombinedOutput()
 	if err != nil {
 		t.Fatalf("zqk system validate-command-specs failed: %v\nOutput: %s", err, string(out))
+	}
+}
+
+func TestCLITaxonomyGovernance_StandardsAndPersonas(t *testing.T) {
+	root := cli.ResolveProjectRoot(".")
+	if root == "" {
+		t.Skip("not running inside a valid project root")
+	}
+
+	standardsDoc := filepath.Join(root, "docs", "architecture", "CLI_COMMAND_TAXONOMY_STANDARDS.md")
+	data, err := fileutil.ReadFile(standardsDoc)
+	if err != nil {
+		t.Fatalf("failed to read CLI taxonomy standards doc: %v", err)
+	}
+
+	content := string(data)
+	if len(content) < 500 {
+		t.Fatalf("CLI taxonomy standards doc too short (%d bytes)", len(content))
+	}
+
+	requiredTokens := []string{
+		"DOC-CLI-COMMAND-TAXONOMY-STANDARDS-001",
+		"PER-INFORMATION-ARCHITECT",
+		"PER-TECHNICAL-DOCUMENTARIAN",
+		"REQ-CLI-TAXONOMY-HARMONIZATION-001",
+		"100% Declarative Spec Coverage Mandatory",
+	}
+
+	for _, token := range requiredTokens {
+		if !strings.Contains(content, token) {
+			t.Errorf("standards doc missing required governance token: %q", token)
+		}
+	}
+}
+
+func TestCommandSpecPolicingAudit_ZeroNewDrift(t *testing.T) {
+	root := cli.ResolveProjectRoot(".")
+	if root == "" {
+		t.Skip("not running inside a valid project root")
+	}
+
+	binPath := filepath.Join(root, "bin", "zqk")
+	if _, err := fileutil.Stat(binPath); err != nil {
+		t.Skip("bin/zqk not found, skipping binary audit test")
+	}
+
+	out, err := exec.Command(binPath, "system", "validate-command-specs", "--format", "json").CombinedOutput()
+	if err != nil {
+		t.Fatalf("zqk system validate-command-specs failed: %v\nOutput: %s", err, string(out))
+	}
+
+	var summary commandSpecCoverageSummary
+	if err := json.Unmarshal(out, &summary); err != nil {
+		t.Fatalf("failed to parse validate-command-specs output: %v\nOutput: %s", err, string(out))
+	}
+
+	if !summary.Valid {
+		t.Fatalf("expected valid command spec coverage, got invalid: %+v", summary)
+	}
+	if summary.NewDriftCount != 0 {
+		t.Fatalf("expected 0 new drift, got %d", summary.NewDriftCount)
+	}
+}
+
+func TestRollupCLITaxonomyOverhaul_Integration(t *testing.T) {
+	root := cli.ResolveProjectRoot(".")
+	if root == "" {
+		t.Skip("not running inside a valid project root")
+	}
+
+	binPath := filepath.Join(root, "bin", "zqk")
+	if _, err := fileutil.Stat(binPath); err != nil {
+		t.Skip("bin/zqk not found, skipping integration test")
+	}
+
+	testCases := [][]string{
+		{"job", "--help"},
+		{"service", "--help"},
+		{"convergence", "--help"},
+		{"agent", "swarm", "--help"},
+		{"agent", "feed", "--help"},
+		{"object", "spec", "--help"},
+	}
+
+	for _, tc := range testCases {
+		out, err := exec.Command(binPath, tc...).CombinedOutput()
+		if err != nil {
+			t.Fatalf("command failed: zqk %v: %v\nOutput: %s", tc, err, string(out))
+		}
+		if len(out) == 0 {
+			t.Errorf("command returned empty output: zqk %v", tc)
+		}
 	}
 }

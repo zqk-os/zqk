@@ -1,0 +1,20 @@
+$schema: ../schemas/command_spec.schema.json
+name: fields <kind>
+short: Inspect field schema and validation rules for an object kind
+description: List all fields and their types, permissions, validation rules, and purposes for an object kind specification.
+
+args:
+  type: exact
+  count: 1
+
+flags:
+  - name: raw
+    type: bool
+    default: false
+    description: Show raw spec fields without resolving inheritance
+  - name: required-only
+    type: bool
+    default: false
+    description: Show only required fields
+
+common_flags: true

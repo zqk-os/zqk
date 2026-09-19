@@ -1,0 +1,22 @@
+$schema: "_schemas/command_spec.schema.json"
+
+name: "job"
+short: "Background scheduler job triggers, queues, history, and status"
+description: |
+  Inspect and manage background scheduler jobs, queues, execution history, activity,
+  and configuration. Reorganizes scheduler operational surfaces under a canonical
+  Job Management domain.
+
+help:
+  examples:
+    - comment: "List available scheduler jobs"
+      command: "%s job list"
+    - comment: "Trigger a scheduled job execution"
+      command: "%s job trigger <job-id>"
+    - comment: "Inspect recent job execution activity"
+      command: "%s job activity"
+
+common_flags: true
+requires_storage: false
+requires_session: false
+requires_scheduler_check: false

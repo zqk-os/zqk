@@ -1,0 +1,39 @@
+$schema: "../schemas/command_spec.schema.json"
+
+name: "config"
+short: "Show or set scheduler config (jobs_paused)"
+description: |
+  Show or update scheduler configuration (e.g. jobs_paused).
+  
+  Without flags, shows the current config. Use --jobs-paused or --no-jobs-paused to set jobs_paused.
+  When jobs_paused is true, the scheduler (after restart) will not run timer or immediate jobs;
+  only manually triggered jobs run. Restart the scheduler for changes to take effect.
+
+flags:
+  - name: "jobs-paused"
+    type: "bool"
+    default: false
+    description: "Set jobs_paused to true (no timer/immediate jobs; only manual trigger)"
+  - name: "no-jobs-paused"
+    type: "bool"
+    default: false
+    description: "Set jobs_paused to false (normal scheduling)"
+
+help:
+  examples:
+    - comment: "Show current scheduler config"
+      command: "%s scheduler config"
+    - comment: "Pause automatic jobs (only manual trigger runs after restart)"
+      command: "%s scheduler config --jobs-paused"
+    - comment: "Resume normal scheduling"
+      command: "%s scheduler config --no-jobs-paused"
+  exclude_flags:
+    - "format"
+    - "output"
+    - "verbose"
+    - "quiet"
+    - "timeout"
+    - "columns"
+
+run_e: "runConfig"
+common_flags: true

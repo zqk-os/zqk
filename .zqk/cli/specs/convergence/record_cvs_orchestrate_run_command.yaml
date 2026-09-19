@@ -1,0 +1,45 @@
+$schema: "../schemas/command_spec.schema.json"
+
+name: "record-cvs-orchestrate-run"
+short: "Append one validated cvs_orchestrate_run_v1 JSON line (stdin) to the orchestrate JSONL log"
+description: |
+  Reads a single JSON object from stdin (one line; schema_version must be cvs_orchestrate_run_v1),
+  validates it, and appends one compact line to .zqk/logs/scheduler/cvs_orchestrate_runs.jsonl
+  unless --jsonl-path overrides the destination.
+
+  This is the in-repo implementation of the durable observability event for
+  scripts/cvs_convergence_orchestrate.sh: the shell builds the JSON (same fields as before) and
+  pipes it here so validation and file append live in Go alongside rollup_status_core.jsonl-style
+  append-only logs. observability.Recorder backends remain optional; the JSONL file is the
+  contract for operators and tooling.
+
+  See docs/architecture/CONVERGENCE_ORCHESTRATION_AND_NESTED_CVS.md (Appendix D).
+
+help:
+  examples:
+    - comment: "Append a line produced by the orchestrate script (normally invoked by the script, not by hand)"
+      command: 'echo ''{"schema_version":"cvs_orchestrate_run_v1","ended_at_ms":1,"duration_ms":1,"cvs_id":"CVS-x","exit_code":0,"stage":"rollup","persist_skipped":false,"persist_failed":false}'' | %s scheduler record-cvs-orchestrate-run'
+  exclude_flags:
+    - "format"
+    - "output"
+    - "verbose"
+    - "quiet"
+    - "timeout"
+    - "columns"
+
+flags:
+  - name: "jsonl-path"
+    type: "string"
+    default: ""
+    description: "Override JSONL path (default: .zqk/logs/scheduler/cvs_orchestrate_runs.jsonl under project root)"
+  - name: "dry-run"
+    type: "bool"
+    default: false
+    description: "Validate stdin JSON only; do not append"
+
+run_e: "runRecordCvsOrchestrateRun"
+async: true
+common_flags: true
+requires_scheduler_check: false
+requires_storage: false
+requires_session: false
