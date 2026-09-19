@@ -57,7 +57,7 @@ func EnsureBundledObjectSpecsMigrated(ctx context.Context, projectRoot string, l
 	}
 
 	secCtx := pkgctx.NewSystemSecurityContext()
-	migrateCtx := storage.WithSyncCreateForKind(ctx, objects.KindObjectSpec)
+	migrateCtx := pkgctx.WithPromoteOnCreate(storage.WithSyncCreateForKind(ctx, objects.KindObjectSpec))
 
 	var firstErr error
 
@@ -121,8 +121,7 @@ func EnsureBundledObjectSpecsMigrated(ctx context.Context, projectRoot string, l
 
 				return nil
 			}
-			// Create mutates want's status to preliminary origin; capture leave status first.
-			// TRACK: BLI-1785443942668406000-1ec5c811 — draft-plane create / promote membrane.
+			// Create mutates want's status to preliminary origin unless WithPromoteOnCreate is set.
 			leaveStatus := objects.GetString(want, objects.FieldKeyStatus)
 			if cerr := store.Create(migrateCtx, secCtx, want); cerr != nil {
 				stats.Errors++
@@ -135,9 +134,10 @@ func EnsureBundledObjectSpecsMigrated(ctx context.Context, projectRoot string, l
 
 				return nil
 			}
-			if leaveStatus != "" {
-				// Create lands on origin (proposed). Walk legal base_object hops
-				// to the seeded leave status (implemented) — do not skip.
+			createdStatus := objects.GetString(want, objects.FieldKeyStatus)
+			if leaveStatus != "" && createdStatus != leaveStatus {
+				// Create landed on preliminary origin; walk legal base_object hops
+				// to the seeded leave status.
 				if uerr := promoteBundledObjectSpecLeaveStatus(migrateCtx, store, secCtx, id, leaveStatus); uerr != nil {
 					stats.Errors++
 					if firstErr == nil {

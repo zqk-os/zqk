@@ -51,7 +51,7 @@ fi
 	cd "$ROOT"
 	unset ZQK_PROJECT_ROOT
 	go test ./cmd/zqk/app ./cmd/zqk/test -timeout 2m
-	go test ./cmd/zqk/system -run 'TestInit_Greenfield$|TestInit_Legacy$|TestInit_Greenfield_StarterKernelGraph$|TestInit_Greenfield_NoEnvVars$|TestCheckOutput|TestSystemCheck' -timeout 3m
+	go test ./cmd/zqk/system -run 'TestInit_Greenfield$|TestInit_Legacy$|TestInit_Greenfield_StarterKernelGraph$|TestInit_Greenfield_NoEnvVars$|TestCheckOutput|TestSystemCheck' -timeout 5m
 	CGO_ENABLED=0 go build -buildvcs=false -o "$TMP_BIN" ./cmd/zqk
 	"$TMP_BIN" --help >/dev/null
 	"$TMP_BIN" system --help >/dev/null

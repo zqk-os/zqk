@@ -64,6 +64,10 @@ func AutoInstall(projectRoot string, logger logging.Logger) error {
 		return fmt.Errorf("failed to get user home directory: %w", err)
 	}
 
+	if zqkenv.IsInTest() || zqkenv.TestRoot().Get() != "" {
+		homeDir = ""
+	}
+
 	configs := findMCPConfigs(homeDir, projectRoot)
 
 	successCount := 0
@@ -94,11 +98,13 @@ func findMCPConfigs(homeDir, projectRoot string) map[string]string {
 		// Cursor 2026 Customize reads project .cursor/mcp.json (not only .ide/).
 		configs["Cursor (Workspace)"] = filepath.Join(projectRoot, ".cursor", "mcp.json")
 	}
-	if homeDir != "" {
-		// Relocated MCP controls (Customize sidebar) edit ~/.cursor/mcp.json.
-		// Empty global mcpServers leaves the connector red even when project file is valid.
-		configs["Cursor (Global)"] = filepath.Join(homeDir, ".cursor", "mcp.json")
+	if homeDir == "" {
+		return configs
 	}
+
+	// Relocated MCP controls (Customize sidebar) edit ~/.cursor/mcp.json.
+	// Empty global mcpServers leaves the connector red even when project file is valid.
+	configs["Cursor (Global)"] = filepath.Join(homeDir, ".cursor", "mcp.json")
 
 	knownFiles := map[string]string{
 		"mcp_config.json":            "Global Daemon (AGY/Windsurf)",
@@ -115,10 +121,20 @@ func findMCPConfigs(homeDir, projectRoot string) map[string]string {
 	}
 
 	if runtime.GOOS == "darwin" {
-		searchDirs = append(searchDirs, filepath.Join(homeDir, "Library", "Application Support"))
+		searchDirs = append(searchDirs,
+			filepath.Join(homeDir, "Library", "Application Support", "Claude"),
+			filepath.Join(homeDir, "Library", "Application Support", "Cursor"),
+			filepath.Join(homeDir, "Library", "Application Support", "Code"),
+			filepath.Join(homeDir, "Library", "Application Support", "Windsurf"),
+		)
 	} else if runtime.GOOS == "windows" {
 		if appData := zqkenv.OSAppData().Get(); appData != "" {
-			searchDirs = append(searchDirs, appData)
+			searchDirs = append(searchDirs,
+				filepath.Join(appData, "Claude"),
+				filepath.Join(appData, "Cursor"),
+				filepath.Join(appData, "Code"),
+				filepath.Join(appData, "Windsurf"),
+			)
 		}
 	}
 
