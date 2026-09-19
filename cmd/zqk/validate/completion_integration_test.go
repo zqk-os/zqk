@@ -20,8 +20,9 @@ import (
 
 func TestVerifyCompletionIntegration(t *testing.T) {
 	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{
-		Kind:            "cmd.validate.verify_completion",
-		SeedSchemaPlane: true,
+		Kind:                     "cmd.validate.verify_completion",
+		SeedSchemaPlane:          true,
+		ForceRemoveRootOnCleanup: true,
 	})
 	fs := proj.FileStorage
 
@@ -73,15 +74,15 @@ func TestVerifyCompletionIntegration(t *testing.T) {
 
 	reqID := "REQ-1"
 	reqObj := map[string]any{
-		objects.FieldKeyKind:            objects.KindRequirement,
-		objects.FieldKeyID:              reqID,
-		objects.FieldKeyTitle:           "Integration requirement",
-		objects.FieldKeyDescription:     "Verify completion hashes propagate to linked objects.",
-		objects.FieldKeyStatus:          objects.ObjectStatusProposed,
-		objects.FieldKeyBacklogItemRefs: []string{bliID},
-		objects.FieldKeyGoalRefs:        []string{goalID},
-		objects.FieldKeyCriteriaRefs:    []string{acID},
-		objects.FieldKeySchemaVersion:   objects.DefaultSchemaVersion,
+		objects.FieldKeyKind:          objects.KindRequirement,
+		objects.FieldKeyID:            reqID,
+		objects.FieldKeyTitle:         "Integration requirement",
+		objects.FieldKeyDescription:   "Verify completion hashes propagate to linked objects.",
+		objects.FieldKeyStatus:        objects.ObjectStatusProposed,
+		objects.FieldKeyPriority:      "p1",
+		objects.FieldKeyGoalRefs:      []string{goalID},
+		objects.FieldKeyCriteriaRefs:  []string{acID},
+		objects.FieldKeySchemaVersion: objects.DefaultSchemaVersion,
 	}
 
 	// TRACK: BLI-1785443942668406000-1ec5c811 — draft-plane create / promote membrane.

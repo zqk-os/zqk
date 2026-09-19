@@ -19,7 +19,7 @@ func TestCollectFilesByKind(t *testing.T) {
 	// Create a temporary test directory structure
 	tmpDir := t.TempDir()
 	processDir := datacell.ProcessPrimaryDir(tmpDir)
-	backlogDir := filepath.Join(processDir, "backlog")
+	backlogDir := filepath.Join(processDir, "backlog_items")
 
 	// Create test files
 	if err := fileutil.MkdirAll(backlogDir, paths.DirPerm755); err != nil {

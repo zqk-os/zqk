@@ -206,6 +206,18 @@ func IsCompositionFieldAllowed(kind, field string, spec *Spec) bool {
 			return true
 		}
 	}
+	if kind == KindTestCase {
+		switch field {
+		case "verification_hash", "verified_artifact_refs":
+			return true
+		}
+	}
+	if kind == KindRequirement {
+		switch field {
+		case "verification_hash":
+			return true
+		}
+	}
 	if kind == KindZqkSession {
 		switch field {
 		case FieldKeyAgreementMode,

@@ -393,6 +393,20 @@ func copyCliSpecsTree(srcRoot, dstRoot string) error {
 		if d.IsDir() {
 			return fileutil.EnsureDir(out)
 		}
+		if d.Type()&fs.ModeSymlink != 0 {
+			target, readlinkErr := os.Readlink(path)
+			if readlinkErr == nil {
+				_ = os.Remove(out)
+				if err := fileutil.EnsureDir(filepath.Dir(out)); err != nil {
+					return err
+				}
+				return os.Symlink(target, out)
+			}
+			info, statErr := fileutil.Stat(path)
+			if statErr == nil && info.IsDir() {
+				return fileutil.EnsureDir(out)
+			}
+		}
 		data, err := fileutil.ReadFile(path)
 		if err != nil {
 			return err
