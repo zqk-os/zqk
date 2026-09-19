@@ -46,6 +46,16 @@ func (s *AmbientIngestService) MapToSystemObject(event Event) (string, string) {
 
 // Ingest ingests an ambient event into the Knowledge Kernel by mapping to discrete system objects and emitting an audit_event.
 func (s *AmbientIngestService) Ingest(ctx context.Context, event Event) error {
+	if event.Type == EventTypeFilesystem {
+		if payloadMap, ok := event.Payload.(map[string]any); ok {
+			if target, ok := payloadMap[objects.FieldKeyTargetID].(string); ok {
+				if isIgnoredFSPath(target) {
+					return nil
+				}
+			}
+		}
+	}
+
 	targetKind, targetURI := s.MapToSystemObject(event)
 
 	metadata := map[string]any{

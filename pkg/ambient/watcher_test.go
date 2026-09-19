@@ -68,7 +68,35 @@ func TestFSWatcher_FiltersNoise(t *testing.T) {
 	case evt := <-received:
 		payload := evt.Payload.(map[string]any)
 		t.Fatalf("received unexpected event for ignored file: %v", payload[objects.FieldKeyTargetID])
-	case <-time.After(1 * time.Second):
+	case <-time.After(500 * time.Millisecond):
 		// Success: timeout means the event was properly filtered
+	}
+
+	// Action 3: Write to internal .zqk directory (must never trigger ambient event feedback loop)
+	zqkDir := filepath.Join(tmpDir, ".zqk", "process", "audit")
+	_ = fileutil.EnsureDir(zqkDir)
+	zqkAuditFile := filepath.Join(zqkDir, "event.yaml")
+	_ = fileutil.WriteSecureFile(zqkAuditFile, []byte("id: AUD-1"))
+
+	select {
+	case evt := <-received:
+		payload := evt.Payload.(map[string]any)
+		t.Fatalf("received unexpected event for internal .zqk file: %v", payload[objects.FieldKeyTargetID])
+	case <-time.After(500 * time.Millisecond):
+		// Success: timeout means the .zqk event was properly filtered
+	}
+
+	// Action 4: Write to internal .zqk-state directory
+	zqkStateDir := filepath.Join(tmpDir, ".zqk-state")
+	_ = fileutil.EnsureDir(zqkStateDir)
+	zqkStateFile := filepath.Join(zqkStateDir, "system-state.csnap")
+	_ = fileutil.WriteSecureFile(zqkStateFile, []byte("state-blob"))
+
+	select {
+	case evt := <-received:
+		payload := evt.Payload.(map[string]any)
+		t.Fatalf("received unexpected event for internal .zqk-state file: %v", payload[objects.FieldKeyTargetID])
+	case <-time.After(500 * time.Millisecond):
+		// Success: timeout means the .zqk-state event was properly filtered
 	}
 }
