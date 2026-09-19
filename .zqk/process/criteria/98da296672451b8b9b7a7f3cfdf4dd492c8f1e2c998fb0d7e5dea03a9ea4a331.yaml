@@ -8,9 +8,9 @@ namespace_id: zqk:kernel
 origin_project: zqk
 origin_system: zqk
 schema_version: 2.0.0
-status: awaiting_verification
+status: complete
 title: 'Verify: Dynamic membrane demo showcases live fail-closed trapping of out-of-boundary path traversal and prompt injection - Boundary & Error Handling'
-updated_at: "2026-09-19T04:24:30Z"
+updated_at: "2026-09-19T04:37:51Z"
 updated_by: ACC-1785920548450214012-68b850c0
 validation_method: automated_test
 version_context: default

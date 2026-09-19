@@ -17,6 +17,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/lifecycle"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/process"
 	"github.com/zqk-os/zqk/pkg/storage"
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"github.com/zqk-os/zqk/pkg/zqkenv"
@@ -254,6 +255,19 @@ func ExecuteSubprocess(ctx context.Context, inv CriterionInvocation) CriterionRu
 			time.Sleep(50 * time.Millisecond)
 			_ = syscall.Kill(pgid, syscall.SIGKILL)
 		case <-done:
+		}
+	})
+
+	activityTicker := time.NewTicker(time.Second)
+	defer activityTicker.Stop()
+	goroutinelabels.NewGoroutine("testrunner.activity_ticker", "keep process watchdog alive during test execution").StartSimple(func() {
+		for {
+			select {
+			case <-activityTicker.C:
+				process.TouchMeaningfulActivity()
+			case <-done:
+				return
+			}
 		}
 	})
 

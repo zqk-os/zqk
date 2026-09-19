@@ -1,5 +1,6 @@
 backlog_item_refs:
     - BLI-1789791788492678000-118045e3
+completed_at: "2026-09-19T04:36:30Z"
 created_at: "2026-09-19T04:23:09Z"
 created_by: ACC-1785920548450214012-68b850c0
 criteria_refs:
@@ -11,11 +12,13 @@ id: TST-1789791788492678001-4a09e6ed
 kind: test_case
 namespace_id: zqk:kernel
 path_or_id: cmd/zqk/system/init_starter_graph_test.go
+remaining_open_count: 0
 requirement_refs:
     - REQ-1789791788373194000-c0430a6a
 schema_version: 2.0.0
-status: originated
+started_at: "2026-09-19T04:23:09Z"
+status: complete
 title: 'Test Suite: Day-0 onboarding demo showcases instant project initialization, starter graph, and health validation in under 3 seconds'
-updated_at: "2026-09-19T04:29:25Z"
+updated_at: "2026-09-19T04:36:30Z"
 updated_by: ACC-1785920548450214012-68b850c0
 version_context: default

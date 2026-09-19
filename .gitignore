@@ -125,21 +125,27 @@ cmd/zqk/utility/pkg/
 
 # Process data (will be managed by CLI)
 .zqk/process/**/*.hashes
+.zqk/process/**/.*.hashes
 .zqk/process/**/.hashes
 .zqk/process/**/*.index
+.zqk/process/**/.*.index
 .zqk/process/**/.corporate_initiative.index.tmp-*
 .zqk/process/**/*.yaml.tmp-*
 docs/process/**/*.hashes
+docs/process/**/.*.hashes
 docs/process/**/.hashes
 docs/process/**/*.index
+docs/process/**/.*.index
 # Corporate initiative index builder temps (atomic write before rename)
 docs/process/**/.corporate_initiative.index.tmp-*
 docs/process/**/*.yaml.tmp-*
 
 # Lock files (temporary, auto-cleaned by FileLockStrategy)
 .zqk/process/**/*.lock
+.zqk/process/**/.*.lock
 .zqk/process/**/.lock
 docs/process/**/*.lock
+docs/process/**/.*.lock
 docs/process/**/.lock
 
 # Audit events (high-volume, system-generated - not suitable for version control)
@@ -177,8 +183,8 @@ docs/process/scheduler_jobs/
 .zqk/system-health/
 
 # MCP session dumps (runtime artifacts)
-.zqk/process/mcp_sessions/MCP-*.yaml
-docs/process/mcp_sessions/MCP-*.yaml
+.zqk/process/mcp_sessions/
+docs/process/mcp_sessions/
 # Local .zqk used by cmd/zqk/internal (runtime)
 cmd/zqk/internal/.zqk/
 # Nested .zqk and docs under package dirs must not be used as project root; ignore if created by mistake

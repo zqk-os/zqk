@@ -1,3 +1,4 @@
+completed_at: "2026-09-19T04:37:29Z"
 created_at: "2026-09-19T04:23:08Z"
 created_by: ACC-1785920548450214012-68b850c0
 criteria_refs:
@@ -12,8 +13,9 @@ kind: requirement
 namespace_id: zqk:kernel
 priority: p2
 schema_version: 2.0.0
-status: active
+started_at: "2026-09-19T04:23:08Z"
+status: complete
 title: Day-0 onboarding demo showcases instant project initialization, starter graph, and health validation in under 3 seconds
-updated_at: "2026-09-19T04:26:41Z"
+updated_at: "2026-09-19T04:37:29Z"
 updated_by: ACC-1785920548450214012-68b850c0
 version_context: default

@@ -32,7 +32,17 @@ echo -e "${BOLD}================================================================
 sleep 1
 
 TMP_PROJECT="$(mktemp -d /tmp/zqk-dayzero-demo-XXXXXX)"
-trap 'rm -rf "$TMP_PROJECT"' EXIT
+cleanup() {
+  if [[ -f "${TMP_PROJECT}/.zqk/ambient/ambient.pid" ]]; then
+    local pid
+    pid=$(cat "${TMP_PROJECT}/.zqk/ambient/ambient.pid" 2>/dev/null || true)
+    if [[ -n "$pid" ]]; then
+      kill "$pid" 2>/dev/null || true
+    fi
+  fi
+  rm -rf "${TMP_PROJECT}" 2>/dev/null || true
+}
+trap cleanup EXIT
 
 echo -e "${BOLD}[SCENE 1: GREENFIELD DIRECTORY CREATION]${NC}"
 echo -e "  Entering empty workspace: ${CYAN}${TMP_PROJECT}${NC}\n"

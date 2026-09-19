@@ -20,6 +20,8 @@ func NewRunCmd() *cobra.Command {
 	cmd := bldr.NewTestRunCommandBuilder()
 	cmd.RunE = func(cmd *cobra.Command, args []string) error {
 			return cli.WithProcessor(func(cmd *cobra.Command, args []string, proc *cli.Processor) error {
+				reconnect := cli.DisconnectTimeoutMonitor()
+				defer reconnect()
 				clipkg.ResetTimeout()
 				all, _ := cmd.Flags().GetBool("all")
 				dryRun, _ := cmd.Flags().GetBool("dry-run")

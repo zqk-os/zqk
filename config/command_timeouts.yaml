@@ -1,0 +1,256 @@
+# Command timeout overrides (pattern → duration)
+# The CLI matches the normalized command (e.g. "zqk pre-commit aggregate") against each
+# pattern (substring). First match wins. Duration uses Go format: 10m, 30s, 1h30m.
+# See: docs/architecture/CLI_PERFORMANCE_AND_CONSISTENCY.md
+#
+# Load order: .zqk/config/command_timeouts.yaml (override) then this file (default).
+# Copy to .zqk/config/command_timeouts.yaml to customize per project.
+#
+# Exception (not in this file): "mcp serve", "mcp daemon", and "mcp proxy" timeouts are
+# read from .zqk/mcp/config.yaml (mcp_server.idle_timeout). That keeps MCP server lifecycle
+# in one place. They are also exempt from the non-zqk-parent 2m childMaxTimeout via
+# TimeoutHook.handleDaemonCommandTimeout (required when ensure/supervise spawn the daemon).
+
+default_max: 4h
+
+rules:
+  # Scheduler stop: quick teardown when not waiting. With --wait, pkg/cli adjusts the outer hook to
+  # cover --max-wait + slack (must match cmd/zqk/scheduler stopScheduler inner wall).
+  - pattern: "scheduler stop"
+    timeout: 30s
+
+  # Object count: namespace-scoped Count walks YAML when filters apply; allow past 10s idle/min floor
+  # for large kinds (doc_entry/glossary_term). TRACK: BLI-1785903709847957000-8c7a991c
+  - pattern: "object count"
+    timeout: 60s
+    idle_shutdown_duration: 60s
+
+  # Object create: single create should be sub-second; allow 15s under load (cold cache, contention) so tests don't hit 10s floor.
+  - pattern: "object create"
+    timeout: 15s
+
+  # Object update: --override TTY confirmation can take >10s; default idle watchdog would
+  # cancel OperationContext mid-phrase (context canceled after "Confirmation accepted").
+  # TRACK: PRI-STABILIZE-FAILCLOSED-READS-001
+  - pattern: "object update"
+    timeout: 2m
+    idle_shutdown_duration: 5m
+
+  # Object delete: Memgraph set-delete is seconds; honor explicit --timeout past the 2m
+  # childMaxTimeout when parent is not zqk (Cursor). Default 60s — not a 10m job.
+  - pattern: "object delete"
+    timeout: 60s
+    child_max_timeout_exempt_if_explicit: true
+    idle_shutdown_duration: 60s
+  - pattern: "object bulk delete"
+    timeout: 60s
+    child_max_timeout_exempt_if_explicit: true
+    idle_shutdown_duration: 60s
+
+  # Object pplan (current/prev/next): simple query; avoid CLI timeout killing it. Target is fast list, not long timeout.
+  - pattern: "object pplan"
+    timeout: 888h
+
+  # Object draft promote: bulk promotion walks validation/CAS for each draft; allow generous
+  # timeout and child-max exemption so studio daemon load does not cause context cancellation.
+  # TRACK: PRI-DRAFT-PROMOTE-TIMEOUT-001 / BLI-1789618716318867000-dc1647b6
+  - pattern: "object draft promote"
+    timeout: 15m
+    child_max_timeout_exempt: true
+    child_max_timeout_exempt_if_explicit: true
+    idle_shutdown_duration: 5m
+
+  # Pre-commit (scheduler jobs): write-result and aggregate can exceed 5m under load
+  - pattern: "pre-commit write-result"
+    timeout: 10m
+  - pattern: "pre-commit aggregate"
+    timeout: 10m
+  - pattern: "<arg> write-result"
+    timeout: 10m
+  - pattern: "<arg> aggregate"
+    timeout: 10m
+
+  # Spec builder generation (schema load, many files)
+  - pattern: "system generate-"
+    timeout: 10m
+
+  # Sync glossary from specs (scans many specs/configs/lifecycles and creates objects)
+  - pattern: "system sync-glossary-from-specs"
+    timeout: 30m
+    child_max_timeout_exempt: true
+    idle_shutdown_duration: 10m
+
+  # Automation docman-sync (universal markdown documentation registration & cryptographic hash sealing)
+  - pattern: "automation docman-sync"
+    timeout: 30m
+    child_max_timeout_exempt: true
+    child_max_timeout_exempt_if_explicit: true
+    idle_shutdown_duration: 5m
+
+  # Retention tolerance (large-scale cleanup); 60m so manual run can finish (47k+ audit_event takes time).
+  # child_max_timeout_exempt: when parent is not zqk (CI/script/IDE), apply full timeout instead of the
+  # 2m cap in timeout_hook_execution (otherwise metrics show 100% timeout despite this 60m rule).
+  - pattern: "system retention-tolerance"
+    timeout: 60m
+    child_max_timeout_exempt: true
+
+  # Aggregate audit: reads/aggregates many audit events; can take 10m+ under load. Avoid metrics baseline (e.g. 5s*3) killing the run.
+  - pattern: "system aggregate-audit"
+    timeout: 60m
+    child_max_timeout_exempt: true
+
+  # Aggregate change journal: similar to audit; 60m so manual run can finish massive backlogs.
+  - pattern: "system aggregate-change-journal"
+    timeout: 60m
+    child_max_timeout_exempt: true
+
+  # Auto-fix pending/batch: processes many files; needs generous time and child-max-timeout exemption
+  - pattern: "system auto-fix-process-pending"
+    timeout: 60m
+    child_max_timeout_exempt: true
+    idle_shutdown_duration: 5m
+  - pattern: "system auto-fix-batch"
+    timeout: 30m
+    child_max_timeout_exempt: true
+    idle_shutdown_duration: 5m
+
+  # Object count report: Count() per kind + disk walk; 10m so it completes on large repos (audit_event fast path helps).
+  # Idle window must cover congruence + integrity budget + filesystem snapshot; default 10s idle watchdog
+  # (when parent is not zqk) otherwise cancels cmd.Context before snapshot starts.
+  - pattern: "system object-count-report"
+    timeout: 10m
+    idle_shutdown_duration: 10m
+
+  # Retention status: the internal count command it calls can take ~11s. Set timeout to 20s to allow for execution.
+  # idle_shutdown_duration must match to prevent early termination of the subprocess.
+  - pattern: "system retention-status"
+    timeout: 20s
+    idle_shutdown_duration: 20s
+
+  # system state-restore: expands and writes 6000+ objects; needs generous timeout and idle window.
+  - pattern: "system state-restore"
+    timeout: 30m
+    child_max_timeout_exempt: true
+    idle_shutdown_duration: 10m
+
+  # system hydrate-graph: expands and writes 6000+ objects to Memgraph; needs generous timeout and idle window.
+  - pattern: "system hydrate-graph"
+    timeout: 30m
+    child_max_timeout_exempt: true
+    idle_shutdown_duration: 10m
+
+
+  # system check: cold path (OID rebuild + CAS warm + 6k validations) regularly exceeds the
+  # 2m childMaxTimeout when parent is Terminal/IDE (not zqk). Always exempt; keep a long idle
+  # window so silent warm/merge does not trip the idle watchdog mid-phase.
+  # TRACK: TDE-SYSCHECK-COLD-REBUILD-IDLE-001
+  - pattern: "system check"
+    child_max_timeout_exempt: true
+    idle_shutdown_duration: 5m
+
+  # Scheduler scan-tests: creates one scheduler_job object per bundle, so cost scales with the
+  # number of packages scanned. Both rules carry the same exemption and idle window because the
+  # cost driver is bundle count, not which flag spelled the request: a --package list of 45
+  # packages is the same bulk-CAS-write work as --all, and only --all used to say so. A 45-package
+  # scan therefore matched the generic rule and was killed at 10m mid-generation, reporting a
+  # timeout that looked like a hang. The idle watchdog, not the total timeout, is what catches a
+  # genuinely stuck scan; the total only bounds how long a large legitimate one may take.
+  - pattern: "scheduler scan-tests --all"
+    timeout: 45m
+    child_max_timeout_exempt: true
+    idle_shutdown_duration: 5m
+  - pattern: "scheduler scan-tests"
+    timeout: 45m
+    child_max_timeout_exempt: true
+    idle_shutdown_duration: 5m
+
+  # Marketing swarm generate: Calls external video generation APIs that can take > 5 minutes
+  - pattern: "marketing swarm generate"
+    timeout: 15m
+    child_max_timeout_exempt: true
+
+  # Observer populate: parses the entire repo and optionally calls the LLM, which can take a long time.
+  - pattern: "observer populate"
+    timeout: 30m
+    idle_shutdown_duration: 30m
+    child_max_timeout_exempt: true
+
+  # Agent orchestrate: coordinates multiple sub-agents and can be long running; requires idle exemption
+  # when called from non-ZQK processes like testing harnesses or parent agents.
+  - pattern: "agent orchestrate"
+    timeout: 4h
+    idle_shutdown_duration: 4h
+    child_max_timeout_exempt: true
+
+  # Agent sync-loop: coordinates multiple sub-agents and can be long running; requires idle exemption
+  # when called from non-ZQK processes like testing harnesses or parent agents.
+  - pattern: "agent sync-loop"
+    timeout: 4h
+    idle_shutdown_duration: 4h
+    child_max_timeout_exempt: true
+
+  # Agent seat-worker: long-lived mesh COMMS daemon supervised by launchd, so the parent is
+  # never zqk and the 10s idle watchdog cancels it between 5s polls (worker exited ~every 12s
+  # and KeepAlive masked it as a restart loop). Runs until stopped.
+  - pattern: "agent seat-worker"
+    timeout: 24h
+    idle_shutdown_duration: 24h
+    child_max_timeout_exempt: true
+
+  # Object daemon (PrivilegedWriter): long-lived RPC helper supervised by launchd, so the parent is
+  # never zqk and the 10s idle watchdog shuts it down between writes. It exits leaving the unix socket
+  # behind, so every later write fails "connection refused" and the CAS membrane goes fail-closed
+  # (object create/update and scheduler scan-tests all break). Runs until stopped.
+  - pattern: "object daemon"
+    timeout: 24h
+    idle_shutdown_duration: 24h
+    child_max_timeout_exempt: true
+
+  # Workflow whats-next: calculates composite metrics and requires idle exemption when called from non-ZQK parents.
+  - pattern: "workflow whats-next"
+    timeout: 30m
+    idle_shutdown_duration: 30m
+    child_max_timeout_exempt: true
+
+  # Workflow gen-trace-pipeline: applies dynamically generated scenarios, which can require long CAS flushes on large graphs.
+  - pattern: "workflow gen-trace-pipeline"
+    timeout: 15m
+    idle_shutdown_duration: 15m
+    child_max_timeout_exempt: true
+
+  # Agent execute: Native Swarm Engine runs multi-turn LLM inference. Stalled executions trigger idle watchdog after 5m.
+  - pattern: "agent execute"
+    timeout: 4h
+    idle_shutdown_duration: 5m
+    child_max_timeout_exempt: true
+
+  # Agent validate: runs tests which can take several minutes; requires idle exemption
+  # and generous timeout when called from non-ZQK parents.
+  - pattern: "agent validate"
+    timeout: 10m
+    idle_shutdown_duration: 10m
+    child_max_timeout_exempt: true
+
+  # Agent next: State transitions can trigger validation hooks. Give it 2m timeout.
+  - pattern: "agent next"
+    timeout: 2m
+
+  # Ops level-up: Runs long LLM evaluations to measure skill convergence.
+  - pattern: "ops level-up"
+    timeout: 30m
+    idle_shutdown_duration: 30m
+    child_max_timeout_exempt: true
+
+  # Test run: running test cases and full verification suites across Go packages.
+  # child_max_timeout_exempt: allow full test run duration when invoked from IDE or parent script.
+  - pattern: "test run"
+    timeout: 30m
+    idle_shutdown_duration: 5m
+    child_max_timeout_exempt: true
+
+  # Test dashboard: interactive pager mode can be kept open indefinitely by the user.
+  - pattern: "test dashboard"
+    timeout: 4h
+    idle_shutdown_duration: 1h
+    child_max_timeout_exempt: true
+
