@@ -61,9 +61,12 @@ func validateAgentRegistrationWithClientInfo(clientID, accountID, clientName str
 func isHumanClient(clientName, clientID string) bool {
 	// Check client name for common IDE and local agent patterns
 	humanClientNames := []string{
-		"ide-ide-proxy",  // zqk mcp proxy stamp (IDE → daemon)
+		"cursor-ide-proxy",
+		"ide-ide-proxy", // zqk mcp proxy stamp (IDE → daemon)
 		"zqk-feed-steer", // feed steer / doctor events/list probes
+		"cursor-seat-01",
 		"ide-seat-01",
+		"cursor",
 		"vscode",
 		"ide",
 		"composer",
@@ -103,7 +106,7 @@ func isHumanClient(clientName, clientID string) bool {
 func isTrustedLoopbackAdapter(clientName, clientID string) bool {
 	name := strings.TrimSpace(clientName)
 	id := strings.TrimSpace(clientID)
-	for _, trusted := range []string{IDEProxySubscriberClientID, feedSteerProbeClientID} {
+	for _, trusted := range []string{IDEProxySubscriberClientID, "cursor-ide-proxy", feedSteerProbeClientID} {
 		if name == trusted || id == trusted {
 			return true
 		}

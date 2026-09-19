@@ -1,8 +1,8 @@
 {
   "mcpServers": {
-    "zcom": {
+    "zqk": {
       "type": "stdio",
-      "command": "${workspaceFolder}/bin/zcom",
+      "command": "${workspaceFolder}/bin/zqk",
       "args": [
         "mcp",
         "serve"

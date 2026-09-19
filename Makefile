@@ -48,6 +48,7 @@ bootstrap-archive:
 
 all: bootstrap-archive
 	go build -ldflags '$(LDFLAGS)' -o $(BIN) ./cmd/zqk
+	ln -sf $(BRAND_EXE) bin/$(BRAND_EXE)-mcp-ide-adapter
 
 clean:
 	rm -rf bin/*
