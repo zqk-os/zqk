@@ -6,8 +6,8 @@ id: CRIT-CLI-DEPRECATE-PURGE-001
 kind: criteria
 namespace_id: zqk:kernel
 schema_version: 2.0.0
-status: originated
+status: complete
 title: Dead packages and obsolete commands/specs are completely purged
-updated_at: "2026-09-19T06:17:46Z"
+updated_at: "2026-09-19T07:22:12Z"
 updated_by: ACC-1785920548450214012-68b850c0
 version_context: default

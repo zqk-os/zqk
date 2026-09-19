@@ -1,0 +1,14 @@
+created_at: "2026-09-19T07:19:25Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1789802365570911000-a5b181c2
+item_id: TST-CLI-SPEC-VALIDATION-001
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 8529d48a2bb8e026794ef628337375b2dfec95b6ff616d7dfd0278bc07abe912ce5068db3e7144cea33032c1c425e3f523aba531f46ce9fdb9363ac81af3aff6
+schema_version: 2.0.0
+signature: 30450220406d1d696613643e0788182a9d3e22bf79d883e0abf25d9406045a2ad534dbdf022100c1b94eca6c4e63a5560230904d5d7fed8a6fd13fb799456d3636d5e8b362f7a2
+status: success
+title: QA success for TST-CLI-SPEC-VALIDATION-001
+updated_at: "2026-09-19T07:19:25Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

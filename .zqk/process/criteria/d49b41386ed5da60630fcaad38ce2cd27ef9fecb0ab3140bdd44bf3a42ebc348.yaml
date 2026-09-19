@@ -6,8 +6,8 @@ id: CRIT-CLI-TAXONOMY-REORG-001
 kind: criteria
 namespace_id: zqk:kernel
 schema_version: 2.0.0
-status: originated
+status: complete
 title: Scheduler commands restructured into Job/Service Management; Convergence and Swarm have dedicated unified parents
-updated_at: "2026-09-19T06:17:58Z"
+updated_at: "2026-09-19T07:22:33Z"
 updated_by: ACC-1785920548450214012-68b850c0
 version_context: default

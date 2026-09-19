@@ -1,0 +1,14 @@
+created_at: "2026-09-19T07:21:36Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1789802496679125000-5c2c09fd
+item_id: CRIT-IO-LOCK-REAP-001
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 8529d48a2bb8e026794ef628337375b2dfec95b6ff616d7dfd0278bc07abe912ce5068db3e7144cea33032c1c425e3f523aba531f46ce9fdb9363ac81af3aff6
+schema_version: 2.0.0
+signature: 3046022100ca5f75599ce1ec47f8890eb83916e71c057984fd6f44baa3f4c6761f80ffbc81022100c638a66df362c76f086b3832e38aea2b3df12abe9c4fa4b57181ed08772ddfc6
+status: success
+title: QA success for CRIT-IO-LOCK-REAP-001
+updated_at: "2026-09-19T07:21:36Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

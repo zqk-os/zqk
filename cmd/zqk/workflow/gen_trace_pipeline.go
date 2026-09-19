@@ -89,12 +89,16 @@ func generateTracePipelineBundle(targetID string, obj map[string]any, criteriaNe
 	}
 	needCriteria := numCriteriaToGenerate > 0
 
+	var existingTestCases []string
 	hasTestCase := false
 	hasBLI := false
 	for _, n := range criteriaNeighbors {
 		k, _ := n["_kind"].(string)
 		if k == objects.KindTestCase {
 			hasTestCase = true
+			if id, ok := n[objects.FieldKeyID].(string); ok && id != "" {
+				existingTestCases = append(existingTestCases, id)
+			}
 		}
 		if k == objects.KindBacklogItem {
 			hasBLI = true
@@ -167,18 +171,22 @@ func generateTracePipelineBundle(targetID string, obj map[string]any, criteriaNe
 		bundle.Objects.Criteria = append(bundle.Objects.Criteria, critTemplate)
 	}
 
+	allTestCases := append([]string(nil), existingTestCases...)
+
 	// Generate 1 test_case object per requirement/target, containing all criteria in its CriteriaRefs
 	if needTestCase {
 		testBytes := make([]byte, 4)
 		_, _ = rand.Read(testBytes)
 		testHint := fmt.Sprintf("TST-%d-%x", ts+1, testBytes)
+		allTestCases = append(allTestCases, testHint)
 		bundle.Objects.TestCases = append(bundle.Objects.TestCases, scenario.TestCaseTemplate{
-			ID:           testHint,
-			IDHint:       testHint,
-			Title:        fmt.Sprintf("Test Suite: %s", title),
-			Status:       pipelineStatus,
-			CriteriaRefs: allCriteria,
-			PathOrID:     "pkg/dummy/path_test.go",
+			ID:              testHint,
+			IDHint:          testHint,
+			Title:           fmt.Sprintf("Test Suite: %s", title),
+			Status:          pipelineStatus,
+			CriteriaRefs:    allCriteria,
+			RequirementRefs: []string{targetID},
+			PathOrID:        "pkg/dummy/path_test.go",
 		})
 	}
 
@@ -195,6 +203,7 @@ func generateTracePipelineBundle(targetID string, obj map[string]any, criteriaNe
 			Status:          pipelineStatus,
 			CriteriaRefs:    allCriteria,
 			RequirementRefs: []string{targetID},
+			TestCaseRefs:    allTestCases,
 			Priority:        "high",
 			PriorityTier:    "P1",
 		})

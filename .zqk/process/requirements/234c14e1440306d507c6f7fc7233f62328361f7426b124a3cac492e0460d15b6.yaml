@@ -10,10 +10,12 @@ goal_refs:
 id: REQ-CLI-TAXONOMY-HARMONIZATION-001
 kind: requirement
 namespace_id: zqk:kernel
+priority: p1
 schema_version: 2.0.0
-status: originated
+stakeholders: []
+status: active
 title: Harmonized CLI Taxonomy, 100% Spec Coverage, and Vendor Command Isolation
-updated_at: "2026-09-19T06:24:28Z"
+updated_at: "2026-09-19T07:23:17Z"
 updated_by: ACC-1785920548450214012-68b850c0
 version_context: default
 workstream_refs:

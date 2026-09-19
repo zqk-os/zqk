@@ -1,0 +1,14 @@
+created_at: "2026-09-19T07:22:02Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1789802522975016000-b0d6ca07
+item_id: CRIT-IO-TELEMETRY-REPORT-001
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 8529d48a2bb8e026794ef628337375b2dfec95b6ff616d7dfd0278bc07abe912ce5068db3e7144cea33032c1c425e3f523aba531f46ce9fdb9363ac81af3aff6
+schema_version: 2.0.0
+signature: 304502202f7b41629a90fd560d49f4069c131018294c754f01be99f8ac333e38ec846877022100e8a6b1bb6279ffe2f9f2ca634edfd2cae59168ef09fd727f202a26911834a2fd
+status: success
+title: QA success for CRIT-IO-TELEMETRY-REPORT-001
+updated_at: "2026-09-19T07:22:02Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

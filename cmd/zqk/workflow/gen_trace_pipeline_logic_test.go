@@ -32,6 +32,9 @@ func TestGenerateTracePipelineBundle_FullGeneration(t *testing.T) {
 	if len(bundle.Objects.TestCases[0].CriteriaRefs) != 3 {
 		t.Errorf("expected test case to contain 3 criteria refs, got %d", len(bundle.Objects.TestCases[0].CriteriaRefs))
 	}
+	if len(bundle.Objects.TestCases[0].RequirementRefs) != 1 || bundle.Objects.TestCases[0].RequirementRefs[0] != "REQ-1" {
+		t.Errorf("expected test case to reference REQ-1, got %v", bundle.Objects.TestCases[0].RequirementRefs)
+	}
 	// 1 backlog item is generated, implementing all 3 criteria
 	if len(bundle.Objects.BacklogItems) != 1 {
 		t.Errorf("expected 1 backlog item, got %d", len(bundle.Objects.BacklogItems))
@@ -40,7 +43,7 @@ func TestGenerateTracePipelineBundle_FullGeneration(t *testing.T) {
 		t.Errorf("expected allCriteria to contain 3 criteria IDs, got %d", len(allCriteria))
 	}
 
-	// Verify the Backlog Item references all 3 generated criteria
+	// Verify the Backlog Item references all 3 generated criteria and the test case
 	bli := bundle.Objects.BacklogItems[0]
 	if len(bli.CriteriaRefs) != 3 {
 		t.Errorf("expected backlog item to reference 3 criteria, got %d", len(bli.CriteriaRefs))
@@ -49,6 +52,9 @@ func TestGenerateTracePipelineBundle_FullGeneration(t *testing.T) {
 		if !slices.Contains(bli.CriteriaRefs, critID) {
 			t.Errorf("backlog item missing reference to criteria %s", critID)
 		}
+	}
+	if len(bli.TestCaseRefs) != 1 || bli.TestCaseRefs[0] != bundle.Objects.TestCases[0].IDHint {
+		t.Errorf("expected backlog item to reference generated test case, got %v", bli.TestCaseRefs)
 	}
 }
 

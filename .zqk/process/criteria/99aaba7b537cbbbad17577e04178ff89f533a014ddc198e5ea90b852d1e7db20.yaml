@@ -6,8 +6,8 @@ id: CRIT-CLI-VENDOR-ISOLATION-001
 kind: criteria
 namespace_id: zqk:kernel
 schema_version: 2.0.0
-status: originated
+status: complete
 title: Cursor and AppleScript specific commands are decoupled from core scheduler/mcp into pluggable vendor adapters
-updated_at: "2026-09-19T06:17:52Z"
+updated_at: "2026-09-19T07:22:43Z"
 updated_by: ACC-1785920548450214012-68b850c0
 version_context: default

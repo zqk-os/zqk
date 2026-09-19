@@ -1,3 +1,6 @@
+agent_skill_refs:
+    - ASK-COMMUNITY-QA-VERIFICATION
+    - ASK-COMMUNITY-OBJECT-STEWARD
 created_at: "2026-09-19T06:10:00Z"
 created_by: ACC-1785920548450214012-68b850c0
 description: Specialist responsible for documentation completeness, 100% command spec coverage, manual page accuracy, and alignment between executable behavior and published reference materials.
@@ -11,8 +14,8 @@ needs:
     - traceability between specifications and implemented commands
 role: technical_documentarian
 schema_version: 2.0.0
-status: originated
+status: approved
 title: Technical Documentarian
-updated_at: "2026-09-19T06:16:11Z"
+updated_at: "2026-09-19T07:24:33Z"
 updated_by: ACC-1785920548450214012-68b850c0
 version_context: default

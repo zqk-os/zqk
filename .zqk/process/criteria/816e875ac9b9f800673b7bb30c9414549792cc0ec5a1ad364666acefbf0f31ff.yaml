@@ -6,8 +6,8 @@ id: CRIT-IO-LOCK-REAP-001
 kind: criteria
 namespace_id: zqk:kernel
 schema_version: 2.0.0
-status: originated
+status: complete
 title: Stale file locks (.lock) and orphaned temp files/directories are safely detected and reaped
-updated_at: "2026-09-19T06:17:34Z"
+updated_at: "2026-09-19T07:21:40Z"
 updated_by: ACC-1785920548450214012-68b850c0
 version_context: default

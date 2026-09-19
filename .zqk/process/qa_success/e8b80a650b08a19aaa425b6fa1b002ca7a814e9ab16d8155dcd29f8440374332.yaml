@@ -1,0 +1,14 @@
+created_at: "2026-09-19T07:19:47Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1789802387691243000-beb2fe1c
+item_id: TST-CLI-VENDOR-ISOLATION-001
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 8529d48a2bb8e026794ef628337375b2dfec95b6ff616d7dfd0278bc07abe912ce5068db3e7144cea33032c1c425e3f523aba531f46ce9fdb9363ac81af3aff6
+schema_version: 2.0.0
+signature: 3045022019a3660633e0d63fd6583f0f0434e10e3503a98bf3fcff4e528042980516c109022100843b81920643de21ea4545328f4964926165f93c1d7e725b236e05be69e2aeb4
+status: success
+title: QA success for TST-CLI-VENDOR-ISOLATION-001
+updated_at: "2026-09-19T07:19:47Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
