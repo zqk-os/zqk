@@ -30,7 +30,6 @@ This directory contains Go packages for the ZQK project. Each package is a reusa
 | [audit](./audit/) | `github.com/lanceman/zqk/pkg/audit` | 2+2 | 2 | - | ❌ - | - |
 | [authcred](./authcred/) | `github.com/lanceman/zqk/pkg/authcred` | 9+9 | 9 | - | ❌ - | - |
 | [batchaf](./batchaf/) | `github.com/lanceman/zqk/pkg/batchaf` | 1+1 | 1 | - | ❌ - | - |
-| [billing](./billing/) | `github.com/lanceman/zqk/pkg/billing` | 1+1 | 1 | - | ❌ - | - |
 | [brand](./brand/) | `github.com/lanceman/zqk/pkg/brand` | 2+3 | 3 | - | ❌ - | - |
 | [bridge](./bridge/) | `github.com/lanceman/zqk/pkg/bridge` | 3+2 | 2 | engine, impl | ❌ - | - |
 | [bufferpool](./bufferpool/) | `github.com/lanceman/zqk/pkg/bufferpool` | 1+1 | 1 | - | ❌ - | - |
@@ -208,7 +207,6 @@ pkg/
 ├── audit/          # 
 ├── authcred/          # 
 ├── batchaf/          # 
-├── billing/          # 
 ├── brand/          # 
 ├── bridge/          # 
 │   └── engine/

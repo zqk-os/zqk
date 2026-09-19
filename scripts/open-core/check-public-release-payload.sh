@@ -27,7 +27,7 @@ for path in README.md LICENSE NOTICE SECURITY.md CODE_OF_CONDUCT.md CONTRIBUTING
 done
 
 for path in .goreleaser.yaml docs/_archive cmd/zqk-admin cmd/codegen_runner \
-	cmd/pattern-cli \
+	cmd/pattern-cli pkg/billing \
 	pkg/community/container_helm_test.go docs/commercial docs/marketing docs/launch; do
 	if [ -e "$ROOT/$path" ]; then
 		fail "forbidden or unconfigured public artifact present: $path"

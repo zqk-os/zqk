@@ -24,6 +24,7 @@ cmd/pattern-cli
 cmd/utilities
 scripts/zqk-internal
 scripts/legacy-decommission
+pkg/billing
 '
 
 for p in $must_not_paths; do
