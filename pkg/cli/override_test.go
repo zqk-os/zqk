@@ -64,7 +64,7 @@ func TestEnforceOverrideFriction(t *testing.T) {
 	})
 
 	t.Run("tray_indirect_execution_blocked", func(t *testing.T) {
-		t.Setenv("ZQK_EXEC_SOURCE", "tray")
+		t.Setenv(zqkenv.ExecSource().Name(), "tray")
 		err := EnforceOverrideFriction(cmd, ctx, secCtx, store, "TEST-1", "backlog_item", reason)
 		if err == nil {
 			t.Fatal("expected tray indirect execution block error, got nil")

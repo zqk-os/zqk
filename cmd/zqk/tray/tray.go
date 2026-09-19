@@ -254,7 +254,7 @@ func runRun(cmd *cobra.Command, args []string) error {
 	if len(c.Env) > 0 {
 		env = c.Env
 	}
-	c.Env = append(env, "ZQK_EXEC_SOURCE=tray")
+	c.Env = append(env, zqkenv.ExecSource().Name()+"=tray")
 	if err := c.Run(); err != nil {
 		var exitErr *exec.ExitError
 		if errors.As(err, &exitErr) {

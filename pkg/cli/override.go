@@ -42,7 +42,7 @@ func EnforceOverrideFriction(
 	reasonCode string,
 ) error {
 	// 0. Indirect execution guard (tray)
-	if os.Getenv("ZQK_EXEC_SOURCE") == "tray" {
+	if zqkenv.ExecSource().Get() == "tray" {
 		return fmt.Errorf("manual break-glass --override is completely blocked when invoked via indirect runners (Tray). Execute directly in an authenticated shell")
 	}
 

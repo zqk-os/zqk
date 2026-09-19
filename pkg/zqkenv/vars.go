@@ -60,6 +60,7 @@ const _sfxEnableIOQueueShutdownTests = "ENABLE_IOQUEUE_SHUTDOWN_TESTS"
 const _sfxEnablePublicCandidateTest = "ENABLE_PUBLIC_CANDIDATE_TEST"
 const _sfxPublicCandidateDir = "PUBLIC_CANDIDATE_DIR"
 const _sfxPublicCandidateAllowClobber = "PUBLIC_CANDIDATE_ALLOW_CLOBBER"
+const _sfxExecSource = "EXEC_SOURCE"
 const _sfxGraphDatabase = "GRAPH_DATABASE"
 const _sfxGraphEnabled = "GRAPH_ENABLED"
 const _sfxAdminGraphEnabled = "ADMIN_GRAPH_ENABLED"
@@ -523,6 +524,9 @@ func MetricsChunkRetentionDays() EnvVar {
 
 // MCPAccountID returns the environment variable name for MCP_ACCOUNT_ID (brand-prefixed).
 func MCPAccountID() EnvVar { return EnvVar{Key: brand.EnvVar(_sfxMCPAccountID)} }
+
+// ExecSource returns the environment variable name for EXEC_SOURCE (brand-prefixed, e.g. ZQK_EXEC_SOURCE).
+func ExecSource() EnvVar { return EnvVar{Key: brand.EnvVar(_sfxExecSource)} }
 
 // MCPConfigPath returns the environment variable name for MCP_CONFIG_PATH (brand-prefixed).
 func MCPConfigPath() EnvVar { return EnvVar{Key: brand.EnvVar(_sfxMCPConfigPath)} }
