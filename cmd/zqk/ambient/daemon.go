@@ -69,6 +69,9 @@ func newDaemonCmd() *cobra.Command {
 }
 
 func runAmbientDaemon(cmd *cobra.Command, args []string) error {
+	reconnect := cli.DisconnectTimeoutMonitor()
+	defer reconnect()
+
 	projectRoot := cli.ResolveProjectRoot(".")
 	if projectRoot == "" {
 		return fmt.Errorf("project root not found")
@@ -208,7 +211,7 @@ func StartDaemon(projectRoot string, out interface{ Write([]byte) (int, error) }
 		return fmt.Errorf("failed to open ambient log file: %w", err)
 	}
 
-	daemonCmd := execwrap.Command(exe, "ambient", "daemon")
+	daemonCmd := execwrap.Command(exe, "ambient", "daemon", "--timeout", "0")
 	daemonCmd.Dir = projectRoot
 	daemonCmd.Stdout = logFile
 	daemonCmd.Stderr = logFile
