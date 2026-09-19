@@ -5,8 +5,8 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/spf13/cobra"
 	"github.com/zqk-os/zqk/internal/cli"
+	clipkg "github.com/zqk-os/zqk/pkg/cli"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -49,8 +49,8 @@ common_flags: true
 		t.Fatal(err)
 	}
 
-	root := &cobra.Command{Use: "zqk"}
-	alphaCmd := &cobra.Command{Use: "alpha", Short: "Alpha command"}
+	root := clipkg.NewCommandBuilder("zqk").Build()
+	alphaCmd := clipkg.NewCommandBuilder("alpha").WithShort("Alpha command").Build()
 	validateCmd := NewValidateCommandSpecsCmd()
 
 	root.AddCommand(alphaCmd)
