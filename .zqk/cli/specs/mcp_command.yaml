@@ -9,16 +9,16 @@ description: |
 
 help:
   examples:
-    - comment: "Ensure the TCP daemon is listening"
+    - comment: "Start stdio MCP server (canonical IDE integration)"
+      command: "%s mcp serve"
+    - comment: "List exposed MCP tool names"
+      command: "%s mcp list-tools"
+    - comment: "Ensure the background TCP daemon is listening (studio hot-reload)"
       command: "%s mcp ensure --tcp 127.0.0.1:8443"
-    - comment: "Supervise the daemon (restart loop)"
-      command: "%s mcp supervise --tcp 127.0.0.1:8443"
-    - comment: "Cursor stdio adapter (preferred Cursor entrypoint)"
+    - comment: "Cursor stdio adapter to background daemon (studio hot-reload)"
       command: "%s mcp cursor-adapter --tcp 127.0.0.1:8443"
     - comment: "Legacy transparent IDE proxy"
       command: "%s mcp proxy --tcp 127.0.0.1:8443"
-    - comment: "List exposed MCP tool names"
-      command: "%s mcp list-tools"
   exclude_flags:
     - "format"
     - "output"

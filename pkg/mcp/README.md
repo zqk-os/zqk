@@ -63,10 +63,54 @@ Metrics tools (PCS, EDD, D&B) are exposed via the CLI bridge:
 - **No Special Bridge Needed**: Metrics tools use the same CLI bridge pattern as all other commands
 - **Consistent Architecture**: All functionality is exposed through CLI commands, which are automatically available via MCP
 
+### Server Execution Models: Direct Stdio vs. Proxy Adapter
+
+ZQK supports two distinct deployment models for MCP integration with IDEs (Cursor, VS Code, Windsurf, Claude Desktop):
+
+```
++-----------------------------------------------------------------------------------+
+| 1. Direct Stdio (Canonical Default for Core Kernel & All Standalone Projects)     |
+|                                                                                   |
+|  [ IDE (Cursor / VS Code) ] --(stdio JSON-RPC)--> [ bin/zqk mcp serve ]           |
+|                                                                                   |
+|  * 100% self-contained within workspace (${workspaceFolder})                      |
+|  * Zero background daemons, zero TCP ports, zero loopback collision hazards      |
+|  * Multiple projects run in parallel with completely isolated memory & WAL       |
++-----------------------------------------------------------------------------------+
+
++-----------------------------------------------------------------------------------+
+| 2. Proxy Adapter (Specialized for Studio Swarms & Continuous Hot-Rebuilds)        |
+|                                                                                   |
+|  [ IDE (Cursor) ] --(stdio)--> [ bin/zqk-mcp-ide-adapter ]                       |
+|                                       |                                           |
+|                               (TCP 127.0.0.1:8443)                                |
+|                                       v                                           |
+|                           [ zqk mcp daemon --tcp ]                                |
+|                                                                                   |
+|  * Shields Cursor from turning red when the underlying binary is recompiled       |
+|  * Auto-reconnects when the background daemon cycles                              |
+|  * Requires central daemon management; potential port clash if multiple repos    |
++-----------------------------------------------------------------------------------+
+```
+
+#### When to Use Direct Stdio (`zqk mcp serve`) — **The Core Kernel Default**
+- **Default for all project-agnostic repositories:** Whenever you initialize ZQK in a project or work with the core kernel, use direct stdio (`bin/zqk mcp serve`).
+- **Why:** 
+  - Standard MCP compliance (Anthropic specification).
+  - No background daemon lifecycle to supervise or troubleshoot.
+  - Zero open TCP ports, avoiding port 8443 clashes when multiple repos are open simultaneously.
+  - Managed cleanly by the IDE process tree: starts on workspace open, terminates on workspace close.
+
+#### When to Use Proxy Adapter (`zqk mcp cursor-adapter` / `mcp proxy`)
+- **Specialized for Continuous Autonomous Swarms:** Use only in dedicated development environments where autonomous agents or developers are continuously recompiling the CLI binary (`go build -o bin/zqk`) or cycling binaries under an active Cursor session.
+- **Why:** Cursor turns its MCP connector red if a direct stdio process dies. The proxy maintains a permanent, resilient stdio channel with Cursor while transparently reconnecting to the background TCP daemon whenever the daemon restarts.
+
+---
+
 ## Quick Start
 
 ```go
-import "github.com/lanceman/zqk/pkg/mcp"
+import "github.com/zqk-os/zqk/pkg/mcp"
 
 server := mcp.NewServer()
 mcp.RegisterGraphTools(server)
@@ -77,28 +121,13 @@ server.Serve()
 
 See [MCP CLI Bridge Architecture v1.0](../../docs/architecture/mcp-cli-bridge-v1.0.md) for detailed usage examples and configuration.
 
-## Documentation
-
-Architecture documentation for the MCP server is located in the project documentation tree:
-
-- **[MCP CLI Bridge Architecture v1.0](../../docs/architecture/mcp-cli-bridge-v1.0.md)**: Context-driven CLI command exposure via MCP with security filtering
-- **[MCP Privilege Tests v1.0](../../docs/architecture/mcp-privilege-tests-v1.0.md)**: Comprehensive test suite validating privilege-based access control
-
 ### Server Modes and Trimming
 
-- **Full server** (`zqk mcp serve`): Has the full cobra CLI tree; discovers and exposes all leaf commands as tools, plus built-in tools, prompts, and resources. This can exceed client limits (e.g. Cursor’s 40-tool warning / 80-tool max).
-- **mcp-simple** (`bin/zqk-mcp`): No CLI tree; only built-in tools, prompts, and resources are registered. Tool execution runs the full `zqk` binary in a subprocess per call.
-- **Plan**: Move back to the full server once tools, prompts, and resources are trimmed/organized (e.g. allowlists or profiles) so we stay within client limits. See **[MCP Exposure and Trimming](docs/MCP_EXPOSURE_AND_TRIMMING.md)** for the audit, limits, and curation sketch.
-
-### Related Documentation
-
-- [Graph Provider Interfaces](../../graph/provider/README.md)
-- [MemGraph Implementation](../../graph/memgraph/README.md)
-- [BLI-622: Expand MCP Server with Graph Traversal Tools](../../.zqk/process/backlog/BLI-622.yaml)
-- [Security Context Package](../../context/README.md)
-- [MCP Exposure and Trimming](docs/MCP_EXPOSURE_AND_TRIMMING.md) — audit, client limits, and trimming approach
+- **Full server** (`zqk mcp serve`): Has the full cobra CLI tree; discovers and exposes all leaf commands as tools, plus built-in tools, prompts, and resources.
+- **Alias / Curated mode** (`alias_mode: true` in `.zqk/mcp/config.yaml`): Exposes a curated set of high-leverage tools (object CRUD, system status, reports, file I/O) to keep tool counts lean and well under IDE limits.
 
 ---
 
-*Last Updated: 2025-01-02*
+*Last Updated: 2026-09-18*
+
 
