@@ -1,0 +1,19 @@
+created_at: "2026-09-19T04:23:13Z"
+created_by: ACC-1785920548450214012-68b850c0
+criteria_refs:
+    - CRIT-1789791794005402000-b99cca78
+    - CRIT-1789791794005403000-35c2454a
+    - CRIT-1789791794005404000-b9a65cbb
+description: Dynamic membrane demo showcases live fail-closed trapping of out-of-boundary path traversal and prompt injection
+goal_refs:
+    - GOAL-1789631957245339000-008aac9f
+id: REQ-1789791793891823000-6dadca14
+kind: requirement
+namespace_id: zqk:kernel
+priority: p2
+schema_version: 2.0.0
+status: active
+title: Dynamic membrane demo showcases live fail-closed trapping of out-of-boundary path traversal and prompt injection
+updated_at: "2026-09-19T04:26:43Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

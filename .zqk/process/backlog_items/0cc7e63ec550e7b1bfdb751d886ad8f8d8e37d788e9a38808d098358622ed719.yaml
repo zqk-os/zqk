@@ -1,0 +1,29 @@
+acceptance_considerations: ""
+created_at: "2026-09-19T04:23:27Z"
+created_by: ACC-1785920548450214012-68b850c0
+criteria_refs:
+    - CRIT-1789791806804436000-ad253841
+    - CRIT-1789791806804437000-fe071c64
+    - CRIT-1789791806804438000-310508f6
+description: 'Implementation and verification pipeline for: Cryptographic audit demo showcases verifiable multi-agent chain of custody and CISA OpenVEX attestation generation'
+estimated_effort: ""
+id: BLI-1789791806804436000-b34062cd
+kind: backlog_item
+milestone_refs:
+    - MIL-1789672699275510000-40c8cee7
+namespace_id: zqk:kernel
+priority: high
+priority_plan_ref: PRI-DEMO-CORE-SHOWCASE-001
+priority_tier: P1
+problem_statement: ""
+requirement_refs:
+    - REQ-1789791806678354000-15eb2745
+schema_version: 2.0.0
+stakeholders: []
+status: planned
+title: 'Implement: Cryptographic audit demo showcases verifiable multi-agent chain of custody and CISA OpenVEX attestation generation'
+updated_at: "2026-09-19T04:26:12Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs:
+    - WS-DEMO-CRYPTO-AUDIT
