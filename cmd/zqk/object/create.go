@@ -111,6 +111,10 @@ func runCreate(cmd *cobra.Command, args []string) error {
 			return cli.Guard(cmd).Err(err).Return()
 		}
 
+		if err := guardManualStatusOnCreate(cmd, proc, kind, objData); err != nil {
+			return cli.Guard(cmd).Err(err).Return()
+		}
+
 		// Elevated create defaults source_type like legacy internal create.
 		// TRACK: BLI-1785930106857898000-94b9a5bc
 		if ElevatedInternalRequested(cmd) && objData[objects.FieldKeySourceType] == nil {
@@ -168,12 +172,20 @@ func runCreate(cmd *cobra.Command, args []string) error {
 			force = false
 		}
 
+		promote, err := cmd.Flags().GetBool("promote")
+		if err != nil {
+			promote = false
+		}
+
 		// Add cache context for update operation.
 		// Skip write-behind on interactive CLI create so CAS+index flush happen in-process
 		// (avoids EnsureCLIObjectMutationVisible waiting on WAL checkpoint stabilization).
 		// Revisit if bulk/API create needs shared write-behind.
 		opCtx := pkgctx.WithCacheUpdate(proc.OperationContext(), objID, objKind, "")
 		opCtx = storage.WithCLIOperation(storage.WithSkipWriteBehind(opCtx))
+		if promote {
+			opCtx = pkgctx.WithPromoteOnCreate(opCtx)
+		}
 
 		// Emit loud contextual broadcast if we are doing this across a boundary
 		clipkg.EmitContextHUD(proc.OperationContext(), proc.SecurityContext(), objData, "creating", objID)

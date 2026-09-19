@@ -8,9 +8,9 @@ namespace_id: zqk:kernel
 origin_project: zqk
 origin_system: zqk
 schema_version: 2.0.0
-status: validated
+status: complete
 title: 'Verify: Fail-closed MCP sandbox directory jail actively traps prompt injection - Boundary & Error Handling'
-updated_at: "2026-09-18T23:41:51Z"
+updated_at: "2026-09-19T03:21:21Z"
 updated_by: ACC-1785920548450214012-68b850c0
 validation_method: automated_test
 version_context: default

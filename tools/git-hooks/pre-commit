@@ -32,6 +32,46 @@ if [ -z "$ZQK_BIN" ]; then
 	exit 0
 fi
 
+# 0. CAS Membrane Integrity Gate (Prevent hand-editing of files past the CAS membrane)
+# Any staged file under .zqk/process/**/*.yaml must:
+# a) Have its filename match sha256 of its staged content (CAS content-addressable hash invariant)
+# b) Not be in a preliminary status (draft, conceptual) - those must remain on the draft plane (.zqk/draft/)
+STAGED_CAS_FILES=$(git diff --cached --name-only --diff-filter=ACMR | grep -E '^\.zqk/process/.*\.ya?ml$' || true)
+if [ -n "$STAGED_CAS_FILES" ]; then
+	SHASUM_CMD=""
+	if command -v sha256sum >/dev/null 2>&1; then
+		SHASUM_CMD="sha256sum"
+	elif command -v shasum >/dev/null 2>&1; then
+		SHASUM_CMD="shasum -a 256"
+	fi
+
+	for f in $STAGED_CAS_FILES; do
+		# Verify preliminary status is prohibited in .zqk/process/
+		if git show ":$f" 2>/dev/null | grep -E '^[[:space:]]*status:[[:space:]]*["'\'']?(draft|conceptual)["'\'']?[[:space:]]*$' >/dev/null 2>&1; then
+			echo "❌ [ZQK PRE-COMMIT] CAS Membrane Violation: Preliminary status detected in $f"
+			echo "   Objects with preliminary status (draft, conceptual) must remain on the draft plane (.zqk/draft/)."
+			echo "   Promote the object via '$ZQK_BIN object promote' before committing to CAS."
+			exit 1
+		fi
+
+		# Verify filename equals sha256 hash of staged content
+		base=$(basename "$f" | sed -E 's/\.ya?ml$//')
+		if echo "$base" | grep -E '^[0-9a-fA-F]{64}$' >/dev/null 2>&1; then
+			if [ -n "$SHASUM_CMD" ]; then
+				actual_hash=$(git show ":$f" 2>/dev/null | $SHASUM_CMD | awk '{print $1}')
+				if [ "$base" != "$actual_hash" ]; then
+					echo "❌ [ZQK PRE-COMMIT] CAS Membrane Violation: Hash mismatch in $f"
+					echo "   Expected hash: $base"
+					echo "   Actual hash:   $actual_hash"
+					echo "   Direct hand-editing of objects past the CAS membrane (.zqk/process/) is strictly prohibited."
+					echo "   Use '$ZQK_BIN object update' or CLI mutation commands to update objects cleanly."
+					exit 1
+				fi
+			fi
+		fi
+	done
+fi
+
 # 1. Knowledge Kernel CAS & Referential Integrity Gate
 if [ -d "$REPO_ROOT/.zqk/process" ]; then
 	echo "🔍 [ZQK PRE-COMMIT] Verifying Knowledge Kernel integrity..."

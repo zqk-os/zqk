@@ -16,6 +16,7 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"github.com/zqk-os/zqk/cmd/zqk/ambient"
 	clicontext "github.com/zqk-os/zqk/internal/cli/context"
 	"github.com/zqk-os/zqk/pkg/appledouble"
 	"github.com/zqk-os/zqk/pkg/brand"
@@ -251,6 +252,11 @@ func runInit(_ *cobra.Command, projectName, template string, force bool, snapsho
 	// Ensure Git pre-commit hooks are installed
 	if err := EnsureGitHooks(projectRoot, logger); err != nil {
 		logging.Fluent(logger).Warn("Failed to ensure git pre-commit hook on init").WithError(err).Log()
+	}
+
+	// Ensure ambient daemon is running
+	if err := ambient.EnsureDaemon(projectRoot, logger); err != nil {
+		logging.Fluent(logger).Warn("Failed to ensure ambient daemon on init").WithError(err).Log()
 	}
 
 	// Warm the test dashboard lite projection from storage

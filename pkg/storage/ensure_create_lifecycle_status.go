@@ -55,7 +55,15 @@ func ensureCreateLifecycleStatus(ctx context.Context, obj map[string]any, promot
 
 	checker := objects.GetGlobalStatusChecker()
 	if checker.IsPreliminary(kind, status) {
-		return
+		if promoteOnCreate {
+			if next, err := objects.NextProgressLifecycleStatus(kind, status); err == nil && next != "" {
+				obj[objects.FieldKeyStatus] = next
+				status = next
+			}
+		}
+		if checker.IsPreliminary(kind, status) {
+			return
+		}
 	}
 	// Promote-ready create, non-CLI (system-generated) create, or bypass kinds:
 	// keep shovel-ready status → skip draft plane (CAS write).

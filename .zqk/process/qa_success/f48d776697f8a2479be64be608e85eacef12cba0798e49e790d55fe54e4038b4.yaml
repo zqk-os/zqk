@@ -1,0 +1,14 @@
+created_at: "2026-09-19T03:20:30Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1789788030040547000-62527e18
+item_id: CRIT-1789772691823583000-a0ed9d54
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 8529d48a2bb8e026794ef628337375b2dfec95b6ff616d7dfd0278bc07abe912ce5068db3e7144cea33032c1c425e3f523aba531f46ce9fdb9363ac81af3aff6
+schema_version: 2.0.0
+signature: 30440220391bb0aca6cc40d6ccfce0580f28dbb057da6dbf14dcaa9b3659500dc27f1b74022029dfa39d9f2c99a2f19c42af17fafd29ee71bca735f209b269af52b738be58d9
+status: success
+title: QA success for CRIT-1789772691823583000-a0ed9d54
+updated_at: "2026-09-19T03:20:30Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

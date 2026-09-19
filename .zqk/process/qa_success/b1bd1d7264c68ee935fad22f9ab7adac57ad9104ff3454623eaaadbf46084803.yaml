@@ -1,0 +1,14 @@
+created_at: "2026-09-19T03:21:34Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1789788094309712000-75bed03e
+item_id: REQ-1789772707977661000-c7ddd468
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 8529d48a2bb8e026794ef628337375b2dfec95b6ff616d7dfd0278bc07abe912ce5068db3e7144cea33032c1c425e3f523aba531f46ce9fdb9363ac81af3aff6
+schema_version: 2.0.0
+signature: 304402207c7baa90bc4b872f150c5b5971e640440ec24bccd4b2797ca38fc1db0d74446f022029fb99b66e7a1a4aa85705ceaff3b727c660780a3689d64f340a2243765e0f22
+status: success
+title: QA success for REQ-1789772707977661000-c7ddd468
+updated_at: "2026-09-19T03:21:34Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

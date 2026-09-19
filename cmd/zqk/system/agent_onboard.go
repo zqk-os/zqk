@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/spf13/cobra"
+	"github.com/zqk-os/zqk/cmd/zqk/ambient"
 	"github.com/zqk-os/zqk/internal/cli"
 	"github.com/zqk-os/zqk/pkg/agentonboard"
 	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
@@ -59,6 +60,9 @@ func runAgentOnboard(cmd *cobra.Command, _ []string) error {
 		if !detectOnly && !dryRun {
 			if err := EnsureGitHooks(root, logger); err != nil {
 				logging.Fluent(logger).Warn("Failed to ensure git pre-commit hook during agent-onboard").WithError(err).Log()
+			}
+			if err := ambient.EnsureDaemon(root, logger); err != nil {
+				logging.Fluent(logger).Warn("Failed to ensure ambient daemon during agent-onboard").WithError(err).Log()
 			}
 			if sp := proc.Storage(); sp != nil {
 				_ = WarmTestDashboard(context.Background(), root, sp)

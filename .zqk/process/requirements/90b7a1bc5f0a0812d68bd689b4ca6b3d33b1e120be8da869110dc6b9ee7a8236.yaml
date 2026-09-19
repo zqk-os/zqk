@@ -13,8 +13,8 @@ namespace_id: zqk:kernel
 priority: p2
 schema_version: 2.0.0
 stakeholders: []
-status: originated
+status: active
 title: Generate verifiable OpenVEX attestation and signed SBOM from multi-agent review
-updated_at: "2026-09-18T23:06:09Z"
+updated_at: "2026-09-19T03:21:09Z"
 updated_by: ACC-1785920548450214012-68b850c0
 version_context: default

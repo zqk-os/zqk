@@ -1,0 +1,27 @@
+backlog_item_refs:
+    - BLI-1789702449225534000-eca4a6bd
+category: integration
+completed_at: "2026-09-18T07:47:19Z"
+created_at: "2026-09-18T03:34:10Z"
+created_by: ACC-1785920548450214012-68b850c0
+criteria_refs:
+    - CRIT-1789702449225534000-91965c35
+    - CRIT-1789702449225535000-21301407
+    - CRIT-1789702449225536000-1bd6c028
+description: ""
+id: TST-1789702449225534001-eeaae992
+kind: test_case
+namespace_id: zqk:kernel
+origin_project: zqk
+origin_system: zqk
+path_or_id: cmd/zqk/system/init_starter_graph_test.go
+remaining_open_count: 0
+requirement_refs:
+    - REQ-1789702448467715000-c05a9ef4
+schema_version: 2.0.0
+started_at: "2026-09-18T03:34:10Z"
+status: complete
+title: 'Test Suite: Shipped first-run docs, IDE boot text, and CLI examples match this SKU (no leftover studio dump, no hardcoded pressure-test executable name)'
+updated_at: "2026-09-19T03:44:43Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

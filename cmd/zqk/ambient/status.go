@@ -2,11 +2,10 @@
 package ambient
 
 import (
+	"github.com/spf13/cobra"
 	"github.com/zqk-os/zqk/internal/cli"
-	"github.com/zqk-os/zqk/pkg/ambient"
 	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
 	"github.com/zqk-os/zqk/pkg/objects"
-	"github.com/spf13/cobra"
 )
 
 func newStatusCmd() *cobra.Command {
@@ -16,11 +15,18 @@ func newStatusCmd() *cobra.Command {
 }
 
 func runStatus(cmd *cobra.Command, args []string) error {
-	hub := ambient.NewEventHub()
-	status := hub.Status()
+	projectRoot := cli.ResolveProjectRoot(".")
+	if pid, running := readAmbientPID(projectRoot); running {
+		return cli.FormatOutput(cmd, map[string]any{
+			objects.FieldKeyComponent: "ambient",
+			objects.FieldKeyStatus:    "running",
+			"pid":                      pid,
+			"project_root":             projectRoot,
+		})
+	}
 
 	return cli.FormatOutput(cmd, map[string]any{
 		objects.FieldKeyComponent: "ambient",
-		objects.FieldKeyStatus:    status,
+		objects.FieldKeyStatus:    "stopped",
 	})
 }

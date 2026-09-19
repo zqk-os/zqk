@@ -11,6 +11,7 @@ import (
 	"gopkg.in/yaml.v3"
 
 	"github.com/zqk-os/zqk/internal/cli"
+	"github.com/zqk-os/zqk/pkg/brand"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/errfmt"
@@ -31,6 +32,9 @@ func RunCreateWithData(cmd *cobra.Command, kind string, objData map[string]any) 
 	}
 	kind, err = objects.ResolveAndValidateKindForProject(proc.ProjectRoot(), kind)
 	if err != nil {
+		return cli.Guard(cmd).Err(err).Return()
+	}
+	if err := guardManualStatusOnCreate(cmd, proc, kind, objData); err != nil {
 		return cli.Guard(cmd).Err(err).Return()
 	}
 	if objData[objects.FieldKeyKind] == nil || objData[objects.FieldKeyKind] == emptyValue {
@@ -54,9 +58,13 @@ func RunCreateWithData(cmd *cobra.Command, kind string, objData map[string]any) 
 	objID, _ := objData[objects.FieldKeyID].(string)
 	objKind, _ := objData[objects.FieldKeyKind].(string)
 	force, _ := cmd.Flags().GetBool("force")
+	promote, _ := cmd.Flags().GetBool("promote")
 	// Sync create for interactive CLI latency (see create.go).
 	opCtx := pkgctx.WithCacheUpdate(proc.OperationContext(), objID, objKind, "")
 	opCtx = storage.WithCLIOperation(storage.WithSkipWriteBehind(opCtx))
+	if promote {
+		opCtx = pkgctx.WithPromoteOnCreate(opCtx)
+	}
 	if err := proc.Storage().Create(opCtx, proc.SecurityContext(), objData); err != nil {
 		if (err == storage.ErrObjectExists || strings.Contains(err.Error(), "already exists")) && force && objID != emptyValue {
 			updateCtx := pkgctx.WithCacheUpdate(proc.OperationContext(), objID, objKind, "")
@@ -338,3 +346,40 @@ func cleanupSourceFile(cmd *cobra.Command, filePath string, proc *cli.Processor)
 func formatCreateSuccessMessage(objData map[string]any, kind string, proc *cli.Processor) string {
 	return clipkg.FormatCreateSuccessMessage(objData, kind, "Object", proc.Logger())
 }
+
+// guardManualStatusOnCreate refuses user-supplied status on create unless audited break-glass --override.
+func guardManualStatusOnCreate(cmd *cobra.Command, proc *cli.Processor, kind string, objData map[string]any) error {
+	statusVal, hasStatus := objData[objects.FieldKeyStatus]
+	if !hasStatus || statusVal == nil {
+		return nil
+	}
+	statusStr, ok := statusVal.(string)
+	if !ok || strings.TrimSpace(statusStr) == "" {
+		return nil
+	}
+
+	override := false
+	if cmd.Flags().Lookup("override") != nil {
+		override, _ = cmd.Flags().GetBool("override")
+	}
+	if !override {
+		exe := brand.ExecutableName()
+		return cli.Guard(cmd).Require(false, fmt.Sprintf("manual status assignment on create is prohibited to preserve lifecycle integrity. Objects start at lifecycle origin on the draft plane, or use '%s object create <kind> --promote' to advance to the initial shovel-ready status. Human interactive TTY snap-remedy (--override) is blocked for non-TTY/agent shells", exe)).Return()
+	}
+	reasonCode := emptyValue
+	if cmd.Flags().Lookup("reason-code") != nil {
+		reasonCode, _ = cmd.Flags().GetString("reason-code")
+	}
+	if reasonCode == emptyValue {
+		return cli.Guard(cmd).Require(false, "--reason-code is required when using --override").Return()
+	}
+	if proc == nil {
+		return nil
+	}
+	objID, _ := objData[objects.FieldKeyID].(string)
+	if objID == "" {
+		objID = "create-" + kind
+	}
+	return clipkg.EnforceOverrideFriction(cmd, proc.OperationContext(), proc.SecurityContext(), proc.Storage(), objID, kind, reasonCode)
+}
+

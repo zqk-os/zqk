@@ -1,3 +1,4 @@
+completed_at: "2026-09-19T03:20:34Z"
 created_at: "2026-09-18T23:04:51Z"
 created_by: ACC-1785920548450214012-68b850c0
 criteria_refs:
@@ -12,9 +13,9 @@ kind: requirement
 namespace_id: zqk:kernel
 priority: p2
 schema_version: 2.0.0
-stakeholders: []
-status: originated
+started_at: "2026-09-18T23:04:51Z"
+status: complete
 title: Replay WAL and change journal via zqk rollback to survive kill -9
-updated_at: "2026-09-18T23:06:08Z"
+updated_at: "2026-09-19T03:20:34Z"
 updated_by: ACC-1785920548450214012-68b850c0
 version_context: default

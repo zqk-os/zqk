@@ -13,5 +13,9 @@ func NewAmbientCmd() *cobra.Command {
 	cmd.AddCommand(newAutomergeCmd())
 	cmd.AddCommand(newIngestCmd())
 	cmd.AddCommand(newWaveCmd())
+	cmd.AddCommand(newDaemonCmd())
+	cmd.AddCommand(newStartCmd())
+	cmd.AddCommand(newStopCmd())
+	cmd.AddCommand(newEnsureCmd())
 	return cmd
 }

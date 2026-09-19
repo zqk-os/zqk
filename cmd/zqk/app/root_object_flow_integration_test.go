@@ -89,7 +89,6 @@ func TestObjectCreateDeleteFlow_UpdatesValidationCache(t *testing.T) {
 		objects.FieldKeyID:            objectID,
 		objects.FieldKeyKind:          kind,
 		objects.FieldKeyTitle:         fixtureObjectTitleApp(testKindBacklogItem, 1),
-		objects.FieldKeyStatus:        testStatusExploring,
 		objects.FieldKeySchemaVersion: testSchemaVersionCurrent,
 	}
 	data, err := yaml.Marshal(obj)
