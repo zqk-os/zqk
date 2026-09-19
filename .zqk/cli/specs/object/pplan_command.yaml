@@ -1,18 +1,11 @@
 $schema: "../../schemas/command_spec.schema.json"
 
 name: "pplan"
-short: "Priority plan operations (current, next, prev, add, remove)"
+short: "Priority plan operations (current)"
 description: |
-  Priority plan operations for navigating and managing priority plans.
+  Priority plan operations for viewing active priority plans.
 
   This command group provides operations for working with priority plans:
     - current: View backlog items for the current priority plan
-    - next: Navigate to the next priority plan
-    - prev: Navigate to the previous priority plan
-    - add: Associate backlog item(s) with a priority plan (child-owned)
-    - remove: Clear priority plan association from backlog item(s)
-
-args:
-  type: "arbitrary"
 
 common_flags: true

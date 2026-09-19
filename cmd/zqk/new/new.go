@@ -12,7 +12,6 @@ import (
 	"github.com/zqk-os/zqk/cmd/zqk/workflow"
 	"github.com/zqk-os/zqk/internal/cli"
 	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
-	"github.com/zqk-os/zqk/pkg/cliexamples"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/logging"
@@ -303,11 +302,7 @@ func runNewObjectSpecKind(cmd *cobra.Command, args []string) (err error) {
 	ontology := strings.TrimSpace(args[0])
 	extendsName, _ := cmd.Flags().GetString("extends")
 	out, _ := cmd.Flags().GetString("output")
-	gen, err := cliexamples.New()
-	if err != nil {
-		return errfmt.Newf("cli examples").Wrap(err)
-	}
-	yamlStr, err := gen.GenerateObjectSpecKindDraft(ontology, extendsName)
+	yamlStr, err := objects.GenerateObjectSpecKindDraft(nil, ontology, extendsName)
 	if err != nil {
 		return errfmt.Newf("object kind spec draft").Wrap(err)
 	}

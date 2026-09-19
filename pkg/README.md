@@ -37,7 +37,6 @@ This directory contains Go packages for the ZQK project. Each package is a reusa
 | [circuitbreaker](./circuitbreaker/) | `github.com/lanceman/zqk/pkg/circuitbreaker` | 5+3 | 3 | - | ❌ - | - |
 | [cleanup](./cleanup/) | `github.com/lanceman/zqk/pkg/cleanup` | 1+1 | 1 | - | ❌ - | - |
 | [cli](./cli/) | `github.com/lanceman/zqk/pkg/cli` | 48+27 | 27 | bldr_cli_cmd_v1, commands, ... | ✅ [README](./cli/README.md) | The CLI package follows the same architectural ... |
-| [cliexamples](./cliexamples/) | `github.com/lanceman/zqk/pkg/cliexamples` | 1+1 | 1 | - | ❌ - | - |
 | [clihooks](./clihooks/) | `github.com/lanceman/zqk/pkg/clihooks` | 2+1 | 1 | - | ❌ - | - |
 | [closureevidence](./closureevidence/) | `github.com/lanceman/zqk/pkg/closureevidence` | 1+1 | 1 | - | ❌ - | - |
 | [concurrency](./concurrency/) | `github.com/lanceman/zqk/pkg/concurrency` | 10+9 | 9 | - | ✅ [README](./concurrency/README.md) | The `pkg/concurrency` package addresses critica... |
@@ -222,7 +221,6 @@ pkg/
 │   └── commands/
 │   └── printer/
     └── ux/
-├── cliexamples/          # 
 ├── clihooks/          # 
 ├── closureevidence/          # 
 ├── concurrency/          # The `pkg/concurrency` package addresses critical concurrency concerns:

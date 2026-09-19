@@ -7,7 +7,6 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/zqk-os/zqk/pkg/cliexamples"
 	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"github.com/spf13/cobra"
@@ -38,7 +37,6 @@ type HelpBuilder struct {
 	// Spec-driven example generation
 	enableSpecExamples bool   // Enable spec-driven examples for object commands
 	specExampleKind    string // Kind to generate examples for (if applicable)
-	exampleGenerator   *cliexamples.Generator
 
 	// Terminal width for text wrapping
 	terminalWidth int // Terminal width (0 = auto-detect)
@@ -184,12 +182,6 @@ func (b *HelpBuilder) CategorizeFlag(category, flagName string) *HelpBuilder {
 func (b *HelpBuilder) WithSpecExamples(kind string) *HelpBuilder {
 	b.enableSpecExamples = true
 	b.specExampleKind = kind
-	return b
-}
-
-// WithExampleGenerator sets a custom example generator
-func (b *HelpBuilder) WithExampleGenerator(gen *cliexamples.Generator) *HelpBuilder {
-	b.exampleGenerator = gen
 	return b
 }
 
@@ -458,40 +450,9 @@ func (b *HelpBuilder) ApplyToCommand(cmd *cobra.Command) {
 	}
 }
 
-// generateSpecExamples generates spec-driven examples using the cliexamples generator
+// generateSpecExamples generates spec-driven examples for object commands
 func (b *HelpBuilder) generateSpecExamples() []string {
-	// Get or create example generator
-	gen := b.exampleGenerator
-	if gen == nil {
-		var err error
-		gen, err = cliexamples.New()
-		if err != nil {
-			return nil // Fail silently if generator can't be created
-		}
-	}
-
-	// Generate examples for the kind
-	examples, err := gen.GenerateCLICommandExamples(b.specExampleKind)
-	if err != nil || len(examples) == 0 {
-		return nil
-	}
-
-	// Format examples with proper indentation
-	var formatted []string
-	for _, line := range examples {
-		if strings.TrimSpace(line) == emptyValue {
-			formatted = append(formatted, "")
-		} else {
-			// Ensure proper indentation (2 spaces for examples)
-			if !strings.HasPrefix(line, "  ") && !strings.HasPrefix(line, "#") {
-				formatted = append(formatted, "  "+line)
-			} else {
-				formatted = append(formatted, line)
-			}
-		}
-	}
-
-	return formatted
+	return nil
 }
 
 // getTerminalWidth gets the terminal width, using cached value or auto-detecting

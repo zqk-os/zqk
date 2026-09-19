@@ -1,0 +1,9 @@
+$schema: "../schemas/command_spec.schema.json"
+
+name: "vendor"
+short: "Vendor-specific integrations and IDE adapters"
+description: |
+  Vendor-specific integrations, adapters, and UI automation bridges
+  isolated from the core kernel and scheduler planes.
+
+common_flags: true

@@ -218,7 +218,7 @@ func init() {
 			"collaborate safely without losing context.",
 		).
 		AddSection("Command surfaces",
-			"Everyday (orientation): workflow whats-next, object, system, pplan, auth, use.\n"+
+			"Everyday (orientation): workflow whats-next, object, system, pplan, auth.\n"+
 				"Draft objects: zqk object template <kind> (canonical). quick/new are shortcuts — see their --help.\n"+
 				"Health: zqk system check (warm cache; repeat runs should be fast). Scheduler + integrations below.\n"+
 				"Privileged / developer: internal (admin), keystore; use only when documented for your role.\n"+

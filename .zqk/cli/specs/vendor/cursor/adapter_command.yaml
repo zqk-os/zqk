@@ -1,11 +1,11 @@
-$schema: "../../schemas/command_spec.schema.json"
+$schema: "../../../schemas/command_spec.schema.json"
 
-name: "cursor-adapter"
+name: "adapter"
 short: "Cursor-specific MCP adapter (stdio ↔ daemon)"
 description: |
   Speaks a clean full MCP contract on stdio for Cursor while privately
   maintaining keepalive, reconnect, and event subscription against the TCP
-  MCP daemon. Other IDEs should use mcp daemon / mcp serve directly.
+  MCP daemon.
 
 flags:
   - name: "tcp"
@@ -19,7 +19,7 @@ args:
 help:
   examples:
     - comment: "Cursor entrypoint (default daemon)"
-      command: "%s mcp cursor-adapter --tcp 127.0.0.1:8443"
+      command: "%s vendor cursor adapter --tcp 127.0.0.1:8443"
   exclude_flags:
     - "columns"
     - "ignore-scheduler-down"

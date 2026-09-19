@@ -42,6 +42,7 @@ import (
 	"github.com/zqk-os/zqk/cmd/zqk/tray"
 	"github.com/zqk-os/zqk/cmd/zqk/utility"
 	"github.com/zqk-os/zqk/cmd/zqk/validate"
+	"github.com/zqk-os/zqk/cmd/zqk/vendor"
 	"github.com/zqk-os/zqk/cmd/zqk/workflow"
 	"github.com/zqk-os/zqk/pkg/objects"
 	internal "github.com/zqk-os/zqk/pkg/zqkcli"
@@ -228,11 +229,6 @@ func registerCommands() {
 	authCmdInst.GroupID = "everyday"
 	rootCmd.AddCommand(authCmdInst)
 
-	// Use: set persistent project root for this workspace (see PROJECT_ROOT_USE_AND_SCHEDULER_ALIGNMENT.md)
-	useCmdInst := NewUseCmd()
-	useCmdInst.GroupID = "everyday"
-	rootCmd.AddCommand(useCmdInst)
-
 	// Join: connect to a peer kernel in the Sovereign Mesh
 	joinCmdInst := NewJoinCmd()
 	joinCmdInst.GroupID = "advanced"
@@ -262,6 +258,11 @@ func registerCommands() {
 	intakeCmdInst := intake.NewIntakeCmd()
 	intakeCmdInst.GroupID = "integrations"
 	rootCmd.AddCommand(intakeCmdInst)
+
+	// Vendor: vendor-specific integrations and IDE adapters
+	vendorCmdInst := vendor.NewVendorCmd()
+	vendorCmdInst.GroupID = "integrations"
+	rootCmd.AddCommand(vendorCmdInst)
 
 	// Ops commands
 	opsCmdInst := ops.NewOpsCmd()

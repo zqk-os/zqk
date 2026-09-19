@@ -1,8 +1,6 @@
 package scheduler
 
 import (
-	"strings"
-
 	"github.com/zqk-os/zqk/internal/cli"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
 	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
@@ -48,42 +46,8 @@ func NewTestFailuresCmd() *cobra.Command {
 	testFailuresCmd.AddCommand(NewTestFailuresAnalyzeCmd())
 	testFailuresCmd.AddCommand(NewTestFailuresHealthCmd())
 	testFailuresCmd.AddCommand(NewTestFailuresCriteriaEvidenceCmd())
-	testFailuresCmd.AddCommand(NewTestFailuresConvergenceAliasCmd())
 
 	return testFailuresCmd
-}
-
-// NewTestFailuresConvergenceAliasCmd restores the legacy test-failures convergence command.
-func NewTestFailuresConvergenceAliasCmd() *cobra.Command {
-	// Find the measure command built from spec
-	cmd, err := buildSchedulerConvergenceCmdFromSpec()
-	if err == nil {
-		for _, sub := range cmd.Commands() {
-			if strings.HasPrefix(sub.Use, "measure") {
-				// Clone and alias
-				alias := *sub
-				alias.Use = "convergence"
-				alias.Hidden = true
-				alias.Short = "Deprecated: use 'zqk scheduler convergence measure' instead"
-				// Ensure common flags are added
-				cli.AddCommonFlagsExcluding(&alias, clipkg.DefaultCommonExcludedFlags())
-				cli.BindAsyncProgress(&alias, runTestFailuresConvergenceFromCmd)
-				return &alias
-			}
-		}
-	}
-	// Fallback if spec load fails
-	fallback := clipkg.ApplyBuilder(bldr_cli_cmd_v1.NewSchedulerConvergenceCommandBuilder(), &cobra.Command{
-		Use:    "convergence",
-		Hidden: true,
-	})
-	fallback.Flags().String("session-id", "", "")
-	fallback.Flags().Bool("persist-session", false, "")
-	fallback.Flags().String("current-phase", "", "")
-	fallback.Flags().String("flow-variant", "", "")
-	cli.BindAsyncProgress(fallback, runTestFailuresConvergenceFromCmd)
-	cli.AddCommonFlagsExcluding(fallback, clipkg.DefaultCommonExcludedFlags())
-	return fallback
 }
 
 // NewTestFailuresCriteriaEvidenceCmd reads criteria_verification_evidence from test-bundles/events.jsonl.

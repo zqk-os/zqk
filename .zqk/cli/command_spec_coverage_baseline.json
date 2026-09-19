@@ -78,11 +78,7 @@
     "organizational record-change",
     "organizational sync",
     "pplan",
-    "pplan add",
     "pplan current",
-    "pplan next",
-    "pplan prev",
-    "pplan remove",
     "pre-commit",
     "pre-commit aggregate",
     "pre-commit clear",
@@ -108,7 +104,6 @@
     "scheduler issues",
     "scheduler print-ide-paste-applescript",
     "scheduler test-failures analyze",
-    "scheduler test-failures convergence",
     "scheduler test-failures criteria-evidence",
     "scheduler test-failures health",
     "scheduler test-failures list",
@@ -181,7 +176,6 @@
     "tray list",
     "tray run",
     "tray show",
-    "use",
     "validate",
     "validate agent",
     "validate build-prompt",
@@ -200,13 +194,11 @@
     "workflow whats-next"
   ],
   "specs_without_commands": [
-    "mcp/svc/cursor_adapter_command.yaml",
     "mcp/svc/daemon_command.yaml",
     "mcp/svc/install_command.yaml",
     "mcp/svc/list_tools_command.yaml",
     "mcp/svc/proxy_command.yaml",
     "mcp/svc/serve_command.yaml",
-    "scheduler/print_cursor_paste_applescript_command.yaml",
     "system/generate_agent_configs_command.yaml"
   ]
 }

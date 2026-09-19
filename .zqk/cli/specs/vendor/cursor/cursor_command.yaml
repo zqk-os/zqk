@@ -1,0 +1,9 @@
+$schema: "../../schemas/command_spec.schema.json"
+
+name: "cursor"
+short: "Cursor IDE integrations and adapters"
+description: |
+  Cursor-specific MCP adapters, AppleScript automation bridges,
+  and environment configurations.
+
+common_flags: true

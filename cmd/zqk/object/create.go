@@ -14,7 +14,6 @@ import (
 	"github.com/zqk-os/zqk/internal/cli"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
 	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
-	"github.com/zqk-os/zqk/pkg/cliexamples"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/interactive"
 	"github.com/zqk-os/zqk/pkg/logging"
@@ -35,48 +34,6 @@ func NewCreateCmd() *cobra.Command {
 	cmd.ValidArgsFunction = kindCompletion
 	ensureCmdAnnotations(cmd)
 	cmd.Annotations[AnnotationKindValidate] = KindValidatePositional0
-
-	// Augment help with spec-driven examples when the user supplies a kind:
-	//   zqk object create backlog_item --help
-	// This is preserved from the original implementation
-	defaultHelp := cmd.HelpFunc()
-	cmd.SetHelpFunc(func(cmd *cobra.Command, args []string) {
-		defaultHelp(cmd, args)
-		var kind string
-		if k, ok := kindCanonicalFromPRERun(cmd); ok {
-			kind = k
-		} else {
-			if len(args) < 1 || args[0] == emptyValue {
-				return
-			}
-			var err error
-			kind, err = objects.ResolveAndValidateKindForProject(cli.ResolveProjectRoot("."), args[0])
-			if err != nil {
-				return
-			}
-		}
-
-		gen, err := cliexamples.New()
-		if err != nil {
-			return
-		}
-		examples, err := gen.GenerateCLICommandExamples(kind)
-		if err != nil || len(examples) == 0 {
-			return
-		}
-
-		// Build additional help text using strings.Builder (POL-CODE-007 compliance)
-		var helpBuilder strings.Builder
-		helpBuilder.WriteString("\n")
-		helpBuilder.WriteString("Spec-driven examples:\n")
-		for _, line := range examples {
-			helpBuilder.WriteString(line)
-			helpBuilder.WriteString("\n")
-		}
-
-		// Route through cli.WriteOutput (POL-CODE-007 / MCP test harness)
-		_ = cli.WriteOutput(cmd, []byte(helpBuilder.String()))
-	})
 
 	return cmd
 }
