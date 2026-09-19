@@ -60,6 +60,18 @@ rules:
     child_max_timeout_exempt_if_explicit: true
     idle_shutdown_duration: 5m
 
+  # Object import: bulk import validates and writes many objects; needs generous timeout and idle window
+  - pattern: "object import"
+    timeout: 10m
+    child_max_timeout_exempt: true
+    idle_shutdown_duration: 5m
+
+  # Object export: bulk export walks CAS and serializes objects
+  - pattern: "object export"
+    timeout: 10m
+    child_max_timeout_exempt: true
+    idle_shutdown_duration: 5m
+
   # Pre-commit (scheduler jobs): write-result and aggregate can exceed 5m under load
   - pattern: "pre-commit write-result"
     timeout: 10m

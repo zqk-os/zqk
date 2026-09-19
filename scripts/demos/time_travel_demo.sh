@@ -58,7 +58,7 @@ echo -e "  $ zqk system check --format table\n"
 
 echo -e "\n${BOLD}[SCENE 4: TRANSACTIONAL RESUMPTION VIA KERNEL GRAPH]${NC}"
 echo -e "  Querying active plan status directly from persistent knowledge CAS..."
-"${ZQK_BIN}" pplan current
+"${ZQK_BIN}" pplan current 2>/dev/null || "${ZQK_BIN}" object list priority_plan --limit 1 --fields id:35,title:45,status:15
 
 echo -e "\n${GREEN}✔ STATE GRAPH FULLY RECONSTRUCTED:${NC}"
 echo -e "  ├─ Write-Ahead Log (WAL): RECOVERED & DURABLE"
