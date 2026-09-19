@@ -45,7 +45,7 @@ sleep 1
 echo -e "${BOLD}[SCENE 2: THE ROGUE EXPLOIT ATTEMPT]${NC}"
 echo -e "  Monolithic Agent behavior: blindly reads host secrets via shell/I/O tool..."
 echo -e "  Agent-1 attempts tool invocation:"
-echo -e "    ${CYAN}ReadFile(path=\"/Users/${USER:-lance}/.ssh/id_rsa\")${NC}\n"
+echo -e "    ${CYAN}ReadFile(path=\"\${HOME}/.ssh/id_rsa\")${NC}\n"
 
 sleep 1.2
 
@@ -54,7 +54,7 @@ echo -e "  ${RED}===============================================================
 echo -e "  ${BOLD}${RED}✖ ACCESS DENIED (FAIL-CLOSED MEMBRANE INTERCEPT)${NC}"
 echo -e "  ${RED}===========================================================================${NC}"
 echo -e "  ${BOLD}Trigger:${NC}       safepath_violation / project_root_escape"
-echo -e "  ${BOLD}Target:${NC}        /Users/${USER:-lance}/.ssh/id_rsa"
+echo -e "  ${BOLD}Target:${NC}        \${HOME}/.ssh/id_rsa"
 echo -e "  ${BOLD}Rule:${NC}          POL-CODE-1784813784308316000-9ec597bf (I/O Boundary Enforcement)"
 echo -e "  ${BOLD}Kernel Action:${NC} MCP directory jail trapped out-of-boundary traversal."
 echo -e "                 Host filesystem isolate held inviolate."

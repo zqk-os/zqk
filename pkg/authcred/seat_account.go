@@ -26,7 +26,6 @@ var legacyAccountColonToACC = map[string]string{
 	"account:developer":               "ACC-1785920548450214003-23d25bd5",
 	"account:executive":               "ACC-1785920548450214004-ad421786",
 	"account:founder":                 "ACC-1785920548450214005-60837d47",
-	"account:lanceettl":               "ACC-1785920548450214006-2e52b3e7",
 	"account:observer_agent":          "ACC-1785920548450214007-10c6d625",
 	"account:owner":                   "ACC-1785920548450214008-ce03e2b5",
 	"account:pedantic-code-inspector": "ACC-1785920548450214009-c051e765",

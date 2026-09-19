@@ -1,5 +1,5 @@
 {
-  "project_root": "/Users/lanceettl/zqk-public-candidate",
+  "project_root": ".",
   "bundle_name": "trace-pipeline-gen",
   "created_criteria_ids": [
     "CRIT-1789772708081138000-deb6d47e",
