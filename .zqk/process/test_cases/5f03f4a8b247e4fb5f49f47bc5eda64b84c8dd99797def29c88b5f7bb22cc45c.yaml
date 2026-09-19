@@ -10,12 +10,12 @@ description: ""
 id: TST-1789791806804436001-b2e160fb
 kind: test_case
 namespace_id: zqk:kernel
-path_or_id: pkg/dummy/path_test.go
+path_or_id: pkg/community/openvex_attestation_test.go
 requirement_refs:
     - REQ-1789791806678354000-15eb2745
 schema_version: 2.0.0
 status: originated
 title: 'Test Suite: Cryptographic audit demo showcases verifiable multi-agent chain of custody and CISA OpenVEX attestation generation'
-updated_at: "2026-09-19T04:27:11Z"
+updated_at: "2026-09-19T04:29:34Z"
 updated_by: ACC-1785920548450214012-68b850c0
 version_context: default

@@ -10,12 +10,12 @@ description: ""
 id: TST-1789791799554613001-ae2b23e4
 kind: test_case
 namespace_id: zqk:kernel
-path_or_id: pkg/dummy/path_test.go
+path_or_id: pkg/storage/wal_crash_recovery_integration_test.go
 requirement_refs:
     - REQ-1789791799446482000-22fa145c
 schema_version: 2.0.0
 status: originated
 title: 'Test Suite: Crash-consistency demo showcases live kill -9 process termination, WAL journal replay, and zero-loss state recovery'
-updated_at: "2026-09-19T04:27:04Z"
+updated_at: "2026-09-19T04:29:31Z"
 updated_by: ACC-1785920548450214012-68b850c0
 version_context: default
