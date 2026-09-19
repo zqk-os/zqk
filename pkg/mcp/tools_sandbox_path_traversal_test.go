@@ -194,3 +194,179 @@ func TestMCPWorkspaceWriteGuard_PathTraversal(t *testing.T) {
 		})
 	}
 }
+
+// TestMCPWorkspaceReadGuard_PathTraversal validates BLI-CEF-SEC-002 (F-SEC-002).
+// It verifies that readGuardedWorkspaceFile, handleAgentReadFileTool, and handleAgentReadCodeTool
+// strictly prevent path traversal escapes and symlink traversal outside the workspace root.
+func TestMCPWorkspaceReadGuard_PathTraversal(t *testing.T) {
+	tempRoot := t.TempDir()
+
+	// Create an external directory and file outside project root
+	externalDir := t.TempDir()
+	externalFile := filepath.Join(externalDir, "secret.txt")
+	_ = fileutil.WriteFile(externalFile, []byte("super_secret_payload"), 0644)
+
+	// Create symlinks inside project root pointing outside
+	_ = fileutil.Symlink(externalDir, filepath.Join(tempRoot, "symlink_dir"))
+	_ = fileutil.Symlink(externalFile, filepath.Join(tempRoot, "symlink_file.txt"))
+
+	// Create legitimate files inside project root
+	legitFilePath := filepath.Join(tempRoot, "pkg", "mcp", "safe_file.txt")
+	_ = fileutil.EnsureDir(filepath.Dir(legitFilePath))
+	_ = fileutil.WriteFile(legitFilePath, []byte("legitimate readable content"), 0644)
+
+	legitGoPath := filepath.Join(tempRoot, "pkg", "mcp", "code.go")
+	_ = fileutil.WriteFile(legitGoPath, []byte("package mcp\n"), 0644)
+
+	server := NewServer()
+	server.SetProjectRoot(tempRoot)
+	ctx := context.Background()
+
+	readVectors := []struct {
+		name            string
+		targetPath      string
+		expectErr       bool
+		errContains     string
+		expectedContent string
+	}{
+		{
+			name:        "direct parent escape",
+			targetPath:  "../secret.txt",
+			expectErr:   true,
+			errContains: "access denied",
+		},
+		{
+			name:        "multi-level parent escape",
+			targetPath:  "../../../../etc/passwd",
+			expectErr:   true,
+			errContains: "access denied",
+		},
+		{
+			name:        "nested directory dot-dot escape",
+			targetPath:  "pkg/mcp/../../../../tmp/secret",
+			expectErr:   true,
+			errContains: "access denied",
+		},
+		{
+			name:        "absolute path to external file",
+			targetPath:  externalFile,
+			expectErr:   true,
+			errContains: "access denied",
+		},
+		{
+			name:        "sibling directory escape",
+			targetPath:  filepath.Join(filepath.Dir(tempRoot), "sibling.txt"),
+			expectErr:   true,
+			errContains: "access denied",
+		},
+		{
+			name:        "root directory read as file",
+			targetPath:  ".",
+			expectErr:   true,
+			errContains: "access denied",
+		},
+		{
+			name:        "empty path rejected",
+			targetPath:  "",
+			expectErr:   true,
+			errContains: "path is required",
+		},
+		{
+			name:        "symlink directory traversal outside root",
+			targetPath:  "symlink_dir/secret.txt",
+			expectErr:   true,
+			errContains: "access denied: directory symlink traversal outside project root",
+		},
+		{
+			name:        "symlink file traversal outside root",
+			targetPath:  "symlink_file.txt",
+			expectErr:   true,
+			errContains: "access denied: file symlink traversal outside project root",
+		},
+		{
+			name:            "legitimate safe file inside project root",
+			targetPath:      "pkg/mcp/safe_file.txt",
+			expectErr:       false,
+			expectedContent: "legitimate readable content",
+		},
+		{
+			name:            "legitimate nested file with dot-dot inside root",
+			targetPath:      "pkg/mcp/../mcp/safe_file.txt",
+			expectErr:       false,
+			expectedContent: "legitimate readable content",
+		},
+		{
+			name:            "legitimate go file for read_code",
+			targetPath:      "pkg/mcp/code.go",
+			expectErr:       false,
+			expectedContent: "package mcp",
+		},
+	}
+
+	for _, tt := range readVectors {
+		t.Run("readGuardedWorkspaceFile_"+tt.name, func(t *testing.T) {
+			content, err := server.readGuardedWorkspaceFile(tt.targetPath)
+			if tt.expectErr {
+				if err == nil {
+					t.Fatalf("expected error containing %q for path %q, got nil", tt.errContains, tt.targetPath)
+				}
+				if tt.errContains != "" && !strings.Contains(err.Error(), tt.errContains) {
+					t.Fatalf("expected error containing %q, got %q", tt.errContains, err.Error())
+				}
+			} else {
+				if err != nil {
+					t.Fatalf("unexpected error for legitimate read on path %q: %v", tt.targetPath, err)
+				}
+				if !strings.Contains(string(content), tt.expectedContent) {
+					t.Fatalf("content mismatch: expected %q in %q", tt.expectedContent, string(content))
+				}
+			}
+		})
+
+		t.Run("handleAgentReadFileTool_"+tt.name, func(t *testing.T) {
+			args := map[string]any{
+				objects.FieldKeyPath: tt.targetPath,
+			}
+			res, err := server.handleAgentReadFileTool(ctx, args)
+			if tt.expectErr {
+				if err == nil {
+					t.Fatalf("expected error containing %q for handleAgentReadFileTool on path %q, got nil", tt.errContains, tt.targetPath)
+				}
+				if tt.errContains != "" && !strings.Contains(err.Error(), tt.errContains) {
+					t.Fatalf("expected error containing %q, got %q", tt.errContains, err.Error())
+				}
+			} else {
+				if err != nil {
+					t.Fatalf("unexpected error for handleAgentReadFileTool on path %q: %v", tt.targetPath, err)
+				}
+				strRes, ok := res.(string)
+				if !ok || !strings.Contains(strRes, tt.expectedContent) {
+					t.Fatalf("result mismatch: expected %q, got %v", tt.expectedContent, res)
+				}
+			}
+		})
+
+		t.Run("handleAgentReadCodeTool_"+tt.name, func(t *testing.T) {
+			args := map[string]any{
+				objects.FieldKeyPath: tt.targetPath,
+			}
+			res, err := server.handleAgentReadCodeTool(ctx, args)
+			if tt.expectErr {
+				if err == nil {
+					t.Fatalf("expected error containing %q for handleAgentReadCodeTool on path %q, got nil", tt.errContains, tt.targetPath)
+				}
+				if tt.errContains != "" && !strings.Contains(err.Error(), tt.errContains) {
+					t.Fatalf("expected error containing %q, got %q", tt.errContains, err.Error())
+				}
+			} else {
+				if err != nil {
+					t.Fatalf("unexpected error for handleAgentReadCodeTool on path %q: %v", tt.targetPath, err)
+				}
+				strRes, ok := res.(string)
+				if !ok || !strings.Contains(strRes, tt.expectedContent) {
+					t.Fatalf("result mismatch: expected %q, got %v", tt.expectedContent, res)
+				}
+			}
+		})
+	}
+}

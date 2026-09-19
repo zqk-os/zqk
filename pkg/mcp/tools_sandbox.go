@@ -73,13 +73,13 @@ func resolveSandboxPath(root, path string) (string, error) {
 	evalDir, evalErr := filepath.EvalSymlinks(filepath.Dir(resolvedPath))
 	if evalErr == nil {
 		if !paths.UnderProjectRoot(evalRoot, evalDir) {
-			return "", fmt.Errorf("access denied: directory symlink traversal outside sandbox root")
+			return "", fmt.Errorf("access denied: directory symlink traversal outside project root")
 		}
 	}
 	evalPath, evalErr := filepath.EvalSymlinks(resolvedPath)
 	if evalErr == nil {
 		if !paths.UnderProjectRoot(evalRoot, evalPath) {
-			return "", fmt.Errorf("access denied: file symlink traversal outside sandbox root")
+			return "", fmt.Errorf("access denied: file symlink traversal outside project root")
 		}
 	}
 
@@ -360,6 +360,52 @@ func checkAgentShellGuard(input string, isBash bool) error {
 		strings.Join(guardedKernelDirs, " and "))
 }
 
+// readGuardedWorkspaceFile is the shared read path for the sandbox read_file / read_code
+// tools: resolve the path within the sandbox root, evaluate symlinks, and read securely.
+func (s *Server) readGuardedWorkspaceFile(path string) ([]byte, error) {
+	return readGuardedWorkspaceFileWithRoot(s.fileSandboxRoot(), path)
+}
+
+func readGuardedWorkspaceFile(path string) ([]byte, error) {
+	return readGuardedWorkspaceFileWithRoot(".", path)
+}
+
+func readGuardedWorkspaceFileWithRoot(root, path string) ([]byte, error) {
+	resolvedPath, err := resolveSandboxPath(root, path)
+	if err != nil {
+		return nil, err
+	}
+
+	if root == "" || root == "." {
+		root = "."
+	}
+	absRoot, err := filepath.Abs(root)
+	if err != nil {
+		return nil, fmt.Errorf("failed to resolve project root: %w", err)
+	}
+	absRoot = filepath.Clean(absRoot)
+
+	if resolvedPath == absRoot {
+		return nil, fmt.Errorf("access denied: cannot read project root %q as a file", path)
+	}
+
+	evalRoot := absRoot
+	if ev, err := filepath.EvalSymlinks(absRoot); err == nil {
+		evalRoot = ev
+	}
+
+	evalPath, evalErr := filepath.EvalSymlinks(resolvedPath)
+	if evalErr == nil {
+		if !paths.UnderProjectRoot(evalRoot, evalPath) {
+			return nil, fmt.Errorf("access denied: file symlink traversal outside project root")
+		}
+	} else if !fileutil.IsNotExist(evalErr) {
+		return nil, fmt.Errorf("failed to evaluate symlinks for file %q: %w", resolvedPath, evalErr)
+	}
+
+	return fileutil.ReadFile(resolvedPath)
+}
+
 // writeGuardedWorkspaceFile is the shared write path for the sandbox write_file / write_code
 // tools: kernel-guard the destination, create the parent dir, then write with secure permissions.
 func (s *Server) writeGuardedWorkspaceFile(path, content string) error {
@@ -468,11 +514,7 @@ func (s *Server) handleAgentReadFileTool(ctx context.Context, args map[string]an
 	if !ok || path == "" {
 		return nil, fmt.Errorf("path is required")
 	}
-	targetPath, err := resolveSandboxPath(s.fileSandboxRoot(), path)
-	if err != nil {
-		return nil, err
-	}
-	content, err := fileutil.ReadFile(targetPath)
+	content, err := s.readGuardedWorkspaceFile(path)
 	if err != nil {
 		return nil, err
 	}
@@ -495,12 +537,7 @@ func (s *Server) handleAgentReadCodeTool(ctx context.Context, args map[string]an
 	if !ok || path == "" {
 		return nil, fmt.Errorf("path is required")
 	}
-	targetPath, err := resolveSandboxPath(s.fileSandboxRoot(), path)
-	if err != nil {
-		return nil, err
-	}
-
-	content, err := fileutil.ReadFile(targetPath)
+	content, err := s.readGuardedWorkspaceFile(path)
 	if err != nil {
 		return nil, err
 	}
@@ -508,14 +545,17 @@ func (s *Server) handleAgentReadCodeTool(ctx context.Context, args map[string]an
 	result := string(content)
 
 	if strings.HasSuffix(path, ".go") {
-		auditor := qa.NewASTAuditor()
-		violations, _ := auditor.AuditFile(targetPath)
-		if len(violations) > 0 {
-			result += "\n\n--- AST AUDIT VIOLATIONS ---\n"
-			for _, v := range violations {
-				result += fmt.Sprintf("- [%s] %s (Line %d)\n", v.Severity, v.Message, v.Pos.Line)
+		targetPath, err := resolveSandboxPath(s.fileSandboxRoot(), path)
+		if err == nil {
+			auditor := qa.NewASTAuditor()
+			violations, _ := auditor.AuditFile(targetPath)
+			if len(violations) > 0 {
+				result += "\n\n--- AST AUDIT VIOLATIONS ---\n"
+				for _, v := range violations {
+					result += fmt.Sprintf("- [%s] %s (Line %d)\n", v.Severity, v.Message, v.Pos.Line)
+				}
+				result += "Please fix these violations to comply with ZQK architecture standards.\n"
 			}
-			result += "Please fix these violations to comply with ZQK architecture standards.\n"
 		}
 	}
 
