@@ -168,7 +168,7 @@ func TestCopyBootstrapConfigFiles_Idempotent(t *testing.T) {
 
 	// Set up source directory structure that the function can find
 	// It walks up from current directory, so we'll create it relative to tmpDir
-	sourceDir := datacell.CellCASPrimaryDir(tmpDir, "_internal")
+	sourceDir := filepath.Join(tmpDir, paths.ProcessInternalDir)
 	targetDir := datacell.CellCASPrimaryDir(filepath.Join(tmpDir, "target"), "_internal")
 
 	if err := fileutil.MkdirAll(sourceDir, paths.DirPerm755); err != nil {
@@ -316,7 +316,7 @@ func TestConfigFileWatcher_RegisterAndDetectChanges(t *testing.T) {
 		t.Skip("skipping ConfigFileWatcher test in short mode (long poll/sleep and goroutine teardown)")
 	}
 	tmpDir := t.TempDir()
-	internalDir := datacell.CellCASPrimaryDir(tmpDir, "_internal")
+	internalDir := filepath.Join(tmpDir, paths.ProcessInternalDir)
 	if err := fileutil.MkdirAll(internalDir, paths.DirPerm755); err != nil {
 		t.Fatalf("Failed to create internal directory: %v", err)
 	}

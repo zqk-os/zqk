@@ -64,7 +64,7 @@ func TestCollectInternalFiles(t *testing.T) {
 	tmpDir := t.TempDir()
 	processDir := datacell.ProcessPrimaryDir(tmpDir)
 	auditDir := filepath.Join(processDir, "audit", "2026-01")
-	changeDir := filepath.Join(processDir, "change_journal", "2026-01")
+	changeDir := filepath.Join(processDir, "change_journal_entries", "2026-01")
 
 	// Create test directories
 	if err := fileutil.MkdirAll(auditDir, paths.DirPerm755); err != nil {
