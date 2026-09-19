@@ -2,6 +2,7 @@
 package tray
 
 import (
+	"bytes"
 	"context"
 	"errors"
 	"os"
@@ -9,17 +10,22 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/zqk-os/zqk/pkg/execwrap"
-	"github.com/zqk-os/zqk/pkg/zqkenv"
-
-	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
+	"gopkg.in/yaml.v3"
 
 	"github.com/zqk-os/zqk/internal/cli"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
+	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/datacell"
 	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/execwrap"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 	traypkg "github.com/zqk-os/zqk/pkg/tray"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/validation/qa"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 	"github.com/spf13/cobra"
 )
 
@@ -47,6 +53,7 @@ func NewTrayCmd() *cobra.Command {
 	cmd.AddCommand(newShowCmd())
 	cmd.AddCommand(newExplainCmd())
 	cmd.AddCommand(newRunCmd())
+	cmd.AddCommand(newSignCmd())
 
 	return cmd
 }
@@ -56,9 +63,9 @@ func resolveRoot(cmd *cobra.Command) (string, error) {
 	if ctx == nil {
 		return "", errfmt.Errorf("failed to get context")
 	}
-	projectRoot := cli.ResolveProjectRoot(".")
+	projectRoot := ctx.ProjectRoot
 	if projectRoot == emptyValue {
-		projectRoot = ctx.ProjectRoot
+		projectRoot = cli.ResolveProjectRoot(".")
 	}
 	if projectRoot == emptyValue {
 		return "", errfmt.Errorf("project root not found (run from a zqk project or set project root)")
@@ -205,6 +212,23 @@ func runRun(cmd *cobra.Command, args []string) error {
 
 	fullArgv := append(append([]string{}, e.Argv...), args[1:]...)
 
+	if !e.IsDefault {
+		isPriv, token := traypkg.IsPrivilegedArgv(fullArgv)
+		if isPriv {
+			if e.Signature == "" {
+				return errfmt.Errorf("access denied: tray entry %q contains restricted flag/command (%s) and is not cryptographically signed. Use 'zqk tray sign %s' to authorize, or execute directly.", e.Name, token, e.Name)
+			}
+			keyPath := filepath.Join(projectRoot, paths.ProjectDataDir, "keystore", "auditor.priv")
+			signer, err := qa.NewAuditorSigner(keyPath)
+			if err != nil {
+				return errfmt.Errorf("access denied: tray entry %q requires signature verification, but failed to load auditor key: %w", e.Name, err)
+			}
+			if err := traypkg.VerifyEntry(e, signer.PublicKey()); err != nil {
+				return errfmt.Errorf("access denied: tray entry %q signature verification failed: %w", e.Name, err)
+			}
+		}
+	}
+
 	if dryRun {
 		logging.Fluent(logger).Info("tray dry-run").
 			String("entry", e.Name).
@@ -226,7 +250,11 @@ func runRun(cmd *cobra.Command, args []string) error {
 	c.Stdout = os.Stdout
 	c.Stderr = os.Stderr
 	c.Stdin = os.Stdin
-	c.Env = os.Environ()
+	env := os.Environ()
+	if len(c.Env) > 0 {
+		env = c.Env
+	}
+	c.Env = append(env, "ZQK_EXEC_SOURCE=tray")
 	if err := c.Run(); err != nil {
 		var exitErr *exec.ExitError
 		if errors.As(err, &exitErr) {
@@ -235,4 +263,87 @@ func runRun(cmd *cobra.Command, args []string) error {
 		return errfmt.Newf("tray run").Wrap(err)
 	}
 	return nil
+}
+
+func newSignCmd() *cobra.Command {
+	cmd := clipkg.ApplyBuilder(bldr_cli_cmd_v1.NewTraySignCommandBuilder(), &cobra.Command{
+		Use:   "sign <name>",
+		Short: "Cryptographically sign a tray entry in .zqk/tray.yaml",
+		Args:  cobra.ExactArgs(1),
+		RunE:  runSign,
+	})
+	cmd.Flags().String("key-path", "", "Path to private key (defaults to .zqk/keystore/auditor.priv)")
+	cli.AddCommonFlags(cmd)
+	return cmd
+}
+
+func runSign(cmd *cobra.Command, args []string) error {
+	projectRoot, err := resolveRoot(cmd)
+	if err != nil {
+		return err
+	}
+	userPath := datacell.TrayYAMLPath(projectRoot)
+	data, err := fileutil.ReadFile(userPath)
+	if err != nil {
+		if fileutil.IsNotExist(err) {
+			return errfmt.Errorf("user tray manifest %s does not exist", userPath)
+		}
+		return errfmt.Errorf("read %s: %w", userPath, err)
+	}
+
+	var userCfg traypkg.Config
+	if err := yaml.Unmarshal(data, &userCfg); err != nil {
+		return errfmt.Newf("parse %s", userPath).Wrap(err)
+	}
+
+	name := strings.TrimSpace(args[0])
+	var targetEntry *traypkg.Entry
+	for i := range userCfg.Entries {
+		if userCfg.Entries[i].Name == name {
+			targetEntry = &userCfg.Entries[i]
+			break
+		}
+	}
+	if targetEntry == nil {
+		return errfmt.Errorf("tray entry %q not found in %s", name, userPath)
+	}
+
+	keyPath, _ := cmd.Flags().GetString("key-path")
+	if keyPath == "" {
+		keyPath = filepath.Join(projectRoot, paths.ProjectDataDir, "keystore", "auditor.priv")
+	} else if !filepath.IsAbs(keyPath) {
+		keyPath = filepath.Join(projectRoot, keyPath)
+	}
+
+	signer, err := qa.NewAuditorSigner(keyPath)
+	if err != nil {
+		return errfmt.Errorf("load auditor signer: %w", err)
+	}
+
+	accountID := qa.AuditorAccountID
+	if secCtx := pkgctx.GetSecurityContext(cmd.Context()); secCtx != nil && secCtx.AccountID != "" {
+		accountID = secCtx.AccountID
+	}
+
+	if err := traypkg.SignEntry(targetEntry, signer.PrivateKey(), accountID); err != nil {
+		return errfmt.Errorf("sign tray entry %q: %w", name, err)
+	}
+
+	var buf bytes.Buffer
+	enc := yaml.NewEncoder(&buf)
+	enc.SetIndent(2)
+	if err := enc.Encode(&userCfg); err != nil {
+		return errfmt.Errorf("encode %s: %w", userPath, err)
+	}
+	if err := fileutil.WriteFile(userPath, buf.Bytes(), 0o644); err != nil {
+		return errfmt.Errorf("write %s: %w", userPath, err)
+	}
+
+	return cli.FormatOutput(cmd, map[string]any{
+		"status":    "signed",
+		"name":      targetEntry.Name,
+		"signed_by": targetEntry.SignedBy,
+		"signature": targetEntry.Signature,
+		"key_path":  keyPath,
+	})
 }

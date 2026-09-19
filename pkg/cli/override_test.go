@@ -62,4 +62,15 @@ func TestEnforceOverrideFriction(t *testing.T) {
 			t.Error("expected CI block error, got nil")
 		}
 	})
+
+	t.Run("tray_indirect_execution_blocked", func(t *testing.T) {
+		t.Setenv("ZQK_EXEC_SOURCE", "tray")
+		err := EnforceOverrideFriction(cmd, ctx, secCtx, store, "TEST-1", "backlog_item", reason)
+		if err == nil {
+			t.Fatal("expected tray indirect execution block error, got nil")
+		}
+		if !strings.Contains(err.Error(), "completely blocked when invoked via indirect runners (Tray)") {
+			t.Fatalf("unexpected error message: %v", err)
+		}
+	})
 }

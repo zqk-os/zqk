@@ -91,6 +91,11 @@ func (s *AuditorSigner) PublicKey() string {
 	return fmt.Sprintf("%x%x", pub.X, pub.Y)
 }
 
+// PrivateKey returns the underlying ECDSA private key.
+func (s *AuditorSigner) PrivateKey() *ecdsa.PrivateKey {
+	return s.privateKey
+}
+
 // QASuccess object kind.
 const KindQASuccess = "qa_success"
 

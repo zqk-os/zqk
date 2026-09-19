@@ -32,8 +32,11 @@ var defaultTrayYAML []byte
 // Entry is one named shortcut in the tray manifest.
 type Entry struct {
 	Name        string   `yaml:"name" json:"name"`
-	Description string   `yaml:"description" json:"description"`
+	Description string   `yaml:"description,omitempty" json:"description,omitempty"`
 	Argv        []string `yaml:"argv" json:"argv"`
+	SignedBy    string   `yaml:"signed_by,omitempty" json:"signed_by,omitempty"`
+	Signature   string   `yaml:"signature,omitempty" json:"signature,omitempty"`
+	IsDefault   bool     `yaml:"-" json:"-"`
 }
 
 // Config is the on-disk / embedded YAML shape.
@@ -51,6 +54,7 @@ func Merge(defaults, user []Entry) []Entry {
 		if e.Name == "" {
 			continue
 		}
+		e.IsDefault = true
 		byName[e.Name] = e
 		order = append(order, e.Name)
 	}
@@ -58,6 +62,7 @@ func Merge(defaults, user []Entry) []Entry {
 		if e.Name == "" {
 			continue
 		}
+		e.IsDefault = false
 		if _, exists := byName[e.Name]; exists {
 			byName[e.Name] = e
 			continue
@@ -82,12 +87,18 @@ func Load(projectRoot string) ([]Entry, error) {
 		return nil, err
 	}
 	if projectRoot == "" {
+		for i := range def.Entries {
+			def.Entries[i].IsDefault = true
+		}
 		return validateEntries(def.Entries)
 	}
 	userPath := datacell.TrayYAMLPath(projectRoot)
 	data, err := fileutil.ReadFile(userPath)
 	if err != nil {
 		if fileutil.IsNotExist(err) {
+			for i := range def.Entries {
+				def.Entries[i].IsDefault = true
+			}
 			return validateEntries(def.Entries)
 		}
 		return nil, errfmt.Errorf("read %s: %w", userPath, err)

@@ -37,6 +37,14 @@
             "minItems": 1,
             "items": { "type": "string" },
             "description": "Arguments after the zqk binary (subcommand and flags); must not include the binary name"
+          },
+          "signed_by": {
+            "type": "string",
+            "description": "Kernel Account ID of the author who signed this tray command"
+          },
+          "signature": {
+            "type": "string",
+            "description": "Hex-encoded ECDSA signature over canonical JSON of name + argv"
           }
         },
         "additionalProperties": false
