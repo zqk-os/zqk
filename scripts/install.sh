@@ -16,8 +16,8 @@
 set -e
 
 VERSION="${1:-latest}"
-REPO="lanceman/zqk"
-MODULE="github.com/lanceman/zqk"
+REPO="${ZQK_REPO:-zqk-os/zqk}"
+MODULE="${ZQK_MODULE:-github.com/zqk-os/zqk}"
 INSTALL_DIR="${ZQK_INSTALL_DIR:-/usr/local/bin}"
 # INSTALL_METHOD: auto | binary | goinstall | source
 INSTALL_METHOD="${ZQK_INSTALL_METHOD:-auto}"
@@ -81,13 +81,23 @@ install_binary() {
   # Verify checksum if available
   if [ -f "${TMPDIR}/checksums.txt" ]; then
     echo "🔒 Verifying checksum..."
-    cd "$TMPDIR"
-    if command -v shasum >/dev/null 2>&1; then
-      shasum -a 256 -c checksums.txt --ignore-missing 2>/dev/null || true
-    elif command -v sha256sum >/dev/null 2>&1; then
-      sha256sum -c checksums.txt --ignore-missing 2>/dev/null || true
-    fi
-    cd - >/dev/null
+    (
+      cd "$TMPDIR"
+      if command -v sha256sum >/dev/null 2>&1; then
+        sha256sum -c checksums.txt --ignore-missing || {
+          echo "❌ Checksum verification failed!" >&2
+          exit 1
+        }
+      elif command -v shasum >/dev/null 2>&1; then
+        shasum -a 256 -c checksums.txt --ignore-missing || {
+          echo "❌ Checksum verification failed!" >&2
+          exit 1
+        }
+      else
+        echo "❌ Neither sha256sum nor shasum found; cannot verify checksum." >&2
+        exit 1
+      fi
+    )
   fi
 
   echo "📦 Extracting..."
@@ -140,7 +150,14 @@ install_source() {
   git clone --depth=1 "https://github.com/${REPO}.git" "$src_dir"
   echo "🔧 Building..."
   make -C "$src_dir" zqk
-  _place_binary "${src_dir}/zqk" ""
+  if [ -f "${src_dir}/bin/zqk" ]; then
+    _place_binary "${src_dir}/bin/zqk" ""
+  elif [ -f "${src_dir}/zqk" ]; then
+    _place_binary "${src_dir}/zqk" ""
+  else
+    echo "❌ Built binary not found in ${src_dir}/bin/zqk" >&2
+    exit 1
+  fi
   rm -rf "$src_dir"
 }
 
@@ -220,7 +237,7 @@ if command -v zqk >/dev/null 2>&1 || [ -f "${INSTALL_DIR}/zqk" ]; then
   echo "  mkdir my-project && cd my-project"
   echo "  zqk system init --project-name my-project"
   echo "  zqk workflow whats-next          # discover mission + next tasks"
-  echo "  zqk mcp proxy --tcp 0.0.0.0:7777 # expose MCP to your AI tool"
+  echo "  zqk mcp proxy --tcp 127.0.0.1:7777 # expose MCP securely on loopback"
   echo ""
   echo "Docs: https://github.com/${REPO}#readme"
 fi
