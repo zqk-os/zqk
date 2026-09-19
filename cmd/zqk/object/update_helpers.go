@@ -11,7 +11,6 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/zqk-os/zqk/cmd/zqk/system"
 	"github.com/zqk-os/zqk/internal/cli"
 	"github.com/zqk-os/zqk/pkg/brand"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
@@ -21,6 +20,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/kernelcas"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/objectget"
+	"github.com/zqk-os/zqk/pkg/objectidcache"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/storage"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
@@ -578,7 +578,7 @@ func performBulkCacheInvalidation(kind string, proc *cli.Processor) {
 		Log()
 
 	// Invalidate the entire kind's cache
-	system.InvalidateObjectIDCacheKind(kind)
+	objectidcache.InvalidateObjectIDCacheKind(kind)
 
 	// Rebuild cache in background
 	projectRoot := proc.ProjectRoot()
@@ -586,7 +586,7 @@ func performBulkCacheInvalidation(kind string, proc *cli.Processor) {
 		logger := proc.Logger()
 		goroutinelabels.NewGoroutine("object_id_cache_rebuilder", fmt.Sprintf("rebuilding object ID cache for %s", kind)).
 			StartSimple(func() {
-				cache := system.GetGlobalObjectIDCache()
+				cache := objectidcache.GetGlobalObjectIDCache()
 				err := cache.BuildCache(pkgctx.NewSystemContext(), projectRoot, false)
 				when.When(func() bool { return err != nil }).Then(func() {
 					logging.FluentEvent(logger).Warn("Failed to rebuild cache in background").

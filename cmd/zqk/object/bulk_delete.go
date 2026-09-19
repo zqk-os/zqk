@@ -7,12 +7,12 @@ import (
 	"time"
 
 	"github.com/fatih/color"
-	"github.com/zqk-os/zqk/cmd/zqk/system"
 	"github.com/zqk-os/zqk/internal/cli"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
 	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/objectidcache"
 	"github.com/zqk-os/zqk/pkg/objects"
 	storagepkg "github.com/zqk-os/zqk/pkg/storage"
 	"github.com/zqk-os/zqk/pkg/validation"
@@ -125,7 +125,7 @@ func executeBulkDelete(cmd *cobra.Command, ids []string, proc *cli.Processor) er
 		}
 	}
 	if len(successIDs) > 0 {
-		system.BulkInvalidateObjectIDCache(successIDs, proc.ProjectRoot())
+		objectidcache.BulkInvalidateObjectIDCache(successIDs, proc.ProjectRoot())
 	}
 
 	// Trigger cache freshness check (async, non-blocking)

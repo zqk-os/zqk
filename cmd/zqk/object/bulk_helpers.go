@@ -3,9 +3,9 @@ package object
 import (
 	"fmt"
 
-	"github.com/zqk-os/zqk/cmd/zqk/system"
 	"github.com/zqk-os/zqk/internal/cli"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
+	"github.com/zqk-os/zqk/pkg/objectidcache"
 	"github.com/zqk-os/zqk/pkg/objects"
 	storagepkg "github.com/zqk-os/zqk/pkg/storage"
 	"github.com/spf13/cobra"
@@ -38,7 +38,7 @@ func applyHybridProjectionToBulkResult(result *storagepkg.BulkResult, fields []s
 // This enables non-blocking reference validation during batch operations
 func setCacheCheckerForBatchCreation(_ *cli.Processor) {
 	storagepkg.SetCacheChecker(func(objectID string) (string, bool) {
-		cache := system.GetGlobalObjectIDCache()
+		cache := objectidcache.GetGlobalObjectIDCache()
 		entry, exists := cache.Get(objectID)
 		if exists && entry != nil && entry.FilePath != emptyValue {
 			return entry.FilePath, true
