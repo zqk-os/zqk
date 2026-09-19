@@ -49,6 +49,16 @@ func TestApplyCommandSpecCoverageBaseline(t *testing.T) {
 			wantValid: true,
 			wantFixed: 1,
 		},
+		{
+			name: "specs without commands fails closed even if recorded in baseline",
+			current: CommandSpecCoverage{
+				SpecsWithoutCommands: []string{"mcp/phantom_command.yaml"},
+			},
+			baseline: CommandSpecCoverageBaseline{
+				SpecsWithoutCommands: []string{"mcp/phantom_command.yaml"},
+			},
+			wantValid: false,
+		},
 	}
 
 	for _, test := range tests {
@@ -100,5 +110,45 @@ func TestAnalyzeCommandSpecCoverageFindsUnspecifiedCommand(t *testing.T) {
 	}
 	if len(coverage.CommandsWithoutSpecs) != 1 || coverage.CommandsWithoutSpecs[0] != "system missing" {
 		t.Fatalf("CommandsWithoutSpecs = %v", coverage.CommandsWithoutSpecs)
+	}
+}
+
+func TestWriteCommandSpecCoverageBaseline_RefusesOrphanedSpecs(t *testing.T) {
+	t.Parallel()
+
+	dir := t.TempDir()
+	baselinePath := filepath.Join(dir, "baseline.json")
+
+	coverage := CommandSpecCoverage{
+		CommandsWithoutSpecs: []string{"system missing"},
+		SpecsWithoutCommands: []string{"mcp/orphan_command.yaml"},
+	}
+
+	err := WriteCommandSpecCoverageBaseline(baselinePath, coverage)
+	if err == nil {
+		t.Fatal("expected error when writing baseline with orphaned specs, got nil")
+	}
+}
+
+func TestCommandSpecIDFromPath_MCPSvcNormalization(t *testing.T) {
+	t.Parallel()
+
+	cases := []struct {
+		path   string
+		wantID string
+	}{
+		{"mcp/svc/daemon_command.yaml", "mcp_daemon"},
+		{"mcp/svc/serve_command.yaml", "mcp_serve"},
+		{"mcp/svc/install_command.yaml", "mcp_install"},
+		{"mcp/svc/proxy_command.yaml", "mcp_proxy"},
+		{"mcp/svc/list_tools_command.yaml", "mcp_list_tools"},
+		{"system/check_command.yaml", "system_check"},
+	}
+
+	for _, tc := range cases {
+		got := commandSpecIDFromPath(tc.path)
+		if got != tc.wantID {
+			t.Errorf("commandSpecIDFromPath(%q) = %q, want %q", tc.path, got, tc.wantID)
+		}
 	}
 }

@@ -29,10 +29,6 @@
     "callback notify",
     "ci demote",
     "completion",
-    "convergence",
-    "convergence nest-link",
-    "convergence nest-spawn",
-    "convergence nest-status",
     "docman",
     "docman register",
     "domain",
@@ -57,12 +53,7 @@
     "matrix report",
     "matrix update",
     "mcp cursor-adapter",
-    "mcp daemon",
     "mcp ide-adapter",
-    "mcp install",
-    "mcp list-tools",
-    "mcp proxy",
-    "mcp serve",
     "mesh",
     "mesh advertise",
     "mesh lease",
@@ -193,12 +184,5 @@
     "workflow next",
     "workflow whats-next"
   ],
-  "specs_without_commands": [
-    "mcp/svc/daemon_command.yaml",
-    "mcp/svc/install_command.yaml",
-    "mcp/svc/list_tools_command.yaml",
-    "mcp/svc/proxy_command.yaml",
-    "mcp/svc/serve_command.yaml",
-    "system/generate_agent_configs_command.yaml"
-  ]
+  "specs_without_commands": []
 }

@@ -8,6 +8,7 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/objects"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
@@ -96,7 +97,8 @@ func ApplyCommandSpecCoverageBaseline(
 		baseline.SpecsWithoutCommands,
 	)
 	coverage.Valid = len(coverage.NewCommandsWithoutSpecs) == 0 &&
-		len(coverage.NewSpecsWithoutCommands) == 0
+		len(coverage.NewSpecsWithoutCommands) == 0 &&
+		len(coverage.SpecsWithoutCommands) == 0
 	return coverage
 }
 
@@ -117,9 +119,21 @@ func LoadCommandSpecCoverageBaseline(path string) (CommandSpecCoverageBaseline, 
 
 // WriteCommandSpecCoverageBaseline replaces baseline with the measured drift.
 func WriteCommandSpecCoverageBaseline(path string, coverage CommandSpecCoverage) error {
+	if len(coverage.SpecsWithoutCommands) > 0 {
+		return errfmt.Errorf("refusing to write baseline with %d orphaned specs without commands (fix path mapping or add to ignored specs): %s",
+			len(coverage.SpecsWithoutCommands), strings.Join(coverage.SpecsWithoutCommands, ", "))
+	}
+	commandsWithoutSpecs := coverage.CommandsWithoutSpecs
+	if commandsWithoutSpecs == nil {
+		commandsWithoutSpecs = []string{}
+	}
+	specsWithoutCommands := coverage.SpecsWithoutCommands
+	if specsWithoutCommands == nil {
+		specsWithoutCommands = []string{}
+	}
 	baseline := CommandSpecCoverageBaseline{
-		CommandsWithoutSpecs: coverage.CommandsWithoutSpecs,
-		SpecsWithoutCommands: coverage.SpecsWithoutCommands,
+		CommandsWithoutSpecs: commandsWithoutSpecs,
+		SpecsWithoutCommands: specsWithoutCommands,
 	}
 	data, err := json.MarshalIndent(baseline, "", "  ")
 	if err != nil {
@@ -211,7 +225,11 @@ func commandSpecIDFromPath(relativePath string) string {
 	}
 	id = strings.Join(deduplicated, "_")
 	id = strings.TrimSuffix(id, "_root")
-	return strings.TrimPrefix(id, "root_")
+	id = strings.TrimPrefix(id, "root_")
+	if strings.HasPrefix(id, "mcp_svc_") {
+		id = "mcp_" + strings.TrimPrefix(id, "mcp_svc_")
+	}
+	return id
 }
 
 func canonicalCommandID(value string) string {
@@ -245,6 +263,7 @@ var commandSpecCoverageIgnoredSpecs = map[string]bool{
 	"project_use":                      true,
 	"scheduler_events_aggregate":       true,
 	"system_compact_maintenance_wal":   true,
+	"system_generate_agent_configs":    true,
 	"system_maintenance_request_cycle": true,
 	objects.FieldKeyVersion:            true,
 }
