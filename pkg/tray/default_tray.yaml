@@ -27,3 +27,17 @@ entries:
   - name: intake
     description: Semantic intent capture and kernel object synthesis
     argv: [intake]
+  - name: backlog
+    description: List active backlog items grouped by priority plan and sorted by priority
+    argv:
+      - object
+      - list
+      - backlog_item
+      - --fields
+      - id:40,title:60,priority:15,category:20,status:20,priority_plan_ref:40
+      - --group-by
+      - priority_plan_ref
+      - --sort-by
+      - priority
+      - --filter
+      - status!=archived|complete
