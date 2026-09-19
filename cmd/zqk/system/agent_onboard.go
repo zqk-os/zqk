@@ -1,12 +1,14 @@
 package system
 
 import (
+	"context"
+
+	"github.com/spf13/cobra"
 	"github.com/zqk-os/zqk/internal/cli"
 	"github.com/zqk-os/zqk/pkg/agentonboard"
 	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/logging"
-	"github.com/spf13/cobra"
 )
 
 // NewAgentOnboardCmd wires system agent-onboard (Vector A/B first-contact sync).
@@ -53,6 +55,14 @@ func runAgentOnboard(cmd *cobra.Command, _ []string) error {
 		})
 		if err != nil {
 			return errfmt.Newf("agent-onboard").Wrap(err)
+		}
+		if !detectOnly && !dryRun {
+			if err := EnsureGitHooks(root, logger); err != nil {
+				logging.Fluent(logger).Warn("Failed to ensure git pre-commit hook during agent-onboard").WithError(err).Log()
+			}
+			if sp := proc.Storage(); sp != nil {
+				_ = WarmTestDashboard(context.Background(), root, sp)
+			}
 		}
 		if err := cli.FormatOutput(cmd, res); err != nil {
 			return err

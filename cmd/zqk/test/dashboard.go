@@ -208,6 +208,15 @@ func (s *DashboardState) ScanFromStorage(ctx context.Context, sp storage.ObjectS
 	return s.scanFromStorageLocked(ctx, sp, nil, s.projectRoot, false, "", "")
 }
 
+// WarmLiteFile builds and persists the materialized test dashboard lite file from storage.
+func WarmLiteFile(ctx context.Context, projectRoot string, sp storage.ObjectStorageProvider) error {
+	state := NewDashboardStateWithProjectRoot(projectRoot)
+	if err := state.ScanFromStorage(ctx, sp); err != nil {
+		return err
+	}
+	return state.SaveToLiteFile(projectRoot)
+}
+
 // Engine returns the attached accumulator engine if initialized.
 func (s *DashboardState) Engine() *accumulator.Engine[*DashboardLitePayload] {
 	s.mu.RLock()
@@ -433,11 +442,17 @@ func NewDashboardCmd() *cobra.Command {
 				eng := state.EnsureEngine(projectRoot)
 				env, err := eng.GetOrRecoverPayload(ctx, proc.Storage())
 				if err == nil && env != nil && env.Payload != nil {
-					state.mu.Lock()
-					state.applyPayloadLocked(env.Payload)
-					state.LastUpdated = env.MaterializedAt
-					state.mu.Unlock()
-					loaded = true
+					// In ephemeral CLI execution (non-watch), if the projection is stale, recovering,
+					// or empty, do not exit with an empty skeleton; fall back to synchronous storage load.
+					if watchInterval <= 0 && (env.Stale || env.Recovering || len(env.Payload.TestCases) == 0) {
+						loaded = false
+					} else {
+						state.mu.Lock()
+						state.applyPayloadLocked(env.Payload)
+						state.LastUpdated = env.MaterializedAt
+						state.mu.Unlock()
+						loaded = true
+					}
 				}
 			}
 

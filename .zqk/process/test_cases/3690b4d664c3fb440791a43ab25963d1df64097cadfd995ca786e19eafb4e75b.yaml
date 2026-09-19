@@ -1,0 +1,29 @@
+backlog_item_refs:
+- BLI-1789630408733990000-0a2023fb
+category: integration
+completed_at: '2026-09-18T07:26:58Z'
+created_at: '2026-09-18T05:17:29Z'
+created_by: ACC-1785920548450214012-68b850c0
+criteria_refs:
+- CRIT-1789673676577796000-03fc29cf
+- CRIT-1789673684713711000-344a7b09
+- CRIT-1789673692417549000-42d0da98
+description: 'Proves dest launch CRITs: dest object list/count/get use this kernel;
+  shipped onboarding + architecture stubs have doc_entry rows; no docs/_archive. Evidence:
+  dest first_run_surface_test.go and dest police-community-tree.sh living-kernel pass.'
+goal_refs:
+- GOAL-1789631957245339000-008aac9f
+id: TST-1789708649546112000-ae5e1c28
+kind: test_case
+namespace_id: zqk:kernel
+path_or_id: cmd/zqk-community/app/first_run_surface_test.go
+remaining_open_count: 0
+requirement_refs:
+- REQ-1789630346648087000-a61b7f27
+schema_version: 2.0.0
+started_at: '2026-09-18T05:17:29Z'
+status: complete
+title: 'Launch vetting: dest kernel isolation, shipped doc_entries, no archive markdown'
+updated_at: '2026-09-18T07:26:58Z'
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

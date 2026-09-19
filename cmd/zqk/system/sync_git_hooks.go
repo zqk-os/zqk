@@ -2,14 +2,18 @@ package system
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"path/filepath"
 	"strings"
+	"sync"
 
 	"github.com/spf13/cobra"
 
 	"github.com/zqk-os/zqk/internal/cli"
 	bldr_cli_cmd_v1 "github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/storage"
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -286,3 +290,147 @@ func compareFiles(path1, path2 string) (bool, error) {
 	norm2 := bytes.ReplaceAll(b2, []byte("\r\n"), []byte("\n"))
 	return bytes.Equal(norm1, norm2), nil
 }
+
+const defaultPreCommitHookScript = `#!/bin/sh
+#
+# Pre-commit hook for ZQK
+# Fail-closed enforcement:
+# 1. System check: Knowledge Kernel CAS and referential graph integrity
+# 2. Test dashboard Definition of Done (TDD lineage)
+# 3. Direct commit to main protection
+# 4. Split-brain docs eradication
+
+set -e
+
+REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
+cd "$REPO_ROOT" || exit 1
+
+# Locate ZQK binary
+ZQK_BIN=""
+if [ -x "$REPO_ROOT/bin/zqk" ]; then
+	ZQK_BIN="$REPO_ROOT/bin/zqk"
+elif command -v zqk >/dev/null 2>&1; then
+	ZQK_BIN="$(command -v zqk)"
+fi
+
+# 1. Direct commits to main protection
+CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "")
+if [ "$CURRENT_BRANCH" = "main" ]; then
+	if [ -z "$ZQK_ALLOW_MAIN_COMMIT" ] && [ -z "$ALLOW_MAIN_COMMIT" ]; then
+		echo "❌ ERROR: Direct commits to main are not allowed!"
+		echo "   Create a feature branch: git checkout -b feature/your-plan"
+		echo "   To override: export ZQK_ALLOW_MAIN_COMMIT=1"
+		exit 1
+	fi
+fi
+
+# 2. Split-Brain Eradication Gate
+STAGED_DOCS_PROCESS=$(git diff --cached --name-only 2>/dev/null | grep -E '^docs/process/' || true)
+if [ -n "$STAGED_DOCS_PROCESS" ]; then
+	echo "❌ [SPLIT-BRAIN GUARD] Attempt to stage legacy docs/process files blocked!"
+	echo "All process data must live under .zqk/process/ and specs under .zqk/specs/."
+	echo "$STAGED_DOCS_PROCESS"
+	exit 1
+fi
+
+# 3. Knowledge Kernel CAS & Integrity Gate
+if [ -n "$ZQK_BIN" ]; then
+	echo "🔍 [ZQK PRE-COMMIT] Running Knowledge Kernel system check..."
+	if ! "$ZQK_BIN" system check; then
+		echo "❌ [ZQK PRE-COMMIT] System check failed! Blocking violations found in kernel graph."
+		echo "   Run '$ZQK_BIN system check --details' to inspect and resolve."
+		exit 1
+	fi
+
+	# 4. TDD Definition of Done Verification
+	echo "⚡ [ZQK PRE-COMMIT] Verifying Test Matrix Definition of Done..."
+	if ! "$ZQK_BIN" test dashboard --check-dod; then
+		echo "❌ [ZQK PRE-COMMIT] Definition of Done validation failed! Broken lineage detected."
+		echo "   Run '$ZQK_BIN test dashboard' to inspect broken bindings."
+		exit 1
+	fi
+fi
+`
+
+// EnsureGitHooks checks if a git repository is present and installs/updates
+// the ZQK pre-commit hook into .git/hooks/pre-commit and tools/git-hooks/pre-commit.
+func EnsureGitHooks(projectRoot string, logger logging.Logger) error {
+	gitDir := filepath.Join(projectRoot, ".git")
+	if _, err := fileutil.Stat(gitDir); err != nil {
+		return nil // Not a git repo, skip cleanly
+	}
+
+	toolsDir := filepath.Join(projectRoot, "tools", "git-hooks")
+	if err := fileutil.MkdirAll(toolsDir, 0755); err != nil {
+		return fmt.Errorf("failed to create tools/git-hooks: %w", err)
+	}
+
+	templatePath := filepath.Join(toolsDir, "pre-commit")
+	if _, err := fileutil.Stat(templatePath); fileutil.IsNotExist(err) {
+		if err := fileutil.WriteFile(templatePath, []byte(defaultPreCommitHookScript), 0755); err != nil {
+			return fmt.Errorf("failed to write hook template %s: %w", templatePath, err)
+		}
+	}
+
+	hooksDir := filepath.Join(gitDir, "hooks")
+	if err := fileutil.MkdirAll(hooksDir, 0755); err != nil {
+		return fmt.Errorf("failed to create .git/hooks: %w", err)
+	}
+
+	installedPath := filepath.Join(hooksDir, "pre-commit")
+	if _, err := fileutil.Stat(installedPath + disabledHookSuffix); err == nil {
+		if logger != nil {
+			logging.Fluent(logger).Info("Pre-commit hook is manually disabled (.git/hooks/pre-commit.disabled); skipping").Log()
+		}
+		return nil
+	}
+
+	// Install or update if missing or different
+	needsInstall := false
+	if _, err := fileutil.Stat(installedPath); fileutil.IsNotExist(err) {
+		needsInstall = true
+	} else {
+		eq, _ := compareFiles(templatePath, installedPath)
+		if !eq {
+			needsInstall = true
+		}
+	}
+
+	if needsInstall {
+		if err := installHook(templatePath, installedPath); err != nil {
+			return fmt.Errorf("failed to install pre-commit hook: %w", err)
+		}
+		if logger != nil {
+			logging.Fluent(logger).Info("Installed pre-commit hook into .git/hooks/pre-commit").Log()
+		}
+	}
+
+	return nil
+}
+
+// TestDashboardWarmer is a function that warms the test dashboard lite projection from storage.
+type TestDashboardWarmer func(ctx context.Context, projectRoot string, sp storage.ObjectStorageProvider) error
+
+var (
+	testDashboardWarmerMu     sync.RWMutex
+	globalTestDashboardWarmer TestDashboardWarmer
+)
+
+// RegisterTestDashboardWarmer registers a handler to warm the test dashboard lite file.
+func RegisterTestDashboardWarmer(warmer TestDashboardWarmer) {
+	testDashboardWarmerMu.Lock()
+	defer testDashboardWarmerMu.Unlock()
+	globalTestDashboardWarmer = warmer
+}
+
+// WarmTestDashboard calls the registered test dashboard warmer if available.
+func WarmTestDashboard(ctx context.Context, projectRoot string, sp storage.ObjectStorageProvider) error {
+	testDashboardWarmerMu.RLock()
+	warmer := globalTestDashboardWarmer
+	testDashboardWarmerMu.RUnlock()
+	if warmer != nil {
+		return warmer(ctx, projectRoot, sp)
+	}
+	return nil
+}
+

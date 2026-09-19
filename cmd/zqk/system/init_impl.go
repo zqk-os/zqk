@@ -248,6 +248,21 @@ func runInit(_ *cobra.Command, projectName, template string, force bool, snapsho
 		logging.Fluent(logger).Warn("Failed to inject agent boot protocol").WithError(err).Log()
 	}
 
+	// Ensure Git pre-commit hooks are installed
+	if err := EnsureGitHooks(projectRoot, logger); err != nil {
+		logging.Fluent(logger).Warn("Failed to ensure git pre-commit hook on init").WithError(err).Log()
+	}
+
+	// Warm the test dashboard lite projection from storage
+	sysCtx := pkgctx.NewSystemContext()
+	if factory, ferr := storage.NewStorageFactory(sysCtx, projectRoot); ferr == nil && factory != nil {
+		if sp := factory.GetStorage(); sp != nil {
+			if err := WarmTestDashboard(context.Background(), projectRoot, sp); err != nil {
+				logging.Fluent(logger).Warn("Failed to warm test dashboard lite projection on init").WithError(err).Log()
+			}
+		}
+	}
+
 	// Generate the human-facing Getting Started guide
 	if err := generateGettingStartedGuide(projectRoot, logger); err != nil {
 		logging.Fluent(logger).Warn("Failed to generate ZQK_GETTING_STARTED.md").WithError(err).Log()

@@ -286,6 +286,7 @@ func registerCommands() {
 	testCmdInst := testcmd.NewTestCmd()
 	testCmdInst.GroupID = "everyday"
 	rootCmd.AddCommand(testCmdInst)
+	system.RegisterTestDashboardWarmer(testcmd.WarmLiteFile)
 
 	// Multi-agent orchestration
 	agentCmdInst := agent.NewAgentCmd()

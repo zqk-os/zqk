@@ -257,6 +257,9 @@ docs/process/**/*.yaml
 # Local agent git author/committer (see agent_git_identity.env.example + agent-git-attribution.mdc)
 .zqk/config/agent_git_identity.env
 .zqk/config/escalation.json
+.zqk/config/agent_workspace_sync.json
+.zqk/agent_packs/
+.zqk/ides/
 # Cursor stdio MCP spawn env (API key + session); never commit.
 .zqk/mcp/cursor-stdio.env
 .zqk/mcp/*.env.local

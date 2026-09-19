@@ -1,0 +1,59 @@
+#!/bin/sh
+#
+# Pre-commit hook for ZQK
+# Fail-closed enforcement:
+# 1. System check: Knowledge Kernel CAS and referential graph integrity
+# 2. Test dashboard Definition of Done (TDD lineage)
+# 3. Direct commit to main protection
+# 4. Split-brain docs eradication
+
+set -e
+
+REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
+cd "$REPO_ROOT" || exit 1
+
+# Locate ZQK binary
+ZQK_BIN=""
+if [ -x "$REPO_ROOT/bin/zqk" ]; then
+	ZQK_BIN="$REPO_ROOT/bin/zqk"
+elif command -v zqk >/dev/null 2>&1; then
+	ZQK_BIN="$(command -v zqk)"
+fi
+
+# 1. Direct commits to main protection
+CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "")
+if [ "$CURRENT_BRANCH" = "main" ]; then
+	if [ -z "$ZQK_ALLOW_MAIN_COMMIT" ] && [ -z "$ALLOW_MAIN_COMMIT" ]; then
+		echo "❌ ERROR: Direct commits to main are not allowed!"
+		echo "   Create a feature branch: git checkout -b feature/your-plan"
+		echo "   To override: export ZQK_ALLOW_MAIN_COMMIT=1"
+		exit 1
+	fi
+fi
+
+# 2. Split-Brain Eradication Gate
+STAGED_DOCS_PROCESS=$(git diff --cached --name-only 2>/dev/null | grep -E '^docs/process/' || true)
+if [ -n "$STAGED_DOCS_PROCESS" ]; then
+	echo "❌ [SPLIT-BRAIN GUARD] Attempt to stage legacy docs/process files blocked!"
+	echo "All process data must live under .zqk/process/ and specs under .zqk/specs/."
+	echo "$STAGED_DOCS_PROCESS"
+	exit 1
+fi
+
+# 3. Knowledge Kernel CAS & Integrity Gate
+if [ -n "$ZQK_BIN" ]; then
+	echo "🔍 [ZQK PRE-COMMIT] Running Knowledge Kernel system check..."
+	if ! "$ZQK_BIN" system check; then
+		echo "❌ [ZQK PRE-COMMIT] System check failed! Blocking violations found in kernel graph."
+		echo "   Run '$ZQK_BIN system check --details' to inspect and resolve."
+		exit 1
+	fi
+
+	# 4. TDD Definition of Done Verification
+	echo "⚡ [ZQK PRE-COMMIT] Verifying Test Matrix Definition of Done..."
+	if ! "$ZQK_BIN" test dashboard --check-dod; then
+		echo "❌ [ZQK PRE-COMMIT] Definition of Done validation failed! Broken lineage detected."
+		echo "   Run '$ZQK_BIN test dashboard' to inspect broken bindings."
+		exit 1
+	fi
+fi
