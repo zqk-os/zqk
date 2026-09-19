@@ -1,0 +1,21 @@
+created_at: "2026-09-19T05:55:00Z"
+created_by: ACC-1785920548450214012-68b850c0
+criteria_refs:
+    - CRIT-CLI-TAXONOMY-REORG-001
+description: Unify CVS recording, orchestrate runs, and convergence commands under a dedicated Convergence Management header (zqk convergence ...).
+id: BLI-CLI-CONVERGENCE-MGMT-REORG-001
+kind: backlog_item
+namespace_id: zqk:kernel
+priority: high
+priority_plan_ref: PRI-CLI-TAXONOMY-OVERHAUL-001
+priority_tier: P0
+requirement_refs:
+    - REQ-CLI-TAXONOMY-HARMONIZATION-001
+schema_version: 2.0.0
+status: originated
+title: Establish dedicated Convergence Management parent for orchestration and CVS sessions
+updated_at: "2026-09-19T06:19:07Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs:
+    - WS-CLI-TAXONOMY-OVERHAUL

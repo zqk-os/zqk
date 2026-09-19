@@ -1,0 +1,18 @@
+created_at: "2026-09-19T06:09:54Z"
+created_by: ACC-1785920548450214012-68b850c0
+criteria_refs:
+    - CRIT-1789798192202007000-363d5dee
+    - CRIT-1789798192202008000-a51f388d
+    - CRIT-1789798192202009000-9d11842f
+id: TST-1789798192202007001-4f8dea09
+kind: test_case
+namespace_id: zqk:kernel
+path_or_id: pkg/dummy/path_test.go
+requirement_refs:
+    - REQ-IO-RESOURCE-HYGIENE-001
+schema_version: 2.0.0
+status: originated
+title: 'Test Suite: Mandatory I/O Resource Lifecycle, Storage Retention, and Lock/Temp Cleanup'
+updated_at: "2026-09-19T06:24:27Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

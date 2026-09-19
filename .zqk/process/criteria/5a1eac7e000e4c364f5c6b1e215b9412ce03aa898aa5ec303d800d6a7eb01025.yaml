@@ -1,0 +1,13 @@
+category: functional
+created_at: "2026-09-19T05:55:00Z"
+created_by: ACC-1785920548450214012-68b850c0
+description: Subsystem log and stream outputs must enforce explicit maximum size and rotation schedules, preventing unbounded growth.
+id: CRIT-IO-LOG-ROLLING-001
+kind: criteria
+namespace_id: zqk:kernel
+schema_version: 2.0.0
+status: originated
+title: All stream journals and diagnostic logs enforce max size or age limits with automatic rotation or truncation
+updated_at: "2026-09-19T06:17:28Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

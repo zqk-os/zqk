@@ -75,7 +75,7 @@ fi
 # 1. Knowledge Kernel CAS & Referential Integrity Gate
 if [ -d "$REPO_ROOT/.zqk/process" ]; then
 	echo "🔍 [ZQK PRE-COMMIT] Verifying Knowledge Kernel integrity..."
-	if ! "$ZQK_BIN" system check; then
+	if ! "$ZQK_BIN" system check --tier 1; then
 		echo "❌ [ZQK PRE-COMMIT] System check failed! Blocking violations found in kernel graph."
 		echo "   Run '$ZQK_BIN system check --details' to inspect and resolve."
 		exit 1

@@ -1,0 +1,18 @@
+created_at: "2026-09-19T06:10:00Z"
+created_by: ACC-1785920548450214012-68b850c0
+description: Specialist responsible for structural design, command taxonomy, domain classification, hierarchy coherence, and discoverability across the ZQK CLI, specifications, and Knowledge Kernel schemas.
+id: PER-INFORMATION-ARCHITECT
+kind: persona
+namespace_id: zqk:kernel
+needs:
+    - logical, intuitive command hierarchy
+    - strict domain separation and vendor decoupling
+    - consistent naming conventions across verbs and nouns
+    - clean directory organization for specs and schemas
+role: information_architect
+schema_version: 2.0.0
+status: originated
+title: Information Architect
+updated_at: "2026-09-19T06:16:06Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
