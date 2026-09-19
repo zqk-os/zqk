@@ -16,6 +16,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/resourcehygiene"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -87,6 +88,12 @@ func (h *CleanupConfigHandler) runStep(ctx context.Context, job *ScheduledJob, w
 		return h.runDeleteFiles(workDir, step.Params)
 	case "truncate_files":
 		return h.runTruncateFiles(workDir, step.Params)
+	case "reap_stale_locks":
+		return h.runReapStaleLocks(workDir, step.Params)
+	case "reap_temp_files":
+		return h.runReapTempFiles(workDir, step.Params)
+	case "enforce_log_retention":
+		return h.runEnforceLogRetention(workDir, step.Params)
 	default:
 		SLog(h.logger).Debug(LogEventCleanupStepNotImplemented).
 			JobID(job.ID).
@@ -262,3 +269,76 @@ func parseDuration(s string) (time.Duration, error) {
 	}
 	return time.ParseDuration(s)
 }
+
+func (h *CleanupConfigHandler) runReapStaleLocks(workDir string, params map[string]any) error {
+	thresholdStr := strParam(params, "older_than")
+	if thresholdStr == emptyValue {
+		thresholdStr = strParam(params, "threshold")
+	}
+	threshold := 15 * time.Minute
+	if thresholdStr != emptyValue {
+		if d, err := parseDuration(thresholdStr); err == nil {
+			threshold = d
+		}
+	}
+	cnt, _, err := resourcehygiene.ReapStaleLocks(workDir, threshold, false)
+	if err != nil {
+		return err
+	}
+	if cnt > 0 {
+		SLog(h.logger).Info("cleanup_reaped_stale_locks").
+			Int("count", cnt).
+			Log()
+	}
+	return nil
+}
+
+func (h *CleanupConfigHandler) runReapTempFiles(workDir string, params map[string]any) error {
+	thresholdStr := strParam(params, "older_than")
+	if thresholdStr == emptyValue {
+		thresholdStr = strParam(params, "threshold")
+	}
+	threshold := 30 * time.Minute
+	if thresholdStr != emptyValue {
+		if d, err := parseDuration(thresholdStr); err == nil {
+			threshold = d
+		}
+	}
+	cnt, bytes, _, err := resourcehygiene.ReapOrphanedTempFiles(workDir, threshold, false)
+	if err != nil {
+		return err
+	}
+	if cnt > 0 {
+		SLog(h.logger).Info("cleanup_reaped_temp_files").
+			Int("count", cnt).
+			Int("bytes", int(bytes)).
+			Log()
+	}
+	return nil
+}
+
+func (h *CleanupConfigHandler) runEnforceLogRetention(workDir string, params map[string]any) error {
+	maxAgeStr := strParam(params, "max_age")
+	maxAge := 14 * 24 * time.Hour
+	if maxAgeStr != emptyValue {
+		if d, err := parseDuration(maxAgeStr); err == nil {
+			maxAge = d
+		}
+	}
+	maxSize := int64(10 * 1024 * 1024)
+	if s := intParam(params, "max_size_bytes"); s > 0 {
+		maxSize = int64(s)
+	}
+	cnt, bytes, _, err := resourcehygiene.EnforceLogRetention(workDir, maxAge, maxSize, false)
+	if err != nil {
+		return err
+	}
+	if cnt > 0 {
+		SLog(h.logger).Info("cleanup_enforced_log_retention").
+			Int("count", cnt).
+			Int("bytes", int(bytes)).
+			Log()
+	}
+	return nil
+}
+

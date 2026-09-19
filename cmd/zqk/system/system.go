@@ -108,6 +108,7 @@ func NewSystemCmd() *cobra.Command {
 	systemCmd.AddCommand(NewPolicyInterruptsCmd())
 	systemCmd.AddCommand(NewStreamGCCmd())
 	systemCmd.AddCommand(NewDiskUsageCmd())
+	systemCmd.AddCommand(NewResourceHygieneCmd())
 
 	// Specialized operations
 	systemCmd.AddCommand(NewInitCmd())

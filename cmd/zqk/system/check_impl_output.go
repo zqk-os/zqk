@@ -1,6 +1,7 @@
 package system
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -9,6 +10,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/zqk-os/zqk/pkg/diskusage"
+	"github.com/zqk-os/zqk/pkg/resourcehygiene"
 	caspkg "github.com/zqk-os/zqk/pkg/storage/cas"
 
 	"github.com/spf13/cobra"
@@ -244,12 +247,18 @@ func PrepareCompactCheckOutputData(cmd *cobra.Command, results []CheckResult, bu
 		Recommendations       int            `json:"recommendations"`
 		ErrorStatusObjects    int            `json:"error_status_objects"`
 		AutoFixed             int            `json:"auto_fixed"`
-		GhostRefCount         int            `json:"ghost_ref_count,omitempty"`
-		PendingAutofixBatches int            `json:"pending_autofix_batches,omitempty"`
-		AuditEventsBuffered   int            `json:"audit_events_buffered,omitempty"`
-		AuditEventsSummary    map[string]int `json:"audit_events_summary,omitempty"`
+		GhostRefCount         int                                  `json:"ghost_ref_count,omitempty"`
+		PendingAutofixBatches int                                  `json:"pending_autofix_batches,omitempty"`
+		AuditEventsBuffered   int                                  `json:"audit_events_buffered,omitempty"`
+		AuditEventsSummary    map[string]int                       `json:"audit_events_summary,omitempty"`
+		IOResourceTelemetry   *resourcehygiene.IOResourceTelemetry `json:"io_resource_telemetry,omitempty"`
 	}{}
 	summary.TotalObjects = len(results)
+	if projectRoot != emptyValue {
+		if ioTel, err := resourcehygiene.InspectIOResources(context.Background(), projectRoot); err == nil {
+			summary.IOResourceTelemetry = ioTel
+		}
+	}
 	casDupInv := inventoryCASDuplicateIDsForOutput(cmd, projectRoot)
 	results = appendCASDuplicateIDCheckResults(results, casDupInv)
 	for _, result := range results {
@@ -620,6 +629,7 @@ func outputTable(cmd *cobra.Command, ctx *cli.Context, results []CheckResult, bu
 	writeObjectDraftPlaneSummary(&buf, projectRoot)
 	writeLayeredSummary(&buf, results, cmd)
 	writeCASDuplicateIDSummary(&buf, casDupInv)
+	writeIOResourceHygieneSummary(&buf, projectRoot)
 
 	// Pending count may already have been cleared by maybeClearStaleAutofixBatchesAfterLiveGreen.
 	pendingAutofixBatches := countUnprocessedAutofixBatches(projectRoot)
@@ -937,3 +947,43 @@ func evaluateSystemCheckPristine(results []CheckResult, runIssues *ValidationRun
 // Layer 1: CAS objects needing fixes
 // Layer 2: Active Priority Plans ready for execution
 // Layer 3: Completed and successfully validated items
+
+func writeIOResourceHygieneSummary(buf *strings.Builder, projectRoot string) {
+	if projectRoot == emptyValue {
+		return
+	}
+	ioTel, err := resourcehygiene.InspectIOResources(context.Background(), projectRoot)
+	if err != nil || ioTel == nil {
+		return
+	}
+	buf.WriteString("┌──────────────────────────────────────────────────────────────────────────────────────────────────┐\n")
+	buf.WriteString("│ Layer 4: I/O Resource Hygiene & Storage Telemetry                                                │\n")
+	buf.WriteString("├────────────────────────────────┬─────────────────┬───────────────────────────────────────────────┤\n")
+	buf.WriteString("│ METRIC                         │ VALUE           │ STATUS                                        │\n")
+	buf.WriteString("├────────────────────────────────┼─────────────────┼───────────────────────────────────────────────┤\n")
+	fdStatus := "healthy"
+	if ioTel.MaxFileDescriptors > 0 && ioTel.OpenFileDescriptors > ioTel.MaxFileDescriptors*8/10 {
+		fdStatus = "warning (>80% FD limit)"
+	}
+	fdVal := fmt.Sprintf("%d / %d", ioTel.OpenFileDescriptors, ioTel.MaxFileDescriptors)
+	if ioTel.OpenFileDescriptors < 0 {
+		fdVal = "unavailable"
+	}
+	fmt.Fprintf(buf, "│ %-30s │ %-15s │ %-45s │\n", "Open File Descriptors", fdVal, fdStatus)
+
+	storageVal := fmt.Sprintf("%d files (%s)", ioTel.TotalZqkFiles, diskusage.FormatBytes(ioTel.TotalZqkBytes))
+	fmt.Fprintf(buf, "│ %-30s │ %-15s │ %-45s │\n", ".zqk Storage Volume", storageVal, "tracked")
+
+	lockStatus := "clean (0 stale)"
+	if ioTel.StaleLocksCount > 0 {
+		lockStatus = fmt.Sprintf("attention (%d stale .lock files)", ioTel.StaleLocksCount)
+	}
+	fmt.Fprintf(buf, "│ %-30s │ %-15d │ %-45s │\n", "Stale Lock Files", ioTel.StaleLocksCount, lockStatus)
+
+	tempStatus := "clean (0 orphaned)"
+	if ioTel.OrphanedTempCount > 0 {
+		tempStatus = fmt.Sprintf("attention (%d orphaned .tmp files)", ioTel.OrphanedTempCount)
+	}
+	fmt.Fprintf(buf, "│ %-30s │ %-15d │ %-45s │\n", "Orphaned Temp Files", ioTel.OrphanedTempCount, tempStatus)
+	buf.WriteString("└────────────────────────────────┴─────────────────┴───────────────────────────────────────────────┘\n\n")
+}

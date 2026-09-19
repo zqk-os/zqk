@@ -2,6 +2,7 @@ package scheduler
 
 import (
 	"context"
+	"os"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -104,3 +105,44 @@ func TestParseDuration(t *testing.T) {
 		}
 	}
 }
+
+func TestCleanupConfigHandler_Execute_ResourceHygieneSteps(t *testing.T) {
+	dir := t.TempDir()
+	cleanupDir := filepath.Join(dir, paths.ProjectDataDir, "cleanup")
+	if err := fileutil.MkdirAll(cleanupDir, paths.DirPerm755); err != nil {
+		t.Fatal(err)
+	}
+	cacheDir := filepath.Join(dir, paths.ProjectDataDir, "cache")
+	if err := fileutil.MkdirAll(cacheDir, paths.DirPerm755); err != nil {
+		t.Fatal(err)
+	}
+
+	oldTmp := filepath.Join(cacheDir, ".tmp-durable-12345")
+	_ = fileutil.WriteFile(oldTmp, []byte("temp"), 0o600)
+	oldTime := time.Now().Add(-2 * time.Hour)
+	_ = os.Chtimes(oldTmp, oldTime, oldTime)
+
+	cfgPath := filepath.Join(cleanupDir, "config.yaml")
+	cfgData := []byte(`steps:
+  - type: reap_temp_files
+    older_than: 1h
+  - type: reap_stale_locks
+    older_than: 1h
+  - type: enforce_log_retention
+    max_age: 7d
+`)
+	if err := fileutil.WriteFile(cfgPath, cfgData, paths.FilePerm644); err != nil {
+		t.Fatal(err)
+	}
+
+	h := NewCleanupConfigHandler(dir, logging.GetLoggerFromProfile("test"))
+	err := h.Execute(context.Background(), &ScheduledJob{ID: "SCH-cleanup", JobType: JobTypeCleanup})
+	if err != nil {
+		t.Fatalf("Execute with resource hygiene steps failed: %v", err)
+	}
+
+	if _, err := fileutil.Stat(oldTmp); !fileutil.IsNotExist(err) {
+		t.Errorf("expected oldTmp to be reaped by cleanup job")
+	}
+}
+

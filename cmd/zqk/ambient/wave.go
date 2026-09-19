@@ -15,6 +15,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/resourcehygiene"
 	"github.com/zqk-os/zqk/pkg/storage"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"github.com/zqk-os/zqk/pkg/workflow/whatsnext"
@@ -65,6 +66,9 @@ func runWave(cmd *cobra.Command, args []string) error {
 		// 4b. Human-log error/warn clusters (BLI-METRICS-ERROR-WARN-SIGNAL-001)
 		logClusters := whatsnext.ParseHumanLogClusters(root)
 
+		// 4c. I/O Resource Hygiene & Telemetry (CRIT-IO-TELEMETRY-REPORT-001)
+		ioTel, _ := resourcehygiene.InspectIOResources(ctx, root)
+
 		// 5. Compute ranked next_admin_action
 		var actions []string
 		if amb.GhostRefCount > 0 {
@@ -74,6 +78,12 @@ func runWave(cmd *cobra.Command, args []string) error {
 			actions = append(actions, fmt.Sprintf("triage-system-check: %d blocking issues", amb.BlockingIssues))
 		}
 		actions = append(actions, whatsnext.RankedHumanLogActions(logClusters)...)
+		if ioTel != nil && (ioTel.StaleLocksCount > 0 || ioTel.OrphanedTempCount > 0) {
+			actions = append(actions, fmt.Sprintf("hygiene: reap %d stale lock(s), %d orphaned temp file(s)", ioTel.StaleLocksCount, ioTel.OrphanedTempCount))
+		}
+		if ioTel != nil && ioTel.MaxFileDescriptors > 0 && ioTel.OpenFileDescriptors > ioTel.MaxFileDescriptors*8/10 {
+			actions = append(actions, fmt.Sprintf("triage-resources: %d open FDs (>80%% of limit %d)", ioTel.OpenFileDescriptors, ioTel.MaxFileDescriptors))
+		}
 		if schStuck > 0 {
 			actions = append(actions, fmt.Sprintf("triage-scheduler: %d stuck queues", schStuck))
 		}
@@ -113,6 +123,7 @@ func runWave(cmd *cobra.Command, args []string) error {
 			TestBundleEvidence:      "non-metric",
 			TopErrorClusters:        logClusters.Errors,
 			TopWarnClusters:         logClusters.Warns,
+			IOResourceTelemetry:     ioTel,
 		}
 
 		// Write to .zqk/state/ambient/metrics-rollup.json

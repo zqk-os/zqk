@@ -15,6 +15,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/interactionpolicy"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/resourcehygiene"
 	"github.com/zqk-os/zqk/pkg/storage"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
@@ -98,8 +99,9 @@ type MetricsRollupSnapshot struct {
 	FrequentTimeouts        int            `json:"frequent_timeouts,omitempty"`
 	ChurnIndicators         int            `json:"churn_indicators,omitempty"`
 	TestBundleEvidence      string         `json:"test_bundle_evidence,omitempty"`
-	TopErrorClusters        []IssueCluster `json:"top_error_clusters,omitempty"`
-	TopWarnClusters         []IssueCluster `json:"top_warn_clusters,omitempty"`
+	TopErrorClusters        []IssueCluster                       `json:"top_error_clusters,omitempty"`
+	TopWarnClusters         []IssueCluster                       `json:"top_warn_clusters,omitempty"`
+	IOResourceTelemetry     *resourcehygiene.IOResourceTelemetry `json:"io_resource_telemetry,omitempty"`
 }
 
 // IssueCluster represents a rollup of similar system-check issues.

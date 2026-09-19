@@ -1,25 +1,14 @@
 # Default cleanup config (bundled in bootstrap; extracted to .zqk/cleanup/config.yaml by init).
 # Single input for SCH-cleanup job. See docs/architecture/CLEANUP_MAINTENANCE_DESIGN.md.
-# Steps run in order; add delete_files, truncate_files, cli, build_target as needed.
+# Steps run in order; delete_files, truncate_files, cli, build_target, reap_temp_files, reap_stale_locks, enforce_log_retention.
 
 working_directory: "."
 
-steps: []
-# Example steps (uncomment and adjust):
-# - type: delete_files
-#   path: ".zqk/logs/**/*.log"
-#   older_than: 7d
-# - type: truncate_files
-#   path: ".zqk/logs/log-events-human.log"
-#   keep_last_lines: 10000
-# - type: build_target
-#   tool: make
-#   target: cleanup
-# - type: cli
-#   command: "./scripts/cleanup.sh"
-#   args: []
-
-created_at: 2026-07-01T18:00:00Z
-updated_at: 2026-07-01T18:00:00Z
-created_by: ACC-1785920548450214012-68b850c0
-updated_by: ACC-1785920548450214012-68b850c0
+steps:
+  - type: reap_temp_files
+    older_than: 30m
+  - type: reap_stale_locks
+    older_than: 15m
+  - type: enforce_log_retention
+    max_age: 14d
+    max_size_bytes: 10485760

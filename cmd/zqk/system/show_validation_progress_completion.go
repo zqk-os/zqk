@@ -10,6 +10,7 @@ import (
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/coordination"
 	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/resourcehygiene"
 	"github.com/zqk-os/zqk/pkg/storage"
 	"github.com/zqk-os/zqk/pkg/validation"
 )
@@ -170,6 +171,9 @@ func handleValidationCompletion(vpc *ValidationProgressContext) error {
 
 		// Stale CAS cleanup: resolve "Stale CAS version" in one run (INTEGRITY_RESOLUTION_PLAN)
 		staleCASResult := RunStaleCASCleanupForResults(projectRoot, results, vpc.Logger)
+
+		// Resource hygiene auto-fix: reap stale locks, orphaned temp files, and enforce log limits
+		_, _ = resourcehygiene.ExecuteHygiene(projectRoot, resourcehygiene.DefaultHygieneOptions())
 
 		// Check if we should use scheduler batching
 		useSchedulerBatching := true
@@ -632,6 +636,9 @@ func collectAndOutputFinalResults(vpc *ValidationProgressContext) (bool, error) 
 
 		// Stale CAS cleanup: resolve "Stale CAS version" in one run (INTEGRITY_RESOLUTION_PLAN)
 		staleCASResult := RunStaleCASCleanupForResults(projectRoot, results, vpc.Logger)
+
+		// Resource hygiene auto-fix: reap stale locks, orphaned temp files, and enforce log limits
+		_, _ = resourcehygiene.ExecuteHygiene(projectRoot, resourcehygiene.DefaultHygieneOptions())
 
 		// Check if we should use scheduler batching
 		useSchedulerBatching := true
