@@ -5,6 +5,7 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/fatih/color"
 	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/storage"
 )
@@ -42,7 +43,11 @@ func writeObjectDraftPlaneSummary(buf *strings.Builder, projectRoot string) {
 		rows = append(rows, []string{"None awaiting crossing.", "0", "-"})
 	}
 
-	buf.WriteString("\n=== System Check: Pre-Membrane (Object Draft Plane) ===\n\n")
+	bold := color.New(color.Bold).SprintFunc()
+	cyan := color.New(color.FgCyan).SprintFunc()
+	buf.WriteString(fmt.Sprintf("\n%s\n\n",
+		bold(cyan("=== System Check: Pre-Membrane (Object Draft Plane) ===")),
+	))
 	buf.WriteString(renderTableWithTitle(
 		"Draft Plane: Preliminary Objects That Have Not Crossed the CAS Membrane",
 		headers,

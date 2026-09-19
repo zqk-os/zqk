@@ -15,6 +15,15 @@ entries:
   - name: active-convergence
     description: List active convergence sessions (JSON)
     argv: [object, list, convergence_session, --filter, status=active, --format, json]
-  - name: test-failures-health
-    description: Test bundle health timeline (meaningful after bundles have run)
-    argv: [scheduler, test-failures, health]
+  - name: system-check
+    description: Run system integrity and compliance radar
+    argv: [system, check]
+  - name: whats-next
+    description: Self-discover mission, priority plan, and next actionable BLI
+    argv: [workflow, whats-next]
+  - name: test-dashboard
+    description: Live test execution and regression suite dashboard
+    argv: [test, dashboard]
+  - name: intake
+    description: Semantic intent capture and kernel object synthesis
+    argv: [intake]

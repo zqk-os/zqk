@@ -84,6 +84,7 @@ backends:
             teams: team
             team_configurations: team_configuration
             technical_debts: technical_debt
+            technical_specs: technical_spec
             templates: template
             test_command_rules: test_command_rule
             tests: test_case
@@ -174,6 +175,7 @@ backends:
             team: teams
             team_configuration: team_configurations
             technical_debt: technical_debts
+            technical_spec: technical_specs
             template: templates
             test_audit_aggregation_metric: metrics
             test_case: test_cases

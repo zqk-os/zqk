@@ -187,5 +187,7 @@ func RenderTableWithTitleAndWrap(title string, columns []string, widths []int, r
 	t.SetColumnConfigs(colConfigs)
 
 	t.SetStyle(table.StyleLight)
+	t.Style().Title.Colors = text.Colors{text.Bold}
+	t.Style().Color.Header = text.Colors{text.Bold}
 	return t.Render()
 }

@@ -170,9 +170,9 @@ func runExplain(cmd *cobra.Command, args []string) error {
 
 func newRunCmd() *cobra.Command {
 	cmd := clipkg.ApplyBuilder(bldr_cli_cmd_v1.NewTrayRunCommandBuilder(), &cobra.Command{
-		Use:   "run <name>",
-		Short: "Run the zqk binary with the tray entry argv",
-		Args:  cobra.ExactArgs(1),
+		Use:   "run <name> [args...]",
+		Short: "Run the zqk binary with the tray entry argv and optional additional arguments",
+		Args:  cobra.MinimumNArgs(1),
 		RunE:  runRun,
 	})
 	cmd.Flags().Bool(cli.FlagDryRun, false, "Print argv and exit without executing")
@@ -203,23 +203,25 @@ func runRun(cmd *cobra.Command, args []string) error {
 	}
 	logger := logging.GetLoggerFromProfile(profile)
 
+	fullArgv := append(append([]string{}, e.Argv...), args[1:]...)
+
 	if dryRun {
 		logging.Fluent(logger).Info("tray dry-run").
 			String("entry", e.Name).
 			String("binary", bin).
-			String("argv", strings.Join(e.Argv, " ")).
+			String("argv", strings.Join(fullArgv, " ")).
 			Log()
 		return cli.FormatOutput(cmd, map[string]any{
 			"dry_run":      true,
 			"entry":        e.Name,
 			"binary":       bin,
-			"argv":         e.Argv,
-			"command_line": traypkg.FormatExplainLine(filepath.Base(bin), e.Argv),
+			"argv":         fullArgv,
+			"command_line": traypkg.FormatExplainLine(filepath.Base(bin), fullArgv),
 			"project_root": projectRoot,
 		})
 	}
 
-	c := execwrap.CommandContext(runCtx, bin, e.Argv...) //nolint:gosec // argv from tray manifest (schema-validated); same trust as invoking zqk subcommands manually.
+	c := execwrap.CommandContext(runCtx, bin, fullArgv...) //nolint:gosec // argv from tray manifest (schema-validated); same trust as invoking zqk subcommands manually.
 	zqkenv.WireExecForIsolatedProject(c, projectRoot)
 	c.Stdout = os.Stdout
 	c.Stderr = os.Stderr

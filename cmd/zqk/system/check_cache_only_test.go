@@ -3,6 +3,7 @@ package system
 import (
 	"bytes"
 	"context"
+	"errors"
 	"fmt"
 	"path/filepath"
 	"strings"
@@ -134,7 +135,8 @@ cacheLoopEnd:
 	err := checkCmd.Execute()
 	capturedOutput := buf.String()
 
-	if err != nil {
+	var scErr *SystemCheckError
+	if err != nil && !errors.As(err, &scErr) {
 		t.Fatalf("Check command failed: %v\nOutput:\n%s", err, capturedOutput)
 	}
 

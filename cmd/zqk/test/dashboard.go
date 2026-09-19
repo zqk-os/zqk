@@ -638,8 +638,13 @@ func (s *DashboardState) scanFromStorageLocked(
 		}
 
 		remOpen := len(criteriaList) - completedCount
-		if remVal, ok := tcObj[objects.FieldKeyRemainingOpenCount].(int); ok {
-			remOpen = remVal
+		if remOpen < 0 {
+			remOpen = 0
+		}
+		if len(criteriaList) == 0 {
+			if remVal, ok := tcObj[objects.FieldKeyRemainingOpenCount].(int); ok && remVal >= 0 {
+				remOpen = remVal
+			}
 		}
 
 		model := &TestCaseModel{
@@ -1223,7 +1228,7 @@ type ioWriter interface {
 
 func isCriterionComplete(st string) bool {
 	switch strings.ToLower(strings.TrimSpace(st)) {
-	case objects.ObjectStatusComplete, "validated", "verified", "passed", "success":
+	case objects.ObjectStatusComplete, "validated", "verified", "passed", "success", objects.ObjectStatusArchived:
 		return true
 	default:
 		return false

@@ -6,6 +6,7 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/fatih/color"
 	pkgcli "github.com/zqk-os/zqk/pkg/cli"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/spf13/cobra"
@@ -92,7 +93,15 @@ func writeLayeredSummary(buf *strings.Builder, results []CheckResult, cmd *cobra
 		}
 	}
 
-	buf.WriteString("\n=== System Check: High-Level Layered Summary ===\n\n")
+	bold := color.New(color.Bold).SprintFunc()
+	cyan := color.New(color.FgCyan).SprintFunc()
+	green := color.New(color.FgGreen).SprintFunc()
+	yellow := color.New(color.FgYellow).SprintFunc()
+	dim := color.New(color.Faint).SprintFunc()
+
+	buf.WriteString(fmt.Sprintf("\n%s\n\n",
+		bold(cyan("=== System Check: High-Level Layered Summary ===")),
+	))
 
 	// Layer 0: CAS & Integrity Blockers
 	{
@@ -101,7 +110,7 @@ func writeLayeredSummary(buf *strings.Builder, results []CheckResult, cmd *cobra
 		if len(layer0Issues) > 0 {
 			rows = getGroupedLayer0Rows(layer0Issues, details)
 		} else {
-			rows = append(rows, []string{"No CAS or integrity blockers found.", "-", "-"})
+			rows = append(rows, []string{green("✓ No CAS or integrity blockers found."), "-", "-"})
 		}
 		buf.WriteString(renderTableWithTitle("Layer 0: CAS & Integrity Blockers", headers, rows))
 		buf.WriteString("\n")
@@ -114,7 +123,7 @@ func writeLayeredSummary(buf *strings.Builder, results []CheckResult, cmd *cobra
 		if len(activeIssues) > 0 {
 			rows = getGroupedIssueRows(activeIssues, details)
 		} else {
-			rows = append(rows, []string{"No CAS object issues found.", "-", "-"})
+			rows = append(rows, []string{green("✓ No CAS object issues found."), "-", "-"})
 		}
 		buf.WriteString(renderTableWithTitle("Layer 1: Objects Needing Fixes (Inside CAS Membrane)", headers, rows))
 		buf.WriteString("\n")
@@ -152,7 +161,15 @@ func writeLayeredSummary(buf *strings.Builder, results []CheckResult, cmd *cobra
 				}
 				sort.Strings(statuses)
 				for _, s := range statuses {
-					parts = append(parts, fmt.Sprintf("%d %s", statusCounts[s], s))
+					cnt := statusCounts[s]
+					sColored := s
+					switch s {
+					case "active", "in_progress", "metrics_captured", "originated", "planned":
+						sColored = yellow(s)
+					case "approved", "ready":
+						sColored = cyan(s)
+					}
+					parts = append(parts, fmt.Sprintf("%d %s", cnt, sColored))
 				}
 				statusStr := strings.Join(parts, ", ")
 				rows = append(rows, []string{formatColumnHeader(kind), fmt.Sprintf("%d", len(objs)), statusStr})
@@ -196,7 +213,17 @@ func writeLayeredSummary(buf *strings.Builder, results []CheckResult, cmd *cobra
 				}
 				sort.Strings(statuses)
 				for _, s := range statuses {
-					parts = append(parts, fmt.Sprintf("%d %s", statusCounts[s], s))
+					cnt := statusCounts[s]
+					sColored := s
+					switch s {
+					case "complete", "implemented", "success", "resolved", "validated", "verified":
+						sColored = green(s)
+					case "archived", "deprecated":
+						sColored = dim(s)
+					case "deferred", "rejected":
+						sColored = yellow(s)
+					}
+					parts = append(parts, fmt.Sprintf("%d %s", cnt, sColored))
 				}
 				statusStr := strings.Join(parts, ", ")
 				rows = append(rows, []string{formatColumnHeader(kind), fmt.Sprintf("%d", len(objs)), statusStr})
@@ -439,6 +466,11 @@ func renderTableWithTitle(title string, headers []string, rows [][]string) strin
 			widths[0] = 30
 			widths[1] = 17
 			widths[2] = 43
+		} else if headers[0] == "METRIC" || headers[0] == "Metric" {
+			// Layer 4: METRIC, VALUE, STATUS
+			widths[0] = 30
+			widths[1] = 25
+			widths[2] = 35
 		} else {
 			widths[0] = 30
 			widths[1] = 15

@@ -10,6 +10,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/fatih/color"
 	"github.com/zqk-os/zqk/pkg/diskusage"
 	"github.com/zqk-os/zqk/pkg/resourcehygiene"
 	caspkg "github.com/zqk-os/zqk/pkg/storage/cas"
@@ -649,7 +650,9 @@ func outputTable(cmd *cobra.Command, ctx *cli.Context, results []CheckResult, bu
 		} else if autoFixedCount > 0 {
 			buf.WriteString(fmt.Sprintf("All violations resolved (public and internal). %d issue(s) were auto-fixed.\n\n", autoFixedCount))
 		} else {
-			buf.WriteString("System check passed. No violations found (public and internal).\n\n")
+			green := color.New(color.FgGreen).SprintFunc()
+			bold := color.New(color.Bold).SprintFunc()
+			buf.WriteString(fmt.Sprintf("%s %s\n\n", green("✓"), bold(green("System check passed. No violations found (public and internal)."))))
 		}
 	}
 
@@ -956,34 +959,39 @@ func writeIOResourceHygieneSummary(buf *strings.Builder, projectRoot string) {
 	if err != nil || ioTel == nil {
 		return
 	}
-	buf.WriteString("┌──────────────────────────────────────────────────────────────────────────────────────────────────┐\n")
-	buf.WriteString("│ Layer 4: I/O Resource Hygiene & Storage Telemetry                                                │\n")
-	buf.WriteString("├────────────────────────────────┬─────────────────┬───────────────────────────────────────────────┤\n")
-	buf.WriteString("│ METRIC                         │ VALUE           │ STATUS                                        │\n")
-	buf.WriteString("├────────────────────────────────┼─────────────────┼───────────────────────────────────────────────┤\n")
-	fdStatus := "healthy"
+
+	green := color.New(color.FgGreen).SprintFunc()
+	yellow := color.New(color.FgYellow).SprintFunc()
+	cyan := color.New(color.FgCyan).SprintFunc()
+
+	fdStatus := green("✓ healthy")
 	if ioTel.MaxFileDescriptors > 0 && ioTel.OpenFileDescriptors > ioTel.MaxFileDescriptors*8/10 {
-		fdStatus = "warning (>80% FD limit)"
+		fdStatus = yellow("⚠️ warning (>80% FD limit)")
 	}
 	fdVal := fmt.Sprintf("%d / %d", ioTel.OpenFileDescriptors, ioTel.MaxFileDescriptors)
 	if ioTel.OpenFileDescriptors < 0 {
 		fdVal = "unavailable"
 	}
-	fmt.Fprintf(buf, "│ %-30s │ %-15s │ %-45s │\n", "Open File Descriptors", fdVal, fdStatus)
 
 	storageVal := fmt.Sprintf("%d files (%s)", ioTel.TotalZqkFiles, diskusage.FormatBytes(ioTel.TotalZqkBytes))
-	fmt.Fprintf(buf, "│ %-30s │ %-15s │ %-45s │\n", ".zqk Storage Volume", storageVal, "tracked")
 
-	lockStatus := "clean (0 stale)"
+	lockStatus := green("✓ clean (0 stale)")
 	if ioTel.StaleLocksCount > 0 {
-		lockStatus = fmt.Sprintf("attention (%d stale .lock files)", ioTel.StaleLocksCount)
+		lockStatus = yellow(fmt.Sprintf("⚠️ attention (%d stale .lock files)", ioTel.StaleLocksCount))
 	}
-	fmt.Fprintf(buf, "│ %-30s │ %-15d │ %-45s │\n", "Stale Lock Files", ioTel.StaleLocksCount, lockStatus)
 
-	tempStatus := "clean (0 orphaned)"
+	tempStatus := green("✓ clean (0 orphaned)")
 	if ioTel.OrphanedTempCount > 0 {
-		tempStatus = fmt.Sprintf("attention (%d orphaned .tmp files)", ioTel.OrphanedTempCount)
+		tempStatus = yellow(fmt.Sprintf("⚠️ attention (%d orphaned .tmp files)", ioTel.OrphanedTempCount))
 	}
-	fmt.Fprintf(buf, "│ %-30s │ %-15d │ %-45s │\n", "Orphaned Temp Files", ioTel.OrphanedTempCount, tempStatus)
-	buf.WriteString("└────────────────────────────────┴─────────────────┴───────────────────────────────────────────────┘\n\n")
+
+	headers := []string{"METRIC", "VALUE", "STATUS"}
+	rows := [][]string{
+		{"Open File Descriptors", fdVal, fdStatus},
+		{".zqk Storage Volume", storageVal, cyan("tracked")},
+		{"Stale Lock Files", fmt.Sprintf("%d", ioTel.StaleLocksCount), lockStatus},
+		{"Orphaned Temp Files", fmt.Sprintf("%d", ioTel.OrphanedTempCount), tempStatus},
+	}
+	buf.WriteString(renderTableWithTitle("Layer 4: I/O Resource Hygiene & Storage Telemetry", headers, rows))
+	buf.WriteString("\n")
 }
