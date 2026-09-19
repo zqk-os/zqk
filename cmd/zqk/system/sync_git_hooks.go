@@ -328,7 +328,7 @@ fi
 # 0. CAS Membrane Integrity Gate (Prevent hand-editing of files past the CAS membrane)
 # Any staged file under .zqk/process/**/*.yaml must:
 # a) Have its filename match sha256 of its staged content (CAS content-addressable hash invariant)
-# b) Not be in a preliminary status (draft, conceptual) - those must remain in .zqk/draft/
+# b) Not be in a preliminary status (conceptual) - those must remain on the draft plane (.zqk/object_drafts/)
 STAGED_CAS_FILES=$(git diff --cached --name-only --diff-filter=ACMR | grep -E '^\.zqk/process/.*\.ya?ml$' || true)
 if [ -n "$STAGED_CAS_FILES" ]; then
 	SHASUM_CMD=""
@@ -339,10 +339,10 @@ if [ -n "$STAGED_CAS_FILES" ]; then
 	fi
 
 	for f in $STAGED_CAS_FILES; do
-		# Verify preliminary status is prohibited in .zqk/process/
-		if git show ":$f" 2>/dev/null | grep -E '^[[:space:]]*status:[[:space:]]*["'\'']?(draft|conceptual)["'\'']?[[:space:]]*$' >/dev/null 2>&1; then
-			echo "❌ [ZQK PRE-COMMIT] CAS Membrane Violation: Preliminary status detected in $f"
-			echo "   Objects with preliminary status (draft, conceptual) must remain on the draft plane (.zqk/draft/)."
+		# Verify preliminary status (conceptual) is prohibited in .zqk/process/ (draft status may be valid in CAS)
+		if git show ":$f" 2>/dev/null | grep -E '^[[:space:]]*status:[[:space:]]*["'\'']?conceptual["'\'']?[[:space:]]*$' >/dev/null 2>&1; then
+			echo "❌ [ZQK PRE-COMMIT] CAS Membrane Violation: Preliminary status (conceptual) detected in $f"
+			echo "   Objects with preliminary status (conceptual) must remain on the draft plane (.zqk/object_drafts/)."
 			echo "   Promote the object via '$ZQK_BIN object promote' before committing to CAS."
 			exit 1
 		fi
