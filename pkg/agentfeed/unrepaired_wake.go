@@ -26,7 +26,6 @@ var desktopNotifyMu sync.Mutex
 // AlertUnrepairedWake records that feed append succeeded but peer wake did not.
 // Best-effort Darwin/Linux desktop notify + returns a stable reason string for CLI output.
 //
-// TRACK: [REDACTED-ID] — Phase B fail-loud unrepaired-wake slice;
 // session last_activity lease lives in pkg/mcp (TouchSessionLastActivity).
 func AlertUnrepairedWake(eventID, detail string, reason UnrepairedWakeReason) string {
 	detail = strings.TrimSpace(detail)

@@ -41,7 +41,6 @@ func (s *Server) ServeTCP(addr string) error {
 		return errfmt.Errorf("refusing to bind unauthenticated plain TCP server to non-loopback address %q; mTLS (ServeMTLS) or TLS with authentication is required for network exposure (CRIT-CEF-R2-SEC-MCP-TCP-AUTH-A)", addr)
 	}
 
-	// TRACK: [REDACTED-ID] — multi-client still shares one Server; disconnect must not reset global tool state.
 	s.multiClient.Store(true)
 
 	listener, err := net.Listen("tcp", addr)

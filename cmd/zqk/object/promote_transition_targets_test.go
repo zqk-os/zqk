@@ -22,7 +22,6 @@ func TestPromoteTransitionTargets_OneHopOnly(t *testing.T) {
 	if _, ok := got["prioritizing"]; ok {
 		t.Fatal("must not include non-neighbor prioritizing")
 	}
-	// TRACK: [REDACTED-ID] — auto-only edges are not promote targets.
 	if _, ok := got["complete"]; ok {
 		t.Fatal("auto-only active→complete must not be a promote candidate (overshoot)")
 	}

@@ -83,7 +83,6 @@ func (mp *MessageProcessor) ProcessMessage(ctx context.Context, msg []byte, form
 
 func (mp *MessageProcessor) doProcessMessage(ctx context.Context, msg []byte, format *MessageFormat, writer *bufio.Writer, baseCtx context.Context, operationTracker *OperationTracker) error {
 	// Update transport state (thread-safe).
-	// TRACK: [REDACTED-ID] — multi-client TCP shares one Server; ephemeral
 	// dials (feed steer PublishDaemonEvent) must not steal IDE's transportWriter.
 	_ = concurrency.RunInLockWithLogger(
 		&mp.server.transportMu, LockNameMcpMessageProcessorUpdateTransport, logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)),
@@ -526,7 +525,6 @@ func (mp *MessageProcessor) buildResponse(req *JSONRPCRequest, result any, err e
 
 // queueForConnectionWriter returns the queue that may serialize writes for this
 // connection. Multi-client TCP uses a per-writer queue (not shared clientID state).
-// TRACK: BLI-1784969955962654000-dc689643 — remove when: per-connection Server is default.
 func (mp *MessageProcessor) queueForConnectionWriter(writer *bufio.Writer, format *MessageFormat) *MessageQueue {
 	if mp == nil || mp.server == nil || writer == nil {
 		return nil

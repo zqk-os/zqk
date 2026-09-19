@@ -16,7 +16,6 @@ import (
 // batches under .zqk/autofix/. Empty batches are deleted. Best-effort sync for shockwave /
 // CascadeOnObjectChange so deferred apply cannot replay issues already resolved by promote
 // or other mutations.
-// TRACK: BLI-1785723654802038000-b14064bc — remove when: pending autofix is always
 // revalidated against live state and batches are id-indexed (no full-dir scan needed).
 func PrunePendingAutofixBatchesForObjectID(projectRoot, objectID string) (rewritten, deleted int) {
 	if projectRoot == "" || objectID == "" {

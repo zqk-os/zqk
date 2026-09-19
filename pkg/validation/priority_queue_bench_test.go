@@ -11,7 +11,6 @@ import (
 // which is why the kernel growing past 8000 objects made the check disproportionately
 // slower without any change to this file.
 //
-// TRACK: BLI-1787554988821523000-5d6ba7fd — remove when Enqueue fast-paths the append case;
 // left unfixed here because it is ~0.2% of check runtime and the loop's lock semantics came
 // from a contention fix (f093c7db27) that deserves its own change.
 func BenchmarkPriorityQueueEnqueueChronological(b *testing.B) {

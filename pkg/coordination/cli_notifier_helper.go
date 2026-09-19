@@ -15,11 +15,9 @@ func NewCLINotifierWithCoordinator(
 	operationID, operationType, profile string,
 ) storage.OperationNotifier {
 	if projectRoot == emptyValue {
-		// TRACK: [Initialization prerequisite missing]
 		panic("NewCLINotifierWithCoordinator requires projectRoot")
 	}
 	if storageProvider == nil {
-		// TRACK: [Initialization prerequisite missing]
 		panic("NewCLINotifierWithCoordinator requires storageProvider")
 	}
 

@@ -249,7 +249,6 @@ func (gv *GoValidator) Validate(ctx context.Context, obj map[string]any, kind st
 // This allows create to omit fields like context_scope / category when the spec declares field-level `default`.
 //
 // checklist.default is human documentation (often prose like "required at creation") and must not be applied.
-// TRACK: [REDACTED-ID] — if create-omit relies on checklist-only defaults, promote those to field-level `default` in the object spec.
 func (gv *GoValidator) applySpecDefaults(obj map[string]any, spec *objects.Spec) {
 	if objects.SpecResolvedFieldsMissing(spec) {
 		return

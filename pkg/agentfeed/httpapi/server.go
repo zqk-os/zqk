@@ -1,6 +1,5 @@
 // Package httpapi exposes a private (node-local) HTTP surface for agent_feed I/O
 // so operators and swarm peers can steer/ack/pending without an IDE.
-// TRACK: [REDACTED-ID]
 package httpapi
 
 import (

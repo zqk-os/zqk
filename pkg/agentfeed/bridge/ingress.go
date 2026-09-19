@@ -39,7 +39,6 @@ type Adapter interface {
 
 // ToSteerInput maps a normalized ingress message onto AppendEventInput (same schema as feed steer).
 //
-// TRACK: [REDACTED-ID] — Phase C enterprise messaging bridges.
 func ToSteerInput(projectRoot string, msg IngressMessage) (agentfeed.AppendEventInput, error) {
 	text := strings.TrimSpace(msg.Text)
 	if text == "" {

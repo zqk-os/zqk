@@ -121,7 +121,6 @@ func (cas *ContentAddressableStorage) Create(objectID string, data []byte, bucke
 	if pendingCache == nil || pendErr != nil {
 		// Pending layer is the cross-process bridge before durable index save.
 		// Fall back to synchronous SetMapping so Create does not ACK a ghost.
-		// TRACK: [REDACTED-ID]
 		setArgs := []string{}
 		if bucketKey != emptyValue {
 			setArgs = append(setArgs, bucketKey)
@@ -217,7 +216,6 @@ func (cas *ContentAddressableStorage) Read(objectID string) ([]byte, error) {
 
 	// Prefer GetHashForID: pending visibility + discover/heal. GetHash alone misses
 	// just-created IDs when durable index lag or async validate stripped a mapping.
-	// TRACK: [REDACTED-ID]
 	hash, err := cas.GetHashForID(objectID)
 	if err != nil {
 		// Return ErrObjectNotFound if ID not in index (matches FileObjectStorage behavior)

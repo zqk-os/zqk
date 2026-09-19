@@ -235,7 +235,6 @@ func deriveHint(inbox, outbox []CorrespondenceItem) string {
 // Collaboration contract: only directed steering/chat (explicit to_agent_id)
 // require a cognitive peer receipt. Untargeted mesh_status is a broadcast
 // stamp and must not block the seat with standby_forbidden.
-// TRACK: [REDACTED-ID] — continuous TPM↔AGY duty cycle / MCP notify.
 func expectsPeerAck(ev map[string]any, eventType, toAgentID string) bool {
 	to := strings.TrimSpace(toAgentID)
 	if to == "" {

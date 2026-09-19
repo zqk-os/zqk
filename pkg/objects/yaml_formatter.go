@@ -9,7 +9,6 @@ import (
 // FormatMultiLineYAML ensures multi-line strings are properly formatted in YAML
 // It uses yaml.Node to set the literal block scalar style (|) for strings containing newlines
 // This prevents malformed YAML when strings contain newlines or special characters.
-// TRACK: [REDACTED-ID] — wire this into yamlMarshalForPersistence / CAS writes
 // (today many object paths still call yaml.Marshal and emit double-quoted \n bodies).
 func FormatMultiLineYAML(data map[string]any) ([]byte, error) {
 	// Convert map to yaml.Node tree

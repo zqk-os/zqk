@@ -15,7 +15,6 @@ import (
 // Membership occupancy is EdgeRoleMembership; this list fallback is the
 // safety net until the reverse index is field+role keyed.
 //
-// TRACK: [REDACTED-ID] — list fallback is a safety net while
 // reverse-index SaveCache/load settles; prefer cache hits for hot path.
 // TRACK: BLI-1785723654802038000-b14064bc — merge list even when index non-empty
 // (partial index returned archived-only deps and blocked PRI-SYM-005 promote).

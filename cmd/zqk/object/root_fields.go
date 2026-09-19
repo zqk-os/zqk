@@ -83,7 +83,6 @@ func runObjectRootFields(cmd *cobra.Command, args []string) error {
 				"discovery_lane": string(lane),
 				"all_kinds":      allKinds,
 				"membrane":       "persona_rbac_discovery",
-				"membrane_track": "BLI-1785908739114727000-9a7cc2bd",
 			}
 			if err := cli.FormatOutput(cmd, data); err != nil {
 				return cli.Guard(cmd).Err(err).Return()

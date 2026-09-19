@@ -10,7 +10,6 @@ import (
 // drops the alias keys. Call only for kind criteria — FieldKeyType is a real
 // field on other kinds. Invoked from CoerceMutationFields (every write path),
 // not from generic object create/update CLI.
-// TRACK: BLI-KERNEL-CRIT-CATEGORY-MINT-001 — remove when agents and docs only emit category.
 func CanonicalizeCriteriaFieldKeys(obj map[string]any) {
 	if obj == nil {
 		return

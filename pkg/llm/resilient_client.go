@@ -37,7 +37,6 @@ func NewResilientClient(primary Client, secondary Client, timeout time.Duration)
 // invalid_request). Retrying the same messages cannot help, and falling
 // through to static_mock produces a no-tool-call "success" that parks the
 // seat-worker for missing mutation evidence.
-// TRACK: BLI-COMMS-ORCH-EXECUTE-NOT-ACK-001 — remove when: providers never
 // reject omitted/nil content and mock fallback is scoped to transport only.
 func isNonRetryableLLMError(err error) bool {
 	if err == nil {

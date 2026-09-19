@@ -26,7 +26,6 @@ var (
 // Seat-worker attach caps. AssemblePreparedContext still builds the full
 // kernel bundle (CLI prepare-context stays rich); only the 7B user message
 // is clipped so a 33KB dump cannot eat a third of the 32k window.
-// TRACK: BLI-COMMS-ORCH-EXECUTE-NOT-ACK-001 — remove when: AgentX user
 // prompts stay under ~8KB without this clip, or the 7B window grows.
 const (
 	seatWorkerSteerCap          = 4000

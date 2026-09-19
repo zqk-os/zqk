@@ -346,7 +346,6 @@ func isSilentStaleTriggerDrop(jobID string) bool {
 // isJobsPausedScheduleExemptBuiltin is the fallback when [Scheduler.jobsPausedScheduleExemptIDs] is unset.
 // Primary source of truth is jobs_paused_schedule_exempt_job_ids in scheduler_maintenance_config.yaml.
 //
-// TRACK: [REDACTED-ID] — remove this builtin map when data-cell managers own
 // maintenance/retention scheduling per docs/architecture/DATA_CELL_MODEL.md program completion (no parallel SCH-* truth).
 func isJobsPausedScheduleExemptBuiltin(jobID string) bool {
 	if isPersistentMaintenanceJob(jobID) {

@@ -200,7 +200,6 @@ func (f *FileObjectStorage) EnsureCASIndexFromPaths(kind string, idToFilePath ma
 		// Object-id-cache often lags CAS updates (path still names the deleted hash).
 		// Warming those mappings via SetMappings (explicit-wins) was reverting healed
 		// indexes and making system check flap 0↔hundreds of "orphans".
-		// TRACK: BLI-1785895580100186000-c5539372 — remove when: object-id-cache
 		// always updates CAS paths on write and warm refuses stale paths.
 		if !casHashFileExistsAt(kindDir, filePath, hash) {
 			continue

@@ -178,7 +178,6 @@ func (b *BatchingObjectStorage) flushCreates(queue []batchCreateOp) {
 		}
 		// Fail closed: BulkCreate often returns err=nil with FailureCount>0. If this
 		// object still has no status after bulk, it never went through Create metadata.
-		// TRACK: [REDACTED-ID]
 		if objects.GetString(op.obj, objects.FieldKeyStatus) == emptyValue {
 			id := objects.GetString(op.obj, objects.FieldKeyID)
 			op.errCh <- errfmt.Errorf("batched bulk create left object without status (id=%s); refusing ghost ACK", id)

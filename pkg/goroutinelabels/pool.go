@@ -46,7 +46,6 @@ type Pool struct {
 	mu      sync.RWMutex
 	started bool
 	stopped bool
-	// TRACK: TDE-1785386957523865000-35d7c51e — remove when: residual concurrency_violation wave closes and atomic.Bool usage is covered by package tests under scan-tests
 	isFallback atomic.Bool // true when this pool was created because budget reserve failed or no budget
 }
 

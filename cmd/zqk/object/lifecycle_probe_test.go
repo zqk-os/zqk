@@ -121,7 +121,6 @@ func TestPromoteProbeOrderForwardOnlyFromActive(t *testing.T) {
 
 // priority_plan: demote orders by percent_complete; missing in_progress sorted as 0 and
 // inverted active ("calculated"→75) → in_progress into a false "demotion".
-// TRACK: [REDACTED-ID]
 func TestPriorityPlanPercentCompleteOrdersExecutionLockedAfterActive(t *testing.T) {
 	t.Parallel()
 	lc := bldr_lifecycle_v1.NewPriorityPlanLifecycleBuilder().Build()

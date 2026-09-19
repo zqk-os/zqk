@@ -14,7 +14,6 @@ import (
 
 // PeerSeatsRelPath is the default relative mesh seat map under project data (not process CAS).
 // Prefer paths.PeerSeatsPath(projectRoot) for absolute resolution (path-cache aware).
-// TRACK: [REDACTED-ID] — retire when native MCP seat routing replaces shell pid map.
 var PeerSeatsRelPath = filepath.Join(paths.ProjectDataDir, paths.StateDir, paths.MeshStateSubdir, paths.PeerSeatsFile)
 
 // PeerSeatRecord binds an agent_id to a local wake transport target.

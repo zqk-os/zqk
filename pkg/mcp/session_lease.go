@@ -45,7 +45,6 @@ func SessionLeaseExpired(lastActivity string, ttl time.Duration, now time.Time) 
 // throttle allows, asynchronously updates mcp_session.last_activity via CLI.
 // Best-effort: never blocks the MCP request path on storage.
 //
-// TRACK: [REDACTED-ID] — Phase B session lease/heartbeat.
 func TouchSessionLastActivity(s *Server) {
 	if s == nil {
 		return

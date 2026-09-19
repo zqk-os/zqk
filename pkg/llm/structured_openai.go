@@ -182,7 +182,6 @@ func encodeToolChoice(opts StructuredCompletionOptions) any {
 // and local servers (vLLM / Ollama) reject with
 // "invalid message content type: <nil>", after which ResilientClient used to
 // fall through to static_mock and the seat-worker parked for missing writes.
-// TRACK: BLI-COMMS-ORCH-EXECUTE-NOT-ACK-001 — remove when: providers accept
 // omitted content on assistant+tool_calls and tool-role messages.
 func openAIChatMessages(messages []Message) []map[string]any {
 	openAIMessages := make([]map[string]any, 0, len(messages))

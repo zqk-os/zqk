@@ -3,7 +3,6 @@ package objects
 import "strings"
 
 // Whats-next ranking helpers keyed by lifecycle status.role.
-// TRACK: [REDACTED-ID]
 
 const (
 	whatsNextBonusExecutionLocked = 500_000

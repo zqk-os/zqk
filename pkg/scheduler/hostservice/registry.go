@@ -1,7 +1,6 @@
 // Package hostservice registers per-project-root OS supervisor units (launchd/systemd)
 // and a host-local registry. See docs/architecture/SCHEDULER_HOST_SERVICE_AND_CLUSTER_STATUS.md.
 //
-// TRACK: [REDACTED-ID] — Windows SCM adapter (design-now; implement later).
 package hostservice
 
 import (
@@ -190,7 +189,6 @@ func NewAdapter() PlatformAdapter {
 	case "linux":
 		return LinuxAdapter{}
 	case "windows":
-		// TRACK: [REDACTED-ID] — Windows SCM backend.
 		return WindowsStubAdapter{}
 	default:
 		return UnsupportedAdapter{GOOS: runtime.GOOS}

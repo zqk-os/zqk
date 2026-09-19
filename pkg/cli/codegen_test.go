@@ -93,7 +93,6 @@ func TestGenerateCommandBuilderFromYAML(t *testing.T) {
 // Many other bldr_cli_cmd_v1 files still have NewCommandBuilder("") and are
 // intentional: ApplyBuilder overlays Use in cmd/zqk. Do not ban all empties.
 //
-// TRACK: [REDACTED-ID] — broaden this list when rematerializing
 // stub specs; remove when empty-Use stubs are no longer the ApplyBuilder pattern.
 var criticalCommandBuildersMustHaveUse = []string{
 	"object_list_command_builder.go",

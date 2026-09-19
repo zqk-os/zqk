@@ -123,7 +123,6 @@ func (p *ProxyDaemon) Start(ctx context.Context) error {
 				// IDE often sends a clientInfo.name the daemon does not treat as a
 				// human IDE → initialize returns auth elicitation → UI green, zero tools.
 				// Stamp a known human client name before forward/cache.
-				// TRACK: [REDACTED-ID] — indestructible IDE MCP.
 				msg = stampIDEInitializeClientInfo(msg)
 				p.mu.Lock()
 				p.initMsg = msg
@@ -133,7 +132,6 @@ func (p *ProxyDaemon) Start(ctx context.Context) error {
 				p.forwardToDaemon(ctx, msg, format)
 				// Stock IDE never calls events/subscribe; register after initialize
 				// lands (auth-error init still accepts subscribe — enable-all path).
-				// TRACK: [REDACTED-ID] — W3 live MCP notify.
 				goroutinelabels.NewGoroutine("mcp_proxy", "ensure IDE events/subscribe after initialize").
 					StartSimple(func() {
 						time.Sleep(50 * time.Millisecond)

@@ -10,7 +10,6 @@ import (
 )
 
 // MCP role names used in process display symlinks (bin/<brand>-mcp-<role>).
-// TRACK: [REDACTED-ID] — ps/Activity Monitor must show role, not bare brand.
 const (
 	MCPRoleProxy      = "proxy"
 	MCPRoleDaemon     = "daemon"

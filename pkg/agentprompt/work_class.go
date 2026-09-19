@@ -7,7 +7,6 @@ import "strings"
 // DocsEval ATKs (CEF remesure, codebase_evaluation) must run on the studio
 // checkout and must not be steered toward cmd/pkg source edits.
 //
-// TRACK: BLI-AGENT-INIT-PROMPT-CLASS-001 — remove when: ATK objects carry an
 // explicit work_class / exec_root field and prepare-context / seat-worker /
 // swarm harness all consume it (no body heuristics).
 type WorkClass string

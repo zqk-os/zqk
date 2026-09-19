@@ -32,7 +32,6 @@ func (f *FileObjectStorage) persistFileObjectUpdate(p *fileObjectUpdatePrep) err
 	effectiveUpdates := p.effectiveUpdates
 	runtimeDeltaOnly := p.runtimeDeltaOnly
 	// Draft-plane / leave-preliminary: sync only (no write-behind). Promote materializes into CAS.
-	// TRACK: [REDACTED-ID]
 	effectiveStatus, _ := existing[objects.FieldKeyStatus].(string)
 	onDraftPlane := f.objectDraftPlaneExists(kind, id)
 	stayOnDraftPlane := shouldUseObjectDraftPlane(kind, effectiveStatus) || caspkg.ParkCriteriaWithoutCategory(kind, existing) || caspkg.ParkObjectWithoutDescription(kind, existing)

@@ -105,7 +105,6 @@ func (p *ContextBuilderPattern) Build() (*Context, error) {
 func (p *ContextBuilderPattern) MustBuild() *Context {
 	ctx, err := p.builder.Build()
 	if err != nil {
-		// TRACK: [Initialization failure]
 		panic(fmt.Sprintf("failed to build context: %v", err))
 	}
 	return ctx

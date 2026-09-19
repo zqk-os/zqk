@@ -192,7 +192,6 @@ func kindDirName(kind string) string {
 	// Must match FileObjectStorage / CAS kind directories (e.g. doc_entry → doc_entries).
 	// Using the raw kind string made async validation scan an empty/wrong tree, so the
 	// existence cache never saw new hash files and treated them as stale on save.
-	// TRACK: [REDACTED-ID]
 	if dir := objects.GetDirectoryFromKind(kind); dir != emptyValue {
 		return dir
 	}

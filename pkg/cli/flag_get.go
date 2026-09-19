@@ -7,7 +7,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// TRACK: [REDACTED-ID] — FlagBag + when.Try/UnlessErr replace Get*+err
 // ladders without swallowing errors.
 
 // FlagBag reads cobra flags with first-error retention. Later getters short-circuit

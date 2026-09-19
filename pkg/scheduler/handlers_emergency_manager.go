@@ -242,7 +242,6 @@ func (h *EmergencyManagerHandler) writeReport(report emergencyManagerReport) {
 
 func (h *EmergencyManagerHandler) appendEmergencyChat(reason string, snap capFailureSnapshot) {
 	eventPath := datacell.AgentChatChannelEventsJSONLPath(h.projectRoot)
-	// TRACK: TDE-1785977862724113000-348bfd5e — remove when: pre-launch fileutil sweep replaces os.MkdirAll/OpenFile with EnsureDir + helpers
 	if err := fileutil.MkdirAll(filepath.Dir(eventPath), 0755); err != nil {
 		return
 	}

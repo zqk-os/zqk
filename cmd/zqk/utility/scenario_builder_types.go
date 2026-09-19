@@ -79,7 +79,6 @@ type ScenarioBuilder struct {
 // Coordinator is required - all events must flow through the coordinator for proper routing
 func NewScenarioBuilder(projectRoot string, storageProvider storage.ObjectStorageProvider, coordinator *coordination.Coordinator) *ScenarioBuilder {
 	if coordinator == nil {
-		// TRACK: [Test utility missing prerequisite]
 		panic("coordinator is required for ScenarioBuilder - all events must flow through coordinator")
 	}
 	return &ScenarioBuilder{

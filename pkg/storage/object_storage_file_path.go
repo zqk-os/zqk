@@ -92,7 +92,6 @@ func (f *FileObjectStorage) getObjectFilePath(id, kind string) (string, error) {
 			_ = coupleObjectIDCacheLivePath(id, kind, draftPath)
 			return draftPath, nil
 		}
-		// TRACK: [REDACTED-ID] — trust CAS index on hot path; no O(files) scan.
 		return "", errfmt.Errorf(ConstStreamObjectStrKindStrNotFoundValErr, id, kind, "cas index miss", ErrObjectNotFound)
 	}
 

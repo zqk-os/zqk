@@ -158,7 +158,6 @@ func detectOrphanedFiles(cmd *cobra.Command, projectRoot string, results []Check
 					// Index often lags updates: id still mapped to a deleted old hash while
 					// the new hash file exists on disk. That is drift, not an orphan — Tier 1
 					// "Orphaned file" made system check flap (0 ↔ hundreds) after bulk updates.
-					// TRACK: BLI-1785723654802038000-b14064bc — remove when: CAS update always
 					// durables the new hash before ACK and check discovery uses disk truth.
 					if oid, idErr := extractObjectIDFromYAMLHead(cleanPath, idHeadBytes); idErr == nil && oid != "" {
 						if indexedHash, ok := indexMappings[oid]; ok && indexedHash != nameWithoutExt {
@@ -210,7 +209,6 @@ func detectOrphanedFiles(cmd *cobra.Command, projectRoot string, results []Check
 					// Prefer re-registering parseable CAS objects over deleting them.
 					// Incomplete indexes falsely mark sole files as orphans; auto-delete wiped
 					// criteria/workstreams during kernel repair (restore from git required).
-					// TRACK: BLI-1785723654802038000-b14064bc — remove when: orphan auto-fix
 					// always reindexes via a shared CAS reconcile API and never deletes sole files.
 					if isCASHashName {
 						if recoveredID, recoverErr := reindexOrphanCASHashFile(kind, kindDir, cleanPath, nameWithoutExt, cas); recoverErr == nil && recoveredID != "" {

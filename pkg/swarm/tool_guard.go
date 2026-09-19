@@ -46,7 +46,6 @@ var inventedObjectListKinds = map[string]struct{}{
 
 // guardSwarmToolCall steers invented or lifecycle-illegal calls into guidance
 // so they do not become coordinator ERROR or "tool not found" loops.
-// TRACK: BLI-COMMS-ORCH-EXECUTE-NOT-ACK-001 — remove when: seats stop inventing
 // hourglass verbs and status= updates after qwen prompt + MCP surface converge.
 func guardSwarmToolCall(call llm.ToolCall) (result string, handled bool) {
 	name := strings.TrimSpace(call.Name)

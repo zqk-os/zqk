@@ -152,7 +152,6 @@ func (s *Scheduler) readJobForAdmission(ctx context.Context, jobID string) *Sche
 // object get / Read already succeed (FailJobAdmission already used this path to disable).
 // Returns true when the job is in cache and eligible to trigger.
 // TRACK: BLI-SCHED-ADMIT-STORAGE-001 / CRIT-SCHED-ADMIT-STORAGE-001 / CRIT-SCHED-TRIGGER-QUEUE-FALLBACK-001
-// TRACK: TDE-CEF-SCHEDULER-CALLBACK-HOURGLASS-001 — remove when List/CAS index is
 // read-your-writes with pending visibility for scheduler_job (CAS_LIST_GET_CONSISTENCY.md).
 func (s *Scheduler) AdmitJobFromStorage(ctx context.Context, jobID string) bool {
 	if s == nil || jobID == emptyValue {

@@ -6,7 +6,6 @@ package objects
 //
 // ok is false when the kind has no archive status — callers must not invent literal
 // "archived" (question uses resolved/deferred; writing archived caused system-check churn).
-// TRACK: BLI-1785723654802038000-b14064bc — remove when: retention never writes status
 // without resolving a lifecycle-valid archive status for the kind.
 func ArchiveStatusForKind(kind string) (status string, ok bool) {
 	return GetGlobalLifecycleLoader().ArchiveStatusForKind(kind)

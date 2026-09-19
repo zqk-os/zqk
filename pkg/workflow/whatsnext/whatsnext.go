@@ -230,7 +230,6 @@ func planHasWork(ctx context.Context, sp storage.ObjectStorageProvider, planID s
 }
 
 func planStatusExecutionReady(st string) bool {
-	// TRACK: [REDACTED-ID] — roles, not status string switches.
 	return objects.PlanStatusExecutionFacing(objects.KindPriorityPlan, st)
 }
 

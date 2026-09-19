@@ -13,7 +13,6 @@ import (
 )
 
 // Lifecycle YAML contract tests (table-driven from disk — no combinatorial matrix).
-// TRACK: [REDACTED-ID]
 
 // strictAutoTriggerKinds require every auto-only non-system edge to declare on_dependent_status
 // (DSL shockwave). Completion rollups are allowlisted until a dependents-all trigger exists.

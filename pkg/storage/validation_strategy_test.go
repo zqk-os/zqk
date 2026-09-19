@@ -470,7 +470,6 @@ func TestAsyncCacheValidationStrategy_ValidateMappings(t *testing.T) {
 
 // TestAsyncCacheValidationStrategy_CacheMissFallsBackToStat ensures a hash written after the
 // last scan is not dropped as stale (CLI parallel create ghost-success bug).
-// TRACK: [REDACTED-ID]
 func TestAsyncCacheValidationStrategy_CacheMissFallsBackToStat(t *testing.T) {
 	tempDir := t.TempDir()
 	seedHash := "async_seed_hash"

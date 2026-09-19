@@ -37,7 +37,6 @@ func (f *FileObjectStorage) maybeStripRedundantTopLevelTraits(obj map[string]any
 }
 
 // yamlMarshalForPersistence applies optional trait normalization then marshals to YAML.
-// TRACK: [REDACTED-ID] — use FormatMultiLineYAML (literal |) so multi-line
 // fields are not re-serialized as double-quoted scalars with \n escapes.
 func (f *FileObjectStorage) yamlMarshalForPersistence(obj map[string]any) ([]byte, error) {
 	f.maybeStripRedundantTopLevelTraits(obj)

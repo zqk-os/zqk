@@ -163,8 +163,8 @@ func TestResolveSeatAccount_plannerFromRoleObject(t *testing.T) {
 }
 
 func TestCanonicalAccountID(t *testing.T) {
-	if got := CanonicalAccountID("", "account:swarm_worker"); got != DefaultSwarmWorkerAccount {
-		t.Fatalf("migrate map: got %q", got)
+	if got := CanonicalAccountID("", "account:swarm_worker"); got != "" {
+		t.Fatalf("unresolved without project root: got %q want empty", got)
 	}
 	if got := CanonicalAccountID("", DefaultSwarmWorkerAccount); got != DefaultSwarmWorkerAccount {
 		t.Fatalf("ACC passthrough: got %q", got)

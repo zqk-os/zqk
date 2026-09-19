@@ -377,7 +377,6 @@ func (iq *indexQueue) processBatch(batch []*indexUpdateRequest) error {
 	mappingsCopy, bucketKeysCopy, staleCount := strategy.ValidateMappings(cas.GetKindDir(), mappingsCopy, bucketKeysCopy)
 	// In-flight batch adds are authoritative: async cache lag must not omit them from the
 	// process view before cross-process merge (re-apply after reload is a second belt).
-	// TRACK: [REDACTED-ID]
 	for _, req := range batch {
 		if req == nil || req.remove {
 			continue
@@ -435,7 +434,6 @@ func (iq *indexQueue) processBatch(batch []*indexUpdateRequest) error {
 	// Cross-process merge: each short-lived CLI process has a partial in-memory index.
 	// Saving only that view clobbers peer creates (parallel `zqk object create`). Under the
 	// file lock, reload disk and overlay this process's mappings (process wins on conflict).
-	// TRACK: [REDACTED-ID] — parallel create lost ~half of durable mappings.
 	if err := concurrency.RunInLock(&cas.GetIndex().Mu, func() error {
 		processMaps := mappingsCopy
 		processBuckets := bucketKeysCopy
@@ -451,7 +449,6 @@ func (iq *indexQueue) processBatch(batch []*indexUpdateRequest) error {
 		mergedMaps := filecas.MergeCASIndexMaps(cas.GetKindDir(), cas.GetIndex().Mappings, processMaps)
 		// Re-apply this batch after disk merge so ValidateMappings cache-lag drops cannot
 		// omit in-flight creates from the durable save (adds are authoritative for this batch).
-		// TRACK: [REDACTED-ID]
 		for _, req := range batch {
 			if req == nil {
 				continue
@@ -543,7 +540,6 @@ func (iq *indexQueue) processBatch(batch []*indexUpdateRequest) error {
 
 	// Normal create/update path persists the index via this queue, not filecas.IDIndex.SetMapping.
 	// Evict pending only after durable save succeeds (ADR-CAS-PENDING-VISIBILITY-LAYER §3).
-	// TRACK: [REDACTED-ID] — queue path omitted confirmPending; single CRUD left stale pending.
 	if err == nil {
 		for _, req := range batch {
 			if req == nil {

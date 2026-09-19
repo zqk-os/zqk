@@ -19,7 +19,6 @@ func (sb *ScenarioBuilder) emitCoordinatorEvent(ctx context.Context, operationTy
 	if sb.coordinator == nil {
 		// Coordinator is required - this indicates a programming error
 		// In normal operation, coordinator is always set by createScenarioBuilder
-		// TRACK: [Test utility missing prerequisite]
 		panic("coordinator is required for ScenarioBuilder - all events must flow through coordinator")
 	}
 

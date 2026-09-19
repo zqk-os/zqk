@@ -35,7 +35,6 @@ func OSEnvSetter(key, value string) { _ = os.Setenv(key, value) }
 //
 // Callers must set TEST_ROOT (and clear PROJECT_ROOT) before this helper when they need local CAS
 // writes. Prefer [pkg/testkit.PrepareIsolatedTempProject].
-// TRACK: BLI-CAS-HAND-DUP-CHECK-001 — remove when: create path refuses fixture IDs into zqk:kernel
 // outside TEST_ROOT regardless of fallthrough.
 func ApplyIsolatedStorageEnv(set EnvSetter) {
 	set(PrivilegedWriterSocket().Name(), UnreachableTestSocketPath())

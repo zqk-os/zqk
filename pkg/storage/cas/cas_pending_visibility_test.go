@@ -152,7 +152,6 @@ func truncateForTest(b []byte, n int) string {
 
 // TestConfirmPendingAfterDurableMappingRequiresIndexEntry ensures pending is kept when
 // the durable index save omitted the id (async validate false-stale).
-// TRACK: [REDACTED-ID]
 func TestConfirmPendingAfterDurableMappingRequiresIndexEntry(t *testing.T) {
 	tempDir := t.TempDir()
 	indexPath := filepath.Join(tempDir, paths.ProcessDir, "doc_entries", ".doc_entry.index")

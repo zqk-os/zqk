@@ -836,7 +836,6 @@ const _sfxIsDaemon = "IS_DAEMON"
 // IsDaemon returns the env name for IS_DAEMON (brand-prefixed). Set to "1" by the privileged
 // writer daemon so in-process storage writes locally (no self-dial), skips write-behind WAL
 // replay, and takes the async hash-registry save path.
-// TRACK: BLI-CEF-R20-SINGLE-WRITER-BLI-001 — remove when: PW is a thin CAS endpoint, not a second write-behind owner
 func IsDaemon() EnvVar { return EnvVar{Key: brand.EnvVar(_sfxIsDaemon)} }
 
 const _sfxPrototypeAccountRefs = "PROTOTYPE_ACCOUNT_REFS"

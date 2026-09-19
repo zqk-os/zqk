@@ -144,7 +144,6 @@ const (
 	PrecondPriorityPlanArchivedWhenSet = "linked priority_plan is archived when priority_plan_ref is set"
 	// PrecondReadyBacklogReferencesPlan is child-owned priority_plan membership:
 	// ≥1 backlog_item with priority_plan_ref=this plan and status planned (conversational "ready").
-	// TRACK: [REDACTED-ID] — naming may rename planned→ready later.
 	PrecondReadyBacklogReferencesPlan = "at least one ready backlog_item references this plan via priority_plan_ref"
 	// PrecondTeamOrPersonaDispatchRefs gates priority_plan shovel-ready / execution-locked
 	// transitions so CAP cannot fall back to every persona. TRACK: BLI-1785915238591238000-619a2f9e
@@ -157,7 +156,6 @@ const (
 	PrecondTDDTestRedPhase = "Must link to a criteria object which is linked to an active but failing test_case (Red TDD phase)"
 	// PrecondAllLinkedBacklogReadyOrLater gates execution lock (→in_progress), including shockwave:
 	// every linked backlog_item must be planned+ (ready-or-later). Vacuous true when no BLI dependents.
-	// TRACK: [REDACTED-ID]
 	PrecondAllLinkedBacklogReadyOrLater = "all linked backlog_items referencing this plan are ready or later"
 	// PrecondNoLinkedBacklogInProgressOrComplete enforces active (shovel-ready) constraints:
 	PrecondNoLinkedBacklogInProgressOrComplete = "no linked backlog_items referencing this plan are in progress or complete"

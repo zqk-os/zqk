@@ -258,7 +258,6 @@ func SetupTestEnvironment(t *testing.T) *TestEnvironment {
 // GetTestRoot returns the test root directory, ensuring it's set
 func (te *TestEnvironment) GetTestRoot() string {
 	if te.TestRoot == emptyValue {
-		// TRACK: [Test helper missing initialization]
 		panic("TestEnvironment not properly initialized")
 	}
 	return te.TestRoot

@@ -156,7 +156,6 @@ func (sb *ScenarioBuilder) createObjectInLayer(
 						})
 				} else {
 					// Other panics - re-panic to let goroutinelabels handle it
-					// TRACK: [Test data loader fatal error]
 					panic(r)
 				}
 			}
@@ -451,7 +450,6 @@ func (sb *ScenarioBuilder) processObjectsSequentially(ctx context.Context, state
 								})
 						} else {
 							// Other panics - re-panic (sequential path doesn't have goroutinelabels protection)
-							// TRACK: [Test data loader fatal error]
 							panic(r)
 						}
 					}

@@ -163,7 +163,6 @@ func InstallToIDE(ideName, configPath, execPath, projectRoot string, logger logg
 		if err := json.Unmarshal(data, &config); err != nil {
 			// Vendor/global files we do not own (empty Gemini mcp_config.json)
 			// must not warn-flood AutoInstall. Skip; do not rewrite.
-			// TRACK: TDE-KERNEL-HARDCODED-ENV-IDS-001 — remove when: AutoInstall
 			// no longer walks ~/.gemini / AGY paths.
 			if isForeignMCPConfig(ideName, configPath) || len(bytes.TrimSpace(data)) == 0 {
 				return nil

@@ -49,7 +49,6 @@ const (
 )
 
 // sessionStorageSecCtx returns a SecurityContext authorized for zqk_session storage I/O.
-// TRACK: BLI-1785905136581480000-1f317f44 — remove when authenticated account contexts
 // always carry the permissions needed for session lifecycle writes.
 func sessionStorageSecCtx(ctx context.Context) *pkgctx.SecurityContext {
 	if sec := pkgctx.GetSecurityContext(ctx); sec != nil {

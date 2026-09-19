@@ -83,7 +83,6 @@ func RunCreateWithData(cmd *cobra.Command, kind string, objData map[string]any) 
 
 // finalizeCLIObjectCreate proves membrane visibility after storage.Create and either
 // reports success or lands a repair draft with an honest notice.
-// TRACK: [REDACTED-ID] — create-friendly: never ghost-success.
 func finalizeCLIObjectCreate(cmd *cobra.Command, proc *cli.Processor, objData map[string]any, kind, objID, sourceFilePath string) error {
 	flushCtx, cancelFlush := storage.DurabilityFlushContext()
 	defer cancelFlush()
@@ -94,7 +93,6 @@ func finalizeCLIObjectCreate(cmd *cobra.Command, proc *cli.Processor, objData ma
 		readErr = errfmt.Errorf("create produced empty object id")
 	} else {
 		// Prove same-process readability first (before flush, which can thrash indexes).
-		// TRACK: [REDACTED-ID]
 		_, readErr = proc.Storage().Read(proc.OperationContext(), proc.SecurityContext(), objID)
 		preFlushOK = readErr == nil
 		// Draft plane is authoritative for preliminary mints — if the file is on disk, do not
@@ -121,7 +119,6 @@ func finalizeCLIObjectCreate(cmd *cobra.Command, proc *cli.Processor, objData ma
 
 	// Draft-plane creates are id-keyed YAML — CAS index flush only thrash-contends with the
 	// scheduler/test matrix and does not make drafts more gettable. Skip when already on disk.
-	// TRACK: [REDACTED-ID]
 	onDraftPlane := false
 	if objID != emptyValue && proc.ProjectRoot() != emptyValue {
 		draftPath := storage.ObjectDraftPlanePath(proc.ProjectRoot(), kind, objID)

@@ -78,7 +78,6 @@ type Status struct {
 	Satisfied   bool   `yaml:"satisfied,omitempty"`
 	System      bool   `yaml:"system,omitempty"`
 	// Role is the cross-kind semantic class (shovel_ready, execution_locked, realign, halted, …).
-	// TRACK: [REDACTED-ID]
 	Role          string          `yaml:"role,omitempty"`
 	Preconditions []string        `yaml:"preconditions,omitempty"`
 	Description   string          `yaml:"description,omitempty"`

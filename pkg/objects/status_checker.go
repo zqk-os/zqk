@@ -106,7 +106,6 @@ func (sc *StatusChecker) IsSatisfied(kind, status string) bool {
 }
 
 // Role returns the cross-kind semantic role from lifecycle YAML (status.role).
-// TRACK: [REDACTED-ID]
 func (sc *StatusChecker) Role(kind, status string) string {
 	if s, ok := sc.getStatusSpec(kind, status); ok {
 		return strings.TrimSpace(s.Role)

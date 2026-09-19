@@ -1042,7 +1042,6 @@ func (c *ObjectIDCache) BuildCache(buildCtx stdcontext.Context, projectRoot stri
 	c.notifyCacheProgress("building", "Building object ID cache...")
 	// Idle watchdog (non-zqk parent) cancels when silent too long; rebuild+warm can
 	// exceed the default 10s window without progress touches.
-	// TRACK: TDE-SYSCHECK-COLD-REBUILD-IDLE-001 — remove when: warm/rebuild always
 	// report activity via a shared progress heartbeat helper.
 	process.TouchMeaningfulActivity()
 

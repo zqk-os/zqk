@@ -10,7 +10,6 @@ import (
 // after Create/Update, ID→index hash must equal sha256(payload). On drift, repair
 // with synchronous SetMapping (same effect as `zqk system sync-cas-index`).
 //
-// TRACK: [REDACTED-ID]
 func (cas *ContentAddressableStorage) EnsureCASIndexMatchesContentHash(objectID string, data []byte, bucketKey string) error {
 	if cas == nil || cas.index == nil || objectID == emptyValue || len(data) == 0 {
 		return nil

@@ -10,7 +10,6 @@ import (
 )
 
 // objectDraftPlaneWarnTotal is an informational backlog signal (does not block "check green").
-// TRACK: [REDACTED-ID]
 const objectDraftPlaneWarnTotal = 50
 
 // writeObjectDraftPlaneSummary reports objects that have not yet met the obligations to cross

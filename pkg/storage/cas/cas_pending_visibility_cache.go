@@ -168,7 +168,6 @@ func (c *CASPendingVisibilityCache) PublishPending(objectID, kind, hash, bucketK
 	}
 
 	// File lock outside in-process mu so we do not hold mu while waiting on peers.
-	// TRACK: [REDACTED-ID] — parallel create pending RMW races.
 	return c.withPendingFileLock(func() error {
 		return concurrency.RunInLockWithLogger(&c.mu, locknames.LockNameListingIndexSave, logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)), func() error {
 			if c.rejectWrites.Load() {
@@ -237,7 +236,6 @@ func (c *CASPendingVisibilityCache) EvictPending(objectID string) error {
 // EvictPendingIfHash removes a pending entry only when it still advertises hash.
 // Used after durable SetMapping confirms id→hash so a newer in-flight PublishPending
 // (concurrent update) is not clobbered.
-// TRACK: [REDACTED-ID] — pending must not shadow durable after confirm.
 func (c *CASPendingVisibilityCache) EvictPendingIfHash(objectID, hash string) error {
 	if c == nil || objectID == "" || hash == "" {
 		return nil
@@ -298,7 +296,6 @@ func projectRootFromCASKindDir(kindDir string) string {
 // Must read the on-disk index: EvictPendingIfHash alone only checks the pending
 // entry's hash, so a save that omitted the id (async validate cache lag) still
 // cleared pending and produced create→get ghosts.
-// TRACK: [REDACTED-ID]
 func ConfirmPendingAfterDurableMapping(indexPath, objectID, hash string) {
 	if objectID == "" || hash == "" || indexPath == "" {
 		return

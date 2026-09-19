@@ -100,7 +100,6 @@ func resolveWakeDeliveryMode(root, explicit string) string {
 
 // IsTPMWakeSeat reports whether toAgentID matches legacy coordinator agent-id tokens.
 // Deprecated for product routing — use ResolveWakeMembrane / peer_seats.wake.
-// TRACK: BLI-COMMS-TPM-LIVE-WAKE-001 — remove when all seats declare wake in peer_seats.
 func IsTPMWakeSeat(toAgentID string) bool {
 	return legacyCoordinatorAgentID(toAgentID)
 }

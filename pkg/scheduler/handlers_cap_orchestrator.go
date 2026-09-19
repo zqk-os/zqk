@@ -337,7 +337,6 @@ func (h *CapOrchestratorHandler) prepareCmd(cmd *exec.Cmd) *exec.Cmd {
 	cmd.Dir = h.projectRoot
 	// Strip then set keys so Unix first-match env semantics cannot keep a parent
 	// ZQK_GRAPH_ENABLED=true (Memgraph hangs were killing review under the CAP timeout).
-	// TRACK: [REDACTED-ID] — CAP review freshness; prefer daemon-level
 	// graph policy once overnight CAP gate is green without per-child overrides.
 	graphKey := zqkenv.RawGraphEnabled()
 	adminGraphKey := zqkenv.AdminGraphEnabled()
@@ -468,7 +467,6 @@ func (h *CapOrchestratorHandler) Execute(ctx context.Context, job *ScheduledJob)
 					if err := h.executeDispatchStage(workerCtx, exe, pid, instruction, shared, isLead); err != nil {
 						// Graph/CAS ghosts in ActivePlans should not fail the whole CAP tick when
 						// the primary Ambient plan can still dispatch.
-						// TRACK: [REDACTED-ID] — tighten whats-next ActivePlans
 						// to file-backed plans only; then remove this soft-skip.
 						msg := err.Error()
 						if strings.Contains(msg, "failed to fetch priority plan") {

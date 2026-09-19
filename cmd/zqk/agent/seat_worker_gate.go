@@ -31,7 +31,6 @@ const (
 	seatWorkerMaxRepairs = 2
 )
 
-// TRACK: BLI-1786951788129303000-f388e71d — remove when: CompletionVerifier
 // evidence is project/ATK-policy pluggable (not hardcoded go vet/test +
 // ZQK_TEST_ROOT) so non-Go / brand-portable repos reuse the seat-worker gate.
 

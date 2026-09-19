@@ -11,7 +11,6 @@ import (
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
-// TRACK: PRI-STABILIZE-FAILCLOSED-READS-001 — remove when: refresh is singleflight
 // without Stat-under-write-lock. 2026-08-29 system-check profiles: ~350 Creates blocked
 // here. Same-process Append/Delete already merge into the cache; this interval only
 // delays noticing another process's registry write.

@@ -89,7 +89,6 @@ func (s *Server) handleEventsSubscribe(_ context.Context, _ string, params json.
 
 	// Create write function that serializes through this connection's message queue.
 	// Direct writes to transportWriter race bufio.Writer with RPC responses (IDE hang).
-	// TRACK: BLI-1784969955962654000-dc689643 — remove when: per-connection Server owns emit path.
 	var bindWriter *bufio.Writer
 	_ = concurrency.RunInRLockWithLogger(
 		&s.clientsMu, LockNameMcpServerEventsTransport, logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)),

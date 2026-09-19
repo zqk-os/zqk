@@ -117,7 +117,6 @@ func runDelete(cmd *cobra.Command, args []string) error {
 
 		// Mark context as CLI operation for authorization (required for delete).
 		// Skip write-behind so delete is durable before return (avoids WAL races with create hammers).
-		// TRACK: [REDACTED-ID]
 		cliCtx := storage.WithSkipWriteBehind(proc.WithCLIOperation())
 		if unlinkRefs {
 			cliCtx = storage.WithUnlinkReferencesBeforeDelete(cliCtx)

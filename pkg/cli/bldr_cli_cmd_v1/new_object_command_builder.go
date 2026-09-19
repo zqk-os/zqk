@@ -7,7 +7,6 @@ import (
 )
 
 // NewNewObjectCommandBuilder creates a new new_object command.
-// TRACK: [REDACTED-ID] — mint (--title) → draft plane; YAML scaffolds use `object template`.
 // Spec codegen: add .zqk/cli/specs/new/ when the new/ tree is migrated off hand-maintained builders.
 func NewNewObjectCommandBuilder() *cobra.Command {
 	builder := clipkg.NewCommandBuilder("object")

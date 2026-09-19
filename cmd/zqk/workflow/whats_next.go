@@ -32,9 +32,6 @@ import (
 	"github.com/zqk-os/zqk/pkg/workflow/whatsnext"
 )
 
-// Default CLI alpha readiness plan (repo lane); still resolved when status is paused.
-const defaultAlphaPriorityPlanID = "PRI-1785898223552319000-f7d266b5"
-
 const whatsNextSchema = "zqk_whats_next_v1"
 
 const measureSubprocessTimeout = 120 * time.Second
@@ -592,40 +589,8 @@ func resolvePriorityPlanForWhatsNext(ctx context.Context, sp workflowStorage, ex
 		}
 	}
 
-	// 2. Hardcoded default alpha plan — only when no in_progress plan has open work.
-	hasInProgressWork := false
-	{
-		res, err := sp.List(ctx, secCtx, storageCtx, storage.ListFilter{
-			Kind:    objects.KindPriorityPlan,
-			Filters: map[string]any{objects.FieldKeyStatus: statusInProcess},
-		})
-		if err == nil {
-			for _, obj := range res.Objects {
-				if !hasPersonaMatch(obj, personaIDs) {
-					continue
-				}
-				id, _ := obj[objects.FieldKeyID].(string)
-				if id != emptyValue && countOpenLinkedBLIs(ctx, sp, id, personaIDs) > 0 {
-					hasInProgressWork = true
-					break
-				}
-			}
-		}
-	}
-	if !hasInProgressWork {
-		if obj, err := sp.Read(ctx, secCtx, defaultAlphaPriorityPlanID); err == nil && obj != nil && hasPersonaMatch(obj, personaIDs) {
-			if st, _ := obj[objects.FieldKeyStatus].(string); !strings.EqualFold(st, "complete") && !strings.EqualFold(st, "archived") {
-				if planHasWork(ctx, sp, defaultAlphaPriorityPlanID) {
-					pID, pSumm := summarizePriorityPlan(obj)
-					return pID, pSumm, nil
-				}
-			}
-		}
-	}
-
-	// 3. Collect all candidate plans (execution + grooming next-columns).
+	// 2. Collect all candidate plans (execution + grooming next-columns).
 	// Must stay in sync with pkg/workflow/whatsnext (PlanWhatsNextCandidateStatuses).
-	// TRACK: BLI-1787035087372193000-c022117d
 	var candidates []map[string]any
 	for _, st := range objects.PlanWhatsNextCandidateStatuses() {
 		for _, kind := range []string{objects.KindPriorityPlan, objects.KindStrategicPlan} {
@@ -665,7 +630,6 @@ func resolvePriorityPlanForWhatsNext(ctx context.Context, sp workflowStorage, ex
 	candidates = preferSeatedPlansWithOpenWork(ctx, sp, candidates, personaIDs)
 
 	// 4. Score: in_progress ≫ active ≫ paused; open (non-terminal) BLIs; lower active_order wins.
-	// TRACK: [REDACTED-ID] — keep in sync with pkg/workflow/whatsnext ranking.
 	var bestPlan map[string]any
 	bestScore := -1
 
@@ -782,7 +746,6 @@ func countOpenLinkedBLIs(ctx context.Context, sp workflowStorage, planID string,
 				continue
 			}
 			st, _ := o[objects.FieldKeyStatus].(string)
-			// TRACK: [REDACTED-ID] — roles (terminal/halted excluded).
 			if !objects.BacklogCountsAsOpenWork(st) {
 				continue
 			}
@@ -817,7 +780,6 @@ func countOpenLinkedBLIs(ctx context.Context, sp workflowStorage, planID string,
 }
 
 func cliPlanExecutionStatusBonus(st string) int {
-	// TRACK: [REDACTED-ID] — keep in sync with pkg/workflow/whatsnext.
 	return objects.PlanWhatsNextStatusBonus(objects.KindPriorityPlan, st)
 }
 

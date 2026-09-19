@@ -186,7 +186,6 @@ func (f *FileObjectStorage) deleteImpl(ctx context.Context, secCtx *pkgctx.Secur
 	}
 
 	// Draft-plane objects: remove id-keyed YAML (may also have legacy CAS — clean both).
-	// TRACK: [REDACTED-ID]
 	if f.objectDraftPlaneExists(kind, id) {
 		draftPath := f.objectDraftPlanePath(kind, id)
 		if err := createDeleteAuditEvent(ctx, f.projectRoot, id, kind, draftPath, cascade, secCtx, dependents, f); err != nil && !IsExpectedMissingErr(err) {
@@ -464,4 +463,3 @@ func (f *FileObjectStorage) deleteImpl(ctx context.Context, secCtx *pkgctx.Secur
 // findDependents finds all objects that reference the given object.
 // Uses the reverse-reference index only. Never walks processDir on the delete
 // hot path (that was O(all objects) and hang-prone).
-// TRACK: [REDACTED-ID]

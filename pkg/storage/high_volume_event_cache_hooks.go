@@ -9,7 +9,6 @@ import (
 	"github.com/zqk-os/zqk/pkg/objects"
 )
 
-// TRACK: [REDACTED-ID] — memory CUD already happened; disk must follow
 // (same class of miss as reverse-reference-index before SaveCache-on-mutate).
 const highVolumeEventPersistDebounce = 250 * time.Millisecond
 
@@ -113,7 +112,6 @@ func SaveHighVolumeEventCache(projectRoot string) {
 	cache := GetGlobalHighVolumeEventCache()
 	// Always persist when scheduled: SaveCache creates metadata if missing so incremental
 	// Set/Invalidate after CUD is durable across CLI processes (not only after BuildCache).
-	// TRACK: [REDACTED-ID]
 	if err := cache.SaveCache(projectRoot); err != nil {
 		logger := logging.GetLoggerFromProfile("system")
 		StorageLog(logger).Warn("Failed to save high-volume event cache").

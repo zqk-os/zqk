@@ -284,7 +284,6 @@ func (p *DSIAStorageProvider) BeginTransaction(ctx context.Context) (ObjectTrans
 	}, nil
 }
 
-// TRACK: [REDACTED-ID] — param renamed objs so FieldKey package objects is not shadowed after AST -write.
 
 func (p *DSIAStorageProvider) Exists(ctx context.Context, secCtx *SecurityContext, id string) (bool, error) {
 	p.mu.RLock()

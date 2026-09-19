@@ -234,7 +234,6 @@ func (sc *ServeCoordinator) handleReadError(readErr error, serverCtx context.Con
 	// TCP/proxy clients often drop with reset/broken-pipe rather than clean EOF.
 	// Treat those as per-connection disconnect — do not shut down the whole daemon
 	// (proxy + multi-provider share one TCP listener).
-	// TRACK: [REDACTED-ID] — TCP path still shares one Server; disconnect
 	// resets global init state (handleClientDisconnect). Fine for single IDE proxy; multi-conn needs isolation.
 	if isBrokenPipeError(readErr) {
 		sc.server.traceLogf("[MCP_INFO] Client transport closed (%v) — ending connection only", readErr)

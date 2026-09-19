@@ -132,7 +132,6 @@ type precondDecideRule struct {
 // TRACK: BLI-1787565256503969000-f5604378 — storage-save compose ops are a
 // second plane; do not silently unify YAML prose dispatch with kernelcas/compose.
 // TRACK: PRI-CEF-PIP-KERNEL-DRIVE-001 / BLI-CEF-PIP-TEAR-SNOWFLAKE-001 —
-// remove when: this DECIDE table is torn out with the snowflake; exams come
 // from a PIP-* loader (or compose DECIDE) instead.
 var precondDecideRules = []precondDecideRule{
 	{name: "ref_status_matrix", eval: evalRefStatusStage},

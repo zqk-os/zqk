@@ -14,7 +14,6 @@ import (
 
 // TestEnsureCASIndexMatchesContentHash_RepairsDrift proves the Tier-1 post-write
 // invariant: when the index points at the wrong hash, ensure repairs via SetMapping.
-// TRACK: [REDACTED-ID]
 func TestEnsureCASIndexMatchesContentHash_RepairsDrift(t *testing.T) {
 	tmp := t.TempDir()
 	kindDir := filepath.Join(tmp, "backlog")

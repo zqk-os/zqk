@@ -38,7 +38,6 @@ func TestAllKindsBulkOperations(t *testing.T) {
 		if kind == "mcp_session" {
 			t.Skip("mcp_session is stream-backed; bulk create/read verification via in-proc storage in this suite races subprocess WAL/stream apply — defer until stream bulk path is aligned with zqk_session work")
 		}
-		// TRACK: BLI-COMMS-CURSOR-TPM-DELIVER-ATTN-001 adjacent — remove when harness seeds org refs.
 		if kind == "partnership" {
 			t.Skip("partnership bulk test is currently failing to seed reference organization cross-kind dependency in temp harness.")
 		}

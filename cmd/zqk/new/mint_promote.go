@@ -14,7 +14,6 @@ import (
 	"github.com/zqk-os/zqk/pkg/zqktime"
 )
 
-// TRACK: [REDACTED-ID] — background promote after mint onto draft plane.
 
 const (
 	mintPromoteJobPrefix     = "SCH-mint-promote-"

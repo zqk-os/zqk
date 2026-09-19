@@ -1,5 +1,4 @@
 // Package vds implements the Verifiable Decomposition Spine evaluator (POL-WORKFLOW-VDS).
-// TRACK: [REDACTED-ID] — fluent agent gate; extend DSL/CI hooks as needed.
 package vds
 
 import (

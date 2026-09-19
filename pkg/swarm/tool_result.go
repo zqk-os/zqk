@@ -15,7 +15,6 @@ const (
 
 // clipSwarmToolResult shortens huge tool payloads and appends write-now
 // guidance so a dump cannot crowd the 7B off mutation tools.
-// TRACK: BLI-COMMS-ORCH-EXECUTE-NOT-ACK-001 — remove when: MCP list/read
 // tools enforce these caps at the executor and seats stop parking for
 // matched-0 writes after a context dump.
 func clipSwarmToolResult(toolName, result string) (string, bool) {

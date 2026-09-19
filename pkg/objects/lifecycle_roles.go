@@ -1,7 +1,6 @@
 package objects
 
 // Cross-kind lifecycle status roles (lifecycle YAML status.role).
-// TRACK: [REDACTED-ID] — membership/lock/whats-next consult roles, not ad-hoc status strings.
 const (
 	LifecycleRoleGrooming        = "grooming"
 	LifecycleRoleShovelReady     = "shovel_ready"

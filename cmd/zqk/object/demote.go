@@ -56,7 +56,6 @@ func runDemote(cmd *cobra.Command, args []string) error {
 		gv := validation.NewGoValidatorWithLoaders(specLoader, lifecycleLoader)
 
 		var errors []string
-		// TRACK: [REDACTED-ID] — nil flushKinds skipped CAS index flush.
 		affectedKinds := make([]string, 0, len(args))
 		kindSet := make(map[string]bool, len(args))
 		addFlushKind := func(k string) {

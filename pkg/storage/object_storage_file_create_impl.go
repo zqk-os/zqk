@@ -164,7 +164,6 @@ func (f *FileObjectStorage) Create(ctx context.Context, secCtx *pkgctx.SecurityC
 
 	// Create never uses write-behind. Buffer ACK without durable YAML is the repair_draft ghost
 	// factory (CLI create→get under scheduler/test load). Sync write + visibility proof only.
-	// TRACK: [REDACTED-ID]
 
 	// Decide draft plane from the live object map (post-metadata), not a re-unmarshal of YAML.
 	// Incomplete criteria park off CAS unless --promote, which hits the membrane.
@@ -221,7 +220,6 @@ func (f *FileObjectStorage) Create(ctx context.Context, secCtx *pkgctx.SecurityC
 
 	// Visibility proof BEFORE audit/journal/notifications — those side effects contend on CAS
 	// indexes / pending visibility and were racing create→get under parallel CLI + scheduler tests.
-	// TRACK: [REDACTED-ID]
 	totalDuration := time.Since(startTime)
 	if proofErr := f.proveCreateVisibility(ctx, secCtx, id, kind, useDraftPlane); proofErr != nil {
 		if err := f.trackPersistenceStep(ctx, secCtx, OpCreate, PersistenceStepExit, map[string]any{objects.FieldKeyKind: kind, objects.FieldKeyID: id}, map[string]any{"success": false}, totalDuration, proofErr); err != nil && !IsExpectedMissingErr(err) {
@@ -282,7 +280,6 @@ func (f *FileObjectStorage) Create(ctx context.Context, secCtx *pkgctx.SecurityC
 	}
 	// Fail closed: a successful Create must leave lifecycle status on the caller's map.
 	// Empty status + nil return was observed with repair_draft ghosts (metadata never applied).
-	// TRACK: [REDACTED-ID]
 	if objects.GetString(obj, objects.FieldKeyStatus) == emptyValue {
 		return errfmt.Errorf("create invariant violated: status empty after persist for %s", id)
 	}
