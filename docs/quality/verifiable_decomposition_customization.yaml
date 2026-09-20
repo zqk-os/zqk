@@ -1,0 +1,33 @@
+# Dest first-run VDS customization. Do not copy studio lint/CI packs here.
+schema_version: 1
+profile_id: verifiable_decomposition_customization_v1
+project_id: zqk
+glossary: {}
+vendor_providers:
+  default: cursor
+  providers: []
+code_style:
+  lint_commands: []
+  formatter: gofmt
+  language_primary: go
+test_execution:
+  mode: foreground
+  foreground_probe_max_timeout_seconds: 60
+  foreground_probe_allowed: true
+process_data:
+  mutation: cli_only
+  instance_data_roots:
+    - .zqk/process/
+security:
+  required_for_stages: []
+  scan_commands: []
+performance:
+  required_for_stages: []
+  budget_doc: ""
+ci_cd:
+  required_checks: []
+  publish_requires_ack: true
+stage_dsl_templates:
+  operate_release:
+    - object_exists:{work_object_ref}
+    - path_exists:docs/onboarding/COMMUNITY_FIRST_RUN.md

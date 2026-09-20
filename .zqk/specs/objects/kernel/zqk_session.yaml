@@ -1,0 +1,277 @@
+schema_version: 2.0.0
+ontology: zqk_session
+extends: base_object
+visibility: internal
+storage_profile: stream
+description: 'Represents a CLI or interactive session (e.g. a zqk invocation or agent session). Tracks session state and optional metadata.\nAgent seat-workers bind runtime identity (executor/provider/model/persona/seat) on a child session with session_type=agent_worker; mesh agent_id remains a routing mailbox.\nLifecycle: zqk_session_lifecycle.yaml.\nTRACK: REQ-COMMS-RUNTIME-SESSION-001 / BLI-1786955190100310000-edcc34dd\n'
+traits: []
+fields:
+  account_id:
+    checklist:
+      authority: system
+      automation_hooks: set from CLI security context (current user)
+      cardinality: one
+      criticality: composition
+      default: null
+      dependencies: account object
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: Account that owns this session (e.g. ACC-1785920548450214012-68b850c0 or logged-in user)
+      security: non-sensitive
+      system_usage:
+        - session attribution
+        - per-account session limits
+      validation: Must match account ID pattern
+    field_profile_code: ZQK-003
+    permissions: r-x
+    semantic_type: reference
+    traits:
+      - readable
+      - filterable
+      - sortable
+    type: string
+    validation:
+      required: true
+  agent_id:
+    checklist:
+      authority: system
+      automation_hooks: set from seat-worker --agent-id (logical mesh seat mailbox)
+      cardinality: zero_or_one
+      criticality: association
+      default: null
+      dependencies: mesh peer seats
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: Logical mesh seat id this worker session serves; not derived from provider/model
+      security: non-sensitive
+      system_usage:
+        - mesh routing attribution
+        - provenance
+      validation: Non-empty seat id when session_type=agent_worker
+    field_profile_code: ZQK-006
+    permissions: r-x
+    semantic_type: identifier
+    traits:
+      - readable
+      - filterable
+    type: string
+    validation:
+      required: false
+  executor_type:
+    checklist:
+      authority: system
+      automation_hooks: set by seat-worker (e.g. agentx)
+      cardinality: zero_or_one
+      criticality: association
+      default: null
+      dependencies: none
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: Executor family driving cognition for this session (not the mesh seat name)
+      security: non-sensitive
+      system_usage:
+        - provenance
+      validation: Short token when set
+    field_profile_code: ZQK-008
+    permissions: r-x
+    semantic_type: statement
+    traits:
+      - readable
+      - filterable
+    type: string
+    validation:
+      required: false
+  id:
+    checklist:
+      authority: system
+      automation_hooks: set by CLI or session manager
+      cardinality: one
+      criticality: composition
+      default: null
+      dependencies: session lifecycle
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: Stable identifier for the session (e.g. ZQK-001)
+      security: non-sensitive
+      system_usage:
+        - session tracking
+      validation: Must match ZQK session ID pattern
+    field_profile_code: ZQK-001
+    permissions: r-x
+    semantic_type: identifier
+    traits:
+      - readable
+      - filterable
+      - sortable
+    type: string
+    validation:
+      pattern: ^ZQK-\d+$
+      required: true
+  model_id:
+    checklist:
+      authority: system
+      automation_hooks: set from llm.DefaultConfig(ctx).ChatModel at worker start
+      cardinality: zero_or_one
+      criticality: association
+      default: null
+      dependencies: LLM client config
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: Chat model serving requests for this worker session
+      security: non-sensitive
+      system_usage:
+        - provenance
+      validation: Model identifier when set
+    field_profile_code: ZQK-011
+    permissions: r-x
+    semantic_type: statement
+    traits:
+      - readable
+      - filterable
+    type: string
+    validation:
+      required: false
+  parent_session_ref:
+    checklist:
+      authority: system
+      automation_hooks: set when creating agent_worker child under an active CLI session
+      cardinality: zero_or_one
+      criticality: association
+      default: null
+      dependencies: zqk_session
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: Parent zqk_session id (CLI/root) for an agent_worker child session
+      security: non-sensitive
+      system_usage:
+        - session tracking
+        - provenance
+      validation: Must match ZQK session ID pattern when set
+    field_profile_code: ZQK-005
+    permissions: r-x
+    semantic_type: reference
+    traits:
+      - field_reference_group
+    type: string
+    validation:
+      pattern: ^ZQK-\d+$
+      required: false
+  persona_ref:
+    checklist:
+      authority: system
+      automation_hooks: set from seat-worker --persona-ref
+      cardinality: zero_or_one
+      criticality: association
+      default: null
+      dependencies: persona object
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: Kernel persona id (PER-*) used for feed authorship during this worker session
+      security: non-sensitive
+      system_usage:
+        - provenance
+        - COMMS attribution
+      validation: PER-* when set
+    field_profile_code: ZQK-007
+    permissions: r-x
+    semantic_type: reference
+    traits:
+      - field_reference_group
+    type: string
+    validation:
+      required: false
+  provider:
+    checklist:
+      authority: system
+      automation_hooks: set from llm.DefaultConfig(ctx).Provider at worker start
+      cardinality: zero_or_one
+      criticality: association
+      default: null
+      dependencies: LLM client config
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: LLM API provider serving requests for this worker session
+      security: non-sensitive
+      system_usage:
+        - provenance
+      validation: Provider name when set
+    field_profile_code: ZQK-009
+    permissions: r-x
+    semantic_type: statement
+    traits:
+      - readable
+      - filterable
+    type: string
+    validation:
+      required: false
+  provider_profile_ref:
+    checklist:
+      authority: system
+      automation_hooks: optional link to provider_profile when CAP resolves one
+      cardinality: zero_or_one
+      criticality: association
+      default: null
+      dependencies: provider_profile
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: Optional provider_profile object id when topology is objectified
+      security: non-sensitive
+      system_usage:
+        - provenance
+        - CAP routing
+      validation: PPRV-* when set
+    field_profile_code: ZQK-010
+    permissions: r-x
+    semantic_type: reference
+    traits:
+      - field_reference_group
+    type: string
+    validation:
+      required: false
+  session_type:
+    checklist:
+      authority: system
+      automation_hooks: set by CLI root (cli) or seat-worker StartWorkerSession (agent_worker)
+      cardinality: zero_or_one
+      criticality: association
+      default: cli
+      dependencies: session lifecycle
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: Distinguishes root CLI sessions from per-process agent seat-worker runtime sessions
+      security: non-sensitive
+      system_usage:
+        - session tracking
+        - provenance
+      validation: enum cli or agent_worker
+    field_profile_code: ZQK-004
+    permissions: r-x
+    semantic_type: state
+    traits:
+      - readable
+      - filterable
+    type: enum
+    validation:
+      enum:
+        - cli
+        - agent_worker
+      required: false
+  title:
+    checklist:
+      authority: system/user
+      cardinality: zero_or_one
+      criticality: association
+      default: null
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Optional human-readable label for the session
+      security: non-sensitive
+    field_profile_code: ZQK-002
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - filterable
+    type: string
+    validation:
+      required: false

@@ -1,0 +1,52 @@
+$schema: "../schemas/command_spec.schema.json"
+
+name: "proof-of-life"
+short: "Pulse a human-visible mesh proof-of-life indicator"
+description: |
+  Stamps a mesh_status event on the agent feed and queues an IDE bridge
+  proof-of-life pulse (status bar + toast). Chat may stay quiet — this tells
+  the human that back-channel mesh work is still alive.
+
+  Does not paste into chat or steal focus. Opt out of IDE pulse with
+  ZQK_IDE_BRIDGE_WAKE=0.
+
+flags:
+  - name: "persona-ref"
+    type: "string"
+    default: ""
+    required: true
+    description: "Kernel persona id (PER-*); community defaults PER-DEFAULT-OPERATOR|PER-DEFAULT-AGENT"
+  - name: "agent-id"
+    type: "string"
+    default: ""
+    required: true
+    description: "Unique swarm member seat id (not the persona id)"
+  - name: "summary"
+    shorthand: "s"
+    type: "string"
+    default: ""
+    description: "Optional detail after PROOF-OF-LIFE: (default explains quiet chat)"
+  - name: "no-ack"
+    type: "bool"
+    default: false
+    description: "Do not append a kernel self-ACK line"
+  - name: "no-pulse"
+    type: "bool"
+    default: false
+    description: "Stamp the feed only; skip IDE bridge proof-of-life pulse"
+
+args:
+  type: "no_args"
+
+help:
+  examples:
+    - comment: "Cursor seat — human sees status bar + toast"
+      command: "%s feed proof-of-life --persona-ref PER-DEFAULT-OPERATOR --agent-id cursor-composer --summary \"working ATK on feed\""
+    - comment: "Worker seat stamps feed; IDE still pulses for the human watching Cursor"
+      command: "%s feed proof-of-life --persona-ref PER-DEFAULT-AGENT --agent-id peer-agent-1 --summary \"checkpoint\""
+  exclude_flags:
+    - "columns"
+    - "ignore-scheduler-down"
+
+run_e: "runFeedProofOfLife"
+common_flags: true

@@ -1,0 +1,26 @@
+$schema: "../../../.zqk/cli/specs/schemas/trait_spec.schema.json"
+
+name: snapable
+description: Trait indicating that an object or field can participate in snapshot operations.\nObjects with this trait can report their state at a specific timestamp.\nFields with this trait can be included or excluded from snapshots.\n\nAt the object level, defines query specifications for discovering objects to snapshot.\nAt the field level, defines data handlers for processing field data during snapshot.\n
+category: system
+requires:
+  - readable
+conflicts: []
+includes: []
+field_level: true
+object_level: true
+config:
+  field_config:
+    data_handlers: null
+  object_config:
+    default_query:
+      filters: null
+      limit: 0
+      sort_asc: true
+      sort_by: null
+    query_presets: null
+
+created_at: 2026-07-01T18:00:00Z
+updated_at: 2026-07-01T18:00:00Z
+created_by: ACC-1785920548450214012-68b850c0
+updated_by: ACC-1785920548450214012-68b850c0

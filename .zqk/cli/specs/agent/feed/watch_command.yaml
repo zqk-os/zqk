@@ -1,0 +1,46 @@
+$schema: "../schemas/command_spec.schema.json"
+
+name: "watch"
+short: "Watch the MCP daemon for events and process the feed"
+description: |
+  Connects to the local MCP daemon over TCP, subscribes to notifications/event,
+  and on action.required ticks the agent feed inbox for --agent-id.
+  Optionally appends peer_ack lines with --auto-ack.
+  Runs until interrupted (long-lived; prefer a dedicated terminal or supervisor).
+
+flags:
+  - name: "tcp"
+    type: "string"
+    default: "127.0.0.1:8443"
+    description: "MCP daemon TCP address"
+  - name: "agent-id"
+    type: "string"
+    default: ""
+    required: true
+    description: "Swarm seat id whose inbox to process"
+  - name: "persona-ref"
+    type: "string"
+    default: "PER-DEFAULT-OPERATOR"
+    description: "Kernel persona id (PER-*) used when auto-acking"
+  - name: "auto-ack"
+    type: "bool"
+    default: false
+    description: "Automatically peer-ack unacked inbox events"
+
+args:
+  type: "no_args"
+
+help:
+  examples:
+    - comment: "Watch operator seat inbox"
+      command: "%s feed watch --agent-id cursor-composer --persona-ref PER-DEFAULT-OPERATOR"
+    - comment: "Watch and auto-ack"
+      command: "%s feed watch --agent-id cursor-composer --auto-ack"
+  exclude_flags:
+    - "columns"
+    - "ignore-scheduler-down"
+    - "format"
+    - "output"
+
+run_e: "runFeedWatch"
+common_flags: true

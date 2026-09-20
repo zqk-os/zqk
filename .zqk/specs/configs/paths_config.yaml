@@ -1,0 +1,28 @@
+$schema: "../../../.zqk/cli/specs/schemas/paths_config.schema.json"
+
+description: |
+    Configuration for standard directory paths used throughout the system.
+    This allows the system to discover directories without hardcoding paths in source code.
+paths:
+    command_specs: .zqk/cli/specs
+    config_dir: .zqk/specs/configs
+    id_prefixes_config: .zqk/specs/configs/id_prefixes_config.yaml
+    kind_mappings_config: .zqk/specs/configs/kind_mappings_config.yaml
+    object_specs: .zqk/specs/objects
+    paths_config: .zqk/specs/configs/paths_config.yaml
+search_strategy:
+    markers:
+        - .zqk/specs
+        - .zqk
+        - go.mod
+    relative_paths:
+        - ""
+        - ../
+        - ../../
+        - ../../../
+version: 1.0.0
+
+created_at: 2026-07-01T18:00:00Z
+updated_at: 2026-07-01T18:00:00Z
+created_by: ACC-1785920548450214012-68b850c0
+updated_by: ACC-1785920548450214012-68b850c0

@@ -1,0 +1,84 @@
+$schema: "../../../.zqk/cli/specs/schemas/lifecycle_spec.schema.json"
+
+object_type: organization
+# Five-question exam: docs/architecture/LIFECYCLE_STATE_MACHINE_RUBRIC.md
+# TRACK: BLI-CEF-R26-REMAINING-KINDS-001
+statuses:
+  - value: conceptual
+    display: Conceptual
+    origin: true
+    preliminary: true
+    description: Draft plane status. Prior to CAS membrane crossing.
+    role: realign
+  - value: originated
+    display: Originated
+    description: CAS membrane crossed. Object officially originated.
+    role: realign
+  - value: active
+    display: Active
+    origin: false
+    role: shovel_ready
+    description: Organization may authenticate and act within its roles.
+  - value: inactive
+    display: Inactive
+    role: realign
+    description: Organization retained but not expected to act until 
+      reactivated.
+  - value: suspended
+    display: Suspended
+    role: realign
+    description: Organization barred from action; administrative or security 
+      hold.
+transitions:
+  - from: conceptual
+    to: originated
+    description: Promote from draft plane to CAS membrane (CAS Qualification).
+    manual: true
+    auto: false
+    catalyst: System promotion
+  - from: originated
+    to: active
+    description: Initial domain workflow transition to active.
+    manual: true
+    auto: true
+    catalyst: System initialization
+  - from: active
+    to: inactive
+    description: ""
+    manual: false
+    auto: false
+    postconditions:
+      - role is realign
+  - from: active
+    to: suspended
+    description: ""
+    manual: false
+    auto: false
+    postconditions:
+      - role is realign
+  - from: inactive
+    to: active
+    description: ""
+    manual: false
+    auto: false
+    postconditions:
+      - role is shovel_ready
+  - from: suspended
+    to: active
+    description: ""
+    manual: false
+    auto: false
+    postconditions:
+      - role is shovel_ready
+percent_complete:
+  method: status_based
+  default_by_status:
+    conceptual: 0
+    originated: 5
+    active: 100
+    inactive: 50
+    suspended: 0
+created_at: 2026-07-01T18:00:00Z
+updated_at: 2026-07-01T18:00:00Z
+created_by: ACC-1785920548450214012-68b850c0
+updated_by: ACC-1785920548450214012-68b850c0

@@ -1,0 +1,235 @@
+$schema: ../../../.zqk/cli/specs/schemas/lifecycle_spec.schema.json
+object_type: agent_task
+extends: base_lifecycle
+status_mapping:
+  approved: approved
+  archived: archived
+  error: error
+  implemented: implemented
+  in_progress: in_progress
+  proposed: proposed
+statuses:
+  - value: conceptual
+    display: Conceptual
+    origin: true
+    preliminary: true
+    description: Draft plane status. Prior to CAS membrane crossing.
+    role: realign
+  - value: originated
+    display: Originated
+    description: CAS membrane crossed. Object officially originated.
+    role: realign
+  - value: proposed
+    display: Proposed
+    origin: false
+    preliminary: false
+    role: realign
+    description: Task drafted but not yet approved for dispatch.
+  - value: approved
+    display: Approved
+    role: shovel_ready
+    description: Approved and ready for an agent to pick up (shovel-ready).
+  - value: in_progress
+    display: In Progress
+    description: Agent is actively executing the task.
+    role: execution_locked
+  - value: pending_verification
+    display: Pending Verification
+    role: halted
+    description: Work claimed done; held for verification before implemented.
+  - value: implemented
+    display: Implemented
+    terminal: true
+    work_done: true
+    description: Task finished and accepted; terminal success.
+    role: terminal
+  - value: error
+    display: Error
+    system: true
+    role: halted
+    description: Task failed or became incoherent; halted for repair or abandon.
+  - value: archived
+    display: Archived
+    terminal: true
+    archive: true
+    role: terminal
+    description: Archived task record; no longer actionable.
+transitions:
+  - from: conceptual
+    to: originated
+    description: Promote from draft plane to CAS membrane (CAS Qualification).
+    manual: true
+    auto: false
+    catalyst: System promotion
+    postconditions:
+      - role is realign
+    class_vs_specialty: class-agnostic
+    shockwave:
+      mode: propagate
+  - from: originated
+    to: proposed
+    description: Initial domain workflow transition to proposed.
+    manual: true
+    auto: true
+    catalyst: System initialization
+    postconditions:
+      - role is realign
+    class_vs_specialty: class-agnostic
+    shockwave:
+      mode: propagate
+  - from: proposed
+    to: approved
+    description: Approve a fully routed and traceable task for dispatch
+    manual: true
+    auto: false
+    postconditions:
+      - role is shovel_ready
+    catalyst: Standard progression
+    class_vs_specialty: class-agnostic
+    shockwave:
+      mode: propagate
+  - from: approved
+    to: in_progress
+    description: Begin work on task
+    manual: true
+    auto: false
+    postconditions:
+      - role is execution_locked
+    catalyst: Standard progression
+    class_vs_specialty: class-agnostic
+    shockwave:
+      mode: propagate
+  - from: in_progress
+    to: pending_verification
+    description: Task is complete, awaiting verification
+    manual: true
+    auto: false
+    postconditions:
+      - role is halted
+    catalyst: Standard progression
+    class_vs_specialty: class-agnostic
+    shockwave:
+      mode: propagate
+  - from: in_progress
+    to: implemented
+    description: Mark task implemented (when verification gate is skipped)
+    manual: true
+    auto: false
+    postconditions:
+      - role is terminal
+    catalyst: Standard progression
+    class_vs_specialty: class-agnostic
+    shockwave:
+      mode: propagate
+  - from: pending_verification
+    to: implemented
+    description: Task verified and implemented
+    manual: true
+    auto: true
+    postconditions:
+      - role is terminal
+    catalyst: Standard progression
+    class_vs_specialty: class-agnostic
+    shockwave:
+      mode: propagate
+  - from: pending_verification
+    to: error
+    description: Task verification failed
+    manual: true
+    auto: true
+    postconditions:
+      - role is halted
+    catalyst: Standard progression
+    class_vs_specialty: class-agnostic
+    shockwave:
+      mode: propagate
+  - from: error
+    to: in_progress
+    description: Wake agent to fix task
+    manual: true
+    auto: false
+    postconditions:
+      - role is execution_locked
+    catalyst: Standard progression
+    class_vs_specialty: class-agnostic
+    shockwave:
+      mode: propagate
+  - from: implemented
+    to: in_progress
+    description: Reset implemented task back to work
+    manual: true
+    auto: false
+    postconditions:
+      - role is execution_locked
+      - terminal re-entry opens a new execution lock; not a resume of the prior 
+        implemented closed system
+    catalyst: Standard progression
+    class_vs_specialty: class-agnostic
+    shockwave:
+      mode: propagate
+  - from: implemented
+    to: archived
+    description: Archive implemented task
+    manual: true
+    auto: false
+    postconditions:
+      - role is terminal
+    catalyst: Standard progression
+    class_vs_specialty: class-agnostic
+    shockwave:
+      mode: propagate
+  - from: error
+    to: archived
+    description: Abandon a halted task without reminting
+    manual: true
+    auto: false
+    postconditions:
+      - role is terminal
+    catalyst: Standard progression
+    class_vs_specialty: class-agnostic
+    shockwave:
+      mode: propagate
+  - from: '*'
+    to: error
+    description: System error occurred
+    manual: false
+    auto: true
+    postconditions:
+      - role is halted
+    catalyst: Standard progression
+    class_vs_specialty: class-agnostic
+    shockwave:
+      mode: propagate
+  - from: '*'
+    to: archived
+    description: Archive leftover or abandoned task from any status; auto when 
+      parent backlog_item is terminal
+    manual: true
+    auto: true
+    on_dependent_status:
+      kind: backlog_item
+      to:
+        - complete
+        - archived
+    postconditions:
+      - role is terminal
+    catalyst: "Auto / shockwave — parent work unit terminal"
+    class_vs_specialty: "specialty — child prune, not ATK→PRI lock"
+    shockwave:
+      mode: propagate
+percent_complete:
+  method: status_defaults
+  default_by_status:
+    conceptual: 0
+    originated: 5
+    proposed: 10
+    approved: 20
+    in_progress: 50
+    pending_verification: 90
+    implemented: 100
+    error: 0
+    archived: 100
+created_at: 2026-07-01 18:00:00+00:00
+updated_at: 2026-07-30 01:00:00+00:00
+created_by: ACC-1785920548450214012-68b850c0
+updated_by: ACC-1785920548450214012-68b850c0

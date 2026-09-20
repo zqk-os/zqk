@@ -1,0 +1,61 @@
+schema_version: 2.0.0
+ontology: pipeline_definition
+extends: base_object
+visibility: internal
+description: Defines the template and structure of a pipeline.\n
+traits:
+  - base_object_traits
+fields:
+  stages:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: orchestrator
+      automation_hooks: execution
+      cardinality: many
+      criticality: composition
+      default: []
+      dependencies: none
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Ordered stages of execution.
+      security: non-sensitive
+      system_usage:
+        - routing
+        - orchestration
+      validation: list of stage objects.
+    field_profile_code: PLD-001
+    permissions: rwx
+    semantic_type: expression
+    traits:
+      - field_mutable_group
+    type: list
+    validation:
+      required: true
+  triggers:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: orchestrator
+      automation_hooks: trigger
+      cardinality: many
+      criticality: composition
+      default: []
+      dependencies: none
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Event hooks that initiate the pipeline.
+      security: non-sensitive
+      system_usage:
+        - scheduling
+      validation: list of trigger objects.
+    field_profile_code: PLD-002
+    permissions: rwx
+    semantic_type: expression
+    traits:
+      - field_mutable_group
+    type: list
+    validation:
+      required: false

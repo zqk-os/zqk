@@ -1,0 +1,15 @@
+category: acceptance
+created_at: "2026-09-19T06:10:01Z"
+created_by: ACC-1785920548450214012-68b850c0
+description: Primary functional acceptance criteria and core capability deliverables.
+id: CRIT-1789798199209192000-f43fd3f2
+kind: criteria
+namespace_id: zqk:kernel
+origin_project: zqk
+origin_system: zqk
+schema_version: 2.0.0
+status: complete
+title: 'Verify: Harmonized CLI Taxonomy, 100% Spec Coverage, and Vendor Command Isolation - Functional Acceptance'
+updated_at: "2026-09-20T01:14:12Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

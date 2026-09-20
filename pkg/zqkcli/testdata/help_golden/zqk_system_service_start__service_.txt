@@ -1,0 +1,22 @@
+Start a service required by ZQK.
+
+Available services:
+  - memgraph: Start MemGraph database for graph backend
+
+  Start MemGraph service
+  zqk system service start memgraph
+
+Usage:
+  zqk system service start <service> [flags]
+
+Flags:
+      --columns string          Override column widths for table output (format: field:width)
+  -f, --format string           Output format (table, json, jsonl, yaml, csv, json-rpc, stream, agent-prompt) (default "table")
+      --ignore-scheduler-down   Ignore scheduler down warning/lockdown
+  -o, --output string           Write output to file
+  -q, --quiet                   Suppress non-essential output
+      --timeout duration        Timeout for command execution (0 = auto-calculate)
+  -v, --verbose                 Verbose output
+
+Global Flags:
+      --allow-degraded   Allow scheduler-dependent commands to run when scheduler daemon is not running

@@ -1,0 +1,20 @@
+created_at: "2026-09-18T03:34:03Z"
+created_by: ACC-1785920548450214012-68b850c0
+criteria_refs:
+    - CRIT-1789702444975811000-110ea11e
+    - CRIT-1789702444975812000-cc92bc2c
+    - CRIT-1789702444975813000-f9d60639
+description: Dest-local rewrite of the Go module and imports from github.com/zqk-os/zqk to github.com/zqk-os/zqk. Do not checkout the private zqk-os/zqk remote to replace dest tip.
+goal_refs:
+    - GOAL-1789631957245339000-008aac9f
+id: REQ-1789702443876068000-64de6f11
+kind: requirement
+namespace_id: zqk:kernel
+priority: p2
+schema_version: 2.0.0
+stakeholders: []
+status: active
+title: Public Go module path is github.com/zqk-os/zqk (dest-local rewrite; no private-repo checkout)
+updated_at: "2026-09-18T03:41:35Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

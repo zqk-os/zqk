@@ -1,0 +1,172 @@
+$schema: ../../../.zqk/cli/specs/schemas/lifecycle_spec.schema.json
+object_type: milestone
+statuses:
+  - value: conceptual
+    display: Conceptual
+    origin: true
+    preliminary: true
+    description: Draft plane status. Prior to CAS membrane crossing.
+    role: realign
+  - value: originated
+    display: Originated
+    description: CAS membrane crossed. Object officially originated.
+    role: realign
+  - value: not_started
+    display: Not Started
+    origin: false
+    role: shovel_ready
+    description: Milestone defined; work toward it has not begun.
+  - value: in_progress
+    display: In Progress
+    description: Milestone criteria are being actively chased.
+    role: execution_locked
+  - value: blocked
+    display: Blocked
+    role: halted
+    description: Milestone progress stopped on a dependency or gate.
+  - value: complete
+    display: Complete
+    terminal: true
+    work_done: true
+    description: Milestone criteria satisfied; verification trail should be 
+      intact.
+    role: terminal
+  - value: deferred
+    display: Deferred
+    terminal: true
+    role: terminal
+    description: Milestone postponed; terminal for the current campaign unless 
+      revived via a new instance.
+  - value: archived
+    display: Archived
+    terminal: true
+    archive: true
+    role: terminal
+    description: Milestone archived for history; no longer an active gate.
+    shockwave:
+      mode: prune
+      fail: closed
+transitions:
+  - from: conceptual
+    to: originated
+    description: Promote from draft plane to CAS membrane (CAS Qualification).
+    manual: true
+    auto: false
+    catalyst: System promotion
+    postconditions:
+      - role is realign
+    class_vs_specialty: class-agnostic
+    shockwave:
+      mode: propagate
+  - from: originated
+    to: not_started
+    description: Initial domain workflow transition to not_started.
+    manual: true
+    auto: true
+    catalyst: System initialization
+    postconditions:
+      - role is shovel_ready
+    class_vs_specialty: class-agnostic
+    shockwave:
+      mode: propagate
+  - from: not_started
+    to: in_progress
+    description: Start milestone work (manual promote or auto when linked 
+      backlog work is in flight)
+    manual: true
+    auto: true
+    on_dependent_status:
+      kind: backlog_item
+      to: in_progress
+    postconditions:
+      - role is execution_locked
+    catalyst: Linked backlog_item occupies execution_locked (ATK claim bubbles 
+      through the BLI)
+    class_vs_specialty: class-agnostic
+    shockwave:
+      mode: propagate
+  - from: in_progress
+    to: complete
+    description: Auto-transition when all linked backlog items are complete
+    manual: false
+    auto: true
+    postconditions:
+      - role is terminal
+    catalyst: Standard progression
+    class_vs_specialty: class-agnostic
+    shockwave:
+      mode: propagate
+  - from: in_progress
+    to: blocked
+    description: Auto-transition when any prerequisite milestone is blocked or 
+      deferred
+    manual: false
+    auto: true
+    postconditions:
+      - role is halted
+    catalyst: Standard progression
+    class_vs_specialty: class-agnostic
+    shockwave:
+      mode: propagate
+  - from: blocked
+    to: in_progress
+    description: Auto-transition when all prerequisites are complete
+    manual: false
+    auto: true
+    postconditions:
+      - role is execution_locked
+      - "halt resume re-locks execution (blocked → in_progress); not a hop to shovel_ready"
+    catalyst: Standard progression
+    class_vs_specialty: class-agnostic
+    shockwave:
+      mode: propagate
+  - from: '*'
+    to: deferred
+    description: Manual deferral from any status
+    manual: true
+    auto: false
+    postconditions:
+      - role is terminal
+    catalyst: Standard progression
+    class_vs_specialty: class-agnostic
+    shockwave:
+      mode: propagate
+  - from: '*'
+    to: archived
+    description: Manual archival from any status
+    manual: true
+    auto: false
+    postconditions:
+      - role is terminal
+    catalyst: Standard progression
+    class_vs_specialty: class-agnostic
+    shockwave:
+      mode: propagate
+  - from: complete
+    to: in_progress
+    description: Manual reopening when new work is linked to a recently closed 
+      milestone
+    manual: true
+    auto: false
+    postconditions:
+      - role is execution_locked
+      - terminal re-entry when new work is linked; new execution lock
+    catalyst: Standard progression
+    class_vs_specialty: class-agnostic
+    shockwave:
+      mode: propagate
+percent_complete:
+  method: item_based
+  default_by_status:
+    conceptual: 0
+    originated: 5
+    archived: 100
+    blocked: 0
+    complete: 100
+    deferred: 0
+    in_progress: 50
+    not_started: 15
+created_at: 2026-07-01 18:00:00+00:00
+updated_at: 2026-07-01 18:00:00+00:00
+created_by: ACC-1785920548450214012-68b850c0
+updated_by: ACC-1785920548450214012-68b850c0

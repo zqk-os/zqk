@@ -1,0 +1,20 @@
+schema_version: 2.0.0
+ontology: shockwave_router
+extends: base_object
+visibility: public
+description: Micro-API Gateway router for semantic payloads and events.
+traits:
+  - base_object_traits
+fields:
+  propagation_rules:
+    type: object
+    validation:
+      required: true
+  reduce_strategy:
+    type: object
+    validation:
+      required: false
+  trigger_condition:
+    type: object
+    validation:
+      required: false

@@ -1,0 +1,29 @@
+$schema: "../schemas/command_spec.schema.json"
+
+name: "service"
+short: "Manage per-root host OS scheduler units (launchd/systemd)"
+description: |
+  Install, list, start, stop, rebind, and GC host OS supervisor units for the
+  scheduler daemon — one unit per project root. Replaces ensure-cron prosthetics.
+  See docs/architecture/SCHEDULER_HOST_SERVICE_AND_CLUSTER_STATUS.md.
+
+help:
+  examples:
+    - comment: "Install a LaunchAgent/systemd unit for this project root"
+      command: "%s scheduler service install --root ."
+    - comment: "List registered units"
+      command: "%s scheduler service list"
+    - comment: "Garbage-collect units whose roots are gone"
+      command: "%s scheduler service gc"
+  exclude_flags:
+    - "format"
+    - "output"
+    - "verbose"
+    - "quiet"
+    - "timeout"
+    - "columns"
+
+common_flags: false
+requires_storage: false
+requires_session: false
+requires_scheduler_check: false

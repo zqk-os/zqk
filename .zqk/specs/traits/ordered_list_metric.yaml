@@ -1,0 +1,18 @@
+$schema: "../../../.zqk/cli/specs/schemas/trait_spec.schema.json"
+
+name: ordered_list_metric
+description: Trait indicating that a field contains ordered list-based metric data (sequence).\nFields with this trait are automatically collected and aggregated into metric objects.\n\nOrdered list metrics represent sequences where order matters (e.g., status transitions,\nevent sequences, time-series data). They can be analyzed for patterns, trends, and sequences.\n
+category: metric-type
+requires:
+  - base_metric_enabled_group
+  - readable
+conflicts: []
+includes: []
+field_level: true
+object_level: false
+config: {}
+
+created_at: 2026-07-01T18:00:00Z
+updated_at: 2026-07-01T18:00:00Z
+created_by: ACC-1785920548450214012-68b850c0
+updated_by: ACC-1785920548450214012-68b850c0

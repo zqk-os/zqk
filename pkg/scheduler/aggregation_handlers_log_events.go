@@ -1,0 +1,100 @@
+package scheduler
+
+// Log events for aggregation handlers (POL-CODE-007). Prefix matches [JobType*] per handler family.
+
+const (
+	// Audit event aggregation ([JobTypeAuditEventAggregation]).
+	LogEventAuditAggregationSingletonLockCreateFailed              = JobTypeAuditEventAggregation + "_singleton_lock_create_failed"
+	LogEventAuditAggregationSingletonLockTryAcquireFailed          = JobTypeAuditEventAggregation + "_singleton_lock_try_acquire_failed"
+	LogEventAuditAggregationSingletonLockHeldSkipExecution         = JobTypeAuditEventAggregation + "_singleton_lock_held_skip_execution"
+	LogEventAuditAggregationSingletonLockReleaseFailed             = JobTypeAuditEventAggregation + "_singleton_lock_release_failed"
+	LogEventAuditAggregationPreExecHealthFailedWarning             = JobTypeAuditEventAggregation + "_pre_exec_health_failed_warning"
+	LogEventAuditAggregationCASRecoveryStoppedEarlyTimeLimit       = JobTypeAuditEventAggregation + "_cas_recovery_stopped_early_time_limit"
+	LogEventAuditAggregationStartedRun                             = JobTypeAuditEventAggregation + "_started_run"
+	LogEventAuditAggregationHVCacheBuildFailedFallback             = JobTypeAuditEventAggregation + "_hv_cache_build_failed_fallback"
+	LogEventAuditAggregationHVCacheBuiltSuccess                    = JobTypeAuditEventAggregation + "_hv_cache_built_success"
+	LogEventAuditAggregationHVCacheAlreadyPopulated                = JobTypeAuditEventAggregation + "_hv_cache_already_populated"
+	LogEventAuditAggregationAggregatingWindow                      = JobTypeAuditEventAggregation + "_aggregating_window"
+	LogEventAuditAggregationCountBasedShortenedRetention           = JobTypeAuditEventAggregation + "_count_based_shortened_retention"
+	LogEventAuditAggregationRetentionFirstPassStarted              = JobTypeAuditEventAggregation + "_retention_first_pass_started"
+	LogEventAuditAggregationRetentionCleanupCancelled              = JobTypeAuditEventAggregation + "_retention_cleanup_cancelled"
+	LogEventAuditAggregationRetentionStoppingEarlyForAgg           = JobTypeAuditEventAggregation + "_retention_stopping_early_for_aggregation"
+	LogEventAuditAggregationRetentionFirstPassBatchFailed          = JobTypeAuditEventAggregation + "_retention_first_pass_batch_failed"
+	LogEventAuditAggregationRetentionCleanupProgress               = JobTypeAuditEventAggregation + "_retention_cleanup_progress"
+	LogEventAuditAggregationRetentionFirstPassCompleted            = JobTypeAuditEventAggregation + "_retention_first_pass_completed"
+	LogEventAuditAggregationAuditEventCountFailedSkipCatchUp       = JobTypeAuditEventAggregation + "_audit_event_count_failed_skip_catchup"
+	LogEventAuditAggregationAuditEventCountOverLimitCatchUp        = JobTypeAuditEventAggregation + "_audit_event_count_over_limit_catchup"
+	LogEventAuditAggregationCatchUpCleanupCancelled                = JobTypeAuditEventAggregation + "_catch_up_cleanup_cancelled"
+	LogEventAuditAggregationCatchUpStoppingEarlyForAgg             = JobTypeAuditEventAggregation + "_catch_up_stopping_early_for_aggregation"
+	LogEventAuditAggregationCatchUpBatchFailed                     = JobTypeAuditEventAggregation + "_catch_up_batch_failed"
+	LogEventAuditAggregationCatchUpCleanupProgress                 = JobTypeAuditEventAggregation + "_catch_up_cleanup_progress"
+	LogEventAuditAggregationCatchUpCleanupCompleted                = JobTypeAuditEventAggregation + "_catch_up_cleanup_completed"
+	LogEventAuditAggregationMetricCountLimitAggressiveCleanup      = JobTypeAuditEventAggregation + "_metric_count_limit_aggressive_cleanup"
+	LogEventAuditAggregationAggressiveCleanupSkippedCancelled      = JobTypeAuditEventAggregation + "_aggressive_cleanup_skipped_cancelled"
+	LogEventAuditAggregationAggressiveCleanupArchivedCompleted     = JobTypeAuditEventAggregation + "_aggressive_cleanup_archived_completed"
+	LogEventAuditAggregationAggressiveCleanupAuditEventsByAge      = JobTypeAuditEventAggregation + "_aggressive_cleanup_audit_events_by_age"
+	LogEventAuditAggregationAggressiveCleanupOldEventsCompleted    = JobTypeAuditEventAggregation + "_aggressive_cleanup_old_events_completed"
+	LogEventAuditAggregationProactiveMetricCleanupSkippedCancelled = JobTypeAuditEventAggregation + "_proactive_metric_cleanup_skipped_cancelled"
+	LogEventAuditAggregationProactiveMetricCleanupCompleted        = JobTypeAuditEventAggregation + "_proactive_metric_cleanup_completed"
+	LogEventAuditAggregationSkippingCancelled                      = JobTypeAuditEventAggregation + "_skipping_aggregation_cancelled"
+	LogEventAuditAggregationBeginningAggregateWindowPass           = JobTypeAuditEventAggregation + "_beginning_aggregate_window_pass"
+	LogEventAuditAggregationHashMismatchPartialContinue            = JobTypeAuditEventAggregation + "_hash_mismatch_partial_continue"
+	LogEventAuditAggregationAggregationMetricStaleCASOK            = JobTypeAuditEventAggregation + "_aggregation_metric_stale_cas_ok"
+	LogEventAuditAggregationAggregationFailed                      = JobTypeAuditEventAggregation + "_aggregation_failed"
+	LogEventAuditAggregationAggregationCompletedNoEvents           = JobTypeAuditEventAggregation + "_aggregation_completed_no_events"
+	LogEventAuditAggregationAggregationCompleted                   = JobTypeAuditEventAggregation + "_aggregation_completed"
+	LogEventAuditAggregationPostAggCleanupStarted                  = JobTypeAuditEventAggregation + "_post_agg_cleanup_started"
+	LogEventAuditAggregationPostAggCleanupFailed                   = JobTypeAuditEventAggregation + "_post_agg_cleanup_failed"
+	LogEventAuditAggregationPostAggCleanupCompleted                = JobTypeAuditEventAggregation + "_post_agg_cleanup_completed"
+	LogEventAuditAggregationRetentionSecondPassStarted             = JobTypeAuditEventAggregation + "_retention_second_pass_started"
+	LogEventAuditAggregationPostAggRetentionStoppingEarlyTime      = JobTypeAuditEventAggregation + "_post_agg_retention_stopping_early_time"
+	LogEventAuditAggregationRetentionSecondPassCleanupFailed       = JobTypeAuditEventAggregation + "_retention_second_pass_cleanup_failed"
+	LogEventAuditAggregationRetentionSecondPassCleanedUp           = JobTypeAuditEventAggregation + "_retention_second_pass_cleaned_up"
+	LogEventAuditAggregationPhaseDurationsBottleneckDump           = JobTypeAuditEventAggregation + "_phase_durations_bottleneck_dump"
+	LogEventAuditAggregationRemoveEmptyBucketDirsFailed            = JobTypeAuditEventAggregation + "_remove_empty_bucket_dirs_failed"
+	LogEventAuditAggregationRemoveEmptyBucketDirsRemoved           = JobTypeAuditEventAggregation + "_remove_empty_bucket_dirs_removed"
+	LogEventAuditAggregationHealthListMetricsFailed                = JobTypeAuditEventAggregation + "_health_list_metrics_failed"
+	LogEventAuditAggregationHealthHashMismatchSample               = JobTypeAuditEventAggregation + "_health_hash_mismatch_sample"
+	LogEventAuditAggregationHealthMetricsPotentialIssues           = JobTypeAuditEventAggregation + "_health_metrics_potential_issues"
+)
+
+const (
+	// Change journal aggregation ([JobTypeChangeJournalAggregation]).
+	LogEventChangeJournalAggregationStarted                       = JobTypeChangeJournalAggregation + "_started"
+	LogEventChangeJournalAggregationHashMismatchPartialContinue   = JobTypeChangeJournalAggregation + "_hash_mismatch_partial_continue"
+	LogEventChangeJournalAggregationAggregationMetricStaleCASOK   = JobTypeChangeJournalAggregation + "_aggregation_metric_stale_cas_ok"
+	LogEventChangeJournalAggregationAggregationFailed             = JobTypeChangeJournalAggregation + "_aggregation_failed"
+	LogEventChangeJournalAggregationAggregationCompletedNoEntries = JobTypeChangeJournalAggregation + "_aggregation_completed_no_entries"
+	LogEventChangeJournalAggregationAggregationCompleted          = JobTypeChangeJournalAggregation + "_aggregation_completed"
+	LogEventChangeJournalAggregationHealthListMetricsFailed       = JobTypeChangeJournalAggregation + "_health_list_metrics_failed"
+	LogEventChangeJournalAggregationHealthHashMismatchSample      = JobTypeChangeJournalAggregation + "_health_hash_mismatch_sample"
+	LogEventChangeJournalAggregationHealthMetricsPotentialIssues  = JobTypeChangeJournalAggregation + "_health_metrics_potential_issues"
+)
+
+const (
+	// Aggregation metrics cleanup ([JobTypeAggregationMetricsCleanup]).
+	LogEventAggregationMetricsCleanupStarted                  = JobTypeAggregationMetricsCleanup + "_started"
+	LogEventAggregationMetricsCleanupRetentionSkipNonPositive = JobTypeAggregationMetricsCleanup + "_retention_skip_non_positive"
+	LogEventAggregationMetricsCleanupCleaningOldMetrics       = JobTypeAggregationMetricsCleanup + "_cleaning_old_metrics"
+	LogEventAggregationMetricsCleanupQueryOldMetricsFailed    = JobTypeAggregationMetricsCleanup + "_query_old_metrics_failed"
+	LogEventAggregationMetricsCleanupNoOldMetricsFound        = JobTypeAggregationMetricsCleanup + "_no_old_metrics_found"
+	LogEventAggregationMetricsCleanupFoundOldMetrics          = JobTypeAggregationMetricsCleanup + "_found_old_metrics_to_cleanup"
+	LogEventAggregationMetricsCleanupDeleteOldMetricsFailed   = JobTypeAggregationMetricsCleanup + "_delete_old_metrics_failed"
+	LogEventAggregationMetricsCleanupCleanedUpOldMetrics      = JobTypeAggregationMetricsCleanup + "_cleaned_up_old_metrics"
+	LogEventAggregationMetricsCleanupSomeMetricsDeleteFailed  = JobTypeAggregationMetricsCleanup + "_some_metrics_delete_failed"
+)
+
+const (
+	// Generic metrics cleanup ([JobTypeGenericMetricsCleanup]).
+	LogEventGenericMetricsCleanupMetricKindEnvNotSet        = JobTypeGenericMetricsCleanup + "_metric_kind_env_not_set"
+	LogEventGenericMetricsCleanupStarted                    = JobTypeGenericMetricsCleanup + "_started"
+	LogEventGenericMetricsCleanupRetentionSkipNonPositive   = JobTypeGenericMetricsCleanup + "_retention_skip_non_positive"
+	LogEventGenericMetricsCleanupObjectCountLimitAggressive = JobTypeGenericMetricsCleanup + "_object_count_limit_aggressive_cleanup"
+	LogEventGenericMetricsCleanupCleaningOldMetrics         = JobTypeGenericMetricsCleanup + "_cleaning_old_metrics"
+	LogEventGenericMetricsCleanupQueryOldMetricsFailed      = JobTypeGenericMetricsCleanup + "_query_old_metrics_failed"
+	LogEventGenericMetricsCleanupNoOldMetricsFound          = JobTypeGenericMetricsCleanup + "_no_old_metrics_found"
+	LogEventGenericMetricsCleanupFoundOldMetrics            = JobTypeGenericMetricsCleanup + "_found_old_metrics_to_cleanup"
+	LogEventGenericMetricsCleanupDeleteOldMetricsFailed     = JobTypeGenericMetricsCleanup + "_delete_old_metrics_failed"
+	LogEventGenericMetricsCleanupCleanedUpOldMetrics        = JobTypeGenericMetricsCleanup + "_cleaned_up_old_metrics"
+	LogEventGenericMetricsCleanupSomeMetricsDeleteFailed    = JobTypeGenericMetricsCleanup + "_some_metrics_delete_failed"
+)

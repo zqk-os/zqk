@@ -1,0 +1,49 @@
+$schema: "../schemas/command_spec.schema.json"
+
+name: "command-spec <command-path>"
+short: "Create canonical file-authored CLI command DNA"
+description: |
+  Writes a new command specification beneath the canonical `.zqk/cli/specs` tree.
+  The command path determines the destination: `system/check-foo` writes
+  `.zqk/cli/specs/system/check_foo_command.yaml`.
+
+  command_spec process objects are not an authoring source. This veneer writes
+  file DNA directly so command creation cannot split across CAS and file specs.
+
+args:
+  type: "exact"
+  count: 1
+
+flags:
+  - name: "use"
+    type: "string"
+    default: ""
+    description: "Command use string; defaults to the final command-path segment"
+  - name: "short"
+    type: "string"
+    default: ""
+    required: true
+    description: "One-line command summary"
+  - name: "description"
+    type: "string"
+    default: ""
+    required: true
+    description: "Long command description"
+  - name: "force"
+    type: "bool"
+    default: false
+    description: "Replace an existing command spec at the canonical path"
+
+help:
+  examples:
+    - comment: "Create DNA for a system subcommand"
+      command: "%s new command-spec system/check-foo --short \"Check foo\" --description \"Validate foo state.\""
+  exclude_flags:
+    - "columns"
+    - "ignore-scheduler-down"
+
+run_e: "runNewCommandSpec"
+common_flags: true
+requires_storage: false
+requires_session: false
+requires_scheduler_check: false

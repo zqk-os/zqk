@@ -1,0 +1,19 @@
+$schema: "../../schemas/command_spec.schema.json"
+
+name: "gen-trace-pipeline"
+short: "Generate a traceability pipeline for an object"
+description: |
+  Automatically scaffolds the required traceability hierarchy for a Goal, Milestone, or Requirement.
+  This generates the associated Criteria, TestCase, and BacklogItem objects required to meet TDD 
+  and execution readiness constraints.
+
+  It behaves intelligently by parsing existing linked objects. If the object already has a Criteria,
+  it will attach the TestCase and BacklogItem to the existing Criteria instead of minting a new one.
+
+args:
+  type: "exact"
+  count: 1
+help:
+  examples:
+    - comment: "Generate pipeline for a requirement"
+      command: "%s workflow gen-trace-pipeline REQ-178867..."

@@ -1,0 +1,268 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://zqk.dev/schemas/command_spec.schema.json",
+  "title": "Command Specification Schema",
+  "description": "Schema for CLI command specifications that define command structure, flags, and behavior",
+  "type": "object",
+  "required": ["name", "short", "description"],
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "Reference to this schema file"
+    },
+    "name": {
+      "type": "string",
+      "description": "Command name/use string (e.g., 'get <id>', 'create <kind>')"
+    },
+    "short": {
+      "type": "string",
+      "description": "Short description (one line)"
+    },
+    "description": {
+      "type": "string",
+      "description": "Long description (can be multi-line YAML string)"
+    },
+    "operation_type": {
+      "type": "string",
+      "enum": ["create", "read", "update", "delete", "list", "count", "query"],
+      "description": "CRUD operation type (for CRUDCommandSpec)"
+    },
+    "args": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["exact", "minimum", "maximum", "range", "no_args"]
+        },
+        "count": {
+          "type": "integer"
+        },
+        "min": {
+          "type": "integer"
+        },
+        "max": {
+          "type": "integer"
+        },
+        "validator": {
+          "type": "string"
+        }
+      },
+      "description": "Argument validation specification"
+    },
+    "flags": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "type", "description"],
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "shorthand": {
+            "type": "string",
+            "maxLength": 1
+          },
+          "type": {
+            "type": "string",
+            "enum": ["string", "bool", "int", "string_array", "stringSlice", "duration"]
+          },
+          "default": {
+            "description": "Default value (type depends on flag type)"
+          },
+          "description": {
+            "type": "string"
+          },
+          "required": {
+            "type": "boolean"
+          },
+          "validate_func": {
+            "type": "string"
+          }
+        }
+      },
+      "description": "Custom flags for this command"
+    },
+    "subcommands": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "spec": {
+            "$ref": "#"
+          },
+          "spec_ref": {
+            "type": "string"
+          }
+        }
+      },
+      "description": "Subcommands (nested or referenced)"
+    },
+    "help": {
+      "type": "object",
+      "properties": {
+        "short": {
+          "type": "string"
+        },
+        "description": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "examples": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["comment", "command"],
+            "properties": {
+              "comment": {
+                "type": "string"
+              },
+              "command": {
+                "type": "string",
+                "description": "Command example (use %s for command name substitution)"
+              }
+            }
+          }
+        },
+        "exclude_flags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "description": "Help text configuration"
+    },
+    "run_e": {
+      "type": "string",
+      "description": "Function name to execute (resolved at build time)"
+    },
+    "async": {
+      "type": "boolean",
+      "default": false,
+      "description": "When true, RunE is wrapped with BindAsyncProgress (operation type from command path)"
+    },
+    "common_flags": {
+      "type": "boolean",
+      "default": true,
+      "description": "Whether to include common flags (format, output, verbose, quiet, timeout, columns)"
+    },
+    "list_harness_flags": {
+      "type": "boolean",
+      "default": false,
+      "description": "Include trait harness list flags (same as AddListFlags)"
+    },
+    "count_harness_flags": {
+      "type": "boolean",
+      "default": false,
+      "description": "Include internal count helper flags (same as AddCountFlags)"
+    },
+    "fields_harness_flags": {
+      "type": "boolean",
+      "default": false,
+      "description": "Include fields-command flags (same as AddFieldsFlags)"
+    },
+    "fields_include_list_kinds": {
+      "type": "boolean",
+      "default": false,
+      "description": "When fields_harness_flags is true, include --list-kinds (root internal fields)"
+    },
+    "requires_storage": {
+      "type": "boolean",
+      "default": true,
+      "description": "When false, root does not pre-warm storage or create storage for session. Omit = use runtime default (true for commands under object or internal subtree)."
+    },
+    "requires_session": {
+      "type": "boolean",
+      "default": true,
+      "description": "When false, root does not start/reuse zqk_session. Omit = use runtime default (true). Set false for codegen, completion, auth."
+    },
+    "requires_scheduler_check": {
+      "type": "boolean",
+      "default": true,
+      "description": "When false, root skips scheduler daemon status check. Omit = use runtime default (true). Set false for scheduler start/stop/status."
+    },
+    "data_input": {
+      "type": "boolean",
+      "default": false,
+      "description": "Include file/data flags for data input"
+    },
+    "dry_run": {
+      "type": "boolean",
+      "default": false,
+      "description": "Include dry-run flag"
+    },
+    "cascade": {
+      "type": "boolean",
+      "default": false,
+      "description": "Include cascade flag (for delete operations)"
+    },
+    "unlink_references": {
+      "type": "boolean",
+      "default": false,
+      "description": "Include --unlink-references flag (strip refs from dependents before delete)"
+    },
+    "query_flags": {
+      "type": "boolean",
+      "default": false,
+      "description": "Non-CRUD: generated builder calls AddQueryFlags after Build (filter, sort, pagination, group, count, fields projection). CRUD: WithQueryFlags on the CRUD builder."
+    },
+    "update_flags": {
+      "type": "boolean",
+      "default": false,
+      "description": "Include update-specific flags"
+    },
+    "required_traits": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Traits required for this command to work"
+    },
+    "conditional_traits": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["flag", "traits"],
+        "properties": {
+          "flag": {
+            "type": "string"
+          },
+          "traits": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "description": "Traits required when specific flags are used"
+    },
+    "required_trait_groups": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Trait groups required (e.g., ['base_object_traits'])"
+    },
+    "aliases": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Alternative names/synonyms for this command"
+    },
+    "synonyms": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Semantic synonyms (e.g., 'task' for 'backlog_item')"
+    }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,126 @@
+$schema: ../../../.zqk/cli/specs/schemas/lifecycle_spec.schema.json
+object_type: risk_blocker
+metadata:
+  description: "First-class risk and blocker tracking. Aligns with the shared risk_blocker
+    status enum (proposed → open → in_progress → implemented). Hourglass missed-deadline
+    escalations enter as open so they are immediately CASable.\n"
+  archive_status: archived
+  error_status: error
+statuses:
+  - value: conceptual
+    display: Conceptual
+    origin: true
+    preliminary: true
+    description: Draft plane status. Prior to CAS membrane crossing.
+    role: realign
+  - value: originated
+    display: Originated
+    description: CAS membrane crossed. Object officially originated.
+    role: realign
+  - value: proposed
+    display: Proposed
+    origin: false
+    preliminary: false
+    role: realign
+    description: Risk/blocker drafted but not yet accepted onto the CAS plane.
+  - value: open
+    display: Open
+    role: shovel_ready
+    description: Risk or blocker is open, visible on CAS, and requires 
+      monitoring or action.
+  - value: in_progress
+    display: In Progress
+    role: execution_locked
+    description: Mitigation or resolution work is actively in progress.
+  - value: implemented
+    display: Implemented
+    terminal: true
+    role: terminal
+    description: Risk mitigated or blocker cleared; no further normal 
+      transitions expected.
+  - value: archived
+    display: Archived
+    terminal: true
+    archive: true
+    role: terminal
+    description: Historical risk/blocker; retained for audit only.
+  - value: error
+    display: Error
+    system: true
+    role: halted
+    description: System-held for repair; recover via promote to open.
+transitions:
+  - from: conceptual
+    to: originated
+    description: Promote from draft plane to CAS membrane (CAS Qualification).
+    manual: true
+    auto: false
+    catalyst: System promotion
+  - from: originated
+    to: proposed
+    description: Initial domain workflow transition to proposed.
+    manual: true
+    auto: true
+    catalyst: System initialization
+  - from: proposed
+    to: open
+    description: Accept proposed risk/blocker onto the active tracking plane
+    manual: true
+    auto: false
+    postconditions:
+      - role is shovel_ready
+  - from: open
+    to: in_progress
+    description: Begin mitigation or resolution work
+    manual: true
+    auto: false
+    postconditions:
+      - role is execution_locked
+  - from: in_progress
+    to: implemented
+    description: Mark risk mitigated or blocker cleared
+    manual: true
+    auto: false
+    postconditions:
+      - role is terminal
+  - from: '*'
+    to: archived
+    description: Archive risk/blocker from any status
+    manual: true
+    auto: false
+    postconditions:
+      - role is terminal
+      - hop from any occupancy to archived
+      - ended; no further normal execution hops expected
+  - from: '*'
+    to: error
+    description: System error occurred
+    manual: false
+    auto: true
+    postconditions:
+      - role is halted
+      - hop from any occupancy to error
+      - system halt; repair before leaving halted
+  - from: error
+    to: open
+    description: Recover from system error after repair
+    manual: true
+    auto: false
+    postconditions:
+      - role is shovel_ready
+      - recover from system halt after repair
+percent_complete:
+  method: status_defaults
+  default_by_status:
+    conceptual: 0
+    originated: 5
+    proposed: 15
+    open: 30
+    in_progress: 50
+    implemented: 100
+    archived: 100
+    error: 0
+created_at: 2026-07-01 18:00:00+00:00
+updated_at: 2026-08-03 07:00:00+00:00
+created_by: ACC-1785920548450214012-68b850c0
+updated_by: ACC-1785920548450214012-68b850c0

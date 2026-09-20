@@ -1,0 +1,21 @@
+$schema: "../schemas/command_spec.schema.json"
+
+name: "start-here"
+short: "Start Here tutorial for new users and agents"
+description: |
+  Shows the Start Here tutorial steps for Community Edition / Sovereign OS onboarding.
+
+help:
+  examples:
+    - comment: "Run the Start Here tutorial"
+      command: "%s system start-here"
+  exclude_flags:
+    - "format"
+    - "output"
+    - "verbose"
+    - "quiet"
+    - "timeout"
+    - "columns"
+
+run_e: "runStartHere"
+common_flags: true

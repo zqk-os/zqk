@@ -1,0 +1,22 @@
+kind: policy
+schema_version: "2.0.0"
+title: Transactional Plane Isolation - Draft vs Promoted
+status: active
+category: workflow
+policy_type: requirement
+body: |
+  All speculative or in-flight agent mutations must occur within isolated scratchpad
+  planes (`PlaneDraft`) with zero blast radius to authoritative runtime state.
+
+  **Requirements**
+  - Unverified work must remain in `PlaneDraft` until all invariant gates clear.
+  - State promotion to `PlanePromoted` requires signed cryptographic attestation and clean gate evaluation.
+  - Runaway or hallucinating agent processes must be quarantined (`PlaneApoptotic`) without corrupting peer cells.
+  - Draft state must never form direct causal dependencies on promoted state without explicit staging.
+
+  **Why**: Plane isolation prevents context pollution and guarantees that only verified truth enters the kernel memory.
+effective_date: "2026-09-14"
+enforcement:
+  automated: true
+  reminder_enabled: true
+  severity: high

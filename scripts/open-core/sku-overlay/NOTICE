@@ -1,0 +1,69 @@
+ZQK
+Copyright 2025–2026 ZQK Contributors
+
+This product includes software developed for the ZQK project.
+This source tree is licensed under the Apache License, Version 2.0.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+========================================================================
+Third-Party Software Licenses and Notices
+========================================================================
+This software includes the following third-party dependencies, each licensed
+under its own permissive open source terms:
+
+1. github.com/robfig/cron/v3
+   License: MIT License
+   Copyright (c) 2012 Rob Figueiredo
+
+2. github.com/spf13/cobra
+   License: Apache License 2.0
+   Copyright (c) 2013-2023 Steve Francia and Cobra Contributors
+
+3. github.com/spf13/pflag
+   License: BSD 3-Clause License
+   Copyright (c) 2012 The Go Authors, Steve Francia
+
+4. github.com/golang-jwt/jwt/v5
+   License: MIT License
+   Copyright (c) 2021-2023 Dave Gurnell, Rob Collins, and jwt-go/golang-jwt authors
+
+5. github.com/neo4j/neo4j-go-driver/v5
+   License: Apache License 2.0
+   Copyright (c) "Neo4j" Neo4j Sweden AB
+
+6. github.com/jedib0t/go-pretty/v6
+   License: MIT License
+   Copyright (c) 2019 jedib0t
+
+7. github.com/santhosh-tekuri/jsonschema/v5
+   License: Apache License 2.0
+   Copyright (c) 2019 Santhosh Tekuri
+
+8. github.com/fatih/color
+   License: MIT License
+   Copyright (c) 2013 Fatih Arslan
+
+9. github.com/briandowns/spinner
+   License: Apache License 2.0
+   Copyright (c) 2014-2023 Brian Downs
+
+10. github.com/stretchr/testify
+    License: MIT License
+    Copyright (c) 2012-2020 Mat Ryer, Tyler Bunnell and contributors
+
+11. github.com/fsnotify/fsnotify
+    License: BSD 3-Clause License
+    Copyright (c) 2012 The Go Authors
+
+12. github.com/shirou/gopsutil/v3
+    License: BSD 3-Clause License
+    Copyright (c) 2014, WAKAYAMA Shirou
+
+13. gopkg.in/yaml.v3
+    License: MIT License / Apache License 2.0
+    Copyright (c) 2011-2019 Canonical Ltd
+
+14. golang.org/x/{crypto,sync,sys,term,tools}
+    License: BSD 3-Clause License
+    Copyright (c) 2009 The Go Authors

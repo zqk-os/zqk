@@ -1,0 +1,14 @@
+federate command
+
+Usage:
+  zqk.test system federate [command]
+
+Available Commands:
+  handshake   handshake command
+  initiate    initiate command
+  status      Show the status of the federated sovereign mesh
+
+Global Flags:
+      --allow-degraded   Allow scheduler-dependent commands to run when scheduler daemon is not running
+
+Use "zqk.test system federate [command] --help" for more information about a command.

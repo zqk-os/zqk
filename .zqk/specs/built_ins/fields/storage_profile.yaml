@@ -1,0 +1,14 @@
+type: enum
+semantic_type: storage_profile
+description: "Data-cell storage profile mechanism (cas_entity, stream, light_file, key_value, blob)."
+default: cas_entity
+traits:
+  - readable
+validation:
+  required: false
+  enum:
+    - cas_entity
+    - stream
+    - light_file
+    - key_value
+    - blob

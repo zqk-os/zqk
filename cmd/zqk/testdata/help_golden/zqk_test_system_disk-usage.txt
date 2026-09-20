@@ -1,0 +1,39 @@
+Walks a tree in pure Go and lists directory sizes up to a depth limit, sorted
+
+largest-first. Replaces ad-hoc `du | sort | grep` for housekeeping so agents
+
+and CI get the same behavior on macOS, Linux, and Windows.
+
+
+
+Pair with scripts/clean-project-sprawl.sh after identifying hot spots under
+.zqk/.
+
+  Project root, depth 2, entries >= 1MiB (default)
+  zqk.test system disk-usage
+  Same shape as du -h -d 2 filtered to gigabyte-scale paths
+  zqk.test system disk-usage --depth 2 --min 1G
+  Inspect .zqk log/state sprawl
+  zqk.test system disk-usage .zqk --depth 3 --min 10M --format json
+  Top 20 hotspots anywhere under cwd
+  zqk.test system disk-usage --top 20 --min 0
+
+Usage:
+  zqk.test system disk-usage [flags]
+
+Aliases:
+  disk-usage, du
+
+Flags:
+  -d, --depth int          Maximum directory depth relative to the scan root (root is 0) (default 2)
+  -f, --format string      Output format (table, json, jsonl, yaml, csv, json-rpc, stream, agent-prompt, semantic-link) (default "table")
+      --include-files      Also list regular files at depth <= --depth
+      --min string         Only list entries at least this large (e.g. 1M, 500M, 1G, 0) (default "1M")
+  -o, --output string      Write output to file
+  -q, --quiet              Suppress non-essential output
+      --timeout duration   Timeout for command execution (0 = auto-calculate)
+      --top int            Limit to the N largest entries after filtering (0 = unlimited)
+  -v, --verbose            Verbose output
+
+Global Flags:
+      --allow-degraded   Allow scheduler-dependent commands to run when scheduler daemon is not running

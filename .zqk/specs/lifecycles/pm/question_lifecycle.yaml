@@ -1,0 +1,137 @@
+$schema: ../../../.zqk/cli/specs/schemas/lifecycle_spec.schema.json
+object_type: question
+statuses:
+  - value: conceptual
+    display: Conceptual
+    origin: true
+    preliminary: true
+    description: Draft plane status. Prior to CAS membrane crossing.
+    role: realign
+  - value: originated
+    display: Originated
+    description: CAS membrane crossed. Object officially originated.
+    role: realign
+  - value: open
+    display: Open
+    origin: false
+    preliminary: false
+    role: realign
+    description: 'question status ''open'' (Open): not yet committed for execution;
+      reshape before pickup.'
+  - value: answered
+    display: Answered
+    role: realign
+    description: 'question status ''answered'' (Answered): not yet committed for execution;
+      reshape before pickup.'
+  - value: resolved
+    display: Resolved
+    terminal: true
+    role: terminal
+    description: 'question status ''resolved'' (Resolved): ended; no further normal
+      execution transitions expected. Flags: terminal.'
+  - value: deferred
+    display: Deferred
+    terminal: true
+    role: terminal
+    description: 'question status ''deferred'' (Deferred): ended; no further normal
+      execution transitions expected. Flags: terminal.'
+  - value: error
+    display: Error
+    system: true
+    role: halted
+    description: 'question status ''error'' (Error): paused or system-held for repair;
+      resolve before advancing. Flags: system-assigned.'
+transitions:
+  - from: conceptual
+    to: originated
+    description: Promote from draft plane to CAS membrane (CAS Qualification).
+    manual: true
+    auto: false
+    catalyst: System promotion
+  - from: originated
+    to: open
+    description: Initial domain workflow transition to open.
+    manual: true
+    auto: true
+    catalyst: System initialization
+  - from: open
+    to: answered
+    description: Answer provided to the question
+    manual: true
+    auto: false
+    postconditions:
+      - role is realign
+  - from: answered
+    to: resolved
+    description: Answer accepted and question closed
+    manual: true
+    auto: false
+    postconditions:
+      - role is terminal
+  - from: open
+    to: resolved
+    description: Question resolved directly (answer provided and accepted in one
+      step)
+    manual: true
+    auto: false
+    postconditions:
+      - role is terminal
+  - from: open
+    to: deferred
+    description: Question postponed for later consideration
+    manual: true
+    auto: false
+    postconditions:
+      - role is terminal
+  - from: answered
+    to: open
+    description: Answer rejected or insufficient, question reopened
+    manual: true
+    auto: false
+    postconditions:
+      - role is realign
+  - from: answered
+    to: deferred
+    description: Answer provided but question deferred for later resolution
+    manual: true
+    auto: false
+    postconditions:
+      - role is terminal
+  - from: deferred
+    to: open
+    description: Deferred question reopened
+    manual: true
+    auto: false
+    postconditions:
+      - role is realign
+  - from: '*'
+    to: error
+    description: System-assigned when lifecycle incoherency detected
+    manual: false
+    auto: false
+    postconditions:
+      - role is halted
+      - hop from any occupancy to error
+      - system halt; repair before leaving halted
+  - from: error
+    to: open
+    description: Recover from system error after repair
+    manual: true
+    auto: false
+    postconditions:
+      - role is realign
+      - recover from system halt after repair
+percent_complete:
+  method: status_based
+  default_by_status:
+    conceptual: 0
+    originated: 5
+    answered: 50
+    deferred: 0
+    error: 0
+    open: 5
+    resolved: 100
+created_at: 2026-07-01 18:00:00+00:00
+updated_at: 2026-07-01 18:00:00+00:00
+created_by: ACC-1785920548450214012-68b850c0
+updated_by: ACC-1785920548450214012-68b850c0

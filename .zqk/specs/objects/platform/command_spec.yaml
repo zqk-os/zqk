@@ -1,0 +1,28 @@
+schema_version: 2.0.0
+ontology: command_spec
+extends: base_object
+visibility: public
+description: Optional process-plane projection of a CLI command definition for governance and traceability.\nThe sole authoring source is file DNA under `.zqk/cli/specs/`; generated Go builders project\nfrom those files. command_spec objects MUST NOT act as an independent command-definition source\nor be created through generic object authoring flows.\n
+traits:
+  - readable
+fields:
+  flags:
+    type: list
+    validation:
+      required: false
+  group_id:
+    type: string
+    validation:
+      required: false
+  long:
+    type: string
+    validation:
+      required: false
+  short:
+    type: string
+    validation:
+      required: true
+  use:
+    type: string
+    validation:
+      required: true

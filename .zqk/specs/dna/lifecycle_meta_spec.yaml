@@ -1,0 +1,32 @@
+schema_version: "2.0.0"
+ontology: lifecycle_meta_spec
+urn: urn:zqk:spec:dna:lifecycle_meta_spec
+namespace: zqk:dna
+visibility: public
+storage_profile: cas_entity
+description: "Meta specification governing state progression, invariant-guarded transitions, and metabolic lifecycles."
+traits:
+  - auditable
+fields:
+  object_type:
+    type: string
+    description: "Object kind governed by this lifecycle specification."
+    validation:
+      required: true
+  extends:
+    type: string
+    description: "Parent lifecycle from which transitions and statuses are inherited."
+    default: "base_object_lifecycle"
+  statuses:
+    type: list
+    description: "List of valid status states with metabolic properties and roles."
+    validation:
+      required: true
+  transitions:
+    type: list
+    description: "Directed transitions allowed between status states."
+    validation:
+      required: true
+  percent_complete:
+    type: map
+    description: "Default progression completion mappings by status."

@@ -1,0 +1,31 @@
+package bldr_trait_v1
+
+import (
+	"github.com/zqk-os/zqk/pkg/specbuilder/trait_builders"
+)
+
+// ReadableBuilder builds the readable trait at version v1_0_0
+// File: bldr_trait_v1/readable_builder.go - version is encoded in package/directory name
+type ReadableBuilder struct {
+	*trait_builders.BaseTraitBuilder
+}
+
+// NewReadableBuilder creates a new builder for readable trait version v1_0_0
+func NewReadableBuilder() *ReadableBuilder {
+	builder := &ReadableBuilder{
+		BaseTraitBuilder: trait_builders.NewBaseTraitBuilder("readable", "v1_0_0"),
+	}
+
+	// Configure the trait
+	builder.
+		SetDescription("Object/field can be read/retrieved").
+		SetCategory("standard").
+		SetObjectLevel(false).
+		SetFieldLevel(false)
+
+	return builder
+}
+
+func init() {
+	trait_builders.RegisterBuilder(NewReadableBuilder())
+}

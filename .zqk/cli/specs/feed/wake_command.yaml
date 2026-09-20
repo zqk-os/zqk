@@ -1,0 +1,57 @@
+$schema: "../schemas/command_spec.schema.json"
+
+name: "wake"
+short: "Append a wake event to the agent chat feed (notify-only)"
+description: |
+  Appends a typed wake event to the agent chat feed to wake a peer doer
+  without requiring planner steering permissions.
+
+flags:
+  - name: "message"
+    shorthand: "m"
+    type: "string"
+    default: ""
+    required: true
+    description: "Wake message body"
+  - name: "agent-id"
+    type: "string"
+    default: ""
+    description: "This swarm seat id (sending agent)"
+  - name: "to-agent-id"
+    type: "string"
+    default: ""
+    description: "Peer agent id to wake"
+  - name: "no-ack"
+    type: "bool"
+    default: false
+    description: "Skip emitting kernel self-ACK receipt"
+  - name: "no-wake"
+    type: "bool"
+    default: false
+    description: "Do not attempt MCP/script peer wake (append only)"
+  - name: "await-peer-ack"
+    type: "bool"
+    default: false
+    description: "Register callback to wake this seat when peer replies"
+  - name: "feed-id"
+    type: "string"
+    default: ""
+    description: "Assert append to specific feed stream"
+
+args:
+  type: "no_args"
+
+help:
+  examples:
+    - comment: "Wake a peer doer"
+      command: "%s feed wake --to-agent-id peer-agent-01 --message \"ATTN peer: wake for check\""
+    - comment: "Stamp only (no MCP/script wake)"
+      command: "%s feed wake --to-agent-id peer-agent-01 --no-wake --message \"ATTN peer: feed stamp\""
+    - comment: "Ring caller when peer feed-acks"
+      command: "%s feed wake --agent-id cursor-composer --to-agent-id peer-agent-1 --await-peer-ack --message \"ATTN PEER: start ATK\""
+  exclude_flags:
+    - "columns"
+    - "ignore-scheduler-down"
+
+run_e: "runFeedWake"
+common_flags: true

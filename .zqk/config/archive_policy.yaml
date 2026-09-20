@@ -1,0 +1,38 @@
+# ZQK Archival Lifecycle & Tiered Storage Configuration
+# Governed by: POL-CODE-1789812821281452000-51f4aea4
+# Specification: TSP-TIERED-STORAGE-ARCHIVE-001
+version: "1.0"
+
+tier_transitions:
+  hot:
+    # Minimum time an object or tree must remain in a terminal state before eligible for warm compaction
+    inactivity_threshold: "${ZQK_ARCHIVE_HOT_INACTIVITY:-30d}"
+    terminal_grace_period: "${ZQK_ARCHIVE_HOT_GRACE:-7d}"
+    
+    # Storage volume & count watermarks triggering proactive compaction sweeps
+    max_volume_bytes: "${ZQK_ARCHIVE_MAX_HOT_BYTES:-524288000}"   # 500 MiB
+    max_object_count: "${ZQK_ARCHIVE_MAX_HOT_OBJECTS:-5000}"
+    auto_compact_on_watermark: true
+
+  warm:
+    # Retention period for compressed capsules in local storage before offloading to cold vault
+    retention_threshold: "${ZQK_ARCHIVE_WARM_RETENTION:-90d}"
+    max_local_archive_bytes: "${ZQK_ARCHIVE_MAX_WARM_BYTES:-5368709120}" # 5 GiB
+    compression:
+      algorithm: "zstd"
+      level: 19
+
+  cold:
+    # Retention period in remote/detached cold vault before abyss purge
+    retention_threshold: "${ZQK_ARCHIVE_COLD_RETENTION:-365d}"
+    vault:
+      backend: "${ZQK_COLD_VAULT_BACKEND:-local_vault}" # local_vault | s3 | gcs | git_lfs
+      endpoint: "${ZQK_COLD_VAULT_ENDPOINT:-~/.zqk/cold-vault}"
+      bucket: "${ZQK_COLD_VAULT_BUCKET:-zqk-archive-cold}"
+      prefix: "vault/capsules"
+      auto_offload_trigger: "quota_breach" # immediate | scheduled | quota_breach
+
+  abyss:
+    # Retention window before permanent purge from cold vault ('never' keeps cold vault indefinitely)
+    purge_after_duration: "${ZQK_ABYSS_PURGE_DURATION:-never}"
+    preserve_audit_merkle_receipt: true # Non-repudiation WAL entry in .zqk/streams/

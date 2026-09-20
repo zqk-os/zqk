@@ -1,0 +1,55 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://zqk.dev/schemas/tray_config.schema.json",
+  "title": "Tray manifest",
+  "description": "Named shortcuts that expand to zqk argv (embedded defaults + optional .zqk/tray.yaml). This is project-local config, not a process object kind—see pkg/tray and zqk tray. Keep pkg/tray/tray_config.schema.json in sync with this file.",
+  "type": "object",
+  "required": ["version", "entries"],
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "Optional JSON Schema URL (e.g. https://zqk.dev/schemas/tray_config.schema.json) for editors and zqk validate-yaml"
+    },
+    "version": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Manifest format version"
+    },
+    "entries": {
+      "type": "array",
+      "description": "Tray entries; user .zqk/tray.yaml merges by name with embedded defaults",
+      "items": {
+        "type": "object",
+        "required": ["name", "argv"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^[a-z0-9][-a-z0-9]*$",
+            "description": "Stable id for list/show/explain/run (lowercase, hyphen-separated)"
+          },
+          "description": {
+            "type": "string",
+            "description": "Human-readable summary for list output"
+          },
+          "argv": {
+            "type": "array",
+            "minItems": 1,
+            "items": { "type": "string" },
+            "description": "Arguments after the zqk binary (subcommand and flags); must not include the binary name"
+          },
+          "signed_by": {
+            "type": "string",
+            "description": "Kernel Account ID of the author who signed this tray command"
+          },
+          "signature": {
+            "type": "string",
+            "description": "Hex-encoded ECDSA signature over canonical JSON of name + argv"
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

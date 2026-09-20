@@ -1,0 +1,210 @@
+schema_version: 2.0.0
+ontology: scheduler_handler_binding
+extends: base_object
+visibility: internal
+description: Optional dynamic binding overlay for scheduler job handler dispatch.\nEach object can remap one scheduler job_type to a handler_key during cache prewarm.\nStatic code defaults remain the fallback when no valid binding exists.\n
+traits:
+  - base_object_traits
+fields:
+  enabled:
+    access:
+      requires:
+        - access:confidential
+        - role:admin
+    checklist:
+      authority: admin.
+      automation_hooks: when false, binding is ignored.
+      cardinality: one
+      criticality: association
+      default: true
+      dependencies: scheduler.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Whether this binding is active.
+      security: non-sensitive
+      system_usage:
+        - scheduler
+      validation: boolean.
+    field_profile_code: SHB-003
+    permissions: rwx
+    semantic_type: state
+    traits:
+      - readable
+      - writable
+      - modifiable
+      - filterable
+      - sortable
+    type: boolean
+    validation:
+      required: false
+  handler_key:
+    access:
+      requires:
+        - access:confidential
+        - role:admin
+    checklist:
+      authority: admin.
+      automation_hooks: maps to a compiled handler constructor key in scheduler registry.
+      cardinality: one
+      criticality: composition
+      default: null
+      dependencies: scheduler handler registry.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Stable handler key used by prewarm overlay resolution.
+      security: non-sensitive
+      system_usage:
+        - scheduler
+      validation: enum.
+    field_profile_code: SHB-002
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+      - modifiable
+      - filterable
+      - sortable
+    type: enum
+    validation:
+      enum:
+        - cache_prewarm
+        - cache_invalidation
+        - retention_tolerance
+        - maintenance
+        - scheduler_job_retention
+        - autofix_batch_cleanup
+        - cleanup
+        - lifecycle_check
+        - integrity_check
+        - object_validation
+        - audit_event_aggregation
+        - change_journal_aggregation
+        - aggregation_metrics_cleanup
+        - generic_metrics_cleanup
+        - metrics_collection
+        - scheduler_events_aggregation
+        - cascade_update
+        - operation_execution
+        - run_wrapper
+        - callback_listener
+        - test_io
+        - context_refresh
+        - convergence_session_tick
+        - data_cell_envelope_tick
+      required: true
+  job_type:
+    access:
+      requires:
+        - access:confidential
+        - role:admin
+    checklist:
+      authority: admin.
+      automation_hooks: selects which scheduler job_type this binding applies to.
+      cardinality: one
+      criticality: composition
+      default: null
+      dependencies: scheduler.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Scheduler job_type to bind (must be a known scheduler job_type value).
+      security: non-sensitive
+      system_usage:
+        - scheduler
+      validation: enum.
+    field_profile_code: SHB-001
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+      - modifiable
+      - filterable
+      - sortable
+    type: enum
+    validation:
+      enum:
+        - context_refresh
+        - manifest_snapshot
+        - test_runner
+        - aggregation
+        - lifecycle_check
+        - audit_event_aggregation
+        - change_journal_aggregation
+        - integrity_check
+        - cache_prewarm
+        - cache_invalidation
+        - cascade_update
+        - operation_execution
+        - run_wrapper
+        - callback_listener
+        - metrics_collection
+        - retention_tolerance
+        - scheduler_job_retention
+        - autofix_batch_cleanup
+        - aggregation_metrics_cleanup
+        - generic_metrics_cleanup
+        - maintenance
+        - object_validation
+        - scheduler_events_aggregation
+        - cleanup
+        - convergence_session_tick
+        - data_cell_envelope_tick
+      required: true
+  notes:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: admin.
+      cardinality: zero_or_one
+      criticality: association
+      default: null
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Optional rationale/context for the binding.
+      security: non-sensitive
+      system_usage:
+        - scheduler
+      validation: text.
+    field_profile_code: SHB-005
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+      - modifiable
+    type: text
+    validation:
+      required: false
+  priority:
+    access:
+      requires:
+        - access:confidential
+        - role:admin
+    checklist:
+      authority: admin.
+      automation_hooks: deterministic conflict resolution (lower wins).
+      cardinality: one
+      criticality: association
+      default: 1000
+      dependencies: scheduler.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Lower value is applied first when multiple bindings target one job_type.
+      security: non-sensitive
+      system_usage:
+        - scheduler
+      validation: integer.
+    field_profile_code: SHB-004
+    permissions: rwx
+    semantic_type: quantity
+    traits:
+      - readable
+      - writable
+      - modifiable
+      - filterable
+      - sortable
+    type: integer
+    validation:
+      required: false

@@ -1,0 +1,58 @@
+schema_version: "2.0.0"
+ontology: base_entity
+urn: urn:zqk:spec:dna:base_entity
+namespace: zqk:dna
+visibility: public
+storage_profile: cas_entity
+description: "Universal base entity contract for the Cellular Knowledge OS. Defines the immutable physical lineage, canonical URN identity, transactional isolation plane, and lifecycle timestamps governing every entity in the microkernel."
+traits:
+  - auditable
+fields:
+  id:
+    $ref: "built_ins/fields/urn"
+    description: "Canonical unique identifier formatted with brand and kind prefix."
+  urn:
+    $ref: "built_ins/fields/urn"
+    description: "Canonical URN address: urn:<brand>:<cell_id>:<kind>:<id>."
+  kind:
+    type: string
+    description: "Ontology name indicating the semantic kind of the entity."
+    validation:
+      required: true
+  schema_ref:
+    type: string
+    description: "Reference to the governing object meta specification."
+    validation:
+      required: true
+  plane:
+    type: enum
+    description: "Transactional isolation plane: draft, staged, promoted, or apoptotic."
+    default: draft
+    validation:
+      enum:
+        - draft
+        - staged
+        - promoted
+        - apoptotic
+  version:
+    type: int
+    description: "Monotonically incrementing mutation version."
+    default: 1
+  storage_profile:
+    $ref: "built_ins/fields/storage_profile"
+    description: "Physical storage mechanism governing persistence."
+  status:
+    $ref: "built_ins/fields/lifecycle_status"
+    description: "Metabolic lifecycle status of the entity."
+  created_at:
+    $ref: "built_ins/fields/timestamp"
+    description: "Immutable creation timestamp in ISO-8601 UTC."
+  updated_at:
+    $ref: "built_ins/fields/timestamp"
+    description: "Last mutation timestamp in ISO-8601 UTC."
+  created_by:
+    $ref: "built_ins/fields/actor_identity"
+    description: "Actor identity responsible for entity inception."
+  updated_by:
+    $ref: "built_ins/fields/actor_identity"
+    description: "Actor identity responsible for last modification."

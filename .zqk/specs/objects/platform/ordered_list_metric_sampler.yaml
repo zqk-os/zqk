@@ -1,0 +1,22 @@
+schema_version: 2.0.0
+ontology: ordered_list_metric_sampler
+extends: base_sampler
+visibility: internal
+description: 'Sampler configuration for ordered list metric types. Specialized sampler for ordered sequences (event sequences, time-series) where order matters. Can be analyzed for patterns, trends, and sequences. '
+traits:
+  - base_object_traits
+fields:
+  batch_size:
+    type: string
+  flush_interval:
+    type: string
+  group_by_object_id:
+    type: string
+  max_batch_size:
+    type: string
+  metric_type:
+    type: string
+    validation:
+      enum:
+        - ordered_list_metric
+      required: true

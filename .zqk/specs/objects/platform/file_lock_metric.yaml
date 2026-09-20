@@ -1,0 +1,411 @@
+schema_version: 2.0.0
+ontology: file_lock_metric
+extends: base_metric
+visibility: internal
+description: 'File lock performance and contention metrics. Tracks lock acquisition times, contention rates, wait times, and system busyness indicators for cross-process file locking operations. '
+traits:
+  - listable
+  - readable
+  - writable
+  - modifiable
+  - formatable
+  - groupable
+  - filterable
+  - sortable
+  - searchable
+fields:
+  avg_acquisition_time_ms:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation (file lock metrics collector)
+      automation_hooks: used for performance trend analysis.
+      cardinality: one
+      criticality: association
+      default: 0
+      dependencies: total_acquisition_time_ms and total_acquisitions.
+      observability: "yes"
+      origin_lifecycle: mutable (calculated from total_acquisition_time_ms / total_acquisitions)
+      purpose: Average time to acquire a lock in milliseconds.
+      security: non-sensitive
+      system_usage:
+        - performance reporting
+        - trend analysis
+      validation: Non-negative number (milliseconds).
+    field_profile_code: FLM-005
+    permissions: rwx
+    semantic_type: measurement
+    traits:
+      - readable
+      - writable
+      - filterable
+      - sortable
+    type: number
+    validation:
+      required: true
+  avg_wait_time_ms:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation (file lock metrics collector)
+      automation_hooks: used for understanding typical wait times.
+      cardinality: one
+      criticality: association
+      default: 0
+      dependencies: total_wait_time_ms and (total_timeouts + total_acquisitions).
+      observability: "yes"
+      origin_lifecycle: mutable (calculated from total_wait_time_ms / total_waits)
+      purpose: Average wait time in milliseconds (including timeouts).
+      security: non-sensitive
+      system_usage:
+        - performance analysis
+        - contention understanding
+      validation: Non-negative number (milliseconds).
+    field_profile_code: FLM-006
+    permissions: rwx
+    semantic_type: measurement
+    traits:
+      - readable
+      - writable
+      - filterable
+      - sortable
+    type: number
+    validation:
+      required: true
+  contention_rate:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation (file lock metrics collector)
+      automation_hooks: used for system busyness detection.
+      cardinality: one
+      criticality: association
+      default: 0
+      dependencies: total_contention and total_attempts.
+      observability: "yes"
+      origin_lifecycle: mutable (calculated from total_contention / total_attempts)
+      purpose: Contention rate as a percentage (0-100).
+      security: non-sensitive
+      system_usage:
+        - system busyness detection
+        - capacity planning
+      validation: Number between 0 and 100 (percentage).
+    field_profile_code: FLM-009
+    permissions: rwx
+    semantic_type: measurement
+    traits:
+      - readable
+      - writable
+      - filterable
+      - sortable
+    type: number
+    validation:
+      required: true
+  max_acquisition_time_ms:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation (file lock metrics collector)
+      automation_hooks: used for outlier detection.
+      cardinality: one
+      criticality: association
+      default: 0
+      dependencies: file lock metrics collection system.
+      observability: "yes"
+      origin_lifecycle: mutable (updated when faster acquisition occurs)
+      purpose: Maximum time to acquire a lock in milliseconds.
+      security: non-sensitive
+      system_usage:
+        - performance analysis
+        - outlier detection
+      validation: Non-negative number (milliseconds).
+    field_profile_code: FLM-007
+    permissions: rwx
+    semantic_type: measurement
+    traits:
+      - readable
+      - writable
+      - filterable
+      - sortable
+    type: number
+    validation:
+      required: true
+  max_wait_time_ms:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation (file lock metrics collector)
+      automation_hooks: used for understanding worst-case wait times.
+      cardinality: one
+      criticality: association
+      default: 0
+      dependencies: file lock metrics collection system.
+      observability: "yes"
+      origin_lifecycle: mutable (updated when longer wait occurs)
+      purpose: Maximum wait time in milliseconds (including timeouts).
+      security: non-sensitive
+      system_usage:
+        - performance analysis
+        - worst-case analysis
+      validation: Non-negative number (milliseconds).
+    field_profile_code: FLM-008
+    permissions: rwx
+    semantic_type: measurement
+    traits:
+      - readable
+      - writable
+      - filterable
+      - sortable
+    type: number
+    validation:
+      required: true
+  measurement_window_end:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation (file lock metrics collector)
+      automation_hooks: used for temporal analysis.
+      cardinality: one
+      criticality: association
+      default: auto-populated on collection
+      dependencies: metrics collection system.
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: ISO 8601 timestamp of measurement window end.
+      security: non-sensitive
+      system_usage:
+        - temporal analysis
+        - window tracking
+      validation: ISO 8601 timestamp format.
+    field_profile_code: FLM-013
+    permissions: r-x
+    semantic_type: timestamp
+    traits:
+      - readable
+      - filterable
+      - sortable
+    type: string
+    validation:
+      pattern: ^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$
+      required: true
+  measurement_window_start:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation (file lock metrics collector)
+      automation_hooks: used for temporal analysis.
+      cardinality: one
+      criticality: association
+      default: auto-populated on collection
+      dependencies: metrics collection system.
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: ISO 8601 timestamp of measurement window start.
+      security: non-sensitive
+      system_usage:
+        - temporal analysis
+        - window tracking
+      validation: ISO 8601 timestamp format.
+    field_profile_code: FLM-012
+    permissions: r-x
+    semantic_type: timestamp
+    traits:
+      - readable
+      - filterable
+      - sortable
+    type: string
+    validation:
+      pattern: ^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$
+      required: true
+  peak_contention:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation (file lock metrics collector)
+      automation_hooks: used for understanding peak load.
+      cardinality: one
+      criticality: association
+      default: 0
+      dependencies: file lock metrics collection system.
+      observability: "yes"
+      origin_lifecycle: mutable (updated when higher contention occurs)
+      purpose: Maximum number of concurrent lock attempts observed.
+      security: non-sensitive
+      system_usage:
+        - capacity planning
+        - peak load analysis
+      validation: Non-negative integer.
+    field_profile_code: FLM-011
+    permissions: rwx
+    semantic_type: measurement
+    traits:
+      - readable
+      - writable
+      - filterable
+      - sortable
+    type: integer
+    validation:
+      required: true
+  success_rate:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation (file lock metrics collector)
+      automation_hooks: used for system health monitoring.
+      cardinality: one
+      criticality: association
+      default: 0
+      dependencies: total_acquisitions and total_attempts.
+      observability: "yes"
+      origin_lifecycle: mutable (calculated from total_acquisitions / total_attempts)
+      purpose: Success rate as a percentage (0-100).
+      security: non-sensitive
+      system_usage:
+        - system health monitoring
+        - reliability reporting
+      validation: Number between 0 and 100 (percentage).
+    field_profile_code: FLM-010
+    permissions: rwx
+    semantic_type: measurement
+    traits:
+      - readable
+      - writable
+      - filterable
+      - sortable
+    type: number
+    validation:
+      required: true
+  total_acquisitions:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation (file lock metrics collector)
+      automation_hooks: used for frequency analysis.
+      cardinality: one
+      criticality: composition
+      default: 0
+      dependencies: file lock metrics collection system.
+      observability: "yes"
+      origin_lifecycle: mutable (incremented on each acquisition)
+      purpose: Total number of successful lock acquisitions.
+      security: non-sensitive
+      system_usage:
+        - reporting
+        - frequency tracking
+        - performance analysis
+      validation: Non-negative integer.
+    field_profile_code: FLM-001
+    permissions: rwx
+    semantic_type: measurement
+    traits:
+      - listable
+      - readable
+      - writable
+      - filterable
+      - sortable
+    type: integer
+    validation:
+      required: true
+  total_contention:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation (file lock metrics collector)
+      automation_hooks: used for contention rate calculation.
+      cardinality: one
+      criticality: association
+      default: 0
+      dependencies: file lock metrics collection system.
+      observability: "yes"
+      origin_lifecycle: mutable (incremented when lock is already held)
+      purpose: Total number of times lock was already held (TryLock returned false).
+      security: non-sensitive
+      system_usage:
+        - contention analysis
+        - system busyness detection
+      validation: Non-negative integer.
+    field_profile_code: FLM-004
+    permissions: rwx
+    semantic_type: measurement
+    traits:
+      - listable
+      - readable
+      - writable
+      - filterable
+      - sortable
+    type: integer
+    validation:
+      required: true
+  total_failures:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation (file lock metrics collector)
+      automation_hooks: used for error rate calculation.
+      cardinality: one
+      criticality: association
+      default: 0
+      dependencies: file lock metrics collection system.
+      observability: "yes"
+      origin_lifecycle: mutable (incremented on each failure)
+      purpose: Total number of failed lock attempts (errors).
+      security: non-sensitive
+      system_usage:
+        - error analysis
+        - reliability reporting
+      validation: Non-negative integer.
+    field_profile_code: FLM-002
+    permissions: rwx
+    semantic_type: measurement
+    traits:
+      - listable
+      - readable
+      - writable
+      - filterable
+      - sortable
+    type: integer
+    validation:
+      required: true
+  total_timeouts:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation (file lock metrics collector)
+      automation_hooks: used for timeout rate calculation.
+      cardinality: one
+      criticality: association
+      default: 0
+      dependencies: file lock metrics collection system.
+      observability: "yes"
+      origin_lifecycle: mutable (incremented on each timeout)
+      purpose: Total number of timeout failures.
+      security: non-sensitive
+      system_usage:
+        - timeout analysis
+        - performance optimization
+      validation: Non-negative integer.
+    field_profile_code: FLM-003
+    permissions: rwx
+    semantic_type: measurement
+    traits:
+      - listable
+      - readable
+      - writable
+      - filterable
+      - sortable
+    type: integer
+    validation:
+      required: true

@@ -1,0 +1,62 @@
+schema_version: 2.0.0
+ontology: glossary_term_relation
+extends: base_object
+visibility: internal
+description: 'Directed, typed link between two glossary_term rows, scoped to a vocabulary_scheme.\npredicate_ref points to a glossary_term whose category documents the predicate semantics\n(e.g. broader, narrower, related, instantiates). source_term_ref and target_term_ref are\nglossary_term ids (GLS-*). scheme_ref is vocabulary_scheme (VOC-*). Enables multiple\nparallel taxonomies over the same terms. Lifecycle: glossary_term_relation_lifecycle.yaml.\n'
+traits:
+  - base_object_traits
+fields:
+  notes:
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+    type: string
+    validation:
+      required: false
+  predicate_ref:
+    permissions: rwx
+    semantic_type: reference
+    traits:
+      - field_reference_group
+    type: string
+    validation:
+      pattern: ^GLS-
+      required: true
+  scheme_ref:
+    permissions: rwx
+    semantic_type: reference
+    traits:
+      - field_reference_group
+    type: string
+    validation:
+      pattern: ^VOC-
+      required: true
+  sort_order:
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - filterable
+      - sortable
+    type: integer
+    validation:
+      required: false
+  source_term_ref:
+    permissions: rwx
+    semantic_type: reference
+    traits:
+      - field_reference_group
+    type: string
+    validation:
+      pattern: ^GLS-
+      required: true
+  target_term_ref:
+    permissions: rwx
+    semantic_type: reference
+    traits:
+      - field_reference_group
+    type: string
+    validation:
+      pattern: ^GLS-
+      required: true

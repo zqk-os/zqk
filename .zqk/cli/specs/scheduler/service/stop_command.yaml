@@ -1,0 +1,19 @@
+$schema: "../../schemas/command_spec.schema.json"
+
+name: "stop"
+short: "Stop a registered scheduler host unit"
+flags:
+  - name: "root"
+    type: "string"
+    default: ""
+    description: "Root id or project path"
+help:
+  examples:
+    - comment: "Stop by path"
+      command: "%s scheduler service stop --root ."
+  exclude_flags: ["format", "output", "verbose", "quiet", "timeout", "columns"]
+run_e: "runSchedulerServiceStop"
+common_flags: false
+requires_storage: false
+requires_session: false
+requires_scheduler_check: false

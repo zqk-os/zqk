@@ -1,0 +1,50 @@
+$schema: "../schemas/command_spec.schema.json"
+
+name: "bind [test_case_id] [flags]"
+short: "TPM Lineage Binding Assistant: connect test cases and requirements into intact traceability chains"
+description: |
+  Helps Technical Program Managers (TPMs) and engineers achieve the Definition of Done (DoD)
+  for project structure by resolving broken or incomplete lineage chains from test cases up to root objects.
+
+  When invoked without a specific test case, it analyzes all incomplete chains across the workspace
+  and presents ranked, high-confidence options. With --auto, it automatically binds the top recommendations.
+
+flags:
+  - name: "req"
+    type: "string"
+    default: ""
+    description: "Requirement ID to bind to the test case"
+  - name: "goal"
+    type: "string"
+    default: ""
+    description: "Root Goal ID to bind to the requirement"
+  - name: "bli"
+    type: "string"
+    default: ""
+    description: "Backlog Item ID to bind to the test case"
+  - name: "auto"
+    type: "bool"
+    default: false
+    description: "Automatically bind broken chains using top candidate matches"
+  - name: "dry-run"
+    type: "bool"
+    default: false
+    description: "Preview proposed bindings without modifying storage"
+  - name: "list"
+    shorthand: "l"
+    type: "bool"
+    default: false
+    description: "List all broken chains requiring lineage binding"
+
+help:
+  examples:
+    - comment: "Inspect incomplete chains and view ranked binding options"
+      command: "%s test bind"
+    - comment: "Bind a specific test case to a requirement"
+      command: "%s test bind TST-123 --req REQ-456"
+    - comment: "Bind a requirement to a root goal to close the chain to root"
+      command: "%s test bind TST-123 --req REQ-456 --goal GOAL-LAUNCH-READINESS"
+    - comment: "Automatically resolve and bind all incomplete chains using top candidates"
+      command: "%s test bind --auto"
+    - comment: "Preview automatic bindings without writing changes"
+      command: "%s test bind --auto --dry-run"

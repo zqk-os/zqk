@@ -1,0 +1,60 @@
+applicability:
+    exclusions: []
+    file_patterns:
+        - .zqk/process/**/*.yaml
+    object_types: []
+    workstreams: []
+body: |
+    **CRITICAL: Always use the CLI for object modifications.** Direct edits to instance YAML under `.zqk/process/` bypass integrity, content-addressed filenames, and caches.
+
+    ## Requirement
+    1. Create, update, and delete instance/process data only via `zqk object create|update|delete` (or the appropriate domain command).
+    2. Do not hand-edit YAML under `.zqk/process/` for instance data. Exception: `.zqk/specs/` schema/config when CLI or tooling is unavailable — document why and follow up.
+    3. After a CLI write, **commit the CAS rename with the work** (`POL-CODE-CAS-COMMIT-001`). Do not leave `complete` / `in_progress` hash YAML untracked.
+
+    ## Mechanical
+    Capability gates (not Cursor `.mdc` prose) enforce CAS integrity:
+    - `scripts/check-process-cas-commit-with-work.sh` — unstaged same-id rename pairs fail the commit (`POL-CODE-CAS-COMMIT-001`).
+    - `scripts/check-cas-process-staged.sh` — staged hash filename must match blob sha256.
+    - `scripts/check-process-casable-staged.sh` — staged instances must have left the draft plane.
+
+    Vendor IDE rules (`.cursor/rules/process-data-cli-only.mdc` and siblings) are **projections**. If they disagree with this object or `POL-CODE-CAS-COMMIT-001`, trust the kernel.
+category: workflow
+created_at: "2025-01-02T00:00:00Z"
+created_by: ACC-1785920548450214012-68b850c0
+description: ""
+effective_date: "2025-01-02"
+enforcement:
+    automated: true
+    reminder_enabled: true
+    review_required: false
+    severity: critical
+examples:
+    - |-
+      ✅ **Correct**: Use CLI for object operations
+      ```bash
+      zqk object update BLI-655 --field status=in_progress
+      zqk object create policy --file new-policy.yaml
+      ```
+    - |-
+      ❌ **Incorrect**: Direct file edits
+      ```bash
+      # Editing .zqk/process/backlog_items/BLI-655.yaml directly
+      # This bypasses integrity mechanisms
+      ```
+id: POL-ONBOARD-001
+kind: policy
+namespace_id: zqk:kernel
+origin_project: zqk
+origin_system: zqk
+policy_type: standard
+related_patterns:
+    - doc_entry:AI_AGENT_ONBOARDING
+review_date: "2025-07-01"
+schema_version: 2.0.0
+status: active
+title: CLI for Object Operations
+updated_at: "2026-09-20T01:09:09Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version: 1.0.0
+version_context: default

@@ -1,0 +1,15 @@
+type: enum
+semantic_type: priority
+description: "Execution urgency / priority classification."
+default: medium
+traits:
+  - readable
+  - filterable
+  - sortable
+validation:
+  required: false
+  enum:
+    - low
+    - medium
+    - high
+    - critical

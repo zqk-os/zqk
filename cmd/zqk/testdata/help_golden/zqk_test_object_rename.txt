@@ -1,0 +1,25 @@
+Rename an object by changing its ID. Same kind; preserves history and updates
+hash registry.
+
+
+
+Optionally updates all objects that reference the old ID to use the new ID
+(--update-references).
+
+  Rename an object
+  zqk.test object rename BLI-001 BLI-XYZ
+  Rename and update references
+  zqk.test object rename BLI-001 BLI-XYZ --update-references
+  Dry-run to see what would happen
+  zqk.test object rename BLI-001 BLI-XYZ --dry-run
+
+Usage:
+  zqk.test object rename [flags]
+
+Flags:
+      --dry-run             Show what would be renamed without making changes
+      --update-references   Update all objects that reference the old ID to use the new ID
+
+Global Flags:
+      --allow-degraded   Allow scheduler-dependent commands to run when scheduler daemon is not running
+      --internal         Elevated access mode for built-in and internal kinds (requires Enterprise license or zqk-admin)

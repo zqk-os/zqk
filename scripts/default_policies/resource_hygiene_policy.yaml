@@ -1,0 +1,22 @@
+kind: policy
+schema_version: "2.0.0"
+title: Resource Hygiene and Goroutine Lifecycle Safety
+status: active
+category: code_quality
+policy_type: standard
+body: |
+  Long-running kernel daemons and CLI executions must practice strict resource hygiene
+  to eliminate memory leaks, goroutine leaks, and file descriptor starvation.
+
+  **Requirements**
+  - All opened files, sockets, and body streams must be explicitly closed using `defer` immediately after acquisition.
+  - Background goroutines must be lifecycle-managed with explicit context cancellation or stop channels.
+  - Concurrency pools and queues must enforce bounded capacity to prevent unbounded memory growth.
+  - Test suites should enforce leak detection (e.g. `goleak.VerifyNone(t)`).
+
+  **Why**: Daemonized cellular kernels require leak-free operations to sustain 24/7 autonomous swarm execution.
+effective_date: "2026-09-14"
+enforcement:
+  automated: true
+  reminder_enabled: true
+  severity: high

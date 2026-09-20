@@ -1,0 +1,52 @@
+$schema: "../../../.zqk/cli/specs/schemas/scanner_config.schema.json"
+
+description: |
+    Configuration for file scanner exclusion patterns.
+    This allows the system to exclude directories and files during scanning without
+    hardcoding exclusion lists in source code.
+exclude_directories:
+    - _internal
+    - _external
+    - .git
+    - node_modules
+    - .workstream-os
+    - .zqk
+    - __pycache__
+    - .pytest_cache
+    - .mypy_cache
+    - venv
+    - env
+    - .venv
+exclude_patterns:
+    - '*.hash'
+    - .*
+    - '*.tmp'
+    - '*.bak'
+    - '*.swp'
+    - '*~'
+scanners:
+    documentation_discoverer:
+        exclude_directories:
+            - .git
+            - node_modules
+            - __pycache__
+            - .zqk
+            - .workstream-os
+        exclude_patterns:
+            - .*
+    yaml_scanner:
+        exclude_directories:
+            - _internal
+            - .git
+            - node_modules
+            - .workstream-os
+            - .zqk
+        exclude_patterns:
+            - '*.hash'
+            - .*
+version: 1.0.0
+
+created_at: 2026-07-01T18:00:00Z
+updated_at: 2026-07-01T18:00:00Z
+created_by: ACC-1785920548450214012-68b850c0
+updated_by: ACC-1785920548450214012-68b850c0

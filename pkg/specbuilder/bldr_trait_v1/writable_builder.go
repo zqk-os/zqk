@@ -1,0 +1,32 @@
+package bldr_trait_v1
+
+import (
+	"github.com/zqk-os/zqk/pkg/specbuilder/trait_builders"
+)
+
+// WritableBuilder builds the writable trait at version v1_0_0
+// File: bldr_trait_v1/writable_builder.go - version is encoded in package/directory name
+type WritableBuilder struct {
+	*trait_builders.BaseTraitBuilder
+}
+
+// NewWritableBuilder creates a new builder for writable trait version v1_0_0
+func NewWritableBuilder() *WritableBuilder {
+	builder := &WritableBuilder{
+		BaseTraitBuilder: trait_builders.NewBaseTraitBuilder("writable", "v1_0_0"),
+	}
+
+	// Configure the trait
+	builder.
+		SetDescription("Object/field can be written/created").
+		SetCategory("standard").
+		SetObjectLevel(false).
+		SetFieldLevel(false).
+		AddRequires("readable")
+
+	return builder
+}
+
+func init() {
+	trait_builders.RegisterBuilder(NewWritableBuilder())
+}

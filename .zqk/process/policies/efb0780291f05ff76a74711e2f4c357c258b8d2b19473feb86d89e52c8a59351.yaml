@@ -1,0 +1,48 @@
+body: |
+    # Commit process CAS renames with the work
+
+    ## Requirement
+    When `zqk` creates or updates an instance under `.zqk/process/` (not `_internal/`),
+    the write is a content-addressed **rename**: old 64-hex YAML deleted, new hash
+    untracked, same YAML `id:`.
+
+    Agents MUST stage that delete+add pair **in the same git commit** as the code
+    (or other work) that caused the object change. Do not land code while
+    `complete` / `in_progress` YAML stays untracked.
+
+    ## Mechanical gate
+    `scripts/check-process-cas-commit-with-work.sh` runs from
+    `tools/git-hooks/pre-commit` and `scripts/git-commit-as-agent.sh`.
+    If a commit is staged and an unstaged CAS rename pair exists for the same `id:`,
+    the commit fails.
+
+    Break-glass **this commit only**: `ZQK_ALLOW_UNSTAGED_PROCESS_CAS=1`.
+
+    ## Do not
+    - `git restore` / `git checkout --` / `git clean` under `.zqk/process/` to tidy
+      untracked hash YAML (kernel state, not junk).
+    - Treat Cursor `.cursor/rules/*.mdc` as the authoring plane for this rule.
+
+    ## Parent
+    CLI-only instance edits: `POL-ONBOARD-001`. Vocabulary: glossary term
+    **process data**.
+category: workflow
+context: |
+    CLI writes hash-named YAML under .zqk/process/ before git commit. Leaving the
+    complete/in_progress rename untracked, then git reset --hard origin/main,
+    restores the old planned file and completed kernel work looks demoted.
+    Cursor .mdc prose is not SSOT (POL-AGENT-001 kernel-first).
+created_at: "2026-09-20T01:13:55Z"
+created_by: ACC-1785920548450214012-68b850c0
+description: Commit process CAS renames in the same commit as the work
+id: POL-CODE-CAS-COMMIT-001
+kind: policy
+namespace_id: zqk:kernel
+policy_type: requirement
+priority_tier: P0
+schema_version: 2.0.0
+status: active
+title: Commit process CAS renames in the same commit as the work
+updated_at: "2026-09-20T01:15:09Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

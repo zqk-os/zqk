@@ -1,0 +1,78 @@
+schema_version: 2.0.0
+ontology: kind_synonym
+extends: "null"
+visibility: internal
+description: 'Defines synonyms/aliases for object kinds to allow shorter, more convenient names in CLI commands. Synonyms must be unique per target_kind (no duplicate synonym entries for the same target_kind). If the same synonym is used for multiple target_kinds, the highest priority mapping wins.\nLifecycle: kind_synonym_lifecycle.yaml.\n'
+traits: []
+fields:
+  convention:
+    permissions: r-x
+    semantic_type: statement
+    traits:
+      - filterable
+      - groupable
+    type: string
+    validation:
+      enum:
+        - two-word-first-letters
+        - single-word-prefix
+        - custom
+        - common-alias
+  description:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: admin.
+      automation_hooks: used in synonym resolution and ontology documentation.
+      cardinality: one
+      criticality: association
+      default: null
+      dependencies: ontology registry.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Explains why this synonym exists and what canonical kind it aliases.
+      security: non-sensitive
+      system_usage:
+        - ontology
+        - documentation
+      validation: free text string.
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+      - modifiable
+    type: string
+    validation:
+      required: false
+  id:
+    permissions: rwx
+    type: string
+    validation:
+      pattern: ^SYN-\d{3,}$
+  priority:
+    permissions: r-x
+    semantic_type: statement
+    traits:
+      - filterable
+      - sortable
+    type: integer
+  synonym:
+    permissions: r-x
+    semantic_type: statement
+    traits:
+      - filterable
+      - sortable
+      - unique
+    type: string
+    validation:
+      pattern: ^[a-z0-9_-]+$
+  target_kind:
+    permissions: r-x
+    semantic_type: reference
+    traits:
+      - filterable
+      - sortable
+      - groupable
+    type: string

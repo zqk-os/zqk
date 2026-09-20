@@ -1,0 +1,245 @@
+schema_version: 2.0.0
+ontology: process_hygiene_rule
+extends: base_object
+visibility: internal
+description: 'Machine-oriented process hygiene rule row: declarative match on a single object field (prefix, suffix,\nequals, or regex). Used by object-hygiene-scan when rules are loaded from object storage. Governance\n`rule` objects remain separate human policy; this kind is operational configuration.\n'
+traits:
+  - base_object_traits
+fields:
+  description:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner
+      automation_hooks: used in scan reports and rule summaries.
+      cardinality: one
+      criticality: association
+      default: ""
+      dependencies: object-hygiene-scan.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Human-readable explanation of the check.
+      security: non-sensitive
+      system_usage:
+        - scan
+      validation: Optional text.
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - field_mutable_group
+    type: string
+    validation:
+      required: false
+  enabled:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner/automation
+      cardinality: one
+      criticality: association
+      default: true
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: When false, rule is skipped.
+      security: non-sensitive
+      system_usage:
+        - scan
+      validation: Boolean.
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - field_mutable_group
+      - filterable
+    type: boolean
+    validation:
+      required: false
+  match_equals:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation
+      cardinality: zero_or_one
+      criticality: association
+      default: ""
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Match when field equals this literal.
+      security: non-sensitive
+      system_usage:
+        - scan
+      validation: Optional.
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - field_mutable_group
+    type: string
+    validation:
+      required: false
+  match_field:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation
+      cardinality: one
+      criticality: composition
+      default: ""
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Object field name to read (e.g. title, id).
+      security: non-sensitive
+      system_usage:
+        - scan
+      validation: Non-empty when enabled.
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - field_mutable_group
+      - filterable
+    type: string
+    validation:
+      required: true
+  match_prefix:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation
+      cardinality: zero_or_one
+      criticality: association
+      default: ""
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Match when field value has this prefix (exclusive with suffix/equals/regex).
+      security: non-sensitive
+      system_usage:
+        - scan
+      validation: Optional.
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - field_mutable_group
+    type: string
+    validation:
+      required: false
+  match_regex:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation
+      cardinality: zero_or_one
+      criticality: association
+      default: ""
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Match when field matches this regex (Go RE2 syntax).
+      security: non-sensitive
+      system_usage:
+        - scan
+      validation: Optional; must compile when set.
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - field_mutable_group
+    type: string
+    validation:
+      required: false
+  match_suffix:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation
+      cardinality: zero_or_one
+      criticality: association
+      default: ""
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Match when field value has this suffix.
+      security: non-sensitive
+      system_usage:
+        - scan
+      validation: Optional.
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - field_mutable_group
+    type: string
+    validation:
+      required: false
+  rule_id:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation
+      cardinality: one
+      criticality: composition
+      default: ""
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Stable identifier for findings (matches process hygiene rule id in YAML bundles).
+      security: non-sensitive
+      system_usage:
+        - scan
+      validation: Non-empty when enabled.
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - field_mutable_group
+      - filterable
+    type: string
+    validation:
+      required: true
+  sort_order:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation
+      cardinality: one
+      criticality: association
+      default: 0
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Ordering when multiple storage rules apply (lower first).
+      security: non-sensitive
+      system_usage:
+        - scan
+      validation: Integer.
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - field_mutable_group
+      - filterable
+      - sortable
+    type: integer
+    validation:
+      required: false
+  title:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation/owner
+      cardinality: one
+      criticality: composition
+      default: ""
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Short label for logs and UI.
+      security: non-sensitive
+      system_usage:
+        - display
+      validation: Free-form string.
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - field_mutable_group
+    type: string
+    validation:
+      required: false

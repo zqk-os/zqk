@@ -1,0 +1,90 @@
+# One-time job: creates onboarding priority plan, workstream, and backlog items from scripts/onboarding_roadmap/.
+# Create via: zqk object create scheduler_job --file scripts/scheduler_jobs/onboarding_roadmap_seed.yaml
+# Then start the scheduler; the job runs immediately (trigger_type: immediate, execution_mode: one_time).
+# Alternatively: zqk scheduler trigger <job-id> after creating the job.
+title: Onboarding Roadmap Seed
+description: |
+  Creates the onboarding curriculum (priority plan PRIO-onboarding, workstream, three backlog items,
+  one milestone, one goal) from scripts/onboarding_roadmap/ and links workstream_refs and backlog_item_refs.
+  Idempotent: tolerates existing priority_plan (fixed id PRIO-onboarding), reuses earliest matching workstream/milestone/backlog/goal by title when present.
+  Uses --relaxed for workstream create so greenfield (no accounts) does not block.
+  Requires python3 on PATH (parses JSON from zqk object list).
+job_type: run_wrapper
+trigger_type: immediate
+category: system
+execution_mode: one_time
+max_runtime_seconds: 120
+enabled: true
+status: active
+namespace_id: zqk:kernel
+schema_version: "2.0.0"
+command: /bin/sh
+command_args:
+  - "-c"
+  - |
+    set -e
+    ZQK="${ZQK_BIN:-zqk}"
+    BASE="scripts/onboarding_roadmap"
+    # Earliest object by created_at (stable pick when duplicate titles exist).
+    _first_id_sorted() {
+      python3 -c 'import json,sys; objs=json.load(sys.stdin).get("objects") or []; objs.sort(key=lambda x: x.get("created_at") or ""); print(objs[0]["id"] if objs else "")'
+    }
+    # Priority plan (fixed id PRIO-onboarding)
+    set +e
+    PP_OUT=$("$ZQK" object create priority_plan --file "$BASE/priority_plan_onboarding.yaml" --keep-file 2>&1)
+    PP_EC=$?
+    set -e
+    if [ "$PP_EC" -ne 0 ]; then
+      echo "$PP_OUT" | grep -qi 'already exists' || { echo "$PP_OUT" >&2; exit "$PP_EC"; }
+    fi
+    # Workstream (title is unique intent; pick oldest if duplicates)
+    WS_ID=$("$ZQK" object list workstream --filter 'title=Agent & User Onboarding' --format json | _first_id_sorted)
+    if [ -z "$WS_ID" ]; then
+      WS_OUT=$("$ZQK" object create workstream --file "$BASE/workstream_onboarding.yaml" --relaxed --keep-file)
+      WS_ID=$(echo "$WS_OUT" | awk '/created successfully/{print $2}')
+    fi
+    [ -n "$WS_ID" ] || { echo "Failed to resolve or create workstream" >&2; exit 1; }
+    # Milestone
+    M_ID=$("$ZQK" object list milestone --filter 'title=Complete onboarding curriculum' --format json | _first_id_sorted)
+    if [ -z "$M_ID" ]; then
+      M_OUT=$("$ZQK" object create milestone --file "$BASE/milestone_onboarding.yaml" --keep-file)
+      M_ID=$(echo "$M_OUT" | awk '/created successfully/{print $2}')
+    fi
+    [ -n "$M_ID" ] || { echo "Failed to resolve or create milestone" >&2; exit 1; }
+    "$ZQK" object update "$M_ID" --field "workstream_refs=[\"$WS_ID\"]"
+    # Backlog items (resolve by title or create with milestone_refs)
+    _resolve_or_create_backlog() {
+      _TITLE="$1"
+      _FILE="$2"
+      _BID=$("$ZQK" object list backlog_item --filter "title=${_TITLE}" --format json | _first_id_sorted)
+      if [ -z "$_BID" ]; then
+        _TMP=$(mktemp "${TMPDIR:-/tmp}/onboarding_bli_XXXXXX.yaml") || exit 1
+        {
+          cat "$BASE/${_FILE}"
+          printf '\nmilestone_refs:\n  - "%s"\n' "$M_ID"
+        } > "$_TMP"
+        _OUT=$("$ZQK" object create backlog_item --file "$_TMP")
+        rm -f "$_TMP"
+        _BID=$(echo "$_OUT" | awk '/created successfully/{print $2}')
+      else
+        "$ZQK" object update "$_BID" --field "milestone_refs=[\"$M_ID\"]" >/dev/null
+      fi
+      printf '%s\n' "$_BID"
+    }
+    B1=$(_resolve_or_create_backlog 'Read Operational Philosophy policy' backlog_item_01_read_philosophy.yaml)
+    B2=$(_resolve_or_create_backlog 'Complete Start Here tutorial' backlog_item_02_start_here.yaml)
+    B3=$(_resolve_or_create_backlog 'Run retention-status and system check' backlog_item_03_system_health.yaml)
+    [ -n "$B1" ] && [ -n "$B2" ] && [ -n "$B3" ] || { echo "Failed to resolve or create backlog items" >&2; exit 1; }
+    "$ZQK" object update "$B1" --field "workstream_refs=[\"$WS_ID\"]"
+    "$ZQK" object update "$B2" --field "workstream_refs=[\"$WS_ID\"]"
+    "$ZQK" object update "$B3" --field "workstream_refs=[\"$WS_ID\"]"
+    # Goal
+    G_ID=$("$ZQK" object list goal --filter 'title=Onboard agents and users to the project' --format json | _first_id_sorted)
+    if [ -z "$G_ID" ]; then
+      G_OUT=$("$ZQK" object create goal --file "$BASE/goal_onboarding.yaml" --keep-file)
+      G_ID=$(echo "$G_OUT" | awk '/created successfully/{print $2}')
+    fi
+    [ -n "$G_ID" ] || { echo "Failed to resolve or create goal" >&2; exit 1; }
+    "$ZQK" object update "$M_ID" --field "workstream_refs=[\"$WS_ID\"]" --field "backlog_item_refs=[\"$B1\",\"$B2\",\"$B3\"]"
+    "$ZQK" object update "$G_ID" --field "workstream_refs=[\"$WS_ID\"]" --field "backlog_item_refs=[\"$B1\",\"$B2\",\"$B3\"]"
+    echo "Onboarding roadmap ensured: workstream $WS_ID, backlog $B1 $B2 $B3, milestone $M_ID, goal $G_ID"

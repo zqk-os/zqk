@@ -1,0 +1,31 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://zqk.dev/schemas/blocking_check_config.schema.json",
+  "title": "Blocking Check Configuration Schema",
+  "description": "Schema for blocking check configuration that defines bypass rules for system-created objects",
+  "type": "object",
+  "required": ["version"],
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "Reference to this schema file"
+    },
+    "description": {
+      "type": "string",
+      "description": "Human-readable description of this configuration"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "Configuration version (semantic versioning)"
+    },
+    "bypass_kinds": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "List of object kinds that can bypass blocking checks (system-created objects like audit_event, change_journal_entry, scheduler_job)"
+    }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,20 @@
+$schema: "../../../.zqk/cli/specs/schemas/trait_spec.schema.json"
+
+name: status_history_metric
+description: Trait indicating that a field contains status history metric data.\nThis is a specialized ordered list metric for tracking status transitions over time.\n\nStatus history metrics track lifecycle state changes, providing insights into\nstate transition patterns, durations in each state, and transition frequencies.\n
+category: metric-type
+requires:
+  - base_metric_enabled_group
+  - ordered_list_metric
+  - readable
+conflicts: []
+includes:
+  - ordered_list_metric
+field_level: true
+object_level: false
+config: {}
+
+created_at: 2026-07-01T18:00:00Z
+updated_at: 2026-07-01T18:00:00Z
+created_by: ACC-1785920548450214012-68b850c0
+updated_by: ACC-1785920548450214012-68b850c0

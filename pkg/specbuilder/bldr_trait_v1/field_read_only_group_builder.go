@@ -1,0 +1,33 @@
+package bldr_trait_v1
+
+import (
+	"github.com/zqk-os/zqk/pkg/specbuilder/trait_builders"
+)
+
+// FieldReadOnlyGroupBuilder builds the field_read_only_group trait at version v1_0_0
+// File: bldr_trait_v1/field_read_only_group_builder.go - version is encoded in package/directory name
+type FieldReadOnlyGroupBuilder struct {
+	*trait_builders.BaseTraitBuilder
+}
+
+// NewFieldReadOnlyGroupBuilder creates a new builder for field_read_only_group trait version v1_0_0
+func NewFieldReadOnlyGroupBuilder() *FieldReadOnlyGroupBuilder {
+	builder := &FieldReadOnlyGroupBuilder{
+		BaseTraitBuilder: trait_builders.NewBaseTraitBuilder("field_read_only_group", "v1_0_0"),
+	}
+
+	// Configure the trait
+	builder.
+		SetDescription("Trait group for read-only fields that can be read but not modified.\\nUse for computed fields, audit fields, or fields with permissions: r-x.\\nMinimal trait set for simple read-only fields.\\n").
+		SetCategory("specialized-group").
+		SetObjectLevel(false).
+		SetFieldLevel(false).
+		AddRequires("readable").
+		AddIncludes("readable")
+
+	return builder
+}
+
+func init() {
+	trait_builders.RegisterBuilder(NewFieldReadOnlyGroupBuilder())
+}

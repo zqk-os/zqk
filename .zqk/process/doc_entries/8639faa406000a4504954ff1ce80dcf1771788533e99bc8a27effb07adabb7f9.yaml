@@ -1,0 +1,21 @@
+content_hash: 9ead3f7e8d9878224ff3a5c04a6ac4aa973bfe21dc1b3913d308bca745c9c737
+content_searchable: true
+content_size: 5621
+created_at: "2026-09-17T08:44:58Z"
+created_by: ACC-1785920548450214012-68b850c0
+goal_refs: []
+group: onboarding
+id: DOC-647
+kind: doc_entry
+milestone_refs: []
+namespace_id: zqk:kernel
+path: prefix:docs/onboarding/README.md
+requirement_refs: []
+schema_version: 2.0.0
+status: active
+summary: 'Documentation: # Onboarding Documentation'
+title: Onboarding Documentation
+updated_at: "2026-09-17T08:44:58Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs: []

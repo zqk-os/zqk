@@ -1,0 +1,8 @@
+Start the privileged writer daemon
+
+Usage:
+  zqk.test object daemon [flags]
+
+Global Flags:
+      --allow-degraded   Allow scheduler-dependent commands to run when scheduler daemon is not running
+      --internal         Elevated access mode for built-in and internal kinds (requires Enterprise license or zqk-admin)

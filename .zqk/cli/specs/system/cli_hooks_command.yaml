@@ -1,0 +1,33 @@
+$schema: "../schemas/command_spec.schema.json"
+
+name: "cli-hooks"
+short: "Manage built-in CLI hook profile and optional tray bindings"
+description: |
+  Manage built-in automation hooks the same way as feature flags: persisted JSON
+  under .zqk/config/cli_hook_profile.json.
+
+  Hooks are stable IDs (for example post_commit_scan_tests) that git hooks or
+  scripts can query. Optional tray_entry points at a zqk tray name for delegated
+  commands.
+
+args:
+  type: "minimum"
+  min: 0
+
+flags: []
+
+help:
+  examples:
+    - comment: "List hooks"
+      command: "%s system cli-hooks list"
+    - comment: "Disable post-commit test scheduling"
+      command: "%s system cli-hooks disable post_commit_scan_tests"
+    - comment: "Shell: exit 1 if hook disabled"
+      command: "%s system cli-hooks is-enabled post_commit_scan_tests"
+    - comment: "Machine: tray name for shell capture"
+      command: "%s system cli-hooks print-tray-entry post_commit_scan_tests"
+    - comment: "Bind a tray entry"
+      command: "%s system cli-hooks set-tray post_commit_scan_tests scheduler-activity"
+
+run_e: "runCliHooks"
+common_flags: true

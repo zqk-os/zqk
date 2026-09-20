@@ -1,0 +1,31 @@
+created_at: "2026-07-12T06:29:15Z"
+created_by: ACC-1785920548450214012-68b850c0
+description: Autonomous CAP orchestrator and technical program manager role with read:* and access:* authority to coordinate planning objects, workstreams, and swarms.
+id: ROL-AGENT-ORCH
+kind: role
+namespace_id: zqk:kernel
+permissions:
+    - read:*
+    - access:*
+    - write:agent_task
+    - write:agent_instruction
+    - write:audit_event
+    - write:priority_plan
+    - write:metrics_report
+    - write:backlog_item
+    - write:requirement
+    - write:goal
+    - write:milestone
+    - write:criteria
+    - write:policy
+    - write:team_configuration
+    - write:glossary_term
+    - agent:orchestrate
+    - delete:object_draft_plane
+role_id: agent-cap-orchestrator
+schema_version: 2.0.0
+status: active
+title: CAP Orchestrator Role
+updated_at: "2026-09-14T05:48:54Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

@@ -1,0 +1,37 @@
+$schema: "../schemas/command_spec.schema.json"
+
+name: "pending"
+short: "Diagnostic: list unacked inbox/outbox for a seat"
+description: |
+  Thin diagnostic over the agent chat feed. Canonical agent UX is
+  `workflow whats-next --format json --persona-id … --agent-id …`
+  (correspondence block). Use this when debugging feed JSONL only.
+
+flags:
+  - name: "agent-id"
+    type: "string"
+    default: ""
+    required: true
+    description: "Swarm seat id"
+  - name: "persona-ref"
+    type: "string"
+    default: ""
+    description: "Optional persona id for seat matching"
+  - name: "limit"
+    type: "int"
+    default: 20
+    description: "Max items per inbox/outbox list"
+
+args:
+  type: "no_args"
+
+help:
+  examples:
+    - comment: "Show pending correspondence for AGY seat"
+      command: "%s feed pending --agent-id peer-agent-1 --persona-ref PER-DEFAULT-AGENT"
+  exclude_flags:
+    - "columns"
+    - "ignore-scheduler-down"
+
+run_e: "runFeedPending"
+common_flags: true

@@ -1,0 +1,298 @@
+schema_version: 2.0.0
+ontology: agent_task
+extends: work_unit
+composes:
+  - occupancy
+visibility: internal
+kernel_critical: false
+description: 'Lifecycle: agent_task_lifecycle.yaml.\nA discrete unit of work assigned to a specific persona. It serves as the primary routing envelope.\n'
+traits:
+  - base_object_traits
+  - effort_aware
+  - occupiable
+fields:
+  assignee_persona_ref:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: orchestrator/tpm.
+      automation_hooks: used for routing work to specific agents.
+      cardinality: one
+      criticality: composition
+      default: null
+      dependencies: persona registry.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Reference to the persona assigned to execute this task.
+      security: non-sensitive
+      system_usage:
+        - routing
+        - queueing
+      validation: valid persona reference.
+    field_profile_code: AT-001
+    permissions: rwx
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+      - field_reference_group
+    type: string
+    validation:
+      required: true
+  inputs:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: orchestrator.
+      automation_hooks: populates agent context.
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: registry.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: References to objects or specs the agent requires to complete work.
+      security: context-dependent.
+      system_usage:
+        - context injection
+      validation: list of input definitions.
+    field_profile_code: AT-004
+    permissions: rwx
+    semantic_type: expression
+    traits:
+      - field_mutable_group
+    type: list
+    validation:
+      required: false
+  model_tier:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: orchestrator.
+      automation_hooks: Used by the CAP router to assign task difficulty levels.
+      cardinality: one
+      criticality: metadata
+      default: tier_2_simple
+      dependencies: none
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: The model tier required to execute this task (e.g. tier_1_complex, tier_2_simple).
+      security: non-sensitive
+      system_usage:
+        - routing
+      validation: Must be a string.
+    field_profile_code: AT-008
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - filterable
+      - groupable
+      - modifiable
+      - readable
+      - searchable
+      - writable
+    type: string
+    validation:
+      required: false
+  outputs:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: agent.
+      automation_hooks: registered upon completion for downstream tasks.
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: registry.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: References to objects or artifacts the agent produces.
+      security: context-dependent.
+      system_usage:
+        - downstream routing
+      validation: list of output definitions.
+    field_profile_code: AT-005
+    permissions: rwx
+    semantic_type: expression
+    traits:
+      - field_mutable_group
+    type: list
+    validation:
+      required: false
+  pipeline_ref:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: orchestrator.
+      automation_hooks: connects tasks back to the parent workflow.
+      cardinality: one
+      criticality: association
+      default: null
+      dependencies: pipeline registry.
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: Reference to the parent pipeline.
+      security: non-sensitive
+      system_usage:
+        - traceability
+        - orchestration
+      validation: valid pipeline reference.
+    field_profile_code: AT-002
+    permissions: r-x
+    semantic_type: reference
+    traits:
+      - field_reference_group
+    type: string
+    validation:
+      required: false
+  policy_refs:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: orchestrator/security.
+      automation_hooks: used for task-level policy checks.
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: policy registry.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: References to policies that govern this task.
+      security: non-sensitive
+      system_usage:
+        - compliance
+        - execution checks
+      validation: valid policy references.
+    field_profile_code: AT-006
+    permissions: rwx
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+      - field_reference_group
+    type: list
+    validation:
+      required: false
+  requirement_refs:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: orchestrator/architect.
+      automation_hooks: trace requirement fulfillment by this task.
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: requirement registry.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: References to requirements driving this task.
+      security: non-sensitive
+      system_usage:
+        - traceability
+      validation: valid requirement references.
+    field_profile_code: AT-007
+    permissions: rwx
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+      - field_reference_group
+    type: list
+    validation:
+      required: false
+  validation_criteria_refs:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: architect/qa.
+      automation_hooks: triggered on task completion proposal.
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: criteria registry.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: References to criteria objects that must pass for completion.
+      security: non-sensitive
+      system_usage:
+        - validation
+        - testing
+      validation: valid criteria references.
+    field_profile_code: AT-003
+    permissions: rwx
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+      - field_reference_group
+    type: list
+    validation:
+      required: false
+  priority_plan_ref:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: orchestrator/tpm.
+      automation_hooks: connects tasks back to the parent priority plan and integration branch.
+      cardinality: one
+      criticality: composition
+      default: null
+      dependencies: priority_plan registry.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Reference to the priority plan this task executes within.
+      security: non-sensitive
+      system_usage:
+        - routing
+        - orchestration
+        - git branch resolution
+      validation: valid priority_plan reference.
+    field_profile_code: AT-009
+    permissions: rwx
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+      - field_reference_group
+      - writable
+      - modifiable
+    type: string
+    validation:
+      pattern: ^(PRI-[\w-]+|PRIO-[\w-]+|priority-plan-[\w-]+)$
+      required: false
+  task_steps:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: orchestrator/planner.
+      automation_hooks: used for step-by-step task execution and verification strategies.
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: none.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Ordered list of sub-steps and verification criteria required to complete the task.
+      security: non-sensitive
+      system_usage:
+        - execution
+        - verification
+        - progress tracking
+      validation: list of step definitions.
+    field_profile_code: AT-010
+    permissions: rwx
+    semantic_type: expression
+    traits:
+      - field_mutable_group
+      - readable
+      - writable
+      - modifiable
+    type: list
+    validation:
+      required: false
+

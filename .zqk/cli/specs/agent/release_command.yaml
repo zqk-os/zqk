@@ -1,0 +1,32 @@
+$schema: "../schemas/command_spec.schema.json"
+
+name: "release [task_id]"
+short: "Release an agent_task execution claim"
+description: |
+  Clears claimed_by and claimed_at when held by --by. Use --force only when
+  the holder cannot release the claim themselves.
+
+flags:
+  - name: "by"
+    type: "string"
+    default: ""
+    description: "Claimant that must currently hold the claim"
+  - name: "force"
+    type: "bool"
+    default: false
+    description: "Clear the claim regardless of holder"
+
+args:
+  type: "maximum"
+  count: 1
+
+help:
+  examples:
+    - comment: "Release a claim held by this seat"
+      command: "%s agent release <task-id> --by <seat-id>"
+    - comment: "Force-clear a stuck claim"
+      command: "%s agent release <task-id> --force"
+  exclude_flags:
+    - "columns"
+
+common_flags: true

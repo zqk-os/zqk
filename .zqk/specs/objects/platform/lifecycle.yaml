@@ -1,0 +1,241 @@
+schema_version: 2.0.0
+ontology: lifecycle
+urn: urn:zqk:spec:kernel:lifecycle
+namespace: zqk:kernel
+extends: base_object
+visibility: internal
+description: Lifecycle definitions define state machines for object kinds.\nBuilt-in lifecycles are immutable defaults generated from lifecycle builders.\nInternal lifecycle objects can override defaults for custom workflows.\n\nEach lifecycle object defines:\n- Valid statuses for an object kind\n- Valid transitions between statuses\n- Preconditions for statuses and transitions\n- Percent complete calculation configuration\n
+traits:
+  - base_object_traits
+fields:
+  extends:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: system architect
+      automation_hooks: used for lifecycle inheritance
+      cardinality: one
+      criticality: association
+      default: ""
+      dependencies: parent lifecycle definitions
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: Parent lifecycle to extend (e.g., \"base_lifecycle\"). Child lifecycle inherits parent statuses and transitions, with child overrides.
+      security: non-sensitive
+      system_usage:
+        - lifecycle inheritance
+        - lifecycle loading
+      validation: Must reference a valid lifecycle (by naming convention or ID)
+    field_profile_code: LIFECYCLE-003
+    permissions: r-x
+    semantic_type: reference
+    traits:
+      - readable
+    type: string
+    validation:
+      required: false
+  id:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation (Generator)
+      automation_hooks: used for cross-file references.
+      cardinality: one
+      criticality: composition
+      default: auto-assigned per object_type sequence
+      dependencies: linkage constraints, URN creation.
+      observability: logged + manifests.
+      origin_lifecycle: immutable
+      purpose: Stable identifier for lifecycle objects (LIFECYCLE-{ABBR}-### format).
+      security: non-sensitive
+      system_usage:
+        - linking
+        - reporting
+        - URIs
+      validation: regex ^LIFECYCLE-[A-Z]+(-[A-Z]+)*-\\\\d{3,}$; uniqueness enforced.
+    field_profile_code: LIFECYCLE-000
+    permissions: r-x
+    semantic_type: statement
+    traits:
+      - field_queryable_group
+    type: string
+    validation:
+      pattern: ^LIFECYCLE-[A-Z]+(-[A-Z]+)*-\d{3,}$
+      required: true
+  object_type:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: system
+      automation_hooks: used for lifecycle resolution (which lifecycle applies to which object kind)
+      cardinality: one
+      criticality: composition
+      default: required
+      dependencies: lifecycle loader
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: The object kind this lifecycle defines states for (e.g., \"backlog_item\", \"goal\", \"milestone\")
+      security: non-sensitive
+      system_usage:
+        - lifecycle loading
+        - validation
+        - lifecycle resolution
+      validation: Must match a valid object kind
+    field_profile_code: LIFECYCLE-001
+    permissions: r-x
+    semantic_type: identifier
+    traits:
+      - readable
+      - filterable
+      - searchable
+    type: string
+    validation:
+      pattern: ^[a-z_]+$
+      required: true
+  percent_complete:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: system architect
+      automation_hooks: used for percent complete calculation
+      cardinality: one
+      criticality: association
+      default: {}
+      dependencies: statuses (for default_by_status), milestone_refs (for milestone_based)
+      observability: "yes"
+      origin_lifecycle: mutable (for internal objects)
+      purpose: 'Configuration for calculating percent complete. Supports methods: \"status_defaults\", \"milestone_based\", or custom calculation.'
+      security: non-sensitive
+      system_usage:
+        - percent complete calculation
+        - progress tracking
+      validation: 'Object with fields: method (string), default_by_status (map[string]any), milestone_based (map[string]any)'
+    field_profile_code: LIFECYCLE-007
+    permissions: r-x
+    semantic_type: expression
+    traits:
+      - readable
+    type: object
+    validation:
+      required: false
+  source_type:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: system
+      automation_hooks: determines if lifecycle is mutable (built-in vs internal)
+      cardinality: one
+      criticality: composition
+      default: internal
+      dependencies: lifecycle loader, built-in detection
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: \"built-in\" for immutable defaults (generated from builders), \"internal\" for overridable objects
+      security: non-sensitive
+      system_usage:
+        - lifecycle mutability
+        - override detection
+        - validation
+      validation: Must be \"built-in\" or \"internal\"
+    field_profile_code: LIFECYCLE-002
+    permissions: r-x
+    semantic_type: identifier
+    traits:
+      - readable
+      - filterable
+    type: enum
+    validation:
+      enum:
+        - built-in
+        - internal
+      required: false
+  status_mapping:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: system architect
+      automation_hooks: maps internal (parent) statuses to external (child) statuses during inheritance
+      cardinality: one
+      criticality: association
+      default: {}
+      dependencies: parent lifecycle (used when extending)
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: Maps internal (base) statuses to external (this lifecycle) statuses. Used when this lifecycle extends another.
+      security: non-sensitive
+      system_usage:
+        - lifecycle inheritance
+        - status translation
+      validation: Map of string to string (status name -> mapped status name)
+    field_profile_code: LIFECYCLE-004
+    permissions: r-x
+    semantic_type: expression
+    traits:
+      - readable
+    type: object
+    validation:
+      required: false
+  statuses:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: system architect
+      automation_hooks: used for status validation, initial status resolution, transition validation
+      cardinality: many
+      criticality: core
+      default: []
+      dependencies: lifecycle loader
+      observability: "yes"
+      origin_lifecycle: mutable (for internal objects)
+      purpose: List of valid statuses for this object type. Each status defines value, display, initial/terminal/archive/system flags, and preconditions.
+      security: non-sensitive
+      system_usage:
+        - status validation
+        - initial status resolution
+        - transition validation
+        - lifecycle state machine
+      validation: 'Array of Status objects with fields: value (string, required), display (string, required), initial (bool), terminal (bool), archive (bool), system (bool), preconditions ([]string), description (string). At least one status must have initial: true.'
+    field_profile_code: LIFECYCLE-005
+    permissions: r-x
+    semantic_type: expression
+    traits:
+      - readable
+    type: list
+    validation:
+      minCount: 1
+      required: true
+  transitions:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: system architect
+      automation_hooks: used for transition validation, automatic status changes
+      cardinality: many
+      criticality: core
+      default: []
+      dependencies: statuses (from/to must be valid statuses)
+      observability: "yes"
+      origin_lifecycle: mutable (for internal objects)
+      purpose: Valid state transitions. Each transition defines from/to statuses, description, manual/auto flags, and preconditions.
+      security: non-sensitive
+      system_usage:
+        - transition validation
+        - automatic status changes
+        - lifecycle state machine
+      validation: 'Array of Transition objects with fields: from (string, required), to (string, required), description (string, required), manual (bool, required), auto (bool, required), preconditions ([]string). From/to must reference valid status values.'
+    field_profile_code: LIFECYCLE-006
+    permissions: r-x
+    semantic_type: expression
+    traits:
+      - readable
+    type: list
+    validation:
+      required: false

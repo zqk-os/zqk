@@ -1,0 +1,63 @@
+$schema: "../../../schemas/command_spec.schema.json"
+
+name: "sweep"
+short: "Delete (or dry-run) objects on the object draft plane"
+description: |
+  Enumerates .zqk/object_drafts and deletes draft-plane YAML only.
+  Never deletes CAS-backed objects (skipped as cas_backed).
+  Default is dry-run; pass --all (or --max with filters) to apply deletes.
+  Applying deletes (--dry-run=false) requires RBAC permission delete:object_draft_plane
+  on the authenticated ACC (role-granted; parallel to delete:core). Dry-run stays open.
+  Unbound system context is refused — authenticate via ZQK_API_KEY / ACC seating.
+
+flags:
+  - name: "dry-run"
+    type: "bool"
+    default: true
+    description: "List matching drafts without deleting"
+  - name: "all"
+    type: "bool"
+    default: false
+    description: "Required to apply deletes across the matched set (fail closed without this or --max+filters)"
+  - name: "kind"
+    type: "string"
+    default: ""
+    description: "Limit to one object kind directory under object_drafts"
+  - name: "id-prefix"
+    type: "string"
+    default: ""
+    description: "Only ids with this prefix"
+  - name: "status"
+    type: "string"
+    default: ""
+    description: "Only drafts whose YAML status equals this value"
+  - name: "older-than"
+    type: "string"
+    default: ""
+    description: "Only drafts whose file mtime is older than this duration (e.g. 24h, 168h)"
+  - name: "max"
+    type: "int"
+    default: 0
+    description: "Optional cap on deletions / would-delete listings"
+  - name: "agent-id"
+    type: "string"
+    default: ""
+    description: "Optional seat id for audit/correlation only; authorization is RBAC on the authenticated account"
+
+args:
+  type: "no_args"
+
+help:
+  examples:
+    - comment: "Dry-run (default): show what would be deleted"
+      command: "%s object draft sweep --dry-run --all"
+    - comment: "Apply deletes when ACC role grants delete:object_draft_plane"
+      command: "%s object draft sweep --kind backlog_item --all --dry-run=false"
+    - comment: "Apply with optional seat correlation"
+      command: "%s object draft sweep --agent-id cursor-composer --id-prefix BLI- --max 10 --dry-run=false"
+  exclude_flags:
+    - "columns"
+    - "ignore-scheduler-down"
+
+run_e: "runObjectDraftSweep"
+common_flags: true

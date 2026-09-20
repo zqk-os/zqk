@@ -1,0 +1,197 @@
+$schema: ../../../.zqk/cli/specs/schemas/lifecycle_spec.schema.json
+object_type: goal
+extends: base_lifecycle
+status_mapping:
+  approved: active
+  archived: archived
+  error: error
+  implemented: complete
+  in_progress: active
+  proposed: proposed
+  blocked: blocked
+statuses:
+  - value: conceptual
+    display: Conceptual
+    origin: true
+    preliminary: true
+    description: Draft plane status. Prior to CAS membrane crossing.
+    role: realign
+  - value: originated
+    display: Originated
+    description: CAS membrane crossed. Object officially originated.
+    role: realign
+  - value: proposed
+    display: Proposed
+    origin: false
+    preliminary: false
+    role: realign
+    description: Candidate target captured for authorization but not yet active.
+  - value: active
+    display: Active
+    role: shovel_ready
+    description: Goal is the live target for linked work and plans.
+  - value: blocked
+    display: Blocked
+    role: halted
+    description: Goal cannot progress until blockers clear.
+  - value: complete
+    display: Complete
+    terminal: true
+    work_done: true
+    role: terminal
+    description: Goal met or accepted as done; linked work should already 
+      reflect completion.
+  - value: archived
+    display: Archived
+    terminal: true
+    archive: true
+    role: terminal
+    description: Goal archived for history; no longer the live north-star 
+      target.
+    shockwave:
+      mode: prune
+      fail: closed
+  - value: error
+    display: Error
+    system: true
+    role: halted
+    description: Goal held in error for repair; recover via promote to proposed.
+transitions:
+  - from: conceptual
+    to: originated
+    description: Promote from draft plane to CAS membrane (CAS Qualification).
+    manual: true
+    auto: false
+    catalyst: System promotion
+    postconditions:
+      - role is realign
+    class_vs_specialty: class-agnostic
+    shockwave:
+      mode: propagate
+  - from: originated
+    to: proposed
+    description: Initial domain workflow transition to proposed.
+    manual: true
+    auto: true
+    catalyst: System initialization
+    postconditions:
+      - role is realign
+    class_vs_specialty: class-agnostic
+    shockwave:
+      mode: propagate
+  - from: error
+    to: proposed
+    description: Recover from system error after required fields are restored
+    manual: true
+    auto: false
+    postconditions:
+      - role is realign
+    catalyst: Standard progression
+    class_vs_specialty: class-agnostic
+    shockwave:
+      mode: propagate
+  - from: proposed
+    to: active
+    description: Activate goal (manual promote, linked workstream live, or 
+      linked backlog in flight)
+    manual: true
+    auto: true
+    on_dependent_status:
+      kind: backlog_item
+      to: in_progress
+    postconditions:
+      - role is shovel_ready
+    catalyst: Linked backlog_item occupies execution_locked
+    class_vs_specialty: class-agnostic
+    shockwave:
+      mode: propagate
+  - from: active
+    to: complete
+    description: Auto-transition when metric target met OR all workstreams 
+      complete
+    manual: false
+    auto: true
+    on_dependent_status:
+      kind: requirement
+      to: complete
+    postconditions:
+      - role is terminal
+    catalyst: Standard progression
+    class_vs_specialty: class-agnostic
+    shockwave:
+      mode: propagate
+  - from: proposed
+    to: complete
+    description: Auto-transition when linked requirement completes
+    manual: false
+    auto: true
+    on_dependent_status:
+      kind: requirement
+      to: complete
+    postconditions:
+      - role is terminal
+    catalyst: Standard progression
+    class_vs_specialty: class-agnostic
+    shockwave:
+      mode: propagate
+  - from: active
+    to: blocked
+    description: Auto-transition when blockers detected
+    manual: false
+    auto: true
+    postconditions:
+      - role is halted
+    catalyst: Standard progression
+    class_vs_specialty: class-agnostic
+    shockwave:
+      mode: propagate
+  - from: blocked
+    to: active
+    description: Auto-transition when blockers resolved
+    manual: false
+    auto: true
+    postconditions:
+      - role is shovel_ready
+      - live program target resumes when blockers clear; active is the 
+        commitment, not a Gantt column seal
+    catalyst: Standard progression
+    class_vs_specialty: class-agnostic
+    shockwave:
+      mode: propagate
+  - from: '*'
+    to: archived
+    description: Manual archival from any status
+    manual: true
+    auto: false
+    postconditions:
+      - role is terminal
+    catalyst: Standard progression
+    class_vs_specialty: class-agnostic
+    shockwave:
+      mode: propagate
+  - from: '*'
+    to: proposed
+    description: Manual recovery to proposed state
+    manual: true
+    auto: false
+    postconditions:
+      - role is realign
+    catalyst: Standard progression
+    class_vs_specialty: class-agnostic
+    shockwave:
+      mode: propagate
+percent_complete:
+  method: metric_based OR workstream_based
+  default_by_status:
+    conceptual: 0
+    originated: 5
+    active: calculated
+    archived: 100
+    blocked: calculated
+    complete: 100
+    error: 0
+    proposed: 10
+created_at: 2026-07-01 18:00:00+00:00
+updated_at: 2026-07-01 18:00:00+00:00
+created_by: ACC-1785920548450214012-68b850c0
+updated_by: ACC-1785920548450214012-68b850c0

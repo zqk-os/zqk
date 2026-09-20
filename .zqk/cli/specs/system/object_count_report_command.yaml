@@ -1,0 +1,62 @@
+$schema: "../schemas/command_spec.schema.json"
+
+name: "object-count-report"
+short: "Report object counts and congruence (disk vs index)"
+description: |
+  Generates an operational congruence report: YAML files on disk per dir, object count by kind,
+  optional internal count. Computes disparity (disk - object count per directory) and can emit
+  coordinator events (audit, logging) when disparity exceeds threshold for metrics and alerts.
+  With --include-filesystem-snapshot, also walks the full project tree (skipping bulky third-party dirs)
+  and records file/byte counts by top-level bucket and by each .zqk/* child for landfill detection over time.
+  Output is written under .zqk/logs/reports/ unless --report-file is set.
+
+help:
+  examples:
+    - comment: "Default (report to timestamped file)"
+      command: "%s system object-count-report"
+    - comment: "Emit alerts when disparity > 50"
+      command: "%s system object-count-report --emit-events"
+    - comment: "Custom output and threshold"
+      command: "%s system object-count-report --report-file ./report.txt --disparity-threshold 100"
+    - comment: "Include full-tree file counts (for landfill / I/O trends on a schedule)"
+      command: "%s system object-count-report --include-filesystem-snapshot"
+    - comment: "Filesystem snapshot only under .zqk (faster scheduled run)"
+      command: "%s system object-count-report --include-filesystem-snapshot --filesystem-snapshot-scope=zqk"
+  exclude_flags:
+    - "format"
+    - "output"
+    - "verbose"
+    - "quiet"
+    - "timeout"
+    - "columns"
+
+flags:
+  - name: "report-file"
+    type: "string"
+    description: "Write report to this path (default: .zqk/logs/reports/object-count-report-<timestamp>.txt)"
+  - name: "emit-events"
+    type: "bool"
+    default: false
+    description: "Emit coordinator events (audit, logging) when there are alerts so metrics and notifications can be triggered"
+  - name: "include-internal"
+    type: "bool"
+    default: true
+    description: "Include internal count via subprocess (zqk internal count --format json)"
+  - name: "disparity-threshold"
+    type: "int"
+    default: 50
+    description: "Alert when disk - object count exceeds this per directory (0 = use default)"
+  - name: "no-cache"
+    type: "bool"
+    default: false
+    description: "Use storage.Count per kind instead of object-id cache (slower but accurate after bulk rm or when cache is stale)"
+  - name: "include-filesystem-snapshot"
+    type: "bool"
+    default: false
+    description: "Walk the project tree (see --filesystem-snapshot-scope) and attach file/byte counts; writes time series under .zqk/metrics/filesystem_snapshot/"
+  - name: "filesystem-snapshot-scope"
+    type: "string"
+    default: "full"
+    description: "With --include-filesystem-snapshot: full (entire repo), zqk (.zqk only), docs (docs/ only), zqk-and-docs (both; parallel fan-out per subtree)"
+
+common_flags: true

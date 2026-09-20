@@ -1,0 +1,153 @@
+$schema: "../../../.zqk/cli/specs/schemas/lifecycle_spec.schema.json"
+
+object_type: doc_entry
+# Five-question exam: docs/architecture/LIFECYCLE_STATE_MACHINE_RUBRIC.md
+# TRACK: BLI-CEF-R26-REMAINING-KINDS-001
+statuses:
+  - value: conceptual
+    display: Conceptual
+    origin: true
+    preliminary: true
+    description: Draft plane status. Prior to CAS membrane crossing.
+    role: realign
+  - value: originated
+    display: Originated
+    description: CAS membrane crossed. Object officially originated.
+    role: realign
+  - value: draft
+    display: Draft
+    origin: false
+    preliminary: false
+    role: realign
+    description: "doc entry status 'draft' (Draft): not yet committed for execution;
+      reshape before pickup."
+  - value: review
+    display: Review
+    role: realign
+    description: "doc entry status 'review' (Review): not yet committed for execution;
+      reshape before pickup."
+  # TRACK: BLI-1785723654802038000-b14064bc — published/active are ready (not terminal) so promote can leave review.
+  - value: published
+    display: Published
+    role: shovel_ready
+    description: "Document published and ready for use on the CAS plane."
+  - value: active
+    display: Active
+    role: shovel_ready
+    description: "Document active and searchable/visible."
+  - value: archived
+    display: Archived
+    terminal: true
+    archive: true
+    role: terminal
+    description: "doc entry status 'archived' (Archived): ended; no further normal
+      execution transitions expected. Flags: archive, terminal."
+  - value: deprecated
+    display: Deprecated
+    terminal: true
+    archive: true
+    role: terminal
+    description: "doc entry status 'deprecated' (Deprecated): ended; no further normal
+      execution transitions expected. Flags: archive, terminal."
+  - value: error
+    display: Error
+    system: true
+    role: halted
+    description: "doc entry status 'error' (Error): paused or system-held for repair;
+      resolve before advancing. Flags: system-assigned."
+transitions:
+  - from: conceptual
+    to: originated
+    description: Promote from draft plane to CAS membrane (CAS Qualification).
+    manual: true
+    auto: false
+    catalyst: System promotion
+  - from: originated
+    to: draft
+    description: Initial domain workflow transition to draft.
+    manual: true
+    auto: true
+    catalyst: System initialization
+    preconditions:
+      - Target document file exists and is reachable on disk
+  - from: draft
+    to: review
+    description: Document entry is submitted for review
+    manual: true
+    auto: false
+    preconditions:
+      - Title, summary, and path are populated
+    postconditions:
+      - role is realign
+  - from: review
+    to: published
+    description: Document entry is published
+    manual: true
+    auto: false
+    preconditions:
+      - Target file reachable and readable
+      - Cryptographic content_hash computed and sealed
+      - Document content_size measured
+    postconditions:
+      - role is shovel_ready
+  - from: published
+    to: active
+    description: Document entry is activated (becomes searchable/visible)
+    manual: true
+    auto: false
+    preconditions:
+      - Cryptographic content_hash matches target file on disk
+    postconditions:
+      - role is shovel_ready
+  - from: '*'
+    to: archived
+    description: Document entry is archived (retention policy)
+    manual: false
+    auto: false
+    postconditions:
+      - role is terminal
+      - hop from any occupancy to archived
+      - ended; no further normal execution hops expected
+  - from: '*'
+    to: deprecated
+    description: Document entry is deprecated (replaced or superseded)
+    manual: true
+    auto: false
+    postconditions:
+      - role is terminal
+      - hop from any occupancy to deprecated
+      - ended; no further normal execution hops expected
+  - from: '*'
+    to: error
+    description: System error occurred
+    manual: false
+    auto: true
+    postconditions:
+      - role is halted
+      - hop from any occupancy to error
+      - system halt; repair before leaving halted
+  # TRACK: BLI-1785723654802038000-b14064bc — recover docs stuck in error (promote skips archive-only edges).
+  - from: error
+    to: review
+    description: Recover from system error into review after repair
+    manual: true
+    auto: false
+    postconditions:
+      - role is realign
+      - recover from system halt after repair
+percent_complete:
+  method: status_defaults
+  default_by_status:
+    conceptual: 0
+    originated: 5
+    active: 100
+    archived: 100
+    deprecated: 100
+    draft: 10
+    error: 0
+    published: 100
+    review: 50
+created_at: 2026-07-01T18:00:00Z
+updated_at: 2026-07-01T18:00:00Z
+created_by: ACC-1785920548450214012-68b850c0
+updated_by: ACC-1785920548450214012-68b850c0

@@ -1,0 +1,68 @@
+schema_version: 2.0.0
+ontology: work_interval
+urn: urn:zqk:spec:kernel:work_interval
+namespace: zqk:kernel
+extends: base_object
+visibility: internal
+description: 'Mixin for kinds that participate in a work clock (started_at, completed_at). completed_at is done-of-work, not archive-of-record. Not instantiable (kind_mappings skip_specs). TRACK: BLI-KERNEL-WORK-ENVELOPE-001 / WORK_ENVELOPE_AND_EFFORT_FACETS.md / CRIT-KERNEL-WORK-ENVELOPE-BASE-LIFT-001. '
+traits:
+  - completable
+fields:
+  completed_at:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation/owner
+      automation_hooks: stamped by the transition membrane on work_done.
+      cardinality: zero_or_one
+      criticality: association
+      default: null
+      dependencies: lifecycle transitions.
+      observability: "yes"
+      origin_lifecycle: mutable (set once on work-done; not overwritten on later field edits)
+      purpose: ISO-8601 datetime when work-done was reached.
+      security: non-sensitive
+      system_usage:
+        - reporting
+        - metrics
+        - wall-clock actual_effort bound
+      validation: ISO-8601 datetime format.
+    field_profile_code: WIN-002
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - field_mutable_group
+    type: string
+    validation:
+      pattern: ^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$
+      required: false
+  started_at:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation/owner
+      automation_hooks: stamped by the transition membrane on execution-locked hops.
+      cardinality: zero_or_one
+      criticality: association
+      default: null
+      dependencies: lifecycle transitions.
+      observability: "yes"
+      origin_lifecycle: mutable (set once on first execution-locked hop)
+      purpose: ISO-8601 datetime when execution of this work interval began.
+      security: non-sensitive
+      system_usage:
+        - reporting
+        - metrics
+        - wall-clock actual_effort bound
+      validation: ISO-8601 datetime format.
+    field_profile_code: WIN-001
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - field_mutable_group
+    type: string
+    validation:
+      pattern: ^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$
+      required: false

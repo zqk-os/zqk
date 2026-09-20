@@ -1,0 +1,43 @@
+$schema: "../schemas/command_spec.schema.json"
+
+name: "run [test_case_id...] [flags]"
+short: "Run executable tests and trigger criteria state machine transitions"
+description: |
+  Executes tests associated with test_case objects in isolated subprocesses.
+  As tests pass, linked criteria are transitioned to 'complete', triggering shockwave
+  events that decrement the criteria counter in the test case. When all criteria complete,
+  the test case reaches terminal completion, rippling completion up to requirements and goals.
+
+flags:
+  - name: "criteria"
+    type: "stringSlice"
+    description: "Filter execution to specific criteria IDs"
+  - name: "all"
+    type: "bool"
+    default: false
+    description: "Run all active test cases in the project"
+  - name: "verbose"
+    shorthand: "v"
+    type: "bool"
+    default: false
+    description: "Print verbose execution output including stdout"
+  - name: "dry-run"
+    type: "bool"
+    default: false
+    description: "Display test execution plan without executing commands"
+  - name: "timeout"
+    type: "string"
+    description: "Maximum duration allowed per test invocation (e.g. '30s', '2m')"
+
+help:
+  examples:
+    - comment: "Run tests for a single test case"
+      command: "%s test run TST-TEST-RUNNER-001"
+    - comment: "Run with verbose output to see subprocess stdout"
+      command: "%s test run TST-TEST-RUNNER-001 -v"
+    - comment: "Run tests for specific criteria only"
+      command: "%s test run TST-TEST-RUNNER-001 --criteria CRIT-001"
+    - comment: "Dry run to inspect execution plan without executing commands"
+      command: "%s test run TST-TEST-RUNNER-001 --dry-run"
+    - comment: "Run all active test cases across the workspace"
+      command: "%s test run --all"

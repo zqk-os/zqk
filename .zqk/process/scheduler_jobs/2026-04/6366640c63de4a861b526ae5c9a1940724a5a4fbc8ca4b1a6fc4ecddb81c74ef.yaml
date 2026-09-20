@@ -1,0 +1,32 @@
+category: maintenance
+created_at: "2026-04-21T18:45:00Z"
+created_by: ACC-1785920548450214012-68b850c0
+description: |
+    Reads .zqk/logs/scheduler/cvs/test-bundles/health.jsonl and updates CVS-1776080007703030000-a726d525
+    when the health watermark advances (same payload as zqk scheduler convergence measure --session-id).
+    Pair with SCH-cvs-pipeline-tick (tutorial CVS); scan-tests populate health.jsonl.
+enabled: false
+environment_variables:
+    CONVERGENCE_SESSION_ID: CVS-1776080007703030000-a726d525
+    CONVERGENCE_TICK_ROLLUP: "1"
+    HEALTH_FILE_MISSING: skip
+    HEALTH_FILE_MISSING_SKIP_BUDGET: "0"
+    HEALTH_LIMIT: "500"
+    PIPELINE_TICK_AUTO_REPOINT: "false"
+execution_mode: reusable
+id: SCH-cvs-datacell-tick
+job_type: convergence_session_tick
+kind: scheduler_job
+max_runtime_seconds: 300
+namespace_id: zqk:kernel
+origin_project: zqk
+origin_system: zqk
+schedule_expression: 20 * * * *
+schema_version: 2.0.0
+source_type: internal
+status: pending
+title: Convergence — test-bundle health tick (data-cell CVS)
+trigger_type: timer
+updated_at: "2026-09-19T00:20:40Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

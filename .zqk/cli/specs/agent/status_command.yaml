@@ -1,0 +1,21 @@
+$schema: "../schemas/command_spec.schema.json"
+
+name: "status"
+short: "Visualize the active hive state and orchestration status"
+description: |
+  Displays concurrent worker status, task routing paths, and policy-compliance
+  heartbeat for the multi-agent orchestrator.
+
+args:
+  type: "no_args"
+
+help:
+  examples:
+    - comment: "Show hive status as a table"
+      command: "%s agent status"
+    - comment: "JSON hive snapshot"
+      command: "%s agent status --format json"
+  exclude_flags:
+    - "columns"
+
+common_flags: true

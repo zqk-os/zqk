@@ -1,0 +1,130 @@
+schema_version: 2.0.0
+ontology: metadata_package
+extends: base_object
+visibility: public
+description: 'Comprehensive metrics collection package for workstreams, milestones, or the entire project. Provides observability into codebase health, technical debt, team productivity, and project velocity. Automatically collected from various sources (source control, CI/CD, test runners, static analysis). '
+traits:
+  - base_object_traits
+fields:
+  collected_at:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation/collector.
+      automation_hooks: used for time-series analysis.
+      cardinality: one
+      criticality: composition
+      default: required
+      dependencies: collector.
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: ISO-8601 timestamp when this metadata package was collected.
+      security: non-sensitive
+      system_usage:
+        - filtering
+        - trending
+        - reporting
+      validation: ISO-8601 datetime.
+    field_profile_code: MDP-003
+    permissions: r-x
+    semantic_type: statement
+    traits:
+      - field_read_only_group
+    type: string
+    validation:
+      pattern: ^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$
+      required: true
+  metrics:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation/collector.
+      automation_hooks: used for metrics reporting and analysis.
+      cardinality: one
+      criticality: composition
+      default: {}
+      dependencies: collector implementation.
+      observability: "yes"
+      origin_lifecycle: mutable (updated on collection).
+      purpose: Collected metrics data (codebase health, test coverage, etc.).
+      security: non-sensitive
+      system_usage:
+        - reporting
+        - analytics
+      validation: Structured object with metric keys and values.
+    field_profile_code: MDP-004
+    permissions: r-x
+    semantic_type: statement
+    traits:
+      - readable
+    type: object
+    validation:
+      required: false
+  scope:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation/collector.
+      automation_hooks: determines which collector methods to use.
+      cardinality: one
+      criticality: composition
+      default: required
+      dependencies: collector logic.
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: The scope of this metadata package (workstream, milestone, or project).
+      security: non-sensitive
+      system_usage:
+        - filtering
+        - aggregation
+        - reporting
+      validation: enum.
+    field_profile_code: MDP-001
+    permissions: r-x
+    semantic_type: statement
+    traits:
+      - groupable
+      - listable
+      - modifiable
+      - readable
+      - writable
+    type: enum
+    validation:
+      enum:
+        - workstream
+        - milestone
+        - project
+      required: true
+  scope_id:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation/collector.
+      automation_hooks: links metadata to workstream/milestone.
+      cardinality: zero_or_one
+      criticality: composition
+      default: null
+      dependencies: workstream/milestone existence.
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: ID of the workstream or milestone this package is for (empty for project scope).
+      security: non-sensitive
+      system_usage:
+        - filtering
+        - linking
+        - reporting
+      validation: Must reference an existing workstream or milestone when scope is \\\"workstream\\\" or \\\"milestone\\\".
+    field_profile_code: MDP-002
+    permissions: r-x
+    semantic_type: reference
+    traits:
+      - readable
+      - writable
+      - modifiable
+    type: string
+    validation:
+      required: false

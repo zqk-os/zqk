@@ -1,0 +1,28 @@
+completed_at: "2026-09-18T07:33:09Z"
+created_at: "2026-09-17T07:32:21Z"
+created_by: ACC-TEST-HARNESS
+description: |
+    Community-side execution column for launch testing and documentation vetting
+    on ~/zqk-public-candidate. Not a studio Gantt column. Covers: kernel seating
+    (ZCOM_PROJECT_ROOT), live doc_entry graph for architecture/best-practices/onboarding,
+    removal of copied archive trees, first-run smoke without studio scheduler, and
+    local payload/hygiene checks that do not public-push.
+id: PRI-1789630341114309000-f91952ee
+kind: priority_plan
+namespace_id: zqk:kernel
+persona_refs:
+    - PER-COMMUNITY-TPM
+    - PER-DEFAULT-AGENT
+    - PER-COMMUNITY-SOFTWARE-ENGINEER
+    - PER-COMMUNITY-QA-AUDITOR
+priority_tier: P0
+remaining_open_count: 0
+schema_version: 2.0.0
+started_at: "2026-09-18T07:27:51Z"
+status: complete
+title: Community launch testing and vetting
+updated_at: "2026-09-19T00:20:35Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs:
+    - WS-1789631797993326000-f9951fe8

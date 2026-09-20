@@ -1,0 +1,15 @@
+$schema: "../../schemas/command_spec.schema.json"
+
+name: "ref"
+short: "Manage object reference relationships (*_ref and *_refs)"
+description: |
+  Manage object reference relationships across the knowledge kernel graph.
+
+  Provides schema-aware commands to add and remove references between objects,
+  supporting scalar (*_ref) and slice (*_refs) reference fields, enforcing target existence,
+  uniqueness, sealed priority plan scope-locks, and cycle prevention on related_object_refs.
+
+args:
+  type: "no_args"
+
+common_flags: true

@@ -1,1 +1,412 @@
 /target
+# Binaries
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test binary, built with `go test -c`
+*.test
+
+# Output of the go coverage tool
+*.out
+
+# Dependency directories
+/vendor/
+node_modules/
+**/node_modules/
+
+# Go workspace file
+go.work
+
+# IDE
+.idea/
+# Track `.vscode/settings.json` for shared editor/extension defaults; keep other `.vscode/*` local.
+.vscode/*
+!.vscode/settings.json
+.gemini/
+
+.workstream-os/
+*.swp
+*.swo
+*~
+nexos_*.txt
+tier*.txt
+COMMIT_MSG*
+
+# zqk
+# Prevent nested .zqk directories from test data pollution (POL-CODE-006).
+# Go test CWD is the package directory; poorly isolated tests can create .zqk/ there.
+**/.zqk/
+!/.zqk
+**/.zqk/logs/
+**/.zqk/scheduler/
+**/.zqk/streams/
+.agents/*
+.zqk/**/*.lock
+.zqk/autofix/
+.zqk/cache/
+.zqk/testscan_cache.json
+# Private signing keys. Nothing here has ever been tracked; this keeps it that way,
+# because one `git add -A` in a repo with public-push gates is all it would take.
+.zqk/keystore/
+.zqk/stream_summary/
+.zqk/scheduler/
+.zqk/state/
+.zqk/seating/
+.zqk/credentials
+.zqk/streams/
+.zqk/tmp/
+# Ephemeral scratch at .zqk root (CLI --file payloads, scans). Use .zqk/tmp/ instead.
+/.zqk/tmp-*
+/.zqk/tmp_*
+/.zqk/temp-*
+/.zqk/temp_*
+.zqk/drafts/
+# Per-ATK git worktrees (local agent workspaces; must not pollute pre-commit / agent-validate)
+.zqk/worktrees/
+.zqk/wal/
+# System-managed resources container (CAS indices, snapshots)
+.zqk/system-state/cas-indices/
+.zqk/system-state/snapshots/
+!.zqk/system-state/README.md  # Track README for documentation
+/zqk
+/zqk-mcp
+
+
+# Logs
+.zqk/logs/
+.zqk/logs/
+.zqk/**/logs/
+
+# OS
+.DS_Store
+._*
+Thumbs.db
+
+# Build artifacts
+bin/
+dist/
+dist-community/
+build
+codebase-inventory
+/zqk
+/zqk_local
+
+# Temporary files
+*.tmp
+*.tmp-*
+*.tmp.*
+*.log
+lint*.txt
+/**/lint*.txt
+auto-fix.*.txt
+autofix.*.txt
+hash-mismatch.*.txt
+
+# Vetting matrix loop backups if written next to CSV (legacy); default backup dir is under .zqk/logs/
+docs/quality/*.bak-*
+
+# Editor / merge leftovers that look like Go but are not compile units (PRI-CEF-R23-PKG-LAYOUT-001)
+*.go.bak
+*.go.bak2
+*.go.orig
+*.go.rej
+*.go.txt
+*.go.patch
+
+# Test data
+test-data/
+test-scenarios/
+
+# Scenario builder generated files (bootstrapping artifacts)
+cmd/zqk/utility/docs/
+cmd/zqk/utility/pkg/
+
+# Process data (will be managed by CLI)
+.zqk/process/**/*.hashes
+.zqk/process/**/.*.hashes
+.zqk/process/**/.hashes
+.zqk/process/**/*.index
+.zqk/process/**/.*.index
+.zqk/process/**/.corporate_initiative.index.tmp-*
+.zqk/process/**/*.yaml.tmp-*
+docs/process/**/*.hashes
+docs/process/**/.*.hashes
+docs/process/**/.hashes
+docs/process/**/*.index
+docs/process/**/.*.index
+# Corporate initiative index builder temps (atomic write before rename)
+docs/process/**/.corporate_initiative.index.tmp-*
+docs/process/**/*.yaml.tmp-*
+
+# Lock files (temporary, auto-cleaned by FileLockStrategy)
+.zqk/process/**/*.lock
+.zqk/process/**/.*.lock
+.zqk/process/**/.lock
+docs/process/**/*.lock
+docs/process/**/.*.lock
+docs/process/**/.lock
+
+# Audit events (high-volume, system-generated - not suitable for version control)
+.zqk/process/audit/
+docs/process/audit/
+
+# Change journal entries (high-volume, system-generated - not suitable for version control)
+.zqk/process/change_journal/
+docs/process/change_journal/
+
+# Metrics (high-volume, system-generated - includes scheduler_health_metric, file_lock_metric, command_metric, etc.)
+.zqk/process/metrics/
+docs/process/metrics/
+
+# Scheduler jobs (high-volume runtime artifacts; temporary until docs/process -> .zqk migration)
+.zqk/process/scheduler_jobs/
+docs/process/scheduler_jobs/
+
+# Local workspace metrics (command_metrics.json, object_volume/stream_volume chunks, baseline_metrics, etc.).
+# Populated by CLI and scheduler; use zqk system audit-report, object-count-report, scripts/collect_baseline*.sh — not versioned.
+.zqk/metrics/
+
+# Pre-commit hook state (results.json, category JSON, lint/policy/integrity outputs). Populated by pre-commit scripts and timer jobs.
+.zqk/pre-commit/
+
+.zqk/diagnostics/
+.zqk/scheduler/locks/
+
+# Compliance output snapshots (generated)
+.zqk/compliance-*.txt
+
+# Ad-hoc Go literal scan dumps at repo root (e.g. for p in cmd cmdv2 pkg internal; do git grep … > ${p}_results.txt).
+# Prefer: ./scripts/scan-hardcoded-go-literals.sh --out .zqk/logs/drift/go-literals-scan.txt
+# System health snapshots (generated)
+.zqk/system-health/
+
+# MCP session dumps (runtime artifacts)
+.zqk/process/mcp_sessions/
+docs/process/mcp_sessions/
+# Local .zqk used by cmd/zqk/internal (runtime)
+cmd/zqk/internal/.zqk/
+# Nested .zqk and docs under package dirs must not be used as project root; ignore if created by mistake
+cmd/zqk/system/.zqk/
+cmd/zqk/system/docs/
+
+# Transient zqk object update payload (CLI --file helper)
+tmp/cvs-update.yaml
+
+# Local zip snapshots of docs/reports (see docs/archive/README.md); regenerate on demand
+docs/archive/snapshots/*.zip
+
+# Kernel state instances: ignore by default (CAS churn); un-ignore durable planning/ontology.
+# High-volume / runtime kinds stay ignored (audit, metrics, change_journal, scheduler_jobs, mcp_sessions).
+# Recovery lesson 2026-08-01: csnap-only baseline is not enough when a thin state-commit overwrites the snap.
+docs/process/**/*.yaml
+!docs/process/_internal/**/*.yaml
+!docs/process/command_specs/**/*.yaml
+!docs/process/goals/**/*.yaml
+!docs/process/epics/**/*.yaml
+!docs/process/requirements/**/*.yaml
+!docs/process/policies/**/*.yaml
+!docs/process/priority_plans/**/*.yaml
+!docs/process/backlog/**/*.yaml
+!docs/process/criteria/**/*.yaml
+!docs/process/tests/**/*.yaml
+!docs/process/milestones/**/*.yaml
+!docs/process/missions/**/*.yaml
+!docs/process/visions/**/*.yaml
+!docs/process/roadmaps/**/*.yaml
+!docs/process/glossary_terms/**/*.yaml
+!docs/process/glossary_term_relations/**/*.yaml
+!docs/process/doc_entries/**/*.yaml
+!docs/process/convergence_sessions/**/*.yaml
+!docs/process/strategic_plans/**/*.yaml
+!docs/process/strategic_contexts/**/*.yaml
+!docs/process/corporate_initiatives/**/*.yaml
+!docs/process/workflows/**/*.yaml
+!docs/process/personas/**/*.yaml
+!docs/process/organizations/**/*.yaml
+!docs/process/teams/**/*.yaml
+!docs/process/accounts/**/*.yaml
+!docs/process/brands/**/*.yaml
+!docs/process/components/**/*.yaml
+!docs/process/workstreams/**/*.yaml
+!docs/process/releases/**/*.yaml
+!docs/process/risk_blockers/**/*.yaml
+!docs/process/technical_debts/**/*.yaml
+!docs/process/decisions/**/*.yaml
+!docs/process/questions/**/*.yaml
+!docs/process/scenarios/**/*.yaml
+!docs/process/stakeholder_profiles/**/*.yaml
+!docs/process/prompt_templates/**/*.yaml
+!docs/process/important_dates/**/*.yaml
+!docs/process/libraries/**/*.yaml
+!docs/process/namespaces/**/*.yaml
+!docs/process/namespace_registries/**/*.yaml
+!docs/process/domain_registries/**/*.yaml
+!docs/process/vocabulary_schemes/**/*.yaml
+!docs/process/verification_matrices/**/*.yaml
+!docs/process/roles/**/*.yaml
+!docs/process/partnerships/**/*.yaml
+!docs/process/divisions/**/*.yaml
+!docs/process/departments/**/*.yaml
+!docs/process/rules/**/*.yaml
+!docs/process/agent_skills/**/*.yaml
+!docs/process/agent_tasks/**/*.yaml
+!docs/process/mcp_specs/**/*.yaml
+!docs/process/pipelines/**/*.yaml
+!docs/process/technical_specs/**/*.yaml
+# Prior csnap archives (state-commit copies before overwrite) — keep in git for rollback
+!.zqk-state/snapshots/
+!.zqk-state/snapshots/**/*.csnap
+
+.zqk/config/ambient_context.json*
+# Local agent git author/committer (see agent_git_identity.env.example + agent-git-attribution.mdc)
+.zqk/config/agent_git_identity.env
+.zqk/config/escalation.json
+.zqk/config/agent_workspace_sync.json
+.zqk/agent_packs/
+.zqk/ides/
+# Cursor stdio MCP spawn env (API key + session); never commit.
+.zqk/mcp/cursor-stdio.env
+.zqk/mcp/*.env.local
+.zqk/mcp/*.pid
+# No trailing slash: leftover symlink or seedAgentWorktreeRuntime plant is not a
+# directory, so object_drafts/ stays dirty as executor leftover.
+# TRACK: BLI-COMMS-ORCH-DRAFT-PLANE-DIRTY-001
+.zqk/object_drafts
+.zqk/scratch_*.json
+.zqk/scratch_*.txt
+/scratch_whatsnext*.json
+# Agent CLI scratch dumps (object list --file payloads, bulk updates)
+/tmp_*.json
+/.tmp_*.json
+/all_atks.json
+/update_atk.json
+.zqk/mcp_sessions/
+
+.env
+/.sandbox/
+.zqk/inbox/
+.zqk/test-bundles/
+docs/process/**/.next_*_seq
+docs/process/**/.*.index
+docs/process/**/.*.index.tmp*
+*.prof
+zqk_local
+dump_commands
+.zqk/cursors/
+pkg/cli/command_builders/
+artifacts/
+
+# Marketing & Public Sites
+docs/marketing/
+docs/commercial/
+marketing-site/
+web/public/assets/
+
+# Personal & Sensitive Data
+*.png
+*.jpg
+*.jpeg
+*.mp4
+*.mp3
+c-corp-filing.png
+domains-registered.png
+
+# Temp / Scratch / Junk
+*.awk
+*.prof
+*.pprof
+*.jsonl
+issues.json
+planned_blis.json
+bundles_to_delete.*
+lint_out*.txt
+remaining.txt
+ack.txt
+patch*.py
+refactor.py
+dry_caches.py
+institutionalize_phase4
+*.patch
+fake_editor.sh
+cap_background.sh
+cap_orchestrator.sh
+fix_refs.sh
+register_docs.sh
+/zqk-demo
+/zqk-ffmpeg-worker
+/zqk-shim
+/mcp-simple
+/zqk
+
+# Repo-root agent scratch (CLI dumps / throwaway probes / prompt scratch).
+whats_next*.json
+whats-next*.json
+scratch_whatsnext*.json
+scratch_whats_next*.json
+prompt_*.txt
+prompt_*.md
+prompt_*.json
+prompt_*
+*PROMPT*.md
+*prompt*.md
+SUBAGENT_PROMPT.md
+actual_prompt.*
+steer_msg*.txt
+test_order*.txt
+failing_fingerprints*.txt
+fix*.py
+fix_*.py
+fix_*.sh
+patch*.py
+patch*.patch
+rename_cas*.py
+run_sed*.py
+restore_blis*.sh
+update_blis*.sh
+fix_health*.sh
+refactor*.py
+dry_caches*.py
+scratch.*
+scratch_*
+test_infer*.go
+test_mapping*.go
+bli_*.yaml
+errors.yaml
+panics.yaml
+mcp.yaml
+/out.json
+/output.txt
+/temp.json
+/vds.txt
+
+# Public tour hygiene rules
+*.tmp-*
+*.tmp
+.zqk/*.log
+
+# Local CI worktree + archive drops (PRI-1785699924616992000-8000284f)
+.zqk/local-ci/
+
+*.test
+
+# CEF remesure evidence (override global *.jsonl ignore)
+!docs/quality/cef-runs/**/*.jsonl
+
+# ---------------------------------------------------------
+# Agent Scratch / Ephemeral Scripts
+# ---------------------------------------------------------
+# NEVER commit random agent automation scripts from the root.
+# Agents should write these to <appDataDir>/brain/<conversation-id>/scratch/
+/update_skill*.sh
+/git_add_commands.sh
+/*_skills.py
+/*_personas.py
+/*_refs.py
+/patch_*.py
+/new_instructions*.txt
+/*.scratch.*
+.zcom/
+config/zqk-local.yaml

@@ -1,0 +1,50 @@
+$schema: "../../schemas/command_spec.schema.json"
+
+name: "set"
+short: "Write skip_window.yaml (matching jobs skip until until)"
+description: |
+  Writes `.zqk/scheduler/skip_window.yaml`. Requires `--for` or `--until`, and
+  `--match-all` and/or `--job-type` / `--trigger-type` / `--title-contains` filters.
+
+flags:
+  - name: "for"
+    type: "string"
+    default: ""
+    description: "Duration from now (e.g. 2h, 30m); mutually exclusive with --until"
+  - name: "until"
+    type: "string"
+    default: ""
+    description: "Absolute end time (RFC3339); mutually exclusive with --for"
+  - name: "match-all"
+    type: "bool"
+    default: false
+    description: "Skip all jobs until until (use with care)"
+  - name: "job-type"
+    type: "stringSlice"
+    description: "Repeat for each job_type to match (e.g. convergence_session_tick)"
+  - name: "trigger-type"
+    type: "stringSlice"
+    description: "Repeat for each trigger_type to match (e.g. timer)"
+  - name: "title-contains"
+    type: "string"
+    default: ""
+    description: "Substring match on job title (case-insensitive)"
+
+help:
+  examples:
+    - comment: "Two-hour window for convergence tick jobs"
+      command: "%s scheduler skip-window set --for 2h --job-type convergence_session_tick --trigger-type timer"
+  exclude_flags:
+    - "format"
+    - "output"
+    - "verbose"
+    - "quiet"
+    - "timeout"
+    - "columns"
+
+common_flags: false
+requires_storage: false
+requires_session: false
+requires_scheduler_check: false
+
+run_e: "runSkipWindowSet"

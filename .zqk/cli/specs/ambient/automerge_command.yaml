@@ -1,0 +1,25 @@
+$schema: "../schemas/command_spec.schema.json"
+
+name: "automerge"
+short: "Run the Autonomy Inbox Auto-Merge Daemon"
+description: |
+  Starts a daemon that continuously polls active pull requests and merges
+  them if fully verified.
+
+flags: []
+
+args:
+  type: "no_args"
+
+help:
+  examples:
+    - comment: "Start auto-merge daemon"
+      command: "%s ambient automerge"
+  exclude_flags:
+    - "columns"
+    - "ignore-scheduler-down"
+    - "format"
+    - "output"
+
+run_e: "runAmbientAutomerge"
+common_flags: true

@@ -1,0 +1,35 @@
+# Dest first-run VDS spine (rigid stages). Project prefs live in the customization file.
+schema_version: 1
+profile_id: verifiable_decomposition_spine_v1
+customization_profile_path: docs/quality/verifiable_decomposition_customization.yaml
+stages:
+  - id: intent_capture
+    label: Intent capture
+    purpose: Persist goals, plans, and constraints.
+  - id: design
+    label: Design
+    purpose: Requirements, criteria, test cases, backlog items.
+  - id: implement
+    label: Implement
+    purpose: Code/docs change with re-runnable evidence.
+  - id: integrate_verify
+    label: Integrate and verify
+    purpose: Integration/smoke evidence.
+  - id: operate_release
+    label: Operate and release
+    purpose: First-run operate gates (not a public Helm/k8s install).
+completion:
+  done_values:
+    - "yes"
+    - "na"
+  hard_gates:
+    - independent_verify
+chunk_contract:
+  required_fields:
+    - chunk_id
+    - stage
+    - claim
+    - rubric_ref
+    - dsl_checks
+    - evidence_refs
+    - independent_verify

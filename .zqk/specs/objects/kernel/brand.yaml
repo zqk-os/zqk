@@ -1,0 +1,318 @@
+schema_version: 2.0.0
+ontology: brand
+extends: base_object
+visibility: public
+description: Brand configuration specification. Defines system branding information including brand name, variants, and substitution patterns for cross-system branding updates. Enables systematic branding changes through the substitution utility by providing declarative brand definitions with scope, patterns, and substitution targets. Supports multi-system branding through meta tags and pointers to substitution configurations. Implements the Cloneable Configuration Pattern - brands can be cloned with shared DNA propagation.
+traits:
+  - base_object_traits
+  - cloneable_configuration
+fields:
+  brand_name:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: system administrator
+      automation_hooks: used by substitution utility to identify brand configurations.
+      cardinality: one
+      criticality: core
+      default: ""
+      dependencies: brand naming conventions.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Primary brand name identifier. The canonical name for this brand (e.g., 'zqk', 'WorkstreamOS'). Used as the primary reference for branding substitutions and system identification.
+      security: non-sensitive
+      system_usage:
+        - brand identification
+        - substitution targeting
+        - system naming
+      validation: Must be a valid brand name string. Should follow naming conventions (e.g., PascalCase, no spaces).
+    field_profile_code: BRD-001
+    permissions: r--
+    semantic_type: identifier
+    traits:
+      - readable
+      - writable
+    type: string
+    validation:
+      max_length: 100
+      min_length: 1
+      pattern: ^[A-Za-z][A-Za-z0-9_-]*$
+      required: true
+  brand_variant:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: system administrator
+      automation_hooks: used to distinguish brand variants (e.g., 'primary', 'secondary', 'legacy').
+      cardinality: one
+      criticality: association
+      default: primary
+      dependencies: brand variant strategy.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Brand variant identifier. Distinguishes different variants of the same brand (e.g., 'primary', 'secondary', 'legacy', 'deprecated'). Enables multiple brand configurations for the same brand name with different scopes or contexts.
+      security: non-sensitive
+      system_usage:
+        - brand variant management
+        - multi-context branding
+        - brand migration
+      validation: 'Must be a valid variant identifier. Common values: primary, secondary, legacy, deprecated.'
+    field_profile_code: BRD-002
+    permissions: r--
+    semantic_type: identifier
+    traits:
+      - readable
+      - writable
+    type: string
+    validation:
+      max_length: 50
+      min_length: 1
+      pattern: ^[a-z][a-z0-9_]*$
+      required: false
+  dna_fields:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: system architect
+      automation_hooks: used by DNA propagation system to determine which fields to propagate from source to clones.
+      cardinality: one
+      criticality: composition
+      default: []
+      dependencies: source configuration field names.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: List of field names that are part of the DNA (propagated from source to clones). Fields listed here are inherited from the source configuration during propagation. Fields not listed are not part of the DNA and can be freely set on clones. Only applicable to DNA source configurations (dna_source_ref is null/empty).
+      security: non-sensitive
+      system_usage:
+        - DNA field definition
+        - propagation scope
+        - clone inheritance
+      validation: Array of strings. Each string must be a valid field name from the configuration schema.
+    field_profile_code: BRD-008
+    permissions: rwx
+    semantic_type: list
+    traits:
+      - readable
+      - writable
+      - modifiable
+    type: array
+    validation:
+      minCount: 0
+      required: false
+  dna_source_ref:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: system
+      automation_hooks: used by DNA propagation system to identify source configuration and propagate updates.
+      cardinality: one
+      criticality: composition
+      default: ""
+      dependencies: source configuration object.
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: 'Reference to the source configuration (the DNA). If null/empty, this configuration IS the DNA. If set, this is a clone that references the source DNA. Format: object ID (e.g., ''BRD-001'') or object reference (e.g., ''brand:BRD-001'').'
+      security: non-sensitive
+      system_usage:
+        - DNA propagation
+        - clone identification
+        - source reference resolution
+      validation: Must be a valid object ID or reference if provided. If empty, configuration is the DNA source.
+    field_profile_code: BRD-006
+    permissions: r-x
+    semantic_type: reference
+    traits:
+      - field_reference_group
+    type: string
+    validation:
+      pattern: ^([A-Z]+-\d+|[\w:]+)?$
+      required: false
+  dna_version:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: system
+      automation_hooks: used by DNA propagation system to detect when DNA has been updated and clones need propagation.
+      cardinality: one
+      criticality: association
+      default: ""
+      dependencies: source configuration updated_at timestamp.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: 'Version/timestamp of the DNA being used by this clone. Set to source configuration''s updated_at when clone is created or DNA is propagated. Used to detect when DNA has been updated and clone needs propagation. Format: ISO-8601 datetime (e.g., ''2026-01-10T08:00:00Z'').'
+      security: non-sensitive
+      system_usage:
+        - DNA version tracking
+        - propagation detection
+        - clone synchronization
+      validation: ISO-8601 datetime format if provided.
+    field_profile_code: BRD-007
+    permissions: r-x
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+    type: string
+    validation:
+      pattern: ^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$
+      required: false
+  metadata:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: system administrator
+      automation_hooks: used for brand metadata tagging and filtering.
+      cardinality: one
+      criticality: association
+      default: {}
+      dependencies: brand metadata conventions.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: 'Brand metadata. Contains metadata for tagging and filtering: tags (array of meta tags), description (brand description), legal_status (legal status indicator), effective_date (when brand becomes effective), deprecated_date (when brand is deprecated). Enables meta tag-based filtering and pointer resolution for brand substitutions.'
+      security: non-sensitive
+      system_usage:
+        - brand metadata
+        - tag-based filtering
+        - pointer resolution
+      validation: 'Object containing metadata. Should include: tags (array of strings), description (string), legal_status (string), effective_date (string/date), deprecated_date (string/date).'
+    field_profile_code: BRD-005
+    permissions: rwx
+    semantic_type: expression
+    traits:
+      - readable
+      - writable
+      - modifiable
+    type: object
+    validation:
+      required: false
+  overrides:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: system architect
+      automation_hooks: used by clone resolution to merge DNA fields with clone-specific overrides.
+      cardinality: one
+      criticality: composition
+      default: {}
+      dependencies: source configuration schema.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Field overrides that differ from the DNA. Contains field names and values that override the inherited DNA values. Only fields listed here override DNA; all other DNA fields are inherited. Overrides take precedence over DNA values during clone resolution. Only applicable to clone configurations (dna_source_ref is set).
+      security: non-sensitive
+      system_usage:
+        - clone customization
+        - override resolution
+        - clone inheritance
+      validation: Object containing field name → value mappings. Field names must be valid fields from the configuration schema. Values must match field types and validation rules.
+    field_profile_code: BRD-009
+    permissions: rwx
+    semantic_type: expression
+    traits:
+      - readable
+      - writable
+      - modifiable
+    type: object
+    validation:
+      required: false
+  propagation_mode:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: system architect
+      automation_hooks: used by DNA propagation system to determine propagation strategy.
+      cardinality: one
+      criticality: association
+      default: immediate
+      dependencies: propagation requirements and system architecture.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: 'How updates to the DNA propagate to this clone. Options: immediate (changes propagate immediately when source is updated), manual (changes require explicit propagation command), scheduled (changes propagate on schedule, e.g., daily sync), versioned (clones track DNA version and can choose when to update). Only applicable to clone configurations (dna_source_ref is set).'
+      security: non-sensitive
+      system_usage:
+        - propagation control
+        - clone synchronization
+        - update strategy
+      validation: 'Must be one of: immediate, manual, scheduled, versioned.'
+    field_profile_code: BRD-010
+    permissions: r-x
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+    type: enum
+    validation:
+      enum:
+        - immediate
+        - manual
+        - scheduled
+        - versioned
+      required: false
+  scope:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: system administrator
+      automation_hooks: used by substitution utility to determine applicability of brand substitutions.
+      cardinality: one
+      criticality: association
+      default: {}
+      dependencies: system architecture and deployment topology.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: 'Brand scope definition. Defines where this brand applies: systems (list of system identifiers), components (list of component names), environments (list of environment names), paths (glob patterns for file paths), metadata_tags (list of meta tags for filtering). Enables multi-system branding with different brands for different contexts.'
+      security: non-sensitive
+      system_usage:
+        - brand scoping
+        - multi-system branding
+        - context-aware branding
+      validation: 'Object containing scope definitions. Should include: systems (array of strings), components (array of strings), environments (array of strings), paths (array of glob patterns), metadata_tags (array of strings).'
+    field_profile_code: BRD-004
+    permissions: rwx
+    semantic_type: expression
+    traits:
+      - readable
+      - writable
+      - modifiable
+    type: object
+    validation:
+      required: false
+  substitution_patterns:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: system administrator
+      automation_hooks: used by substitution utility to load and execute brand substitutions.
+      cardinality: many
+      criticality: core
+      default: []
+      dependencies: substitution utility and substitution configuration objects.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Substitution pattern references. Array of references (IDs or paths) to substitution configuration objects that define how to replace the current brand with this brand. Can reference substitution objects by ID or file path. Enables systematic branding changes across code, documentation, and configurations.
+      security: non-sensitive
+      system_usage:
+        - brand substitution
+        - systematic branding updates
+        - cross-system branding
+      validation: Array of strings. Each string should reference a valid substitution object ID or file path. References should be resolvable by the substitution utility.
+    field_profile_code: BRD-003
+    permissions: rwx
+    semantic_type: reference
+    traits:
+      - readable
+      - writable
+      - modifiable
+    type: array
+    validation:
+      minCount: 1
+      required: true

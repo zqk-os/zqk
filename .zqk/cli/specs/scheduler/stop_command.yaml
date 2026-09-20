@@ -1,0 +1,39 @@
+$schema: "../schemas/command_spec.schema.json"
+
+name: "stop"
+short: "Stop the scheduler daemon"
+description: |
+  Stop the running scheduler daemon.
+  
+  This gracefully stops the scheduler, allowing current jobs to complete
+  before shutting down.
+
+help:
+  examples:
+    - comment: "Stop scheduler daemon"
+      command: "%s scheduler stop"
+  exclude_flags:
+    - "format"
+    - "output"
+    - "verbose"
+    - "quiet"
+    - "timeout"
+    - "columns"
+
+run_e: "runStop"
+async: true
+common_flags: true
+
+flags:
+  - name: "wait"
+    type: "bool"
+    default: false
+    description: "Wait for the daemon process to exit"
+  - name: "max-wait"
+    type: "duration"
+    default: "3m"
+    description: "Max time to wait for exit when --wait is set (matches daemon clean-shutdown budget)"
+  - name: "force"
+    type: "bool"
+    default: false
+    description: "Force kill the daemon (SIGKILL). Use when graceful stop is stuck."

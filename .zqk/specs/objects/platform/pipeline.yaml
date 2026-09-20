@@ -1,0 +1,144 @@
+schema_version: 2.0.0
+ontology: pipeline
+extends: base_object
+visibility: internal
+description: Defines a directed acyclic graph (DAG) of tasks that agents must perform to achieve a higher-level goal.\n
+traits:
+  - base_object_traits
+fields:
+  goal_refs:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: orchestrator.
+      automation_hooks: trace goal alignment.
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: goal registry.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: References to system or business goals this pipeline serves.
+      security: non-sensitive
+      system_usage:
+        - traceability
+      validation: valid goal references.
+    field_profile_code: PL-006
+    permissions: rwx
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+      - field_reference_group
+    type: list
+    validation:
+      required: false
+  policy_refs:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: orchestrator/security.
+      automation_hooks: used for pre-flight policy checks.
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: policy registry.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: References to policies that govern this pipeline.
+      security: non-sensitive
+      system_usage:
+        - compliance
+        - execution checks
+      validation: valid policy references.
+    field_profile_code: PL-004
+    permissions: rwx
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+      - field_reference_group
+    type: list
+    validation:
+      required: false
+  requirement_refs:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: orchestrator/architect.
+      automation_hooks: trace requirement fulfillment by this pipeline.
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: requirement registry.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: References to requirements driving this pipeline.
+      security: non-sensitive
+      system_usage:
+        - traceability
+      validation: valid requirement references.
+    field_profile_code: PL-005
+    permissions: rwx
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+      - field_reference_group
+    type: list
+    validation:
+      required: false
+  stages:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: architect/orchestrator.
+      automation_hooks: used for routing sequential tasks.
+      cardinality: many
+      criticality: composition
+      default: []
+      dependencies: agent task registry.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Ordered stages or DAG nodes of execution.
+      security: non-sensitive
+      system_usage:
+        - routing
+        - orchestration
+      validation: list of stage objects.
+    field_profile_code: PL-002
+    permissions: rwx
+    semantic_type: expression
+    traits:
+      - field_mutable_group
+    type: list
+    validation:
+      required: false
+  trigger:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: orchestrator.
+      automation_hooks: used to determine when the pipeline runs.
+      cardinality: one
+      criticality: composition
+      default: null
+      dependencies: cap_orchestrator.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Describes what triggers the pipeline.
+      security: non-sensitive
+      system_usage:
+        - execution
+        - scheduling
+      validation: structured object defining trigger type and references.
+    field_profile_code: PL-001
+    permissions: rwx
+    semantic_type: expression
+    traits:
+      - field_mutable_group
+    type: map
+    validation:
+      required: true

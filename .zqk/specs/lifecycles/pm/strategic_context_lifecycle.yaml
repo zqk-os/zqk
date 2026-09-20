@@ -1,0 +1,97 @@
+$schema: "../../../.zqk/cli/specs/schemas/lifecycle_spec.schema.json"
+
+object_type: strategic_context
+# Five-question exam: docs/architecture/LIFECYCLE_STATE_MACHINE_RUBRIC.md
+# TRACK: BLI-CEF-R26-REMAINING-KINDS-001
+statuses:
+  - value: conceptual
+    display: Conceptual
+    origin: true
+    preliminary: true
+    description: Draft plane status. Prior to CAS membrane crossing.
+    role: realign
+  - value: originated
+    display: Originated
+    description: CAS membrane crossed. Object officially originated.
+    role: realign
+  - value: draft
+    display: Draft
+    origin: false
+    preliminary: false
+    description: Strategic context is being defined
+    role: realign
+  - value: active
+    display: Active
+    description: Context is active and used for alignment
+    role: shovel_ready
+  - value: archived
+    display: Archived
+    terminal: true
+    archive: true
+    description: Context is no longer active
+    role: terminal
+  - value: error
+    display: Error
+    system: true
+    description: System error occurred
+    role: halted
+transitions:
+  - from: conceptual
+    to: originated
+    description: Promote from draft plane to CAS membrane (CAS Qualification).
+    manual: true
+    auto: false
+    catalyst: System promotion
+  - from: originated
+    to: draft
+    description: Initial domain workflow transition to draft.
+    manual: true
+    auto: true
+    catalyst: System initialization
+  - from: draft
+    to: active
+    description: Activate the strategic context
+    manual: true
+    auto: false
+    postconditions:
+      - role is shovel_ready
+  - from: active
+    to: archived
+    description: Archive the context
+    manual: true
+    auto: false
+    postconditions:
+      - role is terminal
+      - ended; no further normal execution hops expected
+  - from: '*'
+    to: error
+    description: System error occurred
+    manual: false
+    auto: true
+    postconditions:
+      - role is halted
+      - hop from any occupancy to error
+      - system halt; repair before leaving halted
+  # TRACK: BLI-1785723654802038000-b14064bc — recover strategic_context from error via promote.
+  - from: error
+    to: draft
+    description: Recover from system error after repair
+    manual: true
+    auto: false
+    postconditions:
+      - role is realign
+      - recover from system halt after repair
+percent_complete:
+  method: status_defaults
+  default_by_status:
+    # draft > error so promote can recover (equal-zero blocks forward probe).
+    conceptual: 0
+    originated: 5
+    draft: 5
+    active: 100
+    archived: 100
+    error: 0
+created_at: 2026-07-01T18:00:00Z
+updated_at: 2026-07-01T18:00:00Z
+created_by: ACC-1785920548450214012-68b850c0
+updated_by: ACC-1785920548450214012-68b850c0

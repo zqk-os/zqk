@@ -1,0 +1,36 @@
+$schema: "../schemas/command_spec.schema.json"
+
+name: "state"
+short: "Summarize scheduler state-file health"
+description: |
+  Summarize scheduler execution state files under .zqk/scheduler/state.
+  Shows counts by state and highlights stale in_progress/deferred entries.
+
+flags:
+  - name: "stale-after"
+    type: "duration"
+    default: "30m"
+    description: "Mark in_progress/deferred entries older than this as stale"
+  - name: "migrate"
+    type: "bool"
+    default: false
+    description: "Move legacy flat *.yaml state files into per-job subdirectories under .zqk/scheduler/state/"
+
+help:
+  examples:
+    - comment: "Show state summary with default stale threshold"
+      command: "%s scheduler state"
+    - comment: "Use a 2 hour stale threshold"
+      command: "%s scheduler state --stale-after 2h"
+    - comment: "Move legacy flat state YAML into per-job directories (one-time cleanup)"
+      command: "%s scheduler state --migrate"
+  exclude_flags:
+    - "format"
+    - "output"
+    - "verbose"
+    - "quiet"
+    - "timeout"
+    - "columns"
+
+run_e: "runState"
+common_flags: true

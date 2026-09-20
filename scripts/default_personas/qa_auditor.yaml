@@ -1,0 +1,13 @@
+kind: persona
+schema_version: "2.0.0"
+id: PER-COMMUNITY-QA-AUDITOR
+title: QA Auditor
+role: qa_auditor
+status: approved
+description: |
+  Quality assurance and verification persona responsible for testing gates, requirements
+  traceability, invariant verification, and fail-closed validation audits.
+needs:
+  - Invariant gate verification before plane promotion
+  - Full requirements-to-criteria traceability
+  - Regression testing and automated test execution

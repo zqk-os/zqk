@@ -1,0 +1,102 @@
+$schema: ../../../.zqk/cli/specs/schemas/lifecycle_spec.schema.json
+object_type: audit_event_aggregation
+statuses:
+  - value: conceptual
+    display: Conceptual
+    origin: true
+    preliminary: true
+    description: Draft plane status. Prior to CAS membrane crossing.
+    role: realign
+  - value: originated
+    display: Originated
+    description: CAS membrane crossed. Object officially originated.
+    role: realign
+  - value: pending
+    display: Pending Aggregation
+    origin: false
+    preliminary: false
+    description: Audit events waiting to be aggregated into metrics
+    role: realign
+  - value: aggregating
+    display: Aggregating
+    description: Currently being aggregated into metrics
+    role: realign
+  - value: aggregated
+    display: Aggregated
+    description: Successfully aggregated into metrics, ready for cleanup
+    role: realign
+  - value: archived
+    display: Archived
+    terminal: true
+    archive: true
+    description: Events have been archived after aggregation
+    role: terminal
+  - value: deleted
+    display: Deleted
+    terminal: true
+    archive: true
+    description: Events deleted after aggregation and archival period
+    role: terminal
+transitions:
+  - from: conceptual
+    to: originated
+    description: Promote from draft plane to CAS membrane (CAS Qualification).
+    manual: true
+    auto: false
+    catalyst: System promotion
+  - from: originated
+    to: pending
+    description: Initial domain workflow transition to pending.
+    manual: true
+    auto: true
+    catalyst: System initialization
+  - from: pending
+    to: aggregating
+    description: Start aggregating audit events into metrics
+    manual: false
+    auto: true
+    postconditions:
+      - role is realign
+  - from: aggregating
+    to: aggregated
+    description: Aggregation complete, metrics created
+    manual: false
+    auto: true
+    postconditions:
+      - role is realign
+  - from: aggregating
+    to: pending
+    description: Aggregation failed, retry
+    manual: false
+    auto: true
+    postconditions:
+      - role is realign
+  - from: aggregated
+    to: archived
+    description: Archive aggregated events
+    manual: false
+    auto: true
+    postconditions:
+      - role is terminal
+      - ended; no further normal execution hops expected
+  - from: archived
+    to: deleted
+    description: Delete archived events after final retention
+    manual: false
+    auto: true
+    postconditions:
+      - role is terminal
+percent_complete:
+  method: status_based
+  default_by_status:
+    conceptual: 0
+    originated: 5
+    aggregated: 100
+    aggregating: 50
+    archived: 100
+    deleted: 100
+    pending: 20
+created_at: 2026-07-01 18:00:00+00:00
+updated_at: 2026-07-01 18:00:00+00:00
+created_by: ACC-1785920548450214012-68b850c0
+updated_by: ACC-1785920548450214012-68b850c0

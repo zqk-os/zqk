@@ -1,0 +1,380 @@
+schema_version: 2.0.0
+ontology: library
+extends: base_object
+visibility: public
+description: Library specification for architectural patterns and composable specifications. Defines libraries of reusable components, connectors, and architectural patterns that can compose into more complex systems. Each spec layer provides more granular components that comprise to make more complicated structures and systems. Libraries built from ground up with semantic structure and definition enable significant data compression by understanding the semantic stack. Implements the Cloneable Configuration Pattern - libraries can be cloned with shared DNA propagation.
+traits:
+  - base_object_traits
+  - cloneable_configuration
+fields:
+  composable_specs:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: system architect
+      automation_hooks: used by composition system to load and compose specifications.
+      cardinality: many
+      criticality: core
+      default: []
+      dependencies: spec registry and composition system.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: References to composable specifications. Array of references (IDs or ontology names) to specifications that comprise this library. Specs can comprise specs that comprise specs, enabling hierarchical composition. Each spec layer provides more granular components.
+      security: non-sensitive
+      system_usage:
+        - spec composition
+        - hierarchical structure building
+        - semantic stack construction
+      validation: Array of strings. Each string should reference a valid spec ontology or ID. References should be resolvable by the spec registry.
+    field_profile_code: LIB-003
+    permissions: rwx
+    semantic_type: reference
+    traits:
+      - readable
+      - writable
+      - modifiable
+    type: array
+    validation:
+      minCount: 0
+      required: false
+  connector_patterns:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: system architect
+      automation_hooks: used to identify and apply connector patterns for architectural composition.
+      cardinality: many
+      criticality: composition
+      default: []
+      dependencies: connector pattern registry.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Connector patterns defined in this library. Array of connector pattern identifiers that describe how components connect and compose. Connectors form the basis for building out semantic libraries that describe architectural patterns.
+      security: non-sensitive
+      system_usage:
+        - connector identification
+        - pattern matching
+        - architectural composition
+      validation: Array of strings. Each string should reference a valid connector pattern identifier.
+    field_profile_code: LIB-004
+    permissions: rwx
+    semantic_type: list
+    traits:
+      - readable
+      - writable
+      - modifiable
+    type: array
+    validation:
+      minCount: 0
+      required: false
+  dna_fields:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: system architect
+      automation_hooks: used by DNA propagation system to determine which fields to propagate from source to clones.
+      cardinality: one
+      criticality: composition
+      default: []
+      dependencies: source configuration field names.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: List of field names that are part of the DNA (propagated from source to clones). Fields listed here are inherited from the source configuration during propagation. Fields not listed are not part of the DNA and can be freely set on clones. Only applicable to DNA source configurations (dna_source_ref is null/empty).
+      security: non-sensitive
+      system_usage:
+        - DNA field definition
+        - propagation scope
+        - clone inheritance
+      validation: Array of strings. Each string must be a valid field name from the configuration schema.
+    field_profile_code: LIB-008
+    permissions: rwx
+    semantic_type: list
+    traits:
+      - readable
+      - writable
+      - modifiable
+    type: array
+    validation:
+      minCount: 0
+      required: false
+  dna_source_ref:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: system
+      automation_hooks: used by DNA propagation system to identify source configuration and propagate updates.
+      cardinality: one
+      criticality: composition
+      default: ""
+      dependencies: source configuration object.
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: 'Reference to the source configuration (the DNA). If null/empty, this configuration IS the DNA. If set, this is a clone that references the source DNA. Format: object ID (e.g., ''LIB-001'') or object reference (e.g., ''library:LIB-001'').'
+      security: non-sensitive
+      system_usage:
+        - DNA propagation
+        - clone identification
+        - source reference resolution
+      validation: Must be a valid object ID or reference if provided. If empty, configuration is the DNA source.
+    field_profile_code: LIB-009
+    permissions: r-x
+    semantic_type: reference
+    traits:
+      - field_reference_group
+    type: string
+    validation:
+      pattern: ^([A-Z]+-\d+|[\w:]+)?$
+      required: false
+  dna_version:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: system
+      automation_hooks: used by DNA propagation system to detect when DNA has been updated and clones need propagation.
+      cardinality: one
+      criticality: association
+      default: ""
+      dependencies: source configuration updated_at timestamp.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: 'Version/timestamp of the DNA being used by this clone. Set to source configuration''s updated_at when clone is created or DNA is propagated. Used to detect when DNA has been updated and clone needs propagation. Format: ISO-8601 datetime (e.g., ''2026-01-10T08:00:00Z'').'
+      security: non-sensitive
+      system_usage:
+        - DNA version tracking
+        - propagation detection
+        - clone synchronization
+      validation: ISO-8601 datetime format if provided.
+    field_profile_code: LIB-010
+    permissions: r-x
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+    type: string
+    validation:
+      pattern: ^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$
+      required: false
+  library_name:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: system architect
+      automation_hooks: used to identify and reference library configurations.
+      cardinality: one
+      criticality: core
+      default: ""
+      dependencies: library naming conventions.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Primary library name identifier. The canonical name for this library (e.g., 'connector_library', 'semantic_patterns', 'architecture_components'). Used as the primary reference for library composition and semantic compression.
+      security: non-sensitive
+      system_usage:
+        - library identification
+        - composition targeting
+        - semantic stack navigation
+      validation: Must be a valid library name string. Should follow naming conventions (e.g., snake_case, kebab-case).
+    field_profile_code: LIB-001
+    permissions: r--
+    semantic_type: identifier
+    traits:
+      - readable
+      - writable
+    type: string
+    validation:
+      max_length: 100
+      min_length: 1
+      pattern: ^[a-z][a-z0-9_-]*$
+      required: true
+  library_type:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: system architect
+      automation_hooks: used to categorize and filter libraries by type.
+      cardinality: one
+      criticality: association
+      default: architectural_patterns
+      dependencies: library type taxonomy.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Library type/category. Distinguishes different types of libraries (e.g., 'architectural_patterns', 'connectors', 'semantic_components', 'composable_specs'). Enables type-based filtering and composition rules.
+      security: non-sensitive
+      system_usage:
+        - library categorization
+        - composition rules
+        - semantic stack organization
+      validation: 'Must be a valid library type. Common values: architectural_patterns, connectors, semantic_components, composable_specs, circuit_breakers.'
+    field_profile_code: LIB-002
+    permissions: r--
+    semantic_type: identifier
+    traits:
+      - readable
+      - writable
+      - filterable
+    type: string
+    validation:
+      max_length: 50
+      min_length: 1
+      pattern: ^[a-z][a-z0-9_]*$
+      required: false
+  metadata:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: system architect
+      automation_hooks: used for library metadata tagging and filtering.
+      cardinality: one
+      criticality: association
+      default: {}
+      dependencies: library metadata conventions.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: 'Library metadata. Contains metadata for tagging and filtering: tags (array of meta tags), description (library description), version (library version), status (library status indicator), effective_date (when library becomes effective), deprecated_date (when library is deprecated). Enables meta tag-based filtering and pointer resolution for library composition.'
+      security: non-sensitive
+      system_usage:
+        - library metadata
+        - tag-based filtering
+        - pointer resolution
+      validation: 'Object containing metadata. Should include: tags (array of strings), description (string), version (string), status (string), effective_date (string/date), deprecated_date (string/date).'
+    field_profile_code: LIB-007
+    permissions: rwx
+    semantic_type: expression
+    traits:
+      - readable
+      - writable
+      - modifiable
+    type: object
+    validation:
+      required: false
+  overrides:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: system architect
+      automation_hooks: used by clone resolution to merge DNA fields with clone-specific overrides.
+      cardinality: one
+      criticality: composition
+      default: {}
+      dependencies: source configuration schema.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Field overrides that differ from the DNA. Contains field names and values that override the inherited DNA values. Only fields listed here override DNA; all other DNA fields are inherited. Overrides take precedence over DNA values during clone resolution. Only applicable to clone configurations (dna_source_ref is set).
+      security: non-sensitive
+      system_usage:
+        - clone customization
+        - override resolution
+        - clone inheritance
+      validation: Object containing field name → value mappings. Field names must be valid fields from the configuration schema. Values must match field types and validation rules.
+    field_profile_code: LIB-011
+    permissions: rwx
+    semantic_type: expression
+    traits:
+      - readable
+      - writable
+      - modifiable
+    type: object
+    validation:
+      required: false
+  propagation_mode:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: system architect
+      automation_hooks: used by DNA propagation system to determine propagation strategy.
+      cardinality: one
+      criticality: association
+      default: immediate
+      dependencies: propagation requirements and system architecture.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: 'How updates to the DNA propagate to this clone. Options: immediate (changes propagate immediately when source is updated), manual (changes require explicit propagation command), scheduled (changes propagate on schedule, e.g., daily sync), versioned (clones track DNA version and can choose when to update). Only applicable to clone configurations (dna_source_ref is set).'
+      security: non-sensitive
+      system_usage:
+        - propagation control
+        - clone synchronization
+        - update strategy
+      validation: 'Must be one of: immediate, manual, scheduled, versioned.'
+    field_profile_code: LIB-012
+    permissions: r-x
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+    type: enum
+    validation:
+      enum:
+        - immediate
+        - manual
+        - scheduled
+        - versioned
+      required: false
+  scope:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: system architect
+      automation_hooks: used to determine applicability of library in different contexts.
+      cardinality: one
+      criticality: association
+      default: {}
+      dependencies: system architecture and deployment topology.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: 'Library scope definition. Defines where this library applies: systems (list of system identifiers), components (list of component names), environments (list of environment names), paths (glob patterns for file paths), metadata_tags (list of meta tags for filtering). Enables multi-system library usage with different libraries for different contexts.'
+      security: non-sensitive
+      system_usage:
+        - library scoping
+        - multi-system library management
+        - context-aware composition
+      validation: 'Object containing scope definitions. Should include: systems (array of strings), components (array of strings), environments (array of strings), paths (array of glob patterns), metadata_tags (array of strings).'
+    field_profile_code: LIB-006
+    permissions: rwx
+    semantic_type: expression
+    traits:
+      - readable
+      - writable
+      - modifiable
+    type: object
+    validation:
+      required: false
+  semantic_structure:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: system architect
+      automation_hooks: used by semantic compression system to understand semantic stack for compression.
+      cardinality: one
+      criticality: composition
+      default: {}
+      dependencies: semantic compression system.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Semantic structure definition. Defines the semantic stack structure for this library, enabling significant data compression by understanding how components relate semantically. Contains semantic token mappings, hierarchy definitions, and compression strategies.
+      security: non-sensitive
+      system_usage:
+        - semantic compression
+        - semantic stack navigation
+        - data compression optimization
+      validation: Object containing semantic structure definitions. Should include semantic tokens, hierarchy, and compression metadata.
+    field_profile_code: LIB-005
+    permissions: rwx
+    semantic_type: expression
+    traits:
+      - readable
+      - writable
+      - modifiable
+    type: object
+    validation:
+      required: false

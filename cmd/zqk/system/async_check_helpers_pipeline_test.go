@@ -1,0 +1,117 @@
+package system
+
+import (
+	"context"
+	"testing"
+	"time"
+
+	"github.com/zqk-os/zqk/internal/cli"
+
+	"github.com/spf13/cobra"
+
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/testkit"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
+
+	"github.com/zqk-os/zqk/pkg/objects"
+)
+
+// TestDetermineCheckTarget_UsesCacheKindsWhenPopulated is a regression test for the system check pipeline.
+//
+// Per docs/architecture/system-check-pipeline.md and system-check-performance-targets.md (REQ-200):
+// when the object ID cache is populated for the project, kinds MUST come from ObjectIDCache.GetKinds()
+// only; do not call discoverObjectKinds(processDir) (field registry LoadFields + GetAllKinds).
+//
+// This test ensures that when the cache is populated, determineCheckTarget correctly resolves
+// the first argument as a kind (so the implementation is using cache kinds). If someone changes
+// determineCheckTarget to always call discoverObjectKinds first or to ignore the cache,
+// this test may still pass (if field registry returns same kinds), but the test documents the
+// requirement; combined with the implementation comment in determineCheckTarget, regressions
+// should be caught by code review. For stronger guarantees, consider adding a build-time
+// or runtime assertion that discoverObjectKinds is not called when cache is populated.
+func TestDetermineCheckTarget_UsesCacheKindsWhenPopulated(t *testing.T) {
+	// Do not use t.Parallel(): same *testing.T uses t.Setenv(ZQK_TEST_ROOT).
+	proj := testkit.PrepareIsolatedTempProject(t, nil)
+	tempDir := proj.Root
+
+	projectRoot, err := setupSystemTestEnvironmentRoot(t, tempDir)
+	if err != nil {
+		t.Fatalf("SetupTestEnvironment: %v", err)
+	}
+	secCtx := &pkgctx.SecurityContext{AccountID: pkgctx.SystemAccountID}
+	t.Cleanup(func() {
+		// Global ObjectIDCache + CAS/WAL under .zqk: strip .zqk/process and .zqk so t.TempDir()
+		// cleanup does not race "directory not empty" (see TestObjectIDCache_InvalidateAndUpdate).
+		resetDir, rerr := fileutil.MkdirTemp("", "zqk-audit-global-reset")
+		if rerr != nil {
+			_ = testkit.RunStandardTeardown(testkit.TeardownOptions{
+				ProjectRoot:                       projectRoot,
+				StripProcessArtifacts:             true,
+				DrainGlobalListingIndexQueueFirst: true,
+				WALTimeout:                        20 * time.Second,
+				ShutdownTimeout:                   20 * time.Second,
+			})
+			return
+		}
+		defer fileutil.RemoveAll(resetDir)
+		_ = testkit.RunStandardTeardown(testkit.TeardownOptions{
+			ProjectRoot:                       projectRoot,
+			StripProcessArtifacts:             true,
+			DrainGlobalListingIndexQueueFirst: true,
+			WALTimeout:                        20 * time.Second,
+			ShutdownTimeout:                   20 * time.Second,
+			TearDownGlobalAuditBuffer:         true,
+			SecCtx:                            secCtx,
+			AuditBufferResetRoot:              resetDir,
+		})
+	})
+
+	content := "id: CRIT-PIPE\nkind: criteria\nschema_version: \"" + objects.DefaultSchemaVersion + "\"\nstatus: not_started\ntitle: Pipeline\n"
+	_ = testkit.WriteTestObjectStandalone(t, projectRoot, content)
+
+	// Populate the global object ID cache for this project (same as system check does in setupAsyncValidationFunction).
+	cache := GetGlobalObjectIDCache()
+	if err := cache.BuildCache(context.Background(), projectRoot, true); err != nil {
+		t.Fatalf("BuildCache: %v", err)
+	}
+	if !cache.IsPopulatedForProject(projectRoot) {
+		t.Fatal("cache should be populated for projectRoot after BuildCache")
+	}
+	cacheKinds := cache.GetKinds()
+	if len(cacheKinds) == 0 {
+		t.Fatal("cache.GetKinds() should be non-empty after building with criteria dir")
+	}
+	hasCriteria := false
+	for _, k := range cacheKinds {
+		if k == "criteria" {
+			hasCriteria = true
+			break
+		}
+	}
+	if !hasCriteria {
+		t.Fatalf("cache.GetKinds() should include \"criteria\", got %v", cacheKinds)
+	}
+
+	// Build AsyncCheckContext and call determineCheckTarget with args ["criteria"].
+	// When cache is populated, determineCheckTarget must use GetKinds() and thus recognize "criteria" as a kind.
+	cmd := &cobra.Command{}
+	cmd.SetContext(pkgctx.NewSystemContext())
+	ctx := cli.ContextForProjectAndProfile(projectRoot, "system")
+	checkCtx := &AsyncCheckContext{
+		Cmd:         cmd,
+		Ctx:         ctx,
+		ProjectRoot: projectRoot,
+		Logger:      logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem)),
+	}
+
+	if err := determineCheckTarget(checkCtx, []string{"criteria"}); err != nil {
+		t.Fatalf("determineCheckTarget: %v", err)
+	}
+	if checkCtx.TargetKind != "criteria" {
+		t.Errorf("when cache is populated and args=[\"criteria\"], TargetKind want \"criteria\", got %q (pipeline requires using ObjectIDCache.GetKinds() when cache populated)", checkCtx.TargetKind)
+	}
+	if len(checkCtx.TargetIDs) != 0 {
+		t.Errorf("TargetIDs want empty when first arg is kind, got %v", checkCtx.TargetIDs)
+	}
+}

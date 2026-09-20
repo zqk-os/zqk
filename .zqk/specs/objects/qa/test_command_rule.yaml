@@ -1,0 +1,120 @@
+schema_version: 2.0.0
+ontology: test_command_rule
+extends: base_object
+visibility: internal
+description: 'Rule that defines when a command line (command + args) is treated as a \"test command\"\nfor scheduler run_wrapper jobs. Used for notification behavior (e.g. test-failure vs generic failure)\nand output sanitization. Rules are evaluated in order; first match wins.\nEach rule has conditions (field/operator/value). Supported fields: command, args, shell_script.\nOperators: eq, contains, in. See scheduler test command detection docs.\n'
+traits:
+  - base_object_traits
+fields:
+  conditions:
+    access:
+      requires:
+        - access:confidential
+        - role:admin
+    checklist:
+      authority: admin.
+      automation_hooks: consumed by scheduler run_wrapper to detect test commands.
+      cardinality: many
+      criticality: composition
+      default: []
+      dependencies: scheduler.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: List of conditions; all must match for this rule to match. Each item has field (command|args|shell_script), operator (eq|contains|in), value (string or array).
+      security: non-sensitive
+      system_usage:
+        - scheduler
+      validation: list of objects with field, operator, value.
+    field_profile_code: TCR-002
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - field_mutable_group
+    type: list
+    validation:
+      required: true
+  description:
+    access:
+      requires:
+        - access:confidential
+        - role:admin
+    checklist:
+      authority: admin.
+      automation_hooks: used in test runner reports.
+      cardinality: zero_or_one
+      criticality: association
+      default: null
+      dependencies: scheduler, test runner.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Optional description of what this rule matches.
+      security: non-sensitive
+      system_usage:
+        - scheduler
+      validation: text.
+    field_profile_code: TCR-004
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+      - modifiable
+    type: text
+    validation:
+      required: false
+  name:
+    access:
+      requires:
+        - access:confidential
+        - role:admin
+    checklist:
+      authority: admin.
+      cardinality: zero_or_one
+      criticality: association
+      default: null
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Short name for this rule (for display/admin).
+      security: non-sensitive
+      system_usage:
+        - scheduler
+      validation: string.
+    field_profile_code: TCR-001
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+      - modifiable
+    type: string
+    validation:
+      required: false
+  priority:
+    access:
+      requires:
+        - access:confidential
+        - role:admin
+    checklist:
+      authority: admin.
+      automation_hooks: determines evaluation order (lower number = higher priority, evaluated first).
+      cardinality: one
+      criticality: association
+      default: 0
+      dependencies: scheduler.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Evaluation order; lower value = higher priority (e.g. 0 before 10).
+      security: non-sensitive
+      system_usage:
+        - scheduler
+      validation: integer.
+    field_profile_code: TCR-003
+    permissions: rwx
+    semantic_type: quantity
+    traits:
+      - readable
+      - writable
+      - modifiable
+    type: integer
+    validation:
+      required: false

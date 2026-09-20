@@ -1,0 +1,122 @@
+package metrics
+
+import (
+	"context"
+	"fmt"
+	"time"
+
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/metricsrecording"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/specbuilder/bldr_instance_v1"
+	"github.com/zqk-os/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/zqktime"
+)
+
+const maxGraphProviderMetricsJSONLen = 256 * 1024
+
+// GraphProviderPersistMeta carries summary fields for base_metric rows (avoids importing pkg/graph/provider from here).
+type GraphProviderPersistMeta struct {
+	WindowStart     time.Time
+	WindowEnd       time.Time
+	OperationKinds  int
+	QueryKinds      int
+	TotalOperations int64
+}
+
+func graphProviderMetricTitle(opCount, queryCount int, totalOps int64) string {
+	s := fmt.Sprintf("Graph: %d ops, %d queries, %d total", opCount, queryCount, totalOps)
+	if len(s) < 5 {
+		s = "Graph provider metrics"
+	}
+	if len(s) > 120 {
+		s = s[:117] + "..."
+	}
+	return s
+}
+
+// BuildGraphProviderMetricsBaseMetricInstance builds a base_metric from encoded graph provider JSON.
+func BuildGraphProviderMetricsBaseMetricInstance(metricID string, jsonPayload []byte, meta GraphProviderPersistMeta) (map[string]any, error) {
+	if metricID == emptyValue {
+		return nil, errfmt.Errorf("metric id is required")
+	}
+	start := zqktime.FormatRFC3339UTC(meta.WindowStart)
+	end := zqktime.FormatRFC3339UTC(meta.WindowEnd)
+
+	tags := []string{
+		MetricTagSystem,
+		"graph",
+		"provider",
+	}
+
+	oc := int(meta.TotalOperations)
+	if oc < 0 {
+		oc = 0
+	}
+	if oc == 0 {
+		oc = meta.OperationKinds + meta.QueryKinds
+	}
+
+	builder := bldr_instance_v1.NewBaseMetricInstanceBuilder(objects.DefaultSchemaVersion)
+	builder.ID(metricID).
+		Title(graphProviderMetricTitle(meta.OperationKinds, meta.QueryKinds, meta.TotalOperations)).
+		MetricType(MetricTypeSystem).
+		Source(MetricSourceGraphProvider).
+		MetricTypeSpecific("graph_provider_snapshot").
+		Tags(tags).
+		CollectionCount(1).
+		ObjectCount(oc).
+		ObjectKind("graph_provider").
+		FirstSeen(start).
+		LastSeen(end).
+		WindowStart(start).
+		WindowEnd(end)
+
+	payload := string(jsonPayload)
+	if len(payload) > maxGraphProviderMetricsJSONLen {
+		suffix := "\n...(truncated)"
+		payload = payload[:maxGraphProviderMetricsJSONLen-len(suffix)] + suffix
+	}
+	builder.SetField(objects.FieldKeyGraphProviderMetricsJSON, payload)
+
+	return builder.Build()
+}
+
+// PersistGraphProviderMetricsJSONAsync persists pre-encoded graph provider metrics JSON to base_metric.
+func PersistGraphProviderMetricsJSONAsync(sp storage.ObjectStorageProvider, jsonBytes []byte, logger logging.Logger, meta GraphProviderPersistMeta) {
+	if sp == nil {
+		return
+	}
+	if !metricsrecording.Enabled() {
+		return
+	}
+
+	goroutinelabels.NewGoroutine("graph_provider_base_metric", "persist graph provider metrics to base_metric").
+		StartSimple(func() {
+			metricID := fmt.Sprintf("BAS-%d", time.Now().UnixNano())
+			inst, err := BuildGraphProviderMetricsBaseMetricInstance(metricID, jsonBytes, meta)
+			if err != nil {
+				if logger != nil {
+					logging.Fluent(logger).Warn("Failed to build graph provider base_metric").
+						WithError(err).
+						Log()
+				}
+				return
+			}
+
+			ctx, cancel := context.WithTimeout(pkgctx.NewSystemContext(), 60*time.Second)
+			defer cancel()
+			secCtx := pkgctx.NewSystemSecurityContext()
+			if createErr := sp.Create(ctx, secCtx, inst); createErr != nil {
+				if logger != nil {
+					logging.Fluent(logger).Warn("Failed to persist graph provider base_metric").
+						MetricID(metricID).
+						WithError(createErr).
+						Log()
+				}
+			}
+		})
+}

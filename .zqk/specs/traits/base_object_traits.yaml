@@ -1,0 +1,20 @@
+$schema: "../../../.zqk/cli/specs/schemas/trait_spec.schema.json"
+
+name: base_object_traits
+description: Base trait group for all objects extending base_object.\nThis trait group includes base_auditable_traits, groupable, and auto_status_transitionable.\nObjects extending base_object automatically get these traits.\nWhen this trait group is referenced, it expands to include all auditable traits plus shared object behavior traits.\n
+category: base-group
+requires:
+  - base_auditable_traits
+conflicts: []
+includes:
+  - base_auditable_traits
+  - groupable
+  - auto_status_transitionable
+field_level: false
+object_level: true
+config: {}
+
+created_at: 2026-07-01T18:00:00Z
+updated_at: 2026-07-01T18:00:00Z
+created_by: ACC-1785920548450214012-68b850c0
+updated_by: ACC-1785920548450214012-68b850c0

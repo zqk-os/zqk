@@ -1,0 +1,16 @@
+created_at: "2026-06-15T01:18:40Z"
+created_by: ACC-1785920548450214012-68b850c0
+description: Convergence Overseer Role
+id: ROL-1781486320311230000-bd9ed5c4
+kind: role
+namespace_id: zqk:kernel
+permissions:
+    - read:*
+    - write:*
+role_id: overseer
+schema_version: 2.0.0
+status: active
+title: Overseer Role
+updated_at: "2026-08-05T09:36:53Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

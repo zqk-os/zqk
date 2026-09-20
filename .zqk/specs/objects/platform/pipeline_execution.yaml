@@ -1,0 +1,113 @@
+schema_version: 2.0.0
+ontology: pipeline_execution
+extends: base_object
+visibility: internal
+description: Tracks an active, running instance of a pipeline_definition.\n
+traits:
+  - base_object_traits
+fields:
+  audit_trail:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: orchestrator
+      automation_hooks: audit
+      cardinality: many
+      criticality: audit
+      default: []
+      dependencies: none
+      observability: "yes"
+      origin_lifecycle: append-only.
+      purpose: Array of operations performed.
+      security: non-sensitive
+      system_usage:
+        - audit
+      validation: list.
+    field_profile_code: PLX-004
+    permissions: rwx
+    semantic_type: expression
+    traits:
+      - field_mutable_group
+    type: list
+    validation:
+      required: false
+  context_payload:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: orchestrator
+      automation_hooks: payload
+      cardinality: one
+      criticality: state
+      default: {}
+      dependencies: none
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Arbitrary JSON holding working context.
+      security: non-sensitive
+      system_usage:
+        - state
+      validation: map.
+    field_profile_code: PLX-003
+    permissions: rwx
+    semantic_type: expression
+    traits:
+      - field_mutable_group
+    type: map
+    validation:
+      required: false
+  current_stage:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: orchestrator
+      automation_hooks: execution
+      cardinality: one
+      criticality: state
+      default: null
+      dependencies: none
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: String identifier of the active stage.
+      security: non-sensitive
+      system_usage:
+        - state
+      validation: string.
+    field_profile_code: PLX-002
+    permissions: rwx
+    semantic_type: expression
+    traits:
+      - field_mutable_group
+    type: string
+    validation:
+      required: false
+  definition_ref:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: orchestrator
+      automation_hooks: linking
+      cardinality: one
+      criticality: association
+      default: null
+      dependencies: pipeline_definition registry.
+      observability: "yes"
+      origin_lifecycle: read-only.
+      purpose: Pointer to the pipeline_definition.
+      security: non-sensitive
+      system_usage:
+        - traceability
+      validation: valid pipeline_definition reference.
+    field_profile_code: PLX-001
+    permissions: r-x
+    semantic_type: reference
+    traits:
+      - field_reference_group
+      - field_read_only_group
+    type: string
+    validation:
+      required: true

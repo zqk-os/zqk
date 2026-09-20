@@ -1,0 +1,97 @@
+schema_version: 2.0.0
+ontology: division
+extends: extensible_object
+visibility: public
+description: 'Organizational division within an organization. Divisions can be hierarchical (parent/child) and contain teams. Divisions can align with zqk kernel goals. '
+traits:
+  - base_object_traits
+fields:
+  division_name:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner
+      automation_hooks: used for display and identification
+      cardinality: one
+      criticality: composition
+      default: null
+      dependencies: none
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: The name of the division
+      security: non-sensitive
+      system_usage:
+        - display
+        - identification
+        - search
+      validation: Must be a non-empty string
+    field_profile_code: DIV-001
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - filterable
+      - modifiable
+      - readable
+      - searchable
+      - writable
+    type: string
+    validation:
+      required: true
+  kernel_goals_refs:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner
+      automation_hooks: used for strategic alignment tracking
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: goal registry
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: References to kernel goals that align with this division
+      security: non-sensitive
+      system_usage:
+        - strategic alignment
+        - goal tracking
+      validation: Must reference existing goal object IDs using zqk:kernel:goal:{id} format
+    field_profile_code: DIV-005
+    permissions: rwx
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+      - field_reference_group
+    type: list
+    validation:
+      required: false
+  parent_division_ref:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner
+      automation_hooks: used for hierarchical navigation and reporting
+      cardinality: zero_or_one
+      criticality: association
+      default: null
+      dependencies: division registry
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Reference to the parent division (null for top-level divisions)
+      security: non-sensitive
+      system_usage:
+        - organizational hierarchy
+        - navigation
+        - reporting
+      validation: Must reference existing division object ID using domain:organizational:division:{id} format, or null
+    field_profile_code: DIV-002
+    permissions: rwx
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+      - field_reference_group
+    type: reference
+    validation:
+      required: false

@@ -1,0 +1,20 @@
+affected_items:
+    - PRI-DEMO-CORE-SHOWCASE-001
+created_at: "2026-09-19T04:35:02Z"
+created_by: ACC-1785920548450214012-68b850c0
+description: The agent_task PRI-DEMO-CORE-SHOWCASE-001 missed its deadline. Automated wake signal triggered.
+detected_by: hourglass
+id: RIS-1789792502641549000-48fb3bcc
+kind: risk_blocker
+namespace_id: zqk:kernel
+priority_tier: P0
+related_object_refs:
+    - PRI-DEMO-CORE-SHOWCASE-001
+risk_type: blocker
+schema_version: 2.0.0
+severity: high
+status: implemented
+title: 'Missed Deadline Escalation: Core Live Showcase Demos for Community First-Run'
+updated_at: "2026-09-19T04:46:25Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

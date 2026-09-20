@@ -1,0 +1,161 @@
+schema_version: 2.0.0
+ontology: rule
+extends: base_object
+visibility: public
+description: 'Governance rules describing constraints, recommendations, and enforcement. '
+traits:
+  - base_object_traits
+fields:
+  body:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner/executive.
+      automation_hooks: used to generate enforcement hints.
+      cardinality: one
+      criticality: composition
+      default: required
+      dependencies: enforcement hooks.
+      observability: "yes"
+      origin_lifecycle: mutable (with history).
+      purpose: The actual rule instructions/policy.
+      security: may contain sensitive workflows.
+      system_usage:
+        - docs
+        - enforcement
+      validation: markdown allowed.
+    field_profile_code: RUL-002
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - field_mutable_group
+    type: text
+    validation:
+      required: true
+  goal_refs:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: used for goal-rule traceability.
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: goal registry.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Goals this rule supports.
+      security: non-sensitive
+      system_usage:
+        - traceability
+      validation: Must reference existing goal IDs.
+    field_profile_code: RUL-004
+    permissions: r-x
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+      - field_reference_group
+    type: list
+    validation:
+      required: false
+  scope:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner/executive.
+      automation_hooks: determines where the rule is enforced.
+      cardinality: one
+      criticality: composition
+      default: required
+      dependencies: enforcement hooks.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Domain the rule applies to (command_execution, documentation, etc.).
+      security: non-sensitive
+      system_usage:
+        - enforcement
+      validation: controlled vocab.
+    field_profile_code: RUL-001
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - filterable
+      - groupable
+      - listable
+      - modifiable
+      - readable
+      - searchable
+      - sortable
+      - writable
+    type: string
+    validation:
+      required: true
+  type:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner/executive.
+      automation_hooks: determines enforcement strictness.
+      cardinality: one
+      criticality: composition
+      default: recommendation
+      dependencies: enforcement hooks.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Severity (\\\"hard_limit\\\", \\\"required\\\", \\\"recommendation\\\", \\\"informational\\\").
+      security: non-sensitive
+      system_usage:
+        - enforcement
+      validation: enum.
+    field_profile_code: RUL-003
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - listable
+      - readable
+      - writable
+      - modifiable
+      - groupable
+      - filterable
+      - sortable
+      - searchable
+    type: enum
+    validation:
+      enum:
+        - hard_limit
+        - required
+        - recommendation
+        - informational
+      required: false
+  workstream_refs:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: used for workstream-specific enforcement.
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: workstream registry.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Workstreams this rule applies to.
+      security: non-sensitive
+      system_usage:
+        - enforcement
+        - filtering
+      validation: Must reference existing workstream IDs.
+    field_profile_code: RUL-005
+    permissions: r-x
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+      - field_reference_group
+    type: list
+    validation:
+      required: false

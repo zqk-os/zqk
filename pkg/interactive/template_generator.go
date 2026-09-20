@@ -1,0 +1,411 @@
+package interactive
+
+import (
+	"fmt"
+	"regexp"
+	"strings"
+
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/objects"
+)
+
+const (
+	emptyValue            = ""
+	yamlSpecExt           = ".yaml"
+	newline               = "\n"
+	doubleNewline         = "\n\n"
+	templateHeaderFmt     = "# Template for %s object\n"
+	templateHeaderDetails = "# Fields marked with {field_name} tokens need to be provided\n\n"
+	yamlKindPrefix        = "kind: "
+	yamlSchemaVersionFmt  = "schema_version: %q\n\n"
+	requiredFieldsHeader  = "# Required fields\n"
+	optionalFieldsHeader  = "# Optional fields\n"
+	fieldTypeEnum         = "enum"
+	fieldTypeString       = "string"
+	fieldTypeText         = "text"
+	fieldTypeInteger      = "integer"
+	fieldTypeNumber       = "number"
+	fieldTypeBoolean      = "boolean"
+	fieldTypeList         = "list"
+	tokenPatternRegex     = `\{(\w+)\}` //nolint:gosec
+	yamlNull              = "null"
+	yamlTrue              = "true"
+	yamlFalse             = "false"
+	yamlEmptyList         = "[]"
+	yamlEmptyMap          = "{}"
+	yamlListDelimiter     = ", "
+)
+
+// TemplateGenerator generates templates with tokens and manages the validation loop
+type TemplateGenerator struct {
+	fieldRegistry   *objects.FieldRegistry
+	lifecycleLoader *objects.LifecycleLoader // Optional: for filtering auto-generated fields
+	specLoader      *objects.SpecLoader      // For loading specs to get schema_version
+}
+
+// GetFieldRegistry returns the field registry (for use by update loop)
+func (stg *TemplateGenerator) GetFieldRegistry() *objects.FieldRegistry {
+	return stg.fieldRegistry
+}
+
+// GetSchemaVersion returns the schema version for a given kind
+func (stg *TemplateGenerator) GetSchemaVersion(kind string) string {
+	schemaVersion := objects.DefaultSchemaVersion // Default fallback
+	if stg.specLoader != nil {
+		specFile := kind + yamlSpecExt
+		if spec, err := stg.specLoader.LoadSpecWithInheritance(specFile); err == nil {
+			if spec.SchemaVersion != emptyValue {
+				schemaVersion = spec.SchemaVersion
+			}
+		}
+	}
+	return schemaVersion
+}
+
+// NewTemplateGenerator creates a new streaming template generator
+func NewTemplateGenerator(fieldRegistry *objects.FieldRegistry) *TemplateGenerator {
+	return &TemplateGenerator{
+		fieldRegistry:   fieldRegistry,
+		lifecycleLoader: objects.GetGlobalLifecycleLoader(),
+		specLoader:      objects.GetGlobalSpecLoader(), // Use global spec loader to share cache
+	}
+}
+
+// NewTemplateGeneratorWithLifecycle creates a new streaming template generator with lifecycle loader
+func NewTemplateGeneratorWithLifecycle(
+	fieldRegistry *objects.FieldRegistry,
+	lifecycleLoader *objects.LifecycleLoader,
+) *TemplateGenerator {
+	return &TemplateGenerator{
+		fieldRegistry:   fieldRegistry,
+		lifecycleLoader: lifecycleLoader,
+		specLoader:      objects.GetGlobalSpecLoader(), // Use global spec loader to share cache
+	}
+}
+
+// TemplateWithTokens represents a template with token placeholders
+type TemplateWithTokens struct {
+	Template       string                     // YAML template with {field_name} tokens
+	Tokens         []string                   // List of token field names (e.g., ["title", "category"])
+	FieldInfo      map[string]*FieldTokenInfo // Map of field name -> token info
+	RequiredFields []string                   // List of required field names
+}
+
+// FieldTokenInfo contains information about a token field
+type FieldTokenInfo struct {
+	Name         string   // Field name
+	Type         string   // Field type (string, enum, etc.)
+	Required     bool     // Whether field is required
+	Description  string   // Field description
+	EnumValues   []string // Enum values (if type is enum)
+	SemanticType string   // Semantic type (reference, etc.)
+}
+
+// GenerateTemplateWithTokens generates a YAML template with {field_name} tokens
+// Returns the template and information about all tokens
+func (stg *TemplateGenerator) GenerateTemplateWithTokens(kind string) (*TemplateWithTokens, error) {
+	// Get field information for the kind
+	kindFields, err := stg.fieldRegistry.GetFieldsForKind(kind)
+	if err != nil {
+		return nil, errfmt.Errorf("failed to get fields for kind %s: %w", kind, err)
+	}
+
+	var builder strings.Builder
+
+	// Write header
+	fmt.Fprintf(&builder, templateHeaderFmt, kind)
+	builder.WriteString(templateHeaderDetails)
+
+	// Write kind
+	builder.WriteString(yamlKindPrefix)
+	builder.WriteString(kind)
+	builder.WriteString(newline)
+
+	// Write schema_version from spec
+	schemaVersion := objects.DefaultSchemaVersion // Default fallback
+	if stg.specLoader != nil {
+		specFile := kind + yamlSpecExt
+		if spec, err := stg.specLoader.LoadSpecWithInheritance(specFile); err == nil {
+			if spec.SchemaVersion != emptyValue {
+				schemaVersion = spec.SchemaVersion
+			}
+		}
+	}
+	fmt.Fprintf(&builder, yamlSchemaVersionFmt, schemaVersion)
+
+	// Create filter for auto-generated fields (CREATE operation)
+	filter := NewAutoGeneratedFieldsFilter(stg.lifecycleLoader)
+
+	// Separate required and optional fields
+	requiredFields := []objects.FieldInfo{}
+	optionalFields := []objects.FieldInfo{}
+
+	for i := range kindFields.AllFields {
+		field := &kindFields.AllFields[i]
+
+		// Skip auto-generated fields for CREATE operations (includes kind, schema_version, etc.)
+		if filter.IsFieldAutoGenerated(kindFields.Kind, field.Name) {
+			continue
+		}
+
+		if field.Required {
+			requiredFields = append(requiredFields, *field)
+		} else {
+			optionalFields = append(optionalFields, *field)
+		}
+	}
+
+	// Build field info map and required fields list
+	fieldInfoMap := make(map[string]*FieldTokenInfo)
+	requiredFieldNames := make([]string, 0, len(requiredFields))
+	tokens := make([]string, 0, len(requiredFields)+len(optionalFields))
+
+	// Process required fields
+	if len(requiredFields) > 0 {
+		builder.WriteString(requiredFieldsHeader)
+		for i := range requiredFields {
+			field := &requiredFields[i]
+			tokenInfo := &FieldTokenInfo{
+				Name:         field.Name,
+				Type:         field.Type,
+				Required:     field.Required,
+				Description:  field.Description,
+				EnumValues:   field.EnumValues,
+				SemanticType: field.SemanticType,
+			}
+			fieldInfoMap[field.Name] = tokenInfo
+			requiredFieldNames = append(requiredFieldNames, field.Name)
+			tokens = append(tokens, field.Name)
+
+			writeFieldWithToken(&builder, field, tokenInfo)
+		}
+		builder.WriteString(newline)
+	}
+
+	// Process optional fields
+	if len(optionalFields) > 0 {
+		builder.WriteString(optionalFieldsHeader)
+		for i := range optionalFields {
+			field := &optionalFields[i]
+			tokenInfo := &FieldTokenInfo{
+				Name:         field.Name,
+				Type:         field.Type,
+				Required:     field.Required,
+				Description:  field.Description,
+				EnumValues:   field.EnumValues,
+				SemanticType: field.SemanticType,
+			}
+			fieldInfoMap[field.Name] = tokenInfo
+			tokens = append(tokens, field.Name)
+
+			writeFieldWithToken(&builder, field, tokenInfo)
+		}
+	}
+
+	return &TemplateWithTokens{
+		Template:       builder.String(),
+		Tokens:         tokens,
+		FieldInfo:      fieldInfoMap,
+		RequiredFields: requiredFieldNames,
+	}, nil
+}
+
+// writeFieldWithToken writes a field to the template with a {field_name} token
+func writeFieldWithToken(builder *strings.Builder, field *objects.FieldInfo, _ *FieldTokenInfo) {
+	// Add field comment with description
+	if field.Description != emptyValue {
+		fmt.Fprintf(builder, "# %s", field.Description)
+		if field.Type != emptyValue {
+			fmt.Fprintf(builder, " (type: %s)", field.Type)
+		}
+		if !field.Required {
+			builder.WriteString(" [optional]")
+		}
+		builder.WriteString(newline)
+	}
+
+	// Add enum values as comment if applicable
+	if field.Type == fieldTypeEnum && len(field.EnumValues) > 0 {
+		builder.WriteString("# Valid values: ")
+		for i, enumVal := range field.EnumValues {
+			if i > 0 {
+				builder.WriteString(", ")
+			}
+			fmt.Fprintf(builder, "%q", enumVal)
+		}
+		builder.WriteString("\n")
+	}
+
+	// Write field name with token placeholder
+	builder.WriteString(field.Name)
+	builder.WriteString(": {")
+	builder.WriteString(field.Name)
+	builder.WriteString("}")
+	builder.WriteString(doubleNewline)
+}
+
+// DetectTokensInTemplate detects all {field_name} tokens in a template string
+func DetectTokensInTemplate(template string) ([]string, error) {
+	// Token format: {field_name}
+	tokenPattern := regexp.MustCompile(tokenPatternRegex)
+	matches := tokenPattern.FindAllStringSubmatch(template, -1)
+
+	tokens := make([]string, 0, len(matches))
+	seen := make(map[string]bool)
+
+	for _, match := range matches {
+		if len(match) >= 2 {
+			token := match[1]
+			if !seen[token] {
+				tokens = append(tokens, token)
+				seen[token] = true
+			}
+		}
+	}
+
+	return tokens, nil
+}
+
+// ReplaceTokensInTemplate replaces {field_name} tokens with actual values
+func ReplaceTokensInTemplate(template string, fieldValues map[string]any) (string, error) {
+	result := template
+
+	// Token format: {field_name}
+	tokenPattern := regexp.MustCompile(tokenPatternRegex)
+
+	// Replace each token with its value
+	result = tokenPattern.ReplaceAllStringFunc(result, func(match string) string {
+		// Extract field name from {field_name}
+		fieldName := match[1 : len(match)-1]
+
+		// Get value from fieldValues
+		if value, ok := fieldValues[fieldName]; ok {
+			// Convert value to YAML format
+			return formatValueForYAML(value)
+		}
+
+		// Token not provided, leave as-is (will be detected as missing)
+		return match
+	})
+
+	return result, nil
+}
+
+// formatValueForYAML formats a value for YAML output
+func formatValueForYAML(value any) string {
+	switch v := value.(type) {
+	case string:
+		// Escape strings and add quotes if needed
+		if strings.Contains(v, newline) || strings.Contains(v, `"`) || strings.Contains(v, "'") {
+			// Multi-line or contains quotes - use YAML block scalar or escape
+			return fmt.Sprintf("%q", v)
+		}
+		return fmt.Sprintf("%q", v)
+	case []any:
+		// Array - format as YAML array
+		if len(v) == 0 {
+			return yamlEmptyList
+		}
+		var items []string
+		for _, item := range v {
+			items = append(items, formatValueForYAML(item))
+		}
+		return "[" + strings.Join(items, yamlListDelimiter) + "]"
+	case map[string]any:
+		// Object - format as YAML object (simplified, inline)
+		if len(v) == 0 {
+			return yamlEmptyMap
+		}
+		// For simplicity, return as empty object (complex objects need proper YAML formatting)
+		return yamlEmptyMap
+	case bool:
+		if v {
+			return yamlTrue
+		}
+		return yamlFalse
+	case int, int64, float64:
+		return fmt.Sprintf("%v", v)
+	case nil:
+		return yamlNull
+	default:
+		return fmt.Sprintf("%q", fmt.Sprintf("%v", v))
+	}
+}
+
+// ValidateFieldCompleteness checks which required fields are missing from provided values
+func ValidateFieldCompleteness(
+	templateWithTokens *TemplateWithTokens,
+	providedValues map[string]any,
+) (missingRequired []string, invalidFields map[string]string) {
+	missingRequired = []string{}
+	invalidFields = make(map[string]string)
+
+	// Check all required fields
+	for _, fieldName := range templateWithTokens.RequiredFields {
+		if _, exists := providedValues[fieldName]; !exists {
+			missingRequired = append(missingRequired, fieldName)
+		}
+	}
+
+	// Validate field types (basic validation)
+	for fieldName, value := range providedValues {
+		tokenInfo, exists := templateWithTokens.FieldInfo[fieldName]
+		if !exists {
+			// Unknown field - skip for now (could be optional or invalid)
+			continue
+		}
+
+		// Basic type validation
+		if err := validateFieldType(fieldName, value, tokenInfo); err != nil {
+			invalidFields[fieldName] = err.Error()
+		}
+	}
+
+	return missingRequired, invalidFields
+}
+
+// validateFieldType performs basic type validation for a field value
+func validateFieldType(_ string, value any, tokenInfo *FieldTokenInfo) error {
+	// Enum validation
+	if tokenInfo.Type == fieldTypeEnum && len(tokenInfo.EnumValues) > 0 {
+		strValue, ok := value.(string)
+		if !ok {
+			return errfmt.Errorf("enum field must be a string, got %T", value)
+		}
+		valid := false
+		for _, enumVal := range tokenInfo.EnumValues {
+			if strValue == enumVal {
+				valid = true
+				break
+			}
+		}
+		if !valid {
+			return errfmt.Errorf("invalid enum value %q, must be one of: %v", strValue, tokenInfo.EnumValues)
+		}
+	}
+
+	// Type checking (basic)
+	switch tokenInfo.Type {
+	case fieldTypeString, fieldTypeText:
+		if _, ok := value.(string); !ok {
+			return errfmt.Errorf("field must be a string, got %T", value)
+		}
+	case fieldTypeInteger, fieldTypeNumber:
+		switch value.(type) {
+		case int, int64, float64:
+			// Valid numeric type
+		default:
+			return errfmt.Errorf("field must be a number, got %T", value)
+		}
+	case fieldTypeBoolean:
+		if _, ok := value.(bool); !ok {
+			return errfmt.Errorf("field must be a boolean, got %T", value)
+		}
+	case fieldTypeList:
+		if _, ok := value.([]any); !ok {
+			return errfmt.Errorf("field must be a list, got %T", value)
+		}
+	}
+
+	return nil
+}

@@ -1,0 +1,250 @@
+schema_version: 2.0.0
+ontology: requirement
+urn: urn:zqk:spec:project_mgmt:requirement
+namespace: zqk:project_mgmt
+extends: work_interval
+visibility: public
+description: 'Requirements describe specific deliverables linked to goals, with acceptance criteria and dependencies.\nLifecycle: requirement_lifecycle.yaml.\n'
+traits:
+  - base_object_traits
+  - completable
+  - status_reactive
+fields:
+  acceptance_criteria:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner/reviewer.
+      automation_hooks: maps to tests.
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: testing frameworks.
+      observability: "yes"
+      origin_lifecycle: mutable (append/edit via review).
+      purpose: Legacy free-form text acceptance criteria (deprecated - use criteria_refs instead).
+      security: non-sensitive
+      system_usage:
+        - testing
+        - reviews
+      validation: structured text; encourage Given/When/Then style.
+    field_profile_code: REQ-001
+    permissions: rwx
+    semantic_type: expression
+    traits:
+      - field_mutable_group
+    type: list
+    validation:
+      min_length: 0
+      required: false
+  criteria_refs:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: used for completion validation.
+      cardinality: many (>=1)
+      criticality: composition
+      default: []
+      dependencies: criteria registry.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Criteria objects that define requirement completion. Requirements MUST reference at least one criteria object (CRIT-####) instead of using free-form acceptance_criteria strings.
+      security: non-sensitive
+      system_usage:
+        - validation
+        - completion tracking
+      validation: must reference existing criteria object IDs (CRIT-#### format).
+    field_profile_code: REQ-010
+    permissions: r-x
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+      - field_reference_group
+    type: list
+    validation:
+      min_length: 0
+      required: false
+  description:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: used in reports, requirement documentation.
+      cardinality: one
+      criticality: association
+      default: none (optional)
+      dependencies: none.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Detailed description of the requirement, its context, and expected outcomes.
+      security: non-sensitive
+      system_usage:
+        - documentation
+        - communication
+        - planning
+      validation: free text or markdown.
+    field_profile_code: REQ-011
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+      - modifiable
+    type: text
+    validation:
+      required: false
+  goal_refs:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner/executive.
+      automation_hooks: updates goal progress.
+      cardinality: one_or_more
+      criticality: composition
+      default: required
+      dependencies: dashboards.
+      observability: "yes"
+      origin_lifecycle: mutable (with approvals).
+      purpose: Goals fulfilled by this requirement.
+      security: non-sensitive
+      system_usage:
+        - traceability
+      validation: IDs exist.
+    field_profile_code: REQ-005
+    permissions: r-x
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+      - field_reference_group
+    type: list
+    validation:
+      min_length: 0
+      required: false
+  milestone_refs:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: updates milestone progress.
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: dashboards.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Milestones that include this requirement.
+      security: non-sensitive
+      system_usage:
+        - traceability
+        - planning
+      validation: IDs exist.
+    field_profile_code: REQ-007
+    permissions: r-x
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+      - field_reference_group
+    type: list
+    validation:
+      required: false
+  priority:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner/executive.
+      automation_hooks: influences scheduling.
+      cardinality: one
+      criticality: composition
+      default: p2
+      dependencies: scheduling.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Relative urgency (p0..p3 or similar).
+      security: non-sensitive
+      system_usage:
+        - planning
+      validation: enum.
+    field_profile_code: REQ-002
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - listable
+      - readable
+      - writable
+      - modifiable
+      - groupable
+      - filterable
+      - sortable
+      - searchable
+    type: enum
+    validation:
+      enum:
+        - p0
+        - p1
+        - p2
+        - p3
+      required: false
+  workstream_refs:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: updates workstream progress.
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: dashboards.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Workstreams implementing this requirement.
+      security: non-sensitive
+      system_usage:
+        - traceability
+        - planning
+      validation: IDs exist.
+    field_profile_code: REQ-006
+    permissions: r-x
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+      - field_reference_group
+    type: list
+    validation:
+      required: false
+  epic_refs:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: architect/owner.
+      automation_hooks: links requirements under the governing epic enclave umbrella.
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: epic registry.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Epics governing this requirement deliverable.
+      security: non-sensitive
+      system_usage:
+        - traceability
+        - coverage
+      validation: Must reference existing epic IDs.
+    field_profile_code: REQ-008
+    permissions: r-x
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+      - field_reference_group
+    type: list
+    validation:
+      required: false
+

@@ -1,0 +1,18 @@
+$schema: ../schemas/command_spec.schema.json
+name: get <kind>
+short: Get object specification details
+description: Display specification details for an object kind including ontology, traits, and field requirements.
+aliases:
+  - show
+
+args:
+  type: exact
+  count: 1
+
+flags:
+  - name: raw
+    type: bool
+    default: false
+    description: Show raw spec without resolving inheritance
+
+common_flags: true

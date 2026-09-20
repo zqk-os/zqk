@@ -1,0 +1,80 @@
+package testkit
+
+import (
+	"testing"
+
+	"github.com/zqk-os/zqk/pkg/storage"
+)
+
+const emptyValue = ""
+
+// RegisterTempProjectTeardown registers t.Cleanup using [TempProjectTeardown] (strip, scrub, CAS/WAL, 45s timeouts).
+// For audit-buffer teardown or other overrides, build [TeardownOptions] with [TempProjectTeardown] and call [RegisterStandardTeardown].
+func RegisterTempProjectTeardown(t testing.TB, projectRoot string, fileStorage *storage.FileObjectStorage) {
+	t.Helper()
+	if projectRoot == emptyValue {
+		return
+	}
+	// fileStorage may be nil (greenfield / SkipFileStorage): TempProjectTeardown still drains
+	// listing-index queues and strips process artifacts so t.TempDir cleanup can succeed.
+	RegisterStandardTeardown(t, TempProjectTeardown(projectRoot, fileStorage))
+}
+
+// RegisterStandardTeardown registers t.Cleanup that runs [RunStandardTeardown] with defaults applied.
+func RegisterStandardTeardown(t testing.TB, opts TeardownOptions) {
+	t.Helper()
+	t.Cleanup(func() {
+		if err := RunStandardTeardown(opts); err != nil {
+			t.Logf("testkit: storage teardown pipeline: %v", err)
+		}
+	})
+}
+
+// RegisterAuditResetTeardown is [RegisterStandardTeardown] for tests that must also reset the global
+// audit buffer: it sources the reset root from [testing.TB.TempDir] so the directory is removed with
+// the test, instead of each caller pairing [os.MkdirTemp] with its own [os.RemoveAll] and an error
+// branch that silently skips the audit reset.
+//
+// storageRef is dereferenced at cleanup time, so tests can register teardown before the storage they
+// tear down exists. The audit buffer is only torn down when opts.SecCtx is set, since the reset needs
+// an account to attribute the flush to.
+func RegisterAuditResetTeardown(t testing.TB, opts TeardownOptions, storageRef **storage.FileObjectStorage) {
+	t.Helper()
+	resetRoot := t.TempDir()
+	if opts.SecCtx != nil {
+		opts.TearDownGlobalAuditBuffer = true
+		opts.AuditBufferResetRoot = resetRoot
+	}
+	t.Cleanup(func() {
+		if storageRef != nil {
+			opts.FileStorage = *storageRef
+		}
+		if err := RunStandardTeardown(opts); err != nil {
+			t.Logf("testkit: storage teardown pipeline: %v", err)
+		}
+	})
+}
+
+// RegisterStorageTestCleanup registers teardown for storage returned by [storage.NewTestingFactory]
+// (GetTestCleanup when present) or falls back to [RegisterStandardTeardown] with FileStorage.
+func RegisterStorageTestCleanup(t testing.TB, projectRoot string, storageAny any) {
+	t.Helper()
+	if storageAny == nil || projectRoot == emptyValue {
+		return
+	}
+	type cleanupGetter interface {
+		GetTestCleanup() func()
+	}
+	if g, ok := storageAny.(cleanupGetter); ok {
+		if fn := g.GetTestCleanup(); fn != nil {
+			t.Cleanup(fn)
+			return
+		}
+	}
+	fs, ok := storageAny.(*storage.FileObjectStorage)
+	if ok && fs != nil {
+		RegisterTempProjectTeardown(t, projectRoot, fs)
+		return
+	}
+	RegisterStandardTeardown(t, TeardownOptions{ProjectRoot: projectRoot})
+}

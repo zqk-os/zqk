@@ -1,0 +1,26 @@
+$schema: "../../../.zqk/cli/specs/schemas/trait_spec.schema.json"
+
+name: summarizes_children
+description: |
+  Object-level child-rollup summary capability. Indicates that the container
+  object aggregates and summarizes metrics from its child objects (such as
+  backlog items under a milestone or priority plan). Provides rollup counts
+  (total, completed, in_progress, open, percent_complete), total estimated
+  effort, total actual effort, and statistical distributions (average, min, max).
+category: behavior
+requires: []
+conflicts: []
+includes: []
+field_level: false
+object_level: true
+config:
+  child_kinds:
+    - backlog_item
+  rollup_fields:
+    - estimated_effort
+    - actual_effort
+
+created_at: 2026-09-09T18:00:00Z
+updated_at: 2026-09-09T18:00:00Z
+created_by: ACC-1785920548450214012-68b850c0
+updated_by: ACC-1785920548450214012-68b850c0

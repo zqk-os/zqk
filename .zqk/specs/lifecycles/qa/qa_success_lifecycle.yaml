@@ -1,0 +1,57 @@
+$schema: "../../../.zqk/cli/specs/schemas/lifecycle_spec.schema.json"
+
+object_type: qa_success
+# Five-question exam: origin is already terminal (success/failure/archived).
+# TRACK: BLI-CEF-R26-REMAINING-KINDS-001
+# postconditions: not applicable (empty hop set)
+statuses:
+  - value: conceptual
+    display: Conceptual
+    origin: true
+    preliminary: true
+    description: Draft plane status. Prior to CAS membrane crossing.
+    role: realign
+  - value: originated
+    display: Originated
+    description: CAS membrane crossed. Object officially originated.
+    role: realign
+  - value: success
+    display: Success
+    origin: false
+    # Not preliminary: origin+terminal+preliminary has no draft-plane leave path.
+    # TRACK: BLI-1785443942668406000-1ec5c811 — draft-plane / promote membrane.
+    terminal: true
+    role: terminal
+    description: "qa success status 'success' (Success): ended; no further normal
+      execution transitions expected. Flags: origin status, terminal."
+  - value: failure
+    display: Failure
+    terminal: true
+    role: terminal
+    description: "qa success status 'failure' (Failure): ended; no further normal
+      execution transitions expected. Flags: terminal."
+  - value: archived
+    display: Archived
+    terminal: true
+    archive: true
+    role: terminal
+
+    description: "qa success status 'archived' (Archived): ended; no further normal
+      execution transitions expected. Flags: archive, terminal."
+created_at: 2026-07-01T18:00:00Z
+updated_at: 2026-07-01T18:00:00Z
+created_by: ACC-1785920548450214012-68b850c0
+updated_by: ACC-1785920548450214012-68b850c0
+transitions:
+  - from: conceptual
+    to: originated
+    description: Promote from draft plane to CAS membrane (CAS Qualification).
+    manual: true
+    auto: false
+    catalyst: System promotion
+  - from: originated
+    to: success
+    description: Initial domain workflow transition to success.
+    manual: true
+    auto: true
+    catalyst: System initialization

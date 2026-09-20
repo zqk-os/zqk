@@ -1,0 +1,19 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://zqk.dev/schemas/config_spec.schema.json",
+  "title": "Configuration Specification Schema",
+  "description": "Base schema for configuration files. Domain-specific configs should extend this schema.",
+  "type": "object",
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "Reference to this schema file or domain-specific extension"
+    },
+    "description": {
+      "type": "string",
+      "description": "Human-readable description of this configuration"
+    }
+  },
+  "additionalProperties": true,
+  "description": "Configuration files can have domain-specific structures. This base schema allows any properties, but specific config types should define their own schemas that extend this."
+}

@@ -1,0 +1,21 @@
+category: acceptance
+created_at: "2026-09-17T07:33:29Z"
+created_by: ACC-1785920548450214012-68b850c0
+description: |
+    With cwd=~/zqk-public-candidate and ZCOM_PROJECT_ROOT set to that path,
+    object list priority_plan total is the community inventory (empty or this
+    plan), not studio's 200+ plans. whats-next kernel_ambience must not cite
+    /Users/lanceettl/zqk-restore-clone paths. Fail this criterion if ZQK_PROJECT_ROOT
+    alone still seats studio when the binary is zcom.
+id: CRIT-1789630408733990000-962f6513
+kind: criteria
+namespace_id: zqk:kernel
+origin_project: zqk
+origin_system: zqk
+schema_version: 2.0.0
+status: archived
+title: Community zcom object list/count/get use this checkout, not studio
+updated_at: "2026-09-17T19:30:18Z"
+updated_by: ACC-1785920548450214012-68b850c0
+validation_method: automated_test
+version_context: default

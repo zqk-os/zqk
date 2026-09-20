@@ -1,0 +1,68 @@
+$schema: "../schemas/command_spec.schema.json"
+
+name: "submit <command> [args...]"
+short: "Submit a command as a background job to the scheduler"
+description: |
+  Submit a command to run as a background job in the scheduler.
+  
+  This creates a one-time scheduler job that executes immediately. The job runs
+  in the background and you can check its status using 'scheduler activity'
+  or 'scheduler history'.
+  
+  The command is executed using run_wrapper, which provides:
+    - Progress tracking (stdout/stderr capture)
+    - Timeout management
+    - Retry logic
+    - Execution metrics
+
+args:
+  type: "minimum"
+  min: 1
+
+flags:
+  - name: "max-runtime"
+    type: "int"
+    default: 3600
+    description: "Maximum runtime in seconds (0 = no timeout, default: 3600)"
+  - name: "workdir"
+    type: "string"
+    description: "Working directory for command execution"
+  - name: "env"
+    type: "stringSlice"
+    description: "Environment variables (format: KEY=VALUE, can be specified multiple times)"
+  - name: "retry"
+    type: "int"
+    default: 0
+    description: "Number of retry attempts on failure (default: 0)"
+  - name: "retry-delay"
+    type: "int"
+    default: 5
+    description: "Delay between retries in seconds (default: 5)"
+  - name: "title"
+    type: "string"
+    description: "Job title (default: auto-generated from command)"
+  - name: "callback-completion"
+    type: "string"
+    description: "Command to run on job completion (receives JSON payload via stdin)"
+  - name: "callback-failure"
+    type: "string"
+    description: "Command to run on job failure (receives JSON payload via stdin)"
+
+help:
+  examples:
+    - comment: "Submit a simple command"
+      command: "%s scheduler submit \"echo hello world\""
+    - comment: "Submit with timeout and working directory"
+      command: "%s scheduler submit \"make build\" --max-runtime 600 --workdir /path/to/project"
+    - comment: "Submit with environment variables"
+      command: "%s scheduler submit \"npm test\" --env \"NODE_ENV=test\" --env \"CI=true\""
+  exclude_flags:
+    - "format"
+    - "output"
+    - "verbose"
+    - "quiet"
+    - "timeout"
+    - "columns"
+
+run_e: "runSubmit"
+common_flags: true

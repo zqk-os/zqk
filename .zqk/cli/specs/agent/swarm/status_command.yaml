@@ -1,0 +1,24 @@
+$schema: "../schemas/command_spec.schema.json"
+
+name: "status [flags]"
+short: "Show real-time swarm throughput and readiness dashboard"
+description: |
+  Aggregates agent_task and agent_instruction counts by status, active priority
+  plans, persona skill-binding readiness, and CAP orchestrator job presence.
+
+  Pair with feed / mesh wake policies for directed handoffs; use object get on
+  mesh workflow and hourglass policies for the full contracts.
+
+flags: []
+
+help:
+  examples:
+    - comment: "Swarm status JSON"
+      command: "%s swarm status --format json"
+    - comment: "Human-readable table"
+      command: "%s swarm status"
+  exclude_flags:
+    - "output"
+    - "quiet"
+    - "timeout"
+    - "columns"

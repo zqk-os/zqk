@@ -1,0 +1,264 @@
+schema_version: 2.0.0
+ontology: corporate_initiative
+extends: base_object
+visibility: public
+description: 'Corporate initiative objects aggregate multiple Workstream OS projects/repositories into portfolios, business units, and corporate initiatives. Provides rollup metrics (PCS, EDD, D&B), cross-project dependency tracking, and portfolio-level visibility. '
+traits:
+  - base_object_traits
+fields:
+  aggregated_db:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation.
+      automation_hooks: updated during portfolio aggregation.
+      cardinality: zero_or_one
+      criticality: association
+      default: null
+      dependencies: aggregation engine, D&B detection.
+      observability: "yes"
+      origin_lifecycle: mutable (recalculated during aggregation).
+      purpose: Aggregated Dependencies & Blockers result across all projects.
+      security: non-sensitive
+      system_usage:
+        - reporting
+        - dashboards
+        - risk management
+      validation: Must match DBResult structure.
+    field_profile_code: CI-004
+    permissions: r-x
+    semantic_type: statement
+    traits:
+      - field_read_only_group
+    type: object
+    validation:
+      required: false
+  aggregated_edd:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation.
+      automation_hooks: updated during portfolio aggregation.
+      cardinality: zero_or_one
+      criticality: association
+      default: null
+      dependencies: aggregation engine, EDD calculation.
+      observability: "yes"
+      origin_lifecycle: mutable (recalculated during aggregation).
+      purpose: Aggregated Effort Distribution Discrepancy across all projects.
+      security: non-sensitive
+      system_usage:
+        - reporting
+        - dashboards
+        - estimation accuracy
+      validation: Percentage variance (can be negative for under-estimation).
+    field_profile_code: CI-003
+    permissions: r-x
+    semantic_type: expression
+    traits:
+      - readable
+    type: number
+    validation:
+      required: false
+  aggregated_pcs:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation.
+      automation_hooks: updated during portfolio aggregation.
+      cardinality: zero_or_one
+      criticality: association
+      default: null
+      dependencies: aggregation engine, PCS calculation.
+      observability: "yes"
+      origin_lifecycle: mutable (recalculated during aggregation).
+      purpose: Aggregated Project Confidence Score (0-100) across all projects in this initiative.
+      security: non-sensitive
+      system_usage:
+        - reporting
+        - dashboards
+        - prioritization
+      validation: Number between 0 and 100.
+    field_profile_code: CI-002
+    permissions: r-x
+    semantic_type: expression
+    traits:
+      - field_read_only_group
+    type: number
+    validation:
+      required: false
+  aggregation_status:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation.
+      automation_hooks: triggers alerts if failed.
+      cardinality: zero_or_one
+      criticality: association
+      default: null
+      dependencies: aggregation engine.
+      observability: "yes"
+      origin_lifecycle: mutable (set during aggregation).
+      purpose: Status of last aggregation attempt (success/partial/failed).
+      security: non-sensitive
+      system_usage:
+        - error tracking
+        - reporting
+      validation: enum.
+    field_profile_code: CI-006
+    permissions: r-x
+    semantic_type: statement
+    traits:
+      - readable
+    type: enum
+    validation:
+      enum:
+        - success
+        - partial
+        - failed
+      required: false
+  cross_project_dependencies:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation/owner.
+      automation_hooks: updated during dependency analysis.
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: dependency resolver.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Cross-project dependency relationships (e.g., \\\"project:A depends on project:B\\\").
+      security: non-sensitive
+      system_usage:
+        - dependency visualization
+        - risk management
+      validation: Must reference existing projects and describe dependency.
+    field_profile_code: CI-007
+    permissions: r-x
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+    type: list
+    validation:
+      required: false
+  last_aggregated_at:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation.
+      automation_hooks: used to determine if aggregation is stale.
+      cardinality: zero_or_one
+      criticality: association
+      default: null
+      dependencies: aggregation engine.
+      observability: "yes"
+      origin_lifecycle: mutable (set during aggregation).
+      purpose: ISO-8601 timestamp when metrics were last aggregated.
+      security: non-sensitive
+      system_usage:
+        - freshness tracking
+        - reporting
+      validation: ISO-8601 datetime.
+    field_profile_code: CI-005
+    permissions: r-x
+    semantic_type: statement
+    traits:
+      - readable
+    type: string
+    validation:
+      pattern: ^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$
+      required: false
+  owner_ref:
+    access:
+      requires:
+        - access:confidential
+        - role:admin
+    checklist:
+      authority: executive/admin.
+      automation_hooks: ensures ownership is validated.
+      cardinality: one
+      criticality: composition
+      default: null
+      dependencies: authorization checks.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Reference to account/role representing the initiative owner.
+      security: may contain PII—treat as confidential.
+      system_usage:
+        - permissions
+        - reporting
+      validation: URI or structured reference pointing to an existing account/role.
+    field_profile_code: CI-009
+    permissions: r-x
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+    type: string
+    validation:
+      required: false
+  project_refs:
+    access:
+      requires:
+        - access:confidential
+        - role:admin
+    checklist:
+      authority: executive/admin.
+      automation_hooks: triggers aggregation when updated.
+      cardinality: many
+      criticality: composition
+      default: []
+      dependencies: aggregation engine.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: References to Workstream OS instances/projects that are part of this initiative.
+      security: non-sensitive
+      system_usage:
+        - aggregation
+        - reporting
+        - navigation
+      validation: Must reference existing projects using project ID format or storage path.
+    field_profile_code: CI-001
+    permissions: r-x
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+      - field_reference_group
+    type: list
+    validation:
+      required: false
+  resource_allocation:
+    access:
+      requires:
+        - access:confidential
+        - role:admin
+    checklist:
+      authority: executive/admin.
+      automation_hooks: used in resource optimization.
+      cardinality: zero_or_one
+      criticality: association
+      default: null
+      dependencies: resource tracker.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Resource allocation across projects (team assignments, budget, etc.).
+      security: may contain sensitive resource information.
+      system_usage:
+        - resource planning
+        - reporting
+      validation: Flexible structure (project -> resource mapping).
+    field_profile_code: CI-008
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - field_mutable_group
+    type: object
+    validation:
+      required: false

@@ -1,0 +1,443 @@
+schema_version: 2.0.0
+ontology: command_metric
+extends: base_metric
+visibility: public
+description: 'Command execution metrics tracking invocation timing, results, frequency, and failure statistics. Used for performance monitoring, timeout detection, and identifying improvement opportunities. '
+traits: []
+fields:
+  avg_duration_seconds:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation (metrics store)
+      automation_hooks: used for performance trend analysis.
+      cardinality: one
+      criticality: association
+      default: 0
+      dependencies: metrics collection and aggregation.
+      observability: "yes"
+      origin_lifecycle: mutable (updated on each execution)
+      purpose: Average execution duration in seconds.
+      security: non-sensitive
+      system_usage:
+        - performance reporting
+        - trend analysis
+      validation: Non-negative number (seconds).
+    field_profile_code: CMD-010
+    permissions: rwx
+    semantic_type: measurement
+    traits:
+      - readable
+      - writable
+      - filterable
+      - sortable
+    type: number
+    validation:
+      required: true
+  baseline_duration_seconds:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation (metrics store)
+      automation_hooks: used to calculate adaptive timeouts.
+      cardinality: one
+      criticality: association
+      default: 0
+      dependencies: metrics collection and aggregation.
+      observability: "yes"
+      origin_lifecycle: mutable (updated based on successful runs)
+      purpose: Baseline execution duration in seconds (used for timeout calculation).
+      security: non-sensitive
+      system_usage:
+        - timeout calculation
+        - performance baseline
+      validation: Non-negative number (seconds).
+    field_profile_code: CMD-007
+    permissions: rwx
+    semantic_type: measurement
+    traits:
+      - readable
+      - writable
+      - filterable
+      - sortable
+    type: number
+    validation:
+      required: true
+  command:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation (timeout hook)
+      automation_hooks: used for metrics aggregation and analysis.
+      cardinality: one
+      criticality: composition
+      default: auto-populated from execution
+      dependencies: command execution tracking.
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: The original command string as executed.
+      security: may contain sanitized sensitive data
+      system_usage:
+        - tracking
+        - reporting
+        - analysis
+      validation: Non-empty string, max 500 chars.
+    field_profile_code: CMD-001
+    permissions: r-x
+    semantic_type: statement
+    traits:
+      - listable
+      - readable
+      - writable
+      - filterable
+      - sortable
+      - searchable
+    type: string
+    validation:
+      max_length: 500
+      required: true
+  error_rate:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation (metrics store)
+      automation_hooks: used for identifying problematic commands.
+      cardinality: one
+      criticality: association
+      default: 0
+      dependencies: failure_count and invocation_count.
+      observability: "yes"
+      origin_lifecycle: mutable (calculated from failure_count / invocation_count)
+      purpose: Error rate as a percentage (0-100).
+      security: non-sensitive
+      system_usage:
+        - reliability reporting
+        - improvement identification
+      validation: Number between 0 and 100 (percentage).
+    field_profile_code: CMD-011
+    permissions: rwx
+    semantic_type: measurement
+    traits:
+      - readable
+      - writable
+      - filterable
+      - sortable
+    type: number
+    validation:
+      required: true
+  failure_count:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation (metrics store)
+      automation_hooks: used for error rate calculation and improvement suggestions.
+      cardinality: one
+      criticality: association
+      default: 0
+      dependencies: metrics collection system.
+      observability: "yes"
+      origin_lifecycle: mutable (incremented on failed execution)
+      purpose: Number of failed command executions.
+      security: non-sensitive
+      system_usage:
+        - reporting
+        - error analysis
+        - improvement identification
+      validation: Non-negative integer, <= invocation_count.
+    field_profile_code: CMD-005
+    permissions: rwx
+    semantic_type: measurement
+    traits:
+      - listable
+      - readable
+      - writable
+      - filterable
+      - sortable
+    type: integer
+    validation:
+      required: true
+  fastest_duration_seconds:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation (metrics store)
+      automation_hooks: used for performance benchmarking.
+      cardinality: one
+      criticality: association
+      default: 0
+      dependencies: metrics collection.
+      observability: "yes"
+      origin_lifecycle: mutable (updated when faster execution occurs)
+      purpose: Fastest execution duration in seconds.
+      security: non-sensitive
+      system_usage:
+        - performance analysis
+        - optimization targets
+      validation: Non-negative number (seconds).
+    field_profile_code: CMD-008
+    permissions: rwx
+    semantic_type: measurement
+    traits:
+      - readable
+      - writable
+      - filterable
+      - sortable
+    type: number
+    validation:
+      required: true
+  first_seen:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation (metrics store)
+      automation_hooks: used for temporal analysis.
+      cardinality: one
+      criticality: association
+      default: auto-populated on first execution
+      dependencies: metrics collection system.
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: ISO 8601 timestamp of first command execution (inherited from base_metric).
+      security: non-sensitive
+      system_usage:
+        - temporal analysis
+        - trend tracking
+      validation: ISO 8601 timestamp format.
+    field_profile_code: CMD-013
+    permissions: r-x
+    semantic_type: timestamp
+    traits:
+      - readable
+      - writable
+      - filterable
+      - sortable
+    type: string
+    validation:
+      pattern: ^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$
+      required: true
+  invocation_count:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation (metrics store)
+      automation_hooks: used for frequency analysis and churn detection.
+      cardinality: one
+      criticality: composition
+      default: 0
+      dependencies: metrics collection system.
+      observability: "yes"
+      origin_lifecycle: mutable (incremented on each execution)
+      purpose: Total number of times this command has been executed.
+      security: non-sensitive
+      system_usage:
+        - reporting
+        - analysis
+        - frequency tracking
+      validation: Non-negative integer.
+    field_profile_code: CMD-003
+    permissions: rwx
+    semantic_type: measurement
+    traits:
+      - listable
+      - readable
+      - writable
+      - filterable
+      - sortable
+    type: integer
+    validation:
+      required: true
+  last_seen:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation (metrics store)
+      automation_hooks: used for detecting stale commands.
+      cardinality: one
+      criticality: association
+      default: auto-populated on each execution
+      dependencies: metrics collection system.
+      observability: "yes"
+      origin_lifecycle: mutable (updated on each execution)
+      purpose: ISO 8601 timestamp of most recent command execution (inherited from base_metric).
+      security: non-sensitive
+      system_usage:
+        - temporal analysis
+        - staleness detection
+      validation: ISO 8601 timestamp format.
+    field_profile_code: CMD-014
+    permissions: rwx
+    semantic_type: timestamp
+    traits:
+      - readable
+      - writable
+      - filterable
+      - sortable
+    type: string
+    validation:
+      pattern: ^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$
+      required: true
+  normalized_cmd:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation (timeout hook)
+      automation_hooks: used for grouping similar commands.
+      cardinality: one
+      criticality: composition
+      default: auto-generated from command
+      dependencies: command normalization logic.
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: Normalized command string with variable data replaced (e.g., file paths, IDs).
+      security: sanitized (no sensitive data)
+      system_usage:
+        - grouping
+        - aggregation
+        - analysis
+      validation: Non-empty string, max 500 chars.
+    field_profile_code: CMD-002
+    permissions: r-x
+    semantic_type: statement
+    traits:
+      - listable
+      - readable
+      - writable
+      - filterable
+      - sortable
+      - searchable
+    type: string
+    validation:
+      max_length: 500
+      required: true
+  slowest_duration_seconds:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation (metrics store)
+      automation_hooks: used for performance analysis and outlier detection.
+      cardinality: one
+      criticality: association
+      default: 0
+      dependencies: metrics collection.
+      observability: "yes"
+      origin_lifecycle: mutable (updated when slower execution occurs)
+      purpose: Slowest execution duration in seconds.
+      security: non-sensitive
+      system_usage:
+        - performance analysis
+        - outlier detection
+      validation: Non-negative number (seconds).
+    field_profile_code: CMD-009
+    permissions: rwx
+    semantic_type: measurement
+    traits:
+      - readable
+      - writable
+      - filterable
+      - sortable
+    type: number
+    validation:
+      required: true
+  success_count:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation (metrics store)
+      automation_hooks: used for success rate calculation.
+      cardinality: one
+      criticality: association
+      default: 0
+      dependencies: metrics collection system.
+      observability: "yes"
+      origin_lifecycle: mutable (incremented on successful execution)
+      purpose: Number of successful command executions.
+      security: non-sensitive
+      system_usage:
+        - reporting
+        - reliability analysis
+      validation: Non-negative integer, <= invocation_count.
+    field_profile_code: CMD-004
+    permissions: rwx
+    semantic_type: measurement
+    traits:
+      - listable
+      - readable
+      - writable
+      - filterable
+      - sortable
+    type: integer
+    validation:
+      required: true
+  timeout_count:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation (timeout hook)
+      automation_hooks: used for timeout rate calculation and timeout threshold adjustment.
+      cardinality: one
+      criticality: association
+      default: 0
+      dependencies: timeout hook system.
+      observability: "yes"
+      origin_lifecycle: mutable (incremented on timeout)
+      purpose: Number of times this command timed out.
+      security: non-sensitive
+      system_usage:
+        - timeout analysis
+        - performance optimization
+      validation: Non-negative integer, <= invocation_count.
+    field_profile_code: CMD-006
+    permissions: rwx
+    semantic_type: measurement
+    traits:
+      - listable
+      - readable
+      - writable
+      - filterable
+      - sortable
+    type: integer
+    validation:
+      required: true
+  timeout_rate:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation (metrics store)
+      automation_hooks: used for identifying commands with timeout issues.
+      cardinality: one
+      criticality: association
+      default: 0
+      dependencies: timeout_count and invocation_count.
+      observability: "yes"
+      origin_lifecycle: mutable (calculated from timeout_count / invocation_count)
+      purpose: Timeout rate as a percentage (0-100).
+      security: non-sensitive
+      system_usage:
+        - timeout analysis
+        - performance optimization
+      validation: Number between 0 and 100 (percentage).
+    field_profile_code: CMD-012
+    permissions: rwx
+    semantic_type: measurement
+    traits:
+      - readable
+      - writable
+      - filterable
+      - sortable
+    type: number
+    validation:
+      required: true

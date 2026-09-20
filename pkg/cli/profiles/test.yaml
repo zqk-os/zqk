@@ -1,0 +1,18 @@
+# Test CLI profile — used by cmd/zqk/object tests (--context test) and setTestCLIContext.
+# Version: 1.0.0
+
+schema_version: "1.0.0"
+namespace_id: "zqk:kernel:cli"
+name: "test"
+extends: "base"
+description: |
+  Deterministic defaults for in-process and subprocess object command tests.
+  Table output matches assertions that look for bulk result summaries (Total:, Success:).
+
+spec:
+  format: "table"
+  verbose: false
+  quiet: true
+  flags:
+    format: "table"
+    quiet: true

@@ -1,0 +1,13 @@
+Clears priority_plan_ref from the specified backlog item.
+
+  Remove backlog item from plan
+  zqk pplan remove [REDACTED-ID] [REDACTED-ID]
+  Alternative positional syntax
+  zqk pplan [REDACTED-ID] remove [REDACTED-ID]
+
+Usage:
+  zqk object pplan remove [flags]
+
+Global Flags:
+      --allow-degraded   Allow scheduler-dependent commands to run when scheduler daemon is not running
+      --internal         Elevated access mode for built-in and internal kinds (requires Enterprise license or zqk-admin)

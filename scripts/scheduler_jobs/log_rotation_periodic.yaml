@@ -1,0 +1,4 @@
+job_type: log_rotation
+frequency: "24h"
+command: "zqk system rotate-logs"
+description: "Daily rotation and cleanup of log files in .zqk/logs/"

@@ -1,0 +1,13 @@
+kind: persona
+schema_version: "2.0.0"
+id: PER-COMMUNITY-SOFTWARE-ENGINEER
+title: Software Engineer
+role: software_engineer
+status: approved
+description: |
+  Core software engineering persona for cellular microkernel development. Responsible for
+  implementing features, writing deterministic TDD unit tests, refactoring code, and managing PRs.
+needs:
+  - Strict Test-Driven Development (TDD)
+  - Clean idiomatic code conforming to BaseObject primitives
+  - Zero linter warnings on all commits

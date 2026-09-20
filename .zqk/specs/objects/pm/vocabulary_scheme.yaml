@@ -1,0 +1,62 @@
+schema_version: 2.0.0
+ontology: vocabulary_scheme
+extends: base_object
+visibility: internal
+description: 'Names a vocabulary graph (taxonomy / lens network / navigation scheme) so typed edges\n(glossary_term_relation) can be scoped. Multiple schemes can coexist over the same glossary\nterms (e.g. inference predicates vs display groupings). purpose distinguishes machine\nbehavior surfaces from presentation-only groupings. Future SKOS/SHACL-style imports can map\nto schemes with purpose=extension. Lifecycle: vocabulary_scheme_lifecycle.yaml.\n'
+traits:
+  - base_object_traits
+fields:
+  allowed_kinds:
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+    type: list
+    validation:
+      required: false
+  context_scope:
+    default: ""
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - filterable
+      - groupable
+    type: string
+    validation:
+      required: true
+  machine_hints:
+    default: ""
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+    type: string
+    validation:
+      required: true
+  purpose:
+    default: mixed
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - filterable
+      - groupable
+    type: string
+    validation:
+      enum:
+        - inference
+        - display
+        - navigation
+        - mixed
+        - extension
+      required: true
+  summary:
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - searchable
+    type: string
+    validation:
+      required: false

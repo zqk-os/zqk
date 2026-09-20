@@ -1,0 +1,303 @@
+schema_version: 2.0.0
+ontology: criteria
+urn: urn:zqk:spec:project_mgmt:criteria
+namespace: zqk:project_mgmt
+extends: base_object
+visibility: public
+description: "Reusable, independently-trackable validation conditions. Parents own\
+  \ the edge via\ncriteria_refs (requirement, milestone, backlog_item, release, test_case).\
+  \ Do not\nstore reverse requirement_refs or milestone_refs on criteria \u2014 that\
+  \ cycles the graph.\nReverse lookup is the reference index (filter criteria_refs=<CRIT-id>).\n\
+  Lifecycle: criteria_lifecycle.yaml.\nTRACK: BLI-KERNEL-REF-GRAPH-ACYCLIC-001 / docs/architecture/GRAPH_EDGE_OWNERSHIP.md\n"
+traits:
+- base_object_traits
+- satisfiable
+- status_reactive
+fields:
+  category:
+    access:
+      requires: []
+    checklist:
+      authority: creator/owner.
+      automation_hooks: can be used for auto-tagging, filtering, and category-based
+        reporting.
+      cardinality: one
+      criticality: association
+      default: required - must be specified
+      dependencies: criteria-categories-v1.0.md for category definitions.
+      lifecycle: mutable.
+      observability: yes.
+      purpose: Type of criterion (functional, non-functional, acceptance, test, performance,
+        security, compliance). See criteria-categories-v1.0.md for definitions.
+      security: non-sensitive.
+      system_usage:
+      - filtering
+      - grouping
+      - reporting
+      - traceability
+      validation: enum (must be one of defined categories).
+    field_profile_code: CRT-001
+    permissions: rwx
+    semantic_type: statement
+    traits:
+    - listable
+    - readable
+    - writable
+    - modifiable
+    - groupable
+    - filterable
+    - sortable
+    - searchable
+    type: enum
+    validation:
+      enum:
+      - functional
+      - non-functional
+      - acceptance
+      - test
+      - performance
+      - security
+      - compliance
+      required: true
+  goal_refs:
+    access:
+      requires:
+      - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: used for goal validation.
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: goal registry.
+      lifecycle: mutable.
+      observability: yes.
+      purpose: "Membership edge (child\u2192parent). Goal has no criteria_refs reverse.\n\
+        checklist.criticality is not the graph role \u2014 edge_role is membership.\n"
+      security: non-sensitive.
+      system_usage:
+      - traceability
+      - validation
+      validation: must reference existing goal IDs.
+    field_profile_code: CRT-006
+    permissions: r-x
+    semantic_type: reference
+    edge_role: membership
+    traits:
+      - field_mutable_group
+      - field_reference_group
+    type: list
+    validation:
+      required: false
+  priority:
+    access:
+      requires:
+      - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: used for validation prioritization.
+      cardinality: one
+      criticality: association
+      default: null
+      dependencies: validation workflow.
+      lifecycle: mutable.
+      observability: yes.
+      purpose: Priority level (critical, high, medium, low) for validation ordering.
+      security: non-sensitive.
+      system_usage:
+      - prioritization
+      - validation ordering
+      validation: enum (critical, high, medium, low).
+    field_profile_code: CRT-009
+    permissions: rwx
+    semantic_type: statement
+    traits:
+    - filterable
+    - groupable
+    - listable
+    - modifiable
+    - readable
+    - searchable
+    - sortable
+    - writable
+    type: enum
+    validation:
+      enum:
+      - critical
+      - high
+      - medium
+      - low
+      required: false
+  status:
+    access:
+      requires:
+      - access:confidential
+    checklist:
+      authority: validator/owner.
+      automation_hooks: triggers validation workflows.
+      cardinality: one
+      criticality: composition
+      default: awaiting_verification
+      dependencies: validation workflow.
+      lifecycle: mutable.
+      observability: yes.
+      purpose: Validation status of the criterion.
+      security: non-sensitive.
+      system_usage:
+      - lifecycle
+      - reporting
+      validation: enum.
+    field_profile_code: CRT-004
+    permissions: rwx
+    semantic_type: statement
+    traits:
+    - filterable
+    - groupable
+    - listable
+    - modifiable
+    - readable
+    - searchable
+    - sortable
+    - writable
+    type: enum
+    validation:
+      enum:
+      - awaiting_verification
+      - in_progress
+      - validated
+      - complete
+      - blocked
+      - rejected
+      - archived
+      required: true
+  validation_method:
+    access:
+      requires:
+      - access:confidential
+    checklist:
+      authority: creator/owner.
+      automation_hooks: determines auto-transition behavior.
+      cardinality: one
+      criticality: composition
+      default: manual_check
+      dependencies: validation_threshold required for metric_threshold method.
+      lifecycle: mutable (but changing may invalidate evidence).
+      observability: yes.
+      purpose: How the criterion is validated (manual_check, automated_test, metric_threshold,
+        code_review, external_approval).
+      security: non-sensitive.
+      system_usage:
+      - lifecycle
+      - automation
+      - reporting
+      validation: enum.
+    field_profile_code: CRT-002
+    permissions: rwx
+    semantic_type: statement
+    traits:
+    - readable
+    - writable
+    - modifiable
+    type: enum
+    validation:
+      enum:
+      - manual_check
+      - automated_test
+      - metric_threshold
+      - code_review
+      - external_approval
+      required: false
+  validation_threshold:
+    access:
+      requires:
+      - access:confidential
+    checklist:
+      authority: creator/owner.
+      automation_hooks: used for automated validation checks.
+      cardinality: zero_or_one
+      criticality: composition
+      default: null
+      dependencies: validation_method must be "metric_threshold".
+      lifecycle: mutable.
+      observability: yes.
+      purpose: Target value for metric-based validation (e.g., \"80%\", \"100ms\",
+        \"0 errors\").
+      security: non-sensitive.
+      system_usage:
+      - automation
+      - reporting
+      validation: Free-form string describing threshold.
+    field_profile_code: CRT-003
+    permissions: rwx
+    semantic_type: expression
+    traits:
+    - field_mutable_group
+    type: string
+    validation:
+      required: false
+  description:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: creator/owner.
+      automation_hooks: used in verification reports, requirement linkage, and test assertions.
+      cardinality: one
+      criticality: composition
+      default: null
+      dependencies: verification pipeline, requirement traceability.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Detailed explanation of the criteria and verifiable acceptance conditions.
+      security: non-sensitive
+      system_usage:
+        - verification
+        - documentation
+        - planning
+      validation: free text or markdown.
+    field_profile_code: CRT-005
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - field_mutable_group
+      - readable
+      - writable
+      - modifiable
+    type: text
+    validation:
+      required: false
+  evidence:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: validator/owner.
+      automation_hooks: records proof of criterion verification.
+      cardinality: zero_or_one
+      criticality: composition
+      default: null
+      dependencies: verification pipeline.
+      lifecycle: mutable.
+      observability: yes.
+      purpose: Verification evidence, commit hash, or log proof confirming criterion fulfillment.
+      security: non-sensitive.
+      system_usage:
+        - verification
+        - traceability
+        - reporting
+      validation: Free text or map describing verification proof.
+    field_profile_code: CRT-010
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - field_mutable_group
+      - readable
+      - writable
+      - modifiable
+    type: string
+    validation:
+      required: false
+created_at: 2026-07-01 18:00:00+00:00
+updated_at: 2026-07-01 18:00:00+00:00
+created_by: ACC-1785920548450214012-68b850c0
+updated_by: ACC-1785920548450214012-68b850c0

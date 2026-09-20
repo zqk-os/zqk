@@ -1,0 +1,86 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://zqk.dev/schemas/namespaces_config.schema.json",
+  "title": "Namespaces Configuration Schema",
+  "description": "Schema for namespace configuration that defines namespace layers, validation patterns, and kind mappings",
+  "type": "object",
+  "required": ["default_namespace", "namespace_layers", "namespace_validation_pattern", "system_origin", "project_origin", "inference_rules", "namespaces"],
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "Reference to this schema file"
+    },
+    "description": {
+      "type": "string",
+      "description": "Human-readable description of this configuration"
+    },
+    "default_namespace": {
+      "type": "string",
+      "pattern": "^(zqk|domain|integration):[a-z0-9_]+(:[a-z0-9_]+)*$",
+      "description": "Default namespace identifier"
+    },
+    "namespace_layers": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": ["zqk", "domain", "integration"]
+      },
+      "minItems": 1,
+      "description": "List of namespace layers in order"
+    },
+    "namespace_validation_pattern": {
+      "type": "string",
+      "description": "Regex pattern for validating namespace identifiers"
+    },
+    "system_origin": {
+      "type": "string",
+      "description": "System origin identifier"
+    },
+    "project_origin": {
+      "type": "string",
+      "description": "Project origin identifier"
+    },
+    "inference_rules": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "namespace": {
+            "type": "string"
+          },
+          "pattern": {
+            "type": "string"
+          },
+          "example": {
+            "type": "string"
+          },
+          "namespace_template": {
+            "type": "string"
+          }
+        }
+      },
+      "description": "Rules for inferring namespaces from kind names"
+    },
+    "namespaces": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["description", "kinds"],
+        "properties": {
+          "description": {
+            "type": "string"
+          },
+          "kinds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "description": "Namespace definitions with their associated kinds"
+    }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,274 @@
+schema_version: 2.0.0
+ontology: decision
+extends: base_object
+visibility: public
+description: 'Decisions capture governance choices, linking goals, requirements, rules, and workstreams. Architecture Decision Records (ADRs) use the ADR-XXX format, while other decisions use DEC-XXX.\nLifecycle: decision_lifecycle.yaml.\n'
+traits:
+  - base_object_traits
+fields:
+  decision_refs:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner/executive.
+      automation_hooks: used for decision dependency graphs.
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: decision registry.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: References to related or dependent decisions.
+      security: non-sensitive
+      system_usage:
+        - traceability
+        - dependency tracking
+      validation: must reference existing decision IDs.
+    field_profile_code: DEC-007
+    permissions: r-x
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+      - field_reference_group
+    type: list
+    validation:
+      required: false
+  goal_refs:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner/executive.
+      automation_hooks: used for goal impact analysis.
+      cardinality: many
+      criticality: composition
+      default: []
+      dependencies: goal registry.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Goals impacted by this decision.
+      security: non-sensitive
+      system_usage:
+        - traceability
+      validation: must reference existing goal IDs.
+    field_profile_code: DEC-003
+    permissions: r-x
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+      - field_reference_group
+    type: list
+    validation:
+      required: false
+  id:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation (Generator)
+      automation_hooks: used for cross-file references.
+      cardinality: one
+      criticality: composition
+      default: auto-assigned per kind sequence
+      dependencies: linkage constraints, URN creation.
+      observability: logged + manifests.
+      origin_lifecycle: immutable
+      purpose: Stable identifier for decision objects (DEC-### or ADR-### format). ADR-### format is used for Architecture Decision Records.
+      security: non-sensitive
+      system_usage:
+        - linking
+        - reporting
+        - URIs
+      validation: regex ^(DEC|ADR)-\\\\d{3,}$; uniqueness enforced.
+    field_profile_code: DEC-000
+    permissions: r-x
+    semantic_type: statement
+    traits:
+      - filterable
+      - listable
+      - readable
+      - searchable
+      - sortable
+      - writable
+    type: string
+    validation:
+      pattern: ^(DEC|ADR)-\d{3,}$
+      required: true
+  impact:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner/executive
+      automation_hooks: used for release notes.
+      cardinality: one
+      criticality: composition
+      default: null
+      dependencies: goal/requirement summaries.
+      observability: "yes"
+      origin_lifecycle: mutable (through revisions)
+      purpose: Summarize downstream effects/outcomes of the decision.
+      security: may contain sensitive discussion; treat as confidential.
+      system_usage:
+        - reporting
+        - goal dashboards
+      validation: markdown allowed.
+    field_profile_code: DEC-001
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+      - modifiable
+      - searchable
+    type: text
+    validation:
+      required: false
+  impact_level:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner/executive.
+      automation_hooks: highlight critical decisions.
+      cardinality: one
+      criticality: association
+      default: primary
+      dependencies: goal dashboards.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Strength of goal linkage (\\\"primary\\\", \\\"secondary\\\", \\\"observed\\\").
+      security: non-sensitive
+      system_usage:
+        - reporting
+        - goal dashboards
+      validation: enum (\\\"primary\\\", \\\"secondary\\\", \\\"observed\\\").
+    field_profile_code: DEC-008
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - filterable
+      - groupable
+      - modifiable
+      - readable
+      - sortable
+      - writable
+    type: enum
+    validation:
+      enum:
+        - primary
+        - secondary
+        - observed
+      required: false
+  milestone_refs:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner/executive.
+      automation_hooks: used for milestone impact analysis.
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: milestone registry.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Milestones impacted by this decision.
+      security: non-sensitive
+      system_usage:
+        - traceability
+      validation: must reference existing milestone IDs.
+    field_profile_code: DEC-006
+    permissions: r-x
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+      - field_reference_group
+    type: list
+    validation:
+      required: false
+  requirement_refs:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner/executive.
+      automation_hooks: used for requirement impact analysis.
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: requirement registry.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Requirements impacted by this decision.
+      security: non-sensitive
+      system_usage:
+        - traceability
+      validation: must reference existing requirement IDs.
+    field_profile_code: DEC-004
+    permissions: r-x
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+      - field_reference_group
+    type: list
+    validation:
+      required: false
+  revisit:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner/executive.
+      automation_hooks: schedule follow-up tasks.
+      cardinality: zero_or_one
+      criticality: association
+      default: null
+      dependencies: scheduler triggers.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: When to revisit/reassess the decision.
+      security: non-sensitive
+      system_usage:
+        - scheduler
+        - reminders
+      validation: ISO-8601.
+    field_profile_code: DEC-002
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+      - modifiable
+    type: string
+    validation:
+      pattern: ^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}:\d{2}Z)?$
+      required: false
+  workstream_refs:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner/executive.
+      automation_hooks: used for workstream impact analysis.
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: workstream registry.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Workstreams impacted by this decision.
+      security: non-sensitive
+      system_usage:
+        - traceability
+      validation: must reference existing workstream IDs.
+    field_profile_code: DEC-005
+    permissions: r-x
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+      - field_reference_group
+    type: list
+    validation:
+      required: false

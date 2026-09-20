@@ -1,0 +1,28 @@
+$schema: "../schemas/command_spec.schema.json"
+
+name: "evaluate-run"
+short: "Evaluate a completed prompt run"
+description: |
+  Validates artifacts against lifecycle and mandatory constraints after an
+  agent run. Reads the change journal and system state and emits an audit event.
+
+flags:
+  - name: "session-id"
+    type: "string"
+    default: ""
+    description: "ID of the session to evaluate"
+
+args:
+  type: "no_args"
+
+help:
+  examples:
+    - comment: "Evaluate a convergence session run"
+      command: "%s agent evaluate-run --session-id <session-id>"
+    - comment: "JSON evaluation payload"
+      command: "%s agent evaluate-run --session-id <session-id> --format json"
+  exclude_flags:
+    - "columns"
+    - "ignore-scheduler-down"
+
+common_flags: true

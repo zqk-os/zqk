@@ -1,0 +1,154 @@
+schema_version: 2.0.0
+ontology: team
+extends: extensible_object
+visibility: public
+description: 'Organizational team within a division or department. Teams contain members (accounts) and can be associated with zqk kernel workstreams. '
+traits:
+  - base_object_traits
+fields:
+  department_ref:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner
+      automation_hooks: used for organizational hierarchy navigation
+      cardinality: zero_or_one
+      criticality: association
+      default: null
+      dependencies: department registry
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Reference to the department this team belongs to (optional if team belongs directly to division)
+      security: non-sensitive
+      system_usage:
+        - organizational hierarchy
+        - navigation
+        - reporting
+      validation: Must reference existing department object ID using domain:organizational:department:{id} format, or null
+    field_profile_code: TEAM-003
+    permissions: rwx
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+      - field_reference_group
+    type: reference
+    validation:
+      required: false
+  division_ref:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner
+      automation_hooks: used for organizational hierarchy navigation
+      cardinality: zero_or_one
+      criticality: association
+      default: null
+      dependencies: division registry
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Reference to the division this team belongs to (optional if team belongs to department)
+      security: non-sensitive
+      system_usage:
+        - organizational hierarchy
+        - navigation
+        - reporting
+      validation: Must reference existing division object ID using domain:organizational:division:{id} format, or null
+    field_profile_code: TEAM-002
+    permissions: rwx
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+      - field_reference_group
+    type: reference
+    validation:
+      required: false
+  member_refs:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner
+      automation_hooks: used for team membership tracking and permissions
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: account registry
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: References to accounts that are members of this team
+      security: may contain PII—treat as confidential
+      system_usage:
+        - team membership
+        - permissions
+        - reporting
+      validation: Must reference existing account object IDs using account:{id} format
+    field_profile_code: TEAM-004
+    permissions: rwx
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+    type: list
+    validation:
+      required: false
+  team_name:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner
+      automation_hooks: used for display and identification
+      cardinality: one
+      criticality: composition
+      default: null
+      dependencies: none
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: The name of the team
+      security: non-sensitive
+      system_usage:
+        - display
+        - identification
+        - search
+      validation: Must be a non-empty string
+    field_profile_code: TEAM-001
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - filterable
+      - modifiable
+      - readable
+      - searchable
+      - writable
+    type: string
+    validation:
+      required: true
+  workstream_refs:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner
+      automation_hooks: used for workstream-team relationship tracking
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: workstream registry
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: References to zqk kernel workstreams that this team is working on
+      security: non-sensitive
+      system_usage:
+        - workstream tracking
+        - team workload
+      validation: Must reference existing workstream object IDs using zqk:kernel:workstream:{id} format
+    field_profile_code: TEAM-005
+    permissions: rwx
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+      - field_reference_group
+    type: list
+    validation:
+      required: false

@@ -1,0 +1,53 @@
+$schema: "../schemas/command_spec.schema.json"
+
+name: "resource-hygiene"
+short: "Inspect and enforce I/O resource hygiene, file retention, stale lock reaping, and temp artifact cleanup"
+description: |
+  Inspects and enforces system-wide I/O resource hygiene across .zqk directories.
+  Measures open file descriptors against process limits, inspects storage volume
+  breakdown, sweeps stale lock files without active holders, reaps abandoned
+  temporary files (*.tmp, *.tmp-*, .tmp-*), and enforces retention policies on logs.
+
+args:
+  type: "exact"
+  count: 0
+
+flags:
+  - name: "dry-run"
+    type: "bool"
+    default: false
+    description: "Scan and report hygiene issues without modifying or deleting files"
+  - name: "reap-locks"
+    type: "bool"
+    default: true
+    description: "Reap stale .lock files whose holding processes are dead"
+  - name: "reap-temp"
+    type: "bool"
+    default: true
+    description: "Reap orphaned temporary files older than the threshold"
+  - name: "enforce-retention"
+    type: "bool"
+    default: true
+    description: "Prune or truncate logs older than max-age or larger than max-size"
+  - name: "lock-threshold"
+    type: "string"
+    default: "15m"
+    description: "Threshold duration for stale locks (e.g. 15m, 1h)"
+  - name: "temp-threshold"
+    type: "string"
+    default: "30m"
+    description: "Threshold duration for orphaned temp files (e.g. 30m, 2h)"
+
+help:
+  examples:
+    - comment: "Inspect and enforce all hygiene rules"
+      command: "%s system resource-hygiene"
+    - comment: "Dry-run scan without deleting files"
+      command: "%s system resource-hygiene --dry-run"
+    - comment: "Reap only orphaned temporary files older than 1 hour"
+      command: "%s system resource-hygiene --reap-locks=false --enforce-retention=false --temp-threshold 1h"
+    - comment: "JSON output for automation and telemetry integration"
+      command: "%s system resource-hygiene --format json"
+
+run_e: "runResourceHygiene"
+common_flags: true

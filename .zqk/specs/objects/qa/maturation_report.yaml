@@ -1,0 +1,65 @@
+schema_version: 2.0.0
+ontology: maturation_report
+extends: base_object
+visibility: public
+description: Persistent record of a component's fitness and maturation progress.
+  Evaluates whether shadow actions lead to better outcomes than mainline.
+id_prefixes:
+  - MAT-
+traits: []
+fields:
+  component_id:
+    access:
+      requires:
+        - access:confidential
+    permissions: rwx
+    semantic_type: reference
+    traits:
+      - readable
+      - writable
+      - filterable
+    type: string
+    validation:
+      required: true
+  fitness_score:
+    access:
+      requires:
+        - access:confidential
+    permissions: rwx
+    semantic_type: expression
+    traits:
+      - readable
+      - writable
+      - sortable
+    type: float
+    validation:
+      required: true
+  graduation_status:
+    access:
+      requires:
+        - access:confidential
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+      - filterable
+    type: enum
+    validation:
+      enum:
+        - maturation
+        - ready
+        - promoted
+      required: true
+  observation_duration:
+    access:
+      requires:
+        - access:confidential
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+    type: string
+    validation:
+      required: true

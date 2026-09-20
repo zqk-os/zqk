@@ -1,0 +1,150 @@
+$schema: ../../../.zqk/cli/specs/schemas/lifecycle_spec.schema.json
+object_type: technical_debt
+statuses:
+  - value: conceptual
+    display: Conceptual
+    origin: true
+    preliminary: true
+    description: Draft plane status. Prior to CAS membrane crossing.
+    role: realign
+  - value: originated
+    display: Originated
+    description: CAS membrane crossed. Object officially originated.
+    role: realign
+  - value: identified
+    display: Identified
+    origin: false
+    preliminary: false
+    description: Technical debt has been identified but not yet planned
+    role: realign
+  - value: planned
+    display: Planned
+    description: Technical debt has been analyzed and a resolution plan created
+    role: shovel_ready
+  - value: in_progress
+    display: In Progress
+    description: Work to resolve the technical debt is actively in progress
+    role: execution_locked
+  - value: verifying
+    display: Verifying
+    description: Resolution work is complete and being verified
+    role: realign
+  - value: resolved
+    display: Resolved
+    terminal: true
+    work_done: true
+    description: Technical debt has been resolved and verified
+    role: terminal
+  - value: deferred
+    display: Deferred
+    description: Technical debt resolution has been deferred to a later date
+    role: realign
+  - value: archived
+    display: Archived
+    terminal: true
+    archive: true
+    description: Technical debt item has been archived
+    role: terminal
+  - value: error
+    display: Error
+    system: true
+    description: Technical debt item encountered an error during processing
+    role: halted
+transitions:
+  - from: conceptual
+    to: originated
+    description: Promote from draft plane to CAS membrane (CAS Qualification).
+    manual: true
+    auto: false
+    catalyst: System promotion
+  - from: originated
+    to: identified
+    description: Initial domain workflow transition to identified.
+    manual: true
+    auto: true
+    catalyst: System initialization
+  - from: identified
+    to: planned
+    description: Plan resolution for identified technical debt
+    manual: true
+    auto: false
+    postconditions:
+      - role is shovel_ready
+  - from: planned
+    to: in_progress
+    description: Begin work on planned technical debt
+    manual: true
+    auto: false
+    postconditions:
+      - role is execution_locked
+  - from: in_progress
+    to: verifying
+    description: Mark resolution work as complete and ready for verification
+    manual: true
+    auto: false
+    postconditions:
+      - role is realign
+  - from: verifying
+    to: resolved
+    description: Verify that technical debt has been resolved
+    manual: true
+    auto: false
+    postconditions:
+      - role is terminal
+  - from: identified
+    to: deferred
+    description: Defer resolution to a later date
+    manual: true
+    auto: false
+    postconditions:
+      - role is realign
+  - from: planned
+    to: deferred
+    description: Defer resolution to a later date
+    manual: true
+    auto: false
+    postconditions:
+      - role is realign
+  - from: deferred
+    to: planned
+    description: Resume work on deferred technical debt
+    manual: true
+    auto: false
+    postconditions:
+      - role is shovel_ready
+  - from: '*'
+    to: archived
+    description: Archive technical debt from any status
+    manual: true
+    auto: false
+    postconditions:
+      - role is terminal
+      - hop from any occupancy to archived
+      - ended; no further normal execution hops expected
+  - from: '*'
+    to: error
+    description: System error occurred
+    manual: false
+    auto: true
+    postconditions:
+      - role is halted
+      - hop from any occupancy to error
+      - system halt; repair before leaving halted
+percent_complete:
+  method: status_defaults
+  default_by_status:
+    conceptual: 0
+    originated: 5
+    archived: 100
+    deferred: 0
+    error: 0
+    identified: 20
+    in_progress: 50
+    planned: 25
+    resolved: 100
+    verifying: 75
+created_at: 2026-07-01 18:00:00+00:00
+updated_at: 2026-07-01 18:00:00+00:00
+created_by: ACC-1785920548450214012-68b850c0
+updated_by: ACC-1785920548450214012-68b850c0
+target_resolution_date: 2026-07-01

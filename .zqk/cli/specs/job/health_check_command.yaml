@@ -1,0 +1,35 @@
+$schema: "../schemas/command_spec.schema.json"
+
+name: "health-check"
+short: "Check scheduler daemon health (external health check)"
+description: |
+  Check if the scheduler daemon is running and healthy.
+  
+  This command runs externally (not inside the scheduler daemon) and can be used
+  by monitoring systems, cron jobs, or other external tools to detect if the
+  scheduler daemon is down.
+  
+  Exit codes:
+    0 - Scheduler is healthy (running and responsive)
+    1 - Scheduler is unhealthy (down but should be running, or keep-alive is stale)
+    2 - Error checking scheduler status
+  
+  This command checks:
+    - PID file exists and process is running
+    - Keep-alive file is fresh (updated within last 2 minutes)
+    - If enabled timer jobs exist, daemon must be running
+
+help:
+  examples:
+    - comment: "Check scheduler health"
+      command: "%s scheduler health-check"
+  exclude_flags:
+    - "format"
+    - "output"
+    - "verbose"
+    - "quiet"
+    - "timeout"
+    - "columns"
+
+run_e: "runHealthCheck"
+common_flags: false

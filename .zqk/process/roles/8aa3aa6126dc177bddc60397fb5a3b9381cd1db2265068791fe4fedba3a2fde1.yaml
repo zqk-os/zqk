@@ -1,0 +1,13 @@
+created_at: "2026-06-14T22:54:34Z"
+created_by: ACC-1785920548450214012-68b850c0
+description: Specializes in identifying, isolating, and resolving complex concurrency bugs, deadlocks, and performance bottlenecks.
+id: ROL-1781477674945678000-e080b9f0
+kind: role
+namespace_id: zqk:kernel
+role_id: required
+schema_version: 2.0.0
+status: active
+title: Deadlock Investigator
+updated_at: "2026-08-05T09:36:54Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

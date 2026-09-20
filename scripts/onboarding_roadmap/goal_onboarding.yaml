@@ -1,0 +1,10 @@
+kind: goal
+schema_version: "2.0.0"
+# id omitted - system assigns. After creating workstream and backlog items, set workstream_refs and backlog_item_refs.
+title: Onboard agents and users to the project
+description: |
+  Goal: every new agent or user completes the onboarding curriculum (priority plan PRIO-onboarding)
+  and receives a certificate before engaging in project work. Tracked per account.
+status: active
+workstream_refs: []   # Set to [<WS-ID>] after workstream create
+backlog_item_refs: [] # Set to [BLI-1, BLI-2, BLI-3] after backlog items create

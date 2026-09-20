@@ -1,0 +1,24 @@
+$schema: "../schemas/command_spec.schema.json"
+
+name: "status"
+short: "Report the status of the ambient EventHub"
+description: |
+  Reports in-process EventHub status for the ambient nervous system.
+
+flags: []
+
+args:
+  type: "no_args"
+
+help:
+  examples:
+    - comment: "Ambient EventHub status (JSON)"
+      command: "%s ambient status --format json"
+    - comment: "Human-readable status"
+      command: "%s ambient status"
+  exclude_flags:
+    - "columns"
+    - "ignore-scheduler-down"
+
+run_e: "runStatus"
+common_flags: true

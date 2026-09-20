@@ -1,0 +1,134 @@
+schema_version: 2.0.0
+ontology: team_configuration
+extends: base_object
+visibility: public
+description: Defines a Team Configuration (or Cell archetype) to support the biological swarm architecture\n(Neuron, Muscle, Heart, Lungs). Instead of spinning up every active persona, the CAP Loop \nreferences a Team Configuration to spin up a tailored composition of Personas for a specific Priority Plan or Goal.\n
+traits:
+  - base_object_traits
+  - constrainable
+fields:
+  cell_type:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner
+      automation_hooks: Used by the orchestrator to determine the operational mode of the pod.
+      cardinality: one
+      criticality: metadata
+      default: muscle
+      dependencies: none
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: The biological cell archetype (e.g., neuron, muscle, heart, lungs).
+      security: non-sensitive
+      system_usage:
+        - provisioning
+        - telemetry
+      validation: Must be one of neuron, muscle, heart, lungs
+    field_profile_code: TCFG-001
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - filterable
+      - groupable
+      - modifiable
+      - readable
+      - searchable
+      - writable
+    type: string
+    validation:
+      required: true
+  focus_area:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner
+      automation_hooks: Used to align the team to organizational divisions.
+      cardinality: one
+      criticality: metadata
+      default: engineering
+      dependencies: none
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: The strategic focus of the team (e.g., marketing, strategic, architecture).
+      security: non-sensitive
+      system_usage:
+        - reporting
+      validation: Must be a non-empty string.
+    field_profile_code: TCFG-002
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - filterable
+      - groupable
+      - modifiable
+      - readable
+      - searchable
+      - writable
+    type: string
+    validation:
+      required: true
+  id:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation (Generator)
+      automation_hooks: used for cross-file references.
+      cardinality: one
+      criticality: composition
+      default: auto-assigned per kind sequence
+      dependencies: linkage constraints, URN creation.
+      observability: logged + manifests.
+      origin_lifecycle: immutable
+      purpose: Stable identifier.
+      security: non-sensitive
+      system_usage:
+        - linking
+        - reporting
+      validation: Must start with TCFG-
+    field_profile_code: TCFG-000
+    permissions: r-x
+    semantic_type: statement
+    traits:
+      - filterable
+      - groupable
+      - listable
+      - modifiable
+      - readable
+      - searchable
+      - sortable
+    type: string
+    validation:
+      required: true
+  persona_allocations:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner
+      automation_hooks: Used by Sub-Kernel Provisioner to spawn concurrent workers.
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: persona registry
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: List of personas that comprise this team and their counts.
+      security: non-sensitive
+      system_usage:
+        - provisioning
+        - concurrency mapping
+      validation: Must map persona references to required instances
+    field_profile_code: TCFG-003
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+      - modifiable
+    type: list
+    validation:
+      required: false

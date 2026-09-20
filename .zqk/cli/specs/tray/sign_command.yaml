@@ -1,0 +1,29 @@
+$schema: "../schemas/command_spec.schema.json"
+
+name: "sign <name>"
+short: "Cryptographically sign a tray entry in .zqk/tray.yaml"
+description: |
+  Signs an entry in the local project tray manifest (.zqk/tray.yaml) with an ECDSA private key.
+  Cryptographic attestation is required for tray entries that contain privileged flags (--override,
+  --force, --clear-cache, --internal) or destructive verbs (object delete, system shutdown, etc.).
+  The signature covers the canonical JSON encoding of the entry name and arguments.
+
+args:
+  type: "exact"
+  count: 1
+
+flags:
+  - name: "key-path"
+    type: "string"
+    default: ""
+    description: "Path to private key (defaults to .zqk/keystore/auditor.priv)"
+
+help:
+  examples:
+    - comment: "Sign a tray shortcut using the project auditor key"
+      command: "%s tray sign backlog"
+    - comment: "Sign with a custom private key"
+      command: "%s tray sign custom-task --key-path ./keys/custom.priv"
+
+run_e: "runSign"
+common_flags: true

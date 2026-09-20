@@ -1,0 +1,126 @@
+schema_version: 2.0.0
+ontology: extensible_object
+extends: base_object
+visibility: internal
+description: 'Base spec for external domain objects that integrate with Workstream OS. External domains must define their own specs that extend this base. By extending base_object, external domain objects automatically inherit: - All base object traits (listable, readable, searchable, filterable, etc.) - Base object fields (id, title, kind, status, schema_version, etc.) - Base object validation rules Domain-specific traits (like constrainable for components) are declared in the domain''s own spec. '
+traits: []
+fields:
+  domain:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: system
+      automation_hooks: used for domain-specific routing
+      cardinality: one
+      criticality: composition
+      default: null
+      dependencies: domain registry
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: Identifies the external domain this object belongs to
+      security: non-sensitive
+      system_usage:
+        - routing
+        - validation
+        - querying
+      validation: Must be a registered domain
+    field_profile_code: EXT-001
+    permissions: r-x
+    semantic_type: identifier
+    traits:
+      - field_reference_group
+    type: string
+    validation:
+      enum:
+        - visualization
+        - ui
+        - api
+        - integration
+        - custom
+      required: true
+  lifecycle_file:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: system
+      automation_hooks: used for lifecycle loading
+      cardinality: one
+      criticality: association
+      default: ""
+      dependencies: lifecycle system
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: Explicit reference to lifecycle definition file (optional - defaults to naming convention)
+      security: non-sensitive
+      system_usage:
+        - lifecycle loading
+        - validation
+      validation: Must reference valid lifecycle file if provided
+    field_profile_code: EXT-004
+    permissions: r-x
+    semantic_type: reference
+    traits:
+      - readable
+    type: string
+    validation:
+      pattern: ^\.zqk/specs/lifecycles/.*\.yaml$
+      required: false
+  spec_context_broker:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: system
+      automation_hooks: routes to correct broker
+      cardinality: one
+      criticality: composition
+      default: null
+      dependencies: context broker registry
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: Identifier for the context broker that provides domain context
+      security: non-sensitive
+      system_usage:
+        - context resolution
+        - relationship resolution
+      validation: Must be a registered context broker
+    field_profile_code: EXT-003
+    permissions: r-x
+    semantic_type: identifier
+    traits:
+      - field_read_only_group
+    type: string
+    validation:
+      pattern: ^[a-z_]+$
+      required: true
+  spec_interpreter:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: system
+      automation_hooks: routes to correct interpreter
+      cardinality: one
+      criticality: composition
+      default: null
+      dependencies: spec interpreter registry
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: Identifier for the spec interpreter that handles this domain
+      security: non-sensitive
+      system_usage:
+        - spec loading
+        - validation
+        - querying
+      validation: Must be a registered spec interpreter
+    field_profile_code: EXT-002
+    permissions: r-x
+    semantic_type: identifier
+    traits:
+      - readable
+    type: string
+    validation:
+      pattern: ^[a-z_]+$
+      required: true

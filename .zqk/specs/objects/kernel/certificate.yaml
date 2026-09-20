@@ -1,0 +1,195 @@
+schema_version: 2.0.0
+ontology: certificate
+extends: base_object
+visibility: internal
+description: 'Represents a completion certificate issued to an account after fulfilling a scope (e.g. onboarding).\nAlpha: payload is a public-key encrypted or signed message; issuer uses instance-specific or shared CA.\nIntended for tutorial completion: user completes curriculum, data is cleaned up, certificate is issued;\nwith the certificate the holder can log in to the CLI and participate. Instance-specific CAs ensure\ncerts from one instance are not valid for others where scope differs (e.g. software tester onboarding).\n'
+traits:
+  - base_object_traits
+  - manipulatable
+fields:
+  credential_type:
+    checklist:
+      authority: automation
+      automation_hooks: set when certificate is issued
+      cardinality: one
+      criticality: association
+      default: signed_payload
+      dependencies: CA/signing implementation
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: Type of credential (signed_payload, encrypted_payload). Alpha uses self-signed CA; later may use instance-specific CA.
+      security: non-sensitive
+      system_usage:
+        - verification
+      validation: enum
+    field_profile_code: CERT-003
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+      - filterable
+    type: string
+    validation:
+      enum:
+        - signed_payload
+        - encrypted_payload
+      required: false
+  expires_at:
+    checklist:
+      authority: automation/certification policy
+      automation_hooks: set at issue time from policy
+      cardinality: zero_or_one
+      criticality: association
+      default: null
+      dependencies: certification policy
+      observability: "yes"
+      origin_lifecycle: mutable (renewal may extend)
+      purpose: ISO-8601 datetime when the certificate expires (null = no expiry for alpha)
+      security: non-sensitive
+      system_usage:
+        - access control
+        - renewal
+      validation: ISO-8601 datetime
+    field_profile_code: CERT-005
+    permissions: rwx
+    semantic_type: timestamp
+    traits:
+      - readable
+      - writable
+      - filterable
+      - sortable
+    type: string
+    validation:
+      pattern: ^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$
+      required: false
+  holder_ref:
+    checklist:
+      authority: automation/certification service
+      automation_hooks: set when certificate is issued
+      cardinality: one
+      criticality: composition
+      default: null
+      dependencies: account registry
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: Account that completed the scope and holds this certificate (e.g. account:developer)
+      security: non-sensitive
+      system_usage:
+        - authentication
+        - access control
+      validation: Must match account ID pattern
+    field_profile_code: CERT-001
+    permissions: rwx
+    semantic_type: reference
+    traits:
+      - field_reference_group
+      - writable
+    type: string
+    validation:
+      pattern: ^(account:[a-z0-9._-]+|ACC-[A-Za-z0-9-]+)$
+      required: true
+  issued_at:
+    checklist:
+      authority: automation
+      automation_hooks: set at issue time
+      cardinality: one
+      criticality: composition
+      default: null
+      dependencies: system clock
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: ISO-8601 datetime when the certificate was issued
+      security: non-sensitive
+      system_usage:
+        - audit
+        - expiration logic
+      validation: ISO-8601 datetime
+    field_profile_code: CERT-004
+    permissions: rwx
+    semantic_type: timestamp
+    traits:
+      - readable
+      - writable
+      - filterable
+      - sortable
+    type: string
+    validation:
+      pattern: ^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$
+      required: true
+  issuer_id:
+    checklist:
+      authority: automation
+      automation_hooks: set at issue time (CA or instance identifier)
+      cardinality: one
+      criticality: composition
+      default: null
+      dependencies: CA config
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: Identifier of the issuer (CA id or instance id) so verification can use the correct public key. Instance-specific for alpha.
+      security: non-sensitive
+      system_usage:
+        - verification
+      validation: Opaque string
+    field_profile_code: CERT-006
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+      - filterable
+    type: string
+    validation:
+      required: true
+  payload:
+    checklist:
+      authority: automation only
+      automation_hooks: set at issue time (signed or encrypted message)
+      cardinality: one
+      criticality: composition
+      default: null
+      dependencies: CA/signing implementation
+      observability: no (opaque; do not log)
+      origin_lifecycle: immutable
+      purpose: Opaque signed or encrypted payload (e.g. JWS or public-key encrypted blob). Contains attested claims; verification uses issuer public key.
+      security: sensitive - do not expose raw payload in logs
+      system_usage:
+        - verification
+        - login gating
+      validation: Base64 or opaque string
+    field_profile_code: CERT-007
+    permissions: r-x
+    semantic_type: statement
+    traits:
+      - readable
+    type: string
+    validation:
+      required: true
+  scope:
+    checklist:
+      authority: automation/certification service
+      automation_hooks: set when certificate is issued
+      cardinality: one
+      criticality: composition
+      default: null
+      dependencies: certification policy
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: Scope this certificate attests to (e.g. onboarding, software_tester_onboarding). May be standard across instances or instance-specific.
+      security: non-sensitive
+      system_usage:
+        - access control
+        - gating
+      validation: Alphanumeric and underscores
+    field_profile_code: CERT-002
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+      - filterable
+    type: string
+    validation:
+      pattern: ^[a-z][a-z0-9_]*$
+      required: true

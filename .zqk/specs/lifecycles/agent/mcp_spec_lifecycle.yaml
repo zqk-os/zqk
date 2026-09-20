@@ -1,0 +1,120 @@
+$schema: "../../../.zqk/cli/specs/schemas/lifecycle_spec.schema.json"
+
+object_type: mcp_spec
+# Five-question exam: docs/architecture/LIFECYCLE_STATE_MACHINE_RUBRIC.md
+# TRACK: BLI-CEF-R26-REMAINING-KINDS-001
+metadata:
+  description: >
+    Lifecycle for declarative MCP configuration. Specs are reviewed in draft,
+    become authoritative when active, and remain inspectable when superseded.
+    Error is system-managed and indicates an unreadable or invalid payload.
+  archive_status: archived
+  error_status: error
+
+statuses:
+  - value: conceptual
+    display: Conceptual
+    origin: true
+    preliminary: true
+    description: Draft plane status. Prior to CAS membrane crossing.
+    role: realign
+  - value: originated
+    display: Originated
+    description: CAS membrane crossed. Object officially originated.
+    role: realign
+  - value: draft
+    display: Draft
+    origin: false
+    preliminary: false
+    role: realign
+    description: Configuration is being authored and is not eligible for runtime
+      loading.
+  - value: active
+    display: Active
+    role: shovel_ready
+    description: Configuration is valid and authoritative for MCP runtime 
+      loading.
+  - value: deprecated
+    display: Deprecated
+    terminal: true
+    role: terminal
+    description: Configuration has been superseded but remains available for 
+      audit.
+  - value: archived
+    display: Archived
+    terminal: true
+    archive: true
+    role: terminal
+    description: Configuration is retired from normal runtime and operator 
+      workflows.
+  - value: error
+    display: Error
+    system: true
+    role: halted
+    description: Configuration is unreadable, invalid, or lifecycle-incoherent.
+
+transitions:
+  - from: conceptual
+    to: originated
+    description: Promote from draft plane to CAS membrane (CAS Qualification).
+    manual: true
+    auto: false
+    catalyst: System promotion
+  - from: originated
+    to: draft
+    description: Initial domain workflow transition to draft.
+    manual: true
+    auto: true
+    catalyst: System initialization
+  - from: draft
+    to: active
+    description: Configuration passed validation and is approved for runtime 
+      use.
+    manual: true
+    auto: false
+    postconditions:
+      - role is shovel_ready
+  - from: active
+    to: deprecated
+    description: A replacement configuration became authoritative.
+    manual: true
+    auto: false
+    postconditions:
+      - role is terminal
+      - ended; no further normal execution hops expected
+  - from: deprecated
+    to: archived
+    description: Superseded configuration completed its retention period.
+    manual: true
+    auto: false
+    postconditions:
+      - role is terminal
+      - ended; no further normal execution hops expected
+  - from: "*"
+    to: archived
+    description: Manual archival from any non-system status.
+    manual: true
+    auto: false
+    postconditions:
+      - role is terminal
+      - hop from any occupancy to archived
+      - ended; no further normal execution hops expected
+  - from: "*"
+    to: error
+    description: System-assigned when configuration validation or loading fails.
+    manual: false
+    auto: false
+    postconditions:
+      - role is halted
+      - hop from any occupancy to error
+      - system halt; repair before leaving halted
+percent_complete:
+  method: status_defaults
+  default_by_status:
+    conceptual: 0
+    originated: 5
+    draft: 10
+    active: 100
+    deprecated: 100
+    archived: 100
+    error: 0

@@ -1,0 +1,226 @@
+schema_version: 2.0.0
+ontology: bucketing_strategy
+extends: auditable
+visibility: internal
+description: 'Base specification for bucketing strategy objects. Bucketing strategies define how high-volume objects are organized into buckets (subdirectories) for efficient storage and retrieval. Multiple strategies can be active concurrently for the same object kind.\nLifecycle: bucketing_strategy_lifecycle.yaml.\n'
+traits: []
+fields:
+  applies_to:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: system architect
+      automation_hooks: determines which object kinds use this strategy.
+      cardinality: many
+      criticality: composition
+      default:
+        - graph_node
+        - audit_event
+      dependencies: object kind registry.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: List of object kinds this strategy applies to (e.g., [\\\"audit_event\\\", \\\"change_journal_entry\\\"]).
+      security: non-sensitive
+      system_usage:
+        - strategy routing
+        - hash registry management
+    field_profile_code: BST-006
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+      - filterable
+    type: array
+  archive_strategy:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: system architect
+      automation_hooks: used by archive scheduler jobs to determine archival behavior.
+      cardinality: zero_or_one
+      criticality: association
+      default: null
+      dependencies: bucketing strategy must be enabled.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Archive strategy configuration for long-term storage. Supports simple single-tier or complex multi-tier progression (warm → cold → iced).
+      security: non-sensitive
+      system_usage:
+        - archive scheduling
+        - storage tier management
+        - lifecycle management
+    field_profile_code: BST-007
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+    type: object
+  enabled:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: system architect
+      automation_hooks: determines if strategy is active.
+      cardinality: one
+      criticality: metadata
+      default: false
+      dependencies: none.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Whether this strategy is currently enabled and active.
+      security: non-sensitive
+      system_usage:
+        - strategy activation
+        - runtime configuration
+    field_profile_code: BST-005
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+      - filterable
+    type: boolean
+  field:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: system architect
+      automation_hooks: used to extract bucket key from object data.
+      cardinality: one
+      criticality: composition
+      default: null
+      dependencies: strategy_type determines which field is used.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Object field name to extract bucket key from (e.g., \\\"created_at\\\", \\\"status\\\", \\\"size\\\").
+      security: non-sensitive
+      system_usage:
+        - bucket key extraction
+        - storage organization
+    field_profile_code: BST-003
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+      - filterable
+    type: string
+  format:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: system architect
+      automation_hooks: used for chronological strategies to format timestamps.
+      cardinality: zero_or_one
+      criticality: association
+      default: null
+      dependencies: required for chronological strategies.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: 'Go time format string for chronological strategies. Common formats: \\\"2006-01\\\" (monthly), \\\"2006-01-02\\\" (daily), \\\"2006-01-02T15\\\" (hourly), \\\"2006-01-02T15:04\\\" (half_hourly), \\\"2006-01-02T15:04:05\\\" (qtr_hourly), \\\"2006-01-02T15:04:05.9\\\" (tenths). Or use predefined granularity: \\\"monthly\\\", \\\"weekly\\\", \\\"daily\\\", \\\"hourly\\\", \\\"half_hourly\\\", \\\"qtr_hourly\\\", \\\"tenths\\\".'
+      security: non-sensitive
+      system_usage:
+        - timestamp formatting
+        - bucket key generation
+    field_profile_code: BST-004
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+    type: string
+  retention_tolerance:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: system architect
+      automation_hooks: used by retention_tolerance scheduler job to trigger archive and cleanup per kind.
+      cardinality: zero_or_one
+      criticality: association
+      default: null
+      dependencies: bucketing strategy applies_to kinds.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: |
+        Configurable tolerance that triggers archive and cleanup when retention_tolerance job runs.
+        archive_after (duration, e.g. \"24h\", \"30d\") - objects older than this are marked status=archived.
+        cleanup_after (duration) - objects older than this are deleted (only if status not in protect_statuses).
+        max_count (integer, 0=no limit) - oldest objects not in protect_statuses are deleted until count <= max_count.
+        protect_statuses (array of strings) - active-like statuses that must not be removed; strategy does not delete objects in these statuses. If count cannot be reduced (all objects protected), job returns a blocking error requiring human intervention.
+        Aligns with .zqk/specs/configs/retention_tolerance.yaml; strategy-level value overrides config for applies_to kinds.
+      security: non-sensitive
+      system_usage:
+        - retention_tolerance job
+        - archive and cleanup scheduling
+        - object count limits
+    field_profile_code: BST-008
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+    type: object
+  strategy_name:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: system architect
+      automation_hooks: used for strategy identification and logging.
+      cardinality: one
+      criticality: metadata
+      default: null
+      dependencies: strategy_type.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Human-readable name for this strategy instance (e.g., \\\"monthly\\\", \\\"status_based\\\").
+      security: non-sensitive
+      system_usage:
+        - strategy identification
+        - logging
+        - debugging
+    field_profile_code: BST-002
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+      - filterable
+      - searchable
+    type: string
+  strategy_type:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: system architect
+      automation_hooks: used by storage layer to determine bucket organization.
+      cardinality: one
+      criticality: composition
+      default: null
+      dependencies: storage system.
+      observability: "yes"
+      origin_lifecycle: mutable (can be updated as system evolves)
+      purpose: Type of bucketing strategy (chronological, state, size, composite, first_letter). first_letter buckets by first character of a string field (e.g. title); used for glossary_term (A -> a, P -> p, etc.).
+      security: non-sensitive
+      system_usage:
+        - storage organization
+        - hash registry management
+        - performance optimization
+    field_profile_code: BST-001
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+      - filterable
+      - sortable
+    type: enum

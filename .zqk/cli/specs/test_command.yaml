@@ -1,0 +1,41 @@
+$schema: "./schemas/command_spec.schema.json"
+
+name: "test"
+short: "Execute verification tests linked to test cases and criteria"
+description: |
+  The test command surface executes verification tests linked to test_case and criteria objects.
+  Supports running arbitrary test targets in isolated subprocesses, evaluating test outcomes,
+  and triggering shockwave lifecycle state transitions across the knowledge kernel DAG.
+
+help:
+  examples:
+    - comment: "Run all verification suites for a test case"
+      command: "%s test run TST-001"
+    - comment: "Filter execution to specific criteria"
+      command: "%s test run TST-001 --criteria CRIT-001,CRIT-002"
+    - comment: "Run all active test cases across the project"
+      command: "%s test run --all"
+  exclude_flags:
+    - "format"
+    - "output"
+    - "verbose"
+    - "quiet"
+    - "timeout"
+    - "columns"
+
+common_flags: false
+subcommands:
+  - name: run
+    spec_ref: test/run_command.yaml
+  - name: discover
+    spec_ref: test/discover_command.yaml
+  - name: dashboard
+    spec_ref: test/dashboard_command.yaml
+  - name: bind
+    spec_ref: test/bind_command.yaml
+  - name: check-contamination
+    spec_ref: test/check_contamination_command.yaml
+  - name: identify-parallel
+    spec_ref: test/identify_parallel_command.yaml
+  - name: stream
+    spec_ref: test/stream_command.yaml

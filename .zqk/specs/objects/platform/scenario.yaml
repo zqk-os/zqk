@@ -1,0 +1,669 @@
+schema_version: 2.0.0
+ontology: scenario
+extends: base_object
+visibility: public
+description: 'Mock project scenarios / labs used to exercise tooling edge cases. '
+traits:
+  - base_object_traits
+fields:
+  category:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: used for scenario categorization.
+      cardinality: one
+      criticality: association
+      default: ""
+      dependencies: none.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Category classification (e.g., \\\"performance\\\", \\\"validation\\\", \\\"integration\\\", \\\"stress\\\").
+      security: non-sensitive
+      system_usage:
+        - filtering
+        - grouping
+        - organization
+      validation: freeform text but encourage controlled vocabulary.
+    field_profile_code: SCN-014
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+      - modifiable
+      - filterable
+      - groupable
+    type: string
+    validation:
+      required: false
+  change_policy:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: used by scenario builder to handle object changes during snapshot.
+      cardinality: one
+      criticality: association
+      default: include
+      dependencies: scenario builder.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: 'Policy for handling objects that change between snapshot initiation and clone completion. Options: \\\"reject\\\" (skip changed objects), \\\"include\\\" (use current state), \\\"reconstruct\\\" (reconstruct from change journal).'
+      security: non-sensitive
+      system_usage:
+        - change handling
+        - snapshot integrity
+      validation: Must be one of [\\\"reject\\\", \\\"include\\\", \\\"reconstruct\\\"].
+    field_profile_code: SCN-022
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+      - modifiable
+    type: string
+    validation:
+      required: false
+  cleanup_config:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: used by cleanup commands to determine what to clean.
+      cardinality: one
+      criticality: composition
+      default: {}
+      dependencies: cleanup tools.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Cleanup configuration (what to preserve, what to clean, retention policies, etc.).
+      security: non-sensitive
+      system_usage:
+        - scenario cleanup
+        - data management
+      validation: YAML object with cleanup settings.
+    field_profile_code: SCN-011
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+      - modifiable
+    type: object
+    validation:
+      required: false
+  data_generation_config:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: used by scenario builder to generate test data.
+      cardinality: one
+      criticality: composition
+      default: {}
+      dependencies: scenario builder.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Configuration for automated test data generation (kinds, counts, diversity, etc.).
+      security: non-sensitive
+      system_usage:
+        - test data generation
+        - scenario recreation
+      validation: YAML object with data generation settings.
+    field_profile_code: SCN-006
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+      - modifiable
+    type: object
+    validation:
+      required: false
+  documentation_refs:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: used for documentation linking.
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: documentation registry.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: References to documentation files (doc_entry IDs) related to this scenario.
+      security: non-sensitive
+      system_usage:
+        - documentation
+        - traceability
+      validation: Must reference existing doc_entry IDs.
+    field_profile_code: SCN-017
+    permissions: r-x
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+      - field_reference_group
+    type: list
+    validation:
+      required: false
+  edge_cases:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: ensures coverage metrics.
+      cardinality: many
+      criticality: composition
+      default: []
+      dependencies: coverage reporting.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Enumerate edge cases covered.
+      security: non-sensitive
+      system_usage:
+        - test planning
+      validation: freeform text but encourage structured tags.
+    field_profile_code: SCN-002
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+      - modifiable
+    type: list
+    validation:
+      required: false
+  environment_config:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: used to set environment variables and resource limits.
+      cardinality: one
+      criticality: composition
+      default: {}
+      dependencies: test runners.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Environment configuration (environment variables, resource limits, timeouts, etc.).
+      security: non-sensitive
+      system_usage:
+        - test execution
+        - resource management
+      validation: YAML object with environment settings.
+    field_profile_code: SCN-009
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+      - modifiable
+    type: object
+    validation:
+      required: false
+  fixtures:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: used by scenario runners.
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: fixture directory structure.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Paths to fixture data/assets.
+      security: non-sensitive
+      system_usage:
+        - scenario runners
+      validation: paths must exist or be resolvable.
+    field_profile_code: SCN-003
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+      - modifiable
+    type: list
+    validation:
+      required: false
+  goal_refs:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: used for goal-scenario traceability.
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: goal registry.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Goals this scenario tests.
+      security: non-sensitive
+      system_usage:
+        - traceability
+      validation: Must reference existing goal IDs.
+    field_profile_code: SCN-004
+    permissions: r-x
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+      - field_reference_group
+    type: list
+    validation:
+      required: false
+  hash_mappings:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: system.
+      automation_hooks: created automatically by scenario builder during copy.
+      cardinality: one
+      criticality: composition
+      default: {}
+      dependencies: CAS system.
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: Hash mapping from original object hash to new scenario object hash (original_hash -> new_hash). Used for integrity verification and reference updates.
+      security: non-sensitive
+      system_usage:
+        - integrity verification
+        - reference updates
+      validation: YAML object mapping original hashes to new hashes.
+    field_profile_code: SCN-021
+    permissions: r-x
+    semantic_type: statement
+    traits:
+      - readable
+    type: object
+    validation:
+      required: false
+  infrastructure_config:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: used by scenario builder to determine what infrastructure to copy.
+      cardinality: one
+      criticality: composition
+      default: {}
+      dependencies: scenario builder.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Configuration for infrastructure setup (which configs, specs, lifecycles to copy, or use defaults).
+      security: non-sensitive
+      system_usage:
+        - infrastructure setup
+        - scenario initialization
+      validation: YAML object with infrastructure settings (configs, specs, lifecycles, profiles).
+    field_profile_code: SCN-007
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+      - modifiable
+    type: object
+    validation:
+      required: false
+  last_run_info:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: system.
+      automation_hooks: updated automatically by scenario runners.
+      cardinality: one
+      criticality: association
+      default: {}
+      dependencies: scenario runners.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Information about the last scenario execution (timestamp, duration, status, metrics, etc.).
+      security: non-sensitive
+      system_usage:
+        - execution tracking
+        - metrics
+      validation: YAML object with execution info.
+    field_profile_code: SCN-018
+    permissions: r-x
+    semantic_type: statement
+    traits:
+      - readable
+      - modifiable
+    type: object
+    validation:
+      required: false
+  objective:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: used by scenario runners.
+      cardinality: one
+      criticality: composition
+      default: required
+      dependencies: mock project manifests.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: What the scenario aims to test.
+      security: non-sensitive
+      system_usage:
+        - testing
+        - documentation
+      validation: markdown allowed.
+    field_profile_code: SCN-001
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+      - modifiable
+    type: text
+    validation:
+      required: true
+  performance_targets:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: used for performance validation and reporting.
+      cardinality: one
+      criticality: association
+      default: {}
+      dependencies: performance monitoring.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Performance targets and thresholds (e.g., max execution time, min cache hit rate, etc.).
+      security: non-sensitive
+      system_usage:
+        - performance validation
+        - reporting
+      validation: YAML object with performance metrics and thresholds.
+    field_profile_code: SCN-015
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+      - modifiable
+    type: object
+    validation:
+      required: false
+  scenario_refs:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: used for scenario dependency management.
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: scenario registry.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Other scenarios this scenario depends on or extends.
+      security: non-sensitive
+      system_usage:
+        - dependency management
+        - scenario composition
+      validation: Must reference existing scenario IDs.
+    field_profile_code: SCN-012
+    permissions: r-x
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+      - field_reference_group
+    type: list
+    validation:
+      required: false
+  scheduler_config:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: used to configure scheduler for test scenario.
+      cardinality: one
+      criticality: composition
+      default: {}
+      dependencies: scheduler.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Scheduler configuration for the scenario (enabled, project_type, job overrides, etc.).
+      security: non-sensitive
+      system_usage:
+        - scheduler setup
+        - job configuration
+      validation: YAML object with scheduler settings.
+    field_profile_code: SCN-008
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+      - modifiable
+    type: object
+    validation:
+      required: false
+  snapshot_hashes:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: system.
+      automation_hooks: captured automatically by scenario builder during snapshot.
+      cardinality: one
+      criticality: composition
+      default: {}
+      dependencies: CAS system.
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: Hash of each source object at snapshot time (object_id -> hash). Used for integrity verification and change detection.
+      security: non-sensitive
+      system_usage:
+        - integrity verification
+        - change detection
+        - state reconstruction
+      validation: YAML object mapping object IDs to hashes.
+    field_profile_code: SCN-020
+    permissions: r-x
+    semantic_type: statement
+    traits:
+      - readable
+    type: object
+    validation:
+      required: false
+  snapshot_timestamp:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: system.
+      automation_hooks: set by snapshot-scenario command during capture.
+      cardinality: one
+      criticality: high
+      default: null
+      dependencies: snapshot system.
+      observability: "yes"
+      origin_lifecycle: immutable after capture.
+      purpose: Timestamp (UTC) at which the system state was captured for this scenario. Used for change detection and historical state reconstruction.
+      security: non-sensitive
+      system_usage:
+        - state reconstruction
+        - change detection
+        - temporal analysis
+      validation: Must be a valid UTC datetime string (RFC3339Nano).
+    field_profile_code: SCN-019
+    permissions: r-x
+    semantic_type: datetime
+    traits:
+      - readable
+    type: string
+    validation:
+      pattern: ^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$
+      required: false
+  source_object_ids:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: used by scenario builder when copying objects from project.
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: object registry.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Object IDs from the main project that were copied to create this scenario (for traceability and recreation).
+      security: non-sensitive
+      system_usage:
+        - scenario recreation
+        - traceability
+      validation: Must reference existing object IDs in the source project.
+    field_profile_code: SCN-019
+    permissions: r-x
+    semantic_type: reference
+    traits:
+      - readable
+      - writable
+      - modifiable
+    type: list
+    validation:
+      required: false
+  tags:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: used for scenario filtering and organization.
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: none.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Tags for categorizing and filtering scenarios (e.g., \\\"performance\\\", \\\"validation\\\", \\\"integration\\\").
+      security: non-sensitive
+      system_usage:
+        - filtering
+        - organization
+        - discovery
+      validation: freeform text tags.
+    field_profile_code: SCN-013
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+      - modifiable
+      - filterable
+      - groupable
+    type: list
+    validation:
+      required: false
+  test_execution_config:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: used by test runners to execute scenario tests.
+      cardinality: one
+      criticality: composition
+      default: {}
+      dependencies: test runners.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Test execution configuration (commands to run, assertions, performance targets, etc.).
+      security: non-sensitive
+      system_usage:
+        - test execution
+        - validation
+      validation: YAML object with test execution settings.
+    field_profile_code: SCN-010
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+      - modifiable
+    type: object
+    validation:
+      required: false
+  validation_rules:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: used for automated validation checks.
+      cardinality: one
+      criticality: composition
+      default: {}
+      dependencies: validation system.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Validation rules that must pass for scenario to be considered successful (e.g., no blocking errors, max warning count, etc.).
+      security: non-sensitive
+      system_usage:
+        - test validation
+        - quality gates
+      validation: YAML object with validation rules.
+    field_profile_code: SCN-016
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+      - modifiable
+    type: object
+    validation:
+      required: false
+  workstream_refs:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: used for workstream-scenario traceability.
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: workstream registry.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Workstreams this scenario exercises.
+      security: non-sensitive
+      system_usage:
+        - traceability
+      validation: Must reference existing workstream IDs.
+    field_profile_code: SCN-005
+    permissions: r-x
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+      - field_reference_group
+    type: list
+    validation:
+      required: false

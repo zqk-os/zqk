@@ -1,0 +1,59 @@
+$schema: "../schemas/command_spec.schema.json"
+
+name: "steer"
+short: "Append a steering event to the agent chat feed"
+description: |
+  Appends a typed steering event (and optional kernel ACK) to the agent chat
+  channel JSONL. Requires the lite channel enabled with delivery_mode other than off.
+  When delivery_mode is notify or paste, also attempts a peer wake unless --no-wake.
+
+flags:
+  - name: "message"
+    shorthand: "m"
+    type: "string"
+    default: ""
+    required: true
+    description: "Steering message body"
+  - name: "agent-id"
+    type: "string"
+    default: "human"
+    description: "Caller agent id stamp"
+  - name: "feed-id"
+    type: "string"
+    default: ""
+    description: "Fail if the lite feed_id differs from this value"
+  - name: "no-ack"
+    type: "bool"
+    default: false
+    description: "Do not append a kernel self-ACK line"
+  - name: "no-wake"
+    type: "bool"
+    default: false
+    description: "Do not wake the peer (stamp the feed only)"
+  - name: "to-agent-id"
+    type: "string"
+    default: ""
+    description: "Optional peer seat id for inbox routing (to_agent_id)"
+  - name: "await-peer-ack"
+    type: "bool"
+    default: false
+    description: "Register a peer-ack await callback (rings From agent when peer feed-acks this event_id)"
+
+args:
+  type: "no_args"
+
+help:
+  examples:
+    - comment: "Steer a peer via the feed"
+      command: "%s feed steer --message \"ATTN peer: verify work item\""
+    - comment: "Stamp with explicit agent id"
+      command: "%s feed steer --agent-id coordinator --message \"ACCEPT item\""
+    - comment: "Ring caller when peer feed-acks (callback ringer)"
+      command: "%s feed steer --agent-id cursor-composer --to-agent-id peer-agent-1 --await-peer-ack --message \"ATTN PEER: start ATK\""
+  # Keep columns out of leaf help; format/verbose/quiet/timeout stay via common_flags.
+  exclude_flags:
+    - "columns"
+    - "ignore-scheduler-down"
+
+run_e: "runFeedSteer"
+common_flags: true

@@ -1,0 +1,48 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://zqk.dev/schemas/kind_mappings_config.schema.json",
+  "title": "Kind Mappings Configuration Schema",
+  "description": "Schema for kind mappings configuration that maps directories and backends to object kinds",
+  "type": "object",
+  "required": ["backends"],
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "Reference to this schema file"
+    },
+    "description": {
+      "type": "string",
+      "description": "Human-readable description of this configuration"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "Configuration version (semantic versioning)"
+    },
+    "backends": {
+      "type": "object",
+      "description": "Backend configurations",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "directory_to_kind": {
+            "type": "object",
+            "description": "Mapping from directory names to object kinds",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "kind_to_directory": {
+            "type": "object",
+            "description": "Mapping from object kinds to directory names",
+            "additionalProperties": {
+              "type": "string"
+            }
+          }
+        },
+        "additionalProperties": true
+      }
+    }
+  },
+  "additionalProperties": false
+}

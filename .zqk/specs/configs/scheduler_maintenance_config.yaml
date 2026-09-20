@@ -1,0 +1,116 @@
+# Centralized scheduler maintenance job configuration.
+# Single source of truth for "required" maintenance jobs. All create/ensure flows
+# use this config so behavior is observable, reliable, accurate, and efficient.
+#
+# Loaded from: .zqk/specs/configs/scheduler_maintenance_config.yaml
+# Override path via ZQK_SCHEDULER_MAINTENANCE_CONFIG.
+#
+# jobs_paused_schedule_exempt_job_ids: when scheduler config jobs_paused is true, timer/immediate jobs
+# are not scheduled except these ids (today's core maintenance pipeline). Keep in sync when renaming a
+# required maintenance job — update this list and required_jobs together; no Go code change needed for
+# exemption only.
+#
+# Transitional note: discrete scheduler_job rows are easy to drift out of sync (pause exemptions, triggers,
+# retention). The data-cell architecture is meant to replace that sprawl with managers that own coordination
+# so operational safety (e.g. retention, disk) does not depend on scattered edits. As jobs are retired in
+# favor of data-cell-driven flows, drop their ids from this list and required_jobs in the same change.
+#
+# required_jobs is the kernel-survival set (retention, validation, caches, WAL).
+# Do not put source-code lint/policy/integrity here — those are an optional pack
+# for checkouts that ship product source and the matching scripts. Operator guide:
+# docs/howto/SCHEDULER_AND_MAINTENANCE.md
+#
+# required_jobs: list of jobs that must exist. Each entry:
+#   id: fixed scheduler_job id (e.g. SCH-101, SCH-007).
+#   job_type: expected job_type (used for create and for correct-if-wrong updates).
+#   template_file: path relative to project root (e.g. scripts/scheduler_jobs/maintenance_wal_trigger.yaml).
+#
+# Optional (future): startup_burst_job_ids, trigger_queue_on_start for daemon startup behavior.
+#
+# Job sprawl / efficiency: prefer one parameterized scheduler_job (env vars) + shared scripts over
+# many persisted clones that differ only by CVS id or path. See EVENT_PIPELINE_AND_CONVERGENCE_INTEGRATION.md
+# (section "Scheduler automation discipline"). Not every convergence path is listed here: e.g.
+# SCH-convergence-orchestrate (full orchestrate) is a maintained optional job — create from
+# scripts/scheduler_jobs/convergence_orchestrate.yaml when needed; do not duplicate id per session.
+#
+# Future (deferred): optional per-job validation profiles/refs — see EVENT_PIPELINE_AND_CONVERGENCE_INTEGRATION.md "Declarative validators (concept)"; design once DRY job patterns are stable.
+#
+# Promotion gate + overseer record scripts (paths, --help, env): scripts/README.md — "Convergence promotion and overseer helpers".
+
+jobs_paused_schedule_exempt_job_ids:
+  - SCH-evag
+  - SCH-cache-prewarm
+  - SCH-retention-tolerance
+  - SCH-audit-event-aggregation
+  - SCH-cap-orchestrator
+  - SCH-autofix-process-pending
+  - SCH-scheduler-job-retention
+  - SCH-passive-test-sweeper
+
+required_jobs:
+  - id: SCH-val
+    job_type: object_validation
+    template_file: scripts/scheduler_jobs/object_validation_sch_val.yaml
+  - id: SCH-evag
+    job_type: scheduler_events_aggregation
+    template_file: scripts/scheduler_jobs/scheduler_events_aggregation_schevag.yaml
+  - id: SCH-cache-prewarm
+    job_type: cache_prewarm
+    template_file: scripts/scheduler_jobs/cache_prewarm.yaml
+  - id: SCH-retention-tolerance
+    job_type: retention_tolerance
+    template_file: scripts/scheduler_jobs/retention_tolerance_catchall.yaml
+  - id: SCH-audit-event-aggregation
+    job_type: audit_event_aggregation
+    template_file: scripts/scheduler_jobs/audit_event_aggregation_default.yaml
+  - id: SCH-passive-test-sweeper
+    job_type: passive_test_sweeper
+    template_file: scripts/scheduler_jobs/passive_test_sweeper.yaml
+  - id: SCH-maintenance-wal
+    job_type: maintenance
+    template_file: scripts/scheduler_jobs/maintenance_wal_trigger.yaml
+  - id: SCH-objcount-report
+    job_type: run_wrapper
+    template_file: scripts/scheduler_jobs/object_count_report_hourly.yaml
+  - id: SCH-improvement-report
+    job_type: run_wrapper
+    template_file: scripts/scheduler_jobs/improvement_report_hourly.yaml
+  - id: SCH-autofix-batch-cleanup
+    job_type: autofix_batch_cleanup
+    template_file: scripts/scheduler_jobs/autofix_batch_cleanup_hourly.yaml
+  - id: SCH-autofix-run
+    job_type: run_wrapper
+    template_file: scripts/scheduler_jobs/autofix_run_periodic.yaml
+  - id: SCH-autofix-process-pending
+    job_type: run_wrapper
+    template_file: scripts/scheduler_jobs/autofix_process_pending.yaml
+  # Community SKU does not ship scripts/pre-commit-{lint,policy,integrity}.sh.
+  # Those SCH-pre-commit-* jobs are studio-dense; leaving them in required_jobs
+  # makes the daemon exit 126 every timer. Templates remain under scripts/scheduler_jobs/
+  # for studio checkouts. TRACK: BLI-1789871626046148000-78991fa7
+  - id: SCH-cleanup
+    job_type: cleanup
+    template_file: scripts/scheduler_jobs/cleanup_on_demand.yaml
+  - id: SCH-cvs-pipeline-tick
+    job_type: convergence_session_tick
+    template_file: scripts/scheduler_jobs/convergence_session_tick_pkg_vet_hourly.yaml
+  - id: SCH-cvs-datacell-tick
+    job_type: convergence_session_tick
+    template_file: scripts/scheduler_jobs/convergence_session_tick_data_cell_hourly.yaml
+  - id: SCH-convergence-overseer-record
+    job_type: run_wrapper
+    template_file: scripts/scheduler_jobs/convergence_overseer_record_daily.yaml
+  - id: SCH-dce-tick
+    job_type: data_cell_envelope_tick
+    template_file: scripts/scheduler_jobs/data_cell_envelope_tick_six_hourly.yaml
+  - id: SCH-cap-orchestrator
+    job_type: cap_orchestrator
+    template_file: scripts/scheduler_jobs/cap_orchestrator.yaml
+  - id: SCH-scheduler-job-retention
+    job_type: scheduler_job_retention
+    template_file: scripts/scheduler_jobs/scheduler_job_retention_daily.yaml
+
+created_at: 2026-07-01T18:00:00Z
+updated_at: 2026-07-03T18:00:00Z
+created_by: ACC-1785920548450214012-68b850c0
+updated_by: ACC-1785920548450214012-68b850c0

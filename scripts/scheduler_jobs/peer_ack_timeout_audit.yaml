@@ -1,0 +1,17 @@
+id: SCH-PEER-ACK-TIMEOUT
+kind: scheduler_job
+schema_version: "2.0.0"
+status: active
+title: Peer-ack await timeout audit
+description: |
+  Expire open peer_ack_awaits older than DefaultPeerAckAwaitMaxAge so night-duty
+  and directed steers cannot clog correspondence forever.
+job_type: peer_ack_timeout_audit
+trigger_type: timer
+schedule_expression: "*/5 * * * *"
+execution_mode: reusable
+category: maintenance
+priority: normal
+enabled: true
+log_level: default
+namespace_id: zqk:kernel

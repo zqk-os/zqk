@@ -1,0 +1,356 @@
+schema_version: 2.0.0
+ontology: milestone
+urn: urn:zqk:spec:project_mgmt:milestone
+namespace: zqk:project_mgmt
+extends: work_unit
+composes:
+  - remaining_open
+visibility: public
+description: 'Represents a stage/tier/step within or across workstreams. Smaller than a full workstream but larger than a single requirement, used to track prerequisites/blockers and progress.\nLifecycle: milestone_lifecycle.yaml.\n'
+traits:
+  - base_object_traits
+  - manipulatable
+  - effort_aware
+  - status_reactive
+  - open_countable
+  - summarizes_children
+fields:
+  blocked_by_refs:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner/executive.
+      automation_hooks: used for blocking analysis and reports.
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: object registry.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Milestones or work items blocking this milestone.
+      security: non-sensitive
+      system_usage:
+        - blocking checks
+        - reporting
+      validation: must reference existing object IDs.
+    field_profile_code: MLS-006
+    permissions: r-x
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+      - field_reference_group
+    type: list
+    validation:
+      required: false
+  commit_hashes:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation.
+      automation_hooks: used for linking commits to milestones.
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: Version control repository (Git, SVN, Mercurial, Perforce, etc.).
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Version control system commit identifiers that implement or relate to this milestone.
+      security: non-sensitive
+      system_usage:
+        - traceability
+        - code-to-project graph
+      validation: |
+        Must be valid VCS commit identifiers. Format depends on VCS system:
+        - Git: SHA-1 hash (40 chars) or short hash (7+ chars)
+        - SVN: Revision number (numeric)
+        - Mercurial: Hex hash (40 chars)
+        - Perforce: Changelist number (numeric)
+        - Other: Alphanumeric string, 1-40 characters
+    field_profile_code: MLS-010
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - filterable
+      - modifiable
+      - readable
+      - writable
+    type: list
+    validation:
+      pattern: ^[A-Za-z0-9_-]{1,40}$
+      required: false
+  completion_criteria:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner/executive.
+      automation_hooks: used for completion validation.
+      cardinality: many
+      criticality: composition
+      default: []
+      dependencies: none.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Verifiable conditions that must be met for milestone completion.
+      security: non-sensitive
+      system_usage:
+        - validation
+        - completion tracking
+      validation: list of strings describing criteria.
+    field_profile_code: MLS-007
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - field_mutable_group
+    type: list
+    validation:
+      required: false
+  criteria_refs:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: used for milestone verification and completion validation.
+      cardinality: many
+      criticality: composition
+      default: []
+      dependencies: criteria registry.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Canonical typed links to criteria objects (CRIT-*) that must be satisfied for this milestone.
+      security: non-sensitive
+      system_usage:
+        - validation
+        - completion tracking
+        - traceability
+      validation: must reference existing criteria object IDs (CRIT-* format).
+    field_profile_code: MLS-011
+    permissions: rwx
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+      - field_reference_group
+    type: list
+    validation:
+      required: false
+  goal_refs:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner/executive.
+      automation_hooks: used for goal progress calculation.
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: goal registry.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Goals this milestone contributes to.
+      security: non-sensitive
+      system_usage:
+        - traceability
+        - reporting
+      validation: must reference existing goal IDs.
+    field_profile_code: MLS-009
+    permissions: r-x
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+      - field_reference_group
+    type: list
+    validation:
+      required: false
+  prerequisite_refs:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner/executive.
+      automation_hooks: prevents milestone from starting until prerequisites complete.
+      cardinality: many
+      criticality: composition
+      default: []
+      dependencies: milestone registry.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Milestones that must be completed before this one can start.
+      security: non-sensitive
+      system_usage:
+        - blocking checks
+        - planning
+      validation: must reference existing milestone IDs.
+    field_profile_code: MLS-005
+    permissions: r-x
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+      - field_reference_group
+    type: list
+    validation:
+      required: false
+  stage_type:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner/executive.
+      automation_hooks: used to order milestones.
+      cardinality: one
+      criticality: composition
+      default: stage
+      dependencies: dashboards.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Classify the milestone (tier, stage, prerequisite, validation, release gate, etc.).
+      security: non-sensitive
+      system_usage:
+        - planning
+      validation: enum; extendable via config.
+    field_profile_code: MLS-001
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - listable
+      - readable
+      - writable
+      - modifiable
+      - groupable
+      - filterable
+      - sortable
+      - searchable
+    type: enum
+    validation:
+      enum:
+        - tier
+        - stage
+        - prerequisite
+        - validation
+        - release_gate
+      required: false
+  status:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner/executive.
+      automation_hooks: prevents dependent workstreams from starting when blocked.
+      cardinality: one
+      criticality: composition
+      default: not_started
+      dependencies: prerequisite logic.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Milestone status (\\\"not_started\\\", \\\"in_progress\\\", \\\"blocked\\\", \\\"complete\\\", \\\"deferred\\\").
+      security: non-sensitive
+      system_usage:
+        - blocking checks
+      validation: enum.
+    field_profile_code: MLS-002
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - filterable
+      - groupable
+      - listable
+      - modifiable
+      - readable
+      - searchable
+      - sortable
+      - writable
+    type: enum
+    validation:
+      enum:
+        - not_started
+        - in_progress
+        - blocked
+        - complete
+        - deferred
+      required: true
+  status_history:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation/lifecycle system.
+      automation_hooks: automatically populated on status transitions.
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: lifecycle system.
+      observability: "yes"
+      origin_lifecycle: append-only.
+      purpose: Chronological record of status changes and notes.
+      security: non-sensitive
+      system_usage:
+        - audits
+        - reports
+      validation: List of StatusHistoryEntry objects.
+    field_profile_code: MLS-003
+    permissions: r-x
+    semantic_type: expression
+    traits:
+      - readable
+    type: list
+    validation:
+      required: false
+  workstream_refs:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner/executive.
+      automation_hooks: used for workstream progress calculation.
+      cardinality: many
+      criticality: composition
+      default: []
+      dependencies: workstream registry.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Workstreams this milestone belongs to or impacts.
+      security: non-sensitive
+      system_usage:
+        - planning
+        - grouping
+      validation: must reference existing workstream IDs.
+    field_profile_code: MLS-004
+    permissions: r-x
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+      - field_reference_group
+    type: list
+    validation:
+      required: false
+  epic_refs:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner/planner.
+      automation_hooks: associates milestone checkpoints with governing epics.
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: epic registry.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Epics this milestone tracks or contributes to.
+      security: non-sensitive
+      system_usage:
+        - planning
+        - reporting
+      validation: must reference existing epic IDs.
+    field_profile_code: MLS-012
+    permissions: r-x
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+      - field_reference_group
+    type: list
+    validation:
+      required: false
+

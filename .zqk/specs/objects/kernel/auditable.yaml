@@ -1,0 +1,308 @@
+schema_version: 2.0.0
+ontology: auditable
+urn: urn:zqk:spec:kernel:auditable
+namespace: zqk:kernel
+extends: "null"
+visibility: internal
+storage_profile: cas_entity
+description: 'Core audit metadata inherited by every system object. Ensures provenance, attribution, and lifecycle tracking are available everywhere. '
+traits:
+  - base_auditable_traits
+fields:
+  archived_at:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: role with archive permission.
+      automation_hooks: triggers archival workflows.
+      cardinality: zero_or_one
+      criticality: association
+      default: unused until archived
+      dependencies: archive policies.
+      observability: logged.
+      origin_lifecycle: append-only (set once when archived).
+      purpose: Timestamp when object was archived (if applicable).
+      security: non-sensitive
+      system_usage:
+        - retention
+        - visibility
+      validation: ISO-8601.
+    field_profile_code: AUD-007
+    permissions: r-x
+    semantic_type: statement
+    traits:
+      - field_mutable_group
+    type: datetime
+    validation:
+      pattern: ^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$
+      required: false
+  archived_by:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: archive-capable roles.
+      automation_hooks: ensures only authorized actors archive.
+      cardinality: zero_or_one
+      criticality: association
+      default: unused until archived
+      dependencies: review logs.
+      observability: logged.
+      origin_lifecycle: append-only
+      purpose: Who archived the object.
+      security: limited PII.
+      system_usage:
+        - audit
+        - approvals
+      validation: user registry.
+    field_profile_code: AUD-008
+    permissions: r-x
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+      - modifiable
+    type: string
+    validation:
+      required: false
+  change_log:
+    access:
+      requires:
+        - access:audit
+    checklist:
+      authority: automation
+      automation_hooks: used for change journals and manifest hashing.
+      cardinality: many
+      criticality: composition
+      default: starts empty, append per change
+      dependencies: rollback, manifests, audits.
+      observability: persisted outside git as well.
+      origin_lifecycle: append-only
+      purpose: Append-only record of meaningful changes.
+      security: may include commit hashes; non-sensitive otherwise.
+      system_usage:
+        - rollback
+        - analytics
+      validation: each entry includes timestamp, actor, fingerprint, summary.
+    field_profile_code: AUD-009
+    permissions: r-x
+    semantic_type: statement
+    traits:
+      - field_read_only_group
+    type: list
+    validation:
+      required: false
+  created_at:
+    checklist:
+      authority: automation
+      automation_hooks: creation events trigger journal entry.
+      cardinality: one
+      criticality: composition
+      default: auto-generated when object is created
+      dependencies: change_log initialization.
+      observability: recorded in journal + manifests.
+      origin_lifecycle: immutable
+      purpose: Timestamp when the object was first materialized.
+      security: non_pii
+      system_usage:
+        - ordering
+        - lifecycle
+      validation: ISO-8601 datetime enforced by generator.
+    field_profile_code: AUD-001
+    permissions: r-x
+    semantic_type: statement
+    traits:
+      - listable
+      - readable
+      - writable
+      - filterable
+      - sortable
+      - searchable
+    type: datetime
+    validation:
+      pattern: ^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$
+      required: true
+  created_by:
+    access:
+      requires:
+        - access:audit
+    checklist:
+      authority: automation
+      automation_hooks: used to verify permissions for future edits.
+      cardinality: one
+      criticality: composition
+      default: resolved from current CLI login
+      dependencies: authority checks, rollback reports.
+      observability: audited.
+      origin_lifecycle: immutable
+      purpose: Identifies the user/profile that created the object.
+      security: may contain user handle (limited PII) – respect masking rules.
+      system_usage:
+        - attribution
+        - permissions
+      validation: must match user registry entry.
+    field_profile_code: AUD-002
+    permissions: r-x
+    semantic_type: statement
+    traits:
+      - filterable
+      - listable
+      - readable
+      - searchable
+      - sortable
+      - writable
+    type: string
+    validation:
+      min_length: 1
+      required: true
+  origin_project:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation/importer
+      automation_hooks: none.
+      cardinality: one
+      criticality: association
+      default: current project name
+      dependencies: cross-project analysis.
+      observability: visible in exports.
+      origin_lifecycle: immutable
+      purpose: Human-readable project/workstream name where the object began.
+      security: non-sensitive
+      system_usage:
+        - reporting
+        - migration
+      validation: freeform string but encouraged to match registry.
+    field_profile_code: AUD-006
+    permissions: r-x
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+    type: string
+    validation:
+      required: false
+  origin_system:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation/importer
+      automation_hooks: used when exporting/importing graphs.
+      cardinality: one
+      criticality: association
+      default: current repo identifier
+      dependencies: signed artifact verification.
+      observability: stored in manifests.
+      origin_lifecycle: immutable
+      purpose: Where the object was originally authored (repo, external system).
+      security: non-sensitive
+      system_usage:
+        - import validation
+        - signature verification
+      validation: enumerated list or URI.
+    field_profile_code: AUD-005
+    permissions: r-x
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+    type: string
+    validation:
+      required: false
+  provenance:
+    access:
+      requires:
+        - access:audit
+    checklist:
+      authority: automation
+      automation_hooks: verified by cellular membrane invariant gates before plane transitions.
+      cardinality: zero_or_one
+      criticality: composition
+      default: null
+      dependencies: cryptographic hash engine and agent key store.
+      lifecycle: append-only
+      observability: "yes"
+      origin_lifecycle: append-only
+      purpose: Cryptographic causal lineage, actor attestation, and non-repudiation block.
+      security: non-sensitive
+      system_usage:
+        - provenance tracking
+        - membrane invariant gates
+        - plane transition vetting
+      validation: object containing parent_hash, agent_id, model_hash, signature, hash, and metadata.
+    field_profile_code: AUD-010
+    permissions: r-x
+    semantic_type: expression
+    traits:
+      - field_read_only_group
+    type: object
+    validation:
+      required: false
+  updated_at:
+    checklist:
+      authority: automation
+      automation_hooks: used to detect drift/staleness.
+      cardinality: one
+      criticality: composition
+      default: same as created_at until first update
+      dependencies: change_log, sync triggers.
+      observability: always logged.
+      origin_lifecycle: mutable (overwrites)
+      purpose: Last time any field changed.
+      security: non_pii
+      system_usage:
+        - ordering
+        - cache invalidation
+      validation: ISO-8601.
+    field_profile_code: AUD-003
+    permissions: r-x
+    semantic_type: statement
+    traits:
+      - listable
+      - readable
+      - writable
+      - modifiable
+      - filterable
+      - sortable
+      - searchable
+    type: datetime
+    validation:
+      pattern: ^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$
+      required: true
+  updated_by:
+    access:
+      requires:
+        - access:audit
+    checklist:
+      authority: automation
+      automation_hooks: helps detect unauthorized edits.
+      cardinality: one
+      criticality: composition
+      default: created_by until first update
+      dependencies: review workflows.
+      observability: logged.
+      origin_lifecycle: mutable
+      purpose: User/profile responsible for last change.
+      security: limited PII
+      system_usage:
+        - permissions
+        - notifications
+      validation: must map to known user.
+    field_profile_code: AUD-004
+    permissions: r-x
+    semantic_type: statement
+    traits:
+      - filterable
+      - listable
+      - modifiable
+      - readable
+      - searchable
+      - sortable
+      - writable
+    type: string
+    validation:
+      min_length: 1
+      required: true

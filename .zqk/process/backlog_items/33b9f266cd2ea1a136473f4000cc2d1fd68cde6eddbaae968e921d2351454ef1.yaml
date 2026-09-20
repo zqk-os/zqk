@@ -1,0 +1,42 @@
+acceptance_considerations: Built binary exposes the documented object/system/test/workflow/scheduler surfaces; first-run docs equal the dest overlay; canonical brand tokens do not leak the local pressure-test executable; launch VDS chunks pass.
+actual_effort: 0h
+artifacts:
+    - docs/quality/README.md
+commit_hashes:
+    - a04eba138c28c99efb2c0670ae9b8b7afe0f1ca4
+completed_at: "2026-09-18T07:49:45Z"
+created_at: "2026-09-17T21:44:38Z"
+created_by: ACC-1785920548450214012-68b850c0
+criteria_refs:
+    - CRIT-1789673676577796000-03fc29cf
+    - CRIT-1789673684713711000-344a7b09
+    - CRIT-1789673692417549000-42d0da98
+    - CRIT-1789702449225534000-91965c35
+    - CRIT-1789702449225535000-21301407
+    - CRIT-1789702449225536000-1bd6c028
+description: '5-star first-run: dest-owned sku-overlay (COMMUNITY_FIRST_RUN/QUICKSTART/CONTRIBUTING). Slim Makefile. Init seeds starter Gantt in-process and always EnsureRetentionJobsInProject. Flags --with-onboarding-roadmap/--with-maintenance-jobs are aliases, not refuses. zcom scheduler start|stop|status is shipped (not studio cmd/zqk/scheduler). Studio: TDE-1789692371040218000-2330de1d (scheduler SKU cut) and TDE-1789690070487265000-ea5471f4 (overlay Makefile/README hose).'
+estimated_effort: 4 hours
+id: BLI-1789681478369698000-263b989c
+kind: backlog_item
+milestone_refs:
+    - MIL-1789672699275510000-40c8cee7
+namespace_id: zqk:kernel
+persona_refs:
+    - PER-DEFAULT-OPERATOR
+priority: high
+priority_plan_ref: PRI-1789702455694482000-e7fdaf04
+priority_tier: P1
+problem_statement: Would-be users bounce when the first commands in README do not exist on the binary they just built.
+requirement_refs:
+    - REQ-1789630346648087000-a61b7f27
+schema_version: 2.0.0
+stakeholders:
+    - team-core
+started_at: "2026-09-18T07:48:59Z"
+status: complete
+title: 'First-run MTTV: zcom docs/CLI must match the shipped SKU'
+updated_at: "2026-09-18T07:49:45Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs:
+    - WS-1789631797993326000-f9951fe8

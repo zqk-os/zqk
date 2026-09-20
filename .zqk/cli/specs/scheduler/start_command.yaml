@@ -1,0 +1,32 @@
+$schema: "../schemas/command_spec.schema.json"
+
+name: "start"
+short: "Start the scheduler daemon"
+description: |
+  Start the scheduler daemon to execute scheduled jobs.
+  
+  The daemon will:
+    - Load all enabled scheduler_job objects
+    - Schedule timer-based jobs according to their cron expressions
+    - Listen for event and lifecycle triggers
+    - Execute jobs with timeout and retry logic
+    - Create audit events for job execution
+  
+  Default: runs in the background (detached process). Use --foreground to attach and stream logs.
+  If the daemon exits (crash or stop), run zqk scheduler start again to bring it back.
+
+help:
+  examples:
+    - comment: "Start scheduler daemon"
+      command: "%s scheduler start"
+  exclude_flags:
+    - "format"
+    - "output"
+    - "verbose"
+    - "quiet"
+    - "timeout"
+    - "columns"
+
+run_e: "runStart"
+async: true
+common_flags: true

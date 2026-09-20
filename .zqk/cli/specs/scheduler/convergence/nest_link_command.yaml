@@ -1,0 +1,31 @@
+$schema: ../../schemas/command_spec.schema.json
+name: nest-link
+short: Link an existing child CVS under a parent
+description: |
+  Append child CVS-* to parent related_object_refs after depth and cycle checks.
+help:
+  examples:
+  - comment: Link existing child
+    command: '%s scheduler convergence nest-link --parent-session-id CVS-001 --child-session-id CVS-002'
+  exclude_flags:
+  - format
+  - output
+  - verbose
+  - quiet
+  - timeout
+  - columns
+run_e: schedulerConvergenceNestLink
+common_flags: true
+flags:
+- name: parent-session-id
+  type: string
+  default: ''
+  description: Parent convergence_session id (CVS-*)
+- name: child-session-id
+  type: string
+  default: ''
+  description: Existing child convergence_session id (CVS-*)
+- name: max-depth
+  type: int
+  default: 3
+  description: Max nest depth

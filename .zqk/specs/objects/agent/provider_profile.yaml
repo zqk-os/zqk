@@ -1,0 +1,333 @@
+schema_version: 2.0.0
+ontology: provider_profile
+extends: base_object
+visibility: public
+description: Defines the topology, operational constraints, and initialization sequence for LLM providers.\nThis allows the CAP orchestrator to inject context window limits, disable SWA (Sliding Window Attention) \nfor local llama.cpp endpoints, and tailor the prompt structure dynamically without hardcoding.\n
+traits:
+  - base_object_traits
+  - constrainable
+fields:
+  base_url:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner
+      automation_hooks: Used by the swarm engine to route requests.
+      cardinality: one
+      criticality: metadata
+      default: http://127.0.0.1:8080/v1
+      dependencies: none
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: The URL prefix for the LLM API.
+      security: non-sensitive
+      system_usage:
+        - provisioning
+      validation: Must be a valid URL string.
+    field_profile_code: PPRV-002
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - filterable
+      - modifiable
+      - readable
+      - writable
+    type: string
+    validation:
+      required: true
+  capabilities:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner
+      automation_hooks: Used by the swarm engine to determine feature support.
+      cardinality: many
+      criticality: metadata
+      default: []
+      dependencies: none
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: List of supported features (e.g. code_generation, validation, routing, json_mode).
+      security: non-sensitive
+      system_usage:
+        - provisioning
+      validation: Array of capability strings.
+    field_profile_code: PPRV-009
+    permissions: rwx
+    semantic_type: list
+    traits:
+      - modifiable
+      - readable
+      - writable
+    type: list
+    validation:
+      required: false
+  concurrency_limit:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner
+      automation_hooks: Limits parallel calls to this provider to prevent host starvation.
+      cardinality: one
+      criticality: metadata
+      default: "2"
+      dependencies: none
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Max concurrent execution threads allowed.
+      security: non-sensitive
+      system_usage:
+        - provisioning
+      validation: Must be a positive integer.
+    field_profile_code: PPRV-010
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - filterable
+      - modifiable
+      - readable
+      - writable
+    type: string
+    validation:
+      required: false
+  context_window_limit:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner
+      automation_hooks: Informs the graph bloat compactor and memory limits.
+      cardinality: one
+      criticality: metadata
+      default: 32768
+      dependencies: none
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Max tokens or chars allowed in the context window.
+      security: non-sensitive
+      system_usage:
+        - provisioning
+      validation: Must be a positive integer.
+    field_profile_code: PPRV-004
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - filterable
+      - modifiable
+      - readable
+      - writable
+    type: string
+    validation:
+      required: true
+  endpoint_type:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner
+      automation_hooks: Defines which adapter or connector to use.
+      cardinality: one
+      criticality: metadata
+      default: openai_compatible
+      dependencies: none
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: The type of the API endpoint.
+      security: non-sensitive
+      system_usage:
+        - provisioning
+      validation: Must be a string.
+    field_profile_code: PPRV-001
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - filterable
+      - groupable
+      - modifiable
+      - readable
+      - searchable
+      - writable
+    type: string
+    validation:
+      required: true
+  id:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation (Generator)
+      automation_hooks: used for cross-file references.
+      cardinality: one
+      criticality: composition
+      default: auto-assigned per kind sequence
+      dependencies: linkage constraints, URN creation.
+      observability: logged + manifests.
+      origin_lifecycle: immutable
+      purpose: Stable identifier.
+      security: non-sensitive
+      system_usage:
+        - linking
+        - reporting
+      validation: Must start with PPRV-
+    field_profile_code: PPRV-000
+    permissions: r-x
+    semantic_type: statement
+    traits:
+      - filterable
+      - groupable
+      - listable
+      - modifiable
+      - readable
+      - searchable
+      - sortable
+    type: string
+    validation:
+      required: true
+  initialization_sequence:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner
+      automation_hooks: Sequence of actions (e.g. compress_cli_tools, verify_health).
+      cardinality: many
+      criticality: metadata
+      default: []
+      dependencies: none
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Step-by-step startup process for the provider.
+      security: non-sensitive
+      system_usage:
+        - provisioning
+      validation: Array of step strings.
+    field_profile_code: PPRV-007
+    permissions: rwx
+    semantic_type: list
+    traits:
+      - modifiable
+      - readable
+      - writable
+    type: list
+    validation:
+      required: false
+  injection_rules:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner
+      automation_hooks: Rules injected at different lifecycle stages.
+      cardinality: many
+      criticality: metadata
+      default: []
+      dependencies: none
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Provider-specific constraints or instructions.
+      security: non-sensitive
+      system_usage:
+        - provisioning
+      validation: Array of rule objects.
+    field_profile_code: PPRV-006
+    permissions: rwx
+    semantic_type: list
+    traits:
+      - modifiable
+      - readable
+      - writable
+    type: list
+    validation:
+      required: false
+  max_tool_schema_bytes:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner
+      automation_hooks: Used by the tool compression logic.
+      cardinality: one
+      criticality: metadata
+      default: 15000
+      dependencies: none
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Hard limit for JSON schema byte size to prevent SWA blowouts.
+      security: non-sensitive
+      system_usage:
+        - provisioning
+      validation: Must be a positive integer.
+    field_profile_code: PPRV-005
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - filterable
+      - modifiable
+      - readable
+      - writable
+    type: string
+    validation:
+      required: true
+  model_id:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner
+      automation_hooks: Passed to the API for inference.
+      cardinality: one
+      criticality: metadata
+      default: ""
+      dependencies: none
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: The specific model identifier (e.g. qwen3.6.Q4_K_M.gguf).
+      security: non-sensitive
+      system_usage:
+        - provisioning
+      validation: Must be a string.
+    field_profile_code: PPRV-003
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - filterable
+      - modifiable
+      - readable
+      - writable
+    type: string
+    validation:
+      required: true
+  model_tier:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner
+      automation_hooks: Used by the CAP router to assign task difficulty levels.
+      cardinality: one
+      criticality: metadata
+      default: tier_2_simple
+      dependencies: none
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Operational tier (e.g. tier_1_complex, tier_2_simple, tier_3_light).
+      security: non-sensitive
+      system_usage:
+        - provisioning
+      validation: Must be a string.
+    field_profile_code: PPRV-008
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - filterable
+      - groupable
+      - modifiable
+      - readable
+      - searchable
+      - writable
+    type: string
+    validation:
+      required: false

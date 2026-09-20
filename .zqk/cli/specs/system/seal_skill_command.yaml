@@ -1,0 +1,39 @@
+$schema: "../schemas/command_spec.schema.json"
+
+name: "seal-skill <name>"
+short: "Generate or verify the cryptographic seal for a skill pack"
+description: |
+  Seals SKILL.md under .zqk/skills/<name> with content hash, version, issuer,
+  and timestamp. Use --verify to check an existing seal without rewriting.
+  Skill load is fail-closed on mismatch unless BYPASS_SKILL_VERIFICATION is set.
+
+args:
+  type: "exact"
+  count: 1
+
+flags:
+  - name: "verify"
+    type: "bool"
+    default: false
+    description: "Verify the existing seal without rewriting the skill file"
+  - name: "version"
+    type: "string"
+    default: "1.0.0"
+    description: "Seal version string written into frontmatter when sealing"
+  - name: "issuer"
+    type: "string"
+    default: "system:cli"
+    description: "Seal issuer identity written into frontmatter when sealing"
+
+help:
+  examples:
+    - comment: "Seal a skill pack after editing SKILL.md"
+      command: "%s system seal-skill orchestration-boot"
+    - comment: "Verify seal without rewriting"
+      command: "%s system seal-skill orchestration-boot --verify"
+  exclude_flags:
+    - "columns"
+    - "ignore-scheduler-down"
+
+run_e: "runSealSkill"
+common_flags: true

@@ -1,0 +1,518 @@
+schema_version: 2.0.0
+ontology: code_reference
+extends: base_object
+visibility: internal
+description: 'Represents a reference to a specific code location (file, function, line range) for traceability between requirements, tests, and implementation. '
+traits:
+  - base_object_traits
+fields:
+  author:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation.
+      automation_hooks: used for contributor analysis.
+      cardinality: zero_or_one
+      criticality: association
+      default: null
+      dependencies: Version control repository (Git, SVN, Mercurial, Perforce, etc.).
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: Author of the version control commit.
+      security: non-sensitive
+      system_usage:
+        - traceability
+        - attribution
+      validation: author name pattern.
+    field_profile_code: COD-009
+    permissions: r-x
+    semantic_type: statement
+    traits:
+      - filterable
+      - modifiable
+      - readable
+      - searchable
+      - sortable
+      - writable
+    type: string
+    validation:
+      required: false
+  author_email:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation.
+      automation_hooks: used for contributor analysis.
+      cardinality: zero_or_one
+      criticality: association
+      default: null
+      dependencies: Version control repository (Git, SVN, Mercurial, Perforce, etc.).
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: Email of the commit author.
+      security: may be sensitive (PII).
+      system_usage:
+        - traceability
+        - attribution
+      validation: must be valid email format.
+    field_profile_code: COD-010
+    permissions: r-x
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+      - modifiable
+      - filterable
+      - searchable
+    type: string
+    validation:
+      required: false
+  backlog_item_refs:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation/owner.
+      automation_hooks: used for code-to-backlog traceability.
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: backlog_item registry.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Backlog items this code reference implements.
+      security: non-sensitive
+      system_usage:
+        - traceability
+      validation: Must reference existing backlog_item IDs.
+    field_profile_code: COD-014
+    permissions: r-x
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+      - field_reference_group
+    type: list
+    validation:
+      required: false
+  change_type:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation.
+      automation_hooks: used for change impact analysis.
+      cardinality: zero_or_one
+      criticality: association
+      default: null
+      dependencies: Version control repository (Git, SVN, Mercurial, Perforce, etc.).
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: Type of change to the file (added, modified, deleted, renamed, copied).
+      security: non-sensitive
+      system_usage:
+        - traceability
+        - change analysis
+      validation: 'must be one of: added, modified, deleted, renamed, copied'
+    field_profile_code: COD-011
+    permissions: r-x
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+      - modifiable
+      - filterable
+      - sortable
+    type: string
+    validation:
+      enum:
+        - added
+        - modified
+        - deleted
+        - renamed
+        - copied
+      required: false
+  commit_date:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation.
+      automation_hooks: used for temporal queries.
+      cardinality: zero_or_one
+      criticality: association
+      default: null
+      dependencies: Version control repository (Git, SVN, Mercurial, Perforce, etc.).
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: Date of the version control commit (ISO 8601 format).
+      security: non-sensitive
+      system_usage:
+        - traceability
+        - temporal analysis
+      validation: must be valid ISO 8601 date.
+    field_profile_code: COD-008
+    permissions: r-x
+    semantic_type: statement
+    traits:
+      - filterable
+      - modifiable
+      - readable
+      - sortable
+      - writable
+    type: string
+    validation:
+      required: false
+  commit_hash:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation.
+      automation_hooks: used for linking commits to work items.
+      cardinality: zero_or_one
+      criticality: association
+      default: null
+      dependencies: Version control repository (Git, SVN, Mercurial, Perforce, etc.).
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: Version control system commit identifier that introduced this code reference.
+      security: non-sensitive
+      system_usage:
+        - traceability
+        - code-to-project graph
+      validation: |
+        Must be valid VCS commit identifier. Format depends on VCS system:
+        - Git: SHA-1 hash (40 chars) or short hash (7+ chars)
+        - SVN: Revision number (numeric)
+        - Mercurial: Hex hash (40 chars)
+        - Perforce: Changelist number (numeric)
+        - Other: Alphanumeric string, 1-40 characters
+    field_profile_code: COD-007
+    permissions: r-x
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+      - modifiable
+      - filterable
+      - sortable
+      - searchable
+    type: string
+    validation:
+      pattern: ^[A-Za-z0-9_-]{1,40}$
+      required: false
+  file_path:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation/owner.
+      automation_hooks: used for code navigation, coverage reports.
+      cardinality: one
+      criticality: composition
+      default: required
+      dependencies: file system.
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: Path to the source file (relative to repo root or absolute).
+      security: may reveal file structure—non-sensitive.
+      system_usage:
+        - traceability
+        - documentation
+      validation: must be a valid file path.
+    field_profile_code: COD-001
+    permissions: r-x
+    semantic_type: statement
+    traits:
+      - filterable
+      - listable
+      - modifiable
+      - readable
+      - searchable
+      - sortable
+      - writable
+    type: string
+    validation:
+      required: true
+  function_name:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation/owner.
+      automation_hooks: used for function-level traceability.
+      cardinality: zero_or_one
+      criticality: association
+      default: null
+      dependencies: source file parsing.
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: Name of the function/method being referenced.
+      security: non-sensitive
+      system_usage:
+        - traceability
+        - documentation
+      validation: function name pattern.
+    field_profile_code: COD-004
+    permissions: r-x
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+      - modifiable
+    type: string
+    validation:
+      required: false
+  goal_refs:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation/owner.
+      automation_hooks: used for code-to-goal traceability.
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: goal registry.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Goals this code reference supports.
+      security: non-sensitive
+      system_usage:
+        - traceability
+      validation: Must reference existing goal IDs.
+    field_profile_code: COD-016
+    permissions: r-x
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+      - field_reference_group
+    type: list
+    validation:
+      required: false
+  line_end:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation/owner.
+      automation_hooks: used for code navigation.
+      cardinality: zero_or_one
+      criticality: association
+      default: null (same as line_start if not provided)
+      dependencies: source file.
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: Ending line number of the code reference (1-indexed, inclusive).
+      security: non-sensitive
+      system_usage:
+        - traceability
+        - documentation
+      validation: must be >= line_start if provided.
+    field_profile_code: COD-003
+    permissions: r-x
+    traits:
+      - readable
+      - writable
+      - modifiable
+    type: number
+    validation:
+      required: false
+  line_start:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation/owner.
+      automation_hooks: used for code navigation.
+      cardinality: one
+      criticality: association
+      default: required
+      dependencies: source file.
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: Starting line number of the code reference (1-indexed).
+      security: non-sensitive
+      system_usage:
+        - traceability
+        - documentation
+      validation: must be positive integer.
+    field_profile_code: COD-002
+    permissions: r-x
+    traits:
+      - field_mutable_group
+    type: number
+    validation:
+      required: true
+  lines_added:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation.
+      automation_hooks: used for code metrics.
+      cardinality: zero_or_one
+      criticality: association
+      default: null
+      dependencies: Version control repository (Git, SVN, Mercurial, Perforce, etc.).
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: Number of lines added in this file change.
+      security: non-sensitive
+      system_usage:
+        - metrics
+        - change analysis
+      validation: must be non-negative integer.
+    field_profile_code: COD-012
+    permissions: r-x
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+      - modifiable
+      - filterable
+      - sortable
+    type: number
+    validation:
+      required: false
+  lines_removed:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation.
+      automation_hooks: used for code metrics.
+      cardinality: zero_or_one
+      criticality: association
+      default: null
+      dependencies: Version control repository (Git, SVN, Mercurial, Perforce, etc.).
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: Number of lines removed in this file change.
+      security: non-sensitive
+      system_usage:
+        - metrics
+        - change analysis
+      validation: must be non-negative integer.
+    field_profile_code: COD-013
+    permissions: r-x
+    semantic_type: statement
+    traits:
+      - filterable
+      - modifiable
+      - readable
+      - sortable
+      - writable
+    type: number
+    validation:
+      required: false
+  milestone_refs:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation/owner.
+      automation_hooks: used for code-to-milestone traceability.
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: milestone registry.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Milestones this code reference supports.
+      security: non-sensitive
+      system_usage:
+        - traceability
+      validation: Must reference existing milestone IDs.
+    field_profile_code: COD-015
+    permissions: r-x
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+      - field_reference_group
+    type: list
+    validation:
+      required: false
+  requirement_refs:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: used for requirement-code traceability.
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: requirement registry.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Requirements this code reference implements.
+      security: non-sensitive
+      system_usage:
+        - traceability
+      validation: Must reference existing requirement IDs.
+    field_profile_code: COD-005
+    permissions: r-x
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+      - field_reference_group
+    type: list
+    validation:
+      required: false
+  test_case_refs:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: used for test-code traceability.
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: test_case registry.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Test cases that test this code reference.
+      security: non-sensitive
+      system_usage:
+        - traceability
+      validation: Must reference existing test_case IDs.
+    field_profile_code: COD-006
+    permissions: r-x
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+      - field_reference_group
+    type: list
+    validation:
+      required: false
+  workstream_refs:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation/owner.
+      automation_hooks: used for code-to-workstream traceability.
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: workstream registry.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Workstreams this code reference belongs to.
+      security: non-sensitive
+      system_usage:
+        - traceability
+      validation: Must reference existing workstream IDs.
+    field_profile_code: COD-017
+    permissions: r-x
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+      - field_reference_group
+    type: list
+    validation:
+      required: false

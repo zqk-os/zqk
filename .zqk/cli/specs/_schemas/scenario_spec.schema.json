@@ -1,0 +1,169 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://zqk.dev/schemas/scenario_spec.schema.json",
+  "title": "Test Scenario Specification Schema",
+  "description": "Schema for test scenario definitions used in MCP testing framework",
+  "type": "object",
+  "required": ["name", "tests"],
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "Reference to this schema file"
+    },
+    "name": {
+      "type": "string",
+      "description": "Scenario name"
+    },
+    "description": {
+      "type": "string",
+      "description": "Scenario description"
+    },
+    "imports": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Files to import and merge"
+    },
+    "setup": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/testStep"
+      },
+      "description": "Setup steps (run before tests)"
+    },
+    "tests": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/testStep"
+      },
+      "minItems": 1,
+      "description": "Test steps"
+    },
+    "cleanup": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/testStep"
+      },
+      "description": "Cleanup steps (run after tests)"
+    },
+    "variables": {
+      "type": "object",
+      "description": "Variables for interpolation"
+    },
+    "response_processor": {
+      "type": "string",
+      "enum": ["elicitation_to_success", "ignore_errors", "noop"],
+      "description": "Processor name for handling responses"
+    }
+  },
+  "definitions": {
+    "testStep": {
+      "type": "object",
+      "required": ["name", "tool"],
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "tool": {
+          "type": "string",
+          "description": "MCP tool name"
+        },
+        "args": {
+          "type": "object",
+          "description": "Tool arguments"
+        },
+        "import": {
+          "type": "string",
+          "description": "Import external data file"
+        },
+        "import_path": {
+          "type": "string",
+          "description": "JSONPath-like path to merge (e.g., 'args.milestone_refs')"
+        },
+        "skip": {
+          "type": "boolean",
+          "default": false,
+          "description": "Skip this test"
+        },
+        "expected": {
+          "$ref": "#/definitions/testExpectation"
+        },
+        "store_result": {
+          "type": "string",
+          "description": "Store result in variables (key name)"
+        },
+        "depends_on": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Dependencies on stored results"
+        }
+      },
+      "additionalProperties": false
+    },
+    "testExpectation": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean"
+        },
+        "has_field": {
+          "type": "object",
+          "description": "Field name -> expected value"
+        },
+        "has_fields": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "List of fields that must exist"
+        },
+        "not_has_fields": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "List of fields that must not exist"
+        },
+        "matches": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Field name -> regex pattern"
+        },
+        "equals": {
+          "type": "object",
+          "description": "Field name -> exact value"
+        },
+        "error": {
+          "$ref": "#/definitions/errorExpectation"
+        }
+      },
+      "additionalProperties": false
+    },
+    "errorExpectation": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer"
+        },
+        "message": {
+          "type": "string",
+          "description": "Exact message or regex pattern"
+        },
+        "type": {
+          "type": "string",
+          "description": "Error type (e.g., 'elicitation', 'validation')"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

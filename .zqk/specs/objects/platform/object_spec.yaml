@@ -1,0 +1,126 @@
+schema_version: 2.0.0
+ontology: object_spec
+extends: base_object
+visibility: internal
+description: Meta-kind for YAML definition files under .zqk/specs/objects.\nList/get surface each spec file as a row (id = file stem). Specialized fields describe\nthe spec file and the ontology it defines.\n
+traits:
+  - base_object_traits
+fields:
+  completeness_validation:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: system
+      automation_hooks: acts as the master template for validation steps when a new object of this kind is instantiated.
+      cardinality: many
+      criticality: composition
+      default: []
+      dependencies: object generation pipeline.
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: The canonical Validation DSL steps that must pass for any object of this kind to be considered fully complete.
+      security: non-sensitive
+      system_usage:
+        - instantiation_templates
+        - baseline_enforcement
+      validation: List of Validation DSL steps.
+    field_profile_code: OSPEC-004
+    permissions: r-x
+    semantic_type: expression
+    traits:
+      - readable
+      - filterable
+    type: list
+    validation:
+      required: false
+  file_path:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: system
+      automation_hooks: used when listing specs from disk
+      cardinality: one
+      criticality: association
+      default: null
+      dependencies: object_specs directory layout
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: Absolute or project-relative path to the YAML spec file when materialized as an object row.
+      security: non-sensitive
+      system_usage:
+        - listing
+        - navigation
+      validation: Path string when present
+    field_profile_code: OSPEC-001
+    permissions: r-x
+    semantic_type: statement
+    traits:
+      - readable
+      - filterable
+    type: string
+    validation:
+      required: false
+  ontology:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: system
+      automation_hooks: ties list rows to the kind defined by the file
+      cardinality: one
+      criticality: composition
+      default: object_spec
+      dependencies: spec YAML ontology field
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: The object kind (ontology) defined by this spec file (e.g. backlog_item, lifecycle).
+      security: non-sensitive
+      system_usage:
+        - filtering
+        - validation
+      validation: Lowercase identifier
+    field_profile_code: OSPEC-002
+    permissions: r-x
+    semantic_type: identifier
+    traits:
+      - filterable
+      - sortable
+      - searchable
+    type: string
+    validation:
+      pattern: ^[a-z][a-z0-9_]*$
+      required: false
+  source_type:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: system
+      automation_hooks: list grouping for built-in vs internal vs public specs
+      cardinality: one
+      criticality: association
+      default: internal
+      dependencies: path and visibility in spec YAML
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: Provenance bucket (built-in, internal, public) when listing from disk.
+      security: non-sensitive
+      system_usage:
+        - filtering
+        - grouping
+      validation: enum
+    field_profile_code: OSPEC-003
+    permissions: r-x
+    semantic_type: statement
+    traits:
+      - filterable
+      - groupable
+    type: enum
+    validation:
+      enum:
+        - built-in
+        - internal
+        - public
+      required: false

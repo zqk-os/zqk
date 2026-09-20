@@ -1,0 +1,237 @@
+schema_version: 2.0.0
+ontology: agent_feed
+extends: base_object
+visibility: internal
+kernel_critical: false
+description: 'Binds a logical **agent chat / IDE feed** to on-disk policy and event streams (lite file under `.zqk/config/`\nand append-only JSONL). Used by stewards and future Cursor/IDE integrations so delivery rules are process objects,\nnot only local JSON. Runtime paths default through `pkg/datacell` (`AgentChatChannelConfigPath`,\n`AgentChatChannelEventsJSONLPath`); optional overrides below apply when set.\n**Structural (CAS):** identity, title, path overrides, contract version, notes—changes that redefine the binding.\n**Runtime_delta (overlay):** high-churn toggles—`enabled`, `delivery_mode`—so operators can flip delivery without rewriting the structural blob.\nLifecycle: agent_feed_lifecycle.yaml.\n'
+traits:
+  - base_object_traits
+fields:
+  config_path_override:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: operator.
+      automation_hooks: optional override for lite policy JSON path.
+      cardinality: zero_or_one
+      criticality: association
+      default: null
+      dependencies: path cache.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: When set, steward uses this path instead of the default datacell alias for config.
+      security: non-sensitive
+      system_usage:
+        - agent_feed
+      validation: project-relative or absolute path.
+    field_profile_code: AGF-004
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - field_mutable_group
+    type: string
+    validation:
+      required: false
+  contract_schema_version:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: system.
+      automation_hooks: version JSONL event rows.
+      cardinality: one
+      criticality: composition
+      default: "1"
+      dependencies: JSONL writers.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Schema version string for events appended for this feed (e.g. `1`).
+      security: non-sensitive
+      system_usage:
+        - agent_feed
+      validation: non-empty string.
+    field_profile_code: AGF-003
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+      - modifiable
+    type: string
+    validation:
+      max_length: 32
+      required: true
+  delivery_mode:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: operator.
+      automation_hooks: selects how much automation runs (notify vs clipboard vs paste).
+      cardinality: one
+      criticality: composition
+      default: "off"
+      dependencies: IDE hooks, notifications.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Coarse delivery mode for this feed binding.
+      security: non-sensitive
+      system_usage:
+        - agent_feed
+      validation: enum.
+    field_profile_code: AGF-002
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+      - modifiable
+      - filterable
+    type: enum
+    validation:
+      enum:
+        - "off"
+        - log
+        - clipboard
+        - paste
+        - notify
+      required: true
+  enabled:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: operator.
+      automation_hooks: gates whether steward writes events or triggers IDE delivery.
+      cardinality: one
+      criticality: composition
+      default: false
+      dependencies: datacell paths.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: When false, producers should not emit to the feed or paste into IDE.
+      security: non-sensitive
+      system_usage:
+        - agent_feed
+      validation: boolean.
+    field_profile_code: AGF-001
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+      - modifiable
+      - filterable
+    type: bool
+    validation:
+      required: true
+  events_jsonl_path_override:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: operator.
+      automation_hooks: optional override for JSONL event log path.
+      cardinality: zero_or_one
+      criticality: association
+      default: null
+      dependencies: path cache.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: When set, writers append here instead of the default datacell events path.
+      security: non-sensitive
+      system_usage:
+        - agent_feed
+      validation: project-relative or absolute path.
+    field_profile_code: AGF-005
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - field_mutable_group
+    type: string
+    validation:
+      required: false
+  note:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: operator.
+      automation_hooks: none.
+      cardinality: zero_or_one
+      criticality: association
+      default: null
+      dependencies: none.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Free-form operator notes for this feed binding.
+      security: may contain sensitive details.
+      system_usage:
+        - agent_feed
+    field_profile_code: AGF-006
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - field_mutable_group
+    type: text
+    validation:
+      required: false
+  probe_command_substrings:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: operator.
+      automation_hooks: optional postToolUse hook filter; at least one substring must appear in tool payload when non-empty.
+      cardinality: zero_or_one
+      criticality: composition
+      default: null
+      dependencies: Cursor hook.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: e.g. zqk, bin/zqk — narrows probe to CLI-shaped invocations.
+      security: non-sensitive
+      system_usage:
+        - agent_feed
+      validation: list of strings.
+    field_profile_code: AGF-008
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+      - modifiable
+      - filterable
+    type: list
+    validation:
+      required: false
+  probe_tool_allowlist:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: operator.
+      automation_hooks: optional postToolUse hook filter; materialized to agent_chat_channel.json for .cursor/hooks/post-tooluse-probe.sh.
+      cardinality: zero_or_one
+      criticality: composition
+      default: null
+      dependencies: Cursor hook, IDE.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: When non-empty, only these tool_name values (e.g. Shell, run_terminal_cmd) may append probe JSONL; case-insensitive AND with probe_command_substrings when both set.
+      security: non-sensitive
+      system_usage:
+        - agent_feed
+      validation: list of strings.
+    field_profile_code: AGF-007
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+      - modifiable
+      - filterable
+    type: list
+    validation:
+      required: false

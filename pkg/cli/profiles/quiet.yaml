@@ -1,0 +1,25 @@
+# Quiet CLI Profile Specification
+# Version: 1.0.0
+
+schema_version: "1.0.0"
+namespace_id: "zqk:kernel:cli"
+name: "quiet"
+extends: "base"
+description: |
+  Quiet profile: automatically filters out terminal statuses (complete, archived, closed, etc.).
+  Optimized for focusing on active work items and suppressing completed/archived items.
+  Uses table format with minimal verbosity.
+
+spec:
+  format: "table"
+  verbose: false
+  quiet: true
+  flags:
+    format: "table"
+    quiet: true
+  commands:
+    aliases:
+      "list": "object list"
+      "backlog": "backlog list"
+    # Note: Status filtering for terminal statuses is automatically applied in command handlers
+    # when quiet profile is active, object list commands exclude: complete, archived, closed, cancelled

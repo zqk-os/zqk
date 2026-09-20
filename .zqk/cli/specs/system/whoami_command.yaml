@@ -1,0 +1,27 @@
+$schema: "../schemas/command_spec.schema.json"
+
+name: "whoami"
+short: "Show the authenticated account, lane, roles, and permissions"
+description: |
+  Prints the kernel identity AuthMiddleware resolved for this process:
+  ACC-*, persona, planner/doer/admin lane, roles, and permissions.
+  Does not invent a system account when a seat credential is present.
+  Writes .zqk/state/identity_status.json so status bars can read the same snapshot.
+
+args:
+  type: "no_args"
+
+flags: []
+
+help:
+  examples:
+    - comment: "Table view of the current seat"
+      command: "%s system whoami"
+    - comment: "JSON for status bars and agents"
+      command: "%s system whoami --format json"
+  exclude_flags:
+    - "columns"
+    - "ignore-scheduler-down"
+
+run_e: "runWhoami"
+common_flags: true

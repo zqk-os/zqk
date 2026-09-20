@@ -1,0 +1,354 @@
+schema_version: 2.0.0
+ontology: test_case
+urn: urn:zqk:spec:project_mgmt:test_case
+namespace: zqk:project_mgmt
+extends: work_interval
+composes:
+  - remaining_open
+visibility: public
+description: 'Represents an automated or manual test linked to requirements/workstreams.\nLifecycle: test_case_lifecycle.yaml.\n'
+traits:
+  - base_object_traits
+  - completable
+  - open_countable
+fields:
+  backlog_item_refs:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: QA/owner.
+      automation_hooks: used for backlog item coverage tracking.
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: backlog registry.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Backlog items this test case validates.
+      security: non-sensitive
+      system_usage:
+        - traceability
+        - coverage
+      validation: must reference existing backlog item IDs.
+    field_profile_code: TST-005
+    permissions: r-x
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+      - field_reference_group
+    type: list
+    validation:
+      required: false
+  category:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: QA/owner.
+      automation_hooks: used for test filtering and grouping.
+      cardinality: one
+      criticality: association
+      default: null
+      dependencies: none.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Test category classification (e.g., \\\"Unit\\\", \\\"Integration\\\", \\\"E2E\\\", \\\"Performance\\\").
+      security: non-sensitive
+      system_usage:
+        - filtering
+        - grouping
+        - reporting
+      validation: Free-form string.
+    field_profile_code: TST-001
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - listable
+      - readable
+      - writable
+      - modifiable
+      - groupable
+      - filterable
+      - sortable
+      - searchable
+    type: string
+    validation:
+      required: false
+  criteria_refs:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: QA/owner.
+      automation_hooks: used for criteria validation.
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: criteria registry.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Criteria this test case validates.
+      security: non-sensitive
+      system_usage:
+        - traceability
+        - validation
+      validation: must reference existing criteria IDs.
+    field_profile_code: TST-008
+    permissions: r-x
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+      - field_reference_group
+    type: list
+    validation:
+      required: false
+  description:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: QA/owner.
+      automation_hooks: used in test reports and documentation.
+      cardinality: one
+      criticality: association
+      default: null
+      dependencies: none.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Detailed description of what the test case validates.
+      security: non-sensitive
+      system_usage:
+        - documentation
+        - reporting
+        - search
+      validation: Free-form text (markdown allowed).
+    field_profile_code: TST-003
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+      - modifiable
+      - searchable
+    type: text
+    validation:
+      required: false
+  milestone_refs:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: QA/owner.
+      automation_hooks: used for milestone validation.
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: milestone registry.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Milestones this test case validates.
+      security: non-sensitive
+      system_usage:
+        - traceability
+        - validation
+      validation: must reference existing milestone IDs.
+    field_profile_code: TST-006
+    permissions: r-x
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+      - field_reference_group
+    type: list
+    validation:
+      required: false
+  path_or_id:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: QA/owner.
+      automation_hooks: used to execute the test.
+      cardinality: zero_or_one
+      criticality: composition
+      default: null
+      dependencies: test runner.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: File path, test identifier, or command to run the test.
+      security: non-sensitive
+      system_usage:
+        - automation
+        - documentation
+      validation: Free-form string.
+    field_profile_code: TST-002
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+      - modifiable
+    type: string
+    validation:
+      required: false
+  priority:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: QA/owner.
+      automation_hooks: used for test execution prioritization.
+      cardinality: one
+      criticality: association
+      default: null
+      dependencies: test runner.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Priority level (critical, high, medium, low) for test execution ordering.
+      security: non-sensitive
+      system_usage:
+        - prioritization
+        - test execution ordering
+      validation: enum (critical, high, medium, low).
+    field_profile_code: TST-000
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - filterable
+      - groupable
+      - listable
+      - modifiable
+      - readable
+      - searchable
+      - sortable
+      - writable
+    type: enum
+    validation:
+      enum:
+        - critical
+        - high
+        - medium
+        - low
+      required: false
+  requirement_refs:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: QA/owner.
+      automation_hooks: used for requirement coverage tracking.
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: requirement registry.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Requirements this test case validates.
+      security: non-sensitive
+      system_usage:
+        - traceability
+        - coverage
+      validation: must reference existing requirement IDs.
+    field_profile_code: TST-004
+    permissions: r-x
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+      - field_reference_group
+    type: list
+    validation:
+      required: false
+  scope:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: QA/owner.
+      automation_hooks: determines runner to use.
+      cardinality: one
+      criticality: composition
+      default: unit
+      dependencies: test runner.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Test category (unit, integration, e2e, manual, scenario).
+      security: non-sensitive
+      system_usage:
+        - reporting
+        - coverage
+      validation: enum.
+    field_profile_code: TST-001
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - filterable
+      - groupable
+      - listable
+      - modifiable
+      - readable
+      - searchable
+      - sortable
+      - writable
+    type: enum
+    validation:
+      enum:
+        - unit
+        - integration
+        - e2e
+        - manual
+        - scenario
+      required: false
+  verification_suites:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: QA/owner.
+      automation_hooks: used for QA daemon verification.
+      cardinality: many
+      criticality: composition
+      default: []
+      dependencies: none.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: List of antagonistic test suites to run before cryptographic signing.
+      security: non-sensitive
+      system_usage:
+        - verification
+      validation: list of strings.
+    field_profile_code: TST-009
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - field_mutable_group
+    type: list
+    validation:
+      required: false
+  workstream_refs:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: QA/owner.
+      automation_hooks: used for workstream test coverage.
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: workstream registry.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Workstreams this test case belongs to.
+      security: non-sensitive
+      system_usage:
+        - grouping
+        - reporting
+      validation: must reference existing workstream IDs.
+    field_profile_code: TST-006
+    permissions: r-x
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+      - field_reference_group
+    type: list
+    validation:
+      required: false

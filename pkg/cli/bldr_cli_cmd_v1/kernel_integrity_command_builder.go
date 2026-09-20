@@ -1,0 +1,27 @@
+package bldr_cli_cmd_v1
+
+import (
+	clipkg "github.com/zqk-os/zqk/pkg/cli"
+	"github.com/spf13/cobra"
+)
+
+// NewKernelIntegrityCommandBuilder creates a new kernel_integrity command
+func NewKernelIntegrityCommandBuilder() *cobra.Command {
+	builder := clipkg.NewCommandBuilder("kernel-integrity")
+	builder.WithShort("Kernel Mutation Pipeline coverage, dangling-ref heal, and work-envelope backfill")
+	help := clipkg.DynamicHelpBuilder("Kernel Mutation Pipeline coverage, dangling-ref heal, and work-envelope backfill")
+	help.WithDescriptionLines("Observability and heal helpers for closed kernel.cas_object_* mutation kinds.")
+	help.WithDescriptionLines("Compose materializes pipeline_definition rows from kind×intent composition.")
+	help.WithDescriptionLines("See docs/architecture/KERNEL_MUTATION_PIPELINE.md.")
+	help.AddExample("Coverage + composition registry size", "%s system kernel-integrity report")
+	help.AddExample("Compile definitions without writing CAS", "%s system kernel-integrity compose --dry-run")
+	help.AddExample("Materialize pipeline_definition rows", "%s system kernel-integrity compose")
+	help.AddExample("Preview dangling-ref unlinks", "%s system kernel-integrity heal-dangling")
+	help.AddExample("Preview missing work-envelope clocks", "%s system kernel-integrity backfill-work-envelope")
+	help.ExcludeFlag("columns")
+	help.ExcludeFlag("ignore-scheduler-down")
+	builder.WithHelpBuilder(help)
+	builder.WithCommonFlags(false, nil)
+	cmd := builder.Build()
+	return cmd
+}

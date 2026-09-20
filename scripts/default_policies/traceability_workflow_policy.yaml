@@ -1,0 +1,21 @@
+kind: policy
+schema_version: "2.0.0"
+title: Traceable Work - Plans, Backlog, and Relationships
+status: active
+category: workflow
+policy_type: requirement
+body: |
+  Substantive delivery work must be traceable through the graph:
+
+  - Prefer an active priority plan with ordered backlog items.
+  - Link work to goals/milestones when moving beyond exploration.
+  - Keep status honest (exploring → planned → in_progress → complete) via object updates.
+  - Related objects (requirements, criteria, agent tasks) should reference the backlog item they serve.
+
+  Agents and humans should be able to answer "why are we doing this?" by walking
+  backlog → plan → goals → mission/vision — not by reconstructing chat history.
+effective_date: "2026-07-25"
+enforcement:
+  automated: false
+  reminder_enabled: true
+  severity: high

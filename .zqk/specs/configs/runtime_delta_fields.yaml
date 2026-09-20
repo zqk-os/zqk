@@ -1,0 +1,6 @@
+scheduler_job:
+  - status
+  - updated_at
+  - updated_by
+  - last_run_at
+  - next_run_at

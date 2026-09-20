@@ -1,0 +1,172 @@
+$schema: ../../../.zqk/cli/specs/schemas/lifecycle_spec.schema.json
+object_type: epic
+status_mapping:
+  complete: completed
+  active: in_progress
+  approved: planned
+  proposed: draft
+statuses:
+  - value: conceptual
+    display: Conceptual
+    origin: true
+    preliminary: true
+    description: Draft plane status. Prior to CAS membrane crossing.
+    role: realign
+  - value: originated
+    display: Originated
+    description: CAS membrane crossed. Object officially originated.
+    role: realign
+  - value: draft
+    display: Draft
+    origin: false
+    preliminary: false
+    description: Epic scope and enclave boundaries being drafted; intake and early framing.
+    role: realign
+  - value: planned
+    display: Planned
+    description: Enclave scope defined, child requirements, workstreams, and plans mapped; ready for execution.
+    role: shovel_ready
+  - value: in_progress
+    display: In Progress
+    description: Active execution of member work units and priority plans under this epic enclave.
+    role: execution_locked
+  - value: paused
+    display: Paused
+    description: Epic execution temporarily paused; member work units halted.
+    role: halted
+  - value: completed
+    display: Completed
+    terminal: true
+    work_done: true
+    role: terminal
+    description: All governed requirements, criteria, and child work units verified complete.
+  - value: archived
+    display: Archived
+    terminal: true
+    archive: true
+    role: terminal
+    description: Epic archived for history; no longer an active architectural enclave.
+    shockwave:
+      mode: cluster
+      fail: closed
+  - value: error
+    display: Error
+    system: true
+    role: halted
+    description: Epic held in system error state for repair.
+transitions:
+  - from: conceptual
+    to: originated
+    description: Promote from draft plane to CAS membrane (CAS Qualification).
+    manual: true
+    auto: false
+    catalyst: System promotion
+    postconditions:
+      - role is realign
+    class_vs_specialty: class-agnostic
+    shockwave:
+      mode: propagate
+  - from: originated
+    to: draft
+    description: Initial domain workflow transition to draft.
+    manual: true
+    auto: true
+    catalyst: System initialization
+    postconditions:
+      - role is realign
+    class_vs_specialty: class-agnostic
+    shockwave:
+      mode: propagate
+  - from: draft
+    to: planned
+    description: Scope and enclave boundaries defined; promote to planned.
+    manual: true
+    auto: false
+    catalyst: Standard progression
+    postconditions:
+      - role is shovel_ready
+    class_vs_specialty: class-agnostic
+    shockwave:
+      mode: propagate
+  - from: planned
+    to: in_progress
+    description: Begin active execution of epic components.
+    manual: true
+    auto: true
+    catalyst: Standard progression
+    postconditions:
+      - role is execution_locked
+    class_vs_specialty: class-agnostic
+    shockwave:
+      mode: propagate
+  - from: in_progress
+    to: paused
+    description: Temporarily pause execution of epic.
+    manual: true
+    auto: false
+    catalyst: Standard progression
+    postconditions:
+      - role is halted
+    class_vs_specialty: class-agnostic
+    shockwave:
+      mode: propagate
+  - from: paused
+    to: in_progress
+    description: Resume execution of epic from paused state.
+    manual: true
+    auto: false
+    catalyst: Standard progression
+    postconditions:
+      - role is execution_locked
+    class_vs_specialty: class-agnostic
+    shockwave:
+      mode: propagate
+  - from: in_progress
+    to: completed
+    description: Auto-complete or manually complete epic once child components reach completion.
+    manual: true
+    auto: true
+    catalyst: Standard progression
+    postconditions:
+      - role is terminal
+    class_vs_specialty: class-agnostic
+    shockwave:
+      mode: propagate
+  - from: '*'
+    to: archived
+    description: Manual archival from any status.
+    manual: true
+    auto: false
+    catalyst: Standard progression
+    postconditions:
+      - role is terminal
+    class_vs_specialty: class-agnostic
+    shockwave:
+      mode: propagate
+  - from: error
+    to: draft
+    description: Recover from system error after required fields and references are restored.
+    manual: true
+    auto: false
+    catalyst: Standard progression
+    postconditions:
+      - role is realign
+    class_vs_specialty: class-agnostic
+    shockwave:
+      mode: propagate
+percent_complete:
+  method: item_based
+  default_by_status:
+    conceptual: 0
+    originated: 5
+    draft: 10
+    planned: 20
+    in_progress: 50
+    paused: 50
+    completed: 100
+    archived: 100
+    error: 0
+created_at: 2026-07-01 18:00:00+00:00
+updated_at: 2026-07-01 18:00:00+00:00
+created_by: ACC-1785920548450214012-68b850c0
+updated_by: ACC-1785920548450214012-68b850c0

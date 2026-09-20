@@ -1,0 +1,17 @@
+completed_at: "2026-09-20T01:18:41Z"
+created_at: "2026-09-19T05:55:00Z"
+created_by: ACC-1785920548450214012-68b850c0
+description: 'Audit and align the full zqk CLI taxonomy: purge deprecated commands, unify Job and Service management, group Convergence and Swarm commands, isolate vendor adapters, and enforce 100% spec coverage.'
+id: PRI-CLI-TAXONOMY-OVERHAUL-001
+kind: priority_plan
+namespace_id: zqk:kernel
+priority_tier: P0
+schema_version: 2.0.0
+started_at: "2026-09-20T01:13:02Z"
+status: complete
+title: CLI Command Taxonomy Harmonization, Spec Completeness & Vendor Decoupling
+updated_at: "2026-09-20T01:18:41Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs:
+    - WS-CLI-TAXONOMY-OVERHAUL

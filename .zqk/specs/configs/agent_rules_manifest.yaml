@@ -1,0 +1,44 @@
+# Canonical registry for IDE/agent rule files (*.mdc under the configured rules dir; default .cursor/rules).
+# Validated by: zqk system validate-agent-rules (no flags from repo root; use --write-manifest to refresh this list).
+# Override directory: ZQK_AGENT_RULES_DIR or --rules-dir.
+version: 1
+rules:
+    - admin-membrane.mdc
+    - agent-git-attribution.mdc
+    - agent-guidelines-and-patterns.mdc
+    - agent-investigate-first.mdc
+    - agent-working-posture.mdc
+    - agent-worktree-isolation.mdc
+    - autofix-convergence-evidence-first.mdc
+    - branch-hygiene.mdc
+    - cas-cache-git-hygiene.mdc
+    - cli-command-spec-codegen.mdc
+    - convergence-session-agent-discipline.mdc
+    - cursor-agent-terminal-shell.mdc
+    - cvs-silent-iterate-loop.mdc
+    - data-cell-session-priority.mdc
+    - field-key-literal-scan.mdc
+    - filesystem-data-layout.mdc
+    - follow-up-tracked-debt.mdc
+    - instance-builders-and-metrics.mdc
+    - instruction-processing-rubric.mdc
+    - interaction-policies.mdc
+    - kernel-root-binding.mdc
+    - kernel-vs-pack-stage-gate.mdc
+    - lifecycle-no-override.mdc
+    - never-git-clean-process.mdc
+    - object-bulk-delete-not-loop.mdc
+    - object-count-self-maintenance.mdc
+    - observe-hypothesize-test-verify.mdc
+    - pre-change-checklist.mdc
+    - priority-plan-order.mdc
+    - process-data-cli-only.mdc
+    - public-push-capability.mdc
+    - strict-artifact-verification.mdc
+    - tests-background-output-to-file.mdc
+    - tests-go-test-timeout.mdc
+    - three-plan-working-posture.mdc
+    - tpm-agy-mesh-wake.mdc
+    - validation-progress-completion.mdc
+    - verifiable-decomposition-spine.mdc
+    - zqk-test-bundles-commit.mdc

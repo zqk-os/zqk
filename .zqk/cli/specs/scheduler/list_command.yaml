@@ -1,0 +1,22 @@
+$schema: "../schemas/command_spec.schema.json"
+
+name: "list"
+short: "List all scheduler jobs"
+description: |
+  List all scheduler_job objects with their status and schedule information.
+
+help:
+  examples:
+    - comment: "List all scheduler jobs"
+      command: "%s scheduler list"
+  exclude_flags:
+    - "format"
+    - "output"
+    - "verbose"
+    - "quiet"
+    - "timeout"
+    - "columns"
+
+run_e: "runList"
+async: true
+common_flags: true

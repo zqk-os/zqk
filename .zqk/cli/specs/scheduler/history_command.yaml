@@ -1,0 +1,57 @@
+$schema: "../schemas/command_spec.schema.json"
+
+name: "history"
+short: "Show execution history summary for scheduler jobs"
+description: |
+  Show a summary of scheduler job execution history including success/failure counts and last run time.
+  
+  This command queries audit events to show:
+    - Total runs per job
+    - Success count
+    - Failure count
+    - Last run time
+    - Last run outcome
+  
+  Performance tips:
+    - Use --limit to reduce the number of events queried (default: 5000)
+    - Use --since and --until to narrow the time range
+    - Use --job-id to filter by specific job
+
+flags:
+  - name: "job-id"
+    type: "string"
+    description: "Filter by specific job ID (optional)"
+  - name: "limit"
+    type: "int"
+    default: 5000
+    description: "Maximum number of audit events to query (default: 5000, only used with --bypass-cache or time filters)"
+  - name: "since"
+    type: "string"
+    description: "Only show history since this time. Supports: RFC3339, Relative (1h, 12h, 1d, 7d, 30d), Natural (today, yesterday, this-week, last-week, this-month, last-month, this-year). Note: Time filters require --bypass-cache"
+  - name: "until"
+    type: "string"
+    description: "Only show history until this time. Supports: RFC3339, Relative (1h, 12h, 1d, 7d, 30d), Natural (today, yesterday, now). Note: Time filters require --bypass-cache"
+  - name: "bypass-cache"
+    type: "bool"
+    default: false
+    description: "Bypass cache and query audit events directly (slower, but more complete for small datasets)"
+
+help:
+  examples:
+    - comment: "Show history for all jobs"
+      command: "%s scheduler history"
+    - comment: "Show history for a specific job"
+      command: "%s scheduler history --job-id SCH-001"
+    - comment: "Show history since last week"
+      command: "%s scheduler history --since 7d --bypass-cache"
+  exclude_flags:
+    - "format"
+    - "output"
+    - "verbose"
+    - "quiet"
+    - "timeout"
+    - "columns"
+
+run_e: "runHistory"
+async: true
+common_flags: true

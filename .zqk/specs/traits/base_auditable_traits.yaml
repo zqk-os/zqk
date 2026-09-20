@@ -1,0 +1,25 @@
+$schema: "../../../.zqk/cli/specs/schemas/trait_spec.schema.json"
+
+name: base_auditable_traits
+description: Base trait group for all objects extending auditable.\nThis trait group includes the standard traits that all auditable objects inherit.\nObjects extending auditable automatically get these traits.\nWhen this trait group is referenced, it expands to include all listed traits.\n
+category: base-group
+requires: []
+conflicts: []
+includes:
+  - listable
+  - readable
+  - writable
+  - modifiable
+  - removable
+  - formatable
+  - filterable
+  - sortable
+  - searchable
+field_level: false
+object_level: true
+config: {}
+
+created_at: 2026-07-01T18:00:00Z
+updated_at: 2026-07-01T18:00:00Z
+created_by: ACC-1785920548450214012-68b850c0
+updated_by: ACC-1785920548450214012-68b850c0

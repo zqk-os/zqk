@@ -1,0 +1,49 @@
+# Daily read-only overseer snapshot: appends JSON lines to .zqk/logs/scheduler/cvs/overseer_runs.jsonl
+# (schema overseer_run_v1). Does not update convergence_session objects.
+#
+# Create / refresh:
+#   zqk object create scheduler_job --file scripts/scheduler_jobs/convergence_overseer_record_daily.yaml
+# Or rely on ensure-retention-jobs when listed in scheduler_maintenance_config.yaml.
+#
+# Env:
+#   COORDINATOR_SESSION_ID — parent/coordinator CVS-* (required for overseer)
+#   OVERSEER_SKIP_ROLLUP_GATES — default fast path (1 = --skip-rollup-gates)
+#
+# Suspend: zqk object update SCH-convergence-overseer-record --field enabled=false
+#
+# Index: scripts/README.md (section "Convergence promotion and overseer helpers") for script env, --help, related jobs.
+
+kind: scheduler_job
+schema_version: "2.0.0"
+id: SCH-convergence-overseer-record
+title: Convergence — overseer JSONL record (read-only)
+description: |
+  Runs `scripts/record_convergence_overseer_run.sh` once per day to capture
+  overseer JSON (tree + rollup_status_core + arbitrated line) for auditing and
+  future automation without persisting process objects.
+job_type: run_wrapper
+trigger_type: timer
+schedule_expression: "0 12 * * *"
+category: maintenance
+execution_mode: reusable
+max_runtime_seconds: 600
+enabled: true
+status: active
+namespace_id: zqk:kernel
+environment_variables:
+  COORDINATOR_SESSION_ID: CVS-1776058539101059000-ffbcee8f
+  OVERSEER_SKIP_ROLLUP_GATES: "1"
+command: /bin/sh
+command_args:
+  - "-c"
+  - |
+    set -e
+    ROOT="${ZQK_PROJECT_ROOT:-$(pwd)}"
+    export ZQK_PROJECT_ROOT="$ROOT"
+    exec /bin/sh "$ROOT/scripts/record_convergence_overseer_run.sh"
+created_at: "2026-04-04T21:35:00Z"
+updated_at: "2026-04-04T21:35:00Z"
+created_by: account:system
+updated_by: account:system
+origin_project: zqk
+origin_system: zqk

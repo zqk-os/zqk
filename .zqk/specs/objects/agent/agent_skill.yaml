@@ -1,0 +1,29 @@
+schema_version: 2.0.0
+ontology: agent_skill
+extends: base_object
+visibility: public
+description: Represents a distributable, codified agent skill or extension (e.g., Gemini CLI skill, Cursor rule, MCP tool). Integrating skills as system objects ensures procedural knowledge is versioned, shared, and propagates project culture and guidelines.\n
+traits:
+  - base_object_traits
+fields:
+  instructions:
+    semantic_type: description
+    traits:
+      - readable
+      - writable
+      - searchable
+    type: string
+  instructions_summary:
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+      - searchable
+    type: string
+  provider:
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+      - filterable
+    type: string

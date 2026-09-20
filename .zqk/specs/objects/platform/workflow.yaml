@@ -1,0 +1,406 @@
+schema_version: 2.0.0
+ontology: workflow
+extends: base_object
+visibility: public
+description: 'Defines workflows that orchestrate object lifecycles, policies, templates, and other workflow-supporting items. Workflows can be scoped to specific roles or accounts, enabling role-based workflow presentation. A workflow represents a complete process or methodology (e.g., \"Feature Development Workflow\", \"Bug Fix Workflow\").\nLifecycle: workflow_lifecycle.yaml.\n'
+traits:
+  - base_object_traits
+fields:
+  applicable_accounts:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: admin.
+      automation_hooks: filters workflows by account for presentation.
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: account system.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: List of account IDs that can use this workflow. Empty list means available to all accounts.
+      security: non-sensitive
+      system_usage:
+        - account-based filtering
+        - workflow presentation
+        - access control
+      validation: list of account references (account:username or ACC-###).
+    field_profile_code: WFL-006
+    permissions: rwx
+    semantic_type: reference
+    traits:
+      - filterable
+      - modifiable
+      - readable
+      - writable
+    type: list
+    validation:
+      required: false
+  applicable_roles:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: admin.
+      automation_hooks: filters workflows by role for presentation.
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: role system.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: List of role IDs that can use this workflow. Empty list means available to all roles.
+      security: non-sensitive
+      system_usage:
+        - role-based filtering
+        - workflow presentation
+        - access control
+      validation: list of role references (role:ID or RLE-###).
+    field_profile_code: WFL-005
+    permissions: rwx
+    semantic_type: reference
+    traits:
+      - readable
+      - writable
+      - modifiable
+      - filterable
+    type: list
+    validation:
+      required: false
+  blocking_check_config_ref:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: admin.
+      automation_hooks: links workflow to blocking check configuration for validation behavior.
+      cardinality: zero_or_one
+      criticality: association
+      default: null
+      dependencies: blocking check config.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Reference to a blocking check configuration that applies to this workflow (overrides default).
+      security: non-sensitive
+      system_usage:
+        - validation behavior
+        - blocking check customization
+      validation: reference to blocking check config (path or identifier).
+    field_profile_code: WFL-011
+    permissions: rwx
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+      - field_reference_group
+    type: string
+    validation:
+      required: false
+  category:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner/admin.
+      automation_hooks: used for workflow filtering and organization.
+      cardinality: one
+      criticality: association
+      default: null
+      dependencies: workflow registry.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Workflow category for organization (development, operations, planning, review, etc.).
+      security: non-sensitive
+      system_usage:
+        - filtering
+        - grouping
+        - organization
+      validation: enum.
+    field_profile_code: WFL-003
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - listable
+      - readable
+      - writable
+      - modifiable
+      - groupable
+      - filterable
+      - sortable
+      - searchable
+    type: enum
+    validation:
+      enum:
+        - development
+        - operations
+        - planning
+        - review
+        - testing
+        - deployment
+        - maintenance
+        - onboarding
+        - documentation
+        - mcp
+        - other
+      required: false
+  constraints:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner/admin.
+      automation_hooks: defines role-based constraints enforced during priority plan activation and workstream operations.
+      cardinality: one
+      criticality: composition
+      default: {}
+      dependencies: workflow validation system.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: 'Defines role-based constraints for object creation and manipulation. Structure: {role_constraints: {role_id: {allowed_operations: [create, update, delete], allowed_kinds: [kind1, kind2], blocked_kinds: [kind3]}}, object_constraints: {kind: {required_roles: [role_id], blocked_roles: [role_id]}}}.'
+      security: non-sensitive
+      system_usage:
+        - constraint enforcement
+        - role-based access control
+        - workflow validation
+      validation: 'object with structure: {role_constraints: object, object_constraints: object}.'
+    field_profile_code: WFL-013
+    permissions: rwx
+    semantic_type: expression
+    traits:
+      - field_mutable_group
+    type: object
+    validation:
+      required: false
+  description:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner/admin.
+      automation_hooks: used for workflow discovery and documentation.
+      cardinality: one
+      criticality: composition
+      default: required
+      dependencies: workflow registry.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Detailed description of the workflow, its purpose, and when to use it.
+      security: non-sensitive
+      system_usage:
+        - documentation
+        - workflow discovery
+        - guidance
+      validation: markdown.
+    field_profile_code: WFL-002
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - modifiable
+      - readable
+      - searchable
+      - writable
+    type: text
+    validation:
+      required: true
+  enabled:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: admin.
+      automation_hooks: determines if workflow is available for use.
+      cardinality: one
+      criticality: composition
+      default: true
+      dependencies: workflow registry.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Whether this workflow is currently enabled and available for use.
+      security: non-sensitive
+      system_usage:
+        - filtering
+        - workflow availability
+      validation: boolean.
+    field_profile_code: WFL-004
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - filterable
+      - modifiable
+      - readable
+      - writable
+    type: boolean
+    validation:
+      required: false
+  lifecycle_kinds:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner/admin.
+      automation_hooks: links workflows to lifecycle definitions for validation and state management.
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: lifecycle definitions.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: References to lifecycle definitions that this workflow uses (e.g., backlog_item lifecycle, requirement lifecycle).
+      security: non-sensitive
+      system_usage:
+        - lifecycle integration
+        - state management
+        - validation
+      validation: list of object kind strings (e.g., [\\\"backlog_item\\\", \\\"requirement\\\", \\\"milestone\\\"]).
+    field_profile_code: WFL-007
+    permissions: rwx
+    semantic_type: reference
+    traits:
+      - readable
+      - writable
+      - modifiable
+    type: list
+    validation:
+      required: false
+  mcp_config:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner/admin.
+      automation_hooks: 'defines MCP-specific tool exposure rules for MCP workflows (category: mcp).'
+      cardinality: one
+      criticality: composition
+      default: {}
+      dependencies: MCP server, workflow system.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: 'MCP-specific configuration for workflows with category ''mcp''. Controls which CLI commands/tools are exposed via MCP server. Structure: {exposed_tools: [list of command patterns], blocked_tools: [list of command patterns], tool_constraints: {tool_name: {required_roles: [roles], blocked_roles: [roles]}}}. Only applies when category is ''mcp''.'
+      security: non-sensitive
+      system_usage:
+        - MCP tool registration
+        - MCP command filtering
+        - MCP access control
+      validation: 'object with structure: {exposed_tools: list, blocked_tools: list, tool_constraints: object}.'
+    field_profile_code: WFL-014
+    permissions: rwx
+    semantic_type: expression
+    traits:
+      - readable
+      - writable
+      - modifiable
+    type: object
+    validation:
+      required: false
+  metadata:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner/admin.
+      automation_hooks: stores workflow-specific metadata.
+      cardinality: one
+      criticality: composition
+      default: {}
+      dependencies: workflow system.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Additional metadata for workflow configuration (e.g., automation triggers, integration settings).
+      security: may contain sensitive configuration.
+      system_usage:
+        - workflow configuration
+        - integration settings
+      validation: object (key-value pairs).
+    field_profile_code: WFL-012
+    permissions: rwx
+    semantic_type: expression
+    traits:
+      - field_mutable_group
+    type: object
+    validation:
+      required: false
+  policy_refs:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner/admin.
+      automation_hooks: links workflows to policies for enforcement and guidance.
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: policy system.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: References to policy objects that apply to this workflow.
+      security: non-sensitive
+      system_usage:
+        - policy enforcement
+        - guidance
+        - compliance
+      validation: list of policy references (POL-###).
+    field_profile_code: WFL-008
+    permissions: rwx
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+      - field_reference_group
+    type: list
+    validation:
+      required: false
+  stages:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner/admin.
+      automation_hooks: defines workflow stages for orchestration and progress tracking.
+      cardinality: many
+      criticality: composition
+      default: []
+      dependencies: workflow orchestration.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: 'Ordered list of workflow stages, each defining what happens at that stage. Each stage object contains: name, description, order, lifecycle_states (map of object kind to expected status), required_objects (list of object kinds that should exist), optional_objects (list of object kinds that may exist), policies (list of policy refs that apply), templates (list of template refs to use).'
+      security: non-sensitive
+      system_usage:
+        - workflow orchestration
+        - progress tracking
+        - guidance
+      validation: 'list of stage objects with structure: {name: string, description: text, order: number, lifecycle_states: object, required_objects: list, optional_objects: list, policies: list, templates: list}.'
+    field_profile_code: WFL-010
+    permissions: rwx
+    semantic_type: expression
+    traits:
+      - field_mutable_group
+    type: list
+    validation:
+      required: false
+  template_refs:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner/admin.
+      automation_hooks: links workflows to templates for artifact generation.
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: template system.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: References to template objects used in this workflow.
+      security: non-sensitive
+      system_usage:
+        - artifact generation
+        - automation
+      validation: list of template references (TPL-###).
+    field_profile_code: WFL-009
+    permissions: rwx
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+      - field_reference_group
+    type: list
+    validation:
+      required: false

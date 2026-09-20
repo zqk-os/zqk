@@ -1,0 +1,94 @@
+Check object health and compliance.
+
+Validates that an object:
+  - Is properly registered with the system
+  - Adheres to its lifecycle definition
+  - Complies with policies for its object kind
+  - Has valid references (default; --fast skips refs and is NOT an authoritative health verdict)
+  - Has file integrity verified using hash indexes by kind/type
+
+Results are organized into a 4-Layer Compliance Cake:
+  - Layer 0: CAS and Registry Integrity Blockers (Registry, Hash Mismatches, Parse Errors)
+  - Layer 1: Objects Needing Fixes (Business Preconditions, missing attributes, broken relations)
+  - Layer 2: Objects Ready for Promotion/Execution (Clean objects with 0 validation issues)
+  - Layer 3: Completed & Validated Items (Terminal objects passing all validation gates)
+
+--fast / --check-refs=false is a partial, read-only surface (skips reference integrity).
+Combined with --auto-fix or --force, --fast is dropped and refs are enabled so mutation
+uses the full surface. A green partial result does not mean the kernel is healthy.
+Autofix demotes only process_failure findings to status=error (illegal lifecycle /
+status preconditions), never data_completeness or employment_fitness; identity/
+governance kinds never autofix-demote (REQ-KERNEL-LIFECYCLE-FITNESS-001).
+
+Usage patterns:
+  - For full-project checks with auto-fix, run with an explicit long timeout
+    (e.g., --timeout 3600s) so the run can complete and write results.
+  - Prefer background mode (--background) when running from CI or tools;
+    progress and completion are reported via the coordinator and logs.
+  - Avoid short timeouts (e.g., 30s, 60s) for 'check all --auto-fix' – they
+    almost always time out during CAS cleanup and validation.
+
+  Check a specific object (by ID)
+  zqk.test system check BLI-626
+  Check all objects of a kind
+  zqk.test system check backlog_item
+  Check all objects in the system
+  zqk.test system check all
+  Check with verbose output
+  zqk.test system check BLI-626 --verbose
+  Check with JSON output
+  zqk.test system check all --format json
+  Partial check (refs skipped; not authoritative)
+  zqk.test system check all --fast
+  Fast iteration: write failing IDs then re-check only those
+  zqk.test system check all --write-failing-ids tier1.txt --fast; zqk.test system check --ids-from-file tier1.txt --fast
+  Run in background (return immediately; completion via coordinator)
+  zqk.test system check all --auto-fix --background
+  Full-project auto-fix with long timeout
+  zqk.test system check all --auto-fix --timeout 3600s --format json -o .zqk/logs/system-check.json
+  Wake primary agent if draft/error/blocking/warning/info thresholds trip
+  zqk.test system check all --notify
+  Wake a specific seat when thresholds trip
+  zqk.test system check all --notify antigravity-1
+
+Usage:
+  zqk.test system check [kind] [id...] [flags]
+
+Flags:
+      --auto-fix                     Automatically fix recoverable issues (missing hashes and hash mismatches)
+      --auto-fix-scheduler           Use scheduler for auto-fix batching (provides status updates and timeout handling, default: true for batches >= 10 issues) (default true)
+      --background                   Run in background: return immediately with operation ID; check continues and completion is reported via coordinator (default: wait and show progress)
+      --cache-only                   Show cached validation results only (do not run validation, trigger background scan)
+      --check-refs                   Check reference integrity (enabled by default; --fast disables). Combined with --auto-fix/--force, refs are re-enabled (default true)
+      --clean-cache                  Clean stale entries from object ID cache (removes entries for deleted files)
+      --clear-cache                  Break-glass: wipe validation_cache.json. Checker, binary, and lifecycle fingerprints normally invalidate on the next check; reserve this for admin recovery
+      --columns string               Override column widths for table output (format: field:width)
+      --cpu-profile string           Write CPU profile to file (for performance analysis)
+      --delimiter string             Delimiter to use between object IDs when using the 'ids' format (default: newline) (default "\\n")
+      --details                      Show detailed list of object IDs for ready, completed, or static configurations (alias for --include-ids)
+      --dispatch-to string           Dispatch health violations/issues as inbox items to the specified agent/role (e.g. 'QA-Engineer', 'Security-Engineer', 'technical-program-manager', or 'auto')
+      --fast                         Partial check: skip reference integrity only. Not an authoritative health verdict. Combined with --auto-fix/--force, --fast is dropped
+      --force                        Force fix hash mismatches (requires explicit confirmation, creates audit event)
+  -f, --format string                Output format (table, json, jsonl, yaml, csv, json-rpc, stream, agent-prompt, semantic-link) (default "table")
+      --goroutine-profile string     Write goroutine profile to file (for hang/deadlock analysis)
+      --ids-from-file string         Read object IDs from file (one per line, # ignored) and validate only those objects (fast re-check after fixes)
+      --ignore-scheduler-down        Ignore scheduler down warning/lockdown
+      --include-ids                  Include individual object IDs in status breakdown tables
+      --layer int                    Filter results to only show objects in the specified compliance layer (0=integrity, 1=needs_fixes, 2=ready, 3=complete, -1=all) (default -1)
+      --metrics-file string          Write performance metrics to JSON file
+      --notify string[="@primary"]   Wake this agent seat if draft-plane / error-status / blocking / warning / informational thresholds trip after the check; omit value to use primary orchestrator (see .zqk/config/primary_orchestrator.json)
+  -o, --output string                Write output to file
+  -q, --quiet                        Suppress non-essential output
+      --refresh-cache                Rebuild object-id cache and validation-related caches; honored with --fast (fast still skips refs only). Also auto-applied when a significant CAS/cache change marker is present
+      --snapshot string              Save check results as snapshot to test-scenario folder (e.g., 'test-scenarios/check-violations')
+      --surface string               Filter issues by fitness surface (auth, agent_dispatch, system_check_l0, system_check_l1, admin_form, whats_next, list_default); annotates issue_class
+      --tier int                     Filter results to only show objects with issues of the specified tier (1=blocking, 2=warning, 3=informational, 4=recommendation, 0=all)
+      --timeout duration             Timeout for command execution (0 = auto-calculate)
+      --unresolvable-only            Filter output to only show unresolvable violations
+      --validate-specs               Validate object specifications: check that all fields have complete checklists with criteria traceability
+  -v, --verbose                      Verbose output
+      --workers int                  Number of worker goroutines for async validation (0 = auto-detect based on CPU cores, default: NumCPU * 2, max: 32)
+      --write-failing-ids string     After check, write object IDs with Tier 1 issues to this file (use with --ids-from-file for fast iteration)
+
+Global Flags:
+      --allow-degraded   Allow scheduler-dependent commands to run when scheduler daemon is not running

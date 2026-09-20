@@ -1,0 +1,40 @@
+schema_version: 2.0.0
+ontology: api_spec
+extends: base_object
+visibility: public
+description: Defines an API Specification for strict payload validation. Enforces strict structures for Autonomy Inbox messages, Mubert audio requests, and FFmpeg tool payloads.\n
+traits:
+  - readable
+fields:
+  auth_strategy_ref:
+    description: Reference to the auth_strategy to use for this API.
+    traits:
+      - field_reference_group
+    type: string
+    validation:
+      required: false
+  endpoint:
+    description: The API endpoint or binary command path.
+    type: string
+    validation:
+      required: false
+  method:
+    description: The HTTP method or execution strategy (e.g., GET, POST, EXEC).
+    type: string
+    validation:
+      required: false
+  payload_schema:
+    description: Strict validation schema for the expected payload. Must be fulfilled by all Autonomy Inbox messages and tool payloads.
+    type: map
+    validation:
+      required: true
+  target_system:
+    description: The target system for this API (e.g., mubert, ffmpeg, autonomy_inbox).
+    type: string
+    validation:
+      required: true
+  timeout_ms:
+    description: Timeout for the API call or command execution in milliseconds.
+    type: integer
+    validation:
+      required: false

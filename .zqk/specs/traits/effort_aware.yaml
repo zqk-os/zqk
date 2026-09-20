@@ -1,0 +1,23 @@
+$schema: "../../../.zqk/cli/specs/schemas/trait_spec.schema.json"
+
+name: effort_aware
+description: |
+  Object-level planned-vs-realized cost trait (estimated_effort, actual_effort).
+  Composes completable via includes: listing effort_aware is sufficient; do not
+  also list completable on the object spec. Actual effort is only lawful against
+  the work clock.
+  TRACK: BLI-KERNEL-WORK-ENVELOPE-001 / WORK_ENVELOPE_AND_EFFORT_FACETS.md.
+category: behavior
+requires:
+  - completable
+conflicts: []
+includes:
+  - completable
+field_level: false
+object_level: true
+config: {}
+
+created_at: 2026-08-20T21:00:00Z
+updated_at: 2026-08-20T21:00:00Z
+created_by: ACC-1785920548450214012-68b850c0
+updated_by: ACC-1785920548450214012-68b850c0

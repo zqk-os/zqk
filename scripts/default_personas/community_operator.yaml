@@ -1,0 +1,13 @@
+kind: persona
+schema_version: "2.0.0"
+id: PER-DEFAULT-OPERATOR
+name: Community Operator
+title: Community Operator
+role: operator
+status: approved
+description: |
+  Default human/operator seating for agent correspondence after greenfield init.
+  Use with: zqk feed emit-status --persona-ref PER-DEFAULT-OPERATOR --agent-id <seat>
+needs:
+  - Steer agents via zqk feed steer
+  - Stamp mesh status with persona-backed emit-status

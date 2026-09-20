@@ -1,0 +1,90 @@
+schema_version: 2.0.0
+ontology: sampler_profile
+extends: base_sampler
+visibility: internal
+description: 'Profile for metrics sampler configurations. A sampler profile defines a reusable configuration template that can be applied to multiple object kinds or scenarios. Profiles provide sensible defaults and can be customized per use case.  Profiles are used to: - Define default sampler settings for common scenarios - Create named configurations that can be referenced - Apply consistent sampling strategies across object kinds - Enable quick configuration changes by updating the profile '
+traits:
+  - base_object_traits
+fields:
+  applies_to:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: system architect
+      automation_hooks: used to determine which object kinds this profile applies to.
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: object registry
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: List of object kinds this profile applies to. If empty, profile is a template that must be explicitly applied.
+      security: non-sensitive
+      system_usage:
+        - profile application
+        - configuration routing
+      validation: Array of valid object kind identifiers.
+    field_profile_code: SMP-002
+    permissions: rwx
+    semantic_type: expression
+    traits:
+      - field_mutable_group
+    type: list
+    validation:
+      required: false
+  is_default:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: system architect
+      automation_hooks: used to select default profile when no specific profile is specified.
+      cardinality: one
+      criticality: association
+      default: false
+      dependencies: none
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: If true, this profile is used as the default when no specific profile is requested. Only one profile should be marked as default per metric type.
+      security: non-sensitive
+      system_usage:
+        - default selection
+        - fallback configuration
+      validation: Boolean value.
+    field_profile_code: SMP-003
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - field_mutable_group
+    type: boolean
+    validation:
+      required: true
+  profile_name:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: system architect
+      automation_hooks: used for profile lookup and application.
+      cardinality: one
+      criticality: composition
+      default: null
+      dependencies: none
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: Unique name for this sampler profile (e.g., \\\"high_frequency\\\", \\\"low_latency\\\", \\\"audit_events\\\").
+      security: non-sensitive
+      system_usage:
+        - profile lookup
+        - configuration application
+      validation: Must be a valid identifier (alphanumeric, underscores, hyphens).
+    field_profile_code: SMP-001
+    permissions: r-x
+    semantic_type: identifier
+    traits:
+      - field_reference_group
+    type: string
+    validation:
+      pattern: ^[a-z0-9_-]+$
+      required: true

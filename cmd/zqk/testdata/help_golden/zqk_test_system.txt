@@ -1,0 +1,92 @@
+System operations for health checks, validation, and maintenance.
+
+This command group provides operations for system-level management:
+  Common operations: check (object health and compliance), align (strategic alignment)
+  Specialized operations: init, status, validate, sync
+
+  Common operations
+  zqk.test system check
+  Strategic alignment
+  zqk.test system align --gaps
+  Specialized operations
+  zqk.test system init
+  Show status
+  zqk.test system status
+  Validate objects
+  zqk.test system validate
+  Sync system
+  zqk.test system sync
+
+Usage:
+  zqk.test system [command]
+
+Available Commands:
+  agent-onboard                  Detect agent hosts, seed seating, and sync workspace↔kernel directives
+  align                          Validate strategic alignment (goal-work alignment)
+  ambient-daemon                 Generated spec for ambient-daemon
+  audit-milestones               Audit milestone associations for backlog items
+  audit-report                   Generate audit report from command metrics
+  audit-stream                   Stream real-time audit events
+  check                          Check object health: registration, lifecycle, and policy compliance
+  clean-branches                 Prune stale merged feature branches locally and remotely
+  cleanup-duplicates             Clean up duplicate traditional files that have hash-based equivalents
+  cleanup-quarantine             Remove old files from the quarantine folder
+  cli-hooks                      CLI hook profile (built-in hooks + optional tray entry)
+  compact-journal                Compact change journal entries into dictionary-compressed artifacts
+  dashboard                      dashboard command
+  disk-usage                     Report directory sizes (cross-platform du-style scan)
+  emergency-manager              Monitors the health of the CAP orchestrator and Kernel Steward. Executes safe rollbacks or stashes untracked files if the main managers fail continuously.
+  ensure-retention-jobs          Ensure maintenance bundle scheduler jobs exist (retention, audit, cache_prewarm, autofix, etc.)
+  evolve                         evolve command
+  federate                       federate command
+  fswatcher-daemon               Start the FSWatcher daemon
+  health-data                    Output aggregated system-health data for dashboard
+  improvement-report             Generate system improvement report with comparative analysis and prioritized work items
+  init                           Initialize a new ZQK project
+  kernel-integrity               Kernel Mutation Pipeline coverage, dangling-ref heal, and work-envelope backfill
+  materialize-agent-chat-channel Materialize agent_chat_channel lite file from a CAS agent_feed
+  metrics                        View command execution metrics and statistics
+  migrate-cas                    Migrate legacy UUID identities to deterministic CAS hashes
+  object-count-report            Report object counts and congruence (disk vs index)
+  object-hygiene-scan            Scan process objects using configurable hygiene rules (identify only)
+  orchestrate-batch              Generates the ontological cascade (Workstream, Requirement, Criteria, TestCase) for a batch of items
+  policy-interrupts              Generated spec for policy-interrupts
+  prompt-builder                 Builds a topologically sorted context window prompt using the Vectorization Engine
+  quarantine-report              Report contents of the quarantine folder (data for dashboard)
+  quickstart                     Zero-friction project onboarding and quickstart guide
+  rebuild-graph-projection       Rebuild MemGraph projection from file SSOT
+  recover-cas                    Recover CAS objects with missing files
+  repair-cas-corruption          Repair CAS filename/content hash mismatches (Tier-1 integrity blockers)
+  retention-tolerance            Run retention tolerance (archive and cleanup by age and max_count)
+  seal-skill                     Generate or verify the cryptographic seal for a skill pack
+  seed-default-agent-seating     Idempotent seed of PER-DEFAULT-* personas and feed correspondence skill
+  semantic-bridge-daemon         Generated spec for semantic-bridge-daemon
+  shutdown                       Shutdown all ZQK daemons cleanly
+  snapshot                       Capture a sanitized telemetry snapshot for partner support
+  snapshot-expand                Expand a compressed snapshot file
+  snapshot-scenario              Capture system state snapshot for test scenario creation
+  snapshot-verify                Verify compressed snapshot data integrity against live objects
+  spec-origination               Originate a complete object-kind membrane
+  start                          Start all ZQK daemons
+  start-here                     Start Here tutorial for new users and agents
+  state-commit                   Commit the Knowledge Kernel state into a single compressed artifact
+  state-diff                     Compare two system state snapshots or a snapshot against live state
+  state-restore                  Restore the Knowledge Kernel state from a compressed artifact
+  status                         Show system status and health summary
+  stream-gc                      Run garbage collector to prune orphaned JSONL stream segment files
+  sync                           Sync objects between backends or environments
+  sync-cas-index                 Sync CAS index from an existing hash-addressed file
+  sync-git-hooks                 Sync git hook templates to a git hooks directory
+  telemetry                      View telemetry from running agent tasks
+  truth-sentinel                 Run the Truth Sentinel daemon
+  update-specs                   Bulk update object specifications
+  validate                       Validate object(s) against schema
+  validate-agent-rules           Validate IDE agent rules manifest vs rules directory
+  validate-command-specs         Validate live CLI commands against canonical command specs
+  validate-scenario              Execute a programmatic validation scenario
+  whoami                         Display the current user account information
+
+Flags:
+      --allow-degraded   Allow scheduler-dependent commands to run when scheduler daemon is not running
+
+Use "zqk.test system [command] --help" for more information about a command.

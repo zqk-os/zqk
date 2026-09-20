@@ -1,0 +1,26 @@
+$schema: "../../schemas/command_spec.schema.json"
+
+name: "init"
+short: "Scaffold docs/quality/vds_chunks.yaml if missing"
+description: |
+  Writes an example chunks file agents can edit. Does not overwrite unless --force.
+
+flags:
+  - name: "force"
+    type: "bool"
+    default: false
+    description: "Overwrite existing chunks file"
+
+args:
+  type: "no_args"
+
+help:
+  examples:
+    - comment: "Scaffold chunks"
+      command: "%s workflow vds init --format json"
+  exclude_flags:
+    - "columns"
+    - "ignore-scheduler-down"
+
+run_e: "runVDSInit"
+common_flags: true

@@ -1,0 +1,190 @@
+$schema: ../../../.zqk/cli/specs/schemas/lifecycle_spec.schema.json
+object_type: convergence_session
+statuses:
+- value: conceptual
+  display: Conceptual
+  origin: true
+  preliminary: true
+  description: Draft plane status. Prior to CAS membrane crossing.
+  role: realign
+- value: originated
+  display: Originated
+  description: CAS membrane crossed. Object officially originated.
+  role: realign
+- value: draft
+  display: Draft
+  origin: false
+  preliminary: false
+  description: "Session contract being authored; hypothesis/thresholds may be incomplete
+    — not yet measuring."
+  role: realign
+- value: active
+  display: Active
+  description: "Convergence work in progress (phases C1–C5)."
+  role: execution_locked
+- value: paused
+  display: Paused
+  description: Stopped temporarily; handoff fields should be current.
+  role: halted
+- value: completed
+  display: Completed
+  terminal: true
+  work_done: true
+  description: Desired end state reached or accepted stop.
+  role: terminal
+- value: abandoned
+  display: Abandoned
+  terminal: true
+  archive: true
+  description: Work discontinued without reaching end state.
+  role: terminal
+- value: archived
+  display: Archived
+  terminal: true
+  archive: true
+  description: Session retained for audit/lineage (synonym of abandoned for 
+    historical rows).
+  role: terminal
+- value: escalated
+  display: Escalated
+  description: "Option A (park-but-CAP-bound): recoverable handoff/parking hold. CAP
+    may\nstill bind; measure/tick must not persist session measurements; whats-next\n\
+    does not auto-select for measure. Resume→active, or complete/abandon.\nNOT lifecycle-terminal.
+    See DEC-1786686986572580000-54124993 /\nBLI-1786686768606200000-31133cc3.\n"
+  role: halted
+- value: error
+  display: Error
+  system: true
+  description: Session object incoherent or validation-failed; halt ticks until 
+    the contract/evidence is repaired.
+  role: halted
+transitions:
+- from: conceptual
+  to: originated
+  description: Promote from draft plane to CAS membrane (CAS Qualification).
+  manual: true
+  auto: false
+  catalyst: System promotion
+- from: originated
+  to: draft
+  description: Initial domain workflow transition to draft.
+  manual: true
+  auto: true
+  catalyst: System initialization
+- from: draft
+  to: active
+  description: Start convergence work
+  manual: true
+  auto: false
+  postconditions:
+  - role is execution_locked
+  preconditions:
+  - hypothesis is set
+  - desired_end_state is set
+  - current_phase is set
+- from: draft
+  to: abandoned
+  description: Discard draft
+  manual: true
+  auto: false
+  postconditions:
+  - role is terminal
+- from: active
+  to: paused
+  description: Pause for handoff or dependency
+  manual: true
+  auto: false
+  postconditions:
+  - role is halted
+- from: active
+  to: completed
+  description: Mark converged or done
+  manual: true
+  auto: false
+  postconditions:
+  - role is terminal
+- from: active
+  to: abandoned
+  description: Stop without success
+  manual: true
+  auto: false
+  postconditions:
+  - role is terminal
+- from: active
+  to: escalated
+  description: Escalate to design or other owner
+  manual: true
+  auto: false
+  postconditions:
+  - role is halted
+- from: escalated
+  to: active
+  description: Resume after design return or false escalate (kernel integrity 
+    recovery)
+  manual: true
+  auto: false
+  postconditions:
+  - role is execution_locked
+- from: escalated
+  to: completed
+  description: Close escalated session when end state accepted outside this loop
+  manual: true
+  auto: false
+  postconditions:
+  - role is terminal
+- from: escalated
+  to: abandoned
+  description: Drop escalated session without resume
+  manual: true
+  auto: false
+  postconditions:
+  - role is terminal
+- from: paused
+  to: active
+  description: Resume
+  manual: true
+  auto: false
+  postconditions:
+  - role is execution_locked
+- from: paused
+  to: abandoned
+  description: Abandon while paused
+  manual: true
+  auto: false
+  postconditions:
+  - role is terminal
+- from: '*'
+  to: error
+  description: System error
+  manual: false
+  auto: true
+  postconditions:
+  - role is halted
+  - hop from any occupancy to error
+  - system halt; repair before leaving halted
+- from: '*'
+  to: archived
+  description: Archive session for audit retention (lineage-preserving)
+  manual: true
+  auto: false
+  postconditions:
+  - role is terminal
+  - hop from any occupancy to archived
+  - ended; no further normal execution hops expected
+percent_complete:
+  method: status_based
+  default_by_status:
+    conceptual: 0
+    originated: 5
+    draft: 10
+    active: 40
+    paused: 35
+    completed: 100
+    abandoned: 0
+    archived: 100
+    escalated: 50
+    error: 0
+created_at: 2026-07-01 18:00:00+00:00
+updated_at: 2026-07-01 18:00:00+00:00
+created_by: ACC-1785920548450214012-68b850c0
+updated_by: ACC-1785920548450214012-68b850c0

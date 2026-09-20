@@ -1,0 +1,38 @@
+$schema: "../../schemas/command_spec.schema.json"
+
+name: "daemon"
+short: "Start the background MCP daemon"
+description: |
+  Runs the Model Context Protocol server over TCP. Executes tool calls and
+  orchestrates work decoupled from IDE stdio streams.
+  Pair with mcp proxy so IDE clients keep a stable stdio session while this
+  process can be rebuilt or restarted.
+
+flags:
+  - name: "tcp"
+    type: "string"
+    default: "127.0.0.1:8443"
+    description: "TCP listen address for the MCP daemon (proxy default target)"
+  - name: "port"
+    type: "int"
+    default: 0
+    description: "Optional TCP port shorthand (binds 127.0.0.1:<port>; overrides --tcp when > 0)"
+
+args:
+  type: "no_args"
+
+help:
+  examples:
+    - comment: "Start daemon on default proxy target"
+      command: "%s mcp daemon --tcp 127.0.0.1:8443"
+    - comment: "Start daemon on a port shorthand"
+      command: "%s mcp daemon --port 8443"
+  exclude_flags:
+    - "columns"
+    - "ignore-scheduler-down"
+    - "format"
+    - "output"
+
+run_e: "runDaemon"
+common_flags: true
+requires_session: false

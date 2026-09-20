@@ -1,0 +1,375 @@
+$schema: "../../../.zqk/cli/specs/schemas/id_prefixes_config.schema.json"
+
+default_strategy:
+    example: backlog_item -> BAC-
+    method: first_part_upper_3
+description: |
+    Configuration for object kind to ID prefix mappings.
+    This allows the system to validate and generate object IDs without hardcoding
+    prefix rules in the source code.
+
+    Each kind can have multiple valid prefixes (for backward compatibility or
+    migration scenarios). The first prefix listed is considered the primary/current prefix.
+inference_rules:
+    patterns:
+        - example: backlog_item -> BLI-
+          pattern: ^(.+)_item$
+          prefix_template: '{base_upper_3}-'
+        - example: command_metric -> CMD-
+          pattern: ^.+_metric$
+          prefix_template: '{base_upper_3}-'
+        - example: priority_plan -> PRI-
+          pattern: ^([^_]+)_.+$
+          prefix_template: '{first_part_upper_3}-'
+        - example: component -> COM-
+          pattern: ^(.+)$
+          prefix_template: '{first_3_upper}-'
+kind_to_prefixes:
+    account:
+        - ACC-
+    agent_architecture:
+        - AGENT-ARCH-
+    agent_feed:
+        - AGF-
+    agent_instruction:
+        - AGI-
+    agent_onboarding_preparation:
+        - AGENT-PREP-
+        - AGE-
+    agent_skill:
+        - ASK-
+    agent_task:
+        - ATK-
+    audit_aggregation_metric:
+        - AAM-
+        - CJA-
+    audit_event:
+        - AUD-
+    audit_event_aggregation:
+        - AEA-
+    auth_strategy:
+        - AUTH-
+    auto_fix_rule:
+        - AFR-
+    backlog_item:
+        - BLI-
+    base_metric:
+        - BAS-
+    base_sampler:
+        - BSA-
+    brand:
+        - BRA-
+    bucketing_strategy:
+        - BST-
+        - BS-
+    capacity_advertisement:
+        - CADV-
+    certificate:
+        - CERT-
+    change_journal_entry:
+        - CHA-
+    code_quality_metric:
+        - CQM-
+    code_reference:
+        - COD-
+    command_metric:
+        - CMD-
+    command_spec:
+        - CSPEC-
+    component:
+        - COMP-
+    context_refresh_schedule:
+        - CON-
+    convergence_session:
+        - CVS-
+    corporate_initiative:
+        - CI-
+    criteria:
+        - CRIT-
+        - CRI-
+    decision:
+        - DEC-
+        - ADR-
+    department:
+        - DEP-
+    display:
+        - DSP-
+    division:
+        - DIV-
+    doc_entry:
+        - DOC-
+    domain_registry:
+        - DOMAIN-REG-
+    epic:
+        - EPC-
+        - EPI-
+    evolution_management:
+        - EVO-
+        - EVOL-
+    extensible_object:
+        - EXT-
+        - EXTOBJ-
+    file_lock_metric:
+        - FLM-
+    glossary_term:
+        - GLS-
+    glossary_term_relation:
+        - GTR-
+    goal:
+        - GOAL-
+        - G-
+    impact_analysis:
+        - IMP-
+    import_tracking:
+        - IMPTRK-
+    important_date:
+        - DATE-
+    integrity_manifest:
+        - INT-
+    keystore_entry:
+        - KEY-
+    kind_mapping_metric:
+        - KMM-
+    kind_synonym:
+        - SYN-
+    library:
+        - LIB-
+    lifecycle:
+        - LIFECYCLE-
+        - LIF-
+    list_metric_sampler:
+        - LIS-
+    mcp_built_in_tool:
+        - MCPTOOL-
+    mcp_session:
+        - MCP-
+    mcp_spec:
+        - MCPSPEC-
+    maturation_report:
+        - MAT-
+    metadata_package:
+        - MET-
+    milestone:
+        - MIL-
+    mission:
+        - MIS-
+    namespace:
+        - NAM-
+        - NAMESPACE-
+    namespace_registry:
+        - NSR-
+        - NAMESPACE-REGISTRY-
+    object_spec:
+        - OBJ-
+    ordered_list_metric_sampler:
+        - ORD-
+    organization:
+        - ORG-
+    organizational_change:
+        - OCH-
+    partnership:
+        - PAR-
+    persona:
+        - PER-
+    pipeline:
+        - PIP-
+    pipeline_definition:
+        - PLD-
+    pipeline_execution:
+        - PLX-
+    policy:
+        - POL-CODE-
+        - POL-SEC-
+        - POL-DATA-
+        - POL-OPS-
+        - POL-ARCH-
+        - POL-DEBUG-
+        - POL-DOC-
+        - POL-EST-
+        - POL-FEATURE-
+        - POL-MCP-
+        - POL-ONBOARD-
+        - POL-PLAN-
+        - POL-TRACK-
+        - POL-WORKFLOW-
+        - POL-AGENT-
+        - POL-OBS-
+        # Init seeds POL-DEFAULT-<16 hex> (stableDefaultPolicyID). Without this
+        # prefix, InferKindFromID fails and object get never dual-reads the draft
+        # plane. TRACK: BLI-COMMS-ORCH-DRAFT-PLANE-DIRTY-001
+        - POL-DEFAULT-
+    priority_plan:
+        - PRI-
+        - PRIO-
+    process_hygiene_rule:
+        - PHR-
+    prompt_template:
+        - PROMPT-
+    provider_profile:
+        - PPRV-
+    qa_success:
+        - QAS
+    question:
+        - QUE-
+    release:
+        - REL-
+    remote_kernel:
+        - RMK-
+        - REM-
+    requirement:
+        - REQ-
+        - REQU-
+    resolver:
+        - RES-
+    risk_blocker:
+        - RIS-
+    roadmap:
+        - ROAD-
+    role:
+        - ROL-
+        - ROLE-
+    rollback_report:
+        - RBR-
+    rule:
+        - RUL-
+    sampler_profile:
+        - SAM-
+    scalar_metric_sampler:
+        - SCA-
+    scenario:
+        - SCE-
+    scheduler_handler_binding:
+        - SHB-
+    scheduler_health_metric:
+        - SHM-
+    scheduler_job:
+        - SCH-
+    shockwave_router:
+        - SWR-
+    stakeholder_profile:
+        - STK-
+    status_history_metric_sampler:
+        - STA-
+    strategic_context:
+        - SC-
+    strategic_plan:
+        - STRAT-PLAN-
+    team:
+        - TEA-
+    team_configuration:
+        - TCFG-
+    technical_debt:
+        - TDE-
+        - TEC-
+    technical_spec:
+        - TSP-
+    template:
+        - TEM-
+    test_audit_aggregation_metric:
+        - TES-
+        - TAM-
+    test_case:
+        - TST
+        - TEST
+    test_command_rule:
+        - TCR-
+    validation_rule:
+        - VAL-
+        - RULE-
+    verification_matrix:
+        - VMX-
+    vision:
+        - VIS-
+    vocabulary_scheme:
+        - VOC-
+    workflow:
+        - WFL-
+    workstream:
+        - WS-
+    workstream_transition:
+        - WST-
+    zqk_session:
+        - ZS-
+        - ZQK-
+kind_to_synonyms:
+    account:
+        - acc
+    audit_event:
+        - ae
+        - audit
+        - event
+    backlog_item:
+        - bli
+        - bl-item
+        - backlog
+        - bl
+    change_journal_entry:
+        - cje
+        - journal
+        - change_journal
+    component:
+        - comp
+    convergence_session:
+        - cvs
+        - conv-session
+    corporate_initiative:
+        - ci
+        - initiative
+        - corp_init
+    criteria:
+        - crit
+    decision:
+        - dec
+    display:
+        - dsp
+    goal:
+        - go
+    lifecycle:
+        - lc
+        - life
+    milestone:
+        - mil
+        - ms
+    mission:
+        - mis
+    object_spec:
+        - spec
+        - ospec
+    priority_plan:
+        - pplan
+        - p-plan
+        - plan
+        - pp
+    release:
+        - rel
+    requirement:
+        - req
+        - requ
+    roadmap:
+        - road
+        - rm
+    role:
+        - rol
+    shockwave_router:
+        - router
+        - shockwave
+    template:
+        - tpl
+        - tmpl
+    test_case:
+        - test
+        - tc
+        - testcase
+    validation_rule:
+        - vrule
+        - val_rule
+    verification_matrix:
+        - vmx
+        - vmatrix
+        - ver_matrix
+    vision:
+        - vis
+    workstream:
+        - ws
+        - work
+version: 1.0.0
