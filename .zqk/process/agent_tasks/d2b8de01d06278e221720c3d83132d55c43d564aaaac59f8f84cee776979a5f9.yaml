@@ -1,0 +1,38 @@
+assignee_persona_ref: PER-COMMUNITY-SOFTWARE-ENGINEER
+branch_name: integration/pri-community-docs-governance-001
+claimed_at: "2026-09-20T02:15:05Z"
+claimed_by: PER-COMMUNITY-SOFTWARE-ENGINEER
+created_at: "2026-09-20T02:14:55Z"
+created_by: ACC-1785920548450214012-68b850c0
+description: |
+    # Agent Task Envelope
+    zqk_task_envelope_v1
+
+    Dynamic:
+    - Plan: Community Launch Phase 4: Documentation Identity and Governance Harmonization (PRI-1789868700000000000-d5fc9750)
+    - Target: coder-agent
+    - Persona: PER-COMMUNITY-SOFTWARE-ENGINEER
+    - Task: Harmonize Public Identity and Scrub Stale Private Mentions across Docs and Configs
+estimated_effort: 1d
+id: ATK-1789870495279555000-f3ce2dee
+kind: agent_task
+model_tier: tier_2_simple
+namespace_id: zqk:kernel
+policy_refs:
+    - POL-ONBOARD-001
+    - POL-ONBOARD-002
+    - POL-AGENT-INSTRUCTION-RUBRIC-001
+    - POL-WORKFLOW-VDS
+    - POL-CODE-CAS-COMMIT-001
+    - POL-CODE-1784753087498298000-bedce972
+priority_plan_ref: PRI-1789868700000000000-d5fc9750
+related_object_refs:
+    - ASK-COMMUNITY-CODE-CRAFTSMAN
+    - ASK-DEFAULT-FEED-CORRESPONDENCE
+    - BLI-1789869852579209000-b3f94849
+schema_version: 2.0.0
+status: originated
+title: 'Execute Task: Harmonize Public Identity and Scrub Stale Private Mentions across Docs and Configs'
+updated_at: "2026-09-20T02:15:11Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

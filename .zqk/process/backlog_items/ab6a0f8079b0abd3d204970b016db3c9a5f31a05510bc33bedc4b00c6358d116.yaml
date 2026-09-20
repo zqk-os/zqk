@@ -1,0 +1,33 @@
+acceptance_considerations: 1. CONTRIBUTING.md documents clean local build, test, and PR workflow; 2. GOVERNANCE.md details decision-making and open-core boundary; 3. stranger audit confirms guidelines are fully actionable.
+actual_effort: 0h
+commit_hashes:
+    - ca0088e32b8bef5fadc0921256a7333a2d72b4d7
+completed_at: "2026-09-20T02:19:52Z"
+created_at: "2026-09-20T01:57:53Z"
+created_by: ACC-1785920548450214012-68b850c0
+criteria_refs:
+    - CRIT-1789702449225536000-1bd6c028
+description: Establish authoritative CONTRIBUTING.md, GOVERNANCE.md, and open-source licensing guidance for community release candidate.
+estimated_effort: 3h
+id: BLI-1789868730000000000-9725a07f
+kind: backlog_item
+milestone_refs:
+    - MIL-1789672699275510000-40c8cee7
+namespace_id: zqk:kernel
+persona_refs:
+    - PER-COMMUNITY-SOFTWARE-ENGINEER
+priority: medium
+priority_plan_ref: PRI-1789868700000000000-d5fc9750
+priority_tier: P1
+problem_statement: Community developers lack clear governance structure, triage liaison expectations, and branch PR rules in candidate repo.
+requirement_refs:
+    - REQ-1789702448467715000-c05a9ef4
+schema_version: 2.0.0
+started_at: "2026-09-20T02:19:26Z"
+status: complete
+title: Publish Standardized Community Governance and Contributing Guidelines
+updated_at: "2026-09-20T02:19:52Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs:
+    - WS-1789631797993326000-f9951fe8

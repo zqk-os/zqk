@@ -15,8 +15,10 @@ import (
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/authcred"
 	"github.com/zqk-os/zqk/pkg/testkit"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
 func TestOrchestratePriorityPlanExecutionFacingStatuses(t *testing.T) {
@@ -545,4 +547,58 @@ func TestBuildOrchestrationExecutorArgs(t *testing.T) {
 	if len(argsNoTimeout) != 6 {
 		t.Fatalf("buildOrchestrationExecutorArgs len = %d, want 6: %v", len(argsNoTimeout), argsNoTimeout)
 	}
+}
+
+func TestOrchestrationExecutorChildEnv_bindsSeatedKernelNotWorktree(t *testing.T) {
+	t.Parallel()
+
+	kernel := "/Users/lanceettl/zqk-public-candidate"
+	worktree := filepath.Join(fileutil.TempDir(), "zqk-worktrees", "repo", "ATK-1789868091203586000-7b8ea42c")
+	parent := []string{
+		"PATH=/usr/bin",
+		"ZQK_API_KEY=ACC-PARENT",
+		"ZQK_PROJECT_ROOT=" + worktree,
+	}
+	seatKey := authcred.DefaultSwarmWorkerAccount
+	zqkBin := filepath.Join(kernel, "bin", "zqk")
+
+	out := orchestrationExecutorChildEnv(parent, kernel, seatKey, zqkBin)
+
+	if containsEnvLine(out, "ZQK_PROJECT_ROOT="+worktree) {
+		t.Fatalf("child ZQK_PROJECT_ROOT must not be the ATK worktree (POL-AGENT-KERNEL-ROOT-BINDING-001): %v", out)
+	}
+	if !containsEnvLine(out, "ZQK_PROJECT_ROOT="+kernel) {
+		t.Fatalf("child ZQK_PROJECT_ROOT must be seated kernel %q, got %v", kernel, out)
+	}
+	if containsEnvLine(out, "ZQK_API_KEY=ACC-PARENT") {
+		t.Fatalf("parent API key leaked: %v", out)
+	}
+	if !containsEnvLine(out, "ZQK_API_KEY="+seatKey) {
+		t.Fatalf("missing seat API key: %v", out)
+	}
+	if !containsEnvLine(out, zqkenv.Bin().Name()+"="+zqkBin) {
+		t.Fatalf("missing zqk bin: %v", out)
+	}
+}
+
+func TestOrchestrateRun_executorDoesNotBindProjectRootToWorktree(t *testing.T) {
+	t.Parallel()
+
+	data, err := os.ReadFile("orchestrate_run.go")
+	if err != nil {
+		t.Fatal(err)
+	}
+	src := string(data)
+	if strings.Contains(src, "WithSeatAPIKeyEnv(os.Environ(), seatKey, worktreePath)") {
+		t.Fatal("orchestrate_run.go still injects ZQK_PROJECT_ROOT=worktreePath; ATK execute then misses the seated account index")
+	}
+}
+
+func containsEnvLine(ss []string, want string) bool {
+	for _, s := range ss {
+		if s == want {
+			return true
+		}
+	}
+	return false
 }

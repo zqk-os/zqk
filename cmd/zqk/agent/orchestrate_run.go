@@ -704,8 +704,7 @@ func runOrchestrate(cmd *cobra.Command, planArg string, opts OrchestrateOptions)
 									// TRACK: BLI-1785905292370531000-b758a11c
 									seatAccount := authcred.ResolveSeatAccount(state.proc.ProjectRoot(), personaID)
 									seatKey := authcred.APIKeyForSeat(state.proc.ProjectRoot(), seatAccount)
-									childEnv := withLocalLLMEnv(authcred.WithSeatAPIKeyEnv(os.Environ(), seatKey, worktreePath))
-									spawnCmd.Env = withEnvValue(childEnv, zqkenv.Bin().Name(), zqkBin)
+									spawnCmd.Env = orchestrationExecutorChildEnv(os.Environ(), state.proc.ProjectRoot(), seatKey, zqkBin)
 									spawnCmd.Dir = worktreePath
 
 									// Route logs to dedicated file so we can see why it's dying

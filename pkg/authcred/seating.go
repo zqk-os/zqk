@@ -54,7 +54,9 @@ func APIKeyForSeat(projectRoot, accountID string) string {
 	return strings.TrimSpace(accountID)
 }
 
-// WithSeatAPIKeyEnv copies a bounded subset of parent env, replaces ZQK_API_KEY with seatKey, sets ZQK_PROJECT_ROOT when non-empty.
+// WithSeatAPIKeyEnv copies a bounded subset of parent env, replaces ZQK_API_KEY with seatKey,
+// and sets ZQK_PROJECT_ROOT when non-empty. projectRootEnv must be the seated kernel root,
+// never an ATK git worktree (POL-AGENT-KERNEL-ROOT-BINDING-001).
 func WithSeatAPIKeyEnv(parent []string, seatKey, projectRootEnv string) []string {
 	keyName := zqkenv.APIKey()
 	out := make([]string, 0, len(parent)+2)
