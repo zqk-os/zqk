@@ -670,7 +670,7 @@ func TestInit_RegistersShippedDocs(t *testing.T) {
 	// - docs/best-practices/guidelines.md (should be registered)
 	// - docs/onboarding/first_run.md (should be registered)
 	// - docs/onboarding/archive/ignored.md (should be SKIPPED)
-	// - docs/launch/notes.md (should be SKIPPED per TDE-1789629835679972000-dc60b78d)
+	// - docs/launch/notes.md (should be SKIPPED)
 	testDocs := map[string]string{
 		"docs/architecture/sample.md":        "# Sample Architecture\n\nHigh-level system design.",
 		"docs/best-practices/guidelines.md":  "# Best Practices\n\nGuidelines for development.",

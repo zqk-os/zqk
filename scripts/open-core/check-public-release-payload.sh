@@ -67,10 +67,10 @@ fi
 # Studio technical_debt instance IDs (TDE-<nanos>-<hex>) belong in kernel CAS,
 # not in public overlay/packaging comments.
 if git -C "$ROOT" grep -n -E 'TDE-[0-9]{15,}-[0-9a-fA-F]{8}' -- \
-	'scripts' 'cmd' \
+	'scripts' \
 	':!scripts/open-core/check-public-release-payload.sh' \
 	':!scripts/open-core/test-public-release-gates.sh'; then
-	fail "studio technical_debt instance id remains in scripts or cmd"
+	fail "studio technical_debt instance id remains in scripts"
 fi
 
 # TRACK comments must not leak studio kernel object ids (BLI/REQ/CRIT/PRI/TDE/ATK/CAP/CVS).

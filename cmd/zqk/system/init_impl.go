@@ -237,7 +237,7 @@ func runInit(_ *cobra.Command, projectName, template string, force bool, snapsho
 		}
 	}
 
-	// Ensure maintenance retention jobs on init (TDE-1789692371040218000-2330de1d)
+	// Ensure maintenance retention jobs on init
 	if !withMaintenanceJobs {
 		if _, err := EnsureRetentionJobsInProject(projectRoot, logger, nil); err != nil {
 			logging.Fluent(logger).Warn("Failed to ensure maintenance jobs on init").WithError(err).Log()
@@ -381,7 +381,7 @@ func runGreenfieldInit(projectRoot, projectName, template string, force bool, lo
 	}
 
 	// Register shipped documentation in doc_entry graph (architecture, best-practices, onboarding).
-	// Skips archive trees and docs/launch per TDE-1789629835679972000-dc60b78d / REQ-1789654891514127000-25cbd9d1.
+	// Skips archive trees and docs/launch.
 	if reg, skip, err := docman.RegisterShippedDocs(context.Background(), projectRoot, logger); err != nil {
 		return errfmt.Newf("failed to register shipped documentation in kernel graph").Wrap(err)
 	} else if reg > 0 || skip > 0 {

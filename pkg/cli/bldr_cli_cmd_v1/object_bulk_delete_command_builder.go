@@ -26,7 +26,7 @@ func NewObjectBulkDeleteCommandBuilder() *cobra.Command {
 	help.WithDescriptionLines("  - Via --file flag (YAML array of IDs): --file ids.yaml")
 	help.WithDescriptionLines("")
 	help.WithDescriptionLines("By default, deletion will fail if any object has dependents.")
-	help.WithDescriptionLines("Fail-closed: bare bulk delete is refused — pass --unlink-references or --cascade (TRACK: BLI-1786390312940998000-1f101465).")
+	help.WithDescriptionLines("Fail-closed: bare bulk delete is refused — pass --unlink-references or --cascade.")
 	help.WithDescriptionLines("Use --unlink-references to remove each ID from dependents' reference fields before deleting (matches single-object delete).")
 	help.WithDescriptionLines("Use --cascade to delete objects and all their dependents recursively.")
 	help.WithDescriptionLines("Do not combine --unlink-references with --cascade.")

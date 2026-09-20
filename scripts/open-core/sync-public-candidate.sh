@@ -2,7 +2,6 @@
 # Sync a disposable open-core export. Not the community TPM checkout.
 # Default dest: <studio-parent>/zqk-public-candidate-export
 # Product checkout: <studio-parent>/zqk-public-candidate (git-tracked; never default)
-# ()
 
 set -euo pipefail
 
