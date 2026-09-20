@@ -10,6 +10,8 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/zqk-os/zqk/internal/cli"
+	clipkg "github.com/zqk-os/zqk/pkg/cli"
+	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/lifecycle"
 	"github.com/zqk-os/zqk/pkg/objects"
@@ -25,83 +27,48 @@ type CandidateMatch struct {
 
 // NewBindCmd creates the `zqk test bind` command.
 func NewBindCmd() *cobra.Command {
-	var (
-		reqFlag  string
-		goalFlag string
-		bliFlag  string
-		autoFlag bool
-		dryRun   bool
-		listFlag bool
-	)
+	cmd := bldr_cli_cmd_v1.NewTestBindCommandBuilder()
+	cmd.Aliases = []string{"trace-bind", "link"}
+	cmd.RunE = cli.WithProcessor(runBind)
+	return cmd
+}
 
-	cmd := &cobra.Command{
-		Use:     "bind [test_case_id] [flags]",
-		Aliases: []string{"trace-bind", "link"},
-		Short:   "TPM Lineage Binding Assistant: connect test cases and requirements into intact traceability chains",
-		Long: `Helps Technical Program Managers (TPMs) and engineers achieve the Definition of Done (DoD)
-for project structure by resolving broken or incomplete lineage chains from test cases up to root objects.
-
-When invoked without a specific test case, it analyzes all incomplete chains across the workspace
-and presents ranked, high-confidence options. With --auto, it automatically binds the top recommendations.`,
-		Example: `  # Inspect incomplete chains and view ranked binding options
-  zqk test bind
-
-  # Bind a specific test case to a requirement
-  zqk test bind TST-123 --req REQ-456
-
-  # Bind a requirement to a root goal to close the chain to root
-  zqk test bind TST-123 --req REQ-456 --goal GOAL-LAUNCH-READINESS
-
-  # Automatically resolve and bind all incomplete chains using top candidates
-  zqk test bind --auto
-
-  # Preview automatic bindings without writing changes
-  zqk test bind --auto --dry-run`,
-		RunE: func(cmd *cobra.Command, args []string) error {
-			return cli.WithProcessor(func(cmd *cobra.Command, _ []string, proc *cli.Processor) error {
-				ctx := cmd.Context()
-				if ctx == nil {
-					ctx = context.Background()
-				}
-
-				sp := proc.Storage()
-				secCtx := proc.SecurityContext()
-
-				// Load current dashboard state to identify broken chains
-				state := NewDashboardState()
-				if err := state.LoadFromStorage(ctx, proc, false, "", ""); err != nil {
-					return fmt.Errorf("failed to load test assets from storage: %w", err)
-				}
-
-				var targetTCID string
-				if len(args) > 0 {
-					targetTCID = strings.TrimSpace(args[0])
-				}
-
-				// Mode 1: Explicit binding of target test case
-				if targetTCID != "" && (reqFlag != "" || goalFlag != "" || bliFlag != "") {
-					return executeExplicitBinding(ctx, proc, targetTCID, reqFlag, goalFlag, bliFlag, dryRun, cmd)
-				}
-
-				// Mode 2: Auto-bind all broken chains
-				if autoFlag {
-					return executeAutoBinding(ctx, proc, state, dryRun, cmd)
-				}
-
-				// Mode 3: Assistant / Ranked Options display (Default)
-				return displayBindingAssistant(ctx, sp, secCtx, state, targetTCID, cmd)
-			})(cmd, args)
-		},
+func runBind(cmd *cobra.Command, args []string, proc *cli.Processor) error {
+	ctx := cmd.Context()
+	if ctx == nil {
+		ctx = context.Background()
 	}
 
-	cmd.Flags().StringVar(&reqFlag, "req", "", "Requirement ID to bind to the test case")
-	cmd.Flags().StringVar(&goalFlag, "goal", "", "Root Goal ID to bind to the requirement")
-	cmd.Flags().StringVar(&bliFlag, "bli", "", "Backlog Item ID to bind to the test case")
-	cmd.Flags().BoolVar(&autoFlag, "auto", false, "Automatically bind broken chains using top candidate matches")
-	cmd.Flags().BoolVar(&dryRun, "dry-run", false, "Preview proposed bindings without modifying storage")
-	cmd.Flags().BoolVarP(&listFlag, "list", "l", false, "List all broken chains requiring lineage binding")
+	var flags clipkg.FlagBag
+	reqFlag := flags.String(cmd, "req")
+	goalFlag := flags.String(cmd, "goal")
+	bliFlag := flags.String(cmd, "bli")
+	autoFlag := flags.Bool(cmd, "auto")
+	dryRun := flags.Bool(cmd, "dry-run")
+	if err := flags.Err(); err != nil {
+		return err
+	}
 
-	return cmd
+	sp := proc.Storage()
+	secCtx := proc.SecurityContext()
+
+	state := NewDashboardState()
+	if err := state.LoadFromStorage(ctx, proc, false, "", ""); err != nil {
+		return fmt.Errorf("failed to load test assets from storage: %w", err)
+	}
+
+	var targetTCID string
+	if len(args) > 0 {
+		targetTCID = strings.TrimSpace(args[0])
+	}
+
+	if targetTCID != "" && (reqFlag != "" || goalFlag != "" || bliFlag != "") {
+		return executeExplicitBinding(ctx, proc, targetTCID, reqFlag, goalFlag, bliFlag, dryRun, cmd)
+	}
+	if autoFlag {
+		return executeAutoBinding(ctx, proc, state, dryRun, cmd)
+	}
+	return displayBindingAssistant(ctx, sp, secCtx, state, targetTCID, cmd)
 }
 
 func executeExplicitBinding(

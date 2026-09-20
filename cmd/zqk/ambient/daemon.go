@@ -254,16 +254,17 @@ func EnsureDaemon(projectRoot string, logger logging.Logger) error {
 
 // StopDaemon stops the running ambient daemon
 func StopDaemon(projectRoot string) error {
+	logger := logging.GetLoggerFromProfile("cli")
 	pid, ok := readAmbientPID(projectRoot)
 	if !ok {
-		fmt.Println("Ambient daemon is not running.")
+		logging.Fluent(logger).Info("Ambient daemon is not running.").Log()
 		return nil
 	}
 
 	process, err := os.FindProcess(pid)
 	if err != nil {
 		_ = fileutil.Remove(ambientPIDFilePath(projectRoot))
-		fmt.Println("Ambient daemon is not running.")
+		logging.Fluent(logger).Info("Ambient daemon is not running.").Log()
 		return nil
 	}
 
@@ -284,6 +285,6 @@ func StopDaemon(projectRoot string) error {
 	}
 
 	_ = fileutil.Remove(ambientPIDFilePath(projectRoot))
-	fmt.Printf("Stopped ambient daemon (PID: %d).\n", pid)
+	logging.Fluent(logger).Info(fmt.Sprintf("Stopped ambient daemon (PID: %d).", pid)).Log()
 	return nil
 }

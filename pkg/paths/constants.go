@@ -99,6 +99,8 @@ const (
 	// IdentityStatusFile is the last-resolved CLI/MCP seat snapshot (ACC, lane, roles).
 	// Written by AuthMiddleware / system whoami. Not CAS.
 	IdentityStatusFile = "identity_status.json"
+	// ObserverTipsFile is the AST observer coach cache under StateDir.
+	ObserverTipsFile = "observer_tips.json"
 	// AgentChatChannelConfigFile is lite-file policy for the agent chat channel pilot (steward rules, enable/disable).
 	// See pkg/datacell, DATA_CELL_RUNTIME_ORGANISM.md.
 	AgentChatChannelConfigFile = "agent_chat_channel.json"

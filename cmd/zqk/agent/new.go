@@ -1,6 +1,7 @@
 package agent
 
 import (
+	"context"
 	"fmt"
 	"strings"
 	"time"
@@ -8,8 +9,10 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/zqk-os/zqk/internal/cli"
 	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/storage"
 )
 
 // NewAgentNewCmd creates the ` + "`" + `zqk agent new` + "`" + ` command
@@ -72,7 +75,7 @@ func runAgentNew(cmd *cobra.Command, personaName, description string) error {
 	// from ID"), which failed the whole transaction and made `agent new` unusable. Nothing was
 	// lost by removing it — .zqk/process/assessment_ratings/ holds zero instances and no object
 	// references an ASR id, because the command could never complete. Reintroducing ratings
-	// means restoring the spec and prefix first. TRACK: BLI-1787556517612216000-d382f41e
+	// means restoring the spec and prefix first.
 	skillObj := map[string]any{
 		objects.FieldKeyKind:          "agent_skill",
 		objects.FieldKeySchemaVersion: objects.DefaultSchemaVersion,
@@ -90,19 +93,14 @@ func runAgentNew(cmd *cobra.Command, personaName, description string) error {
 		return errfmt.Newf("failed to commit transaction").Wrap(err)
 	}
 
-	// TRACK: BLI-1785443942668406000-1ec5c811 — draft-plane create / promote membrane.
-	promote := func(id, leaveStatus string) error {
-		return sp.Update(ctx, secCtx, id, map[string]any{objects.FieldKeyStatus: leaveStatus})
-	}
-	// Approved, not implemented: persona_lifecycle.yaml only allows
-	// proposed -> approved -> in_progress -> implemented, so promoting a freshly drafted
-	// persona straight to implemented is an illegal transition and fails the command.
-	// Approved is also the right meaning here — the persona is ready to use, not finished —
-	// and it matches the agent_skill promote below.
-	if err := promote(skillID, objects.ObjectStatusApproved); err != nil {
+	// Leave proposed via a manual one-hop (proposed → approved). A raw status
+	// Update still validates the lifecycle *edge*, but object promote also
+	// refuses auto-only and wildcard hops (* → archived). Require the same
+	// neighbor set here so this cannot skip Promote's hop checker.
+	if err := promoteStatusOneHop(ctx, secCtx, sp, skillID, objects.ObjectStatusApproved); err != nil {
 		return errfmt.Newf("promote agent_skill %s", skillID).Wrap(err)
 	}
-	if err := promote(personaID, objects.ObjectStatusApproved); err != nil {
+	if err := promoteStatusOneHop(ctx, secCtx, sp, personaID, objects.ObjectStatusApproved); err != nil {
 		return errfmt.Newf("promote persona %s", personaID).Wrap(err)
 	}
 
@@ -110,4 +108,47 @@ func runAgentNew(cmd *cobra.Command, personaName, description string) error {
 		"\n✨ Successfully initialized agent: %s\n   Persona ID: %s\n   Skill Placeholder ID: %s\n\n",
 		personaName, personaID, skillID,
 	)))
+}
+
+// promoteStatusOneHop writes status only when toStatus is a manual promote
+// neighbor of the object's current status (objects.PromoteTransitionTargets).
+// Storage.Update still enforces IsValidTransition + YAML preconditions.
+func promoteStatusOneHop(ctx context.Context, secCtx *pkgctx.SecurityContext, sp storage.ObjectStorageProvider, id, toStatus string) error {
+	obj, err := sp.Read(ctx, secCtx, id)
+	if err != nil {
+		return err
+	}
+	kind := objects.GetString(obj, objects.FieldKeyKind)
+	from := objects.GetString(obj, objects.FieldKeyStatus)
+	if err := rejectNonManualPromoteHop(kind, from, toStatus); err != nil {
+		return err
+	}
+	return sp.Update(ctx, secCtx, id, map[string]any{objects.FieldKeyStatus: toStatus})
+}
+
+func rejectNonManualPromoteHop(kind, from, to string) error {
+	if from == to {
+		return nil
+	}
+	loader := objects.GetGlobalLifecycleLoader()
+	lc, err := loader.LoadLifecycle(kind)
+	if err != nil {
+		return errfmt.Newf("load lifecycle for %s", kind).Wrap(err)
+	}
+	if _, ok := objects.PromoteTransitionTargets(lc, from)[to]; !ok {
+		return errfmt.Errorf("%s: %s → %s is not a manual one-hop promote", kind, from, to)
+	}
+	var meta objects.Status
+	for _, st := range lc.Statuses {
+		if st.Value == to {
+			meta = st
+			break
+		}
+	}
+	// object promote skips archive/error/parking even when the graph lists them
+	// (wildcard * → archived is a legal Update edge).
+	if objects.IsNonProgressLifecycleStatus(to, meta) {
+		return errfmt.Errorf("%s: %s → %s is not a progress promote hop", kind, from, to)
+	}
+	return nil
 }

@@ -43,7 +43,7 @@ func runDaemon(cmd *cobra.Command, args []string) error {
 
 	// Do not derive from cmd.Context(): agent/IDE shells often cancel it when stdin
 	// closes or the parent request ends, which exited ServeTCP immediately (no listen).
-	// Lifetime is SIGINT/SIGTERM. TRACK: BLI-1784969955962654000-dc689643 — hourglass.
+	// Lifetime is SIGINT/SIGTERM. hourglass.
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM) // Background: request-or-shutdown derived
 	defer stop()
 	cmd.SetContext(ctx)

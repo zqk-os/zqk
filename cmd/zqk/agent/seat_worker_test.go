@@ -29,9 +29,9 @@ func TestParseOrchestratePlanDirective(t *testing.T) {
 func TestExtractATKIDFromSteer(t *testing.T) {
 	t.Parallel()
 
-	body := "ATTN antigravity-1 NIGHT-DUTY MINT: claim ATK-1786936832123289000-879e523f for BLI-CEF-SEC-AUTH-FAILCLOSED."
+	body := "ATTN peer-1 NIGHT-DUTY MINT: claim ATK-1-abc for BLI-TEST-ITEM."
 	got := extractATKIDFromSteer(body)
-	if got != "ATK-1786936832123289000-879e523f" {
+	if got != "ATK-1-abc" {
 		t.Fatalf("extractATKIDFromSteer = %q", got)
 	}
 	if extractATKIDFromSteer("no task here") != "" {
@@ -66,7 +66,7 @@ func TestBuildSeatWorkerAgentXPromptsRefusesWithoutStorage(t *testing.T) {
 		"peer-agent-1",
 		"PER-ORCH-ALPHA",
 		"AFE-1",
-		"ATTN claim ATK-1786936832123289000-879e523f — swarm must not idle.",
+		"ATTN claim ATK-1-abc — swarm must not idle.",
 	)
 	if !isPreparedContextRefusal(err) {
 		t.Fatalf("want prepared-context refusal, got %v", err)

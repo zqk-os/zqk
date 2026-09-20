@@ -119,7 +119,6 @@ func checkResultsHaveTierIssues(results []CheckResult, maxTier int) bool {
 // kernel check found no tier-1/2/3 issues. Those batches are stale snapshots; leaving them
 // blocked "healthy" and invited deferred churn. Scoped checks never clear (other kinds may
 // still need their batches).
-// TRACK: BLI-1785723654802038000-b14064bc
 func maybeClearStaleAutofixBatchesAfterLiveGreen(cmd *cobra.Command, projectRoot string, results []CheckResult) int {
 	if projectRoot == "" || !systemCheckIsFullKernelScan(cmd) {
 		return 0
@@ -137,7 +136,6 @@ func maybeClearStaleAutofixBatchesAfterLiveGreen(cmd *cobra.Command, projectRoot
 
 // issueStillAppliesToObject reports whether a snapshotted autofix issue is still relevant
 // for the live object. Cheap predicates only — fail closed (return true) when unsure.
-// TRACK: BLI-1785723654802038000-b14064bc
 func issueStillAppliesToObject(kind string, props map[string]any, issue Issue) bool {
 	if props == nil {
 		return false

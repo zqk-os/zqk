@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/zqk-os/zqk/pkg/goroutinelabels"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 func TestWorktreePoolAcquisitionAndRelease(t *testing.T) {
@@ -15,7 +16,7 @@ func TestWorktreePoolAcquisitionAndRelease(t *testing.T) {
 	if err != nil {
 		t.Fatalf("failed to create temp dir: %v", err)
 	}
-	defer os.RemoveAll(tempDir)
+	defer fileutil.RemoveAll(tempDir)
 
 	pool := NewWorktreePool(tempDir, 5)
 	defer pool.Close()
@@ -58,7 +59,7 @@ func TestWorktreePoolConcurrentAcquire(t *testing.T) {
 	if err != nil {
 		t.Fatalf("failed to create temp dir: %v", err)
 	}
-	defer os.RemoveAll(tempDir)
+	defer fileutil.RemoveAll(tempDir)
 
 	capacity := 10
 	pool := NewWorktreePool(tempDir, capacity)
@@ -97,7 +98,7 @@ func TestWorktreeSweeperPruning(t *testing.T) {
 	if err != nil {
 		t.Fatalf("failed to create temp dir: %v", err)
 	}
-	defer os.RemoveAll(tempDir)
+	defer fileutil.RemoveAll(tempDir)
 
 	pool := NewWorktreePool(tempDir, 5)
 	defer pool.Close()
@@ -134,7 +135,7 @@ func TestWorktreePool_BLI_STORAGE_WORKTREE_POOL_001(t *testing.T) {
 	if err != nil {
 		t.Fatalf("failed to create temp dir: %v", err)
 	}
-	defer os.RemoveAll(tempDir)
+	defer fileutil.RemoveAll(tempDir)
 
 	pool := NewWorktreePool(tempDir, 3)
 	defer pool.Close()

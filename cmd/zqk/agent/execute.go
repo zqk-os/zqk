@@ -63,7 +63,7 @@ func NewExecuteCmd() *cobra.Command {
 				return errfmt.Newf("failed to read task %s", taskID).Wrap(err)
 			}
 
-			// TRACK: BLI-1785886160479244000-c9f67956 — migrate this subgraph+prompt
+			// migrate this subgraph+prompt
 			// assembly to AssemblePreparedContext so execute cannot drift from prepare-context.
 			// Resolve Bounded Context via QuerySubgraph for full knowledge awareness
 			deps, err := QuerySubgraph(ctx, proc.SecurityContext(), proc.Storage(), taskID, 1)

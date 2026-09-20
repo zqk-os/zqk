@@ -7,7 +7,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/objects"
 )
 
-// NewWstransListCmd creates the wstrans list subcommand (BLI-807).
+// NewWstransListCmd creates the wstrans list subcommand.
 // Generated spec: .zqk/cli/specs/object/wstrans/list_command.yaml; query flags from generated builder (query_flags: true).
 func NewWstransListCmd() *cobra.Command {
 	cmd := bldr_cli_cmd_v1.NewObjectWstransListCommandBuilder()

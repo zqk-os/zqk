@@ -56,13 +56,11 @@ func NewDaemonCmd() *cobra.Command {
 			// CAS membrane key off DaemonProcess() (skip WAL replay, write locally).
 			// Setting it after WithProcessor left the daemon as a second write-behind
 			// owner that then self-dialed until EMFILE.
-			// TRACK: BLI-CEF-R20-SINGLE-WRITER-BLI-001
 			if err := zqkenv.IsDaemon().Set(daemonEnvEnabled); err != nil {
 				return errfmt.Errorf("failed to mark process as privileged writer daemon: %w", err)
 			}
 			// Privileged writer daemon must run under the system service account
-			// (ACC-1785920548450214012-68b850c0) so it does not inherit ambient
-			// unprivileged sessions from the workspace.
+			// so it does not inherit ambient unprivileged sessions from the workspace.
 			if os.Getenv(zqkenv.APIKey().Name()) == "" {
 				_ = zqkenv.APIKey().Set(pkgctx.SystemAccountID)
 			}

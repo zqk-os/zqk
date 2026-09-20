@@ -34,9 +34,9 @@ type StreamSummary struct {
 }
 
 var (
-	reSkip = regexp.MustCompile(`^\?\s+github\.com/lanceman/zqk/(.+)$`)
-	rePass = regexp.MustCompile(`^ok\s+github\.com/lanceman/zqk/(\S+)\s+([0-9.]+)s`)
-	reFail = regexp.MustCompile(`^FAIL\s+github\.com/lanceman/zqk/(\S+)`)
+	reSkip = regexp.MustCompile(`^\?\s+github\.com/zqk-os/zqk/(.+)$`)
+	rePass = regexp.MustCompile(`^ok\s+github\.com/zqk-os/zqk/(\S+)\s+([0-9.]+)s`)
+	reFail = regexp.MustCompile(`^FAIL\s+github\.com/zqk-os/zqk/(\S+)`)
 )
 
 // StreamTests runs tests with real-time progress streaming and output formatting.

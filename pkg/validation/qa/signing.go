@@ -88,7 +88,7 @@ func (s *AuditorSigner) Sign(data []byte) (string, error) {
 // PublicKey returns the hex-encoded public key.
 func (s *AuditorSigner) PublicKey() string {
 	pub := s.privateKey.PublicKey
-	return fmt.Sprintf("%x%x", pub.X, pub.Y)
+	return fmt.Sprintf("%064x%064x", pub.X, pub.Y)
 }
 
 // PrivateKey returns the underlying ECDSA private key.

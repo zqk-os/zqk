@@ -11,7 +11,7 @@ import (
 
 // FlagElevatedInternal is the object-group elevated access mode flag.
 // It means privilege mode, not visibility: internal as a data filter.
-// TRACK: BLI-1785930106857898000-94b9a5bc — retire parallel zqk-admin internal tree.
+// retire parallel zqk-admin internal tree.
 const FlagElevatedInternal = "internal"
 
 // ElevatedInternalRequested reports whether object … --internal was set.

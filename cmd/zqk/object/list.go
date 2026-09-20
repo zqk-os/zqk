@@ -22,7 +22,7 @@ import (
 // Generated from command spec - DO NOT EDIT MANUALLY (use spec file as source of truth)
 func NewListCmd() *cobra.Command {
 	// Use generated builder from object/list DNA (path-qualified object_list stem).
-	// TRACK: BLI-1785903708509306000-a6d8dc5b — shallow DNA must not share list_command_builder.go with scheduler/list.
+	// shallow DNA must not share list_command_builder.go with scheduler/list.
 	cmd := bldr_cli_cmd_v1.NewObjectListCommandBuilder()
 	cli.BindAsyncProgress(cmd, runList)
 

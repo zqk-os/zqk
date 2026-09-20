@@ -62,6 +62,9 @@ func TestAgentNew(t *testing.T) {
 	if len(res.Objects) < 1 {
 		t.Errorf("Expected 1 persona, got %d", len(res.Objects))
 	}
+	if st := objects.GetString(res.Objects[0], objects.FieldKeyStatus); st != objects.ObjectStatusApproved {
+		t.Errorf("persona status=%q want %q", st, objects.ObjectStatusApproved)
+	}
 
 	resSkill, err := store.List(ctx, secCtx, nil, storage.ListFilter{
 		Kind: "agent_skill",
@@ -71,5 +74,8 @@ func TestAgentNew(t *testing.T) {
 	}
 	if len(resSkill.Objects) < 1 {
 		t.Errorf("Expected 1 agent_skill, got %d", len(resSkill.Objects))
+	}
+	if st := objects.GetString(resSkill.Objects[0], objects.FieldKeyStatus); st != objects.ObjectStatusApproved {
+		t.Errorf("agent_skill status=%q want %q", st, objects.ObjectStatusApproved)
 	}
 }

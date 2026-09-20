@@ -54,7 +54,6 @@ func shouldSkipReferenceField(kind, fieldName string) bool {
 	}
 	// Git branch name (spec type string). Suffix matching would Layer-1 warn
 	// "Cannot determine object kind" for integration/pri-* values.
-	// TRACK: PRI-CEF-R21-ENVELOPE-REMEASURE-001 / PRI-CEF-R26-LIFECYCLE-EXAM-001
 	if fieldName == objects.FieldKeyBranchRef {
 		return true
 	}
@@ -175,7 +174,7 @@ func validateReferenceWithCache(refCtx *ReferenceCheckContext, refID, fieldName 
 	projectRoot := ProjectRootOrResolve(refCtx.Ctx.ProjectRoot)
 
 	// Canonicalize retired account:username → ACC-* so cache keys match object-id-cache.
-	// TRACK: BLI-1785905136581480000-1f317f44 — Cache key used: account:swarm_worker was a false miss.
+	// Cache key used: account:swarm_worker was a false miss.
 	lookupRef := refID
 	if refKind == objects.KindAccount {
 		if canon := authcred.CanonicalAccountID(projectRoot, refID); canon != "" {
@@ -184,7 +183,7 @@ func validateReferenceWithCache(refCtx *ReferenceCheckContext, refID, fieldName 
 		}
 	}
 
-	// Fast path: well-known account refs (e.g. ACC-1785920548450214012-68b850c0) are always valid; skip cache/storage lookup
+	// Fast path: well-known account refs are always valid; skip cache/storage lookup
 	// to avoid slow Exists() that can cause audit_event validation to timeout.
 	if refKind == objects.KindAccount && (wellKnownAccountRefs[lookupRef] || wellKnownAccountRefs[refID]) {
 		return nil
@@ -193,7 +192,6 @@ func validateReferenceWithCache(refCtx *ReferenceCheckContext, refID, fieldName 
 	cacheKey := getCacheKeyForReference(lookupRef, actualRefID)
 
 	// Mid-refresh: CAS mutation pending object-id-cache true-up — soft-exclude, do not Layer-0/1 hard-fail.
-	// TRACK: BLI-1785895580100186000-c5539372
 	if storage.IsObjectIDCachePending(projectRoot, cacheKey) || storage.IsObjectIDCachePending(projectRoot, refID) {
 		return []Issue{
 			{
@@ -230,7 +228,7 @@ func validateReferenceWithCache(refCtx *ReferenceCheckContext, refID, fieldName 
 			if err == nil && existsInStorage {
 				// High-volume kinds (scheduler_job, audit_event, metrics, …) are intentionally
 				// omitted from object-id-cache; Exists+miss is expected, not CacheLag.
-				// TRACK: BLI-1786387465409533000-45bd780c — honest GhostRef vs CacheLag remediation.
+				// honest GhostRef vs CacheLag remediation.
 				if storage.IsHighVolumeKindForCache(refKind) {
 					return nil
 				}
@@ -265,7 +263,7 @@ func validateReferenceWithCache(refCtx *ReferenceCheckContext, refID, fieldName 
 		// Not AutoFixable: --auto-fix / SCH-AUTOFIX must not unlink or delete.
 		// Close the graph with explicit `zqk system kernel-integrity heal-dangling --apply`
 		// after restoring or intentionally dropping the target.
-		// TRACK: BLI-1786387465409533000-45bd780c — honest GhostRef vs CacheLag remediation.
+		// honest GhostRef vs CacheLag remediation.
 		return []Issue{
 			{
 				Tier:        1,

@@ -1,5 +1,5 @@
 // Package app: thin wrappers over pkg/zqksession for CLI session lifecycle.
-// TRACK: REQ-COMMS-RUNTIME-SESSION-001 — session identity lives in pkg/zqksession.
+// session identity lives in pkg/zqksession.
 package app
 
 import (

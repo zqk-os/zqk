@@ -82,7 +82,7 @@ func runDelete(cmd *cobra.Command, args []string) error {
 		if unlinkRefs && cascade {
 			return cli.Guard(cmd).Err(errors.New("--unlink-references cannot be combined with --cascade")).Return()
 		}
-		// TEST EDIT: BLI-1786390312940998000-1f101465 — fail-closed delete (no silent GhostRef fan-in).
+		// Fail-closed delete (no silent GhostRef fan-in).
 		if !unlinkRefs && !cascade {
 			return cli.Guard(cmd).Err(errors.New("delete refused: pass --unlink-references (strip inbound refs) or --cascade; refusing to leave GhostRefs")).Return()
 		}

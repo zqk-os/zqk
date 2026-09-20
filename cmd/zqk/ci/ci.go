@@ -18,7 +18,6 @@ import (
 )
 
 // NewCICmd creates the top-level `ci` command group (Local CI).
-// Kernel: PRI-1785699924616992000-8000284f
 func NewCICmd() *cobra.Command {
 	cmd := bldr.NewCiCommandBuilder()
 	cmd.AddCommand(newCheckoutCmd())
@@ -48,7 +47,7 @@ func newRunCmd() *cobra.Command {
 
 func newStatusCmd() *cobra.Command {
 	// Do not use NewStatusCommandBuilder — that DNA is scheduler status (name collision).
-	// TRACK: BLI-1785699946601766000-26fbe6a5 — prefer ci_status_* builder once codegen nests like mcp_svc_*.
+	// prefer ci_status_* builder once codegen nests like mcp_svc_*.
 	cmd := &cobra.Command{
 		Use:   "status",
 		Short: "Show Local CI SOURCE_SHA and test-bundle health summary",
@@ -164,7 +163,7 @@ func runStatus(cmd *cobra.Command, args []string) error {
 	shaPath := filepath.Join(base, "SOURCE_SHA")
 	workdir := filepath.Join(base, "workdir")
 	var b strings.Builder
-	fmt.Fprintf(&b, "Local CI status (PRI-1785699924616992000-8000284f)\n")
+	fmt.Fprintf(&b, "Local CI status\n")
 	if raw, err := fileutil.ReadFile(shaPath); err == nil {
 		fmt.Fprintf(&b, "  SOURCE_SHA=%s\n", strings.TrimSpace(string(raw)))
 	} else {

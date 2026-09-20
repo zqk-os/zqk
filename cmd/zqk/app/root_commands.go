@@ -55,7 +55,7 @@ import (
 func registerCommands() {
 	// getting_started must be registered before any subcommand uses GroupID
 	// "getting_started" (e.g. quickstart) — cobra panics on Execute otherwise.
-	// TRACK: BLI-1785839468275201000-ddb513d4 — quickstart GroupID registration.
+	// quickstart GroupID registration.
 	rootCmd.AddGroup(&cobra.Group{ID: "getting_started", Title: "Getting Started:"})
 	rootCmd.AddGroup(&cobra.Group{ID: "everyday", Title: "Everyday Commands:"})
 	rootCmd.AddGroup(&cobra.Group{ID: "integrations", Title: "Integrations & Automation:"})
@@ -177,7 +177,7 @@ func registerCommands() {
 	schedulerCmdInst.GroupID = "integrations"
 	rootCmd.AddCommand(schedulerCmdInst)
 
-	// Local CI — commit on studio, checkout SHA elsewhere, scan-tests (PRI-1785699924616992000-8000284f)
+	// Local CI — commit locally, checkout SHA elsewhere, run tests
 	ciCmdInst := cicmd.NewCICmd()
 	ciCmdInst.GroupID = "integrations"
 	rootCmd.AddCommand(ciCmdInst)

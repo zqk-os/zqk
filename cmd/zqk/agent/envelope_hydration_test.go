@@ -10,7 +10,7 @@ import (
 )
 
 // TestEnvelopeHydration_FunctionalAcceptance verifies that AssemblePreparedContext
-// builds a comprehensive task envelope with standing mandates and context (REQ-SWARM-ENVELOPE-HYDRATION-001).
+// builds a comprehensive task envelope with standing mandates and context.
 func TestEnvelopeHydration_FunctionalAcceptance(t *testing.T) {
 	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{
 		Kind:            "agent_prepared_ctx",

@@ -61,8 +61,7 @@ type whatsNextOut struct {
 	MaterializedViewDegradedReason string                    `json:"materialized_view_degraded_reason,omitempty"`
 }
 
-// whatsNextGuidingStep is compiled hunger (POL-AGENT-INTERACTION-POLICY-001).
-// TRACK: BLI-1787035087372193000-c022117d
+// whatsNextGuidingStep is compiled hunger from the interaction policy.
 type whatsNextGuidingStep struct {
 	Event       string `json:"event"`
 	PolicyID    string `json:"policy_id"`
@@ -554,7 +553,7 @@ func runWhatsNextSyncSweep(cmd *cobra.Command, args []string, proc *cli.Processo
 }
 
 func getObserverTips() []string {
-	return observerpkg.ReadCachedTips(zqkenv.ProjectRoot().Name())
+	return observerpkg.ReadCachedTips(zqkenv.ProjectRoot().Get())
 }
 
 func resolvePriorityPlanForWhatsNext(ctx context.Context, sp workflowStorage, explicit string, personaIDs []string) (planID string, summ *whatsNextPriorityPlan, activePlans []whatsNextPriorityPlan) {
@@ -926,7 +925,6 @@ func getAgentPersonaIDs(ctx context.Context, sp workflowStorage, explicitPersona
 
 // leadColumnPersonaIDs drops plan/BLI persona filters for operator/TPM seats so
 // hunger compiles from the lead Gantt. Evaluate still uses the original IDs.
-// TRACK: BLI-1787035087372193000-c022117d
 func leadColumnPersonaIDs(ctx context.Context, sp workflowStorage, personaIDs []string) []string {
 	if len(personaIDs) == 0 || sp == nil {
 		return personaIDs
@@ -1254,7 +1252,7 @@ func compileWhatsNextDrive(out *whatsNextOut, ctx context.Context, sp workflowSt
 	}
 	hydrated := false
 	// Idle catalog text must not be replaced by a GROOM-AHEAD / process-admin
-	// policy body (those overlay as "column is empty"). TRACK: BLI-1787035087372193000-c022117d
+	// policy body (those overlay as "column is empty").
 	if !interactionpolicy.SkipCASOverlay(event) && sp != nil && res.Step.PolicyID != "" {
 		if pol, err := sp.Read(ctx, sec, res.Step.PolicyID); err == nil && interactionpolicy.OverlayFromPolicy(res.Step, pol) {
 			hydrated = true

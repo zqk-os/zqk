@@ -9,7 +9,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
-// TRACK: BLI-1783631896775129000-de3fef87 — loop guard knobs + stagnation heuristic.
+// loop guard knobs + stagnation heuristic.
 
 const (
 	defaultMaxSyncLoops             = 100
@@ -27,9 +27,9 @@ type LoopGuardConfig struct {
 // LoadLoopGuardConfig reads brand-prefixed env overrides (≤0 → defaults).
 func LoadLoopGuardConfig() LoopGuardConfig {
 	cfg := LoopGuardConfig{
-		MaxSyncLoops:             zqkenv.Get(zqkenv.AgentSyncMaxLoops().Name()).IntOrDefault(defaultMaxSyncLoops),
-		MaxVerificationAttempts:  zqkenv.Get(zqkenv.AgentMaxVerificationAttempts().Name()).IntOrDefault(defaultMaxVerificationAttempts),
-		MaxStagnantProgressTicks: zqkenv.Get(zqkenv.AgentSyncMaxStagnantTicks().Name()).IntOrDefault(defaultMaxStagnantProgressTicks),
+		MaxSyncLoops:             zqkenv.AgentSyncMaxLoops().IntOrDefault(defaultMaxSyncLoops),
+		MaxVerificationAttempts:  zqkenv.AgentMaxVerificationAttempts().IntOrDefault(defaultMaxVerificationAttempts),
+		MaxStagnantProgressTicks: zqkenv.AgentSyncMaxStagnantTicks().IntOrDefault(defaultMaxStagnantProgressTicks),
 	}
 	if cfg.MaxSyncLoops <= 0 {
 		cfg.MaxSyncLoops = defaultMaxSyncLoops

@@ -73,7 +73,6 @@ func runCreate(cmd *cobra.Command, args []string) error {
 		}
 
 		// Elevated create defaults source_type like legacy internal create.
-		// TRACK: BLI-1785930106857898000-94b9a5bc
 		if ElevatedInternalRequested(cmd) && objData[objects.FieldKeySourceType] == nil {
 			objData[objects.FieldKeySourceType] = "internal"
 		}
@@ -91,7 +90,6 @@ func runCreate(cmd *cobra.Command, args []string) error {
 		normalizeObjectData(objData, kind, proc)
 
 		// Drop get-time hydration keys so CAS stays sealed (hash = truth).
-		// TRACK: BLI-1785909672838827000-9fca84f5
 		_ = objectget.StripReferenceResolverOverlayFields(objData)
 
 		// Ensure kind matches

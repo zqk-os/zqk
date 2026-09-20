@@ -29,7 +29,6 @@ func newTimingTestScenarioBuilder(t *testing.T) (*ScenarioBuilder, *storagepkg.F
 	tmpDir := t.TempDir()
 	// Bind isolated TEST_ROOT before fallthrough is allowed — otherwise ApplyIsolatedStorageEnv
 	// would either dial live PW or (with unconditional fallthrough) write into live .zqk/process.
-	// TRACK: BLI-CAS-HAND-DUP-CHECK-001
 	t.Setenv(zqkenv.TestRoot().Name(), tmpDir)
 	t.Setenv(zqkenv.ProjectRoot().Name(), "")
 	zqkenv.ApplyIsolatedStorageEnv(t.Setenv)
@@ -101,7 +100,7 @@ func TestCacheCheckerTiming_RaceCondition(t *testing.T) {
 		// Also cache account username format
 		if kind, ok := obj[objects.FieldKeyKind].(string); ok && kind == "account" {
 			if username, ok := obj[objects.FieldKeyUsername].(string); ok && username != emptyValue {
-				accountID := "" // ACC-* from storage; TRACK: BLI-1785905134201010000-07393484
+				accountID := "" // ACC-* from storage;
 				referenceCacheMu.Lock()
 				referenceCache[accountID] = true
 				referenceCacheMu.Unlock()
@@ -227,7 +226,7 @@ func TestCacheCheckerTiming_CorrectBehavior(t *testing.T) {
 		}
 		if kind, ok := obj[objects.FieldKeyKind].(string); ok && kind == "account" {
 			if username, ok := obj[objects.FieldKeyUsername].(string); ok && username != emptyValue {
-				accountID := "" // ACC-* from storage; TRACK: BLI-1785905134201010000-07393484
+				accountID := "" // ACC-* from storage;
 				referenceCacheMu.Lock()
 				referenceCache[accountID] = true
 				referenceCacheMu.Unlock()

@@ -37,7 +37,6 @@ func NewActivityCmd() *cobra.Command {
 	cli.AddCommonFlags(activityCmd)
 
 	// DNA may already define these; only add when builder is still a stub.
-	// TRACK: BLI-1785903708509306000-a6d8dc5b
 	ensureActivityFlags(activityCmd)
 
 	return activityCmd
@@ -175,7 +174,7 @@ func buildSchedulerBusyness(projectRoot string, stuckJobs []jobActivityEvent) Sc
 	}
 
 	// Prefer live daemon conflict set (in-process) or persisted snapshot (CLI talking to daemon).
-	// TRACK: BLI-1785443942668406000-1ec5c811 — false Executing:0 while test bundles run.
+	// false Executing:0 while test bundles run.
 	if sched := schedulerpkg.GetGlobalScheduler(); sched != nil {
 		if ids := sched.GetRunningJobIDs(); len(ids) > 0 {
 			b.Executing = len(ids)

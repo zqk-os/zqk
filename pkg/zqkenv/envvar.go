@@ -3,6 +3,7 @@ package zqkenv
 import (
 	"fmt"
 	"os"
+	"strconv"
 	"strings"
 
 	"github.com/zqk-os/zqk/pkg/brand"
@@ -56,6 +57,26 @@ func (e EnvVar) OrDefault(def string) string {
 		return def
 	}
 	return val
+}
+
+// IntOrDefault parses the environment variable as an integer, otherwise returns def.
+func (e EnvVar) IntOrDefault(def int) int {
+	if val := e.Get(); val != "" {
+		if parsed, err := strconv.Atoi(val); err == nil {
+			return parsed
+		}
+	}
+	return def
+}
+
+// BoolOrDefault parses the environment variable as a boolean, otherwise returns def.
+func (e EnvVar) BoolOrDefault(def bool) bool {
+	if val := e.Get(); val != "" {
+		if parsed, err := strconv.ParseBool(val); err == nil {
+			return parsed
+		}
+	}
+	return def
 }
 
 // Required panics if the environment variable is not present.

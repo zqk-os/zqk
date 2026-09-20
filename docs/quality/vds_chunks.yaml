@@ -75,7 +75,7 @@ chunks:
     independent_verify: yes
   - chunk_id: dest-module-path-boundary
     stage: integrate_verify
-    claim: Dest Go source contains no github.com/lanceman/zqk imports
+    claim: Dest Go source contains no private module imports
     work_object_ref: CRIT-1789702444975812000-cc92bc2c
     rubric_ref: CRIT-1789702444975812000-cc92bc2c
     dsl_checks:

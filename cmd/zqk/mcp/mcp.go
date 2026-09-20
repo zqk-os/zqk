@@ -403,7 +403,6 @@ func newInProcessCLIRunner(rootCmd *cobra.Command, projectRoot string, cliExecMu
 		// Detach from MCP request ctx: canceled parents left on rootCmd / timeout hooks
 		// poisoned the 2nd+ in-process tools/call with "context canceled".
 		// Honor caller's remaining deadline only when still valid; else 120s cap.
-		// TRACK: BLI-1784969955962654000-dc689643
 		runCtx, runCancel := context.WithTimeout(pkgctx.NewSystemContext(), 120*time.Second)
 		if ctx != nil && ctx.Err() == nil {
 			if deadline, ok := ctx.Deadline(); ok {

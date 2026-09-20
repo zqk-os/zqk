@@ -94,7 +94,7 @@ func processAlive(pid int) bool {
 // Workshop runtime hangs off stable so tip rebuilds (bin/zqk) cannot split-brain
 // MCP vs scheduler. Promote tip→stable intentionally via install-zqk-stable.sh.
 // Override with ZQK_BIN. Fall back: workshop/repo stable → tip bin/zqk → executable.
-// TRACK: TDE-1785808957221945000-fcd15e47 — one operational inode for long-lived procs.
+// one operational inode for long-lived procs.
 func resolveMCPDaemonBinPath(projectRoot string) string {
 	if zqkBin := zqkenv.Bin().Get(); zqkBin != "" && fileutil.IsRegularFile(zqkBin) {
 		return zqkBin

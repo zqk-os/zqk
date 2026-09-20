@@ -298,7 +298,7 @@ func SeedKernelFromAnswerFile(projectRoot, answerFilePath string, logger logging
 			lastCreateErr = err
 			continue
 		}
-		// TRACK: BLI-1785443942668406000-1ec5c811 — answer-file seed must promote off draft plane for CAS visibility.
+		// answer-file seed must promote off draft plane for CAS visibility.
 		if leaveStatus != emptyValue && leaveStatus != createStatus {
 			if err := sp.Update(ctx, secCtx, id, map[string]any{objects.FieldKeyStatus: leaveStatus}); err != nil {
 				if _, readErr := sp.Read(ctx, secCtx, id); readErr != nil {

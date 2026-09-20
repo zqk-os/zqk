@@ -15,7 +15,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/storage"
 )
 
-// NewEvomanShowCmd creates the evoman show subcommand (BLI-808).
+// NewEvomanShowCmd creates the evoman show subcommand.
 // Generated spec: .zqk/cli/specs/object/evoman/show_command.yaml. RunE and BLI-642 filtering in this package.
 func NewEvomanShowCmd() *cobra.Command {
 	cmd := bldr_cli_cmd_v1.NewObjectEvomanShowCommandBuilder()

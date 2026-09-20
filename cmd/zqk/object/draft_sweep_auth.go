@@ -14,7 +14,7 @@ import (
 //  2. Require delete:object_draft_plane (or delete:* / admin) via CheckPermission
 //
 // No ZQK_ALLOW_* env bypass — env break-glasses are privilege-bleeding holes
-// (tech-debt CVS facet; TRACK: BLI-ENV-BREAKGLASS-REMOVE-001).
+// (tech-debt CVS facet; ).
 //
 // Denial messages name the missing capability rather than a policy object ID: kernel objects can
 // be archived or deleted, which would leave the CLI pointing at a reference the user cannot read.

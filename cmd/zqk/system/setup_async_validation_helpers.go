@@ -465,7 +465,7 @@ func createAsyncValidationFunc(asyncCtx *AsyncValidationContext) validation.Vali
 			}, nil
 		}
 
-		// When inferKindFromID returned empty (e.g. ACC-1785920548450214017-87f10a62, MCP-*), use kind from file content
+		// When inferKindFromID returned empty (e.g. MCP-*), use kind from file content
 		if effectiveKind == emptyValue && obj.Kind != emptyValue {
 			objectKind = obj.Kind
 		}
@@ -473,7 +473,6 @@ func createAsyncValidationFunc(asyncCtx *AsyncValidationContext) validation.Vali
 		// HashRegistry is unused for CAS integrity (checkIntegrity ignores it). Skip load/cache
 		// unless --auto-fix may need it — loading .doc_entry.hashes (~180KB) under fan-out
 		// contended with the 5s fail-fast budget.
-		// TRACK: BLI-1785895580100186000-c5539372
 		var registry storage.HashRegistryProvider
 		if shouldAutoFix(asyncCtx.Cmd) {
 			registry = getHashRegistryForValidation(stdCtx, asyncCtx, objectKind, filePath)

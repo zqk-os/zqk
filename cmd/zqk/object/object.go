@@ -13,7 +13,6 @@ import (
 const emptyValue = ""
 
 // Help / discovery partitions for `zqk object -h` (verbs vs shortcuts vs schema kinds).
-// TRACK: BLI-1785908736395909000-25c4884e
 const (
 	objectHelpGroupVerbs     = "verbs"
 	objectHelpGroupGraph     = "graph"
@@ -65,8 +64,7 @@ Examples:
 	// Scheduler guard + declarative kind validation (see kind_validate_prerun.go; leaf commands set AnnotationKindValidate).
 	objectCmd.PersistentPreRunE = runObjectSchedulerGuard
 	objectCmd.PersistentFlags().Bool("allow-degraded", false, "Allow scheduler-dependent commands to run when scheduler daemon is not running")
-	// Elevated access mode (DEC-1785930071988960000-364a5796). Not visibility:internal filter.
-	// TRACK: BLI-1785930106857898000-94b9a5bc
+	// Elevated access mode for built-in and internal kinds. Not visibility:internal filter.
 	objectCmd.PersistentFlags().Bool(FlagElevatedInternal, false, "Elevated access mode for built-in and internal kinds (requires Enterprise license or zqk-admin)")
 
 	add := func(cmd *cobra.Command, group string) {

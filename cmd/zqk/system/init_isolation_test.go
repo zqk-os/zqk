@@ -285,7 +285,7 @@ func TestCommunitySourceOverlay_IntegrityAndProcessPreservation(t *testing.T) {
 		}
 	}
 
-	// Verify the installed Makefile is the slim community version (TDE-1789690070487265000-ea5471f4)
+	// Verify the installed Makefile is the slim community version
 	installedMf, err := os.ReadFile(filepath.Join(tmpDest, "Makefile"))
 	if err != nil {
 		t.Fatalf("failed to read installed Makefile: %v", err)

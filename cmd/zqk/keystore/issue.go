@@ -17,7 +17,7 @@ import (
 )
 
 // NewIssueCmd creates keystore issue — generate a unique API key for an ACC seat.
-// TRACK: BLI-1785905292370531000-b758a11c — wire CLI spec + codegen when keystore group is migrated.
+// wire CLI spec + codegen when keystore group is migrated.
 func NewIssueCmd() *cobra.Command {
 	helpBuilder := clipkg.DynamicHelpBuilder(
 		"Issue a unique API key for an account seat",
@@ -32,7 +32,7 @@ func NewIssueCmd() *cobra.Command {
 		AddExample("JSON (includes credential once)", "%s keystore issue --account-id ACC-… --title seat --format json").
 		ExcludeCommonFlags()
 
-	// TRACK: BLI-1785905292370531000-b758a11c — add .zqk/cli/specs/keystore/issue_command.yaml + codegen.
+	// add .zqk/cli/specs/keystore/issue_command.yaml + codegen.
 	issueCmd := &cobra.Command{
 		Use:   "issue [flags]",
 		Short: "Issue a unique API key for an account seat",

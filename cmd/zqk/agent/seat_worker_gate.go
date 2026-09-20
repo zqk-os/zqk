@@ -176,7 +176,7 @@ func historyHasMutationWrite(history []swarm.ToolCallRecord) bool {
 // verifyGoWorkAsCompletion is the seat-worker completion gate: a coding ATK
 // cannot complete on narrative. A successful write tool call is the minimum
 // evidence; Go writes must also compile and pass package tests.
-// TRACK: BLI-1786948736717976000-a0522aac — compile+test still replaces
+// compile+test still replaces
 // tool-name evidence; this only closes the empty-history false-complete.
 func verifyGoWorkAsCompletion(ctx context.Context, root string, history []swarm.ToolCallRecord) (string, error) {
 	if !historyHasMutationWrite(history) {

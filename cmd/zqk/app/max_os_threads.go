@@ -11,7 +11,6 @@ import (
 
 // Fail-closed OS thread cap. Go mints an M per G blocked in a syscall; those Ms
 // park in pthread_cond_wait and never shrink. Sample 2026-09-02: ~2041 threads.
-// TRACK: BLI-CEF-STORAGE-INDEX-CACHE-001
 const (
 	defaultMaxOSThreads = 512
 	minMaxOSThreads     = 64
@@ -52,7 +51,6 @@ func applyMaxOSThreads() {
 // applyDefaultCLIGoroutineBudget installs a process DefaultBudget when none is set.
 // Scheduler daemons already set one; CLI object promote did not, so EnqueueValidation
 // and other optional-budget StartSimple paths were unbounded.
-// TRACK: BLI-CEF-STORAGE-INDEX-CACHE-001
 func applyDefaultCLIGoroutineBudget() {
 	if goroutinelabels.DefaultBudget() != nil {
 		return

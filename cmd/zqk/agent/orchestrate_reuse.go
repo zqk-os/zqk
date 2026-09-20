@@ -171,7 +171,7 @@ func orchDispRank(d orchDisposition) int {
 }
 
 // orchLivePickRank prefers an assigned approved/claimed ATK over leftover remint debris
-// that shares the same title. TRACK: BLI-COMMS-ORCH-DRAFT-PLANE-DIRTY-001
+// that shares the same title.
 func orchLivePickRank(obj map[string]any) int {
 	if obj == nil {
 		return 0
@@ -331,7 +331,6 @@ func ensureOrchestrationWorktree(ctx context.Context, projectRoot, taskID string
 	if isGitWorktreeCheckout(worktreePath) {
 		// Leftover agent/ATK-* branches sit on pre-merge tips. Reset to the
 		// plan/main tip, then drop untracked junk (except .zqk/process CAS).
-		// TRACK: BLI-COMMS-ORCH-DRAFT-PLANE-DIRTY-001
 		if err := resetOrchestrationWorktree(ctx, worktreePath, baseRef); err != nil {
 			return "", err
 		}

@@ -11,7 +11,7 @@ import (
 )
 
 // runCEFDiamondConvergenceMeasure handles evaluation_surface=cef_diamond_scorecard.
-// Does not twin SCH-cvs-*-tick / health.jsonl. TRACK: BLI-CVS-EVAL-SURFACE-ADAPTER-001.
+// Does not twin SCH-cvs-*-tick / health.jsonl.
 func runCEFDiamondConvergenceMeasure(
 	cliCtx *cli.Context,
 	cmd *cobra.Command,

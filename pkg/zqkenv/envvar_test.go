@@ -38,6 +38,40 @@ func TestEnvVar_OrDefault(t *testing.T) {
 	_ = e.Unset()
 }
 
+func TestEnvVar_IntOrDefault(t *testing.T) {
+	e := EnvVar{Key: "TEST_ZQK_ENV_VAR_INT"}
+	_ = e.Unset()
+	if e.IntOrDefault(7) != 7 {
+		t.Errorf("Expected 7, got %v", e.IntOrDefault(7))
+	}
+	_ = e.Set("42")
+	if e.IntOrDefault(7) != 42 {
+		t.Errorf("Expected 42, got %v", e.IntOrDefault(7))
+	}
+	_ = e.Set("nope")
+	if e.IntOrDefault(7) != 7 {
+		t.Errorf("Expected 7 for invalid int, got %v", e.IntOrDefault(7))
+	}
+	_ = e.Unset()
+}
+
+func TestEnvVar_BoolOrDefault(t *testing.T) {
+	e := EnvVar{Key: "TEST_ZQK_ENV_VAR_BOOL"}
+	_ = e.Unset()
+	if e.BoolOrDefault(true) != true {
+		t.Errorf("Expected true, got %v", e.BoolOrDefault(true))
+	}
+	_ = e.Set("false")
+	if e.BoolOrDefault(true) != false {
+		t.Errorf("Expected false, got %v", e.BoolOrDefault(true))
+	}
+	_ = e.Set("nope")
+	if e.BoolOrDefault(true) != true {
+		t.Errorf("Expected true for invalid bool, got %v", e.BoolOrDefault(true))
+	}
+	_ = e.Unset()
+}
+
 func TestEnvVar_Required(t *testing.T) {
 	e := EnvVar{Key: "TEST_ZQK_ENV_VAR_REQUIRED"}
 	_ = e.Unset()

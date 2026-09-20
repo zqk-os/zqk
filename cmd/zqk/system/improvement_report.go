@@ -960,7 +960,7 @@ func ensureWorkItemBLI(_ context.Context, _ storage.ObjectStorageProvider, item 
 	// Do not Create. ensureCreateLifecycleStatus coerces planned → exploring (no
 	// --promote), so the object parks on the draft plane. List omits drafts, so the
 	// hourly job remints the same title every run. Autofix still fires via the
-	// trigger queue above. TRACK: BLI-CAS-HAND-DUP-CHECK-001
+	// trigger queue above.
 	if logger != nil {
 		logging.Fluent(logger).Info("skipping improvement-report BLI mint (would park on object draft plane)").
 			String("title", item.Title).

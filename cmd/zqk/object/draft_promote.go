@@ -13,7 +13,6 @@ import (
 )
 
 // Constants for resilient draft plane bulk promote batching.
-// TRACK: PRI-DRAFT-PROMOTE-TIMEOUT-001 / BLI-1789618716318867000-dc1647b6
 const (
 	defaultDraftPromoteBatchSize = 10
 	maxBoundedDraftErrors        = 50
@@ -25,7 +24,6 @@ type draftItemError struct {
 }
 
 // NewDraftPromoteCmd creates `object draft promote`.
-// TRACK: BLI-1785827958281378000-c0366ecd
 func NewDraftPromoteCmd() *cobra.Command {
 	cmd := bldr_cli_cmd_v1.NewObjectDraftPromoteCommandBuilder()
 	cli.BindAsyncProgress(cmd, runObjectDraftPromote)
@@ -147,7 +145,7 @@ func runObjectDraftPromote(cmd *cobra.Command, args []string) error {
 
 			// If batch failed, fall back to one-item-at-a-time
 			// so individual stuck items or transient daemon delays do not block healthy drafts.
-			// TRACK: BLI-1789618716318867000-dc1647b6 (one-id promote remains documented fallback)
+			// (one-id promote remains documented fallback)
 			for _, singleID := range batch {
 				singleErr := promoteObjectIDs(cmd, proc, []string{singleID})
 				if singleErr == nil {

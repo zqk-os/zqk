@@ -70,6 +70,17 @@ func RepoBinPath(projectRoot string) string {
 	return filepath.Join(binDir, brand.ExecutableName())
 }
 
+// StateDirPath returns the absolute project state directory (.zqk/state by default).
+func StateDirPath(projectRoot string) string {
+	fallback := filepath.Join(ProjectDataDir, StateDir)
+	return ResolvePathFromCacheOrConstant(projectRoot, "state", fallback)
+}
+
+// ObserverTipsPath returns the AST observer coach cache file under state/.
+func ObserverTipsPath(projectRoot string) string {
+	return filepath.Join(StateDirPath(projectRoot), ObserverTipsFile)
+}
+
 // MeshStateDirPath returns the absolute mesh state directory.
 func MeshStateDirPath(projectRoot string) string {
 	fallback := filepath.Join(ProjectDataDir, StateDir, MeshStateSubdir)

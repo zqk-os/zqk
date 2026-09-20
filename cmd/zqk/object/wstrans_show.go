@@ -15,7 +15,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/storage"
 )
 
-// NewWstransShowCmd creates the wstrans show subcommand (BLI-807).
+// NewWstransShowCmd creates the wstrans show subcommand.
 // Generated spec: .zqk/cli/specs/object/wstrans/show_command.yaml. RunE and BLI-642 filtering in this package.
 func NewWstransShowCmd() *cobra.Command {
 	cmd := bldr_cli_cmd_v1.NewObjectWstransShowCommandBuilder()

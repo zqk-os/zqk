@@ -12,7 +12,7 @@ import (
 )
 
 func TestCompactChangeJournalWindow_Integration(t *testing.T) {
-	// TRACK: BLI-1785443942668406000-1ec5c811 — no t.Parallel with t.Setenv (Go 1.26+).
+	// no t.Parallel with t.Setenv (Go 1.26+).
 	projectRoot := t.TempDir()
 	t.Setenv(zqkenv.ProjectRoot().Name(), projectRoot)
 	if _, err := setupSystemTestEnvironmentRoot(t, projectRoot); err != nil {

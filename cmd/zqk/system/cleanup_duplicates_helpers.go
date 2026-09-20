@@ -32,7 +32,7 @@ var (
 	hashFilePattern = regexp.MustCompile(`^[a-f0-9]{64}\.yaml$`)
 	// Top-level object id only (column 0). Indented "id:" (nested maps) must not be
 	// treated as the object id — that false-grouped hash duplicates and let cleanup
-	// delete sole real objects. TRACK: BLI-1785723654802038000-b14064bc
+	// delete sole real objects.
 	idLineRegex = regexp.MustCompile(`(?m)^id\s*:\s*(.+)$`)
 )
 
@@ -91,7 +91,6 @@ func initializeCleanupContext(cmd *cobra.Command, args []string) (*CleanupDuplic
 
 	// Bypass/system-generated kinds delete by default (quarantine would grow forever).
 	// All other kinds quarantine unless --delete-hash-duplicates.
-	// TRACK: BLI-1786358681981576000-66f07f6c
 	var deleteForKindsMap map[string]bool
 	if hashDupes {
 		if cfg := storage.GetGlobalBlockingCheckConfig(); cfg != nil {
@@ -276,7 +275,7 @@ func scanHashFiles(dirPath string, verbose bool, logger logging.Logger) (primary
 }
 
 // quarantineOrDeleteDuplicateHashFile moves a hash-duplicate into QuarantineDir (default),
-// or deletes when --delete-hash-duplicates / bypass kind. TRACK: BLI-1786358681981576000-66f07f6c
+// or deletes when --delete-hash-duplicates / bypass kind.
 func quarantineOrDeleteDuplicateHashFile(ctx *CleanupDuplicatesContext, kind, objectID, filePath string) (bool, error) {
 	deleteIt := ctx.DeleteHashDuplicates ||
 		(ctx.DeleteHashDuplicatesForKinds != nil && ctx.DeleteHashDuplicatesForKinds[kind])

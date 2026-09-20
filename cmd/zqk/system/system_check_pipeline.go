@@ -70,7 +70,6 @@ func runSystemCheckPipelineWithOutcome(
 ) (map[string]any, error) {
 	// Do not persist sampled metric objects during check. grprof_traces.txt:
 	// hundreds of coordinator_metrics_router Gs blocked on FileObjectStorage.Create.
-	// TRACK: BLI-CEF-STORAGE-INDEX-CACHE-001
 	metricsrecording.EnterHotPathNoPersist()
 	defer metricsrecording.LeaveHotPathNoPersist()
 

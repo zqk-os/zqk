@@ -317,7 +317,7 @@ func convertValidationResultsToIssues(result *validation.ValidationResult, err e
 			// Mark tier 3 warnings as auto-fixable if they have fix commands.
 			// Wall-clock clamp is gated: FixCommand stays advisory for humans;
 			// AutoFixable only when completed_at makes the span definitive.
-			// TRACK: PRI-1785885772223315000-0649f401 — avoid autofix shrinking in-progress effort.
+			// avoid autofix shrinking in-progress effort.
 			if isWallClockClampWarning(validationWarning.Rule, issue.Message) {
 				issue.AutoFixable = wallClockClampSafeToAutoFix(objMap)
 			} else {
@@ -359,7 +359,6 @@ func generateFixCommand(objID, kind, field, message, rule string, objMap map[str
 	// Do NOT rely on executeFixCommand — it only resolves <PLACEHOLDER_ID:…> templates
 	// and its object-id regex misses modern BLI-…-hex IDs. In-process autofix applies
 	// the clamp via applyWallClockClampAutoFix when AutoFixable + --auto-fix.
-	// TRACK: PRI-1785885772223315000-0649f401
 	// Leftover wall-clock detector: not a typed field fix. Membrane clamps; only
 	// lifecycle --override / break-glass may persist overstated actual.
 	if rule == validation.RuleActualEffortWallClock {
@@ -479,7 +478,7 @@ func isWallClockClampIssue(issue Issue) bool {
 
 // wallClockClampSafeToAutoFix is true only when completed_at is set so the span is
 // not a bouncing updated_at window on in-progress work.
-// TRACK: PRI-1785885772223315000-0649f401 — same incident class as autofix status demote.
+// same incident class as autofix status demote.
 func wallClockClampSafeToAutoFix(objMap map[string]any) bool {
 	if objMap == nil {
 		return false

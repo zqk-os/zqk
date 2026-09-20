@@ -266,7 +266,6 @@ func runAdd(cmd *cobra.Command, args []string) error {
 
 			// planned/in_progress require priority_tier (lifecycle precondition).
 			// Keep priority and priority_tier strictly synchronized.
-			// TRACK: TDE-ENV-ALLOW-CI-OVERRIDES-STALE-TESTS-001
 			if tier, ok := objects.PriorityToTier(priority); ok {
 				updates[objects.FieldKeyPriorityTier] = tier
 			} else if tier, ok := current[objects.FieldKeyPriorityTier].(string); ok && strings.TrimSpace(tier) != "" {

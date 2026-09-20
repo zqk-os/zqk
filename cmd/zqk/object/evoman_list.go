@@ -7,7 +7,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/objects"
 )
 
-// NewEvomanListCmd creates the evoman list subcommand (BLI-808).
+// NewEvomanListCmd creates the evoman list subcommand.
 // Generated spec: .zqk/cli/specs/object/evoman/list_command.yaml; query flags from generated builder (query_flags: true).
 func NewEvomanListCmd() *cobra.Command {
 	cmd := bldr_cli_cmd_v1.NewObjectEvomanListCommandBuilder()

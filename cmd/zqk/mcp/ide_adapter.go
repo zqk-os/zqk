@@ -25,7 +25,7 @@ func NewIDEAdapterCmd() *cobra.Command {
 // NewCursorAdapterCmd wires the Cursor-preferred alias to the same ide-adapter
 // runtime. Help/examples advertise cursor-adapter; without this AddCommand the
 // binary treats `mcp cursor-adapter --tcp` as parent flags → unknown --tcp and
-// Cursor MCP stays red. TRACK: BLI-MCP-CURSOR-ADAPTER-SYMLINK-001
+// Cursor MCP stays red.
 func NewCursorAdapterCmd() *cobra.Command {
 	cmd := bldr_cli_cmd_v1.NewMcpSvcCursorAdapterCommandBuilder()
 	cmd.RunE = runIDEAdapter
@@ -63,8 +63,7 @@ func runIDEAdapter(cmd *cobra.Command, _ []string) error {
 
 	// Do not derive from cmd.Context(): IDE cancels it after tools/call, which
 	// used to exit the adapter process and mark MCP red. Lifetime is stdin EOF;
-	// SIGINT/SIGTERM close stdin to unblock the read loop. TRACK:
-	// BLI-1784969955962654000-dc689643 — hourglass/context-refresh soft drain.
+	// SIGINT/SIGTERM close stdin to unblock the read loop for hourglass/context-refresh soft drain.
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM) // Background: request-or-shutdown derived
 	defer stop()
 	goroutinelabels.NewGoroutine("mcp_ide_adapter_stdin_close", "close stdin on SIGINT/SIGTERM soft drain").StartSimple(func() {

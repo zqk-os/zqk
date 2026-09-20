@@ -10,7 +10,6 @@ import (
 	"github.com/zqk-os/zqk/pkg/storage"
 )
 
-// TRACK: BLI-1785895580100186000-c5539372
 func TestDetectAndConsumeSignificantCacheChange_Marker(t *testing.T) {
 	root := t.TempDir()
 	storage.ResetSignificantCacheChangeForTest(root)
@@ -29,7 +28,6 @@ func TestDetectAndConsumeSignificantCacheChange_Marker(t *testing.T) {
 	}
 }
 
-// TRACK: BLI-1785895580100186000-c5539372
 func TestHandleClearCache_AutoEnablesRefreshOnSignificantChange(t *testing.T) {
 	root := t.TempDir()
 	storage.ResetSignificantCacheChangeForTest(root)
@@ -61,7 +59,6 @@ func TestHandleClearCache_AutoEnablesRefreshOnSignificantChange(t *testing.T) {
 	}
 }
 
-// TRACK: BLI-1785895580100186000-c5539372
 func TestHandleClearCache_PendingBurstDoesNotClearValidation(t *testing.T) {
 	root := t.TempDir()
 	storage.ResetSignificantCacheChangeForTest(root)

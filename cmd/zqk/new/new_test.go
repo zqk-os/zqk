@@ -12,6 +12,7 @@ import (
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/storage"
 	"github.com/zqk-os/zqk/pkg/testenvroot"
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"github.com/zqk-os/zqk/pkg/zqkenv"
@@ -55,6 +56,10 @@ func TestNewObject_mintRequiresTitle(t *testing.T) {
 func TestNewObject_unknown_kind_errors(t *testing.T) {
 	testRoot := t.TempDir()
 	t.Setenv(zqkenv.TestRoot().Name(), testRoot)
+	t.Cleanup(func() {
+		_ = storage.RunProjectTestTeardown(storage.TempProjectTeardown(testRoot, nil))
+		_ = fileutil.RemoveAll(filepath.Join(testRoot, ".zqk"))
+	})
 
 	repoRoot := zqkenv.ProjectRoot().Get()
 	if repoRoot == "" {
@@ -263,7 +268,7 @@ func TestShouldAutoTracePipeline(t *testing.T) {
 
 // TestAutoTracePipeline_BLI1789335658105469000_Discipline tests the fail-closed mint discipline
 // where requirement, goal, and milestone mints must auto-run gen-trace-pipeline unless skipped or in test.
-// TRACK: BLI-1789335658105469000-6a07dd3a, PRI-1789335690752634000-26ad932b, POL-AGENT-TPM-TRACE-PIPELINE-001
+// POL-AGENT-TPM-TRACE-PIPELINE-001
 func TestAutoTracePipeline_BLI1789335658105469000_Discipline(t *testing.T) {
 	cmd := NewNewCmd()
 	var leaf *cobra.Command

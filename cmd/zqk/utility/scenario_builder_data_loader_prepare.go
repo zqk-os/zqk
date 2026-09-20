@@ -85,7 +85,6 @@ func (sb *ScenarioBuilder) prepareObjectFromDataFile(obj map[string]any, kind st
 	}
 
 	// Handle account ID: leave unset so storage generates ACC-* (full cutover).
-	// TRACK: BLI-1785905134201010000-07393484
 	if kind == objects.KindAccount {
 		if id, ok := obj[objects.FieldKeyID].(string); ok && strings.HasPrefix(id, "account:") {
 			delete(obj, objects.FieldKeyID)
@@ -189,7 +188,6 @@ func (sb *ScenarioBuilder) setFieldsDirectly(obj map[string]any, kind string) er
 	// Don't set ID - let storage auto-generate it
 	// But don't delete it if it's already set (for reference objects)
 	// Accounts: strip legacy account:* ids so storage assigns ACC-*.
-	// TRACK: BLI-1785905134201010000-07393484
 	if kind == objects.KindAccount {
 		if id, ok := obj[objects.FieldKeyID].(string); ok && strings.HasPrefix(id, "account:") {
 			delete(obj, objects.FieldKeyID)
@@ -225,7 +223,6 @@ func (sb *ScenarioBuilder) validateObjectBeforeCreation(obj map[string]any, kind
 	}
 
 	// Accounts use ACC-* ids from storage generation — do not invent account:* ids.
-	// TRACK: BLI-1785905134201010000-07393484
 	if kind == objects.KindAccount {
 		if id, ok := obj[objects.FieldKeyID].(string); ok && strings.HasPrefix(id, "account:") {
 			delete(obj, objects.FieldKeyID)

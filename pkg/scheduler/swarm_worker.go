@@ -349,7 +349,7 @@ func (s *Scheduler) resolveLLMClientForTask(ctx context.Context, task map[string
 }
 
 func fallbackChatModel() string {
-	if m := zqkenv.Get(zqkenv.LLMChatModel().Name()).OrDefault(""); m != "" {
+	if m := zqkenv.LLMChatModel().Get(); m != "" {
 		return m
 	}
 	if strings.Contains(zqkenv.LLMBaseURL().Get(), "11434") {

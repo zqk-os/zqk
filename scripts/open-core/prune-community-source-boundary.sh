@@ -21,8 +21,8 @@ rm -f "$ROOT/cmd/zqk-community/app/join.go" \
 	"$ROOT/pkg/brand/project_config.go" \
 	"$ROOT/pkg/brand/project_config_test.go"
 
-# TRACK: TDE-1789712164445942000-2f9cf61a — include Helm tests only after
-# the community distribution has a dest-owned design and public chart assets.
+# Include Helm tests only after the community distribution has a dest-owned
+# design and public chart assets.
 rm -f "$ROOT/pkg/community/container_helm_test.go"
 
 if [ -d "$ROOT/pkg/cli" ]; then

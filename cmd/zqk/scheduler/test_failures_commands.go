@@ -84,7 +84,7 @@ func NewTestFailuresListCmd() *cobra.Command {
 		ExcludeCommonFlags()
 
 	// Do not reuse NewSchedulerListCommandBuilder — that is the job-list DNA
-	// (object/scheduler list collision fix). TRACK: BLI-1785903708509306000-a6d8dc5b
+	// (object/scheduler list collision fix).
 	cmd := &cobra.Command{
 		Use: "list",
 	}

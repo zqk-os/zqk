@@ -17,7 +17,7 @@ const coreDeleteReasonMinRunes = 30
 //
 // No elevated shortcut: privilege answers "may you", not "did you mean to". Every daemon is
 // constructed elevated, so an elevation shortcut here would exempt exactly the automated callers
-// the guard exists to stop. TRACK: BLI-1785723654802038000-b14064bc.
+// the guard exists to stop.
 func withCoreDeleteReasonFromFlags(cmd *cobra.Command, ctx context.Context) (context.Context, error) {
 	reason, _ := cmd.Flags().GetString("reason-code")
 	reason = strings.TrimSpace(reason)

@@ -176,7 +176,7 @@ func checkIntegrityWithRegistryAndContent(ctx *cli.Context, obj *parser.ParsedOb
 	// Use cached CAS when available (async validation / scheduler) to avoid loading full index per object.
 	// Storage from system check is typically Batching(Routing(...)) — bare *FileObjectStorage asserts miss
 	// and reloaded .doc_entry.index (~170KB) on every object under concurrency → validation timeouts.
-	// TRACK: BLI-1785895580100186000-c5539372 — keep unwrap when: check uses factory/cache providers.
+	// keep unwrap when: check uses factory/cache providers.
 	var cas *storage.ContentAddressableStorage
 	if fileStorage := extractFileStorage(storageProvider); fileStorage != nil {
 		if c, err := fileStorage.GetContentAddressableStorage(kind); err == nil && c != nil {

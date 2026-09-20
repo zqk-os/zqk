@@ -198,64 +198,9 @@ tmp/cvs-update.yaml
 # Local zip snapshots of docs/reports (see docs/archive/README.md); regenerate on demand
 docs/archive/snapshots/*.zip
 
-# Kernel state instances: ignore by default (CAS churn); un-ignore durable planning/ontology.
-# High-volume / runtime kinds stay ignored (audit, metrics, change_journal, scheduler_jobs, mcp_sessions).
-# Recovery lesson 2026-08-01: csnap-only baseline is not enough when a thin state-commit overwrites the snap.
-docs/process/**/*.yaml
-!docs/process/_internal/**/*.yaml
-!docs/process/command_specs/**/*.yaml
-!docs/process/goals/**/*.yaml
-!docs/process/epics/**/*.yaml
-!docs/process/requirements/**/*.yaml
-!docs/process/policies/**/*.yaml
-!docs/process/priority_plans/**/*.yaml
-!docs/process/backlog/**/*.yaml
-!docs/process/criteria/**/*.yaml
-!docs/process/tests/**/*.yaml
-!docs/process/milestones/**/*.yaml
-!docs/process/missions/**/*.yaml
-!docs/process/visions/**/*.yaml
-!docs/process/roadmaps/**/*.yaml
-!docs/process/glossary_terms/**/*.yaml
-!docs/process/glossary_term_relations/**/*.yaml
-!docs/process/doc_entries/**/*.yaml
-!docs/process/convergence_sessions/**/*.yaml
-!docs/process/strategic_plans/**/*.yaml
-!docs/process/strategic_contexts/**/*.yaml
-!docs/process/corporate_initiatives/**/*.yaml
-!docs/process/workflows/**/*.yaml
-!docs/process/personas/**/*.yaml
-!docs/process/organizations/**/*.yaml
-!docs/process/teams/**/*.yaml
-!docs/process/accounts/**/*.yaml
-!docs/process/brands/**/*.yaml
-!docs/process/components/**/*.yaml
-!docs/process/workstreams/**/*.yaml
-!docs/process/releases/**/*.yaml
-!docs/process/risk_blockers/**/*.yaml
-!docs/process/technical_debts/**/*.yaml
-!docs/process/decisions/**/*.yaml
-!docs/process/questions/**/*.yaml
-!docs/process/scenarios/**/*.yaml
-!docs/process/stakeholder_profiles/**/*.yaml
-!docs/process/prompt_templates/**/*.yaml
-!docs/process/important_dates/**/*.yaml
-!docs/process/libraries/**/*.yaml
-!docs/process/namespaces/**/*.yaml
-!docs/process/namespace_registries/**/*.yaml
-!docs/process/domain_registries/**/*.yaml
-!docs/process/vocabulary_schemes/**/*.yaml
-!docs/process/verification_matrices/**/*.yaml
-!docs/process/roles/**/*.yaml
-!docs/process/partnerships/**/*.yaml
-!docs/process/divisions/**/*.yaml
-!docs/process/departments/**/*.yaml
-!docs/process/rules/**/*.yaml
-!docs/process/agent_skills/**/*.yaml
-!docs/process/agent_tasks/**/*.yaml
-!docs/process/mcp_specs/**/*.yaml
-!docs/process/pipelines/**/*.yaml
-!docs/process/technical_specs/**/*.yaml
+# Kernel state instances: all instance kernel objects are runtime data and must NEVER be tracked in git
+.zqk/process/
+docs/process/
 # Prior csnap archives (state-commit copies before overwrite) — keep in git for rollback
 !.zqk-state/snapshots/
 !.zqk-state/snapshots/**/*.csnap

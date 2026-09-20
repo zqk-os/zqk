@@ -48,7 +48,6 @@ func NewHistoryCmd() *cobra.Command {
 	cli.AddCommonFlags(historyCmd)
 
 	// DNA may already define these; only add when builder is still a stub.
-	// TRACK: BLI-1785903708509306000-a6d8dc5b
 	ensureHistoryFlags(historyCmd)
 
 	return historyCmd

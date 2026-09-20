@@ -44,7 +44,7 @@ func NewGetCmd() *cobra.Command {
 	cmd.Aliases = []string{"show", "view"}
 	cmd.Args = cobra.MinimumNArgs(0)
 	_ = cmd.RegisterFlagCompletionFunc("fields", completeGetProjectFields)
-	// TRACK: BLI-1785909672838827000-9fca84f5 — resolved sidecar (not CAS)
+	// resolved sidecar (not CAS)
 	cmd.Flags().Bool("write-resolved-sidecar", false, "Write hydration overlay to .zqk/resolved/… sidecar (CAS get stays raw when combined with --resolved-sidecar-only)")
 	cmd.Flags().Bool("resolved-sidecar-only", false, "After hydrating, write sidecar and emit raw CAS object (no resolved_* in stdout)")
 	return cmd

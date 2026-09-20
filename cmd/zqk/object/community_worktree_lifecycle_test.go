@@ -11,7 +11,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/paths"
 )
 
-// TestGoalAndMilestoneLifecycle_ForwardPercentCompleteDefaults validates TDE-1789674845502853000-3c3a7794.
+// TestGoalAndMilestoneLifecycle_ForwardPercentCompleteDefaults validates goal and milestone lifecycle defaults.
 // Goal originated (5) -> proposed (10) and Milestone originated (5) -> not_started (15) must be
 // strictly forward by percent_complete so promotion is not skipped.
 func TestGoalAndMilestoneLifecycle_ForwardPercentCompleteDefaults(t *testing.T) {
@@ -63,7 +63,7 @@ func TestGoalAndMilestoneLifecycle_ForwardPercentCompleteDefaults(t *testing.T) 
 	}
 }
 
-// TestWorktreeChangeIntent_ScriptsUseGitTopLevel validates TDE-1789674842955767000-a308ef84.
+// TestWorktreeChangeIntent_ScriptsUseGitTopLevel validates scripts resolve git top level.
 // Git hooks and adapters must use `git rev-parse --show-toplevel` so worktree commits do not
 // look for intent files on the studio repo root.
 func TestWorktreeChangeIntent_ScriptsUseGitTopLevel(t *testing.T) {
@@ -90,7 +90,7 @@ func TestWorktreeChangeIntent_ScriptsUseGitTopLevel(t *testing.T) {
 	}
 }
 
-// TestWorktreeChangeIntent_ExecutionInGitWorktree validates TDE-1789674842955767000-a308ef84 end-to-end.
+// TestWorktreeChangeIntent_ExecutionInGitWorktree validates execution in git worktree end-to-end.
 // Even when ZQK_PROJECT_ROOT is set in the environment to another directory (e.g. studio root),
 // declare-change-intent and check-change-intent resolve the local worktree via git rev-parse --show-toplevel.
 func TestWorktreeChangeIntent_ExecutionInGitWorktree(t *testing.T) {

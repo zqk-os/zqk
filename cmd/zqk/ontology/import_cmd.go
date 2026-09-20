@@ -56,7 +56,7 @@ func runOntologyImport(cmd *cobra.Command, args []string) error {
 			lines = 0
 		}
 
-		// Create import_tracking record (BLI-765)
+		// Create import_tracking record
 		ctx := proc.OperationContext()
 		secCtx := proc.SecurityContext()
 		store := proc.Storage()
@@ -83,7 +83,7 @@ func runOntologyImport(cmd *cobra.Command, args []string) error {
 			}
 		}
 
-		// CRIT-7643: Invoke translation engine (BLI-764) using the Mid-Brain Semantic Importer.
+		// Invoke translation engine using the semantic importer.
 		importer := semantic.NewOntologyImporter()
 		// No need for explicit registration since it's now wired to use pkg/translation internally.
 		importResult, trErr := importer.Import(filePath, formatKey, data)
@@ -172,7 +172,7 @@ func persistTranslatedObjects(ctx context.Context, secCtx *pkgctx.SecurityContex
 }
 
 // detectImportFormat returns format key and human-readable label from path, content, or flag.
-// Supports RDF/OWL (BLI-764), Cypher (BLI-761), JSON Schema (BLI-762), OpenAPI (BLI-763).
+// Supports RDF/OWL, Cypher, JSON Schema, and OpenAPI.
 func detectImportFormat(path, content, formatFlag string) (key, label string) {
 	if formatFlag != emptyValue && formatFlag != "auto" {
 		label := formatFlag
@@ -196,16 +196,16 @@ func detectImportFormat(path, content, formatFlag string) (key, label string) {
 	}
 	ext := strings.ToLower(filepath.Ext(path))
 	trimmed := strings.TrimSpace(content)
-	// Cypher (BLI-761): .cypher or schema-like CREATE CONSTRAINT/INDEX
+	// Cypher: .cypher or schema-like CREATE CONSTRAINT/INDEX
 	if ext == ".cypher" || strings.Contains(trimmed, "CREATE CONSTRAINT") || strings.Contains(trimmed, "CREATE INDEX") {
 		return "cypher", "Cypher"
 	}
-	// OpenAPI (BLI-763): openapi: 3.x or swagger: 2.x
+	// OpenAPI: openapi: 3.x or swagger: 2.x
 	if strings.HasPrefix(trimmed, "openapi:") || strings.HasPrefix(trimmed, "swagger:") ||
 		strings.Contains(trimmed, "\nopenapi:") || strings.Contains(trimmed, "\nswagger:") {
 		return "openapi", "OpenAPI"
 	}
-	// JSON Schema (BLI-762): $schema and definitions
+	// JSON Schema: $schema and definitions
 	if (ext == ".json" || strings.HasPrefix(trimmed, "{")) && strings.Contains(content, "$schema") && strings.Contains(content, "definitions") {
 		return "json_schema", "JSON Schema"
 	}

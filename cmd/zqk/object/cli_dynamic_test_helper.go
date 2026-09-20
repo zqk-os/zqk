@@ -67,7 +67,7 @@ func getInitialStatus(kind string) string {
 	// getInitialStatusForKind in this same package already derives this from the lifecycle YAML by
 	// selecting the status marked initial; the rows below are corrected in place rather than
 	// delegated because that helper lives in a _test.go file this one cannot import from.
-	// TRACK: BLI-1785443942668406000-1ec5c811 — collapse onto the lifecycle-derived helper.
+	// collapse onto the lifecycle-derived helper.
 	statuses := map[string]string{
 		pplanKindBacklogItem: objectStatusExploring,
 		"goal":               objectStatusActive,
@@ -84,7 +84,7 @@ func getInitialStatus(kind string) string {
 // casLeaveStatus picks a CAS-visible leave status for CreateCASVisible.
 // Draft-first create parks preliminary statuses on the draft plane; List/Count omit them.
 // Empty string lets CreateCASVisible use defaultLeavePreliminaryStatus (kind-aware).
-// TRACK: BLI-1785443942668406000-1ec5c811 — draft-plane create / promote membrane.
+// draft-plane create / promote membrane.
 func casLeaveStatus(status string) string {
 	switch status {
 	// FINDING: this list is a hardcoded stand-in for "is this status preliminary?", a question
@@ -94,7 +94,7 @@ func casLeaveStatus(status string) string {
 	// object in the draft plane where List cannot see it. awaiting_verification is listed because
 	// criteria's origin status moved onto it above; a kind whose origin status is missing from this
 	// list fails that way with no error.
-	// TRACK: BLI-1785443942668406000-1ec5c811 — take a kind and use StatusChecker.IsPreliminary.
+	// take a kind and use StatusChecker.IsPreliminary.
 	case objectStatusExploring, objectStatusNotStarted, objects.ObjectStatusAwaitingVerification, emptyValue:
 		return ""
 	default:

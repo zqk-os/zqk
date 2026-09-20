@@ -33,7 +33,7 @@ func NewCheckCmd() *cobra.Command {
 		"uses the full surface. A green partial result does not mean the kernel is healthy.",
 		"Autofix demotes only process_failure findings to status=error (illegal lifecycle /",
 		"status preconditions), never data_completeness or employment_fitness; identity/",
-		"governance kinds never autofix-demote (REQ-KERNEL-LIFECYCLE-FITNESS-001).",
+		"governance kinds never autofix-demote.",
 		"",
 		"Usage patterns:",
 		"  - For full-project checks with auto-fix, run with an explicit long timeout",
@@ -43,10 +43,10 @@ func NewCheckCmd() *cobra.Command {
 		"  - Avoid short timeouts (e.g., 30s, 60s) for 'check all --auto-fix' – they",
 		"    almost always time out during CAS cleanup and validation.",
 	).
-		AddExample("Check a specific object (by ID)", "%s system check BLI-626").
+		AddExample("Check a specific object (by ID)", "%s system check BLI-001").
 		AddExample("Check all objects of a kind", "%s system check backlog_item").
 		AddExample("Check all objects in the system", "%s system check all").
-		AddExample("Check with verbose output", "%s system check BLI-626 --verbose").
+		AddExample("Check with verbose output", "%s system check BLI-001 --verbose").
 		AddExample("Check with JSON output", "%s system check all --format json").
 		AddExample("Partial check (refs skipped; not authoritative)", "%s system check all --fast").
 		AddExample("Fast iteration: write failing IDs then re-check only those", "%s system check all --write-failing-ids tier1.txt --fast; %s system check --ids-from-file tier1.txt --fast").
@@ -77,7 +77,6 @@ func NewCheckCmd() *cobra.Command {
 	cmd.Flags().Bool("fast", false, "Partial check: skip reference integrity only. Not an authoritative health verdict. Combined with --auto-fix/--force, --fast is dropped")
 	cmd.Flags().Int("tier", 0, "Filter results to only show objects with issues of the specified tier (1=blocking, 2=warning, 3=informational, 4=recommendation, 0=all)")
 	cmd.Flags().Int("layer", -1, "Filter results to only show objects in the specified compliance layer (0=integrity, 1=needs_fixes, 2=ready, 3=complete, -1=all)")
-	// TRACK: REQ-KERNEL-LIFECYCLE-FITNESS-001 / BLI-KERNEL-LF-SURFACE-001
 	cmd.Flags().String("surface", "", "Filter issues by fitness surface (auth, agent_dispatch, system_check_l0, system_check_l1, admin_form, whats_next, list_default); annotates issue_class")
 	cmd.Flags().String("delimiter", "\\n", "Delimiter to use between object IDs when using the 'ids' format (default: newline)")
 	cmd.Flags().Bool("include-ids", false, "Include individual object IDs in status breakdown tables")
@@ -99,7 +98,6 @@ func NewCheckCmd() *cobra.Command {
 	cmd.Flags().String("dispatch-to", "", "Dispatch health violations/issues as inbox items to the specified agent/role (e.g. 'QA-Engineer', 'Security-Engineer', 'technical-program-manager', or 'auto')")
 	// Opt-in mesh wake when draft/error/blocking/warning/info thresholds trip (not automatic).
 	// Bare --notify → primary orchestrator agent_id; --notify <id> overrides.
-	// TRACK: BLI-COMMS-TPM-LIVE-WAKE-001
 	cmd.Flags().String("notify", "", "Wake this agent seat if draft-plane / error-status / blocking / warning / informational thresholds trip after the check; omit value to use primary orchestrator (see .zqk/config/primary_orchestrator.json)")
 	if f := cmd.Flags().Lookup("notify"); f != nil {
 		f.NoOptDefVal = systemcheckwake.PrimarySentinel

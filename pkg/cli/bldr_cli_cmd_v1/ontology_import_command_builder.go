@@ -12,7 +12,7 @@ func NewOntologyImportCommandBuilder() *cobra.Command {
 	builder.WithShort("Import ontology from RDF/OWL or other format")
 	help := clipkg.DynamicHelpBuilder("Import ontology from RDF/OWL or other format")
 	help.WithDescriptionLines("Import an ontology from a file (RDF/OWL: Turtle, RDF/XML, JSON-LD).")
-	help.WithDescriptionLines("Detects format and reports; full translation to zqk domain ontology is via BLI-764.")
+	help.WithDescriptionLines("Detects format and reports; full translation to the kernel domain ontology.")
 	help.AddExample("Import RDF/OWL file (auto-detect format)", "%s ontology import --file organizational.owl")
 	help.AddExample("Import Turtle file", "%s ontology import --file schema.ttl --input-format rdf_owl")
 	help.ExcludeFlag("format")

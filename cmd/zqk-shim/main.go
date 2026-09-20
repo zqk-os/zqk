@@ -1,7 +1,21 @@
+// Package main implements zqk-shim, a transparent low-latency binary interceptor
+// for developer tools (git, gh).
+//
+// When placed in a PATH directory ahead of the genuine executables (e.g. ~/.zqk/shims),
+// zqk-shim transparently:
+//  1. Resolves the real system binary while skipping the shim directory to avoid infinite loops.
+//  2. Enforces POL-CODE-009 on mutating operations (git commit, gh pr create) ensuring the
+//     active branch possesses bidirectional traceability to an active workstream in the kernel.
+//  3. Injects cryptographic agent provenance stamps into pull request bodies (gh pr create).
+//  4. Proxies execution to the underlying binary, preserving standard input/output interactivity.
+//
+// Bypass environment variables (e.g. ZQK_SHIM_BYPASS_POLCODE009) allow tests and emergency
+// operations to bypass policy checks, but are fail-closed: naked bypass flags are rejected
+// unless accompanied by an auditable human break-glass justification (ZQK_BREAK_GLASS_REASON)
+// of at least 30 characters.
 package main
 
 import (
-	"context"
 	"crypto/sha256"
 	"fmt"
 	"os"
@@ -22,8 +36,11 @@ import (
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
-// TRACK: BLI-CEF-R15-ENV-TRUST-001 / REQ-CEF-R2-SEC-ENV-TRUST
 const minBreakGlassReasonLen = 30
+
+func shimLogger() logging.Logger {
+	return logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
+}
 
 func main() {
 	if len(os.Args) < 1 {
@@ -37,25 +54,24 @@ func main() {
 	// We need to find the real binary, skipping our own shim.
 	// Since the shim is likely placed in ~/.zqk/shims, we can look up the binary
 	// using the PATH env var, but omitting the shim directory.
-	logger := logging.GetLogger()
+	logger := shimLogger()
 
 	realPath := findRealBinary(cmdName)
 	if realPath == "" {
-		logger.LogError("zqk-shim: could not find original executable for "+cmdName, nil)
+		logger.Error("zqk-shim: could not find original executable for "+cmdName, nil)
 		os.Exit(1)
 	}
 
 	// 2. POL-CODE-009 Enforcement Gate
 	if isMutatingOperation(cmdName, args) {
 		if err := validatePOLCODE009(); err != nil {
-			logger.LogError("POL-CODE-009 Violation", err)
+			logger.Error("POL-CODE-009 Violation", err)
 			os.Exit(1)
 		}
 	}
 
 	// 3. Route through cli_wrapper pattern
-	type contextKey string
-	ctx := context.WithValue(context.Background(), contextKey("profile"), "system")
+	ctx := pkgctx.NewSystemContext()
 
 	// Emit telemetry directly if in e2e test because full logging framework isn't initialized
 	val := zqkenv.ZqkShimBypassPolCode009().Get()
@@ -90,7 +106,7 @@ func main() {
 	if err != nil {
 		// Output is already printed or captured in err message by cli_builders
 		// Actually builder.Execute wraps the stderr in the error message.
-		logger.LogError("command execution failed", err)
+		logger.Error("command execution failed", err)
 		os.Exit(1)
 	}
 }
@@ -304,7 +320,7 @@ func generateCryptographicStampWithEnv(projectRoot string, getenv func(string) s
 		if err == nil {
 			return stamp
 		}
-		logging.GetLogger().LogError("failed to generate cryptographic stamp with private key, falling back to hash", err)
+		shimLogger().Error("failed to generate cryptographic stamp with private key, falling back to hash", err)
 	}
 
 	// A basic cryptographic stamp (could be extended to use Keystore ECDSA signatures)

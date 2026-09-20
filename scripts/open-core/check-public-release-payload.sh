@@ -57,6 +57,56 @@ if git -C "$ROOT" grep -n -F 'lanceman/zqk' -- \
 	fail "private GitHub identity remains in scripts"
 fi
 
+if git -C "$ROOT" grep -n -i 'lanceman' -- \
+	. \
+	':!scripts/open-core/rewrite-community-module-path.sh' \
+	':!scripts/open-core/check-public-release-payload.sh' >/dev/null 2>&1; then
+	fail "private owner/namespace reference (lanceman) remains in tracked repo files"
+fi
+
+# Studio technical_debt instance IDs (TDE-<nanos>-<hex>) belong in kernel CAS,
+# not in public overlay/packaging comments.
+if git -C "$ROOT" grep -n -E 'TDE-[0-9]{15,}-[0-9a-fA-F]{8}' -- \
+	'scripts' \
+	':!scripts/open-core/check-public-release-payload.sh' \
+	':!scripts/open-core/test-public-release-gates.sh'; then
+	fail "studio technical_debt instance id remains in scripts"
+fi
+
+# TRACK comments must not leak studio kernel object ids (BLI/REQ/CRIT/PRI/TDE/ATK/CAP/CVS).
+# cmd/zqk-shim previously shipped BLI-CEF-* / REQ-CEF-* TRACK lines while this gate
+# only scanned TDE-nanos-hex under scripts/.
+if git -C "$ROOT" grep -n -E 'TRACK:.*(BLI|REQ|CRIT|PRI|TDE|ATK|CAP|CVS)-' -- \
+	'cmd' 'scripts' \
+	':!scripts/open-core/check-public-release-payload.sh' \
+	':!scripts/open-core/test-public-release-gates.sh'; then
+	fail "studio TRACK comment with kernel object id remains in cmd or scripts"
+fi
+
+# Studio CAS nanos-hex instance ids belong in kernel CAS, not production cmd/,
+# command DNA, or generated builders. Tests may still mint synthetic ids.
+if git -C "$ROOT" grep -n -E '[A-Z]{2,12}-[0-9]{15,}-[0-9a-fA-F]{8}' -- \
+	'cmd' \
+	'.zqk/cli/specs' \
+	'pkg/cli/bldr_cli_cmd_v1' \
+	':!*_test.go' \
+	':!scripts/open-core/check-public-release-payload.sh'; then
+	fail "studio nanos-hex kernel object id remains in production cmd, CLI specs, or command builders"
+fi
+
+# CEF program ids are studio-only; keep them out of shipped cmd/scripts (not tests).
+if git -C "$ROOT" grep -n -E '(BLI|REQ|CRIT|TDE)-CEF-' -- \
+	'cmd' 'scripts' \
+	':!*_test.go' \
+	':!scripts/open-core/check-public-release-payload.sh' \
+	':!scripts/open-core/test-public-release-gates.sh'; then
+	fail "studio CEF kernel object id remains in production cmd or scripts"
+fi
+
+if git -C "$ROOT" grep -n -E 'Traceability:.*(BLI|REQ|CRIT)-' -- cmd; then
+	fail "studio Traceability header with kernel object id remains in cmd"
+fi
+
 if grep -E 'APPENDIX A|Proprietary|Commercial Enterprise|OPEN_CORE_PROPRIETARY_SPLIT' \
 	"$ROOT/LICENSE" "$ROOT/NOTICE" >/dev/null 2>&1; then
 	fail "LICENSE or NOTICE still carries the studio monorepo carve-out"
@@ -70,6 +120,7 @@ if git -C "$ROOT" grep -n -E '\bzcom\b|zqk-community' -- \
 fi
 
 sensitive=$(git -C "$ROOT" ls-files \
+	'.zqk/process/**' 'docs/process/**' \
 	'.zqk/keystore/**' '.zqk/state/**' 'config/zqk-local.yaml' \
 	'*.pem' '*.key' '*.p12' '*.pfx' '*.test')
 if [ -n "$sensitive" ]; then

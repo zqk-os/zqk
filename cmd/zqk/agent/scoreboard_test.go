@@ -11,6 +11,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/agentidle"
 	"github.com/zqk-os/zqk/pkg/datacell"
 	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/storage"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
@@ -18,6 +19,10 @@ import (
 func TestScoreboardCmd(t *testing.T) {
 	tempDir := t.TempDir()
 	t.Setenv(zqkenv.TestRoot().Name(), tempDir)
+	t.Cleanup(func() {
+		_ = storage.RunProjectTestTeardown(storage.TempProjectTeardown(tempDir, nil))
+		_ = fileutil.RemoveAll(filepath.Join(tempDir, ".zqk"))
+	})
 
 	// cli.WithProcessor requires a valid project structure
 	err := fileutil.MkdirAll(filepath.Join(tempDir, paths.ProcessDir), 0755)

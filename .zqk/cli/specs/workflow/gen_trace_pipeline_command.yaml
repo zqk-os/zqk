@@ -16,4 +16,4 @@ args:
 help:
   examples:
     - comment: "Generate pipeline for a requirement"
-      command: "%s workflow gen-trace-pipeline REQ-178867..."
+      command: "%s workflow gen-trace-pipeline REQ-001"

@@ -1,4 +1,3 @@
-// Traceability: BLI-SYM-011, BLI-SYM-013, REQ-SYM-007
 package system
 
 import (

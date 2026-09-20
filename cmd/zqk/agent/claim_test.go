@@ -95,3 +95,10 @@ func TestClaimCommand_Flags(t *testing.T) {
 	assert.Equal(t, true, obj["exit_when_cvs_completed"])
 	assert.Equal(t, true, obj["hourglass_on"])
 }
+
+func TestReleaseCommand_BuilderFlags(t *testing.T) {
+	cmd := agent.NewReleaseCmd()
+	assert.NotNil(t, cmd.Flags().Lookup("by"))
+	assert.NotNil(t, cmd.Flags().Lookup("force"))
+	assert.Nil(t, cmd.Flags().Lookup("hourglass-on"))
+}

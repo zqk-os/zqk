@@ -22,7 +22,6 @@ const (
 )
 
 // NewStatusCmd creates swarm status.
-// TRACK: BLI-1785886166768774000-c429c155
 func NewStatusCmd() *cobra.Command {
 	cmd := clipkg.ApplyBuilder(bldr_cli_cmd_v1.NewSwarmStatusCommandBuilder(), &cobra.Command{
 		RunE: runSwarmStatus,
@@ -166,7 +165,6 @@ func countWithFilter(ctx context.Context, sp storage.ObjectStorageProvider, sec 
 func summarizePersonaSkillBound(ctx context.Context, sp storage.ObjectStorageProvider, sec *pkgctx.SecurityContext) map[string]any {
 	// Structural dual-read (agent_skill_refs + related ASK-*). Full resolve gate lands with
 	// CRI-PERSONA-SKILL-BOUND enforce PR; status still surfaces bind rate for throughput ops.
-	// TRACK: BLI-1785886166768774000-c429c155 / BLI-1785904242062561000-ec024787
 	res, err := sp.List(ctx, sec, pkgctx.NewStorageContext(), storage.ListFilter{Kind: objects.KindPersona, Limit: 0})
 	out := map[string]any{
 		"total":   0,

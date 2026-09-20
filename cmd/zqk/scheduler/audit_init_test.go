@@ -12,7 +12,6 @@ import (
 	"github.com/zqk-os/zqk/pkg/testkit"
 )
 
-// TRACK: BLI-SCHED-GOROUTINE-DISCIPLINE-001 / CRIT-SCHED-NO-UNMANAGED-GOROUTINES-001 / TDE-1788667145346300000-ab4c8c54
 func TestAuditSchedulerInitFull(t *testing.T) {
 	p := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{Kind: "cmd.scheduler.audit_init"})
 	t.Logf("Project Root: %s", p.Root)

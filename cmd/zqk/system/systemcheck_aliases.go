@@ -7,7 +7,7 @@ import (
 )
 
 // Type aliases keep cmd/zqk/system call sites stable while check domain types
-// live in pkg/systemcheck (TRACK: BLI-CEF-ARCH-SYSTEM-TRANCHE1).
+// live in pkg/systemcheck ( ).
 type (
 	CheckResult           = systemcheck.CheckResult
 	Issue                 = systemcheck.Issue

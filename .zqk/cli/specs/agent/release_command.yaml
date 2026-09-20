@@ -1,6 +1,6 @@
 $schema: "../schemas/command_spec.schema.json"
 
-name: "release [task_id]"
+name: "release <task_id>"
 short: "Release an agent_task execution claim"
 description: |
   Clears claimed_by and claimed_at when held by --by. Use --force only when
@@ -17,7 +17,7 @@ flags:
     description: "Clear the claim regardless of holder"
 
 args:
-  type: "maximum"
+  type: "exact"
   count: 1
 
 help:
@@ -29,4 +29,5 @@ help:
   exclude_flags:
     - "columns"
 
+run_e: "runRelease"
 common_flags: true

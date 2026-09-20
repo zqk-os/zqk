@@ -3,12 +3,13 @@ package agent
 import (
 	"os"
 	"strings"
-	"time"
 
 	"github.com/spf13/cobra"
 
 	"github.com/zqk-os/zqk/internal/cli"
 	"github.com/zqk-os/zqk/pkg/agentclaim"
+	clipkg "github.com/zqk-os/zqk/pkg/cli"
+	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/objects"
@@ -16,63 +17,54 @@ import (
 )
 
 func NewClaimCmd() *cobra.Command {
-	var claimant string
-	var forRef string
-	var cvsRef string
-	var exitWhenCVSCompleted bool
-	var hourglassOn bool
-	var checkinCadence time.Duration
-
-	cmd := &cobra.Command{
-		Use:   "claim [task_id]",
-		Short: "Atomically claim an agent_task for exclusive execution",
-		Long:  "Sets claimed_by and claimed_at for exclusive multi-agent execution. Fails if another agent already holds the claim.",
-		Args:  cobra.ExactArgs(1),
-		RunE: cli.WithProcessor(func(cmd *cobra.Command, args []string, proc *cli.Processor) error {
-			ctx := proc.OperationContext()
-			sec := proc.SecurityContext()
-			if sec == nil {
-				sec = pkgctx.NewSystemSecurityContext()
-			}
-			who := strings.TrimSpace(claimant)
-			if who == "" {
-				who = resolveClaimantIdentity(cmd, proc)
-			}
-
-			// Extract extra options
-			opts := agentclaim.ClaimOptions{
-				ForRef:               forRef,
-				CVSRef:               cvsRef,
-				ExitWhenCVSCompleted: exitWhenCVSCompleted,
-				HourglassOn:          hourglassOn,
-				ProjectRoot:          proc.ProjectRoot(),
-				CheckinCadence:       checkinCadence,
-			}
-
-			res, err := agentclaim.TryClaim(ctx, proc.Storage(), sec, args[0], who, opts)
-			if err != nil {
-				return err
-			}
-			payload := map[string]any{
-				"task_id":                 args[0],
-				"claimed":                 res.Claimed,
-				objects.FieldKeyClaimedBy: res.ClaimedBy,
-				objects.FieldKeyClaimedAt: res.ClaimedAt,
-				objects.FieldKeyReason:    res.Reason,
-				"checkin_due":             checkinDue(proc.ProjectRoot(), args[0]),
-			}
-			return cli.FormatOutput(cmd, payload)
-		}),
-	}
-	cmd.Flags().StringVar(&claimant, "by", "", "Claimant agent/account id (default: seating/env identity)")
-	cmd.Flags().StringVar(&forRef, "for", "", "Target BLI or related object reference")
-	cmd.Flags().StringVar(&cvsRef, "cvs", "", "Active CVS reference")
-	cmd.Flags().BoolVar(&exitWhenCVSCompleted, "exit-when-cvs-completed", false, "Block exit until CVS is complete")
-	cmd.Flags().BoolVar(&hourglassOn, "hourglass-on", false, "Enable hourglass deadline wake signal")
-	cmd.Flags().DurationVar(&checkinCadence, "checkin-cadence", agentclaim.DefaultCheckinCadence,
-		"How long the claim may stay silent before the orchestrator is woken")
-	cli.AddCommonFlags(cmd)
+	cmd := bldr_cli_cmd_v1.NewAgentClaimCommandBuilder()
+	cmd.RunE = cli.WithProcessor(runClaim)
 	return cmd
+}
+
+func runClaim(cmd *cobra.Command, args []string, proc *cli.Processor) error {
+	ctx := proc.OperationContext()
+	sec := proc.SecurityContext()
+	if sec == nil {
+		sec = pkgctx.NewSystemSecurityContext()
+	}
+	var flags clipkg.FlagBag
+	claimant := flags.String(cmd, "by")
+	forRef := flags.String(cmd, "for")
+	cvsRef := flags.String(cmd, "cvs")
+	exitWhenCVSCompleted := flags.Bool(cmd, "exit-when-cvs-completed")
+	hourglassOn := flags.Bool(cmd, "hourglass-on")
+	checkinCadence := flags.Duration(cmd, "checkin-cadence")
+	if err := flags.Err(); err != nil {
+		return err
+	}
+	who := strings.TrimSpace(claimant)
+	if who == "" {
+		who = resolveClaimantIdentity(cmd, proc)
+	}
+
+	opts := agentclaim.ClaimOptions{
+		ForRef:               forRef,
+		CVSRef:               cvsRef,
+		ExitWhenCVSCompleted: exitWhenCVSCompleted,
+		HourglassOn:          hourglassOn,
+		ProjectRoot:          proc.ProjectRoot(),
+		CheckinCadence:       checkinCadence,
+	}
+
+	res, err := agentclaim.TryClaim(ctx, proc.Storage(), sec, args[0], who, opts)
+	if err != nil {
+		return err
+	}
+	payload := map[string]any{
+		"task_id":                 args[0],
+		"claimed":                 res.Claimed,
+		objects.FieldKeyClaimedBy: res.ClaimedBy,
+		objects.FieldKeyClaimedAt: res.ClaimedAt,
+		objects.FieldKeyReason:    res.Reason,
+		"checkin_due":             checkinDue(proc.ProjectRoot(), args[0]),
+	}
+	return cli.FormatOutput(cmd, payload)
 }
 
 // checkinDue reports the check-in deadline so the claimant learns the cadence at claim
@@ -85,42 +77,38 @@ func checkinDue(projectRoot, taskID string) string {
 	return timer.ExpiresAt
 }
 
-// NewReleaseCmd creates `zqk agent release <ATK-id>`.
-// TRACK: BLI-1785886173393325000-d0690a02
 func NewReleaseCmd() *cobra.Command {
-	var claimant string
-	var force bool
-	cmd := &cobra.Command{
-		Use:   "release [task_id]",
-		Short: "Release an agent_task execution claim",
-		Long:  "Clears claimed_by/claimed_at when held by --by (or --force).",
-		Args:  cobra.ExactArgs(1),
-		RunE: cli.WithProcessor(func(cmd *cobra.Command, args []string, proc *cli.Processor) error {
-			ctx := proc.OperationContext()
-			sec := proc.SecurityContext()
-			if sec == nil {
-				sec = pkgctx.NewSystemSecurityContext()
-			}
-			who := strings.TrimSpace(claimant)
-			if who == "" && !force {
-				who = resolveClaimantIdentity(cmd, proc)
-			}
-			res, err := agentclaim.Release(ctx, proc.Storage(), sec, args[0], who, force, proc.ProjectRoot())
-			if err != nil {
-				return err
-			}
-			payload := map[string]any{
-				"task_id":              args[0],
-				"released":             res.Released,
-				objects.FieldKeyReason: res.Reason,
-			}
-			return cli.FormatOutput(cmd, payload)
-		}),
-	}
-	cmd.Flags().StringVar(&claimant, "by", "", "Claimant that must hold the claim")
-	cmd.Flags().BoolVar(&force, "force", false, "Clear claim regardless of holder")
-	cli.AddCommonFlags(cmd)
+	cmd := bldr_cli_cmd_v1.NewAgentReleaseCommandBuilder()
+	cmd.RunE = cli.WithProcessor(runRelease)
 	return cmd
+}
+
+func runRelease(cmd *cobra.Command, args []string, proc *cli.Processor) error {
+	ctx := proc.OperationContext()
+	sec := proc.SecurityContext()
+	if sec == nil {
+		sec = pkgctx.NewSystemSecurityContext()
+	}
+	var flags clipkg.FlagBag
+	claimant := flags.String(cmd, "by")
+	force := flags.Bool(cmd, "force")
+	if err := flags.Err(); err != nil {
+		return err
+	}
+	who := strings.TrimSpace(claimant)
+	if who == "" && !force {
+		who = resolveClaimantIdentity(cmd, proc)
+	}
+	res, err := agentclaim.Release(ctx, proc.Storage(), sec, args[0], who, force, proc.ProjectRoot())
+	if err != nil {
+		return err
+	}
+	payload := map[string]any{
+		"task_id":              args[0],
+		"released":             res.Released,
+		objects.FieldKeyReason: res.Reason,
+	}
+	return cli.FormatOutput(cmd, payload)
 }
 
 func resolveClaimantIdentity(cmd *cobra.Command, proc *cli.Processor) string {

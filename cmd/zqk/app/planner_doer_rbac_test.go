@@ -18,7 +18,7 @@ import (
 )
 
 // INV-RBAC-PD-001 — planner denied code; doer denied strategic write + orchestration.
-// TRACK: BLI-1785905540598640000-12d5118e / TST-1785905543229739000-341d327c
+// TST-1785905543229739000-341d327c
 func TestINV_RBAC_PD_001_PlannerDoerSplit(t *testing.T) {
 	const (
 		doerACC     = "ACC-TEST-DOER-001"

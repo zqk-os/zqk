@@ -1,6 +1,6 @@
 package system
 
-// TRACK: REQ-1789663115292037000-d2917c1c / BLI-1789663115490931000-c70edb10 / TST-1789663115490931001-9e67dbc8
+// TST-1789663115490931001-9e67dbc8
 // Verifies multi-phase window progress observability across all 4 silent windows:
 // Window 1: Process start to initial feedback (start idempotency and fast feedback)
 // Window 2: Discovery phase streaming and heartbeat progress

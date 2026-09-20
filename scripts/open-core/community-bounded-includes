@@ -1,6 +1,6 @@
 # Community-bounded source overlay (KERNEL vs PACK / OPEN_CORE allowlist).
 # One repo-relative path per line. Comments start with #.
-# TRACK: TDE-1789678536875854000-47240146 — keep in sync with apply-community-source.sh
+# Keep in sync with apply-community-source.sh
 # and sync-public-candidate.sh. Do not list .zqk/process.
 # Filename has no .txt suffix: repo gitignore matches *-[a-z]*.txt.
 

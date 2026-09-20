@@ -109,7 +109,6 @@ func InvalidateValidationCacheForCacheContext(projectRoot string, cacheCtx *pkgc
 // Called from the cache operation handler; best-effort and non-blocking.
 // Work runs on a bounded pool: one goroutine per object minted an OS thread per
 // blocked ReadFile and exhausted the CLI 512-thread cap on object promote.
-// TRACK: BLI-CEF-STORAGE-INDEX-CACHE-001
 func EnqueueValidationForObject(projectRoot, objectID, kind, filePath string) {
 	if projectRoot == emptyValue || objectID == emptyValue {
 		return

@@ -42,6 +42,12 @@ func prewarmGlobalsOnce(projectRoot string) {
 
 func getSharedCLIBinary(t *testing.T, projectRoot string) string {
 	sharedCLIOnce.Do(func() {
+		if envBin := os.Getenv("ZQK_SHARED_TEST_BIN"); envBin != "" {
+			if _, err := os.Stat(envBin); err == nil {
+				sharedCLIBinary = envBin
+				return
+			}
+		}
 		tmpBinDir, err := fileutil.MkdirTemp("", "zqk-shared-bin-*")
 		if err != nil {
 			sharedCLIBuildErr = fmt.Errorf("failed to create global temp dir: %w", err)
@@ -49,8 +55,8 @@ func getSharedCLIBinary(t *testing.T, projectRoot string) string {
 		}
 		sharedCLIBinary = filepath.Join(tmpBinDir, "zqk-admin")
 		buildCmd := execwrap.Command("go", "build", "-o", sharedCLIBinary, "./cmd/zqk")
-		zqkenv.WireExecForIsolatedProject(buildCmd, projectRoot)
-		// buildCmd.Env = os.Environ() removed to preserve WireExecForIsolatedProject env
+		buildCmd.Dir = projectRoot
+		buildCmd.Env = os.Environ()
 		output, err := buildCmd.CombinedOutput()
 		if err != nil {
 			sharedCLIBuildErr = fmt.Errorf("failed to build CLI: %v\n%s", err, string(output))
@@ -231,7 +237,7 @@ func SetupTestEnvironment(t *testing.T) *TestEnvironment {
 
 	// Always build/copy CLI from projectRoot. Scheduler-injected ZQK_TEST_CLI_BINARY can point at a
 	// daemon binary that predates the Local CI workdir checkout (e.g. template --output - semantics).
-	// TRACK: BLI-1785443942668406000-1ec5c811 — draft-plane / Local CI binary-SHA parity.
+	// draft-plane / Local CI binary-SHA parity.
 	sharedBin := getSharedCLIBinary(t, projectRoot)
 	cliBinary := filepath.Join(tmpDir, "zqk-admin")
 	data, err := fileutil.ReadFile(sharedBin)
@@ -295,7 +301,7 @@ func (te *TestEnvironment) CreateCLICommand(args ...string) *exec.Cmd {
 	//
 	// Tests spell this as the single wireExecForTest call; this file is a non-test file and cannot
 	// reference it, so the two-line form stays here.
-	// TRACK: BLI-1787558884394841000-7dbc6d50 — identity isolation belongs in zqkenv, but that
+	// identity isolation belongs in zqkenv, but that
 	// function is also on production spawn paths, so widening it needs its own pass.
 	zqkenv.WireExecForIsolatedProject(cmd, te.TestRoot)
 	cmd.Env = EnvWithTestRoot(te.TestRoot)

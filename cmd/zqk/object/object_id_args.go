@@ -8,7 +8,6 @@ import (
 // expandObjectIDArgs expands positional args and optional --ids into individual
 // object IDs (comma-separated lists and whitespace segments). Shared by update,
 // delete, get, promote, demote, and park so multi-ID CLI DNA stays aligned.
-// TRACK: BLI-CEF-CLI-MULTI-ID-UPDATE
 func expandObjectIDArgs(cmd *cobra.Command, args []string) []string {
 	ids := clipkg.ExpandCommaSeparatedIDs(args...)
 	if cmd == nil {

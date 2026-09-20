@@ -13,7 +13,7 @@ You can provide IDs either:
 By default, deletion will fail if any object has dependents.
 
 Fail-closed: bare bulk delete is refused — pass --unlink-references or
---cascade (TRACK: BLI-1786390312940998000-1f101465).
+--cascade.
 
 Use --unlink-references to remove each ID from dependents' reference fields
 before deleting (matches single-object delete).

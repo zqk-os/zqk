@@ -1,6 +1,6 @@
 package system
 
-// TRACK: BLI-CEF-LOGGING-PROGRESS-002 / REQ-CEF-POL007-LOGGING-001: real-time progress feedback across discovery and aggregation phases
+// : real-time progress feedback across discovery and aggregation phases
 
 import (
 	"fmt"
@@ -273,7 +273,6 @@ func collectResultsForCompletion(vpc *ValidationProgressContext, failedCopy map[
 				} else {
 					// Summary-time miss is cache coherence, not CAS. Category integrity
 					// is counted as Layer 0 and made SCH-autofix-run look like hash mismatch.
-					// TRACK: BLI-1786387465409533000-45bd780c
 					result.Issues = append(result.Issues, Issue{
 						Tier:     3,
 						Category: categoryCacheCoherence,
@@ -292,7 +291,6 @@ func collectResultsForCompletion(vpc *ValidationProgressContext, failedCopy map[
 			tier := 1
 			// Per-object budget expiry is infrastructure under fan-out, not an object
 			// defect. Do not block system check; re-run or rely on prior cache retention.
-			// TRACK: BLI-1785723654802038000-b14064bc
 			if strings.Contains(errMsg, "validation timeout after") {
 				tier = 3
 				category = "validation_timeout"
@@ -609,11 +607,11 @@ func collectAndOutputFinalResults(vpc *ValidationProgressContext) (bool, error) 
 	results := collectResultsForCompletion(vpc, failedCopy)
 
 	// Hand-CAS / full-kind CAS re-peek was wired into every check completion by
-	// 6526fdeb0f (BLI-CAS-HAND-DUP-CHECK-001). That O(all hash YAML) scan after
+	// 6526fdeb0f. That O(all hash YAML) scan after
 	// validation is already complete made system check wall-time unacceptable and
 	// piled heat onto the scheduler when night-duty fired checks in a loop.
 	// Duplicate-ID coverage remains via checkDuplicateIDs + object ID cache.
-	// TRACK: BLI-CAS-HAND-DUP-CHECK-001 — reintroduce as opt-in / index-backed only.
+	// reintroduce as opt-in / index-backed only.
 
 	vpc.Metrics.RecordCollection(time.Since(collectionStart))
 

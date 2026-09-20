@@ -1,7 +1,6 @@
 #!/bin/sh
 # Install the community Makefile over dest/Makefile.
 # Studio keeps its full Makefile; this SKU template is renamed only in exports.
-# TRACK: TDE-1789678536875854000-47240146
 set -eu
 
 DEST=${1:-}

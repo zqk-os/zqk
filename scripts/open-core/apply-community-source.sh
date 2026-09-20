@@ -1,7 +1,6 @@
 #!/bin/bash
 # Apply community source overlay non-destructively to a target checkout (e.g. zqk-public-candidate).
 # Crucially: NEVER touches or clobbers .zqk/process, .zqk/state, .zqk-state, or .env.
-# TRACK: TDE-1789678536875854000-47240146 (PRI-1789678738709181000-3832006d)
 
 set -euo pipefail
 

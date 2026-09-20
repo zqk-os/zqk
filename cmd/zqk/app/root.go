@@ -328,7 +328,6 @@ func init() {
 		}
 		// When a backlog_item completes: last-child hop runs in ApplyDependencyRefEvents
 		// above. TryEmit only appends criterion when remaining_open_count is already 0.
-		// TRACK: BLI-CEF-CONTAINER-REMAINING-OPEN-001
 		if kind == objects.KindBacklogItem && toState == "complete" && projectRoot != EmptyValue {
 			if planRef, _ := objectData[objects.FieldKeyPriorityPlanRef].(string); planRef != EmptyValue {
 				lifecycle.TryEmitRemainingOpenDrained(ctx, projectRoot, planRef, cli.GetObjectStorageForProjectRoot)
@@ -371,7 +370,6 @@ func init() {
 			object.RunPriorityPlanCompleteUpdater(ctx, projectRoot)
 		}
 		// When priority_plan activates: trigger execution lock
-		// TRACK: BLI-TDE-LIFECYCLE-PROMOTE-CLAIM-001
 		if kind == objects.KindPriorityPlan && toState == objects.ObjectStatusActive && projectRoot != EmptyValue {
 			if planID, _ := objectData[objects.FieldKeyID].(string); planID != EmptyValue {
 				if p, ok := cli.GetObjectStorageForProjectRoot(projectRoot); ok && p != nil {
@@ -584,7 +582,7 @@ func Execute() {
 
 		// Help/version skips file-logging init; Fluent may have no sink. Always emit via
 		// a stderr logger so agents/operators see the failure (silent exit 1 breaks MMORCH).
-		// TRACK: PRI-GROOM-EVIDENCE-REOPEN-001 — CLI fail-closed visibility on help/version path.
+		// CLI fail-closed visibility on help/version path.
 		stderrLogger := logging.NewLogger(os.Stderr, logging.ErrorLevel, logging.NewTextFormatter(context.Background())) // Background: root logger formatter // Background: request-or-shutdown derived
 		logger := logging.GetLoggerFromProfile(profile)
 		if isExpectedObjectNotFound(err) {

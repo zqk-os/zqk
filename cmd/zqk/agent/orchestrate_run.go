@@ -1,8 +1,8 @@
-// TRACK: BLI-TRACK-STORAGE-SPLIT-001 - Exceeds 800 LOC threshold
+// Exceeds 800 LOC threshold
 
-// TRACK: BLI-CEF-STORAGE-DECOMPOSE-V2 - File exceeds 800 LOC threshold
-// TRACK: BLI-CEF-STORAGE-DECOMPOSE-V2 - File exceeds 800 LOC threshold
-// TRACK: BLI-CEF-STORAGE-DECOMPOSE-V2 - File exceeds 800 LOC threshold
+// File exceeds 800 LOC threshold
+// File exceeds 800 LOC threshold
+// File exceeds 800 LOC threshold
 package agent
 
 import (
@@ -58,8 +58,7 @@ func runOrchestrate(cmd *cobra.Command, planArg string, opts OrchestrateOptions)
 		return errfmt.Errorf("project root is required")
 	}
 
-	// POL-AGENT-PLANNER-DOER-001: doers cannot orchestrate peers.
-	// TRACK: BLI-1785905540598640000-12d5118e
+	// Doers cannot orchestrate peers.
 	if err := authcred.DenyOrchestrateIfDoer(proc.SecurityContext()); err != nil {
 		return err
 	}
@@ -284,7 +283,7 @@ func runOrchestrate(cmd *cobra.Command, planArg string, opts OrchestrateOptions)
 		return state, nil
 	})
 
-	// CRI-SHOVEL-READY (CRIT-1785885889228395000-15c56d02): skip non-actionable BLIs on dispatch.
+	// Skip non-actionable backlog items on dispatch.
 	b.AddStage("filter_shovel_ready", func(pctx *pipeline.Context, payload any) (any, error) {
 		state := payload.(*orchestratorState)
 		if state.isStrategicPlan {
@@ -378,12 +377,14 @@ func runOrchestrate(cmd *cobra.Command, planArg string, opts OrchestrateOptions)
 				if skillEnforcement == nil || len(skillEnforcement.RelevantSkills) == 0 {
 					broker := meshbroker.NewSkillBroker(state.sp, nil, state.proc.ProjectRoot())
 					if subAgent == "coder_agent" {
-						remoteSkill, err := broker.EnsureSkill(workerCtx, "AGE-1779674769908710000-5bb40a93")
-						if err == nil {
-							meshSkillSection = fmt.Sprintf("\n## Leased Mesh Capability\n- Skill: %s\n- Provider: %s\n- Token: %s\n- Status: %s\n",
-								"Go AST Expert", remoteSkill.Provider, remoteSkill.Token, "Authenticated")
-							if remoteSkill.Endpoint != "" {
-								agentDeliverer = &agentdelivery.TDEEnforcer{Next: agentdelivery.NewMCPDeliverer(sharedMCPTransport, remoteSkill.Endpoint, "zqk_agent_process_prompt")}
+						if skillID := localSkillIDByTitle(workerCtx, state.sp, state.secCtx, "Go AST Expert"); skillID != "" {
+							remoteSkill, err := broker.EnsureSkill(workerCtx, skillID)
+							if err == nil {
+								meshSkillSection = fmt.Sprintf("\n## Leased Mesh Capability\n- Skill: %s\n- Provider: %s\n- Token: %s\n- Status: %s\n",
+									"Go AST Expert", remoteSkill.Provider, remoteSkill.Token, "Authenticated")
+								if remoteSkill.Endpoint != "" {
+									agentDeliverer = &agentdelivery.TDEEnforcer{Next: agentdelivery.NewMCPDeliverer(sharedMCPTransport, remoteSkill.Endpoint, "zqk_agent_process_prompt")}
+								}
 							}
 						}
 					}
@@ -489,7 +490,7 @@ func runOrchestrate(cmd *cobra.Command, planArg string, opts OrchestrateOptions)
 						taskSteps = append(taskSteps, map[string]any{
 							objects.FieldKeyTitle:       "Kernel Graph Composition Context",
 							objects.FieldKeyStatus:      objects.ObjectStatusPending,
-							objects.FieldKeyDescription: "Kernel graph composition: `zqk object get POL-ONBOARD-001`. Use `zqk intake` / `zqk object import`; do not script `zqk object create` loops.",
+							objects.FieldKeyDescription: "Kernel graph composition: use `zqk object get` for the onboarding policy, then `zqk intake` / `zqk object import`; do not script `zqk object create` loops.",
 						})
 					}
 
@@ -507,7 +508,6 @@ func runOrchestrate(cmd *cobra.Command, planArg string, opts OrchestrateOptions)
 						objects.FieldKeySchemaVersion: objects.DefaultSchemaVersion,
 						objects.FieldKeyTitle:         titleStr,
 						// Persist refs, not a pasted prompt catalog.
-						// TRACK: BLI-1787805421435713000-3cf3884a
 						objects.FieldKeyDescription:        envelope.Description,
 						objects.FieldKeyEstimatedEffort:    "1d",
 						objects.FieldKeyAssigneePersonaRef: personaID,
@@ -610,7 +610,7 @@ func runOrchestrate(cmd *cobra.Command, planArg string, opts OrchestrateOptions)
 							// Local/native swarm executor for simple/routine/light tiers.
 							// Complex tiers wake primary (IDE/AGY) instead of starving on a
 							// vendor queue labeled "Gemini". Default BLI/ATK tier is tier_2_simple.
-							// TRACK: BLI-CAPH-001 — align model_tier enum (tier_1_complex vs tier_1_routine) in specs.
+							// align model_tier enum (tier_1_complex vs tier_1_routine) in specs.
 							if !nativeSwarmEligible(modelTier) {
 								_ = cli.WriteOutput(state.cmd, []byte(fmt.Sprintf("ℹ️  Queued '%s' for primary claim (skipped native swarm for %s)\n", taskID, modelTier)))
 								// Wake host/project primary orchestrator so work is not stranded.
@@ -641,7 +641,6 @@ func runOrchestrate(cmd *cobra.Command, planArg string, opts OrchestrateOptions)
 									} else {
 										// Isolated git worktree for the subagent. Reuse a leftover
 										// checkout/branch from a prior error cycle — do not remint.
-										// TRACK: BLI-1783831585418122000-c57cd667
 										var wtErr error
 										worktreePath, wtErr = ensureOrchestrationWorktree(workerCtx, state.proc.ProjectRoot(), taskID)
 										if wtErr != nil {
@@ -700,8 +699,7 @@ func runOrchestrate(cmd *cobra.Command, planArg string, opts OrchestrateOptions)
 										spawnArgs...,
 									)
 									configureOrchestrationExecutorProcess(spawnCmd)
-									// POL-AGENT-API-KEY-001: inject seat credential; do not inherit parent/human key.
-									// TRACK: BLI-1785905292370531000-b758a11c
+									// Inject seat credential; do not inherit parent/human key.
 									seatAccount := authcred.ResolveSeatAccount(state.proc.ProjectRoot(), personaID)
 									seatKey := authcred.APIKeyForSeat(state.proc.ProjectRoot(), seatAccount)
 									spawnCmd.Env = orchestrationExecutorChildEnv(os.Environ(), state.proc.ProjectRoot(), seatKey, zqkBin)
@@ -982,4 +980,24 @@ func runOrchestrate(cmd *cobra.Command, planArg string, opts OrchestrateOptions)
 
 	_, err = pl.Run(pctx, initialState)
 	return err
+}
+
+func localSkillIDByTitle(ctx context.Context, sp storage.ObjectStorageProvider, secCtx *pkgctx.SecurityContext, title string) string {
+	if sp == nil || strings.TrimSpace(title) == "" {
+		return ""
+	}
+	listed, err := sp.List(ctx, secCtx, nil, storage.ListFilter{Kind: objects.KindAgentSkill})
+	if err != nil || listed == nil {
+		return ""
+	}
+	want := strings.ToLower(strings.TrimSpace(title))
+	for _, obj := range listed.Objects {
+		got, _ := obj[objects.FieldKeyTitle].(string)
+		if strings.ToLower(strings.TrimSpace(got)) != want {
+			continue
+		}
+		id, _ := obj[objects.FieldKeyID].(string)
+		return strings.TrimSpace(id)
+	}
+	return ""
 }

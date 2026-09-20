@@ -292,7 +292,7 @@ func (e *Engine) Run(ctx context.Context, systemPrompt, userPrompt string) (stri
 			Log()
 
 		// Token Budgeting / Context Compaction
-		contextWindow := zqkenv.Get(zqkenv.LLMContextWindowSize().Name()).IntOrDefault(32768)
+		contextWindow := zqkenv.LLMContextWindowSize().IntOrDefault(32768)
 		tracker := NewTokenTracker(contextWindow, 0.9)
 
 		promptTokens, historyTokens, totalTokens := tracker.EstimateTokens(messages, tools)

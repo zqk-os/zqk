@@ -257,7 +257,7 @@ func TestParallelCreate_WithValidation(t *testing.T) {
 
 	// Create objects sequentially first (to establish dependencies)
 	ctx := pkgctx.NewSystemContext()
-	// TRACK: BLI-1785443942668406000-1ec5c811 — draft-plane create / promote membrane.
+	// draft-plane create / promote membrane.
 	for i, obj := range testObjects {
 		kind, _ := obj[objects.FieldKeyKind].(string)
 		objID, _ := obj[objects.FieldKeyID].(string)
@@ -311,7 +311,7 @@ func TestParallelCreate_WithValidation(t *testing.T) {
 
 				createCtx := pkgctx.WithCacheUpdate(ctx, objID, kind, "")
 				createErr := storageProvider.Create(createCtx, builder.secCtx, objCopy)
-				// TRACK: BLI-1785443942668406000-1ec5c811 — promote parallel creates off draft plane.
+				// promote parallel creates off draft plane.
 				if createErr == nil {
 					createErr = storageProvider.Update(createCtx, builder.secCtx, objID, map[string]any{
 						objects.FieldKeyStatus: scenarioBuilderStatusActive,

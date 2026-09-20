@@ -35,7 +35,6 @@ func NewWhoamiCmd() *cobra.Command {
 		Use: "whoami",
 	})
 	// Spec short until generate-command-builders refreshes the empty-Use slop builder.
-	// TRACK: BLI-1787804771598596000-27599a81
 	whoamiCmd.Short = "Show the authenticated account, lane, roles, and permissions"
 	cli.BindAsyncProgress(whoamiCmd, func(cmd *cobra.Command, args []string) error {
 		return runWhoami(cmd)
@@ -69,7 +68,7 @@ func runWhoami(cmd *cobra.Command) error {
 
 	accountInfo := loadWhoamiFromSecurityContext(cmd, projectRoot)
 	if accountInfo == nil {
-		return errfmt.Errorf("unauthorized: no security context (run from a seated CLI; see POL-AGENT-ACCOUNT-LOGIN-001)")
+		return errfmt.Errorf("unauthorized: no security context (run from a seated CLI)")
 	}
 
 	// Build output data
