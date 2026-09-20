@@ -147,7 +147,7 @@ func TestSignAndVerifyEntry_Success(t *testing.T) {
 	if err != nil {
 		t.Fatalf("generate key: %v", err)
 	}
-	pubHex := fmt.Sprintf("%x%x", privKey.PublicKey.X, privKey.PublicKey.Y)
+	pubHex := fmt.Sprintf("%064x%064x", privKey.PublicKey.X, privKey.PublicKey.Y)
 
 	entry := Entry{
 		Name:        "purge-cache",
@@ -177,7 +177,7 @@ func TestVerifyEntry_TamperDetection(t *testing.T) {
 	if err != nil {
 		t.Fatalf("generate key: %v", err)
 	}
-	pubHex := fmt.Sprintf("%x%x", privKey.PublicKey.X, privKey.PublicKey.Y)
+	pubHex := fmt.Sprintf("%064x%064x", privKey.PublicKey.X, privKey.PublicKey.Y)
 
 	entry := Entry{
 		Name: "test-task",
