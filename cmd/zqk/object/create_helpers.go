@@ -358,6 +358,12 @@ func guardManualStatusOnCreate(cmd *cobra.Command, proc *cli.Processor, kind str
 		return nil
 	}
 
+	if cmd.Flags().Lookup("promote") != nil {
+		if promote, _ := cmd.Flags().GetBool("promote"); promote {
+			return nil
+		}
+	}
+
 	override := false
 	if cmd.Flags().Lookup("override") != nil {
 		override, _ = cmd.Flags().GetBool("override")

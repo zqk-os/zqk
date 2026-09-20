@@ -100,10 +100,10 @@ func inventedRepoPath(p string) bool {
 	if strings.Contains(lower, "yourrepo") || strings.Contains(lower, "helloworld") {
 		return true
 	}
-	if base == "main.go" && (p == "main.go" || strings.HasPrefix(lower, "src/")) {
+	if base == "main.go" && strings.HasPrefix(lower, "src/") {
 		return true
 	}
-	if strings.HasSuffix(lower, ".py") && !strings.HasPrefix(lower, "scripts/") {
+	if strings.HasPrefix(base, "antigravity") || strings.HasPrefix(base, "vendor_") || strings.Contains(lower, "vendor-agent") {
 		return true
 	}
 	if kernelObjectIDPath(filepath.Base(p)) {

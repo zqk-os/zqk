@@ -139,7 +139,14 @@ func (s *Scheduler) evaluateActiveConvergenceSessions(ctx context.Context) {
 
 		SchedulerDaemonLog(s.logger).Debug("convergence_engine: autonomously evaluating active session").String("session_id", id).Log()
 
-		cmd := s.executor.CommandContext(ctx, "bash", "scripts/cvs_convergence_orchestrate.sh", id, "--no-fail-on-gates")
+		var cmd Cmd
+		scriptPath := filepath.Join(s.projectRoot, "scripts", "cvs_convergence_orchestrate.sh")
+		if _, statErr := fileutil.Stat(scriptPath); statErr == nil {
+			cmd = s.executor.CommandContext(ctx, "bash", "scripts/cvs_convergence_orchestrate.sh", id, "--no-fail-on-gates")
+		} else {
+			cliBin := resolveSchedulerCLIBinary(s.projectRoot)
+			cmd = s.executor.CommandContext(ctx, cliBin, "scheduler", "convergence", "measure", "--session-id", id, "--format", "json", "--skip-rollup-gates")
+		}
 		cmd.SetDir(s.projectRoot)
 		// Inherit env, set ZQK_PROJECT_ROOT
 		env := append(os.Environ(), zqkenv.ProjectRoot().Name()+"="+s.projectRoot)

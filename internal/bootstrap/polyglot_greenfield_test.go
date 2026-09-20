@@ -148,13 +148,18 @@ func TestCommunityBinaryBuildCGOZero(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
 	defer cancel()
 
+	targetPkg := "./cmd/zqk-community"
+	if _, err := os.Stat(filepath.Join(moduleRoot, "cmd", "zqk-community")); os.IsNotExist(err) {
+		targetPkg = "./cmd/zqk"
+	}
+
 	tmpBin := filepath.Join(t.TempDir(), "zqk-community-probe")
-	cmd := exec.CommandContext(ctx, "go", "build", "-o", tmpBin, "./cmd/zqk-community")
+	cmd := exec.CommandContext(ctx, "go", "build", "-o", tmpBin, targetPkg)
 	cmd.Dir = moduleRoot
 	cmd.Env = append(os.Environ(), "CGO_ENABLED=0")
 	out, err := cmd.CombinedOutput()
 	if err != nil {
-		t.Fatalf("CGO_ENABLED=0 build of cmd/zqk-community failed: %v\nOutput:\n%s", err, string(out))
+		t.Fatalf("CGO_ENABLED=0 build of %s failed: %v\nOutput:\n%s", targetPkg, err, string(out))
 	}
 
 	if st, err := fileutil.Stat(tmpBin); err != nil || st.Size() == 0 {

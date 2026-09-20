@@ -105,7 +105,7 @@ func TestConvergenceOrchestrateJobYAML_CLIValidate(t *testing.T) {
 		t.Skip("bin/zqk not built; run: go build -o bin/zqk ./cmd/zqk")
 	}
 	yamlPath := filepath.Join(projectRoot, filepath.FromSlash(convergenceOrchestrateJobRel))
-	cmd := execwrap.Command(zqkBin, "object", "create", "scheduler_job", "--file", yamlPath, "--dry-run")
+	cmd := execwrap.Command(zqkBin, "object", "create", "scheduler_job", "--file", yamlPath, "--promote", "--dry-run")
 	zqkenv.WireExecForIsolatedProject(cmd, projectRoot)
 	out, err := cmd.CombinedOutput()
 	if err != nil {

@@ -4,8 +4,15 @@
 package bootstrap
 
 import (
+	"archive/tar"
+	"bytes"
+	"compress/gzip"
 	"embed"
+	"io"
+	"path/filepath"
 	"strings"
+
+	"github.com/zqk-os/zqk/pkg/errfmt"
 )
 
 const emptyValue = ""
@@ -32,4 +39,47 @@ func ManifestPaths() []string {
 		}
 	}
 	return out
+}
+
+// ReadEmbeddedFile reads a specific file's content from the embedded bootstrap archive.
+// relPath can match with or without leading "./", "scripts/", or match as a relative path suffix.
+func ReadEmbeddedFile(relPath string) ([]byte, error) {
+	data, err := archiveFS.ReadFile(embeddedBootstrapArchivePath)
+	if err != nil {
+		return nil, errfmt.Newf("read embedded bootstrap archive").Wrap(err)
+	}
+	if len(data) == 0 {
+		return nil, errfmt.Errorf("bootstrap archive is empty")
+	}
+
+	zr, err := gzip.NewReader(bytes.NewReader(data))
+	if err != nil {
+		return nil, errfmt.Newf("open gzip reader").Wrap(err)
+	}
+	defer zr.Close()
+
+	cleanTarget := filepath.Clean(filepath.ToSlash(relPath))
+	cleanTarget = strings.TrimPrefix(cleanTarget, "./")
+
+	tr := tar.NewReader(zr)
+	for {
+		hdr, err := tr.Next()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			return nil, errfmt.Newf("read tar archive").Wrap(err)
+		}
+		name := filepath.Clean(filepath.ToSlash(hdr.Name))
+		name = strings.TrimPrefix(name, "./")
+		if name == cleanTarget ||
+			strings.HasSuffix(name, "/"+cleanTarget) ||
+			(strings.HasPrefix(cleanTarget, "scripts/") && strings.TrimPrefix(cleanTarget, "scripts/") == name) ||
+			strings.TrimPrefix(name, "scripts/") == cleanTarget {
+			if hdr.Typeflag == tar.TypeReg {
+				return io.ReadAll(io.LimitReader(tr, maxFileSize))
+			}
+		}
+	}
+	return nil, errfmt.Errorf("file not found in bootstrap archive: %s", relPath)
 }
