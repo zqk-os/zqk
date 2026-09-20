@@ -1,0 +1,30 @@
+aggregation_window_start: auto-populated from oldest event in window
+collection_count: 0
+created_at: "2025-01-01T00:00:00Z"
+created_by: ACC-1785920548450214012-68b850c0
+description: Coder agent that writes and modifies code. Resp...
+event_count: auto-calculated during aggregation
+event_type: required - must be specified
+event_type_counts: auto-calculated during aggregation
+first_seen: auto-populated on first collection
+id: ROL-010
+influence_level: automation
+kind: role
+last_seen: auto-populated on each collection
+metric_type: system
+namespace_id: zqk:kernel
+operation: required - must be specified
+permissions:
+    - read:*
+    - write:code
+    - write:agent_task
+    - write:audit_event
+    - read:graph_node
+    - read:graph_edge
+role_id: coder_agent
+schema_version: 2.0.0
+status: active
+title: Coder Agent Role
+updated_at: "2026-08-05T09:38:06Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

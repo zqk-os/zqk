@@ -1,0 +1,27 @@
+created_at: "2026-08-04T23:25:07Z"
+created_by: ACC-1785920548450214012-68b850c0
+description: Read-heavy MMORCH process auditor role with broad object visibility for audit and analysis. Creates audit reports, findings, criteria, and questions.
+id: ROL-MMORCH-PROCESS-AUDITOR
+kind: role
+namespace_id: zqk:kernel
+origin_project: zqk
+origin_system: zqk
+permissions:
+    - object:read:*
+    - object:list:*
+    - system:check
+    - system:metrics
+    - scheduler:activity
+    - scheduler:health-check
+    - object:create:audit_event
+    - object:create:criteria
+    - object:create:question
+related_object_refs:
+    - GOAL-1789631957245339000-008aac9f
+role_id: mmorch-process-auditor
+schema_version: 2.0.0
+status: active
+title: MMORCH Process Auditor Role
+updated_at: "2026-08-19T04:52:19Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

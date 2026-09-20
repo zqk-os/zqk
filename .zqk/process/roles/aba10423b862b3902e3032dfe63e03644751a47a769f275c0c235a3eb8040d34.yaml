@@ -1,0 +1,13 @@
+created_at: "2026-06-14T21:38:16Z"
+created_by: ACC-1785920548450214012-68b850c0
+description: Analyzes codebase and operational behaviors to ensure strict adherence to documented project policies.
+id: ROL-1781473096943115000-21db58d4
+kind: role
+namespace_id: zqk:kernel
+role_id: required
+schema_version: 2.0.0
+status: active
+title: Policy Compliance Analyst
+updated_at: "2026-08-05T09:36:55Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

@@ -7,9 +7,9 @@ kind: criteria
 namespace_id: zqk:kernel
 priority_tier: P0
 schema_version: 2.0.0
-status: awaiting_verification
+status: complete
 title: Scheduler Global Test Slot Timeout Aligns with 2h Dispatch Contract
-updated_at: "2026-09-20T01:28:03Z"
+updated_at: "2026-09-20T01:49:09Z"
 updated_by: ACC-1785920548450214012-68b850c0
 validation_method: automated_test
 version_context: default

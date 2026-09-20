@@ -19,9 +19,10 @@ problem_statement: Immediate run_wrapper jobs are dropped when packageConcurrenc
 requirement_refs:
     - REQ-1789630346648087000-a61b7f27
 schema_version: 2.0.0
-status: planned
+started_at: "2026-09-20T01:31:50Z"
+status: in_progress
 title: Align Scheduler Global Test Slot Timeout with 2h Dispatch Contract
-updated_at: "2026-09-20T01:28:48Z"
+updated_at: "2026-09-20T01:31:50Z"
 updated_by: ACC-1785920548450214012-68b850c0
 version_context: default
 workstream_refs:

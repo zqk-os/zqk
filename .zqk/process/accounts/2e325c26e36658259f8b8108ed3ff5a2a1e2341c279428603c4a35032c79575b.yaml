@@ -1,0 +1,17 @@
+created_at: "2026-09-20T01:33:21Z"
+created_by: ACC-1785920548450214012-68b850c0
+description: ""
+display_name: Swarm Worker Agent
+id: ACC-1785920548450214011-dabd3692
+kind: account
+namespace_id: zqk:kernel
+roles:
+    - swarm_worker
+persona_ref: PER-COMMUNITY-SOFTWARE-ENGINEER
+schema_version: 2.0.0
+status: active
+title: Swarm Worker Agent Account
+updated_at: "2026-09-20T01:33:38Z"
+updated_by: ACC-1785920548450214012-68b850c0
+username: swarm_worker
+version_context: default
