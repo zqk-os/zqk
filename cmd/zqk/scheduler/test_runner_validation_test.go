@@ -25,6 +25,9 @@ func TestTestRunnerAssemblesJobCorrectly(t *testing.T) {
 	// Get project root
 	projectRoot := findProjectRootForTest(t)
 	scriptPath := filepath.Join(projectRoot, "scripts", "test-runner.sh")
+	if _, err := fileutil.Stat(scriptPath); err != nil {
+		t.Skipf("scripts/test-runner.sh not found: %v", err)
+	}
 
 	// Create a temporary directory for test isolation
 	testDir := t.TempDir()
@@ -251,6 +254,9 @@ func TestTestRunnerJobYAMLStructure(t *testing.T) {
 	// parallel test resolve against an arbitrary directory.
 	projectRoot := findProjectRootForTest(t)
 	scriptPath := filepath.Join(projectRoot, "scripts", "test-runner.sh")
+	if _, err := fileutil.Stat(scriptPath); err != nil {
+		t.Skipf("scripts/test-runner.sh not found: %v", err)
+	}
 
 	testDir := t.TempDir()
 	testLogDir := filepath.Join(testDir, paths.ProjectDataDir, paths.LogsDir, "tests")

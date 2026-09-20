@@ -4,11 +4,14 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"os/exec"
+	"path/filepath"
 	"strings"
 	"sync"
 	"time"
 
 	"github.com/zqk-os/zqk/pkg/config"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"github.com/zqk-os/zqk/pkg/zqkenv"
 
 	"github.com/zqk-os/zqk/pkg/agentclaim"
@@ -49,6 +52,20 @@ var SwarmNewLLMClient = func(ctx context.Context, c *llm.Config) llm.Client {
 	return llm.NewQwenClient(ctx, c)
 }
 var SwarmNewMCPExecutor = func(ctx context.Context, path string) (swarm.Executor, error) { return swarm.NewMCPExecutor(ctx, path) }
+
+func resolveSwarmMCPPath(projectRoot string) string {
+	if projectRoot != "" {
+		localMCP := filepath.Join(projectRoot, "bin", "zqk-mcp")
+		if info, err := fileutil.Stat(localMCP); err == nil && !info.IsDir() {
+			return localMCP
+		}
+	}
+	if p, err := exec.LookPath("zqk-mcp"); err == nil {
+		return p
+	}
+	cliBin := resolveSchedulerCLIBinary(projectRoot)
+	return cliBin + " mcp serve"
+}
 
 func (s *Scheduler) watchSwarmTasks(ctx context.Context) {
 	getSwarmWorkerPool().Start(ctx)
@@ -187,7 +204,7 @@ func (s *Scheduler) pollAndSpawnSwarmTasks(ctx context.Context) {
 				return nil
 			}
 
-			executor, err := SwarmNewMCPExecutor(workerCtx, "./bin/zqk-mcp")
+			executor, err := SwarmNewMCPExecutor(workerCtx, resolveSwarmMCPPath(s.projectRoot))
 			if err != nil {
 				failTask(fmt.Errorf("MCP EXECUTOR INIT FAILED: %w", err))
 				return nil

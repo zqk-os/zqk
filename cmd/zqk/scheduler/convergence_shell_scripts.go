@@ -20,11 +20,25 @@ import (
 )
 
 func runConvergencePromotionReadiness(cmd *cobra.Command, args []string) error {
-	return runRepoBashScript(cmd, "scripts/check_convergence_promotion_readiness.sh", args)
+	script := "scripts/check_convergence_promotion_readiness.sh"
+	projectRoot := cli.ResolveProjectRoot(".")
+	if projectRoot != "" {
+		if _, err := fileutil.Stat(filepath.Join(projectRoot, filepath.FromSlash(script))); err == nil {
+			return runRepoBashScript(cmd, script, args)
+		}
+	}
+	return runTestFailuresConvergenceFromCmd(cmd, args)
 }
 
 func runConvergenceRecordOverseerRun(cmd *cobra.Command, args []string) error {
-	return runRepoBashScript(cmd, "scripts/record_convergence_overseer_run.sh", args)
+	script := "scripts/record_convergence_overseer_run.sh"
+	projectRoot := cli.ResolveProjectRoot(".")
+	if projectRoot != "" {
+		if _, err := fileutil.Stat(filepath.Join(projectRoot, filepath.FromSlash(script))); err == nil {
+			return runRepoBashScript(cmd, script, args)
+		}
+	}
+	return runTestFailuresConvergenceOverseerFromCmd(cmd, args)
 }
 
 func runRepoBashScript(cmd *cobra.Command, scriptRel string, scriptArgs []string) error {

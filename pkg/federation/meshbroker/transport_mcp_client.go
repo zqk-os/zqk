@@ -19,6 +19,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/zqk-os/zqk/pkg/mcp"
 	"github.com/zqk-os/zqk/pkg/objects"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 type pooledClient struct {
@@ -51,9 +52,38 @@ type MCPClientTransport struct {
 	pool map[string]*pooledClient
 }
 
+func resolveDefaultMCPBinary() string {
+	if p, err := fileutil.Stat("./bin/zqk-mcp"); err == nil && !p.IsDir() {
+		return "./bin/zqk-mcp"
+	}
+	if p, err := exec.LookPath("zqk-mcp"); err == nil {
+		return p
+	}
+	if self, err := fileutil.Executable(); err == nil && strings.TrimSpace(self) != "" {
+		return self + " mcp serve"
+	}
+	if p, err := exec.LookPath("zqk"); err == nil {
+		return p + " mcp serve"
+	}
+	return "zqk mcp serve"
+}
+
+func resolveDefaultCLIBinary() string {
+	if p, err := fileutil.Stat("./bin/zqk"); err == nil && !p.IsDir() {
+		return "./bin/zqk"
+	}
+	if self, err := fileutil.Executable(); err == nil && strings.TrimSpace(self) != "" {
+		return self
+	}
+	if p, err := exec.LookPath("zqk"); err == nil {
+		return p
+	}
+	return "zqk"
+}
+
 func NewMCPClientTransport(binaryPath string) *MCPClientTransport {
 	if binaryPath == "" {
-		binaryPath = "./bin/zqk-mcp" // Use the dedicated MCP server binary
+		binaryPath = resolveDefaultMCPBinary()
 	}
 	return &MCPClientTransport{
 		BinaryPath: binaryPath,
@@ -62,7 +92,7 @@ func NewMCPClientTransport(binaryPath string) *MCPClientTransport {
 }
 
 func (t *MCPClientTransport) SendHandshake(ctx context.Context, endpoint string, req federation.HandshakeRequest) (*federation.HandshakeResponse, error) {
-	cliTransport := federation.NewLocalCLITransport("./bin/zqk")
+	cliTransport := federation.NewLocalCLITransport(resolveDefaultCLIBinary())
 	return cliTransport.SendHandshake(ctx, endpoint, req)
 }
 

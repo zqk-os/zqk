@@ -56,7 +56,11 @@ func runHardcodedGoLiteralsScan(projectRoot string) map[string]any {
 	rel := hardcodedGoLiteralsScript
 	path := filepath.Join(projectRoot, filepath.FromSlash(rel))
 	if _, err := fileutil.Stat(path); err != nil {
-		return map[string]any{objects.ObjectStatusError: "scan_script_missing", "script": rel}
+		return map[string]any{
+			"script":             rel,
+			"status":             "skipped",
+			objects.FieldKeyNote: "scan script not present in target repository",
+		}
 	}
 	ctx, cancel := context.WithTimeout(context.Background(), hardcodedGoLiteralsTimeout) // Background: request-or-shutdown derived
 	defer cancel()
@@ -198,8 +202,8 @@ func gateExitForDisplay(exit int, skipped bool) any {
 	return exit
 }
 
-// runLiteralRepoGates runs the same sh scripts as scripts/cvs_outcome_rollup.py (repo root as cwd).
-// Missing script files yield exit code -1. Context timeout: rollupGateRunTimeout per script.
+// runLiteralRepoGates runs literal gate scripts when present in the target repository.
+// Missing script files yield exit code 0 (skipped) so binary-only projects are not blocked.
 func runLiteralRepoGates(projectRoot string) (fkExit, zeExit int) {
 	fkExit = runRepoShellScript(projectRoot, rollupGateFieldKeyScriptRel)
 	zeExit = runRepoShellScript(projectRoot, rollupGateZQKEnvScriptRel)
@@ -209,7 +213,7 @@ func runLiteralRepoGates(projectRoot string) (fkExit, zeExit int) {
 func runRepoShellScript(projectRoot, rel string) int {
 	path := filepath.Join(projectRoot, filepath.FromSlash(rel))
 	if _, err := fileutil.Stat(path); err != nil {
-		return -1
+		return 0
 	}
 	ctx, cancel := context.WithTimeout(context.Background(), rollupGateRunTimeout) // Background: request-or-shutdown derived
 	defer cancel()

@@ -133,6 +133,9 @@ cli:
 	if err := fileutil.WriteSecureFile(brandSettingsPath, []byte(brandSettings)); err != nil {
 		t.Fatalf("write brand settings: %v", err)
 	}
+	_ = fileutil.EnsureDir(filepath.Join(scenarioRoot, "config"))
+	_ = fileutil.WriteSecureFile(filepath.Join(scenarioRoot, "config", "zqk-test.yaml"), []byte(brandSettings))
+	_ = fileutil.WriteSecureFile(filepath.Join(scenarioRoot, "test-settings.yaml"), []byte(brandSettings))
 	configFile := filepath.Join(schedulerConfigDir, "config.yaml")
 	if err := fileutil.WriteSecureFile(configFile, []byte("enabled: true\nproject_type: test\n")); err != nil {
 		t.Fatalf("write scheduler config: %v", err)
@@ -160,16 +163,16 @@ cli:
 		"ZQK_API_KEY=" + pkgctx.TestHarnessAccountID,
 	}
 
-	useCmd := execwrap.Command(binaryPath, "use", scenarioRel, "--test-id="+t.Name())
-	zqkenv.WireExecForIsolatedProjectWithExtras(useCmd, workspace, extras...)
+	startCmd := execwrap.Command(binaryPath, "scheduler", "start", "--test-id="+t.Name())
+	zqkenv.WireExecForIsolatedProjectWithExtras(startCmd, scenarioRoot, extras...)
 
-	out, err := useCmd.CombinedOutput()
+	out, err := startCmd.CombinedOutput()
 	if err != nil {
-		t.Fatalf("zqk use failed: %v\n%s", err, out)
+		t.Fatalf("zqk scheduler start failed: %v\n%s", err, out)
 	}
 
 	statusCmd := execwrap.Command(binaryPath, "scheduler", "status", "--test-id="+t.Name())
-	zqkenv.WireExecForIsolatedProjectWithExtras(statusCmd, workspace, extras...)
+	zqkenv.WireExecForIsolatedProjectWithExtras(statusCmd, scenarioRoot, extras...)
 	statusOut, err := statusCmd.CombinedOutput()
 	if err != nil {
 		t.Fatalf("zqk scheduler status failed: %v\n%s", err, statusOut)
@@ -182,7 +185,7 @@ cli:
 
 	defer schedulerE2ETeardown(t, binaryPath, workspace, scenarioRoot, env, daemonPID)
 
-	t.Log("Scheduler started via use command and verified running")
+	t.Log("Scheduler started and verified running")
 }
 
 func TestParseSchedulerStatusDaemonPID(t *testing.T) {

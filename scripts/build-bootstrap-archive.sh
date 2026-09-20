@@ -40,9 +40,7 @@ fi
 # Maintenance job templates so init --with-maintenance-jobs works in greenfield (no repo scripts to copy from)
 if [ -d "$SCRIPTS_SCHEDULER_JOBS_DIR" ]; then
 	mkdir -p "$STAGING/scripts/scheduler_jobs"
-	for f in retention_tolerance_catchall.yaml audit_event_aggregation_default.yaml onboarding_roadmap_seed.yaml cleanup_on_demand.yaml; do
-		[ -f "$SCRIPTS_SCHEDULER_JOBS_DIR/$f" ] && cp "$SCRIPTS_SCHEDULER_JOBS_DIR/$f" "$STAGING/scripts/scheduler_jobs/"
-	done
+	cp -r "$SCRIPTS_SCHEDULER_JOBS_DIR"/*.yaml "$STAGING/scripts/scheduler_jobs/" 2>/dev/null || true
 fi
 # Default policy pack templates (seeded by system init)
 DEFAULT_POLICIES_DIR="${REPO_ROOT}/scripts/default_policies"

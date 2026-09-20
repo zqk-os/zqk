@@ -80,7 +80,7 @@ func TestConvergenceEngine_evaluateActiveConvergenceSessions(t *testing.T) {
 	mustCreateActiveConvergenceSession(t, st, ctx, secCtx, "CVS-ACTIVE")
 
 	// Create inactive session (stays draft / List-invisible — evaluate must ignore it)
-	err := st.Create(pkgctx.WithPromoteOnCreate(ctx), secCtx, map[string]any{
+	err := st.Create(ctx, secCtx, map[string]any{
 		objects.FieldKeyID:     "CVS-INACTIVE",
 		objects.FieldKeyKind:   objects.KindConvergenceSession,
 		objects.FieldKeyStatus: objects.ObjectStatusDraft,
@@ -119,7 +119,8 @@ func TestConvergenceEngine_evaluateActiveConvergenceSessions(t *testing.T) {
 			for _, a := range args {
 				full += " " + a
 			}
-			if name == "bash" && len(args) >= 3 && args[0] == "scripts/cvs_convergence_orchestrate.sh" && args[1] == "CVS-ACTIVE" {
+			if (name == "bash" && len(args) >= 3 && args[0] == "scripts/cvs_convergence_orchestrate.sh" && args[1] == "CVS-ACTIVE") ||
+				(len(args) >= 5 && args[0] == "scheduler" && args[1] == "convergence" && args[2] == "measure" && args[4] == "CVS-ACTIVE") {
 				executed = true
 				return &MockCmd{OutputBytes: []byte(`{"rollup_status": "blocked"}`)}
 			}

@@ -11,6 +11,7 @@ import (
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v3"
 
+	"github.com/zqk-os/zqk/internal/bootstrap"
 	"github.com/zqk-os/zqk/internal/cli"
 	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
 	"github.com/zqk-os/zqk/pkg/config"
@@ -188,7 +189,7 @@ func ensureRetentionJobsCore(projectRoot string, logger logging.Logger, listCont
 		}
 		templatePath := filepath.Join(projectRoot, entry.TemplateFile)
 		if !ids[entry.ID] {
-			created, updatedID := ensureJobFromTemplateInProcess(logger, provider, secCtx, projectRoot, templatePath, entry.JobType, entry.ID)
+			created, updatedID := ensureJobFromTemplateInProcess(logger, provider, secCtx, projectRoot, templatePath, entry.TemplateFile, entry.JobType, entry.ID)
 			if created {
 				setResultCreatedByID(&result, entry.ID, true)
 			}
@@ -227,7 +228,7 @@ func ensureRetentionJobsCore(projectRoot string, logger logging.Logger, listCont
 				}
 			}
 		}
-		if syncExistingJobFromTemplate(logger, provider, secCtx, entry.ID, templatePath, existing) {
+		if syncExistingJobFromTemplate(logger, provider, secCtx, entry.ID, templatePath, entry.TemplateFile, existing) {
 			result.JobsSyncedFromTemplate = append(result.JobsSyncedFromTemplate, entry.ID)
 		}
 	}
@@ -291,16 +292,21 @@ func buildEnsureResultMessage(r *EnsureRetentionJobsResult) string {
 	return strings.Join(parts, "; ") + ". Source: scheduler_maintenance_config.yaml."
 }
 
+// readTemplateData reads the template YAML from the project filesystem or falls back
+// to the embedded bootstrap archive for standalone binary distributions.
+func readTemplateData(templatePath, templateFile string) ([]byte, error) {
+	if data, err := fileutil.ReadFile(templatePath); err == nil {
+		return data, nil
+	}
+	return bootstrap.ReadEmbeddedFile(templateFile)
+}
+
 // ensureJobFromTemplateInProcess reads the template YAML and creates the scheduler_job in storage (same process as list).
 // If create fails with already-exists and defaultID is set, updates job_type on that ID. Returns (created, updatedID).
-func ensureJobFromTemplateInProcess(logger logging.Logger, provider storage.ObjectStorageProvider, secCtx *pkgctx.SecurityContext, projectRoot, templatePath, jobType, defaultID string) (created bool, updatedID string) {
-	if _, statErr := fileutil.Stat(templatePath); statErr != nil {
-		logging.Fluent(logger).Warn("Template not found, skipping create").Path(templatePath).WithError(statErr).Log()
-		return false, ""
-	}
-	data, err := fileutil.ReadFile(templatePath)
+func ensureJobFromTemplateInProcess(logger logging.Logger, provider storage.ObjectStorageProvider, secCtx *pkgctx.SecurityContext, projectRoot, templatePath, templateFile, jobType, defaultID string) (created bool, updatedID string) {
+	data, err := readTemplateData(templatePath, templateFile)
 	if err != nil {
-		logging.Fluent(logger).Warn("Failed to read template").Path(templatePath).WithError(err).Log()
+		logging.Fluent(logger).Warn("Template not found in filesystem or bootstrap archive, skipping create").Path(templatePath).WithError(err).Log()
 		return false, ""
 	}
 	var obj map[string]any
@@ -344,8 +350,8 @@ func updateJobTypeInProcess(logger logging.Logger, provider storage.ObjectStorag
 // syncExistingJobFromTemplate applies schedule_expression and (when present in the template)
 // environment_variables from the template file so ensure-retention-jobs updates live objects
 // when templates change. Returns true if an update was applied.
-func syncExistingJobFromTemplate(logger logging.Logger, provider storage.ObjectStorageProvider, secCtx *pkgctx.SecurityContext, id, templatePath string, existing map[string]any) bool {
-	data, err := fileutil.ReadFile(templatePath)
+func syncExistingJobFromTemplate(logger logging.Logger, provider storage.ObjectStorageProvider, secCtx *pkgctx.SecurityContext, id, templatePath, templateFile string, existing map[string]any) bool {
+	data, err := readTemplateData(templatePath, templateFile)
 	if err != nil {
 		return false
 	}

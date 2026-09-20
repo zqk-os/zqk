@@ -85,7 +85,6 @@ func TestCLI_TestFailuresConvergence_JSON_Integration(t *testing.T) {
 	cvsContent := `id: ` + cvsID + `
 kind: convergence_session
 title: CLI integration test session
-status: draft
 current_phase: c1_scope
 outcome_character: pending
 delta_assessment: unknown
@@ -102,7 +101,7 @@ next_action: |
 		t.Fatalf("write cvs yaml: %v", err)
 	}
 
-	runZQKCLI(t, te, "object", "create", "convergence_session", "--file", cvsYAML)
+	runZQKCLI(t, te, "object", "create", "convergence_session", "--file", cvsYAML, "--promote")
 
 	outSession := runZQKCLI(t, te, "scheduler", "convergence", "measure", "--format", "json", "--session-id", cvsID, "--skip-rollup-gates")
 	top := parseJSONObjectFromCLI(t, outSession)

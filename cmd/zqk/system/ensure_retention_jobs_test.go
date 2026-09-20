@@ -1,9 +1,13 @@
 package system
 
 import (
+	"path/filepath"
 	"testing"
 
+	"github.com/zqk-os/zqk/internal/bootstrap"
 	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/paths"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 func TestNewEnsureRetentionJobsCmd(t *testing.T) {
@@ -78,3 +82,30 @@ environment_variables:
 		t.Errorf("no env: sched=%q hasEnv=%v", sched2, hasEnv2)
 	}
 }
+
+func TestEnsureRetentionJobs_FallbackToEmbeddedTemplates(t *testing.T) {
+	t.Parallel()
+	tmp := t.TempDir()
+	logger := logging.GetLoggerFromProfile("test")
+
+	// Extract bootstrap specs into tmp, but do not extract scripts/
+	if err := bootstrap.ExtractTo(tmp, logger, true); err != nil {
+		t.Fatalf("ExtractTo failed: %v", err)
+	}
+
+	// Deliberately remove scripts/ if it was extracted, simulating a binary user's standalone project
+	_ = fileutil.RemoveAll(filepath.Join(tmp, "scripts"))
+	_ = fileutil.EnsureDir(filepath.Join(tmp, paths.ProcessDir))
+
+	result, err := EnsureRetentionJobsInProject(tmp, logger, nil)
+	if err != nil {
+		t.Fatalf("EnsureRetentionJobsInProject failed: %v", err)
+	}
+	if result == nil {
+		t.Fatal("expected non-nil result")
+	}
+	if len(result.CreatedJobIDs) == 0 {
+		t.Fatal("expected jobs to be created via embedded bootstrap archive templates")
+	}
+}
+
