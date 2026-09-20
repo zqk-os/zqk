@@ -39,7 +39,6 @@ var (
 	reFail = regexp.MustCompile(`^FAIL\s+github\.com/zqk-os/zqk/(\S+)`)
 )
 
-
 // StreamTests runs tests with real-time progress streaming and output formatting.
 func StreamTests(ctx context.Context, opts StreamOptions, out io.Writer) (StreamSummary, error) {
 	if opts.Parallel <= 0 {
