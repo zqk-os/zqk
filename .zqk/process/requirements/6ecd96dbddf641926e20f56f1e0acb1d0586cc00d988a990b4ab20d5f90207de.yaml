@@ -4,6 +4,9 @@ criteria_refs:
     - CRIT-1789673676577796000-03fc29cf
     - CRIT-1789673684713711000-344a7b09
     - CRIT-1789673692417549000-42d0da98
+    - CRIT-1789867597356481000-a3ab6d87
+    - CRIT-1789867601927187000-9af6f16b
+    - CRIT-1789867606651627000-510451af
 description: |
     Community kernel must demonstrate launch-ready testing and documentation
     vetting without reading the studio kernel. Isolation uses ZCOM_PROJECT_ROOT.
@@ -21,6 +24,6 @@ priority_tier: P0
 schema_version: 2.0.0
 status: active
 title: Community kernel must prove launch-ready testing and documentation vetting
-updated_at: "2026-09-17T19:35:43Z"
+updated_at: "2026-09-20T01:28:00Z"
 updated_by: ACC-1785920548450214012-68b850c0
 version_context: default

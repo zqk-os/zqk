@@ -1,0 +1,28 @@
+acceptance_considerations: 1. Tests run isolated within candidate repo boundaries; 2. Enterprise test suites correctly stubbed or omitted from community tier; 3. Monotonic test reduction achieves 0 unexpected test failures.
+created_at: "2026-09-20T01:27:06Z"
+created_by: ACC-1785920548450214012-68b850c0
+criteria_refs:
+    - CRIT-1789867606651627000-510451af
+description: Scan and resolve hardcoded studio package imports, test path assumptions, and enterprise-only test suites in candidate checkout.
+estimated_effort: 3h
+id: BLI-1789867626532147000-ddad7529
+kind: backlog_item
+milestone_refs:
+    - MIL-1789672699275510000-40c8cee7
+namespace_id: zqk:kernel
+persona_refs:
+    - PER-COMMUNITY-SOFTWARE-ENGINEER
+priority: critical
+priority_plan_ref: PRI-1789867611559561000-14e832b4
+priority_tier: P0
+problem_statement: go test ./... in candidate encounters dangling test cases expecting studio process directories and enterprise licenses.
+requirement_refs:
+    - REQ-1789630346648087000-a61b7f27
+schema_version: 2.0.0
+status: planned
+title: Reconcile Community Test Boundary and Fix Hardcoded Studio Dependencies
+updated_at: "2026-09-20T01:28:53Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs:
+    - WS-1789631797993326000-f9951fe8

@@ -1,0 +1,28 @@
+acceptance_considerations: 1. Global test slot acquires slot with context-aware timeout; 2. Slot held longer than package wait starts exactly once before dispatch deadline; 3. Regression tests pass.
+created_at: "2026-09-20T01:26:56Z"
+created_by: ACC-1785920548450214012-68b850c0
+criteria_refs:
+    - CRIT-1789867597356481000-a3ab6d87
+description: Align the global test slot timeout in pkg/scheduler/global_test_concurrency.go with the 2h dispatch contract to eliminate dropped run_wrapper jobs under maintenance load.
+estimated_effort: 2h
+id: BLI-1789867616595840000-3fda4ca8
+kind: backlog_item
+milestone_refs:
+    - MIL-1789672699275510000-40c8cee7
+namespace_id: zqk:kernel
+persona_refs:
+    - PER-COMMUNITY-SOFTWARE-ENGINEER
+priority: critical
+priority_plan_ref: PRI-1789867611559561000-14e832b4
+priority_tier: P0
+problem_statement: Immediate run_wrapper jobs are dropped when packageConcurrencyLimiter independently expires acquisition after 2s despite a 2h declared dispatch resource budget.
+requirement_refs:
+    - REQ-1789630346648087000-a61b7f27
+schema_version: 2.0.0
+status: planned
+title: Align Scheduler Global Test Slot Timeout with 2h Dispatch Contract
+updated_at: "2026-09-20T01:28:48Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs:
+    - WS-1789631797993326000-f9951fe8
