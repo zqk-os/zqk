@@ -14,7 +14,7 @@ description: |
     - Plan: I/O Resource Lifecycle, Storage Retention, and Leak Eradication (PRI-IO-RESOURCE-HYGIENE-001)
     - Target: software_engineer (capability: )
     - Persona: PER-COMMUNITY-SOFTWARE-ENGINEER
-    - Task: Implement: Mandatory I/O Resource Lifecycle, Storage Retention, and Lock/Temp Cleanup
+    - Task: Implement automated log rolling, stream retention, and stale lock/temp reaping
 
     ## Standing refs (do not duplicate bodies)
     - `POL-ONBOARD-001` — `zqk object get POL-ONBOARD-001`
@@ -38,12 +38,12 @@ description: |
     ## Observer
     Do not persist an AST census. At execute time call observer_search, then read_code the returned path.
 estimated_effort: 1d
-id: ATK-1789867335658465000-c530204a
+id: ATK-1789867335658086000-061ca3c4
 kind: agent_task
 model_tier: tier_2_simple
 namespace_id: zqk:kernel
 outputs:
-    - error: 'native executor failed for ATK-1789867335658465000-c530204a: exit status 1'
+    - error: 'native executor failed for ATK-1789867335658086000-061ca3c4: exit status 1'
       type: executor_failure
 policy_refs:
     - POL-ONBOARD-001
@@ -55,10 +55,10 @@ policy_refs:
 priority_plan_ref: PRI-IO-RESOURCE-HYGIENE-001
 related_object_refs:
     - ASK-COMMUNITY-CODE-CRAFTSMAN
-    - BLI-1789798192202007000-d96bdcbf
+    - BLI-IO-CLEANUP-RESOURCE-RETENTION-001
 schema_version: 2.0.0
 started_at: "2026-09-20T01:22:21Z"
-status: error
+status: archived
 task_steps:
     - description: Resolve the task envelope refs (`zqk object get`, `zqk agent prepare-context`) and execute the dynamic task. Do not copy policy or skill bodies onto the task object.
       status: pending_implementation
@@ -68,7 +68,7 @@ task_steps:
       status: pending
       title: Validation Phase
       verification_strategy: command_exit_code
-title: 'Execute Task: Implement: Mandatory I/O Resource Lifecycle, Storage Retention, and Lock/Temp Cleanup'
-updated_at: "2026-09-20T01:22:21Z"
+title: 'Execute Task: Implement automated log rolling, stream retention, and stale lock/temp reaping'
+updated_at: "2026-09-20T01:24:21Z"
 updated_by: ACC-1785920548450214012-68b850c0
 version_context: default

@@ -1,27 +1,27 @@
 package scheduler
 
 import (
+	"context"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
+	"io"
 	"strconv"
 	"strings"
-	"github.com/zqk-os/zqk/pkg/zqkenv"
-	"context"
-	"io"
 	"sync"
 	"sync/atomic"
 	"time"
 
+	"github.com/robfig/cron/v3"
 	"github.com/zqk-os/zqk/pkg/ambience"
 	"github.com/zqk-os/zqk/pkg/circuitbreaker"
 	"github.com/zqk-os/zqk/pkg/concurrency"
-	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/config"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/metrics"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/scheduler/transceiver"
 	storagepkg "github.com/zqk-os/zqk/pkg/storage"
-	"github.com/robfig/cron/v3"
 )
 
 var (
@@ -359,9 +359,10 @@ type Scheduler struct {
 	objectIDCacheBuilder ObjectIDCacheBuilder // optional; for cache_prewarm (BLI-954)
 
 	// Symbiotic Mesh Anticipatory Logic components
-	ambienceMesh              ambience.EventMesh
-	anticipatoryEngine        ambience.AnticipatoryEngine
-	packageConcurrencyLimiter circuitbreaker.ConcurrencyLimiter
+	ambienceMesh                 ambience.EventMesh
+	anticipatoryEngine           ambience.AnticipatoryEngine
+	packageConcurrencyLimiter    circuitbreaker.ConcurrencyLimiter
+	globalTestConcurrencyLimiter circuitbreaker.ConcurrencyLimiter
 
 	// Bounded pool for event- and lifecycle-triggered jobs (from goroutine budget factory).
 	triggeredPool *goroutinelabels.Pool

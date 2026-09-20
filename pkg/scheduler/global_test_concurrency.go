@@ -7,10 +7,13 @@ import (
 	"github.com/zqk-os/zqk/pkg/hostload"
 )
 
-// globalTestJobSlotKey is the reserved key under which the global test budget is held in the same
-// MapConcurrencyLimiter that tracks per-package slots. Reusing that limiter means the waiter queue,
-// max-wait behavior, and Snapshot reporting are the already-tested ones rather than a second
-// implementation. The key is not a Go package path, so it cannot collide with a real one.
+// globalTestJobSlotKey is the reserved key under which the global test budget is held.
+// The key is not a Go package path, so it cannot collide with a real one.
+//
+// Global slots live on a dedicated limiter whose max-wait is the dispatch resource
+// budget (default 2h), not the per-package limiter (default 2s). Sharing one limiter
+// dropped run_wrapper jobs under ordinary maintenance load.
+// TRACK: TDE-1789763617048880000-b8016f74 / BLI-1789866677572207000-df80dba2
 const globalTestJobSlotKey = "__global_test_jobs__"
 
 // globalTestJobLimit is the host-derived ceiling on concurrently dispatched run_wrapper jobs.
@@ -21,32 +24,32 @@ func globalTestJobLimit() int {
 	return hostload.Scale(n, hostload.CurrentLevel())
 }
 
-// acquireGlobalTestJobSlot blocks until a slot in the global test budget is free, the limiter's
-// max-wait elapses, or ctx is done.
+// acquireGlobalTestJobSlot blocks until a slot in the global test budget is free, the global
+// limiter's max-wait (dispatch resource budget, default 2h) elapses, or ctx is done.
 //
-// Returns nil when no limiter is configured. That is deliberate: this gate exists to protect the
-// host from oversubscription, and a scheduler constructed without a limiter (as several tests do)
-// should keep dispatching rather than refuse every test job. The per-package gate takes the same
-// position for the same reason.
+// Returns nil when no global limiter is configured. That is deliberate: this gate exists to
+// protect the host from oversubscription, and a scheduler constructed without a limiter (as
+// several tests do) should keep dispatching rather than refuse every test job. The per-package
+// gate takes the same position for the same reason.
 func (s *Scheduler) acquireGlobalTestJobSlot(ctx context.Context) error {
-	if s == nil || s.packageConcurrencyLimiter == nil {
+	if s == nil || s.globalTestConcurrencyLimiter == nil {
 		return nil
 	}
 	limit := globalTestJobLimit()
 	if limit <= 0 {
 		return nil
 	}
-	s.packageConcurrencyLimiter.MergeLimits(map[string]int{globalTestJobSlotKey: limit})
-	return s.packageConcurrencyLimiter.Acquire(ctx, globalTestJobSlotKey)
+	s.globalTestConcurrencyLimiter.MergeLimits(map[string]int{globalTestJobSlotKey: limit})
+	return s.globalTestConcurrencyLimiter.Acquire(ctx, globalTestJobSlotKey)
 }
 
 // releaseGlobalTestJobSlot returns a slot to the global test budget.
 func (s *Scheduler) releaseGlobalTestJobSlot() {
-	if s == nil || s.packageConcurrencyLimiter == nil {
+	if s == nil || s.globalTestConcurrencyLimiter == nil {
 		return
 	}
 	if globalTestJobLimit() <= 0 {
 		return
 	}
-	s.packageConcurrencyLimiter.Release(globalTestJobSlotKey)
+	s.globalTestConcurrencyLimiter.Release(globalTestJobSlotKey)
 }

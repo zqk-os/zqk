@@ -11,6 +11,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/robfig/cron/v3"
 	"github.com/zqk-os/zqk/pkg/ambience"
 	"github.com/zqk-os/zqk/pkg/ambient"
 	"github.com/zqk-os/zqk/pkg/circuitbreaker"
@@ -29,7 +30,6 @@ import (
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"github.com/zqk-os/zqk/pkg/zqkenv"
 	"github.com/zqk-os/zqk/pkg/zqktime"
-	"github.com/robfig/cron/v3"
 )
 
 const (
@@ -423,21 +423,22 @@ func NewSchedulerWithProjectRoot(storage storagepkg.ObjectStorageProvider, specL
 			runningJobs: make(map[string]*ScheduledJob),
 			projectRoot: projectRoot,
 		},
-		secCtx:                     secCtx,
-		notificationContext:        notificationContext,
-		executor:                   &NativeExecutor{},
-		router:                     router,
-		asyncRouter:                asyncRouter,
-		metrics:                    metricsCollector,
-		handlerFactory:             handlerFactory,
-		jobLoader:                  jobLoader,
-		processGroupManager:        processGroupManager,
-		objectIDCacheBuilder:       objectIDCacheBuilder,
-		ambienceMesh:               ambienceMesh,
-		anticipatoryEngine:         fseventsEngine,
-		packageConcurrencyLimiter:  circuitbreaker.NewConcurrencyLimiter(logger, getPackageConcurrencyMaxWait()),
-		lockFailureCountByJobID:    make(map[string]int),
-		dispatchDropRetriesByJobID: make(map[string]int),
+		secCtx:                       secCtx,
+		notificationContext:          notificationContext,
+		executor:                     &NativeExecutor{},
+		router:                       router,
+		asyncRouter:                  asyncRouter,
+		metrics:                      metricsCollector,
+		handlerFactory:               handlerFactory,
+		jobLoader:                    jobLoader,
+		processGroupManager:          processGroupManager,
+		objectIDCacheBuilder:         objectIDCacheBuilder,
+		ambienceMesh:                 ambienceMesh,
+		anticipatoryEngine:           fseventsEngine,
+		packageConcurrencyLimiter:    circuitbreaker.NewConcurrencyLimiter(logger, getPackageConcurrencyMaxWait()),
+		globalTestConcurrencyLimiter: circuitbreaker.NewConcurrencyLimiter(logger, getSchedulerDispatchResourceWaitMax()),
+		lockFailureCountByJobID:      make(map[string]int),
+		dispatchDropRetriesByJobID:   make(map[string]int),
 	}
 	sched.jobsPausedScheduleExemptIDs = loadJobsPausedScheduleExemptIDs(projectRoot)
 	handlerFactory.BindScheduler(sched)

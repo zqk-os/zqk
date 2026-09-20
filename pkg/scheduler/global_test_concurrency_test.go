@@ -41,8 +41,9 @@ func TestGlobalTestJobLimit_derivesFromHostAndStaysInBounds(t *testing.T) {
 func TestAcquireGlobalTestJobSlot_capsConcurrentHolders(t *testing.T) {
 	logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
 	s := &Scheduler{
-		logger:                    logger,
-		packageConcurrencyLimiter: circuitbreaker.NewConcurrencyLimiter(logger, 2*time.Second),
+		logger:                       logger,
+		packageConcurrencyLimiter:    circuitbreaker.NewConcurrencyLimiter(logger, 2*time.Second),
+		globalTestConcurrencyLimiter: circuitbreaker.NewConcurrencyLimiter(logger, 2*time.Second),
 	}
 
 	limit := globalTestJobLimit()
@@ -107,4 +108,53 @@ func TestAcquireGlobalTestJobSlot_noLimiterDoesNotBlockDispatch(t *testing.T) {
 		t.Errorf("expected dispatch to proceed with no limiter configured, got %v", err)
 	}
 	s.releaseGlobalTestJobSlot() // must not panic
+}
+
+// TestAcquireGlobalTestJobSlot_waitsPastPackageMaxWaitUntilDispatchBudget is the
+// TDE-1789763617048880000-b8016f74 regression: a slot held longer than the 2s package
+// max-wait must still be acquired before the dispatch budget elapses, exactly once.
+func TestAcquireGlobalTestJobSlot_waitsPastPackageMaxWaitUntilDispatchBudget(t *testing.T) {
+	logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
+	packageMaxWait := 2 * time.Second
+	dispatchBudget := 6 * time.Second
+	s := &Scheduler{
+		logger:                       logger,
+		packageConcurrencyLimiter:    circuitbreaker.NewConcurrencyLimiter(logger, packageMaxWait),
+		globalTestConcurrencyLimiter: circuitbreaker.NewConcurrencyLimiter(logger, dispatchBudget),
+	}
+
+	limit := globalTestJobLimit()
+	ctx := context.Background()
+	for range limit {
+		if err := s.acquireGlobalTestJobSlot(ctx); err != nil {
+			t.Fatalf("setup: filling global slots: %v", err)
+		}
+	}
+
+	started := make(chan struct{})
+	result := make(chan error, 1)
+	goroutinelabels.NewGoroutine("test-global-slot-wait-past-package", "waiter past package max-wait").
+		StartSimple(func() {
+			close(started)
+			result <- s.acquireGlobalTestJobSlot(ctx)
+		})
+	<-started
+
+	select {
+	case err := <-result:
+		t.Fatalf("waiter returned after %v without a release (err=%v); global wait is still the package max-wait", packageMaxWait, err)
+	case <-time.After(packageMaxWait + 400*time.Millisecond):
+	}
+
+	s.releaseGlobalTestJobSlot()
+
+	select {
+	case err := <-result:
+		if err != nil {
+			t.Fatalf("waiter failed after a slot was released within dispatch budget: %v", err)
+		}
+		s.releaseGlobalTestJobSlot()
+	case <-time.After(dispatchBudget):
+		t.Fatal("waiter did not acquire after a slot was released within the dispatch budget")
+	}
 }
