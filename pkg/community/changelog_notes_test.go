@@ -61,7 +61,7 @@ func TestChangeLogReleaseNotes_FunctionalAcceptance(t *testing.T) {
 		t.Fatalf("failed to read RELEASE_NOTES.md: %v", err)
 	}
 	notesContent := string(notesBytes)
-	if !strings.Contains(notesContent, "brew tap lanceman/zqk") {
+	if !strings.Contains(notesContent, "brew tap zqk-os/zqk") {
 		t.Errorf("expected brew tap instructions in RELEASE_NOTES.md")
 	}
 	if !strings.Contains(notesContent, "checksums.txt") {

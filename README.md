@@ -134,4 +134,4 @@ Open-core / Community: [Apache License 2.0](LICENSE) (see `NOTICE`). Enterprise 
 - **Website:** [zqkos.com](https://zqkos.com)
 - **Public Contact:** [zqk@zqkos.com](mailto:zqk@zqkos.com)
 - **Schedule a Call:** [Book a ZQK Inquiry](https://calendar.app.google/VhhrKgXqrukr48Kg7)
-- **GitHub:** [@zqk-lance](https://github.com/zqk-lance)
+- **GitHub:** [zqk-os/zqk](https://github.com/zqk-os/zqk)

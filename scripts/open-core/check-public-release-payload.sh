@@ -42,6 +42,21 @@ if git -C "$ROOT" grep -n -F 'github.com/lanceman/zqk' -- '*.go' go.mod >/dev/nu
 	fail "private module path remains in Go source or go.mod"
 fi
 
+# Packaging/operator scripts must not advertise the private module or GitHub identity.
+# rewrite-community-module-path.sh is the one-shot migrator and may name the old path.
+if git -C "$ROOT" grep -n -F 'github.com/lanceman/zqk' -- \
+	'scripts' \
+	':!scripts/open-core/rewrite-community-module-path.sh' \
+	':!scripts/open-core/check-public-release-payload.sh' >/dev/null 2>&1; then
+	fail "private module path remains in scripts"
+fi
+if git -C "$ROOT" grep -n -F 'lanceman/zqk' -- \
+	'scripts' \
+	':!scripts/open-core/rewrite-community-module-path.sh' \
+	':!scripts/open-core/check-public-release-payload.sh' >/dev/null 2>&1; then
+	fail "private GitHub identity remains in scripts"
+fi
+
 if grep -E 'APPENDIX A|Proprietary|Commercial Enterprise|OPEN_CORE_PROPRIETARY_SPLIT' \
 	"$ROOT/LICENSE" "$ROOT/NOTICE" >/dev/null 2>&1; then
 	fail "LICENSE or NOTICE still carries the studio monorepo carve-out"

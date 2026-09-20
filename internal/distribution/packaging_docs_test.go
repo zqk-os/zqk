@@ -21,12 +21,8 @@ func TestCommunityDocumentationHonesty(t *testing.T) {
 	firstRunContent := string(firstRunBytes)
 
 	requiredFirstRunTerms := []string{
-		"brew tap lanceman/zqk",
-		"brew install zqk",
+		"no Homebrew formula and no public GitHub release",
 		"zqk system init",
-		"pyproject.toml",
-		"package.json",
-		"Cargo.toml",
 		"zqk grep",
 	}
 	for _, term := range requiredFirstRunTerms {
@@ -44,8 +40,8 @@ func TestCommunityDocumentationHonesty(t *testing.T) {
 	readmeContent := string(readmeBytes)
 
 	requiredReadmeTerms := []string{
-		"brew tap lanceman/zqk",
-		"brew install zqk",
+		"no brew formula and no public GitHub release",
+		"github.com/zqk-os/zqk",
 		"zqk grep",
 		"Polyglot",
 	}

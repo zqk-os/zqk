@@ -26,13 +26,13 @@ export SOURCE_DATE_EPOCH="${SOURCE_DATE_EPOCH:-$(git -C "$REPO_ROOT" log -1 --pr
 export TOUCH_TS="$(date -u -r "$SOURCE_DATE_EPOCH" '+%Y%m%d%H%M.%S' 2>/dev/null || date -u '+%Y%m%d%H%M.%S')"
 BUILD_DATE="$(date -u -r "$SOURCE_DATE_EPOCH" '+%Y-%m-%dT%H:%M:%SZ' 2>/dev/null || date -u '+%Y-%m-%dT%H:%M:%SZ')"
 
+# Public module is github.com/zqk-os/zqk; the community SKU ships ./cmd/zqk.
+# Archive/binary name stays zqk-community so Homebrew formula + dist tests stay stable.
+# TRACK: BLI-1789869852579209000-b3f94849 — private identity must not appear in packaging.
 LDFLAGS="-s -w -buildid= \
-  -X github.com/lanceman/zqk/cmd/zqk/app.version=${VERSION} \
-  -X github.com/lanceman/zqk/cmd/zqk/app.buildDate=${BUILD_DATE} \
-  -X github.com/lanceman/zqk/cmd/zqk/app.gitCommit=${GIT_COMMIT} \
-  -X github.com/lanceman/zqk/cmd/zqk-community/app.version=${VERSION} \
-  -X github.com/lanceman/zqk/cmd/zqk-community/app.buildDate=${BUILD_DATE} \
-  -X github.com/lanceman/zqk/cmd/zqk-community/app.gitCommit=${GIT_COMMIT}"
+  -X github.com/zqk-os/zqk/cmd/zqk/app.version=${VERSION} \
+  -X github.com/zqk-os/zqk/cmd/zqk/app.buildDate=${BUILD_DATE} \
+  -X github.com/zqk-os/zqk/cmd/zqk/app.gitCommit=${GIT_COMMIT}"
 
 PLATFORMS=(
   "darwin/amd64"
@@ -42,7 +42,7 @@ PLATFORMS=(
 )
 
 BINARIES=(
-  "zqk-community:./cmd/zqk-community"
+  "zqk-community:./cmd/zqk"
 )
 
 echo "🔨 Building ZQK Community Edition ${VERSION} (commit ${GIT_COMMIT})"
@@ -159,26 +159,26 @@ mkdir -p "${DIST_DIR}/Formula"
 cat <<EOF > "${DIST_DIR}/Formula/zqk.rb"
 class Zqk < Formula
   desc "Kernel and orchestration CLI for AI-human hybrid software engineering"
-  homepage "https://github.com/lanceman/zqk"
+  homepage "https://github.com/zqk-os/zqk"
   version "${VER_NUM}"
   license "Apache-2.0"
 
   on_macos do
     if Hardware::CPU.arm?
-      url "https://github.com/lanceman/zqk/releases/download/v#{version}/zqk-community_#{version}_darwin_arm64.tar.gz"
+      url "https://github.com/zqk-os/zqk/releases/download/v#{version}/zqk-community_#{version}_darwin_arm64.tar.gz"
       sha256 "${DARWIN_ARM64_SHA}"
     else
-      url "https://github.com/lanceman/zqk/releases/download/v#{version}/zqk-community_#{version}_darwin_amd64.tar.gz"
+      url "https://github.com/zqk-os/zqk/releases/download/v#{version}/zqk-community_#{version}_darwin_amd64.tar.gz"
       sha256 "${DARWIN_AMD64_SHA}"
     end
   end
 
   on_linux do
     if Hardware::CPU.arm?
-      url "https://github.com/lanceman/zqk/releases/download/v#{version}/zqk-community_#{version}_linux_arm64.tar.gz"
+      url "https://github.com/zqk-os/zqk/releases/download/v#{version}/zqk-community_#{version}_linux_arm64.tar.gz"
       sha256 "${LINUX_ARM64_SHA}"
     else
-      url "https://github.com/lanceman/zqk/releases/download/v#{version}/zqk-community_#{version}_linux_amd64.tar.gz"
+      url "https://github.com/zqk-os/zqk/releases/download/v#{version}/zqk-community_#{version}_linux_amd64.tar.gz"
       sha256 "${LINUX_AMD64_SHA}"
     end
   end
@@ -228,13 +228,13 @@ The Zen Quantum Kernel Community Edition.
 
 **Homebrew (Recommended):**
 \`\`\`bash
-brew tap lanceman/zqk
+brew tap zqk-os/zqk
 brew install zqk
 \`\`\`
 
 **Manual Checksum Verification:**
 \`\`\`bash
-curl -fsSL https://github.com/lanceman/zqk/releases/download/community-${VERSION}/checksums.txt | sha256sum -c
+curl -fsSL https://github.com/zqk-os/zqk/releases/download/community-${VERSION}/checksums.txt | sha256sum -c
 \`\`\`
 EOF
 
@@ -256,6 +256,13 @@ if [ "$DRY_RUN" = "--dry" ]; then
   echo "   git tag community-${VERSION} && git push origin community-${VERSION}"
   echo "   gh release create community-${VERSION} dist-community/*.tar.gz dist-community/checksums.txt dist-community/Formula/zqk.rb --title 'Community Edition ${VERSION}' --notes-file -"
   exit 0
+fi
+
+HOLD_FILE="${REPO_ROOT}/.zqk/state/remote_hold.json"
+if [ -f "$HOLD_FILE" ] && grep -q '"hold": true' "$HOLD_FILE"; then
+  echo "BLOCK: remote_hold=true; refusing GitHub publish. Artifacts are in ${DIST_DIR}." >&2
+  echo "Re-run with --dry, or wait for a human-written public_push_ack.json." >&2
+  exit 1
 fi
 
 echo ""
@@ -284,20 +291,20 @@ The Zen Quantum Kernel Community Edition.
 
 **Homebrew (Recommended):**
 \`\`\`bash
-brew tap lanceman/zqk
+brew tap zqk-os/zqk
 brew install zqk
 \`\`\`
 
 **Manual:** Download the archive for your platform below and verify checksums:
 \`\`\`bash
-curl -fsSL https://github.com/lanceman/zqk/releases/download/${TAG_NAME}/checksums.txt | sha256sum -c
+curl -fsSL https://github.com/zqk-os/zqk/releases/download/${TAG_NAME}/checksums.txt | sha256sum -c
 \`\`\`
 
 **Build from source:**
 \`\`\`bash
-git clone https://github.com/lanceman/zqk && cd zqk && make zqk-community
+git clone https://github.com/zqk-os/zqk && cd zqk && make
 \`\`\`
 "
 
 echo ""
-echo "✅ Release ${VERSION} published: https://github.com/lanceman/zqk/releases/tag/${TAG_NAME}"
+echo "✅ Release ${VERSION} published: https://github.com/zqk-os/zqk/releases/tag/${TAG_NAME}"

@@ -4,10 +4,11 @@
 
 ## Test plan
 
-- [ ] Targeted tests or `zqk scheduler scan-tests --package ./…` recorded (job id + log path)
-- [ ] `zqk system check` clean for the change surface
+- [ ] Targeted `go test ./<pkg> -timeout 60s` for the change surface (`go test ./...` only when blast radius is wide)
+- [ ] `./bin/zqk system check` clean for the change surface
+- [ ] `sh scripts/open-core/test-public-release-gates.sh` (same suite as Community CI)
 - [ ] Process data under `.zqk/process/` went through `./bin/zqk` (no hand-edited hash YAML)
 
 ## Publication
 
-Do not request a public push. `remote_hold` stays true until a human publication ACK.
+Open the PR from a `feature/` or `integration/` branch. Do not push directly to `origin/main`. Wait for Community CI to pass.
