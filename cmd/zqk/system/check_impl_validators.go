@@ -297,9 +297,9 @@ func checkInstanceValidationWithValidatorAndData(ctx *cli.Context, stdCtx stdcon
 				}
 				if allTestsComplete {
 					validationIssues = append(validationIssues, Issue{
-						Tier:        2,
+						Tier:        1,
 						Category:    "lifecycle",
-						Message:     fmt.Sprintf("Requirement %s is %s but all criteria and linked test cases are complete; requirement should be transitioned to complete", obj.ID, currentState),
+						Message:     fmt.Sprintf("Requirement %s is %s but all criteria and linked test cases are complete; requirement must be transitioned to complete", obj.ID, currentState),
 						AutoFixable: false,
 						FixCommand:  fmt.Sprintf("zqk object promote %s", obj.ID),
 					})
