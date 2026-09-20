@@ -43,6 +43,9 @@ id: ATK-1789870152512491000-19de83e3
 kind: agent_task
 model_tier: tier_2_simple
 namespace_id: zqk:kernel
+outputs:
+    - error: 'native executor failed for ATK-1789870152512491000-19de83e3: signal: killed'
+      type: executor_failure
 policy_refs:
     - POL-ONBOARD-001
     - POL-ONBOARD-002
@@ -68,6 +71,6 @@ task_steps:
       title: Validation Phase
       verification_strategy: command_exit_code
 title: 'Execute Task: Repair 80 Broken Relative Documentation Links across Community Guides'
-updated_at: "2026-09-20T02:26:21Z"
+updated_at: "2026-09-20T03:17:52Z"
 updated_by: ACC-1785920548450214012-68b850c0
 version_context: default

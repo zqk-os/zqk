@@ -1,7 +1,8 @@
 # Pre-commit policy: runs scripts/pre-commit-policy.sh (logging + architecture compliance);
 # writes .zqk/pre-commit/policy.json and runs aggregate.
 #
-# Ensured by: zqk system ensure-retention-jobs (scheduler_maintenance_config.yaml)
+# Optional source-code pack — not in community required_jobs.
+# Mint only when scripts/pre-commit-policy.sh exists. See docs/howto/SCHEDULER_AND_MAINTENANCE.md
 # See: docs/architecture/PRE_COMMIT_BACKGROUND_RESULTS.md
 
 id: SCH-pre-commit-policy

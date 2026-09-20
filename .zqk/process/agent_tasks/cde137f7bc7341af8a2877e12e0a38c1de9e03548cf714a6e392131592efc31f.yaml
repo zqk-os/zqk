@@ -1,0 +1,82 @@
+assignee_persona_ref: PER-COMMUNITY-SOFTWARE-ENGINEER
+claimed_at: "2026-09-20T03:11:59Z"
+claimed_by: PER-COMMUNITY-SOFTWARE-ENGINEER
+created_at: "2026-09-20T02:43:38Z"
+created_by: ACC-1785920548450214012-68b850c0
+description: |
+    # Agent Task Envelope
+    zqk_task_envelope_v1
+
+    Static context lives in kernel objects. Do not treat this description as a copy of policy or skill bodies.
+    Resolve at execute: `zqk object get <id>`, `zqk agent prepare-context --task-id <ATK>`, or `zqk workflow whats-next`.
+
+    ## Dynamic
+    - Plan: Community Launch Phase 5: Surface Area Bounding and Public Package Sanitization (PRI-1789871591479586000-98a8d448)
+    - Target: coder-agent (capability: )
+    - Persona: PER-COMMUNITY-SOFTWARE-ENGINEER
+    - Task: Automated Stranger Clean-Clone Installation and Release Verification Gate
+
+    ## Standing refs (do not duplicate bodies)
+    - `POL-ONBOARD-001` — `zqk object get POL-ONBOARD-001`
+    - `POL-ONBOARD-002` — `zqk object get POL-ONBOARD-002`
+    - `POL-AGENT-INSTRUCTION-RUBRIC-001` — `zqk object get POL-AGENT-INSTRUCTION-RUBRIC-001`
+    - `POL-WORKFLOW-VDS` — `zqk object get POL-WORKFLOW-VDS`
+    - `POL-CODE-CAS-COMMIT-001` — `zqk object get POL-CODE-CAS-COMMIT-001`
+    - `POL-CODE-1784753087498298000-bedce972` — `zqk object get POL-CODE-1784753087498298000-bedce972`
+
+    ## Bound policies
+    - `POL-ONBOARD-001`
+    - `POL-ONBOARD-002`
+    - `POL-AGENT-INSTRUCTION-RUBRIC-001`
+    - `POL-WORKFLOW-VDS`
+    - `POL-CODE-CAS-COMMIT-001`
+    - `POL-CODE-1784753087498298000-bedce972`
+
+    ## Bound skills
+    - `ASK-COMMUNITY-ARCH-DESIGN` — `zqk object get ASK-COMMUNITY-ARCH-DESIGN`
+    - `ASK-COMMUNITY-CODE-CRAFTSMAN` — `zqk object get ASK-COMMUNITY-CODE-CRAFTSMAN`
+    - `ASK-COMMUNITY-QA-VERIFICATION` — `zqk object get ASK-COMMUNITY-QA-VERIFICATION`
+    - `ASK-DEFAULT-FEED-CORRESPONDENCE` — `zqk object get ASK-DEFAULT-FEED-CORRESPONDENCE`
+
+    ## Observer
+    Do not persist an AST census. At execute time call observer_search, then read_code the returned path.
+estimated_effort: 1d
+id: ATK-1789872218074023000-2f119250
+kind: agent_task
+model_tier: tier_2_simple
+namespace_id: zqk:kernel
+outputs:
+    - error: 'reset orchestration worktree /var/folders/gb/31sgyvn551ld6l0zfk50yl8h0000gn/T/zqk-worktrees/zqk-public-candidate-8a1fd554/ATK-1789872218074023000-2f119250 to 67cc483fcd498b7736cce1b4cf881d6942f0bc06: fatal: not a git repository: (null): exit status 128'
+      type: executor_failure
+    - error: 'native executor failed for ATK-1789872218074023000-2f119250: exit status 1'
+      type: executor_failure
+policy_refs:
+    - POL-ONBOARD-001
+    - POL-ONBOARD-002
+    - POL-AGENT-INSTRUCTION-RUBRIC-001
+    - POL-WORKFLOW-VDS
+    - POL-CODE-CAS-COMMIT-001
+    - POL-CODE-1784753087498298000-bedce972
+priority_plan_ref: PRI-1789871591479586000-98a8d448
+related_object_refs:
+    - ASK-COMMUNITY-ARCH-DESIGN
+    - ASK-COMMUNITY-CODE-CRAFTSMAN
+    - ASK-COMMUNITY-QA-VERIFICATION
+    - ASK-DEFAULT-FEED-CORRESPONDENCE
+    - BLI-1789871646317688000-f7fca709
+schema_version: 2.0.0
+started_at: "2026-09-20T02:44:13Z"
+status: in_progress
+task_steps:
+    - description: Resolve the task envelope refs (`zqk object get`, `zqk agent prepare-context`) and execute the dynamic task. Do not copy policy or skill bodies onto the task object.
+      status: pending_implementation
+      title: Implementation Phase
+    - command: ./bin/zqk agent validate
+      description: Must pass targeted validation script.
+      status: pending
+      title: Validation Phase
+      verification_strategy: command_exit_code
+title: 'Execute Task: Automated Stranger Clean-Clone Installation and Release Verification Gate'
+updated_at: "2026-09-20T03:11:59Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

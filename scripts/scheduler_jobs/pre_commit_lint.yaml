@@ -1,7 +1,8 @@
 # Pre-commit lint: runs scripts/pre-commit-lint.sh on a timer; writes .zqk/pre-commit/lint.json
 # and aggregate so the hook sees up-to-date results.
 #
-# Ensured by: zqk system ensure-retention-jobs (scheduler_maintenance_config.yaml)
+# Optional source-code pack — not in community required_jobs.
+# Mint only when scripts/pre-commit-lint.sh exists. See docs/howto/SCHEDULER_AND_MAINTENANCE.md
 # See: docs/architecture/PRE_COMMIT_BACKGROUND_RESULTS.md
 
 id: SCH-pre-commit-lint

@@ -1,7 +1,7 @@
 assignee_persona_ref: PER-COMMUNITY-SOFTWARE-ENGINEER
-claimed_at: "2026-09-20T02:09:29Z"
+claimed_at: "2026-09-20T03:11:06Z"
 claimed_by: PER-COMMUNITY-SOFTWARE-ENGINEER
-created_at: "2026-09-20T02:09:12Z"
+created_at: "2026-09-20T02:45:49Z"
 created_by: ACC-1785920548450214012-68b850c0
 description: |
     # Agent Task Envelope
@@ -11,10 +11,10 @@ description: |
     Resolve at execute: `zqk object get <id>`, `zqk agent prepare-context --task-id <ATK>`, or `zqk workflow whats-next`.
 
     ## Dynamic
-    - Plan: Community Launch Phase 4: Documentation Identity and Governance Harmonization (PRI-1789868700000000000-d5fc9750)
+    - Plan: Community Launch Phase 5: Surface Area Bounding and Public Package Sanitization (PRI-1789871591479586000-98a8d448)
     - Target: coder-agent (capability: )
     - Persona: PER-COMMUNITY-SOFTWARE-ENGINEER
-    - Task: Publish Standardized Community Governance and Contributing Guidelines
+    - Task: Automate Open-Core Payload Sanitization and CAS Stripping Pipeline
 
     ## Standing refs (do not duplicate bodies)
     - `POL-ONBOARD-001` — `zqk object get POL-ONBOARD-001`
@@ -33,16 +33,20 @@ description: |
     - `POL-CODE-1784753087498298000-bedce972`
 
     ## Bound skills
+    - `ASK-COMMUNITY-ARCH-DESIGN` — `zqk object get ASK-COMMUNITY-ARCH-DESIGN`
     - `ASK-COMMUNITY-CODE-CRAFTSMAN` — `zqk object get ASK-COMMUNITY-CODE-CRAFTSMAN`
     - `ASK-DEFAULT-FEED-CORRESPONDENCE` — `zqk object get ASK-DEFAULT-FEED-CORRESPONDENCE`
 
     ## Observer
     Do not persist an AST census. At execute time call observer_search, then read_code the returned path.
 estimated_effort: 1d
-id: ATK-1789870152502456000-36369ff7
+id: ATK-1789872349162837000-55a5c2c5
 kind: agent_task
 model_tier: tier_2_simple
 namespace_id: zqk:kernel
+outputs:
+    - error: 'native executor failed for ATK-1789872349162837000-55a5c2c5: exit status 1'
+      type: executor_failure
 policy_refs:
     - POL-ONBOARD-001
     - POL-ONBOARD-002
@@ -50,14 +54,15 @@ policy_refs:
     - POL-WORKFLOW-VDS
     - POL-CODE-CAS-COMMIT-001
     - POL-CODE-1784753087498298000-bedce972
-priority_plan_ref: PRI-1789868700000000000-d5fc9750
+priority_plan_ref: PRI-1789871591479586000-98a8d448
 related_object_refs:
+    - ASK-COMMUNITY-ARCH-DESIGN
     - ASK-COMMUNITY-CODE-CRAFTSMAN
     - ASK-DEFAULT-FEED-CORRESPONDENCE
-    - BLI-1789868730000000000-9725a07f
+    - BLI-1789871626046148000-78991fa7
 schema_version: 2.0.0
-started_at: "2026-09-20T02:09:29Z"
-status: archived
+started_at: "2026-09-20T02:46:00Z"
+status: in_progress
 task_steps:
     - description: Resolve the task envelope refs (`zqk object get`, `zqk agent prepare-context`) and execute the dynamic task. Do not copy policy or skill bodies onto the task object.
       status: pending_implementation
@@ -67,7 +72,7 @@ task_steps:
       status: pending
       title: Validation Phase
       verification_strategy: command_exit_code
-title: 'Execute Task: Publish Standardized Community Governance and Contributing Guidelines'
-updated_at: "2026-09-20T02:26:21Z"
+title: 'Execute Task: Automate Open-Core Payload Sanitization and CAS Stripping Pipeline'
+updated_at: "2026-09-20T03:11:06Z"
 updated_by: ACC-1785920548450214012-68b850c0
 version_context: default

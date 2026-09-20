@@ -15,5 +15,6 @@ Start in **onboarding**.
 | **[Governance](../GOVERNANCE.md)** | Open-core boundary, decision-making, publication hold |
 | **[Tutorials](./tutorials/README.md)** | Learn-by-doing (Divio) |
 | **[How-to](./howto/README.md)** | Task recipes (Divio) |
+| **[Scheduler and maintenance](./howto/SCHEDULER_AND_MAINTENANCE.md)** | Daemon, kernel survival jobs vs optional source-code lint/policy/integrity |
 | **[Manual](./manual/README.md)** | Reference (Divio) |
 | **[Explanation](./explanation/README.md)** | Why the kernel is shaped this way (Divio) |

@@ -24,9 +24,9 @@ requirement_refs:
     - REQ-1789702448467715000-c05a9ef4
 schema_version: 2.0.0
 started_at: "2026-09-20T02:19:27Z"
-status: complete
+status: in_progress
 title: Harmonize Public Identity and Scrub Stale Private Mentions across Docs and Configs
-updated_at: "2026-09-20T02:19:53Z"
+updated_at: "2026-09-20T02:39:25Z"
 updated_by: ACC-1785920548450214012-68b850c0
 version_context: default
 workstream_refs:

@@ -15,6 +15,11 @@
 # so operational safety (e.g. retention, disk) does not depend on scattered edits. As jobs are retired in
 # favor of data-cell-driven flows, drop their ids from this list and required_jobs in the same change.
 #
+# required_jobs is the kernel-survival set (retention, validation, caches, WAL).
+# Do not put source-code lint/policy/integrity here — those are an optional pack
+# for checkouts that ship product source and the matching scripts. Operator guide:
+# docs/howto/SCHEDULER_AND_MAINTENANCE.md
+#
 # required_jobs: list of jobs that must exist. Each entry:
 #   id: fixed scheduler_job id (e.g. SCH-101, SCH-007).
 #   job_type: expected job_type (used for create and for correct-if-wrong updates).
@@ -79,15 +84,10 @@ required_jobs:
   - id: SCH-autofix-process-pending
     job_type: run_wrapper
     template_file: scripts/scheduler_jobs/autofix_process_pending.yaml
-  - id: SCH-pre-commit-lint
-    job_type: run_wrapper
-    template_file: scripts/scheduler_jobs/pre_commit_lint.yaml
-  - id: SCH-pre-commit-policy
-    job_type: run_wrapper
-    template_file: scripts/scheduler_jobs/pre_commit_policy.yaml
-  - id: SCH-pre-commit-integrity
-    job_type: run_wrapper
-    template_file: scripts/scheduler_jobs/pre_commit_integrity.yaml
+  # Community SKU does not ship scripts/pre-commit-{lint,policy,integrity}.sh.
+  # Those SCH-pre-commit-* jobs are studio-dense; leaving them in required_jobs
+  # makes the daemon exit 126 every timer. Templates remain under scripts/scheduler_jobs/
+  # for studio checkouts. TRACK: BLI-1789871626046148000-78991fa7
   - id: SCH-cleanup
     job_type: cleanup
     template_file: scripts/scheduler_jobs/cleanup_on_demand.yaml

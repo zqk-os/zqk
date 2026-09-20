@@ -2,6 +2,8 @@
 
 Templates for creating **scheduler_job** objects via the CLI (process-data-cli-only: do not edit instance YAML under `.zqk/process/`).
 
+Operator guide (kernel survival vs optional source-code pack, how to use the daemon): `docs/howto/SCHEDULER_AND_MAINTENANCE.md`.
+
 ## autofix_batch_cleanup_hourly.yaml
 
 Hourly job that cleans up `.zqk/autofix/`:

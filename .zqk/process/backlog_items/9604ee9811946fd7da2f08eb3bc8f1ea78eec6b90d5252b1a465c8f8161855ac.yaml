@@ -1,0 +1,27 @@
+acceptance_considerations: 1. scripts/check-public-release-payload.sh passes cleanly with zero violations; 2. All studio kernel IDs scrubbed from community configs; 3. Payload size and file count meet open-core boundary specs.
+created_at: "2026-09-20T02:33:46Z"
+created_by: ACC-1785920548450214012-68b850c0
+criteria_refs:
+    - CRIT-1789702449225534000-91965c35
+description: Hardens the open-core candidate packaging pipeline to reliably scrub studio process objects, sanitize long IDs, and enforce the 2-script ceiling.
+estimated_effort: 8h
+id: BLI-1789871626046148000-78991fa7
+kind: backlog_item
+milestone_refs:
+    - MIL-1789672699275510000-40c8cee7
+namespace_id: zqk:kernel
+persona_refs:
+    - PER-COMMUNITY-SOFTWARE-ENGINEER
+priority: critical
+priority_plan_ref: PRI-1789871591479586000-98a8d448
+priority_tier: P0
+problem_statement: Release payload check fails closed due to process instance YAML, 22 residual scripts, and 971 studio kernel IDs in the candidate export.
+requirement_refs:
+    - REQ-1789702448467715000-c05a9ef4
+schema_version: 2.0.0
+started_at: "2026-09-20T02:51:20Z"
+status: in_progress
+title: Automate Open-Core Payload Sanitization and CAS Stripping Pipeline
+updated_at: "2026-09-20T03:10:55Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

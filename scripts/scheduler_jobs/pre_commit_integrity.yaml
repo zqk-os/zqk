@@ -1,7 +1,8 @@
 # Pre-commit integrity: runs scripts/pre-commit-integrity.sh on a timer;
 # writes .zqk/pre-commit/.last-integrity.json. Callback runs when triggered with --pre-commit.
 #
-# Ensured by: zqk system ensure-retention-jobs (scheduler_maintenance_config.yaml)
+# Optional source-code pack — not in community required_jobs.
+# Mint only when scripts/pre-commit-integrity.sh exists. See docs/howto/SCHEDULER_AND_MAINTENANCE.md
 # See: docs/architecture/PRE_COMMIT_BACKGROUND_RESULTS.md
 
 id: SCH-pre-commit-integrity

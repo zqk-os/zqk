@@ -61,6 +61,8 @@ Background loops (job ticks, retention, one-shots):
 
 First-run CRUD, `object list`, and `whats-next` work without the daemon. Start it when you want the organism to keep running after you close the shell.
 
+Init's maintenance jobs are **kernel survival** (retention, object validation, caches). They are not a prompt to configure linting. Lint, policy, and integrity timers are an optional source-code pack — see [Scheduler and maintenance](../howto/SCHEDULER_AND_MAINTENANCE.md).
+
 ## Code search
 
 ```bash

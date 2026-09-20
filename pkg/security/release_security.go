@@ -107,7 +107,8 @@ func AuditPayload(root string, opts AuditOptions) (*AuditReport, error) {
 		}
 	}
 
-	// Script budget check (G11 Option B: <= MaxProductScripts)
+	// Script budget check (G11): same extras rule as scripts/open-core/police-community-tree.sh.
+	// TRACK: BLI-1789871626046148000-78991fa7 — keep AuditPayload extras in lockstep with police.
 	if opts.CheckScriptBudget {
 		scriptsDir := filepath.Join(cleanRoot, "scripts")
 		if sInfo, err := fileutil.Stat(scriptsDir); err == nil && sInfo.IsDir() {
@@ -117,19 +118,24 @@ func AuditPayload(root string, opts AuditOptions) (*AuditReport, error) {
 					return nil
 				}
 				ext := filepath.Ext(p)
-				if ext == ".sh" || ext == ".py" {
-					base := filepath.Base(p)
-					if base != "check-public-release-payload.sh" && base != "install-public-push-guard.sh" {
-						count++
-					}
+				if ext != ".sh" && ext != ".py" {
+					return nil
 				}
+				rel, relErr := filepath.Rel(scriptsDir, p)
+				if relErr != nil {
+					rel = d.Name()
+				}
+				if g11AllowlistedScript(rel) {
+					return nil
+				}
+				count++
 				return nil
 			})
 			if count > opts.MaxProductScripts {
 				report.Violations = append(report.Violations, Violation{
 					Rule:     "SCRIPT_BUDGET_EXCEEDED",
 					Path:     "scripts",
-					Evidence: fmt.Sprintf("scripts/ contains %d product scripts (budget cap is %d)", count, opts.MaxProductScripts),
+					Evidence: fmt.Sprintf("scripts/ contains %d extra product scripts (budget cap is %d)", count, opts.MaxProductScripts),
 				})
 			}
 		}
@@ -340,6 +346,35 @@ func AuditStaticVulnerabilities(ctx context.Context, projectRoot, targetPkg stri
 	}
 
 	return res, nil
+}
+
+// g11AllowlistedScript reports whether rel (path under scripts/) is a living
+// community SKU script, matching police-community-tree.sh MUST_NOT extras.
+func g11AllowlistedScript(rel string) bool {
+	base := filepath.Base(rel)
+	switch base {
+	case "check-public-release-payload.sh",
+		"install-public-push-guard.sh",
+		"package-community.sh",
+		"install.sh",
+		"generate-openvex.sh",
+		"build-bootstrap-archive.sh":
+		return true
+	}
+	n := filepath.ToSlash(rel)
+	for _, prefix := range []string{
+		"open-core/",
+		"starter_kernel_graph/",
+		"onboarding_roadmap/",
+		"default_agent_skills/",
+		"default_policies/",
+		"demos/",
+	} {
+		if strings.HasPrefix(n, prefix) {
+			return true
+		}
+	}
+	return false
 }
 
 func isBinary(data []byte) bool {

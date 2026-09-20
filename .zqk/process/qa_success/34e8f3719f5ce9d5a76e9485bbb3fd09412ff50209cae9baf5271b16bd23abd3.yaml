@@ -1,0 +1,14 @@
+created_at: "2026-09-20T02:46:01Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1789872361140952000-fbc59741
+item_id: ATK-1789872349162837000-55a5c2c5
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 8529d48a2bb8e026794ef628337375b2dfec95b6ff616d7dfd0278bc07abe912ce5068db3e7144cea33032c1c425e3f523aba531f46ce9fdb9363ac81af3aff6
+schema_version: 2.0.0
+signature: 304502204586b744b534b8eed1d49048d192e1f96e9c8cd7e2170a5bc02ecb0a9a24dfad022100b603bcbd1c7ffa82580aa175f33c5729e7618d3d4e024fbc41c2c04751e3633a
+status: success
+title: QA success for ATK-1789872349162837000-55a5c2c5
+updated_at: "2026-09-20T02:46:01Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

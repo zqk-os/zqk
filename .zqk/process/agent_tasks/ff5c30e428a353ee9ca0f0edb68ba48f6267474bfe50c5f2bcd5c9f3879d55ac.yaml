@@ -31,8 +31,8 @@ related_object_refs:
     - ASK-DEFAULT-FEED-CORRESPONDENCE
     - BLI-1789869852579209000-b3f94849
 schema_version: 2.0.0
-status: originated
+status: archived
 title: 'Execute Task: Harmonize Public Identity and Scrub Stale Private Mentions across Docs and Configs'
-updated_at: "2026-09-20T02:15:11Z"
+updated_at: "2026-09-20T03:17:55Z"
 updated_by: ACC-1785920548450214012-68b850c0
 version_context: default

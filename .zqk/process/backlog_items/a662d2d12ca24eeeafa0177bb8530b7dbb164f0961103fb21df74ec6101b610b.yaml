@@ -1,0 +1,26 @@
+acceptance_considerations: 1. Clean clone automated installer executes in under 2 minutes; 2. All 4 core showcase demos run green without error; 3. Verification report produced and ready for human push authorization.
+created_at: "2026-09-20T02:34:06Z"
+created_by: ACC-1785920548450214012-68b850c0
+criteria_refs:
+    - CRIT-1789702449225534000-91965c35
+description: Executes and hardens the stranger clean-clone verification suite to prove unassisted onboarding success before public push escalation.
+estimated_effort: ""
+id: BLI-1789871646317688000-f7fca709
+kind: backlog_item
+milestone_refs:
+    - MIL-1789672699275510000-40c8cee7
+namespace_id: zqk:kernel
+persona_refs:
+    - PER-COMMUNITY-SOFTWARE-ENGINEER
+priority: critical
+priority_plan_ref: PRI-1789871591479586000-98a8d448
+priority_tier: P0
+problem_statement: Release gate requires five consecutive stranger trial passes without maintainer intervention, fail-closed on any failure.
+requirement_refs:
+    - REQ-1789702448467715000-c05a9ef4
+schema_version: 2.0.0
+status: planned
+title: Automated Stranger Clean-Clone Installation and Release Verification Gate
+updated_at: "2026-09-20T02:40:33Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
