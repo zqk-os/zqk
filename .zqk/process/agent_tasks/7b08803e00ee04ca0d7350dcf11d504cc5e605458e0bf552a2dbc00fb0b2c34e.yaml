@@ -1,7 +1,7 @@
 assignee_persona_ref: PER-COMMUNITY-SOFTWARE-ENGINEER
-claimed_at: "2026-09-20T01:39:16Z"
+claimed_at: "2026-09-20T01:32:05Z"
 claimed_by: PER-COMMUNITY-SOFTWARE-ENGINEER
-created_at: "2026-09-20T01:38:37Z"
+created_at: "2026-09-20T01:31:49Z"
 created_by: ACC-1785920548450214012-68b850c0
 description: |
     # Agent Task Envelope
@@ -40,10 +40,15 @@ description: |
     ## Observer
     Do not persist an AST census. At execute time call observer_search, then read_code the returned path.
 estimated_effort: 1d
-id: ATK-1789868317340908000-8cc0f066
+id: ATK-1789867909779599000-1b141bcf
 kind: agent_task
 model_tier: tier_2_simple
 namespace_id: zqk:kernel
+outputs:
+    - error: 'native executor failed for ATK-1789867909779599000-1b141bcf: exit status 1'
+      type: executor_failure
+    - error: 'native executor failed for ATK-1789867909779599000-1b141bcf: exit status 1'
+      type: executor_failure
 policy_refs:
     - POL-ONBOARD-001
     - POL-ONBOARD-002
@@ -58,8 +63,8 @@ related_object_refs:
     - ASK-DEFAULT-FEED-CORRESPONDENCE
     - BLI-1789867626532147000-ddad7529
 schema_version: 2.0.0
-started_at: "2026-09-20T01:39:16Z"
-status: in_progress
+started_at: "2026-09-20T01:32:05Z"
+status: archived
 task_steps:
     - description: Resolve the task envelope refs (`zqk object get`, `zqk agent prepare-context`) and execute the dynamic task. Do not copy policy or skill bodies onto the task object.
       status: pending_implementation
@@ -70,6 +75,6 @@ task_steps:
       title: Validation Phase
       verification_strategy: command_exit_code
 title: 'Execute Task: Reconcile Community Test Boundary and Fix Hardcoded Studio Dependencies'
-updated_at: "2026-09-20T01:39:16Z"
+updated_at: "2026-09-20T01:51:42Z"
 updated_by: ACC-1785920548450214012-68b850c0
 version_context: default
