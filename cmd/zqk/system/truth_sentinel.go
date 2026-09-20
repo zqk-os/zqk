@@ -8,6 +8,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/zqk-os/zqk/internal/cli"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
+	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/lifecycle"
 	"github.com/zqk-os/zqk/pkg/objects"
@@ -17,31 +18,8 @@ import (
 
 // NewTruthSentinelCmd creates a new truth-sentinel command
 func NewTruthSentinelCmd() *cobra.Command {
-	helpBuilder := clipkg.DynamicHelpBuilder(
-		truthSentinelCmdShort,
-		truthSentinelCmdLong,
-		"",
-		truthSentinelCmdDescription,
-		truthSentinelHelpDesc1,
-		truthSentinelHelpDesc2,
-		truthSentinelHelpDesc3,
-		truthSentinelHelpDesc4,
-	).
-		AddExample(truthSentinelHelpExample, truthSentinelHelpExampleCmd).
-		AddExample(truthSentinelHelpOnceExample, truthSentinelHelpOnceExampleCmd)
-
-	cmd := &cobra.Command{
-		Use:   truthSentinelCmdUse,
-		Short: truthSentinelCmdShort,
-		Args:  cobra.NoArgs,
-	}
-	cmd.Flags().Bool(truthSentinelFlagOnce, false, truthSentinelFlagOnceUsage)
-	cmd.Flags().StringSlice(truthSentinelFlagIDs, nil, truthSentinelFlagIDsUsage)
-
+	cmd := bldr_cli_cmd_v1.NewSystemTruthSentinelCommandBuilder()
 	cmd.RunE = runTruthSentinel
-
-	helpBuilder.ApplyToCommand(cmd)
-
 	return cmd
 }
 
@@ -76,8 +54,12 @@ func runTruthSentinel(cmd *cobra.Command, args []string) error {
 		// 4. Create Service
 		svc := qa.NewAuditorService(wal, proc.Storage(), signer, emitter, engine, gate)
 
-		once, _ := cmd.Flags().GetBool(truthSentinelFlagOnce)
-		ids, _ := cmd.Flags().GetStringSlice(truthSentinelFlagIDs)
+		var flags clipkg.FlagBag
+		once := flags.Bool(cmd, truthSentinelFlagOnce)
+		ids := flags.StringArray(cmd, truthSentinelFlagIDs)
+		if err := flags.Err(); err != nil {
+			return err
+		}
 		if once {
 			if len(ids) == 0 {
 				return errors.New(truthSentinelErrOnceNeedsIDs)

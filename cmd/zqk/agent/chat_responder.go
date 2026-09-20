@@ -5,13 +5,13 @@ import (
 	"encoding/json"
 	"fmt"
 	"hash/fnv"
-	"path/filepath"
 	"strings"
 	"time"
 
 	"github.com/spf13/cobra"
 
 	"github.com/zqk-os/zqk/internal/cli"
+	"github.com/zqk-os/zqk/pkg/adapters/antigravity"
 	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/errfmt"
@@ -38,11 +38,11 @@ func runChatResponder(cmd *cobra.Command, args []string, proc *cli.Processor) er
 		return nil
 	}
 
-	// Extract conversation ID from transcript path to maintain per-conversation state
 	convID := "DEFAULT"
-	brainDir := filepath.Dir(filepath.Dir(filepath.Dir(transcriptPath)))
-	if base := filepath.Base(brainDir); base != "" && base != "." {
-		convID = base
+	if root, err := antigravity.ConversationRootFromTranscript(transcriptPath); err == nil {
+		if id := antigravity.ConversationID(root); id != "" {
+			convID = id
+		}
 	}
 
 	// Hash the convID into a uint32 to match the ZQK-\d+ pattern

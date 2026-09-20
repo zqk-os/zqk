@@ -37,6 +37,10 @@ flags:
     type: "string"
     default: "30m"
     description: "Threshold duration for orphaned temp files (e.g. 30m, 2h)"
+  - name: "project-root"
+    type: "string"
+    default: ""
+    description: "Project root directory"
 
 help:
   examples:

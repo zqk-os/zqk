@@ -43,10 +43,10 @@ func NewCheckCmd() *cobra.Command {
 		"  - Avoid short timeouts (e.g., 30s, 60s) for 'check all --auto-fix' – they",
 		"    almost always time out during CAS cleanup and validation.",
 	).
-		AddExample("Check a specific object (by ID)", "%s system check BLI-626").
+		AddExample("Check a specific object (by ID)", "%s system check BLI-001").
 		AddExample("Check all objects of a kind", "%s system check backlog_item").
 		AddExample("Check all objects in the system", "%s system check all").
-		AddExample("Check with verbose output", "%s system check BLI-626 --verbose").
+		AddExample("Check with verbose output", "%s system check BLI-001 --verbose").
 		AddExample("Check with JSON output", "%s system check all --format json").
 		AddExample("Partial check (refs skipped; not authoritative)", "%s system check all --fast").
 		AddExample("Fast iteration: write failing IDs then re-check only those", "%s system check all --write-failing-ids tier1.txt --fast; %s system check --ids-from-file tier1.txt --fast").

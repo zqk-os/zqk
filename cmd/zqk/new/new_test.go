@@ -3,7 +3,6 @@ package newcmd
 import (
 	"bytes"
 	"context"
-	"os"
 	"path/filepath"
 	"strings"
 	"testing"

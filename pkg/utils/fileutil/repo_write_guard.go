@@ -56,7 +56,7 @@ func guardRepoMutation(path string) {
 	if !inTest {
 		return
 	}
-	testRoot := zqkenv.Get(zqkenv.TestRoot().Name()).Val
+	testRoot := zqkenv.TestRoot().Get()
 	if err := ValidateNoRepoStateMutation(path, repo, testRoot); err != nil {
 		// TRACK: [Fatal safety violation]
 		panic(err)

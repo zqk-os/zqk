@@ -932,11 +932,11 @@ func agentPromptStageCommit(pctx *pipeline.Context, payload any) (any, error) {
 		if adapter != nil {
 			err := adapter.Deliver(context.Background(), p.markdown, fmt.Sprintf("msg-%d", time.Now().UnixNano()), nil) // Background: request-or-shutdown derived
 			if err != nil {
-				return nil, errfmt.Newf("native agent delivery").Wrap(err)
+				return nil, errfmt.Newf("%s vendor message delivery", adapter.Vendor()).Wrap(err)
 			}
+			p.footer = fmt.Sprintf("\n\n(Delivered via %s vendor adapter)\n", adapter.Vendor())
 		}
 		pctx.Outcome[outcomeAgentPromptDeliverMode] = agentPromptDeliverPasteIDE
-		p.footer = "\n\n(Delivered via Native JSON Bindings - no focus stolen)\n"
 	case p.copyClip:
 		if err := copyAgentPromptToClipboard(p.markdown); err != nil {
 			return nil, errfmt.Newf("copy to clipboard").Wrap(err)

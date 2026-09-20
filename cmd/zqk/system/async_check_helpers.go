@@ -1130,7 +1130,7 @@ func enqueueFilesAsDiscovered(checkCtx *AsyncCheckContext, filesStream <-chan []
 	}
 
 	// Enqueue deferred (wrong-directory) items only when this path matches the ID's kind.
-	// Skip wrong-kind entries (e.g. ACC-1785920548450214012-68b850c0 from requirements/, BAS-* as file_lock_metric);
+	// Skip wrong-kind entries (e.g. an account object discovered under requirements/, BAS-* as file_lock_metric);
 	// the correct path was already enqueued in the first pass, so skipping avoids duplicate
 	// tasks and validation against the wrong spec (which can hang or fail).
 	for objectID, file := range pendingByID {

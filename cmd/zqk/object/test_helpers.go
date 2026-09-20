@@ -42,6 +42,12 @@ func prewarmGlobalsOnce(projectRoot string) {
 
 func getSharedCLIBinary(t *testing.T, projectRoot string) string {
 	sharedCLIOnce.Do(func() {
+		if envBin := os.Getenv("ZQK_SHARED_TEST_BIN"); envBin != "" {
+			if _, err := os.Stat(envBin); err == nil {
+				sharedCLIBinary = envBin
+				return
+			}
+		}
 		tmpBinDir, err := fileutil.MkdirTemp("", "zqk-shared-bin-*")
 		if err != nil {
 			sharedCLIBuildErr = fmt.Errorf("failed to create global temp dir: %w", err)
@@ -49,8 +55,8 @@ func getSharedCLIBinary(t *testing.T, projectRoot string) string {
 		}
 		sharedCLIBinary = filepath.Join(tmpBinDir, "zqk-admin")
 		buildCmd := execwrap.Command("go", "build", "-o", sharedCLIBinary, "./cmd/zqk")
-		zqkenv.WireExecForIsolatedProject(buildCmd, projectRoot)
-		// buildCmd.Env = os.Environ() removed to preserve WireExecForIsolatedProject env
+		buildCmd.Dir = projectRoot
+		buildCmd.Env = os.Environ()
 		output, err := buildCmd.CombinedOutput()
 		if err != nil {
 			sharedCLIBuildErr = fmt.Errorf("failed to build CLI: %v\n%s", err, string(output))

@@ -83,13 +83,15 @@ if git -C "$ROOT" grep -n -E 'TRACK:.*(BLI|REQ|CRIT|PRI|TDE|ATK|CAP|CVS)-' -- \
 	fail "studio TRACK comment with kernel object id remains in cmd or scripts"
 fi
 
-# Studio CAS nanos-hex instance ids belong in kernel CAS, not production cmd/.
-# Tests may still mint synthetic ids; this gate is production sources only.
-if git -C "$ROOT" grep -n -E '(BLI|REQ|CRIT|PRI|TDE|ATK|CVS|GLS)-[0-9]{15,}-[0-9a-fA-F]{8}' -- \
+# Studio CAS nanos-hex instance ids belong in kernel CAS, not production cmd/,
+# command DNA, or generated builders. Tests may still mint synthetic ids.
+if git -C "$ROOT" grep -n -E '[A-Z]{2,12}-[0-9]{15,}-[0-9a-fA-F]{8}' -- \
 	'cmd' \
+	'.zqk/cli/specs' \
+	'pkg/cli/bldr_cli_cmd_v1' \
 	':!*_test.go' \
 	':!scripts/open-core/check-public-release-payload.sh'; then
-	fail "studio nanos-hex kernel object id remains in production cmd"
+	fail "studio nanos-hex kernel object id remains in production cmd, CLI specs, or command builders"
 fi
 
 # CEF program ids are studio-only; keep them out of shipped cmd/scripts (not tests).

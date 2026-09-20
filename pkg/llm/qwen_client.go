@@ -33,7 +33,7 @@ func NewQwenClient(ctx context.Context, config *Config) *OpenAIClient {
 		config.EmbedModel = "text-embedding-v3"
 	}
 	if config.ContextWindowSize == 0 {
-		config.ContextWindowSize = zqkenv.Get(zqkenv.LLMContextWindowSize().Name()).IntOrDefault(32768)
+		config.ContextWindowSize = zqkenv.LLMContextWindowSize().IntOrDefault(32768)
 	}
 
 	// Fallback to ZQK_QWEN_API_KEY if specific key is desired over generic LLM_API_KEY

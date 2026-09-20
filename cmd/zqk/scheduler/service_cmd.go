@@ -41,7 +41,7 @@ func NewServiceCmd() *cobra.Command {
 }
 
 func requireSchedulerServiceControl(cmd *cobra.Command) error {
-	// Privilege: host unit install/enable/start/stop require system account (keystore / ACC-1785920548450214012-68b850c0).
+	// Privilege: host unit install/enable/start/stop require the system account.
 	if sec := pkgctx.GetSecurityContext(cmd.Context()); sec != nil && sec.AccountID == pkgctx.SystemAccountID {
 		return nil
 	}

@@ -5,7 +5,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
 )
 
-// NewWstransCmd creates the workstream transition command group (BLI-807).
+// NewWstransCmd creates the workstream transition command group.
 // Uses generated builder from .zqk/cli/specs/object/wstrans_command.yaml; subcommands add RunE and query flags.
 func NewWstransCmd() *cobra.Command {
 	cmd := bldr_cli_cmd_v1.NewObjectWstransCommandBuilder()

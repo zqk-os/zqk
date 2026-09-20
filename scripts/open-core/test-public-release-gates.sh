@@ -103,7 +103,7 @@ if sh "$HEX_REPO/scripts/open-core/check-public-release-payload.sh" "$HEX_REPO" 
 	printf '%s\n' "payload gate accepted nanos-hex kernel id in production cmd" >&2
 	exit 1
 fi
-grep -F 'studio nanos-hex kernel object id remains in production cmd' "$HEX_REPO/result.log" >/dev/null
+grep -F 'studio nanos-hex kernel object id remains in production cmd, CLI specs, or command builders' "$HEX_REPO/result.log" >/dev/null
 
 if [ "$MODE" = "payload-only" ]; then
 	printf '%s\n' "PUBLIC PAYLOAD GATES: PASS"
@@ -118,6 +118,7 @@ fi
 	# 1. Build entire project (all packages across cmd and pkg)
 	CGO_ENABLED=0 go build -buildvcs=false ./...
 	CGO_ENABLED=0 go build -buildvcs=false -o "$TMP_BIN" ./cmd/zqk
+	export ZQK_SHARED_TEST_BIN="$TMP_BIN"
 	"$TMP_BIN" --help >/dev/null
 	"$TMP_BIN" system --help >/dev/null
 	"$TMP_BIN" test dashboard --help >/dev/null

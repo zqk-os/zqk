@@ -14,7 +14,7 @@ func NewOntologyCmd() *cobra.Command {
 		"",
 		"The ontology command group provides tools for:",
 		"- Importing RDF/OWL (Turtle, RDF/XML, JSON-LD)",
-		"- Translation to zqk domain ontology (BLI-764)",
+		"- Translation to the kernel domain ontology",
 	).
 		ExcludeCommonFlags()
 

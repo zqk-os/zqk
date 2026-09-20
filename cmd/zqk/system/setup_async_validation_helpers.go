@@ -465,7 +465,7 @@ func createAsyncValidationFunc(asyncCtx *AsyncValidationContext) validation.Vali
 			}, nil
 		}
 
-		// When inferKindFromID returned empty (e.g. ACC-1785920548450214017-87f10a62, MCP-*), use kind from file content
+		// When inferKindFromID returned empty (e.g. MCP-*), use kind from file content
 		if effectiveKind == emptyValue && obj.Kind != emptyValue {
 			objectKind = obj.Kind
 		}

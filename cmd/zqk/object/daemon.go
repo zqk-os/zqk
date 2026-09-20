@@ -60,8 +60,7 @@ func NewDaemonCmd() *cobra.Command {
 				return errfmt.Errorf("failed to mark process as privileged writer daemon: %w", err)
 			}
 			// Privileged writer daemon must run under the system service account
-			// (ACC-1785920548450214012-68b850c0) so it does not inherit ambient
-			// unprivileged sessions from the workspace.
+			// so it does not inherit ambient unprivileged sessions from the workspace.
 			if os.Getenv(zqkenv.APIKey().Name()) == "" {
 				_ = zqkenv.APIKey().Set(pkgctx.SystemAccountID)
 			}

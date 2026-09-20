@@ -229,7 +229,7 @@ func (s *SecurityContext) GetLLMBaseURL(provider string) string {
 			return u
 		}
 	}
-	if u := zqkenv.Get(zqkenv.LLMBaseURL().Name()).OrDefault(""); u != "" {
+	if u := zqkenv.LLMBaseURL().Get(); u != "" {
 		return u
 	}
 	if u := zqkenv.Get("LLM_BASE_URL").OrDefault(""); u != "" {

@@ -55,7 +55,7 @@ const (
 	initLogFieldPath                        = "path"
 )
 
-// runInit handles all three init scenarios plus optional discovery wizard (BLI-770), optional maintenance jobs, and optional onboarding roadmap job.
+// runInit handles all three init scenarios plus optional discovery wizard, optional maintenance jobs, and optional onboarding roadmap job.
 func runInit(_ *cobra.Command, projectName, template string, force bool, snapshotPath, answerFilePath string, legacy, merge, wipe, discover, withMaintenanceJobs, withOnboardingRoadmap, simple, advanced bool, importOntology string) error {
 	logger := logging.GetLoggerFromProfile(systemProfileHuman)
 
@@ -198,7 +198,7 @@ func runInit(_ *cobra.Command, projectName, template string, force bool, snapsho
 		}
 	}
 
-	// After init, run discovery wizard if requested (BLI-770)
+	// After init, run discovery wizard if requested
 	if discover {
 		if legacy {
 			if err := runLegacyDiscoverWizard(projectRoot, logger); err != nil {
@@ -286,7 +286,7 @@ func runInit(_ *cobra.Command, projectName, template string, force bool, snapsho
 
 // determineProjectRoot determines project root from environment variables or auto-discovery.
 // Greenfield init anchors to CWD when neither ZQK_PROJECT_ROOT nor ZQK_TEST_ROOT is set,
-// preventing upward directory discovery from walking into parent/HOME .zqk markers (TDE-71e3706a).
+// preventing upward directory discovery from walking into parent/HOME .zqk markers.
 func determineProjectRoot() string {
 	// Check ZQK_PROJECT_ROOT first (explicit override)
 	if root := zqkenv.ProjectRoot().Get(); root != emptyValue {
@@ -372,7 +372,7 @@ func runGreenfieldInit(projectRoot, projectName, template string, force bool, lo
 		logging.Fluent(logger).Warn("Failed to write root isolation files").WithError(err).Log()
 	}
 
-	// Persist bundled object_spec rows from .zqk/specs/objects (REQ-035 / CRIT-9035).
+	// Persist bundled object_spec rows from .zqk/specs/objects.
 	if _, err := migration.EnsureBundledObjectSpecsMigrated(context.Background(), projectRoot, logger); err != nil {
 		logging.Fluent(logger).Warn("Bundled object_spec migration did not complete").
 			WithError(err).
@@ -916,8 +916,8 @@ func promptWizard(reader *bufio.Reader, out *fileutil.File, promptText, defaultV
 	return input
 }
 
-// runDiscoverWizard discovers existing object files under .zqk/process and reports counts per kind (BLI-770).
-// runInteractiveWizard runs the interactive Project Discovery Wizard (BLI-770).
+// runDiscoverWizard discovers existing object files under .zqk/process and reports counts per kind.
+// runInteractiveWizard runs the interactive Project Discovery Wizard.
 func runInteractiveWizard(projectRoot string, logger logging.Logger) error {
 	reader := bufio.NewReader(os.Stdin)
 	out := os.Stdout

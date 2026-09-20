@@ -10,17 +10,17 @@ func TestApplyIsolatedStorageEnv_RequiresTestRootForFallthrough(t *testing.T) {
 	t.Setenv(PrivilegedWriterSocket().Name(), "")
 
 	ApplyIsolatedStorageEnv(t.Setenv)
-	if v := Get(TestAllowCASFallthrough().Name()).Val; v == enabledFlagValue {
+	if v := TestAllowCASFallthrough().Get(); v == enabledFlagValue {
 		t.Fatalf("fallthrough must stay off when TEST_ROOT is empty; got %q", v)
 	}
-	if v := Get(PrivilegedWriterSocket().Name()).Val; v == "" {
+	if v := PrivilegedWriterSocket().Get(); v == "" {
 		t.Fatal("expected privileged-writer socket override when isolation env applied")
 	}
 
 	t.Setenv(TestRoot().Name(), t.TempDir())
 	t.Setenv(TestAllowCASFallthrough().Name(), "")
 	ApplyIsolatedStorageEnv(t.Setenv)
-	if v := Get(TestAllowCASFallthrough().Name()).Val; v != enabledFlagValue {
+	if v := TestAllowCASFallthrough().Get(); v != enabledFlagValue {
 		t.Fatalf("fallthrough must enable when TEST_ROOT is set; got %q", v)
 	}
 }

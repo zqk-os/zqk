@@ -29,13 +29,13 @@ Usage patterns:
     almost always time out during CAS cleanup and validation.
 
   Check a specific object (by ID)
-  zqk.test system check BLI-626
+  zqk.test system check BLI-001
   Check all objects of a kind
   zqk.test system check backlog_item
   Check all objects in the system
   zqk.test system check all
   Check with verbose output
-  zqk.test system check BLI-626 --verbose
+  zqk.test system check BLI-001 --verbose
   Check with JSON output
   zqk.test system check all --format json
   Partial check (refs skipped; not authoritative)

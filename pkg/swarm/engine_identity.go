@@ -24,7 +24,7 @@ func (e *Engine) resolvedSessionID(ctx context.Context) string {
 	if id := zqksession.GetIDFromContext(ctx); id != "" {
 		return id
 	}
-	return strings.TrimSpace(zqkenv.Get(zqkenv.SessionID().Name()).Val)
+	return strings.TrimSpace(zqkenv.SessionID().Get())
 }
 
 func (e *Engine) correlationFields(ctx context.Context) []logging.Field {

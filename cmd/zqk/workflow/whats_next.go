@@ -61,7 +61,7 @@ type whatsNextOut struct {
 	MaterializedViewDegradedReason string                    `json:"materialized_view_degraded_reason,omitempty"`
 }
 
-// whatsNextGuidingStep is compiled hunger (POL-AGENT-INTERACTION-POLICY-001).
+// whatsNextGuidingStep is compiled hunger from the interaction policy.
 type whatsNextGuidingStep struct {
 	Event       string `json:"event"`
 	PolicyID    string `json:"policy_id"`

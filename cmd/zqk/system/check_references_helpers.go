@@ -183,7 +183,7 @@ func validateReferenceWithCache(refCtx *ReferenceCheckContext, refID, fieldName 
 		}
 	}
 
-	// Fast path: well-known account refs (e.g. ACC-1785920548450214012-68b850c0) are always valid; skip cache/storage lookup
+	// Fast path: well-known account refs are always valid; skip cache/storage lookup
 	// to avoid slow Exists() that can cause audit_event validation to timeout.
 	if refKind == objects.KindAccount && (wellKnownAccountRefs[lookupRef] || wellKnownAccountRefs[refID]) {
 		return nil

@@ -377,12 +377,14 @@ func runOrchestrate(cmd *cobra.Command, planArg string, opts OrchestrateOptions)
 				if skillEnforcement == nil || len(skillEnforcement.RelevantSkills) == 0 {
 					broker := meshbroker.NewSkillBroker(state.sp, nil, state.proc.ProjectRoot())
 					if subAgent == "coder_agent" {
-						remoteSkill, err := broker.EnsureSkill(workerCtx, "AGE-1779674769908710000-5bb40a93")
-						if err == nil {
-							meshSkillSection = fmt.Sprintf("\n## Leased Mesh Capability\n- Skill: %s\n- Provider: %s\n- Token: %s\n- Status: %s\n",
-								"Go AST Expert", remoteSkill.Provider, remoteSkill.Token, "Authenticated")
-							if remoteSkill.Endpoint != "" {
-								agentDeliverer = &agentdelivery.TDEEnforcer{Next: agentdelivery.NewMCPDeliverer(sharedMCPTransport, remoteSkill.Endpoint, "zqk_agent_process_prompt")}
+						if skillID := localSkillIDByTitle(workerCtx, state.sp, state.secCtx, "Go AST Expert"); skillID != "" {
+							remoteSkill, err := broker.EnsureSkill(workerCtx, skillID)
+							if err == nil {
+								meshSkillSection = fmt.Sprintf("\n## Leased Mesh Capability\n- Skill: %s\n- Provider: %s\n- Token: %s\n- Status: %s\n",
+									"Go AST Expert", remoteSkill.Provider, remoteSkill.Token, "Authenticated")
+								if remoteSkill.Endpoint != "" {
+									agentDeliverer = &agentdelivery.TDEEnforcer{Next: agentdelivery.NewMCPDeliverer(sharedMCPTransport, remoteSkill.Endpoint, "zqk_agent_process_prompt")}
+								}
 							}
 						}
 					}
@@ -978,4 +980,24 @@ func runOrchestrate(cmd *cobra.Command, planArg string, opts OrchestrateOptions)
 
 	_, err = pl.Run(pctx, initialState)
 	return err
+}
+
+func localSkillIDByTitle(ctx context.Context, sp storage.ObjectStorageProvider, secCtx *pkgctx.SecurityContext, title string) string {
+	if sp == nil || strings.TrimSpace(title) == "" {
+		return ""
+	}
+	listed, err := sp.List(ctx, secCtx, nil, storage.ListFilter{Kind: objects.KindAgentSkill})
+	if err != nil || listed == nil {
+		return ""
+	}
+	want := strings.ToLower(strings.TrimSpace(title))
+	for _, obj := range listed.Objects {
+		got, _ := obj[objects.FieldKeyTitle].(string)
+		if strings.ToLower(strings.TrimSpace(got)) != want {
+			continue
+		}
+		id, _ := obj[objects.FieldKeyID].(string)
+		return strings.TrimSpace(id)
+	}
+	return ""
 }

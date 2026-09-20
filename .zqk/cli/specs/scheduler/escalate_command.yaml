@@ -2,3 +2,44 @@ $schema: ../schemas/command_spec.schema.json
 name: escalate
 short: Diagnostic verification and testing of Slack webhook and inbox escalations
 description: Verify configuration and dispatch diagnostic escalation alerts across Slack webhook and human inbox notification channels.
+
+args:
+  type: exact
+  count: 0
+
+flags:
+  - name: test
+    type: bool
+    default: false
+    description: Dispatch a diagnostic test alert to active escalation channels
+  - name: dry-run
+    type: bool
+    default: false
+    description: Inspect and validate escalation channels without sending alerts
+  - name: severity
+    type: string
+    default: warning
+    description: Escalation severity (warning, critical)
+  - name: title
+    type: string
+    default: Diagnostic Escalation Test
+    description: Alert title
+  - name: issue
+    type: stringSlice
+    default: []
+    description: Issue descriptions to include
+  - name: suggested-action
+    type: stringSlice
+    default: []
+    description: Suggested actions to include
+  - name: slack-only
+    type: bool
+    default: false
+    description: Dispatch only to Slack webhook channel
+  - name: inbox-only
+    type: bool
+    default: false
+    description: Dispatch only to human inbox channel
+
+run_e: runEscalate
+common_flags: true
