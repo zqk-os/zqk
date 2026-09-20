@@ -77,6 +77,11 @@ func StateDirPath(projectRoot string) string {
 	return ResolvePathFromCacheOrConstant(projectRoot, "state", fallback)
 }
 
+// SessionStateRel is the project-relative session file (brand data dir / state / session).
+func SessionStateRel() string {
+	return filepath.ToSlash(filepath.Join(ProjectDataDir, StateDir, SessionStateFile))
+}
+
 // ObserverTipsPath returns the AST observer coach cache file under state/.
 func ObserverTipsPath(projectRoot string) string {
 	return filepath.Join(StateDirPath(projectRoot), ObserverTipsFile)

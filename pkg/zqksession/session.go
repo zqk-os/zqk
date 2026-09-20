@@ -34,7 +34,6 @@ const (
 	StatusError            = "error"
 	ExecutorTypeAgentX     = "agentx"
 
-	sessionStateFile     = "session"
 	sessionLockFile      = "session.lock"
 	lastSessionTouchFile = "last_session_touch"
 	zqkSessionPrefix     = "ZQK"
@@ -245,7 +244,7 @@ func sessionStateDir(projectRoot string) string {
 }
 
 func sessionStatePath(projectRoot string) string {
-	return filepath.Join(sessionStateDir(projectRoot), sessionStateFile)
+	return filepath.Join(sessionStateDir(projectRoot), paths.SessionStateFile)
 }
 
 func sessionLockPath(projectRoot string) string {

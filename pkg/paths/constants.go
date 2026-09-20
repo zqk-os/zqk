@@ -72,9 +72,13 @@ const (
 	// MeshStateSubdir holds local mesh runtime state under ProjectDataDir/state/ (peer seats, peer-ack awaits).
 	MeshStateSubdir = "mesh"
 	// SwarmInitSubdir holds swarm-init run artifacts under MeshStateSubdir (date-bucketed).
-	SwarmInitSubdir       = "swarm_init"
-	MetricsDir            = "metrics"
-	StateDir              = "state"
+	SwarmInitSubdir = "swarm_init"
+	MetricsDir      = "metrics"
+	StateDir        = "state"
+	// SessionStateFile is the persisted CLI session id under StateDir.
+	SessionStateFile = "session"
+	// CredentialsFile is the home-dir session token filename under ProjectDataDir.
+	CredentialsFile       = "credentials"
 	StreamCurrentSubdir   = "stream_current" // Runtime deltas for stream-backed kinds (no CAS hash); see HIGH_VOLUME_STORAGE_DEPRECATION.md
 	CallbackDir           = "callback-logs"
 	MigrationSnapshotsDir = "migration-snapshots"

@@ -5,6 +5,7 @@ package app
 
 import (
 	"context"
+	"fmt"
 	"path/filepath"
 
 	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
@@ -27,7 +28,7 @@ func NewAuthCmd() *cobra.Command {
 		"Session and authentication",
 		"Login and logout for CLI session lifecycle.",
 		"",
-		"Session ID can be stored in ZQK_SESSION_ID (env) or in .zqk/state/session (file).",
+		fmt.Sprintf("Session ID can be stored in %s (env) or in %s (file).", zqkenv.SessionID().Name(), paths.SessionStateRel()),
 		"Multiple terminals share the same session via the file; a file lock ensures consistency.",
 		"Use 'auth login' to create or reuse a session; use 'auth logout' to end it.",
 	).
@@ -48,7 +49,7 @@ func NewLoginCmd() *cobra.Command {
 	loginCmd := clipkg.ApplyBuilder(bldr_cli_cmd_v1.NewAppLoginCommandBuilder(), &cobra.Command{
 		Use:   "login",
 		Short: "Create or reuse a CLI session (persisted for multiple terminals)",
-		Long:  "Creates a new session or reuses the current one if still active. Session is written to .zqk/state/session (under lock) so other terminals can reuse it. Optionally set ZQK_SESSION_ID in your shell to tie the session to this process tree.",
+		Long:  fmt.Sprintf("Creates a new session or reuses the current one if still active. Session is written to %s (under lock) so other terminals can reuse it. Optionally set %s in your shell to tie the session to this process tree.", paths.SessionStateRel(), zqkenv.SessionID().Name()),
 	})
 	cli.RequireSession(loginCmd, false) // login owns create/reuse; root must not start session
 	cli.BindAsyncProgress(loginCmd, runLogin)
@@ -59,7 +60,7 @@ func NewLoginCmd() *cobra.Command {
 func runLogin(cmd *cobra.Command, _ []string) error {
 	projectRoot := cli.ResolveProjectRoot(".")
 	if projectRoot == EmptyValue {
-		return errfmt.Errorf("project root not found (run from project dir or set ZQK_PROJECT_ROOT)")
+		return errfmt.Errorf("project root not found (run from project dir or set %s)", zqkenv.ProjectRoot().Name())
 	}
 	sp, err := cli.GetObjectStorageForCommand(cmd, projectRoot)
 	if err != nil || sp == nil {
@@ -97,12 +98,12 @@ func runLogin(cmd *cobra.Command, _ []string) error {
 			Log()
 	}
 
-	// Persist the token to ~/.zqk/credentials
+	// Persist the token to ~/<brand-data-dir>/credentials
 	home, err := fileutil.UserHomeDir()
 	if err == nil {
 		credDir := filepath.Join(home, paths.ProjectDataDir)
 		_ = fileutil.MkdirAll(credDir, paths.DirPerm700)
-		credPath := filepath.Join(credDir, "credentials")
+		credPath := filepath.Join(credDir, paths.CredentialsFile)
 		_ = fileutil.WriteSecureFile(credPath, []byte(sessionID))
 	}
 
@@ -116,7 +117,7 @@ func NewLogoutCmd() *cobra.Command {
 	logoutCmd := clipkg.ApplyBuilder(bldr_cli_cmd_v1.NewAppLogoutCommandBuilder(), &cobra.Command{
 		Use:   "logout",
 		Short: "End the current CLI session and clear persisted state",
-		Long:  "Ends the current session (status set to completed), removes .zqk/state/session, and optionally unset ZQK_SESSION_ID in your shell.",
+		Long:  fmt.Sprintf("Ends the current session (status set to completed), removes %s, and optionally unset %s in your shell.", paths.SessionStateRel(), zqkenv.SessionID().Name()),
 	})
 	cli.RequireSession(logoutCmd, false) // logout ends session; root must not start/reuse
 	cli.BindAsyncProgress(logoutCmd, runLogout)
