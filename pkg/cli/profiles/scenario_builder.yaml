@@ -1,0 +1,15 @@
+schema_version: "1.0.0"
+namespace_id: "zqk:kernel:cli"
+name: "scenario_builder"
+extends: "human"
+description: |
+  Scenario builder profile with Info-level logging for progress visibility.
+  Extends human profile but overrides logging level to show info messages.
+spec:
+  flags:
+    format: table
+  format: table
+  quiet: false
+  verbose: false
+  logging:
+    level: info

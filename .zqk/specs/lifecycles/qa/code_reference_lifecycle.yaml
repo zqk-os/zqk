@@ -1,0 +1,83 @@
+$schema: ../../../.zqk/cli/specs/schemas/lifecycle_spec.schema.json
+object_type: code_reference
+statuses:
+  - value: conceptual
+    display: Conceptual
+    origin: true
+    preliminary: true
+    description: Draft plane status. Prior to CAS membrane crossing.
+    role: realign
+  - value: originated
+    display: Originated
+    description: CAS membrane crossed. Code reference officially originated.
+    role: realign
+  - value: active
+    display: Active
+    role: execution_locked
+    description: Code reference is actively linked to ongoing work.
+  - value: verified
+    display: Verified
+    role: realign
+    satisfied: true
+    description: Code reference has been verified against working code and test suites.
+  - value: complete
+    display: Complete
+    terminal: true
+    satisfied: true
+    role: terminal
+    description: Code reference merged to trunk and fully delivered.
+  - value: archived
+    display: Archived
+    terminal: true
+    archive: true
+    role: terminal
+    description: Code reference retained for audit and lineage tracking.
+transitions:
+  - from: conceptual
+    to: originated
+    description: Promote from draft plane to CAS membrane.
+    manual: true
+    auto: false
+    catalyst: System promotion
+  - from: originated
+    to: active
+    description: Initial link to active implementation work.
+    manual: true
+    auto: true
+    catalyst: System initialization
+  - from: active
+    to: verified
+    description: Verification that code references valid files and passes tests.
+    manual: true
+    auto: true
+    postconditions:
+      - role is realign
+    catalyst: Verification suite pass
+  - from: verified
+    to: complete
+    description: Final delivery and trunk merge.
+    manual: true
+    auto: false
+    postconditions:
+      - role is terminal
+    catalyst: Merge to trunk
+  - from: '*'
+    to: archived
+    description: Archive code reference for audit retention.
+    manual: true
+    auto: false
+    shockwave:
+      mode: cluster
+      fail: closed
+    postconditions:
+      - role is terminal
+    catalyst: Standard progression
+percent_complete:
+  method: status_defaults
+  default_by_status:
+    conceptual: 0
+    originated: 10
+    active: 50
+    verified: 90
+    complete: 100
+    archived: 100

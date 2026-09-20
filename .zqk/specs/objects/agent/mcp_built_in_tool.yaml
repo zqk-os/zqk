@@ -1,0 +1,71 @@
+schema_version: 2.0.0
+ontology: mcp_built_in_tool
+extends: base_object
+visibility: internal
+storage_profile: cas_entity
+id_prefixes:
+  - MCPTOOL-
+description: |
+  Catalog entry for a built-in MCP tool (draft → proposed → under_review → active).
+  Lifecycle: mcp_built_in_tool_lifecycle.yaml.
+  TRACK: BLI-CEF-R26-REMAINING-KINDS-001 — was a census lifecycle_orphan (YAML without a spec).
+fields:
+  id:
+    checklist:
+      authority: system
+      automation_hooks: minted on create
+      cardinality: one
+      criticality: composition
+      default: required
+      dependencies: id_prefixes_config MCPTOOL-
+      lifecycle: immutable
+      observability: "yes"
+      purpose: Stable identifier for a built-in MCP tool catalog entry
+      security: non-sensitive
+      system_usage:
+        - storage lookup
+        - MCP catalog
+      validation: Must match MCPTOOL- prefix
+    field_profile_code: MCPTOOL-000
+    permissions: r-x
+    semantic_type: identifier
+    traits:
+      - readable
+      - filterable
+      - sortable
+    type: string
+    validation:
+      pattern: ^MCPTOOL-
+      required: true
+  name:
+    checklist:
+      authority: operator
+      automation_hooks: used by MCP loaders to bind the catalog entry to a tool
+      cardinality: one
+      criticality: composition
+      default: required
+      dependencies: MCP runtime registration
+      lifecycle: immutable
+      observability: "yes"
+      purpose: Stable tool name as advertised on the MCP membrane
+      security: non-sensitive
+      system_usage:
+        - MCP tool dispatch
+        - catalog lookup
+      validation: Lowercase identifier
+    field_profile_code: MCPTOOL-001
+    permissions: rwx
+    semantic_type: identifier
+    traits:
+      - readable
+      - writable
+      - filterable
+    type: string
+    validation:
+      pattern: ^[a-z][a-z0-9_]*$
+      required: true
+
+created_at: 2026-08-29T00:00:00Z
+updated_at: 2026-08-29T00:00:00Z
+created_by: ACC-1785920548450214012-68b850c0
+updated_by: ACC-1785920548450214012-68b850c0

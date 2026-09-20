@@ -1,0 +1,31 @@
+created_at: "2026-09-19T06:10:00Z"
+created_by: ACC-1785920548450214012-68b850c0
+description: |-
+    Establish an authoritative, ergonomic, and cleanly compartmentalized CLI command taxonomy across the ZQK ecosystem.
+
+    Ground Rules & Architectural Standards:
+    1. 100% Spec Mandatory: No command exists without an authoritative, valid command spec in .zqk/cli/specs/. Un-specced commands are treated as build-breaking defects.
+    2. Strict Domain Grouping: Commands must live under intuitive functional umbrellas:
+       - Job Management (zqk job ...): config, activity, skip-window, events, listing, state.
+       - Services Management (zqk service ...): background daemon lifecycles, MCP servers (serve, stop-serve, supervise).
+       - Convergence Management (zqk convergence ...): orchestration, CVS session recording, convergence loops.
+       - Agent & Swarm (zqk agent ...): unified agent orchestration, event subscriptions, and real-time dashboard views.
+       - Metrics & Feedback (zqk metrics ...): ambient wave rollups, telemetry diagnostics, and I/O status reports.
+       - Code & Build (zqk build / zqk ci): verification, linting, packaging, and compilation.
+    3. Strict Vendor Isolation: Vendor-specific functionality (e.g. Cursor IDE adapters, AppleScript paste commands) must never pollute core scheduler or kernel commands; they must be encapsulated behind a pluggable vendor adapter namespace (zqk vendor cursor ...).
+    4. Immediate Deprecation & Purge: Dead code, legacy prototypes (pkg/cliexamples), and obsolete commands (app use, pplan add/remove/next/prev) must be actively purged to eliminate cognitive load and attack surface.
+    5. Information Architecture & Documentation Hygiene: Governed by the Information Architecture and Technical Documentarian personas to maintain SSOT, clean directory layouts (_schemas, spec under object), and zero-drift documentation.
+id: GOAL-CLI-TAXONOMY-CANONICAL-001
+kind: goal
+metric: 100% command spec coverage and zero deprecated commands
+namespace_id: zqk:kernel
+percent_complete: 100
+schema_version: 2.0.0
+status: active
+target: 100%
+title: Canonical CLI Command Taxonomy, Spec Completeness, and Ergonomic Governance
+updated_at: "2026-09-20T01:26:44Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs:
+    - WS-CLI-TAXONOMY-OVERHAUL

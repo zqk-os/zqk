@@ -1,0 +1,41 @@
+$schema: "../schemas/command_spec.schema.json"
+
+name: "trigger <job-id>"
+short: "Manually trigger a scheduler job"
+description: |
+  Manually trigger execution of a scheduler job by ID.
+  
+  This allows you to run a job immediately, regardless of its trigger_type.
+  The job must be enabled and support manual triggering.
+
+  Use --pre-commit for pre-commit category jobs (lint, policy, integrity). When set,
+  the job's callback_on_completion runs after the job finishes (writes pre-commit
+  category and runs aggregate) so the hook sees results. Timer runs do not run callbacks.
+
+args:
+  type: "exact"
+  count: 1
+
+flags:
+  - name: "pre-commit"
+    type: "bool"
+    default: false
+    description: "Run with pre-commit origin so the job's callback_on_completion runs (writes pre-commit category and aggregate)"
+
+help:
+  examples:
+    - comment: "Trigger a job immediately"
+      command: "%s scheduler trigger SCH-001"
+    - comment: "Trigger pre-commit lint job so callback runs and hook sees result"
+      command: "%s scheduler trigger SCH-pre-commit-lint --pre-commit"
+  exclude_flags:
+    - "format"
+    - "output"
+    - "verbose"
+    - "quiet"
+    - "timeout"
+    - "columns"
+
+run_e: "runTrigger"
+async: true
+common_flags: true

@@ -1,0 +1,22 @@
+kind: policy
+schema_version: "2.0.0"
+title: Atomic Work Claiming and Swarm Concurrency
+status: active
+category: agent_guidance
+policy_type: requirement
+body: |
+  To prevent duplicate work and race conditions across multi-agent swarms, all tasks
+  must be explicitly claimed before execution.
+
+  **Requirements**
+  - Verify task availability before claiming (`zqk object get <ID>`).
+  - Transition the backlog item from `planned` to `in_progress` with an associated agent persona/account.
+  - Do not work on tasks assigned to peer swarm members unless an explicit handoff or reassignment occurs.
+  - Release or transition claimed tasks promptly upon completion or blockage.
+
+  **Why**: Autonomous swarms coordinate effectively only when object ownership is atomic and visible across the graph.
+effective_date: "2026-09-14"
+enforcement:
+  automated: true
+  reminder_enabled: true
+  severity: high

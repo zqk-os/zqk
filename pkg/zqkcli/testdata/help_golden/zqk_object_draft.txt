@@ -1,0 +1,32 @@
+Operate on lifecycle-preliminary objects parked under .zqk/object_drafts/
+
+(not visible to object list/count). Subcommands: sweep (delete drafts),
+
+promote (materialize to CAS) — see CAS create membrane docs.
+
+  Dry-run sweep all draft-plane objects
+  zqk object draft sweep --dry-run --all
+  Dry-run promote all draft-plane objects
+  zqk object draft promote --dry-run --all
+  Sweep draft backlog items older than 7d
+  zqk object draft sweep --kind backlog_item --older-than 168h --all
+
+Usage:
+  zqk object draft [command]
+
+Available Commands:
+  promote     Promote (or dry-run) objects on the object draft plane
+  sweep       Delete (or dry-run) objects on the object draft plane
+
+Flags:
+  -f, --format string      Output format (table, json, jsonl, yaml, csv, json-rpc, stream, agent-prompt, semantic-link) (default "table")
+  -o, --output string      Write output to file
+  -q, --quiet              Suppress non-essential output
+      --timeout duration   Timeout for command execution (0 = auto-calculate)
+  -v, --verbose            Verbose output
+
+Global Flags:
+      --allow-degraded   Allow scheduler-dependent commands to run when scheduler daemon is not running
+      --internal         Elevated access mode for built-in and internal kinds (requires Enterprise license or zqk-admin)
+
+Use "zqk object draft [command] --help" for more information about a command.

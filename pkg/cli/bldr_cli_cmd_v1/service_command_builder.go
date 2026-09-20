@@ -1,0 +1,33 @@
+package bldr_cli_cmd_v1
+
+import (
+	"github.com/spf13/cobra"
+	"github.com/zqk-os/zqk/internal/cli"
+	clipkg "github.com/zqk-os/zqk/pkg/cli"
+)
+
+// NewServiceCommandBuilder creates a new service command
+func NewServiceCommandBuilder() *cobra.Command {
+	builder := clipkg.NewCommandBuilder("service")
+	builder.WithShort("Manage per-root host OS scheduler units (launchd/systemd)")
+	help := clipkg.DynamicHelpBuilder("Manage per-root host OS scheduler units (launchd/systemd)")
+	help.WithDescriptionLines("Install, list, start, stop, rebind, and GC host OS supervisor units for the")
+	help.WithDescriptionLines("scheduler daemon — one unit per project root. Replaces ensure-cron prosthetics.")
+	help.WithDescriptionLines("See docs/architecture/SCHEDULER_HOST_SERVICE_AND_CLUSTER_STATUS.md.")
+	help.AddExample("Install a LaunchAgent/systemd unit for this project root", "%s scheduler service install --root .")
+	help.AddExample("List registered units", "%s scheduler service list")
+	help.AddExample("Garbage-collect units whose roots are gone", "%s scheduler service gc")
+	help.ExcludeFlag("format")
+	help.ExcludeFlag("output")
+	help.ExcludeFlag("verbose")
+	help.ExcludeFlag("quiet")
+	help.ExcludeFlag("timeout")
+	help.ExcludeFlag("columns")
+	builder.WithHelpBuilder(help)
+	builder.WithCommonFlags(false, nil)
+	cmd := builder.Build()
+	cli.RequireStorage(cmd, false)
+	cli.RequireSession(cmd, false)
+	cli.RequireSchedulerCheck(cmd, false)
+	return cmd
+}

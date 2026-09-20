@@ -1,0 +1,23 @@
+$schema: "../../schemas/command_spec.schema.json"
+
+name: "clear"
+short: "Remove skip_window.yaml"
+description: |
+  Deletes `.zqk/scheduler/skip_window.yaml` so policy evaluation no longer applies
+  bulk skip-window rules.
+
+help:
+  exclude_flags:
+    - "format"
+    - "output"
+    - "verbose"
+    - "quiet"
+    - "timeout"
+    - "columns"
+
+common_flags: false
+requires_storage: false
+requires_session: false
+requires_scheduler_check: false
+
+run_e: "runSkipWindowClear"

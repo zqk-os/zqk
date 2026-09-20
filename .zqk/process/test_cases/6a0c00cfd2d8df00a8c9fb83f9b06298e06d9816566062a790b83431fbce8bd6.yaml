@@ -1,0 +1,26 @@
+backlog_item_refs:
+- BLI-1789772697159634000-58b1d844
+created_at: '2026-09-18T23:04:57Z'
+created_by: ACC-1785920548450214012-68b850c0
+criteria_refs:
+- CRIT-1789772697159634000-1981bf48
+- CRIT-1789772697159635000-b0c8c527
+- CRIT-1789772697159636000-84f60d83
+description: ''
+goal_refs:
+- GOAL-1789631957245339000-008aac9f
+id: TST-1789772697159634001-d3ab770f
+kind: test_case
+namespace_id: zqk:kernel
+origin_project: zqk
+origin_system: zqk
+path_or_id: scripts/open-core/test-public-release-gates.sh
+requirement_refs:
+- REQ-1789772697022346000-9f3bec2a
+schema_version: 2.0.0
+status: complete
+title: 'Test Suite: Generate verifiable OpenVEX attestation and signed SBOM from multi-agent
+  review'
+updated_at: '2026-09-18T23:06:13Z'
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

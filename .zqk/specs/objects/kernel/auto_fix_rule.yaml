@@ -1,0 +1,224 @@
+schema_version: 2.0.0
+ontology: auto_fix_rule
+extends: base_object
+visibility: internal
+description: 'System object that describes how to auto-fix certain validation issues by object kind and condition.\nUsed to curate fix commands per (kind, category, tier, rule) so fixes stay consistent and editable\nwithout code changes. Conditions are general (not per-object); one rule applies to many objects.\nPlaceholders in fix_command_template: {object_id}, {kind}, {field}, {message}, {rule}, {tier}, {category}.\n'
+traits:
+  - base_object_traits
+fields:
+  applies_to_kind:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner
+      cardinality: one
+      criticality: composition
+      default: ""
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Object kind this rule applies to (e.g. backlog_item, requirement). Required.
+      security: non-sensitive
+      system_usage:
+        - fix command lookup
+      validation: Object kind identifier.
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - field_mutable_group
+      - filterable
+    type: string
+    validation:
+      required: true
+  condition_category:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner
+      cardinality: zero_or_one
+      criticality: association
+      default: ""
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Issue category to match (e.g. instance_validation, reference, integrity). Empty = any.
+      security: non-sensitive
+      system_usage:
+        - fix command lookup
+      validation: Category string or empty.
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - field_mutable_group
+      - filterable
+    type: string
+    validation:
+      required: false
+  condition_message_contains:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner
+      cardinality: zero_or_one
+      criticality: association
+      default: ""
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Substring that issue message must contain. Empty = any.
+      security: non-sensitive
+      system_usage:
+        - fix command lookup
+      validation: Substring or empty.
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - field_mutable_group
+    type: string
+    validation:
+      required: false
+  condition_rule:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner
+      cardinality: zero_or_one
+      criticality: association
+      default: ""
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Validation rule to match (e.g. lifecycle, required). Empty = any.
+      security: non-sensitive
+      system_usage:
+        - fix command lookup
+      validation: Rule name or empty.
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - field_mutable_group
+      - filterable
+    type: string
+    validation:
+      required: false
+  condition_tier:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner
+      cardinality: zero_or_one
+      criticality: association
+      default: 0
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Issue tier to match (1-4). 0 = any tier.
+      security: non-sensitive
+      system_usage:
+        - fix command lookup
+      validation: 0 or 1-4.
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - field_mutable_group
+      - filterable
+    type: integer
+    validation:
+      required: false
+  enabled:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner
+      cardinality: one
+      criticality: association
+      default: true
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: When false, rule is ignored. Default true.
+      security: non-sensitive
+      system_usage:
+        - fix command lookup
+      validation: Boolean.
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - field_mutable_group
+      - filterable
+    type: boolean
+    validation:
+      required: false
+  fix_command_template:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner
+      cardinality: one
+      criticality: composition
+      default: ""
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: |
+        Fix command template. Placeholders: {object_id}, {kind}, {field}, {message}, {rule}, {tier}, {category}.
+        Example: \"zqk object update {object_id} --field {field}=<VALUE>\"
+        Or with query hint: \"zqk object update {object_id} --field milestone_refs+=<MILESTONE_ID:category=feature>\"
+      security: non-sensitive
+      system_usage:
+        - auto-fix execution
+      validation: Template string with optional placeholders.
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - field_mutable_group
+    type: string
+    validation:
+      required: true
+  priority:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner
+      cardinality: zero_or_one
+      criticality: association
+      default: 100
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Lower value = higher priority when multiple rules match. Default 100.
+      security: non-sensitive
+      system_usage:
+        - fix command lookup
+      validation: Integer.
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - field_mutable_group
+      - filterable
+    type: integer
+    validation:
+      required: false
+  title:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner
+      cardinality: one
+      criticality: composition
+      default: ""
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Human-readable label for this rule (e.g. \"Backlog item lifecycle milestone_refs\").
+      security: non-sensitive
+      system_usage:
+        - display
+      validation: Free-form string.
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - field_mutable_group
+    type: string
+    validation:
+      required: false

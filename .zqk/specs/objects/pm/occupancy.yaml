@@ -1,0 +1,71 @@
+schema_version: 2.0.0
+ontology: occupancy
+urn: urn:zqk:spec:kernel:occupancy
+namespace: zqk:kernel
+extends: work_interval
+visibility: internal
+description: 'Mixin for an occupancy slot (claimed_by, claimed_at). Occupiable means the slot exists; empty claimed_by means unoccupied — including in_progress, which is parked. Filling the slot is exclusive claim. Assignment (persona_refs) is routing and does not occupy. Occupancy is not a timesheet: it extends work_interval (Gantt/clock plane), not work_unit (effort). Not instantiable (kind_mappings skip_specs). Inherit: Gantt bodies that can be occupied (priority_plan) switch extends to occupancy. Compose: timesheet kinds that also need occupancy (agent_task) keep extends: work_unit and list occupancy under composes. TRACK: POL-KERNEL-GANTT-OCCUPANCY-001 / WFL-MULTI-AGENT-WORK-CLAIM. '
+traits:
+  - occupiable
+fields:
+  claimed_at:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: system.
+      automation_hooks: stamped with claimed_by on successful claim.
+      cardinality: one
+      criticality: metadata
+      default: null
+      dependencies: claimed_by.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: RFC3339 timestamp when the current claim was taken.
+      security: non-sensitive
+      system_usage:
+        - observability
+        - stale-claim detection
+      validation: RFC3339 datetime string.
+    field_profile_code: OCC-002
+    permissions: r-x
+    semantic_type: datetime
+    traits:
+      - filterable
+      - readable
+      - sortable
+    type: string
+    validation:
+      required: false
+  claimed_by:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: swarm worker / orchestrator.
+      automation_hooks: WFL-MULTI-AGENT-WORK-CLAIM atomic claim; ATK fail-closed via pkg/agentclaim.
+      cardinality: one
+      criticality: association
+      default: null
+      dependencies: account or agent seat id.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Agent or account id holding the exclusive execution claim on this object.
+      security: non-sensitive
+      system_usage:
+        - routing
+        - deduplication
+      validation: non-empty string when claimed.
+    field_profile_code: OCC-001
+    permissions: rwx
+    semantic_type: reference
+    traits:
+      - filterable
+      - groupable
+      - modifiable
+      - readable
+      - searchable
+      - writable
+    type: string
+    validation:
+      required: false

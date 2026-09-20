@@ -1,0 +1,40 @@
+$schema: "../../../schemas/command_spec.schema.json"
+
+name: "current"
+short: "View backlog items for the current priority plan"
+description: |
+  View backlog items for the current priority plan.
+
+  The current priority plan is determined by:
+    1. If there's an in_progress plan, that's the current
+    2. Otherwise, the active plan with the lowest active_order
+    3. If no active_order, the most recent active plan by plan_date
+
+args:
+  type: "exact"
+  n: 0
+
+flags:
+  - name: "filter"
+    type: "string_array"
+    default: []
+    description: "Filter by field (format: field=value or field:value, can be used multiple times)"
+  - name: "sort-by"
+    type: "string"
+    default: ""
+    description: "Field to sort by"
+  - name: "sort-asc"
+    type: "bool"
+    default: true
+    description: "Sort ascending (default: true)"
+
+help:
+  examples:
+    - comment: "View backlog items for current plan"
+      command: "%s pplan current"
+    - comment: "View with filters"
+      command: "%s pplan current --filter status!=complete"
+    - comment: "View in JSON format"
+      command: "%s pplan current --format json"
+
+common_flags: true

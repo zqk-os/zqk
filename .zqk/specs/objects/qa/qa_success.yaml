@@ -1,0 +1,93 @@
+schema_version: 2.0.0
+ontology: qa_success
+extends: base_object
+visibility: internal
+description: Cryptographically signed proof of a successful QA audit. Kernel-internal token (QAS-*). Distinct from criteria (satisfiable predicate) and from unsigned audit_event. Payload is item_id plus ECDSA P-256 signature and public_key (pkg/validation/qa). Instances are immutable after mint.
+traits:
+  - base_object_traits
+fields:
+  item_id:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: QA auditor / pkg/validation/qa signer.
+      automation_hooks: bound into the signed payload; id_template interpolates this field.
+      cardinality: one
+      criticality: composition
+      default: required
+      dependencies: signed subject object id (BLI, ATK, or other kernel id).
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: Identity of the object whose QA audit this token attests.
+      security: non-sensitive
+      system_usage:
+        - signing
+        - verification
+        - filtering
+      validation: Non-empty kernel object id; required.
+    field_profile_code: QAS-001
+    permissions: r-x
+    semantic_type: identifier
+    traits:
+      - filterable
+      - readable
+      - searchable
+    type: string
+    validation:
+      display_length: 64
+      required: true
+  public_key:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: pkg/validation/qa AuditorSigner.
+      automation_hooks: persisted with the token so verification does not need a key store.
+      cardinality: one
+      criticality: composition
+      default: required
+      dependencies: signature, ECDSA P-256 keypair.
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: Hex-encoded ECDSA P-256 public key that verifies signature.
+      security: non-sensitive (public key material)
+      system_usage:
+        - verification
+        - integrity
+      validation: Non-empty hex string; required.
+    field_profile_code: QAS-003
+    permissions: r-x
+    semantic_type: statement
+    traits:
+      - readable
+    type: string
+    validation:
+      required: true
+  signature:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: pkg/validation/qa AuditorSigner (ECDSA P-256).
+      automation_hooks: produced by Signer.Sign; verified on auditor gate.
+      cardinality: one
+      criticality: composition
+      default: required
+      dependencies: item_id, public_key, ECDSA P-256 private key.
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: Hex-encoded ECDSA P-256 ASN.1 signature over the audit payload.
+      security: non-sensitive (public signature material)
+      system_usage:
+        - verification
+        - integrity
+      validation: Non-empty hex string; required.
+    field_profile_code: QAS-002
+    permissions: r-x
+    semantic_type: statement
+    traits:
+      - readable
+    type: string
+    validation:
+      required: true

@@ -1,0 +1,142 @@
+schema_version: 2.0.0
+ontology: auth_strategy
+extends: base_object
+visibility: internal
+description: 'Represents an authentication strategy available in the system. Defines how users can authenticate (keystore, OAuth, username/password, etc.). Strategies are configured at the system level and can be enabled/disabled.\nLifecycle: auth_strategy_lifecycle.yaml.\n'
+traits: []
+fields:
+  configuration:
+    checklist:
+      authority: admin
+      automation_hooks: used by authentication implementation
+      cardinality: zero_or_one
+      criticality: association
+      default: {}
+      dependencies: strategy implementation
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Strategy-specific configuration (e.g., OAuth provider URL, keystore path)
+      security: may contain sensitive configuration
+      system_usage:
+        - authentication
+        - configuration
+      validation: JSON object with strategy-specific fields
+    field_profile_code: AUTH-004
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+    type: object
+    validation:
+      required: false
+  description:
+    checklist:
+      authority: admin
+      automation_hooks: used in documentation
+      cardinality: zero_or_one
+      criticality: association
+      default: null
+      dependencies: documentation
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Human-readable description of this authentication strategy
+      security: non-sensitive
+      system_usage:
+        - documentation
+        - configuration
+      validation: Free-form string
+    field_profile_code: AUTH-003
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+    type: string
+    validation:
+      required: false
+  enabled:
+    checklist:
+      authority: admin
+      automation_hooks: checked during authentication flow
+      cardinality: one
+      criticality: composition
+      default: false
+      dependencies: configuration
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Whether this authentication strategy is enabled
+      security: non-sensitive
+      system_usage:
+        - authentication
+        - configuration
+      validation: Boolean
+    field_profile_code: AUTH-002
+    permissions: rwx
+    semantic_type: state
+    traits:
+      - readable
+      - writable
+      - filterable
+    type: boolean
+    validation:
+      required: true
+  priority:
+    checklist:
+      authority: admin
+      automation_hooks: used to determine order of strategy checks
+      cardinality: one
+      criticality: association
+      default: 0
+      dependencies: authentication flow
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Priority order for this strategy (lower numbers checked first)
+      security: non-sensitive
+      system_usage:
+        - authentication
+      validation: Integer >= 0
+    field_profile_code: AUTH-005
+    permissions: rwx
+    semantic_type: ordering
+    traits:
+      - readable
+      - writable
+      - filterable
+      - sortable
+    type: integer
+    validation:
+      required: true
+  strategy_type:
+    checklist:
+      authority: admin
+      automation_hooks: used by authentication flow
+      cardinality: one
+      criticality: composition
+      default: null
+      dependencies: authentication implementation
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: Type of authentication strategy (keystore, oauth, username_password, personal_access_token, api_key)
+      security: non-sensitive
+      system_usage:
+        - authentication
+        - configuration
+      validation: 'Must be one of: keystore, oauth, username_password, personal_access_token, api_key'
+    field_profile_code: AUTH-001
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+      - filterable
+      - groupable
+    type: string
+    validation:
+      enum:
+        - keystore
+        - oauth
+        - username_password
+        - personal_access_token
+        - api_key
+      required: true

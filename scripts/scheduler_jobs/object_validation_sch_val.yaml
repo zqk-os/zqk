@@ -1,0 +1,18 @@
+# Reusable object_validation job (SCH-val). Used by: zqk system ensure-retention-jobs (config-driven).
+# Triggered by event (object create/update/delete); triggers are batched; each run processes a batch.
+# Create manually: zqk object create scheduler_job --file scripts/scheduler_jobs/object_validation_sch_val.yaml
+id: SCH-val
+title: Background Object Validations
+description: |
+  Reusable job triggered on object create/update/delete. Triggers are batched (by size and time);
+  each run processes a batch of (kind, id) and runs 'zqk system check <kind> <id> --background' per item.
+job_type: object_validation
+trigger_type: event
+event_filter: object_validation
+category: maintenance
+execution_mode: reusable
+max_runtime_seconds: 3600
+enabled: true
+status: active
+namespace_id: zqk:kernel
+schema_version: "2.0.0"

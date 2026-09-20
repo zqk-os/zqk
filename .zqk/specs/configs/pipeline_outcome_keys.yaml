@@ -1,0 +1,76 @@
+# Declarative registry for pipeline.Context.Outcome map keys (wire strings).
+# Edit this file when adding or renaming outcome keys; regenerate Go with:
+#   zqk system generate-pipeline-outcome-keys
+# CLI flags/help: .zqk/cli/specs/system/generate_pipeline_outcome_keys_command.yaml (generate-command-builders).
+#
+# Go identifiers are OutcomeKey + CamelCase from each key (same rules as objects.FieldKeyConstName,
+# plus a small override table in pkg/pipeline/outcome_keys_generate.go when needed, e.g. output_csv -> OutputCSV).
+schema_version: 1
+keys:
+  - args_count
+  - break_glass_reason
+  - cache_load_build_stage_started
+  - commit_done
+  - commit_summary_path
+  - convergence_error
+  - convergence_exit
+  - convergence_json
+  - convergence_ran
+  - discovery_enqueue_stage_started
+  - erase_policy
+  - field_keys_written
+  - finalize_at
+  - finalize_done
+  - finalize_entry_count
+  - finalize_job_id
+  - finalize_lines_read
+  - finalize_metric_id
+  - finalize_validation_soft
+  - generate_exit
+  - generate_log_tail
+  - ingest_error
+  - ingest_events_path
+  - ingest_job_id
+  - ingest_stage_started
+  - ingest_summary_path
+  - ingest_window_end
+  - ingest_window_start
+  - intent
+  - lifecycle_ok
+  - metrics_resolve
+  - normalize_done
+  - normalize_entry_count
+  - normalize_error
+  - normalize_lines_read
+  - normalize_metric_id
+  - normalize_metrics_created
+  - normalized
+  - object_id
+  - object_kind
+  - output_csv
+  - plan
+  - plan_apply_trigger
+  - plan_dry_run
+  - plan_field_keys
+  - plan_skip_spec_index
+  - project_root
+  - refuse_reason
+  - spec_file_exists
+  - spec_index_refreshed
+  - spec_path
+  - trigger_executed
+  - trigger_manual_commands
+  - unlink_planned
+  - validation_error
+  - validation_error_count
+  - validation_stage_started
+  - validation_success
+  - verify_exit
+  - verify_log
+  - verify_skipped
+  - warm_cas_stage_started
+
+created_at: 2026-07-01T18:00:00Z
+updated_at: 2026-08-03T19:00:00Z
+created_by: ACC-1785920548450214012-68b850c0
+updated_by: ACC-1785920548450214012-68b850c0

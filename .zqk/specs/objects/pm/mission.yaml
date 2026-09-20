@@ -1,0 +1,146 @@
+schema_version: 2.0.0
+ontology: mission
+extends: base_object
+visibility: public
+description: 'Foundational statement describing the problem/mission/vision for a project or workstream.\nLifecycle: mission_lifecycle.yaml.\n'
+traits:
+  - base_object_traits
+fields:
+  goal_refs:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: used for mission-goal alignment.
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: goal registry.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Goals that support this mission.
+      security: non-sensitive
+      system_usage:
+        - traceability
+        - alignment
+      validation: Must reference existing goal IDs.
+    field_profile_code: MIS-004
+    permissions: r-x
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+      - field_reference_group
+    type: list
+    validation:
+      required: false
+  mission_statement:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: executive/owner.
+      automation_hooks: seeds initial templates/prompts.
+      cardinality: one
+      criticality: composition
+      default: required
+      dependencies: docs, onboarding.
+      observability: "yes"
+      origin_lifecycle: mutable (with history).
+      purpose: Core statement of why this effort exists.
+      security: may contain strategic info—treat as confidential by default.
+      system_usage:
+        - context
+        - prompting
+      validation: markdown allowed; should cite personas/goals when possible.
+    field_profile_code: MIS-001
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+      - modifiable
+    type: text
+    validation:
+      required: true
+  problem_statement:
+    checklist:
+      authority: executive/owner.
+      automation_hooks: used in requirement generation.
+      cardinality: one
+      criticality: composition
+      default: null
+      dependencies: requirements.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Defines the pain points motivating the mission.
+      security: may contain strategic info.
+      system_usage:
+        - requirements
+        - scenario planning
+      validation: markdown.
+    field_profile_code: MIS-003
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+      - modifiable
+    type: text
+    validation:
+      required: false
+  vision:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: executive.
+      automation_hooks: can be referenced by templates for tone.
+      cardinality: one
+      criticality: composition
+      default: null
+      dependencies: goal alignment.
+      observability: "yes"
+      origin_lifecycle: mutable (tracked via change_log).
+      purpose: Desired future state / success narrative.
+      security: confidential by default.
+      system_usage:
+        - strategy
+        - reports
+      validation: markdown.
+    field_profile_code: MIS-002
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - field_mutable_group
+    type: text
+    validation:
+      required: false
+  workstream_refs:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: used for mission-workstream alignment.
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: workstream registry.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Workstreams that support this mission.
+      security: non-sensitive
+      system_usage:
+        - traceability
+        - alignment
+      validation: Must reference existing workstream IDs.
+    field_profile_code: MIS-005
+    permissions: r-x
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+      - field_reference_group
+    type: list
+    validation:
+      required: false

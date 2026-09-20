@@ -1,0 +1,38 @@
+$schema: "../schemas/command_spec.schema.json"
+
+name: "check-contamination"
+short: "Execute tests and fail if the kernel schema plane was mutated"
+description: >
+  Runs a command and verifies the kernel schema plane (.zqk/specs) was not mutated
+  during execution. Generates a pre/post SHA-256 snapshot to detect additions, deletions,
+  or edits caused by tests with improper isolation.
+
+aliases:
+  - "contamination-check"
+
+args:
+  type: "minimum"
+  min: 0
+
+flags:
+  - name: "plane"
+    type: "string"
+    default: ".zqk/specs"
+    description: "Directory path of the schema plane to guard"
+  - name: "command"
+    type: "string"
+    default: ""
+    description: "Command string to execute within the contamination guard"
+
+help:
+  examples:
+    - comment: "Run a test package under contamination guard"
+      command: "%s test check-contamination -- go test ./pkg/storage"
+    - comment: "Guard against custom plane directory"
+      command: "%s test check-contamination --plane=.zqk/specs -- make test"
+
+run_e: "runCheckContamination"
+common_flags: true
+requires_storage: false
+requires_session: false
+requires_scheduler_check: false

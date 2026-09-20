@@ -1,0 +1,33 @@
+acceptance_considerations: Run test suites verifying taxonomy and spec coverage.
+actual_effort: 0h
+commit_hashes:
+    - 984c1f2
+completed_at: "2026-09-20T01:16:06Z"
+created_at: "2026-09-19T06:10:04Z"
+created_by: ACC-1785920548450214012-68b850c0
+criteria_refs:
+    - CRIT-1789798199209192000-f43fd3f2
+    - CRIT-1789798199209193000-8e2bf84b
+    - CRIT-1789798199209194000-8c812261
+description: 'Implementation and verification pipeline for: Harmonized CLI Taxonomy, 100% Spec Coverage, and Vendor Command Isolation'
+estimated_effort: 4h
+id: BLI-1789798199209192000-3e611a09
+kind: backlog_item
+milestone_refs:
+    - MIL-CLI-TAXONOMY-001
+namespace_id: zqk:kernel
+persona_refs:
+    - PER-COMMUNITY-SOFTWARE-ENGINEER
+priority: high
+priority_plan_ref: PRI-CLI-TAXONOMY-OVERHAUL-001
+priority_tier: P1
+problem_statement: Need verification pipeline for taxonomy.
+requirement_refs:
+    - REQ-CLI-TAXONOMY-HARMONIZATION-001
+schema_version: 2.0.0
+started_at: "2026-09-20T01:15:56Z"
+status: complete
+title: 'Implement: Harmonized CLI Taxonomy, 100% Spec Coverage, and Vendor Command Isolation'
+updated_at: "2026-09-20T01:16:06Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

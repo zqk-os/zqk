@@ -1,0 +1,260 @@
+# Dest first-run VDS chunks. Chat is never evidence.
+# Evaluate: ./bin/zqk workflow vds evaluate --format json --persist
+schema: zqk_vds_chunks_v1
+chunks:
+  - chunk_id: dest-launch-kernel-isolation
+    stage: operate_release
+    claim: Dest object list/count/get resolve this checkout kernel, not studio
+    work_object_ref: CRIT-1789673676577796000-03fc29cf
+    rubric_ref: CRIT-1789673676577796000-03fc29cf
+    dsl_checks:
+      - object_exists:CRIT-1789673676577796000-03fc29cf
+      - object_exists:TST-1789708649546112000-ae5e1c28
+      - object_exists:BLI-1789630408733990000-0a2023fb
+      - path_exists:config/zqk.yaml
+      - path_exists:cmd/zqk-community/app/first_run_surface_test.go
+    evidence_refs:
+      - CRIT-1789673676577796000-03fc29cf
+      - TST-1789708649546112000-ae5e1c28
+      - cmd/zqk-community/app/first_run_surface_test.go
+      - config/zqk.yaml
+    gate_operate: yes
+    independent_verify: yes
+    notes: Isolation is dest cwd + dest config; do not export a project-root override to studio
+  - chunk_id: dest-launch-shipped-doc-entries
+    stage: operate_release
+    claim: First-run onboarding and architecture stubs are registered as doc_entry objects
+    work_object_ref: CRIT-1789673684713711000-344a7b09
+    rubric_ref: CRIT-1789673684713711000-344a7b09
+    dsl_checks:
+      - object_exists:CRIT-1789673684713711000-344a7b09
+      - object_exists:DOC-629
+      - object_exists:DOC-251
+      - object_exists:DOC-135
+      - path_exists:docs/onboarding/COMMUNITY_FIRST_RUN.md
+      - path_exists:docs/architecture/README.md
+      - path_exists:docs/architecture/INDEX.md
+      - path_exists:docs/INDEX.md
+    evidence_refs:
+      - DOC-629
+      - DOC-251
+      - DOC-135
+      - docs/onboarding/COMMUNITY_FIRST_RUN.md
+      - docs/architecture/README.md
+    gate_operate: yes
+    independent_verify: yes
+  - chunk_id: dest-launch-no-archive-markdown
+    stage: operate_release
+    claim: Copied archive markdown is gone from the dest product tree
+    work_object_ref: CRIT-1789673692417549000-42d0da98
+    rubric_ref: CRIT-1789673692417549000-42d0da98
+    dsl_checks:
+      - object_exists:CRIT-1789673692417549000-42d0da98
+      - path_exists:scripts/open-core/police-community-tree.sh
+      - path_exists:cmd/zqk-community/app/first_run_surface_test.go
+    evidence_refs:
+      - scripts/open-core/police-community-tree.sh
+      - cmd/zqk-community/app/first_run_surface_test.go
+    gate_operate: yes
+    independent_verify: yes
+    notes: TestShippedFirstRunDocsExist fails if docs/_archive exists; dest police fails on archive dirs
+  - chunk_id: dest-module-path-functional
+    stage: integrate_verify
+    claim: The dest Go module is github.com/zqk-os/zqk
+    work_object_ref: CRIT-1789702444975811000-110ea11e
+    rubric_ref: CRIT-1789702444975811000-110ea11e
+    dsl_checks:
+      - object_exists:CRIT-1789702444975811000-110ea11e
+      - path_exists:go.mod
+      - tests_ok_per_customization
+    evidence_refs:
+      - CRIT-1789702444975811000-110ea11e
+      - go.mod
+      - go test ./cmd/zqk-community/app -run TestPublicModulePath -timeout 60s
+    gate_integrate: yes
+    independent_verify: yes
+  - chunk_id: dest-module-path-boundary
+    stage: integrate_verify
+    claim: Dest Go source contains no github.com/lanceman/zqk imports
+    work_object_ref: CRIT-1789702444975812000-cc92bc2c
+    rubric_ref: CRIT-1789702444975812000-cc92bc2c
+    dsl_checks:
+      - object_exists:CRIT-1789702444975812000-cc92bc2c
+      - path_exists:cmd/zqk-community/app/first_run_surface_test.go
+      - tests_ok_per_customization
+    evidence_refs:
+      - CRIT-1789702444975812000-cc92bc2c
+      - cmd/zqk-community/app/first_run_surface_test.go
+      - go test ./cmd/zqk-community/app -run TestPublicModulePath -timeout 60s
+    gate_integrate: yes
+    independent_verify: yes
+  - chunk_id: dest-module-path-integration
+    stage: integrate_verify
+    claim: The dest-owned community command compiles against github.com/zqk-os/zqk
+    work_object_ref: CRIT-1789702444975813000-f9d60639
+    rubric_ref: CRIT-1789702444975813000-f9d60639
+    dsl_checks:
+      - object_exists:CRIT-1789702444975813000-f9d60639
+      - object_exists:TST-1789702444975811001-79e00e2d
+      - path_exists:cmd/zqk-community
+      - tests_ok_per_customization
+    evidence_refs:
+      - CRIT-1789702444975813000-f9d60639
+      - TST-1789702444975811001-79e00e2d
+      - cmd/zqk-community
+      - go test ./cmd/zqk-community/app -run TestPublicModulePath -timeout 60s
+    gate_integrate: yes
+    independent_verify: yes
+  - chunk_id: dest-sku-text-functional
+    stage: integrate_verify
+    claim: Shipped first-run text uses canonical brand tokens rather than the local pressure-test name
+    work_object_ref: CRIT-1789702449225534000-91965c35
+    rubric_ref: CRIT-1789702449225534000-91965c35
+    dsl_checks:
+      - object_exists:CRIT-1789702449225534000-91965c35
+      - path_exists:scripts/open-core/applybrand
+      - tests_ok_per_customization
+    evidence_refs:
+      - CRIT-1789702449225534000-91965c35
+      - scripts/open-core/applybrand
+      - go test ./cmd/zqk-community/app -run TestFirstRunTextUsesCanonicalBrandTokens -timeout 60s
+    gate_integrate: yes
+    independent_verify: yes
+  - chunk_id: dest-sku-text-boundary
+    stage: integrate_verify
+    claim: Public architecture is pointer-only and archived documentation does not ship
+    work_object_ref: CRIT-1789702449225535000-21301407
+    rubric_ref: CRIT-1789702449225535000-21301407
+    dsl_checks:
+      - object_exists:CRIT-1789702449225535000-21301407
+      - path_exists:docs/architecture/INDEX.md
+      - path_exists:docs/architecture/README.md
+      - tests_ok_per_customization
+    evidence_refs:
+      - CRIT-1789702449225535000-21301407
+      - docs/architecture/INDEX.md
+      - docs/architecture/README.md
+      - go test ./cmd/zqk-community/app -run TestShippedFirstRunDocsExist -timeout 60s
+    gate_integrate: yes
+    independent_verify: yes
+  - chunk_id: dest-sku-text-integration
+    stage: integrate_verify
+    claim: The shipped community first-run doc equals its dest overlay source
+    work_object_ref: CRIT-1789702449225536000-1bd6c028
+    rubric_ref: CRIT-1789702449225536000-1bd6c028
+    dsl_checks:
+      - object_exists:CRIT-1789702449225536000-1bd6c028
+      - path_exists:docs/onboarding/COMMUNITY_FIRST_RUN.md
+      - path_exists:scripts/open-core/sku-overlay/COMMUNITY_FIRST_RUN.md
+      - tests_ok_per_customization
+    evidence_refs:
+      - CRIT-1789702449225536000-1bd6c028
+      - docs/onboarding/COMMUNITY_FIRST_RUN.md
+      - scripts/open-core/sku-overlay/COMMUNITY_FIRST_RUN.md
+      - go test ./cmd/zqk-community/app -run TestFirstRunTextUsesCanonicalBrandTokens -timeout 60s
+    gate_integrate: yes
+    independent_verify: yes
+  - chunk_id: dest-public-payload-functional
+    stage: operate_release
+    claim: The current dest source tree passes a fail-closed public payload gate
+    work_object_ref: CRIT-1789717939876745000-cf3ca409
+    rubric_ref: CRIT-1789717939876745000-cf3ca409
+    dsl_checks:
+      - object_exists:CRIT-1789717939876745000-cf3ca409
+      - path_exists:scripts/open-core/check-public-release-payload.sh
+      - path_exists:SECURITY.md
+      - tests_ok_per_customization
+    evidence_refs:
+      - CRIT-1789717939876745000-cf3ca409
+      - scripts/open-core/check-public-release-payload.sh
+      - SECURITY.md
+      - sh scripts/open-core/test-public-release-gates.sh --payload-only
+      - go test ./cmd/zqk-community/system ./cmd/zqk-community/test -timeout 60s
+      - SCH-1789718605088226000 success
+    gate_integrate: yes
+    independent_verify: yes
+  - chunk_id: dest-public-payload-boundary
+    stage: operate_release
+    claim: The payload test proves an unconfigured release file is rejected
+    work_object_ref: CRIT-1789717939876746000-f5bf8f34
+    rubric_ref: CRIT-1789717939876746000-f5bf8f34
+    dsl_checks:
+      - object_exists:CRIT-1789717939876746000-f5bf8f34
+      - path_exists:scripts/open-core/test-public-release-gates.sh
+      - tests_ok_per_customization
+    evidence_refs:
+      - CRIT-1789717939876746000-f5bf8f34
+      - scripts/open-core/test-public-release-gates.sh
+      - sh scripts/open-core/test-public-release-gates.sh --payload-only
+    gate_integrate: yes
+    independent_verify: yes
+  - chunk_id: dest-public-payload-integration
+    stage: operate_release
+    claim: CI runs the dest release-gate script and the community binary builds from this module
+    work_object_ref: CRIT-1789717939876747000-d17ced38
+    rubric_ref: CRIT-1789717939876747000-d17ced38
+    dsl_checks:
+      - object_exists:CRIT-1789717939876747000-d17ced38
+      - object_exists:TST-1789717939876745001-db183096
+      - path_exists:.github/workflows/ci.yml
+      - path_exists:cmd/zqk-community
+      - tests_ok_per_customization
+    evidence_refs:
+      - CRIT-1789717939876747000-d17ced38
+      - TST-1789717939876745001-db183096
+      - .github/workflows/ci.yml
+      - cmd/zqk-community
+      - go test ./cmd/zqk-community/system ./cmd/zqk-community/test -timeout 60s
+      - CGO_ENABLED=0 go build -buildvcs=false ./cmd/zqk-community
+      - SCH-1789718605088226000 success
+    gate_integrate: yes
+    independent_verify: yes
+  - chunk_id: dest-overlay-release-files-functional
+    stage: operate_release
+    claim: Community SKU installation reproduces dest-owned license, notice, security, CI, and README files
+    work_object_ref: CRIT-1789719098362564000-fd05f1e4
+    rubric_ref: CRIT-1789719098362564000-fd05f1e4
+    dsl_checks:
+      - object_exists:CRIT-1789719098362564000-fd05f1e4
+      - path_exists:scripts/open-core/install-community-sku.sh
+      - path_exists:scripts/open-core/test-community-overlay-release-files.sh
+      - tests_ok_per_customization
+    evidence_refs:
+      - CRIT-1789719098362564000-fd05f1e4
+      - scripts/open-core/install-community-sku.sh
+      - sh scripts/open-core/test-community-overlay-release-files.sh
+    gate_integrate: yes
+    independent_verify: yes
+  - chunk_id: dest-overlay-release-files-boundary
+    stage: operate_release
+    claim: Community overlay manifests cannot copy the unconfigured GoReleaser file
+    work_object_ref: CRIT-1789719098362565000-21b9314b
+    rubric_ref: CRIT-1789719098362565000-21b9314b
+    dsl_checks:
+      - object_exists:CRIT-1789719098362565000-21b9314b
+      - path_exists:scripts/open-core/community-bounded-includes
+      - tests_ok_per_customization
+    evidence_refs:
+      - CRIT-1789719098362565000-21b9314b
+      - scripts/open-core/community-bounded-includes
+      - scripts/open-core/community-bounded-includes.txt
+      - sh scripts/open-core/test-community-overlay-release-files.sh
+    gate_integrate: yes
+    independent_verify: yes
+  - chunk_id: dest-overlay-release-files-integration
+    stage: operate_release
+    claim: Scratch export installs the community SKU before running the dest payload gate
+    work_object_ref: CRIT-1789719098362566000-f65356cc
+    rubric_ref: CRIT-1789719098362566000-f65356cc
+    dsl_checks:
+      - object_exists:CRIT-1789719098362566000-f65356cc
+      - object_exists:TST-1789719098362564001-5bd2ed19
+      - path_exists:scripts/open-core/sync-public-candidate.sh
+      - tests_ok_per_customization
+    evidence_refs:
+      - CRIT-1789719098362566000-f65356cc
+      - TST-1789719098362564001-5bd2ed19
+      - scripts/open-core/sync-public-candidate.sh
+      - sh scripts/open-core/test-community-overlay-release-files.sh
+    gate_integrate: yes
+    independent_verify: yes

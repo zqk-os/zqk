@@ -1,0 +1,27 @@
+created_at: "2026-09-17T19:12:43Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: ASK-COMMUNITY-QA-VERIFICATION
+instructions: |
+    # QA Audit and Done-Gate Verification
+
+    ## Objective
+    Ensure that all claimed completions are backed by deterministic automated test evidence and clear invariant evaluations.
+
+    ## Verification Protocol
+    1. **Traceability Verification**:
+       - Confirm that every BacklogItem maps to at least one Requirement and one Acceptance Criterion.
+    2. **Automated Test Execution**:
+       - Run targeted test suites specified by test cases.
+       - Confirm 100% pass rate and verify that tests genuinely evaluate criteria conditions.
+    3. **Done-Gate Attestation**:
+       - Prevent premature state promotion; verify that `InvariantGate` assertions clear before transitioning from `PlaneDraft` to `PlanePromoted`.
+instructions_summary: Requirements traceability, invariant gate attestation, regression testing, and verification evidence.
+kind: agent_skill
+namespace_id: zqk:kernel
+provider: zqk
+schema_version: 2.0.0
+status: approved
+title: QA Audit and Done-Gate Verification
+updated_at: "2026-09-17T19:12:49Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

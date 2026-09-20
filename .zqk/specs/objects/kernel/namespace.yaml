@@ -1,0 +1,217 @@
+schema_version: 2.0.0
+ontology: namespace
+extends: base_object
+visibility: public
+description: 'Defines a namespace that groups related object types and provides a naming scope. Namespaces enable categorization, isolation, integration, and discovery of object types.\nLifecycle: namespace_lifecycle.yaml.\n'
+traits:
+  - base_object_traits
+fields:
+  applicability:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: namespace_owner
+      automation_hooks: used for applicability checks
+      cardinality: one
+      criticality: composition
+      default: required
+      dependencies: none
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Defines when, where, and how the namespace can be used.
+      security: non-sensitive
+      system_usage:
+        - usage_guidance
+        - validation
+      validation: Namespace applicability object structure
+    field_profile_code: NS-005
+    permissions: rwx
+    semantic_type: expression
+    traits:
+      - field_mutable_group
+    type: object
+    validation:
+      required: true
+  code:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: namespace_owner
+      automation_hooks: used for reference resolution and discovery
+      cardinality: one
+      criticality: composition
+      default: null
+      dependencies: namespace_registry
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: Published catalog key for this namespace (e.g. zqk:kernel). Distinct from inherited namespace_id occupancy.
+      security: non-sensitive
+      system_usage:
+        - reference_resolution
+        - namespace_discovery
+      validation: Namespace catalog-key pattern
+    field_profile_code: NS-001
+    permissions: r-x
+    semantic_type: identifier
+    traits:
+      - readable
+      - writable
+      - filterable
+      - sortable
+      - searchable
+    type: string
+    validation:
+      pattern: ^(zqk|domain|integration):[a-z0-9_]+(:[a-z0-9_]+)*$
+      required: false
+  domain:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: namespace_owner
+      automation_hooks: used for domain-based queries
+      cardinality: zero_or_one
+      criticality: association
+      default: null
+      dependencies: layer must be domain or integration
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: Domain name for domain and integration layers (e.g., \\\"organizational\\\", \\\"financial\\\").
+      security: non-sensitive
+      system_usage:
+        - categorization
+        - discovery
+      validation: Domain name pattern
+    field_profile_code: NS-003
+    permissions: r-x
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+      - filterable
+      - sortable
+      - searchable
+    type: string
+    validation:
+      pattern: ^[a-z0-9_]+$
+      required: false
+  integration:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: namespace_owner
+      automation_hooks: used for cross-namespace validation
+      cardinality: one
+      criticality: composition
+      default: required
+      dependencies: none
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Defines how namespaces integrate with each other while maintaining boundaries.
+      security: non-sensitive
+      system_usage:
+        - reference_validation
+        - integration_validation
+      validation: Namespace integration object structure
+    field_profile_code: NS-006
+    permissions: rwx
+    semantic_type: expression
+    traits:
+      - field_mutable_group
+    type: object
+    validation:
+      required: true
+  isolation:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: namespace_owner
+      automation_hooks: used for conflict detection and resolution
+      cardinality: one
+      criticality: composition
+      default: required
+      dependencies: none
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Defines mechanisms to keep namespaces separate and prevent conflicts.
+      security: non-sensitive
+      system_usage:
+        - conflict_prevention
+        - access_control
+      validation: Namespace isolation object structure
+    field_profile_code: NS-007
+    permissions: rwx
+    semantic_type: expression
+    traits:
+      - readable
+      - writable
+      - modifiable
+    type: object
+    validation:
+      required: true
+  layer:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: namespace_owner
+      automation_hooks: determines isolation rules
+      cardinality: one
+      criticality: composition
+      default: required
+      dependencies: none
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: Namespace layer (kernel, domain, or integration).
+      security: non-sensitive
+      system_usage:
+        - categorization
+        - isolation
+      validation: Must be one of kernel, domain, or integration
+    field_profile_code: NS-002
+    permissions: r-x
+    semantic_type: statement
+    traits:
+      - filterable
+      - readable
+      - searchable
+      - sortable
+      - writable
+    type: enum
+    validation:
+      enum:
+        - kernel
+        - domain
+        - integration
+      required: true
+  origin:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: namespace_owner
+      automation_hooks: used for authority checks
+      cardinality: one
+      criticality: composition
+      default: required
+      dependencies: none
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Describes where the namespace comes from and who has authority over it.
+      security: non-sensitive
+      system_usage:
+        - authority_validation
+        - discovery
+      validation: Namespace origin object structure
+    field_profile_code: NS-004
+    permissions: rwx
+    semantic_type: expression
+    traits:
+      - field_mutable_group
+    type: object
+    validation:
+      required: true

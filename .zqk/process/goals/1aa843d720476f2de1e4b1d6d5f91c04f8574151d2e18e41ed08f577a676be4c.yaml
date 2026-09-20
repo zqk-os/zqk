@@ -1,0 +1,19 @@
+completed_at: "2026-09-19T03:20:34Z"
+created_at: "2026-09-17T07:59:17Z"
+created_by: ACC-1785920548450214012-68b850c0
+description: 'Measurable outcome: zcom in this checkout lists a linked org/mission/vision/goal/workstream/priority_plan, live docs have doc_entry rows, archive copies are gone, and identity is the system account.'
+id: GOAL-1789631957245339000-008aac9f
+kind: goal
+metric: starter_graph objects at shovel-ready statuses
+namespace_id: zqk:kernel
+percent_complete: 10
+schema_version: 2.0.0
+started_at: "2026-09-17T07:59:17Z"
+status: complete
+target: "1"
+title: Community kernel is launch-ready for strangers and agents
+updated_at: "2026-09-19T03:20:34Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs:
+    - WS-1789631797993326000-f9951fe8

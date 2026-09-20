@@ -1,0 +1,550 @@
+$schema: ../../../.zqk/cli/specs/schemas/lifecycle_spec.schema.json
+object_type: backlog_item
+extends: base_lifecycle
+status_mapping:
+  approved: validated
+  archived: archived
+  error: error
+  implemented: complete
+  in_progress: in_progress
+  proposed: exploring
+  roadmap: roadmap
+  deferred: deferred
+  rejected: archived
+statuses:
+  - value: conceptual
+    display: Conceptual
+    origin: true
+    preliminary: true
+    description: Draft plane status. Prior to CAS membrane crossing.
+    role: realign
+  - value: originated
+    display: Originated
+    description: CAS membrane crossed. Object officially originated.
+    role: realign
+  - value: exploring
+    display: Exploring
+    origin: false
+    preliminary: false
+    role: realign
+    description: Raw idea under exploration; not plan-ready until validated and 
+      planned.
+  - value: validated
+    display: Validated
+    role: realign
+    description: Problem/approach accepted; still needs plan + milestone linkage
+      before shovel-ready planned.
+  - value: roadmap
+    display: Roadmap
+    role: realign
+    description: Parked on a longer horizon; not eligible for execution-facing 
+      plan membership. Use object park --to roadmap.
+  - value: deferred
+    display: Deferred
+    role: realign
+    description: Explicitly deferred; keep out of active execution scope until 
+      revived. Use object park --to deferred.
+  - value: planned
+    display: Planned (shovel-ready)
+    role: shovel_ready
+    description: "Shovel-ready work item: committed on a priority plan with at least
+      one milestone linked.\nConversational \"ready\" means this status (value remains
+      planned — do not invent a ready status).\nMilestones anchor work to the strategic
+      hierarchy (mission, vision, goals, strategic plan) so\nexecution is traceable
+      before active development.\n"
+  - value: testing
+    display: Testing (Red Phase)
+    role: execution_locked
+    description: TDD Red Phase. A failing test case is being written before 
+      active implementation begins.
+  - value: in_progress
+    display: In Progress
+    role: execution_locked
+    description: 'Active work in flight. Requires the same traceability as planned:
+      priority plan plus milestone
+
+      linkage so in_progress can be held without lifecycle error and every active
+      item ties back
+
+      through milestones to mission, vision, goals, and strategic plan.
+
+      '
+  - value: complete
+    display: Complete
+    terminal: true
+    work_done: true
+    role: terminal
+    description: Accepted as done; estimated_effort (planner intent), criteria 
+      evidence, and commit evidence should already be present. actual_effort is 
+      membrane-autofilled, not a typed hold.
+    preconditions:
+      - all linked criteria_refs are validated or complete (archived-only 
+        lineage also satisfies; never delete archived CRITs to clear this gate)
+  - value: archived
+    display: Archived
+    terminal: true
+    archive: true
+    role: terminal
+    description: 'Archived for history; no longer in the active backlog stream. Occupancy
+      is hierarchical: when priority_plan_ref is set, that plan must also be archived
+      (RUL-1782235658105562000-b27c8dfc state ceiling). Promote the plan to archived
+      (children ride the prune shockwave); do not archive a lone member under a live
+      or complete plan.'
+  - value: error
+    display: Halted (error)
+    system: true
+    role: halted
+    description: System/validation incoherency hold (halted). Recover via 
+      promote to planned after fixing fields.
+transitions:
+  - from: conceptual
+    to: originated
+    description: Promote from draft plane to CAS membrane (CAS Qualification).
+    manual: true
+    auto: false
+    catalyst: System promotion
+    postconditions:
+      - role is realign
+    class_vs_specialty: class-agnostic
+    shockwave:
+      mode: propagate
+  - from: originated
+    to: exploring
+    description: Initial domain workflow transition to exploring.
+    manual: true
+    auto: true
+    catalyst: System initialization
+    postconditions:
+      - role is realign
+    class_vs_specialty: class-agnostic
+    shockwave:
+      mode: propagate
+  - from: originated
+    to: planned
+    description: Fast-track shovel-ready plan assignment from originated when priority plan is assigned.
+    manual: true
+    auto: true
+    postconditions:
+      - role is shovel_ready
+    catalyst: Standard progression
+    class_vs_specialty: class-agnostic
+    shockwave:
+      mode: propagate
+  - from: exploring
+    to: validated
+    description: Idea reviewed and approved for deeper planning
+    manual: true
+    auto: false
+    preconditions:
+      - Problem statement and acceptance considerations defined
+    postconditions:
+      - role is realign
+    catalyst: Standard progression
+    class_vs_specialty: class-agnostic
+    shockwave:
+      mode: propagate
+  - from: exploring
+    to: roadmap
+    description: Move item to roadmap for future planning
+    manual: true
+    auto: false
+    postconditions:
+      - role is realign
+    catalyst: Standard progression
+    class_vs_specialty: class-agnostic
+    preconditions:
+      - Standard checks pass
+    shockwave:
+      mode: propagate
+  - from: exploring
+    to: deferred
+    description: Defer item for later consideration
+    manual: true
+    auto: false
+    postconditions:
+      - role is realign
+    catalyst: Standard progression
+    class_vs_specialty: class-agnostic
+    preconditions:
+      - Standard checks pass
+    shockwave:
+      mode: propagate
+  - from: roadmap
+    to: validated
+    description: Move item from roadmap to validated
+    manual: true
+    auto: false
+    postconditions:
+      - role is realign
+    catalyst: Standard progression
+    class_vs_specialty: class-agnostic
+    preconditions:
+      - Standard checks pass
+    shockwave:
+      mode: propagate
+  - from: roadmap
+    to: planned
+    description: Move item from roadmap to planned
+    manual: true
+    auto: false
+    postconditions:
+      - role is shovel_ready
+    catalyst: Standard progression
+    class_vs_specialty: class-agnostic
+    shockwave:
+      mode: propagate
+  - from: deferred
+    to: exploring
+    description: Move deferred item back to exploring
+    manual: true
+    auto: false
+    postconditions:
+      - role is realign
+    catalyst: Standard progression
+    class_vs_specialty: class-agnostic
+    preconditions:
+      - Standard checks pass
+    shockwave:
+      mode: propagate
+  - from: deferred
+    to: validated
+    description: Move deferred item to validated
+    manual: true
+    auto: false
+    postconditions:
+      - role is realign
+    catalyst: Standard progression
+    class_vs_specialty: class-agnostic
+    preconditions:
+      - Standard checks pass
+    shockwave:
+      mode: propagate
+  - from: exploring
+    to: planned
+    description: Fast-track plan assignment when validation happens during 
+      promotion
+    manual: true
+    auto: false
+    postconditions:
+      - role is shovel_ready
+    catalyst: Standard progression
+    class_vs_specialty: class-agnostic
+    shockwave:
+      mode: propagate
+  - from: roadmap
+    to: planned
+    description: Move from roadmap to planned
+    manual: true
+    auto: false
+    postconditions:
+      - role is shovel_ready
+    catalyst: Standard progression
+    class_vs_specialty: class-agnostic
+    shockwave:
+      mode: propagate
+  - from: validated
+    to: planned
+    description: Item assigned to priority plan
+    manual: true
+    auto: false
+    postconditions:
+      - role is shovel_ready
+    catalyst: Standard progression
+    class_vs_specialty: class-agnostic
+    shockwave:
+      mode: propagate
+  - from: validated
+    to: deferred
+    description: Park validated item (acknowledged, not scheduling now)
+    manual: true
+    auto: false
+    postconditions:
+      - role is realign
+    catalyst: Standard progression
+    class_vs_specialty: class-agnostic
+    preconditions:
+      - Standard checks pass
+    shockwave:
+      mode: propagate
+  - from: validated
+    to: roadmap
+    description: Horizon-park validated item
+    manual: true
+    auto: false
+    postconditions:
+      - role is realign
+    catalyst: Standard progression
+    class_vs_specialty: class-agnostic
+    preconditions:
+      - Standard checks pass
+    shockwave:
+      mode: propagate
+  - from: planned
+    to: validated
+    description: Plan removed; item returns to validated for re-planning
+    manual: true
+    auto: false
+    postconditions:
+      - role is realign
+    catalyst: Standard progression
+    class_vs_specialty: class-agnostic
+    shockwave:
+      mode: propagate
+  - from: planned
+    to: deferred
+    description: Unschedule shovel-ready item back to deferred
+    manual: true
+    auto: false
+    side_effects:
+      - clear: priority_plan_ref
+    postconditions:
+      - role is realign
+    catalyst: Standard progression
+    class_vs_specialty: class-agnostic
+    preconditions:
+      - Standard checks pass
+    shockwave:
+      mode: propagate
+  - from: planned
+    to: roadmap
+    description: Move shovel-ready item to longer-horizon roadmap
+    manual: true
+    auto: false
+    side_effects:
+      - clear: priority_plan_ref
+    postconditions:
+      - role is realign
+    catalyst: Standard progression
+    class_vs_specialty: class-agnostic
+    preconditions:
+      - Standard checks pass
+    shockwave:
+      mode: propagate
+  - from: error
+    to: planned
+    description: Recover from validation error status
+    manual: true
+    auto: false
+    postconditions:
+      - role is shovel_ready
+    catalyst: Standard progression
+    class_vs_specialty: class-agnostic
+    shockwave:
+      mode: propagate
+  - from: planned
+    to: testing
+    description: Begin TDD Red Phase (write failing test)
+    manual: true
+    auto: false
+    preconditions:
+      - Standard checks pass
+    postconditions:
+      - role is testing
+    catalyst: Standard progression
+    class_vs_specialty: class-agnostic
+    shockwave: &id001
+      mode: propagate
+  - from: planned
+    to: in_progress
+    description: Direct start of development when active work begins
+    manual: true
+    auto: false
+    preconditions:
+      - Standard checks pass
+    postconditions:
+      - role is execution_locked
+    catalyst: Standard progression
+    class_vs_specialty: class-agnostic
+    shockwave: *id001
+  - from: testing
+    to: in_progress
+    description: Active development begins (Test is red, moving to Green)
+    manual: true
+    auto: false
+    preconditions:
+      - Must link to a criteria object which is linked to an active but failing 
+        test_case (Red TDD phase)
+    postconditions:
+      - role is execution_locked
+    catalyst: Standard progression
+    class_vs_specialty: class-agnostic
+    shockwave: *id001
+  - from: testing
+    to: planned
+    description: Work paused during testing and returned to plan
+    manual: true
+    auto: false
+    preconditions:
+      - Standard checks pass
+    postconditions:
+      - role is shovel_ready
+    catalyst: Standard progression
+    class_vs_specialty: class-agnostic
+    shockwave: *id001
+  - from: testing
+    to: complete
+    description: Complete from testing when criteria are satisfied and git mutation evidence is present
+    manual: true
+    auto: true
+    preconditions:
+      - commit_hashes have git mutation evidence for this backlog_item
+      - all linked criteria_refs are validated or complete (archived-only lineage also satisfies; never delete archived CRITs to clear this gate)
+    postconditions:
+      - role is terminal
+    catalyst: Standard progression
+    class_vs_specialty: class-agnostic
+    shockwave:
+      mode: propagate
+  - from: in_progress
+    to: complete
+    description: Auto-complete when validation and linked criteria are met
+    manual: true
+    auto: true
+    preconditions:
+      - commit_hashes have git mutation evidence for this backlog_item
+      - all linked criteria_refs are validated or complete (archived-only 
+        lineage also satisfies; never delete archived CRITs to clear this gate)
+    postconditions:
+      - role is terminal
+    catalyst: Standard progression
+    class_vs_specialty: class-agnostic
+    shockwave:
+      mode: propagate
+  - from: planned
+    to: complete
+    description: Direct complete only when git mutation evidence is present (no 
+      empty/merge SHA theater)
+    manual: true
+    auto: false
+    preconditions:
+      - commit_hashes have git mutation evidence for this backlog_item
+      - all linked criteria_refs are validated or complete (archived-only 
+        lineage also satisfies; never delete archived CRITs to clear this gate)
+    postconditions:
+      - role is terminal
+    catalyst: Standard progression
+    class_vs_specialty: class-agnostic
+    shockwave:
+      mode: propagate
+  - from: in_progress
+    to: planned
+    description: Work paused and returned to plan
+    manual: true
+    auto: false
+    postconditions:
+      - role is shovel_ready
+      - execution lock released back to shovel_ready membership; BLI pause is 
+        not a PRI column unseal
+    catalyst: Standard progression
+    class_vs_specialty: class-agnostic
+    shockwave:
+      mode: propagate
+  - from: complete
+    to: archived
+    description: Manual archival after completion review
+    manual: true
+    auto: false
+    postconditions:
+      - role is terminal
+    catalyst: Standard progression
+    class_vs_specialty: class-agnostic
+    preconditions:
+      - Standard checks pass
+      - linked priority_plan is archived when priority_plan_ref is set
+    shockwave:
+      mode: propagate
+  - from: complete
+    to: planned
+    description: Reopen a falsely completed item so remaining work can execute
+    manual: true
+    auto: false
+    postconditions:
+      - role is shovel_ready
+      - 'terminal re-entry: remaining work exam, not a resume of the prior complete
+        closed system'
+    catalyst: Standard progression
+    class_vs_specialty: class-agnostic
+    shockwave:
+      mode: propagate
+  - from: complete
+    to: in_progress
+    description: Reopen a falsely completed item into active work
+    manual: true
+    auto: false
+    preconditions:
+      - Standard checks pass
+    postconditions:
+      - role is execution_locked
+      - terminal re-entry into execution_locked; new work interval, not rewind 
+        of the prior complete
+    catalyst: Standard progression
+    class_vs_specialty: class-agnostic
+    shockwave:
+      mode: propagate
+  - from: archived
+    to: complete
+    description: Restore a falsely archived item onto successful completion when
+      work was done and the execution parent is not on the history membrane. 
+      Re-entry is a new closed system, not a resume of the archive hop 
+      (RUL-1782235658105562000-b27c8dfc).
+    manual: true
+    auto: false
+    preconditions:
+      - all linked criteria_refs are validated or complete (archived-only 
+        lineage also satisfies; never delete archived CRITs to clear this gate)
+    postconditions:
+      - role is terminal
+      - work_done
+    catalyst: "Re-entry — operator promote after false archive"
+    class_vs_specialty: class-agnostic re-entry from archive membrane to success
+      terminal
+    shockwave:
+      mode: propagate
+  - from: '*'
+    to: archived
+    description: Manual archival from any status (object park --to archived). 
+      Fail-closed when a linked priority_plan is not archived (composed hold 
+      bli_archived_requires_archived_plan).
+    manual: true
+    auto: false
+    postconditions:
+      - role is terminal
+    catalyst: Standard progression
+    class_vs_specialty: class-agnostic
+    preconditions:
+      - Standard checks pass
+      - linked priority_plan is archived when priority_plan_ref is set
+    shockwave:
+      mode: propagate
+  - from: '*'
+    to: error
+    description: System-assigned when lifecycle incoherency detected
+    manual: false
+    auto: false
+    postconditions:
+      - role is halted
+    catalyst: Standard progression
+    class_vs_specialty: class-agnostic
+    preconditions:
+      - Standard checks pass
+    shockwave:
+      mode: propagate
+percent_complete:
+  method: status_defaults
+  default_by_status:
+    conceptual: 0
+    originated: 1
+    archived: 100
+    complete: 100
+    deferred: 2
+    error: 0
+    exploring: 5
+    in_progress: 50
+    planned: 15
+    roadmap: 5
+    validated: 10
+    testing: 25
+created_at: 2026-07-01 18:00:00+00:00
+updated_at: 2026-08-14 08:10:00+00:00
+created_by: ACC-1785920548450214012-68b850c0
+updated_by: ACC-1785920548450214012-68b850c0

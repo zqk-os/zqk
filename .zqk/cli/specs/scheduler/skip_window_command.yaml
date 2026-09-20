@@ -1,0 +1,33 @@
+$schema: "../schemas/command_spec.schema.json"
+
+name: "skip-window"
+short: "Set or clear scheduler skip window (bulk skip matching jobs until a time)"
+description: |
+  Manage `.zqk/scheduler/skip_window.yaml`. When active, the scheduler policy engine skips
+  matching job executions until `until` (handlers do not run). Use during instability or when
+  you want timer-driven jobs to stay quiet until the workspace is healthy again.
+
+  Subcommands: set, clear, status.
+
+help:
+  examples:
+    - comment: "Skip convergence_session_tick timer jobs for 2 hours"
+      command: "%s scheduler skip-window set --for 2h --job-type convergence_session_tick --trigger-type timer"
+    - comment: "Skip all jobs for 30 minutes (use with care)"
+      command: "%s scheduler skip-window set --for 30m --match-all"
+    - comment: "Show active window"
+      command: "%s scheduler skip-window status"
+    - comment: "Remove skip window"
+      command: "%s scheduler skip-window clear"
+  exclude_flags:
+    - "format"
+    - "output"
+    - "verbose"
+    - "quiet"
+    - "timeout"
+    - "columns"
+
+common_flags: false
+requires_storage: false
+requires_session: false
+requires_scheduler_check: false

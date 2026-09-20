@@ -1,0 +1,156 @@
+$schema: ../../../.zqk/cli/specs/schemas/lifecycle_spec.schema.json
+object_type: workstream
+extends: base_lifecycle
+status_mapping:
+  approved: active
+  archived: archived
+  error: error
+  implemented: complete
+  in_progress: active
+  proposed: planned
+statuses:
+  - value: conceptual
+    display: Conceptual
+    origin: true
+    preliminary: true
+    description: Draft plane status. Prior to CAS membrane crossing.
+    role: realign
+  - value: originated
+    display: Originated
+    description: CAS membrane crossed. Object officially originated.
+    role: realign
+  - value: planned
+    display: Planned
+    origin: false
+    preliminary: false
+    role: realign
+    description: 'workstream status ''planned'' (Planned): not yet committed for execution;
+      reshape before pickup.'
+  - value: active
+    display: Active
+    role: shovel_ready
+    description: 'workstream status ''active'' (Active): ready for pickup or use;
+      not locked mid-flight.'
+  - value: paused
+    display: Paused
+    role: halted
+    description: 'workstream status ''paused'' (Paused): paused or system-held for
+      repair; resolve before advancing.'
+  - value: complete
+    display: Complete
+    terminal: true
+    work_done: true
+    role: terminal
+    description: 'workstream status ''complete'' (Complete): ended; no further normal
+      execution transitions expected. Flags: terminal.'
+  - value: archived
+    display: Archived
+    terminal: true
+    role: terminal
+    description: 'workstream status ''archived'' (Archived): ended; no further normal
+      execution transitions expected. Flags: terminal.'
+    shockwave:
+      mode: shared
+      fail: closed
+      exclusive_kinds:
+        - workstream_transition
+transitions:
+  - from: conceptual
+    to: originated
+    description: Promote from draft plane to CAS membrane (CAS Qualification).
+    manual: true
+    auto: false
+    catalyst: System promotion
+    postconditions:
+      - role is realign
+    class_vs_specialty: class-agnostic
+    shockwave:
+      mode: propagate
+  - from: originated
+    to: planned
+    description: Initial domain workflow transition to planned.
+    manual: true
+    auto: true
+    catalyst: System initialization
+    postconditions:
+      - role is realign
+    class_vs_specialty: class-agnostic
+    shockwave:
+      mode: propagate
+  - from: planned
+    to: active
+    description: Commit research/execution lane (manual promote or auto when 
+      prerequisite milestones complete)
+    manual: true
+    auto: true
+    postconditions:
+      - role is shovel_ready
+    catalyst: Standard progression
+    class_vs_specialty: class-agnostic
+    shockwave:
+      mode: propagate
+  - from: active
+    to: complete
+    description: Auto-transition when all linked milestones are complete
+    manual: false
+    auto: true
+    postconditions:
+      - role is terminal
+    catalyst: Standard progression
+    class_vs_specialty: class-agnostic
+    shockwave:
+      mode: propagate
+  - from: active
+    to: paused
+    description: Auto-transition when any linked milestone is blocked for > 
+      threshold duration
+    manual: false
+    auto: true
+    postconditions:
+      - role is halted
+    catalyst: Standard progression
+    class_vs_specialty: class-agnostic
+    shockwave:
+      mode: propagate
+  - from: paused
+    to: active
+    description: Manual resume from paused
+    manual: true
+    auto: false
+    postconditions:
+      - role is shovel_ready
+      - halt resume returns the research/execution lane to shovel_ready; this is
+        not a priority_plan check-valve leak
+    catalyst: Standard progression
+    class_vs_specialty: class-agnostic
+    shockwave:
+      mode: propagate
+  - from: '*'
+    to: archived
+    description: Manual archival from any status
+    manual: true
+    auto: false
+    postconditions:
+      - role is terminal
+    catalyst: Standard progression
+    class_vs_specialty: class-agnostic
+    shockwave:
+      mode: propagate
+percent_complete:
+  method: milestone_based
+  default_by_status:
+    conceptual: 0
+    originated: 5
+    active: calculated
+    archived: 100
+    complete: 100
+    paused: calculated
+    planned: 20
+  milestone_based:
+    calculation: (completed_milestones / total_milestones) * 100
+    field: milestone_refs
+    weighted_by_stage_type: false
+created_at: 2026-07-01 18:00:00+00:00
+updated_at: 2026-07-01 18:00:00+00:00
+created_by: ACC-1785920548450214012-68b850c0
+updated_by: ACC-1785920548450214012-68b850c0

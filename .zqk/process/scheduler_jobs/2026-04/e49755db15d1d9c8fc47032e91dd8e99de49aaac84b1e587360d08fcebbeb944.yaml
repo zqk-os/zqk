@@ -1,0 +1,36 @@
+category: maintenance
+command: /bin/sh
+command_args:
+    - -c
+    - |-
+      set -e
+      ROOT="${ZQK_PROJECT_ROOT:-$(pwd)}"
+      export ZQK_PROJECT_ROOT="$ROOT"
+      exec /bin/sh "$ROOT/scripts/record_convergence_overseer_run.sh"
+created_at: "2026-04-04T21:35:00Z"
+created_by: ACC-1785920548450214012-68b850c0
+description: |
+    Runs `scripts/record_convergence_overseer_run.sh` once per day to capture
+    overseer JSON (tree + rollup_status_core + arbitrated line) for auditing and
+    future automation without persisting process objects.
+enabled: true
+environment_variables:
+    COORDINATOR_SESSION_ID: CVS-1776058539101059000-ffbcee8f
+    OVERSEER_SKIP_ROLLUP_GATES: "1"
+execution_mode: reusable
+id: SCH-convergence-overseer-record
+job_type: run_wrapper
+kind: scheduler_job
+max_runtime_seconds: 600
+namespace_id: zqk:kernel
+origin_project: zqk
+origin_system: zqk
+schedule_expression: 0 12 * * *
+schema_version: 2.0.0
+source_type: internal
+status: active
+title: Convergence — overseer JSONL record (read-only)
+trigger_type: timer
+updated_at: "2026-09-19T00:20:40Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

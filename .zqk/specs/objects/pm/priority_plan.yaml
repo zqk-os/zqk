@@ -1,0 +1,587 @@
+schema_version: 2.0.0
+ontology: priority_plan
+urn: urn:zqk:spec:project_mgmt:priority_plan
+namespace: zqk:project_mgmt
+extends: work_interval
+composes:
+  - remaining_open
+visibility: public
+description: 'Represents a priority plan that organizes backlog items into priority tiers (P0, P1, P2, P3). Priority plans are used to sequence work and manage capacity across workstreams.\nCHILD→PARENT ONLY: Membership is exclusively backlog_item.priority_plan_ref → this plan. Do not store\nbacklog_item_refs (or legacy p0_items/p1_items/…) on priority_plan — parent→child refs are forbidden\non this kind and on the graph edge set (query children with filter priority_plan_ref=<PRI-id>).\nUse zqk pplan add/remove to bind membership on the child. Stray backlog_item_refs on instances are\nrejected by composed integrity (pri_no_backlog_item_refs).\nNEW MODEL (as of 2025-12-15): Priority plans no longer store tier arrays (p0_items, p1_items, etc.).\nTiering comes from each item''s priority_tier field (P0, P1, P2, P3).\nLifecycle: priority_plan_lifecycle.yaml.\n'
+traits:
+  - base_object_traits
+  - constrainable
+  - completable
+  - status_reactive
+  - open_countable
+  - summarizes_children
+fields:
+  active_order:
+    checklist:
+      authority: owner/executive.
+      automation_hooks: used for deterministic current plan selection when multiple plans are active.
+      cardinality: one
+      criticality: metadata
+      default: null (treated as lowest priority)
+      dependencies: none.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Explicit ordering for active priority plans. Lower numbers take precedence when multiple plans are active. If not set, defaults to lowest priority (treated as highest number).
+      security: non-sensitive
+      system_usage:
+        - selection
+        - ordering
+      validation: Must be a positive integer. Lower numbers indicate higher priority for current plan selection.
+    field_profile_code: PRIO-013
+    permissions: rwx
+    semantic_type: ordering
+    traits:
+      - filterable
+      - groupable
+      - listable
+      - modifiable
+      - readable
+      - searchable
+      - sortable
+      - writable
+    type: integer
+    validation:
+      required: false
+  branch_name:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation/orchestrator.
+      automation_hooks: used by agent orchestrator to checkout the correct worktree.
+      cardinality: one
+      criticality: composition
+      default: null
+      dependencies: git
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Track the collaboration branch where work is executed for this object.
+      security: non-sensitive
+      system_usage:
+        - checkout
+        - orchestration
+      validation: Must be a valid git branch name.
+    type: string
+  code_location:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: used for linking priority plan to codebase.
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: source code.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: List of codebase locations (files/packages) associated with this plan.
+      security: non-sensitive
+      system_usage:
+        - traceability
+        - context
+      validation: list of file paths or package names.
+    field_profile_code: PRIO-019
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+      - modifiable
+    type: list
+    validation:
+      required: false
+  description:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: used in reports and documentation.
+      cardinality: one
+      criticality: association
+      default: null
+      dependencies: none.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Description of this priority plan.
+      security: non-sensitive
+      system_usage:
+        - documentation
+        - context
+      validation: Free text or markdown.
+    field_profile_code: PRIO-000
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+      - modifiable
+    type: text
+    validation:
+      required: false
+  id:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation (Generator)
+      automation_hooks: used for cross-file references.
+      cardinality: one
+      criticality: composition
+      default: auto-assigned per kind sequence
+      dependencies: linkage constraints, URN creation.
+      observability: logged + manifests.
+      origin_lifecycle: immutable
+      purpose: Stable identifier for the priority plan. Supports formats like \\\"PRIO-20251212-week1\\\", \\\"PRIO-4\\\", \\\"PRI-001\\\", etc.
+      security: non-sensitive
+      system_usage:
+        - linking
+        - reporting
+        - URIs
+      validation: Must start with PRI- or PRIO- followed by alphanumeric characters, dots, dashes, or underscores.
+    field_profile_code: PRIO-000
+    permissions: r-x
+    semantic_type: statement
+    traits:
+      - filterable
+      - listable
+      - readable
+      - searchable
+      - sortable
+      - writable
+    type: string
+    validation:
+      pattern: ^(PRI-|PRIO-)[A-Za-z0-9][A-Za-z0-9._-]*$
+      required: true
+  next_plan_id:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: system.
+      automation_hooks: used for plan history navigation.
+      cardinality: one
+      criticality: association
+      default: null
+      dependencies: priority_plan registry.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Reference to the next priority plan for historical tracking.
+      security: non-sensitive
+      system_usage:
+        - tracking
+        - navigation
+      validation: Must reference existing priority plan ID.
+    field_profile_code: PRIO-010
+    permissions: r-x
+    semantic_type: reference
+    traits:
+      - readable
+      - writable
+      - modifiable
+    type: string
+    validation:
+      required: false
+  note:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: used in reports and documentation.
+      cardinality: one
+      criticality: association
+      default: null
+      dependencies: none.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Optional notes about the priority plan.
+      security: non-sensitive
+      system_usage:
+        - documentation
+        - context
+      validation: Free text or markdown.
+    field_profile_code: PRIO-006
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - field_mutable_group
+    type: text
+    validation:
+      required: false
+  persona_refs:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner/executive.
+      automation_hooks: used for persona-based filtering.
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: persona registry.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: List of persona IDs associated with this priority plan. Required (with team_configuration_ref as alternate) before shovel-ready active / execution-locked — CAP dispatch identity.
+      security: non-sensitive
+      system_usage:
+        - grouping
+        - reporting
+        - routing
+      validation: Must reference existing persona IDs.
+    field_profile_code: PRIO-015
+    permissions: r-x
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+      - field_reference_group
+    type: list
+    validation:
+      required: false
+  plan_date:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: system.
+      automation_hooks: used for plan date tracking.
+      cardinality: one
+      criticality: metadata
+      default: null
+      dependencies: none.
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: ISO-8601 date when this priority plan was created.
+      security: non-sensitive
+      system_usage:
+        - tracking
+        - reporting
+      validation: Must be in ISO-8601 format (YYYY-MM-DD or RFC3339).
+    field_profile_code: PRIO-000
+    permissions: r-x
+    semantic_type: date
+    traits:
+      - readable
+      - writable
+      - modifiable
+    type: string
+    validation:
+      required: false
+  plan_version:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: used for plan versioning.
+      cardinality: one
+      criticality: metadata
+      default: null
+      dependencies: none.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Version identifier for this priority plan (e.g., \\\"v1.0\\\", \\\"2025-01-21\\\").
+      security: non-sensitive
+      system_usage:
+        - tracking
+        - versioning
+      validation: Free text version identifier.
+    field_profile_code: PRIO-000
+    permissions: rwx
+    semantic_type: version
+    traits:
+      - field_mutable_group
+    type: string
+    validation:
+      required: false
+  previous_plan_id:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: system.
+      automation_hooks: used for plan history navigation.
+      cardinality: one
+      criticality: association
+      default: null
+      dependencies: priority_plan registry.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Reference to the previous priority plan for historical tracking.
+      security: non-sensitive
+      system_usage:
+        - tracking
+        - navigation
+      validation: Must reference existing priority plan ID.
+    field_profile_code: PRIO-009
+    permissions: r-x
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+    type: string
+    validation:
+      required: false
+  rationale:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner/executive.
+      automation_hooks: used in reports and documentation.
+      cardinality: one
+      criticality: association
+      default: null
+      dependencies: none.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Rationale for priority assignments in this plan.
+      security: non-sensitive
+      system_usage:
+        - documentation
+        - context
+      validation: Free text or markdown.
+    field_profile_code: PRIO-000
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+      - modifiable
+    type: text
+    validation:
+      required: false
+  release_ref:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: system.
+      automation_hooks: used for release tracking.
+      cardinality: one
+      criticality: association
+      default: null
+      dependencies: release registry.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Link to release object created when plan completes.
+      security: non-sensitive
+      system_usage:
+        - tracking
+        - reporting
+      validation: Must reference existing release ID.
+    field_profile_code: PRIO-012
+    permissions: r-x
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+      - field_reference_group
+    type: string
+    validation:
+      required: false
+  source_file:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: system.
+      automation_hooks: used for plan generation tracking.
+      cardinality: one
+      criticality: metadata
+      default: null
+      dependencies: none.
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: Path to source markdown file used to create this priority plan.
+      security: non-sensitive
+      system_usage:
+        - metadata
+        - tracking
+      validation: File path string.
+    field_profile_code: PRIO-007
+    permissions: r-x
+    semantic_type: path
+    traits:
+      - readable
+      - writable
+      - modifiable
+    type: string
+    validation:
+      required: false
+  source_format:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: system.
+      automation_hooks: used for plan generation tracking.
+      cardinality: one
+      criticality: metadata
+      default: manual
+      dependencies: none.
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: Indicates the source format used to create this priority plan.
+      security: non-sensitive
+      system_usage:
+        - metadata
+        - tracking
+      validation: 'Must be one of: markdown, yaml, manual.'
+    field_profile_code: PRIO-008
+    permissions: r-x
+    semantic_type: metadata
+    traits:
+      - field_mutable_group
+    type: string
+    validation:
+      enum:
+        - markdown
+        - yaml
+        - manual
+      required: false
+  team_configuration_ref:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner
+      automation_hooks: used by CAP Loop sub-kernel provisioner
+      cardinality: zero_or_one
+      criticality: association
+      default: null
+      dependencies: team configuration registry
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: References a team configuration (cellular archetype) for the priority plan pod execution. Required (with persona_refs as alternate) before shovel-ready active / execution-locked — CAP dispatch identity (TRACK BLI-1785915238591238000-619a2f9e).
+      security: non-sensitive
+      system_usage:
+        - orchestrator provisioning
+        - routing
+      validation: Must reference a team_configuration ID
+    field_profile_code: PRIO-018
+    permissions: rwx
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+      - field_reference_group
+    type: reference
+    validation:
+      required: false
+  workflow_ref:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner/admin.
+      automation_hooks: used for workflow constraint validation during activation.
+      cardinality: zero_or_one
+      criticality: association
+      default: null
+      dependencies: workflow registry.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Reference to workflow object that defines constraints and rules for this priority plan. Workflow constraints are enforced when plan transitions to active status.
+      security: non-sensitive
+      system_usage:
+        - workflow validation
+        - constraint enforcement
+        - role-based access control
+      validation: Must reference existing workflow object ID (WFL-###).
+    field_profile_code: PRIO-014
+    permissions: rwx
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+      - field_reference_group
+    type: string
+    validation:
+      required: false
+  workstream_ref:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner/executive.
+      automation_hooks: used for workstream-based grouping.
+      cardinality: one
+      criticality: association
+      default: null
+      dependencies: workstream registry.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Link to associated workstream (singular reference, legacy field).
+      security: non-sensitive
+      system_usage:
+        - grouping
+        - reporting
+      validation: Must reference existing workstream ID.
+    field_profile_code: PRIO-011
+    permissions: r-x
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+      - field_reference_group
+    type: string
+    validation:
+      required: false
+  workstream_refs:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner/executive.
+      automation_hooks: used for workstream-based grouping.
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: workstream registry.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: List of workstream IDs associated with this priority plan.
+      security: non-sensitive
+      system_usage:
+        - grouping
+        - reporting
+      validation: Must reference existing workstream IDs.
+    field_profile_code: PRIO-005
+    permissions: r-x
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+      - field_reference_group
+    type: list
+    validation:
+      required: false
+  epic_refs:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner/planner.
+      automation_hooks: links priority execution plans implementing this epic.
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: epic registry.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Epics driving execution of this priority plan.
+      security: non-sensitive
+      system_usage:
+        - execution
+        - scheduling
+      validation: Must reference existing epic IDs.
+    field_profile_code: PRIO-020
+    permissions: r-x
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+      - field_reference_group
+    type: list
+    validation:
+      required: false
+

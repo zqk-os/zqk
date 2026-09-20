@@ -1,0 +1,57 @@
+$schema: "../../../schemas/command_spec.schema.json"
+
+name: "promote"
+short: "Promote (or dry-run) objects on the object draft plane"
+description: |
+  Enumerates .zqk/object_drafts and advances each matching draft one lifecycle
+  hop when preconditions pass (same rules as `object promote`). Stuck ids report
+  reasons; successful promotes materialize to CAS and remove the draft file.
+  Default is dry-run; pass --all (or --max with filters) to apply.
+
+flags:
+  - name: "dry-run"
+    type: "bool"
+    default: true
+    description: "List matching drafts and probe promote readiness without writing"
+  - name: "all"
+    type: "bool"
+    default: false
+    description: "Required to apply promotes across the matched set (fail closed without this or --max+filters)"
+  - name: "kind"
+    type: "string"
+    default: ""
+    description: "Limit to one object kind directory under object_drafts"
+  - name: "id-prefix"
+    type: "string"
+    default: ""
+    description: "Only ids with this prefix"
+  - name: "status"
+    type: "string"
+    default: ""
+    description: "Only drafts whose YAML status equals this value"
+  - name: "older-than"
+    type: "string"
+    default: ""
+    description: "Only drafts whose file mtime is older than this duration (e.g. 24h, 168h)"
+  - name: "max"
+    type: "int"
+    default: 0
+    description: "Optional cap on promotions / would-promote listings"
+
+args:
+  type: "no_args"
+
+help:
+  examples:
+    - comment: "Dry-run (default): show draft-plane promote candidates"
+      command: "%s object draft promote --dry-run --all"
+    - comment: "Promote all draft agent_task objects that are ready"
+      command: "%s object draft promote --kind agent_task --all --dry-run=false"
+    - comment: "Promote up to 10 drafts with id prefix ATK-"
+      command: "%s object draft promote --id-prefix ATK- --max 10 --dry-run=false"
+  exclude_flags:
+    - "columns"
+    - "ignore-scheduler-down"
+
+run_e: "runObjectDraftPromote"
+common_flags: true

@@ -1,0 +1,22 @@
+Display a workstream transition. If id is provided, show that transition;
+otherwise list
+
+workstream_transition and show the first.
+
+
+
+Respects field-level read permissions (BLI-642). Output format via --format.
+
+  Show first workstream transition
+  zqk object wstrans show
+  Show by ID
+  zqk object wstrans show WST-001
+  Show in JSON format
+  zqk object wstrans show --format json
+
+Usage:
+  zqk object wstrans show [flags]
+
+Global Flags:
+      --allow-degraded   Allow scheduler-dependent commands to run when scheduler daemon is not running
+      --internal         Elevated access mode for built-in and internal kinds (requires Enterprise license or zqk-admin)

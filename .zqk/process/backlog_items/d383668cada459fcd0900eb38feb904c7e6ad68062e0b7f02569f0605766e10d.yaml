@@ -1,0 +1,39 @@
+acceptance_considerations: 1. Zero mentions of private studio endpoints or internal
+  repo links; 2. All canonical org links point to github.com/zqk-os/zqk; 3. Identity
+  and naming are consistent across all docs.
+actual_effort: 0h
+commit_hashes:
+- ca0088e32b8bef5fadc0921256a7333a2d72b4d7
+completed_at: '2026-09-20T02:19:53Z'
+created_at: '2026-09-20T02:04:12Z'
+created_by: ACC-1785920548450214012-68b850c0
+criteria_refs:
+- CRIT-1789702449225534000-91965c35
+description: Systematically replace all internal studio references, legacy organization
+  names, and private repository links with canonical public equivalents.
+estimated_effort: 3h
+id: BLI-1789869852579209000-b3f94849
+kind: backlog_item
+milestone_refs:
+- MIL-1789672699275510000-40c8cee7
+namespace_id: zqk:kernel
+persona_refs:
+- PER-COMMUNITY-SOFTWARE-ENGINEER
+priority: high
+priority_plan_ref: PRI-1789868700000000000-d5fc9750
+priority_tier: P0
+problem_statement: Documentation and metadata files contain hardcoded studio-private
+  repo links, private agent handles, and internal account IDs unsuitable for public
+  release.
+requirement_refs:
+- REQ-1789702448467715000-c05a9ef4
+schema_version: 2.0.0
+started_at: '2026-09-20T02:19:27Z'
+status: complete
+title: Harmonize Public Identity and Scrub Stale Private Mentions across Docs and
+  Configs
+updated_at: '2026-09-20T02:39:25Z'
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs:
+- WS-1789631797993326000-f9951fe8

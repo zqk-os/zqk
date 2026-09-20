@@ -1,0 +1,22 @@
+kind: policy
+schema_version: "2.0.0"
+title: Pull Request-Only Development and Plan-Scoped Branches
+status: active
+category: workflow
+policy_type: requirement
+body: |
+  All codebase evolution must proceed via plan-scoped integration branches and verified
+  pull requests. Direct commits or unreviewed pushes to `main` are prohibited.
+
+  **Requirements**
+  - Branch names must strictly align with active priority plans (`integration/pri-<name>-<num>`).
+  - Pre-merge verification requires 100% passing tests and zero linter warnings.
+  - Pull requests must cite the owning priority plan, requirements, and acceptance criteria.
+  - Swarm peers coordinate merges across the integration plane before promotion to `main`.
+
+  **Why**: Enforcing PR-only discipline maintains a clean, linear, and reproducible git release history.
+effective_date: "2026-09-14"
+enforcement:
+  automated: true
+  reminder_enabled: true
+  severity: critical

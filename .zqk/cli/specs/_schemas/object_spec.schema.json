@@ -1,0 +1,222 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://zqk.dev/schemas/object_spec.schema.json",
+  "title": "Object Specification Schema",
+  "description": "Schema for object specifications that define fields, traits, and metadata for system objects",
+  "type": "object",
+  "required": ["schema_version", "ontology", "visibility", "description", "traits", "fields"],
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "Reference to this schema file"
+    },
+    "schema_version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "Semantic version of the object spec schema (e.g., 2.0.0)"
+    },
+    "ontology": {
+      "type": "string",
+      "pattern": "^[a-z_]+$",
+      "description": "Ontology type identifier (e.g., backlog_item, goal, milestone)"
+    },
+    "urn": {
+      "type": "string",
+      "pattern": "^urn:[a-zA-Z0-9_\\-]+:spec:[a-zA-Z0-9_\\-]+:[a-zA-Z0-9_\\-]+$",
+      "description": "Canonical URN identifier of the object specification"
+    },
+    "namespace": {
+      "type": "string",
+      "pattern": "^([a-zA-Z0-9_\\-]+|domain|integration):[a-z0-9_]+(:[a-z0-9_]+)*$",
+      "description": "Namespace identifier for this object specification"
+    },
+    "extends": {
+      "oneOf": [
+        { "type": "string", "pattern": "^[a-z_]+$" },
+        { "type": "string", "const": "null" }
+      ],
+      "description": "Parent ontology to extend (or 'null' for root specs like auditable)"
+    },
+    "composes": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z_]+$"
+      },
+      "description": "Mixin ontologies whose resolved fields and traits merge after extends (child wins). Independent of the single-parent extends DAG. Use when a facet (e.g. occupancy) is orthogonal to the parent chain (e.g. work_unit)."
+    },
+    "visibility": {
+      "type": "string",
+      "enum": ["public", "internal", "private"],
+      "description": "Visibility level: public (user-visible), internal (system), private (restricted)"
+    },
+    "description": {
+      "type": "string",
+      "description": "Human-readable description of the object type"
+    },
+    "traits": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "List of trait identifiers that apply to this object type"
+    },
+    "storage_profile": {
+      "type": "string",
+      "enum": ["cas_entity", "light_file", "stream"],
+      "description": "Data-cell physical storage profile for this kind (inherited along extends when omitted)"
+    },
+    "fields": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/definitions/fieldDefinition"
+      },
+      "description": "Field definitions for this object type"
+    }
+  },
+  "definitions": {
+    "fieldDefinition": {
+      "type": "object",
+      "required": ["access", "checklist", "field_profile_code", "permissions", "semantic_type", "traits", "type", "validation"],
+      "properties": {
+        "access": {
+          "type": "object",
+          "properties": {
+            "requires": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "description": "Access control requirements"
+        },
+        "checklist": {
+          "type": "object",
+          "required": ["authority", "cardinality", "criticality", "default", "dependencies", "lifecycle", "observability", "purpose", "security", "system_usage", "validation"],
+          "properties": {
+            "authority": {
+              "type": "string",
+              "description": "Who has authority to set/modify this field (e.g., 'owner', 'automation', 'system')"
+            },
+            "automation_hooks": {
+              "type": "string",
+              "description": "How automation uses this field"
+            },
+            "cardinality": {
+              "type": "string",
+              "enum": ["one", "many", "zero_or_one"],
+              "description": "Cardinality: one (single value), many (list), zero_or_one (optional single)"
+            },
+            "criticality": {
+              "type": "string",
+              "enum": ["composition", "association"],
+              "description": "Criticality: composition (required for identity), association (optional relationship)"
+            },
+            "default": {
+              "description": "Default value (type depends on field type)"
+            },
+            "dependencies": {
+              "type": "string",
+              "description": "External dependencies or systems this field relies on"
+            },
+            "lifecycle": {
+              "type": "string",
+              "enum": ["immutable", "mutable", "append-only"],
+              "description": "Lifecycle mutability: immutable (never changes), mutable (can change), append-only (only additions)"
+            },
+            "observability": {
+              "oneOf": [
+                { "type": "string", "enum": ["yes", "no"] },
+                { "type": "boolean" }
+              ],
+              "description": "Whether this field is observable/logged"
+            },
+            "purpose": {
+              "type": "string",
+              "description": "Human-readable purpose of this field"
+            },
+            "security": {
+              "type": "string",
+              "description": "Security classification (e.g., 'non-sensitive', 'confidential', 'PII')"
+            },
+            "system_usage": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "List of system features that use this field"
+            },
+            "validation": {
+              "type": "string",
+              "description": "Human-readable validation rules"
+            }
+          },
+          "additionalProperties": false
+        },
+        "field_profile_code": {
+          "type": "string",
+          "pattern": "^[A-Z]+-\\d{3,}$",
+          "description": "Unique field profile code (e.g., BLI-001, BSE-013)"
+        },
+        "permissions": {
+          "type": "string",
+          "pattern": "^r?w?x?$",
+          "description": "Permission flags: r (read), w (write), x (execute/query)"
+        },
+        "semantic_type": {
+          "type": "string",
+          "enum": ["statement", "reference", "expression", "list", "comparison", "identifier"],
+          "description": "Semantic type for GraphRAG and reasoning"
+        },
+        "traits": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "List of traits that apply to this field"
+        },
+        "type": {
+          "type": "string",
+          "enum": ["string", "text", "int", "float", "bool", "list", "map", "object", "datetime", "enum"],
+          "description": "Data type of the field"
+        },
+        "validation": {
+          "type": "object",
+          "properties": {
+            "required": {
+              "type": "boolean"
+            },
+            "pattern": {
+              "type": "string",
+              "description": "Regex pattern for validation"
+            },
+            "enum": {
+              "type": "array",
+              "description": "Enum values (for enum type)"
+            },
+            "min_length": {
+              "type": "integer"
+            },
+            "max_length": {
+              "type": "integer"
+            },
+            "min": {
+              "type": "number"
+            },
+            "max": {
+              "type": "number"
+            },
+            "display_length": {
+              "type": "integer",
+              "description": "Maximum characters for table display (for listable fields)"
+            }
+          },
+          "additionalProperties": true,
+          "description": "Validation rules for this field"
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

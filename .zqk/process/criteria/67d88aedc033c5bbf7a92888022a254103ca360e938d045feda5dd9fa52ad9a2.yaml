@@ -1,0 +1,13 @@
+category: functional
+created_at: "2026-09-19T05:55:00Z"
+created_by: ACC-1785920548450214012-68b850c0
+description: An automated verification check enforces that every registered cobra command in cmd/zqk maps 1:1 to an existing, valid command spec in .zqk/cli/specs/.
+id: CRIT-CLI-SPEC-100PCT-COVERAGE-001
+kind: criteria
+namespace_id: zqk:kernel
+schema_version: 2.0.0
+status: complete
+title: 100% of executable zqk CLI commands have matching valid specs verified by automated gate
+updated_at: "2026-09-19T07:22:22Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

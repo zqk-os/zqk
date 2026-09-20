@@ -1,0 +1,20 @@
+id: SCH-stream-gc-hourly
+title: Telemetry Stream GC (Hourly)
+description: |
+  Runs `zqk system stream-gc` to prune orphaned JSONL stream segment files from .zqk/streams/
+  This prevents disk explosion and file descriptor exhaustion from old telemetry files.
+  Fulfills BLI-1782716260842767000-f4e08645 (Implement Telemetry Stream Compaction and GC).
+job_type: run_wrapper
+trigger_type: timer
+schedule_expression: "0 * * * *"
+category: maintenance
+execution_mode: reusable
+max_runtime_seconds: 3600
+enabled: true
+status: active
+namespace_id: zqk:kernel
+schema_version: "2.0.0"
+command: ./bin/zqk
+command_args:
+  - system
+  - stream-gc

@@ -1,0 +1,37 @@
+body: |
+    ZQK must remain universally project-agnostic in its configuration, execution environment, and exposed product surface area. No part of the kernel, CLI, MCP server, or daemon infrastructure may couple itself to a specific host machine, proprietary developer seat, or private directory layout.
+
+    **Core Architectural Invariants**
+    1. **Universal Path Encapsulation (Zero Machine-Specific Hardcoding):**
+       - Tracked repository configurations, IDE settings, templates, and scripts must never contain absolute paths (e.g. `/Users/...` or `/home/...`).
+       - Configuration files must exclusively use relative paths, environment expansion variables (e.g. `${workspaceFolder}`), or dynamic kernel root discovery (`zqk --root`).
+    2. **Brand & Product Surface Neutrality:**
+       - The engine and CLI framework must remain neutral and customizable via `brand.ExecutableName()`.
+       - Kernel commands, object schemas, and telemetry events must represent engine-level concepts rather than vendor-specific or studio-specific nomenclature.
+    3. **Universal Transport Defaults (Direct Stdio First):**
+       - Direct Stdio (JSON-RPC over standard I/O) is the canonical baseline transport for external agent and IDE integration (e.g. `zqk mcp serve`).
+       - Daemon, socket, and proxy transports are strictly opt-in performance overlays for high-concurrency studio environments and must never be required for standalone workspace operation.
+    4. **Strict Multi-Root Isolation (Zero Cross-Repo Contamination):**
+       - Daemons, background schedulers, host service registries, and state snapshots must be strictly scoped to their canonical repository root ID (`root_id`).
+       - Commands like `zqk system start` or `shutdown` must never perform indiscriminate host-level operations across other repositories or launchd units.
+    5. **Independent Workspace Self-Containment:**
+       - Any workspace initialized with ZQK must be fully functional from its own local `.zqk/` metadata without depending on external studio seating, uncommitted local branches, or proprietary enterprise overlays.
+
+    **Why**: A self-healing cellular kernel must be portable across any operating system, repository, or user environment without leaky abstractions, cross-talk, or manual path patching.
+category: architecture
+created_at: "2026-09-19T00:57:27Z"
+created_by: ACC-1785920548450214012-68b850c0
+description: Mandates that ZQK core kernel, CLI commands, daemons, and configuration layers must remain universally project-agnostic, portable, and free of host or vendor-specific hardcoding.
+enforcement:
+    automated: true
+    severity: critical
+id: POL-CODE-1789779447521208000-ffc6efb9
+kind: policy
+namespace_id: zqk:kernel
+policy_type: standard
+schema_version: 2.0.0
+status: active
+title: 'Project-Agnostic Architecture: Universal Encapsulation and Neutral Product Surface Area'
+updated_at: "2026-09-19T00:58:00Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

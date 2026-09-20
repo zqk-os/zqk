@@ -1,0 +1,106 @@
+$schema: "../../../.zqk/cli/specs/schemas/lifecycle_spec.schema.json"
+
+object_type: agent_architecture
+# Five-question exam: docs/architecture/LIFECYCLE_STATE_MACHINE_RUBRIC.md
+# TRACK: BLI-CEF-R26-REMAINING-KINDS-001
+statuses:
+  - value: conceptual
+    display: Conceptual
+    origin: true
+    preliminary: true
+    description: Draft plane status. Prior to CAS membrane crossing.
+    role: realign
+  - value: originated
+    display: Originated
+    description: CAS membrane crossed. Object officially originated.
+    role: realign
+  - value: design
+    display: Design
+    origin: false
+    preliminary: false
+    role: realign
+    description: "agent architecture status 'design' (Design): not yet committed for
+      execution; reshape before pickup."
+  - value: implementation
+    display: Implementation
+    role: realign
+    description: "agent architecture status 'implementation' (Implementation): not
+      yet committed for execution; reshape before pickup."
+  - value: active
+    display: Active
+    terminal: true
+    role: terminal
+    description: "agent architecture status 'active' (Active): ended; no further normal
+      execution transitions expected. Flags: terminal."
+  - value: archived
+    display: Archived
+    terminal: true
+    archive: true
+    role: terminal
+    description: "agent architecture status 'archived' (Archived): ended; no further
+      normal execution transitions expected. Flags: archive, terminal."
+  - value: error
+    display: Error
+    system: true
+    role: halted
+    description: "agent architecture status 'error' (Error): paused or system-held
+      for repair; resolve before advancing. Flags: system-assigned."
+transitions:
+  - from: conceptual
+    to: originated
+    description: Promote from draft plane to CAS membrane (CAS Qualification).
+    manual: true
+    auto: false
+    catalyst: System promotion
+  - from: originated
+    to: design
+    description: Initial domain workflow transition to design.
+    manual: true
+    auto: true
+    catalyst: System initialization
+  - from: design
+    to: implementation
+    description: Move from design to implementation
+    manual: true
+    auto: false
+    postconditions:
+      - role is realign
+  - from: implementation
+    to: active
+    description: Activate architecture
+    manual: true
+    auto: false
+    postconditions:
+      - role is terminal
+  - from: active
+    to: archived
+    description: Archive architecture
+    manual: true
+    auto: false
+    postconditions:
+      - role is terminal
+      - ended; no further normal execution hops expected
+  - from: '*'
+    to: error
+    description: System error occurred
+    manual: false
+    auto: true
+    postconditions:
+      - role is halted
+      - hop from any occupancy to error
+      - system halt; repair before leaving halted
+percent_complete:
+  method: status_defaults
+  default_by_status:
+    conceptual: 0
+    originated: 5
+    active: 100
+    archived: 100
+    design: 0
+    error: 0
+    implementation: 50
+machine_hints: []
+created_at: 2026-07-01T18:00:00Z
+updated_at: 2026-07-01T18:00:00Z
+created_by: ACC-1785920548450214012-68b850c0
+updated_by: ACC-1785920548450214012-68b850c0

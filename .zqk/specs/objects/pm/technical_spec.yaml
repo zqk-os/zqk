@@ -1,0 +1,92 @@
+schema_version: 2.0.0
+ontology: technical_spec
+extends: base_object
+visibility: public
+description: Technical Specs define the engineering implementation architecture for specific domain problems, supporting the Context Onion by explicitly mapping down to Requirements.\n
+traits:
+  - base_object_traits
+fields:
+  component:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: architect/owner.
+      automation_hooks: groups tech specs by component.
+      cardinality: one
+      criticality: association
+      default: null
+      dependencies: none.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Target component or system module this spec covers.
+      security: non-sensitive
+      system_usage:
+        - traceability
+      validation: structured string.
+    field_profile_code: TSP-001
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - field_mutable_group
+    type: string
+    validation:
+      required: false
+  description:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: architect/owner.
+      automation_hooks: used in prompt builders for domain context.
+      cardinality: one
+      criticality: association
+      default: none
+      dependencies: none.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Architectural explanation and context of the implementation approach.
+      security: non-sensitive
+      system_usage:
+        - documentation
+        - context layering
+      validation: markdown.
+    field_profile_code: TSP-002
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+      - modifiable
+    type: text
+    validation:
+      required: true
+  requirement_refs:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: architect/owner.
+      automation_hooks: maps technical specs to acceptance criteria.
+      cardinality: many (>=1)
+      criticality: composition
+      default: required
+      dependencies: none.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Requirements this technical specification addresses.
+      security: non-sensitive
+      system_usage:
+        - validation
+        - context layering
+      validation: IDs exist.
+    field_profile_code: TSP-003
+    permissions: r-x
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+      - field_reference_group
+    type: list
+    validation:
+      min_length: 1
+      required: true

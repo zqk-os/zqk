@@ -1,0 +1,358 @@
+schema_version: 2.0.0
+ontology: scheduler_health_metric
+extends: base_metric
+visibility: internal
+description: 'Scheduler health and recovery metrics. Tracks health check runs, missed job triggers, automatic recoveries, and cron scheduler restarts for monitoring scheduler daemon reliability and self-healing capabilities.\nLifecycle: scheduler_health_metric_lifecycle.yaml.\n'
+traits:
+  - listable
+  - readable
+  - writable
+  - modifiable
+  - formatable
+  - groupable
+  - filterable
+  - sortable
+  - searchable
+fields:
+  cron_restarts:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation (scheduler health monitor)
+      automation_hooks: used for cron stability analysis.
+      cardinality: one
+      criticality: association
+      default: 0
+      dependencies: scheduler health monitoring system.
+      observability: "yes"
+      origin_lifecycle: mutable (incremented when cron scheduler is restarted)
+      purpose: Total number of times the cron scheduler was automatically restarted.
+      security: non-sensitive
+      system_usage:
+        - stability analysis
+        - scheduler reliability reporting
+        - failure detection
+      validation: Non-negative integer.
+    field_profile_code: SHM-004
+    permissions: rwx
+    semantic_type: measurement
+    traits:
+      - listable
+      - readable
+      - writable
+      - filterable
+      - sortable
+    type: integer
+    validation:
+      required: true
+  goroutine_count:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation (scheduler health monitor)
+      automation_hooks: used for thread explosion diagnosis and trend analysis.
+      cardinality: one
+      criticality: association
+      default: 0
+      dependencies: Go runtime (runtime.NumGoroutine).
+      observability: "yes"
+      origin_lifecycle: mutable (sampled each health check)
+      purpose: Number of goroutines in the scheduler process at sample time (helps diagnose thread explosion).
+      security: non-sensitive
+      system_usage:
+        - thread explosion diagnosis
+        - resource trend analysis
+      validation: Non-negative integer.
+    field_profile_code: SHM-008
+    permissions: rwx
+    semantic_type: measurement
+    traits:
+      - listable
+      - readable
+      - writable
+      - filterable
+      - sortable
+    type: integer
+    validation:
+      required: false
+  health_check_duration_ms:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation (scheduler health monitor)
+      automation_hooks: used for performance trend analysis.
+      cardinality: one
+      criticality: association
+      default: 0
+      dependencies: scheduler health monitoring system.
+      observability: "yes"
+      origin_lifecycle: mutable (updated on each health check)
+      purpose: Duration of the health check in milliseconds.
+      security: non-sensitive
+      system_usage:
+        - performance reporting
+        - trend analysis
+        - health check efficiency monitoring
+      validation: Non-negative number (milliseconds).
+    field_profile_code: SHM-005
+    permissions: rwx
+    semantic_type: measurement
+    traits:
+      - readable
+      - writable
+      - filterable
+      - sortable
+    type: number
+    validation:
+      required: true
+  health_checks:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation (scheduler health monitor)
+      automation_hooks: used for health check frequency analysis.
+      cardinality: one
+      criticality: composition
+      default: 0
+      dependencies: scheduler health monitoring system.
+      observability: "yes"
+      origin_lifecycle: mutable (incremented on each health check)
+      purpose: Total number of health check runs performed.
+      security: non-sensitive
+      system_usage:
+        - reporting
+        - frequency tracking
+        - health monitoring
+      validation: Non-negative integer.
+    field_profile_code: SHM-001
+    permissions: rwx
+    semantic_type: measurement
+    traits:
+      - listable
+      - readable
+      - writable
+      - filterable
+      - sortable
+    type: integer
+    validation:
+      required: true
+  heap_alloc_bytes:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation (scheduler health monitor)
+      automation_hooks: used for memory bloat diagnosis and trend analysis.
+      cardinality: one
+      criticality: association
+      default: 0
+      dependencies: Go runtime (runtime.MemStats).
+      observability: "yes"
+      origin_lifecycle: mutable (sampled each health check)
+      purpose: Heap memory allocated by the scheduler process at sample time.
+      security: non-sensitive
+      system_usage:
+        - memory leak diagnosis
+        - resource trend analysis
+      validation: Non-negative integer.
+    field_profile_code: SHM-010
+    permissions: rwx
+    semantic_type: measurement
+    traits:
+      - listable
+      - readable
+      - writable
+      - filterable
+      - sortable
+    type: integer
+    validation:
+      required: false
+  measurement_window_end:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation (scheduler health monitor)
+      automation_hooks: used for temporal analysis.
+      cardinality: one
+      criticality: association
+      default: auto-populated on collection
+      dependencies: metrics collection system.
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: ISO 8601 timestamp of measurement window end.
+      security: non-sensitive
+      system_usage:
+        - temporal analysis
+        - window tracking
+      validation: ISO 8601 timestamp format.
+    field_profile_code: SHM-007
+    permissions: r-x
+    semantic_type: timestamp
+    traits:
+      - readable
+      - filterable
+      - sortable
+    type: string
+    validation:
+      pattern: ^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$
+      required: true
+  measurement_window_start:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation (scheduler health monitor)
+      automation_hooks: used for temporal analysis.
+      cardinality: one
+      criticality: association
+      default: auto-populated on collection
+      dependencies: metrics collection system.
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: ISO 8601 timestamp of measurement window start.
+      security: non-sensitive
+      system_usage:
+        - temporal analysis
+        - window tracking
+      validation: ISO 8601 timestamp format.
+    field_profile_code: SHM-006
+    permissions: r-x
+    semantic_type: timestamp
+    traits:
+      - readable
+      - filterable
+      - sortable
+    type: string
+    validation:
+      pattern: ^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$
+      required: true
+  missed_triggers:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation (scheduler health monitor)
+      automation_hooks: used for missed trigger rate calculation.
+      cardinality: one
+      criticality: association
+      default: 0
+      dependencies: scheduler health monitoring system.
+      observability: "yes"
+      origin_lifecycle: mutable (incremented when missed triggers detected)
+      purpose: Total number of missed job triggers detected (jobs that should have run but didn't).
+      security: non-sensitive
+      system_usage:
+        - error analysis
+        - reliability reporting
+        - scheduler health monitoring
+      validation: Non-negative integer.
+    field_profile_code: SHM-002
+    permissions: rwx
+    semantic_type: measurement
+    traits:
+      - listable
+      - readable
+      - writable
+      - filterable
+      - sortable
+    type: integer
+    validation:
+      required: true
+  recovered_jobs:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation (scheduler health monitor)
+      automation_hooks: used for recovery success rate calculation.
+      cardinality: one
+      criticality: association
+      default: 0
+      dependencies: scheduler health monitoring system.
+      observability: "yes"
+      origin_lifecycle: mutable (incremented when jobs are automatically recovered)
+      purpose: Total number of jobs automatically recovered after missed triggers.
+      security: non-sensitive
+      system_usage:
+        - recovery analysis
+        - self-healing effectiveness
+        - scheduler reliability reporting
+      validation: Non-negative integer.
+    field_profile_code: SHM-003
+    permissions: rwx
+    semantic_type: measurement
+    traits:
+      - listable
+      - readable
+      - writable
+      - filterable
+      - sortable
+    type: integer
+    validation:
+      required: true
+  runtime_thread_count:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation (scheduler health monitor)
+      automation_hooks: used for thread explosion diagnosis (OS thread count).
+      cardinality: one
+      criticality: association
+      default: 0
+      dependencies: platform (Linux /proc/self/status; other OS may report 0).
+      observability: "yes"
+      origin_lifecycle: mutable (sampled each health check)
+      purpose: OS thread count of the scheduler process at sample time (Linux only; 0 elsewhere). Helps correlate with goroutine_count for thread exhaustion.
+      security: non-sensitive
+      system_usage:
+        - thread explosion diagnosis
+      validation: Non-negative integer.
+    field_profile_code: SHM-009
+    permissions: rwx
+    semantic_type: measurement
+    traits:
+      - listable
+      - readable
+      - writable
+      - filterable
+      - sortable
+    type: integer
+    validation:
+      required: false
+  sys_memory_bytes:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation (scheduler health monitor)
+      automation_hooks: used for memory bloat diagnosis and trend analysis.
+      cardinality: one
+      criticality: association
+      default: 0
+      dependencies: Go runtime (runtime.MemStats).
+      observability: "yes"
+      origin_lifecycle: mutable (sampled each health check)
+      purpose: Total OS memory obtained by the scheduler process at sample time.
+      security: non-sensitive
+      system_usage:
+        - memory leak diagnosis
+        - resource trend analysis
+      validation: Non-negative integer.
+    field_profile_code: SHM-011
+    permissions: rwx
+    semantic_type: measurement
+    traits:
+      - listable
+      - readable
+      - writable
+      - filterable
+      - sortable
+    type: integer
+    validation:
+      required: false

@@ -1,0 +1,160 @@
+schema_version: 2.0.0
+ontology: strategic_plan
+extends: work_interval
+visibility: public
+description: 'Defines multi-year strategic plans with phases, workstreams, goals, and agent onboarding timelines. Enables long-term planning and strategic alignment across multiple years.\nLifecycle: strategic_plan_lifecycle.yaml.\n'
+traits:
+  - base_object_traits
+  - completable
+fields:
+  goal_refs:
+    access:
+      requires:
+        - access:confidential
+        - role:admin
+    checklist:
+      authority: automation/admin
+      automation_hooks: used for goal tracking
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: goals must exist
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: References to all goals in this strategic plan.
+      security: non-sensitive
+      system_usage:
+        - planning
+        - reporting
+      validation: Must reference existing goals
+    field_profile_code: STRAT-004
+    permissions: r-x
+    semantic_type: reference
+    traits:
+      - field_reference_group
+      - writable
+    type: list
+    validation:
+      required: false
+  id:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation (Generator)
+      automation_hooks: used for cross-file references.
+      cardinality: one
+      criticality: composition
+      default: auto-assigned per kind sequence
+      dependencies: linkage constraints, URN creation.
+      observability: logged + manifests.
+      origin_lifecycle: immutable
+      purpose: Stable identifier used across the graph (\\\"STRAT-PLAN-####\\\").
+      security: non-sensitive
+      system_usage:
+        - linking
+        - reporting
+        - URIs
+      validation: regex ^STRAT-PLAN-\\\\d{3,}$; uniqueness enforced.
+    permissions: r-x
+    semantic_type: statement
+    traits:
+      - listable
+      - readable
+      - writable
+      - filterable
+      - sortable
+      - searchable
+    type: string
+    validation:
+      pattern: ^STRAT-PLAN-\d{3,}$
+      required: true
+  phases:
+    access:
+      requires:
+        - access:confidential
+        - role:admin
+    checklist:
+      authority: executive/admin
+      automation_hooks: used for phase management
+      cardinality: many
+      criticality: composition
+      default: required
+      dependencies: none
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: List of phases in this strategic plan, each with workstreams, goals, and agent onboarding.
+      security: non-sensitive
+      system_usage:
+        - planning
+        - reporting
+        - workflow_management
+      validation: List of phase objects
+    field_profile_code: STRAT-002
+    permissions: rwx
+    semantic_type: expression
+    traits:
+      - field_mutable_group
+    type: list
+    validation:
+      required: true
+  planning_horizon:
+    access:
+      requires:
+        - access:confidential
+        - role:admin
+    checklist:
+      authority: executive/admin
+      automation_hooks: used for plan validation
+      cardinality: one
+      criticality: composition
+      default: required
+      dependencies: none
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: Time period covered by this strategic plan (e.g., \\\"2026-01-01 to 2028-12-31\\\").
+      security: non-sensitive
+      system_usage:
+        - planning
+        - reporting
+      validation: Date range format
+    field_profile_code: STRAT-001
+    permissions: r-x
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+      - filterable
+      - searchable
+    type: string
+    validation:
+      required: true
+  workstream_refs:
+    access:
+      requires:
+        - access:confidential
+        - role:admin
+    checklist:
+      authority: automation/admin
+      automation_hooks: used for workstream tracking
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: workstreams must exist
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: References to all workstreams in this strategic plan.
+      security: non-sensitive
+      system_usage:
+        - planning
+        - reporting
+      validation: Must reference existing workstreams
+    field_profile_code: STRAT-003
+    permissions: r-x
+    semantic_type: reference
+    traits:
+      - field_reference_group
+      - writable
+    type: list
+    validation:
+      required: false

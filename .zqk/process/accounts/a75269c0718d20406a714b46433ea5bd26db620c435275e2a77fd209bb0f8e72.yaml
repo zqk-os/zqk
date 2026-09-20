@@ -1,0 +1,13 @@
+created_at: 2026-09-17T06:20:08Z
+created_by: ACC-1785920548450214012-68b850c0
+description: Bootstrap system account for this community kernel. Actors and created_by must resolve here, not ACC-TEST-HARNESS.
+id: ACC-1785920548450214012-68b850c0
+kind: account
+namespace_id: zqk:kernel
+schema_version: 2.0.0
+status: active
+title: System Account
+updated_at: "2026-09-17T07:42:30Z"
+updated_by: ACC-TEST-HARNESS
+username: system
+version_context: default

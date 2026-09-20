@@ -1,0 +1,15 @@
+package bldr_cli_cmd_v1
+
+import (
+	"github.com/spf13/cobra"
+	clipkg "github.com/zqk-os/zqk/pkg/cli"
+)
+
+// NewLearnCommandBuilder creates a new learn command
+func NewLearnCommandBuilder() *cobra.Command {
+	builder := clipkg.NewCommandBuilder("")
+	builder.WithShort("Generated spec for learn")
+	builder.WithCommonFlags(false, nil)
+	cmd := builder.Build()
+	return cmd
+}

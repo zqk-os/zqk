@@ -1,0 +1,49 @@
+schema_version: 2.0.0
+ontology: namespace_registry
+extends: base_object
+visibility: public
+description: 'Registry that tracks all registered namespaces in the system. Enables namespace discovery, validation, and management.\nLifecycle: namespace_registry_lifecycle.yaml.\n'
+traits:
+  - listable
+  - readable
+  - writable
+  - modifiable
+  - formatable
+  - filterable
+  - sortable
+  - searchable
+fields:
+  id:
+    type: string
+    validation:
+      pattern: ^NAMESPACE-REGISTRY-\d{3,}$
+  namespaces:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: system
+      automation_hooks: used for namespace discovery
+      cardinality: many
+      criticality: composition
+      default: []
+      dependencies: namespace objects
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: List of registered namespaces with their metadata.
+      security: non-sensitive
+      system_usage:
+        - namespace_discovery
+        - validation
+      validation: List of namespace registry entries
+    field_profile_code: NSR-001
+    permissions: rwx
+    semantic_type: expression
+    traits:
+      - readable
+      - writable
+      - modifiable
+    type: list
+    validation:
+      minCount: 1
+      required: true

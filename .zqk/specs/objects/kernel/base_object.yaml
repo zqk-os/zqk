@@ -1,0 +1,751 @@
+schema_version: 2.0.0
+ontology: base_object
+urn: urn:zqk:spec:kernel:base_object
+namespace: zqk:kernel
+extends: auditable
+visibility: internal
+description: 'Core structural fields shared by every system object after audit metadata. Objects extending base_object use the default base_lifecycle.yaml lifecycle unless they define their own lifecycle file. '
+traits:
+  - base_object_traits
+fields:
+  artifacts:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner/automation
+      automation_hooks: ensures watchers update those files.
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: doc index updates.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Files/components touched by this object.
+      security: non-sensitive
+      system_usage:
+        - doc index
+        - dependency mapping
+      validation: paths must exist or be declared.
+    field_profile_code: BSE-007
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - field_mutable_group
+    type: list
+    validation:
+      required: false
+  completeness_validation:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: system/automation
+      automation_hooks: used by orchestrators to rigorously verify object completeness before advancing its lifecycle.
+      cardinality: many
+      criticality: composition
+      default: []
+      dependencies: verification engine.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: A programmatic Universal Verification DSL definition dictating exactly how this object's completeness is objectively verified.
+      security: non-sensitive
+      system_usage:
+        - state_transitions
+        - objective_verification
+      validation: List of Validation DSL step configurations.
+    field_profile_code: BSE-021
+    permissions: rwx
+    semantic_type: expression
+    traits:
+      - field_mutable_group
+    type: list
+    validation:
+      required: false
+  context:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner/executive depending on goal authority.
+      automation_hooks: used to seed prompts.
+      cardinality: one
+      criticality: composition
+      default: required
+      dependencies: prompt templates, decision records.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Problem statement / motivation.
+      security: may contain sensitive details; treat as confidential by default.
+      system_usage:
+        - reasoning
+        - prompting
+      validation: markdown allowed; must mention goal/workstream when applicable.
+    field_profile_code: BSE-004
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - field_mutable_group
+    type: text
+    validation:
+      required: false
+  deadline:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner/executive
+      automation_hooks: triggers deadline reminders and priority escalation.
+      cardinality: one
+      criticality: association
+      default: null
+      dependencies: scheduler, notification system.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: ISO-8601 date or datetime when the object must be completed.
+      security: non-sensitive
+      system_usage:
+        - scheduling
+        - notifications
+        - priority calculation
+      validation: ISO-8601 date or datetime format.
+    field_profile_code: BSE-014
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - field_mutable_group
+    type: string
+    validation:
+      pattern: ^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}:\d{2}Z)?$
+      required: false
+  dependencies:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner
+      automation_hooks: used during delete/merge operations.
+      cardinality: many (can be empty)
+      criticality: composition
+      default: []
+      dependencies: linkage constraints.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Related object IDs this entity depends on.
+      security: non-sensitive
+      system_usage:
+        - graph validity
+        - impact analysis
+      validation: referenced IDs must exist or be placeholders.
+    field_profile_code: BSE-008
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - field_mutable_group
+    type: list
+    validation:
+      required: false
+  description:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner/creator
+      automation_hooks: used in markdown documentation generation and report summaries.
+      cardinality: one
+      criticality: composition
+      default: null
+      dependencies: reports, doc generation.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Detailed narrative description of the object, its purpose, and operational scope.
+      security: non-sensitive
+      system_usage:
+        - documentation
+        - planning
+        - reporting
+      validation: free text or markdown.
+    field_profile_code: BSE-022
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - field_mutable_group
+      - readable
+      - writable
+      - modifiable
+    type: text
+    validation:
+      min_length: 10
+      required: true
+  id:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation (Generator)
+      automation_hooks: used for cross-file references.
+      cardinality: one
+      criticality: composition
+      default: auto-assigned per kind sequence
+      dependencies: linkage constraints, URN creation.
+      observability: logged + manifests.
+      origin_lifecycle: immutable
+      purpose: Stable identifier used across the graph (\\\"PREFIX-####\\\").
+      security: non-sensitive
+      system_usage:
+        - linking
+        - reporting
+        - URIs
+      validation: regex ^[A-Z]+-\\\\d{3,}$; uniqueness enforced.
+    field_profile_code: BSE-001
+    permissions: r-x
+    semantic_type: statement
+    traits:
+      - field_queryable_group
+    type: string
+    validation:
+      max_length: 2048
+      pattern: ^[A-Z]+-\d{3,}$
+      required: true
+  kind:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation
+      automation_hooks: drives validator selection.
+      cardinality: one
+      criticality: composition
+      default: derived from generator template
+      dependencies: schema selection.
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: Declares ontology type (decision, requirement, etc.).
+      security: non-sensitive
+      system_usage:
+        - routing
+        - validation
+      validation: must match registered kinds.
+    field_profile_code: BSE-003
+    permissions: r-x
+    semantic_type: statement
+    traits:
+      - listable
+      - readable
+      - writable
+      - filterable
+      - sortable
+      - searchable
+    type: enum
+    validation:
+      required: true
+  namespace_id:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation/system
+      automation_hooks: automatically derived from object ID or kind registry
+      cardinality: one
+      criticality: association
+      default: derived from ID or kind registry
+      dependencies: namespace registry, ID validator
+      observability: "yes"
+      origin_lifecycle: immutable (derived, not user-set)
+      purpose: Namespace identifier for this object (e.g., \\\"zqk:kernel\\\", \\\"domain:organizational\\\")
+      security: non-sensitive
+      system_usage:
+        - namespace-aware queries
+        - cross-namespace reference validation
+        - namespace isolation
+      validation: Namespace ID format pattern (zqk:kernel, domain:*, integration:*)
+    field_profile_code: BSE-019
+    permissions: r-x
+    semantic_type: identifier
+    traits:
+      - field_read_only_group
+      - filterable
+      - sortable
+      - searchable
+    type: string
+    validation:
+      pattern: ^(zqk|domain|integration):[a-z0-9_]+(:[a-z0-9_]+)*$
+      required: false
+  plane:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation
+      automation_hooks: governs transactional isolation and visibility across draft, staged, promoted, and apoptotic planes.
+      cardinality: one
+      criticality: composition
+      default: promoted
+      dependencies: membrane invariant engine.
+      lifecycle: mutable
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Transactional isolation plane boundary.
+      security: non-sensitive
+      system_usage:
+        - membrane routing
+        - isolation
+        - promotion gates
+      validation: enum (draft, staged, promoted, apoptotic).
+    field_profile_code: BSE-025
+    permissions: r-x
+    semantic_type: statement
+    traits:
+      - field_read_only_group
+      - filterable
+      - sortable
+    type: enum
+    validation:
+      display_length: 15
+      enum:
+        - draft
+        - staged
+        - promoted
+        - apoptotic
+      required: false
+  priority_tier:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner/executive
+      automation_hooks: used for priority-based filtering and sorting in reports.
+      cardinality: one
+      criticality: composition
+      default: null
+      dependencies: priority plan, backlog management.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Priority tier tracking (P0/P1/P2/P3) for prioritization.
+      security: non-sensitive
+      system_usage:
+        - prioritization
+        - planning
+        - filtering
+      validation: enum (\\\"P0\\\", \\\"P1\\\", \\\"P2\\\", \\\"P3\\\") where P0 is critical, P1 is high, P2 is medium, P3 is low.
+    field_profile_code: BSE-016
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - listable
+      - readable
+      - writable
+      - modifiable
+      - groupable
+      - filterable
+      - sortable
+      - searchable
+    type: enum
+    validation:
+      enum:
+        - P0
+        - P1
+        - P2
+        - P3
+      required: false
+  questions:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation (generator)
+      automation_hooks: used to re-run prompts.
+      cardinality: many
+      criticality: association
+      default: filled during creation flow
+      dependencies: template regeneration.
+      observability: available for audits.
+      origin_lifecycle: append-only per iteration
+      purpose: Prompt items that captured this object's data.
+      security: may include sensitive context; mark as confidential.
+      system_usage:
+        - regeneration
+        - explanations
+      validation: stored as structured Q/A pairs.
+    field_profile_code: BSE-006
+    permissions: rwx
+    semantic_type: expression
+    traits:
+      - field_mutable_group
+    type: list
+    validation:
+      required: false
+  related_object_refs:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner/automation
+      automation_hooks: optional graph expansion, cross-plan and secondary traceability reports.
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: object ID registry.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: |
+        Optional links to other objects by stable ID (any kind). Use when typed *\\_refs fields are not enough
+        (e.g. secondary priority plans, historical milestones, parallel tracks). Distinct from dependencies
+        (structural depends-on for impact analysis). Empty list when unused.
+      security: non-sensitive
+      system_usage:
+        - traceability
+        - reporting
+      validation: each entry is a valid object ID; targets may be validated when read.
+    field_profile_code: BSE-020
+    permissions: rwx
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+      - field_reference_group
+    type: list
+    validation:
+      required: false
+  schema_ref:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation
+      automation_hooks: binds instance to governing MetaSchema in the cellular membrane.
+      cardinality: one
+      criticality: composition
+      default: null
+      dependencies: schema registry, metaschema.
+      lifecycle: immutable
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: Canonical URN of governing object specification schema.
+      security: non-sensitive
+      system_usage:
+        - validation
+        - schema binding
+        - membrane gates
+      validation: regex ^urn:[a-zA-Z0-9_\-]+:spec:[a-zA-Z0-9_\-]+:[a-zA-Z0-9_\-]+$
+    field_profile_code: BSE-024
+    permissions: r-x
+    semantic_type: reference
+    traits:
+      - field_read_only_group
+      - field_reference_group
+    type: string
+    validation:
+      pattern: ^urn:[a-zA-Z0-9_\-]+:spec:[a-zA-Z0-9_\-]+:[a-zA-Z0-9_\-]+$
+      required: false
+  schema_version:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation/importer.
+      automation_hooks: ensures correct validator is loaded.
+      cardinality: one
+      criticality: composition
+      default: current spec version at creation
+      dependencies: import/export tooling.
+      observability: "yes"
+      origin_lifecycle: immutable except when migrations run.
+      purpose: SemVer indicating which object schema this instance conforms to.
+      security: non-sensitive
+      system_usage:
+        - imports
+        - validation
+      validation: SemVer pattern (e.g., 1.0.0 or 2.0.0).
+    field_profile_code: BSE-000
+    permissions: r-x
+    semantic_type: statement
+    traits:
+      - field_read_only_group
+      - writable
+    type: string
+    validation:
+      pattern: ^\d+\.\d+\.\d+$
+      required: true
+  source_type:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation/importer.
+      automation_hooks: determines how strictly to enforce validation/fallbacks.
+      cardinality: one
+      criticality: composition
+      default: internal
+      dependencies: fallback logic (e.g., prefer internal if external fails).
+      observability: "yes"
+      origin_lifecycle: immutable unless re-imported.
+      purpose: Indicates if the object originated internally, was imported, or provided by a user.
+      security: non-sensitive
+      system_usage:
+        - resolver decisions
+        - trust policies
+      validation: enum (\\\"internal\\\", \\\"external\\\", \\\"imported\\\"); configs may extend.
+    field_profile_code: BSE-011
+    permissions: r-x
+    semantic_type: statement
+    traits:
+      - field_read_only_group
+      - writable
+    type: enum
+    validation:
+      enum:
+        - internal
+        - external
+        - imported
+      required: false
+  spec_adherence:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation/validator.
+      automation_hooks: prevents imports/promotions if adherence is "fail".
+      cardinality: one
+      criticality: association
+      default:
+        status: unspecified
+      dependencies: validator tooling, import pipeline.
+      observability: "yes"
+      origin_lifecycle: mutable (updated whenever validation runs).
+      purpose: Records the validation status/results for the current schema version.
+      security: non-sensitive
+      system_usage:
+        - imports
+        - audits
+      validation: Structured object containing fields like \\\"status\\\" (pass/fail), \\\"timestamp\\\", \\\"validator_fingerprint\\\".
+    field_profile_code: BSE-010
+    permissions: r-x
+    semantic_type: expression
+    traits:
+      - field_read_only_group
+    type: object
+    validation:
+      required: false
+  stakeholders:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner
+      automation_hooks: used to mention watchers.
+      cardinality: many (>=0)
+      criticality: association
+      default: []
+      dependencies: scheduling, approvals.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Personas/roles impacted.
+      security: no direct PII (role names only).
+      system_usage:
+        - routing
+        - notifications
+      validation: entries from controlled vocab.
+    field_profile_code: BSE-005
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - listable
+      - readable
+      - writable
+      - modifiable
+      - groupable
+      - filterable
+      - sortable
+      - searchable
+    type: list
+    validation:
+      required: false
+  status:
+    access:
+      requires:
+        - access:confidential
+        - access:system_override
+    checklist:
+      authority: depends_on_role (owner/executive)
+      automation_hooks: triggers notifications/testing when status changes.
+      cardinality: one
+      criticality: composition
+      default: proposed
+      dependencies: scheduler, enforcement.
+      observability: "yes"
+      origin_lifecycle: mutable (track via auditable fields)
+      purpose: Lifecycle stage (\\\"proposed\\\", \\\"approved\\\", \\\"in_progress\\\", \\\"implemented\\\", \\\"archived\\\").
+      security: non-sensitive
+      system_usage:
+        - workflows
+        - reports
+      validation: enum.
+    default: proposed
+    field_profile_code: BSE-009
+    permissions: r--
+    semantic_type: statement
+    traits:
+      - listable
+      - readable
+      - groupable
+      - filterable
+      - sortable
+      - searchable
+    type: enum
+    validation:
+      required: true
+  status_history:
+    checklist:
+      authority: automation/lifecycle system
+      automation_hooks: automatically populated on status transitions; used for audit trails and lifecycle analysis.
+      cardinality: many (>=0)
+      criticality: association
+      default: []
+      dependencies: lifecycle system, status transition logic.
+      observability: "yes"
+      origin_lifecycle: append-only (new entries added on status changes)
+      purpose: List of StatusHistoryEntry records for auditing and lifecycle analysis.
+      security: non-sensitive (may contain actor information).
+      system_usage:
+        - auditing
+        - lifecycle analysis
+        - status transition tracking
+      validation: 'List of StatusHistoryEntry objects with fields: sequence (int), timestamp (string), status (string), note/notes (string), actor/updated_by (string), updated_at (string). Supports both Workstream format (sequence, timestamp, status, note) and BacklogItem format (status, updated_at, updated_by, notes).'
+    field_profile_code: BSE-018
+    permissions: r-x
+    semantic_type: expression
+    traits:
+      - field_read_only_group
+    type: list
+    validation:
+      required: false
+  target_date:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner/planner
+      automation_hooks: used for timeline visualization and milestone tracking.
+      cardinality: one
+      criticality: association
+      default: null
+      dependencies: timeline generation, reporting.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: ISO-8601 date (alternative to deadline) for target completion.
+      security: non-sensitive
+      system_usage:
+        - planning
+        - reporting
+      validation: ISO-8601 date format.
+    field_profile_code: BSE-015
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - field_mutable_group
+    type: string
+    validation:
+      pattern: ^\d{4}-\d{2}-\d{2}$
+      required: false
+  title:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner role
+      automation_hooks: used in generated docs.
+      cardinality: one
+      criticality: composition
+      default: required at creation
+      dependencies: doc index, reports.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Human-readable name/summary.
+      security: non-sensitive
+      system_usage:
+        - UI display
+        - search
+      validation: At least 5 chars; full value is canonical. UI surfaces may abbreviate to display_length.
+    field_profile_code: BSE-002
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - listable
+      - readable
+      - writable
+      - modifiable
+      - filterable
+      - sortable
+      - searchable
+    type: string
+    validation:
+      display_length: 120
+      min_length: 5
+      pattern: ^.+$
+      required: true
+  urn:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation
+      automation_hooks: used for canonical universal addressing across cells and planes.
+      cardinality: one
+      criticality: composition
+      default: null
+      dependencies: cell registry, kind registry.
+      lifecycle: immutable
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: Canonical Uniform Resource Name in format urn:<brand>:<cell>:<kind>:<id>.
+      security: non-sensitive
+      system_usage:
+        - addressing
+        - linking
+        - cross-plane routing
+        - membrane validation
+      validation: regex ^urn:[a-zA-Z0-9_\-]+:[a-zA-Z0-9_\-]+:[a-zA-Z0-9_\-]+:[a-zA-Z0-9_\-]+$
+    field_profile_code: BSE-023
+    permissions: r-x
+    semantic_type: identifier
+    traits:
+      - field_read_only_group
+      - searchable
+      - filterable
+    type: string
+    validation:
+      display_length: 64
+      pattern: ^urn:[a-zA-Z0-9_\-]+:[a-zA-Z0-9_\-]+:[a-zA-Z0-9_\-]+:[a-zA-Z0-9_\-]+$
+      required: false
+  version:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation
+      automation_hooks: incremented on every committed mutation for optimistic concurrency and causal ordering.
+      cardinality: one
+      criticality: composition
+      default: 1
+      dependencies: change journal, CAS storage.
+      lifecycle: mutable
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Monotonic revision counter for optimistic concurrency and state versioning.
+      security: non-sensitive
+      system_usage:
+        - concurrency control
+        - causal ordering
+        - sync
+      validation: non-negative integer >= 1.
+    field_profile_code: BSE-026
+    permissions: r-x
+    semantic_type: statement
+    traits:
+      - field_read_only_group
+      - sortable
+    type: int
+    validation:
+      display_length: 10
+      min: 1
+      required: false

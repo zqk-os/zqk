@@ -1,0 +1,56 @@
+$schema: "../schemas/command_spec.schema.json"
+
+name: "seat-worker"
+short: "Run a ZQK-native seat worker for directed feed COMMS and work"
+description: |
+  Long-lived seat worker that consumes the directed agent_feed inbox for --agent-id.
+  COMMS-CHECK challenges are handled deterministically (life peer_ack + WORK reply)
+  without chat paste. Non-COMMS items are left unacked for AgentX / human handling.
+  Writes a heartbeat under .zqk/state/mesh/seat_workers/ for fail-closed COMMS gates.
+
+flags:
+  - name: "agent-id"
+    type: "string"
+    default: ""
+    required: true
+    description: "Mesh seat id this worker binds to"
+  - name: "persona-ref"
+    type: "string"
+    default: "PER-DEFAULT-OPERATOR"
+    description: "Kernel persona id (PER-*) used for peer_ack and WORK steers"
+  - name: "tcp"
+    type: "string"
+    default: "127.0.0.1:8443"
+    description: "MCP daemon TCP address for action.required ticks"
+  - name: "poll-seconds"
+    type: "int"
+    default: 30
+    description: "Fallback inbox poll interval when MCP is down or quiet"
+  - name: "once"
+    type: "bool"
+    default: false
+    description: "Process inbox once and exit (for tests / one-shot)"
+  - name: "execute-non-comms"
+    type: "bool"
+    default: false
+    description: "For non-COMMS inbox items: peer-ack then run AgentX (swarm execute) on the message body"
+  - name: "reply-to-agent-id"
+    type: "string"
+    default: ""
+    description: "Override WORK reply destination (default: challenge from_agent_id)"
+
+args:
+  type: "no_args"
+
+help:
+  examples:
+    - comment: "Bind worker to peer-agent-1 seat"
+      command: "%s agent seat-worker --agent-id peer-agent-1 --persona-ref PER-ORCH-ALPHA"
+    - comment: "One-shot COMMS drain"
+      command: "%s agent seat-worker --agent-id peer-agent-1 --once"
+  exclude_flags:
+    - "columns"
+    - "ignore-scheduler-down"
+
+run_e: "runAgentSeatWorker"
+common_flags: true

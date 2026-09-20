@@ -1,0 +1,28 @@
+package bldr_cli_cmd_v1
+
+import (
+	"github.com/spf13/cobra"
+	"github.com/zqk-os/zqk/internal/cli"
+	clipkg "github.com/zqk-os/zqk/pkg/cli"
+)
+
+// NewPendingCommandBuilder creates a new pending command
+func NewPendingCommandBuilder() *cobra.Command {
+	builder := clipkg.NewCommandBuilder("pending")
+	builder.WithShort("Diagnostic: list unacked inbox/outbox for a seat")
+	help := clipkg.DynamicHelpBuilder("Diagnostic: list unacked inbox/outbox for a seat")
+	help.WithDescriptionLines("Thin diagnostic over the agent chat feed. Canonical agent UX is")
+	help.WithDescriptionLines("`workflow whats-next --format json --persona-id … --agent-id …`")
+	help.WithDescriptionLines("(correspondence block). Use this when debugging feed JSONL only.")
+	help.AddExample("Show pending correspondence for AGY seat", "%s feed pending --agent-id peer-agent-01 --persona-ref PER-DEFAULT-AGENT")
+	help.ExcludeFlag("columns")
+	help.ExcludeFlag("ignore-scheduler-down")
+	builder.WithHelpBuilder(help)
+	builder.WithArgs(cobra.NoArgs)
+	builder.AddStringFlag("agent-id", "", "", "Swarm seat id")
+	builder.AddStringFlag("persona-ref", "", "", "Optional persona id for seat matching")
+	builder.AddIntFlag("limit", "", 20, "Max items per inbox/outbox list")
+	builder.WithCommonFlagsExcluding(cli.AddCommonFlagsExcluding, []string{"columns", "ignore-scheduler-down"})
+	cmd := builder.Build()
+	return cmd
+}

@@ -1,0 +1,305 @@
+schema_version: 2.0.0
+ontology: goal
+urn: urn:zqk:spec:project_mgmt:goal
+namespace: zqk:project_mgmt
+extends: work_interval
+visibility: public
+description: 'Goal objects define measurable outcomes linked to metrics, authority, and workstreams.\nLifecycle: goal_lifecycle.yaml.\n'
+traits:
+  - base_object_traits
+  - manipulatable
+  - completable
+  - status_reactive
+fields:
+  achieved_at:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation/metrics engine.
+      automation_hooks: automatically set when metric reaches target.
+      cardinality: zero_or_one
+      criticality: association
+      default: null
+      dependencies: metrics engine.
+      observability: "yes"
+      origin_lifecycle: mutable (set when goal is achieved).
+      purpose: ISO-8601 datetime when the goal was achieved.
+      security: non-sensitive
+      system_usage:
+        - reporting
+        - metrics
+      validation: ISO-8601 datetime format.
+    field_profile_code: GOL-010
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - field_mutable_group
+    type: string
+    validation:
+      pattern: ^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$
+      required: false
+  authority:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: executive.
+      automation_hooks: used for notifications and routing.
+      cardinality: one
+      criticality: composition
+      default: required at creation
+      dependencies: role registry.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Role/person responsible for goal achievement.
+      security: non-sensitive
+      system_usage:
+        - routing
+        - notifications
+      validation: must match role registry.
+    field_profile_code: GOL-008
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+      - modifiable
+    type: string
+    validation:
+      required: false
+  commit_hashes:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation.
+      automation_hooks: used for linking commits to goals.
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: Version control repository (Git, SVN, Mercurial, Perforce, etc.).
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Version control system commit identifiers that implement or relate to this goal.
+      security: non-sensitive
+      system_usage:
+        - traceability
+        - code-to-project graph
+      validation: |
+        Must be valid VCS commit identifiers. Format depends on VCS system:
+        - Git: SHA-1 hash (40 chars) or short hash (7+ chars)
+        - SVN: Revision number (numeric)
+        - Mercurial: Hex hash (40 chars)
+        - Perforce: Changelist number (numeric)
+        - Other: Alphanumeric string, 1-40 characters
+    field_profile_code: GOAL-006
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+      - modifiable
+      - filterable
+    type: list
+    validation:
+      pattern: ^[A-Za-z0-9_-]{1,40}$
+      required: false
+  current_value:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation/metrics engine.
+      automation_hooks: updated by metrics evaluation pipeline.
+      cardinality: one
+      criticality: association
+      default: none (populated by metrics engine)
+      dependencies: metrics engine.
+      observability: "yes"
+      origin_lifecycle: mutable (updated by metrics engine).
+      purpose: Current measured value for the metric.
+      security: non-sensitive
+      system_usage:
+        - evaluation
+        - reports
+      validation: format matches metric type.
+    field_profile_code: GOL-004
+    permissions: rwx
+    semantic_type: expression
+    traits:
+      - field_mutable_group
+    type: string
+    validation:
+      required: false
+  deadline:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: executive.
+      automation_hooks: triggers deadline reminders.
+      cardinality: one
+      criticality: association
+      default: null
+      dependencies: scheduler, notification system.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: ISO-8601 date or datetime when the goal must be achieved.
+      security: non-sensitive
+      system_usage:
+        - planning
+        - notifications
+      validation: ISO-8601 date or datetime format.
+    field_profile_code: GOL-009
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+      - modifiable
+    type: string
+    validation:
+      pattern: ^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}:\d{2}Z)?$
+      required: false
+  metric:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner/executive.
+      automation_hooks: display only.
+      cardinality: one
+      criticality: association
+      default: auto-populated from template
+      dependencies: documentation.
+      observability: "yes"
+      origin_lifecycle: mutable (but should stay aligned with template).
+      purpose: Human-readable metric description (may mirror template).
+      security: non-sensitive
+      system_usage:
+        - docs
+        - communication
+      validation: <= 120 chars.
+    field_profile_code: GOL-002
+    permissions: rwx
+    semantic_type: expression
+    traits:
+      - field_mutable_group
+    type: string
+    validation:
+      max_length: 120
+      required: false
+  metric_template_id:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: executive/owner with metric permission.
+      automation_hooks: metrics evaluation pipeline.
+      cardinality: one
+      criticality: composition
+      default: none (required at creation)
+      dependencies: metrics engine.
+      observability: "yes"
+      origin_lifecycle: immutable (can change via decision but treat carefully).
+      purpose: Reference to metric template governing measurement.
+      security: non-sensitive
+      system_usage:
+        - reporting
+        - automation
+      validation: must exist in \\\"METRIC_TEMPLATES.yaml\\\".
+    field_profile_code: GOL-001
+    permissions: r-x
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+    type: string
+    validation:
+      required: false
+  target:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner/executive.
+      automation_hooks: used in evaluation logic.
+      cardinality: one
+      criticality: composition
+      default: required at creation
+      dependencies: metrics engine.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Success threshold for the metric.
+      security: non-sensitive
+      system_usage:
+        - evaluation
+        - reports
+      validation: format depends on metric type.
+    field_profile_code: GOL-003
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - field_mutable_group
+    type: string
+    validation:
+      required: false
+  workstream_refs:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner/executive.
+      automation_hooks: used for goal progress calculation.
+      cardinality: many
+      criticality: composition
+      default: []
+      dependencies: workstream registry.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Workstreams that contribute to achieving this goal.
+      security: non-sensitive
+      system_usage:
+        - planning
+        - reporting
+      validation: must reference existing workstream IDs.
+    field_profile_code: GOL-005
+    permissions: r-x
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+      - field_reference_group
+    type: list
+    validation:
+      required: false
+  epic_refs:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner/planner.
+      automation_hooks: maps strategic goal into concrete enclave epics.
+      cardinality: many
+      criticality: composition
+      default: []
+      dependencies: epic registry.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Epics directly executing towards achieving this strategic goal.
+      security: non-sensitive
+      system_usage:
+        - planning
+        - traceability
+        - alignment
+      validation: must reference existing epic IDs.
+    field_profile_code: GOL-011
+    permissions: r-x
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+      - field_reference_group
+    type: list
+    validation:
+      required: false
+

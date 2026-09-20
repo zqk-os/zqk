@@ -1,0 +1,57 @@
+$schema: "../../schemas/command_spec.schema.json"
+
+name: "evaluate"
+short: "Evaluate VDS chunks — exit 0 only when gates pass"
+description: |
+  Re-runs dsl_checks and returns a fluent checklist per chunk (schema zqk_vds_evaluate_v1).
+  This command is the independent verifier: narrative claims of done are not accepted.
+
+  Default chunks file: docs/quality/vds_chunks.yaml
+
+flags:
+  - name: "file"
+    type: "string"
+    default: ""
+    description: "Chunks YAML path; docs/quality/vds_chunks.yaml when unset"
+  - name: "spine"
+    type: "string"
+    default: ""
+    description: "Spine profile path relative to project root"
+  - name: "customization"
+    type: "string"
+    default: ""
+    description: "Customization profile path relative to project root"
+  - name: "run-commands"
+    type: "bool"
+    default: false
+    description: "Execute lint/scan commands from customization (slow)"
+  - name: "persist"
+    type: "bool"
+    default: false
+    description: "Write last report to .zqk/state/vds/last_evaluate.json"
+  - name: "apply-verify"
+    type: "bool"
+    default: false
+    description: "On PASS, write independent_verify=yes back into the chunks YAML for verified chunks"
+
+args:
+  type: "no_args"
+
+help:
+  examples:
+    - comment: "Evaluate default file"
+      command: "%s workflow vds evaluate --format json"
+    - comment: "Evaluate explicit file"
+      command: "%s workflow vds evaluate --file docs/quality/vds_chunks.yaml --format json"
+    - comment: "Run lint commands from customization"
+      command: "%s workflow vds evaluate --run-commands --format json"
+    - comment: "Markdown for agents"
+      command: "%s workflow vds evaluate --format agent-prompt"
+    - comment: "Persist independent_verify=yes for PASS chunks"
+      command: "%s workflow vds evaluate --apply-verify --format json"
+  exclude_flags:
+    - "columns"
+    - "ignore-scheduler-down"
+
+run_e: "runVDSEvaluate"
+common_flags: true

@@ -1,0 +1,367 @@
+schema_version: 2.0.0
+ontology: audit_aggregation_metric
+extends: base_metric
+visibility: internal
+description: 'Aggregated metrics derived from audit events. Compresses multiple audit events into summary metrics for efficient storage and analysis while preserving key information for compliance and reporting.\nLifecycle: audit_aggregation_metric_lifecycle.yaml.\n'
+traits: []
+fields:
+  aggregated_event_ids:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation (aggregation job)
+      automation_hooks: used for event traceability. Ranges can be expanded to individual IDs when needed.
+      cardinality: zero_or_many
+      criticality: association
+      default: auto-populated during aggregation (optional, may use ranges for consecutive IDs, may be truncated for very large aggregations)
+      dependencies: aggregation system.
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: Array of audit event IDs or ID ranges that were aggregated (for traceability).
+      security: non-sensitive
+      system_usage:
+        - traceability
+        - forensic analysis
+      validation: 'Array of audit event IDs (AUD-#### format) or ranges (AUD-####..AUD-#### format). Ranges are used for consecutive IDs to save space. Examples: Individual: [\\\"AUD-1\\\", \\\"AUD-5\\\", \\\"AUD-10\\\"], Range: [\\\"AUD-100..AUD-199\\\"] (represents AUD-100 through AUD-199), Mixed: [\\\"AUD-1\\\", \\\"AUD-100..AUD-199\\\", \\\"AUD-250\\\"]'
+    field_profile_code: AAM-009
+    permissions: r-x
+    semantic_type: reference
+    traits:
+      - field_read_only_group
+    type: array
+    validation:
+      required: false
+  aggregation_window_end:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation (aggregation job)
+      automation_hooks: used for window-based queries.
+      cardinality: one
+      criticality: composition
+      default: auto-populated from newest event in window
+      dependencies: aggregation system.
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: ISO 8601 timestamp of the end of the aggregation window.
+      security: non-sensitive
+      system_usage:
+        - temporal analysis
+        - window identification
+      validation: ISO 8601 timestamp format.
+    field_profile_code: AAM-003
+    permissions: r-x
+    semantic_type: timestamp
+    traits:
+      - readable
+      - writable
+      - filterable
+      - sortable
+    type: string
+    validation:
+      pattern: ^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$
+      required: true
+  aggregation_window_start:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation (aggregation job)
+      automation_hooks: used for window-based queries.
+      cardinality: one
+      criticality: composition
+      default: auto-populated from oldest event in window
+      dependencies: aggregation system.
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: ISO 8601 timestamp of the start of the aggregation window.
+      security: non-sensitive
+      system_usage:
+        - temporal analysis
+        - window identification
+      validation: ISO 8601 timestamp format.
+    field_profile_code: AAM-002
+    permissions: r-x
+    semantic_type: timestamp
+    traits:
+      - filterable
+      - readable
+      - sortable
+      - writable
+    type: string
+    validation:
+      pattern: ^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$
+      required: true
+  compression_ratio:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation (aggregation job)
+      automation_hooks: used for storage efficiency metrics.
+      cardinality: one
+      criticality: association
+      default: auto-calculated during aggregation
+      dependencies: aggregation system.
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: Compression ratio (events aggregated / metric size ratio).
+      security: non-sensitive
+      system_usage:
+        - efficiency analysis
+        - storage optimization
+      validation: Non-negative number.
+    field_profile_code: AAM-008
+    permissions: r-x
+    semantic_type: measurement
+    traits:
+      - readable
+      - writable
+      - filterable
+      - sortable
+    type: number
+    validation:
+      required: false
+  error_event_count:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation (aggregation job)
+      automation_hooks: derived from status_counts.
+      cardinality: one
+      criticality: association
+      default: auto-calculated during aggregation
+      dependencies: aggregation system.
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: Total number of error-status events in the aggregation window.
+      security: non-sensitive
+      system_usage:
+        - reporting
+        - reliability analysis
+      validation: Non-negative integer.
+    field_profile_code: AAM-011
+    permissions: r-x
+    semantic_type: measurement
+    traits:
+      - readable
+      - writable
+      - filterable
+      - sortable
+    type: integer
+    validation:
+      required: false
+  error_rate:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation (aggregation job)
+      automation_hooks: derived from status_counts and event_count.
+      cardinality: one
+      criticality: association
+      default: auto-calculated during aggregation
+      dependencies: aggregation system.
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: Ratio of error-status events to total events in the aggregation window.
+      security: non-sensitive
+      system_usage:
+        - reporting
+        - reliability analysis
+      validation: Number from 0.0 to 1.0 inclusive.
+    field_profile_code: AAM-012
+    permissions: r-x
+    semantic_type: measurement
+    traits:
+      - readable
+      - writable
+      - filterable
+      - sortable
+    type: number
+    validation:
+      required: false
+  event_count:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation (aggregation job)
+      automation_hooks: used for compression metrics.
+      cardinality: one
+      criticality: composition
+      default: auto-calculated during aggregation
+      dependencies: aggregation system.
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: Total number of audit events aggregated into this metric.
+      security: non-sensitive
+      system_usage:
+        - reporting
+        - compression ratio analysis
+      validation: Positive integer.
+    field_profile_code: AAM-004
+    permissions: r-x
+    semantic_type: measurement
+    traits:
+      - filterable
+      - listable
+      - readable
+      - sortable
+      - writable
+    type: integer
+    validation:
+      required: true
+  event_type_counts:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation (aggregation job)
+      automation_hooks: used for event type analysis.
+      cardinality: one
+      criticality: association
+      default: auto-calculated during aggregation
+      dependencies: aggregation system.
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: 'Count of events by event_type (e.g., hash_regeneration: 5, integrity_recovery: 2).'
+      security: non-sensitive
+      system_usage:
+        - reporting
+        - analysis
+        - trend detection
+      validation: Object with string keys and integer values.
+    field_profile_code: AAM-005
+    permissions: r-x
+    semantic_type: expression
+    traits:
+      - readable
+      - writable
+    type: object
+    validation:
+      required: true
+  metric_type:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation (aggregation job)
+      automation_hooks: used for metric routing.
+      cardinality: one
+      criticality: composition
+      default: system
+      dependencies: aggregation system.
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: Type of metric - always \\\"system\\\" for audit aggregations.
+      security: non-sensitive
+      system_usage:
+        - filtering
+        - grouping
+        - reporting
+      validation: Must be \\\"system\\\".
+    field_profile_code: AAM-001
+    permissions: r-x
+    semantic_type: statement
+    traits:
+      - filterable
+      - groupable
+      - listable
+      - readable
+      - searchable
+      - sortable
+      - writable
+    type: enum
+    validation:
+      enum:
+        - system
+      required: true
+  object_kind_counts:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation (aggregation job)
+      automation_hooks: used for object type analysis.
+      cardinality: one
+      criticality: association
+      default: auto-calculated during aggregation if available
+      dependencies: aggregation system.
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: 'Count of events by object_kind (e.g., backlog_item: 10, goal: 3).'
+      security: non-sensitive
+      system_usage:
+        - reporting
+        - object type analysis
+      validation: Object with string keys and integer values.
+    field_profile_code: AAM-006
+    permissions: r-x
+    semantic_type: expression
+    traits:
+      - readable
+      - writable
+    type: object
+    validation:
+      required: false
+  operation_counts:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation (aggregation job)
+      automation_hooks: used for operation analysis.
+      cardinality: one
+      criticality: association
+      default: auto-calculated during aggregation if available
+      dependencies: aggregation system.
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: 'Count of events by operation type (e.g., Regenerated hash: 5, Fixed integrity: 2).'
+      security: non-sensitive
+      system_usage:
+        - reporting
+        - operation analysis
+      validation: Object with string keys and integer values.
+    field_profile_code: AAM-007
+    permissions: r-x
+    semantic_type: expression
+    traits:
+      - readable
+      - writable
+    type: object
+    validation:
+      required: false
+  status_counts:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation (aggregation job)
+      automation_hooks: used for status-based error-rate analysis.
+      cardinality: one
+      criticality: association
+      default: auto-calculated during aggregation if status is present on events
+      dependencies: aggregation system.
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: 'Count of events by audit_event status (e.g., completed: 120, failed: 4, error: 2).'
+      security: non-sensitive
+      system_usage:
+        - reporting
+        - reliability analysis
+        - trend detection
+      validation: Object with string keys and integer values.
+    field_profile_code: AAM-010
+    permissions: r-x
+    semantic_type: expression
+    traits:
+      - readable
+      - writable
+    type: object
+    validation:
+      required: false

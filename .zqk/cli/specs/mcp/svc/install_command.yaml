@@ -1,0 +1,25 @@
+$schema: "../../schemas/command_spec.schema.json"
+
+name: "install"
+short: "Install MCP server configurations for supported IDEs"
+description: |
+  Writes or updates IDE MCP configuration for the current ZQK project so Cursor
+  and other clients can attach to the local MCP server. Restart the IDE after
+  install for changes to take effect.
+
+args:
+  type: "no_args"
+
+help:
+  examples:
+    - comment: "Install project MCP config for supported IDEs"
+      command: "%s mcp install"
+  exclude_flags:
+    - "columns"
+    - "ignore-scheduler-down"
+    - "format"
+    - "output"
+
+run_e: "runInstall"
+common_flags: true
+requires_session: false

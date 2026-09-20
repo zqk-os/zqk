@@ -1,0 +1,24 @@
+body: |
+    **Utilize a TDD process** while implementing new logic.
+
+    - Ensure tests are written first prior to functional code.
+    - Create test_case objects to document and group related tests.
+    - Use zqk criteria objects for traceability between backlog items, goals, requirements, and milestones.
+    - Run package unit tests before changes to establish a green baseline.
+    - Never disable, bypass, or comment out failing tests to achieve a passing build.
+
+    Community kernel companion: POL-CODE-1789672481919632000-e3500fed (Test-Driven Development and Continuous Verification).
+category: testing
+created_at: "2026-09-20T01:13:48Z"
+created_by: ACC-1785920548450214012-68b850c0
+description: Standing TDD mandate for agent prepare-context / orchestrate ATK persist on the community kernel.
+id: POL-ONBOARD-002
+kind: policy
+namespace_id: zqk:kernel
+policy_type: requirement
+schema_version: 2.0.0
+status: active
+title: Test-Driven Development (TDD) Required
+updated_at: "2026-09-20T01:15:08Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

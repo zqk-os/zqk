@@ -1,0 +1,22 @@
+created_at: "2026-09-19T05:55:00Z"
+created_by: ACC-1785920548450214012-68b850c0
+criteria_refs:
+    - CRIT-1789798199209192000-f43fd3f2
+    - CRIT-1789798199209193000-8e2bf84b
+    - CRIT-1789798199209194000-8c812261
+description: The zqk CLI must have a coherent, discoverable command taxonomy with 100% command spec coverage, deprecating legacy commands and isolating vendor-specific extensions behind pluggable adapters.
+goal_refs:
+    - GOAL-CLI-TAXONOMY-CANONICAL-001
+id: REQ-CLI-TAXONOMY-HARMONIZATION-001
+kind: requirement
+namespace_id: zqk:kernel
+priority: p1
+schema_version: 2.0.0
+stakeholders: []
+status: active
+title: Harmonized CLI Taxonomy, 100% Spec Coverage, and Vendor Command Isolation
+updated_at: "2026-09-19T07:23:17Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs:
+    - WS-CLI-TAXONOMY-OVERHAUL

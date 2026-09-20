@@ -1,0 +1,19 @@
+$schema: "../../../.zqk/cli/specs/schemas/trait_spec.schema.json"
+
+name: auto_status_transitionable
+description: |
+  Object-level trait for lifecycle-driven status advancement.
+  Objects with this trait can be advanced using `zqk object update <id> --auto-status`,
+  which derives the next status from lifecycle order and valid transitions.
+category: behavior
+requires: []
+conflicts: []
+includes: []
+field_level: false
+object_level: true
+config: {}
+
+created_at: 2026-07-01T18:00:00Z
+updated_at: 2026-07-01T18:00:00Z
+created_by: ACC-1785920548450214012-68b850c0
+updated_by: ACC-1785920548450214012-68b850c0

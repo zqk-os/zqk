@@ -1,0 +1,48 @@
+Count objects by kind with optional filtering.
+
+This command reports object counts (optionally scoped by namespace).
+
+
+
+When no kind is specified, counts public registry kinds (visibility≠internal),
+
+matching bare object list. Intentional exclusions are recorded in JSON/YAML meta
+
+(skipped_internal_*, omitted_zero_count_kinds, find_vs_count_recipe).
+
+Full inventory: object count --internal (entitled) and/or --include-zero-count,
+
+or object count <kind> for a named kind (including internals).
+
+  Count all backlog items
+  zqk.test count backlog_item
+  Count with filtering
+  zqk.test count backlog_item --filter status=exploring
+  Count all kinds
+  zqk.test count
+  Count all kinds including visibility:internal (entitled)
+  zqk.test count --internal
+  Include zero-count kinds in the inventory
+  zqk.test count --include-zero-count
+  Count with grouping
+  zqk.test count backlog_item --group-by status
+  Count a specific namespace
+  zqk.test count team --namespace tenant:acme
+  Count across namespaces
+  zqk.test count team --federated
+
+Usage:
+  zqk.test object count [flags]
+
+Flags:
+      --all-kinds            Show full registered kind catalog (bypass planner/doer discovery membrane)
+      --all-namespaces       Alias for --federated
+      --allow-degraded       Allow running when scheduler daemon is not running (results may be partial/stale)
+      --federated            Disable namespace isolation and count across all namespaces
+      --filter stringArray   Filter by field (format: field=value or field:value, can be used multiple times)
+      --group-by string      Field to group counts by (returns count per group)
+      --include-zero-count   Include kinds with 0 objects (default omits them to reduce noise)
+      --namespace string     Restrict counts to this namespace_id (when omitted, default kernel isolation applies)
+
+Global Flags:
+      --internal   Elevated access mode for built-in and internal kinds (requires Enterprise license or zqk-admin)

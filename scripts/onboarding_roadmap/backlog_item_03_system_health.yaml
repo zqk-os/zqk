@@ -1,0 +1,15 @@
+kind: backlog_item
+schema_version: "2.0.0"
+title: Run retention-status and system check
+description: |
+  Run system health commands so you understand retention targets and
+  system check reminders (e.g. retention_drift).
+priority_plan_ref: PRIO-onboarding
+workstream_refs: []
+priority_tier: P1
+status: planned
+category: Developer Experience
+acceptance_criteria:
+  - "Run: zqk system retention-status"
+  - "Run: zqk system check (and note any reminders)"
+  - "Understand what retention_drift reminder means and when it appears"

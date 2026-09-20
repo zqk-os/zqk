@@ -1,0 +1,23 @@
+Count objects by kind with optional filtering.
+This command reports the total system object count (all objects).
+
+When no kind is specified, counts all object kinds.
+
+
+  Count all backlog items
+  zqk count backlog_item
+  Count with filtering
+  zqk count backlog_item --filter status=exploring
+  Count all kinds
+  zqk count
+  Count with grouping
+  zqk count backlog_item --group-by status
+
+Usage:
+  zqk object count [kind] [flags]
+
+Flags:
+      --allow-degraded       Allow running when scheduler daemon is not running (results may be partial/stale)
+      --filter stringArray   Filter by field (format: field=value or field:value, can be used multiple times)
+      --group-by string      Field to group counts by (returns count per group)
+      --include-zero-count   Include kinds with 0 objects (default omits them to reduce noise)

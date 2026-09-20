@@ -1,0 +1,17 @@
+created_at: "2026-06-15T01:18:44Z"
+created_by: ACC-1785920548450214012-68b850c0
+description: GitHub Steward Role
+id: ROL-1781486324800203000-08822719
+kind: role
+namespace_id: zqk:kernel
+permissions:
+    - read:*
+    - write:*
+    - delete:object_draft_plane
+role_id: steward
+schema_version: 2.0.0
+status: active
+title: Steward Role
+updated_at: "2026-08-11T03:35:05Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

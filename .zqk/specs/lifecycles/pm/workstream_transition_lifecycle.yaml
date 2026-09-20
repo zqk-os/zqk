@@ -1,0 +1,108 @@
+$schema: "../../../.zqk/cli/specs/schemas/lifecycle_spec.schema.json"
+
+object_type: workstream_transition
+# Five-question exam: docs/architecture/LIFECYCLE_STATE_MACHINE_RUBRIC.md
+# TRACK: BLI-CEF-R26-REMAINING-KINDS-001
+statuses:
+  - value: conceptual
+    display: Conceptual
+    origin: true
+    preliminary: true
+    description: Draft plane status. Prior to CAS membrane crossing.
+    role: realign
+  - value: originated
+    display: Originated
+    description: CAS membrane crossed. Object officially originated.
+    role: realign
+  - value: planned
+    display: Planned
+    origin: false
+    preliminary: false
+    role: realign
+    description: "workstream transition status 'planned' (Planned): not yet committed
+      for execution; reshape before pickup."
+  - value: active
+    display: Active
+    role: shovel_ready
+    description: "workstream transition status 'active' (Active): ready for pickup
+      or use; not locked mid-flight."
+  - value: complete
+    display: Complete
+    terminal: true
+    role: terminal
+    description: "workstream transition status 'complete' (Complete): ended; no further
+      normal execution transitions expected. Flags: terminal."
+  - value: archived
+    display: Archived
+    terminal: true
+    archive: true
+    role: terminal
+    description: "workstream transition status 'archived' (Archived): ended; no further
+      normal execution transitions expected. Flags: archive, terminal."
+    shockwave:
+      mode: shared
+      fail: open
+  - value: error
+    display: Error
+    system: true
+    role: halted
+    description: "workstream transition status 'error' (Error): paused or system-held
+      for repair; resolve before advancing. Flags: system-assigned."
+transitions:
+  - from: conceptual
+    to: originated
+    description: Promote from draft plane to CAS membrane (CAS Qualification).
+    manual: true
+    auto: false
+    catalyst: System promotion
+  - from: originated
+    to: planned
+    description: Initial domain workflow transition to planned.
+    manual: true
+    auto: true
+    catalyst: System initialization
+  - from: planned
+    to: active
+    description: Activate transition
+    manual: true
+    auto: false
+    postconditions:
+      - role is shovel_ready
+  - from: active
+    to: complete
+    description: Complete transition
+    manual: true
+    auto: false
+    postconditions:
+      - role is terminal
+  - from: complete
+    to: archived
+    description: Archive transition
+    manual: true
+    auto: false
+    postconditions:
+      - role is terminal
+      - ended; no further normal execution hops expected
+  - from: '*'
+    to: error
+    description: System error occurred
+    manual: false
+    auto: true
+    postconditions:
+      - role is halted
+      - hop from any occupancy to error
+      - system halt; repair before leaving halted
+percent_complete:
+  method: status_defaults
+  default_by_status:
+    conceptual: 0
+    originated: 5
+    active: 100
+    archived: 100
+    complete: 100
+    error: 0
+    pending: 20
+created_at: 2026-07-01T18:00:00Z
+updated_at: 2026-07-01T18:00:00Z
+created_by: ACC-1785920548450214012-68b850c0
+updated_by: ACC-1785920548450214012-68b850c0

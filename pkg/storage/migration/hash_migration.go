@@ -1,0 +1,268 @@
+package migration
+
+import (
+	"fmt"
+	"path/filepath"
+	"strings"
+
+	"github.com/zqk-os/zqk/pkg/appledouble"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/storage"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
+)
+
+// HashMigration migrates individual .hash files to hash index files by kind
+type HashMigration struct {
+	rootPath string
+	verbose  bool
+	logger   *logging.EventLogger
+}
+
+// NewHashMigration creates a new hash migration utility
+func NewHashMigration(rootPath string) *HashMigration {
+	return &HashMigration{
+		rootPath: rootPath,
+		logger:   logging.NewEventLogger(pkgctx.NewSystemContext()),
+	}
+}
+
+// SetVerbose enables verbose output
+func (hm *HashMigration) SetVerbose(verbose bool) {
+	hm.verbose = verbose
+}
+
+// SetLogger sets a custom logger for the migration
+func (hm *HashMigration) SetLogger(logger *logging.EventLogger) {
+	hm.logger = logger
+}
+
+// MigrationResult contains the results of a hash migration
+type MigrationResult struct {
+	KindsProcessed []string
+	HashesMigrated int
+	HashesSkipped  int
+	Errors         []error
+	OldHashFiles   []string // List of old .hash files that were migrated
+}
+
+// Migrate migrates all individual .hash files to hash index files
+// Returns a MigrationResult with statistics about the migration
+func (hm *HashMigration) Migrate(dryRun bool) (*MigrationResult, error) {
+	result := &MigrationResult{
+		KindsProcessed: []string{},
+		HashesMigrated: 0,
+		HashesSkipped:  0,
+		Errors:         []error{},
+		OldHashFiles:   []string{},
+	}
+
+	// Map to track hashes by kind
+	hashesByKind := make(map[string]map[string]string) // kind -> filename -> hash
+
+	// Scan for all .hash files
+	hashFiles, err := hm.findHashFiles()
+	if err != nil {
+		return nil, errfmt.Newf(storage.ConstMiscFailedToFindHashFiles).Wrap(err)
+	}
+
+	if hm.verbose {
+		storage.StorageLog(hm.logger.Logger()).Info(storage.LogEventStorageHashMigrationFoundFilesInfo).
+			Int("count", len(hashFiles)).
+			Log()
+	}
+
+	// Process each hash file
+	for _, hashFile := range hashFiles {
+		// Determine object kind from directory
+		kind, filename, err := hm.parseHashFile(hashFile)
+		if err != nil {
+			result.Errors = append(result.Errors, errfmt.Errorf(storage.ConstMiscFailedToParseSW, hashFile, err))
+			continue
+		}
+
+		// Read hash value from .hash file
+		hash, err := fileutil.ReadFile(hashFile)
+		if err != nil {
+			result.Errors = append(result.Errors, errfmt.Errorf(storage.ConstMiscFailedToReadSW, hashFile, err))
+			continue
+		}
+
+		hashStr := strings.TrimSpace(string(hash))
+		if hashStr == "" {
+			result.Errors = append(result.Errors, errfmt.Errorf(storage.ConstMiscEmptyHashInS, hashFile))
+			continue
+		}
+
+		// Initialize kind map if needed
+		if hashesByKind[kind] == nil {
+			hashesByKind[kind] = make(map[string]string)
+		}
+
+		// Check if hash already exists in index (if it does, skip)
+		kindDir := hm.getKindDirectory(kind)
+		registry := storage.NewHashRegistry(pkgctx.NewSystemContext(), kind, kindDir)
+		if err := registry.Load(); err == nil {
+			if existingHash := registry.GetHash(filename); existingHash != "" {
+				if existingHash == hashStr {
+					// Hash already exists in index, skip
+					result.HashesSkipped++
+					if hm.verbose {
+						storage.StorageLog(hm.logger.Logger()).Debug(storage.LogEventStorageHashMigrationSkippingIndexedDebug).
+							String("file", hashFile).
+							Log()
+					}
+					continue
+				}
+				// Hash mismatch - this is a conflict
+				result.Errors = append(result.Errors, errfmt.Errorf(storage.ConstMiscHashMismatchForSIndexHasSHashFileHasS, filename, existingHash, hashStr))
+				continue
+			}
+		}
+
+		// Add to migration map
+		hashesByKind[kind][filename] = hashStr
+		result.OldHashFiles = append(result.OldHashFiles, hashFile)
+	}
+
+	// Write hash indexes for each kind
+	for kind, hashes := range hashesByKind {
+		if len(hashes) == 0 {
+			continue
+		}
+
+		kindDir := hm.getKindDirectory(kind)
+		registry := storage.NewHashRegistry(pkgctx.NewSystemContext(), kind, kindDir)
+
+		// Load existing registry (if any)
+		if err := registry.Load(); err != nil && !fileutil.IsNotExist(err) {
+			result.Errors = append(result.Errors, errfmt.Errorf(storage.ConstMiscFailedToLoadExistingRegistryForSW, kind, err))
+			continue
+		}
+
+		// Add migrated hashes
+		for filename, hash := range hashes {
+			registry.SetHash(filename, hash)
+			result.HashesMigrated++
+		}
+
+		// Save registry
+		if !dryRun {
+			if err := registry.Save(); err != nil {
+				result.Errors = append(result.Errors, errfmt.Errorf(storage.ConstMiscFailedToSaveRegistryForSW, kind, err))
+				continue
+			}
+			if hm.verbose {
+				storage.StorageLog(hm.logger.Logger()).Info(storage.LogEventStorageHashMigrationRegistryUpdatedInfo).
+					Kind(kind).
+					String("file", fmt.Sprintf("hash-index for %s", kind)).
+					Int("hash_count", len(hashes)).
+					Log()
+			}
+		} else if hm.verbose {
+			storage.StorageLog(hm.logger.Logger()).Info(storage.LogEventStorageHashMigrationDryRunWouldUpdateInfo).
+				Kind(kind).
+				String("file", fmt.Sprintf("hash-index for %s", kind)).
+				Int("hash_count", len(hashes)).
+				Log()
+		}
+
+		result.KindsProcessed = append(result.KindsProcessed, kind)
+	}
+
+	// Remove old .hash files if not dry run
+	if !dryRun && len(result.OldHashFiles) > 0 {
+		for _, oldHashFile := range result.OldHashFiles {
+			if err := fileutil.Remove(oldHashFile); err != nil {
+				result.Errors = append(result.Errors, errfmt.Errorf(storage.ConstMiscFailedToRemoveSW, oldHashFile, err))
+			} else if hm.verbose {
+				storage.StorageLog(hm.logger.Logger()).Info(storage.LogEventStorageHashMigrationRemovedOldFileInfo).
+					String("file", oldHashFile).
+					Log()
+			}
+		}
+	}
+
+	return result, nil
+}
+
+// findHashFiles finds all .hash files in the root path
+func (hm *HashMigration) findHashFiles() ([]string, error) {
+	var hashFiles []string
+
+	err := filepath.Walk(hm.rootPath, func(path string, info fileutil.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+
+		// Skip directories
+		if info.IsDir() {
+			return nil
+		}
+
+		if appledouble.SkipPathInTreeWalk(path) {
+			return nil
+		}
+
+		// Check if file ends with .hash
+		if strings.HasSuffix(path, ".hash") {
+			hashFiles = append(hashFiles, path)
+		}
+
+		return nil
+	})
+
+	return hashFiles, err
+}
+
+// parseHashFile extracts the object kind and filename from a hash file path
+// Example: ".zqk/process/backlog_items/BLI-001.yaml.hash" -> kind="backlog_item", filename="BLI-001.yaml"
+func (hm *HashMigration) parseHashFile(hashFilePath string) (kind, filename string, err error) {
+	// Remove .hash extension
+	objectPath := strings.TrimSuffix(hashFilePath, ".hash")
+
+	// Get directory and filename
+	dir := filepath.Dir(objectPath)
+	filename = filepath.Base(objectPath)
+
+	// Determine kind from directory name
+	// Map directory names to object kinds
+	dirBase := filepath.Base(dir)
+	kind = hm.directoryToKind(dirBase)
+
+	if kind == "" {
+		return "", "", errfmt.Errorf(storage.ConstMiscUnknownObjectKindForDirectoryS, dirBase)
+	}
+
+	return kind, filename, nil
+}
+
+// directoryToKind maps directory names to object kinds
+func (hm *HashMigration) directoryToKind(dirName string) string {
+	return objects.GetKindFromDirectory(dirName)
+}
+
+// getKindDirectory returns the directory path for a given object kind
+func (hm *HashMigration) getKindDirectory(kind string) string {
+	dirName := objects.GetDirectoryFromKind(kind)
+	if dirName == "" {
+		return hm.rootPath
+	}
+
+	return filepath.Join(hm.rootPath, dirName)
+}
+
+// VerifyHash verifies that a file's hash matches the expected hash
+func VerifyHash(filePath, expectedHash string) (bool, error) {
+	data, err := fileutil.ReadFile(filePath)
+	if err != nil {
+		return false, errfmt.Newf(storage.ConstMiscFailedToReadFile).Wrap(err)
+	}
+
+	// Use shared hash calculation function to ensure consistency
+	actualHash := storage.CalculateSHA256Hash(data)
+
+	return actualHash == expectedHash, nil
+}

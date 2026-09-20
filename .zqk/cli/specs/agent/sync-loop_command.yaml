@@ -1,0 +1,22 @@
+$schema: "../schemas/command_spec.schema.json"
+
+name: "sync-loop"
+short: "Run a native local-LLM sync-loop worker for an agent_task"
+description: |
+  Spawns a graph-state sync-loop that executes an agent_task against the
+  configured local LLM (ZQK_LLM_* / Ollama).
+
+args:
+  type: "no_args"
+
+help:
+  examples:
+    - comment: "Start the local LLM sync-loop worker"
+      command: "%s agent sync-loop"
+    - comment: "JSON worker result"
+      command: "%s agent sync-loop --format json"
+  exclude_flags:
+    - "columns"
+    - "ignore-scheduler-down"
+
+common_flags: true

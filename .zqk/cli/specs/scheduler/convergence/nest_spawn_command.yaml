@@ -1,0 +1,48 @@
+$schema: ../../schemas/command_spec.schema.json
+name: nest-spawn
+short: Spawn a child convergence_session under a parent
+description: |
+  Create an active child CVS with hypothesis/desired_end_state and append it to the parent's
+  related_object_refs. Enforces CollectCVSTreeBFS max depth (default 3) and rejects cycles.
+help:
+  examples:
+  - comment: Spawn child under parent CVS
+    command: '%s scheduler convergence nest-spawn --parent-session-id CVS-001 --title "Child tranche" --hypothesis "h" --desired-end-state "done"'
+  exclude_flags:
+  - format
+  - output
+  - verbose
+  - quiet
+  - timeout
+  - columns
+run_e: schedulerConvergenceNestSpawn
+common_flags: true
+flags:
+- name: parent-session-id
+  type: string
+  default: ''
+  description: Parent/coordinator convergence_session id (CVS-*)
+- name: title
+  type: string
+  default: ''
+  description: Child session title
+- name: hypothesis
+  type: string
+  default: ''
+  description: Child hypothesis
+- name: desired-end-state
+  type: string
+  default: ''
+  description: Child desired_end_state
+- name: next-action
+  type: string
+  default: ''
+  description: Optional child next_action
+- name: current-phase
+  type: string
+  default: c1_scope
+  description: Child current_phase (C1–C6)
+- name: max-depth
+  type: int
+  default: 3
+  description: Max nest depth (CollectCVSTreeBFS cap)

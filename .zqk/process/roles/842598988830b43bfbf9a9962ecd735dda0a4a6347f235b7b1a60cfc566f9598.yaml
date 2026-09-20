@@ -1,0 +1,16 @@
+created_at: "2026-06-15T01:18:17Z"
+created_by: ACC-1785920548450214012-68b850c0
+description: Architect role
+id: ROL-1781486297179143000-a2225cd1
+kind: role
+namespace_id: zqk:kernel
+permissions:
+    - read:*
+    - write:*
+role_id: architect
+schema_version: 2.0.0
+status: active
+title: Architect
+updated_at: "2026-08-05T09:36:54Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

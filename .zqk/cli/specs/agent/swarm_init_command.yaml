@@ -1,0 +1,61 @@
+$schema: "../schemas/command_spec.schema.json"
+
+name: "swarm-init"
+short: "Run a configured mesh swarm-init pipeline recipe"
+description: |
+  Bring up mesh seats from a kernel pipeline (PIP-*) recipe: control plane, seat
+  bind, seat-workers, optional chat bootstrap, COMMS-CHECK, then plan dispatch.
+  Workflows may name a recipe in metadata.swarm_init_pipeline_ref. Unknown
+  executors fail closed. Does not run feed doctor --refresh-seats. Chat bootstrap
+  is skipped unless --allow-chat.
+
+flags:
+  - name: "pipeline"
+    type: "string"
+    default: ""
+    description: "Pipeline object id (PIP-*) to run"
+  - name: "workflow"
+    type: "string"
+    default: ""
+    description: "Workflow object id (WFL-*) whose metadata.swarm_init_pipeline_ref selects the recipe"
+  - name: "from-stage"
+    type: "string"
+    default: ""
+    description: "Skip stages before this stage id"
+  - name: "plan-id"
+    type: "string"
+    default: ""
+    description: "Priority plan id for the orchestrate_plan stage (PRI-*)"
+  - name: "agent-id"
+    type: "string"
+    default: ""
+    description: "Coordinator seat id used as feed from_agent_id"
+  - name: "persona-ref"
+    type: "string"
+    default: ""
+    description: "Coordinator persona (PER-*) for feed stamps"
+  - name: "dry-run"
+    type: "bool"
+    default: false
+    description: "Validate and print the run without writing peer seats or installing seat-workers"
+  - name: "allow-chat"
+    type: "bool"
+    default: false
+    description: "Permit the optional chat_bootstrap executor (human opt-in)"
+
+args:
+  type: "no_args"
+
+help:
+  examples:
+    - comment: "Run a named pipeline recipe"
+      command: "%s agent swarm-init --pipeline PIP-SWARM-INIT-MMORCH-001"
+    - comment: "Resolve recipe from a workflow"
+      command: "%s agent swarm-init --workflow WFL-TPM-AGY-MESH-001"
+    - comment: "Preview stages without writing seats"
+      command: "%s agent swarm-init --pipeline PIP-SWARM-INIT-PHASE-B-001 --dry-run"
+    - comment: "Resume at COMMS-CHECK with chat bootstrap allowed"
+      command: "%s agent swarm-init --pipeline PIP-SWARM-INIT-MMORCH-001 --from-stage comms_check --allow-chat"
+  exclude_flags:
+    - "columns"
+    - "ignore-scheduler-down"

@@ -1,0 +1,24 @@
+$schema: "../../schemas/command_spec.schema.json"
+
+name: "report"
+short: "Report pipeline kind coverage, lifecycle YAML presence, and composition registry"
+description: |
+  Reports closed kernel.cas_object_* pipeline kinds, critical-kind lifecycle YAML
+  presence, composed pipeline_definition registry size vs expected, and a dangling
+  ref sample. Observability only — not a second mutation engine.
+
+  See docs/architecture/KERNEL_MUTATION_PIPELINE.md.
+
+args:
+  type: "no_args"
+
+help:
+  examples:
+    - comment: "JSON coverage report"
+      command: "%s system kernel-integrity report --format json"
+  exclude_flags:
+    - "columns"
+    - "ignore-scheduler-down"
+
+run_e: "runKernelIntegrityReport"
+common_flags: true

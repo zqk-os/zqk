@@ -1,0 +1,167 @@
+schema_version: 2.0.0
+ontology: partnership
+extends: extensible_object
+visibility: public
+description: 'Partnership relationship between two or more organizations. Partnerships represent collaborative relationships, joint ventures, or other inter-organizational arrangements. '
+traits:
+  - base_object_traits
+fields:
+  end_date:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner
+      automation_hooks: used for partnership timeline tracking
+      cardinality: zero_or_one
+      criticality: association
+      default: null
+      dependencies: none
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: The date when the partnership ended (null for active partnerships)
+      security: non-sensitive
+      system_usage:
+        - timeline tracking
+        - reporting
+      validation: Must be a valid ISO 8601 date, must be after start_date if both are provided
+    field_profile_code: PART-005
+    permissions: rwx
+    semantic_type: date
+    traits:
+      - readable
+      - writable
+      - filterable
+      - sortable
+    type: date
+    validation:
+      required: false
+  organization_refs:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner
+      automation_hooks: used for partnership relationship tracking
+      cardinality: many
+      criticality: composition
+      default: []
+      dependencies: organization registry
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: References to organizations participating in this partnership (minimum 2)
+      security: non-sensitive
+      system_usage:
+        - partnership tracking
+        - relationship analysis
+      validation: Must reference at least 2 existing organization object IDs using domain:organizational:organization:{id} format
+    field_profile_code: PART-002
+    permissions: rwx
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+      - field_reference_group
+    type: list
+    validation:
+      required: true
+  partnership_name:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner
+      automation_hooks: used for display and identification
+      cardinality: one
+      criticality: composition
+      default: null
+      dependencies: none
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: The name or description of the partnership
+      security: non-sensitive
+      system_usage:
+        - display
+        - identification
+        - search
+      validation: Must be a non-empty string
+    field_profile_code: PART-001
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+      - modifiable
+      - searchable
+      - filterable
+    type: string
+    validation:
+      required: true
+  partnership_type:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner
+      automation_hooks: used for partnership categorization and filtering
+      cardinality: one
+      criticality: association
+      default: collaboration
+      dependencies: none
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: The type of partnership (collaboration, joint_venture, strategic_alliance, etc.)
+      security: non-sensitive
+      system_usage:
+        - categorization
+        - filtering
+        - reporting
+      validation: Must be one of the defined partnership types
+    field_profile_code: PART-003
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+      - modifiable
+      - filterable
+      - groupable
+    type: enum
+    validation:
+      enum:
+        - collaboration
+        - joint_venture
+        - strategic_alliance
+        - supplier
+        - customer
+        - other
+      required: false
+  start_date:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner
+      automation_hooks: used for partnership timeline tracking
+      cardinality: zero_or_one
+      criticality: association
+      default: null
+      dependencies: none
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: The date when the partnership began
+      security: non-sensitive
+      system_usage:
+        - timeline tracking
+        - reporting
+      validation: Must be a valid ISO 8601 date
+    field_profile_code: PART-004
+    permissions: rwx
+    semantic_type: date
+    traits:
+      - readable
+      - writable
+      - filterable
+      - sortable
+    type: date
+    validation:
+      required: false

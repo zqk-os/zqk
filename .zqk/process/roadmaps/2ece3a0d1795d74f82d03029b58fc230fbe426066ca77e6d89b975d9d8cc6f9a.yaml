@@ -1,0 +1,20 @@
+created_at: "2026-09-17T19:15:18Z"
+created_by: ACC-1785920548450214012-68b850c0
+description: 'Execution roadmap for the open-core community kernel: first-run seating (personas, skills, policies), Gantt (org to mission to vision to goal to workstream to priority_plan), and launch vetting without public push.'
+goal_refs:
+    - GOAL-1789631957245339000-008aac9f
+id: ROAD-1789672518317622000-a1c01b83
+kind: roadmap
+milestone_refs:
+    - MIL-1789672699275510000-40c8cee7
+namespace_id: zqk:kernel
+related_object_refs:
+    - PRI-1789630341114309000-f91952ee
+schema_version: 2.0.0
+status: published
+title: Community launch and first-run kernel
+updated_at: "2026-09-17T19:19:20Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs:
+    - WS-1789631797993326000-f9951fe8

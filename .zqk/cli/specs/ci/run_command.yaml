@@ -1,0 +1,49 @@
+$schema: "../schemas/command_spec.schema.json"
+
+name: "run [flags]"
+short: "Checkout committed SHA into local-ci workdir and scan-tests"
+description: |
+  Runs scripts/local-ci-checkout.sh then scheduler scan-tests with the Local CI
+  source-root. Studio must be clean of tracked changes unless --allow-dirty or
+  --sha points at an already-committed revision.
+
+  Does not delete or reset in-flight SCH-run jobs unless scan-tests updates
+  matching stable IDs (prefer waiting for an idle wave before full --all).
+
+flags:
+  - name: "sha"
+    type: "string"
+    description: "Commit SHA to checkout (default: HEAD)"
+  - name: "allow-dirty"
+    type: "bool"
+    default: false
+    description: "Allow checkout when studio has tracked dirty files"
+  - name: "no-archive"
+    type: "bool"
+    default: false
+    description: "Skip tar drop / archive-git recording"
+  - name: "package"
+    type: "string"
+    description: "Pass-through to scan-tests --package (omit with --all)"
+  - name: "all"
+    type: "bool"
+    default: false
+    description: "Pass-through to scan-tests --all (default when no --package)"
+  - name: "checkout-only"
+    type: "bool"
+    default: false
+    description: "Only checkout; do not schedule tests"
+
+help:
+  examples:
+    - comment: "Full local CI on HEAD"
+      command: "%s ci run --all"
+    - comment: "Targeted package after a fix commit"
+      command: "%s ci run --package ./pkg/storage"
+  exclude_flags:
+    - "format"
+    - "output"
+    - "verbose"
+    - "quiet"
+    - "timeout"
+    - "columns"

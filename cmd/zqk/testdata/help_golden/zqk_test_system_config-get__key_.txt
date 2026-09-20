@@ -1,0 +1,7 @@
+Print a project config value by key (e.g. logging.error_log_output)
+
+Usage:
+  zqk.test system config-get [key] [flags]
+
+Global Flags:
+      --allow-degraded   Allow scheduler-dependent commands to run when scheduler daemon is not running

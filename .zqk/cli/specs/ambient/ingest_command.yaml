@@ -1,0 +1,32 @@
+$schema: "../schemas/command_spec.schema.json"
+
+name: "ingest"
+short: "Start the ambient event ingest API"
+description: |
+  Exposes a high-throughput HTTP API to ingest context events into the
+  ZQK ambient nervous system.
+
+flags:
+  - name: "port"
+    shorthand: "p"
+    type: "int"
+    default: 8089
+    description: "Port to listen on for HTTP ingest API"
+
+args:
+  type: "no_args"
+
+help:
+  examples:
+    - comment: "Default ingest listener"
+      command: "%s ambient ingest"
+    - comment: "Custom port"
+      command: "%s ambient ingest --port 8090"
+  exclude_flags:
+    - "columns"
+    - "ignore-scheduler-down"
+    - "format"
+    - "output"
+
+run_e: "runAmbientIngest"
+common_flags: true

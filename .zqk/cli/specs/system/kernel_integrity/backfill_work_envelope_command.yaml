@@ -1,0 +1,39 @@
+$schema: "../../schemas/command_spec.schema.json"
+
+name: "backfill-work-envelope"
+short: "Stamp missing completed_at from historical updated_at on effort-aware work-done objects"
+description: |
+  One-shot backfill for effort-aware kinds whose work-done status predates
+  work-envelope autofill. Sets completed_at from updated_at when the work clock
+  is empty. Does not mutate on object get. Defaults to dry-run; pass --apply
+  to write.
+
+args:
+  type: "no_args"
+
+flags:
+  - name: "dry-run"
+    type: "bool"
+    default: true
+    description: "Report only; do not write"
+  - name: "apply"
+    type: "bool"
+    default: false
+    description: "Write completed_at stamps (implies dry-run=false)"
+  - name: "limit"
+    type: "int"
+    default: 0
+    description: "Max objects to consider (0 = unlimited)"
+
+help:
+  examples:
+    - comment: "Preview missing work clocks"
+      command: "%s system kernel-integrity backfill-work-envelope"
+    - comment: "Stamp completed_at from historical updated_at"
+      command: "%s system kernel-integrity backfill-work-envelope --apply"
+  exclude_flags:
+    - "columns"
+    - "ignore-scheduler-down"
+
+run_e: "runKernelIntegrityBackfillWorkEnvelope"
+common_flags: true

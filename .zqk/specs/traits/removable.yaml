@@ -1,0 +1,17 @@
+$schema: "../../../.zqk/cli/specs/schemas/trait_spec.schema.json"
+
+name: removable
+description: Object/field can be removed/deleted
+category: standard
+requires:
+  - readable
+conflicts: []
+includes: []
+field_level: false
+object_level: true
+config: {}
+
+created_at: 2026-07-01T18:00:00Z
+updated_at: 2026-07-01T18:00:00Z
+created_by: ACC-1785920548450214012-68b850c0
+updated_by: ACC-1785920548450214012-68b850c0

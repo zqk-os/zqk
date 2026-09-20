@@ -1,0 +1,76 @@
+schema_version: 2.0.0
+ontology: glossary_term
+extends: base_object
+visibility: internal
+description: 'Operational glossary term: a context-scoped definition for agents and tooling.\nUse for shared vocabulary (e.g. \"new system object\", \"process data\") so agents\nand automation use consistent definitions. Link to existing alias/synonym objects\nvia alias_refs. context_scope, category, agent_prompts, and machine_hints are\nrequired; defaults are auto-resolved at create if omitted.\nsemantic_tags classifies usage: e.g. ontology, epistemology, inference, display,\nnavigation, predicate_definition (for terms that define glossary_term_relation predicates).\nLifecycle: glossary_term_lifecycle.yaml.\n'
+traits:
+  - base_object_traits
+fields:
+  agent_prompts:
+    default: ""
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+    type: string
+    validation:
+      required: true
+  alias_refs:
+    permissions: r-x
+    semantic_type: reference
+    traits:
+      - field_reference_group
+    type: list
+    validation:
+      required: false
+  category:
+    default: ""
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - filterable
+      - listable
+      - groupable
+    type: string
+    validation:
+      required: true
+  context_scope:
+    default: ""
+    permissions: r-x
+    semantic_type: statement
+    traits:
+      - filterable
+      - groupable
+    type: string
+    validation:
+      required: true
+  definition:
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+      - filterable
+      - searchable
+    type: string
+    validation:
+      required: true
+  machine_hints:
+    default: ""
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+    type: string
+    validation:
+      required: true
+  semantic_tags:
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - filterable
+    type: list
+    validation:
+      required: false

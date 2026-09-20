@@ -1,0 +1,125 @@
+$schema: "../../../.zqk/cli/specs/schemas/lifecycle_spec.schema.json"
+
+object_type: prompt_template
+# Five-question exam: docs/architecture/LIFECYCLE_STATE_MACHINE_RUBRIC.md
+# TRACK: BLI-CEF-R26-REMAINING-KINDS-001
+metadata:
+  description: >
+    Lifecycle for prompt templates that guide agents or humans. Templates move
+    from draft/proposed through active use, and eventually to deprecated or archived
+    when replaced or retired. Error status is reserved for lifecycle incoherency.
+  archive_status: archived
+  error_status: error
+
+statuses:
+  - value: conceptual
+    display: Conceptual
+    origin: true
+    preliminary: true
+    description: Draft plane status. Prior to CAS membrane crossing.
+    role: realign
+  - value: originated
+    display: Originated
+    description: CAS membrane crossed. Object officially originated.
+    role: realign
+  - value: draft
+    display: Draft
+    origin: false
+    preliminary: false
+    role: realign
+    description: "prompt template status 'draft' (Draft): not yet committed for execution;
+      reshape before pickup."
+  - value: active
+    display: Active
+    role: shovel_ready
+    description: "prompt template status 'active' (Active): ready for pickup or use;
+      not locked mid-flight."
+  - value: deprecated
+    display: Deprecated
+    terminal: true
+    role: terminal
+    description: "prompt template status 'deprecated' (Deprecated): ended; no further
+      normal execution transitions expected. Flags: terminal."
+  - value: archived
+    display: Archived
+    terminal: true
+    archive: true
+    role: terminal
+    description: "prompt template status 'archived' (Archived): ended; no further
+      normal execution transitions expected. Flags: archive, terminal."
+  - value: error
+    display: Error
+    system: true
+
+    role: halted
+    description: "prompt template status 'error' (Error): paused or system-held for
+      repair; resolve before advancing. Flags: system-assigned."
+transitions:
+  - from: conceptual
+    to: originated
+    description: Promote from draft plane to CAS membrane (CAS Qualification).
+    manual: true
+    auto: false
+    catalyst: System promotion
+  - from: originated
+    to: draft
+    description: Initial domain workflow transition to draft.
+    manual: true
+    auto: true
+    catalyst: System initialization
+  - from: draft
+    to: active
+    description: Template reviewed and approved for general use
+    manual: true
+    auto: false
+    postconditions:
+      - role is shovel_ready
+  - from: active
+    to: deprecated
+    description: Template superseded by a newer version but kept for reference
+    manual: true
+    auto: false
+    postconditions:
+      - role is terminal
+      - ended; no further normal execution hops expected
+  - from: deprecated
+    to: archived
+    description: Template fully retired from active and fallback use
+    manual: true
+    auto: false
+    postconditions:
+      - role is terminal
+      - ended; no further normal execution hops expected
+  - from: "*"
+    to: archived
+    description: Manual archival from any status
+    manual: true
+    auto: false
+    postconditions:
+      - role is terminal
+      - hop from any occupancy to archived
+      - ended; no further normal execution hops expected
+  - from: "*"
+    to: error
+    description: System-assigned when lifecycle incoherency or illegal 
+      transition is detected
+    manual: false
+    auto: false
+    postconditions:
+      - role is halted
+      - hop from any occupancy to error
+      - system halt; repair before leaving halted
+percent_complete:
+  method: status_defaults
+  default_by_status:
+    conceptual: 0
+    originated: 5
+    draft: 10
+    active: 100
+    deprecated: 100
+    archived: 100
+    error: 0
+created_at: 2026-07-01T18:00:00Z
+updated_at: 2026-07-01T18:00:00Z
+created_by: ACC-1785920548450214012-68b850c0
+updated_by: ACC-1785920548450214012-68b850c0

@@ -1,0 +1,113 @@
+$schema: "../../../.zqk/cli/specs/schemas/lifecycle_spec.schema.json"
+
+object_type: scheduler_job
+# Five-question exam: docs/architecture/LIFECYCLE_STATE_MACHINE_RUBRIC.md
+# TRACK: BLI-CEF-R26-REMAINING-KINDS-001
+statuses:
+  - value: conceptual
+    display: Conceptual
+    origin: true
+    preliminary: true
+    description: Draft plane status. Prior to CAS membrane crossing.
+    role: realign
+  - value: originated
+    display: Originated
+    description: CAS membrane crossed. Object officially originated.
+    role: realign
+  - value: active
+    display: Active
+    origin: false
+    description: Job is enabled and scheduled for execution
+    role: execution_locked
+  - value: disabled
+    display: Disabled
+    description: Job is temporarily disabled and will not execute
+    role: halted
+  - value: archived
+    display: Archived
+    terminal: true
+    archive: true
+    description: Job is permanently archived and removed from scheduling
+    role: terminal
+  - value: pending
+    display: Pending
+    description: Job is pending execution
+    role: shovel_ready
+  - value: error
+    display: Error
+    system: true
+    description: Job encountered an error during execution or scheduling
+    role: halted
+transitions:
+  - from: conceptual
+    to: originated
+    description: Promote from draft plane to CAS membrane (CAS Qualification).
+    manual: true
+    auto: false
+    catalyst: System promotion
+  - from: originated
+    to: active
+    description: Initial domain workflow transition to active.
+    manual: true
+    auto: true
+    catalyst: System initialization
+  - from: pending
+    to: active
+    description: Run or activate the pending job
+    manual: false
+    auto: true
+    postconditions:
+      - role is execution_locked
+  - from: active
+    to: pending
+    description: Put job in pending state
+    manual: false
+    auto: true
+    postconditions:
+      - role is shovel_ready
+  - from: active
+    to: disabled
+    description: Disable the job temporarily
+    manual: true
+    auto: false
+    postconditions:
+      - role is halted
+  - from: disabled
+    to: active
+    description: Re-enable the job
+    manual: true
+    auto: false
+    postconditions:
+      - role is execution_locked
+  - from: '*'
+    to: archived
+    description: Archive the job permanently
+    manual: true
+    auto: false
+    postconditions:
+      - role is terminal
+      - hop from any occupancy to archived
+      - ended; no further normal execution hops expected
+  - from: '*'
+    to: error
+    description: Job encountered an execution error
+    manual: false
+    auto: true
+    postconditions:
+      - role is halted
+      - hop from any occupancy to error
+      - system halt; repair before leaving halted
+percent_complete:
+  method: status_defaults
+  default_by_status:
+    conceptual: 0
+    originated: 10
+    active: 100
+    archived: 100
+    disabled: 0
+    error: 0
+    pending: 20
+created_at: 2026-07-01T18:00:00Z
+updated_at: 2026-07-01T18:00:00Z
+created_by: ACC-1785920548450214012-68b850c0
+updated_by: ACC-1785920548450214012-68b850c0

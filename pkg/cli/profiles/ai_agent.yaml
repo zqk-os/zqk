@@ -1,0 +1,22 @@
+# AI Agent CLI Profile Specification
+# Version: 1.0.0
+
+schema_version: "1.0.0"
+namespace_id: "zqk:kernel:cli"
+name: "ai_agent"
+extends: "base"
+description: |
+  Machine-readable output for AI agents.
+  Optimized for programmatic consumption with JSON format and minimal verbosity.
+
+spec:
+  format: "jsonl"
+  verbose: false
+  quiet: false
+  flags:
+    format: "jsonl"
+    verbose: false
+  commands:
+    aliases:
+      "list": "object list --format jsonl"
+      "get": "object get --format jsonl"

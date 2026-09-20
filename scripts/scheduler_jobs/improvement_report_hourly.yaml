@@ -1,0 +1,37 @@
+# System improvement report: hourly run for comparative analysis and prioritized work items.
+#
+# Runs `zqk system improvement-report` once per hour to produce:
+# - Snapshot: status, object count, retention, health data, metrics analysis, stream counts
+# - Comparative analysis vs previous run (deltas, retention over target, blocking)
+# - Prioritized work items (P0–P3) to steer performance, behavior, accuracy, quality
+#
+# Output: .zqk/logs/reports/improvement-report-YYYYMMDD-HHMMSS.txt and .json
+#
+# Create via:
+#   zqk object create scheduler_job --file scripts/scheduler_jobs/improvement_report_hourly.yaml
+#
+# Or ensure maintenance bundle: zqk system ensure-retention-jobs
+
+id: SCH-improvement-report
+title: System Health - Improvement Report (Hourly)
+description: |
+  Runs `zqk system improvement-report` once per hour to generate a comprehensive
+  report with comparative analysis and prioritized work items for system
+  performance, behavior, accuracy, and quality.
+job_type: run_wrapper
+trigger_type: timer
+schedule_expression: "0 * * * *"
+category: maintenance
+execution_mode: reusable
+max_runtime_seconds: 600
+enabled: true
+status: active
+namespace_id: zqk:kernel
+schema_version: "2.0.0"
+command: /bin/sh
+command_args:
+  - "-c"
+  - |
+    set -e
+    ZQK="${ZQK_BIN:-zqk}"
+    "$ZQK" system improvement-report --emit-events

@@ -1,0 +1,103 @@
+package feed
+
+import (
+	"strings"
+
+	"github.com/spf13/cobra"
+	"github.com/zqk-os/zqk/internal/cli"
+	"github.com/zqk-os/zqk/pkg/agentfeed"
+	clipkg "github.com/zqk-os/zqk/pkg/cli"
+	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/idebridge"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/objects"
+)
+
+// NewProofOfLifeCmd creates zqk feed proof-of-life.
+func NewProofOfLifeCmd() *cobra.Command {
+	cmd := bldr_cli_cmd_v1.NewFeedProofOfLifeCommandBuilder()
+	cmd.RunE = runFeedProofOfLife
+	return cmd
+}
+
+func runFeedProofOfLife(cmd *cobra.Command, _ []string) error {
+	return cli.WithProcessor(func(cmd *cobra.Command, _ []string, proc *cli.Processor) error {
+		root := proc.ProjectRoot()
+		if root == "" {
+			return errfmt.Errorf("project root not found")
+		}
+		var flags clipkg.FlagBag
+		personaRef := flags.String(cmd, "persona-ref")
+		agentID := flags.String(cmd, "agent-id")
+		summary := flags.String(cmd, "summary")
+		noAck := flags.Bool(cmd, "no-ack")
+		noPulse := flags.Bool(cmd, "no-pulse")
+		if err := flags.Err(); err != nil {
+			return err
+		}
+
+		personaRef = strings.TrimSpace(personaRef)
+		agentID = strings.TrimSpace(agentID)
+		if personaRef == "" {
+			return errfmt.Errorf("--persona-ref is required (kernel persona PER-*)")
+		}
+		if agentID == "" {
+			return errfmt.Errorf("--agent-id is required (unique swarm seat; not the persona id)")
+		}
+		if strings.EqualFold(agentID, personaRef) {
+			return errfmt.Errorf("--agent-id must differ from --persona-ref (seat vs kernel persona)")
+		}
+
+		persona, err := proc.Storage().Read(proc.OperationContext(), proc.SecurityContext(), personaRef)
+		if err != nil {
+			return errfmt.Newf("feed proof-of-life: resolve persona %s", personaRef).Wrap(err)
+		}
+		kind, _ := persona[objects.FieldKeyKind].(string)
+		if !strings.EqualFold(strings.TrimSpace(kind), "persona") {
+			return errfmt.Errorf("--persona-ref %q is kind %q (want persona)", personaRef, kind)
+		}
+
+		msg := idebridge.FormatProofOfLifeMessage(summary)
+		roleFromPersona, _ := persona[objects.FieldKeyRole].(string)
+		title, _ := persona[objects.FieldKeyTitle].(string)
+
+		res, err := agentfeed.AppendEvent(agentfeed.AppendEventInput{
+			ProjectRoot: root,
+			Message:     msg,
+			AgentID:     agentID,
+			PersonaRef:  personaRef,
+			Role:        strings.TrimSpace(roleFromPersona),
+			Sender:      agentfeed.FeedSenderMeshStatus,
+			EventType:   agentfeed.FeedEventTypeMeshStatus,
+			SelfACK:     !noAck,
+		})
+		if err != nil {
+			return errfmt.Newf("feed proof-of-life").Wrap(err)
+		}
+
+		pulsed := false
+		if !noPulse {
+			pulsed = idebridge.QueueProofOfLife(root, summary)
+		}
+
+		logger := logging.GetLoggerFromProfile(proc.Context().Profile)
+		logging.Fluent(logger).Info("feed proof-of-life appended").
+			Path(res.EventPath).
+			PersonaRef(personaRef).
+			PersonaTitle(strings.TrimSpace(title)).
+			AgentID(agentID).
+			FeedID(res.FeedID).
+			Bool("ide_bridge_queued", pulsed).
+			Log()
+
+		out := feedResult(cmd, res, nil)
+		out[objects.FieldKeyPersonaRef] = personaRef
+		out[objects.FieldKeyAgentID] = agentID
+		if pulsed {
+			out["ide_bridge_queued"] = true
+		}
+		out["proof_of_life"] = true
+		return cli.FormatOutput(cmd, out)
+	})(cmd, nil)
+}

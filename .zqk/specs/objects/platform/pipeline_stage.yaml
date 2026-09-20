@@ -1,0 +1,69 @@
+schema_version: 2.0.0
+ontology: pipeline_stage
+prefix: PLS-
+extends: base_object
+visibility: internal
+storage_profile: cas_entity
+traits:
+    - base_object_traits
+description: |
+    A single execution step in a pipeline graph. Defines behavior (sequential vs parallel) and instructions for agent_tasks minted from this stage.
+fields:
+  pipeline_ref:
+    checklist:
+      authority: orchestrator
+      automation_hooks: groups stages into a pipeline
+      cardinality: one
+      criticality: association
+      default: null
+      purpose: Pipeline this stage belongs to
+    field_profile_code: PLS-001
+    permissions: rwx
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+      - field_reference_group
+    type: string
+    validation:
+      required: true
+  execution_mode:
+    checklist:
+      authority: architect
+      automation_hooks: orchestrator runs parallel stages concurrently
+      cardinality: one
+      criticality: metadata
+      default: "sequential"
+      purpose: Determines if tasks in this stage block progression
+    field_profile_code: PLS-002
+    permissions: rwx
+    semantic_type: enumeration
+    traits:
+      - field_mutable_group
+    type: string
+    validation:
+      required: true
+      enum:
+        - sequential
+        - parallel
+  instruction_refs:
+    checklist:
+      authority: architect
+      automation_hooks: attached to minted ATKs
+      cardinality: many
+      criticality: association
+      default: []
+      purpose: Policies, skills, or rules to pass to ATKs
+    field_profile_code: PLS-003
+    permissions: rwx
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+      - field_reference_group
+    type: list
+    validation:
+      required: false
+
+created_at: 2026-08-31T18:00:00Z
+updated_at: 2026-08-31T18:00:00Z
+created_by: ACC-1785920548450214012-68b850c0
+updated_by: ACC-1785920548450214012-68b850c0

@@ -1,0 +1,14 @@
+created_at: "2026-09-19T05:55:00Z"
+created_by: ACC-1785920548450214012-68b850c0
+description: Reorganize the zqk CLI command hierarchy into intuitive domains, eliminate deprecated and redundant commands, enforce 100% command spec coverage, and isolate vendor adapters.
+entry_point: cmd/zqk/main.go
+id: WS-CLI-TAXONOMY-OVERHAUL
+kind: workstream
+namespace_id: zqk:kernel
+owner_ref: ACC-1785920548450214012-68b850c0
+schema_version: 2.0.0
+status: originated
+title: CLI Command Taxonomy Harmonization, Spec Completeness & Vendor Decoupling
+updated_at: "2026-09-19T06:22:54Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

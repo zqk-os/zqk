@@ -1,0 +1,60 @@
+$schema: "../schemas/command_spec.schema.json"
+
+name: "bridge-ingest"
+short: "Ingest an enterprise messaging payload onto the agent feed as steering"
+description: |
+  Parses a provider payload (Slack, Teams, Telegram, Signal, or generic JSON) through
+  the messaging bridge adapters and appends a steering event with the same schema as
+  feed steer. Use for cloud/webhook edges that should not invent a parallel event shape.
+
+flags:
+  - name: "channel"
+    shorthand: "c"
+    type: "string"
+    default: ""
+    required: true
+    description: "Bridge channel (slack, teams, telegram, signal, generic)"
+  - name: "payload-file"
+    type: "string"
+    default: ""
+    description: "Path to provider JSON payload (mutually exclusive with --payload)"
+  - name: "payload"
+    type: "string"
+    default: ""
+    description: "Inline provider JSON payload (mutually exclusive with --payload-file)"
+  - name: "agent-id"
+    type: "string"
+    default: ""
+    description: "Optional agent id stamp (overrides payload agent_id when set)"
+  - name: "to-agent-id"
+    type: "string"
+    default: ""
+    description: "Optional peer seat id for inbox routing"
+  - name: "feed-id"
+    type: "string"
+    default: ""
+    description: "Fail if the lite feed_id differs from this value"
+  - name: "no-ack"
+    type: "bool"
+    default: false
+    description: "Do not append a kernel self-ACK line"
+  - name: "no-wake"
+    type: "bool"
+    default: false
+    description: "Do not wake the peer (stamp the feed only)"
+
+args:
+  type: "no_args"
+
+help:
+  examples:
+    - comment: "Ingest a Slack Events payload from a file"
+      command: "%s feed bridge-ingest --channel slack --payload-file /tmp/slack.json"
+    - comment: "Ingest generic normalized JSON inline"
+      command: "%s feed bridge-ingest --channel generic --payload '{\"text\":\"ship it\",\"agent_id\":\"ops\"}'"
+  exclude_flags:
+    - "columns"
+    - "ignore-scheduler-down"
+
+run_e: "runFeedBridgeIngest"
+common_flags: true

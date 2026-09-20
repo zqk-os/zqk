@@ -1,0 +1,40 @@
+$schema: "../schemas/command_spec.schema.json"
+
+name: "validate-command-specs"
+short: "Validate live CLI commands against canonical command specs"
+description: >
+  Compare the loaded Cobra command tree with canonical command specifications
+  under .zqk/cli/specs. Fails when a static command lacks a specification or a
+  specification is not wired into the live CLI.
+
+args:
+  type: "no_args"
+
+flags:
+  - name: "specs-dir"
+    type: "string"
+    default: ""
+    description: "Override the canonical command-spec directory"
+  - name: "baseline"
+    type: "string"
+    default: ""
+    description: "Override the accepted historical-drift baseline"
+  - name: "write-baseline"
+    type: "bool"
+    default: false
+    description: "Replace the baseline with the current measured drift"
+
+help:
+  examples:
+    - comment: "Validate the default command-spec source of truth"
+      command: "%s system validate-command-specs"
+    - comment: "Emit full structured coverage diagnostics"
+      command: "%s system validate-command-specs --format json --verbose"
+    - comment: "Deliberately capture the current historical-drift baseline"
+      command: "%s system validate-command-specs --write-baseline"
+  exclude_flags:
+    - "columns"
+    - "ignore-scheduler-down"
+
+run_e: "runValidateCommandSpecs"
+common_flags: true

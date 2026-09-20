@@ -1,0 +1,114 @@
+$schema: "../../../.zqk/cli/specs/schemas/lifecycle_spec.schema.json"
+
+object_type: display
+# Five-question exam: docs/architecture/LIFECYCLE_STATE_MACHINE_RUBRIC.md
+# TRACK: BLI-CEF-R26-REMAINING-KINDS-001
+statuses:
+  - value: conceptual
+    display: Conceptual
+    origin: true
+    preliminary: true
+    description: Draft plane status. Prior to CAS membrane crossing.
+    role: realign
+  - value: originated
+    display: Originated
+    description: CAS membrane crossed. Object officially originated.
+    role: realign
+  - value: created
+    display: Created
+    origin: false
+    preliminary: false
+    description: Display has been instantiated but not yet validated
+    role: realign
+  - value: validated
+    display: Validated      - Display type is valid
+    description: Display passes validation checks (type, configuration, 
+      constraints)
+    role: realign
+  - value: configured
+    display: Configured      - Display has valid layout configuration
+    description: Display layout and components are configured
+    role: realign
+  - value: rendered
+    display: Rendered      - Display successfully written to output
+    description: Display successfully written to output
+    role: realign
+  - value: archived
+    display: Archived
+    terminal: true
+    archive: true
+    description: Display is no longer active and has been archived
+    role: terminal
+  - value: error
+    display: Error
+    system: true
+    description: Display encountered an error during validation, configuration, 
+      or rendering
+    role: halted
+transitions:
+  - from: conceptual
+    to: originated
+    description: Promote from draft plane to CAS membrane (CAS Qualification).
+    manual: true
+    auto: false
+    catalyst: System promotion
+  - from: originated
+    to: created
+    description: Initial domain workflow transition to created.
+    manual: true
+    auto: true
+    catalyst: System initialization
+  - from: created
+    to: validated
+    description: Display passes validation checks
+    manual: true
+    auto: false
+    postconditions:
+      - role is realign
+  - from: validated
+    to: configured
+    description: Display layout and components are configured
+    manual: true
+    auto: false
+    postconditions:
+      - role is realign
+  - from: configured
+    to: rendered
+    description: Display successfully rendered to output
+    manual: false
+    auto: true
+    postconditions:
+      - role is realign
+  - from: '*'
+    to: error
+    description: Display encountered an error
+    manual: false
+    auto: true
+    postconditions:
+      - role is halted
+      - hop from any occupancy to error
+      - system halt; repair before leaving halted
+  - from: '*'
+    to: archived
+    description: Display is no longer needed and can be archived
+    manual: true
+    auto: false
+    postconditions:
+      - role is terminal
+      - hop from any occupancy to archived
+      - ended; no further normal execution hops expected
+percent_complete:
+  method: status_defaults
+  default_by_status:
+    conceptual: 0
+    originated: 5
+    archived: 100
+    configured: 50
+    created: 0
+    error: 0
+    rendered: 100
+    validated: 25
+created_at: 2026-07-01T18:00:00Z
+updated_at: 2026-07-01T18:00:00Z
+created_by: ACC-1785920548450214012-68b850c0
+updated_by: ACC-1785920548450214012-68b850c0

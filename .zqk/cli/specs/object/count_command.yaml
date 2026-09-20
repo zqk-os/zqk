@@ -1,0 +1,69 @@
+$schema: "../../schemas/command_spec.schema.json"
+
+name: "count"
+short: "Count objects by kind"
+description: |
+  Count objects by kind with optional filtering.
+  This command reports object counts (optionally scoped by namespace).
+
+  When no kind is specified, counts public registry kinds (visibility≠internal),
+  matching bare object list. Intentional exclusions are recorded in JSON/YAML meta
+  (skipped_internal_*, omitted_zero_count_kinds, find_vs_count_recipe).
+  Full inventory: object count --internal (entitled) and/or --include-zero-count,
+  or object count <kind> for a named kind (including internals).
+
+args:
+  type: "maximum"
+  max: 1
+
+flags:
+  - name: "allow-degraded"
+    type: "bool"
+    default: false
+    description: "Allow running when scheduler daemon is not running (results may be partial/stale)"
+  - name: "namespace"
+    type: "string"
+    default: ""
+    description: "Restrict counts to this namespace_id (when omitted, default kernel isolation applies)"
+  - name: "federated"
+    type: "bool"
+    default: false
+    description: "Disable namespace isolation and count across all namespaces"
+  - name: "all-namespaces"
+    type: "bool"
+    default: false
+    description: "Alias for --federated"
+
+help:
+  examples:
+    - comment: "Count all backlog items"
+      command: "%s count backlog_item"
+    - comment: "Count with filtering"
+      command: "%s count backlog_item --filter status=exploring"
+    - comment: "Count all kinds"
+      command: "%s count"
+    - comment: "Count all kinds including visibility:internal (entitled)"
+      command: "%s count --internal"
+    - comment: "Include zero-count kinds in the inventory"
+      command: "%s count --include-zero-count"
+    - comment: "Count with grouping"
+      command: "%s count backlog_item --group-by status"
+    - comment: "Count a specific namespace"
+      command: "%s count team --namespace tenant:acme"
+    - comment: "Count across namespaces"
+      command: "%s count team --federated"
+  exclude_flags:
+    - "format"
+    - "output"
+    - "verbose"
+    - "quiet"
+    - "timeout"
+    - "columns"
+
+run_e: "runCount"
+common_flags: true
+count_harness_flags: true
+
+# Trait requirements
+required_traits:
+  - listable

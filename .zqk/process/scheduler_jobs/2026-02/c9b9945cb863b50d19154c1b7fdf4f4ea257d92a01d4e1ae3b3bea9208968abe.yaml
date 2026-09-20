@@ -1,0 +1,23 @@
+category: maintenance
+created_at: "2026-02-17T00:00:00Z"
+created_by: ACC-1785920548450214012-68b850c0
+description: Cleans up processed FIXED_/PROCESSED_ autofix batch files and removes unprocessed AUTOFIX-*.json older than AUTOFIX_BATCH_MAX_AGE_HOURS (default 24). Tighter schedule avoids piling up.
+enabled: true
+environment_variables:
+    AUTOFIX_BATCH_MAX_AGE_HOURS: "1"
+execution_mode: reusable
+id: SCH-autofix-batch-cleanup
+job_type: autofix_batch_cleanup
+kind: scheduler_job
+namespace_id: zqk:kernel
+origin_project: zqk
+origin_system: zqk
+schedule_expression: '*/30 * * * *'
+schema_version: 2.0.0
+source_type: internal
+status: active
+title: Autofix batch cleanup (every 30m)
+trigger_type: timer
+updated_at: "2026-09-19T00:20:38Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

@@ -1,0 +1,13 @@
+category: functional
+created_at: "2026-09-19T05:55:00Z"
+created_by: ACC-1785920548450214012-68b850c0
+description: Background processes and startup hooks must reap abandoned lock files and orphaned temp artifacts.
+id: CRIT-IO-LOCK-REAP-001
+kind: criteria
+namespace_id: zqk:kernel
+schema_version: 2.0.0
+status: complete
+title: Stale file locks (.lock) and orphaned temp files/directories are safely detected and reaped
+updated_at: "2026-09-19T07:21:40Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

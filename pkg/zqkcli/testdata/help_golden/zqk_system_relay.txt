@@ -1,0 +1,13 @@
+Starts the ZQK Sovereign Relay server. 
+This command is intended to be run on a public-facing cloud instance (e.g. behind Cloudflare).
+It acts as a secure, end-to-end encrypted 'dumb pipe' router, mapping incoming webhook traffic
+from external APIs to persistent WebSockets held by local ZQK developer daemons.
+
+Usage:
+  zqk system relay [flags]
+
+Flags:
+      --listen string   Address and port to listen on (default ":8443")
+
+Global Flags:
+      --allow-degraded   Allow scheduler-dependent commands to run when scheduler daemon is not running

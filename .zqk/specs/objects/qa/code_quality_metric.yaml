@@ -1,0 +1,305 @@
+schema_version: 2.0.0
+ontology: code_quality_metric
+extends: base_metric
+visibility: internal
+description: 'Code quality metrics track policy enforcement and compliance over time. These metrics capture adherence to code quality policies (POL-CODE-009), measure technical debt trends, and provide observability into code quality maintenance effectiveness.\nLifecycle: code_quality_metric_lifecycle.yaml.\n'
+traits:
+  - listable
+  - readable
+  - writable
+  - modifiable
+  - formatable
+  - groupable
+  - filterable
+  - sortable
+  - searchable
+fields:
+  compliance_percentage:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation (metric collector)
+      automation_hooks: calculated from adherence metrics
+      cardinality: zero_or_one
+      criticality: composition
+      default: null
+      dependencies: metric calculation system
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: Compliance percentage (0-100) for adherence metrics
+      security: non-sensitive
+      system_usage:
+        - reporting
+        - trend analysis
+        - compliance tracking
+      validation: Float between 0 and 100
+    field_profile_code: CQM-006
+    permissions: r-x
+    semantic_type: measurement
+    traits:
+      - filterable
+      - readable
+      - sortable
+    type: number
+    validation:
+      required: false
+  issue_count:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation (metric collector)
+      automation_hooks: populated by linter analysis
+      cardinality: zero_or_one
+      criticality: composition
+      default: null
+      dependencies: linter system
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: Number of issues detected (for violation metrics)
+      security: non-sensitive
+      system_usage:
+        - reporting
+        - trend analysis
+        - compliance tracking
+      validation: Non-negative integer
+    field_profile_code: CQM-004
+    permissions: r-x
+    semantic_type: measurement
+    traits:
+      - filterable
+      - readable
+      - sortable
+    type: integer
+    validation:
+      required: false
+  issue_type:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation (metric collector)
+      automation_hooks: populated by linter analysis
+      cardinality: zero_or_one
+      criticality: association
+      default: null
+      dependencies: linter system
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: Type of issue detected (e.g., \\\"gofmt\\\", \\\"unused\\\", \\\"unparam\\\", \\\"gocyclo\\\", \\\"gocritic\\\")
+      security: non-sensitive
+      system_usage:
+        - filtering
+        - grouping
+        - reporting
+      validation: Valid linter rule identifier
+    field_profile_code: CQM-005
+    permissions: r-x
+    semantic_type: identifier
+    traits:
+      - filterable
+      - groupable
+      - readable
+    type: string
+    validation:
+      max_length: 100
+      required: false
+  measurement_period:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation (metric collector)
+      automation_hooks: used for temporal analysis
+      cardinality: one
+      criticality: association
+      default: daily
+      dependencies: metric collection system
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: Measurement period for the metric (daily, weekly, monthly)
+      security: non-sensitive
+      system_usage:
+        - filtering
+        - grouping
+        - temporal analysis
+      validation: Must be one of defined periods
+    field_profile_code: CQM-009
+    permissions: r-x
+    semantic_type: statement
+    traits:
+      - filterable
+      - groupable
+      - readable
+    type: enum
+    validation:
+      enum:
+        - daily
+        - weekly
+        - monthly
+      required: true
+  metric_category:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation (metric collector)
+      automation_hooks: used for categorization, filtering
+      cardinality: one
+      criticality: composition
+      default: null
+      dependencies: metric collection system
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: Category of code quality metric (adherence, compliance, trend, violation, resolution)
+      security: non-sensitive
+      system_usage:
+        - filtering
+        - grouping
+        - reporting
+      validation: Must be one of defined categories
+    field_profile_code: CQM-002
+    permissions: r-x
+    semantic_type: statement
+    traits:
+      - filterable
+      - groupable
+      - readable
+    type: enum
+    validation:
+      enum:
+        - adherence
+        - compliance
+        - trend
+        - violation
+        - resolution
+      required: true
+  policy_ref:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation (metric collector)
+      automation_hooks: used for policy compliance tracking
+      cardinality: one
+      criticality: composition
+      default: null
+      dependencies: policy registry
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: Reference to policy being measured (POL-#### format, e.g., \\\"POL-CODE-009\\\")
+      security: non-sensitive
+      system_usage:
+        - policy compliance
+        - filtering
+        - grouping
+        - reporting
+      validation: Must match policy ID pattern (POL-####)
+    field_profile_code: CQM-001
+    permissions: r-x
+    semantic_type: reference
+    traits:
+      - field_reference_group
+    type: string
+    validation:
+      pattern: ^POL-[A-Z]+-\d{3}$
+      required: true
+  resolution_count:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation (metric collector)
+      automation_hooks: populated from technical debt resolution tracking
+      cardinality: zero_or_one
+      criticality: composition
+      default: null
+      dependencies: technical debt registry
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: Number of technical debt items resolved (for resolution metrics)
+      security: non-sensitive
+      system_usage:
+        - reporting
+        - trend analysis
+        - effectiveness tracking
+      validation: Non-negative integer
+    field_profile_code: CQM-008
+    permissions: r-x
+    semantic_type: measurement
+    traits:
+      - filterable
+      - readable
+      - sortable
+    type: integer
+    validation:
+      required: false
+  tier:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation (metric collector)
+      automation_hooks: used for prioritization, filtering
+      cardinality: zero_or_one
+      criticality: association
+      default: null
+      dependencies: metric collection system
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: Issue tier for violation metrics (tier_1, tier_2, tier_3)
+      security: non-sensitive
+      system_usage:
+        - filtering
+        - grouping
+        - prioritization
+      validation: Must be one of defined tiers
+    field_profile_code: CQM-003
+    permissions: r-x
+    semantic_type: statement
+    traits:
+      - filterable
+      - groupable
+      - readable
+    type: enum
+    validation:
+      enum:
+        - tier_1
+        - tier_2
+        - tier_3
+      required: false
+  trend_direction:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation (metric collector)
+      automation_hooks: calculated from historical metrics
+      cardinality: zero_or_one
+      criticality: association
+      default: null
+      dependencies: trend analysis system
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: Trend direction for trend metrics (improving, stable, degrading)
+      security: non-sensitive
+      system_usage:
+        - reporting
+        - alerting
+        - analysis
+      validation: Must be one of defined trend directions
+    field_profile_code: CQM-007
+    permissions: r-x
+    semantic_type: statement
+    traits:
+      - filterable
+      - groupable
+      - readable
+    type: enum
+    validation:
+      enum:
+        - improving
+        - stable
+        - degrading
+      required: false

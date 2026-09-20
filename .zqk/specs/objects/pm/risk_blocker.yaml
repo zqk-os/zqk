@@ -1,0 +1,465 @@
+schema_version: 2.0.0
+ontology: risk_blocker
+extends: base_object
+visibility: public
+description: 'First-class risk and blocker tracking object. Distinguishes between risks (potential future issues) and blockers (current impediments), enabling impact analysis, mitigation planning, and resolution tracking. '
+traits:
+  - base_object_traits
+fields:
+  affected_items:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: updates affected item status, triggers notifications.
+      cardinality: many
+      criticality: composition
+      default: []
+      dependencies: work item status tracking.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Work items (milestones, goals, backlog items) affected by this risk/blocker.
+      security: non-sensitive
+      system_usage:
+        - impact analysis
+        - traceability
+        - reporting
+      validation: Must reference existing work items.
+    field_profile_code: RB-005
+    permissions: r-x
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+    type: list
+    validation:
+      required: false
+  backlog_item_refs:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: used for backlog item impact tracking.
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: backlog registry.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Backlog items affected by this risk/blocker.
+      security: non-sensitive
+      system_usage:
+        - impact analysis
+        - traceability
+      validation: Must reference existing backlog item IDs.
+    field_profile_code: RB-015
+    permissions: r-x
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+      - field_reference_group
+    type: list
+    validation:
+      required: false
+  detected_by:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation/creator.
+      automation_hooks: used in detection method analytics.
+      cardinality: zero_or_one
+      criticality: association
+      default: manual
+      dependencies: detection analytics.
+      observability: "yes"
+      origin_lifecycle: immutable (set at creation).
+      purpose: How this risk/blocker was detected (system, manual, D&B detection, etc.).
+      security: non-sensitive
+      system_usage:
+        - analytics
+        - process improvement
+      validation: Free text or system identifier.
+    field_profile_code: RB-010
+    permissions: r-x
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+    type: string
+    validation:
+      required: false
+  goal_refs:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: used for goal impact tracking.
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: goal registry.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Goals affected by this risk/blocker.
+      security: non-sensitive
+      system_usage:
+        - impact analysis
+        - traceability
+      validation: Must reference existing goal IDs.
+    field_profile_code: RB-014
+    permissions: r-x
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+      - field_reference_group
+    type: list
+    validation:
+      required: false
+  impact:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: used in impact analysis, reporting.
+      cardinality: one
+      criticality: composition
+      default: null
+      dependencies: impact analysis reports.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Description of the impact if this risk materializes or blocker persists.
+      security: may contain sensitive information.
+      system_usage:
+        - impact analysis
+        - reporting
+      validation: markdown allowed.
+    field_profile_code: RB-004
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - field_mutable_group
+    type: text
+    validation:
+      required: false
+  milestone_refs:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: used for milestone impact tracking.
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: milestone registry.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Milestones affected by this risk/blocker.
+      security: non-sensitive
+      system_usage:
+        - impact analysis
+        - traceability
+      validation: Must reference existing milestone IDs.
+    field_profile_code: RB-013
+    permissions: r-x
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+      - field_reference_group
+    type: list
+    validation:
+      required: false
+  mitigation_plan:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: used in resolution tracking, reporting.
+      cardinality: zero_or_one
+      criticality: association
+      default: null
+      dependencies: resolution tracking.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Plan to mitigate the risk or resolve the blocker.
+      security: may contain sensitive information.
+      system_usage:
+        - planning
+        - tracking
+      validation: markdown allowed.
+    field_profile_code: RB-006
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - field_mutable_group
+    type: text
+    validation:
+      required: false
+  probability:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner/risk_manager.
+      automation_hooks: used in risk score calculation.
+      cardinality: zero_or_one
+      criticality: association
+      default: null (not applicable to blockers)
+      dependencies: risk scoring.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Probability of risk materializing (for risks only). Not applicable to blockers (they're already materialized).
+      security: non-sensitive
+      system_usage:
+        - risk scoring
+        - prioritization
+      validation: enum. Only applicable when risk_type is risk.
+    field_profile_code: RB-003
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+      - modifiable
+    type: enum
+    validation:
+      enum:
+        - high
+        - medium
+        - low
+      required: false
+  related_risks:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: used in risk dependency analysis.
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: risk_blocker registry.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Related risk/blocker objects (e.g., cascading risks, related blockers).
+      security: non-sensitive
+      system_usage:
+        - risk analysis
+        - dependency graphs
+      validation: Must reference existing risk_blocker objects.
+    field_profile_code: RB-012
+    permissions: r-x
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+    type: list
+    validation:
+      required: false
+  resolution_status:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: triggers status updates, affects affected items.
+      cardinality: one
+      criticality: composition
+      default: open
+      dependencies: status transitions, reporting.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Current resolution status (open, in_progress, resolved, mitigated, accepted).
+      security: non-sensitive
+      system_usage:
+        - status tracking
+        - reporting
+      validation: enum.
+    field_profile_code: RB-007
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - listable
+      - readable
+      - writable
+      - modifiable
+      - groupable
+      - filterable
+      - sortable
+      - searchable
+    type: enum
+    validation:
+      enum:
+        - open
+        - in_progress
+        - resolved
+        - mitigated
+        - accepted
+      required: false
+  resolved_at:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation/owner.
+      automation_hooks: used in resolution time analytics.
+      cardinality: zero_or_one
+      criticality: association
+      default: null
+      dependencies: resolution_status.
+      observability: "yes"
+      origin_lifecycle: mutable (set when resolution_status changes to resolved/mitigated).
+      purpose: When the risk was mitigated or blocker was resolved.
+      security: non-sensitive
+      system_usage:
+        - reporting
+        - analytics
+      validation: ISO-8601 datetime.
+    field_profile_code: RB-008
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - field_mutable_group
+    type: string
+    validation:
+      pattern: ^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}:\d{2}Z)?$
+      required: false
+  resolved_by:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation/owner.
+      automation_hooks: used in accountability reporting.
+      cardinality: zero_or_one
+      criticality: association
+      default: null
+      dependencies: resolution_status.
+      observability: "yes"
+      origin_lifecycle: mutable (set when resolution_status changes to resolved/mitigated).
+      purpose: Actor who resolved the risk/blocker.
+      security: non-sensitive
+      system_usage:
+        - accountability
+        - reporting
+      validation: Must reference existing account or system identifier.
+    field_profile_code: RB-009
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+      - modifiable
+    type: string
+    validation:
+      required: false
+  risk_score:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation.
+      automation_hooks: used for automatic prioritization, sorting.
+      cardinality: zero_or_one
+      criticality: association
+      default: null
+      dependencies: severity, probability.
+      observability: "yes"
+      origin_lifecycle: mutable (recalculated when severity or probability changes).
+      purpose: Calculated risk score (0-100) based on severity and probability. Higher score = higher priority.
+      security: non-sensitive
+      system_usage:
+        - prioritization
+        - sorting
+        - filtering
+      validation: Number between 0 and 100.
+    field_profile_code: RB-011
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - field_mutable_group
+    type: number
+    validation:
+      required: false
+  risk_type:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: triggers different workflows for risks vs blockers.
+      cardinality: one
+      criticality: composition
+      default: risk
+      dependencies: status transitions, reporting.
+      observability: "yes"
+      origin_lifecycle: mutable (can convert risk to blocker when it materializes).
+      purpose: Distinguish between risk (potential future issue) and blocker (current impediment).
+      security: non-sensitive
+      system_usage:
+        - filtering
+        - reporting
+        - workflow
+      validation: enum.
+    field_profile_code: RB-001
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - listable
+      - readable
+      - writable
+      - modifiable
+      - groupable
+      - filterable
+      - sortable
+      - searchable
+    type: enum
+    validation:
+      enum:
+        - risk
+        - blocker
+      required: false
+  severity:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner/risk_manager.
+      automation_hooks: triggers alerts, affects priority calculations.
+      cardinality: one
+      criticality: composition
+      default: medium
+      dependencies: prioritization, alerts.
+      observability: "yes"
+      origin_lifecycle: mutable (can escalate or de-escalate).
+      purpose: Severity level (critical, high, medium, low) for prioritization and impact analysis.
+      security: non-sensitive
+      system_usage:
+        - prioritization
+        - reporting
+        - filtering
+      validation: enum.
+    field_profile_code: RB-002
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - filterable
+      - groupable
+      - listable
+      - modifiable
+      - readable
+      - searchable
+      - sortable
+      - writable
+    type: enum
+    validation:
+      enum:
+        - critical
+        - high
+        - medium
+        - low
+      required: false

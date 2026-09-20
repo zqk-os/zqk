@@ -1,0 +1,53 @@
+$schema: ../../schemas/command_spec.schema.json
+name: overseer
+short: Coordinator convergence overseer (nested CVS)
+description: 'Coordinator/parent CVS overseer: same rollup_status_core as measure for --coordinator-session-id,
+
+  BFS tree of linked CVS-* under related_object_refs (depth-capped), cycle detection on refs, and
+
+  arbitrated_next_action_markdown (gate parent exit until children complete). Does not persist process objects.
+
+
+  For a parent/coordinator convergence_session, combines the same rollup_status_core as
+
+  convergence measure (bundle-health window + literal gates + direct related_object_refs children),
+
+  a BFS tree of linked CVS-* sessions (depth-capped), related_object_refs cycle detection,
+
+  and a single arbitrated_next_action_markdown line for prompts (child completion before parent exit).
+
+
+  Entry point: `zqk scheduler convergence overseer`.
+
+
+  Does not write process objects; pipe JSON to automation or paste markdown into an agent chat.
+
+  '
+help:
+  examples:
+  - comment: JSON for coordinator CVS
+    command: '%s scheduler convergence overseer --coordinator-session-id CVS-001 --format json'
+  - comment: Skip literal gate scripts (faster)
+    command: '%s scheduler convergence overseer --coordinator-session-id CVS-001 --format json --skip-rollup-gates'
+  exclude_flags:
+  - format
+  - output
+  - verbose
+  - quiet
+  - timeout
+  - columns
+run_e: schedulerConvergenceOverseer
+common_flags: true
+flags:
+- name: coordinator-session-id
+  type: string
+  default: ''
+  description: Coordinator convergence_session id (CVS-*), required
+- name: limit
+  type: int
+  default: 500
+  description: Max JSONL lines to read from the end of health.jsonl
+- name: skip-rollup-gates
+  type: bool
+  default: false
+  description: Skip FieldKey/ZQK-env literal gate scripts when computing rollup_status_core

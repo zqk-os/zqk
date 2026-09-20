@@ -1,0 +1,130 @@
+$schema: "../schemas/command_spec.schema.json"
+
+name: "scan-tests [flags]"
+short: "Scan and schedule tests using the test scanner"
+description: |
+  Scan Go test files and schedule them as scheduler jobs.
+  
+  The scanner:
+    - Identifies test functions in *_test.go files
+    - Detects parallel safety (t.Parallel())
+    - Bundles tests that can run safely in parallel
+    - Schedules tests based on runtime metrics
+    - Creates optimized scheduler jobs
+  
+  Modes:
+    --test <name>     - Scan and schedule a single test by name
+    --tests <names>   - Scan and schedule multiple tests (comma-separated)
+    --package <path>  - Scan and schedule all tests in one or more packages (comma-separated, e.g. ./pkg/a,./pkg/b)
+    --all             - Scan and schedule all tests in the project
+    --load-bundle <name> - Load a previously saved bundle
+    --load-bundles <names> - Load multiple bundles (comma-separated) for regression
+  
+  Bundle Management:
+    --save-bundle <name> - Save created bundles with this name
+    --load-bundle <name>  - Load a previously saved bundle
+    --load-bundles <names> - Load multiple saved bundles (comma-separated)
+    --list-bundles       - List all saved bundles
+    --show-bundle        - Show bundle details without scheduling
+    --only <indexes>     - Run only specified test indexes (e.g., 0,2,5)
+    --skip <indexes>     - Skip specified test indexes (e.g., 1,3)
+
+flags:
+  - name: "test"
+    type: "string"
+    description: "Single test name to schedule"
+  - name: "tests"
+    type: "string"
+    description: "Comma-separated list of test names to schedule"
+  - name: "package"
+    type: "string"
+    description: "One package path or comma-separated paths (e.g., ./pkg/storage or ./pkg/a,./pkg/b)"
+  - name: "all"
+    type: "bool"
+    default: false
+    description: "Schedule all tests in the project"
+  - name: "max-bundle-size"
+    type: "int"
+    default: 10
+    description: "Maximum number of tests per bundle"
+  - name: "max-parallel"
+    type: "int"
+    default: 4
+    description: "Maximum number of parallel bundles"
+  - name: "save-bundle"
+    type: "string"
+    description: "Save the created bundles with this name"
+  - name: "load-bundle"
+    type: "string"
+    description: "Load a previously saved bundle"
+  - name: "load-bundles"
+    type: "string"
+    description: "Load multiple saved bundles (comma-separated names); schedules all for regression runs"
+  - name: "only"
+    type: "string"
+    description: "Comma-separated list of test indexes to run (e.g., 0,2,5)"
+  - name: "skip"
+    type: "string"
+    description: "Comma-separated list of test indexes to skip (e.g., 1,3)"
+  - name: "list-bundles"
+    type: "bool"
+    default: false
+    description: "List all saved bundles"
+  - name: "show-bundle"
+    type: "bool"
+    default: false
+    description: "Show bundle details without scheduling"
+  - name: "overwrite"
+    type: "bool"
+    default: false
+    description: "Overwrite existing bundle when saving"
+  - name: "merge"
+    type: "bool"
+    default: false
+    description: "Merge new tests with existing bundle (adds new, keeps existing)"
+  - name: "remove-missing"
+    type: "bool"
+    default: false
+    description: "Remove tests from bundle that no longer exist (use with --merge)"
+  - name: "setup-bundles"
+    type: "bool"
+    default: false
+    description: "Set up initial bundles for the project (scans all tests and creates bundles)"
+  - name: "delete-all-bundles"
+    type: "bool"
+    default: false
+    description: "Delete all saved test bundles from .zqk/test-bundles (does not remove scheduler_job objects like SCH-run-bundle-*; use before --setup-bundles to recreate)"
+  - name: "suggest-timeout"
+    type: "bool"
+    default: false
+    description: "Print suggested timeout in seconds for --package (dynamic from timing data and package defaults); if multiple comma-separated packages, prints the maximum; exit without scheduling"
+  - name: "source-root"
+    type: "string"
+    description: "Go module root for go test cwd (Local CI workdir). Defaults to .zqk/local-ci/workdir when present unless --live-source. Logs and SCH-run objects stay on studio project root."
+  - name: "live-source"
+    type: "bool"
+    default: false
+    description: "Force go test against the live studio tree (not Local CI). Escape hatch; not CI-honest."
+
+help:
+  examples:
+    - comment: "Schedule a single test"
+      command: "%s scheduler scan-tests --test TestMyFeature"
+    - comment: "Schedule all tests in a package"
+      command: "%s scheduler scan-tests --package ./pkg/storage"
+    - comment: "Schedule all tests in multiple packages (comma-separated)"
+      command: "%s scheduler scan-tests --package ./pkg/paths,./pkg/agentdelivery"
+    - comment: "Schedule all tests in project"
+      command: "%s scheduler scan-tests --all"
+    - comment: "Run regression: schedule multiple saved bundles"
+      command: "%s scheduler scan-tests --load-bundles pkg-storage-1,pkg-scheduler-2,cmd-zqk-system-2"
+  exclude_flags:
+    - "format"
+    - "output"
+    - "verbose"
+    - "quiet"
+    - "timeout"
+    - "columns"
+
+run_e: "runScanTests"
+common_flags: true

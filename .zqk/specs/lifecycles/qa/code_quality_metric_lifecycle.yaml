@@ -1,0 +1,108 @@
+$schema: "../../../.zqk/cli/specs/schemas/lifecycle_spec.schema.json"
+
+object_type: code_quality_metric
+# Five-question exam: docs/architecture/LIFECYCLE_STATE_MACHINE_RUBRIC.md
+# TRACK: BLI-CEF-R26-REMAINING-KINDS-001
+statuses:
+  - value: conceptual
+    display: Conceptual
+    origin: true
+    preliminary: true
+    description: Draft plane status. Prior to CAS membrane crossing.
+    role: realign
+  - value: originated
+    display: Originated
+    description: CAS membrane crossed. Object officially originated.
+    role: realign
+  - value: collected
+    display: Collected
+    origin: false
+    preliminary: false
+    description: Code quality metric has been collected but not yet analyzed
+    role: realign
+  - value: analyzed
+    display: Analyzed
+    description: Code quality metric has been analyzed for trends and patterns
+    role: realign
+  - value: reported
+    display: Reported
+    description: Code quality metric has been included in quality reports
+    role: realign
+  - value: archived
+    display: Archived
+    terminal: true
+    archive: true
+    description: Code quality metric has been archived
+    role: terminal
+  - value: error
+    display: Error
+    system: true
+    description: Code quality metric encountered an error during processing
+    role: halted
+transitions:
+  - from: conceptual
+    to: originated
+    description: Promote from draft plane to CAS membrane (CAS Qualification).
+    manual: true
+    auto: false
+    catalyst: System promotion
+  - from: originated
+    to: collected
+    description: Initial domain workflow transition to collected.
+    manual: true
+    auto: true
+    catalyst: System initialization
+  - from: collected
+    to: analyzed
+    description: Analyze collected code quality metric
+    manual: false
+    auto: true
+    postconditions:
+      - role is realign
+  - from: analyzed
+    to: reported
+    description: Include metric in quality report
+    manual: true
+    auto: false
+    postconditions:
+      - role is realign
+  - from: reported
+    to: archived
+    description: Archive metric after reporting
+    manual: false
+    auto: true
+    postconditions:
+      - role is terminal
+      - ended; no further normal execution hops expected
+  - from: '*'
+    to: archived
+    description: Archive metric directly
+    manual: true
+    auto: false
+    postconditions:
+      - role is terminal
+      - hop from any occupancy to archived
+      - ended; no further normal execution hops expected
+  - from: '*'
+    to: error
+    description: System error occurred
+    manual: false
+    auto: true
+    postconditions:
+      - role is halted
+      - hop from any occupancy to error
+      - system halt; repair before leaving halted
+percent_complete:
+  method: status_defaults
+  default_by_status:
+    conceptual: 0
+    originated: 5
+    analyzed: 50
+    archived: 100
+    collected: 0
+    error: 0
+    reported: 75
+created_at: 2026-07-01T18:00:00Z
+updated_at: 2026-07-01T18:00:00Z
+created_by: ACC-1785920548450214012-68b850c0
+updated_by: ACC-1785920548450214012-68b850c0

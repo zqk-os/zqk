@@ -1,0 +1,30 @@
+body: |
+    All feature code and structural changes must follow Test-Driven Development (TDD).
+    A deterministic automated test suite must run and pass before and after every modification.
+
+    **Requirements**
+    - Run package unit tests (`go test -v ./...`) before making changes to establish a green baseline.
+    - Implement tests covering acceptance criteria before declaring work complete.
+    - Never disable, bypass, or comment out failing tests to achieve a passing build.
+    - Verification gates evaluate test outcomes deterministically before state promotion.
+
+    **Why**: Autonomous agents require verifiable automated truth to prevent regressions and silent divergence.
+category: testing
+created_at: "2026-09-17T19:14:41Z"
+created_by: ACC-1785920548450214012-68b850c0
+description: ""
+effective_date: "2026-09-14"
+enforcement:
+    automated: true
+    reminder_enabled: true
+    severity: high
+id: POL-CODE-1789672481919632000-e3500fed
+kind: policy
+namespace_id: zqk:kernel
+policy_type: requirement
+schema_version: 2.0.0
+status: active
+title: Test-Driven Development and Continuous Verification
+updated_at: "2026-09-17T19:29:07Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

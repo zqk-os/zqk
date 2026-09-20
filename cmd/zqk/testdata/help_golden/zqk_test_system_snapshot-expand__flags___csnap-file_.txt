@@ -1,0 +1,22 @@
+Expand a compressed snapshot (.csnap) file back to original objects.
+
+This command reads a compressed snapshot file and expands it, optionally
+writing the expanded objects to a directory or outputting them.
+
+  Expand and show object count
+  zqk.test system snapshot-expand test-scenarios/my-snapshot/snapshot.csnap --verbose
+  Expand and write to directory
+  zqk.test system snapshot-expand snapshot.csnap --output-dir expanded/
+  Expand and show first object
+  zqk.test system snapshot-expand snapshot.csnap --show-object 0
+
+Usage:
+  zqk.test system snapshot-expand [flags] <csnap-file>
+
+Flags:
+      --output-dir string   Directory to write expanded objects (default: stdout)
+      --show-object int     Show specific object by index (0-based) (default -1)
+      --verify-only         Only verify the snapshot without expanding
+
+Global Flags:
+      --allow-degraded   Allow scheduler-dependent commands to run when scheduler daemon is not running

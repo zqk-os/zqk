@@ -1,0 +1,364 @@
+schema_version: 2.0.0
+ontology: verification_matrix
+extends: base_object
+visibility: public
+storage_profile: stream
+description: 'A registered verification or traceability matrix: links CSV inventories and profile YAML to\nconvergence sessions, goals, milestones, and roadmaps. Use for codebase vetting rows, test-bundle\nhealth, goal-progress rollups, and future transition gates (e.g. roadmap complete only when\nlinked milestones and criteria satisfy a configured matrix). Agents and automation resolve the\nmatrix by id; CLI uses docs/quality/matrix_registry.yaml for default paths unless overrides are set.\nLifecycle: verification_matrix_lifecycle.yaml.\n'
+traits:
+  - base_object_traits
+  - manipulatable
+fields:
+  csv_path_override:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: matrix report, future get/update.
+      cardinality: one
+      criticality: association
+      default: ""
+      dependencies: filesystem.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Optional repo-relative path overriding registry CSV for this object instance.
+      security: non-sensitive
+      system_usage:
+        - reporting
+    field_profile_code: VMX-004
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - writable
+    type: string
+    validation:
+      required: false
+  gate_policy_notes:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: future evaluator (JSON or rubric text).
+      cardinality: one
+      criticality: association
+      default: ""
+      dependencies: none.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: |
+        Human- and machine-readable notes for gate rules (which rows must be yes/na, criteria links).
+        May reference CRIT- ids or backlog items.
+      security: non-sensitive
+      system_usage:
+        - gating
+    field_profile_code: VMX-009
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - writable
+    type: text
+    validation:
+      required: false
+  gated_object_kind:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: future transition gate evaluator.
+      cardinality: one
+      criticality: association
+      default: ""
+      dependencies: object kinds registry.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: |
+        When matrix_role is transition_gate, the object kind whose transitions are gated
+        (e.g. roadmap, milestone). Empty when not used as a gate.
+      security: non-sensitive
+      system_usage:
+        - gating
+    field_profile_code: VMX-007
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - writable
+    type: string
+    validation:
+      required: false
+  gated_transition_to:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: future gate engine.
+      cardinality: one
+      criticality: association
+      default: ""
+      dependencies: target kind lifecycle.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Target status value that requires matrix completion (e.g. complete).
+      security: non-sensitive
+      system_usage:
+        - gating
+    field_profile_code: VMX-008
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - writable
+    type: string
+    validation:
+      required: false
+  linked_goal_refs:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: goal progress matrices, reporting.
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: goal registry.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Goals whose achievement or progress this matrix tracks or gates.
+      security: non-sensitive
+      system_usage:
+        - traceability
+    field_profile_code: VMX-010
+    permissions: r-x
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+      - field_reference_group
+    type: list
+    validation:
+      required: false
+  linked_milestone_refs:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: milestone completion vs matrix rows.
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: milestone registry.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Milestones tied to this verification surface (e.g. all complete before roadmap closes).
+      security: non-sensitive
+      system_usage:
+        - traceability
+    field_profile_code: VMX-011
+    permissions: r-x
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+      - field_reference_group
+    type: list
+    validation:
+      required: false
+  linked_roadmap_refs:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: roadmap completion gates.
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: roadmap registry.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Roadmaps whose completion may depend on matrix fullness.
+      security: non-sensitive
+      system_usage:
+        - traceability
+    field_profile_code: VMX-012
+    permissions: r-x
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+      - field_reference_group
+    type: list
+    validation:
+      required: false
+  matrix_role:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: routing to evaluators, report commands, future gate engine.
+      cardinality: one
+      criticality: composition
+      default: custom
+      dependencies: matrix_registry.yaml, profile YAML.
+      observability: "yes"
+      origin_lifecycle: mutable (with care).
+      purpose: |
+        Kind of matrix: codebase file vetting, test bundles, goal progress rollup, transition_gate
+        (block object status until rows complete), or agent_coordination (cross-agent punch list).
+      security: non-sensitive
+      system_usage:
+        - reporting
+        - gating
+    field_profile_code: VMX-001
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - filterable
+      - groupable
+      - listable
+      - writable
+    type: enum
+    validation:
+      enum:
+        - custom
+        - codebase_vetting
+        - test_bundle
+        - goal_progress
+        - transition_gate
+        - agent_coordination
+      required: true
+  planning_notes:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: agent handoff, viability review.
+      cardinality: one
+      criticality: association
+      default: ""
+      dependencies: none.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: |
+        Forward-looking context: unknowns, complexity, cross-cutting constraints, agent specialization
+        slices. Complements gate_policy_notes with qualitative planning.
+      security: non-sensitive
+      system_usage:
+        - planning
+    field_profile_code: VMX-013
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - writable
+    type: text
+    validation:
+      required: false
+  primary_convergence_session_ref:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: activity_log, convergence reporting.
+      cardinality: one
+      criticality: association
+      default: ""
+      dependencies: convergence_session objects.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Primary CVS id (CVS-…) for traceability when updating matrix rows or notes.
+      security: non-sensitive
+      system_usage:
+        - traceability
+    field_profile_code: VMX-006
+    permissions: rwx
+    semantic_type: reference
+    traits:
+      - field_reference_group
+      - writable
+    type: string
+    validation:
+      required: false
+  profile_path_override:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: matrix report column semantics.
+      cardinality: one
+      criticality: association
+      default: ""
+      dependencies: profile YAML.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Optional repo-relative path overriding registry profile.
+      security: non-sensitive
+      system_usage:
+        - reporting
+    field_profile_code: VMX-005
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - writable
+    type: string
+    validation:
+      required: false
+  registry_alias:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: zqk matrix report --name <alias>.
+      cardinality: one
+      criticality: association
+      default: ""
+      dependencies: docs/quality/matrix_registry.yaml.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Key in matrix_registry.yaml when csv/profile overrides are not used.
+      security: non-sensitive
+      system_usage:
+        - CLI resolution
+    field_profile_code: VMX-003
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - writable
+    type: string
+    validation:
+      required: false
+  status:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: lifecycle.
+      automation_hooks: lifecycle transitions.
+      cardinality: one
+      criticality: composition
+      default: draft
+      dependencies: verification_matrix_lifecycle.yaml.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Lifecycle status (draft, active, archived).
+      security: non-sensitive
+      system_usage:
+        - lifecycle enforcement
+    field_profile_code: VMX-002
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - filterable
+      - groupable
+      - writable
+    type: enum
+    validation:
+      enum:
+        - draft
+        - active
+        - archived
+      required: true

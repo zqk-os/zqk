@@ -1,0 +1,47 @@
+$schema: ../schemas/command_spec.schema.json
+name: spec-origination
+short: Originate a complete object-kind membrane
+description: Run the staged spec origination pipeline for one object kind, materializing kind mappings, identifiers, indexes, builders, and validation evidence from canonical object-spec DNA.
+
+args:
+  type: no_args
+
+flags:
+  - name: ontology
+    type: string
+    default: ""
+    required: true
+    description: Object kind stem under .zqk/specs/objects
+  - name: dry-run
+    type: bool
+    default: true
+    description: Validate and report the origination plan without writing materialized artifacts
+  - name: skip-materialize-spec-index
+    type: bool
+    default: false
+    description: Do not refresh the materialized spec index
+  - name: materialize-field-keys
+    type: bool
+    default: false
+    description: Regenerate pkg/objects/field_keys.go from the current spec plane
+  - name: skip-finalize-validation
+    type: bool
+    default: false
+    description: Record final spec validation errors without failing the pipeline
+  - name: apply-trigger
+    type: bool
+    default: false
+    description: Run glossary, instance-builder, and path-cache trigger steps
+
+help:
+  examples:
+    - comment: Preview a new kind membrane
+      command: "%s system spec-origination --ontology mcp_spec"
+    - comment: Materialize the kind, indexes, field keys, and trigger steps
+      command: "%s system spec-origination --ontology mcp_spec --dry-run=false --materialize-field-keys --apply-trigger"
+  exclude_flags:
+    - columns
+    - ignore-scheduler-down
+
+run_e: runSpecOriginationAsync
+common_flags: true

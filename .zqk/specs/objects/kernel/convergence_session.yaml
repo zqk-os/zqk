@@ -1,0 +1,617 @@
+schema_version: 2.0.0
+ontology: convergence_session
+extends: work_interval
+visibility: public
+description: 'Persistent record of a convergence lifecycle run: hypothesis, triggers, desired end state, phased progress (C1–C6),\npredictions and adjustable thresholds, chronological activity, before/after snapshots, delta and outcome character,\nand next action. Supports handoffs across sessions and automation hooks that react to phase or measurement updates.\nComplements glossary term GLS (convergence lifecycle concept); this kind is the machine-usable data structure.\nRelated glossary terms (operational semantics): evaluation surface, observable artifact, remedy observation lifecycle,\ndeviation response — use them to name what is measured, how signal state evolves, and how to react when observations\ndiverge from expectations, across use cases beyond test-bundle health.jsonl.\nLifecycle: convergence_session_lifecycle.yaml.\n'
+traits:
+  - base_object_traits
+  - completable
+fields:
+  activity_log:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner/automation.
+      automation_hooks: append on each act/verify step; drives chronology and audit.
+      cardinality: many
+      criticality: composition
+      default: []
+      dependencies: scheduler, agents, CI.
+      observability: "yes"
+      origin_lifecycle: append-mostly (mutable).
+      purpose: |
+        Ordered list of activity entries. Each entry is a map with at least: timestamp (RFC3339), phase (string),
+        action (string), optional before_snapshot/after_snapshot (objects), delta_assessment, outcome_character,
+        notes. Enables replay and cross-session continuity.
+      security: non-sensitive
+      system_usage:
+        - convergence_tracking
+        - automation
+        - reporting
+      validation: list of objects; shape enforced by convention and tooling.
+    field_profile_code: CVS-010
+    permissions: rwx
+    semantic_type: expression
+    traits:
+      - readable
+      - writable
+      - modifiable
+    type: list
+    validation:
+      required: false
+  after_state_snapshot:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner/automation.
+      automation_hooks: compared to before_state_snapshot for delta_assessment.
+      cardinality: one
+      criticality: composition
+      default: {}
+      dependencies: health.jsonl, metrics.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: |
+        Latest measured state (e.g. failing fingerprints, health_watermark, test counts). Flexible object map.
+      security: non-sensitive
+      system_usage:
+        - measurement
+        - delta
+    field_profile_code: CVS-004
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+      - modifiable
+    type: object
+    validation:
+      required: false
+  automation_hooks:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: optional labels or channel names for event subscribers.
+      cardinality: one
+      criticality: association
+      default: ""
+      dependencies: scheduler, notifications.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Optional hints for tooling (e.g. event names, job categories) when this session updates.
+      security: non-sensitive
+      system_usage:
+        - automation
+    field_profile_code: CVS-011
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+      - modifiable
+    type: string
+    validation:
+      required: false
+  before_state_snapshot:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner/automation.
+      automation_hooks: baseline for delta_assessment.
+      cardinality: one
+      criticality: composition
+      default: {}
+      dependencies: health.jsonl.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Baseline state at session start or iteration boundary (fingerprints, metrics, watermark).
+      security: non-sensitive
+      system_usage:
+        - measurement
+        - delta
+    field_profile_code: CVS-003
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+      - modifiable
+    type: object
+    validation:
+      required: false
+  current_phase:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner/automation.
+      automation_hooks: phase transitions may trigger automations.
+      cardinality: one
+      criticality: composition
+      default: c1_scope
+      dependencies: glossary convergence lifecycle phases.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Current convergence phase (aligned with glossary C1–C6).
+      security: non-sensitive
+      system_usage:
+        - routing
+        - UI
+        - automation
+      validation: enum aligned with glossary_term convergence phases.
+    field_profile_code: CVS-002
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - filterable
+      - groupable
+      - listable
+      - readable
+      - writable
+      - modifiable
+      - sortable
+    type: enum
+    validation:
+      enum:
+        - c1_scope
+        - c2_triage
+        - c3_order
+        - c4_act
+        - c5_verify
+        - c6_exit
+      required: true
+  debrief_notes:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner/automation.
+      automation_hooks: optional copy into next session iteration_process or backlog.
+      cardinality: one
+      criticality: association
+      default: ""
+      dependencies: none.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: |
+        Post-close operator analysis: what worked, what to avoid, scheduler/queue tips, and how to run the
+        next convergence_session more efficiently. Filled at finalize; future sessions may reference this
+        object or copy excerpts into iteration_process / next_action on a new CVS.
+      security: non-sensitive
+      system_usage:
+        - handoff
+        - retrospectives
+    field_profile_code: CVS-021
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+      - modifiable
+      - searchable
+    type: text
+    validation:
+      max_length: 32000
+      required: false
+  delta_assessment:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner/automation.
+      automation_hooks: may drive alerts when trending_away.
+      cardinality: one
+      criticality: association
+      default: unknown
+      dependencies: before/after snapshots.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Whether the latest measurement moves toward the desired end state.
+      security: non-sensitive
+      system_usage:
+        - reporting
+        - automation
+    field_profile_code: CVS-005
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - filterable
+      - groupable
+      - listable
+      - readable
+      - writable
+      - modifiable
+    type: enum
+    validation:
+      enum:
+        - trending_toward
+        - trending_away
+        - neutral
+        - unknown
+      required: false
+  desired_end_state:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: used to judge completion and delta.
+      cardinality: one
+      criticality: composition
+      default: ""
+      dependencies: none.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Target outcome in plain language (e.g. all scoped fingerprints pass in health).
+      security: non-sensitive
+      system_usage:
+        - validation
+    field_profile_code: CVS-007
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+      - modifiable
+      - searchable
+    type: text
+    validation:
+      required: false
+  flow_variant:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: selects branch-specific steps or templates.
+      cardinality: one
+      criticality: association
+      default: ""
+      dependencies: optional workflow or policy objects.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Optional named branch flow (e.g. storage-heavy, scheduler-only) for specificity beyond the base C1–C6 path.
+      security: non-sensitive
+      system_usage:
+        - routing
+    field_profile_code: CVS-013
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - filterable
+      - groupable
+    type: string
+    validation:
+      required: false
+  glossary_term_ref:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: link to operational definition of convergence lifecycle.
+      cardinality: zero_or_one
+      criticality: association
+      default: ""
+      dependencies: glossary_term objects.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Reference to glossary term (typically GLS-* for convergence lifecycle).
+      security: non-sensitive
+      system_usage:
+        - traceability
+    field_profile_code: CVS-001
+    permissions: rwx
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+      - field_reference_group
+    type: string
+    validation:
+      pattern: ^$|^GLS-[0-9]+-[a-f0-9]+$
+      required: false
+  hypothesis:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: may seed prompts and success checks.
+      cardinality: one
+      criticality: composition
+      default: ""
+      dependencies: none.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Preliminary claim to validate (what we believe is wrong or what fix will work).
+      security: non-sensitive
+      system_usage:
+        - reasoning
+        - reporting
+    field_profile_code: CVS-006
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+      - modifiable
+      - searchable
+    type: text
+    validation:
+      required: false
+  iteration_process:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: optional template for repeated steps.
+      cardinality: one
+      criticality: association
+      default: ""
+      dependencies: none.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Proposed iteration or loop body (human-readable); may reference PRE_CHANGE_CHECKLIST or bundle commands.
+      security: non-sensitive
+      system_usage:
+        - procedures
+    field_profile_code: CVS-008
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+      - modifiable
+    type: text
+    validation:
+      required: false
+  last_measurement_at:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation.
+      automation_hooks: staleness checks.
+      cardinality: one
+      criticality: association
+      default: ""
+      dependencies: health.jsonl, jobs.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: ISO-8601 timestamp of the last measurement or verify step.
+      security: non-sensitive
+      system_usage:
+        - reporting
+    field_profile_code: CVS-014
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - filterable
+      - sortable
+    type: string
+    validation:
+      required: false
+  next_action:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: handoff and playbooks.
+      cardinality: one
+      criticality: association
+      default: ""
+      dependencies: none.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: One concrete next step for the current resource (or handoff).
+      security: non-sensitive
+      system_usage:
+        - continuity
+    field_profile_code: CVS-009
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+      - modifiable
+    type: text
+    validation:
+      required: false
+  outcome_character:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner/automation.
+      automation_hooks: surprising/catastrophic may escalate notifications.
+      cardinality: one
+      criticality: association
+      default: pending
+      dependencies: measurement vs prediction.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Whether the latest result matched expectations, was surprising, or catastrophic relative to hypothesis.
+      security: non-sensitive
+      system_usage:
+        - reporting
+        - risk
+    field_profile_code: CVS-015
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - filterable
+      - groupable
+      - listable
+      - readable
+      - writable
+      - modifiable
+    type: enum
+    validation:
+      enum:
+        - pending
+        - expected
+        - surprising
+        - catastrophic
+      required: true
+  predictions:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: compare to actuals for outcome_character.
+      cardinality: one
+      criticality: composition
+      default: {}
+      dependencies: none.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: |
+        Structured predictions before iterations: e.g. expected_duration, time_estimate, expected_signal,
+        hypothesis_confidence. Flexible object map; tooling may standardize keys.
+      security: non-sensitive
+      system_usage:
+        - planning
+        - retrospectives
+    field_profile_code: CVS-016
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+      - modifiable
+    type: object
+    validation:
+      required: false
+  requirement_refs:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: traceability to requirements.
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: requirements registry.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Requirements this session advances or validates.
+      security: non-sensitive
+      system_usage:
+        - traceability
+    field_profile_code: CVS-017
+    permissions: rwx
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+      - field_reference_group
+    type: list
+    validation:
+      required: false
+  start_condition:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: may trigger session creation from health predicates.
+      cardinality: one
+      criticality: composition
+      default: ""
+      dependencies: health.jsonl, triggers.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Starting trigger or acceptance predicate (what makes this session applicable).
+      security: non-sensitive
+      system_usage:
+        - automation
+    field_profile_code: CVS-018
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+      - modifiable
+      - searchable
+    type: text
+    validation:
+      required: false
+  status:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner/automation.
+      automation_hooks: lifecycle transitions; may fire events.
+      cardinality: one
+      criticality: composition
+      default: draft
+      dependencies: convergence_session_lifecycle.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Session lifecycle status.
+      security: non-sensitive
+      system_usage:
+        - workflows
+        - reporting
+      validation: enum from lifecycle.
+    field_profile_code: CVS-019
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - filterable
+      - groupable
+      - listable
+      - modifiable
+      - readable
+      - searchable
+      - sortable
+    type: enum
+    validation:
+      enum:
+        - draft
+        - active
+        - paused
+        - completed
+        - abandoned
+        - archived
+        - escalated
+        - error
+      required: true
+  thresholds:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: gating reruns, stop rules, diminishing returns.
+      cardinality: one
+      criticality: composition
+      default: {}
+      dependencies: policy, metrics.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: |
+        Adjustable thresholds (max iterations, time budget, flake tolerance, min pass rate). Flexible object map.
+      security: non-sensitive
+      system_usage:
+        - automation
+        - steering
+    field_profile_code: CVS-020
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+      - modifiable
+    type: object
+    validation:
+      required: false

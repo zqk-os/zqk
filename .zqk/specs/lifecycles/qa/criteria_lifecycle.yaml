@@ -1,0 +1,203 @@
+$schema: ../../../.zqk/cli/specs/schemas/lifecycle_spec.schema.json
+object_type: criteria
+statuses:
+  - value: conceptual
+    display: Conceptual
+    origin: true
+    preliminary: true
+    description: Draft plane status. Prior to CAS membrane crossing.
+    role: realign
+  - value: originated
+    display: Originated
+    description: CAS membrane crossed. Object officially originated.
+    role: realign
+  - value: awaiting_verification
+    display: Awaiting Verification
+    origin: false
+    role: shovel_ready
+    description: Criterion is defined and is awaiting evidence or an explicit 
+      verification attempt.
+  - value: in_progress
+    display: In Progress
+    role: execution_locked
+    description: 'criteria status ''in_progress'' (In Progress): in flight; treat
+      as scope-locked until it advances or halts.'
+  - value: validated
+    display: Validated
+    role: realign
+    satisfied: true
+    description: 'criteria status ''validated'' (Validated): not yet committed for
+      execution; reshape before pickup.'
+  - value: complete
+    display: Complete
+    terminal: true
+    satisfied: true
+    role: terminal
+    description: 'criteria status ''complete'' (Complete): ended; no further normal
+      execution transitions expected. Flags: terminal.'
+  - value: blocked
+    display: Blocked
+    role: halted
+    description: 'criteria status ''blocked'' (Blocked): paused or system-held for
+      repair; resolve before advancing.'
+  - value: rejected
+    display: Rejected
+    terminal: true
+    role: terminal
+    description: 'criteria status ''rejected'' (Rejected): ended; no further normal
+      execution transitions expected. Flags: terminal.'
+  - value: archived
+    display: Archived
+    terminal: true
+    archive: true
+    role: terminal
+    description: 'criteria status ''archived'' (Archived): retained for audit/lineage;
+      no further normal execution. Prefer aggregate/compress over hard-delete.'
+transitions:
+  - from: conceptual
+    to: originated
+    description: Promote from draft plane to CAS membrane (CAS Qualification).
+    manual: true
+    auto: false
+    catalyst: System promotion
+    postconditions:
+      - role is realign
+    class_vs_specialty: class-agnostic
+    shockwave:
+      mode: propagate
+  - from: originated
+    to: awaiting_verification
+    description: Initial domain workflow transition to awaiting_verification.
+    manual: true
+    auto: true
+    catalyst: System initialization
+    postconditions:
+      - role is shovel_ready
+    class_vs_specialty: class-agnostic
+    shockwave:
+      mode: propagate
+  - from: awaiting_verification
+    to: in_progress
+    description: Begin evaluating the criterion (manual promote or auto when 
+      linked backlog work is in flight)
+    manual: true
+    auto: true
+    on_dependent_status:
+      kind: backlog_item
+      to: in_progress
+    postconditions:
+      - role is execution_locked
+      - destination is in_progress, not validated
+    catalyst: Linked backlog_item occupies execution_locked (Plane C); dual 
+      manual so promote remains first-class
+    class_vs_specialty: "class hop shovel_ready → execution_locked; composition is
+      parent-owned via criteria_refs"
+    shockwave:
+      mode: propagate
+  - from: in_progress
+    to: validated
+    description: Manual transition after validation check
+    manual: true
+    auto: false
+    postconditions:
+      - role is realign
+    catalyst: Standard progression
+    class_vs_specialty: class-agnostic
+    shockwave:
+      mode: propagate
+  - from: in_progress
+    to: complete
+    description: Auto-transition when automated test passes
+    manual: false
+    auto: true
+    postconditions:
+      - role is terminal
+    catalyst: Standard progression
+    class_vs_specialty: class-agnostic
+    shockwave:
+      mode: propagate
+  - from: in_progress
+    to: complete
+    description: Auto-transition when metric threshold is met
+    manual: false
+    auto: true
+    postconditions:
+      - role is terminal
+    catalyst: Standard progression
+    class_vs_specialty: class-agnostic
+    shockwave:
+      mode: propagate
+  - from: validated
+    to: complete
+    description: Manual confirmation after validation
+    manual: true
+    auto: false
+    postconditions:
+      - role is terminal
+    catalyst: Standard progression
+    class_vs_specialty: class-agnostic
+    shockwave:
+      mode: propagate
+  - from: in_progress
+    to: blocked
+    description: Auto-transition when dependent criteria are blocked
+    manual: false
+    auto: true
+    postconditions:
+      - role is halted
+    catalyst: Standard progression
+    class_vs_specialty: class-agnostic
+    shockwave:
+      mode: propagate
+  - from: blocked
+    to: in_progress
+    description: Auto-transition when all dependent criteria are complete
+    manual: false
+    auto: true
+    postconditions:
+      - role is execution_locked
+      - halt resume re-locks verification; not a return to awaiting_verification
+    catalyst: Standard progression
+    class_vs_specialty: class-agnostic
+    shockwave:
+      mode: propagate
+  - from: '*'
+    to: rejected
+    description: Manual rejection from any status
+    manual: true
+    auto: false
+    postconditions:
+      - role is terminal
+    catalyst: Standard progression
+    class_vs_specialty: class-agnostic
+    shockwave:
+      mode: propagate
+  - from: '*'
+    to: archived
+    description: Archive criterion for audit retention (lineage-preserving; not 
+      hard-delete)
+    manual: true
+    auto: false
+    shockwave:
+      mode: cluster
+      fail: closed
+    postconditions:
+      - role is terminal
+    catalyst: Standard progression
+    class_vs_specialty: class-agnostic
+percent_complete:
+  method: status_based
+  default_by_status:
+    conceptual: 0
+    originated: 5
+    blocked: 0
+    complete: 100
+    in_progress: 50
+    rejected: 0
+    validated: 90
+    archived: 100
+    awaiting_verification: 10
+created_at: 2026-07-01 18:00:00+00:00
+updated_at: 2026-07-01 18:00:00+00:00
+created_by: ACC-1785920548450214012-68b850c0
+updated_by: ACC-1785920548450214012-68b850c0

@@ -1,0 +1,21 @@
+Display a strategic plan. If id is provided, show that plan; otherwise list
+
+strategic_plan and show the first (e.g. STRAT-PLAN-001).
+
+
+
+Respects field-level read permissions (BLI-642). Output format via --format.
+
+  Show primary strategic plan
+  zqk.test object splan show
+  Show plan by ID
+  zqk.test object splan show STRAT-PLAN-001
+  Show in JSON format
+  zqk.test object splan show --format json
+
+Usage:
+  zqk.test object splan show [flags]
+
+Global Flags:
+      --allow-degraded   Allow scheduler-dependent commands to run when scheduler daemon is not running
+      --internal         Elevated access mode for built-in and internal kinds (requires Enterprise license or zqk-admin)

@@ -1,0 +1,33 @@
+package bldr_trait_v1
+
+import (
+	"github.com/zqk-os/zqk/pkg/specbuilder/trait_builders"
+)
+
+// OrderedListMetricBuilder builds the ordered_list_metric trait at version v1_0_0
+// File: bldr_trait_v1/ordered_list_metric_builder.go - version is encoded in package/directory name
+type OrderedListMetricBuilder struct {
+	*trait_builders.BaseTraitBuilder
+}
+
+// NewOrderedListMetricBuilder creates a new builder for ordered_list_metric trait version v1_0_0
+func NewOrderedListMetricBuilder() *OrderedListMetricBuilder {
+	builder := &OrderedListMetricBuilder{
+		BaseTraitBuilder: trait_builders.NewBaseTraitBuilder("ordered_list_metric", "v1_0_0"),
+	}
+
+	// Configure the trait
+	builder.
+		SetDescription("Trait indicating that a field contains ordered list-based metric data (sequence).\\nFields with this trait are automatically collected and aggregated into metric objects.\\n\\nOrdered list metrics represent sequences where order matters (e.g., status transitions,\\nevent sequences, time-series data). They can be analyzed for patterns, trends, and sequences.\\n").
+		SetCategory("metric-type").
+		SetObjectLevel(false).
+		SetFieldLevel(false).
+		AddRequires("base_metric_enabled_group").
+		AddRequires("readable")
+
+	return builder
+}
+
+func init() {
+	trait_builders.RegisterBuilder(NewOrderedListMetricBuilder())
+}

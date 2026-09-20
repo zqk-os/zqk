@@ -1,0 +1,64 @@
+# High-volume kinds: canonical list for storage policy and documentation.
+# See docs/architecture/HIGH_VOLUME_STORAGE_DEPRECATION.md.
+#
+# SINGLE SOURCE OF TRUTH for Go: pkg/storage/stream_config.go loads this file.
+# - storage: stream → stream create path + HV cache/retention
+# - storage: cas   → HV cache/retention only (not stream)
+# Do not add parallel hardcoded kind lists in Go when introducing a new HV kind —
+# add an entry here (+ object spec storage_profile when stream).
+#
+# These kinds require efficient, compressed storage (stream or timeseries).
+# Legacy one-file-per-object (CAS) format is deprecated for stream-backed kinds.
+# Object specs for these kinds remain in .zqk/specs/objects/;
+# retention is configured in retention_tolerance.yaml.
+#
+# Code references: pkg/storage/stream_config.go (StreamStorageEnabledForKind,
+# IsHighVolumeKindForCache, HighVolumeKindsForCacheBuild),
+# pkg/storage/high_volume_event_cache.go, pkg/storage/bucketing_strategy_defaults.go.
+
+kinds:
+  - kind: audit_event
+    storage: stream
+    note: "Segment per day; aggregation + retention."
+  - kind: audit_aggregation_metric
+    storage: stream
+  - kind: base_metric
+    storage: stream
+  - kind: command_metric
+    storage: stream
+  - kind: file_lock_metric
+    storage: stream
+  - kind: code_quality_metric
+    storage: stream
+  - kind: kind_mapping_metric
+    storage: stream
+    note: "Extends base_metric; kind-mapping / config-load metrics."
+  - kind: scheduler_health_metric
+    storage: stream
+  - kind: change_journal_entry
+    storage: stream
+    note: "Delta-only fields."
+  - kind: mcp_session
+    storage: stream
+    note: "Stream or CAS until stream supports status filter."
+  # scheduler_job: CAS-backed (not stream) but still high-volume for cache/retention.
+  # Runtime-churn fields use runtime_delta (see runtime_delta_kinds.yaml).
+  # storage: cas → HV cache + retention OldestIDs; StreamStorageEnabledForKind stays false.
+  - kind: scheduler_job
+    storage: cas
+    note: "CAS + runtime_delta; listed so cache/retention pick it up without a Go kind list."
+  - kind: zqk_session
+    storage: stream
+    note: "Session state; retention via retention_tolerance (max_count, cleanup_after)."
+  - kind: verification_matrix
+    storage: stream
+    note: "Matrix definitions and frequent row/status updates; create→segment, updates→stream_current overlay."
+  - kind: agent_instruction
+    storage: stream
+    note: "Transient instructions submitted to Autonomy Inbox; retention prunes frequently."
+
+created_at: 2026-07-01T18:00:00Z
+updated_at: 2026-07-06T19:33:00Z
+created_by: ACC-1785920548450214012-68b850c0
+updated_by: ACC-1785920548450214012-68b850c0
+

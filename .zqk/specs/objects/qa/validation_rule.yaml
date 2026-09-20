@@ -1,0 +1,151 @@
+schema_version: 2.0.0
+ontology: validation_rule
+extends: base_object
+visibility: public
+description: Represents a programmable validation rule that enforces constraints during object lifecycle transitions.\n
+traits:
+  - base_object_traits
+  - manipulatable
+fields:
+  parameters:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner/architect.
+      cardinality: one
+      criticality: composition
+      observability: "yes"
+      purpose: Configuration parameters mapping values for the rule_type.
+      security: non-sensitive
+      system_usage:
+        - validation
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+      - modifiable
+    type: object
+    validation:
+      required: false
+  rule_type:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner/architect.
+      cardinality: one
+      criticality: composition
+      observability: "yes"
+      purpose: The generic validator template (field_presence, active_reference, alignment, expression).
+      security: non-sensitive
+      system_usage:
+        - validation
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - filterable
+      - readable
+      - writable
+      - modifiable
+    type: enum
+    validation:
+      enum:
+        - field_presence
+        - active_reference
+        - alignment
+        - expression
+      required: true
+  sequence_level:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner/architect.
+      cardinality: one
+      criticality: composition
+      observability: "yes"
+      purpose: Evaluation tier (1 = local completeness, 2 = dereference/active checks, 3 = path integrity).
+      security: non-sensitive
+      system_usage:
+        - validation
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - filterable
+      - readable
+      - writable
+      - modifiable
+    type: integer
+    validation:
+      required: true
+  target_kind:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner/architect.
+      cardinality: one
+      criticality: composition
+      observability: "yes"
+      purpose: The object kind this rule restricts (e.g. backlog_item, milestone).
+      security: non-sensitive
+      system_usage:
+        - validation
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - filterable
+      - readable
+      - writable
+      - modifiable
+    type: string
+    validation:
+      required: true
+  target_status:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner/architect.
+      cardinality: one
+      criticality: composition
+      observability: "yes"
+      purpose: The target lifecycle status (e.g. active, complete, in_progress) this rule restricts.
+      security: non-sensitive
+      system_usage:
+        - validation
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - filterable
+      - readable
+      - writable
+      - modifiable
+    type: string
+    validation:
+      required: true
+  transition_from:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner/architect.
+      cardinality: zero_or_one
+      criticality: composition
+      observability: "yes"
+      purpose: Optional source status limiting this rule to a specific transition path.
+      security: non-sensitive
+      system_usage:
+        - validation
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - filterable
+      - readable
+      - writable
+      - modifiable
+    type: string
+    validation:
+      required: false

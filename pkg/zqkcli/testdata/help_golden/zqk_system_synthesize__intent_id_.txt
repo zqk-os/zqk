@@ -1,0 +1,16 @@
+The synthesize command pulls an intent submission from the object store and
+processes it through the Orchestrator Registry to dynamically generate a new
+Agent Capability.
+
+The synthesize command is the entry point to the Autonomous Kernel's dynamic capability generation system. It verifies intent via Policy Engine, extracts semantic context via the Hivemind, and commits the capability.
+• Requires a valid Intent object ID.
+• Executes Phase 2 Synthesis Orchestration.
+
+  Synthesize a new capability from an intent object
+  zqk system synthesize INT-12345
+
+Usage:
+  zqk system synthesize [intent_id] [flags]
+
+Global Flags:
+      --allow-degraded   Allow scheduler-dependent commands to run when scheduler daemon is not running

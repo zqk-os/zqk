@@ -1,0 +1,76 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://zqk.dev/schemas/brand_settings.schema.json",
+  "title": "Brand Settings Schema",
+  "description": "Schema for {brand}-settings.yaml (e.g. zqk-settings.yaml). Per-project or per-CLI-instance settings: path config, staleness check dirs, optional path alias overrides. Used by path resolution and zqk use.",
+  "type": "object",
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "Reference to this schema file, e.g. https://zqk.dev/schemas/brand_settings.schema.json"
+    },
+    "description": {
+      "type": "string",
+      "description": "Human-readable description of this settings file"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "Settings schema version (semantic versioning) for evolution and default generation"
+    },
+    "paths": {
+      "type": "object",
+      "description": "Path-related options. All paths are relative to project root unless noted.",
+      "properties": {
+        "project_root": {
+          "type": "string",
+          "description": "Optional override for project root (absolute path). If unset, project root is resolved from cwd or .zqk/current_root"
+        },
+        "staleness_check_dirs": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Paths (relative to project root) checked for mtime when deciding if path alias cache is stale. Defaults if unset: [.zqk, .zqk/config]"
+        },
+        "aliases": {
+          "type": "object",
+          "additionalProperties": { "type": "string" },
+          "description": "Optional alias -> relative path overrides merged into the path alias cache (e.g. custom_docs: docs/custom)"
+        }
+      },
+      "additionalProperties": false
+    },
+    "cli": {
+      "type": "object",
+      "description": "CLI behavior options",
+      "properties": {
+        "default_context": {
+          "type": "string",
+          "enum": ["human", "ai-agent", "debug"],
+          "description": "Default context profile when not set by --context or env"
+        },
+        "binary_path": {
+          "type": "string",
+          "description": "Optional explicit path to the CLI binary for scheduler/run_wrapper subprocess execution. May be absolute or project-root relative."
+        }
+      },
+      "additionalProperties": false
+    },
+    "kernel_state": {
+      "type": "object",
+      "description": "Knowledge Kernel tip snapshot (system-state.csnap) and external prior backups for state-commit",
+      "properties": {
+        "snapshot_backup_dir": {
+          "type": "string",
+          "description": "Directory for prior tip .csnap copies (absolute, ~/…, or relative to project root). Default when unset: <parent>/<repo>-csnap-backups"
+        },
+        "snapshot_backup_keep": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "How many prior tip .csnap files to retain in snapshot_backup_dir (default 3 when unset)"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

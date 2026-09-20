@@ -1,0 +1,31 @@
+package bldr_trait_v1
+
+import (
+	"github.com/zqk-os/zqk/pkg/specbuilder/trait_builders"
+)
+
+// CompletableBuilder builds the completable trait at version v1_0_0
+// File: bldr_trait_v1/completable_builder.go - version is encoded in package/directory name
+type CompletableBuilder struct {
+	*trait_builders.BaseTraitBuilder
+}
+
+// NewCompletableBuilder creates a new builder for completable trait version v1_0_0
+func NewCompletableBuilder() *CompletableBuilder {
+	builder := &CompletableBuilder{
+		BaseTraitBuilder: trait_builders.NewBaseTraitBuilder("completable", "v1_0_0"),
+	}
+
+	// Configure the trait
+	builder.
+		SetDescription("Object-level work-interval trait. Kinds with this trait participate in a work\\nclock (started_at, completed_at). completed_at is done-of-work, not archive-of-record.\\nTRACK: BLI-KERNEL-WORK-ENVELOPE-001 / WORK_ENVELOPE_AND_EFFORT_FACETS.md.\\n").
+		SetCategory("behavior").
+		SetObjectLevel(true).
+		SetFieldLevel(false)
+
+	return builder
+}
+
+func init() {
+	trait_builders.RegisterBuilder(NewCompletableBuilder())
+}

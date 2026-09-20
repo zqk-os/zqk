@@ -1,0 +1,83 @@
+$schema: "../../../.zqk/cli/specs/schemas/lifecycle_spec.schema.json"
+
+object_type: verification_matrix
+# Five-question exam: docs/architecture/LIFECYCLE_STATE_MACHINE_RUBRIC.md
+# TRACK: BLI-CEF-R26-REMAINING-KINDS-001
+extends: base_lifecycle
+statuses:
+  - value: conceptual
+    display: Conceptual
+    origin: true
+    preliminary: true
+    description: Draft plane status. Prior to CAS membrane crossing.
+    role: realign
+  - value: originated
+    display: Originated
+    description: CAS membrane crossed. Object officially originated.
+    role: realign
+  - value: draft
+    display: Draft
+    origin: false
+    preliminary: false
+    description: |
+      Definition in progress; CSV/profile paths and gate policy may change.
+    role: realign
+  - value: active
+    display: Active
+    description: |
+      Matrix is authoritative for reporting and (when wired) transition gating.
+    role: shovel_ready
+  - value: archived
+    display: Archived
+    terminal: true
+    archive: true
+    description: Retired; keep for audit only.
+    role: terminal
+transitions:
+  - from: conceptual
+    to: originated
+    description: Promote from draft plane to CAS membrane (CAS Qualification).
+    manual: true
+    auto: false
+    catalyst: System promotion
+  - from: originated
+    to: draft
+    description: Initial domain workflow transition to draft.
+    manual: true
+    auto: true
+    catalyst: System initialization
+  - from: draft
+    to: active
+    description: Publish matrix for use in reports and gates
+    manual: true
+    auto: false
+    postconditions:
+      - role is shovel_ready
+  - from: draft
+    to: archived
+    description: Abandon draft
+    manual: true
+    auto: false
+    postconditions:
+      - role is terminal
+      - ended; no further normal execution hops expected
+  - from: active
+    to: archived
+    description: Retire matrix
+    manual: true
+    auto: false
+    postconditions:
+      - role is terminal
+      - ended; no further normal execution hops expected
+percent_complete:
+  method: status_defaults
+  default_by_status:
+    conceptual: 0
+    originated: 5
+    draft: 10
+    active: 100
+    archived: 100
+created_at: 2026-07-01T18:00:00Z
+updated_at: 2026-07-01T18:00:00Z
+created_by: ACC-1785920548450214012-68b850c0
+updated_by: ACC-1785920548450214012-68b850c0

@@ -1,0 +1,40 @@
+$schema: "../schemas/command_spec.schema.json"
+
+name: "doctor"
+short: "Inspect feed health, MCP subscribers, and peer wake status"
+description: |
+  Diagnoses the agent correspondence feed: channel health, live MCP event
+  subscribers, peer seat PID hygiene, peer-wake contract paths, and issues.
+  Use --refresh-seats to rewrite .zqk/state/mesh/peer_seats.json from live
+  peer worker processes. Reports missing community default seating
+  (PER-DEFAULT-OPERATOR / PER-DEFAULT-AGENT). Structured result via FormatOutput.
+
+args:
+  type: "no_args"
+
+flags:
+  - name: "refresh-seats"
+    type: "bool"
+    default: false
+    description: "Refresh peer_seats.json PIDs from live peer executables before diagnose"
+  - name: "dry-run"
+    type: "bool"
+    default: false
+    description: "With --refresh-seats, report assignments without writing peer_seats.json"
+
+help:
+  examples:
+    - comment: "Check feed / MCP subscriber health"
+      command: "%s feed doctor"
+    - comment: "Refresh seat PIDs then diagnose"
+      command: "%s feed doctor --refresh-seats --format json"
+    - comment: "If issues include missing_default_seating, repair with system seed"
+      command: "%s system seed-default-agent-seating"
+    - comment: "JSON for agents"
+      command: "%s feed doctor --format json"
+  exclude_flags:
+    - "columns"
+    - "ignore-scheduler-down"
+
+run_e: "runFeedDoctor"
+common_flags: true

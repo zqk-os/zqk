@@ -1,0 +1,964 @@
+schema_version: 2.0.0
+ontology: backlog_item
+urn: urn:zqk:spec:project_mgmt:backlog_item
+namespace: zqk:project_mgmt
+extends: work_unit
+visibility: public
+description: 'Backlog items represent feature ideas, enhancements, and work items that are being explored, validated, or planned. They progress through a lifecycle from exploration to completion, and can be linked to goals, milestones, requirements, and documents for traceability.\nWork that is planned or in progress must be traceable through milestones (and priority plans) to mission, vision, goals, and strategic plan; lifecycle preconditions enforce milestone linkage before planned and in_progress can be held without error.\nLifecycle: backlog_item_lifecycle.yaml.\n'
+traits:
+  - base_object_traits
+  - manipulatable
+  - constrainable
+  - effort_aware
+fields:
+  acceptance_considerations:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: used during exploring to validated grooming; not a completion gate.
+      cardinality: one
+      criticality: association
+      default: none (optional narrative)
+      dependencies: none.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Free-form narrative about how acceptance will be judged. Verifiable gates live in criteria_refs (CRIT-* objects), not in this field.
+      security: non-sensitive
+      system_usage:
+        - grooming
+        - documentation
+        - planning
+      validation: free text or markdown.
+    field_profile_code: BLI-023
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+      - modifiable
+    type: text
+    validation:
+      required: false
+  benefits:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: used in prioritization, justification reports.
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: none.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: List of benefits this feature provides (user value, technical value, etc.).
+      security: non-sensitive
+      system_usage:
+        - justification
+        - prioritization
+        - communication
+      validation: list of strings.
+    field_profile_code: BLI-008
+    permissions: rwx
+    semantic_type: expression
+    traits:
+      - readable
+      - writable
+      - modifiable
+    type: list
+    validation:
+      required: false
+  branch_name:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation/orchestrator.
+      automation_hooks: used by agent orchestrator to checkout the correct worktree.
+      cardinality: one
+      criticality: composition
+      default: null
+      dependencies: git
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Track the collaboration branch where work is executed for this object.
+      security: non-sensitive
+      system_usage:
+        - checkout
+        - orchestration
+      validation: Must be a valid git branch name.
+    type: string
+  category:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner/product.
+      automation_hooks: used for filtering, reporting, prioritization.
+      cardinality: one
+      criticality: composition
+      default: auto-extracted from description if config available
+      dependencies: category extraction rules.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Category classification (e.g., \\\"Developer Experience\\\", \\\"Product\\\", \\\"Reliability\\\").
+      security: non-sensitive
+      system_usage:
+        - filtering
+        - grouping
+        - prioritization
+      validation: Should match controlled vocabulary (see category extraction config).
+    field_profile_code: BLI-001
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - filterable
+      - groupable
+      - listable
+      - modifiable
+      - readable
+      - searchable
+      - sortable
+      - writable
+    type: string
+    validation:
+      required: false
+  code_location:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: used for linking backlog item to codebase.
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: source code.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: List of codebase locations (files/packages) associated with this item.
+      security: non-sensitive
+      system_usage:
+        - traceability
+        - context
+      validation: list of file paths or package names.
+    field_profile_code: BLI-036
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+      - modifiable
+    type: list
+    validation:
+      required: false
+  commit_hashes:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation.
+      automation_hooks: used for linking commits to backlog items.
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: Version control repository (Git, SVN, Mercurial, Perforce, etc.).
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Version control system commit identifiers that implement or relate to this backlog item.
+      security: non-sensitive
+      system_usage:
+        - traceability
+        - code-to-project graph
+      validation: |
+        Must be valid VCS commit identifiers. Format depends on VCS system:
+        - Git: SHA-1 hash (40 chars) or short hash (7+ chars)
+        - SVN: Revision number (numeric)
+        - Mercurial: Hex hash (40 chars)
+        - Perforce: Changelist number (numeric)
+        - Other: Alphanumeric string, 1-40 characters
+    field_profile_code: BLI-013
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+      - modifiable
+      - filterable
+    type: list
+    validation:
+      pattern: ^[A-Za-z0-9_-]{1,40}$
+      required: false
+  code_reference_refs:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation/owner.
+      automation_hooks: used for code-to-backlog traceability.
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: code_reference registry.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Code references (CDR-...) that implement this backlog item.
+      security: non-sensitive
+      system_usage:
+        - traceability
+      validation: Must reference existing code_reference IDs.
+    field_profile_code: BLI-040
+    permissions: rwx
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+      - field_reference_group
+      - writable
+      - modifiable
+    type: list
+    validation:
+      required: false
+  components:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: used for work breakdown, milestone creation.
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: none.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: List of components or sub-features that make up this item.
+      security: non-sensitive
+      system_usage:
+        - planning
+        - breakdown
+        - tracking
+      validation: list of strings.
+    field_profile_code: BLI-007
+    permissions: rwx
+    semantic_type: expression
+    traits:
+      - readable
+      - writable
+      - modifiable
+    type: list
+    validation:
+      required: false
+  considerations:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: used in planning, risk reports.
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: none.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Implementation considerations, risks, or constraints.
+      security: non-sensitive
+      system_usage:
+        - planning
+        - risk assessment
+        - decision making
+      validation: list of strings.
+    field_profile_code: BLI-009
+    permissions: rwx
+    semantic_type: expression
+    traits:
+      - field_mutable_group
+    type: list
+    validation:
+      required: false
+  context:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: used in reports, justification documents.
+      cardinality: one
+      criticality: association
+      default: none (optional)
+      dependencies: none.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: When/why the idea surfaced (meeting, user feedback, technical debt, etc.).
+      security: non-sensitive
+      system_usage:
+        - context
+        - justification
+        - traceability
+      validation: free text.
+    field_profile_code: BLI-005
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+      - modifiable
+    type: text
+    validation:
+      required: false
+  convergence_session_profile:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: workflow next output, dashboards.
+      cardinality: zero_or_one
+      criticality: association
+      default: ""
+      dependencies: none.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Short label for how the linked CVS is used (e.g. vetting_matrix, health, nested_orchestration).
+      security: non-sensitive
+      system_usage:
+        - display
+        - filtering
+      validation: Free text when convergence_session_ref is set.
+    field_profile_code: BLI-020
+    permissions: r-x
+    semantic_type: statement
+    traits:
+      - field_mutable_group
+    type: string
+    validation:
+      required: false
+  convergence_session_ref:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: workflow next, convergence reporting, vetting matrix alignment.
+      cardinality: zero_or_one
+      criticality: association
+      default: ""
+      dependencies: convergence_session registry.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Optional link to the convergence session that owns or measures work for this backlog item.
+      security: non-sensitive
+      system_usage:
+        - traceability
+        - workflow routing
+        - nested CVS coordination
+      validation: Must reference an existing convergence_session id when set.
+    field_profile_code: BLI-019
+    permissions: r-x
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+      - field_reference_group
+    type: string
+    validation:
+      required: false
+  criteria_refs:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: used for shovel-ready gates, completion validation, and lifecycle auto-complete.
+      cardinality: many (>=1 for planned/in_progress/complete)
+      criticality: composition
+      default: []
+      dependencies: criteria registry.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Canonical typed links to criteria objects (CRIT-*) that must be satisfied for this backlog item.
+      security: non-sensitive
+      system_usage:
+        - validation
+        - completion tracking
+        - traceability
+        - testing
+      validation: must reference existing criteria object IDs (CRIT-* format).
+    field_profile_code: BLI-016
+    permissions: rwx
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+      - field_reference_group
+    type: list
+    validation:
+      required: false
+  date_captured:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation.
+      automation_hooks: used for date-based filtering, backlog age reports.
+      cardinality: one
+      criticality: association
+      default: auto-populated from created_at if not provided
+      dependencies: creation timestamp.
+      observability: "yes"
+      origin_lifecycle: immutable (set at creation).
+      purpose: ISO-8601 date when the idea was first captured.
+      security: non-sensitive
+      system_usage:
+        - filtering
+        - reporting
+        - age calculation
+      validation: ISO-8601 date format (YYYY-MM-DD).
+    field_profile_code: BLI-004
+    permissions: r-x
+    semantic_type: statement
+    traits:
+      - filterable
+      - listable
+      - readable
+      - searchable
+      - sortable
+      - writable
+    type: date
+    validation:
+      pattern: ^\d{4}-\d{2}-\d{2}$
+      required: false
+  description:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: used in markdown generation, reports.
+      cardinality: one
+      criticality: composition
+      default: none (optional but recommended)
+      dependencies: none.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Detailed description of the feature or enhancement.
+      security: non-sensitive
+      system_usage:
+        - documentation
+        - planning
+        - communication
+      validation: free text, recommended >= 50 chars.
+    field_profile_code: BLI-006
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+      - modifiable
+    type: text
+    validation:
+      min_length: 0
+      required: false
+  doc_entry_refs:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: used for dependency tree construction, document discovery.
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: doc_entry registry.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Kernel pointers to doc_entry objects related to this backlog item.
+      security: non-sensitive
+      system_usage:
+        - traceability
+        - documentation discovery
+        - dependency graphs
+      validation: Must reference existing doc_entry IDs (DOC-*). Leftover document_refs is dual-read; repo paths are not kernel refs.
+    field_profile_code: BLI-014
+    permissions: rwx
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+      - field_reference_group
+    type: list
+    validation:
+      required: false
+  goal_refs:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: used to trace goal support, generate goal reports.
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: goal registry.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: References to goals this backlog item supports.
+      security: non-sensitive
+      system_usage:
+        - traceability
+        - justification
+        - goal coverage
+      validation: Must reference existing goal IDs.
+    field_profile_code: BLI-011
+    permissions: r-x
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+      - field_reference_group
+    type: list
+    validation:
+      required: false
+  milestone_ref:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: used for milestone membership, auto-transition to complete.
+      cardinality: zero_or_one
+      criticality: association
+      default: none
+      dependencies: milestone registry.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: |
+        Membership edge (child→parent). Occupancy lists children by filtering this field; the milestone must not store backlog_item_refs.
+        TRACK: BLI-KERNEL-REF-GRAPH-ACYCLIC-001.
+      security: non-sensitive
+      system_usage:
+        - progress tracking
+        - lifecycle transitions
+        - completion
+      validation: Must reference existing milestone ID.
+    field_profile_code: BLI-036
+    permissions: rwx
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+      - field_reference_group
+      - modifiable
+      - writable
+    type: string
+    validation:
+      pattern: ^(MIL-[\w-]+|milestone-[\w-]+)$
+      required: false
+  milestone_refs:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: used for percent-complete calculation, auto-transition to complete.
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: milestone registry, lifecycle (auto-complete when all complete).
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: |
+        References to milestones that implement this backlog item. Milestones are the primary link from
+        execution back to strategic context (mission, vision, goals, strategic plan); planned and
+        in_progress statuses require at least one milestone reference so work stays traceable.
+      security: non-sensitive
+      system_usage:
+        - progress tracking
+        - lifecycle transitions
+        - completion
+      validation: Must reference existing milestone IDs.
+    field_profile_code: BLI-012
+    permissions: rwx
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+      - field_reference_group
+    type: list
+    validation:
+      required: false
+  model_tier:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: Used by the orchestrator to route task execution difficulty.
+      cardinality: one
+      criticality: metadata
+      default: tier_2_simple
+      dependencies: none
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: The model tier required to execute tasks generated from this backlog item (e.g. tier_1_complex, tier_2_simple).
+      security: non-sensitive
+      system_usage:
+        - routing
+      validation: Must be a string.
+    field_profile_code: BLI-022
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - filterable
+      - groupable
+      - modifiable
+      - readable
+      - searchable
+      - writable
+    type: string
+    validation:
+      required: false
+  notes:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: used in reports, markdown generation.
+      cardinality: one
+      criticality: association
+      default: none (optional)
+      dependencies: none.
+      observability: "yes"
+      origin_lifecycle: mutable (append-only recommended).
+      purpose: Additional notes, decisions, or context about this backlog item.
+      security: non-sensitive
+      system_usage:
+        - documentation
+        - context
+        - history
+      validation: free text.
+    field_profile_code: BLI-015
+    permissions: r-x
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+      - modifiable
+    type: text
+    validation:
+      required: false
+  owner_ref:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: product/owner.
+      automation_hooks: gates validated to planned and ownership reporting.
+      cardinality: zero_or_one
+      criticality: association
+      default: null
+      dependencies: account registry.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Durable account ownership for this backlog item.
+      security: may contain PII—treat as confidential.
+      system_usage:
+        - permissions
+        - reporting
+        - lifecycle preconditions
+      validation: Must reference an existing account ID when set.
+    field_profile_code: BLI-024
+    permissions: rwx
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+    type: reference
+    validation:
+      required: false
+  persona_refs:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: used for persona-based filtering.
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: persona registry.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Personas assigned or relevant to this backlog item.
+      security: non-sensitive
+      system_usage:
+        - grouping
+        - reporting
+        - routing
+      validation: must reference existing persona IDs.
+    field_profile_code: BLI-021
+    permissions: r-x
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+      - field_reference_group
+    type: list
+    validation:
+      required: false
+  priority:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: product/owner.
+      automation_hooks: used for roadmap ordering, priority-based filtering.
+      cardinality: one
+      criticality: composition
+      default: none (optional until roadmap commitment)
+      dependencies: roadmap planning.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Priority level (critical, high, medium, low) aligned with priority tiers (P0=critical, P1=high, P2=medium, P3=low).
+      security: non-sensitive
+      system_usage:
+        - prioritization
+        - roadmap ordering
+        - filtering
+      validation: enum (critical, high, medium, low).
+    field_profile_code: BLI-002
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - filterable
+      - groupable
+      - listable
+      - modifiable
+      - readable
+      - searchable
+      - sortable
+      - writable
+    type: enum
+    validation:
+      enum:
+        - critical
+        - high
+        - medium
+        - low
+      required: false
+  priority_plan_ref:
+    checklist:
+      authority: owner/product.
+      automation_hooks: used for plan-based filtering, workstream derivation, future planning.
+      cardinality: one
+      criticality: composition
+      default: none (optional for exploring/validated, required for planned/in_progress/complete)
+      dependencies: priority_plan registry.
+      observability: "yes"
+      origin_lifecycle: mutable (via explicit move command).
+      purpose: Reference to the priority plan this backlog item belongs to (1:1 relationship, enforced). Required for items beyond exploring/validated status per DEC-priority-plan-ref-requirement.
+      security: non-sensitive
+      system_usage:
+        - planning
+        - grouping
+        - reporting
+        - future planning
+      validation: Must reference existing priority_plan object ID. Required for status beyond exploring/validated.
+    field_profile_code: BLI-035
+    permissions: r-x
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+      - field_reference_group
+    type: string
+    validation:
+      pattern: ^(PRI-[\w-]+|PRIO-[\w-]+|priority-plan-[\w-]+)$
+      required: false
+  problem_statement:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: exploring to validated precondition with acceptance_considerations.
+      cardinality: one
+      criticality: association
+      default: none (optional until validated)
+      dependencies: none.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Concise statement of the problem this backlog item addresses.
+      security: non-sensitive
+      system_usage:
+        - grooming
+        - documentation
+        - lifecycle preconditions
+      validation: free text or markdown.
+    field_profile_code: BLI-025
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+      - modifiable
+    type: text
+    validation:
+      required: false
+  related_features:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: used for dependency graphs, related item discovery.
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: backlog registry.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: References to related backlog items or features (by ID or title).
+      security: non-sensitive
+      system_usage:
+        - discovery
+        - grouping
+        - dependency tracking
+      validation: list of strings (IDs or titles).
+    field_profile_code: BLI-010
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - field_mutable_group
+    type: list
+    validation:
+      required: false
+  requirement_refs:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: used to verify requirement coverage, generate traceability reports.
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: requirement registry.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: References to requirements this backlog item fulfills.
+      security: non-sensitive
+      system_usage:
+        - traceability
+        - requirement coverage
+      validation: Must reference existing requirement IDs.
+    field_profile_code: BLI-013
+    permissions: r-x
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+      - field_reference_group
+    type: list
+    validation:
+      required: false
+  status:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: lifecycle rules (see backlog_item_lifecycle.yaml).
+      automation_hooks: lifecycle transitions, status validation.
+      cardinality: one
+      criticality: composition
+      default: exploring
+      dependencies: lifecycle registry.
+      observability: "yes"
+      origin_lifecycle: mutable (via lifecycle transitions).
+      purpose: 'Lifecycle status (exploring, validated, planned, in_progress, complete, archived, rejected). Note: ''workstream'' status replaced with ''planned'' per DEC-backlog-item-priority-plan-1-1-relationship. Statuses planned and in_progress require priority_plan_ref and milestone linkage so items cannot be worked under those statuses until traceability to the strategic hierarchy is in place.'
+      security: non-sensitive
+      system_usage:
+        - lifecycle enforcement
+        - filtering
+        - reporting
+      validation: Must match lifecycle definition.
+    default: exploring
+    field_profile_code: BLI-003
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - filterable
+      - groupable
+      - listable
+      - modifiable
+      - readable
+      - searchable
+      - sortable
+      - writable
+    type: enum
+    validation:
+      enum:
+        - exploring
+        - validated
+        - roadmap
+        - deferred
+        - planned
+        - in_progress
+        - complete
+        - archived
+        - rejected
+        - error
+      required: true
+  workstream_refs:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: used for workstream progress calculation.
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: workstream registry.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Workstreams this backlog item belongs to or contributes to.
+      security: non-sensitive
+      system_usage:
+        - grouping
+        - reporting
+        - planning
+      validation: must reference existing workstream IDs.
+    field_profile_code: BLI-018
+    permissions: r-x
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+      - field_reference_group
+    type: list
+    validation:
+      required: false
+  epic_refs:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner/planner.
+      automation_hooks: bounds child work unit permissions and blast radius under the epic enclave.
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: epic registry.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Enclave epics governing and bounding the scope of this backlog item.
+      security: non-sensitive
+      system_usage:
+        - planning
+        - scope_boundary
+        - isolation
+      validation: must reference existing epic IDs.
+    field_profile_code: BLI-041
+    permissions: r-x
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+      - field_reference_group
+    type: list
+    validation:
+      required: false
+

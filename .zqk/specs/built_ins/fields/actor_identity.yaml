@@ -1,0 +1,8 @@
+type: string
+semantic_type: identity
+description: "Actor or agent identity (account ID or agent seat identifier)."
+traits:
+  - readable
+  - filterable
+validation:
+  required: false

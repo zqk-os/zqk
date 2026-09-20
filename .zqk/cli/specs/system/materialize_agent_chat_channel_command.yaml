@@ -1,0 +1,38 @@
+$schema: "../schemas/command_spec.schema.json"
+
+name: "materialize-agent-chat-channel"
+short: "Materialize agent_chat_channel lite file from a CAS agent_feed"
+description: |
+  Reads an agent_feed (AGF-*) from CAS and writes `.zqk/config/agent_chat_channel.json`
+  (enabled, delivery_mode, feed_id, contract_schema_version, path overrides, probe filters).
+  Ensures the events JSONL parent directory exists.
+
+  Prefer rematerializing from a live AGF after object updates instead of hand-editing the lite file.
+
+args:
+  type: "no_args"
+
+flags:
+  - name: "feed-id"
+    type: "string"
+    default: ""
+    required: true
+    description: "agent_feed object id (AGF-*)"
+  - name: "dry-run"
+    type: "bool"
+    default: false
+    description: "Print materialized lite JSON without writing"
+
+help:
+  examples:
+    - comment: "Materialize lite policy from a live agent_feed"
+      command: "%s system materialize-agent-chat-channel --feed-id AGF-001"
+    - comment: "Preview without writing"
+      command: "%s system materialize-agent-chat-channel --feed-id AGF-001 --dry-run"
+  # format/verbose stay available for FormatOutput; columns unused for this command.
+  exclude_flags:
+    - "columns"
+    - "ignore-scheduler-down"
+
+run_e: "runMaterializeAgentChatChannel"
+common_flags: true

@@ -1,0 +1,975 @@
+schema_version: 2.0.0
+ontology: scheduler_job
+extends: base_object
+visibility: internal
+kernel_critical: false
+description: 'Represents a scheduled automation task (context refresh, manifest generation, etc.) with triggers and actions.\nStructural fields (CAS rehash): identity and execution semantics—job_type, trigger_type, command/schedule,\nexecution_mode, callbacks, auth, listeners, routes—anything that changes validation or how the scheduler runs the job.\nRuntime_delta fields (overlay): bounded operational state—status/title (inherited), timestamps, enabled, category,\npriority, log_level, retries, last/next run, max_runtime tuning—high churn without rewriting the structural blob.\nPrivilege Requirements: Read (read:scheduler_job or read:* or admin), Create/Update (write:scheduler_job or write:* or admin), Delete (delete:scheduler_job or delete:* or admin), Execute/Trigger (execute:scheduler_job or execute:* or admin), Manage Scheduler (manage:scheduler or admin).\nLifecycle: scheduler_job_lifecycle.yaml.\n'
+traits:
+  - base_object_traits
+exclude_traits:
+  - auto_status_transitionable
+fields:
+  action_ref:
+    access:
+      requires:
+        - access:confidential
+        - role:admin
+    checklist:
+      authority: admin.
+      automation_hooks: used to invoke the action.
+      cardinality: zero_or_one
+      criticality: composition
+      default: null
+      dependencies: action registry.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Reference to the handler/resolver action.
+      security: non-sensitive
+      system_usage:
+        - execution
+      validation: Reference format.
+    field_profile_code: SCH-003
+    permissions: r-x
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+      - field_reference_group
+    type: string
+    validation:
+      required: false
+  allow_parallel_execution:
+    access:
+      requires:
+        - access:confidential
+        - role:admin
+    checklist:
+      authority: admin.
+      automation_hooks: used for missed-trigger catch-up and conflict manager; when true, multiple instances can run concurrently.
+      cardinality: one
+      criticality: association
+      default: false
+      dependencies: scheduler.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: When true, multiple instances of this job may run concurrently (e.g. catch-up triggers for missed runs). When false, scheduler uses job-type default (e.g. cache_prewarm, audit_event_aggregation allow concurrent; run_wrapper does not).
+      security: non-sensitive
+      system_usage:
+        - scheduler
+      validation: boolean.
+    field_profile_code: SCH-024
+    permissions: rwx
+    semantic_type: state
+    traits:
+      - filterable
+      - modifiable
+      - readable
+      - writable
+    type: boolean
+    validation:
+      required: false
+  auth_config:
+    access:
+      requires:
+        - access:confidential
+        - role:admin
+    checklist:
+      authority: admin.
+      automation_hooks: configures auth validation.
+      cardinality: zero_or_one
+      criticality: composition
+      default: null
+      dependencies: scheduler (for callback_listener job_type).
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Authentication configuration (for callback_listener job_type). Type-specific settings (JWT secret, x509 CA cert, API key, OAuth2 client ID/secret).
+      security: sensitive (contains secrets/credentials).
+      system_usage:
+        - scheduler
+      validation: object (auth type-specific key-value pairs).
+    field_profile_code: SCH-025
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+      - modifiable
+    type: object
+    validation:
+      required: false
+  auth_type:
+    access:
+      requires:
+        - access:confidential
+        - role:admin
+    checklist:
+      authority: admin.
+      automation_hooks: determines auth mechanism.
+      cardinality: zero_or_one
+      criticality: composition
+      default: none
+      dependencies: scheduler (for callback_listener job_type).
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Authentication type for callback listener (for callback_listener job_type).
+      security: sensitive (determines security posture).
+      system_usage:
+        - scheduler
+      validation: enum (none, jwt, x509, api_key, oauth2).
+    field_profile_code: SCH-024
+    permissions: rwx
+    semantic_type: state
+    traits:
+      - field_mutable_group
+    type: enum
+    validation:
+      enum:
+        - none
+        - jwt
+        - x509
+        - api_key
+        - oauth2
+      required: false
+  callback_on_completion:
+    access:
+      requires:
+        - access:confidential
+        - role:admin
+    checklist:
+      authority: admin.
+      automation_hooks: invoked after successful command execution.
+      cardinality: zero_or_one
+      criticality: association
+      default: null
+      dependencies: scheduler (for run_wrapper job_type).
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Callback URL or command to execute on successful job completion (for run_wrapper job_type).
+      security: sensitive (may contain credentials in URL).
+      system_usage:
+        - scheduler
+      validation: string (URL or command).
+    field_profile_code: SCH-016
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+      - modifiable
+    type: string
+    validation:
+      required: false
+  callback_on_error:
+    access:
+      requires:
+        - access:confidential
+        - role:admin
+    checklist:
+      authority: admin.
+      automation_hooks: invoked after command failure (including retry exhaustion).
+      cardinality: zero_or_one
+      criticality: association
+      default: null
+      dependencies: scheduler (for run_wrapper job_type).
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Callback URL or command to execute on job failure (for run_wrapper job_type).
+      security: sensitive (may contain credentials in URL).
+      system_usage:
+        - scheduler
+      validation: string (URL or command).
+    field_profile_code: SCH-017
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - field_mutable_group
+    type: string
+    validation:
+      required: false
+  callback_on_status:
+    access:
+      requires:
+        - access:confidential
+        - role:admin
+    checklist:
+      authority: admin.
+      automation_hooks: invoked periodically during command execution (if supported by command).
+      cardinality: zero_or_one
+      criticality: association
+      default: null
+      dependencies: scheduler (for run_wrapper job_type).
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Callback URL or command to execute for incremental status updates (for run_wrapper job_type).
+      security: sensitive (may contain credentials in URL).
+      system_usage:
+        - scheduler
+      validation: string (URL or command).
+    field_profile_code: SCH-018
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+      - modifiable
+    type: string
+    validation:
+      required: false
+  callback_type:
+    access:
+      requires:
+        - access:confidential
+        - role:admin
+    checklist:
+      authority: admin.
+      automation_hooks: determines how callback is invoked.
+      cardinality: zero_or_one
+      criticality: association
+      default: webhook
+      dependencies: scheduler (for run_wrapper job_type).
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Type of callback mechanism (webhook=HTTP POST, command=execute command, event=emit system event).
+      security: non-sensitive
+      system_usage:
+        - scheduler
+      validation: enum (webhook, command, event).
+    field_profile_code: SCH-019
+    permissions: rwx
+    semantic_type: state
+    traits:
+      - field_mutable_group
+    type: enum
+    validation:
+      enum:
+        - webhook
+        - command
+        - event
+      required: false
+  category:
+    access:
+      requires:
+        - access:confidential
+        - role:admin
+    checklist:
+      authority: admin.
+      automation_hooks: used for job grouping and filtering.
+      cardinality: one
+      criticality: association
+      default: maintenance
+      dependencies: scheduler.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Job category for grouping and organization (e.g., \\\\\\\"maintenance\\\\\\\", \\\\\\\"monitoring\\\\\\\", \\\\\\\"cleanup\\\\\\\", \\\\\\\"cache\\\\\\\").
+      security: non-sensitive
+      system_usage:
+        - scheduler
+        - reporting
+      validation: string.
+    field_profile_code: SCH-007
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+      - modifiable
+      - groupable
+      - filterable
+      - sortable
+      - searchable
+    type: string
+    validation:
+      required: false
+  command:
+    access:
+      requires:
+        - access:confidential
+        - role:admin
+    checklist:
+      authority: admin.
+      automation_hooks: used to execute external processes.
+      cardinality: zero_or_one
+      criticality: composition
+      default: null
+      dependencies: scheduler (for run_wrapper job_type).
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Command to execute (for run_wrapper job_type). Full path or command name.
+      security: sensitive (command execution).
+      system_usage:
+        - scheduler
+      validation: string (command path or name).
+    field_profile_code: SCH-010
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - field_mutable_group
+    type: string
+    validation:
+      required: false
+  command_args:
+    access:
+      requires:
+        - access:confidential
+        - role:admin
+    checklist:
+      authority: admin.
+      automation_hooks: passed to command execution.
+      cardinality: zero_or_one
+      criticality: composition
+      default: null
+      dependencies: scheduler (for run_wrapper job_type).
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Command arguments (for run_wrapper job_type). Array of strings.
+      security: sensitive (command arguments may contain sensitive data).
+      system_usage:
+        - scheduler
+      validation: array of strings.
+    field_profile_code: SCH-011
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+      - modifiable
+    type: array
+    validation:
+      required: false
+  enabled:
+    access:
+      requires:
+        - access:confidential
+        - role:admin
+    checklist:
+      authority: admin.
+      automation_hooks: used to enable/disable jobs.
+      cardinality: one
+      criticality: association
+      default: true
+      dependencies: scheduler.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Whether the job is currently enabled.
+      security: non-sensitive
+      system_usage:
+        - scheduler
+      validation: boolean.
+    field_profile_code: SCH-004
+    permissions: rwx
+    semantic_type: state
+    traits:
+      - field_mutable_group
+    type: boolean
+    validation:
+      required: false
+  environment_variables:
+    access:
+      requires:
+        - access:confidential
+        - role:admin
+    checklist:
+      authority: admin.
+      automation_hooks: sets environment for command execution.
+      cardinality: zero_or_one
+      criticality: association
+      default: null (inherits scheduler's environment)
+      dependencies: scheduler (for run_wrapper job_type).
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Environment variables to set for command execution (for run_wrapper job_type). Key-value pairs.
+      security: sensitive (may contain secrets).
+      system_usage:
+        - scheduler
+      validation: object (key-value pairs).
+    field_profile_code: SCH-013
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+      - modifiable
+    type: object
+    validation:
+      required: false
+  execution_mode:
+    access:
+      requires:
+        - access:confidential
+        - role:admin
+    checklist:
+      authority: admin.
+      automation_hooks: determines if job is disabled after execution.
+      cardinality: one
+      criticality: composition
+      default: reusable
+      dependencies: scheduler.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Whether the job can be executed multiple times (reusable) or only once (one_time).
+      security: non-sensitive
+      system_usage:
+        - scheduler
+      validation: enum (reusable, one_time).
+    field_profile_code: SCH-008
+    permissions: rwx
+    semantic_type: state
+    traits:
+      - filterable
+      - modifiable
+      - readable
+      - sortable
+      - writable
+    type: enum
+    validation:
+      enum:
+        - reusable
+        - one_time
+      required: false
+  idle_shutdown_seconds:
+    access:
+      requires:
+        - access:confidential
+        - role:admin
+    checklist:
+      authority: admin.
+      automation_hooks: determines idle shutdown behavior (lambda-style).
+      cardinality: zero_or_one
+      criticality: association
+      default: 300 (5 minutes)
+      dependencies: scheduler (for callback_listener job_type).
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Idle timeout in seconds before listener server shuts down (for callback_listener job_type). 0 = never shutdown.
+      security: non-sensitive
+      system_usage:
+        - scheduler
+      validation: integer (0-3600).
+    field_profile_code: SCH-022
+    permissions: rwx
+    semantic_type: quantity
+    traits:
+      - readable
+      - writable
+      - modifiable
+    type: integer
+    validation:
+      required: false
+  job_type:
+    access:
+      requires:
+        - access:confidential
+        - role:admin
+    checklist:
+      authority: admin.
+      automation_hooks: determines handler.
+      cardinality: one
+      criticality: composition
+      default: context_refresh
+      dependencies: scheduler runtime.
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: Kind of job (context_refresh, manifest_snapshot, test_runner, etc.).
+      security: non-sensitive
+      system_usage:
+        - scheduler
+      validation: enum.
+    field_profile_code: SCH-001
+    permissions: r-x
+    semantic_type: statement
+    traits:
+      - filterable
+      - groupable
+      - listable
+      - modifiable
+      - readable
+      - searchable
+      - sortable
+      - writable
+    type: enum
+    validation:
+      enum:
+        - context_refresh
+        - manifest_snapshot
+        - test_runner
+        - aggregation
+        - lifecycle_check
+        - audit_event_aggregation
+        - change_journal_aggregation
+        - integrity_check
+        - cache_prewarm
+        - cache_invalidation
+        - cascade_update
+        - operation_execution
+        - run_wrapper
+        - callback_listener
+        - metrics_collection
+        - retention_tolerance
+        - scheduler_job_retention
+        - autofix_batch_cleanup
+        - aggregation_metrics_cleanup
+        - generic_metrics_cleanup
+        - maintenance
+        - object_validation
+        - scheduler_events_aggregation
+        - cleanup
+        - convergence_session_tick
+        - data_cell_envelope_tick
+        - auto_transition
+        - cap_orchestrator
+        - emergency_manager
+        - idle_cleanup
+      required: true
+  last_run_at:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation.
+      automation_hooks: used for job health monitoring.
+      cardinality: zero_or_one
+      criticality: association
+      default: null
+      dependencies: scheduler.
+      observability: "yes"
+      origin_lifecycle: mutable (set by scheduler).
+      purpose: ISO-8601 timestamp of last execution.
+      security: non-sensitive
+      system_usage:
+        - monitoring
+        - reporting
+      validation: ISO-8601 datetime.
+    field_profile_code: SCH-005
+    permissions: r-x
+    semantic_type: statement
+    traits:
+      - filterable
+      - readable
+      - sortable
+    type: string
+    validation:
+      pattern: ^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z|)$
+      required: false
+  listener_path:
+    access:
+      requires:
+        - access:confidential
+        - role:admin
+    checklist:
+      authority: admin.
+      automation_hooks: sets HTTP route prefix.
+      cardinality: zero_or_one
+      criticality: association
+      default: /callbacks
+      dependencies: scheduler (for callback_listener job_type).
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Base path for callback listener endpoints (for callback_listener job_type). Default is /callbacks.
+      security: non-sensitive
+      system_usage:
+        - scheduler
+      validation: string (URL path).
+    field_profile_code: SCH-021
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - field_mutable_group
+    type: string
+    validation:
+      required: false
+  listener_port:
+    access:
+      requires:
+        - access:confidential
+        - role:admin
+    checklist:
+      authority: admin.
+      automation_hooks: sets HTTP server port.
+      cardinality: zero_or_one
+      criticality: composition
+      default: 8080
+      dependencies: scheduler (for callback_listener job_type).
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Port number for callback listener server (for callback_listener job_type).
+      security: non-sensitive
+      system_usage:
+        - scheduler
+      validation: integer (1024-65535).
+    field_profile_code: SCH-020
+    permissions: rwx
+    semantic_type: quantity
+    traits:
+      - readable
+      - writable
+      - modifiable
+    type: integer
+    validation:
+      required: false
+  log_level:
+    access:
+      requires:
+        - access:confidential
+        - role:admin
+    checklist:
+      authority: admin.
+      automation_hooks: controls logging verbosity for troubleshooting.
+      cardinality: one
+      criticality: association
+      default: default
+      dependencies: scheduler.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: |
+        Logging verbosity level for this job:
+        - default: Standard logging (Info/Warn/Error only)
+        - verbose: Include command output (stdout/stderr) in logs
+        - debug: Full debug logging including all execution details
+      security: non-sensitive
+      system_usage:
+        - scheduler
+        - troubleshooting
+      validation: enum (default, verbose, debug).
+    field_profile_code: SCH-026
+    permissions: rwx
+    semantic_type: state
+    traits:
+      - field_mutable_group
+    type: enum
+    validation:
+      enum:
+        - default
+        - verbose
+        - debug
+      required: false
+  max_runtime_seconds:
+    access:
+      requires:
+        - access:confidential
+        - role:admin
+    checklist:
+      authority: admin.
+      automation_hooks: used to timeout and kill hung jobs.
+      cardinality: one
+      criticality: composition
+      default: 3600
+      dependencies: scheduler.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Maximum execution time in seconds before job is killed (prevents hangs).
+      security: non-sensitive
+      system_usage:
+        - scheduler
+      validation: integer 1-86400 (1 second to 24 hours).
+    field_profile_code: SCH-009
+    permissions: rwx
+    semantic_type: quantity
+    traits:
+      - field_mutable_group
+    type: integer
+    validation:
+      required: false
+  metadata:
+    access:
+      requires:
+        - access:public
+    checklist:
+      authority: system.
+      automation_hooks: used for bundle metadata and execution parameters.
+      cardinality: zero_or_one
+      criticality: composition
+      default: null
+      dependencies: none.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Structured metadata dictionary for test bundles and execution parameters.
+      security: non-sensitive
+      system_usage:
+        - scheduler
+        - test_execution
+      validation: object.
+    field_profile_code: SCH-035
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - field_mutable_group
+    type: object
+    validation:
+      required: false
+  next_run_at:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation.
+      automation_hooks: used for job scheduling.
+      cardinality: zero_or_one
+      criticality: association
+      default: null
+      dependencies: scheduler.
+      observability: "yes"
+      origin_lifecycle: mutable (recalculated by scheduler).
+      purpose: ISO-8601 timestamp of next scheduled execution.
+      security: non-sensitive
+      system_usage:
+        - monitoring
+        - reporting
+      validation: ISO-8601 datetime.
+    field_profile_code: SCH-006
+    permissions: r-x
+    semantic_type: statement
+    traits:
+      - filterable
+      - readable
+      - sortable
+    type: string
+    validation:
+      pattern: ^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$
+      required: false
+  priority:
+    access:
+      requires:
+        - access:confidential
+        - role:admin
+    checklist:
+      authority: admin.
+      automation_hooks: used for scheduling order (critical jobs run before normal).
+      cardinality: one
+      criticality: association
+      default: normal
+      dependencies: scheduler.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: |
+        Scheduling priority. Higher priority jobs are submitted before lower when the scheduler
+        loads and runs immediate/triggered work (e.g. cache_prewarm, cache_invalidation, retention).
+        Use critical for jobs that must run first so caches and critical work complete before others.
+      security: non-sensitive
+      system_usage:
+        - scheduler
+      validation: enum (normal, high, critical).
+    field_profile_code: SCH-027
+    permissions: rwx
+    semantic_type: state
+    traits:
+      - readable
+      - writable
+      - modifiable
+      - filterable
+      - sortable
+    type: enum
+    validation:
+      enum:
+        - normal
+        - high
+        - critical
+      required: false
+  retry_count:
+    access:
+      requires:
+        - access:confidential
+        - role:admin
+    checklist:
+      authority: admin.
+      automation_hooks: determines retry behavior on failure.
+      cardinality: zero_or_one
+      criticality: association
+      default: 0
+      dependencies: scheduler (for run_wrapper job_type).
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Number of retry attempts on failure (for run_wrapper job_type). 0 = no retries.
+      security: non-sensitive
+      system_usage:
+        - scheduler
+      validation: integer (0-10).
+    field_profile_code: SCH-014
+    permissions: rwx
+    semantic_type: quantity
+    traits:
+      - field_mutable_group
+    type: integer
+    validation:
+      required: false
+  retry_delay_seconds:
+    access:
+      requires:
+        - access:confidential
+        - role:admin
+    checklist:
+      authority: admin.
+      automation_hooks: determines retry delay.
+      cardinality: zero_or_one
+      criticality: association
+      default: 5
+      dependencies: scheduler (for run_wrapper job_type).
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Delay in seconds between retry attempts (for run_wrapper job_type).
+      security: non-sensitive
+      system_usage:
+        - scheduler
+      validation: integer (0-3600).
+    field_profile_code: SCH-015
+    permissions: rwx
+    semantic_type: quantity
+    traits:
+      - readable
+      - writable
+      - modifiable
+    type: integer
+    validation:
+      required: false
+  route_handlers:
+    access:
+      requires:
+        - access:confidential
+        - role:admin
+    checklist:
+      authority: admin.
+      automation_hooks: configures route routing.
+      cardinality: zero_or_one
+      criticality: composition
+      default: null (uses default routes)
+      dependencies: scheduler (for callback_listener job_type).
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Route-to-handler mappings for callback listener (for callback_listener job_type). Key-value pairs map route to handler_type.
+      security: non-sensitive
+      system_usage:
+        - scheduler
+      validation: object (route -> handler_type mappings).
+    field_profile_code: SCH-023
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - field_mutable_group
+    type: object
+    validation:
+      required: false
+  schedule_expression:
+    access:
+      requires:
+        - access:confidential
+        - role:admin
+    checklist:
+      authority: admin.
+      automation_hooks: scheduling (timer jobs only).
+      cardinality: zero_or_one
+      criticality: composition
+      default: null
+      dependencies: scheduler (only for timer trigger_type).
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Cron/ISO schedule or cadence definition (required for timer trigger_type, optional otherwise).
+      security: non-sensitive
+      system_usage:
+        - scheduler
+      validation: cron expression or ISO duration.
+    field_profile_code: SCH-003
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+      - modifiable
+    type: string
+    validation:
+      required: false
+  transactional:
+    access:
+      requires:
+        - access:confidential
+        - role:admin
+    checklist:
+      authority: admin.
+      automation_hooks: determines if job operations are wrapped in a transaction (all-or-nothing).
+      cardinality: one
+      criticality: composition
+      default: false
+      dependencies: scheduler.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: If true, all storage operations within the job are wrapped in a transaction. On success, all operations commit atomically. On failure, all operations rollback.
+      security: non-sensitive
+      system_usage:
+        - scheduler
+      validation: boolean.
+    field_profile_code: SCH-023
+    permissions: rwx
+    semantic_type: state
+    traits:
+      - filterable
+      - modifiable
+      - readable
+      - writable
+    type: boolean
+    validation:
+      required: false
+  trigger_type:
+    access:
+      requires:
+        - access:confidential
+        - role:admin
+    checklist:
+      authority: admin.
+      automation_hooks: determines how job is scheduled/triggered.
+      cardinality: one
+      criticality: composition
+      default: timer
+      dependencies: scheduler.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: How the job is triggered (timer=cron schedule, manual=user-triggered, immediate=run once now, workflow=workflow event, event=system event).
+      security: non-sensitive
+      system_usage:
+        - scheduler
+      validation: enum (timer, manual, immediate, workflow, event, lifecycle).
+    field_profile_code: SCH-002
+    permissions: rwx
+    semantic_type: state
+    traits:
+      - filterable
+      - groupable
+      - modifiable
+      - readable
+      - sortable
+      - writable
+    type: enum
+    validation:
+      enum:
+        - timer
+        - manual
+        - immediate
+        - workflow
+        - event
+        - lifecycle
+      required: true
+  working_directory:
+    access:
+      requires:
+        - access:confidential
+        - role:admin
+    checklist:
+      authority: admin.
+      automation_hooks: sets CWD for command execution.
+      cardinality: zero_or_one
+      criticality: association
+      default: null (uses scheduler's working directory)
+      dependencies: scheduler (for run_wrapper job_type).
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Working directory for command execution (for run_wrapper job_type).
+      security: non-sensitive
+      system_usage:
+        - scheduler
+      validation: string (directory path).
+    field_profile_code: SCH-012
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+      - modifiable
+    type: string
+    validation:
+      required: false

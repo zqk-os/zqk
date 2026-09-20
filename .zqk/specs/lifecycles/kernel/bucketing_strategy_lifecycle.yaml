@@ -1,0 +1,74 @@
+$schema: "../../../.zqk/cli/specs/schemas/lifecycle_spec.schema.json"
+
+object_type: bucketing_strategy
+# Five-question exam: docs/architecture/LIFECYCLE_STATE_MACHINE_RUBRIC.md
+# TRACK: BLI-CEF-R26-REMAINING-KINDS-001
+statuses:
+  - value: conceptual
+    display: Conceptual
+    origin: true
+    preliminary: true
+    description: Draft plane status. Prior to CAS membrane crossing.
+    role: realign
+  - value: originated
+    display: Originated
+    description: CAS membrane crossed. Object officially originated.
+    role: realign
+  - value: active
+    display: Active
+    origin: false
+    description: Strategy is active and being used by the storage layer
+    role: shovel_ready
+  - value: archived
+    display: Archived
+    terminal: true
+    archive: true
+    description: Strategy has been deprecated and is no longer used
+    role: terminal
+  - value: error
+    display: Error
+    system: true
+    description: Strategy has an invalid configuration or encountered an error
+    role: halted
+transitions:
+  - from: conceptual
+    to: originated
+    description: Promote from draft plane to CAS membrane (CAS Qualification).
+    manual: true
+    auto: false
+    catalyst: System promotion
+  - from: originated
+    to: active
+    description: Initial domain workflow transition to active.
+    manual: true
+    auto: true
+    catalyst: System initialization
+  - from: active
+    to: archived
+    description: Archive the strategy (deprecate it)
+    manual: true
+    auto: false
+    postconditions:
+      - role is terminal
+      - ended; no further normal execution hops expected
+  - from: '*'
+    to: error
+    description: Strategy encountered a system error or validation failure
+    manual: false
+    auto: true
+    postconditions:
+      - role is halted
+      - hop from any occupancy to error
+      - system halt; repair before leaving halted
+percent_complete:
+  method: status_defaults
+  default_by_status:
+    conceptual: 0
+    originated: 5
+    active: 100
+    archived: 100
+    error: 0
+created_at: 2026-07-01T18:00:00Z
+updated_at: 2026-07-01T18:00:00Z
+created_by: ACC-1785920548450214012-68b850c0
+updated_by: ACC-1785920548450214012-68b850c0

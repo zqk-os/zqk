@@ -1,0 +1,14 @@
+kinds:
+  audit_event:
+    max_count: 5
+    protect_statuses: ["pending"]
+  change_journal_entry:
+    archive_after: "0"
+    cleanup_after: "72h"
+    max_count: 200
+    protect_statuses: []
+  zqk_session:
+    archive_after: "0"
+    cleanup_after: "168h"
+    max_count: 300
+    protect_statuses: []

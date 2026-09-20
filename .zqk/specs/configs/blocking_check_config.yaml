@@ -1,0 +1,17 @@
+$schema: "../../../.zqk/cli/specs/schemas/blocking_check_config.schema.json"
+
+bypass_kinds:
+    - audit_event
+    - change_journal_entry
+    - scheduler_job
+description: |
+    Configuration for blocking check bypass rules.
+    This allows the system to bypass blocking checks for specific object kinds that are
+    created by the system itself and are necessary for audit trails and system operations.
+    These kinds can be updated even when there are blocking issues in the system.
+version: 1.0.0
+
+created_at: 2026-07-01T18:00:00Z
+updated_at: 2026-07-01T18:00:00Z
+created_by: ACC-1785920548450214012-68b850c0
+updated_by: ACC-1785920548450214012-68b850c0

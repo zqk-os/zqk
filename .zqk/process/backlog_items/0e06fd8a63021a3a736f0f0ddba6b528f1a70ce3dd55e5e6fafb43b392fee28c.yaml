@@ -1,0 +1,35 @@
+acceptance_considerations: Vendor integrations isolated into pluggable vendor namespaces.
+actual_effort: 0.03h
+commit_hashes:
+    - 984c1f2
+completed_at: "2026-09-20T01:18:32Z"
+created_at: "2026-09-19T05:55:00Z"
+created_by: ACC-1785920548450214012-68b850c0
+criteria_refs:
+    - CRIT-CLI-VENDOR-ISOLATION-001
+description: Relocate Cursor adapter specs/commands and AppleScript paste utilities out of core scheduler/mcp into a dedicated pluggable vendor adapter hierarchy.
+estimated_effort: 4h
+id: BLI-CLI-VENDOR-ADAPTER-ISOLATION-001
+kind: backlog_item
+milestone_refs:
+    - MIL-CLI-TAXONOMY-001
+namespace_id: zqk:kernel
+persona_refs:
+    - PER-COMMUNITY-SOFTWARE-ENGINEER
+priority: high
+priority_plan_ref: PRI-CLI-TAXONOMY-OVERHAUL-001
+priority_tier: P0
+problem_statement: Vendor integrations (Cursor, AppleScript) pollute core kernel commands.
+requirement_refs:
+    - REQ-CLI-TAXONOMY-HARMONIZATION-001
+schema_version: 2.0.0
+started_at: "2026-09-20T01:17:00Z"
+status: complete
+test_case_refs:
+    - TST-CLI-VENDOR-ISOLATION-001
+title: Isolate vendor-specific commands (Cursor adapter, AppleScript paste) into pluggable vendor namespaces
+updated_at: "2026-09-20T01:18:32Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs:
+    - WS-CLI-TAXONOMY-OVERHAUL

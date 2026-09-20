@@ -1,0 +1,36 @@
+# Periodic auto-fix run: runs system check --auto-fix every 5 minutes so autofixes are applied regularly
+# without requiring a manual "zqk system check --auto-fix". Ensures the system reaches a good state quickly.
+#
+# Create via: zqk object create scheduler_job --file scripts/scheduler_jobs/autofix_run_periodic.yaml
+# Or ensure maintenance bundle: zqk system ensure-retention-jobs (when autofix_run is included)
+#
+# Uses run_wrapper; ZQK_BIN is set by the scheduler so the same binary runs the command.
+#
+# Do NOT pass --fast with --auto-fix: partial checks must not mutate (see docs/architecture/check-fast-mode.md).
+
+id: SCH-autofix-run
+title: Auto-fix run (every 5 min)
+description: |
+  Runs `zqk system check all --auto-fix` every 5 minutes so auto-fixable issues
+  (missing hashes, hash mismatches, etc.) are applied regularly and the system reaches
+  a good state without waiting for manual check --auto-fix.
+  Uses a full check surface (refs on): --fast is incompatible with --auto-fix.
+  Uses --timeout 540s (below max_runtime_seconds 600) so the CLI does not stop at the
+  default ~2m floor for --auto-fix while proactive CAS cleanup and validation run.
+job_type: run_wrapper
+trigger_type: timer
+schedule_expression: "0 */5 * * * *"
+category: maintenance
+execution_mode: reusable
+max_runtime_seconds: 600
+enabled: true
+status: active
+namespace_id: zqk:kernel
+schema_version: "2.0.0"
+command: /bin/sh
+command_args:
+  - "-c"
+  - |
+    set -e
+    ZQK="${ZQK_BIN:-zqk}"
+    "$ZQK" system check all --auto-fix --auto-fix-scheduler --timeout 540s

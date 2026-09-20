@@ -1,0 +1,89 @@
+schema_version: 2.0.0
+ontology: integrity_manifest
+extends: base_object
+visibility: internal
+description: 'Snapshot of critical files/objects (e.g., doc_index, project decisions) with hashes for integrity verification. '
+traits:
+  - base_object_traits
+fields:
+  entries:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation.
+      automation_hooks: used during verification.
+      cardinality: many
+      criticality: composition
+      default: []
+      dependencies: hash calculation.
+      observability: "yes"
+      origin_lifecycle: immutable once published.
+      purpose: Hash entries (target reference + hash + timestamp).
+      security: non-sensitive
+      system_usage:
+        - verification
+      validation: list of entry objects.
+    field_profile_code: MAN-003
+    permissions: r-x
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+    type: list
+    validation:
+      required: false
+  hash_algorithm:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation.
+      automation_hooks: instructs verifier.
+      cardinality: one
+      criticality: composition
+      default: sha256
+      dependencies: hash verification.
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: Algorithm used (sha256, blake3, etc.).
+      security: non-sensitive
+      system_usage:
+        - verification
+      validation: known algorithms.
+    field_profile_code: MAN-002
+    permissions: r-x
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+    type: string
+    validation:
+      required: false
+  scope:
+    access:
+      requires:
+        - access:confidential
+        - role:admin
+    checklist:
+      authority: automation/admin.
+      automation_hooks: used during verification.
+      cardinality: many (>=1)
+      criticality: composition
+      default: required
+      dependencies: integrity tooling.
+      observability: "yes"
+      origin_lifecycle: immutable once published.
+      purpose: Files/objects included in the manifest (paths, object IDs).
+      security: non-sensitive
+      system_usage:
+        - verification
+      validation: array of references or paths.
+    field_profile_code: MAN-001
+    permissions: r-x
+    semantic_type: statement
+    traits:
+      - field_mutable_group
+    type: list
+    validation:
+      required: true

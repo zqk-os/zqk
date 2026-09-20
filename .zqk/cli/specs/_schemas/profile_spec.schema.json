@@ -1,0 +1,151 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://zqk.dev/schemas/profile_spec.schema.json",
+  "title": "Profile Specification Schema",
+  "description": "Schema for unified profile specifications that define CLI context, metrics sampler, and transceiver router profiles",
+  "type": "object",
+  "required": ["schema_version", "kind", "type", "metadata"],
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "Reference to this schema file"
+    },
+    "schema_version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "Schema version (semantic versioning)"
+    },
+    "kind": {
+      "type": "string",
+      "const": "profile",
+      "description": "Must be 'profile' for all profile specs"
+    },
+    "type": {
+      "type": "string",
+      "enum": ["cli_context", "metrics_sampler", "transceiver_router"],
+      "description": "Profile type: cli_context, metrics_sampler, or transceiver_router"
+    },
+    "metadata": {
+      "type": "object",
+      "required": ["name"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Profile name (used to reference this profile)"
+        },
+        "extends": {
+          "type": "string",
+          "description": "Parent profile to extend (optional, supports inheritance)"
+        },
+        "description": {
+          "type": "string",
+          "description": "Human-readable description of this profile"
+        }
+      },
+      "additionalProperties": false
+    },
+    "spec": {
+      "type": "object",
+      "description": "Domain-specific configuration (structure varies by type)",
+      "oneOf": [
+        {
+          "title": "CLI Context Profile Spec",
+          "description": "Spec for cli_context type profiles",
+          "properties": {
+            "format": {
+              "type": "string",
+              "enum": ["table", "json", "yaml", "jsonl"],
+              "description": "Output format"
+            },
+            "verbose": {
+              "type": "boolean",
+              "description": "Enable verbose output"
+            },
+            "quiet": {
+              "type": "boolean",
+              "description": "Enable quiet mode"
+            },
+            "flags": {
+              "type": "object",
+              "description": "Flag bundles automatically applied",
+              "additionalProperties": true
+            },
+            "commands": {
+              "type": "object",
+              "description": "Command aliases and variants",
+              "properties": {
+                "aliases": {
+                  "type": "object",
+                  "description": "Command aliases",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                }
+              },
+              "additionalProperties": true
+            },
+            "storage": {
+              "type": "object",
+              "description": "Storage context parameters (pagination, grouping)",
+              "additionalProperties": true
+            }
+          },
+          "additionalProperties": true
+        },
+        {
+          "title": "Metrics Sampler Profile Spec",
+          "description": "Spec for metrics_sampler type profiles",
+          "properties": {
+            "enabled": {
+              "type": "boolean",
+              "description": "Whether sampling is enabled"
+            },
+            "batch_size": {
+              "type": "integer",
+              "minimum": 1,
+              "description": "Number of events to batch before creating metric"
+            },
+            "max_batch_size": {
+              "type": "integer",
+              "minimum": 1,
+              "description": "Maximum batch size"
+            },
+            "flush_interval": {
+              "type": "string",
+              "pattern": "^\\d+[smhd]$",
+              "description": "Time interval for flushing batches (e.g., '5m', '1h')"
+            },
+            "group_by_object_id": {
+              "type": "boolean",
+              "description": "Group events by target object ID"
+            },
+            "applies_to": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "List of object kinds this profile applies to"
+            }
+          },
+          "additionalProperties": true
+        },
+        {
+          "title": "Transceiver Router Profile Spec",
+          "description": "Spec for transceiver_router type profiles",
+          "properties": {
+            "routing_rules": {
+              "type": "array",
+              "description": "Routing rules for message routing",
+              "items": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          },
+          "additionalProperties": true
+        }
+      ]
+    }
+  },
+  "additionalProperties": false
+}

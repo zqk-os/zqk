@@ -1,0 +1,7 @@
+Promote one or more objects to the highest valid lifecycle status they satisfy
+
+Usage:
+  zqk object promote <id> [id...] [flags]
+
+Global Flags:
+      --allow-degraded   Allow scheduler-dependent commands to run when scheduler daemon is not running

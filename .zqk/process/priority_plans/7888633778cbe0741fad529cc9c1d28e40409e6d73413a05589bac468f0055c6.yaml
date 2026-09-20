@@ -1,0 +1,52 @@
+child_rollup:
+  actual_effort:
+    avg_hours: 1
+    formatted: 1h
+    max_hours: 1
+    min_hours: 1
+    total_hours: 1
+  completed_count: 1
+  estimated_effort:
+    avg_hours: 1
+    formatted: 1h
+    max_hours: 1
+    min_hours: 1
+    total_hours: 1
+  halted_count: 0
+  in_progress_count: 0
+  open_count: 0
+  percent_complete: 100
+  total_count: 1
+completed_at: '2026-09-19T01:49:21Z'
+created_at: '2026-09-19T01:34:58Z'
+created_by: ACC-1785920548450214012-68b850c0
+description: 'Comprehensive remediation of exposed surface area across the open-core
+  distribution to achieve full project-agnostic architecture:
+
+  1. Normalize all 121 object_spec file_path properties from absolute machine paths
+  to relative paths (.zqk/specs/objects/...)
+
+  2. Remove personal developer usernames from Go auth tables (seat_account.go)
+
+  3. Ensure scenario summaries and demo scripts use cross-platform path variables
+  ($HOME)
+
+  '
+id: PRI-PROJECT-AGNOSTIC-HARDENING-001
+kind: priority_plan
+namespace_id: zqk:kernel
+persona_refs:
+- PER-COMMUNITY-SOFTWARE-ENGINEER
+- PER-COMMUNITY-QA-AUDITOR
+priority_plan_complete: true
+priority_plan_percent_complete: 100
+priority_tier: P0
+schema_version: 2.0.0
+started_at: '2026-09-19T01:35:28Z'
+status: complete
+title: Eliminate Machine Paths, Personal Identifiers, and Surface Area Hardcoding
+updated_at: '2026-09-19T01:49:21Z'
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs:
+- WS-1789631797993326000-f9951fe8

@@ -1,0 +1,276 @@
+schema_version: 2.0.0
+ontology: mcp_session
+extends: base_object
+visibility: internal
+storage_profile: stream
+description: 'Represents an MCP client session and its authentication state. Tracks authentication status, account, roles, and permissions for MCP connections.\nLifecycle: mcp_session_lifecycle.yaml.\n'
+traits: []
+fields:
+  account_id:
+    checklist:
+      authority: user/system
+      automation_hooks: set during authentication
+      cardinality: zero_or_one
+      criticality: composition
+      default: null
+      dependencies: account object
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Account ID once authenticated (e.g., \\\"account:cursor-vscode\\\")
+      security: non-sensitive
+      system_usage:
+        - authentication
+        - authorization
+      validation: Must match account ID pattern
+    field_profile_code: MCP-004
+    permissions: rwx
+    semantic_type: reference
+    traits:
+      - readable
+      - writable
+      - filterable
+    type: string
+    validation:
+      pattern: ^(account:[a-z0-9._-]+|ACC-\d{3,})$
+      required: false
+  authentication_status:
+    checklist:
+      authority: system
+      automation_hooks: updated by authentication flow
+      cardinality: one
+      criticality: composition
+      default: pending_authentication
+      dependencies: authentication flow
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Current authentication status (pending_authentication, authenticated, expired, revoked)
+      security: non-sensitive
+      system_usage:
+        - authentication flow
+        - session management
+      validation: 'Must be one of: pending_authentication, authenticated, expired, revoked'
+    field_profile_code: MCP-003
+    permissions: rwx
+    semantic_type: state
+    traits:
+      - readable
+      - writable
+      - filterable
+    type: string
+    validation:
+      enum:
+        - pending_authentication
+        - authenticated
+        - expired
+        - revoked
+      required: true
+  client_id:
+    checklist:
+      authority: system
+      automation_hooks: set by MCP server on connection
+      cardinality: one
+      criticality: composition
+      default: null
+      dependencies: MCP client connection
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: Unique identifier for the MCP client connection
+      security: non-sensitive
+      system_usage:
+        - session tracking
+        - authentication
+      validation: Client-provided identifier
+    field_profile_code: MCP-001
+    permissions: r-x
+    semantic_type: identifier
+    traits:
+      - readable
+      - filterable
+      - sortable
+    type: string
+    validation:
+      required: true
+  client_name:
+    checklist:
+      authority: system
+      automation_hooks: set by MCP server from clientInfo
+      cardinality: one
+      criticality: association
+      default: null
+      dependencies: MCP client connection
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Human-readable name of the MCP client (e.g., \\\"cursor-vscode\\\")
+      security: non-sensitive
+      system_usage:
+        - session tracking
+        - logging
+      validation: Client-provided name
+    field_profile_code: MCP-002
+    permissions: r-x
+    semantic_type: statement
+    traits:
+      - readable
+      - filterable
+    type: string
+    validation:
+      required: false
+  id:
+    checklist:
+      authority: system
+      automation_hooks: set by MCP server on connection
+      cardinality: one
+      criticality: composition
+      default: null
+      dependencies: MCP session lifecycle
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: Stable identifier for an MCP session (supports client sessions and agent/test sessions)
+      security: non-sensitive
+      system_usage:
+        - session tracking
+        - authentication
+      validation: Must match MCP session ID pattern
+    field_profile_code: MCP-000
+    permissions: r-x
+    semantic_type: identifier
+    traits:
+      - readable
+      - filterable
+      - sortable
+    type: string
+    validation:
+      pattern: ^MCP-\d+$
+      required: true
+  last_activity:
+    checklist:
+      authority: system
+      automation_hooks: updated on each MCP request
+      cardinality: one
+      criticality: association
+      default: null
+      dependencies: MCP server activity tracking
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: ISO-8601 timestamp of last MCP activity
+      security: non-sensitive
+      system_usage:
+        - session management
+        - timeout detection
+      validation: ISO-8601 datetime
+    field_profile_code: MCP-007
+    permissions: r-x
+    semantic_type: timestamp
+    traits:
+      - readable
+      - filterable
+      - sortable
+    type: datetime
+    validation:
+      required: false
+  permissions:
+    checklist:
+      authority: user/system
+      automation_hooks: set during authentication
+      cardinality: zero_or_many
+      criticality: composition
+      default: []
+      dependencies: role objects
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Permissions granted to this session after authentication
+      security: non-sensitive
+      system_usage:
+        - authorization
+        - access control
+      validation: 'Array of permission strings (format: \\\"operation:resource\\\")'
+    field_profile_code: MCP-006
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+    type: array
+    validation:
+      required: false
+  roles:
+    checklist:
+      authority: user/system
+      automation_hooks: set during authentication
+      cardinality: zero_or_many
+      criticality: composition
+      default: []
+      dependencies: role objects
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Roles assigned to this session after authentication
+      security: non-sensitive
+      system_usage:
+        - authorization
+        - access control
+      validation: Array of role identifiers
+    field_profile_code: MCP-005
+    permissions: rwx
+    semantic_type: reference
+    traits:
+      - readable
+      - writable
+    type: array
+    validation:
+      required: false
+  status:
+    checklist:
+      authority: system
+      automation_hooks: set on session create (in_progress); set to disconnected on client disconnect
+      cardinality: one
+      criticality: composition
+      default: in_progress
+      dependencies: MCP session lifecycle
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Session lifecycle stage (in_progress while connected; disconnected on EOF/timeout/shutdown; eligible for retention when not in_progress)
+      security: non-sensitive
+      system_usage:
+        - session tracking
+        - retention_tolerance (prunes disconnected/archived)
+      validation: Must be one of in_progress, disconnected, archived, error (see mcp_session lifecycle)
+    field_profile_code: MCP-009
+    permissions: rwx
+    semantic_type: state
+    traits:
+      - readable
+      - writable
+      - filterable
+    type: enum
+    validation:
+      enum:
+        - in_progress
+        - disconnected
+        - archived
+        - error
+      required: true
+  title:
+    checklist:
+      authority: system
+      automation_hooks: optional; may be set for agent/test sessions
+      cardinality: zero_or_one
+      criticality: association
+      default: null
+      dependencies: none
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Optional human-readable label for the session
+      security: non-sensitive
+      system_usage:
+        - observability
+        - debugging
+      validation: Optional
+    field_profile_code: MCP-008
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - filterable
+    type: string
+    validation:
+      required: false

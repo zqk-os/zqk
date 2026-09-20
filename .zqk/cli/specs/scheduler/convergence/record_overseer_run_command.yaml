@@ -1,0 +1,16 @@
+$schema: "../../schemas/command_spec.schema.json"
+
+name: "record-overseer-run [COORDINATOR_SESSION_ID]"
+short: "Append overseer_run_v1 line (delegates to scripts/record_convergence_overseer_run.sh)"
+description: |
+  Read-only: runs zqk scheduler convergence overseer and appends one JSON line to
+  .zqk/logs/scheduler/cvs/overseer_runs.jsonl. Coordinator id as first argument or COORDINATOR_SESSION_ID.
+
+  Requires bash and jq on PATH. See scripts/README.md — Convergence promotion and overseer helpers.
+
+args:
+  type: maximum
+  max: 1
+
+run_e: schedulerConvergenceRecordOverseerRun
+common_flags: true

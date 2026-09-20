@@ -1,0 +1,645 @@
+schema_version: 2.0.0
+ontology: kind_mapping_metric
+extends: base_metric
+visibility: internal
+description: 'Kind mappings initialization and lookup metrics. Tracks config loading, backend operations, mapping lookups, cache performance, initialization duration, and discovery operations for monitoring the kind-to-directory mapping system performance and reliability. '
+traits:
+  - listable
+  - readable
+  - writable
+  - modifiable
+  - formatable
+  - groupable
+  - filterable
+  - sortable
+  - searchable
+fields:
+  backend_config_merges:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation (kind mappings system)
+      automation_hooks: used for config merge frequency analysis.
+      cardinality: one
+      criticality: association
+      default: 0
+      dependencies: kind mappings configuration system.
+      observability: "yes"
+      origin_lifecycle: mutable (incremented on each config merge)
+      purpose: Total number of backend config merges performed.
+      security: non-sensitive
+      system_usage:
+        - configuration analysis
+        - performance monitoring
+      validation: Non-negative integer.
+    field_profile_code: KMM-005
+    permissions: rwx
+    semantic_type: measurement
+    traits:
+      - listable
+      - readable
+      - writable
+      - filterable
+      - sortable
+    type: integer
+    validation:
+      required: true
+  backend_switches:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation (kind mappings system)
+      automation_hooks: used for backend switch frequency analysis.
+      cardinality: one
+      criticality: association
+      default: 0
+      dependencies: kind mappings configuration system.
+      observability: "yes"
+      origin_lifecycle: mutable (incremented on each backend switch)
+      purpose: Total number of backend type switches (file to graph, etc.).
+      security: non-sensitive
+      system_usage:
+        - backend usage tracking
+        - configuration analysis
+      validation: Non-negative integer.
+    field_profile_code: KMM-004
+    permissions: rwx
+    semantic_type: measurement
+    traits:
+      - listable
+      - readable
+      - writable
+      - filterable
+      - sortable
+    type: integer
+    validation:
+      required: true
+  cache_hits:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation (kind mappings system)
+      automation_hooks: used for cache hit rate calculation.
+      cardinality: one
+      criticality: composition
+      default: 0
+      dependencies: kind mappings cache system.
+      observability: "yes"
+      origin_lifecycle: mutable (incremented on each cache hit)
+      purpose: Total number of cache hits (lookups that found cached mappings).
+      security: non-sensitive
+      system_usage:
+        - performance analysis
+        - cache effectiveness
+        - optimization
+      validation: Non-negative integer.
+    field_profile_code: KMM-008
+    permissions: rwx
+    semantic_type: measurement
+    traits:
+      - listable
+      - readable
+      - writable
+      - filterable
+      - sortable
+    type: integer
+    validation:
+      required: true
+  cache_misses:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation (kind mappings system)
+      automation_hooks: used for cache miss rate calculation.
+      cardinality: one
+      criticality: composition
+      default: 0
+      dependencies: kind mappings cache system.
+      observability: "yes"
+      origin_lifecycle: mutable (incremented on each cache miss)
+      purpose: Total number of cache misses (lookups that required computation).
+      security: non-sensitive
+      system_usage:
+        - performance analysis
+        - cache effectiveness
+        - optimization
+      validation: Non-negative integer.
+    field_profile_code: KMM-009
+    permissions: rwx
+    semantic_type: measurement
+    traits:
+      - listable
+      - readable
+      - writable
+      - filterable
+      - sortable
+    type: integer
+    validation:
+      required: true
+  config_load_duration_ms:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation (kind mappings system)
+      automation_hooks: used for performance analysis.
+      cardinality: one
+      criticality: composition
+      default: 0
+      dependencies: kind mappings configuration system.
+      observability: "yes"
+      origin_lifecycle: mutable (accumulated on each config load)
+      purpose: Total time spent loading configs in milliseconds.
+      security: non-sensitive
+      system_usage:
+        - performance analysis
+        - trend tracking
+        - optimization
+      validation: Non-negative number.
+    field_profile_code: KMM-003
+    permissions: rwx
+    semantic_type: measurement
+    traits:
+      - listable
+      - readable
+      - writable
+      - filterable
+      - sortable
+    type: number
+    validation:
+      required: true
+  config_load_failures:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation (kind mappings system)
+      automation_hooks: used for error rate calculation.
+      cardinality: one
+      criticality: association
+      default: 0
+      dependencies: kind mappings configuration system.
+      observability: "yes"
+      origin_lifecycle: mutable (incremented on each failed config load)
+      purpose: Total number of failed config loads.
+      security: non-sensitive
+      system_usage:
+        - error analysis
+        - reliability reporting
+        - health monitoring
+      validation: Non-negative integer.
+    field_profile_code: KMM-002
+    permissions: rwx
+    semantic_type: measurement
+    traits:
+      - listable
+      - readable
+      - writable
+      - filterable
+      - sortable
+    type: integer
+    validation:
+      required: true
+  config_loads:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation (kind mappings system)
+      automation_hooks: used for config load frequency analysis.
+      cardinality: one
+      criticality: composition
+      default: 0
+      dependencies: kind mappings configuration system.
+      observability: "yes"
+      origin_lifecycle: mutable (incremented on each config load)
+      purpose: Total number of successful config loads.
+      security: non-sensitive
+      system_usage:
+        - reporting
+        - frequency tracking
+        - performance monitoring
+      validation: Non-negative integer.
+    field_profile_code: KMM-001
+    permissions: rwx
+    semantic_type: measurement
+    traits:
+      - listable
+      - readable
+      - writable
+      - filterable
+      - sortable
+    type: integer
+    validation:
+      required: true
+  directories_scanned:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation (kind mappings system)
+      automation_hooks: used for discovery scope analysis.
+      cardinality: one
+      criticality: composition
+      default: 0
+      dependencies: kind mappings discovery system.
+      observability: "yes"
+      origin_lifecycle: mutable (incremented for each directory scanned)
+      purpose: Total number of directories scanned during initialization.
+      security: non-sensitive
+      system_usage:
+        - discovery scope tracking
+        - performance analysis
+      validation: Non-negative integer.
+    field_profile_code: KMM-014
+    permissions: rwx
+    semantic_type: measurement
+    traits:
+      - listable
+      - readable
+      - writable
+      - filterable
+      - sortable
+    type: integer
+    validation:
+      required: true
+  directory_lookups:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation (kind mappings system)
+      automation_hooks: used for lookup frequency analysis.
+      cardinality: one
+      criticality: composition
+      default: 0
+      dependencies: kind mappings system.
+      observability: "yes"
+      origin_lifecycle: mutable (incremented on each GetDirectoryFromKind call)
+      purpose: Total number of GetDirectoryFromKind lookup operations.
+      security: non-sensitive
+      system_usage:
+        - performance analysis
+        - usage tracking
+      validation: Non-negative integer.
+    field_profile_code: KMM-006
+    permissions: rwx
+    semantic_type: measurement
+    traits:
+      - listable
+      - readable
+      - writable
+      - filterable
+      - sortable
+    type: integer
+    validation:
+      required: true
+  discovery_errors:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation (kind mappings system)
+      automation_hooks: used for error rate calculation.
+      cardinality: one
+      criticality: association
+      default: 0
+      dependencies: kind mappings discovery system.
+      observability: "yes"
+      origin_lifecycle: mutable (incremented on each discovery error)
+      purpose: Total number of errors encountered during discovery/initialization.
+      security: non-sensitive
+      system_usage:
+        - error analysis
+        - reliability reporting
+        - health monitoring
+      validation: Non-negative integer.
+    field_profile_code: KMM-017
+    permissions: rwx
+    semantic_type: measurement
+    traits:
+      - listable
+      - readable
+      - writable
+      - filterable
+      - sortable
+    type: integer
+    validation:
+      required: true
+  inference_rule_hits:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation (kind mappings system)
+      automation_hooks: used for inference rule usage analysis.
+      cardinality: one
+      criticality: association
+      default: 0
+      dependencies: kind mappings inference system.
+      observability: "yes"
+      origin_lifecycle: mutable (incremented when inference rules are used)
+      purpose: Total number of times inference rules were used to determine mappings.
+      security: non-sensitive
+      system_usage:
+        - inference effectiveness
+        - configuration completeness
+        - optimization
+      validation: Non-negative integer.
+    field_profile_code: KMM-010
+    permissions: rwx
+    semantic_type: measurement
+    traits:
+      - listable
+      - readable
+      - writable
+      - filterable
+      - sortable
+    type: integer
+    validation:
+      required: true
+  initialization_duration_ms:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation (kind mappings system)
+      automation_hooks: used for initialization performance analysis.
+      cardinality: one
+      criticality: composition
+      default: 0
+      dependencies: kind mappings initialization system.
+      observability: "yes"
+      origin_lifecycle: mutable (accumulated on each initialization)
+      purpose: Total time spent initializing in milliseconds.
+      security: non-sensitive
+      system_usage:
+        - performance analysis
+        - trend tracking
+        - optimization
+      validation: Non-negative number.
+    field_profile_code: KMM-012
+    permissions: rwx
+    semantic_type: measurement
+    traits:
+      - listable
+      - readable
+      - writable
+      - filterable
+      - sortable
+    type: number
+    validation:
+      required: true
+  initializations:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation (kind mappings system)
+      automation_hooks: used for initialization frequency analysis.
+      cardinality: one
+      criticality: composition
+      default: 0
+      dependencies: kind mappings initialization system.
+      observability: "yes"
+      origin_lifecycle: mutable (incremented on each Initialize() call)
+      purpose: Total number of Initialize() operations performed.
+      security: non-sensitive
+      system_usage:
+        - initialization tracking
+        - performance monitoring
+      validation: Non-negative integer.
+    field_profile_code: KMM-011
+    permissions: rwx
+    semantic_type: measurement
+    traits:
+      - listable
+      - readable
+      - writable
+      - filterable
+      - sortable
+    type: integer
+    validation:
+      required: true
+  kind_lookups:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation (kind mappings system)
+      automation_hooks: used for lookup frequency analysis.
+      cardinality: one
+      criticality: composition
+      default: 0
+      dependencies: kind mappings system.
+      observability: "yes"
+      origin_lifecycle: mutable (incremented on each GetKindFromDirectory call)
+      purpose: Total number of GetKindFromDirectory lookup operations.
+      security: non-sensitive
+      system_usage:
+        - performance analysis
+        - usage tracking
+      validation: Non-negative integer.
+    field_profile_code: KMM-007
+    permissions: rwx
+    semantic_type: measurement
+    traits:
+      - listable
+      - readable
+      - writable
+      - filterable
+      - sortable
+    type: integer
+    validation:
+      required: true
+  lookup_errors:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation (kind mappings system)
+      automation_hooks: used for error rate calculation.
+      cardinality: one
+      criticality: association
+      default: 0
+      dependencies: kind mappings lookup system.
+      observability: "yes"
+      origin_lifecycle: mutable (incremented on each lookup error)
+      purpose: Total number of errors encountered during lookup operations.
+      security: non-sensitive
+      system_usage:
+        - error analysis
+        - reliability reporting
+        - health monitoring
+      validation: Non-negative integer.
+    field_profile_code: KMM-018
+    permissions: rwx
+    semantic_type: measurement
+    traits:
+      - listable
+      - readable
+      - writable
+      - filterable
+      - sortable
+    type: integer
+    validation:
+      required: true
+  mappings_discovered:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation (kind mappings system)
+      automation_hooks: used for discovery effectiveness analysis.
+      cardinality: one
+      criticality: composition
+      default: 0
+      dependencies: kind mappings discovery system.
+      observability: "yes"
+      origin_lifecycle: mutable (incremented for each mapping discovered)
+      purpose: Total number of kind-to-directory mappings discovered.
+      security: non-sensitive
+      system_usage:
+        - discovery effectiveness
+        - mapping coverage
+        - system completeness
+      validation: Non-negative integer.
+    field_profile_code: KMM-016
+    permissions: rwx
+    semantic_type: measurement
+    traits:
+      - listable
+      - readable
+      - writable
+      - filterable
+      - sortable
+    type: integer
+    validation:
+      required: true
+  max_initialization_time_ms:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation (kind mappings system)
+      automation_hooks: used for worst-case performance analysis.
+      cardinality: one
+      criticality: association
+      default: 0
+      dependencies: kind mappings initialization system.
+      observability: "yes"
+      origin_lifecycle: mutable (updated when new maximum is reached)
+      purpose: Maximum initialization time in milliseconds (worst-case performance).
+      security: non-sensitive
+      system_usage:
+        - performance analysis
+        - SLA monitoring
+        - optimization
+      validation: Non-negative number.
+    field_profile_code: KMM-013
+    permissions: rwx
+    semantic_type: measurement
+    traits:
+      - listable
+      - readable
+      - writable
+      - filterable
+      - sortable
+    type: number
+    validation:
+      required: true
+  measurement_window_end:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation (kind mappings metrics collector)
+      automation_hooks: used for temporal analysis.
+      cardinality: one
+      criticality: association
+      default: auto-populated on metric collection
+      dependencies: metrics collection system.
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: ISO 8601 timestamp of measurement window end.
+      security: non-sensitive
+      system_usage:
+        - temporal analysis
+        - trend tracking
+      validation: ISO 8601 timestamp format.
+    field_profile_code: KMM-020
+    permissions: r-x
+    semantic_type: timestamp
+    traits:
+      - readable
+      - filterable
+      - sortable
+    type: string
+    validation:
+      pattern: ^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$
+      required: true
+  measurement_window_start:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation (kind mappings metrics collector)
+      automation_hooks: used for temporal analysis.
+      cardinality: one
+      criticality: association
+      default: auto-populated on metric collection
+      dependencies: metrics collection system.
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: ISO 8601 timestamp of measurement window start.
+      security: non-sensitive
+      system_usage:
+        - temporal analysis
+        - trend tracking
+      validation: ISO 8601 timestamp format.
+    field_profile_code: KMM-019
+    permissions: r-x
+    semantic_type: timestamp
+    traits:
+      - readable
+      - filterable
+      - sortable
+    type: string
+    validation:
+      pattern: ^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$
+      required: true
+  specs_scanned:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation (kind mappings system)
+      automation_hooks: used for discovery scope analysis.
+      cardinality: one
+      criticality: composition
+      default: 0
+      dependencies: kind mappings discovery system.
+      observability: "yes"
+      origin_lifecycle: mutable (incremented for each spec file scanned)
+      purpose: Total number of spec files scanned during initialization.
+      security: non-sensitive
+      system_usage:
+        - discovery scope tracking
+        - performance analysis
+      validation: Non-negative integer.
+    field_profile_code: KMM-015
+    permissions: rwx
+    semantic_type: measurement
+    traits:
+      - listable
+      - readable
+      - writable
+      - filterable
+      - sortable
+    type: integer
+    validation:
+      required: true

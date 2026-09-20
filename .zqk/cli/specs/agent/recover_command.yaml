@@ -1,0 +1,32 @@
+$schema: "../schemas/command_spec.schema.json"
+
+name: "recover"
+short: "Recover failed agent tasks"
+description: |
+  Finds agent_task objects in error, injects verification feedback into task
+  context, and resets them to planned so orchestrate can re-dispatch.
+
+flags:
+  - name: "all"
+    type: "bool"
+    default: false
+    description: "Recover across all plans"
+  - name: "stale"
+    type: "bool"
+    default: false
+    description: "Include stale in_progress tasks"
+
+args:
+  type: "maximum"
+  count: 1
+
+help:
+  examples:
+    - comment: "Recover error tasks on a plan"
+      command: "%s agent recover <plan-id>"
+    - comment: "Recover every error task"
+      command: "%s agent recover --all"
+  exclude_flags:
+    - "columns"
+
+common_flags: true

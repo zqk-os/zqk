@@ -1,0 +1,24 @@
+$schema: "../schemas/command_spec.schema.json"
+
+name: "dump"
+short: "Capture process dump from the running scheduler daemon"
+description: |
+  Sends SIGUSR1 to the scheduler daemon to capture goroutine dump, heap profile,
+  and thread info to .zqk/scheduler/diagnostics/. Use this when threads or goroutines
+  are escalating. The daemon must be running (zqk scheduler start). Not supported
+  on Windows (SIGUSR1 not available).
+
+help:
+  examples:
+    - comment: "Capture process dump from running daemon"
+      command: "%s scheduler dump"
+  exclude_flags:
+    - "format"
+    - "output"
+    - "verbose"
+    - "quiet"
+    - "timeout"
+    - "columns"
+
+run_e: "runDump"
+common_flags: true

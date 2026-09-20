@@ -1,0 +1,22 @@
+$schema: "../schemas/command_spec.schema.json"
+
+name: "status"
+short: "Show scheduler daemon status"
+description: |
+  Show the current status of the scheduler daemon and running jobs.
+
+help:
+  examples:
+    - comment: "Show scheduler status"
+      command: "%s scheduler status"
+  exclude_flags:
+    - "format"
+    - "output"
+    - "verbose"
+    - "quiet"
+    - "timeout"
+    - "columns"
+
+run_e: "runStatus"
+async: true
+common_flags: true

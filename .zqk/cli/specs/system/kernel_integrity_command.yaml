@@ -1,0 +1,35 @@
+$schema: "../schemas/command_spec.schema.json"
+
+name: "kernel-integrity"
+short: "Kernel Mutation Pipeline coverage, dangling-ref heal, and work-envelope backfill"
+description: |
+  Observability and heal helpers for closed kernel.cas_object_* mutation kinds.
+  Compose materializes pipeline_definition rows from kind×intent composition.
+  See docs/architecture/KERNEL_MUTATION_PIPELINE.md.
+
+help:
+  examples:
+    - comment: "Coverage + composition registry size"
+      command: "%s system kernel-integrity report"
+    - comment: "Compile definitions without writing CAS"
+      command: "%s system kernel-integrity compose --dry-run"
+    - comment: "Materialize pipeline_definition rows"
+      command: "%s system kernel-integrity compose"
+    - comment: "Preview dangling-ref unlinks"
+      command: "%s system kernel-integrity heal-dangling"
+    - comment: "Preview missing work-envelope clocks"
+      command: "%s system kernel-integrity backfill-work-envelope"
+  exclude_flags:
+    - "columns"
+    - "ignore-scheduler-down"
+
+common_flags: false
+subcommands:
+  - name: report
+    spec_ref: system/kernel_integrity/report_command.yaml
+  - name: compose
+    spec_ref: system/kernel_integrity/compose_command.yaml
+  - name: heal-dangling
+    spec_ref: system/kernel_integrity/heal_dangling_command.yaml
+  - name: backfill-work-envelope
+    spec_ref: system/kernel_integrity/backfill_work_envelope_command.yaml

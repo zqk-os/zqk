@@ -1,0 +1,31 @@
+package bldr_trait_v1
+
+import (
+	"github.com/zqk-os/zqk/pkg/specbuilder/trait_builders"
+)
+
+// SortableBuilder builds the sortable trait at version v1_0_0
+// File: bldr_trait_v1/sortable_builder.go - version is encoded in package/directory name
+type SortableBuilder struct {
+	*trait_builders.BaseTraitBuilder
+}
+
+// NewSortableBuilder creates a new builder for sortable trait version v1_0_0
+func NewSortableBuilder() *SortableBuilder {
+	builder := &SortableBuilder{
+		BaseTraitBuilder: trait_builders.NewBaseTraitBuilder("sortable", "v1_0_0"),
+	}
+
+	// Configure the trait
+	builder.
+		SetDescription("Object/field can be sorted in collections").
+		SetCategory("standard").
+		SetObjectLevel(false).
+		SetFieldLevel(false)
+
+	return builder
+}
+
+func init() {
+	trait_builders.RegisterBuilder(NewSortableBuilder())
+}

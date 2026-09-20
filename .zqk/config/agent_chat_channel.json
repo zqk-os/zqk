@@ -1,0 +1,8 @@
+{
+  "schema_version": "1",
+  "enabled": true,
+  "delivery_mode": "notify",
+  "feed_id": "AGF-1789865874592905000-4519d578",
+  "materialized_at": "2026-09-20T00:58:36Z",
+  "contract_schema_version": "1"
+}

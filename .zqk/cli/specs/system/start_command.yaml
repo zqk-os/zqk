@@ -1,0 +1,18 @@
+$schema: "../schemas/command_spec.schema.json"
+name: "start"
+short: "Start all ZQK daemons"
+description: |
+  Starts the scheduler service and ensures background daemons are loaded.
+
+help:
+  examples:
+    - comment: "Start the entire system"
+      command: "%s system start"
+  exclude_flags:
+    - "columns"
+    - "ignore-scheduler-down"
+
+common_flags: false
+requires_storage: false
+requires_session: false
+requires_scheduler_check: false

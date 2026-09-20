@@ -1,0 +1,116 @@
+$schema: "../../../.zqk/cli/specs/schemas/namespaces_config.schema.json"
+
+default_namespace: zqk:kernel
+description: |
+    Configuration for default namespace mappings for object kinds.
+    This allows the system to assign namespaces to objects without hardcoding
+    kind-to-namespace mappings in source code.
+    
+    All brand names, namespace layers, and validation patterns are configurable
+    to support white-labeling. Change these values to rebrand the system.
+namespace_layers:
+    - zqk
+    - domain
+    - integration
+namespace_validation_pattern: ^(zqk|domain|integration):[a-z0-9_]+(:[a-z0-9_]+)*$
+system_origin: zqk
+project_origin: zqk
+inference_rules:
+    - namespace: domain:organizational
+      pattern: ^(organization|division|department|team|partnership)$
+    - example: integration_jira -> integration:jira
+      namespace_template: integration:{domain}
+      pattern: ^integration_.*|.*_integration$
+    - namespace: zqk:kernel
+      pattern: .*
+namespaces:
+    domain:organizational:
+        description: Organizational domain objects - organizational structure
+        kinds:
+            - organization
+            - division
+            - department
+            - team
+            - partnership
+    zqk:kernel:
+        description: ZQK kernel objects - core system functionality
+        kinds:
+            - goal
+            - milestone
+            - workstream
+            - priority_plan
+            - backlog_item
+            - requirement
+            - criteria
+            - test_case
+            - policy
+            - decision
+            - question
+            - mission
+            - vision
+            - roadmap
+            - workflow
+            - account
+            - agent_feed
+            - role
+            - component
+            - audit_event
+            - change_journal_entry
+            - base_metric
+            - command_metric
+            - scheduler_health_metric
+            - file_lock_metric
+            - kind_mapping_metric
+            - audit_aggregation_metric
+            - code_reference
+            - doc_entry
+            - glossary_term
+            - glossary_term_relation
+            - vocabulary_scheme
+            - persona
+            - resolver
+            - rule
+            - scenario
+            - scheduler_job
+            - scheduler_handler_binding
+            - template
+            - context_refresh_schedule
+            - integrity_manifest
+            - metadata_package
+            - risk_blocker
+            - rollback_report
+            - verification_matrix
+            - display
+            - namespace
+            - namespace_registry
+            - domain_registry
+            - import_tracking
+            - bucketing_strategy
+            - auto_fix_rule
+            - strategic_context
+            - stakeholder_profile
+            - important_date
+        subordinate_namespaces:
+            - zqk:kernel:cli
+            - zqk:kernel:metrics
+            - zqk:kernel:storage
+            - zqk:kernel:scheduler
+    zqk:kernel:cli:
+        description: CLI module - profiles, configurations, and CLI-specific resources
+        kinds:
+            - cli_profile
+            - cli_config
+        parent_namespace: zqk:kernel
+    zqk:kernel:metrics:
+        description: Metrics module - sampler profiles, aggregation settings, and metrics-specific resources
+        kinds:
+            - metrics_profile
+            - sampler_profile
+            - sampler_config
+        parent_namespace: zqk:kernel
+version: 1.0.0
+
+created_at: 2026-07-01T18:00:00Z
+updated_at: 2026-07-01T18:00:00Z
+created_by: ACC-1785920548450214012-68b850c0
+updated_by: ACC-1785920548450214012-68b850c0

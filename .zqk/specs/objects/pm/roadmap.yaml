@@ -1,0 +1,151 @@
+schema_version: 2.0.0
+ontology: roadmap
+extends: work_interval
+visibility: public
+description: 'Strategic roadmap that creates views for a given set of workstreams, their associated priority plans, and backlog items within a specific time window. Roadmaps frame work by specifying workstream_refs and timeline_start/timeline_end to generate Gantt chart visualizations. The structure comes from workstreams (organizational), priority plans (planning), and backlog items (work items) - no manual phase definitions needed.\nLifecycle: roadmap_lifecycle.yaml.\n'
+traits:
+  - base_object_traits
+  - completable
+fields:
+  goal_refs:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: used for goal-roadmap alignment.
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: goal registry.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Goals this roadmap supports.
+      security: non-sensitive
+      system_usage:
+        - traceability
+        - alignment
+      validation: Must reference existing goal IDs.
+    field_profile_code: RDM-006
+    permissions: r-x
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+      - field_reference_group
+    type: list
+    validation:
+      required: false
+  milestone_refs:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: used for roadmap-milestone traceability.
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: milestone registry.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Milestones included in this roadmap.
+      security: non-sensitive
+      system_usage:
+        - planning
+        - traceability
+      validation: Must reference existing milestone IDs.
+    field_profile_code: RDM-005
+    permissions: r-x
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+      - field_reference_group
+    type: list
+    validation:
+      required: false
+  timeline_end:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: used for timeline visualization.
+      cardinality: zero_or_one
+      criticality: association
+      default: null
+      dependencies: timeline generation.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: End date/time for the roadmap (ISO-8601).
+      security: non-sensitive
+      system_usage:
+        - planning
+        - reporting
+      validation: ISO-8601 datetime.
+    field_profile_code: RDM-004
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - field_mutable_group
+    type: string
+    validation:
+      pattern: ^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}:\d{2}Z)?$
+      required: false
+  timeline_start:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: used for timeline visualization.
+      cardinality: zero_or_one
+      criticality: association
+      default: null
+      dependencies: timeline generation.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Start date/time for the roadmap (ISO-8601).
+      security: non-sensitive
+      system_usage:
+        - planning
+        - reporting
+      validation: ISO-8601 datetime.
+    field_profile_code: RDM-003
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+      - modifiable
+    type: string
+    validation:
+      pattern: ^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}:\d{2}Z)?$
+      required: false
+  workstream_refs:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: creator/owner.
+      automation_hooks: used for roadmap filtering and navigation.
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: workstream objects.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Workstreams this roadmap applies to.
+      security: non-sensitive
+      system_usage:
+        - navigation
+        - reporting
+      validation: must reference existing workstream objects.
+    field_profile_code: RDM-001
+    permissions: r-x
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+      - field_reference_group
+    type: list
+    validation:
+      required: false

@@ -1,0 +1,158 @@
+schema_version: 2.0.0
+ontology: change_journal_entry
+extends: base_object
+visibility: internal
+storage_profile: stream
+description: 'Internal object: logged change (create/update/delete/import/health_check) for auditing, rollbacks, and time-series (e.g. health monitor results).\nLifecycle: change_journal_entry_lifecycle.yaml (pending → completed | failed; completed → aggregated; then archived). See .zqk/specs/configs/change_journal_entry_config.md.\nCollection: append on object change (create/update/delete/import) and on health_check (health_monitor:<id>). No samplers/gauges; append-only event log.\nAggregation: change_journal_aggregation job; time window → audit_aggregation_metric; entries marked aggregated; compaction (micro-GC) .cjournal.\nBucketing: chronological monthly (high-volume); retention in retention_tolerance.yaml; bucketing_strategy override supported.\n'
+traits:
+  - base_object_traits
+fields:
+  change_type:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation.
+      automation_hooks: determines rollback behavior.
+      cardinality: one
+      criticality: composition
+      default: update
+      dependencies: rollback logic.
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: Nature of the change (create, update, delete, import, health_check).
+      security: non-sensitive
+      system_usage:
+        - audits
+      validation: enum.
+    field_profile_code: CJE-002
+    permissions: r-x
+    semantic_type: statement
+    traits:
+      - filterable
+      - groupable
+      - listable
+      - modifiable
+      - readable
+      - searchable
+      - sortable
+      - writable
+    type: enum
+    validation:
+      enum:
+        - create
+        - update
+        - delete
+        - import
+        - health_check
+      required: true
+  changed_paths:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation.
+      automation_hooks: used for analytics and compaction (dictionary compression).
+      cardinality: zero_or_many
+      criticality: association
+      default: null
+      dependencies: flattenUpdatePaths from updates map.
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: Flattened dotted paths of changed fields (e.g. meta.tags, status) for analysis and compaction.
+      security: non-sensitive
+      system_usage:
+        - audits
+        - compaction
+      validation: Array of path strings.
+    field_profile_code: CJE-005
+    permissions: r-x
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+      - filterable
+    type: array
+    validation:
+      required: false
+  diff_summary:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation.
+      automation_hooks: used in audit reports.
+      cardinality: zero_or_one
+      criticality: association
+      default: null
+      dependencies: diff tooling.
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: Summary of what changed (fields, old/new).
+      security: non-sensitive
+      system_usage:
+        - audits
+      validation: Free-form text describing changes.
+    field_profile_code: CJE-003
+    permissions: r-x
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+    type: text
+    validation:
+      required: false
+  object_ref:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation.
+      automation_hooks: used to trace changes.
+      cardinality: one
+      criticality: composition
+      default: required
+      dependencies: rollback tooling.
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: Reference to the object that changed.
+      security: non-sensitive
+      system_usage:
+        - audits
+        - rollback
+      validation: URI/reference of the object (e.g., \\\"goal:{id}\\\").
+    field_profile_code: CJE-001
+    permissions: r-x
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+      - field_reference_group
+    type: string
+    validation:
+      required: true
+  previous_state:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation.
+      automation_hooks: used for rollback operations.
+      cardinality: zero_or_one
+      criticality: association
+      default: null
+      dependencies: rollback tooling.
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: Snapshot of object state before change (for rollback).
+      security: non-sensitive
+      system_usage:
+        - rollback
+      validation: Object snapshot.
+    field_profile_code: CJE-004
+    permissions: r-x
+    semantic_type: expression
+    traits:
+      - readable
+    type: object
+    validation:
+      required: false

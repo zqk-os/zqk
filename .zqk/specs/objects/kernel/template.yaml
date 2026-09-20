@@ -1,0 +1,131 @@
+schema_version: 2.0.0
+ontology: template
+extends: base_object
+visibility: internal
+description: 'Prompt/template definitions that generate artifacts (docs, scripts, flows). '
+traits:
+  - base_object_traits
+fields:
+  category:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: used for template filtering.
+      cardinality: one
+      criticality: association
+      default: null
+      dependencies: template registry.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Template category for organization.
+      security: non-sensitive
+      system_usage:
+        - filtering
+        - grouping
+      validation: enum.
+    field_profile_code: TPL-004
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - filterable
+      - groupable
+      - listable
+      - modifiable
+      - readable
+      - searchable
+      - sortable
+      - writable
+    type: enum
+    validation:
+      enum:
+        - branching
+        - commit
+        - structure
+        - bootstrap
+      required: false
+  flow_order:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner/executive.
+      automation_hooks: determines pipeline sequencing.
+      cardinality: one
+      criticality: composition
+      default: null
+      dependencies: CLI flows.
+      observability: "yes"
+      origin_lifecycle: mutable (with approvals).
+      purpose: Position within initialization/generation pipeline.
+      security: non-sensitive
+      system_usage:
+        - workflow orchestration
+      validation: positive integer.
+    field_profile_code: TPL-002
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+      - modifiable
+    type: number
+    validation:
+      required: false
+  outputs:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: instructs generator what to emit.
+      cardinality: many (>=1)
+      criticality: composition
+      default: required
+      dependencies: generators, doc index registration.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Files/artifacts produced by the template.
+      security: non-sensitive
+      system_usage:
+        - generation
+        - doc index
+      validation: paths or identifiers must be valid.
+    field_profile_code: TPL-001
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - field_mutable_group
+    type: list
+    validation:
+      required: true
+  questions:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: used to generate prompts.
+      cardinality: many (>=1)
+      criticality: composition
+      default: []
+      dependencies: prompt engine.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Question set driving the template prompts.
+      security: non-sensitive
+      system_usage:
+        - prompting
+        - AI workflows
+      validation: list of question objects.
+    field_profile_code: TPL-003
+    permissions: rwx
+    semantic_type: expression
+    traits:
+      - readable
+      - writable
+      - modifiable
+    type: list
+    validation:
+      required: false

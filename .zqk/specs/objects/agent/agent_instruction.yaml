@@ -1,0 +1,166 @@
+schema_version: 2.0.0
+ontology: agent_instruction
+extends: base_object
+visibility: public
+storage_profile: stream
+description: 'agent_instruction objects represent proposals or executable instructions submitted to the Autonomy Inbox.\nHuman operators review, approve, or reject these proposals before execution.\nLifecycle: agent_instruction_lifecycle.yaml\n'
+traits:
+  - base_object_traits
+  - manipulatable
+  - constrainable
+fields:
+  execution_log:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: system.
+      automation_hooks: updated during execution.
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: none.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Log of execution steps and results.
+      security: non-sensitive
+      system_usage:
+        - debugging
+        - auditing
+      validation: list of strings.
+    field_profile_code: AGI-004
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - field_mutable_group
+    type: list
+    validation:
+      required: false
+  instruction:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: used by agents for execution context.
+      cardinality: one
+      criticality: composition
+      default: ""
+      dependencies: none.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: The actual prompt or proposal instruction text for the agent to execute.
+      security: non-sensitive
+      system_usage:
+        - execution
+        - context
+      validation: free text.
+    field_profile_code: AGI-001
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+      - modifiable
+    type: text
+    validation:
+      required: true
+  source_session:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: system.
+      automation_hooks: used for traceability back to a convergence session.
+      cardinality: zero_or_one
+      criticality: association
+      default: ""
+      dependencies: convergence session registry.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Convergence session that generated this instruction.
+      security: non-sensitive
+      system_usage:
+        - traceability
+      validation: string ID.
+    field_profile_code: AGI-003
+    permissions: r-x
+    semantic_type: reference
+    traits:
+      - readable
+      - writable
+      - modifiable
+    type: string
+    validation:
+      required: false
+  status:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: lifecycle rules.
+      automation_hooks: lifecycle transitions.
+      cardinality: one
+      criticality: composition
+      default: proposed
+      dependencies: lifecycle registry.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Lifecycle status.
+      security: non-sensitive
+      system_usage:
+        - lifecycle enforcement
+        - filtering
+      validation: Must match lifecycle definition.
+    field_profile_code: AGI-005
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - filterable
+      - groupable
+      - listable
+      - modifiable
+      - readable
+      - searchable
+      - sortable
+      - writable
+    type: enum
+    validation:
+      enum:
+        - proposed
+        - approved
+        - rejected
+        - in_progress
+        - completed
+        - error
+      required: true
+  target_persona:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: used for routing instructions to the right agent persona.
+      cardinality: zero_or_one
+      criticality: association
+      default: ""
+      dependencies: persona registry.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Optional persona reference intended to execute this instruction.
+      security: non-sensitive
+      system_usage:
+        - routing
+        - filtering
+      validation: string ID.
+    field_profile_code: AGI-002
+    permissions: rwx
+    semantic_type: reference
+    traits:
+      - readable
+      - writable
+      - modifiable
+      - filterable
+    type: string
+    validation:
+      required: false

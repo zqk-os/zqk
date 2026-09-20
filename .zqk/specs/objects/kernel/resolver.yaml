@@ -1,0 +1,95 @@
+schema_version: 2.0.0
+ontology: resolver
+extends: base_object
+visibility: internal
+description: 'Defines how reference schemes (e.g., account:{id}, test://suite) are resolved to concrete locations/commands. Handles user-provided hints plus internal fallback logic. '
+traits:
+  - base_object_traits
+fields:
+  reference_format:
+    access:
+      requires:
+        - access:confidential
+        - role:admin
+    checklist:
+      authority: admin.
+      automation_hooks: ensures references parse correctly.
+      cardinality: one
+      criticality: composition
+      default: required
+      dependencies: validators.
+      observability: "yes"
+      origin_lifecycle: mutable with version bumps.
+      purpose: Pattern/URI describing valid references (e.g., \\\"account:{id}\\\" or \\\"test://suite/name\\\").
+      security: non-sensitive
+      system_usage:
+        - validation
+      validation: regex or URI template.
+    field_profile_code: RSV-002
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - field_mutable_group
+    type: string
+    validation:
+      required: true
+  scheme:
+    access:
+      requires:
+        - access:confidential
+        - role:admin
+    checklist:
+      authority: admin/automation.
+      automation_hooks: determines resolver selection.
+      cardinality: one
+      criticality: composition
+      default: required
+      dependencies: reference fields using "scheme:{id}" format.
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: Identifier for the reference scheme handled (e.g., \\\"account\\\", \\\"workstream\\\", \\\"test\\\").
+      security: non-sensitive
+      system_usage:
+        - reference resolution
+      validation: Username pattern.
+    field_profile_code: RSV-001
+    permissions: r-x
+    semantic_type: statement
+    traits:
+      - listable
+      - readable
+      - writable
+      - filterable
+      - sortable
+      - searchable
+    type: string
+    validation:
+      pattern: ^[a-z0-9_-]+$
+      required: true
+  user_hint:
+    access:
+      requires:
+        - access:confidential
+        - role:admin
+    checklist:
+      authority: user/admin.
+      automation_hooks: used by resolver when primary resolution fails.
+      cardinality: zero_or_one
+      criticality: association
+      default: null
+      dependencies: resolver implementation.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Optional user-defined hint/config (path template, host, etc.).
+      security: may contain sensitive paths.
+      system_usage:
+        - custom resolution
+      validation: Free-form text.
+    field_profile_code: RSV-003
+    permissions: rwx
+    semantic_type: expression
+    traits:
+      - field_mutable_group
+    type: text
+    validation:
+      required: false

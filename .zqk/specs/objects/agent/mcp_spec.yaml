@@ -1,0 +1,120 @@
+schema_version: 2.0.0
+ontology: mcp_spec
+extends: base_object
+visibility: internal
+description: 'Declarative MCP server configuration stored as a first-class kernel object.\nThe spec payload configures prompts, resources, tools, tool groups, discovery,\nand schema handlers. Lifecycle: mcp_spec_lifecycle.yaml.\n'
+traits: []
+fields:
+  name:
+    checklist:
+      authority: operator
+      automation_hooks: used by MCP loaders to select one canonical configuration
+      cardinality: one
+      criticality: composition
+      default: required
+      dependencies: MCP runtime registration
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: Stable configuration name used by MCP loaders
+      security: non-sensitive
+      system_usage:
+        - storage lookup
+        - runtime configuration selection
+      validation: Lowercase identifier
+    field_profile_code: MCPSPEC-001
+    permissions: rwx
+    semantic_type: identifier
+    traits:
+      - readable
+      - writable
+      - filterable
+    type: string
+    validation:
+      display_length: 40
+      pattern: ^[a-z][a-z0-9_]*$
+      required: true
+  source:
+    checklist:
+      authority: operator
+      automation_hooks: reported when MCP selects a configuration source
+      cardinality: one
+      criticality: association
+      default: required
+      dependencies: configuration origination workflow
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: Record where the authoritative configuration originated
+      security: non-sensitive
+      system_usage:
+        - provenance diagnostics
+        - fallback decisions
+        - audit
+      validation: Non-empty provenance label
+    field_profile_code: MCPSPEC-004
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+      - filterable
+    type: string
+    validation:
+      display_length: 32
+      min_length: 1
+      required: true
+  spec:
+    checklist:
+      authority: operator
+      automation_hooks: parsed and validated before MCP runtime registration
+      cardinality: one
+      criticality: composition
+      default: required
+      dependencies: MCP specification schema
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Declarative MCP configuration payload
+      security: may contain confidential paths and prompt templates
+      system_usage:
+        - prompt registration
+        - resource registration
+        - tool registration
+        - schema handler registration
+      validation: Valid YAML accepted by MCPSpec.Validate
+    field_profile_code: MCPSPEC-002
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+    type: text
+    validation:
+      required: true
+  version:
+    checklist:
+      authority: operator
+      automation_hooks: emitted in source provenance and diagnostics
+      cardinality: one
+      criticality: association
+      default: required
+      dependencies: configuration release process
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Identify the revision of the stored MCP configuration
+      security: non-sensitive
+      system_usage:
+        - diagnostics
+        - migration
+        - audit
+      validation: Non-empty version string
+    field_profile_code: MCPSPEC-003
+    permissions: rwx
+    semantic_type: identifier
+    traits:
+      - readable
+      - writable
+      - filterable
+    type: string
+    validation:
+      display_length: 24
+      min_length: 1
+      required: true

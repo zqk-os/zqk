@@ -1,0 +1,31 @@
+$schema: "../schemas/command_spec.schema.json"
+
+name: "new <persona-name>"
+short: "Create a persona and agent_skill placeholder"
+description: |
+  Initializes a kernel agent in one transaction: a persona (PER-*) plus an
+  agent_skill (ASK-*) placeholder bound to that persona. The positional
+  argument is the persona title/name. Does not invent a system account.
+
+args:
+  type: "exact"
+  count: 1
+
+flags:
+  - name: "description"
+    type: "string"
+    default: ""
+    description: "Optional description stored on the new persona"
+
+help:
+  examples:
+    - comment: "Create a persona named Reviewer"
+      command: "%s agent new Reviewer"
+    - comment: "Create with a description"
+      command: "%s agent new Reviewer --description \"Reviews pull requests\""
+  exclude_flags:
+    - "columns"
+    - "ignore-scheduler-down"
+
+run_e: "runAgentNew"
+common_flags: true

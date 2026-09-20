@@ -1,0 +1,217 @@
+schema_version: 2.0.0
+ontology: workstream_transition
+extends: base_object
+visibility: public
+description: 'Defines a transition from one workstream to another, including transition criteria, readiness checks, and agent onboarding requirements. Ensures smooth handoffs and strategic alignment in multi-year planning contexts.\nLifecycle: workstream_transition_lifecycle.yaml.\n'
+traits:
+  - base_object_traits
+fields:
+  agent_onboarding:
+    access:
+      requires:
+        - access:confidential
+        - role:admin
+    checklist:
+      authority: automation/admin
+      automation_hooks: used for agent readiness checks
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: none
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: List of agents that must be onboarded for this transition.
+      security: non-sensitive
+      system_usage:
+        - agent_onboarding_management
+      validation: List of agent onboarding objects
+    field_profile_code: WST-007
+    permissions: rwx
+    semantic_type: expression
+    traits:
+      - field_mutable_group
+    type: list
+    validation:
+      required: false
+  from_workstream_ref:
+    access:
+      requires:
+        - access:confidential
+        - role:admin
+    checklist:
+      authority: automation/admin
+      automation_hooks: used for transition validation
+      cardinality: one
+      criticality: composition
+      default: required
+      dependencies: workstream must exist
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: Reference to the workstream transitioning from.
+      security: non-sensitive
+      system_usage:
+        - transition_tracking
+        - workflow_management
+      validation: Must reference existing workstream
+    field_profile_code: WST-001
+    permissions: r-x
+    semantic_type: reference
+    traits:
+      - field_reference_group
+      - writable
+    type: string
+    validation:
+      required: true
+  readiness_criteria:
+    access:
+      requires:
+        - access:confidential
+        - role:admin
+    checklist:
+      authority: automation/admin
+      automation_hooks: used for readiness validation
+      cardinality: many
+      criticality: composition
+      default: []
+      dependencies: none
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: List of criteria that must be met before transition can occur.
+      security: non-sensitive
+      system_usage:
+        - transition_validation
+      validation: List of criterion objects
+    field_profile_code: WST-006
+    permissions: rwx
+    semantic_type: expression
+    traits:
+      - field_mutable_group
+    type: list
+    validation:
+      required: false
+  to_workstream_ref:
+    access:
+      requires:
+        - access:confidential
+        - role:admin
+    checklist:
+      authority: automation/admin
+      automation_hooks: used for transition validation
+      cardinality: one
+      criticality: composition
+      default: required
+      dependencies: workstream must exist
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: Reference to the workstream transitioning to.
+      security: non-sensitive
+      system_usage:
+        - transition_tracking
+        - workflow_management
+      validation: Must reference existing workstream
+    field_profile_code: WST-002
+    permissions: r-x
+    semantic_type: reference
+    traits:
+      - field_reference_group
+      - writable
+    type: string
+    validation:
+      required: true
+  transition_date:
+    access:
+      requires:
+        - access:confidential
+        - role:admin
+    checklist:
+      authority: automation/admin
+      automation_hooks: used for transition scheduling
+      cardinality: one
+      criticality: association
+      default: optional
+      dependencies: none
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Target date for this transition.
+      security: non-sensitive
+      system_usage:
+        - planning
+        - scheduling
+      validation: Valid date format
+    field_profile_code: WST-005
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - filterable
+      - readable
+      - searchable
+      - sortable
+      - writable
+    type: date
+    validation:
+      required: false
+  trigger:
+    access:
+      requires:
+        - access:confidential
+        - role:admin
+    checklist:
+      authority: automation/admin
+      automation_hooks: determines transition logic
+      cardinality: one
+      criticality: composition
+      default: required
+      dependencies: transition logic
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Type of trigger that initiates this transition.
+      security: non-sensitive
+      system_usage:
+        - transition_automation
+        - workflow_management
+      validation: enum
+    field_profile_code: WST-003
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+      - filterable
+      - sortable
+      - searchable
+    type: enum
+    validation:
+      enum:
+        - milestone_completion
+        - agent_readiness
+        - dependency_resolution
+        - strategic_pivot
+      required: true
+  trigger_milestone_ref:
+    access:
+      requires:
+        - access:confidential
+        - role:admin
+    checklist:
+      authority: automation/admin
+      automation_hooks: used for milestone-based transitions
+      cardinality: one
+      criticality: association
+      default: optional
+      dependencies: milestone must exist
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Reference to milestone that triggers transition (if trigger is milestone_completion).
+      security: non-sensitive
+      system_usage:
+        - transition_automation
+      validation: Must reference existing milestone if provided
+    field_profile_code: WST-004
+    permissions: r-x
+    semantic_type: reference
+    traits:
+      - field_reference_group
+      - writable
+    type: string
+    validation:
+      required: false

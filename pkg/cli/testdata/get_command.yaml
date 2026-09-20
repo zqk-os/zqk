@@ -1,0 +1,29 @@
+name: "get <id>"
+short: "Get an object by ID"
+description: |
+  Get an object by its ID.
+  
+  The object kind is inferred from the ID format (e.g., BLI-001 -> backlog_item).
+
+args:
+  type: "exact"
+  count: 1
+
+help:
+  examples:
+    - comment: "Get a backlog item"
+      command: "%s get BLI-626"
+    - comment: "Get with JSON output"
+      command: "%s get BLI-626 --format json"
+    - comment: "Get with YAML output"
+      command: "%s get BLI-626 --format yaml"
+  exclude_flags:
+    - "format"
+    - "output"
+    - "verbose"
+    - "quiet"
+    - "timeout"
+    - "columns"
+
+run_e: "runGet"
+common_flags: true

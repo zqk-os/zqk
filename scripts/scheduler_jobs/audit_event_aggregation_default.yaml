@@ -1,0 +1,21 @@
+# Default audit_event_aggregation job. Used by: zqk system ensure-retention-jobs
+# Create manually: zqk internal create scheduler_job --file scripts/scheduler_jobs/audit_event_aggregation_default.yaml
+id: SCH-audit-event-aggregation
+title: Audit Event Aggregation and Cleanup
+description: |
+  Aggregates audit events into audit_aggregation_metric and optionally archives/deletes source events.
+  Uses AGGREGATION_WINDOW (e.g. 1h), RETENTION_DURATION, DELETE_ENABLED from environment_variables.
+job_type: audit_event_aggregation
+trigger_type: timer
+schedule_expression: "*/15 * * * *"
+category: maintenance
+execution_mode: reusable
+max_runtime_seconds: 2700
+enabled: true
+status: active
+namespace_id: zqk:kernel
+schema_version: "2.0.0"
+environment_variables:
+  AGGREGATION_WINDOW: "1h"
+  RETENTION_DURATION: "2h"
+  DELETE_ENABLED: "true"

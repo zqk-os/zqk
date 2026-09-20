@@ -1,0 +1,14 @@
+# Default cleanup config (bundled in bootstrap; extracted to .zqk/cleanup/config.yaml by init).
+# Single input for SCH-cleanup job. See docs/architecture/CLEANUP_MAINTENANCE_DESIGN.md.
+# Steps run in order; delete_files, truncate_files, cli, build_target, reap_temp_files, reap_stale_locks, enforce_log_retention.
+
+working_directory: "."
+
+steps:
+  - type: reap_temp_files
+    older_than: 30m
+  - type: reap_stale_locks
+    older_than: 15m
+  - type: enforce_log_retention
+    max_age: 14d
+    max_size_bytes: 10485760

@@ -1,0 +1,182 @@
+$schema: ../../../.zqk/cli/specs/schemas/lifecycle_spec.schema.json
+object_type: requirement
+statuses:
+  - value: conceptual
+    display: Conceptual
+    origin: true
+    preliminary: true
+    description: Draft plane status. Prior to CAS membrane crossing.
+    role: realign
+  - value: originated
+    display: Originated
+    description: CAS membrane crossed. Object officially originated.
+    role: realign
+  - value: proposed
+    display: Proposed
+    origin: false
+    preliminary: false
+    role: realign
+    description: Candidate requirement captured for review but not yet 
+      authorized as a system commitment.
+  - value: active
+    display: Active
+    role: shovel_ready
+    description: Requirement is an active commitment driving backlog and 
+      verification.
+  - value: complete
+    display: Complete
+    terminal: true
+    work_done: true
+    role: terminal
+    description: Requirement satisfied; acceptance evidence should already be 
+      linked.
+  - value: deferred
+    display: Deferred
+    terminal: true
+    role: terminal
+    description: Requirement postponed; not in the active commitment set until 
+      revived.
+  - value: rejected
+    display: Rejected
+    terminal: true
+    role: terminal
+    description: Requirement rejected; terminal for this wording of the need.
+  - value: archived
+    display: Archived
+    terminal: true
+    archive: true
+    role: terminal
+    description: Requirement archived for history; cluster shockwave with linked
+      criteria and backlog.
+    shockwave:
+      mode: cluster
+      fail: closed
+transitions:
+  - from: conceptual
+    to: originated
+    description: Promote from draft plane to CAS membrane (CAS Qualification).
+    manual: true
+    auto: false
+    catalyst: System promotion
+    postconditions:
+      - role is realign
+    class_vs_specialty: class-agnostic
+    shockwave:
+      mode: propagate
+  - from: originated
+    to: proposed
+    description: Initial domain workflow transition to proposed.
+    manual: true
+    auto: true
+    catalyst: System initialization
+    postconditions:
+      - role is realign
+    class_vs_specialty: class-agnostic
+    shockwave:
+      mode: propagate
+  - from: proposed
+    to: active
+    description: Authorize the requirement as an active system commitment
+    manual: true
+    auto: false
+    postconditions:
+      - role is shovel_ready
+    catalyst: Standard progression
+    class_vs_specialty: class-agnostic
+    shockwave:
+      mode: propagate
+  - from: active
+    to: complete
+    description: "Complete when all test cases passing OR linked milestone complete (dual manual+auto).
+      Promote may hop; auto shockwave may still fire."
+    manual: true
+    auto: true
+    on_dependent_status:
+      kind: test_case
+      to: complete
+    postconditions:
+      - role is terminal
+    catalyst: Standard progression
+    class_vs_specialty: class-agnostic
+    shockwave:
+      mode: propagate
+  - from: proposed
+    to: complete
+    description: "Complete when all test cases passing OR linked milestone complete (dual manual+auto).
+      Promote may hop; auto shockwave may still fire."
+    manual: true
+    auto: true
+    on_dependent_status:
+      kind: test_case
+      to: complete
+    postconditions:
+      - role is terminal
+    catalyst: Standard progression
+    class_vs_specialty: class-agnostic
+    shockwave:
+      mode: propagate
+  - from: active
+    to: deferred
+    description: Manual deferral
+    manual: true
+    auto: false
+    postconditions:
+      - role is terminal
+    catalyst: Standard progression
+    class_vs_specialty: class-agnostic
+    shockwave:
+      mode: propagate
+  - from: deferred
+    to: active
+    description: Revive a deferred requirement back into the active commitment 
+      set
+    manual: true
+    auto: false
+    postconditions:
+      - role is shovel_ready
+      - revive is a new commitment exam, not a halt resume
+    catalyst: Standard progression
+    class_vs_specialty: class-agnostic
+    shockwave:
+      mode: propagate
+  - from: '*'
+    to: rejected
+    description: Manual rejection from any status
+    manual: true
+    auto: false
+    postconditions:
+      - role is terminal
+    catalyst: Standard progression
+    class_vs_specialty: class-agnostic
+    shockwave:
+      mode: propagate
+  - from: '*'
+    to: archived
+    description: Manual archival from any status (object park --to archived)
+    manual: true
+    auto: false
+    shockwave:
+      mode: cluster
+      fail: closed
+    postconditions:
+      - role is terminal
+    catalyst: Standard progression
+    class_vs_specialty: class-agnostic
+percent_complete:
+  method: test_case_based OR milestone_based
+  default_by_status:
+    conceptual: 0
+    originated: 5
+    active: 50
+    complete: 100
+    deferred: 0
+    proposed: 15
+    rejected: 0
+    archived: 100
+  milestone_based:
+    calculation: use_milestone_percent_complete
+    field: milestone_ref
+created_at: 2026-07-01 18:00:00+00:00
+updated_at: 2026-07-01 18:00:00+00:00
+created_by: ACC-1785920548450214012-68b850c0
+updated_by: ACC-1785920548450214012-68b850c0

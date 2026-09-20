@@ -1,0 +1,17 @@
+body: Every executable command in the zqk CLI tree must have an authoritative, valid command spec in .zqk/cli/specs/. Commands must adhere strictly to the standardized command taxonomy (Job Management, Services Management, Convergence Management, Agent/Swarm, Metrics & Feedback, Code & Build). Vendor-specific functionality (Cursor, AppleScript) must reside in dedicated, pluggable vendor adapter namespaces and never leak into core general-purpose commands.
+category: architecture
+created_at: "2026-09-19T05:55:00Z"
+created_by: ACC-1785920548450214012-68b850c0
+description: Mandates that every executable zqk CLI command has an authoritative command spec adhering to standardized taxonomy domains and vendor isolation boundaries.
+id: POL-ARCH-CLI-SPEC-MANDATORY-001
+kind: policy
+namespace_id: zqk:kernel
+policy_type: standard
+schema_version: 2.0.0
+status: originated
+title: 100% CLI Command Spec Coverage and Architectural Taxonomy Compliance
+updated_at: "2026-09-19T06:16:23Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs:
+    - WS-CLI-TAXONOMY-OVERHAUL

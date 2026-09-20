@@ -1,0 +1,173 @@
+schema_version: 2.0.0
+ontology: watchdog_registration
+extends: base_object
+visibility: internal
+description: Registers an event subscription rule for the centralized Event-Driven Watchdog daemon. \nInstead of hardcoding triggers or running independent polling loops, Agents or Agent Service Pools \n(Teams) define their watch criteria here. When the target object kind meets the condition, the Watchdog \nevaluates this rule and dispatches an audit_event payload to the specified `notify_target_ref` (typically \nan `agent_feed`).\n
+traits:
+  - base_object_traits
+fields:
+  condition_query:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: operator.
+      automation_hooks: Parsed by Watchdog query builder.
+      cardinality: one
+      criticality: composition
+      default: null
+      dependencies: Graph-state sync loop.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: The specific criteria to trigger the notification (e.g., 'status == error').
+      security: non-sensitive
+      system_usage:
+        - watchdog
+      validation: valid query string.
+    field_profile_code: WDR-002
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+      - modifiable
+    type: string
+    validation:
+      required: true
+  frequency:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: operator.
+      automation_hooks: Sets the polling interval for the Watchdog scheduler.
+      cardinality: one
+      criticality: composition
+      default: event-driven
+      dependencies: Scheduler timing ticks.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: How frequently this rule should be evaluated (e.g., '1m', '5m', or 'event-driven').
+      security: non-sensitive
+      system_usage:
+        - watchdog
+      validation: duration format or enum.
+    field_profile_code: WDR-003
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+      - modifiable
+    type: string
+    validation:
+      required: true
+  heartbeat_enabled:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: operator.
+      automation_hooks: Triggers all-clear events when queue is empty.
+      cardinality: one
+      criticality: composition
+      default: false
+      dependencies: none.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: If true, the Watchdog will periodically send an all-clear payload to assure the pool the monitoring loop is alive even if no infractions occur.
+      security: non-sensitive
+      system_usage:
+        - watchdog
+      validation: boolean.
+    field_profile_code: WDR-005
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+      - modifiable
+    type: bool
+    validation:
+      required: false
+  note:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: operator.
+      automation_hooks: none.
+      cardinality: zero_or_one
+      criticality: association
+      default: null
+      dependencies: none.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Human-readable context about why this registration exists.
+      security: non-sensitive
+      system_usage:
+        - watchdog
+    field_profile_code: WDR-006
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - field_mutable_group
+    type: text
+    validation:
+      required: false
+  notify_target_ref:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: system.
+      automation_hooks: Watchdog routes events here.
+      cardinality: one
+      criticality: association
+      default: null
+      dependencies: Agent feeds or personas.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: The graph ID of the recipient (e.g., an agent_feed, team, or persona) that will receive the wake-up payload.
+      security: non-sensitive
+      system_usage:
+        - watchdog
+      validation: Valid ZQK reference ID.
+    field_profile_code: WDR-004
+    permissions: rwx
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+      - field_reference_group
+      - reference
+    type: string
+    validation:
+      required: true
+  target_kind:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: system.
+      automation_hooks: Used by the Watchdog to filter graph queries.
+      cardinality: one
+      criticality: composition
+      default: null
+      dependencies: Object kinds registry.
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: The object kind being monitored (e.g., agent_task, convergence_session).
+      security: non-sensitive
+      system_usage:
+        - watchdog
+      validation: valid ZQK object kind.
+    field_profile_code: WDR-001
+    permissions: r--
+    semantic_type: statement
+    traits:
+      - readable
+      - filterable
+    type: string
+    validation:
+      max_length: 64
+      required: true

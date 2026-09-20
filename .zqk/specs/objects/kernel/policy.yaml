@@ -1,0 +1,471 @@
+schema_version: 2.0.0
+ontology: policy
+extends: base_object
+visibility: public
+description: 'Project-wide policies that establish standards, expectations, and best practices. Policies are required at project initialization and evolve throughout the delivery lifecycle. They provide a central index for AI agents to understand expectations before implementing.\nLifecycle: policy_lifecycle.yaml.\n'
+traits:
+  - base_object_traits
+fields:
+  applicability:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: determines when policy applies.
+      cardinality: one
+      criticality: association
+      default:
+        exclusions: []
+        file_patterns: []
+        object_types: []
+        workstreams: []
+      dependencies: enforcement hooks.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Scope of policy applicability (workstreams, object types, file patterns, etc.).
+      security: non-sensitive
+      system_usage:
+        - filtering
+        - enforcement
+      validation: Structured object with optional fields like \\\"workstreams\\\", \\\"object_types\\\", \\\"file_patterns\\\", \\\"exclusions\\\".
+    field_profile_code: POL-007
+    permissions: rwx
+    semantic_type: expression
+    traits:
+      - field_mutable_group
+    type: object
+    validation:
+      required: false
+  body:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner/executive.
+      automation_hooks: used to generate guidance and enforcement hints.
+      cardinality: one
+      criticality: composition
+      default: required
+      dependencies: policy index, enforcement hooks.
+      observability: "yes"
+      origin_lifecycle: mutable (with version history).
+      purpose: The actual policy content, standards, and expectations.
+      security: may contain sensitive workflows.
+      system_usage:
+        - documentation
+        - enforcement
+        - guidance
+      validation: markdown allowed.
+    field_profile_code: POL-003
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+      - modifiable
+      - searchable
+    type: text
+    validation:
+      required: true
+  category:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner/executive.
+      automation_hooks: used for policy discovery and indexing.
+      cardinality: one
+      criticality: composition
+      default: required
+      dependencies: policy index.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Policy category (architecture, code_quality, documentation, testing, security, workflow, etc.).
+      security: non-sensitive
+      system_usage:
+        - indexing
+        - filtering
+        - organization
+      validation: controlled vocab (architecture, code_quality, documentation, testing, security, workflow, git, ci_cd, etc.).
+    field_profile_code: POL-001
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - filterable
+      - groupable
+      - listable
+      - modifiable
+      - readable
+      - searchable
+      - sortable
+      - writable
+    type: string
+    validation:
+      required: true
+  effective_date:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: tracks when policy was established or updated.
+      cardinality: one
+      criticality: association
+      default: creation date
+      dependencies: policy index.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: When this policy version became effective.
+      security: non-sensitive
+      system_usage:
+        - temporal tracking
+        - compliance
+      validation: ISO-8601 date.
+    field_profile_code: POL-009
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+      - modifiable
+      - filterable
+      - sortable
+    type: string
+    validation:
+      pattern: ^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}:\d{2}Z)?$
+      required: false
+  enforcement:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner/executive.
+      automation_hooks: configures how policy is enforced.
+      cardinality: one
+      criticality: association
+      default:
+        automated: false
+        reminder_enabled: true
+        review_required: false
+        severity: medium
+      dependencies: enforcement hooks, reminder system.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Enforcement mechanism configuration (automated checks, reminders, review requirements).
+      security: non-sensitive
+      system_usage:
+        - enforcement
+        - automation
+      validation: Structured object with fields like \\\"automated\\\", \\\"reminder_enabled\\\", \\\"review_required\\\", \\\"severity\\\".
+    field_profile_code: POL-006
+    permissions: rwx
+    semantic_type: expression
+    traits:
+      - field_mutable_group
+    type: object
+    validation:
+      required: false
+  examples:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: used to provide concrete examples to AI agents.
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: policy index.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Code examples, patterns, or anti-patterns illustrating the policy.
+      security: non-sensitive
+      system_usage:
+        - documentation
+        - guidance
+      validation: markdown allowed in list items.
+    field_profile_code: POL-004
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+      - modifiable
+    type: list
+    validation:
+      required: false
+  goal_refs:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: used for goal-policy traceability.
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: goal registry.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Goals this policy supports.
+      security: non-sensitive
+      system_usage:
+        - traceability
+      validation: Must reference existing goal IDs.
+    field_profile_code: POL-011
+    permissions: r-x
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+      - field_reference_group
+    type: list
+    validation:
+      required: false
+  id:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation (Generator)
+      automation_hooks: used for cross-file references.
+      cardinality: one
+      criticality: composition
+      default: auto-assigned per category sequence
+      dependencies: linkage constraints, URN creation.
+      observability: logged + manifests.
+      origin_lifecycle: immutable
+      purpose: Stable identifier for policy objects (POL-CATEGORY-### format).
+      security: non-sensitive
+      system_usage:
+        - linking
+        - reporting
+        - URIs
+      validation: regex ^POL-[A-Z]+-\\\\d{3,}$; uniqueness enforced.
+    field_profile_code: POL-000
+    permissions: r-x
+    semantic_type: statement
+    traits:
+      - listable
+      - readable
+      - writable
+      - filterable
+      - sortable
+      - searchable
+    type: string
+    validation:
+      pattern: ^POL-[A-Z]+-\d{3,}$
+      required: true
+  milestone_refs:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: used for milestone-policy traceability.
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: milestone registry.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Milestones this policy relates to.
+      security: non-sensitive
+      system_usage:
+        - traceability
+      validation: Must reference existing milestone IDs.
+    field_profile_code: POL-013
+    permissions: r-x
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+      - field_reference_group
+    type: list
+    validation:
+      required: false
+  policy_type:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner/executive.
+      automation_hooks: determines enforcement strictness and reminder priority.
+      cardinality: one
+      criticality: composition
+      default: guideline
+      dependencies: enforcement hooks.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Type of policy (standard=mandatory, requirement=must follow, guideline=should follow, best_practice=recommended, anti_pattern=what to avoid).
+      security: non-sensitive
+      system_usage:
+        - enforcement
+        - prioritization
+      validation: enum.
+    field_profile_code: POL-002
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - listable
+      - readable
+      - writable
+      - modifiable
+      - groupable
+      - filterable
+      - sortable
+      - searchable
+    type: enum
+    validation:
+      enum:
+        - standard
+        - requirement
+        - guideline
+        - best_practice
+        - anti_pattern
+      required: true
+  related_patterns:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: used for cross-referencing and discovery.
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: policy index, architecture patterns.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: References to architecture patterns, ADRs, or other policies related to this policy.
+      security: non-sensitive
+      system_usage:
+        - traceability
+        - discovery
+      validation: Must reference existing doc_entry, decision, or policy IDs.
+    field_profile_code: POL-005
+    permissions: r-x
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+    type: list
+    validation:
+      required: false
+  review_date:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: triggers policy review reminders.
+      cardinality: one
+      criticality: association
+      default: null
+      dependencies: scheduler, reminder system.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Next scheduled review date for this policy.
+      security: non-sensitive
+      system_usage:
+        - scheduler
+        - reminders
+      validation: ISO-8601 date.
+    field_profile_code: POL-010
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+      - modifiable
+      - filterable
+      - sortable
+    type: string
+    validation:
+      pattern: ^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}:\d{2}Z)?$
+      required: false
+  validation_overlays:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner/architect.
+      automation_hooks: overlays these DSL definitions onto target objects during verification.
+      cardinality: many
+      criticality: composition
+      default: []
+      dependencies: verification engine.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Universal Verification DSL definitions that are automatically injected as validation overlays into objects governed by this policy.
+      security: non-sensitive
+      system_usage:
+        - verification
+        - enforcement
+      validation: List of VerificationStrategy objects.
+    field_profile_code: POL-014
+    permissions: rwx
+    semantic_type: expression
+    traits:
+      - field_mutable_group
+    type: list
+    validation:
+      required: false
+  version:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: tracks policy changes over time.
+      cardinality: one
+      criticality: association
+      default: 1.0.0
+      dependencies: policy index.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Policy version (SemVer) for tracking policy evolution.
+      security: non-sensitive
+      system_usage:
+        - versioning
+        - evolution tracking
+      validation: SemVer pattern.
+    field_profile_code: POL-008
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - filterable
+      - modifiable
+      - readable
+      - sortable
+      - writable
+    type: string
+    validation:
+      pattern: ^\d+\.\d+\.\d+$
+      required: false
+  workstream_refs:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: used for workstream-specific enforcement.
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: workstream registry.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Workstreams this policy applies to (if specific).
+      security: non-sensitive
+      system_usage:
+        - filtering
+        - enforcement
+      validation: Must reference existing workstream IDs.
+    field_profile_code: POL-012
+    permissions: r-x
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+      - field_reference_group
+    type: list
+    validation:
+      required: false

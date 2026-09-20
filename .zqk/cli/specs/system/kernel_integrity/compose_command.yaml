@@ -1,0 +1,30 @@
+$schema: "../../schemas/command_spec.schema.json"
+
+name: "compose"
+short: "Compile kind×intent mutation pipelines and materialize pipeline_definition rows"
+description: |
+  Compiles composed DECIDE/FINALIZE definitions for each critical kind × mutation
+  intent, warms the in-process registry, and (unless --dry-run) upserts
+  pipeline_definition objects in CAS.
+
+args:
+  type: "no_args"
+
+flags:
+  - name: "dry-run"
+    type: "bool"
+    default: false
+    description: "Compile and list titles only; do not write pipeline_definition objects"
+
+help:
+  examples:
+    - comment: "Compile without writing"
+      command: "%s system kernel-integrity compose --dry-run"
+    - comment: "Materialize or refresh pipeline_definition rows"
+      command: "%s system kernel-integrity compose"
+  exclude_flags:
+    - "columns"
+    - "ignore-scheduler-down"
+
+run_e: "runKernelIntegrityCompose"
+common_flags: true

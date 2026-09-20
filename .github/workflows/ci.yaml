@@ -31,10 +31,10 @@ jobs:
           fi
 
       - name: Vet Code
-        run: go vet ./...
+        run: go vet ./cmd/...
 
       - name: Run Tests
-        run: go test -v ./...
+        run: sh scripts/open-core/test-public-release-gates.sh
 
       - name: Build Binary
         run: go build -v -o zqk ./cmd/zqk

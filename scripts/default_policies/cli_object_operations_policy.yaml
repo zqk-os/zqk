@@ -1,0 +1,19 @@
+kind: policy
+schema_version: "2.0.0"
+title: CLI or MCP for Object Operations
+status: active
+category: workflow
+policy_type: standard
+body: |
+  Create, update, list, and transition process objects via `zqk` CLI or the zqk MCP server.
+  Do not hand-edit hash YAML under `.zqk/process/` as the primary write path.
+
+  **Allowed**: `zqk object create|update|list|get`, `zqk quick …`, MCP tools that wrap the same commands.
+  **Avoid**: Direct file edits that bypass lifecycle, validation, and audit.
+
+  Exceptions: intentional low-level repair documented in a change_journal / backlog item.
+effective_date: "2026-07-25"
+enforcement:
+  automated: false
+  reminder_enabled: true
+  severity: medium

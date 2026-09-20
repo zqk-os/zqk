@@ -1,0 +1,117 @@
+schema_version: 2.0.0
+ontology: context_refresh_schedule
+extends: base_object
+visibility: internal
+description: 'Defines how often \\".cursor\\" or other context artifacts are refreshed, per profile/project (scheduler schedule, not a policy). '
+traits:
+  - base_object_traits
+fields:
+  cadence:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: used to configure scheduler jobs.
+      cardinality: one
+      criticality: composition
+      default: P1D
+      dependencies: scheduler.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Desired refresh interval (cron or ISO duration).
+      security: non-sensitive
+      system_usage:
+        - scheduler
+      validation: cron/ISO format.
+    field_profile_code: CRP-002
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - field_mutable_group
+    type: string
+    validation:
+      required: true
+  last_refresh:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation.
+      automation_hooks: used to determine if refresh is needed.
+      cardinality: zero_or_one
+      criticality: association
+      default: null
+      dependencies: scheduler.
+      observability: "yes"
+      origin_lifecycle: mutable (set by scheduler).
+      purpose: Last time context was refreshed.
+      security: non-sensitive
+      system_usage:
+        - compliance
+      validation: ISO-8601 datetime.
+    field_profile_code: CRP-003
+    permissions: r-x
+    semantic_type: statement
+    traits:
+      - readable
+    type: string
+    validation:
+      pattern: ^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$
+      required: false
+  next_refresh:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: automation.
+      automation_hooks: used for scheduling.
+      cardinality: zero_or_one
+      criticality: association
+      default: null
+      dependencies: scheduler.
+      observability: "yes"
+      origin_lifecycle: mutable (recalculated by scheduler).
+      purpose: Next scheduled refresh time.
+      security: non-sensitive
+      system_usage:
+        - scheduling
+      validation: ISO-8601 datetime.
+    field_profile_code: CRP-004
+    permissions: r-x
+    semantic_type: statement
+    traits:
+      - field_read_only_group
+    type: string
+    validation:
+      pattern: ^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$
+      required: false
+  target:
+    access:
+      requires:
+        - access:confidential
+        - role:admin
+    checklist:
+      authority: admin/owner.
+      automation_hooks: ensures correct subject.
+      cardinality: one
+      criticality: composition
+      default: required
+      dependencies: scheduler job creation.
+      observability: "yes"
+      origin_lifecycle: immutable
+      purpose: What the schedule applies to (\\\"profile:{id}\\\", \\\"project:{id}\\\", etc.).
+      security: non-sensitive
+      system_usage:
+        - scheduler
+      validation: reference pattern.
+    field_profile_code: CRP-001
+    permissions: r-x
+    semantic_type: reference
+    traits:
+      - readable
+      - writable
+      - modifiable
+    type: string
+    validation:
+      required: true

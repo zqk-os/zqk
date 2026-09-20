@@ -1,0 +1,125 @@
+$schema: "../../../.zqk/cli/specs/schemas/lifecycle_spec.schema.json"
+
+object_type: base_object
+# Five-question exam: docs/architecture/LIFECYCLE_STATE_MACHINE_RUBRIC.md
+# TRACK: BLI-CEF-R26-REMAINING-KINDS-001
+statuses:
+  - value: conceptual
+    display: Conceptual
+    origin: true
+    preliminary: true
+    description: Draft plane status. Prior to CAS membrane crossing.
+    role: realign
+  - value: originated
+    display: Originated
+    description: CAS membrane crossed. Object officially originated.
+    role: realign
+  - value: proposed
+    display: Proposed
+    origin: false
+    preliminary: false
+    description: Object has been proposed but not yet approved
+    role: realign
+  - value: approved
+    display: Approved
+    description: Object has been approved and is ready to begin work
+    role: shovel_ready
+  - value: in_progress
+    display: In Progress
+    description: Work on the object is actively in progress
+    role: execution_locked
+  - value: implemented
+    display: Implemented
+    terminal: true
+    description: Object has been completed and implemented
+    role: terminal
+  - value: archived
+    display: Archived
+    terminal: true
+    archive: true
+    description: Object has been archived and is no longer active
+    role: terminal
+    shockwave:
+      mode: cluster
+      fail: closed
+  - value: error
+    display: Error
+    system: true
+    description: Object encountered an error during processing
+    role: halted
+transitions:
+  - from: conceptual
+    to: originated
+    description: Promote from draft plane to CAS membrane (CAS Qualification).
+    manual: true
+    auto: false
+    catalyst: System promotion
+  - from: originated
+    to: proposed
+    description: Initial domain workflow transition to proposed.
+    manual: true
+    auto: true
+    catalyst: System initialization
+  - from: proposed
+    to: approved
+    description: Approve the proposed object
+    manual: true
+    auto: false
+    postconditions:
+      - role is shovel_ready
+  - from: approved
+    to: in_progress
+    description: Begin work on the approved object
+    manual: true
+    auto: false
+    postconditions:
+      - role is execution_locked
+  - from: in_progress
+    to: implemented
+    description: Mark object as implemented
+    manual: true
+    auto: false
+    postconditions:
+      - role is terminal
+  - from: '*'
+    to: archived
+    description: Archive object from any status
+    manual: true
+    auto: false
+    postconditions:
+      - role is terminal
+      - hop from any occupancy to archived
+      - ended; no further normal execution hops expected
+  - from: '*'
+    to: error
+    description: System error occurred
+    manual: false
+    auto: true
+    postconditions:
+      - role is halted
+      - hop from any occupancy to error
+      - system halt; repair before leaving halted
+  # TRACK: BLI-1785723654802038000-b14064bc — recover persona/base_object from error (promote skips archive-only).
+  - from: error
+    to: approved
+    description: Recover from system error after repair
+    manual: true
+    auto: false
+    postconditions:
+      - role is shovel_ready
+      - recover from system halt after repair
+percent_complete:
+  method: status_defaults
+  default_by_status:
+    conceptual: 0
+    originated: 5
+    approved: 25
+    archived: 100
+    error: 0
+    implemented: 100
+    in_progress: 50
+    proposed: 15
+created_at: 2026-07-01T18:00:00Z
+updated_at: 2026-07-01T18:00:00Z
+created_by: ACC-1785920548450214012-68b850c0
+updated_by: ACC-1785920548450214012-68b850c0

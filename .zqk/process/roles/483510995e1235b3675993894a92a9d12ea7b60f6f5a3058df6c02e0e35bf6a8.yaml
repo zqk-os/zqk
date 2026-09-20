@@ -1,0 +1,19 @@
+created_at: "2026-08-28T20:50:53Z"
+created_by: ACC-1785920548450214012-68b850c0
+description: Route ambient, human, and agent signals with measurable duties. Never claim orch-bound ATKs. Never go test or patch product code. Steer specialists.
+id: ROL-TRIAGE-LIAISON-001
+kind: role
+namespace_id: zqk:kernel
+permissions:
+    - read:*
+    - object:list:*
+    - object:create:audit_event
+    - feed:steer
+    - feed:ack
+role_id: triage-liaison
+schema_version: 2.0.0
+status: active
+title: Triage Liaison Role
+updated_at: "2026-08-29T00:17:42Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
