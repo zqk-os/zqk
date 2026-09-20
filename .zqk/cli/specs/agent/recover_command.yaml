@@ -18,7 +18,7 @@ flags:
 
 args:
   type: "maximum"
-  count: 1
+  max: 1
 
 help:
   examples:

@@ -269,7 +269,7 @@ func swarmInitChatBootstrap(root string) swarminit.ChatBootstrapFunc {
 		path := strings.ReplaceAll(strings.TrimSpace(payloadPath), "{seat_id}", seatID)
 		msg := "BOOTSTRAP swarm-init seat=" + seatID
 		if path != "" {
-			raw, err := os.ReadFile(filepath.Clean(path))
+			raw, err := fileutil.ReadFile(filepath.Clean(path))
 			if err != nil {
 				return errfmt.Newf("read chat payload").Wrap(err)
 			}

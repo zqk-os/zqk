@@ -3,9 +3,10 @@
 package resourcehygiene
 
 import (
-	"os"
 	"runtime"
 	"syscall"
+
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // GetProcessFDUsage returns the number of open file descriptors for the current process
@@ -15,7 +16,7 @@ func GetProcessFDUsage() (int, int, error) {
 	if runtime.GOOS == "linux" {
 		fdDir = "/proc/self/fd"
 	}
-	f, err := os.Open(fdDir)
+	f, err := fileutil.Open(fdDir)
 	if err != nil {
 		return -1, -1, err
 	}

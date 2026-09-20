@@ -58,7 +58,7 @@ func runOrchestrate(cmd *cobra.Command, planArg string, opts OrchestrateOptions)
 		return errfmt.Errorf("project root is required")
 	}
 
-	// POL-AGENT-PLANNER-DOER-001: doers cannot orchestrate peers.
+	// Doers cannot orchestrate peers.
 	if err := authcred.DenyOrchestrateIfDoer(proc.SecurityContext()); err != nil {
 		return err
 	}
@@ -283,7 +283,7 @@ func runOrchestrate(cmd *cobra.Command, planArg string, opts OrchestrateOptions)
 		return state, nil
 	})
 
-	// CRI-SHOVEL-READY (CRIT-1785885889228395000-15c56d02): skip non-actionable BLIs on dispatch.
+	// Skip non-actionable backlog items on dispatch.
 	b.AddStage("filter_shovel_ready", func(pctx *pipeline.Context, payload any) (any, error) {
 		state := payload.(*orchestratorState)
 		if state.isStrategicPlan {
@@ -488,7 +488,7 @@ func runOrchestrate(cmd *cobra.Command, planArg string, opts OrchestrateOptions)
 						taskSteps = append(taskSteps, map[string]any{
 							objects.FieldKeyTitle:       "Kernel Graph Composition Context",
 							objects.FieldKeyStatus:      objects.ObjectStatusPending,
-							objects.FieldKeyDescription: "Kernel graph composition: `zqk object get POL-ONBOARD-001`. Use `zqk intake` / `zqk object import`; do not script `zqk object create` loops.",
+							objects.FieldKeyDescription: "Kernel graph composition: use `zqk object get` for the onboarding policy, then `zqk intake` / `zqk object import`; do not script `zqk object create` loops.",
 						})
 					}
 
@@ -697,7 +697,7 @@ func runOrchestrate(cmd *cobra.Command, planArg string, opts OrchestrateOptions)
 										spawnArgs...,
 									)
 									configureOrchestrationExecutorProcess(spawnCmd)
-									// POL-AGENT-API-KEY-001: inject seat credential; do not inherit parent/human key.
+									// Inject seat credential; do not inherit parent/human key.
 									seatAccount := authcred.ResolveSeatAccount(state.proc.ProjectRoot(), personaID)
 									seatKey := authcred.APIKeyForSeat(state.proc.ProjectRoot(), seatAccount)
 									spawnCmd.Env = orchestrationExecutorChildEnv(os.Environ(), state.proc.ProjectRoot(), seatKey, zqkBin)

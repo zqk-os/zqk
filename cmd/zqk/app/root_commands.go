@@ -177,7 +177,7 @@ func registerCommands() {
 	schedulerCmdInst.GroupID = "integrations"
 	rootCmd.AddCommand(schedulerCmdInst)
 
-	// Local CI — commit on studio, checkout SHA elsewhere, scan-tests (PRI-1785699924616992000-8000284f)
+	// Local CI — commit locally, checkout SHA elsewhere, run tests
 	ciCmdInst := cicmd.NewCICmd()
 	ciCmdInst.GroupID = "integrations"
 	rootCmd.AddCommand(ciCmdInst)

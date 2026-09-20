@@ -12,7 +12,7 @@
 // Bypass environment variables (e.g. ZQK_SHIM_BYPASS_POLCODE009) allow tests and emergency
 // operations to bypass policy checks, but are fail-closed: naked bypass flags are rejected
 // unless accompanied by an auditable human break-glass justification (ZQK_BREAK_GLASS_REASON)
-// of at least 30 characters (REQ-CEF-R2-SEC-ENV-TRUST).
+// of at least 30 characters.
 package main
 
 import (

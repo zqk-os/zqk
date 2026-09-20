@@ -1002,7 +1002,7 @@ func extractFileStorage(provider storage.ObjectStorageProvider) *storage.FileObj
 }
 
 // shouldDemoteStatusToErrorForUnresolvedIssues reports whether auto-fix should set status=error.
-// Policy lives in pkg/fitness (REQ-KERNEL-LIFECYCLE-FITNESS-001): only process_failure, and
+// Policy lives in pkg/fitness: only process_failure, and
 // never for identity_governance kinds. Kinds without lifecycle "error" are skipped by applySpecFix.
 func shouldDemoteStatusToErrorForUnresolvedIssues(kind, currentStatus string, issues []Issue) bool {
 	return wouldDemoteStatusToErrorForUnresolvedIssues(kind, currentStatus, issues)

@@ -59,7 +59,7 @@ func TestNewObject_unknown_kind_errors(t *testing.T) {
 	t.Setenv(zqkenv.TestRoot().Name(), testRoot)
 	t.Cleanup(func() {
 		_ = storage.RunProjectTestTeardown(storage.TempProjectTeardown(testRoot, nil))
-		_ = os.RemoveAll(filepath.Join(testRoot, ".zqk"))
+		_ = fileutil.RemoveAll(filepath.Join(testRoot, ".zqk"))
 	})
 
 	repoRoot := zqkenv.ProjectRoot().Get()

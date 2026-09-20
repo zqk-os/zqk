@@ -23,8 +23,6 @@ func NewMetricsFeedCmd() *cobra.Command {
 	helpBuilder := clipkg.DynamicHelpBuilder(
 		"Push metrics digest to agent_feed with notify",
 		"Analyzes command metrics and pushes a digest to agent_feed so seats can self-direct.",
-		"",
-		"This command satisfies CAP metrics-plane directive feeder facets (GLS-1786416188034709000).",
 	).
 		AddExample("Push metrics digest", "%s system metrics feed").
 		ExcludeCommonFlags()

@@ -701,7 +701,7 @@ func runSyncLoop(cmd *cobra.Command, taskID string) (runErr error) {
 			// 2. Invoke LLM with Strict Schema Contract
 			systemPrompt := "You are the ZQK Graph-State Sync Loop LLM node. Your goal is to consume the Task Graph Bundle and produce a single state transition mutation. You must strictly output ONLY valid JSON matching the schema.\nSchema:\n" + mutation.OutputSchema()
 
-			// Token budget gate (BLI-1783631892661332000-b2cd615e): fit prompt before call
+			// Token budget gate: fit prompt before call
 			fittedPrompt, estTokens, budgetOK := tokenTracker.FitUserPrompt(systemPrompt, prompt)
 			logging.FluentEvent(logging.GetLogger()).Info("Sync-loop token budget check").
 				WithFields(

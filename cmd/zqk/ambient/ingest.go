@@ -93,8 +93,8 @@ func runAmbientIngest(cmd *cobra.Command, _ []string) error {
 		fmt.Fprintln(w, `{"status":"accepted"}`)
 	})
 
-	// Loopback-only by default (REQ-CEF-SEC-001 / CRIT-CEF-SEC-001B).
-	// Set timeouts to prevent unbounded resource consumption (REQ-CEF-R2-SEC-HTTP-TIMEOUTS / CRIT-CEF-R2-SEC-HTTP-TIMEOUTS-A).
+	// Loopback-only by default.
+	// Set timeouts to prevent unbounded resource consumption.
 	addr := fmt.Sprintf("127.0.0.1:%d", port)
 	eventLogger.Logger().Info("Starting ambient event ingest API", logging.String("addr", addr))
 	srv := newAmbientIngestServer(addr, mux)

@@ -311,7 +311,7 @@ func generateCRUDCommandBuilderCode(spec *CRUDCommandSpec, commandName, packageN
 
 func generateArgsCode(args *ArgsSpec) string {
 	switch args.Type {
-	case "exact":
+	case "exact", "exact_args":
 		count := 0
 		if args.Count != nil {
 			count = *args.Count

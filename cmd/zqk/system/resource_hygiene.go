@@ -2,7 +2,6 @@ package system
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"github.com/spf13/cobra"
@@ -96,24 +95,24 @@ func runResourceHygiene(cmd *cobra.Command, args []string) error {
 			})
 		}
 
-		fmt.Printf("Resource Hygiene Report (dry_run: %t)\n", report.DryRun)
-		fmt.Printf("=========================================\n")
-		fmt.Printf("Locks reaped:     %d\n", report.LocksReaped)
-		fmt.Printf("Temp reaped:      %d\n", report.TempReaped)
-		fmt.Printf("Logs pruned:      %d\n", report.LogsPruned)
-		fmt.Printf("Bytes reclaimed:  %s (%d bytes)\n", diskusage.FormatBytes(report.BytesReclaimed), report.BytesReclaimed)
+		cmd.Printf("Resource Hygiene Report (dry_run: %t)\n", report.DryRun)
+		cmd.Printf("=========================================\n")
+		cmd.Printf("Locks reaped:     %d\n", report.LocksReaped)
+		cmd.Printf("Temp reaped:      %d\n", report.TempReaped)
+		cmd.Printf("Logs pruned:      %d\n", report.LogsPruned)
+		cmd.Printf("Bytes reclaimed:  %s (%d bytes)\n", diskusage.FormatBytes(report.BytesReclaimed), report.BytesReclaimed)
 		if len(report.ReapedPaths) > 0 {
-			fmt.Printf("\nReaped Artifacts:\n")
+			cmd.Printf("\nReaped Artifacts:\n")
 			for _, p := range report.ReapedPaths {
-				fmt.Printf("  • %s\n", p)
+				cmd.Printf("  • %s\n", p)
 			}
 		}
 		if telemetry != nil {
-			fmt.Printf("\nCurrent I/O Telemetry:\n")
-			fmt.Printf("  • Open FDs:          %d / %d\n", telemetry.OpenFileDescriptors, telemetry.MaxFileDescriptors)
-			fmt.Printf("  • .zqk Storage:      %d files (%s)\n", telemetry.TotalZqkFiles, diskusage.FormatBytes(telemetry.TotalZqkBytes))
-			fmt.Printf("  • Stale locks:       %d\n", telemetry.StaleLocksCount)
-			fmt.Printf("  • Orphaned temps:    %d\n", telemetry.OrphanedTempCount)
+			cmd.Printf("\nCurrent I/O Telemetry:\n")
+			cmd.Printf("  • Open FDs:          %d / %d\n", telemetry.OpenFileDescriptors, telemetry.MaxFileDescriptors)
+			cmd.Printf("  • .zqk Storage:      %d files (%s)\n", telemetry.TotalZqkFiles, diskusage.FormatBytes(telemetry.TotalZqkBytes))
+			cmd.Printf("  • Stale locks:       %d\n", telemetry.StaleLocksCount)
+			cmd.Printf("  • Orphaned temps:    %d\n", telemetry.OrphanedTempCount)
 		}
 
 		return nil

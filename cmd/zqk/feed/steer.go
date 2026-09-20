@@ -41,7 +41,7 @@ func runFeedSteer(cmd *cobra.Command, _ []string) error {
 		if err := flags.Err(); err != nil {
 			return err
 		}
-		// POL-AGENT-ORCH-HOURGLASS-001: directed routing without await is fire-and-forget.
+		// Directed routing without await is fire-and-forget.
 		if err := agentfeed.EnforceDirectedHourglass(toAgentID, awaitPeerAck); err != nil {
 			return err
 		}

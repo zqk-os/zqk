@@ -565,7 +565,7 @@ func TestOrchestrationExecutorChildEnv_bindsSeatedKernelNotWorktree(t *testing.T
 	out := orchestrationExecutorChildEnv(parent, kernel, seatKey, zqkBin)
 
 	if containsEnvLine(out, "ZQK_PROJECT_ROOT="+worktree) {
-		t.Fatalf("child ZQK_PROJECT_ROOT must not be the ATK worktree (POL-AGENT-KERNEL-ROOT-BINDING-001): %v", out)
+		t.Fatalf("child ZQK_PROJECT_ROOT must not be the ATK worktree: %v", out)
 	}
 	if !containsEnvLine(out, "ZQK_PROJECT_ROOT="+kernel) {
 		t.Fatalf("child ZQK_PROJECT_ROOT must be seated kernel %q, got %v", kernel, out)

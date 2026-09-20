@@ -103,11 +103,8 @@ func runKernelIntegrityReport(cmd *cobra.Command, args []string) error {
 			CompositionExpected:     expected,
 			CompositionOK:           compose.Default().Len() >= expected,
 			Docs:                    filepath.Join(paths.DocsDir, "architecture", "KERNEL_MUTATION_PIPELINE.md"),
-			ConvergenceSessions: []string{
-				"CVS-1785785017436434000-69ba5b9f",
-				"CVS-1785787008426153000-dcbc3e9f",
-			},
-			ConvergenceSession: "CVS-1785787008426153000-dcbc3e9f",
+			ConvergenceSessions:     nil,
+			ConvergenceSession:      "",
 		}
 
 		lcDir := filepath.Join(proc.ProjectRoot(), paths.ProcessDir, "_internal", "lifecycles")

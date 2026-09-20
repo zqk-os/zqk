@@ -83,6 +83,28 @@ if git -C "$ROOT" grep -n -E 'TRACK:.*(BLI|REQ|CRIT|PRI|TDE|ATK|CAP|CVS)-' -- \
 	fail "studio TRACK comment with kernel object id remains in cmd or scripts"
 fi
 
+# Studio CAS nanos-hex instance ids belong in kernel CAS, not production cmd/.
+# Tests may still mint synthetic ids; this gate is production sources only.
+if git -C "$ROOT" grep -n -E '(BLI|REQ|CRIT|PRI|TDE|ATK|CVS|GLS)-[0-9]{15,}-[0-9a-fA-F]{8}' -- \
+	'cmd' \
+	':!*_test.go' \
+	':!scripts/open-core/check-public-release-payload.sh'; then
+	fail "studio nanos-hex kernel object id remains in production cmd"
+fi
+
+# CEF program ids are studio-only; keep them out of shipped cmd/scripts (not tests).
+if git -C "$ROOT" grep -n -E '(BLI|REQ|CRIT|TDE)-CEF-' -- \
+	'cmd' 'scripts' \
+	':!*_test.go' \
+	':!scripts/open-core/check-public-release-payload.sh' \
+	':!scripts/open-core/test-public-release-gates.sh'; then
+	fail "studio CEF kernel object id remains in production cmd or scripts"
+fi
+
+if git -C "$ROOT" grep -n -E 'Traceability:.*(BLI|REQ|CRIT)-' -- cmd; then
+	fail "studio Traceability header with kernel object id remains in cmd"
+fi
+
 if grep -E 'APPENDIX A|Proprietary|Commercial Enterprise|OPEN_CORE_PROPRIETARY_SPLIT' \
 	"$ROOT/LICENSE" "$ROOT/NOTICE" >/dev/null 2>&1; then
 	fail "LICENSE or NOTICE still carries the studio monorepo carve-out"

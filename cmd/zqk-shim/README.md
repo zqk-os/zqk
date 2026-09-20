@@ -48,7 +48,7 @@ GH_ZQK_SHIM_BYPASS_POLCODE009=1
 2. **Emergency Maintenance / Bootstrapping**: During early repo bootstrapping or out-of-band operational emergencies, engineers may need to commit without kernel objects present.
 
 ### Fail-Closed Protection: The Human Break-Glass Rule
-To prevent rogue agents or scripts from silently disabling POL-CODE-009 by exporting `ZQK_SHIM_BYPASS_POLCODE009=1`, the shim implements **BLI-CEF-R15-ENV-TRUST-001** / **REQ-CEF-R2-SEC-ENV-TRUST**:
+To prevent rogue agents or scripts from silently disabling POL-CODE-009 by exporting `ZQK_SHIM_BYPASS_POLCODE009=1`, the shim requires a human break-glass reason:
 
 > **A naked bypass variable is strictly rejected.** Setting `ZQK_SHIM_BYPASS_POLCODE009=1` alone will abort with:
 > `unvalidated POL-CODE-009 bypass rejected: human break-glass requires explicit justification in ZQK_BREAK_GLASS_REASON (min 30 chars)`

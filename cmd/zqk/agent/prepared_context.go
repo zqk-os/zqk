@@ -14,13 +14,12 @@ import (
 	"github.com/zqk-os/zqk/pkg/storage"
 )
 
-// WFL-SUBAGENT-DISPATCH
-// every cognition entry (CLI prepare-context, seat-worker AgentX) must call
+// Every cognition entry (CLI prepare-context, seat-worker AgentX) must call
 // AssemblePreparedContext. Do not rebuild a thinner prompt beside this.
 
 var (
-	errPreparedContextRequired = errfmt.Errorf("prepared context required: task_id or description (WFL-SUBAGENT-DISPATCH)")
-	errPreparedContextStorage  = errfmt.Errorf("prepared context required: storage unavailable (WFL-SUBAGENT-DISPATCH)")
+	errPreparedContextRequired = errfmt.Errorf("prepared context required: task_id or description")
+	errPreparedContextStorage  = errfmt.Errorf("prepared context required: storage unavailable")
 )
 
 // Seat-worker attach caps. AssemblePreparedContext still builds the full

@@ -17,7 +17,7 @@ func NewWorkflowAddCommandBuilder() *cobra.Command {
 	help.WithDescriptionLines("If no plan exists, the system automatically scaffolds a new priority plan, milestone, and goal.")
 	help.AddExample("Add a backlog item to the default active priority plan", "%s workflow add BLI-SYM-901")
 	help.AddExample("Add a backlog item to the priority plan with active order 3", "%s workflow add BLI-SYM-901 3")
-	help.AddExample("Add multiple backlog items to an explicit plan ID", "%s workflow add BLI-1 BLI-2 PRI-1783304506261")
+	help.AddExample("Add multiple backlog items to an explicit plan ID", "%s workflow add BLI-1 BLI-2 PRI-001")
 	help.ExcludeFlag("format")
 	help.ExcludeFlag("output")
 	help.ExcludeFlag("verbose")

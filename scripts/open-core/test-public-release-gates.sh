@@ -75,6 +75,36 @@ if sh "$TRACK_REPO/scripts/open-core/check-public-release-payload.sh" "$TRACK_RE
 fi
 grep -F 'studio TRACK comment with kernel object id remains in cmd or scripts' "$TRACK_REPO/result.log" >/dev/null
 
+# Prove production cmd nanos-hex kernel ids fail closed (not only TRACK comments).
+HEX_REPO=$(mktemp -d "${TMPDIR:-/tmp}/zqk-public-gate-hex.XXXXXX")
+trap 'rm -f "$TMP_BIN"; rm -rf "$TMP_REPO" "$TRACK_REPO" "$HEX_REPO"' EXIT HUP INT TERM
+mkdir -p "$HEX_REPO/cmd/zqk" "$HEX_REPO/config" "$HEX_REPO/docs/onboarding" "$HEX_REPO/scripts/open-core"
+for path in README.md LICENSE NOTICE SECURITY.md CODE_OF_CONDUCT.md CONTRIBUTING.md; do
+	printf '%s\n' "fixture" >"$HEX_REPO/$path"
+done
+printf '%s\n' 'module github.com/zqk-os/zqk' >"$HEX_REPO/go.mod"
+printf '%s\n' 'brand:' '  executable_name: zqk' >"$HEX_REPO/config/zqk.yaml"
+printf '%s\n' 'package main' >"$HEX_REPO/cmd/zqk/main.go"
+printf '%s\n' 'fixture' >"$HEX_REPO/docs/INDEX.md"
+printf '%s\n' 'fixture' >"$HEX_REPO/docs/onboarding/COMMUNITY_FIRST_RUN.md"
+cp "$ROOT/scripts/open-core/check-public-release-payload.sh" "$HEX_REPO/scripts/open-core/"
+cat >"$HEX_REPO/scripts/open-core/police-community-tree.sh" <<'EOF'
+#!/bin/sh
+exit 0
+EOF
+{
+	printf '%s\n' 'package ci'
+	printf '%s\n' '// Kernel: '"PRI-1785699924616992000-8000284f"
+	printf '%s\n' 'func NewCICmd() {}'
+} >"$HEX_REPO/cmd/zqk/ci.go"
+git -C "$HEX_REPO" init -q
+git -C "$HEX_REPO" add .
+if sh "$HEX_REPO/scripts/open-core/check-public-release-payload.sh" "$HEX_REPO" >"$HEX_REPO/result.log" 2>&1; then
+	printf '%s\n' "payload gate accepted nanos-hex kernel id in production cmd" >&2
+	exit 1
+fi
+grep -F 'studio nanos-hex kernel object id remains in production cmd' "$HEX_REPO/result.log" >/dev/null
+
 if [ "$MODE" = "payload-only" ]; then
 	printf '%s\n' "PUBLIC PAYLOAD GATES: PASS"
 	exit 0
@@ -93,7 +123,7 @@ fi
 	"$TMP_BIN" test dashboard --help >/dev/null
 
 	# 2. Run public CLI commands test suite
-	go test -short -timeout 5m \
+	go test -short -p 2 -timeout 5m \
 		./cmd/zqk/app ./cmd/zqk/test ./cmd/zqk/docman ./cmd/zqk/automation \
 		./cmd/zqk/new ./cmd/zqk/inbox ./cmd/zqk/learn ./cmd/zqk/matrix ./cmd/zqk/mcp ./cmd/zqk/mcp-simple \
 		./cmd/zqk/mesh ./cmd/zqk/feed ./cmd/zqk/convergence ./cmd/zqk/callback ./cmd/zqk/intake \
@@ -101,7 +131,7 @@ fi
 	go test ./cmd/zqk/system -run 'TestInit_Greenfield$|TestInit_Legacy$|TestInit_Greenfield_StarterKernelGraph$|TestInit_Greenfield_NoEnvVars$|TestCheckOutput|TestSystemCheck' -timeout 5m
 
 	# 3. Run core kernel packages test suite
-	go test -short -timeout 5m \
+	go test -short -p 2 -timeout 5m \
 		./pkg/brand/... ./pkg/bridge/... ./pkg/circuitbreaker/... ./pkg/cli/... \
 		./pkg/concurrency/... ./pkg/dna/... ./pkg/docman/... ./pkg/graph/... \
 		./pkg/healthcheck/... ./pkg/hive/... ./pkg/hostload/... ./pkg/integrity/... \

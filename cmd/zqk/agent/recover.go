@@ -16,9 +16,6 @@ import (
 // NewRecoverCmd creates the recover command
 func NewRecoverCmd() *cobra.Command {
 	cmd := bldr_cli_cmd_v1.NewAgentRecoverCommandBuilder()
-	cmd.Args = cobra.MaximumNArgs(1)
-	cmd.Flags().Bool("stale", false, "Include stale in_progress tasks")
-	cmd.Flags().Bool("all", false, "Recover across all plans")
 	cmd.RunE = runRecover
 	return cmd
 }

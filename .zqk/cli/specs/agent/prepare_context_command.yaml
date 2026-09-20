@@ -27,7 +27,7 @@ flags:
 
 args:
   type: "maximum"
-  count: 1
+  max: 1
 
 help:
   examples:
@@ -38,4 +38,5 @@ help:
   exclude_flags:
     - "columns"
 
+run_e: "runPrepareContext"
 common_flags: true

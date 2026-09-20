@@ -15,8 +15,6 @@ func NewCiCommandBuilder() *cobra.Command {
 	help.WithDescriptionLines("Studio-local CI that mirrors remote CI. Commit on the studio root, then")
 	help.WithDescriptionLines("checkout that SHA into .zqk/local-ci/workdir and run scan-tests against it")
 	help.WithDescriptionLines("while health/logs stay on studio.")
-	help.WithDescriptionLines("")
-	help.WithDescriptionLines("Kernel plan: PRI-1785699924616992000-8000284f")
 	help.AddExample("Checkout HEAD into local-ci workdir and scan all packages", "%s ci run")
 	help.AddExample("Checkout only (no schedule)", "%s ci checkout")
 	help.AddExample("Show pinned SOURCE_SHA and health summary", "%s ci status")

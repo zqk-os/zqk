@@ -18,7 +18,6 @@ import (
 )
 
 // NewCICmd creates the top-level `ci` command group (Local CI).
-// Kernel: PRI-1785699924616992000-8000284f
 func NewCICmd() *cobra.Command {
 	cmd := bldr.NewCiCommandBuilder()
 	cmd.AddCommand(newCheckoutCmd())
@@ -164,7 +163,7 @@ func runStatus(cmd *cobra.Command, args []string) error {
 	shaPath := filepath.Join(base, "SOURCE_SHA")
 	workdir := filepath.Join(base, "workdir")
 	var b strings.Builder
-	fmt.Fprintf(&b, "Local CI status (PRI-1785699924616992000-8000284f)\n")
+	fmt.Fprintf(&b, "Local CI status\n")
 	if raw, err := fileutil.ReadFile(shaPath); err == nil {
 		fmt.Fprintf(&b, "  SOURCE_SHA=%s\n", strings.TrimSpace(string(raw)))
 	} else {

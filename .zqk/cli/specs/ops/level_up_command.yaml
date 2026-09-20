@@ -1,6 +1,6 @@
 $schema: "../schemas/command_spec.schema.json"
 
-name: "level-up"
+name: "level-up [agent_skill_id]"
 short: "Run an evaluation loop for an agent skill"
 description: |
   Natively evaluate and optimize agent skills against the convergence matrix and kernel health metrics.
@@ -8,8 +8,8 @@ description: |
 flags: []
 
 args:
-  type: "exact_args"
-  expected: 1
+  type: "exact"
+  count: 1
 
 help:
   examples:

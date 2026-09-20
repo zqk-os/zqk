@@ -18,7 +18,7 @@ func NewWorkflowGenTracePipelineCommandBuilder() *cobra.Command {
 	help.WithDescriptionLines("")
 	help.WithDescriptionLines("It behaves intelligently by parsing existing linked objects. If the object already has a Criteria,")
 	help.WithDescriptionLines("it will attach the TestCase and BacklogItem to the existing Criteria instead of minting a new one.")
-	help.AddExample("Generate pipeline for a requirement", "%s workflow gen-trace-pipeline REQ-178867...")
+	help.AddExample("Generate pipeline for a requirement", "%s workflow gen-trace-pipeline REQ-001")
 	builder.WithHelpBuilder(help)
 	builder.WithArgs(cobra.ExactArgs(1))
 	builder.WithCommonFlags(false, nil)

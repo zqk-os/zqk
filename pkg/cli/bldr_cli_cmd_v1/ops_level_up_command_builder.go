@@ -10,13 +10,13 @@ import (
 
 // NewOpsLevelUpCommandBuilder creates a new ops_level_up command
 func NewOpsLevelUpCommandBuilder() *cobra.Command {
-	builder := clipkg.NewCommandBuilder("level-up")
+	builder := clipkg.NewCommandBuilder("level-up [agent_skill_id]")
 	builder.WithShort("Run an evaluation loop for an agent skill")
 	help := clipkg.DynamicHelpBuilder("Run an evaluation loop for an agent skill")
 	help.WithDescriptionLines("Natively evaluate and optimize agent skills against the convergence matrix and kernel health metrics.")
 	help.AddExample("Level up an agent skill by its ID", "%s ops level-up strategy-architect")
 	builder.WithHelpBuilder(help)
-	builder.WithArgs(cobra.NoArgs)
+	builder.WithArgs(cobra.ExactArgs(1))
 	builder.WithCommonFlagsDefault(cli.AddCommonFlags)
 	cmd := builder.Build()
 	return cmd

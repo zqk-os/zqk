@@ -197,7 +197,7 @@ func runRefAdd(cmd *cobra.Command, args []string) error {
 					return cli.Guard(cmd).Err(errfmt.Errorf("association denied: CAS object %s (%s) cannot reference draft-plane object %s (%s); cross-plane references prohibited", sourceID, sourceKind, targetID, targetKind)).Return()
 				}
 
-				// Sealed Priority Plan Scope-Lock Gate (BLI-1789167113049711000-359f8a8c)
+				// Sealed Priority Plan Scope-Lock Gate
 				if targetField == objects.FieldKeyPriorityPlanRef || targetKind == objects.KindPriorityPlan {
 					statusRole := objects.GetGlobalStatusChecker()
 					sourceStatus, _ := sourceObj[objects.FieldKeyStatus].(string)
@@ -219,7 +219,7 @@ func runRefAdd(cmd *cobra.Command, args []string) error {
 					}
 				}
 
-				// Traversal and Cycle Prevention for related_object_refs (BLI-1789167127826190000-f5e59d20)
+				// Traversal and Cycle Prevention for related_object_refs
 				if targetField == objects.FieldKeyRelatedObjectRefs {
 					// 1. Redundancy check: target must not already be present in typed reference fields
 					if typedField := findInTypedRefFields(sourceObj, updates, targetID); typedField != "" {

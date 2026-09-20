@@ -77,7 +77,7 @@ func casDuplicateQuarantineCommand(kind string) string {
 
 // appendCASDuplicateIDCheckResults adds one Tier-1 registration issue per duplicated object id
 // so summary + results_by_kind surface POL-CODE-004 dual blobs (cache-blind otherwise).
-// It ensures finding rows are deduplicated by object ID (CRIT-1786695439226552000-f1a93ee6).
+// It ensures finding rows are deduplicated by object ID.
 func appendCASDuplicateIDCheckResults(results []CheckResult, inv caspkg.CASDuplicateIDInventory) []CheckResult {
 	if inv.DuplicateCount == 0 {
 		return results

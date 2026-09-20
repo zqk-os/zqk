@@ -350,7 +350,7 @@ func promoteObjectIDs(cmd *cobra.Command, proc *cli.Processor, args []string) er
 			continue
 		}
 
-		// CRIT-COMPLETE-HOP-VERIFYCOMPLETE-001: complete hop invokes AuditorGate.VerifyComplete for execution work units
+		// Complete hop invokes AuditorGate.VerifyComplete for execution work units
 		if (kind == objects.KindBacklogItem || kind == objects.KindAgentTask) && objects.GetGlobalStatusChecker().IsWorkDone(kind, bestStatus) {
 			gate := qa.NewAuditorGateForProject(proc.Storage(), proc.ProjectRoot())
 			if err := gate.VerifyComplete(ctx, id); err != nil {

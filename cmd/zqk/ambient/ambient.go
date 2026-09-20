@@ -1,4 +1,3 @@
-// Traceability: BLI-SYM-008, BLI-SYM-010, REQ-SYM-005
 package ambient
 
 import (

@@ -32,7 +32,6 @@ func NewObjectGetCommandBuilder() *cobra.Command {
 	builder.WithArgs(cobra.ExactArgs(1))
 	builder.AddStringFlag("view", "", "", "Optional view name to scope output fields (default: full object with reference-resolver overlay).")
 	builder.AddStringArrayFlag("fields", "", "Top-level keys to include in output (repeat or comma-separated); same hybrid projection as list. Omit for full object after overlays. Put -h before --fields if you need help so '-h' is not parsed as a field name.")
-	// TRACK: BLI-1785909672838827000-9fca84f5 — regenerate from CLI spec when specs regain this flag.
 	builder.AddStringFlag("link-hydration", "", "", "Reference overlay: none/omit/raw (default) = no embeds; lazy = one hop; default = depth 2; eager = deeper.")
 	builder.WithCommonFlagsExcluding(cli.AddCommonFlagsExcluding, []string{"format", "output", "verbose", "quiet", "timeout", "columns"})
 	cmd := builder.Build()

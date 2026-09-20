@@ -450,7 +450,7 @@ func buildOrchestrationExecutorArgs(taskID, promptMarkdown string, timeout time.
 // orchestrationExecutorChildEnv injects the seat API key and binds the child CLI to the
 // seated kernel. Git cwd may be the ATK worktree; ZQK_PROJECT_ROOT must not be.
 // seedAgentWorktreeRuntime copies .account.index without account YAML, so a worktree
-// bind yields POL-AGENT-ACCOUNT-LOGIN-001 / CRI-ACCOUNT-RBAC-READY on DefaultSwarmWorkerAccount.
+// bind yields an account-login / RBAC-ready failure on DefaultSwarmWorkerAccount.
 func orchestrationExecutorChildEnv(parent []string, seatedKernelRoot, seatKey, zqkBin string) []string {
 	childEnv := withLocalLLMEnv(authcred.WithSeatAPIKeyEnv(parent, seatKey, seatedKernelRoot))
 	return withEnvValue(childEnv, zqkenv.Bin().Name(), zqkBin)

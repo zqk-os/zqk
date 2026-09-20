@@ -710,8 +710,7 @@ func startScheduler(ctx *cli.Context, cmd *cobra.Command) error {
 								}, fmt.Errorf("Method not allowed")
 							}
 
-							// Fail-closed stub: do not report ok for unimplemented CAP wiring
-							// (REQ-CEF-OBS-002 / CRIT-CEF-OBS-002A).
+							// Fail-closed stub: do not report ok for unimplemented CAP wiring.
 							schedulerpkg.SLog(logging.GetLoggerFromProfile(profile)).Info("Received intent from UI (stub — not dispatched)").Log()
 
 							return transport.Response[map[string]any]{
@@ -725,8 +724,8 @@ func startScheduler(ctx *cli.Context, cmd *cobra.Command) error {
 						}))
 						corsMux := buildAutonomyCorsHandler(mux)
 
-						// Loopback-only (REQ-CEF-SEC-001 / CRIT-CEF-SEC-001A).
-						// Set timeouts to prevent unbounded resource consumption (REQ-CEF-R2-SEC-HTTP-TIMEOUTS / CRIT-CEF-R2-SEC-HTTP-TIMEOUTS-A).
+						// Loopback-only.
+						// Set timeouts to prevent unbounded resource consumption.
 						const autonomyUIAddr = "127.0.0.1:5173"
 						schedulerpkg.SLog(logging.GetLoggerFromProfile(profile)).Info("Autonomy Inbox UI running on http://" + autonomyUIAddr).Log()
 						uiServer := &http.Server{
@@ -922,7 +921,7 @@ func startSchedulerBackgroundWatchers(_ *cobra.Command, startCtx context.Context
 	}
 }
 
-// buildAutonomyCorsHandler wraps an http.Handler with restricted CORS headers for the Autonomy UI (BLI-CEF-SEC-003).
+// buildAutonomyCorsHandler wraps an http.Handler with restricted CORS headers for the Autonomy UI.
 func buildAutonomyCorsHandler(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		origin := r.Header.Get("Origin")

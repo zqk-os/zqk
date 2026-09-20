@@ -33,7 +33,7 @@ func NewCheckCmd() *cobra.Command {
 		"uses the full surface. A green partial result does not mean the kernel is healthy.",
 		"Autofix demotes only process_failure findings to status=error (illegal lifecycle /",
 		"status preconditions), never data_completeness or employment_fitness; identity/",
-		"governance kinds never autofix-demote (REQ-KERNEL-LIFECYCLE-FITNESS-001).",
+		"governance kinds never autofix-demote.",
 		"",
 		"Usage patterns:",
 		"  - For full-project checks with auto-fix, run with an explicit long timeout",

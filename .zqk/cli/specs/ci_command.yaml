@@ -7,8 +7,6 @@ description: |
   checkout that SHA into .zqk/local-ci/workdir and run scan-tests against it
   while health/logs stay on studio.
 
-  Kernel plan: PRI-1785699924616992000-8000284f
-
 help:
   examples:
     - comment: "Checkout HEAD into local-ci workdir and scan all packages"

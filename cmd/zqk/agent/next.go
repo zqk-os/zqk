@@ -56,8 +56,8 @@ func runNext(cmd *cobra.Command, args []string, proc *cli.Processor) error {
 		updates[objects.FieldKeyAssigneePersonaRef] = objects.ConstPersonaOrchestratorAlpha
 	}
 
-	// Enforce worktree teardown and merge proof before advancing (BLI-ATK-MERGE-UP-HYGIENE-001).
-	// Docs-eval / CEF ATKs do not use ATK worktrees or commit_hashes — artifact SUCCESS_GATE instead.
+	// Enforce worktree teardown and merge proof before advancing.
+	// Docs-eval tasks do not use ATK worktrees or commit_hashes — artifact SUCCESS_GATE instead.
 	title, _ := task[objects.FieldKeyTitle].(string)
 	desc, _ := task[objects.FieldKeyDescription].(string)
 	workClass := agentprompt.ClassifyWorkClass(title, desc)
@@ -103,7 +103,7 @@ func runNext(cmd *cobra.Command, args []string, proc *cli.Processor) error {
 		return errfmt.Newf("failed to auto-transition state for %s", id).Wrap(err)
 	}
 
-	// Release work claim after worker advances (WFL-MULTI-AGENT-WORK-CLAIM).
+	// Release work claim after worker advances.
 	_ = releaseTaskAfterNext(proc, id, "")
 
 	// Emit verification_signal to health.jsonl
@@ -128,9 +128,9 @@ func runNext(cmd *cobra.Command, args []string, proc *cli.Processor) error {
 
 	_ = cli.WriteOutput(cmd, []byte(fmt.Sprintf("Successfully transitioned task %s to status: pending_verification\n", id)))
 
-	// POL-AGENT-ORCH-HOURGLASS-001: workers must register wake-on-validation-failure.
+	// Workers must register wake-on-validation-failure.
 	// Default to wake so omitting the flag is not fire-and-forget.
-	// none/off is refused — no env privilege override (BLI-ENV-BREAKGLASS-REMOVE-001).
+	// none/off is refused — no env privilege override.
 	onValidationFailure, _ := cmd.Flags().GetString("on-validation-failure")
 	onVF := strings.TrimSpace(onValidationFailure)
 	if onVF == "" {
@@ -138,7 +138,7 @@ func runNext(cmd *cobra.Command, args []string, proc *cli.Processor) error {
 	}
 	if strings.EqualFold(onVF, "none") || strings.EqualFold(onVF, "off") {
 		return errfmt.Errorf(
-			"POL-AGENT-ORCH-HOURGLASS-001: agent next requires --on-validation-failure wake (none/off refused; no env override)",
+			"agent next requires --on-validation-failure wake (none/off refused; no env override)",
 		)
 	}
 	if onVF != "" {

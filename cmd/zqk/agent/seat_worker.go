@@ -90,12 +90,12 @@ func runAgentSeatWorker(cmd *cobra.Command, _ []string) error {
 		root := proc.ProjectRoot()
 		if root == "" {
 			if envRoot := zqkenv.ProjectRoot().Get(); envRoot != "" && paths.IsAgentWorktreePath(envRoot) {
-				return errfmt.Errorf("seat-worker cannot run with ZQK_PROJECT_ROOT set to agent worktree %s without seated kernel configuration (POL-AGENT-KERNEL-ROOT-BINDING-001)", envRoot)
+				return errfmt.Errorf("seat-worker cannot run with ZQK_PROJECT_ROOT set to agent worktree %s without seated kernel configuration", envRoot)
 			}
 			return errfmt.Errorf("project root not found")
 		}
 		if paths.IsAgentWorktreePath(root) {
-			return errfmt.Errorf("seat-worker cannot run with project root inside agent worktree %s (POL-AGENT-KERNEL-ROOT-BINDING-001)", root)
+			return errfmt.Errorf("seat-worker cannot run with project root inside agent worktree %s", root)
 		}
 		var flags clipkg.FlagBag
 		agentID := strings.TrimSpace(flags.String(cmd, "agent-id"))
@@ -128,7 +128,7 @@ func runAgentSeatWorker(cmd *cobra.Command, _ []string) error {
 			accountID = pkgctx.SystemAccountID
 		}
 
-		// One fresh zqk_session per worker process (CRIT-COMMS-RUNTIME-SESSION-ONE-PER-WORKER-001).
+		// One fresh zqk_session per worker process.
 		llmCfg := llm.DefaultConfig(cmd.Context())
 		parentSessionID := zqksession.GetIDFromContext(cmd.Context())
 		workerSessionID := ""
@@ -324,7 +324,7 @@ func seatWorkerMCPServePath(root string) string {
 }
 
 // handleNonCommsWithAgentX peer-acks the steer then runs a bounded swarm.Engine pass
-// on the feed body (REQ-COMMS-SEAT-WORKER-001 non-COMMS path).
+// on the feed body (non-COMMS path).
 //
 // Cognition uses the ATK assignee persona when the steer names an ATK; mesh ack
 // permanently keeps the seat persona so feed identity and task expertise remain
@@ -364,11 +364,10 @@ func handleNonCommsWithAgentX(
 	taskID := extractATKIDFromSteer(body)
 	if taskID == "" {
 		return ackSeatWorkerSkip(root, agentID, personaRef, sessionID, item.EventID,
-			"refuse cold AgentX: steer has no ATK (WFL-SUBAGENT-DISPATCH)")
+			"refuse cold AgentX: steer has no ATK")
 	}
 
 	// Occupancy before cognition — in_progress without claimed_by is not exclusive work.
-	// TRACK: WFL-MULTI-AGENT-WORK-CLAIM
 	if sp != nil && strings.TrimSpace(agentID) != "" {
 		claimRes, claimErr := agentclaim.TryClaim(ctx, sp, secCtx, taskID, agentID, agentclaim.ClaimOptions{
 			ProjectRoot:    root,
@@ -616,7 +615,7 @@ func buildSeatWorkerAgentXPrompts(
 	clippedSteer := clipSeatWorkerPromptPart(steer, seatWorkerSteerCap, "STEER", workClass)
 	clippedPrepared := clipSeatWorkerPromptPart(prepared.Prompt, seatWorkerPreparedPromptCap, "PREPARED CONTEXT", workClass)
 	out.User = fmt.Sprintf(
-		"Seat %s / feed event %s\nwork_class=%s\nSteer:\n%s\n\n## Prepared kernel context (WFL-SUBAGENT-DISPATCH)\n%s\n\nRequired: work this ATK from the prepared context; do not invent tools absent from Available Tools; when finished, summarize with NO further tool calls.",
+		"Seat %s / feed event %s\nwork_class=%s\nSteer:\n%s\n\n## Prepared kernel context\n%s\n\nRequired: work this ATK from the prepared context; do not invent tools absent from Available Tools; when finished, summarize with NO further tool calls.",
 		agentID, eventID, workClass, clippedSteer, clippedPrepared,
 	)
 	if logger != nil {

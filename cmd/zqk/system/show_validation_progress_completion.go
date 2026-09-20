@@ -607,7 +607,7 @@ func collectAndOutputFinalResults(vpc *ValidationProgressContext) (bool, error) 
 	results := collectResultsForCompletion(vpc, failedCopy)
 
 	// Hand-CAS / full-kind CAS re-peek was wired into every check completion by
-	// 6526fdeb0f (BLI-CAS-HAND-DUP-CHECK-001). That O(all hash YAML) scan after
+	// 6526fdeb0f. That O(all hash YAML) scan after
 	// validation is already complete made system check wall-time unacceptable and
 	// piled heat onto the scheduler when night-duty fired checks in a loop.
 	// Duplicate-ID coverage remains via checkDuplicateIDs + object ID cache.

@@ -17,7 +17,6 @@ const (
 )
 
 // NewWorkflowCheckCommandBuilder creates a new workflow_check command
-// TRACK: BLI-1788841705527001000-d18ec5a6 / REQ-CEF-ARCH-001
 func NewWorkflowCheckCommandBuilder() *cobra.Command {
 	builder := clipkg.NewCommandBuilder("check")
 	builder.WithShort(checkShortDesc)

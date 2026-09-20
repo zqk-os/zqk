@@ -68,7 +68,7 @@ func runWhoami(cmd *cobra.Command) error {
 
 	accountInfo := loadWhoamiFromSecurityContext(cmd, projectRoot)
 	if accountInfo == nil {
-		return errfmt.Errorf("unauthorized: no security context (run from a seated CLI; see POL-AGENT-ACCOUNT-LOGIN-001)")
+		return errfmt.Errorf("unauthorized: no security context (run from a seated CLI)")
 	}
 
 	// Build output data
