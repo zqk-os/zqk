@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"regexp"
 
+	"github.com/spf13/cobra"
 	"github.com/zqk-os/zqk/internal/cli"
 	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
@@ -11,7 +12,6 @@ import (
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/storage"
 	internal "github.com/zqk-os/zqk/pkg/zqkcli"
-	"github.com/spf13/cobra"
 )
 
 var domainRegistryIDRe = regexp.MustCompile(`^DOMAIN-REG-(\d+)$`)

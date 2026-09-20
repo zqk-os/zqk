@@ -7,10 +7,10 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/spf13/cobra"
 	"github.com/zqk-os/zqk/internal/cli"
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	schedpkg "github.com/zqk-os/zqk/pkg/scheduler"
-	"github.com/spf13/cobra"
 )
 
 func runTestFailuresHealth(cliCtx *cli.Context, cmd *cobra.Command) error {

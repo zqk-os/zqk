@@ -876,8 +876,8 @@ func TestValidateObjectIntent_requirementTracePipelineCriteria(t *testing.T) {
 	originated := map[string]any{
 		objects.FieldKeyID:          "REQ-trace-001",
 		objects.FieldKeyKind:        objects.KindRequirement,
-		objects.FieldKeyTitle:        "Trace pipeline gate",
-		objects.FieldKeyStatus:       objects.ObjectStatusOriginated,
+		objects.FieldKeyTitle:       "Trace pipeline gate",
+		objects.FieldKeyStatus:      objects.ObjectStatusOriginated,
 		objects.FieldKeyDescription: "A substantive requirement description that crosses the CAS description barrier.",
 	}
 	for _, intent := range []struct {
@@ -910,8 +910,8 @@ func TestValidateObjectIntent_requirementTracePipelineCriteria(t *testing.T) {
 	conceptual := map[string]any{
 		objects.FieldKeyID:          "REQ-trace-002",
 		objects.FieldKeyKind:        objects.KindRequirement,
-		objects.FieldKeyTitle:        "Trace pipeline draft",
-		objects.FieldKeyStatus:       objects.ObjectStatusConceptual,
+		objects.FieldKeyTitle:       "Trace pipeline draft",
+		objects.FieldKeyStatus:      objects.ObjectStatusConceptual,
 		objects.FieldKeyDescription: "Draft plane requirement may exist before gen-trace-pipeline.",
 	}
 	errs := ValidateObjectIntent(t.Context(), Default(), objects.KindRequirement, KindCreate, IntentCreate, conceptual, nil)
@@ -924,8 +924,8 @@ func TestValidateObjectIntent_requirementTracePipelineCriteria(t *testing.T) {
 	linked := map[string]any{
 		objects.FieldKeyID:           "REQ-trace-003",
 		objects.FieldKeyKind:         objects.KindRequirement,
-		objects.FieldKeyTitle:         "Trace pipeline linked",
-		objects.FieldKeyStatus:        objects.ObjectStatusOriginated,
+		objects.FieldKeyTitle:        "Trace pipeline linked",
+		objects.FieldKeyStatus:       objects.ObjectStatusOriginated,
 		objects.FieldKeyDescription:  "Linked requirement with a criteria_ref from gen-trace-pipeline.",
 		objects.FieldKeyCriteriaRefs: []any{"CRIT-trace-001"},
 	}
@@ -936,5 +936,3 @@ func TestValidateObjectIntent_requirementTracePipelineCriteria(t *testing.T) {
 		}
 	}
 }
-
-

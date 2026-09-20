@@ -88,7 +88,7 @@ func TestOOMSafeStreamer_Streaming(t *testing.T) {
 	for i, item := range data {
 		chunk := streamer.ProcessChunk(item)
 		if chunk == nil {
-			t.Fatalf(errMsgNilChunk + " chunk[%d]", i)
+			t.Fatalf(errMsgNilChunk+" chunk[%d]", i)
 		}
 		v, ok := chunk.Payload.(string)
 		if !ok || v != item {

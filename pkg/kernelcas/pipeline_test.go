@@ -131,4 +131,3 @@ func TestRunUpdate_requiresIDAndKind(t *testing.T) {
 		t.Fatalf("expected kind required error, got %v", errNoKind)
 	}
 }
-

@@ -5,10 +5,10 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/stretchr/testify/require"
 	"github.com/zqk-os/zqk/pkg/agentfeed"
 	"github.com/zqk-os/zqk/pkg/datacell"
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
-	"github.com/stretchr/testify/require"
 )
 
 func TestInspectFeed_Doctor(t *testing.T) {

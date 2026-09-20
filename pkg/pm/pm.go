@@ -15,28 +15,28 @@ type InvariantPredicateFunc func(ctx context.Context, obj any) error
 
 // BacklogItem models an atomic unit of execution in the cellular PM domain.
 type BacklogItem struct {
-	dna.BaseObject            `yaml:",inline" json:",inline"`
-	dna.Auditable             `yaml:",inline" json:",inline"`
-	dna.Lifecycle             `yaml:",inline" json:",inline"`
-	ID                        string     `json:"id,omitempty" yaml:"id,omitempty"`
-	Title                     string     `json:"title" yaml:"title"`
-	Description               string     `json:"description" yaml:"description"`
-	ProblemStatement          string     `json:"problem_statement,omitempty" yaml:"problem_statement,omitempty"`
-	AcceptanceConsiderations  string     `json:"acceptance_considerations,omitempty" yaml:"acceptance_considerations,omitempty"`
-	Priority                  string     `json:"priority,omitempty" yaml:"priority,omitempty"`
-	PriorityTier              string     `json:"priority_tier,omitempty" yaml:"priority_tier,omitempty"`
-	EstimatedEffort           string     `json:"estimated_effort,omitempty" yaml:"estimated_effort,omitempty"`
-	ActualEffort              string     `json:"actual_effort,omitempty" yaml:"actual_effort,omitempty"`
-	StartedAt                 *time.Time `json:"started_at,omitempty" yaml:"started_at,omitempty"`
-	CompletedAt               *time.Time `json:"completed_at,omitempty" yaml:"completed_at,omitempty"`
-	CommitHashes              []string   `json:"commit_hashes,omitempty" yaml:"commit_hashes,omitempty"`
-	RequirementRefs           []string   `json:"requirement_refs,omitempty" yaml:"requirement_refs,omitempty"`
-	CriteriaRefs              []string   `json:"criteria_refs,omitempty" yaml:"criteria_refs,omitempty"`
-	MilestoneRefs             []string   `json:"milestone_refs,omitempty" yaml:"milestone_refs,omitempty"`
-	WorkstreamRefs            []string   `json:"workstream_refs,omitempty" yaml:"workstream_refs,omitempty"`
-	PersonaRefs               []string   `json:"persona_refs,omitempty" yaml:"persona_refs,omitempty"`
-	PriorityPlanRef           string     `json:"priority_plan_ref,omitempty" yaml:"priority_plan_ref,omitempty"`
-	GoalRefs                  []string   `json:"goal_refs,omitempty" yaml:"goal_refs,omitempty"`
+	dna.BaseObject           `yaml:",inline" json:",inline"`
+	dna.Auditable            `yaml:",inline" json:",inline"`
+	dna.Lifecycle            `yaml:",inline" json:",inline"`
+	ID                       string     `json:"id,omitempty" yaml:"id,omitempty"`
+	Title                    string     `json:"title" yaml:"title"`
+	Description              string     `json:"description" yaml:"description"`
+	ProblemStatement         string     `json:"problem_statement,omitempty" yaml:"problem_statement,omitempty"`
+	AcceptanceConsiderations string     `json:"acceptance_considerations,omitempty" yaml:"acceptance_considerations,omitempty"`
+	Priority                 string     `json:"priority,omitempty" yaml:"priority,omitempty"`
+	PriorityTier             string     `json:"priority_tier,omitempty" yaml:"priority_tier,omitempty"`
+	EstimatedEffort          string     `json:"estimated_effort,omitempty" yaml:"estimated_effort,omitempty"`
+	ActualEffort             string     `json:"actual_effort,omitempty" yaml:"actual_effort,omitempty"`
+	StartedAt                *time.Time `json:"started_at,omitempty" yaml:"started_at,omitempty"`
+	CompletedAt              *time.Time `json:"completed_at,omitempty" yaml:"completed_at,omitempty"`
+	CommitHashes             []string   `json:"commit_hashes,omitempty" yaml:"commit_hashes,omitempty"`
+	RequirementRefs          []string   `json:"requirement_refs,omitempty" yaml:"requirement_refs,omitempty"`
+	CriteriaRefs             []string   `json:"criteria_refs,omitempty" yaml:"criteria_refs,omitempty"`
+	MilestoneRefs            []string   `json:"milestone_refs,omitempty" yaml:"milestone_refs,omitempty"`
+	WorkstreamRefs           []string   `json:"workstream_refs,omitempty" yaml:"workstream_refs,omitempty"`
+	PersonaRefs              []string   `json:"persona_refs,omitempty" yaml:"persona_refs,omitempty"`
+	PriorityPlanRef          string     `json:"priority_plan_ref,omitempty" yaml:"priority_plan_ref,omitempty"`
+	GoalRefs                 []string   `json:"goal_refs,omitempty" yaml:"goal_refs,omitempty"`
 }
 
 // GetID returns the entity ID, resolving from URN if ID field is empty.
@@ -393,4 +393,3 @@ func NewADR(id, title, contextText, decision, consequences string) (*ADR, error)
 
 	return adr, nil
 }
-

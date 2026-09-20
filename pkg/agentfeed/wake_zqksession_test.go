@@ -180,13 +180,13 @@ func TestResolveFromAgentID(t *testing.T) {
 			want:        "explicit-author",
 		},
 		{
-			name:       "session_fallback",
+			name:        "session_fallback",
 			fromAgentID: "",
 			sessionEnv:  "bound-session",
 			want:        "bound-session",
 		},
 		{
-			name:       "default_when_unbound",
+			name:        "default_when_unbound",
 			fromAgentID: "",
 			sessionEnv:  "", // unset
 			want:        FromAgentID,

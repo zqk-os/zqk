@@ -3,9 +3,9 @@ package scheduler
 import (
 	"strings"
 
+	"github.com/spf13/cobra"
 	"github.com/zqk-os/zqk/internal/cli"
 	schedpkg "github.com/zqk-os/zqk/pkg/scheduler"
-	"github.com/spf13/cobra"
 )
 
 // resolveConvergenceRoutingForCLI loads convergence_session fields when --session-id is set (unless

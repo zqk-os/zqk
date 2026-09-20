@@ -1,9 +1,9 @@
 package app
 
 import (
+	"github.com/spf13/cobra"
 	"github.com/zqk-os/zqk/internal/cli"
 	"github.com/zqk-os/zqk/pkg/paths"
-	"github.com/spf13/cobra"
 )
 
 // NewCompletionCmd returns the root-level completion command for generating shell completion scripts.

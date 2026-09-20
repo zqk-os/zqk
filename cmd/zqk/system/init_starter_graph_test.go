@@ -100,4 +100,3 @@ func TestInit_Greenfield_StarterKernelGraph(t *testing.T) {
 		t.Fatalf("whats-next failed following greenfield init: %v", err)
 	}
 }
-

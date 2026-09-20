@@ -20,10 +20,10 @@ const (
 // Known interaction policy IDs (kernel objects). Catalog text is the fast pong;
 // CAS policy body remains SSOT for operators.
 const (
-	PolicyAdminMembrane   = "POL-AGENT-ADMIN-MEMBRANE-001"
-	PolicyTPMGroomAhead      = "POL-AGENT-TPM-GROOM-AHEAD-001"
-	PolicyTPMProcessAdmin    = "POL-AGENT-TPM-PROCESS-ADMIN-001"
-	PolicyTPMTracePipeline   = "POL-AGENT-TPM-TRACE-PIPELINE-001"
-	PolicyCommsRemedy     = "POL-AGENT-COMMS-REMEDY-WAKE-001"
-	PolicyInteractionMeta = "POL-AGENT-INTERACTION-POLICY-001"
+	PolicyAdminMembrane    = "POL-AGENT-ADMIN-MEMBRANE-001"
+	PolicyTPMGroomAhead    = "POL-AGENT-TPM-GROOM-AHEAD-001"
+	PolicyTPMProcessAdmin  = "POL-AGENT-TPM-PROCESS-ADMIN-001"
+	PolicyTPMTracePipeline = "POL-AGENT-TPM-TRACE-PIPELINE-001"
+	PolicyCommsRemedy      = "POL-AGENT-COMMS-REMEDY-WAKE-001"
+	PolicyInteractionMeta  = "POL-AGENT-INTERACTION-POLICY-001"
 )

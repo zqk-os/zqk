@@ -21,15 +21,15 @@ import (
 )
 
 const (
-	useIntakeCommand      = "intake [context...]"
-	shortIntakeCommand    = "Semantic ingestion pipeline (Intent Capture)"
-	errFailedToReadStdin  = "failed to read from stdin"
-	errNoContextProvided  = "no intent context provided. Please provide arguments or pipe content via stdin."
-	statusSynthesizing    = "Synthesizing objects from input context via ambient Semantic Engine..."
+	useIntakeCommand        = "intake [context...]"
+	shortIntakeCommand      = "Semantic ingestion pipeline (Intent Capture)"
+	errFailedToReadStdin    = "failed to read from stdin"
+	errNoContextProvided    = "no intent context provided. Please provide arguments or pipe content via stdin."
+	statusSynthesizing      = "Synthesizing objects from input context via ambient Semantic Engine..."
 	statusApplyingShockwave = "Applying Policy Shockwave Validation and saving..."
-	msgNoObjectsExtracted = "No objects were extracted from the provided context."
-	msgIntakeCancelled    = "Intake cancelled."
-	msgMissingDescription = "description is required on base_object: fail-closed CAS intake gate"
+	msgNoObjectsExtracted   = "No objects were extracted from the provided context."
+	msgIntakeCancelled      = "Intake cancelled."
+	msgMissingDescription   = "description is required on base_object: fail-closed CAS intake gate"
 )
 
 // IntakeObject is a single object synthesized by the semantic engine

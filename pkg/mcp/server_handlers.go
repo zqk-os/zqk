@@ -17,7 +17,7 @@ const (
 	clientInfoKeystoreKeyID       = "keystore_key_id"
 	clientInfoUsername            = objects.FieldKeyUsername
 	clientInfoPassword            = "password"
-	clientInfoOAuthTok          = "oauth_token"
+	clientInfoOAuthTok            = "oauth_token"
 	clientInfoPersonalAccessToken = "personal_access_token"
 	clientInfoRoles               = objects.FieldKeyRoles
 	clientInfoPermissions         = objects.FieldKeyPermissions

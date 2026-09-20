@@ -3,13 +3,13 @@ package agent
 import (
 	"strings"
 
+	"github.com/spf13/cobra"
 	"github.com/zqk-os/zqk/internal/cli"
 	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/interactionpolicy"
 	"github.com/zqk-os/zqk/pkg/logging"
-	"github.com/spf13/cobra"
 )
 
 // NewGuidingStepCmd returns zqk agent guiding-step (kernel ping-pong).

@@ -7,13 +7,13 @@ import (
 	"testing"
 	"time"
 
+	"github.com/spf13/cobra"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
 	schedulerpkg "github.com/zqk-os/zqk/pkg/scheduler"
 	storagepkg "github.com/zqk-os/zqk/pkg/storage"
 	"github.com/zqk-os/zqk/pkg/zqkenv"
-	"github.com/spf13/cobra"
 )
 
 // registerSubmitFlags mirrors the flags submitJob reads from the generated

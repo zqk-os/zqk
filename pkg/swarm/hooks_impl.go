@@ -50,7 +50,9 @@ func NewHallucinationCircuitBreaker() *HallucinationCircuitBreaker {
 	return &HallucinationCircuitBreaker{}
 }
 
-func (h *HallucinationCircuitBreaker) PreTool(ctx context.Context, call llm.ToolCall) error { return nil }
+func (h *HallucinationCircuitBreaker) PreTool(ctx context.Context, call llm.ToolCall) error {
+	return nil
+}
 
 func (h *HallucinationCircuitBreaker) PostTool(ctx context.Context, call llm.ToolCall, result string, err error) (string, error) {
 	combined := result
@@ -70,12 +72,15 @@ func (h *HallucinationCircuitBreaker) PostTool(ctx context.Context, call llm.Too
 	return "", nil
 }
 
-func (h *HallucinationCircuitBreaker) OnSuccess(ctx context.Context, call llm.ToolCall, result string) {}
+func (h *HallucinationCircuitBreaker) OnSuccess(ctx context.Context, call llm.ToolCall, result string) {
+}
 
-type ProactiveWorkspaceSeeder struct {}
+type ProactiveWorkspaceSeeder struct{}
 
 func (p *ProactiveWorkspaceSeeder) PreTool(ctx context.Context, call llm.ToolCall) error { return nil }
-func (p *ProactiveWorkspaceSeeder) PostTool(ctx context.Context, call llm.ToolCall, result string, err error) (string, error) { return "", nil }
+func (p *ProactiveWorkspaceSeeder) PostTool(ctx context.Context, call llm.ToolCall, result string, err error) (string, error) {
+	return "", nil
+}
 func (p *ProactiveWorkspaceSeeder) OnSuccess(ctx context.Context, call llm.ToolCall, result string) {
 	// Ambient trigger: kick off lints or builds in background to warm cache.
 	if call.Name == "zqk_write_code" || call.Name == "zqk_execute_bash" {

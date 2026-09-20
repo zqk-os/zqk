@@ -56,7 +56,7 @@ func RegisterObserverTools(server *Server) {
 				},
 				"roles": map[string]any{
 					objects.FieldKeyType:        "array",
-					"items": map[string]any{"type": "string"},
+					"items":                     map[string]any{"type": "string"},
 					objects.FieldKeyDescription: "Expected roles for the agent",
 				},
 				"profile": map[string]any{
@@ -128,7 +128,7 @@ func (s *Server) handleObserverRegisterTool(ctx context.Context, args map[string
 			}
 		}
 	}
-	
+
 	profile, _ := args["profile"].(string)
 	if profile == "" {
 		profile = "ai-agent"
@@ -141,7 +141,7 @@ func (s *Server) handleObserverRegisterTool(ctx context.Context, args map[string
 	if s.config.MCPServer.Security.AgentRegistry == nil {
 		s.config.MCPServer.Security.AgentRegistry = make(map[string]AgentConfig)
 	}
-	
+
 	s.config.MCPServer.Security.AgentRegistry[accountID] = AgentConfig{
 		AccountID: accountID,
 		Roles:     roles,
@@ -155,6 +155,6 @@ func (s *Server) handleObserverRegisterTool(ctx context.Context, args map[string
 			return nil, fmt.Errorf("failed to save config: %v", err)
 		}
 	}
-	
+
 	return fmt.Sprintf("Successfully registered agent %s with roles %v and profile %s", accountID, roles, profile), nil
 }

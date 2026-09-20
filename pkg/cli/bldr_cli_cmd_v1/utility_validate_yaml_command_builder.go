@@ -1,8 +1,8 @@
 package bldr_cli_cmd_v1
 
 import (
-	clipkg "github.com/zqk-os/zqk/pkg/cli"
 	"github.com/spf13/cobra"
+	clipkg "github.com/zqk-os/zqk/pkg/cli"
 )
 
 // NewUtilityValidateYamlCommandBuilder creates a new utility_validate_yaml command

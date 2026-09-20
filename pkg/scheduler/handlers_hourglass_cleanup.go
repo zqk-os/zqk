@@ -6,9 +6,9 @@ import (
 	"strings"
 	"time"
 
+	"github.com/shirou/gopsutil/v3/process"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/logging"
-	"github.com/shirou/gopsutil/v3/process"
 )
 
 // HourglassCleanupHandler enforces the Hourglass protocol by terminating stalled agent builds natively.

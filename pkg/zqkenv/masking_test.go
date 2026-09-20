@@ -3,8 +3,8 @@ package zqkenv_test
 import (
 	"testing"
 
-	"github.com/zqk-os/zqk/pkg/zqkenv"
 	"github.com/stretchr/testify/assert"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
 func TestMaskSensitiveValue(t *testing.T) {

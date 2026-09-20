@@ -11,13 +11,13 @@ import (
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 
 	"github.com/fatih/color"
+	"github.com/spf13/cobra"
 	"github.com/zqk-os/zqk/internal/cli"
 	bldr_cli_cmd_v1 "github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/pipeline"
-	"github.com/spf13/cobra"
 )
 
 type SynthesizeSkillOptions struct {

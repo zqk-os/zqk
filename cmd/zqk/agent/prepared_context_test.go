@@ -134,4 +134,3 @@ func TestAssemblePreparedContext_WorkClassClassification(t *testing.T) {
 		t.Fatalf("expected ExecRoot=%s for overridden docs_eval, got %s", root, overrideCtx.ExecRoot)
 	}
 }
-

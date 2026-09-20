@@ -49,7 +49,7 @@ func BenchmarkObjectStorage_ListPagination(b *testing.B) {
 			"val":                i,
 		}
 		data, _ := json.Marshal(record)
-		_ , _ = f.Write(append(data, '\n'))
+		_, _ = f.Write(append(data, '\n'))
 		_ = AppendStreamLocationToRegistry(tmpDir, kind, id, FormatStreamLocation(segFile, int64(i)))
 	}
 	_ = f.Close()
@@ -100,7 +100,7 @@ func TestObjectStorage_ListBoundedReads(t *testing.T) {
 			"val":                i,
 		}
 		data, _ := json.Marshal(record)
-		_ , _ = f.Write(append(data, '\n'))
+		_, _ = f.Write(append(data, '\n'))
 		_ = AppendStreamLocationToRegistry(tmpDir, kind, id, FormatStreamLocation(segFile, int64(i)))
 	}
 	_ = f.Close()

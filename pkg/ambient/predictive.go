@@ -72,4 +72,3 @@ func (s *PredictiveTaskSpawner) handleFilesystem(ctx context.Context, event Even
 	}
 	return nil
 }
-

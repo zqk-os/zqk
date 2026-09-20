@@ -160,4 +160,3 @@ func TestCoerceRequirementPriorityForCASUpdate(t *testing.T) {
 		t.Fatalf("medium -> p2, got %#v", obj[objects.FieldKeyPriority])
 	}
 }
-

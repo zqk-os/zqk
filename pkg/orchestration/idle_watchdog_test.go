@@ -57,8 +57,8 @@ func TestIdleWatchdog_StalledSubagent_IsBounded(t *testing.T) {
 // once the watchdog cancels its execution context.
 func TestIdleWatchdog_RespectingSubagent_PromptlyCancelled(t *testing.T) {
 	const (
-		timeout     = 40 * time.Millisecond
-		probeTick   = 5 * time.Millisecond
+		timeout       = 40 * time.Millisecond
+		probeTick     = 5 * time.Millisecond
 		overallBudget = 200 * time.Millisecond
 	)
 
@@ -96,7 +96,7 @@ func TestIdleWatchdog_RespectingSubagent_PromptlyCancelled(t *testing.T) {
 // guard: a subagent that completes inside its budget is not touched by the
 // watchdog, and its return value (including nil) is propagated to the caller.
 func TestIdleWatchdog_HealthySubagent_Completes(t *testing.T) {
-	w := NewIdleWatchdog(250 * time.Millisecond, 20 * time.Millisecond)
+	w := NewIdleWatchdog(250*time.Millisecond, 20*time.Millisecond)
 	ctx := context.Background()
 
 	beatIn := 0
@@ -138,7 +138,7 @@ func TestIdleWatchdog_DeadlineHonoured(t *testing.T) {
 	}
 	// The watchdog must respect the tighter parent deadline; do not
 	// allow the whole budget to be consumed by an uncancelled blocked task.
-	if elapsed > 150 * time.Millisecond {
+	if elapsed > 150*time.Millisecond {
 		t.Fatalf("expected parent deadline to win, took %s", elapsed)
 	}
 }
@@ -216,7 +216,7 @@ func TestRunSubagentTask_IdleWatchdog_TriggeredAndRolledBack(t *testing.T) {
 // appended.
 func TestRunSubagentTask_IdleWatchdog_Disabled_NoEffect(t *testing.T) {
 	cfg := SentinelConfig{
-		MaxRetries:        0,
+		MaxRetries:          0,
 		IdleWatchdogEnabled: false,
 	}
 	mockCap := &MockCAPLoop{}

@@ -160,4 +160,5 @@ func TestEmbeddedTSDBProvider_IsClosed(t *testing.T) {
 		t.Errorf("expected provider IsClosed to be true after Close")
 	}
 }
+
 // tdd refresh

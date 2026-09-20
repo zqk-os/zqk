@@ -28,14 +28,19 @@ const truncationMarkerValue = "payload truncated by zqk dynamic token budget"
 // drop mutation evidence (tool_calls).
 //
 // MaxTokens     caps the total payload (content + tool_call arguments) for
-//               the request. If zero, no global cap is applied.
+//
+//	the request. If zero, no global cap is applied.
+//
 // PerToolCall   caps the argument size for each individual tool_call
-//               (not the content). If zero, per-call caps are not applied.
+//
+//	(not the content). If zero, per-call caps are not applied.
+//
 // Weight        is a reserved knob for future recency weighting. Values in
-//               (0,1] shrink the applied budget; a value of 0 or a value
-//               >1 (common "unlimited") is treated as 1.0. This field is a
-//               no-op in the current implementation — it is reserved so the
-//               struct shape is stable for callers that already pass it.
+//
+//	(0,1] shrink the applied budget; a value of 0 or a value
+//	>1 (common "unlimited") is treated as 1.0. This field is a
+//	no-op in the current implementation — it is reserved so the
+//	struct shape is stable for callers that already pass it.
 type ToolBudgetLimits struct {
 	MaxTokens   int
 	PerToolCall int
@@ -60,12 +65,17 @@ func NewToolBudget() *ToolBudget {
 // ApplyResult is the return value of ToolBudget.Apply.
 //
 // Kept            is the deep-copied []Message the caller may hand to the
-//                 provider. Apply never mutates the input slice.
+//
+//	provider. Apply never mutates the input slice.
+//
 // Exceeded         is true when the request needed truncation (any budget
-//                 was applied). Callers can use this to emit a telemetry
-//                 event without re-scanning the messages.
+//
+//	was applied). Callers can use this to emit a telemetry
+//	event without re-scanning the messages.
+//
 // ContentTokens    is a rough pre-truncation estimate of total token count,
-//                 for telemetry.
+//
+//	for telemetry.
 type ApplyResult struct {
 	Kept          []Message
 	Exceeded      bool

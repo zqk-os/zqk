@@ -97,4 +97,3 @@ func TestMeshDynamicTopology(t *testing.T) {
 		t.Errorf("expected h100 accelerator label")
 	}
 }
-

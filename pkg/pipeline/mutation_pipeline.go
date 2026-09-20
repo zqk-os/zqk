@@ -12,10 +12,10 @@ var (
 
 // Mutation represents a process mutation event.
 type Mutation struct {
-	Type          string    `json:"type"`
-	Payload       map[string]any
-	StatusClass   StatusClass `json:"status_class,omitempty"`
-	PipelineMutationApplied bool  `json:"pipeline_mutation_applied,omitempty"`
+	Type                    string `json:"type"`
+	Payload                 map[string]any
+	StatusClass             StatusClass `json:"status_class,omitempty"`
+	PipelineMutationApplied bool        `json:"pipeline_mutation_applied,omitempty"`
 }
 
 // StatusClass classifies the mutation scope.
@@ -28,10 +28,10 @@ const (
 
 // MutationRecord is the immutable record of a mutation event, stored in the pipeline log.
 type MutationRecord struct {
-	Mutation                  Mutation    `json:"mutation"`
-	ViaPipeline               bool        `json:"via_pipeline"`
-	PipelineMutationApplied   bool        `json:"pipeline_mutation_applied"`
-	ProcessClockSequence      int64       `json:"process_clock_sequence"`
+	Mutation                Mutation `json:"mutation"`
+	ViaPipeline             bool     `json:"via_pipeline"`
+	PipelineMutationApplied bool     `json:"pipeline_mutation_applied"`
+	ProcessClockSequence    int64    `json:"process_clock_sequence"`
 }
 
 // Execution represents the live pipeline execution context.
@@ -76,10 +76,10 @@ func newPipelineMutator() *Execution {
 func (exec *Execution) mutate(m Mutation) (*MutationRecord, error) {
 	procClock := exec.nextProcessClock()
 	rec := MutationRecord{
-		Mutation:                  m,
-		ViaPipeline:               true,
-		PipelineMutationApplied:   true,
-		ProcessClockSequence:      procClock,
+		Mutation:                m,
+		ViaPipeline:             true,
+		PipelineMutationApplied: true,
+		ProcessClockSequence:    procClock,
 	}
 
 	exec.mutations = append(exec.mutations, rec)

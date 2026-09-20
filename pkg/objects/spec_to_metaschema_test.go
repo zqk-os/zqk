@@ -9,9 +9,9 @@ import (
 func TestSpecToMetaSchema(t *testing.T) {
 	kernelCritical := true
 	spec := &Spec{
-		Ontology:      "account",
-		SchemaVersion: "2.0.0",
-		Extends:       "base_object",
+		Ontology:       "account",
+		SchemaVersion:  "2.0.0",
+		Extends:        "base_object",
 		StorageProfile: "cas_entity",
 		KernelCritical: &kernelCritical,
 		Traits:         []string{"auditable", "streamable"},

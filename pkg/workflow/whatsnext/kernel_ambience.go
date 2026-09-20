@@ -86,19 +86,19 @@ type StaleTestCatalyst struct {
 
 // MetricsRollupSnapshot contains the aggregated metrics from ambient wave.
 type MetricsRollupSnapshot struct {
-	CommandErrors           int            `json:"command_errors"`
-	SchedulerStuckCount     int            `json:"scheduler_stuck_count"`
-	AuditEventsCount        int            `json:"audit_events_count"`
-	GhostRefCount           int            `json:"ghost_ref_count"`
-	SystemCheckIssues       int            `json:"system_check_issues"`
-	NextAdminAction         string         `json:"next_admin_action"`
-	RankedActions           []string       `json:"ranked_actions"`
-	MeasuredAt              string         `json:"measured_at"`
-	HighFailureRateCommands int            `json:"high_failure_rate_commands,omitempty"`
-	SlowCommands            int            `json:"slow_commands,omitempty"`
-	FrequentTimeouts        int            `json:"frequent_timeouts,omitempty"`
-	ChurnIndicators         int            `json:"churn_indicators,omitempty"`
-	TestBundleEvidence      string         `json:"test_bundle_evidence,omitempty"`
+	CommandErrors           int                                  `json:"command_errors"`
+	SchedulerStuckCount     int                                  `json:"scheduler_stuck_count"`
+	AuditEventsCount        int                                  `json:"audit_events_count"`
+	GhostRefCount           int                                  `json:"ghost_ref_count"`
+	SystemCheckIssues       int                                  `json:"system_check_issues"`
+	NextAdminAction         string                               `json:"next_admin_action"`
+	RankedActions           []string                             `json:"ranked_actions"`
+	MeasuredAt              string                               `json:"measured_at"`
+	HighFailureRateCommands int                                  `json:"high_failure_rate_commands,omitempty"`
+	SlowCommands            int                                  `json:"slow_commands,omitempty"`
+	FrequentTimeouts        int                                  `json:"frequent_timeouts,omitempty"`
+	ChurnIndicators         int                                  `json:"churn_indicators,omitempty"`
+	TestBundleEvidence      string                               `json:"test_bundle_evidence,omitempty"`
 	TopErrorClusters        []IssueCluster                       `json:"top_error_clusters,omitempty"`
 	TopWarnClusters         []IssueCluster                       `json:"top_warn_clusters,omitempty"`
 	IOResourceTelemetry     *resourcehygiene.IOResourceTelemetry `json:"io_resource_telemetry,omitempty"`

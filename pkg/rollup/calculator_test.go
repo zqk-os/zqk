@@ -40,7 +40,7 @@ func TestCalculate_MixedStatusesAndEfforts(t *testing.T) {
 			objects.FieldKeyID:              "GOAL-003",
 			objects.FieldKeyKind:            objects.KindGoal,
 			objects.FieldKeyStatus:          objects.ObjectStatusBlocked,
-			objects.FieldKeyEstimatedEffort: "1d", // 24h
+			objects.FieldKeyEstimatedEffort: "1d",          // 24h
 			objects.FieldKeyActualEffort:    "unspecified", // unparsable -> ignored
 		},
 		{

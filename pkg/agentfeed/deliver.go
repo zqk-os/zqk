@@ -12,16 +12,16 @@ import (
 
 // PeerWakeResult is the outcome of a best-effort peer wake after feed append.
 type PeerWakeResult struct {
-	Attempted       bool   `json:"attempted"`
+	Attempted          bool   `json:"attempted"`
 	Skipped            string `json:"skipped,omitempty"`
 	SkippedReason      string `json:"skipped_reason,omitempty"`
 	WakeAuthorExcluded bool   `json:"wake_author_excluded,omitempty"`
 	Script             string `json:"script,omitempty"` // legacy JSON key; opaque endpoint from adapter
-	Error           string `json:"error,omitempty"`
-	DeliveryReceipt bool   `json:"delivery_receipt,omitempty"`
-	DeliveryEventID string `json:"delivery_event_id,omitempty"`
-	InReplyTo       string `json:"in_reply_to,omitempty"`
-	PasteText       string `json:"paste_text,omitempty"` // chat paste (stub by default)
+	Error              string `json:"error,omitempty"`
+	DeliveryReceipt    bool   `json:"delivery_receipt,omitempty"`
+	DeliveryEventID    string `json:"delivery_event_id,omitempty"`
+	InReplyTo          string `json:"in_reply_to,omitempty"`
+	PasteText          string `json:"paste_text,omitempty"` // chat paste (stub by default)
 	// Transport names the membrane used (e.g. tpm_stamp, agentapi_notify, tpm_paste, mcp_action_required).
 	Transport string `json:"transport,omitempty"`
 	// Live is true only when the membrane can resume a running peer turn

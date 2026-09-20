@@ -10,7 +10,7 @@ import (
 )
 
 type dummyKindAdapter struct {
-	kind       string
+	kind        string
 	invocations int
 }
 

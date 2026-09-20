@@ -12,8 +12,6 @@ import (
 func TestObjectDemoteCommand(t *testing.T) {
 	testEnv := SetupTestEnvironment(t)
 
-
-
 	fieldRegistry := objects.GetGlobalFieldRegistry()
 	if err := fieldRegistry.LoadFields(); err != nil {
 		t.Fatalf("failed to load field registry: %v", err)

@@ -8,6 +8,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/spf13/cobra"
 	"github.com/zqk-os/zqk/internal/cli"
 	"github.com/zqk-os/zqk/pkg/agentfeed"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
@@ -16,7 +17,6 @@ import (
 	"github.com/zqk-os/zqk/pkg/idebridge"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/objects"
-	"github.com/spf13/cobra"
 )
 
 // wakeStubBodyPrefix marks inbox entries that carry only a wake stub, so operators

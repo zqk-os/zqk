@@ -4,8 +4,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/robfig/cron/v3"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 func TestLastRunAtFromJob(t *testing.T) {

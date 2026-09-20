@@ -2,11 +2,11 @@ package scheduler
 
 import (
 	"fmt"
+	__exec "os/exec"
 	"path/filepath"
 	"strings"
 	"testing"
 	"time"
-	__exec "os/exec"
 
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/federation"
@@ -166,7 +166,7 @@ func TestMeshLeaseSupervision_Integration(t *testing.T) {
 
 	// Force the stream segment directly!
 	time.Sleep(200 * time.Millisecond)
-		streamDir := filepath.Join(providerRoot, ".zqk", "streams", "zqk_session")
+	streamDir := filepath.Join(providerRoot, ".zqk", "streams", "zqk_session")
 	if files, err := fileutil.ReadDir(streamDir); err == nil {
 		for _, file := range files {
 			if strings.HasSuffix(file.Name(), ".json") {
@@ -183,8 +183,6 @@ func TestMeshLeaseSupervision_Integration(t *testing.T) {
 		t.Logf("ReadDir err: %v", err)
 	}
 
-
-	
 	// Stream-backed objects skip promotion in CreateCASVisible, so force the update here:
 	breakCtx1 := pkgctx.WithLifecycleBreakGlass(ctx, "test harness setup")
 	if err := providerStorage.Update(breakCtx1, secCtx, leaseID, map[string]any{objects.FieldKeyStatus: objects.ObjectStatusActive}); err != nil {
@@ -341,7 +339,7 @@ func TestMeshLeaseSupervision_QuotasAndRevocation(t *testing.T) {
 
 	// Force the stream segment directly!
 	time.Sleep(200 * time.Millisecond)
-		streamDir := filepath.Join(providerRoot, ".zqk", "streams", "zqk_session")
+	streamDir := filepath.Join(providerRoot, ".zqk", "streams", "zqk_session")
 	if files, err := fileutil.ReadDir(streamDir); err == nil {
 		for _, file := range files {
 			if strings.HasSuffix(file.Name(), ".json") {
@@ -358,8 +356,6 @@ func TestMeshLeaseSupervision_QuotasAndRevocation(t *testing.T) {
 		t.Logf("ReadDir err: %v", err)
 	}
 
-
-	
 	// Stream-backed objects skip promotion in CreateCASVisible, so force the update here:
 	breakCtx1 := pkgctx.WithLifecycleBreakGlass(ctx, "test harness setup")
 	if err := providerStorage.Update(breakCtx1, secCtx, leaseID, map[string]any{objects.FieldKeyStatus: objects.ObjectStatusActive}); err != nil {
@@ -447,7 +443,7 @@ func TestMeshLeaseSupervision_QuotasAndRevocation(t *testing.T) {
 	storage.CreateCASVisible(t, providerStorage, ctx, secCtx, skillLease2, objects.ObjectStatusActive)
 
 	time.Sleep(200 * time.Millisecond)
-		streamDir2 := filepath.Join(providerRoot, ".zqk", "streams", "zqk_session")
+	streamDir2 := filepath.Join(providerRoot, ".zqk", "streams", "zqk_session")
 	if files, err := fileutil.ReadDir(streamDir2); err == nil {
 		for _, file := range files {
 			if strings.HasSuffix(file.Name(), ".json") {

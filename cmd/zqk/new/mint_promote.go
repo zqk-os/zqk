@@ -14,7 +14,6 @@ import (
 	"github.com/zqk-os/zqk/pkg/zqktime"
 )
 
-
 const (
 	mintPromoteJobPrefix     = "SCH-mint-promote-"
 	mintPromoteJobCategory   = "lifecycle"

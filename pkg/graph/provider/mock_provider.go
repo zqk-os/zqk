@@ -647,7 +647,6 @@ func (c *MockConnection) Accelerator() *EmbeddedGraphAccelerator {
 	return c.store.accelerator
 }
 
-
 // BeginTransaction starts an explicit transaction.
 func (c *MockConnection) BeginTransaction(ctx context.Context) (GraphTransaction, error) {
 	tx := &MockTransaction{

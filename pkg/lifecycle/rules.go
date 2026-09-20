@@ -45,6 +45,12 @@ func DefaultTransitionRules() []TransitionRule {
 			IDFromScope: scopeBacklogItemID,
 			ToStatus:    statusComplete,
 		},
+		{
+			CriterionID: criterionAllCriteriaCompleteForRequirement,
+			Kind:        kindRequirement,
+			IDFromScope: scopeRequirementID,
+			ToStatus:    statusComplete,
+		},
 	}
 }
 

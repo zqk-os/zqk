@@ -5,10 +5,10 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"github.com/spf13/cobra"
 	"github.com/zqk-os/zqk/pkg/audit"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
 	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
-	"github.com/spf13/cobra"
 )
 
 // NewAuditStreamCmd returns a command to tail the audit stream.

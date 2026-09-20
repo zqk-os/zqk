@@ -463,7 +463,6 @@ func TestWithLockTimeout_BLI_CEF_ARCH_CONCURRENCY_CTX_001(t *testing.T) {
 	}
 }
 
-
 // TestWithRLockTimeout_ContextCancellation tests that cancelled context aborts immediately during rlock contention
 func TestWithRLockTimeout_ContextCancellation(t *testing.T) {
 	t.Parallel()

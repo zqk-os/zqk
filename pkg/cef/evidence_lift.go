@@ -2,9 +2,9 @@ package cef
 
 // Envelope levels for R27 evidence elevation (floor-4 → target-floor5 → moonshot)
 const (
-	EnvelopeFloor4   = 4.0
-	EnvelopeTarget   = 4.5
-	EnvelopeFloor5   = 5.0
+	EnvelopeFloor4 = 4.0
+	EnvelopeTarget = 4.5
+	EnvelopeFloor5 = 5.0
 )
 
 // EvidenceTier tracks the three evidence dimensions required to lift an

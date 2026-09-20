@@ -1,8 +1,8 @@
 package scheduler
 
 import (
-	"github.com/zqk-os/zqk/pkg/zqkenv"
 	"github.com/spf13/cobra"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
 // registerStudioSchedulerCommands registers studio-only scheduler subcommands.

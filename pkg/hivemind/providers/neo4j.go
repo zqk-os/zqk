@@ -74,7 +74,7 @@ func (s *MemGraphMemoryStore) LinkVectorID(ctx context.Context, objectID string,
 		Language: provider.QueryLanguageCypher,
 		Query:    `MATCH (n:ZQK_Object {id: $id}) SET n.vector_id = $vector_id`,
 		Params: map[string]any{
-			"id":       objectID,
+			"id":        objectID,
 			"vector_id": vectorID,
 		},
 	}

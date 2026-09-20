@@ -3,9 +3,9 @@
 package system
 
 import (
+	"github.com/spf13/cobra"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
 	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
-	"github.com/spf13/cobra"
 )
 
 // NewPathCacheCmd creates the path-cache check/refresh command from the command spec.

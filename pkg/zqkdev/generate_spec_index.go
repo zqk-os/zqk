@@ -4,6 +4,7 @@ import (
 	"path/filepath"
 	"strconv"
 
+	"github.com/spf13/cobra"
 	"github.com/zqk-os/zqk/internal/cli"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
 	"github.com/zqk-os/zqk/pkg/errfmt"
@@ -11,7 +12,6 @@ import (
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/validation"
-	"github.com/spf13/cobra"
 )
 
 // NewGenerateSpecIndexCmd creates a command to generate a flattened spec index for all kinds.

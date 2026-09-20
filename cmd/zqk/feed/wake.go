@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/spf13/cobra"
 	"github.com/zqk-os/zqk/internal/cli"
 	"github.com/zqk-os/zqk/pkg/agentfeed"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
@@ -13,7 +14,6 @@ import (
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/mcp"
 	"github.com/zqk-os/zqk/pkg/zqkenv"
-	"github.com/spf13/cobra"
 )
 
 // NewWakeCmd creates zqk feed wake.

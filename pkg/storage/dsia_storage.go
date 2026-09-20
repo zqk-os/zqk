@@ -284,7 +284,6 @@ func (p *DSIAStorageProvider) BeginTransaction(ctx context.Context) (ObjectTrans
 	}, nil
 }
 
-
 func (p *DSIAStorageProvider) Exists(ctx context.Context, secCtx *SecurityContext, id string) (bool, error) {
 	p.mu.RLock()
 	defer p.mu.RUnlock()

@@ -1,8 +1,8 @@
 package object
 
 import (
-	"github.com/zqk-os/zqk/internal/cli"
 	"github.com/spf13/cobra"
+	"github.com/zqk-os/zqk/internal/cli"
 )
 
 // Annotation keys — aliases for declarative kind validation on the object command subtree.

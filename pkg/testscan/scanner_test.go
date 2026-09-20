@@ -297,4 +297,5 @@ func TestSymlinkScan(t *testing.T) {}
 		t.Fatalf("TestSymlinkScan not found; got %+v", tests)
 	}
 }
+
 // tdd refresh

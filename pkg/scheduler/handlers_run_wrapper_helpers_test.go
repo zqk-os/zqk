@@ -246,7 +246,7 @@ func TestEnsureEnvHasSchedulerTools(t *testing.T) {
 	}
 	hasPATH := false
 	for _, e := range got {
-		if strings.HasPrefix(e, zqkenv.OSPath().Name() + "=") {
+		if strings.HasPrefix(e, zqkenv.OSPath().Name()+"=") {
 			hasPATH = true
 			break
 		}

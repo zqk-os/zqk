@@ -3,8 +3,8 @@ package core_test
 import (
 	"testing"
 
-	"github.com/zqk-os/zqk/pkg/storage/core"
 	"github.com/stretchr/testify/require"
+	"github.com/zqk-os/zqk/pkg/storage/core"
 )
 
 func TestCoreMemoryEngine(t *testing.T) {

@@ -32,7 +32,7 @@ func ProcessQuickBundle(data []byte, createObj ObjectCreator, out io.Writer, log
 	}
 
 	if out != nil {
-		_ , _ = out.Write([]byte("Verifying bundle contents...\n"))
+		_, _ = out.Write([]byte("Verifying bundle contents...\n"))
 	}
 
 	// Create BacklogItem
@@ -50,7 +50,7 @@ func ProcessQuickBundle(data []byte, createObj ObjectCreator, out io.Writer, log
 		logging.FluentEvent(logger).Info("Backlog item created from bundle").ObjectID(bliID).Log()
 	}
 	if out != nil {
-		_ , _ = out.Write([]byte(fmt.Sprintf("%s Backlog item created: %s\n", color.GreenString("✓"), bliID)))
+		_, _ = out.Write([]byte(fmt.Sprintf("%s Backlog item created: %s\n", color.GreenString("✓"), bliID)))
 	}
 
 	// Create Criteria
@@ -71,7 +71,7 @@ func ProcessQuickBundle(data []byte, createObj ObjectCreator, out io.Writer, log
 			logging.FluentEvent(logger).Info("Criteria created from bundle").ObjectID(critID).Log()
 		}
 		if out != nil {
-			_ , _ = out.Write([]byte(fmt.Sprintf("%s Criteria created: %s\n", color.GreenString("✓"), critID)))
+			_, _ = out.Write([]byte(fmt.Sprintf("%s Criteria created: %s\n", color.GreenString("✓"), critID)))
 		}
 	}
 
@@ -95,7 +95,7 @@ func ProcessQuickBundle(data []byte, createObj ObjectCreator, out io.Writer, log
 			logging.FluentEvent(logger).Info("Agent task created from bundle").ObjectID(taskID).Log()
 		}
 		if out != nil {
-			_ , _ = out.Write([]byte(fmt.Sprintf("%s Agent task created: %s\n", color.GreenString("✓"), taskID)))
+			_, _ = out.Write([]byte(fmt.Sprintf("%s Agent task created: %s\n", color.GreenString("✓"), taskID)))
 		}
 	}
 

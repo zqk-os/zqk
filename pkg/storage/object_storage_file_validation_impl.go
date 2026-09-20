@@ -180,7 +180,6 @@ func (f *FileObjectStorage) validateObject(ctx context.Context, obj map[string]a
 		return err
 	}
 
-
 	// 1. Spec validation using GoValidator
 	// BLI-621 / KMP: --force skips lifecycle only when DECIDE break_glass reason is present for critical kinds.
 	// TRACK: BLI-1785784867143912000-635942fb

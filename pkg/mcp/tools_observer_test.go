@@ -55,23 +55,23 @@ func TestRegisterObserverTools_exposesSearch(t *testing.T) {
 func TestHandleObserverRegisterTool(t *testing.T) {
 	s := NewServer()
 	s.config = &ServerConfig{}
-	
+
 	args := map[string]any{
 		"account_id": "ACC-12345",
 		"roles":      []any{"admin"},
 		"profile":    "mcp",
 	}
-	
+
 	got, err := s.handleObserverRegisterTool(context.Background(), args)
 	if err != nil {
 		t.Fatal(err)
 	}
-	
+
 	text, _ := got.(string)
 	if !strings.Contains(text, "Successfully registered agent ACC-12345") {
 		t.Fatalf("got %q", text)
 	}
-	
+
 	if cfg, ok := s.config.MCPServer.Security.AgentRegistry["ACC-12345"]; !ok {
 		t.Fatalf("agent not registered in config")
 	} else if cfg.Profile != "mcp" {

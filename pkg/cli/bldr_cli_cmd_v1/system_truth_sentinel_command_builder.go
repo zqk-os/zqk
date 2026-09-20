@@ -3,8 +3,8 @@
 package bldr_cli_cmd_v1
 
 import (
-	clipkg "github.com/zqk-os/zqk/pkg/cli"
 	"github.com/spf13/cobra"
+	clipkg "github.com/zqk-os/zqk/pkg/cli"
 )
 
 // NewSystemTruthSentinelCommandBuilder creates a new system_truth_sentinel command

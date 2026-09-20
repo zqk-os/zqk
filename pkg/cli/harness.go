@@ -14,8 +14,8 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/spf13/cobra"
+	"github.com/zqk-os/zqk/pkg/errfmt"
 	"gopkg.in/yaml.v3"
 )
 

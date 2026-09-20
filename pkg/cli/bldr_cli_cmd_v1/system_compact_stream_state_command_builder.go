@@ -1,8 +1,8 @@
 package bldr_cli_cmd_v1
 
 import (
-	clipkg "github.com/zqk-os/zqk/pkg/cli"
 	"github.com/spf13/cobra"
+	clipkg "github.com/zqk-os/zqk/pkg/cli"
 )
 
 // NewSystemCompactStreamStateCommandBuilder creates a new system_compact_stream_state command

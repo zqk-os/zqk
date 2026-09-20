@@ -4,9 +4,9 @@ import (
 	"bytes"
 	"testing"
 
+	"github.com/spf13/cobra"
 	"github.com/zqk-os/zqk/pkg/coordination"
 	"github.com/zqk-os/zqk/pkg/objects"
-	"github.com/spf13/cobra"
 )
 
 // newTestCmd creates a minimal cobra.Command with stderr wired to a buffer.

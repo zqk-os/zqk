@@ -147,4 +147,5 @@ func TestNewStore_CreatesDir(t *testing.T) {
 		t.Errorf("wal file not created at %s", walPath)
 	}
 }
+
 // tdd refresh

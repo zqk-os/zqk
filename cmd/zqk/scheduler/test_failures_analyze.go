@@ -3,8 +3,8 @@ package scheduler
 import (
 	"time"
 
-	"github.com/zqk-os/zqk/internal/cli"
 	"github.com/spf13/cobra"
+	"github.com/zqk-os/zqk/internal/cli"
 )
 
 // TestFailureStats tracks statistics for a specific test failure

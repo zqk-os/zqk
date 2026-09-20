@@ -71,4 +71,3 @@ func TestResolveProjectRoot_AgentWorktreeBindsToSettingsProjectRoot(t *testing.T
 		t.Fatalf("ResolveProjectRoot = %q, want seated studio root %q", got, want)
 	}
 }
-

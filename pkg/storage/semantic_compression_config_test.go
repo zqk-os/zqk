@@ -4,9 +4,9 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestSemanticCompressionConfig_Policy(t *testing.T) {

@@ -150,12 +150,12 @@ func TestDocEntryIntegrity_Suite(t *testing.T) {
 		expectedSize := int64(len(initialContent))
 
 		docObj := map[string]any{
-			objects.FieldKeyID:          "DOC-SAMPLE-001",
-			objects.FieldKeyKind:        objects.KindDocEntry,
-			objects.FieldKeyStatus:      "published",
-			objects.FieldKeyPath:        "prefix:" + relDoc,
-			"content_hash":              expectedHash,
-			"content_size":              expectedSize,
+			objects.FieldKeyID:     "DOC-SAMPLE-001",
+			objects.FieldKeyKind:   objects.KindDocEntry,
+			objects.FieldKeyStatus: "published",
+			objects.FieldKeyPath:   "prefix:" + relDoc,
+			"content_hash":         expectedHash,
+			"content_size":         expectedSize,
 		}
 
 		// 1. Clean verification

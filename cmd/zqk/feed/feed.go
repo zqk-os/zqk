@@ -1,8 +1,8 @@
 package feed
 
 import (
-	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
 	"github.com/spf13/cobra"
+	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
 )
 
 // NewFeedCmd creates the feed command group (steer / emit-status / proof-of-life / ack / pending / doctor / bridge-ingest / serve / watch / wake).

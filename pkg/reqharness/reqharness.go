@@ -164,9 +164,9 @@ func registeredNames() []string {
 
 // critOutcome is one criterion's judged state, computed declaratively.
 type critOutcome struct {
-	result      CriterionResult
+	result       CriterionResult
 	structBroken bool
-	next        []string
+	next         []string
 }
 
 // judgeCriterion decides a single criterion: malformed shape, unregistered

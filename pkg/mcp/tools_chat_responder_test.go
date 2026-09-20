@@ -86,4 +86,5 @@ func TestHandleChatInject_disabledFeed(t *testing.T) {
 		t.Fatal("expected disabled error")
 	}
 }
+
 // tdd refresh

@@ -5,12 +5,12 @@ import (
 
 	"github.com/zqk-os/zqk/pkg/execwrap"
 
+	"github.com/spf13/cobra"
 	"github.com/zqk-os/zqk/internal/cli"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
 	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/logging"
-	"github.com/spf13/cobra"
 )
 
 func NewAgentLockdownCmd() *cobra.Command {

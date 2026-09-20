@@ -201,4 +201,3 @@ func TestDraftPlane_PromoteStickFailsClosedUntilValid(t *testing.T) {
 		t.Fatalf("expected draft to remain on draft plane after failed promote")
 	}
 }
-

@@ -4,13 +4,13 @@ import (
 	"context"
 	"sync"
 
+	"github.com/neo4j/neo4j-go-driver/v5/neo4j"
 	"github.com/zqk-os/zqk/pkg/concurrency"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/graph/provider"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/objects"
-	"github.com/neo4j/neo4j-go-driver/v5/neo4j"
 )
 
 // memgraphTransaction implements the GraphTransaction interface for MemGraph

@@ -4,9 +4,9 @@ import (
 	"context"
 	"testing"
 
+	"github.com/stretchr/testify/require"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/storage/graph"
-	"github.com/stretchr/testify/require"
 )
 
 func TestGraphStore(t *testing.T) {

@@ -3,8 +3,8 @@ package system
 import (
 	"strings"
 
-	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/config"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
 
 	"github.com/zqk-os/zqk/pkg/logging"
 )

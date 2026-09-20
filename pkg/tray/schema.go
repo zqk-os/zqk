@@ -5,8 +5,8 @@ import (
 	"encoding/json"
 	"sync"
 
-	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/santhosh-tekuri/jsonschema/v5"
+	"github.com/zqk-os/zqk/pkg/errfmt"
 )
 
 //go:embed tray_config.schema.json

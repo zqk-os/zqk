@@ -11,6 +11,7 @@ import (
 
 	"github.com/zqk-os/zqk/pkg/execwrap"
 
+	"github.com/spf13/cobra"
 	"github.com/zqk-os/zqk/internal/cli"
 	"github.com/zqk-os/zqk/pkg/agentdelivery"
 	"github.com/zqk-os/zqk/pkg/agentprompt"
@@ -27,7 +28,6 @@ import (
 	"github.com/zqk-os/zqk/pkg/storage"
 	"github.com/zqk-os/zqk/pkg/storage/locknames"
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
-	"github.com/spf13/cobra"
 )
 
 // EvolveOptions holds the execution options for evolve

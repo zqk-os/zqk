@@ -186,7 +186,7 @@ func (p *EmbeddedTSDBProvider) Query(ctx context.Context, query TSDBQuery) (*TSD
 			}
 
 			timestampNano := int64(0)
-			_ , _ = fmt.Sscanf(parts[2], "%d", &timestampNano)
+			_, _ = fmt.Sscanf(parts[2], "%d", &timestampNano)
 			ts := time.Unix(0, timestampNano)
 
 			if !query.StartTime.IsZero() && ts.Before(query.StartTime) {

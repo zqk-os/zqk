@@ -6,6 +6,7 @@ import (
 	"encoding/hex"
 	"fmt"
 
+	"github.com/spf13/cobra"
 	"github.com/zqk-os/zqk/internal/cli"
 	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
@@ -14,7 +15,6 @@ import (
 	enumv "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/pipeline_definitions"
 	"github.com/zqk-os/zqk/pkg/specbuilder/bldr_instance_v1"
 	"github.com/zqk-os/zqk/pkg/storage"
-	"github.com/spf13/cobra"
 )
 
 func newKernelIntegrityComposeCmd() *cobra.Command {

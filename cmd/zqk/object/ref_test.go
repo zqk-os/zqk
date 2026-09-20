@@ -268,5 +268,3 @@ func TestRefAddRemoveOperations(t *testing.T) {
 		t.Fatalf("expected initial slice [REQ-1], got %v", slice)
 	}
 }
-
-

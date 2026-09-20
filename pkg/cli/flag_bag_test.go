@@ -3,8 +3,8 @@ package cli_test
 import (
 	"testing"
 
-	clipkg "github.com/zqk-os/zqk/pkg/cli"
 	"github.com/spf13/cobra"
+	clipkg "github.com/zqk-os/zqk/pkg/cli"
 )
 
 func TestFlagBag_FirstErrorWins(t *testing.T) {

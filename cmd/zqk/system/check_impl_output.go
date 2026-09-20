@@ -232,22 +232,22 @@ type compactCheckEntry struct {
 // Used by the format handler so the written cache (e.g. .zqk/pre-commit/system-check.json) is compact.
 func PrepareCompactCheckOutputData(cmd *cobra.Command, results []CheckResult, bufferCount int, bufferSummary map[string]int, projectRoot string) any {
 	summary := struct {
-		TotalObjects          int            `json:"total_objects"`
-		PublicObjects         int            `json:"public_objects"`
-		InternalObjects       int            `json:"internal_objects"`
-		TotalIssues           int            `json:"total_issues"`
-		BlockingIssues        int            `json:"blocking_issues"`
-		PublicBlocking        int            `json:"public_blocking"`
-		InternalBlocking      int            `json:"internal_blocking"`
-		Warnings              int            `json:"warnings"`
-		PublicWarnings        int            `json:"public_warnings"`
-		InternalWarnings      int            `json:"internal_warnings"`
-		Informational         int            `json:"informational"`
-		PublicInformational   int            `json:"public_informational"`
-		InternalInformational int            `json:"internal_informational"`
-		Recommendations       int            `json:"recommendations"`
-		ErrorStatusObjects    int            `json:"error_status_objects"`
-		AutoFixed             int            `json:"auto_fixed"`
+		TotalObjects          int                                  `json:"total_objects"`
+		PublicObjects         int                                  `json:"public_objects"`
+		InternalObjects       int                                  `json:"internal_objects"`
+		TotalIssues           int                                  `json:"total_issues"`
+		BlockingIssues        int                                  `json:"blocking_issues"`
+		PublicBlocking        int                                  `json:"public_blocking"`
+		InternalBlocking      int                                  `json:"internal_blocking"`
+		Warnings              int                                  `json:"warnings"`
+		PublicWarnings        int                                  `json:"public_warnings"`
+		InternalWarnings      int                                  `json:"internal_warnings"`
+		Informational         int                                  `json:"informational"`
+		PublicInformational   int                                  `json:"public_informational"`
+		InternalInformational int                                  `json:"internal_informational"`
+		Recommendations       int                                  `json:"recommendations"`
+		ErrorStatusObjects    int                                  `json:"error_status_objects"`
+		AutoFixed             int                                  `json:"auto_fixed"`
 		GhostRefCount         int                                  `json:"ghost_ref_count,omitempty"`
 		PendingAutofixBatches int                                  `json:"pending_autofix_batches,omitempty"`
 		AuditEventsBuffered   int                                  `json:"audit_events_buffered,omitempty"`

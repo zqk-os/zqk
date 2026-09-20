@@ -13,8 +13,8 @@ import (
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"github.com/zqk-os/zqk/pkg/zqkenv"
 
-	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/spf13/cobra"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
 )
 
 func TestAuthMiddleware_Unauthorized(t *testing.T) {

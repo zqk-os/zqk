@@ -185,13 +185,13 @@ func ApplyComputeHooks(ctx context.Context, provider storage.ObjectStorageProvid
 				logging.FluentEvent(logger).Debug("ZQK Active Order Promoter: list failed").WithError(err).Log()
 				return
 			}
-			
+
 			for _, obj := range result.Objects {
 				id, _ := obj[objects.FieldKeyID].(string)
 				if id == "" {
 					continue
 				}
-				
+
 				var order int64
 				switch v := obj["active_order"].(type) {
 				case int:

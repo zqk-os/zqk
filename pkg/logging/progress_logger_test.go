@@ -244,4 +244,5 @@ func TestProgressLogger_WithFields(t *testing.T) {
 		t.Errorf("Expected items_processed=42, got: %v", data["items_processed"])
 	}
 }
+
 // tdd refresh

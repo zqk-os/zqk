@@ -772,4 +772,3 @@ func TestGoValidator_validateUnknownFields_AllowsCompositionFields(t *testing.T)
 		t.Fatalf("expected 1 error for bad_extra_field, got %d", len(errs))
 	}
 }
-

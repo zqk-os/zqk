@@ -38,7 +38,6 @@ type Adapter interface {
 }
 
 // ToSteerInput maps a normalized ingress message onto AppendEventInput (same schema as feed steer).
-//
 func ToSteerInput(projectRoot string, msg IngressMessage) (agentfeed.AppendEventInput, error) {
 	text := strings.TrimSpace(msg.Text)
 	if text == "" {

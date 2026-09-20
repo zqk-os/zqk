@@ -5,8 +5,8 @@ import (
 	"io"
 	"strings"
 
-	"github.com/zqk-os/zqk/internal/cli"
 	"github.com/spf13/cobra"
+	"github.com/zqk-os/zqk/internal/cli"
 )
 
 const (

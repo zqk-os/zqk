@@ -1,10 +1,10 @@
 package filecas
 
 import (
+	"github.com/zqk-os/zqk/pkg/paths"
 	"path/filepath"
 	"strings"
 	"testing"
-	"github.com/zqk-os/zqk/pkg/paths"
 )
 
 func TestCalculateSHA256Hash_empty(t *testing.T) {

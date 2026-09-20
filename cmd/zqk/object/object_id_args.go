@@ -1,8 +1,8 @@
 package object
 
 import (
-	clipkg "github.com/zqk-os/zqk/pkg/cli"
 	"github.com/spf13/cobra"
+	clipkg "github.com/zqk-os/zqk/pkg/cli"
 )
 
 // expandObjectIDArgs expands positional args and optional --ids into individual

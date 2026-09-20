@@ -62,7 +62,7 @@ func isHumanClient(clientName, clientID string) bool {
 	// Check client name for common IDE and local agent patterns
 	humanClientNames := []string{
 		"cursor-ide-proxy",
-		"ide-ide-proxy", // zqk mcp proxy stamp (IDE → daemon)
+		"ide-ide-proxy",  // zqk mcp proxy stamp (IDE → daemon)
 		"zqk-feed-steer", // feed steer / doctor events/list probes
 		"cursor-seat-01",
 		"ide-seat-01",

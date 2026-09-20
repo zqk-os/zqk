@@ -10,7 +10,6 @@ import (
 
 var errEmptyWorkerID = errors.New("worker id cannot be empty")
 
-
 // Option configures a ThroughputAggregator.
 type Option func(*ThroughputAggregator)
 

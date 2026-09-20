@@ -49,12 +49,12 @@ func TestInvalidationShockwaveBus_SubscribeAndBroadcast(t *testing.T) {
 
 	// Broadcast Delete event
 	deleteEvent := MutationEvent{
-		Op:         MutationOpDelete,
-		Kind:       "backlog_item",
-		ID:         "BLI-TEST-001",
-		OldHash:    "newhash456",
-		Path:       "/path/to/bli.yaml",
-		Timestamp:  time.Now(),
+		Op:        MutationOpDelete,
+		Kind:      "backlog_item",
+		ID:        "BLI-TEST-001",
+		OldHash:   "newhash456",
+		Path:      "/path/to/bli.yaml",
+		Timestamp: time.Now(),
 	}
 	bus.Broadcast(ctx, deleteEvent)
 
@@ -427,4 +427,3 @@ func TestObjectIDCache_SSOTLocator(t *testing.T) {
 		t.Fatalf("resolved path %s does not exist on disk: %v", resolvedPath, statErr)
 	}
 }
-

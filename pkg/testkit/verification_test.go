@@ -73,4 +73,5 @@ func TestSignTestCaseCompletion(t *testing.T) {
 		t.Errorf("expected verification_hash to be set, got empty string")
 	}
 }
+
 // tdd refresh

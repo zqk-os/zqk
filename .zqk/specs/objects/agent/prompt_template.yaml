@@ -1,0 +1,228 @@
+schema_version: 2.0.0
+ontology: prompt_template
+extends: base_object
+visibility: public
+description: 'Prompt templates are structured, reusable prompts that guide agents or humans to produce\nright-sized requests. They sit on a spectrum from tactical (short, explicit, low ambiguity)\nto strategic (broad, exploratory, subjective, influenced by market/seasonal/financial/political\nfactors). The template ensures a clear line between open-ended creative possibilities and\nstructural concerns (dependencies, risks, timelines, delivery) so the system can provide\nskeleton and rigidity while leaving room for high-value, creative outcomes.\nLifecycle: prompt_template_lifecycle.yaml.\n'
+traits:
+  - base_object_traits
+  - manipulatable
+fields:
+  category:
+    checklist:
+      authority: owner.
+      automation_hooks: used for filtering and grouping (e.g. "establish_deliverable", "tactical_fix", "exploratory_planning").
+      cardinality: one
+      criticality: association
+      default: ""
+      dependencies: controlled vocabulary recommended.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Category for grouping prompt templates (establish_deliverable, tactical, strategic, reporting, etc.).
+      security: non-sensitive
+      system_usage:
+        - filtering
+        - grouping
+      validation: string; controlled vocabulary encouraged.
+    type: string
+    validation:
+      required: false
+  doc_entry_refs:
+    checklist:
+      authority: owner.
+      automation_hooks: links prompt template to user-facing docs (e.g. ESTABLISH_DELIVERABLE_OBJECTS_PROMPT.md).
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: doc_entry registry.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Doc entries that contain or expand this template (human-readable, reporting).
+      security: non-sensitive
+      system_usage:
+        - traceability
+        - navigation
+      validation: list of doc_entry IDs or paths.
+    traits:
+      - field_reference_group
+    type: list
+    validation:
+      required: false
+  expected_outcome_kinds:
+    checklist:
+      authority: owner.
+      automation_hooks: used to validate or scaffold created objects (e.g. establish-deliverable prompts expect milestones, goals, requirements, etc.).
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: object kind registry.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Object kinds the prompt is intended to produce or touch (e.g. milestone, goal, requirement, criteria, priority_plan, backlog_item, risk_blocker, doc_entry).
+      security: non-sensitive
+      system_usage:
+        - prompt assembly
+        - outcome validation
+        - reporting
+      validation: list of canonical kind names.
+    type: list
+    validation:
+      required: false
+  goal_refs:
+    checklist:
+      authority: owner.
+      automation_hooks: links template to strategic goals (e.g. "increase delivery velocity", "ensure governance adherence").
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: goal registry.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Goals this prompt template supports.
+      security: non-sensitive
+      system_usage:
+        - traceability
+        - filtering
+      validation: list of goal IDs.
+    traits:
+      - field_reference_group
+    type: list
+    validation:
+      required: false
+  mandatory_constraints:
+    checklist:
+      authority: owner/policy.
+      automation_hooks: injected into generated prompt text; enforced in instructions.
+      cardinality: many
+      criticality: composition
+      default: []
+      dependencies: policy and lifecycle docs.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: |
+        Constraint identifiers or short statements that must be reflected in the prompt
+        (e.g. \"use CLI only for process data\", \"backlog items start with initial status\",
+        \"no direct YAML edits under .zqk/process/\"). Ensures system guardrails are present.
+      security: non-sensitive
+      system_usage:
+        - prompt assembly
+        - compliance
+      validation: list of strings (constraint refs or statements).
+    type: list
+    validation:
+      required: false
+  originator_questionnaire_refs:
+    checklist:
+      authority: owner.
+      automation_hooks: used to present questions to the originator before prompt is finalized.
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: question or criteria registry.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: References to question or criteria objects that the originator should answer to right-size the prompt (scope, timeline, risks, stakeholders, etc.).
+      security: non-sensitive
+      system_usage:
+        - prompt development
+        - right-sizing
+      validation: list of question or criteria IDs.
+    traits:
+      - field_reference_group
+    type: list
+    validation:
+      required: false
+  prompt_archetype:
+    checklist:
+      authority: owner/product.
+      automation_hooks: used for filtering, default questionnaire, and right-sizing guidance.
+      cardinality: one
+      criticality: composition
+      default: tactical
+      dependencies: PROMPT_DEVELOPMENT_GUIDE archetype definitions.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: |
+        Archetype that drives expected length, specificity, and rigidity.
+        - tactical: Short, simple, explicit instructions; clear success criteria; minimal ambiguity.
+        - structured: Medium length; defined outcomes (e.g. object kinds to create); lifecycle and linkage rules explicit.
+        - strategic: Broad, exploratory; subjective; influenced by market/seasonal/financial/political factors; looser expectations.
+        - hybrid: Combines structured skeleton (milestones, risks, timelines) with open-ended creative scope.
+      security: non-sensitive
+      system_usage:
+        - filtering
+        - default questionnaire selection
+        - prompt assembly
+      validation: enum.
+    type: enum
+    validation:
+      enum:
+        - tactical
+        - structured
+        - strategic
+        - hybrid
+      required: true
+  prompt_body:
+    checklist:
+      authority: owner.
+      automation_hooks: used as template body; placeholders filled from questionnaire or context.
+      cardinality: one
+      criticality: composition
+      default: ""
+      dependencies: none.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: The main prompt text or template with placeholders (e.g. {{deliverable}}, {{intent}}, {{constraints}}). Used when archetype and specificity are known.
+      security: may contain confidential context.
+      system_usage:
+        - prompt assembly
+        - reuse
+      validation: text; markdown allowed.
+    type: text
+    validation:
+      required: false
+  risk_blocker_refs:
+    checklist:
+      authority: owner.
+      automation_hooks: documents risks if template is misused or omitted (e.g. "lifecycle violations", "scattered outcomes").
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: risk_blocker registry.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Risks or blockers mitigated by using this template (or risks from not using it).
+      security: non-sensitive
+      system_usage:
+        - risk awareness
+        - mitigation
+      validation: list of risk_blocker IDs.
+    traits:
+      - field_reference_group
+    type: list
+    validation:
+      required: false
+  specificity_level:
+    checklist:
+      authority: owner.
+      automation_hooks: used with archetype to choose questionnaire and template body.
+      cardinality: one
+      criticality: association
+      default: high
+      dependencies: none.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: |
+        How prescriptive the prompt should be (high = explicit constraints and steps;
+        medium = outcome-focused with guardrails; low = open-ended with minimal guardrails).
+      security: non-sensitive
+      system_usage:
+        - prompt assembly
+        - validation
+      validation: enum.
+    type: enum
+    validation:
+      enum:
+        - high
+        - medium
+        - low
+      required: false

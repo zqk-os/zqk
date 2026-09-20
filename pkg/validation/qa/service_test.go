@@ -118,10 +118,10 @@ func TestAuditorService_PerformAudit_CompleteUsesSupportedEvidence(t *testing.T)
 		service, objectStorage, ctx, secCtx, tmpDir := newTraceabilityAuditorTest(t)
 		bliID := qaFixtureID("BLI-COMMIT-EVIDENCE")
 		qaForceStatus(t, objectStorage, ctx, secCtx, map[string]any{
-			objects.FieldKeyID:         bliID,
-			objects.FieldKeyKind:       "backlog_item",
-			objects.FieldKeyTitle:      "Complete with traceability",
-			objects.FieldKeyStatus:     objects.ObjectStatusComplete,
+			objects.FieldKeyID:           bliID,
+			objects.FieldKeyKind:         "backlog_item",
+			objects.FieldKeyTitle:        "Complete with traceability",
+			objects.FieldKeyStatus:       objects.ObjectStatusComplete,
 			objects.FieldKeyCommitHashes: []any{"abc123"},
 		})
 

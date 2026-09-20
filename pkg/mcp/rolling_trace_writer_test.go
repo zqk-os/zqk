@@ -8,10 +8,10 @@ import (
 )
 
 const (
-	traceBaseName     = "mcp-trace.log"
-	testRoundtripMsg  = "verify-content-roundtrip"
-	concurrencyProbe  = "concurrency-probe"
-	rotationPayload   = "rotate-payload"
+	traceBaseName    = "mcp-trace.log"
+	testRoundtripMsg = "verify-content-roundtrip"
+	concurrencyProbe = "concurrency-probe"
+	rotationPayload  = "rotate-payload"
 )
 
 // rotatedTraceFiles returns all rotated trace files in dir for the given

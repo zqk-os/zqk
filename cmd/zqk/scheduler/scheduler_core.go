@@ -13,6 +13,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/spf13/cobra"
 	"github.com/zqk-os/zqk/cmd/zqk/system"
 	"github.com/zqk-os/zqk/internal/cli"
 	clicontext "github.com/zqk-os/zqk/internal/cli/context"
@@ -43,7 +44,6 @@ import (
 	"github.com/zqk-os/zqk/pkg/validation/qa"
 	"github.com/zqk-os/zqk/pkg/zqkenv"
 	"github.com/zqk-os/zqk/pkg/zqktime"
-	"github.com/spf13/cobra"
 )
 
 // schedulerDaemonProcessName is argv[0] for the scheduler daemon child process so it shows distinctly in ps/top (e.g. "zqk-scheduler" vs "zqk").

@@ -20,8 +20,8 @@ func runStatus(cmd *cobra.Command, args []string) error {
 		return cli.FormatOutput(cmd, map[string]any{
 			objects.FieldKeyComponent: "ambient",
 			objects.FieldKeyStatus:    "running",
-			"pid":                      pid,
-			"project_root":             projectRoot,
+			"pid":                     pid,
+			"project_root":            projectRoot,
 		})
 	}
 

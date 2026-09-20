@@ -44,7 +44,6 @@ func SessionLeaseExpired(lastActivity string, ttl time.Duration, now time.Time) 
 // TouchSessionLastActivity refreshes in-memory session activity and, when the persist
 // throttle allows, asynchronously updates mcp_session.last_activity via CLI.
 // Best-effort: never blocks the MCP request path on storage.
-//
 func TouchSessionLastActivity(s *Server) {
 	if s == nil {
 		return

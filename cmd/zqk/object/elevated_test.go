@@ -4,9 +4,9 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/spf13/cobra"
 	"github.com/zqk-os/zqk/pkg/brand"
 	"github.com/zqk-os/zqk/pkg/entitlements"
-	"github.com/spf13/cobra"
 )
 
 func testElevatedFlagCmd() *cobra.Command {

@@ -5,8 +5,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/zqk-os/zqk/pkg/mcp"
 	"github.com/stretchr/testify/assert"
+	"github.com/zqk-os/zqk/pkg/mcp"
 )
 
 func TestOSSignalTriggersShutdown(t *testing.T) {

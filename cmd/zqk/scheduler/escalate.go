@@ -6,11 +6,11 @@ import (
 	"strings"
 	"time"
 
+	"github.com/spf13/cobra"
 	"github.com/zqk-os/zqk/internal/cli"
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/paths"
 	schedulerpkg "github.com/zqk-os/zqk/pkg/scheduler"
-	"github.com/spf13/cobra"
 )
 
 // NewEscalateCmd creates the `scheduler escalate` diagnostic and dispatch command.

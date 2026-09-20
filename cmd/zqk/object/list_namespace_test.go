@@ -3,9 +3,9 @@ package object
 import (
 	"testing"
 
+	"github.com/spf13/cobra"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/validation"
-	"github.com/spf13/cobra"
 )
 
 func TestApplyNamespaceBoundaries(t *testing.T) {

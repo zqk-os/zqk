@@ -106,4 +106,5 @@ func TestAuditStream_UnsubscribeOnCancel(t *testing.T) {
 		t.Error("Expected channel to be closed")
 	}
 }
+
 // tdd refresh

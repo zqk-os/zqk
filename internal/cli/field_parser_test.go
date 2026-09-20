@@ -130,4 +130,3 @@ func TestDataLoader_FieldFlags_ConsistentWithUpdate(t *testing.T) {
 		t.Fatalf("expected tags to be []any of len 2, got %T: %v", data["tags"], data["tags"])
 	}
 }
-

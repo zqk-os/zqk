@@ -1,9 +1,9 @@
 package bldr_cli_cmd_v1
 
 import (
+	"github.com/spf13/cobra"
 	"github.com/zqk-os/zqk/internal/cli"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
-	"github.com/spf13/cobra"
 )
 
 // NewNewObjectSpecKindCommandBuilder creates a new new_object_spec_kind command

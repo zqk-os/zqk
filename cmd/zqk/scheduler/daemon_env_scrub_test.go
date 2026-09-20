@@ -22,7 +22,7 @@ func TestScrubDaemonInheritEnv_DropsParentAndMCPAccount(t *testing.T) {
 	if containsEnvKey(out, zqkenv.MCPAccountID().Name()) {
 		t.Fatalf("MCPAccountID still present: %v", out)
 	}
-	if !containsExact(out, zqkenv.IsParentZqk().Name() + "=1") {
+	if !containsExact(out, zqkenv.IsParentZqk().Name()+"=1") {
 		t.Fatalf("expected IsParentZqk=1 in %v", out)
 	}
 	if !containsExact(out, "PATH=/bin") || !containsExact(out, "HOME=/tmp") {

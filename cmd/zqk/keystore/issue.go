@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/spf13/cobra"
 	"github.com/zqk-os/zqk/internal/cli"
 	"github.com/zqk-os/zqk/pkg/authcred"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
@@ -13,7 +14,6 @@ import (
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/zqkenv"
-	"github.com/spf13/cobra"
 )
 
 // NewIssueCmd creates keystore issue — generate a unique API key for an ACC seat.

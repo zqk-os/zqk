@@ -5,13 +5,13 @@ import (
 
 	"github.com/zqk-os/zqk/pkg/execwrap"
 
+	"github.com/spf13/cobra"
 	"github.com/zqk-os/zqk/internal/cli"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
 	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/paths"
-	"github.com/spf13/cobra"
 )
 
 // NewDocmanSyncCmd creates a command to sync documentation registration

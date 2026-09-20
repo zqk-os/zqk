@@ -4,11 +4,11 @@ import (
 	"context"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"github.com/zqk-os/zqk/pkg/graph/provider"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/zqkenv"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 )
 
 type mockGraphProvider struct {
@@ -150,4 +150,5 @@ func TestGetFileObjectStorage(t *testing.T) {
 	require.NoError(t, err)
 	require.NotNil(t, sTest)
 }
+
 // tdd refresh

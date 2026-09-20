@@ -3,8 +3,8 @@ package envelope_test
 import (
 	"testing"
 
-	"github.com/zqk-os/zqk/pkg/envelope"
 	"github.com/stretchr/testify/assert"
+	"github.com/zqk-os/zqk/pkg/envelope"
 )
 
 func TestParseTDEEnvelope(t *testing.T) {

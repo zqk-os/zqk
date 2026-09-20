@@ -4,9 +4,9 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/zqk-os/zqk/pkg/ambient"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestAmbientIngestService(t *testing.T) {

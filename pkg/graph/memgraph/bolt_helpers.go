@@ -4,9 +4,9 @@ import (
 	"context"
 	"time"
 
+	"github.com/neo4j/neo4j-go-driver/v5/neo4j"
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/graph/provider"
-	"github.com/neo4j/neo4j-go-driver/v5/neo4j"
 )
 
 const (

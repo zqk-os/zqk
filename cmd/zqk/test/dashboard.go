@@ -337,21 +337,22 @@ func (s *DashboardState) SaveToLiteFile(projectRoot string) error {
 	return eng.SaveToLiteFile()
 }
 
-// ValidateTPMDefinitionOfDone verifies that all active test cases have unbroken lineage to root objects.
+// ValidateTPMDefinitionOfDone verifies that all non-archived test cases have unbroken lineage to root objects
+// and that zero unbound test criteria exist in the test matrix.
 func (s *DashboardState) ValidateTPMDefinitionOfDone(out, errOut ioWriter) error {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 
 	var brokenList []string
-	activeCount := 0
+	checkedCount := 0
 	intactCount := 0
 
 	for _, tcID := range s.TestCaseOrder {
 		tc := s.TestCases[tcID]
-		if tc == nil || tc.Status == objects.ObjectStatusComplete || tc.Status == objects.ObjectStatusArchived {
+		if tc == nil || tc.Status == objects.ObjectStatusArchived {
 			continue
 		}
-		activeCount++
+		checkedCount++
 		if tc.Lineage != nil && tc.Lineage.IsIntact {
 			intactCount++
 		} else {
@@ -359,20 +360,36 @@ func (s *DashboardState) ValidateTPMDefinitionOfDone(out, errOut ioWriter) error
 			if tc.Lineage != nil && tc.Lineage.BrokenReason != "" {
 				reason = tc.Lineage.BrokenReason
 			}
-			brokenList = append(brokenList, fmt.Sprintf("%s (%s): %s", tc.ID, tc.Title, reason))
+			brokenList = append(brokenList, fmt.Sprintf("%s [%s] (%s): %s", tc.ID, tc.Status, tc.Title, reason))
 		}
 	}
 
-	if len(brokenList) > 0 {
-		_, _ = fmt.Fprintf(errOut, "❌ TPM Definition of Done FAILED: %d of %d active test case chain(s) are incomplete or missing root objects:\n", len(brokenList), activeCount)
-		for _, b := range brokenList {
-			_, _ = fmt.Fprintf(errOut, "   - %s\n", b)
+	var unboundList []string
+	for _, uc := range s.UnboundTestCriteria {
+		if uc == nil || uc.Status == objects.ObjectStatusArchived {
+			continue
+		}
+		unboundList = append(unboundList, fmt.Sprintf("%s [%s] (%s): category=%s, method=%s", uc.ID, uc.Status, uc.Title, uc.Category, uc.ValidationMethod))
+	}
+
+	if len(brokenList) > 0 || len(unboundList) > 0 {
+		if len(brokenList) > 0 {
+			_, _ = fmt.Fprintf(errOut, "❌ TPM Definition of Done FAILED: %d of %d test case chain(s) are incomplete or missing root objects:\n", len(brokenList), checkedCount)
+			for _, b := range brokenList {
+				_, _ = fmt.Fprintf(errOut, "   - %s\n", b)
+			}
+		}
+		if len(unboundList) > 0 {
+			_, _ = fmt.Fprintf(errOut, "❌ TPM Definition of Done FAILED: %d unbound test criteria detected (missing test_case binding):\n", len(unboundList))
+			for _, u := range unboundList {
+				_, _ = fmt.Fprintf(errOut, "   - %s\n", u)
+			}
 		}
 		_, _ = fmt.Fprintf(errOut, "\nTip: Run 'zqk test bind' to see recommended parent bindings and repair broken chains.\n")
-		return fmt.Errorf("traceability DoD check failed: %d broken lineage chains", len(brokenList))
+		return fmt.Errorf("traceability DoD check failed: %d broken lineage chains, %d unbound test criteria", len(brokenList), len(unboundList))
 	}
 
-	_, _ = fmt.Fprintf(out, "✓ TPM Definition of Done SATISFIED: All %d active test case chains have intact, unbroken lineage to root objects!\n", activeCount)
+	_, _ = fmt.Fprintf(out, "✓ TPM Definition of Done SATISFIED: All %d test case chains have intact, unbroken lineage to root objects and 0 unbound test criteria!\n", checkedCount)
 	return nil
 }
 

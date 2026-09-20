@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"strings"
 
-	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/spf13/cobra"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // KindAnnotKeys names the three Cobra annotation keys used for declarative kind validation

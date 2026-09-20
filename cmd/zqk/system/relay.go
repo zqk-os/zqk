@@ -1,10 +1,10 @@
 package system
 
 import (
+	"github.com/spf13/cobra"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
 	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
 	"github.com/zqk-os/zqk/pkg/relay"
-	"github.com/spf13/cobra"
 )
 
 // NewRelayCmd creates the relay command that spins up the Sovereign Relay HTTP/WebSocket server.

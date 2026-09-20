@@ -46,5 +46,5 @@ func EmitContextHUD(ctx context.Context, secCtx *pkgctx.SecurityContext, obj map
 	}
 
 	// Fallback if no context/logger provided
-	_ , _ = os.Stderr.WriteString(hud + "\n")
+	_, _ = os.Stderr.WriteString(hud + "\n")
 }

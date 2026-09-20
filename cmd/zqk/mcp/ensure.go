@@ -7,6 +7,7 @@ import (
 
 	"github.com/zqk-os/zqk/pkg/execwrap"
 
+	"github.com/spf13/cobra"
 	"github.com/zqk-os/zqk/internal/cli"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
 	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
@@ -14,7 +15,6 @@ import (
 	"github.com/zqk-os/zqk/pkg/logging"
 	mcppkg "github.com/zqk-os/zqk/pkg/mcp"
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
-	"github.com/spf13/cobra"
 )
 
 func NewEnsureCmd() *cobra.Command {

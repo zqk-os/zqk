@@ -26,12 +26,12 @@ type CandidateMatch struct {
 // NewBindCmd creates the `zqk test bind` command.
 func NewBindCmd() *cobra.Command {
 	var (
-		reqFlag   string
-		goalFlag  string
-		bliFlag   string
-		autoFlag  bool
-		dryRun    bool
-		listFlag  bool
+		reqFlag  string
+		goalFlag string
+		bliFlag  string
+		autoFlag bool
+		dryRun   bool
+		listFlag bool
 	)
 
 	cmd := &cobra.Command{

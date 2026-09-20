@@ -42,7 +42,7 @@ func (c *streamRegistrySnapshot) refreshFromDisk(projectRoot, kind string) {
 		if info.Size() > c.delSize {
 			f, err := fileutil.Open(delPath)
 			if err == nil {
-				_ , _ = f.Seek(c.delSize, 0)
+				_, _ = f.Seek(c.delSize, 0)
 				sc := bufio.NewScanner(f)
 				for sc.Scan() {
 					id := strings.TrimSpace(sc.Text())
@@ -80,7 +80,7 @@ func (c *streamRegistrySnapshot) refreshFromDisk(projectRoot, kind string) {
 		if info.Size() > c.sizes[i] {
 			f, err := fileutil.Open(registryPath)
 			if err == nil {
-				_ , _ = f.Seek(c.sizes[i], 0)
+				_, _ = f.Seek(c.sizes[i], 0)
 				sc := bufio.NewScanner(f)
 				for sc.Scan() {
 					id, loc := parseStreamRegistryLineFast(sc.Bytes())

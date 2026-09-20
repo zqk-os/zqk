@@ -8,11 +8,11 @@ import (
 func TestValidate_ValidEnvelope(t *testing.T) {
 	v := NewTDEValidator()
 	env := &Envelope{
-		ID:       "BLI-123",
-		Kind:     "backlog_item",
-		Category: "implementation",
-		Status:   "in_progress",
-		Priority: 5,
+		ID:        "BLI-123",
+		Kind:      "backlog_item",
+		Category:  "implementation",
+		Status:    "in_progress",
+		Priority:  5,
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
 		CreatedBy: "test-agent",
@@ -29,11 +29,11 @@ func TestValidate_ValidEnvelope(t *testing.T) {
 func TestValidate_MissingID(t *testing.T) {
 	v := NewTDEValidator()
 	env := &Envelope{
-		ID:       "",
-		Kind:     "backlog_item",
-		Category: "implementation",
-		Status:   "in_progress",
-		Priority: 5,
+		ID:        "",
+		Kind:      "backlog_item",
+		Category:  "implementation",
+		Status:    "in_progress",
+		Priority:  5,
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
 		CreatedBy: "test-agent",
@@ -58,11 +58,11 @@ func TestValidate_MissingID(t *testing.T) {
 func TestValidate_MissingKind(t *testing.T) {
 	v := NewTDEValidator()
 	env := &Envelope{
-		ID:       "BLI-124",
-		Kind:     "",
-		Category: "implementation",
-		Status:   "in_progress",
-		Priority: 5,
+		ID:        "BLI-124",
+		Kind:      "",
+		Category:  "implementation",
+		Status:    "in_progress",
+		Priority:  5,
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
 		Title:     "Test title",
@@ -86,11 +86,11 @@ func TestValidate_MissingKind(t *testing.T) {
 func TestValidate_MissingParent(t *testing.T) {
 	v := NewTDEValidator()
 	env := &Envelope{
-		ID:       "BLI-125",
-		Kind:     "backlog_item",
-		Category: "implementation",
-		Status:   "in_progress",
-		Priority: 5,
+		ID:        "BLI-125",
+		Kind:      "backlog_item",
+		Category:  "implementation",
+		Status:    "in_progress",
+		Priority:  5,
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
 		Title:     "Test title",
@@ -114,11 +114,11 @@ func TestValidate_MissingParent(t *testing.T) {
 func TestValidate_ShortSeal(t *testing.T) {
 	v := NewTDEValidator().WithEnforceSeal(true)
 	env := &Envelope{
-		ID:       "BLI-126",
-		Kind:     "backlog_item",
-		Category: "implementation",
-		Status:   "in_progress",
-		Priority: 5,
+		ID:        "BLI-126",
+		Kind:      "backlog_item",
+		Category:  "implementation",
+		Status:    "in_progress",
+		Priority:  5,
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
 		Title:     "Test title",

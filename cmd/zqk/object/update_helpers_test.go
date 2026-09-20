@@ -439,4 +439,3 @@ func TestGuardManualRefFieldUpdates_addRefFlagAllowed(t *testing.T) {
 		t.Fatalf("expected --add-ref field to be exempt from direct mutation guard, got %v", err)
 	}
 }
-

@@ -5,9 +5,9 @@ import (
 	"testing"
 	"time"
 
+	"github.com/spf13/cobra"
 	pkgcli "github.com/zqk-os/zqk/pkg/cli"
 	"github.com/zqk-os/zqk/pkg/zqkenv"
-	"github.com/spf13/cobra"
 
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/objects"

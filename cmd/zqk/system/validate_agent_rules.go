@@ -3,6 +3,7 @@ package system
 // Command spec: .zqk/cli/specs/system/validate_agent_rules_command.yaml (generate-command-builders).
 
 import (
+	"github.com/spf13/cobra"
 	"github.com/zqk-os/zqk/internal/cli"
 	"github.com/zqk-os/zqk/pkg/agentrules"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
@@ -10,7 +11,6 @@ import (
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/paths"
-	"github.com/spf13/cobra"
 )
 
 // NewValidateAgentRulesCmd validates that .zqk/specs/configs/agent_rules_manifest.yaml

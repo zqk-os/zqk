@@ -1,9 +1,9 @@
 package bldr_cli_cmd_v1
 
 import (
+	"github.com/spf13/cobra"
 	"github.com/zqk-os/zqk/internal/cli"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
-	"github.com/spf13/cobra"
 )
 
 // NewSystemUpdateSpecsCommandBuilder creates a new system_update_specs command

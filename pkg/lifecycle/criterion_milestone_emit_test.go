@@ -224,4 +224,3 @@ func TestTryEmitAllBacklogItemsCompleteForMilestone_ScalarMilestoneRef(t *testin
 		t.Fatal("expected criterion_satisfied event for all_backlog_items_complete_for_milestone via scalar milestone_ref")
 	}
 }
-

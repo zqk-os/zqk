@@ -547,7 +547,7 @@ func loadBaselineMetrics(filePath string) (BaselineMetrics, error) {
 	issuesByTier := make(map[int]int)
 	for k, v := range baselineJSON.IssuesByTier {
 		var tier int
-		_ , _ = fmt.Sscanf(k, "%d", &tier)
+		_, _ = fmt.Sscanf(k, "%d", &tier)
 		issuesByTier[tier] = v
 	}
 

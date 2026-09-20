@@ -4,8 +4,8 @@ import (
 	"bytes"
 	"testing"
 
-	"github.com/zqk-os/zqk/cmd/zqk/learn"
 	"github.com/stretchr/testify/assert"
+	"github.com/zqk-os/zqk/cmd/zqk/learn"
 )
 
 func TestNewLearnCmd(t *testing.T) {

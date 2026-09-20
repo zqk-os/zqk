@@ -1,6 +1,5 @@
 // Package hostservice registers per-project-root OS supervisor units (launchd/systemd)
 // and a host-local registry. See docs/architecture/SCHEDULER_HOST_SERVICE_AND_CLUSTER_STATUS.md.
-//
 package hostservice
 
 import (

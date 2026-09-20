@@ -387,8 +387,3 @@ func TestDNACoreInterfaceAndMetaSpecs(t *testing.T) {
 		t.Errorf("expected 'P99' to be invalid in Enum")
 	}
 }
-
-
-
-
-

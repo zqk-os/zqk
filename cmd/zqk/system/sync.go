@@ -603,7 +603,7 @@ func parseTableOutput(output string, logger *logging.EventLogger) error {
 
 	tier1Count := 0
 	if len(matches) > 1 {
-		_ , _ = fmt.Sscanf(matches[1], "%d", &tier1Count)
+		_, _ = fmt.Sscanf(matches[1], "%d", &tier1Count)
 	}
 
 	if tier1Count > 0 {

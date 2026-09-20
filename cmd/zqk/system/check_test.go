@@ -4,8 +4,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/spf13/cobra"
+	"github.com/zqk-os/zqk/pkg/paths"
 )
 
 func TestNewCheckCmd(t *testing.T) {

@@ -1,10 +1,10 @@
 package system
 
 import (
+	"github.com/spf13/cobra"
 	"github.com/zqk-os/zqk/internal/cli"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/migration/parser"
-	"github.com/spf13/cobra"
 )
 
 // AutoFixContext groups state for auto-fix operations

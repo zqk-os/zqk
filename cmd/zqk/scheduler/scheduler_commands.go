@@ -6,11 +6,11 @@ import (
 
 	"github.com/zqk-os/zqk/internal/cli"
 
+	"github.com/spf13/cobra"
 	bldr_cli_cmd_v1 "github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	_ "github.com/zqk-os/zqk/pkg/mcp"
 	schedulerpkg "github.com/zqk-os/zqk/pkg/scheduler"
-	"github.com/spf13/cobra"
 )
 
 // NewSchedulerCmd creates the scheduler command

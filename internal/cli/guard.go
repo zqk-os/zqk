@@ -5,8 +5,8 @@
 package cli
 
 import (
-	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/spf13/cobra"
+	"github.com/zqk-os/zqk/pkg/errfmt"
 )
 
 // guard holds command context and an optional error (and optional wrap format) for fluent error handling.

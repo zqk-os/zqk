@@ -3,9 +3,9 @@ package system
 import (
 	"fmt"
 
+	"github.com/spf13/cobra"
 	"github.com/zqk-os/zqk/internal/cli"
 	"github.com/zqk-os/zqk/pkg/specbuilder/registry"
-	"github.com/spf13/cobra"
 )
 
 // NewGenerateFieldRegistryCmd creates the system generate-field-registry command

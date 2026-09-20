@@ -1,9 +1,9 @@
 package precommit
 
 import (
+	"github.com/spf13/cobra"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
 	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
-	"github.com/spf13/cobra"
 )
 
 // NewPreCommitCmd creates the pre-commit command group (aggregate, write-result, status).

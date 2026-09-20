@@ -1,8 +1,8 @@
 package object
 
 import (
-	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
 	"github.com/spf13/cobra"
+	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
 )
 
 // NewSPlanCmd creates the strategic plan command group (BLI-805).

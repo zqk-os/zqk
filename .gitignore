@@ -349,7 +349,6 @@ scratch_whats_next*.json
 prompt_*.txt
 prompt_*.md
 prompt_*.json
-prompt_*
 *PROMPT*.md
 *prompt*.md
 SUBAGENT_PROMPT.md

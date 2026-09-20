@@ -43,9 +43,9 @@ type Pool struct {
 	runCancel context.CancelFunc
 	wg        sync.WaitGroup
 
-	mu      sync.RWMutex
-	started bool
-	stopped bool
+	mu         sync.RWMutex
+	started    bool
+	stopped    bool
 	isFallback atomic.Bool // true when this pool was created because budget reserve failed or no budget
 }
 

@@ -35,7 +35,7 @@ var untypedRefFields = map[string]struct{}{
 	"commit_refs":                     {},
 	objects.FieldKeyDocumentRefs:      {},
 	objects.FieldKeyLifecycleRef:      {},
-	objects.FieldKeyLifecycleRefs:    {},
+	objects.FieldKeyLifecycleRefs:     {},
 	objects.FieldKeyObjectRef:         {},
 }
 

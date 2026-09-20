@@ -1,12 +1,12 @@
 package precommit
 
 import (
+	"github.com/spf13/cobra"
 	"github.com/zqk-os/zqk/internal/cli"
 	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/precommit"
 	"github.com/zqk-os/zqk/pkg/zqktime"
-	"github.com/spf13/cobra"
 )
 
 // NewWriteResultCmd creates the pre-commit write-result command from spec-driven builder; RunE reads flags and writes category result.

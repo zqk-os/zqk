@@ -413,11 +413,11 @@ func (ca *CommitAnalyzer) getFileChanges(ctx context.Context, hash string, commi
 			if n, err := fmt.Sscanf(stats, "%d", &total); n == 1 && err == nil {
 				// Try to parse "+N -M" format
 				if strings.Contains(stats, "+") && strings.Contains(stats, "-") {
-					_ , _ = fmt.Sscanf(stats, "%d +%d -%d", &total, &added, &removed)
+					_, _ = fmt.Sscanf(stats, "%d +%d -%d", &total, &added, &removed)
 				} else if strings.Contains(stats, "+") {
-					_ , _ = fmt.Sscanf(stats, "%d +%d", &total, &added)
+					_, _ = fmt.Sscanf(stats, "%d +%d", &total, &added)
 				} else if strings.Contains(stats, "-") {
-					_ , _ = fmt.Sscanf(stats, "%d -%d", &total, &removed)
+					_, _ = fmt.Sscanf(stats, "%d -%d", &total, &removed)
 				}
 			}
 

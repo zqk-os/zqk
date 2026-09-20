@@ -761,7 +761,6 @@ func occupiableTransitionOverlay() []Rule {
 	}
 }
 
-
 func traitOverlayRules(objectKind, intent string) []Rule {
 	var rules []Rule
 	if intent != IntentTransition {

@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/fatih/color"
+	"github.com/spf13/cobra"
 	"github.com/zqk-os/zqk/internal/cli"
 	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
@@ -22,7 +23,6 @@ import (
 	"github.com/zqk-os/zqk/pkg/validation"
 	"github.com/zqk-os/zqk/pkg/validation/qa"
 	"github.com/zqk-os/zqk/pkg/workflow/whatsnext"
-	"github.com/spf13/cobra"
 )
 
 // NewPromoteCmd creates a new promote command

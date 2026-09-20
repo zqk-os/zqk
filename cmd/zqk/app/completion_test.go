@@ -6,10 +6,10 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/spf13/cobra"
 	"github.com/zqk-os/zqk/cmd/zqk/app"
 	"github.com/zqk-os/zqk/pkg/execwrap"
 	"github.com/zqk-os/zqk/pkg/zqkenv"
-	"github.com/spf13/cobra"
 )
 
 // moduleRoot returns the Go module root (directory containing go.mod).

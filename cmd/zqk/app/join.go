@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/fatih/color"
+	"github.com/spf13/cobra"
 	"github.com/zqk-os/zqk/internal/cli"
 	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
 	"github.com/zqk-os/zqk/pkg/errfmt"
@@ -13,7 +14,6 @@ import (
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/storage"
-	"github.com/spf13/cobra"
 )
 
 func NewJoinCmd() *cobra.Command {
@@ -102,7 +102,7 @@ func runJoin(cmd *cobra.Command, args []string) error {
 		if interactive {
 			fmt.Fprintf(cmd.OutOrStdout(), "\nJoin this peer as %s? [Y/n]: ", cyan(alias))
 			var input string
-			_ , _ = fmt.Scanln(&input)
+			_, _ = fmt.Scanln(&input)
 			if input != "" && !strings.EqualFold(input, "y") && !strings.EqualFold(input, "yes") {
 				fmt.Fprintln(cmd.OutOrStdout(), "Aborted.")
 				return nil

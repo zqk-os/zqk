@@ -7,6 +7,7 @@ const (
 	criterionAllBacklogCompleteForMilestone         = "all_backlog_items_complete_for_milestone"
 	criterionAllCriteriaCompleteForMilestone        = "all_criteria_complete_for_milestone"
 	criterionAllAcceptanceCriteriaMetForBacklogItem = "all_acceptance_criteria_met_for_backlog_item"
+	criterionAllCriteriaCompleteForRequirement      = "all_criteria_complete_for_requirement"
 
 	kindPriorityPlan  = objects.KindPriorityPlan
 	kindMilestone     = objects.KindMilestone
@@ -23,6 +24,7 @@ const (
 	scopePlanID        = "plan_id"
 	scopeMilestoneID   = "milestone_id"
 	scopeBacklogItemID = "backlog_item_id"
+	scopeRequirementID = "requirement_id"
 
 	statusComplete     = "complete"
 	statusArchived     = "archived"

@@ -15,7 +15,7 @@ type Property[T any] struct {
 func envKey(name string) string {
 	// Convert dot to underscore
 	name = strings.ReplaceAll(name, ".", "_")
-	
+
 	// Convert camelCase to snake_case
 	var result strings.Builder
 	for i, r := range name {
@@ -24,7 +24,7 @@ func envKey(name string) string {
 		}
 		result.WriteRune(r)
 	}
-	
+
 	return "ZQK_" + strings.ToUpper(result.String())
 }
 
@@ -57,11 +57,11 @@ func (p Property[T]) OrDefault(def T) T {
 				return any(false).(T)
 			case int:
 				var i int
-				_ , _ = fmt.Sscanf(val, "%d", &i)
+				_, _ = fmt.Sscanf(val, "%d", &i)
 				return any(i).(T)
 			case float64:
 				var f float64
-				_ , _ = fmt.Sscanf(val, "%f", &f)
+				_, _ = fmt.Sscanf(val, "%f", &f)
 				return any(f).(T)
 			}
 		}

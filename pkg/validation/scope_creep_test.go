@@ -4,8 +4,8 @@ import (
 	"context"
 	"testing"
 
-	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/stretchr/testify/assert"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 func TestScopeCreepProtection(t *testing.T) {

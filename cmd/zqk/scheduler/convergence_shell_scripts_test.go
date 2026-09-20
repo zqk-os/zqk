@@ -6,8 +6,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/zqk-os/zqk/pkg/zqkenv"
 	"github.com/spf13/cobra"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
 func TestSchedulerConvergenceDelegatesRegistered(t *testing.T) {

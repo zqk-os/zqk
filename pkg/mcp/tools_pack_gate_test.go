@@ -3,10 +3,10 @@ package mcp_test
 import (
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/mcp"
 	"github.com/zqk-os/zqk/pkg/zqkenv"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestStudioPackMCPToolsGating(t *testing.T) {

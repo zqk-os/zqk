@@ -11,9 +11,9 @@ import (
 	"strings"
 	"time"
 
+	"github.com/spf13/cobra"
 	"github.com/zqk-os/zqk/internal/cli"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
-	"github.com/spf13/cobra"
 )
 
 // NewCacheAuditCmd creates a new cache audit command

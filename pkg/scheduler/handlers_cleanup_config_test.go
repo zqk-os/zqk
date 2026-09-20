@@ -145,4 +145,3 @@ func TestCleanupConfigHandler_Execute_ResourceHygieneSteps(t *testing.T) {
 		t.Errorf("expected oldTmp to be reaped by cleanup job")
 	}
 }
-

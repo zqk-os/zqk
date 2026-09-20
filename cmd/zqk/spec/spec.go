@@ -3,10 +3,10 @@ package spec
 import (
 	"fmt"
 
+	"github.com/spf13/cobra"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
 	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
 	"github.com/zqk-os/zqk/pkg/paths"
-	"github.com/spf13/cobra"
 )
 
 // NewSpecCmd creates the "spec" command group for programmatic spec management (CRIT-9036, BLI-152).

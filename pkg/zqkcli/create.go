@@ -1,11 +1,11 @@
 package internal
 
 import (
+	"github.com/spf13/cobra"
 	"github.com/zqk-os/zqk/internal/cli"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/objects"
-	"github.com/spf13/cobra"
 )
 
 // NewInternalCreateCmd creates a create command for internal objects

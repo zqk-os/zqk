@@ -317,4 +317,3 @@ func TestAutoTracePipeline_BLI1789335658105469000_Discipline(t *testing.T) {
 		}
 	}
 }
-

@@ -157,7 +157,7 @@ func TestExtractReferenceFields_SkipsLeftoverNonKernelRefs(t *testing.T) {
 	properties := map[string]any{
 		objects.FieldKeyPriorityPlanRef: "PRI-001",
 		objects.FieldKeyBranchRef:       "integration/pri-PRI-CEF-R21-ENVELOPE-REMEASURE-001",
-		objects.FieldKeyDocumentRefs:     []string{"docs/architecture/FOO.md"},
+		objects.FieldKeyDocumentRefs:    []string{"docs/architecture/FOO.md"},
 		objects.FieldKeyDocEntryRefs:    []string{"DOC-001"},
 	}
 	refs := parser.ExtractReferenceFields(properties)

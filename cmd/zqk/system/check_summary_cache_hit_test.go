@@ -5,10 +5,10 @@ import (
 	"testing"
 	"time"
 
+	"github.com/spf13/cobra"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/validation"
-	"github.com/spf13/cobra"
 )
 
 // TestCollectResultsForCompletion_UsesCacheHitSnapshot prevents false-clean summaries:

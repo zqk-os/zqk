@@ -8,10 +8,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/zqk-os/zqk/pkg/paths"
-	"github.com/zqk-os/zqk/pkg/zqktime"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
+	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/zqktime"
 )
 
 // CommandMetrics represents usage metrics for a CLI command

@@ -19,7 +19,7 @@ const harnessAccountID = "ACC-TEST-HARNESS"
 // cannot override isolation. Prefer [wireIsolatedCLI] when wiring *exec.Cmd.
 func envForIsolatedCLIProject(tmpRoot string) []string {
 	env := zqkenv.SubprocessEnvironWithTestRoot(tmpRoot)
-	env = append(env, zqkenv.APIKey().Name() + "="+harnessAccountID)
+	env = append(env, zqkenv.APIKey().Name()+"="+harnessAccountID)
 	return env
 }
 
@@ -37,7 +37,7 @@ func wireIsolatedCLI(cmd *exec.Cmd, tmpRoot string) {
 		return
 	}
 	zqkenv.WireExecForIsolatedProject(cmd, tmpRoot)
-	cmd.Env = append(cmd.Env, zqkenv.APIKey().Name() + "="+harnessAccountID)
+	cmd.Env = append(cmd.Env, zqkenv.APIKey().Name()+"="+harnessAccountID)
 }
 
 // getStorageProviderForTest returns a storage provider and registers cleanup

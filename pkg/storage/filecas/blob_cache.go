@@ -102,7 +102,6 @@ func lookupCASBlob(hash string) ([]byte, bool) { return LookupCASBlob(hash) }
 
 func storeCASBlob(hash string, data []byte) { StoreCASBlob(hash, data) }
 
-
 // Peek copies the value for key without changing eviction order.
 func (c *BlobCache) Peek(key string) ([]byte, bool) {
 	if c == nil || key == "" {

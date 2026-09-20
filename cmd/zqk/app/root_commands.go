@@ -5,6 +5,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/spf13/cobra"
 	"github.com/zqk-os/zqk/cmd/zqk/agent"
 	"github.com/zqk-os/zqk/cmd/zqk/ambient"
 	"github.com/zqk-os/zqk/cmd/zqk/automation"
@@ -47,7 +48,6 @@ import (
 	"github.com/zqk-os/zqk/cmd/zqk/workflow"
 	"github.com/zqk-os/zqk/pkg/objects"
 	internal "github.com/zqk-os/zqk/pkg/zqkcli"
-	"github.com/spf13/cobra"
 )
 
 // registerCommands registers all implemented commands

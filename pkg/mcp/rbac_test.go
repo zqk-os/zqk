@@ -4,8 +4,8 @@ import (
 	"strings"
 	"testing"
 
-	pkgcli "github.com/zqk-os/zqk/pkg/cli"
 	"github.com/spf13/cobra"
+	pkgcli "github.com/zqk-os/zqk/pkg/cli"
 
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/objects"

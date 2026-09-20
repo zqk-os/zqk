@@ -633,7 +633,6 @@ func processDuplicateReferenceIssue(fixCtx *AutoFixContext, issue Issue) string 
 	return ""
 }
 
-
 // chooseRedundantField determines which of two fields should yield when both reference the same target ID.
 func chooseRedundantField(fieldA, fieldB, targetID string) string {
 	// Rule 0: Field-prefix affinity mismatch.

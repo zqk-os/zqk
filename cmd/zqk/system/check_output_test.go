@@ -467,4 +467,3 @@ func TestIsCompletedSystemCheckError(t *testing.T) {
 		t.Fatal("SystemCheckError must return to Cobra, not os.Exit")
 	}
 }
-

@@ -97,10 +97,10 @@ func TestFormatHandler_SanitizesNonFiniteFloats(t *testing.T) {
 	}
 
 	payload := map[string]any{
-		"inf":      math.Inf(1),
-		"neg_inf":  math.Inf(-1),
-		"nan":      math.NaN(),
-		"regular":  42.5,
+		"inf":     math.Inf(1),
+		"neg_inf": math.Inf(-1),
+		"nan":     math.NaN(),
+		"regular": 42.5,
 		"nested": map[string]any{
 			"deep_inf": math.Inf(1),
 		},

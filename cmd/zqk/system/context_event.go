@@ -4,12 +4,12 @@ package system
 import (
 	"strings"
 
+	"github.com/spf13/cobra"
 	"github.com/zqk-os/zqk/internal/cli"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
 	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
 	"github.com/zqk-os/zqk/pkg/contextevents"
 	"github.com/zqk-os/zqk/pkg/errfmt"
-	"github.com/spf13/cobra"
 )
 
 // NewEmitContextEventCmd emits one structured line to .zqk/metrics/context_events.jsonl (POL-OBS-001).

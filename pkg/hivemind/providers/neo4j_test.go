@@ -164,7 +164,7 @@ func TestMemGraphMemoryStore_FindObjectsMissingVectors(t *testing.T) {
 			Rows: []map[string]any{
 				{"id": "obj1"},
 				{"id": "obj2"},
-				{"id": ""}, // should be ignored
+				{"id": ""},        // should be ignored
 				{"other": "data"}, // should be ignored
 			},
 		},
@@ -197,4 +197,3 @@ func TestMemGraphMemoryStore_LinkVectorID(t *testing.T) {
 		t.Fatalf("unexpected error: %v", err)
 	}
 }
-

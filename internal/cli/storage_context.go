@@ -4,9 +4,9 @@ import (
 	"context"
 	"sync"
 
+	"github.com/spf13/cobra"
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/storage"
-	"github.com/spf13/cobra"
 )
 
 // storageProviderKey is the context key for the storage provider set by root PersistentPreRunE

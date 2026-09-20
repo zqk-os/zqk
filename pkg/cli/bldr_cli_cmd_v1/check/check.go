@@ -28,14 +28,30 @@ func NewCheckResult() *CheckResult {
 func (r *CheckResult) Score() int {
 	total := 8
 	passed := 0
-	if r.sessionValid { passed++ }
-	if r.planAligned { passed++ }
-	if r.itemValid { passed++ }
-	if r.policyOK { passed++ }
-	if r.branchValid { passed++ }
-	if r.gitClean { passed++ }
-	if r.branchLatestMain { passed++ }
-	if r.itemFirstNonComp { passed++ }
+	if r.sessionValid {
+		passed++
+	}
+	if r.planAligned {
+		passed++
+	}
+	if r.itemValid {
+		passed++
+	}
+	if r.policyOK {
+		passed++
+	}
+	if r.branchValid {
+		passed++
+	}
+	if r.gitClean {
+		passed++
+	}
+	if r.branchLatestMain {
+		passed++
+	}
+	if r.itemFirstNonComp {
+		passed++
+	}
 	return (passed * 100) / total
 }
 

@@ -173,4 +173,3 @@ func TestQuarantineImportBanForDNAAndKernel(t *testing.T) {
 func TestCodegenBoundaryIsolation(t *testing.T) {
 	TestQuarantineImportBanForDNAAndKernel(t)
 }
-

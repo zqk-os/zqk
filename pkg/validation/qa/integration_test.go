@@ -112,4 +112,3 @@ func TestQASuccessSpec_BLI_CEF_QA_SUCCESS_SPEC_001(t *testing.T) {
 		t.Fatal("expected non-empty signer public key")
 	}
 }
-

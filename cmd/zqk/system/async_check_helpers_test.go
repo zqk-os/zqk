@@ -5,8 +5,8 @@ import (
 
 	"github.com/zqk-os/zqk/internal/cli"
 
-	schedulerpkg "github.com/zqk-os/zqk/pkg/scheduler"
 	"github.com/spf13/cobra"
+	schedulerpkg "github.com/zqk-os/zqk/pkg/scheduler"
 )
 
 // TestInitializeAsyncCheckContext_EnqueuesCachePrewarmTrigger verifies that when system check

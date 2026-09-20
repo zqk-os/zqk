@@ -7,6 +7,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/spf13/cobra"
 	"github.com/zqk-os/zqk/internal/cli"
 	clicontext "github.com/zqk-os/zqk/internal/cli/context"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
@@ -16,7 +17,6 @@ import (
 	schedulerpkg "github.com/zqk-os/zqk/pkg/scheduler"
 	storagepkg "github.com/zqk-os/zqk/pkg/storage"
 	"github.com/zqk-os/zqk/pkg/strutil"
-	"github.com/spf13/cobra"
 )
 
 // stopScheduler stops the scheduler daemon.

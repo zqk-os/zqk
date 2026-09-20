@@ -375,5 +375,3 @@ func TestProcessDuplicateReferenceIssue_ThreeWayCascade(t *testing.T) {
 		t.Fatalf("expected only DOC-001 in related_object_refs, got: %v", fixCtx.Obj.Properties["related_object_refs"])
 	}
 }
-
-

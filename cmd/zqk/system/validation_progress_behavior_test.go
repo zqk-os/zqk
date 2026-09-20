@@ -10,11 +10,11 @@ import (
 	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 
+	"github.com/spf13/cobra"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/validation"
-	"github.com/spf13/cobra"
 )
 
 // TestAllTasksAccountedFor verifies cache-based completion logic.

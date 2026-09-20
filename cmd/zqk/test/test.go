@@ -1,8 +1,8 @@
 package test
 
 import (
-	bldr "github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
 	"github.com/spf13/cobra"
+	bldr "github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
 )
 
 // NewTestCmd creates the top-level `test` command group.

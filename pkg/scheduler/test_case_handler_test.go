@@ -20,9 +20,9 @@ func TestSchedulerTestCaseRouting(t *testing.T) {
 	t.Parallel()
 
 	testCase := map[string]any{
-		"id":          "TST-ROUTING-SAMPLE-001",
-		"kind":        "test_case",
-		"path_or_id":  "pkg/scheduler/test_case_handler_test.go",
+		"id":         "TST-ROUTING-SAMPLE-001",
+		"kind":       "test_case",
+		"path_or_id": "pkg/scheduler/test_case_handler_test.go",
 		"criteria_refs": []any{
 			"CRIT-TEST-SCHED-FUNC-ROUTING-001",
 		},

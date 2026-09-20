@@ -3,9 +3,9 @@ package storage_test
 import (
 	"testing"
 
+	"github.com/stretchr/testify/require"
 	"github.com/zqk-os/zqk/pkg/graph/provider"
 	"github.com/zqk-os/zqk/pkg/storage"
-	"github.com/stretchr/testify/require"
 )
 
 func TestGraphFacade_NewGraphLock(t *testing.T) {

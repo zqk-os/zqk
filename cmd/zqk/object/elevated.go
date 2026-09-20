@@ -3,10 +3,10 @@ package object
 import (
 	"strings"
 
+	"github.com/spf13/cobra"
 	"github.com/zqk-os/zqk/pkg/brand"
 	"github.com/zqk-os/zqk/pkg/entitlements"
 	"github.com/zqk-os/zqk/pkg/errfmt"
-	"github.com/spf13/cobra"
 )
 
 // FlagElevatedInternal is the object-group elevated access mode flag.

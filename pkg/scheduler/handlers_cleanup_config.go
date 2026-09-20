@@ -341,4 +341,3 @@ func (h *CleanupConfigHandler) runEnforceLogRetention(workDir string, params map
 	}
 	return nil
 }
-

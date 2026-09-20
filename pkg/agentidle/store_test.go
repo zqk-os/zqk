@@ -76,4 +76,5 @@ func TestFileStore_PermissionsAndSchema(t *testing.T) {
 	// Check if schema_version exists
 	assert.Contains(t, string(data), `"schema_version": "2.0.0"`)
 }
+
 // tdd refresh

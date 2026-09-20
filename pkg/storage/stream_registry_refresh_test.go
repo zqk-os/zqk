@@ -54,4 +54,5 @@ func TestStreamRegistrySnapshot_RefreshCoalescesWithinInterval(t *testing.T) {
 		t.Fatalf("coalesced refresh moved lastRefresh from %v to %v", first, snap.lastRefresh)
 	}
 }
+
 // tdd refresh

@@ -3,9 +3,9 @@ package cli
 import (
 	"fmt"
 
+	"github.com/spf13/cobra"
 	pkgcli "github.com/zqk-os/zqk/pkg/cli"
 	"github.com/zqk-os/zqk/pkg/errfmt"
-	"github.com/spf13/cobra"
 )
 
 // QuarantinedCommand represents a command that exists but is not yet ready

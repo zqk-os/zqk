@@ -74,4 +74,3 @@ func TestLinkOrCopyYAML(t *testing.T) {
 		t.Fatalf("content mismatch: got %q, want %q", string(got), string(content))
 	}
 }
-

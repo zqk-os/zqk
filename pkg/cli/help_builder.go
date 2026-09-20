@@ -7,10 +7,10 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/zqk-os/zqk/pkg/paths"
-	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
+	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"golang.org/x/term"
 )
 

@@ -123,4 +123,3 @@ func TestEnsureCreateLifecycleStatus_CLIPolicyActiveCoercedToConceptual(t *testi
 		t.Fatalf("expected CLI policy create active→conceptual, got %q", got)
 	}
 }
-

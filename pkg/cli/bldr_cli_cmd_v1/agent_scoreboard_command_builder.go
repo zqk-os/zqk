@@ -1,8 +1,8 @@
 package bldr_cli_cmd_v1
 
 import (
-	"github.com/zqk-os/zqk/internal/cli"
 	"github.com/spf13/cobra"
+	"github.com/zqk-os/zqk/internal/cli"
 )
 
 type AgentScoreboardCommandBuilder struct{}

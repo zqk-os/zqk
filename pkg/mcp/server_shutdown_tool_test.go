@@ -5,8 +5,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/stretchr/testify/assert"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 func TestServerShutdownTool(t *testing.T) {

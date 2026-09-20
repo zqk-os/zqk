@@ -6,8 +6,8 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"github.com/stretchr/testify/require"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 func TestComputeTestCaseHash(t *testing.T) {

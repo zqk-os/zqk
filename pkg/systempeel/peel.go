@@ -7,8 +7,8 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"github.com/spf13/cobra"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // LargeFileReport describes a source file exceeding a lines-of-code threshold.

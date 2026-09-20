@@ -28,7 +28,7 @@ type Violation struct {
 
 // PayloadReport is the complete result of a payload check scan.
 type PayloadReport struct {
-	TotalViolations int       `json:"total_violations"`
+	TotalViolations int         `json:"total_violations"`
 	Violations      []Violation `json:"violations,omitempty"`
 }
 
@@ -51,7 +51,7 @@ func PayloadCheck(rootDir string, opts PayloadCheckOptions) (*PayloadReport, err
 			return report, fmt.Errorf("invalid exclusion glob %q: %w", pat, err)
 		}
 		// Use the pattern as a contains-match via regexp.
-		exclRegexes = append(exclRegexes, regexp.MustCompile("^" + pathToRegexp(pat) + "$"))
+		exclRegexes = append(exclRegexes, regexp.MustCompile("^"+pathToRegexp(pat)+"$"))
 		_ = rx
 	}
 

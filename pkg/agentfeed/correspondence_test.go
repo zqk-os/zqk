@@ -455,4 +455,3 @@ func TestLoadCorrespondence_WorktreeEnvBindsToSeatedRoot(t *testing.T) {
 		t.Fatalf("expected event written to studio root %s, got %s", wantEventPath, appRes.EventPath)
 	}
 }
-

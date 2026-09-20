@@ -266,8 +266,8 @@ func calculateBaseEDD(ctx context.Context, storageProvider storage.ObjectStorage
 // ComputeEffortVariance calculates the percentage variance between estimated and actual effort for a single object.
 func ComputeEffortVariance(estimated, actual string) float64 {
 	var est, act float64
-	_ , _ = fmt.Sscanf(estimated, "%f", &est)
-	_ , _ = fmt.Sscanf(actual, "%f", &act)
+	_, _ = fmt.Sscanf(estimated, "%f", &est)
+	_, _ = fmt.Sscanf(actual, "%f", &act)
 	if est == 0 {
 		return 0.0
 	}

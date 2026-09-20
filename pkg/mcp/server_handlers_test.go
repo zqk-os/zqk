@@ -829,4 +829,5 @@ func TestClientIDInSubscriptionID(t *testing.T) {
 		t.Errorf("expected second part to be 'sub', got '%s'", parts[1])
 	}
 }
+
 // tdd refresh

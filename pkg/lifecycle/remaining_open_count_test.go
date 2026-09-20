@@ -329,4 +329,3 @@ func TestApplyPlanChildMembershipRemoved_WithParkTransitionsToPaused(t *testing.
 		t.Fatalf("active_order must be unset on transition to paused, got %v", plan[objects.FieldKeyActiveOrder])
 	}
 }
-

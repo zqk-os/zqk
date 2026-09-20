@@ -521,4 +521,5 @@ func TestValidationStateCache_LoadPrunesExcludedKinds(t *testing.T) {
 		t.Error(ConstMagic42f28d39)
 	}
 }
+
 // tdd refresh

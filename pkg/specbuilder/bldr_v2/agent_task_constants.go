@@ -24,4 +24,3 @@ const (
 	// FieldTaskSteps is the field name for task_steps
 	FieldTaskSteps = "task_steps"
 )
-

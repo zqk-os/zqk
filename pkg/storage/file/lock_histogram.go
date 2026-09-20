@@ -8,24 +8,24 @@ import (
 
 // ContentionHistogram tracks latency distributions for lock acquisition wait times.
 type ContentionHistogram struct {
-	under1ms          atomic.Int64
-	between1And5ms    atomic.Int64
-	between5And25ms   atomic.Int64
-	between25And100ms atomic.Int64
+	under1ms           atomic.Int64
+	between1And5ms     atomic.Int64
+	between5And25ms    atomic.Int64
+	between25And100ms  atomic.Int64
 	between100And500ms atomic.Int64
-	over500ms         atomic.Int64
-	totalSamples      atomic.Int64
+	over500ms          atomic.Int64
+	totalSamples       atomic.Int64
 }
 
 // HistogramSnapshot represents an immutable point-in-time view of lock latency distributions.
 type HistogramSnapshot struct {
-	Under1ms          int64
-	Between1And5ms    int64
-	Between5And25ms   int64
-	Between25And100ms int64
+	Under1ms           int64
+	Between1And5ms     int64
+	Between5And25ms    int64
+	Between25And100ms  int64
 	Between100And500ms int64
-	Over500ms         int64
-	TotalSamples      int64
+	Over500ms          int64
+	TotalSamples       int64
 }
 
 var (
@@ -69,13 +69,13 @@ func (h *ContentionHistogram) Record(d time.Duration) {
 // Snapshot returns a point-in-time copy of all histogram bucket counts.
 func (h *ContentionHistogram) Snapshot() HistogramSnapshot {
 	return HistogramSnapshot{
-		Under1ms:          h.under1ms.Load(),
-		Between1And5ms:    h.between1And5ms.Load(),
-		Between5And25ms:   h.between5And25ms.Load(),
-		Between25And100ms: h.between25And100ms.Load(),
+		Under1ms:           h.under1ms.Load(),
+		Between1And5ms:     h.between1And5ms.Load(),
+		Between5And25ms:    h.between5And25ms.Load(),
+		Between25And100ms:  h.between25And100ms.Load(),
 		Between100And500ms: h.between100And500ms.Load(),
-		Over500ms:         h.over500ms.Load(),
-		TotalSamples:      h.totalSamples.Load(),
+		Over500ms:          h.over500ms.Load(),
+		TotalSamples:       h.totalSamples.Load(),
 	}
 }
 

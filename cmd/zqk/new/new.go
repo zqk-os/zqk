@@ -1,9 +1,9 @@
 package newcmd
 
 import (
+	"github.com/zqk-os/zqk/pkg/quick"
 	"path/filepath"
 	"strings"
-	"github.com/zqk-os/zqk/pkg/quick"
 
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v3"
@@ -353,4 +353,3 @@ func readTitleAndBody(filePath, content, titleOverride string) (body, title stri
 	}
 	return body, title, nil
 }
-

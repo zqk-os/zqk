@@ -243,15 +243,15 @@ func TestGoValidator_StrictMode_DuplicateRefs(t *testing.T) {
 
 	// Intra-object duplicate across sibling ref fields: same ID in related_object_refs and dependencies
 	obj := map[string]any{
-		objects.FieldKeyID:            "BLI-TEST-002",
-		objects.FieldKeyKind:          objects.KindBacklogItem,
-		objects.FieldKeyTitle:         "Test item with duplicate refs",
-		objects.FieldKeyStatus:        objects.ObjectStatusExploring,
-		objects.FieldKeySchemaVersion: objects.DefaultSchemaVersion,
-		objects.FieldKeyCreatedAt:     "2026-01-01T00:00:00Z",
-		objects.FieldKeyCreatedBy:     "ACC-TEST",
-		objects.FieldKeyUpdatedAt:     "2026-01-01T00:00:00Z",
-		objects.FieldKeyUpdatedBy:     "ACC-TEST",
+		objects.FieldKeyID:                "BLI-TEST-002",
+		objects.FieldKeyKind:              objects.KindBacklogItem,
+		objects.FieldKeyTitle:             "Test item with duplicate refs",
+		objects.FieldKeyStatus:            objects.ObjectStatusExploring,
+		objects.FieldKeySchemaVersion:     objects.DefaultSchemaVersion,
+		objects.FieldKeyCreatedAt:         "2026-01-01T00:00:00Z",
+		objects.FieldKeyCreatedBy:         "ACC-TEST",
+		objects.FieldKeyUpdatedAt:         "2026-01-01T00:00:00Z",
+		objects.FieldKeyUpdatedBy:         "ACC-TEST",
 		objects.FieldKeyRelatedObjectRefs: []any{"BLI-TARGET-001"},
 		objects.FieldKeyDependencies:      []any{"BLI-TARGET-001"},
 	}
@@ -275,15 +275,15 @@ func TestGoValidator_StrictMode_DuplicateRefs(t *testing.T) {
 
 	// Duplicate within the same list
 	objWithin := map[string]any{
-		objects.FieldKeyID:            "BLI-TEST-003",
-		objects.FieldKeyKind:          objects.KindBacklogItem,
-		objects.FieldKeyTitle:         "Test item with duplicate within field",
-		objects.FieldKeyStatus:        objects.ObjectStatusExploring,
-		objects.FieldKeySchemaVersion: objects.DefaultSchemaVersion,
-		objects.FieldKeyCreatedAt:     "2026-01-01T00:00:00Z",
-		objects.FieldKeyCreatedBy:     "ACC-TEST",
-		objects.FieldKeyUpdatedAt:     "2026-01-01T00:00:00Z",
-		objects.FieldKeyUpdatedBy:     "ACC-TEST",
+		objects.FieldKeyID:                "BLI-TEST-003",
+		objects.FieldKeyKind:              objects.KindBacklogItem,
+		objects.FieldKeyTitle:             "Test item with duplicate within field",
+		objects.FieldKeyStatus:            objects.ObjectStatusExploring,
+		objects.FieldKeySchemaVersion:     objects.DefaultSchemaVersion,
+		objects.FieldKeyCreatedAt:         "2026-01-01T00:00:00Z",
+		objects.FieldKeyCreatedBy:         "ACC-TEST",
+		objects.FieldKeyUpdatedAt:         "2026-01-01T00:00:00Z",
+		objects.FieldKeyUpdatedBy:         "ACC-TEST",
 		objects.FieldKeyRelatedObjectRefs: []any{"BLI-TARGET-002", "BLI-TARGET-002"},
 	}
 	resWithin, err := gv.Validate(ctx, objWithin, objects.KindBacklogItem, &ValidationOptions{
@@ -309,16 +309,16 @@ func TestCompose_Workflow_RefusesPercentComplete(t *testing.T) {
 	ctx := pkgctx.NewSystemContext()
 
 	obj := map[string]any{
-		objects.FieldKeyID:               "WFL-TEST-001",
-		objects.FieldKeyKind:             objects.KindWorkflow,
-		objects.FieldKeyTitle:            "Workflow with percent complete",
-		objects.FieldKeyStatus:           objects.ObjectStatusActive,
-		objects.FieldKeySchemaVersion:    objects.DefaultSchemaVersion,
-		objects.FieldKeyCreatedAt:        "2026-01-01T00:00:00Z",
-		objects.FieldKeyCreatedBy:        "ACC-TEST",
-		objects.FieldKeyUpdatedAt:        "2026-01-01T00:00:00Z",
-		objects.FieldKeyUpdatedBy:        "ACC-TEST",
-		objects.FieldKeyPercentComplete:  100,
+		objects.FieldKeyID:              "WFL-TEST-001",
+		objects.FieldKeyKind:            objects.KindWorkflow,
+		objects.FieldKeyTitle:           "Workflow with percent complete",
+		objects.FieldKeyStatus:          objects.ObjectStatusActive,
+		objects.FieldKeySchemaVersion:   objects.DefaultSchemaVersion,
+		objects.FieldKeyCreatedAt:       "2026-01-01T00:00:00Z",
+		objects.FieldKeyCreatedBy:       "ACC-TEST",
+		objects.FieldKeyUpdatedAt:       "2026-01-01T00:00:00Z",
+		objects.FieldKeyUpdatedBy:       "ACC-TEST",
+		objects.FieldKeyPercentComplete: 100,
 	}
 
 	res, err := gv.Validate(ctx, obj, objects.KindWorkflow, &ValidationOptions{})
@@ -342,15 +342,15 @@ func TestCompose_BacklogItem_RefusesDuplicateRefs(t *testing.T) {
 	ctx := pkgctx.NewSystemContext()
 
 	obj := map[string]any{
-		objects.FieldKeyID:            "BLI-TEST-004",
-		objects.FieldKeyKind:          objects.KindBacklogItem,
-		objects.FieldKeyTitle:         "Backlog item with duplicate refs",
-		objects.FieldKeyStatus:        objects.ObjectStatusExploring,
-		objects.FieldKeySchemaVersion: objects.DefaultSchemaVersion,
-		objects.FieldKeyCreatedAt:     "2026-01-01T00:00:00Z",
-		objects.FieldKeyCreatedBy:     "ACC-TEST",
-		objects.FieldKeyUpdatedAt:     "2026-01-01T00:00:00Z",
-		objects.FieldKeyUpdatedBy:     "ACC-TEST",
+		objects.FieldKeyID:                "BLI-TEST-004",
+		objects.FieldKeyKind:              objects.KindBacklogItem,
+		objects.FieldKeyTitle:             "Backlog item with duplicate refs",
+		objects.FieldKeyStatus:            objects.ObjectStatusExploring,
+		objects.FieldKeySchemaVersion:     objects.DefaultSchemaVersion,
+		objects.FieldKeyCreatedAt:         "2026-01-01T00:00:00Z",
+		objects.FieldKeyCreatedBy:         "ACC-TEST",
+		objects.FieldKeyUpdatedAt:         "2026-01-01T00:00:00Z",
+		objects.FieldKeyUpdatedBy:         "ACC-TEST",
 		objects.FieldKeyRelatedObjectRefs: []any{"BLI-DUP-001"},
 		objects.FieldKeyDependencies:      []any{"BLI-DUP-001"},
 	}

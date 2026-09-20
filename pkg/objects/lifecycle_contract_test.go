@@ -525,4 +525,3 @@ func TestLifecycleContract_GanttPartnersHaveLifecycleExam(t *testing.T) {
 		}
 	}
 }
-

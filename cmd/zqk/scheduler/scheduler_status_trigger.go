@@ -11,6 +11,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/spf13/cobra"
 	"github.com/zqk-os/zqk/internal/cli"
 	clicontext "github.com/zqk-os/zqk/internal/cli/context"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
@@ -23,7 +24,6 @@ import (
 	storagepkg "github.com/zqk-os/zqk/pkg/storage"
 	"github.com/zqk-os/zqk/pkg/strutil"
 	"github.com/zqk-os/zqk/pkg/zqkenv"
-	"github.com/spf13/cobra"
 )
 
 // showSchedulerStatus shows scheduler daemon status
@@ -230,10 +230,10 @@ func upgradeToWebSocket(w http.ResponseWriter, r *http.Request) (net.Conn, error
 	h.Write([]byte(key + rfc6455WebSocketGuid))
 	accept := base64.StdEncoding.EncodeToString(h.Sum(nil))
 
-	_ , _ = bufrw.WriteString("HTTP/1.1 101 Switching Protocols\r\n")
-	_ , _ = bufrw.WriteString("Upgrade: websocket\r\n")
-	_ , _ = bufrw.WriteString("Connection: Upgrade\r\n")
-	_ , _ = bufrw.WriteString("Sec-WebSocket-Accept: " + accept + "\r\n\r\n")
+	_, _ = bufrw.WriteString("HTTP/1.1 101 Switching Protocols\r\n")
+	_, _ = bufrw.WriteString("Upgrade: websocket\r\n")
+	_, _ = bufrw.WriteString("Connection: Upgrade\r\n")
+	_, _ = bufrw.WriteString("Sec-WebSocket-Accept: " + accept + "\r\n\r\n")
 	_ = bufrw.Flush()
 
 	return conn, nil

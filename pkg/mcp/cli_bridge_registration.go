@@ -3,9 +3,9 @@ package mcp
 import (
 	"strings"
 
+	"github.com/spf13/cobra"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/logging"
-	"github.com/spf13/cobra"
 )
 
 // RegisterCLIToolsWithRootCommandAndConfig registers CLI commands as MCP tools with config security enforcement

@@ -3,9 +3,9 @@ package wal_test
 import (
 	"testing"
 
+	"github.com/stretchr/testify/require"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/storage/wal"
-	"github.com/stretchr/testify/require"
 )
 
 func TestWALLogging(t *testing.T) {

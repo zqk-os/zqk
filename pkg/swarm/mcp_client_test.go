@@ -166,10 +166,10 @@ func TestMCPChildEnviron_keepsProjectRootSetsWorktree(t *testing.T) {
 	if !strings.Contains(joined, zqkenv.ProjectRoot().Name()+"=/studio") {
 		t.Fatalf("studio PROJECT_ROOT must stay: %v", got)
 	}
-	if !strings.Contains(joined, zqkenv.AgentWorktreeRoot().Name() + "=/wt") {
+	if !strings.Contains(joined, zqkenv.AgentWorktreeRoot().Name()+"=/wt") {
 		t.Fatalf("worktree root missing: %v", got)
 	}
-	if strings.Contains(joined, zqkenv.AgentWorktreeRoot().Name() + "=/old") {
+	if strings.Contains(joined, zqkenv.AgentWorktreeRoot().Name()+"=/old") {
 		t.Fatalf("stale worktree root kept: %v", got)
 	}
 }
@@ -210,4 +210,5 @@ func TestNormalizeToolName_prefersExactLazyWriteCode(t *testing.T) {
 		t.Fatalf("normalizeToolName(zqk_write_code)=%q, want exact lazy name not write_file", got)
 	}
 }
+
 // tdd refresh

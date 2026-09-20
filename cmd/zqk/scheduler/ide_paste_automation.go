@@ -13,10 +13,10 @@ import (
 const (
 	idePasteTokenBuiltin      = "builtin"
 	idePasteTokenCmdY         = "cmd_y"
-	idePasteCmdShiftE    = "cmd_shift_e"
+	idePasteCmdShiftE         = "cmd_shift_e"
 	idePasteTokenCmdL         = "cmd_l"
 	idePasteTokenEscape       = "escape"
-	idePasteOptionCmdE   = "option_cmd_e"
+	idePasteOptionCmdE        = "option_cmd_e"
 	idePasteTokenDefaultAlias = "default"
 )
 
@@ -298,11 +298,11 @@ func humanShortIDEPasteTokens(tokens []string) string {
 // validateBuiltIDEPasteScript checks the generated AppleScript matches the requested token keystrokes.
 func validateBuiltIDEPasteScript(s string, tokens []string) error {
 	want := map[string]int{
-		idePasteTokenCmdY:       0,
-		idePasteCmdShiftE:  0,
-		idePasteTokenEscape:     0,
-		idePasteTokenCmdL:       0,
-		idePasteOptionCmdE: 0,
+		idePasteTokenCmdY:   0,
+		idePasteCmdShiftE:   0,
+		idePasteTokenEscape: 0,
+		idePasteTokenCmdL:   0,
+		idePasteOptionCmdE:  0,
 	}
 	for _, t := range tokens {
 		want[t]++

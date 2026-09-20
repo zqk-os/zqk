@@ -46,7 +46,7 @@ func TestThroughputAggregator_RecordsAndCounts(t *testing.T) {
 func TestThroughputAggregator_SlidingWindow(t *testing.T) {
 	fixed := time.Date(2026, 9, 13, 10, 0, 0, 0, time.UTC)
 
-	a := NewThroughputAggregator(WithWindow(30 * time.Second), WithClock(func() time.Time { return fixed }))
+	a := NewThroughputAggregator(WithWindow(30*time.Second), WithClock(func() time.Time { return fixed }))
 
 	ctx := context.Background()
 	_ = a.RecordWorkerSample(ctx, "alpha", 1000)
@@ -168,7 +168,7 @@ func TestThroughputAggregator_TokenRate(t *testing.T) {
 
 	snap := a.Snapshot()
 	want := 10.0
-	if absFloat64(snap.ThroughputTokensPerSecond - want) > 1e-9 {
+	if absFloat64(snap.ThroughputTokensPerSecond-want) > 1e-9 {
 		t.Errorf("expected 10 tok/s, got %f", snap.ThroughputTokensPerSecond)
 	}
 }
@@ -263,7 +263,7 @@ func TestThroughputAggregator_WorkerDetailsSortedByTokens(t *testing.T) {
 		t.Errorf("expected descending order, got %s,%s,%s",
 			details[0].WorkerID, details[1].WorkerID, details[2].WorkerID)
 	}
-	_ = sort.Slice // keep the sort import in use
+	_ = sort.Slice       // keep the sort import in use
 	_ = atomic.LoadInt64 // keep the atomic import in use
 }
 

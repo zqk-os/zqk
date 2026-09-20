@@ -131,4 +131,3 @@ func TestCreateAuthHook_StubAuthRemediatedFailClosed(t *testing.T) {
 		}
 	})
 }
-

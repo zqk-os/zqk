@@ -16,7 +16,7 @@ func Confirm(prompt string) bool {
 	if strings.HasSuffix(os.Args[0], ".test") {
 		return false
 	}
-	_ , _ = os.Stderr.WriteString(prompt + " ")
+	_, _ = os.Stderr.WriteString(prompt + " ")
 	reader := bufio.NewReader(os.Stdin)
 	response, err := reader.ReadString('\n')
 	if err != nil {

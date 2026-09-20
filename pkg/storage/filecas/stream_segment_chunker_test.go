@@ -96,7 +96,7 @@ func TestStreamSegmentChunker_MultiChunkDeduplication(t *testing.T) {
 	// Small 1KB chunk size for testing multi-chunk partitioning
 	membrane.chunker = NewStreamSegmentChunker(1024)
 
-	chunk1Data := bytes.Repeat([]byte("1234567890abcdef"), 64) // exactly 1024 bytes
+	chunk1Data := bytes.Repeat([]byte("1234567890abcdef"), 64)             // exactly 1024 bytes
 	chunk2DataA := bytes.Repeat([]byte("stream A unique body line\n"), 10) // 270 bytes
 	chunk2DataB := bytes.Repeat([]byte("stream B unique body line\n"), 10) // 270 bytes
 

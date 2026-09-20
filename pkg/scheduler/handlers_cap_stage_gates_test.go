@@ -674,4 +674,5 @@ func TestResolveBoundCVS_SkipsTerminalPlanRef(t *testing.T) {
 		t.Fatalf("expected CVS-LIVE, got %q", cvsID)
 	}
 }
+
 // tdd refresh

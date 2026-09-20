@@ -87,9 +87,9 @@ transitions:
       mode: propagate
   - from: active
     to: complete
-    description: Auto-transition when all test cases passing OR linked milestone
-      complete
-    manual: false
+    description: "Complete when all test cases passing OR linked milestone complete (dual manual+auto).
+      Promote may hop; auto shockwave may still fire."
+    manual: true
     auto: true
     on_dependent_status:
       kind: test_case
@@ -102,9 +102,9 @@ transitions:
       mode: propagate
   - from: proposed
     to: complete
-    description: Auto-transition when all test cases passing OR linked milestone
-      complete
-    manual: false
+    description: "Complete when all test cases passing OR linked milestone complete (dual manual+auto).
+      Promote may hop; auto shockwave may still fire."
+    manual: true
     auto: true
     on_dependent_status:
       kind: test_case

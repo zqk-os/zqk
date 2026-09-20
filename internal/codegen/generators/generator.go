@@ -21,13 +21,13 @@ type FieldDefinition struct {
 
 // EntitySpec defines the parameters for generating a cellular domain entity.
 type EntitySpec struct {
-	PackageName     string
-	EntityName      string
-	Kind            string
-	SchemaRef       string
-	IncludeAudit    bool
+	PackageName      string
+	EntityName       string
+	Kind             string
+	SchemaRef        string
+	IncludeAudit     bool
 	IncludeLifecycle bool
-	Fields          []FieldDefinition
+	Fields           []FieldDefinition
 }
 
 // EntityGenerator synthesizes cellular entity code conforming strictly to BaseObject and MetaSchema.

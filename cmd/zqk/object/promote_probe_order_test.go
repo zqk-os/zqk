@@ -52,4 +52,3 @@ func TestPromoteForwardProbeOrder_KeepsCompleteFromTestingOrInProgress(t *testin
 		}
 	}
 }
-

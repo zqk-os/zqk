@@ -573,6 +573,26 @@ func TestDashboardState_ValidateTPMDefinitionOfDone(t *testing.T) {
 	if !strings.Contains(outBuf.String(), "TPM Definition of Done SATISFIED") {
 		t.Errorf("expected success message in stdout, got:\n%s", outBuf.String())
 	}
+
+	// 3. Add an unbound test criterion; DoD must fail closed
+	state.UnboundTestCriteria = []*UnboundCriterionModel{
+		{
+			ID:               "CRIT-UNBOUND-001",
+			Title:            "Orphan Criteria",
+			Status:           objects.ObjectStatusActive,
+			Category:         "test",
+			ValidationMethod: "automated_test",
+		},
+	}
+	outBuf.Reset()
+	errBuf.Reset()
+	err = state.ValidateTPMDefinitionOfDone(&outBuf, &errBuf)
+	if err == nil {
+		t.Errorf("expected DoD validation to fail when unbound test criterion exists")
+	}
+	if !strings.Contains(errBuf.String(), "unbound test criteria detected") {
+		t.Errorf("expected unbound criteria warning in stderr, got:\n%s", errBuf.String())
+	}
 }
 
 func TestDashboard_ColorAndPagerFlags(t *testing.T) {

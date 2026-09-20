@@ -1,8 +1,8 @@
 package agent
 
 import (
-	"github.com/zqk-os/zqk/cmd/zqk/validate"
 	"github.com/spf13/cobra"
+	"github.com/zqk-os/zqk/cmd/zqk/validate"
 )
 
 func NewValidateCmd() *cobra.Command {

@@ -19,6 +19,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/metrics"
 	"github.com/zqk-os/zqk/pkg/zqkenv"
 
+	"github.com/spf13/cobra"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/dispatch"
 	"github.com/zqk-os/zqk/pkg/errfmt"
@@ -28,7 +29,6 @@ import (
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/storage"
 	"github.com/zqk-os/zqk/pkg/validation"
-	"github.com/spf13/cobra"
 )
 
 // specLoaderAdapter adapts objects.SpecLoader to mcp.SpecLoader interface

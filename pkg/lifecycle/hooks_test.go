@@ -151,31 +151,31 @@ func TestApplyComputeHooks_PriorityPlan_Complete(t *testing.T) {
 	// Create 3 active plans with active_orders: 2, 4, 6
 	id1 := fixtureID(t, "PRI")
 	obj1 := map[string]any{
-		objects.FieldKeyKind:            objects.KindPriorityPlan,
-		objects.FieldKeyID:              id1,
-		objects.FieldKeyStatus:          statusActive,
-		"active_order":                  int64(2),
+		objects.FieldKeyKind:   objects.KindPriorityPlan,
+		objects.FieldKeyID:     id1,
+		objects.FieldKeyStatus: statusActive,
+		"active_order":         int64(2),
 	}
 	mustCreateCASVisible(t, realStorage, ctx, secCtx, obj1)
 
 	id2 := fixtureID(t, "PRI")
 	obj2 := map[string]any{
-		objects.FieldKeyKind:            objects.KindPriorityPlan,
-		objects.FieldKeyID:              id2,
-		objects.FieldKeyStatus:          statusActive,
-		"active_order":                  int64(4),
+		objects.FieldKeyKind:   objects.KindPriorityPlan,
+		objects.FieldKeyID:     id2,
+		objects.FieldKeyStatus: statusActive,
+		"active_order":         int64(4),
 	}
 	mustCreateCASVisible(t, realStorage, ctx, secCtx, obj2)
 
 	id3 := fixtureID(t, "PRI")
 	obj3 := map[string]any{
-		objects.FieldKeyKind:            objects.KindPriorityPlan,
-		objects.FieldKeyID:              id3,
-		objects.FieldKeyStatus:          statusActive,
-		"active_order":                  int64(6),
+		objects.FieldKeyKind:   objects.KindPriorityPlan,
+		objects.FieldKeyID:     id3,
+		objects.FieldKeyStatus: statusActive,
+		"active_order":         int64(6),
 	}
 	mustCreateCASVisible(t, realStorage, ctx, secCtx, obj3)
-    
+
 	req := TransitionRequest{
 		Kind:     objects.KindPriorityPlan,
 		ID:       id1,
@@ -191,7 +191,7 @@ func TestApplyComputeHooks_PriorityPlan_Complete(t *testing.T) {
 	// Validate that active_order of remaining active plans are decremented
 	readObj2, _ := realStorage.Read(ctx, secCtx, id2)
 	readObj3, _ := realStorage.Read(ctx, secCtx, id3)
-	
+
 	if val := readObj2["active_order"].(int64); val != 3 {
 		t.Errorf("Expected obj2 active_order to be 3, got %d", val)
 	}

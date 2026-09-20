@@ -1,10 +1,10 @@
 package internal
 
 import (
+	"github.com/spf13/cobra"
 	"github.com/zqk-os/zqk/internal/cli"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
 	"github.com/zqk-os/zqk/pkg/errfmt"
-	"github.com/spf13/cobra"
 )
 
 // NewInternalUpdateCmd creates an update command for internal/built-in objects

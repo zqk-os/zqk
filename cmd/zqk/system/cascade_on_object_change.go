@@ -189,14 +189,14 @@ func isAgentNotifiableKind(kind string) bool {
 
 // agentWakeNotification is the structured payload written to the chat channel JSONL.
 type agentWakeNotification struct {
-	Type            string `json:"type"`
-	ProjectRoot     string `json:"project_root"`
-	KernelName      string `json:"kernel_name"`
-	Operation       string `json:"operation"`
-	Kind            string `json:"kind"`
-	ObjectID        string `json:"object_id"`
-	Timestamp       string `json:"timestamp"`
-	Message         string `json:"message"`
+	Type            string   `json:"type"`
+	ProjectRoot     string   `json:"project_root"`
+	KernelName      string   `json:"kernel_name"`
+	Operation       string   `json:"operation"`
+	Kind            string   `json:"kind"`
+	ObjectID        string   `json:"object_id"`
+	Timestamp       string   `json:"timestamp"`
+	Message         string   `json:"message"`
 	ExcludeSessions []string `json:"exclude_sessions,omitempty"`
 }
 

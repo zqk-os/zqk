@@ -5,12 +5,12 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/spf13/cobra"
 	"github.com/zqk-os/zqk/internal/cli"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
 	"github.com/zqk-os/zqk/pkg/hivemind"
 	"github.com/zqk-os/zqk/pkg/orchestration"
 	"github.com/zqk-os/zqk/pkg/scheduler"
-	"github.com/spf13/cobra"
 )
 
 func NewSynthesizeCmd() *cobra.Command {

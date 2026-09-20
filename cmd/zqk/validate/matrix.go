@@ -1,12 +1,12 @@
 package validate
 
 import (
+	"github.com/spf13/cobra"
 	"github.com/zqk-os/zqk/internal/cli"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
 	bldr_cli_cmd_v1 "github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/quality"
-	"github.com/spf13/cobra"
 )
 
 func runMatrixValidate(cmd *cobra.Command, _ []string) error {

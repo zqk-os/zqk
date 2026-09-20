@@ -3,8 +3,8 @@ package cli
 import (
 	"testing"
 
-	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/spf13/cobra"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 func TestParseColumnsFlag(t *testing.T) {

@@ -55,7 +55,7 @@ func TestProcessFeed_RendersFullMessageAndLabelsWakeStubs(t *testing.T) {
 		agentfeed.JSONFieldToAgentID:   agentID,
 	}
 	b1, _ := json.Marshal(steerEvent)
-	_ , _ = f.Write(append(b1, '\n'))
+	_, _ = f.Write(append(b1, '\n'))
 
 	wakeEvent := map[string]interface{}{
 		agentfeed.JSONFieldEventID:     "AFE-wake",
@@ -67,7 +67,7 @@ func TestProcessFeed_RendersFullMessageAndLabelsWakeStubs(t *testing.T) {
 		agentfeed.JSONFieldToAgentID:   agentID,
 	}
 	b2, _ := json.Marshal(wakeEvent)
-	_ , _ = f.Write(append(b2, '\n'))
+	_, _ = f.Write(append(b2, '\n'))
 	_ = f.Close()
 
 	var buf bytes.Buffer

@@ -283,18 +283,18 @@ func (e *Engine) GenerateTestCaseObject(target DiscoveredTarget, projectRoot str
 	now := time.Now().UTC().Format(time.RFC3339)
 
 	tcObj := map[string]any{
-		objects.FieldKeySchemaVersion:  objects.DefaultSchemaVersion,
-		objects.FieldKeyKind:           objects.KindTestCase,
-		objects.FieldKeyID:             tcID,
-		objects.FieldKeyTitle:          fmt.Sprintf("[%s] %s (%s)", strings.ToUpper(target.Language), target.Function, target.Path),
-		objects.FieldKeyDescription:    fmt.Sprintf("Discovered automated test in %s at %s:%d", target.Language, target.Path, target.Line),
-		objects.FieldKeyStatus:         objects.ObjectStatusOriginated,
-		objects.FieldKeyCategory:       category,
-		objects.FieldKeyPathOrID:       target.Path,
-		objects.FieldKeyCriteriaRefs:   target.CriteriaRefs,
+		objects.FieldKeySchemaVersion:   objects.DefaultSchemaVersion,
+		objects.FieldKeyKind:            objects.KindTestCase,
+		objects.FieldKeyID:              tcID,
+		objects.FieldKeyTitle:           fmt.Sprintf("[%s] %s (%s)", strings.ToUpper(target.Language), target.Function, target.Path),
+		objects.FieldKeyDescription:     fmt.Sprintf("Discovered automated test in %s at %s:%d", target.Language, target.Path, target.Line),
+		objects.FieldKeyStatus:          objects.ObjectStatusOriginated,
+		objects.FieldKeyCategory:        category,
+		objects.FieldKeyPathOrID:        target.Path,
+		objects.FieldKeyCriteriaRefs:    target.CriteriaRefs,
 		objects.FieldKeyRequirementRefs: target.RequirementRefs,
-		objects.FieldKeyCreatedAt:      now,
-		objects.FieldKeyUpdatedAt:      now,
+		objects.FieldKeyCreatedAt:       now,
+		objects.FieldKeyUpdatedAt:       now,
 	}
 
 	if target.ExecutionCommand != "" {

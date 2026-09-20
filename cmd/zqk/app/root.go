@@ -350,14 +350,21 @@ func init() {
 				lifecycle.TryEmitRemainingOpenDrained(ctx, projectRoot, milID, cli.GetObjectStorageForProjectRoot)
 			}
 		}
-		// When a criterion reaches a satisfied status, milestones that reference it may become completable.
+		// When a criterion reaches a satisfied status, milestones, backlog items, and requirements that reference it may become completable.
 		if kind == objects.KindCriteria && projectRoot != EmptyValue && lifecycle.CriterionStatusMeetsMilestoneGateForMilestone(toState) {
 			if critID, _ := objectData[objects.FieldKeyID].(string); critID != EmptyValue {
 				lifecycle.TryEmitForMilestonesContainingCriterion(ctx, projectRoot, critID, cli.GetObjectStorageForProjectRoot)
 				lifecycle.TryEmitForBacklogItemsContainingCriterion(ctx, projectRoot, critID, cli.GetObjectStorageForProjectRoot)
+				lifecycle.TryEmitForRequirementsContainingCriterion(ctx, projectRoot, critID, cli.GetObjectStorageForProjectRoot)
 				if toState == "complete" {
 					lifecycle.TryEmitForTestCasesContainingCriterion(ctx, projectRoot, critID, cli.GetObjectStorageForProjectRoot)
 				}
+			}
+		}
+		// When a test case completes, referenced requirements may become completable.
+		if kind == objects.KindTestCase && toState == "complete" && projectRoot != EmptyValue {
+			for _, reqID := range lifecycle.StringRefsFromAny(objectData[objects.FieldKeyRequirementRefs]) {
+				lifecycle.TryEmitAllCriteriaCompleteForRequirement(ctx, projectRoot, reqID, cli.GetObjectStorageForProjectRoot)
 			}
 		}
 		if kind == objects.KindPriorityPlan && toState == "complete" && projectRoot != EmptyValue {

@@ -132,7 +132,7 @@ func (pl *progressLogger) write(data []byte) {
 	if isMCPServerServing() || (zqkenv.MCPAccountID().Get() != emptyValue) {
 		// In MCP mode, always use stderr for progress (even if writer is stdout)
 		if pl.writer == os.Stdout {
-			_ , _ = os.Stderr.Write(data)
+			_, _ = os.Stderr.Write(data)
 			return
 		}
 	}

@@ -657,4 +657,5 @@ func TestDetectCommitBasedDependencies(t *testing.T) {
 		t.Error("expected to detect stale file blocker for pkg/c.go")
 	}
 }
+
 // tdd refresh

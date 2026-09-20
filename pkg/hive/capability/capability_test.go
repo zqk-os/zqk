@@ -4,8 +4,8 @@ import (
 	"context"
 	"testing"
 
-	"github.com/zqk-os/zqk/pkg/hive/capability"
 	"github.com/stretchr/testify/assert"
+	"github.com/zqk-os/zqk/pkg/hive/capability"
 )
 
 type mockCapability struct {

@@ -7,11 +7,11 @@ import (
 )
 
 const (
-	testExpectedNonNilResult = "expected non-nil cobra.Command from NewWorkflowCheckCommandBuilder"
-	testExpectedCheckName    = "check"
+	testExpectedNonNilResult     = "expected non-nil cobra.Command from NewWorkflowCheckCommandBuilder"
+	testExpectedCheckName        = "check"
 	testExpectedSubOfWorkflowMsg = "expected check to be a sub-command of workflow"
-	testHasShortDescription  = "expected non-empty short description on check command"
-	testZeroArgsSucceeded    = "expected zero arguments to succeed"
+	testHasShortDescription      = "expected non-empty short description on check command"
+	testZeroArgsSucceeded        = "expected zero arguments to succeed"
 )
 
 func TestNewWorkflowCheckCommandBuilder_ReturnsNonNil(t *testing.T) {
@@ -27,7 +27,6 @@ func TestNewWorkflowCheckCommandBuilder_HasName(t *testing.T) {
 		t.Errorf("expected command name %q, got %q", testExpectedCheckName, got)
 	}
 }
-
 
 func TestNewWorkflowCheckCommandBuilder_HasShortDescription(t *testing.T) {
 	cmd := bldr_cli_cmd_v1.NewWorkflowCheckCommandBuilder()

@@ -11,12 +11,12 @@ import (
 type EvidenceKind string
 
 const (
-	EviDirExists      EvidenceKind = "directory_exists"
-	EviFileExists     EvidenceKind = "file_exists"
-	EviGoVersion      EvidenceKind = "go_version"
-	EviGitStatus      EvidenceKind = "git_status"
-	EviProcessStates  EvidenceKind = "process_states"
-	EviMemoryStats    EvidenceKind = "memory_stats"
+	EviDirExists     EvidenceKind = "directory_exists"
+	EviFileExists    EvidenceKind = "file_exists"
+	EviGoVersion     EvidenceKind = "go_version"
+	EviGitStatus     EvidenceKind = "git_status"
+	EviProcessStates EvidenceKind = "process_states"
+	EviMemoryStats   EvidenceKind = "memory_stats"
 )
 
 // EvidenceHint describes one observation to collect from the workspace.

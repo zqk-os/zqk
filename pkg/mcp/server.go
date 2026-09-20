@@ -158,7 +158,7 @@ const (
 func (s *Server) SetMCPSpecDiagnostics(provenance string, configured, defaultCount int) {
 	s.mcpSpecProvenance = provenance
 	s.mcpSpecConfigured.Store(int32(configured)) //nolint:gosec
-	s.mcpSpecDefault.Store(int32(defaultCount)) //nolint:gosec
+	s.mcpSpecDefault.Store(int32(defaultCount))  //nolint:gosec
 }
 
 // GetMCPSpecDiagnostics returns the diagnostics for the loaded MCP specs.

@@ -6,8 +6,8 @@ import (
 	"strings"
 	"unicode/utf8"
 
-	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/spf13/cobra"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
 )
 
 const coreDeleteReasonMinRunes = 30

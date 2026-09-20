@@ -61,8 +61,8 @@ func main() {
 	val := zqkenv.ZqkShimBypassPolCode009().Get()
 	if val == "1" {
 		if ok, _ := hasBreakGlassOverride(os.Getenv); ok {
-			_ , _ = os.Stderr.WriteString("cli_exec_start\n")
-			_ , _ = os.Stderr.WriteString("cli_exec_success\n")
+			_, _ = os.Stderr.WriteString("cli_exec_start\n")
+			_, _ = os.Stderr.WriteString("cli_exec_success\n")
 		}
 	}
 	spec := cli_builders.CLISpec{

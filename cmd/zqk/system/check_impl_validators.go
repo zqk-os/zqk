@@ -9,9 +9,11 @@ import (
 	"strings"
 	"time"
 
+	"github.com/spf13/cobra"
 	"github.com/zqk-os/zqk/internal/cli"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/lifecycle"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/migration/parser"
 	"github.com/zqk-os/zqk/pkg/objects"
@@ -19,7 +21,6 @@ import (
 	"github.com/zqk-os/zqk/pkg/storage"
 	"github.com/zqk-os/zqk/pkg/systemcheck"
 	"github.com/zqk-os/zqk/pkg/validation"
-	"github.com/spf13/cobra"
 )
 
 func checkRegistration(obj *parser.ParsedObject, kind string) []Issue {
@@ -228,6 +229,82 @@ func checkInstanceValidationWithValidatorAndData(ctx *cli.Context, stdCtx stdcon
 				AutoFixable: false,
 				FixCommand:  fmt.Sprintf("zqk object promote %s", obj.ID),
 			})
+		}
+	}
+
+	// Invariant: test criteria must be bound to at least one test case
+	if kind == objects.KindCriteria && currentState != objects.ObjectStatusArchived && currentState != "rejected" {
+		category, _ := objMap[objects.FieldKeyCategory].(string)
+		vMethod, _ := objMap["validation_method"].(string)
+		if strings.EqualFold(category, "test") || strings.EqualFold(vMethod, "automated_test") {
+			deps := options.DependentsLookup(obj.ID)
+			hasTestCase := false
+			for _, depID := range deps {
+				if strings.HasPrefix(depID, "TST-") {
+					hasTestCase = true
+					break
+				}
+				if depObj, readErr := options.ObjectLookup(depID); readErr == nil && depObj != nil {
+					if depKind, _ := depObj[objects.FieldKeyKind].(string); depKind == objects.KindTestCase {
+						hasTestCase = true
+						break
+					}
+				}
+			}
+			if !hasTestCase {
+				validationIssues = append(validationIssues, Issue{
+					Tier:        1,
+					Category:    "traceability",
+					Message:     fmt.Sprintf("Test criterion %s has category=%q / validation_method=%q but is not bound to any test_case object", obj.ID, category, vMethod),
+					AutoFixable: false,
+				})
+			}
+		}
+	}
+
+	// Invariant: requirements in active/proposed status where all criteria and test cases are complete
+	if kind == objects.KindRequirement && (currentState == objects.ObjectStatusActive || currentState == "proposed") {
+		critRefs := lifecycle.StringRefsFromAny(objMap[objects.FieldKeyCriteriaRefs])
+		if len(critRefs) > 0 {
+			allCriteriaMet := true
+			checker := objects.GetGlobalStatusChecker()
+			for _, cid := range critRefs {
+				cObj, cErr := options.ObjectLookup(cid)
+				if cErr != nil || cObj == nil {
+					allCriteriaMet = false
+					break
+				}
+				cStatus, _ := cObj[objects.FieldKeyStatus].(string)
+				if !checker.IsSatisfied(objects.KindCriteria, cStatus) {
+					allCriteriaMet = false
+					break
+				}
+			}
+			if allCriteriaMet {
+				deps := options.DependentsLookup(obj.ID)
+				allTestsComplete := true
+				for _, depID := range deps {
+					if strings.HasPrefix(depID, "TST-") {
+						tObj, tErr := options.ObjectLookup(depID)
+						if tErr == nil && tObj != nil {
+							tStatus, _ := tObj[objects.FieldKeyStatus].(string)
+							if tStatus != objects.ObjectStatusComplete && tStatus != objects.ObjectStatusArchived {
+								allTestsComplete = false
+								break
+							}
+						}
+					}
+				}
+				if allTestsComplete {
+					validationIssues = append(validationIssues, Issue{
+						Tier:        1,
+						Category:    "lifecycle",
+						Message:     fmt.Sprintf("Requirement %s is %s but all criteria and linked test cases are complete; requirement must be transitioned to complete", obj.ID, currentState),
+						AutoFixable: false,
+						FixCommand:  fmt.Sprintf("zqk object promote %s", obj.ID),
+					})
+				}
+			}
 		}
 	}
 

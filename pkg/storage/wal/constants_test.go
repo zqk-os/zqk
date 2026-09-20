@@ -3,8 +3,8 @@ package wal_test
 import (
 	"testing"
 
-	"github.com/zqk-os/zqk/pkg/storage/wal"
 	"github.com/stretchr/testify/require"
+	"github.com/zqk-os/zqk/pkg/storage/wal"
 )
 
 func TestWALConstants(t *testing.T) {

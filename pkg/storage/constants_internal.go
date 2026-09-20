@@ -446,8 +446,8 @@ const (
 	LogMsgAuditAggregation    = "⚠️ [STORAGE-AUDIT] Failed to list CAS IDs during pre-aggregate check: %v\n"
 	LogMsgCasIndexPopulated   = "⚠️ [STORAGE-AUDIT] Failed to ensure CAS index populated: %v\n"
 	LogMsgCacheBuildFailed    = "⚠️ [STORAGE-AUDIT] High-volume event cache build failed: %v\n"
-	LogMsgLintSkipped        = "Lint checks bypassed with --no-verify flag" //nolint:gosec
-	LogFmtLintSkipped        = "Lint checks bypassed: %s"
+	LogMsgLintSkipped         = "Lint checks bypassed with --no-verify flag" //nolint:gosec
+	LogFmtLintSkipped         = "Lint checks bypassed: %s"
 	LogFmtCreatedObject       = "Created object %s"
 	LogFmtUpdatedObject       = "Updated object %s"
 	LogFmtUpdatedObjectDetail = "Updated object %s: %s"

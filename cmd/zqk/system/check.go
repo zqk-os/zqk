@@ -1,10 +1,10 @@
 package system
 
 import (
+	"github.com/spf13/cobra"
 	"github.com/zqk-os/zqk/internal/cli"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
 	"github.com/zqk-os/zqk/pkg/systemcheckwake"
-	"github.com/spf13/cobra"
 )
 
 // checkCmd represents the check command

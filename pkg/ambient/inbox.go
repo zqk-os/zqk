@@ -96,7 +96,7 @@ func NewAutonomyInbox(capacity ...int) *AutonomyInbox {
 	return &AutonomyInbox{
 		slots: slots,
 		mask:  uint64(cap_ - 1), //nolint:gosec
-		cap_:  uint64(cap_), //nolint:gosec
+		cap_:  uint64(cap_),     //nolint:gosec
 	}
 }
 
