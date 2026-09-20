@@ -177,35 +177,78 @@ func TestAutoCommitWorktreeChanges(t *testing.T) {
 	if !strings.Contains(msg, "BLI-auto-test-2") {
 		t.Fatalf("commit message %q does not contain itemID BLI-auto-test-2", msg)
 	}
+	wantName, wantEmail := swarmGitAuthorIdentity()
+	if got := runTestGit(t, worktree, "log", "-1", "--format=%an"); got != wantName {
+		t.Fatalf("author name = %q, want %q", got, wantName)
+	}
+	if got := runTestGit(t, worktree, "log", "-1", "--format=%ae"); got != wantEmail {
+		t.Fatalf("author email = %q, want %q", got, wantEmail)
+	}
+}
+
+func TestSwarmGitAuthorIdentity_Defaults(t *testing.T) {
+	t.Setenv(zqkenv.AgentGitName().Name(), "")
+	t.Setenv(zqkenv.AgentGitEmail().Name(), "")
+	t.Setenv("GIT_AUTHOR_NAME", "")
+	t.Setenv("GIT_AUTHOR_EMAIL", "")
+	name, email := swarmGitAuthorIdentity()
+	if name != defaultSwarmGitAuthorName || email != defaultSwarmGitAuthorEmail {
+		t.Fatalf("got %q <%q>", name, email)
+	}
+}
+
+func TestSwarmGitAuthorIdentity_EnvOverride(t *testing.T) {
+	t.Setenv(zqkenv.AgentGitName().Name(), "Community Swarm")
+	t.Setenv(zqkenv.AgentGitEmail().Name(), "swarm@example.test")
+	t.Setenv("GIT_AUTHOR_NAME", "ignored-git-author")
+	t.Setenv("GIT_AUTHOR_EMAIL", "ignored@example.test")
+	name, email := swarmGitAuthorIdentity()
+	if name != "Community Swarm" || email != "swarm@example.test" {
+		t.Fatalf("got %q <%q>", name, email)
+	}
+}
+
+func TestSwarmGitAuthorIdentity_GitAuthorFallback(t *testing.T) {
+	t.Setenv(zqkenv.AgentGitName().Name(), "")
+	t.Setenv(zqkenv.AgentGitEmail().Name(), "")
+	t.Setenv("GIT_AUTHOR_NAME", "Wrapper Author")
+	t.Setenv("GIT_AUTHOR_EMAIL", "wrapper@example.test")
+	name, email := swarmGitAuthorIdentity()
+	if name != "Wrapper Author" || email != "wrapper@example.test" {
+		t.Fatalf("got %q <%q>", name, email)
+	}
 }
 
 func TestOrchestrationExecutorDirtIgnoresDraftPlaneSymlink(t *testing.T) {
 	t.Parallel()
-	if got := orchestrationExecutorDirt("?? .zqk/object_drafts"); got != "" {
+	drafts := paths.ObjectDraftsRel()
+	if got := orchestrationExecutorDirt("?? " + drafts); got != "" {
 		t.Fatalf("symlink porcelain = %q, want empty", got)
 	}
-	if got := orchestrationExecutorDirt("?? .zqk/object_drafts/\n M result.txt"); !strings.Contains(got, "result.txt") || strings.Contains(got, "object_drafts") {
+	if got := orchestrationExecutorDirt("?? " + drafts + "/\n M result.txt"); !strings.Contains(got, "result.txt") || strings.Contains(got, paths.ObjectDraftsDir) {
 		t.Fatalf("kept dirt = %q, want result.txt only", got)
 	}
 }
 
 func TestOrchestrationExecutorDirtIgnoresWorktreeLocalConfig(t *testing.T) {
 	t.Parallel()
+	local := paths.WorktreeLocalConfigRel()
+	yml := paths.WorktreeLocalConfigRelYml()
 	cases := []string{
-		" M config/zqk-local.yaml",
-		"M  config/zqk-local.yaml",
-		"MM config/zqk-local.yaml",
-		"?? config/zqk-local.yaml",
-		"config/zqk-local.yaml",
-		" M config/zqk-local.yml",
-		"R  old -> config/zqk-local.yaml",
+		" M " + local,
+		"M  " + local,
+		"MM " + local,
+		"?? " + local,
+		local,
+		" M " + yml,
+		"R  old -> " + local,
 	}
 	for _, c := range cases {
 		if got := orchestrationExecutorDirt(c); got != "" {
 			t.Fatalf("porcelain %q produced dirt %q, want empty", c, got)
 		}
 	}
-	if got := orchestrationExecutorDirt(" M config/zqk-local.yaml\n M result.txt"); !strings.Contains(got, "result.txt") || strings.Contains(got, "zqk-local.yaml") {
+	if got := orchestrationExecutorDirt(" M " + paths.WorktreeLocalConfigRel() + "\n M result.txt"); !strings.Contains(got, "result.txt") || strings.Contains(got, paths.ZqkLocalConfigFileName) {
 		t.Fatalf("kept dirt = %q, want result.txt only", got)
 	}
 }
@@ -218,13 +261,13 @@ func TestCollectOrchestrationCommitManifestIgnoresDraftPlaneSymlink(t *testing.T
 	if err := os.WriteFile(filepath.Join(worktree, "result.txt"), []byte("base\n"), 0o600); err != nil {
 		t.Fatal(err)
 	}
-	if err := fileutil.MkdirAll(filepath.Join(worktree, ".zqk"), 0o755); err != nil {
+	if err := fileutil.MkdirAll(filepath.Join(worktree, paths.ProjectDataDir), 0o755); err != nil {
 		t.Fatal(err)
 	}
-	if err := os.WriteFile(filepath.Join(worktree, ".zqk", ".keep"), []byte("keep\n"), 0o600); err != nil {
+	if err := os.WriteFile(filepath.Join(worktree, paths.ProjectDataDir, ".keep"), []byte("keep\n"), 0o600); err != nil {
 		t.Fatal(err)
 	}
-	runTestGit(t, worktree, "add", "result.txt", ".zqk/.keep")
+	runTestGit(t, worktree, "add", "result.txt", filepath.Join(paths.ProjectDataDir, ".keep"))
 	runTestGit(t, worktree, "-c", "user.name=CAP Test", "-c", "user.email=cap@example.invalid", "commit", "-m", "base")
 	baseSHA := runTestGit(t, worktree, "rev-parse", "HEAD")
 
@@ -234,7 +277,7 @@ func TestCollectOrchestrationCommitManifestIgnoresDraftPlaneSymlink(t *testing.T
 	runTestGit(t, worktree, "add", "result.txt")
 	runTestGit(t, worktree, "-c", "user.name=CAP Test", "-c", "user.email=cap@example.invalid", "commit", "-m", "deliver")
 
-	if err := os.Symlink(t.TempDir(), filepath.Join(worktree, ".zqk", "object_drafts")); err != nil {
+	if err := os.Symlink(t.TempDir(), filepath.Join(worktree, paths.ProjectDataDir, paths.ObjectDraftsDir)); err != nil {
 		t.Fatal(err)
 	}
 
@@ -386,10 +429,11 @@ func TestSeedAgentWorktreeRuntime(t *testing.T) {
 
 func TestOrchestrationExecutorDirtIgnoresDraftPlane(t *testing.T) {
 	t.Parallel()
-	if got := orchestrationExecutorDirt("?? .zqk/object_drafts"); got != "" {
+	drafts := paths.ObjectDraftsRel()
+	if got := orchestrationExecutorDirt("?? " + drafts); got != "" {
 		t.Fatalf("symlink porcelain = %q, want empty", got)
 	}
-	if got := orchestrationExecutorDirt("?? .zqk/object_drafts/\n M result.txt"); !strings.Contains(got, "result.txt") || strings.Contains(got, "object_drafts") {
+	if got := orchestrationExecutorDirt("?? " + drafts + "/\n M result.txt"); !strings.Contains(got, "result.txt") || strings.Contains(got, paths.ObjectDraftsDir) {
 		t.Fatalf("kept dirt = %q, want result.txt only", got)
 	}
 }

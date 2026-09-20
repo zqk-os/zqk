@@ -142,7 +142,7 @@ func BootstrapWorktreeConfig(worktreeDir, seatedProjectRoot string) error {
 // AssumeUnchangedWorktreeConfig marks config/zqk-local.yaml as assume-unchanged in git
 // within worktreeDir so that local worktree configuration does not appear in git status --porcelain.
 func AssumeUnchangedWorktreeConfig(worktreeDir string) {
-	relConfig := filepath.ToSlash(filepath.Join(ConfigDir, ZqkLocalConfigFileName))
+	relConfig := WorktreeLocalConfigRel()
 	cmd := execwrap.Command("git", "update-index", "--assume-unchanged", relConfig)
 	cmd.Dir = worktreeDir
 	_ = cmd.Run()

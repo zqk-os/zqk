@@ -30,6 +30,7 @@ type FileMetricsStore struct {
 	windowDate    string       // UTC date formatted as YYYY-MM-DD for current in-memory / active file
 	metrics       atomic.Value // holds map[string]*CommandMetrics
 	mu            sync.Mutex
+	flusherWg     sync.WaitGroup
 }
 
 // cloneCommandMetricsMap returns a deep copy of the map values (struct copies); empty input yields a new empty map.
@@ -495,11 +496,18 @@ func (s *FileMetricsStore) RecordCommandExecution(metric *CommandMetric) error {
 	metricsCopy := cloneCommandMetricsMap(newMetrics)
 	windowDate := s.windowDate
 
+	s.flusherWg.Add(1)
 	goroutinelabels.StartNamedGoroutine("cli-metrics-flusher", "flush CLI metrics to storage", func() {
+		defer s.flusherWg.Done()
 		_ = s.saveMetrics(metricsCopy, windowDate)
 	})
 
 	return nil
+}
+
+// WaitForFlushes waits for any in-flight background flushes to complete.
+func (s *FileMetricsStore) WaitForFlushes() {
+	s.flusherWg.Wait()
 }
 
 // GetCommandMetrics gets metrics for a specific command from the current active window.

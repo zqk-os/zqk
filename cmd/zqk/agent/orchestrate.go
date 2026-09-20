@@ -70,11 +70,13 @@ func NewOrchestrateCmd() *cobra.Command {
 }
 
 const (
-	orchestratedTaskStatus = objects.ObjectStatusApproved
-	taskReadinessAttempts  = 20
-	taskReadinessDelay     = 50 * time.Millisecond
-	orchestrationTimeout   = 4 * time.Hour
-	nativeSwarmConcurrency = 2
+	orchestratedTaskStatus     = objects.ObjectStatusApproved
+	taskReadinessAttempts      = 20
+	taskReadinessDelay         = 50 * time.Millisecond
+	orchestrationTimeout       = 4 * time.Hour
+	nativeSwarmConcurrency     = 2
+	defaultSwarmGitAuthorName  = "ZQK Swarm Agent"
+	defaultSwarmGitAuthorEmail = "swarm@zqk.internal"
 )
 
 func resolveOrchestrationTimeout(optsTimeout time.Duration, cmd *cobra.Command) time.Duration {
@@ -483,7 +485,7 @@ func collectOrchestrationCommitManifest(
 	if err != nil {
 		return nil, err
 	}
-	// seedAgentWorktreeRuntime may leave .zqk/object_drafts as a symlink; ignore it.
+	// seedAgentWorktreeRuntime may leave the object-drafts dir as a symlink; ignore it.
 	if remaining := orchestrationExecutorDirt(dirty); remaining != "" {
 		return nil, errfmt.Errorf("executor left uncommitted work for %s: %s", taskID, remaining)
 	}
@@ -526,20 +528,46 @@ func autoCommitWorktreeChanges(ctx context.Context, worktreePath, taskID string,
 	if out, err := addCmd.CombinedOutput(); err != nil {
 		return errfmt.Newf("git add in %s: %s", worktreePath, strings.TrimSpace(string(out))).Wrap(err)
 	}
-	// Unstage config/zqk-local.yaml so worktree runtime settings are not committed
-	resetCmd := execwrap.CommandContext(ctx, "git", "reset", "--", "config/zqk-local.yaml")
+	// Unstage the worktree local-config wedge so seated-kernel settings are not committed
+	resetCmd := execwrap.CommandContext(ctx, "git", "reset", "--", paths.WorktreeLocalConfigRel())
 	resetCmd.Dir = worktreePath
 	_ = resetCmd.Run()
 	commitMsg := fmt.Sprintf("Agent implementation for %s", taskID)
 	if len(itemID) > 0 && strings.TrimSpace(itemID[0]) != "" {
 		commitMsg = fmt.Sprintf("Agent implementation for %s (%s)", taskID, strings.TrimSpace(itemID[0]))
 	}
-	commitCmd := execwrap.CommandContext(ctx, "git", "-c", "user.name=ZQK Swarm Agent", "-c", "user.email=swarm@zqk.internal", "commit", "-m", commitMsg)
+	authorName, authorEmail := swarmGitAuthorIdentity()
+	commitCmd := execwrap.CommandContext(ctx, "git",
+		"-c", "user.name="+authorName,
+		"-c", "user.email="+authorEmail,
+		"commit", "-m", commitMsg,
+	)
 	commitCmd.Dir = worktreePath
 	if out, err := commitCmd.CombinedOutput(); err != nil {
 		return errfmt.Newf("git commit in %s: %s", worktreePath, strings.TrimSpace(string(out))).Wrap(err)
 	}
 	return nil
+}
+
+// swarmGitAuthorIdentity is the git -c user.name/email for swarm worktree commits.
+// Precedence: ZQK_AGENT_GIT_NAME/EMAIL (same keys as agent_git_identity.env), then
+// GIT_AUTHOR_NAME/EMAIL, then defaultSwarmGitAuthorName/Email.
+func swarmGitAuthorIdentity() (name, email string) {
+	name = strings.TrimSpace(zqkenv.AgentGitName().Get())
+	if name == "" {
+		name = strings.TrimSpace(zqkenv.Get("GIT_AUTHOR_NAME").Val)
+	}
+	if name == "" {
+		name = defaultSwarmGitAuthorName
+	}
+	email = strings.TrimSpace(zqkenv.AgentGitEmail().Get())
+	if email == "" {
+		email = strings.TrimSpace(zqkenv.Get("GIT_AUTHOR_EMAIL").Val)
+	}
+	if email == "" {
+		email = defaultSwarmGitAuthorEmail
+	}
+	return name, email
 }
 
 func gitWorktreeOutput(ctx context.Context, worktreePath string, args ...string) (string, error) {
@@ -554,7 +582,7 @@ func gitWorktreeOutput(ctx context.Context, worktreePath string, args ...string)
 }
 
 // orchestrationExecutorDirt drops seeded draft-plane porcelain so an isolated
-// .zqk/object_drafts directory (or a leftover symlink) is not treated as executor leftover work.
+// object-drafts directory (or a leftover symlink) is not treated as executor leftover work.
 func orchestrationExecutorDirt(porcelain string) string {
 	var kept []string
 	for _, line := range splitNonEmptyLines(porcelain) {
@@ -580,10 +608,7 @@ func isSeededDraftPlanePorcelain(line string) bool {
 	if strings.HasSuffix(path, ".index") || strings.HasSuffix(path, ".index.json") {
 		return true
 	}
-	if path == "config/zqk-local.yaml" || path == "config/zqk-local.yml" || strings.HasPrefix(path, "config/zqk-local.yaml") || strings.HasPrefix(path, "config/zqk-local.yml") {
-		return true
-	}
-	return path == ".zqk/object_drafts" || strings.HasPrefix(path, ".zqk/object_drafts/")
+	return paths.IsWorktreeRuntimePorcelain(path)
 }
 
 func splitNonEmptyLines(value string) []string {

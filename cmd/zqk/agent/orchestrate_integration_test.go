@@ -9,6 +9,7 @@ import (
 
 	"github.com/zqk-os/zqk/cmd/zqk/agent"
 	"github.com/zqk-os/zqk/pkg/agentdelivery"
+	"github.com/zqk-os/zqk/pkg/agentprompt"
 	"github.com/zqk-os/zqk/pkg/brand"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/objects"
@@ -126,8 +127,18 @@ func setupOrchestrateTest(t *testing.T) (string, storage.ObjectStorageProvider) 
 							return err
 						}
 						if dir == "personas" || dir == "agent_skills" || dir == "policies" {
-							copyDir(t, srcDir, dstDir)
+							if entries, _ := fileutil.ReadDir(srcDir); len(entries) > 0 {
+								copyDir(t, srcDir, dstDir)
+							}
 						}
+					}
+					defaultAgentSrc := filepath.Join(repoRoot, "scripts", "default_personas", "community_agent.yaml")
+					if data, err := fileutil.ReadFile(defaultAgentSrc); err == nil {
+						_ = fileutil.WriteStandardFile(filepath.Join(root, paths.ProcessDir, "personas", "PER-DEFAULT-AGENT.yaml"), data)
+					}
+					for _, pID := range agentprompt.StandingPolicyRefs() {
+						polPath := filepath.Join(root, paths.ProcessDir, "policies", pID+".yaml")
+						_ = fileutil.WriteStandardFile(polPath, []byte("id: "+pID+"\nkind: policy\ntitle: Policy "+pID+"\nstatus: active\npolicy_type: standing\n"))
 					}
 
 					srcSpecs := filepath.Join(repoRoot, paths.ProcessInternalObjectSpecsDir)
