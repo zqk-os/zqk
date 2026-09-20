@@ -17,11 +17,14 @@ description: |-
     5. Information Architecture & Documentation Hygiene: Governed by the Information Architecture and Technical Documentarian personas to maintain SSOT, clean directory layouts (_schemas, spec under object), and zero-drift documentation.
 id: GOAL-CLI-TAXONOMY-CANONICAL-001
 kind: goal
+metric: 100% command spec coverage and zero deprecated commands
 namespace_id: zqk:kernel
+percent_complete: 100
 schema_version: 2.0.0
-status: originated
+status: active
+target: 100%
 title: Canonical CLI Command Taxonomy, Spec Completeness, and Ergonomic Governance
-updated_at: "2026-09-19T06:16:40Z"
+updated_at: "2026-09-20T01:26:44Z"
 updated_by: ACC-1785920548450214012-68b850c0
 version_context: default
 workstream_refs:
