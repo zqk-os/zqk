@@ -161,9 +161,9 @@ func TestAutoCommitWorktreeChanges(t *testing.T) {
 	if manifest["commit_sha"] == baseSHA {
 		t.Fatalf("commit_sha must advance")
 	}
-	paths, _ := manifest[objects.FieldKeyChangedPaths].([]string)
-	if len(paths) != 1 || paths[0] != "feature.go" {
-		t.Fatalf("changed_paths = %#v, want [feature.go]", paths)
+	changedPaths, _ := manifest[objects.FieldKeyChangedPaths].([]string)
+	if len(changedPaths) != 1 || changedPaths[0] != "feature.go" {
+		t.Fatalf("changed_paths = %#v, want [feature.go]", changedPaths)
 	}
 
 	// 4. Auto-commit with itemID includes BLI citation in commit message
