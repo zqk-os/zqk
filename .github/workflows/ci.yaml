@@ -31,7 +31,7 @@ jobs:
           fi
 
       - name: Vet Code
-        run: go vet ./cmd/...
+        run: go vet ./...
 
       - name: Run Tests
         run: sh scripts/open-core/test-public-release-gates.sh

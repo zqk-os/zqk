@@ -2,9 +2,12 @@ package intake
 
 import (
 	"bytes"
+	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 
+	"github.com/zqk-os/zqk/pkg/storage"
 	"github.com/zqk-os/zqk/pkg/testenvroot"
 	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
@@ -12,6 +15,10 @@ import (
 func TestIntakeCommand_NoArgs(t *testing.T) {
 	tempDir := t.TempDir()
 	t.Setenv(zqkenv.TestRoot().Name(), tempDir)
+	t.Cleanup(func() {
+		_ = storage.RunProjectTestTeardown(storage.TempProjectTeardown(tempDir, nil))
+		_ = os.RemoveAll(filepath.Join(tempDir, ".zqk"))
+	})
 	_, err := testenvroot.Setup(tempDir)
 	if err != nil {
 		t.Fatalf("failed to setup test env: %v", err)

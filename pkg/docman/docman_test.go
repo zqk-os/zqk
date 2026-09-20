@@ -195,10 +195,10 @@ func TestDivioQuadrant_FunctionalAcceptance(t *testing.T) {
 	docsDir := filepath.Join(repoRoot, "docs")
 
 	quadrants := map[string][]string{
-		"Tutorials":   {"tutorials/quickstart.md", "tutorials/first-agent-session.md", "tutorials/object-lifecycle.md"},
-		"How-To":      {"howto/create-objects.md", "howto/workflow-vds.md", "howto/agent-admin-membrane.md", "howto/process-cas-commits.md"},
-		"Reference":   {"manual/CLI_REFERENCE.md", "reference/README.md"},
-		"Explanation": {"explanation/kernel-vs-ide.md", "explanation/vds-state-machine.md", "explanation/agent-membrane.md"},
+		"Tutorials":   {"tutorials/README.md"},
+		"How-To":      {"howto/README.md", "howto/SCHEDULER_AND_MAINTENANCE.md"},
+		"Reference":   {"manual/README.md"},
+		"Explanation": {"explanation/README.md"},
 	}
 
 	for quadrant, files := range quadrants {

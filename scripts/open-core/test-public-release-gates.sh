@@ -60,12 +60,37 @@ fi
 (
 	cd "$ROOT"
 	unset ZQK_PROJECT_ROOT
-	go test ./cmd/zqk/app ./cmd/zqk/test -timeout 5m
-	go test ./cmd/zqk/system -run 'TestInit_Greenfield$|TestInit_Legacy$|TestInit_Greenfield_StarterKernelGraph$|TestInit_Greenfield_NoEnvVars$|TestCheckOutput|TestSystemCheck' -timeout 5m
+	export ZQK_ALLOW_FOREGROUND_GO_TEST=1
+
+	# 1. Build entire project across all cmd and pkg packages
+	CGO_ENABLED=0 go build -buildvcs=false ./...
 	CGO_ENABLED=0 go build -buildvcs=false -o "$TMP_BIN" ./cmd/zqk
 	"$TMP_BIN" --help >/dev/null
 	"$TMP_BIN" system --help >/dev/null
 	"$TMP_BIN" test dashboard --help >/dev/null
+
+	# 2. Run public CLI commands test suite
+	go test -short -timeout 5m \
+		./cmd/zqk/app ./cmd/zqk/test ./cmd/zqk/docman ./cmd/zqk/automation \
+		./cmd/zqk/new ./cmd/zqk/inbox ./cmd/zqk/learn ./cmd/zqk/matrix ./cmd/zqk/mcp ./cmd/zqk/mcp-simple \
+		./cmd/zqk/mesh ./cmd/zqk/feed ./cmd/zqk/convergence ./cmd/zqk/callback ./cmd/zqk/intake \
+		./cmd/zqk/domain ./cmd/zqk/ambient
+	go test ./cmd/zqk/system -run 'TestInit_Greenfield$|TestInit_Legacy$|TestInit_Greenfield_StarterKernelGraph$|TestInit_Greenfield_NoEnvVars$|TestCheckOutput|TestSystemCheck' -timeout 5m
+
+	# 3. Run core kernel packages test suite
+	go test -short -timeout 5m \
+		./pkg/brand/... ./pkg/bridge/... ./pkg/circuitbreaker/... ./pkg/cli/... \
+		./pkg/concurrency/... ./pkg/dna/... ./pkg/docman/... ./pkg/graph/... \
+		./pkg/healthcheck/... ./pkg/hive/... ./pkg/hostload/... ./pkg/integrity/... \
+		./pkg/interactive/... ./pkg/kernel/... ./pkg/telemetry/... ./pkg/accumulator/... \
+		./pkg/authcred/... ./pkg/bufferpool/... ./pkg/cleanup/... ./pkg/clihooks/... \
+		./pkg/closureevidence/... ./pkg/coordination/... ./pkg/crypto/... ./pkg/datacell/... \
+		./pkg/dispatch/... ./pkg/events/... ./pkg/grooming/... ./pkg/handslapper/... \
+		./pkg/hivemind/... ./pkg/idebridge/... ./pkg/idehooks/... ./pkg/inbox/... \
+		./pkg/infrastructure/... ./pkg/ingestion/... ./pkg/interactionpolicy/... \
+		./pkg/kernelcas ./pkg/lifecycle/... ./pkg/lockhealth/... ./pkg/observability/... \
+		./pkg/paths/... ./pkg/pipeline/... ./pkg/tray/... ./pkg/vds/... ./pkg/walutil/... \
+		./pkg/workflow/whatsnext
 )
 
 printf '%s\n' "PUBLIC RELEASE GATES: PASS"

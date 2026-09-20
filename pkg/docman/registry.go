@@ -127,13 +127,13 @@ func (r *Registry) CreateDocEntry(ctx context.Context, profile string, file *Mar
 	// Prefer review (shovel_ready) over terminal active when metadata asked for active.
 	// TRACK: BLI-1785443942668406000-1ec5c811 — draft-plane create / promote membrane.
 	leaveStatus := objects.GetString(entry, objects.FieldKeyStatus)
-	if leaveStatus == "" || leaveStatus == objects.ObjectStatusDraft || leaveStatus == objects.ObjectStatusActive {
+	if leaveStatus == "" || leaveStatus == objects.ObjectStatusDraft || leaveStatus == "conceptual" {
 		leaveStatus = "review"
+		if err := r.storageProvider.Update(ctx, secCtx, docID, map[string]any{objects.FieldKeyStatus: leaveStatus}); err != nil {
+			return errfmt.Errorf("failed to promote doc_entry %s off draft plane: %w", docID, err)
+		}
+		entry[objects.FieldKeyStatus] = leaveStatus
 	}
-	if err := r.storageProvider.Update(ctx, secCtx, docID, map[string]any{objects.FieldKeyStatus: leaveStatus}); err != nil {
-		return errfmt.Errorf("failed to promote doc_entry %s off draft plane: %w", docID, err)
-	}
-	entry[objects.FieldKeyStatus] = leaveStatus
 
 	logging.Fluent(logger).Info("Created doc_entry").
 		ObjectID(docID).

@@ -25,7 +25,7 @@ func TestWorkflowDispatcher_FunctionalAcceptance(t *testing.T) {
 		body, _ := io.ReadAll(r.Body)
 		_ = json.Unmarshal(body, &receivedPayload)
 
-		if r.Method == http.MethodPost && receivedPath == "/repos/lanceman/zqk/actions/workflows/release.yml/dispatches" {
+		if r.Method == http.MethodPost && receivedPath == "/repos/zqk-os/zqk/actions/workflows/release.yml/dispatches" {
 			w.WriteHeader(http.StatusNoContent)
 			return
 		}
@@ -34,7 +34,7 @@ func TestWorkflowDispatcher_FunctionalAcceptance(t *testing.T) {
 	defer srv.Close()
 
 	cfg := WorkflowDispatchConfig{
-		Owner:      "lanceman",
+		Owner:      "zqk-os",
 		Repo:       "zqk",
 		WorkflowID: "release.yml",
 		Ref:        "main",
@@ -232,7 +232,7 @@ func TestWorkflowDispatcher_IntegrationAndConformance(t *testing.T) {
 	defer srv.Close()
 
 	dispatcher, err := NewWorkflowDispatcher(WorkflowDispatchConfig{
-		Owner:      "lanceman",
+		Owner:      "zqk-os",
 		Repo:       "zqk",
 		WorkflowID: "release.yml",
 		Token:      "token123",

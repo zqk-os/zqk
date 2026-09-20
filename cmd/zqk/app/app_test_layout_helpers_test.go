@@ -19,6 +19,7 @@ import (
 	"github.com/zqk-os/zqk/cmd/zqk/app"
 	clctx "github.com/zqk-os/zqk/internal/cli/context"
 	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/storage"
 )
 
 type testSettingsYAMLShapeApp struct {
@@ -208,6 +209,8 @@ func setupIntegrationTestWithSpecsApp(t *testing.T, scenarioName string) (testRo
 	// Avoid ApplyIsolatedStorageEnv(t.Setenv): callers may use t.Parallel().
 	// TestRoot enables membrane local write (privilegedWriterLocalWriteAllowed).
 	t.Cleanup(func() {
+		_ = storage.RunProjectTestTeardown(storage.TempProjectTeardown(testRoot, nil))
+		_ = fileutil.RemoveAll(filepath.Join(testRoot, ".zqk"))
 		if orig != app.EmptyValue {
 			_ = zqkenv.TestRoot().Set(orig)
 		} else {
