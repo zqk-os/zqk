@@ -20,3 +20,7 @@ jobs:
           cache: true
       - name: Verify public source artifact
         run: sh scripts/open-core/test-public-release-gates.sh
+      - uses: golangci/golangci-lint-action@v9
+        with:
+          version: v2.11.4
+          args: --enable-only=forbidigo --timeout=5m

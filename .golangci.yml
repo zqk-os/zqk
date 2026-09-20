@@ -1,0 +1,114 @@
+version: "2"
+run:
+  timeout: 15m
+linters:
+  enable:
+    - gosec
+    - govet
+    - forbidigo
+    - errcheck
+  disable:
+    - staticcheck
+    - ineffassign
+    - unused
+  settings:
+    errcheck:
+      check-type-assertions: false
+      check-blank: false
+      exclude-functions:
+        - (*github.com/zqk-os/zqk/pkg/storage.Transaction).Rollback
+        - github.com/zqk-os/zqk/pkg/utils/fileutil.Remove
+        - github.com/zqk-os/zqk/pkg/utils/fileutil.RemoveAll
+        - github.com/zqk-os/zqk/pkg/utils/fileutil.EnsureDir
+    forbidigo:
+      forbid:
+        - pattern: "^fmt\\.Print.*$"
+          msg: "Use pkg/logging instead of fmt.Print* for application logging"
+        - pattern: "^log\\.Print.*$"
+          msg: "Use pkg/logging instead of log.Print* for application logging"
+        - pattern: "^os\\.ReadFile$"
+          msg: "Use pkg/fileutil instead of os.ReadFile"
+        - pattern: "^os\\.WriteFile$"
+          msg: "Use pkg/fileutil instead of os.WriteFile"
+        - pattern: "^os\\.Open$"
+          msg: "Use pkg/fileutil instead of os.Open"
+        - pattern: "^os\\.RemoveAll$"
+          msg: "Use pkg/fileutil instead of os.RemoveAll"
+        - pattern: "^os\\.Getenv\\(zqkenv\\."
+          msg: "Use config.GetString(config.Get()...) instead of os.Getenv for configuration"
+  exclusions:
+    presets:
+      - std-error-handling
+      - common-false-positives
+    rules:
+      - path: "_test\\.go"
+        linters:
+          - errcheck
+          - gosec
+      # Tests may print; they may not skip fileutil for teardown deletes.
+      - path: "_test\\.go"
+        text: "Use pkg/logging instead of"
+        linters:
+          - forbidigo
+      - path: "_test\\.go"
+        text: "Use pkg/fileutil instead of os.ReadFile"
+        linters:
+          - forbidigo
+      - path: "_test\\.go"
+        text: "Use pkg/fileutil instead of os.WriteFile"
+        linters:
+          - forbidigo
+      - path: "_test\\.go"
+        text: "Use pkg/fileutil instead of os.Open"
+        linters:
+          - forbidigo
+      - path: "_test\\.go"
+        text: "Use config.GetString"
+        linters:
+          - forbidigo
+      - path: "scripts/"
+        linters:
+          - forbidigo
+          - gosec
+          - errcheck
+      - path: "pkg/utils/fileutil/"
+        linters:
+          - forbidigo
+      - path: "pkg/community/privacy_guard\\.go"
+        text: "G101: Potential hardcoded credentials"
+        linters:
+          - gosec
+      - text: "G115:"
+        linters:
+          - gosec
+      - text: "G301:"
+        linters:
+          - gosec
+      - text: "G702:"
+        linters:
+          - gosec
+      - path: "pkg/systemcheck/policy/"
+        text: "G304:"
+        linters:
+          - gosec
+      - path: "pkg/systemcheck/policy/"
+        linters:
+          - forbidigo
+      - path: "pkg/brand/runtime\\.go"
+        linters:
+          - forbidigo
+      - path: "pkg/telemetry/collector\\.go"
+        linters:
+          - forbidigo
+      - path: "pkg/mcp/cli_ontology_jsonld\\.go"
+        linters:
+          - forbidigo
+      - path: "pkg/paths/module_root\\.go"
+        linters:
+          - forbidigo
+      - path: "pkg/opencore/payload_check\\.go"
+        linters:
+          - forbidigo
+      - path: "pkg/testrunner/testrunner\\.go"
+        linters:
+          - forbidigo

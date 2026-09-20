@@ -2,13 +2,13 @@ package intake
 
 import (
 	"bytes"
-	"os"
 	"path/filepath"
 	"strings"
 	"testing"
 
 	"github.com/zqk-os/zqk/pkg/storage"
 	"github.com/zqk-os/zqk/pkg/testenvroot"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
@@ -17,7 +17,7 @@ func TestIntakeCommand_NoArgs(t *testing.T) {
 	t.Setenv(zqkenv.TestRoot().Name(), tempDir)
 	t.Cleanup(func() {
 		_ = storage.RunProjectTestTeardown(storage.TempProjectTeardown(tempDir, nil))
-		_ = os.RemoveAll(filepath.Join(tempDir, ".zqk"))
+		_ = fileutil.RemoveAll(filepath.Join(tempDir, ".zqk"))
 	})
 	_, err := testenvroot.Setup(tempDir)
 	if err != nil {
