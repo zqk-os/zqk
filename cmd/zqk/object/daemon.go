@@ -56,7 +56,6 @@ func NewDaemonCmd() *cobra.Command {
 			// CAS membrane key off DaemonProcess() (skip WAL replay, write locally).
 			// Setting it after WithProcessor left the daemon as a second write-behind
 			// owner that then self-dialed until EMFILE.
-			// TRACK: BLI-CEF-R20-SINGLE-WRITER-BLI-001
 			if err := zqkenv.IsDaemon().Set(daemonEnvEnabled); err != nil {
 				return errfmt.Errorf("failed to mark process as privileged writer daemon: %w", err)
 			}

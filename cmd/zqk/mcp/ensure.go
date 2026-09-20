@@ -46,7 +46,7 @@ func runEnsure(cmd *cobra.Command, _ []string) error {
 				Log()
 		}
 		// Cursor Customize (~/.cursor/mcp.json) + project .cursor/mcp.json.
-		// TRACK: BLI-MCP-CURSOR-ADAPTER-SYMLINK-001 — empty global mcpServers after UI move.
+		// empty global mcpServers after UI move.
 		if instErr := mcppkg.AutoInstall(projectRoot, logger); instErr != nil {
 			logging.Fluent(logger).Warn("mcp.json AutoInstall incomplete").
 				WithError(instErr).

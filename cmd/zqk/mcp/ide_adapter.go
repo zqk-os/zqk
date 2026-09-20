@@ -25,7 +25,7 @@ func NewIDEAdapterCmd() *cobra.Command {
 // NewCursorAdapterCmd wires the Cursor-preferred alias to the same ide-adapter
 // runtime. Help/examples advertise cursor-adapter; without this AddCommand the
 // binary treats `mcp cursor-adapter --tcp` as parent flags → unknown --tcp and
-// Cursor MCP stays red. TRACK: BLI-MCP-CURSOR-ADAPTER-SYMLINK-001
+// Cursor MCP stays red.
 func NewCursorAdapterCmd() *cobra.Command {
 	cmd := bldr_cli_cmd_v1.NewMcpSvcCursorAdapterCommandBuilder()
 	cmd.RunE = runIDEAdapter

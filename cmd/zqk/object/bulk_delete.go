@@ -60,7 +60,7 @@ func executeBulkDelete(cmd *cobra.Command, ids []string, proc *cli.Processor) er
 	if unlinkRefs && cascade {
 		return cli.Guard(cmd).Err(errors.New("--unlink-references cannot be combined with --cascade")).Return()
 	}
-	// TRACK: BLI-1786390312940998000-1f101465 — fail-closed bulk delete (no silent GhostRef fan-in).
+	// fail-closed bulk delete (no silent GhostRef fan-in).
 	if !unlinkRefs && !cascade {
 		return cli.Guard(cmd).Err(errors.New("bulk delete refused: pass --unlink-references or --cascade; refusing to leave GhostRefs")).Return()
 	}

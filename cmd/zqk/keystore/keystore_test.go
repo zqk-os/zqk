@@ -81,7 +81,7 @@ func setupKeystoreTest(t *testing.T) (tmpDir string, storageProvider *storage.Fi
 }
 
 // promoteKeystoreEntryOffDraft leaves draft-first create so later Update/Read hit CAS.
-// TRACK: BLI-1785443942668406000-1ec5c811 — draft-plane create / promote membrane.
+// draft-plane create / promote membrane.
 func promoteKeystoreEntryOffDraft(t *testing.T, fs storage.ObjectStorageProvider, ctx context.Context, secCtx *pkgctx.SecurityContext, id string) {
 	t.Helper()
 	if id == "" {
@@ -93,7 +93,7 @@ func promoteKeystoreEntryOffDraft(t *testing.T, fs storage.ObjectStorageProvider
 }
 
 func TestKeystoreCreate_ValidKey(t *testing.T) {
-	// TRACK: BLI-1785443942668406000-1ec5c811 — no t.Parallel: setupKeystoreTest mutates global ID validator.
+	// no t.Parallel: setupKeystoreTest mutates global ID validator.
 	_, storageProvider, systemCtx := setupKeystoreTest(t)
 	ctx := pkgctx.NewSystemContext()
 
@@ -187,7 +187,7 @@ func TestKeystoreCreate_ValidKey(t *testing.T) {
 }
 
 func TestKeystoreCreate_NonSystemUserCannotSetCredentialHash(t *testing.T) {
-	// TRACK: BLI-1785443942668406000-1ec5c811 — no t.Parallel: setupKeystoreTest mutates global ID validator.
+	// no t.Parallel: setupKeystoreTest mutates global ID validator.
 	_, storageProvider, _ := setupKeystoreTest(t)
 	ctx := pkgctx.NewSystemContext()
 
@@ -213,7 +213,7 @@ func TestKeystoreCreate_NonSystemUserCannotSetCredentialHash(t *testing.T) {
 }
 
 func TestKeystoreCreate_AccountIDAutoSet(t *testing.T) {
-	// TRACK: BLI-1785443942668406000-1ec5c811 — no t.Parallel: setupKeystoreTest mutates global ID validator.
+	// no t.Parallel: setupKeystoreTest mutates global ID validator.
 	_, storageProvider, _ := setupKeystoreTest(t)
 	ctx := pkgctx.NewSystemContext()
 
@@ -248,22 +248,22 @@ func TestKeystoreCreate_AccountIDAutoSet(t *testing.T) {
 // The list functionality is thoroughly tested in pkg/storage/keystore_access_control_test.go
 // which has access to the ListFilter type since it's in the same package.
 func TestKeystoreList_UserSeesOwnEntries(t *testing.T) {
-	// TRACK: BLI-1785443942668406000-1ec5c811 — no t.Parallel: setupKeystoreTest mutates global ID validator.
+	// no t.Parallel: setupKeystoreTest mutates global ID validator.
 	t.Skip("Skipping test due to ListFilter type visibility issue - functionality tested in pkg/storage/keystore_access_control_test.go")
 }
 
 func TestKeystoreList_AdminSeesAllEntries(t *testing.T) {
-	// TRACK: BLI-1785443942668406000-1ec5c811 — no t.Parallel: setupKeystoreTest mutates global ID validator.
+	// no t.Parallel: setupKeystoreTest mutates global ID validator.
 	t.Skip("Skipping test due to ListFilter type visibility issue - functionality tested in pkg/storage/keystore_access_control_test.go")
 }
 
 func TestKeystoreList_SystemSeesAllFields(t *testing.T) {
-	// TRACK: BLI-1785443942668406000-1ec5c811 — no t.Parallel: setupKeystoreTest mutates global ID validator.
+	// no t.Parallel: setupKeystoreTest mutates global ID validator.
 	t.Skip("Skipping test due to ListFilter type visibility issue - functionality tested in pkg/storage/keystore_access_control_test.go")
 }
 
 func TestKeystoreRotate_ValidRotation(t *testing.T) {
-	// TRACK: BLI-1785443942668406000-1ec5c811 — no t.Parallel: setupKeystoreTest mutates global ID validator.
+	// no t.Parallel: setupKeystoreTest mutates global ID validator.
 	_, storageProvider, systemCtx := setupKeystoreTest(t)
 	ctx := pkgctx.NewSystemContext()
 
@@ -285,7 +285,7 @@ func TestKeystoreRotate_ValidRotation(t *testing.T) {
 		t.Fatalf("Failed to create keystore entry: %v", err)
 	}
 	id, _ := entry[objects.FieldKeyID].(string)
-	// TRACK: BLI-1785443942668406000-1ec5c811 — draft-plane create / promote membrane.
+	// draft-plane create / promote membrane.
 	promoteKeystoreEntryOffDraft(t, storageProvider, ctx, systemCtx, id)
 
 	// Rotate the key (system can update credential_hash)
@@ -310,7 +310,7 @@ func TestKeystoreRotate_ValidRotation(t *testing.T) {
 }
 
 func TestKeystoreRotate_NonSystemUserCannotRotate(t *testing.T) {
-	// TRACK: BLI-1785443942668406000-1ec5c811 — no t.Parallel: setupKeystoreTest mutates global ID validator.
+	// no t.Parallel: setupKeystoreTest mutates global ID validator.
 	_, storageProvider, systemCtx := setupKeystoreTest(t)
 	ctx := pkgctx.NewSystemContext()
 
@@ -347,7 +347,7 @@ func TestKeystoreRotate_NonSystemUserCannotRotate(t *testing.T) {
 }
 
 func TestKeystoreRotate_RevokeOldKey(t *testing.T) {
-	// TRACK: BLI-1785443942668406000-1ec5c811 — no t.Parallel: setupKeystoreTest mutates global ID validator.
+	// no t.Parallel: setupKeystoreTest mutates global ID validator.
 	_, storageProvider, systemCtx := setupKeystoreTest(t)
 	ctx := pkgctx.NewSystemContext()
 
@@ -369,7 +369,7 @@ func TestKeystoreRotate_RevokeOldKey(t *testing.T) {
 		t.Fatalf("Failed to create keystore entry: %v", err)
 	}
 	id, _ := entry[objects.FieldKeyID].(string)
-	// TRACK: BLI-1785443942668406000-1ec5c811 — draft-plane create / promote membrane.
+	// draft-plane create / promote membrane.
 	promoteKeystoreEntryOffDraft(t, storageProvider, ctx, systemCtx, id)
 
 	// Revoke the key
@@ -393,7 +393,7 @@ func TestKeystoreRotate_RevokeOldKey(t *testing.T) {
 }
 
 func TestKeystoreRotate_OwnerCanRevoke(t *testing.T) {
-	// TRACK: BLI-1785443942668406000-1ec5c811 — no t.Parallel: setupKeystoreTest mutates global ID validator.
+	// no t.Parallel: setupKeystoreTest mutates global ID validator.
 	_, storageProvider, systemCtx := setupKeystoreTest(t)
 	ctx := pkgctx.NewSystemContext()
 
@@ -415,7 +415,7 @@ func TestKeystoreRotate_OwnerCanRevoke(t *testing.T) {
 		t.Fatalf("Failed to create keystore entry: %v", err)
 	}
 	id, _ := entry[objects.FieldKeyID].(string)
-	// TRACK: BLI-1785443942668406000-1ec5c811 — draft-plane create / promote membrane.
+	// draft-plane create / promote membrane.
 	promoteKeystoreEntryOffDraft(t, storageProvider, ctx, systemCtx, id)
 
 	// Owner should be able to revoke their own key

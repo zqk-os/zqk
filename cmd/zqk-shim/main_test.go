@@ -74,7 +74,6 @@ func TestValidatePOLCODE009_BypassRequiresBreakGlass(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			// TRACK: BLI-CEF-R15-ENV-TRUST-001 / REQ-CEF-R2-SEC-ENV-TRUST
 			name: "bypass with whitespace-only break glass is rejected",
 			env: map[string]string{
 				zqkenv.ZqkShimBypassPolCode009().Name(): "1",

@@ -64,7 +64,7 @@ func NewSubmitCmd() *cobra.Command {
 
 	// Flags may already come from DNA (scheduler/submit_command.yaml). Only add
 	// when the builder is still a stub so generate-command-builders does not panic
-	// on "flag redefined". TRACK: BLI-1785903708509306000-a6d8dc5b
+	// on "flag redefined".
 	ensureSubmitFlags(submitCmd)
 
 	cli.AddCommonFlags(submitCmd)
@@ -83,7 +83,7 @@ func ensureSubmitFlags(cmd *cobra.Command) {
 		// Must match generated builder (StringArray). GetStringSlice silently
 		// returns empty when the flag was registered as StringArray — that
 		// dropped every --env on the live CLI path.
-		// TRACK: BLI-1786687873940250000-a6c3a985 — swarm LLM env inheritance via submit.
+		// swarm LLM env inheritance via submit.
 		f.StringArrayP("env", "e", []string{}, "Environment variables (format: KEY=VALUE, can be specified multiple times)")
 	}
 	if f.Lookup("retry") == nil {

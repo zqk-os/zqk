@@ -64,7 +64,6 @@ func NewSystemCmd() *cobra.Command {
 	systemCmd.AddCommand(NewKernelIntegrityCmd())
 	// Integrity readers were implemented and specced but never registered, so they
 	// reported nothing and no gate noticed the silence.
-	// TRACK: PRI-STABILIZE-FAILCLOSED-READS-001
 	systemCmd.AddCommand(NewObjectCountReportCmd())
 	systemCmd.AddCommand(NewObjectHygieneScanCmd())
 	systemCmd.AddCommand(NewTruthSentinelCmd())

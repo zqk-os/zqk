@@ -8,7 +8,7 @@ import (
 
 // flagDuration reads a duration flag that may be registered as duration or string
 // (codegen historically emitted string for DNA type "duration").
-// TRACK: BLI-1785903708509306000-a6d8dc5b — codegen now emits AddDurationFlag.
+// codegen now emits AddDurationFlag.
 func flagDuration(cmd *cobra.Command, name string, fallback time.Duration) time.Duration {
 	f := cmd.Flags().Lookup(name)
 	if f == nil {

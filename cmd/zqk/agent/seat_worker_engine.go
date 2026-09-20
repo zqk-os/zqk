@@ -15,7 +15,7 @@ const seatWorkerLaneUnknown = "seat"
 // seatWorkerEngineID is the swarm engine label. It uses the orch lane
 // (alpha/beta/gamma), not the leftover opaque seat id. Those ids still look
 // like a vendor (antigravity-*) even though the live workers are not that
-// product. TRACK: TDE-KERNEL-HARDCODED-ENV-IDS-001 — remove when: seating
+// product. remove when: seating
 // agent_id is itself an opaque lane token and no leftover vendor-shaped ids
 // remain in launchd / peer_seats.
 func seatWorkerEngineID(personaRef, agentID string) string {

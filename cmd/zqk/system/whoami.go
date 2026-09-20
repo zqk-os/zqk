@@ -35,7 +35,6 @@ func NewWhoamiCmd() *cobra.Command {
 		Use: "whoami",
 	})
 	// Spec short until generate-command-builders refreshes the empty-Use slop builder.
-	// TRACK: BLI-1787804771598596000-27599a81
 	whoamiCmd.Short = "Show the authenticated account, lane, roles, and permissions"
 	cli.BindAsyncProgress(whoamiCmd, func(cmd *cobra.Command, args []string) error {
 		return runWhoami(cmd)

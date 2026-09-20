@@ -22,7 +22,7 @@ import (
 
 // bindIsolatedInitRoot points init at tmpDir and clears ZQK_PROJECT_ROOT so Local CI / scheduler
 // inheritance of an already-initialized worktree cannot win over ZQK_TEST_ROOT (determineProjectRoot
-// prefers PROJECT_ROOT). TRACK: TDE-1785808957221945000-fcd15e47 (env pollution under bundler).
+// prefers PROJECT_ROOT). (env pollution under bundler).
 
 // requireBootstrapPresent verifies that a full bootstrap left nothing missing: _internal (specs, config),
 // .zqk/specs (when embedded), .zqk/cli/specs (when embedded), and project config in both canonical and legacy paths.

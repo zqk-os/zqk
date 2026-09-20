@@ -1,8 +1,8 @@
-// TRACK: BLI-TRACK-STORAGE-SPLIT-001 - Exceeds 800 LOC threshold
+// Exceeds 800 LOC threshold
 
-// TRACK: BLI-CEF-STORAGE-DECOMPOSE-V2 - File exceeds 800 LOC threshold
-// TRACK: BLI-CEF-STORAGE-DECOMPOSE-V2 - File exceeds 800 LOC threshold
-// TRACK: BLI-CEF-STORAGE-DECOMPOSE-V2 - File exceeds 800 LOC threshold
+// File exceeds 800 LOC threshold
+// File exceeds 800 LOC threshold
+// File exceeds 800 LOC threshold
 package agent
 
 import (
@@ -59,7 +59,6 @@ func runOrchestrate(cmd *cobra.Command, planArg string, opts OrchestrateOptions)
 	}
 
 	// POL-AGENT-PLANNER-DOER-001: doers cannot orchestrate peers.
-	// TRACK: BLI-1785905540598640000-12d5118e
 	if err := authcred.DenyOrchestrateIfDoer(proc.SecurityContext()); err != nil {
 		return err
 	}
@@ -507,7 +506,6 @@ func runOrchestrate(cmd *cobra.Command, planArg string, opts OrchestrateOptions)
 						objects.FieldKeySchemaVersion: objects.DefaultSchemaVersion,
 						objects.FieldKeyTitle:         titleStr,
 						// Persist refs, not a pasted prompt catalog.
-						// TRACK: BLI-1787805421435713000-3cf3884a
 						objects.FieldKeyDescription:        envelope.Description,
 						objects.FieldKeyEstimatedEffort:    "1d",
 						objects.FieldKeyAssigneePersonaRef: personaID,
@@ -610,7 +608,7 @@ func runOrchestrate(cmd *cobra.Command, planArg string, opts OrchestrateOptions)
 							// Local/native swarm executor for simple/routine/light tiers.
 							// Complex tiers wake primary (IDE/AGY) instead of starving on a
 							// vendor queue labeled "Gemini". Default BLI/ATK tier is tier_2_simple.
-							// TRACK: BLI-CAPH-001 — align model_tier enum (tier_1_complex vs tier_1_routine) in specs.
+							// align model_tier enum (tier_1_complex vs tier_1_routine) in specs.
 							if !nativeSwarmEligible(modelTier) {
 								_ = cli.WriteOutput(state.cmd, []byte(fmt.Sprintf("ℹ️  Queued '%s' for primary claim (skipped native swarm for %s)\n", taskID, modelTier)))
 								// Wake host/project primary orchestrator so work is not stranded.
@@ -641,7 +639,6 @@ func runOrchestrate(cmd *cobra.Command, planArg string, opts OrchestrateOptions)
 									} else {
 										// Isolated git worktree for the subagent. Reuse a leftover
 										// checkout/branch from a prior error cycle — do not remint.
-										// TRACK: BLI-1783831585418122000-c57cd667
 										var wtErr error
 										worktreePath, wtErr = ensureOrchestrationWorktree(workerCtx, state.proc.ProjectRoot(), taskID)
 										if wtErr != nil {
@@ -701,7 +698,6 @@ func runOrchestrate(cmd *cobra.Command, planArg string, opts OrchestrateOptions)
 									)
 									configureOrchestrationExecutorProcess(spawnCmd)
 									// POL-AGENT-API-KEY-001: inject seat credential; do not inherit parent/human key.
-									// TRACK: BLI-1785905292370531000-b758a11c
 									seatAccount := authcred.ResolveSeatAccount(state.proc.ProjectRoot(), personaID)
 									seatKey := authcred.APIKeyForSeat(state.proc.ProjectRoot(), seatAccount)
 									spawnCmd.Env = orchestrationExecutorChildEnv(os.Environ(), state.proc.ProjectRoot(), seatKey, zqkBin)

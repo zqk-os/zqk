@@ -11,7 +11,7 @@ import (
 )
 
 // NewDraftSweepCmd creates `object draft sweep`.
-// TRACK: BLI-1785827957031623000-b08b9791 / POL-AGENT-DRAFT-SWEEP-TPM-001
+// POL-AGENT-DRAFT-SWEEP-TPM-001
 func NewDraftSweepCmd() *cobra.Command {
 	cmd := bldr_cli_cmd_v1.NewObjectDraftSweepCommandBuilder()
 	cli.BindAsyncProgress(cmd, runObjectDraftSweep)

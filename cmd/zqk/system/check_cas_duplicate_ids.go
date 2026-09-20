@@ -12,8 +12,8 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// TRACK: BLI-1786358681981576000-66f07f6c — Tier-1 dual-CAS detection in system check output.
-// TRACK: TDE-CEF-CHECK-CAS-DUP-SCAN-ON-PRINT-001 — print-time peek of every CAS blob; skip in
+// Tier-1 dual-CAS detection in system check output.
+// print-time peek of every CAS blob; skip in
 // --fast and memoize per process+root so JSON/YAML/table siblings do not rescan.
 
 func inventoryCASDuplicateIDs(projectRoot string) caspkg.CASDuplicateIDInventory {

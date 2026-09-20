@@ -711,7 +711,7 @@ func startScheduler(ctx *cli.Context, cmd *cobra.Command) error {
 							}
 
 							// Fail-closed stub: do not report ok for unimplemented CAP wiring
-							// (REQ-CEF-OBS-002 / CRIT-CEF-OBS-002A). TRACK: BLI-CEF-OBS-DOC-HONEST.
+							// (REQ-CEF-OBS-002 / CRIT-CEF-OBS-002A).
 							schedulerpkg.SLog(logging.GetLoggerFromProfile(profile)).Info("Received intent from UI (stub — not dispatched)").Log()
 
 							return transport.Response[map[string]any]{

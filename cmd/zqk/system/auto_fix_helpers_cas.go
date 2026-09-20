@@ -32,7 +32,6 @@ const (
 
 // removeOldKindFileIfCASReplacementExists deletes oldPath only after newPath exists on disk
 // and oldPath is under kindDir. Prevents wiping the sole blob when CAS create/index lied.
-// TRACK: BLI-1785723654802038000-b14064bc
 func removeOldKindFileIfCASReplacementExists(logger logging.Logger, objectID, oldPath, newPath, kindDir string) {
 	if oldPath == emptyValue || oldPath == newPath {
 		return

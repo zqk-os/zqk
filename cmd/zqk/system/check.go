@@ -77,7 +77,6 @@ func NewCheckCmd() *cobra.Command {
 	cmd.Flags().Bool("fast", false, "Partial check: skip reference integrity only. Not an authoritative health verdict. Combined with --auto-fix/--force, --fast is dropped")
 	cmd.Flags().Int("tier", 0, "Filter results to only show objects with issues of the specified tier (1=blocking, 2=warning, 3=informational, 4=recommendation, 0=all)")
 	cmd.Flags().Int("layer", -1, "Filter results to only show objects in the specified compliance layer (0=integrity, 1=needs_fixes, 2=ready, 3=complete, -1=all)")
-	// TRACK: REQ-KERNEL-LIFECYCLE-FITNESS-001 / BLI-KERNEL-LF-SURFACE-001
 	cmd.Flags().String("surface", "", "Filter issues by fitness surface (auth, agent_dispatch, system_check_l0, system_check_l1, admin_form, whats_next, list_default); annotates issue_class")
 	cmd.Flags().String("delimiter", "\\n", "Delimiter to use between object IDs when using the 'ids' format (default: newline)")
 	cmd.Flags().Bool("include-ids", false, "Include individual object IDs in status breakdown tables")
@@ -99,7 +98,6 @@ func NewCheckCmd() *cobra.Command {
 	cmd.Flags().String("dispatch-to", "", "Dispatch health violations/issues as inbox items to the specified agent/role (e.g. 'QA-Engineer', 'Security-Engineer', 'technical-program-manager', or 'auto')")
 	// Opt-in mesh wake when draft/error/blocking/warning/info thresholds trip (not automatic).
 	// Bare --notify → primary orchestrator agent_id; --notify <id> overrides.
-	// TRACK: BLI-COMMS-TPM-LIVE-WAKE-001
 	cmd.Flags().String("notify", "", "Wake this agent seat if draft-plane / error-status / blocking / warning / informational thresholds trip after the check; omit value to use primary orchestrator (see .zqk/config/primary_orchestrator.json)")
 	if f := cmd.Flags().Lookup("notify"); f != nil {
 		f.NoOptDefVal = systemcheckwake.PrimarySentinel

@@ -55,7 +55,7 @@ import (
 func registerCommands() {
 	// getting_started must be registered before any subcommand uses GroupID
 	// "getting_started" (e.g. quickstart) — cobra panics on Execute otherwise.
-	// TRACK: BLI-1785839468275201000-ddb513d4 — quickstart GroupID registration.
+	// quickstart GroupID registration.
 	rootCmd.AddGroup(&cobra.Group{ID: "getting_started", Title: "Getting Started:"})
 	rootCmd.AddGroup(&cobra.Group{ID: "everyday", Title: "Everyday Commands:"})
 	rootCmd.AddGroup(&cobra.Group{ID: "integrations", Title: "Integrations & Automation:"})

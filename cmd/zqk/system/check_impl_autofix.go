@@ -161,7 +161,6 @@ func executeAutoFixIssuesCore(ctx *cli.Context, cmd *cobra.Command, obj *parser.
 	// Demote to error only for issue_class=process_failure (illegal lifecycle / status
 	// preconditions), and only when kind family allows autofix demote. Completeness /
 	// employment / referential findings must not yank process position.
-	// TRACK: REQ-KERNEL-LIFECYCLE-FITNESS-001 / BLI-KERNEL-LF-AUTOFIX-001
 	if currentStatus, ok := fixCtx.Obj.Properties[objects.FieldKeyStatus].(string); ok {
 		if shouldDemoteStatusToErrorForUnresolvedIssues(kind, currentStatus, sortedIssues) {
 			reason := demoteReasonFromIssues(sortedIssues)
@@ -310,7 +309,6 @@ func processIssueForAutoFix(fixCtx *AutoFixContext, issue Issue, registry storag
 		// unlink and wipes sole CAS objects when the object-id cache/index is wrong
 		// (00dd9c269e; 2026-08-18 GhostRef cohort). Quarantine via cleanup-duplicates
 		// or `zqk object delete --unlink-references` — never silent unlink of the file.
-		// TRACK: BLI-1785723654802038000-b14064bc
 		if strings.Contains(issue.Message, "Duplicate object ID") && issue.AutoFixable {
 			if fixCtx.AutoFix || fixCtx.Force {
 				return fmt.Sprintf("refused to auto-delete purported duplicate %s (%s); use cleanup-duplicates quarantine or zqk object delete --unlink-references", filepath.Base(fixCtx.FilePath), fixCtx.Kind)
@@ -335,7 +333,6 @@ func processIssueForAutoFix(fixCtx *AutoFixContext, issue Issue, registry storag
 // processReferenceIssue processes reference validation issues.
 // Prefer re-adding the target to the object-id cache when the file exists.
 // When the target is truly gone, unlink it from the referring object (do not invent a replacement).
-// TRACK: BLI-1785786997399161000-76ea6811
 func processReferenceIssue(fixCtx *AutoFixContext, issue Issue) string {
 	message := strings.ReplaceAll(issue.Message, "\n", " ")
 	if !strings.Contains(message, "does not exist") {
@@ -379,7 +376,6 @@ func processReferenceIssue(fixCtx *AutoFixContext, issue Issue) string {
 
 	// Target missing on disk: do not strip referrers from --auto-fix / SCH-AUTOFIX.
 	// Graph close is explicit: `zqk system kernel-integrity heal-dangling --apply` or --force.
-	// TRACK: BLI-1785723654802038000-b14064bc
 	if !fixCtx.Force {
 		return ""
 	}
@@ -472,7 +468,6 @@ func processDocumentationPolicyIssue(fixCtx *AutoFixContext, issue Issue) string
 }
 
 // processEmptyReferenceFieldIssue unsets empty *_ref / *_refs left after prior coerce/unlink.
-// TRACK: BLI-1785786997399161000-76ea6811
 func processEmptyReferenceFieldIssue(fixCtx *AutoFixContext, issue Issue) string {
 	if !(fixCtx.AutoFix || fixCtx.Force) || fixCtx.Obj == nil || fixCtx.Obj.Properties == nil {
 		return ""
@@ -506,7 +501,7 @@ func processEmptyReferenceFieldIssue(fixCtx *AutoFixContext, issue Issue) string
 // processInvalidLifecycleStatusIssue demotes to lifecycle status "error" when the kind
 // supports it (preserving the check message as demote reason); otherwise falls back to
 // the kind origin. Only rewrites when the *current* status is still invalid for the kind.
-// TRACK: BLI-CEF-FRIC-DRAFT-CAS-DELETE-001 / shockwave demote muddying — invalid statuses
+// shockwave demote muddying — invalid statuses
 // must not linger as fake terminals (e.g. agent_task status=complete).
 func processInvalidLifecycleStatusIssue(fixCtx *AutoFixContext, issue Issue) string {
 	if !(fixCtx.AutoFix || fixCtx.Force) {
@@ -576,7 +571,6 @@ var (
 // processDuplicateReferenceIssue eliminates duplicate intra-object references.
 // For cross-field duplicates, it removes the reference from the less specific / redundant field.
 // For within-field duplicates, it deduplicates the list preserving the first occurrence.
-// TRACK: BLI-1786121565703984000-627fbbdd
 func processDuplicateReferenceIssue(fixCtx *AutoFixContext, issue Issue) string {
 	if !(fixCtx.AutoFix || fixCtx.Force) || fixCtx.Obj == nil || fixCtx.Obj.Properties == nil {
 		return ""
@@ -879,7 +873,6 @@ func processInstanceValidationIssue(fixCtx *AutoFixContext, issue Issue, specFix
 	}
 	// Wall-clock clamp: apply in-memory (then cumulative applySpecFix). Do not use
 	// executeFixCommand — literal field=value commands are not supported there.
-	// TRACK: PRI-1785885772223315000-0649f401
 	if isWallClockClampIssue(issue) {
 		if msg := applyWallClockClampAutoFix(fixCtx, issue); msg != emptyValue {
 			return msg

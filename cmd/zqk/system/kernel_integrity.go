@@ -23,7 +23,6 @@ import (
 
 // NewKernelIntegrityCmd reports Kernel Mutation Pipeline coverage and optional dangling-ref heal.
 // Command structure from .zqk/cli/specs/system/kernel_integrity_command.yaml (+ subcommands).
-// TRACK: BLI-1785784868493840000-a8a0b4fc / BLI-1785786991961752000-a9d2f142
 func NewKernelIntegrityCmd() *cobra.Command {
 	cmd := bldr_cli_cmd_v1.NewKernelIntegrityCommandBuilder()
 	cmd.AddCommand(newKernelIntegrityReportCmd())

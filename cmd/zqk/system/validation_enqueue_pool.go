@@ -11,7 +11,6 @@ import (
 // Incremental validation after CUD is syscall-heavy (os.ReadFile per compose lookup).
 // One StartSimple per object exhausted the CLI 512-thread cap during object promote
 // (2026-09-13 dump: thousands of enqueue_validation_for_object Gs in syscall.Open).
-// TRACK: BLI-CEF-STORAGE-INDEX-CACHE-001
 const (
 	incrementalValidationMaxWorkers = 8
 	incrementalValidationQueue      = 128

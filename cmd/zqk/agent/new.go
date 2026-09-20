@@ -72,7 +72,7 @@ func runAgentNew(cmd *cobra.Command, personaName, description string) error {
 	// from ID"), which failed the whole transaction and made `agent new` unusable. Nothing was
 	// lost by removing it — .zqk/process/assessment_ratings/ holds zero instances and no object
 	// references an ASR id, because the command could never complete. Reintroducing ratings
-	// means restoring the spec and prefix first. TRACK: BLI-1787556517612216000-d382f41e
+	// means restoring the spec and prefix first.
 	skillObj := map[string]any{
 		objects.FieldKeyKind:          "agent_skill",
 		objects.FieldKeySchemaVersion: objects.DefaultSchemaVersion,
@@ -90,7 +90,7 @@ func runAgentNew(cmd *cobra.Command, personaName, description string) error {
 		return errfmt.Newf("failed to commit transaction").Wrap(err)
 	}
 
-	// TRACK: BLI-1785443942668406000-1ec5c811 — draft-plane create / promote membrane.
+	// draft-plane create / promote membrane.
 	promote := func(id, leaveStatus string) error {
 		return sp.Update(ctx, secCtx, id, map[string]any{objects.FieldKeyStatus: leaveStatus})
 	}

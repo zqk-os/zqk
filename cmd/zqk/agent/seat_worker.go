@@ -245,7 +245,6 @@ func runAgentSeatWorker(cmd *cobra.Command, _ []string) error {
 				InboxCount:     inboxCount,
 			}
 			// Named-ATK hourglasses run even when --execute-non-comms is off.
-			// TRACK: BLI-COMMS-ORCH-EXECUTE-NOT-ACK-001
 			opts.OnNamedATK = func(ctx context.Context, item agentfeed.CorrespondenceItem, body string) error {
 				return handleNonCommsWithAgentX(ctx, logger, sp, secCtx, root, agentID, personaRef, workerSessionID, item, body)
 			}
@@ -402,7 +401,6 @@ func handleNonCommsWithAgentX(
 
 	// Coding ATKs isolate into a git worktree. Docs-eval / CEF ATKs must not:
 	// worktrees reset to origin/main and hide untracked cef-runs + studio docs.
-	// TRACK: BLI-AGENT-INIT-PROMPT-CLASS-001
 	execRoot := root
 	workClass := agentprompt.ClassifyWorkClass(body)
 	if sp != nil {
@@ -805,7 +803,7 @@ func triggerPlanOrchestration(ctx context.Context, sp storage.ObjectStorageProvi
 		return "", errfmt.Errorf("orchestrate callback dir: %w", err)
 	}
 	cb := filepath.Join(logDir, "orch-"+safePlanFileName(planID)+".callback.json")
-	// TRACK: TDE-CEF-SCHEDULER-CALLBACK-HOURGLASS-001 — tee-only is not a seat wake.
+	// tee-only is not a seat wake.
 	hourglass := filepath.Join(root, "scripts", "agent-ops", "scheduler-job-callback.py") +
 		" --log " + cb
 	cmd := execwrap.CommandContext(ctx, zqkPath,

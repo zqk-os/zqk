@@ -286,6 +286,11 @@ func (e *Engine[T]) TriggerAsyncRebuild(sp storage.ObjectStorageProvider) bool {
 	return true
 }
 
+// IsReconciling returns true if a background reconciliation scan is actively running.
+func (e *Engine[T]) IsReconciling() bool {
+	return atomic.LoadUint32(&e.isReconciling) == 1
+}
+
 // SubscribeWAL starts an incremental background listener on lifecycle_events.wal.
 func (e *Engine[T]) SubscribeWAL(ctx context.Context, updateCh chan<- struct{}) {
 	if e.spec.ProjectRoot == "" {

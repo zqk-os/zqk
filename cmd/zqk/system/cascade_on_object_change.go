@@ -39,7 +39,6 @@ func CascadeOnObjectChange(ctx context.Context, projectRoot, operation, kind, id
 
 	// Drop pending AUTOFIX batch rows for this id so deferred apply cannot replay
 	// snapshotted issues after promote/status repair (stale-batch churn).
-	// TRACK: BLI-1785895580100186000-c5539372
 	switch operation {
 	case storage.OpCreate, storage.OpUpdate, storage.OpDelete:
 		capturedRoot, capturedID := projectRoot, id
@@ -53,7 +52,7 @@ func CascadeOnObjectChange(ctx context.Context, projectRoot, operation, kind, id
 	case storage.OpCreate, storage.OpUpdate:
 		// Shockwave Event: If a global rule is updated, trigger a system-wide shockwave
 		// to ensure the graph and all object caches are refreshed properly.
-		// TRACK: BLI-1785918841712163000-f128dc79 — contract-change shockwave is async:
+		// contract-change shockwave is async:
 		// emit durable outbox at SPEC_ORIGIN_TRIGGER / codegen; on kernel start load +
 		// demote shovel_ready|execution_locked that fail new invariants (not mid-build).
 		if kind == "validation_rule" || kind == "verification_matrix" || kind == "rule" {
@@ -90,7 +89,6 @@ func CascadeOnObjectChange(ctx context.Context, projectRoot, operation, kind, id
 			}
 			// Keep object-id-cache on the live CAS hash path after update/promote.
 			// CAS post-sync is primary; this covers background paths without CacheContext.
-			// TRACK: BLI-1785723654802038000-b14064bc
 			refreshObjectIDCachePathAfterUpdate(projectRoot, kind, id)
 		}
 	case storage.OpDelete:
@@ -151,7 +149,6 @@ func withDefaultCacheMode(ctx context.Context) context.Context {
 // refreshObjectIDCachePathAfterUpdate re-points object-id-cache at the live CAS
 // blob when the listing index already has the new hash (update/promote). No-op
 // when the object is missing or not CAS-backed.
-// TRACK: BLI-1785895580100186000-c5539372
 func refreshObjectIDCachePathAfterUpdate(projectRoot, kind, id string) {
 	if projectRoot == emptyValue || kind == emptyValue || id == emptyValue {
 		return

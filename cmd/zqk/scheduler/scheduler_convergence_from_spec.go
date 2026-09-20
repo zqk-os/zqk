@@ -74,7 +74,7 @@ func buildSchedulerConvergenceCmdFromSpec() (*cobra.Command, error) {
 // resolveConvergenceSpecsProjectRoot finds the checkout that holds .zqk/cli/specs.
 // ZQK_TEST_ROOT can redirect ResolveProjectRoot to an empty fixture tree; command DNA still
 // lives in the workspace, so fall back to FindWorkspaceRoot when the fixture has no specs.
-// TRACK: BLI-1786958141394413000-50f6af36 — fold into a shared ResolveCLISpecsRoot helper.
+// fold into a shared ResolveCLISpecsRoot helper.
 func resolveConvergenceSpecsProjectRoot() (string, error) {
 	candidates := []string{cli.ResolveProjectRoot(".")}
 	if ws := clictx.FindWorkspaceRoot("."); ws != "" {

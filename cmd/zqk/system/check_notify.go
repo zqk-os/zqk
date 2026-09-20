@@ -13,7 +13,7 @@ import (
 )
 
 // maybeNotifySystemCheckWake runs opt-in --notify wake after a finished check.
-// Best-effort: never fails the check. TRACK: BLI-COMMS-TPM-LIVE-WAKE-001
+// Best-effort: never fails the check.
 func maybeNotifySystemCheckWake(cmd *cobra.Command, projectRoot string, results []CheckResult) {
 	if cmd == nil {
 		return

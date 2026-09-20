@@ -86,7 +86,6 @@ func checkinDue(projectRoot, taskID string) string {
 }
 
 // NewReleaseCmd creates `zqk agent release <ATK-id>`.
-// TRACK: BLI-1785886173393325000-d0690a02
 func NewReleaseCmd() *cobra.Command {
 	var claimant string
 	var force bool

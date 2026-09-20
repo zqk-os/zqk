@@ -1,5 +1,4 @@
 # Emergency Manager — out-of-band CAP health / recovery monitor
-# TRACK: BLI-1783831583919580000-8b543560
 # Create: zqk object create scheduler_job --internal --file scripts/scheduler_jobs/emergency_manager.yaml
 # Stash is OFF by default. To enable gated stash: update metadata.allow_stash=true
 id: SCH-emergency-manager

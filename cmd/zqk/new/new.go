@@ -36,7 +36,7 @@ const (
 // pkg/cli/bldr_cli_cmd_v1/new_*_command_builder.go (zqk system generate-command-builders --overwrite).
 func NewNewCmd() *cobra.Command {
 	root := bldr_cli_cmd_v1.NewNewRootCommandBuilder()
-	// TRACK: BLI-1785930106857898000-94b9a5bc — retire stale internal-create help until new_* builders regenerate from specs.
+	// retire stale internal-create help until new_* builders regenerate from specs.
 	root.Long = strings.ReplaceAll(root.Long,
 		"zqk internal create <kind>",
 		"zqk object create <kind> --internal",

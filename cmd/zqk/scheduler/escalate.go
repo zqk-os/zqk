@@ -14,7 +14,6 @@ import (
 )
 
 // NewEscalateCmd creates the `scheduler escalate` diagnostic and dispatch command.
-// TRACK: PRI-SLACK-ALERT-DISPATCH-VERIFY-001 / BLI-1789634862108198000-26daaa5d
 func NewEscalateCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "escalate",

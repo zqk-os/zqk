@@ -10,7 +10,6 @@ import (
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
-// TRACK: BLI-SYSTEM-STATUS-CHECK-PATH-HONEST-001
 func TestResolveStatusCheckBinary_PrefersProjectStable(t *testing.T) {
 	t.Parallel()
 	root := t.TempDir()

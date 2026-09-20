@@ -13,7 +13,7 @@ import (
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
-// TRACK: BLI-1783831585418122000-c57cd667 — worktree sandbox + pre-trunk build gate.
+// worktree sandbox + pre-trunk build gate.
 
 const (
 	agentWorktreeMarker       = ".zqk/worktrees/"

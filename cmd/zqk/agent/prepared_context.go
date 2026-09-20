@@ -14,7 +14,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/storage"
 )
 
-// TRACK: BLI-1785886160479244000-c9f67956 / WFL-SUBAGENT-DISPATCH —
+// WFL-SUBAGENT-DISPATCH
 // every cognition entry (CLI prepare-context, seat-worker AgentX) must call
 // AssemblePreparedContext. Do not rebuild a thinner prompt beside this.
 

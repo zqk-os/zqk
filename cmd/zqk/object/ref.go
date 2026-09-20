@@ -18,7 +18,6 @@ import (
 )
 
 // NewRefCmd creates the top-level 'object ref' command.
-// TRACK: REQ-1789166976332116000-7fb91b3a / BLI-1789167120582788000-84acf011
 func NewRefCmd() *cobra.Command {
 	cmd := bldr_cli_cmd_v1.NewObjectRefCommandBuilder()
 	cmd.AddCommand(NewRefAddCmd())

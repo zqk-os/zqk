@@ -42,15 +42,38 @@ if sh "$TMP_REPO/scripts/open-core/check-public-release-payload.sh" "$TMP_REPO" 
 fi
 grep -F 'forbidden or unconfigured public artifact present: cmd/zqk-admin' "$TMP_REPO/result.log" >/dev/null
 
-# Prove studio technical_debt instance IDs in overlay scripts fail closed.
-git -C "$TMP_REPO" rm -f -- cmd/zqk-admin >/dev/null
-printf '%s\n' '# leftover studio id TDE-1789678536875854000-47240146' >"$TMP_REPO/scripts/open-core/applybrand-comment.sh"
-git -C "$TMP_REPO" add -- scripts/open-core/applybrand-comment.sh
-if sh "$TMP_REPO/scripts/open-core/check-public-release-payload.sh" "$TMP_REPO" >"$TMP_REPO/tde.log" 2>&1; then
-	printf '%s\n' "payload gate accepted studio technical_debt instance id in scripts" >&2
+# Prove TRACK comments with kernel object ids fail closed (cmd/, not only scripts/).
+TRACK_REPO=$(mktemp -d "${TMPDIR:-/tmp}/zqk-public-gate-track.XXXXXX")
+trap 'rm -f "$TMP_BIN"; rm -rf "$TMP_REPO" "$TRACK_REPO"' EXIT HUP INT TERM
+mkdir -p "$TRACK_REPO/cmd/zqk" "$TRACK_REPO/cmd/zqk-shim" "$TRACK_REPO/config" \
+	"$TRACK_REPO/docs/onboarding" "$TRACK_REPO/scripts/open-core"
+for path in README.md LICENSE NOTICE SECURITY.md CODE_OF_CONDUCT.md CONTRIBUTING.md; do
+	printf '%s\n' "fixture" >"$TRACK_REPO/$path"
+done
+printf '%s\n' 'module github.com/zqk-os/zqk' >"$TRACK_REPO/go.mod"
+printf '%s\n' 'brand:' '  executable_name: zqk' >"$TRACK_REPO/config/zqk.yaml"
+printf '%s\n' 'package main' >"$TRACK_REPO/cmd/zqk/main.go"
+printf '%s\n' 'fixture' >"$TRACK_REPO/docs/INDEX.md"
+printf '%s\n' 'fixture' >"$TRACK_REPO/docs/onboarding/COMMUNITY_FIRST_RUN.md"
+cp "$ROOT/scripts/open-core/check-public-release-payload.sh" "$TRACK_REPO/scripts/open-core/"
+cat >"$TRACK_REPO/scripts/open-core/police-community-tree.sh" <<'EOF'
+#!/bin/sh
+exit 0
+EOF
+# Assemble the leak without embedding a TRACK: BLI-... literal in this gate script
+# (the payload scan also covers scripts/).
+{
+	printf '%s\n' 'package main'
+	printf '%s\n' '// TRACK: '"BLI-CEF-R15-ENV-TRUST-001 / REQ-CEF-R2-SEC-ENV-TRUST"
+	printf '%s\n' 'func main() {}'
+} >"$TRACK_REPO/cmd/zqk-shim/main.go"
+git -C "$TRACK_REPO" init -q
+git -C "$TRACK_REPO" add .
+if sh "$TRACK_REPO/scripts/open-core/check-public-release-payload.sh" "$TRACK_REPO" >"$TRACK_REPO/result.log" 2>&1; then
+	printf '%s\n' "payload gate accepted TRACK kernel id in cmd/zqk-shim" >&2
 	exit 1
 fi
-grep -F 'studio technical_debt instance id remains in scripts' "$TMP_REPO/tde.log" >/dev/null
+grep -F 'studio TRACK comment with kernel object id remains in cmd or scripts' "$TRACK_REPO/result.log" >/dev/null
 
 if [ "$MODE" = "payload-only" ]; then
 	printf '%s\n' "PUBLIC PAYLOAD GATES: PASS"
@@ -62,7 +85,7 @@ fi
 	unset ZQK_PROJECT_ROOT
 	export ZQK_ALLOW_FOREGROUND_GO_TEST=1
 
-	# 1. Build entire project across all cmd and pkg packages
+	# 1. Build entire project (all packages across cmd and pkg)
 	CGO_ENABLED=0 go build -buildvcs=false ./...
 	CGO_ENABLED=0 go build -buildvcs=false -o "$TMP_BIN" ./cmd/zqk
 	"$TMP_BIN" --help >/dev/null

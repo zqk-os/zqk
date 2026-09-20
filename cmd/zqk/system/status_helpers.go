@@ -158,7 +158,6 @@ func getCurrentPriorityPlan(cmd *cobra.Command, projectRoot string) map[string]a
 // Used when --context mcp so system status returns in ~2–3s instead of 10+ seconds.
 // resolveStatusCheckBinary picks a project-local CLI for system status's embedded
 // fast check. PATH-only "zqk-stable" misses produced false check_failed.
-// TRACK: BLI-SYSTEM-STATUS-CHECK-PATH-HONEST-001
 func resolveStatusCheckBinary(projectRoot string) string {
 	cands := append([]string{}, paths.StableBinaryCandidates(projectRoot)...)
 	cands = append(cands,
@@ -223,7 +222,6 @@ func getSystemHealthData(projectRoot string) map[string]any {
 
 	// Prefer workshop/repo stable then tip bin — never fail solely because
 	// "zqk-stable" is absent from PATH (PATH miss was a false check_failed).
-	// TRACK: BLI-SYSTEM-STATUS-CHECK-PATH-HONEST-001
 	zqkBin := resolveStatusCheckBinary(projectRoot)
 
 	// Run system check with JSON output for parsing (quick check, no auto-fix)
@@ -380,7 +378,6 @@ func buildStatusData(cmd *cobra.Command, ctx *cli.Context, verbose bool) (map[st
 				age := time.Since(info.ModTime())
 				capReview["freshness"] = age.Truncate(time.Second).String()
 				// 2h: stale "system_check:true" must not read as pristine.
-				// TRACK: BLI-CAP-REVIEW-SYSTEM-CHECK-FRESHNESS-001
 				stale := age > 2*time.Hour
 				capReview["stale"] = stale
 				if stale {

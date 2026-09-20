@@ -43,7 +43,7 @@ func runUpdate(cmd *cobra.Command, args []string) error {
 			return runUpdateAll(cmd, args)
 		}
 
-		// TRACK: BLI-CEF-CLI-MULTI-ID-UPDATE — positional comma lists must expand like delete.
+		// positional comma lists must expand like delete.
 		rawIDs := expandObjectIDArgs(cmd, args)
 
 		if len(rawIDs) == 0 {
@@ -213,7 +213,7 @@ func runUpdate(cmd *cobra.Command, args []string) error {
 		}
 
 		if len(updates) == 0 {
-			// TRACK: BLI-1785723654802038000-b14064bc — ACL strip previously looked like "no updates provided"
+			// ACL strip previously looked like "no updates provided"
 			// and caused repeated TestAllKindsCRUD Update false-fails (e.g. role.description).
 			if requestedFieldCount > 0 && len(deniedFields) > 0 {
 				logging.FluentEvent(proc.Logger()).Warn("All requested field updates denied by field-level permissions").
@@ -408,7 +408,6 @@ func runUpdate(cmd *cobra.Command, args []string) error {
 func enforceActivePlanMembership(ctx context.Context, secCtx *pkgctx.SecurityContext, sp storage.ObjectStorageProvider, id string) error {
 	// Child-owned membership: BLI.priority_plan_ref must point at an execution-facing plan
 	// (active = shovel-ready, in_progress = scope locked). Parent backlog_item_refs is not required.
-	// TRACK: BLI-1783845980884549000-014a1c61
 	item, err := sp.Read(ctx, secCtx, id)
 	if err != nil || item == nil {
 		return fmt.Errorf("failed to read backlog item %s for plan membership check", id)

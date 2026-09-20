@@ -1,7 +1,6 @@
 #!/bin/sh
 # Rewrite a bounded community export from Studio's private source module to the
 # public module identity. This script refuses a tree that still contains Studio.
-# TRACK: BLI-1789702449225534000-eca4a6bd
 set -eu
 
 DEST=${1:-}

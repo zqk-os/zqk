@@ -47,7 +47,6 @@ func runFeedSteer(cmd *cobra.Command, _ []string) error {
 		}
 
 		// POL-AGENT-PLANNER-DOER-001: directed peer steer is planner-lane only.
-		// TRACK: BLI-1785905540598640000-12d5118e
 		if err := authcred.DenyPeerSteerIfDoer(proc.SecurityContext(), toAgentID); err != nil {
 			return err
 		}
@@ -103,7 +102,7 @@ func runFeedSteer(cmd *cobra.Command, _ []string) error {
 		// Studio mesh wake (local MCP proxy IPC + peer wake script) is not part of
 		// the community edition surface — community delivery is feed JSONL only.
 		if !zqkenv.IsCommunityEdition && !noWake && agentfeed.ShouldWakePeer(res.DeliveryMode) {
-			// TRACK: BLI-COMMS-TPM-LIVE-WAKE-001 / CRIT-COMMS-003 — MCP ActionRequired is the
+			// MCP ActionRequired is the
 			// live coordinator interrupt; shell stamp alone is not Live.
 			// MCP IPC + peer wake script are complementary: IPC targets IDE MCP
 			// subscribers; wake-agy targets Terminal AGY seats. Do not skip WakePeer

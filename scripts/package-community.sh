@@ -28,7 +28,7 @@ BUILD_DATE="$(date -u -r "$SOURCE_DATE_EPOCH" '+%Y-%m-%dT%H:%M:%SZ' 2>/dev/null 
 
 # Public module is github.com/zqk-os/zqk; the community SKU ships ./cmd/zqk.
 # Archive/binary name stays zqk-community so Homebrew formula + dist tests stay stable.
-# TRACK: BLI-1789869852579209000-b3f94849 — private identity must not appear in packaging.
+# private identity must not appear in packaging.
 LDFLAGS="-s -w -buildid= \
   -X github.com/zqk-os/zqk/cmd/zqk/app.version=${VERSION} \
   -X github.com/zqk-os/zqk/cmd/zqk/app.buildDate=${BUILD_DATE} \

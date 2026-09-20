@@ -26,7 +26,7 @@ func NewKindCmd() *cobra.Command {
 // kindCommandShort returns a cobra Short for a kind from the object_spec description
 // (first sentence/line, truncated). Falls back to a kind-qualified stub — never the
 // identical "Operations for a specific object kind" string for every kind.
-// TRACK: BLI-1785903708509306000-a6d8dc5b — inventory membrane honesty / discoverability.
+// inventory membrane honesty / discoverability.
 func kindCommandShort(kind string) string {
 	const maxShort = 96
 	if kind == "" || kind == "<kind>" {
@@ -155,7 +155,6 @@ func RegisterKindCommandsForKinds(objectCmd *cobra.Command, kinds []string) {
 		kc := NewKindCmdForKind(kind)
 		kc.GroupID = objectHelpGroupKinds
 		// Keep kinds routable but out of the flat -h scrape surface; use fields --list-kinds.
-		// TRACK: BLI-1785908736395909000-25c4884e
 		kc.Hidden = true
 		objectCmd.AddCommand(kc)
 		have[kind] = true

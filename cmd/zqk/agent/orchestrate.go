@@ -361,7 +361,6 @@ func seedAgentWorktreeRuntime(mainRoot, worktreeRoot string) error {
 	// Isolated empty draft plane — never symlink studio object_drafts.
 	// A symlink is not a directory; git status --porcelain reports dirty and
 	// persistOrchestratedTaskOutcome writes status=error for every native-swarm ATK.
-	// TRACK: BLI-COMMS-ORCH-DRAFT-PLANE-DIRTY-001
 	worktreeDraftDir := storage.ObjectDraftPlaneRoot(worktreeRoot)
 	if ensureErr := fileutil.EnsureDir(filepath.Dir(worktreeDraftDir)); ensureErr != nil {
 		return errfmt.Newf("create worktree state directory").Wrap(ensureErr)
@@ -452,7 +451,6 @@ func buildOrchestrationExecutorArgs(taskID, promptMarkdown string, timeout time.
 // seated kernel. Git cwd may be the ATK worktree; ZQK_PROJECT_ROOT must not be.
 // seedAgentWorktreeRuntime copies .account.index without account YAML, so a worktree
 // bind yields POL-AGENT-ACCOUNT-LOGIN-001 / CRI-ACCOUNT-RBAC-READY on DefaultSwarmWorkerAccount.
-// TRACK: BLI-KERNEL-ROOT-BINDING-FAILCLOSED-001
 func orchestrationExecutorChildEnv(parent []string, seatedKernelRoot, seatKey, zqkBin string) []string {
 	childEnv := withLocalLLMEnv(authcred.WithSeatAPIKeyEnv(parent, seatKey, seatedKernelRoot))
 	return withEnvValue(childEnv, zqkenv.Bin().Name(), zqkBin)
@@ -489,7 +487,6 @@ func collectOrchestrationCommitManifest(
 		return nil, err
 	}
 	// seedAgentWorktreeRuntime may leave .zqk/object_drafts as a symlink; ignore it.
-	// TRACK: BLI-COMMS-ORCH-DRAFT-PLANE-DIRTY-001
 	if remaining := orchestrationExecutorDirt(dirty); remaining != "" {
 		return nil, errfmt.Errorf("executor left uncommitted work for %s: %s", taskID, remaining)
 	}
@@ -561,7 +558,6 @@ func gitWorktreeOutput(ctx context.Context, worktreePath string, args ...string)
 
 // orchestrationExecutorDirt drops seeded draft-plane porcelain so an isolated
 // .zqk/object_drafts directory (or a leftover symlink) is not treated as executor leftover work.
-// TRACK: BLI-COMMS-ORCH-DRAFT-PLANE-DIRTY-001
 func orchestrationExecutorDirt(porcelain string) string {
 	var kept []string
 	for _, line := range splitNonEmptyLines(porcelain) {

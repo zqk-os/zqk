@@ -1,5 +1,4 @@
 // Package system implements system diagnostic, check, and maintenance commands.
-// TRACK: BLI-CEF-R17-SYSTEM-TRANCHE1-001, CRIT-CEF-R17-SYSTEM-TRANCHE1-001
 package system
 
 import (
@@ -96,7 +95,6 @@ func detectOrphanedFiles(cmd *cobra.Command, projectRoot string, results []Check
 		indexCount := len(indexMappings)
 		// Incomplete/empty index + hash files on disk: do NOT treat unindexed files as
 		// disposable orphans. That is how sole criteria/workstreams were wiped.
-		// TRACK: BLI-1785723654802038000-b14064bc
 		sparseIndex := casIndexSparseVersusDisk(indexCount, diskHashCount)
 		if sparseIndex && diskHashCount > 0 {
 			orphanedResults = append(orphanedResults, CheckResult{
@@ -257,7 +255,6 @@ func detectOrphanedFiles(cmd *cobra.Command, projectRoot string, results []Check
 					// Never fileutil.RemoveFile from orphan detection. IsCoreKernelKind is false when the
 					// spec index is not loaded, so a "non-core" branch previously wiped real
 					// process YAML. Reindex CAS hashes above; traditional files need CLI repair.
-					// TRACK: BLI-1785723654802038000-b14064bc
 					orphanedResults = append(orphanedResults, CheckResult{
 						ObjectID:   id,
 						ObjectKind: kind,
@@ -343,7 +340,6 @@ func truncateHashPrefix(hash string, n int) string {
 // reindexOrphanCASHashFile registers a hash-named YAML into the kind CAS index when it parses
 // as an object of that kind. Returns the object id on success.
 // Runs under kernel.cas_object_reconcile_index (reindex only; never sole-delete).
-// TRACK: BLI-1785784865905766000-dded0895
 func reindexOrphanCASHashFile(kind, kindDir, filePath, hash string, cas *storage.ContentAddressableStorage) (string, error) {
 	var recoveredID string
 	err := kernelcas.RunReconcileIndex(context.Background(), nil, &kernelcas.Mutation{ // Background: request-or-shutdown derived

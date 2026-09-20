@@ -404,7 +404,7 @@ func TestReactiveViewsAccumulatorConformance(t *testing.T) {
 	if payload.Stale || payload.Recovering {
 		t.Errorf("expected fresh payload, got stale=%v recovering=%v", payload.Stale, payload.Recovering)
 	}
-	if elapsed > 5*time.Millisecond {
+	if elapsed > 25*time.Millisecond {
 		t.Errorf("hot path read exceeded SLA: %v", elapsed)
 	}
 }

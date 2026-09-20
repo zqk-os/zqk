@@ -85,7 +85,7 @@ func TestVerifyCompletionIntegration(t *testing.T) {
 		objects.FieldKeySchemaVersion: objects.DefaultSchemaVersion,
 	}
 
-	// TRACK: BLI-1785443942668406000-1ec5c811 — draft-plane create / promote membrane.
+	// draft-plane create / promote membrane.
 	storage.CreateCASVisible(t, fs, ctx, secCtx, goalObj, objects.ObjectStatusActive)
 	storage.CreateCASVisible(t, fs, ctx, secCtx, critObj, objects.ObjectStatusInProgress)
 	critRead, err := fs.Read(ctx, secCtx, acID)
@@ -110,7 +110,7 @@ func TestVerifyCompletionIntegration(t *testing.T) {
 		objects.FieldKeyGoalRefs:        []string{goalID},
 		objects.FieldKeyCriteriaRefs:    []string{acID},
 	}
-	// TRACK: BLI-1785443942668406000-1ec5c811 — draft-plane create / promote membrane.
+	// draft-plane create / promote membrane.
 	storage.CreateCASVisible(t, fs, ctx, secCtx, tcObj, objects.ObjectStatusActive)
 
 	err = testkit.SignTestCaseCompletion(ctx, tcID, []string{"src/dummy.go"})

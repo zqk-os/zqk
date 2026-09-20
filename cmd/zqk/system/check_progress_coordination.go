@@ -185,7 +185,6 @@ func emitCheckProgressEventViaCoordinator(
 
 // emitCheckProgressSummaryEvent emits a sparse progress-summary checkpoint
 // (25%, 50%, …). The log label must not say "Milestone" — that is KindMilestone (MIL-*).
-// TRACK: BLI-CEF-LOG-SIGNAL-VS-NOISE-001
 func emitCheckProgressSummaryEvent(
 	ctx context.Context,
 	projectRoot string,

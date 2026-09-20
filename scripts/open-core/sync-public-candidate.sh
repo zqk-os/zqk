@@ -2,7 +2,7 @@
 # Sync a disposable open-core export. Not the community TPM checkout.
 # Default dest: <studio-parent>/zqk-public-candidate-export
 # Product checkout: <studio-parent>/zqk-public-candidate (git-tracked; never default)
-# TRACK: BLI-1789670600000000000-00000001 (PRI-OPENCORE-EXPORT-GATE-001)
+# ()
 
 set -euo pipefail
 
@@ -12,7 +12,7 @@ SIBLING="$PARENT/zqk-public-candidate"
 DEFAULT_DEST="$PARENT/zqk-public-candidate-export"
 CANDIDATE_DIR="${ZQK_PUBLIC_CANDIDATE_DIR:-$DEFAULT_DEST}"
 
-# TRACK: BLI-1789619419231762000-7f87694b — never rm -rf a seated community kernel.
+# never rm -rf a seated community kernel.
 seated_kernel() {
   [ -d "$1/.zqk/process" ] || [ -f "$1/.env" ]
 }

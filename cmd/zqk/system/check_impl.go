@@ -583,7 +583,7 @@ func checkObjectWithCacheAndContent(ctx *cli.Context, stdCtx stdcontext.Context,
 }
 
 // waitGroupWithTimeout waits for wg with a hard deadline so bare wg.Wait cannot hang forever
-// (goroutine architecture policy — TRACK: BLI-CEF-ARCH-SYSTEM-TRANCHE1).
+// (goroutine architecture policy — ).
 func waitGroupWithTimeout(wg *sync.WaitGroup, timeout time.Duration, label string) {
 	waitDone := make(chan struct{})
 	goroutinelabels.NewGoroutine(label, "waiting for wait group").

@@ -12,7 +12,6 @@ import (
 
 // objectComplianceSnapshot is the instance-validation health slice of kernel integrity.
 // Membrane green (composition / dangling / pipeline) is orthogonal — do not treat as "all objects healthy".
-// TRACK: BLI-1785786997399161000-76ea6811
 type objectComplianceSnapshot struct {
 	Available             bool                   `json:"available"`
 	SourcePath            string                 `json:"source_path,omitempty"`

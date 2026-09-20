@@ -112,7 +112,7 @@ previous_state:
 	createCtx := pkgctx.NewSystemContext()
 	// CreateCASVisible materializes off the draft plane so CAS + hash registry exist.
 	// (Bare Create can park CHA-* on the draft plane when lifecycle/stream gating disagrees.)
-	// TRACK: BLI-1785443942668406000-1ec5c811 — draft-plane create / promote membrane.
+	// draft-plane create / promote membrane.
 	storage.CreateCASVisible(t, fileStorage, createCtx, secCtx, createObj.Properties, "completed")
 	kindDir = fileStorage.GetKindDir("change_journal_entry")
 	if kindDir == "" {

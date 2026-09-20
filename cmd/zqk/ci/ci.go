@@ -48,7 +48,7 @@ func newRunCmd() *cobra.Command {
 
 func newStatusCmd() *cobra.Command {
 	// Do not use NewStatusCommandBuilder — that DNA is scheduler status (name collision).
-	// TRACK: BLI-1785699946601766000-26fbe6a5 — prefer ci_status_* builder once codegen nests like mcp_svc_*.
+	// prefer ci_status_* builder once codegen nests like mcp_svc_*.
 	cmd := &cobra.Command{
 		Use:   "status",
 		Short: "Show Local CI SOURCE_SHA and test-bundle health summary",

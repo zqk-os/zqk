@@ -6,7 +6,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// TRACK: BLI-1785723654802038000-b14064bc — replace --fast with CAS-hash attestation
+// replace --fast with CAS-hash attestation
 // (reuse last validated write when content hash unchanged). Until then, reduced
 // surfaces are partial, non-authoritative, and must never mutate. Also: autofix
 // must not demote lifecycle status to error without an explicit capability gate.

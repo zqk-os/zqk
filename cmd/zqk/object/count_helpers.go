@@ -70,7 +70,6 @@ func countAllKinds(cmd *cobra.Command, proc *cli.Processor, filters map[string]a
 
 	// Always Count() — List() was used when filters were present to dodge a countWithFilters
 	// deadlock (small workCh buffer). Count is fixed; List would load every object into memory.
-	// TRACK: BLI-1785903709847957000-8c7a991c
 	elevated := ElevatedInternalRequested(cmd)
 	for _, kind := range kinds {
 		process.TouchMeaningfulActivity()
@@ -119,7 +118,6 @@ func countAllKinds(cmd *cobra.Command, proc *cli.Processor, filters map[string]a
 }
 
 // allKindsCountScopeNote documents default public-vs-internal inventory policy.
-// TRACK: BLI-1785903709847957000-8c7a991c
 func allKindsCountScopeNote(elevated bool) string {
 	if elevated {
 		return "all registry kinds including visibility:internal (--internal). Zero-count kinds omitted unless --include-zero-count."
@@ -129,7 +127,6 @@ func allKindsCountScopeNote(elevated bool) string {
 }
 
 // hvInventoryRollup distinguishes stream vs cas_disk object counts and process-dir orphan YAML.
-// TRACK: BLI-1785903709847957000-8c7a991c
 type hvInventoryRollup struct {
 	Stream  int
 	CASDisk int
@@ -138,7 +135,6 @@ type hvInventoryRollup struct {
 
 // rollupHighVolumeInventory counts every high_volume_kinds entry (independent of visibility skip)
 // and estimates orphan CAS YAML left under .zqk/process for stream-primary kinds.
-// TRACK: BLI-1785903709847957000-8c7a991c
 func rollupHighVolumeInventory(proc *cli.Processor) hvInventoryRollup {
 	var out hvInventoryRollup
 	if proc == nil || proc.Storage() == nil {
@@ -200,7 +196,6 @@ func countProcessDirYAMLFiles(projectRoot, kind string) int {
 }
 
 // buildAllKindsCountMeta records intentional exclusions + HV stream/cas/orphan rollup for find-vs-count audits.
-// TRACK: BLI-1785903709847957000-8c7a991c
 func buildAllKindsCountMeta(
 	nsScope NamespaceQueryScope,
 	elevated bool,

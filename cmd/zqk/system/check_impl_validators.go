@@ -136,7 +136,7 @@ func checkInstanceValidationWithValidatorAndData(ctx *cli.Context, stdCtx stdcon
 	// fail-closed false positives during system check. Same helper as promote/demote/save.
 	// Use the hybrid/factory provider (not GetPrimary alone): graph-primary unwrap can
 	// miss file CAS BLIs or surface stale graph edges and falsely fail the hold check.
-	// TRACK: TDE-1785808957221945000-fcd15e47 — keep check/promote/storage lookup wiring aligned.
+	// keep check/promote/storage lookup wiring aligned.
 	depsProvider := storageProvider
 	if depsProvider == nil {
 		depsProvider = lookupProvider

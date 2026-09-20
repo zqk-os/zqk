@@ -67,7 +67,6 @@ func NewNextCmd() *cobra.Command {
 
 		// Enforce worktree teardown and merge proof before advancing (BLI-ATK-MERGE-UP-HYGIENE-001).
 		// Docs-eval / CEF ATKs do not use ATK worktrees or commit_hashes — artifact SUCCESS_GATE instead.
-		// TRACK: BLI-AGENT-INIT-PROMPT-CLASS-001
 		title, _ := task[objects.FieldKeyTitle].(string)
 		desc, _ := task[objects.FieldKeyDescription].(string)
 		workClass := agentprompt.ClassifyWorkClass(title, desc)
@@ -114,7 +113,6 @@ func NewNextCmd() *cobra.Command {
 		}
 
 		// Release work claim after worker advances (WFL-MULTI-AGENT-WORK-CLAIM).
-		// TRACK: BLI-1785886173393325000-d0690a02
 		_ = releaseTaskAfterNext(proc, id, "")
 
 		// Emit verification_signal to health.jsonl

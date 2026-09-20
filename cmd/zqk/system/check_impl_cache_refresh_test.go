@@ -364,7 +364,6 @@ func TestBuildObjectIDCacheIfNeeded_RefreshCacheWithFastStillRebuilds(t *testing
 		objects.FieldKeyOriginProject: validation.DefaultOriginProject,
 	}
 	// awaiting_verification is preliminary → draft plane; promote so object-id cache scan can see CAS.
-	// TRACK: BLI-1785443942668406000-1ec5c811
 	storagepkg.CreateCASVisible(t, st, opCtx, secCtx, obj, objects.ObjectStatusInProgress)
 	waitUntilStorageReadable(t, st, opCtx, secCtx, projectRoot, "CRIT-FAST-REF-001", 20*time.Second)
 

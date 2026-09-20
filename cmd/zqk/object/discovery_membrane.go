@@ -12,7 +12,6 @@ import (
 )
 
 // FlagAllKinds break-glass for persona/RBAC discovery membrane (full kind catalog).
-// TRACK: BLI-1785908739114727000-9a7cc2bd
 const FlagAllKinds = "all-kinds"
 
 const flagHelpAllKinds = "Show full registered kind catalog (bypass planner/doer discovery membrane)"

@@ -45,7 +45,7 @@ func TestObjectDemoteCommand(t *testing.T) {
 	bliObj[objects.FieldKeyMilestoneRefs] = []any{"MIL-11111"}
 
 	// Create in CAS with planned status for demote testing.
-	// TRACK: BLI-1785443942668406000-1ec5c811 — draft-plane create / promote membrane.
+	// draft-plane create / promote membrane.
 	storage.CreateCASVisible(t, fs, cliCtx, secCtx, bliObj, objects.ObjectStatusPlanned)
 
 	flushCtx, cancelFlush := storage.DurabilityFlushContext()

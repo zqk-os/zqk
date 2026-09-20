@@ -67,10 +67,20 @@ fi
 # Studio technical_debt instance IDs (TDE-<nanos>-<hex>) belong in kernel CAS,
 # not in public overlay/packaging comments.
 if git -C "$ROOT" grep -n -E 'TDE-[0-9]{15,}-[0-9a-fA-F]{8}' -- \
-	'scripts' \
+	'scripts' 'cmd' \
 	':!scripts/open-core/check-public-release-payload.sh' \
-	':!scripts/open-core/test-public-release-gates.sh' >/dev/null 2>&1; then
-	fail "studio technical_debt instance id remains in scripts"
+	':!scripts/open-core/test-public-release-gates.sh'; then
+	fail "studio technical_debt instance id remains in scripts or cmd"
+fi
+
+# TRACK comments must not leak studio kernel object ids (BLI/REQ/CRIT/PRI/TDE/ATK/CAP/CVS).
+# cmd/zqk-shim previously shipped BLI-CEF-* / REQ-CEF-* TRACK lines while this gate
+# only scanned TDE-nanos-hex under scripts/.
+if git -C "$ROOT" grep -n -E 'TRACK:.*(BLI|REQ|CRIT|PRI|TDE|ATK|CAP|CVS)-' -- \
+	'cmd' 'scripts' \
+	':!scripts/open-core/check-public-release-payload.sh' \
+	':!scripts/open-core/test-public-release-gates.sh'; then
+	fail "studio TRACK comment with kernel object id remains in cmd or scripts"
 fi
 
 if grep -E 'APPENDIX A|Proprietary|Commercial Enterprise|OPEN_CORE_PROPRIETARY_SPLIT' \

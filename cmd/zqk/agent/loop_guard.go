@@ -9,7 +9,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
-// TRACK: BLI-1783631896775129000-de3fef87 — loop guard knobs + stagnation heuristic.
+// loop guard knobs + stagnation heuristic.
 
 const (
 	defaultMaxSyncLoops             = 100

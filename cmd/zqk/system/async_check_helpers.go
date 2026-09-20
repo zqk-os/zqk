@@ -271,7 +271,6 @@ func (acc *AsyncCheckContext) getOperationCallback() concurrency.OperationCallba
 // significant CAS/cache change marker is present. Pending burst/drain refresh
 // object-id-cache and invalidate pending validation IDs only — they do not
 // wipe the validation cache.
-// TRACK: BLI-1785895580100186000-c5539372
 func handleClearCache(checkCtx *AsyncCheckContext) error {
 	clearCache, err := checkCtx.Cmd.Flags().GetBool("clear-cache")
 	if err != nil {
@@ -954,7 +953,7 @@ func discoverAndEnqueueObjectsImpl(checkCtx *AsyncCheckContext) error {
 // These must never be persisted in or trusted from the validation cache: once stored they replay
 // on every later run for objects that are otherwise cache hits, so the noise survives
 // --refresh-cache (which rebuilds the object-id cache, not validation state) and only
-// --clear-cache clears it. TRACK: BLI-1786387465409533000-45bd780c
+// --clear-cache clears it.
 func isTransientCacheCoherenceIssue(category string) bool {
 	return category == categoryCacheLag || category == categoryCacheCoherence
 }
@@ -985,7 +984,6 @@ func shouldUseCachedState(objectID, filePath string, state *validation.Validatio
 		// DependentsLookup nil → false "complete PRI children not terminal"). Never
 		// treat those as permanent hits; revalidate so a fixed binary self-heals
 		// without requiring --clear-cache every time.
-		// TRACK: BLI-1785723654802038000-b14064bc
 		if issue.Tier == 1 && issue.Category == "instance_validation" {
 			return false
 		}
@@ -997,7 +995,7 @@ func shouldUseCachedState(objectID, filePath string, state *validation.Validatio
 		// GhostRef is a cache-miss + Exists-false verdict at validation time, not a
 		// property of the referrer file. After object-id-cache refresh (or a peer
 		// restoring the target), the referrer mtime is unchanged so these must not
-		// replay as cache hits. TRACK: BLI-1786387465409533000-45bd780c
+		// replay as cache hits.
 		if issue.Tier == 1 && issue.Category == categoryGhostRef {
 			return false
 		}
@@ -1035,7 +1033,6 @@ func enqueueOrUseCache(
 		bypassCacheWithIssues = autoFix || force
 		// Explicit clear must revalidate even if Clear() raced with another writer
 		// that restored a poison on-disk snapshot.
-		// TRACK: BLI-1785723654802038000-b14064bc
 		forceMiss = clearCache
 	}
 	if !forceMiss && inCache && shouldUseCachedState(file.ObjectID, file.Path, state, bypassCacheWithIssues) {

@@ -327,6 +327,12 @@ func TestAccumulator_DebounceConcurrency(t *testing.T) {
 	if third {
 		t.Error("expected third TriggerAsyncRebuild to be debounced (return false)")
 	}
+
+	// Wait for the in-flight background reconciler to finish before test cleanup removes tmpDir
+	deadline := time.Now().Add(2 * time.Second)
+	for time.Now().Before(deadline) && engine.IsReconciling() {
+		time.Sleep(10 * time.Millisecond)
+	}
 }
 
 // TestAccumulator_WALSubscription satisfies CRIT-1789551839272714000-27a0ccc0 incremental WAL ingestion.

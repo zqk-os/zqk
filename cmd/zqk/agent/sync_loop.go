@@ -38,7 +38,7 @@ import (
 // NewSyncLoopCmd creates the agent sync-loop command
 func NewSyncLoopCmd() *cobra.Command {
 	cmd := bldr_cli_cmd_v1.NewAgentSyncLoopCommandBuilder()
-	// TRACK: BLI-CAPH-001 — regenerate from CLI spec; builder currently emits empty Use.
+	// regenerate from CLI spec; builder currently emits empty Use.
 	cmd.Use = "sync-loop"
 	cmd.Short = "Run a native local-LLM (Ollama) sync-loop worker for an agent_task"
 	cmd.Long = "Spawns a graph-state sync-loop that executes an agent_task against the configured local LLM (ZQK_LLM_* / Ollama)."
@@ -519,7 +519,6 @@ func runSyncLoop(cmd *cobra.Command, taskID string) (runErr error) {
 						}
 						// Persist steps + status in one mutation so a status-only write cannot
 						// race and leave steps stuck at pending_verification.
-						// TRACK: BLI-1785723654802038000-b14064bc
 						currentKind, _ := currentTask[objects.FieldKeyKind].(string)
 						if errMut := applyStateMutationWithFields(ctx, secCtx, sp, taskID, currentKind, validator, auditStream, objects.ObjectStatusFailed, stepFieldUpdates); errMut != nil {
 							if wErr := cli.WriteOutput(cmd, []byte(fmt.Sprintf("❌ Failed to apply state mutation: %v\n", errMut))); wErr != nil {
@@ -612,7 +611,6 @@ func runSyncLoop(cmd *cobra.Command, taskID string) (runErr error) {
 					finalStatus = objects.ObjectStatusFailed
 				} else if isAgentWorktree(proc.ProjectRoot()) {
 					// Swarm sync-loop: build-gate then commit worktree branch before teardown.
-					// TRACK: BLI-1783831585418122000-c57cd667
 					wtRoot := proc.ProjectRoot()
 					if bErr := worktreeBuildCheck(ctx, wtRoot); bErr != nil {
 						finalStatus = objects.ObjectStatusFailed
@@ -636,7 +634,7 @@ func runSyncLoop(cmd *cobra.Command, taskID string) (runErr error) {
 					}
 				}
 				// Always tear down agent worktrees on terminal (success or fail).
-				// TRACK: BLI-1785886134649966000-7732876c — previously only cleaned on success → orphan pile.
+				// previously only cleaned on success → orphan pile.
 				if isAgentWorktree(proc.ProjectRoot()) {
 					mainRepo := agentWorktreeMainRepo(proc.ProjectRoot())
 					maintenanceService := maintenance.NewGitMaintenanceService(mainRepo)
@@ -826,7 +824,6 @@ func applyStateMutation(ctx context.Context, secCtx *storage.SecurityContext, sp
 
 // applyStateMutationWithFields transitions status and optionally merges extra fields in the same Update
 // so callers do not lose nested writes (e.g. task_steps) to a status-only CAS race.
-// TRACK: BLI-1785723654802038000-b14064bc
 func applyStateMutationWithFields(ctx context.Context, secCtx *storage.SecurityContext, sp storage.ObjectStorageProvider, taskID string, kind string, validator *mutation.Validator, auditStream *audit.AuditStream, newStatus string, extraFields map[string]any) error {
 	mut := mutation.Mutation{
 		Action:           mutation.ActionUpdateNode,

@@ -31,7 +31,6 @@ func mustProcessRoot(t *testing.T) string {
 // Regression: system check StorageProvider is Batching(Routing(...)). Integrity used to
 // type-assert only *FileObjectStorage, miss the cache, and NewContentAddressableStorage
 // (full index reload) per object — doc_entry (~2k, ~170KB index) blew the 5s validation budget.
-// TRACK: BLI-1785895580100186000-c5539372
 func TestExtractFileStorage_UnwrapsBatchingRouting(t *testing.T) {
 	t.Parallel()
 	tmp := mustProcessRoot(t)

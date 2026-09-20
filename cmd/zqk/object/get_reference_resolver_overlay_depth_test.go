@@ -135,7 +135,6 @@ func TestGetReferenceResolverOverlay_DefaultView_Depth2ResolvesNestedRefs(t *tes
 
 // TestGetReferenceResolverOverlay_UnspecifiedHydration_IsRaw locks ViewDefault product
 // contract: omit --link-hydration ⇒ no resolved_* embeds (CAS seal / raw get).
-// TRACK: BLI-1785909672838827000-9fca84f5
 func TestGetReferenceResolverOverlay_UnspecifiedHydration_IsRaw(t *testing.T) {
 	testEnv := SetupTestEnvironment(t)
 	requirementID, _, _ := seedRequirementCriteriaMilestoneGraph(t, testEnv)
