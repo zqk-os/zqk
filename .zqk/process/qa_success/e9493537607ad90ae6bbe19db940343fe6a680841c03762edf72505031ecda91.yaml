@@ -1,0 +1,14 @@
+created_at: "2026-09-20T01:22:50Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1789867370947820000-65f4f09c
+item_id: BLI-IO-TELEMETRY-REPORTING-001
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 8529d48a2bb8e026794ef628337375b2dfec95b6ff616d7dfd0278bc07abe912ce5068db3e7144cea33032c1c425e3f523aba531f46ce9fdb9363ac81af3aff6
+schema_version: 2.0.0
+signature: 3045022100ad88b6b8c8057c25581091eeefb69b9ef10291d4fd002e57e6aeee839436c6c60220141c31086330524fca45605c399411f503db14a5b1861449aef7742a1ecf6485
+status: success
+title: QA success for BLI-IO-TELEMETRY-REPORTING-001
+updated_at: "2026-09-20T01:22:50Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
