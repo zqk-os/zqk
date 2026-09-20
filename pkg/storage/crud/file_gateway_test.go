@@ -29,12 +29,13 @@ func TestFileObjectStorage_DispatchStatusGatewayDoesNotWalkParents(t *testing.T)
 	require.NoError(t, fileutil.MkdirAll(filepath.Join(processDir, "personas"), paths.DirPerm755))
 
 	storage.CreateCASVisible(t, fos, ctx, secCtx, map[string]any{
-		objects.FieldKeyID:    "PER-001",
-		objects.FieldKeyKind:  "persona",
-		objects.FieldKeyTitle: "Test Persona",
-		objects.FieldKeyName:  "Test Persona",
-		objects.FieldKeyRole:  "tester",
-	}, "")
+		objects.FieldKeyID:     "PER-001",
+		objects.FieldKeyKind:   "persona",
+		objects.FieldKeyStatus: objects.ObjectStatusApproved,
+		objects.FieldKeyTitle:  "Test Persona",
+		objects.FieldKeyName:   "Test Persona",
+		objects.FieldKeyRole:   "tester",
+	}, objects.ObjectStatusApproved)
 	storage.CreateCASVisible(t, fos, ctx, secCtx, map[string]any{
 		objects.FieldKeyID:              "MIL-GATEWAY-TEST-001",
 		objects.FieldKeyKind:            "milestone",
