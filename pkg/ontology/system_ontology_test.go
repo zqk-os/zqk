@@ -97,8 +97,10 @@ func TestSystemOntology_requirementCriteriaComposition(t *testing.T) {
 	if _, ok := mil.Properties[objects.FieldKeyGoalRefs]; !ok {
 		t.Fatal("milestone must store goal_refs (child-owned occupancy)")
 	}
-	if _, ok := mil.Properties[objects.FieldKeyCriteriaRefs]; ok {
-		t.Fatal("milestone must not store criteria_refs; milestones summarize child backlog items")
+	if critProp, ok := mil.Properties[objects.FieldKeyCriteriaRefs]; !ok {
+		t.Fatal("milestone must store criteria_refs (parent-owned composition)")
+	} else if critProp.EdgeRole != string(objects.EdgeRoleComposition) {
+		t.Fatalf("milestone.criteria_refs edge_role = %q, want composition", critProp.EdgeRole)
 	}
 	if _, ok := mil.Properties[objects.FieldKeyRequirementRefs]; ok {
 		t.Fatal("milestone must not store requirement_refs; occupancy is requirement.milestone_refs")

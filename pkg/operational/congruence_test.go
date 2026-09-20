@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/datacell"
 	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/storage"
 	"github.com/zqk-os/zqk/pkg/testkit"
@@ -22,10 +23,9 @@ func registerCongruenceStorageTeardown(t *testing.T, tmpDir string, sp *storage.
 }
 
 const (
-	testProcessDirName = "process"
-	testAuditDirName   = "audit"
+	testAuditDirName = "audit"
 
-	testChangeJournalDir = "change_journal"
+	testChangeJournalDir = "change_journal_entries"
 
 	testDirPerm  = paths.DirPerm750
 	testFilePerm = paths.FilePerm600
@@ -38,7 +38,7 @@ func TestRun_toleratesMissingFilesDuringWalk(t *testing.T) {
 	t.Parallel()
 	ctx := context.Background()
 	tmpDir := t.TempDir()
-	processDir := filepath.Join(tmpDir, "docs", testProcessDirName)
+	processDir := datacell.ProcessPrimaryDir(tmpDir)
 	auditDir := filepath.Join(processDir, testAuditDirName)
 	if err := fileutil.MkdirAll(auditDir, testDirPerm); err != nil {
 		t.Fatalf("mkdir: %v", err)
@@ -91,7 +91,7 @@ func TestRun_streamBackedDirs_skipsDiskWalk(t *testing.T) {
 	t.Parallel()
 	ctx := context.Background()
 	tmpDir := t.TempDir()
-	processDir := filepath.Join(tmpDir, "docs", testProcessDirName)
+	processDir := datacell.ProcessPrimaryDir(tmpDir)
 	changeJournalDir := filepath.Join(processDir, testChangeJournalDir)
 	if err := fileutil.MkdirAll(changeJournalDir, testDirPerm); err != nil {
 		t.Fatalf("mkdir: %v", err)
@@ -157,7 +157,7 @@ func TestRun_legacyStreamBacked_nestedSubdirs(t *testing.T) {
 	t.Parallel()
 	ctx := context.Background()
 	tmpDir := t.TempDir()
-	processDir := filepath.Join(tmpDir, "docs", testProcessDirName)
+	processDir := datacell.ProcessPrimaryDir(tmpDir)
 
 	// Simulate monthly-bucketed audit layout: audit/2026-01/ and audit/2026-02/
 	for _, sub := range []string{"2026-01", "2026-02"} {
@@ -207,7 +207,7 @@ func TestRun_legacyStreamBacked_emptyDir(t *testing.T) {
 	t.Parallel()
 	ctx := context.Background()
 	tmpDir := t.TempDir()
-	processDir := filepath.Join(tmpDir, "docs", testProcessDirName)
+	processDir := datacell.ProcessPrimaryDir(tmpDir)
 	auditDir := filepath.Join(processDir, testAuditDirName)
 	if err := fileutil.MkdirAll(auditDir, testDirPerm); err != nil {
 		t.Fatalf("mkdir: %v", err)
@@ -243,12 +243,11 @@ func TestRun_legacyStreamBacked_emptyDir(t *testing.T) {
 
 // TestRun_strayUnmappedProcessDir alerts when YAML sits in a top-level folder
 // that is not a kind mapping (.zqk/process/decision/ vs canonical decisions/).
-// TRACK: BLI-CEF-OCR-STRAY-KIND-DIR-001
 func TestRun_strayUnmappedProcessDir(t *testing.T) {
 	t.Parallel()
 	ctx := context.Background()
 	tmpDir := t.TempDir()
-	strayDir := filepath.Join(tmpDir, "docs", testProcessDirName, "decision")
+	strayDir := filepath.Join(datacell.ProcessPrimaryDir(tmpDir), "decision")
 	if err := fileutil.MkdirAll(strayDir, testDirPerm); err != nil {
 		t.Fatalf("mkdir: %v", err)
 	}

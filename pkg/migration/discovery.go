@@ -3,7 +3,6 @@ package migration
 import (
 	"path/filepath"
 
-	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/paths"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
@@ -23,13 +22,22 @@ type SpecInfo struct {
 // and returns metadata (id, name, description, path) for each. Paths are absolute.
 // Returns an empty slice if the migrations directory does not exist.
 func ListSpecs(projectRoot string) ([]SpecInfo, error) {
-	dir := filepath.Join(projectRoot, paths.ProcessInternalDir, MigrationsDirName)
-	entries, err := fileutil.ReadDir(dir)
-	if err != nil {
-		if fileutil.IsNotExist(err) {
-			return nil, nil
+	candidates := []string{
+		filepath.Join(projectRoot, paths.ProcessInternalDir, MigrationsDirName),
+		filepath.Join(projectRoot, paths.ProcessDir, "_internal", MigrationsDirName),
+	}
+	var dir string
+	var entries []fileutil.DirEntry
+	for _, cand := range candidates {
+		var err error
+		entries, err = fileutil.ReadDir(cand)
+		if err == nil {
+			dir = cand
+			break
 		}
-		return nil, errfmt.Newf("read migrations dir").Wrap(err)
+	}
+	if dir == "" {
+		return nil, nil
 	}
 
 	var out []SpecInfo
