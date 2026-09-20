@@ -106,3 +106,22 @@ All commands must implement the standard **Command DNA**:
   - Verifies that 100% of commands have up-to-date specs and accurate manual pages.
   - Audits help strings, flag descriptions, and usage examples.
   - Eliminates undocumented flags, hidden arguments, and stale guidance.
+
+---
+
+## 5. Verification & Acceptance Reference
+
+This standard is verified by the automated test suite in `cmd/zqk/system/validate_command_specs_test.go` and executed via `zqk system validate-command-specs`.
+
+- **Priority Plan:** `PRI-CLI-TAXONOMY-OVERHAUL-001`
+- **Backlog Items Verified:**
+  - `BLI-1789798199209192000-4b7ef477` (Harmonized CLI Taxonomy & 100% Spec Coverage)
+  - `BLI-CLI-AGENT-FEED-001` (Unify Swarm & Feed Families)
+  - `BLI-CLI-CONVERGENCE-001` (Convergence Management Parent)
+  - `BLI-CLI-DEPRECATE-PURGE-001` (Purge Obsolete Commands & Specs)
+  - `BLI-CLI-SCHEDULER-REORG-001` (Job & State Management Reorg)
+  - `BLI-CLI-SERVICES-MGT-001` (Services Management Daemon Lifecycle)
+  - `BLI-CLI-SPECS-LAYOUT-001` (Specs Directory Layout Restructuring)
+  - `BLI-CLI-SPECS-COVERAGE-001` (100% Command Spec Coverage Audit)
+  - `BLI-CLI-TAXONOMY-STANDARDS-001` (Taxonomy Standards Governance)
+  - `BLI-CLI-VENDOR-ISOLATION-001` (Vendor Adapter Pluggable Isolation)

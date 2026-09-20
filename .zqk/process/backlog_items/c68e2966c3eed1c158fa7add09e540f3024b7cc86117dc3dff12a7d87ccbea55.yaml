@@ -1,7 +1,11 @@
 acceptance_considerations: ""
+actual_effort: 0h
 artifacts:
     - scripts/demos/crypto_audit_demo.sh
     - scripts/generate-openvex.sh
+commit_hashes:
+    - 84481c78
+completed_at: "2026-09-20T01:11:55Z"
 created_at: "2026-09-19T04:23:27Z"
 created_by: ACC-1785920548450214012-68b850c0
 criteria_refs:
@@ -24,9 +28,10 @@ problem_statement: ""
 requirement_refs:
     - REQ-1789791806678354000-15eb2745
 schema_version: 2.0.0
-status: planned
+started_at: "2026-09-20T01:11:45Z"
+status: complete
 title: 'Implement: Cryptographic audit demo showcases verifiable multi-agent chain of custody and CISA OpenVEX attestation generation'
-updated_at: "2026-09-20T01:05:58Z"
+updated_at: "2026-09-20T01:11:55Z"
 updated_by: ACC-1785920548450214012-68b850c0
 version_context: default
 workstream_refs:
