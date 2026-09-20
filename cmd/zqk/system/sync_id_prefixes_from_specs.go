@@ -39,6 +39,7 @@ type syncPrefixDetail struct {
 // .zqk/cli/specs/system/sync_id_prefixes_from_specs_command.yaml
 func NewSyncIDPrefixesFromSpecsCmd() *cobra.Command {
 	cmd := bldr_cli_cmd_v1.NewSystemSyncIdPrefixesFromSpecsCommandBuilder()
+	cli.RequireSession(cmd, false)
 	cmd.Args = cobra.NoArgs
 	cmd.RunE = runSyncIDPrefixesFromSpecs
 	return cmd

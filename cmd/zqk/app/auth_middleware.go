@@ -56,7 +56,7 @@ func AuthMiddleware(cmd *cobra.Command, projectRoot string) error {
 		}
 	}
 
-	if isTest {
+	if isTest || zqkenv.DevCodegen().Get() == "1" || zqkenv.Codegen().Get() == "1" {
 		secCtx := pkgctx.NewTestSecurityContext()
 		cmd.SetContext(pkgctx.WithSecurityContext(ctx, secCtx))
 		return nil
