@@ -1,3 +1,4 @@
+completed_at: "2026-09-20T01:07:10Z"
 created_at: "2026-09-19T11:23:16Z"
 created_by: ACC-1785920548450214012-68b850c0
 description: Deliver cryptographic command signing (zqk tray sign), indirect execution barriers, and Governor pattern enforcement for CLI shortcuts.
@@ -11,9 +12,9 @@ persona_refs:
 priority_tier: P0
 schema_version: 2.0.0
 started_at: "2026-09-19T11:23:32Z"
-status: in_progress
+status: complete
 title: 'CLI Taxonomy Phase 2: Cryptographic Security Envelope & Tray Integrity'
-updated_at: "2026-09-19T11:23:32Z"
+updated_at: "2026-09-20T01:07:10Z"
 updated_by: ACC-1785920548450214012-68b850c0
 version_context: default
 workstream_refs:

@@ -50,26 +50,37 @@ run_demo() {
 }
 
 run_all() {
+  local interactive=1
+  if [[ "${1:-}" == "--batch" || "${1:-}" == "--non-interactive" || "${NON_INTERACTIVE:-0}" == "1" ]]; then
+    interactive=0
+  fi
+
   print_header
   echo -e "${BOLD}Executing full 4-part showcase sequence...${NC}\n"
   
   echo -e "${BOLD}▶ [1/4] DAY-0 GREENFIELD DEVELOPER EXPERIENCE${NC}"
   run_demo 1
   
-  echo -e "\n${BOLD}Press Enter to proceed to Demo 2 (or Ctrl+C to stop)...${NC}"
-  read -r _ || true
+  if [[ "$interactive" -eq 1 ]]; then
+    echo -e "\n${BOLD}Press Enter to proceed to Demo 2 (or Ctrl+C to stop)...${NC}"
+    read -r _ || true
+  fi
   
   echo -e "\n${BOLD}▶ [2/4] CRASH-CONSISTENCY & KILL -9 RESURRECTION${NC}"
   run_demo 2
   
-  echo -e "\n${BOLD}Press Enter to proceed to Demo 3 (or Ctrl+C to stop)...${NC}"
-  read -r _ || true
+  if [[ "$interactive" -eq 1 ]]; then
+    echo -e "\n${BOLD}Press Enter to proceed to Demo 3 (or Ctrl+C to stop)...${NC}"
+    read -r _ || true
+  fi
   
   echo -e "\n${BOLD}▶ [3/4] DYNAMIC MEMBRANE & PROMPT INJECTION INTERCEPT${NC}"
   run_demo 3
   
-  echo -e "\n${BOLD}Press Enter to proceed to Demo 4 (or Ctrl+C to stop)...${NC}"
-  read -r _ || true
+  if [[ "$interactive" -eq 1 ]]; then
+    echo -e "\n${BOLD}Press Enter to proceed to Demo 4 (or Ctrl+C to stop)...${NC}"
+    read -r _ || true
+  fi
   
   echo -e "\n${BOLD}▶ [4/4] CRYPTOGRAPHIC AUDIT & OPENVEX ATTESTATION${NC}"
   run_demo 4
@@ -79,8 +90,8 @@ run_all() {
   echo -e "${BOLD}═══════════════════════════════════════════════════════════════════════════${NC}"
 }
 
-if [[ "${1:-}" == "--all" ]]; then
-  run_all
+if [[ "${1:-}" == "--all" || "${1:-}" == "--batch" || "${1:-}" == "--non-interactive" ]]; then
+  run_all "$@"
   exit 0
 fi
 

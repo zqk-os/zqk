@@ -1,4 +1,13 @@
 acceptance_considerations: Tray runners detect indirect execution and block --override, --force, and destructive verbs unless signed; zqk tray sign produces valid ECDSA signature; schema validation supports signed_by and signature.
+actual_effort: 0.06h
+artifacts:
+    - pkg/tray/tray.go
+    - cmd/zqk/tray/tray.go
+    - cmd/zqk/tray/tray_security_test.go
+    - .zqk/cli/specs/tray/sign_command.yaml
+commit_hashes:
+    - a35509df
+completed_at: "2026-09-20T01:07:02Z"
 created_at: "2026-09-19T11:23:18Z"
 created_by: ACC-1785920548450214012-68b850c0
 criteria_refs:
@@ -10,6 +19,8 @@ kind: backlog_item
 milestone_refs:
     - MIL-CLI-TAXONOMY-001
 namespace_id: zqk:kernel
+persona_refs:
+    - PER-COMMUNITY-SOFTWARE-ENGINEER
 priority: high
 priority_plan_ref: PRI-CLI-TAXONOMY-OVERHAUL-002
 priority_tier: P0
@@ -17,9 +28,10 @@ problem_statement: Untrusted writers of .zqk/tray.yaml can inject destructive co
 requirement_refs:
     - REQ-CLI-TAXONOMY-HARMONIZATION-001
 schema_version: 2.0.0
-status: planned
+started_at: "2026-09-20T01:03:26Z"
+status: complete
 title: Implement Cryptographic Command Signing and Indirect Execution Guards for Tray Shortcuts
-updated_at: "2026-09-19T11:23:56Z"
+updated_at: "2026-09-20T01:07:02Z"
 updated_by: ACC-1785920548450214012-68b850c0
 version_context: default
 workstream_refs:
