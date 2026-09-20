@@ -2,11 +2,11 @@
 # ZQK Installer — supports public release download, go install, and build-from-source.
 #
 # Public OSS install (no token required — once repo is public):
-#   curl -sSL https://raw.githubusercontent.com/lanceman/zqk/main/scripts/install.sh | sh
+#   curl -sSL https://raw.githubusercontent.com/zqk-os/zqk/main/scripts/install.sh | sh
 #
 # Private / pre-release install (requires GITHUB_TOKEN):
 #   export GITHUB_TOKEN="ghp_..."
-#   curl -sSL https://raw.githubusercontent.com/lanceman/zqk/main/scripts/install.sh | sh -s -- v2.7.0
+#   curl -sSL https://raw.githubusercontent.com/zqk-os/zqk/main/scripts/install.sh | sh -s -- v2.7.0
 #
 # Build from source (Go 1.21+ required — no token, no binary release needed):
 #   ZQK_INSTALL_METHOD=source ./scripts/install.sh
