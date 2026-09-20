@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"os"
 	"strings"
+
+	"github.com/zqk-os/zqk/pkg/brand"
 )
 
 // Property is a generic wrapper around a configuration value pointer.
@@ -25,7 +27,7 @@ func envKey(name string) string {
 		result.WriteRune(r)
 	}
 
-	return "ZQK_" + strings.ToUpper(result.String())
+	return brand.EnvVar(strings.ToUpper(result.String()))
 }
 
 func envKeys(name string) []string {

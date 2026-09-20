@@ -37,9 +37,9 @@ func (cas *ContentAddressableStorage) WithSweepLock(fn func() error) error {
 	lockPath := filepath.Join(cas.kindDir, ".cas_sweep.lock")
 	fl, err := file.NewFileLock(lockPath)
 	if err == nil {
-		defer fl.Close()
+		defer func() { _ = fl.Close() }()
 		if err := fl.LockWithTimeout(10 * time.Second); err == nil {
-			defer fl.Unlock()
+			defer func() { _ = fl.Unlock() }()
 		}
 	}
 	return fn()

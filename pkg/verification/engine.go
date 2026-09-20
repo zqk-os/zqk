@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/zqk-os/zqk/pkg/execwrap"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/storage"
@@ -71,7 +72,7 @@ func (s *CommandExitCodeStrategy) Verify(ctx context.Context, secCtx *storage.Se
 	// Propagate task ID and target artifacts to command environment
 	env := os.Environ()
 	if taskID, ok := step["task_id"].(string); ok && taskID != "" {
-		env = append(env, "ZQK_TASK_ID="+taskID)
+		env = append(env, zqkenv.TaskID().Name()+"="+taskID)
 	}
 	if arts, ok := step[objects.FieldKeyArtifacts]; ok {
 		if artsList, ok2 := arts.([]any); ok2 {
@@ -82,7 +83,7 @@ func (s *CommandExitCodeStrategy) Verify(ctx context.Context, secCtx *storage.Se
 				}
 			}
 			if len(artStrs) > 0 {
-				env = append(env, "ZQK_TASK_ARTIFACTS="+strings.Join(artStrs, ","))
+				env = append(env, zqkenv.TaskArtifacts().Name()+"="+strings.Join(artStrs, ","))
 			}
 		}
 	}

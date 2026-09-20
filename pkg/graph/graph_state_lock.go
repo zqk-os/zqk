@@ -71,7 +71,7 @@ func (l *graphStateLocker) tryAcquire(ctx context.Context, resourceID string, lo
 	if err != nil {
 		return false, err
 	}
-	defer l.pool.ReturnConnection(conn)
+	defer func() { _ = l.pool.ReturnConnection(conn) }()
 
 	now := time.Now().UnixNano()
 	expiresAt := time.Now().Add(lockTTL).UnixNano()
@@ -109,7 +109,7 @@ func (l *graphStateLocker) release(ctx context.Context, resourceID string) error
 	if err != nil {
 		return err
 	}
-	defer l.pool.ReturnConnection(conn)
+	defer func() { _ = l.pool.ReturnConnection(conn) }()
 
 	query := provider.Query{
 		Language: provider.QueryLanguageCypher,

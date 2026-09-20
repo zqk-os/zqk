@@ -5,11 +5,7 @@ import (
 )
 
 func TestAgentScoreboardCommandBuilder(t *testing.T) {
-	b := NewAgentScoreboardCommandBuilder()
-	if b == nil {
-		t.Fatal("expected builder to not be nil")
-	}
-	cmd := b.Build(nil)
+	cmd := NewAgentScoreboardCommandBuilder()
 	if cmd == nil {
 		t.Fatal("expected command to not be nil")
 	}

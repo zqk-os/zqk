@@ -11,18 +11,13 @@ import (
 // NewObjectPplanCommandBuilder creates a new object_pplan command
 func NewObjectPplanCommandBuilder() *cobra.Command {
 	builder := clipkg.NewCommandBuilder("pplan")
-	builder.WithShort("Priority plan operations (current, next, prev, add, remove)")
-	help := clipkg.DynamicHelpBuilder("Priority plan operations (current, next, prev, add, remove)")
-	help.WithDescriptionLines("Priority plan operations for navigating and managing priority plans.")
+	builder.WithShort("Priority plan operations (current)")
+	help := clipkg.DynamicHelpBuilder("Priority plan operations (current)")
+	help.WithDescriptionLines("Priority plan operations for viewing active priority plans.")
 	help.WithDescriptionLines("")
 	help.WithDescriptionLines("This command group provides operations for working with priority plans:")
 	help.WithDescriptionLines("  - current: View backlog items for the current priority plan")
-	help.WithDescriptionLines("  - next: Navigate to the next priority plan")
-	help.WithDescriptionLines("  - prev: Navigate to the previous priority plan")
-	help.WithDescriptionLines("  - add: Associate backlog item(s) with a priority plan (child-owned)")
-	help.WithDescriptionLines("  - remove: Clear priority plan association from backlog item(s)")
 	builder.WithHelpBuilder(help)
-	builder.WithArgs(cobra.NoArgs)
 	builder.WithCommonFlagsDefault(cli.AddCommonFlags)
 	cmd := builder.Build()
 	return cmd

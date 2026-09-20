@@ -25,7 +25,7 @@ func TestBrandEnvParity_FunctionalAcceptance(t *testing.T) {
 	}
 
 	testVal := "/tmp/test-zqk-root"
-	t.Setenv("ZQK_PROJECT_ROOT", testVal)
+	t.Setenv(zqkenv.DefaultBrandKey("PROJECT_ROOT"), testVal)
 	if got := zqkenv.ProjectRoot().Get(); got != testVal {
 		t.Fatalf("expected zqkenv.ProjectRoot().Get() = %q, got %q", testVal, got)
 	}
@@ -44,7 +44,7 @@ func TestBrandEnvParity_FunctionalAcceptance(t *testing.T) {
 
 	// Fallback to ZQK_* when ZCOM_* is unset
 	t.Setenv("ZCOM_PROJECT_ROOT", "")
-	t.Setenv("ZQK_PROJECT_ROOT", testVal)
+	t.Setenv(zqkenv.DefaultBrandKey("PROJECT_ROOT"), testVal)
 	if got := zqkenv.ProjectRoot().Get(); got != testVal {
 		t.Fatalf("expected fallback to ZQK_PROJECT_ROOT (%q), got %q", testVal, got)
 	}
@@ -95,7 +95,7 @@ func TestBrandEnvParity_BoundaryAndErrorHandling(t *testing.T) {
 	// Boundary 2: Required() panics when unset across both branded and fallback keys
 	brand.SetExecutableName("zcom")
 	t.Setenv("ZCOM_TEST_KEY_PANIC", "")
-	t.Setenv("ZQK_TEST_KEY_PANIC", "")
+	t.Setenv(zqkenv.DefaultBrandKey("TEST_KEY_PANIC"), "")
 	ev := zqkenv.EnvVar{Key: "ZCOM_TEST_KEY_PANIC"}
 
 	func() {
@@ -120,15 +120,15 @@ func TestBrandEnvParity_BoundaryAndErrorHandling(t *testing.T) {
 	defer func() { _ = fileutil.RemoveAll(unseatedWorktree) }()
 
 	// Under ProjectRoot
-	t.Setenv("ZQK_PROJECT_ROOT", unseatedWorktree)
-	t.Setenv("ZQK_TEST_ROOT", "")
+	t.Setenv(zqkenv.DefaultBrandKey("PROJECT_ROOT"), unseatedWorktree)
+	t.Setenv(zqkenv.DefaultBrandKey("TEST_ROOT"), "")
 	if resolved := paths.ResolveProjectRoot(unseatedWorktree); resolved == unseatedWorktree {
 		t.Fatalf("ResolveProjectRoot should refuse unseated agent worktree under ProjectRoot; got %q", resolved)
 	}
 
 	// Under TestRoot
-	t.Setenv("ZQK_PROJECT_ROOT", "")
-	t.Setenv("ZQK_TEST_ROOT", unseatedWorktree)
+	t.Setenv(zqkenv.DefaultBrandKey("PROJECT_ROOT"), "")
+	t.Setenv(zqkenv.DefaultBrandKey("TEST_ROOT"), unseatedWorktree)
 	if resolved := paths.ResolveProjectRoot(unseatedWorktree); resolved == unseatedWorktree {
 		t.Fatalf("ResolveProjectRoot should refuse unseated agent worktree under TestRoot; got %q", resolved)
 	}
@@ -142,13 +142,13 @@ func TestBrandEnvParity_IntegrationAndConformance(t *testing.T) {
 
 	// Integration 1: SubprocessEnvironWithTestRoot strips sensitive session tokens across brands
 	brand.SetExecutableName("zcom")
-	t.Setenv("ZQK_SESSION", "secret-zqk-session")
+	t.Setenv(zqkenv.DefaultBrandKey("SESSION"), "secret-zqk-session")
 	t.Setenv("ZCOM_SESSION", "secret-zcom-session")
 	t.Setenv("ZCOM_TEST_SESSION", "secret-zcom-test-session")
 
 	subEnv := zqkenv.SubprocessEnvironWithTestRoot(t.TempDir())
 	for _, entry := range subEnv {
-		if strings.HasPrefix(entry, "ZQK_SESSION=") ||
+		if strings.HasPrefix(entry, zqkenv.DefaultBrandKey("SESSION")+"=") ||
 			strings.HasPrefix(entry, "ZCOM_SESSION=") ||
 			strings.HasPrefix(entry, "ZCOM_TEST_SESSION=") {
 			t.Fatalf("SubprocessEnvironWithTestRoot leaked sensitive session variable: %q", entry)
@@ -157,7 +157,7 @@ func TestBrandEnvParity_IntegrationAndConformance(t *testing.T) {
 
 	// Integration 2: MaskSensitiveValue and SanitizeEnvironment conformance
 	testEnvs := []string{
-		"ZQK_TOKEN=supersecret123",
+		zqkenv.DefaultBrandKey("TOKEN") + "=supersecret123",
 		"ZCOM_API_KEY=apikey987",
 		"APP_PUBLIC_VAR=public_value",
 		"AUTHORIZATION=Bearer tokenXYZ",
@@ -166,7 +166,7 @@ func TestBrandEnvParity_IntegrationAndConformance(t *testing.T) {
 	sanitized := zqkenv.SanitizeEnvironment(testEnvs)
 	for _, kv := range sanitized {
 		k, v, _ := strings.Cut(kv, "=")
-		if k == "ZQK_TOKEN" || k == "ZCOM_API_KEY" || k == "AUTHORIZATION" {
+		if k == zqkenv.DefaultBrandKey("TOKEN") || k == "ZCOM_API_KEY" || k == "AUTHORIZATION" {
 			if v != "******" {
 				t.Fatalf("expected %s to be masked with '******', got %q", k, v)
 			}
@@ -189,14 +189,14 @@ func TestBrandEnvParity_IntegrationAndConformance(t *testing.T) {
 
 	brand.SetExecutableName("zcom")
 	t.Setenv("ZCOM_PROJECT_ROOT", testDir)
-	t.Setenv("ZQK_PROJECT_ROOT", "")
+	t.Setenv(zqkenv.DefaultBrandKey("PROJECT_ROOT"), "")
 	if got := paths.ResolveProjectRoot(testDir); got != expectedAbs {
 		t.Fatalf("expected ResolveProjectRoot for zcom to be %q, got %q", expectedAbs, got)
 	}
 
 	brand.SetExecutableName("zqk")
 	t.Setenv("ZCOM_PROJECT_ROOT", "")
-	t.Setenv("ZQK_PROJECT_ROOT", testDir)
+	t.Setenv(zqkenv.DefaultBrandKey("PROJECT_ROOT"), testDir)
 	if got := paths.ResolveProjectRoot(testDir); got != expectedAbs {
 		t.Fatalf("expected ResolveProjectRoot for zqk to be %q, got %q", expectedAbs, got)
 	}

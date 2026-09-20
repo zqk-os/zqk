@@ -78,7 +78,7 @@ func HandleGetSignedUrl(ctx context.Context, args map[string]any) (any, error) {
 
 	secret := zqkenv.MCPExternalSecretKey().Get()
 	if secret == "" {
-		return nil, fmt.Errorf("ZQK_MCP_EXTERNAL_SECRET_KEY environment variable is not set")
+		return nil, fmt.Errorf("%s environment variable is not set", zqkenv.MCPExternalSecretKey().Name())
 	}
 	signer := signedurl.NewSigner(secret)
 

@@ -5,8 +5,10 @@ import (
 	"strings"
 
 	"github.com/spf13/cobra"
+	"github.com/zqk-os/zqk/pkg/brand"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
 	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
 // NewSystemCmd creates a new system command group
@@ -70,9 +72,17 @@ func NewSystemCmd() *cobra.Command {
 	systemCmd.AddCommand(NewUpdateSpecsCmd())
 	systemCmd.AddCommand(NewSpecOriginationCmd())
 	systemCmd.AddCommand(NewCliHooksCmd())
-	// Developer and Codegen commands (only available in zqk-admin)
+	// Developer and Codegen commands (available on the admin binary or when DEV_CODEGEN / CODEGEN is enabled)
 	isAdminBinary := false
-	if len(os.Args) > 0 && (strings.HasSuffix(os.Args[0], "zqk-admin") || strings.HasSuffix(os.Args[0], "zqk-admin.exe")) {
+	if len(os.Args) > 0 {
+		base := os.Args[0]
+		adminSuffix := brand.CanonicalExecutableToken + "-admin"
+		if strings.HasSuffix(base, adminSuffix) || strings.HasSuffix(base, adminSuffix+".exe") ||
+			strings.HasSuffix(base, brand.ExecutableName()+"-admin") || strings.HasSuffix(base, brand.ExecutableName()+"-admin.exe") {
+			isAdminBinary = true
+		}
+	}
+	if zqkenv.DevCodegen().Get() == "1" || zqkenv.Codegen().Get() == "1" {
 		isAdminBinary = true
 	}
 

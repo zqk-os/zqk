@@ -121,10 +121,10 @@ func TestSubmitJobPersistsEnvironmentVariables(t *testing.T) {
 	testRoot, cliCtx, cmd := setupTestEnvironment(t)
 	registerSubmitFlags(cmd)
 
-	if err := cmd.Flags().Set("env", "ZQK_LLM_PROVIDER=openai"); err != nil {
+	if err := cmd.Flags().Set("env", zqkenv.LLMProvider().Name()+"=openai"); err != nil {
 		t.Fatalf("Failed to set env provider: %v", err)
 	}
-	if err := cmd.Flags().Set("env", "ZQK_LLM_API_KEY=ollama"); err != nil {
+	if err := cmd.Flags().Set("env", zqkenv.LLMAPIKey().Name()+"=ollama"); err != nil {
 		t.Fatalf("Failed to set env api key: %v", err)
 	}
 
@@ -148,12 +148,12 @@ func TestSubmitJobPersistsEnvironmentVariables(t *testing.T) {
 	var found bool
 	for _, job := range result.Objects {
 		raw, ok := job[objects.FieldKeyEnvironmentVariables].(map[string]any)
-		if !ok || raw["ZQK_LLM_PROVIDER"] != "openai" {
+		if !ok || raw[zqkenv.LLMProvider().Name()] != "openai" {
 			continue
 		}
 		found = true
-		if raw["ZQK_LLM_API_KEY"] != "ollama" {
-			t.Errorf("ZQK_LLM_API_KEY = %v, want ollama", raw["ZQK_LLM_API_KEY"])
+		if raw[zqkenv.LLMAPIKey().Name()] != "ollama" {
+			t.Errorf("%s = %v, want ollama", zqkenv.LLMAPIKey().Name(), raw[zqkenv.LLMAPIKey().Name()])
 		}
 	}
 	if !found {

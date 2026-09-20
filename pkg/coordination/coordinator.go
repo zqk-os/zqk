@@ -416,7 +416,7 @@ func resolveLogLevel(eventCtx *EventContext, message string, fields []logging.Fi
 
 	// 3. Dynamic Environment overrides to easily switch log levels without code changes
 	// Set ZQK_INFO_OPERATIONS=queue_shutdown,system_check or ZQK_INFO_OPERATIONS=* to force info
-	if infoOps := zqkenv.Get("ZQK_INFO_OPERATIONS").OrDefault(""); infoOps != "" {
+	if infoOps := zqkenv.InfoOperations().OrDefault(""); infoOps != "" {
 		for _, op := range strings.Split(infoOps, ",") {
 			op = strings.TrimSpace(op)
 			if op == "*" || strings.EqualFold(op, eventCtx.OperationType) {
@@ -425,7 +425,7 @@ func resolveLogLevel(eventCtx *EventContext, message string, fields []logging.Fi
 		}
 	}
 	// Set ZQK_DEBUG_OPERATIONS=queue_shutdown,system_check or ZQK_DEBUG_OPERATIONS=* to force debug
-	if debugOps := zqkenv.Get("ZQK_DEBUG_OPERATIONS").OrDefault(""); debugOps != "" {
+	if debugOps := zqkenv.DebugOperations().OrDefault(""); debugOps != "" {
 		for _, op := range strings.Split(debugOps, ",") {
 			op = strings.TrimSpace(op)
 			if op == "*" || strings.EqualFold(op, eventCtx.OperationType) {

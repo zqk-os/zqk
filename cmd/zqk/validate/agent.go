@@ -166,8 +166,6 @@ func NewValidateAgentCmd() *cobra.Command {
 
 		return nil
 	})
-	cmd.Flags().String("stamp", "", "Cryptographic stamp to verify")
-	cmd.Flags().Bool("local-fallback", false, "Use local offline fallback to verify stamp")
 	return cmd
 }
 

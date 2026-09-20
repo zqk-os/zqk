@@ -18,6 +18,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/storage"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
 var (
@@ -187,9 +188,9 @@ func (h *MeshLeaseSupervisionHandler) ensureSubprocess(ctx context.Context, leas
 
 	// Override specific environment variables to guarantee isolation
 	envOverrides := map[string]string{
-		"ZQK_PROJECT_ROOT": consumerProjectRoot,
+		zqkenv.ProjectRoot().Name(): consumerProjectRoot,
 		// Ensure we don't leak provider-specific configurations
-		"ZQK_PROFILE": "system",
+		zqkenv.Profile().Name(): "system",
 	}
 
 	var newEnv []string

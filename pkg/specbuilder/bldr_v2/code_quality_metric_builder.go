@@ -20,7 +20,7 @@ func NewCodeQualityMetricBuilder() *CodeQualityMetricBuilder {
 	// Configure the spec
 	builder.
 		SetExtends("base_metric").
-		SetDescription("Code quality metrics track policy enforcement and compliance over time. These metrics capture adherence to code quality policies (POL-CODE-009), measure technical debt trends, and provide observability into code quality maintenance effectiveness.\\nLifecycle: code_quality_metric_lifecycle.yaml.\\n").
+		SetDescription("Code quality metrics track policy enforcement and compliance over time. These metrics capture adherence to code quality policies (POL-####), measure technical debt trends, and provide observability into code quality maintenance effectiveness.\\nLifecycle: code_quality_metric_lifecycle.yaml.\\n").
 		SetVisibility("internal").
 		SetSchemaVersion(objects.DefaultSchemaVersion).
 		AddTrait("listable").
@@ -209,7 +209,7 @@ func (b *CodeQualityMetricBuilder) addCodeQualityMetricFields() {
 			Dependencies("policy registry").
 			Lifecycle("immutable").
 			Observability("yes").
-			Purpose("Reference to policy being measured (POL-#### format, e.g., \\\\\\\"POL-CODE-009\\\\\\\")").
+			Purpose("Reference to policy being measured (POL-#### format, e.g., \\\\\\\"POL-EXAMPLE-001\\\\\\\")").
 			Security("non-sensitive").
 			SystemUsage([]any{
 				"policy compliance",

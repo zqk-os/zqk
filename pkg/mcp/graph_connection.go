@@ -64,7 +64,7 @@ func isGraphBackendEnabled() bool {
 	// Prefer brand-derived env vars, but accept legacy and direct prefixes for compatibility.
 	keys := []string{
 		brand.EnvVar(graphEnvSuffixEnabled),
-		"ZQK_GRAPH_ENABLED",
+		brand.DefaultEnvPrefix + "_" + graphEnvSuffixEnabled,
 		"GRAPH_ENABLED",
 		brand.EnvVar("MOCK_GRAPH"),
 	}
@@ -84,32 +84,32 @@ func getGraphConfig() provider.ConnectionConfig {
 	config := provider.ConnectionConfig{
 		Host: getEnvOrDefaultAny([]string{
 			brand.EnvVar(graphEnvSuffixHost),
-			"ZQK_GRAPH_HOST",
+			brand.DefaultEnvPrefix + "_" + graphEnvSuffixHost,
 			"GRAPH_HOST",
 		}, "127.0.0.1"),
 		Port: getEnvIntOrDefaultAny([]string{
 			brand.EnvVar(graphEnvSuffixPort),
-			"ZQK_GRAPH_PORT",
+			brand.DefaultEnvPrefix + "_" + graphEnvSuffixPort,
 			"GRAPH_PORT",
 		}, 7687),
 		Username: getEnvOrDefaultAny([]string{
 			brand.EnvVar(graphEnvSuffixUsername),
-			"ZQK_GRAPH_USERNAME",
+			brand.DefaultEnvPrefix + "_" + graphEnvSuffixUsername,
 			"GRAPH_USERNAME",
 		}, ""),
 		Password: getEnvOrDefaultAny([]string{
 			brand.EnvVar(graphEnvSuffixPassword),
-			"ZQK_GRAPH_PASSWORD",
+			brand.DefaultEnvPrefix + "_" + graphEnvSuffixPassword,
 			"GRAPH_PASSWORD",
 		}, ""),
 		Database: getEnvOrDefaultAny([]string{
 			brand.EnvVar(graphEnvSuffixDatabase),
-			"ZQK_GRAPH_DATABASE",
+			brand.DefaultEnvPrefix + "_" + graphEnvSuffixDatabase,
 			"GRAPH_DATABASE",
 		}, ""),
 		MaxConns: getEnvIntOrDefaultAny([]string{
 			brand.EnvVar(graphEnvSuffixPoolSize),
-			"ZQK_GRAPH_POOL_SIZE",
+			brand.DefaultEnvPrefix + "_" + graphEnvSuffixPoolSize,
 			"GRAPH_POOL_SIZE",
 		}, 10),
 	}

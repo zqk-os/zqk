@@ -61,7 +61,6 @@ import (
 //   - BLI-WORLD completes -> shockwave CAS-decrements PRI-HW-001 remaining_open_count from 1 -> 0.
 //   - Terminal Shockwave 4: PRI-HW-001 auto-transitions to complete!
 func TestShockwaveHarness_EndToEnd_HelloWorld(t *testing.T) {
-	t.Setenv(zqkenv.ZQKAllowForegroundGoTest().Key, "1")
 	t.Setenv(zqkenv.TestBypassGitevidence().Key, "1")
 
 	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{

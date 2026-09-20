@@ -11,12 +11,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/testdiscovery"
-	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
-
-func init() {
-	_ = os.Setenv(zqkenv.ZQKAllowForegroundGoTest().Key, "1")
-}
 
 // CRIT-TEST-DISC-FUNC-POLYGLOT-001 & CRIT-TEST-DISCOVERY-ENGINE-001:
 // Polyglot static test file and function discovery across Go, Python, and TypeScript.

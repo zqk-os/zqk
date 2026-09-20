@@ -47,7 +47,7 @@ func runRepoBashScript(cmd *cobra.Command, scriptRel string, scriptArgs []string
 	c := execwrap.CommandContext(runCtx, "bash", bashArgv...) //nolint:gosec // argv from fixed script path + optional CVS id only
 	zqkenv.WireExecForIsolatedProject(c, projectRoot)
 	c.Env = os.Environ()
-	c.Env = append(c.Env, "ZQK_PROJECT_ROOT="+projectRoot, "ZQK_BIN="+self)
+	c.Env = append(c.Env, zqkenv.ProjectRoot().Name()+"="+projectRoot, zqkenv.Bin().Name()+"="+self)
 
 	out := cli.CommandOutputWriter(cmd, nil)
 	c.Stdout = out

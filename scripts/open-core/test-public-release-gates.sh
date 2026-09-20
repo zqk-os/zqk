@@ -112,8 +112,8 @@ fi
 
 (
 	cd "$ROOT"
-	unset ZQK_PROJECT_ROOT
-	export ZQK_ALLOW_FOREGROUND_GO_TEST=1
+	. "$ROOT/scripts/open-core/brand-env-prefix.sh"
+	unset "${BRAND_ENV_PREFIX}_PROJECT_ROOT" || true
 
 	# 1. Check hardcoded path and permission literals across repository
 	if [ -x "$ROOT/scripts/check-hardcoded-paths-and-perms-repo.sh" ]; then
@@ -123,7 +123,7 @@ fi
 	# 2. Build entire project (all packages across cmd and pkg)
 	CGO_ENABLED=0 go build -buildvcs=false ./...
 	CGO_ENABLED=0 go build -buildvcs=false -o "$TMP_BIN" ./cmd/zqk
-	export ZQK_SHARED_TEST_BIN="$TMP_BIN"
+	export "${BRAND_ENV_PREFIX}_SHARED_TEST_BIN=$TMP_BIN"
 	"$TMP_BIN" --help >/dev/null
 	"$TMP_BIN" system --help >/dev/null
 	"$TMP_BIN" test dashboard --help >/dev/null

@@ -144,19 +144,20 @@ func RunStaleCASCleanupForResults(projectRoot string, results []CheckResult, log
 	for _, k := range kinds {
 		cleanedKinds[k] = true
 	}
-	for i := range results {
-		if cleanedKinds[results[i].ObjectKind] {
+	for i := 0; i < len(results); i++ {
+		r := &results[i]
+		if cleanedKinds[r.ObjectKind] {
 			var remainingIssues []Issue
-			for _, iss := range results[i].Issues {
+			for _, iss := range r.Issues {
 				if strings.Contains(iss.Message, "Duplicate CAS blob") ||
 					strings.Contains(iss.Message, "dual CAS blobs") ||
 					strings.Contains(iss.Message, "Stale CAS version") {
-					results[i].AutoFixed = append(results[i].AutoFixed, "reconciled duplicate CAS blob and healed index")
+					r.AutoFixed = append(r.AutoFixed, "reconciled duplicate CAS blob and healed index")
 				} else {
 					remainingIssues = append(remainingIssues, iss)
 				}
 			}
-			results[i].Issues = remainingIssues
+			r.Issues = remainingIssues
 		}
 	}
 

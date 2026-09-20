@@ -64,11 +64,11 @@ func WithSeatAPIKeyEnv(parent []string, seatKey, projectRootEnv string) []string
 		if strings.HasPrefix(e, keyName.Name()+"=") {
 			continue
 		}
-		if projectRootEnv != "" && strings.HasPrefix(e, "ZQK_PROJECT_ROOT=") {
+		if projectRootEnv != "" && strings.HasPrefix(e, zqkenv.ProjectRoot().Name()+"=") {
 			continue
 		}
 		// Bound environment to prevent dumping parent secrets into untrusted agent seat
-		if strings.HasPrefix(e, zqkenv.OSPath().Name()+"=") || strings.HasPrefix(e, zqkenv.OSHome().Name()+"=") || strings.HasPrefix(e, "USER=") || strings.HasPrefix(e, "ZQK_") {
+		if strings.HasPrefix(e, zqkenv.OSPath().Name()+"=") || strings.HasPrefix(e, zqkenv.OSHome().Name()+"=") || strings.HasPrefix(e, "USER=") || zqkenv.IsProductPrefixed(e) {
 			out = append(out, e)
 		}
 	}
@@ -76,7 +76,7 @@ func WithSeatAPIKeyEnv(parent []string, seatKey, projectRootEnv string) []string
 		out = append(out, keyName.Name()+"="+seatKey)
 	}
 	if projectRootEnv != "" {
-		out = append(out, "ZQK_PROJECT_ROOT="+projectRootEnv)
+		out = append(out, zqkenv.ProjectRoot().Name()+"="+projectRootEnv)
 	}
 	return out
 }

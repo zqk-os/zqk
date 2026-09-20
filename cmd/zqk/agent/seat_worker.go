@@ -899,7 +899,7 @@ func withLocalLLMEnv(environ []string) []string {
 		timeout = "900"
 	}
 	out = withEnvValue(out, "LLM_TIMEOUT", timeout)
-	out = withEnvValue(out, "ZQK_LLM_TIMEOUT", timeout)
+	out = withEnvValue(out, zqkenv.LLMTimeout().Name(), timeout)
 	if apiKey := localLLMAPIKeyValue(); apiKey != "" {
 		out = withEnvValue(out, zqkenv.LLMAPIKey().Name(), apiKey)
 	} else {

@@ -69,13 +69,13 @@ func (g *GraphObjectStorage) ImportSnapshot(ctx context.Context, secCtx *pkgctx.
 		_, err = g.BulkCreate(ctx, secCtx, expanded)
 		return err
 	}
-	defer pool.Close()
+	defer func() { _ = pool.Close() }()
 
 	conn, err := pool.GetConnection(ctx)
 	if err != nil {
 		return errfmt.Newf("failed to get connection for bulk import").Wrap(err)
 	}
-	defer pool.ReturnConnection(conn)
+	defer func() { _ = pool.ReturnConnection(conn) }()
 
 	// Since we are hydrating, we can just run a big transaction or individual inserts
 	for _, obj := range expanded {

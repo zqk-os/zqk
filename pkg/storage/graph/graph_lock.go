@@ -31,7 +31,7 @@ func (gl *GraphLock) TryLock(ctx context.Context) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	defer gl.pool.ReturnConnection(conn)
+	defer func() { _ = gl.pool.ReturnConnection(conn) }()
 
 	query := provider.Query{
 		Language: provider.QueryLanguageCypher,
@@ -78,7 +78,7 @@ func (gl *GraphLock) Unlock(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-	defer gl.pool.ReturnConnection(conn)
+	defer func() { _ = gl.pool.ReturnConnection(conn) }()
 
 	query := provider.Query{
 		Language: provider.QueryLanguageCypher,

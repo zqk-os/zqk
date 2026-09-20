@@ -340,12 +340,12 @@ func (h *CapOrchestratorHandler) prepareCmd(cmd *exec.Cmd) *exec.Cmd {
 	// graph policy once overnight CAP gate is green without per-child overrides.
 	graphKey := zqkenv.RawGraphEnabled()
 	adminGraphKey := zqkenv.AdminGraphEnabled()
-	const apiKey = "ZQK_API_KEY" //nolint:gosec
+	apiKey := zqkenv.APIKey().Name()
 	env := make([]string, 0, len(os.Environ())+3)
 	for _, e := range os.Environ() {
 		if strings.HasPrefix(e, graphKey.Name()+"=") || strings.HasPrefix(e, adminGraphKey.Name()+"=") ||
 			strings.HasPrefix(e, apiKey+"=") ||
-			strings.HasPrefix(e, "ZQK_GRAPH_ENABLED=") || strings.HasPrefix(e, "ZQK_ADMIN_GRAPH_ENABLED=") {
+			zqkenv.HasDefaultAssignment(e, "GRAPH_ENABLED") || zqkenv.HasDefaultAssignment(e, "ADMIN_GRAPH_ENABLED") {
 			continue
 		}
 		env = append(env, e)

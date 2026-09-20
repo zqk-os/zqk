@@ -11,7 +11,6 @@ import (
 	"github.com/zqk-os/zqk/pkg/execwrap"
 	"github.com/zqk-os/zqk/pkg/gotestparse"
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
-	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
 // RaceGateConfig configures an isolated race gate execution.
@@ -77,7 +76,7 @@ func RunRaceGate(ctx context.Context, cfg RaceGateConfig) (*RaceGateResult, erro
 		Setpgid: true,
 	}
 
-	cmd.Env = append(os.Environ(), zqkenv.ZQKAllowForegroundGoTest().Key+"=1")
+	cmd.Env = os.Environ()
 	if os.Getenv("DEVELOPER_DIR") == "" {
 		if _, err := os.Stat("/Library/Developer/CommandLineTools"); err == nil {
 			cmd.Env = append(cmd.Env, "DEVELOPER_DIR=/Library/Developer/CommandLineTools")

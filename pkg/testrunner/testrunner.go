@@ -212,7 +212,7 @@ func ExecuteSubprocess(ctx context.Context, inv CriterionInvocation) CriterionRu
 	}
 
 	// Pass parent env plus test-friendly flags and isolated ephemeral TMPDIR
-	cmd.Env = append(os.Environ(), zqkenv.ZQKAllowForegroundGoTest().Key+"=1")
+	cmd.Env = os.Environ()
 	if os.Getenv("DEVELOPER_DIR") == "" {
 		if _, err := os.Stat("/Library/Developer/CommandLineTools"); err == nil {
 			cmd.Env = append(cmd.Env, "DEVELOPER_DIR=/Library/Developer/CommandLineTools")

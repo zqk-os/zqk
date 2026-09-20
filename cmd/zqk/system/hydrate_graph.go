@@ -117,7 +117,7 @@ func runHydrateGraph(cmd *cobra.Command, args []string) error {
 				})
 				return
 			}
-			defer pool.ReturnConnection(conn)
+			defer func() { _ = pool.ReturnConnection(conn) }()
 
 			toLabel := func(k string) string {
 				parts := strings.Split(k, "_")

@@ -16,6 +16,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/storage/filecas"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
 // NewInitCmd creates a new init command
@@ -55,7 +56,7 @@ func NewInitCmd() *cobra.Command {
 		AddExample("Greenfield: Initialize in current directory", "%s system init").
 		AddExample("Declarative Seed: Initialize with answer file", "%s system init --answer-file seed.yaml").
 		AddExample("Legacy: Initialize existing project", "%s system init --legacy").
-		AddExample("Snapshot: Initialize from snapshot (test scenario)", "ZQK_TEST_ROOT=test-scenarios/my-scenario %s system init --from-snapshot snapshot.csnap --wipe").
+		AddExample("Snapshot: Initialize from snapshot (test scenario)", zqkenv.TestRoot().Name()+"=test-scenarios/my-scenario %s system init --from-snapshot snapshot.csnap --wipe").
 		AddExample("Snapshot: Merge with existing data", "%s system init --from-snapshot snapshot.csnap --merge").
 		AddExample("Legacy + discover: Initialize and report existing objects", "%s system init --legacy --discover").
 		AddExample("Greenfield with maintenance jobs", "%s system init --with-maintenance-jobs").

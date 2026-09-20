@@ -17,6 +17,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
 // ConvergenceEngine loop interval
@@ -141,7 +142,7 @@ func (s *Scheduler) evaluateActiveConvergenceSessions(ctx context.Context) {
 		cmd := s.executor.CommandContext(ctx, "bash", "scripts/cvs_convergence_orchestrate.sh", id, "--no-fail-on-gates")
 		cmd.SetDir(s.projectRoot)
 		// Inherit env, set ZQK_PROJECT_ROOT
-		env := append(os.Environ(), "ZQK_PROJECT_ROOT="+s.projectRoot)
+		env := append(os.Environ(), zqkenv.ProjectRoot().Name()+"="+s.projectRoot)
 		cmd.SetEnv(env)
 
 		var buf bytes.Buffer

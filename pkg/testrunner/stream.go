@@ -84,7 +84,6 @@ func StreamTests(ctx context.Context, opts StreamOptions, out io.Writer) (Stream
 	cmd := exec.CommandContext(ctx, "go", args...)
 	cmd.Dir = opts.ProjectRoot
 	cmd.Env = append(os.Environ(),
-		"ZQK_ALLOW_FOREGROUND_GO_TEST=1",
 		"CGO_ENABLED=0",
 		"DEVELOPER_DIR=/Library/Developer/CommandLineTools",
 	)

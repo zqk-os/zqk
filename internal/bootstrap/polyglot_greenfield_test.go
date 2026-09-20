@@ -130,7 +130,7 @@ func TestBootstrapPortableScript(t *testing.T) {
 
 	cmd := exec.CommandContext(ctx, "/bin/sh", scriptPath, moduleRoot)
 	cmd.Dir = moduleRoot
-	cmd.Env = append(os.Environ(), "ZQK_ALLOW_FOREGROUND_GO_TEST=1")
+	cmd.Env = append(os.Environ(), "CGO_ENABLED=0")
 	out, err := cmd.CombinedOutput()
 	if err != nil {
 		t.Fatalf("verify-bootstrap-portable.sh failed: %v\nOutput:\n%s", err, string(out))

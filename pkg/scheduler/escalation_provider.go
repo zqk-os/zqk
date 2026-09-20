@@ -244,8 +244,8 @@ func ResolveSlackWebhookURL(projectRoot string) string {
 		if data, err := fileutil.ReadFile(identityPath); err == nil {
 			for _, line := range strings.Split(string(data), "\n") {
 				line = strings.TrimSpace(line)
-				if strings.HasPrefix(line, "ZQK_AGENT_WEBHOOK_SLACK_ALL_AGENT_FARM=") {
-					val := strings.TrimSpace(strings.TrimPrefix(line, "ZQK_AGENT_WEBHOOK_SLACK_ALL_AGENT_FARM="))
+				if strings.HasPrefix(line, zqkenv.AgentWebhookSlackAllAgentFarm().Name()+"=") {
+					val := strings.TrimSpace(strings.TrimPrefix(line, zqkenv.AgentWebhookSlackAllAgentFarm().Name()+"="))
 					if val != "" {
 						return strings.Trim(val, "\"'")
 					}
@@ -264,8 +264,8 @@ func ResolveSlackWebhookURL(projectRoot string) string {
 		if data, err := fileutil.ReadFile(envPath); err == nil {
 			for _, line := range strings.Split(string(data), "\n") {
 				line = strings.TrimSpace(line)
-				if strings.HasPrefix(line, "ZQK_AGENT_WEBHOOK_SLACK_ALL_AGENT_FARM=") {
-					val := strings.TrimSpace(strings.TrimPrefix(line, "ZQK_AGENT_WEBHOOK_SLACK_ALL_AGENT_FARM="))
+				if strings.HasPrefix(line, zqkenv.AgentWebhookSlackAllAgentFarm().Name()+"=") {
+					val := strings.TrimSpace(strings.TrimPrefix(line, zqkenv.AgentWebhookSlackAllAgentFarm().Name()+"="))
 					if val != "" {
 						return strings.Trim(val, "\"'")
 					}

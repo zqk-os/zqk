@@ -11,12 +11,7 @@ import (
 	"github.com/zqk-os/zqk/cmd/zqk/test"
 	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/testkit"
-	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
-
-func init() {
-	_ = os.Setenv(zqkenv.ZQKAllowForegroundGoTest().Key, "1")
-}
 
 func TestDiscoverCmd_Basic(t *testing.T) {
 	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{Kind: "cmd.test.discover"})

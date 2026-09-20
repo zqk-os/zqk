@@ -13,7 +13,7 @@ import (
 // (argv basename "zqk" → brand env prefix ZQK). Child processes must use this key, not [TestRoot]
 // of the parent process: under "go test", argv is e.g. object.test so [TestRoot] would be
 // OBJECT_TEST_TEST_ROOT while the spawned ./zqk binary only honors ZQK_TEST_ROOT.
-var subprocessChildTestRootEnvKey = brand.DefaultEnvPrefix + "_TEST_ROOT"
+var subprocessChildTestRootEnvKey = DefaultBrandKey("TEST_ROOT")
 
 // subprocessChildZQKProjectRootEnvKey and subprocessChildZQKTestDataDirEnvKey are the env keys
 // read by the default binary (ZQK prefix). The parent "go test" process uses a different
@@ -21,8 +21,8 @@ var subprocessChildTestRootEnvKey = brand.DefaultEnvPrefix + "_TEST_ROOT"
 // shell or IDE ZQK_PROJECT_ROOT / ZQK_TEST_DATA_DIR would not be removed by the tr/pr/td strip
 // above and would make the child resolve the real workspace instead of the isolated test root.
 var (
-	subprocessChildZQKProjectRootEnvKey = brand.DefaultEnvPrefix + "_PROJECT_ROOT"
-	subprocessChildZQKTestDataDirEnvKey = brand.DefaultEnvPrefix + "_TEST_DATA_DIR"
+	subprocessChildZQKProjectRootEnvKey = DefaultBrandKey("PROJECT_ROOT")
+	subprocessChildZQKTestDataDirEnvKey = DefaultBrandKey("TEST_DATA_DIR")
 )
 
 // SubprocessEnvironWithTestRoot returns a copy of [os.Environ] for spawning a zqk CLI subprocess
@@ -52,29 +52,29 @@ func SubprocessEnvironWithTestRoot(testRoot string) []string {
 			continue
 		}
 		pfx := brand.EnvPrefix()
-		if strings.HasPrefix(e, "ZQK_SESSION=") || strings.HasPrefix(e, "ZQK_TEST_SESSION=") ||
+		if HasDefaultAssignment(e, "SESSION") || HasDefaultAssignment(e, "TEST_SESSION") ||
 			(pfx != brand.DefaultEnvPrefix && (strings.HasPrefix(e, pfx+"_SESSION=") || strings.HasPrefix(e, pfx+"_TEST_SESSION="))) {
 			continue
 		}
 		out = append(out, e)
 	}
-	out = append(out, "ZQK_TEST_ROOT="+testRoot)
-	out = append(out, "ZQK_ADMIN_TEST_ROOT="+testRoot)
-	out = append(out, "ZQK_TEST_ALLOW_CAS_FALLTHROUGH=1")
-	out = append(out, "ZQK_ADMIN_TEST_ALLOW_CAS_FALLTHROUGH=1")
-	out = append(out, "ZQK_TEST_BYPASS_AUTH=1")
+	out = append(out, DefaultAssignment("TEST_ROOT", testRoot))
+	out = append(out, AdminAssignment("TEST_ROOT", testRoot))
+	out = append(out, DefaultAssignment("TEST_ALLOW_CAS_FALLTHROUGH", "1"))
+	out = append(out, AdminAssignment("TEST_ALLOW_CAS_FALLTHROUGH", "1"))
+	out = append(out, DefaultAssignment("TEST_BYPASS_AUTH", "1"))
 	unreachableSocket := UnreachableTestSocketPath()
-	out = append(out, "ZQK_PRIVILEGED_WRITER_SOCKET="+unreachableSocket)
-	out = append(out, "ZQK_ADMIN_PRIVILEGED_WRITER_SOCKET="+unreachableSocket)
-	out = append(out, "ZQK_MOCK_GRAPH=false")
-	out = append(out, "ZQK_ADMIN_MOCK_GRAPH=false")
+	out = append(out, DefaultAssignment("PRIVILEGED_WRITER_SOCKET", unreachableSocket))
+	out = append(out, AdminAssignment("PRIVILEGED_WRITER_SOCKET", unreachableSocket))
+	out = append(out, DefaultAssignment("MOCK_GRAPH", "false"))
+	out = append(out, AdminAssignment("MOCK_GRAPH", "false"))
 	out = append(out, "MOCK_GRAPH=false")
-	out = append(out, "ZQK_GRAPH_ENABLED=false")
-	out = append(out, "ZQK_ADMIN_GRAPH_ENABLED=false")
+	out = append(out, DefaultAssignment("GRAPH_ENABLED", "false"))
+	out = append(out, AdminAssignment("GRAPH_ENABLED", "false"))
 	// AllowCIOverrides removed (PRI-ENV-SIGNED-LOGIN-001). Do not reintroduce CI override inject.
 	// Isolated CLI tests that need lifecycle motion must use promote/demote, not --override.
 
-	if tr != "ZQK_TEST_ROOT=" && tr != "ZQK_ADMIN_TEST_ROOT=" {
+	if tr != DefaultBrandKey("TEST_ROOT")+"=" && tr != AdminBrandKey("TEST_ROOT")+"=" {
 		out = append(out, TestRoot().Name()+"="+testRoot)
 	}
 	return out

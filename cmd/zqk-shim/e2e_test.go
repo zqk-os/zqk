@@ -73,21 +73,20 @@ func TestZQKShim_E2E(t *testing.T) {
 			if err := fileutil.Symlink(shimBinary, shimLink); err != nil && !fileutil.IsExist(err) {
 				t.Fatalf("Failed to create symlink: %v", err)
 			}
-			// We need to bypass POL-CODE-009 validation or ensure it doesn't run.
-			// Set up a fake project root so logging writes to .zqk/logs instead of failing
+			// Bypass the traceability gate in this isolated temp project.
 			_ = fileutil.EnsureDir(filepath.Join(tempDir, paths.ProjectDataDir, paths.LogsDir))
 			cmd := execwrap.Command(shimLink, tt.args...)
 			cmd.Dir = tempDir
 			cmd.Env = []string{
 				zqkenv.OSPath().Name() + "=" + shimBinDir + string(fileutil.PathListSeparator) + newPath,
 				zqkenv.OSHome().Name() + "=" + tempDir,
-				"ZQK_SHIM_BYPASS_POLCODE009=1",
-				"GIT_ZQK_SHIM_BYPASS_POLCODE009=1",
-				"GH_ZQK_SHIM_BYPASS_POLCODE009=1",
-				"ZQK_BREAK_GLASS_REASON=testing shim e2e execution under isolated test harness",
-				"ZQK_PROJECT_ROOT=" + tempDir,
-				"ZQK_LOG_LEVEL=debug",
-				"ZQK_PROFILE=system",
+				zqkenv.ZqkShimBypassTraceability().Name() + "=1",
+				"GIT_" + zqkenv.DefaultBrandKey("SHIM_BYPASS_TRACEABILITY") + "=1",
+				"GH_" + zqkenv.DefaultBrandKey("SHIM_BYPASS_TRACEABILITY") + "=1",
+				zqkenv.BreakGlassReason().Name() + "=testing shim e2e execution under isolated test harness",
+				zqkenv.ProjectRoot().Name() + "=" + tempDir,
+				zqkenv.LogLevel().Name() + "=debug",
+				zqkenv.Profile().Name() + "=system",
 			}
 
 			var stdout, stderr bytes.Buffer
@@ -134,10 +133,10 @@ func TestZQKShim_E2E(t *testing.T) {
 		cmd.Env = []string{
 			zqkenv.OSPath().Name() + "=" + shimBinDir + string(fileutil.PathListSeparator) + newPath,
 			zqkenv.OSHome().Name() + "=" + tempDir,
-			"ZQK_SHIM_BYPASS_POLCODE009=1",
-			"ZQK_PROJECT_ROOT=" + tempDir,
-			"ZQK_LOG_LEVEL=debug",
-			"ZQK_PROFILE=system",
+			zqkenv.ZqkShimBypassTraceability().Name() + "=1",
+			zqkenv.ProjectRoot().Name() + "=" + tempDir,
+			zqkenv.LogLevel().Name() + "=debug",
+			zqkenv.Profile().Name() + "=system",
 		}
 
 		var stdout, stderr bytes.Buffer

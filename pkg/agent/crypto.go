@@ -6,13 +6,13 @@
 //     It is chosen for its performance, small signature size, and strong security properties.
 //  2. Secret Management: Private keys MUST NOT be hardcoded or stored in plaintext
 //     configuration files. They must be loaded dynamically via secure environment
-//     variables (e.g., ZQK_AGENT_PUB_KEY), a dedicated secrets manager, or an OIDC endpoint.
+//     variables (e.g., AGENT_PUB_KEY, brand-prefixed), a dedicated secrets manager, or an OIDC endpoint.
 //  3. Key Rotation: Keys should be rotated on a regular schedule (e.g., every 90 days)
 //     or immediately upon suspected compromise. During rotation, systems should temporarily
 //     trust both old and new public keys until all stamps signed by the old key have
 //     expired.
 //  4. Fail-Closed Security: There is NO hardcoded public key fallback.
-//     Environments MUST supply a valid public key via ZQK_AGENT_PUB_KEY or
+//     Environments MUST supply a valid public key via AGENT_PUB_KEY (brand-prefixed) or
 //     verification fails closed.
 package agent
 
@@ -56,7 +56,7 @@ func VerifyStamp(stamp string, publicKey ed25519.PublicKey) (jwt.MapClaims, erro
 func GetAuthorizedPublicKey() (ed25519.PublicKey, error) {
 	keyB64 := zqkenv.AgentPubKey().Get()
 	if keyB64 == "" {
-		return nil, errors.New("ZQK_AGENT_PUB_KEY environment variable is not set; cryptographic verification must fail closed")
+		return nil, fmt.Errorf("%s environment variable is not set; cryptographic verification must fail closed", zqkenv.AgentPubKey().Name())
 	}
 	keyBytes, err := base64.StdEncoding.DecodeString(keyB64)
 	if err != nil {
