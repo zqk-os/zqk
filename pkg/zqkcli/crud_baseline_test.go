@@ -517,6 +517,7 @@ func minimalRequirement(id string) map[string]any {
 	now := zqktime.NowLayoutUTC(zqktime.LayoutObjectDateTimeZ)
 	return map[string]any{
 		objects.FieldKeyID: id, objects.FieldKeyKind: "requirement", objects.FieldKeyTitle: "CRUD baseline requirement",
+		objects.FieldKeyPriority: "p2",
 		objects.FieldKeyStatus: objects.ObjectStatusProposed, objects.FieldKeySchemaVersion: objects.DefaultSchemaVersion,
 		objects.FieldKeyGoalRefs: []string{"GOAL-BASELINE-001"}, objects.FieldKeyCriteriaRefs: []string{"CRIT-BASELINE-001"},
 		objects.FieldKeyCreatedAt: now, objects.FieldKeyCreatedBy: "ACC-TEST", objects.FieldKeyUpdatedAt: now, objects.FieldKeyUpdatedBy: "ACC-TEST",

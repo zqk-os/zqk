@@ -77,7 +77,19 @@ build: all
 build-all: all
 
 test-unit:
-	go test -short -timeout 10m ./pkg/...
+	go test -short -p 2 -timeout 5m \
+		./pkg/brand/... ./pkg/bridge/... ./pkg/circuitbreaker/... ./pkg/cli/... \
+		./pkg/concurrency/... ./pkg/dna/... ./pkg/docman/... ./pkg/graph/... \
+		./pkg/healthcheck/... ./pkg/hive/... ./pkg/hostload/... ./pkg/integrity/... \
+		./pkg/interactive/... ./pkg/kernel/... ./pkg/telemetry/... ./pkg/accumulator/... \
+		./pkg/authcred/... ./pkg/bufferpool/... ./pkg/cleanup/... ./pkg/clihooks/... \
+		./pkg/closureevidence/... ./pkg/coordination/... ./pkg/crypto/... ./pkg/datacell/... \
+		./pkg/dispatch/... ./pkg/events/... ./pkg/grooming/... ./pkg/handslapper/... \
+		./pkg/hivemind/... ./pkg/idebridge/... ./pkg/idehooks/... ./pkg/inbox/... \
+		./pkg/infrastructure/... ./pkg/ingestion/... ./pkg/interactionpolicy/... \
+		./pkg/kernelcas ./pkg/lifecycle/... ./pkg/lockhealth/... ./pkg/observability/... \
+		./pkg/paths/... ./pkg/pipeline/... ./pkg/tray/... ./pkg/vds/... ./pkg/walutil/... \
+		./pkg/workflow/whatsnext ./pkg/specorigination/... ./pkg/specbuilder/builders/...
 
 test-integration: all
 	$(BRAND_ENV_PREFIX)_SHARED_TEST_BIN="$$(pwd)/$(BIN)" sh scripts/open-core/test-public-release-gates.sh

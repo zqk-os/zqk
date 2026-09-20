@@ -243,7 +243,6 @@ func TestBatchInternalUpdate_SequentialNoDeadlock(t *testing.T) {
 			objects.FieldKeyOperation:     "test_operation",
 			objects.FieldKeySeverity:      "low",
 			objects.FieldKeyEventType:     "command_execution",
-			"message":                     fmt.Sprintf("Test message %d", i),
 			objects.FieldKeySchemaVersion: objects.DefaultSchemaVersion,
 			objects.FieldKeyCreatedAt:     zqktime.NowLayoutUTC(zqktime.LayoutObjectDateTimeZ),
 			objects.FieldKeyCreatedBy:     "test",
