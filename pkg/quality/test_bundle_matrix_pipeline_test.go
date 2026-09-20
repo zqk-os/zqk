@@ -2,6 +2,7 @@ package quality
 
 import (
 	"context"
+	"os"
 	"os/exec"
 	"path/filepath"
 	"strings"
@@ -70,6 +71,10 @@ func TestRunTestBundleMatrixPipeline_smokeNoVerify(t *testing.T) {
 		t.Skip("runs python generate script")
 	}
 	root := moduleRootFromGoEnvForQualityTest(t)
+	gen := filepath.Join(root, "scripts", "generate-test-bundle-matrix.py")
+	if _, err := os.Stat(gen); err != nil {
+		t.Skip("scripts/generate-test-bundle-matrix.py absent (studio generator)")
+	}
 	err := RunTestBundleMatrixPipeline(context.Background(), &TestBundleMatrixOptions{
 		ProjectRoot: root,
 		SkipVerify:  true,

@@ -622,21 +622,30 @@ func runSyncLoop(cmd *cobra.Command, taskID string) (runErr error) {
 						commitCmd.Dir = wtRoot
 						_ = commitCmd.Run()
 
-						mainRepo := agentWorktreeMainRepo(wtRoot)
-						mergeCmd := execwrap.Command("git", "merge", branchName)
-						mergeCmd.Dir = mainRepo
-						if out, mErr := mergeCmd.CombinedOutput(); mErr != nil {
+						mainRepo, rErr := agentWorktreeMainRepo(wtRoot)
+						if rErr != nil {
 							finalStatus = objects.ObjectStatusFailed
-							_ = cli.WriteOutput(cmd, []byte(fmt.Sprintf("❌ Worktree merge failed for %s: %v\n%s\n", taskID, mErr, string(out))))
+							_ = cli.WriteOutput(cmd, []byte(fmt.Sprintf("❌ Worktree studio checkout unresolved for %s: %v\n", taskID, rErr)))
+						} else {
+							mergeCmd := execwrap.Command("git", "merge", branchName)
+							mergeCmd.Dir = mainRepo
+							if out, mErr := mergeCmd.CombinedOutput(); mErr != nil {
+								finalStatus = objects.ObjectStatusFailed
+								_ = cli.WriteOutput(cmd, []byte(fmt.Sprintf("❌ Worktree merge failed for %s: %v\n%s\n", taskID, mErr, string(out))))
+							}
 						}
 					}
 				}
 				// Always tear down agent worktrees on terminal (success or fail).
 				// previously only cleaned on success → orphan pile.
 				if isAgentWorktree(proc.ProjectRoot()) {
-					mainRepo := agentWorktreeMainRepo(proc.ProjectRoot())
-					maintenanceService := maintenance.NewGitMaintenanceService(mainRepo)
-					_ = maintenanceService.CleanupWorktreeAndBranchForID(ctx, taskID)
+					mainRepo, rErr := agentWorktreeMainRepo(proc.ProjectRoot())
+					if rErr != nil {
+						_ = cli.WriteOutput(cmd, []byte(fmt.Sprintf("❌ Worktree teardown skipped for %s: %v\n", taskID, rErr)))
+					} else {
+						maintenanceService := maintenance.NewGitMaintenanceService(mainRepo)
+						_ = maintenanceService.CleanupWorktreeAndBranchForID(ctx, taskID)
+					}
 				}
 				currentKind, _ := currentTask[objects.FieldKeyKind].(string)
 				if err := applyStateMutation(ctx, secCtx, sp, taskID, currentKind, validator, auditStream, finalStatus); err != nil {

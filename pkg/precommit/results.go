@@ -115,22 +115,22 @@ func ReadLastResult(projectRoot, category string) (CategoryResult, error) {
 	return r, nil
 }
 
-// LintOutputPath returns the path where the lint script writes full golangci-lint output for viewing.
-// Use this to create backlog items from lint issues. Updated by scripts/pre-commit-lint.sh.
+// LintOutputPath returns the path where the lint check writes full golangci-lint output for viewing.
+// Use this to create backlog items from lint issues. Updated by zqk pre-commit lint.
 func LintOutputPath(projectRoot string) string {
 	return filepath.Join(CategoryDir(projectRoot), "lint-output.txt")
 }
 
-// PolicyOutputPath returns the path where the policy script writes full policy-check output (logging
+// PolicyOutputPath returns the path where the policy check writes full policy-check output (logging
 // and architecture compliance). Use this to see exact violations when the policy category fails.
-// Updated by scripts/pre-commit-policy.sh. View with: zqk pre-commit policy-report.
+// Updated by zqk pre-commit policy. View with: zqk pre-commit policy-report.
 func PolicyOutputPath(projectRoot string) string {
 	return filepath.Join(CategoryDir(projectRoot), "policy-output.txt")
 }
 
-// IntegrityOutputPath returns the path where the integrity script writes full system check output.
+// IntegrityOutputPath returns the path where the integrity check writes full system check output.
 // Use this to see exact violations when the integrity category fails (Tier 1 issues, hash mismatches, etc.).
-// Updated by scripts/pre-commit-integrity.sh. View with: zqk pre-commit integrity-report.
+// Updated by zqk pre-commit integrity. View with: zqk pre-commit integrity-report.
 func IntegrityOutputPath(projectRoot string) string {
 	return filepath.Join(CategoryDir(projectRoot), "integrity-output.txt")
 }

@@ -231,6 +231,16 @@ const (
 	PreCommitDir         = "pre-commit"
 	PreCommitResultsFile = "results.json" // aggregated file read by hook: .zqk/pre-commit/results.json
 
+	// Local CI directory and file constants (under .zqk/ci)
+	LocalCIDir            = "ci"
+	LocalCIWorkdirName    = "workdir"
+	LocalCITreesDir       = "trees"
+	LocalCIArchivesDir    = "archives"
+	LocalCIArchiveGitDir  = "git"
+	LocalCISourceSHAFile  = "SOURCE_SHA"
+	LocalCIPromotedAtFile = "PROMOTED_AT"
+	LocalCICurrentEnvFile = "CURRENT.env"
+
 	// DraftsDir is under ProjectDataDir: default output for `zqk new` (editable YAML before object create).
 	DraftsDir = "drafts"
 	// LastDraftPointerFile records the most recently written draft path for implicit `object create` / tooling.
