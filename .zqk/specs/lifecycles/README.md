@@ -7,9 +7,9 @@ can rely on the exact same definition.
 
 Each lifecycle file should answer these questions:
 
-**Canonical exam:** [docs/architecture/LIFECYCLE_STATE_MACHINE_RUBRIC.md](../../architecture/LIFECYCLE_STATE_MACHINE_RUBRIC.md) — enumerate \(n(n-1)\) edges, prune to valid; class roles vs kind tokens; catalyst / preconditions / postconditions / shockwave / similarity. Start with **policy** membranes even when policy occupancy is thin.
+**Canonical exam:** Lifecycle state machine rubric — enumerate \(n(n-1)\) edges, prune to valid; class roles vs kind tokens; catalyst / preconditions / postconditions / shockwave / similarity. Start with **policy** membranes even when policy occupancy is thin.
 
-**Shockwave catalog (do not clone PRI):** [LIFECYCLE_SHOCKWAVE_MAP.md](../../architecture/LIFECYCLE_SHOCKWAVE_MAP.md) → [family](../../architecture/lifecycle_shockwave/README.md) → [kind index](../../architecture/lifecycle_shockwave/KIND_INDEX.md). PRI filled exam: [kind_priority_plan.md](../../architecture/lifecycle_shockwave/kind_priority_plan.md).
+**Shockwave catalog:** Invariants for cascading transitions and dependent lifecycle shockwaves across parent/child object relations.
 
 1. **What are the valid statuses?**  
    Include display labels, `role` (class), whether the status is origin, terminal

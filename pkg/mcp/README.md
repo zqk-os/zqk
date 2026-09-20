@@ -39,7 +39,7 @@ The MCP server automatically exposes CLI commands as MCP tools with context-driv
 - **Tool Generation**: Converts cobra commands to MCP tools automatically
 - **Security Context**: Initializes from MCP client info during initialization
 
-See [MCP CLI Bridge Architecture v1.0](../../docs/architecture/mcp-cli-bridge-v1.0.md) for detailed information.
+See [Quickstart / MCP Integration](../../docs/onboarding/QUICKSTART.md) for detailed information.
 
 ### Server Shutdown and OS Signal Handling
 
@@ -50,9 +50,9 @@ The MCP server gracefully handles termination to prevent data loss or corrupted 
 
 ## Documentation
 
-Detailed MCP documentation is available in:
-- [docs/architecture/mcp/](../../docs/architecture/mcp/) - Active architecture documentation
-- [docs/archive/mcp/](../../docs/archive/mcp/) - Archived implementation and refactoring documents
+Detailed MCP integration documentation is available in:
+- [docs/onboarding/QUICKSTART.md](../../docs/onboarding/QUICKSTART.md) - MCP server setup, client configuration, and quickstart
+- [docs/architecture/README.md](../../docs/architecture/README.md) - Architecture documentation
 
 ### Metrics Tools
 
@@ -119,7 +119,7 @@ server.SetSecurityContext(secCtx)
 server.Serve()
 ```
 
-See [MCP CLI Bridge Architecture v1.0](../../docs/architecture/mcp-cli-bridge-v1.0.md) for detailed usage examples and configuration.
+See [Quickstart / MCP Integration](../../docs/onboarding/QUICKSTART.md) for detailed usage examples and configuration.
 
 ### Server Modes and Trimming
 

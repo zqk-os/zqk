@@ -81,7 +81,7 @@ To prevent Confused Deputy exploits while preserving frictionless developer expe
     - name: purge-cache
       description: Hard reset local cache
       argv: [cache, clear, --force]
-      signed_by: ACC-1785920548450214012-68b850c0
+      signed_by: auditor
       signature: 30450221008d72...
   ```
 - **Verification Gate**:

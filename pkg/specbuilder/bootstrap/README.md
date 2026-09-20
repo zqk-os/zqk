@@ -20,7 +20,7 @@ This is useful for:
 ### Capturing Current State
 
 ```go
-import "github.com/lanceman/zqk/pkg/specbuilder/bootstrap"
+import "github.com/zqk-os/zqk/pkg/specbuilder/bootstrap"
 
 // Capture current state from .zqk/specs
 capture, err := bootstrap.CaptureCurrentState(".zqk/specs")

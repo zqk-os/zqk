@@ -1,6 +1,6 @@
 # First-run object tutorial (template → create → get → update)
 
-**Audience:** New users after `zqk init` (Journey B in [CLI_ALPHA_LAUNCH_PLAN.md](../architecture/CLI_ALPHA_LAUNCH_PLAN.md)).
+**Audience:** New users after `zqk init` (see [community first-run](./COMMUNITY_FIRST_RUN.md) and [architecture (this SKU)](../architecture/README.md)).
 **Backlog:** Tracked as part of alpha CLI launch work (see priority plan *CLI alpha launch readiness*).
 
 This path uses the **`question`** kind as a **small** object: few required fields, suitable for learning `object template` / `object create` without editing large YAML. Adjust the kind if your org standardizes another “low-risk” kind.
@@ -87,6 +87,6 @@ When you no longer need the example object, delete it per project policy (`zqk o
 ## See also
 
 - [AI Agent Onboarding Guide](./AI_AGENT_ONBOARDING.md) — full agent/human norms (CLI-only process data, etc.).
-- [CLI_ALPHA_LAUNCH_PLAN.md](../architecture/CLI_ALPHA_LAUNCH_PLAN.md) — alpha journeys and backlog seed.
+- [architecture/README.md](../architecture/README.md) — what this SKU ships vs studio dumps.
 - [scripts/onboarding_roadmap/README.md](../../scripts/onboarding_roadmap/README.md) — full **onboarding curriculum** as objects (milestone-first order); advanced-tutorial pattern.
-- [ONBOARDING_EVALUATION_SCENARIO.md](../process/testing/ONBOARDING_EVALUATION_SCENARIO.md) — isolated scenario with **`zqk-ts`** / **`ZQK_TS_TEST_ROOT`** (optional after first-run comfort).
+- [COMMUNITY_FIRST_RUN.md](./COMMUNITY_FIRST_RUN.md) — bounded first-run after object CRUD (optional isolated test roots are not shipped on this SKU).

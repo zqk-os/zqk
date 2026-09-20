@@ -2,7 +2,7 @@
 
 **Status:** Active  
 **Last Updated:** 2026-01-27  
-**Package:** `github.com/lanceman/zqk/pkg/specbuilder/bldr_v2`
+**Package:** `github.com/zqk-os/zqk/pkg/specbuilder/bldr_v2`
 
 ## Overview
 
@@ -113,7 +113,7 @@ This ensures generated code is always up-to-date.
 
 - [Specbuilder Package README](../README.md) - Overview of the specbuilder package
 - [Builders README](../builders/README.md) - Base builder implementation
-- [CLI Architecture](../../cli/ARCHITECTURE.md) - Parallel CLI command builder system
+- [CLI Command Taxonomy Standards](../../../docs/architecture/CLI_COMMAND_TAXONOMY_STANDARDS.md) - Canonical CLI architecture and taxonomy standards
 - [Object Specs Documentation](../../../.zqk/specs/objects/README.md) - Spec file format reference
 
 ## Versioning

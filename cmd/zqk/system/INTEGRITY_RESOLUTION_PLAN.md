@@ -49,7 +49,7 @@ Integrity tooling must be **helpful, not cumbersome**. Resolution should be a cl
 
 5. **Docs**
    - Help text for `check --auto-fix` can note that it also runs Stale CAS cleanup (hash-duplicates) for affected kinds when such issues are found. No change to `cleanup-duplicates` CLI; it remains the standalone command for manual or scripted use.
-   - Quarantine folder and analysis gap: see [QUARANTINE_AND_ANALYSIS.md](../../../docs/archive/system_health/QUARANTINE_AND_ANALYSIS.md) for what goes in `.zqk/system-health/quarantine/`, why we keep it, and current lack of analysis/cleanup tooling.
+   - Quarantine folder and analysis gap: see `QUARANTINE_AND_ANALYSIS.md` for what goes in `.zqk/system-health/quarantine/`, why we keep it, and current lack of analysis/cleanup tooling.
 
 ---
 

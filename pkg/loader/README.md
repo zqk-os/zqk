@@ -2,7 +2,7 @@
 
 Abstract **component loader** pattern: shared state as atomics, callback on state change, configurable timeouts (default config + profile/thematic overrides). The **retryable component** is implemented as **`Runner`**: one-shot load with wait-for-completion channel and timeout.
 
-- **Design:** [docs/architecture/COMPONENT_LOADER_PATTERN.md](../../../docs/architecture/COMPONENT_LOADER_PATTERN.md)
+- **Design:** Component loader pattern with atomic state, retryable `Runner`, and timeout cascading.
 - **Types:** `LoadState`, `LoaderTimeoutConfig`, `StateChangeCallback`, `ComponentLoader`, `LoadFn`
 - **Runner:** `NewRunner(name, loadFn, opts...)`, `Load(ctx)`, `ResetLoaded()`, `WithCallback`, `WithTimeoutConfig`
 - **Config:** `LoadLoaderTimeoutConfig(configPath)`, `MergeLoaderTimeoutOverrides(base, overrides)`, `GetLoaderTimeoutConfig(loaderName)`

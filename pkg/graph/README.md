@@ -25,8 +25,8 @@ pkg/graph/
 
 ```go
 import (
-    "github.com/lanceman/zqk/pkg/graph/memgraph"
-    "github.com/lanceman/zqk/pkg/graph/provider"
+    "github.com/zqk-os/zqk/pkg/graph/memgraph"
+    "github.com/zqk-os/zqk/pkg/graph/provider"
 )
 
 // Create provider
@@ -57,20 +57,9 @@ err = pool.Execute(ctx, func(conn provider.GraphConnection) error {
 
 ## Documentation
 
-**All documentation lives in the docs directory per project standards.** See:
-
-- **Architecture & Design**:
-  - [Pluggable Graph Backend Interface](../../docs/architecture/pluggable-graph-backend-interface-v1.0.md)
-  - [GraphRAG Schema Design](../../docs/architecture/graphrag-schema-design-v1.0.md)
-  - [MemGraph Research](../../docs/architecture/memgraph-research-v1.0.md)
-  - [Migration Strategy](../../docs/architecture/migration-strategy-file-to-graph-v1.0.md)
-
-- **Implementation Details**:
-  - [Architecture Decisions](../../docs/architecture/graph-backend/ARCHITECTURE_DECISIONS.md) - Design decisions and rationale
-  - [Shared Implementations](../../docs/architecture/graph-backend/SHARED_IMPLEMENTATIONS.md) - DRY patterns and base implementations
-  - [Commit & Timeout Semantics](../../docs/architecture/graph-backend/COMMIT_AND_TIMEOUT_SEMANTICS.md) - Transaction and timeout behavior
-  - [Observability](../../docs/architecture/graph-backend/OBSERVABILITY.md) - Metrics, health checks, self-healing
-  - [Configuration](../../docs/architecture/graph-backend/CONFIGURATION.md) - Metrics configuration guide
+**Core architecture standards are documented in `docs/architecture/`:**
+- [Storage Architecture](../../docs/architecture/TIERED_STORAGE_AND_ARCHIVAL_LIFECYCLE.md) - Storage lifecycle and retention
+- [Architecture Overview](../../docs/architecture/README.md) - Community SKU architecture overview
 
 ## Development Status
 

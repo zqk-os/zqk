@@ -1,9 +1,8 @@
 # Edge / headless first-run (Vector B)
 
 **Audience:** Operators on appliances, DGX/Spark-class boxes, SSH-only hosts, local SLM runtimes (Liquid-class, etc.) — **no** public IDE agent (or `--headless` forced).
-**Vector A (IDE agents):** [`COMMUNITY_FIRST_RUN.md`](./COMMUNITY_FIRST_RUN.md).
-**SKU map:** [`../strategy/open-core/SKU_ONBOARDING_SURFACES.md`](../strategy/open-core/SKU_ONBOARDING_SURFACES.md).
-**Strategy:** [`../strategy/open-core/AGENT_ONBOARDING_SEQUENCE.md`](../strategy/open-core/AGENT_ONBOARDING_SEQUENCE.md).
+**SKU map:** [`COMMUNITY_FIRST_RUN.md`](./COMMUNITY_FIRST_RUN.md).
+**Strategy:** [`AI_AGENT_ONBOARDING.md`](./AI_AGENT_ONBOARDING.md) (pointer only — the studio process pack is not shipped).
 
 ## Goal
 
@@ -51,5 +50,5 @@ Prefer scheduler ticks and feed/`delivery_mode=notify` — not Terminal paste. S
 ## After green
 
 1. `zqk workflow whats-next --format json`
-2. [`SKU_ONBOARDING_SURFACES.md`](../strategy/open-core/SKU_ONBOARDING_SURFACES.md) — which SKU you are actually running
+2. [`COMMUNITY_FIRST_RUN.md`](./COMMUNITY_FIRST_RUN.md) — which SKU you are actually running
 3. Studio process guide only if dogfooding ZQK Studio: [`AI_AGENT_ONBOARDING.md`](./AI_AGENT_ONBOARDING.md)

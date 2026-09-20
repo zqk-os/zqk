@@ -2,7 +2,7 @@
 
 This directory contains YAML templates for the **Agent & User Onboarding** workstream, priority plan, and backlog items. The onboarding curriculum is first-class system data (workstream, priority plan, backlog items) so it is indexed, discoverable, and auditable.
 
-**Design**: [docs/architecture/ONBOARDING_ROADMAP_AND_CERTIFICATION.md](../../docs/architecture/ONBOARDING_ROADMAP_AND_CERTIFICATION.md)
+**Design**: Architecture overview and onboarding curriculum (see [docs/onboarding/COMMUNITY_FIRST_RUN.md](../../docs/onboarding/COMMUNITY_FIRST_RUN.md))
 
 **Automated seed**: [scripts/scheduler_jobs/onboarding_roadmap_seed.yaml](../scheduler_jobs/onboarding_roadmap_seed.yaml) runs the same steps as below (milestone before backlog items with `milestone_refs`). After `zqk system init --with-onboarding-roadmap`, start the scheduler once to execute the job.
 

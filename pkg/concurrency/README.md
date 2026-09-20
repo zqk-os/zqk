@@ -32,8 +32,7 @@ See `run_with_max_wait.go` for full documentation.
 
 **Solution**: Use **RunInLock** / **RunInRLock** for any critical section that reads or modifies shared state. The callback runs in the **same goroutine** that holds the lock, so the "transaction" (lock → modify → unlock) is atomic and no other goroutine can see half-updated state.
 
-- **Single, predictable pattern**: one place owns the lock; no scattering of raw `Lock()`/`Unlock()`.
-- **Deadlock avoidance**: establish a global lock order when multiple locks are needed (e.g. always A before B); prefer holding one lock at a time and copying data out when possible. See **Lock ordering** in [docs/architecture/LOCK_ORDERING.md](../../docs/architecture/LOCK_ORDERING.md).
+- **Deadlock avoidance**: establish a global lock order when multiple locks are needed (e.g. always A before B); prefer holding one lock at a time and copying data out when possible.
 
 ```go
 // Preferred: same-goroutine critical section
@@ -91,8 +90,8 @@ err := concurrency.RunInLockWithLogger(&buf.mu, "audit_buffer_flush_copy", loggi
 
 ```go
 import (
-    "github.com/lanceman/zqk/pkg/concurrency"
-    "github.com/lanceman/zqk/pkg/logging"
+    "github.com/zqk-os/zqk/pkg/concurrency"
+    "github.com/zqk-os/zqk/pkg/logging"
 )
 
 // Standard pattern: context + logger (no metrics boilerplate)
@@ -134,7 +133,7 @@ err := concurrency.WithRLockCtxLogger(
 **For packages that cannot import `pkg/logging`** (e.g., `pkg/context`, `pkg/logging` itself) - use `WithLockCtx` / `WithRLockCtx`:
 
 ```go
-import "github.com/lanceman/zqk/pkg/concurrency"
+import "github.com/zqk-os/zqk/pkg/concurrency"
 
 // No logger to avoid import cycles
 err := concurrency.WithLockCtx(
@@ -193,8 +192,8 @@ type OperationCallback interface {
 **Usage**:
 ```go
 import (
-    "github.com/lanceman/zqk/pkg/concurrency"
-    "github.com/lanceman/zqk/pkg/coordination"
+    "github.com/zqk-os/zqk/pkg/concurrency"
+    "github.com/zqk-os/zqk/pkg/coordination"
 )
 
 // Create callback (coordinator-integrated)
@@ -225,7 +224,7 @@ callback.OnComplete(operationID, result, duration)
 **Solution**: Use `WaitUnderGoroutineCeiling` at "gate" points (e.g. before submitting to the triggered-job pool, or before acquiring a list slot). When `runtime.NumGoroutine()` is already at or above the ceiling (default 2000), the call blocks until the count drops or the context is cancelled. This prevents adding more work when the process is already overloaded.
 
 ```go
-import "github.com/lanceman/zqk/pkg/concurrency"
+import "github.com/zqk-os/zqk/pkg/concurrency"
 
 // Before submitting work that would add goroutines
 if err := concurrency.WaitUnderGoroutineCeiling(ctx, concurrency.DefaultGoroutineCeiling, 200*time.Millisecond); err != nil {
@@ -247,7 +246,7 @@ if err := concurrency.WaitUnderGoroutineCeiling(ctx, concurrency.DefaultGoroutin
 **Solution**: CPU-aware defaults with global configuration.
 
 ```go
-import "github.com/lanceman/zqk/pkg/concurrency"
+import "github.com/zqk-os/zqk/pkg/concurrency"
 
 // Get smart defaults (CPU-aware)
 cfg := concurrency.GetGlobalConcurrencyConfig()
@@ -312,7 +311,7 @@ Implemented by `pkg/validation/ValidationMetrics` for validation operations.
 For tests that don't need coordinator/storage dependencies:
 
 ```go
-import "github.com/lanceman/zqk/pkg/concurrency"
+import "github.com/zqk-os/zqk/pkg/concurrency"
 
 recorder := concurrency.NewRecordingOperationCallback()
 
@@ -392,7 +391,7 @@ callback.OnComplete(operationID, result, duration)
 
 ## Related Documentation
 
-- [docs/architecture/LOCK_ORDERING.md](../../docs/architecture/LOCK_ORDERING.md): Global lock order when multiple locks are needed; enforce in code review (POL-ARCH-004).
+- `docs/architecture/LOCK_ORDERING.md`: Global lock order when multiple locks are needed; enforce in code review (POL-ARCH-004).
 - `docs/architecture/GOROUTINE_ARCHITECTURE_POLICY.md`: Goroutine patterns
 - `CONCURRENCY_STANDARDIZATION_PLAN.md`: Standardization plan
 - `CONCURRENCY_STANDARDIZATION_PROGRESS.md`: Progress tracking

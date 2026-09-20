@@ -28,10 +28,9 @@ verboseCtx := ctx.WithVerbose(true)
 
 ## Related Documentation
 
-**Detailed documentation is located in the docs tree per project standards:**
-
-- **[Context Architecture v1.0](../../../docs/architecture/cli-context/architecture-v1.0.md)**: Single Context Principle and architecture overview
-- **[Context Patterns v1.0](../../../docs/architecture/cli-context/patterns-v1.0.md)**: Context building patterns, processing modes, and usage examples
+**Architecture Principles:**
+- **Context Architecture v1.0**: Single Context Principle and command execution context isolation.
+- **Context Patterns v1.0**: Context building patterns, processing modes, and profile resolution.
 
 ## Package Structure
 
@@ -51,7 +50,7 @@ The context system supports three processing modes:
 2. **Hierarchical**: Tree structure with inheritance (parent → child)
 3. **Hybrid**: Combination of sequential and hierarchical
 
-See [Context Patterns](../../../docs/architecture/cli-context/patterns-v1.0.md) for detailed examples.
+See context processing mode specifications for detailed examples.
 
 ## Context Precedence
 

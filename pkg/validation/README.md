@@ -15,7 +15,7 @@ This package provides object validation for zqk: instance validation (schema, li
 ## Usage
 
 ```go
-import "github.com/lanceman/zqk/pkg/validation"
+import "github.com/zqk-os/zqk/pkg/validation"
 
 // Sync validation via registry
 registry := validation.NewValidatorRegistry()
@@ -37,8 +37,6 @@ asyncVal.Enqueue(ctx, task)
 - **Shared field helpers** (`field_validators.go`): Use `ValidateRequiredField` (required + optional empty-collection check) and `ValidateEnumField` (allowed values, case-insensitive for strings) so all validators behave consistently.
 - **Sync vs async**: Use sync validation (registry + `Validate`) for inline checks (e.g. CLI, single object); use async validator (`Enqueue` + workers) for batch or storage-layer validation with timeouts and caching.
 - **Instance + ID**: Instance validator handles lifecycle/state; ID validator handles prefixes/patterns from config. Both are used by storage on write.
-
-See [REMAINING_REFACTOR_WORK.md](../../docs/refactoring/REMAINING_REFACTOR_WORK.md) for optional “base validator interface” follow-up.
 
 ## Configuration
 

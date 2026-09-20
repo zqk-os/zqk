@@ -13,7 +13,7 @@ This package provides a robust builder and runtime for the standardized data pip
 ## Usage
 
 ```go
-import "github.com/lanceman/zqk/pkg/pipeline"
+import "github.com/zqk-os/zqk/pkg/pipeline"
 
 // Build a sequential processing pipeline
 bldr := pipeline.NewBuilder("document_ingestion", logger).

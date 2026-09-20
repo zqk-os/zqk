@@ -12,3 +12,8 @@ Start in **onboarding**.
 | **[Agents on this SKU](./onboarding/AI_AGENT_ONBOARDING.md)** | Pointer only — studio process pack is not shipped |
 | **[Architecture (this SKU)](./architecture/README.md)** | Pointer only — studio architecture dump is not shipped |
 | **[Contributing](../CONTRIBUTING.md)** | How to work in this tree |
+| **[Governance](../GOVERNANCE.md)** | Open-core boundary, decision-making, publication hold |
+| **[Tutorials](./tutorials/README.md)** | Learn-by-doing (Divio) |
+| **[How-to](./howto/README.md)** | Task recipes (Divio) |
+| **[Manual](./manual/README.md)** | Reference (Divio) |
+| **[Explanation](./explanation/README.md)** | Why the kernel is shaped this way (Divio) |

@@ -22,7 +22,7 @@ This package provides binary detection and integrity verification for the `zqk-m
 ### Basic Detection
 
 ```go
-import "github.com/lanceman/zqk/pkg/migration/detector"
+import "github.com/zqk-os/zqk/pkg/migration/detector"
 
 // Check if migration is available
 if detector.SupportsMigration() {
@@ -166,9 +166,6 @@ The detector is designed to be used by the zqk orchestrator to:
 
 ## Related Documentation
 
-**Detailed documentation is located in the docs tree per project standards:**
-
-- **[Migration Detector Test Coverage](../../../docs/testing/migration-detector/test-coverage.md)**: Comprehensive test coverage documentation
-- **[Migration Binary Detection Strategy](../../../docs/architecture/migration-binary-detection-strategy.md)**: Binary detection and integrity verification strategy
-- **[Migration Strategy](../../../docs/architecture/migration-strategy-file-to-graph-v1.0.md)**: File-based to graph backend migration strategy
+- [Storage Architecture](../../../docs/architecture/TIERED_STORAGE_AND_ARCHIVAL_LIFECYCLE.md) - Storage lifecycle and retention
+- [Architecture Overview](../../../docs/architecture/README.md) - Architecture documentation
 

@@ -2,7 +2,7 @@
 
 **Status:** Active  
 **Last Updated:** 2026-04-03  
-**Package:** `github.com/lanceman/zqk/pkg/cli/bldr_cli_cmd_v1`
+**Package:** `github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1`
 
 ## Overview
 
@@ -98,8 +98,7 @@ This ensures generated code is always up-to-date.
 ## Related Documentation
 
 - [CLI Package README](../README.md) - Overview of the CLI package (links here for **RunE handlers and pflag getters**)
-- [CLI Architecture](../ARCHITECTURE.md) - Detailed architecture documentation
-- [Command Spec Documentation](../COMMAND_SPEC.md) - Command spec format reference
+- [CLI Command Taxonomy Standards](../../../docs/architecture/CLI_COMMAND_TAXONOMY_STANDARDS.md) - Canonical CLI architecture and taxonomy standards
 - [Specbuilder README](../../specbuilder/README.md) - Parallel specbuilder system
 
 ## Versioning

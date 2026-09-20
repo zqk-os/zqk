@@ -29,7 +29,7 @@ Storage backends are selected automatically via `StorageFactory`:
 | **Query** | List/filter/sort over files; full-text search | List/filter/sort; Cypher; vector similarity; traversal (GetRelated, GetPath, GetNeighbors) |
 | **Use when** | Default; no graph DB; traceable YAML on disk | Graph DB enabled; relationship-heavy queries; vector search |
 
-Shared behavior: same `ObjectStorageProvider` interface, permission checks, metadata (created_at, updated_at, namespace_id), and error types. See [REMAINING_REFACTOR_WORK.md](../../docs/refactoring/REMAINING_REFACTOR_WORK.md) for optional “extract storage backend commonalities” follow-up.
+Shared behavior: same `ObjectStorageProvider` interface, permission checks, metadata (created_at, updated_at, namespace_id), and error types.
 
 ## Core Components
 
@@ -247,8 +247,7 @@ result, _ := storage.List(ctx, secCtx, storageCtx, filter)
 
 ## Related Documentation
 
-- [CRUD Standardization](./CRUD_STANDARDIZATION.md) - CRUD operation patterns
-- [Storage Architecture](../../docs/architecture/) - System architecture
+- [Storage Architecture](../../docs/architecture/README.md) - System architecture
 - [Graph Package](../graph/README.md) - Graph database provider
 
 ## Notes

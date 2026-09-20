@@ -31,7 +31,7 @@ Operation/Task/Job
 ### Basic Usage
 
 ```go
-import "github.com/lanceman/zqk/pkg/coordination"
+import "github.com/zqk-os/zqk/pkg/coordination"
 
 // Get the global coordinator
 coordinator := coordination.GetCoordinator()
@@ -82,9 +82,9 @@ Together these paths give a single, observable story for “what the scheduler d
 
 ## Documentation
 
-For detailed documentation, see:
-- [Coordinator Mandatory Migration](../../docs/architecture/coordinator-mandatory-migration-v1.0.md)
-- Archived integration documents: [docs/archive/completed-integrations/](../../docs/archive/completed-integrations/)
+For architecture standards and system overview:
+- [CLI Command Taxonomy Standards](../../docs/architecture/CLI_COMMAND_TAXONOMY_STANDARDS.md)
+- [Architecture Overview](../../docs/architecture/README.md)
 
 ## Design Principles
 

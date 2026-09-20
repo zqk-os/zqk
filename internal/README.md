@@ -14,9 +14,9 @@ This directory contains Go packages for the ZQK project. Each package is a reusa
 
 | Package | Import Path | Files | Tests | Subpackages | README | Description |
 |---------|-------------|-------|-------|-------------|--------|-------------|
-| [bootstrap](./bootstrap/) | `github.com/lanceman/zqk/internal/bootstrap` | 4+4 | 4 | - | ✅ [README](./bootstrap/README.md) | - **Build:** The build process creates `archive... |
-| [cli](./cli/) | `github.com/lanceman/zqk/internal/cli` | 24+13 | 13 | context, errorsuggest, flag... | ✅ [README](./cli/README.md) | The CLI uses a layered context system with prec... |
-| [testpackageconcurrency](./testpackageconcurrency/) | `github.com/lanceman/zqk/internal/testpackageconcurrency` | 1+1 | 1 | - | ❌ - | - |
+| [bootstrap](./bootstrap/) | `github.com/zqk-os/zqk/internal/bootstrap` | 4+4 | 4 | - | ✅ [README](./bootstrap/README.md) | - **Build:** The build process creates `archive... |
+| [cli](./cli/) | `github.com/zqk-os/zqk/internal/cli` | 24+13 | 13 | context, errorsuggest, flag... | ✅ [README](./cli/README.md) | The CLI uses a layered context system with prec... |
+| [testpackageconcurrency](./testpackageconcurrency/) | `github.com/zqk-os/zqk/internal/testpackageconcurrency` | 1+1 | 1 | - | ❌ - | - |
 
 ## Package Structure
 
@@ -35,7 +35,7 @@ internal/
 Import packages using their import path:
 
 ```go
-import "github.com/lanceman/zqk/internal/bootstrap"
+import "github.com/zqk-os/zqk/internal/bootstrap"
 ```
 
 ## Related Documentation
