@@ -1,0 +1,14 @@
+created_at: "2026-09-20T01:20:21Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1789867221919741000-b70b786c
+item_id: PRI-IO-RESOURCE-HYGIENE-001
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 8529d48a2bb8e026794ef628337375b2dfec95b6ff616d7dfd0278bc07abe912ce5068db3e7144cea33032c1c425e3f523aba531f46ce9fdb9363ac81af3aff6
+schema_version: 2.0.0
+signature: 3045022008c516ba7a707e66a27386c9a7f669248974a6ca4ffb9f71ed4a2e28806402e6022100f6c0fa4bb99f6854a86e88d066d9714e418f8949413dfe35be36c54981bf2e70
+status: success
+title: QA success for PRI-IO-RESOURCE-HYGIENE-001
+updated_at: "2026-09-20T01:20:21Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

@@ -1,0 +1,14 @@
+created_at: "2026-09-20T01:18:32Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1789867112622152000-293d9d39
+item_id: BLI-CLI-SERVICE-MGMT-REORG-001
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 8529d48a2bb8e026794ef628337375b2dfec95b6ff616d7dfd0278bc07abe912ce5068db3e7144cea33032c1c425e3f523aba531f46ce9fdb9363ac81af3aff6
+schema_version: 2.0.0
+signature: 3046022100b3d9d6c89b1f124ebd923182134359c9b2357db397e5c284615517ce2c81fbe6022100e8f896461482eb0eeea2f62fe903a2fd42dfd3c4a0ea031e69244dc9ab37866f
+status: success
+title: QA success for BLI-CLI-SERVICE-MGMT-REORG-001
+updated_at: "2026-09-20T01:18:32Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

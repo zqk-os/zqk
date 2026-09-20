@@ -1,0 +1,42 @@
+$schema: "../schemas/command_spec.schema.json"
+
+name: "orchestrate"
+short: "Route tasks from a priority plan to specialized sub-agents"
+description: |
+  Reads an active or in-progress priority plan and routes shovel-ready backlog
+  items to native sub-agents based on semantic content and dependencies.
+  Persists agent_task envelopes with standing policy refs (IDs, not bodies).
+
+flags:
+  - name: "ambient-context"
+    type: "string"
+    default: ""
+    description: "Optional path to ambient context JSON or a raw JSON payload"
+  - name: "persona-id"
+    type: "string"
+    default: ""
+    description: "Optional persona ID to filter work and define agent role"
+  - name: "session-id"
+    type: "string"
+    default: ""
+    description: "Optional convergence session ID to isolate execution context"
+  - name: "timeout"
+    type: "duration"
+    default: "0s"
+    description: "Timeout for the orchestration session (0 uses the default 4h)"
+
+args:
+  type: "maximum"
+  count: 1
+
+help:
+  examples:
+    - comment: "Orchestrate the current in-progress plan"
+      command: "%s agent orchestrate --persona-id PER-COMMUNITY-SOFTWARE-ENGINEER --timeout 90s"
+    - comment: "Orchestrate a named plan"
+      command: "%s agent orchestrate <plan-id> --persona-id PER-COMMUNITY-SOFTWARE-ENGINEER --format json"
+  exclude_flags:
+    - "columns"
+    - "ignore-scheduler-down"
+
+common_flags: true

@@ -1,0 +1,22 @@
+$schema: "../schemas/command_spec.schema.json"
+
+name: "chat-responder"
+short: "Run the native Chat Responder subagent"
+description: |
+  Reads the agent chat channel, detects new messages since the last read, and
+  responds natively inside the kernel when the feed has changed.
+
+args:
+  type: "no_args"
+
+help:
+  examples:
+    - comment: "Process new chat-channel messages"
+      command: "%s agent chat-responder"
+    - comment: "JSON result"
+      command: "%s agent chat-responder --format json"
+  exclude_flags:
+    - "columns"
+    - "ignore-scheduler-down"
+
+common_flags: true

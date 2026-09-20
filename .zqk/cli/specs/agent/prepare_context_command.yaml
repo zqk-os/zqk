@@ -1,0 +1,41 @@
+$schema: "../schemas/command_spec.schema.json"
+
+name: "prepare-context [task_id]"
+short: "Generate a persona-scoped context-rich prompt for subagent launch"
+description: |
+  Assembles kernel context (task subgraph, agent skills, and standing policy
+  refs) into a single prompt. Prefer an agent_task id; use --description for
+  ad-hoc work. Persist policy IDs, not policy bodies.
+
+flags:
+  - name: "depth"
+    type: "int"
+    default: 1
+    description: "Related-object subgraph depth for task_id mode"
+  - name: "description"
+    type: "string"
+    default: ""
+    description: "Ad-hoc task description when no task_id is given"
+  - name: "persona-ref"
+    type: "string"
+    default: ""
+    description: "Persona id (PER-*) for skill and prompt binding"
+  - name: "tdd"
+    type: "bool"
+    default: true
+    description: "Include TDD guidance in the prompt"
+
+args:
+  type: "maximum"
+  count: 1
+
+help:
+  examples:
+    - comment: "Build context for a minted task"
+      command: "%s agent prepare-context <task-id> --persona-ref PER-COMMUNITY-SOFTWARE-ENGINEER --format json"
+    - comment: "Ad-hoc description with a persona"
+      command: "%s agent prepare-context --persona-ref PER-COMMUNITY-SOFTWARE-ENGINEER --description \"Harden tray signing\""
+  exclude_flags:
+    - "columns"
+
+common_flags: true

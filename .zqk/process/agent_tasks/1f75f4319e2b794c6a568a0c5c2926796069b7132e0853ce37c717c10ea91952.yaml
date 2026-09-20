@@ -1,0 +1,74 @@
+assignee_persona_ref: PER-COMMUNITY-SOFTWARE-ENGINEER
+created_at: "2026-09-20T01:17:05Z"
+created_by: ACC-1785920548450214012-68b850c0
+description: |
+    # Agent Task Envelope
+    zqk_task_envelope_v1
+
+    Static context lives in kernel objects. Do not treat this description as a copy of policy or skill bodies.
+    Resolve at execute: `zqk object get <id>`, `zqk agent prepare-context --task-id <ATK>`, or `zqk workflow whats-next`.
+
+    ## Dynamic
+    - Plan: CLI Command Taxonomy Harmonization, Spec Completeness & Vendor Decoupling (PRI-CLI-TAXONOMY-OVERHAUL-001)
+    - Target: software_engineer (capability: )
+    - Persona: PER-COMMUNITY-SOFTWARE-ENGINEER
+    - Task: Establish CLI taxonomy standards, ground rules, and Information Architecture governance
+
+    ## Standing refs (do not duplicate bodies)
+    - `POL-ONBOARD-001` — `zqk object get POL-ONBOARD-001`
+    - `POL-ONBOARD-002` — `zqk object get POL-ONBOARD-002`
+    - `POL-AGENT-INSTRUCTION-RUBRIC-001` — `zqk object get POL-AGENT-INSTRUCTION-RUBRIC-001`
+    - `POL-WORKFLOW-VDS` — `zqk object get POL-WORKFLOW-VDS`
+    - `POL-CODE-CAS-COMMIT-001` — `zqk object get POL-CODE-CAS-COMMIT-001`
+    - `POL-CODE-1784753087498298000-bedce972` — `zqk object get POL-CODE-1784753087498298000-bedce972`
+
+    ## Bound policies
+    - `POL-ONBOARD-001`
+    - `POL-ONBOARD-002`
+    - `POL-AGENT-INSTRUCTION-RUBRIC-001`
+    - `POL-WORKFLOW-VDS`
+    - `POL-CODE-CAS-COMMIT-001`
+    - `POL-CODE-1784753087498298000-bedce972`
+
+    ## Bound skills
+    - `ASK-COMMUNITY-ARCH-DESIGN` — `zqk object get ASK-COMMUNITY-ARCH-DESIGN`
+    - `ASK-COMMUNITY-CODE-CRAFTSMAN` — `zqk object get ASK-COMMUNITY-CODE-CRAFTSMAN`
+
+    ## Observer
+    Do not persist an AST census. At execute time call observer_search, then read_code the returned path.
+estimated_effort: 1d
+id: ATK-1789867025450955000-957844c1
+kind: agent_task
+model_tier: tier_2_simple
+namespace_id: zqk:kernel
+outputs:
+    - error: 'native executor failed for ATK-1789867025450955000-957844c1: exit status 1'
+      type: executor_failure
+policy_refs:
+    - POL-ONBOARD-001
+    - POL-ONBOARD-002
+    - POL-AGENT-INSTRUCTION-RUBRIC-001
+    - POL-WORKFLOW-VDS
+    - POL-CODE-CAS-COMMIT-001
+    - POL-CODE-1784753087498298000-bedce972
+priority_plan_ref: PRI-CLI-TAXONOMY-OVERHAUL-001
+related_object_refs:
+    - ASK-COMMUNITY-ARCH-DESIGN
+    - ASK-COMMUNITY-CODE-CRAFTSMAN
+    - BLI-CLI-TAXONOMY-GOVERNANCE-001
+schema_version: 2.0.0
+started_at: "2026-09-20T01:17:08Z"
+status: archived
+task_steps:
+    - description: Resolve the task envelope refs (`zqk object get`, `zqk agent prepare-context`) and execute the dynamic task. Do not copy policy or skill bodies onto the task object.
+      status: pending_implementation
+      title: Implementation Phase
+    - command: ./bin/zqk agent validate
+      description: Must pass targeted validation script.
+      status: pending
+      title: Validation Phase
+      verification_strategy: command_exit_code
+title: 'Execute Task: Establish CLI taxonomy standards, ground rules, and Information Architecture governance'
+updated_at: "2026-09-20T01:20:55Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

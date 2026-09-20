@@ -231,3 +231,15 @@ The tiered storage engine integrates into **Layer 4 Storage & I/O Telemetry**:
   - Number of local Warm Capsules and volume reduction ratio.
   - Number of Cold Vault references.
   - Verification that 0 apoptotic objects participate in active edges.
+
+---
+
+## 7. Traceability & Backlog Verification
+
+This architecture is implemented and verified by `pkg/resourcehygiene` and CLI commands under `zqk system resource-hygiene`.
+
+- **Priority Plan:** `PRI-IO-RESOURCE-HYGIENE-001`
+- **Backlog Items Verified:**
+  - `BLI-1789798192202007000-d96bdcbf` (Mandatory I/O Resource Lifecycle & Lock/Temp Cleanup)
+  - `BLI-IO-CLEANUP-RESOURCE-RETENTION-001` (Automated Log Rolling, Stream Retention, and Stale Lock/Temp Reaping)
+  - `BLI-IO-TELEMETRY-REPORTING-001` (I/O Resource Telemetry and Diagnostics Reporting)

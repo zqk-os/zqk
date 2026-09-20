@@ -1,0 +1,14 @@
+created_at: "2026-09-20T01:18:33Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1789867113344820000-0d7f260a
+item_id: BLI-CLI-VENDOR-ADAPTER-ISOLATION-001
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 8529d48a2bb8e026794ef628337375b2dfec95b6ff616d7dfd0278bc07abe912ce5068db3e7144cea33032c1c425e3f523aba531f46ce9fdb9363ac81af3aff6
+schema_version: 2.0.0
+signature: 3045022100fd37da777f96db08fd5f7c641a1e37d5c6779b4e3aaab6548af8753277d3bfd40220632a5be8c3384789c5701895efa1fd73613dcac00457cfe32d4d1e82363d2041
+status: success
+title: QA success for BLI-CLI-VENDOR-ADAPTER-ISOLATION-001
+updated_at: "2026-09-20T01:18:33Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

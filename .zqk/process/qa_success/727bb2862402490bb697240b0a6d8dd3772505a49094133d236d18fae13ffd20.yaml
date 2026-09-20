@@ -1,0 +1,14 @@
+created_at: "2026-09-20T01:18:32Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1789867112621566000-2444ff11
+item_id: BLI-CLI-SCHEDULER-JOB-MGMT-REORG-001
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 8529d48a2bb8e026794ef628337375b2dfec95b6ff616d7dfd0278bc07abe912ce5068db3e7144cea33032c1c425e3f523aba531f46ce9fdb9363ac81af3aff6
+schema_version: 2.0.0
+signature: 3045022045201053c73a16f4da6573fa65ef3da364feb3b5aa0b2ac2445fe28f01855134022100ecfecaeac3dd4a2323115ef47d9ee1e475369b20a7b745879411b57322b98fef
+status: success
+title: QA success for BLI-CLI-SCHEDULER-JOB-MGMT-REORG-001
+updated_at: "2026-09-20T01:18:32Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

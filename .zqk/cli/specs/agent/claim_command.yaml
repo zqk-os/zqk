@@ -1,0 +1,48 @@
+$schema: "../schemas/command_spec.schema.json"
+
+name: "claim [task_id]"
+short: "Atomically claim an agent_task for exclusive execution"
+description: |
+  Sets claimed_by and claimed_at so only one seat executes the task. Fails if
+  another agent already holds the claim. Hourglass deadline wake is opt-in.
+
+flags:
+  - name: "by"
+    type: "string"
+    default: ""
+    description: "Claimant agent or account id (default: seating or env identity)"
+  - name: "checkin-cadence"
+    type: "duration"
+    default: "5m0s"
+    description: "How long the claim may stay silent before the orchestrator is woken"
+  - name: "cvs"
+    type: "string"
+    default: ""
+    description: "Active convergence session reference"
+  - name: "exit-when-cvs-completed"
+    type: "bool"
+    default: false
+    description: "Block exit until the referenced convergence session is complete"
+  - name: "for"
+    type: "string"
+    default: ""
+    description: "Target backlog item or related object reference"
+  - name: "hourglass-on"
+    type: "bool"
+    default: false
+    description: "Enable hourglass deadline wake signal"
+
+args:
+  type: "maximum"
+  count: 1
+
+help:
+  examples:
+    - comment: "Claim a task as this seat"
+      command: "%s agent claim <task-id> --by <seat-id>"
+    - comment: "Claim work for a backlog item"
+      command: "%s agent claim --for <backlog-id> --by <seat-id>"
+  exclude_flags:
+    - "columns"
+
+common_flags: true

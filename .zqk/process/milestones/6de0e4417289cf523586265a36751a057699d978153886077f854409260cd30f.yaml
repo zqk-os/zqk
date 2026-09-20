@@ -1,0 +1,25 @@
+actual_effort: 14h
+completed_at: "2026-09-20T01:18:33Z"
+created_at: "2026-09-19T11:00:19Z"
+created_by: ACC-1785920548450214012-68b850c0
+criteria_refs:
+    - CRIT-CLI-SPEC-100PCT-COVERAGE-001
+    - CRIT-CLI-TAXONOMY-REORG-001
+description: Foundation milestone establishing 100% command spec coverage, vendor decoupling, deprecated command purge, and intuitive domain grouping.
+estimated_effort: 2d
+goal_refs:
+    - GOAL-CLI-TAXONOMY-CANONICAL-001
+id: MIL-CLI-TAXONOMY-001
+kind: milestone
+namespace_id: zqk:kernel
+priority_tier: P0
+schema_version: 2.0.0
+stage_type: validation
+started_at: "2026-09-19T11:00:19Z"
+status: complete
+title: Canonical CLI Command Taxonomy & Spec Completeness Foundation
+updated_at: "2026-09-20T01:18:33Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default
+workstream_refs:
+    - WS-CLI-TAXONOMY-OVERHAUL

@@ -1,0 +1,14 @@
+created_at: "2026-09-20T01:16:01Z"
+created_by: ACC-1785920548450214012-68b850c0
+id: QAS-1789866961658751000-effaae25
+item_id: BLI-1789798199209192000-3e611a09
+kind: qa_success
+namespace_id: zqk:kernel
+public_key: 8529d48a2bb8e026794ef628337375b2dfec95b6ff616d7dfd0278bc07abe912ce5068db3e7144cea33032c1c425e3f523aba531f46ce9fdb9363ac81af3aff6
+schema_version: 2.0.0
+signature: 3046022100d51fc6bdb6bacdae96299d2933f45a70abbce78f206c6b763cdd8f8cc59ee45d022100bdd83ff6e4d1fe5d3f764391a3a691c6607d117a6ac9a2b62ffcac59d64e44d6
+status: success
+title: QA success for BLI-1789798199209192000-3e611a09
+updated_at: "2026-09-20T01:16:01Z"
+updated_by: ACC-1785920548450214012-68b850c0
+version_context: default

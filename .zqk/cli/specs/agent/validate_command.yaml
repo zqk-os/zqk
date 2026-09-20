@@ -1,0 +1,32 @@
+$schema: "../schemas/command_spec.schema.json"
+
+name: "validate"
+short: "Validate codebase and optionally verify a cryptographic stamp"
+description: |
+  Runs agent-side validation of the codebase. When --stamp is set, verifies
+  the cryptographic stamp (optionally with a local offline fallback).
+
+flags:
+  - name: "local-fallback"
+    type: "bool"
+    default: false
+    description: "Use local offline fallback to verify the stamp"
+  - name: "stamp"
+    type: "string"
+    default: ""
+    description: "Cryptographic stamp to verify"
+
+args:
+  type: "no_args"
+
+help:
+  examples:
+    - comment: "Validate the current tree"
+      command: "%s agent validate"
+    - comment: "Verify a stamp with local fallback"
+      command: "%s agent validate --stamp <stamp> --local-fallback"
+  exclude_flags:
+    - "columns"
+    - "ignore-scheduler-down"
+
+common_flags: true
