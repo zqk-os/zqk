@@ -11,7 +11,7 @@ if [ -z "$DEST" ] || [ ! -d "$DEST" ]; then
 fi
 DEST=$(CDPATH= cd -- "$DEST" && pwd)
 
-# TRACK: TDE-1789629838711755000-bc3ed5d4 — do not ship launch / archive docs.
+# Do not ship launch / archive docs.
 rm -rf "$DEST/docs/launch"
 if [ -d "$DEST/docs" ]; then
   find "$DEST/docs" -depth -type d \( -name "archive" -o -name "_archive" \) -exec rm -rf {} + 2>/dev/null || true

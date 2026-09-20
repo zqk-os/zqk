@@ -14,7 +14,6 @@ import (
 // applybrand rewrites dest first-run copy from canonical `zqk` tokens to
 // brand.executable_name in config/zqk-local.yaml then config/zqk.yaml.
 // SKU overlay sources stay canonical.
-// TRACK: TDE-1789678536875854000-47240146
 func main() {
 	root := flag.String("root", ".", "project root whose brand.executable_name is applied")
 	flag.Parse()

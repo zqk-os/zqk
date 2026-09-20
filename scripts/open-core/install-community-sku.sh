@@ -2,7 +2,6 @@
 # Re-install dest-owned SKU files after a studio overlay so first-run docs/Makefile
 # cannot be replaced by brew/zqk/scheduler copy-paste.
 # Usage: install-community-sku.sh <dest-root>
-# TRACK: TDE-1789690070487265000-ea5471f4
 set -eu
 
 DEST=${1:-}

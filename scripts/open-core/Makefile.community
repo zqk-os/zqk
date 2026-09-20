@@ -3,7 +3,6 @@
 # scripts/open-core/install-community-makefile.sh.
 # Binary basename comes from brand.executable_name in
 # config/zqk-local.yaml (wins) then config/zqk.yaml (default zqk).
-# TRACK: TDE-1789678536875854000-47240146
 
 .PHONY: help all bootstrap-archive clean
 

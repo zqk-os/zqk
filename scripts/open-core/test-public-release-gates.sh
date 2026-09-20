@@ -42,6 +42,16 @@ if sh "$TMP_REPO/scripts/open-core/check-public-release-payload.sh" "$TMP_REPO" 
 fi
 grep -F 'forbidden or unconfigured public artifact present: cmd/zqk-admin' "$TMP_REPO/result.log" >/dev/null
 
+# Prove studio technical_debt instance IDs in overlay scripts fail closed.
+git -C "$TMP_REPO" rm -f -- cmd/zqk-admin >/dev/null
+printf '%s\n' '# leftover studio id TDE-1789678536875854000-47240146' >"$TMP_REPO/scripts/open-core/applybrand-comment.sh"
+git -C "$TMP_REPO" add -- scripts/open-core/applybrand-comment.sh
+if sh "$TMP_REPO/scripts/open-core/check-public-release-payload.sh" "$TMP_REPO" >"$TMP_REPO/tde.log" 2>&1; then
+	printf '%s\n' "payload gate accepted studio technical_debt instance id in scripts" >&2
+	exit 1
+fi
+grep -F 'studio technical_debt instance id remains in scripts' "$TMP_REPO/tde.log" >/dev/null
+
 if [ "$MODE" = "payload-only" ]; then
 	printf '%s\n' "PUBLIC PAYLOAD GATES: PASS"
 	exit 0

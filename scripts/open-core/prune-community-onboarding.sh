@@ -3,7 +3,6 @@
 # dump. First-run surface is sku-overlay last-wins (COMMUNITY_FIRST_RUN,
 # QUICKSTART, FIRST_RUN_OBJECT_TUTORIAL, onboarding README, architecture stubs).
 # Usage: prune-community-onboarding.sh <dest-root>
-# TRACK: TDE-1789690070487265000-ea5471f4
 set -eu
 
 DEST=${1:-}

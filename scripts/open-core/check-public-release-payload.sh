@@ -57,6 +57,22 @@ if git -C "$ROOT" grep -n -F 'lanceman/zqk' -- \
 	fail "private GitHub identity remains in scripts"
 fi
 
+if git -C "$ROOT" grep -n -i 'lanceman' -- \
+	. \
+	':!scripts/open-core/rewrite-community-module-path.sh' \
+	':!scripts/open-core/check-public-release-payload.sh' >/dev/null 2>&1; then
+	fail "private owner/namespace reference (lanceman) remains in tracked repo files"
+fi
+
+# Studio technical_debt instance IDs (TDE-<nanos>-<hex>) belong in kernel CAS,
+# not in public overlay/packaging comments.
+if git -C "$ROOT" grep -n -E 'TDE-[0-9]{15,}-[0-9a-fA-F]{8}' -- \
+	'scripts' \
+	':!scripts/open-core/check-public-release-payload.sh' \
+	':!scripts/open-core/test-public-release-gates.sh' >/dev/null 2>&1; then
+	fail "studio technical_debt instance id remains in scripts"
+fi
+
 if grep -E 'APPENDIX A|Proprietary|Commercial Enterprise|OPEN_CORE_PROPRIETARY_SPLIT' \
 	"$ROOT/LICENSE" "$ROOT/NOTICE" >/dev/null 2>&1; then
 	fail "LICENSE or NOTICE still carries the studio monorepo carve-out"
@@ -70,6 +86,7 @@ if git -C "$ROOT" grep -n -E '\bzcom\b|zqk-community' -- \
 fi
 
 sensitive=$(git -C "$ROOT" ls-files \
+	'.zqk/process/**' 'docs/process/**' \
 	'.zqk/keystore/**' '.zqk/state/**' 'config/zqk-local.yaml' \
 	'*.pem' '*.key' '*.p12' '*.pfx' '*.test')
 if [ -n "$sensitive" ]; then

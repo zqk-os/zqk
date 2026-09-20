@@ -86,8 +86,14 @@ if command -v find >/dev/null 2>&1; then
       echo "$extras"
       FAIL=1
     fi
+    studio_diffs=$(find "$ROOT/scripts" -name 'community-to-studio-*' 2>/dev/null || true)
+    if [ -n "$studio_diffs" ]; then
+      echo "MUST_NOT leftover studio patch dump:"
+      echo "$studio_diffs"
+      FAIL=1
+    fi
   fi
-  # Archived docs must not be present in candidate docs (TDE-1789629838711755000-bc3ed5d4)
+  # Archived docs must not be present in candidate docs.
   if [ -d "$ROOT/docs" ]; then
     archived_docs=$(find "$ROOT/docs" \( -name "archive" -o -name "_archive" -o -path '*/archive/*' -o -path '*/_archive/*' \) 2>/dev/null || true)
     if [ -n "$archived_docs" ]; then
