@@ -108,4 +108,3 @@ func TestEnsureRetentionJobs_FallbackToEmbeddedTemplates(t *testing.T) {
 		t.Fatal("expected jobs to be created via embedded bootstrap archive templates")
 	}
 }
-
