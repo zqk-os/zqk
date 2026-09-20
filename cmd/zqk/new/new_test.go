@@ -3,6 +3,7 @@ package newcmd
 import (
 	"bytes"
 	"context"
+	"os"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -12,6 +13,7 @@ import (
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/storage"
 	"github.com/zqk-os/zqk/pkg/testenvroot"
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"github.com/zqk-os/zqk/pkg/zqkenv"
@@ -55,6 +57,10 @@ func TestNewObject_mintRequiresTitle(t *testing.T) {
 func TestNewObject_unknown_kind_errors(t *testing.T) {
 	testRoot := t.TempDir()
 	t.Setenv(zqkenv.TestRoot().Name(), testRoot)
+	t.Cleanup(func() {
+		_ = storage.RunProjectTestTeardown(storage.TempProjectTeardown(testRoot, nil))
+		_ = os.RemoveAll(filepath.Join(testRoot, ".zqk"))
+	})
 
 	repoRoot := zqkenv.ProjectRoot().Get()
 	if repoRoot == "" {

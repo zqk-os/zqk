@@ -766,6 +766,14 @@ const _sfxWatchdogTimeout = "WATCHDOG_TIMEOUT"
 
 func WatchdogTimeout() EnvVar { return EnvVar{Key: brand.EnvVar(_sfxWatchdogTimeout)} }
 
+const _sfxZqkShimBypassTraceability = "SHIM_BYPASS_TRACEABILITY"
+
+// ZqkShimBypassTraceability returns the canonical environment variable name for bypassing shim commit traceability.
+func ZqkShimBypassTraceability() EnvVar {
+	return EnvVar{Key: brand.EnvVar(_sfxZqkShimBypassTraceability)}
+}
+
+// ZqkShimBypassPolCode009 is a deprecated alias for ZqkShimBypassTraceability (retained for backward compatibility).
 const _sfxZqkShimBypassPolCode009 = "ZQK_SHIM_BYPASS_POLCODE009" //nolint:gosec
 
 func ZqkShimBypassPolCode009() EnvVar { return EnvVar{Key: brand.EnvVar(_sfxZqkShimBypassPolCode009)} }

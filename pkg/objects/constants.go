@@ -158,6 +158,11 @@ const (
 	JobIDCapOrchestrator = "SCH-cap-orchestrator"
 	JobIDCapNightDuty    = "SCH-cap-night-duty"
 
+	// StarterCAPGlossaryTermID is the community first-run glossary_term that defines CAP.
+	StarterCAPGlossaryTermID = "GLS-STARTER-CAP-001"
+	// StarterCAPGlossaryTitle is the portable title used to resolve CAP when CAS ids differ.
+	StarterCAPGlossaryTitle = "Continuous Autonomous Progression (CAP)"
+
 	KindBaseObject             = kindnames.BaseObject
 	KindAuditable              = kindnames.Auditable
 	KindWorkInterval           = kindnames.WorkInterval

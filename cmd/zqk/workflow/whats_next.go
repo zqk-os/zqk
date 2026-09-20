@@ -553,7 +553,7 @@ func runWhatsNextSyncSweep(cmd *cobra.Command, args []string, proc *cli.Processo
 }
 
 func getObserverTips() []string {
-	return observerpkg.ReadCachedTips(zqkenv.ProjectRoot().Name())
+	return observerpkg.ReadCachedTips(zqkenv.ProjectRoot().Get())
 }
 
 func resolvePriorityPlanForWhatsNext(ctx context.Context, sp workflowStorage, explicit string, personaIDs []string) (planID string, summ *whatsNextPriorityPlan, activePlans []whatsNextPriorityPlan) {

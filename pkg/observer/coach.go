@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"path/filepath"
 	"strings"
 
 	"github.com/zqk-os/zqk/pkg/paths"
@@ -66,8 +65,7 @@ func cleanJSONResponse(raw string) string {
 
 // ReadCachedTips reads the latest generated tips from the state file.
 func ReadCachedTips(projectRoot string) []string {
-	stateFile := filepath.Join(projectRoot, paths.ProjectDataDir, "state", "observer_tips.json")
-	b, err := fileutil.ReadFile(stateFile)
+	b, err := fileutil.ReadFile(paths.ObserverTipsPath(projectRoot))
 	if err != nil {
 		return nil
 	}
@@ -78,9 +76,24 @@ func ReadCachedTips(projectRoot string) []string {
 	return nil
 }
 
+// FormatCachedTips returns the observer-tips block for prompts, or empty if none are cached.
+func FormatCachedTips(projectRoot string) string {
+	tips := ReadCachedTips(projectRoot)
+	if len(tips) == 0 {
+		return ""
+	}
+	var sb strings.Builder
+	sb.WriteString("\n--- AST Observer Insights ---\n")
+	for _, tip := range tips {
+		sb.WriteString("- " + tip + "\n")
+	}
+	sb.WriteString("-----------------------------\n")
+	return sb.String()
+}
+
 // WriteCachedTips writes the generated tips to the state file.
 func WriteCachedTips(projectRoot string, tips []string) error {
-	stateDir := filepath.Join(projectRoot, paths.ProjectDataDir, "state")
+	stateDir := paths.StateDirPath(projectRoot)
 	if err := fileutil.EnsureDir(stateDir); err != nil {
 		return err
 	}
@@ -88,5 +101,5 @@ func WriteCachedTips(projectRoot string, tips []string) error {
 	if err != nil {
 		return err
 	}
-	return fileutil.WriteSecureFile(filepath.Join(stateDir, "observer_tips.json"), b)
+	return fileutil.WriteSecureFile(paths.ObserverTipsPath(projectRoot), b)
 }

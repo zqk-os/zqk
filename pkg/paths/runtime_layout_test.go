@@ -33,6 +33,12 @@ func TestRuntimeLayoutPaths_fallbackWithoutCache(t *testing.T) {
 	if got := RepoBinPath(root); got != filepath.Join(root, RepoBinDir, brand.ExecutableName()) {
 		t.Fatalf("RepoBinPath=%q", got)
 	}
+	if got := StateDirPath(root); got != filepath.Join(root, ProjectDataDir, StateDir) {
+		t.Fatalf("StateDirPath=%q", got)
+	}
+	if got := ObserverTipsPath(root); got != filepath.Join(root, ProjectDataDir, StateDir, ObserverTipsFile) {
+		t.Fatalf("ObserverTipsPath=%q", got)
+	}
 	if got := PeerSeatsPath(root); got != filepath.Join(root, ProjectDataDir, StateDir, MeshStateSubdir, PeerSeatsFile) {
 		t.Fatalf("PeerSeatsPath=%q", got)
 	}

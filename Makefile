@@ -3,9 +3,8 @@
 # scripts/open-core/install-community-makefile.sh.
 # Binary basename comes from brand.executable_name in
 # config/zqk-local.yaml (wins) then config/zqk.yaml (default zqk).
-# TRACK: TDE-1789678536875854000-47240146
 
-.PHONY: help all bootstrap-archive clean
+.PHONY: help all bootstrap-archive clean test test-unit test-integration
 
 .DEFAULT_GOAL := all
 
@@ -31,8 +30,11 @@ LDFLAGS = -X github.com/zqk-os/zqk/cmd/zqk/app.version=$(VERSION) \
 help:
 	@echo "ZQK — binary name is brand.executable_name ($(BRAND_EXE))"
 	@echo ""
-	@echo "  make / make all    Build ./$(BIN)"
-	@echo "  make clean         Remove bin/*"
+	@echo "  make / make all       Build ./$(BIN)"
+	@echo "  make clean            Remove bin/*"
+	@echo "  make test             Run both unit and integration tests"
+	@echo "  make test-unit        Run unit tests (pkg/...)"
+	@echo "  make test-integration Run integration tests (release gates & CLI suites)"
 	@echo ""
 	@echo "Scheduler CLI: ./$(BIN) scheduler start|stop|status"
 	@echo "Run ./$(BIN) from this directory. Do not export a project-root environment variable."
@@ -49,6 +51,14 @@ bootstrap-archive:
 all: bootstrap-archive
 	go build -ldflags '$(LDFLAGS)' -o $(BIN) ./cmd/zqk
 	ln -sf $(BRAND_EXE) bin/$(BRAND_EXE)-mcp-ide-adapter
+
+test-unit:
+	ZQK_ALLOW_FOREGROUND_GO_TEST=1 go test -short -timeout 10m ./pkg/...
+
+test-integration:
+	ZQK_ALLOW_FOREGROUND_GO_TEST=1 sh scripts/open-core/test-public-release-gates.sh
+
+test: test-unit test-integration
 
 clean:
 	rm -rf bin/*

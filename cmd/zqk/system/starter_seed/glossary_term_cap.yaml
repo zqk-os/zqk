@@ -1,0 +1,45 @@
+id: GLS-STARTER-CAP-001
+kind: glossary_term
+schema_version: 2.0.0
+namespace_id: zqk:kernel
+title: Continuous Autonomous Progression (CAP)
+status: active
+category: process
+context_scope: operational
+definition: |-
+  Continuous Autonomous Progression (CAP) is the kernel's repeating work loop.
+  Stages run in order: planning, design, grooming, orchestrating, review, metrics,
+  self-improvement, and sentinel. The scheduler job SCH-cap-orchestrator is the
+  loop driver; a stage advance is not "done" and does not replace evidence gates
+  such as the Verifiable Decomposition Spine (VDS).
+  Summary milestones (merged PR, promoted binary, rendered artifact) are transitions
+  inside the loop, not a reason to go idle.
+agent_prompts: |-
+  Expand CAP on first use as Continuous Autonomous Progression.
+  Bind glossary_term_ref to GLS-STARTER-CAP-001 when writing requirements,
+  criteria, or session notes about the loop.
+  Do not treat CAP stage churn as completion.
+machine_hints: |-
+  {
+    "acronym": "CAP",
+    "aliases": ["CAP loop", "Continuous Autonomous Progression", "continuous autonomous loop"],
+    "scheduler_job_id": "SCH-cap-orchestrator",
+    "stages": [
+      "cap_stage_planning",
+      "cap_stage_design",
+      "cap_stage_grooming",
+      "cap_stage_orchestrating",
+      "cap_stage_review",
+      "cap_stage_metrics",
+      "cap_stage_self_improvement",
+      "cap_stage_sentinel"
+    ]
+  }
+semantic_tags:
+  - process
+  - orchestration
+description: Seed glossary term so first-run agents can resolve the CAP acronym.
+created_by: "{{CREATED_BY}}"
+updated_by: "{{UPDATED_BY}}"
+created_at: "{{CREATED_AT}}"
+updated_at: "{{UPDATED_AT}}"

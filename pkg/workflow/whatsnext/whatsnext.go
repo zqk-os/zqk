@@ -76,7 +76,7 @@ type WhatsNextCVSRow struct {
 // NewWhatsNextCmd returns workflow whats-next command.
 
 func getObserverTips() []string {
-	return observerpkg.ReadCachedTips(zqkenv.ProjectRoot().Name())
+	return observerpkg.ReadCachedTips(zqkenv.ProjectRoot().Get())
 }
 
 func resolvePriorityPlanForWhatsNext(ctx context.Context, sp storage.ObjectStorageProvider, explicit string, personaIDs []string) (planID string, summ *WhatsNextPriorityPlan, activePlans []WhatsNextPriorityPlan) {

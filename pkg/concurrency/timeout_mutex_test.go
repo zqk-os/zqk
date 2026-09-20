@@ -162,16 +162,17 @@ func TestWithLockTimeout_Timeout(t *testing.T) {
 	t.Parallel()
 
 	var mu sync.Mutex
-	ctx, cancel := context.WithTimeout(context.Background(), 50*time.Millisecond)
+	ctx, cancel := context.WithTimeout(context.Background(), 25*time.Millisecond)
 	defer cancel()
 
-	// Acquire lock in another goroutine to block
+	// Acquire lock to block
 	mu.Lock()
+	done := make(chan struct{})
 	goroutinelabels.NewGoroutine("concurrency_test", "block mutex").StartSimple(func() {
-		// retry backoff delay
-		time.Sleep(50 * time.Millisecond)
+		<-done
 		mu.Unlock()
 	})
+	defer close(done)
 
 	// This should timeout because lock is held
 	err := WithLockTimeout(
@@ -181,8 +182,6 @@ func TestWithLockTimeout_Timeout(t *testing.T) {
 		nil,
 		lockOpTimeoutTest,
 		func() error {
-			// retry backoff delay
-			time.Sleep(50 * time.Millisecond)
 			return nil
 		},
 	)

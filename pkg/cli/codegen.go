@@ -327,6 +327,9 @@ func generateArgsCode(args *ArgsSpec) string {
 		max := 0
 		if args.Max != nil {
 			max = *args.Max
+		} else if args.Count != nil {
+			// DNA often uses count: with type maximum (same as max).
+			max = *args.Count
 		}
 		return fmt.Sprintf("cobra.MaximumNArgs(%d)", max)
 	default:
