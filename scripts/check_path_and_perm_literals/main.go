@@ -687,7 +687,7 @@ func isTrivialString(s string) bool {
 func detectPathsImport(repoRoot string) (string, error) {
 	data, err := os.ReadFile(filepath.Join(repoRoot, "go.mod"))
 	if err != nil {
-		return "github.com/lanceman/zqk/pkg/paths", nil
+		return "github.com/zqk-os/zqk/pkg/paths", nil
 	}
 	for _, line := range strings.Split(string(data), "\n") {
 		line = strings.TrimSpace(line)
@@ -696,7 +696,7 @@ func detectPathsImport(repoRoot string) (string, error) {
 			return mod + "/pkg/paths", nil
 		}
 	}
-	return "github.com/lanceman/zqk/pkg/paths", nil
+	return "github.com/zqk-os/zqk/pkg/paths", nil
 }
 
 func gitGoFiles(repo string) ([]string, error) {

@@ -16,8 +16,8 @@ func NewPreCommitCmd() *cobra.Command {
 		"Commands for the pre-commit hook that reads a single results file updated by background jobs.",
 		"",
 		"Background jobs (e.g. linter per package, integrity check, policy checks) write category",
-		"files to " + paths.ProjectDataDir + "/pre-commit/<category>.json. The aggregate command merges them into",
-		paths.ProjectDataDir + "/pre-commit/results.json (under " + paths.ProjectDataDir + "/pre-commit/) with one 'block' indicator that the hook reads.",
+		"files to "+paths.ProjectDataDir+"/pre-commit/<category>.json. The aggregate command merges them into",
+		paths.ProjectDataDir+"/pre-commit/results.json (under "+paths.ProjectDataDir+"/pre-commit/) with one 'block' indicator that the hook reads.",
 	).
 		AddExample("Merge category results into single file", "%s pre-commit aggregate").
 		AddExample("Write lint result after running linter", "%s pre-commit write-result --category=lint --ok=false --summary=\"3 issues\"")
