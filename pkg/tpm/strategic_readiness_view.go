@@ -16,6 +16,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/zqk-os/zqk/pkg/lifecycle"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/storage"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"github.com/zqk-os/zqk/pkg/walutil"
@@ -23,7 +24,7 @@ import (
 
 // StrategicReadinessLiteFilePath returns the canonical path for the materialized strategic readiness view.
 func StrategicReadinessLiteFilePath(projectRoot string) string {
-	return filepath.Join(projectRoot, ".zqk", "state", "strategic_readiness_lite.json")
+	return filepath.Join(projectRoot, paths.ProjectDataDir, paths.StateDir, "strategic_readiness_lite.json")
 }
 
 // RequirementReadinessNode tracks the functional readiness and fuel status of a single requirement.
@@ -367,14 +368,14 @@ func (v *StrategicReadinessView) SaveToLiteFile() error {
 		return fmt.Errorf("marshal strategic readiness payload: %w", err)
 	}
 
-	stateDir := filepath.Join(v.projectRoot, ".zqk", "state")
-	if err := fileutil.MkdirAll(stateDir, 0o755); err != nil {
+	stateDir := filepath.Join(v.projectRoot, paths.ProjectDataDir, paths.StateDir)
+	if err := fileutil.MkdirAll(stateDir, paths.DirPerm755); err != nil {
 		return fmt.Errorf("create state dir: %w", err)
 	}
 
 	litePath := StrategicReadinessLiteFilePath(v.projectRoot)
 	tmpPath := litePath + ".tmp"
-	if err := fileutil.WriteFile(tmpPath, data, 0o644); err != nil {
+	if err := fileutil.WriteFile(tmpPath, data, paths.FilePerm644); err != nil {
 		return fmt.Errorf("write tmp strategic readiness file: %w", err)
 	}
 	return fileutil.Rename(tmpPath, litePath)

@@ -17,6 +17,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/metricsrecording"
 	"github.com/zqk-os/zqk/pkg/nildecode"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/pipeline"
 	"github.com/zqk-os/zqk/pkg/storage"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
@@ -475,7 +476,7 @@ func runSystemCheckPipelineWithOutcome(
 		AddStage("CAP_PROBE", func(stageCtx *pipeline.Context, payload any) (any, error) {
 			plLoad := payload.(*systemCheckPipelinePayload)
 			if plLoad.checkCtx != nil && plLoad.checkCtx.ProjectRoot != emptyValue {
-				journalPath := filepath.Join(plLoad.checkCtx.ProjectRoot, ".zqk", "logs", "scheduler", objects.JobIDCapOrchestrator, objects.JobIDCapOrchestrator+".events.jsonl")
+				journalPath := filepath.Join(plLoad.checkCtx.ProjectRoot, paths.ProjectDataDir, paths.LogsDir, "scheduler", objects.JobIDCapOrchestrator, objects.JobIDCapOrchestrator+".events.jsonl")
 				stat, err := fileutil.Stat(journalPath)
 				if err == nil {
 					if time.Since(stat.ModTime()) > 4*time.Hour {

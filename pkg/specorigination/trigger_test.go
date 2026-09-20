@@ -37,7 +37,7 @@ func TestAdminTriggerBinaryPath(t *testing.T) {
 	}
 
 	projectRoot := filepath.Join(string(filepath.Separator), "work", "zqk")
-	stable := filepath.Join(projectRoot, ".zqk", "bin", "zqk-stable")
+	stable := filepath.Join(projectRoot, paths.ProjectDataDir, "bin", "zqk-stable")
 	candidates := adminTriggerBinaryCandidates(stable)
 	repoAdmin := filepath.Join(projectRoot, "bin", adminBinaryName)
 	if len(candidates) != 2 || candidates[1] != repoAdmin {
@@ -48,15 +48,15 @@ func TestAdminTriggerBinaryPath(t *testing.T) {
 func TestGenerateSpecBuilder(t *testing.T) {
 	root := t.TempDir()
 	specDir := filepath.Join(root, paths.ProcessInternalObjectSpecsDir)
-	if err := fileutil.MkdirAll(specDir, 0o755); err != nil {
+	if err := fileutil.MkdirAll(specDir, paths.DirPerm755); err != nil {
 		t.Fatal(err)
 	}
 	versionDir := filepath.Join(root, "pkg", "specbuilder", "bldr_v2")
-	if err := fileutil.MkdirAll(versionDir, 0o755); err != nil {
+	if err := fileutil.MkdirAll(versionDir, paths.DirPerm755); err != nil {
 		t.Fatal(err)
 	}
 	existingConstants := "package bldr_v2\n\nconst FieldName = \"name\"\n"
-	if err := fileutil.WriteFile(filepath.Join(versionDir, "persona_constants.go"), []byte(existingConstants), 0o644); err != nil {
+	if err := fileutil.WriteFile(filepath.Join(versionDir, "persona_constants.go"), []byte(existingConstants), paths.FilePerm644); err != nil {
 		t.Fatal(err)
 	}
 	spec := `schema_version: 2.0.0
@@ -66,7 +66,7 @@ fields:
   name:
     type: string
 `
-	if err := fileutil.WriteFile(filepath.Join(specDir, "trigger_probe.yaml"), []byte(spec), 0o644); err != nil {
+	if err := fileutil.WriteFile(filepath.Join(specDir, "trigger_probe.yaml"), []byte(spec), paths.FilePerm644); err != nil {
 		t.Fatal(err)
 	}
 

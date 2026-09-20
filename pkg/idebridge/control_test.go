@@ -6,6 +6,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/zqk-os/zqk/pkg/paths"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -41,7 +42,7 @@ func TestAppendRequest_rejectsPrivateIDEIDs(t *testing.T) {
 
 func TestControlJSONLPath(t *testing.T) {
 	got := ControlJSONLPath("/proj")
-	if !strings.HasSuffix(got, filepath.Join(".zqk", "logs", "ide-hooks", "ide_bridge_control.jsonl")) {
+	if !strings.HasSuffix(got, filepath.Join(paths.ProjectDataDir, paths.LogsDir, "ide-hooks", "ide_bridge_control.jsonl")) {
 		t.Fatalf("unexpected path: %s", got)
 	}
 }

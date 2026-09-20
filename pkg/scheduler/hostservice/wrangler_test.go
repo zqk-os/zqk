@@ -4,6 +4,7 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/zqk-os/zqk/pkg/paths"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -52,9 +53,9 @@ func TestRuntimeWranglerStopSticky(t *testing.T) {
 	wrangler := NewRuntimeWrangler(tempDir)
 
 	// Create fake scheduler pid
-	pidDir := filepath.Join(tempDir, ".zqk", "state")
-	_ = fileutil.MkdirAll(pidDir, 0755)
-	_ = fileutil.WriteFile(filepath.Join(pidDir, "scheduler.pid"), []byte("9999999"), 0644)
+	pidDir := filepath.Join(tempDir, paths.ProjectDataDir, paths.StateDir)
+	_ = fileutil.MkdirAll(pidDir, paths.DirPerm755)
+	_ = fileutil.WriteFile(filepath.Join(pidDir, "scheduler.pid"), []byte("9999999"), paths.FilePerm644)
 
 	if err := wrangler.Stop(); err != nil {
 		t.Fatalf("Stop() error = %v", err)

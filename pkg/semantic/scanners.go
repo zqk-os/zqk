@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/zqk-os/zqk/pkg/appledouble"
+	"github.com/zqk-os/zqk/pkg/paths"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -165,7 +166,7 @@ func (s *SemanticRepositoryScanner) Scan(projectRoot string) ([]Indicator, error
 
 	// Check for SPARQL endpoint configurations
 	configFiles := []string{
-		".zqk/config.yaml",
+		filepath.Join(paths.ProjectDataDir, paths.ProjectConfigFile),
 		"config.yaml",
 		".env",
 		"docker-compose.yml",

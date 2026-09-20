@@ -9,6 +9,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/brand"
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/license"
+	"github.com/zqk-os/zqk/pkg/paths"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -98,11 +99,11 @@ func LoadLicense() {
 		return
 	}
 
-	licensePath := filepath.Join(home, ".zqk-state", "license.jwt")
+	licensePath := filepath.Join(home, paths.ProjectStateDir, "license.jwt")
 	tokenBytes, err := fileutil.ReadFile(licensePath)
 	if err != nil {
 		// Fallback to checking ~/.zqk/license.jwt for backwards compatibility
-		licensePath = filepath.Join(home, ".zqk", "license.jwt")
+		licensePath = filepath.Join(home, paths.ProjectDataDir, "license.jwt")
 		tokenBytes, err = fileutil.ReadFile(licensePath)
 		if err != nil {
 			return

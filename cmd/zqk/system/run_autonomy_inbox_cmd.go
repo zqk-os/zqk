@@ -2,11 +2,13 @@ package system
 
 import (
 	"context"
+	"path/filepath"
 	"time"
 
 	"github.com/spf13/cobra"
 
 	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/paths"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -51,7 +53,7 @@ func evaluatePendingPullRequests(ctx context.Context) error {
 	logging.FluentEvent(logger).Debug("Verified test coverage and policy adherence for ambient triggers.").Log()
 
 	// Read canonical cap_review_result.json state if present
-	capPath := ".zqk/state/cap_review_result.json"
+	capPath := filepath.Join(paths.ProjectDataDir, paths.StateDir, "cap_review_result.json")
 	data, err := fileutil.ReadFile(capPath)
 	if err == nil && len(data) > 0 {
 		logging.FluentEvent(logger).Info("Autonomy Inbox successfully loaded ambient CAP review state").Log()

@@ -247,7 +247,7 @@ func TestEnsureOrchestrationWorktreeReusesExisting(t *testing.T) {
 	runTestGit(t, repo, "init")
 	runTestGit(t, repo, "config", "user.email", "orch@example.invalid")
 	runTestGit(t, repo, "config", "user.name", "Orch Test")
-	if err := fileutil.WriteFile(filepath.Join(repo, "README"), []byte("base\n"), 0o600); err != nil {
+	if err := fileutil.WriteFile(filepath.Join(repo, "README"), []byte("base\n"), paths.FilePerm600); err != nil {
 		t.Fatal(err)
 	}
 	runTestGit(t, repo, "add", "README")
@@ -278,7 +278,7 @@ func TestEnsureOrchestrationWorktree_resetsLeftoverDirt(t *testing.T) {
 	runTestGit(t, repo, "init")
 	runTestGit(t, repo, "config", "user.email", "orch@example.invalid")
 	runTestGit(t, repo, "config", "user.name", "Orch Test")
-	if err := fileutil.WriteFile(filepath.Join(repo, "kept.go"), []byte("package kept\n"), 0o600); err != nil {
+	if err := fileutil.WriteFile(filepath.Join(repo, "kept.go"), []byte("package kept\n"), paths.FilePerm600); err != nil {
 		t.Fatal(err)
 	}
 	runTestGit(t, repo, "add", "kept.go")
@@ -292,19 +292,19 @@ func TestEnsureOrchestrationWorktree_resetsLeftoverDirt(t *testing.T) {
 	if err != nil {
 		t.Fatalf("create: %v", err)
 	}
-	if err := fileutil.WriteFile(filepath.Join(wt, "kept.go"), []byte("package clobbered\n"), 0o600); err != nil {
+	if err := fileutil.WriteFile(filepath.Join(wt, "kept.go"), []byte("package clobbered\n"), paths.FilePerm600); err != nil {
 		t.Fatal(err)
 	}
 	junk := filepath.Join(wt, "invented.go")
-	if err := fileutil.WriteFile(junk, []byte("package invented\n"), 0o600); err != nil {
+	if err := fileutil.WriteFile(junk, []byte("package invented\n"), paths.FilePerm600); err != nil {
 		t.Fatal(err)
 	}
 	casDir := filepath.Join(wt, paths.ProcessDir, "backlog")
-	if err := fileutil.MkdirAll(casDir, 0o755); err != nil {
+	if err := fileutil.MkdirAll(casDir, paths.DirPerm755); err != nil {
 		t.Fatal(err)
 	}
 	casFile := filepath.Join(casDir, "deadbeef.yaml")
-	if err := fileutil.WriteFile(casFile, []byte("id: BLI-KEEP\n"), 0o600); err != nil {
+	if err := fileutil.WriteFile(casFile, []byte("id: BLI-KEEP\n"), paths.FilePerm600); err != nil {
 		t.Fatal(err)
 	}
 
@@ -335,14 +335,14 @@ func TestEnsureOrchestrationWorktree_retargetsStaleAgentBranch(t *testing.T) {
 	runTestGit(t, repo, "init", "-b", "main")
 	runTestGit(t, repo, "config", "user.email", "orch@example.invalid")
 	runTestGit(t, repo, "config", "user.name", "Orch Test")
-	if err := fileutil.WriteFile(filepath.Join(repo, "old.go"), []byte("package old\n"), 0o600); err != nil {
+	if err := fileutil.WriteFile(filepath.Join(repo, "old.go"), []byte("package old\n"), paths.FilePerm600); err != nil {
 		t.Fatal(err)
 	}
 	runTestGit(t, repo, "add", "old.go")
 	runTestGit(t, repo, "commit", "-m", "old tip")
 	runTestGit(t, repo, "branch", "agent/ATK-stale-1")
 
-	if err := fileutil.WriteFile(filepath.Join(repo, "new.go"), []byte("package new\n"), 0o600); err != nil {
+	if err := fileutil.WriteFile(filepath.Join(repo, "new.go"), []byte("package new\n"), paths.FilePerm600); err != nil {
 		t.Fatal(err)
 	}
 	runTestGit(t, repo, "add", "new.go")

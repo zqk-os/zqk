@@ -12,6 +12,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/lifecycle"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/storage"
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"github.com/zqk-os/zqk/pkg/walutil"
@@ -52,7 +53,7 @@ func NewAuditorService(wal *lifecycle.LifecycleEventWAL, s storage.ObjectStorage
 }
 
 func (s *AuditorService) getIDEPath() string {
-	return filepath.Join(".zqk", "ides", "qa_auditor.ide")
+	return filepath.Join(paths.ProjectDataDir, paths.IdesSubdir, "qa_auditor.ide")
 }
 
 func (s *AuditorService) loadIDE() walutil.ReplayCursor {

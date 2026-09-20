@@ -85,10 +85,10 @@ func TestValidateCrossPlaneReferences_FilesystemFallback(t *testing.T) {
 	shard := fmt.Sprintf("%x", sum[:])[:2]
 
 	draftFile := filepath.Join(tmpDir, paths.ProjectDataDir, paths.ObjectDraftsDir, objects.KindCriteria, shard, draftID+".yaml")
-	if err := fileutil.MkdirAll(filepath.Dir(draftFile), 0755); err != nil {
+	if err := fileutil.MkdirAll(filepath.Dir(draftFile), paths.DirPerm755); err != nil {
 		t.Fatalf("failed to create draft dir: %v", err)
 	}
-	if err := fileutil.WriteFile(draftFile, []byte("id: "+draftID+"\nkind: criteria\nstatus: conceptual\n"), 0644); err != nil {
+	if err := fileutil.WriteFile(draftFile, []byte("id: "+draftID+"\nkind: criteria\nstatus: conceptual\n"), paths.FilePerm644); err != nil {
 		t.Fatalf("failed to write draft file: %v", err)
 	}
 

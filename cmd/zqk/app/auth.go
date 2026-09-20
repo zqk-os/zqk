@@ -101,7 +101,7 @@ func runLogin(cmd *cobra.Command, _ []string) error {
 	home, err := fileutil.UserHomeDir()
 	if err == nil {
 		credDir := filepath.Join(home, paths.ProjectDataDir)
-		_ = fileutil.MkdirAll(credDir, 0700)
+		_ = fileutil.MkdirAll(credDir, paths.DirPerm700)
 		credPath := filepath.Join(credDir, "credentials")
 		_ = fileutil.WriteSecureFile(credPath, []byte(sessionID))
 	}

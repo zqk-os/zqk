@@ -13,10 +13,10 @@ func TestValidateNoRepoStateMutation(t *testing.T) {
 
 	repoRoot := t.TempDir()
 	testRoot := filepath.Join(repoRoot, "test_root")
-	if err := fileutil.MkdirAll(filepath.Join(repoRoot, paths.ProcessDir), 0755); err != nil {
+	if err := fileutil.MkdirAll(filepath.Join(repoRoot, paths.ProcessDir), paths.DirPerm755); err != nil {
 		t.Fatal(err)
 	}
-	if err := fileutil.MkdirAll(testRoot, 0755); err != nil {
+	if err := fileutil.MkdirAll(testRoot, paths.DirPerm755); err != nil {
 		t.Fatal(err)
 	}
 
@@ -33,7 +33,7 @@ func TestValidateNoRepoStateMutation(t *testing.T) {
 	}
 
 	// 3. Prohibited: target directly in repo .zqk
-	badZqkTarget := filepath.Join(repoRoot, ".zqk", "cache.json")
+	badZqkTarget := filepath.Join(repoRoot, paths.ProjectDataDir, "cache.json")
 	if err := ValidateNoRepoStateMutation(badZqkTarget, repoRoot, testRoot); err == nil {
 		t.Fatal("expected write to repo .zqk to fail closed, got nil error")
 	}
@@ -44,11 +44,11 @@ func TestSnapshotRepoState_DetectsDeliberateViolation(t *testing.T) {
 
 	repoRoot := t.TempDir()
 	processDir := filepath.Join(repoRoot, paths.ProcessBacklogDir)
-	if err := fileutil.MkdirAll(processDir, 0755); err != nil {
+	if err := fileutil.MkdirAll(processDir, paths.DirPerm755); err != nil {
 		t.Fatal(err)
 	}
 	existingFile := filepath.Join(processDir, "original.yaml")
-	if err := fileutil.WriteFile(existingFile, []byte("id: BLI-ORIGINAL\n"), 0600); err != nil {
+	if err := fileutil.WriteFile(existingFile, []byte("id: BLI-ORIGINAL\n"), paths.FilePerm600); err != nil {
 		t.Fatal(err)
 	}
 
@@ -64,7 +64,7 @@ func TestSnapshotRepoState_DetectsDeliberateViolation(t *testing.T) {
 
 	// Deliberate violation: create a rogue file in repo process dir
 	rogueFile := filepath.Join(processDir, "rogue_leak.yaml")
-	if err := fileutil.WriteFile(rogueFile, []byte("id: BLI-ROGUE\n"), 0600); err != nil {
+	if err := fileutil.WriteFile(rogueFile, []byte("id: BLI-ROGUE\n"), paths.FilePerm600); err != nil {
 		t.Fatal(err)
 	}
 

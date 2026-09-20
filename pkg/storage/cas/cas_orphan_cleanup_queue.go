@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"path/filepath"
 
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/storage/filecas"
 
 	"sync"
@@ -660,7 +661,7 @@ func (q *CASOrphanCleanupQueue) CleanupOrphanedDrafts(ctx context.Context, draft
 		if pRoot == emptyValue {
 			return 0, nil
 		}
-		draftsDir = filepath.Join(pRoot, ".zqk", "drafts")
+		draftsDir = filepath.Join(pRoot, paths.ProjectDataDir, paths.DraftsSubdir)
 	}
 
 	entries, err := fileutil.ReadDir(draftsDir)

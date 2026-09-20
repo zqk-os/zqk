@@ -14,11 +14,11 @@ func TestResolveStatusCheckBinary_PrefersProjectStable(t *testing.T) {
 	t.Parallel()
 	root := t.TempDir()
 	stableDir := filepath.Join(root, paths.ProjectDataDir, "bin")
-	if err := fileutil.MkdirAll(stableDir, 0o755); err != nil {
+	if err := fileutil.MkdirAll(stableDir, paths.DirPerm755); err != nil {
 		t.Fatal(err)
 	}
 	stable := filepath.Join(stableDir, "zqk-stable")
-	if err := fileutil.WriteFile(stable, []byte("#!/bin/sh\n"), 0o755); err != nil {
+	if err := fileutil.WriteFile(stable, []byte("#!/bin/sh\n"), paths.DirPerm755); err != nil {
 		t.Fatal(err)
 	}
 	got := resolveStatusCheckBinary(root)

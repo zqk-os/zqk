@@ -8,6 +8,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -87,7 +88,7 @@ func (c *DiscoveryCache) Save() error {
 		return nil
 	}
 
-	if err := fileutil.MkdirAll(filepath.Dir(c.path), 0750); err != nil {
+	if err := fileutil.MkdirAll(filepath.Dir(c.path), paths.DirPerm750); err != nil {
 		return err
 	}
 

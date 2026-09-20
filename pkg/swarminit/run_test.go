@@ -10,6 +10,7 @@ import (
 
 	"github.com/zqk-os/zqk/pkg/agentfeed"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 )
 
 func TestRun_unknownExecutorFailClosed(t *testing.T) {
@@ -36,7 +37,7 @@ func TestRun_dryRunDoesNotWriteSeatsOrInstall(t *testing.T) {
 	t.Parallel()
 	root := t.TempDir()
 	seatsPath := filepath.Join(root, "seats-sentinel.json")
-	if err := os.WriteFile(seatsPath, []byte("keep\n"), 0o600); err != nil {
+	if err := os.WriteFile(seatsPath, []byte("keep\n"), paths.FilePerm600); err != nil {
 		t.Fatal(err)
 	}
 	store := map[string]map[string]any{

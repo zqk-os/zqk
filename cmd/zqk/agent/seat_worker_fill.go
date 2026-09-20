@@ -63,7 +63,7 @@ func recentFillSubmit(root, kind string) (bool, string) {
 
 func writeFillSubmitMark(root, kind, detail string) error {
 	path := fillSubmitMarkPath(root, kind)
-	if err := fileutil.MkdirAll(filepath.Dir(path), 0o755); err != nil {
+	if err := fileutil.MkdirAll(filepath.Dir(path), paths.DirPerm755); err != nil {
 		return errfmt.Errorf("fill mark dir: %w", err)
 	}
 	payload, err := json.Marshal(map[string]string{
@@ -75,7 +75,7 @@ func writeFillSubmitMark(root, kind, detail string) error {
 	if err != nil {
 		return err
 	}
-	return fileutil.WriteFile(path, append(payload, '\n'), 0o600)
+	return fileutil.WriteFile(path, append(payload, '\n'), paths.FilePerm600)
 }
 
 func submitKernelFill(ctx context.Context, root string, fill *whatsnext.FillItem) (string, error) {
@@ -91,8 +91,8 @@ func submitKernelFill(ctx context.Context, root string, fill *whatsnext.FillItem
 	}
 	zqkPath := filepath.Join(root, "bin", "zqk")
 	fillCmd := zqkPath + " " + sub
-	logDir := filepath.Join(root, paths.ProjectDataDir, "logs", "agent-ops")
-	if err := fileutil.MkdirAll(logDir, 0o755); err != nil {
+	logDir := filepath.Join(root, paths.ProjectDataDir, paths.LogsDir, "agent-ops")
+	if err := fileutil.MkdirAll(logDir, paths.DirPerm755); err != nil {
 		return "", errfmt.Errorf("fill callback dir: %w", err)
 	}
 	cb := filepath.Join(logDir, "fill-"+safePlanFileName(fill.Kind)+".callback.json")

@@ -14,11 +14,11 @@ func TestRefuseIfCallerDescendsFromUnit_liveAncestor(t *testing.T) {
 	t.Parallel()
 	root := t.TempDir()
 	dir := filepath.Join(root, paths.ProjectDataDir, paths.SchedulerDir)
-	if err := fileutil.MkdirAll(dir, 0o755); err != nil {
+	if err := fileutil.MkdirAll(dir, paths.DirPerm755); err != nil {
 		t.Fatal(err)
 	}
 	pid := os.Getpid()
-	if err := fileutil.WriteFile(filepath.Join(dir, paths.SchedulerPIDFile), []byte(strconv.Itoa(pid)+"\n"), 0o644); err != nil {
+	if err := fileutil.WriteFile(filepath.Join(dir, paths.SchedulerPIDFile), []byte(strconv.Itoa(pid)+"\n"), paths.FilePerm644); err != nil {
 		t.Fatal(err)
 	}
 	err := refuseIfCallerDescendsFromUnit(Entry{AbsRoot: root, UnitLabel: "com.zqk.scheduler.test"})

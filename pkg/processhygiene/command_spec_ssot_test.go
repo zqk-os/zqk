@@ -52,8 +52,8 @@ func TestCommandSpecSSOTDecisionRecorded(t *testing.T) {
 		text := string(data)
 		if strings.Contains(text, "DEC-1786732826125502000-ef80a104") {
 			found = true
-			if !strings.Contains(text, ".zqk/cli/specs") {
-				t.Errorf("Decision does not cite .zqk/cli/specs as file DNA: %s", text)
+			if !strings.Contains(text, paths.CLICommandSpecsDir) {
+				t.Errorf("Decision does not cite %s as file DNA: %s", paths.CLICommandSpecsDir, text)
 			}
 			if !strings.Contains(text, "Adopt file DNA as the CLI command single source of truth") {
 				t.Errorf("Decision title unexpected: %s", text)
@@ -70,7 +70,7 @@ func TestCommandSpecSSOTDecisionRecorded(t *testing.T) {
 // TestCommandSpecFileDNADirectoryExists verifies that .zqk/cli/specs/ exists and contains specs.
 func TestCommandSpecFileDNADirectoryExists(t *testing.T) {
 	repoRoot := findRepoRoot(t)
-	specsDir := filepath.Join(repoRoot, ".zqk", "cli", "specs")
+	specsDir := filepath.Join(repoRoot, paths.ProjectDataDir, "cli", "specs")
 
 	info, err := fileutil.Stat(specsDir)
 	if err != nil || !info.IsDir() {

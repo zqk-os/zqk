@@ -41,7 +41,7 @@ func runAgentNew(cmd *cobra.Command, personaName, description string) error {
 	if err != nil {
 		return errfmt.Newf("failed to begin transaction").Wrap(err)
 	}
-	defer tx.Rollback(ctx)
+	defer func() { _ = tx.Rollback(ctx) }()
 
 	ts := time.Now().UnixNano()
 

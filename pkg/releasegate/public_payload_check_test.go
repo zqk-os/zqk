@@ -8,6 +8,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/execwrap"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/opencore"
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -17,17 +18,17 @@ func TestPublicPayloadCheck_FunctionalAcceptance(t *testing.T) {
 	tmpDir := t.TempDir()
 
 	// Populate clean tree with allowed files
-	if err := fileutil.WriteFile(filepath.Join(tmpDir, "README.md"), []byte("# Community Open-Core\nSafe release payload."), 0644); err != nil {
+	if err := fileutil.WriteFile(filepath.Join(tmpDir, "README.md"), []byte("# Community Open-Core\nSafe release payload."), paths.FilePerm644); err != nil {
 		t.Fatalf("failed to write README: %v", err)
 	}
-	if err := fileutil.WriteFile(filepath.Join(tmpDir, "LICENSE"), []byte("Apache License 2.0"), 0644); err != nil {
+	if err := fileutil.WriteFile(filepath.Join(tmpDir, "LICENSE"), []byte("Apache License 2.0"), paths.FilePerm644); err != nil {
 		t.Fatalf("failed to write LICENSE: %v", err)
 	}
 	codeDir := filepath.Join(tmpDir, "pkg", "tool")
 	if err := fileutil.EnsureDir(codeDir); err != nil {
 		t.Fatalf("failed to create code dir: %v", err)
 	}
-	if err := fileutil.WriteFile(filepath.Join(codeDir, "tool.go"), []byte("package tool\nfunc Run() string { return \"ok\" }\n"), 0644); err != nil {
+	if err := fileutil.WriteFile(filepath.Join(codeDir, "tool.go"), []byte("package tool\nfunc Run() string { return \"ok\" }\n"), paths.FilePerm644); err != nil {
 		t.Fatalf("failed to write go code: %v", err)
 	}
 
@@ -50,12 +51,12 @@ func TestPublicPayloadCheck_FunctionalAcceptance(t *testing.T) {
 	}
 
 	// Set up remote_hold.json
-	stateDir := filepath.Join(tmpDir, ".zqk", "state")
+	stateDir := filepath.Join(tmpDir, paths.ProjectDataDir, paths.StateDir)
 	if err := fileutil.EnsureDir(stateDir); err != nil {
 		t.Fatalf("failed to create state dir: %v", err)
 	}
 	holdJSON := `{"hold": true, "` + objects.FieldKeyReason + `": "Default deny"}`
-	if err := fileutil.WriteFile(filepath.Join(stateDir, "remote_hold.json"), []byte(holdJSON), 0644); err != nil {
+	if err := fileutil.WriteFile(filepath.Join(stateDir, "remote_hold.json"), []byte(holdJSON), paths.FilePerm644); err != nil {
 		t.Fatalf("failed to write remote_hold.json: %v", err)
 	}
 
@@ -82,11 +83,11 @@ func TestPublicPayloadCheck_BoundaryAndErrorHandling(t *testing.T) {
 	// Case 1: Rejects forbidden process instance data
 	t.Run("RejectsProcessInstanceData", func(t *testing.T) {
 		tmpDir := t.TempDir()
-		bliDir := filepath.Join(tmpDir, ".zqk", "process", "backlog_items")
+		bliDir := filepath.Join(tmpDir, paths.ProjectDataDir, paths.ProcessSubdir, "backlog_items")
 		if err := fileutil.EnsureDir(bliDir); err != nil {
 			t.Fatalf("mkdir failed: %v", err)
 		}
-		if err := fileutil.WriteFile(filepath.Join(bliDir, "item.yaml"), []byte("id: BLI-1785642072074959000-a1dfbde9\n"), 0644); err != nil {
+		if err := fileutil.WriteFile(filepath.Join(bliDir, "item.yaml"), []byte("id: BLI-1785642072074959000-a1dfbde9\n"), paths.FilePerm644); err != nil {
 			t.Fatalf("write failed: %v", err)
 		}
 
@@ -108,7 +109,7 @@ func TestPublicPayloadCheck_BoundaryAndErrorHandling(t *testing.T) {
 		if err := fileutil.EnsureDir(pkgDir); err != nil {
 			t.Fatalf("mkdir failed: %v", err)
 		}
-		if err := fileutil.WriteFile(filepath.Join(pkgDir, "core.go"), []byte("// Ref: BLI-1785642072074959000-a1dfbde9\npackage core\n"), 0644); err != nil {
+		if err := fileutil.WriteFile(filepath.Join(pkgDir, "core.go"), []byte("// Ref: BLI-1785642072074959000-a1dfbde9\npackage core\n"), paths.FilePerm644); err != nil {
 			t.Fatalf("write failed: %v", err)
 		}
 
@@ -126,10 +127,10 @@ func TestPublicPayloadCheck_BoundaryAndErrorHandling(t *testing.T) {
 	// Case 3: Opencore scanner catches secrets and binaries
 	t.Run("OpencoreCatchesSecretsAndBinaries", func(t *testing.T) {
 		tmpDir := t.TempDir()
-		if err := fileutil.WriteFile(filepath.Join(tmpDir, "secret.txt"), []byte("api_key = \"sk-1234567890abcdef\"\n"), 0644); err != nil {
+		if err := fileutil.WriteFile(filepath.Join(tmpDir, "secret.txt"), []byte("api_key = \"sk-1234567890abcdef\"\n"), paths.FilePerm644); err != nil {
 			t.Fatalf("write failed: %v", err)
 		}
-		if err := fileutil.WriteFile(filepath.Join(tmpDir, "blob.bin"), []byte{0x7f, 0x45, 0x4c, 0x46, 0x01}, 0644); err != nil {
+		if err := fileutil.WriteFile(filepath.Join(tmpDir, "blob.bin"), []byte{0x7f, 0x45, 0x4c, 0x46, 0x01}, paths.FilePerm644); err != nil {
 			t.Fatalf("write failed: %v", err)
 		}
 

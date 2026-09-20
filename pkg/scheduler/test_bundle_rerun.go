@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	"github.com/zqk-os/zqk/pkg/circuitbreaker"
+	"github.com/zqk-os/zqk/pkg/paths"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 
 	"github.com/zqk-os/zqk/pkg/zqktime"
@@ -44,9 +45,9 @@ func ResolveBundleLogPath(projectRoot, jobID, cmdStr string) string {
 	if projectRoot != "" && strings.HasPrefix(jobID, "SCH-run-") {
 		suffix := strings.TrimPrefix(jobID, "SCH-run-")
 		candidates := []string{
-			filepath.Join(projectRoot, ".zqk", "logs", "scheduler", "cvs", "test-bundles", "bundle-"+suffix+".log"),
-			filepath.Join(projectRoot, ".zqk", "logs", "scheduler", "cvs", "test-bundles", suffix+".log"),
-			filepath.Join(projectRoot, ".zqk", "logs", "scheduler", "cvs", "test-bundles", jobID+".log"),
+			filepath.Join(projectRoot, paths.ProjectDataDir, paths.LogsDir, "scheduler", "cvs", "test-bundles", "bundle-"+suffix+".log"),
+			filepath.Join(projectRoot, paths.ProjectDataDir, paths.LogsDir, "scheduler", "cvs", "test-bundles", suffix+".log"),
+			filepath.Join(projectRoot, paths.ProjectDataDir, paths.LogsDir, "scheduler", "cvs", "test-bundles", jobID+".log"),
 		}
 		for _, c := range candidates {
 			if _, err := fileutil.Stat(c); err == nil {

@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -42,7 +43,7 @@ func (s *PredictiveTaskSpawner) handleFilesystem(ctx context.Context, event Even
 				pkgName = "main" // fallback
 			}
 			stub := "package " + pkgName + "\n\nimport \"testing\"\n"
-			_ = fileutil.WriteFile(testFile, []byte(stub), 0644)
+			_ = fileutil.WriteFile(testFile, []byte(stub), paths.FilePerm644)
 		}
 
 		// Schedule a background code-quality vet

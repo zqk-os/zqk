@@ -22,7 +22,7 @@ func TestGenerateFieldConstantsCode_Auditable(t *testing.T) {
 		t.Fatal("Could not find specs directory")
 	}
 
-	auditablePath := filepath.Join(specsDir, "auditable.yaml")
+	auditablePath := findSpecFile(specsDir, "auditable.yaml")
 	data, err := fileutil.ReadFile(auditablePath)
 	if err != nil {
 		t.Fatalf("Failed to read auditable.yaml: %v", err)
@@ -110,7 +110,7 @@ func TestGenerateFieldConstantsCode_BaseObject(t *testing.T) {
 		t.Fatal("Could not find specs directory")
 	}
 
-	baseObjectPath := filepath.Join(specsDir, "base_object.yaml")
+	baseObjectPath := findSpecFile(specsDir, "base_object.yaml")
 	data, err := fileutil.ReadFile(baseObjectPath)
 	if err != nil {
 		t.Fatalf("Failed to read base_object.yaml: %v", err)
@@ -193,7 +193,7 @@ func TestGenerateFieldConstantsCode_FieldFiltering(t *testing.T) {
 		t.Fatal("Could not find specs directory")
 	}
 
-	baseObjectPath := filepath.Join(specsDir, "base_object.yaml")
+	baseObjectPath := findSpecFile(specsDir, "base_object.yaml")
 	data, err := fileutil.ReadFile(baseObjectPath)
 	if err != nil {
 		t.Fatalf("Failed to read base_object.yaml: %v", err)
@@ -313,6 +313,29 @@ func findSpecsDir() string {
 	return ""
 }
 
+func findSpecFile(specsDir, filename string) string {
+	candidate := filepath.Join(specsDir, filename)
+	if _, err := fileutil.Stat(candidate); err == nil {
+		return candidate
+	}
+	candidate = filepath.Join(specsDir, "kernel", filename)
+	if _, err := fileutil.Stat(candidate); err == nil {
+		return candidate
+	}
+	var found string
+	_ = filepath.Walk(specsDir, func(path string, info fileutil.FileInfo, err error) error {
+		if err == nil && !info.IsDir() && info.Name() == filename {
+			found = path
+			return filepath.SkipAll
+		}
+		return nil
+	})
+	if found != "" {
+		return found
+	}
+	return filepath.Join(specsDir, filename)
+}
+
 // TestGenerateBuilderFromYAML_ConstantsGeneration tests the full codegen flow
 // to verify constants are generated correctly using ConstantsFactory
 func TestGenerateBuilderFromYAML_ConstantsGeneration(t *testing.T) {
@@ -322,7 +345,7 @@ func TestGenerateBuilderFromYAML_ConstantsGeneration(t *testing.T) {
 		t.Fatal("Could not find specs directory")
 	}
 
-	auditablePath := filepath.Join(specsDir, "auditable.yaml")
+	auditablePath := findSpecFile(specsDir, "auditable.yaml")
 
 	// Create a temporary output directory
 	tmpDir := t.TempDir()

@@ -4,6 +4,7 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/zqk-os/zqk/pkg/paths"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -33,7 +34,7 @@ func TestRotateCSnapBackups(t *testing.T) {
 		"prior_400_1_dddddddd.csnap",
 		"prior_500_1_eeeeeeee.csnap",
 	} {
-		if err := fileutil.WriteFile(filepath.Join(backup, name), []byte("x"), 0o644); err != nil {
+		if err := fileutil.WriteFile(filepath.Join(backup, name), []byte("x"), paths.FilePerm644); err != nil {
 			t.Fatal(err)
 		}
 	}
@@ -59,7 +60,7 @@ func TestArchivePriorCSnapExternal(t *testing.T) {
 	backup := t.TempDir()
 	tip := filepath.Join(t.TempDir(), "system-state.csnap")
 	payload := []byte("header:\n    object_count: 2\n")
-	if err := fileutil.WriteFile(tip, payload, 0o644); err != nil {
+	if err := fileutil.WriteFile(tip, payload, paths.FilePerm644); err != nil {
 		t.Fatal(err)
 	}
 	dest, err := archivePriorCSnapExternal(backup, tip, 2, "abcdef0123456789", 3)

@@ -1,6 +1,7 @@
 package docman
 
 import (
+	"github.com/zqk-os/zqk/pkg/paths"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -12,7 +13,7 @@ func TestDiscoverer_Discover(t *testing.T) {
 	t.Parallel()
 	tmpDir := t.TempDir()
 	docsDir := filepath.Join(tmpDir, "docs")
-	if err := os.MkdirAll(filepath.Join(docsDir, "sub"), 0755); err != nil {
+	if err := os.MkdirAll(filepath.Join(docsDir, "sub"), paths.DirPerm755); err != nil {
 		t.Fatalf("mkdir failed: %v", err)
 	}
 
@@ -20,13 +21,13 @@ func TestDiscoverer_Discover(t *testing.T) {
 	doc2 := filepath.Join(docsDir, "sub", "tutorial.md")
 	txt := filepath.Join(docsDir, "notes.txt")
 
-	if err := os.WriteFile(doc1, []byte("# Guide"), 0644); err != nil {
+	if err := os.WriteFile(doc1, []byte("# Guide"), paths.FilePerm644); err != nil {
 		t.Fatal(err)
 	}
-	if err := os.WriteFile(doc2, []byte("# Tutorial"), 0644); err != nil {
+	if err := os.WriteFile(doc2, []byte("# Tutorial"), paths.FilePerm644); err != nil {
 		t.Fatal(err)
 	}
-	if err := os.WriteFile(txt, []byte("plain text"), 0644); err != nil {
+	if err := os.WriteFile(txt, []byte("plain text"), paths.FilePerm644); err != nil {
 		t.Fatal(err)
 	}
 
@@ -77,7 +78,7 @@ func TestDiscoverer_ExcludeArchiveDirs(t *testing.T) {
 	nestedArchiveDir := filepath.Join(docsDir, "onboarding", "archive")
 
 	for _, d := range []string{archiveDir, underscoreArchiveDir, nestedArchiveDir} {
-		if err := os.MkdirAll(d, 0755); err != nil {
+		if err := os.MkdirAll(d, paths.DirPerm755); err != nil {
 			t.Fatalf("mkdir failed: %v", err)
 		}
 	}
@@ -88,7 +89,7 @@ func TestDiscoverer_ExcludeArchiveDirs(t *testing.T) {
 	nestedDoc := filepath.Join(nestedArchiveDir, "summary.md")
 
 	for _, f := range []string{liveDoc, archiveDoc, underscoreDoc, nestedDoc} {
-		if err := os.WriteFile(f, []byte("# Note"), 0644); err != nil {
+		if err := os.WriteFile(f, []byte("# Note"), paths.FilePerm644); err != nil {
 			t.Fatal(err)
 		}
 	}
@@ -129,7 +130,7 @@ func TestDiscoverer_Subtrees(t *testing.T) {
 		filepath.Join(tmpDir, "docs", "internal"),
 	}
 	for _, d := range treeDirs {
-		if err := os.MkdirAll(d, 0755); err != nil {
+		if err := os.MkdirAll(d, paths.DirPerm755); err != nil {
 			t.Fatalf("mkdir failed: %v", err)
 		}
 	}
@@ -145,7 +146,7 @@ func TestDiscoverer_Subtrees(t *testing.T) {
 	}
 
 	for f := range testFiles {
-		if err := os.WriteFile(f, []byte("# Test Document"), 0644); err != nil {
+		if err := os.WriteFile(f, []byte("# Test Document"), paths.FilePerm644); err != nil {
 			t.Fatalf("failed to write %s: %v", f, err)
 		}
 	}
@@ -261,7 +262,7 @@ func TestDivioQuadrant_BoundaryAndErrorHandling(t *testing.T) {
 
 	// Case 1: Empty markdown file does not panic and returns non-empty fallback title
 	emptyFile := filepath.Join(tmpDir, "empty-guide.md")
-	if err := os.WriteFile(emptyFile, []byte(""), 0644); err != nil {
+	if err := os.WriteFile(emptyFile, []byte(""), paths.FilePerm644); err != nil {
 		t.Fatal(err)
 	}
 	meta, err := parser.Parse(emptyFile)
@@ -274,7 +275,7 @@ func TestDivioQuadrant_BoundaryAndErrorHandling(t *testing.T) {
 
 	// Case 2: Markdown file with only whitespace
 	whitespaceFile := filepath.Join(tmpDir, "whitespace.md")
-	if err := os.WriteFile(whitespaceFile, []byte("   \n\n  \t\n"), 0644); err != nil {
+	if err := os.WriteFile(whitespaceFile, []byte("   \n\n  \t\n"), paths.FilePerm644); err != nil {
 		t.Fatal(err)
 	}
 	meta, err = parser.Parse(whitespaceFile)
@@ -294,7 +295,7 @@ func TestDivioQuadrant_BoundaryAndErrorHandling(t *testing.T) {
 	// Case 4: Malformed frontmatter or unusual characters without H1
 	weirdFile := filepath.Join(tmpDir, "malformed.md")
 	weirdContent := "---\ntitle: unclosed \"quote\n---\nSome text without H1"
-	if err := os.WriteFile(weirdFile, []byte(weirdContent), 0644); err != nil {
+	if err := os.WriteFile(weirdFile, []byte(weirdContent), paths.FilePerm644); err != nil {
 		t.Fatal(err)
 	}
 	meta, err = parser.Parse(weirdFile)

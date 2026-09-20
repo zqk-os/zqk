@@ -9,6 +9,7 @@ import (
 	"runtime"
 	"time"
 
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -242,7 +243,7 @@ func (c *ProcessDirectoryChecker) Check(ctx context.Context, rootDir string) Dia
 	if rootDir == "" {
 		rootDir = "."
 	}
-	zqkDir := filepath.Join(rootDir, ".zqk")
+	zqkDir := filepath.Join(rootDir, paths.ProjectDataDir)
 	if info, err := fileutil.Stat(zqkDir); err == nil && info.IsDir() {
 		return DiagnosticResult{
 			Name:     c.Name(),

@@ -2,6 +2,7 @@ package lockhealth
 
 import (
 	"errors"
+	"github.com/zqk-os/zqk/pkg/paths"
 	"os"
 	"path/filepath"
 	"testing"
@@ -14,7 +15,7 @@ var referenceNow = time.Date(2026, 9, 13, 12, 0, 0, 0, time.UTC)
 func writeLockFile(t *testing.T, dir, name string, modTime time.Time) string {
 	t.Helper()
 	p := filepath.Join(dir, name)
-	if err := os.WriteFile(p, []byte(""), 0o600); err != nil {
+	if err := os.WriteFile(p, []byte(""), paths.FilePerm600); err != nil {
 		t.Fatalf("write %s: %v", name, err)
 	}
 	if err := os.Chtimes(p, modTime, modTime); err != nil {
@@ -121,7 +122,7 @@ func TestSweep_RootIsFileFailsClosed(t *testing.T) {
 	t.Parallel()
 
 	f := filepath.Join(t.TempDir(), "notadir")
-	if err := os.WriteFile(f, []byte(""), 0o600); err != nil {
+	if err := os.WriteFile(f, []byte(""), paths.FilePerm600); err != nil {
 		t.Fatalf("write: %v", err)
 	}
 
@@ -136,7 +137,7 @@ func TestSweep_SubdirectoriesAreUntouched(t *testing.T) {
 
 	dir := t.TempDir()
 	sub := filepath.Join(dir, "nested")
-	if err := os.MkdirAll(sub, 0o750); err != nil {
+	if err := os.MkdirAll(sub, paths.DirPerm750); err != nil {
 		t.Fatalf("mkdir: %v", err)
 	}
 	// Even a stale .lock inside a subdirectory must NOT be removed: the sweep

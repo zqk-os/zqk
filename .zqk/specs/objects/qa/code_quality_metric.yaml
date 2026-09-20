@@ -2,7 +2,7 @@ schema_version: 2.0.0
 ontology: code_quality_metric
 extends: base_metric
 visibility: internal
-description: 'Code quality metrics track policy enforcement and compliance over time. These metrics capture adherence to code quality policies (POL-CODE-009), measure technical debt trends, and provide observability into code quality maintenance effectiveness.\nLifecycle: code_quality_metric_lifecycle.yaml.\n'
+description: 'Code quality metrics track policy enforcement and compliance over time. These metrics capture adherence to code quality policies (POL-####), measure technical debt trends, and provide observability into code quality maintenance effectiveness.\nLifecycle: code_quality_metric_lifecycle.yaml.\n'
 traits:
   - listable
   - readable
@@ -188,7 +188,7 @@ fields:
       dependencies: policy registry
       observability: "yes"
       origin_lifecycle: immutable
-      purpose: Reference to policy being measured (POL-#### format, e.g., \\\"POL-CODE-009\\\")
+      purpose: Reference to policy being measured (POL-#### format, e.g., \\\"POL-EXAMPLE-001\\\")
       security: non-sensitive
       system_usage:
         - policy compliance

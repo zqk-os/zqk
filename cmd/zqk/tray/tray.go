@@ -266,14 +266,8 @@ func runRun(cmd *cobra.Command, args []string) error {
 }
 
 func newSignCmd() *cobra.Command {
-	cmd := clipkg.ApplyBuilder(bldr_cli_cmd_v1.NewTraySignCommandBuilder(), &cobra.Command{
-		Use:   "sign <name>",
-		Short: "Cryptographically sign a tray entry in .zqk/tray.yaml",
-		Args:  cobra.ExactArgs(1),
-		RunE:  runSign,
-	})
-	cmd.Flags().String("key-path", "", "Path to private key (defaults to .zqk/keystore/auditor.priv)")
-	cli.AddCommonFlags(cmd)
+	cmd := bldr_cli_cmd_v1.NewTraySignCommandBuilder()
+	cmd.RunE = runSign
 	return cmd
 }
 
@@ -335,7 +329,7 @@ func runSign(cmd *cobra.Command, args []string) error {
 	if err := enc.Encode(&userCfg); err != nil {
 		return errfmt.Errorf("encode %s: %w", userPath, err)
 	}
-	if err := fileutil.WriteFile(userPath, buf.Bytes(), 0o644); err != nil {
+	if err := fileutil.WriteFile(userPath, buf.Bytes(), paths.FilePerm644); err != nil {
 		return errfmt.Errorf("write %s: %w", userPath, err)
 	}
 

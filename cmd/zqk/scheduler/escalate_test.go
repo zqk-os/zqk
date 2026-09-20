@@ -41,8 +41,8 @@ func TestEscalateCmd_DryRunAndConfiguration(t *testing.T) {
 	tmpDir := t.TempDir()
 	t.Setenv(zqkenv.ProjectRoot().Key, tmpDir)
 
-	cfgDir := filepath.Join(tmpDir, paths.ProjectDataDir, "config")
-	if err := fileutil.MkdirAll(cfgDir, 0o755); err != nil {
+	cfgDir := filepath.Join(tmpDir, paths.ProjectDataDir, paths.ConfigDir)
+	if err := fileutil.MkdirAll(cfgDir, paths.DirPerm755); err != nil {
 		t.Fatal(err)
 	}
 
@@ -137,7 +137,7 @@ func TestEscalateCmd_TestDispatchMockServer(t *testing.T) {
 	}
 
 	// Verify inbox delivery
-	latestInbox := filepath.Join(tmpDir, paths.ProjectDataDir, "inbox", "human", "LATEST_ESCALATION.json")
+	latestInbox := filepath.Join(tmpDir, paths.ProjectDataDir, paths.InboxSubdir, "human", "LATEST_ESCALATION.json")
 	if !fileutil.Exists(latestInbox) {
 		t.Errorf("expected inbox file at %s", latestInbox)
 	}
@@ -216,7 +216,7 @@ func TestEscalateCmd_SlackOnlyAndInboxOnly(t *testing.T) {
 	if webhookCalls != 1 {
 		t.Errorf("expected 1 webhook call, got %d", webhookCalls)
 	}
-	latestInbox := filepath.Join(tmpDir, paths.ProjectDataDir, "inbox", "human", "LATEST_ESCALATION.json")
+	latestInbox := filepath.Join(tmpDir, paths.ProjectDataDir, paths.InboxSubdir, "human", "LATEST_ESCALATION.json")
 	if fileutil.Exists(latestInbox) {
 		t.Errorf("inbox file should not exist when --slack-only is specified")
 	}

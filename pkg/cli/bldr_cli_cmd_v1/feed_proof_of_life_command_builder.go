@@ -18,7 +18,7 @@ func NewFeedProofOfLifeCommandBuilder() *cobra.Command {
 	help.WithDescriptionLines("the human that back-channel mesh work is still alive.")
 	help.WithDescriptionLines("")
 	help.WithDescriptionLines("Does not paste into chat or steal focus. Opt out of IDE pulse with")
-	help.WithDescriptionLines("ZQK_IDE_BRIDGE_WAKE=0.")
+	help.WithDescriptionLines("IDE_BRIDGE_WAKE=0 (brand-prefixed).")
 	help.AddExample("Cursor seat — human sees status bar + toast", "%s feed proof-of-life --persona-ref PER-DEFAULT-OPERATOR --agent-id cursor-composer --summary \"working ATK on feed\"")
 	help.AddExample("Worker seat stamps feed; IDE still pulses for the human watching Cursor", "%s feed proof-of-life --persona-ref PER-DEFAULT-AGENT --agent-id peer-agent-1 --summary \"checkpoint\"")
 	help.ExcludeFlag("columns")

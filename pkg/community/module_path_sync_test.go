@@ -64,7 +64,7 @@ func main() {
 	fmt.Println("test")
 }
 `)
-	if err := fileutil.WriteFile(fakeSrc, badImport, 0644); err != nil {
+	if err := fileutil.WriteFile(fakeSrc, badImport, paths.FilePerm644); err != nil {
 		t.Fatalf("failed to write fake source: %v", err)
 	}
 

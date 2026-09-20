@@ -8,6 +8,7 @@ import (
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/lockhealth"
 	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -85,7 +86,7 @@ func (w *WatchdogInterceptor) SweepAndRecover(ctx context.Context) {
 
 	// Trigger stale lock sweep if a lock directory exists under projectRoot
 	if w.projectRoot != "" {
-		lockDir := filepath.Join(w.projectRoot, ".zqk", "locks")
+		lockDir := filepath.Join(w.projectRoot, paths.ProjectDataDir, "locks")
 		info, err := fileutil.Stat(lockDir)
 		if err == nil && info.IsDir() {
 			threshold := w.LockSweepThreshold

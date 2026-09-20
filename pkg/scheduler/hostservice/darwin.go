@@ -81,10 +81,10 @@ func (a DarwinAdapter) Install(e Entry) error {
 </plist>
 `, e.UnitLabel, e.BinaryRef, e.AbsRoot, schedulerEnvironmentPlistXML(e),
 		keepAlivePlistXML(),
-		filepath.Join(e.AbsRoot, paths.ProjectDataDir, "logs", "scheduler-service.stdout.log"),
-		filepath.Join(e.AbsRoot, paths.ProjectDataDir, "logs", "scheduler-service.stderr.log"),
+		filepath.Join(e.AbsRoot, paths.ProjectDataDir, paths.LogsDir, "scheduler-service.stdout.log"),
+		filepath.Join(e.AbsRoot, paths.ProjectDataDir, paths.LogsDir, "scheduler-service.stderr.log"),
 	)
-	if err := fileutil.MkdirAll(filepath.Join(e.AbsRoot, paths.ProjectDataDir, "logs"), paths.DirPerm755); err != nil {
+	if err := fileutil.MkdirAll(filepath.Join(e.AbsRoot, paths.ProjectDataDir, paths.LogsDir), paths.DirPerm755); err != nil {
 		return errfmt.Newf("mkdir scheduler service logs").Wrap(err)
 	}
 	if err := fileutil.WriteFile(plist, []byte(body), paths.FilePerm644); err != nil {

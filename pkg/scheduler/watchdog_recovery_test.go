@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/zqk-os/zqk/pkg/goroutinelabels"
+	"github.com/zqk-os/zqk/pkg/paths"
 )
 
 func TestWatchdogInterceptor_StalledWorkerAborted(t *testing.T) {
@@ -74,12 +75,12 @@ func TestWatchdogInterceptor_LockDrainOnStall(t *testing.T) {
 	tempDir := t.TempDir()
 
 	// Create a dummy stale lock file in tempDir
-	lockDir := filepath.Join(tempDir, ".zqk", "locks")
-	if err := os.MkdirAll(lockDir, 0750); err != nil {
+	lockDir := filepath.Join(tempDir, paths.ProjectDataDir, "locks")
+	if err := os.MkdirAll(lockDir, paths.DirPerm750); err != nil {
 		t.Fatalf("failed to create lockdir: %v", err)
 	}
 	staleLockFile := filepath.Join(lockDir, "test_orphan.lock")
-	if err := os.WriteFile(staleLockFile, []byte("stale"), 0600); err != nil {
+	if err := os.WriteFile(staleLockFile, []byte("stale"), paths.FilePerm600); err != nil {
 		t.Fatalf("failed to create stale lock file: %v", err)
 	}
 	// Backdate the lock file to be older than threshold

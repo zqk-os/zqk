@@ -245,7 +245,7 @@ func (h *SchedulerJobRetentionHandler) executeSchedulerJobRetentionCore(ctx cont
 
 		// Remove log directories for deleted job IDs so logs don't accumulate.
 		for _, id := range toDelete {
-			logDir := filepath.Join(h.projectRoot, paths.ProjectDataDir, "logs", "scheduler", id)
+			logDir := filepath.Join(h.projectRoot, paths.ProjectDataDir, paths.LogsDir, "scheduler", id)
 			if err := fileutil.RemoveAll(logDir); err != nil && !fileutil.IsNotExist(err) {
 				SLog(h.logger).Warn(LogEventSchedulerJobRetentionRemoveLogDirFailed).
 					JobID(job.ID).
@@ -261,7 +261,7 @@ func (h *SchedulerJobRetentionHandler) executeSchedulerJobRetentionCore(ctx cont
 
 	// Remove orphaned log dirs (job no longer exists).
 	if h.projectRoot != emptyValue {
-		logRoot := filepath.Join(h.projectRoot, paths.ProjectDataDir, "logs", "scheduler")
+		logRoot := filepath.Join(h.projectRoot, paths.ProjectDataDir, paths.LogsDir, "scheduler")
 		entries, err := fileutil.ReadDir(logRoot)
 		if err == nil {
 			for _, e := range entries {

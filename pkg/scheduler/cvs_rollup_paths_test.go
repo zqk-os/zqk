@@ -32,7 +32,7 @@ func TestResolveCVSRollupLatestJSONPath_repoRelativeEnv(t *testing.T) {
 	root := t.TempDir()
 	rel := paths.ProjectDataDir + "/logs/" + paths.LogsDriftSubdir + "/custom.json"
 	got := ResolveCVSRollupLatestJSONPath(root, rel)
-	want := filepath.Join(root, paths.ProjectDataDir, "logs", paths.LogsDriftSubdir, "custom.json")
+	want := filepath.Join(root, paths.ProjectDataDir, paths.LogsDir, paths.LogsDriftSubdir, "custom.json")
 	if got != want {
 		t.Fatalf("got %q want %q", got, want)
 	}

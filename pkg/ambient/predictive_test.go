@@ -8,6 +8,7 @@ import (
 
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -45,7 +46,7 @@ func TestPredictiveTaskSpawner_CreatesTestStub(t *testing.T) {
 	// Create a temporary Go file
 	tmpDir := t.TempDir()
 	goFile := filepath.Join(tmpDir, "example.go")
-	_ = fileutil.WriteFile(goFile, []byte("package example\n"), 0644)
+	_ = fileutil.WriteFile(goFile, []byte("package example\n"), paths.FilePerm644)
 
 	err := hub.Publish(context.Background(), Event{
 		Type: EventTypeFilesystem,
@@ -91,10 +92,10 @@ func TestPredictiveTaskSpawner_IgnoresExistingTestFile(t *testing.T) {
 
 	tmpDir := t.TempDir()
 	testFile := filepath.Join(tmpDir, "example_test.go")
-	_ = fileutil.WriteFile(testFile, []byte("package example\n// custom test"), 0644)
+	_ = fileutil.WriteFile(testFile, []byte("package example\n// custom test"), paths.FilePerm644)
 
 	goFile := filepath.Join(tmpDir, "example.go")
-	_ = fileutil.WriteFile(goFile, []byte("package example\n"), 0644)
+	_ = fileutil.WriteFile(goFile, []byte("package example\n"), paths.FilePerm644)
 
 	err := hub.Publish(context.Background(), Event{
 		Type: EventTypeFilesystem,
@@ -123,7 +124,7 @@ func TestPredictiveTaskSpawner_StageConvergenceSession(t *testing.T) {
 	err := hub.Publish(context.Background(), Event{
 		Type: EventTypeFilesystem,
 		Payload: map[string]any{
-			objects.FieldKeyTargetID:  ".zqk/process/priority_plans/PRI-123.yaml",
+			objects.FieldKeyTargetID:  filepath.Join(paths.ProcessDir, "priority_plans", "PRI-123.yaml"),
 			objects.FieldKeyOperation: "WRITE",
 			objects.FieldKeySource:    "fswatcher",
 		},

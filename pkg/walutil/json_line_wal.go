@@ -15,8 +15,8 @@ import (
 
 const (
 	emptyValue            = ""
-	walDirPerm            = 0o755
-	walFilePerm           = 0o600
+	walDirPerm            = paths.DirPerm755
+	walFilePerm           = paths.FilePerm600
 	defaultScannerBufCap  = 4096
 	defaultScannerMaxSize = 64 * 1024
 	errWALEmptyProject    = "WAL requires non-empty project root"

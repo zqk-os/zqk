@@ -139,7 +139,7 @@ func TestAdversarialConcurrency(t *testing.T) {
 	}
 
 	// 8. Structural Integrity Check
-	kindDir := filepath.Join(root, paths.ProjectDataDir, "state", "datacells", "audit_event", "cas")
+	kindDir := filepath.Join(root, paths.ProjectDataDir, paths.StateDir, "datacells", "audit_event", "cas")
 	if entries, err := fileutil.ReadDir(kindDir); err == nil {
 		fmt.Printf("📦 CAS contains %d bucket directories.\n", len(entries))
 	}

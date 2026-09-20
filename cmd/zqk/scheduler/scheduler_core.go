@@ -408,7 +408,7 @@ func startScheduler(ctx *cli.Context, cmd *cobra.Command) error {
 		GetPool() provider.ConnectionPool
 	}); ok {
 		if pool := p.GetPool(); pool != nil {
-			sockPath := filepath.Join(projectRoot, paths.ProjectDataDir, "scheduler", "rpcpool.sock")
+			sockPath := filepath.Join(projectRoot, paths.ProjectDataDir, paths.SchedulerSubdir, "rpcpool.sock")
 			if err := rpcpool.StartServer(sockPath, pool); err != nil {
 				schedulerpkg.SLog(logger).Warn("Failed to start RPC pool proxy server").WithError(err).Log()
 			} else {

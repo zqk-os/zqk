@@ -99,21 +99,6 @@ func NewSchedulerMaintenanceConfigBuilder() *SchedulerMaintenanceConfigBuilder {
 					"template_file":         "scripts/scheduler_jobs/autofix_process_pending.yaml",
 				},
 				map[string]any{
-					objects.FieldKeyID:      "SCH-pre-commit-lint",
-					objects.FieldKeyJobType: "run_wrapper",
-					"template_file":         "scripts/scheduler_jobs/pre_commit_lint.yaml",
-				},
-				map[string]any{
-					objects.FieldKeyID:      "SCH-pre-commit-policy",
-					objects.FieldKeyJobType: "run_wrapper",
-					"template_file":         "scripts/scheduler_jobs/pre_commit_policy.yaml",
-				},
-				map[string]any{
-					objects.FieldKeyID:      "SCH-pre-commit-integrity",
-					objects.FieldKeyJobType: "run_wrapper",
-					"template_file":         "scripts/scheduler_jobs/pre_commit_integrity.yaml",
-				},
-				map[string]any{
 					objects.FieldKeyID:      "SCH-cleanup",
 					objects.FieldKeyJobType: "cleanup",
 					"template_file":         "scripts/scheduler_jobs/cleanup_on_demand.yaml",

@@ -23,8 +23,8 @@ const (
 	errCreateStoreDirFmt     = "create rollback store dir: %w"
 	errMarshalPointFmt       = "marshal rollback point: %w"
 	errPointTooLargeFmt      = "rollback point too large: %d bytes"
-	storeDirPerm             = 0o755
-	storeFilePerm            = 0o600
+	storeDirPerm             = paths.DirPerm755
+	storeFilePerm            = paths.FilePerm600
 	scannerInitialBufSize    = 65536
 	tmpFileSuffix            = ".tmp"
 )

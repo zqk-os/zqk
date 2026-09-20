@@ -127,10 +127,10 @@ func runWave(cmd *cobra.Command, args []string) error {
 		}
 
 		// Write to .zqk/state/ambient/metrics-rollup.json
-		rollupPath := filepath.Join(root, paths.ProjectDataDir, "state", "ambient", "metrics-rollup.json")
-		_ = fileutil.MkdirAll(filepath.Dir(rollupPath), 0755)
+		rollupPath := filepath.Join(root, paths.ProjectDataDir, paths.StateDir, "ambient", "metrics-rollup.json")
+		_ = fileutil.MkdirAll(filepath.Dir(rollupPath), paths.DirPerm755)
 		if b, err := json.MarshalIndent(rollup, "", "  "); err == nil {
-			_ = fileutil.WriteFile(rollupPath, b, 0644)
+			_ = fileutil.WriteFile(rollupPath, b, paths.FilePerm644)
 		}
 
 		// Post to agent_feed

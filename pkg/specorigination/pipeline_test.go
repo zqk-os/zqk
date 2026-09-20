@@ -8,6 +8,7 @@ import (
 
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/pipeline"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
@@ -33,7 +34,7 @@ func testModuleRoot(t *testing.T) string {
 func TestRun_auditable_dryRun_softFinalize(t *testing.T) {
 	t.Parallel()
 	root := testModuleRoot(t)
-	specPath := filepath.Join(root, ".zqk", "specs", "objects", "auditable.yaml")
+	specPath := filepath.Join(root, paths.ProjectDataDir, paths.SpecsSubdir, "objects", "auditable.yaml")
 	if _, err := fileutil.Stat(specPath); err != nil {
 		t.Skipf("spec file required at %s: skipping in environment without .zqk specs", specPath)
 	}
@@ -73,7 +74,7 @@ func TestYAMLConfigDocSchemaHeaderIsIdempotent(t *testing.T) {
 
 	path := filepath.Join(t.TempDir(), "config.yaml")
 	const source = "$schema: schema.json\n\nversion: 1.0.0\n"
-	if err := fileutil.WriteFile(path, []byte(source), 0o600); err != nil {
+	if err := fileutil.WriteFile(path, []byte(source), paths.FilePerm600); err != nil {
 		t.Fatal(err)
 	}
 

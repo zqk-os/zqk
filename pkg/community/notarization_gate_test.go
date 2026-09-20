@@ -25,7 +25,7 @@ func TestNotarizationGate_FunctionalAcceptance(t *testing.T) {
 	// Create temporary dummy binary file to test signing & notarization metadata emission
 	tmpDir := t.TempDir()
 	dummyBin := filepath.Join(tmpDir, "dummy-binary")
-	if err := os.WriteFile(dummyBin, []byte("#!/bin/sh\necho test\n"), 0755); err != nil {
+	if err := os.WriteFile(dummyBin, []byte("#!/bin/sh\necho test\n"), paths.DirPerm755); err != nil {
 		t.Fatalf("failed to write dummy binary: %v", err)
 	}
 
@@ -76,7 +76,7 @@ func TestNotarizationGate_BoundaryAndErrorHandling(t *testing.T) {
 	// Create dummy archive and test --verify flag
 	tmpDir := t.TempDir()
 	dummyArchive := filepath.Join(tmpDir, "dummy-archive.tar.gz")
-	if err := os.WriteFile(dummyArchive, []byte("fake archive contents"), 0644); err != nil {
+	if err := os.WriteFile(dummyArchive, []byte("fake archive contents"), paths.FilePerm644); err != nil {
 		t.Fatalf("failed to write dummy archive: %v", err)
 	}
 

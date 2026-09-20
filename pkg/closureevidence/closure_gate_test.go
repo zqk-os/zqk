@@ -15,7 +15,7 @@ func setupTestRepoWithHealth(t *testing.T) string {
 	t.Helper()
 	root := t.TempDir()
 	logDir := filepath.Join(root, paths.ProjectDataDir, paths.SchedulerLogsDir, paths.SchedulerCVSSubdir, paths.SchedulerTestBundlesSubdir)
-	if err := fileutil.MkdirAll(logDir, 0o755); err != nil {
+	if err := fileutil.MkdirAll(logDir, paths.DirPerm755); err != nil {
 		t.Fatal(err)
 	}
 	return root
@@ -24,10 +24,10 @@ func setupTestRepoWithHealth(t *testing.T) string {
 func writeBundleLog(t *testing.T, root, relPath, content string) string {
 	t.Helper()
 	absPath := filepath.Join(root, relPath)
-	if err := fileutil.MkdirAll(filepath.Dir(absPath), 0o755); err != nil {
+	if err := fileutil.MkdirAll(filepath.Dir(absPath), paths.DirPerm755); err != nil {
 		t.Fatal(err)
 	}
-	if err := fileutil.WriteFile(absPath, []byte(content), 0o644); err != nil {
+	if err := fileutil.WriteFile(absPath, []byte(content), paths.FilePerm644); err != nil {
 		t.Fatal(err)
 	}
 	return absPath
@@ -40,7 +40,7 @@ func appendHealthRecord(t *testing.T, root string, rec closureevidence.HealthRec
 	if err != nil {
 		t.Fatal(err)
 	}
-	f, err := fileutil.OpenFile(healthPath, fileutil.O_CREATE|fileutil.O_WRONLY|fileutil.O_APPEND, 0o644)
+	f, err := fileutil.OpenFile(healthPath, fileutil.O_CREATE|fileutil.O_WRONLY|fileutil.O_APPEND, paths.FilePerm644)
 	if err != nil {
 		t.Fatal(err)
 	}

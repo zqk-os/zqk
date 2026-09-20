@@ -4,6 +4,7 @@ import (
 	"strings"
 
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 )
 
 // MergeConvergencePersistObjectUpdateBody applies operator-preserving merges before storage Update for
@@ -88,7 +89,7 @@ func isOperatorHandoffNextAction(s string) bool {
 		return false
 	}
 	markers := []string{
-		"drift", "triage", "cvs_outcome", ".zqk/logs/drift", "scan-tests --package",
+		"drift", "triage", "cvs_outcome", paths.ProjectDataDir + "/" + paths.LogsDir + "/" + paths.LogsDriftSubdir, "scan-tests --package",
 		"matrix", "baseline", "hardcoded-go-literals", "rollup", "fieldkeys",
 		"packages rollup", "scripts/drift",
 	}

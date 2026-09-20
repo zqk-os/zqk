@@ -21,6 +21,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/outputtypes"
+	"github.com/zqk-os/zqk/pkg/paths"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
@@ -39,7 +40,7 @@ const (
 	FlagQuiet                           = "quiet"
 	FlagForce                           = "force"
 	FlagDryRun                          = "dry-run"
-	cliOutputFilePerm fileutil.FileMode = 0o600
+	cliOutputFilePerm fileutil.FileMode = paths.FilePerm600
 )
 
 var supportedOutputFormats = []OutputFormat{

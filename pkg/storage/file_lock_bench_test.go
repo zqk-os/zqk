@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/zqk-os/zqk/pkg/goroutinelabels"
+	"github.com/zqk-os/zqk/pkg/paths"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -26,7 +27,7 @@ func BenchmarkFileLockContention(b *testing.B) {
 	b.ResetTimer()
 	b.RunParallel(func(pb *testing.PB) {
 		for pb.Next() {
-			f, err := fileutil.OpenFile(lockPath, fileutil.O_CREATE|fileutil.O_RDWR, 0600)
+			f, err := fileutil.OpenFile(lockPath, fileutil.O_CREATE|fileutil.O_RDWR, paths.FilePerm600)
 			if err == nil {
 				_ = f.Close()
 			}

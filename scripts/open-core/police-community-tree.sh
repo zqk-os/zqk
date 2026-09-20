@@ -73,6 +73,7 @@ if command -v find >/dev/null 2>&1; then
       ! -name 'package-community.sh' \
       ! -name 'install.sh' \
       ! -name 'generate-openvex.sh' \
+      ! -name 'check-hardcoded-paths-and-perms-repo.sh' \
       ! -path '*/open-core/*' \
       ! -path '*/starter_kernel_graph/*' \
       ! -path '*/onboarding_roadmap/*' \

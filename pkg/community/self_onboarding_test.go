@@ -8,6 +8,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/agentonboard"
 	"github.com/zqk-os/zqk/pkg/execwrap"
 	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/paths"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -17,7 +18,7 @@ func TestCommunitySelfOnboarding_FunctionalAcceptance(t *testing.T) {
 	tmpDir := t.TempDir()
 
 	// Simulate a community workspace with .ide marker
-	if err := fileutil.MkdirAll(filepath.Join(tmpDir, ".ide"), 0o755); err != nil {
+	if err := fileutil.MkdirAll(filepath.Join(tmpDir, ".ide"), paths.DirPerm755); err != nil {
 		t.Fatalf("failed to create simulated ide marker: %v", err)
 	}
 

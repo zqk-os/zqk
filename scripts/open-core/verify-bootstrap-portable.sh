@@ -18,7 +18,6 @@ cd "$REPO_ROOT"
 TEST_ROOT=$(mktemp -d "${TMPDIR:-/tmp}/zqk-bootstrap-verify.XXXXXX")
 trap 'rm -rf "$TEST_ROOT"' EXIT INT TERM
 export ZQK_TEST_ROOT="$TEST_ROOT"
-export ZQK_ALLOW_FOREGROUND_GO_TEST=1
 go test ./internal/bootstrap -count=1 -timeout 60s \
   -run 'TestManifestPaths_EmbeddedArchive|TestExtractEmbeddedToTempProject'
 

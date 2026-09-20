@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/zqk-os/zqk/pkg/execwrap"
+	"github.com/zqk-os/zqk/pkg/paths"
 
 	"github.com/spf13/cobra"
 
@@ -79,7 +80,7 @@ func runLocalCICheckout(cmd *cobra.Command) error {
 	sha, _ := cmd.Flags().GetString("sha")
 
 	// Checkout SHA worktree gate: skip if already checked out
-	base := filepath.Join(studio, ".zqk", "local-ci")
+	base := filepath.Join(studio, paths.ProjectDataDir, "local-ci")
 	shaPath := filepath.Join(base, "SOURCE_SHA")
 	if raw, err := fileutil.ReadFile(shaPath); err == nil {
 		currentSHA := strings.TrimSpace(string(raw))
@@ -127,7 +128,7 @@ func runScanTestsAfterCheckout(cmd *cobra.Command) error {
 	if studio == "" {
 		return errfmt.Errorf("project root not found")
 	}
-	workdir := filepath.Join(studio, ".zqk", "local-ci", "workdir")
+	workdir := filepath.Join(studio, paths.ProjectDataDir, "local-ci", "workdir")
 	if _, err := fileutil.Stat(filepath.Join(workdir, "go.mod")); err != nil {
 		return errfmt.Errorf("local-ci workdir missing go.mod at %s (run checkout first)", workdir)
 	}
@@ -159,7 +160,7 @@ func runStatus(cmd *cobra.Command, args []string) error {
 	if studio == "" {
 		return errfmt.Errorf("project root not found")
 	}
-	base := filepath.Join(studio, ".zqk", "local-ci")
+	base := filepath.Join(studio, paths.ProjectDataDir, "local-ci")
 	shaPath := filepath.Join(base, "SOURCE_SHA")
 	workdir := filepath.Join(base, "workdir")
 	var b strings.Builder

@@ -6,6 +6,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/zqk-os/zqk/pkg/paths"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -13,7 +14,7 @@ func TestMCPClientTransport_EnforcesTimeoutAndConcurrency(t *testing.T) {
 	// Create a script that sleeps to simulate hanging MCP server
 	tmpDir := t.TempDir()
 	hangScript := filepath.Join(tmpDir, "hang.sh")
-	if err := fileutil.WriteFile(hangScript, []byte("#!/bin/sh\nexec sleep 20\n"), 0755); err != nil {
+	if err := fileutil.WriteFile(hangScript, []byte("#!/bin/sh\nexec sleep 20\n"), paths.DirPerm755); err != nil {
 		t.Fatalf("Failed to write hang script: %v", err)
 	}
 

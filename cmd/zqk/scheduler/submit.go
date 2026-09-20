@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"path/filepath"
 	"strings"
 	"time"
 
@@ -15,6 +16,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 	schedulerpkg "github.com/zqk-os/zqk/pkg/scheduler"
 	"github.com/zqk-os/zqk/pkg/storage"
 	"github.com/zqk-os/zqk/pkg/zqkenv"
@@ -130,7 +132,7 @@ func runSubmit(cmd *cobra.Command, args []string) error {
 				projectRoot = cliCtx.ProjectRoot
 			}
 			if projectRoot != emptyValue {
-				diagnosticsDir = fmt.Sprintf("%s/.zqk/diagnostics", projectRoot)
+				diagnosticsDir = filepath.Join(projectRoot, paths.ProjectDataDir, "diagnostics")
 			}
 		}
 		if diagnosticsDir != emptyValue {

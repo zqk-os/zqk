@@ -60,9 +60,9 @@ func (t *ActivityTicker) Display(nextUpdate time.Duration) {
 
 	// Open or create the log file in .zqk/logs using resolved project root
 	root := paths.ResolveProjectRoot(".")
-	logPath := filepath.Join(root, paths.ProjectDataDir, "logs", orchestration.LogKeyHiveActivity)
+	logPath := filepath.Join(root, paths.ProjectDataDir, paths.LogsDir, orchestration.LogKeyHiveActivity)
 
-	f, err := fileutil.OpenFile(logPath, fileutil.O_APPEND|fileutil.O_CREATE|fileutil.O_WRONLY, 0600)
+	f, err := fileutil.OpenFile(logPath, fileutil.O_APPEND|fileutil.O_CREATE|fileutil.O_WRONLY, paths.FilePerm600)
 	if err != nil {
 		logging.GetLogger().LogError(fmt.Sprintf(orchestration.ErrMsgWriteTickerLog, err), err)
 		return

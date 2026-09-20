@@ -7,6 +7,7 @@ import (
 
 	"github.com/zqk-os/zqk/internal/cli"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/paths"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 
 	"github.com/zqk-os/zqk/pkg/logging"
@@ -50,7 +51,7 @@ func TestTryAcquireAutoFixProcessingLockSerializesProcessors(t *testing.T) {
 		t.Fatalf("second lock unexpectedly acquired: acquired=%t lock=%v", acquired, second)
 	}
 
-	wantLock := filepath.Join(root, ".zqk", "lock", autoFixProcessingLockFile)
+	wantLock := filepath.Join(root, paths.ProjectDataDir, "lock", autoFixProcessingLockFile)
 	if _, err := fileutil.Stat(wantLock); err != nil {
 		t.Fatalf("lock file was not created at %s: %v", wantLock, err)
 	}

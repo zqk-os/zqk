@@ -3,6 +3,7 @@ package cas_test
 import (
 	"os"
 
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/storage"
 	caspkg "github.com/zqk-os/zqk/pkg/storage/cas"
 
@@ -112,7 +113,7 @@ func TestCAS_WriteFileWithSync_VisibleAfterChildKill(t *testing.T) {
 		if err := cas.WriteFileWithSync(dest, casCrashKillPayload); err != nil {
 			os.Exit(2)
 		}
-		if err := fileutil.WriteFile(filepath.Join(dir, "ready"), []byte("ok\n"), 0o644); err != nil {
+		if err := fileutil.WriteFile(filepath.Join(dir, "ready"), []byte("ok\n"), paths.FilePerm644); err != nil {
 			os.Exit(3)
 		}
 		select {}

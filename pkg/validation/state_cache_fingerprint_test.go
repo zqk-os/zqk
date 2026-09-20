@@ -79,14 +79,15 @@ func TestRunningExecutableFingerprint_HasPathSizeMtime(t *testing.T) {
 
 func TestValidationFingerprintGlobs_IncludeUnlistedCheckerAndParser(t *testing.T) {
 	t.Parallel()
-	root := registerZQKTestRootForTest(t)
+	root := t.TempDir()
+	policyRel := filepath.Join(paths.ProcessInternalLifecyclesDir, "policy_lifecycle.yaml")
 	writeProjectFile(t, root, "cmd/zqk/system/check_references_helpers.go", "package system\n")
 	writeProjectFile(t, root, "pkg/migration/parser/parser.go", "package parser\n")
-	writeProjectFile(t, root, ".zqk/specs/lifecycles/policy_lifecycle.yaml", "id: policy\n")
+	writeProjectFile(t, root, policyRel, "id: policy\n")
 	rels := validationFingerprintRelPaths(root)
 	want := []string{
 		"cmd/zqk/system/check_references_helpers.go",
-		".zqk/specs/lifecycles/policy_lifecycle.yaml",
+		policyRel,
 		"pkg/migration/parser/parser.go",
 	}
 	for _, w := range want {
@@ -114,7 +115,7 @@ func TestValidationStateCache_UnlistedCheckerFileInvalidates(t *testing.T) {
 func TestValidationStateCache_PolicyLifecycleYAMLInvalidates(t *testing.T) {
 	t.Parallel()
 	root := registerZQKTestRootForTest(t)
-	rel := ".zqk/specs/lifecycles/policy_lifecycle.yaml"
+	rel := filepath.Join(paths.ProcessInternalLifecyclesDir, "policy_lifecycle.yaml")
 	writeProjectFile(t, root, rel, "id: policy\nstatus: draft\n")
 	seedValidationCacheWithState(t, root)
 	assertCacheHoldsTest001(t, root)

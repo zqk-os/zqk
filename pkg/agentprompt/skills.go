@@ -10,6 +10,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/skill"
 	"github.com/zqk-os/zqk/pkg/storage"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
@@ -17,7 +18,7 @@ import (
 
 // SyncASKTwins scans the .zqk/skills/ directory and creates missing kernel agent_skill objects.
 func SyncASKTwins(ctx context.Context, sp storage.ObjectStorageProvider, secCtx *pkgctx.SecurityContext, projectRoot string) error {
-	skillsDir := filepath.Join(projectRoot, ".zqk", "skills")
+	skillsDir := filepath.Join(projectRoot, paths.ProjectDataDir, paths.SkillsSubdir)
 	entries, err := fileutil.ReadDir(skillsDir)
 	if err != nil {
 		if fileutil.IsNotExist(err) {
@@ -52,7 +53,7 @@ func SyncASKTwins(ctx context.Context, sp storage.ObjectStorageProvider, secCtx 
 			newObj := map[string]any{
 				objects.FieldKeyKind:     objects.KindAgentSkill,
 				objects.FieldKeyTitle:    title,
-				objects.FieldKeyFilePath: filepath.Join(".zqk", "skills", name),
+				objects.FieldKeyFilePath: filepath.Join(paths.ProjectDataDir, paths.SkillsSubdir, name),
 			}
 			err := sp.Create(ctx, secCtx, newObj)
 			if err != nil {

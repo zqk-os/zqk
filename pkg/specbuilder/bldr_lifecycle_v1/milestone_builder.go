@@ -30,7 +30,7 @@ func NewMilestoneLifecycleBuilder() *MilestoneLifecycleBuilder {
 				"conceptual":  0,
 				"deferred":    0,
 				"in_progress": 50,
-				"not_started": 0,
+				"not_started": 15,
 				"originated":  5,
 			},
 		})

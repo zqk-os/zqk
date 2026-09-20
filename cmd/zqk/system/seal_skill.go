@@ -12,6 +12,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/skill"
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
@@ -47,7 +48,7 @@ func runSealSkill(cmd *cobra.Command, args []string) error {
 		}
 
 		skillName := args[0]
-		skillDir := filepath.Join(projectRoot, ".zqk", "skills", skillName)
+		skillDir := filepath.Join(projectRoot, paths.ProjectDataDir, paths.SkillsSubdir, skillName)
 		skillPath := filepath.Join(skillDir, "SKILL.md")
 
 		contentBytes, err := fileutil.ReadFile(skillPath)

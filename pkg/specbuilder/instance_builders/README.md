@@ -20,7 +20,7 @@ Instance builders provide:
 
 Example:
 - **Policy spec**: ONE spec → ONE `PolicySpecBuilder`
-- **Policy instances**: MANY (POL-CODE-009, POL-CODE-010, etc.) → **ONE** `PolicyInstanceBuilder`
+- **Policy instances**: MANY (POL-EXAMPLE-001, POL-EXAMPLE-002, etc.) → **ONE** `PolicyInstanceBuilder`
 
 ## Architecture
 
@@ -50,7 +50,7 @@ import "github.com/zqk-os/zqk/pkg/objects"
 // Create a policy instance builder (ONE builder for ALL policy instances)
 builder := NewPolicyInstanceBuilder(objects.DefaultSchemaVersion)
 instance, err := builder.
-    SetID("POL-CODE-009").
+    SetID("POL-EXAMPLE-001").
     SetTitle("Code Quality Maintenance").
     SetCategory("code_quality").
     SetStatus("active").
@@ -63,7 +63,7 @@ instance, err := builder.
 import "github.com/zqk-os/zqk/pkg/objects"
 
 builder := NewPolicyInstanceBuilder(objects.DefaultSchemaVersion)
-instance, err := builder.LoadFromYAML(".zqk/process/policies/POL-CODE-009.yaml")
+instance, err := builder.LoadFromYAML(".zqk/process/policies/POL-EXAMPLE-001.yaml")
 ```
 
 ### Loading from Sequence File (Compact Format)
@@ -72,7 +72,7 @@ instance, err := builder.LoadFromYAML(".zqk/process/policies/POL-CODE-009.yaml")
 import "github.com/zqk-os/zqk/pkg/objects"
 
 builder := NewPolicyInstanceBuilder(objects.DefaultSchemaVersion)
-instance, err := builder.LoadFromSequence(".zqk/process/policies/POL-CODE-009.seq")
+instance, err := builder.LoadFromSequence(".zqk/process/policies/POL-EXAMPLE-001.seq")
 ```
 
 ### Writing to Compact Format
@@ -82,11 +82,11 @@ import "github.com/zqk-os/zqk/pkg/objects"
 
 builder := NewPolicyInstanceBuilder(objects.DefaultSchemaVersion)
 instance := map[string]any{
-    "id": "POL-CODE-009",
+    "id": "POL-EXAMPLE-001",
     "title": "Code Quality Maintenance",
     // ...
 }
-err := builder.WriteToSequence(instance, "policies/POL-CODE-009.seq")
+err := builder.WriteToSequence(instance, "policies/POL-EXAMPLE-001.seq")
 ```
 
 ### Version-Aware Creation

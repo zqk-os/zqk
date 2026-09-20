@@ -49,7 +49,7 @@ func TestRunProjectTestTeardown_skipsDestructiveStagesOnGitRoot(t *testing.T) {
 	if err := fileutil.MkdirAll(docs, paths.DirPerm755); err != nil {
 		t.Fatalf("mkdir: %v", err)
 	}
-	zqkData := filepath.Join(tmp, paths.ProjectDataDir, "wal")
+	zqkData := filepath.Join(tmp, paths.ProjectDataDir, paths.WalDir)
 	if err := fileutil.MkdirAll(zqkData, paths.DirPerm755); err != nil {
 		t.Fatalf("mkdir .zqk: %v", err)
 	}
@@ -90,7 +90,7 @@ func TestRunProjectTestTeardown_scrubsWhenStripWithoutAggressive(t *testing.T) {
 	if err := fileutil.MkdirAll(docs, paths.DirPerm755); err != nil {
 		t.Fatalf("mkdir: %v", err)
 	}
-	zqkData := filepath.Join(tmp, paths.ProjectDataDir, "wal")
+	zqkData := filepath.Join(tmp, paths.ProjectDataDir, paths.WalDir)
 	if err := fileutil.MkdirAll(zqkData, paths.DirPerm755); err != nil {
 		t.Fatalf("mkdir .zqk: %v", err)
 	}

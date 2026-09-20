@@ -254,7 +254,7 @@ func TestReverseReferenceIndex_LoadCache_InvalidOrMissing(t *testing.T) {
 	}
 
 	// Invalid/corrupt file
-	cacheDir := filepath.Join(tmpDir, paths.ProjectDataDir, "cache")
+	cacheDir := filepath.Join(tmpDir, paths.ProjectDataDir, paths.CacheDir)
 	if err := fileutil.MkdirAll(cacheDir, paths.DirPerm755); err != nil {
 		t.Fatalf("MkdirAll: %v", err)
 	}
@@ -279,7 +279,7 @@ func TestReverseReferenceIndex_SaveCache_CreatesDir(t *testing.T) {
 	if err := index.SaveCache(tmpDir); err != nil {
 		t.Fatalf("SaveCache: %v", err)
 	}
-	cachePath := filepath.Join(tmpDir, paths.ProjectDataDir, "cache", "reverse-reference-index.json")
+	cachePath := filepath.Join(tmpDir, paths.ProjectDataDir, paths.CacheDir, "reverse-reference-index.json")
 	if _, err := fileutil.Stat(cachePath); err != nil {
 		t.Errorf("Cache file not created: %v", err)
 	}
@@ -311,7 +311,7 @@ func TestReverseReferenceIndex_BuildFromScanThenSaveCache(t *testing.T) {
 		t.Fatalf("SaveCache: %v", err)
 	}
 
-	cachePath := filepath.Join(tmpDir, paths.ProjectDataDir, "cache", "reverse-reference-index.json")
+	cachePath := filepath.Join(tmpDir, paths.ProjectDataDir, paths.CacheDir, "reverse-reference-index.json")
 	if _, err := fileutil.Stat(cachePath); err != nil {
 		t.Errorf("Cache file not created after BuildFromScan+SaveCache: %v", err)
 	}

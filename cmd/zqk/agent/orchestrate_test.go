@@ -95,14 +95,14 @@ func TestCollectOrchestrationCommitManifest(t *testing.T) {
 
 	worktree := t.TempDir()
 	runTestGit(t, worktree, "init")
-	if err := fileutil.WriteFile(filepath.Join(worktree, "result.txt"), []byte("base\n"), 0o600); err != nil {
+	if err := fileutil.WriteFile(filepath.Join(worktree, "result.txt"), []byte("base\n"), paths.FilePerm600); err != nil {
 		t.Fatal(err)
 	}
 	runTestGit(t, worktree, "add", "result.txt")
 	runTestGit(t, worktree, "-c", "user.name=CAP Test", "-c", "user.email=cap@example.invalid", "commit", "-m", "base")
 	baseSHA := runTestGit(t, worktree, "rev-parse", "HEAD")
 
-	if err := fileutil.WriteFile(filepath.Join(worktree, "result.txt"), []byte("delivered\n"), 0o600); err != nil {
+	if err := fileutil.WriteFile(filepath.Join(worktree, "result.txt"), []byte("delivered\n"), paths.FilePerm600); err != nil {
 		t.Fatal(err)
 	}
 	runTestGit(t, worktree, "add", "result.txt")
@@ -130,7 +130,7 @@ func TestAutoCommitWorktreeChanges(t *testing.T) {
 
 	worktree := t.TempDir()
 	runTestGit(t, worktree, "init")
-	if err := fileutil.WriteFile(filepath.Join(worktree, "base.txt"), []byte("base\n"), 0o600); err != nil {
+	if err := fileutil.WriteFile(filepath.Join(worktree, "base.txt"), []byte("base\n"), paths.FilePerm600); err != nil {
 		t.Fatal(err)
 	}
 	runTestGit(t, worktree, "add", "base.txt")
@@ -146,7 +146,7 @@ func TestAutoCommitWorktreeChanges(t *testing.T) {
 	}
 
 	// 2. Uncommitted file modified by agent
-	if err := fileutil.WriteFile(filepath.Join(worktree, "feature.go"), []byte("package main\n"), 0o600); err != nil {
+	if err := fileutil.WriteFile(filepath.Join(worktree, "feature.go"), []byte("package main\n"), paths.FilePerm600); err != nil {
 		t.Fatal(err)
 	}
 	if err := autoCommitWorktreeChanges(context.Background(), worktree, "ATK-auto-test"); err != nil {
@@ -161,13 +161,13 @@ func TestAutoCommitWorktreeChanges(t *testing.T) {
 	if manifest["commit_sha"] == baseSHA {
 		t.Fatalf("commit_sha must advance")
 	}
-	paths, _ := manifest[objects.FieldKeyChangedPaths].([]string)
-	if len(paths) != 1 || paths[0] != "feature.go" {
-		t.Fatalf("changed_paths = %#v, want [feature.go]", paths)
+	changedPaths, _ := manifest[objects.FieldKeyChangedPaths].([]string)
+	if len(changedPaths) != 1 || changedPaths[0] != "feature.go" {
+		t.Fatalf("changed_paths = %#v, want [feature.go]", changedPaths)
 	}
 
 	// 4. Auto-commit with itemID includes BLI citation in commit message
-	if err := fileutil.WriteFile(filepath.Join(worktree, "feature2.go"), []byte("package main\n"), 0o600); err != nil {
+	if err := fileutil.WriteFile(filepath.Join(worktree, "feature2.go"), []byte("package main\n"), paths.FilePerm600); err != nil {
 		t.Fatal(err)
 	}
 	if err := autoCommitWorktreeChanges(context.Background(), worktree, "ATK-auto-test-2", "BLI-auto-test-2"); err != nil {
@@ -258,20 +258,20 @@ func TestCollectOrchestrationCommitManifestIgnoresDraftPlaneSymlink(t *testing.T
 
 	worktree := t.TempDir()
 	runTestGit(t, worktree, "init")
-	if err := os.WriteFile(filepath.Join(worktree, "result.txt"), []byte("base\n"), 0o600); err != nil {
+	if err := os.WriteFile(filepath.Join(worktree, "result.txt"), []byte("base\n"), paths.FilePerm600); err != nil {
 		t.Fatal(err)
 	}
-	if err := fileutil.MkdirAll(filepath.Join(worktree, paths.ProjectDataDir), 0o755); err != nil {
+	if err := fileutil.MkdirAll(filepath.Join(worktree, paths.ProjectDataDir), paths.DirPerm755); err != nil {
 		t.Fatal(err)
 	}
-	if err := os.WriteFile(filepath.Join(worktree, paths.ProjectDataDir, ".keep"), []byte("keep\n"), 0o600); err != nil {
+	if err := os.WriteFile(filepath.Join(worktree, paths.ProjectDataDir, ".keep"), []byte("keep\n"), paths.FilePerm600); err != nil {
 		t.Fatal(err)
 	}
 	runTestGit(t, worktree, "add", "result.txt", filepath.Join(paths.ProjectDataDir, ".keep"))
 	runTestGit(t, worktree, "-c", "user.name=CAP Test", "-c", "user.email=cap@example.invalid", "commit", "-m", "base")
 	baseSHA := runTestGit(t, worktree, "rev-parse", "HEAD")
 
-	if err := os.WriteFile(filepath.Join(worktree, "result.txt"), []byte("delivered\n"), 0o600); err != nil {
+	if err := os.WriteFile(filepath.Join(worktree, "result.txt"), []byte("delivered\n"), paths.FilePerm600); err != nil {
 		t.Fatal(err)
 	}
 	runTestGit(t, worktree, "add", "result.txt")
@@ -307,7 +307,7 @@ func TestCollectOrchestrationCommitManifestRejectsMissingEvidence(t *testing.T) 
 			name: "dirty worktree",
 			mutate: func(t *testing.T, worktree string) {
 				t.Helper()
-				if err := fileutil.WriteFile(filepath.Join(worktree, "result.txt"), []byte("dirty\n"), 0o600); err != nil {
+				if err := fileutil.WriteFile(filepath.Join(worktree, "result.txt"), []byte("dirty\n"), paths.FilePerm600); err != nil {
 					t.Fatal(err)
 				}
 			},
@@ -328,7 +328,7 @@ func TestCollectOrchestrationCommitManifestRejectsMissingEvidence(t *testing.T) 
 			t.Parallel()
 			worktree := t.TempDir()
 			runTestGit(t, worktree, "init")
-			if err := fileutil.WriteFile(filepath.Join(worktree, "result.txt"), []byte("base\n"), 0o600); err != nil {
+			if err := fileutil.WriteFile(filepath.Join(worktree, "result.txt"), []byte("base\n"), paths.FilePerm600); err != nil {
 				t.Fatal(err)
 			}
 			runTestGit(t, worktree, "add", "result.txt")
@@ -385,18 +385,18 @@ func TestSeedAgentWorktreeRuntime(t *testing.T) {
 	personaDir := filepath.Join(mainRoot, paths.ProcessDir, "personas")
 	draftDir := filepath.Join(storage.ObjectDraftPlaneRoot(mainRoot), objects.KindAgentTask)
 	for _, dir := range []string{accountDir, personaDir, draftDir} {
-		if err := fileutil.MkdirAll(dir, 0o755); err != nil {
+		if err := fileutil.MkdirAll(dir, paths.DirPerm755); err != nil {
 			t.Fatal(err)
 		}
 	}
-	if err := fileutil.WriteFile(filepath.Join(accountDir, ".account.index"), []byte("account-index"), 0o600); err != nil {
+	if err := fileutil.WriteFile(filepath.Join(accountDir, ".account.index"), []byte("account-index"), paths.FilePerm600); err != nil {
 		t.Fatal(err)
 	}
-	if err := fileutil.WriteFile(filepath.Join(personaDir, ".persona.index"), []byte("persona-index"), 0o600); err != nil {
+	if err := fileutil.WriteFile(filepath.Join(personaDir, ".persona.index"), []byte("persona-index"), paths.FilePerm600); err != nil {
 		t.Fatal(err)
 	}
 	taskData := []byte("id: ATK-TEST\n")
-	if err := fileutil.WriteFile(filepath.Join(draftDir, taskID+".yaml"), taskData, 0o600); err != nil {
+	if err := fileutil.WriteFile(filepath.Join(draftDir, taskID+".yaml"), taskData, paths.FilePerm600); err != nil {
 		t.Fatal(err)
 	}
 

@@ -8,6 +8,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"github.com/zqk-os/zqk/pkg/agentfeed"
 	"github.com/zqk-os/zqk/pkg/datacell"
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -51,7 +52,7 @@ func TestVendorPathPolicy_FindLeak(t *testing.T) {
 	if m, ok := p.FindLeak("/tmp/proj/.windsurf/brain"); !ok || m != ".windsurf" {
 		t.Fatalf("got marker=%q ok=%v", m, ok)
 	}
-	if _, ok := p.FindLeak("/tmp/proj/.zqk/config"); ok {
+	if _, ok := p.FindLeak(filepath.Join("/tmp/proj", paths.ProjectDataDir, paths.ConfigDir)); ok {
 		t.Fatal("project data path must not leak")
 	}
 }

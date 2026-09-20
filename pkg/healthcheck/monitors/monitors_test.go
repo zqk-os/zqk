@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/scheduler"
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
@@ -219,7 +220,7 @@ func TestAutonomyInboxMonitor_Run(t *testing.T) {
 
 	t.Run("inbox_with_items_returns_count", func(t *testing.T) {
 		tmpDir := t.TempDir()
-		inboxDir := filepath.Join(tmpDir, ".zqk", "inbox")
+		inboxDir := filepath.Join(tmpDir, paths.ProjectDataDir, paths.InboxSubdir)
 		_ = fileutil.EnsureDir(inboxDir)
 		_ = fileutil.WriteStandardFile(filepath.Join(inboxDir, "msg1.json"), []byte("{}"))
 		_ = fileutil.WriteStandardFile(filepath.Join(inboxDir, "msg2.json"), []byte("{}"))

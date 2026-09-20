@@ -59,7 +59,7 @@ func (l *LazyGraphStorage) ensureInitialized(ctx context.Context) error {
 			}
 
 			if !isSchedulerDaemon {
-				sockPath := filepath.Join(l.projectRoot, paths.ProjectDataDir, "scheduler", "rpcpool.sock")
+				sockPath := filepath.Join(l.projectRoot, paths.ProjectDataDir, paths.SchedulerSubdir, "rpcpool.sock")
 				if _, statErr := fileutil.Stat(sockPath); statErr == nil {
 					var rpcPool provider.ConnectionPool
 					var rpcErr error

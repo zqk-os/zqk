@@ -36,7 +36,7 @@ func TestGreenfieldQuickstart_FunctionalAcceptance(t *testing.T) {
 		t.Fatalf("system init failed in empty greenfield directory: %v\nOutput:\n%s", initErr, string(initOut))
 	}
 
-	zqkDir := filepath.Join(greenfieldDir, ".zqk")
+	zqkDir := filepath.Join(greenfieldDir, paths.ProjectDataDir)
 	if !fileutil.Exists(zqkDir) {
 		t.Fatalf(".zqk directory missing after system init")
 	}

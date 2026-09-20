@@ -15,6 +15,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -69,7 +70,7 @@ func (e *Engine) Discover(ctx context.Context, opts DiscoveryOptions) ([]Discove
 	if opts.Incremental {
 		cachePath := opts.CachePath
 		if cachePath == "" {
-			cachePath = filepath.Join(cleanRoot, ".zqk", "cache", "test_discovery.json")
+			cachePath = filepath.Join(cleanRoot, paths.ProjectDataDir, paths.CacheDir, "test_discovery.json")
 		}
 		cache = LoadCache(cachePath)
 	}

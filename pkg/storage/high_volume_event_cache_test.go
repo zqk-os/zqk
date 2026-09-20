@@ -425,7 +425,7 @@ func TestHighVolumeEventCache_LoadInvalidFile(t *testing.T) {
 	cache := NewHighVolumeEventCache()
 
 	// Create invalid cache file
-	cachePath := filepath.Join(projectRoot, paths.ProjectDataDir, "cache", highVolumeEventCacheFile)
+	cachePath := filepath.Join(projectRoot, paths.ProjectDataDir, paths.CacheDir, highVolumeEventCacheFile)
 	if err := fileutil.MkdirAll(filepath.Dir(cachePath), paths.DirPerm755); err != nil {
 		t.Fatalf("MkdirAll failed: %v", err)
 	}
@@ -449,7 +449,7 @@ func TestHighVolumeEventCache_LoadV1Format(t *testing.T) {
 	projectRoot := tempDir
 
 	// Write v1-style cache (flat entries)
-	cachePath := filepath.Join(projectRoot, paths.ProjectDataDir, "cache", highVolumeEventCacheFile)
+	cachePath := filepath.Join(projectRoot, paths.ProjectDataDir, paths.CacheDir, highVolumeEventCacheFile)
 	if err := fileutil.MkdirAll(filepath.Dir(cachePath), paths.DirPerm755); err != nil {
 		t.Fatalf("MkdirAll failed: %v", err)
 	}

@@ -115,7 +115,7 @@ func TestPrunePendingAutofixBatchesForObjectID(t *testing.T) {
 	t.Parallel()
 	root := t.TempDir()
 	autofixDir := filepath.Join(root, paths.ProjectDataDir, paths.AutofixDir)
-	if err := fileutil.MkdirAll(autofixDir, 0o755); err != nil {
+	if err := fileutil.MkdirAll(autofixDir, paths.DirPerm755); err != nil {
 		t.Fatal(err)
 	}
 	batch := AutoFixBatch{
@@ -132,7 +132,7 @@ func TestPrunePendingAutofixBatchesForObjectID(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if err := fileutil.WriteFile(path, raw, 0o644); err != nil {
+	if err := fileutil.WriteFile(path, raw, paths.FilePerm644); err != nil {
 		t.Fatal(err)
 	}
 	rewritten, deleted := PrunePendingAutofixBatchesForObjectID(root, "QUE-drop")
@@ -164,11 +164,11 @@ func TestMaybeClearStaleAutofixBatchesAfterLiveGreen(t *testing.T) {
 	t.Parallel()
 	root := t.TempDir()
 	autofixDir := filepath.Join(root, paths.ProjectDataDir, paths.AutofixDir)
-	if err := fileutil.MkdirAll(autofixDir, 0o755); err != nil {
+	if err := fileutil.MkdirAll(autofixDir, paths.DirPerm755); err != nil {
 		t.Fatal(err)
 	}
 	batchPath := filepath.Join(autofixDir, "AUTOFIX-stale.json")
-	if err := fileutil.WriteFile(batchPath, []byte(`{"batch_id":"x","objects":[]}`), 0o644); err != nil {
+	if err := fileutil.WriteFile(batchPath, []byte(`{"batch_id":"x","objects":[]}`), paths.FilePerm644); err != nil {
 		t.Fatal(err)
 	}
 
@@ -187,7 +187,7 @@ func TestMaybeClearStaleAutofixBatchesAfterLiveGreen(t *testing.T) {
 	}
 
 	// Scoped check must not clear.
-	if err := fileutil.WriteFile(batchPath, []byte(`{"batch_id":"y"}`), 0o644); err != nil {
+	if err := fileutil.WriteFile(batchPath, []byte(`{"batch_id":"y"}`), paths.FilePerm644); err != nil {
 		t.Fatal(err)
 	}
 	cmdScoped := &cobra.Command{Use: "check"}

@@ -239,7 +239,7 @@ func setupCLITestEnvironmentForComprehensive(t *testing.T) (tmpDir, cliBinary st
 	if err != nil {
 		t.Fatalf("failed to read shared CLI binary: %v", err)
 	}
-	if err := fileutil.WriteFile(cliBinary, data, 0o755); err != nil { //nolint:gosec // test binary needs execution permissions
+	if err := fileutil.WriteFile(cliBinary, data, paths.DirPerm755); err != nil { //nolint:gosec // test binary needs execution permissions
 		t.Fatalf("failed to write CLI binary to temp dir: %v", err)
 	}
 
@@ -373,7 +373,7 @@ func seedReferenceAccountViaCLI(t *testing.T, cliBinary, testRoot string) {
 	flushListingIndexAfterObjectCreate(t, testRoot, objects.KindAccount)
 }
 
-// seedReferencePolicyForTests ensures POL-CODE-009 exists for code_quality_metric.policy_ref.
+// seedReferencePolicyForTests ensures a reference policy exists for code_quality_metric.policy_ref.
 func seedReferencePolicyForTests(t *testing.T, testRoot string) {
 	t.Helper()
 	ctx := pkgctx.NewSystemContext()
@@ -385,7 +385,7 @@ func seedReferencePolicyForTests(t *testing.T, testRoot string) {
 	}
 	defer func() { _ = fs.Shutdown(context.Background()) }()
 	policyObj := map[string]any{
-		objects.FieldKeyID:            "POL-CODE-009",
+		objects.FieldKeyID:            "POL-EXAMPLE-001",
 		objects.FieldKeyKind:          objects.KindPolicy,
 		objects.FieldKeyTitle:         "Reference policy for metric tests",
 		objects.FieldKeyBody:          "Test policy body for code quality metric tests.",
@@ -1820,7 +1820,7 @@ func setKindSpecificFieldsForCLIExtended(obj map[string]any, kind string, index 
 		setBaseMetricTimeAndType(obj, index)
 		obj[objects.FieldKeyMetricType] = cliMetricTypeSystem
 		obj[objects.FieldKeyMetricCategory] = "compliance"
-		obj[objects.FieldKeyPolicyRef] = "POL-CODE-009"
+		obj[objects.FieldKeyPolicyRef] = "POL-EXAMPLE-001"
 		obj[objects.FieldKeyMeasurementPeriod] = "daily"
 	case objects.KindDepartment:
 		obj[objects.FieldKeyDepartmentName] = fmt.Sprintf("Dept%d", index+1)

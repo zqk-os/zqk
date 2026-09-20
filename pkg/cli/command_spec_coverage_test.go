@@ -6,6 +6,7 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"github.com/zqk-os/zqk/pkg/paths"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -83,14 +84,14 @@ func TestAnalyzeCommandSpecCoverageFindsUnspecifiedCommand(t *testing.T) {
 
 	specsDir := t.TempDir()
 	systemDir := filepath.Join(specsDir, "system")
-	if err := fileutil.Mkdir(systemDir, 0o755); err != nil {
+	if err := fileutil.Mkdir(systemDir, paths.DirPerm755); err != nil {
 		t.Fatal(err)
 	}
 	for path, contents := range map[string]string{
 		filepath.Join(specsDir, "system_command.yaml"):   "name: system\nshort: system\ndescription: system\n",
 		filepath.Join(systemDir, "covered_command.yaml"): "name: covered\nshort: covered\ndescription: covered\n",
 	} {
-		if err := fileutil.WriteFile(path, []byte(contents), 0o644); err != nil {
+		if err := fileutil.WriteFile(path, []byte(contents), paths.FilePerm644); err != nil {
 			t.Fatal(err)
 		}
 	}

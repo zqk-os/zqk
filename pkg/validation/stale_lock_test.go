@@ -20,7 +20,7 @@ func TestValidationStateCache_StaleLockRecovery(t *testing.T) {
 
 	cache := NewValidationStateCache(testRoot, time.Hour)
 	// Get lock file path (same pattern as Save method)
-	cacheFile := filepath.Join(testRoot, paths.ProjectDataDir, "cache", ConstMagic65c9aa69)
+	cacheFile := filepath.Join(testRoot, paths.ProjectDataDir, paths.CacheDir, ConstMagic65c9aa69)
 	lockFile := cacheFile + ".lock"
 
 	// Create cache directory first
@@ -91,7 +91,7 @@ func TestValidationStateCache_ActiveLockRespected(t *testing.T) {
 
 	cache := NewValidationStateCache(testRoot, time.Hour)
 	// Get lock file path (same pattern as Save method)
-	cacheFile := filepath.Join(testRoot, paths.ProjectDataDir, "cache", ConstMagic65c9aa69)
+	cacheFile := filepath.Join(testRoot, paths.ProjectDataDir, paths.CacheDir, ConstMagic65c9aa69)
 	lockFile := cacheFile + ".lock"
 
 	// Create cache directory first
@@ -150,7 +150,7 @@ func TestValidationStateCache_ProcessDeathLockRelease(t *testing.T) {
 
 	cache := NewValidationStateCache(testRoot, time.Hour)
 	// Get lock file path (same pattern as Save method)
-	cacheFile := filepath.Join(testRoot, paths.ProjectDataDir, "cache", ConstMagic65c9aa69)
+	cacheFile := filepath.Join(testRoot, paths.ProjectDataDir, paths.CacheDir, ConstMagic65c9aa69)
 	lockFile := cacheFile + ".lock"
 
 	// Create cache directory first

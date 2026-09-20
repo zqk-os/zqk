@@ -8,27 +8,30 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/zqk-os/zqk/pkg/brand"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/goroutinelabels"
-	"github.com/zqk-os/zqk/pkg/zqkenv"
-
 	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
 const (
 	defaultPort  = 6060
 	emptyPortVal = ""
 
-	// legacyZQKPprof are documented in SCHEDULER_DIAGNOSTICS_VIEWING.md as ZQK_PPROF / ZQK_PPROF_PORT.
-	// The scheduler daemon child sets argv[0] to "zqk-scheduler", so brand.EnvPrefix() is ZQK_SCHEDULER and
-	// zqkenv.Pprof() already resolves to ZQK_SCHEDULER_PPROF; users often set ZQK_PPROF or ZQK_STABLE_PPROF
-	// instead — try those as fallbacks.
-	legacyZQKPprof                = "ZQK_PPROF"
-	legacyZQKPprofPort            = "ZQK_PPROF_PORT"
-	fallbackSchedulerDaemonPprof  = "ZQK_SCHEDULER_PPROF"
-	fallbackSchedulerDaemonPort   = "ZQK_SCHEDULER_PPROF_PORT"
-	fallbackStableBinaryPprof     = "ZQK_STABLE_PPROF"
-	fallbackStableBinaryPprofPort = "ZQK_STABLE_PPROF_PORT"
+// legacyZQKPprof are documented in SCHEDULER_DIAGNOSTICS_VIEWING.md as ZQK_PPROF / ZQK_PPROF_PORT.
+// The scheduler daemon child sets argv[0] to "zqk-scheduler", so brand.EnvPrefix() is ZQK_SCHEDULER and
+// zqkenv.Pprof() already resolves to ZQK_SCHEDULER_PPROF; users often set ZQK_PPROF or ZQK_STABLE_PPROF
+// instead — try those as fallbacks.
+)
+
+var (
+	legacyDefaultPprof            = zqkenv.DefaultBrandKey("PPROF")
+	legacyDefaultPprofPort        = zqkenv.DefaultBrandKey("PPROF_PORT")
+	fallbackSchedulerDaemonPprof  = brand.EnvPrefixForExecutable(brand.CanonicalExecutableToken+"-scheduler") + "_PPROF"
+	fallbackSchedulerDaemonPort   = brand.EnvPrefixForExecutable(brand.CanonicalExecutableToken+"-scheduler") + "_PPROF_PORT"
+	fallbackStableBinaryPprof     = zqkenv.DefaultBrandKey("STABLE_PPROF")
+	fallbackStableBinaryPprofPort = zqkenv.DefaultBrandKey("STABLE_PPROF_PORT")
 )
 
 func pprofEnvTruthy(v string) bool {
@@ -38,7 +41,7 @@ func pprofEnvTruthy(v string) bool {
 func pprofEnabledFromEnv() bool {
 	for _, key := range []string{
 		zqkenv.Pprof().Name(),
-		legacyZQKPprof,
+		legacyDefaultPprof,
 		fallbackSchedulerDaemonPprof,
 		fallbackStableBinaryPprof,
 	} {
@@ -52,7 +55,7 @@ func pprofEnabledFromEnv() bool {
 func pprofPortFromEnv() int {
 	for _, key := range []string{
 		zqkenv.PprofPort().Name(),
-		legacyZQKPprofPort,
+		legacyDefaultPprofPort,
 		fallbackSchedulerDaemonPort,
 		fallbackStableBinaryPprofPort,
 	} {

@@ -29,8 +29,8 @@ func TestGetProcessFDUsage(t *testing.T) {
 
 func TestReapOrphanedTempFiles(t *testing.T) {
 	tmpDir := t.TempDir()
-	zqkCache := filepath.Join(tmpDir, paths.ProjectDataDir, "cache")
-	if err := fileutil.MkdirAll(zqkCache, 0o755); err != nil {
+	zqkCache := filepath.Join(tmpDir, paths.ProjectDataDir, paths.CacheDir)
+	if err := fileutil.MkdirAll(zqkCache, paths.DirPerm755); err != nil {
 		t.Fatalf("mkdir failed: %v", err)
 	}
 
@@ -38,9 +38,9 @@ func TestReapOrphanedTempFiles(t *testing.T) {
 	freshTmp := filepath.Join(zqkCache, ".tmp-durable-fresh")
 	regularFile := filepath.Join(zqkCache, "regular.json")
 
-	_ = fileutil.WriteFile(oldTmp, []byte("abandoned temp content"), 0o600)
-	_ = fileutil.WriteFile(freshTmp, []byte("fresh temp content"), 0o600)
-	_ = fileutil.WriteFile(regularFile, []byte("regular content"), 0o600)
+	_ = fileutil.WriteFile(oldTmp, []byte("abandoned temp content"), paths.FilePerm600)
+	_ = fileutil.WriteFile(freshTmp, []byte("fresh temp content"), paths.FilePerm600)
+	_ = fileutil.WriteFile(regularFile, []byte("regular content"), paths.FilePerm600)
 
 	// Backdate oldTmp by 2 hours
 	oldTime := time.Now().Add(-2 * time.Hour)
@@ -80,22 +80,22 @@ func TestReapOrphanedTempFiles(t *testing.T) {
 func TestReapStaleLocks(t *testing.T) {
 	tmpDir := t.TempDir()
 	zqkLocks := filepath.Join(tmpDir, paths.ProjectDataDir, "locks")
-	if err := fileutil.MkdirAll(zqkLocks, 0o755); err != nil {
+	if err := fileutil.MkdirAll(zqkLocks, paths.DirPerm755); err != nil {
 		t.Fatalf("mkdir failed: %v", err)
 	}
 
 	staleLock := filepath.Join(zqkLocks, "test_stale.lock")
 	activeLock := filepath.Join(zqkLocks, "test_active.lock")
 
-	_ = fileutil.WriteFile(staleLock, []byte(""), 0o600)
-	_ = fileutil.WriteFile(activeLock, []byte(""), 0o600)
+	_ = fileutil.WriteFile(staleLock, []byte(""), paths.FilePerm600)
+	_ = fileutil.WriteFile(activeLock, []byte(""), paths.FilePerm600)
 
 	oldTime := time.Now().Add(-2 * time.Hour)
 	_ = os.Chtimes(staleLock, oldTime, oldTime)
 	_ = os.Chtimes(activeLock, oldTime, oldTime)
 
 	// Hold active lock in this process
-	activeF, errOpen := fileutil.OpenFile(activeLock, fileutil.O_RDWR, 0o600)
+	activeF, errOpen := fileutil.OpenFile(activeLock, fileutil.O_RDWR, paths.FilePerm600)
 	if errOpen != nil {
 		t.Fatalf("failed to open active lock: %v", errOpen)
 	}
@@ -120,14 +120,14 @@ func TestReapStaleLocks(t *testing.T) {
 func TestEnforceLogRetention(t *testing.T) {
 	tmpDir := t.TempDir()
 	logDir := filepath.Join(tmpDir, paths.ProjectDataDir, paths.LogsDir)
-	if err := fileutil.MkdirAll(logDir, 0o755); err != nil {
+	if err := fileutil.MkdirAll(logDir, paths.DirPerm755); err != nil {
 		t.Fatalf("mkdir failed: %v", err)
 	}
 
 	oldLog := filepath.Join(logDir, "old-events.log")
 	oversizeLog := filepath.Join(logDir, "oversize.log")
 
-	_ = fileutil.WriteFile(oldLog, []byte("old log entries"), 0o600)
+	_ = fileutil.WriteFile(oldLog, []byte("old log entries"), paths.FilePerm600)
 	oldTime := time.Now().Add(-30 * 24 * time.Hour)
 	_ = os.Chtimes(oldLog, oldTime, oldTime)
 
@@ -136,7 +136,7 @@ func TestEnforceLogRetention(t *testing.T) {
 	for i := 0; i < 12000; i++ {
 		sb.WriteString("log entry line sample payload\n")
 	}
-	_ = fileutil.WriteFile(oversizeLog, []byte(sb.String()), 0o600)
+	_ = fileutil.WriteFile(oversizeLog, []byte(sb.String()), paths.FilePerm600)
 
 	// Enforce retention: maxAge 7d, maxSizeBytes 10KB
 	cnt, reclaimed, _, err := EnforceLogRetention(tmpDir, 7*24*time.Hour, 10*1024, false)
@@ -163,11 +163,11 @@ func TestEnforceLogRetention(t *testing.T) {
 
 func TestInspectIOResources(t *testing.T) {
 	tmpDir := t.TempDir()
-	zqkCache := filepath.Join(tmpDir, paths.ProjectDataDir, "cache")
-	_ = fileutil.MkdirAll(zqkCache, 0o755)
+	zqkCache := filepath.Join(tmpDir, paths.ProjectDataDir, paths.CacheDir)
+	_ = fileutil.MkdirAll(zqkCache, paths.DirPerm755)
 
 	oldTmp := filepath.Join(zqkCache, ".tmp-durable-test")
-	_ = fileutil.WriteFile(oldTmp, []byte("temp"), 0o600)
+	_ = fileutil.WriteFile(oldTmp, []byte("temp"), paths.FilePerm600)
 	oldTime := time.Now().Add(-2 * time.Hour)
 	_ = os.Chtimes(oldTmp, oldTime, oldTime)
 

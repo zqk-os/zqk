@@ -108,8 +108,8 @@ func ArmCheckin(projectRoot, taskID, holder, kind string, cadence time.Duration)
 	walCache.Store(taskID, timer)
 	if data, err := json.Marshal(timer); err == nil {
 		walPath := fallbackWALPath(taskID)
-		_ = fileutil.MkdirAll(filepath.Dir(walPath), 0755)
-		_ = fileutil.WriteFile(walPath, data, 0644)
+		_ = fileutil.MkdirAll(filepath.Dir(walPath), paths.DirPerm755)
+		_ = fileutil.WriteFile(walPath, data, paths.FilePerm644)
 	}
 	return writeCheckin(projectRoot, timer)
 }
@@ -166,8 +166,8 @@ func RenewCheckin(projectRoot, taskID string) error {
 	walCache.Store(taskID, timer)
 	if data, mErr := json.Marshal(timer); mErr == nil {
 		walPath := fallbackWALPath(taskID)
-		_ = fileutil.MkdirAll(filepath.Dir(walPath), 0755)
-		_ = fileutil.WriteFile(walPath, data, 0644)
+		_ = fileutil.MkdirAll(filepath.Dir(walPath), paths.DirPerm755)
+		_ = fileutil.WriteFile(walPath, data, paths.FilePerm644)
 	}
 
 	return writeCheckin(projectRoot, timer)

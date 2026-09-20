@@ -17,6 +17,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/lifecycle"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/storage"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"github.com/zqk-os/zqk/pkg/walutil"
@@ -32,7 +33,7 @@ const (
 
 // WhatsNextLiteFilePath returns the canonical path to the materialized view projection.
 func WhatsNextLiteFilePath(projectRoot string) string {
-	return filepath.Join(projectRoot, ".zqk", "state", "whats_next_lite.json")
+	return filepath.Join(projectRoot, paths.ProjectDataDir, paths.StateDir, "whats_next_lite.json")
 }
 
 // PlanNode represents an in-memory tracked priority plan.
@@ -687,7 +688,7 @@ func (v *WhatsNextMaterializedView) SaveToLiteFile() error {
 	}
 
 	tmpFile := fmt.Sprintf("%s.tmp.%d", targetPath, time.Now().UnixNano())
-	if err := fileutil.WriteFile(tmpFile, data, 0644); err != nil {
+	if err := fileutil.WriteFile(tmpFile, data, paths.FilePerm644); err != nil {
 		return fmt.Errorf("write temp whats_next_lite: %w", err)
 	}
 

@@ -5,6 +5,7 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/zqk-os/zqk/pkg/paths"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -22,7 +23,7 @@ func TestRefreshPeerSeatsFromLivePIDs_AssignsAndPersists(t *testing.T) {
 	if res.Assigned["peer-agent-1"] != self {
 		t.Fatalf("assigned=%v want self=%d on peer-agent-1", res.Assigned, self)
 	}
-	path := filepath.Join(root, ".zqk", "state", "mesh", "peer_seats.json")
+	path := filepath.Join(root, paths.ProjectDataDir, paths.StateDir, "mesh", "peer_seats.json")
 	if _, err := fileutil.Stat(path); err != nil {
 		t.Fatalf("expected seats file: %v", err)
 	}
@@ -54,7 +55,7 @@ func TestRefreshPeerSeatsFromLivePIDs_DryRunNoWrite(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	path := filepath.Join(root, ".zqk", "state", "mesh", "peer_seats.json")
+	path := filepath.Join(root, paths.ProjectDataDir, paths.StateDir, "mesh", "peer_seats.json")
 	if _, err := fileutil.Stat(path); !fileutil.IsNotExist(err) {
 		t.Fatalf("dry-run should not write seats file, err=%v", err)
 	}

@@ -8,7 +8,7 @@ description: |
   the human that back-channel mesh work is still alive.
 
   Does not paste into chat or steal focus. Opt out of IDE pulse with
-  ZQK_IDE_BRIDGE_WAKE=0.
+  IDE_BRIDGE_WAKE=0 (brand-prefixed).
 
 flags:
   - name: "persona-ref"

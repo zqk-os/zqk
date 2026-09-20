@@ -7,6 +7,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -55,10 +56,10 @@ func TestReleaseSecurity_FunctionalAcceptance(t *testing.T) {
 	// 3. Payload audit on clean fixture or repository source paths
 	tmpDir := t.TempDir()
 	sampleCleanSrc := filepath.Join(tmpDir, "pkg", "sample")
-	if err := fileutil.MkdirAll(sampleCleanSrc, 0755); err != nil {
+	if err := fileutil.MkdirAll(sampleCleanSrc, paths.DirPerm755); err != nil {
 		t.Fatal(err)
 	}
-	if err := fileutil.WriteFile(filepath.Join(sampleCleanSrc, "sample.go"), []byte("package sample\n\nfunc Hello() string { return \"world\" }\n"), 0644); err != nil {
+	if err := fileutil.WriteFile(filepath.Join(sampleCleanSrc, "sample.go"), []byte("package sample\n\nfunc Hello() string { return \"world\" }\n"), paths.FilePerm644); err != nil {
 		t.Fatal(err)
 	}
 
@@ -86,7 +87,7 @@ func TestReleaseSecurity_BoundaryAndErrorHandling(t *testing.T) {
 	// 2. Boundary: regular file passed as directory root
 	tmpDir := t.TempDir()
 	dummyFile := filepath.Join(tmpDir, "dummy.txt")
-	if err := fileutil.WriteFile(dummyFile, []byte("hello"), 0644); err != nil {
+	if err := fileutil.WriteFile(dummyFile, []byte("hello"), paths.FilePerm644); err != nil {
 		t.Fatal(err)
 	}
 	_, err = AuditPayload(dummyFile, DefaultAuditOptions())
@@ -97,7 +98,7 @@ func TestReleaseSecurity_BoundaryAndErrorHandling(t *testing.T) {
 	// 3. Negative test: secret leaks
 	leakDir := t.TempDir()
 	srcDir := filepath.Join(leakDir, "src")
-	if err := fileutil.MkdirAll(srcDir, 0755); err != nil {
+	if err := fileutil.MkdirAll(srcDir, paths.DirPerm755); err != nil {
 		t.Fatal(err)
 	}
 
@@ -109,31 +110,31 @@ func TestReleaseSecurity_BoundaryAndErrorHandling(t *testing.T) {
 	ref := "BLI-" + "1789621133231480000-5d6304d4"
 	taintedContent := "package src\n\nconst (\n\tawsKey = \"" + aws + "\"\n\tpat = \"" + pat + "\"\n\tslack = \"" + slack + "\"\n\tpriv = \"" + priv + "\"\n\tref = \"" + ref + "\"\n)\n"
 
-	if err := fileutil.WriteFile(taintedFile, []byte(taintedContent), 0644); err != nil {
+	if err := fileutil.WriteFile(taintedFile, []byte(taintedContent), paths.FilePerm644); err != nil {
 		t.Fatal(err)
 	}
 
 	// Also add forbidden studio paths
-	if err := fileutil.MkdirAll(filepath.Join(leakDir, "cmd", "zqk-admin"), 0755); err != nil {
+	if err := fileutil.MkdirAll(filepath.Join(leakDir, "cmd", "zqk-admin"), paths.DirPerm755); err != nil {
 		t.Fatal(err)
 	}
-	if err := fileutil.MkdirAll(filepath.Join(leakDir, ".cursor"), 0755); err != nil {
+	if err := fileutil.MkdirAll(filepath.Join(leakDir, ".cursor"), paths.DirPerm755); err != nil {
 		t.Fatal(err)
 	}
 
 	// Also add compiled test binary
-	if err := fileutil.WriteFile(filepath.Join(leakDir, "app.test"), []byte("ELF binary"), 0755); err != nil {
+	if err := fileutil.WriteFile(filepath.Join(leakDir, "app.test"), []byte("ELF binary"), paths.DirPerm755); err != nil {
 		t.Fatal(err)
 	}
 
 	// Also add script budget overflow
 	scriptsDir := filepath.Join(leakDir, "scripts")
-	if err := fileutil.MkdirAll(scriptsDir, 0755); err != nil {
+	if err := fileutil.MkdirAll(scriptsDir, paths.DirPerm755); err != nil {
 		t.Fatal(err)
 	}
 	for i := 0; i < 4; i++ {
 		p := filepath.Join(scriptsDir, string(rune('a'+i))+".sh")
-		if err := fileutil.WriteFile(p, []byte("#!/bin/sh\n"), 0755); err != nil {
+		if err := fileutil.WriteFile(p, []byte("#!/bin/sh\n"), paths.DirPerm755); err != nil {
 			t.Fatal(err)
 		}
 	}

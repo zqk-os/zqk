@@ -2,11 +2,13 @@ package ambient
 
 import (
 	"context"
+	"path/filepath"
 	"testing"
 	"time"
 
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 )
 
 type mockEventHub struct {
@@ -49,7 +51,7 @@ func TestCoachHeuristics_ManualEdit(t *testing.T) {
 		Type: EventTypeFilesystem,
 		Payload: map[string]any{
 			objects.FieldKeySource:    "fswatcher",
-			objects.FieldKeyTargetID:  ".zqk/process/goals/my_goal.yaml",
+			objects.FieldKeyTargetID:  filepath.Join(paths.ProcessGoalsDir, "my_goal.yaml"),
 			objects.FieldKeyOperation: "WRITE",
 		},
 		Timestamp: time.Now(),

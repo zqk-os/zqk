@@ -101,7 +101,7 @@ func runFSWatcherDaemon(cmd *cobra.Command, args []string) error {
 	if err := watcher.Start(ctx); err != nil {
 		return fmt.Errorf("failed to start fswatcher: %w", err)
 	}
-	defer watcher.Stop()
+	defer func() { _ = watcher.Stop() }()
 
 	// Wait for termination
 	<-ctx.Done()

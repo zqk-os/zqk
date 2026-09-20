@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/zqk-os/zqk/pkg/execwrap"
+	"github.com/zqk-os/zqk/pkg/paths"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -45,7 +46,7 @@ func TestScanStashForProcessCAS_emptyStashExitsZero(t *testing.T) {
 	run("init")
 	run("config", "user.email", "gate@test")
 	run("config", "user.name", "gate")
-	if err := fileutil.WriteFile(filepath.Join(dir, "README"), []byte("x\n"), 0o644); err != nil {
+	if err := fileutil.WriteFile(filepath.Join(dir, "README"), []byte("x\n"), paths.FilePerm644); err != nil {
 		t.Fatal(err)
 	}
 	run("add", "README")

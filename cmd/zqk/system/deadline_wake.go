@@ -33,7 +33,7 @@ func ScheduleDeadlineWakeSignal(ctx context.Context, projectRoot string, kind, i
 
 	schedulerRoot := paths.ResolvePathFromCacheOrConstant(projectRoot, "scheduler", filepath.Join(paths.ProjectDataDir, paths.SchedulerDir))
 	hourglassDir := filepath.Join(schedulerRoot, "hourglass")
-	_ = fileutil.MkdirAll(hourglassDir, 0755)
+	_ = fileutil.MkdirAll(hourglassDir, paths.DirPerm755)
 
 	filePath := filepath.Join(hourglassDir, id+".json")
 
@@ -46,6 +46,6 @@ func ScheduleDeadlineWakeSignal(ctx context.Context, projectRoot string, kind, i
 
 	data, err := json.Marshal(info)
 	if err == nil {
-		_ = fileutil.WriteFile(filePath, data, 0644)
+		_ = fileutil.WriteFile(filePath, data, paths.FilePerm644)
 	}
 }

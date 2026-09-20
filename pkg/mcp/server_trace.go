@@ -213,7 +213,7 @@ func openTraceWriter(config *ServerConfig, projectRoot string) (io.Writer, io.Cl
 	}
 
 	// Open trace file (append mode) - non-rolling
-	f, err := fileutil.OpenFile(path, fileutil.O_CREATE|fileutil.O_WRONLY|fileutil.O_APPEND, 0o600)
+	f, err := fileutil.OpenFile(path, fileutil.O_CREATE|fileutil.O_WRONLY|fileutil.O_APPEND, paths.FilePerm600)
 	if err != nil {
 		// Log error using helper that respects MCPServerContext.IsServing()
 		// This ensures errors are suppressed during active MCP serving to prevent stderr pollution
@@ -305,7 +305,7 @@ func (s *Server) openClientSpecificTraceWriter(clientIDWithRole string, config *
 	}
 
 	// Open client-specific trace file (append mode) - non-rolling
-	f, err := fileutil.OpenFile(clientTracePath, fileutil.O_CREATE|fileutil.O_WRONLY|fileutil.O_APPEND, 0o600)
+	f, err := fileutil.OpenFile(clientTracePath, fileutil.O_CREATE|fileutil.O_WRONLY|fileutil.O_APPEND, paths.FilePerm600)
 	if err != nil {
 		logTraceError("Failed to open client-specific trace file", err, "trace_file", clientTracePath)
 		return os.Stderr, nil

@@ -10,6 +10,7 @@ import (
 
 	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/paths"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 
 	"github.com/spf13/cobra"
@@ -52,7 +53,7 @@ func NewStateCommitCmd() *cobra.Command {
 	helpBuilder.ApplyToCommand(cmd)
 	cli.AddCommonFlags(cmd)
 
-	cmd.Flags().String("snapshot-file", ".zqk-state/system-state.csnap", "Tip path written for git (single file)")
+	cmd.Flags().String("snapshot-file", filepath.Join(paths.DefaultProjectStateDir, "system-state.csnap"), "Tip path written for git (single file)")
 	cmd.Flags().String("backup-dir", "", "External prior-tip backup dir (overrides zqk-settings.yaml kernel_state.snapshot_backup_dir)")
 	cmd.Flags().Int("backup-keep", 0, "Prior tip copies to keep (0 = use settings or default 3)")
 	cmd.Flags().Bool("allow-shrink", false, "Allow writing a tip csnap with far fewer objects than the previous tip")
@@ -279,7 +280,7 @@ func rejectThinStateCommit(prevCount, newCount int, allowShrink bool) error {
 // archivePriorCSnapExternal copies the tip into a sibling backup dir and rotates to keep N newest.
 // Name: prior_<unix>_<count>_<checksum8>.csnap
 func archivePriorCSnapExternal(backupDir, tipPath string, prevCount int, checksum string, keep int) (string, error) {
-	if err := fileutil.MkdirAll(backupDir, 0o755); err != nil {
+	if err := fileutil.MkdirAll(backupDir, paths.DirPerm755); err != nil {
 		return "", err
 	}
 	sum := checksum
@@ -295,7 +296,7 @@ func archivePriorCSnapExternal(backupDir, tipPath string, prevCount int, checksu
 	if err != nil {
 		return "", err
 	}
-	if err := fileutil.WriteFile(dest, data, 0o644); err != nil {
+	if err := fileutil.WriteFile(dest, data, paths.FilePerm644); err != nil {
 		return "", err
 	}
 	if err := rotateCSnapBackups(backupDir, keep); err != nil {

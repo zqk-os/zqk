@@ -41,7 +41,7 @@ func NewGoalLifecycleBuilder() *GoalLifecycleBuilder {
 				"conceptual": 0,
 				"error":      0,
 				"originated": 5,
-				"proposed":   5,
+				"proposed":   10,
 			},
 		})
 

@@ -2,6 +2,7 @@ package system
 
 import (
 	"fmt"
+	"path/filepath"
 	"time"
 
 	"github.com/spf13/cobra"
@@ -10,6 +11,7 @@ import (
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/storage"
 )
 
@@ -59,7 +61,7 @@ func runCompactJournal(cmd *cobra.Command, windowHours int, outputDir string) er
 	windowStart := now.Add(-1 * time.Duration(windowHours) * time.Hour)
 
 	if outputDir == "" {
-		outputDir = fmt.Sprintf("%s/.zqk/state/compacted_journals", projectRoot)
+		outputDir = filepath.Join(projectRoot, paths.ProjectDataDir, paths.StateDir, "compacted_journals")
 	}
 
 	res, err := compactor.CompactWindow(cmd.Context(), nil, nil, windowStart, now, outputDir)

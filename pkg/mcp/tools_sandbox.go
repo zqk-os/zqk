@@ -95,7 +95,7 @@ func (s *Server) isHighRiskBashCommand(ctx context.Context, cmdStr string) bool 
 	projectRoot := s.GetProjectRoot()
 	storageProvider, err := storage.NewFileObjectStorage(projectRoot)
 	if err == nil {
-		defer storageProvider.Shutdown(context.Background()) // Background: request-or-shutdown derived
+		defer func() { _ = storageProvider.Shutdown(context.Background()) }() // Background: request-or-shutdown derived
 		obj, err := storageProvider.Read(ctx, pkgctx.NewSystemSecurityContext(), "POL-CODE-1784813784308316000-9ec597bf")
 		if err == nil {
 			if bodyStr, ok := obj[objects.FieldKeyBody].(string); ok {

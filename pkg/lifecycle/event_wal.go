@@ -24,7 +24,7 @@ const (
 	// maxLifecycleWALLineSize limits line length when reading (single JSON object per line).
 	maxLifecycleWALLineSize  = 64 * 1024
 	errWALNeedsProjectRoot   = "lifecycle event WAL requires non-empty project root"
-	walDirPerm               = 0o755
+	walDirPerm               = paths.DirPerm755
 	errRenameLifecycleWALFmt = "migrate lifecycle WAL: rename %s -> %s: %w"
 	errCreateLifecycleDirFmt = "create lifecycle WAL dir: %w"
 	scopeEntrySeparator      = ','

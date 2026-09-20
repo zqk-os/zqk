@@ -5,7 +5,6 @@ package library
 
 import (
 	base_objectenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
-	shared_librariesenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/shared_libraries"
 )
 
 type Plane = base_objectenum.Plane
@@ -43,15 +42,15 @@ const (
 	SourceTypeInternal SourceType = base_objectenum.SourceTypeInternal
 )
 
-type Status = shared_librariesenum.Status
+type Status = base_objectenum.Status
 
 const (
-	StatusApproved    Status = shared_librariesenum.StatusApproved
-	StatusArchived    Status = shared_librariesenum.StatusArchived
-	StatusConceptual  Status = shared_librariesenum.StatusConceptual
-	StatusError       Status = shared_librariesenum.StatusError
-	StatusImplemented Status = shared_librariesenum.StatusImplemented
-	StatusInProgress  Status = shared_librariesenum.StatusInProgress
-	StatusOriginated  Status = shared_librariesenum.StatusOriginated
-	StatusProposed    Status = shared_librariesenum.StatusProposed
+	StatusApproved    Status = base_objectenum.StatusApproved
+	StatusArchived    Status = base_objectenum.StatusArchived
+	StatusConceptual  Status = base_objectenum.StatusConceptual
+	StatusError       Status = base_objectenum.StatusError
+	StatusImplemented Status = base_objectenum.StatusImplemented
+	StatusInProgress  Status = base_objectenum.StatusInProgress
+	StatusOriginated  Status = base_objectenum.StatusOriginated
+	StatusProposed    Status = base_objectenum.StatusProposed
 )

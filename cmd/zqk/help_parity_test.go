@@ -412,7 +412,7 @@ func compareWithGolden(t *testing.T, goldenDir, path, output string) {
 		// This prevents the verbose diff output from polluting the debug log
 		// Use project root, not current directory
 		projectRoot := findProjectRootForTest()
-		testRunLogPath := filepath.Join(projectRoot, paths.ProjectDataDir, "logs", "test-run.log")
+		testRunLogPath := filepath.Join(projectRoot, paths.ProjectDataDir, paths.LogsDir, "test-run.log")
 		if err := fileutil.MkdirAll(filepath.Dir(testRunLogPath), paths.DirPerm755); err == nil {
 			logEntry := fmt.Sprintf("=== %s: Help output differs from golden file ===\n%s\n\nTo regenerate golden files, run: %s=1 go test ./pkg/zqkcli/... -run TestHelpMenuParity/GoldenFileComparison\n\n", path, diff, zqkenv.UpdateHelpGolden())
 			if f, err := fileutil.OpenFile(testRunLogPath, fileutil.O_APPEND|fileutil.O_CREATE|fileutil.O_WRONLY, paths.FilePerm644); err == nil { //nolint:gosec // Test files - 0600 is acceptable
@@ -422,7 +422,7 @@ func compareWithGolden(t *testing.T, goldenDir, path, output string) {
 		}
 
 		// Still report the failure, but without the verbose diff
-		logPath := filepath.Join(projectRoot, paths.ProjectDataDir, "logs", "test-run.log")
+		logPath := filepath.Join(projectRoot, paths.ProjectDataDir, paths.LogsDir, "test-run.log")
 		t.Errorf("%s: Help output differs from golden file (see %s for details). To regenerate golden files, run: %s=1 go test ./pkg/zqkcli/... -run TestHelpMenuParity/GoldenFileComparison", path, logPath, zqkenv.UpdateHelpGolden())
 	}
 }

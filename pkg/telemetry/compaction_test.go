@@ -5,6 +5,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/zqk-os/zqk/pkg/paths"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -13,7 +14,7 @@ func TestCompactOldSegments(t *testing.T) {
 
 	// Create an old file
 	oldPath := filepath.Join(dir, "old_stream.jsonl")
-	err := fileutil.WriteFile(oldPath, []byte("data"), 0644)
+	err := fileutil.WriteFile(oldPath, []byte("data"), paths.FilePerm644)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -27,14 +28,14 @@ func TestCompactOldSegments(t *testing.T) {
 
 	// Create a new file
 	newPath := filepath.Join(dir, "new_stream.json")
-	err = fileutil.WriteFile(newPath, []byte("data"), 0644)
+	err = fileutil.WriteFile(newPath, []byte("data"), paths.FilePerm644)
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	// Create an old file with uninteresting extension, shouldn't be deleted
 	ignoredPath := filepath.Join(dir, "old_file.txt")
-	err = fileutil.WriteFile(ignoredPath, []byte("data"), 0644)
+	err = fileutil.WriteFile(ignoredPath, []byte("data"), paths.FilePerm644)
 	if err != nil {
 		t.Fatal(err)
 	}

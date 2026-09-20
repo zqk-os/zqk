@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/zqk-os/zqk/pkg/datacell"
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -24,7 +25,7 @@ func TestListSpecs_EmptyDir(t *testing.T) {
 	t.Parallel()
 	root := t.TempDir()
 	dir := filepath.Join(datacell.CellCASPrimaryDir(root, "_internal"), MigrationsDirName)
-	if err := fileutil.MkdirAll(dir, 0o750); err != nil {
+	if err := fileutil.MkdirAll(dir, paths.DirPerm750); err != nil {
 		t.Fatalf("MkdirAll: %v", err)
 	}
 	specs, err := ListSpecs(root)
@@ -40,7 +41,7 @@ func TestListSpecs_ValidSpec(t *testing.T) {
 	t.Parallel()
 	root := t.TempDir()
 	dir := filepath.Join(datacell.CellCASPrimaryDir(root, "_internal"), MigrationsDirName)
-	if err := fileutil.MkdirAll(dir, 0o750); err != nil {
+	if err := fileutil.MkdirAll(dir, paths.DirPerm750); err != nil {
 		t.Fatalf("MkdirAll: %v", err)
 	}
 	path := filepath.Join(dir, "minimal.yaml")

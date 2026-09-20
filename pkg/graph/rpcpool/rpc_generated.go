@@ -379,7 +379,7 @@ func (p *RPCConnectionPool) Execute(ctx context.Context, fn func(conn provider.G
 	if err != nil {
 		return err
 	}
-	defer p.ReturnConnection(conn)
+	defer func() { _ = p.ReturnConnection(conn) }()
 	return fn(conn)
 }
 

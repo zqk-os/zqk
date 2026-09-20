@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -113,7 +114,7 @@ func (w *TimeSeriesWriter) startChunk(ts time.Time) error {
 	}
 	name := fmt.Sprintf("%s_%s.chunk", sanitizeSeriesName(w.cfg.Series), start.Format("20060102T1504"))
 	path := filepath.Join(w.cfg.Dir, name)
-	f, err := fileutil.OpenFile(path, fileutil.O_CREATE|fileutil.O_WRONLY|fileutil.O_APPEND, 0o600)
+	f, err := fileutil.OpenFile(path, fileutil.O_CREATE|fileutil.O_WRONLY|fileutil.O_APPEND, paths.FilePerm600)
 	if err != nil {
 		return err
 	}

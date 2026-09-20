@@ -736,7 +736,7 @@ func (sl *SpecLoader) loadSpecWithInheritanceRecursive(specFile string, visited 
 	if !config.ValidationSkipSpecSchemaValidation().OrDefault(false) && yaml.Unmarshal(data, &tempSpec) == nil {
 		if schemaRef := tempSpec.Schema; schemaRef != emptyValue {
 			// Try to find schemas directory relative to project root
-			schemasDir := ".zqk/cli/specs/schemas"
+			schemasDir := filepath.Join(paths.ProjectDataDir, "cli", "specs", "schemas")
 			// Try to resolve from specsDir
 			if sl.specsDir != emptyValue {
 				dir := sl.specsDir

@@ -136,7 +136,7 @@ func appendDispatchPressureJSONL(projectRoot string, rec map[string]any) {
 		return
 	}
 	path := filepath.Join(dir, dispatchPressureJSONLFile)
-	f, err := fileutil.OpenFile(path, fileutil.O_APPEND|fileutil.O_CREATE|fileutil.O_WRONLY, 0o600)
+	f, err := fileutil.OpenFile(path, fileutil.O_APPEND|fileutil.O_CREATE|fileutil.O_WRONLY, paths.FilePerm600)
 	if err != nil {
 		return
 	}

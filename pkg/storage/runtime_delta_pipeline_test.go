@@ -66,7 +66,7 @@ func TestRuntimeDeltaOnlyUpdate_SkipsCASRewrite_UsesOverlay(t *testing.T) {
 	if err := str.Update(ctx, secCtx, jobID, map[string]any{objects.FieldKeyLastRunAt: "2030-03-20T12:00:00Z"}); err != nil {
 		t.Fatalf("Update runtime delta: %v", err)
 	}
-	overlay := filepath.Join(testRoot, paths.ProjectDataDir, "state", storage.RuntimeDeltaCurrentDirNameForTest, "scheduler_job", jobID+".yaml")
+	overlay := filepath.Join(testRoot, paths.ProjectDataDir, paths.StateDir, storage.RuntimeDeltaCurrentDirNameForTest, "scheduler_job", jobID+".yaml")
 	if _, err := fileutil.Stat(overlay); err != nil {
 		t.Fatalf("runtime-delta overlay missing: %v", err)
 	}
@@ -118,7 +118,7 @@ func TestRuntimeDeltaStructuralUpdate_ClearsOverlay(t *testing.T) {
 	if err := str.Update(ctx, secCtx, jobID, map[string]any{objects.FieldKeyScheduleExpression: "0 0 * * *"}); err != nil {
 		t.Fatalf("structural update: %v", err)
 	}
-	overlay := filepath.Join(testRoot, paths.ProjectDataDir, "state", storage.RuntimeDeltaCurrentDirNameForTest, "scheduler_job", jobID+".yaml")
+	overlay := filepath.Join(testRoot, paths.ProjectDataDir, paths.StateDir, storage.RuntimeDeltaCurrentDirNameForTest, "scheduler_job", jobID+".yaml")
 	if _, err := fileutil.Stat(overlay); !fileutil.IsNotExist(err) {
 		t.Fatalf("expected overlay removed after structural update")
 	}
@@ -166,7 +166,7 @@ func TestRuntimeDeltaFullPayload_WithOnlyRuntimeFieldChange_SkipsCASRewrite(t *t
 		t.Fatalf("Update full payload runtime change: %v", err)
 	}
 
-	overlay := filepath.Join(testRoot, paths.ProjectDataDir, "state", storage.RuntimeDeltaCurrentDirNameForTest, "scheduler_job", jobID+".yaml")
+	overlay := filepath.Join(testRoot, paths.ProjectDataDir, paths.StateDir, storage.RuntimeDeltaCurrentDirNameForTest, "scheduler_job", jobID+".yaml")
 	if _, err := fileutil.Stat(overlay); err != nil {
 		t.Fatalf("runtime-delta overlay missing after full payload update: %v", err)
 	}

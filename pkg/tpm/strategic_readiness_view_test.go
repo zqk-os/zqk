@@ -10,6 +10,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/accumulator"
 	"github.com/zqk-os/zqk/pkg/lifecycle"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/storage"
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
@@ -388,7 +389,7 @@ func TestStrategicReadinessView_DualFormatDeserialization(t *testing.T) {
 	tempDir := t.TempDir()
 
 	litePath := StrategicReadinessLiteFilePath(tempDir)
-	if err := fileutil.MkdirAll(filepath.Dir(litePath), 0755); err != nil {
+	if err := fileutil.MkdirAll(filepath.Dir(litePath), paths.DirPerm755); err != nil {
 		t.Fatalf("mkdir state: %v", err)
 	}
 
@@ -422,7 +423,7 @@ func TestStrategicReadinessView_DualFormatDeserialization(t *testing.T) {
 		t.Fatalf("marshal legacy flat: %v", err)
 	}
 
-	if err := fileutil.WriteFile(litePath, legacyFlatJSON, 0644); err != nil {
+	if err := fileutil.WriteFile(litePath, legacyFlatJSON, paths.FilePerm644); err != nil {
 		t.Fatalf("write legacy flat file: %v", err)
 	}
 

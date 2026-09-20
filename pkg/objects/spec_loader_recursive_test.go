@@ -1,6 +1,7 @@
 package objects
 
 import (
+	"github.com/zqk-os/zqk/pkg/paths"
 	"os"
 	"path/filepath"
 	"testing"
@@ -23,12 +24,12 @@ fields:
   id:
     type: string
 `
-	if err := os.WriteFile(filepath.Join(tmp, "base_object.yaml"), []byte(baseContent), 0644); err != nil {
+	if err := os.WriteFile(filepath.Join(tmp, "base_object.yaml"), []byte(baseContent), paths.FilePerm644); err != nil {
 		t.Fatal(err)
 	}
 
 	fieldsDir := filepath.Join(tmp, "built_ins", "fields")
-	if err := os.MkdirAll(fieldsDir, 0755); err != nil {
+	if err := os.MkdirAll(fieldsDir, paths.DirPerm755); err != nil {
 		t.Fatal(err)
 	}
 	tsContent := `type: string
@@ -37,12 +38,12 @@ description: "Universal UTC timestamp"
 traits:
   - readable
 `
-	if err := os.WriteFile(filepath.Join(fieldsDir, "timestamp.yaml"), []byte(tsContent), 0644); err != nil {
+	if err := os.WriteFile(filepath.Join(fieldsDir, "timestamp.yaml"), []byte(tsContent), paths.FilePerm644); err != nil {
 		t.Fatal(err)
 	}
 
 	pmDir := filepath.Join(tmp, "pm")
-	if err := os.MkdirAll(pmDir, 0755); err != nil {
+	if err := os.MkdirAll(pmDir, paths.DirPerm755); err != nil {
 		t.Fatal(err)
 	}
 	sampleContent := `schema_version: 2.0.0
@@ -57,7 +58,7 @@ fields:
   title:
     type: string
 `
-	if err := os.WriteFile(filepath.Join(pmDir, "sample_item.yaml"), []byte(sampleContent), 0644); err != nil {
+	if err := os.WriteFile(filepath.Join(pmDir, "sample_item.yaml"), []byte(sampleContent), paths.FilePerm644); err != nil {
 		t.Fatal(err)
 	}
 
@@ -131,19 +132,19 @@ func TestLifecycleLoader_SubdirectoryDiscovery(t *testing.T) {
 statuses:
   - value: draft
 `
-	if err := os.WriteFile(filepath.Join(tmp, "base_object_lifecycle.yaml"), []byte(baseContent), 0644); err != nil {
+	if err := os.WriteFile(filepath.Join(tmp, "base_object_lifecycle.yaml"), []byte(baseContent), paths.FilePerm644); err != nil {
 		t.Fatal(err)
 	}
 
 	pmDir := filepath.Join(tmp, "pm")
-	if err := os.MkdirAll(pmDir, 0755); err != nil {
+	if err := os.MkdirAll(pmDir, paths.DirPerm755); err != nil {
 		t.Fatal(err)
 	}
 	bliContent := `object_type: backlog_item
 statuses:
   - value: open
 `
-	if err := os.WriteFile(filepath.Join(pmDir, "backlog_item_lifecycle.yaml"), []byte(bliContent), 0644); err != nil {
+	if err := os.WriteFile(filepath.Join(pmDir, "backlog_item_lifecycle.yaml"), []byte(bliContent), paths.FilePerm644); err != nil {
 		t.Fatal(err)
 	}
 

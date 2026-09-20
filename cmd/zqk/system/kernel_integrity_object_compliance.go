@@ -77,8 +77,8 @@ func kernelObjectComplianceHistoryPath(projectRoot string) string {
 func preferredCheckSummaryPaths(projectRoot string) []string {
 	return []string{
 		filepath.Join(projectRoot, paths.ProjectDataDir, paths.PreCommitDir, "system-check.json"),
-		filepath.Join(projectRoot, paths.ProjectDataDir, "logs", "system-check-autofix-dangling.json"),
-		filepath.Join(projectRoot, paths.ProjectDataDir, "logs", "system-check.json"),
+		filepath.Join(projectRoot, paths.ProjectDataDir, paths.LogsDir, "system-check-autofix-dangling.json"),
+		filepath.Join(projectRoot, paths.ProjectDataDir, paths.LogsDir, "system-check.json"),
 	}
 }
 
@@ -244,7 +244,7 @@ func readObjectComplianceHistoryTail(histPath string, n int) []objectComplianceH
 
 func appendObjectComplianceHistory(projectRoot string, entry objectComplianceHistoryEntry) error {
 	dir := kernelObjectComplianceDir(projectRoot)
-	if err := fileutil.MkdirAll(dir, 0o755); err != nil {
+	if err := fileutil.MkdirAll(dir, paths.DirPerm755); err != nil {
 		return err
 	}
 	path := kernelObjectComplianceHistoryPath(projectRoot)
@@ -260,7 +260,7 @@ func appendObjectComplianceHistory(projectRoot string, entry objectComplianceHis
 	if err != nil {
 		return err
 	}
-	f, err := fileutil.OpenFile(path, fileutil.O_APPEND|fileutil.O_CREATE|fileutil.O_WRONLY, 0o644)
+	f, err := fileutil.OpenFile(path, fileutil.O_APPEND|fileutil.O_CREATE|fileutil.O_WRONLY, paths.FilePerm644)
 	if err != nil {
 		return err
 	}

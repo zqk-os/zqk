@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/zqk-os/zqk/pkg/datacell"
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/storage"
 	caspkg "github.com/zqk-os/zqk/pkg/storage/cas"
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
@@ -86,7 +87,7 @@ func TestRepairCASHFilenameMismatch_RecoversCorruptedFile(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	quarantineDir := filepath.Join(dir, ".zqk", "quarantine")
+	quarantineDir := filepath.Join(dir, paths.ProjectDataDir, "quarantine")
 
 	// 2. Run caspkg.RepairCASHFilenameMismatch to repair the corruption
 	opts := &caspkg.CASCorruptionRepairOptions{

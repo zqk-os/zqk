@@ -3,6 +3,7 @@ package storage
 import (
 	"os"
 
+	"github.com/zqk-os/zqk/pkg/paths"
 	caspkg "github.com/zqk-os/zqk/pkg/storage/cas"
 
 	"context"
@@ -193,7 +194,7 @@ func EnsureCLIObjectMutationVisibleForProvider(ctx context.Context, provider Obj
 }
 
 func isSchedulerRunning(projectRoot string) bool {
-	pidBytes, err := fileutil.ReadFile(filepath.Join(projectRoot, ".zqk", "scheduler", "scheduler.pid"))
+	pidBytes, err := fileutil.ReadFile(filepath.Join(projectRoot, paths.ProjectDataDir, paths.SchedulerSubdir, "scheduler.pid"))
 	if err != nil {
 		return false
 	}

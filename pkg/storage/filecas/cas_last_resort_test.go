@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/zqk-os/zqk/pkg/goroutinelabels"
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -20,7 +21,7 @@ func writeMockCASYAMLAt(t *testing.T, dir, id string) (string, string) {
 	t.Helper()
 	body := []byte("id: " + id + "\nkind: goal\n")
 	hash := CalculateSHA256Hash(body)
-	if err := fileutil.MkdirAll(dir, 0o755); err != nil {
+	if err := fileutil.MkdirAll(dir, paths.DirPerm755); err != nil {
 		t.Fatal(err)
 	}
 	path := filepath.Join(dir, hash+".yaml")

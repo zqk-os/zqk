@@ -44,10 +44,6 @@ type OrchestrateOptions struct {
 // NewOrchestrateCmd creates the orchestrate command
 func NewOrchestrateCmd() *cobra.Command {
 	cmd := bldr_cli_cmd_v1.NewAgentOrchestrateCommandBuilder()
-	cmd.Flags().String("persona-id", "", "Optional persona ID to filter work and define agent role")
-	if cmd.Flags().Lookup(cli.FlagTimeout) == nil {
-		cmd.Flags().Duration(cli.FlagTimeout, 0, "Timeout for orchestration session (e.g. 4h, 30m; 0 = default 4h)")
-	}
 	cmd.RunE = func(cmd *cobra.Command, args []string) error {
 		sessionID, _ := cmd.Flags().GetString("session-id")
 		ambientContext, _ := cmd.Flags().GetString("ambient-context")
@@ -352,7 +348,7 @@ func seedAgentWorktreeRuntime(mainRoot, worktreeRoot string) error {
 			if ensureErr := fileutil.EnsureDir(filepath.Dir(dst)); ensureErr != nil {
 				return errfmt.Newf("create runtime index directory %s", filepath.Dir(dst)).Wrap(ensureErr)
 			}
-			if writeErr := fileutil.WriteFile(dst, data, 0o600); writeErr != nil {
+			if writeErr := fileutil.WriteFile(dst, data, paths.FilePerm600); writeErr != nil {
 				return errfmt.Newf("write runtime index %s", dst).Wrap(writeErr)
 			}
 		}

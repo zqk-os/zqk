@@ -452,7 +452,7 @@ func TestJobStateRegistry_CompleteExecution_LocalCleanupOnlyHotPath(t *testing.T
 	if err != nil {
 		t.Fatal(err)
 	}
-	if err := fileutil.WriteFile(bPath, out, 0o600); err != nil {
+	if err := fileutil.WriteFile(bPath, out, paths.FilePerm600); err != nil {
 		t.Fatal(err)
 	}
 

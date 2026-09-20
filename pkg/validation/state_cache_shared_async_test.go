@@ -142,7 +142,7 @@ func TestClear_SuppressesLoadFromRacedRestore(t *testing.T) {
 	if err := cache.Clear(); err != nil {
 		t.Fatalf("Clear: %v", err)
 	}
-	if err := fileutil.WriteFile(cache.cacheFile, poison, 0o600); err != nil {
+	if err := fileutil.WriteFile(cache.cacheFile, poison, paths.FilePerm600); err != nil {
 		t.Fatalf("restore poison: %v", err)
 	}
 	if err := cache.Load(); err != nil {

@@ -13,7 +13,6 @@ import (
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/testkit"
 	"github.com/zqk-os/zqk/pkg/testrunner"
-	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
 // CRIT-TEST-RUNNER-001: CLI test run command specification & argument resolution
@@ -323,6 +322,5 @@ func TestCRIT_Ephemeral_TMPDIR_Provisioning(t *testing.T) {
 
 func init() {
 	// Set test environment variable so tests can run
-	_ = os.Setenv(zqkenv.ZQKAllowForegroundGoTest().Key, "1")
 	_ = filepath.Separator
 }

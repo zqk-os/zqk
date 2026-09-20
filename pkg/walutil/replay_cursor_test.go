@@ -5,6 +5,7 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/zqk-os/zqk/pkg/paths"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -16,7 +17,7 @@ func TestReplayFromCursor_SeeksPastAppliedAndDeliversNew(t *testing.T) {
 		b, _ := json.Marshal(map[string]any{"seq": i, "v": i})
 		lines = append(lines, string(b)+"\n")
 	}
-	if err := fileutil.WriteFile(path, []byte(lines[0]+lines[1]+lines[2]), 0o600); err != nil {
+	if err := fileutil.WriteFile(path, []byte(lines[0]+lines[1]+lines[2]), paths.FilePerm600); err != nil {
 		t.Fatal(err)
 	}
 	// First pass: consume seq 1..3 from offset 0
@@ -48,7 +49,7 @@ func TestReplayFromCursor_SeeksPastAppliedAndDeliversNew(t *testing.T) {
 	}
 
 	// Append seq 4..5
-	f, err := fileutil.OpenFile(path, fileutil.O_APPEND|fileutil.O_WRONLY, 0o600)
+	f, err := fileutil.OpenFile(path, fileutil.O_APPEND|fileutil.O_WRONLY, paths.FilePerm600)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -90,7 +91,7 @@ func TestReplayFromCursor_IdleAtEOFScansNothing(t *testing.T) {
 	path := filepath.Join(dir, "events.wal")
 	line, _ := json.Marshal(map[string]any{"seq": 1})
 	body := append(line, '\n')
-	if err := fileutil.WriteFile(path, body, 0o600); err != nil {
+	if err := fileutil.WriteFile(path, body, paths.FilePerm600); err != nil {
 		t.Fatal(err)
 	}
 	cursor := ReplayCursor{Seq: 1, Offset: int64(len(body))}

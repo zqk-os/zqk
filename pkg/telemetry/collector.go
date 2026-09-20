@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"github.com/zqk-os/zqk/pkg/goroutinelabels"
+	"github.com/zqk-os/zqk/pkg/paths"
 )
 
 var (
@@ -176,7 +177,7 @@ func ExportToFile(filePath string, events []MetricEvent) error {
 	if err != nil {
 		return err
 	}
-	return os.WriteFile(filePath, data, 0600)
+	return os.WriteFile(filePath, data, paths.FilePerm600)
 }
 
 // AsyncExport launches background export adhering to ZQK goroutine policies.

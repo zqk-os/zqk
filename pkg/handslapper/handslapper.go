@@ -8,6 +8,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/paths"
 
 	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
 // DriftType defines the classification of agent drift
@@ -46,7 +47,7 @@ func NewService(strictMode bool) *Service {
 func (s *Service) MonitorCommand(ctx context.Context, agentID string, cmd string) error {
 	// 1. Check for Legitimate Entitlement
 	// If the workflow or engineer explicitly authorizes primitive usage for a specific script
-	if strings.Contains(cmd, "ZQK_BYPASS_HANDSLAPPER=1") {
+	if strings.Contains(cmd, zqkenv.BypassHandslapper().Name()+"=1") {
 		return nil
 	}
 

@@ -14,7 +14,7 @@ import (
 func TestReadTestBundleHealthTailLines_AlreadyCanceled(t *testing.T) {
 	t.Parallel()
 	root := t.TempDir()
-	if err := fileutil.EnsureDir(filepath.Join(root, paths.ProjectDataDir, "logs", "scheduler", "cvs", "test-bundles")); err != nil {
+	if err := fileutil.EnsureDir(filepath.Join(root, paths.ProjectDataDir, paths.LogsDir, "scheduler", "cvs", "test-bundles")); err != nil {
 		t.Fatal(err)
 	}
 	p := TestBundlesHealthFilePath(root)
@@ -32,7 +32,7 @@ func TestReadTestBundleHealthTailLines_AlreadyCanceled(t *testing.T) {
 func TestReadTestBundleHealthTailLines_CanceledMidScan(t *testing.T) {
 	// Uses package-level test hooks; must not run parallel with other hook tests.
 	root := t.TempDir()
-	if err := fileutil.EnsureDir(filepath.Join(root, paths.ProjectDataDir, "logs", "scheduler", "cvs", "test-bundles")); err != nil {
+	if err := fileutil.EnsureDir(filepath.Join(root, paths.ProjectDataDir, paths.LogsDir, "scheduler", "cvs", "test-bundles")); err != nil {
 		t.Fatal(err)
 	}
 	p := TestBundlesHealthFilePath(root)

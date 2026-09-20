@@ -79,7 +79,7 @@ func TestSeedSchemaPlaneRunsBeforeCallerStages(t *testing.T) {
 					specs := filepath.Join(root, paths.ProcessInternalObjectSpecsDir)
 					entries, err := fileutil.ReadDir(specs)
 					sawSeededSpecs = err == nil && len(entries) > 0
-					return fileutil.WriteFile(filepath.Join(specs, fixtureName), []byte("kind: object_spec\n"), 0o600)
+					return fileutil.WriteFile(filepath.Join(specs, fixtureName), []byte("kind: object_spec\n"), paths.FilePerm600)
 				},
 			}}
 		},

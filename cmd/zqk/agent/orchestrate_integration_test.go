@@ -191,10 +191,10 @@ attributes:
 					if err != nil {
 						return err
 					}
-					if err := fileutil.WriteFile(dstBin, data, 0755); err != nil {
+					if err := fileutil.WriteFile(dstBin, data, paths.DirPerm755); err != nil {
 						return err
 					}
-					return fileutil.Chmod(dstBin, 0755)
+					return fileutil.Chmod(dstBin, paths.DirPerm755)
 				},
 			}}
 		},

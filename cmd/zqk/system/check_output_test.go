@@ -12,6 +12,7 @@ import (
 
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -297,7 +298,7 @@ func TestDispatchViolationsToInbox(t *testing.T) {
 	}
 
 	// Check that files are written in tmpDir/.zqk/inbox/QA-Engineer/
-	inboxDir := filepath.Join(tmpDir, ".zqk", "inbox", roleQAEngineer)
+	inboxDir := filepath.Join(tmpDir, paths.ProjectDataDir, paths.InboxSubdir, roleQAEngineer)
 	files, err := fileutil.ReadDir(inboxDir)
 	if err != nil {
 		t.Fatalf("Failed to read inbox dir: %v", err)
@@ -313,7 +314,7 @@ func TestDispatchViolationsToInbox(t *testing.T) {
 	}
 
 	// For TEST-001 (policy), role should be "Security-Engineer"
-	secDir := filepath.Join(tmpDir, ".zqk", "inbox", roleSecurityEngineer)
+	secDir := filepath.Join(tmpDir, paths.ProjectDataDir, paths.InboxSubdir, roleSecurityEngineer)
 	secFiles, err := fileutil.ReadDir(secDir)
 	if err != nil {
 		t.Fatalf("Failed to read Security-Engineer inbox dir: %v", err)
@@ -323,7 +324,7 @@ func TestDispatchViolationsToInbox(t *testing.T) {
 	}
 
 	// For TEST-002 (reference / test_case), role should be "QA-Engineer"
-	qaDir := filepath.Join(tmpDir, ".zqk", "inbox", roleQAEngineer)
+	qaDir := filepath.Join(tmpDir, paths.ProjectDataDir, paths.InboxSubdir, roleQAEngineer)
 	qaFiles, err := fileutil.ReadDir(qaDir)
 	if err != nil {
 		t.Fatalf("Failed to read QA-Engineer inbox dir: %v", err)

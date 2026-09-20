@@ -12,6 +12,7 @@ import (
 	"github.com/zqk-os/zqk/internal/cli"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/storage"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"github.com/zqk-os/zqk/pkg/zqkenv"
@@ -80,7 +81,7 @@ func TestCommandFlagPermutations(t *testing.T) {
 	}
 
 	projectRoot := filepath.Clean(filepath.Join(cwd, "../../.."))
-	specsDir := filepath.Join(projectRoot, ".zqk/cli/specs")
+	specsDir := filepath.Join(projectRoot, paths.ProjectDataDir, "cli/specs")
 
 	err = filepath.Walk(specsDir, func(path string, info fileutil.FileInfo, err error) error {
 		if err != nil {

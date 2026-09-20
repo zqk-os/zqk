@@ -94,7 +94,7 @@ func appendCategoryLogEntry(projectRoot string, job *ScheduledJob, eventType str
 	if mkErr := fileutil.EnsureDir(dir); mkErr != nil {
 		return
 	}
-	f, openErr := fileutil.OpenFile(path, fileutil.O_WRONLY|fileutil.O_CREATE|fileutil.O_APPEND, 0o600)
+	f, openErr := fileutil.OpenFile(path, fileutil.O_WRONLY|fileutil.O_CREATE|fileutil.O_APPEND, paths.FilePerm600)
 	if openErr != nil {
 		return
 	}

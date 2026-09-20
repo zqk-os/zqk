@@ -22,7 +22,7 @@ func (m *autonomyInboxMonitor) Run(ctx context.Context, projectRoot string) (*he
 		return &healthcheck.Result{Status: statusOK, Summary: summaryNoProjectRoot}, nil
 	}
 
-	inboxDir := filepath.Join(projectRoot, paths.ProjectDataDir, "inbox")
+	inboxDir := filepath.Join(projectRoot, paths.ProjectDataDir, paths.InboxSubdir)
 	var pendingCount int
 	if info, err := fileutil.Stat(inboxDir); err == nil && info.IsDir() {
 		entries, _ := fileutil.ReadDir(inboxDir)

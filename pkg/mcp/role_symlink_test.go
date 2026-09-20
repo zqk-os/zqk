@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/zqk-os/zqk/pkg/brand"
+	"github.com/zqk-os/zqk/pkg/paths"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -12,11 +13,11 @@ func TestEnsureMCPIDERoleSymlinksCreatesDaemonAndIDEAdapter(t *testing.T) {
 	t.Parallel()
 	root := t.TempDir()
 	binDir := filepath.Join(root, "bin")
-	if err := fileutil.MkdirAll(binDir, 0o755); err != nil {
+	if err := fileutil.MkdirAll(binDir, paths.DirPerm755); err != nil {
 		t.Fatal(err)
 	}
 	target := filepath.Join(binDir, brand.ExecutableName())
-	if err := fileutil.WriteFile(target, []byte("#!/bin/sh\n"), 0o755); err != nil {
+	if err := fileutil.WriteFile(target, []byte("#!/bin/sh\n"), paths.DirPerm755); err != nil {
 		t.Fatal(err)
 	}
 
@@ -43,11 +44,11 @@ func TestEnsureMCPRoleSymlinkCreatesProxyLink(t *testing.T) {
 	t.Parallel()
 	root := t.TempDir()
 	binDir := filepath.Join(root, "bin")
-	if err := fileutil.MkdirAll(binDir, 0o755); err != nil {
+	if err := fileutil.MkdirAll(binDir, paths.DirPerm755); err != nil {
 		t.Fatal(err)
 	}
 	target := filepath.Join(binDir, brand.ExecutableName())
-	if err := fileutil.WriteFile(target, []byte("#!/bin/sh\n"), 0o755); err != nil {
+	if err := fileutil.WriteFile(target, []byte("#!/bin/sh\n"), paths.DirPerm755); err != nil {
 		t.Fatal(err)
 	}
 

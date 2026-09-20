@@ -92,7 +92,7 @@ func ReapStaleLocks(projectRoot string, threshold time.Duration, dryRun bool) (i
 		}
 
 		// Try non-blocking exclusive lock to guarantee no live holder
-		file, errOpen := fileutil.OpenFile(path, fileutil.O_RDWR, 0o600)
+		file, errOpen := fileutil.OpenFile(path, fileutil.O_RDWR, paths.FilePerm600)
 		if errOpen != nil {
 			// If file cannot be opened (e.g. permission/disappeared), skip
 			return nil
@@ -196,7 +196,7 @@ func EnforceLogRetention(projectRoot string, maxAge time.Duration, maxSizeBytes 
 							rel, _ := filepath.Rel(projectRoot, path)
 							reaped = append(reaped, rel+" (truncated: size)")
 							if !dryRun {
-								_ = fileutil.WriteFile(path, newContent, 0o600)
+								_ = fileutil.WriteFile(path, newContent, paths.FilePerm600)
 							}
 						}
 					}

@@ -463,7 +463,7 @@ func TestPhantomCreate_MembraneVisibility(t *testing.T) {
 	}
 
 	// 4. Verify draft orphan cleanup queue integration
-	draftsDir := filepath.Join(testRoot, ".zqk", "drafts")
+	draftsDir := filepath.Join(testRoot, paths.ProjectDataDir, paths.DraftsSubdir)
 	_ = fileutil.MkdirAll(draftsDir, paths.DirPerm755)
 	orphanFile := filepath.Join(draftsDir, "phantom-draft-999.yaml")
 	_ = fileutil.WriteFile(orphanFile, []byte("draft: true"), paths.FilePerm644)

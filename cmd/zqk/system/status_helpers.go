@@ -370,7 +370,7 @@ func buildStatusData(cmd *cobra.Command, ctx *cli.Context, verbose bool) (map[st
 	}
 
 	// Read CAP review result gate status from .zqk/state/cap_review_result.json
-	capReviewPath := filepath.Join(projectRoot, paths.ProjectDataDir, "state", "cap_review_result.json")
+	capReviewPath := filepath.Join(projectRoot, paths.ProjectDataDir, paths.StateDir, "cap_review_result.json")
 	if raw, err := fileutil.ReadFile(capReviewPath); err == nil {
 		var capReview map[string]any
 		if json.Unmarshal(raw, &capReview) == nil {

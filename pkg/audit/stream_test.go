@@ -55,7 +55,7 @@ func TestAuditStream_PublishAndSubscribe(t *testing.T) {
 	}
 
 	// Verify WAL file was created and written
-	walPath := filepath.Join(tmpDir, paths.ProjectDataDir, "logs", "audit", "wal.jsonl")
+	walPath := filepath.Join(tmpDir, paths.ProjectDataDir, paths.LogsDir, "audit", "wal.jsonl")
 	b, err := fileutil.ReadFile(walPath)
 	if err != nil {
 		t.Fatalf("Failed to read WAL file: %v", err)

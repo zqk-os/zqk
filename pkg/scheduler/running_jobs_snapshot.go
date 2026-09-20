@@ -25,7 +25,7 @@ type RunningJobsSnapshot struct {
 
 // RunningJobsSnapshotPath returns the absolute path of the running-jobs snapshot file.
 func RunningJobsSnapshotPath(projectRoot string) string {
-	return filepath.Join(projectRoot, paths.ProjectDataDir, "scheduler", "state", runningJobsSnapshotFile)
+	return filepath.Join(projectRoot, paths.ProjectDataDir, paths.SchedulerSubdir, "state", runningJobsSnapshotFile)
 }
 
 // PersistRunningJobsSnapshot writes the current running job ID set for out-of-process readers.

@@ -80,7 +80,7 @@ func (w *RuntimeWrangler) Status() (*RuntimeWranglerReport, error) {
 		}
 	} else {
 		// Check process fallback via daemon lock / PID
-		pidFile := filepath.Join(w.AbsRoot, paths.ProjectDataDir, "state", "scheduler.pid")
+		pidFile := filepath.Join(w.AbsRoot, paths.ProjectDataDir, paths.StateDir, "scheduler.pid")
 		if pid, alive := readPidFile(pidFile); alive {
 			schedUnit.Running = true
 			schedUnit.PID = pid
@@ -167,7 +167,7 @@ func (w *RuntimeWrangler) Stop() error {
 		_, _ = SetEntryDesiredState(entry.RootID, DesiredStateDisabled)
 	}
 	// Also stop local scheduler PID if running
-	pidFile := filepath.Join(w.AbsRoot, paths.ProjectDataDir, "state", "scheduler.pid")
+	pidFile := filepath.Join(w.AbsRoot, paths.ProjectDataDir, paths.StateDir, "scheduler.pid")
 	if pid, alive := readPidFile(pidFile); alive {
 		_ = syscall.Kill(pid, syscall.SIGTERM)
 	}

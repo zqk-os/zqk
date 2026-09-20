@@ -29,7 +29,7 @@ func getCriticalResourcesFromSpec(server *Server) ([]ResourceSpec, error) {
 
 	// Try to load from spec file (externalized configuration)
 	specPaths := []string{
-		".zqk/mcp_specs/critical_resources.yaml",
+		filepath.Join(paths.ProjectDataDir, "mcp_specs", "critical_resources.yaml"),
 		filepath.Join(datacell.ProcessPrimaryDir("."), "mcp_specs", "critical_resources.yaml"),
 		"mcp_specs/critical_resources.yaml",
 	}

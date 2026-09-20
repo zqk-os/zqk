@@ -317,10 +317,10 @@ func TestInventoryObjectDraftPlane(t *testing.T) {
 	}
 	id := "DOC-inv-0001"
 	path := ObjectDraftPlanePath(root, "doc_entry", id)
-	if err := fileutil.MkdirAll(filepath.Dir(path), 0o755); err != nil {
+	if err := fileutil.MkdirAll(filepath.Dir(path), paths.DirPerm755); err != nil {
 		t.Fatal(err)
 	}
-	if err := fileutil.WriteFile(path, []byte("id: "+id+"\n"), 0o644); err != nil {
+	if err := fileutil.WriteFile(path, []byte("id: "+id+"\n"), paths.FilePerm644); err != nil {
 		t.Fatal(err)
 	}
 	inv = InventoryObjectDraftPlane(root)
@@ -401,11 +401,11 @@ func TestDraftPlaneHasTitle(t *testing.T) {
 	root := t.TempDir()
 	id := "DOC-title-0001"
 	path := ObjectDraftPlanePath(root, "doc_entry", id)
-	if err := fileutil.MkdirAll(filepath.Dir(path), 0o755); err != nil {
+	if err := fileutil.MkdirAll(filepath.Dir(path), paths.DirPerm755); err != nil {
 		t.Fatal(err)
 	}
 	body := "id: " + id + "\nkind: doc_entry\ntitle: Shared Kernel Constraints\n"
-	if err := fileutil.WriteFile(path, []byte(body), 0o644); err != nil {
+	if err := fileutil.WriteFile(path, []byte(body), paths.FilePerm644); err != nil {
 		t.Fatal(err)
 	}
 	if !DraftPlaneHasTitle(root, "doc_entry", "shared kernel constraints") {

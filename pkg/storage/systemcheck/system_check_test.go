@@ -5,6 +5,7 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/zqk-os/zqk/pkg/paths"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -22,7 +23,7 @@ func TestRunSystemCheckForHandCASAndDupIDs(t *testing.T) {
 	// 1. Valid file
 	validFile := filepath.Join(tempDir, "0000000000000000000000000000000000000000000000000000000000000000.yaml")
 	validYaml := "id: VAL-001\nkind: test_kind\n"
-	err = fileutil.WriteFile(validFile, []byte(validYaml), 0644)
+	err = fileutil.WriteFile(validFile, []byte(validYaml), paths.FilePerm644)
 	if err != nil {
 		t.Fatalf("failed to write file: %v", err)
 	}
@@ -30,7 +31,7 @@ func TestRunSystemCheckForHandCASAndDupIDs(t *testing.T) {
 	// 2. Duplicate ID file
 	dupFile := filepath.Join(tempDir, "1111111111111111111111111111111111111111111111111111111111111111.yaml")
 	dupYaml := "id: VAL-001\nkind: test_kind\n"
-	err = fileutil.WriteFile(dupFile, []byte(dupYaml), 0644)
+	err = fileutil.WriteFile(dupFile, []byte(dupYaml), paths.FilePerm644)
 	if err != nil {
 		t.Fatalf("failed to write file: %v", err)
 	}
@@ -38,7 +39,7 @@ func TestRunSystemCheckForHandCASAndDupIDs(t *testing.T) {
 	// 3. Orphan path file (missing ID)
 	orphanFile := filepath.Join(tempDir, "2222222222222222222222222222222222222222222222222222222222222222.yaml")
 	orphanYaml := "kind: test_kind\n"
-	err = fileutil.WriteFile(orphanFile, []byte(orphanYaml), 0644)
+	err = fileutil.WriteFile(orphanFile, []byte(orphanYaml), paths.FilePerm644)
 	if err != nil {
 		t.Fatalf("failed to write file: %v", err)
 	}

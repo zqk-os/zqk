@@ -255,10 +255,10 @@ func mustWriteGoModule(t *testing.T, root string) {
 
 func mustWriteFile(t *testing.T, path, content string) {
 	t.Helper()
-	if err := fileutil.MkdirAll(filepath.Dir(path), 0o755); err != nil {
+	if err := fileutil.MkdirAll(filepath.Dir(path), paths.DirPerm755); err != nil {
 		t.Fatal(err)
 	}
-	if err := fileutil.WriteFile(path, []byte(content), 0o644); err != nil {
+	if err := fileutil.WriteFile(path, []byte(content), paths.FilePerm644); err != nil {
 		t.Fatal(err)
 	}
 }

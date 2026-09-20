@@ -36,7 +36,7 @@ func TestRecordSuccess_AndLoadHistory(t *testing.T) {
 	t.Parallel()
 	root := t.TempDir()
 	stateDir := filepath.Join(root, paths.ProjectDataDir, paths.StateDir)
-	if err := fileutil.MkdirAll(stateDir, 0o750); err != nil {
+	if err := fileutil.MkdirAll(stateDir, paths.DirPerm750); err != nil {
 		t.Fatalf("MkdirAll: %v", err)
 	}
 	if err := RecordSuccess(root, "mig-1"); err != nil {

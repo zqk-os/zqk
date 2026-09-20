@@ -136,8 +136,8 @@ func (b *RequirementLifecycleBuilder) addRequirementLifecycleData() {
 	b.AddTransition(objects.Transition{
 		From:        "active",
 		To:          "complete",
-		Description: "Auto-transition when all test cases passing OR linked milestone complete",
-		Manual:      false,
+		Description: "Complete when all test cases passing OR linked milestone complete (dual manual+auto). Promote may hop; auto shockwave may still fire.",
+		Manual:      true,
 		Auto:        true,
 		OnDependentStatus: &objects.DependentStatusTrigger{
 			Kind: "test_case",
@@ -153,8 +153,8 @@ func (b *RequirementLifecycleBuilder) addRequirementLifecycleData() {
 	b.AddTransition(objects.Transition{
 		From:        "proposed",
 		To:          "complete",
-		Description: "Auto-transition when all test cases passing OR linked milestone complete",
-		Manual:      false,
+		Description: "Complete when all test cases passing OR linked milestone complete (dual manual+auto). Promote may hop; auto shockwave may still fire.",
+		Manual:      true,
 		Auto:        true,
 		OnDependentStatus: &objects.DependentStatusTrigger{
 			Kind: "test_case",

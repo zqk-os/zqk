@@ -50,7 +50,7 @@ func (sl *YAMLSpecLoader[S]) getSchemaValidator() *SchemaValidator {
 	if sl.schemaValidator == nil {
 		// Default schemas directory: .zqk/cli/specs/schemas (relative to project root)
 		// Try to find project root by looking for .zqk directory
-		schemasDir := ".zqk/cli/specs/schemas"
+		schemasDir := filepath.Join(paths.CLICommandSpecsDir, "schemas")
 		// Try to resolve from baseDir
 		if sl.baseDir != emptyValue {
 			// Look for .zqk directory starting from baseDir

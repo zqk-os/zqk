@@ -140,7 +140,7 @@ func DefaultConfig(ctx context.Context) *Config {
 	}
 	embedModel := config.LLMEmbedModel().OrDefault("")
 	if embedModel == "" {
-		if v := zqkenv.Get("ZQK_LLM_EMBED_MODEL").OrDefault(""); v != "" {
+		if v := zqkenv.LLMEmbedModel().OrDefault(""); v != "" {
 			embedModel = v
 		} else if v := zqkenv.Get("LLM_EMBED_MODEL").OrDefault(""); v != "" {
 			embedModel = v
@@ -230,7 +230,7 @@ func ensureConfigDefaults(ctx context.Context, config *Config) {
 		}
 	}
 	if config.EmbedModel == "" {
-		if v := zqkenv.Get("ZQK_LLM_EMBED_MODEL").OrDefault(""); v != "" {
+		if v := zqkenv.LLMEmbedModel().OrDefault(""); v != "" {
 			config.EmbedModel = v
 		} else if v := zqkenv.Get("LLM_EMBED_MODEL").OrDefault(""); v != "" {
 			config.EmbedModel = v
@@ -985,7 +985,7 @@ func isLocalOllamaDisabled() bool {
 	if v := zqkenv.Get("LLM_DISABLE_LOCAL_OLLAMA").OrDefault(""); v == "true" || v == "1" {
 		return true
 	}
-	if v := zqkenv.Get("ZQK_DISABLE_LOCAL_OLLAMA").OrDefault(""); v == "true" || v == "1" {
+	if v := zqkenv.DisableLocalOllama().OrDefault(""); v == "true" || v == "1" {
 		return true
 	}
 	return false
@@ -1019,7 +1019,7 @@ func shouldDetectLocalOllama() bool {
 	if v := zqkenv.Get("LLM_ENABLE_LOCAL_OLLAMA").OrDefault(""); v == "true" || v == "1" {
 		return true
 	}
-	if v := zqkenv.Get("ZQK_FORCE_LOCAL_OLLAMA").OrDefault(""); v == "true" || v == "1" {
+	if v := zqkenv.ForceLocalOllama().OrDefault(""); v == "true" || v == "1" {
 		return true
 	}
 	if v := zqkenv.Get("FORCE_LOCAL_OLLAMA").OrDefault(""); v == "true" || v == "1" {

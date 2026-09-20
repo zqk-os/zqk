@@ -5,13 +5,14 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/zqk-os/zqk/pkg/paths"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 func TestChangeJournalIDCache_LifetimeCounters(t *testing.T) {
 	tmpDir := t.TempDir()
-	stateDir := filepath.Join(tmpDir, ".zqk", "state")
-	if err := fileutil.MkdirAll(stateDir, 0755); err != nil {
+	stateDir := filepath.Join(tmpDir, paths.ProjectDataDir, paths.StateDir)
+	if err := fileutil.MkdirAll(stateDir, paths.DirPerm755); err != nil {
 		t.Fatalf("MkdirAll failed: %v", err)
 	}
 

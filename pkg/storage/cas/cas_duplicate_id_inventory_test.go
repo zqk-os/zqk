@@ -6,6 +6,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/zqk-os/zqk/pkg/paths"
 	caspkg "github.com/zqk-os/zqk/pkg/storage/cas"
 
 	"github.com/zqk-os/zqk/pkg/datacell"
@@ -17,17 +18,17 @@ func TestInventoryCASDuplicateIDs_FindsDualBlob(t *testing.T) {
 	t.Parallel()
 	root := t.TempDir()
 	kindDir := filepath.Join(datacell.ProcessPrimaryDir(root), objects.GetDirectoryFromKind(objects.KindBacklogItem))
-	if err := fileutil.MkdirAll(kindDir, 0o755); err != nil {
+	if err := fileutil.MkdirAll(kindDir, paths.DirPerm755); err != nil {
 		t.Fatal(err)
 	}
 	older := filepath.Join(kindDir, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.yaml")
 	newer := filepath.Join(kindDir, "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb.yaml")
 	body := "id: BLI-DUAL-TEST-001\nkind: backlog_item\n"
-	if err := fileutil.WriteFile(older, []byte(body), 0o644); err != nil {
+	if err := fileutil.WriteFile(older, []byte(body), paths.FilePerm644); err != nil {
 		t.Fatal(err)
 	}
 	time.Sleep(5 * time.Millisecond)
-	if err := fileutil.WriteFile(newer, []byte(body), 0o644); err != nil {
+	if err := fileutil.WriteFile(newer, []byte(body), paths.FilePerm644); err != nil {
 		t.Fatal(err)
 	}
 
@@ -47,18 +48,18 @@ func TestQuarantineCASDuplicateLosers_MovesOlder(t *testing.T) {
 	t.Parallel()
 	root := t.TempDir()
 	kindDir := filepath.Join(datacell.ProcessPrimaryDir(root), "goals")
-	qDir := filepath.Join(root, ".zqk", "system-health", "quarantine", "hash-duplicates")
-	if err := fileutil.MkdirAll(kindDir, 0o755); err != nil {
+	qDir := filepath.Join(root, paths.ProjectDataDir, "system-health", "quarantine", "hash-duplicates")
+	if err := fileutil.MkdirAll(kindDir, paths.DirPerm755); err != nil {
 		t.Fatal(err)
 	}
 	older := filepath.Join(kindDir, "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc.yaml")
 	newer := filepath.Join(kindDir, "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd.yaml")
 	body := "id: GOAL-DUAL-TEST-001\nkind: goal\n"
-	if err := fileutil.WriteFile(older, []byte(body), 0o644); err != nil {
+	if err := fileutil.WriteFile(older, []byte(body), paths.FilePerm644); err != nil {
 		t.Fatal(err)
 	}
 	time.Sleep(5 * time.Millisecond)
-	if err := fileutil.WriteFile(newer, []byte(body), 0o644); err != nil {
+	if err := fileutil.WriteFile(newer, []byte(body), paths.FilePerm644); err != nil {
 		t.Fatal(err)
 	}
 

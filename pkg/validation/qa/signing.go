@@ -13,6 +13,7 @@ import (
 
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"github.com/zqk-os/zqk/pkg/validation"
 )
@@ -58,7 +59,7 @@ func NewAuditorSigner(keyPath string) (*AuditorSigner, error) {
 
 	// Save new key if path provided
 	if keyPath != "" {
-		if err := fileutil.MkdirAll(filepath.Dir(keyPath), 0o700); err != nil {
+		if err := fileutil.MkdirAll(filepath.Dir(keyPath), paths.DirPerm700); err != nil {
 			logging.FluentEvent(logging.GetLogger()).Error(fmt.Sprintf(validation.ConstMagic708b5a99, err), nil).Log()
 		}
 		der, err := x509.MarshalECPrivateKey(priv)

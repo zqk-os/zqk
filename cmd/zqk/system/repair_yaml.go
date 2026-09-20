@@ -30,7 +30,7 @@ func NewRepairYAMLCmd() *cobra.Command {
 		dryRun   bool
 	)
 
-	examplePolicyFile := filepath.Join(paths.ProcessPoliciesDir, "POL-CODE-009.yaml")
+	examplePolicyFile := filepath.Join(paths.ProcessPoliciesDir, "POL-EXAMPLE-001.yaml")
 	longHelp := fmt.Sprintf(`Repair YAML files that have parsing errors by extracting fields and rewriting using instance builders.
 
 This command is useful when YAML files become corrupted or have syntax errors that prevent normal parsing.
@@ -41,10 +41,10 @@ Examples:
   %s system repair-yaml --file %s
 
   # Repair by object ID (finds the file automatically)
-  %s system repair-yaml --id POL-CODE-009
+  %s system repair-yaml --id POL-EXAMPLE-001
 
   # Dry run to see what would be repaired
-  %s system repair-yaml --id POL-CODE-009 --dry-run`, paths.CLICommandName, examplePolicyFile, paths.CLICommandName, paths.CLICommandName)
+  %s system repair-yaml --id POL-EXAMPLE-001 --dry-run`, paths.CLICommandName, examplePolicyFile, paths.CLICommandName, paths.CLICommandName)
 
 	cmd := clipkg.ApplyBuilder(bldr_cli_cmd_v1.NewSystemRepairYamlCommandBuilder(), &cobra.Command{
 		Use:   "repair-yaml",

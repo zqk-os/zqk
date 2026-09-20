@@ -83,7 +83,7 @@ func PrunePendingAutofixBatchesForObjectID(projectRoot, objectID string) (rewrit
 		if err != nil {
 			continue
 		}
-		if err := fileutil.WriteFile(path, out, 0o644); err == nil {
+		if err := fileutil.WriteFile(path, out, paths.FilePerm644); err == nil {
 			rewritten++
 		}
 	}

@@ -94,7 +94,7 @@ func revertSeatWrites(ctx context.Context, root string, files []string) error {
 	var failures []string
 	for _, file := range files {
 		// Kernel CAS instance data is never reverted through git.
-		if strings.HasPrefix(file, paths.ProcessDir+"/") || strings.HasPrefix(file, ".zqk/") {
+		if strings.HasPrefix(file, paths.ProcessDir+"/") || strings.HasPrefix(file, paths.ProjectDataDir+"/") {
 			continue
 		}
 		tracked := execwrap.CommandContext(ctx, "git", "ls-files", "--error-unmatch", file)

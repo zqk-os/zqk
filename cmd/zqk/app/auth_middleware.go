@@ -56,7 +56,7 @@ func AuthMiddleware(cmd *cobra.Command, projectRoot string) error {
 		}
 	}
 
-	if isTest {
+	if isTest || zqkenv.DevCodegen().Get() == "1" || zqkenv.Codegen().Get() == "1" {
 		secCtx := pkgctx.NewTestSecurityContext()
 		cmd.SetContext(pkgctx.WithSecurityContext(ctx, secCtx))
 		return nil
@@ -73,7 +73,7 @@ func AuthMiddleware(cmd *cobra.Command, projectRoot string) error {
 	}
 
 	if apiKey == "" && credentialsToken == "" {
-		return errfmt.Errorf("unauthorized: missing token in ~/.zqk/credentials or %s", zqkenv.APIKey())
+		return errfmt.Errorf("unauthorized: missing token in ~/%s/credentials or %s", paths.ProjectDataDir, zqkenv.APIKey())
 	}
 
 	// Fail-closed uninitialized kernel hint: if projectRoot is empty or uninitialized,

@@ -72,7 +72,7 @@ func NewMCPExecutorAt(ctx context.Context, mcpPath, workDir string) (*MCPExecuto
 	}
 	var traceFile, stderrFile string
 	if projectRoot != "" {
-		logsDir := filepath.Join(projectRoot, paths.ProjectDataDir, "logs")
+		logsDir := filepath.Join(projectRoot, paths.ProjectDataDir, paths.LogsDir)
 		_ = fileutil.EnsureDir(logsDir)
 		traceFile = filepath.Join(logsDir, "mcp-trace.log")
 		stderrFile = filepath.Join(logsDir, "mcp-stderr.log")
@@ -82,7 +82,7 @@ func NewMCPExecutorAt(ctx context.Context, mcpPath, workDir string) (*MCPExecuto
 	}
 
 	cmd.Env = mcpChildEnviron(os.Environ(), workDir)
-	cmd.Env = append(cmd.Env, "ZQK_MCP_TRACE=true", "ZQK_MCP_TRACE_FILE="+traceFile)
+	cmd.Env = append(cmd.Env, zqkenv.MCPTrace().Name()+"=true", zqkenv.MCPTraceFile().Name()+"="+traceFile)
 
 	f, _ := fileutil.OpenFile(stderrFile, fileutil.O_CREATE|fileutil.O_WRONLY|fileutil.O_APPEND, 0666)
 	if f != nil {
@@ -280,7 +280,7 @@ func isEagerTool(name string) bool {
 }
 
 // mcpChildEnviron keeps studio PROJECT_ROOT, points file I/O at workDir,
-// and ensures ZQK_SESSION is auto-injected in worker subprocess environments (REQ-SWARM-SESSION-AUTO-INJECT-001).
+// and ensures SESSION is auto-injected in worker subprocess environments (REQ-SWARM-SESSION-AUTO-INJECT-001).
 func mcpChildEnviron(parent []string, workDir string) []string {
 	workDir = strings.TrimSpace(workDir)
 	wtKey := zqkenv.AgentWorktreeRoot().Name() + "="
@@ -288,8 +288,8 @@ func mcpChildEnviron(parent []string, workDir string) []string {
 
 	var hasSession bool
 	var hasSessionID bool
-	sessKey := "ZQK_SESSION="
-	sessIDKey := "ZQK_SESSION_ID="
+	sessKey := zqkenv.Session().Name() + "="
+	sessIDKey := zqkenv.SessionID().Name() + "="
 
 	for _, e := range parent {
 		if workDir != "" && strings.HasPrefix(e, wtKey) {

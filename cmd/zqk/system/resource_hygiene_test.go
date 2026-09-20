@@ -34,7 +34,7 @@ func TestNewResourceHygieneCmd(t *testing.T) {
 
 func TestRunResourceHygiene_Execution(t *testing.T) {
 	dir := t.TempDir()
-	cacheDir := filepath.Join(dir, paths.ProjectDataDir, "cache")
+	cacheDir := filepath.Join(dir, paths.ProjectDataDir, paths.CacheDir)
 	if err := fileutil.MkdirAll(cacheDir, paths.DirPerm755); err != nil {
 		t.Fatal(err)
 	}

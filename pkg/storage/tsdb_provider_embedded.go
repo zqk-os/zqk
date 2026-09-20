@@ -14,6 +14,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -49,7 +50,7 @@ func (p *EmbeddedTSDBProvider) Initialize(ctx context.Context) error {
 	today := time.Now().Format("2006-01-02")
 	filePath := filepath.Join(p.baseDir, fmt.Sprintf("metrics-%s.tsdb", today))
 
-	f, err := fileutil.OpenFile(filePath, fileutil.O_APPEND|fileutil.O_CREATE|fileutil.O_WRONLY, 0644)
+	f, err := fileutil.OpenFile(filePath, fileutil.O_APPEND|fileutil.O_CREATE|fileutil.O_WRONLY, paths.FilePerm644)
 	if err != nil {
 		return errfmt.Errorf("failed to open tsdb file: %w", err)
 	}

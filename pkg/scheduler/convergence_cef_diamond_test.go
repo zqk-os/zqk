@@ -4,6 +4,7 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/zqk-os/zqk/pkg/paths"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -60,7 +61,7 @@ func TestBuildCEFDiamondMeasureResult_fixture(t *testing.T) {
 	t.Parallel()
 	root := t.TempDir()
 	qualityDir := filepath.Join(root, "docs", "quality")
-	if err := fileutil.MkdirAll(qualityDir, 0o755); err != nil {
+	if err := fileutil.MkdirAll(qualityDir, paths.DirPerm755); err != nil {
 		t.Fatal(err)
 	}
 	reg := `default: cef_diamond_scorecard
@@ -79,13 +80,13 @@ completion:
   gate_columns: [package_complete]
   done_values: [yes, na]
 `
-	if err := fileutil.WriteFile(filepath.Join(qualityDir, "matrix_registry.yaml"), []byte(reg), 0o644); err != nil {
+	if err := fileutil.WriteFile(filepath.Join(qualityDir, "matrix_registry.yaml"), []byte(reg), paths.FilePerm644); err != nil {
 		t.Fatal(err)
 	}
-	if err := fileutil.WriteFile(filepath.Join(qualityDir, "CEF_DIAMOND_SCORECARD_MATRIX.csv"), []byte(csv), 0o644); err != nil {
+	if err := fileutil.WriteFile(filepath.Join(qualityDir, "CEF_DIAMOND_SCORECARD_MATRIX.csv"), []byte(csv), paths.FilePerm644); err != nil {
 		t.Fatal(err)
 	}
-	if err := fileutil.WriteFile(filepath.Join(qualityDir, "cef_diamond_scorecard_matrix_profile.yaml"), []byte(prof), 0o644); err != nil {
+	if err := fileutil.WriteFile(filepath.Join(qualityDir, "cef_diamond_scorecard_matrix_profile.yaml"), []byte(prof), paths.FilePerm644); err != nil {
 		t.Fatal(err)
 	}
 	res, err := BuildCEFDiamondMeasureResult(root, "CVS-TEST", map[string]any{"min_axis_grade": 4})

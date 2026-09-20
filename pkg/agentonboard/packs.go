@@ -9,11 +9,12 @@ import (
 
 	"github.com/zqk-os/zqk/pkg/brand"
 	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // AgentPacksRelDir holds regenerable per-vendor boot packs (≤100 top-level vendor dirs).
-const AgentPacksRelDir = ".zqk/agent_packs"
+var AgentPacksRelDir = paths.AgentPacksDir
 
 // BootPayloadFor returns shared kernel boot text plus a thin vendor-specific addendum.
 func BootPayloadFor(v Vendor) string {

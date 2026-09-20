@@ -15,7 +15,7 @@ func TestExtractFieldsFromCorruptedYAML_BodyBlock_MetadataOK(t *testing.T) {
 	tmp := t.TempDir()
 	p := filepath.Join(tmp, "bad.yaml")
 	input := `kind: policy
-id: POL-CODE-009
+id: POL-EXAMPLE-001
 schema_version: "` + objects.DefaultSchemaVersion + `"
 body:
   |
@@ -34,7 +34,7 @@ other_field: should_stop
 	if extractedKind != "policy" {
 		t.Fatalf("unexpected extractedKind=%q", extractedKind)
 	}
-	if instance[objects.FieldKeyID] != "POL-CODE-009" {
+	if instance[objects.FieldKeyID] != "POL-EXAMPLE-001" {
 		t.Fatalf("unexpected id=%v", instance[objects.FieldKeyID])
 	}
 	if instance[objects.FieldKeySchemaVersion] != objects.DefaultSchemaVersion {
@@ -50,7 +50,7 @@ other_field: should_stop
 func TestExtractFieldsFromCorruptedYAML_BodyBlock_MetadataFallback(t *testing.T) {
 	tmp := t.TempDir()
 	p := filepath.Join(tmp, "bad.yaml")
-	input := `id: POL-CODE-009
+	input := `id: POL-EXAMPLE-001
 kind: policy
 schema_version: "` + objects.DefaultSchemaVersion + `"
 bad: [unclosed
@@ -71,7 +71,7 @@ next: Z
 	if extractedKind != "policy" {
 		t.Fatalf("unexpected extractedKind=%q", extractedKind)
 	}
-	if instance[objects.FieldKeyID] != "POL-CODE-009" {
+	if instance[objects.FieldKeyID] != "POL-EXAMPLE-001" {
 		t.Fatalf("unexpected id=%v", instance[objects.FieldKeyID])
 	}
 	if instance[objects.FieldKeySchemaVersion] != objects.DefaultSchemaVersion {
@@ -86,7 +86,7 @@ next: Z
 func TestExtractFieldsFromCorruptedYAML_NoBody_ParsesNormally(t *testing.T) {
 	tmp := t.TempDir()
 	input := `kind: policy
-id: POL-CODE-009
+id: POL-EXAMPLE-001
 schema_version: "` + objects.DefaultSchemaVersion + `"
 `
 	p := testkit.WriteTestObjectStandalone(t, tmp, input)
@@ -98,7 +98,7 @@ schema_version: "` + objects.DefaultSchemaVersion + `"
 	if extractedKind != "policy" {
 		t.Fatalf("unexpected extractedKind=%q", extractedKind)
 	}
-	if instance[objects.FieldKeyID] != "POL-CODE-009" {
+	if instance[objects.FieldKeyID] != "POL-EXAMPLE-001" {
 		t.Fatalf("unexpected id=%v", instance[objects.FieldKeyID])
 	}
 }

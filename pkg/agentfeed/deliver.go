@@ -2,12 +2,12 @@ package agentfeed
 
 import (
 	"context"
-	"os"
 	"strings"
 	"time"
 
 	"github.com/zqk-os/zqk/pkg/datacell"
 	"github.com/zqk-os/zqk/pkg/idebridge"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
 // PeerWakeResult is the outcome of a best-effort peer wake after feed append.
@@ -120,14 +120,15 @@ func legacyCoordinatorAgentID(toAgentID string) bool {
 }
 
 const (
-	SessionEnvKey        = "ZQK_SESSION"
 	FromAgentID          = "primary"
 	skWakeAuthorExcluded = "author_excluded"
 )
 
+var SessionEnvKey = zqkenv.Session().Name()
+
 // SeatWorkerBound returns whether the current process has an active ZQK_SESSION binding.
 func SeatWorkerBound() (bool, string) {
-	val := strings.TrimSpace(os.Getenv(SessionEnvKey))
+	val := strings.TrimSpace(zqkenv.Session().Get())
 	return val != "", val
 }
 

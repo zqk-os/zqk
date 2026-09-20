@@ -13,6 +13,7 @@ import (
 	"github.com/zqk-os/zqk/internal/cli"
 	bldr_cli_cmd_v1 "github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
 	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/storage"
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
@@ -395,19 +396,19 @@ func EnsureGitHooks(projectRoot string, logger logging.Logger) error {
 	}
 
 	toolsDir := filepath.Join(projectRoot, "tools", "git-hooks")
-	if err := fileutil.MkdirAll(toolsDir, 0755); err != nil {
+	if err := fileutil.MkdirAll(toolsDir, paths.DirPerm755); err != nil {
 		return fmt.Errorf("failed to create tools/git-hooks: %w", err)
 	}
 
 	templatePath := filepath.Join(toolsDir, "pre-commit")
 	if _, err := fileutil.Stat(templatePath); fileutil.IsNotExist(err) {
-		if err := fileutil.WriteFile(templatePath, []byte(defaultPreCommitHookScript), 0755); err != nil {
+		if err := fileutil.WriteFile(templatePath, []byte(defaultPreCommitHookScript), paths.DirPerm755); err != nil {
 			return fmt.Errorf("failed to write hook template %s: %w", templatePath, err)
 		}
 	}
 
 	hooksDir := filepath.Join(gitDir, "hooks")
-	if err := fileutil.MkdirAll(hooksDir, 0755); err != nil {
+	if err := fileutil.MkdirAll(hooksDir, paths.DirPerm755); err != nil {
 		return fmt.Errorf("failed to create .git/hooks: %w", err)
 	}
 

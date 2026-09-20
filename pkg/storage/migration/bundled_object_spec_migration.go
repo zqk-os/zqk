@@ -255,7 +255,7 @@ var baseObjectIDRegex = regexp.MustCompile(`^[A-Z]+-\d{3,}$`)
 // ObjectSpecIDForStem computes a deterministic, spec-compliant ID (^[A-Z]+-\d{3,}$) for a bundled spec file stem.
 func ObjectSpecIDForStem(stem string) string {
 	h := fnv.New32a()
-	h.Write([]byte(stem))
+	_, _ = h.Write([]byte(stem))
 	num := (h.Sum32() % 900000) + 100000
 	return fmt.Sprintf("OBJ-%06d", num)
 }

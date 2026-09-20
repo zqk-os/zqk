@@ -77,7 +77,7 @@ func NewCoachCmd() *cobra.Command {
 
 			// 3. Get scheduler status (check if running)
 			schedulerStatus := "inactive"
-			schedPidFile := filepath.Join(projectRoot, paths.ProjectDataDir, "scheduler", "scheduler.pid")
+			schedPidFile := filepath.Join(projectRoot, paths.ProjectDataDir, paths.SchedulerSubdir, "scheduler.pid")
 			if _, err := fileutil.Stat(schedPidFile); err == nil {
 				schedulerStatus = "active"
 			}

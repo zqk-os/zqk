@@ -136,12 +136,12 @@ func TestDocEntryIntegrity_Suite(t *testing.T) {
 		tmpDir := t.TempDir()
 		relDoc := "docs/architecture/sample.md"
 		fullDocPath := filepath.Join(tmpDir, relDoc)
-		if err := os.MkdirAll(filepath.Dir(fullDocPath), 0750); err != nil {
+		if err := os.MkdirAll(filepath.Dir(fullDocPath), paths.DirPerm750); err != nil {
 			t.Fatalf("failed to create dir: %v", err)
 		}
 
 		initialContent := "# Architecture Sample\nOriginal content."
-		if err := fileutil.WriteFile(fullDocPath, []byte(initialContent), 0644); err != nil {
+		if err := fileutil.WriteFile(fullDocPath, []byte(initialContent), paths.FilePerm644); err != nil {
 			t.Fatalf("failed to write initial doc: %v", err)
 		}
 
@@ -166,7 +166,7 @@ func TestDocEntryIntegrity_Suite(t *testing.T) {
 
 		// 2. Drift verification: content modified
 		modifiedContent := "# Architecture Sample\nTampered content!"
-		if err := fileutil.WriteFile(fullDocPath, []byte(modifiedContent), 0644); err != nil {
+		if err := fileutil.WriteFile(fullDocPath, []byte(modifiedContent), paths.FilePerm644); err != nil {
 			t.Fatalf("failed to tamper doc: %v", err)
 		}
 		driftViolations := storage.ValidateDocEntryIntegrity(tmpDir, docObj)
@@ -214,7 +214,7 @@ func TestDocEntryIntegrity_Suite(t *testing.T) {
 			// content_hash missing
 		}
 		// recreate file
-		_ = fileutil.WriteFile(fullDocPath, []byte(initialContent), 0644)
+		_ = fileutil.WriteFile(fullDocPath, []byte(initialContent), paths.FilePerm644)
 		unsealedViolations := storage.ValidateDocEntryIntegrity(tmpDir, docObjUnsealed)
 		foundUnsealed := false
 		for _, v := range unsealedViolations {
@@ -233,11 +233,11 @@ func TestDocEntryIntegrity_Suite(t *testing.T) {
 		tmpDir := t.TempDir()
 		relDoc := "docs/architecture/seal_test.md"
 		fullDocPath := filepath.Join(tmpDir, relDoc)
-		if err := os.MkdirAll(filepath.Dir(fullDocPath), 0750); err != nil {
+		if err := os.MkdirAll(filepath.Dir(fullDocPath), paths.DirPerm750); err != nil {
 			t.Fatalf("failed to create dir: %v", err)
 		}
 		content := "# Seal Test Doc\nTesting automated SHA-256 sealing."
-		if err := fileutil.WriteFile(fullDocPath, []byte(content), 0644); err != nil {
+		if err := fileutil.WriteFile(fullDocPath, []byte(content), paths.FilePerm644); err != nil {
 			t.Fatalf("failed to write doc: %v", err)
 		}
 

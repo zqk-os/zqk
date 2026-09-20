@@ -24,6 +24,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"github.com/zqk-os/zqk/pkg/zqktime"
 )
@@ -169,7 +170,7 @@ func AppendToStream(projectRoot, kind, id string, obj map[string]any, createdAt 
 	if err := fileutil.EnsureDir(dir); err != nil {
 		return "", 0, errfmt.Newf("stream: mkdir").Wrap(err)
 	}
-	f, err := fileutil.OpenFile(segmentPath, fileutil.O_CREATE|fileutil.O_APPEND|fileutil.O_WRONLY, 0o600)
+	f, err := fileutil.OpenFile(segmentPath, fileutil.O_CREATE|fileutil.O_APPEND|fileutil.O_WRONLY, paths.FilePerm600)
 	if err != nil {
 		return "", 0, errfmt.Newf("stream: open").Wrap(err)
 	}
