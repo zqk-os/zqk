@@ -80,7 +80,6 @@ func TestSystemCheck_ProgressUpdates_E2E(t *testing.T) {
 		t.Logf("Binary not found at %s, building...", binaryPath)
 		buildCmd := execwrap.Command("go", "build", "-o", binaryPath, "./cmd/zqk")
 		buildCmd.Dir = moduleRoot
-		zqkenv.WireExecForIsolatedProject(buildCmd, projectRoot)
 		var buildStderr strings.Builder
 		buildCmd.Stderr = &buildStderr
 		if err := buildCmd.Run(); err != nil {
