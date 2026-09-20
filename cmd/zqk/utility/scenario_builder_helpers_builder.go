@@ -85,7 +85,7 @@ func createScenarioBuilder(cmd *cobra.Command, targetDir string) (*ScenarioBuild
 	// Load cache (or initialize if it doesn't exist) - this sets the cache directory
 	_, _ = objectIDCache.LoadCache(targetDir) // Best effort - cache may not exist yet
 	// Ensure cache directory exists
-	cacheDir := filepath.Join(targetDir, paths.ProjectDataDir, "cache")
+	cacheDir := filepath.Join(targetDir, paths.ProjectDataDir, paths.CacheDir)
 	_ = fileutil.MkdirAll(cacheDir, paths.DirPerm755) // Best effort
 
 	// Note: Cache checker is set in scenario_builder_data_loader.go during BuildFromDataFile

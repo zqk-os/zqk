@@ -335,7 +335,7 @@ func runSign(cmd *cobra.Command, args []string) error {
 	if err := enc.Encode(&userCfg); err != nil {
 		return errfmt.Errorf("encode %s: %w", userPath, err)
 	}
-	if err := fileutil.WriteFile(userPath, buf.Bytes(), 0o644); err != nil {
+	if err := fileutil.WriteFile(userPath, buf.Bytes(), paths.FilePerm644); err != nil {
 		return errfmt.Errorf("write %s: %w", userPath, err)
 	}
 

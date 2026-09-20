@@ -762,7 +762,7 @@ func dispatchViolationsToInbox(projectRoot string, results []CheckResult, dispat
 
 		// Create delivery Prompt
 		filename := fmt.Sprintf("violation_%s_%d.md", res.ObjectID, time.Now().UnixNano())
-		destPath := filepath.Join(projectRoot, paths.ProjectDataDir, "inbox", role, filename)
+		destPath := filepath.Join(projectRoot, paths.ProjectDataDir, paths.InboxSubdir, role, filename)
 
 		prompt := agentdelivery.Prompt{
 			Markdown: []byte(sb.String()),

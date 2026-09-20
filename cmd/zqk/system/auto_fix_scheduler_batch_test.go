@@ -4,6 +4,7 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/zqk-os/zqk/pkg/paths"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -52,7 +53,7 @@ func TestRemoveUnsubmittedAutoFixBatchFile(t *testing.T) {
 
 	t.Run("removes orphan when submission did not persist", func(t *testing.T) {
 		batchFile := filepath.Join(t.TempDir(), "AUTOFIX-orphan.json")
-		if err := fileutil.WriteFile(batchFile, []byte("{}"), 0o600); err != nil {
+		if err := fileutil.WriteFile(batchFile, []byte("{}"), paths.FilePerm600); err != nil {
 			t.Fatal(err)
 		}
 		if err := removeUnsubmittedAutoFixBatchFile(batchFile, false); err != nil {
@@ -65,7 +66,7 @@ func TestRemoveUnsubmittedAutoFixBatchFile(t *testing.T) {
 
 	t.Run("retains batch after scheduler persistence", func(t *testing.T) {
 		batchFile := filepath.Join(t.TempDir(), "AUTOFIX-submitted.json")
-		if err := fileutil.WriteFile(batchFile, []byte("{}"), 0o600); err != nil {
+		if err := fileutil.WriteFile(batchFile, []byte("{}"), paths.FilePerm600); err != nil {
 			t.Fatal(err)
 		}
 		if err := removeUnsubmittedAutoFixBatchFile(batchFile, true); err != nil {

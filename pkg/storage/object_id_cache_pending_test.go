@@ -154,7 +154,7 @@ func TestObjectIDCachePending_PersistErrorIsRetained(t *testing.T) {
 	ResetObjectIDCachePendingForTest()
 	t.Cleanup(ResetObjectIDCachePendingForTest)
 
-	zqkDir := filepath.Join(root, ".zqk")
+	zqkDir := filepath.Join(root, paths.ProjectDataDir)
 	if err := fileutil.MkdirAll(zqkDir, paths.DirPerm755); err != nil {
 		t.Fatal(err)
 	}
@@ -176,7 +176,7 @@ func TestObjectIDCache_BLI_CEF_R16_OIDCACHE_SWALLOW_001(t *testing.T) {
 	ResetObjectIDCachePendingForTest()
 	t.Cleanup(ResetObjectIDCachePendingForTest)
 
-	zqkDir := filepath.Join(root, ".zqk")
+	zqkDir := filepath.Join(root, paths.ProjectDataDir)
 	if err := fileutil.MkdirAll(zqkDir, paths.DirPerm755); err != nil {
 		t.Fatal(err)
 	}

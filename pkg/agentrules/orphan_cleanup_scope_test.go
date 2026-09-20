@@ -6,6 +6,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/zqk-os/zqk/pkg/paths"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -47,7 +48,7 @@ func TestOrphanCleanupDoesNotClassifySchedulerSubcommandsAsDaemons(t *testing.T)
 
 	// Long-lived processes: killing these when truly abandoned is the point of the script.
 	daemonArgv := []string{
-		"/Users/x/zqk/.zqk/bin/zqk-stable scheduler start --foreground",
+		filepath.Join("/Users/x/zqk", paths.ProjectDataDir, "bin", "zqk-stable") + " scheduler start --foreground",
 		"./bin/zqk-stable scheduler daemon",
 		"bin/zqk scheduler start",
 	}

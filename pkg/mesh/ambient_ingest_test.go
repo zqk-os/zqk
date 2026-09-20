@@ -7,6 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/zqk-os/zqk/pkg/ambient"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/paths"
 )
 
 func TestAmbientIngestService(t *testing.T) {
@@ -27,14 +28,15 @@ func TestAmbientIngestService(t *testing.T) {
 	assert.Equal(t, "docs/architecture/README.md", uriMD)
 
 	// Test technical_spec mapping (.yaml and .json)
+	specPath := paths.ProcessDir + "/technical_spec/tspec-001.yaml"
 	eventYAML := ambient.Event{
 		Type:      ambient.EventTypeFilesystem,
-		Payload:   map[string]any{"file": ".zqk/process/technical_spec/tspec-001.yaml"},
+		Payload:   map[string]any{"file": specPath},
 		Timestamp: time.Now(),
 	}
 	kindYAML, uriYAML := service.MapToSystemObject(eventYAML)
 	assert.Equal(t, "technical_spec", kindYAML)
-	assert.Equal(t, ".zqk/process/technical_spec/tspec-001.yaml", uriYAML)
+	assert.Equal(t, specPath, uriYAML)
 
 	eventJSON := ambient.Event{
 		Type:      ambient.EventTypeFilesystem,

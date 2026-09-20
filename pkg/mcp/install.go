@@ -239,7 +239,7 @@ func InstallToIDE(ideName, configPath, execPath, projectRoot string, logger logg
 			cwd = "${workspaceFolder}"
 			env = map[string]string{
 				zqkenv.ProjectRoot().Name():   "${workspaceFolder}",
-				zqkenv.MCPConfigPath().Name(): "${workspaceFolder}/.zqk/mcp/config.yaml",
+				zqkenv.MCPConfigPath().Name(): "${workspaceFolder}/" + paths.ProjectDataDir + "/" + paths.MCPDir + "/config.yaml",
 			}
 			args = []string{"mcp", "ide-adapter", "--tcp", DefaultDaemonTCP}
 		} else {
@@ -268,7 +268,7 @@ func InstallToIDE(ideName, configPath, execPath, projectRoot string, logger logg
 	}
 	if isIDEStdioAdapterConfig(ideName, configPath) {
 		entry.Type = mcpTransportStdio
-		entry.EnvFile = "${workspaceFolder}/.zqk/mcp/cursor-stdio.env"
+		entry.EnvFile = "${workspaceFolder}/" + paths.ProjectDataDir + "/" + paths.MCPDir + "/cursor-stdio.env"
 	}
 	config.MCPServers[serverName] = entry
 

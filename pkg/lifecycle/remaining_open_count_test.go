@@ -8,6 +8,7 @@ import (
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/storage"
 	"github.com/zqk-os/zqk/pkg/testkit"
 )
@@ -146,7 +147,7 @@ func TestApplyPlanLastChildComplete_ZeroCompletesWithoutMemberList(t *testing.T)
 		t.Fatal(err)
 	}
 	if st, _ := plan[objects.FieldKeyStatus].(string); st != statusComplete {
-		t.Fatalf("plan status=%q want complete (path=%s)", st, filepath.Join(projectRoot, ".zqk"))
+		t.Fatalf("plan status=%q want complete (path=%s)", st, filepath.Join(projectRoot, paths.ProjectDataDir))
 	}
 	if _, ok := plan[objects.FieldKeyActiveOrder]; ok {
 		t.Fatalf("active_order must unset on last-child complete, got %v", plan[objects.FieldKeyActiveOrder])

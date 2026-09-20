@@ -137,7 +137,7 @@ func AppendCapAdvanceJournal(projectRoot string, e CapAdvanceJournalEntry) error
 	if err != nil {
 		return err
 	}
-	f, err := fileutil.OpenFile(path, fileutil.O_APPEND|fileutil.O_CREATE|fileutil.O_WRONLY, 0o644)
+	f, err := fileutil.OpenFile(path, fileutil.O_APPEND|fileutil.O_CREATE|fileutil.O_WRONLY, paths.FilePerm644)
 	if err != nil {
 		return err
 	}

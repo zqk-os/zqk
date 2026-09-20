@@ -173,7 +173,7 @@ func (s *Scheduler) evaluateActiveConvergenceSessions(ctx context.Context) {
 
 		if rollupStatus == "" {
 			// Fallback: read the file produced by the script
-			rollupPath := filepath.Join(s.projectRoot, paths.ProjectDataDir, "logs", "drift", "cvs_rollup_latest.json")
+			rollupPath := filepath.Join(s.projectRoot, paths.ProjectDataDir, paths.LogsDir, "drift", "cvs_rollup_latest.json")
 			if data, err := fileutil.ReadFile(rollupPath); err == nil {
 				if err := json.Unmarshal(data, &result); err == nil {
 					if rs, ok := result["rollup_status"].(string); ok {

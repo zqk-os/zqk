@@ -41,7 +41,7 @@ func jobTypeViewCachePath(projectRoot string) string {
 	if strings.TrimSpace(projectRoot) == emptyValue {
 		return ""
 	}
-	return filepath.Join(projectRoot, paths.ProjectDataDir, "cache", jobTypeViewCacheFileName)
+	return filepath.Join(projectRoot, paths.ProjectDataDir, paths.CacheDir, jobTypeViewCacheFileName)
 }
 
 // EnsureJobTypeViewCacheReady builds and saves the job_type view cache to disk.

@@ -9,6 +9,7 @@ import (
 	"testing"
 
 	"github.com/zqk-os/zqk/cmd/zqk/test"
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/testkit"
 	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
@@ -24,7 +25,7 @@ func TestDiscoverCmd_Basic(t *testing.T) {
 import "testing"
 func TestDummyItem(t *testing.T) {}
 `
-	if err := os.WriteFile(filepath.Join(proj.Root, "dummy_test.go"), []byte(testFile), 0600); err != nil {
+	if err := os.WriteFile(filepath.Join(proj.Root, "dummy_test.go"), []byte(testFile), paths.FilePerm600); err != nil {
 		t.Fatalf("failed to write test file: %v", err)
 	}
 
@@ -52,7 +53,7 @@ func TestDiscoverCmd_JSONFormat(t *testing.T) {
 import "testing"
 func TestDummyJson(t *testing.T) {}
 `
-	if err := os.WriteFile(filepath.Join(proj.Root, "dummy_test.go"), []byte(testFile), 0600); err != nil {
+	if err := os.WriteFile(filepath.Join(proj.Root, "dummy_test.go"), []byte(testFile), paths.FilePerm600); err != nil {
 		t.Fatalf("failed to write test file: %v", err)
 	}
 

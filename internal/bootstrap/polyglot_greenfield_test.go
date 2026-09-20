@@ -59,7 +59,7 @@ func TestPolyglotGreenfieldInit(t *testing.T) {
 
 			// Seed ecosystem marker file
 			markerPath := filepath.Join(projectRoot, tc.markerFile)
-			if err := fileutil.WriteFile(markerPath, []byte(tc.markerData), 0644); err != nil {
+			if err := fileutil.WriteFile(markerPath, []byte(tc.markerData), paths.FilePerm644); err != nil {
 				t.Fatalf("failed to write ecosystem marker file: %v", err)
 			}
 

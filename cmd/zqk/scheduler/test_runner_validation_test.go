@@ -28,7 +28,7 @@ func TestTestRunnerAssemblesJobCorrectly(t *testing.T) {
 
 	// Create a temporary directory for test isolation
 	testDir := t.TempDir()
-	testLogDir := filepath.Join(testDir, paths.ProjectDataDir, "logs", "tests")
+	testLogDir := filepath.Join(testDir, paths.ProjectDataDir, paths.LogsDir, "tests")
 	if err := fileutil.MkdirAll(testLogDir, paths.DirPerm755); err != nil {
 		t.Fatalf("Failed to create test log directory: %v", err)
 	}
@@ -253,7 +253,7 @@ func TestTestRunnerJobYAMLStructure(t *testing.T) {
 	scriptPath := filepath.Join(projectRoot, "scripts", "test-runner.sh")
 
 	testDir := t.TempDir()
-	testLogDir := filepath.Join(testDir, paths.ProjectDataDir, "logs", "tests")
+	testLogDir := filepath.Join(testDir, paths.ProjectDataDir, paths.LogsDir, "tests")
 	_ = fileutil.MkdirAll(testLogDir, paths.DirPerm755)
 
 	originalDir, _ := fileutil.Getwd()

@@ -5,6 +5,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/zqk-os/zqk/pkg/paths"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"github.com/zqk-os/zqk/pkg/workflow/whatsnext"
 )
@@ -38,7 +39,7 @@ func TestRecentFillSubmit_cooldown(t *testing.T) {
 	}
 	path := fillSubmitMarkPath(root, whatsnext.FillKindGhostRef)
 	old := []byte(`{"schema":"zqk_kernel_fill_submit_v1","kind":"ghost_ref","dispatched_at":"` + time.Now().UTC().Add(-planOrchSubmitCooldown-time.Minute).Format(time.RFC3339) + `","detail":"old"}` + "\n")
-	if err := fileutil.WriteFile(path, old, 0o600); err != nil {
+	if err := fileutil.WriteFile(path, old, paths.FilePerm600); err != nil {
 		t.Fatal(err)
 	}
 	if skip, _ := recentFillSubmit(root, whatsnext.FillKindGhostRef); skip {

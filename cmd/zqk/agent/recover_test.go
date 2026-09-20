@@ -20,11 +20,11 @@ func TestRecoverCmd_NoArgs(t *testing.T) {
 
 	repoRoot := t.TempDir()
 	t.Setenv(zqkenv.ProjectRoot().Name(), repoRoot)
-	_ = fileutil.MkdirAll(filepath.Join(repoRoot, ".zqk", "state", "cache"), 0755)
-	_ = fileutil.MkdirAll(filepath.Join(repoRoot, paths.ProcessDir), 0755)
+	_ = fileutil.MkdirAll(filepath.Join(repoRoot, paths.ProjectDataDir, paths.StateDir, "cache"), paths.DirPerm755)
+	_ = fileutil.MkdirAll(filepath.Join(repoRoot, paths.ProcessDir), paths.DirPerm755)
 
 	t.Cleanup(func() {
-		_ = fileutil.RemoveAll(filepath.Join(repoRoot, ".zqk"))
+		_ = fileutil.RemoveAll(filepath.Join(repoRoot, paths.ProjectDataDir))
 	})
 
 	err := cmd.Execute()
@@ -51,11 +51,11 @@ func TestRecoverCmd_WithArg(t *testing.T) {
 
 	repoRoot := t.TempDir()
 	t.Setenv(zqkenv.ProjectRoot().Name(), repoRoot)
-	_ = fileutil.MkdirAll(filepath.Join(repoRoot, ".zqk", "state", "cache"), 0755)
-	_ = fileutil.MkdirAll(filepath.Join(repoRoot, paths.ProcessDir), 0755)
+	_ = fileutil.MkdirAll(filepath.Join(repoRoot, paths.ProjectDataDir, paths.StateDir, "cache"), paths.DirPerm755)
+	_ = fileutil.MkdirAll(filepath.Join(repoRoot, paths.ProcessDir), paths.DirPerm755)
 
 	t.Cleanup(func() {
-		_ = fileutil.RemoveAll(filepath.Join(repoRoot, ".zqk"))
+		_ = fileutil.RemoveAll(filepath.Join(repoRoot, paths.ProjectDataDir))
 	})
 
 	err := cmd.Execute()

@@ -14,6 +14,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/storage"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"github.com/zqk-os/zqk/pkg/vds"
@@ -312,8 +313,8 @@ func vdsTitleLookup(proc *cli.Processor) vds.TitleLookup {
 }
 
 func persistVDSReport(projectRoot string, rep *vds.Report) error {
-	dir := filepath.Join(projectRoot, ".zqk", "state", "vds")
-	if err := fileutil.MkdirAll(dir, 0o755); err != nil {
+	dir := filepath.Join(projectRoot, paths.ProjectDataDir, paths.StateDir, "vds")
+	if err := fileutil.MkdirAll(dir, paths.DirPerm755); err != nil {
 		return err
 	}
 	path := filepath.Join(dir, "last_evaluate.json")
@@ -321,5 +322,5 @@ func persistVDSReport(projectRoot string, rep *vds.Report) error {
 	if err != nil {
 		return err
 	}
-	return fileutil.WriteFile(path, append(b, '\n'), 0o644)
+	return fileutil.WriteFile(path, append(b, '\n'), paths.FilePerm644)
 }

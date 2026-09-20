@@ -7,6 +7,7 @@ import (
 	"gopkg.in/yaml.v3"
 
 	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/paths"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -72,10 +73,10 @@ func SaveChunks(path string, chunks []Chunk) error {
 	if err != nil {
 		return errfmt.Errorf("vds: marshal chunks: %w", err)
 	}
-	if err := fileutil.MkdirAll(filepath.Dir(path), 0o755); err != nil {
+	if err := fileutil.MkdirAll(filepath.Dir(path), paths.DirPerm755); err != nil {
 		return errfmt.Errorf("vds: mkdir chunks dir: %w", err)
 	}
-	if err := fileutil.WriteFile(path, b, 0o644); err != nil {
+	if err := fileutil.WriteFile(path, b, paths.FilePerm644); err != nil {
 		return errfmt.Errorf("vds: write chunks %s: %w", path, err)
 	}
 	return nil
@@ -122,7 +123,7 @@ func ApplyIndependentVerifyYes(path string, chunkIDs []string) (int, error) {
 	wantN := len(toSet)
 	updated, n, ok := surgicalSetIndependentVerifyYes(string(raw), toSet)
 	if ok && n == wantN {
-		if err := fileutil.WriteFile(path, []byte(updated), 0o644); err != nil {
+		if err := fileutil.WriteFile(path, []byte(updated), paths.FilePerm644); err != nil {
 			return 0, errfmt.Errorf("vds: write chunks %s: %w", path, err)
 		}
 		return n, nil
@@ -143,7 +144,7 @@ func ApplyIndependentVerifyYes(path string, chunkIDs []string) (int, error) {
 	if err != nil {
 		return 0, errfmt.Errorf("vds: marshal chunks: %w", err)
 	}
-	if err := fileutil.WriteFile(path, b, 0o644); err != nil {
+	if err := fileutil.WriteFile(path, b, paths.FilePerm644); err != nil {
 		return 0, errfmt.Errorf("vds: write chunks %s: %w", path, err)
 	}
 	return len(toSet), nil

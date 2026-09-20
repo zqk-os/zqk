@@ -23,8 +23,8 @@ const (
 	summaryErrorSuffix = ": error: "
 	summaryIDSeparator = ": "
 	detailsErrorKey    = "error"
-	configDirPerm      = 0o755
-	configFilePerm     = 0o600
+	configDirPerm      = paths.DirPerm755
+	configFilePerm     = paths.FilePerm600
 	jsonIndentPrefix   = ""
 	jsonIndentValue    = "  "
 	defaultMonitorOn   = true

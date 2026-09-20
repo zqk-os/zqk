@@ -5,6 +5,7 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/testrunner"
 )
 
@@ -36,7 +37,7 @@ func TestNeedsReview(t *testing.T) {
 }
 `
 	file := filepath.Join(tempDir, "sample_test.go")
-	if err := os.WriteFile(file, []byte(testCode), 0o644); err != nil {
+	if err := os.WriteFile(file, []byte(testCode), paths.FilePerm644); err != nil {
 		t.Fatalf("write test file: %v", err)
 	}
 

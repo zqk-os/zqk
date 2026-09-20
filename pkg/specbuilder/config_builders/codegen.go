@@ -11,6 +11,7 @@ import (
 
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -25,8 +26,8 @@ const codegenSourcePath = "pkg/specbuilder/config_builders/codegen.go"
 const regenerateConfigBuildersCommand = "zqk system generate-config-builders --overwrite"
 
 const (
-	defaultDirectoryPerm fileutil.FileMode = 0o755
-	defaultFilePerm      fileutil.FileMode = 0o600
+	defaultDirectoryPerm fileutil.FileMode = paths.DirPerm755
+	defaultFilePerm      fileutil.FileMode = paths.FilePerm600
 )
 
 // defaultConfigYAMLVersion is the top-level "version" string in internal config YAML for v1 builders.

@@ -438,14 +438,14 @@ func (cm *ContextManager) loadUserConfig() error {
 		return err
 	}
 
-	primaryPath := filepath.Join(homeDir, ".zqk", "config", "config.yaml")
+	primaryPath := filepath.Join(homeDir, paths.ProjectDataDir, paths.ConfigDir, "config.yaml")
 	cfg, err := cm.loadConfigFile(primaryPath)
 	if err != nil {
 		return err
 	}
 	// Backward-compat: if primary config is empty, try legacy path.
 	if len(cfg) == 0 {
-		legacyPath := filepath.Join(homeDir, ".zqk", "config", "config.yaml")
+		legacyPath := filepath.Join(homeDir, paths.ProjectDataDir, paths.ConfigDir, "config.yaml")
 		if legacyCfg, _ := cm.loadConfigFile(legacyPath); len(legacyCfg) > 0 {
 			cfg = legacyCfg
 		}

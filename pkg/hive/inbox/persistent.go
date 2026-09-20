@@ -8,6 +8,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -43,7 +44,7 @@ func NewPersistentInbox(stateDir string) (*PersistentInbox, error) {
 	}
 
 	logPath := filepath.Join(stateDir, "inbox_tde.jsonl")
-	file, err := fileutil.OpenFile(logPath, fileutil.O_CREATE|fileutil.O_RDWR|fileutil.O_APPEND, 0600)
+	file, err := fileutil.OpenFile(logPath, fileutil.O_CREATE|fileutil.O_RDWR|fileutil.O_APPEND, paths.FilePerm600)
 	if err != nil {
 		return nil, fmt.Errorf("failed to open inbox log: %w", err)
 	}

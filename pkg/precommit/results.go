@@ -28,8 +28,8 @@ const MaxCategoryAge = 24 * time.Hour
 const staleSuffix = " (stale: no fresh run)"
 
 const (
-	preCommitDirPerm   = 0o755
-	preCommitFilePerm  = 0o600
+	preCommitDirPerm   = paths.DirPerm755
+	preCommitFilePerm  = paths.FilePerm600
 	jsonFileExt        = ".json"
 	jsonIndentPrefix   = ""
 	jsonIndentValue    = "  "

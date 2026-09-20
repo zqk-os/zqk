@@ -317,7 +317,7 @@ func TestJobLock_DefaultConfig(t *testing.T) {
 	tmpDir := t.TempDir()
 	config := DefaultJobLockConfig(tmpDir)
 
-	expectedDir := filepath.Join(tmpDir, paths.ProjectDataDir, "scheduler", "locks")
+	expectedDir := filepath.Join(tmpDir, paths.ProjectDataDir, paths.SchedulerSubdir, "locks")
 	if config.LockDir != expectedDir {
 		t.Errorf("Expected LockDir '%s', got '%s'", expectedDir, config.LockDir)
 	}

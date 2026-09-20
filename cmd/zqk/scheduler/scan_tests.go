@@ -12,6 +12,7 @@ import (
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/storage"
 	"github.com/zqk-os/zqk/pkg/testscan"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
@@ -192,7 +193,7 @@ func resolveScanTestsSourceRoot(studioRoot string, cmd *cobra.Command) (string, 
 		}
 		return abs, nil
 	}
-	candidate := filepath.Join(studioRoot, ".zqk", "local-ci", "workdir")
+	candidate := filepath.Join(studioRoot, paths.ProjectDataDir, "local-ci", "workdir")
 	if st, err := fileutil.Stat(filepath.Join(candidate, "go.mod")); err == nil && !st.IsDir() {
 		abs, err := filepath.Abs(candidate)
 		if err != nil {

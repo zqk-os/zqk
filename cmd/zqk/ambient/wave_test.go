@@ -73,8 +73,8 @@ func TestRunWaveLogic(t *testing.T) {
 	}
 
 	// Create system-check summary (for KernelAmbience)
-	sysCheckPath := filepath.Join(tmpDir, paths.ProjectDataDir, "logs", "system-check.json")
-	_ = fileutil.MkdirAll(filepath.Dir(sysCheckPath), 0755)
+	sysCheckPath := filepath.Join(tmpDir, paths.ProjectDataDir, paths.LogsDir, "system-check.json")
+	_ = fileutil.MkdirAll(filepath.Dir(sysCheckPath), paths.DirPerm755)
 	_ = fileutil.WriteFile(sysCheckPath, []byte(`{
 		"summary": {
 			"total_objects": 100,
@@ -82,7 +82,7 @@ func TestRunWaveLogic(t *testing.T) {
 			"blocking_issues": 3,
 			"ghost_ref_count": 4
 		}
-	}`), 0644)
+	}`), paths.FilePerm644)
 
 	_ = caspkg.GetGlobalListingIndexWriteQueue().FlushKind("command_metric", 2*time.Second)
 	_ = caspkg.GetGlobalListingIndexWriteQueue().FlushKind("scheduler_health_metric", 2*time.Second)
@@ -99,7 +99,7 @@ func TestRunWaveLogic(t *testing.T) {
 	}
 
 	// Verify metrics-rollup.json
-	rollupPath := filepath.Join(tmpDir, paths.ProjectDataDir, "state", "ambient", "metrics-rollup.json")
+	rollupPath := filepath.Join(tmpDir, paths.ProjectDataDir, paths.StateDir, "ambient", "metrics-rollup.json")
 	b, err := fileutil.ReadFile(rollupPath)
 	if err != nil {
 		t.Fatalf("failed to read rollup: %v", err)
@@ -132,12 +132,12 @@ func TestRunWaveLogic(t *testing.T) {
 
 	// Human-log clusters (optional fixture)
 	logDir := filepath.Join(tmpDir, paths.ProjectDataDir, paths.LogsDir)
-	_ = fileutil.MkdirAll(logDir, 0755)
+	_ = fileutil.MkdirAll(logDir, paths.DirPerm755)
 	_ = fileutil.WriteFile(filepath.Join(logDir, paths.LogEventsPrefix+"human.log"), []byte(
 		"2026-08-13T04:17:33Z [error] Ambient probe failed code=1\n"+
 			"2026-08-13T04:17:34Z [error] Ambient probe failed code=2\n"+
 			"2026-08-13T04:17:35Z [warn] Disk pressure high pct=91\n",
-	), 0644)
+	), paths.FilePerm644)
 
 	cmd2 := execwrap.Command(cliBinary, "ambient", "wave")
 	cmd2.Dir = tmpDir

@@ -3,9 +3,11 @@ package pm
 import (
 	"encoding/json"
 	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/zqk-os/zqk/pkg/dna"
+	"github.com/zqk-os/zqk/pkg/paths"
 )
 
 func TestMigrateLegacyBacklogItemYAML(t *testing.T) {
@@ -143,7 +145,7 @@ description: Missing title`
 }
 
 func TestMigrateActualCASBacklogFile(t *testing.T) {
-	samplePath := "../../.zqk/process/backlog_items/0012e74fe0f16c0aadf6d0eae87c63f612ca8537b8374b21687aa861cf9adc0e.yaml"
+	samplePath := filepath.Join("../..", paths.ProcessBacklogDir, "0012e74fe0f16c0aadf6d0eae87c63f612ca8537b8374b21687aa861cf9adc0e.yaml")
 	data, err := os.ReadFile(samplePath)
 	if err != nil {
 		t.Skipf("sample CAS file %s not found, skipping disk test", samplePath)

@@ -61,7 +61,7 @@ func AppendStewardEnqueueRecord(projectRoot string, rec map[string]any) error {
 	}
 
 	// Fallback path calculation to avoid datacell dependency
-	path := filepath.Join(root, paths.ProjectDataDir, "logs", "datacell", "steward_enqueue.jsonl")
+	path := filepath.Join(root, paths.ProjectDataDir, paths.LogsDir, "datacell", "steward_enqueue.jsonl")
 
 	line, err := json.Marshal(rec)
 	if err != nil {

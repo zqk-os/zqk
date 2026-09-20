@@ -12,7 +12,7 @@ import (
 func TestCreateHealthCheckChangeJournalEntry_LifetimeCounters(t *testing.T) {
 	tmpDir := t.TempDir()
 	journalDir := filepath.Join(tmpDir, paths.ProcessDir, "change_journal_entry")
-	if err := fileutil.MkdirAll(journalDir, 0755); err != nil {
+	if err := fileutil.MkdirAll(journalDir, paths.DirPerm755); err != nil {
 		t.Fatalf("MkdirAll failed: %v", err)
 	}
 

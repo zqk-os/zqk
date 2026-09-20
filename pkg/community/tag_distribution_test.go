@@ -36,7 +36,7 @@ func TestTagDistribution_FunctionalAcceptance(t *testing.T) {
 		archive := FormatArchiveName("v2.9.4-rc1", p.OS, p.Arch)
 		archivePath := filepath.Join(tmpDir, archive)
 		content := []byte("binary payload for " + p.OS + "/" + p.Arch + " at tag v2.9.4-rc1")
-		if err := fileutil.WriteFile(archivePath, content, 0644); err != nil {
+		if err := fileutil.WriteFile(archivePath, content, paths.FilePerm644); err != nil {
 			t.Fatalf("failed to write mock archive: %v", err)
 		}
 		hash, err := ComputeFileSHA256(archivePath)
@@ -51,7 +51,7 @@ func TestTagDistribution_FunctionalAcceptance(t *testing.T) {
 		manifestLines = append(manifestLines, hash+"  "+archive)
 	}
 	manifestPath := filepath.Join(tmpDir, "checksums.txt")
-	if err := fileutil.WriteFile(manifestPath, []byte(strings.Join(manifestLines, "\n")), 0644); err != nil {
+	if err := fileutil.WriteFile(manifestPath, []byte(strings.Join(manifestLines, "\n")), paths.FilePerm644); err != nil {
 		t.Fatalf("failed to write manifest: %v", err)
 	}
 
@@ -130,7 +130,7 @@ func TestTagDistribution_BoundaryAndErrorHandling(t *testing.T) {
 	tmpDir := t.TempDir()
 	manifestPath := filepath.Join(tmpDir, "checksums.txt")
 	manifestContent := "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef  missing-archive.tar.gz\n"
-	_ = fileutil.WriteFile(manifestPath, []byte(manifestContent), 0644)
+	_ = fileutil.WriteFile(manifestPath, []byte(manifestContent), paths.FilePerm644)
 	if err := VerifyChecksumManifest(tmpDir); err == nil {
 		t.Errorf("expected VerifyChecksumManifest to fail on missing archives, but passed")
 	}

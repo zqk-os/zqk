@@ -8,10 +8,8 @@ import (
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
 	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
 	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/paths"
 )
-
-const canonicalCommandSpecsRelativePath = ".zqk/cli/specs"
-const commandSpecCoverageBaselineRelativePath = ".zqk/cli/command_spec_coverage_baseline.json"
 
 type commandSpecCoverageSummary struct {
 	Valid                    bool   `json:"valid" yaml:"valid"`
@@ -56,10 +54,10 @@ func runValidateCommandSpecs(command *cobra.Command, _ []string) error {
 		return errfmt.Errorf("not a ZQK project (no project root found)")
 	}
 	if specsDir == emptyValue {
-		specsDir = filepath.Join(projectRoot, canonicalCommandSpecsRelativePath)
+		specsDir = filepath.Join(projectRoot, paths.ProjectDataDir, paths.CLISpecsDir)
 	}
 	if baselinePath == emptyValue {
-		baselinePath = filepath.Join(projectRoot, commandSpecCoverageBaselineRelativePath)
+		baselinePath = filepath.Join(projectRoot, paths.ProjectDataDir, "cli", "command_spec_coverage_baseline.json")
 	}
 
 	coverage, err := clipkg.AnalyzeCommandSpecCoverage(command.Root(), specsDir)

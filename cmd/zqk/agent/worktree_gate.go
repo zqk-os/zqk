@@ -16,8 +16,6 @@ import (
 // worktree sandbox + pre-trunk build gate.
 
 const (
-	agentWorktreeMarker       = ".zqk/worktrees/"
-	agentWorktreeTempMarker   = "zqk-worktrees/"
 	worktreeBuildCheckTimeout = 3 * time.Minute
 )
 

@@ -18,7 +18,7 @@ func TestGeminiAdapter_Ingest(t *testing.T) {
 	geminiDir := filepath.Join(tempDir, paths.ProjectDataDir)
 
 	// Create test files
-	assert.NoError(t, fileutil.Mkdir(geminiDir, 0755))
+	assert.NoError(t, fileutil.Mkdir(geminiDir, paths.DirPerm755))
 	assert.NoError(t, fileutil.WriteStandardFile(filepath.Join(geminiDir, "agent.json"), []byte("{}")))
 	assert.NoError(t, fileutil.WriteStandardFile(filepath.Join(geminiDir, "config.yaml"), []byte("key: value")))
 	assert.NoError(t, fileutil.WriteStandardFile(filepath.Join(geminiDir, "notes.txt"), []byte("some notes")))

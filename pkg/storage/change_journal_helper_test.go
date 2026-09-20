@@ -15,7 +15,7 @@ func TestCreateChangeJournalEntryWithBuilder_LifetimeCounters(t *testing.T) {
 	tmpDir := filepath.Join(t.TempDir(), "test-project")
 	mustEnsureProcessSpecsLayout(t, tmpDir)
 	journalDir := filepath.Join(tmpDir, paths.ProcessDir, "change_journal_entry")
-	if err := fileutil.MkdirAll(journalDir, 0755); err != nil {
+	if err := fileutil.MkdirAll(journalDir, paths.DirPerm755); err != nil {
 		t.Fatalf("MkdirAll failed: %v", err)
 	}
 

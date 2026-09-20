@@ -8,6 +8,7 @@ import (
 
 	"github.com/zqk-os/zqk/pkg/datacell"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -142,7 +143,7 @@ func TestAppendEvent_disabledFails(t *testing.T) {
 
 func TestAppendEvent_respectsEventsPathOverride(t *testing.T) {
 	root := t.TempDir()
-	rel := filepath.Join(".zqk", "logs", "custom", "events.jsonl")
+	rel := filepath.Join(paths.ProjectDataDir, paths.LogsDir, "custom", "events.jsonl")
 	if err := datacell.WriteAgentChatChannelConfig(root, datacell.AgentChatChannelConfig{
 		SchemaVersion:           datacell.AgentChatChannelSchemaVersion,
 		Enabled:                 true,

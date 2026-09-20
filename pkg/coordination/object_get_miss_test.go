@@ -2,7 +2,11 @@ package coordination
 
 import (
 	"errors"
+	"fmt"
 	"testing"
+
+	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
 func TestExpectedObjectGetMiss(t *testing.T) {
@@ -22,7 +26,8 @@ func TestExpectedObjectGetMiss(t *testing.T) {
 	if !expectedObjectGetMiss(errors.New("unauthorized: account ACC-system not found in account index")) {
 		t.Fatal("acc-system")
 	}
-	if !expectedObjectGetMiss(errors.New("unauthorized: missing token in ~/.zqk/credentials or ZQK_API_KEY")) {
+	expectedAuthErr := fmt.Sprintf("unauthorized: missing token in ~/%s/credentials or %s", paths.ProjectDataDir, zqkenv.APIKey())
+	if !expectedObjectGetMiss(errors.New(expectedAuthErr)) {
 		t.Fatal("missing token")
 	}
 }

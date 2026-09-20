@@ -13,8 +13,8 @@ import (
 func TestRunFilesystemProjectSnapshot_Buckets(t *testing.T) {
 	t.Parallel()
 	root := t.TempDir()
-	_ = fileutil.MkdirAll(filepath.Join(root, paths.ProjectDataDir, "logs", "a"), paths.DirPerm750)
-	_ = fileutil.WriteFile(filepath.Join(root, paths.ProjectDataDir, "logs", "a", "x.jsonl"), []byte("hi"), paths.FilePerm600)
+	_ = fileutil.MkdirAll(filepath.Join(root, paths.ProjectDataDir, paths.LogsDir, "a"), paths.DirPerm750)
+	_ = fileutil.WriteFile(filepath.Join(root, paths.ProjectDataDir, paths.LogsDir, "a", "x.jsonl"), []byte("hi"), paths.FilePerm600)
 	_ = fileutil.MkdirAll(filepath.Join(root, "docs"), paths.DirPerm750)
 	_ = fileutil.WriteFile(filepath.Join(root, "docs", "readme.md"), []byte("doc"), paths.FilePerm600)
 	_ = fileutil.MkdirAll(filepath.Join(root, "pkg", "x"), paths.DirPerm750)

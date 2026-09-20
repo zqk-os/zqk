@@ -105,12 +105,12 @@ func TestTriggerPlanOrchestrationSubmitsAgentOrchestrate(t *testing.T) {
 
 	root := t.TempDir()
 	binDir := filepath.Join(root, "bin")
-	if err := fileutil.MkdirAll(binDir, 0o750); err != nil {
+	if err := fileutil.MkdirAll(binDir, paths.DirPerm750); err != nil {
 		t.Fatal(err)
 	}
 	zqkPath := filepath.Join(binDir, "zqk")
 	script := "#!/bin/sh\nprintf '%s\\n' \"$@\" > \"$0.args\"\n"
-	if err := fileutil.WriteFile(zqkPath, []byte(script), 0o700); err != nil {
+	if err := fileutil.WriteFile(zqkPath, []byte(script), paths.DirPerm700); err != nil {
 		t.Fatal(err)
 	}
 

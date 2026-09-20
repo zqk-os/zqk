@@ -23,6 +23,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/zqk-os/zqk/pkg/lifecycle"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/storage"
 	"github.com/zqk-os/zqk/pkg/walutil"
 )
@@ -270,7 +271,7 @@ type DashboardLitePayload struct {
 
 // LiteFilePath returns the canonical on-disk path for the materialized test dashboard lite-file.
 func LiteFilePath(projectRoot string) string {
-	return filepath.Join(projectRoot, ".zqk", "state", "test_dashboard_lite.json")
+	return filepath.Join(projectRoot, paths.ProjectDataDir, paths.StateDir, "test_dashboard_lite.json")
 }
 
 // LoadFromLiteFile loads the materialized dashboard projection from disk without hitting the storage layer.

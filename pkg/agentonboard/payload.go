@@ -2,8 +2,10 @@ package agentonboard
 
 import (
 	"fmt"
+	"path/filepath"
 
 	"github.com/zqk-os/zqk/pkg/brand"
+	"github.com/zqk-os/zqk/pkg/paths"
 )
 
 // BootPayload returns the regenerable directive written into vendor config files.
@@ -39,7 +41,7 @@ func BootPayload() string {
 }
 
 // SyncReportRelPath is the workspace→kernel sync artifact (lite file under .zqk/config).
-const SyncReportRelPath = ".zqk/config/agent_workspace_sync.json"
+var SyncReportRelPath = filepath.ToSlash(filepath.Join(paths.ProjectDataDir, paths.ConfigDir, "agent_workspace_sync.json"))
 
 // SyncReportSchema identifies the sync report JSON shape.
 const SyncReportSchema = "zqk_agent_workspace_sync_v1"

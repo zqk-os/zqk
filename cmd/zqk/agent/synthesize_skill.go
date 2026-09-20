@@ -82,7 +82,7 @@ func runSynthesizeSkill(cmd *cobra.Command, opts SynthesizeSkillOptions) error {
 			in := payload.(*synthesizeSkillPayload)
 
 			skillSlug := strings.ToLower(strings.ReplaceAll(in.opts.Capability, " ", "-"))
-			skillDir := filepath.Join(projectRoot, paths.ProjectDataDir, "skills", skillSlug)
+			skillDir := filepath.Join(projectRoot, paths.ProjectDataDir, paths.SkillsSubdir, skillSlug)
 			if err := fileutil.EnsureDir(skillDir); err != nil {
 				return nil, err
 			}

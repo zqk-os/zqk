@@ -16,6 +16,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/lifecycle"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/storage"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"github.com/zqk-os/zqk/pkg/walutil"
@@ -61,9 +62,9 @@ func NewEngine[T any](spec AccumulatorSpec, acc Accumulator[T]) (*Engine[T], err
 
 	if spec.StoragePath == "" {
 		if spec.ProjectRoot == "" {
-			spec.StoragePath = filepath.Join(".zqk", "state", fmt.Sprintf("%s_lite.json", name))
+			spec.StoragePath = filepath.Join(paths.ProjectDataDir, paths.StateDir, fmt.Sprintf("%s_lite.json", name))
 		} else {
-			spec.StoragePath = filepath.Join(spec.ProjectRoot, ".zqk", "state", fmt.Sprintf("%s_lite.json", name))
+			spec.StoragePath = filepath.Join(spec.ProjectRoot, paths.ProjectDataDir, paths.StateDir, fmt.Sprintf("%s_lite.json", name))
 		}
 	}
 
@@ -120,7 +121,7 @@ func (e *Engine[T]) SaveToLiteFile() error {
 	envelope := e.BuildEnvelope()
 
 	targetPath := e.spec.StoragePath
-	if err := os.MkdirAll(filepath.Dir(targetPath), 0755); err != nil {
+	if err := os.MkdirAll(filepath.Dir(targetPath), paths.DirPerm755); err != nil {
 		return fmt.Errorf("create state dir: %w", err)
 	}
 
@@ -130,7 +131,7 @@ func (e *Engine[T]) SaveToLiteFile() error {
 	}
 
 	tmpFile := fmt.Sprintf("%s.tmp.%d", targetPath, time.Now().UnixNano())
-	if err := fileutil.WriteFile(tmpFile, data, 0644); err != nil {
+	if err := fileutil.WriteFile(tmpFile, data, paths.FilePerm644); err != nil {
 		return fmt.Errorf("write temp lite file: %w", err)
 	}
 

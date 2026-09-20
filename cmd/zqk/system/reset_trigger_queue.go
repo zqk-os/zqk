@@ -19,7 +19,7 @@ func NewResetTriggerQueueCmd() *cobra.Command {
 		Short: "Clear the scheduler trigger queue to prevent startup DDOS",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			// Get path using internal paths logic
-			queueDir := filepath.Join(zqkenv.ProjectRoot().Get(), paths.ProjectDataDir, "scheduler", "triggers")
+			queueDir := filepath.Join(zqkenv.ProjectRoot().Get(), paths.ProjectDataDir, paths.SchedulerSubdir, "triggers")
 			err := fileutil.RemoveAll(queueDir)
 			if err == nil {
 				return cli.WriteOutput(cmd, []byte("Trigger queue cleared.\n"))

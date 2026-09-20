@@ -9,6 +9,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/execwrap"
 
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -70,7 +71,7 @@ func EvalPredicate(ctx context.Context, pred string, chunk Chunk, opt EvalOption
 	case "tests_ok_per_customization":
 		return predTests(pred, chunk, opt)
 	case "smoke_or_integration_evidence_present":
-		return predEvidenceKind(pred, chunk, []string{"smoke", "integration", "e2e", ".zqk/logs", "SCH-", "job"}, "smoke/integration")
+		return predEvidenceKind(pred, chunk, []string{"smoke", "integration", "e2e", paths.LogsDir, "SCH-", "job"}, "smoke/integration")
 	case "ci_required_checks_green_or_na":
 		return predCIOrNA(pred, chunk, opt)
 	case "security_gate_ok_or_na":
@@ -239,7 +240,7 @@ func predTests(pred string, chunk Chunk, opt EvalOptions) PredicateResult {
 		if strings.Contains(rl, "sch-") || strings.Contains(rl, "job") {
 			hasJob = true
 		}
-		if strings.Contains(rl, ".zqk/logs") || strings.HasSuffix(rl, ".log") || strings.Contains(rl, "health.jsonl") {
+		if strings.Contains(rl, paths.LogsDir) || strings.HasSuffix(rl, ".log") || strings.Contains(rl, "health.jsonl") {
 			hasLog = true
 			if pathExists(opt.ProjectRoot, r) {
 				hasLog = true
@@ -357,8 +358,8 @@ func predPublishAck(pred string, chunk Chunk, opt EvalOptions) PredicateResult {
 	}
 	joined := strings.ToLower(strings.Join(chunk.EvidenceRefs, " "))
 	if strings.Contains(joined, "public_push_ack") || strings.Contains(joined, "publish_ack") {
-		if pathExists(opt.ProjectRoot, ".zqk/state/public_push_ack.json") ||
-			strings.Contains(joined, ".zqk/state/public_push_ack.json") {
+		ackPath := filepath.Join(paths.ProjectDataDir, paths.StateDir, "public_push_ack.json")
+		if pathExists(opt.ProjectRoot, ackPath) || strings.Contains(joined, ackPath) {
 			return PredicateResult{Predicate: pred, OK: true, Detail: "publish ack referenced"}
 		}
 		return PredicateResult{Predicate: pred, OK: true, Detail: "publish ack token in evidence_refs"}

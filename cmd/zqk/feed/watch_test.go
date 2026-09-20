@@ -12,6 +12,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/datacell"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -32,9 +33,9 @@ func TestProcessFeed_RendersFullMessageAndLabelsWakeStubs(t *testing.T) {
 	}
 
 	eventsPath := datacell.EffectiveAgentChatChannelEventsJSONLPath(root, cfg)
-	_ = fileutil.MkdirAll(filepath.Dir(eventsPath), 0755)
+	_ = fileutil.MkdirAll(filepath.Dir(eventsPath), paths.DirPerm755)
 
-	f, err := fileutil.OpenFile(eventsPath, fileutil.O_CREATE|fileutil.O_WRONLY|fileutil.O_APPEND, 0644)
+	f, err := fileutil.OpenFile(eventsPath, fileutil.O_CREATE|fileutil.O_WRONLY|fileutil.O_APPEND, paths.FilePerm644)
 	if err != nil {
 		t.Fatalf("OpenFile: %v", err)
 	}

@@ -3,6 +3,7 @@ package reqharness
 import (
 	"context"
 	"encoding/json"
+	"github.com/zqk-os/zqk/pkg/paths"
 	"os"
 	"path/filepath"
 	"testing"
@@ -185,7 +186,7 @@ func TestLoadRequirements_rejectsEmptyAndMissing(t *testing.T) {
 		t.Fatal("missing file must error")
 	}
 	empty := filepath.Join(d, "empty.json")
-	if err := os.WriteFile(empty, []byte("[]"), 0o600); err != nil {
+	if err := os.WriteFile(empty, []byte("[]"), paths.FilePerm600); err != nil {
 		t.Fatalf("write: %v", err)
 	}
 	if _, err := LoadRequirements(empty); err == nil {

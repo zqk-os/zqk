@@ -111,7 +111,7 @@ func TestContainerDistribution_BoundaryAndErrorHandling(t *testing.T) {
 	// 3. Corrupt archive
 	tmpDir := t.TempDir()
 	corruptTgz := filepath.Join(tmpDir, "corrupt.tgz")
-	if err := os.WriteFile(corruptTgz, []byte("invalid gzip stream content"), 0644); err != nil {
+	if err := os.WriteFile(corruptTgz, []byte("invalid gzip stream content"), paths.FilePerm644); err != nil {
 		t.Fatalf("failed to write corrupt archive: %v", err)
 	}
 	cmdCorrupt := exec.Command("bash", packageScript, "--verify", corruptTgz)

@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -43,7 +44,7 @@ func AppendRollupStatusCoreEvent(projectRoot, convergenceSessionID string, rollu
 	if err := fileutil.EnsureDir(filepath.Dir(path)); err != nil {
 		return
 	}
-	f, err := fileutil.OpenFile(path, fileutil.O_WRONLY|fileutil.O_CREATE|fileutil.O_APPEND, 0o600)
+	f, err := fileutil.OpenFile(path, fileutil.O_WRONLY|fileutil.O_CREATE|fileutil.O_APPEND, paths.FilePerm600)
 	if err != nil {
 		return
 	}

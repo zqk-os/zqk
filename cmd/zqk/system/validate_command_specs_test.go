@@ -9,6 +9,7 @@ import (
 
 	"github.com/zqk-os/zqk/internal/cli"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
+	"github.com/zqk-os/zqk/pkg/paths"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -32,7 +33,7 @@ func TestNewValidateCommandSpecsCmd(t *testing.T) {
 func TestRunValidateCommandSpecs_MockHierarchy(t *testing.T) {
 	dir := t.TempDir()
 	specsDir := filepath.Join(dir, "specs")
-	if err := fileutil.MkdirAll(specsDir, 0755); err != nil {
+	if err := fileutil.MkdirAll(specsDir, paths.DirPerm755); err != nil {
 		t.Fatal(err)
 	}
 
@@ -42,12 +43,12 @@ func TestRunValidateCommandSpecs_MockHierarchy(t *testing.T) {
 short: Alpha command
 common_flags: true
 `
-	if err := fileutil.WriteFile(alphaSpec, []byte(specContent), 0644); err != nil {
+	if err := fileutil.WriteFile(alphaSpec, []byte(specContent), paths.FilePerm644); err != nil {
 		t.Fatal(err)
 	}
 
 	baselineFile := filepath.Join(dir, "baseline.json")
-	if err := fileutil.WriteFile(baselineFile, []byte(`{"commands_without_specs":[]}`), 0644); err != nil {
+	if err := fileutil.WriteFile(baselineFile, []byte(`{"commands_without_specs":[]}`), paths.FilePerm644); err != nil {
 		t.Fatal(err)
 	}
 

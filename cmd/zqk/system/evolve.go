@@ -103,7 +103,7 @@ func runEvolve(cmd *cobra.Command, opts *EvolveOptions) error {
 		files := strings.Split(string(output), "\n")
 		for _, file := range files {
 			f := strings.TrimSpace(file)
-			if f == "" || strings.HasPrefix(f, ".git/") || strings.HasPrefix(f, "bin/") || strings.Contains(f, ".zqk/cache") {
+			if f == "" || strings.HasPrefix(f, ".git/") || strings.HasPrefix(f, "bin/") || strings.Contains(f, filepath.Join(paths.ProjectDataDir, paths.CacheDir)) {
 				continue
 			}
 			candidates = append(candidates, EvolutionCandidate{

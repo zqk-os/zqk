@@ -239,7 +239,7 @@ func setupCLITestEnvironmentForComprehensive(t *testing.T) (tmpDir, cliBinary st
 	if err != nil {
 		t.Fatalf("failed to read shared CLI binary: %v", err)
 	}
-	if err := fileutil.WriteFile(cliBinary, data, 0o755); err != nil { //nolint:gosec // test binary needs execution permissions
+	if err := fileutil.WriteFile(cliBinary, data, paths.DirPerm755); err != nil { //nolint:gosec // test binary needs execution permissions
 		t.Fatalf("failed to write CLI binary to temp dir: %v", err)
 	}
 

@@ -72,7 +72,7 @@ func NewMCPExecutorAt(ctx context.Context, mcpPath, workDir string) (*MCPExecuto
 	}
 	var traceFile, stderrFile string
 	if projectRoot != "" {
-		logsDir := filepath.Join(projectRoot, paths.ProjectDataDir, "logs")
+		logsDir := filepath.Join(projectRoot, paths.ProjectDataDir, paths.LogsDir)
 		_ = fileutil.EnsureDir(logsDir)
 		traceFile = filepath.Join(logsDir, "mcp-trace.log")
 		stderrFile = filepath.Join(logsDir, "mcp-stderr.log")

@@ -5,6 +5,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/zqk-os/zqk/pkg/paths"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -12,24 +13,24 @@ func TestDriftAuditor(t *testing.T) {
 	// Create temporary workspace
 	tempDir := t.TempDir()
 
-	primaryDir := filepath.Join(tempDir, ".zqk", "skills")
+	primaryDir := filepath.Join(tempDir, paths.ProjectDataDir, paths.SkillsSubdir)
 	secondaryDir := filepath.Join(tempDir, "skills")
 
-	if err := fileutil.MkdirAll(primaryDir, 0755); err != nil {
+	if err := fileutil.MkdirAll(primaryDir, paths.DirPerm755); err != nil {
 		t.Fatal(err)
 	}
-	if err := fileutil.MkdirAll(secondaryDir, 0755); err != nil {
+	if err := fileutil.MkdirAll(secondaryDir, paths.DirPerm755); err != nil {
 		t.Fatal(err)
 	}
 
 	// Helper to create a skill
 	createSkill := func(dir, name string, mtime time.Time) {
 		skillDir := filepath.Join(dir, name)
-		if err := fileutil.MkdirAll(skillDir, 0755); err != nil {
+		if err := fileutil.MkdirAll(skillDir, paths.DirPerm755); err != nil {
 			t.Fatal(err)
 		}
 		skillMd := filepath.Join(skillDir, "SKILL.md")
-		if err := fileutil.WriteFile(skillMd, []byte("test"), 0644); err != nil {
+		if err := fileutil.WriteFile(skillMd, []byte("test"), paths.FilePerm644); err != nil {
 			t.Fatal(err)
 		}
 		if err := fileutil.Chtimes(skillMd, mtime, mtime); err != nil {

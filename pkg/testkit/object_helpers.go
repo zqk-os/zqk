@@ -71,7 +71,7 @@ func WriteTestObjectStandalone(t testing.TB, projectRoot, content string) string
 	}
 
 	filePath := filepath.Join(kindDir, obj.ID+".yaml")
-	if err := fileutil.WriteFile(filePath, []byte(content), 0644); err != nil {
+	if err := fileutil.WriteFile(filePath, []byte(content), paths.FilePerm644); err != nil {
 		t.Fatalf("Failed to write test object: %v", err)
 	}
 

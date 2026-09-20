@@ -147,7 +147,7 @@ func runSyncIDPrefixesFromSpecs(cmd *cobra.Command, _ []string) error {
 			}
 
 			// Prepend schema comment
-			output := []byte("$schema: \"../../../.zqk/cli/specs/schemas/id_prefixes_config.schema.json\"\n\n" + string(data))
+			output := []byte("$schema: \"../../../" + paths.CLICommandSpecsDir + "/schemas/id_prefixes_config.schema.json\"\n\n" + string(data))
 
 			if err := fileutil.WriteSecureFile(configFile, output); err != nil {
 				return errfmt.Newf("failed to write config file").Wrap(err)

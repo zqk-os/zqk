@@ -71,7 +71,7 @@ func RecordSuccess(projectRoot, migrationID string) error {
 		return errfmt.Errorf("project root and migration id are required")
 	}
 	stateDir := filepath.Join(projectRoot, paths.ProjectDataDir, paths.StateDir)
-	if err := fileutil.MkdirAll(stateDir, 0o750); err != nil {
+	if err := fileutil.MkdirAll(stateDir, paths.DirPerm750); err != nil {
 		return errfmt.Newf("create state dir").Wrap(err)
 	}
 

@@ -686,7 +686,7 @@ func runOrchestrate(cmd *cobra.Command, planArg string, opts OrchestrateOptions)
 										zqkBin = filepath.Join(state.proc.ProjectRoot(), "bin", "zqk")
 									}
 									if _, stErr := fileutil.Stat(zqkBin); stErr != nil {
-										stable := filepath.Join(state.proc.ProjectRoot(), ".zqk", "bin", "zqk-stable")
+										stable := filepath.Join(state.proc.ProjectRoot(), paths.ProjectDataDir, "bin", "zqk-stable")
 										if _, sErr := fileutil.Stat(stable); sErr == nil {
 											zqkBin = stable
 										}
@@ -708,7 +708,7 @@ func runOrchestrate(cmd *cobra.Command, planArg string, opts OrchestrateOptions)
 									// Route logs to dedicated file so we can see why it's dying
 									logDir := filepath.Join(state.proc.ProjectRoot(), paths.ProjectDataDir, paths.LogsDir, "agent")
 									_ = fileutil.EnsureDir(logDir)
-									logFile, logErr := fileutil.OpenFile(filepath.Join(logDir, taskID+".log"), fileutil.O_CREATE|fileutil.O_WRONLY|fileutil.O_APPEND, 0o644)
+									logFile, logErr := fileutil.OpenFile(filepath.Join(logDir, taskID+".log"), fileutil.O_CREATE|fileutil.O_WRONLY|fileutil.O_APPEND, paths.FilePerm644)
 									if logErr != nil {
 										executorErr := errfmt.Newf("open executor log for %s", taskID).Wrap(logErr)
 										_ = persistOrchestratedTaskOutcome(
@@ -884,7 +884,7 @@ func runOrchestrate(cmd *cobra.Command, planArg string, opts OrchestrateOptions)
 						Markdown:  []byte(promptMarkdown),
 						SessionID: state.opts.SessionID,
 						Format:    "agent-prompt",
-						DestPath:  filepath.Join(state.proc.ProjectRoot(), paths.ProjectDataDir, "inbox", subAgent, fmt.Sprintf("%s.md", itemID)),
+						DestPath:  filepath.Join(state.proc.ProjectRoot(), paths.ProjectDataDir, paths.InboxSubdir, subAgent, fmt.Sprintf("%s.md", itemID)),
 						TDE:       tdeEnvelope,
 					}
 

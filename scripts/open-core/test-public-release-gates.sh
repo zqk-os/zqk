@@ -115,7 +115,12 @@ fi
 	unset ZQK_PROJECT_ROOT
 	export ZQK_ALLOW_FOREGROUND_GO_TEST=1
 
-	# 1. Build entire project (all packages across cmd and pkg)
+	# 1. Check hardcoded path and permission literals across repository
+	if [ -x "$ROOT/scripts/check-hardcoded-paths-and-perms-repo.sh" ]; then
+		"$ROOT/scripts/check-hardcoded-paths-and-perms-repo.sh" --no-dups
+	fi
+
+	# 2. Build entire project (all packages across cmd and pkg)
 	CGO_ENABLED=0 go build -buildvcs=false ./...
 	CGO_ENABLED=0 go build -buildvcs=false -o "$TMP_BIN" ./cmd/zqk
 	export ZQK_SHARED_TEST_BIN="$TMP_BIN"

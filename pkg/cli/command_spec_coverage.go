@@ -10,6 +10,7 @@ import (
 
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -140,7 +141,7 @@ func WriteCommandSpecCoverageBaseline(path string, coverage CommandSpecCoverage)
 		return err
 	}
 	data = append(data, '\n')
-	return fileutil.WriteFile(path, data, 0o644)
+	return fileutil.WriteFile(path, data, paths.FilePerm644)
 }
 
 func compareCoverageSets(current, baseline []string) (added, removed []string) {

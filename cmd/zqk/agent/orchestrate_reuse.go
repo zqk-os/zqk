@@ -397,7 +397,7 @@ func resetOrchestrationWorktree(ctx context.Context, worktreePath, baseRef strin
 		return errfmt.Newf("reset orchestration worktree %s to %s: %s", worktreePath, baseRef, strings.TrimSpace(string(out))).Wrap(err)
 	}
 	// Exclude process directories and .zqk: untracked hash YAML is kernel state.
-	clean := execwrap.CommandContext(ctx, "git", "clean", "-fd", "-e", paths.ProcessDir, "-e", paths.ProcessDir+"/", "-e", ".zqk", "-e", ".zqk/")
+	clean := execwrap.CommandContext(ctx, "git", "clean", "-fd", "-e", paths.ProcessDir, "-e", paths.ProcessDir+"/", "-e", paths.ProjectDataDir, "-e", paths.ProjectDataDir+"/")
 	clean.Dir = worktreePath
 	if out, err := clean.CombinedOutput(); err != nil {
 		return errfmt.Newf("clean orchestration worktree %s: %s", worktreePath, strings.TrimSpace(string(out))).Wrap(err)

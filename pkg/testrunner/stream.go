@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/paths"
 )
 
 // StreamOptions controls execution parameters for test progress streaming.
@@ -53,8 +54,8 @@ func StreamTests(ctx context.Context, opts StreamOptions, out io.Writer) (Stream
 
 	startTime := time.Now()
 	timestamp := startTime.Format("20060102_150405")
-	logDir := filepath.Join(opts.ProjectRoot, ".zqk", "logs")
-	_ = os.MkdirAll(logDir, 0o755)
+	logDir := filepath.Join(opts.ProjectRoot, paths.ProjectDataDir, paths.LogsDir)
+	_ = os.MkdirAll(logDir, paths.DirPerm755)
 	logFile := filepath.Join(logDir, fmt.Sprintf("test-output-%s.txt", timestamp))
 
 	logWriter, err := os.Create(logFile)

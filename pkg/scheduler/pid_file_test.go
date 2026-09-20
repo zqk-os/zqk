@@ -255,7 +255,7 @@ func TestForceKillSchedulerByPID_NotRunning(t *testing.T) {
 func TestGetPIDFilePath(t *testing.T) {
 	t.Parallel()
 	testRoot := "/tmp/test-project"
-	expected := filepath.Join(testRoot, paths.ProjectDataDir, "scheduler", DefaultPIDFileName)
+	expected := filepath.Join(testRoot, paths.ProjectDataDir, paths.SchedulerSubdir, DefaultPIDFileName)
 
 	actual := getPIDFilePath(testRoot)
 	if actual != expected {

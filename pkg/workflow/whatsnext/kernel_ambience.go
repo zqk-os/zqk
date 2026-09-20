@@ -153,8 +153,8 @@ type checkSummaryFile struct {
 func preferredCheckSummaryPaths(projectRoot string) []string {
 	return []string{
 		filepath.Join(projectRoot, paths.ProjectDataDir, paths.PreCommitDir, "system-check.json"),
-		filepath.Join(projectRoot, paths.ProjectDataDir, "logs", "system-check-autofix-dangling.json"),
-		filepath.Join(projectRoot, paths.ProjectDataDir, "logs", "system-check.json"),
+		filepath.Join(projectRoot, paths.ProjectDataDir, paths.LogsDir, "system-check-autofix-dangling.json"),
+		filepath.Join(projectRoot, paths.ProjectDataDir, paths.LogsDir, "system-check.json"),
 	}
 }
 
@@ -252,7 +252,7 @@ func EnrichMetricsRollup(amb *KernelAmbience, projectRoot string) {
 	if amb == nil {
 		return
 	}
-	path := filepath.Join(projectRoot, paths.ProjectDataDir, "state", "ambient", "metrics-rollup.json")
+	path := filepath.Join(projectRoot, paths.ProjectDataDir, paths.StateDir, "ambient", "metrics-rollup.json")
 	if b, err := fileutil.ReadFile(path); err == nil {
 		var rollup MetricsRollupSnapshot
 		if err := json.Unmarshal(b, &rollup); err == nil {

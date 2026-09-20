@@ -21,11 +21,11 @@ func TestScoreboardCmd(t *testing.T) {
 	t.Setenv(zqkenv.TestRoot().Name(), tempDir)
 	t.Cleanup(func() {
 		_ = storage.RunProjectTestTeardown(storage.TempProjectTeardown(tempDir, nil))
-		_ = fileutil.RemoveAll(filepath.Join(tempDir, ".zqk"))
+		_ = fileutil.RemoveAll(filepath.Join(tempDir, paths.ProjectDataDir))
 	})
 
 	// cli.WithProcessor requires a valid project structure
-	err := fileutil.MkdirAll(filepath.Join(tempDir, paths.ProcessDir), 0755)
+	err := fileutil.MkdirAll(filepath.Join(tempDir, paths.ProcessDir), paths.DirPerm755)
 	require.NoError(t, err)
 
 	storePath := datacell.AgentIdleStorePath(tempDir)

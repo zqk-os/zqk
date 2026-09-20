@@ -756,12 +756,12 @@ func TestObjectIDCache_BuildCache_BuildsReverseReferenceIndex(t *testing.T) {
 
 	// When object ID cache is rebuilt, reverse reference index should also be built and saved.
 	// Check object ID cache file first; if it wasn't created, the build path may not have completed (e.g. kind discovery).
-	objectIDCachePath := filepath.Join(projectRoot, paths.ProjectDataDir, "cache", "object-id-cache.json")
+	objectIDCachePath := filepath.Join(projectRoot, paths.ProjectDataDir, paths.CacheDir, "object-id-cache.json")
 	if _, err := fileutil.Stat(objectIDCachePath); err != nil {
 		t.Skipf("Object ID cache file not created (build path may vary): %v", err)
 	}
 
-	revCachePath := filepath.Join(projectRoot, paths.ProjectDataDir, "cache", "reverse-reference-index.json")
+	revCachePath := filepath.Join(projectRoot, paths.ProjectDataDir, paths.CacheDir, "reverse-reference-index.json")
 	if _, err := fileutil.Stat(revCachePath); err != nil {
 		if fileutil.IsNotExist(err) {
 			// Reverse ref build path may not run in all environments (e.g. kind discovery); covered by storage unit tests.
@@ -801,7 +801,7 @@ func TestTryBuildAndSaveReverseReferenceIndexSync_createsFile(t *testing.T) {
 		t.Fatalf("WriteFile: %v", err)
 	}
 
-	revPath := filepath.Join(projectRoot, paths.ProjectDataDir, "cache", "reverse-reference-index.json")
+	revPath := filepath.Join(projectRoot, paths.ProjectDataDir, paths.CacheDir, "reverse-reference-index.json")
 	if _, err := fileutil.Stat(revPath); err == nil {
 		t.Fatalf("reverse-reference-index.json should not exist yet: %s", revPath)
 	}

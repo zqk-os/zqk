@@ -5,6 +5,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/scheduler/clusterstatus"
 )
 
@@ -28,7 +29,7 @@ func TestBusFailClosedOnStale(t *testing.T) {
 	if d.AllowForward || d.Phase != clusterstatus.PhaseStale {
 		t.Fatalf("expected fail-closed stale, got %+v", d)
 	}
-	if _, err := filepath.Glob(filepath.Join(dir, ".zqk", "logs", "cluster_status", "*.jsonl")); err != nil {
+	if _, err := filepath.Glob(filepath.Join(dir, paths.ProjectDataDir, paths.LogsDir, "cluster_status", "*.jsonl")); err != nil {
 		t.Fatal(err)
 	}
 }

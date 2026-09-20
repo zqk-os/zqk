@@ -2,6 +2,7 @@ package system
 
 import (
 	"context"
+	"path/filepath"
 	"strings"
 	"testing"
 	"time"
@@ -10,6 +11,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/datacell"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -37,6 +39,7 @@ func TestNotifyLiteFileAgentChatMaterialized_enqueueJSONL(t *testing.T) {
 func TestMaterializeAgentChatChannelLiteFromObject(t *testing.T) {
 	t.Parallel()
 	at := time.Date(2026, 4, 16, 12, 0, 0, 0, time.UTC)
+	customPath := filepath.Join(paths.ProjectDataDir, paths.LogsDir, "ide-hooks", "custom.jsonl")
 	cfg, err := materializeAgentChatChannelLiteFromObject(map[string]any{
 		objects.FieldKeyKind:                    objects.KindAgentFeed,
 		objects.FieldKeyID:                      "AGF-test-1",
@@ -44,7 +47,7 @@ func TestMaterializeAgentChatChannelLiteFromObject(t *testing.T) {
 		objects.FieldKeyDeliveryMode:            "off",
 		objects.FieldKeyContractSchemaVersion:   "1",
 		objects.FieldKeyNote:                    "n",
-		objects.FieldKeyEventsJsonlPathOverride: ".zqk/logs/ide-hooks/custom.jsonl",
+		objects.FieldKeyEventsJsonlPathOverride: customPath,
 		objects.FieldKeyProbeToolAllowlist:      []any{"Shell", "run_terminal_cmd"},
 		objects.FieldKeyProbeCommandSubstrings:  []any{"zqk"},
 	}, at)
@@ -57,7 +60,7 @@ func TestMaterializeAgentChatChannelLiteFromObject(t *testing.T) {
 	if cfg.MaterializedAt != "2026-04-16T12:00:00Z" {
 		t.Fatalf("ts %q", cfg.MaterializedAt)
 	}
-	if cfg.EventsJSONLPathOverride != ".zqk/logs/ide-hooks/custom.jsonl" {
+	if cfg.EventsJSONLPathOverride != customPath {
 		t.Fatalf("override %q", cfg.EventsJSONLPathOverride)
 	}
 	if len(cfg.ProbeToolAllowlist) != 2 || cfg.ProbeToolAllowlist[0] != "Shell" {

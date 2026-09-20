@@ -499,7 +499,7 @@ func TestCASOrphanCleanupQueue_CleanupOrphanedDrafts(t *testing.T) {
 		t.Fatal("Expected per-test orphan cleanup queue from factory")
 	}
 
-	draftsDir := filepath.Join(testRoot, ".zqk", "drafts")
+	draftsDir := filepath.Join(testRoot, paths.ProjectDataDir, paths.DraftsSubdir)
 	if err := fileutil.MkdirAll(draftsDir, paths.DirPerm755); err != nil {
 		t.Fatalf("Failed to create drafts dir: %v", err)
 	}

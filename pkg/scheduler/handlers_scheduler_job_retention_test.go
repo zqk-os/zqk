@@ -83,7 +83,7 @@ func TestSchedulerJobRetentionHandler_Execute(t *testing.T) {
 			t.Fatalf("Failed to create old job %s: %v", id, err)
 		}
 		// Create log directory for this job
-		logDir := filepath.Join(projectRoot, paths.ProjectDataDir, "logs", "scheduler", id)
+		logDir := filepath.Join(projectRoot, paths.ProjectDataDir, paths.LogsDir, "scheduler", id)
 		if err := fileutil.MkdirAll(logDir, paths.DirPerm755); err != nil {
 			t.Fatalf("Failed to create log dir for %s: %v", id, err)
 		}
@@ -190,7 +190,7 @@ func TestSchedulerJobRetentionHandler_Execute(t *testing.T) {
 			t.Errorf("Old job %s should have been deleted but still exists", id)
 		}
 		// Verify log directory was removed
-		logDir := filepath.Join(projectRoot, paths.ProjectDataDir, "logs", "scheduler", id)
+		logDir := filepath.Join(projectRoot, paths.ProjectDataDir, paths.LogsDir, "scheduler", id)
 		if _, err := fileutil.Stat(logDir); err == nil {
 			t.Errorf("Log directory for deleted job %s should have been removed but still exists", id)
 		}

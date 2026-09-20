@@ -531,7 +531,7 @@ func TestVerifyCriticalPackagesHealth_UsesRecentRunsNotNewestCreatedJob(t *testi
 		objects.KindSchedulerJob: jobs,
 	}}
 	healthPath := TestBundlesHealthFilePath(root)
-	if err := fileutil.MkdirAll(filepath.Dir(healthPath), 0o755); err != nil {
+	if err := fileutil.MkdirAll(filepath.Dir(healthPath), paths.DirPerm755); err != nil {
 		t.Fatal(err)
 	}
 	var health bytes.Buffer
@@ -545,7 +545,7 @@ func TestVerifyCriticalPackagesHealth_UsesRecentRunsNotNewestCreatedJob(t *testi
 			t.Fatal(err)
 		}
 	}
-	if err := fileutil.WriteFile(healthPath, health.Bytes(), 0o644); err != nil {
+	if err := fileutil.WriteFile(healthPath, health.Bytes(), paths.FilePerm644); err != nil {
 		t.Fatal(err)
 	}
 

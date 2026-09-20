@@ -4,6 +4,7 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/zqk-os/zqk/pkg/paths"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -58,10 +59,10 @@ func TestScanDepthAndMin(t *testing.T) {
 	mustMk := func(rel string, size int) {
 		t.Helper()
 		p := filepath.Join(root, filepath.FromSlash(rel))
-		if err := fileutil.MkdirAll(filepath.Dir(p), 0o755); err != nil {
+		if err := fileutil.MkdirAll(filepath.Dir(p), paths.DirPerm755); err != nil {
 			t.Fatal(err)
 		}
-		if err := fileutil.WriteFile(p, make([]byte, size), 0o644); err != nil {
+		if err := fileutil.WriteFile(p, make([]byte, size), paths.FilePerm644); err != nil {
 			t.Fatal(err)
 		}
 	}

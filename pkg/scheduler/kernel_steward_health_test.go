@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/zqk-os/zqk/pkg/agentprompt"
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -14,7 +15,7 @@ func TestGatherHealthSignals(t *testing.T) {
 	tempDir := t.TempDir()
 
 	// Write a mock health.jsonl with some failing test entries
-	healthDir := filepath.Join(tempDir, ".zqk", "scheduler")
+	healthDir := filepath.Join(tempDir, paths.ProjectDataDir, paths.SchedulerSubdir)
 	if err := fileutil.EnsureDir(healthDir); err != nil {
 		t.Fatalf("failed to create health dir: %v", err)
 	}

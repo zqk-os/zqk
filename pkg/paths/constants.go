@@ -28,10 +28,19 @@ var (
 
 	// CLICommandSpecsDir is the canonical file-authored command DNA directory.
 	CLICommandSpecsDir = ProjectDataDir + "/cli/specs"
+
+	// ProjectStateDir is the root directory name for compressed snapshot state (.zqk-state).
+	ProjectStateDir = "." + brand.NamespacePrefix() + "-state"
+
+	// AgentPacksDir holds regenerable per-vendor boot packs.
+	AgentPacksDir = ProjectDataDir + "/agent_packs"
 )
 
 const (
 	configYAMLFileName = "config.yaml"
+
+	// DefaultProjectStateDir is the literal directory name for project state snapshots (".zqk-state").
+	DefaultProjectStateDir = ".zqk-state"
 
 	// GitWorktreeMetadataEntry is the file or directory name Git places at the root of a work tree.
 	// Tests and teardown use it to avoid stripping or scrubbing a real checkout.
@@ -69,6 +78,18 @@ const (
 	CallbackDir           = "callback-logs"
 	MigrationSnapshotsDir = "migration-snapshots"
 	WalDir                = "wal"
+	ProcessSubdir         = "process"
+	SpecsSubdir           = "specs"
+	SkillsSubdir          = "skills"
+	IdesSubdir            = "ides"
+	InboxSubdir           = "inbox"
+	SchedulerSubdir       = "scheduler"
+	StreamsSubdir         = "streams"
+	WorktreesSubdir       = "worktrees"
+	RunSubdir             = "run"
+	DraftsSubdir          = "drafts"
+	CleanupSubdir         = "cleanup"
+	AgentPacksSubdir      = "agent_packs"
 
 	// Logs subdirs: reports (object-count-report, etc.) live under logs/reports/
 	LogsReportsSubdir = "reports"
@@ -313,4 +334,6 @@ const (
 	DirPerm755  fs.FileMode = 0o755
 	FilePerm600 fs.FileMode = 0o600
 	FilePerm644 fs.FileMode = 0o644
+	FilePerm755 fs.FileMode = 0o755 // e.g. executable scripts, binaries, test runners
+	FilePerm700 fs.FileMode = 0o700 // e.g. private executable scripts, key material
 )

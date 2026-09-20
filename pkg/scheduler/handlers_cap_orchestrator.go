@@ -63,8 +63,8 @@ type CapOrchestratorHandler struct {
 func (h *CapOrchestratorHandler) wakeAgentAndScheduleHourglass(taskID, persona string) {
 	// 1. Wake Agent via chat channel (simulating MCP chat_inject)
 	eventPath := datacell.AgentChatChannelEventsJSONLPath(h.projectRoot)
-	if err := fileutil.MkdirAll(filepath.Dir(eventPath), 0755); err == nil {
-		if f, err := fileutil.OpenFile(eventPath, fileutil.O_APPEND|fileutil.O_CREATE|fileutil.O_WRONLY, 0644); err == nil {
+	if err := fileutil.MkdirAll(filepath.Dir(eventPath), paths.DirPerm755); err == nil {
+		if f, err := fileutil.OpenFile(eventPath, fileutil.O_APPEND|fileutil.O_CREATE|fileutil.O_WRONLY, paths.FilePerm644); err == nil {
 			timestamp := time.Now().UTC()
 			event := map[string]any{
 				"timestamp": timestamp.Format(time.RFC3339),
@@ -113,7 +113,7 @@ func (h *CapOrchestratorHandler) wakeAgentAndScheduleHourglass(taskID, persona s
 	deadlineStr := time.Now().Add(5 * time.Minute).Format(time.RFC3339)
 	schedulerRoot := paths.ResolvePathFromCacheOrConstant(h.projectRoot, "scheduler", filepath.Join(paths.ProjectDataDir, paths.SchedulerDir))
 	hourglassDir := filepath.Join(schedulerRoot, "hourglass")
-	_ = fileutil.MkdirAll(hourglassDir, 0755)
+	_ = fileutil.MkdirAll(hourglassDir, paths.DirPerm755)
 
 	filePath := filepath.Join(hourglassDir, taskID+".json")
 	info := map[string]any{
@@ -123,7 +123,7 @@ func (h *CapOrchestratorHandler) wakeAgentAndScheduleHourglass(taskID, persona s
 		objects.FieldKeyExpiresAt: deadlineStr,
 	}
 	if data, err := json.Marshal(info); err == nil {
-		_ = fileutil.WriteFile(filePath, data, 0644)
+		_ = fileutil.WriteFile(filePath, data, paths.FilePerm644)
 	}
 }
 
@@ -275,7 +275,7 @@ func buildHumanProvider(projectRoot string) EscalationProvider {
 	}
 
 	// Custom human command from escalation.json if configured
-	configPath := filepath.Join(projectRoot, paths.ProjectDataDir, "config", "escalation.json")
+	configPath := filepath.Join(projectRoot, paths.ProjectDataDir, paths.ConfigDir, "escalation.json")
 	if data, err := fileutil.ReadFile(configPath); err == nil {
 		var config struct {
 			HumanCommand string   `json:"human_command"`
@@ -297,7 +297,7 @@ func buildHumanProvider(projectRoot string) EscalationProvider {
 
 	// 3. Maintain bounded inbox directory with auto-pruning to prevent file clutter
 	providers = append(providers, &InboxEscalationProvider{
-		InboxDir:   filepath.Join(projectRoot, paths.ProjectDataDir, "inbox", "human"),
+		InboxDir:   filepath.Join(projectRoot, paths.ProjectDataDir, paths.InboxSubdir, "human"),
 		MaxHistory: 3,
 	})
 
@@ -312,7 +312,7 @@ func buildHumanProvider(projectRoot string) EscalationProvider {
 // the coder_agent inbox if no command is configured.
 func buildAgentProvider(projectRoot string) EscalationProvider {
 	// Check for custom escalation command in project config
-	configPath := filepath.Join(projectRoot, paths.ProjectDataDir, "config", "escalation.json")
+	configPath := filepath.Join(projectRoot, paths.ProjectDataDir, paths.ConfigDir, "escalation.json")
 	if data, err := fileutil.ReadFile(configPath); err == nil {
 		var config struct {
 			AgentCommand string   `json:"agent_command"`
@@ -329,7 +329,7 @@ func buildAgentProvider(projectRoot string) EscalationProvider {
 
 	// Default: write to coder_agent inbox (works regardless of provider)
 	return &InboxEscalationProvider{
-		InboxDir: filepath.Join(projectRoot, paths.ProjectDataDir, "inbox", "coder_agent"),
+		InboxDir: filepath.Join(projectRoot, paths.ProjectDataDir, paths.InboxSubdir, "coder_agent"),
 	}
 }
 

@@ -5,6 +5,7 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/zqk-os/zqk/pkg/paths"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -41,7 +42,7 @@ func (s *Server) Stop() {
 	fmt.Println("Server stopped.")
 }
 `
-	if err := fileutil.WriteFile(filepath.Join(dir, "server.go"), []byte(goCode), 0o644); err != nil {
+	if err := fileutil.WriteFile(filepath.Join(dir, "server.go"), []byte(goCode), paths.FilePerm644); err != nil {
 		t.Fatalf("failed writing server.go: %v", err)
 	}
 
@@ -50,13 +51,13 @@ func (s *Server) Stop() {
 This is a test project demonstrating native in-process code search.
 Trigram indexing speeds up searches across millions of characters.
 `
-	if err := fileutil.WriteFile(filepath.Join(dir, "README.md"), []byte(readme), 0o644); err != nil {
+	if err := fileutil.WriteFile(filepath.Join(dir, "README.md"), []byte(readme), paths.FilePerm644); err != nil {
 		t.Fatalf("failed writing README.md: %v", err)
 	}
 
 	// Sample binary file (with null bytes)
 	binaryData := []byte{0x7f, 'E', 'L', 'F', 0x00, 0x01, 0x02, 0x00}
-	if err := fileutil.WriteFile(filepath.Join(dir, "binary.bin"), binaryData, 0o644); err != nil {
+	if err := fileutil.WriteFile(filepath.Join(dir, "binary.bin"), binaryData, paths.FilePerm644); err != nil {
 		t.Fatalf("failed writing binary.bin: %v", err)
 	}
 
@@ -262,20 +263,20 @@ func TestMaxMatchesCap(t *testing.T) {
 
 func TestZqkProcessDirCollected(t *testing.T) {
 	ws := t.TempDir()
-	procDir := filepath.Join(ws, ".zqk", "process", "backlog_items")
+	procDir := filepath.Join(ws, paths.ProjectDataDir, paths.ProcessSubdir, "backlog_items")
 	if err := fileutil.EnsureDir(procDir); err != nil {
 		t.Fatal(err)
 	}
 	bliFile := filepath.Join(procDir, "BLI-1.yaml")
-	if err := fileutil.WriteFile(bliFile, []byte("id: BLI-1\ntitle: Test Item\n"), 0644); err != nil {
+	if err := fileutil.WriteFile(bliFile, []byte("id: BLI-1\ntitle: Test Item\n"), paths.FilePerm644); err != nil {
 		t.Fatal(err)
 	}
-	cacheDir := filepath.Join(ws, ".zqk", "cache")
+	cacheDir := filepath.Join(ws, paths.ProjectDataDir, paths.CacheDir)
 	if err := fileutil.EnsureDir(cacheDir); err != nil {
 		t.Fatal(err)
 	}
 	cacheFile := filepath.Join(cacheDir, "cache.json")
-	if err := fileutil.WriteFile(cacheFile, []byte("cached data"), 0644); err != nil {
+	if err := fileutil.WriteFile(cacheFile, []byte("cached data"), paths.FilePerm644); err != nil {
 		t.Fatal(err)
 	}
 

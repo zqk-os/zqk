@@ -10,6 +10,7 @@ import (
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	pkgmcp "github.com/zqk-os/zqk/pkg/mcp"
+	"github.com/zqk-os/zqk/pkg/paths"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -47,8 +48,8 @@ func TestSuperviseStatusPayload_Diagnostics(t *testing.T) {
 	defer fileutil.RemoveAll(tempDir)
 
 	// Create a dummy spec file
-	specsDir := filepath.Join(tempDir, ".zqk", "mcp", "specs")
-	if err := fileutil.MkdirAll(specsDir, 0755); err != nil {
+	specsDir := filepath.Join(tempDir, paths.ProjectDataDir, "mcp", "specs")
+	if err := fileutil.MkdirAll(specsDir, paths.DirPerm755); err != nil {
 		t.Fatalf("Failed to create specs dir: %v", err)
 	}
 	specContent := `
@@ -57,7 +58,7 @@ prompts:
   - name: dummy_prompt
     description: dummy
 `
-	if err := fileutil.WriteFile(filepath.Join(specsDir, "dummy.yaml"), []byte(specContent), 0644); err != nil {
+	if err := fileutil.WriteFile(filepath.Join(specsDir, "dummy.yaml"), []byte(specContent), paths.FilePerm644); err != nil {
 		t.Fatalf("Failed to write dummy spec: %v", err)
 	}
 

@@ -352,7 +352,7 @@ func seedAgentWorktreeRuntime(mainRoot, worktreeRoot string) error {
 			if ensureErr := fileutil.EnsureDir(filepath.Dir(dst)); ensureErr != nil {
 				return errfmt.Newf("create runtime index directory %s", filepath.Dir(dst)).Wrap(ensureErr)
 			}
-			if writeErr := fileutil.WriteFile(dst, data, 0o600); writeErr != nil {
+			if writeErr := fileutil.WriteFile(dst, data, paths.FilePerm600); writeErr != nil {
 				return errfmt.Newf("write runtime index %s", dst).Wrap(writeErr)
 			}
 		}

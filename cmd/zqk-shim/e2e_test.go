@@ -30,13 +30,13 @@ func TestZQKShim_E2E(t *testing.T) {
 
 	fakeGit := filepath.Join(fakeBinDir, "git")
 	gitScript := "#!/bin/sh\necho 'intercepted git:' \"$@\"\n"
-	if err := fileutil.WriteFile(fakeGit, []byte(gitScript), 0755); err != nil {
+	if err := fileutil.WriteFile(fakeGit, []byte(gitScript), paths.DirPerm755); err != nil {
 		t.Fatalf("Failed to write fake git: %v", err)
 	}
 
 	fakeGh := filepath.Join(fakeBinDir, "gh")
 	ghScript := "#!/bin/sh\necho 'intercepted gh:' \"$@\"\n"
-	if err := fileutil.WriteFile(fakeGh, []byte(ghScript), 0755); err != nil {
+	if err := fileutil.WriteFile(fakeGh, []byte(ghScript), paths.DirPerm755); err != nil {
 		t.Fatalf("Failed to write fake gh: %v", err)
 	}
 
@@ -75,7 +75,7 @@ func TestZQKShim_E2E(t *testing.T) {
 			}
 			// We need to bypass POL-CODE-009 validation or ensure it doesn't run.
 			// Set up a fake project root so logging writes to .zqk/logs instead of failing
-			_ = fileutil.EnsureDir(filepath.Join(tempDir, paths.ProjectDataDir, "logs"))
+			_ = fileutil.EnsureDir(filepath.Join(tempDir, paths.ProjectDataDir, paths.LogsDir))
 			cmd := execwrap.Command(shimLink, tt.args...)
 			cmd.Dir = tempDir
 			cmd.Env = []string{
@@ -127,7 +127,7 @@ func TestZQKShim_E2E(t *testing.T) {
 		if err := fileutil.Symlink(shimBinary, shimLink); err != nil && !fileutil.IsExist(err) {
 			t.Fatalf("Failed to create symlink: %v", err)
 		}
-		_ = fileutil.EnsureDir(filepath.Join(tempDir, paths.ProjectDataDir, "logs"))
+		_ = fileutil.EnsureDir(filepath.Join(tempDir, paths.ProjectDataDir, paths.LogsDir))
 
 		cmd := execwrap.Command(shimLink, "commit", "-m", "should fail")
 		cmd.Dir = tempDir

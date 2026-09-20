@@ -82,7 +82,7 @@ func runHardcodedGoLiteralsScan(projectRoot string) map[string]any {
 		}
 	}
 	hits := countGoPathGrepHitLines(stdout)
-	latestRel := filepath.Join(paths.ProjectDataDir, "logs", "drift", "hardcoded-go-literals-scan-latest.txt")
+	latestRel := filepath.Join(paths.ProjectDataDir, paths.LogsDir, "drift", "hardcoded-go-literals-scan-latest.txt")
 	latest := filepath.Join(projectRoot, filepath.FromSlash(latestRel))
 	_ = fileutil.EnsureDir(filepath.Dir(latest))
 	_ = fileutil.WriteSecureFile(latest, stdout)

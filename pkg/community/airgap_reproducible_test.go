@@ -4,6 +4,7 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
+	"github.com/zqk-os/zqk/pkg/paths"
 	"os"
 	"path/filepath"
 	"testing"
@@ -17,7 +18,7 @@ func TestAirgapReproducibleBuild_FunctionalAcceptance(t *testing.T) {
 
 	// Simulate build output files
 	file1 := filepath.Join(tempDir, "zqk-community")
-	if err := os.WriteFile(file1, []byte("binary_payload_version_2.7.0"), 0755); err != nil {
+	if err := os.WriteFile(file1, []byte("binary_payload_version_2.7.0"), paths.DirPerm755); err != nil {
 		t.Fatalf("failed writing simulated binary: %v", err)
 	}
 
@@ -50,7 +51,7 @@ func TestAirgapReproducibleBuild_BoundaryAndErrorHandling(t *testing.T) {
 func TestAirgapReproducibleBuild_IntegrationAndConformance(t *testing.T) {
 	tempDir := t.TempDir()
 	binFile := filepath.Join(tempDir, "zqk")
-	if err := os.WriteFile(binFile, []byte("standalone_airgap_binary"), 0755); err != nil {
+	if err := os.WriteFile(binFile, []byte("standalone_airgap_binary"), paths.DirPerm755); err != nil {
 		t.Fatalf("failed writing test file: %v", err)
 	}
 
@@ -61,7 +62,7 @@ func TestAirgapReproducibleBuild_IntegrationAndConformance(t *testing.T) {
 
 	expectedManifest := fmt.Sprintf("%s  %s\n", hash, filepath.Base(binFile))
 	manifestPath := filepath.Join(tempDir, "checksums.txt")
-	if err := os.WriteFile(manifestPath, []byte(expectedManifest), 0644); err != nil {
+	if err := os.WriteFile(manifestPath, []byte(expectedManifest), paths.FilePerm644); err != nil {
 		t.Fatalf("failed writing manifest: %v", err)
 	}
 

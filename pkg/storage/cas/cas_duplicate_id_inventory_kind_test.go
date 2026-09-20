@@ -18,7 +18,7 @@ func writeCASBlob(t *testing.T, kindDir, content string) {
 	t.Helper()
 	sum := sha256.Sum256([]byte(content))
 	name := hex.EncodeToString(sum[:]) + ".yaml"
-	if err := fileutil.WriteFile(filepath.Join(kindDir, name), []byte(content), 0o644); err != nil {
+	if err := fileutil.WriteFile(filepath.Join(kindDir, name), []byte(content), paths.FilePerm644); err != nil {
 		t.Fatalf("write %s: %v", name, err)
 	}
 }
@@ -39,7 +39,7 @@ func TestInventoryCASDuplicateIDs_reportsRegisteredKindNotDirectoryName(t *testi
 	// because it is the directory that produced the reported failure.
 	const dir = "scheduler_jobs"
 	kindDir := filepath.Join(root, paths.ProcessDir, dir)
-	if err := fileutil.MkdirAll(kindDir, 0o755); err != nil {
+	if err := fileutil.MkdirAll(kindDir, paths.DirPerm755); err != nil {
 		t.Fatalf("mkdir: %v", err)
 	}
 

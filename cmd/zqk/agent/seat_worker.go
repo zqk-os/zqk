@@ -797,8 +797,8 @@ func triggerPlanOrchestration(ctx context.Context, sp storage.ObjectStorageProvi
 	// Do not pass --persona-id: that filter drops BLIs assigned to coder/reviewer
 	// seats and the job exits routed with dispatched_items=0.
 	orchCmd := zqkPath + " agent orchestrate " + planID
-	logDir := filepath.Join(root, paths.ProjectDataDir, "logs", "agent-ops")
-	if err := fileutil.MkdirAll(logDir, 0o755); err != nil {
+	logDir := filepath.Join(root, paths.ProjectDataDir, paths.LogsDir, "agent-ops")
+	if err := fileutil.MkdirAll(logDir, paths.DirPerm755); err != nil {
 		return "", errfmt.Errorf("orchestrate callback dir: %w", err)
 	}
 	cb := filepath.Join(logDir, "orch-"+safePlanFileName(planID)+".callback.json")
@@ -861,7 +861,7 @@ func recentPlanOrchSubmit(root, planID string) (bool, string) {
 
 func writePlanOrchSubmitMark(root, planID, detail string) error {
 	path := planOrchSubmitMarkPath(root, planID)
-	if err := fileutil.MkdirAll(filepath.Dir(path), 0o755); err != nil {
+	if err := fileutil.MkdirAll(filepath.Dir(path), paths.DirPerm755); err != nil {
 		return errfmt.Errorf("plan orch mark dir: %w", err)
 	}
 	payload, err := json.Marshal(map[string]string{
@@ -873,7 +873,7 @@ func writePlanOrchSubmitMark(root, planID, detail string) error {
 	if err != nil {
 		return err
 	}
-	return fileutil.WriteFile(path, append(payload, '\n'), 0o600)
+	return fileutil.WriteFile(path, append(payload, '\n'), paths.FilePerm600)
 }
 
 // withLocalLLMEnv ensures local LLM settings from the process environment (or the
@@ -942,6 +942,6 @@ func localLLMAPIKeyValue() string {
 
 func writeSeatWorkerResult(root, engineID, result string) {
 	logDir := filepath.Join(root, paths.ProjectDataDir, paths.LogsDir, "agent-seat-worker")
-	_ = fileutil.MkdirAll(logDir, 0o755)
-	_ = fileutil.WriteFile(filepath.Join(logDir, engineID+".log"), []byte(result), 0o644)
+	_ = fileutil.MkdirAll(logDir, paths.DirPerm755)
+	_ = fileutil.WriteFile(filepath.Join(logDir, engineID+".log"), []byte(result), paths.FilePerm644)
 }

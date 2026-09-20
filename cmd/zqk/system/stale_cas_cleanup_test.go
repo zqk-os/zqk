@@ -236,7 +236,7 @@ func TestCASMembraneHealing_BoundaryAndErrorHandling(t *testing.T) {
 
 	tmp := t.TempDir()
 	kindDir := filepath.Join(tmp, paths.ProcessBacklogDir)
-	if err := fileutil.MkdirAll(kindDir, 0o755); err != nil {
+	if err := fileutil.MkdirAll(kindDir, paths.DirPerm755); err != nil {
 		t.Fatalf("failed to create kind dir: %v", err)
 	}
 
@@ -244,7 +244,7 @@ func TestCASMembraneHealing_BoundaryAndErrorHandling(t *testing.T) {
 	liveHash := "1111222233334444555566667777888899990000aaaabbbbccccddddeeeeffff"
 	liveFile := filepath.Join(kindDir, liveHash+".yaml")
 	fileBody := "id: BLI-RELINK-001\nkind: backlog_item\ntitle: Relinked Item\n"
-	if err := fileutil.WriteFile(liveFile, []byte(fileBody), 0o644); err != nil {
+	if err := fileutil.WriteFile(liveFile, []byte(fileBody), paths.FilePerm644); err != nil {
 		t.Fatalf("failed to write live file: %v", err)
 	}
 
@@ -323,7 +323,7 @@ func TestCASDuplicateBlobs_GitReconciliation(t *testing.T) {
 
 	tmp := t.TempDir()
 	kindDir := filepath.Join(tmp, paths.ProcessBacklogDir)
-	if err := fileutil.MkdirAll(kindDir, 0o755); err != nil {
+	if err := fileutil.MkdirAll(kindDir, paths.DirPerm755); err != nil {
 		t.Fatalf("MkdirAll failed: %v", err)
 	}
 
@@ -336,10 +336,10 @@ func TestCASDuplicateBlobs_GitReconciliation(t *testing.T) {
 	content1 := "id: BLI-GIT-001\nkind: backlog_item\ntitle: Committed Item\n"
 	content2 := "id: BLI-GIT-001\nkind: backlog_item\ntitle: Untracked Leftover\n"
 
-	if err := fileutil.WriteFile(trackedFile, []byte(content1), 0o644); err != nil {
+	if err := fileutil.WriteFile(trackedFile, []byte(content1), paths.FilePerm644); err != nil {
 		t.Fatalf("WriteFile trackedFile failed: %v", err)
 	}
-	if err := fileutil.WriteFile(untrackedFile, []byte(content2), 0o644); err != nil {
+	if err := fileutil.WriteFile(untrackedFile, []byte(content2), paths.FilePerm644); err != nil {
 		t.Fatalf("WriteFile untrackedFile failed: %v", err)
 	}
 
@@ -366,7 +366,7 @@ func TestCASDuplicateBlobs_AutoFixHealing(t *testing.T) {
 	tmp := t.TempDir()
 	processDir := datacell.ProcessPrimaryDir(tmp)
 	kindDir := filepath.Join(processDir, paths.ProcessBacklogDir)
-	if err := fileutil.MkdirAll(kindDir, 0o755); err != nil {
+	if err := fileutil.MkdirAll(kindDir, paths.DirPerm755); err != nil {
 		t.Fatalf("MkdirAll failed: %v", err)
 	}
 
@@ -379,10 +379,10 @@ func TestCASDuplicateBlobs_AutoFixHealing(t *testing.T) {
 	content1 := "id: BLI-AUTO-001\nkind: backlog_item\ntitle: Version 1\n"
 	content2 := "id: BLI-AUTO-001\nkind: backlog_item\ntitle: Version 2\n"
 
-	if err := fileutil.WriteFile(file1, []byte(content1), 0o644); err != nil {
+	if err := fileutil.WriteFile(file1, []byte(content1), paths.FilePerm644); err != nil {
 		t.Fatalf("WriteFile file1 failed: %v", err)
 	}
-	if err := fileutil.WriteFile(file2, []byte(content2), 0o644); err != nil {
+	if err := fileutil.WriteFile(file2, []byte(content2), paths.FilePerm644); err != nil {
 		t.Fatalf("WriteFile file2 failed: %v", err)
 	}
 
@@ -432,7 +432,7 @@ func TestQuarantineCASDuplicateLosers_ReconcilesIndex(t *testing.T) {
 	tmp := t.TempDir()
 	kindDir := filepath.Join(tmp, paths.ProcessBacklogDir)
 	quarantineDir := filepath.Join(tmp, "quarantine")
-	if err := fileutil.MkdirAll(kindDir, 0o755); err != nil {
+	if err := fileutil.MkdirAll(kindDir, paths.DirPerm755); err != nil {
 		t.Fatalf("MkdirAll kindDir failed: %v", err)
 	}
 
@@ -445,10 +445,10 @@ func TestQuarantineCASDuplicateLosers_ReconcilesIndex(t *testing.T) {
 	content1 := "id: BLI-LOSER-001\nkind: backlog_item\ntitle: Older Blob\n"
 	content2 := "id: BLI-LOSER-001\nkind: backlog_item\ntitle: Newer Blob\n"
 
-	if err := fileutil.WriteFile(file1, []byte(content1), 0o644); err != nil {
+	if err := fileutil.WriteFile(file1, []byte(content1), paths.FilePerm644); err != nil {
 		t.Fatalf("WriteFile file1 failed: %v", err)
 	}
-	if err := fileutil.WriteFile(file2, []byte(content2), 0o644); err != nil {
+	if err := fileutil.WriteFile(file2, []byte(content2), paths.FilePerm644); err != nil {
 		t.Fatalf("WriteFile file2 failed: %v", err)
 	}
 
@@ -483,14 +483,14 @@ func TestCASDuplicateReconciliation_DateBucketKeyPreserved(t *testing.T) {
 	tmp := t.TempDir()
 	kindDir := filepath.Join(tmp, paths.ProcessBacklogDir)
 	bucketDir := filepath.Join(kindDir, "2026-09")
-	if err := fileutil.MkdirAll(bucketDir, 0o755); err != nil {
+	if err := fileutil.MkdirAll(bucketDir, paths.DirPerm755); err != nil {
 		t.Fatalf("failed to create bucket dir: %v", err)
 	}
 
 	liveHash := "2222333344445555666677778888999900001111aaaabbbbccccddddeeeeffff"
 	liveFile := filepath.Join(bucketDir, liveHash+".yaml")
 	fileBody := "id: BLI-BUCKET-001\nkind: backlog_item\ntitle: Bucket Relinked Item\n"
-	if err := fileutil.WriteFile(liveFile, []byte(fileBody), 0o644); err != nil {
+	if err := fileutil.WriteFile(liveFile, []byte(fileBody), paths.FilePerm644); err != nil {
 		t.Fatalf("failed to write live file in bucket: %v", err)
 	}
 

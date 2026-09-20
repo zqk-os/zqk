@@ -12,6 +12,7 @@ import (
 
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/goroutinelabels"
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/telemetry"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"github.com/zqk-os/zqk/pkg/zqkenv"
@@ -419,7 +420,7 @@ func (c *Client) ListTools(ctx context.Context) (*ToolsListResult, error) {
 }
 
 func (c *Client) logToSandbox(format string, args ...any) {
-	if f, err := fileutil.OpenFile(".sandbox/mcp-client.log", fileutil.O_APPEND|fileutil.O_CREATE|fileutil.O_WRONLY, 0644); err == nil {
+	if f, err := fileutil.OpenFile(".sandbox/mcp-client.log", fileutil.O_APPEND|fileutil.O_CREATE|fileutil.O_WRONLY, paths.FilePerm644); err == nil {
 		_, _ = f.WriteString(fmt.Sprintf(format, args...))
 		_ = f.Close()
 	}

@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/storage"
 	"github.com/zqk-os/zqk/pkg/testkit"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
@@ -26,8 +27,8 @@ const (
 
 	testChangeJournalDir = "change_journal"
 
-	testDirPerm  = 0o750
-	testFilePerm = 0o600
+	testDirPerm  = paths.DirPerm750
+	testFilePerm = paths.FilePerm600
 )
 
 // TestRun_toleratesMissingFilesDuringWalk verifies that Run completes successfully

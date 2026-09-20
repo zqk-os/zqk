@@ -58,7 +58,7 @@ func TestNewObject_unknown_kind_errors(t *testing.T) {
 	t.Setenv(zqkenv.TestRoot().Name(), testRoot)
 	t.Cleanup(func() {
 		_ = storage.RunProjectTestTeardown(storage.TempProjectTeardown(testRoot, nil))
-		_ = fileutil.RemoveAll(filepath.Join(testRoot, ".zqk"))
+		_ = fileutil.RemoveAll(filepath.Join(testRoot, paths.ProjectDataDir))
 	})
 
 	repoRoot := zqkenv.ProjectRoot().Get()
@@ -207,14 +207,14 @@ func TestNewBundle_defaultOutput_createsDraftAndLastDraftPointer(t *testing.T) {
 	if err := cmd.Execute(); err != nil {
 		t.Fatal(err)
 	}
-	matches, err := filepath.Glob(filepath.Join(tmp, paths.ProjectDataDir, "drafts", "my-bundle-*.yaml"))
+	matches, err := filepath.Glob(filepath.Join(tmp, paths.ProjectDataDir, paths.DraftsSubdir, "my-bundle-*.yaml"))
 	if err != nil {
 		t.Fatal(err)
 	}
 	if len(matches) != 1 {
 		t.Fatalf("expected one bundle draft, got %v (stdout=%q)", matches, buf.String())
 	}
-	ptrPath := filepath.Join(tmp, paths.ProjectDataDir, "drafts", "last-draft.yaml")
+	ptrPath := filepath.Join(tmp, paths.ProjectDataDir, paths.DraftsSubdir, "last-draft.yaml")
 	ptrBytes, err := fileutil.ReadFile(ptrPath)
 	if err != nil {
 		t.Fatalf("last-draft pointer: %v", err)

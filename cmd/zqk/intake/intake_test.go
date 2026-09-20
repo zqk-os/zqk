@@ -6,6 +6,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/storage"
 	"github.com/zqk-os/zqk/pkg/testenvroot"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
@@ -17,7 +18,7 @@ func TestIntakeCommand_NoArgs(t *testing.T) {
 	t.Setenv(zqkenv.TestRoot().Name(), tempDir)
 	t.Cleanup(func() {
 		_ = storage.RunProjectTestTeardown(storage.TempProjectTeardown(tempDir, nil))
-		_ = fileutil.RemoveAll(filepath.Join(tempDir, ".zqk"))
+		_ = fileutil.RemoveAll(filepath.Join(tempDir, paths.ProjectDataDir))
 	})
 	_, err := testenvroot.Setup(tempDir)
 	if err != nil {

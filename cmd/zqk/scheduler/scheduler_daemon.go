@@ -64,7 +64,7 @@ func startDetachedSchedulerDaemonProcess(execCmd *exec.Cmd) error {
 // the parent's terminal or pipe fds. Inheriting a blocked pipe/socket can strand new zqk processes in
 // _dyld_start (vm_object lock cascade on macOS); see cmd/zqk/app/root.go watchdog comments.
 func attachSchedulerDaemonStdioToDevNull(execCmd *exec.Cmd) (func(), error) {
-	dupOut, err := fileutil.OpenAppend(".zqk/daemon_crash.log")
+	dupOut, err := fileutil.OpenAppend(filepath.Join(paths.ProjectDataDir, "daemon_crash.log"))
 	if err != nil {
 		return nil, errfmt.Errorf("open daemon_crash.log for scheduler daemon stdout/stderr: %w", err)
 	}

@@ -1,6 +1,7 @@
 package system
 
 import (
+	"path/filepath"
 	"time"
 
 	"github.com/spf13/cobra"
@@ -8,6 +9,7 @@ import (
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
 	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
 	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/scheduler"
 )
 
@@ -16,7 +18,7 @@ func NewRotateLogsCmd() *cobra.Command {
 		Use:   "rotate-logs",
 		Short: "Rotate and cleanup logs",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			rotator := scheduler.NewLogRotator(".zqk/logs", logging.GetLoggerFromProfile("system"))
+			rotator := scheduler.NewLogRotator(filepath.Join(paths.ProjectDataDir, paths.LogsDir), logging.GetLoggerFromProfile("system"))
 			err := rotator.Rotate(cmd.Context(), 7*24*time.Hour)
 			if err == nil {
 				return cli.WriteOutput(cmd, []byte("Logs rotated successfully\n"))

@@ -14,7 +14,7 @@ func TestLimits_ReadAndMerge(t *testing.T) {
 
 	tmp := t.TempDir()
 	bundlesDir := filepath.Join(tmp, paths.ProjectDataDir, paths.TestBundlesDir)
-	if err := fileutil.MkdirAll(bundlesDir, 0755); err != nil {
+	if err := fileutil.MkdirAll(bundlesDir, paths.DirPerm755); err != nil {
 		t.Fatal(err)
 	}
 
@@ -42,7 +42,7 @@ func TestLimits_ReadAndMerge(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if err := fileutil.WriteFile(filepath.Join(bundlesDir, LimitsFileName), raw, 0600); err != nil {
+	if err := fileutil.WriteFile(filepath.Join(bundlesDir, LimitsFileName), raw, paths.FilePerm600); err != nil {
 		t.Fatal(err)
 	}
 

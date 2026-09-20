@@ -37,7 +37,7 @@ func setupKeystoreAuthTest(t *testing.T) (string, *Server) {
 					}
 					// Mock .account.index for AccountCASPath resolution
 					idxPath := filepath.Join(root, paths.ProcessAccountsDir, ".account.index")
-					return fileutil.WriteFile(idxPath, []byte(`{"mappings":{"ACC-1785920548450214003-23d25bd5":"ACC-1785920548450214003-23d25bd5","ACC-AUTO-123":"ACC-AUTO-123"}}`), 0644)
+					return fileutil.WriteFile(idxPath, []byte(`{"mappings":{"ACC-1785920548450214003-23d25bd5":"ACC-1785920548450214003-23d25bd5","ACC-AUTO-123":"ACC-AUTO-123"}}`), paths.FilePerm644)
 				},
 			}}
 		},

@@ -86,7 +86,7 @@ goal_refs:
 				}
 			}
 		}
-		draftDir := filepath.Join(tmpDir, ".zqk", "object_drafts", "backlog_item")
+		draftDir := filepath.Join(tmpDir, paths.ProjectDataDir, paths.ObjectDraftsDir, "backlog_item")
 		if entries, readErr := fileutil.ReadDir(draftDir); readErr == nil {
 			for _, entry := range entries {
 				if entry.IsDir() {

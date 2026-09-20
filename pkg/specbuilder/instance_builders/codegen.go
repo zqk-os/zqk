@@ -11,6 +11,7 @@ import (
 
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -20,8 +21,8 @@ var defaultInstanceVersion = objects.DefaultSchemaVersion
 
 const (
 	emptyValue                                  = ""
-	defaultDirectoryPerm      fileutil.FileMode = 0o755
-	defaultFilePerm           fileutil.FileMode = 0o600
+	defaultDirectoryPerm      fileutil.FileMode = paths.DirPerm755
+	defaultFilePerm           fileutil.FileMode = paths.FilePerm600
 	codegenSourcePath                           = "pkg/specbuilder/instance_builders/codegen.go"
 	regenerateBuildersCommand                   = "zqk system generate-instance-builders --overwrite"
 	codegenSpecFileExtYAML                      = ".yaml"

@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -73,7 +74,7 @@ func TestFSWatcher_FiltersNoise(t *testing.T) {
 	}
 
 	// Action 3: Write to internal .zqk directory (must never trigger ambient event feedback loop)
-	zqkDir := filepath.Join(tmpDir, ".zqk", "process", "audit")
+	zqkDir := filepath.Join(tmpDir, paths.ProjectDataDir, paths.ProcessSubdir, "audit")
 	_ = fileutil.EnsureDir(zqkDir)
 	zqkAuditFile := filepath.Join(zqkDir, "event.yaml")
 	_ = fileutil.WriteSecureFile(zqkAuditFile, []byte("id: AUD-1"))
@@ -87,7 +88,7 @@ func TestFSWatcher_FiltersNoise(t *testing.T) {
 	}
 
 	// Action 4: Write to internal .zqk-state directory
-	zqkStateDir := filepath.Join(tmpDir, ".zqk-state")
+	zqkStateDir := filepath.Join(tmpDir, paths.ProjectStateDir)
 	_ = fileutil.EnsureDir(zqkStateDir)
 	zqkStateFile := filepath.Join(zqkStateDir, "system-state.csnap")
 	_ = fileutil.WriteSecureFile(zqkStateFile, []byte("state-blob"))

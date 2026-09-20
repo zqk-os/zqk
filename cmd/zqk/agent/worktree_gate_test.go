@@ -3,6 +3,7 @@ package agent
 import (
 	"context"
 	"errors"
+	"github.com/zqk-os/zqk/pkg/paths"
 	"path/filepath"
 	"testing"
 )
@@ -13,13 +14,13 @@ func TestIsAgentWorktree(t *testing.T) {
 		root string
 		want bool
 	}{
-		{"/repo/.zqk/worktrees/ATK-1", true},
+		{filepath.Join("/repo", paths.ProjectDataDir, paths.WorktreesSubdir, "ATK-1"), true},
 		{"/tmp/zqk-worktrees/repo-abcd/ATK-1", true},
-		{"/repo/.zqk/worktrees/ATK-1/subdir", true},
+		{filepath.Join("/repo", paths.ProjectDataDir, paths.WorktreesSubdir, "ATK-1", "subdir"), true},
 		{"/tmp/ATK-1", true},
 		{"/private/tmp/ATK-99", true},
 		{"/repo", false},
-		{"/repo/.zqk/local-ci/workdir", false},
+		{filepath.Join("/repo", paths.ProjectDataDir, "local-ci", "workdir"), false},
 	}
 	for _, tc := range cases {
 		if got := isAgentWorktree(tc.root); got != tc.want {
@@ -30,7 +31,7 @@ func TestIsAgentWorktree(t *testing.T) {
 
 func TestAgentWorktreeMainRepo(t *testing.T) {
 	t.Parallel()
-	wt := filepath.Join("/Users/x/proj", ".zqk", "worktrees", "ATK-1")
+	wt := filepath.Join("/Users/x/proj", paths.ProjectDataDir, paths.WorktreesSubdir, "ATK-1")
 	got := agentWorktreeMainRepo(wt)
 	want := "/Users/x/proj"
 	if got != want {

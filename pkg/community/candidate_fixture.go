@@ -20,7 +20,7 @@ func seatedCommunityKernel(dir string) bool {
 	if dir == "" {
 		return false
 	}
-	if fileutil.Exists(filepath.Join(dir, ".zqk", "process")) {
+	if fileutil.Exists(filepath.Join(dir, paths.ProjectDataDir, paths.ProcessSubdir)) {
 		return true
 	}
 	return fileutil.Exists(filepath.Join(dir, ".env"))

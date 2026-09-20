@@ -16,17 +16,17 @@ import (
 func TestPrepareCompactCheckOutputData_CASDuplicateIDsTier1(t *testing.T) {
 	root := t.TempDir()
 	kindDir := filepath.Join(root, paths.ProcessBacklogDir)
-	if err := fileutil.MkdirAll(kindDir, 0o755); err != nil {
+	if err := fileutil.MkdirAll(kindDir, paths.DirPerm755); err != nil {
 		t.Fatal(err)
 	}
 	a := filepath.Join(kindDir, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.yaml")
 	b := filepath.Join(kindDir, "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb.yaml")
 	body := "id: BLI-CHECK-DUAL-001\nkind: backlog_item\n"
-	if err := fileutil.WriteFile(a, []byte(body), 0o644); err != nil {
+	if err := fileutil.WriteFile(a, []byte(body), paths.FilePerm644); err != nil {
 		t.Fatal(err)
 	}
 	time.Sleep(5 * time.Millisecond)
-	if err := fileutil.WriteFile(b, []byte(body), 0o644); err != nil {
+	if err := fileutil.WriteFile(b, []byte(body), paths.FilePerm644); err != nil {
 		t.Fatal(err)
 	}
 

@@ -8,6 +8,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/systemcheck/policy"
 )
 
@@ -50,7 +51,7 @@ func TestPublicRepoSanitation(t *testing.T) {
 	t.Run("BoundaryAndErrorHandling_RejectsScratchFileAdditions", func(t *testing.T) {
 		tmpDir := t.TempDir()
 		dirtyFile := filepath.Join(tmpDir, "studio_test.orig")
-		if err := os.WriteFile(dirtyFile, []byte("temporary studio artifact"), 0600); err != nil {
+		if err := os.WriteFile(dirtyFile, []byte("temporary studio artifact"), paths.FilePerm600); err != nil {
 			t.Fatalf("failed to write dirty file: %v", err)
 		}
 
@@ -110,7 +111,7 @@ func TestPublicPushLeakPrevention(t *testing.T) {
 		leakedFile := filepath.Join(tmpDir, "secret_leak.txt")
 		prefix := strings.Join([]string{"gh", "p_"}, "")
 		syntheticSecret := prefix + "1234567890abcdefghijklmnopqrstuvwxyz"
-		if err := os.WriteFile(leakedFile, []byte("token = "+syntheticSecret+"\n"), 0600); err != nil {
+		if err := os.WriteFile(leakedFile, []byte("token = "+syntheticSecret+"\n"), paths.FilePerm600); err != nil {
 			t.Fatalf("failed to write synthetic secret: %v", err)
 		}
 

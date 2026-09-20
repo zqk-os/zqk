@@ -27,7 +27,7 @@ import (
 
 const (
 	emptyValue          = ""
-	commandSpecFilePerm = 0o644
+	commandSpecFilePerm = paths.FilePerm644
 	newRootIntro        = "Mint instances (`new object --title`) onto the draft plane; command DNA: `new command-spec`; YAML scaffolds: zqk object template <kind>. Bundles/object-specs still use .zqk/drafts/."
 )
 

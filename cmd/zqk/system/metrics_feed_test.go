@@ -60,7 +60,7 @@ func TestParseHumanLogClusters(t *testing.T) {
 2026-08-13T04:17:35Z [warn] High memory usage percent=90
 2026-08-13T04:17:36Z [error] Unexpected EOF
 `
-	if err := fileutil.WriteFile(humanLogPath, []byte(logContent), 0644); err != nil {
+	if err := fileutil.WriteFile(humanLogPath, []byte(logContent), paths.FilePerm644); err != nil {
 		t.Fatal(err)
 	}
 

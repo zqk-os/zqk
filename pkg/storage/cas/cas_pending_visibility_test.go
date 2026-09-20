@@ -155,7 +155,7 @@ func truncateForTest(b []byte, n int) string {
 func TestConfirmPendingAfterDurableMappingRequiresIndexEntry(t *testing.T) {
 	tempDir := t.TempDir()
 	indexPath := filepath.Join(tempDir, paths.ProcessDir, "doc_entries", ".doc_entry.index")
-	if err := fileutil.MkdirAll(filepath.Dir(indexPath), 0o755); err != nil {
+	if err := fileutil.MkdirAll(filepath.Dir(indexPath), paths.DirPerm755); err != nil {
 		t.Fatal(err)
 	}
 	id := "DOC-1785520000000000000-pend01"
@@ -166,7 +166,7 @@ func TestConfirmPendingAfterDurableMappingRequiresIndexEntry(t *testing.T) {
 	}
 
 	// Index without the id — must not clear pending.
-	if err := fileutil.WriteFile(indexPath, []byte(`{"`+objects.FieldKeyVersion+`":"1.0","`+objects.FieldKeyKind+`":"doc_entry","mappings":{}}`+"\n"), 0o644); err != nil {
+	if err := fileutil.WriteFile(indexPath, []byte(`{"`+objects.FieldKeyVersion+`":"1.0","`+objects.FieldKeyKind+`":"doc_entry","mappings":{}}`+"\n"), paths.FilePerm644); err != nil {
 		t.Fatal(err)
 	}
 	caspkg.ConfirmPendingAfterDurableMapping(indexPath, id, hash)
@@ -176,7 +176,7 @@ func TestConfirmPendingAfterDurableMappingRequiresIndexEntry(t *testing.T) {
 
 	// Index with matching id→hash — may clear pending.
 	body := `{"version":"1.0","kind":"doc_entry","mappings":{"` + id + `":"` + hash + `"}}` + "\n"
-	if err := fileutil.WriteFile(indexPath, []byte(body), 0o644); err != nil {
+	if err := fileutil.WriteFile(indexPath, []byte(body), paths.FilePerm644); err != nil {
 		t.Fatal(err)
 	}
 	caspkg.ConfirmPendingAfterDurableMapping(indexPath, id, hash)

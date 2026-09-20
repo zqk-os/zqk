@@ -776,8 +776,8 @@ func (h *CapOrchestratorHandler) maybeWakeOnStageHold(stage, reason string) {
 	h.wakeAgentAndScheduleHourglass(planID, "tpm")
 	// Append hold-specific detail so operators see the gate reason, not only assignment text.
 	eventPath := datacell.AgentChatChannelEventsJSONLPath(h.projectRoot)
-	if err := fileutil.MkdirAll(filepath.Dir(eventPath), 0755); err == nil {
-		if f, err := fileutil.OpenFile(eventPath, fileutil.O_APPEND|fileutil.O_CREATE|fileutil.O_WRONLY, 0644); err == nil {
+	if err := fileutil.MkdirAll(filepath.Dir(eventPath), paths.DirPerm755); err == nil {
+		if f, err := fileutil.OpenFile(eventPath, fileutil.O_APPEND|fileutil.O_CREATE|fileutil.O_WRONLY, paths.FilePerm644); err == nil {
 			_ = json.NewEncoder(f).Encode(map[string]any{
 				"timestamp": now.Format(time.RFC3339),
 				"sender":    "cap_orchestrator",

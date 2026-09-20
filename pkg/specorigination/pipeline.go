@@ -245,7 +245,7 @@ func writeYAMLConfigDoc(path string, doc *yamlDoc) error {
 		return err
 	}
 	finalOutput := []byte(doc.schema + string(outData))
-	return fileutil.WriteFile(path, finalOutput, 0644)
+	return fileutil.WriteFile(path, finalOutput, paths.FilePerm644)
 }
 
 func mutateKindMappings(doc map[string]any, kind, dirName string) {

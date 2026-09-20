@@ -534,12 +534,12 @@ func TestInit_GreenfieldAnchorsToCWD(t *testing.T) {
 		parentDir = eval
 	}
 	// Create parent .zqk marker to simulate ~/.zqk or parent repo
-	if err := fileutil.MkdirAll(filepath.Join(parentDir, paths.ProjectDataDir), 0755); err != nil {
+	if err := fileutil.MkdirAll(filepath.Join(parentDir, paths.ProjectDataDir), paths.DirPerm755); err != nil {
 		t.Fatalf("MkdirAll parent .zqk: %v", err)
 	}
 
 	childDir := filepath.Join(parentDir, "child-project")
-	if err := fileutil.MkdirAll(childDir, 0755); err != nil {
+	if err := fileutil.MkdirAll(childDir, paths.DirPerm755); err != nil {
 		t.Fatalf("MkdirAll child-project: %v", err)
 	}
 	// Init leaves write-behind / MCP state under .zqk; scrub so t.TempDir cleanup succeeds.
@@ -682,10 +682,10 @@ func TestInit_RegistersShippedDocs(t *testing.T) {
 
 	for relPath, content := range testDocs {
 		fullPath := filepath.Join(tmpDir, relPath)
-		if err := fileutil.MkdirAll(filepath.Dir(fullPath), 0755); err != nil {
+		if err := fileutil.MkdirAll(filepath.Dir(fullPath), paths.DirPerm755); err != nil {
 			t.Fatalf("mkdir failed: %v", err)
 		}
-		if err := fileutil.WriteFile(fullPath, []byte(content), 0644); err != nil {
+		if err := fileutil.WriteFile(fullPath, []byte(content), paths.FilePerm644); err != nil {
 			t.Fatalf("write file failed: %v", err)
 		}
 	}
@@ -767,10 +767,10 @@ func TestInit_RegistersShippedDocs_Legacy(t *testing.T) {
 
 	for relPath, content := range testDocs {
 		fullPath := filepath.Join(tmpDir, relPath)
-		if err := fileutil.MkdirAll(filepath.Dir(fullPath), 0755); err != nil {
+		if err := fileutil.MkdirAll(filepath.Dir(fullPath), paths.DirPerm755); err != nil {
 			t.Fatalf("mkdir failed: %v", err)
 		}
-		if err := fileutil.WriteFile(fullPath, []byte(content), 0644); err != nil {
+		if err := fileutil.WriteFile(fullPath, []byte(content), paths.FilePerm644); err != nil {
 			t.Fatalf("write file failed: %v", err)
 		}
 	}

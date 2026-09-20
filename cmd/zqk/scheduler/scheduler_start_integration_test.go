@@ -94,7 +94,7 @@ func TestSchedulerStart_EndToEnd(t *testing.T) {
 
 	scenarioRel := "test-scenarios/scheduler-e2e"
 	scenarioRoot := filepath.Join(workspace, scenarioRel)
-	schedulerConfigDir := filepath.Join(scenarioRoot, paths.ProjectDataDir, "scheduler")
+	schedulerConfigDir := filepath.Join(scenarioRoot, paths.ProjectDataDir, paths.SchedulerSubdir)
 	if err := fileutil.EnsureDir(schedulerConfigDir); err != nil {
 		t.Fatalf("create scenario scheduler config dir: %v", err)
 	}

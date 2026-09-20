@@ -5,6 +5,7 @@ import (
 
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/storage"
 	"github.com/zqk-os/zqk/pkg/testkit"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
@@ -78,7 +79,7 @@ func TestSeedKernelFromAnswerFile(t *testing.T) {
   origin_project: zqk
   origin_system: zqk
 `
-	if err := fileutil.WriteFile(answerFile, []byte(content), 0600); err != nil {
+	if err := fileutil.WriteFile(answerFile, []byte(content), paths.FilePerm600); err != nil {
 		t.Fatalf("WriteFile: %v", err)
 	}
 

@@ -20,6 +20,7 @@ import (
 
 	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -512,7 +513,7 @@ func generateTestPKI(t *testing.T, dir string) (caCertFile, serverCertFile, serv
 
 	caCertFile = filepath.Join(dir, "ca.crt")
 	caCertPEM := pem.EncodeToMemory(&pem.Block{Type: "CERTIFICATE", Bytes: caDER})
-	if err := fileutil.WriteFile(caCertFile, caCertPEM, 0644); err != nil {
+	if err := fileutil.WriteFile(caCertFile, caCertPEM, paths.FilePerm644); err != nil {
 		t.Fatalf("failed to write CA cert: %v", err)
 	}
 
@@ -542,7 +543,7 @@ func generateTestPKI(t *testing.T, dir string) (caCertFile, serverCertFile, serv
 
 	serverCertFile = filepath.Join(dir, "server.crt")
 	serverCertPEM := pem.EncodeToMemory(&pem.Block{Type: "CERTIFICATE", Bytes: serverDER})
-	if err := fileutil.WriteFile(serverCertFile, serverCertPEM, 0644); err != nil {
+	if err := fileutil.WriteFile(serverCertFile, serverCertPEM, paths.FilePerm644); err != nil {
 		t.Fatalf("failed to write server cert: %v", err)
 	}
 
@@ -552,7 +553,7 @@ func generateTestPKI(t *testing.T, dir string) (caCertFile, serverCertFile, serv
 	}
 	serverKeyFile = filepath.Join(dir, "server.key")
 	serverKeyPEM := pem.EncodeToMemory(&pem.Block{Type: "EC PRIVATE KEY", Bytes: serverKeyDER})
-	if err := fileutil.WriteFile(serverKeyFile, serverKeyPEM, 0600); err != nil {
+	if err := fileutil.WriteFile(serverKeyFile, serverKeyPEM, paths.FilePerm600); err != nil {
 		t.Fatalf("failed to write server key: %v", err)
 	}
 
@@ -580,7 +581,7 @@ func generateTestPKI(t *testing.T, dir string) (caCertFile, serverCertFile, serv
 
 	clientCertFile = filepath.Join(dir, "client.crt")
 	clientCertPEM := pem.EncodeToMemory(&pem.Block{Type: "CERTIFICATE", Bytes: clientDER})
-	if err := fileutil.WriteFile(clientCertFile, clientCertPEM, 0644); err != nil {
+	if err := fileutil.WriteFile(clientCertFile, clientCertPEM, paths.FilePerm644); err != nil {
 		t.Fatalf("failed to write client cert: %v", err)
 	}
 
@@ -590,7 +591,7 @@ func generateTestPKI(t *testing.T, dir string) (caCertFile, serverCertFile, serv
 	}
 	clientKeyFile = filepath.Join(dir, "client.key")
 	clientKeyPEM := pem.EncodeToMemory(&pem.Block{Type: "EC PRIVATE KEY", Bytes: clientKeyDER})
-	if err := fileutil.WriteFile(clientKeyFile, clientKeyPEM, 0600); err != nil {
+	if err := fileutil.WriteFile(clientKeyFile, clientKeyPEM, paths.FilePerm600); err != nil {
 		t.Fatalf("failed to write client key: %v", err)
 	}
 

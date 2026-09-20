@@ -8,14 +8,13 @@ import (
 	"strings"
 
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // DefaultIgnoreDirs contains directory names excluded from search by default.
-// DefaultIgnoreDirs contains directory names excluded from search by default.
 var DefaultIgnoreDirs = map[string]bool{
 	".git":           true,
-	".zqk-state":     true,
 	".gemini":        true,
 	"vendor":         true,
 	"node_modules":   true,
@@ -30,6 +29,10 @@ var DefaultIgnoreDirs = map[string]bool{
 	".cache":         true,
 	".cursor":        true,
 	".claude":        true,
+}
+
+func init() {
+	DefaultIgnoreDirs[paths.DefaultProjectStateDir] = true
 }
 
 // ZqkIgnoredSubdirs contains subdirectories under .zqk that should always be ignored (runtime caches/logs/builds).
@@ -112,7 +115,7 @@ func ShouldSkipDir(name string, includeHidden bool, customExcludes []string) boo
 		return true
 	}
 	// Always skip heavy build / vendor dirs
-	if name == "vendor" || name == "node_modules" || name == "dist" || name == "dist-community" || name == "bin" || name == "target" || name == ".zqk-state" {
+	if name == "vendor" || name == "node_modules" || name == "dist" || name == "dist-community" || name == "bin" || name == "target" || name == paths.DefaultProjectStateDir {
 		return true
 	}
 	if ZqkIgnoredSubdirs[name] {
@@ -121,7 +124,7 @@ func ShouldSkipDir(name string, includeHidden bool, customExcludes []string) boo
 	if !includeHidden {
 		if strings.HasPrefix(name, ".") && name != "." && name != ".." {
 			// Whitelist .agent, .agents, and .zqk for core project knowledge
-			if name != ".agent" && name != ".agents" && name != ".zqk" {
+			if name != ".agent" && name != ".agents" && name != paths.ProjectDataDir {
 				return true
 			}
 		}

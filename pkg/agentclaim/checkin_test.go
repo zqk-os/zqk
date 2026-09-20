@@ -7,6 +7,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/zqk-os/zqk/pkg/paths"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -150,10 +151,10 @@ func TestLoadCheckinFile_corruptJSONReportsError(t *testing.T) {
 	t.Parallel()
 	root := tempDir(t)
 	path := CheckinTimerPath(root, "ATK-7")
-	if err := fileutil.MkdirAll(filepath.Dir(path), 0o755); err != nil {
+	if err := fileutil.MkdirAll(filepath.Dir(path), paths.DirPerm755); err != nil {
 		t.Fatalf("mkdir: %v", err)
 	}
-	if err := fileutil.WriteFile(path, []byte("{not json"), 0o644); err != nil {
+	if err := fileutil.WriteFile(path, []byte("{not json"), paths.FilePerm644); err != nil {
 		t.Fatalf("write: %v", err)
 	}
 	if _, err := LoadCheckinFile(path); err == nil {

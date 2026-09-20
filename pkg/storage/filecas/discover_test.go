@@ -5,6 +5,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -48,7 +49,7 @@ func TestDiscoverCASFilePathsByScanning_bucketAndEmpty(t *testing.T) {
 	t.Parallel()
 	kindDir := t.TempDir()
 	bucket := filepath.Join(kindDir, "ab")
-	if err := fileutil.Mkdir(bucket, 0o755); err != nil {
+	if err := fileutil.Mkdir(bucket, paths.DirPerm755); err != nil {
 		t.Fatal(err)
 	}
 	id := "GOAL-BUCKET-1"

@@ -1,10 +1,12 @@
 package cleanup
 
 import (
+	"fmt"
 	"path/filepath"
 	"testing"
 
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -12,26 +14,27 @@ const (
 	testCleanupConfigFilename = "cleanup.yaml"
 	testMissingConfigFilename = "nonexistent.yaml"
 	testEmptyValue            = ""
-	testFilePerm              = 0o600
-	testDirPerm               = 0o755
+	testFilePerm              = paths.FilePerm600
+	testDirPerm               = paths.DirPerm755
 	testDeleteFilesType       = "delete_files"
 	testCLIType               = "cli"
 	testEchoCommand           = "echo"
-	testLogsGlobPath          = ".zqk/logs/**/*.log"
 )
+
+var testLogsGlobPath = paths.ProjectDataDir + "/" + paths.LogsDir + "/**/*.log"
 
 func TestLoadFromPath(t *testing.T) {
 	dir := t.TempDir()
 	cfgPath := filepath.Join(dir, testCleanupConfigFilename)
-	content := []byte(`working_directory: "."
+	content := []byte(fmt.Sprintf(`working_directory: "."
 steps:
   - type: delete_files
-    path: ".zqk/logs/**/*.log"
+    path: %q
     older_than: 7d
   - type: cli
     command: "echo"
     args: ["hello"]
-`)
+`, testLogsGlobPath))
 	if err := fileutil.WriteFile(cfgPath, content, testFilePerm); err != nil {
 		t.Fatal(err)
 	}

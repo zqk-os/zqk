@@ -17,6 +17,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/graph/memgraph"
 	"github.com/zqk-os/zqk/pkg/graph/provider"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/storage"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
@@ -26,7 +27,7 @@ func NewHydrateGraphCmd() *cobra.Command {
 	cmd := bldr_cli_cmd_v1.NewSystemHydrateGraphCommandBuilder()
 	cmd.RunE = runHydrateGraph
 
-	cmd.Flags().String("input", ".zqk-state/system-state.csnap", "Path to read the compressed snapshot")
+	cmd.Flags().String("input", filepath.Join(paths.DefaultProjectStateDir, "system-state.csnap"), "Path to read the compressed snapshot")
 	cmd.Flags().String("graph-host", "localhost", "Graph DB host")
 	cmd.Flags().Int("graph-port", 7687, "Graph DB port")
 
@@ -222,7 +223,7 @@ func runHydrateGraph(cmd *cobra.Command, args []string) error {
 				}
 			})
 		}
-		wg.Wait()
+		waitGroupWithTimeout(&wg, 30*time.Minute, "hydrate_graph")
 
 		if firstError != nil {
 			return errfmt.Newf("failed to write some objects").Wrap(firstError)

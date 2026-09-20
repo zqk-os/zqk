@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/zqk-os/zqk/pkg/paths"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"github.com/zqk-os/zqk/pkg/walutil"
 )
@@ -17,7 +18,7 @@ const (
 	policyInterruptWALCheckpointExt = ".checkpoint"
 	defaultPolicyProfile            = "pol" + "icy" // logging profile id; not necessarily KindPolicy
 	tmpFileSuffix                   = ".tmp"
-	walFilePerm                     = 0o600
+	walFilePerm                     = paths.FilePerm600
 
 	// maxWALLineSize limits line length when reading (single JSON object per line).
 	maxWALLineSize  = 64 * 1024

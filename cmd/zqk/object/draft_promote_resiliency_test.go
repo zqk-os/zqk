@@ -27,7 +27,7 @@ func setupTestProjectForDraftPromote(t *testing.T) string {
 		filepath.Join(paths.ProcessDir, "backlog_items"),
 		storage.ObjectDraftPlaneRoot(root),
 	} {
-		if err := fileutil.MkdirAll(filepath.Join(root, sub), 0o755); err != nil {
+		if err := fileutil.MkdirAll(filepath.Join(root, sub), paths.DirPerm755); err != nil {
 			t.Fatal(err)
 		}
 	}

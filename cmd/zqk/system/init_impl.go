@@ -883,9 +883,9 @@ func readDiscoveryDraft(projectRoot string) *discoveryDraft {
 
 func saveDiscoveryDraft(projectRoot string, draft *discoveryDraft) {
 	draftPath := filepath.Join(projectRoot, paths.ProjectDataDir, paths.CacheDir, "wizard_draft.json")
-	_ = fileutil.MkdirAll(filepath.Dir(draftPath), 0755)
+	_ = fileutil.MkdirAll(filepath.Dir(draftPath), paths.DirPerm755)
 	if data, err := json.Marshal(draft); err == nil {
-		_ = fileutil.WriteFile(draftPath, data, 0644)
+		_ = fileutil.WriteFile(draftPath, data, paths.FilePerm644)
 	}
 }
 
@@ -1229,7 +1229,7 @@ func injectAgentBootProtocol(projectRoot string, isLegacy bool, logger logging.L
 	ruleFiles := []string{".iderules", ".clinerules", ".windsurfrules"}
 	for _, file := range ruleFiles {
 		path := filepath.Join(projectRoot, file)
-		f, err := fileutil.OpenFile(path, fileutil.O_APPEND|fileutil.O_CREATE|fileutil.O_WRONLY, 0644)
+		f, err := fileutil.OpenFile(path, fileutil.O_APPEND|fileutil.O_CREATE|fileutil.O_WRONLY, paths.FilePerm644)
 		if err != nil {
 			logging.Fluent(logger).Warn("Could not open rule file for appending").String("file", file).WithError(err).Log()
 			continue

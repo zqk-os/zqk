@@ -9,6 +9,7 @@ import (
 
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -235,10 +236,10 @@ func writeOrCheckOne(ctx context.Context, opt ProjectOptions, prov VendorProvide
 	}
 
 	if write {
-		if err := fileutil.MkdirAll(filepath.Dir(outPath), 0o755); err != nil {
+		if err := fileutil.MkdirAll(filepath.Dir(outPath), paths.DirPerm755); err != nil {
 			return res, errfmt.Errorf("vds project: mkdir: %w", err)
 		}
-		if err := fileutil.WriteFile(outPath, want, 0o644); err != nil {
+		if err := fileutil.WriteFile(outPath, want, paths.FilePerm644); err != nil {
 			return res, errfmt.Errorf("vds project: write: %w", err)
 		}
 		res.Wrote = true

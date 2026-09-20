@@ -56,7 +56,7 @@ func GenerateBuilderFromYAML(yamlPath, outputDir string, version string, constan
 	if !config.ValidationSkipSpecSchemaValidation().OrDefault(false) && (yaml.Unmarshal(data, &tempSpec) == nil) {
 		if schemaRef, ok := tempSpec["$schema"].(string); ok && schemaRef != emptyValue {
 			// Try to find schemas directory relative to project root
-			schemasDir := ".zqk/cli/specs/schemas"
+			schemasDir := filepath.Join(paths.CLICommandSpecsDir, "schemas")
 			// Try to resolve from yamlPath
 			dir := filepath.Dir(yamlPath)
 			for i := 0; i < 10; i++ { // Limit depth

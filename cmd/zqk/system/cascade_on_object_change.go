@@ -226,7 +226,7 @@ func notifyAgentsOfKernelChange(projectRoot, operation, kind, id, sessionID stri
 	chatPath := filepath.Join(projectRoot, paths.ProjectDataDir, paths.LogsDir,
 		paths.IDEHooksLogsSubdir, paths.AgentChatChannelEventsFile)
 
-	if err := fileutil.MkdirAll(filepath.Dir(chatPath), 0o755); err != nil {
+	if err := fileutil.MkdirAll(filepath.Dir(chatPath), paths.DirPerm755); err != nil {
 		logging.Fluent(logger).Warn(fmt.Sprintf("agent_wake: mkdir failed: %v", err)).Log()
 		return
 	}
@@ -237,7 +237,7 @@ func notifyAgentsOfKernelChange(projectRoot, operation, kind, id, sessionID stri
 		return
 	}
 
-	f, err := fileutil.OpenFile(chatPath, fileutil.O_APPEND|fileutil.O_CREATE|fileutil.O_WRONLY, 0o644)
+	f, err := fileutil.OpenFile(chatPath, fileutil.O_APPEND|fileutil.O_CREATE|fileutil.O_WRONLY, paths.FilePerm644)
 	if err != nil {
 		logging.Fluent(logger).Warn(fmt.Sprintf("agent_wake: open failed: %v", err)).Log()
 		return

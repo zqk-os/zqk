@@ -55,7 +55,7 @@ func NewGenerateCommandBuildersCmd() *cobra.Command {
 
 		// Default specs directory
 		if specsDir == EmptyValue {
-			specsDir = ".zqk/cli/specs"
+			specsDir = paths.CLICommandSpecsDir
 		}
 
 		// Default output directory

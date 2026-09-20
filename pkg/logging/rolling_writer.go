@@ -11,6 +11,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/concurrency"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"github.com/zqk-os/zqk/pkg/zqktime"
 )
@@ -85,7 +86,7 @@ func (f *RollingWriterFactory) createSimpleWriter(filePath string) (RollingWrite
 		return nil, errfmt.Newf("failed to create log directory").Wrap(err)
 	}
 
-	file, err := fileutil.OpenFile(filePath, fileutil.O_CREATE|fileutil.O_WRONLY|fileutil.O_APPEND, 0o600)
+	file, err := fileutil.OpenFile(filePath, fileutil.O_CREATE|fileutil.O_WRONLY|fileutil.O_APPEND, paths.FilePerm600)
 	if err != nil {
 		return nil, errfmt.Newf("failed to open log file").Wrap(err)
 	}
@@ -213,7 +214,7 @@ func NewSizeBasedRollingWriter(basePath string, config SizeBasedRollingConfig) (
 	}
 
 	// Open or create the initial file
-	f, err := fileutil.OpenFile(basePath, fileutil.O_CREATE|fileutil.O_WRONLY|fileutil.O_APPEND, 0o600)
+	f, err := fileutil.OpenFile(basePath, fileutil.O_CREATE|fileutil.O_WRONLY|fileutil.O_APPEND, paths.FilePerm600)
 	if err != nil {
 		return nil, errfmt.Newf("failed to open log file").Wrap(err)
 	}
@@ -299,7 +300,7 @@ func (rtw *SizeBasedRollingWriter) rotateLocked() error {
 	}
 
 	// Open new file
-	f, err := fileutil.OpenFile(rtw.basePath, fileutil.O_CREATE|fileutil.O_WRONLY|fileutil.O_APPEND, 0o600)
+	f, err := fileutil.OpenFile(rtw.basePath, fileutil.O_CREATE|fileutil.O_WRONLY|fileutil.O_APPEND, paths.FilePerm600)
 	if err != nil {
 		return errfmt.Newf("failed to open new log file after rotation").Wrap(err)
 	}

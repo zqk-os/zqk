@@ -41,11 +41,11 @@ func extractTarGz(srcTarGz, destDir string) error {
 		target := filepath.Join(destDir, header.Name)
 		switch header.Typeflag {
 		case tar.TypeDir:
-			if err := fileutil.MkdirAll(target, 0o755); err != nil {
+			if err := fileutil.MkdirAll(target, paths.DirPerm755); err != nil {
 				return err
 			}
 		case tar.TypeReg:
-			if err := fileutil.MkdirAll(filepath.Dir(target), 0o755); err != nil {
+			if err := fileutil.MkdirAll(filepath.Dir(target), paths.DirPerm755); err != nil {
 				return err
 			}
 			outFile, err := fileutil.OpenFile(target, fileutil.O_CREATE|fileutil.O_RDWR|fileutil.O_TRUNC, fileutil.FileMode(header.Mode))
@@ -118,7 +118,7 @@ func TestQuickstartSmoke_FunctionalAcceptance(t *testing.T) {
 	}
 
 	// Verify .zqk configuration directory was initialized
-	if !fileutil.Exists(filepath.Join(strangerWorkspace, ".zqk")) {
+	if !fileutil.Exists(filepath.Join(strangerWorkspace, paths.ProjectDataDir)) {
 		t.Fatalf(".zqk directory was not created by system init")
 	}
 
@@ -135,7 +135,7 @@ func TestQuickstartSmoke_FunctionalAcceptance(t *testing.T) {
 	}
 
 	// Verify sync report was written
-	syncReport := filepath.Join(strangerWorkspace, ".zqk", "config", "agent_workspace_sync.json")
+	syncReport := filepath.Join(strangerWorkspace, paths.ProjectDataDir, paths.ConfigDir, "agent_workspace_sync.json")
 	if !fileutil.Exists(syncReport) {
 		t.Errorf("agent_workspace_sync.json not created at %s", syncReport)
 	}

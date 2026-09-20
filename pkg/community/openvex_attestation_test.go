@@ -125,7 +125,7 @@ func TestOpenVEX_BoundaryAndErrorHandling(t *testing.T) {
 	// 3. Corrupt JSON
 	tmpDir := t.TempDir()
 	badJSON := filepath.Join(tmpDir, "bad.json")
-	if err := os.WriteFile(badJSON, []byte("{invalid json content"), 0644); err != nil {
+	if err := os.WriteFile(badJSON, []byte("{invalid json content"), paths.FilePerm644); err != nil {
 		t.Fatalf("failed to write bad json: %v", err)
 	}
 	cmdBad := exec.Command("bash", scriptPath, "--verify", badJSON)
@@ -136,7 +136,7 @@ func TestOpenVEX_BoundaryAndErrorHandling(t *testing.T) {
 	// 4. Invalid OpenVEX schema (missing statements)
 	invalidVex := filepath.Join(tmpDir, "invalid-vex.json")
 	invalidContent := `{"@context":"https://openvex.dev/ns/v0.2.0","@id":"test","author":"test","statements":[]}`
-	if err := os.WriteFile(invalidVex, []byte(invalidContent), 0644); err != nil {
+	if err := os.WriteFile(invalidVex, []byte(invalidContent), paths.FilePerm644); err != nil {
 		t.Fatalf("failed to write invalid vex: %v", err)
 	}
 	cmdInvalid := exec.Command("bash", scriptPath, "--verify", invalidVex)

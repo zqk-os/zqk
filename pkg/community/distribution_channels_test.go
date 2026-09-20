@@ -71,7 +71,7 @@ func TestDistributionChannels_BoundaryAndErrorHandling(t *testing.T) {
 		archive := FormatArchiveName("2.9.4", p.OS, p.Arch)
 		archivePath := filepath.Join(tmpDir, archive)
 		content := []byte("mock binary archive content for " + p.OS + "/" + p.Arch)
-		if err := fileutil.WriteFile(archivePath, content, 0644); err != nil {
+		if err := fileutil.WriteFile(archivePath, content, paths.FilePerm644); err != nil {
 			t.Fatalf("failed to write mock archive: %v", err)
 		}
 		hash, err := ComputeFileSHA256(archivePath)
@@ -87,7 +87,7 @@ func TestDistributionChannels_BoundaryAndErrorHandling(t *testing.T) {
 		manifestLines = append(manifestLines, hash+"  "+archive)
 	}
 	manifestPath := filepath.Join(tmpDir, "checksums.txt")
-	if err := fileutil.WriteFile(manifestPath, []byte(strings.Join(manifestLines, "\n")), 0644); err != nil {
+	if err := fileutil.WriteFile(manifestPath, []byte(strings.Join(manifestLines, "\n")), paths.FilePerm644); err != nil {
 		t.Fatalf("failed to write manifest: %v", err)
 	}
 
@@ -99,7 +99,7 @@ func TestDistributionChannels_BoundaryAndErrorHandling(t *testing.T) {
 	// 3. Test corrupted archive detection
 	firstArchive := FormatArchiveName("2.9.4", SupportedPlatforms[0].OS, SupportedPlatforms[0].Arch)
 	firstArchivePath := filepath.Join(tmpDir, firstArchive)
-	if err := fileutil.WriteFile(firstArchivePath, []byte("tampered content"), 0644); err != nil {
+	if err := fileutil.WriteFile(firstArchivePath, []byte("tampered content"), paths.FilePerm644); err != nil {
 		t.Fatalf("failed to corrupt archive: %v", err)
 	}
 	if err := VerifyChecksumManifest(tmpDir); err == nil {
@@ -120,14 +120,14 @@ func TestDistributionChannels_BoundaryAndErrorHandling(t *testing.T) {
 		t.Fatalf("GenerateHomebrewFormula failed: %v", err)
 	}
 	formulaPath := filepath.Join(tmpDir, "zqk.rb")
-	if err := fileutil.WriteFile(formulaPath, []byte(formulaContent), 0644); err != nil {
+	if err := fileutil.WriteFile(formulaPath, []byte(formulaContent), paths.FilePerm644); err != nil {
 		t.Fatalf("failed to write formula: %v", err)
 	}
 
 	// Corrupt formula sha256
 	corruptedFormula := strings.Replace(formulaContent, mockChecksums[FormatArchiveName("2.9.4", "darwin", "arm64")], "0000000000000000000000000000000000000000000000000000000000000000", 1)
 	corruptedFormulaPath := filepath.Join(tmpDir, "zqk_corrupt.rb")
-	if err := fileutil.WriteFile(corruptedFormulaPath, []byte(corruptedFormula), 0644); err != nil {
+	if err := fileutil.WriteFile(corruptedFormulaPath, []byte(corruptedFormula), paths.FilePerm644); err != nil {
 		t.Fatalf("failed to write corrupted formula: %v", err)
 	}
 	if err := VerifyHomebrewFormula(corruptedFormulaPath, manifestPath); err == nil {

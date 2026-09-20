@@ -75,7 +75,7 @@ func TestMaybeAppendTestBundleCriteriaVerificationEvidence_NoMetadataNoFile(t *t
 
 func TestMaybeAppendTestBundleCriteriaVerificationEvidence_TestFailNotSatisfied(t *testing.T) {
 	root := t.TempDir()
-	_ = fileutil.MkdirAll(filepath.Join(root, paths.ProjectDataDir, "logs", "scheduler", "cvs", "test-bundles"), paths.DirPerm755)
+	_ = fileutil.MkdirAll(filepath.Join(root, paths.ProjectDataDir, paths.LogsDir, "scheduler", "cvs", "test-bundles"), paths.DirPerm755)
 	job := &ScheduledJob{
 		ID: "SCH-run-fail",
 		Metadata: map[string]any{
