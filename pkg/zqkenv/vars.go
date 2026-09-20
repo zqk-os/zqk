@@ -22,6 +22,8 @@ const _sfxAgentRulesDir = "AGENT_RULES_DIR"
 const _sfxAgentWebhookSlackAllAgentFarm = "AGENT_WEBHOOK_SLACK_ALL_AGENT_FARM"
 const _sfxAgentWorktreeRoot = "AGENT_WORKTREE_ROOT"
 const _sfxAgentID = "AGENT_ID"
+const _sfxAgentGitEmail = "AGENT_GIT_EMAIL"
+const _sfxAgentGitName = "AGENT_GIT_NAME"
 const _sfxAgentPubKey = "AGENT_PUB_KEY"
 const _sfxAgentPrivateKey = "AGENT_PRIVATE_KEY"
 const _sfxAgentSyncMaxLoops = "AGENT_SYNC_MAX_LOOPS"
@@ -146,6 +148,7 @@ const _sfxStreamDeltaFieldsConfig = "STREAM_DELTA_FIELDS_CONFIG"
 const _sfxStreamStorageEnabled = "STREAM_STORAGE_ENABLED"
 const _sfxTaskArtifacts = "TASK_ARTIFACTS"
 const _sfxTableMaxRows = "TABLE_MAX_ROWS"
+const _sfxSharedTestBin = "SHARED_TEST_BIN"
 const _sfxTestCLIBinary = "TEST_CLI_BINARY"
 const _sfxTestDataDir = "TEST_DATA_DIR"
 const _sfxTestMetricsRecording = "TEST_METRICS_RECORDING"
@@ -190,6 +193,14 @@ func AgentRulesDir() EnvVar { return EnvVar{Key: brand.EnvVar(_sfxAgentRulesDir)
 // studio project root. Default when unset: $TMPDIR/zqk-worktrees/<repo-key>/.
 // Kernel: POL-AGENT-WORKTREE-ISOLATION-001.
 func AgentWorktreeRoot() EnvVar { return EnvVar{Key: brand.EnvVar(_sfxAgentWorktreeRoot)} }
+
+// AgentGitName returns AGENT_GIT_NAME (brand-prefixed). Git author/committer
+// name for swarm worktree commits. Default when unset: "ZQK Swarm Agent".
+func AgentGitName() EnvVar { return EnvVar{Key: brand.EnvVar(_sfxAgentGitName)} }
+
+// AgentGitEmail returns AGENT_GIT_EMAIL (brand-prefixed). Git author/committer
+// email for swarm worktree commits. Default when unset: "swarm@zqk.internal".
+func AgentGitEmail() EnvVar { return EnvVar{Key: brand.EnvVar(_sfxAgentGitEmail)} }
 
 // AgentID returns the environment variable name for AGENT_ID (brand-prefixed).
 func AgentID() EnvVar { return EnvVar{Key: brand.EnvVar(_sfxAgentID)} }
@@ -698,6 +709,9 @@ func TestRoot() EnvVar { return EnvVar{Key: brand.EnvVar(_sfxTestRoot)} }
 // without the agent guard panicking. It changes no paths and no behavior, which is the point —
 // it is safe to export into a long-lived shell.
 func AllowForegroundGoTest() EnvVar { return EnvVar{Key: brand.EnvVar(_sfxAllowForegroundGoTest)} }
+
+// SharedTestBin returns the environment variable name for SHARED_TEST_BIN (brand-prefixed).
+func SharedTestBin() EnvVar { return EnvVar{Key: brand.EnvVar(_sfxSharedTestBin)} }
 
 // TestVerbose returns the environment variable name for TEST_VERBOSE (brand-prefixed).
 func TestVerbose() EnvVar { return EnvVar{Key: brand.EnvVar(_sfxTestVerbose)} }

@@ -2,6 +2,7 @@ package paths
 
 import (
 	"path/filepath"
+	"strings"
 
 	"github.com/zqk-os/zqk/pkg/brand"
 )
@@ -107,4 +108,39 @@ func SwarmInitDirPath(projectRoot string) string {
 // ScriptsDirPath returns the absolute scripts/ directory (path-cache alias "scripts").
 func ScriptsDirPath(projectRoot string) string {
 	return ResolvePathFromCacheOrConstant(projectRoot, "scripts", ScriptsDir)
+}
+
+// WorktreeLocalConfigRel is the git-relative seated-kernel wedge written by
+// BootstrapWorktreeConfig (config/<ZqkLocalConfigFileName>).
+func WorktreeLocalConfigRel() string {
+	return filepath.ToSlash(filepath.Join(ConfigDir, ZqkLocalConfigFileName))
+}
+
+// WorktreeLocalConfigRelYml is the .yml sibling of WorktreeLocalConfigRel when
+// the canonical file name ends in .yaml.
+func WorktreeLocalConfigRelYml() string {
+	rel := WorktreeLocalConfigRel()
+	if strings.HasSuffix(rel, ".yaml") {
+		return strings.TrimSuffix(rel, ".yaml") + ".yml"
+	}
+	return rel
+}
+
+// ObjectDraftsRel is the git-relative draft-plane directory
+// (ProjectDataDir/object_drafts).
+func ObjectDraftsRel() string {
+	return filepath.ToSlash(filepath.Join(ProjectDataDir, ObjectDraftsDir))
+}
+
+// IsWorktreeRuntimePorcelain reports git-relative paths that are worktree
+// runtime (local config wedge or isolated draft plane), not executor work.
+func IsWorktreeRuntimePorcelain(path string) bool {
+	path = filepath.ToSlash(path)
+	for _, rel := range []string{WorktreeLocalConfigRel(), WorktreeLocalConfigRelYml()} {
+		if rel != "" && (path == rel || strings.HasPrefix(path, rel)) {
+			return true
+		}
+	}
+	drafts := ObjectDraftsRel()
+	return path == drafts || strings.HasPrefix(path, drafts+"/")
 }

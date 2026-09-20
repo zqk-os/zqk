@@ -51,6 +51,18 @@ func TestRuntimeLayoutPaths_fallbackWithoutCache(t *testing.T) {
 	if got := ScriptsDirPath(root); got != filepath.Join(root, ScriptsDir) {
 		t.Fatalf("ScriptsDirPath=%q", got)
 	}
+	if got := WorktreeLocalConfigRel(); got != filepath.ToSlash(filepath.Join(ConfigDir, ZqkLocalConfigFileName)) {
+		t.Fatalf("WorktreeLocalConfigRel=%q", got)
+	}
+	if got := ObjectDraftsRel(); got != filepath.ToSlash(filepath.Join(ProjectDataDir, ObjectDraftsDir)) {
+		t.Fatalf("ObjectDraftsRel=%q", got)
+	}
+	if !IsWorktreeRuntimePorcelain(WorktreeLocalConfigRel()) || !IsWorktreeRuntimePorcelain(ObjectDraftsRel()+"/x.yaml") {
+		t.Fatal("IsWorktreeRuntimePorcelain rejected canonical rel paths")
+	}
+	if IsWorktreeRuntimePorcelain("result.txt") {
+		t.Fatal("IsWorktreeRuntimePorcelain matched executor path")
+	}
 }
 
 func TestRuntimeLayoutPaths_honorPathCache(t *testing.T) {

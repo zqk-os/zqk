@@ -76,6 +76,7 @@ func TestFileMetricsStore_Basic(t *testing.T) {
 	if m.ErrorRate != 50.0 {
 		t.Errorf("expected error rate 50.0, got %f", m.ErrorRate)
 	}
+	store.WaitForFlushes()
 }
 
 func TestFileMetricsStore_DayRoll_OnLoad(t *testing.T) {

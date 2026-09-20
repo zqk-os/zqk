@@ -42,7 +42,7 @@ func prewarmGlobalsOnce(projectRoot string) {
 
 func getSharedCLIBinary(t *testing.T, projectRoot string) string {
 	sharedCLIOnce.Do(func() {
-		if envBin := os.Getenv("ZQK_SHARED_TEST_BIN"); envBin != "" {
+		if envBin := zqkenv.SharedTestBin().Get(); envBin != "" {
 			if _, err := os.Stat(envBin); err == nil {
 				sharedCLIBinary = envBin
 				return
