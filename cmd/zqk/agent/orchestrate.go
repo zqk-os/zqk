@@ -70,14 +70,11 @@ func NewOrchestrateCmd() *cobra.Command {
 }
 
 const (
-	defaultHitlConfidence     = 0.8
-	defaultHitlDecisionBranch = "branch-main"
-	hitlPolicyID              = "POL-HITL-001"
-	orchestratedTaskStatus    = objects.ObjectStatusApproved
-	taskReadinessAttempts     = 20
-	taskReadinessDelay        = 50 * time.Millisecond
-	orchestrationTimeout      = 4 * time.Hour
-	nativeSwarmConcurrency    = 2
+	orchestratedTaskStatus = objects.ObjectStatusApproved
+	taskReadinessAttempts  = 20
+	taskReadinessDelay     = 50 * time.Millisecond
+	orchestrationTimeout   = 4 * time.Hour
+	nativeSwarmConcurrency = 2
 )
 
 func resolveOrchestrationTimeout(optsTimeout time.Duration, cmd *cobra.Command) time.Duration {

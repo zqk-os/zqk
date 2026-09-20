@@ -33,6 +33,10 @@ func testModuleRoot(t *testing.T) string {
 func TestRun_auditable_dryRun_softFinalize(t *testing.T) {
 	t.Parallel()
 	root := testModuleRoot(t)
+	specPath := filepath.Join(root, ".zqk", "specs", "objects", "auditable.yaml")
+	if _, err := fileutil.Stat(specPath); err != nil {
+		t.Skipf("spec file required at %s: skipping in environment without .zqk specs", specPath)
+	}
 	logger := logging.NewLogger(io.Discard, logging.InfoLevel, logging.NewTextFormatter(pkgctx.NewSystemContext()))
 	pctx := &pipeline.Context{Ctx: pkgctx.NewSystemContext(), Outcome: make(map[string]any)}
 	st, err := Run(pctx, logger, Options{

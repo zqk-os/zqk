@@ -1,6 +1,7 @@
 package agent
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"path/filepath"
@@ -56,46 +57,11 @@ func runNext(cmd *cobra.Command, args []string, proc *cli.Processor) error {
 		updates[objects.FieldKeyAssigneePersonaRef] = objects.ConstPersonaOrchestratorAlpha
 	}
 
-	// Enforce worktree teardown and merge proof before advancing.
-	// Docs-eval tasks do not use ATK worktrees or commit_hashes — artifact SUCCESS_GATE instead.
 	title, _ := task[objects.FieldKeyTitle].(string)
 	desc, _ := task[objects.FieldKeyDescription].(string)
 	workClass := agentprompt.ClassifyWorkClass(title, desc)
-
-	if !workClass.IsDocsEval() {
-		for _, worktreeDir := range paths.AgentWorktreeLookupDirs(proc.ProjectRoot(), id) {
-			if _, statErr := fileutil.Stat(worktreeDir); statErr == nil {
-				return errfmt.Errorf("FAIL-CLOSED: worktree %s still exists. You must merge your work into the active integration branch (integration/pri-*) and tear down the worktree before calling 'agent next'.", worktreeDir)
-			}
-		}
-	}
-
-	priRef, ok := task[objects.FieldKeyPriorityPlanRef].(string)
-	if !ok || priRef == "" {
-		return errfmt.Errorf("FAIL-CLOSED: priority_plan_ref is missing on task %s. You must link your work to a priority plan and merge to its integration branch.", id)
-	}
-
-	if workClass.IsDocsEval() {
-		if err := verifyDocsEvalNextEvidence(proc.ProjectRoot(), desc); err != nil {
-			return err
-		}
-	} else {
-		// Check if commit_hashes are merged into integration/<priRef>
-		commitRefs, _ := task[objects.FieldKeyCommitHashes].([]any)
-		if len(commitRefs) == 0 {
-			return errfmt.Errorf("FAIL-CLOSED: no commit_hashes found on task %s. You must merge your work into integration/%s and update commit_hashes before calling 'agent next'.", id, strings.ToLower(priRef))
-		}
-		integrationBranch := "integration/" + strings.ToLower(priRef)
-		for _, cr := range commitRefs {
-			if crStr, ok := cr.(string); ok && crStr != "" {
-				cmd := execwrap.CommandContext(ctx, "git", "branch", "--contains", crStr)
-				cmd.Dir = proc.ProjectRoot()
-				out, err := cmd.CombinedOutput()
-				if err != nil || !strings.Contains(string(out), integrationBranch) {
-					return errfmt.Errorf("FAIL-CLOSED: commit %s is not merged into %s. You must merge your work before calling 'agent next'.", crStr, integrationBranch)
-				}
-			}
-		}
+	if err := verifyAgentNextEvidence(ctx, proc.ProjectRoot(), id, task, workClass); err != nil {
+		return err
 	}
 
 	err = proc.Storage().Update(ctx, secCtx, id, updates)
@@ -163,6 +129,62 @@ func runNext(cmd *cobra.Command, args []string, proc *cli.Processor) error {
 		}
 	}
 
+	return nil
+}
+
+func verifyAgentNextEvidence(ctx context.Context, projectRoot, taskID string, task map[string]any, workClass agentprompt.WorkClass) error {
+	if workClass.IsDocsEval() {
+		if _, err := requirePriorityPlanRef(task, taskID); err != nil {
+			return err
+		}
+		desc, _ := task[objects.FieldKeyDescription].(string)
+		return verifyDocsEvalNextEvidence(projectRoot, desc)
+	}
+	if err := requireAtkWorktreeTornDown(projectRoot, taskID); err != nil {
+		return err
+	}
+	priRef, err := requirePriorityPlanRef(task, taskID)
+	if err != nil {
+		return err
+	}
+	return requireCommitsMergedToIntegration(ctx, projectRoot, taskID, priRef, task)
+}
+
+func requirePriorityPlanRef(task map[string]any, taskID string) (string, error) {
+	priRef, ok := task[objects.FieldKeyPriorityPlanRef].(string)
+	if !ok || priRef == "" {
+		return "", errfmt.Errorf("FAIL-CLOSED: priority_plan_ref is missing on task %s. You must link your work to a priority plan and merge to its integration branch.", taskID)
+	}
+	return priRef, nil
+}
+
+func requireAtkWorktreeTornDown(projectRoot, taskID string) error {
+	for _, worktreeDir := range paths.AgentWorktreeLookupDirs(projectRoot, taskID) {
+		if _, statErr := fileutil.Stat(worktreeDir); statErr == nil {
+			return errfmt.Errorf("FAIL-CLOSED: worktree %s still exists. You must merge your work into the active integration branch (integration/pri-*) and tear down the worktree before calling 'agent next'.", worktreeDir)
+		}
+	}
+	return nil
+}
+
+func requireCommitsMergedToIntegration(ctx context.Context, projectRoot, taskID, priRef string, task map[string]any) error {
+	commitRefs, _ := task[objects.FieldKeyCommitHashes].([]any)
+	if len(commitRefs) == 0 {
+		return errfmt.Errorf("FAIL-CLOSED: no commit_hashes found on task %s. You must merge your work into integration/%s and update commit_hashes before calling 'agent next'.", taskID, strings.ToLower(priRef))
+	}
+	integrationBranch := "integration/" + strings.ToLower(priRef)
+	for _, cr := range commitRefs {
+		crStr, ok := cr.(string)
+		if !ok || crStr == "" {
+			continue
+		}
+		cmd := execwrap.CommandContext(ctx, "git", "branch", "--contains", crStr)
+		cmd.Dir = projectRoot
+		out, err := cmd.CombinedOutput()
+		if err != nil || !strings.Contains(string(out), integrationBranch) {
+			return errfmt.Errorf("FAIL-CLOSED: commit %s is not merged into %s. You must merge your work before calling 'agent next'.", crStr, integrationBranch)
+		}
+	}
 	return nil
 }
 
