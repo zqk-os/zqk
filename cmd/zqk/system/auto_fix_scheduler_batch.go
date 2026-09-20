@@ -215,7 +215,7 @@ func (asb *AutoFixSchedulerBatcher) SubmitBatchToScheduler(ctx *cli.Context, bat
 
 	// Create scheduler job command
 	// The command will execute: zqk system auto-fix-batch --batch-file <file>
-	command := "zqk"
+	command := paths.ResolveProductCLI(asb.projectRoot)
 	commandArgs := []string{
 		"system",
 		"auto-fix-batch",

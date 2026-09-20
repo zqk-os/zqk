@@ -52,12 +52,17 @@ func TestClipSeatWorkerPromptPart_capsAndSteersWrite(t *testing.T) {
 	if !strings.Contains(got, "TRUNCATED FOR WINDOW") {
 		t.Fatalf("missing truncation footer: %q", got[len(got)-160:])
 	}
-	if !strings.Contains(got, "write_code") {
-		t.Fatal("coding clip footer must steer toward write_code")
+	if !strings.Contains(got, "write_code") || strings.Contains(got, "cmd/") || strings.Contains(got, "pkg/") {
+		t.Fatalf("coding clip footer must steer write_code without assuming a cmd/pkg layout: %q", got[len(got)-280:])
 	}
 	docs := clipSeatWorkerPromptPart(dump, seatWorkerPreparedPromptCap, "PREPARED CONTEXT", agentprompt.WorkClassDocsEval)
-	if !strings.Contains(docs, "docs/quality/") || !strings.Contains(docs, "Do NOT edit cmd/") {
-		t.Fatalf("docs_eval clip footer must prefer docs/quality and forbid cmd edits: %q", docs[len(docs)-220:])
+	if !strings.Contains(docs, "write_file") || !strings.Contains(docs, "application source") {
+		t.Fatalf("docs_eval clip footer must steer write_file and spare application source: %q", docs[len(docs)-280:])
+	}
+	for _, studio := range []string{"docs/quality/", "cef-runs", "cmd/", "pkg/", "backlog"} {
+		if strings.Contains(docs, studio) || strings.Contains(got, studio) {
+			t.Fatalf("clip footer must not assume studio path %q: coding=%q docs=%q", studio, got[len(got)-200:], docs[len(docs)-200:])
+		}
 	}
 	if strings.Contains(got, strings.Repeat("x", seatWorkerPreparedPromptCap+1)) {
 		t.Fatal("clip kept more than the prepared-context cap")

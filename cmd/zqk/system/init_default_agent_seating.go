@@ -15,6 +15,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/storage"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
@@ -226,11 +227,11 @@ func embeddedDefaultAgentSkillTemplates() []map[string]any {
 			objects.FieldKeyTitle:               "Agent Feed Correspondence (Community Default)",
 			objects.FieldKeyStatus:              objects.ObjectStatusApproved,
 			objects.FieldKeyProvider:            "zqk",
-			objects.FieldKeyInstructionsSummary: "Use kernel personas and zqk feed for out-of-the-box multi-agent chat.",
-			objects.FieldKeyInstructions: fmt.Sprintf(`# Agent Feed Correspondence
+			objects.FieldKeyInstructionsSummary: paths.RewriteCanonicalCLIInvocations("Use kernel personas and zqk feed for out-of-the-box multi-agent chat."),
+			objects.FieldKeyInstructions: paths.RewriteCanonicalCLIInvocations(fmt.Sprintf(`# Agent Feed Correspondence
 
 After init, use %s / %s with zqk feed steer and emit-status --persona-ref.
-Do not invent role enums; agent-id is the unique swarm seat.`, objects.ConstPersonaDefaultOperator, objects.ConstPersonaDefaultAgent),
+Do not invent role enums; agent-id is the unique swarm seat.`, objects.ConstPersonaDefaultOperator, objects.ConstPersonaDefaultAgent)),
 		},
 	}
 }

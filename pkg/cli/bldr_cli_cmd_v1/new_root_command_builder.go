@@ -3,6 +3,7 @@ package bldr_cli_cmd_v1
 import (
 	"github.com/spf13/cobra"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
+	"github.com/zqk-os/zqk/pkg/paths"
 )
 
 // NewNewRootCommandBuilder creates a new new_root command
@@ -11,10 +12,10 @@ func NewNewRootCommandBuilder() *cobra.Command {
 	builder.WithShort("Write draft YAML templates for object create and scenario bundles")
 	help := clipkg.DynamicHelpBuilder("Write draft YAML templates for object create and scenario bundles")
 	help.WithDescriptionLines("Materialize editable drafts derived from object specs (cliexamples) or a minimal scenario bundle.")
-	help.WithDescriptionLines("For a new kind definition file (object_specs YAML), use: zqk new object-spec <ontology> [--extends base_object]")
+	help.WithDescriptionLines(paths.RewriteCanonicalCLIInvocations("For a new kind definition file (object_specs YAML), use: zqk new object-spec <ontology> [--extends base_object]"))
 	help.WithDescriptionLines("Edit instance drafts, then persist with:")
-	help.WithDescriptionLines("  zqk object create <kind>   (after a default-path draft, --file is optional)")
-	help.WithDescriptionLines("  zqk internal create <kind>   (privileged kinds; same last-draft pointer)")
+	help.WithDescriptionLines(paths.RewriteCanonicalCLIInvocations("  zqk object create <kind>   (after a default-path draft, --file is optional)"))
+	help.WithDescriptionLines(paths.RewriteCanonicalCLIInvocations("  zqk internal create <kind>   (privileged kinds; same last-draft pointer)"))
 	help.WithDescriptionLines("  zqk-scenario bundle apply -f <draft> -R .")
 	help.WithDescriptionLines("")
 	help.WithDescriptionLines("Default output path when --output is omitted: .zqk/drafts/<name>-<timestamp>.yaml")

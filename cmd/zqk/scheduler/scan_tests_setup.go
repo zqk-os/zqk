@@ -152,8 +152,8 @@ func setupInitialBundles(projectRoot string, maxBundleSize int, overwrite bool, 
 	for _, name := range savedBundles {
 		fmt.Fprintf(out, "  - %s\n", name)
 	}
-	fmt.Fprintf(out, "\nView bundles: zqk scheduler scan-tests --list-bundles\n")
-	fmt.Fprintf(out, "Load bundle: zqk scheduler scan-tests --load-bundle <name>\n")
+	fmt.Fprintf(out, "%s", paths.RewriteCanonicalCLIInvocations("\nView bundles: zqk scheduler scan-tests --list-bundles\n"))
+	fmt.Fprintf(out, "%s", paths.RewriteCanonicalCLIInvocations("Load bundle: zqk scheduler scan-tests --load-bundle <name>\n"))
 
 	return nil
 }

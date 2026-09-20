@@ -8,6 +8,7 @@ import (
 	"github.com/zqk-os/zqk/internal/cli"
 	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
 	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/paths"
 	schedulerpkg "github.com/zqk-os/zqk/pkg/scheduler"
 )
 
@@ -69,7 +70,7 @@ func runIssuesBundleHealth(cliCtx *cli.Context, cmd *cobra.Command) error {
 		fmt.Fprintf(&b, "  → %s\n\n", row.Interpretation)
 	}
 
-	b.WriteString("Tip: if all bundles are green but issues.json is still \"issues\", run `zqk scheduler clear-issues` after confirming test-failures list is empty, or wait for automatic age-out (see issues.go).\n")
+	b.WriteString(paths.RewriteCanonicalCLIInvocations("Tip: if all bundles are green but issues.json is still \"issues\", run `zqk scheduler clear-issues` after confirming test-failures list is empty, or wait for automatic age-out (see issues.go).\n"))
 
 	return cli.WriteOutput(cmd, []byte(b.String()))
 }

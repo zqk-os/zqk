@@ -14,6 +14,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 	traypkg "github.com/zqk-os/zqk/pkg/tray"
 )
 
@@ -176,7 +177,7 @@ func setCliHookTray(cmd *cobra.Command, prof *clihooks.Profile, id, trayEntry, p
 			return err
 		}
 		if traypkg.Find(entries, trayEntry) == nil {
-			return errfmt.Errorf("unknown tray entry %q (see: zqk tray list)", trayEntry)
+			return errfmt.Errorf("%s", paths.RewriteCanonicalCLIInvocations(fmt.Sprintf("unknown tray entry %q (see: zqk tray list)", trayEntry)))
 		}
 	}
 	if err := prof.SetTrayEntry(id, trayEntry); err != nil {
@@ -209,8 +210,7 @@ func NewCliHooksCmd() *cobra.Command {
 	helpBuilder := clipkg.DynamicHelpBuilder(
 		"CLI hook profile (built-in hooks + optional tray entry)",
 		"Manage built-in automation hooks the same way as feature flags: persisted JSON under .zqk/config/cli_hook_profile.json.",
-		"",
-		"Hooks are stable IDs (e.g. post_commit_scan_tests) that git hooks or scripts can query. Optional tray_entry points at a zqk tray name for delegated commands.",
+		"", paths.RewriteCanonicalCLIInvocations("Hooks are stable IDs (e.g. post_commit_scan_tests) that git hooks or scripts can query. Optional tray_entry points at a zqk tray name for delegated commands."),
 	).
 		AddExample("List hooks", "%s system cli-hooks list").
 		AddExample("Disable post-commit test scheduling", "%s system cli-hooks disable post_commit_scan_tests").

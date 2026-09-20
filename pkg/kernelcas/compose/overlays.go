@@ -2,6 +2,7 @@ package compose
 
 import (
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 )
 
 // kindOverlayRules migrates former Go customRuleValidators into declarative rules.
@@ -459,7 +460,7 @@ func priorityPlanOverlay() []Rule {
 			Op: OpRefuseFieldPresent,
 			Config: map[string]any{
 				objects.FieldKeyField: objects.FieldKeyBacklogItemRefs,
-				"message":             "priority_plan must not store backlog_item_refs; membership is child-owned via backlog_item.priority_plan_ref (use zqk pplan add/remove)",
+				"message":             paths.RewriteCanonicalCLIInvocations("priority_plan must not store backlog_item_refs; membership is child-owned via backlog_item.priority_plan_ref (use zqk pplan add/remove)"),
 			},
 		},
 		{
@@ -554,7 +555,7 @@ func requirementTracePipelineOverlay() []Rule {
 			Op: OpRequireField,
 			Config: map[string]any{
 				objects.FieldKeyField: objects.FieldKeyCriteriaRefs,
-				"message":             "requirement.criteria_refs must be populated before leaving conceptual (CAS traceability barrier). Run: zqk workflow gen-trace-pipeline <REQ-id>",
+				"message":             paths.RewriteCanonicalCLIInvocations("requirement.criteria_refs must be populated before leaving conceptual (CAS traceability barrier). Run: zqk workflow gen-trace-pipeline <REQ-id>"),
 				"skip_preliminary":    true,
 				"skip_terminal":       true,
 			},

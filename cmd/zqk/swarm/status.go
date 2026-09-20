@@ -13,6 +13,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/storage"
 )
 
@@ -106,13 +107,13 @@ func buildSwarmStatus(ctx context.Context, sp storage.ObjectStorageProvider, sec
 			"cap_orchestrator_job": map[string]any{
 				objects.FieldKeyID: capOrchestratorJobID,
 				"present":          capPresent,
-				"history":          "zqk scheduler history --job-id " + capOrchestratorJobID,
+				"history":          paths.CLIUsage("scheduler", "history", "--job-id", capOrchestratorJobID),
 			},
 			"related_commands": []string{
-				"zqk agent status",
-				"zqk feed pending",
-				"zqk workflow whats-next --format json",
-				"zqk scheduler history --job-id " + capOrchestratorJobID,
+				paths.CLIUsage("agent", "status"),
+				paths.CLIUsage("feed", "pending"),
+				paths.CLIUsage("workflow", "whats-next", "--format", "json"),
+				paths.CLIUsage("scheduler", "history", "--job-id", capOrchestratorJobID),
 			},
 		},
 	}, nil

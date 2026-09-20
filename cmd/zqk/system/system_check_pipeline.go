@@ -23,6 +23,8 @@ import (
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"github.com/zqk-os/zqk/pkg/validation"
 	"github.com/zqk-os/zqk/pkg/when"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
+	"github.com/zqk-os/zqk/pkg/zqktime"
 )
 
 const pipelineKindSystemCheck = "system_check_async"
@@ -475,12 +477,22 @@ func runSystemCheckPipelineWithOutcome(
 		}).
 		AddStage("CAP_PROBE", func(stageCtx *pipeline.Context, payload any) (any, error) {
 			plLoad := payload.(*systemCheckPipelinePayload)
+			if plLoad.cmd != nil {
+				allowDegraded, _ := plLoad.cmd.Flags().GetBool("allow-degraded")
+				ignoreSchedulerDown, _ := plLoad.cmd.Flags().GetBool("ignore-scheduler-down")
+				if allowDegraded || ignoreSchedulerDown || zqkenv.AllowDegraded().Get() == "true" {
+					return payload, nil
+				}
+				if tier, _ := plLoad.cmd.Flags().GetInt("tier"); tier > 0 {
+					return payload, nil
+				}
+			}
 			if plLoad.checkCtx != nil && plLoad.checkCtx.ProjectRoot != emptyValue {
 				journalPath := filepath.Join(plLoad.checkCtx.ProjectRoot, paths.ProjectDataDir, paths.LogsDir, "scheduler", objects.JobIDCapOrchestrator, objects.JobIDCapOrchestrator+".events.jsonl")
 				stat, err := fileutil.Stat(journalPath)
 				if err == nil {
 					if time.Since(stat.ModTime()) > 4*time.Hour {
-						return nil, errfmt.Errorf("CAP journal is stale: no updates in over 4 hours (last modified %s)", stat.ModTime().Format(time.RFC3339))
+						return nil, errfmt.Errorf("CAP journal is stale: no updates in over 4 hours (last modified %s)", zqktime.FormatRFC3339UTC(stat.ModTime()))
 					}
 				} else if !fileutil.IsNotExist(err) {
 					return nil, errfmt.Errorf("failed to check CAP journal freshness: %w", err)

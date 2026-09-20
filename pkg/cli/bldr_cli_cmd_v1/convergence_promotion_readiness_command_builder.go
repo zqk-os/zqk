@@ -11,13 +11,10 @@ import (
 // NewConvergencePromotionReadinessCommandBuilder creates a new convergence_promotion_readiness command
 func NewConvergencePromotionReadinessCommandBuilder() *cobra.Command {
 	builder := clipkg.NewCommandBuilder("promotion-readiness [SESSION_ID]")
-	builder.WithShort("Optional promotion gate (delegates to scripts/check_convergence_promotion_readiness.sh)")
-	help := clipkg.DynamicHelpBuilder("Optional promotion gate (delegates to scripts/check_convergence_promotion_readiness.sh)")
-	help.WithDescriptionLines("Runs the shell promotion gate: zqk scheduler convergence measure --format json plus optional")
-	help.WithDescriptionLines("checks (PROMOTION_REQUIRE_* env). Same exit codes as the script (0 ok, 1 blocked, 2 usage/jq).")
-	help.WithDescriptionLines("")
-	help.WithDescriptionLines("Session id may be passed as the first argument or via CONVERGENCE_SESSION_ID.")
-	help.WithDescriptionLines("See scripts/README.md — Convergence promotion and overseer helpers.")
+	builder.WithShort("Optional promotion gate (native convergence measure)")
+	help := clipkg.DynamicHelpBuilder("Optional promotion gate (native convergence measure)")
+	help.WithDescriptionLines("Runs the native promotion-readiness path: zqk scheduler convergence measure")
+	help.WithDescriptionLines("(session id as the first argument or CONVERGENCE_SESSION_ID).")
 	builder.WithHelpBuilder(help)
 	builder.WithArgs(cobra.MaximumNArgs(1))
 	builder.WithCommonFlagsDefault(cli.AddCommonFlags)

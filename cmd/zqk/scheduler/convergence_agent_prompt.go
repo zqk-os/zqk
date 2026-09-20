@@ -274,9 +274,9 @@ func formatAgentPromptRollupSection(rollup map[string]any) string {
 	}
 	var b strings.Builder
 	b.WriteString("## Next measured action (rollup)\n\n")
-	b.WriteString("Same signals as JSON **`rollup_status_core`** from `zqk scheduler convergence measure --format json --session-id ...`. ")
+	b.WriteString(paths.RewriteCanonicalCLIInvocations("Same signals as JSON **`rollup_status_core`** from `zqk scheduler convergence measure --format json --session-id ...`. "))
 	b.WriteString("Use this to choose the **next measured step** before defaulting to persisted **next_action** below. ")
-	b.WriteString("**Parent/coordinator** CVS with nested children: `zqk scheduler convergence overseer --coordinator-session-id <CVS> --format json` adds tree walk + arbitrated parent line.\n\n")
+	b.WriteString(paths.RewriteCanonicalCLIInvocations("**Parent/coordinator** CVS with nested children: `zqk scheduler convergence overseer --coordinator-session-id <CVS> --format json` adds tree walk + arbitrated parent line.\n\n"))
 	if rs, ok := rollup["rollup_status"].(string); ok && strings.TrimSpace(rs) != "" {
 		fmt.Fprintf(&b, "- **rollup_status:** `%s`\n", rs)
 	}
@@ -408,7 +408,7 @@ func appendAgentPromptCLIDiagnostic(b *strings.Builder, sug map[string]any, effF
 		}
 	}
 	if agentPromptPhaseRouterNotesContainUnknownVariant(pr) {
-		b.WriteString("- **Stale binary hint:** If `main` already registers this `flow_variant` in `pkg/scheduler/convergence_phase_router.go` but the phase router JSON still shows an unknown-variant note, rebuild (`go build -o bin/zqk ./cmd/zqk`) and run `./bin/zqk scheduler convergence measure ...`, or align `PATH` so `which zqk` matches that binary.\n")
+		b.WriteString(paths.RewriteCanonicalCLIInvocations("- **Stale binary hint:** If `main` already registers this `flow_variant` in `pkg/scheduler/convergence_phase_router.go` but the phase router JSON still shows an unknown-variant note, rebuild (`go build -o bin/zqk ./cmd/zqk`) and run `./bin/zqk scheduler convergence measure ...`, or align `PATH` so `which zqk` matches that binary.\n"))
 	}
 	b.WriteString("\n")
 }
@@ -509,9 +509,9 @@ func formatAgentMarkdown(sessionID string, cvs map[string]any, sug map[string]an
 		b.WriteString("- **This run appended an activity_log audit only:** health watermark unchanged vs CVS `last_measurement_at` — snapshot fields (`delta_assessment`, `after_state_snapshot`, phase routing, etc.) were **not** rewritten.\n")
 		b.WriteString("- **When you have new test-bundle evidence** in `health.jsonl`, rerun with `--persist-session` to persist the full measurement payload.\n")
 	default:
-		b.WriteString("- After changes, run `zqk scheduler convergence measure --format json --session-id ")
+		b.WriteString(paths.RewriteCanonicalCLIInvocations("- After changes, run `zqk scheduler convergence measure --format json --session-id "))
 		fmt.Fprintf(&b, "`%s`", sessionID)
-		b.WriteString(" and apply `suggested_convergence_session_fields.object_update_body` with `zqk object update`, **or** use **`--persist-session`** on this command to write the CVS in one step.\n")
+		b.WriteString(paths.RewriteCanonicalCLIInvocations(" and apply `suggested_convergence_session_fields.object_update_body` with `zqk object update`, **or** use **`--persist-session`** on this command to write the CVS in one step.\n"))
 	}
 	b.WriteString("- Use targeted test bundles / `scan-tests` per project policy; attach log paths when reporting.\n")
 

@@ -731,7 +731,7 @@ func prioritizeWorkItems(snap ImprovementReportSnapshot, comp ImprovementReportC
 			Category:        "quality",
 			Title:           "Resolve blocking validation issues",
 			Description:     fmt.Sprintf("%d blocking issue(s) from last check.", b),
-			SuggestedAction: "Run 'zqk system check all' and fix Tier-1 issues; then 'zqk system check all --auto-fix' for auto-fixable.",
+			SuggestedAction: paths.RewriteCanonicalCLIInvocations("Run 'zqk system check all' and fix Tier-1 issues; then 'zqk system check all --auto-fix' for auto-fixable."),
 			Metric:          "blocking_issues",
 			Value:           fmt.Sprintf("%d", b),
 		})
@@ -744,7 +744,7 @@ func prioritizeWorkItems(snap ImprovementReportSnapshot, comp ImprovementReportC
 			Category:        "performance",
 			Title:           "Reduce internal object count over retention targets",
 			Description:     fmt.Sprintf("%d kind(s) over target: %s.", len(comp.RetentionOver), strings.Join(comp.RetentionOver, ", ")),
-			SuggestedAction: "Run 'zqk system aggregate-audit --window 7d --delete' then 'zqk system retention-tolerance'. Ensure retention_tolerance scheduler job is enabled.",
+			SuggestedAction: paths.RewriteCanonicalCLIInvocations("Run 'zqk system aggregate-audit --window 7d --delete' then 'zqk system retention-tolerance'. Ensure retention_tolerance scheduler job is enabled."),
 			Metric:          "retention_over_target",
 			Value:           strings.Join(comp.RetentionOver, ";"),
 		})
@@ -764,7 +764,7 @@ func prioritizeWorkItems(snap ImprovementReportSnapshot, comp ImprovementReportC
 			Category:        "behavior",
 			Title:           "Address high-failure or timeout-prone commands",
 			Description:     strings.TrimSpace(desc),
-			SuggestedAction: "Run 'zqk system audit-report --format json' to list commands; fix or extend timeouts.",
+			SuggestedAction: paths.RewriteCanonicalCLIInvocations("Run 'zqk system audit-report --format json' to list commands; fix or extend timeouts."),
 			Metric:          "metrics_issues",
 			Value:           fmt.Sprintf("failure=%d timeout=%d", snap.MetricsAnalysis.HighFailureCount, snap.MetricsAnalysis.TimeoutCount),
 		})
@@ -777,7 +777,7 @@ func prioritizeWorkItems(snap ImprovementReportSnapshot, comp ImprovementReportC
 			Category:        "quality",
 			Title:           "Reduce validation warnings",
 			Description:     fmt.Sprintf("%d warning(s) from last check.", w),
-			SuggestedAction: "Run 'zqk system check all' and address Tier-2 issues.",
+			SuggestedAction: paths.RewriteCanonicalCLIInvocations("Run 'zqk system check all' and address Tier-2 issues."),
 			Metric:          "warnings",
 			Value:           fmt.Sprintf("%d", w),
 		})
@@ -790,7 +790,7 @@ func prioritizeWorkItems(snap ImprovementReportSnapshot, comp ImprovementReportC
 			Category:        "performance",
 			Title:           "Optimize slow commands",
 			Description:     fmt.Sprintf("%d command(s) flagged as slow.", snap.MetricsAnalysis.SlowCount),
-			SuggestedAction: "Run 'zqk system audit-report' for details; consider caching or batching.",
+			SuggestedAction: paths.RewriteCanonicalCLIInvocations("Run 'zqk system audit-report' for details; consider caching or batching."),
 			Metric:          "slow_commands",
 			Value:           fmt.Sprintf("%d", snap.MetricsAnalysis.SlowCount),
 		})
@@ -803,7 +803,7 @@ func prioritizeWorkItems(snap ImprovementReportSnapshot, comp ImprovementReportC
 			Category:        "accuracy",
 			Title:           "Review object count growth",
 			Description:     fmt.Sprintf("Object count increased by %d since last report.", comp.ObjectCountDelta),
-			SuggestedAction: "Run 'zqk system object-count-report' to confirm congruence; run retention if internal kinds grew.",
+			SuggestedAction: paths.RewriteCanonicalCLIInvocations("Run 'zqk system object-count-report' to confirm congruence; run retention if internal kinds grew."),
 			Metric:          "object_count_delta",
 			Value:           fmt.Sprintf("%d", comp.ObjectCountDelta),
 		})
@@ -816,7 +816,7 @@ func prioritizeWorkItems(snap ImprovementReportSnapshot, comp ImprovementReportC
 			Category:        "behavior",
 			Title:           "Reduce CLI churn and user confusion",
 			Description:     fmt.Sprintf("%d churn indicator(s) in command metrics.", snap.MetricsAnalysis.ChurnCount),
-			SuggestedAction: "Run 'zqk system audit-report' and improve docs or UX for frequently failed command patterns.",
+			SuggestedAction: paths.RewriteCanonicalCLIInvocations("Run 'zqk system audit-report' and improve docs or UX for frequently failed command patterns."),
 			Metric:          "churn_indicators",
 			Value:           fmt.Sprintf("%d", snap.MetricsAnalysis.ChurnCount),
 		})
@@ -829,7 +829,7 @@ func prioritizeWorkItems(snap ImprovementReportSnapshot, comp ImprovementReportC
 			Category:        "quality",
 			Title:           "Review quarantine folder",
 			Description:     fmt.Sprintf("%d file(s) in quarantine.", q),
-			SuggestedAction: "Run 'zqk system quarantine-report' and 'zqk system cleanup-quarantine' if appropriate.",
+			SuggestedAction: paths.RewriteCanonicalCLIInvocations("Run 'zqk system quarantine-report' and 'zqk system cleanup-quarantine' if appropriate."),
 			Metric:          "quarantine_files",
 			Value:           fmt.Sprintf("%d", q),
 		})

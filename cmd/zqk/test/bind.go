@@ -15,6 +15,7 @@ import (
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/lifecycle"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/storage"
 )
 
@@ -150,7 +151,7 @@ func executeExplicitBinding(
 	_ = state.LoadFromStorage(ctx, proc, false, "", "")
 	_ = state.SaveToLiteFile(projectRoot)
 
-	fmt.Fprintf(cmd.OutOrStdout(), "\n%s Lineage updated successfully! Run 'zqk test dashboard' to inspect.\n", green("✓"))
+	fmt.Fprintf(cmd.OutOrStdout(), "%s", paths.RewriteCanonicalCLIInvocations(fmt.Sprintf("\n%s Lineage updated successfully! Run 'zqk test dashboard' to inspect.\n", green("✓"))))
 	return nil
 }
 
@@ -219,7 +220,7 @@ func displayBindingAssistant(
 					prefix = "(Alternative)"
 				}
 				fmt.Fprintf(cmd.OutOrStdout(), "      %s %s %s %s\n", yellow(fmt.Sprintf("[%d]", optIdx+1)), cyan(prefix), bold(c.ID), dim(c.Title))
-				fmt.Fprintf(cmd.OutOrStdout(), "          zqk test bind %s --req %s\n", tc.ID, c.ID)
+				fmt.Fprintf(cmd.OutOrStdout(), "%s", paths.RewriteCanonicalCLIInvocations(fmt.Sprintf("          zqk test bind %s --req %s\n", tc.ID, c.ID)))
 			}
 		} else if tc.Lineage != nil && tc.Lineage.RootObject == nil {
 			// Has requirement, but requirement lacks root goal
@@ -241,7 +242,7 @@ func displayBindingAssistant(
 					prefix = "(Alternative)"
 				}
 				fmt.Fprintf(cmd.OutOrStdout(), "      %s %s %s %s\n", yellow(fmt.Sprintf("[%d]", optIdx+1)), cyan(prefix), bold(c.ID), dim(c.Title))
-				fmt.Fprintf(cmd.OutOrStdout(), "          zqk test bind %s --req %s --goal %s\n", tc.ID, reqID, c.ID)
+				fmt.Fprintf(cmd.OutOrStdout(), "%s", paths.RewriteCanonicalCLIInvocations(fmt.Sprintf("          zqk test bind %s --req %s --goal %s\n", tc.ID, reqID, c.ID)))
 			}
 		}
 		fmt.Fprintf(cmd.OutOrStdout(), "\n")
@@ -249,7 +250,7 @@ func displayBindingAssistant(
 
 	fmt.Fprintf(cmd.OutOrStdout(), "──────────────────────────────────────────────────────────────────────────────\n")
 	fmt.Fprintf(cmd.OutOrStdout(), "Quick Command to automatically bind all incomplete chains using best matches:\n")
-	fmt.Fprintf(cmd.OutOrStdout(), "  %s\n\n", bold("zqk test bind --auto"))
+	fmt.Fprintf(cmd.OutOrStdout(), "  %s\n\n", bold(paths.CLIUsage("test", "bind", "--auto")))
 	return nil
 }
 

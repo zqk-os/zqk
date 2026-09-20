@@ -4,6 +4,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/zqk-os/zqk/internal/cli"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
+	"github.com/zqk-os/zqk/pkg/paths"
 )
 
 type SchedulerCommandConfig struct {
@@ -147,15 +148,14 @@ func NewSchedulerConvergenceCommandBuilder() *cobra.Command {
 			"nest-spawn           — Create child CVS under parent (related_object_refs; depth/cycle safe).",
 			"nest-link            — Link existing child CVS under parent.",
 			"nest-status          — BFS nest tree status for a parent CVS.",
-			"promotion-readiness   — Optional promotion gate; delegates to scripts/check_convergence_promotion_readiness.sh (bash + jq).",
-			"record-overseer-run   — Append overseer_run_v1 JSONL; delegates to scripts/record_convergence_overseer_run.sh.",
+			"promotion-readiness   — Optional promotion gate (native measure; session id as arg or CONVERGENCE_SESSION_ID).",
+			"record-overseer-run   — Coordinator overseer snapshot (native; coordinator id as arg or --coordinator-session-id).",
 			"",
 			"For agent markdown, use measure with --format agent-prompt. For JSON automation, use --format json."},
 		Examples: []string{"Convergence measure for automation (JSON)", "%s scheduler convergence measure --format json",
 			"Convergence JSON without literal gate scripts (faster; full gates + matrix in cvs_outcome_rollup.py)", "%s scheduler convergence measure --format json --skip-rollup-gates",
 			"Convergence measure with suggested CVS fields for object update", "%s scheduler convergence measure --format json --session-id CVS-001",
-			"Convergence with phase router alignment (current CVS phase + flow variant)", "%s scheduler convergence measure --format json --session-id CVS-001 --current-phase c5_verify --flow-variant scheduler_fast",
-			"Object update payload only (pipe to file for zqk object update --file)", "%s scheduler convergence measure --format json --session-id CVS-001 | jq '.suggested_convergence_session_fields.object_update_body'",
+			"Convergence with phase router alignment (current CVS phase + flow variant)", "%s scheduler convergence measure --format json --session-id CVS-001 --current-phase c5_verify --flow-variant scheduler_fast", paths.RewriteCanonicalCLIInvocations("Object update payload only (pipe to file for zqk object update --file)"), "%s scheduler convergence measure --format json --session-id CVS-001 | jq '.suggested_convergence_session_fields.object_update_body'",
 			"Agent prompt (markdown) for chat — same command as JSON, different --format", "%s scheduler convergence measure --format agent-prompt --session-id CVS-001",
 			"Agent prompt to file only (no CVS write; omit --persist-session when health watermark unchanged)", "%s scheduler convergence measure --format agent-prompt --session-id CVS-001 -o .zqk/logs/drift/cvs_agent_prompt_latest.md",
 			"Agent prompt copied to clipboard (macOS pbcopy)", "%s scheduler convergence measure --format agent-prompt --session-id CVS-001 --copy",
@@ -182,9 +182,7 @@ func NewSchedulerDumpCommandBuilder() *cobra.Command {
 		Use:   "dump",
 		Short: "Capture process dump from the running scheduler daemon",
 		Description: []string{"Sends SIGUSR1 to the scheduler daemon to capture goroutine dump, heap profile,",
-			"and thread info to .zqk/scheduler/diagnostics/. Use this when threads or goroutines",
-			"are escalating. The daemon must be running (zqk scheduler start). Not supported",
-			"on Windows (SIGUSR1 not available)."},
+			"and thread info to .zqk/scheduler/diagnostics/. Use this when threads or goroutines", paths.RewriteCanonicalCLIInvocations("are escalating. The daemon must be running (zqk scheduler start). Not supported"), "on Windows (SIGUSR1 not available)."},
 		Examples: []string{"Capture process dump from running daemon", "%s scheduler dump"},
 	})
 }
@@ -294,8 +292,7 @@ func NewSchedulerIssuesBundleHealthCommandBuilder() *cobra.Command {
 			"entry to lines in .zqk/logs/scheduler/cvs/test-bundles/health.jsonl. For each bundle",
 			"fingerprint, the last line in the scanned file wins — so a newer pass (possibly under a new",
 			"job id) shows as green even if issues.json was never cleared.",
-			"",
-			"Use together with: zqk scheduler test-failures list, zqk scheduler test-failures health."},
+			"", paths.RewriteCanonicalCLIInvocations("Use together with: zqk scheduler test-failures list, zqk scheduler test-failures health.")},
 		Examples: []string{"Compare issues.json to bundle health", "%s scheduler issues-bundle-health"},
 		Flags: func(builder *clipkg.CommandBuilder) {
 			builder.AddIntFlag("health-limit", "", 100000, "Max successfully parsed JSON rows from health.jsonl (full scan from start; error if exceeded)")
@@ -327,10 +324,8 @@ func NewSchedulerPrintCursorPasteApplescriptCommandBuilder() *cobra.Command {
 	return buildSchedulerCommand(SchedulerCommandConfig{
 		Use:   "print-cursor-paste-applescript",
 		Short: "Print AppleScript for agent chat paste (same as --paste-cursor; honors ZQK_CURSOR_PASTE_PREFIX_STEPS)",
-		Description: []string{"Prints the AppleScript used by `zqk scheduler convergence measure --format agent-prompt --paste-cursor`.",
-			"Respects `ZQK_CURSOR_PASTE_PREFIX_STEPS`; default tokens: cmd_shift_e, escape, option_cmd_e, option_cmd_e.",
-			"",
-			"For shell: `zqk scheduler print-cursor-paste-applescript | osascript -`"},
+		Description: []string{paths.RewriteCanonicalCLIInvocations("Prints the AppleScript used by `zqk scheduler convergence measure --format agent-prompt --paste-cursor`."), "Respects `ZQK_CURSOR_PASTE_PREFIX_STEPS`; default tokens: cmd_shift_e, escape, option_cmd_e, option_cmd_e.",
+			"", paths.RewriteCanonicalCLIInvocations("For shell: `zqk scheduler print-cursor-paste-applescript | osascript -`")},
 		Examples: []string{"Pipe generated script to osascript", "%s scheduler print-cursor-paste-applescript | osascript -"},
 	})
 }
@@ -340,10 +335,8 @@ func NewSchedulerPrintIDEPasteApplescriptCommandBuilder() *cobra.Command {
 	return buildSchedulerCommand(SchedulerCommandConfig{
 		Use:   "print-ide-paste-applescript",
 		Short: "Print AppleScript for agent chat paste (same as --paste-ide; honors ZQK_CURSOR_PASTE_PREFIX_STEPS)",
-		Description: []string{"Prints the AppleScript used by `zqk scheduler convergence measure --format agent-prompt --paste-ide`.",
-			"Respects `ZQK_CURSOR_PASTE_PREFIX_STEPS`; default tokens: cmd_shift_e, escape, option_cmd_e, option_cmd_e.",
-			"",
-			"For shell: `zqk scheduler print-ide-paste-applescript | osascript -`"},
+		Description: []string{paths.RewriteCanonicalCLIInvocations("Prints the AppleScript used by `zqk scheduler convergence measure --format agent-prompt --paste-ide`."), "Respects `ZQK_CURSOR_PASTE_PREFIX_STEPS`; default tokens: cmd_shift_e, escape, option_cmd_e, option_cmd_e.",
+			"", paths.RewriteCanonicalCLIInvocations("For shell: `zqk scheduler print-ide-paste-applescript | osascript -`")},
 		Examples: []string{"Pipe generated script to osascript", "%s scheduler print-ide-paste-applescript | osascript -"},
 	})
 }
@@ -623,8 +616,7 @@ func NewSchedulerStartCommandBuilder() *cobra.Command {
 			"  - Execute jobs with timeout and retry logic",
 			"  - Create audit events for job execution",
 			"",
-			"Default: runs in the background (detached process). Use --foreground to attach and stream logs.",
-			"If the daemon exits (crash or stop), run zqk scheduler start again to bring it back."},
+			"Default: runs in the background (detached process). Use --foreground to attach and stream logs.", paths.RewriteCanonicalCLIInvocations("If the daemon exits (crash or stop), run zqk scheduler start again to bring it back.")},
 		Examples: []string{"Start scheduler daemon", "%s scheduler start"},
 	})
 }
@@ -725,9 +717,7 @@ func NewSchedulerTestFailuresCommandBuilder() *cobra.Command {
 			"",
 			"Failed bundle event lines include test_failures and suggested_rerun_commands (copy-paste go test",
 			"lines). Subcommands list and rerun consider both callbacks and test-bundle events.",
-			"",
-			"Convergence measurement (health rollup, CVS handoff) lives under `zqk scheduler convergence`",
-			"(measure, overseer), not under test-failures."},
+			"", paths.RewriteCanonicalCLIInvocations("Convergence measurement (health rollup, CVS handoff) lives under `zqk scheduler convergence`"), "(measure, overseer), not under test-failures."},
 		Examples: []string{"List failing tests (callbacks + test-bundle events)", "%s scheduler test-failures list",
 			"List failures for a specific package", "%s scheduler test-failures list --package ./pkg/storage",
 			"Re-run only failing tests (creates scheduler jobs)", "%s scheduler test-failures rerun",
@@ -735,8 +725,7 @@ func NewSchedulerTestFailuresCommandBuilder() *cobra.Command {
 			"Convergence measure for automation (JSON)", "%s scheduler convergence measure --format json",
 			"Convergence JSON without literal gate scripts (faster; full gates + matrix in cvs_outcome_rollup.py)", "%s scheduler convergence measure --format json --skip-rollup-gates",
 			"Convergence measure with suggested CVS fields for object update", "%s scheduler convergence measure --format json --session-id CVS-001",
-			"Convergence with phase router alignment (current CVS phase + flow variant)", "%s scheduler convergence measure --format json --session-id CVS-001 --current-phase c5_verify --flow-variant scheduler_fast",
-			"Object update payload only (pipe to file for zqk object update --file)", "%s scheduler convergence measure --format json --session-id CVS-001 | jq '.suggested_convergence_session_fields.object_update_body'",
+			"Convergence with phase router alignment (current CVS phase + flow variant)", "%s scheduler convergence measure --format json --session-id CVS-001 --current-phase c5_verify --flow-variant scheduler_fast", paths.RewriteCanonicalCLIInvocations("Object update payload only (pipe to file for zqk object update --file)"), "%s scheduler convergence measure --format json --session-id CVS-001 | jq '.suggested_convergence_session_fields.object_update_body'",
 			"Include iteration tombstone (before_state_snapshot) in object update payload", "%s scheduler convergence measure --format json --session-id CVS-001 --stamp-tombstone | jq '.suggested_convergence_session_fields.object_update_body'",
 			"Finalize: merge predictions with retrospective debrief into object update payload", "%s scheduler convergence measure --format json --session-id CVS-001 --finalize-debrief | jq '.suggested_convergence_session_fields.object_update_body.predictions'",
 			"Handoff: operator debrief notes on the CVS for the next convergence session", "%s scheduler convergence measure --format json --session-id CVS-001 --debrief-notes 'Next: focus pkg/scheduler first; watch retention bundle timeouts.' | jq '.suggested_convergence_session_fields.object_update_body.debrief_notes'",

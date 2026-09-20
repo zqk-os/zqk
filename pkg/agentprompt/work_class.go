@@ -12,6 +12,7 @@ import "strings"
 type WorkClass string
 
 const (
+	emptyWorkClass              = ""
 	WorkClassCoding   WorkClass = "coding"
 	WorkClassDocsEval WorkClass = "docs_eval"
 )
@@ -55,4 +56,13 @@ func (c WorkClass) IsCode() bool {
 // IsCoding is an alias for IsCode.
 func (c WorkClass) IsCoding() bool {
 	return c.IsCode()
+}
+
+// PromptCapabilities is the capability list injected into the worker system prompt.
+// It is the work class only — not a studio skill inventory (review, cef, …).
+func (c WorkClass) PromptCapabilities() []string {
+	if strings.TrimSpace(string(c)) == "" {
+		return []string{string(WorkClassCoding)}
+	}
+	return []string{string(c)}
 }

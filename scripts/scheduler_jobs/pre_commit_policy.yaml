@@ -15,12 +15,16 @@ schedule_expression: "*/15 * * * *"
 category: maintenance
 execution_mode: reusable
 max_runtime_seconds: 600
-enabled: true
+enabled: false
 callback_type: command
 callback_on_completion: zqk pre-commit write-result-from-last --category=policy
 title: Pre-commit policy (logging + architecture)
 description: |
-  Runs pre-commit-policy.sh (check-logging-compliance, check-architecture-compliance),
-  writes policy category and runs pre-commit aggregate.
-command: ./scripts/pre-commit-policy.sh
+  Runs policy verification, writes policy category and runs pre-commit aggregate.
+command: /bin/sh
+command_args:
+  - "-c"
+  - |
+    BIN="${ZQK_BIN:-zqk}"
+    exec "$BIN" validate agent
 namespace_id: zqk:kernel

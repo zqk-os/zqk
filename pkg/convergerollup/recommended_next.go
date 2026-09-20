@@ -2,6 +2,7 @@ package convergerollup
 
 import (
 	"fmt"
+	"github.com/zqk-os/zqk/pkg/paths"
 	"strings"
 )
 
@@ -9,8 +10,7 @@ import (
 // for agent prompts and overseer output (measurement-disambiguated next step).
 func BuildRecommendedNextAction(status RollupStatus, blockers []Blocker, tb TestBundleInput, readyBundles bool) string {
 	if len(blockers) == 0 && status == RollupStatusSatisfied && readyBundles {
-		return "All configured rollup surfaces in this command's scope are green (bundles, literal gates, linked child CVS rows). " +
-			"Advance phase or complete the session via zqk object update when lifecycle rules and desired_end_state allow."
+		return "All configured rollup surfaces in this command's scope are green (bundles, literal gates, linked child CVS rows). " + paths.RewriteCanonicalCLIInvocations("Advance phase or complete the session via zqk object update when lifecycle rules and desired_end_state allow.")
 	}
 
 	priority := []string{
@@ -36,8 +36,7 @@ func BuildRecommendedNextAction(status RollupStatus, blockers []Blocker, tb Test
 			"(related_object_refs), or document explicit acceptance. See docs/architecture/CONVERGENCE_ORCHESTRATION_AND_NESTED_CVS.md."
 	}
 	if !readyBundles {
-		return "Wait for bundle health to satisfy ready_for_session_completion (scan-tests, scheduler activity); " +
-			"then re-measure with zqk scheduler convergence measure --format json --session-id <CVS>."
+		return "Wait for bundle health to satisfy ready_for_session_completion (scan-tests, scheduler activity); " + paths.RewriteCanonicalCLIInvocations("then re-measure with zqk scheduler convergence measure --format json --session-id <CVS>.")
 	}
 	return "Address rollup blockers above; re-run convergence measure and literal gates. " +
 		"See docs/architecture/CONVERGENCE_ORCHESTRATION_AND_NESTED_CVS.md."
@@ -50,10 +49,8 @@ func actionLineForBlocker(code, detail string, tb TestBundleInput) string {
 		if n == 0 {
 			n = 1
 		}
-		return fmt.Sprintf(
-			"Fix failing test bundles (%d fingerprint(s) in latest measurement): run targeted zqk scheduler scan-tests --package … "+
-				"and inspect .zqk/logs/scheduler/cvs/test-bundles/; re-run measure when green.",
-			n,
+		return fmt.Sprintf(paths.RewriteCanonicalCLIInvocations("Fix failing test bundles (%d fingerprint(s) in latest measurement): run targeted zqk scheduler scan-tests --package … ")+
+			"and inspect .zqk/logs/scheduler/cvs/test-bundles/; re-run measure when green.", n,
 		)
 	case "delta_trending_away":
 		return "Bundle health is trending away from the session goal; stabilize tests and scheduler load before advancing phase. " +

@@ -15,6 +15,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/pipeline"
 	"github.com/zqk-os/zqk/pkg/tpm"
 	"github.com/zqk-os/zqk/pkg/workflow/whatsnext"
@@ -348,7 +349,7 @@ func (h *CapOrchestratorHandler) executeSelfImprovementStage(ctx context.Context
 				"last_stage":           tracker.LastStage,
 			},
 			SuggestedActions: []string{
-				"zqk scheduler status",
+				paths.CLIUsage("scheduler", "status"),
 				"cat .zqk/state/cap_review_result.json",
 				"go test ./pkg/scheduler/...",
 			},

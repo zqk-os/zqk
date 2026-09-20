@@ -9,6 +9,7 @@ import (
 	"github.com/zqk-os/zqk/internal/cli"
 	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
 	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/precommit"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
@@ -75,13 +76,13 @@ func printStatus(cmd *cobra.Command, path string, a *precommit.AggregatedResult)
 			}
 			fmt.Fprintln(&b, "")
 			fmt.Fprintln(&b, "Required action: Fix the issues above, then either:")
-			fmt.Fprintln(&b, "  zqk pre-commit clear     # clear results and allow commits; next script run repopulates")
-			fmt.Fprintln(&b, "  zqk pre-commit aggregate # after re-running scripts (e.g. scripts/pre-commit-lint.sh)")
+			fmt.Fprintln(&b, paths.RewriteCanonicalCLIInvocations("  zqk pre-commit clear     # clear results and allow commits; next script run repopulates"))
+			fmt.Fprintln(&b, paths.RewriteCanonicalCLIInvocations("  zqk pre-commit aggregate # after re-running scripts (e.g. scripts/pre-commit-lint.sh)"))
 		}
 	} else {
 		fmt.Fprintln(&b, "")
 		fmt.Fprintln(&b, "Commit would be allowed. To refresh results, run:")
-		fmt.Fprintln(&b, "  zqk pre-commit aggregate")
+		fmt.Fprintln(&b, paths.RewriteCanonicalCLIInvocations("  zqk pre-commit aggregate"))
 		fmt.Fprintln(&b, "  (after background jobs have run)")
 	}
 	return cli.WriteOutput(cmd, []byte(b.String()))

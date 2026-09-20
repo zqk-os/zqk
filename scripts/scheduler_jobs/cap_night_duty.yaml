@@ -4,15 +4,20 @@ schema_version: "2.0.0"
 status: active
 title: CAP Night Duty
 description: |
-  Overnight CAP integrity check and agent feeding loop. Runs scripts/mesh/night-duty-tick.sh
-  to ensure swarm never idles.
+  Overnight CAP integrity check and agent feeding loop. Runs zqk system check --fast
+  to ensure workspace integrity.
 job_type: run_wrapper
 trigger_type: timer
-schedule_expression: "*/2 * * * *"
+schedule_expression: "*/15 * * * *"
 execution_mode: reusable
 category: maintenance
 priority: normal
-enabled: true
+enabled: false
 log_level: default
 namespace_id: zqk:kernel
-command: ./scripts/mesh/night-duty-tick.sh
+command: /bin/sh
+command_args:
+  - "-c"
+  - |
+    BIN="${ZQK_BIN:-zqk}"
+    exec "$BIN" system check --fast

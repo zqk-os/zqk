@@ -7,6 +7,7 @@ import (
 	"github.com/zqk-os/zqk/internal/cli"
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/paths"
 	schedulerpkg "github.com/zqk-os/zqk/pkg/scheduler"
 )
 
@@ -102,8 +103,8 @@ func handleAutoFixBatching(ctx *cli.Context, cmd *cobra.Command, projectRoot str
 		_, _ = fmt.Fprintf(out, " and %d more", len(jobIDs)-1)
 	}
 	_, _ = fmt.Fprintf(out, "\n")
-	_, _ = fmt.Fprintf(out, "   Monitor: zqk scheduler activity\n")
-	_, _ = fmt.Fprintf(out, "   History: zqk scheduler history\n\n")
+	_, _ = fmt.Fprintf(out, "%s", paths.RewriteCanonicalCLIInvocations("   Monitor: zqk scheduler activity\n"))
+	_, _ = fmt.Fprintf(out, "%s", paths.RewriteCanonicalCLIInvocations("   History: zqk scheduler history\n\n"))
 
 	return nil
 }

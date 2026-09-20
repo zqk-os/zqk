@@ -37,7 +37,8 @@ var (
 )
 
 const (
-	configYAMLFileName = "config.yaml"
+	ConfigYAMLFileName = "config.yaml"
+	configYAMLFileName = ConfigYAMLFileName
 
 	// DefaultProjectStateDir is the literal directory name for project state snapshots (".zqk-state").
 	DefaultProjectStateDir = ".zqk-state"

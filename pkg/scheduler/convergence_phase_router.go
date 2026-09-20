@@ -3,6 +3,7 @@ package scheduler
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/zqk-os/zqk/pkg/paths"
 	"strings"
 )
 
@@ -85,9 +86,7 @@ var phaseRoutingProfiles = map[string]phaseRoutingProfile{
 	"expertise_docs_and_alpha_prep": {
 		ID: "expertise_docs_and_alpha_prep",
 		ExtraNotes: func(*TestBundleConvergenceSnapshot) []string {
-			return []string{
-				"Profile expertise_docs_and_alpha_prep: land docs under docs/architecture/ with a single index; link PRI/backlog; archive redundant reports to docs/archive/; use targeted zqk scheduler scan-tests so health.jsonl advances — full matrix only when blast radius warrants it.",
-			}
+			return []string{paths.RewriteCanonicalCLIInvocations("Profile expertise_docs_and_alpha_prep: land docs under docs/architecture/ with a single index; link PRI/backlog; archive redundant reports to docs/archive/; use targeted zqk scheduler scan-tests so health.jsonl advances — full matrix only when blast radius warrants it.")}
 		},
 	},
 	// Backlog-scoped delivery (tutorial/docs/hands-on); session thresholds may disable bundle-health as completion gate.

@@ -114,13 +114,13 @@ func TestModulePathSync_IntegrationAndConformance(t *testing.T) {
 		}
 	}
 
-	// Verify cmd/zqk-community builds standalone
-	binPath := filepath.Join(t.TempDir(), "zqk-community-test")
-	cmd := execwrap.Command("go", "build", "-buildvcs=false", "-o", binPath, "./cmd/zqk-community")
+	// Verify ./cmd/zqk builds standalone
+	binPath := filepath.Join(t.TempDir(), "zqk-build-probe")
+	cmd := execwrap.Command("go", "build", "-buildvcs=false", "-o", binPath, "./cmd/zqk")
 	cmd.Dir = root
 	var stderr bytes.Buffer
 	cmd.Stderr = &stderr
 	if err := cmd.Run(); err != nil {
-		t.Fatalf("go build ./cmd/zqk-community failed: %v\nStderr: %s", err, stderr.String())
+		t.Fatalf("go build ./cmd/zqk failed: %v\nStderr: %s", err, stderr.String())
 	}
 }

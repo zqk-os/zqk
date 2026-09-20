@@ -12,6 +12,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 	schedpkg "github.com/zqk-os/zqk/pkg/scheduler"
 )
 
@@ -247,7 +248,7 @@ func runTestFailuresConvergence(cliCtx *cli.Context, cmd *cobra.Command) error {
 		}
 		if sessionID != emptyValue {
 			b.WriteString("\n---\n")
-			fmt.Fprintf(&b, "Session %s — paste into zqk object update (see suggested_convergence_session_fields with --format json --session-id):\n", sessionID)
+			fmt.Fprintf(&b, "%s", paths.RewriteCanonicalCLIInvocations(fmt.Sprintf("Session %s — paste into zqk object update (see suggested_convergence_session_fields with --format json --session-id):\n", sessionID)))
 			summary, err := summarizeSuggestedSessionFields(snap, effCurrentPhase, effFlowVariant, sessionRoutingMeta, beforeStateSnapshot, stampTombstone, sessionPredictions, finalizeDebrief, debriefNotes, sessionThresholds)
 			if err != nil {
 				return errfmt.Newf("suggested fields").Wrap(err)

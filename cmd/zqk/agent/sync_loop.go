@@ -40,8 +40,6 @@ func NewSyncLoopCmd() *cobra.Command {
 	cmd := bldr_cli_cmd_v1.NewAgentSyncLoopCommandBuilder()
 	// regenerate from CLI spec; builder currently emits empty Use.
 	cmd.Use = "sync-loop"
-	cmd.Short = "Run a native local-LLM (Ollama) sync-loop worker for an agent_task"
-	cmd.Long = "Spawns a graph-state sync-loop that executes an agent_task against the configured local LLM (ZQK_LLM_* / Ollama)."
 	cmd.Hidden = false
 	cmd.Args = cobra.ExactArgs(1)
 	cmd.RunE = func(cmd *cobra.Command, args []string) error {
@@ -50,7 +48,7 @@ func NewSyncLoopCmd() *cobra.Command {
 			taskID = strings.TrimSpace(args[0])
 		}
 		if taskID == "" {
-			return errfmt.Errorf("task ID is required. Usage: zqk agent sync-loop <task-id>")
+			return errfmt.Errorf("task ID is required. Usage: %s <task-id>", paths.CLIUsage("agent", "sync-loop"))
 		}
 		return runSyncLoop(cmd, taskID)
 	}

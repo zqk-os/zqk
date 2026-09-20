@@ -12,6 +12,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 )
 
 // NewSpecGetCmd creates the "spec get" / "spec show" subcommand.
@@ -123,7 +124,7 @@ func runSpecGet(cmd *cobra.Command, args []string) error {
 		buf.WriteString(fmt.Sprintf("\nFields (%d):\n", len(fieldNames)))
 		buf.WriteString(fmt.Sprintf("  Required: %s\n", strings.Join(requiredFields, ", ")))
 		buf.WriteString(fmt.Sprintf("  All:      %s\n", strings.Join(fieldNames, ", ")))
-		buf.WriteString(fmt.Sprintf("\nTip: Run 'zqk spec fields %s' for field-level attributes and validation rules.\n", spec.Ontology))
+		buf.WriteString(paths.RewriteCanonicalCLIInvocations(fmt.Sprintf("\nTip: Run 'zqk spec fields %s' for field-level attributes and validation rules.\n", spec.Ontology)))
 
 		return cli.WriteOutput(cmd, []byte(buf.String()))
 	})(cmd, args)

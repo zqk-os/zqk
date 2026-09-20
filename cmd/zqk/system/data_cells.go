@@ -219,10 +219,7 @@ func formatTestBundleHealthSummaryFooter(s testBundleHealthSummary, ok bool) str
 	if !ok {
 		return ""
 	}
-	return fmt.Sprintf(
-		"\nTest-bundle health (rolling health.jsonl): ~%d line(s) indexed in stream summary; updated %s. Details: zqk scheduler test-failures health\n",
-		s.LineCount, s.UpdatedAtRFC3339,
-	)
+	return paths.RewriteCanonicalCLIInvocations(fmt.Sprintf("\nTest-bundle health (rolling health.jsonl): ~%d line(s) indexed in stream summary; updated %s. Details: zqk scheduler test-failures health\n", s.LineCount, s.UpdatedAtRFC3339))
 }
 
 // testBundleHealthSummaryFooter returns a short operator hint when stream_summary/test_bundle_health.json exists
@@ -403,8 +400,7 @@ func runDataCells(cmd *cobra.Command, _ []string) error {
 	if accErr == nil {
 		eventsLine = datacell.EffectiveAgentChatChannelEventsJSONLPath(root, accText)
 	}
-	fmt.Fprintf(&b, "Agent chat channel (pilot): config=%s\n  events (JSONL)=%s\n  (see: zqk system path-cache --show-paths; materialize: zqk system materialize-agent-chat-channel; DATA_CELL_RUNTIME_ORGANISM.md#data-cell-narrative — agent_feed vs CVS measure vs orchestration)\n",
-		rp.AgentChatChannelConfig, eventsLine)
+	fmt.Fprintf(&b, "%s", paths.RewriteCanonicalCLIInvocations(fmt.Sprintf("Agent chat channel (pilot): config=%s\n  events (JSONL)=%s\n  (see: zqk system path-cache --show-paths; materialize: zqk system materialize-agent-chat-channel; DATA_CELL_RUNTIME_ORGANISM.md#data-cell-narrative — agent_feed vs CVS measure vs orchestration)\n", rp.AgentChatChannelConfig, eventsLine)))
 	fmt.Fprintf(&b, "Steward coordinator (slice): enqueue JSONL=%s\n  steward metrics (JSONL)=%s\n  (metrics lines when recording enabled; see DATA_CELL_MODEL.md)\n",
 		rp.StewardEnqueue, rp.StewardMetrics)
 	if feedSum := loadAgentFeedBindingsSummary(cli.CommandContextOr(cmd, context.Background()), root); feedSum != nil { // Background: request-or-shutdown derived
@@ -510,7 +506,7 @@ func formatAgentFeedBindingsFooter(sum *agentFeedBindingsSummary) string {
 	if sum.Truncated {
 		fmt.Fprintf(&b, " (showing %d most recently updated)", sum.Listed)
 	}
-	fmt.Fprintf(&b, "; see: zqk object list agent_feed\n")
+	fmt.Fprintf(&b, "%s", paths.RewriteCanonicalCLIInvocations("; see: zqk object list agent_feed\n"))
 	if sum.TotalCount == 0 {
 		return b.String()
 	}

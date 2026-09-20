@@ -107,13 +107,13 @@ func scanAndScheduleTests(cliCtx *cli.Context, cmd *cobra.Command) error {
 	setupBundles, _ := cmd.Flags().GetBool("setup-bundles")
 	out := cli.CommandOutputWriter(cmd, ctx)
 	if logger != nil {
-		logger.Warn("zqk scheduler scan-tests is deprecated; migrate to zqk test discover and zqk test run",
+		logger.Warn(paths.CLIUsage("scheduler", "scan-tests")+" is deprecated; migrate to "+paths.CLIUsage("test", "discover")+" and "+paths.CLIUsage("test", "run"),
 			logging.String("deprecation_code", "DEP-SCAN-TESTS-001"),
-			logging.String("alternative", "zqk test run"),
+			logging.String("alternative", paths.CLIUsage("test", "run")),
 		)
 	}
 	if out != nil {
-		_, _ = out.Write([]byte("⚠️  DEPRECATION NOTICE: 'zqk scheduler scan-tests' and disk test-bundles are deprecated. Use 'zqk test discover' and 'zqk test run' for universal test_case orchestration.\n"))
+		_, _ = out.Write([]byte("⚠️  DEPRECATION NOTICE: '" + paths.CLIUsage("scheduler", "scan-tests") + "' and disk test-bundles are deprecated. Use '" + paths.CLIUsage("test", "discover") + "' and '" + paths.CLIUsage("test", "run") + "' for universal test_case orchestration.\n"))
 	}
 
 	// Handle bundle listing

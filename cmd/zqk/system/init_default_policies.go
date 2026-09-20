@@ -15,6 +15,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/storage"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
@@ -202,13 +203,13 @@ func embeddedDefaultPolicyTemplates() []map[string]any {
 			objects.FieldKeyStatus:     objects.ObjectStatusActive,
 			objects.FieldKeyCategory:   "workflow",
 			objects.FieldKeyPolicyType: "requirement",
-			objects.FieldKeyBody: `This project must maintain an active policy set covering at least these categories:
+			objects.FieldKeyBody: paths.RewriteCanonicalCLIInvocations(`This project must maintain an active policy set covering at least these categories:
 workflow, agent_guidance, documentation, and (when code exists) code_quality / testing.
 
 Near-term: A default pack is seeded at init. Do not delete the last policy in a required
 category without replacing it.
 
-Check: zqk object list policy and verify category coverage before major delivery.`,
+Check: zqk object list policy and verify category coverage before major delivery.`),
 			objects.FieldKeyEffectiveDate: "2026-07-25",
 		},
 		{
@@ -225,8 +226,8 @@ mission, vision, and goals.`,
 			objects.FieldKeyStatus:     objects.ObjectStatusActive,
 			objects.FieldKeyCategory:   "agent_guidance",
 			objects.FieldKeyPolicyType: "requirement",
-			objects.FieldKeyBody: `All agents share one knowledge kernel. Orient with zqk workflow whats-next, read active
-policies, and create work as objects — not only chat prose.`,
+			objects.FieldKeyBody: paths.RewriteCanonicalCLIInvocations(`All agents share one knowledge kernel. Orient with zqk workflow whats-next, read active
+policies, and create work as objects — not only chat prose.`),
 			objects.FieldKeyEffectiveDate: "2026-07-25",
 		},
 		{
@@ -260,8 +261,8 @@ backlog items; link work to goals/milestones; keep status honest via object upda
 			objects.FieldKeyStatus:     objects.ObjectStatusActive,
 			objects.FieldKeyCategory:   "workflow",
 			objects.FieldKeyPolicyType: "standard",
-			objects.FieldKeyBody: `Maintenance goals drive efficiency, reliability, robustness, and observability.
-Use zqk system init --with-maintenance-jobs and zqk system ensure-retention-jobs.`,
+			objects.FieldKeyBody: paths.RewriteCanonicalCLIInvocations(`Maintenance goals drive efficiency, reliability, robustness, and observability.
+Use zqk system init --with-maintenance-jobs and zqk system ensure-retention-jobs.`),
 		},
 		{
 			objects.FieldKeyTitle:      "Fail-Closed Safety and Invariant Gate Enforcement",

@@ -1,13 +1,10 @@
 $schema: "../../schemas/command_spec.schema.json"
 
 name: "promotion-readiness [SESSION_ID]"
-short: "Optional promotion gate (delegates to scripts/check_convergence_promotion_readiness.sh)"
+short: "Optional promotion gate (native convergence measure)"
 description: |
-  Runs the shell promotion gate: zqk scheduler convergence measure --format json plus optional
-  checks (PROMOTION_REQUIRE_* env). Same exit codes as the script (0 ok, 1 blocked, 2 usage/jq).
-
-  Session id may be passed as the first argument or via CONVERGENCE_SESSION_ID.
-  See scripts/README.md — Convergence promotion and overseer helpers.
+  Runs the native promotion-readiness path: zqk scheduler convergence measure
+  (session id as the first argument or CONVERGENCE_SESSION_ID).
 
 args:
   type: maximum

@@ -3,6 +3,8 @@ package vds
 import (
 	"context"
 	"strings"
+
+	"github.com/zqk-os/zqk/pkg/paths"
 )
 
 // CheckItem is one fluent checklist row agents can scan quickly.
@@ -274,7 +276,7 @@ func suggestNext(ch Chunk, preds []PredicateResult, opt EvalOptions) []string {
 			out = append(out, "For tests: "+ex+" then put job id + log path in evidence_refs")
 		}
 	}
-	out = append(out, "Re-run: zqk workflow vds evaluate --file <chunks.yaml> --format json")
+	out = append(out, "Re-run: "+paths.CLIUsage("workflow", "vds", "evaluate", "--file", "<chunks.yaml>", "--format", "json"))
 	return uniqStrings(out)
 }
 

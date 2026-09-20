@@ -6,7 +6,6 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
@@ -59,16 +58,6 @@ func TestSubprocessEnvForCVSOrchestrateRollupOnly_setsRollupOutFromJob(t *testin
 	}
 }
 
-func TestConvergenceOrchestrateScriptPath(t *testing.T) {
-	t.Parallel()
-	root := filepath.Join(string(filepath.Separator), "repo", "root")
-	p := convergenceOrchestrateScriptPath(root)
-	want := filepath.Join(root, paths.ScriptsDir, convergenceOrchestrateScriptFile)
-	if p != want {
-		t.Fatalf("got %q want %q", p, want)
-	}
-}
-
 func TestNewCVSOrchestrateRollupOnlyCommand_fields(t *testing.T) {
 	t.Parallel()
 	ctx := context.Background()
@@ -78,9 +67,9 @@ func TestNewCVSOrchestrateRollupOnlyCommand_fields(t *testing.T) {
 	if cmd.Dir != root {
 		t.Fatalf("Dir: got %q want %q", cmd.Dir, root)
 	}
-	wantScript := convergenceOrchestrateScriptPath(root)
-	if len(cmd.Args) < 3 || cmd.Args[0] != wantScript || cmd.Args[1] != sid || cmd.Args[2] != convergenceOrchestrateArgNoFailOnGates {
-		t.Fatalf("Args: %#v (want [script %s %s])", cmd.Args, sid, convergenceOrchestrateArgNoFailOnGates)
+	wantBin := resolveSchedulerCLIBinary(root)
+	if len(cmd.Args) < 7 || cmd.Args[0] != wantBin || cmd.Args[1] != "scheduler" || cmd.Args[2] != "convergence" || cmd.Args[3] != "measure" || cmd.Args[5] != sid {
+		t.Fatalf("Args: %#v (want [%s scheduler convergence measure --session-id %s ...])", cmd.Args, wantBin, sid)
 	}
 	pr := zqkenv.ProjectRoot().Name() + "="
 	sp := EnvKeyCVSOrchestrateSkipPersist + "="

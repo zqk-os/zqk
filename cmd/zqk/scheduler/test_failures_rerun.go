@@ -233,7 +233,7 @@ func rerunTestFailures(cliCtx *cli.Context, cmd *cobra.Command) error {
 	if len(jobIDs) > 0 && projectRoot != emptyValue {
 		triggerQueue := schedpkg.NewJobTriggerQueue(projectRoot)
 		if enqErr := triggerQueue.EnqueueTriggerRequests(jobIDs, ""); enqErr != nil {
-			schedpkg.SLog(logger).Warn("Failed to enqueue trigger requests for rerun jobs; trigger them manually with 'zqk scheduler trigger <job-id>'").
+			schedpkg.SLog(logger).Warn(paths.RewriteCanonicalCLIInvocations("Failed to enqueue trigger requests for rerun jobs; trigger them manually with 'zqk scheduler trigger <job-id>'")).
 				WithError(enqErr).
 				Int("job_count", len(jobIDs)).
 				Log()
@@ -254,7 +254,7 @@ func rerunTestFailures(cliCtx *cli.Context, cmd *cobra.Command) error {
 				fmt.Fprintf(&outputBuf, "✅ Scheduled re-run for %d test(s) in %s (job: %s)\n", len(failures), pkg, jobIDs[i])
 			}
 		}
-		fmt.Fprintf(&outputBuf, "\n📋 Scheduled %d test job(s). Use 'zqk scheduler activity' to monitor progress.\n", len(jobIDs))
+		fmt.Fprintf(&outputBuf, "%s", paths.RewriteCanonicalCLIInvocations(fmt.Sprintf("\n📋 Scheduled %d test job(s). Use 'zqk scheduler activity' to monitor progress.\n", len(jobIDs))))
 		return cli.WriteOutput(cmd, []byte(outputBuf.String()))
 	}
 

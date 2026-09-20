@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 )
 
 // convSugKey* are convergence suggested-field / after_state_snapshot map keys without objects.FieldKey* constants.
@@ -170,7 +171,7 @@ func BuildConvergenceActivityLogEntry(suggested map[string]any, snap *TestBundle
 	if p, ok := suggested[objects.FieldKeyCurrentPhase].(string); ok {
 		phase = p
 	}
-	notes := "Automated measure from test-bundle health.jsonl (zqk scheduler convergence measure)."
+	notes := paths.RewriteCanonicalCLIInvocations("Automated measure from test-bundle health.jsonl (zqk scheduler convergence measure).")
 	if snap != nil && len(snap.FailingFingerprintsNow) > 0 {
 		notes = fmt.Sprintf("Failing fingerprints in window: %d. %s", len(snap.FailingFingerprintsNow), notes)
 	}

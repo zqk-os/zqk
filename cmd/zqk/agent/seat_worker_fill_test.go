@@ -2,6 +2,7 @@ package agent
 
 import (
 	"path/filepath"
+	"strings"
 	"testing"
 	"time"
 
@@ -12,17 +13,26 @@ import (
 
 func TestFillSubmitCommand_kindGating(t *testing.T) {
 	t.Parallel()
-	if got := fillSubmitCommand(whatsnext.FillKindGhostRef); got == "" {
-		t.Fatal("ghost_ref must submit")
+	ghost := whatsnext.CompileFillItem(&whatsnext.KernelAmbience{GhostRefCount: 1})
+	if ghost == nil || !ghost.AutoSubmit || strings.TrimSpace(ghost.SubmitArgs) == "" {
+		t.Fatalf("ghost_ref must auto-submit: %+v", ghost)
 	}
-	if got := fillSubmitCommand(whatsnext.FillKindCheckCache); got == "" {
-		t.Fatal("check_cache_missing must submit")
+	cache := whatsnext.CompileFillItem(&whatsnext.KernelAmbience{Available: false})
+	if cache == nil || !cache.AutoSubmit || !strings.Contains(cache.SubmitArgs, paths.ProjectDataDir) {
+		t.Fatalf("check_cache_missing must auto-submit with project data dir: %+v", cache)
 	}
-	if got := fillSubmitCommand(whatsnext.FillKindMetrics); got != "" {
-		t.Fatalf("metrics must not auto-submit: %q", got)
+	metrics := whatsnext.CompileFillItem(&whatsnext.KernelAmbience{
+		Available: true,
+		MetricsRollup: &whatsnext.MetricsRollupSnapshot{
+			NextAdminAction: "zqk scheduler test-failures",
+		},
+	})
+	if metrics != nil && metrics.AutoSubmit {
+		t.Fatalf("metrics must not auto-submit: %+v", metrics)
 	}
-	if got := fillSubmitCommand(whatsnext.FillKindDraftPlane); got != "" {
-		t.Fatalf("draft must not auto-submit: %q", got)
+	draft := whatsnext.CompileFillItem(&whatsnext.KernelAmbience{Available: true, DraftPlaneTotal: 2})
+	if draft != nil && draft.AutoSubmit {
+		t.Fatalf("draft must not auto-submit: %+v", draft)
 	}
 }
 

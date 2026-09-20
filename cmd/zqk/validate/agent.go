@@ -12,6 +12,7 @@ import (
 	"strings"
 
 	"github.com/zqk-os/zqk/pkg/execwrap"
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/zqkenv"
 
 	"github.com/spf13/cobra"
@@ -407,7 +408,7 @@ func verifyVettingMatrix(projectRoot string, changedFiles []string) error {
 			vettedVal := strings.TrimSpace(rec[vettedIdx])
 			refactoredVal := strings.TrimSpace(rec[refactoredIdx])
 			if vettedVal != "yes" || refactoredVal != "yes" {
-				return errfmt.Errorf("file %s is modified but its row in %s is not marked as fully_vetted=yes and fully_refactored_dry=yes (got fully_vetted=%s, fully_refactored_dry=%s). You must run 'zqk matrix update --file-path %s --set fully_vetted=yes --set fully_refactored_dry=yes' first.", filePath, filepath.Base(csvPath), vettedVal, refactoredVal, filePath)
+				return errfmt.Errorf("%s", paths.RewriteCanonicalCLIInvocations(fmt.Sprintf("file %s is modified but its row in %s is not marked as fully_vetted=yes and fully_refactored_dry=yes (got fully_vetted=%s, fully_refactored_dry=%s). You must run 'zqk matrix update --file-path %s --set fully_vetted=yes --set fully_refactored_dry=yes' first.", filePath, filepath.Base(csvPath), vettedVal, refactoredVal, filePath)))
 			}
 		}
 	}

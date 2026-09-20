@@ -16,6 +16,7 @@ import (
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/quality"
 	"gopkg.in/yaml.v3"
 )
@@ -430,7 +431,7 @@ type CSVFormatHandler struct{}
 func (h *CSVFormatHandler) Format(data any) ([]byte, error) {
 	res, ok := data.(*quality.MatrixGetResult)
 	if !ok {
-		return nil, errfmt.Errorf("output format csv is only supported for zqk matrix get results")
+		return nil, errfmt.Errorf("%s", paths.RewriteCanonicalCLIInvocations("output format csv is only supported for zqk matrix get results"))
 	}
 	return quality.FormatMatrixGetResultCSV(res)
 }
@@ -450,7 +451,7 @@ func (h *CSVFormatHandler) Stream(ctx context.Context, data any, writer io.Write
 
 func (h *CSVFormatHandler) Validate(data any) error {
 	if _, ok := data.(*quality.MatrixGetResult); !ok {
-		return errfmt.Errorf("output format csv is only supported for zqk matrix get results")
+		return errfmt.Errorf("%s", paths.RewriteCanonicalCLIInvocations("output format csv is only supported for zqk matrix get results"))
 	}
 	return nil
 }

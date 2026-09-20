@@ -29,7 +29,7 @@ func TestCompileWhatsNextDrive_emptyColumnIsStratplan(t *testing.T) {
 	if strings.Contains(out.GuidingStep.GuidingStep, "Groom BLIs on the seated PRI") {
 		t.Fatalf("must not tell TPM to restuff: %q", out.GuidingStep.GuidingStep)
 	}
-	if out.GuidingStep.CommandHint != interactionpolicy.HintAlignRefresh {
+	if out.GuidingStep.CommandHint != interactionpolicy.HintAlignRefresh() {
 		t.Fatalf("missing align cache must hint persist, got %q", out.GuidingStep.CommandHint)
 	}
 }
@@ -93,7 +93,7 @@ func TestCompileWhatsNextDrive_shapedNextHourglassesLead(t *testing.T) {
 	if !strings.Contains(out.GuidingStep.GuidingStep, "grooming,shaped") {
 		t.Fatalf("ambient should mark shaped: %q", out.GuidingStep.GuidingStep)
 	}
-	if out.GuidingStep.CommandHint != interactionpolicy.HintHourglass {
+	if out.GuidingStep.CommandHint != interactionpolicy.HintHourglass() {
 		t.Fatalf("shaped next + executing lead: got hint %q", out.GuidingStep.CommandHint)
 	}
 }
@@ -147,7 +147,7 @@ func TestCompileWhatsNextDrive_idleFillSetsHint(t *testing.T) {
 	if out.FillItem == nil || out.FillItem.Kind != whatsnext.FillKindGhostRef {
 		t.Fatalf("fill=%+v", out.FillItem)
 	}
-	if out.GuidingStep.CommandHint != whatsnext.FillCmdAutofixDangling {
+	if out.GuidingStep.CommandHint != whatsnext.FillCmdAutofixDangling() {
 		t.Fatalf("hint=%q", out.GuidingStep.CommandHint)
 	}
 	if !strings.Contains(out.GuidingStep.GuidingStep, "GhostRefs") {
@@ -203,7 +203,7 @@ func TestCompileWhatsNextDrive_hourglassFillKeepsWorking(t *testing.T) {
 	if out.GuidingStep == nil || out.GuidingStep.Event != interactionpolicy.EventIdle {
 		t.Fatalf("hourglass must not silence hunger: %+v", out.GuidingStep)
 	}
-	if out.GuidingStep.CommandHint != whatsnext.FillCmdAutofixDangling {
+	if out.GuidingStep.CommandHint != whatsnext.FillCmdAutofixDangling() {
 		t.Fatalf("hourglass fill hint=%q", out.GuidingStep.CommandHint)
 	}
 }

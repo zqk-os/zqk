@@ -175,7 +175,7 @@ func runSyncGitHooks(cmd *cobra.Command, args []string) error {
 	}
 
 	if dryRun && outOfSync {
-		cmd.Printf("Run 'zqk system sync-git-hooks --source %s --target %s' to update hooks.\n", sourceDir, targetDir)
+		cmd.Printf("%s", paths.RewriteCanonicalCLIInvocations(fmt.Sprintf("Run 'zqk system sync-git-hooks --source %s --target %s' to update hooks.\n", sourceDir, targetDir)))
 		return fmt.Errorf("git hooks are out of sync")
 	}
 

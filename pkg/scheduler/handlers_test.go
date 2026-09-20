@@ -13,6 +13,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/zqk-os/zqk/pkg/objects"
 	storagepkg "github.com/zqk-os/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/storage/cas"
 	"github.com/zqk-os/zqk/pkg/testkit"
 	"github.com/zqk-os/zqk/pkg/zqktime"
 )
@@ -952,6 +953,10 @@ func TestOperationExecutionHandler_Execute(t *testing.T) {
 func TestOperationExecutionHandler_DeleteOperation(t *testing.T) {
 	env := setupSchedulerCompleteTestEnvironment(t, nil)
 	defer env.Cleanup()
+	defer func() {
+		_ = cas.GetGlobalListingIndexWriteQueue().FlushKind("backlog_item", 2*time.Second)
+		_ = cas.GetGlobalListingIndexWriteQueue().FlushKind("audit_event", 2*time.Second)
+	}()
 
 	storage := env.Storage.(storagepkg.ObjectStorageProvider)
 	storagepkg.BuildPathAliasCacheForProject(env.TestRoot)
@@ -964,6 +969,7 @@ func TestOperationExecutionHandler_DeleteOperation(t *testing.T) {
 		objects.FieldKeyID:            "BLI-003",
 		objects.FieldKeyKind:          "backlog_item",
 		objects.FieldKeyTitle:         "To Be Deleted",
+		objects.FieldKeyDescription:   "Description of item to be deleted",
 		objects.FieldKeyStatus:        objects.ObjectStatusExploring,
 		objects.FieldKeySchemaVersion: objects.DefaultSchemaVersion,
 		objects.FieldKeyCreatedAt:     zqktime.NowLayoutUTC(zqktime.LayoutObjectDateTimeZ),

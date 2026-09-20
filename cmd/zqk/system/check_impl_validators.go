@@ -227,7 +227,7 @@ func checkInstanceValidationWithValidatorAndData(ctx *cli.Context, stdCtx stdcon
 				Category:    "lifecycle",
 				Message:     fmt.Sprintf("Priority plan %s is in_progress but all linked backlog items are terminal (%d complete/archived); plan should be transitioned to complete", obj.ID, totalBLIs),
 				AutoFixable: false,
-				FixCommand:  fmt.Sprintf("zqk object promote %s", obj.ID),
+				FixCommand:  paths.CLIUsage("object", "promote", obj.ID),
 			})
 		}
 	}
@@ -301,7 +301,7 @@ func checkInstanceValidationWithValidatorAndData(ctx *cli.Context, stdCtx stdcon
 						Category:    "lifecycle",
 						Message:     fmt.Sprintf("Requirement %s is %s but all criteria and linked test cases are complete; requirement must be transitioned to complete", obj.ID, currentState),
 						AutoFixable: false,
-						FixCommand:  fmt.Sprintf("zqk object promote %s", obj.ID),
+						FixCommand:  paths.CLIUsage("object", "promote", obj.ID),
 					})
 				}
 			}
@@ -384,7 +384,7 @@ func checkDuplicateIDs(_ *cli.Context, objectID, _, filePath string, objectIDCac
 		issues = append(issues, Issue{
 			Tier:        1, // Blocking tier for duplicate-id orphans
 			Category:    "registration",
-			Message:     fmt.Sprintf("Duplicate object ID '%s' detected. This file appears to be a duplicate of '%s' (which is newer). Quarantine via cleanup-duplicates or zqk object delete --unlink-references; never silent auto-delete.", objectID, latestEntry.FilePath),
+			Message:     paths.RewriteCanonicalCLIInvocations(fmt.Sprintf("Duplicate object ID '%s' detected. This file appears to be a duplicate of '%s' (which is newer). Quarantine via cleanup-duplicates or zqk object delete --unlink-references; never silent auto-delete.", objectID, latestEntry.FilePath)),
 			AutoFixable: false,
 		})
 	}

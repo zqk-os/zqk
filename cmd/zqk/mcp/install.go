@@ -7,6 +7,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/mcp"
+	"github.com/zqk-os/zqk/pkg/paths"
 )
 
 func NewInstallCmd() *cobra.Command {
@@ -20,7 +21,7 @@ func runInstall(cmd *cobra.Command, _ []string) error {
 		logger := logging.GetLoggerFromProfile(proc.Context().Profile)
 		projectRoot := proc.ProjectRoot()
 		if projectRoot == "" {
-			return errfmt.Errorf("zqk mcp install must be run inside a ZQK project (no project root detected)")
+			return errfmt.Errorf("%s must be run inside a project (no project root detected)", paths.CLIUsage("mcp", "install"))
 		}
 
 		if err := mcp.AutoInstall(projectRoot, logger); err != nil {

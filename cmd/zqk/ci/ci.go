@@ -168,7 +168,7 @@ func runStatus(cmd *cobra.Command, args []string) error {
 	if raw, err := fileutil.ReadFile(shaPath); err == nil {
 		fmt.Fprintf(&b, "  SOURCE_SHA=%s\n", strings.TrimSpace(string(raw)))
 	} else {
-		fmt.Fprintf(&b, "  SOURCE_SHA=(not set — run: zqk ci checkout)\n")
+		fmt.Fprintf(&b, "%s", paths.RewriteCanonicalCLIInvocations("  SOURCE_SHA=(not set — run: zqk ci checkout)\n"))
 	}
 	if st, err := fileutil.Stat(filepath.Join(workdir, "go.mod")); err == nil && !st.IsDir() {
 		fmt.Fprintf(&b, "  workdir=%s\n", workdir)

@@ -137,8 +137,8 @@ func TestBootstrapPortableScript(t *testing.T) {
 	}
 }
 
-// TestCommunityBinaryBuildCGOZero verifies that cmd/zqk-community builds cleanly with CGO_ENABLED=0.
-func TestCommunityBinaryBuildCGOZero(t *testing.T) {
+// TestProductBinaryBuildCGOZero verifies that ./cmd/zqk builds cleanly with CGO_ENABLED=0.
+func TestProductBinaryBuildCGOZero(t *testing.T) {
 	t.Parallel()
 	moduleRoot, err := findModuleRoot()
 	if err != nil || moduleRoot == "" {
@@ -148,12 +148,8 @@ func TestCommunityBinaryBuildCGOZero(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
 	defer cancel()
 
-	targetPkg := "./cmd/zqk-community"
-	if _, err := os.Stat(filepath.Join(moduleRoot, "cmd", "zqk-community")); os.IsNotExist(err) {
-		targetPkg = "./cmd/zqk"
-	}
-
-	tmpBin := filepath.Join(t.TempDir(), "zqk-community-probe")
+	const targetPkg = "./cmd/zqk"
+	tmpBin := filepath.Join(t.TempDir(), "zqk-cgo-probe")
 	cmd := exec.CommandContext(ctx, "go", "build", "-o", tmpBin, targetPkg)
 	cmd.Dir = moduleRoot
 	cmd.Env = append(os.Environ(), "CGO_ENABLED=0")

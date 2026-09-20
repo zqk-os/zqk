@@ -16,6 +16,7 @@ import (
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 	schedulerpkg "github.com/zqk-os/zqk/pkg/scheduler"
 	storagepkg "github.com/zqk-os/zqk/pkg/storage"
 	"github.com/zqk-os/zqk/pkg/zqktime"
@@ -682,7 +683,7 @@ func outputDaemonDownWarningToBuffer(buf *strings.Builder, daemonDown bool) {
 	if daemonDown {
 		buf.WriteString("🚨 CRITICAL: Scheduler daemon is not running!\n")
 		buf.WriteString("   The daemon should be running to execute scheduled jobs.\n")
-		buf.WriteString("   Start it with: zqk scheduler start\n")
+		buf.WriteString(paths.RewriteCanonicalCLIInvocations("   Start it with: zqk scheduler start\n"))
 		buf.WriteString("\n")
 	}
 }

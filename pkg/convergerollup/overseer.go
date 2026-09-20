@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 )
 
 // CVSTreeNode is one convergence_session in the coordinator's descendant tree (BFS, depth-limited).
@@ -57,7 +58,7 @@ func BuildArbitratedParentMessage(rollup map[string]any, tree []CVSTreeNode, coo
 		b.WriteString("Measured rollup directive: ")
 		b.WriteString(rec)
 	} else {
-		b.WriteString("Run zqk scheduler convergence measure --format json --session-id ")
+		b.WriteString(paths.RewriteCanonicalCLIInvocations("Run zqk scheduler convergence measure --format json --session-id "))
 		b.WriteString(coordinatorID)
 		b.WriteString(" for recommended_next_action.")
 	}

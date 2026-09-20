@@ -8,6 +8,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/zqk-os/zqk/internal/cli"
 	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/paths"
 )
 
 const (
@@ -112,10 +113,7 @@ func FormatCheckTimeoutError(cmd *cobra.Command, args []string, timeout time.Dur
 
 	// Suggest scoping if checking all
 	if len(args) == 0 || args[0] == "all" {
-		suggestions = append(suggestions,
-			"• Scoped Validation: Narrow scope by checking a specific kind ('zqk system check <kind>') or object ID ('zqk system check <id>').",
-			"• Fast Iteration: Save failing IDs using '--write-failing-ids fail.txt --fast' and re-check with '--ids-from-file fail.txt --fast'.",
-		)
+		suggestions = append(suggestions, paths.RewriteCanonicalCLIInvocations("• Scoped Validation: Narrow scope by checking a specific kind ('zqk system check <kind>') or object ID ('zqk system check <id>')."), "• Fast Iteration: Save failing IDs using '--write-failing-ids fail.txt --fast' and re-check with '--ids-from-file fail.txt --fast'.")
 	}
 
 	if autoFix {
@@ -124,12 +122,9 @@ func FormatCheckTimeoutError(cmd *cobra.Command, args []string, timeout time.Dur
 		)
 	}
 
-	msg := fmt.Sprintf(
-		"system check timed out after %v\n\nCommand: zqk system check %s\n\nActionable Guidance & Suggested Remedies:\n  %s",
-		timeout,
+	msg := paths.RewriteCanonicalCLIInvocations(fmt.Sprintf("system check timed out after %v\n\nCommand: zqk system check %s\n\nActionable Guidance & Suggested Remedies:\n  %s", timeout,
 		cmdPattern,
-		strings.Join(suggestions, "\n  "),
-	)
+		strings.Join(suggestions, "\n  ")))
 
 	return errfmt.Errorf("%s", msg)
 }
@@ -147,7 +142,7 @@ func FormatCheckExecutionError(cmd *cobra.Command, args []string, err error) err
 	}
 
 	if strings.Contains(errStr, "CAP journal is stale") {
-		return errfmt.Errorf("%w\n\nActionable Guidance:\n  • The scheduler CAP daemon is inactive or stalled.\n  • Recycle background daemons: ./scripts/recycle-stable-daemons.sh\n  • Verify scheduler status: zqk scheduler status", err)
+		return errfmt.Errorf("%s", paths.RewriteCanonicalCLIInvocations(fmt.Sprintf("%v\n\nActionable Guidance:\n  • The scheduler CAP daemon is inactive or stalled.\n  • Recycle background daemons: ./scripts/recycle-stable-daemons.sh\n  • Verify scheduler status: zqk scheduler status", err)))
 	}
 
 	return err
@@ -175,7 +170,7 @@ func ValidateTargetKindOrSuggest(target string, allKinds []string) error {
 		guidance = fmt.Sprintf("\n\nDid you mean:\n  • %s", strings.Join(suggestions, "\n  • "))
 	}
 
-	return errfmt.Errorf("unknown object kind %q.%s\n\nRun 'zqk object list kinds' or 'zqk system check --help' for valid options.", target, guidance)
+	return errfmt.Errorf("%s", paths.RewriteCanonicalCLIInvocations(fmt.Sprintf("unknown object kind %q.%s\n\nRun 'zqk object list kinds' or 'zqk system check --help' for valid options.", target, guidance)))
 }
 
 // SuggestSimilarKinds finds closest kinds using edit distance and prefix matching.

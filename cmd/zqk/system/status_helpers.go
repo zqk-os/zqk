@@ -200,7 +200,7 @@ func getSystemHealthData(projectRoot string) map[string]any {
 
 	if projectRoot == emptyValue || !paths.IsValidProjectRoot(projectRoot) {
 		healthData[objects.FieldKeyStatus] = "uninitialized"
-		healthData["error"] = "project root not found or uninitialized; run 'zqk system init'"
+		healthData["error"] = paths.RewriteCanonicalCLIInvocations("project root not found or uninitialized; run 'zqk system init'")
 		healthData["check_failed"] = true
 		healthData["scheduler"] = map[string]any{"running": false}
 		return healthData

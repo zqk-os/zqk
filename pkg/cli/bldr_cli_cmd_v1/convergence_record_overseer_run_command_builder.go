@@ -11,12 +11,10 @@ import (
 // NewConvergenceRecordOverseerRunCommandBuilder creates a new convergence_record_overseer_run command
 func NewConvergenceRecordOverseerRunCommandBuilder() *cobra.Command {
 	builder := clipkg.NewCommandBuilder("record-overseer-run [COORDINATOR_SESSION_ID]")
-	builder.WithShort("Append overseer_run_v1 line (delegates to scripts/record_convergence_overseer_run.sh)")
-	help := clipkg.DynamicHelpBuilder("Append overseer_run_v1 line (delegates to scripts/record_convergence_overseer_run.sh)")
-	help.WithDescriptionLines("Read-only: runs zqk scheduler convergence overseer and appends one JSON line to")
-	help.WithDescriptionLines(".zqk/logs/scheduler/cvs/overseer_runs.jsonl. Coordinator id as first argument or COORDINATOR_SESSION_ID.")
-	help.WithDescriptionLines("")
-	help.WithDescriptionLines("Requires bash and jq on PATH. See scripts/README.md — Convergence promotion and overseer helpers.")
+	builder.WithShort("Coordinator overseer snapshot (native)")
+	help := clipkg.DynamicHelpBuilder("Coordinator overseer snapshot (native)")
+	help.WithDescriptionLines("Read-only: runs the native coordinator overseer. Coordinator id as first argument")
+	help.WithDescriptionLines("or --coordinator-session-id.")
 	builder.WithHelpBuilder(help)
 	builder.WithArgs(cobra.MaximumNArgs(1))
 	builder.WithCommonFlagsDefault(cli.AddCommonFlags)

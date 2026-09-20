@@ -86,7 +86,7 @@ func NewInitCmd() *cobra.Command {
 	initCmd.Flags().BoolVar(&merge, "merge", false, "Merge snapshot data with existing (snapshot mode only)")
 	initCmd.Flags().BoolVar(&wipe, "wipe", false, "Wipe existing data before restoring snapshot (requires --force)")
 	initCmd.Flags().BoolVar(&discover, "discover", false, "Run the interactive Project Discovery Wizard to capture strategic context, stakeholders, and important dates. If --legacy is provided, it will instead scan and report existing objects.")
-	initCmd.Flags().BoolVar(&withMaintenanceJobs, "with-maintenance-jobs", false, "After init, ensure retention and audit-aggregation scheduler jobs exist (same as running 'zqk system ensure-retention-jobs'). Puts the project in optimal maintenance configuration.")
+	initCmd.Flags().BoolVar(&withMaintenanceJobs, "with-maintenance-jobs", false, paths.RewriteCanonicalCLIInvocations("After init, ensure retention and audit-aggregation scheduler jobs exist (same as running 'zqk system ensure-retention-jobs'). Puts the project in optimal maintenance configuration."))
 	initCmd.Flags().BoolVar(&withOnboardingRoadmap, "with-onboarding-roadmap", false, "After init, create the onboarding roadmap seed scheduler job. Start the scheduler to run it once and create the priority plan, workstream, and backlog items.")
 	initCmd.Flags().BoolVar(&simple, "simple", false, "Initialize with a simple, guided interface (Semantic Bridge Phase 1)")
 	initCmd.Flags().BoolVar(&advanced, "advanced", false, "Initialize with an advanced, ontology-aware interface (Semantic Bridge Phase 1)")

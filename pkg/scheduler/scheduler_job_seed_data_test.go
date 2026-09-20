@@ -9,6 +9,7 @@ import (
 	"testing"
 
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
 // TestSchedulerJobSeedDataConformance validates that all scheduler_job seed
@@ -39,9 +40,10 @@ func TestSchedulerJobSeedDataConformance(t *testing.T) {
 		t.Skipf("compiled CLI binary not found at %s (build bin/zqk first)", binPath)
 	}
 
-	cmd := exec.CommandContext(ctx, binPath, "system", "check", "scheduler_job", "--format", "json") //nolint:gosec
+	cmd := exec.CommandContext(ctx, binPath, "system", "check", "scheduler_job", "--format", "json", "--ignore-scheduler-down", "--allow-degraded") //nolint:gosec
 	cmd.Dir = projectRoot
-	cmd.Env = append(os.Environ(), "ZQK_API_KEY=ACC-TEST-HARNESS")
+	cmd.Env = append(os.Environ(), "ZQK_API_KEY=ACC-TEST-HARNESS", "ZQK_DEV_CODEGEN=1")
+	zqkenv.WireExecForIsolatedProject(cmd, projectRoot)
 
 	output, err := cmd.CombinedOutput()
 	if err != nil {

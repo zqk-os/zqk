@@ -186,7 +186,7 @@ func countAllKinds(cmd *cobra.Command, proc *cli.Processor, storageProvider stor
 
 	scopeNote := ""
 	if !flags.AllObjects {
-		scopeNote = "internal/built-in only; run 'zqk object count' for total system object count"
+		scopeNote = paths.RewriteCanonicalCLIInvocations("internal/built-in only; run 'zqk object count' for total system object count")
 	}
 
 	// Optimize: when !AllObjects, we've already filtered to internal kinds
@@ -304,7 +304,7 @@ func countMultipleKinds(cmd *cobra.Command, proc *cli.Processor, storageProvider
 
 	scopeNote := ""
 	if !flags.AllObjects {
-		scopeNote = "internal/built-in only; run 'zqk object count' for total system object count"
+		scopeNote = paths.RewriteCanonicalCLIInvocations("internal/built-in only; run 'zqk object count' for total system object count")
 	}
 
 	useList := shouldUseListForCount(flags)

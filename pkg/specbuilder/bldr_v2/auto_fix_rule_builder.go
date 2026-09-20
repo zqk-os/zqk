@@ -2,6 +2,7 @@ package bldr_v2
 
 import (
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/specbuilder/builders"
 )
 
@@ -185,7 +186,7 @@ func (b *AutoFixRuleBuilder) addAutoFixRuleFields() {
 			Default("").
 			Lifecycle("mutable").
 			Observability("yes").
-			Purpose("Fix command template. Placeholders: {object_id}, {kind}, {field}, {message}, {rule}, {tier}, {category}.\nExample: \\\"zqk object update {object_id} --field {field}=<VALUE>\\\"\nOr with query hint: \\\"zqk object update {object_id} --field milestone_refs+=<MILESTONE_ID:category=feature>\\\"\n").
+			Purpose("Fix command template. Placeholders: {object_id}, {kind}, {field}, {message}, {rule}, {tier}, {category}.\nExample: \\\"" + paths.CLIInvocation("object update {object_id} --field {field}=<VALUE>") + "\\\"\nOr with query hint: \\\"" + paths.CLIInvocation("object update {object_id} --field milestone_refs+=<MILESTONE_ID:category=feature>") + "\\\"\n").
 			Security("non-sensitive").
 			SystemUsage([]any{
 				"auto-fix execution",

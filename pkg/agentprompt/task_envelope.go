@@ -7,6 +7,7 @@ import (
 
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/storage"
 )
 
@@ -70,7 +71,7 @@ func FormatTaskEnvelope(opts TaskPromptOptions, policyRefs, skillRefs []string) 
 	sb.WriteString(TaskEnvelopeMarker)
 	sb.WriteString("\n\n")
 	sb.WriteString("Static context lives in kernel objects. Do not treat this description as a copy of policy or skill bodies.\n")
-	sb.WriteString("Resolve at execute: `zqk object get <id>`, `zqk agent prepare-context --task-id <ATK>`, or `zqk workflow whats-next`.\n\n")
+	sb.WriteString(paths.RewriteCanonicalCLIInvocations("Resolve at execute: `zqk object get <id>`, `zqk agent prepare-context --task-id <ATK>`, or `zqk workflow whats-next`.\n\n"))
 
 	sb.WriteString("## Dynamic\n")
 	if opts.PlanTitle != "" || opts.PlanID != "" {
@@ -96,7 +97,7 @@ func FormatTaskEnvelope(opts TaskPromptOptions, policyRefs, skillRefs []string) 
 
 	sb.WriteString("\n## Standing refs (do not duplicate bodies)\n")
 	for _, id := range StandingPolicyRefs() {
-		sb.WriteString(fmt.Sprintf("- `%s` — `zqk object get %s`\n", id, id))
+		sb.WriteString(paths.RewriteCanonicalCLIInvocations(fmt.Sprintf("- `%s` — `zqk object get %s`\n", id, id)))
 	}
 
 	if len(policyRefs) > 0 {
@@ -108,7 +109,7 @@ func FormatTaskEnvelope(opts TaskPromptOptions, policyRefs, skillRefs []string) 
 	if len(skillRefs) > 0 {
 		sb.WriteString("\n## Bound skills\n")
 		for _, id := range skillRefs {
-			sb.WriteString(fmt.Sprintf("- `%s` — `zqk object get %s`\n", id, id))
+			sb.WriteString(paths.RewriteCanonicalCLIInvocations(fmt.Sprintf("- `%s` — `zqk object get %s`\n", id, id)))
 		}
 	}
 

@@ -18,7 +18,7 @@ func GenerateDynamicTips(ctx context.Context, llmClient llm.Client, projectRoot 
 		llmClient = llm.NewClient(ctx, nil)
 	}
 
-	prompt := fmt.Sprintf(`You are the "ZQK Observer Coach", a real-time orchestrator monitoring the ZQK knowledge kernel and swarm architecture.
+	prompt := paths.RewriteCanonicalCLIInvocations(fmt.Sprintf(`You are the "ZQK Observer Coach", a real-time orchestrator monitoring the ZQK knowledge kernel and swarm architecture.
 Your job is to read the current system state summary and provide EXACTLY 3 short, actionable, dynamic tips for the user/agent.
 Focus on identifying any signs of policy violation, failure to orchestrate, maximizing swarm usage and multi-agent parallelism, or AST integrity.
 Do not provide generic advice. Be specific to the current state.
@@ -31,7 +31,7 @@ Respond ONLY with a valid JSON array of 3 strings. Example:
 [
   "ZQK Observer Tip: The test bundle for PRI-003 is blocked. Ensure 'zqk scheduler scan-tests' is running parallel jobs.",
   "ZQK Observer Tip: You have 3 backlog items in 'planned' but no active agents. Run 'zqk agent orchestrate' to parallelize the work."
-]`, systemStateSummary)
+]`, systemStateSummary))
 
 	resp, err := llmClient.GenerateCompletion(ctx, prompt, "")
 	if err != nil {

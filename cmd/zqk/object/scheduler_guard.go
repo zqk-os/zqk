@@ -1,9 +1,11 @@
 package object
 
 import (
+	"fmt"
 	"github.com/spf13/cobra"
 	"github.com/zqk-os/zqk/internal/cli"
 	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/paths"
 	schedulerpkg "github.com/zqk-os/zqk/pkg/scheduler"
 )
 
@@ -78,7 +80,7 @@ func runObjectSchedulerGuard(cmd *cobra.Command, args []string) error {
 			// Allow the command to proceed after restart
 			return nil
 		}
-		return errfmt.Errorf("scheduler daemon is not running; object command %q requires scheduler-backed maintenance/caches. Start it with 'zqk scheduler start' or re-run with --allow-degraded", cmd.Name())
+		return errfmt.Errorf("%s", paths.RewriteCanonicalCLIInvocations(fmt.Sprintf("scheduler daemon is not running; object command %q requires scheduler-backed maintenance/caches. Start it with 'zqk scheduler start' or re-run with --allow-degraded", cmd.Name())))
 	}
 	return nil
 }

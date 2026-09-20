@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/zqk-os/zqk/pkg/agentprompt"
+	"github.com/zqk-os/zqk/pkg/brand"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/objects"
@@ -39,14 +40,22 @@ func clipSeatWorkerPromptPart(s string, capBytes int, label string, class agentp
 }
 
 func seatWorkerPromptTruncationFooter(label string, class agentprompt.WorkClass) string {
-	next := "Use observer_search then read_code for one real cmd/ or pkg/ path, then write_code or write_file. " +
-		"Do not re-list the backlog."
+	p := brand.NamespacePrefix() + "_"
+	next := fmt.Sprintf(
+		"Use %sobserver_search or %sread_file on one existing path named in the remaining prompt or task, then %swrite_code or %swrite_file. "+
+			"Do not re-fetch truncated text via object_list.",
+		p, p, p, p,
+	)
 	if class.IsDocsEval() {
-		next = "Use read_file/read_code on paths under docs/quality/ (rubrics/, prompts/, cef-runs/, schemas/). " +
-			"Overwrite findings JSONL with write_file. Do NOT edit cmd/ or pkg/. Do not re-list the backlog."
+		next = fmt.Sprintf(
+			"Use %sread_file/%sread_code on documentation or evaluation paths named in the task. "+
+				"Write assigned outputs with %swrite_file. Do not edit application source unless the task requires it. "+
+				"Do not re-fetch truncated text via object_list.",
+			p, p, p,
+		)
 	}
 	return fmt.Sprintf(
-		"... [%s TRUNCATED FOR WINDOW] Details stay in the kernel. %s",
+		"... [%s TRUNCATED FOR WINDOW] Full text remains in the task objects. %s",
 		label, next,
 	)
 }

@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 )
 
 // StratplanAmbient is the kernel facts that make a planned==0 hunger
@@ -33,27 +34,32 @@ const MaxAmbientPlans = 3
 const AlignFreshMax = 30 * time.Minute
 
 const (
-	HintAlignRefresh  = "zqk system align --format json -o .zqk/state/ambient/align-latest.json"
-	HintDraftClassify = "zqk object draft sweep --dry-run --all"
-	HintHourglass     = "zqk feed steer --to-agent-id <seat> --await-peer-ack"
-	HintPushAhead     = "git status -sb && git push"
-	// HintTracePipeline is the TPM objectify path. Hand-minting 1:1 REQ→CRIT
+	hintAlignRefreshSuffix  = "system align --format json -o .zqk/state/ambient/align-latest.json"
+	hintDraftClassifySuffix = "object draft sweep --dry-run --all"
+	hintHourglassSuffix     = "feed steer --to-agent-id <seat> --await-peer-ack"
+	HintPushAhead           = "git status -sb && git push"
+	// hintTracePipelineSuffix is the TPM objectify path. Hand-minting 1:1 REQ→CRIT
 	// skips test cases and the multi-criteria base structure.
 	// TRACK: POL-AGENT-TPM-TRACE-PIPELINE-001
-	HintTracePipeline = "zqk new object requirement --title \"...\" && zqk workflow gen-trace-pipeline <REQ-id>"
+	hintTracePipelineSuffix = "new object requirement --title \"...\" && workflow gen-trace-pipeline <REQ-id>"
 )
+
+func HintAlignRefresh() string  { return paths.CLIInvocation(hintAlignRefreshSuffix) }
+func HintDraftClassify() string { return paths.CLIInvocation(hintDraftClassifySuffix) }
+func HintHourglass() string     { return paths.CLIInvocation(hintHourglassSuffix) }
+func HintTracePipeline() string { return paths.CLIInvocation(hintTracePipelineSuffix) }
 
 // HintOrchestratePlan is the machine first line. Empty seat stays a placeholder
 // so stop-hunger can still name the protocol when persona→seat is unknown.
 func HintOrchestratePlan(seat, planID string) string {
 	planID = strings.TrimSpace(planID)
 	if planID == "" {
-		return HintHourglass
+		return HintHourglass()
 	}
 	if strings.TrimSpace(seat) == "" {
 		seat = "<seat>"
 	}
-	return fmt.Sprintf("zqk feed steer --to-agent-id %s --await-peer-ack --message %q", seat, "ORCHESTRATE_PLAN "+planID)
+	return paths.CLIUsage("feed", "steer", "--to-agent-id", seat, "--await-peer-ack", "--message", fmt.Sprintf("%q", "ORCHESTRATE_PLAN "+planID))
 }
 
 // HintObjectGet is the situational next when a grooming/unlocked column is named.
@@ -62,7 +68,7 @@ func HintObjectGet(id string) string {
 	if id == "" {
 		return ""
 	}
-	return "zqk object get " + id
+	return paths.CLIUsage("object", "get", id)
 }
 
 // FirstAmbientPlanID parses "PRI-X (grooming)" labels from NextPlans.
@@ -123,7 +129,7 @@ func formatAlignAge(d time.Duration) string {
 // fresh cache and a grooming next column, but hunger kept saying "run align".
 func CompileStratplanCommandHint(a StratplanAmbient) string {
 	if !a.AlignOK || !a.AlignFresh {
-		return HintAlignRefresh
+		return HintAlignRefresh()
 	}
 	if id := NextUnshapedPlanID(a.NextPlans); id != "" {
 		return HintObjectGet(id)
@@ -131,12 +137,12 @@ func CompileStratplanCommandHint(a StratplanAmbient) string {
 	// Next grooming PRI already shaped: do not re-get it. If the lead is
 	// executing, hourglass that work. Draft classify only when nothing is in flight.
 	if leadExecuting(a) {
-		return HintHourglass
+		return HintHourglass()
 	}
 	if a.DraftPlaneTotal > 0 {
-		return HintDraftClassify
+		return HintDraftClassify()
 	}
-	return HintHourglass
+	return HintHourglass()
 }
 
 func leadExecuting(a StratplanAmbient) bool {
@@ -242,7 +248,7 @@ func formatStratplanAmbient(a StratplanAmbient) string {
 		}
 		fmt.Fprintf(&b, "; align score=%.1f %s age=%s goal_gaps=%d", a.AlignScore, fresh, age, a.GoalGaps)
 	} else {
-		b.WriteString("; align cache missing — persist " + HintAlignRefresh)
+		b.WriteString("; align cache missing — persist " + HintAlignRefresh())
 	}
 	if a.DraftPlaneTotal > 0 {
 		fmt.Fprintf(&b, "; draft_plane=%d", a.DraftPlaneTotal)

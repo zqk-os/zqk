@@ -14,6 +14,7 @@ import (
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/scheduler"
 )
 
@@ -25,7 +26,7 @@ func NewRetentionToleranceCmd() *cobra.Command {
 	cmd := clipkg.ApplyBuilder(bldr_cli_cmd_v1.NewSystemRetentionToleranceCommandBuilder(), &cobra.Command{
 		Use:   "retention-tolerance",
 		Short: "Run retention tolerance (archive and cleanup by age and max_count)",
-		Long: `Applies per-kind archive and cleanup from retention_tolerance.yaml: archive old objects, delete by age, enforce max_count.
+		Long: paths.RewriteCanonicalCLIInvocations(`Applies per-kind archive and cleanup from retention_tolerance.yaml: archive old objects, delete by age, enforce max_count.
 
 Use --kind to process specific kinds (can be repeated). Without --kind, processes all configured kinds.
 
@@ -46,7 +47,7 @@ Examples:
   zqk system retention-tolerance --kind audit_event --batch-size 5000 --max-batches -1 --bulk-delete-workers 32
 
 Schedule via scheduler job (job_type: retention_tolerance) with KINDS env var for kind filtering.
-BATCH_SIZE, MAX_BATCHES, BULK_DELETE_WORKERS can also be set via environment (overridden by flags).`,
+BATCH_SIZE, MAX_BATCHES, BULK_DELETE_WORKERS can also be set via environment (overridden by flags).`),
 		Args: cobra.NoArgs,
 	})
 	cli.BindAsyncProgress(cmd, func(c *cobra.Command, args []string) error {

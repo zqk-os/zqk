@@ -14,6 +14,7 @@ import (
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/pipeline"
 	schedpkg "github.com/zqk-os/zqk/pkg/scheduler"
 	"github.com/zqk-os/zqk/pkg/storage"
@@ -349,7 +350,7 @@ func scanTestsStageFinalize(pctx *pipeline.Context, payload any) (any, error) {
 
 	var finBuf strings.Builder
 	fmt.Fprintf(&finBuf, "\n✅ Created %d scheduler job(s) and enqueued for immediate execution.\n", len(st.jobIDs))
-	fmt.Fprintf(&finBuf, "   The scheduler daemon will run them when it processes the trigger queue (ensure it is running: zqk scheduler start).\n")
+	fmt.Fprintf(&finBuf, "%s", paths.RewriteCanonicalCLIInvocations("   The scheduler daemon will run them when it processes the trigger queue (ensure it is running: zqk scheduler start).\n"))
 	if st.sourceRoot != emptyValue && st.sourceRoot != st.projectRoot {
 		fmt.Fprintf(&finBuf, "   Source root (go test cwd): %s\n", st.sourceRoot)
 		fmt.Fprintf(&finBuf, "   Tip: use --live-source to test studio HEAD instead of Local CI workdir.\n")
@@ -368,12 +369,12 @@ func scanTestsStageFinalize(pctx *pipeline.Context, payload any) (any, error) {
 		fmt.Fprintf(&finBuf, "  - %s\n", jobID)
 		fmt.Fprintf(&finBuf, "    Log: %s\n", logFilePath)
 	}
-	fmt.Fprintf(&finBuf, "\nDo not assume jobs started: check Executing via zqk scheduler activity (daemon snapshot),\n")
+	fmt.Fprintf(&finBuf, "%s", paths.RewriteCanonicalCLIInvocations("\nDo not assume jobs started: check Executing via zqk scheduler activity (daemon snapshot),\n"))
 	fmt.Fprintf(&finBuf, "or last_run_at on the SCH-run-* object. If stuck with empty last_run_at, look for\n")
 	fmt.Fprintf(&finBuf, "package_concurrency_acquire_failed in .zqk/scheduler/diagnostics.jsonl / dispatch_pressure.jsonl\n")
 	fmt.Fprintf(&finBuf, "(one go-test package can hold the only concurrency slot for up to ~30m).\n")
-	fmt.Fprintf(&finBuf, "\nView status: zqk scheduler activity\n")
-	fmt.Fprintf(&finBuf, "View history: zqk scheduler history\n")
+	fmt.Fprintf(&finBuf, "%s", paths.RewriteCanonicalCLIInvocations("\nView status: zqk scheduler activity\n"))
+	fmt.Fprintf(&finBuf, "%s", paths.RewriteCanonicalCLIInvocations("View history: zqk scheduler history\n"))
 	fmt.Fprintf(&finBuf, "View logs: ls -lh %s\n", logDir)
 
 	if err := cli.WriteOutput(st.cmd, []byte(finBuf.String())); err != nil {

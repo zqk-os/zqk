@@ -784,7 +784,7 @@ func (h *CapOrchestratorHandler) recordFailure(stage string, err error) {
 			"last_error":           tracker.LastError,
 		},
 		SuggestedActions: []string{
-			"zqk scheduler status",
+			paths.CLIUsage("scheduler", "status"),
 			"cat .zqk/state/cap_failure_tracker.json",
 			"cat .zqk/state/cap_review_result.json",
 			"go test ./pkg/scheduler/...",
@@ -846,7 +846,7 @@ func (h *CapOrchestratorHandler) readFailureTracker() capFailureTracker {
 
 func (h *CapOrchestratorHandler) resolveCLIExecutable() (string, error) {
 	binaryPath := resolveSchedulerCLIBinary(h.projectRoot)
-	if binaryPath != "zqk" {
+	if filepath.IsAbs(binaryPath) || strings.ContainsRune(binaryPath, os.PathSeparator) {
 		if _, err := fileutil.Stat(binaryPath); err == nil {
 			return binaryPath, nil
 		}

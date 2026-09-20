@@ -289,8 +289,6 @@ def main() -> int:
     conv = conv.replace('env := append(os.Environ(), "ZQK_PROJECT_ROOT="+s.projectRoot)', 'env := append(os.Environ(), zqkenv.ProjectRoot().Name()+"="+s.projectRoot)')
     write("pkg/scheduler/convergence_engine.go", conv)
 
-    sub_all("cmd/zqk/scheduler/convergence_shell_scripts.go", 'c.Env = append(c.Env, "ZQK_PROJECT_ROOT="+projectRoot, "ZQK_BIN="+self)', 'c.Env = append(c.Env, zqkenv.ProjectRoot().Name()+"="+projectRoot, zqkenv.Bin().Name()+"="+self)')
-
     shim = read("cmd/zqk-shim/main.go")
     shim = shim.replace('getenv("ZQK_BREAK_GLASS_REASON")', 'getenv(zqkenv.DefaultBrandKey("BREAK_GLASS_REASON"))')
     shim = shim.replace('getenv("ZQK_SHIM_BYPASS_POLCODE009")', 'getenv(zqkenv.DefaultBrandKey("SHIM_BYPASS_TRACEABILITY"))')

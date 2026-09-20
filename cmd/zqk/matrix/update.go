@@ -9,6 +9,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/quality"
 )
 
@@ -22,7 +23,7 @@ func runMatrixUpdate(cmd *cobra.Command, _ []string) error {
 		projectRoot = cli.ResolveProjectRoot(".")
 	}
 	if projectRoot == "" {
-		return errfmt.Errorf("project root not found; run from repo root or zqk use")
+		return errfmt.Errorf("%s", paths.RewriteCanonicalCLIInvocations("project root not found; run from repo root or zqk use"))
 	}
 
 	name, _ := cmd.Flags().GetString("name")

@@ -257,8 +257,7 @@ func runGlossaryMaintenanceAfterAutofix(cmd *cobra.Command, projectRoot string, 
 		maxCreate = 25
 	}
 	if len(missing) > maxCreate {
-		return errfmt.Errorf("autofix: glossary sync refused to create %d terms (cap %d). Set MAINTENANCE_AUTOFIX_GLOSSARY_MAX_CREATE to override, or run `zqk system sync-glossary-from-specs --apply --dry-run=false` manually",
-			len(missing), maxCreate)
+		return errfmt.Errorf("%s", paths.RewriteCanonicalCLIInvocations(fmt.Sprintf("autofix: glossary sync refused to create %d terms (cap %d). Set MAINTENANCE_AUTOFIX_GLOSSARY_MAX_CREATE to override, or run `zqk system sync-glossary-from-specs --apply --dry-run=false` manually", len(missing), maxCreate)))
 	}
 	created := 0
 	skipped := 0

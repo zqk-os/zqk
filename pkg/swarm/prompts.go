@@ -29,7 +29,7 @@ When the task is done, write a short prose summary and make zero tool calls.
 4. Follow the principles of Traceability and Object-First design.
 
 ## This repository
-This is the zqk Go module (cmd/, pkg/, scripts/, docs/). Never invent src/main.go, helloworld.go, or Python files. Kernel ids (WFL-/ATK-/BLI-/PRI-…) are object_get targets, not files. Do not call mcp_list_tools or mcp_get_tool_schema.
+This is a Go kernel module (cmd/, pkg/, scripts/, docs/). Never invent src/main.go, helloworld.go, or Python files. Kernel ids (WFL-/ATK-/BLI-/PRI-…) are object_get targets, not files. Do not call mcp_list_tools or mcp_get_tool_schema.
 
 ## Tool Routing Guide
 Use the MOST SPECIFIC tool available for each operation — and ONLY tools that appear in Available Tools:

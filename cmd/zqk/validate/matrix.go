@@ -6,6 +6,7 @@ import (
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
 	bldr_cli_cmd_v1 "github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
 	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/quality"
 )
 
@@ -19,7 +20,7 @@ func runMatrixValidate(cmd *cobra.Command, _ []string) error {
 		projectRoot = cli.ResolveProjectRoot(".")
 	}
 	if projectRoot == "" {
-		return errfmt.Errorf("project root not found; run from repo root or zqk use")
+		return errfmt.Errorf("%s", paths.RewriteCanonicalCLIInvocations("project root not found; run from repo root or zqk use"))
 	}
 
 	var flags clipkg.FlagBag

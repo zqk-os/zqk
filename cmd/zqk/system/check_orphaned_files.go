@@ -263,7 +263,7 @@ func detectOrphanedFiles(cmd *cobra.Command, projectRoot string, results []Check
 							{
 								Tier:        1,
 								Category:    "integrity",
-								Message:     "Untracked traditional process file; not deleted (use zqk object delete --unlink-references or kernel.cas_object_reconcile_index)",
+								Message:     paths.RewriteCanonicalCLIInvocations("Untracked traditional process file; not deleted (use zqk object delete --unlink-references or kernel.cas_object_reconcile_index)"),
 								AutoFixable: false,
 							},
 						},

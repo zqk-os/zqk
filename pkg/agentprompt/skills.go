@@ -295,7 +295,7 @@ func (s *SkillEnforcement) GeneratePromptSectionRefs() string {
 
 	var sb strings.Builder
 	sb.WriteString("## Relevant Agent Skills\n")
-	sb.WriteString("Resolve mandates with `zqk object get <ASK-id>` or the listed `file_path`. Do not persist instruction bodies on the task object.\n\n")
+	sb.WriteString(paths.RewriteCanonicalCLIInvocations("Resolve mandates with `zqk object get <ASK-id>` or the listed `file_path`. Do not persist instruction bodies on the task object.\n\n"))
 
 	for _, skillObj := range s.RelevantSkills {
 		title, _ := skillObj[objects.FieldKeyTitle].(string)

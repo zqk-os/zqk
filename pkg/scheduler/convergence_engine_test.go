@@ -119,8 +119,7 @@ func TestConvergenceEngine_evaluateActiveConvergenceSessions(t *testing.T) {
 			for _, a := range args {
 				full += " " + a
 			}
-			if (name == "bash" && len(args) >= 3 && args[0] == "scripts/cvs_convergence_orchestrate.sh" && args[1] == "CVS-ACTIVE") ||
-				(len(args) >= 5 && args[0] == "scheduler" && args[1] == "convergence" && args[2] == "measure" && args[4] == "CVS-ACTIVE") {
+			if len(args) >= 5 && args[0] == "scheduler" && args[1] == "convergence" && args[2] == "measure" && args[4] == "CVS-ACTIVE" {
 				executed = true
 				return &MockCmd{OutputBytes: []byte(`{"rollup_status": "blocked"}`)}
 			}
@@ -129,7 +128,7 @@ func TestConvergenceEngine_evaluateActiveConvergenceSessions(t *testing.T) {
 		},
 	}
 
-	// Evaluate. The MockExecutor will intercept the bash call.
+	// Evaluate. The MockExecutor will intercept the CLI call.
 	sched.EvaluateActiveConvergenceSessions(ctx)
 
 	if !executed {

@@ -55,8 +55,8 @@ func TestMultiPlatformCompilation(t *testing.T) {
 			ctx, cancel := context.WithTimeout(context.Background(), 120*time.Second)
 			defer cancel()
 
-			tmpOut := filepath.Join(t.TempDir(), "zqk-community-"+p.goos+"-"+p.goarch)
-			cmd := exec.CommandContext(ctx, "go", "build", "-o", tmpOut, "./cmd/zqk-community")
+			tmpOut := filepath.Join(t.TempDir(), "zqk-"+p.goos+"-"+p.goarch)
+			cmd := exec.CommandContext(ctx, "go", "build", "-o", tmpOut, "./cmd/zqk")
 			cmd.Dir = root
 			cmd.Env = append(os.Environ(),
 				"CGO_ENABLED=0",
