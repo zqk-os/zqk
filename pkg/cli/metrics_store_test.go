@@ -175,6 +175,7 @@ func TestFileMetricsStore_DayRoll_OnRecordExecution(t *testing.T) {
 	if err != nil {
 		t.Fatalf("NewFileMetricsStoreWithConfig failed: %v", err)
 	}
+	defer store.WaitForFlushes()
 
 	// Simulate recording a command for yesterday
 	yesterday := time.Now().UTC().Add(-24 * time.Hour)
