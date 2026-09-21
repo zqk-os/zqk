@@ -40,11 +40,11 @@ function App() {
       id: 'init',
       label: '2. Seed Cell',
       command: 'zqk system init --project-name core-service',
-      output: `[zqk:cell] Initializing sovereign cellular node: core-service
+      output: `[zqk:cell] Initializing sovereign microkernel node: core-service
 [zqk:membrane] Establishing deterministic state boundary (.zqk/)
-[zqk:dna] Minting standard library: Intent, WorkUnit, InvariantGate, ADR
-[zqk:gantt] Seeded root objective graph: org -> mission -> vision -> plan
-[zqk:ready] Kernel cell alive. Memory plane: Draft | Staged | Promoted`
+[zqk:intent] Imparting human intent: root mission, vision, and invariant policies
+[zqk:holon] Instantiating autonomous holon: self-contained yet networked
+[zqk:ready] Kernel cell alive. Dynamic memory planes: Draft | Staged | Promoted`
     },
     onboard: {
       id: 'onboard',
@@ -54,13 +54,23 @@ function App() {
   "agent_host": "cursor",
   "seating_status": "active",
   "cell_urn": "urn:zqk:cell-01:agent:claude-sonnet-3-7",
+  "token_efficiency": "curated_context_only (-78% token bloat)",
   "membrane_policy": "fail-closed",
   "directives_primed": [".cursor/rules/zqk-kernel.mdc", "AGENTS.md"]
 }`
     },
+    snapshot: {
+      id: 'snapshot',
+      label: '4. Snapshot & Rollback',
+      command: 'zqk system snapshot create --tag v1-baseline && zqk object rollback BLI-104',
+      output: `[zqk:snapshot] Created cryptographic state checkpoint: snap_178987391.csnap
+[zqk:sensing] Ambient feedback sensor detected invariant divergence in test_bundle.
+[zqk:rollback] Reverting BLI-104 state to last known stable checkpoint.
+[zqk:curate] Memory plane restored without corrupting graph nervous system.`
+    },
     mcp: {
       id: 'mcp',
-      label: '4. Connect MCP',
+      label: '5. Connect MCP',
       command: 'zqk mcp install && zqk workflow whats-next',
       output: `[mcp] Registered ZQK Knowledge Kernel MCP server with local IDEs.
 [workflow] Querying real-time kernel nervous system...
@@ -68,7 +78,7 @@ Priority Plan: PRI-AUTH-FEDERATION-001 (active)
 Available WorkUnits:
   - BLI-104: Implement JWT invariant gate verification [planned]
   - BLI-105: Wire apoptotic timeout on stale lease [claimed]
-Next Agentic Action: Claim BLI-104 and enter PlaneDraft.`
+Next Agentic Action: Claim BLI-104 with task-curated context slice.`
     }
   };
 
@@ -88,6 +98,8 @@ Next Agentic Action: Claim BLI-104 and enter PlaneDraft.`
           </div>
           <nav className="nav-links">
             <a href="#cellular-model">Cellular Architecture</a>
+            <a href="#memory-management">Autonomous Memory</a>
+            <a href="#holon-model">Holons & Microkernel</a>
             <a href="#comparison">Why Cellular OS</a>
             <a href="#open-core">Open Core</a>
             <a href="https://docs.zqk.dev" target="_blank" rel="noreferrer">Documentation</a>
@@ -108,7 +120,8 @@ Next Agentic Action: Claim BLI-104 and enter PlaneDraft.`
             The Operating System for<br />Autonomous Agent Swarms
           </h1>
           <p className="hero-subtitle">
-            <span className="hero-highlight">Your AI agents are coding blind.</span> Current frameworks glue loose prompt scripts to chaotic vector swamps. ZQK OS provides <strong>cellular isolation</strong>, a <strong>graph nervous system</strong>, and <strong>self-healing biological guardrails</strong> so agents govern themselves.
+            <span className="hero-highlight">The Substrate for Living Software: Sovereign Cells. Verified Truth. Autonomous Organisms.</span><br />
+            Your AI agents are coding blind. Current frameworks glue loose prompt scripts to chaotic vector swamps. ZQK OS provides a <strong>microkernel architecture</strong> with <strong>cellular isolation</strong>, an <strong>adaptive memory mesh programmed with human intent</strong>, and <strong>self-healing biological guardrails</strong> so agents govern themselves.
           </p>
 
           <p style={{ display: 'none' }}>
@@ -123,7 +136,7 @@ Next Agentic Action: Claim BLI-104 and enter PlaneDraft.`
                 <span className="dot dot-yellow"></span>
                 <span className="dot dot-green"></span>
               </div>
-              <div style={{ display: 'flex', gap: '8px' }}>
+              <div style={{ display: 'flex', gap: '8px', overflowX: 'auto' }}>
                 {Object.keys(terminalTabs).map((key) => (
                   <button
                     key={key}
@@ -136,7 +149,8 @@ Next Agentic Action: Claim BLI-104 and enter PlaneDraft.`
                       borderRadius: '4px',
                       cursor: 'pointer',
                       fontSize: '0.8rem',
-                      fontFamily: 'monospace'
+                      fontFamily: 'monospace',
+                      whiteSpace: 'nowrap'
                     }}
                   >
                     {terminalTabs[key].label}
@@ -165,19 +179,113 @@ Next Agentic Action: Claim BLI-104 and enter PlaneDraft.`
             </div>
           </div>
 
-          <div style={{ marginTop: '28px', display: 'flex', gap: '16px', justifyContent: 'center' }}>
+          <div style={{ marginTop: '28px', display: 'flex', gap: '16px', justifyContent: 'center', flexWrap: 'wrap' }}>
             <a href="#quickstart" className="btn-primary">
               Get Started (5-minute value) →
             </a>
-            <a href="https://docs.zqk.dev" target="_blank" rel="noreferrer" className="btn-secondary">
-              Read the Manifesto
+            <a href="#memory-management" className="btn-secondary">
+              Explore Autonomous Memory
             </a>
           </div>
         </div>
       </section>
 
+      {/* Autonomous Memory & Imparted Intent Section */}
+      <section className="section" id="memory-management">
+        <div className="site-container">
+          <div className="section-header">
+            <div className="section-tag">Autonomous Memory & Imparted Intent</div>
+            <h2 className="section-title">Living Knowledge, Not Static Documentation</h2>
+            <p className="section-desc">
+              Traditional knowledge bases are dead files. ZQK memory is a dynamic, sensing nervous system programmed with human intent—rules, vision, and non-negotiable invariants—that constantly adapts from operational feedback.
+            </p>
+          </div>
+
+          <div className="bio-grid">
+            <div className="glass-panel bio-card">
+              <div className="bio-icon" style={{ color: 'var(--accent-cyan)' }}>🧠</div>
+              <div className="bio-meta cell">Programmed Intent</div>
+              <h3 className="bio-title">Human Vision as Guardrails</h3>
+              <p className="bio-desc">
+                Human intent is imparted through top-level mission, vision, and immutable policy objects. Agents never invent goals out of thin air—their actions are continuously constrained and validated against the organism's core charter.
+              </p>
+            </div>
+
+            <div className="glass-panel bio-card">
+              <div className="bio-icon" style={{ color: 'var(--accent-magenta)' }}>📡</div>
+              <div className="bio-meta membrane">Ambient Sensing</div>
+              <h3 className="bio-title">Adaptive Feedback Loops</h3>
+              <p className="bio-desc">
+                The kernel is not static. Ambient background daemons listen to filesystem mutations, test results, and runtime drift. When conditions diverge, the memory state dynamically adjusts its next-action recommendations.
+              </p>
+            </div>
+
+            <div className="glass-panel bio-card">
+              <div className="bio-icon" style={{ color: 'var(--accent-amber)' }}>📸</div>
+              <div className="bio-meta nervous">Temporal Agility</div>
+              <h3 className="bio-title">Snapshot, Clone & Rollback</h3>
+              <p className="bio-desc">
+                Treat knowledge like Git commits. Instantly create atomic snapshots, branch an entire cell's memory for parallel experimentation, rollback failed agent excursions, or cherry-pick verified knowledge artifacts across nodes.
+              </p>
+            </div>
+
+            <div className="glass-panel bio-card">
+              <div className="bio-icon" style={{ color: 'var(--accent-emerald)' }}>⚡</div>
+              <div className="bio-meta organism">Token Optimization</div>
+              <h3 className="bio-title">Laser Context Curation</h3>
+              <p className="bio-desc">
+                Stop blowing context windows on bloated chat logs. ZQK slices and curates exact subgraph context based on the specific WorkUnit an agent claims—reducing token utilization by up to 80% while dramatically improving output precision.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Holons & Microkernel Architecture */}
+      <section className="section" id="holon-model" style={{ background: 'rgba(5, 8, 16, 0.4)' }}>
+        <div className="site-container">
+          <div className="section-header">
+            <div className="section-tag">Systems Topology</div>
+            <h2 className="section-title">Microkernel Architecture & Holonic Design</h2>
+            <p className="section-desc">
+              In nature, a holon is something that is simultaneously a whole and a part. ZQK nodes embody this exact duality: each cell is a self-governing whole, yet meshes harmoniously into the greater organism.
+            </p>
+          </div>
+
+          <div className="comparison-container">
+            <div className="glass-panel" style={{ borderLeft: '4px solid var(--accent-cyan)' }}>
+              <h3 style={{ fontSize: '1.4rem', marginBottom: '12px', color: 'var(--accent-cyan)' }}>
+                Microkernel Systems Rigor
+              </h3>
+              <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem', lineHeight: '1.7', marginBottom: '16px' }}>
+                Following the microkernel design pattern of L4 and Mach, the ZQK Core runtime is stripped to essential primitives: <strong>state plane isolation</strong>, <strong>graph telemetry bus</strong>, <strong>deterministic task scheduler</strong>, and <strong>IPC wire messaging</strong>. Domain-specific workflows run in user-space above the kernel, preventing architectural bloat.
+              </p>
+              <ul style={{ listStyle: 'none', padding: 0, margin: 0, color: 'var(--text-muted)', fontSize: '0.9rem' }}>
+                <li style={{ padding: '6px 0' }}><span style={{ color: 'var(--accent-cyan)' }}>•</span> Single Go binary, zero heavy daemon dependencies</li>
+                <li style={{ padding: '6px 0' }}><span style={{ color: 'var(--accent-cyan)' }}>•</span> In-process Git CAS and memory graph synchronization</li>
+                <li style={{ padding: '6px 0' }}><span style={{ color: 'var(--accent-cyan)' }}>•</span> Strict isolation prevents rogue agent crash cascades</li>
+              </ul>
+            </div>
+
+            <div className="glass-panel" style={{ borderLeft: '4px solid var(--accent-magenta)' }}>
+              <h3 style={{ fontSize: '1.4rem', marginBottom: '12px', color: 'var(--accent-magenta)' }}>
+                Holonic Autonomous Units
+              </h3>
+              <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem', lineHeight: '1.7', marginBottom: '16px' }}>
+                Every ZQK repository or service is an autonomous holon. It maintains complete sovereignty over its local code, tests, and dependencies. When networked over the ZQK peer mesh protocol, individual holons coordinate compound enterprise initiatives without sacrificing local autonomy.
+              </p>
+              <ul style={{ listStyle: 'none', padding: 0, margin: 0, color: 'var(--text-muted)', fontSize: '0.9rem' }}>
+                <li style={{ padding: '6px 0' }}><span style={{ color: 'var(--accent-magenta)' }}>•</span> Complete local autonomy: works 100% offline</li>
+                <li style={{ padding: '6px 0' }}><span style={{ color: 'var(--accent-magenta)' }}>•</span> Recursive composition: cells nest into clusters and swarms</li>
+                <li style={{ padding: '6px 0' }}><span style={{ color: 'var(--accent-magenta)' }}>•</span> Federated trust: signed attestations verify cross-cell work</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Cellular Biology 4 Pillars */}
-      <section className="section" id="cellular-model" style={{ background: 'rgba(5, 8, 16, 0.4)' }}>
+      <section className="section" id="cellular-model">
         <div className="site-container">
           <div className="section-header">
             <div className="section-tag">Biological Systems Architecture</div>
@@ -228,7 +336,7 @@ Next Agentic Action: Claim BLI-104 and enter PlaneDraft.`
       </section>
 
       {/* Comparison: Vector Swamp vs Cellular OS */}
-      <section className="section" id="comparison">
+      <section className="section" id="comparison" style={{ background: 'rgba(5, 8, 16, 0.4)' }}>
         <div className="site-container">
           <div className="section-header">
             <div className="section-tag">First-Principles Paradigm Shift</div>
@@ -280,7 +388,7 @@ Next Agentic Action: Claim BLI-104 and enter PlaneDraft.`
               <div className="comp-item">
                 <div className="comp-bullet good">•</div>
                 <div>
-                  <div className="comp-text-title">Operating System Kernel Primitives</div>
+                  <div className="comp-text-title">Microkernel Architecture Primitives</div>
                   <div className="comp-text-desc">First-class kernel objects, multi-plane memory isolation, and deterministic task scheduling built natively in high-performance Go.</div>
                 </div>
               </div>
@@ -297,7 +405,7 @@ Next Agentic Action: Claim BLI-104 and enter PlaneDraft.`
       </section>
 
       {/* Open-Core Boundary Matrix */}
-      <section className="section" id="open-core" style={{ background: 'rgba(5, 8, 16, 0.4)' }}>
+      <section className="section" id="open-core">
         <div className="site-container">
           <div className="section-header">
             <div className="section-tag">Distribution Architecture</div>
@@ -354,7 +462,7 @@ Next Agentic Action: Claim BLI-104 and enter PlaneDraft.`
       </section>
 
       {/* Quickstart / CTA */}
-      <section className="section" id="quickstart">
+      <section className="section" id="quickstart" style={{ background: 'rgba(5, 8, 16, 0.4)' }}>
         <div className="site-container" style={{ textAlign: 'center' }}>
           <div className="glass-panel" style={{ maxWidth: '800px', margin: '0 auto', padding: '48px' }}>
             <h2 style={{ fontSize: '2.2rem', marginBottom: '16px' }}>Ready to Run Living Software?</h2>
@@ -386,7 +494,8 @@ Next Agentic Action: Claim BLI-104 and enter PlaneDraft.`
             <div>
               <h4 style={{ color: '#fff', marginBottom: '16px' }}>Architecture</h4>
               <p><a href="#cellular-model">Cellular Model</a></p>
-              <p><a href="#comparison">Epistemic Hygiene</a></p>
+              <p><a href="#memory-management">Autonomous Memory</a></p>
+              <p><a href="#holon-model">Holonic Architecture</a></p>
               <p><a href="#open-core">Open Core Boundary</a></p>
               <p><a href="https://docs.zqk.dev/specs" target="_blank" rel="noreferrer">Kernel Specifications</a></p>
             </div>
@@ -407,7 +516,7 @@ Next Agentic Action: Claim BLI-104 and enter PlaneDraft.`
 
           <div className="footer-bottom">
             <div>© {new Date().getFullYear()} ZQK OS Project. Apache 2.0 Open Core.</div>
-            <div>Designed for Autonomous Living Software.</div>
+            <div>The Substrate for Living Software.</div>
           </div>
         </div>
       </footer>
