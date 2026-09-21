@@ -212,10 +212,10 @@ type tryRLocker interface {
 	TryRLock() bool
 }
 
-// acquireLockWithContext attempts to acquire mu within the lifetime of ctx.
+// AcquireLockWithContext attempts to acquire mu within the lifetime of ctx.
 // If mu supports TryLock (e.g. *sync.Mutex or *sync.RWMutex), it polls with an adaptive backoff
 // without ever blocking indefinitely on mu.Lock().
-func acquireLockWithContext(ctx context.Context, mu sync.Locker) error {
+func AcquireLockWithContext(ctx context.Context, mu sync.Locker) error {
 	if tl, ok := mu.(tryLocker); ok {
 		if tl.TryLock() {
 			return nil
@@ -242,14 +242,15 @@ func acquireLockWithContext(ctx context.Context, mu sync.Locker) error {
 		}
 	}
 
-	// Custom Locker without TryLock cannot honor ctx without a helper
-	// goroutine that can leak mu.Lock() after cancel. Refuse.
-	// TRACK: BLI-CEF-R2-CON-LOCK-TIMEOUT — require TryLock for timeout waits
-	return errfmt.Errorf("locker %T does not implement TryLock; refusing helper goroutine that can leak Lock after cancel", mu)
+	return errfmt.Errorf("WithLockTimeout: Locker does not implement TryLock; refusing unbounded Lock()")
 }
 
-// acquireRLockWithContext attempts to acquire mu's read lock within the lifetime of ctx.
-func acquireRLockWithContext(ctx context.Context, mu *sync.RWMutex) error {
+func acquireLockWithContext(ctx context.Context, mu sync.Locker) error {
+	return AcquireLockWithContext(ctx, mu)
+}
+
+// AcquireRLockWithContext attempts to acquire mu's read lock within the lifetime of ctx.
+func AcquireRLockWithContext(ctx context.Context, mu *sync.RWMutex) error {
 	if mu.TryRLock() {
 		return nil
 	}
@@ -273,6 +274,10 @@ func acquireRLockWithContext(ctx context.Context, mu *sync.RWMutex) error {
 			timer.Reset(backoff)
 		}
 	}
+}
+
+func acquireRLockWithContext(ctx context.Context, mu *sync.RWMutex) error {
+	return AcquireRLockWithContext(ctx, mu)
 }
 
 // WithLockTimeout executes a function with a lock and timeout monitoring
