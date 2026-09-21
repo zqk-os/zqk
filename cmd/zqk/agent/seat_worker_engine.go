@@ -7,13 +7,13 @@ import (
 	"fmt"
 	"path/filepath"
 	"strings"
-	"sync"
 	"time"
 
 	"gopkg.in/yaml.v3"
 
 	"github.com/zqk-os/zqk/pkg/agentfeed"
 	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/stampmemo"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
@@ -33,15 +33,7 @@ type workerLanesFile struct {
 	DefaultLane string `json:"default_lane" yaml:"default_lane"`
 }
 
-type cachedLaneConfig struct {
-	modTime time.Time
-	data    workerLanesFile
-}
-
-var (
-	laneConfigCacheMu sync.RWMutex
-	laneConfigCache   = make(map[string]cachedLaneConfig)
-)
+var laneConfigs stampmemo.Table[workerLanesFile] // keyed by config path (closed lane-file set)
 
 // seatWorkerEngineID is the swarm engine label. It uses the configured or derived orch lane,
 // not the leftover opaque seat id.
@@ -237,43 +229,32 @@ func loadConfiguredWorkerLane(root, personaRef, agentID string) string {
 }
 
 func readLaneConfigFile(path string) (workerLanesFile, bool) {
-	info, err := fileutil.Stat(path)
-	if err != nil || info.IsDir() {
-		return workerLanesFile{}, false
-	}
-
-	laneConfigCacheMu.RLock()
-	cached, found := laneConfigCache[path]
-	laneConfigCacheMu.RUnlock()
-
-	if found && cached.modTime.Equal(info.ModTime()) {
-		return cached.data, true
-	}
-
-	data, err := fileutil.ReadFile(path)
+	parsed, err := laneConfigs.Load(path, stampmemo.Of(path), func() (workerLanesFile, error) {
+		info, err := fileutil.Stat(path)
+		if err != nil {
+			return workerLanesFile{}, err
+		}
+		if info.IsDir() {
+			return workerLanesFile{}, fmt.Errorf("lane config path is a directory")
+		}
+		data, err := fileutil.ReadFile(path)
+		if err != nil {
+			return workerLanesFile{}, err
+		}
+		var parsed workerLanesFile
+		ext := strings.ToLower(filepath.Ext(path))
+		if ext == ".json" {
+			if err := json.Unmarshal(data, &parsed); err != nil {
+				return workerLanesFile{}, err
+			}
+		} else if err := yaml.Unmarshal(data, &parsed); err != nil {
+			return workerLanesFile{}, err
+		}
+		return parsed, nil
+	})
 	if err != nil {
 		return workerLanesFile{}, false
 	}
-
-	var parsed workerLanesFile
-	ext := strings.ToLower(filepath.Ext(path))
-	if ext == ".json" {
-		if err := json.Unmarshal(data, &parsed); err != nil {
-			return workerLanesFile{}, false
-		}
-	} else {
-		if err := yaml.Unmarshal(data, &parsed); err != nil {
-			return workerLanesFile{}, false
-		}
-	}
-
-	laneConfigCacheMu.Lock()
-	laneConfigCache[path] = cachedLaneConfig{
-		modTime: info.ModTime(),
-		data:    parsed,
-	}
-	laneConfigCacheMu.Unlock()
-
 	return parsed, true
 }
 

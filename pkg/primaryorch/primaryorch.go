@@ -25,7 +25,7 @@ import (
 // SchemaVersion is the binding file schema_version.
 const SchemaVersion = "1"
 
-// ConfigFileName is the lite binding under ProjectDataDir/config/.
+// ConfigFileName is the lite binding under .zqk/agent-runtime/.
 const ConfigFileName = "primary_orchestrator.json"
 
 // DefaultAgentIDFallback is the vendor-neutral agent_id when no binding file and
