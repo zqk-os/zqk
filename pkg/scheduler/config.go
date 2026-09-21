@@ -7,6 +7,7 @@ import (
 
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/stampmemo"
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -23,23 +24,28 @@ type SchedulerConfig struct {
 	JobsPaused bool `yaml:"jobs_paused"`
 }
 
+var schedulerConfigs stampmemo.Table[*SchedulerConfig] // keyed by projectRoot; stamp is config.yaml
+
 // LoadSchedulerConfig loads scheduler configuration from the scheduler config file.
 // Returns default (enabled, jobs not paused) if the file does not exist.
 func LoadSchedulerConfig(projectRoot string) (*SchedulerConfig, error) {
 	schedulerRoot := paths.ResolvePathFromCacheOrConstant(projectRoot, "scheduler", filepath.Join(paths.ProjectDataDir, paths.SchedulerDir))
 	configPath := filepath.Join(schedulerRoot, paths.SchedulerConfigFile)
+	return schedulerConfigs.Load(projectRoot, stampmemo.Of(configPath), func() (*SchedulerConfig, error) {
+		return readSchedulerConfig(configPath)
+	})
+}
 
-	if info, err := fileutil.Stat(configPath); fileutil.IsNotExist(err) {
-		_ = info // Acknowledged
-		return &SchedulerConfig{
-			Enabled:     true,
-			ProjectType: "production",
-			JobsPaused:  false,
-		}, nil
-	}
-
+func readSchedulerConfig(configPath string) (*SchedulerConfig, error) {
 	data, err := fileutil.ReadFile(configPath)
 	if err != nil {
+		if fileutil.IsNotExist(err) {
+			return &SchedulerConfig{
+				Enabled:     true,
+				ProjectType: "production",
+				JobsPaused:  false,
+			}, nil
+		}
 		return nil, errfmt.Newf("failed to read scheduler config").Wrap(err)
 	}
 
@@ -69,6 +75,7 @@ func SaveSchedulerConfig(projectRoot string, config *SchedulerConfig) error {
 	if err := fileutil.WriteSecureFile(configPath, data); err != nil {
 		return errfmt.Newf("failed to write scheduler config").Wrap(err)
 	}
+	schedulerConfigs.Delete(projectRoot)
 	return nil
 }
 

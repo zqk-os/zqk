@@ -2,7 +2,6 @@ package internal
 
 import (
 	"context"
-	"sync"
 
 	"github.com/spf13/cobra"
 	"github.com/zqk-os/zqk/internal/cli"
@@ -148,14 +147,6 @@ func updateResultMetadata(result *storage.QueryResult, count int) {
 
 // applyGroupingIfRequested applies grouping to results if requested
 
-var (
-	// Cached spec loader for visibility checks (lazy-loaded)
-	visibilitySpecLoader *objects.SpecLoader
-	visibilityLoaderOnce sync.Once
-	// Cache of kind -> visibility to avoid repeated spec loads
-	kindVisibilityCache sync.Map // map[string]string
-)
-
 // isInternalObject checks if an object is internal (visibility: internal)
 // Internal objects are system objects, not regular user-created objects.
 // They are identified by:
@@ -192,41 +183,21 @@ func isInternalObject(obj map[string]any) bool {
 		}
 	}
 
-	// Check spec's visibility field dynamically
-	// Use cached visibility if available
-	if cachedVisibility, ok := kindVisibilityCache.Load(kind); ok {
-		return cachedVisibility.(string) == internalSourceInternal
-	}
-
-	// Load spec to check visibility (with caching)
-	visibilityLoaderOnce.Do(func() {
-		visibilitySpecLoader = objects.NewSpecLoader("")
-	})
-
+	// SpecLoader already stamp-memos YAML; do not keep a second visibility map.
+	specLoader := objects.GetGlobalSpecLoader()
 	specFile := kind + ".yaml"
-	spec, err := visibilitySpecLoader.LoadSpecWithInheritance(specFile)
+	spec, err := specLoader.LoadSpecWithInheritance(specFile)
 	if err != nil || spec == nil {
-		// If spec can't be loaded, default to false (not internal)
-		// Cache the result to avoid repeated failed lookups
-		kindVisibilityCache.Store(kind, internalSourcePublic) // Default assumption
 		return false
 	}
 
-	// Check visibility from spec (may be inherited from parent)
 	visibility := spec.Visibility
 	if visibility == emptyValue && spec.Extends != emptyValue {
-		// If no visibility, check parent spec
 		parentFile := spec.Extends + ".yaml"
-		if parentSpec, err := visibilitySpecLoader.LoadSpecWithInheritance(parentFile); err == nil && parentSpec != nil {
+		if parentSpec, err := specLoader.LoadSpecWithInheritance(parentFile); err == nil && parentSpec != nil {
 			visibility = parentSpec.Visibility
 		}
 	}
-
-	// Cache the result
-	if visibility == emptyValue {
-		visibility = internalSourcePublic // Default if not specified
-	}
-	kindVisibilityCache.Store(kind, visibility)
 
 	return visibility == internalSourceInternal
 }
