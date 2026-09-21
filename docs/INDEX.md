@@ -1,4 +1,4 @@
-# ZQK documentation (this SKU)
+# ZQK documentation (Core)
 
 Start in **onboarding**.
 
@@ -9,8 +9,8 @@ Start in **onboarding**.
 | **[Getting started](./getting-started.md)** | Pointer to first-run |
 | **[Quickstart](./onboarding/QUICKSTART.md)** | Same text as `./bin/zqk system start-here` |
 | **[First-run object tutorial](./onboarding/FIRST_RUN_OBJECT_TUTORIAL.md)** | Create / get / update a `question` |
-| **[Agents on this SKU](./onboarding/AI_AGENT_ONBOARDING.md)** | Pointer only — studio process pack is not shipped |
-| **[Architecture (this SKU)](./architecture/README.md)** | Pointer only — studio architecture dump is not shipped |
+| **[AI Agent Onboarding](./onboarding/AI_AGENT_ONBOARDING.md)** | Directives and workflow discipline for autonomous agents |
+| **[Architecture](./architecture/README.md)** | Core system architecture and downstream Studio consumption model |
 | **[Contributing](../CONTRIBUTING.md)** | How to work in this tree |
 | **[Governance](../GOVERNANCE.md)** | Open-core boundary, decision-making, publication hold |
 | **[Tutorials](./tutorials/README.md)** | Learn-by-doing (Divio) |

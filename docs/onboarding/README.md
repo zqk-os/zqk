@@ -11,8 +11,8 @@
 
 ## Not first-run
 
-- **[Agents on this SKU](./AI_AGENT_ONBOARDING.md)** — pointer only. The studio process pack is not shipped here.
-- There is no `make alpha-help`, `zqk-admin`, or public brew/GitHub release on this SKU.
+- **[AI Agent Onboarding](./AI_AGENT_ONBOARDING.md)** — directives and conventions for autonomous AI agents operating on ZQK Core.
+- ZQK Core is the canonical upstream kernel; ZQK Studio consumes Core directly as an upstream dependency without bifurcation.
 - Scheduler **is** shipped: `./bin/zqk scheduler start|stop|status`. CRUD works without it.
 
 ## Session start

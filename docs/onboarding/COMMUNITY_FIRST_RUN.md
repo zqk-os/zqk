@@ -3,8 +3,7 @@
 **Audience:** People installing ZQK Community.  
 **CLI:** examples use the default executable token; `scripts/open-core/applybrand` rewrites them from `brand.executable_name` in `config/zqk-local.yaml` then `config/zqk.yaml`.  
 **Kernel directory:** `.zqk/` (never rewritten by branding; not a second YAML config tree — that is `config/`).  
-**MCP pairing:** [`QUICKSTART.md`](./QUICKSTART.md).  
-**Not this SKU:** Studio process dogfood. [`AI_AGENT_ONBOARDING.md`](./AI_AGENT_ONBOARDING.md) is a pointer, not that pack.
+**Downstream architecture:** ZQK Core is the canonical open-core kernel. ZQK Studio consumes ZQK Core directly as an upstream dependency without bifurcation. See [`AI_AGENT_ONBOARDING.md`](./AI_AGENT_ONBOARDING.md).
 
 ## Install (this tree)
 
@@ -79,4 +78,4 @@ Init's maintenance jobs are **kernel survival** (retention, object validation, c
 5. `./bin/zqk test dashboard` — test_case ↔ criteria lineage.
 6. `./bin/zqk workflow whats-next --format json`.
 
-There is no `zqk agent new`, `zqk auth`, `zqk-admin`, or `system spec-origination` on this SKU. Scheduler **is** shipped: `zqk scheduler start|stop|status`. Spec origination and command codegen stay on the admin binary.
+ZQK Core provides the complete unbifurcated system kernel: object lifecycle, spec origination, command codegen, scheduler daemons (`zqk scheduler start|stop|status`), and MCP integration are fully native. Downstream capabilities (such as multi-tenant orchestration, specialized compliance packs, and proprietary enterprise workflows) layer directly on top of Core in Studio.
