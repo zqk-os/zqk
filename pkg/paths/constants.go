@@ -275,7 +275,8 @@ var (
 	ProcessInternalProfileSpecsDir         = ProjectDataDir + "/specs/profile_specs"
 	ProcessPoliciesDir                     = ProjectDataDir + "/process/policies"
 	ProcessPlanningDir                     = ProjectDataDir + "/process/planning"
-	ProcessAuditDir                        = ProjectDataDir + "/process/audit"
+	// Audit events are stream-backed (.zqk/state/stream_current/audit_event and .zqk/streams/audit_event).
+	// There is no CAS folder under process/audit.
 	ProcessAccountsDir                     = ProjectDataDir + "/process/accounts"
 	ProcessPersonasDir                     = ProjectDataDir + "/process/personas"
 	ProcessAuthStrategiesDir               = ProjectDataDir + "/process/auth_strategies"

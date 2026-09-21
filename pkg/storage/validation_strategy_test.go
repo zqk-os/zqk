@@ -338,7 +338,7 @@ func TestValidationMetrics_Concurrent(t *testing.T) {
 // TestBuildHashFilePath tests the helper function.
 func TestBuildHashFilePath(t *testing.T) {
 	proj := "/project"
-	auditUnderProj := filepath.Join(proj, paths.ProcessAuditDir)
+	casKindDir := datacell.CellCASPrimaryDir(proj, "backlog_items")
 	metricsUnderProj := datacell.CellCASPrimaryDir(proj, "metrics")
 	tests := []struct {
 		kindDir   string
@@ -347,16 +347,16 @@ func TestBuildHashFilePath(t *testing.T) {
 		expected  string
 	}{
 		{
-			kindDir:   auditUnderProj,
+			kindDir:   casKindDir,
 			hash:      "abc123",
 			bucketKey: "",
-			expected:  filepath.Join(auditUnderProj, "abc123.yaml"),
+			expected:  filepath.Join(casKindDir, "abc123.yaml"),
 		},
 		{
-			kindDir:   auditUnderProj,
+			kindDir:   casKindDir,
 			hash:      "abc123",
 			bucketKey: "2030-01",
-			expected:  filepath.Join(auditUnderProj, "2030-01", "abc123.yaml"),
+			expected:  filepath.Join(casKindDir, "2030-01", "abc123.yaml"),
 		},
 		{
 			kindDir:   metricsUnderProj,

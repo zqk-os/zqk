@@ -13,6 +13,7 @@ import (
 	"github.com/spf13/cobra"
 
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/datacell"
 	"github.com/zqk-os/zqk/pkg/migration/parser"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
@@ -110,7 +111,7 @@ namespace_id: %s
 	// 5 audit files (bucketed)
 	now := time.Now().UTC()
 	month := now.Format("2006-01")
-	auditDir := filepath.Join(testRoot, paths.ProcessAuditDir, month)
+	auditDir := filepath.Join(datacell.StreamCurrentKindDir(testRoot, objects.KindAuditEvent), month)
 	if err := fileutil.MkdirAll(auditDir, paths.DirPerm755); err != nil {
 		t.Fatalf("Failed to create audit directory: %v", err)
 	}
