@@ -5,6 +5,7 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/zqk-os/zqk/pkg/brand"
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
@@ -20,14 +21,28 @@ var (
 	envOnce        sync.Once
 )
 
+func projectDataDirName() string {
+	prefix := brand.NamespacePrefix()
+	if prefix == "" {
+		return defaultProjectDataDir
+	}
+	return "." + prefix
+}
+
 func findWorkspaceRoot(startPath string) string {
 	dir, err := filepath.Abs(startPath)
 	if err != nil {
 		dir = startPath
 	}
+	pDataDir := projectDataDirName()
 	for {
-		if _, err := Stat(filepath.Join(dir, defaultProjectDataDir)); err == nil {
+		if _, err := Stat(filepath.Join(dir, pDataDir)); err == nil {
 			return dir
+		}
+		if pDataDir != defaultProjectDataDir {
+			if _, err := Stat(filepath.Join(dir, defaultProjectDataDir)); err == nil {
+				return dir
+			}
 		}
 		parent := filepath.Dir(dir)
 		if parent == dir {
@@ -88,7 +103,11 @@ func ValidateNoRepoStateMutation(targetPath, repoRoot, testRoot string) error {
 		return nil
 	}
 
+	pDataDir := projectDataDirName()
 	protectedDirs := []string{
+		filepath.Join(absRepo, pDataDir, "process"),
+		filepath.Join(absRepo, pDataDir),
+		filepath.Join(absRepo, pDataDir+"-state"),
 		filepath.Join(absRepo, defaultProcessDir),
 		filepath.Join(absRepo, defaultProjectDataDir),
 		filepath.Join(absRepo, ".zqk-state"),

@@ -1,6 +1,7 @@
 package crud
 
 import (
+	"strings"
 	"time"
 
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
@@ -55,6 +56,66 @@ func IdsFromListFilter(filters map[string]any) []string {
 		return out
 	}
 	return nil
+}
+
+// ReferenceValuesFromListFilter returns referenced object IDs mentioned in list filters
+// for keys ending with "_ref" or "_refs" (e.g. priority_plan_ref="PRI-...", criteria_refs=["CRIT-..."]).
+// Used by CAS list to consult the reverse reference index and narrow candidate object IDs.
+func ReferenceValuesFromListFilter(filters map[string]any) []string {
+	if len(filters) == 0 {
+		return nil
+	}
+	var out []string
+	seen := make(map[string]bool)
+	for k, v := range filters {
+		if !strings.HasSuffix(k, "_ref") && !strings.HasSuffix(k, "_refs") {
+			continue
+		}
+		if s, ok := v.(string); ok && s != emptyValue {
+			if !seen[s] {
+				seen[s] = true
+				out = append(out, s)
+			}
+			continue
+		}
+		if sl, ok := v.([]string); ok {
+			for _, s := range sl {
+				if s != emptyValue && !seen[s] {
+					seen[s] = true
+					out = append(out, s)
+				}
+			}
+			continue
+		}
+		if al, ok := v.([]any); ok {
+			for _, item := range al {
+				if s, ok := item.(string); ok && s != emptyValue && !seen[s] {
+					seen[s] = true
+					out = append(out, s)
+				}
+			}
+			continue
+		}
+		if m, ok := v.(map[string]any); ok {
+			if eq, ok := m["$eq"]; ok {
+				if s, ok := eq.(string); ok && s != emptyValue && !seen[s] {
+					seen[s] = true
+					out = append(out, s)
+				}
+			}
+			if in, ok := m["$in"]; ok {
+				if sl, ok := in.([]any); ok {
+					for _, item := range sl {
+						if s, ok := item.(string); ok && s != emptyValue && !seen[s] {
+							seen[s] = true
+							out = append(out, s)
+						}
+					}
+				}
+			}
+		}
+	}
+	return out
 }
 
 // listFilterIsOnlyCreatedAtRange returns true when filters contain only a created_at range ($gte and/or $lte).

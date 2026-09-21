@@ -46,7 +46,7 @@ func (r *ReverseReferenceIndex) LoadCache(projectRoot string) (bool, error) {
 	}
 
 	// Check if project root matches
-	if cacheData.Metadata.ProjectRoot != projectRoot {
+	if !isProjectRootEquivalent(cacheData.Metadata.ProjectRoot, projectRoot) {
 		// Different project - cache is invalid
 		return false, nil
 	}
@@ -180,3 +180,18 @@ func (r *ReverseReferenceIndex) SaveCache(projectRoot string) error {
 }
 
 // ReferencedIDCount returns the number of referenced IDs in the index (for reporting).
+
+func isProjectRootEquivalent(a, b string) bool {
+	if a == b {
+		return true
+	}
+	if a == "" || b == "" {
+		return false
+	}
+	absA, errA := filepath.Abs(a)
+	absB, errB := filepath.Abs(b)
+	if errA == nil && errB == nil && absA == absB {
+		return true
+	}
+	return filepath.Clean(a) == filepath.Clean(b)
+}

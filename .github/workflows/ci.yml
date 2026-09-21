@@ -172,7 +172,7 @@ jobs:
   extended-unit-tests:
     name: Extended Unit Tests (Full Non-Short)
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 25
     steps:
       - name: Checkout Code
         uses: actions/checkout@v7
@@ -185,7 +185,7 @@ jobs:
 
       - name: Run Full Unit Tests (Non-Short)
         run: |
-          go test -p 2 -timeout 15m -coverprofile=coverage-extended.out \
+          go test -p 2 -timeout 20m -coverprofile=coverage-extended.out \
             ./pkg/brand/... ./pkg/bridge/... ./pkg/circuitbreaker/... ./pkg/cli/... \
             ./pkg/concurrency/... ./pkg/dna/... ./pkg/docman/... ./pkg/graph/... \
             ./pkg/healthcheck/... ./pkg/hive/... ./pkg/hostload/... ./pkg/integrity/... \
@@ -198,7 +198,8 @@ jobs:
             ./pkg/kernelcas ./pkg/lifecycle/... ./pkg/lockhealth/... ./pkg/observability/... \
             ./pkg/paths/... ./pkg/pipeline/... ./pkg/tray/... ./pkg/vds/... ./pkg/walutil/... \
             ./pkg/contextevents/... ./pkg/quality/... ./pkg/stampmemo/... ./pkg/zqkenv/... \
-            ./pkg/objects/... ./pkg/validation/... ./pkg/scheduler/... ./cmd/zqk/test
+            ./pkg/objects/... ./pkg/validation/... ./pkg/scheduler/... ./pkg/storage/... \
+            ./cmd/zqk/test
 
       - name: Generate Extended Coverage Summary
         if: always()

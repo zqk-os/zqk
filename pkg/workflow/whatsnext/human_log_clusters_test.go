@@ -68,3 +68,46 @@ func TestProjectStewardFocus_HumanLogClusters(t *testing.T) {
 		t.Fatalf("expected metrics wave action, got %q", got)
 	}
 }
+
+func TestParseHumanLogClusters_GenericDisambiguation(t *testing.T) {
+	t.Parallel()
+	tmpDir := t.TempDir()
+	logDir := filepath.Join(tmpDir, paths.ProjectDataDir, paths.LogsDir)
+	if err := fileutil.MkdirAll(logDir, paths.DirPerm755); err != nil {
+		t.Fatal(err)
+	}
+
+	humanLogPath := filepath.Join(logDir, paths.LogEventsPrefix+"human.log")
+	logContent := `2026-09-21T11:47:45Z [error] Operation failed caller_file=coordinator.go error=no data provided (use --file, --data, or pipe from stdin) event=error
+2026-09-21T11:47:46Z [error] Operation failed caller_file=coordinator.go error=no data provided (use --file, --data, or pipe from stdin) event=error
+2026-09-21T12:00:41Z [error] scheduler_job_execution caller_file=coordinator.go error=command failed after 1 attempts: exit status 1 job_id=SCH-autofix-run
+2026-09-21T12:00:42Z [error] Command execution failed error=another system check is already running event=error
+`
+	if err := fileutil.WriteFile(humanLogPath, []byte(logContent), paths.FilePerm644); err != nil {
+		t.Fatal(err)
+	}
+
+	got := ParseHumanLogClusters(tmpDir)
+	if len(got.Errors) != 3 {
+		t.Fatalf("expected 3 ranked errors, got %#v", got.Errors)
+	}
+	if got.Errors[0].Message != "no data provided (use --file, --data, or pipe from stdin)" || got.Errors[0].Count != 2 {
+		t.Fatalf("expected disambiguated error 'no data provided...', got %#v", got.Errors[0])
+	}
+	foundScheduler := false
+	foundCommand := false
+	for _, e := range got.Errors {
+		if e.Message == "SCH-autofix-run: command failed after 1 attempts: exit status 1" {
+			foundScheduler = true
+		}
+		if e.Message == "another system check is already running" {
+			foundCommand = true
+		}
+	}
+	if !foundScheduler {
+		t.Errorf("expected SCH-autofix-run disambiguation, got %#v", got.Errors)
+	}
+	if !foundCommand {
+		t.Errorf("expected Command execution disambiguation, got %#v", got.Errors)
+	}
+}

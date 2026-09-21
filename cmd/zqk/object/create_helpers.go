@@ -358,6 +358,12 @@ func guardManualStatusOnCreate(cmd *cobra.Command, proc *cli.Processor, kind str
 		}
 	}
 
+	if loader := objects.GetGlobalLifecycleLoader(); loader != nil {
+		if origin, err := loader.GetOriginStatus(kind); err == nil && origin != "" && statusStr == origin {
+			return nil
+		}
+	}
+
 	override := false
 	if cmd.Flags().Lookup("override") != nil {
 		override, _ = cmd.Flags().GetBool("override")

@@ -256,37 +256,42 @@ const (
 	// Layout: ProjectDataDir/object_drafts/<kind>/<shard>/<id>.yaml — see pkg/storage/object_draft_plane.go.
 	ObjectDraftsDir = "object_drafts"
 
-	// Process directory constants (under .zqk e.g. .zqk/process and .zqk/specs)
-	ProcessDir                    = ".zqk/process"
-	ProcessInternalDir            = ".zqk/specs"
-	ProcessInternalConfigsDir     = ".zqk/specs/configs"
-	ProcessInternalAPISpecsDir    = ".zqk/specs/api_specs"
-	ProcessInternalLifecyclesDir  = ".zqk/specs/lifecycles"
-	ProcessInternalObjectSpecsDir = ".zqk/specs/objects"
-	// ProcessInternalPipelineOutcomeKeysFile is the declarative registry for pkg/pipeline outcome map keys (codegen).
-	ProcessInternalPipelineOutcomeKeysFile = ".zqk/specs/configs/pipeline_outcome_keys.yaml"
-	ProcessInternalTraitsDir               = ".zqk/specs/traits"
-	ProcessInternalProfileSpecsDir         = ".zqk/specs/profile_specs"
-	ProcessArchitectureDir                 = "docs/architecture"
-	ProcessPoliciesDir                     = ".zqk/process/policies"
-	ProcessPlanningDir                     = ".zqk/process/planning"
-	ProcessAuditDir                        = ".zqk/process/audit"
-	ProcessAccountsDir                     = ".zqk/process/accounts"
-	ProcessPersonasDir                     = ".zqk/process/personas"
-	AccountIndexFile                       = ".account.index"
-	PersonaIndexFile                       = ".persona.index"
-	RoleIndexFile                          = ".role.index"
-	ProcessAuthStrategiesDir               = ".zqk/process/auth_strategies"
-	ProcessBacklogDir                      = ".zqk/process/backlog_items"
-	ProcessTestCasesDir                    = ".zqk/process/test_cases"
-	ProcessKeystoreDir                     = ".zqk/process/keystore"
-	ProcessRolesDir                        = ".zqk/process/roles"
-	ProcessMissionsDir                     = ".zqk/process/missions"
-	ProcessVisionsDir                      = ".zqk/process/visions"
-	ProcessGoalsDir                        = ".zqk/process/goals"
-	ProcessWorkstreamsDir                  = ".zqk/process/workstreams"
-	ProcessPriorityPlansDir                = ".zqk/process/priority_plans"
-	ProcessAgentSkillsDir                  = ".zqk/process/agent_skills"
+	// Process directory constants (under ProjectDataDir e.g. .zqk/process and .zqk/specs)
+	ProcessArchitectureDir = "docs/architecture"
+	AccountIndexFile       = ".account.index"
+	PersonaIndexFile       = ".persona.index"
+	RoleIndexFile          = ".role.index"
+)
+
+var (
+	ProcessDir                             = ProjectDataDir + "/process"
+	ProcessInternalDir                     = ProjectDataDir + "/specs"
+	ProcessInternalConfigsDir              = ProjectDataDir + "/specs/configs"
+	ProcessInternalAPISpecsDir             = ProjectDataDir + "/specs/api_specs"
+	ProcessInternalLifecyclesDir           = ProjectDataDir + "/specs/lifecycles"
+	ProcessInternalObjectSpecsDir          = ProjectDataDir + "/specs/objects"
+	ProcessInternalPipelineOutcomeKeysFile = ProjectDataDir + "/specs/configs/pipeline_outcome_keys.yaml"
+	ProcessInternalTraitsDir               = ProjectDataDir + "/specs/traits"
+	ProcessInternalProfileSpecsDir         = ProjectDataDir + "/specs/profile_specs"
+	ProcessPoliciesDir                     = ProjectDataDir + "/process/policies"
+	ProcessPlanningDir                     = ProjectDataDir + "/process/planning"
+	ProcessAuditDir                        = ProjectDataDir + "/process/audit"
+	ProcessAccountsDir                     = ProjectDataDir + "/process/accounts"
+	ProcessPersonasDir                     = ProjectDataDir + "/process/personas"
+	ProcessAuthStrategiesDir               = ProjectDataDir + "/process/auth_strategies"
+	ProcessBacklogDir                      = ProjectDataDir + "/process/backlog_items"
+	ProcessTestCasesDir                    = ProjectDataDir + "/process/test_cases"
+	ProcessKeystoreDir                     = ProjectDataDir + "/process/keystore"
+	ProcessRolesDir                        = ProjectDataDir + "/process/roles"
+	ProcessMissionsDir                     = ProjectDataDir + "/process/missions"
+	ProcessVisionsDir                      = ProjectDataDir + "/process/visions"
+	ProcessGoalsDir                        = ProjectDataDir + "/process/goals"
+	ProcessWorkstreamsDir                  = ProjectDataDir + "/process/workstreams"
+	ProcessPriorityPlansDir                = ProjectDataDir + "/process/priority_plans"
+	ProcessAgentSkillsDir                  = ProjectDataDir + "/process/agent_skills"
+)
+
+const (
 
 	// Documentation directory constants
 	OnboardingDir = "docs/onboarding"

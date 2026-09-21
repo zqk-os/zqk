@@ -58,3 +58,22 @@ func TestDependentsForID_CriteriaFallback(t *testing.T) {
 		t.Fatalf("expected 2 dependents for CRIT-200, got %d: %v", len(deps2), deps2)
 	}
 }
+
+func TestDependentsForID_WrappedStorageUnwrap(t *testing.T) {
+	tempDir := t.TempDir()
+	fs, err := NewFileObjectStorageForTest(tempDir)
+	if err != nil {
+		t.Fatalf("failed to create test file storage: %v", err)
+	}
+	hybrid := NewHybridObjectStorage(fs, nil)
+
+	// Clear bound root before test
+	revRefBoundRoot.Store("")
+
+	_ = DependentsForID(context.Background(), hybrid, "PRI-TEST-999")
+
+	bound := reverseReferenceBoundProjectRoot()
+	if bound != tempDir {
+		t.Errorf("expected bound project root %q, got %q", tempDir, bound)
+	}
+}

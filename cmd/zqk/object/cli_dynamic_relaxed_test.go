@@ -33,7 +33,6 @@ func TestCreateWithRelaxed(t *testing.T) {
 		objects.FieldKeyID:            testID,
 		objects.FieldKeyKind:          pplanKindBacklogItem,
 		objects.FieldKeyTitle:         "Object with forward reference",
-		objects.FieldKeyStatus:        objectStatusExploring,
 		objects.FieldKeyGoalRefs:      []string{"G-123"},
 		"related_refs":                []string{referencedID}, // Forward reference
 		objects.FieldKeySchemaVersion: objectSchemaV2,

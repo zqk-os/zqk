@@ -203,6 +203,7 @@ var FlattenGroups = crud.FlattenGroups
 var sortObjects = crud.SortObjects
 var EffectiveListLimit = crud.EffectiveListLimit
 var IdsFromListFilter = crud.IdsFromListFilter
+var ReferenceValuesFromListFilter = crud.ReferenceValuesFromListFilter
 var ListFilterIsOnlyCreatedAtRange = crud.ListFilterIsOnlyCreatedAtRange
 var ParseCreatedAtOlderThan = crud.ParseCreatedAtOlderThan
 var ParseCreatedAtRangeFromFilters = crud.ParseCreatedAtRangeFromFilters

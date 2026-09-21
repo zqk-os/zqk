@@ -157,6 +157,9 @@ func runWhatsNextLite(cmd *cobra.Command, args []string, proc *cli.Processor, pr
 		out.RunwayDepth = lite.RunwayDepth
 
 		for _, p := range lite.ActivePlans {
+			if strings.TrimSpace(p.Title) == "" {
+				continue
+			}
 			out.ActivePlans = append(out.ActivePlans, whatsNextPriorityPlan{
 				ID:     p.ID,
 				Title:  p.Title,
@@ -167,7 +170,7 @@ func runWhatsNextLite(cmd *cobra.Command, args []string, proc *cli.Processor, pr
 		explicit := strings.TrimSpace(priFlag)
 		if explicit != emptyValue {
 			var matched *whatsNextPriorityPlan
-			if lite.LeadPlan != nil && lite.LeadPlan.ID == explicit {
+			if lite.LeadPlan != nil && lite.LeadPlan.ID == explicit && strings.TrimSpace(lite.LeadPlan.Title) != "" {
 				matched = &whatsNextPriorityPlan{
 					ID:     lite.LeadPlan.ID,
 					Title:  lite.LeadPlan.Title,
@@ -175,7 +178,7 @@ func runWhatsNextLite(cmd *cobra.Command, args []string, proc *cli.Processor, pr
 				}
 			} else {
 				for _, p := range lite.ActivePlans {
-					if p.ID == explicit {
+					if p.ID == explicit && strings.TrimSpace(p.Title) != "" {
 						matched = &whatsNextPriorityPlan{
 							ID:     p.ID,
 							Title:  p.Title,
@@ -190,7 +193,7 @@ func runWhatsNextLite(cmd *cobra.Command, args []string, proc *cli.Processor, pr
 			} else {
 				out.PriorityPlan = &whatsNextPriorityPlan{ID: explicit}
 			}
-		} else if lite.LeadPlan != nil {
+		} else if lite.LeadPlan != nil && strings.TrimSpace(lite.LeadPlan.Title) != "" {
 			out.PriorityPlan = &whatsNextPriorityPlan{
 				ID:     lite.LeadPlan.ID,
 				Title:  lite.LeadPlan.Title,

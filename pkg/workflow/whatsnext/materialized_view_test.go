@@ -538,3 +538,26 @@ func TestKernelDaemonAccumulatorHostingAndProjectionRouting(t *testing.T) {
 		t.Fatalf("unexpected view name: %s", view.Name())
 	}
 }
+
+func TestEvaluatePhiLead_GhostPlanFilter(t *testing.T) {
+	plans := []*PlanNode{
+		{
+			ID:     "PRI-GHOST-001",
+			Title:  "",
+			Status: "in_progress",
+		},
+		{
+			ID:     "PRI-REAL-001",
+			Title:  "Legitimate Priority Plan",
+			Status: "in_progress",
+		},
+	}
+
+	lead, ranked := EvaluatePhiLead(plans, nil)
+	if lead == nil || lead.ID != "PRI-REAL-001" {
+		t.Fatalf("expected real plan PRI-REAL-001, got %v", lead)
+	}
+	if len(ranked) != 1 || ranked[0].ID != "PRI-REAL-001" {
+		t.Fatalf("expected only real plan in ranked, got %v", ranked)
+	}
+}

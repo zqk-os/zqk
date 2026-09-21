@@ -160,7 +160,6 @@ func TestFileCleanupAfterCreate(t *testing.T) {
 		testData := fmt.Sprintf(`id: BLI-901
 kind: %s
 title: Test Item for Cleanup
-status: exploring
 goal_refs: ["G-123"]
 schema_version: "%s"`, pplanKindBacklogItem, objectSchemaV2)
 
@@ -196,7 +195,6 @@ schema_version: "%s"`, pplanKindBacklogItem, objectSchemaV2)
 		testData := fmt.Sprintf(`id: BLI-902
 kind: %s
 title: Test Item in /tmp/
-status: exploring
 goal_refs: ["G-123"]
 schema_version: "%s"`, pplanKindBacklogItem, objectSchemaV2)
 
@@ -231,7 +229,6 @@ schema_version: "%s"`, pplanKindBacklogItem, objectSchemaV2)
 		testData := fmt.Sprintf(`id: BLI-903
 kind: %s
 title: Test Item to Keep
-status: exploring
 goal_refs: ["G-123"]
 schema_version: "%s"`, pplanKindBacklogItem, objectSchemaV2)
 
@@ -260,7 +257,6 @@ schema_version: "%s"`, pplanKindBacklogItem, objectSchemaV2)
 		testData := fmt.Sprintf(`id: BLI-904
 kind: %s
 title: Regular File Test
-status: exploring
 goal_refs: ["G-123"]
 schema_version: "%s"`, pplanKindBacklogItem, objectSchemaV2)
 
@@ -313,7 +309,6 @@ func TestTemplateToCreateWorkflow(t *testing.T) {
 			objects.FieldKeyID:            "BLI-905",
 			objects.FieldKeyKind:          pplanKindBacklogItem,
 			objects.FieldKeyTitle:         "Workflow Test Item",
-			objects.FieldKeyStatus:        objectStatusExploring,
 			objects.FieldKeyGoalRefs:      []string{"G-123"},
 			objects.FieldKeyCreatedAt:     "2025-12-29T00:00:00Z",
 			objects.FieldKeyUpdatedAt:     "2025-12-29T00:00:00Z",
@@ -367,7 +362,6 @@ func TestTemplateCleanupEdgeCases(t *testing.T) {
 		testData := fmt.Sprintf(`id: BLI-906
 kind: %s
 title: Subdir Temp File
-status: exploring
 goal_refs: ["G-123"]
 schema_version: "%s"`, pplanKindBacklogItem, objectSchemaV2)
 

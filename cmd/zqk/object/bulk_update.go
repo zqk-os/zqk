@@ -267,12 +267,12 @@ func runBulkUpdate(cmd *cobra.Command, args []string) error {
 			continue
 		}
 
+		pruneUnknownFields(objectData, kind)
+
 		// Apply updates
 		for field, value := range setMap {
 			objectData[field] = value
 		}
-
-		pruneUnknownFields(objectData, kind)
 
 		_ = objectget.StripReferenceResolverOverlayFields(objectData)
 

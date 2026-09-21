@@ -107,6 +107,10 @@ func runMetricsFeed(cmd *cobra.Command, args []string) error {
 	rollup.TestBundleEvidence = "non-metric"
 	rollup.TopErrorClusters = logClusters.Errors
 	rollup.TopWarnClusters = logClusters.Warns
+	if actions := whatsnext.RankedHumanLogActions(logClusters); len(actions) > 0 {
+		rollup.NextAdminAction = actions[0]
+		rollup.RankedActions = actions
+	}
 
 	// Persist to .zqk/state/ambient/metrics-rollup.json for ambient stream consumers
 	rollupPath := filepath.Join(projectRoot, paths.ProjectDataDir, paths.StateDir, "ambient", "metrics-rollup.json")

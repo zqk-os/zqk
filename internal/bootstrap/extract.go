@@ -21,7 +21,6 @@ const (
 	archivePrefixCLISpecs                          = "cli_specs/"
 	archivePrefixScripts                           = "scripts/"
 	archivePrefixCleanupConfig                     = "cleanup_config/"
-	internalSubdir                                 = paths.ProcessInternalDir
 	scriptsSubdir                                  = "scripts"
 	bootstrapDirPerm             fileutil.FileMode = paths.DirPerm755
 	bootstrapFilePerm            fileutil.FileMode = paths.FilePerm600
@@ -29,7 +28,10 @@ const (
 	maxFileSize = 50 << 20 // 50 MiB per file
 )
 
-var cleanupConfigSubdir = paths.ProjectDataDir + "/cleanup"
+var (
+	internalSubdir      = paths.ProcessInternalDir
+	cleanupConfigSubdir = paths.ProjectDataDir + "/cleanup"
+)
 
 // ExtractTo extracts the embedded bootstrap archive into the project.
 // projectRoot is the repo root. Archive entries are mapped as follows:

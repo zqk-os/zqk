@@ -15,3 +15,29 @@ func TestNamedFilePermissionsMatchTheirNames(t *testing.T) {
 		t.Error("secure and standard file permissions must not alias")
 	}
 }
+
+func TestProcessDirectoryDerivation(t *testing.T) {
+	t.Parallel()
+
+	prefix := ProjectDataDir + "/"
+	checks := map[string]string{
+		"ProcessDir":                    ProcessDir,
+		"ProcessInternalDir":            ProcessInternalDir,
+		"ProcessInternalConfigsDir":     ProcessInternalConfigsDir,
+		"ProcessInternalObjectSpecsDir": ProcessInternalObjectSpecsDir,
+		"ProcessPoliciesDir":            ProcessPoliciesDir,
+		"ProcessPlanningDir":            ProcessPlanningDir,
+		"ProcessAuditDir":               ProcessAuditDir,
+		"ProcessAccountsDir":            ProcessAccountsDir,
+		"ProcessBacklogDir":             ProcessBacklogDir,
+		"ProcessGoalsDir":               ProcessGoalsDir,
+		"ProcessWorkstreamsDir":         ProcessWorkstreamsDir,
+		"ProcessPriorityPlansDir":       ProcessPriorityPlansDir,
+	}
+
+	for name, path := range checks {
+		if len(path) <= len(prefix) || path[:len(prefix)] != prefix {
+			t.Errorf("%s = %q; expected to start with %q", name, path, prefix)
+		}
+	}
+}

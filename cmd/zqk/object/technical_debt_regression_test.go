@@ -12,7 +12,7 @@ func TestTechnicalDebtIDValidationRegression(t *testing.T) {
 	projectRoot := tmpDir
 
 	tdeID := "TDE-1234567890-test"
-	createArgs := []string{"object", "create", kindnames.TechnicalDebt, "--data", "{\"id\": \"" + tdeID + "\", \"title\": \"Test Debt\", \"status\": \"identified\", \"debt_type\": \"tooling\", \"description\": \"A test debt\", \"target_resolution_date\": \"2026-12-31\"}"}
+	createArgs := []string{"object", "create", kindnames.TechnicalDebt, "--promote", "--data", "{\"id\": \"" + tdeID + "\", \"title\": \"Test Debt\", \"status\": \"identified\", \"debt_type\": \"tooling\", \"description\": \"A test debt\", \"target_resolution_date\": \"2026-12-31\"}"}
 
 	out, err := runCLIWithTimeout(t, cliBinary, projectRoot, 30*time.Second, createArgs...)
 	if err != nil {
@@ -23,6 +23,7 @@ func TestTechnicalDebtIDValidationRegression(t *testing.T) {
 	updateArgs := []string{
 		"object", "update", tdeID,
 		"--field", "impact_assessment=medium",
+		"--field", "estimated_effort=1h",
 	}
 	out, err = runCLIWithTimeout(t, cliBinary, projectRoot, 30*time.Second, updateArgs...)
 	if err != nil {

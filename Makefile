@@ -4,7 +4,7 @@
 # Binary basename comes from brand.executable_name in
 # config/zqk-local.yaml (wins) then config/zqk.yaml (default zqk).
 
-.PHONY: help all bootstrap-archive clean test test-unit test-unit-all test-integration
+.PHONY: help all bootstrap-archive clean test test-unit test-unit-all test-integration test-coverage test-coverage-html
 
 .DEFAULT_GOAL := all
 
@@ -42,6 +42,8 @@ help:
 	@echo "  make test-unit        Run partitioned unit tests (pkg/... & cmd/...)"
 	@echo "  make test-unit-all    Run full non-short unit tests"
 	@echo "  make test-integration Run integration tests using built binary (release gates & CLI suites)"
+	@echo "  make test-coverage    Run unit tests with coverage profile and print summary table"
+	@echo "  make test-coverage-html Generate HTML visual test coverage report (coverage.html)"
 	@echo ""
 	@echo "Scheduler CLI: ./$(BIN) scheduler start|stop|status"
 	@echo "Run ./$(BIN) from this directory. Do not export a project-root environment variable."
@@ -86,7 +88,15 @@ test-unit-all:
 test-integration: all
 	$(BRAND_ENV_PREFIX)_SHARED_TEST_BIN="$$(pwd)/$(BIN)" sh scripts/open-core/test-public-release-gates.sh
 
+test-coverage:
+	go test -short -p 2 -timeout 15m -coverprofile=coverage.out -covermode=atomic ./pkg/... ./cmd/... ./internal/... ./ext/...
+	python3 scripts/open-core/generate-coverage-summary.py coverage.out "Whole-Project Test Coverage"
+
+test-coverage-html: test-coverage
+	go tool cover -html=coverage.out -o coverage.html
+	@echo "Coverage HTML report generated at coverage.html"
+ 
 test: test-unit test-integration
 
 clean:
-	rm -rf bin/*
+	rm -rf bin/* coverage.out coverage.html

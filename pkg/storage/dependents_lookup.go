@@ -24,7 +24,7 @@ func DependentsForID(ctx context.Context, sp ObjectStorageProvider, id string) [
 	}
 	if root := reverseReferenceBoundProjectRoot(); root != emptyValue {
 		ensureReverseReferenceIndexLoaded(root)
-	} else if f, ok := sp.(*FileObjectStorage); ok && f != nil && f.projectRoot != emptyValue {
+	} else if f := UnwrapToFileObjectStorage(sp); f != nil && f.projectRoot != emptyValue {
 		BindReverseReferenceIndexProjectRoot(f.projectRoot)
 	}
 	revIndex := GetGlobalReverseReferenceIndex()
