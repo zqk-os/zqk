@@ -2,12 +2,14 @@ package ambient
 
 import (
 	"context"
+	"path/filepath"
 	"testing"
 	"time"
 
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/observer"
+	"github.com/zqk-os/zqk/pkg/paths"
 )
 
 func TestMapToSystemObject(t *testing.T) {
@@ -70,7 +72,7 @@ func TestAmbientIngestService_IgnoredFS(t *testing.T) {
 	ev := Event{
 		Type: EventTypeFilesystem,
 		Payload: map[string]any{
-			objects.FieldKeyTargetID: ".zqk/storage/cas/file.yaml",
+			objects.FieldKeyTargetID: filepath.Join("/", paths.ProjectDataDir, "storage", "cas", "file.yaml"),
 		},
 	}
 	if err := svc.Ingest(context.Background(), ev); err != nil {
