@@ -1,7 +1,7 @@
 schema_version: 2.0.0
 ontology: vocabulary_scheme
 extends: base_object
-visibility: internal
+visibility: public
 description: 'Names a vocabulary graph (taxonomy / lens network / navigation scheme) so typed edges\n(glossary_term_relation) can be scoped. Multiple schemes can coexist over the same glossary\nterms (e.g. inference predicates vs display groupings). purpose distinguishes machine\nbehavior surfaces from presentation-only groupings. Future SKOS/SHACL-style imports can map\nto schemes with purpose=extension. Lifecycle: vocabulary_scheme_lifecycle.yaml.\n'
 traits:
   - base_object_traits
