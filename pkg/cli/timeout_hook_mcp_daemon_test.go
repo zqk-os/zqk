@@ -2,11 +2,14 @@ package cli
 
 import (
 	"context"
+	"path/filepath"
 	"sync/atomic"
 	"testing"
 	"time"
 
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/paths"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 func TestHandleDaemonCommandTimeout_mcpDaemonRunsWithoutOuterCap(t *testing.T) {
@@ -105,5 +108,35 @@ func TestGetTimeoutForCommand_mcpDaemonUsesIdleTimeoutDisabled(t *testing.T) {
 		if d > 0 && d <= 2*time.Minute {
 			t.Fatalf("mcp daemon timeout too short (child-cap territory): %v", d)
 		}
+	}
+}
+
+func TestGetMCPIdleTimeout_reloadsWhenStampMoves(t *testing.T) {
+	root := t.TempDir()
+	configPath := paths.MCPConfigPath(root)
+	if err := fileutil.EnsureDir(filepath.Dir(configPath)); err != nil {
+		t.Fatal(err)
+	}
+	t.Chdir(root)
+
+	hook := NewTimeoutHook()
+	if d, disabled := hook.getMCPIdleTimeout(); d != 0 || disabled {
+		t.Fatalf("missing config: timeout=%v disabled=%v", d, disabled)
+	}
+
+	if err := fileutil.WriteStandardFile(configPath, []byte("mcp_server:\n  idle_timeout: 99m\n")); err != nil {
+		t.Fatal(err)
+	}
+	d, disabled := hook.getMCPIdleTimeout()
+	if disabled || d != 99*time.Minute {
+		t.Fatalf("after write: timeout=%v disabled=%v want 99m", d, disabled)
+	}
+
+	if err := fileutil.WriteStandardFile(configPath, []byte("mcp_server:\n  idle_timeout: \"0\"\n")); err != nil {
+		t.Fatal(err)
+	}
+	d, disabled = hook.getMCPIdleTimeout()
+	if !disabled || d != 0 {
+		t.Fatalf("after disable: timeout=%v disabled=%v want disabled", d, disabled)
 	}
 }

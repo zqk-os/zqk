@@ -4,7 +4,6 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-	"sync"
 
 	"gopkg.in/yaml.v3"
 
@@ -166,7 +165,6 @@ type ZqkConfig struct {
 
 var (
 	globalConfig *ZqkConfig
-	configOnce   sync.Once
 	rootConfigs  stampmemo.Table[*ZqkConfig] // keyed by project root; stamp is the config files
 )
 

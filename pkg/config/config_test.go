@@ -300,7 +300,6 @@ func TestAccessor_NewSections(t *testing.T) {
 
 	// Override Get to work without config file by setting globalConfig directly
 	globalConfig = &ZqkConfig{}
-	configOnce.Do(func() {}) // mark as loaded
 
 	if DiagnosticsPprof().Safe() != false {
 		t.Error("Expected DiagnosticsPprof().Safe() == false when not configured")
@@ -324,7 +323,6 @@ func TestAccessor_NewSystemFields(t *testing.T) {
 	resetForTesting()
 	defer resetForTesting()
 	globalConfig = &ZqkConfig{}
-	configOnce.Do(func() {})
 
 	if SystemHostCPUBackpressure().Safe() != false {
 		t.Error("Expected SystemHostCPUBackpressure().Safe() == false")
@@ -351,7 +349,6 @@ func TestAccessor_NewSchedulerFields(t *testing.T) {
 	resetForTesting()
 	defer resetForTesting()
 	globalConfig = &ZqkConfig{}
-	configOnce.Do(func() {})
 
 	if SchedulerDaemonBin().Safe() != "" {
 		t.Error("Expected SchedulerDaemonBin().Safe() == ''")
@@ -375,7 +372,6 @@ func TestAccessor_NewStorageFields(t *testing.T) {
 	resetForTesting()
 	defer resetForTesting()
 	globalConfig = &ZqkConfig{}
-	configOnce.Do(func() {})
 
 	if StorageListCountMaxConcurrent().Safe() != 0 {
 		t.Error("Expected StorageListCountMaxConcurrent().Safe() == 0")
@@ -393,7 +389,6 @@ func TestAccessor_NewLLMFields(t *testing.T) {
 	resetForTesting()
 	defer resetForTesting()
 	globalConfig = &ZqkConfig{}
-	configOnce.Do(func() {})
 
 	if LLMTopP().Safe() != 0.0 {
 		t.Error("Expected LLMTopP().Safe() == 0.0")
@@ -408,7 +403,6 @@ func TestAccessor_NewTestingFields(t *testing.T) {
 	resetForTesting()
 	defer resetForTesting()
 	globalConfig = &ZqkConfig{}
-	configOnce.Do(func() {})
 
 	boolAccessors := []struct {
 		name string
@@ -448,7 +442,6 @@ func TestAccessor_NewPathsFields(t *testing.T) {
 	resetForTesting()
 	defer resetForTesting()
 	globalConfig = &ZqkConfig{}
-	configOnce.Do(func() {})
 
 	if PathsStableBinaryPath().Safe() != "" {
 		t.Error("Expected PathsStableBinaryPath().Safe() == ''")
@@ -466,7 +459,6 @@ func TestAccessor_OrDefault_WithConfiguredValue(t *testing.T) {
 	port := 6061
 	globalConfig = &ZqkConfig{}
 	globalConfig.Diagnostics.PprofPort = &port
-	configOnce.Do(func() {})
 
 	got := DiagnosticsPprofPort().OrDefault(6060)
 	if got != 6061 {
@@ -479,7 +471,6 @@ func TestAccessor_Required_Panics(t *testing.T) {
 	resetForTesting()
 	defer resetForTesting()
 	globalConfig = &ZqkConfig{}
-	configOnce.Do(func() {})
 
 	defer func() {
 		if r := recover(); r == nil {

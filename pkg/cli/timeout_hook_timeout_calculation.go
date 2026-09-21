@@ -333,70 +333,51 @@ func (h *TimeoutHook) findProjectRoot() string {
 	return ""
 }
 
+// mcpIdleMemo is the stampmemo value for getMCPIdleTimeout.
+type mcpIdleMemo struct {
+	timeout  time.Duration
+	disabled bool
+}
+
+var mcpIdleTimeouts stampmemo.Table[mcpIdleMemo] // keyed by project root; stamp is .zqk/mcp/config.yaml
+
 // getMCPIdleTimeout reads the MCP server config and returns the configured idle timeout
 // Returns (0, false) if config not found or timeout not configured
 // Returns (0, true) if timeout is explicitly disabled (idle_timeout: "0")
 // Returns (duration, false) if timeout is configured with a duration
 // This avoids circular dependencies by reading the config file directly
 func (h *TimeoutHook) getMCPIdleTimeout() (time.Duration, bool) {
-	// Try to find project root by looking for .zqk directory
-	// Start from current working directory and walk up
-	wd, err := fileutil.Getwd()
-	if err != nil {
+	projectRoot := h.findProjectRoot()
+	if projectRoot == emptyValue {
 		return 0, false
 	}
-
-	// Walk up directory tree to find .zqk
-	dir := wd
-	for {
-		configPath := filepath.Join(dir, paths.ProjectDataDir, paths.MCPDir, paths.MCPConfigFile)
-		if _, err := fileutil.Stat(configPath); err == nil {
-			// Found config file, try to read it
-			data, err := fileutil.ReadFile(configPath)
-			if err != nil {
-				return 0, false
-			}
-
-			// Parse just the IdleTimeout field (minimal struct to avoid importing mcp package)
-			var config struct {
-				MCPServer struct {
-					IdleTimeout string `yaml:"idle_timeout"`
-				} `yaml:"mcp_server"`
-			}
-
-			if err := yaml.Unmarshal(data, &config); err != nil {
-				return 0, false
-			}
-
-			// Check if timeout is explicitly disabled
-			if config.MCPServer.IdleTimeout == "0" {
-				return 0, true // Explicitly disabled
-			}
-
-			// Empty string means not configured (use default)
-			if config.MCPServer.IdleTimeout == emptyValue {
-				return 0, false // Not configured, use fallback
-			}
-
-			// Parse duration (e.g., "1h30m", "5m", etc.)
-			duration, err := time.ParseDuration(config.MCPServer.IdleTimeout)
-			if err != nil {
-				return 0, false
-			}
-
-			return duration, false
+	configPath := paths.MCPConfigPath(projectRoot)
+	memo, _ := mcpIdleTimeouts.Load(projectRoot, stampmemo.Of(configPath), func() (mcpIdleMemo, error) {
+		data, err := fileutil.ReadFile(configPath)
+		if err != nil {
+			return mcpIdleMemo{}, nil
 		}
-
-		// Move up one directory
-		parent := filepath.Dir(dir)
-		if parent == dir {
-			// Reached root, stop searching
-			break
+		var config struct {
+			MCPServer struct {
+				IdleTimeout string `yaml:"idle_timeout"`
+			} `yaml:"mcp_server"`
 		}
-		dir = parent
-	}
-
-	return 0, false
+		if yaml.Unmarshal(data, &config) != nil {
+			return mcpIdleMemo{}, nil
+		}
+		if config.MCPServer.IdleTimeout == "0" {
+			return mcpIdleMemo{disabled: true}, nil
+		}
+		if config.MCPServer.IdleTimeout == emptyValue {
+			return mcpIdleMemo{}, nil
+		}
+		d, err := time.ParseDuration(config.MCPServer.IdleTimeout)
+		if err != nil {
+			return mcpIdleMemo{}, nil
+		}
+		return mcpIdleMemo{timeout: d}, nil
+	})
+	return memo.timeout, memo.disabled
 }
 
 // estimateObjectCountForSystemCheck estimates the number of objects to process
