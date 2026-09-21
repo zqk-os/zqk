@@ -2,13 +2,12 @@ package config
 
 import (
 	"path/filepath"
-	"sync"
 
 	"gopkg.in/yaml.v3"
 
-	"github.com/zqk-os/zqk/pkg/concurrency"
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/stampmemo"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -30,11 +29,11 @@ type RequiredJobEntry struct {
 	TemplateFile string `yaml:"template_file"`
 }
 
+var schedulerMaintenanceYAML stampmemo.Table[*SchedulerMaintenanceConfig]
+
 // SchedulerMaintenanceLoader loads scheduler maintenance config from YAML.
 type SchedulerMaintenanceLoader struct {
 	configPath string
-	mu         sync.Mutex
-	cache      *SchedulerMaintenanceConfig
 }
 
 // NewSchedulerMaintenanceLoader creates a loader. configPath is optional; if empty, path is resolved from projectRoot.
@@ -48,28 +47,21 @@ func NewSchedulerMaintenanceLoader(projectRoot string) *SchedulerMaintenanceLoad
 
 // Load loads and returns the scheduler maintenance config. Missing file returns nil, error.
 func (l *SchedulerMaintenanceLoader) Load() (*SchedulerMaintenanceConfig, error) {
-	var c *SchedulerMaintenanceConfig
-	err := concurrency.RunInLock(&l.mu, func() error {
+	return schedulerMaintenanceYAML.Load(l.configPath, stampmemo.Of(l.configPath), func() (*SchedulerMaintenanceConfig, error) {
 		if l.configPath == emptyPath {
-			return errfmt.Errorf("scheduler maintenance config path is empty")
+			return nil, errfmt.Errorf("scheduler maintenance config path is empty")
 		}
 		data, readErr := fileutil.ReadFile(l.configPath)
 		if readErr != nil {
 			if fileutil.IsNotExist(readErr) {
-				return errfmt.Errorf("scheduler maintenance config not found: %s", l.configPath)
+				return nil, errfmt.Errorf("scheduler maintenance config not found: %s", l.configPath)
 			}
-			return errfmt.Newf("read scheduler maintenance config").Wrap(readErr)
+			return nil, errfmt.Newf("read scheduler maintenance config").Wrap(readErr)
 		}
 		var parsed SchedulerMaintenanceConfig
 		if parseErr := yaml.Unmarshal(data, &parsed); parseErr != nil {
-			return errfmt.Newf("parse scheduler maintenance config").Wrap(parseErr)
+			return nil, errfmt.Newf("parse scheduler maintenance config").Wrap(parseErr)
 		}
-		l.cache = &parsed
-		c = &parsed
-		return nil
+		return &parsed, nil
 	})
-	if err != nil {
-		return nil, err
-	}
-	return c, nil
 }

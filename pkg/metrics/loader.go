@@ -4,15 +4,12 @@ import (
 	"maps"
 	"path/filepath"
 	"strings"
-	"sync"
 
 	"gopkg.in/yaml.v3"
 
-	"github.com/zqk-os/zqk/pkg/concurrency"
-	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/errfmt"
-	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/stampmemo"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -30,8 +27,7 @@ type SamplerProfile struct {
 // ProfileLoader loads and resolves metrics sampler profiles with inheritance
 type ProfileLoader struct {
 	profilesDir string
-	cache       map[string]*SamplerProfile
-	mu          sync.RWMutex
+	cache       stampmemo.Table[*SamplerProfile] // keyed by profile name (closed sampler tree)
 }
 
 // NewProfileLoader creates a new metrics profile loader
@@ -41,53 +37,15 @@ func NewProfileLoader(profilesDir string) *ProfileLoader {
 	}
 	return &ProfileLoader{
 		profilesDir: profilesDir,
-		cache:       make(map[string]*SamplerProfile),
 	}
 }
 
 // LoadProfile loads a profile and resolves its inheritance chain
 func (pl *ProfileLoader) LoadProfile(name string) (*SamplerProfile, error) {
-	// Check cache first
-	var cached *SamplerProfile
-	var exists bool
-	_ = concurrency.RunInRLockWithLogger(
-		&pl.mu, LockNameProfileLoaderCheckCache, logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)),
-		func() error {
-			var ok bool
-			cached, ok = pl.cache[name]
-			exists = ok
-			return nil
-		},
-	)
-	if exists {
-		return cached, nil
-	}
-
-	// Load profile (will recursively load parents)
-	visited := make(map[string]bool)
-	profile, err := pl.loadProfileRecursive(name, visited)
-	if err != nil {
-		return nil, err
-	}
-
-	// Double-checked locking: check cache again
-	var result *SamplerProfile
-	err = concurrency.RunInLockWithLogger(
-		&pl.mu, LockNameProfileLoaderUpdateCache, logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)),
-		func() error {
-			if cached, ok := pl.cache[name]; ok {
-				result = cached
-				return nil
-			}
-			pl.cache[name] = profile
-			result = profile
-			return nil
-		},
-	)
-	if err != nil {
-		return nil, err
-	}
-	return result, nil
+	path := pl.resolveProfilePath(name)
+	return pl.cache.Load(name, stampmemo.Of(path), func() (*SamplerProfile, error) {
+		return pl.loadProfileRecursive(name, make(map[string]bool))
+	})
 }
 
 // loadProfileRecursive recursively loads profile and resolves inheritance
@@ -225,11 +183,5 @@ func findMetricsProfilesDir() string {
 
 // ClearCache clears the profile cache
 func (pl *ProfileLoader) ClearCache() {
-	_ = concurrency.RunInLockWithLogger(
-		&pl.mu, LockNameMetricsLoaderClearCache, logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)),
-		func() error {
-			pl.cache = make(map[string]*SamplerProfile)
-			return nil
-		},
-	)
+	pl.cache.Reset()
 }

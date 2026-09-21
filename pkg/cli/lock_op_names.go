@@ -3,9 +3,6 @@
 package cli
 
 const (
-	LockNameCliLoaderCacheProfile        = "cli_loader_cache_profile"
-	LockNameCliLoaderCheckCache          = "cli_loader_check_cache"
-	LockNameCliLoaderClearCache          = "cli_loader_clear_cache"
 	LockNameCommandTrackerRecordCreated  = "command_tracker_record_created"
 	LockNameCommandTrackerRecordDeleted  = "command_tracker_record_deleted"
 	LockNameCommandTrackerRecordUpdated  = "command_tracker_record_updated"
