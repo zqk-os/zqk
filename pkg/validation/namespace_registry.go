@@ -12,8 +12,11 @@ import (
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/stampmemo"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
+
+var specNamespaceOverlays stampmemo.Table[map[string]string] // keyed by specsDir; stamp is top-level YAML
 
 // NamespaceRegistry maps object kinds to their default namespaces
 type NamespaceRegistry struct {
@@ -140,61 +143,70 @@ func (nr *NamespaceRegistry) getSpecsDirForIO() string {
 
 func (nr *NamespaceRegistry) loadNamespaceMappings(specsDir string) map[string]string {
 	newMappings := nr.getDefaultNamespaces()
-
-	if specsDir == emptyValue {
-		return newMappings // No specs directory, use defaults only
+	for k, v := range loadSpecNamespaceOverlays(specsDir) {
+		newMappings[k] = v
 	}
-
-	// Scan specs directory for namespace information
-	entries, readErr := fileutil.ReadDir(specsDir)
-	if readErr != nil {
-		return newMappings
-	}
-
-	for _, entry := range entries {
-		if nr.shouldSkipSpecEntry(entry) {
-			continue
-		}
-
-		baseName := nr.getBaseNameFromEntry(entry)
-		if nr.shouldSkipSpec(baseName) {
-			continue
-		}
-
-		// Try to load namespace from spec
-		specPath := filepath.Join(specsDir, entry.Name())
-		namespace := nr.loadNamespaceFromSpec(specPath, baseName)
-		if namespace != emptyValue {
-			newMappings[baseName] = namespace
-		}
-	}
-
 	return newMappings
 }
 
-// shouldSkipSpecEntry checks if a directory entry should be skipped
-func (nr *NamespaceRegistry) shouldSkipSpecEntry(entry fileutil.DirEntry) bool {
-	if entry.IsDir() {
-		return true
+func loadSpecNamespaceOverlays(specsDir string) map[string]string {
+	if specsDir == emptyValue {
+		return map[string]string{}
 	}
-	if !strings.HasSuffix(entry.Name(), ".yaml") && !strings.HasSuffix(entry.Name(), ".yml") {
-		return true
-	}
-	return false
+	files := listNamespaceSpecFiles(specsDir)
+	stamp := stampmemo.OfAll(append([]string{specsDir}, files...)...)
+	overlays, _ := specNamespaceOverlays.Load(specsDir, stamp, func() (map[string]string, error) {
+		return readSpecNamespaceOverlays(files), nil
+	})
+	return cloneStringMap(overlays)
 }
 
-// getBaseNameFromEntry extracts base name from entry (without extension)
-func (nr *NamespaceRegistry) getBaseNameFromEntry(entry fileutil.DirEntry) string {
-	baseName := strings.TrimSuffix(entry.Name(), ".yaml")
-	baseName = strings.TrimSuffix(baseName, ".yml")
-	return baseName
+func listNamespaceSpecFiles(specsDir string) []string {
+	entries, err := fileutil.ReadDir(specsDir)
+	if err != nil {
+		return nil
+	}
+	var files []string
+	for _, entry := range entries {
+		if entry.IsDir() {
+			continue
+		}
+		name := entry.Name()
+		if !strings.HasSuffix(name, ".yaml") && !strings.HasSuffix(name, ".yml") {
+			continue
+		}
+		files = append(files, filepath.Join(specsDir, name))
+	}
+	return files
 }
 
-// shouldSkipSpec checks if a spec should be skipped using kind_mappings_config
-func (nr *NamespaceRegistry) shouldSkipSpec(baseName string) bool {
-	// Use kind_mappings_config to determine if spec should be skipped
-	// This avoids hardcoding and allows config-driven skip lists
-	// GetGlobalKindMappingsConfig() always returns a non-nil config (with defaults if needed)
+func readSpecNamespaceOverlays(files []string) map[string]string {
+	out := make(map[string]string, len(files))
+	for _, specPath := range files {
+		baseName := strings.TrimSuffix(filepath.Base(specPath), filepath.Ext(specPath))
+		if shouldSkipNamespaceSpec(baseName) {
+			continue
+		}
+		namespace := namespaceFromSpecFile(specPath, baseName)
+		if namespace != emptyValue {
+			out[baseName] = namespace
+		}
+	}
+	return out
+}
+
+func cloneStringMap(in map[string]string) map[string]string {
+	if len(in) == 0 {
+		return map[string]string{}
+	}
+	out := make(map[string]string, len(in))
+	for k, v := range in {
+		out[k] = v
+	}
+	return out
+}
+
+func shouldSkipNamespaceSpec(baseName string) bool {
 	config := objects.GetGlobalKindMappingsConfig()
 	return config.ShouldSkipSpec(baseName)
 }
@@ -246,6 +258,10 @@ func (nr *NamespaceRegistry) updateRegistry(newMappings map[string]string, subor
 
 // loadNamespaceFromSpec attempts to extract namespace information from a spec file
 func (nr *NamespaceRegistry) loadNamespaceFromSpec(specPath, kind string) string {
+	return namespaceFromSpecFile(specPath, kind)
+}
+
+func namespaceFromSpecFile(specPath, kind string) string {
 	data, err := fileutil.ReadFile(specPath)
 	if err != nil {
 		return ""
@@ -294,7 +310,7 @@ func (nr *NamespaceRegistry) loadNamespaceFromSpec(specPath, kind string) string
 	}
 
 	// Infer namespace from ontology/kind
-	return nr.inferNamespaceFromKind(objectKind)
+	return inferNamespaceFromKindConfig(objectKind)
 }
 
 // inferNamespaceFromKind infers the default namespace for a given object kind
@@ -322,12 +338,15 @@ func (nr *NamespaceRegistry) inferNamespaceFromKind(kind string) string {
 		return namespace
 	}
 
-	// Fall back to config-based inference
+	return inferNamespaceFromKindConfig(kind)
+}
+
+func inferNamespaceFromKindConfig(kind string) string {
 	config := GetGlobalNamespacesConfig()
 	if config != nil {
 		return config.GetNamespaceForKind(kind)
 	}
-	return DefaultNamespaceKernel // Ultimate fallback
+	return DefaultNamespaceKernel
 }
 
 // getDefaultNamespaces returns default namespace mappings for known object kinds
