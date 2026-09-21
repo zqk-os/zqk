@@ -9,6 +9,7 @@ import (
 // IndexYAMLNames maps basename and ontology (basename minus .yaml) to abs path.
 // Nested directories are included. Last walk wins on collision. Keys are the
 // closed spec/lifecycle/trait tree under dir — not every file in the repo.
+// Names that start with "." are skipped (includes macOS AppleDouble `._*`).
 func IndexYAMLNames(dir string) map[string]string {
 	idx := make(map[string]string)
 	if dir == "" {
@@ -19,7 +20,7 @@ func IndexYAMLNames(dir string) map[string]string {
 			return nil
 		}
 		name := d.Name()
-		if !strings.HasSuffix(name, YAMLExtension) {
+		if strings.HasPrefix(name, ".") || !strings.HasSuffix(name, YAMLExtension) {
 			return nil
 		}
 		idx[name] = path

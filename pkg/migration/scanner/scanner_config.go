@@ -2,11 +2,11 @@ package scanner
 
 import (
 	"path/filepath"
-	"sync"
 
 	"gopkg.in/yaml.v3"
 
 	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/stampmemo"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -25,10 +25,7 @@ type ScannerOverride struct {
 	ExcludePatterns    []string `yaml:"exclude_patterns"`
 }
 
-var (
-	globalScannerConfig     *ScannerConfig
-	globalScannerConfigOnce sync.Once
-)
+var scannerConfigs stampmemo.Table[*ScannerConfig] // keyed by discovered path; stamp is the YAML file
 
 // LoadScannerConfig loads the scanner configuration from file
 func LoadScannerConfig(configPath string) (*ScannerConfig, error) {
@@ -57,17 +54,28 @@ func LoadScannerConfig(configPath string) (*ScannerConfig, error) {
 	return &config, nil
 }
 
-// GetGlobalScannerConfig returns the singleton instance of the scanner config
+// ResetGlobalScannerConfig forgets the process-wide scanner memo (tests that chdir).
+func ResetGlobalScannerConfig() {
+	scannerConfigs.Reset()
+}
+
+// GetGlobalScannerConfig returns the stamp-invalidated scanner config.
 func GetGlobalScannerConfig() *ScannerConfig {
-	globalScannerConfigOnce.Do(func() {
-		config, err := LoadScannerConfig("")
-		if err != nil {
-			globalScannerConfig = getDefaultScannerConfig()
-		} else {
-			globalScannerConfig = config
+	configPath := findScannerConfig()
+	cfg, err := scannerConfigs.Load(configPath, stampmemo.Of(configPath), func() (*ScannerConfig, error) {
+		if configPath == emptyValue {
+			return getDefaultScannerConfig(), nil
 		}
+		loaded, loadErr := LoadScannerConfig(configPath)
+		if loadErr != nil || loaded == nil {
+			return getDefaultScannerConfig(), nil
+		}
+		return loaded, nil
 	})
-	return globalScannerConfig
+	if err != nil || cfg == nil {
+		return getDefaultScannerConfig()
+	}
+	return cfg
 }
 
 // getDefaultScannerConfig returns default scanner configuration
@@ -152,56 +160,6 @@ func (c *ScannerConfig) GetExcludePatterns(scannerName string) []string {
 	return c.ExcludePatterns
 }
 
-// findScannerConfig finds the scanner config file
 func findScannerConfig() string {
-	// Try standard locations
-	possiblePaths := []string{
-		filepath.Join(paths.ProcessInternalDir, paths.ScannerConfigFile),
-		filepath.Join("..", paths.ProcessInternalDir, paths.ScannerConfigFile),
-		filepath.Join("..", "..", paths.ProcessInternalDir, paths.ScannerConfigFile),
-	}
-
-	wd, err := fileutil.Getwd()
-	if err != nil {
-		return ""
-	}
-
-	for _, path := range possiblePaths {
-		absPath := filepath.Join(wd, path)
-		if _, err := fileutil.Stat(absPath); err == nil {
-			return absPath
-		}
-	}
-
-	// Walk up directory tree looking for markers
-	dir := wd
-	markers := []string{paths.ProcessInternalDir, paths.ProjectDataDir, "go.mod"}
-
-	for {
-		// Check if this directory has a marker
-		hasMarker := false
-		for _, marker := range markers {
-			markerPath := filepath.Join(dir, marker)
-			if _, err := fileutil.Stat(markerPath); err == nil {
-				hasMarker = true
-				break
-			}
-		}
-
-		if hasMarker {
-			// Found project root, try the path from here
-			potentialPath := filepath.Join(dir, paths.ProcessInternalDir, paths.ScannerConfigFile)
-			if _, err := fileutil.Stat(potentialPath); err == nil {
-				return potentialPath
-			}
-		}
-
-		parent := filepath.Dir(dir)
-		if parent == dir {
-			break
-		}
-		dir = parent
-	}
-
-	return ""
+	return paths.FirstExistingFromCwd(filepath.Join(paths.ProcessInternalDir, paths.ScannerConfigFile))
 }
