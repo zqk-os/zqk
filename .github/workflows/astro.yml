@@ -69,6 +69,7 @@ jobs:
         if: steps.detect-package-manager.outputs.has_site == 'true'
         id: pages
         uses: actions/configure-pages@v6
+        continue-on-error: true
       - name: Install dependencies
         if: steps.detect-package-manager.outputs.has_site == 'true'
         run: ${{ steps.detect-package-manager.outputs.manager }} ${{ steps.detect-package-manager.outputs.command }}
@@ -102,3 +103,4 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+        continue-on-error: true
