@@ -8,8 +8,11 @@ import (
 
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/stampmemo"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
+
+var chunkFiles stampmemo.Table[*ChunkFile] // keyed by absolute/resolved path
 
 // Chunk is one independently verifiable unit of work.
 type Chunk struct {
@@ -42,25 +45,41 @@ func LoadChunks(path string) ([]Chunk, error) {
 	if err != nil {
 		return nil, err
 	}
-	return f.Chunks, nil
+	return cloneChunks(f.Chunks), nil
+}
+
+func cloneChunks(in []Chunk) []Chunk {
+	out := make([]Chunk, len(in))
+	for i, c := range in {
+		out[i] = c
+		out[i].DSLChecks = append([]string(nil), c.DSLChecks...)
+		out[i].EvidenceRefs = append([]string(nil), c.EvidenceRefs...)
+	}
+	return out
 }
 
 func loadChunkFile(path string) (*ChunkFile, error) {
-	b, err := fileutil.ReadFile(path)
-	if err != nil {
-		return nil, errfmt.Errorf("vds: read chunks %s: %w", path, err)
-	}
-	var f ChunkFile
-	if err := yaml.Unmarshal(b, &f); err != nil {
-		return nil, errfmt.Errorf("vds: parse chunks: %w", err)
-	}
-	if len(f.Chunks) == 0 {
-		return nil, errfmt.Errorf("vds: no chunks in %s", path)
-	}
-	if strings.TrimSpace(f.Schema) == "" {
-		f.Schema = "zqk_vds_chunks_v1"
-	}
-	return &f, nil
+	return chunkFiles.Load(path, stampmemo.Of(path), func() (*ChunkFile, error) {
+		b, err := fileutil.ReadFile(path)
+		if err != nil {
+			return nil, errfmt.Errorf("vds: read chunks %s: %w", path, err)
+		}
+		var f ChunkFile
+		if err := yaml.Unmarshal(b, &f); err != nil {
+			return nil, errfmt.Errorf("vds: parse chunks: %w", err)
+		}
+		if len(f.Chunks) == 0 {
+			return nil, errfmt.Errorf("vds: no chunks in %s", path)
+		}
+		if strings.TrimSpace(f.Schema) == "" {
+			f.Schema = "zqk_vds_chunks_v1"
+		}
+		return &f, nil
+	})
+}
+
+func forgetChunkFile(path string) {
+	chunkFiles.Delete(path)
 }
 
 // SaveChunks writes a chunk file (preserves schema; stable field order via struct tags).
@@ -79,6 +98,7 @@ func SaveChunks(path string, chunks []Chunk) error {
 	if err := fileutil.WriteFile(path, b, paths.FilePerm644); err != nil {
 		return errfmt.Errorf("vds: write chunks %s: %w", path, err)
 	}
+	forgetChunkFile(path)
 	return nil
 }
 
@@ -126,6 +146,7 @@ func ApplyIndependentVerifyYes(path string, chunkIDs []string) (int, error) {
 		if err := fileutil.WriteFile(path, []byte(updated), paths.FilePerm644); err != nil {
 			return 0, errfmt.Errorf("vds: write chunks %s: %w", path, err)
 		}
+		forgetChunkFile(path)
 		return n, nil
 	}
 
@@ -147,6 +168,7 @@ func ApplyIndependentVerifyYes(path string, chunkIDs []string) (int, error) {
 	if err := fileutil.WriteFile(path, b, paths.FilePerm644); err != nil {
 		return 0, errfmt.Errorf("vds: write chunks %s: %w", path, err)
 	}
+	forgetChunkFile(path)
 	return len(toSet), nil
 }
 

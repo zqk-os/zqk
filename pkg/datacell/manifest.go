@@ -4,8 +4,11 @@ import (
 	"encoding/json"
 
 	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/stampmemo"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
+
+var runtimeManifests stampmemo.Table[RuntimeManifest] // keyed by projectRoot
 
 // RuntimeManifest is optional JSON at .zqk/agent-runtime/datacell_runtime.json (or alias override).
 // When missing, consumers treat protocol version as [ProtocolVersion] constant.
@@ -22,18 +25,20 @@ func RuntimeManifestPath(projectRoot string) string {
 // Invalid JSON returns a non-nil error.
 func ReadRuntimeManifest(projectRoot string) (RuntimeManifest, error) {
 	p := RuntimeManifestPath(projectRoot)
-	b, err := fileutil.ReadFile(p)
-	if err != nil {
-		if fileutil.IsNotExist(err) {
-			return RuntimeManifest{}, nil
+	return runtimeManifests.Load(projectRoot, stampmemo.Of(p), func() (RuntimeManifest, error) {
+		b, err := fileutil.ReadFile(p)
+		if err != nil {
+			if fileutil.IsNotExist(err) {
+				return RuntimeManifest{}, nil
+			}
+			return RuntimeManifest{}, err
 		}
-		return RuntimeManifest{}, err
-	}
-	var m RuntimeManifest
-	if err := json.Unmarshal(b, &m); err != nil {
-		return RuntimeManifest{}, err
-	}
-	return m, nil
+		var m RuntimeManifest
+		if err := json.Unmarshal(b, &m); err != nil {
+			return RuntimeManifest{}, err
+		}
+		return m, nil
+	})
 }
 
 // EffectiveProtocolVersion returns manifest.protocol_version when set, else [ProtocolVersion].
