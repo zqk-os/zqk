@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Community first-run
+    url: https://github.com/zqk-os/zqk/blob/main/docs/onboarding/COMMUNITY_FIRST_RUN.md
+    about: Install, init, agent-onboard, and MCP for a greenfield tree.
+  - name: Security report
+    url: https://github.com/zqk-os/zqk/blob/main/SECURITY.md
+    about: Please do not file security issues in the public tracker.

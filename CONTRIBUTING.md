@@ -91,5 +91,6 @@ go test ./...
 ## 6. Community & Governance
 
 - Project governance, decision-making, and open-core boundaries are defined in [GOVERNANCE.md](GOVERNANCE.md).
+- File bugs and enhancements with the GitHub issue templates under `.github/ISSUE_TEMPLATE/`.
 - Security policies and vulnerability disclosures are governed by [SECURITY.md](SECURITY.md).
 - Licensed under the Apache License 2.0 (`LICENSE` + `NOTICE`).
