@@ -98,7 +98,7 @@ func NewCheckCmd() *cobra.Command {
 	cmd.Flags().String("dispatch-to", "", "Dispatch health violations/issues as inbox items to the specified agent/role (e.g. 'QA-Engineer', 'Security-Engineer', 'technical-program-manager', or 'auto')")
 	// Opt-in mesh wake when draft/error/blocking/warning/info thresholds trip (not automatic).
 	// Bare --notify → primary orchestrator agent_id; --notify <id> overrides.
-	cmd.Flags().String("notify", "", "Wake this agent seat if draft-plane / error-status / blocking / warning / informational thresholds trip after the check; omit value to use primary orchestrator (see .zqk/config/primary_orchestrator.json)")
+	cmd.Flags().String("notify", "", "Wake this agent seat if draft-plane / error-status / blocking / warning / informational thresholds trip after the check; omit value to use primary orchestrator (see .zqk/agent-runtime/primary_orchestrator.json)")
 	if f := cmd.Flags().Lookup("notify"); f != nil {
 		f.NoOptDefVal = systemcheckwake.PrimarySentinel
 	}

@@ -135,7 +135,7 @@ func TestQuickstartSmoke_FunctionalAcceptance(t *testing.T) {
 	}
 
 	// Verify sync report was written
-	syncReport := filepath.Join(strangerWorkspace, paths.ProjectDataDir, paths.ConfigDir, "agent_workspace_sync.json")
+	syncReport := filepath.Join(strangerWorkspace, paths.ProjectDataDir, paths.AgentRuntimeDir, "agent_workspace_sync.json")
 	if !fileutil.Exists(syncReport) {
 		t.Errorf("agent_workspace_sync.json not created at %s", syncReport)
 	}

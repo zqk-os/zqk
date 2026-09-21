@@ -205,6 +205,11 @@ docs/process/
 !.zqk-state/snapshots/
 !.zqk-state/snapshots/**/*.csnap
 
+.zqk/agent-runtime/ambient_context.json*
+.zqk/agent-runtime/agent_git_identity.env
+.zqk/agent-runtime/escalation.json
+.zqk/agent-runtime/agent_workspace_sync.json
+# leftover kernel copies (pre agent-runtime rename)
 .zqk/config/ambient_context.json*
 # Local agent git author/committer (see agent_git_identity.env.example + agent-git-attribution.mdc)
 .zqk/config/agent_git_identity.env

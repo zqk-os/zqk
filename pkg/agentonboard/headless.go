@@ -1,7 +1,6 @@
 package agentonboard
 
 import (
-	"path/filepath"
 	"strings"
 
 	"github.com/zqk-os/zqk/pkg/objects"
@@ -40,9 +39,9 @@ func CollectEdgeSignals(projectRoot string) []EdgeSignal {
 	}
 	if projectRoot != "" {
 		// Optional operator-declared headless marker (does not invent organ binaries).
-		marker := filepath.Join(projectRoot, paths.ProjectDataDir, paths.ConfigDir, "headless_edge.json")
+		marker := paths.AgentRuntimeFile(projectRoot, "headless_edge.json")
 		if pathExists(marker) {
-			signals = append(signals, EdgeSignal{ID: "headless_edge_marker", Present: true, Detail: filepath.Join(paths.ProjectDataDir, paths.ConfigDir, "headless_edge.json")})
+			signals = append(signals, EdgeSignal{ID: "headless_edge_marker", Present: true, Detail: paths.AgentRuntimeRel("headless_edge.json")})
 		}
 	}
 	return signals

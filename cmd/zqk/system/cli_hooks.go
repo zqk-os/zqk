@@ -209,7 +209,7 @@ func requireCliHookWritePermission() error {
 func NewCliHooksCmd() *cobra.Command {
 	helpBuilder := clipkg.DynamicHelpBuilder(
 		"CLI hook profile (built-in hooks + optional tray entry)",
-		"Manage built-in automation hooks the same way as feature flags: persisted JSON under .zqk/config/cli_hook_profile.json.",
+		"Manage built-in automation hooks the same way as feature flags: persisted JSON under .zqk/agent-runtime/cli_hook_profile.json.",
 		"", paths.RewriteCanonicalCLIInvocations("Hooks are stable IDs (e.g. post_commit_scan_tests) that git hooks or scripts can query. Optional tray_entry points at a zqk tray name for delegated commands."),
 	).
 		AddExample("List hooks", "%s system cli-hooks list").

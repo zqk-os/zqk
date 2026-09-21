@@ -24,7 +24,7 @@ const (
 	DeliveryModeNotify    = "notify"
 )
 
-// AgentChatChannelConfig is the lite-file policy for the agent chat channel pilot (bounded JSON under .zqk/config/).
+// AgentChatChannelConfig is the lite-file policy for the agent chat channel pilot (bounded JSON under .zqk/agent-runtime/).
 // Steward / IDE integrations read this to enable or filter delivery; the append-only event stream is separate
 // ([AgentChatChannelEventsJSONLPath]).
 type AgentChatChannelConfig struct {
@@ -58,7 +58,7 @@ func DefaultAgentChatChannelConfig() AgentChatChannelConfig {
 	}
 }
 
-// ReadAgentChatChannelConfig loads .zqk/config/agent_chat_channel.json when present.
+// ReadAgentChatChannelConfig loads .zqk/agent-runtime/agent_chat_channel.json when present.
 // A missing file returns [DefaultAgentChatChannelConfig] with a nil error.
 func ReadAgentChatChannelConfig(projectRoot string) (AgentChatChannelConfig, error) {
 	p := AgentChatChannelConfigPath(projectRoot)

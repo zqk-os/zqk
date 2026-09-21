@@ -55,7 +55,7 @@ echo -e "  $ ${BOLD}zqk system init --project-name \"fintech-core\"${NC}\n"
 
 echo -e "\n${BOLD}[SCENE 3: VERIFYING KERNEL MEMBRANE & SCAFFOLDING]${NC}"
 echo -e "  Inspecting generated Knowledge Kernel tree:"
-ls -d "${TMP_PROJECT}/.zqk" "${TMP_PROJECT}/.zqk/process" "${TMP_PROJECT}/.zqk/config"
+ls -d "${TMP_PROJECT}/.zqk" "${TMP_PROJECT}/.zqk/process" "${TMP_PROJECT}/.zqk/agent-runtime"
 
 echo -e "\n${BOLD}[SCENE 4: ZERO-FRICTION QUICKSTART ORIENTATION]${NC}"
 (cd "${TMP_PROJECT}" && "${ZQK_BIN}" quickstart)

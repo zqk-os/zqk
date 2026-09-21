@@ -14,7 +14,7 @@ func NewSystemCliHooksCommandBuilder() *cobra.Command {
 	builder.WithShort("Manage built-in CLI hook profile and optional tray bindings")
 	help := clipkg.DynamicHelpBuilder("Manage built-in CLI hook profile and optional tray bindings")
 	help.WithDescriptionLines("Manage built-in automation hooks the same way as feature flags: persisted JSON")
-	help.WithDescriptionLines("under .zqk/config/cli_hook_profile.json.")
+	help.WithDescriptionLines("under .zqk/agent-runtime/cli_hook_profile.json.")
 	help.WithDescriptionLines("")
 	help.WithDescriptionLines("Hooks are stable IDs (for example post_commit_scan_tests) that git hooks or")
 	help.WithDescriptionLines("scripts can query. Optional tray_entry points at a zqk tray name for delegated")

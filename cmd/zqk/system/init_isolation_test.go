@@ -19,7 +19,7 @@ func TestWriteRootIsolationFiles(t *testing.T) {
 	tmpDir := t.TempDir()
 	logger := logging.GetLoggerFromProfile("human")
 
-	// Ensure .zqk/config and .zqk/state dirs exist or are created
+	// Ensure .zqk/agent-runtime and .zqk/state dirs exist or are created
 	err := writeRootIsolationFiles(tmpDir, false, logger)
 	if err != nil {
 		t.Fatalf("writeRootIsolationFiles failed: %v", err)
@@ -28,9 +28,9 @@ func TestWriteRootIsolationFiles(t *testing.T) {
 	expectedFiles := []string{
 		filepath.Join(tmpDir, paths.ConfigDir, paths.ZqkConfigFileName),
 		filepath.Join(tmpDir, paths.ConfigDir, paths.ZqkLocalConfigFileName),
-		filepath.Join(tmpDir, paths.ProjectDataDir, paths.ConfigDir, "agent_chat_channel.json"),
-		filepath.Join(tmpDir, paths.ProjectDataDir, paths.ConfigDir, "agent_workspace_sync.json"),
-		filepath.Join(tmpDir, paths.ProjectDataDir, paths.ConfigDir, "agent_git_identity.env.example"),
+		filepath.Join(tmpDir, paths.ProjectDataDir, paths.AgentRuntimeDir, "agent_chat_channel.json"),
+		filepath.Join(tmpDir, paths.ProjectDataDir, paths.AgentRuntimeDir, "agent_workspace_sync.json"),
+		filepath.Join(tmpDir, paths.ProjectDataDir, paths.AgentRuntimeDir, "agent_git_identity.env.example"),
 		filepath.Join(tmpDir, paths.ProjectDataDir, paths.StateDir, "remote_hold.json"),
 	}
 
@@ -173,7 +173,7 @@ func TestFirstRun_AgentOnboardingDirectives(t *testing.T) {
 		t.Errorf("expected remote_hold.json to guard fresh workspace from premature remote sync")
 	}
 
-	syncPath := filepath.Join(tmpDir, paths.ProjectDataDir, paths.ConfigDir, "agent_workspace_sync.json")
+	syncPath := filepath.Join(tmpDir, paths.ProjectDataDir, paths.AgentRuntimeDir, "agent_workspace_sync.json")
 	if !fileutil.Exists(syncPath) {
 		t.Errorf("expected agent_workspace_sync.json to be created")
 	}

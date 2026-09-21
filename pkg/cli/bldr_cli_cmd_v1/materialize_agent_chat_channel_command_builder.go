@@ -11,7 +11,7 @@ func NewMaterializeAgentChatChannelCommandBuilder() *cobra.Command {
 	builder := clipkg.NewCommandBuilder("materialize-agent-chat-channel")
 	builder.WithShort("Materialize agent_chat_channel lite file from a CAS agent_feed")
 	help := clipkg.DynamicHelpBuilder("Materialize agent_chat_channel lite file from a CAS agent_feed")
-	help.WithDescriptionLines("Reads an agent_feed (AGF-*) from CAS and writes `.zqk/config/agent_chat_channel.json`")
+	help.WithDescriptionLines("Reads an agent_feed (AGF-*) from CAS and writes `.zqk/agent-runtime/agent_chat_channel.json`")
 	help.WithDescriptionLines("(enabled, delivery_mode, feed_id, contract_schema_version, path overrides, probe filters).")
 	help.WithDescriptionLines("Ensures the events JSONL parent directory exists.")
 	help.WithDescriptionLines("")

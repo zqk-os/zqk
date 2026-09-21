@@ -52,7 +52,7 @@ func TestVendorPathPolicy_FindLeak(t *testing.T) {
 	if m, ok := p.FindLeak("/tmp/proj/.windsurf/brain"); !ok || m != ".windsurf" {
 		t.Fatalf("got marker=%q ok=%v", m, ok)
 	}
-	if _, ok := p.FindLeak(filepath.Join("/tmp/proj", paths.ProjectDataDir, paths.ConfigDir)); ok {
+	if _, ok := p.FindLeak(filepath.Join("/tmp/proj", paths.ProjectDataDir, paths.AgentRuntimeDir)); ok {
 		t.Fatal("project data path must not leak")
 	}
 }

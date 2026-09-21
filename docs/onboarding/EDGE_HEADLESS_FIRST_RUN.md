@@ -20,17 +20,17 @@ zqk system agent-onboard --format json
 
 | Stage | Vector B behavior |
 |-------|-------------------|
-| **detect** | Reports IDE markers (usually empty) + **edge_signals** (`SPECIALIZATION_TIER`, NVIDIA/DGX/SSH hints, optional `.zqk/config/headless_edge.json`) + open **market_probe** questions |
+| **detect** | Reports IDE markers (usually empty) + **edge_signals** (`SPECIALIZATION_TIER`, NVIDIA/DGX/SSH hints, optional `.zqk/agent-runtime/headless_edge.json`) + open **market_probe** questions |
 | **seat** | Same default seating pack as community |
 | **prime_workspace** | **Only** `.agents/AGENTS.md` (unless `--all-vendors`) |
-| **prime_kernel** | `.zqk/config/agent_workspace_sync.json` |
+| **prime_kernel** | `.zqk/agent-runtime/agent_workspace_sync.json` |
 | **smoke** | AGENTS.md + sync report |
 
 Optional marker (operator-declared, not required):
 
 ```bash
-mkdir -p .zqk/config
-echo '{"schema":"zqk_headless_edge_v1","note":"appliance control plane"}' > .zqk/config/headless_edge.json
+mkdir -p .zqk/agent-runtime
+echo '{"schema":"zqk_headless_edge_v1","note":"appliance control plane"}' > .zqk/agent-runtime/headless_edge.json
 ```
 
 Specialization (when meaningful on the node):

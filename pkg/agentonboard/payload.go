@@ -40,8 +40,8 @@ func BootPayload() string {
 `, brand.ProductName(), exe, exe, exe, exe, exe)
 }
 
-// SyncReportRelPath is the workspace→kernel sync artifact (lite file under .zqk/config).
-var SyncReportRelPath = filepath.ToSlash(filepath.Join(paths.ProjectDataDir, paths.ConfigDir, "agent_workspace_sync.json"))
+// SyncReportRelPath is the workspace→kernel sync artifact (lite file under .zqk/agent-runtime).
+var SyncReportRelPath = filepath.ToSlash(paths.AgentRuntimeRel(paths.AgentWorkspaceSyncFile))
 
 // SyncReportSchema identifies the sync report JSON shape.
 const SyncReportSchema = "zqk_agent_workspace_sync_v1"

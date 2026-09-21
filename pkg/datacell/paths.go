@@ -12,16 +12,14 @@ const ProtocolVersion = "1"
 
 // FeatureFlagsPath returns the absolute path to the feature flags JSON file.
 // Uses the path alias [paths.PathAliasDatacellFeatureFlags] when the cache is built; otherwise
-// .zqk/config/feature_flags.json. Override via brand/path settings (see PATH_ALIAS_RESOLUTION.md).
+// .zqk/agent-runtime/feature_flags.json. Override via brand/path settings (see PATH_ALIAS_RESOLUTION.md).
 func FeatureFlagsPath(projectRoot string) string {
-	fallback := filepath.Join(paths.ProjectDataDir, paths.ConfigDir, paths.FeatureFlagsFile)
-	return paths.ResolvePathFromCacheOrConstant(projectRoot, paths.PathAliasDatacellFeatureFlags, fallback)
+	return paths.ResolveAgentRuntimePath(projectRoot, paths.PathAliasDatacellFeatureFlags, paths.FeatureFlagsFile)
 }
 
 // CLIHookProfilePath returns the absolute path to the CLI hook profile JSON file.
 func CLIHookProfilePath(projectRoot string) string {
-	fallback := filepath.Join(paths.ProjectDataDir, paths.ConfigDir, paths.CLIHookProfileFile)
-	return paths.ResolvePathFromCacheOrConstant(projectRoot, paths.PathAliasDatacellCLIHookProfile, fallback)
+	return paths.ResolveAgentRuntimePath(projectRoot, paths.PathAliasDatacellCLIHookProfile, paths.CLIHookProfileFile)
 }
 
 // TrayYAMLPath returns the absolute path to the optional tray manifest YAML.
@@ -53,8 +51,7 @@ type RuntimePaths struct {
 // AgentChatChannelConfigPath returns the absolute path to agent_chat_channel.json (lite file).
 // Uses [paths.PathAliasDatacellAgentChatChannelConfig] when the path cache is built.
 func AgentChatChannelConfigPath(projectRoot string) string {
-	fallback := filepath.Join(paths.ProjectDataDir, paths.ConfigDir, paths.AgentChatChannelConfigFile)
-	return paths.ResolvePathFromCacheOrConstant(projectRoot, paths.PathAliasDatacellAgentChatChannelConfig, fallback)
+	return paths.ResolveAgentRuntimePath(projectRoot, paths.PathAliasDatacellAgentChatChannelConfig, paths.AgentChatChannelConfigFile)
 }
 
 // AgentChatChannelEventsJSONLPath returns the absolute path to agent_chat_channel.jsonl under .zqk/logs/ide-hooks/.
@@ -65,8 +62,7 @@ func AgentChatChannelEventsJSONLPath(projectRoot string) string {
 
 // AgentIdleStorePath returns the absolute path to agent_idle_store.json (lite file).
 func AgentIdleStorePath(projectRoot string) string {
-	fallback := filepath.Join(paths.ProjectDataDir, paths.ConfigDir, paths.AgentIdleStoreFile)
-	return paths.ResolvePathFromCacheOrConstant(projectRoot, paths.PathAliasDatacellAgentIdleStore, fallback)
+	return paths.ResolveAgentRuntimePath(projectRoot, paths.PathAliasDatacellAgentIdleStore, paths.AgentIdleStoreFile)
 }
 
 // AllRuntimePaths returns all standard paths for projectRoot (path-alias aware).

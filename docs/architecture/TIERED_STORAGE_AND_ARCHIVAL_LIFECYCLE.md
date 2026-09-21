@@ -119,7 +119,7 @@ Per policy `POL-CODE-1789812821281452000-51f4aea4`, **no retention duration or t
 - **Developer Workstations:** Medium churn; hot retention measured in days.
 - **Regulated Enterprise Clusters:** Low churn, high audit retention; cold storage retained for years.
 
-### Dynamic Configuration File: `.zqk/config/archive_policy.yaml`
+### Dynamic Configuration File: `config/archive_policy.yaml`
 
 ```yaml
 # ZQK Archival Lifecycle & Tiered Storage Configuration

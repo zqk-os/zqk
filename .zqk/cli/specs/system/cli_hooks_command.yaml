@@ -4,7 +4,7 @@ name: "cli-hooks"
 short: "Manage built-in CLI hook profile and optional tray bindings"
 description: |
   Manage built-in automation hooks the same way as feature flags: persisted JSON
-  under .zqk/config/cli_hook_profile.json.
+  under .zqk/agent-runtime/cli_hook_profile.json.
 
   Hooks are stable IDs (for example post_commit_scan_tests) that git hooks or
   scripts can query. Optional tray_entry points at a zqk tray name for delegated

@@ -182,8 +182,8 @@ func lookupMapInsensitive(m map[string]string, personaRef, agentID string) (stri
 
 func loadConfiguredWorkerLane(root, personaRef, agentID string) string {
 	candidates := []string{
-		filepath.Join(root, paths.ProjectDataDir, paths.ConfigDir, "worker_lanes.json"),
-		filepath.Join(root, paths.ProjectDataDir, paths.ConfigDir, "worker_lanes.yaml"),
+		paths.AgentRuntimeFile(root, "worker_lanes.json"),
+		paths.AgentRuntimeFile(root, "worker_lanes.yaml"),
 		filepath.Join(root, paths.ConfigDir, "worker_lanes.yaml"),
 		filepath.Join(root, paths.ConfigDir, paths.ZqkLocalConfigFileName),
 		filepath.Join(root, paths.ConfigDir, paths.ZqkConfigFileName),

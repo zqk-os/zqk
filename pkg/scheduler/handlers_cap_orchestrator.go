@@ -275,7 +275,7 @@ func buildHumanProvider(projectRoot string) EscalationProvider {
 	}
 
 	// Custom human command from escalation.json if configured
-	configPath := filepath.Join(projectRoot, paths.ProjectDataDir, paths.ConfigDir, "escalation.json")
+	configPath := paths.AgentRuntimeFile(projectRoot, "escalation.json")
 	if data, err := fileutil.ReadFile(configPath); err == nil {
 		var config struct {
 			HumanCommand string   `json:"human_command"`
@@ -308,11 +308,11 @@ func buildHumanProvider(projectRoot string) EscalationProvider {
 }
 
 // buildAgentProvider constructs the agent escalation provider from config.
-// Checks .zqk/config/escalation.json for a custom command, falls back to
+// Checks .zqk/agent-runtime/escalation.json for a custom command, falls back to
 // the coder_agent inbox if no command is configured.
 func buildAgentProvider(projectRoot string) EscalationProvider {
 	// Check for custom escalation command in project config
-	configPath := filepath.Join(projectRoot, paths.ProjectDataDir, paths.ConfigDir, "escalation.json")
+	configPath := paths.AgentRuntimeFile(projectRoot, "escalation.json")
 	if data, err := fileutil.ReadFile(configPath); err == nil {
 		var config struct {
 			AgentCommand string   `json:"agent_command"`

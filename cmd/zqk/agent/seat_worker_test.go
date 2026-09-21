@@ -269,7 +269,7 @@ func TestSeatWorkerLane_configuredViaPeerSeats(t *testing.T) {
 
 func TestSeatWorkerLane_configuredViaWorkerLanesFile(t *testing.T) {
 	tmpDir := t.TempDir()
-	configDir := filepath.Join(tmpDir, paths.ProjectDataDir, paths.ConfigDir)
+	configDir := filepath.Join(tmpDir, paths.ProjectDataDir, paths.AgentRuntimeDir)
 	if err := fileutil.MkdirAll(configDir, paths.DirPerm755); err != nil {
 		t.Fatal(err)
 	}

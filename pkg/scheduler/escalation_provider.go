@@ -213,7 +213,7 @@ func (p *WebhookEscalationProvider) Escalate(ctx context.Context, notice Escalat
 
 // ResolveSlackWebhookURL resolves the Slack incoming webhook URL for CAP escalations and scheduler alerts.
 // It checks environment variables (ZQK_AGENT_WEBHOOK_SLACK_ALL_AGENT_FARM, SLACK_WEBHOOK_URL, ESCALATION_SLACK_WEBHOOK_URL),
-// .zqk/config/escalation.json, .zqk/config/agent_git_identity.env, and the project root .env,
+// .zqk/agent-runtime/escalation.json, .zqk/agent-runtime/agent_git_identity.env, and the project root .env,
 // stripping surrounding whitespace and quotes.
 func ResolveSlackWebhookURL(projectRoot string) string {
 	// 1. Check environment variables
@@ -227,9 +227,9 @@ func ResolveSlackWebhookURL(projectRoot string) string {
 		return strings.Trim(strings.TrimSpace(url), "\"'")
 	}
 
-	// 2. Check .zqk/config/escalation.json
+	// 2. Check .zqk/agent-runtime/escalation.json
 	if projectRoot != "" {
-		configPath := filepath.Join(projectRoot, paths.ProjectDataDir, paths.ConfigDir, "escalation.json")
+		configPath := paths.AgentRuntimeFile(projectRoot, "escalation.json")
 		if data, err := fileutil.ReadFile(configPath); err == nil {
 			var config struct {
 				SlackWebhookURL string `json:"slack_webhook_url"`
@@ -239,8 +239,8 @@ func ResolveSlackWebhookURL(projectRoot string) string {
 			}
 		}
 
-		// 3. Check .zqk/config/agent_git_identity.env
-		identityPath := filepath.Join(projectRoot, paths.ProjectDataDir, paths.ConfigDir, "agent_git_identity.env")
+		// 3. Check .zqk/agent-runtime/agent_git_identity.env
+		identityPath := paths.AgentRuntimeFile(projectRoot, paths.AgentGitIdentityFile)
 		if data, err := fileutil.ReadFile(identityPath); err == nil {
 			for _, line := range strings.Split(string(data), "\n") {
 				line = strings.TrimSpace(line)

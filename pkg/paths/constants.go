@@ -56,13 +56,13 @@ const (
 	// Common subdirectories under ProjectDataDir
 	CacheDir = "cache"
 	LogsDir  = "logs"
-	// ConfigDir is the directory name "config".
-	// Joined with projectRoot it is the committed product config tree (SSOT).
-	// Joined with ProjectDataDir it is leftover kernel lite-files (.zqk/config).
-	// Do not add new YAML there.
-	// TRACK: docs/onboarding/COMMUNITY_FIRST_RUN.md — move agent/idle/chat/git-identity
-	// lite-files to StateDir when: no reader still joins ProjectDataDir+ConfigDir for YAML.
+	// ConfigDir is committed product configuration at <project_root>/config/.
+	// Do not join with ProjectDataDir for new files — machine/seat lite-files live in AgentRuntimeDir.
 	ConfigDir = "config"
+	// AgentRuntimeDir is machine/seat lite-files under ProjectDataDir (.zqk/agent-runtime/).
+	// Chat channel, idle store, git identity, workspace sync, feature flags, CLI hooks.
+	// Not product YAML (that is ConfigDir at project root).
+	AgentRuntimeDir = "agent-runtime"
 
 	// Canonical configuration files under ConfigDir ("config") at project root.
 	ZqkConfigFileName      = "zqk.yaml"

@@ -1,7 +1,7 @@
 // Package primaryorch resolves the host/project primary orchestrator and wakes
 // them through pluggable vendor adapters (script, agent chat channel, inbox).
 //
-// Binding lives at .zqk/config/primary_orchestrator.json — not in vendor brain dirs.
+// Binding lives at .zqk/agent-runtime/primary_orchestrator.json — not in vendor brain dirs.
 // See [REDACTED-ID].
 package primaryorch
 
@@ -86,9 +86,9 @@ type Adapter interface {
 	Wake(ctx context.Context, projectRoot string, b Binding, req WakeRequest) (WakeResult, error)
 }
 
-// ConfigPath returns .zqk/config/primary_orchestrator.json.
+// ConfigPath returns .zqk/agent-runtime/primary_orchestrator.json.
 func ConfigPath(projectRoot string) string {
-	return filepath.Join(projectRoot, paths.ProjectDataDir, paths.ConfigDir, ConfigFileName)
+	return paths.AgentRuntimeFile(projectRoot, ConfigFileName)
 }
 
 // DefaultBinding is used when no config file exists.

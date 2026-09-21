@@ -128,7 +128,7 @@ func TestStreamOrganism_SpecIndexRegistryAndStreamAlignment(t *testing.T) {
 func TestStreamOrganism_RuntimeOrganismPathsAndManifest(t *testing.T) {
 	t.Parallel()
 	root := t.TempDir()
-	cfgDir := filepath.Join(root, paths.ProjectDataDir, paths.ConfigDir)
+	cfgDir := filepath.Join(root, paths.ProjectDataDir, paths.AgentRuntimeDir)
 	if err := fileutil.EnsureDir(cfgDir); err != nil {
 		t.Fatal(err)
 	}
@@ -267,7 +267,7 @@ func writeSyntheticDataCellProject(t *testing.T) string {
 		t.Fatal(err)
 	}
 	// Runtime organism: minimal files so ReadRuntimeManifest / paths resolve like a real project.
-	cfgDir := filepath.Join(root, paths.ProjectDataDir, paths.ConfigDir)
+	cfgDir := filepath.Join(root, paths.ProjectDataDir, paths.AgentRuntimeDir)
 	if err := fileutil.EnsureDir(cfgDir); err != nil {
 		t.Fatal(err)
 	}

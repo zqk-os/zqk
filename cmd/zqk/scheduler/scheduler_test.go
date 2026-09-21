@@ -37,7 +37,7 @@ paths:
   project_root: ""
   staleness_check_dirs:
     - paths.ProjectDataDir
-    - ".zqk/config"
+    - ".zqk/agent-runtime"
   aliases:
     docs: "docs"
     process: "` + paths.ProcessDir + `"

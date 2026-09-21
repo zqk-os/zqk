@@ -203,9 +203,9 @@ func IsPathCacheStale(projectRoot string, checkDirs []string) bool {
 }
 
 // DefaultStalenessCheckDirs returns the default list of paths (relative to project root) to check for cache staleness.
-// Configurable later via {brand}-settings (e.g. zqk-settings.yaml); for now .zqk and .zqk/config are critical.
+// Configurable later via {brand}-settings (e.g. zqk-settings.yaml); for now .zqk and .zqk/agent-runtime are critical.
 func DefaultStalenessCheckDirs() []string {
-	return []string{ProjectDataDir, filepath.Join(ProjectDataDir, ConfigDir)}
+	return []string{ProjectDataDir, filepath.Join(ProjectDataDir, AgentRuntimeDir)}
 }
 
 // ResolvePath resolves a path reference using the scheme prefix and alias cache.
@@ -388,13 +388,14 @@ func DefaultPathAliases() map[string]string {
 		PathAliasMeshState:                      filepath.Join(ProjectDataDir, StateDir, MeshStateSubdir),
 		PathAliasMeshPeerSeats:                  filepath.Join(ProjectDataDir, StateDir, MeshStateSubdir, PeerSeatsFile),
 		PathAliasMeshPeerAckAwait:               filepath.Join(ProjectDataDir, StateDir, MeshStateSubdir, PeerAckAwaitsFile),
-		PathAliasDatacellFeatureFlags:           filepath.Join(ProjectDataDir, ConfigDir, FeatureFlagsFile),
-		PathAliasDatacellCLIHookProfile:         filepath.Join(ProjectDataDir, ConfigDir, CLIHookProfileFile),
+		"agent_runtime":                         filepath.Join(ProjectDataDir, AgentRuntimeDir),
+		PathAliasDatacellFeatureFlags:           filepath.Join(ProjectDataDir, AgentRuntimeDir, FeatureFlagsFile),
+		PathAliasDatacellCLIHookProfile:         filepath.Join(ProjectDataDir, AgentRuntimeDir, CLIHookProfileFile),
 		PathAliasDatacellTrayYAML:               filepath.Join(ProjectDataDir, TrayYAMLFile),
-		PathAliasDatacellRuntimeManifest:        filepath.Join(ProjectDataDir, ConfigDir, DataCellRuntimeManifestFile),
-		PathAliasDatacellAgentChatChannelConfig: filepath.Join(ProjectDataDir, ConfigDir, AgentChatChannelConfigFile),
+		PathAliasDatacellRuntimeManifest:        filepath.Join(ProjectDataDir, AgentRuntimeDir, DataCellRuntimeManifestFile),
+		PathAliasDatacellAgentChatChannelConfig: filepath.Join(ProjectDataDir, AgentRuntimeDir, AgentChatChannelConfigFile),
 		PathAliasDatacellAgentChatChannelEvents: filepath.Join(ProjectDataDir, LogsDir, IDEHooksLogsSubdir, AgentChatChannelEventsFile),
-		PathAliasDatacellAgentIdleStore:         filepath.Join(ProjectDataDir, ConfigDir, AgentIdleStoreFile),
+		PathAliasDatacellAgentIdleStore:         filepath.Join(ProjectDataDir, AgentRuntimeDir, AgentIdleStoreFile),
 		PathAliasDatacellStewardEnqueue:         filepath.Join(ProjectDataDir, LogsDir, DataCellLogsSubdir, StewardEnqueueJSONLFile),
 		"process_internal":                      ProcessInternalDir,
 		"process_policies":                      ProcessPoliciesDir,

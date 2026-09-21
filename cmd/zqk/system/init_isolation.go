@@ -64,7 +64,7 @@ paths:
 		}
 	}
 
-	// 3. .zqk/config/agent_chat_channel.json
+	// 3. .zqk/agent-runtime/agent_chat_channel.json
 	chatChannelPath := datacell.AgentChatChannelConfigPath(projectRoot)
 	if _, err := fileutil.Stat(chatChannelPath); fileutil.IsNotExist(err) || force {
 		c := datacell.AgentChatChannelConfig{
@@ -78,7 +78,7 @@ paths:
 		}
 	}
 
-	// 4. .zqk/config/agent_workspace_sync.json
+	// 4. .zqk/agent-runtime/agent_workspace_sync.json
 	syncReportPath := filepath.Join(projectRoot, filepath.FromSlash(agentonboard.SyncReportRelPath))
 	if _, err := fileutil.Stat(syncReportPath); fileutil.IsNotExist(err) || force {
 		rep := agentonboard.SyncReport{
@@ -94,8 +94,8 @@ paths:
 		}
 	}
 
-	// 5. .zqk/config/agent_git_identity.env.example
-	gitIdentityExamplePath := filepath.Join(projectRoot, paths.ProjectDataDir, paths.ConfigDir, "agent_git_identity.env.example")
+	// 5. .zqk/agent-runtime/agent_git_identity.env.example
+	gitIdentityExamplePath := paths.AgentRuntimeFile(projectRoot, paths.AgentGitIdentityExampleFile)
 	if _, err := fileutil.Stat(gitIdentityExamplePath); fileutil.IsNotExist(err) || force {
 		content := `# Copy to agent_git_identity.env (gitignored) and set values for THIS machine.
 # Agents must load this before any ` + "`git commit`" + ` so history is not attributed to the human owner.

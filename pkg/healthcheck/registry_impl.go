@@ -34,7 +34,7 @@ const (
 // DefaultRegistry is the global registry used by healthchk and by components that run monitors.
 var DefaultRegistry Registry = NewRegistry("")
 
-// NewRegistry returns a registry that persists enabled state to projectRoot/.zqk/config/health_monitors.json.
+// NewRegistry returns a registry that persists enabled state to projectRoot/.zqk/agent-runtime/health_monitors.json.
 // If projectRoot is empty, config is in-memory only (for list without a project).
 func NewRegistry(projectRoot string) *DefaultRegistryImpl {
 	r := &DefaultRegistryImpl{
@@ -196,7 +196,7 @@ func (r *DefaultRegistryImpl) Run(ctx context.Context, projectRoot string, id st
 }
 
 func (r *DefaultRegistryImpl) configPath() string {
-	return filepath.Join(r.projectRoot, paths.ProjectDataDir, paths.ConfigDir, configFileName)
+	return paths.AgentRuntimeFile(r.projectRoot, configFileName)
 }
 
 func (r *DefaultRegistryImpl) loadConfig() error {

@@ -225,7 +225,6 @@ kernel_state:
 
 	pathsToWrite := []string{
 		filepath.Join(projectRoot, paths.BrandSettingsFilename),
-		filepath.Join(projectRoot, paths.ProjectDataDir, paths.ConfigDir, paths.BrandSettingsFilename),
 	}
 
 	for _, p := range pathsToWrite {

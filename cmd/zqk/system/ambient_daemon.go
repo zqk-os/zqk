@@ -36,7 +36,7 @@ func runAmbientDaemon(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("project root not found")
 	}
 
-	configDir := filepath.Join(projectRoot, paths.ProjectDataDir, paths.ConfigDir)
+	configDir := filepath.Join(projectRoot, paths.ProjectDataDir, paths.AgentRuntimeDir)
 	if err := fileutil.EnsureDir(configDir); err != nil {
 		return err
 	}

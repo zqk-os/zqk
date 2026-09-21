@@ -20,7 +20,7 @@ func NewAgentFeedBuilder() *AgentFeedBuilder {
 	// Configure the spec
 	builder.
 		SetExtends("base_object").
-		SetDescription("Binds a logical **agent chat / IDE feed** to on-disk policy and event streams (lite file under `.zqk/config/`\\nand append-only JSONL). Used by stewards and future Cursor/IDE integrations so delivery rules are process objects,\\nnot only local JSON. Runtime paths default through `pkg/datacell` (`AgentChatChannelConfigPath`,\\n`AgentChatChannelEventsJSONLPath`); optional overrides below apply when set.\\n**Structural (CAS):** identity, title, path overrides, contract version, notes—changes that redefine the binding.\\n**Runtime_delta (overlay):** high-churn toggles—`enabled`, `delivery_mode`—so operators can flip delivery without rewriting the structural blob.\\nLifecycle: agent_feed_lifecycle.yaml.\\n").
+		SetDescription("Binds a logical **agent chat / IDE feed** to on-disk policy and event streams (lite file under `.zqk/agent-runtime/`\\nand append-only JSONL). Used by stewards and future Cursor/IDE integrations so delivery rules are process objects,\\nnot only local JSON. Runtime paths default through `pkg/datacell` (`AgentChatChannelConfigPath`,\\n`AgentChatChannelEventsJSONLPath`); optional overrides below apply when set.\\n**Structural (CAS):** identity, title, path overrides, contract version, notes—changes that redefine the binding.\\n**Runtime_delta (overlay):** high-churn toggles—`enabled`, `delivery_mode`—so operators can flip delivery without rewriting the structural blob.\\nLifecycle: agent_feed_lifecycle.yaml.\\n").
 		SetVisibility("internal").
 		SetSchemaVersion(objects.DefaultSchemaVersion).
 		AddTrait("base_object_traits")

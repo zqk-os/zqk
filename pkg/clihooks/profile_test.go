@@ -37,7 +37,7 @@ func TestProfile_defaultsAndRoundTrip(t *testing.T) {
 
 func TestProfile_mergePreservesBuiltinDescription(t *testing.T) {
 	root := t.TempDir()
-	cfgDir := filepath.Join(root, paths.ProjectDataDir, paths.ConfigDir)
+	cfgDir := filepath.Join(root, paths.ProjectDataDir, paths.AgentRuntimeDir)
 	if err := fileutil.EnsureDir(cfgDir); err != nil {
 		t.Fatal(err)
 	}

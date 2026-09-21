@@ -271,6 +271,7 @@ var knownSubdirConstants = map[string]string{
 	"cache":         "CacheDir",
 	"logs":          "LogsDir",
 	"config":        "ConfigDir",
+	"agent-runtime": "AgentRuntimeDir",
 	"state":         "StateDir",
 	"wal":           "WalDir",
 	"metrics":       "MetricsDir",

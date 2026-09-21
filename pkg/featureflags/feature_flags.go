@@ -1,4 +1,4 @@
-// Package featureflags loads feature toggles from .zqk/config/feature_flags.json.
+// Package featureflags loads feature toggles from .zqk/agent-runtime/feature_flags.json.
 //
 // On-disk path is defined by [github.com/zqk-os/zqk/pkg/datacell.FeatureFlagsPath] (runtime organism layout).
 // Broader data-cell work: docs/architecture/DATA_CELL_RUNTIME_ORGANISM.md, BLI-1775890418242630000.

@@ -11,7 +11,7 @@ import (
 func TestReadRuntimeManifest_MissingOK(t *testing.T) {
 	t.Parallel()
 	root := t.TempDir()
-	zqk := filepath.Join(root, paths.ProjectDataDir, paths.ConfigDir)
+	zqk := filepath.Join(root, paths.ProjectDataDir, paths.AgentRuntimeDir)
 	if err := fileutil.MkdirAll(zqk, paths.DirPerm755); err != nil {
 		t.Fatal(err)
 	}
@@ -30,7 +30,7 @@ func TestReadRuntimeManifest_MissingOK(t *testing.T) {
 func TestReadRuntimeManifest_WithFile(t *testing.T) {
 	t.Parallel()
 	root := t.TempDir()
-	zqk := filepath.Join(root, paths.ProjectDataDir, paths.ConfigDir)
+	zqk := filepath.Join(root, paths.ProjectDataDir, paths.AgentRuntimeDir)
 	if err := fileutil.MkdirAll(zqk, paths.DirPerm755); err != nil {
 		t.Fatal(err)
 	}
@@ -53,7 +53,7 @@ func TestReadRuntimeManifest_WithFile(t *testing.T) {
 func TestReadRuntimeManifest_InvalidJSON(t *testing.T) {
 	t.Parallel()
 	root := t.TempDir()
-	zqk := filepath.Join(root, paths.ProjectDataDir, paths.ConfigDir)
+	zqk := filepath.Join(root, paths.ProjectDataDir, paths.AgentRuntimeDir)
 	if err := fileutil.MkdirAll(zqk, paths.DirPerm755); err != nil {
 		t.Fatal(err)
 	}

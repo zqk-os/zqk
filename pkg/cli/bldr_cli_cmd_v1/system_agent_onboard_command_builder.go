@@ -13,7 +13,7 @@ func NewSystemAgentOnboardCommandBuilder() *cobra.Command {
 	builder := clipkg.NewCommandBuilder("agent-onboard")
 	builder.WithShort("Detect agent hosts, seed seating, and sync workspace↔kernel directives")
 	help := clipkg.DynamicHelpBuilder("Detect agent hosts, seed seating, and sync workspace↔kernel directives")
-	help.WithDescriptionLines("Fail-closed first-contact sequence for Vector A (existing IDE/agent hosts) and a thin Vector B path (no public agent markers): detect → auth warn → seat → prime regenerable vendor directives (+ .zqk/agent_packs) → write .zqk/config/agent_workspace_sync.json → smoke. Does not expand studio ontology into the community seed.")
+	help.WithDescriptionLines("Fail-closed first-contact sequence for Vector A (existing IDE/agent hosts) and a thin Vector B path (no public agent markers): detect → auth warn → seat → prime regenerable vendor directives (+ .zqk/agent_packs) → write .zqk/agent-runtime/agent_workspace_sync.json → smoke. Does not expand studio ontology into the community seed.")
 	help.AddExample("Full sync for the current workspace", "%s system agent-onboard")
 	help.AddExample("Headless / appliance (Vector B)", "%s system agent-onboard --headless --format json")
 	help.AddExample("Detect only (JSON)", "%s system agent-onboard --detect-only --format json")

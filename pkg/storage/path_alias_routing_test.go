@@ -111,7 +111,7 @@ paths:
 	if gotDocs != wantDocs {
 		t.Errorf("docs = %q want %q", gotDocs, wantDocs)
 	}
-	wantFF := filepath.Join(root, paths.ProjectDataDir, paths.ConfigDir, paths.FeatureFlagsFile)
+	wantFF := filepath.Join(root, paths.ProjectDataDir, paths.AgentRuntimeDir, paths.FeatureFlagsFile)
 	if got := datacell.FeatureFlagsPath(root); got != wantFF {
 		t.Errorf("datacell FeatureFlagsPath = %q want %q", got, wantFF)
 	}

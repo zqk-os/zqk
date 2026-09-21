@@ -41,7 +41,7 @@ func TestEscalateCmd_DryRunAndConfiguration(t *testing.T) {
 	tmpDir := t.TempDir()
 	t.Setenv(zqkenv.ProjectRoot().Key, tmpDir)
 
-	cfgDir := filepath.Join(tmpDir, paths.ProjectDataDir, paths.ConfigDir)
+	cfgDir := filepath.Join(tmpDir, paths.ProjectDataDir, paths.AgentRuntimeDir)
 	if err := fileutil.MkdirAll(cfgDir, paths.DirPerm755); err != nil {
 		t.Fatal(err)
 	}

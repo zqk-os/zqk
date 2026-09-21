@@ -14,7 +14,7 @@ Contract workflow: `WFL-TPM-AGY-MESH-001` (read it: `zqk object get WFL-TPM-AGY-
 
 ## Response plane (where to talk)
 
-Durable truth lives on the **agent_feed** (lite: `.zqk/config/agent_chat_channel.json`).
+Durable truth lives on the **agent_feed** (lite: `.zqk/agent-runtime/agent_chat_channel.json`).
 Do **not** treat Terminal chat paste or `scripts/wake-cursor-tpm.sh` as the primary way to reach Cursor TPM.
 
 | Intent | Preferred | Avoid as primary |

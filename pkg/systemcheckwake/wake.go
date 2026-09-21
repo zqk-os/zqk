@@ -23,7 +23,7 @@ import (
 )
 
 const (
-	// ConfigFileName is the optional threshold override under .zqk/config/.
+	// ConfigFileName is the optional threshold override under .zqk/agent-runtime/.
 	ConfigFileName = "system_check_wake.json"
 	// SchemaVersion is the lite config schema_version.
 	SchemaVersion = "1"
@@ -95,9 +95,9 @@ func DefaultConfig() Config {
 	}
 }
 
-// ConfigPath returns .zqk/config/system_check_wake.json.
+// ConfigPath returns .zqk/agent-runtime/system_check_wake.json.
 func ConfigPath(projectRoot string) string {
-	return filepath.Join(projectRoot, paths.ProjectDataDir, paths.ConfigDir, ConfigFileName)
+	return paths.AgentRuntimeFile(projectRoot, ConfigFileName)
 }
 
 // LoadConfig reads optional overrides; missing file → DefaultConfig.

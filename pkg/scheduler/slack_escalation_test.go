@@ -27,7 +27,7 @@ func TestSlackEscalation_FunctionalAcceptance(t *testing.T) {
 
 	// 1. Test URL resolution priority and quote stripping
 	t.Run("resolve_from_agent_git_identity", func(t *testing.T) {
-		cfgDir := filepath.Join(tmpDir, paths.ProjectDataDir, paths.ConfigDir)
+		cfgDir := filepath.Join(tmpDir, paths.ProjectDataDir, paths.AgentRuntimeDir)
 		if err := fileutil.MkdirAll(cfgDir, paths.DirPerm755); err != nil {
 			t.Fatalf("failed to create config dir: %v", err)
 		}
@@ -49,7 +49,7 @@ ZQK_AGENT_WEBHOOK_SLACK_ALL_AGENT_FARM="https://hooks.slack.com/services/T00/B00
 
 	t.Run("resolve_from_escalation_json", func(t *testing.T) {
 		workDir := t.TempDir()
-		cfgDir := filepath.Join(workDir, paths.ProjectDataDir, paths.ConfigDir)
+		cfgDir := filepath.Join(workDir, paths.ProjectDataDir, paths.AgentRuntimeDir)
 		if err := fileutil.MkdirAll(cfgDir, paths.DirPerm755); err != nil {
 			t.Fatalf("failed to create config dir: %v", err)
 		}

@@ -427,7 +427,7 @@ func primaryPathForDescriptor(projectRoot string, d datacell.CellKindDescriptor)
 		// (same directory contract as datacell.FeatureFlagsPath; routed through [datacell.RuntimeOrganismMembraneReadPaths]).
 		ff := datacell.RuntimeOrganismMembraneReadPaths(projectRoot).FeatureFlagsPath()
 		if ff == "" {
-			return filepath.Join(projectRoot, paths.ProjectDataDir, paths.ConfigDir)
+			return filepath.Join(projectRoot, paths.ProjectDataDir, paths.AgentRuntimeDir)
 		}
 		return filepath.Dir(ff)
 	default:

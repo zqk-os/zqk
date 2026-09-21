@@ -3,7 +3,7 @@ $schema: "../schemas/command_spec.schema.json"
 name: "materialize-agent-chat-channel"
 short: "Materialize agent_chat_channel lite file from a CAS agent_feed"
 description: |
-  Reads an agent_feed (AGF-*) from CAS and writes `.zqk/config/agent_chat_channel.json`
+  Reads an agent_feed (AGF-*) from CAS and writes `.zqk/agent-runtime/agent_chat_channel.json`
   (enabled, delivery_mode, feed_id, contract_schema_version, path overrides, probe filters).
   Ensures the events JSONL parent directory exists.
 
