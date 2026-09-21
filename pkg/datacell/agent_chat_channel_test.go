@@ -23,6 +23,35 @@ func TestReadAgentChatChannelConfig_missingFile_defaults(t *testing.T) {
 	}
 }
 
+func TestReadAgentChatChannelConfig_reloadsWhenStampMoves(t *testing.T) {
+	t.Parallel()
+	root := t.TempDir()
+	if err := fileutil.MkdirAll(filepath.Join(root, paths.ProjectDataDir, paths.AgentRuntimeDir), paths.DirPerm755); err != nil {
+		t.Fatal(err)
+	}
+	first, err := ReadAgentChatChannelConfig(root)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if first.Enabled {
+		t.Fatal("expected disabled before file exists")
+	}
+	if err := WriteAgentChatChannelConfig(root, AgentChatChannelConfig{
+		SchemaVersion: AgentChatChannelSchemaVersion,
+		Enabled:       true,
+		DeliveryMode:  DeliveryModeNotify,
+	}); err != nil {
+		t.Fatal(err)
+	}
+	second, err := ReadAgentChatChannelConfig(root)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !second.Enabled || second.DeliveryMode != DeliveryModeNotify {
+		t.Fatalf("expected reload after write, got %#v", second)
+	}
+}
+
 func TestEnsureAgentChatChannelEventsDir(t *testing.T) {
 	t.Parallel()
 	root := t.TempDir()

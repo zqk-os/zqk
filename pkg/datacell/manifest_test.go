@@ -3,6 +3,7 @@ package datacell
 import (
 	"path/filepath"
 	"testing"
+	"time"
 
 	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
@@ -47,6 +48,40 @@ func TestReadRuntimeManifest_WithFile(t *testing.T) {
 	}
 	if got := EffectiveProtocolVersion(m); got != "9" {
 		t.Fatalf("EffectiveProtocolVersion = %q", got)
+	}
+}
+
+func TestReadRuntimeManifest_reloadsWhenStampMoves(t *testing.T) {
+	t.Parallel()
+	root := t.TempDir()
+	zqk := filepath.Join(root, paths.ProjectDataDir, paths.AgentRuntimeDir)
+	if err := fileutil.MkdirAll(zqk, paths.DirPerm755); err != nil {
+		t.Fatal(err)
+	}
+	p := filepath.Join(zqk, paths.DataCellRuntimeManifestFile)
+	if err := fileutil.WriteSecureFile(p, []byte(`{"protocol_version":"1"}`)); err != nil {
+		t.Fatal(err)
+	}
+	first, err := ReadRuntimeManifest(root)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if first.ProtocolVersion != "1" {
+		t.Fatalf("got %q", first.ProtocolVersion)
+	}
+	if err := fileutil.WriteSecureFile(p, []byte(`{"protocol_version":"2"}`)); err != nil {
+		t.Fatal(err)
+	}
+	later := time.Now().Add(2 * time.Second)
+	if err := fileutil.Chtimes(p, later, later); err != nil {
+		t.Fatal(err)
+	}
+	second, err := ReadRuntimeManifest(root)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if second.ProtocolVersion != "2" {
+		t.Fatalf("expected reload after stamp move, got %q", second.ProtocolVersion)
 	}
 }
 

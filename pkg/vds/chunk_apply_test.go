@@ -4,6 +4,7 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/zqk-os/zqk/pkg/paths"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
@@ -53,6 +54,47 @@ chunks:
 	}
 	if chunks[0].IndependentVerify != "yes" {
 		t.Fatalf("a=%q", chunks[0].IndependentVerify)
+	}
+}
+
+func TestLoadChunks_reloadsWhenStampMoves(t *testing.T) {
+	dir := t.TempDir()
+	path := filepath.Join(dir, "chunks.yaml")
+	write := func(claim string) {
+		t.Helper()
+		body := []byte(`schema: zqk_vds_chunks_v1
+chunks:
+  - chunk_id: a
+    stage: design
+    claim: ` + claim + `
+    rubric_ref: r
+    dsl_checks: [path_exists:x]
+    evidence_refs: [e]
+    independent_verify: pending
+`)
+		if err := fileutil.WriteFile(path, body, paths.FilePerm644); err != nil {
+			t.Fatal(err)
+		}
+	}
+	write("one")
+	first, err := LoadChunks(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if first[0].Claim != "one" {
+		t.Fatalf("got %q", first[0].Claim)
+	}
+	write("two")
+	later := time.Now().Add(2 * time.Second)
+	if err := fileutil.Chtimes(path, later, later); err != nil {
+		t.Fatal(err)
+	}
+	second, err := LoadChunks(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if second[0].Claim != "two" {
+		t.Fatalf("expected reload after stamp move, got %q", second[0].Claim)
 	}
 }
 

@@ -7,8 +7,11 @@ import (
 
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/stampmemo"
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
+
+var agentChatChannelConfigs stampmemo.Table[AgentChatChannelConfig] // keyed by projectRoot
 
 var errInvalidAgentChatChannelEventsPath = errfmt.Errorf("agent chat channel events path empty")
 
@@ -62,6 +65,16 @@ func DefaultAgentChatChannelConfig() AgentChatChannelConfig {
 // A missing file returns [DefaultAgentChatChannelConfig] with a nil error.
 func ReadAgentChatChannelConfig(projectRoot string) (AgentChatChannelConfig, error) {
 	p := AgentChatChannelConfigPath(projectRoot)
+	cfg, err := agentChatChannelConfigs.Load(projectRoot, stampmemo.Of(p), func() (AgentChatChannelConfig, error) {
+		return readAgentChatChannelConfig(p)
+	})
+	if err != nil {
+		return AgentChatChannelConfig{}, err
+	}
+	return cloneAgentChatChannelConfig(cfg), nil
+}
+
+func readAgentChatChannelConfig(p string) (AgentChatChannelConfig, error) {
 	b, err := fileutil.ReadFile(p)
 	if err != nil {
 		if fileutil.IsNotExist(err) {
@@ -79,6 +92,12 @@ func ReadAgentChatChannelConfig(projectRoot string) (AgentChatChannelConfig, err
 	return c, nil
 }
 
+func cloneAgentChatChannelConfig(c AgentChatChannelConfig) AgentChatChannelConfig {
+	c.ProbeToolAllowlist = append([]string(nil), c.ProbeToolAllowlist...)
+	c.ProbeCommandSubstrings = append([]string(nil), c.ProbeCommandSubstrings...)
+	return c
+}
+
 // WriteAgentChatChannelConfig writes the lite file to [AgentChatChannelConfigPath] with 0600.
 func WriteAgentChatChannelConfig(projectRoot string, c AgentChatChannelConfig) error {
 	p := AgentChatChannelConfigPath(projectRoot)
@@ -90,7 +109,11 @@ func WriteAgentChatChannelConfig(projectRoot string, c AgentChatChannelConfig) e
 		return err
 	}
 	b = append(b, '\n')
-	return fileutil.WriteSecureFile(p, b)
+	if err := fileutil.WriteSecureFile(p, b); err != nil {
+		return err
+	}
+	agentChatChannelConfigs.Delete(projectRoot)
+	return nil
 }
 
 // EffectiveAgentChatChannelEventsJSONLPath returns the JSONL path for events: override from lite config when set, else default alias path.
