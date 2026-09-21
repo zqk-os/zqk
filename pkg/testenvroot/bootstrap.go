@@ -2,40 +2,11 @@ package testenvroot
 
 import (
 	"path/filepath"
-	"sync"
 
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
-
-var cachedYAMLFilenames sync.Map // sourceDir (string) -> []string
-
-func getSourceYAMLFilenames(sourceDir string) ([]string, error) {
-	if cached, ok := cachedYAMLFilenames.Load(sourceDir); ok {
-		return cached.([]string), nil
-	}
-	if _, err := fileutil.Stat(sourceDir); fileutil.IsNotExist(err) {
-		return nil, errfmt.Errorf("source directory does not exist: %s", sourceDir)
-	}
-	entries, err := fileutil.ReadDir(sourceDir)
-	if err != nil {
-		return nil, errfmt.Newf("failed to read source directory").Wrap(err)
-	}
-	var files []string
-	for _, entry := range entries {
-		if entry.IsDir() {
-			continue
-		}
-		ext := filepath.Ext(entry.Name())
-		if ext != ".yaml" && ext != ".yml" {
-			continue
-		}
-		files = append(files, entry.Name())
-	}
-	cachedYAMLFilenames.Store(sourceDir, files)
-	return files, nil
-}
 
 // linkOrCopyYAML copies sourcePath to targetPath so tests cannot mutate repository schemas.
 func linkOrCopyYAML(sourcePath, targetPath string) error {

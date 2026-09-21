@@ -1,19 +1,16 @@
 package storage
 
 import (
-	"context"
 	"path/filepath"
 	"regexp"
-	"sync"
 	"time"
 
 	"gopkg.in/yaml.v3"
 
-	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/errfmt"
-	"github.com/zqk-os/zqk/pkg/loader"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/stampmemo"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -54,49 +51,46 @@ type BucketingConfig struct {
 }
 
 // BucketingConfigRegistry manages bucketing configurations per object kind.
-// Load uses the component loader pattern (pkg/loader) for consistent timeout and wait-for-completion behavior.
+// YAML is stamp-invalidated from .zqk/config/config.yaml.
 type BucketingConfigRegistry struct {
-	configs    map[string]*BucketingConfig
 	configPath string
-	runner     *loader.Runner
-	runnerOnce sync.Once
 }
+
+var bucketingConfigs stampmemo.Table[map[string]*BucketingConfig] // keyed by config path
 
 // NewBucketingConfigRegistry creates a new bucketing config registry
 func NewBucketingConfigRegistry(projectRoot string) *BucketingConfigRegistry {
 	configPath := filepath.Join(projectRoot, paths.ProjectDataDir, paths.ConfigDir, paths.ProjectConfigFile)
-	return &BucketingConfigRegistry{
-		configs:    make(map[string]*BucketingConfig),
-		configPath: configPath,
-	}
+	return &BucketingConfigRegistry{configPath: configPath}
 }
 
-// getRunner returns the shared loader.Runner for this registry (lazily created).
-func (bcr *BucketingConfigRegistry) getRunner() *loader.Runner {
-	bcr.runnerOnce.Do(func() {
-		bcr.runner = loader.NewRunner(ConstMiscBucketingConfig, func(ctx context.Context) error {
-			return bcr.doLoad(ctx)
-		})
-	})
-	return bcr.runner
-}
-
-// Load loads bucketing configurations from .zqk/config/config.yaml via the component loader pattern.
+// Load loads bucketing configurations from .zqk/config/config.yaml.
 func (bcr *BucketingConfigRegistry) Load() error {
-	return bcr.getRunner().Load(pkgctx.NewSystemContext())
+	_, err := bucketingConfigs.Load(bcr.configPath, stampmemo.Of(bcr.configPath), bcr.readConfigs)
+	if err != nil {
+		bucketingConfigs.Delete(bcr.configPath)
+	}
+	return err
 }
 
-// doLoad performs the actual I/O; called by loader.Runner.
-func (bcr *BucketingConfigRegistry) doLoad(_ context.Context) error {
-	// Check if config file exists
+func (bcr *BucketingConfigRegistry) kindConfigs() map[string]*BucketingConfig {
+	cfg, _ := bucketingConfigs.Load(bcr.configPath, stampmemo.Of(bcr.configPath), bcr.readConfigs)
+	if cfg == nil {
+		return map[string]*BucketingConfig{}
+	}
+	return cfg
+}
+
+func (bcr *BucketingConfigRegistry) readConfigs() (map[string]*BucketingConfig, error) {
+	out := make(map[string]*BucketingConfig)
 	if _, err := fileutil.Stat(bcr.configPath); fileutil.IsNotExist(err) {
-		bcr.setDefaults()
-		return nil
+		applyBucketingDefaults(out)
+		return out, nil
 	}
 
 	data, err := fileutil.ReadFile(bcr.configPath)
 	if err != nil {
-		return errfmt.Newf(ConstMiscFailedToReadConfigFile).Wrap(err)
+		return nil, errfmt.Newf(ConstMiscFailedToReadConfigFile).Wrap(err)
 	}
 
 	var config struct {
@@ -106,22 +100,19 @@ func (bcr *BucketingConfigRegistry) doLoad(_ context.Context) error {
 	}
 
 	if err := yaml.Unmarshal(data, &config); err != nil {
-		bcr.setDefaults()
-		return nil
+		applyBucketingDefaults(out)
+		return out, nil
 	}
 
 	for kind, cfg := range config.Storage.Bucketing {
 		configCopy := *cfg
-		bcr.configs[kind] = &configCopy
+		out[kind] = &configCopy
 	}
-
-	bcr.setDefaults()
-	return nil
+	applyBucketingDefaults(out)
+	return out, nil
 }
 
-// setDefaults sets default bucketing configurations
-func (bcr *BucketingConfigRegistry) setDefaults() {
-	// Default bucketing configurations
+func applyBucketingDefaults(configs map[string]*BucketingConfig) {
 	defaults := map[string]*BucketingConfig{
 		objects.KindAuditEvent: {
 			Strategy:          BucketingStrategyChronologicalMonthly,
@@ -137,18 +128,16 @@ func (bcr *BucketingConfigRegistry) setDefaults() {
 			Enabled:  true,
 		},
 	}
-
-	// Only set defaults if not already configured
 	for kind, cfg := range defaults {
-		if _, exists := bcr.configs[kind]; !exists {
-			bcr.configs[kind] = cfg
+		if _, exists := configs[kind]; !exists {
+			configs[kind] = cfg
 		}
 	}
 }
 
 // GetConfig returns the bucketing configuration for a kind
 func (bcr *BucketingConfigRegistry) GetConfig(kind string) *BucketingConfig {
-	if cfg, ok := bcr.configs[kind]; ok {
+	if cfg, ok := bcr.kindConfigs()[kind]; ok {
 		return cfg
 	}
 

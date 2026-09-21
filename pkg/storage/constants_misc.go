@@ -6,7 +6,6 @@ const (
 	ConstMiscFailedToMergeBatchResults                = "failed to merge batch results"
 	ConstMiscDefaultBlockingCheckBypassConfiguration  = "Default blocking check bypass configuration"
 	ConstMiscBlockingCheckConfigYaml                  = "blocking_check_config.yaml"
-	ConstMiscBucketingConfig                          = "bucketing_config"
 	ConstMiscFailedToReadConfigFile                   = "failed to read config file"
 	ConstMisc20060102t150405z                         = "2006-01-02T15:04:05Z"
 	ConstMisc20060102t1504                            = "2006-01-02T15:04"
