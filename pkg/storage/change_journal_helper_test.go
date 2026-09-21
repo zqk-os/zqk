@@ -25,6 +25,12 @@ func TestCreateChangeJournalEntryWithBuilder_LifetimeCounters(t *testing.T) {
 	}
 
 	defer func() { _ = fileStorage.Shutdown(context.Background()) }()
+	t.Cleanup(func() {
+		opts := TempProjectTeardown(tmpDir, fileStorage)
+		if err := RunProjectTestTeardown(opts); err != nil {
+			t.Logf("project test teardown: %v", err)
+		}
+	})
 
 	createdBefore, failedBefore := GetChangeJournalHelperStats()
 

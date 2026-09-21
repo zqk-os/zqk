@@ -306,6 +306,21 @@ func TestGetCriteriaIDByTitle_GraphBackend(t *testing.T) {
 
 	secCtx := pkgctx.NewSystemSecurityContext()
 	storageProvider := factory.GetStorage()
+	var fos *FileObjectStorage
+	if f, ok := storageProvider.(*FileObjectStorage); ok {
+		fos = f
+	}
+	defer func() {
+		if fos != nil {
+			_ = fos.Shutdown(context.Background())
+		}
+	}()
+	t.Cleanup(func() {
+		opts := TempProjectTeardown(testRoot, fos)
+		if err := RunProjectTestTeardown(opts); err != nil {
+			t.Logf("project test teardown: %v", err)
+		}
+	})
 
 	// Create a test criteria object with unique title
 	testCriteria := map[string]any{
