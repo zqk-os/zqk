@@ -2,12 +2,12 @@ package storage
 
 import (
 	"path/filepath"
-	"sync"
 
 	"gopkg.in/yaml.v3"
 
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/stampmemo"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"github.com/zqk-os/zqk/pkg/validation"
 )
@@ -91,10 +91,9 @@ type SystemLevelBlockingConfig struct {
 	BypassKinds []string `yaml:"bypass_kinds,omitempty"`
 }
 
-var (
-	globalBlockingCheckConfig     *BlockingCheckConfig
-	globalBlockingCheckConfigOnce sync.Once
-)
+const blockingCheckConfigKey = "global"
+
+var blockingCheckConfigs stampmemo.Table[*BlockingCheckConfig] // keyed "global"; stamp is the YAML file
 
 // LoadBlockingCheckConfig loads the blocking check configuration from file
 func LoadBlockingCheckConfig(configPath string) (*BlockingCheckConfig, error) {
@@ -125,15 +124,14 @@ func LoadBlockingCheckConfig(configPath string) (*BlockingCheckConfig, error) {
 
 // GetGlobalBlockingCheckConfig returns the singleton instance of the blocking check config
 func GetGlobalBlockingCheckConfig() *BlockingCheckConfig {
-	globalBlockingCheckConfigOnce.Do(func() {
-		config, err := LoadBlockingCheckConfig("")
-		if err != nil {
-			globalBlockingCheckConfig = getDefaultBlockingCheckConfig()
-		} else {
-			globalBlockingCheckConfig = config
-		}
+	path := findBlockingCheckConfig()
+	cfg, err := blockingCheckConfigs.Load(blockingCheckConfigKey, stampmemo.Of(path), func() (*BlockingCheckConfig, error) {
+		return LoadBlockingCheckConfig(path)
 	})
-	return globalBlockingCheckConfig
+	if err != nil || cfg == nil {
+		return getDefaultBlockingCheckConfig()
+	}
+	return cfg
 }
 
 // getDefaultBlockingCheckConfig returns default blocking check configuration
@@ -384,57 +382,7 @@ func (c *BlockingCheckConfig) GetBlockingValidationErrors(errors []validation.Va
 
 // findBlockingCheckConfig finds the blocking check config file
 func findBlockingCheckConfig() string {
-	cfg := filepath.Join(paths.ProcessInternalDir, ConstMiscBlockingCheckConfigYaml)
-	// Try standard locations
-	possiblePaths := []string{
-		cfg,
-		filepath.Join("..", cfg),
-		filepath.Join("..", "..", cfg),
-	}
-
-	wd, err := fileutil.Getwd()
-	if err != nil {
-		return ""
-	}
-
-	for _, path := range possiblePaths {
-		absPath := filepath.Join(wd, path)
-		if _, err := fileutil.Stat(absPath); err == nil {
-			return absPath
-		}
-	}
-
-	// Walk up directory tree looking for markers
-	dir := wd
-	markers := []string{paths.ProcessInternalDir, paths.ProjectDataDir, "go.mod"}
-
-	for {
-		// Check if this directory has a marker
-		hasMarker := false
-		for _, marker := range markers {
-			markerPath := filepath.Join(dir, marker)
-			if _, err := fileutil.Stat(markerPath); err == nil {
-				hasMarker = true
-				break
-			}
-		}
-
-		if hasMarker {
-			// Found project root, try the path from here
-			potentialPath := filepath.Join(dir, paths.ProcessInternalDir, paths.BlockingCheckConfigFile)
-			if _, err := fileutil.Stat(potentialPath); err == nil {
-				return potentialPath
-			}
-		}
-
-		parent := filepath.Dir(dir)
-		if parent == dir {
-			break
-		}
-		dir = parent
-	}
-
-	return ""
+	return paths.FirstExistingFromCwd(filepath.Join(paths.ProcessInternalDir, paths.BlockingCheckConfigFile))
 }
 
 // GetBypassKinds returns the list of kinds that bypass blocking checks
