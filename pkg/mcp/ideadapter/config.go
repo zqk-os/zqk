@@ -7,6 +7,7 @@ import (
 
 	"github.com/zqk-os/zqk/pkg/mcp"
 	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/stampmemo"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -30,6 +31,8 @@ type Config struct {
 type configFile struct {
 	IDEAdapter Config `yaml:"ide_adapter"`
 }
+
+var ideAdapterConfigs stampmemo.Table[Config] // keyed by projectRoot; stamp is .zqk/mcp/config.yaml
 
 // DefaultConfig returns studio-safe defaults for the IDE adapter.
 func DefaultConfig() Config {
@@ -55,8 +58,15 @@ func DefaultConfig() Config {
 // LoadConfig loads ide_adapter from the MCP config file (same path as the daemon).
 // Missing file or section yields defaults.
 func LoadConfig(projectRoot string) Config {
-	cfg := DefaultConfig()
 	path := paths.MCPConfigPath(projectRoot)
+	cfg, _ := ideAdapterConfigs.Load(projectRoot, stampmemo.Of(path), func() (Config, error) {
+		return readIDEAdapterConfig(path), nil
+	})
+	return cfg
+}
+
+func readIDEAdapterConfig(path string) Config {
+	cfg := DefaultConfig()
 	data, err := fileutil.ReadFile(path)
 	if err != nil {
 		return cfg

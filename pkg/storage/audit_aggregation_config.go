@@ -10,8 +10,11 @@ import (
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/stampmemo"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
+
+var aggregationConfigs stampmemo.Table[AuditAggregationConfig] // keyed by projectRoot; stamp is config.yaml
 
 // AuditAggregationConfig represents the audit aggregation configuration
 type AuditAggregationConfig struct {
@@ -34,7 +37,18 @@ type aggregationRuleYAML struct {
 // LoadAggregationConfig loads audit aggregation configuration from .zqk/config/config.yaml
 func LoadAggregationConfig(projectRoot string) (*AuditAggregationConfig, error) {
 	configPath := filepath.Join(projectRoot, paths.ProjectDataDir, paths.ConfigDir, paths.ProjectConfigFile)
+	cfg, err := aggregationConfigs.Load(projectRoot, stampmemo.Of(configPath), func() (AuditAggregationConfig, error) {
+		parsed, loadErr := readAggregationConfig(configPath)
+		if parsed == nil {
+			return AuditAggregationConfig{}, loadErr
+		}
+		return *parsed, loadErr
+	})
+	out := cfg
+	return &out, err
+}
 
+func readAggregationConfig(configPath string) (*AuditAggregationConfig, error) {
 	// Check if config file exists
 	if _, err := fileutil.Stat(configPath); fileutil.IsNotExist(err) {
 		// No config file - return defaults
