@@ -57,6 +57,7 @@ func TestInit_Greenfield_StarterKernelGraph(t *testing.T) {
 		objects.KindPriorityPlan,
 		objects.KindRequirement,
 		objects.KindCriteria,
+		objects.KindTestCase,
 		objects.KindBacklogItem,
 	}
 

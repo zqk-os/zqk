@@ -32,11 +32,12 @@ The project is stewarded by the **Technical Steering Committee (TSC)**, comprise
 
 ---
 
-## 3. Open-Core Boundary & Licensing
+## 3. Open-Core Boundary & Studio Architecture
 
-- **Community Edition (Open-Core)**: Licensed under the **Apache License 2.0** (`LICENSE` + `NOTICE`). Includes the core CLI runtime, Knowledge Kernel, scheduler, ambient daemons, MCP bridge, and showcase suites.
-- **Enterprise & Studio Extensions**: Proprietary features (such as hosted multi-tenant cloud orchestration, specialized enterprise compliance packs, and proprietary model fine-tunes) are cleanly isolated outside the public community distribution.
-- **Export Gate Compliance**: The codebase is continuously audited by `./bin/zqk system export-gate` to guarantee zero proprietary leakage into public candidate trees.
+- **Canonical Open-Core Foundation**: ZQK Core is the canonical, un-bifurcated system kernel. To avoid code bifurcation and the maintenance overhead of bidirectional syncs, ZQK Studio pulls ZQK Core in directly as an upstream dependency.
+- **Licensing**: ZQK Core is licensed under the **Apache License 2.0** (`LICENSE` + `NOTICE`). It includes the complete core CLI runtime, Knowledge Kernel, scheduler, ambient daemons, MCP bridge, and showcase suites.
+- **Enterprise & Studio Extensions**: Proprietary features (such as hosted multi-tenant cloud orchestration, specialized enterprise compliance packs, and proprietary model fine-tunes) are cleanly layered on top of Core within Studio. Core remains hermetic, self-contained, and free of downstream Studio assumptions, studio-only scripts, or proprietary dependencies.
+- **Release Gate Compliance**: The codebase is continuously audited by `./scripts/open-core/test-public-release-gates.sh` and `./scripts/open-core/check-public-release-payload.sh` to guarantee self-contained execution and zero proprietary leakage.
 
 ---
 

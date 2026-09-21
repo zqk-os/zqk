@@ -59,7 +59,10 @@ func TestPoliceAndPayloadGates(t *testing.T) {
 		t.Fatalf("police-community-tree.sh did not output POLICE: PASS: %s", string(outPolice))
 	}
 
-	payloadScript := filepath.Join(root, "scripts", "check-public-release-payload.sh")
+	payloadScript := filepath.Join(root, "scripts", "open-core", "check-public-release-payload.sh")
+	if !fileutil.Exists(payloadScript) {
+		payloadScript = filepath.Join(root, "scripts", "check-public-release-payload.sh")
+	}
 	cmdPayload := execwrap.Command("sh", payloadScript, candidateDir)
 	cmdPayload.Env = append(cmdPayload.Environ(), "ALLOW_STUDIO_IDS=1")
 	outPayload, errPayload := cmdPayload.CombinedOutput()

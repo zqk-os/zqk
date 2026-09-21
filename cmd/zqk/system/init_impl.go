@@ -171,21 +171,19 @@ func runInit(_ *cobra.Command, projectName, template string, force bool, snapsho
 			Log()
 	}
 
-	// Seed curated default policy pack ([REDACTED-ID] / [REDACTED-ID])
-	if !legacy {
-		if _, err := SeedDefaultPolicyPack(projectRoot, logger); err != nil {
-			logging.Fluent(logger).Warn("Failed to seed default policy pack").
-				WithError(err).
-				String(initLogFieldNote, "Run again after fixing storage, or create policies manually from scripts/default_policies").
-				Log()
-		}
-		// Community default personas + feed skill so emit-status --persona-ref works out of the gate.
-		if _, err := SeedDefaultAgentSeatingPack(projectRoot, logger); err != nil {
-			logging.Fluent(logger).Warn("Failed to seed default agent seating pack").
-				WithError(err).
-				String(initLogFieldNote, "Run again after fixing storage, or create personas/skills from scripts/default_personas and scripts/default_agent_skills").
-				Log()
-		}
+	// Seed curated default policy pack
+	if _, err := SeedDefaultPolicyPack(projectRoot, logger); err != nil {
+		logging.Fluent(logger).Warn("Failed to seed default policy pack").
+			WithError(err).
+			String(initLogFieldNote, "Run again after fixing storage, or create policies manually from scripts/default_policies").
+			Log()
+	}
+	// Community default personas + feed skill so emit-status --persona-ref works out of the gate.
+	if _, err := SeedDefaultAgentSeatingPack(projectRoot, logger); err != nil {
+		logging.Fluent(logger).Warn("Failed to seed default agent seating pack").
+			WithError(err).
+			String(initLogFieldNote, "Run again after fixing storage, or create personas/skills from scripts/default_personas and scripts/default_agent_skills").
+			Log()
 	}
 
 	// Seed kernel declarative answer file if provided (--answer-file)
@@ -516,6 +514,10 @@ func runLegacyInit(projectRoot, projectName, template string, force bool, logger
 	// Create system account if missing
 	if err := writeSystemAccount(projectRoot); err != nil {
 		logging.Fluent(logger).Warn("Failed to create system account").WithError(err).Log()
+	}
+
+	if err := seedStarterKernelGraph(projectRoot, logger); err != nil {
+		logging.Fluent(logger).Warn("Failed to seed starter kernel graph").WithError(err).Log()
 	}
 
 	// Create zqk-settings.yaml in project root and config dir
@@ -1216,7 +1218,7 @@ ZQK enforces strict architectural determinism. As an AI agent, you may occasiona
 - **Summary-as-Terminal Failure Mode Prohibition:** In the autonomous CAP loop, merging a PR, promoting binaries, or rendering an artifact summary is a MILESTONE TRANSITION, NOT a stopping condition.
 - **NEVER yield control or go idle at summary milestones.** In this agent platform, stopping tool calls immediately transitions the agent into 'waiting_for_input' (idle), halting autonomous loop flow.
 - **Strict Post-Merge Self-Continuation Protocol:**
-  1. Merge PR & promote stable binary ('./scripts/install-zqk-stable.sh --build --force && ./scripts/recycle-stable-daemons.sh').
+  1. Merge PR & promote stable binary ('./scripts/install.sh && ./bin/zqk mcp restart').
   2. Query './bin/zqk workflow whats-next'.
   3. Immediately create/checkout the next integration branch ('git checkout -b integration/<pri-id> origin/main').
   4. Claim or shape the first BLI ('zqk agent claim-work ...' or kernel object creation).

@@ -183,8 +183,11 @@ func TestReleaseSecurity_IntegrationAndConformance(t *testing.T) {
 		t.Errorf("NOTICE file missing or empty at %s", noticePath)
 	}
 
-	// Verify scripts/check-public-release-payload.sh exists and is executable
-	gateScript := filepath.Join(projectRoot, "scripts", "check-public-release-payload.sh")
+	// Verify check-public-release-payload.sh exists and is executable
+	gateScript := filepath.Join(projectRoot, "scripts", "open-core", "check-public-release-payload.sh")
+	if !fileutil.Exists(gateScript) {
+		gateScript = filepath.Join(projectRoot, "scripts", "check-public-release-payload.sh")
+	}
 	info, err := fileutil.Stat(gateScript)
 	if err != nil {
 		t.Fatalf("gate script %s missing: %v", gateScript, err)

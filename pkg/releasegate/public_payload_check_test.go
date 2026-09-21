@@ -45,7 +45,10 @@ func TestPublicPayloadCheck_FunctionalAcceptance(t *testing.T) {
 
 	// 2. Shell payload check script
 	root := findModuleRoot(t)
-	script := filepath.Join(root, "scripts", "check-public-release-payload.sh")
+	script := filepath.Join(root, "scripts", "open-core", "check-public-release-payload.sh")
+	if !fileutil.Exists(script) {
+		script = filepath.Join(root, "scripts", "check-public-release-payload.sh")
+	}
 	if !fileutil.Exists(script) {
 		t.Fatalf("check-public-release-payload.sh not found at %s", script)
 	}
@@ -75,7 +78,10 @@ func TestPublicPayloadCheck_FunctionalAcceptance(t *testing.T) {
 // instance data, long studio IDs, and sensitive secrets (CRIT-1789626190967620000-74dcba74).
 func TestPublicPayloadCheck_BoundaryAndErrorHandling(t *testing.T) {
 	root := findModuleRoot(t)
-	script := filepath.Join(root, "scripts", "check-public-release-payload.sh")
+	script := filepath.Join(root, "scripts", "open-core", "check-public-release-payload.sh")
+	if !fileutil.Exists(script) {
+		script = filepath.Join(root, "scripts", "check-public-release-payload.sh")
+	}
 	if !fileutil.Exists(script) {
 		t.Fatalf("check-public-release-payload.sh not found at %s", script)
 	}
@@ -154,18 +160,23 @@ func TestPublicPayloadCheck_IntegrationAndConformance(t *testing.T) {
 	}
 
 	root := findModuleRoot(t)
-	script := filepath.Join(root, "scripts", "test-public-push-gate-failclosed.sh")
+	script := filepath.Join(root, "scripts", "open-core", "test-public-release-gates.sh")
+	banner := "PUBLIC RELEASE GATES: PASS"
 	if !fileutil.Exists(script) {
-		t.Fatalf("test-public-push-gate-failclosed.sh not found at %s", script)
+		script = filepath.Join(root, "scripts", "test-public-push-gate-failclosed.sh")
+		banner = "All Public Push Fail-Closed Checks PASSED"
+	}
+	if !fileutil.Exists(script) {
+		t.Fatalf("release gate script not found at %s", script)
 	}
 
-	cmd := execwrap.Command("bash", script)
+	cmd := execwrap.Command("sh", script, "--payload-only", root)
 	cmd.Dir = root
 	out, err := cmd.CombinedOutput()
 	if err != nil {
-		t.Fatalf("test-public-push-gate-failclosed.sh failed: %v\nOutput:\n%s", err, string(out))
+		t.Fatalf("release gate script failed: %v\nOutput:\n%s", err, string(out))
 	}
-	if !strings.Contains(string(out), "All Public Push Fail-Closed Checks PASSED") {
-		t.Errorf("expected success banner, got:\n%s", string(out))
+	if !strings.Contains(string(out), banner) {
+		t.Errorf("expected success banner (%s), got:\n%s", banner, string(out))
 	}
 }

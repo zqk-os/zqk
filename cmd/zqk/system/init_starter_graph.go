@@ -82,7 +82,8 @@ title: First-run produces a complete executable graph
 narrative: "A stranger runs system init and immediately has organization, mission, vision, goal, workstream, priority_plan, and a requirement with criteria/tests/backlog — seated as the system account, not a test harness."
 description: "Desired end state for community first-run: whats-next has a real plan because the starter graph exists."
 status: active
-mission_ref: MIS-STARTER-COMMUNITY-001
+mission_refs:
+  - MIS-STARTER-COMMUNITY-001
 created_by: %s
 updated_by: %s
 created_at: %s
@@ -189,7 +190,34 @@ title: Community kernel starter graph and documentation verified
 description: Verify that community repository possesses a complete starter graph with linked objects and valid whats-next execution plan.
 priority: critical
 validation_method: automated_test
-status: validated
+status: awaiting_verification
+test_case_refs:
+  - TST-STARTER-COMMUNITY-001
+created_by: %s
+updated_by: %s
+created_at: %s
+updated_at: %s
+`, accID, accID, now, now),
+		},
+		{
+			kind: objects.KindTestCase,
+			id:   "TST-STARTER-COMMUNITY-001",
+			content: fmt.Sprintf(`id: TST-STARTER-COMMUNITY-001
+kind: test_case
+schema_version: 2.0.0
+namespace_id: zqk:kernel
+title: Automated verification of community starter graph
+description: Verify that community repository possesses a complete starter graph with linked objects and valid whats-next execution plan.
+category: Integration
+status: active
+priority: critical
+path_or_id: cmd/zqk/system/init_starter_graph_test.go:TestSeedStarterKernelGraph
+requirement_refs:
+  - REQ-STARTER-COMMUNITY-001
+criteria_refs:
+  - CRIT-STARTER-COMMUNITY-001
+backlog_item_refs:
+  - BLI-STARTER-COMMUNITY-001
 created_by: %s
 updated_by: %s
 created_at: %s
@@ -216,6 +244,8 @@ requirement_refs:
   - REQ-STARTER-COMMUNITY-001
 criteria_refs:
   - CRIT-STARTER-COMMUNITY-001
+test_case_refs:
+  - TST-STARTER-COMMUNITY-001
 goal_refs:
   - GOAL-STARTER-COMMUNITY-001
 workstream_refs:
@@ -236,13 +266,11 @@ updated_at: %s
 			return err
 		}
 		cas := filecas.NewContentAddressableStorage(dir, spec.kind)
-		// If objects already exist in this kind, preserve idempotency
-		existingIDs, err := cas.ListIDs()
-		if err == nil && len(existingIDs) > 0 {
-			continue
-		}
-		if hash, err := cas.GetIndex().GetHash(spec.id); err == nil && hash != "" {
-			continue
+		// If object file already exists on disk, preserve idempotency
+		if filePath, err := cas.GetFilePathForID(spec.id); err == nil && filePath != "" {
+			if _, statErr := fileutil.Stat(filePath); statErr == nil {
+				continue
+			}
 		}
 		if err := cas.Create(spec.id, []byte(spec.content)); err != nil {
 			logging.Fluent(logger).Warn("Failed to create starter kernel object").

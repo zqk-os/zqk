@@ -92,7 +92,7 @@ func processAlive(pid int) bool {
 
 // resolveMCPDaemonBinPath chooses the binary used to spawn `mcp daemon` / ensure.
 // Workshop runtime hangs off stable so tip rebuilds (bin/zqk) cannot split-brain
-// MCP vs scheduler. Promote tip→stable intentionally via install-zqk-stable.sh.
+// MCP vs scheduler. Promote tip→stable intentionally via scripts/install.sh.
 // Override with ZQK_BIN. Fall back: workshop/repo stable → tip bin/zqk → executable.
 // one operational inode for long-lived procs.
 func resolveMCPDaemonBinPath(projectRoot string) string {

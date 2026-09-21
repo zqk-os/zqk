@@ -16,7 +16,7 @@ func NewMcpEnsureCommandBuilder() *cobra.Command {
 	help.WithDescriptionLines("Starts the TCP MCP daemon if nothing is listening on --tcp.")
 	help.WithDescriptionLines("Prefers ZQK_BIN, then workshop/repo stable (`.zqk/bin/zqk-stable`, `bin/zqk-stable`),")
 	help.WithDescriptionLines("then tip `bin/zqk`, then the current executable. Tip rebuilds must not retarget the")
-	help.WithDescriptionLines("daemon — promote via `scripts/install-zqk-stable.sh` then restart.")
+	help.WithDescriptionLines("daemon — promote via `./scripts/install.sh` then restart.")
 	help.WithDescriptionLines("Always refreshes IDE role symlinks (bin/<brand>-mcp-daemon and")
 	help.WithDescriptionLines("bin/<brand>-mcp-ide-adapter) so Cursor mcp.json survives tip rebuilds.")
 	help.WithDescriptionLines("Spawns via the daemon role symlink so process lists show the daemon role.")

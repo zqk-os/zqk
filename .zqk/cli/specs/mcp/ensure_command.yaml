@@ -6,7 +6,7 @@ description: |
   Starts the TCP MCP daemon if nothing is listening on --tcp.
   Prefers ZQK_BIN, then workshop/repo stable (`.zqk/bin/zqk-stable`, `bin/zqk-stable`),
   then tip `bin/zqk`, then the current executable. Tip rebuilds must not retarget the
-  daemon — promote via `scripts/install-zqk-stable.sh` then restart.
+  daemon — promote via `./scripts/install.sh` then restart.
   Always refreshes IDE role symlinks (bin/<brand>-mcp-daemon and
   bin/<brand>-mcp-ide-adapter) so Cursor mcp.json survives tip rebuilds.
   Spawns via the daemon role symlink so process lists show the daemon role.

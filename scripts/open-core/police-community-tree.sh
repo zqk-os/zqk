@@ -118,6 +118,17 @@ if [ -f "$ROOT/.gitignore" ]; then
   done
 fi
 
+# Studio script bleedthrough prohibition: Open-Core must never reference studio-only scripts.
+for bad_script in 'install-zqk-stable\.sh' 'recycle-stable-daemons\.sh' 'declare-change-intent\.sh' 'check-change-intent\.sh'; do
+  if [ -d "$ROOT/.git" ] && command -v git >/dev/null 2>&1; then
+    if git -C "$ROOT" grep -n -E "$bad_script" -- . ':!scripts/open-core/police-community-tree.sh' >/dev/null 2>&1; then
+      echo "MUST_NOT studio script reference found ($bad_script):"
+      git -C "$ROOT" grep -n -E "$bad_script" -- . ':!scripts/open-core/police-community-tree.sh' || true
+      FAIL=1
+    fi
+  fi
+done
+
 if [ "$FAIL" -ne 0 ]; then
   echo "POLICE: FAIL"
   exit 1
