@@ -189,6 +189,7 @@ type brandFileHit struct {
 	root     string
 }
 
+// brandFiles is keyed by the settings file path. Stamp is that file.
 var brandFiles stampmemo.Table[brandFileHit]
 
 // LoadBrandSettingsFromFile loads brand settings from an explicit settings file path and returns

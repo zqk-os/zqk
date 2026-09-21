@@ -30,6 +30,7 @@ type MockAccumulator struct {
 	name         string
 	itemStatuses map[string]string
 	scanCount    uint32
+	scanBlockCh  chan struct{}
 }
 
 func NewMockAccumulator(name string) *MockAccumulator {
@@ -93,6 +94,13 @@ func (m *MockAccumulator) BuildPayload() SamplePayload {
 }
 
 func (m *MockAccumulator) ScanFromStorage(ctx context.Context, sp storage.ObjectStorageProvider) error {
+	if m.scanBlockCh != nil {
+		select {
+		case <-m.scanBlockCh:
+		case <-ctx.Done():
+			return ctx.Err()
+		}
+	}
 	atomic.AddUint32(&m.scanCount, 1)
 	m.mu.Lock()
 	defer m.mu.Unlock()
@@ -306,6 +314,9 @@ func TestAccumulator_StalenessCircuitBreaker(t *testing.T) {
 func TestAccumulator_DebounceConcurrency(t *testing.T) {
 	tmpDir := t.TempDir()
 	acc := NewMockAccumulator("debounce_test")
+	blockCh := make(chan struct{})
+	acc.scanBlockCh = blockCh
+	defer close(blockCh)
 
 	engine, err := NewBuilder[SamplePayload](acc).
 		WithProjectRoot(tmpDir).

@@ -7,7 +7,9 @@ type viewHit[T any] struct {
 	val T
 }
 
-// View retains a parsed projection of a byte slice until the backing array changes.
+// View retains a parsed projection of a byte slice until the backing array
+// changes. Keys are unbounded like Table — use a closed identity, not a new
+// key per payload generation.
 type View[T any] struct {
 	m sync.Map
 }

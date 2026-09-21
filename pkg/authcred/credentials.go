@@ -10,6 +10,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
+// credTokens is keyed by credentials path. Stamp is that file.
 var credTokens stampmemo.Table[string]
 
 // ResolveCredentialPath picks the credentials file for AuthMiddleware.

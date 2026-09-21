@@ -16,6 +16,7 @@ type AuthStrategyRecord struct {
 	Status  string
 }
 
+// authStrategyRecords is keyed by project root. Stamp is the auth-strategy YAML dir.
 var authStrategyRecords stampmemo.Table[[]AuthStrategyRecord]
 
 // ListAuthStrategyRecords returns parsed auth_strategy YAML for projectRoot.

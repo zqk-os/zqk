@@ -25,6 +25,7 @@ type accountPersonaFields struct {
 	Permissions []string `yaml:"permissions"`
 }
 
+// activeAccounts is keyed by project root. Stamp is the account YAML dir.
 var activeAccounts stampmemo.Table[[]accountPersonaFields]
 
 // CanonicalAccountID resolves ACC-* passthrough or legacy account:username → ACC-*.

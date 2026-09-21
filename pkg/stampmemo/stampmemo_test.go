@@ -43,6 +43,25 @@ func TestOf_missingIsZero(t *testing.T) {
 	}
 }
 
+func TestTable_ResetDropsMemo(t *testing.T) {
+	var loads int
+	var tab Table[string]
+	load := func() (string, error) {
+		loads++
+		return "v", nil
+	}
+	if _, err := tab.Load("k", 1, load); err != nil || loads != 1 {
+		t.Fatalf("first loads=%d err=%v", loads, err)
+	}
+	if _, err := tab.Load("k", 1, load); err != nil || loads != 1 {
+		t.Fatalf("hit loads=%d err=%v", loads, err)
+	}
+	tab.Reset()
+	if _, err := tab.Load("k", 1, load); err != nil || loads != 2 {
+		t.Fatalf("after reset loads=%d err=%v", loads, err)
+	}
+}
+
 func TestView_reusesUntilBackingChanges(t *testing.T) {
 	raw := []byte("id: ACC-1\n")
 	var views View[string]

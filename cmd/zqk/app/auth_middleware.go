@@ -14,6 +14,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/stampmemo"
 	"github.com/zqk-os/zqk/pkg/storage"
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"github.com/zqk-os/zqk/pkg/zqkenv"
@@ -86,41 +87,11 @@ func AuthMiddleware(cmd *cobra.Command, projectRoot string) error {
 	}
 
 	if authcred.LooksLikeSessionToken(accountID) {
-		sp, err := cli.GetObjectStorageForCommand(cmd, projectRoot)
-		if err != nil || sp == nil {
-			return errfmt.Errorf("unauthorized: storage not available to validate session: %v", err)
+		acc, err := resolveSessionAccountID(ctx, cmd, projectRoot, accountID)
+		if err != nil {
+			return err
 		}
-		systemSecCtx := pkgctx.NewSystemSecurityContext()
-		sessionID := accountID
-		var explicitPersona string
-		if idx := strings.Index(sessionID, "|"); idx != -1 {
-			explicitPersona = sessionID[idx:]
-			sessionID = sessionID[:idx]
-		}
-		sessionObj, readErr := sp.Read(ctx, systemSecCtx, sessionID)
-		if readErr != nil {
-			if errors.Is(readErr, storage.ErrObjectNotFound) {
-				// Cursor/MCP often inherit a dead ZQK-* session stuffed into
-				// ~/.zqk/credentials or ZQK_API_KEY; fall back to persisted file.
-				if fileSID := strings.TrimSpace(ReadPersistedSessionID(projectRoot)); fileSID != "" && fileSID != sessionID {
-					if retry, err2 := sp.Read(ctx, systemSecCtx, fileSID); err2 == nil {
-						sessionObj = retry
-						readErr = nil
-					}
-				}
-			}
-			if readErr != nil {
-				if errors.Is(readErr, storage.ErrObjectNotFound) {
-					return errfmt.Errorf("unauthorized: session %s not found", sessionID)
-				}
-				return errfmt.Errorf("unauthorized: session %s not found: %w", sessionID, readErr)
-			}
-		}
-		if accID, exists := sessionObj[objects.FieldKeyAccountID].(string); exists && accID != "" {
-			accountID = accID + explicitPersona
-		} else {
-			return errfmt.Errorf("unauthorized: session %s has no account_id", sessionID)
-		}
+		accountID = acc
 	} else if authcred.LooksLikeIssuedSecret(accountID) {
 		// POL-AGENT-API-KEY-001: opaque secrets resolve via keystore fingerprint.
 		match, resolveErr := authcred.ResolveSecret(projectRoot, accountID)
@@ -141,6 +112,74 @@ func AuthMiddleware(cmd *cobra.Command, projectRoot string) error {
 	authcred.WriteIdentityStatus(projectRoot, authcred.SnapshotFromSecurityContext(secCtx, nil))
 
 	return nil
+}
+
+type sessionAccountHit struct {
+	sessionID string
+	accountID string
+}
+
+// sessionAccounts is keyed by project root (one live token per project).
+// Session ids live in the value, not the key — an unbounded ZS-/ZQK-* stream
+// would leak in a long-lived MCP daemon. See pkg/stampmemo.
+var sessionAccounts stampmemo.Table[sessionAccountHit]
+
+func resolveSessionAccountID(ctx context.Context, cmd *cobra.Command, projectRoot, token string) (string, error) {
+	sessionID := token
+	var explicitPersona string
+	if idx := strings.Index(sessionID, "|"); idx != -1 {
+		explicitPersona = sessionID[idx:]
+		sessionID = sessionID[:idx]
+	}
+	stamp := stampmemo.OfAll(
+		paths.SessionStatePath(projectRoot),
+		authcred.ResolveCredentialPath(projectRoot),
+	)
+	load := func() (sessionAccountHit, error) {
+		accID, err := readSessionAccountID(ctx, cmd, projectRoot, sessionID)
+		if err != nil {
+			return sessionAccountHit{}, err
+		}
+		return sessionAccountHit{sessionID: sessionID, accountID: accID}, nil
+	}
+	hit, err := sessionAccounts.Load(projectRoot, stamp, load)
+	if err == nil && hit.sessionID != sessionID {
+		sessionAccounts.Delete(projectRoot)
+		hit, err = sessionAccounts.Load(projectRoot, stamp, load)
+	}
+	if err != nil {
+		return "", err
+	}
+	return hit.accountID + explicitPersona, nil
+}
+
+func readSessionAccountID(ctx context.Context, cmd *cobra.Command, projectRoot, sessionID string) (string, error) {
+	sp, err := cli.GetObjectStorageForCommand(cmd, projectRoot)
+	if err != nil || sp == nil {
+		return "", errfmt.Errorf("unauthorized: storage not available to validate session: %v", err)
+	}
+	systemSecCtx := pkgctx.NewSystemSecurityContext()
+	sessionObj, readErr := sp.Read(ctx, systemSecCtx, sessionID)
+	if readErr != nil {
+		if errors.Is(readErr, storage.ErrObjectNotFound) {
+			if fileSID := strings.TrimSpace(ReadPersistedSessionID(projectRoot)); fileSID != "" && fileSID != sessionID {
+				if retry, err2 := sp.Read(ctx, systemSecCtx, fileSID); err2 == nil {
+					sessionObj = retry
+					readErr = nil
+				}
+			}
+		}
+		if readErr != nil {
+			if errors.Is(readErr, storage.ErrObjectNotFound) {
+				return "", errfmt.Errorf("unauthorized: session %s not found", sessionID)
+			}
+			return "", errfmt.Errorf("unauthorized: session %s not found: %w", sessionID, readErr)
+		}
+	}
+	if accID, exists := sessionObj[objects.FieldKeyAccountID].(string); exists && accID != "" {
+		return accID, nil
+	}
+	return "", errfmt.Errorf("unauthorized: session %s has no account_id", sessionID)
 }
 
 func resolveSecurityContext(projectRoot string, rawAccountID string) (*pkgctx.SecurityContext, error) {

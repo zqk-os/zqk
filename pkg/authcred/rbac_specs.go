@@ -9,6 +9,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/stampmemo"
 )
 
+// rbacSpecs is keyed by project root. Stamp is the account+role spec files.
 var rbacSpecs stampmemo.Table[struct{}]
 
 // RequireRBACSpecs reports whether account and role object specs exist (flat or domain bucket).

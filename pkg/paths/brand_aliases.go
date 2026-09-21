@@ -26,6 +26,7 @@ type brandSettingsAliasesFile struct {
 	} `yaml:"kernel_state"`
 }
 
+// parsedBrandFiles is keyed by the settings file path (one per root). Stamp is that file.
 var parsedBrandFiles stampmemo.Table[[]brandSettingsAliasesFile]
 
 func configCandidates(projectRoot string) []string {

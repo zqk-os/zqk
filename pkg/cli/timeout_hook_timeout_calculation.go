@@ -216,6 +216,7 @@ func (h *TimeoutHook) getTimeoutForCommand(normalizedCmd string, args []string) 
 
 // loadCommandTimeoutsConfig reads the effective command_timeouts.yaml: project-level override
 // (.zqk/config/) takes precedence over repo default (config/). Returns nil if neither is found.
+// commandTimeouts is keyed by project root. Stamp is the timeouts YAML pair.
 var commandTimeouts stampmemo.Table[*commandTimeoutsConfig]
 
 func (h *TimeoutHook) loadCommandTimeoutsConfig() *commandTimeoutsConfig {

@@ -21,7 +21,7 @@ func NewAgentSyncLoopCommandBuilder() *cobra.Command {
 	help.ExcludeFlag("columns")
 	help.ExcludeFlag("ignore-scheduler-down")
 	builder.WithHelpBuilder(help)
-	builder.WithArgs(cobra.NoArgs)
+	builder.WithArgs(cobra.MaximumNArgs(1))
 	builder.WithCommonFlagsExcluding(cli.AddCommonFlagsExcluding, []string{"columns", "ignore-scheduler-down"})
 	cmd := builder.Build()
 	return cmd

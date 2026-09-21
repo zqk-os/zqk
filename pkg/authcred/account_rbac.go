@@ -10,6 +10,7 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+// boundAccounts is keyed by account id (closed ACC-* catalog). Backing bytes are the generation.
 var boundAccounts stampmemo.View[BoundAccount]
 
 // BoundAccount is the RBAC slice of an ACC-* object needed at auth time.

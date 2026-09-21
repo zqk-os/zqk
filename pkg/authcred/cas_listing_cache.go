@@ -25,6 +25,7 @@ type listingValue struct {
 	files    map[string]listingFile
 }
 
+// listingIndexes is keyed by listing-index path. Stamp is that file.
 var listingIndexes stampmemo.Table[*listingValue]
 
 type listingIndexFile struct {

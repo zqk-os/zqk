@@ -14,6 +14,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
+// identityFP is keyed by identity-status path (one per project). Not per command.
 var identityFP stampmemo.Fingerprints
 
 // Identity snapshot schema (lite file, not CAS).

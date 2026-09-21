@@ -3,6 +3,7 @@ package stampmemo
 import "sync"
 
 // Fingerprints skips a side effect when the payload fingerprint is unchanged.
+// Same key-space rule as Table: one stable key per destination, not per write.
 type Fingerprints struct {
 	m sync.Map
 }

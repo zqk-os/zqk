@@ -92,6 +92,7 @@ type roleFile struct {
 	Permissions []string `yaml:"permissions"`
 }
 
+// roleRecords is keyed by project root. Stamp is the role YAML dir.
 var roleRecords stampmemo.Table[[]RoleRecord]
 
 func loadRoleRecords(projectRoot string) []RoleRecord {

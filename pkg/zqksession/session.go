@@ -16,6 +16,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/paths"
 	enumzqksession "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/zqk_session"
 	"github.com/zqk-os/zqk/pkg/specbuilder/bldr_instance_v1"
+	"github.com/zqk-os/zqk/pkg/stampmemo"
 	"github.com/zqk-os/zqk/pkg/storage"
 	idgen "github.com/zqk-os/zqk/pkg/storage/id_generation"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
@@ -244,8 +245,11 @@ func sessionStateDir(projectRoot string) string {
 }
 
 func sessionStatePath(projectRoot string) string {
-	return filepath.Join(sessionStateDir(projectRoot), paths.SessionStateFile)
+	return paths.SessionStatePath(projectRoot)
 }
+
+// persistedIDs is keyed by project root (one live CLI session file per project).
+var persistedIDs stampmemo.Table[string]
 
 func sessionLockPath(projectRoot string) string {
 	return filepath.Join(sessionStateDir(projectRoot), sessionLockFile)
@@ -259,22 +263,24 @@ func readSessionFileUnderLock(projectRoot string) string {
 	if projectRoot == EmptyValue {
 		return EmptyValue
 	}
-	fl, err := storage.NewFileLock(sessionLockPath(projectRoot))
-	if err != nil {
-		return EmptyValue
-	}
-	defer func() { _ = fl.Close() }()
-
-	var sessionID string
-	_ = fl.WithLockTimeout(sessionFileLockTimeout, func() error {
-		data, err := fileutil.ReadFile(sessionStatePath(projectRoot))
+	id, _ := persistedIDs.Load(projectRoot, stampmemo.Of(sessionStatePath(projectRoot)), func() (string, error) {
+		fl, err := storage.NewFileLock(sessionLockPath(projectRoot))
 		if err != nil {
-			return err
+			return EmptyValue, err
 		}
-		sessionID = strings.TrimSpace(string(data))
-		return nil
+		defer func() { _ = fl.Close() }()
+		var sessionID string
+		_ = fl.WithLockTimeout(sessionFileLockTimeout, func() error {
+			data, err := fileutil.ReadFile(sessionStatePath(projectRoot))
+			if err != nil {
+				return err
+			}
+			sessionID = strings.TrimSpace(string(data))
+			return nil
+		})
+		return sessionID, nil
 	})
-	return sessionID
+	return id
 }
 
 func writeSessionFileUnderLock(projectRoot, sessionID string) bool {
@@ -296,6 +302,9 @@ func writeSessionFileUnderLock(projectRoot, sessionID string) bool {
 		writeErr = fileutil.WriteFile(sessionStatePath(projectRoot), []byte(sessionID+"\n"), paths.FilePerm600)
 		return writeErr
 	})
+	if writeErr == nil {
+		persistedIDs.Delete(projectRoot)
+	}
 	return writeErr == nil
 }
 
@@ -312,6 +321,7 @@ func clearSessionFileUnderLock(projectRoot string) {
 		_ = fileutil.Remove(sessionStatePath(projectRoot))
 		return nil
 	})
+	persistedIDs.Delete(projectRoot)
 }
 
 // GetCurrentID returns the environment session ID, or the persisted session ID.

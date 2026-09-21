@@ -4,7 +4,6 @@ import (
 	"path/filepath"
 	"slices"
 	"strings"
-	"sync"
 
 	"gopkg.in/yaml.v3"
 
@@ -12,6 +11,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/kindnames"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/stampmemo"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -50,11 +50,6 @@ const (
 	namespaceLayerIntegration = "integration"
 )
 
-var (
-	globalNamespacesConfig     *NamespacesConfig
-	globalNamespacesConfigOnce sync.Once
-)
-
 // LoadNamespacesConfig loads the namespaces configuration from file
 func LoadNamespacesConfig(configPath string) (*NamespacesConfig, error) {
 	if configPath == emptyValue {
@@ -84,15 +79,18 @@ func LoadNamespacesConfig(configPath string) (*NamespacesConfig, error) {
 
 // GetGlobalNamespacesConfig returns the singleton instance of the namespaces config
 func GetGlobalNamespacesConfig() *NamespacesConfig {
-	globalNamespacesConfigOnce.Do(func() {
-		config, err := LoadNamespacesConfig("")
-		if err != nil {
-			globalNamespacesConfig = getDefaultNamespacesConfig()
-		} else {
-			globalNamespacesConfig = config
+	configPath := findNamespacesConfig()
+	cfg, err := namespaceConfigs.Load(globalConfigKey, stampmemo.Of(configPath), func() (*NamespacesConfig, error) {
+		loaded, loadErr := LoadNamespacesConfig(configPath)
+		if loadErr != nil {
+			return getDefaultNamespacesConfig(), nil
 		}
+		return loaded, nil
 	})
-	return globalNamespacesConfig
+	if err != nil || cfg == nil {
+		return getDefaultNamespacesConfig()
+	}
+	return cfg
 }
 
 // getDefaultNamespacesConfig returns default namespace configuration

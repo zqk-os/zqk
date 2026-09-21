@@ -167,7 +167,7 @@ type ZqkConfig struct {
 var (
 	globalConfig *ZqkConfig
 	configOnce   sync.Once
-	rootConfigs  stampmemo.Table[*ZqkConfig]
+	rootConfigs  stampmemo.Table[*ZqkConfig] // keyed by project root; stamp is the config files
 )
 
 func Get() *ZqkConfig {

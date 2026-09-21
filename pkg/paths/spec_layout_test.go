@@ -45,6 +45,23 @@ func TestFindObjectSpecFile_domainFallback(t *testing.T) {
 	}
 }
 
+func TestFindLifecycleFile_domainFallback(t *testing.T) {
+	root := t.TempDir()
+	lc := filepath.Join(root, "lifecycles")
+	kernel := filepath.Join(lc, "kernel")
+	if err := fileutil.EnsureDir(kernel); err != nil {
+		t.Fatal(err)
+	}
+	want := filepath.Join(kernel, "account_lifecycle.yaml")
+	if err := fileutil.WriteStandardFile(want, []byte("object_type: account\n")); err != nil {
+		t.Fatal(err)
+	}
+	got := FindLifecycleFile(lc, "account")
+	if got != want {
+		t.Fatalf("got %q want %q", got, want)
+	}
+}
+
 func TestObjectSpecPathCandidates(t *testing.T) {
 	t.Parallel()
 	got := ObjectSpecPathCandidates("/proj/.zqk/specs/objects", "account")

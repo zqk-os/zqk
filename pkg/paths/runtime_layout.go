@@ -82,6 +82,11 @@ func SessionStateRel() string {
 	return filepath.ToSlash(filepath.Join(ProjectDataDir, StateDir, SessionStateFile))
 }
 
+// SessionStatePath is the absolute persisted CLI session id file.
+func SessionStatePath(projectRoot string) string {
+	return filepath.Join(StateDirPath(projectRoot), SessionStateFile)
+}
+
 // ObserverTipsPath returns the AST observer coach cache file under state/.
 func ObserverTipsPath(projectRoot string) string {
 	return filepath.Join(StateDirPath(projectRoot), ObserverTipsFile)

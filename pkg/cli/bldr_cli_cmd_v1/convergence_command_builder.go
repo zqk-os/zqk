@@ -25,7 +25,7 @@ func NewConvergenceCommandBuilder() *cobra.Command {
 	help.WithDescriptionLines("")
 	help.WithDescriptionLines("For agent markdown, use measure with --format agent-prompt. For JSON automation, use --format json.")
 	help.AddExample("Convergence measure for automation (JSON)", "%s scheduler convergence measure --format json")
-	help.AddExample("Convergence JSON without literal gate scripts (faster)", "%s scheduler convergence measure --format json --skip-rollup-gates")
+	help.AddExample("Convergence JSON without literal gate scripts (faster; full gates + matrix in cvs_outcome_rollup.py)", "%s scheduler convergence measure --format json --skip-rollup-gates")
 	help.AddExample("Convergence measure with suggested CVS fields for object update", "%s scheduler convergence measure --format json --session-id CVS-001")
 	help.AddExample("Convergence with phase router alignment (current CVS phase + flow variant)", "%s scheduler convergence measure --format json --session-id CVS-001 --current-phase c5_verify --flow-variant scheduler_fast")
 	help.AddExample("Object update payload only (pipe to file for zqk object update --file)", "%s scheduler convergence measure --format json --session-id CVS-001 | jq '.suggested_convergence_session_fields.object_update_body'")

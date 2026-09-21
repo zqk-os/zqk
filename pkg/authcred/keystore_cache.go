@@ -42,6 +42,7 @@ func (r KeystoreRecord) ExpiresAt() string {
 	return s
 }
 
+// keystoreRecords is keyed by project root. Stamp is the keystore YAML dir.
 var keystoreRecords stampmemo.Table[[]KeystoreRecord]
 
 func parseKeystoreYAML(fileID string, data []byte) (KeystoreRecord, bool) {
