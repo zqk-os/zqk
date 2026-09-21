@@ -50,43 +50,47 @@ const (
 	namespaceLayerIntegration = "integration"
 )
 
+// ResetGlobalNamespacesConfig drops the process-wide namespaces memo (tests that chdir).
+func ResetGlobalNamespacesConfig() {
+	namespaceConfigs.Reset()
+}
+
 // LoadNamespacesConfig loads the namespaces configuration from file
 func LoadNamespacesConfig(configPath string) (*NamespacesConfig, error) {
 	if configPath == emptyValue {
 		configPath = findNamespacesConfig()
 		if configPath == emptyValue {
-			// Return default config if file not found
 			return getDefaultNamespacesConfig(), nil
 		}
 	}
 
+	cfg, err := namespaceConfigs.Load(configPath, stampmemo.Of(configPath), func() (*NamespacesConfig, error) {
+		return parseNamespacesConfigFile(configPath), nil
+	})
+	if err != nil || cfg == nil {
+		return getDefaultNamespacesConfig(), nil
+	}
+	return cloneNamespacesConfig(cfg), nil
+}
+
+func parseNamespacesConfigFile(configPath string) *NamespacesConfig {
 	data, err := fileutil.ReadFile(configPath)
 	if err != nil {
-		// Return default config if file can't be read
-		return getDefaultNamespacesConfig(), nil
+		return getDefaultNamespacesConfig()
 	}
 
 	var config NamespacesConfig
 	if err := yaml.Unmarshal(data, &config); err != nil {
-		// Return default config if file can't be parsed
-		return getDefaultNamespacesConfig(), nil
+		return getDefaultNamespacesConfig()
 	}
 
-	// Validate and set defaults
 	config.validate()
-	return &config, nil
+	return &config
 }
 
-// GetGlobalNamespacesConfig returns the singleton instance of the namespaces config
+// GetGlobalNamespacesConfig returns the namespaces config for the discovered file.
 func GetGlobalNamespacesConfig() *NamespacesConfig {
-	configPath := findNamespacesConfig()
-	cfg, err := namespaceConfigs.Load(globalConfigKey, stampmemo.Of(configPath), func() (*NamespacesConfig, error) {
-		loaded, loadErr := LoadNamespacesConfig(configPath)
-		if loadErr != nil {
-			return getDefaultNamespacesConfig(), nil
-		}
-		return loaded, nil
-	})
+	cfg, err := LoadNamespacesConfig(findNamespacesConfig())
 	if err != nil || cfg == nil {
 		return getDefaultNamespacesConfig()
 	}

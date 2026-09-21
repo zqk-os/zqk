@@ -8,30 +8,28 @@ import (
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
-const globalConfigKey = "global"
-
 var (
-	// idPrefixConfigs is keyed "global" (one process config). Stamp is the YAML file.
+	// idPrefixConfigs is keyed by id_prefixes_config.yaml path (closed set).
 	idPrefixConfigs stampmemo.Table[*IDPrefixesConfig]
-	// namespaceConfigs is keyed "global". Stamp is the YAML file.
+	// namespaceConfigs is keyed by namespaces_config.yaml path (closed set).
 	namespaceConfigs stampmemo.Table[*NamespacesConfig]
-	// pathsConfigs is keyed "global". Stamp is the YAML file.
+	// pathsConfigs is keyed by paths_config.yaml path (closed set).
 	pathsConfigs stampmemo.Table[*PathsConfig]
 	// discoveredPaths is keyed by cwd+relative+isDir (cwd × closed path keys).
 	discoveredPaths stampmemo.Table[string]
 	// resolvedFindPaths is keyed by cwd+pathKey. Stamp is cwd.
 	resolvedFindPaths stampmemo.Table[string]
-	// timeoutConfigs is keyed "global". Stamp is config/zqk.yaml (legacy kernel copies fallback).
+	// timeoutConfigs is keyed by config/zqk.yaml path (closed set).
 	timeoutConfigs stampmemo.Table[*ValidationTimeoutConfig]
-	// tierConfigs is keyed "global". Stamp is config/zqk.yaml (legacy kernel copies fallback).
+	// tierConfigs is keyed by config/zqk.yaml path (closed set).
 	tierConfigs stampmemo.Table[*ValidationTierConfig]
 )
 
 func resetDiscoveredPaths() {
 	discoveredPaths.Reset()
 	resolvedFindPaths.Reset()
-	timeoutConfigs.Delete(globalConfigKey)
-	tierConfigs.Delete(globalConfigKey)
+	timeoutConfigs.Reset()
+	tierConfigs.Reset()
 	paths.ResetCwdDiscovery()
 }
 

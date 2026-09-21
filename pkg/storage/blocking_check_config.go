@@ -1,7 +1,9 @@
 package storage
 
 import (
+	"maps"
 	"path/filepath"
+	"slices"
 
 	"gopkg.in/yaml.v3"
 
@@ -91,43 +93,44 @@ type SystemLevelBlockingConfig struct {
 	BypassKinds []string `yaml:"bypass_kinds,omitempty"`
 }
 
-const blockingCheckConfigKey = "global"
-
-var blockingCheckConfigs stampmemo.Table[*BlockingCheckConfig] // keyed "global"; stamp is the YAML file
+var blockingCheckConfigs stampmemo.Table[*BlockingCheckConfig] // keyed by blocking check YAML path (closed set)
 
 // LoadBlockingCheckConfig loads the blocking check configuration from file
 func LoadBlockingCheckConfig(configPath string) (*BlockingCheckConfig, error) {
 	if configPath == emptyValue {
 		configPath = findBlockingCheckConfig()
 		if configPath == emptyValue {
-			// Return default config if file not found
 			return getDefaultBlockingCheckConfig(), nil
 		}
 	}
 
+	cfg, err := blockingCheckConfigs.Load(configPath, stampmemo.Of(configPath), func() (*BlockingCheckConfig, error) {
+		return parseBlockingCheckConfigFile(configPath), nil
+	})
+	if err != nil || cfg == nil {
+		return getDefaultBlockingCheckConfig(), nil
+	}
+	return cloneBlockingCheckConfig(cfg), nil
+}
+
+func parseBlockingCheckConfigFile(configPath string) *BlockingCheckConfig {
 	data, err := fileutil.ReadFile(configPath)
 	if err != nil {
-		// Return default config if file can't be read
-		return getDefaultBlockingCheckConfig(), nil
+		return getDefaultBlockingCheckConfig()
 	}
 
 	var config BlockingCheckConfig
 	if err := yaml.Unmarshal(data, &config); err != nil {
-		// Return default config if file can't be parsed
-		return getDefaultBlockingCheckConfig(), nil
+		return getDefaultBlockingCheckConfig()
 	}
 
-	// Validate and set defaults
 	config.validate()
-	return &config, nil
+	return &config
 }
 
-// GetGlobalBlockingCheckConfig returns the singleton instance of the blocking check config
+// GetGlobalBlockingCheckConfig returns the blocking check config for the discovered file.
 func GetGlobalBlockingCheckConfig() *BlockingCheckConfig {
-	path := findBlockingCheckConfig()
-	cfg, err := blockingCheckConfigs.Load(blockingCheckConfigKey, stampmemo.Of(path), func() (*BlockingCheckConfig, error) {
-		return LoadBlockingCheckConfig(path)
-	})
+	cfg, err := LoadBlockingCheckConfig(findBlockingCheckConfig())
 	if err != nil || cfg == nil {
 		return getDefaultBlockingCheckConfig()
 	}
@@ -387,5 +390,44 @@ func findBlockingCheckConfig() string {
 
 // GetBypassKinds returns the list of kinds that bypass blocking checks
 func (c *BlockingCheckConfig) GetBypassKinds() []string {
-	return c.BypassKinds
+	if c == nil {
+		return nil
+	}
+	return slices.Clone(c.BypassKinds)
+}
+
+func cloneBlockingCheckConfig(in *BlockingCheckConfig) *BlockingCheckConfig {
+	if in == nil {
+		return nil
+	}
+	out := *in
+	out.BypassKinds = slices.Clone(in.BypassKinds)
+	out.BypassPatterns = slices.Clone(in.BypassPatterns)
+	if in.PerKindRules != nil {
+		out.PerKindRules = make(map[string]KindBlockingRules, len(in.PerKindRules))
+		for k, v := range in.PerKindRules {
+			v.BlockingTiersOverride = slices.Clone(v.BlockingTiersOverride)
+			out.PerKindRules[k] = v
+		}
+	}
+	if in.PerOperationRules != nil {
+		out.PerOperationRules = make(map[string]OperationBlockingRules, len(in.PerOperationRules))
+		for k, v := range in.PerOperationRules {
+			v.BlockingTiersOverride = slices.Clone(v.BlockingTiersOverride)
+			out.PerOperationRules[k] = v
+		}
+	}
+	if in.ValidationTierBlocking != nil {
+		tier := *in.ValidationTierBlocking
+		tier.BlockingTiers = slices.Clone(in.ValidationTierBlocking.BlockingTiers)
+		tier.RuleToTierMapping = maps.Clone(in.ValidationTierBlocking.RuleToTierMapping)
+		out.ValidationTierBlocking = &tier
+	}
+	if in.SystemLevelBlocking != nil {
+		sys := *in.SystemLevelBlocking
+		sys.CheckTiers = slices.Clone(in.SystemLevelBlocking.CheckTiers)
+		sys.BypassKinds = slices.Clone(in.SystemLevelBlocking.BypassKinds)
+		out.SystemLevelBlocking = &sys
+	}
+	return &out
 }

@@ -27,7 +27,7 @@ type SearchStrategyConfig struct {
 
 // ResetGlobalPathsConfig drops the process-wide paths memo (tests that chdir).
 func ResetGlobalPathsConfig() {
-	pathsConfigs.Delete(globalConfigKey)
+	pathsConfigs.Reset()
 	resetDiscoveredPaths()
 }
 
@@ -37,38 +37,37 @@ func LoadPathsConfig(configPath string) (*PathsConfig, error) {
 	if configPath == emptyValue {
 		configPath = findPathsConfig()
 		if configPath == emptyValue {
-			// Return default config if file not found
 			return getDefaultPathsConfig(), nil
 		}
 	}
 
+	cfg, err := pathsConfigs.Load(configPath, stampmemo.Of(configPath), func() (*PathsConfig, error) {
+		return parsePathsConfigFile(configPath), nil
+	})
+	if err != nil || cfg == nil {
+		return getDefaultPathsConfig(), nil
+	}
+	return clonePathsConfig(cfg), nil
+}
+
+func parsePathsConfigFile(configPath string) *PathsConfig {
 	data, err := fileutil.ReadFile(configPath)
 	if err != nil {
-		// Return default config if file can't be read
-		return getDefaultPathsConfig(), nil
+		return getDefaultPathsConfig()
 	}
 
 	var config PathsConfig
 	if err := yaml.Unmarshal(data, &config); err != nil {
-		// Return default config if file can't be parsed
-		return getDefaultPathsConfig(), nil
+		return getDefaultPathsConfig()
 	}
 
-	// Validate and set defaults
 	config.validate()
-	return &config, nil
+	return &config
 }
 
-// GetGlobalPathsConfig returns the singleton instance of the paths config
+// GetGlobalPathsConfig returns the paths config for the discovered file.
 func GetGlobalPathsConfig() *PathsConfig {
-	configPath := findPathsConfig()
-	cfg, err := pathsConfigs.Load(globalConfigKey, stampmemo.Of(configPath), func() (*PathsConfig, error) {
-		loaded, loadErr := LoadPathsConfig(configPath)
-		if loadErr != nil {
-			return getDefaultPathsConfig(), nil
-		}
-		return loaded, nil
-	})
+	cfg, err := LoadPathsConfig(findPathsConfig())
 	if err != nil || cfg == nil {
 		return getDefaultPathsConfig()
 	}
