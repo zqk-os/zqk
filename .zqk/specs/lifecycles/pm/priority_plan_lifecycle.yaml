@@ -141,11 +141,13 @@ transitions:
     description: Auto-transition from active to in_progress when the first 
       linked backlog_item starts work (locks scope & clears active execution 
       order position)
-    manual: false
+    manual: true
     auto: true
     on_dependent_status:
       kind: backlog_item
-      to: in_progress
+      to:
+        - in_progress
+        - testing
     side_effects:
       - clear: active_order
     preconditions:

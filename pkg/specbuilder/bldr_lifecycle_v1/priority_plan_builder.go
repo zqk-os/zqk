@@ -186,7 +186,7 @@ func (b *PriorityPlanLifecycleBuilder) addPriorityPlanLifecycleData() {
 		From:        "active",
 		To:          "in_progress",
 		Description: "Auto-transition from active to in_progress when the first linked backlog_item starts work (locks scope & clears active execution order position)",
-		Manual:      false,
+		Manual:      true,
 		Auto:        true,
 		Preconditions: []string{
 			"all linked backlog_items referencing this plan are ready or later",
@@ -195,6 +195,7 @@ func (b *PriorityPlanLifecycleBuilder) addPriorityPlanLifecycleData() {
 			Kind: "backlog_item",
 			To: objects.StringOrSlice{
 				"in_progress",
+				"testing",
 			},
 		},
 		SideEffects: []objects.TransitionSideEffect{
