@@ -1,5 +1,5 @@
 Reads an agent_feed (AGF-*) from CAS and writes
-`.zqk/config/agent_chat_channel.json`
+`.zqk/agent-runtime/agent_chat_channel.json`
 
 (enabled, delivery_mode, feed_id, contract_schema_version, path overrides, probe
 filters).

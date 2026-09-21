@@ -1,7 +1,7 @@
 Fail-closed first-contact sequence for Vector A (existing IDE/agent hosts) and a
 thin Vector B path (no public agent markers): detect → auth warn → seat →
 prime regenerable vendor directives (+ .zqk/agent_packs) → write
-.zqk/config/agent_workspace_sync.json → smoke. Does not expand studio ontology
+.zqk/agent-runtime/agent_workspace_sync.json → smoke. Does not expand studio ontology
 into the community seed.
 
   Full sync for the current workspace
