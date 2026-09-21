@@ -1,3 +1,8 @@
+// Unused config.yaml overlay for CAS folder layout (storage.bucketing).
+// Not wired into FileObjectStorage. Live layout is bucketing_strategy objects
+// plus CAS-only defaults in determineDefaultStrategy.
+// TRACK: docs/architecture/HIGH_VOLUME_STORAGE_DEPRECATION.md — delete this overlay
+// when: no revival of storage.bucketing in project config.yaml.
 package storage
 
 import (

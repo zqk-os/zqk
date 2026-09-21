@@ -51,3 +51,23 @@ func TestFirstLetterBucketStrategy_Name(t *testing.T) {
 		t.Errorf("Name() = %q, want %q", got, "first-letter")
 	}
 }
+
+func TestDetermineDefaultStrategy_streamKindsStayPathBased(t *testing.T) {
+	r := &DefaultBucketStrategyRegistry{}
+	got := r.determineDefaultStrategy(objects.KindAuditEvent)
+	if _, ok := got.(*PathBasedBucketStrategy); !ok {
+		t.Fatalf("audit_event (stream) default = %T, want PathBasedBucketStrategy", got)
+	}
+	got = r.determineDefaultStrategy(objects.KindChangeJournalEntry)
+	if _, ok := got.(*PathBasedBucketStrategy); !ok {
+		t.Fatalf("change_journal_entry (stream) default = %T, want PathBasedBucketStrategy", got)
+	}
+	got = r.determineDefaultStrategy(objects.KindSchedulerJob)
+	if _, ok := got.(*ChronoBucketStrategy); !ok {
+		t.Fatalf("scheduler_job (CAS HV) default = %T, want ChronoBucketStrategy", got)
+	}
+	got = r.determineDefaultStrategy(objects.KindBacklogItem)
+	if _, ok := got.(*PathBasedBucketStrategy); !ok {
+		t.Fatalf("backlog_item default = %T, want PathBasedBucketStrategy", got)
+	}
+}

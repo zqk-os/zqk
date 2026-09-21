@@ -229,23 +229,22 @@ func (r *DefaultBucketStrategyRegistry) computeBaseKind(kind string) string {
 }
 
 // determineDefaultStrategy determines the appropriate default strategy for a kind
-// High-volume kinds get chronological bucketing; others path-based (no bucketing).
-// glossary_term uses first-letter bucketing via an explicit bucketing_strategy object (strategy_type: first_letter).
+// when no bucketing_strategy object applies. Stream-backed kinds stay path-based
+// (no CAS folders). CAS high-volume kinds (e.g. scheduler_job) default to monthly
+// chrono. glossary_term first-letter comes from an explicit strategy object.
 func (r *DefaultBucketStrategyRegistry) determineDefaultStrategy(kind string) BucketStrategy {
-	// High-volume kinds that benefit from chronological bucketing (high_volume_kinds.yaml).
+	if StreamStorageEnabledForKind(kind) {
+		return &PathBasedBucketStrategy{}
+	}
 	if IsHighVolumeKindForCache(kind) {
-		// Use monthly chronological bucketing by default
-		// Can be overridden with explicit strategy for more granular bucketing
 		return &ChronoBucketStrategy{
 			Field:       objects.FieldKeyCreatedAt,
-			Granularity: GranularityMonthly, // Use predefined granularity
+			Granularity: GranularityMonthly,
 			ParseFunc: func(s string) (time.Time, error) {
 				return time.Parse(time.RFC3339, s)
 			},
 		}
 	}
-
-	// Default: path-based (no bucketing)
 	return &PathBasedBucketStrategy{}
 }
 

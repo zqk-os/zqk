@@ -135,8 +135,7 @@ type FileObjectStorage struct {
 	idValidator            *validation.IDValidator
 	specLoader             *objects.SpecLoader
 	lifecycleLoader        *objects.LifecycleLoader
-	bucketingConfig        *BucketingConfigRegistry       // Legacy bucketing config
-	bucketStrategyRegistry *DefaultBucketStrategyRegistry // New bucketing strategy system (lazy-loaded)
+	bucketStrategyRegistry *DefaultBucketStrategyRegistry // lazy-loaded; CAS folder layout from bucketing_strategy objects
 	bucketStrategyOnce     sync.Once                      // Ensures single initialization (replaces mutex)
 
 	// Content-addressable storage instances (lazy-loaded per kind)

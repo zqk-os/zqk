@@ -77,7 +77,6 @@ const (
 	LogEventStorageBucketingGetStrategyForKindFailedWarn  = storageBucketingWirePrefix + "_get_strategy_for_kind_failed_use_default"
 	LogEventStorageBucketingEnsuredAllKindsInfo           = storageBucketingWirePrefix + "_ensured_all_system_kinds_have_strategies"
 	LogEventStorageBucketingInitRegistryFailedWarn        = storageBucketingWirePrefix + "_init_bucket_strategy_registry_failed_use_defaults"
-	LogEventStorageBucketingLoadLegacyConfigFailedWarn    = storageBucketingWirePrefix + "_load_legacy_configuration_failed_use_defaults"
 	LogEventStorageBucketingLoaderInitializingDebug       = storageBucketingWirePrefix + "_strategy_loader_initializing"
 	LogEventStorageBucketingLoaderValidationFailedSkip    = storageBucketingWirePrefix + "_strategy_validation_failed_skipping"
 	LogEventStorageBucketingLoaderMissingIDSkip           = storageBucketingWirePrefix + "_strategy_missing_id_skipping"

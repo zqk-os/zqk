@@ -183,7 +183,7 @@ func (f *FileObjectStorage) writeObjectToCAS(ctx context.Context, id, kind, file
 		}
 	}
 
-	if bucketDir == emptyValue && obj != nil {
+	if bucketDir == emptyValue && obj != nil && !StreamStorageEnabledForKind(kind) {
 		if kind == objects.KindAuditEvent || kind == objects.KindChangeJournalEntry {
 			if createdAt, _ := obj[objects.FieldKeyCreatedAt].(string); createdAt != emptyValue {
 				if t, err := time.Parse(time.RFC3339, createdAt); err == nil {

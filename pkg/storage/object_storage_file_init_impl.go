@@ -130,17 +130,8 @@ func NewFileObjectStorage(projectRoot string, opts ...*FileObjectStorageOptions)
 	// This ensures ID validation uses the correct project's specs
 	idValidator := validation.NewIDValidator(specsDir)
 
-	// Initialize bucketing configuration registry (legacy)
-	bucketingConfig := NewBucketingConfigRegistry(projectRoot)
-	if err := bucketingConfig.Load(); err != nil {
-		// Log warning but continue - will use defaults
-		logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
-		StorageLog(logger).Warn(LogEventStorageBucketingLoadLegacyConfigFailedWarn).WithError(err).Log()
-	}
-
-	// Initialize default bucket strategy registry (new system using bucketing_strategy objects)
-	// NOTE: This is lazy-loaded to avoid circular dependencies during initialization
-	// The registry will be created on first use via getBucketStrategyRegistry()
+	// Folder layout comes from bucketing_strategy objects (and CAS-only defaults).
+	// config.yaml storage.bucketing is not consulted.
 	bucketStrategyRegistry := (*DefaultBucketStrategyRegistry)(nil)
 
 	f := &FileObjectStorage{
@@ -150,7 +141,6 @@ func NewFileObjectStorage(projectRoot string, opts ...*FileObjectStorageOptions)
 		idValidator:            idValidator,
 		specLoader:             specLoader,
 		lifecycleLoader:        lifecycleLoader,
-		bucketingConfig:        bucketingConfig,
 		bucketStrategyRegistry: bucketStrategyRegistry,
 		wgManager:              NewWaitGroupManager(),
 		casCache:               &ResourceCache[*filecas.ContentAddressableStorage]{},

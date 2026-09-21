@@ -103,7 +103,6 @@ func TestStorageRuntimeLogEvents_bucketingWirePrefix(t *testing.T) {
 		LogEventStorageBucketingGetStrategyForKindFailedWarn,
 		LogEventStorageBucketingEnsuredAllKindsInfo,
 		LogEventStorageBucketingInitRegistryFailedWarn,
-		LogEventStorageBucketingLoadLegacyConfigFailedWarn,
 		LogEventStorageBucketingLoaderInitializingDebug,
 		LogEventStorageBucketingLoaderValidationFailedSkip,
 		LogEventStorageBucketingLoaderMissingIDSkip,
