@@ -59,7 +59,7 @@ func TestCAS_BuiltinTamperDetection_AuditEvent(t *testing.T) {
 
 	ctx := pkgctx.NewSystemContext()
 	secCtx := &pkgctx.SecurityContext{
-		AccountID: "ACC-1785920548450214012-68b850c0",
+		AccountID: "ACC-SYSTEM",
 	}
 
 	// Create an audit event through the system
@@ -69,7 +69,7 @@ func TestCAS_BuiltinTamperDetection_AuditEvent(t *testing.T) {
 		objects.FieldKeyEventType:     "test_event",
 		"action":                      "create",
 		objects.FieldKeyCreatedAt:     time.Now().Format(time.RFC3339),
-		objects.FieldKeyCreatedBy:     "ACC-1785920548450214012-68b850c0",
+		objects.FieldKeyCreatedBy:     "ACC-SYSTEM",
 		objects.FieldKeySchemaVersion: objects.DefaultSchemaVersion,
 	}
 
@@ -107,7 +107,7 @@ kind: audit_event
 event_type: test_event
 action: TAMPERED
 created_at: "2030-01-05T00:00:00Z"
-created_by: ACC-1785920548450214012-68b850c0
+created_by: ACC-SYSTEM
 schema_version: "` + objects.DefaultSchemaVersion + `"`)
 
 	if err := fileutil.WriteFile(filePath, tamperedContent, paths.FilePerm644); err != nil {
@@ -165,7 +165,7 @@ func TestCAS_BuiltinTamperDetection_ChangeJournal(t *testing.T) {
 		objects.FieldKeyObjectKind:    "backlog_item",
 		objects.FieldKeyChangeType:    "update",
 		objects.FieldKeyCreatedAt:     time.Now().Format(time.RFC3339),
-		objects.FieldKeyCreatedBy:     "ACC-1785920548450214012-68b850c0",
+		objects.FieldKeyCreatedBy:     "ACC-SYSTEM",
 		objects.FieldKeySchemaVersion: objects.DefaultSchemaVersion,
 	}
 
@@ -202,7 +202,7 @@ object_id: BLI-001
 object_kind: backlog_item
 change_type: TAMPERED
 created_at: "2030-01-05T00:00:00Z"
-created_by: ACC-1785920548450214012-68b850c0
+created_by: ACC-SYSTEM
 schema_version: "` + objects.DefaultSchemaVersion + `"`)
 
 	if err := fileutil.WriteFile(filePath, tamperedContent, paths.FilePerm644); err != nil {
@@ -258,7 +258,7 @@ func TestCAS_BuiltinTamperDetection_MtimeCheck(t *testing.T) {
 
 	ctx := pkgctx.NewSystemContext()
 	secCtx := &pkgctx.SecurityContext{
-		AccountID: "ACC-1785920548450214012-68b850c0",
+		AccountID: "ACC-SYSTEM",
 	}
 
 	// Create an audit event
@@ -268,7 +268,7 @@ func TestCAS_BuiltinTamperDetection_MtimeCheck(t *testing.T) {
 		objects.FieldKeyEventType:     "test_event",
 		"action":                      "create",
 		objects.FieldKeyCreatedAt:     time.Now().Format(time.RFC3339),
-		objects.FieldKeyCreatedBy:     "ACC-1785920548450214012-68b850c0",
+		objects.FieldKeyCreatedBy:     "ACC-SYSTEM",
 		objects.FieldKeySchemaVersion: objects.DefaultSchemaVersion,
 	}
 
@@ -360,7 +360,7 @@ func TestCAS_BuiltinTamperDetection_DocEntry(t *testing.T) {
 
 	ctx := pkgctx.NewSystemContext()
 	secCtx := &pkgctx.SecurityContext{
-		AccountID: "ACC-1785920548450214012-68b850c0",
+		AccountID: "ACC-SYSTEM",
 	}
 
 	// Create a doc_entry object
@@ -381,7 +381,7 @@ func TestCAS_BuiltinTamperDetection_DocEntry(t *testing.T) {
 		objects.FieldKeyRequirementRefs:   []string{},
 		objects.FieldKeySchemaVersion:     objects.DefaultSchemaVersion,
 		objects.FieldKeyCreatedAt:         createdAt,
-		objects.FieldKeyCreatedBy:         "ACC-1785920548450214012-68b850c0",
+		objects.FieldKeyCreatedBy:         "ACC-SYSTEM",
 	}
 
 	storage.CreateCASVisible(t, fileStorage, ctx, secCtx, docEntryData, "")
@@ -414,7 +414,7 @@ milestone_refs: []
 requirement_refs: []
 schema_version: "` + objects.DefaultSchemaVersion + `"
 created_at: "2030-01-05T00:00:00Z"
-created_by: ACC-1785920548450214012-68b850c0`)
+created_by: ACC-SYSTEM`)
 
 	if err := fileutil.WriteFile(filePath, tamperedContent, paths.FilePerm644); err != nil {
 		t.Fatalf("Failed to tamper with file: %v", err)

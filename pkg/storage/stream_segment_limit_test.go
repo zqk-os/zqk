@@ -62,7 +62,7 @@ func TestStreamSegment_LimitZeroEnforcesDefaultCap(t *testing.T) {
 	_ = f.Close()
 
 	ctx := context.Background()
-	secCtx := &pkgctx.SecurityContext{AccountID: "ACC-1785920548450214012-68b850c0"}
+	secCtx := &pkgctx.SecurityContext{AccountID: "ACC-SYSTEM"}
 
 	// 1. Explicit limit = 5
 	res, _, err := st.listStreamSegmentsWithLimit(ctx, secCtx, ListFilter{Kind: kind}, 5)

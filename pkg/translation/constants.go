@@ -60,8 +60,7 @@ const (
 	// DefaultStatus is the default status for translated domain_registry.
 	DefaultStatus = "active"
 	// CreatedBySystem is the created_by value for system-generated translated objects.
-	// TRACK: ACC-* cutover
-	CreatedBySystem = "ACC-" + "1785920548450214012" + "-" + "68b850c0"
+	CreatedBySystem = objects.DefaultSystemAccountID
 	// UpdatedBySystem is the updated_by value for system-generated translated objects.
 	// TRACK: ACC-* cutover (do not persist bare "system").
 	UpdatedBySystem = CreatedBySystem

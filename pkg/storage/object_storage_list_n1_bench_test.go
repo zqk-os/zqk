@@ -33,7 +33,7 @@ func BenchmarkObjectStorage_ListPagination(b *testing.B) {
 	}
 
 	ctx := context.Background()
-	secCtx := &pkgctx.SecurityContext{AccountID: "ACC-1785920548450214012-68b850c0"}
+	secCtx := &pkgctx.SecurityContext{AccountID: "ACC-SYSTEM"}
 
 	kind := "test_bench_kind"
 	segDir := filepath.Join(tmpDir, paths.ProjectDataDir, paths.StreamsDir, kind)
@@ -83,7 +83,7 @@ func TestObjectStorage_ListBoundedReads(t *testing.T) {
 	}
 
 	ctx := context.Background()
-	secCtx := &pkgctx.SecurityContext{AccountID: "ACC-1785920548450214012-68b850c0"}
+	secCtx := &pkgctx.SecurityContext{AccountID: "ACC-SYSTEM"}
 	sctx := pkgctx.NewStorageContext()
 
 	kind := "test_bounded_kind"

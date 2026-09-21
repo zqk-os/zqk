@@ -318,7 +318,7 @@ func testContentAddressableStorageCRUD(t *testing.T, storage *FileObjectStorage,
 		objects.FieldKeyKind:                   kind,
 		objects.FieldKeySchemaVersion:          objects.DefaultSchemaVersion,
 		objects.FieldKeyCreatedAt:              now,
-		objects.FieldKeyCreatedBy:              "ACC-1785920548450214012-68b850c0",
+		objects.FieldKeyCreatedBy:              "ACC-SYSTEM",
 		objects.FieldKeyTitle:                  "Test Content-Addressable Storage Metric",
 		objects.FieldKeyStatus:                 objects.ObjectStatusImplemented,
 		objects.FieldKeyMetricType:             "system",
@@ -386,7 +386,7 @@ func testContentAddressableStorageCRUD(t *testing.T, storage *FileObjectStorage,
 	updates := map[string]any{
 		objects.FieldKeyEventCount: 20,
 		objects.FieldKeyUpdatedAt:  zqktime.NowRFC3339UTC(),
-		objects.FieldKeyUpdatedBy:  "ACC-1785920548450214012-68b850c0",
+		objects.FieldKeyUpdatedBy:  "ACC-SYSTEM",
 	}
 
 	err = storage.Update(cliCtx, secCtx, testID, updates)
@@ -763,7 +763,7 @@ func createTestAggregationMetric(id, kind string, eventCount int, timestamp stri
 		objects.FieldKeyKind:                   kind,
 		objects.FieldKeySchemaVersion:          objects.DefaultSchemaVersion,
 		objects.FieldKeyCreatedAt:              timestamp,
-		objects.FieldKeyCreatedBy:              "ACC-1785920548450214012-68b850c0",
+		objects.FieldKeyCreatedBy:              "ACC-SYSTEM",
 		objects.FieldKeyTitle:                  fmt.Sprintf("Test Metric %s", id),
 		objects.FieldKeyStatus:                 objects.ObjectStatusImplemented,
 		objects.FieldKeyMetricType:             "system",

@@ -33,7 +33,7 @@ func TestClientIDEstablishment(t *testing.T) {
 			},
 			Capabilities: map[string]any{
 				objects.FieldKeyClientID: "test-client-123",
-				clientInfoAccountID:      "ACC-1785920548450214016-ace2aae1", // Use registered account for tests
+				clientInfoAccountID:      "ACC-TEST-AGENT", // Use registered account for tests
 				objects.FieldKeyRoles:    []any{"test_agent"},
 			},
 		}
@@ -105,7 +105,7 @@ func TestClientIDEstablishment(t *testing.T) {
 			},
 			Capabilities: map[string]any{
 				objects.FieldKeyClientID: "test-client-456",
-				clientInfoAccountID:      "ACC-1785920548450214016-ace2aae1", // Use registered account
+				clientInfoAccountID:      "ACC-TEST-AGENT", // Use registered account
 				objects.FieldKeyRoles:    []any{"test_agent"},
 			},
 		}
@@ -269,7 +269,7 @@ func TestClientIDReinitialization(t *testing.T) {
 			},
 			Capabilities: map[string]any{
 				objects.FieldKeyClientID: "persistent-client-id",
-				clientInfoAccountID:      "ACC-1785920548450214016-ace2aae1", // Use registered account
+				clientInfoAccountID:      "ACC-TEST-AGENT", // Use registered account
 				objects.FieldKeyRoles:    []any{"test_agent"},
 			},
 		}
@@ -301,7 +301,7 @@ func TestClientIDReinitialization(t *testing.T) {
 			},
 			Capabilities: map[string]any{
 				objects.FieldKeyClientID: "new-client-id",
-				clientInfoAccountID:      "ACC-1785920548450214016-ace2aae1", // Use registered account
+				clientInfoAccountID:      "ACC-TEST-AGENT", // Use registered account
 				objects.FieldKeyRoles:    []any{"test_agent"},
 			},
 		}
@@ -474,7 +474,7 @@ func TestRoleElicitation(t *testing.T) {
 				Version: "1.0.0",
 			},
 			Capabilities: map[string]any{
-				objects.FieldKeyClientID: "ACC-1785920548450214012-68b850c0", // System account
+				objects.FieldKeyClientID: "ACC-SYSTEM", // System account
 				// No roles or permissions
 			},
 		}

@@ -47,7 +47,7 @@ event_type: scheduler_job_completed
 target_kind: scheduler_job
 target_id: SCH-001
 created_at: "2026-01-03T12:00:00Z"
-created_by: "ACC-1785920548450214012-68b850c0"
+created_by: "ACC-SYSTEM"
 `
 	testFile := testkit.WriteTestObjectStandalone(t, tmpDir, testContent)
 
@@ -373,7 +373,7 @@ event_type: scheduler_job_completed
 target_kind: scheduler_job
 target_id: SCH-001
 created_at: "2026-01-03T12:00:00Z"
-created_by: "ACC-1785920548450214012-68b850c0"
+created_by: "ACC-SYSTEM"
 `
 		testFilePaths[objectID] = testkit.WriteTestObjectStandalone(t, tmpDir, testContent)
 	}

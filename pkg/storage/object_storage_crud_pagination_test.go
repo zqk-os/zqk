@@ -258,8 +258,8 @@ func testKindCRUD(t *testing.T, storage *FileObjectStorage, ctx context.Context,
 		// TRACK: BLI-1785443942668406000-1ec5c811 — draft-plane create / promote membrane.
 		EnsureCASVisibleRef(t, storage, cliCtx, secCtx, policyObj, "active")
 	case "certificate":
-		// holder_ref defaults reference ACC-1785920548450214012-68b850c0; create it before certificate Create (parallel subtests race otherwise)
-		accountID := "ACC-1785920548450214012-68b850c0"
+		// holder_ref defaults reference ACC-SYSTEM; create it before certificate Create (parallel subtests race otherwise)
+		accountID := "ACC-SYSTEM"
 		accountObj := map[string]any{
 			objects.FieldKeyID:            accountID,
 			objects.FieldKeyKind:          "account",

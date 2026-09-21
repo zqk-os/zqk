@@ -10,9 +10,9 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-// DefaultSwarmWorkerAccount is the transitional ACC used when orchestrate cannot
+// DefaultSwarmWorkerAccount is the well-known ACC used when orchestrate cannot
 // map a persona/role to a seated account.
-const DefaultSwarmWorkerAccount = "ACC-" + "1785920548450214011" + "-" + "dabd3692"
+const DefaultSwarmWorkerAccount = "ACC-SWARM-WORKER"
 
 type accountPersonaFields struct {
 	ID          string   `yaml:"id"`

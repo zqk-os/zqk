@@ -85,7 +85,7 @@ func TestWhatsNextTaskSpecificRouting(t *testing.T) {
 	store := newMemoryWorkflowStore(
 		map[string]any{
 			objects.FieldKeyKind:       objects.FieldKeyKind,
-			objects.FieldKeyID:         "PROMPT-1775443238169278000-3db7d1ea",
+			objects.FieldKeyID:         "PROMPT-ONBOARDING",
 			objects.FieldKeyPromptBody: "System prompt instructions.",
 		},
 		map[string]any{

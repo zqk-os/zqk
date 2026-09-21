@@ -120,9 +120,9 @@ func TestFixCommandResolution_RealData(t *testing.T) {
 			objects.FieldKeyTags:          []string{"branding", "white-label"},
 			objects.FieldKeySchemaVersion: objects.DefaultSchemaVersion,
 			objects.FieldKeyCreatedAt:     "2025-01-07T00:00:00Z",
-			objects.FieldKeyCreatedBy:     "ACC-1785920548450214012-68b850c0",
+			objects.FieldKeyCreatedBy:     "ACC-SYSTEM",
 			objects.FieldKeyUpdatedAt:     "2025-01-07T00:00:00Z",
-			objects.FieldKeyUpdatedBy:     "ACC-1785920548450214012-68b850c0",
+			objects.FieldKeyUpdatedBy:     "ACC-SYSTEM",
 			// Intentionally missing milestone_refs - will trigger error when validating with "planned" status
 		}
 

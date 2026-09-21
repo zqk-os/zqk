@@ -52,9 +52,9 @@ schema_version: "` + objects.DefaultSchemaVersion + `"
 status: exploring
 title: Test Item Created Outside CLI
 created_at: "2026-01-02T00:00:00Z"
-created_by: ACC-1785920548450214012-68b850c0
+created_by: ACC-SYSTEM
 updated_at: "2026-01-02T00:00:00Z"
-updated_by: ACC-1785920548450214012-68b850c0
+updated_by: ACC-SYSTEM
 origin_project: zqk
 origin_system: zqk
 namespace_id: zqk:kernel
@@ -251,9 +251,9 @@ schema_version: "` + objects.DefaultSchemaVersion + `"
 status: exploring
 title: Test Item for Auto-Fix
 created_at: "2026-01-02T00:00:00Z"
-created_by: ACC-1785920548450214012-68b850c0
+created_by: ACC-SYSTEM
 updated_at: "2026-01-02T00:00:00Z"
-updated_by: ACC-1785920548450214012-68b850c0
+updated_by: ACC-SYSTEM
 origin_project: zqk
 origin_system: zqk
 namespace_id: zqk:kernel
@@ -421,9 +421,9 @@ schema_version: "` + objects.DefaultSchemaVersion + `"
 status: exploring
 title: Test Item for Force Fix - MODIFIED
 created_at: "2026-01-02T00:00:00Z"
-created_by: ACC-1785920548450214012-68b850c0
+created_by: ACC-SYSTEM
 updated_at: "2026-01-02T00:00:00Z"
-updated_by: ACC-1785920548450214012-68b850c0
+updated_by: ACC-SYSTEM
 origin_project: zqk
 origin_system: zqk
 namespace_id: zqk:kernel
@@ -540,9 +540,9 @@ schema_version: "` + objects.DefaultSchemaVersion + `"
 status: exploring
 title: Test Item for Auto-Fix Audit
 created_at: "2026-01-02T00:00:00Z"
-created_by: ACC-1785920548450214012-68b850c0
+created_by: ACC-SYSTEM
 updated_at: "2026-01-02T00:00:00Z"
-updated_by: ACC-1785920548450214012-68b850c0
+updated_by: ACC-SYSTEM
 origin_project: zqk
 origin_system: zqk
 namespace_id: zqk:kernel
@@ -727,9 +727,9 @@ schema_version: "`+objects.DefaultSchemaVersion+`"
 status: exploring
 title: Test Item %s
 created_at: "2026-01-02T00:00:00Z"
-created_by: ACC-1785920548450214012-68b850c0
+created_by: ACC-SYSTEM
 updated_at: "2026-01-02T00:00:00Z"
-updated_by: ACC-1785920548450214012-68b850c0
+updated_by: ACC-SYSTEM
 origin_project: zqk
 origin_system: zqk
 namespace_id: zqk:kernel

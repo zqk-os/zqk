@@ -44,9 +44,9 @@ schema_version: "` + objects.DefaultSchemaVersion + `"
 status: exploring
 title: Missing ID Test
 created_at: "2026-01-02T00:00:00Z"
-created_by: ACC-1785920548450214012-68b850c0
+created_by: ACC-SYSTEM
 updated_at: "2026-01-02T00:00:00Z"
-updated_by: ACC-1785920548450214012-68b850c0
+updated_by: ACC-SYSTEM
 origin_project: zqk
 origin_system: zqk
 namespace_id: zqk:kernel
@@ -164,9 +164,9 @@ schema_version: "` + objects.DefaultSchemaVersion + `"
 status: exploring
 title: Missing Kind Test
 created_at: "2026-01-02T00:00:00Z"
-created_by: ACC-1785920548450214012-68b850c0
+created_by: ACC-SYSTEM
 updated_at: "2026-01-02T00:00:00Z"
-updated_by: ACC-1785920548450214012-68b850c0
+updated_by: ACC-SYSTEM
 origin_project: zqk
 origin_system: zqk
 namespace_id: zqk:kernel
@@ -285,9 +285,9 @@ schema_version: "` + objects.DefaultSchemaVersion + `"
 status: active
 title: Kind Mismatch Test
 created_at: "2026-01-02T00:00:00Z"
-created_by: ACC-1785920548450214012-68b850c0
+created_by: ACC-SYSTEM
 updated_at: "2026-01-02T00:00:00Z"
-updated_by: ACC-1785920548450214012-68b850c0
+updated_by: ACC-SYSTEM
 origin_project: zqk
 origin_system: zqk
 namespace_id: zqk:kernel
@@ -462,9 +462,9 @@ schema_version: "` + objects.DefaultSchemaVersion + `"
 status: exploring
 title: Invalid ID Format Test
 created_at: "2026-01-02T00:00:00Z"
-created_by: ACC-1785920548450214012-68b850c0
+created_by: ACC-SYSTEM
 updated_at: "2026-01-02T00:00:00Z"
-updated_by: ACC-1785920548450214012-68b850c0
+updated_by: ACC-SYSTEM
 origin_project: zqk
 origin_system: zqk
 namespace_id: zqk:kernel
@@ -624,7 +624,7 @@ created_at: "2026-01-02T00:00:00Z"
 
 	// Resolution: Fix YAML syntax and recreate via CLI (reuse fileStorage from above)
 	secCtx := &pkgctx.SecurityContext{
-		AccountID: "ACC-1785920548450214012-68b850c0",
+		AccountID: "ACC-SYSTEM",
 	}
 
 	// Remove invalid file

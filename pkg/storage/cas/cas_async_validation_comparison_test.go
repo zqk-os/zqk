@@ -81,7 +81,7 @@ func TestCAS_AsyncValidationComparison(t *testing.T) {
 
 	ctx := pkgctx.NewSystemContext()
 	secCtx := &pkgctx.SecurityContext{
-		AccountID: "ACC-1785920548450214012-68b850c0",
+		AccountID: "ACC-SYSTEM",
 	}
 
 	// Create the same objects in both environments
@@ -273,7 +273,7 @@ func TestCAS_AsyncValidationSameResults(t *testing.T) {
 
 	ctx := pkgctx.NewSystemContext()
 	secCtx := &pkgctx.SecurityContext{
-		AccountID: "ACC-1785920548450214012-68b850c0",
+		AccountID: "ACC-SYSTEM",
 	}
 
 	// Create identical objects in both environments

@@ -54,7 +54,7 @@ func testPlaceholderOwnerRef(t *testing.T) {
 
 	// Test that a real owner_ref does not match
 	realObj := map[string]any{
-		objects.FieldKeyOwnerRef: "ACC-1785920548450214012-68b850c0", // real pattern
+		objects.FieldKeyOwnerRef: "ACC-SYSTEM", // real pattern
 	}
 	detail2, matched2 := rule.Evaluate(realObj)
 	if matched2 {

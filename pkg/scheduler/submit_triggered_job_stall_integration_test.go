@@ -66,9 +66,9 @@ func TestSubmitTriggeredJob_integrationPoolStallDeadlineExceeded(t *testing.T) {
 		objects.FieldKeyCategory:      CategoryTesting,
 		objects.FieldKeyExecutionMode: "reusable",
 		objects.FieldKeyCreatedAt:     zqktime.NowLayoutUTC(zqktime.LayoutObjectDateTimeZ),
-		objects.FieldKeyCreatedBy:     "ACC-1785920548450214012-68b850c0",
+		objects.FieldKeyCreatedBy:     "ACC-SYSTEM",
 		objects.FieldKeyUpdatedAt:     zqktime.NowLayoutUTC(zqktime.LayoutObjectDateTimeZ),
-		objects.FieldKeyUpdatedBy:     "ACC-1785920548450214012-68b850c0",
+		objects.FieldKeyUpdatedBy:     "ACC-SYSTEM",
 		objects.FieldKeyOriginProject: "zqk",
 		objects.FieldKeyOriginSystem:  "zqk",
 	}

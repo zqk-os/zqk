@@ -91,7 +91,7 @@ func TestWaitGroupPanic_Reproduce(t *testing.T) {
 	}
 
 	secCtx := pkgctx.NewSystemSecurityContext()
-	createCtx := pkgctx.WithCacheUpdate(pkgctx.NewSystemContext(), "ACC-1785920548450214015-3df55bd1", "account", "")
+	createCtx := pkgctx.WithCacheUpdate(pkgctx.NewSystemContext(), "ACC-TEST-USER", "account", "")
 
 	// First creation - should succeed
 	err = storageProvider.Create(createCtx, secCtx, accountObj)
@@ -132,7 +132,7 @@ func TestWaitGroupPanic_Reproduce(t *testing.T) {
 
 			// Try to create duplicate - this should trigger audit event creation
 			// which may use WaitGroups internally
-			duplicateCtx := pkgctx.WithCacheUpdate(pkgctx.NewSystemContext(), "ACC-1785920548450214015-3df55bd1", "account", "")
+			duplicateCtx := pkgctx.WithCacheUpdate(pkgctx.NewSystemContext(), "ACC-TEST-USER", "account", "")
 			err := storageProvider.Create(duplicateCtx, builder.secCtx, accountObj)
 			if err != nil {
 				// Expected - object already exists
@@ -205,7 +205,7 @@ func TestWaitGroupPanic_ConcurrentDuplicateCreates(t *testing.T) {
 		objects.FieldKeySchemaVersion: scenarioBuilderSchemaV2,
 	}
 
-	createCtx := pkgctx.WithCacheUpdate(pkgctx.NewSystemContext(), "ACC-1785920548450214015-3df55bd1", "account", "")
+	createCtx := pkgctx.WithCacheUpdate(pkgctx.NewSystemContext(), "ACC-TEST-USER", "account", "")
 
 	// First creation
 	err = storageProvider.Create(createCtx, builder.secCtx, accountObj)
@@ -223,7 +223,7 @@ func TestWaitGroupPanic_ConcurrentDuplicateCreates(t *testing.T) {
 	// Create multiple goroutines trying to create the same duplicate (simulating concurrent processing)
 	concurrency := 3
 	for i := 0; i < concurrency; i++ {
-		goroutinelabels.NewGoroutine(fmt.Sprintf("scenario_builder_create_account_%d", i), fmt.Sprintf("creating account object ACC-1785920548450214015-3df55bd1 in layer 1 (attempt %d)", i)).
+		goroutinelabels.NewGoroutine(fmt.Sprintf("scenario_builder_create_account_%d", i), fmt.Sprintf("creating account object ACC-TEST-USER in layer 1 (attempt %d)", i)).
 			WithWaitGroup(&layerWg).
 			WithPanicHandler(func(r any) {
 				panicMu.Lock()
@@ -258,10 +258,10 @@ func TestWaitGroupPanic_ConcurrentDuplicateCreates(t *testing.T) {
 				}()
 
 				// Try to create duplicate - this triggers the panic
-				duplicateCtx := pkgctx.WithCacheUpdate(pkgctx.NewSystemContext(), "ACC-1785920548450214015-3df55bd1", "account", "")
+				duplicateCtx := pkgctx.WithCacheUpdate(pkgctx.NewSystemContext(), "ACC-TEST-USER", "account", "")
 				localAccountObj := map[string]any{
 					objects.FieldKeyKind:          "account",
-					objects.FieldKeyID:            "ACC-1785920548450214015-3df55bd1",
+					objects.FieldKeyID:            "ACC-TEST-USER",
 					objects.FieldKeyTitle:         "Test User Account",
 					objects.FieldKeyStatus:        scenarioBuilderStatusActive,
 					objects.FieldKeySchemaVersion: scenarioBuilderSchemaV2,
@@ -345,7 +345,7 @@ func TestWaitGroupPanic_WithActiveValidations(t *testing.T) {
 		objects.FieldKeySchemaVersion: scenarioBuilderSchemaV2,
 	}
 
-	createCtx := pkgctx.WithCacheUpdate(pkgctx.NewSystemContext(), "ACC-1785920548450214015-3df55bd1", "account", "")
+	createCtx := pkgctx.WithCacheUpdate(pkgctx.NewSystemContext(), "ACC-TEST-USER", "account", "")
 
 	// First creation
 	err = storageProvider.Create(createCtx, builder.secCtx, accountObj)
@@ -360,7 +360,7 @@ func TestWaitGroupPanic_WithActiveValidations(t *testing.T) {
 	panicMu := &sync.Mutex{}
 
 	// Simulate creating duplicate in goroutine (like scenario builder does)
-	goroutinelabels.NewGoroutine("scenario_builder_create_account_0", "creating account object ACC-1785920548450214015-3df55bd1 in layer 1").
+	goroutinelabels.NewGoroutine("scenario_builder_create_account_0", "creating account object ACC-TEST-USER in layer 1").
 		WithWaitGroup(&layerWg).
 		WithPanicHandler(func(r any) {
 			panicMu.Lock()
@@ -406,7 +406,7 @@ func TestWaitGroupPanic_WithActiveValidations(t *testing.T) {
 			}()
 
 			// Try to create duplicate - this triggers the panic
-			duplicateCtx := pkgctx.WithCacheUpdate(pkgctx.NewSystemContext(), "ACC-1785920548450214015-3df55bd1", "account", "")
+			duplicateCtx := pkgctx.WithCacheUpdate(pkgctx.NewSystemContext(), "ACC-TEST-USER", "account", "")
 			err := storageProvider.Create(duplicateCtx, builder.secCtx, accountObj)
 			if err != nil {
 				// Expected - object already exists

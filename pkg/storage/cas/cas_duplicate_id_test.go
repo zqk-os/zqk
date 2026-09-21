@@ -237,7 +237,7 @@ func TestCAS_DuplicateID_ThroughStorage(t *testing.T) {
 
 	ctx := pkgctx.NewSystemContext()
 	secCtx := &pkgctx.SecurityContext{
-		AccountID: "ACC-1785920548450214012-68b850c0", // Use system account to bypass permission checks
+		AccountID: "ACC-SYSTEM", // Use system account to bypass permission checks
 	}
 
 	// Create first object

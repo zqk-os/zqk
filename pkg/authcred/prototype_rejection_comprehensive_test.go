@@ -16,10 +16,10 @@ func TestPrototypeRejection_KnownHashesComprehensive(t *testing.T) {
 		hasError bool
 	}{
 		// Known hashes - definite prototype accounts
-		{"known test-user exact", "ACC-1785920548450214015-3df55bd1", true, true},
-		{"known test-agent exact", "ACC-1785920548450214016-ace2aae1", true, true},
-		{"known test-user uppercase", "ACC-1785920548450214015-3DF55BD1", true, true},
-		{"known test-agent uppercase", "ACC-1785920548450214016-ACE2AAE1", true, true},
+		{"known test-user exact", "ACC-TEST-USER", true, true},
+		{"known test-agent exact", "ACC-TEST-AGENT", true, true},
+		{"known test-user uppercase", "ACC-TEST-USER", true, true},
+		{"known test-agent uppercase", "ACC-TEST-AGENT", true, true},
 		// Suffix detection - prototype/test keywords
 		{"proto in suffix", "ACC-abcd-proto-env", true, true},
 		{"test in suffix", "ACC-efgh-test-user", true, true},
@@ -53,8 +53,8 @@ func TestPrototypeRejection_KnownHashesComprehensive(t *testing.T) {
 func TestPrototypeRejection_ErrorFormatDeterministic(t *testing.T) {
 	t.Parallel()
 	tests := []string{
-		"ACC-1785920548450214015-3df55bd1",
-		"ACC-1785920548450214016-ace2aae1",
+		"ACC-TEST-USER",
+		"ACC-TEST-AGENT",
 		"ACC-abcd-proto-env",
 	}
 	for _, ref := range tests {

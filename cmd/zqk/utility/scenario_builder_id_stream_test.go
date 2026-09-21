@@ -37,7 +37,7 @@ func TestResolveReferencesFromIDStream(t *testing.T) {
 	idStreamMu.Lock()
 	idStream["WS-001"] = "WS-001"                                                     // Workstream ID
 	idStream["GOAL-001"] = "GOAL-001"                                                 // Goal ID
-	idStream["ACC-1785920548450214015-3df55bd1"] = "ACC-1785920548450214015-3df55bd1" // Account ID
+	idStream["ACC-TEST-USER"] = "ACC-TEST-USER" // Account ID
 	idStreamMu.Unlock()
 
 	tests := []struct {
@@ -78,12 +78,12 @@ func TestResolveReferencesFromIDStream(t *testing.T) {
 			obj: map[string]any{
 				objects.FieldKeyKind:     "workstream",
 				objects.FieldKeyTitle:    "Test Workstream",
-				objects.FieldKeyOwnerRef: "ACC-1785920548450214015-3df55bd1",
+				objects.FieldKeyOwnerRef: "ACC-TEST-USER",
 			},
 			expected: map[string]any{
 				objects.FieldKeyKind:     "workstream",
 				objects.FieldKeyTitle:    "Test Workstream",
-				objects.FieldKeyOwnerRef: "ACC-1785920548450214015-3df55bd1", // Already correct format
+				objects.FieldKeyOwnerRef: "ACC-TEST-USER", // Already correct format
 			},
 		},
 		{

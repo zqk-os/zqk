@@ -6,9 +6,8 @@ import (
 	"github.com/zqk-os/zqk/pkg/objects"
 )
 
-// CriteriaID is the canonical CRI-SHOVEL-READY criteria object (MMORCH F-002).
-// TRACK: keep in sync with the kernel criteria object.
-const CriteriaID = "CRIT-" + "1785885889228395000" + "-" + "15c56d02"
+// CriteriaID is the canonical CRI-SHOVEL-READY criteria object.
+const CriteriaID = "CRIT-SHOVEL-READY"
 
 // Precondition is the exact lifecycle precondition string. checkPrecondition must
 // recognize this token; English theater ("Owner confirms…") is fail-open.

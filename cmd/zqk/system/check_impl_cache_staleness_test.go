@@ -57,9 +57,9 @@ change_type: update
 title: "Update: backlog_item:BLI-999"
 diff_summary: "Test hash mismatch"
 created_at: "2025-12-29T16:00:00Z"
-created_by: ACC-1785920548450214012-68b850c0
+created_by: ACC-SYSTEM
 updated_at: "2025-12-29T16:00:00Z"
-updated_by: ACC-1785920548450214012-68b850c0
+updated_by: ACC-SYSTEM
 origin_system: zqk
 origin_project: zqk
 previous_state:

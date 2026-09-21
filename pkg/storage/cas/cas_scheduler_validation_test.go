@@ -54,7 +54,7 @@ func TestCAS_SchedulerAuditEvents(t *testing.T) {
 
 	ctx := pkgctx.NewSystemContext()
 	secCtx := &pkgctx.SecurityContext{
-		AccountID: "ACC-1785920548450214012-68b850c0",
+		AccountID: "ACC-SYSTEM",
 	}
 
 	// Create an audit event (simulating scheduler job execution)
@@ -63,9 +63,9 @@ func TestCAS_SchedulerAuditEvents(t *testing.T) {
 		objects.FieldKeyKind:          "audit_event",
 		objects.FieldKeySchemaVersion: objects.DefaultSchemaVersion,
 		objects.FieldKeyCreatedAt:     "2030-01-05T10:00:00Z",
-		objects.FieldKeyCreatedBy:     "ACC-1785920548450214012-68b850c0",
+		objects.FieldKeyCreatedBy:     "ACC-SYSTEM",
 		objects.FieldKeyUpdatedAt:     "2030-01-05T10:00:00Z",
-		objects.FieldKeyUpdatedBy:     "ACC-1785920548450214012-68b850c0",
+		objects.FieldKeyUpdatedBy:     "ACC-SYSTEM",
 		objects.FieldKeyOriginSystem:  validation.DefaultOriginSystem,
 		objects.FieldKeyOriginProject: validation.DefaultOriginProject,
 		objects.FieldKeyStatus:        objects.ObjectStatusCompleted,
@@ -172,7 +172,7 @@ func TestCAS_ValidationCacheFilePath(t *testing.T) {
 
 	ctx := pkgctx.NewSystemContext()
 	secCtx := &pkgctx.SecurityContext{
-		AccountID: "ACC-1785920548450214012-68b850c0",
+		AccountID: "ACC-SYSTEM",
 	}
 
 	// Create an object

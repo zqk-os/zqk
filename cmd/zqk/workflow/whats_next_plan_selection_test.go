@@ -12,7 +12,7 @@ import (
 // prefers in_progress plans that actually have BLIs linked, over empty plans.
 func TestResolvePriorityPlan_PrefersPlansWithWork(t *testing.T) {
 	ctx := pkgctx.WithSecurityContext(context.Background(), &pkgctx.SecurityContext{
-		AccountID: "ACC-1785920548450214012-68b850c0",
+		AccountID: "ACC-SYSTEM",
 	})
 
 	store := newMemoryWorkflowStore(
@@ -55,7 +55,7 @@ func TestResolvePriorityPlan_PrefersPlansWithWork(t *testing.T) {
 // verifies that when all plans are empty, we still return a plan.
 func TestResolvePriorityPlan_FallsBackToEmptyPlan(t *testing.T) {
 	ctx := pkgctx.WithSecurityContext(context.Background(), &pkgctx.SecurityContext{
-		AccountID: "ACC-1785920548450214012-68b850c0",
+		AccountID: "ACC-SYSTEM",
 	})
 
 	store := newMemoryWorkflowStore(
@@ -77,7 +77,7 @@ func TestResolvePriorityPlan_FallsBackToEmptyPlan(t *testing.T) {
 // an explicitly requested plan is always used, even if empty.
 func TestResolvePriorityPlan_ExplicitOverridesWorkCheck(t *testing.T) {
 	ctx := pkgctx.WithSecurityContext(context.Background(), &pkgctx.SecurityContext{
-		AccountID: "ACC-1785920548450214012-68b850c0",
+		AccountID: "ACC-SYSTEM",
 	})
 
 	store := newMemoryWorkflowStore(
@@ -110,7 +110,7 @@ func TestResolvePriorityPlan_ExplicitOverridesWorkCheck(t *testing.T) {
 // TestCountBacklogByStatus_ReturnsCorrectCounts verifies counting works.
 func TestCountBacklogByStatus_ReturnsCorrectCounts(t *testing.T) {
 	ctx := pkgctx.WithSecurityContext(context.Background(), &pkgctx.SecurityContext{
-		AccountID: "ACC-1785920548450214012-68b850c0",
+		AccountID: "ACC-SYSTEM",
 	})
 
 	store := newMemoryWorkflowStore(

@@ -131,7 +131,7 @@ title: Community launch and first-run kernel
 description: "Execution lane for community launch vetting: isolation, documentation graph, starter kernel objects, and installer/quickstart."
 category: feature
 entry_point: scripts/starter_kernel_graph/seed.sh
-owner_ref: ACC-1785920548450214012-68b850c0
+owner_ref: ACC-SYSTEM
 EOF
   out="$("$BIN" object create workstream --file "$WORKDIR/ws-create.yaml" --format json --timeout 120s)"
   python3 -c '
