@@ -52,6 +52,7 @@
     "matrix list",
     "matrix report",
     "matrix update",
+    "matrix validate",
     "mcp cursor-adapter",
     "mcp ide-adapter",
     "mesh",
