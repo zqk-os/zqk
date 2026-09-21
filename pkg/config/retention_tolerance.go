@@ -4,14 +4,13 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
-	"sync"
 	"time"
 
 	"gopkg.in/yaml.v3"
 
-	"github.com/zqk-os/zqk/pkg/concurrency"
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/stampmemo"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -134,11 +133,11 @@ func (c *RetentionToleranceConfig) EnabledKinds() []string {
 	return kinds
 }
 
+var retentionToleranceYAML stampmemo.Table[*RetentionToleranceConfig]
+
 // RetentionToleranceLoader loads RetentionToleranceConfig from YAML.
 type RetentionToleranceLoader struct {
 	configPath string
-	cache      *RetentionToleranceConfig
-	mu         sync.RWMutex
 }
 
 // NewRetentionToleranceLoader creates a loader. configPath is optional; if empty, path is resolved from projectRoot.
@@ -152,32 +151,23 @@ func NewRetentionToleranceLoader(projectRoot string) *RetentionToleranceLoader {
 
 // Load loads and returns the retention tolerance config. Missing file returns default (no kinds) and nil error.
 func (l *RetentionToleranceLoader) Load() (*RetentionToleranceConfig, error) {
-	var c *RetentionToleranceConfig
-	err := concurrency.RunInLock(&l.mu, func() error {
+	return retentionToleranceYAML.Load(l.configPath, stampmemo.Of(l.configPath), func() (*RetentionToleranceConfig, error) {
 		if l.configPath == emptyPath {
-			c = &RetentionToleranceConfig{}
-			return nil
+			return &RetentionToleranceConfig{}, nil
 		}
 		data, readErr := fileutil.ReadFile(l.configPath)
 		if readErr != nil {
 			if fileutil.IsNotExist(readErr) {
-				c = &RetentionToleranceConfig{}
-				return nil
+				return &RetentionToleranceConfig{}, nil
 			}
-			return errfmt.Newf("read retention tolerance config").Wrap(readErr)
+			return nil, errfmt.Newf("read retention tolerance config").Wrap(readErr)
 		}
 		var parsed RetentionToleranceConfig
 		if parseErr := yaml.Unmarshal(data, &parsed); parseErr != nil {
-			return errfmt.Newf("parse retention tolerance config").Wrap(parseErr)
+			return nil, errfmt.Newf("parse retention tolerance config").Wrap(parseErr)
 		}
-		l.cache = &parsed
-		c = &parsed
-		return nil
+		return &parsed, nil
 	})
-	if err != nil {
-		return nil, err
-	}
-	return c, nil
 }
 
 // GetConfigPath returns the config file path used by this loader.

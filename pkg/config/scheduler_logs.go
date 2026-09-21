@@ -2,13 +2,12 @@ package config
 
 import (
 	"path/filepath"
-	"sync"
 
 	"gopkg.in/yaml.v3"
 
-	"github.com/zqk-os/zqk/pkg/concurrency"
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/stampmemo"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -27,11 +26,11 @@ type JobLogsConfig struct {
 
 const defaultMaxJobLogLines = 500
 
+var schedulerLogsYAML stampmemo.Table[*SchedulerLogsConfig]
+
 // SchedulerLogsLoader loads scheduler log config from YAML.
 type SchedulerLogsLoader struct {
 	configPath string
-	mu         sync.Mutex
-	cache      *SchedulerLogsConfig
 }
 
 // NewSchedulerLogsLoader creates a loader. configPath is optional; if empty, path is resolved from projectRoot.
@@ -43,37 +42,32 @@ func NewSchedulerLogsLoader(projectRoot string) *SchedulerLogsLoader {
 	return &SchedulerLogsLoader{configPath: path}
 }
 
+func defaultSchedulerLogsConfig() *SchedulerLogsConfig {
+	return &SchedulerLogsConfig{JobLogs: JobLogsConfig{MaxLines: defaultMaxJobLogLines}}
+}
+
 // Load loads and returns the scheduler logs config. Missing file returns default (max_lines 500) and nil error.
 func (l *SchedulerLogsLoader) Load() (*SchedulerLogsConfig, error) {
-	var c *SchedulerLogsConfig
-	err := concurrency.RunInLock(&l.mu, func() error {
+	return schedulerLogsYAML.Load(l.configPath, stampmemo.Of(l.configPath), func() (*SchedulerLogsConfig, error) {
 		if l.configPath == emptyPath {
-			c = &SchedulerLogsConfig{JobLogs: JobLogsConfig{MaxLines: defaultMaxJobLogLines}}
-			return nil
+			return defaultSchedulerLogsConfig(), nil
 		}
 		data, readErr := fileutil.ReadFile(l.configPath)
 		if readErr != nil {
 			if fileutil.IsNotExist(readErr) {
-				c = &SchedulerLogsConfig{JobLogs: JobLogsConfig{MaxLines: defaultMaxJobLogLines}}
-				return nil
+				return defaultSchedulerLogsConfig(), nil
 			}
-			return errfmt.Newf("read scheduler logs config").Wrap(readErr)
+			return nil, errfmt.Newf("read scheduler logs config").Wrap(readErr)
 		}
 		var parsed SchedulerLogsConfig
 		if parseErr := yaml.Unmarshal(data, &parsed); parseErr != nil {
-			return errfmt.Newf("parse scheduler logs config").Wrap(parseErr)
+			return nil, errfmt.Newf("parse scheduler logs config").Wrap(parseErr)
 		}
 		if parsed.JobLogs.MaxLines <= 0 {
 			parsed.JobLogs.MaxLines = defaultMaxJobLogLines
 		}
-		l.cache = &parsed
-		c = &parsed
-		return nil
+		return &parsed, nil
 	})
-	if err != nil {
-		return nil, err
-	}
-	return c, nil
 }
 
 // GetMaxJobLogLines returns the configured max lines per job log (rolling retention).

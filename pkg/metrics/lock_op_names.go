@@ -3,9 +3,6 @@
 package metrics
 
 const (
-	LockNameMetricsLoaderClearCache         = "metrics_loader_clear_cache"
-	LockNameProfileLoaderCheckCache         = "profile_loader_check_cache"
-	LockNameProfileLoaderUpdateCache        = "profile_loader_update_cache"
 	LockNameSamplerBatchAddEvent            = "sampler_batch_add_event"
 	LockNameSamplerBatchGetEventCount       = "sampler_batch_get_event_count"
 	LockNameSamplerFlushAllCopyKeys         = "sampler_flush_all_copy_keys"
