@@ -1,5 +1,5 @@
-# Architecture index (this SKU)
+# Architecture Index (Open Core)
 
-No studio architecture catalog is shipped.
+Core system architecture and upstream foundation.
 
 See [`README.md`](./README.md) and [`../onboarding/COMMUNITY_FIRST_RUN.md`](../onboarding/COMMUNITY_FIRST_RUN.md).

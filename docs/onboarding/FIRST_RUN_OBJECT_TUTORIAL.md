@@ -86,7 +86,7 @@ When you no longer need the example object, delete it per project policy (`zqk o
 
 ## See also
 
-- [AI Agent Onboarding Guide](./AI_AGENT_ONBOARDING.md) — full agent/human norms (CLI-only process data, etc.).
-- [architecture/README.md](../architecture/README.md) — what this SKU ships vs studio dumps.
+- [AI Agent Onboarding Guide](./AI_AGENT_ONBOARDING.md) — agent directives, hermeticity, and workflow discipline on ZQK Core.
+- [architecture/README.md](../architecture/README.md) — Core system architecture and downstream Studio consumption model.
 - [scripts/onboarding_roadmap/README.md](../../scripts/onboarding_roadmap/README.md) — full **onboarding curriculum** as objects (milestone-first order); advanced-tutorial pattern.
-- [COMMUNITY_FIRST_RUN.md](./COMMUNITY_FIRST_RUN.md) — bounded first-run after object CRUD (optional isolated test roots are not shipped on this SKU).
+- [COMMUNITY_FIRST_RUN.md](./COMMUNITY_FIRST_RUN.md) — first-run setup, MCP installation, and kernel verification.
