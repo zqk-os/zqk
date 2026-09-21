@@ -150,6 +150,9 @@ fi
 		./pkg/kernelcas ./pkg/lifecycle/... ./pkg/lockhealth/... ./pkg/observability/... \
 		./pkg/paths/... ./pkg/pipeline/... ./pkg/tray/... ./pkg/vds/... ./pkg/walutil/... \
 		./pkg/workflow/whatsnext
+
+	# 4. Run storage package test suite
+	go test -short -p 2 -timeout 10m ./pkg/storage/...
 )
 
 printf '%s\n' "PUBLIC RELEASE GATES: PASS"
