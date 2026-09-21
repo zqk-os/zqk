@@ -111,18 +111,18 @@ func (dkm *DynamicKindMapper) doInitialize(start time.Time, metrics *KindMapping
 		return nil
 	}
 
-	if dkm.processDir == emptyValue {
-		err := errfmt.Errorf("process directory not found")
-		metrics.RecordInitialization(time.Since(start), err)
-		return err
-	}
-
-	// Scan process directory for subdirectories (I/O outside lock)
-	entries, err := fileutil.ReadDir(dkm.processDir)
-	if err != nil {
-		err = errfmt.Newf("failed to read process directory").Wrap(err)
-		metrics.RecordInitialization(time.Since(start), err)
-		return err
+	var entries []fileutil.DirEntry
+	if dkm.processDir != emptyValue {
+		e, err := fileutil.ReadDir(dkm.processDir)
+		if err != nil {
+			if !fileutil.IsNotExist(err) {
+				err = errfmt.Newf("failed to read process directory").Wrap(err)
+				metrics.RecordInitialization(time.Since(start), err)
+				return err
+			}
+		} else {
+			entries = e
+		}
 	}
 
 	// Build mappings outside lock (copy-out/process pattern)

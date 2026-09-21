@@ -54,6 +54,7 @@ func TestSeedSchemaPlaneAllowsObjectCreate(t *testing.T) {
 		objects.FieldKeyID:            "PER-seed-plane-test",
 		objects.FieldKeyKind:          objects.KindPersona,
 		objects.FieldKeyTitle:         "Seed plane persona",
+		objects.FieldKeyDescription:   "Seed plane persona valid description for CAS membrane crossing",
 		objects.FieldKeyStatus:        objects.ObjectStatusProposed,
 		objects.FieldKeySchemaVersion: objects.DefaultSchemaVersion,
 	})
@@ -127,15 +128,15 @@ func TestDefaultRootSeedsOnlyHalfThePlane(t *testing.T) {
 
 func countYAML(t *testing.T, dir string) int {
 	t.Helper()
-	entries, err := fileutil.ReadDir(dir)
-	if err != nil {
-		return 0
-	}
 	var n int
-	for _, entry := range entries {
-		if filepath.Ext(entry.Name()) == ".yaml" {
-			n++
+	_ = filepath.Walk(dir, func(path string, info fileutil.FileInfo, err error) error {
+		if err == nil && !info.IsDir() {
+			ext := filepath.Ext(path)
+			if ext == ".yaml" || ext == ".yml" {
+				n++
+			}
 		}
-	}
+		return nil
+	})
 	return n
 }

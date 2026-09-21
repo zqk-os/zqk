@@ -330,6 +330,7 @@ func createTestData(t *testing.T, storageProvider storage.ObjectStorageProvider)
 
 	for _, ref := range codeRefs {
 		ref[objects.FieldKeyID] = ref[objects.FieldKeyID].(string) + suffix
+		ref[objects.FieldKeyStatus] = "conceptual"
 		if refs, ok := ref[objects.FieldKeyBacklogItemRefs].([]string); ok {
 			mapped := make([]string, len(refs))
 			for i, r := range refs {
@@ -341,10 +342,8 @@ func createTestData(t *testing.T, storageProvider storage.ObjectStorageProvider)
 			}
 			ref[objects.FieldKeyBacklogItemRefs] = mapped
 		}
-		// The leave status must differ from the create status, or the promote is a no-op and the
-		// object stays in the draft plane where List cannot see it. approved is the only forward
-		// hop base_object allows from proposed.
-		storage.CreateCASVisible(t, storageProvider, ctx, secCtx, ref, objects.ObjectStatusApproved)
+		// code_reference lifecycle: conceptual (origin/draft) -> originated (membrane-crossed).
+		storage.CreateCASVisible(t, storageProvider, ctx, secCtx, ref, "originated")
 	}
 }
 
