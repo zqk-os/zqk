@@ -25,8 +25,7 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  BUILD_PATH: "." # default value when not using subfolders
-  # BUILD_PATH: subfolder
+  BUILD_PATH: "zqkos-website"
 
 jobs:
   build:
@@ -40,14 +39,15 @@ jobs:
       - name: Detect package manager
         id: detect-package-manager
         run: |
-          if [ -f "${{ github.workspace }}/yarn.lock" ]; then
+          TARGET_DIR="${{ github.workspace }}/${{ env.BUILD_PATH }}"
+          if [ -f "$TARGET_DIR/yarn.lock" ] || [ -f "${{ github.workspace }}/yarn.lock" ]; then
             echo "manager=yarn" >> $GITHUB_OUTPUT
             echo "command=install" >> $GITHUB_OUTPUT
             echo "runner=yarn" >> $GITHUB_OUTPUT
             echo "lockfile=yarn.lock" >> $GITHUB_OUTPUT
             echo "has_site=true" >> $GITHUB_OUTPUT
             exit 0
-          elif [ -f "${{ github.workspace }}/package.json" ]; then
+          elif [ -f "$TARGET_DIR/package.json" ] || [ -f "${{ github.workspace }}/package.json" ]; then
             echo "manager=npm" >> $GITHUB_OUTPUT
             echo "command=ci" >> $GITHUB_OUTPUT
             echo "runner=npx --no-install" >> $GITHUB_OUTPUT
@@ -55,7 +55,7 @@ jobs:
             echo "has_site=true" >> $GITHUB_OUTPUT
             exit 0
           else
-            echo "Error: No package.json or yarn.lock found in ${{ github.workspace }}; cannot build Astro site." >&2
+            echo "Error: No package.json or yarn.lock found in $TARGET_DIR; cannot build site." >&2
             exit 1
           fi
       - name: Setup Node
@@ -73,12 +73,16 @@ jobs:
         if: steps.detect-package-manager.outputs.has_site == 'true'
         run: ${{ steps.detect-package-manager.outputs.manager }} ${{ steps.detect-package-manager.outputs.command }}
         working-directory: ${{ env.BUILD_PATH }}
-      - name: Build with Astro
+      - name: Build site
         if: steps.detect-package-manager.outputs.has_site == 'true'
         run: |
-          ${{ steps.detect-package-manager.outputs.runner }} astro build \
-            --site "${{ steps.pages.outputs.origin }}" \
-            --base "${{ steps.pages.outputs.base_path }}"
+          if [ -f "astro.config.mjs" ] || [ -f "astro.config.ts" ] || grep -q '"astro"' package.json; then
+            ${{ steps.detect-package-manager.outputs.runner }} astro build \
+              --site "${{ steps.pages.outputs.origin }}" \
+              --base "${{ steps.pages.outputs.base_path }}"
+          else
+            ${{ steps.detect-package-manager.outputs.manager }} run build
+          fi
         working-directory: ${{ env.BUILD_PATH }}
       - name: Upload artifact
         if: steps.detect-package-manager.outputs.has_site == 'true'
