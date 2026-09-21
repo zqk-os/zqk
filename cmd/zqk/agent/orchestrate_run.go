@@ -1,8 +1,4 @@
-// Exceeds 800 LOC threshold
-
-// File exceeds 800 LOC threshold
-// File exceeds 800 LOC threshold
-// File exceeds 800 LOC threshold
+// TRACK: orchestrate pipeline decomposition
 package agent
 
 import (
