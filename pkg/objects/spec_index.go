@@ -5,13 +5,12 @@ import (
 	"path/filepath"
 	"sort"
 	"strings"
-	"sync"
-	"time"
 
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/stampmemo"
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -433,16 +432,7 @@ func KindNamesFromSpecIndex(idx *SpecIndex) (map[string]struct{}, error) {
 // and bootstrap layout differences are handled centrally.
 const DefaultSpecIndexPathRef = paths.PathSchemePrefix + "process_internal/spec_index.json"
 
-type cachedSpecIndex struct {
-	idx     *SpecIndex
-	modTime time.Time
-	size    int64
-}
-
-var (
-	specIndexCache   = make(map[string]cachedSpecIndex)
-	specIndexCacheMu sync.RWMutex
-)
+var specIndexes stampmemo.Table[*SpecIndex] // keyed by resolved index path (one file per project)
 
 // TryLoadSpecIndexForProjectRoot loads the spec index for the given projectRoot using the
 // path resolver. Callers should fall back to existing behavior if this returns nil or error.
@@ -458,35 +448,15 @@ func TryLoadSpecIndexForProjectRoot(projectRoot string) *SpecIndex {
 		return nil
 	}
 
-	info, err := fileutil.Stat(abs)
-	if err != nil {
-		return nil
-	}
-
-	specIndexCacheMu.RLock()
-	cached, ok := specIndexCache[abs]
-	specIndexCacheMu.RUnlock()
-
-	if ok && cached.modTime.Equal(info.ModTime()) && cached.size == info.Size() {
-		return cached.idx
-	}
-
-	idx, err := LoadSpecIndex(abs)
+	idx, err := specIndexes.Load(abs, stampmemo.Of(abs), func() (*SpecIndex, error) {
+		return LoadSpecIndex(abs)
+	})
 	if err != nil {
 		logging.Fluent(logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).Debug("Spec index not available or failed to load; falling back to dynamic spec loading").
 			WithError(err).
 			Log()
 		return nil
 	}
-
-	specIndexCacheMu.Lock()
-	specIndexCache[abs] = cachedSpecIndex{
-		idx:     idx,
-		modTime: info.ModTime(),
-		size:    info.Size(),
-	}
-	specIndexCacheMu.Unlock()
-
 	return idx
 }
 
