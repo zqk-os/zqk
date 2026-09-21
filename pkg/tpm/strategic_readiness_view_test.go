@@ -351,6 +351,13 @@ func TestStrategicReadinessEvaluateAndReplenishRunway(t *testing.T) {
 func TestStrategicReadinessAccumulatorInterfaceAndCircuitBreaker(t *testing.T) {
 	tempDir := t.TempDir()
 	view := NewStrategicReadinessView(tempDir)
+	// GetOrRecoverPayload dispatches TriggerAsyncRebuild; drain it before t.TempDir
+	// RemoveAll or writers leave the tree "directory not empty".
+	t.Cleanup(func() {
+		if eng := view.Engine(); eng != nil && !eng.WaitUntilIdle(5*time.Second) {
+			t.Error("async strategic readiness rebuild still running")
+		}
+	})
 
 	// Static check that view satisfies accumulator.Accumulator[*StrategicReadinessLitePayload]
 	var _ accumulator.Accumulator[*StrategicReadinessLitePayload] = view

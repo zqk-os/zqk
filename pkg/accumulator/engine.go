@@ -292,6 +292,20 @@ func (e *Engine[T]) IsReconciling() bool {
 	return atomic.LoadUint32(&e.isReconciling) == 1
 }
 
+// WaitUntilIdle blocks until no background rebuild is running, or timeout elapses.
+// Tests must call this before t.TempDir cleanup: GetOrRecoverPayload may still be
+// writing the lite file after the hot-path return.
+func (e *Engine[T]) WaitUntilIdle(timeout time.Duration) bool {
+	if e == nil {
+		return true
+	}
+	deadline := time.Now().Add(timeout)
+	for e.IsReconciling() && time.Now().Before(deadline) {
+		time.Sleep(time.Millisecond)
+	}
+	return !e.IsReconciling()
+}
+
 // SubscribeWAL starts an incremental background listener on lifecycle_events.wal.
 func (e *Engine[T]) SubscribeWAL(ctx context.Context, updateCh chan<- struct{}) {
 	if e.spec.ProjectRoot == "" {
