@@ -141,7 +141,7 @@ func TestRequireRBACSpecs(t *testing.T) {
 	}
 
 	// Create account spec
-	if err := os.WriteFile(filepath.Join(specsDir, "account.yaml"), []byte("kind: account\n"), 0o644); err != nil {
+	if err := os.WriteFile(filepath.Join(specsDir, "account.yaml"), []byte("kind: account\n"), paths.FilePerm644); err != nil {
 		t.Fatal(err)
 	}
 	if err := RequireRBACSpecs(root); err == nil {
@@ -149,7 +149,7 @@ func TestRequireRBACSpecs(t *testing.T) {
 	}
 
 	// Create role spec
-	if err := os.WriteFile(filepath.Join(specsDir, "role.yaml"), []byte("kind: role\n"), 0o644); err != nil {
+	if err := os.WriteFile(filepath.Join(specsDir, "role.yaml"), []byte("kind: role\n"), paths.FilePerm644); err != nil {
 		t.Fatal(err)
 	}
 	if err := RequireRBACSpecs(root); err != nil {
