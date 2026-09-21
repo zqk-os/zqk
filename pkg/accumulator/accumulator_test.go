@@ -315,8 +315,9 @@ func TestAccumulator_DebounceConcurrency(t *testing.T) {
 	tmpDir := t.TempDir()
 	acc := NewMockAccumulator("debounce_test")
 	blockCh := make(chan struct{})
+	var closeOnce sync.Once
 	acc.scanBlockCh = blockCh
-	defer close(blockCh)
+	defer closeOnce.Do(func() { close(blockCh) })
 
 	engine, err := NewBuilder[SamplePayload](acc).
 		WithProjectRoot(tmpDir).
@@ -340,10 +341,16 @@ func TestAccumulator_DebounceConcurrency(t *testing.T) {
 		t.Error("expected third TriggerAsyncRebuild to be debounced (return false)")
 	}
 
+	// Unblock the background reconciler now that debounce assertions are complete
+	closeOnce.Do(func() { close(blockCh) })
+
 	// Wait for the in-flight background reconciler to finish before test cleanup removes tmpDir
-	deadline := time.Now().Add(2 * time.Second)
+	deadline := time.Now().Add(5 * time.Second)
 	for time.Now().Before(deadline) && engine.IsReconciling() {
 		time.Sleep(10 * time.Millisecond)
+	}
+	if engine.IsReconciling() {
+		t.Fatal("reconciler did not finish within deadline")
 	}
 }
 
