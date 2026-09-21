@@ -20,6 +20,12 @@ import (
 // Empty hashes fail. Merge commits fail (agents were citing PR merges on main).
 // Paths only under .zqk/process/ fail (CAS YAML theater).
 func ValidateBacklogCommitHashes(repoRoot, backlogItemID, branchRef string, hashes []string) error {
+	return ValidateBacklogCommitHashesWithPlan(repoRoot, backlogItemID, "", branchRef, hashes)
+}
+
+// ValidateBacklogCommitHashesWithPlan ensures commit_hashes are real non-merge commits that
+// change product paths and mention the backlog item id or priority plan id in the commit message.
+func ValidateBacklogCommitHashesWithPlan(repoRoot, backlogItemID, planID, branchRef string, hashes []string) error {
 	if zqkenv.TestBypassGitevidence().Get() == "1" {
 		return nil
 	}
@@ -27,6 +33,7 @@ func ValidateBacklogCommitHashes(repoRoot, backlogItemID, branchRef string, hash
 	if bli == "" {
 		return fmt.Errorf("backlog item id is required for commit_hashes evidence")
 	}
+	plan := strings.TrimSpace(planID)
 	if len(hashes) == 0 {
 		return fmt.Errorf("commit_hashes is empty")
 	}
@@ -42,12 +49,20 @@ func ValidateBacklogCommitHashes(repoRoot, backlogItemID, branchRef string, hash
 			last = fmt.Errorf("commit_hashes contains an empty entry")
 			continue
 		}
-		if err := validateOne(root, bli, branchRef, hash); err != nil {
+		if err := validateOne(root, bli, plan, branchRef, hash); err != nil {
 			return err
 		}
 	}
 
-	if branchRef != "" {
+	targetBranch := branchRef
+	if targetBranch != "" {
+		if _, err := gitOutput(root, "rev-parse", "--verify", targetBranch+"^{commit}"); err != nil {
+			if _, errMain := gitOutput(root, "rev-parse", "--verify", "main^{commit}"); errMain == nil {
+				targetBranch = "main"
+			} else {
+				targetBranch = "HEAD"
+			}
+		}
 		allCommits, err := gitOutput(root, "log", "--all", "--format=%H", "--grep="+bli)
 		if err == nil {
 			for _, c := range strings.Split(allCommits, "\n") {
@@ -55,7 +70,7 @@ func ValidateBacklogCommitHashes(repoRoot, backlogItemID, branchRef string, hash
 				if c == "" {
 					continue
 				}
-				if _, err := gitOutput(root, "merge-base", "--is-ancestor", c, branchRef); err != nil {
+				if _, err := gitOutput(root, "merge-base", "--is-ancestor", c, targetBranch); err != nil {
 					return fmt.Errorf("duplicate implementation: BLI %s is also implemented in commit %s which is not an ancestor of %s", bli, short(c), branchRef)
 				}
 			}
@@ -65,15 +80,23 @@ func ValidateBacklogCommitHashes(repoRoot, backlogItemID, branchRef string, hash
 	return last
 }
 
-func validateOne(repoRoot, bliID, branchRef, hash string) error {
+func validateOne(repoRoot, bliID, planID, branchRef, hash string) error {
 	full, err := gitOutput(repoRoot, "rev-parse", "--verify", hash+"^{commit}")
 	if err != nil {
 		return fmt.Errorf("commit_hashes %q is not a resolvable git commit in %s: %w", hash, repoRoot, err)
 	}
 	full = strings.TrimSpace(full)
 
-	if branchRef != "" {
-		if _, err := gitOutput(repoRoot, "merge-base", "--is-ancestor", full, branchRef); err != nil {
+	targetRef := branchRef
+	if targetRef != "" {
+		if _, err := gitOutput(repoRoot, "rev-parse", "--verify", targetRef+"^{commit}"); err != nil {
+			if _, errMain := gitOutput(repoRoot, "merge-base", "--is-ancestor", full, "main"); errMain == nil {
+				targetRef = "main"
+			} else if _, errHead := gitOutput(repoRoot, "merge-base", "--is-ancestor", full, "HEAD"); errHead == nil {
+				targetRef = "HEAD"
+			}
+		}
+		if _, err := gitOutput(repoRoot, "merge-base", "--is-ancestor", full, targetRef); err != nil {
 			return fmt.Errorf("commit_hashes %q is not an ancestor of branch_name %q (YAML-only promotion attempt)", short(full), branchRef)
 		}
 	}
@@ -92,7 +115,8 @@ func validateOne(repoRoot, bliID, branchRef, hash string) error {
 	if err != nil {
 		return fmt.Errorf("commit_hashes %q: cannot read message: %w", hash, err)
 	}
-	if !strings.Contains(msg, bliID) {
+	matched := (bliID != "" && strings.Contains(msg, bliID)) || (planID != "" && strings.Contains(msg, planID))
+	if !matched {
 		return fmt.Errorf("commit_hashes %q message does not mention %s (refuse unrelated SHA cites)", short(full), bliID)
 	}
 

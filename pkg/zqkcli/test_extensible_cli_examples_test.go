@@ -3,6 +3,7 @@ package internal
 import (
 	"context"
 	"fmt"
+	"os"
 	"os/exec"
 	"path/filepath"
 	"strings"
@@ -711,7 +712,15 @@ func setupIsolatedCLITestProject(t *testing.T) (tmpRoot, cliBinary string) {
 	tmpRoot = proj.Root
 	projectRoot := findProjectRootForParityTest(t)
 	cliBinary = filepath.Join(tmpRoot, paths.CLICommandName)
-	buildCmd := execwrap.Command("go", "build", "-o", cliBinary, "./cmd/zqk-admin")
+	if shared := os.Getenv("ZQK_SHARED_TEST_BIN"); shared != "" {
+		if _, err := fileutil.Stat(shared); err == nil {
+			if err := copyFile(shared, cliBinary); err == nil {
+				_ = os.Chmod(cliBinary, paths.DirPerm755)
+				return tmpRoot, cliBinary
+			}
+		}
+	}
+	buildCmd := execwrap.Command("go", "build", "-o", cliBinary, "./cmd/zqk")
 	buildCmd.Dir = projectRoot
 	// buildCmd.Env = os.Environ() removed to preserve WireExecForIsolatedProject env
 	if err := buildCmd.Run(); err != nil {

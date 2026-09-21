@@ -50,6 +50,30 @@ func TestValidateBacklogCommitHashes_RejectsMergeAndUnrelated(t *testing.T) {
 	}
 }
 
+func TestValidateBacklogCommitHashesWithPlan(t *testing.T) {
+	root := initRepo(t)
+	bli := "BLI-PLAN-TEST-001"
+	plan := "PRI-STARTER-COMMUNITY-007"
+
+	writeAndCommit(t, root, "pkg/work/item.go", "package work\n", "feat(plan): work for "+plan)
+	planCommit := head(t, root)
+
+	// Validate with plan ID provided - should pass
+	if err := gitevidence.ValidateBacklogCommitHashesWithPlan(root, bli, plan, "", []string{planCommit}); err != nil {
+		t.Fatalf("commit mentioning plan ID should pass: %v", err)
+	}
+
+	// Validate with empty plan ID - should fail because commit only mentions plan, not BLI
+	if err := gitevidence.ValidateBacklogCommitHashesWithPlan(root, bli, "", "", []string{planCommit}); err == nil {
+		t.Fatal("commit mentioning plan ID without plan parameter should fail")
+	}
+
+	// Branch fallback when branchRef does not exist (deleted post-merge) but commit is in main
+	if err := gitevidence.ValidateBacklogCommitHashesWithPlan(root, bli, plan, "nonexistent-deleted-branch", []string{planCommit}); err != nil {
+		t.Fatalf("deleted branchRef should fall back to main and pass: %v", err)
+	}
+}
+
 func TestValidateBacklogCommitHashes_EdgeCases(t *testing.T) {
 	root := initRepo(t)
 	bli := "BLI-STEWARD-CI-GATE-ENFORCEMENT-001"

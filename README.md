@@ -10,18 +10,6 @@ This tree is the **community** product. Command examples use the default executa
 
 ---
 
-### ⚡ Core Architecture
-
-- **Distributed Knowledge Kernel:** Built on a cellular, spec-driven architecture where project artifacts, policies, and goals are managed as graph nodes.
-- **Dual-Storage & CAS:** Combines Git-native YAML with Content-Addressable Storage (CAS) for cryptographic integrity, synchronized to a high-throughput MemGraph/Neo4j backend.
-- **GraphRAG Engine:** Native multi-hop traversal, semantic proximity queries, and vector search for deep AI reasoning.
-- **MCP Server & RBAC:** Exposes system commands to AI agents via the Model Context Protocol standard under strict role-based access control.
-- **DAG Pipeline Executor:** Composable workflow engine with automatic rollback semantics, retry stages, and rate-limiting.
-
----
-
-ZQK is an operating system for AI + human hybrid engineering teams. It standardizes project goals, architecture, documentation, and task orchestration so multiple agents can collaborate safely and autonomously without losing context or drifting from requirements.
-
 ## ⚡ Quickstart (5 minutes)
 
 There is **no brew formula and no public GitHub release** yet. Build from this checkout.
@@ -57,6 +45,16 @@ Do **not** `export ZQK_PROJECT_ROOT` in your shell profile. It silently attaches
 ./bin/zqk mcp ensure --tcp 127.0.0.1:8443
 # Cursor stdio: ./bin/zqk mcp cursor-adapter
 ```
+
+---
+
+### ⚡ Core Architecture
+
+- **Distributed Knowledge Kernel:** Built on a cellular, spec-driven architecture where project artifacts, policies, and goals are managed as graph nodes.
+- **Dual-Storage & CAS:** Combines Git-native YAML with Content-Addressable Storage (CAS) for cryptographic integrity, synchronized to a high-throughput MemGraph/Neo4j backend.
+- **GraphRAG Engine:** Native multi-hop traversal, semantic proximity queries, and vector search for deep AI reasoning.
+- **MCP Server & RBAC:** Exposes system commands to AI agents via the Model Context Protocol standard under strict role-based access control.
+- **DAG Pipeline Executor:** Composable workflow engine with automatic rollback semantics, retry stages, and rate-limiting.
 
 ---
 

@@ -64,3 +64,25 @@ func TestGetAuthorizedPublicKey_Success(t *testing.T) {
 		t.Fatal("retrieved public key does not match configured key")
 	}
 }
+
+func TestGetAuthorizedPublicKey_InvalidErrors(t *testing.T) {
+	// Invalid base64
+	t.Setenv(zqkenv.AgentPubKey().Key, "invalid base64!!!")
+	if _, err := GetAuthorizedPublicKey(); err == nil {
+		t.Fatal("expected error for invalid base64")
+	}
+
+	// Invalid key length
+	shortB64 := base64.StdEncoding.EncodeToString([]byte("short-key"))
+	t.Setenv(zqkenv.AgentPubKey().Key, shortB64)
+	if _, err := GetAuthorizedPublicKey(); err == nil {
+		t.Fatal("expected error for wrong key size")
+	}
+}
+
+func TestVerifyStamp_Invalid(t *testing.T) {
+	pub, _, _ := ed25519.GenerateKey(rand.Reader)
+	if _, err := VerifyStamp("not-a-valid-jwt-token", pub); err == nil {
+		t.Fatal("expected error when verifying invalid stamp")
+	}
+}

@@ -989,6 +989,7 @@ func (gv *GoValidator) checkCommitHashesGitMutationEvidence(obj map[string]any, 
 		}
 	}
 	id, _ := obj[objects.FieldKeyID].(string)
+	planRef, _ := obj[objects.FieldKeyPriorityPlanRef].(string)
 	hashes := stringSliceField(obj[objects.FieldKeyCommitHashes])
 	branchName, _ := obj[objects.FieldKeyBranchName].(string)
 	if branchName == "" {
@@ -1004,7 +1005,7 @@ func (gv *GoValidator) checkCommitHashesGitMutationEvidence(obj map[string]any, 
 	if root == "" {
 		return false
 	}
-	return gitevidence.ValidateBacklogCommitHashes(root, id, branchName, hashes) == nil
+	return gitevidence.ValidateBacklogCommitHashesWithPlan(root, id, planRef, branchName, hashes) == nil
 }
 
 // checkMachineCheckableClosureEvidence requires valid scheduler job id, bundle log, and re-read green fingerprint.
