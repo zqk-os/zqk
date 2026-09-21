@@ -6,7 +6,7 @@ import (
 )
 
 // kindOverlayRules migrates former Go customRuleValidators into declarative rules.
-// TRACK: BLI-1785786996110276000-11dde761 / BLI-1785786997399161000-76ea6811
+// TRACK: /
 func kindOverlayRules(objectKind, intent string) []Rule {
 	var rules []Rule
 	switch objectKind {
@@ -162,7 +162,7 @@ func backlogItemOverlay() []Rule {
 			// Sealed-column immutability: once a plan is execution-facing (active / in_progress),
 			// refuse *new* membership. Mid-flight gaps get a new grooming (intake) column —
 			// never stuff the locked set. Existing links (same priority_plan_ref) still update freely.
-			// TRACK: GOAL-1786331776059716000-96be46df — sealed-plan membership refuse
+			// TRACK: sealed-plan membership refuse
 			ID: "bli_refuse_new_link_execution_facing_plan",
 			Op: OpRefusePlanStatus,
 			Config: map[string]any{
@@ -194,7 +194,7 @@ func backlogItemOverlay() []Rule {
 		{
 			// State ceiling: archived is the history membrane of the Gantt container.
 			// A child cannot occupy archived while its priority_plan is live or complete.
-			// Draft-plane items with no priority_plan_ref still park. TRACK: RUL-1782235658105562000-b27c8dfc
+			// Draft-plane items with no priority_plan_ref still park. TRACK
 			ID: "bli_archived_requires_archived_plan",
 			Op: OpRefusePlanStatus,
 			Config: map[string]any{
@@ -216,7 +216,7 @@ func backlogItemOverlay() []Rule {
 }
 
 // backlogItemTransitionOverlay encodes lifecycle ready-state promote gates for TransitionStatus.
-// TRACK: BLI-1785786993294193000-ebe57e46
+// TRACK: follow-up in kernel backlog
 func backlogItemTransitionOverlay() []Rule {
 	return []Rule{
 		{
@@ -241,7 +241,7 @@ func backlogItemTransitionOverlay() []Rule {
 		{
 			// CRI-SHOVEL-READY on promote INTO in_progress. Destination planned is
 			// gated by the lifecycle token (except in_progress→planned demote).
-			// TRACK: CRIT-1785885889228395000-15c56d02 — CAP dor-gap vs empty-column split.
+			// TRACK: CAP dor-gap vs empty-column split.
 			ID: "bli_transition_shovel_ready",
 			Op: OpShovelReadyWhenStatus,
 			Config: map[string]any{
@@ -250,7 +250,7 @@ func backlogItemTransitionOverlay() []Rule {
 			},
 		},
 		// Plan immutability / execution gate: in_progress BLI requires shovel-ready or locked plan.
-		// TRACK: BLI-1783845980884549000-014a1c61
+		// TRACK: follow-up in kernel backlog
 		{
 			ID: "bli_in_progress_requires_execution_facing_plan",
 			Op: OpRefusePlanStatus,
@@ -439,7 +439,7 @@ func priorityPlanOverlay() []Rule {
 		{
 			// Execution lock and terminal statuses leave the roadmap queue.
 			// Numeric active_order is only for shovel-ready active plans (unique among actives).
-			// TRACK: BLI-1785439367722386000-7bd43e71 / BLI-1785439369431933000-f0cccd6c
+			// TRACK: /
 			ID: "pri_active_order_cleared_when_locked",
 			Op: OpRefuseFieldWhenStatus,
 			Config: map[string]any{
@@ -455,7 +455,7 @@ func priorityPlanOverlay() []Rule {
 		},
 		{
 			// Spec removed parent→child membership; instances must not carry the key.
-			// TRACK: BLI-1785439365092316000-2c09c364 — child-owned priority_plan membership.
+			// TRACK: child-owned priority_plan membership.
 			ID: "pri_no_backlog_item_refs",
 			Op: OpRefuseFieldPresent,
 			Config: map[string]any{

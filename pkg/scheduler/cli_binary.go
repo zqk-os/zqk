@@ -22,7 +22,7 @@ import (
 //  5. bare "zqk" (PATH fallback)
 func resolveSchedulerCLIBinary(projectRoot string) string {
 	// Honor ZQK_BIN only when the path exists; stale Local CI pins must not block fallbacks.
-	// TRACK: TDE-1785808957221945000-fcd15e47
+	// TRACK: follow-up in kernel backlog
 	if zqkBin := zqkenv.Bin().Get(); zqkBin != emptyValue {
 		if info, err := fileutil.Stat(zqkBin); err == nil && !info.IsDir() {
 			return zqkBin
@@ -88,7 +88,7 @@ func resolveSchedulerCLIBinary(projectRoot string) string {
 	if exe, err := fileutil.Executable(); err == nil && exe != emptyValue && !isTestBinary(exe) {
 		// Prefer the running binary (including workshop stable). Do not flip stable→tip:
 		// that recreates tip/stable split-brain for scheduler-spawned children.
-		// TRACK: TDE-1785808957221945000-fcd15e47
+		// TRACK: follow-up in kernel backlog
 		return exe
 	}
 
@@ -125,7 +125,7 @@ func ResolveSchedulerDaemonBinary(projectRoot string) (string, error) {
 		return v, nil
 	}
 	// Honor ZQK_BIN only when the path exists; stale Local CI pins must not block fallbacks.
-	// TRACK: TDE-1785808957221945000-fcd15e47
+	// TRACK: follow-up in kernel backlog
 	if zqkBin := zqkenv.Bin().Get(); zqkBin != emptyValue {
 		if info, err := fileutil.Stat(zqkBin); err == nil && !info.IsDir() {
 			return zqkBin, nil
@@ -164,7 +164,7 @@ func ResolveSchedulerDaemonBinary(projectRoot string) (string, error) {
 		return "", errfmt.Newf("failed to get executable path").Wrap(err)
 	}
 	// Never spawn the test runner as the daemon; prefer real project/module binaries.
-	// TRACK: BLI-1785443942668406000-1ec5c811 — IsInTest early-return invented missing projectRoot/bin/zqk.
+	// TRACK: IsInTest early-return invented missing projectRoot/bin/zqk.
 	if zqkenv.IsInTest() || isTestBinary(exe) {
 		if path, ok := firstExistingDaemonBinary(projectRoot); ok {
 			return path, nil

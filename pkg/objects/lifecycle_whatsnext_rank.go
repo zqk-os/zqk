@@ -17,7 +17,7 @@ const (
 // PlanWhatsNextCandidateStatuses is the status list both CLI whats-next and
 // pkg/workflow/whatsnext walk when collecting Gantt columns. Includes grooming
 // so next-unlocked (not yet active) plans appear in ambient next_columns.
-// TRACK: BLI-1787035087372193000-c022117d
+// TRACK: follow-up in kernel backlog
 func PlanWhatsNextCandidateStatuses() []string {
 	return []string{
 		ObjectStatusInProgress,
@@ -151,7 +151,7 @@ func BacklogCountsAsOpenWork(status string) bool {
 
 // BacklogCountsAsExecutionFuel is shovel-ready / in-flight / blocked only.
 // Parked realign (deferred, roadmap, validated, exploring) must not win a seated
-// whats-next column over planned work. TRACK: BLI-1787035087372193000-c022117d
+// whats-next column over planned work. TRACK
 func BacklogCountsAsExecutionFuel(status string) bool {
 	role := statusRoleOrFallback(KindBacklogItem, status)
 	switch role {

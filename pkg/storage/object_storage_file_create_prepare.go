@@ -136,7 +136,7 @@ func (f *FileObjectStorage) ensureObjectID(ctx context.Context, obj map[string]a
 			// Generate unique timestamp-based ID with random component to prevent collisions
 			// Even with nanosecond precision, concurrent goroutines can generate IDs at the same nanosecond
 			// Adding a small random component (4 bytes = 8 hex chars) ensures uniqueness
-			// Format: PREFIX-timestamp-random (e.g., BAS-1768909936457275000-a1b2c3d4)
+			// Format: PREFIX-timestamp-random (e.g., )
 			baseTime := time.Now().UnixNano()
 			randomBytes := make([]byte, 4) // 4 bytes = 8 hex characters
 			if _, err := rand.Read(randomBytes); err != nil {

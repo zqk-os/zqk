@@ -325,7 +325,7 @@ func (f *FileObjectStorage) persistFileObjectUpdate(p *fileObjectUpdatePrep) err
 		// Prefer the live CAS path for CacheContext updates (promote/update set
 		// WithCacheUpdate with empty FilePath). Post-sync on cas.Update is primary;
 		// this covers callers that only rely on executeCacheOperation.
-		// TRACK: BLI-1785723654802038000-b14064bc
+		// TRACK: follow-up in kernel backlog
 		if filePath != emptyValue {
 			if cacheErr := executeCacheOperation(ctx, filePath); cacheErr != nil {
 				StorageLog(logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).

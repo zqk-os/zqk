@@ -93,7 +93,7 @@ type ValidationStateCache struct {
 	projectRoot string
 	// loadedUpdated is the on-disk `updated` timestamp from the last Load.
 	// Save refuses to overwrite a file whose Updated is newer (another process
-	// already swapped in a fresher generation). TRACK: BLI-1786387465409533000-45bd780c
+	// already swapped in a fresher generation). TRACK
 	loadedUpdated time.Time
 	// replaceDiskOnNextSave is set by Clear so this instance's next Save wins
 	// even if a peer restored the old file between unlink and persist.
@@ -165,7 +165,7 @@ func (c *ValidationStateCache) Load() error {
 			if currentChecksum != NoSourceCodeAvailableChecksum && legacy.CodeChecksum != currentChecksum {
 				// Do not leave a poison on-disk file: empty Save() later can hit the
 				// empty-overwrite guard and preserve stale Tier-1 hits across processes.
-				// TRACK: BLI-1785723654802038000-b14064bc
+				// TRACK: follow-up in kernel backlog
 				c.cache = make(map[string]*ValidationState)
 				discardStaleFile = true
 				return nil
@@ -444,7 +444,7 @@ func (c *ValidationStateCache) Save() error {
 	defer file.Close()
 
 	// Bounded retry on LOCK_NB contention. Stale-lock break is attempted mid-loop.
-	// TRACK: BLI-1787822805586349000-ba64fe46
+	// TRACK: follow-up in kernel backlog
 	acquireStart := time.Now()
 	maxRetries := 50 // Increased maxRetries to 5 seconds to reduce warn-spam
 	lockAcquired := false
@@ -914,7 +914,7 @@ func shrinkGuardSkipSave(cacheFile string, byKind map[string]kindBucket) bool {
 // staleGenerationSkipSave returns true when another process already wrote a
 // newer validation_cache.json than this instance loaded. Without this, a
 // long-lived daemon Save of a GhostRef-era snapshot clobbers a CLI
-// --clear-cache persist. TRACK: BLI-1786387465409533000-45bd780c
+// clear-cache persist. TRACK
 func staleGenerationSkipSave(c *ValidationStateCache) bool {
 	if c == nil {
 		return false

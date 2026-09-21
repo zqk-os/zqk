@@ -48,7 +48,7 @@ var (
 // fingerprint (sparse test roots still hash these when present). Production
 // coverage is ValidationCodeChecksumGlobs plus the running executable — do not
 // grow this list as the primary way to catch checker edits.
-// TRACK: PRI-CEF-R26-LIFECYCLE-EXAM-001 / BLI-1785723654802038000-b14064bc
+// TRACK: PRI-CEF-R26-LIFECYCLE-EXAM-001 /
 var ValidationCodeChecksumFiles = []string{
 	PathCheckInstanceValidationHelpers,
 	PathCheckImplValidators,
@@ -123,7 +123,7 @@ const (
 	PrecondCommitHashesNotEmpty          = "commit_hashes is not empty"
 	// PrecondCommitRefsGitMutationEvidence fail-closes BLI→complete when agents cite
 	// empty refs, merge SHAs on main, or .zqk/process-only CAS renames.
-	// TRACK: BLI-1787131824765736000-312b6c71
+	// TRACK: follow-up in kernel backlog
 	PrecondCommitRefsGitMutationEvidence   = "commit_refs have git mutation evidence for this backlog_item"
 	PrecondCommitHashesGitMutationEvidence = "commit_hashes have git mutation evidence for this backlog_item"
 	// PrecondBranchRefIsAncestorOfTrunk enforces that a plan cannot complete until its branch_name
@@ -149,11 +149,11 @@ const (
 	// ≥1 backlog_item with priority_plan_ref=this plan and status planned (conversational "ready").
 	PrecondReadyBacklogReferencesPlan = "at least one ready backlog_item references this plan via priority_plan_ref"
 	// PrecondTeamOrPersonaDispatchRefs gates priority_plan shovel-ready / execution-locked
-	// transitions so CAP cannot fall back to every persona. TRACK: BLI-1785915238591238000-619a2f9e
+	// transitions so CAP cannot fall back to every persona. TRACK
 	PrecondTeamOrPersonaDispatchRefs = "at least one team_configuration_ref or persona_refs"
 	// PrecondCRIShovelReady is the MMORCH DoR gate for promote into planned/in_progress.
 	// Must be the exact lifecycle precondition string so checkPrecondition cannot no-op.
-	// TRACK: CRIT-1785885889228395000-15c56d02 — CAP dor-gap vs empty-column split.
+	// TRACK: CAP dor-gap vs empty-column split.
 	PrecondCRIShovelReady = shovelready.Precondition
 	// PrecondTDDTestRedPhase requires that the object links to a criteria linked to a red test case
 	PrecondTDDTestRedPhase = "Must link to a criteria object which is linked to an active but failing test_case (Red TDD phase)"
@@ -165,11 +165,11 @@ const (
 	// PrecondLinkedBacklogAllTerminal gates priority_plan status=complete (hold + →complete):
 	// planned/in_progress/exploring children must not coexist with a complete plan.
 	// Vacuous true when no BLI dependents. Fail-closed without lookups.
-	// TRACK: PRI-1786121461227090000-f8c05f3c — was complete with 9 planned L1–L10 BLIs.
+	// TRACK: was complete with 9 planned L1–L10 BLIs.
 	PrecondLinkedBacklogAllTerminal = "all linked backlog_items referencing this plan are terminal"
 	// PrecondWorkflowConstraintsIfSet gates priority_plan seal when workflow_ref is present:
 	// the referenced workflow must exist, be kind workflow, and enabled. Vacuous true when unset.
-	// Must match the lifecycle YAML token (case-insensitive). TRACK: BLI-1785439365092316000-2c09c364
+	// Must match the lifecycle YAML token (case-insensitive). TRACK
 	PrecondWorkflowConstraintsIfSet = "workflow constraints validated (if workflow_ref is set)"
 	// PrecondPriorityPlanValidated is the remaining grooming→active YAML token:
 	// inherited title or specialized description, plus workstream_refs or singular workstream_ref.

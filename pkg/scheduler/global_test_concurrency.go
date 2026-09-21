@@ -13,7 +13,7 @@ import (
 // Global slots live on a dedicated limiter whose max-wait is the dispatch resource
 // budget (default 2h), not the per-package limiter (default 2s). Sharing one limiter
 // dropped run_wrapper jobs under ordinary maintenance load.
-// TRACK: TDE-1789763617048880000-b8016f74 / BLI-1789866677572207000-df80dba2
+// TRACK: /
 const globalTestJobSlotKey = "__global_test_jobs__"
 
 // globalTestJobLimit is the host-derived ceiling on concurrently dispatched run_wrapper jobs.

@@ -44,7 +44,7 @@ const (
 // the sweeper may delete. IsSchedulerJobMarkedForDeletion already treats lifecycle
 // terminal statuses (archived) as marked, but List only returns rows that match a
 // filter — archived+enabled=true never appeared in the enabled=false / status=disabled
-// passes. TRACK: POL-CODE-1770955023916495000-baa4612b
+// passes. TRACK: POL
 func schedulerJobRetentionCandidateListFilters(batchSize int) []storagepkg.ListFilter {
 	mk := func(extra map[string]any) storagepkg.ListFilter {
 		filters := map[string]any{objects.FieldKeyExecutionMode: ExecutionModeOneTime}

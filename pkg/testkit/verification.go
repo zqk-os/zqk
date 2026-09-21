@@ -20,7 +20,7 @@ import (
 // and updates the test_case object's verification_hash and status to complete.
 func SignTestCaseCompletion(ctx context.Context, testCaseID string, artifacts []string) error {
 	// Prefer TestRoot under tests so inherited ZQK_PROJECT_ROOT (Local CI worktree) cannot
-	// resolve artifacts against the wrong tree. TRACK: TDE-1785808957221945000-fcd15e47.
+	// resolve artifacts against the wrong tree. TRACK: .
 	projectRoot := zqkenv.ProjectRoot().Get()
 	if testRoot := zqkenv.TestRoot().Get(); testRoot != "" && (zqkenv.IsInTest() || projectRoot == "") {
 		projectRoot = testRoot

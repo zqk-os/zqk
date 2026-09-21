@@ -450,7 +450,7 @@ func (av *AsyncValidator) worker(id int) {
 								}
 								// Object-id-cache / discovery may still name a deleted hash after
 								// update. Prefer the live listing-index mapping before blaming CAS.
-								// TRACK: BLI-1785723654802038000-b14064bc
+								// TRACK: follow-up in kernel backlog
 								if readErr != nil {
 									if livePath, liveData, ok := readLiveCASBlobFromIndex(kindDir, taskCopy.ObjectKind, taskCopy.ObjectID); ok {
 										taskCopy.FilePath = livePath
@@ -507,7 +507,7 @@ func (av *AsyncValidator) worker(id int) {
 					// the fail-fast budget for progress. The semaphore MUST stay held until that
 					// goroutine returns: releasing on timeout leaked one OS thread (M) per object
 					// and starved the host (1116 threads in sample). A stuck object occupying one
-					// of ≤8 slots is the fail-closed trade. TRACK: BLI-1785723654802038000-b14064bc
+					// of ≤8 slots is the fail-closed trade. TRACK
 					var valState *ValidationState
 					var valErr error
 					doneChan := make(chan struct{})

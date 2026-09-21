@@ -6,7 +6,7 @@ import (
 
 // PersonaRoleOperator is persona.role for TPM / community operator seats.
 // Those seats compile the lead Gantt, not a persona-bound empty column.
-// TRACK: BLI-1787035087372193000-c022117d
+// TRACK: follow-up in kernel backlog
 const PersonaRoleOperator = "operator"
 
 // PersonaSeesLeadGantt is true when the seated persona is a steward (operator).
@@ -16,7 +16,7 @@ func PersonaSeesLeadGantt(role string) bool {
 
 // CollectPersonaInteractionPolicyRefs returns POL-* ids bound on a persona via
 // canonical interaction_policy_refs and/or related_object_refs.
-// TRACK: BLI-1787035087372193000-c022117d — dual-read until all personas migrate.
+// TRACK: dual-read until all personas migrate.
 func CollectPersonaInteractionPolicyRefs(persona map[string]any) []string {
 	if persona == nil {
 		return nil

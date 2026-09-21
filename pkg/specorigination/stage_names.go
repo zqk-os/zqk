@@ -27,7 +27,7 @@ const (
 	// StageMaterializeIndexes — write spec_index.json, field-keys outputs, and other derived indexes under process/_internal.
 	StageMaterializeIndexes = "SPEC_ORIGIN_MATERIALIZE_INDEXES"
 	// StageTriggerSideEffects — idempotent fan-out: generate-instance-builders, sync-glossary-from-specs, path-cache pre-warm, optional detect-spec-changes.
-	// TRACK: BLI-1785918841712163000-f128dc79 — also append durable contract-change outbox here
+	// TRACK: also append durable contract-change outbox here
 	// (lifecycle/object_spec invariant fingerprint); kernel/scheduler start loads + demotes.
 	StageTriggerSideEffects = "SPEC_ORIGIN_TRIGGER"
 	// StageFinalize — verify: system validate --kind, optional system check --fast, smoke list/count.

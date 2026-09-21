@@ -17,7 +17,7 @@ func IsFieldUnset(v any) bool {
 // UnsetFieldKeys returns the keys in updates whose value is FieldUnset.
 // Graph UpdateNode SET-merges properties, so these keys must be REMOVEd
 // after the in-memory delete or they linger on the node.
-// TRACK: BLI-1785439369431933000-f0cccd6c — persisted active_order on in_progress is invalid.
+// TRACK: persisted active_order on in_progress is invalid.
 func UnsetFieldKeys(updates map[string]any) []string {
 	if len(updates) == 0 {
 		return nil

@@ -338,7 +338,7 @@ func (s *Scheduler) recordSilentClaimBlocker(ctx context.Context, secCtx *pkgctx
 //
 // Uses WithPromoteOnCreate (same intent as `zqk new object … --promote`): the payload is
 // already shovel-ready, so Create keeps status=open and writes CAS instead of parking
-// on the draft plane. List/dedupe then see the escalation. TRACK: BLI-1785723654802038000-b14064bc
+// on the draft plane. List/dedupe then see the escalation. TRACK
 func (s *Scheduler) escalateMissedDeadline(ctx context.Context, secCtx *pkgctx.SecurityContext, taskID, kind, title string) {
 	if s.storage == nil || taskID == "" {
 		return
@@ -400,7 +400,7 @@ func newMissedDeadlineRiskBlockerID() string {
 
 // hourglassSourcePresent is the Exists gate for missed-deadline / silent-claim RIS mint.
 // TRACK: BLI-CEF-R26-DEADLINE-RIS-CLOSE-001 — process heal landed; mint still wrote
-// GhostRefs when the ATK was already gone (2026-08-31 RIS-1788185325801202000-4d46cfab).
+// GhostRefs when the ATK was already gone (2026-08-31 ).
 type hourglassExister interface {
 	Exists(ctx context.Context, secCtx *pkgctx.SecurityContext, id string) (bool, error)
 }

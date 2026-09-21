@@ -47,7 +47,7 @@ func initDefaultConfig() *ConcurrencyConfig {
 	// The previous [4, 8] cap left 10–12 core laptops at ~23 objects/s (~6 min for 8k).
 	// Nested validate still holds the semaphore until done (no timeout thread leak).
 	// Hostload refuses extra slots under foreign CPU pressure, not self-heat.
-	// TRACK: BLI-1785895580100186000-c5539372
+	// TRACK: follow-up in kernel backlog
 	const maxValidatorWorkers = 16
 	validatorWorkers := runtime.NumCPU() * 2
 	if validatorWorkers < 4 {

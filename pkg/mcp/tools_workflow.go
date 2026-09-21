@@ -159,7 +159,7 @@ const getNextBacklogItemPerCallTimeout = 30 * time.Second
 // workflowExecContext returns a context for workflow tool CLI execution that is cancelled on
 // server shutdown or after timeout. Mid-flight request cancel (IDE) is ignored so successive
 // in-process CLI tools/calls are not poisoned — already-cancelled request ctx still fails fast.
-// TRACK: BLI-1784969955962654000-dc689643 — re-wire polite client cancel without killing CLI.
+// TRACK: re-wire polite client cancel without killing CLI.
 func workflowExecContext(ctx context.Context, server *Server, timeout time.Duration) (context.Context, context.CancelFunc) {
 	ctx = EnsureContext(ctx)
 	if ctx.Err() != nil {

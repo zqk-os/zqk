@@ -26,7 +26,7 @@ const (
 
 	// keepaliveIDPrefix marks server→IDE ping ids that flip the host hourglass.
 	// Observed: IDE closes stdio ~120s when only daemon pings run (host-invisible).
-	// TRACK: BLI-1784969955962654000-dc689643 — retire when Streamable HTTP is default
+	// TRACK: retire when Streamable HTTP is default
 	// or IDE no longer requires host-visible keepalive.
 	keepaliveIDPrefix = "zqk-ka-"
 

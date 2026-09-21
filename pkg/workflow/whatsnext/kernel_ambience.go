@@ -43,7 +43,7 @@ const AlignLatestRelativePath = "state/ambient/align-latest.json"
 // KernelAmbience is the cheap thought-projector slice for whats-next:
 // last compact system-check cache + live draft-plane inventory + employed workflows.
 // Does not run system check (too heavy for the composite hot path).
-// TRACK: CRIT-1785944166826206000-61c518e9 — ambient verification on whats-next.
+// TRACK: ambient verification on whats-next.
 type KernelAmbience struct {
 	Available          bool                        `json:"available"`
 	BlockingIssues     int                         `json:"blocking_issues"`

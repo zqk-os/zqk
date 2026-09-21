@@ -16,7 +16,7 @@ import (
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
-// TRACK: BLI-1786358681981576000-66f07f6c — fail-closed against dual CAS blobs (POL-CODE-004).
+// TRACK: fail-closed against dual CAS blobs (POL-CODE-004).
 // ObjectIDCache / index keep one path per id, so per-object checkDuplicateIDs is blind to
 // multiple hash-named YAML files that embed the same id. Filesystem scan is authoritative.
 

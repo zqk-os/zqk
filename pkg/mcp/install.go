@@ -212,7 +212,7 @@ func InstallToIDE(ideName, configPath, execPath, projectRoot string, logger logg
 			// IDE entrypoint: ide-adapter (stdio MCP face) → host MCP daemon.
 			// Prefer workshop stable so Cursor/MCP share the same inode as scheduler;
 			// tip bin/zqk is for rebuilds — promote via scripts/install.sh.
-			// TRACK: TDE-1785808957221945000-fcd15e47 — no tip/stable split-brain.
+			// TRACK: no tip/stable split-brain.
 			serverName = exeName
 			target := ""
 			for _, candidate := range paths.StableBinaryCandidates(projectRoot) {

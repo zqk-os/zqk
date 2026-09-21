@@ -57,7 +57,7 @@ type SpecKindSummary struct {
 }
 
 // EffectiveKernelCritical reports kernel-critical policy from a materialized kind summary.
-// TRACK: BLI-1785784863457357000-dda098ed
+// TRACK: follow-up in kernel backlog
 func (ks SpecKindSummary) EffectiveKernelCritical() bool {
 	if ks.KernelCritical != nil {
 		return *ks.KernelCritical

@@ -171,7 +171,7 @@ func (mp *MessageProcessor) updateClientConnection(writer *bufio.Writer, format 
 				// connection currently processing a message so reconnect after EOF works.
 				// Responses still route only when queue.Writer matches this connection
 				// (queueForConnectionWriter) so a brief ephemeral dial cannot enqueue onto
-				// IDE's socket. TRACK: BLI-1784969955962654000-dc689643 — remove when:
+				// IDE's socket. TRACK: remove when
 				// per-connection Server isolates client identity.
 				if mp.server.multiClient.Load() && client.Writer != nil && client.Writer != writer {
 					mp.server.traceLogf("[MCP_DEBUG] multi-client: rebinding Writer for client_id=%s (reconnect or peer dial)", currentClientID)

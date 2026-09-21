@@ -58,7 +58,7 @@ func MergeShockwavePolicy(parent, child ShockwavePolicy) ShockwavePolicy {
 // together; goal/milestone/mission/vision and shared lanes/views stay as trunks.
 // priority_plan is also a lineage trunk (its status does not hop with a BLI seed),
 // but archiving a member BLI while that plan is not archived is refused
-// (RUL-1782235658105562000-b27c8dfc state ceiling). Park the plan to archive children.
+// ( state ceiling). Park the plan to archive children.
 func DefaultArchiveShockwavePolicy() ShockwavePolicy {
 	return ShockwavePolicy{
 		Mode: ShockwaveModeCluster,

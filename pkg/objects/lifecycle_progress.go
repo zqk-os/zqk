@@ -183,7 +183,7 @@ func IsSuccessLifecycleTerminal(candidate string) bool {
 		ObjectStatusCompleted,
 		ObjectStatusImplemented,
 		ObjectStatusSuccess,
-		ObjectStatusResolved: // TRACK: TDE-1784981879484045000-4d1fba7b — technical_debt verifying→resolved remains a success path.
+		ObjectStatusResolved: // TRACK: technical_debt verifying→resolved remains a success path.
 		return true
 	default:
 		return false

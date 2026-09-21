@@ -56,7 +56,7 @@ func CanonicalAccountID(projectRoot, ref string) string {
 
 // ResolveSeatAccount maps a persona id, role label, or ACC id to an ACC-* seat.
 // Preference: already ACC-* → account with matching persona_ref → default swarm worker.
-// TRACK: BLI-1785905292370531000-b758a11c
+// TRACK: follow-up in kernel backlog
 func ResolveSeatAccount(projectRoot, personaOrAccount string) string {
 	raw := strings.TrimSpace(personaOrAccount)
 	if strings.HasPrefix(raw, "ACC-") {

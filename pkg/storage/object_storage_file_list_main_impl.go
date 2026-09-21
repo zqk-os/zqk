@@ -63,7 +63,7 @@ func (f *FileObjectStorage) List(ctx context.Context, secCtx *pkgctx.SecurityCon
 func (f *FileObjectStorage) listStreamBackedOnly(ctx context.Context, secCtx *pkgctx.SecurityContext, _ *pkgctx.StorageContext, filter ListFilter, effectiveLimit int, cacheable bool, _ *logging.EventLogger) (*QueryResult, error) {
 	// Fail-closed: never scanLimit=0 (open every PID shard) for SortBy/Offset.
 	// HV streams are newest-segment-first and bounded; global sort of the whole
-	// stream pegs MCP/scheduler daemons. TRACK: BLI-1785905541906569000-074e24d7
+	// stream pegs MCP/scheduler daemons. TRACK
 	scanLimit := effectiveLimit
 	if scanLimit <= 0 {
 		scanLimit = DefaultMaxStreamListLimit

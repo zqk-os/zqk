@@ -102,7 +102,7 @@ func (tda *TimingDataAccessor) GetTiming(testName, packageName string) *testkit.
 // NewScanner creates a new test scanner.
 // ProjectRoot is cleaned and symlink-resolved so filepath.Walk can descend into
 // Local CI workdirs that are symlinks (trees/<sha>); Walk does not follow symlinks.
-// TRACK: BLI-1785723654802038000-b14064bc
+// TRACK: follow-up in kernel backlog
 func NewScanner(projectRoot string) *Scanner {
 	root := projectRoot
 	if abs, err := filepath.Abs(projectRoot); err == nil {

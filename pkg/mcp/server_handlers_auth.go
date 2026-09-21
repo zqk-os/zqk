@@ -253,7 +253,7 @@ func (s *Server) validateCredentialsAndResolveAccount(ctx context.Context, clien
 // "invalid username or password".
 func (s *Server) validateUsernamePassword(_ context.Context, username, password, projectRoot string) (accountID string, roles, permissions []string, err error) {
 	// Prefer ACC-* via migrate map / username index (account:username files are retired).
-	// TRACK: BLI-1785905136581480000-1f317f44 / f021fe6f02
+	// TRACK: / f021fe6f02
 	accountID = authcred.CanonicalAccountID(projectRoot, "account:"+strings.ToLower(username))
 	var accountObj map[string]any
 	if accountID != emptyValue {
@@ -529,7 +529,7 @@ func (s *Server) validatePersonalAccessToken(_ context.Context, pat, projectRoot
 
 // loadAccountObject loads an account object by ACC-* id (CAS via .account.index).
 // Legacy account:username / account-username.yaml paths are retired.
-// TRACK: BLI-1785905136581480000-1f317f44
+// TRACK: follow-up in kernel backlog
 func (s *Server) loadAccountObject(accountID, projectRoot string) (map[string]any, error) {
 	accountID = strings.TrimSpace(accountID)
 	if canon := authcred.CanonicalAccountID(projectRoot, accountID); canon != "" {

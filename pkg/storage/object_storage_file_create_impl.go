@@ -18,7 +18,7 @@ import (
 //nolint:gocyclo
 func (f *FileObjectStorage) Create(ctx context.Context, secCtx *pkgctx.SecurityContext, obj map[string]any) error {
 	// Kernel Mutation Pipeline entry (COMMIT re-enters with kernelcas.WithCommit).
-	// TRACK: BLI-1785784864671436000-071adcbe
+	// TRACK: follow-up in kernel backlog
 	if !kernelcas.IsCommit(ctx) {
 		kind, _ := obj[objects.FieldKeyKind].(string)
 		id, _ := obj[objects.FieldKeyID].(string)

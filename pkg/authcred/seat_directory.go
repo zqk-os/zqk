@@ -12,7 +12,7 @@ import (
 
 // SeatDirectory is the external data plane for seating and planner-lane decisions.
 // Behavior lives in RoleRecord / IsPlannerSeatRef; labels and permissions live here.
-// TRACK: BLI-1787804771598596000-27599a81
+// TRACK: follow-up in kernel backlog
 type SeatDirectory interface {
 	Roles() []RoleRecord
 	Accounts() []AccountRecord

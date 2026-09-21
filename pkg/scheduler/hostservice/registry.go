@@ -107,7 +107,7 @@ func SaveRegistry(reg *Registry) error {
 // ResolveServiceDaemonBinary prefers workshop stable for LaunchAgent/systemd units so
 // host supervision matches MCP/scheduler daemon resolution (no tip rebuild split-brain).
 // CE may still fall back to tip bin/<exe> when stable is absent.
-// TRACK: TDE-1785808957221945000-fcd15e47 — one operational inode for long-lived procs.
+// TRACK: one operational inode for long-lived procs.
 func ResolveServiceDaemonBinary(projectRoot string) string {
 	if projectRoot == "" {
 		return brand.ExecutableName()

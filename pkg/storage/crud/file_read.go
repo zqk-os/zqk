@@ -31,7 +31,7 @@ func ReadFileObject(f FileStorageReadFacade, ctx context.Context, secCtx *pkgctx
 	// This handles cases where account IDs are passed in filename format instead of ID format
 	normalizedID := id
 	if strings.HasPrefix(id, "account-") && !strings.HasPrefix(id, "account:") {
-		// Convert account-ide-seat-01 -> ACC-1785920548450214001-7b3cc2de
+		// Convert account-ide-seat-01 ->
 		username := strings.TrimPrefix(id, "account-")
 		normalizedID = fmt.Sprintf("account:%s", username)
 	}

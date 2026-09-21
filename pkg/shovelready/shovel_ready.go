@@ -7,7 +7,7 @@ import (
 )
 
 // CriteriaID is the canonical CRI-SHOVEL-READY criteria object (MMORCH F-002).
-// TRACK: CRIT-1785885889228395000-15c56d02 — keep in sync with the kernel criteria object.
+// TRACK: keep in sync with the kernel criteria object.
 const CriteriaID = "CRIT-1785885889228395000-15c56d02"
 
 // Precondition is the exact lifecycle precondition string. checkPrecondition must

@@ -46,7 +46,7 @@ type daemonSession struct {
 
 	// lifeCtx bounds all daemon dial/RPC work. Canceled only by Close() so IDE
 	// tearing down cmd.Context mid-tools/call cannot abort an in-flight daemon RPC.
-	// Hard cap remains RequestTimeout per call. TRACK: BLI-1784969955962654000-dc689643 —
+	// Hard cap remains RequestTimeout per call. TRACK
 	// prefer hourglass/context-refresh deadlines when shutdown polish lands.
 	lifeCtx    context.Context
 	lifeCancel context.CancelFunc
@@ -404,7 +404,7 @@ func (s *daemonSession) pendingCount() int {
 // HeartbeatLoop pings the daemon; on failure clears the connection for reconnect.
 // Never closeConn while another RPC is pending — that aborted tools/call when the
 // daemon was wedged and ping timed out first (AGY-2 ServeLoop leak). Skip ping
-// entirely while work is in flight. TRACK: BLI-1784969955962654000-dc689643.
+// entirely while work is in flight. TRACK: .
 func (s *daemonSession) HeartbeatLoop(ctx context.Context) {
 	interval := s.cfg.HeartbeatInterval
 	if interval <= 0 {

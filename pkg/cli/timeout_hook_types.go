@@ -148,7 +148,7 @@ type CommandContext struct {
 	PriorityPlan string         // Priority plan ID (e.g., PRI-208)
 	Workstream   string         // Workstream ID (e.g., WS-007)
 	Milestone    string         // Milestone ID (e.g., MIL-036)
-	ActorID      string         // Actor account ID (e.g., ACC-1785920548450214012-68b850c0)
+	ActorID      string         // Actor account ID (e.g., )
 	ActorRoles   []string       // Actor roles (e.g., ["admin"])
 	Flags        map[string]any // Command flags (sanitized)
 }

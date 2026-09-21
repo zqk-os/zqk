@@ -152,7 +152,7 @@ func WallClockActualEffortString(obj map[string]any) (string, bool) {
 // ClampActualEffortToWallClock rewrites actual_effort down to the wall-clock span when
 // it exceeds started_at (created_at fallback) → completed/updated elapsed time.
 // Qualitative / unparsable values are left unchanged. Returns whether a rewrite occurred.
-// TRACK: PRI-1785885772223315000-0649f401 — stop estimated→actual copy from failing validation forever.
+// TRACK: stop estimated→actual copy from failing validation forever.
 func ClampActualEffortToWallClock(obj map[string]any) (clamped bool, previous, next string) {
 	if obj == nil {
 		return false, "", ""
@@ -191,7 +191,7 @@ func ClampActualEffortToWallClock(obj map[string]any) (clamped bool, previous, n
 // span. Callers must treat the result as a warning (or ignore it after clamp):
 // process admins cannot "fix" this field — the membrane autofills/clamps, and
 // only lifecycle override / break-glass may persist an overstated actual.
-// TRACK: PRI-1785885772223315000-0649f401 / BLI-KERNEL-WORK-ENVELOPE-001
+// TRACK: / BLI-KERNEL-WORK-ENVELOPE-001
 func ValidateActualEffortWithinWallClock(obj map[string]any) []ValidationWarning {
 	if obj == nil {
 		return nil

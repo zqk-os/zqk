@@ -125,7 +125,7 @@ func (r *Registry) CreateDocEntry(ctx context.Context, profile string, file *Mar
 
 	// Promote off draft plane so List/registry discovery see the entry (origin is preliminary).
 	// Prefer review (shovel_ready) over terminal active when metadata asked for active.
-	// TRACK: BLI-1785443942668406000-1ec5c811 — draft-plane create / promote membrane.
+	// TRACK: draft-plane create / promote membrane.
 	leaveStatus := objects.GetString(entry, objects.FieldKeyStatus)
 	if leaveStatus == "" || leaveStatus == objects.ObjectStatusDraft || leaveStatus == "conceptual" {
 		leaveStatus = "review"

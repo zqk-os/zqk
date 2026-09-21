@@ -93,7 +93,7 @@ func (f *FileObjectStorage) getContentAddressableStorage(kind string) (*filecas.
 	ctx := pkgctx.NewSystemContext()
 	cas, err := f.casCache.GetOrCreate(ctx, kind, func(ctx context.Context, key string) (*filecas.ContentAddressableStorage, error) {
 		casInstance := filecas.NewContentAddressableStorage(kindDir, key, writeQueue)
-		// Wire per-kind CAS in-memory index to InvalidationShockwaveBus (BLI-1789165691528268000-7bb48f71)
+		// Wire per-kind CAS in-memory index to InvalidationShockwaveBus ()
 		GetGlobalInvalidationBus().Subscribe(NewCASIndexInvalidationSubscriber(casInstance))
 		return casInstance, nil
 	})

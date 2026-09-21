@@ -199,7 +199,7 @@ func (f *FileObjectStorage) prepareKeystoreEntry(obj map[string]any, secCtx *pkg
 }
 
 // applyKeystoreAccessControl applies access control rules for keystore entries
-// - System (ACC-1785920548450214012-68b850c0) can see all fields including credential_hash and salt
+// System () can see all fields including credential_hash and salt
 // - Admins can see all entries but credential_hash and salt are hidden
 // - Users can only see their own entries (matching account_id) and credential_hash/salt are hidden
 func (f *FileObjectStorage) applyKeystoreAccessControl(obj map[string]any, secCtx *pkgctx.SecurityContext) map[string]any {
@@ -238,7 +238,7 @@ func (f *FileObjectStorage) applyKeystoreAccessControl(obj map[string]any, secCt
 	filtered := make(map[string]any)
 	for k, v := range obj {
 		// Hide credential_hash and salt from all non-system users
-		// These fields are only accessible to ACC-1785920548450214012-68b850c0
+		// These fields are only accessible to
 		if k == objects.FieldKeyCredentialHash || k == objects.FieldKeySalt {
 			// Do not include these fields
 			continue

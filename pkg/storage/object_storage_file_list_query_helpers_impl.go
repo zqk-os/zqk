@@ -167,7 +167,7 @@ func (f *FileObjectStorage) countWithFilters(ctx context.Context, kindDir string
 	// workCh must be buffered to len(filePaths): we enqueue before workers start (same pattern as
 	// CAS list). A small buffer (maxWorkers*2) deadlocks when file count exceeds the buffer —
 	// default namespace-scoped object count hit this for kinds with >128 YAML files.
-	// TRACK: BLI-1785903709847957000-8c7a991c
+	// TRACK: follow-up in kernel backlog
 	count := 0
 	maxWorkers := getListReadWorkers()
 	results := make(chan bool, maxWorkers*2)

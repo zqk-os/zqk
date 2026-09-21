@@ -107,7 +107,7 @@ const objectListTimeout = 20 * time.Second
 // mcpFilterExprs normalizes MCP `filter` so list and count share one membrane.
 // JSON-schema arrays arrive as []any; some clients send []string or a single string.
 // Dropping a mistyped filter made list return a different set than count.
-// TRACK: BLI-1785723654802038000-b14064bc
+// TRACK: follow-up in kernel backlog
 func mcpFilterExprs(v any) []any {
 	switch x := v.(type) {
 	case []any:

@@ -104,7 +104,7 @@ func writeObjectViaPrivilegedWriter(ctx context.Context, id, kind string, data [
 // When test local-write is allowed (ZQK_TEST_ROOT or ZQK_TEST_ALLOW_CAS_FALLTHROUGH=1 or IsTestOrTempProjectRoot),
 // always use localFn and skip the daemon — a live LaunchAgent would otherwise write into
 // the studio tree while the test asserts paths under an isolated root (ghost draft create).
-// TRACK: BLI-1785886134649966000-7732876c — membrane must not leak test creates into live CAS.
+// TRACK: membrane must not leak test creates into live CAS.
 func (f *FileObjectStorage) writeCASThroughMembrane(ctx context.Context, id, kind string, data []byte, isDraft bool, localFn func() error) error {
 	if err := caspkg.RefuseCriteriaCASWithoutCategory(kind, isDraft, data); err != nil {
 		return err

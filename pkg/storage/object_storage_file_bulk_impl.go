@@ -276,7 +276,7 @@ func (f *FileObjectStorage) BulkGet(ctx context.Context, secCtx *pkgctx.Security
 // BulkDeleteOptimized (batched WAL / leaf fast path). World-class local deletes
 // must not babysit N×sync round-trips.
 // Critical kinds always go through Delete → kernel.cas_object_erase (never batch CAS wipe).
-// TRACK: BLI-1785784864671436000-071adcbe
+// TRACK: follow-up in kernel backlog
 func (f *FileObjectStorage) BulkDelete(ctx context.Context, secCtx *pkgctx.SecurityContext, ids []string, cascade bool) (*BulkResult, error) {
 	if !IsCLIOperation(ctx, secCtx) {
 		return nil, errfmt.Errorf(ConstStreamDeleteOperationsMustBePerformedThroughCli)

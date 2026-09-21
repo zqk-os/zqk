@@ -108,7 +108,7 @@ func AuditPayload(root string, opts AuditOptions) (*AuditReport, error) {
 	}
 
 	// Script budget check (G11): same extras rule as scripts/open-core/police-community-tree.sh.
-	// TRACK: BLI-1789871626046148000-78991fa7 — keep AuditPayload extras in lockstep with police.
+	// TRACK: keep AuditPayload extras in lockstep with police.
 	if opts.CheckScriptBudget {
 		scriptsDir := filepath.Join(cleanRoot, "scripts")
 		if sInfo, err := fileutil.Stat(scriptsDir); err == nil && sInfo.IsDir() {

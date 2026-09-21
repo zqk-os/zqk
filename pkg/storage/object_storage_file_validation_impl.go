@@ -182,7 +182,7 @@ func (f *FileObjectStorage) validateObject(ctx context.Context, obj map[string]a
 
 	// 1. Spec validation using GoValidator
 	// BLI-621 / KMP: --force skips lifecycle only when DECIDE break_glass reason is present for critical kinds.
-	// TRACK: BLI-1785784867143912000-635942fb
+	// TRACK: follow-up in kernel backlog
 	if pkgctx.IsLifecycleBreakGlass(ctx) && IsCoreKernelKind(kind) {
 		if !pkgctx.GetAllowCoreObjectDelete(ctx) && zqkenv.TestRoot().Get() == "" {
 			return errfmt.Errorf("break_glass requires --reason-code for critical kind %s (Kernel Mutation Pipeline DECIDE)", kind)
@@ -191,7 +191,7 @@ func (f *FileObjectStorage) validateObject(ctx context.Context, obj map[string]a
 	// Break-glass and trusted shockwave writes still validate lifecycle. The
 	// validator skips auto-only *edges* under those overrides; skipping here
 	// dropped criteria/complete holds and allowed false-complete BLIs.
-	// TRACK: BLI-1785784867143912000-635942fb
+	// TRACK: follow-up in kernel backlog
 	options := &validation.ValidationOptions{
 		CurrentState:          currentState,
 		ValidateLifecycle:     true,
@@ -201,7 +201,7 @@ func (f *FileObjectStorage) validateObject(ctx context.Context, obj map[string]a
 		// Leaving ProjectRoot empty made FindNearestProjectRoot(".") use the
 		// caller's cwd (the real repo under `go test`), so isolated fixtures
 		// with a real product commit still failed the complete gate.
-		// TRACK: BLI-1787131824765736000-312b6c71
+		// TRACK: follow-up in kernel backlog
 		ProjectRoot: f.GetProjectRoot(),
 		IsDraftPlaneOnly: func(id string) bool {
 			return f.IsDraftPlaneOnly(id)
@@ -277,7 +277,7 @@ func (f *FileObjectStorage) validateObject(ctx context.Context, obj map[string]a
 			//
 			// Exception — sealed priority_plan membership: create must NOT soft-accept a priority_plan_ref onto an
 			// execution-facing plan (or draft-plane status onto one). Otherwise agents create exploring+active-plan,
-			// then promote with the same ref and bypass new_link_only. TRACK: GOAL-1786331776059716000-96be46df
+			// then promote with the same ref and bypass new_link_only. TRACK
 			if currentState == "" {
 				var hard []validation.ValidationError
 				var soft []validation.ValidationError

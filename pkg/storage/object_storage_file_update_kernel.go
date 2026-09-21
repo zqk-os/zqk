@@ -10,7 +10,7 @@ import (
 
 func (f *FileObjectStorage) updateViaKernelIfNeeded(ctx context.Context, secCtx *pkgctx.SecurityContext, id string, updates map[string]any) (bool, error) {
 	// Kernel Mutation Pipeline entry (COMMIT re-enters with kernelcas.WithCommit).
-	// TRACK: BLI-1785784864671436000-071adcbe
+	// TRACK: follow-up in kernel backlog
 	if !kernelcas.IsCommit(ctx) {
 		kind := ""
 		if f.idValidator != nil {

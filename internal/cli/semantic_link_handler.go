@@ -68,7 +68,7 @@ func (h *SemanticLinkFormatHandler) Validate(data any) error {
 	return nil
 }
 
-// ScanForObjectIDs scans for IDs like ABC-1234567890123456789-abcdef12 with near-zero allocations
+// ScanForObjectIDs scans for IDs like with near-zero allocations
 func ScanForObjectIDs(data []byte) []string {
 	var ids []string
 	idMap := make(map[string]struct{})

@@ -10,7 +10,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
-// TRACK: BLI-PERF-FILEUTIL-METRICS-001 / CRIT-1787075073743178000-853fbf8c / REQ-1787075085088349000-53c24a8e
+// TRACK: BLI-PERF-FILEUTIL-METRICS-001 / /
 
 // IOOp identifies an atomic I/O operation tracked by the metrics collector.
 type IOOp string

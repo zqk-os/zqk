@@ -160,7 +160,7 @@ func stringSliceFromAny(val any) []string {
 }
 
 // Ambience is compiled micro-signals from whats-next (not a shell command).
-// TRACK: BLI-1787035087372193000-c022117d
+// TRACK: follow-up in kernel backlog
 type Ambience struct {
 	Planned        int
 	InProgress     int
@@ -190,7 +190,7 @@ func planExecutionLocked(s Ambience) bool {
 // Preemption (POL-AGENT-INTERACTION-POLICY-001): inbox > push-ahead >
 // planned execution (idle) > kernel fill (compiled onto idle, not a
 // separate event) > groom-ahead > align. Never silence.
-// TRACK: BLI-1787035087372193000-c022117d
+// TRACK: follow-up in kernel backlog
 //
 // Inbox unacked is the TPM swarm gland: MCP notify does not start a Cursor
 // turn, so hunger must compile a followup_message or the seat goes idle while

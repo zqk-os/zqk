@@ -1,6 +1,6 @@
 // Package compose compiles kind×intent mutation DECIDE/FINALIZE configuration
 // into pipeline_definition-shaped definitions (Kernel Mutation Pipeline v2).
-// TRACK: BLI-1785786991961752000-a9d2f142
+// TRACK: follow-up in kernel backlog
 package compose
 
 import (
@@ -114,7 +114,7 @@ const (
 	OpRefuseTwoCycle = "refuse_two_cycle"
 	// OpShovelReadyWhenStatus refuses in_progress BLIs that fail CRI-SHOVEL-READY.
 	// Planned promote is the lifecycle token (except in_progress→planned demote).
-	// TRACK: CRIT-1785885889228395000-15c56d02 — promote must not skip DoR.
+	// TRACK: promote must not skip DoR.
 	OpShovelReadyWhenStatus = "shovel_ready_when_status"
 	// FieldCRIShovelReady is the overlay error field for CRI-SHOVEL-READY (not a spec FieldKey).
 	FieldCRIShovelReady = "cri_shovel_ready"

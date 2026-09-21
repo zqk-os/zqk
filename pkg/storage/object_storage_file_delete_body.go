@@ -116,7 +116,7 @@ func (f *FileObjectStorage) deleteImpl(ctx context.Context, secCtx *pkgctx.Secur
 				return errfmt.Errorf(ErrMsgCannotDeleteDeps, id, len(dependents))
 			}
 			// Iterative BFS cascade (cycle-safe; no recursive Delete stack).
-			// TRACK: BLI-1783796263496783000-dd863823
+			// TRACK: follow-up in kernel backlog
 			if err := f.cascadeDeleteDependentsBFS(ctx, secCtx, id); err != nil {
 				return err
 			}

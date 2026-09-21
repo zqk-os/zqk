@@ -65,7 +65,7 @@ func parseBulkDeleteFlags(cmd *cobra.Command, proc *cli.Processor) (*BulkDeleteF
 	if flags.UnlinkReferences && flags.Cascade {
 		return nil, errfmt.Errorf("--unlink-references cannot be combined with --cascade")
 	}
-	// TRACK: BLI-1786390312940998000-1f101465 — fail-closed bulk delete (parity with object delete).
+	// TRACK: fail-closed bulk delete (parity with object delete).
 	if !flags.UnlinkReferences && !flags.Cascade {
 		return nil, errfmt.Errorf("bulk delete refused: pass --unlink-references or --cascade; refusing to leave GhostRefs")
 	}

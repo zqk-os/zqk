@@ -529,14 +529,14 @@ func (h *CapOrchestratorHandler) Execute(ctx context.Context, job *ScheduledJob)
 }
 
 // capDispatchShared is tick-scoped state shared across parallel plan dispatchers.
-// TRACK: BLI-1785915238591238000-619a2f9e
+// TRACK: follow-up in kernel backlog
 type capDispatchShared struct {
 	openAGI *openAgentInstructionIndex
 	openATK *openAgentTaskIndex
 }
 
 // openAgentInstructionIndex is a one-shot snapshot of open AGIs for CAP fan-out.
-// TRACK: BLI-1785915238591238000-619a2f9e
+// TRACK: follow-up in kernel backlog
 type openAgentInstructionIndex struct {
 	mu sync.RWMutex
 	// key: lower(plan)\0lower(persona) → uppercased instruction texts
@@ -632,7 +632,7 @@ func (h *CapOrchestratorHandler) buildOpenAgentInstructionIndex(ctx context.Cont
 // already exists for the persona+plan with a matching instruction token.
 // instructionMatch is matched case-insensitively as a substring so stage keys
 // (cap_stage_design) and free-text grooming prompts both reuse.
-// TRACK: BLI-1785915238591238000-619a2f9e
+// TRACK: follow-up in kernel backlog
 func (h *CapOrchestratorHandler) hasOpenAgentInstruction(ctx context.Context, planID, personaID, instructionMatch string) bool {
 	return h.buildOpenAgentInstructionIndex(ctx).has(planID, personaID, instructionMatch)
 }

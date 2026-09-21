@@ -17,7 +17,7 @@ func (av *AsyncValidator) GetCachedState(objectID string) (*ValidationState, boo
 // isReusablePriorValidationState reports whether a cached state is safe to keep when a
 // fresh validation times out under load. Tier-1 results (integrity / hard failures /
 // prior timeouts recorded as errors) must not be treated as still-good.
-// TRACK: BLI-1785723654802038000-b14064bc
+// TRACK: follow-up in kernel backlog
 func isReusablePriorValidationState(state *ValidationState) bool {
 	if state == nil {
 		return false
@@ -105,7 +105,7 @@ func (av *AsyncValidator) ShouldEnqueue(objectID, objectKind, filePath string) b
 					// Tier-1 reference misses stay cached on the *referrer* even after the
 					// target is restored (referrer mtime unchanged). Always re-enqueue so
 					// Layer-1 does not keep false "does not exist in object cache" hits.
-					// TRACK: BLI-1785895580100186000-c5539372
+					// TRACK: follow-up in kernel backlog
 					if hasBlockingReferenceIssues(state.Issues) {
 						return true
 					}

@@ -99,7 +99,7 @@ type Server struct {
 	writerQueuesMu sync.Mutex
 	// writerSubscriptions: events/subscribe IDs bound to a connection Writer.
 	// Cleared on disconnect so mcp_subscribers does not accumulate across reconnects.
-	// TRACK: TDE-1785808957221945000-fcd15e47 — honest live subscriber count.
+	// TRACK: honest live subscriber count.
 	writerSubscriptions   map[*bufio.Writer][]string
 	writerSubscriptionsMu sync.Mutex
 	// maxClients is from config (0 = unlimited). Enforced in registerNewClient to prevent resource exhaustion.

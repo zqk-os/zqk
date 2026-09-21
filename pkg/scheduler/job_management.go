@@ -345,7 +345,7 @@ var criticalJobTypesForSubmission = map[string]bool{
 // bulk SCH-run-bundle-* immediate jobs on the default pool.
 // CategoryManual immediate jobs (and callback-bearing one-shots) use priority dispatch so CLI
 // one-shot submissions, agent-exec commits, and hourglass callback workflows are never starved
-// behind goroutine storms or bulk test runners. TRACK: TDE-1789630460110488000-1f2e7aa3
+// behind goroutine storms or bulk test runners. TRACK
 func priorityDispatchJob(job *ScheduledJob) bool {
 	if job == nil {
 		return false
@@ -504,7 +504,7 @@ func (s *Scheduler) tryScheduleJob(result map[string]any, h hydratedJob, reload 
 	}
 	job := h.job
 	// Skip archived and disabled jobs at schedule time (testjobgen delete+recreates SCH-run-* on rescan;
-	// other paths must not re-trigger terminal archived jobs or disabled one-time jobs). TRACK: TDE-1784981879484045000-4d1fba7b
+	// other paths must not re-trigger terminal archived jobs or disabled one-time jobs). TRACK
 	if job == nil || !job.Enabled || job.Status == objects.ObjectStatusArchived || job.Status == StatusDisabled {
 		return nil, nil
 	}

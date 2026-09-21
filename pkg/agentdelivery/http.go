@@ -26,7 +26,7 @@ type httpDoer interface {
 // URLs must use http or https with a non-empty host; see parseHTTPDeliveryURL.
 // For custom TLS, timeouts, or HTTP/2, set Client to a configured *http.Client.
 // When Client is nil, the default uses the APISpec builder (telemetry + resiliency).
-// TRACK: BLI-1783761336286408000-ca1625db
+// TRACK: follow-up in kernel backlog
 type HTTPDeliverer struct {
 	URL         string
 	BearerToken string

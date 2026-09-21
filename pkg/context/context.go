@@ -59,7 +59,7 @@ func IsMCPServerServing() bool {
 }
 
 // Account ID constants for system and common accounts.
-// TRACK: BLI-1785905134201010000-07393484 — ACC-* full cutover (no account:* primary ids).
+// TRACK: ACC-* full cutover (no account:* primary ids).
 const (
 	// SystemAccountID is the account ID used for system operations
 	// This account is used when objects are created by automated processes
@@ -78,7 +78,7 @@ const (
 // ActorIDForAttribution returns the account id to persist on created_by / updated_by.
 // Bare "system" and "account:system" are retired aliases of SystemAccountID; empty
 // also maps there so automated writers cannot omit an actor.
-// TRACK: BLI-1785905134201010000-07393484
+// TRACK: follow-up in kernel backlog
 func ActorIDForAttribution(accountID string) string {
 	id := strings.TrimSpace(accountID)
 	if id == emptyContextValue || IsSystemAccount(id) {
@@ -89,7 +89,7 @@ func ActorIDForAttribution(accountID string) string {
 
 // IsSystemAccount reports whether accountID is the system actor or a retired alias.
 // Empty is not the system actor (permission checks must fail closed).
-// TRACK: BLI-1785905134201010000-07393484
+// TRACK: follow-up in kernel backlog
 func IsSystemAccount(accountID string) bool {
 	switch strings.TrimSpace(accountID) {
 	case SystemAccountID, "system", "account:system":
@@ -587,7 +587,7 @@ func IsTrustedLifecycleEventTarget(ctx stdcontext.Context, targetID string) bool
 
 // WithLifecycleBreakGlassReason records the audited reason for DECIDE plan=break_glass /
 // ForceLifecycleOverride. Empty reason is invalid for critical kinds outside test roots.
-// TRACK: BLI-1785784867143912000-635942fb
+// TRACK: follow-up in kernel backlog
 func WithLifecycleBreakGlassReason(ctx stdcontext.Context, reason string) stdcontext.Context {
 	return stdcontext.WithValue(ctx, lifecycleBreakGlassReasonKey{}, reason)
 }
@@ -601,7 +601,7 @@ func GetLifecycleBreakGlassReason(ctx stdcontext.Context) string {
 }
 
 // WithLifecycleBreakGlass sets force lifecycle override plus an audited DECIDE break_glass reason.
-// TRACK: BLI-1785784867143912000-635942fb
+// TRACK: follow-up in kernel backlog
 func WithLifecycleBreakGlass(ctx stdcontext.Context, reason string) stdcontext.Context {
 	if reason != "" {
 		ctx = WithLifecycleBreakGlassReason(ctx, reason)
@@ -611,7 +611,7 @@ func WithLifecycleBreakGlass(ctx stdcontext.Context, reason string) stdcontext.C
 
 // IsLifecycleBreakGlass reports DECIDE break_glass is armed: force override plus non-empty reason.
 // Composed integrity overlays and critical-kind skips must use this — not bare Force.
-// TRACK: BLI-1785784867143912000-635942fb
+// TRACK: follow-up in kernel backlog
 func IsLifecycleBreakGlass(ctx stdcontext.Context) bool {
 	return strings.TrimSpace(GetLifecycleBreakGlassReason(ctx)) != ""
 }
@@ -623,7 +623,7 @@ type promoteOnCreateKey struct{}
 // WithPromoteOnCreate marks Create to honor a shovel-ready status instead of coercing to
 // lifecycle origin (draft-first). Same intent as `zqk new object … --promote` when the
 // payload is already promote-ready: skip parking on .zqk/object_drafts.
-// TRACK: BLI-1785443942668406000-1ec5c811
+// TRACK: follow-up in kernel backlog
 func WithPromoteOnCreate(ctx stdcontext.Context) stdcontext.Context {
 	return stdcontext.WithValue(ctx, promoteOnCreateKey{}, true)
 }
@@ -646,7 +646,7 @@ type allowCoreObjectDeleteKey struct{}
 // WithAllowCoreObjectDelete marks Delete/BulkDelete to proceed for core kernel kinds.
 // Callers must supply a human justification (CLI --reason-code) unless the actor is
 // elevated (see MayHardDeleteCoreWithoutReason); prefer archive+aggregate.
-// TRACK: BLI-1785723654802038000-b14064bc (incident hardening 2026-08-03)
+// TRACK: (incident hardening 2026-08-03)
 func WithAllowCoreObjectDelete(ctx stdcontext.Context) stdcontext.Context {
 	return stdcontext.WithValue(ctx, allowCoreObjectDeleteKey{}, true)
 }
@@ -683,7 +683,7 @@ const PermissionDeleteAll = "delete:*"
 // kinds without --reason-code. Privilege is account/role permission based (delete:*
 // or delete:core, admin role, or system account). Personas do not grant this alone —
 // bind an elevated role to the ACC. Non-elevated actors still need --reason-code
-// (audit signal). TRACK: BLI-1785723654802038000-b14064bc / POL-AGENT-PLANNER-DOER-001.
+// (audit signal). TRACK: / POL-AGENT-PLANNER-DOER-001.
 func MayHardDeleteCoreWithoutReason(secCtx *SecurityContext) bool {
 	if secCtx == nil {
 		return false
