@@ -1,26 +1,40 @@
 # ZQK OS (`zqk@zqkos.com`)
 
-> **The Cellular Knowledge Operating System for Autonomous Agent Swarms**
+> **The Cellular Knowledge Operating System for Autonomous Agent Swarms**  
+> *The Substrate for Living Software: Sovereign Cells. Verified Truth. Autonomous Organisms.*
 
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 [![Go Report Card](https://goreportcard.com/badge/github.com/zqk-os/zqk)](https://goreportcard.com/report/github.com/zqk-os/zqk)
 
-ZQK (Zen Quantum Kernel) is an open-core, distributed **Cellular Knowledge Operating System (Cellular OS)** built in Go. It treats autonomous multi-agent systems as a biological computing substrate: where individual kernels operate like sovereign cells, transactional membranes isolate memory planes, and an active knowledge graph serves as the operational nervous system.
+ZQK (Zen Quantum Kernel) is an open-core, distributed **Cellular Knowledge Operating System (Cellular OS)** engineered in high-performance Go. It fundamentally rejects the status quo of gluing autonomous agents together with fragile Python scripts and chaotic vector swamps. 
 
-**Your AI agents are coding blind.** Dumping uncurated conversation logs into fragile vector swamps or letting agents edit repositories raw leads to catastrophic context decay. ZQK provides **cellular isolation**, **epistemic hygiene**, and **self-healing biological guardrails** so agent swarms govern themselves.
+Instead, ZQK treats multi-agent systems as a biological computing substrate built upon a rigorous **microkernel architecture**: where individual repositories and services function as **autonomous holons**—sovereign, self-governing wholes that integrate seamlessly into a collaborative distributed organism.
+
+**Your AI agents are coding blind.** Dumping uncurated conversation logs into vector lakes produces context decay and runaway hallucination blast radiuses. ZQK provides **cellular memory isolation**, **epistemic hygiene**, **ambient feedback sensing**, and **biological self-healing guardrails** so agent swarms govern themselves.
 
 This repository hosts **ZQK Core**, the open-core community microkernel.
 
 ---
 
-## 🧬 Biological Systems Architecture
+## 🧬 Biological Systems & Holonic Architecture
 
 Rather than treating multi-agent work as loose prompt scripts or terminal splits, ZQK introduces four foundational biological primitives:
 
-1. **The Cell (Sovereign Local Node):** Each ZQK kernel is an authoritative domain expert over its local environment and private knowledge graph. No bloated, uncurated global vector lakes.
-2. **The Membrane (Deterministic Boundaries):** A strict multi-plane state machine (`PlaneDraft` $\rightarrow$ `PlaneStaged` $\rightarrow$ `PlanePromoted`) ensuring that zero unverified agent mutations touch working code.
-3. **The Nervous System (Active Operational Graph):** An active, real-time state bus driving task execution, lineage, and dependency trees—not a passive data dump.
+1. **The Cell / Holon (Sovereign Node):** Each ZQK kernel is an autonomous holon—simultaneously a complete, self-governing whole and an organic participant in the wider mesh. It maintains authoritative stewardship over its local codebase, tests, and private knowledge graph without relying on bloated global vector lakes.
+2. **The Membrane (Deterministic Boundaries):** A strict multi-plane state machine (`PlaneDraft` $\rightarrow$ `PlaneStaged` $\rightarrow$ `PlanePromoted`) ensuring that zero unverified agent mutations ever pollute working code or canonical state.
+3. **The Nervous System (Active Operational Graph):** An active, real-time synaptic state bus driving task execution, causal provenance lineage, and dependency trees—not a passive secondary data lake.
 4. **The Organism (Inter-Cellular Mesh):** Domain-expert kernels communicating over a typed P2P wire protocol to achieve compound objectives without central micromanagement.
+
+---
+
+## 🧠 Autonomous Memory & Imparted Human Intent
+
+Knowledge in ZQK is never static documentation. It is an active, sensing memory layer:
+
+- **Programmed Human Intent:** Human goals, non-negotiable rules, architectural invariants, mission, and vision are encoded directly into kernel schema objects (`Intent`, `Policy`, `InvariantGate`). Agents never invent objectives in isolation; their actions are strictly bounded by human-imparted intent.
+- **Ambient Feedback Sensing:** Integrated background daemons monitor filesystem changes, test execution suites, and process drift. The kernel senses when reality diverges from intent and dynamically triggers corrective cycles.
+- **Temporal Agility (Snapshot, Rollback & Cherry-Pick):** Treat knowledge like Git commits. Create atomic cryptographic snapshots, fork or branch memory planes for parallel experimentation, rollback failed excursions, and cherry-pick verified knowledge across cells.
+- **Laser Context Curation & Token Efficiency:** Rather than exhausting LLM context windows on uncurated chat history, ZQK slices precise graph subtrees based on the specific WorkUnit an agent claims—**reducing token bloat by up to 80%** while maximizing reasoning accuracy.
 
 ---
 
