@@ -6,6 +6,7 @@
 package bldr_config_v1
 
 import (
+	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/specbuilder/config_builders"
 )
 
@@ -237,7 +238,7 @@ func NewKindMappingsConfigBuilder() *KindMappingsConfigBuilder {
 				"graph": nil,
 			},
 			"created_at":  "2026-07-01 18:00:00 +0000 UTC",
-			"created_by":  "ACC-1785920548450214012-68b850c0",
+			"created_by":  objects.DefaultSystemAccountID,
 			"description": "Configuration for dynamic kind-to-directory mappings.\nThis allows the system to discover and map object kinds to their storage directories\nwithout hardcoding rules in the source code.\n\nBackend-specific configurations:\n- file: Uses directory-based storage, mappings define kind -> directory relationships\n- graph: Uses graph database storage, mappings may define labels/collections instead of directories\n- default: Applied when no backend-specific config exists (backward compatibility)\n",
 			"inference_rules": map[string]any{
 				"directory_patterns": []any{
@@ -408,7 +409,7 @@ func NewKindMappingsConfigBuilder() *KindMappingsConfigBuilder {
 				"remaining_open",
 			},
 			"updated_at": "2026-07-01 18:00:00 +0000 UTC",
-			"updated_by": "ACC-1785920548450214012-68b850c0",
+			"updated_by": objects.DefaultSystemAccountID,
 			"version":    ConfigYAMLVersionV1,
 		})
 

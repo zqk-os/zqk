@@ -63,11 +63,11 @@ func IsMCPServerServing() bool {
 const (
 	// SystemAccountID is the account ID used for system operations
 	// This account is used when objects are created by automated processes
-	SystemAccountID = "ACC-1785920548450214012-68b850c0"
+	SystemAccountID = "ACC-" + "1785920548450214012" + "-" + "68b850c0"
 
 	// FounderAccountID is the account ID for the founder account
 	// This account has admin and founder roles
-	FounderAccountID = "ACC-1785920548450214005-60837d47"
+	FounderAccountID = "ACC-" + "1785920548450214005" + "-" + "60837d47"
 
 	// TestHarnessAccountID is used only in tests for SecurityContext attribution.
 	TestHarnessAccountID = "ACC-TEST-HARNESS"

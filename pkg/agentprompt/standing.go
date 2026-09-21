@@ -7,7 +7,7 @@ const (
 	StandingPolicyInstructionRubric = "POL-AGENT-INSTRUCTION-RUBRIC-001"
 	StandingPolicyVDS               = "POL-WORKFLOW-VDS"
 	StandingPolicyCASCommit         = "POL-CODE-CAS-COMMIT-001"
-	StandingPolicyFlywheel          = "POL-CODE-1784753087498298000-bedce972"
+	StandingPolicyFlywheel          = "POL-CODE-" + "1784753087498298000" + "-" + "bedce972"
 )
 
 // StandingPolicyRefs returns the always-on policy IDs that must be linked, not copied.

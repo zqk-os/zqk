@@ -20,7 +20,7 @@ func NewZqkSessionBuilder() *ZqkSessionBuilder {
 	// Configure the spec
 	builder.
 		SetExtends("base_object").
-		SetDescription("Represents a CLI or interactive session (e.g. a zqk invocation or agent session). Tracks session state and optional metadata.\\nAgent seat-workers bind runtime identity (executor/provider/model/persona/seat) on a child session with session_type=agent_worker; mesh agent_id remains a routing mailbox.\\nLifecycle: zqk_session_lifecycle.yaml.\\nTRACK: REQ-COMMS-RUNTIME-SESSION-001 / BLI-1786955190100310000-edcc34dd\\n").
+		SetDescription("Represents a CLI or interactive session (e.g. a zqk invocation or agent session). Tracks session state and optional metadata.\\nAgent seat-workers bind runtime identity (executor/provider/model/persona/seat) on a child session with session_type=agent_worker; mesh agent_id remains a routing mailbox.\\nLifecycle: zqk_session_lifecycle.yaml.\\nTRACK: REQ-COMMS-RUNTIME-SESSION-001 / kernel-backlog\\n").
 		SetVisibility("internal").
 		SetSchemaVersion(objects.DefaultSchemaVersion)
 
@@ -42,7 +42,7 @@ func (b *ZqkSessionBuilder) addZqkSessionFields() {
 			Dependencies("account object").
 			Lifecycle("immutable").
 			Observability("yes").
-			Purpose("Account that owns this session (e.g. ACC-1785920548450214012-68b850c0 or logged-in user)").
+			Purpose("Account that owns this session (system actor or logged-in user)").
 			Security("non-sensitive").
 			SystemUsage([]any{
 				"session attribution",

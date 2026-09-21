@@ -122,7 +122,7 @@ func generateBuilderCode(config map[string]any, fileName, version, packageName, 
 
 	writeGeneratedConfigBuilderHeader(&buf, sourceYAML)
 	writePackageDeclaration(&buf, packageName)
-	writeImportBlock(&buf, fileName == schedulerMaintenanceConfigFileName)
+	writeImportBlock(&buf, true)
 
 	// Type definition
 	fmt.Fprintf(&buf, "// %s builds the %s config at version %s\n", typeName, fileName, version)
@@ -182,6 +182,9 @@ func formatValue(val any, indentLevel int, packageName, fileName string) string 
 
 	switch v := val.(type) {
 	case string:
+		if v == objects.DefaultSystemAccountID {
+			return "objects.DefaultSystemAccountID"
+		}
 		return fmt.Sprintf("%q", v)
 	case int, int8, int16, int32, int64:
 		return fmt.Sprintf("%d", v)

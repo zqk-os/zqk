@@ -6,6 +6,7 @@
 package bldr_config_v1
 
 import (
+	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/specbuilder/config_builders"
 )
 
@@ -26,7 +27,7 @@ func NewPathsConfigBuilder() *PathsConfigBuilder {
 		SetConfig(map[string]any{
 			"$schema":     "../../../.zqk/cli/specs/schemas/paths_config.schema.json",
 			"created_at":  "2026-07-01 18:00:00 +0000 UTC",
-			"created_by":  "ACC-1785920548450214012-68b850c0",
+			"created_by":  objects.DefaultSystemAccountID,
 			"description": "Configuration for standard directory paths used throughout the system.\nThis allows the system to discover directories without hardcoding paths in source code.\n",
 			"paths": map[string]any{
 				"command_specs":        ".zqk/cli/specs",
@@ -50,7 +51,7 @@ func NewPathsConfigBuilder() *PathsConfigBuilder {
 				},
 			},
 			"updated_at": "2026-07-01 18:00:00 +0000 UTC",
-			"updated_by": "ACC-1785920548450214012-68b850c0",
+			"updated_by": objects.DefaultSystemAccountID,
 			"version":    ConfigYAMLVersionV1,
 		})
 

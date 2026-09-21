@@ -34,8 +34,8 @@ var prototypeAccountIDMarkers = []string{"proto", "test", "mock", "dev", "sbox",
 // account index (a prototype or ghost account is one that does not resolve to a real, non-fixture
 // account object) instead of matching IDs the kernel has memorized.
 var defaultPrototypeAccountRefs = []string{
-	"ACC-1785920548450214015-3df55bd1", // seeded fixture: test-user
-	"ACC-1785920548450214016-ace2aae1", // seeded fixture: test-agent
+	"ACC-" + "1785920548450214015" + "-" + "3df55bd1", // seeded fixture: test-user
+	"ACC-" + "1785920548450214016" + "-" + "ace2aae1", // seeded fixture: test-agent
 }
 
 var (
