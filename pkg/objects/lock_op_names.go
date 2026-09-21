@@ -3,14 +3,6 @@
 package objects
 
 const (
-	LockNameFieldDiscoveryGetCommonCheckLoaded = "field_discovery_get_common_check_loaded"
-	LockNameFieldDiscoveryGetCommonCopy        = "field_discovery_get_common_copy"
-	LockNameFieldRegistryGetAllCheckLoaded     = "field_registry_get_all_check_loaded"
-	LockNameFieldRegistryGetAllCopy            = "field_registry_get_all_copy"
-	LockNameFieldRegistryLoadCheck             = "field_registry_load_check"
-	LockNameFieldRegistryLoadUpdate            = "field_registry_load_update"
-	LockNameFieldRegistryReload                = "field_registry_reload"
-	LockNameFieldRegistryTryReload             = "field_registry_try_reload"
 	LockNameKindMapperGetDirCheckInit          = "kind_mapper_get_dir_check_init"
 	LockNameKindMapperGetDirLookup             = "kind_mapper_get_dir_lookup"
 	LockNameKindMapperGetKindCheckInit         = "kind_mapper_get_kind_check_init"
@@ -40,7 +32,4 @@ const (
 	LockNameSynonymResolverSetLoader           = "synonym_resolver_set_loader"
 	LockNameSynonymResolverSetProvider         = "synonym_resolver_set_provider"
 	LockNameSynonymResolverValidateCopy        = "synonym_resolver_validate_copy"
-	LockNameSystemFieldsLoadCheck              = "system_fields_load_check"
-	LockNameSystemFieldsLoadUpdate             = "system_fields_load_update"
-	LockNameSystemFieldsReload                 = "system_fields_reload"
 )
