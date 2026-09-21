@@ -61,7 +61,7 @@ func NewConvergenceMeasureCommandBuilder() *cobra.Command {
 	help.WithDescriptionLines("Use --format json for scripts; default text summarizes the same fields.")
 	help.WithDescriptionLines("")
 	help.WithDescriptionLines("rollup_status_core: json/yaml include convergerollup.ComputeRollupStatus (bundle-health window + literal gate exit codes + optional child CVS from related_object_refs).")
-	help.WithDescriptionLines("Gate scripts: scripts/check-field-key-literals-repo.sh and scripts/check-zqk-env-literals-repo.sh (same as cvs_outcome_rollup.py). Use --skip-rollup-gates for fast runs.")
+	help.WithDescriptionLines("Use --skip-rollup-gates for fast runs.")
 	help.WithDescriptionLines("Each json/yaml/table run appends one line to .zqk/logs/scheduler/rollup_status_core.jsonl (timestamp + session id + rollup map).")
 	help.ExcludeFlag("format")
 	help.ExcludeFlag("verbose")

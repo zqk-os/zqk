@@ -107,7 +107,6 @@ const (
 
 - **Test-bundle measurement** (section below) is derived only from **health.jsonl**: last outcome per fingerprint, window history, heartbeat, and scheduler trigger-queue depth. It does **not** evaluate free-text **desired_end_state** (vetting matrix, FieldKey/ZQK-env gates, drift baselines, refactors).
 - **Next measured action (rollup)** (below) adds **rollup_status_core**: bundles + literal gate scripts + direct **related_object_refs** child CVS rows — use it to pick the next command before relying on persisted **next_action** alone.
-- **Full rollup_v1** (vetting matrix, drift baselines, **ready_for_parent_completion**) is assembled by **scripts/cvs_outcome_rollup.py** (**--apply** merges into **after_state_snapshot**) — not produced by **zqk scheduler convergence measure** alone; see **CONVERGENCE_PREDICATES_AND_GATES.md**.
 - **Nested CVS tree** (coordinator, depth-capped BFS): **zqk scheduler convergence overseer** — read-only; does not write **rollup_v1**. See **CONVERGENCE_ORCHESTRATION_AND_NESTED_CVS.md** Appendix C.
 - Field **ready_for_session_completion** means bundle-health gates in **pkg/scheduler** (**applySessionCompletionGates**) passed; it does **not** mean every bullet in **desired_end_state** is satisfied.
 - **status → completed** and **current_phase → c6_exit** still require alignment with the written contract and **process rules**; see **docs/architecture/CONVERGENCE_PREDICATES_AND_GATES.md**.

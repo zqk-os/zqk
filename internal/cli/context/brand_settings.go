@@ -10,6 +10,7 @@ import (
 
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/stampmemo"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
@@ -115,73 +116,30 @@ func (s *BrandSettings) ProjectRoot(dir string) string {
 }
 
 // BrandSettingsPath returns the absolute path to the brand settings file for the given project root.
-// All configuration originates from config/** with environment overrides.
 func BrandSettingsPath(projectRoot string) string {
-	candidates := []string{
-		filepath.Join(projectRoot, paths.ConfigDir, paths.ZqkLocalConfigFileName),
-		filepath.Join(projectRoot, paths.ConfigDir, paths.ZqkConfigFileName),
-		filepath.Join(projectRoot, paths.ProjectDataDir, paths.ConfigDir, paths.BrandSettingsFilename),
-		filepath.Join(projectRoot, paths.BrandSettingsFilename),
-	}
-	for _, p := range candidates {
-		if _, err := fileutil.Stat(p); err == nil {
-			return p
-		}
-	}
-	return filepath.Join(projectRoot, paths.ConfigDir, paths.ZqkConfigFileName)
+	return paths.BrandSettingsPath(projectRoot)
 }
 
-// TestSettingsPath returns the path to the test settings file at projectRoot.
-// Used when ZQK_TEST_ROOT is set so tests never load or depend on zqk-settings.yaml.
-func TestSettingsPath(projectRoot string) string {
-	candidates := []string{
-		filepath.Join(projectRoot, paths.ConfigDir, paths.ZqkTestConfigFileName),
-		filepath.Join(projectRoot, paths.ConfigDir, paths.ZqkConfigFileName),
-		filepath.Join(projectRoot, paths.ProjectDataDir, paths.ConfigDir, paths.TestSettingsFilename),
+// LoadBrandSettings loads and parses the brand settings file from projectRoot.
+// When the branded TEST_ROOT env matches projectRoot, loads test-settings.yaml or zqk-test-settings.yaml; otherwise zqk-settings.yaml.
+// Returns an error if the file is missing or invalid.
+func LoadBrandSettings(projectRoot string) (*BrandSettings, error) {
+	if projectRoot == emptyValue {
+		return nil, errfmt.Errorf("project root is required to load brand settings")
 	}
-	for _, p := range candidates {
-		if _, err := fileutil.Stat(p); err == nil {
-			return p
-		}
+	s, _, err := LoadBrandSettingsFromFile(paths.SettingsPathForRoot(projectRoot))
+	if err != nil {
+		return nil, err
 	}
-	return filepath.Join(projectRoot, paths.ConfigDir, paths.ZqkTestConfigFileName)
+	return s, nil
 }
 
-// settingsPathForRoot returns the path to the settings file to load for the given root.
-// When projectRoot is the same as ZQK_TEST_ROOT, returns test-settings.yaml path; otherwise zqk-settings.yaml.
-func settingsPathForRoot(projectRoot string) string {
-	testRoot := zqkenv.TestRoot().Get()
-	if testRoot != emptyValue {
-		absTest, err1 := filepath.Abs(testRoot)
-		absProject, err2 := filepath.Abs(projectRoot)
-		if err1 == nil && err2 == nil && absTest == absProject {
-			return resolveTestBrandSettingsPath(projectRoot)
-		}
-	}
-	return BrandSettingsPath(projectRoot)
+// minimalTestBrandSettingsYAML is the default content for test root settings (same schema as zqk-settings.yaml).
+type minimalTestBrandSettingsYAML struct {
+	Version string         `yaml:"version"`
+	Paths   map[string]any `yaml:"paths"`
 }
 
-// resolveTestBrandSettingsPath picks the first existing file among test-settings.yaml and zqk-test-settings.yaml.
-// If neither exists, returns test-settings.yaml path (for a clear missing-file error).
-func resolveTestBrandSettingsPath(projectRoot string) string {
-	candidates := []string{
-		filepath.Join(projectRoot, paths.ConfigDir, paths.ZqkTestConfigFileName),
-		filepath.Join(projectRoot, paths.ConfigDir, paths.ZqkLocalConfigFileName),
-		filepath.Join(projectRoot, paths.ConfigDir, paths.ZqkConfigFileName),
-		filepath.Join(projectRoot, paths.ProjectDataDir, paths.ConfigDir, paths.TestSettingsFilename),
-		filepath.Join(projectRoot, paths.ProjectDataDir, paths.ConfigDir, paths.ZqkTestSettingsFilename),
-		filepath.Join(projectRoot, paths.TestSettingsFilename),    // Legacy fallback
-		filepath.Join(projectRoot, paths.ZqkTestSettingsFilename), // Legacy fallback
-	}
-	for _, p := range candidates {
-		if _, err := fileutil.Stat(p); err == nil {
-			return p
-		}
-	}
-	return filepath.Join(projectRoot, paths.ConfigDir, paths.ZqkTestConfigFileName)
-}
-
-// testRootMatchesProject reports whether ZQK_*_TEST_ROOT (brand-prefixed) points at projectRoot.
 func testRootMatchesProject(projectRoot string) bool {
 	testRoot := zqkenv.TestRoot().Get()
 	if testRoot == emptyValue {
@@ -190,12 +148,6 @@ func testRootMatchesProject(projectRoot string) bool {
 	absTest, err1 := filepath.Abs(testRoot)
 	absProject, err2 := filepath.Abs(projectRoot)
 	return err1 == nil && err2 == nil && absTest == absProject
-}
-
-// minimalTestBrandSettingsYAML is the default content for test root settings (same schema as zqk-settings.yaml).
-type minimalTestBrandSettingsYAML struct {
-	Version string         `yaml:"version"`
-	Paths   map[string]any `yaml:"paths"`
 }
 
 // EnsureTestRootBrandSettingsFiles writes test-settings.yaml and zqk-test-settings.yaml when
@@ -232,20 +184,12 @@ func EnsureTestRootBrandSettingsFiles(projectRoot string) error {
 	return nil
 }
 
-// LoadBrandSettings loads and parses the brand settings file from projectRoot.
-// When the branded TEST_ROOT env matches projectRoot, loads test-settings.yaml or zqk-test-settings.yaml; otherwise zqk-settings.yaml.
-// Returns an error if the file is missing or invalid.
-func LoadBrandSettings(projectRoot string) (*BrandSettings, error) {
-	if projectRoot == emptyValue {
-		return nil, errfmt.Errorf("project root is required to load brand settings")
-	}
-	path := settingsPathForRoot(projectRoot)
-	s, _, err := LoadBrandSettingsFromFile(path)
-	if err != nil {
-		return nil, err
-	}
-	return s, nil
+type brandFileHit struct {
+	settings *BrandSettings
+	root     string
 }
+
+var brandFiles stampmemo.Table[brandFileHit]
 
 // LoadBrandSettingsFromFile loads brand settings from an explicit settings file path and returns
 // the settings and the effective project root derived from settings.Paths.ProjectRoot or the file's
@@ -254,29 +198,35 @@ func LoadBrandSettingsFromFile(settingsPath string) (*BrandSettings, string, err
 	if settingsPath == emptyValue {
 		return nil, "", errfmt.Errorf("settings path is required")
 	}
-	data, err := fileutil.ReadFile(settingsPath)
-	if err != nil {
-		if fileutil.IsNotExist(err) {
-			return nil, "", errfmt.Errorf("brand settings file missing: %s", settingsPath)
+	hit, err := brandFiles.Load(settingsPath, stampmemo.Of(settingsPath), func() (brandFileHit, error) {
+		data, err := fileutil.ReadFile(settingsPath)
+		if err != nil {
+			if fileutil.IsNotExist(err) {
+				return brandFileHit{}, errfmt.Errorf("brand settings file missing: %s", settingsPath)
+			}
+			return brandFileHit{}, errfmt.Newf("read brand settings").Wrap(err)
 		}
-		return nil, "", errfmt.Newf("read brand settings").Wrap(err)
+		var s BrandSettings
+		if err := yaml.Unmarshal(data, &s); err != nil {
+			return brandFileHit{}, errfmt.Newf("parse brand settings").Wrap(err)
+		}
+		if s.Version == emptyValue {
+			s.Version = DefaultBrandSettingsVersion
+		}
+		if s.Paths.ProjectRoot == emptyValue && s.KernelState.ProjectRoot != emptyValue {
+			s.Paths.ProjectRoot = s.KernelState.ProjectRoot
+		}
+		dir := filepath.Dir(settingsPath)
+		projectRoot := s.ProjectRoot(dir)
+		if _, err := fileutil.Stat(filepath.Join(projectRoot, paths.ProjectDataDir)); err != nil {
+			return brandFileHit{}, errfmt.Errorf("derived project root from settings does not contain %s: %s", paths.ProjectDataDir, projectRoot)
+		}
+		return brandFileHit{settings: &s, root: projectRoot}, nil
+	})
+	if err != nil {
+		return nil, "", err
 	}
-	var s BrandSettings
-	if err := yaml.Unmarshal(data, &s); err != nil {
-		return nil, "", errfmt.Newf("parse brand settings").Wrap(err)
-	}
-	if s.Version == emptyValue {
-		s.Version = DefaultBrandSettingsVersion
-	}
-	if s.Paths.ProjectRoot == emptyValue && s.KernelState.ProjectRoot != emptyValue {
-		s.Paths.ProjectRoot = s.KernelState.ProjectRoot
-	}
-	dir := filepath.Dir(settingsPath)
-	projectRoot := s.ProjectRoot(dir)
-	if _, err := fileutil.Stat(filepath.Join(projectRoot, paths.ProjectDataDir)); err != nil {
-		return nil, "", errfmt.Errorf("derived project root from settings does not contain %s: %s", paths.ProjectDataDir, projectRoot)
-	}
-	return &s, projectRoot, nil
+	return hit.settings, hit.root, nil
 }
 
 // ResolveProjectRootFromSettings resolves project root by loading the brand settings file at the

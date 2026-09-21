@@ -3,21 +3,14 @@ package authcred
 import (
 	"path/filepath"
 	"strings"
-	"sync"
 
 	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/stampmemo"
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
-type credFileSnap struct {
-	mu     sync.Mutex
-	mtime  int64
-	loaded bool
-	token  string
-}
-
-var credFileSnaps sync.Map // path -> *credFileSnap
+var credTokens stampmemo.Table[string]
 
 // ResolveCredentialPath picks the credentials file for AuthMiddleware.
 // Isolated ZQK_TEST_ROOT (not the live projectRoot) never falls back to $HOME
@@ -72,15 +65,6 @@ func canonDir(p string) string {
 	return abs
 }
 
-func credCache(path string) *credFileSnap {
-	if existing, ok := credFileSnaps.Load(path); ok {
-		return existing.(*credFileSnap)
-	}
-	fresh := &credFileSnap{}
-	actual, _ := credFileSnaps.LoadOrStore(path, fresh)
-	return actual.(*credFileSnap)
-}
-
 // ReadCredentialToken returns the trimmed credentials-file payload, retained
 // until that file's mtime changes. Missing files yield "".
 func ReadCredentialToken(path string) string {
@@ -88,23 +72,12 @@ func ReadCredentialToken(path string) string {
 	if path == "" {
 		return ""
 	}
-	var mtime int64
-	if info, err := fileutil.Stat(path); err == nil {
-		mtime = info.ModTime().UnixNano()
-	}
-	snap := credCache(path)
-	snap.mu.Lock()
-	defer snap.mu.Unlock()
-	if snap.loaded && snap.mtime == mtime {
-		return snap.token
-	}
-	data, err := fileutil.ReadFile(path)
-	token := ""
-	if err == nil {
-		token = strings.TrimSpace(string(data))
-	}
-	snap.loaded = true
-	snap.mtime = mtime
-	snap.token = token
+	token, _ := credTokens.Load(path, stampmemo.Of(path), func() (string, error) {
+		data, err := fileutil.ReadFile(path)
+		if err != nil {
+			return "", nil
+		}
+		return strings.TrimSpace(string(data)), nil
+	})
 	return token
 }

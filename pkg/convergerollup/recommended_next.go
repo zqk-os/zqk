@@ -56,15 +56,13 @@ func actionLineForBlocker(code, detail string, tb TestBundleInput) string {
 		return "Bundle health is trending away from the session goal; stabilize tests and scheduler load before advancing phase. " +
 			"Re-run scan-tests for the packages implicated by failing fingerprints."
 	case "field_key_literals_gate":
-		return "Field-key literal gate failed (" + detail + "). Run: sh ./scripts/check-field-key-literals-repo.sh; " +
-			"fix with go run ./scripts/fix_field_key_literals -path <pkg> -write (see field-key-literal-scan rule)."
+		return "Field-key literal gate failed (" + detail + "). Inspect field key literals and use pkg/objects accessors."
 	case "zqk_env_literals_gate":
-		return "ZQK env literal gate failed (" + detail + "). Run: sh ./scripts/check-zqk-env-literals-repo.sh; " +
-			"use pkg/zqkenv accessors (see check-zqk-env-literals-repo.sh)."
+		return "ZQK env literal gate failed (" + detail + "). Use pkg/zqkenv accessors."
 	case "vetting_matrix":
-		return "Vetting matrix error: " + detail + ". Fix CSV/process inputs or re-run scripts/cvs_outcome_rollup.py."
+		return "Vetting matrix error: " + detail + ". Fix CSV/process inputs or re-run matrix verification."
 	case "matrix_rows_pending":
-		return "Vetting matrix still has pending .go rows (" + detail + "). Drive CODEBASE_VETTING_MATRIX.csv to completion or adjust session scope."
+		return "Verification matrix still has pending rows (" + detail + "). Drive matrix to completion or adjust session scope."
 	case "child_session":
 		if strings.HasPrefix(detail, "CVS-") {
 			return "Complete or archive child convergence_session before parent exit: " + detail + "."

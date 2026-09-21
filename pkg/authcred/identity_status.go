@@ -5,16 +5,16 @@ import (
 	"path/filepath"
 	"slices"
 	"strings"
-	"sync"
 	"time"
 
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/stampmemo"
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
-var lastIdentityFP sync.Map // path -> fingerprint (identity without UpdatedAt)
+var identityFP stampmemo.Fingerprints
 
 // Identity snapshot schema (lite file, not CAS).
 const (
@@ -127,7 +127,7 @@ func WriteIdentityStatus(projectRoot string, snap IdentityStatus) {
 		return
 	}
 	fp := identityFingerprint(snap)
-	if prev, ok := lastIdentityFP.Load(path); ok && prev.(string) == fp {
+	if identityFP.Unchanged(path, fp) {
 		return
 	}
 	if err := fileutil.EnsureDir(filepath.Dir(path)); err != nil {
@@ -140,7 +140,7 @@ func WriteIdentityStatus(projectRoot string, snap IdentityStatus) {
 	if err := fileutil.WriteStandardFile(path, append(data, '\n')); err != nil {
 		return
 	}
-	lastIdentityFP.Store(path, fp)
+	identityFP.Remember(path, fp)
 }
 
 // ReadIdentityStatus loads the last snapshot if present.

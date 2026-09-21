@@ -3,11 +3,10 @@ package authcred
 import (
 	"slices"
 	"strings"
-	"sync"
 
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
-	"github.com/zqk-os/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/stampmemo"
 	"gopkg.in/yaml.v3"
 )
 
@@ -25,6 +24,8 @@ type accountPersonaFields struct {
 	Roles       []string `yaml:"roles"`
 	Permissions []string `yaml:"permissions"`
 }
+
+var activeAccounts stampmemo.Table[[]accountPersonaFields]
 
 // CanonicalAccountID resolves ACC-* passthrough or legacy account:username → ACC-*.
 // Empty string means unresolved (caller keeps the original ref for diagnostics).
@@ -165,9 +166,20 @@ func AccountCASPath(projectRoot, accountID string) string {
 }
 
 func loadActiveAccounts(projectRoot string) []accountPersonaFields {
-	if cached, ok := cachedActiveAccounts(projectRoot); ok {
-		return cached
+	if projectRoot == "" {
+		return nil
 	}
+	stamp := stampmemo.Of(paths.AccountIndexPath(projectRoot))
+	if stamp == 0 {
+		return collectActiveAccounts(projectRoot)
+	}
+	accs, _ := activeAccounts.Load(projectRoot, stamp, func() ([]accountPersonaFields, error) {
+		return collectActiveAccounts(projectRoot), nil
+	})
+	return slices.Clone(accs)
+}
+
+func collectActiveAccounts(projectRoot string) []accountPersonaFields {
 	indexPath := paths.AccountIndexPath(projectRoot)
 	mappings := casMappings(projectRoot, indexPath)
 	if mappings == nil {
@@ -195,53 +207,5 @@ func loadActiveAccounts(projectRoot string) []accountPersonaFields {
 		}
 		out = append(out, acc)
 	}
-	storeActiveAccounts(projectRoot, indexPath, out)
 	return out
-}
-
-type accountCatalogSnap struct {
-	mu         sync.Mutex
-	indexMtime int64
-	loaded     bool
-	accounts   []accountPersonaFields
-}
-
-var accountCatalogs sync.Map
-
-func accountCatalog(projectRoot string) *accountCatalogSnap {
-	if existing, ok := accountCatalogs.Load(projectRoot); ok {
-		return existing.(*accountCatalogSnap)
-	}
-	fresh := &accountCatalogSnap{}
-	actual, _ := accountCatalogs.LoadOrStore(projectRoot, fresh)
-	return actual.(*accountCatalogSnap)
-}
-
-func cachedActiveAccounts(projectRoot string) ([]accountPersonaFields, bool) {
-	indexPath := paths.AccountIndexPath(projectRoot)
-	info, err := fileutil.Stat(indexPath)
-	if err != nil {
-		return nil, false
-	}
-	mtime := info.ModTime().UnixNano()
-	snap := accountCatalog(projectRoot)
-	snap.mu.Lock()
-	defer snap.mu.Unlock()
-	if snap.indexMtime != mtime || !snap.loaded {
-		return nil, false
-	}
-	return slices.Clone(snap.accounts), true
-}
-
-func storeActiveAccounts(projectRoot, indexPath string, accounts []accountPersonaFields) {
-	info, err := fileutil.Stat(indexPath)
-	if err != nil {
-		return
-	}
-	snap := accountCatalog(projectRoot)
-	snap.mu.Lock()
-	snap.indexMtime = info.ModTime().UnixNano()
-	snap.loaded = true
-	snap.accounts = slices.Clone(accounts)
-	snap.mu.Unlock()
 }

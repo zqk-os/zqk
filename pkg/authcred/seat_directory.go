@@ -1,14 +1,12 @@
 package authcred
 
 import (
-	"path/filepath"
 	"slices"
 	"strings"
-	"sync"
 
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
-	"github.com/zqk-os/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/stampmemo"
 	"gopkg.in/yaml.v3"
 )
 
@@ -94,10 +92,23 @@ type roleFile struct {
 	Permissions []string `yaml:"permissions"`
 }
 
+var roleRecords stampmemo.Table[[]RoleRecord]
+
 func loadRoleRecords(projectRoot string) []RoleRecord {
-	if recs, ok := cachedRoleRecords(projectRoot); ok {
-		return recs
+	if projectRoot == "" {
+		return nil
 	}
+	stamp := stampmemo.Of(paths.RoleIndexPath(projectRoot))
+	if stamp == 0 {
+		return collectRoleRecords(projectRoot)
+	}
+	recs, _ := roleRecords.Load(projectRoot, stamp, func() ([]RoleRecord, error) {
+		return collectRoleRecords(projectRoot), nil
+	})
+	return slices.Clone(recs)
+}
+
+func collectRoleRecords(projectRoot string) []RoleRecord {
 	rolesDir := paths.RolesDirPath(projectRoot)
 	indexPath := paths.RoleIndexPath(projectRoot)
 	seen := map[string]struct{}{}
@@ -135,77 +146,13 @@ func loadRoleRecords(projectRoot string) []RoleRecord {
 	}
 
 	if !indexLoaded {
-		entries, err := fileutil.ReadDir(rolesDir)
-		if err != nil {
-			return out
-		}
-		for _, ent := range entries {
-			name := ent.Name()
-			if ent.IsDir() || !strings.HasSuffix(name, ".yaml") || strings.HasPrefix(name, ".") {
-				continue
-			}
-			if rec, ok := readRoleFile(filepath.Join(rolesDir, name)); ok {
+		_ = forEachYAMLFile(rolesDir, func(_ string, data []byte) {
+			if rec, ok := parseRoleFile(data); ok {
 				appendRole(rec)
 			}
-		}
+		})
 	}
-	storeRoleRecords(projectRoot, indexPath, out)
 	return out
-}
-
-type roleCatalogSnap struct {
-	mu         sync.Mutex
-	indexMtime int64
-	loaded     bool
-	records    []RoleRecord
-}
-
-var roleCatalogs sync.Map // projectRoot -> *roleCatalogSnap
-
-func roleCatalog(projectRoot string) *roleCatalogSnap {
-	if existing, ok := roleCatalogs.Load(projectRoot); ok {
-		return existing.(*roleCatalogSnap)
-	}
-	fresh := &roleCatalogSnap{}
-	actual, _ := roleCatalogs.LoadOrStore(projectRoot, fresh)
-	return actual.(*roleCatalogSnap)
-}
-
-func cachedRoleRecords(projectRoot string) ([]RoleRecord, bool) {
-	indexPath := paths.RoleIndexPath(projectRoot)
-	info, err := fileutil.Stat(indexPath)
-	if err != nil {
-		return nil, false
-	}
-	mtime := info.ModTime().UnixNano()
-	snap := roleCatalog(projectRoot)
-	snap.mu.Lock()
-	defer snap.mu.Unlock()
-	if snap.indexMtime != mtime || !snap.loaded {
-		return nil, false
-	}
-	return slices.Clone(snap.records), true
-}
-
-func storeRoleRecords(projectRoot, indexPath string, records []RoleRecord) {
-	info, err := fileutil.Stat(indexPath)
-	if err != nil {
-		return
-	}
-	snap := roleCatalog(projectRoot)
-	snap.mu.Lock()
-	snap.indexMtime = info.ModTime().UnixNano()
-	snap.loaded = true
-	snap.records = slices.Clone(records)
-	snap.mu.Unlock()
-}
-
-func readRoleFile(path string) (RoleRecord, bool) {
-	raw, err := fileutil.ReadFile(path)
-	if err != nil {
-		return RoleRecord{}, false
-	}
-	return parseRoleFile(raw)
 }
 
 func parseRoleFile(raw []byte) (RoleRecord, bool) {

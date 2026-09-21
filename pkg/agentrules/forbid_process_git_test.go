@@ -15,6 +15,9 @@ func TestForbidGitCleanProcess_blocksStashUntracked(t *testing.T) {
 	t.Parallel()
 	root := repoRoot(t)
 	script := filepath.Join(root, "scripts", "forbid-git-clean-process.sh")
+	if _, err := fileutil.Stat(script); err != nil {
+		t.Skip("scripts/forbid-git-clean-process.sh absent (studio script)")
+	}
 
 	cmd := execwrap.Command("sh", script, "stash", "-u")
 	cmd.Dir = root
@@ -53,7 +56,11 @@ func TestScanStashForProcessCAS_emptyStashExitsZero(t *testing.T) {
 	run("commit", "-m", "base")
 
 	root := repoRoot(t)
-	cmd := execwrap.Command("sh", filepath.Join(root, "scripts", "scan-stash-for-process-cas.sh")) //nolint:gosec
+	scanScript := filepath.Join(root, "scripts", "scan-stash-for-process-cas.sh")
+	if _, err := fileutil.Stat(scanScript); err != nil {
+		t.Skip("scripts/scan-stash-for-process-cas.sh absent (studio script)")
+	}
+	cmd := execwrap.Command("sh", scanScript) //nolint:gosec
 	cmd.Dir = dir
 	if out, err := cmd.CombinedOutput(); err != nil {
 		t.Fatalf("empty stash should exit 0: %v\n%s", err, out)

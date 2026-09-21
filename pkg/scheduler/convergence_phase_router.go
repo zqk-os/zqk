@@ -61,7 +61,7 @@ var phaseRoutingProfiles = map[string]phaseRoutingProfile{
 		ID: "code_quality_go_matrix",
 		ExtraNotes: func(*TestBundleConvergenceSnapshot) []string {
 			return []string{
-				"Profile code_quality_go_matrix: matrix rows, FieldKey/ZQK-env repo gates, scan-tests bundles; use scripts/cvs_outcome_rollup.py for surfaces beyond CLI rollup.",
+				"Profile code_quality_go_matrix: matrix rows, FieldKey/ZQK-env repo gates, scan-tests bundles; use matrix report for surfaces beyond CLI rollup.",
 			}
 		},
 	},
@@ -73,12 +73,12 @@ var phaseRoutingProfiles = map[string]phaseRoutingProfile{
 			}
 		},
 	},
-	// Nested / matrix-only C6: CODEBASE_VETTING_MATRIX fully_vetted per VETTING_RUBRIC; bundles are secondary.
+	// Nested / matrix-only C6: matrix fully vetted per rubric; bundles are secondary.
 	"vetting_matrix_c6": {
 		ID: "vetting_matrix_c6",
 		ExtraNotes: func(*TestBundleConvergenceSnapshot) []string {
 			return []string{
-				"Profile vetting_matrix_c6: C6 human checklist for .go rows in CODEBASE_VETTING_MATRIX.csv; use scripts/cvs_outcome_rollup.py for pending_go_rows; test-bundle rollup alone does not prove matrix completion.",
+				"Profile vetting_matrix_c6: checklist for matrix rows; use matrix report for pending rows; test-bundle rollup alone does not prove matrix completion.",
 			}
 		},
 	},

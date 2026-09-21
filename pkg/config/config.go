@@ -9,6 +9,7 @@ import (
 	"gopkg.in/yaml.v3"
 
 	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/stampmemo"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
@@ -166,6 +167,7 @@ type ZqkConfig struct {
 var (
 	globalConfig *ZqkConfig
 	configOnce   sync.Once
+	rootConfigs  stampmemo.Table[*ZqkConfig]
 )
 
 func Get() *ZqkConfig {
@@ -196,16 +198,41 @@ func loadConfig() *ZqkConfig {
 // LoadForRoot loads configuration originating from config/** for a specific project root,
 // applying defaults from zqk.yaml, environment overrides from zqk-{env}.yaml, and local overrides from zqk-local.yaml.
 func LoadForRoot(root string) *ZqkConfig {
-	cfg := &ZqkConfig{}
 	if root == "" {
-		return cfg
+		return &ZqkConfig{}
 	}
+	cfg, _ := rootConfigs.Load(root, configStamp(root), func() (*ZqkConfig, error) {
+		return readConfigForRoot(root), nil
+	})
+	if cfg == nil {
+		return &ZqkConfig{}
+	}
+	return cfg
+}
+
+func configStamp(root string) stampmemo.Stamp {
+	envName := strings.TrimSpace(zqkenv.ZqkEnv().Get())
+	if envName == "" {
+		envName = strings.TrimSpace(os.Getenv("ENVIRONMENT"))
+	}
+	return stampmemo.OfAll(
+		filepath.Join(root, paths.ConfigDir, paths.ZqkConfigFileName),
+		filepath.Join(root, paths.ZqkConfigFileName),
+		filepath.Join(root, paths.ConfigDir, paths.ZqkEnvConfigFilePrefix+envName+paths.YAMLExtension),
+		filepath.Join(root, paths.ZqkEnvConfigFilePrefix+envName+paths.YAMLExtension),
+		filepath.Join(root, paths.ConfigDir, paths.ZqkLocalConfigFileName),
+		filepath.Join(root, paths.ZqkLocalConfigFileName),
+	)
+}
+
+func readConfigForRoot(root string) *ZqkConfig {
+	cfg := &ZqkConfig{}
 
 	// 1. Load committed defaults: config/zqk.yaml (fallback: zqk.yaml at root)
 	defaultPath := filepath.Join(root, paths.ConfigDir, paths.ZqkConfigFileName)
-	if !fileutil.Exists(defaultPath) {
+	if stampmemo.Of(defaultPath) == 0 {
 		rootDefault := filepath.Join(root, paths.ZqkConfigFileName)
-		if fileutil.Exists(rootDefault) {
+		if stampmemo.Of(rootDefault) != 0 {
 			defaultPath = rootDefault
 		}
 	}
@@ -220,9 +247,9 @@ func LoadForRoot(root string) *ZqkConfig {
 	}
 	if envName != "" && envName != "local" {
 		envPath := filepath.Join(root, paths.ConfigDir, paths.ZqkEnvConfigFilePrefix+envName+paths.YAMLExtension)
-		if !fileutil.Exists(envPath) {
+		if stampmemo.Of(envPath) == 0 {
 			rootEnv := filepath.Join(root, paths.ZqkEnvConfigFilePrefix+envName+paths.YAMLExtension)
-			if fileutil.Exists(rootEnv) {
+			if stampmemo.Of(rootEnv) != 0 {
 				envPath = rootEnv
 			}
 		}
@@ -233,9 +260,9 @@ func LoadForRoot(root string) *ZqkConfig {
 
 	// 3. Load local overrides: config/zqk-local.yaml (fallback: zqk-local.yaml at root)
 	localPath := filepath.Join(root, paths.ConfigDir, paths.ZqkLocalConfigFileName)
-	if !fileutil.Exists(localPath) {
+	if stampmemo.Of(localPath) == 0 {
 		rootLocal := filepath.Join(root, paths.ZqkLocalConfigFileName)
-		if fileutil.Exists(rootLocal) {
+		if stampmemo.Of(rootLocal) != 0 {
 			localPath = rootLocal
 		}
 	}

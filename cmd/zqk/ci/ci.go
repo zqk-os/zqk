@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/zqk-os/zqk/pkg/execwrap"
+	"github.com/zqk-os/zqk/pkg/localci"
 	"github.com/zqk-os/zqk/pkg/paths"
 
 	"github.com/spf13/cobra"
@@ -78,47 +79,23 @@ func runLocalCICheckout(cmd *cobra.Command) error {
 		return errfmt.Errorf("project root not found")
 	}
 	sha, _ := cmd.Flags().GetString("sha")
-
-	// Checkout SHA worktree gate: skip if already checked out
-	base := filepath.Join(studio, paths.ProjectDataDir, "local-ci")
-	shaPath := filepath.Join(base, "SOURCE_SHA")
-	if raw, err := fileutil.ReadFile(shaPath); err == nil {
-		currentSHA := strings.TrimSpace(string(raw))
-		if sha != "" {
-			c := execwrap.Command("git", "rev-parse", "--verify", sha+"^{commit}")
-			c.Dir = studio
-			if resolved, err := c.Output(); err == nil {
-				if strings.TrimSpace(string(resolved)) == currentSHA {
-					fmt.Fprintf(cmd.OutOrStdout(), "local-ci checkout skipped: %s already checked out at %s\n", currentSHA, filepath.Join(base, "workdir"))
-					return nil
-				}
-			}
-		}
-	}
-
-	script := filepath.Join(studio, "scripts", "local-ci-checkout.sh")
-	if _, err := fileutil.Stat(script); err != nil {
-		return errfmt.Errorf("local-ci checkout script missing: %s", script)
-	}
 	allowDirty, _ := cmd.Flags().GetBool("allow-dirty")
 	noArchive, _ := cmd.Flags().GetBool("no-archive")
 
-	argv := []string{script}
-	if strings.TrimSpace(sha) != "" {
-		argv = append(argv, "--sha", sha)
-	}
-	if allowDirty {
-		argv = append(argv, "--allow-dirty")
-	}
-	if noArchive {
-		argv = append(argv, "--no-archive")
-	}
-	c := execwrap.Command(argv[0], argv[1:]...)
-	c.Dir = studio
-	c.Stdout = cmd.OutOrStdout()
-	c.Stderr = cmd.ErrOrStderr()
-	if err := c.Run(); err != nil {
+	res, err := localci.Checkout(cmd.Context(), localci.Options{
+		RepoRoot:   studio,
+		SHA:        sha,
+		SHAPinned:  strings.TrimSpace(sha) != "",
+		AllowDirty: allowDirty,
+		Archive:    !noArchive,
+	})
+	if err != nil {
 		return errfmt.Errorf("local-ci checkout failed: %w", err)
+	}
+	if res.Skipped {
+		fmt.Fprintf(cmd.OutOrStdout(), "local-ci checkout skipped: %s already checked out at %s\n", res.SHA, res.Workdir)
+	} else {
+		fmt.Fprintf(cmd.OutOrStdout(), "local-ci checkout: %s checked out at %s\n", res.SHA, res.Workdir)
 	}
 	return nil
 }
@@ -192,16 +169,11 @@ func runDemote(cmd *cobra.Command, args []string) error {
 	if studio == "" {
 		return errfmt.Errorf("project root not found")
 	}
-	script := filepath.Join(studio, "scripts", "local-ci-demote.sh")
-	if _, err := fileutil.Stat(script); err != nil {
-		return errfmt.Errorf("local-ci demote script missing: %s", script)
-	}
-	c := execwrap.Command(script)
-	c.Dir = studio
-	c.Stdout = cmd.OutOrStdout()
-	c.Stderr = cmd.ErrOrStderr()
-	if err := c.Run(); err != nil {
+	if err := localci.Demote(cmd.Context(), localci.Options{
+		RepoRoot: studio,
+	}); err != nil {
 		return errfmt.Errorf("local-ci demote failed: %w", err)
 	}
+	fmt.Fprintln(cmd.OutOrStdout(), "local-ci demote: worktrees and pointer files removed")
 	return nil
 }

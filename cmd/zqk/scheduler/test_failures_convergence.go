@@ -217,7 +217,7 @@ func runTestFailuresConvergence(cliCtx *cli.Context, cmd *cobra.Command) error {
 			fmt.Fprintf(&b, "Note: %s\n", snap.SessionCompletionNote)
 		}
 		fmt.Fprintf(&b, "\nNext action: %s\n", snap.NextActionHint)
-		b.WriteString("\n---\nrollup_status_core (pkg/convergerollup; matrix/drift: scripts/cvs_outcome_rollup.py)\n")
+		b.WriteString("\n---\nrollup_status_core (pkg/convergerollup)\n")
 		if rs, ok := rollupCore["rollup_status"].(string); ok {
 			fmt.Fprintf(&b, "rollup_status: %s\n", rs)
 		}

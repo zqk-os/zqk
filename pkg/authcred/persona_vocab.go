@@ -1,11 +1,12 @@
 package authcred
 
 import (
+	"errors"
 	"slices"
 	"strings"
-	"sync"
 
 	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/stampmemo"
 	"gopkg.in/yaml.v3"
 )
 
@@ -13,12 +14,10 @@ type personaVocabFile struct {
 	VocabularySchemeRefs []string `yaml:"vocabulary_scheme_refs"`
 }
 
-type personaVocabHit struct {
-	raw  []byte
-	refs []string
-}
-
-var personaVocabParsed sync.Map // projectRoot + "\x00" + personaID -> personaVocabHit
+var (
+	personaVocab    stampmemo.View[[]string]
+	errPersonaVocab = errors.New("persona vocabulary yaml")
+)
 
 // VocabularySchemesForPersona returns vocabulary_scheme_refs for a persona id.
 // Kind dir and listing-index paths come from the path alias cache; parsed YAML
@@ -32,17 +31,15 @@ func VocabularySchemesForPersona(projectRoot, personaID string) []string {
 	if !ok {
 		return nil
 	}
-	cacheKey := projectRoot + "\x00" + personaID
-	if hit, ok := personaVocabParsed.Load(cacheKey); ok {
-		parsed := hit.(personaVocabHit)
-		if sameByteBacking(parsed.raw, raw) {
-			return slices.Clone(parsed.refs)
+	refs, err := personaVocab.Get(projectRoot+"\x00"+personaID, raw, func(raw []byte) ([]string, error) {
+		var body personaVocabFile
+		if yaml.Unmarshal(raw, &body) != nil {
+			return nil, errPersonaVocab
 		}
-	}
-	var body personaVocabFile
-	if yaml.Unmarshal(raw, &body) != nil {
+		return slices.Clone(body.VocabularySchemeRefs), nil
+	})
+	if err != nil {
 		return nil
 	}
-	personaVocabParsed.Store(cacheKey, personaVocabHit{raw: raw, refs: slices.Clone(body.VocabularySchemeRefs)})
-	return slices.Clone(body.VocabularySchemeRefs)
+	return slices.Clone(refs)
 }

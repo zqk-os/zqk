@@ -2,86 +2,72 @@ package authcred
 
 import (
 	"encoding/json"
+	"errors"
 	"maps"
 	"path/filepath"
 	"strings"
 	"sync"
 
 	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/stampmemo"
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 type listingFile struct {
 	hash      string
-	yamlMtime int64
+	yamlStamp stampmemo.Stamp
 	raw       []byte
 }
 
-type listingSnap struct {
-	mu         sync.Mutex
-	indexMtime int64
-	mappings   map[string]string
-	files      map[string]listingFile
+type listingValue struct {
+	mu       sync.Mutex
+	mappings map[string]string
+	files    map[string]listingFile
 }
 
-var listingSnaps sync.Map // projectRoot + "\x00" + indexPath -> *listingSnap
+var listingIndexes stampmemo.Table[*listingValue]
 
 type listingIndexFile struct {
 	Mappings map[string]string `json:"mappings"`
 }
 
-func listingCache(projectRoot, indexPath string) *listingSnap {
-	key := projectRoot + "\x00" + indexPath
-	if existing, ok := listingSnaps.Load(key); ok {
-		return existing.(*listingSnap)
-	}
-	fresh := &listingSnap{}
-	actual, _ := listingSnaps.LoadOrStore(key, fresh)
-	return actual.(*listingSnap)
-}
+var errListingIndex = errors.New("listing index missing or invalid")
 
-func (s *listingSnap) reset() {
-	s.indexMtime = 0
-	s.mappings = nil
-	s.files = nil
-}
-
-func (s *listingSnap) reloadIndex(indexPath string) bool {
-	info, err := fileutil.Stat(indexPath)
-	if err != nil {
-		s.reset()
-		return false
-	}
-	mtime := info.ModTime().UnixNano()
-	if s.indexMtime == mtime && s.mappings != nil {
-		return true
-	}
+func loadListingIndex(indexPath string) (*listingValue, error) {
 	data, err := fileutil.ReadFile(indexPath)
 	if err != nil {
-		s.reset()
-		return false
+		return nil, err
 	}
 	var idx listingIndexFile
 	if json.Unmarshal(data, &idx) != nil || idx.Mappings == nil {
-		s.reset()
-		return false
+		return nil, errListingIndex
 	}
-	s.indexMtime = mtime
-	s.mappings = idx.Mappings
-	s.files = make(map[string]listingFile, len(idx.Mappings))
-	return true
+	return &listingValue{
+		mappings: idx.Mappings,
+		files:    make(map[string]listingFile, len(idx.Mappings)),
+	}, nil
+}
+
+func listingFor(projectRoot, indexPath string) *listingValue {
+	v, err := listingIndexes.Load(projectRoot+"\x00"+indexPath, stampmemo.Of(indexPath), func() (*listingValue, error) {
+		return loadListingIndex(indexPath)
+	})
+	if err != nil {
+		return nil
+	}
+	return v
 }
 
 func casMappings(projectRoot, indexPath string) map[string]string {
 	if projectRoot == "" || indexPath == "" {
 		return nil
 	}
-	s := listingCache(projectRoot, indexPath)
-	s.mu.Lock()
-	defer s.mu.Unlock()
-	if !s.reloadIndex(indexPath) {
+	s := listingFor(projectRoot, indexPath)
+	if s == nil {
 		return nil
 	}
+	s.mu.Lock()
+	defer s.mu.Unlock()
 	return maps.Clone(s.mappings)
 }
 
@@ -90,12 +76,12 @@ func casHash(projectRoot, objectID, indexPath string) (string, bool) {
 	if projectRoot == "" || objectID == "" || indexPath == "" {
 		return "", false
 	}
-	s := listingCache(projectRoot, indexPath)
-	s.mu.Lock()
-	defer s.mu.Unlock()
-	if !s.reloadIndex(indexPath) {
+	s := listingFor(projectRoot, indexPath)
+	if s == nil {
 		return "", false
 	}
+	s.mu.Lock()
+	defer s.mu.Unlock()
 	hash, ok := s.mappings[objectID]
 	if !ok || strings.TrimSpace(hash) == "" {
 		return "", false
@@ -108,24 +94,23 @@ func casYAML(projectRoot, objectID, indexPath, kindDir string) ([]byte, bool) {
 	if projectRoot == "" || objectID == "" || indexPath == "" || kindDir == "" {
 		return nil, false
 	}
-	s := listingCache(projectRoot, indexPath)
-	s.mu.Lock()
-	defer s.mu.Unlock()
-	if !s.reloadIndex(indexPath) {
+	s := listingFor(projectRoot, indexPath)
+	if s == nil {
 		return nil, false
 	}
+	s.mu.Lock()
+	defer s.mu.Unlock()
 	hash, ok := s.mappings[objectID]
 	if !ok || strings.TrimSpace(hash) == "" {
 		return nil, false
 	}
 	yamlPath := filepath.Join(kindDir, hash+paths.YAMLExtension)
-	info, err := fileutil.Stat(yamlPath)
-	if err != nil {
+	yamlStamp := stampmemo.Of(yamlPath)
+	if yamlStamp == 0 {
 		delete(s.files, objectID)
 		return nil, false
 	}
-	yamlMtime := info.ModTime().UnixNano()
-	if hit, ok := s.files[objectID]; ok && hit.hash == hash && hit.yamlMtime == yamlMtime {
+	if hit, ok := s.files[objectID]; ok && hit.hash == hash && hit.yamlStamp == yamlStamp {
 		return hit.raw, true
 	}
 	raw, err := fileutil.ReadFile(yamlPath)
@@ -133,7 +118,7 @@ func casYAML(projectRoot, objectID, indexPath, kindDir string) ([]byte, bool) {
 		delete(s.files, objectID)
 		return nil, false
 	}
-	s.files[objectID] = listingFile{hash: hash, yamlMtime: yamlMtime, raw: raw}
+	s.files[objectID] = listingFile{hash: hash, yamlStamp: yamlStamp, raw: raw}
 	return raw, true
 }
 
