@@ -14,5 +14,3 @@ const (
 	wireLegacyBacklogItemIDs       = "backlog_item_ids"
 	wireLegacyConvergenceSessionID = "convergence_session_id"
 )
-
-
