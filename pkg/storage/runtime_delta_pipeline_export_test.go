@@ -42,8 +42,6 @@ func WriteRuntimeDeltaKindsConfigForTest(t *testing.T, root string) {
 	if err := fileutil.WriteFile(filepath.Join(cfgDir, runtimeDeltaFieldsConfigFile), []byte(fields), paths.FilePerm644); err != nil {
 		t.Fatalf("write runtime delta fields config: %v", err)
 	}
-	runtimeDeltaKindsMu.Lock()
-	delete(runtimeDeltaKinds, root)
-	delete(runtimeDeltaFields, root)
-	runtimeDeltaKindsMu.Unlock()
+	runtimeDeltaKindSets.Delete(root)
+	runtimeDeltaFieldSets.Delete(root)
 }

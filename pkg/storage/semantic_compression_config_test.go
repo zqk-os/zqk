@@ -27,11 +27,6 @@ zlib_threshold_bytes: 1024
 		t.Fatalf("write: %v", err)
 	}
 
-	// Clear cache for test
-	semanticCompressionMu.Lock()
-	compressionPolicies = make(map[string]*CompressionPolicy)
-	semanticCompressionMu.Unlock()
-
 	policy := GetCompressionPolicy(root, "test_event")
 	if policy == nil {
 		t.Fatal("expected policy to be loaded")

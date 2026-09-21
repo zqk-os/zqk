@@ -365,14 +365,26 @@ func ClearPersisted(projectRoot string) {
 	clearSessionFileUnderLock(projectRoot)
 }
 
+var idleTimeouts stampmemo.Table[time.Duration] // keyed by projectRoot; stamp is project YAML
+
 // GetIdleTimeout reads the configured session idle timeout.
 func GetIdleTimeout(projectRoot string) time.Duration {
-	configPaths := []string{
-		filepath.Join(paths.ProjectDataDir, paths.ConfigDir, paths.ProjectConfigFile),
-		filepath.Join(paths.ProjectDataDir, paths.ProjectConfigFile),
+	files := []string{
+		filepath.Join(projectRoot, paths.ProjectDataDir, paths.ConfigDir, paths.ProjectConfigFile),
+		filepath.Join(projectRoot, paths.ProjectDataDir, paths.ProjectConfigFile),
 	}
-	for _, rel := range configPaths {
-		data, err := fileutil.ReadFile(filepath.Join(projectRoot, rel))
+	d, _ := idleTimeouts.Load(projectRoot, stampmemo.OfAll(files...), func() (time.Duration, error) {
+		return readIdleTimeout(files), nil
+	})
+	if d <= 0 {
+		return defaultIdleTimeout
+	}
+	return d
+}
+
+func readIdleTimeout(files []string) time.Duration {
+	for _, path := range files {
+		data, err := fileutil.ReadFile(path)
 		if err != nil {
 			continue
 		}

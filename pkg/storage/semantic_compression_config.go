@@ -4,12 +4,12 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
-	"sync"
 
 	"gopkg.in/yaml.v3"
 
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/stampmemo"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -32,47 +32,35 @@ type FieldRegistry struct {
 }
 
 var (
-	semanticCompressionMu sync.RWMutex
-	compressionPolicies   map[string]*CompressionPolicy // keyed by projectRoot + ":" + targetKind
-	fieldRegistries       map[string]*FieldRegistry     // keyed by projectRoot
+	compressionPoliciesByRoot stampmemo.Table[map[string]*CompressionPolicy] // keyed by projectRoot
+	fieldRegistriesByRoot     stampmemo.Table[*FieldRegistry]
 )
 
-func init() {
-	compressionPolicies = make(map[string]*CompressionPolicy)
-	fieldRegistries = make(map[string]*FieldRegistry)
+func yamlDirStamp(dir string) stampmemo.Stamp {
+	cands := []string{dir}
+	entries, err := fileutil.ReadDir(dir)
+	if err != nil {
+		return stampmemo.Of(dir)
+	}
+	for _, entry := range entries {
+		if entry.IsDir() || !strings.HasSuffix(entry.Name(), ".yaml") {
+			continue
+		}
+		cands = append(cands, filepath.Join(dir, entry.Name()))
+	}
+	return stampmemo.OfAll(cands...)
 }
 
 // GetCompressionPolicy returns the compression policy for a specific kind in a project.
 func GetCompressionPolicy(projectRoot, kind string) *CompressionPolicy {
-	key := projectRoot + ":" + kind
-
-	semanticCompressionMu.RLock()
-	policy, ok := compressionPolicies[key]
-	semanticCompressionMu.RUnlock()
-
-	if ok {
-		return policy
+	dir := filepath.Join(projectRoot, paths.ProcessDir, ConstMiscCompressionPolicy)
+	policies, _ := compressionPoliciesByRoot.Load(projectRoot, yamlDirStamp(dir), func() (map[string]*CompressionPolicy, error) {
+		return readCompressionPolicies(dir), nil
+	})
+	if p := policies[kind]; p != nil {
+		return p
 	}
-
-	semanticCompressionMu.Lock()
-	defer semanticCompressionMu.Unlock()
-
-	// Double check
-	if policy, ok := compressionPolicies[key]; ok {
-		return policy
-	}
-
-	// Load policies for this project
-	loadCompressionPoliciesForProject(projectRoot)
-
-	if policy, ok := compressionPolicies[key]; ok {
-		return policy
-	}
-
-	// Not found, check fallback default
-	defaultPolicy := GetDefaultCompressionPolicyForKind(kind)
-	compressionPolicies[key] = defaultPolicy
-	return defaultPolicy
+	return GetDefaultCompressionPolicyForKind(kind)
 }
 
 // GetDefaultCompressionPolicyForKind provides a fallback default policy for high-volume kinds.
@@ -99,60 +87,43 @@ func GetDefaultCompressionPolicyForKind(kind string) *CompressionPolicy {
 
 // GetFieldRegistry returns the field registry for a project, providing string to byte ID mappings.
 func GetFieldRegistry(projectRoot string) *FieldRegistry {
-	semanticCompressionMu.RLock()
-	registry, ok := fieldRegistries[projectRoot]
-	semanticCompressionMu.RUnlock()
-
-	if ok {
-		return registry
+	dir := filepath.Join(projectRoot, paths.ProcessDir, ConstMiscFieldRegistry)
+	reg, _ := fieldRegistriesByRoot.Load(projectRoot, yamlDirStamp(dir), func() (*FieldRegistry, error) {
+		return readFieldRegistry(dir), nil
+	})
+	if reg == nil {
+		return &FieldRegistry{fieldMap: make(map[string]byte)}
 	}
-
-	semanticCompressionMu.Lock()
-	defer semanticCompressionMu.Unlock()
-
-	// Double check
-	if registry, ok := fieldRegistries[projectRoot]; ok {
-		return registry
-	}
-
-	// Load registry for this project
-	registry = loadFieldRegistryForProject(projectRoot)
-	fieldRegistries[projectRoot] = registry
-
-	return registry
+	return reg
 }
 
-// loadCompressionPoliciesForProject parses all compression_policy YAML files in the project.
-// Must be called with semanticCompressionMu held for write.
-func loadCompressionPoliciesForProject(projectRoot string) {
-	dir := filepath.Join(projectRoot, paths.ProcessDir, ConstMiscCompressionPolicy)
+func readCompressionPolicies(dir string) map[string]*CompressionPolicy {
+	out := make(map[string]*CompressionPolicy)
 	entries, err := fileutil.ReadDir(dir)
 	if err != nil {
-		return
+		return out
 	}
-
 	for _, entry := range entries {
-		if !entry.IsDir() && strings.HasSuffix(entry.Name(), ".yaml") {
-			path := filepath.Join(dir, entry.Name())
-			data, err := fileutil.ReadFile(path)
-			if err == nil {
-				var policy CompressionPolicy
-				if err := yaml.Unmarshal(data, &policy); err == nil && policy.TargetKind != "" {
-					compressionPolicies[projectRoot+":"+policy.TargetKind] = &policy
-				}
-			}
+		if entry.IsDir() || !strings.HasSuffix(entry.Name(), ".yaml") {
+			continue
+		}
+		data, err := fileutil.ReadFile(filepath.Join(dir, entry.Name()))
+		if err != nil {
+			continue
+		}
+		var policy CompressionPolicy
+		if err := yaml.Unmarshal(data, &policy); err == nil && policy.TargetKind != "" {
+			out[policy.TargetKind] = &policy
 		}
 	}
+	return out
 }
 
-// loadFieldRegistryForProject parses all field_registry YAML files and merges them.
-// Must be called with semanticCompressionMu held for write.
-func loadFieldRegistryForProject(projectRoot string) *FieldRegistry {
+func readFieldRegistry(dir string) *FieldRegistry {
 	registry := &FieldRegistry{
 		fieldMap: make(map[string]byte),
 	}
 
-	dir := filepath.Join(projectRoot, paths.ProcessDir, ConstMiscFieldRegistry)
 	entries, err := fileutil.ReadDir(dir)
 	if err != nil {
 		return registry

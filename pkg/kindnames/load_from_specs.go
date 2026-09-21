@@ -9,6 +9,7 @@ import (
 
 	"github.com/zqk-os/zqk/pkg/appledouble"
 	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/stampmemo"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -21,10 +22,11 @@ const (
 	errNoOntologyTemplate = "no ontology values found under %s"
 )
 
-// specOntologyHeader is the minimal YAML shape to read ontology from object spec files.
 type specOntologyHeader struct {
 	Ontology string `yaml:"ontology"`
 }
+
+var kindNameSets stampmemo.Table[map[string]struct{}] // keyed by specsDir; stamp is top-level YAML files
 
 // LoadKindNamesFromSpecsDir walks specsDir for *.yaml / *.yml and returns unique ontology
 // strings (object kind names) from each file’s top-level `ontology` field.
@@ -37,11 +39,25 @@ func LoadKindNamesFromSpecsDir(specsDir string) (map[string]struct{}, error) {
 	if specsDir == emptyValue {
 		return nil, errors.New(errSpecsDirEmpty)
 	}
+	files, err := listSpecYAMLFiles(specsDir)
+	if err != nil {
+		return nil, err
+	}
+	out, loadErr := kindNameSets.Load(specsDir, stampmemo.OfAll(files...), func() (map[string]struct{}, error) {
+		return readKindNames(files, specsDir)
+	})
+	if loadErr != nil {
+		return nil, loadErr
+	}
+	return out, nil
+}
+
+func listSpecYAMLFiles(specsDir string) ([]string, error) {
 	entries, err := fileutil.ReadDir(specsDir)
 	if err != nil {
 		return nil, err
 	}
-	out := make(map[string]struct{})
+	var files []string
 	for _, e := range entries {
 		if e.IsDir() {
 			continue
@@ -53,7 +69,14 @@ func LoadKindNamesFromSpecsDir(specsDir string) (map[string]struct{}, error) {
 		if !strings.HasSuffix(name, yamlExt) && !strings.HasSuffix(name, ymlExt) {
 			continue
 		}
-		path := filepath.Join(specsDir, name)
+		files = append(files, filepath.Join(specsDir, name))
+	}
+	return files, nil
+}
+
+func readKindNames(files []string, specsDir string) (map[string]struct{}, error) {
+	out := make(map[string]struct{})
+	for _, path := range files {
 		data, err := fileutil.ReadFile(path)
 		if err != nil {
 			continue

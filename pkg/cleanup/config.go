@@ -10,6 +10,7 @@ import (
 
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/stampmemo"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -51,6 +52,8 @@ func (s *Step) UnmarshalYAML(n *yaml.Node) error {
 	return nil
 }
 
+var cleanupConfigs stampmemo.Table[*Config] // keyed by resolved path; stamp is the YAML file
+
 // LoadFromPath loads cleanup config from path. Path is relative to projectRoot unless absolute.
 // Missing file or empty path returns an error.
 func LoadFromPath(projectRoot, path string) (*Config, error) {
@@ -61,11 +64,16 @@ func LoadFromPath(projectRoot, path string) (*Config, error) {
 	if !filepath.IsAbs(path) && projectRoot != emptyValue {
 		full = filepath.Join(projectRoot, path)
 	}
+	return cleanupConfigs.Load(full, stampmemo.Of(full), func() (*Config, error) {
+		return readCleanupConfig(full, path)
+	})
+}
+
+func readCleanupConfig(full, logicalPath string) (*Config, error) {
 	data, err := fileutil.ReadFile(full)
 	if err != nil {
 		if fileutil.IsNotExist(err) {
-			// Use logical path (path) in error so persisted issues stay portable (no absolute path).
-			return nil, errfmt.Errorf(errConfigNotFoundFmt, path)
+			return nil, errfmt.Errorf(errConfigNotFoundFmt, logicalPath)
 		}
 		return nil, errfmt.Errorf(errReadCleanupConfigFmt, err)
 	}

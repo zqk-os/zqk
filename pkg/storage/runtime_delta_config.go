@@ -2,11 +2,11 @@ package storage
 
 import (
 	"path/filepath"
-	"sync"
 
 	"gopkg.in/yaml.v3"
 
 	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/stampmemo"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -20,10 +20,19 @@ type runtimeDeltaKindsConfig struct {
 }
 
 var (
-	runtimeDeltaKindsMu sync.RWMutex
-	runtimeDeltaKinds   = make(map[string]map[string]bool) // projectRoot -> kind -> true
-	runtimeDeltaFields  = make(map[string]map[string][]string)
+	runtimeDeltaKindSets  stampmemo.Table[map[string]bool]
+	runtimeDeltaFieldSets stampmemo.Table[map[string][]string]
 )
+
+func processInternalYAMLConfigCandidates(projectRoot, fileName string) []string {
+	primary := filepath.Join(projectRoot, paths.ProcessInternalConfigsDir, fileName)
+	processBase := paths.ResolvePathFromCacheOrConstant(projectRoot, "process", paths.ProcessDir)
+	fallback := filepath.Join(processBase, "_internal", "configs", fileName)
+	if primary == fallback {
+		return []string{primary}
+	}
+	return []string{primary, fallback}
+}
 
 func RuntimeDeltaEnabledForKind(projectRoot, kind string) bool {
 	if projectRoot == emptyValue || kind == emptyValue {
@@ -43,42 +52,32 @@ func RuntimeDeltaEnabledKindsList(projectRoot string) []string {
 }
 
 func loadRuntimeDeltaKindsConfig(projectRoot string) map[string]bool {
-	runtimeDeltaKindsMu.RLock()
-	cached, ok := runtimeDeltaKinds[projectRoot]
-	runtimeDeltaKindsMu.RUnlock()
-	if ok {
-		return cached
-	}
-
-	configPath := filepath.Join(projectRoot, paths.ProcessInternalConfigsDir, runtimeDeltaKindsConfigFile)
-	if _, err := fileutil.Stat(configPath); fileutil.IsNotExist(err) {
-		processBase := paths.ResolvePathFromCacheOrConstant(projectRoot, "process", paths.ProcessDir)
-		configPath = filepath.Join(processBase, "_internal", "configs", runtimeDeltaKindsConfigFile)
-	}
-	data, err := fileutil.ReadFile(configPath)
-	if err != nil {
-		runtimeDeltaKindsMu.Lock()
-		runtimeDeltaKinds[projectRoot] = map[string]bool{}
-		runtimeDeltaKindsMu.Unlock()
-		return map[string]bool{}
-	}
-	var parsed runtimeDeltaKindsConfig
-	if err := yaml.Unmarshal(data, &parsed); err != nil {
-		runtimeDeltaKindsMu.Lock()
-		runtimeDeltaKinds[projectRoot] = map[string]bool{}
-		runtimeDeltaKindsMu.Unlock()
-		return map[string]bool{}
-	}
-	out := make(map[string]bool, len(parsed.Kinds))
-	for _, k := range parsed.Kinds {
-		if k.Kind != emptyValue {
-			out[k.Kind] = true
+	cands := processInternalYAMLConfigCandidates(projectRoot, runtimeDeltaKindsConfigFile)
+	cfg, _ := runtimeDeltaKindSets.Load(projectRoot, stampmemo.OfAll(cands...), func() (map[string]bool, error) {
+		path := stampmemo.FirstExisting(cands)
+		if path == emptyValue {
+			return map[string]bool{}, nil
 		}
+		data, err := fileutil.ReadFile(path)
+		if err != nil {
+			return map[string]bool{}, nil
+		}
+		var parsed runtimeDeltaKindsConfig
+		if err := yaml.Unmarshal(data, &parsed); err != nil {
+			return map[string]bool{}, nil
+		}
+		out := make(map[string]bool, len(parsed.Kinds))
+		for _, k := range parsed.Kinds {
+			if k.Kind != emptyValue {
+				out[k.Kind] = true
+			}
+		}
+		return out, nil
+	})
+	if cfg == nil {
+		return map[string]bool{}
 	}
-	runtimeDeltaKindsMu.Lock()
-	runtimeDeltaKinds[projectRoot] = out
-	runtimeDeltaKindsMu.Unlock()
-	return out
+	return cfg
 }
 
 func updateIsRuntimeDeltaOnly(projectRoot, kind string, updates map[string]any) bool {
@@ -108,33 +107,27 @@ func updateIsRuntimeDeltaOnly(projectRoot, kind string, updates map[string]any) 
 }
 
 func loadRuntimeDeltaFieldsConfig(projectRoot string) map[string][]string {
-	runtimeDeltaKindsMu.RLock()
-	cached, ok := runtimeDeltaFields[projectRoot]
-	runtimeDeltaKindsMu.RUnlock()
-	if ok {
-		return cached
-	}
-	configPath := filepath.Join(projectRoot, paths.ProcessInternalConfigsDir, runtimeDeltaFieldsConfigFile)
-	if _, err := fileutil.Stat(configPath); fileutil.IsNotExist(err) {
-		processBase := paths.ResolvePathFromCacheOrConstant(projectRoot, "process", paths.ProcessDir)
-		configPath = filepath.Join(processBase, "_internal", "configs", runtimeDeltaFieldsConfigFile)
-	}
-	data, err := fileutil.ReadFile(configPath)
-	if err != nil {
-		runtimeDeltaKindsMu.Lock()
-		runtimeDeltaFields[projectRoot] = map[string][]string{}
-		runtimeDeltaKindsMu.Unlock()
+	cands := processInternalYAMLConfigCandidates(projectRoot, runtimeDeltaFieldsConfigFile)
+	cfg, _ := runtimeDeltaFieldSets.Load(projectRoot, stampmemo.OfAll(cands...), func() (map[string][]string, error) {
+		path := stampmemo.FirstExisting(cands)
+		if path == emptyValue {
+			return map[string][]string{}, nil
+		}
+		data, err := fileutil.ReadFile(path)
+		if err != nil {
+			return map[string][]string{}, nil
+		}
+		var parsed map[string][]string
+		if err := yaml.Unmarshal(data, &parsed); err != nil {
+			return map[string][]string{}, nil
+		}
+		if parsed == nil {
+			parsed = map[string][]string{}
+		}
+		return parsed, nil
+	})
+	if cfg == nil {
 		return map[string][]string{}
 	}
-	var parsed map[string][]string
-	if err := yaml.Unmarshal(data, &parsed); err != nil {
-		runtimeDeltaKindsMu.Lock()
-		runtimeDeltaFields[projectRoot] = map[string][]string{}
-		runtimeDeltaKindsMu.Unlock()
-		return map[string][]string{}
-	}
-	runtimeDeltaKindsMu.Lock()
-	runtimeDeltaFields[projectRoot] = parsed
-	runtimeDeltaKindsMu.Unlock()
-	return parsed
+	return cfg
 }
