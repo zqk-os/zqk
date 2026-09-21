@@ -22,10 +22,10 @@ schema_version: "2.0.0"
 id: SCH-convergence-orchestrate
 title: Convergence — orchestrate (persist + rollup)
 description: |
-  Timer run_wrapper for ./scripts/cvs_convergence_orchestrate.sh: persist test-bundle convergence to the
-  CVS in CONVERGENCE_SESSION_ID, then Python cvs_outcome_rollup.py --apply with --no-fail-on-gates.
-  Cron cadence is schedule_expression on this job. Set CONVERGENCE_SESSION_ID (and ZQK_PROJECT_ROOT if
-  needed) before enabling. Disabled by default until you enable the job.
+  Timer run_wrapper for convergence measure: persist test-bundle convergence to the
+  CVS in CONVERGENCE_SESSION_ID. Cron cadence is schedule_expression on this job.
+  Set CONVERGENCE_SESSION_ID (and ZQK_PROJECT_ROOT if needed) before enabling.
+  Disabled by default until you enable the job.
 job_type: run_wrapper
 trigger_type: timer
 schedule_expression: "*/15 * * * *"
@@ -42,8 +42,9 @@ command_args:
     set -euo pipefail
     ROOT="${ZQK_PROJECT_ROOT:-.}"
     cd "$ROOT"
+    BIN="${ZQK_BIN:-zqk}"
     ID="${CONVERGENCE_SESSION_ID:?set CONVERGENCE_SESSION_ID on the scheduler_job}"
-    exec ./scripts/cvs_convergence_orchestrate.sh "$ID" --no-fail-on-gates
+    exec "$BIN" scheduler convergence measure --session-id "$ID" --skip-rollup-gates
 environment_variables:
   # Set to your active CVS-* before enabling (zqk object update … --field 'environment_variables={"CONVERGENCE_SESSION_ID":"CVS-…"}').
   CONVERGENCE_SESSION_ID: ""

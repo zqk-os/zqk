@@ -228,7 +228,7 @@ func registerHashViaSystemCheck(ctx *cli.Context, logger logging.Logger, filePat
 						String("current_hash", currentHash[:16]+"...").
 						Log()
 				}
-				return errfmt.Errorf("hash mismatch detected - file may have been tampered with (use 'zqk system check %s --force' to regenerate hash, creates audit event)", objID)
+				return errfmt.Errorf("%s", paths.RewriteCanonicalCLIInvocations(fmt.Sprintf("hash mismatch detected - file may have been tampered with (use 'zqk system check %s --force' to regenerate hash, creates audit event)", objID)))
 			}
 			// Hash matches - nothing to do
 			return nil
@@ -266,7 +266,7 @@ func registerHashViaSystemCheckCommand(ctx *cli.Context, logger logging.Logger, 
 				String("output", string(output)).
 				Log()
 		}
-		return errfmt.Errorf("system check failed: %v (object may be invalid - use 'zqk object create' to create valid objects)", err)
+		return errfmt.Errorf("%s", paths.RewriteCanonicalCLIInvocations(fmt.Sprintf("system check failed: %v (object may be invalid - use 'zqk object create' to create valid objects)", err)))
 	}
 
 	// Hash registration completed (if hash was missing and object is valid)

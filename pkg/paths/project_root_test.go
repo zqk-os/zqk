@@ -35,7 +35,7 @@ func TestIsValidProjectRoot(t *testing.T) {
 }
 
 func TestResolveProjectRoot_AgentWorktreeRefusedWithoutSettings(t *testing.T) {
-	worktreeDir := filepath.Join(fileutil.TempDir(), "zqk-worktrees", "test-repo", "ATK-failclosed-1")
+	worktreeDir := filepath.Join(fileutil.TempDir(), "zqk-worktrees", "test-repo", "ATK-failclosed-"+t.Name())
 	if err := fileutil.EnsureDir(filepath.Join(worktreeDir, ProjectDataDir)); err != nil {
 		t.Fatal(err)
 	}
@@ -54,7 +54,7 @@ func TestResolveProjectRoot_AgentWorktreeBindsToSettingsProjectRoot(t *testing.T
 		t.Fatal(err)
 	}
 
-	worktreeDir := filepath.Join(fileutil.TempDir(), "zqk-worktrees", "test-repo", "ATK-bound-1")
+	worktreeDir := filepath.Join(fileutil.TempDir(), "zqk-worktrees", "test-repo", "ATK-bound-"+t.Name())
 	if err := fileutil.EnsureDir(filepath.Join(worktreeDir, ProjectDataDir)); err != nil {
 		t.Fatal(err)
 	}
@@ -64,6 +64,7 @@ func TestResolveProjectRoot_AgentWorktreeBindsToSettingsProjectRoot(t *testing.T
 		t.Fatalf("BootstrapWorktreeConfig: %v", err)
 	}
 
+	t.Setenv(zqkenv.TestRoot().Name(), "")
 	t.Setenv(zqkenv.ProjectRoot().Name(), worktreeDir)
 	got := ResolveProjectRoot(worktreeDir)
 	want, _ := filepath.Abs(studioRoot)

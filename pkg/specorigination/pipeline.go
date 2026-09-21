@@ -348,11 +348,7 @@ func stageTrigger(pctx *pipeline.Context, pl any) (any, error) {
 		return nil, errfmt.Errorf("SPEC_ORIGIN_TRIGGER: expected *State, got %T", pl)
 	}
 	note := strings.Join([]string{
-		"After spec changes, run when applicable:",
-		"  zqk system sync-glossary-from-specs [--apply]",
-		"  zqk system generate-instance-builders --overwrite",
-		"  zqk system path-cache  (optional)",
-		"Or pass --apply-trigger (not with --dry-run) to run these steps automatically.",
+		"After spec changes, run when applicable:", paths.RewriteCanonicalCLIInvocations("  zqk system sync-glossary-from-specs [--apply]"), paths.RewriteCanonicalCLIInvocations("  zqk system generate-instance-builders --overwrite"), paths.RewriteCanonicalCLIInvocations("  zqk system path-cache  (optional)"), "Or pass --apply-trigger (not with --dry-run) to run these steps automatically.",
 	}, "\n")
 	if pctx != nil && pctx.Outcome != nil {
 		pctx.Outcome[pipeline.OutcomeKeyTriggerManualCommands] = note

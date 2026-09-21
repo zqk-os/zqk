@@ -29,7 +29,7 @@ When the task is done, write a short prose summary and make zero tool calls.
 4. Follow the principles of Traceability and Object-First design.
 
 ## This repository
-This is the zqk Go module (cmd/, pkg/, scripts/, docs/). Never invent src/main.go, helloworld.go, or Python files. Kernel ids (WFL-/ATK-/BLI-/PRI-…) are object_get targets, not files. Do not call mcp_list_tools or mcp_get_tool_schema.
+This is a Go kernel module (cmd/, pkg/, scripts/, docs/). Never invent src/main.go, helloworld.go, or Python files. Kernel ids (WFL-/ATK-/BLI-/PRI-…) are object_get targets, not files. Do not call mcp_list_tools or mcp_get_tool_schema.
 
 ## Tool Routing Guide
 Use the MOST SPECIFIC tool available for each operation — and ONLY tools that appear in Available Tools:
@@ -57,10 +57,10 @@ Capabilities: {{range .Capabilities}}{{.}}, {{end}}
 Work class: coding
 `
 
-// QwenDocsEvalSystemPromptTemplate is for CEF / codebase_evaluation ATKs.
-// It must not push TDD, go test loops, or cmd/pkg source edits.
+// QwenDocsEvalSystemPromptTemplate is for docs / evaluation ATKs.
+// It must not push TDD, go test loops, or source edits.
 // TRACK: BLI-AGENT-INIT-PROMPT-CLASS-001
-const QwenDocsEvalSystemPromptTemplate = `You are a Qwen LLM acting as a docs/evaluation worker in the ZQK Swarm Orchestrator.
+const QwenDocsEvalSystemPromptTemplate = `You are an LLM acting as a docs/evaluation worker in the Swarm Orchestrator.
 
 ## How you call tools
 The host already registered tools on this request. To invoke a tool you MUST use the native function-calling API (tool_calls field). Leave assistant text empty when calling a tool.
@@ -71,24 +71,21 @@ When the task is done, write a short prose summary and make zero tool calls.
 1. Obey FORBID / SUCCESS_GATE in the task description exactly.
 2. Use specific MCP tools instead of {{.ToolPrefix}}execute_bash whenever possible.
 3. Never call the same tool with the same arguments more than once.
-4. Cite real paths under docs/quality/ and the codebase; do not invent modules.
+4. Cite real paths under documentation and the codebase; do not invent modules.
 
-## This assignment class (docs_eval / CEF)
-- Read rubrics and specialist prompts under docs/quality/codebase_evaluation/.
-- Write findings JSONL and run_log under the named docs/quality/cef-runs/… package.
-- Do NOT edit cmd/, pkg/, or other application source unless the task explicitly requires it.
-- Do NOT mint process/backlog objects. Do NOT call agent_next — summarize and stop; the seat-worker promotes.
+## This assignment class (docs_eval)
+- Read rubrics and evaluation documents named in the task.
+- Write findings JSONL and run logs under the paths named in the task.
+- Do NOT edit application source unless the task explicitly requires it.
+- Do NOT mint process objects. Do NOT call agent_next — summarize and stop; the seat-worker promotes.
 
 ## Tool Routing Guide
 - To READ docs or code: use {{.ToolPrefix}}read_file or {{.ToolPrefix}}read_code
-- To WRITE findings / run_log / diagrams: use {{.ToolPrefix}}write_file (paths under docs/quality/)
+- To WRITE findings / run_log / diagrams: use {{.ToolPrefix}}write_file
 - To GET task/object details: use {{.ToolPrefix}}object_get
-- Rubric path shape: docs/quality/codebase_evaluation/rubrics/L-*.md (never rubric_L-*.md)
-- Finding schema: docs/quality/codebase_evaluation/schemas/finding.schema.json
 
 ## Anti-Patterns
 - Rewriting application source to "prove" architecture findings
-- Inventing paths like rubric_L-ARCHITECTURE.md
 - Calling {{.ToolPrefix}}execute_bash for cat/ls when read_file exists
 - Claiming SUCCESS_GATE without a successful write_file of findings JSONL
 
@@ -313,7 +310,7 @@ func DetectContextGatheringLoop(history []ToolCallRecord) bool {
 func ContextGatheringLoopGuidance() string {
 	return "WARNING: You have spent too many steps reading status or source without taking action. " +
 		"You already have the context you need. STOP object_get, object_list, and read_code loops. " +
-		"Call write_file or write_code on a path named in the task (docs/quality/… for CEF; cmd/ or pkg/ for coding ATKs). Make progress NOW."
+		"Call write_file or write_code on a path named in the task. Make progress NOW."
 }
 
 // DetectRepeatingCycle detects multi-tool repeating sequences over periods 2-8.

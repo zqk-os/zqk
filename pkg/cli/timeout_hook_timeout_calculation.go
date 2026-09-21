@@ -14,6 +14,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/concurrency"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/stampmemo"
 )
 
 // commandTimeoutsConfig is the on-disk format for command timeout overrides.
@@ -215,26 +216,33 @@ func (h *TimeoutHook) getTimeoutForCommand(normalizedCmd string, args []string) 
 
 // loadCommandTimeoutsConfig reads the effective command_timeouts.yaml: project-level override
 // (.zqk/config/) takes precedence over repo default (config/). Returns nil if neither is found.
+// commandTimeouts is keyed by project root. Stamp is the timeouts YAML pair.
+var commandTimeouts stampmemo.Table[*commandTimeoutsConfig]
+
 func (h *TimeoutHook) loadCommandTimeoutsConfig() *commandTimeoutsConfig {
 	projectRoot := h.findProjectRoot()
 	if projectRoot == emptyValue {
 		return nil
 	}
-	for _, base := range []string{
+	files := []string{
 		filepath.Join(projectRoot, paths.ProjectDataDir, paths.ConfigDir, paths.CommandTimeoutsConfigFile),
 		filepath.Join(projectRoot, "config", paths.CommandTimeoutsConfigFile),
-	} {
-		data, err := fileutil.ReadFile(base)
-		if err != nil {
-			continue
-		}
-		var cfg commandTimeoutsConfig
-		if err := yaml.Unmarshal(data, &cfg); err != nil {
-			continue
-		}
-		return &cfg
 	}
-	return nil
+	cfg, _ := commandTimeouts.Load(projectRoot, stampmemo.OfAll(files...), func() (*commandTimeoutsConfig, error) {
+		for _, base := range files {
+			data, err := fileutil.ReadFile(base)
+			if err != nil {
+				continue
+			}
+			var parsed commandTimeoutsConfig
+			if yaml.Unmarshal(data, &parsed) != nil {
+				continue
+			}
+			return &parsed, nil
+		}
+		return nil, nil
+	})
+	return cfg
 }
 
 // findMatchingRule returns the first rule whose pattern is a substring of normalizedCmd,

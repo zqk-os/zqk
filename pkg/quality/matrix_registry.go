@@ -1,6 +1,7 @@
 package quality
 
 import (
+	"os"
 	"path/filepath"
 	"strings"
 
@@ -80,9 +81,13 @@ func normalizeValueMapKeys(m map[string]string) map[string]string {
 }
 
 // LoadMatrixRegistry reads docs/quality/matrix_registry.yaml (or path) from project root.
+// If the registry file is missing at the default path, it auto-initializes a default template
+// artifact so non-vital matrix operations can continue gracefully.
 func LoadMatrixRegistry(projectRoot, registryRel string) (*MatrixRegistry, error) {
+	isDefault := false
 	if registryRel == "" {
 		registryRel = filepath.Join(paths.DocsQualityDir, "matrix_registry.yaml")
+		isDefault = true
 	}
 	p := registryRel
 	if !filepath.IsAbs(p) {
@@ -90,14 +95,26 @@ func LoadMatrixRegistry(projectRoot, registryRel string) (*MatrixRegistry, error
 	}
 	data, err := fileutil.ReadFile(p)
 	if err != nil {
+		if os.IsNotExist(err) && isDefault {
+			defaultReg := MatrixRegistry{
+				SchemaVersion: "2.0.0",
+				DefaultName:   "",
+				Matrices:      make(map[string]MatrixRegistryEntry),
+			}
+			raw, _ := yaml.Marshal(defaultReg)
+			if dirErr := fileutil.EnsureDir(filepath.Dir(p)); dirErr == nil {
+				_ = fileutil.WriteSecureFile(p, raw)
+			}
+			return &defaultReg, nil
+		}
 		return nil, errfmt.Newf("matrix registry").Wrap(err)
 	}
 	var r MatrixRegistry
 	if err := yaml.Unmarshal(data, &r); err != nil {
 		return nil, errfmt.Newf("matrix registry yaml").Wrap(err)
 	}
-	if len(r.Matrices) == 0 {
-		return nil, errfmt.Errorf("matrix registry: no matrices defined")
+	if r.Matrices == nil {
+		r.Matrices = make(map[string]MatrixRegistryEntry)
 	}
 	return &r, nil
 }
@@ -108,6 +125,12 @@ func (r *MatrixRegistry) Resolve(projectRoot, name string) (MatrixRegistryEntry,
 		name = r.DefaultName
 	}
 	name = strings.TrimSpace(name)
+	if len(r.Matrices) == 0 {
+		return MatrixRegistryEntry{}, "", "", errfmt.Errorf("no matrices configured in registry (%s). Define an entry under 'matrices' to report or update.", filepath.Join(paths.DocsQualityDir, "matrix_registry.yaml"))
+	}
+	if name == "" {
+		return MatrixRegistryEntry{}, "", "", errfmt.Errorf("no default matrix configured in registry (%s). Specify --name <matrix> or set default_name.", filepath.Join(paths.DocsQualityDir, "matrix_registry.yaml"))
+	}
 	e, ok := r.Matrices[name]
 	if !ok {
 		return MatrixRegistryEntry{}, "", "", errfmt.Errorf("unknown matrix name %q (see %s)", name, filepath.Join(paths.DocsQualityDir, "matrix_registry.yaml"))

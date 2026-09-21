@@ -2295,10 +2295,6 @@
 ./scripts/scheduler_jobs/sync_external_agents.yaml
 ./scripts/scheduler_jobs/sync_external_agents.yaml
 ./scripts/scheduler_jobs/sync_external_agents.yaml
-./scripts/scheduler_jobs/test_bundle_matrix_regen_daily.yaml
-./scripts/scheduler_jobs/test_bundle_matrix_regen_daily.yaml
-./scripts/scheduler_jobs/test_bundle_matrix_regen_daily.yaml
-./scripts/scheduler_jobs/test_bundle_matrix_regen_daily.yaml
 ./scripts/scheduler_jobs/truth_sentinel.yaml
 ./scripts/scheduler_jobs/truth_sentinel.yaml
 ./scripts/scheduler_jobs/truth_sentinel.yaml

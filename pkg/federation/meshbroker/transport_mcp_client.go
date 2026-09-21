@@ -13,13 +13,14 @@ import (
 	"github.com/zqk-os/zqk/pkg/execwrap"
 	"github.com/zqk-os/zqk/pkg/zqkenv"
 
+	"github.com/zqk-os/zqk/pkg/brand"
 	"github.com/zqk-os/zqk/pkg/concurrency"
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/federation"
 	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/zqk-os/zqk/pkg/mcp"
 	"github.com/zqk-os/zqk/pkg/objects"
-	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/paths"
 )
 
 type pooledClient struct {
@@ -52,47 +53,19 @@ type MCPClientTransport struct {
 	pool map[string]*pooledClient
 }
 
-func resolveDefaultMCPBinary() string {
-	if p, err := fileutil.Stat("./bin/zqk-mcp"); err == nil && !p.IsDir() {
-		return "./bin/zqk-mcp"
-	}
-	if p, err := exec.LookPath("zqk-mcp"); err == nil {
-		return p
-	}
-	if self, err := fileutil.Executable(); err == nil && strings.TrimSpace(self) != "" {
-		return self + " mcp serve"
-	}
-	if p, err := exec.LookPath("zqk"); err == nil {
-		return p + " mcp serve"
-	}
-	return "zqk mcp serve"
-}
-
-func resolveDefaultCLIBinary() string {
-	if p, err := fileutil.Stat("./bin/zqk"); err == nil && !p.IsDir() {
-		return "./bin/zqk"
-	}
-	if self, err := fileutil.Executable(); err == nil && strings.TrimSpace(self) != "" {
-		return self
-	}
-	if p, err := exec.LookPath("zqk"); err == nil {
-		return p
-	}
-	return "zqk"
-}
-
 func NewMCPClientTransport(binaryPath string) *MCPClientTransport {
-	if binaryPath == "" {
-		binaryPath = resolveDefaultMCPBinary()
-	}
 	return &MCPClientTransport{
 		BinaryPath: binaryPath,
 		pool:       make(map[string]*pooledClient),
 	}
 }
 
+func (t *MCPClientTransport) mcpArgv() (string, []string) {
+	return paths.MCPServeArgv(t.BinaryPath, "")
+}
+
 func (t *MCPClientTransport) SendHandshake(ctx context.Context, endpoint string, req federation.HandshakeRequest) (*federation.HandshakeResponse, error) {
-	cliTransport := federation.NewLocalCLITransport(resolveDefaultCLIBinary())
+	cliTransport := federation.NewLocalCLITransport(paths.ResolveProductCLI(""))
 	return cliTransport.SendHandshake(ctx, endpoint, req)
 }
 
@@ -146,7 +119,8 @@ func (t *MCPClientTransport) initializeClient(ctx context.Context, endpoint stri
 		cmdCtx, cmdCancel := context.WithTimeout(ctx, initTimeout)
 		// NOTE: cmdCancel is deferred further down after cmd.Start() succeeds,
 		// but the exec.CommandContext will kill the process if the context expires.
-		cmd := execwrap.CommandContext(cmdCtx, t.BinaryPath)
+		bin, args := t.mcpArgv()
+		cmd := execwrap.CommandContext(cmdCtx, bin, args...)
 		cmd.Env = os.Environ()
 		if endpoint != "" && !strings.HasPrefix(endpoint, "http://") && !strings.HasPrefix(endpoint, "https://") {
 			cmd.Env = append(cmd.Env, zqkenv.ProjectRoot().Name()+"="+endpoint)
@@ -191,12 +165,12 @@ func (t *MCPClientTransport) initializeClient(ctx context.Context, endpoint stri
 	initCtx, cancel := context.WithTimeout(ctx, 10*time.Second)
 	defer cancel()
 
-	clientName := "zqk-cli"
+	clientName := brand.ExecutableName() + "-meshbroker"
 
 	initParams := mcp.InitializeParams{
 		ProtocolVersion: "2024-11-05",
 		Capabilities: map[string]any{
-			objects.FieldKeyClientID: "system:meshbroker",
+			objects.FieldKeyClientID: brand.NamespacePrefix() + ":meshbroker",
 		},
 	}
 	initParams.ClientInfo.Name = clientName

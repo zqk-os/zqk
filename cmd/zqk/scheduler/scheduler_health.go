@@ -124,7 +124,7 @@ func runHealthCheck(cmd *cobra.Command, args []string) error {
 					String("age", age.Round(time.Second).String()).
 					Log()
 			}
-			logging.Fluent(logger).Info("Start the daemon with: zqk scheduler start").Log()
+			logging.Fluent(logger).Info(paths.RewriteCanonicalCLIInvocations("Start the daemon with: zqk scheduler start")).Log()
 			os.Exit(1)
 		}
 		removeDaemonUnhealthyFile(projectRoot)
@@ -188,7 +188,7 @@ func writeDaemonUnhealthyFile(projectRoot, reason string, enabledTimerJobs int, 
 		CheckedAt:          zqktime.NowRFC3339UTC(),
 		EnabledTimerJobs:   enabledTimerJobs,
 		Message:            message,
-		RemediationCommand: "zqk scheduler start",
+		RemediationCommand: paths.CLIUsage("scheduler", "start"),
 	}
 	data, err := json.Marshal(payload)
 	if err != nil {

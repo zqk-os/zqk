@@ -8,6 +8,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/zqk-os/zqk/internal/cli"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/search"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"gopkg.in/yaml.v3"
@@ -75,7 +76,7 @@ func NewGrepCmd() *cobra.Command {
 			}
 
 			if query == "" && pathFlag == "" && !astMode && astKind == "" && astReceiver == "" && !reindex {
-				return fmt.Errorf("search query required (e.g. zqk grep 'pattern')")
+				return fmt.Errorf("%s", paths.RewriteCanonicalCLIInvocations("search query required (e.g. zqk grep 'pattern')"))
 			}
 
 			engine := search.NewEngine(".")

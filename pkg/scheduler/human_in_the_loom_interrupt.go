@@ -11,6 +11,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/coordination"
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/policyinterrupt"
 )
 
@@ -40,7 +41,7 @@ func EmitHumanInTheLoomInterrupt(
 		DedupeKey:        dedupeKey,
 		PolicyID:         policyID,
 		Message:          fmt.Sprintf("Human-in-the-Loom approval required for session %s: %s", sessionID, reason),
-		SuggestedAction:  "zqk system policy-interrupts ack --dedupe-key " + dedupeKey,
+		SuggestedAction:  paths.CLIUsage("system", "policy-interrupts", "ack", "--dedupe-key", dedupeKey),
 		ExpiresAtRFC3339: time.Now().UTC().Add(24 * time.Hour).Format(time.RFC3339),
 		OriginOperation:  "convergence_router",
 		OriginActorID:    "system", // Typically the orchestrator/agent

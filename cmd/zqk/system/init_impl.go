@@ -216,7 +216,7 @@ func runInit(_ *cobra.Command, projectName, template string, force bool, snapsho
 	if withMaintenanceJobs {
 		result, err := EnsureRetentionJobsInProject(projectRoot, logger, nil)
 		if err != nil {
-			return errfmt.Newf("init --with-maintenance-jobs failed; run 'zqk system ensure-retention-jobs' after fixing the error").Wrap(err)
+			return errfmt.Newf("%s", paths.RewriteCanonicalCLIInvocations("init --with-maintenance-jobs failed; run 'zqk system ensure-retention-jobs' after fixing the error")).Wrap(err)
 		}
 		if result != nil && !result.AlreadySatisfied {
 			logging.Fluent(logger).Info("Maintenance jobs ensured").
@@ -376,7 +376,7 @@ func runGreenfieldInit(projectRoot, projectName, template string, force bool, lo
 	if _, err := migration.EnsureBundledObjectSpecsMigrated(context.Background(), projectRoot, logger); err != nil {
 		logging.Fluent(logger).Warn("Bundled object_spec migration did not complete").
 			WithError(err).
-			String("note", "Run from repo after fixing storage, or use zqk spec list (file fallback)").
+			String("note", paths.RewriteCanonicalCLIInvocations("Run from repo after fixing storage, or use zqk spec list (file fallback)")).
 			Log()
 	}
 
@@ -502,7 +502,7 @@ func runLegacyInit(projectRoot, projectName, template string, force bool, logger
 	if _, err := migration.EnsureBundledObjectSpecsMigrated(context.Background(), projectRoot, logger); err != nil {
 		logging.Fluent(logger).Warn("Bundled object_spec migration did not complete").
 			WithError(err).
-			String("note", "Run from repo after fixing storage, or use zqk spec list (file fallback)").
+			String("note", paths.RewriteCanonicalCLIInvocations("Run from repo after fixing storage, or use zqk spec list (file fallback)")).
 			Log()
 	}
 
@@ -1119,7 +1119,7 @@ func runLegacyDiscoverWizard(projectRoot string, logger logging.Logger) error {
 			Int("count", c.count).
 			Log()
 	}
-	logging.Fluent(logger).Info("To register hashes and validate discovered objects, run: zqk system check --auto-fix").Log()
+	logging.Fluent(logger).Info(paths.RewriteCanonicalCLIInvocations("To register hashes and validate discovered objects, run: zqk system check --auto-fix")).Log()
 	return nil
 }
 

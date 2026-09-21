@@ -55,7 +55,7 @@ func TestRenderSystemPrompt_ContainsTacticalGuidance(t *testing.T) {
 		{"bash restriction", p + "execute_bash"},
 		{"circuit breaker warning", "circuit breaker"},
 		{"no hourglass tool", "do NOT call agent_next"},
-		{"repo layout", "zqk Go module"},
+		{"repo layout", "Go kernel module"},
 		{"native tool API", "native function-calling API"},
 		{"no markdown fences", "markdown fences"},
 	}

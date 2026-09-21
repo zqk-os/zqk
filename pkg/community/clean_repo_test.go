@@ -74,10 +74,10 @@ func TestPoliceAndPayloadGates(t *testing.T) {
 // TestCandidateBinaryHelp verifies candidate builds standalone and runs --help with exit code 0.
 func TestCandidateBinaryHelp(t *testing.T) {
 	candidateDir := publicCandidateFixture(t)
-	binPath := filepath.Join(candidateDir, "bin", "zqk-community")
+	binPath := filepath.Join(candidateDir, "bin", "zqk")
 
 	if !fileutil.Exists(binPath) {
-		cmdBuild := execwrap.Command("go", "build", "-buildvcs=false", "-o", binPath, "./cmd/zqk-community")
+		cmdBuild := execwrap.Command("go", "build", "-buildvcs=false", "-o", binPath, "./cmd/zqk")
 		cmdBuild.Dir = candidateDir
 		outBuild, errBuild := cmdBuild.CombinedOutput()
 		if errBuild != nil {

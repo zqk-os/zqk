@@ -2,6 +2,7 @@ package bldr_v2
 
 import (
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/specbuilder/builders"
 )
 
@@ -21,7 +22,7 @@ func NewPriorityPlanBuilder() *PriorityPlanBuilder {
 	builder.
 		SetExtends("work_interval").
 		AddCompose("remaining_open").
-		SetDescription("Represents a priority plan that organizes backlog items into priority tiers (P0, P1, P2, P3). Priority plans are used to sequence work and manage capacity across workstreams.\\nCHILD→PARENT ONLY: Membership is exclusively backlog_item.priority_plan_ref → this plan. Do not store\\nbacklog_item_refs (or legacy p0_items/p1_items/…) on priority_plan — parent→child refs are forbidden\\non this kind and on the graph edge set (query children with filter priority_plan_ref=<PRI-id>).\\nUse zqk pplan add/remove to bind membership on the child. Stray backlog_item_refs on instances are\\nrejected by composed integrity (pri_no_backlog_item_refs).\\nNEW MODEL (as of 2025-12-15): Priority plans no longer store tier arrays (p0_items, p1_items, etc.).\\nTiering comes from each item's priority_tier field (P0, P1, P2, P3).\\nLifecycle: priority_plan_lifecycle.yaml.\\n").
+		SetDescription(paths.RewriteCanonicalCLIInvocations("Represents a priority plan that organizes backlog items into priority tiers (P0, P1, P2, P3). Priority plans are used to sequence work and manage capacity across workstreams.\\nCHILD→PARENT ONLY: Membership is exclusively backlog_item.priority_plan_ref → this plan. Do not store\\nbacklog_item_refs (or legacy p0_items/p1_items/…) on priority_plan — parent→child refs are forbidden\\non this kind and on the graph edge set (query children with filter priority_plan_ref=<PRI-id>).\\nUse zqk pplan add/remove to bind membership on the child. Stray backlog_item_refs on instances are\\nrejected by composed integrity (pri_no_backlog_item_refs).\\nNEW MODEL (as of 2025-12-15): Priority plans no longer store tier arrays (p0_items, p1_items, etc.).\\nTiering comes from each item's priority_tier field (P0, P1, P2, P3).\\nLifecycle: priority_plan_lifecycle.yaml.\\n")).
 		SetVisibility("public").
 		SetSchemaVersion(objects.DefaultSchemaVersion).
 		AddTrait("base_object_traits").

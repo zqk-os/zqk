@@ -52,12 +52,18 @@ func TestClipSeatWorkerPromptPart_capsAndSteersWrite(t *testing.T) {
 	if !strings.Contains(got, "TRUNCATED FOR WINDOW") {
 		t.Fatalf("missing truncation footer: %q", got[len(got)-160:])
 	}
-	if !strings.Contains(got, "write_code") {
-		t.Fatal("coding clip footer must steer toward write_code")
+	if !strings.Contains(got, "write_code") || !strings.Contains(got, "write_file") {
+		t.Fatalf("coding clip footer must steer write tools: %q", got[len(got)-280:])
+	}
+	if !strings.Contains(got, "read_file") || !strings.Contains(got, "observer_search") {
+		t.Fatalf("coding clip footer must steer search and read tools: %q", got[len(got)-280:])
 	}
 	docs := clipSeatWorkerPromptPart(dump, seatWorkerPreparedPromptCap, "PREPARED CONTEXT", agentprompt.WorkClassDocsEval)
-	if !strings.Contains(docs, "docs/quality/") || !strings.Contains(docs, "Do NOT edit cmd/") {
-		t.Fatalf("docs_eval clip footer must prefer docs/quality and forbid cmd edits: %q", docs[len(docs)-220:])
+	if !strings.Contains(docs, "write_file") {
+		t.Fatalf("docs_eval clip footer must steer write_file: %q", docs[len(docs)-280:])
+	}
+	if !strings.Contains(docs, "read_file") {
+		t.Fatalf("docs_eval clip footer must steer read_file: %q", docs[len(docs)-280:])
 	}
 	if strings.Contains(got, strings.Repeat("x", seatWorkerPreparedPromptCap+1)) {
 		t.Fatal("clip kept more than the prepared-context cap")
@@ -104,7 +110,7 @@ func TestAssemblePreparedContext_WorkClassClassification(t *testing.T) {
 
 	// 2. DocsEval task with description
 	docsCtx, err := AssemblePreparedContext(context.Background(), sec, fs, PreparedContextInput{
-		Description: "evaluate docs/quality/cef-runs/2026-09-04-AGENT_AD finding.schema.json",
+		Description: "evaluate documentation forbid: source edits finding.schema.json",
 		ProjectRoot: root,
 		IncludeTDD:  true,
 	})

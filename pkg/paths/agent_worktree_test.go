@@ -53,6 +53,85 @@ func TestAgentWorktreeDir_notNestedInProjectEvenIfEnvInside(t *testing.T) {
 	}
 }
 
+func TestAgentWorktreeMainRepo_seatedKernelNotParentHops(t *testing.T) {
+	t.Parallel()
+	studio := t.TempDir()
+	wt := filepath.Join(t.TempDir(), agentWorktreeTempBucket, "repo-key", "ATK-1")
+	if err := BootstrapWorktreeConfig(wt, studio); err != nil {
+		t.Fatal(err)
+	}
+	got, err := AgentWorktreeMainRepo(wt)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got != studio {
+		t.Fatalf("got %q want seated kernel %q", got, studio)
+	}
+	hop := filepath.Dir(filepath.Dir(filepath.Dir(wt)))
+	if got == hop {
+		t.Fatalf("must not resolve studio by three Dir hops (%s)", hop)
+	}
+}
+
+func TestAgentWorktreeMainRepo_refusesUnbondedIsolatedTree(t *testing.T) {
+	t.Parallel()
+	wt := filepath.Join(t.TempDir(), agentWorktreeTempBucket, "repo-key", "ATK-unbonded")
+	if err := os.MkdirAll(wt, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	got, err := AgentWorktreeMainRepo(wt)
+	if err == nil {
+		t.Fatalf("unbonded isolated worktree must not guess a parent; got %q", got)
+	}
+}
+
+func TestAgentWorktreeMainRepo_gitCommonDir(t *testing.T) {
+	t.Parallel()
+	studio := t.TempDir()
+	initGitRepo(t, studio)
+	wt := filepath.Join(t.TempDir(), agentWorktreeTempBucket, "repo-key", "ATK-git")
+	cmd := execwrap.Command("git", "worktree", "add", "--detach", wt)
+	cmd.Dir = studio
+	if out, err := cmd.CombinedOutput(); err != nil {
+		t.Fatalf("git worktree add: %v (%s)", err, out)
+	}
+	got, err := AgentWorktreeMainRepo(wt)
+	if err != nil {
+		t.Fatal(err)
+	}
+	studioAbs, err := filepath.EvalSymlinks(studio)
+	if err != nil {
+		studioAbs, _ = filepath.Abs(studio)
+	}
+	gotAbs, err := filepath.EvalSymlinks(got)
+	if err != nil {
+		gotAbs, _ = filepath.Abs(got)
+	}
+	if gotAbs != studioAbs {
+		t.Fatalf("git common-dir = %q want %q", gotAbs, studioAbs)
+	}
+}
+
+func initGitRepo(t *testing.T, dir string) {
+	t.Helper()
+	cmd := execwrap.Command("git", "init")
+	cmd.Dir = dir
+	if out, err := cmd.CombinedOutput(); err != nil {
+		t.Fatalf("git init: %v (%s)", err, out)
+	}
+	for _, args := range [][]string{
+		{"config", "user.name", "Test"},
+		{"config", "user.email", "test@test.local"},
+		{"commit", "--allow-empty", "-m", "init"},
+	} {
+		cmd = execwrap.Command("git", args...)
+		cmd.Dir = dir
+		if out, err := cmd.CombinedOutput(); err != nil {
+			t.Fatalf("git %v: %v (%s)", args, err, out)
+		}
+	}
+}
+
 func TestBootstrapWorktreeConfig_AssumeUnchanged(t *testing.T) {
 	t.Parallel()
 	repoDir := t.TempDir()

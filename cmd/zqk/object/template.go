@@ -33,8 +33,7 @@ func NewTemplateCmd() *cobra.Command {
 	cmd := bldr_cli_cmd_v1.NewObjectTemplateCommandBuilder()
 	// Community draft canon: prefer this over quick/new.
 	if cmd.Long != "" {
-		cmd.Long = "Canonical draft path: generate YAML, edit, then object create --file.\n" +
-			"(Alternatives: zqk quick … for text/markdown; zqk new … for scenario drafts.)\n\n" + cmd.Long
+		cmd.Long = "Canonical draft path: generate YAML, edit, then object create --file.\n" + paths.RewriteCanonicalCLIInvocations("(Alternatives: zqk quick … for text/markdown; zqk new … for scenario drafts.)\n\n") + cmd.Long
 	}
 	// Add RunE implementation
 	cli.BindAsyncProgress(cmd, runTemplate)

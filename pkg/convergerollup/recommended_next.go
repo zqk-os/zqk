@@ -2,6 +2,7 @@ package convergerollup
 
 import (
 	"fmt"
+	"github.com/zqk-os/zqk/pkg/paths"
 	"strings"
 )
 
@@ -9,8 +10,7 @@ import (
 // for agent prompts and overseer output (measurement-disambiguated next step).
 func BuildRecommendedNextAction(status RollupStatus, blockers []Blocker, tb TestBundleInput, readyBundles bool) string {
 	if len(blockers) == 0 && status == RollupStatusSatisfied && readyBundles {
-		return "All configured rollup surfaces in this command's scope are green (bundles, literal gates, linked child CVS rows). " +
-			"Advance phase or complete the session via zqk object update when lifecycle rules and desired_end_state allow."
+		return "All configured rollup surfaces in this command's scope are green (bundles, literal gates, linked child CVS rows). " + paths.RewriteCanonicalCLIInvocations("Advance phase or complete the session via zqk object update when lifecycle rules and desired_end_state allow.")
 	}
 
 	priority := []string{
@@ -36,8 +36,7 @@ func BuildRecommendedNextAction(status RollupStatus, blockers []Blocker, tb Test
 			"(related_object_refs), or document explicit acceptance. See docs/architecture/CONVERGENCE_ORCHESTRATION_AND_NESTED_CVS.md."
 	}
 	if !readyBundles {
-		return "Wait for bundle health to satisfy ready_for_session_completion (scan-tests, scheduler activity); " +
-			"then re-measure with zqk scheduler convergence measure --format json --session-id <CVS>."
+		return "Wait for bundle health to satisfy ready_for_session_completion (scan-tests, scheduler activity); " + paths.RewriteCanonicalCLIInvocations("then re-measure with zqk scheduler convergence measure --format json --session-id <CVS>.")
 	}
 	return "Address rollup blockers above; re-run convergence measure and literal gates. " +
 		"See docs/architecture/CONVERGENCE_ORCHESTRATION_AND_NESTED_CVS.md."
@@ -50,24 +49,20 @@ func actionLineForBlocker(code, detail string, tb TestBundleInput) string {
 		if n == 0 {
 			n = 1
 		}
-		return fmt.Sprintf(
-			"Fix failing test bundles (%d fingerprint(s) in latest measurement): run targeted zqk scheduler scan-tests --package … "+
-				"and inspect .zqk/logs/scheduler/cvs/test-bundles/; re-run measure when green.",
-			n,
+		return fmt.Sprintf(paths.RewriteCanonicalCLIInvocations("Fix failing test bundles (%d fingerprint(s) in latest measurement): run targeted zqk scheduler scan-tests --package … ")+
+			"and inspect .zqk/logs/scheduler/cvs/test-bundles/; re-run measure when green.", n,
 		)
 	case "delta_trending_away":
 		return "Bundle health is trending away from the session goal; stabilize tests and scheduler load before advancing phase. " +
 			"Re-run scan-tests for the packages implicated by failing fingerprints."
 	case "field_key_literals_gate":
-		return "Field-key literal gate failed (" + detail + "). Run: sh ./scripts/check-field-key-literals-repo.sh; " +
-			"fix with go run ./scripts/fix_field_key_literals -path <pkg> -write (see field-key-literal-scan rule)."
+		return "Field-key literal gate failed (" + detail + "). Inspect field key literals and use pkg/objects accessors."
 	case "zqk_env_literals_gate":
-		return "ZQK env literal gate failed (" + detail + "). Run: sh ./scripts/check-zqk-env-literals-repo.sh; " +
-			"use pkg/zqkenv accessors (see check-zqk-env-literals-repo.sh)."
+		return "ZQK env literal gate failed (" + detail + "). Use pkg/zqkenv accessors."
 	case "vetting_matrix":
-		return "Vetting matrix error: " + detail + ". Fix CSV/process inputs or re-run scripts/cvs_outcome_rollup.py."
+		return "Vetting matrix error: " + detail + ". Fix CSV/process inputs or re-run matrix verification."
 	case "matrix_rows_pending":
-		return "Vetting matrix still has pending .go rows (" + detail + "). Drive CODEBASE_VETTING_MATRIX.csv to completion or adjust session scope."
+		return "Verification matrix still has pending rows (" + detail + "). Drive matrix to completion or adjust session scope."
 	case "child_session":
 		if strings.HasPrefix(detail, "CVS-") {
 			return "Complete or archive child convergence_session before parent exit: " + detail + "."

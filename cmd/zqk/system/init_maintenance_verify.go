@@ -5,6 +5,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/storage"
 )
 
@@ -30,7 +31,7 @@ func verifyMaintenanceJobsPresent(projectRoot string, logger logging.Logger) err
 		count = len(res.Objects)
 	}
 	if count == 0 {
-		return errfmt.Errorf("init --with-maintenance-jobs left zero scheduler_job objects; run 'zqk system ensure-retention-jobs' and re-check")
+		return errfmt.Errorf("%s", paths.RewriteCanonicalCLIInvocations("init --with-maintenance-jobs left zero scheduler_job objects; run 'zqk system ensure-retention-jobs' and re-check"))
 	}
 	if logger != nil {
 		logging.Fluent(logger).Info("Verified maintenance scheduler jobs present").

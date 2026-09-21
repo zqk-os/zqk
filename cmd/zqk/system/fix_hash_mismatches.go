@@ -192,7 +192,7 @@ func runFixHashMismatches(cmd *cobra.Command, args []string, strategyName, input
 	fmt.Fprintf(out, "Fixed: %d\n", fixedCount)
 	fmt.Fprintf(out, "Not found in index: %d\n", notFoundCount)
 	fmt.Fprintf(out, "Errors: %d\n", errorCount)
-	fmt.Fprintf(out, "\nNext step: Run 'zqk system check --auto-fix --tier 0' to re-index\n")
+	fmt.Fprintf(out, "%s", paths.RewriteCanonicalCLIInvocations("\nNext step: Run 'zqk system check --auto-fix --tier 0' to re-index\n"))
 
 	return nil
 }

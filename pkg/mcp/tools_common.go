@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 )
 
 // mcpToolArgKey* are MCP tool schema / forwarded CLI argument map keys.
@@ -60,7 +61,7 @@ func RegisterCommonTools(server *Server) {
 
 	NewToolBuilder(
 		GetToolName("object_get"),
-		"Get a single object by ID. Returns full object data including all fields and metadata (unless fields is set). Use this to retrieve detailed information about a specific object. Example: "+GetToolName("object_get")+" with id='BLI-626', format='json'. Optional: fields=['prompt_body'] (same as CLI --fields), view='milestone-completion-report', link_hydration='lazy' (same as zqk object get; see pkg/objectget).",
+		"Get a single object by ID. Returns full object data including all fields and metadata (unless fields is set). Use this to retrieve detailed information about a specific object. Example: "+GetToolName("object_get")+paths.RewriteCanonicalCLIInvocations(" with id='BLI-626', format='json'. Optional: fields=['prompt_body'] (same as CLI --fields), view='milestone-completion-report', link_hydration='lazy' (same as zqk object get; see pkg/objectget)."),
 	).
 		AddStringProperty(objects.FieldKeyID, "Object ID (e.g., 'BLI-626', 'GOAL-123')").
 		MarkRequired(objects.FieldKeyID).

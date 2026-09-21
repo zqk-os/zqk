@@ -414,16 +414,13 @@ func (r *JobStateRegistry) writeStateHintsFile() error {
 	}
 	content := []byte(
 		"purpose: Per-execution scheduler job state files for cross-process visibility.\n" +
-			"layout_current: <bucket>/<job_id_segment>/<execution_id>.yaml (bucket = " + schedulerStateBucketREADMEBucketLegend() + ")\n" +
-			"layout_legacy: <job_id_segment>/<execution_id>.yaml (no bucket; still read — run: zqk scheduler state --migrate)\n" +
+			"layout_current: <bucket>/<job_id_segment>/<execution_id>.yaml (bucket = " + schedulerStateBucketREADMEBucketLegend() + ")\n" + paths.RewriteCanonicalCLIInvocations("layout_legacy: <job_id_segment>/<execution_id>.yaml (no bucket; still read — run: zqk scheduler state --migrate)\n") +
 			"layout_flat: <job_id>-<execution_id>.yaml (top-level flat; migrate moves into nested layout)\n" +
 			"states: [in_progress, completed, failed, deferred, skipped]\n" +
 			"notes:\n" +
 			"  - in_progress/deferred files may remain if a run is interrupted.\n" +
 			"  - completed/failed/skipped files are retained then cleaned best-effort (~7d).\n" +
-			"cli_hints:\n" +
-			"  - zqk scheduler state\n" +
-			"  - zqk scheduler history --job-id <JOB_ID>\n",
+			"cli_hints:\n" + paths.RewriteCanonicalCLIInvocations("  - zqk scheduler state\n") + paths.RewriteCanonicalCLIInvocations("  - zqk scheduler history --job-id <JOB_ID>\n"),
 	)
 	return fileutil.WriteFile(hintsPath, content, paths.FilePerm600)
 }

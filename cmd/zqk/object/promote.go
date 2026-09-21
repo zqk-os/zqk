@@ -517,7 +517,7 @@ func formatStuckPromote(id string, diag promoteStuckDiag, rejectedOrder []string
 		}
 	}
 	if (diag.CurrentPercent >= 100 || isSuccessLifecycleTerminal(diag.CurrentStatus)) && hasArchiveNeighbor {
-		fmt.Fprintf(&b, "\n  Note: '%s' is terminal completion. To archive, use: zqk object promote %s (targets archived; children ride the prune shockwave)", diag.CurrentStatus, id)
+		fmt.Fprintf(&b, "%s", paths.RewriteCanonicalCLIInvocations(fmt.Sprintf("\n  Note: '%s' is terminal completion. To archive, use: zqk object promote %s (targets archived; children ride the prune shockwave)", diag.CurrentStatus, id)))
 	}
 
 	if len(rejectedOrder) == 0 {
@@ -531,7 +531,7 @@ func formatStuckPromote(id string, diag promoteStuckDiag, rejectedOrder []string
 		status := rejectedOrder[i]
 		fmt.Fprintf(&b, "\n    - %s: %s", status, rejectionByStatus[status])
 	}
-	b.WriteString("\n  Tip: satisfy the validation/preconditions above, then re-run: zqk object promote " + id)
+	b.WriteString(paths.RewriteCanonicalCLIInvocations("\n  Tip: satisfy the validation/preconditions above, then re-run: zqk object promote ") + id)
 	return b.String()
 }
 

@@ -212,10 +212,7 @@ func notifyAgentsOfKernelChange(projectRoot, operation, kind, id, sessionID stri
 		Kind:        kind,
 		ObjectID:    id,
 		Timestamp:   ts,
-		Message: fmt.Sprintf(
-			"[KERNEL_CHANGE] Project: %s. Object %s %sd: %s (%s). Query: ./bin/zqk object list %s",
-			kernelName, kind, operation, id, kind, kind,
-		),
+		Message:     paths.RewriteCanonicalCLIInvocations(fmt.Sprintf("[KERNEL_CHANGE] Project: %s. Object %s %sd: %s (%s). Query: ./bin/zqk object list %s", kernelName, kind, operation, id, kind, kind)),
 	}
 
 	if sessionID != "" {

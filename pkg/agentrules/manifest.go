@@ -163,10 +163,10 @@ func WriteManifestFromDisk(projectRoot string, rulesDirFlag string) error {
 	if err != nil {
 		return errfmt.Newf(errMsgMarshalManifest).Wrap(err)
 	}
-	header := []byte(`# Canonical registry for IDE/agent rule files (*.mdc under the configured rules dir; default .cursor/rules).
+	header := []byte(paths.RewriteCanonicalCLIInvocations(`# Canonical registry for IDE/agent rule files (*.mdc under the configured rules dir; default .cursor/rules).
 # Validated by: zqk system validate-agent-rules (no flags from repo root; use --write-manifest to refresh this list).
 # Override directory: ZQK_AGENT_RULES_DIR or --rules-dir.
-`)
+`))
 	body := append(header, out...)
 	dest := ManifestPath(projectRoot)
 	if err := fileutil.EnsureDir(filepath.Dir(dest)); err != nil {

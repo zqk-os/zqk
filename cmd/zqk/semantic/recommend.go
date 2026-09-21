@@ -9,6 +9,7 @@ import (
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
 	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
 	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/semantic"
 )
 
@@ -25,8 +26,7 @@ func NewRecommendCmd() *cobra.Command {
 		"- Focused list of next-step recommendations tailored to that level",
 		"",
 		"Examples:",
-		"  # Recommend next steps for semantic maturity",
-		"  zqk semantic recommend",
+		"  # Recommend next steps for semantic maturity", paths.RewriteCanonicalCLIInvocations("  zqk semantic recommend"),
 	).
 		ExcludeCommonFlagsWithout("format")
 

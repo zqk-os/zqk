@@ -18,4 +18,13 @@ func TestClassifyWorkClass(t *testing.T) {
 	if !WorkClassDocsEval.IsDocsEval() || WorkClassCoding.IsDocsEval() {
 		t.Fatal("IsDocsEval mismatch")
 	}
+	if got := WorkClassCoding.PromptCapabilities(); len(got) != 1 || got[0] != string(WorkClassCoding) {
+		t.Fatalf("coding caps %v", got)
+	}
+	if got := WorkClassDocsEval.PromptCapabilities(); len(got) != 1 || got[0] != string(WorkClassDocsEval) {
+		t.Fatalf("docs_eval caps %v", got)
+	}
+	if got := WorkClass("").PromptCapabilities(); len(got) != 1 || got[0] != string(WorkClassCoding) {
+		t.Fatalf("empty caps %v", got)
+	}
 }

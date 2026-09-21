@@ -2,6 +2,7 @@ package bldr_v2
 
 import (
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/specbuilder/builders"
 )
 
@@ -20,7 +21,7 @@ func NewStakeholderProfileBuilder() *StakeholderProfileBuilder {
 	// Configure the spec
 	builder.
 		SetExtends("base_object").
-		SetDescription("Stakeholder profile captures expectations and priorities for a stakeholder (e.g. executive, product owner).\\nUsed by strategic alignment (zqk system align) and goal discovery. See project-discovery-and-strategic-alignment-v1.0.md.\\nLifecycle: stakeholder_profile_lifecycle.yaml.\\n").
+		SetDescription(paths.RewriteCanonicalCLIInvocations("Stakeholder profile captures expectations and priorities for a stakeholder (e.g. executive, product owner).\\nUsed by strategic alignment (zqk system align) and goal discovery. See project-discovery-and-strategic-alignment-v1.0.md.\\nLifecycle: stakeholder_profile_lifecycle.yaml.\\n")).
 		SetVisibility("public").
 		SetSchemaVersion(objects.DefaultSchemaVersion).
 		AddTrait("base_object_traits")

@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/zqk-os/zqk/pkg/config"
+	"github.com/zqk-os/zqk/pkg/paths"
 
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/objects"
@@ -236,7 +237,7 @@ func BuildTaskPrompt(ctx context.Context, sp storage.ObjectStorageProvider, secC
 
 	var footerSb strings.Builder
 	footerSb.WriteString("## Standing mandates\n")
-	footerSb.WriteString("Resolve bodies with `zqk object get`. Do not copy them into the task object.\n")
+	footerSb.WriteString(paths.RewriteCanonicalCLIInvocations("Resolve bodies with `zqk object get`. Do not copy them into the task object.\n"))
 	if opts.IncludeTDD {
 		footerSb.WriteString(fmt.Sprintf("- TDD: `%s`\n", StandingPolicyTDD))
 	}

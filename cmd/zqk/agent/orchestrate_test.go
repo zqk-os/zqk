@@ -511,7 +511,7 @@ func TestOrchestrationTaskOpts_ClassifiesWorkClass(t *testing.T) {
 			codingOpts.IncludeTDD, codingOpts.IncludeObserver)
 	}
 
-	docsOpts := orchestrationTaskOpts(state, "worker", "PER-EVAL", "docs_eval", "CEF evaluate docs/quality/cef-runs/2026-09-04")
+	docsOpts := orchestrationTaskOpts(state, "worker", "PER-EVAL", "docs_eval", "evaluate documentation and rubrics forbid: source edits")
 	if docsOpts.IncludeTDD || docsOpts.IncludeObserver {
 		t.Fatalf("docs_eval task must have IncludeTDD=false and IncludeObserver=false: got tdd=%v, observer=%v",
 			docsOpts.IncludeTDD, docsOpts.IncludeObserver)

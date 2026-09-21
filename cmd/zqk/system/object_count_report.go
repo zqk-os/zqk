@@ -244,10 +244,7 @@ func runObjectCountReportImpl(cmd *cobra.Command, _ []string) error {
 			totalLegacy += n
 		}
 		if totalLegacy > legacyAdvisoryThreshold {
-			report.Alerts = append(report.Alerts, fmt.Sprintf(
-				"legacy pre-migration YAML files in stream-backed dirs: %d total (run 'zqk system migrate-legacy-to-stream --kind <kind> --remove-legacy' or 'scripts/delete_unmanaged_audit_yaml.py --execute')",
-				totalLegacy,
-			))
+			report.Alerts = append(report.Alerts, paths.RewriteCanonicalCLIInvocations(fmt.Sprintf("legacy pre-migration YAML files in stream-backed dirs: %d total (run 'zqk system migrate-legacy-to-stream --kind <kind> --remove-legacy' or 'scripts/delete_unmanaged_audit_yaml.py --execute')", totalLegacy)))
 		}
 
 		if err := writeReportFile(outputPath, report, cacheStatus, integrity, fsProjectSnap); err != nil {
@@ -856,7 +853,7 @@ func writeReportFile(path string, report *operational.CongruenceReport, cacheSta
 		for _, d := range legacyDirs {
 			fmt.Fprintf(f, "  %s: %d file(s)\n", d, report.LegacyStreamBackedByDir[d])
 		}
-		fmt.Fprintf(f, "  Cleanup: zqk system migrate-legacy-to-stream --kind <kind> --remove-legacy\n")
+		fmt.Fprintf(f, "%s", paths.RewriteCanonicalCLIInvocations("  Cleanup: zqk system migrate-legacy-to-stream --kind <kind> --remove-legacy\n"))
 		fmt.Fprintf(f, "           scripts/delete_unmanaged_audit_yaml.py --execute  (audit/metrics)\n")
 		fmt.Fprintf(f, "\n")
 	}
@@ -872,7 +869,7 @@ func writeReportFile(path string, report *operational.CongruenceReport, cacheSta
 		writeFilesystemSnapshotSection(f, fsSnap)
 	}
 	fmt.Fprintf(f, "--- When counts are off: investigate ---\n")
-	fmt.Fprintf(f, "  See %s and run zqk system retention-status.\n", filepath.Join(paths.ProcessDir, "observability", "RETENTION_TARGET_VISIBILITY_GAP.md"))
+	fmt.Fprintf(f, "%s", paths.RewriteCanonicalCLIInvocations(fmt.Sprintf("  See %s and run zqk system retention-status.\n", filepath.Join(paths.ProcessDir, "observability", "RETENTION_TARGET_VISIBILITY_GAP.md"))))
 	if len(report.StreamBackedDirs) > 0 {
 		fmt.Fprintf(f, "  Stream-backed dirs (object count from stream): legacy YAML in %s/<dir> is not the source of truth;\n", paths.ProcessDir)
 		fmt.Fprintf(f, "  you may prune legacy files or leave them; see %s.\n", filepath.Join(paths.DocsDir, "architecture", "HIGH_VOLUME_STORAGE_DEPRECATION.md"))
@@ -950,7 +947,7 @@ func writeInterpretation(f *fileutil.File, report *operational.CongruenceReport)
 	fmt.Fprintf(f, "--- Interpretation ---\n")
 	fmt.Fprintf(f, "  total_disk:   count of .yaml files under %s (one file per object or legacy).\n", paths.ProcessDir)
 	fmt.Fprintf(f, "  total_object: sum of per-kind counts (CAS index or stream registry for stream-backed kinds).\n")
-	fmt.Fprintf(f, "  total_internal: sum of per-kind counts from 'zqk internal count' (in-memory view).\n")
+	fmt.Fprintf(f, "%s", paths.RewriteCanonicalCLIInvocations("  total_internal: sum of per-kind counts from 'zqk internal count' (in-memory view).\n"))
 	if len(report.StreamBackedDirs) > 0 {
 		fmt.Fprintf(f, "  Stream-backed kinds (audit_event, change_journal_entry, scheduler_job, metrics, etc.): object count\n")
 		fmt.Fprintf(f, "  comes from stream storage; disk count is legacy YAML in %s/<dir>. Negative disparity for those\n", paths.ProcessDir)
@@ -970,18 +967,18 @@ func writeInterpretation(f *fileutil.File, report *operational.CongruenceReport)
 	} else if gap < -1000 {
 		fmt.Fprintf(f, "  Large gap (total_disk - total_object = %d): more files than index/stream entries.\n", -gap)
 		fmt.Fprintf(f, "  If you recently deleted files manually (e.g. rm), object count may be from stale cache;\n")
-		fmt.Fprintf(f, "  run 'zqk system check' to refresh caches and CAS indexes, or use --no-cache for this report.\n")
+		fmt.Fprintf(f, "%s", paths.RewriteCanonicalCLIInvocations("  run 'zqk system check' to refresh caches and CAS indexes, or use --no-cache for this report.\n"))
 		fmt.Fprintf(f, "  Otherwise run CAS reconcile to repopulate indexes from disk, or investigate orphans.\n")
 	} else {
 		fmt.Fprintf(f, "  Small gap between total_object and total_disk is normal (e.g. _internal, multi-object YAML, stream-backed legacy dirs).\n")
 	}
 	// Suggest retention when high-volume dirs have large disparity (audit_event/mcp_session explosion).
 	if d := report.DisparityByDir[streamDirAudit]; d > 5000 {
-		fmt.Fprintf(f, "  audit/ disparity=%d: to keep audit_event under control, run 'zqk system retention-tolerance --kind audit_event'\n", d)
+		fmt.Fprintf(f, "%s", paths.RewriteCanonicalCLIInvocations(fmt.Sprintf("  audit/ disparity=%d: to keep audit_event under control, run 'zqk system retention-tolerance --kind audit_event'\n", d)))
 		fmt.Fprintf(f, "  or ensure the retention_tolerance scheduler job runs often; see %s.\n", filepath.Join(paths.ProcessInternalConfigsDir, "retention_tolerance.yaml"))
 	}
 	if d := report.DisparityByDir[streamDirMCPSessions]; d > 500 {
-		fmt.Fprintf(f, "  mcp_sessions/ disparity=%d: run 'zqk system retention-tolerance --kind mcp_session' or schedule it more frequently.\n", d)
+		fmt.Fprintf(f, "%s", paths.RewriteCanonicalCLIInvocations(fmt.Sprintf("  mcp_sessions/ disparity=%d: run 'zqk system retention-tolerance --kind mcp_session' or schedule it more frequently.\n", d)))
 	}
 }
 

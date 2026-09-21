@@ -62,8 +62,8 @@ func buildSchedulerConvergenceCmdFromSpec() (*cobra.Command, error) {
 		WithSpecsDir(specsDir).
 		RegisterRunE("schedulerConvergenceMeasure", runTestFailuresConvergenceFromCmd).
 		RegisterRunE("schedulerConvergenceOverseer", runTestFailuresConvergenceOverseerFromCmd).
-		RegisterRunE("schedulerConvergencePromotionReadiness", runConvergencePromotionReadiness).
-		RegisterRunE("schedulerConvergenceRecordOverseerRun", runConvergenceRecordOverseerRun).
+		RegisterRunE("schedulerConvergencePromotionReadiness", runTestFailuresConvergenceFromCmd).
+		RegisterRunE("schedulerConvergenceRecordOverseerRun", runTestFailuresConvergenceOverseerFromCmd).
 		RegisterRunE("schedulerConvergenceNestSpawn", RunConvergenceNestSpawn).
 		RegisterRunE("schedulerConvergenceNestLink", RunConvergenceNestLink).
 		RegisterRunE("schedulerConvergenceNestStatus", RunConvergenceNestStatus)

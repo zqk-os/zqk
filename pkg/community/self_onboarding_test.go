@@ -115,7 +115,7 @@ func TestCommunitySelfOnboarding_IntegrationAndConformance(t *testing.T) {
 	_ = agentonboard.InferVector(vendors)
 
 	// 4. Verify candidate CLI help works if candidate binary is present
-	binPath := filepath.Join(candidateDir, "bin", "zqk-community")
+	binPath := filepath.Join(candidateDir, "bin", "zqk")
 	if fileutil.Exists(binPath) {
 		cmd := execwrap.Command(binPath, "--help")
 		out, errCmd := cmd.CombinedOutput()

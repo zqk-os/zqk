@@ -8,6 +8,7 @@ import (
 	"github.com/zqk-os/zqk/internal/cli"
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/goroutinelabels"
+	"github.com/zqk-os/zqk/pkg/paths"
 	schedulerpkg "github.com/zqk-os/zqk/pkg/scheduler"
 	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
@@ -108,7 +109,7 @@ func requireSchedulerRunning(ctx *cli.Context) (*SchedulerStatus, error) {
 	}
 
 	if !status.Running {
-		return nil, errfmt.Errorf("scheduler daemon is not running - start it first with 'zqk scheduler start'")
+		return nil, errfmt.Errorf("%s", paths.RewriteCanonicalCLIInvocations("scheduler daemon is not running - start it first with 'zqk scheduler start'"))
 	}
 
 	return status, nil
@@ -130,7 +131,7 @@ func requireSchedulerNotRunning(ctx *cli.Context) (*SchedulerStatus, error) {
 		if status.InProcess {
 			return status, errfmt.Errorf("scheduler is already running in this process")
 		}
-		return status, errfmt.Errorf("scheduler daemon is already running (PID: %d). Use 'zqk scheduler stop' to stop it first", status.ProcessID)
+		return status, errfmt.Errorf("%s", paths.RewriteCanonicalCLIInvocations(fmt.Sprintf("scheduler daemon is already running (PID: %d). Use 'zqk scheduler stop' to stop it first", status.ProcessID)))
 	}
 
 	return status, nil
@@ -151,7 +152,7 @@ func getSchedulerInstance(ctx *cli.Context) (*schedulerpkg.Scheduler, *Scheduler
 	}
 
 	if !status.Running {
-		return nil, status, errfmt.Errorf("scheduler daemon is not running - start it first with 'zqk scheduler start'")
+		return nil, status, errfmt.Errorf("%s", paths.RewriteCanonicalCLIInvocations("scheduler daemon is not running - start it first with 'zqk scheduler start'"))
 	}
 
 	if !status.InProcess {

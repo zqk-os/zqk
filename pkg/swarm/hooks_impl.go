@@ -83,7 +83,7 @@ func (p *ProactiveWorkspaceSeeder) PostTool(ctx context.Context, call llm.ToolCa
 }
 func (p *ProactiveWorkspaceSeeder) OnSuccess(ctx context.Context, call llm.ToolCall, result string) {
 	// Ambient trigger: kick off lints or builds in background to warm cache.
-	if call.Name == "zqk_write_code" || call.Name == "zqk_execute_bash" {
+	if toolSuffixIs(call.Name, "write_code") || toolSuffixIs(call.Name, "execute_bash") {
 		goroutinelabels.NewGoroutine("ambient_success_trigger", "ambient workspace check").StartSimple(func() {
 			// Minimal placeholder logic for ambient warming
 		})

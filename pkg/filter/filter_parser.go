@@ -7,6 +7,7 @@ import (
 
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 	"gopkg.in/yaml.v3"
 )
 
@@ -255,7 +256,7 @@ func ValidateFilterFields(kind string, filters map[string]any) error {
 				}
 				return errfmt.Errorf("unknown filter field %q for kind %q. Did you mean %s?", fieldName, kind, strings.Join(quoted, " or "))
 			}
-			return errfmt.Errorf("unknown filter field %q for kind %q. Check available fields with 'zqk object template %s'", fieldName, kind, kind)
+			return errfmt.Errorf("%s", paths.RewriteCanonicalCLIInvocations(fmt.Sprintf("unknown filter field %q for kind %q. Check available fields with 'zqk object template %s'", fieldName, kind, kind)))
 		}
 	}
 	return nil

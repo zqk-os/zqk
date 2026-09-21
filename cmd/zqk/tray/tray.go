@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"context"
 	"errors"
+	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -130,7 +131,7 @@ func runShow(cmd *cobra.Command, args []string) error {
 	}
 	e := traypkg.Find(entries, args[0])
 	if e == nil {
-		return errfmt.Errorf("unknown tray entry %q (see: zqk tray list)", args[0])
+		return errfmt.Errorf("%s", paths.RewriteCanonicalCLIInvocations(fmt.Sprintf("unknown tray entry %q (see: zqk tray list)", args[0])))
 	}
 	return cli.FormatOutput(cmd, map[string]any{
 		objects.FieldKeyName:        e.Name,
@@ -162,7 +163,7 @@ func runExplain(cmd *cobra.Command, args []string) error {
 	}
 	e := traypkg.Find(entries, args[0])
 	if e == nil {
-		return errfmt.Errorf("unknown tray entry %q (see: zqk tray list)", args[0])
+		return errfmt.Errorf("%s", paths.RewriteCanonicalCLIInvocations(fmt.Sprintf("unknown tray entry %q (see: zqk tray list)", args[0])))
 	}
 	bin := filepath.Base(os.Args[0])
 	line := traypkg.FormatExplainLine(bin, e.Argv)
@@ -198,7 +199,7 @@ func runRun(cmd *cobra.Command, args []string) error {
 	}
 	e := traypkg.Find(entries, args[0])
 	if e == nil {
-		return errfmt.Errorf("unknown tray entry %q (see: zqk tray list)", args[0])
+		return errfmt.Errorf("%s", paths.RewriteCanonicalCLIInvocations(fmt.Sprintf("unknown tray entry %q (see: zqk tray list)", args[0])))
 	}
 	dryRun, _ := cmd.Flags().GetBool(cli.FlagDryRun)
 	bin := os.Args[0]
@@ -216,7 +217,7 @@ func runRun(cmd *cobra.Command, args []string) error {
 		isPriv, token := traypkg.IsPrivilegedArgv(fullArgv)
 		if isPriv {
 			if e.Signature == "" {
-				return errfmt.Errorf("access denied: tray entry %q contains restricted flag/command (%s) and is not cryptographically signed. Use 'zqk tray sign %s' to authorize, or execute directly.", e.Name, token, e.Name)
+				return errfmt.Errorf("%s", paths.RewriteCanonicalCLIInvocations(fmt.Sprintf("access denied: tray entry %q contains restricted flag/command (%s) and is not cryptographically signed. Use 'zqk tray sign %s' to authorize, or execute directly.", e.Name, token, e.Name)))
 			}
 			keyPath := filepath.Join(projectRoot, paths.ProjectDataDir, "keystore", "auditor.priv")
 			signer, err := qa.NewAuditorSigner(keyPath)

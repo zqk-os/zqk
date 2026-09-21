@@ -46,7 +46,7 @@ func runDump(ctx *cli.Context, cmd *cobra.Command) error {
 		return err
 	}
 	if !status.Running {
-		return errfmt.Errorf("scheduler daemon is not running; start it with 'zqk scheduler start' first")
+		return errfmt.Errorf("%s", paths.RewriteCanonicalCLIInvocations("scheduler daemon is not running; start it with 'zqk scheduler start' first"))
 	}
 
 	pid := status.ProcessID

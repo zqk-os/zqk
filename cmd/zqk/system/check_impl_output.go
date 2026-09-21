@@ -709,7 +709,7 @@ func writeValidationRunIssues(buf *strings.Builder, runIssues *ValidationRunIssu
 func writeUnprocessedAutofixBatches(buf *strings.Builder, count int, terminalWidth int) {
 	buf.WriteString("=== Unprocessed autofix batches (blocking) ===\n")
 	fmt.Fprintf(buf, "⚠️  %d unprocessed batch file(s) under .zqk/autofix/ — fixes have not been applied.\n", count)
-	buf.WriteString("   Run: zqk system auto-fix-batch --batch-file .zqk/autofix/<file> --project-root <root>\n")
+	buf.WriteString(paths.RewriteCanonicalCLIInvocations("   Run: zqk system auto-fix-batch --batch-file .zqk/autofix/<file> --project-root <root>\n"))
 	buf.WriteString("   Or wait for the scheduler to process the batch job.\n\n")
 }
 

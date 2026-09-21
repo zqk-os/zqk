@@ -8,6 +8,7 @@ import (
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
 	bldr "github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
 	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/testrunner"
 )
 
@@ -33,7 +34,7 @@ func runCheckContamination(cmd *cobra.Command, args []string, proc *cli.Processo
 	}
 
 	if len(command) == 0 {
-		return errfmt.Errorf("specify command to run (e.g. zqk test check-contamination -- go test ./pkg/storage)")
+		return errfmt.Errorf("%s", paths.RewriteCanonicalCLIInvocations("specify command to run (e.g. zqk test check-contamination -- go test ./pkg/storage)"))
 	}
 
 	opts := testrunner.ContaminationCheckOptions{

@@ -46,7 +46,7 @@ func (e *MCPExecutor) SetTelemetryContext(personaID string, tracker telemetry.Tr
 	}
 }
 
-// NewMCPExecutor starts the zqk-mcp binary and initializes the MCP client.
+// NewMCPExecutor starts the product MCP server and initializes the MCP client.
 func NewMCPExecutor(ctx context.Context, mcpPath string) (*MCPExecutor, error) {
 	return NewMCPExecutorAt(ctx, mcpPath, "")
 }
@@ -224,7 +224,7 @@ func (e *MCPExecutor) GetTools(ctx context.Context) ([]llm.ToolDefinition, error
 
 	// Inject meta-tools for lazy loading
 	eagerTools = append(eagerTools, llm.ToolDefinition{
-		Name:        "zqk_mcp_list_tools",
+		Name:        DefaultToolPrefix() + "mcp_list_tools",
 		Description: "List all available lazy-loaded tools in the system. Use this to discover specialized tools.",
 		Parameters: map[string]any{
 			objects.FieldKeyType: "object",
@@ -232,7 +232,7 @@ func (e *MCPExecutor) GetTools(ctx context.Context) ([]llm.ToolDefinition, error
 		},
 	})
 	eagerTools = append(eagerTools, llm.ToolDefinition{
-		Name:        "zqk_mcp_get_tool_schema",
+		Name:        DefaultToolPrefix() + "mcp_get_tool_schema",
 		Description: "Get the JSON schema for a specific lazy-loaded tool by its name.",
 		Parameters: map[string]any{
 			objects.FieldKeyType: "object",
@@ -243,7 +243,7 @@ func (e *MCPExecutor) GetTools(ctx context.Context) ([]llm.ToolDefinition, error
 		},
 	})
 	eagerTools = append(eagerTools, llm.ToolDefinition{
-		Name:        "zqk_mcp_call_tool",
+		Name:        DefaultToolPrefix() + "mcp_call_tool",
 		Description: "Call a lazy-loaded tool by its name and arguments.",
 		Parameters: map[string]any{
 			objects.FieldKeyType: "object",
@@ -259,22 +259,17 @@ func (e *MCPExecutor) GetTools(ctx context.Context) ([]llm.ToolDefinition, error
 	return eagerTools, nil
 }
 
+var eagerToolSuffixes = []string{
+	"read_file", "write_file", "read_code", "write_code", "execute_bash", "help",
+	"object_create", "object_update", "object_delete", "object_get", "object_list", "object_fields",
+	"system_status", "workflow_next", "agent_next", "get_next_backlog_item", "observer_search",
+}
+
 func isEagerTool(name string) bool {
-	n := strings.ToLower(strings.TrimSpace(name))
-	// write_code must be eager: prompts tell AgentX to call it, but a lazy
-	// listing made levenshtein remap it to write_file (distance 3).
-	if n == "write_code" || strings.HasSuffix(n, "_write_code") {
-		return true
-	}
-	if n == "observer_search" || strings.HasSuffix(n, "_observer_search") {
-		return true
-	}
-	switch n {
-	case "zqk_read_file", "zqk_write_file", "zqk_read_code", "zqk_execute_bash",
-		"zqk_help", "zqk_object_create", "zqk_object_update", "zqk_object_delete",
-		"zqk_object_get", "zqk_object_list", "zqk_object_fields", "zqk_system_status",
-		"zqk_workflow_next", "zqk_agent_next", "zqk_get_next_backlog_item":
-		return true
+	for _, suffix := range eagerToolSuffixes {
+		if toolSuffixIs(name, suffix) {
+			return true
+		}
 	}
 	return false
 }
@@ -361,7 +356,7 @@ func compressSchema(schema map[string]any) {
 
 // ExecuteToolCall routes a ToolCall to the MCP client.
 func (e *MCPExecutor) ExecuteToolCall(ctx context.Context, call llm.ToolCall) (string, error) {
-	if call.Name == "zqk_mcp_list_tools" {
+	if toolSuffixIs(call.Name, "mcp_list_tools") {
 		var summary []map[string]string
 		for _, t := range e.lazyTools {
 			summary = append(summary, map[string]string{
@@ -373,7 +368,7 @@ func (e *MCPExecutor) ExecuteToolCall(ctx context.Context, call llm.ToolCall) (s
 		return string(b), nil
 	}
 
-	if call.Name == "zqk_mcp_get_tool_schema" {
+	if toolSuffixIs(call.Name, "mcp_get_tool_schema") {
 		var args map[string]any
 		if err := json.Unmarshal([]byte(call.Arguments), &args); err != nil {
 			return "", errfmt.Newf("failed to parse arguments").Wrap(err)
@@ -386,7 +381,7 @@ func (e *MCPExecutor) ExecuteToolCall(ctx context.Context, call llm.ToolCall) (s
 		return "", errfmt.Errorf("tool '%s' not found", toolName)
 	}
 
-	if call.Name == "zqk_mcp_call_tool" {
+	if toolSuffixIs(call.Name, "mcp_call_tool") {
 		var args map[string]any
 		if err := json.Unmarshal([]byte(call.Arguments), &args); err != nil {
 			return "", errfmt.Newf("failed to parse arguments").Wrap(err)

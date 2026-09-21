@@ -12,6 +12,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/nildecode"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 	schedpkg "github.com/zqk-os/zqk/pkg/scheduler"
 )
 
@@ -175,7 +176,7 @@ func formatCriteriaAcceptanceBulletResolved(crit map[string]any, globalHints map
 	}
 
 	if method == criteriaValidationMethodAutomatedTest {
-		b.WriteString("    - **Programmatic verification:** Run targeted **`zqk scheduler scan-tests --package …`** (or saved bundles) so a passing line lands in **health.jsonl**; green bundle measurement plus satisfied **rollup_status_core** support advancing **current_phase** / completion when **desired_end_state** is also met.\n")
+		b.WriteString(paths.RewriteCanonicalCLIInvocations("    - **Programmatic verification:** Run targeted **`zqk scheduler scan-tests --package …`** (or saved bundles) so a passing line lands in **health.jsonl**; green bundle measurement plus satisfied **rollup_status_core** support advancing **current_phase** / completion when **desired_end_state** is also met.\n"))
 	}
 	return b.String()
 }
@@ -288,5 +289,5 @@ func verificationHintAcceptable(m string) bool {
 		return false
 	}
 	lm := strings.ToLower(m)
-	return strings.HasPrefix(lm, "go test") || strings.HasPrefix(lm, "zqk scheduler scan-tests")
+	return strings.HasPrefix(lm, "go test") || strings.HasPrefix(lm, paths.RewriteCanonicalCLIInvocations("zqk scheduler scan-tests"))
 }

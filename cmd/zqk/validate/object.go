@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/zqk-os/zqk/pkg/execwrap"
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/zqkenv"
 
 	"github.com/spf13/cobra"
@@ -18,8 +19,8 @@ import (
 func NewValidateObjectCmd() *cobra.Command {
 	cmd := bldr_cli_cmd_v1.NewValidateObjectCommandBuilder()
 	cmd.Use = "object <id>"
-	cmd.Long = `Reads an object and looks for an embedded CLI command inside its machine_hints field
-(e.g., "CMD: zqk object list ...") and automatically executes it to derive its real-time status.`
+	cmd.Long = paths.RewriteCanonicalCLIInvocations(`Reads an object and looks for an embedded CLI command inside its machine_hints field
+(e.g., "CMD: zqk object list ...") and automatically executes it to derive its real-time status.`)
 	cmd.Args = cobra.ExactArgs(1)
 	cli.BindAsyncProgress(cmd, runVerify)
 	cli.RequireStorage(cmd, true)

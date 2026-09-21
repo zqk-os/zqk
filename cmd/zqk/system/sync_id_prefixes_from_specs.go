@@ -176,7 +176,7 @@ func outputSyncIDPrefixesReport(cmd *cobra.Command, rep syncIDPrefixesFromSpecsR
 			}
 			if rep.DryRun {
 				b.WriteString("\nApply:\n")
-				b.WriteString("  zqk system sync-id-prefixes-from-specs --apply --dry-run=false\n")
+				b.WriteString(paths.RewriteCanonicalCLIInvocations("  zqk system sync-id-prefixes-from-specs --apply --dry-run=false\n"))
 			}
 		} else {
 			b.WriteString("\nNo changes detected.\n")

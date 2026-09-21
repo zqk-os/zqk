@@ -10,6 +10,7 @@ import (
 
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/paths"
 )
 
 const emptyValue = ""
@@ -86,14 +87,14 @@ func (s *defaultService) Suggest(err error, opts Options) Suggestion {
 
 func suggestProjectRootNotFound(opts Options) string {
 	if opts.ExperienceLevel == ExperienceBeginner || opts.Verbose {
-		return "Project root not found. Run 'zqk system init --project-name <name>' to initialize, navigate to a directory containing .zqk, or specify --project-root."
+		return paths.RewriteCanonicalCLIInvocations("Project root not found. Run 'zqk system init --project-name <name>' to initialize, navigate to a directory containing .zqk, or specify --project-root.")
 	}
-	return "Project root not found. Run 'zqk system init' to initialize, or pass --project-root."
+	return paths.RewriteCanonicalCLIInvocations("Project root not found. Run 'zqk system init' to initialize, or pass --project-root.")
 }
 
 func suggestNotFound(opts Options) string {
 	if opts.ExperienceLevel == ExperienceBeginner || opts.Verbose {
-		return "Check the object ID or path. Use list to see available items (e.g. zqk object list <kind>)."
+		return paths.RewriteCanonicalCLIInvocations("Check the object ID or path. Use list to see available items (e.g. zqk object list <kind>).")
 	}
 	return "Check ID or path; use list to see available items."
 }

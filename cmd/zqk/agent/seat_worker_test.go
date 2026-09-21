@@ -218,6 +218,98 @@ func TestSeatWorkerLane_hashesUnknownPersonaSeat(t *testing.T) {
 	}
 }
 
+func TestSeatWorkerLane_configuredViaDirectEnv(t *testing.T) {
+	t.Setenv("ZQK_WORKER_LANE", "fast-pipeline")
+	got := seatWorkerLane("PER-ORCH-ALPHA", "peer-1")
+	if got != "fast-pipeline" {
+		t.Fatalf("ZQK_WORKER_LANE override = %q, want fast-pipeline", got)
+	}
+}
+
+func TestSeatWorkerLane_configuredViaMappedEnv(t *testing.T) {
+	t.Setenv("ZQK_WORKER_LANES", "PER-CUSTOM=custom-lane,peer-99=seat-99-lane")
+	if got := seatWorkerLane("PER-CUSTOM", ""); got != "custom-lane" {
+		t.Fatalf("ZQK_WORKER_LANES persona mapping = %q, want custom-lane", got)
+	}
+	if got := seatWorkerLane("", "peer-99"); got != "seat-99-lane" {
+		t.Fatalf("ZQK_WORKER_LANES seat mapping = %q, want seat-99-lane", got)
+	}
+
+	// JSON format
+	t.Setenv("ZQK_WORKER_LANES", `{"PER-SPECIAL":"special-lane"}`)
+	if got := seatWorkerLane("PER-SPECIAL", ""); got != "special-lane" {
+		t.Fatalf("ZQK_WORKER_LANES json mapping = %q, want special-lane", got)
+	}
+}
+
+func TestSeatWorkerLane_configuredViaPeerSeats(t *testing.T) {
+	tmpDir := t.TempDir()
+	peerSeatsDir := filepath.Join(tmpDir, paths.ProjectDataDir, paths.StateDir, paths.MeshStateSubdir)
+	if err := fileutil.MkdirAll(peerSeatsDir, paths.DirPerm755); err != nil {
+		t.Fatal(err)
+	}
+	peerSeatsContent := `{
+		"schema_version": "1",
+		"seats": {
+			"peer-custom-seat": {
+				"lane": "configured-seat-lane",
+				"persona_ref": "PER-DOCS"
+			}
+		}
+	}`
+	if err := fileutil.WriteFile(filepath.Join(peerSeatsDir, paths.PeerSeatsFile), []byte(peerSeatsContent), paths.FilePerm644); err != nil {
+		t.Fatal(err)
+	}
+
+	got := seatWorkerLaneWithRoot(tmpDir, "PER-DOCS", "peer-custom-seat")
+	if got != "configured-seat-lane" {
+		t.Fatalf("peer_seats.json configured lane = %q, want configured-seat-lane", got)
+	}
+}
+
+func TestSeatWorkerLane_configuredViaWorkerLanesFile(t *testing.T) {
+	tmpDir := t.TempDir()
+	configDir := filepath.Join(tmpDir, paths.ProjectDataDir, paths.ConfigDir)
+	if err := fileutil.MkdirAll(configDir, paths.DirPerm755); err != nil {
+		t.Fatal(err)
+	}
+	configContent := `{
+		"worker_lanes": {
+			"PER-CUSTOM-LEAD": "lead-lane",
+			"worker-agent-77": "high-priority"
+		}
+	}`
+	if err := fileutil.WriteFile(filepath.Join(configDir, "worker_lanes.json"), []byte(configContent), paths.FilePerm644); err != nil {
+		t.Fatal(err)
+	}
+
+	if got := seatWorkerLaneWithRoot(tmpDir, "PER-CUSTOM-LEAD", ""); got != "lead-lane" {
+		t.Fatalf("worker_lanes.json persona lane = %q, want lead-lane", got)
+	}
+	if got := seatWorkerLaneWithRoot(tmpDir, "", "worker-agent-77"); got != "high-priority" {
+		t.Fatalf("worker_lanes.json seat lane = %q, want high-priority", got)
+	}
+}
+
+func TestSeatWorkerLane_dynamicArbitraryOrchestrator(t *testing.T) {
+	t.Parallel()
+
+	cases := []struct {
+		persona string
+		want    string
+	}{
+		{"PER-ORCH-DELTA", "delta"},
+		{"PER-ORCH-OMEGA", "omega"},
+		{"PER-ORCH-DOCS-EVAL", "docs-eval"},
+		{"ORCH-FAST-TRACK", "fast-track"},
+	}
+	for _, tc := range cases {
+		if got := seatWorkerLane(tc.persona, "agent-1"); got != tc.want {
+			t.Fatalf("dynamic lane for %q = %q, want %q", tc.persona, got, tc.want)
+		}
+	}
+}
+
 func TestSeatWorker_WorktreeRootBinding(t *testing.T) {
 	// 1. Unbonded worktree under zqk-worktrees must fail closed
 	unbondedWorktree := filepath.Join(fileutil.TempDir(), "zqk-worktrees", "test-repo", "ATK-worker-unbonded")

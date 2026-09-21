@@ -81,7 +81,7 @@ func runEscalate(cmd *cobra.Command, _ []string) error {
 		Issues:           issues,
 		SuggestedActions: suggestedActions,
 		Context: map[string]any{
-			"event_source": "zqk scheduler escalate",
+			"event_source": paths.CLIUsage("scheduler", "escalate"),
 			"project_root": projectRoot,
 		},
 	}

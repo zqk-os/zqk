@@ -3,15 +3,16 @@ package agentprompt
 import "strings"
 
 // WorkClass selects cognition + exec-root policy for an ATK.
-// Coding ATKs isolate to worktrees and use the Go/TDD harness.
-// DocsEval ATKs (CEF remesure, codebase_evaluation) must run on the studio
-// checkout and must not be steered toward cmd/pkg source edits.
+// Coding ATKs isolate to worktrees and use the test/build harness.
+// DocsEval ATKs run on the main checkout for documentation or evaluation work
+// and do not require code build harnesses.
 //
-// explicit work_class / exec_root field and prepare-context / seat-worker /
+// Explicit work_class / exec_root field and prepare-context / seat-worker /
 // swarm harness all consume it (no body heuristics).
 type WorkClass string
 
 const (
+	emptyWorkClass              = ""
 	WorkClassCoding   WorkClass = "coding"
 	WorkClassDocsEval WorkClass = "docs_eval"
 )
@@ -24,6 +25,7 @@ func ClassifyWorkClass(parts ...string) WorkClass {
 		return WorkClassCoding
 	}
 	for _, marker := range []string{
+		"docs_eval",
 		"docs/quality/cef-runs",
 		"docs/quality/codebase_evaluation",
 		"pip-cef-",
@@ -55,4 +57,13 @@ func (c WorkClass) IsCode() bool {
 // IsCoding is an alias for IsCode.
 func (c WorkClass) IsCoding() bool {
 	return c.IsCode()
+}
+
+// PromptCapabilities is the capability list injected into the worker system prompt.
+// It is the work class only — not a studio skill inventory (review, cef, …).
+func (c WorkClass) PromptCapabilities() []string {
+	if strings.TrimSpace(string(c)) == "" {
+		return []string{string(WorkClassCoding)}
+	}
+	return []string{string(c)}
 }

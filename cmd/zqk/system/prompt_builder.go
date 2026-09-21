@@ -9,6 +9,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/agentprompt"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
 	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
+	"github.com/zqk-os/zqk/pkg/paths"
 )
 
 func NewPromptBuilderCmd() *cobra.Command {
@@ -16,13 +17,13 @@ func NewPromptBuilderCmd() *cobra.Command {
 	cmd := clipkg.ApplyBuilder(bldr_cli_cmd_v1.NewSystemPromptBuilderCommandBuilder(), &cobra.Command{
 		Use:   "prompt-builder [query]",
 		Short: "Builds a topologically sorted context window prompt using the Vectorization Engine",
-		Long: `Builds a topologically sorted context window prompt by querying the graph for
+		Long: paths.RewriteCanonicalCLIInvocations(`Builds a topologically sorted context window prompt by querying the graph for
 initial matches and then walking the structural graph up to the root Policies, returning
 the optimal token-budgeted prompt context.
 
 Example:
   zqk system prompt-builder "authentication mechanisms" --budget 4000
-`,
+`),
 		RunE: cli.WithProcessor(func(cmd *cobra.Command, args []string, proc *cli.Processor) error {
 			query := ""
 			if len(args) > 0 {
@@ -59,7 +60,7 @@ Example:
 				buf.WriteString("\n\nEMBEDDED RETRIEVAL COMMANDS:\n")
 				buf.WriteString("--------------------------------------------------\n")
 				for _, id := range ids {
-					buf.WriteString(fmt.Sprintf("zqk object get %s\n", id))
+					buf.WriteString(fmt.Sprintf("%s\n", paths.CLIUsage("object", "get", id)))
 				}
 			}
 

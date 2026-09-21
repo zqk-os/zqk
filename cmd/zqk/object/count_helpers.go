@@ -222,7 +222,7 @@ func buildAllKindsCountMeta(
 			"orphan":   hv.Orphan,
 		},
 		"intentional_exclusions": "Default all-kinds count skips visibility:internal kinds (match object list) and zero-count kinds. Use --internal and/or --include-zero-count for full registry inventory. HV rollup in meta always includes high_volume_kinds (stream/cas_disk/orphan).",
-		"find_vs_count_recipe":   "Public: zqk object count. Internal inventory: zqk object count --internal (entitled) or zqk object count <kind>. Dir↔kind: .zqk/process/<plural> via kind_mappings_config (list-vocabulary / object fields --list-kinds). HV orphan ≈ process-dir YAML leftovers for stream kinds (or disk−count for cas).",
+		"find_vs_count_recipe":   paths.RewriteCanonicalCLIInvocations("Public: zqk object count. Internal inventory: zqk object count --internal (entitled) or zqk object count <kind>. Dir↔kind: .zqk/process/<plural> via kind_mappings_config (list-vocabulary / object fields --list-kinds). HV orphan ≈ process-dir YAML leftovers for stream kinds (or disk−count for cas)."),
 	}
 	if len(skippedInternal) > 0 && len(skippedInternal) <= 80 {
 		meta["skipped_internal_kinds"] = skippedInternal
@@ -292,7 +292,7 @@ func countMultipleKinds(cmd *cobra.Command, proc *cli.Processor, kinds []string,
 		}
 	}
 
-	return outputAllKindsCount(cmd, counts, string(format), "all objects in system (all kinds). zqk system check validates a subset from the object ID cache", nsScope)
+	return outputAllKindsCount(cmd, counts, string(format), paths.RewriteCanonicalCLIInvocations("all objects in system (all kinds). zqk system check validates a subset from the object ID cache"), nsScope)
 }
 
 // countSingleKindWithGrouping counts a single kind with grouping

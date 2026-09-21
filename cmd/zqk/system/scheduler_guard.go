@@ -1,7 +1,9 @@
 package system
 
 import (
+	"fmt"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/paths"
 
 	"github.com/spf13/cobra"
 	"github.com/zqk-os/zqk/internal/cli"
@@ -85,15 +87,12 @@ func runSystemSchedulerGuard(cmd *cobra.Command, args []string) error {
 			// Allow the command to proceed after restart
 			return nil
 		}
-		return errfmt.Errorf(
-			"scheduler daemon is not running; command %q requires scheduler-backed maintenance/caches. Start it with 'zqk scheduler start' or re-run with --allow-degraded (see docs/architecture/SCHEDULER_DEGRADED_MODE_GUARDRAILS.md)",
-			cmd.Name(),
-		)
+		return errfmt.Errorf("%s", paths.RewriteCanonicalCLIInvocations(fmt.Sprintf("scheduler daemon is not running; command %q requires scheduler-backed maintenance/caches. Start it with 'zqk scheduler start' or re-run with --allow-degraded (see docs/architecture/SCHEDULER_DEGRADED_MODE_GUARDRAILS.md)", cmd.Name())))
 	}
 	logging.Fluent(logger).Warn("Running command while scheduler daemon is not running").
 		Command(cmd.Name()).
 		String("impact", "maintenance/caches may be stale and results can be partial").
-		String("action", "Start scheduler with: zqk scheduler start (details: docs/architecture/SCHEDULER_DEGRADED_MODE_GUARDRAILS.md)").
+		String("action", paths.RewriteCanonicalCLIInvocations("Start scheduler with: zqk scheduler start (details: docs/architecture/SCHEDULER_DEGRADED_MODE_GUARDRAILS.md)")).
 		Log()
 	return nil
 }

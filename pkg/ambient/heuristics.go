@@ -43,7 +43,7 @@ func (h *CoachHeuristics) handleFilesystem(ctx context.Context, event Event) err
 	// Heuristic: Catch manual edits to process YAMLs
 	if source == "fswatcher" && strings.Contains(op, "WRITE") && strings.Contains(target, paths.ProcessDir+"/") && strings.HasSuffix(target, ".yaml") {
 		if h.projectRoot != "" {
-			h.appendTip(fmt.Sprintf("ZQK Ambient Warning: Direct edit on %s detected. Once past the CAS membrane, edits must go through the CLI (zqk object update|promote).", target))
+			h.appendTip(paths.RewriteCanonicalCLIInvocations(fmt.Sprintf("ZQK Ambient Warning: Direct edit on %s detected. Once past the CAS membrane, edits must go through the CLI (zqk object update|promote).", target)))
 		}
 		if err := h.hub.Publish(ctx, Event{
 			Type: EventTypeSession,
@@ -77,7 +77,7 @@ func (h *CoachHeuristics) handleSession(ctx context.Context, event Event) error 
 	// Heuristic: Catch grep pipes or lookup commands to hint zqk grep
 	if (strings.Contains(cmd, "|") && strings.Contains(cmd, "grep")) || strings.HasPrefix(strings.TrimSpace(cmd), "grep ") {
 		if h.projectRoot != "" {
-			h.appendTip("ZQK Observer Tip: Utilize 'zqk grep' for faster, indexed, and kernel/AST-aware code and object lookups instead of shell grep.")
+			h.appendTip(paths.RewriteCanonicalCLIInvocations("ZQK Observer Tip: Utilize 'zqk grep' for faster, indexed, and kernel/AST-aware code and object lookups instead of shell grep."))
 		}
 		if err := h.hub.Publish(ctx, Event{
 			Type: EventTypeSession,

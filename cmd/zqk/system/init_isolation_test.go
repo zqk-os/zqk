@@ -275,7 +275,7 @@ func TestCommunitySourceOverlay_IntegrityAndProcessPreservation(t *testing.T) {
 	// Verify required overlay assets were copied
 	expectedCopied := []string{
 		filepath.Join(tmpDest, "Makefile"),
-		filepath.Join(tmpDest, "cmd", "zqk-community", "main.go"),
+		filepath.Join(tmpDest, "cmd", "zqk", "main.go"),
 		filepath.Join(tmpDest, "scripts", "build-bootstrap-archive.sh"),
 		filepath.Join(tmpDest, paths.ProjectDataDir, paths.SpecsSubdir, "spec_index.json"),
 	}

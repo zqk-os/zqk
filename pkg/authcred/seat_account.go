@@ -1,23 +1,18 @@
 package authcred
 
 import (
-	"encoding/json"
-	"path/filepath"
+	"slices"
 	"strings"
 
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
-	"github.com/zqk-os/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/stampmemo"
 	"gopkg.in/yaml.v3"
 )
 
 // DefaultSwarmWorkerAccount is the transitional ACC used when orchestrate cannot
 // map a persona/role to a seated account.
 const DefaultSwarmWorkerAccount = "ACC-1785920548450214011-dabd3692"
-
-type accountIndexFile struct {
-	Mappings map[string]string `json:"mappings"`
-}
 
 type accountPersonaFields struct {
 	ID          string   `yaml:"id"`
@@ -27,7 +22,11 @@ type accountPersonaFields struct {
 	Persona     string   `yaml:"persona"`
 	PersonaRefs []string `yaml:"persona_refs"`
 	Roles       []string `yaml:"roles"`
+	Permissions []string `yaml:"permissions"`
 }
+
+// activeAccounts is keyed by project root. Stamp is the account YAML dir.
+var activeAccounts stampmemo.Table[[]accountPersonaFields]
 
 // CanonicalAccountID resolves ACC-* passthrough or legacy account:username → ACC-*.
 // Empty string means unresolved (caller keeps the original ref for diagnostics).
@@ -160,40 +159,41 @@ func AccountCASPath(projectRoot, accountID string) string {
 	if projectRoot == "" || !strings.HasPrefix(accountID, "ACC-") {
 		return ""
 	}
-	indexPath := filepath.Join(projectRoot, paths.ProcessDir, "accounts", ".account.index")
-	data, err := fileutil.ReadFile(indexPath)
-	if err != nil {
+	hashName, ok := casHash(projectRoot, accountID, paths.AccountIndexPath(projectRoot))
+	if !ok {
 		return ""
 	}
-	var idx accountIndexFile
-	if err := json.Unmarshal(data, &idx); err != nil || idx.Mappings == nil {
-		return ""
-	}
-	hashName, ok := idx.Mappings[accountID]
-	if !ok || strings.TrimSpace(hashName) == "" {
-		return ""
-	}
-	return filepath.Join(projectRoot, paths.ProcessDir, "accounts", hashName+".yaml")
+	return paths.AccountYAMLPath(projectRoot, hashName)
 }
 
 func loadActiveAccounts(projectRoot string) []accountPersonaFields {
-	indexPath := filepath.Join(projectRoot, paths.ProcessDir, "accounts", ".account.index")
-	data, err := fileutil.ReadFile(indexPath)
-	if err != nil {
+	if projectRoot == "" {
 		return nil
 	}
-	var idx accountIndexFile
-	if err := json.Unmarshal(data, &idx); err != nil || idx.Mappings == nil {
+	stamp := stampmemo.Of(paths.AccountIndexPath(projectRoot))
+	if stamp == 0 {
+		return collectActiveAccounts(projectRoot)
+	}
+	accs, _ := activeAccounts.Load(projectRoot, stamp, func() ([]accountPersonaFields, error) {
+		return collectActiveAccounts(projectRoot), nil
+	})
+	return slices.Clone(accs)
+}
+
+func collectActiveAccounts(projectRoot string) []accountPersonaFields {
+	indexPath := paths.AccountIndexPath(projectRoot)
+	mappings := casMappings(projectRoot, indexPath)
+	if mappings == nil {
 		return nil
 	}
-	out := make([]accountPersonaFields, 0, len(idx.Mappings))
-	for accountID, hashName := range idx.Mappings {
+	accountsDir := paths.AccountsDirPath(projectRoot)
+	out := make([]accountPersonaFields, 0, len(mappings))
+	for accountID := range mappings {
 		if !strings.HasPrefix(accountID, "ACC-") {
 			continue
 		}
-		yamlPath := filepath.Join(projectRoot, paths.ProcessDir, "accounts", hashName+".yaml")
-		raw, err := fileutil.ReadFile(yamlPath)
-		if err != nil {
+		raw, ok := casYAML(projectRoot, accountID, indexPath, accountsDir)
+		if !ok {
 			continue
 		}
 		var acc accountPersonaFields

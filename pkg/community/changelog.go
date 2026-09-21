@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"strings"
 	"time"
+
+	"github.com/zqk-os/zqk/pkg/zqktime"
 )
 
 // ReleaseNoteEntry represents a categorized changelog item.
@@ -17,7 +19,7 @@ type ReleaseNoteEntry struct {
 // GenerateChangelog synthesizes a markdown changelog from a slice of commits.
 func GenerateChangelog(version string, date time.Time, entries []ReleaseNoteEntry) string {
 	var sb strings.Builder
-	sb.WriteString(fmt.Sprintf("## [%s] - %s\n\n", version, date.Format("2006-01-02")))
+	sb.WriteString(fmt.Sprintf("## [%s] - %s\n\n", version, zqktime.FormatLayoutUTC(date, zqktime.LayoutDate)))
 
 	features := []ReleaseNoteEntry{}
 	fixes := []ReleaseNoteEntry{}

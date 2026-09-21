@@ -102,7 +102,7 @@ func runRetentionStatus(cmd *cobra.Command, _ []string) error {
 		AtOrUnderTarget: atOrUnder,
 	}
 	if len(overTarget) > 0 || totalInternal > retentionTargetTotalApprox {
-		data.SuggestedAction = "Run 'zqk system aggregate-audit --window 7d --delete' then 'zqk system retention-tolerance'. Ensure retention_tolerance scheduler job is enabled and running."
+		data.SuggestedAction = paths.RewriteCanonicalCLIInvocations("Run 'zqk system aggregate-audit --window 7d --delete' then 'zqk system retention-tolerance'. Ensure retention_tolerance scheduler job is enabled and running.")
 	}
 
 	format := cli.GetFormat(cmd)
@@ -213,6 +213,6 @@ func GetRetentionDriftReminder(ctx context.Context, projectRoot string) (visible
 	if len(overTarget) > 0 {
 		msg = fmt.Sprintf("%d kind(s) over max_count; %s", len(overTarget), msg)
 	}
-	action := "Run 'zqk system retention-status' for details; then 'zqk system ensure-retention-jobs', 'zqk system aggregate-audit --window 7d --delete', and 'zqk system retention-tolerance' as needed."
+	action := paths.RewriteCanonicalCLIInvocations("Run 'zqk system retention-status' for details; then 'zqk system ensure-retention-jobs', 'zqk system aggregate-audit --window 7d --delete', and 'zqk system retention-tolerance' as needed.")
 	return true, msg, action
 }

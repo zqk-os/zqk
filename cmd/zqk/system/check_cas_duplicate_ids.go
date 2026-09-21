@@ -7,6 +7,7 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/zqk-os/zqk/pkg/paths"
 	caspkg "github.com/zqk-os/zqk/pkg/storage/cas"
 
 	"github.com/spf13/cobra"
@@ -70,9 +71,9 @@ func inventoryCASDuplicateIDsForOutput(cmd *cobra.Command, projectRoot string) c
 // tool or the diagnosis is wrong.
 func casDuplicateQuarantineCommand(kind string) string {
 	if kind == "" {
-		return "zqk system cleanup-duplicates --hash-duplicates"
+		return paths.CLIUsage("system", "cleanup-duplicates", "--hash-duplicates")
 	}
-	return fmt.Sprintf("zqk system cleanup-duplicates %s --hash-duplicates", kind)
+	return paths.CLIUsage("system", "cleanup-duplicates", kind, "--hash-duplicates")
 }
 
 // appendCASDuplicateIDCheckResults adds one Tier-1 registration issue per duplicated object id
@@ -133,9 +134,9 @@ func appendCASDuplicateIDCheckResults(results []CheckResult, inv caspkg.CASDupli
 			Issues: []Issue{{
 				Tier:        1,
 				Category:    "registration",
-				Message:     fmt.Sprintf("%d additional object id(s) with dual CAS blobs omitted from sample. Run: zqk system cleanup-duplicates --hash-duplicates", rem),
+				Message:     fmt.Sprintf("%d additional object id(s) with dual CAS blobs omitted from sample. Run: %s", rem, paths.CLIUsage("system", "cleanup-duplicates", "--hash-duplicates")),
 				AutoFixable: true,
-				FixCommand:  "zqk system cleanup-duplicates --hash-duplicates",
+				FixCommand:  paths.CLIUsage("system", "cleanup-duplicates", "--hash-duplicates"),
 			}},
 		})
 	}
@@ -166,7 +167,7 @@ func writeCASDuplicateIDSummary(buf *strings.Builder, inv caspkg.CASDuplicateIDI
 	}
 	buf.WriteString("=== CAS duplicate IDs (POL-CODE-004; Tier-1) ===\n")
 	fmt.Fprintf(buf, "❌ %d object id(s) have multiple hash-named CAS blobs (object-id cache keeps one path — filesystem scan is authoritative).\n", inv.DuplicateCount)
-	fmt.Fprintf(buf, "   Fix: zqk system cleanup-duplicates --hash-duplicates  (quarantines losers under .zqk/system-health/quarantine/hash-duplicates/)\n")
+	fmt.Fprintf(buf, "   Fix: %s  (quarantines losers under .zqk/system-health/quarantine/hash-duplicates/)\n", paths.CLIUsage("system", "cleanup-duplicates", "--hash-duplicates"))
 	maxShow := 8
 	if len(inv.Hits) < maxShow {
 		maxShow = len(inv.Hits)

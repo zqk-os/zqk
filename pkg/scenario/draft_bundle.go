@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/paths"
 	"gopkg.in/yaml.v3"
 )
 
@@ -27,7 +28,7 @@ func DraftBundleYAML(name, description string) ([]byte, error) {
 		Objects: BundleObjects{},
 	}
 	var buf bytes.Buffer
-	buf.WriteString("# Draft scenario bundle (zqk new bundle)\n")
+	buf.WriteString(paths.RewriteCanonicalCLIInvocations("# Draft scenario bundle (zqk new bundle)\n"))
 	buf.WriteString("# Add goals, requirements, criteria, doc_entries, convergence_sessions, fixtures under objects: as needed.\n\n")
 	enc := yaml.NewEncoder(&buf)
 	enc.SetIndent(2)

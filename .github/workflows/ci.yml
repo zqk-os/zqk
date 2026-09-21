@@ -38,6 +38,12 @@ jobs:
       - name: Verify Public Release Payload
         run: sh scripts/open-core/check-public-release-payload.sh
 
+      - name: Check Hardcoded Paths and Permissions
+        run: ./scripts/check-hardcoded-paths-and-perms-repo.sh --no-dups
+
+      - name: Check CLI Name Literals
+        run: ./scripts/check-cli-name-literals-repo.sh
+
       - name: Run golangci-lint (.golangci.yml)
         uses: golangci/golangci-lint-action@v9
         with:
@@ -72,7 +78,8 @@ jobs:
             ./pkg/infrastructure/... ./pkg/ingestion/... ./pkg/interactionpolicy/... \
             ./pkg/kernelcas ./pkg/lifecycle/... ./pkg/lockhealth/... ./pkg/observability/... \
             ./pkg/paths/... ./pkg/pipeline/... ./pkg/tray/... ./pkg/vds/... ./pkg/walutil/... \
-            ./pkg/workflow/whatsnext ./pkg/specorigination/... ./pkg/specbuilder/builders/...
+            ./pkg/workflow/whatsnext ./pkg/specorigination/... ./pkg/specbuilder/builders/... \
+            ./pkg/contextevents/... ./pkg/quality/...
 
   build:
     name: Build Binary & Assets

@@ -2,7 +2,6 @@ package scheduler
 
 import (
 	"context"
-	"fmt"
 	"strings"
 	"time"
 
@@ -10,6 +9,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 	storagepkg "github.com/zqk-os/zqk/pkg/storage"
 	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
@@ -144,9 +144,8 @@ func (h *ConvergenceSessionTickHandler) Execute(ctx context.Context, job *Schedu
 			objects.FieldKeyReadyForSessionCompletion: res.ReadyForSessionCompletion,
 			objects.FieldKeyPrimaryMeasurementOutcome: res.PrimaryMeasurementOutcome,
 			objects.FieldKeyNextActionHint:            truncateCVSHint(res.NextActionHint, cvsMeasurementHintMaxRunes),
-			objects.FieldKeyAgentPromptCli: fmt.Sprintf(
-				"zqk scheduler convergence measure --format agent-prompt --session-id %s",
-				sessionID,
+			objects.FieldKeyAgentPromptCli: paths.CLIUsage(
+				"scheduler", "convergence", "measure", "--format", "agent-prompt", "--session-id", sessionID,
 			),
 		})
 	}
@@ -195,7 +194,7 @@ func (h *ConvergenceSessionTickHandler) maybeRunOrchestrateRollupAfterTick(ctx c
 		})
 		return
 	}
-	script := convergenceOrchestrateScriptPath(root)
+	cliBin := resolveSchedulerCLIBinary(root)
 	rollupOut := strings.TrimSpace(envLookup(job, EnvKeyCVSOrchestrateRollupOut))
 	started := time.Now()
 	out, err := runCVSOrchestrateRollupCmd(ctx, root, sessionID, rollupOut)
@@ -215,7 +214,7 @@ func (h *ConvergenceSessionTickHandler) maybeRunOrchestrateRollupAfterTick(ctx c
 		ConvergenceSessionTickLog(h.logger).Warn(LogEventConvergenceSessionTickRollupFailed).
 			JobID(job.ID).
 			SessionID(sessionID).
-			String("script", script).
+			String("binary", cliBin).
 			Int("rollup_duration_ms", int(durationMs)).
 			Int(OutcomeKeyConvergenceTickRollupOutputByteCount, len(out)).
 			String("rollup_output", strings.TrimSpace(truncateOrchestrateOutputPreview(string(out), convergenceTickRollupOrchestrateOutputPreviewMaxBytes))).
@@ -247,7 +246,7 @@ func (h *ConvergenceSessionTickHandler) maybeRunOrchestrateRollupAfterTick(ctx c
 	infoFields := []logging.Field{
 		logging.JobIDField(job.ID),
 		logging.String("session_id", sessionID),
-		logging.ScriptField(script),
+		logging.String("binary", cliBin),
 		logging.Int("rollup_duration_ms", int(durationMs)),
 		logging.Bool(OutcomeKeyConvergenceTickRollupLatestFileMatched, matched),
 	}

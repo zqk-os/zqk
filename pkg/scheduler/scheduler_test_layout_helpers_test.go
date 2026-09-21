@@ -291,21 +291,20 @@ func setupSchedulerCompleteTestEnvironment(t *testing.T, opts *schedulerTestEnvO
 	lifecycleLoader := objects.NewLifecycleLoader(testRoot)
 	secCtx := pkgctx.NewSystemSecurityContext()
 
-	// Prefer GetTestCleanup first: *storage.FileObjectStorage runs RunProjectTestTeardown (BLI-177483 pipeline).
+	// Two-phase teardown: Shutdown first (closing write-behind and index writers), then RunProjectTestTeardown.
 	cleanup := func() {
 		if storageProvider == nil {
 			return
-		}
-		if s, ok := storageProvider.(interface{ GetTestCleanup() func() }); ok {
-			if fn := s.GetTestCleanup(); fn != nil {
-				fn()
-				return
-			}
 		}
 		if s, ok := storageProvider.(interface{ Shutdown(context.Context) error }); ok {
 			ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 			defer cancel()
 			_ = s.Shutdown(ctx)
+		}
+		if s, ok := storageProvider.(interface{ GetTestCleanup() func() }); ok {
+			if fn := s.GetTestCleanup(); fn != nil {
+				fn()
+			}
 		}
 	}
 	t.Cleanup(cleanup)

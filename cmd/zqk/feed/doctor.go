@@ -7,6 +7,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 )
 
 func NewDoctorCmd() *cobra.Command {
@@ -56,7 +57,7 @@ func runFeedDoctor(cmd *cobra.Command, _ []string) error {
 		for _, id := range communityDefaultSeatingIDs {
 			if _, rerr := proc.Storage().Read(ctx, sec, id); rerr != nil {
 				missingSeating = append(missingSeating, id)
-				res.Issues = append(res.Issues, "missing_default_seating: "+id+" (run: zqk system seed-default-agent-seating)")
+				res.Issues = append(res.Issues, "missing_default_seating: "+id+paths.RewriteCanonicalCLIInvocations(" (run: zqk system seed-default-agent-seating)"))
 			}
 		}
 		out["default_seating_ok"] = len(missingSeating) == 0

@@ -12,6 +12,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 	schedpkg "github.com/zqk-os/zqk/pkg/scheduler"
 )
 
@@ -216,7 +217,7 @@ func runTestFailuresConvergence(cliCtx *cli.Context, cmd *cobra.Command) error {
 			fmt.Fprintf(&b, "Note: %s\n", snap.SessionCompletionNote)
 		}
 		fmt.Fprintf(&b, "\nNext action: %s\n", snap.NextActionHint)
-		b.WriteString("\n---\nrollup_status_core (pkg/convergerollup; matrix/drift: scripts/cvs_outcome_rollup.py)\n")
+		b.WriteString("\n---\nrollup_status_core (pkg/convergerollup)\n")
 		if rs, ok := rollupCore["rollup_status"].(string); ok {
 			fmt.Fprintf(&b, "rollup_status: %s\n", rs)
 		}
@@ -247,7 +248,7 @@ func runTestFailuresConvergence(cliCtx *cli.Context, cmd *cobra.Command) error {
 		}
 		if sessionID != emptyValue {
 			b.WriteString("\n---\n")
-			fmt.Fprintf(&b, "Session %s — paste into zqk object update (see suggested_convergence_session_fields with --format json --session-id):\n", sessionID)
+			fmt.Fprintf(&b, "%s", paths.RewriteCanonicalCLIInvocations(fmt.Sprintf("Session %s — paste into zqk object update (see suggested_convergence_session_fields with --format json --session-id):\n", sessionID)))
 			summary, err := summarizeSuggestedSessionFields(snap, effCurrentPhase, effFlowVariant, sessionRoutingMeta, beforeStateSnapshot, stampTombstone, sessionPredictions, finalizeDebrief, debriefNotes, sessionThresholds)
 			if err != nil {
 				return errfmt.Newf("suggested fields").Wrap(err)

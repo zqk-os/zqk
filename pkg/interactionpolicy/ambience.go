@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 )
 
 // StaleInProgressItem records an in-progress work item that has stalled.
@@ -22,7 +23,7 @@ func StaleTestCatalystHint(testCaseID string) string {
 	if testCaseID == "" {
 		return ""
 	}
-	return "zqk test run " + testCaseID
+	return paths.CLIUsage("test", "run", testCaseID)
 }
 
 // DetectStaleInProgress identifies in-progress backlog items that have had no progress beyond staleThreshold.

@@ -27,23 +27,20 @@ func discoverSpecsDir() string {
 //
 //nolint:gocyclo // Function orchestrates multiple search strategies; complexity reduced via helper functions
 func findPathWithDefaults(relativePath string, isDir bool) string {
-	config := GetGlobalPathsConfig()
-	if config == nil {
-		config = getDefaultPathsConfig()
-	}
-
-	wd, err := fileutil.Getwd()
-	if err != nil {
-		return ""
-	}
-
-	// Try relative paths first
-	if foundPath := findPathInRelativePaths(wd, relativePath, isDir, config); foundPath != emptyValue {
-		return foundPath
-	}
-
-	// Walk up directory tree looking for markers
-	return findPathByWalkingUp(wd, relativePath, isDir, config)
+	return rememberDiscoveredPath(relativePath, isDir, func() string {
+		config := GetGlobalPathsConfig()
+		if config == nil {
+			config = getDefaultPathsConfig()
+		}
+		wd, err := fileutil.Getwd()
+		if err != nil {
+			return ""
+		}
+		if foundPath := findPathInRelativePaths(wd, relativePath, isDir, config); foundPath != emptyValue {
+			return foundPath
+		}
+		return findPathByWalkingUp(wd, relativePath, isDir, config)
+	})
 }
 
 // findPathInRelativePaths searches for path in relative paths from current working directory

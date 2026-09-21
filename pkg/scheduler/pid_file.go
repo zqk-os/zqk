@@ -432,7 +432,7 @@ func WaitForSchedulerDaemonExit(projectRoot string, pid int, maxWait time.Durati
 		_ = removePIDFile(projectRoot) //nolint:errcheck
 		return nil
 	}
-	return errfmt.Errorf("scheduler daemon (PID %d) still running after %v wait; PID file kept — run zqk scheduler stop --force, or stop --wait --max-wait <longer>", pid, maxWait)
+	return errfmt.Errorf("%s", paths.RewriteCanonicalCLIInvocations(fmt.Sprintf("scheduler daemon (PID %d) still running after %v wait; PID file kept — run zqk scheduler stop --force, or stop --wait --max-wait <longer>", pid, maxWait)))
 }
 
 // StopSchedulerByPID stops the scheduler by sending SIGTERM to the process and waiting for it to exit.

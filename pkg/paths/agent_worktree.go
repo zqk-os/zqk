@@ -6,7 +6,9 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/execwrap"
+	"github.com/zqk-os/zqk/pkg/gitconstants"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
@@ -116,6 +118,50 @@ func IsAgentWorktreePath(p string) bool {
 		}
 	}
 	return false
+}
+
+// AgentWorktreeMainRepo returns the studio git checkout bound to this
+// isolated worktree. Worktrees are not nested under the project; parent
+// directory hops are not a valid mapping (POL-AGENT-WORKTREE-ISOLATION-001).
+// Resolve order: seated kernel in worktree local config, then git common-dir.
+func AgentWorktreeMainRepo(worktreeRoot string) (string, error) {
+	clean := filepath.Clean(strings.TrimSpace(worktreeRoot))
+	if clean == "" || clean == "." {
+		return "", errfmt.Errorf("empty worktree root")
+	}
+	if seated := LoadBrandSettingsProjectRoot(clean); seated != "" && !IsAgentWorktreePath(seated) {
+		return seated, nil
+	}
+	main, err := gitCommonWorkingTree(clean)
+	if err != nil {
+		return "", err
+	}
+	if IsAgentWorktreePath(main) {
+		return "", errfmt.Errorf("git common dir resolved to another worktree (%s); refuse parent-dir guess", main)
+	}
+	return main, nil
+}
+
+func gitCommonWorkingTree(worktreeRoot string) (string, error) {
+	cmd := execwrap.Command(gitconstants.BinaryGit, gitconstants.SubcmdRevParse, gitconstants.FlagGitCommonDir)
+	cmd.Dir = worktreeRoot
+	out, err := cmd.Output()
+	if err != nil {
+		return "", errfmt.Newf("resolve studio checkout from worktree %s", worktreeRoot).Wrap(err)
+	}
+	common := strings.TrimSpace(string(out))
+	if common == "" {
+		return "", errfmt.Errorf("git %s returned empty for %s", gitconstants.FlagGitCommonDir, worktreeRoot)
+	}
+	if !filepath.IsAbs(common) {
+		common = filepath.Clean(filepath.Join(worktreeRoot, common))
+	} else {
+		common = filepath.Clean(common)
+	}
+	if filepath.Base(common) == GitWorktreeMetadataEntry {
+		return filepath.Dir(common), nil
+	}
+	return common, nil
 }
 
 // BootstrapWorktreeConfig writes config/zqk-local.yaml in worktreeDir

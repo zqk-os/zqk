@@ -311,7 +311,7 @@ func applySessionCompletionGates(out *TestBundleConvergenceSnapshot) {
 	out.SessionCompletionBlockedReasons = reasons
 	out.ReadyForSessionCompletion = len(reasons) == 0 && out.DeltaAssessment == "neutral" && len(out.FailingFingerprintsNow) == 0
 	if out.ReadyForSessionCompletion {
-		out.SessionCompletionNote = "Health snapshot is green; also confirm `zqk scheduler activity` shows busyness Executing=0 and PendingInQueue=0 before closing a convergence_session (jobs may still run when trigger queue is empty)."
+		out.SessionCompletionNote = paths.RewriteCanonicalCLIInvocations("Health snapshot is green; also confirm `zqk scheduler activity` shows busyness Executing=0 and PendingInQueue=0 before closing a convergence_session (jobs may still run when trigger queue is empty).")
 	}
 }
 

@@ -343,8 +343,7 @@ func runOrchestrate(cmd *cobra.Command, planArg string, opts OrchestrateOptions)
 		)
 		pool.Start(pctx.Ctx)
 
-		mcpBinaryPath := filepath.Join(state.proc.ProjectRoot(), "bin", "zqk-mcp")
-		sharedMCPTransport := meshbroker.NewMCPClientTransport(mcpBinaryPath)
+		sharedMCPTransport := meshbroker.NewMCPClientTransport("")
 		defer sharedMCPTransport.Close()
 
 		for i, item := range state.items {
@@ -479,7 +478,7 @@ func runOrchestrate(cmd *cobra.Command, planArg string, opts OrchestrateOptions)
 					taskSteps = append(taskSteps, map[string]any{
 						objects.FieldKeyTitle:       "Implementation Phase",
 						objects.FieldKeyStatus:      objects.ObjectStatusPendingImplementation,
-						objects.FieldKeyDescription: "Resolve the task envelope refs (`zqk object get`, `zqk agent prepare-context`) and execute the dynamic task. Do not copy policy or skill bodies onto the task object.",
+						objects.FieldKeyDescription: paths.RewriteCanonicalCLIInvocations("Resolve the task envelope refs (`zqk object get`, `zqk agent prepare-context`) and execute the dynamic task. Do not copy policy or skill bodies onto the task object."),
 					})
 
 					// Persona-Bound Task Boundary: Do not inject codebase validation for TPMs or Design personas
@@ -490,7 +489,7 @@ func runOrchestrate(cmd *cobra.Command, planArg string, opts OrchestrateOptions)
 						taskSteps = append(taskSteps, map[string]any{
 							objects.FieldKeyTitle:       "Kernel Graph Composition Context",
 							objects.FieldKeyStatus:      objects.ObjectStatusPending,
-							objects.FieldKeyDescription: "Kernel graph composition: use `zqk object get` for the onboarding policy, then `zqk intake` / `zqk object import`; do not script `zqk object create` loops.",
+							objects.FieldKeyDescription: paths.RewriteCanonicalCLIInvocations("Kernel graph composition: use `zqk object get` for the onboarding policy, then `zqk intake` / `zqk object import`; do not script `zqk object create` loops."),
 						})
 					}
 
@@ -500,7 +499,7 @@ func runOrchestrate(cmd *cobra.Command, planArg string, opts OrchestrateOptions)
 							"verification_strategy":     "command_exit_code",
 							objects.FieldKeyStatus:      objects.ObjectStatusPending,
 							objects.FieldKeyDescription: "Must pass targeted validation script.",
-							objects.FieldKeyCommand:     "./bin/zqk agent validate",
+							objects.FieldKeyCommand:     paths.RewriteCanonicalCLIInvocations("./bin/zqk agent validate"),
 						})
 					}
 					agentTask := map[string]any{

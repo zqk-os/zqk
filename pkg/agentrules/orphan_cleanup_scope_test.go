@@ -16,7 +16,11 @@ const orphanCleanupScript = "scripts/cleanup_orphan_test_processes.sh"
 // so this test exercises the shipped line rather than a copy that can drift away from it.
 func daemonPgrepPattern(t *testing.T) *regexp.Regexp {
 	t.Helper()
-	data, err := fileutil.ReadFile(filepath.Join(repoRoot(t), orphanCleanupScript))
+	p := filepath.Join(repoRoot(t), orphanCleanupScript)
+	if _, err := fileutil.Stat(p); err != nil {
+		t.Skipf("%s absent (studio script)", orphanCleanupScript)
+	}
+	data, err := fileutil.ReadFile(p)
 	if err != nil {
 		t.Fatalf("read %s: %v", orphanCleanupScript, err)
 	}
@@ -90,7 +94,11 @@ func TestOrphanCleanupDoesNotClassifySchedulerSubcommandsAsDaemons(t *testing.T)
 // bundles it had in flight, and a killed bundle writes no health.jsonl outcome — the package simply
 // never reports, which reads as "still running" rather than as a failure.
 func TestOrphanCleanupExemptsDaemonSupervisedWork(t *testing.T) {
-	data, err := fileutil.ReadFile(filepath.Join(repoRoot(t), orphanCleanupScript))
+	p := filepath.Join(repoRoot(t), orphanCleanupScript)
+	if _, err := fileutil.Stat(p); err != nil {
+		t.Skipf("%s absent (studio script)", orphanCleanupScript)
+	}
+	data, err := fileutil.ReadFile(p)
 	if err != nil {
 		t.Fatalf("read %s: %v", orphanCleanupScript, err)
 	}

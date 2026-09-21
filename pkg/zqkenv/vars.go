@@ -33,6 +33,8 @@ const _sfxAPIKey = "API_KEY"
 const _sfxAggregationMetricCreationTimeout = "AGGREGATION_METRIC_CREATION_TIMEOUT"
 const _sfxBin = "BIN"
 const _sfxBulkBenchSize = "BULK_BENCH_SIZE"
+const _sfxLocalCIDir = "LOCAL_CI_DIR"
+const _sfxLocalCIArchiveKeep = "LOCAL_CI_ARCHIVE_KEEP"
 
 const _sfxCacheDiagnosticEnabled = "CACHE_DIAGNOSTIC_ENABLED"
 const _sfxCacheDiagnosticObjects = "CACHE_DIAGNOSTIC_OBJECTS"
@@ -207,6 +209,12 @@ func AgentID() EnvVar { return EnvVar{Key: brand.EnvVar(_sfxAgentID)} }
 // AgentSyncMaxLoops returns the env var for AGENT_SYNC_MAX_LOOPS (brand-prefixed).
 // Sync-loop outer poll guard; default 100. TRACK: BLI-1783631896775129000-de3fef87
 func AgentSyncMaxLoops() EnvVar { return EnvVar{Key: brand.EnvVar(_sfxAgentSyncMaxLoops)} }
+
+// LocalCIDir returns the environment variable name for LOCAL_CI_DIR (brand-prefixed).
+func LocalCIDir() EnvVar { return EnvVar{Key: brand.EnvVar(_sfxLocalCIDir)} }
+
+// LocalCIArchiveKeep returns the environment variable name for LOCAL_CI_ARCHIVE_KEEP (brand-prefixed).
+func LocalCIArchiveKeep() EnvVar { return EnvVar{Key: brand.EnvVar(_sfxLocalCIArchiveKeep)} }
 
 // AgentMaxVerificationAttempts returns AGENT_MAX_VERIFICATION_ATTEMPTS (brand-prefixed).
 // Per-step verification retry cap; default 3. TRACK: BLI-1783631896775129000-de3fef87
@@ -920,3 +928,6 @@ func ZQKCLITestUpdateHelpGolden() EnvVar { return EnvVar{Key: "ZQKCLI_TEST_UPDAT
 func ZqkEnv() EnvVar                     { return Env() }
 func ZQKProjectRoot() EnvVar             { return EnvVar{Key: DefaultBrandKey("PROJECT_ROOT")} }
 func ZQKTestRoot() EnvVar                { return EnvVar{Key: DefaultBrandKey("TEST_ROOT")} }
+func WorkerLane() EnvVar                 { return EnvVar{Key: brand.EnvVar("WORKER_LANE")} }
+func SeatWorkerLane() EnvVar             { return EnvVar{Key: brand.EnvVar("SEAT_WORKER_LANE")} }
+func WorkerLanes() EnvVar                { return EnvVar{Key: brand.EnvVar("WORKER_LANES")} }

@@ -55,11 +55,8 @@ const CVSPipelineTickJobID = "SCH-cvs-pipeline-tick"
 // CVSDatacellTickJobID is the fixed scheduler_job id for convergence_session_tick targeting the data-cell program CVS (PRI CLI alpha lane).
 const CVSDatacellTickJobID = "SCH-cvs-datacell-tick"
 
-// Convergence orchestrate subprocess filenames and CLI flags — keep aligned with
-// scripts/cvs_convergence_orchestrate.sh and scripts/scheduler_jobs/convergence_orchestrate.yaml.
+// Convergence orchestrate subprocess constants.
 const (
-	convergenceOrchestrateScriptFile           = "cvs_convergence_orchestrate.sh"
-	convergenceOrchestrateArgNoFailOnGates     = "--no-fail-on-gates"
 	convergenceOrchestrateRollupLatestFileName = "cvs_rollup_latest.json"
 )
 

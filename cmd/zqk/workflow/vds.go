@@ -70,7 +70,7 @@ func resolveVDSProjectRoot(cmd *cobra.Command) (string, error) {
 		root = cli.ResolveProjectRoot(".")
 	}
 	if root == "" {
-		return "", errfmt.Errorf("project root not found; run from a project directory or zqk use")
+		return "", errfmt.Errorf("%s", paths.RewriteCanonicalCLIInvocations("project root not found; run from a project directory or zqk use"))
 	}
 	return root, nil
 }
@@ -265,7 +265,7 @@ func runVDSInit(cmd *cobra.Command, args []string) error {
 			"schema":             "zqk_vds_init_v1",
 			objects.FieldKeyPath: path,
 			"created":            created,
-			"next":               "Edit chunks, then: zqk workflow vds evaluate --format json",
+			"next":               paths.RewriteCanonicalCLIInvocations("Edit chunks, then: zqk workflow vds evaluate --format json"),
 			"policy":             vds.PolicyID,
 		}
 		return emitVDS(cmd, proc, payload, "")

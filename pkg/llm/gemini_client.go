@@ -28,21 +28,14 @@ func NewGeminiClient(ctx context.Context, config *Config) *GeminiClient {
 	if config == nil {
 		config = DefaultConfig(ctx)
 	}
-	// Override defaults if they are the OpenAI defaults
-	if config.BaseURL == "https://api.openai.com/v1" || config.BaseURL == "" {
-		config.BaseURL = "https://generativelanguage.googleapis.com/v1beta"
+	if config.Provider == "" {
+		config.Provider = "gemini"
 	}
-	if config.ChatModel == "gpt-4o-mini" || config.ChatModel == "" {
-		config.ChatModel = "gemini-2.5-flash"
-	}
-	if config.EmbedModel == "text-embedding-3-small" || config.EmbedModel == "" {
-		config.EmbedModel = "gemini-embedding-2"
-	}
-	// Try to read Gemini-specific key if set, otherwise fallback to the generic one
 	secCtx := zqkctx.GetSecurityContext(ctx)
 	if key := secCtx.GetLLMAPIKey("gemini"); key != "" {
 		config.APIKey = key
 	}
+	ApplyProviderAdapters(config)
 	return &GeminiClient{
 		config:     config,
 		httpClient: newLLMAPIClient("Gemini LLM", config.BaseURL, config.Timeout),
@@ -56,11 +49,9 @@ func (c *GeminiClient) shouldMock() bool {
 	if c.config.APIKey != "" {
 		return false
 	}
-	// Default public Gemini endpoint requires a key; mock if missing to keep tests passing.
-	if c.config.BaseURL == "https://generativelanguage.googleapis.com/v1beta" || c.config.BaseURL == "" {
+	if c.config.BaseURL == "" || IsPublicCloudBaseURL(c.config.BaseURL) {
 		return true
 	}
-	// Custom base URLs don't require mocking.
 	return false
 }
 

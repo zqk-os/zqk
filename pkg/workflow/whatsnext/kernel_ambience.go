@@ -165,7 +165,7 @@ func LoadKernelAmbience(projectRoot string) KernelAmbience {
 		Available:        false,
 		DraftPlaneTotal:  inv.Total,
 		DraftPlaneByKind: inv.ByKind,
-		Note:             "No compact system-check JSON found; run zqk system check --format json -o .zqk/logs/system-check.json",
+		Note:             paths.RewriteCanonicalCLIInvocations("No compact system-check JSON found; run zqk system check --format json -o .zqk/logs/system-check.json"),
 	}
 
 	var (
@@ -271,7 +271,7 @@ func EnrichStrategicAlignment(amb *KernelAmbience, projectRoot string) {
 	if err != nil || st.IsDir() {
 		amb.StrategicAlignment = &StrategicAlignmentSnapshot{
 			Available: false,
-			Note:      "no align cache — TPM: zqk system align --format json -o .zqk/state/ambient/align-latest.json",
+			Note:      paths.RewriteCanonicalCLIInvocations("no align cache — TPM: zqk system align --format json -o .zqk/state/ambient/align-latest.json"),
 		}
 		return
 	}
@@ -289,7 +289,7 @@ func EnrichStrategicAlignment(amb *KernelAmbience, projectRoot string) {
 		Available:  true,
 		SourcePath: path,
 		MeasuredAt: st.ModTime().UTC().Format(time.RFC3339),
-		Note:       "from zqk system align cache — peers trust whats-next priority_plan; TPM refreshes align + active_order",
+		Note:       paths.RewriteCanonicalCLIInvocations("from zqk system align cache — peers trust whats-next priority_plan; TPM refreshes align + active_order"),
 	}
 	snap.AlignmentScore = firstFloat(raw, "overall_alignment_score", "alignment_score")
 	if snap.AlignmentScore == 0 {
@@ -407,9 +407,9 @@ func EnrichKernelAmbienceWithStaleTasks(ctx context.Context, sp storage.ObjectSt
 				break
 			}
 		}
-		cmdHint := "zqk agent recover"
+		cmdHint := paths.CLIUsage("agent", "recover")
 		if planRef != "" {
-			cmdHint = fmt.Sprintf("zqk agent recover %s", planRef)
+			cmdHint = paths.CLIUsage("agent", "recover", planRef)
 		}
 		amb.StaleAgentTask = &StaleAgentTask{
 			TaskID:      topStale.TaskID,
@@ -658,10 +658,7 @@ func ProjectStewardFocus(amb KernelAmbience, correspondenceHint string) string {
 					sa.AlignScore, "fresh", sa.AlignAge, sa.GoalGaps,
 				))
 			} else {
-				parts = append(parts, fmt.Sprintf(
-					"align score %.1f STALE age=%s gaps=%d — persist zqk system align --format json -o .zqk/state/ambient/align-latest.json; trust active_order only after refresh against mission/vision/strat",
-					sa.AlignScore, sa.AlignAge, sa.GoalGaps,
-				))
+				parts = append(parts, paths.RewriteCanonicalCLIInvocations(fmt.Sprintf("align score %.1f STALE age=%s gaps=%d — persist zqk system align --format json -o .zqk/state/ambient/align-latest.json; trust active_order only after refresh against mission/vision/strat", sa.AlignScore, sa.AlignAge, sa.GoalGaps)))
 			}
 		} else if note := strings.TrimSpace(amb.StrategicAlignment.Note); note != "" {
 			parts = append(parts, note)
@@ -674,10 +671,7 @@ func ProjectStewardFocus(amb KernelAmbience, correspondenceHint string) string {
 		))
 	}
 	if amb.GhostRefCount > 0 {
-		parts = append(parts, fmt.Sprintf(
-			"heal-dangling required: %d GhostRefs detected — run `zqk system check autofix dangling`",
-			amb.GhostRefCount,
-		))
+		parts = append(parts, paths.RewriteCanonicalCLIInvocations(fmt.Sprintf("heal-dangling required: %d GhostRefs detected — run `zqk system check autofix dangling`", amb.GhostRefCount)))
 	}
 	if amb.DraftPlaneTotal >= DraftPlaneStewardWarn {
 		switch amb.SeatMode {
@@ -707,7 +701,7 @@ func ProjectStewardFocus(amb KernelAmbience, correspondenceHint string) string {
 		}
 	}
 	if !amb.Available {
-		parts = append(parts, "no system-check cache — run zqk system check --format json -o .zqk/logs/system-check.json before claiming kernel healthy")
+		parts = append(parts, paths.RewriteCanonicalCLIInvocations("no system-check cache — run zqk system check --format json -o .zqk/logs/system-check.json before claiming kernel healthy"))
 	}
 	switch strings.TrimSpace(correspondenceHint) {
 	case "ack_then_continue":
@@ -729,10 +723,7 @@ func ProjectStewardFocus(amb KernelAmbience, correspondenceHint string) string {
 				ids = append(ids, w.ID)
 			}
 		}
-		parts = append(parts, fmt.Sprintf(
-			"employed workflows (%d): %s — keep contracts fresh via kernel_ambience.employed_workflows / zqk object get <WFL>",
-			n, strings.Join(ids, ", "),
-		))
+		parts = append(parts, paths.RewriteCanonicalCLIInvocations(fmt.Sprintf("employed workflows (%d): %s — keep contracts fresh via kernel_ambience.employed_workflows / zqk object get <WFL>", n, strings.Join(ids, ", "))))
 	}
 	if amb.MetricsRollup != nil {
 		if amb.MetricsRollup.NextAdminAction != "" {
@@ -767,16 +758,16 @@ func PrependStewardProjectionForSeat(instruction, focus, seatMode string) string
 	if focus == "" {
 		return instruction
 	}
-	seatCue := "Seat: always pass --agent-id matching peer_seats.json (opaque seat id, not a vendor nickname). " +
+	seatCue := paths.RewriteCanonicalCLIInvocations("Seat: always pass --agent-id matching peer_seats.json (opaque seat id, not a vendor nickname). " +
 		"COMMS-CHECK / STEWARD: zqk feed ack --agent-id <you> --in-reply-to <AFE>; echo nonce via " +
 		"zqk feed steer --to-agent-id <coordinator seat> --await-peer-ack (not IDE chat). " +
-		"Workflows: honor kernel_ambience.employed_workflows (mesh/MMORCH/subagent/bootstrap) — do not drift from active WFL contracts.\n\n"
+		"Workflows: honor kernel_ambience.employed_workflows (mesh/MMORCH/subagent/bootstrap) — do not drift from active WFL contracts.\n\n")
 	switch seatMode {
 	case SeatModeTPMProcessAdmin:
 		seatCue = "TPM: process admin only — if align-latest.json is stale (>30m) persist a new align cache; if fresh, do not remint align. Shape an unshaped grooming priority_plan; if it is already shaped, hourglass the lead in_progress PRI and classify draft plane. " +
 			"Set priority_plan.active_order to match mission/vision/strategic_plan; hourglass steer peers to pull whats-next — do not agent orchestrate their PRI. " + seatCue
 	case SeatModePeerExecution:
-		seatCue = "Peer: run zqk workflow whats-next --agent-id <you> --format json; execute the proposed priority_plan/BLIs; " +
+		seatCue = paths.RewriteCanonicalCLIInvocations("Peer: run zqk workflow whats-next --agent-id <you> --format json; execute the proposed priority_plan/BLIs; ") +
 			"prepare-context then orchestrate/subagent scale-up; agent next --on-validation-failure wake; " +
 			"draft plane: promote/fix only — never draft sweep apply without RBAC delete:object_draft_plane. " + seatCue
 	}

@@ -86,4 +86,10 @@ func TestWriteReadIdentityStatus(t *testing.T) {
 	if IdentityStatusPath(root) != want {
 		t.Fatalf("path %s", IdentityStatusPath(root))
 	}
+	firstUpdated := got.UpdatedAt
+	WriteIdentityStatus(root, SnapshotFromSecurityContext(sec, nil))
+	again, ok := ReadIdentityStatus(root)
+	if !ok || again.UpdatedAt != firstUpdated {
+		t.Fatalf("unchanged identity must skip rewrite: first=%s again=%s", firstUpdated, again.UpdatedAt)
+	}
 }

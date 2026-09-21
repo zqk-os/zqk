@@ -13,6 +13,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/storage"
 )
 
@@ -151,7 +152,7 @@ func outputDiscoverGoalsTable(cmd *cobra.Command, result map[string]any) error {
 		}
 	} else {
 		buf.WriteString("No goals found. Create goals with:\n")
-		buf.WriteString("  zqk object create goal --file goal.yaml\n")
+		buf.WriteString(paths.RewriteCanonicalCLIInvocations("  zqk object create goal --file goal.yaml\n"))
 		buf.WriteString("Or add vision/mission/strategic_plan context to inform goal discovery.\n")
 	}
 

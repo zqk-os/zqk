@@ -88,7 +88,7 @@ func loadObjectComplianceSnapshot(projectRoot string) objectComplianceSnapshot {
 		Available:   false,
 		HistoryPath: histPath,
 		Trend:       "unknown",
-		Note:        "No compact system-check JSON found; run zqk system check … --format json -o .zqk/pre-commit/system-check.json to populate object compliance",
+		Note:        paths.RewriteCanonicalCLIInvocations("No compact system-check JSON found; run zqk system check … --format json -o .zqk/pre-commit/system-check.json to populate object compliance"),
 	}
 
 	var (

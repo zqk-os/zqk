@@ -3,7 +3,6 @@ package swarm
 import (
 	"bytes"
 	"context"
-	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -15,11 +14,13 @@ import (
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
 	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/datacell"
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/execwrap"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/mcp"
 	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/seatworker"
 	"github.com/zqk-os/zqk/pkg/swarminit"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"github.com/zqk-os/zqk/pkg/zqkenv"
@@ -223,49 +224,17 @@ func swarmInitMCPSubscribers(logger logging.Logger) swarminit.MCPSubscribersFunc
 
 func swarmInitInstallWorkers(root string) swarminit.SeatWorkerInstall {
 	return func(ctx context.Context, cfg swarminit.SeatWorkerInstallConfig) error {
-		script := filepath.Join(root, "scripts", "mesh", "install-seat-workers.sh")
-		if !fileutil.IsRegularFile(script) {
-			return errfmt.Errorf("missing %s", script)
-		}
-		base := []string{}
-		if cfg.ExecuteNonComms {
-			base = append(base, "--execute-non-comms")
-		} else {
-			base = append(base, "--no-execute-non-comms")
-		}
-		if cfg.PollSeconds > 0 {
-			base = append(base, "--poll-seconds", strconv.Itoa(cfg.PollSeconds))
-		}
-		runOnce := func(extra ...string) error {
-			args := append(append([]string{}, base...), extra...)
-			cmd := execwrap.CommandContext(ctx, script, args...)
-			cmd.Dir = root
-			cmd.Env = os.Environ()
-			var stderr bytes.Buffer
-			cmd.Stderr = &stderr
-			if err := cmd.Run(); err != nil {
-				return errfmt.Errorf("install-seat-workers: %s", strings.TrimSpace(stderr.String()))
-			}
-			return nil
-		}
-		if len(cfg.Seats) == 0 {
-			return runOnce()
-		}
-		for _, seat := range cfg.Seats {
-			if err := runOnce("--seat", seat); err != nil {
-				return err
-			}
-		}
-		return nil
+		return seatworker.Install(ctx, seatworker.InstallConfig{
+			ProjectRoot:     root,
+			Seats:           cfg.Seats,
+			ExecuteNonComms: cfg.ExecuteNonComms,
+			PollSeconds:     cfg.PollSeconds,
+		})
 	}
 }
 
 func swarmInitChatBootstrap(root string) swarminit.ChatBootstrapFunc {
 	return func(ctx context.Context, seatID string, rec agentfeed.PeerSeatRecord, payloadPath string) error {
-		script := filepath.Join(root, "scripts", "wake-agy.sh")
-		if !fileutil.IsRegularFile(script) {
-			return errfmt.Errorf("missing %s", script)
-		}
 		path := strings.ReplaceAll(strings.TrimSpace(payloadPath), "{seat_id}", seatID)
 		msg := "BOOTSTRAP swarm-init seat=" + seatID
 		if path != "" {
@@ -275,21 +244,18 @@ func swarmInitChatBootstrap(root string) swarminit.ChatBootstrapFunc {
 			}
 			msg = string(raw)
 		}
-		args := []string{"--chat"}
-		if rec.PID > 0 {
-			args = append(args, "--pid", strconv.Itoa(rec.PID))
-		}
-		if strings.TrimSpace(rec.Conversation) != "" {
-			args = append(args, "--conversation", rec.Conversation)
-		}
-		args = append(args, msg)
-		cmd := execwrap.CommandContext(ctx, script, args...)
-		cmd.Dir = root
-		cmd.Env = os.Environ()
-		var stderr bytes.Buffer
-		cmd.Stderr = &stderr
-		if err := cmd.Run(); err != nil {
-			return errfmt.Errorf("chat bootstrap %s: %s", seatID, strings.TrimSpace(stderr.String()))
+		_, err := agentfeed.CurrentPeerWakeAdapter().Wake(ctx, agentfeed.PeerWakeRequest{
+			ProjectRoot:  root,
+			ToAgentID:    seatID,
+			SeatKind:     agentfeed.SeatKindWorker,
+			DeliveryMode: datacell.DeliveryModePaste,
+			PasteText:    msg,
+			PeerPID:      rec.PID,
+			Conversation: rec.Conversation,
+			Message:      msg,
+		})
+		if err != nil {
+			return errfmt.Errorf("chat bootstrap %s: %w", seatID, err)
 		}
 		return nil
 	}

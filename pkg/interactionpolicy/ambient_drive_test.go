@@ -75,7 +75,7 @@ func TestHintOrchestratePlan(t *testing.T) {
 	if !strings.Contains(got, "--to-agent-id antigravity-1") || !strings.Contains(got, "--await-peer-ack") {
 		t.Fatalf("hourglass flags missing: %q", got)
 	}
-	if HintOrchestratePlan("", "") != HintHourglass {
+	if HintOrchestratePlan("", "") != HintHourglass() {
 		t.Fatal("empty plan falls back to hourglass protocol")
 	}
 }
@@ -90,17 +90,17 @@ func TestCompileStratplanCommandHint_ShapedNextHourglassesExecutingLead(t *testi
 		DraftPlaneTotal: 2,
 		NextPlans:       []string{"PRI-CEF-R9-MEASURE-001 (grooming,shaped)"},
 	})
-	if got != HintHourglass {
+	if got != HintHourglass() {
 		t.Fatalf("shaped next + executing lead must not remint get/draft, got %q", got)
 	}
 }
 
 func TestCompileStratplanCommandHint_MissingOrStaleAlign(t *testing.T) {
 	t.Parallel()
-	if got := CompileStratplanCommandHint(StratplanAmbient{}); got != HintAlignRefresh {
+	if got := CompileStratplanCommandHint(StratplanAmbient{}); got != HintAlignRefresh() {
 		t.Fatalf("missing: %q", got)
 	}
-	if got := CompileStratplanCommandHint(StratplanAmbient{AlignOK: true, AlignFresh: false}); got != HintAlignRefresh {
+	if got := CompileStratplanCommandHint(StratplanAmbient{AlignOK: true, AlignFresh: false}); got != HintAlignRefresh() {
 		t.Fatalf("stale: %q", got)
 	}
 }
@@ -112,8 +112,8 @@ func TestCompileStratplanCommandHint_FreshAlignDraftPlane(t *testing.T) {
 		AlignFresh:      true,
 		DraftPlaneTotal: 4,
 	})
-	if got != HintDraftClassify {
-		t.Fatalf("got %q want %q", got, HintDraftClassify)
+	if got != HintDraftClassify() {
+		t.Fatalf("got %q want %q", got, HintDraftClassify())
 	}
 }
 

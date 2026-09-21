@@ -2,6 +2,7 @@ package bldr_v2
 
 import (
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/specbuilder/builders"
 )
 
@@ -332,7 +333,7 @@ func (b *VerificationMatrixBuilder) addVerificationMatrixFields() {
 	b.AddFieldBuilder(builders.NewFieldBuilder("registry_alias", "string").
 		WithChecklist(builders.NewChecklistBuilder().
 			Authority("owner.").
-			AutomationHooks("zqk matrix report --name <alias>.").
+			AutomationHooks(paths.CLIInvocation("matrix report --name <alias>.")).
 			Cardinality("one").
 			Criticality("association").
 			Default("").
