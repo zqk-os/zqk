@@ -3,6 +3,7 @@ package vds
 import (
 	"path/filepath"
 	"testing"
+	"time"
 
 	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
@@ -92,5 +93,77 @@ func TestLoadCustomization_parsesVendorProviders(t *testing.T) {
 	p, err := LookupProvider(ResolveVendorProviders(cust), "")
 	if err != nil || p.ID != "cursor" {
 		t.Fatalf("%+v %v", p, err)
+	}
+}
+
+func TestLoadSpine_reloadsWhenStampMoves(t *testing.T) {
+	root := t.TempDir()
+	const rel = "spine.yaml"
+	path := filepath.Join(root, rel)
+	write := func(id string) {
+		t.Helper()
+		body := []byte(`schema_version: 1
+profile_id: ` + id + `
+stages:
+  - id: intent_capture
+    label: Intent
+    purpose: persist
+`)
+		if err := fileutil.WriteFile(path, body, paths.FilePerm644); err != nil {
+			t.Fatal(err)
+		}
+	}
+	write("spine-one")
+	first, err := LoadSpine(root, rel)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if first.ProfileID != "spine-one" {
+		t.Fatalf("got %q", first.ProfileID)
+	}
+	write("spine-two")
+	later := time.Now().Add(2 * time.Second)
+	if err := fileutil.Chtimes(path, later, later); err != nil {
+		t.Fatal(err)
+	}
+	second, err := LoadSpine(root, rel)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if second.ProfileID != "spine-two" {
+		t.Fatalf("expected reload after stamp move, got %q", second.ProfileID)
+	}
+}
+
+func TestLoadCustomization_reloadsWhenStampMoves(t *testing.T) {
+	root := t.TempDir()
+	const rel = "customization.yaml"
+	path := filepath.Join(root, rel)
+	write := func(id string) {
+		t.Helper()
+		body := []byte("project_id: " + id + "\n")
+		if err := fileutil.WriteFile(path, body, paths.FilePerm644); err != nil {
+			t.Fatal(err)
+		}
+	}
+	write("proj-one")
+	first, _, err := LoadCustomization(root, rel)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if first.ProjectID != "proj-one" {
+		t.Fatalf("got %q", first.ProjectID)
+	}
+	write("proj-two")
+	later := time.Now().Add(2 * time.Second)
+	if err := fileutil.Chtimes(path, later, later); err != nil {
+		t.Fatal(err)
+	}
+	second, _, err := LoadCustomization(root, rel)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if second.ProjectID != "proj-two" {
+		t.Fatalf("expected reload after stamp move, got %q", second.ProjectID)
 	}
 }

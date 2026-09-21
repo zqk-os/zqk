@@ -23,8 +23,11 @@ import (
 
 	"github.com/zqk-os/zqk/pkg/datacell"
 	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/stampmemo"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
+
+var trayEntries stampmemo.Table[[]Entry] // keyed by projectRoot; stamp is .zqk/tray.yaml
 
 //go:embed default_tray.yaml
 var defaultTrayYAML []byte
@@ -79,6 +82,20 @@ func Merge(defaults, user []Entry) []Entry {
 
 // Load returns merged tray entries for projectRoot (embedded default + optional .zqk/tray.yaml).
 func Load(projectRoot string) ([]Entry, error) {
+	userPath := ""
+	if projectRoot != "" {
+		userPath = datacell.TrayYAMLPath(projectRoot)
+	}
+	entries, err := trayEntries.Load(projectRoot, stampmemo.Of(userPath), func() ([]Entry, error) {
+		return loadTray(projectRoot)
+	})
+	if err != nil {
+		return nil, err
+	}
+	return cloneEntries(entries), nil
+}
+
+func loadTray(projectRoot string) ([]Entry, error) {
 	var def Config
 	if err := yaml.Unmarshal(defaultTrayYAML, &def); err != nil {
 		return nil, errfmt.Newf("parse embedded default tray").Wrap(err)
@@ -120,6 +137,15 @@ func Load(projectRoot string) ([]Entry, error) {
 		return nil, err
 	}
 	return validateEntries(merged)
+}
+
+func cloneEntries(in []Entry) []Entry {
+	out := make([]Entry, len(in))
+	for i, e := range in {
+		out[i] = e
+		out[i].Argv = append([]string(nil), e.Argv...)
+	}
+	return out
 }
 
 func validateEntries(entries []Entry) ([]Entry, error) {

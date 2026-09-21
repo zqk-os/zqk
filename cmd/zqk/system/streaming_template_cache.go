@@ -1,97 +1,54 @@
 package system
 
 import (
-	"sync"
-	"sync/atomic"
-
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/interactive"
 	"github.com/zqk-os/zqk/pkg/logging"
-
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/stampmemo"
 )
 
-// cachedTemplate stores a template (without backend-specific metadata like mtime)
-type cachedTemplate struct {
-	template *interactive.TemplateWithTokens
-}
-
-// StreamingTemplateCache provides cached template generation
-// Backend-agnostic: relies on FieldRegistry for spec information
-// Cache invalidation is manual or triggered by FieldRegistry.Reload()
+// StreamingTemplateCache memos generated templates by kind (closed spec set).
+// Stamp is FieldRegistry.CacheStamp(); InvalidateKind/ClearCache remain for
+// out-of-band drops when SpecCacheRevision has not moved.
 type StreamingTemplateCache struct {
 	generator     *interactive.TemplateGenerator
 	fieldRegistry *objects.FieldRegistry
-	cache         atomic.Value // holds map[string]*cachedTemplate
-	mu            sync.Mutex   // Protects writes to cache
+	cache         stampmemo.Table[*interactive.TemplateWithTokens]
 }
 
 // NewStreamingTemplateCache creates a new cached template generator
 // Backend-agnostic: relies on FieldRegistry which abstracts spec loading
 func NewStreamingTemplateCache(fieldRegistry *objects.FieldRegistry) *StreamingTemplateCache {
-	stc := &StreamingTemplateCache{
+	return &StreamingTemplateCache{
 		generator:     interactive.NewTemplateGenerator(fieldRegistry),
 		fieldRegistry: fieldRegistry,
 	}
-	stc.cache.Store(make(map[string]*cachedTemplate))
-	return stc
+}
+
+func (stc *StreamingTemplateCache) kindStamp() stampmemo.Stamp {
+	if stc.fieldRegistry == nil {
+		return 0
+	}
+	return stc.fieldRegistry.CacheStamp()
 }
 
 // GetTemplateWithTokens gets a template for a kind, using cache if available
 // Returns cached template if available, otherwise generates and caches new template.
 func (stc *StreamingTemplateCache) GetTemplateWithTokens(kind string) (*interactive.TemplateWithTokens, error) {
-	c := stc.cache.Load().(map[string]*cachedTemplate)
-	if cached, ok := c[kind]; ok {
-		return cached.template, nil
-	}
-
-	template, err := stc.generator.GenerateTemplateWithTokens(kind)
-	if err != nil {
-		return nil, err
-	}
-
-	stc.mu.Lock()
-	defer stc.mu.Unlock()
-
-	c = stc.cache.Load().(map[string]*cachedTemplate)
-	if cached, ok := c[kind]; ok {
-		return cached.template, nil
-	}
-
-	newCache := make(map[string]*cachedTemplate, len(c)+1)
-	for k, v := range c {
-		newCache[k] = v
-	}
-	newCache[kind] = &cachedTemplate{template: template}
-	stc.cache.Store(newCache)
-
-	return template, nil
+	return stc.cache.Load(kind, stc.kindStamp(), func() (*interactive.TemplateWithTokens, error) {
+		return stc.generator.GenerateTemplateWithTokens(kind)
+	})
 }
 
 // InvalidateKind invalidates the cache entry for a specific kind
 func (stc *StreamingTemplateCache) InvalidateKind(kind string) {
-	stc.mu.Lock()
-	defer stc.mu.Unlock()
-
-	c := stc.cache.Load().(map[string]*cachedTemplate)
-	if _, ok := c[kind]; !ok {
-		return
-	}
-
-	newCache := make(map[string]*cachedTemplate, len(c)-1)
-	for k, v := range c {
-		if k != kind {
-			newCache[k] = v
-		}
-	}
-	stc.cache.Store(newCache)
+	stc.cache.Delete(kind)
 }
 
 // ClearCache clears all cached templates
 func (stc *StreamingTemplateCache) ClearCache() {
-	stc.mu.Lock()
-	defer stc.mu.Unlock()
-	stc.cache.Store(make(map[string]*cachedTemplate))
+	stc.cache.Reset()
 }
 
 // GetAllKinds returns all object kinds that have specs (discovered from FieldRegistry)
