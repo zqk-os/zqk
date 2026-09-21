@@ -130,7 +130,7 @@ func orchestrationTaskOpts(
 	state *orchestratorState,
 	targetAgent, personaID, capability, taskTitle string,
 ) agentprompt.TaskPromptOptions {
-	workClass := agentprompt.ClassifyWorkClass(taskTitle, state.ambientSection)
+	workClass := agentprompt.ClassifyWorkClass(taskTitle, capability, state.ambientSection)
 	includeTDD := true
 	includeObserver := true
 	if workClass.IsDocsEval() {

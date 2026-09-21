@@ -928,3 +928,6 @@ func ZQKCLITestUpdateHelpGolden() EnvVar { return EnvVar{Key: "ZQKCLI_TEST_UPDAT
 func ZqkEnv() EnvVar                     { return Env() }
 func ZQKProjectRoot() EnvVar             { return EnvVar{Key: DefaultBrandKey("PROJECT_ROOT")} }
 func ZQKTestRoot() EnvVar                { return EnvVar{Key: DefaultBrandKey("TEST_ROOT")} }
+func WorkerLane() EnvVar                 { return EnvVar{Key: brand.EnvVar("WORKER_LANE")} }
+func SeatWorkerLane() EnvVar             { return EnvVar{Key: brand.EnvVar("SEAT_WORKER_LANE")} }
+func WorkerLanes() EnvVar                { return EnvVar{Key: brand.EnvVar("WORKER_LANES")} }

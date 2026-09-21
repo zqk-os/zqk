@@ -5,7 +5,6 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
-	"os"
 	"path/filepath"
 	"strings"
 	"sync"
@@ -14,9 +13,9 @@ import (
 	"gopkg.in/yaml.v3"
 
 	"github.com/zqk-os/zqk/pkg/agentfeed"
-	"github.com/zqk-os/zqk/pkg/brand"
 	"github.com/zqk-os/zqk/pkg/paths"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
 const seatWorkerLaneUnknown = "seat"
@@ -125,14 +124,11 @@ func seatWorkerLaneWithRoot(projectRoot, personaRef, agentID string) string {
 }
 
 func directEnvLane() string {
-	keys := []string{
-		brand.EnvVar("WORKER_LANE"),
-		brand.EnvVar("SEAT_WORKER_LANE"),
-		"ZQK_WORKER_LANE",
-		"ZQK_SEAT_WORKER_LANE",
-	}
-	for _, k := range keys {
-		if v := strings.TrimSpace(os.Getenv(k)); v != "" {
+	for _, env := range []zqkenv.EnvVar{
+		zqkenv.WorkerLane(),
+		zqkenv.SeatWorkerLane(),
+	} {
+		if v := strings.TrimSpace(env.Get()); v != "" {
 			return v
 		}
 	}
@@ -140,12 +136,10 @@ func directEnvLane() string {
 }
 
 func envMappedLane(personaRef, agentID string) string {
-	keys := []string{
-		brand.EnvVar("WORKER_LANES"),
-		"ZQK_WORKER_LANES",
-	}
-	for _, k := range keys {
-		raw := strings.TrimSpace(os.Getenv(k))
+	for _, env := range []zqkenv.EnvVar{
+		zqkenv.WorkerLanes(),
+	} {
+		raw := strings.TrimSpace(env.Get())
 		if raw == "" {
 			continue
 		}

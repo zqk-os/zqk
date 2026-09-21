@@ -3,11 +3,11 @@ package agentprompt
 import "strings"
 
 // WorkClass selects cognition + exec-root policy for an ATK.
-// Coding ATKs isolate to worktrees and use the Go/TDD harness.
-// DocsEval ATKs (CEF remesure, codebase_evaluation) must run on the studio
-// checkout and must not be steered toward cmd/pkg source edits.
+// Coding ATKs isolate to worktrees and use the test/build harness.
+// DocsEval ATKs run on the main checkout for documentation or evaluation work
+// and do not require code build harnesses.
 //
-// explicit work_class / exec_root field and prepare-context / seat-worker /
+// Explicit work_class / exec_root field and prepare-context / seat-worker /
 // swarm harness all consume it (no body heuristics).
 type WorkClass string
 
@@ -25,6 +25,7 @@ func ClassifyWorkClass(parts ...string) WorkClass {
 		return WorkClassCoding
 	}
 	for _, marker := range []string{
+		"docs_eval",
 		"docs/quality/cef-runs",
 		"docs/quality/codebase_evaluation",
 		"pip-cef-",

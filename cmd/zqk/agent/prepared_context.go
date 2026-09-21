@@ -42,20 +42,19 @@ func clipSeatWorkerPromptPart(s string, capBytes int, label string, class agentp
 func seatWorkerPromptTruncationFooter(label string, class agentprompt.WorkClass) string {
 	p := brand.NamespacePrefix() + "_"
 	next := fmt.Sprintf(
-		"Use %sobserver_search or %sread_file on one existing path named in the remaining prompt or task, then %swrite_code or %swrite_file. "+
-			"Do not re-fetch truncated text via object_list.",
+		"Use %sobserver_search or %sread_file on existing paths named in the remaining context, "+
+			"then use %swrite_code or %swrite_file to make changes.",
 		p, p, p, p,
 	)
 	if class.IsDocsEval() {
 		next = fmt.Sprintf(
-			"Use %sread_file/%sread_code on documentation or evaluation paths named in the task. "+
-				"Write assigned outputs with %swrite_file. Do not edit application source unless the task requires it. "+
-				"Do not re-fetch truncated text via object_list.",
+			"Use %sread_file or %sread_code on documentation or evaluation paths named in the task, "+
+				"then use %swrite_file to save outputs.",
 			p, p, p,
 		)
 	}
 	return fmt.Sprintf(
-		"... [%s TRUNCATED FOR WINDOW] Full text remains in the task objects. %s",
+		"... [%s TRUNCATED FOR WINDOW] Full text remains in task objects. %s",
 		label, next,
 	)
 }

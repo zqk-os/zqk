@@ -382,8 +382,8 @@ func handleNonCommsWithAgentX(
 		return nil
 	}
 
-	// Coding ATKs isolate into a git worktree. Docs-eval / CEF ATKs must not:
-	// worktrees reset to origin/main and hide untracked cef-runs + studio docs.
+	// Coding ATKs isolate into a git worktree. Docs-eval ATKs run on the main
+	// project root so documentation and evaluation artifacts remain accessible.
 	execRoot := root
 	workClass := agentprompt.ClassifyWorkClass(body)
 	if sp != nil {
@@ -394,7 +394,7 @@ func handleNonCommsWithAgentX(
 		}
 	}
 	if workClass.IsDocsEval() {
-		logging.Fluent(logger).Info("seat-worker AgentX using studio exec root").
+		logging.Fluent(logger).Info("seat-worker AgentX using project root").
 			String("event_id", item.EventID).
 			String("task_id", taskID).
 			String("work_class", string(workClass)).
@@ -446,7 +446,7 @@ func handleNonCommsWithAgentX(
 		RequireAnySuccessfulTools(swarm.MutationEvidenceTools()...).
 		VerifyCompletionWith(func(ctx context.Context, history []swarm.ToolCallRecord) (string, error) {
 			if prompts.WorkClass.IsDocsEval() {
-				// Docs-eval / CEF tasks write evaluation JSONL/markdown under docs/quality/, not Go source code.
+				// Docs-eval tasks write evaluation JSONL or markdown documents, not source code.
 				return "", nil
 			}
 			writtenFiles = seatWorkerCompletionGate.WrittenFiles(history, execRoot)
