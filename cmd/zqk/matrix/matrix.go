@@ -33,6 +33,7 @@ func NewMatrixCmd() *cobra.Command {
 	cmd.AddCommand(NewMatrixListCmd())
 	cmd.AddCommand(NewMatrixGetCmd())
 	cmd.AddCommand(NewMatrixUpdateCmd())
+	cmd.AddCommand(NewMatrixValidateCmd())
 	return cmd
 }
 

@@ -27,7 +27,6 @@ import (
 	"github.com/zqk-os/zqk/pkg/pipeline"
 	"github.com/zqk-os/zqk/pkg/scheduler/transceiver"
 	storagepkg "github.com/zqk-os/zqk/pkg/storage"
-	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"github.com/zqk-os/zqk/pkg/zqkenv"
 	"github.com/zqk-os/zqk/pkg/zqktime"
 )
@@ -764,9 +763,7 @@ func (s *Scheduler) Start(ctx context.Context) error {
 	if bud != nil {
 		swarmWatchBuilder = swarmWatchBuilder.WithBudget(bud)
 	}
-	_ = fileutil.WriteStandardFile("/tmp/zqk-swarm-watcher-started.txt", []byte("YES"))
 	swarmWatchBuilder.StartWithContext(ctx, func(ctx context.Context) error {
-		_ = fileutil.WriteStandardFile("/tmp/zqk-swarm-watcher-inside.txt", []byte("YES"))
 		s.watchSwarmTasks(ctx)
 		return nil
 	})

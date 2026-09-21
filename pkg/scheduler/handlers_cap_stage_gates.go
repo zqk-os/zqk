@@ -575,12 +575,15 @@ func (h *CapOrchestratorHandler) capEvidenceStorage() storagepkg.ObjectStoragePr
 	if fs := storagepkg.UnwrapToFileObjectStorage(h.storage); fs != nil {
 		return fs
 	}
+	if h.storage != nil {
+		return h.storage
+	}
 	if h.projectRoot != "" {
 		if fs, err := storagepkg.NewFileObjectStorage(h.projectRoot, &storagepkg.FileObjectStorageOptions{SkipGlobalWiring: true}); err == nil && fs != nil {
 			return fs
 		}
 	}
-	return h.storage
+	return nil
 }
 
 // verifiedStageReceipt accepts receipts only when artifact_ids Get and were touched since stage entry.

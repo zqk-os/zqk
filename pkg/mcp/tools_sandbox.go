@@ -17,7 +17,6 @@ import (
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
-	"github.com/zqk-os/zqk/pkg/storage"
 	"github.com/zqk-os/zqk/pkg/tde"
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"github.com/zqk-os/zqk/pkg/validation/qa"
@@ -92,11 +91,8 @@ func (s *Server) isHighRiskBashCommand(ctx context.Context, cmdStr string) bool 
 	// Default fallback in case storage fails
 	highRiskTokens := []string{"rm", "mv", "chmod", "chown", "curl", "wget", "git push", "git commit", "sudo", "apt", "brew", "yum", "apk"}
 
-	projectRoot := s.GetProjectRoot()
-	storageProvider, err := storage.NewFileObjectStorage(projectRoot)
-	if err == nil {
-		defer func() { _ = storageProvider.Shutdown(context.Background()) }() // Background: request-or-shutdown derived
-		obj, err := storageProvider.Read(ctx, pkgctx.NewSystemSecurityContext(), "POL-CODE-1784813784308316000-9ec597bf")
+	if s != nil && s.storageProvider != nil {
+		obj, err := s.storageProvider.Read(ctx, pkgctx.NewSystemSecurityContext(), "POL-CODE-1784813784308316000-9ec597bf")
 		if err == nil {
 			if bodyStr, ok := obj[objects.FieldKeyBody].(string); ok {
 				var dynamicTokens []string
