@@ -9,8 +9,25 @@ import (
 
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/stampmemo"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
+
+var (
+	spineProfiles  stampmemo.Table[*SpineProfile]  // keyed by resolved path
+	customizations stampmemo.Table[*Customization] // keyed by resolved path
+)
+
+func resolveProfilePath(projectRoot, relPath, defaultRel string) string {
+	rel := strings.TrimSpace(relPath)
+	if rel == "" {
+		rel = defaultRel
+	}
+	if filepath.IsAbs(rel) {
+		return rel
+	}
+	return filepath.Join(projectRoot, rel)
+}
 
 // Default relative paths (portable across projects using zqk).
 const (
@@ -114,50 +131,41 @@ type CICDPrefs struct {
 
 // LoadSpine loads the spine profile from project root.
 func LoadSpine(projectRoot, relPath string) (*SpineProfile, error) {
-	rel := strings.TrimSpace(relPath)
-	if rel == "" {
-		rel = DefaultSpineProfileRel
-	}
-	path := rel
-	if !filepath.IsAbs(path) {
-		path = filepath.Join(projectRoot, rel)
-	}
-	b, err := fileutil.ReadFile(path)
-	if err != nil {
-		return nil, errfmt.Errorf("vds: read spine profile %s: %w", path, err)
-	}
-	var p SpineProfile
-	if err := yaml.Unmarshal(b, &p); err != nil {
-		return nil, errfmt.Errorf("vds: parse spine profile: %w", err)
-	}
-	if len(p.Stages) == 0 {
-		return nil, errfmt.Errorf("vds: spine profile has no stages: %s", path)
-	}
-	return &p, nil
+	path := resolveProfilePath(projectRoot, relPath, DefaultSpineProfileRel)
+	return spineProfiles.Load(path, stampmemo.Of(path), func() (*SpineProfile, error) {
+		b, err := fileutil.ReadFile(path)
+		if err != nil {
+			return nil, errfmt.Errorf("vds: read spine profile %s: %w", path, err)
+		}
+		var p SpineProfile
+		if err := yaml.Unmarshal(b, &p); err != nil {
+			return nil, errfmt.Errorf("vds: parse spine profile: %w", err)
+		}
+		if len(p.Stages) == 0 {
+			return nil, errfmt.Errorf("vds: spine profile has no stages: %s", path)
+		}
+		return &p, nil
+	})
 }
 
 // LoadCustomization loads project customization; missing file yields empty prefs (not an error).
 func LoadCustomization(projectRoot, relPath string) (*Customization, string, error) {
-	rel := strings.TrimSpace(relPath)
-	if rel == "" {
-		rel = DefaultCustomizationProfileRel
-	}
-	path := rel
-	if !filepath.IsAbs(path) {
-		path = filepath.Join(projectRoot, rel)
-	}
-	b, err := fileutil.ReadFile(path)
-	if err != nil {
-		if fileutil.IsNotExist(err) {
-			return &Customization{}, path, nil
+	path := resolveProfilePath(projectRoot, relPath, DefaultCustomizationProfileRel)
+	cfg, err := customizations.Load(path, stampmemo.Of(path), func() (*Customization, error) {
+		b, err := fileutil.ReadFile(path)
+		if err != nil {
+			if fileutil.IsNotExist(err) {
+				return &Customization{}, nil
+			}
+			return nil, errfmt.Errorf("vds: read customization %s: %w", path, err)
 		}
-		return nil, path, errfmt.Errorf("vds: read customization %s: %w", path, err)
-	}
-	var c Customization
-	if err := yaml.Unmarshal(b, &c); err != nil {
-		return nil, path, errfmt.Errorf("vds: parse customization: %w", err)
-	}
-	return &c, path, nil
+		var c Customization
+		if err := yaml.Unmarshal(b, &c); err != nil {
+			return nil, errfmt.Errorf("vds: parse customization: %w", err)
+		}
+		return &c, nil
+	})
+	return cfg, path, err
 }
 
 // ResolveProfiles loads spine then customization path from spine (or defaults).

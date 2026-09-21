@@ -70,6 +70,12 @@ func (fr *FieldRegistry) memoStamp() stampmemo.Stamp {
 	return 0
 }
 
+// CacheStamp is the generation for closed-set caches derived from this registry
+// (SpecCacheRevision). Kind-keyed memos should use this as the stampmemo stamp.
+func (fr *FieldRegistry) CacheStamp() stampmemo.Stamp {
+	return fr.memoStamp()
+}
+
 func (fr *FieldRegistry) snapshot() (fieldRegistrySnapshot, bool) {
 	return fieldRegistryMemos.Peek(fr.memoKey(), fr.memoStamp())
 }

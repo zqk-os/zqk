@@ -3,6 +3,7 @@ package tray
 import (
 	"path/filepath"
 	"testing"
+	"time"
 
 	"github.com/zqk-os/zqk/pkg/datacell"
 	"github.com/zqk-os/zqk/pkg/paths"
@@ -92,6 +93,50 @@ entries:
 	}
 	if !containsName(entries, "scheduler-status") {
 		t.Fatal("expected default entries still present")
+	}
+}
+
+func TestLoad_reloadsWhenStampMoves(t *testing.T) {
+	tmp := t.TempDir()
+	zqkDir := filepath.Join(tmp, paths.ProjectDataDir)
+	if err := fileutil.EnsureDir(zqkDir); err != nil {
+		t.Fatal(err)
+	}
+	path := datacell.TrayYAMLPath(tmp)
+	write := func(name string) {
+		t.Helper()
+		content := `
+version: 1
+entries:
+  - name: ` + name + `
+    argv: [object, count]
+`
+		if err := fileutil.WriteSecureFile(path, []byte(content)); err != nil {
+			t.Fatal(err)
+		}
+	}
+	write("custom-one")
+	first, err := Load(tmp)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !containsName(first, "custom-one") {
+		t.Fatalf("missing custom-one: %#v", first)
+	}
+	write("custom-two")
+	later := time.Now().Add(2 * time.Second)
+	if err := fileutil.Chtimes(path, later, later); err != nil {
+		t.Fatal(err)
+	}
+	second, err := Load(tmp)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !containsName(second, "custom-two") {
+		t.Fatalf("expected reload after stamp move, got %#v", second)
+	}
+	if containsName(second, "custom-one") {
+		t.Fatal("stale custom-one still present after stamp move")
 	}
 }
 
