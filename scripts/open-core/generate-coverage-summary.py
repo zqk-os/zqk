@@ -56,13 +56,13 @@ def parse_coverage(coverprofile_path):
     return packages, files, total_stmts, covered_stmts
 
 
-def status_badge(pct):
+def status_indicator(pct):
     if pct >= 80.0:
-        return "🟢 High"
+        return "🟢", "High"
     elif pct >= 50.0:
-        return "🟡 Moderate"
+        return "🟡", "Medium"
     else:
-        return "🔴 Low"
+        return "🔴", "Low"
 
 
 def generate_markdown(title, packages, files, total_stmts, covered_stmts):
@@ -70,26 +70,28 @@ def generate_markdown(title, packages, files, total_stmts, covered_stmts):
         return f"### {title}\n\n*No test coverage data recorded.*"
 
     total_pct = (covered_stmts / total_stmts * 100.0) if total_stmts else 0.0
+    circle, label = status_indicator(total_pct)
 
     lines = []
     lines.append(f"### {title}")
-    lines.append(f"**Total Coverage:** `{total_pct:.1f}%` ({covered_stmts}/{total_stmts} statements) &nbsp; {status_badge(total_pct)}\n")
-    lines.append("| Package | Statements | Covered | Coverage | Health |")
-    lines.append("| :--- | :---: | :---: | :---: | :---: |")
+    lines.append(f"**Total Coverage:** `{total_pct:.1f}%` ({covered_stmts}/{total_stmts} statements) &nbsp; {circle} {label}\n")
+    lines.append("| Package | Statements | Covered | Coverage | Status | Level |")
+    lines.append("| :--- | :---: | :---: | :---: | :---: | :---: |")
 
     for pkg, (tot, cov) in sorted(packages.items()):
         pct = (cov / tot * 100.0) if tot else 0.0
-        badge = status_badge(pct)
-        lines.append(f"| `{pkg}` | {tot} | {cov} | **{pct:.1f}%** | {badge} |")
+        c, l = status_indicator(pct)
+        lines.append(f"| `{pkg}` | {tot} | {cov} | **{pct:.1f}%** | {c} | {l} |")
 
     # If there are multiple files, provide a collapsible file breakdown
     if len(files) > 1:
         lines.append("\n<details><summary><b>View detailed file breakdown</b></summary>\n")
-        lines.append("| File | Statements | Covered | Coverage |")
-        lines.append("| :--- | :---: | :---: | :---: |")
+        lines.append("| File | Statements | Covered | Coverage | Status | Level |")
+        lines.append("| :--- | :---: | :---: | :---: | :---: | :---: |")
         for fpath, (tot, cov) in sorted(files.items()):
             pct = (cov / tot * 100.0) if tot else 0.0
-            lines.append(f"| `{fpath}` | {tot} | {cov} | {pct:.1f}% |")
+            c, l = status_indicator(pct)
+            lines.append(f"| `{fpath}` | {tot} | {cov} | {pct:.1f}% | {c} | {l} |")
         lines.append("\n</details>\n")
 
     return "\n".join(lines) + "\n"
