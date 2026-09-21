@@ -2,13 +2,10 @@ package automation
 
 import (
 	"context"
-	"fmt"
-	"path/filepath"
 
 	"github.com/spf13/cobra"
 	"github.com/zqk-os/zqk/internal/cli"
 	"github.com/zqk-os/zqk/pkg/errfmt"
-	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/storage"
 )
 
@@ -138,8 +135,7 @@ func outputAuditSuccess(cmd *cobra.Command, projectRoot string) {
 		return
 	}
 
-	auditDir := filepath.Join(projectRoot, paths.ProcessAuditDir)
-	msg := fmt.Sprintf("Created lint bypass audit event in %s\n", auditDir)
+	msg := "Created lint bypass audit event\n"
 	//nolint:errcheck // Output errors are non-critical
 	_ = cli.WriteOutput(cmd, []byte(msg))
 }

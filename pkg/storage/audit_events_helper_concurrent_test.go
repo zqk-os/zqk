@@ -11,21 +11,28 @@ import (
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/storage/audit"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
+
+// File storage still requires .zqk/process. Audit events live on the stream overlay,
+// so creating audit.KindDir no longer creates that CAS folder as a side effect.
+func ensureProcessAndAuditDirs(t *testing.T, projectRoot string) {
+	t.Helper()
+	if err := fileutil.MkdirAll(filepath.Join(projectRoot, paths.ProcessDir), paths.DirPerm755); err != nil {
+		t.Fatalf("Failed to create process directory: %v", err)
+	}
+	if err := fileutil.MkdirAll(filepath.Join(audit.KindDir(projectRoot), "2030-01"), paths.DirPerm755); err != nil {
+		t.Fatalf("Failed to create audit directory: %v", err)
+	}
+}
 
 // TestCreateAuditEventWithBuilder_Concurrent tests that CreateAuditEventWithBuilder
 // can be called concurrently without causing concurrent map writes or panics
 func TestCreateAuditEventWithBuilder_Concurrent(t *testing.T) {
-	// Create a temporary test directory
 	tmpDir := t.TempDir()
-
-	// Create minimal project structure
 	projectRoot := tmpDir
-	auditDir := filepath.Join(tmpDir, paths.ProcessAuditDir, "2030-01")
-	if err := fileutil.MkdirAll(auditDir, paths.DirPerm755); err != nil {
-		t.Fatalf("Failed to create audit directory: %v", err)
-	}
+	ensureProcessAndAuditDirs(t, tmpDir)
 
 	// Create storage
 	storageFactory, err := NewStorageFactory(context.Background(), projectRoot)
@@ -100,10 +107,7 @@ func TestCreateAuditEventWithBuilder_Concurrent(t *testing.T) {
 func TestCreateAuditEventWithBuilder_ConcurrentIDGeneration(t *testing.T) {
 	tmpDir := t.TempDir()
 	projectRoot := tmpDir
-	auditDir := filepath.Join(tmpDir, paths.ProcessAuditDir, "2030-01")
-	if err := fileutil.MkdirAll(auditDir, paths.DirPerm755); err != nil {
-		t.Fatalf("Failed to create audit directory: %v", err)
-	}
+	ensureProcessAndAuditDirs(t, tmpDir)
 
 	storageFactory, err := NewStorageFactory(context.Background(), projectRoot)
 	if err != nil {
@@ -175,10 +179,7 @@ func TestCreateAuditEventWithBuilder_SessionID(t *testing.T) {
 	t.Parallel()
 	tmpDir := t.TempDir()
 	projectRoot := tmpDir
-	auditDir := filepath.Join(tmpDir, paths.ProcessAuditDir, "2030-01")
-	if err := fileutil.MkdirAll(auditDir, paths.DirPerm755); err != nil {
-		t.Fatalf("Failed to create audit directory: %v", err)
-	}
+	ensureProcessAndAuditDirs(t, tmpDir)
 
 	storageFactory, err := NewStorageFactory(context.Background(), projectRoot)
 	if err != nil {

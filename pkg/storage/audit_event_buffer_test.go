@@ -6,13 +6,13 @@ import (
 	"testing"
 	"time"
 
-	"github.com/zqk-os/zqk/pkg/paths"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"github.com/zqk-os/zqk/pkg/zqkenv"
 
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/pipeline"
+	"github.com/zqk-os/zqk/pkg/storage/audit"
 	"github.com/zqk-os/zqk/pkg/validation"
 	"github.com/zqk-os/zqk/pkg/zqktime"
 )
@@ -450,7 +450,7 @@ func TestAuditEventBuffer_Flush(t *testing.T) {
 		}
 	}
 	month := time.Now().UTC().Format("2006-01")
-	auditDir := filepath.Join(testRoot, paths.ProcessAuditDir, month)
+	auditDir := filepath.Join(audit.KindDir(testRoot), month)
 	entries, err := fileutil.ReadDir(auditDir)
 	if err != nil {
 		t.Fatalf("Failed to read audit directory: %v", err)

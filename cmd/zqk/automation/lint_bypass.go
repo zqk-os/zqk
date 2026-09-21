@@ -27,7 +27,7 @@ func NewLintBypassAuditCmd() *cobra.Command {
 		"when lint checks are bypassed, helping identify when lint warnings increase and",
 		"who is not taking time to resolve lint checks.",
 		"",
-		"The command creates an audit event in "+filepath.Join(paths.ProcessAuditDir, "YYYY-MM")+"/ with:",
+		"The command creates a stream-backed audit_event with:",
 		"  - Git user information (name and email)",
 		"  - Commit message",
 		"  - List of staged files",

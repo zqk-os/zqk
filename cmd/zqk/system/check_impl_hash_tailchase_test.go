@@ -241,7 +241,7 @@ previous_state:
 	}
 
 	// Check what objects were created
-	auditDir := filepath.Join(projectRoot, paths.ProcessAuditDir, month)
+	auditDir := filepath.Join(datacell.StreamCurrentKindDir(projectRoot, objects.KindAuditEvent), month)
 	//nolint:errcheck // Test cleanup - errors are acceptable
 	auditFiles, _ := fileutil.ReadDir(auditDir)
 	for _, file := range auditFiles {

@@ -10,6 +10,7 @@ import (
 	"github.com/spf13/cobra"
 
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/datacell"
 	"github.com/zqk-os/zqk/pkg/migration/parser"
 	"github.com/zqk-os/zqk/pkg/storage"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
@@ -29,7 +30,7 @@ func TestAutoFixMissingHash_BucketedObject(t *testing.T) {
 	projectRoot := filepath.Join(testRoot, "project")
 
 	// Create directory structure for bucketed audit_event
-	auditDir := filepath.Join(projectRoot, paths.ProcessAuditDir, "2026-01")
+	auditDir := filepath.Join(datacell.StreamCurrentKindDir(projectRoot, objects.KindAuditEvent), "2026-01")
 	if err := fileutil.MkdirAll(auditDir, paths.DirPerm755); err != nil {
 		t.Fatalf("Failed to create audit directory: %v", err)
 	}

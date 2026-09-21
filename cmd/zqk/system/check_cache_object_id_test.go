@@ -388,7 +388,7 @@ func TestUpdateObjectIDCache_NoOpForHighVolumeKind(t *testing.T) {
 	}
 
 	// High-volume kind: UpdateObjectIDCache must not add the entry
-	auditPath := filepath.Join(projectRoot, paths.ProcessAuditDir, "AUD-1.yaml")
+	auditPath := filepath.Join(datacell.StreamCurrentKindDir(projectRoot, objects.KindAuditEvent), "AUD-1.yaml")
 	_ = fileutil.MkdirAll(filepath.Dir(auditPath), paths.DirPerm755)
 	if err := UpdateObjectIDCache("AUD-1", "audit_event", auditPath); err != nil {
 		t.Fatalf("UpdateObjectIDCache (no-op) should not error: %v", err)
@@ -418,7 +418,7 @@ func TestObjectIDCache_BuildExcludesHighVolumeKinds(t *testing.T) {
 	}
 
 	criteriaDir := datacell.CellCASPrimaryDir(projectRoot, "criteria")
-	auditDir := filepath.Join(projectRoot, paths.ProcessAuditDir)
+	auditDir := datacell.StreamCurrentKindDir(projectRoot, objects.KindAuditEvent)
 	for _, dir := range []string{criteriaDir, auditDir} {
 		if err := fileutil.MkdirAll(dir, paths.DirPerm755); err != nil {
 			t.Fatalf("MkdirAll: %v", err)
