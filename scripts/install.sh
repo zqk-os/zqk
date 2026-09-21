@@ -52,6 +52,39 @@ resolve_latest() {
   fi
 }
 
+# Verify exactly one archive against checksums.txt. Multi-platform manifests list
+# files we did not download; do not skip unmatched checksum lines.
+_verify_archive_sha256() {
+  sums="$1"
+  archive="$2"
+  name=$(basename "$archive")
+  expected=$(awk -v n="$name" '
+    {
+      f=$NF
+      sub(/^\*/, "", f)
+      if (f == n) { print $1; found=1; exit }
+    }
+    END { if (!found) exit 1 }
+  ' "$sums") || {
+    echo "No SHA256 for ${name} in checksums.txt" >&2
+    exit 1
+  }
+  if command -v sha256sum >/dev/null 2>&1; then
+    actual=$(sha256sum "$archive" | awk '{print $1}')
+  elif command -v shasum >/dev/null 2>&1; then
+    actual=$(shasum -a 256 "$archive" | awk '{print $1}')
+  else
+    echo "Neither sha256sum nor shasum found; cannot verify checksum." >&2
+    exit 1
+  fi
+  expected=$(printf '%s' "$expected" | tr 'A-F' 'a-f')
+  actual=$(printf '%s' "$actual" | tr 'A-F' 'a-f')
+  if [ "$expected" != "$actual" ]; then
+    echo "Checksum mismatch for ${name}" >&2
+    exit 1
+  fi
+}
+
 # ---------------------------------------------------------------------------
 # Helper: install binary from GitHub Releases (public or private)
 # ---------------------------------------------------------------------------
@@ -75,30 +108,14 @@ install_binary() {
     curl -sSLf "${base_url}/${archive}" -o "${TMPDIR}/${archive}" || {
       echo "Binary release not found for ${ver}. Try ZQK_INSTALL_METHOD=source." >&2; exit 1
     }
-    curl -sSLf "${base_url}/checksums.txt" -o "${TMPDIR}/checksums.txt" 2>/dev/null || true
+    curl -sSLf "${base_url}/checksums.txt" -o "${TMPDIR}/checksums.txt" || {
+      echo "checksums.txt not found for ${ver}; refusing to install." >&2
+      exit 1
+    }
   fi
 
-  # Verify checksum if available
-  if [ -f "${TMPDIR}/checksums.txt" ]; then
-    echo "🔒 Verifying checksum..."
-    (
-      cd "$TMPDIR"
-      if command -v sha256sum >/dev/null 2>&1; then
-        sha256sum -c checksums.txt --ignore-missing || {
-          echo "❌ Checksum verification failed!" >&2
-          exit 1
-        }
-      elif command -v shasum >/dev/null 2>&1; then
-        shasum -a 256 -c checksums.txt --ignore-missing || {
-          echo "❌ Checksum verification failed!" >&2
-          exit 1
-        }
-      else
-        echo "❌ Neither sha256sum nor shasum found; cannot verify checksum." >&2
-        exit 1
-      fi
-    )
-  fi
+  echo "🔒 Verifying checksum..."
+  _verify_archive_sha256 "${TMPDIR}/checksums.txt" "${TMPDIR}/${archive}"
 
   echo "📦 Extracting..."
   tar -xzf "${TMPDIR}/${archive}" -C "$TMPDIR"

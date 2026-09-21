@@ -129,16 +129,34 @@ get_latest_version() {
 }
 
 # --- Checksum Verification ---
+# Verify exactly one archive against checksums.txt. Multi-platform manifests list
+# files we did not download; do not skip unmatched checksum lines.
 verify_checksum() {
     tarball="$1"
     checksums_file="$2"
+    name=$(basename "$tarball")
+
+    expected=$(awk -v n="$name" '
+        {
+            f=$NF
+            sub(/^\*/, "", f)
+            if (f == n) { print $1; found=1; exit }
+        }
+        END { if (!found) exit 1 }
+    ' "$checksums_file") || error "No SHA256 for ${name} in checksums.txt"
 
     if command_exists sha256sum; then
-        (cd "$(dirname "$tarball")" && sha256sum -c "$checksums_file" --ignore-missing >/dev/null 2>&1)
+        actual=$(sha256sum "$tarball" | awk '{print $1}')
     elif command_exists shasum; then
-        (cd "$(dirname "$tarball")" && shasum -a 256 -c "$checksums_file" --ignore-missing >/dev/null 2>&1)
+        actual=$(shasum -a 256 "$tarball" | awk '{print $1}')
     else
-        warn "Neither 'sha256sum' nor 'shasum' found. Skipping binary integrity check."
+        error "Neither 'sha256sum' nor 'shasum' found; cannot verify binary integrity."
+    fi
+
+    expected=$(printf '%s' "$expected" | tr 'A-F' 'a-f')
+    actual=$(printf '%s' "$actual" | tr 'A-F' 'a-f')
+    if [ "$expected" != "$actual" ]; then
+        error "Checksum mismatch for ${name}"
     fi
 }
 
@@ -167,12 +185,11 @@ main() {
     info "Downloading binary archive..."
 
     download_file "$DOWNLOAD_URL" "${TMP_DIR}/${TARBALL_NAME}" || error "Failed to download release archive from ${DOWNLOAD_URL}"
-    
-    # Attempt optional checksum download and verification
-    if download_file "$CHECKSUMS_URL" "${TMP_DIR}/checksums.txt" 2>/dev/null; then
-        info "Verifying SHA256 integrity..."
-        verify_checksum "${TMP_DIR}/${TARBALL_NAME}" "${TMP_DIR}/checksums.txt"
-    fi
+
+    info "Downloading SHA256 checksums..."
+    download_file "$CHECKSUMS_URL" "${TMP_DIR}/checksums.txt" || error "checksums.txt not found at ${CHECKSUMS_URL}; refusing to install."
+    info "Verifying SHA256 integrity..."
+    verify_checksum "${TMP_DIR}/${TARBALL_NAME}" "${TMP_DIR}/checksums.txt"
 
     info "Extracting payload..."
     tar -xzf "${TMP_DIR}/${TARBALL_NAME}" -C "$TMP_DIR"

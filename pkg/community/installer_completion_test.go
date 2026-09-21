@@ -3,19 +3,28 @@ package community
 import (
 	"bytes"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"testing"
 
 	"github.com/zqk-os/zqk/pkg/execwrap"
-	"github.com/zqk-os/zqk/pkg/paths"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
+
+func communityRepoRoot(t *testing.T) string {
+	t.Helper()
+	_, thisFile, _, ok := runtime.Caller(0)
+	if !ok {
+		t.Fatal("runtime.Caller")
+	}
+	return filepath.Clean(filepath.Join(filepath.Dir(thisFile), "..", ".."))
+}
 
 // TestInstaller_FunctionalAcceptance verifies the standalone install script and
 // multi-shell auto-completion capabilities across bash, zsh, and fish.
 // (CRIT-1789629268879699000-df0bf053 / BLI-1789629268879699000-f2d02b60)
 func TestInstaller_FunctionalAcceptance(t *testing.T) {
-	root := paths.ResolveProjectRoot(".")
+	root := communityRepoRoot(t)
 	installScript := filepath.Join(root, "scripts", "install.sh")
 
 	if !fileutil.Exists(installScript) {
@@ -48,6 +57,17 @@ func TestInstaller_FunctionalAcceptance(t *testing.T) {
 		if !strings.Contains(content, kw) {
 			t.Errorf("install.sh missing required keyword: %q", kw)
 		}
+	}
+	if strings.Contains(content, "--ignore-missing") {
+		t.Errorf("scripts/install.sh must fail closed on checksum miss")
+	}
+	rootInstall := filepath.Join(root, "install.sh")
+	rootBytes, err := fileutil.ReadFile(rootInstall)
+	if err != nil {
+		t.Fatalf("failed reading root install.sh: %v", err)
+	}
+	if strings.Contains(string(rootBytes), "--ignore-missing") {
+		t.Errorf("install.sh must fail closed on checksum miss")
 	}
 
 	// Test multi-shell completion generation using built zqk binary if available,
@@ -108,7 +128,7 @@ func TestInstaller_FunctionalAcceptance(t *testing.T) {
 // error handling, and invalid inputs in installer logic and CLI completion.
 // (CRIT-1789629268879700000-5971f74b / BLI-1789629268879699000-f2d02b60)
 func TestInstaller_BoundaryAndErrorHandling(t *testing.T) {
-	root := paths.ResolveProjectRoot(".")
+	root := communityRepoRoot(t)
 	zqkBin := filepath.Join(root, "bin", "zqk")
 
 	var runCmd func(args ...string) (string, error)
@@ -160,7 +180,7 @@ func TestInstaller_BoundaryAndErrorHandling(t *testing.T) {
 // and stranger first-run experience in an isolated temporary directory.
 // (CRIT-1789629268879701000-09f5a56b / BLI-1789629268879699000-f2d02b60)
 func TestInstaller_IntegrationAndConformance(t *testing.T) {
-	root := paths.ResolveProjectRoot(".")
+	root := communityRepoRoot(t)
 	zqkBin := filepath.Join(root, "bin", "zqk")
 
 	if !fileutil.Exists(zqkBin) {
